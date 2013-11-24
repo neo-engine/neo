@@ -1,0 +1,73 @@
+@@Prerelease Builds@@
+@Raging Gyarados[WIP]@
+ - Speichern von Spielständen (ô)
+ - Pokémon-Datenstruktur (+)
+ - Rudimentäre variabel-breite Schrift (+)
+ - PokéDex (ô)
+ - PokéDex: Pokémon-Bases (+)
+ - PokéDex: Dex-Einträge (+)
+ - PokéDex / Pokémon-Screen: Pokémon-Sprites [m/w] (+)
+ - PokéDex / Pokémon-Screen: Pokémon-Sprites [shiny][m/w] (+)
+ - PokéDex: sp. Formen (+)
+#! N3Dlib entfernt (-)
+ - Emulator-Version (+); extrem langsam bei DeSmuME
+
+@Waiting Suicune [2013-08-01]@
+ - PKMNMenuSprites (+)
+ - (Fee-Typ-Unterstützung hinzugefügt (^))
+ - Speichern von Spielständen (ô)
+ - Textgeschwindigkeit einstellbar (Naja fast) (+)
+
+ - SubScreen (^)
+ - PKMNSubScreen: Ladezeit stark reduziert (^)
+ - PKMNSubScreen: Pokémondaten sind jetzt lesbar... (^) 
+
+ - Beutel (+)
+ - Beutel: Item von PKMN tauschen (+)
+ - Beutel: PKMN Item geben (+)
+
+ - PokéDex / PokéBox funktioniert jetzt (zumindest teilweise) (^)
+ - PokéNav-Skin hinzugefügt (+) {Waiting Suicune}
+ - PokéNav-Skin hinzugefügt (+) {Fighting Groudon}
+ - PokéNav-Skin hinzugefügt (+) {Fighting Kyogre}
+ - PokéNav-Skins werden von ROM geladen (^) {liegen nicht mehr im RAM}
+ - Weltkarten (^) {an HGSS angepasst}
+ - Weltkarten-Info (+) {Hoenn}
+
+@Mystic Guardevoir [2013-07-01]@
+ - SubScreen (^) {SubSprites}
+ - PKMN-Box Struktur (+)
+ - PKMNScreen (+)
+ - PKMNSubScreen (+)
+ - TitleScreen (^)
+ - Speichern von Spielständen (ô)
+ - PokéNav-Skin hinzugefügt (+) {Mystic Guardevoir}
+
+@Sleeping Eevee [2013-06-01]@
+ - SubScreen (+)
+ - erste Kartenfunktion (+)
+ - erster PokeDex (+)
+ - PKMNEngine (^)
+ - TitleScreen (+)
+ - NewGame-Dialog (+)
+ - Speichern von "Spielständen" (+)
+ - PokéNav-Skin hinzugefügt (+) {Sleeping Eevee}
+
+@0.01 [2013-02-15]@
+ - PKMNEngine (+)
+
+@Einstellung der Arbeit am GBA-Vorbild [2012-10-x]@
+
+@Projektbeginn [2012-10-x]@
+ - Idee (^)
+
+ 
+@@Legende@@
+@...@ - Build-Title
+[...] - Fertigstellung
+(+) - neu hinzugefügt
+(^) - geupdatet
+(ô) - geupdatet, keine Abwärtskompatibilität
+(-) - entfernt
+(v) - gedowngradet
+(F) - fertig

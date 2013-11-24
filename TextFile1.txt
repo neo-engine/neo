@@ -1,0 +1,24 @@
+Pic's Sources
+
+~shivanking [dA] (Hoenn Map)
+
+PokéNav-Screens
+~SchnitzelLion [dA] (Groudon,Kyogre)
+meh707 [PPorg] (Guardevoir,Suicune)
+evilsbrother [PPorg] (Lucario)
+
+Special Thanks
+
+Peter Schraut (N3D)
+Michael Noland (libnds)
+Jason Rogers (libnds)
+Dave Murpy (libnds)
+Rafael Vuijk
+Alexei Karpenko
+Bjarne Stroustrup (C++)
+
+Satoshi Tajiri
+Ken Sugimori
+Junichi Masuda 
+
+(Nintendo)

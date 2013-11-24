@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\ability.h" />
+    <ClInclude Include="include\attack.h" />
+    <ClInclude Include="include\bag.h" />
+    <ClInclude Include="include\battle.h" />
+    <ClInclude Include="include\berry.h" />
+    <ClInclude Include="include\font_data.h" />
+    <ClInclude Include="include\Map_Obj.h" />
+    <ClInclude Include="include\nitrofs.h" />
+    <ClInclude Include="include\item.h" />
+    <ClInclude Include="include\keyboard.h" />
+    <ClInclude Include="include\Map.h" />
+    <ClInclude Include="include\mbox.h" />
+    <ClInclude Include="include\n3dsampleframework.h" />
+    <ClInclude Include="include\nsbmd.h" />
+    <ClInclude Include="include\PKMN.h" />
+    <ClInclude Include="include\print.h" />
+    <ClInclude Include="include\savgm.h" />
+    <ClInclude Include="include\scrnloader.h" />
+    <ClInclude Include="include\sprite.h" />
+    <ClInclude Include="include\type.h" />
+    <ClInclude Include="include\unistd.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\ability.cpp" />
+    <ClCompile Include="source\attack.cpp" />
+    <ClCompile Include="source\Bag.cpp" />
+    <ClCompile Include="source\battle.cpp" />
+    <ClCompile Include="source\Box.cpp" />
+    <ClCompile Include="source\font_data.cpp" />
+    <ClCompile Include="source\hex2dec.c" />
+    <ClCompile Include="source\item.cpp" />
+    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Map.cpp" />
+    <ClCompile Include="source\maploader.cpp" />
+    <ClCompile Include="source\Map_Obj.cpp" />
+    <ClCompile Include="source\mbox.cpp" />
+    <ClCompile Include="source\n3dsampleframework_nds.cpp" />
+    <ClCompile Include="source\options.cpp" />
+    <ClCompile Include="source\PKMN.cpp" />
+    <ClCompile Include="source\print.cpp" />
+    <ClCompile Include="source\savgm.cpp" />
+    <ClCompile Include="source\nitrofs.c" />
+    <ClCompile Include="source\scrnloader.cpp" />
+    <ClCompile Include="source\sprite.cpp" />
+    <ClCompile Include="source\type.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{516845C0-8C30-4C35-80DF-F3ED8E61213B}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeBuildCommandLine>make 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeBuildCommandLine>
+    <NMakeOutput>P-Emerald_2.nds</NMakeOutput>
+    <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>make rebuild 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>ARM7;ARM9;WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\include;C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\build\;C:\devkitPro\libnds\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <ExecutablePath>C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2;$(ExecutablePath)</ExecutablePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakeBuildCommandLine>make</NMakeBuildCommandLine>
+    <NMakeOutput>P-Emerald_2.exe</NMakeOutput>
+    <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>make rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>ARM7;ARM9;WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>C:\devkitPro\libnds\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
