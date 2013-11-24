@@ -35,9 +35,9 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
-.opensdf
-.sdf
-.suo
-.lnk
+*.opensdf
+*.sdf
+*.suo
+*.lnk
 
 P-Emerald_2/build/
