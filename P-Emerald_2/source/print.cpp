@@ -5,12 +5,12 @@
 #include "mbox.h"
 
 namespace font{
-    void putrec(int x1,int y1,int x2,int y2, bool bottom,bool striped){
+    void putrec(int x1,int y1,int x2,int y2, bool bottom,bool striped,int color){
         for(int x = x1; x <= x2; ++x) for(int y = y1; y < y2; ++y)
             if(bottom)
-                ((Color *)BG_BMP_RAM_SUB(1))[(x + y * SCREEN_WIDTH)/2] = !striped ? (((u8)42) << 8 ) | ((u8)42) : 42;
+                ((Color *)BG_BMP_RAM_SUB(1))[(x + y * SCREEN_WIDTH)/2] = !striped ? (((u8)color) << 8 ) | ((u8)color) : color;
             else
-                ((Color *)BG_BMP_RAM(1))[(x + y * SCREEN_WIDTH)/2] = !striped ? (((u8)42) << 8 ) | ((u8)42) : 42;
+                ((Color *)BG_BMP_RAM(1))[(x + y * SCREEN_WIDTH)/2] = !striped ? (((u8)color) << 8 ) | ((u8)color) : color;
     }
     Font::Font(u8 *the_data, u8 *the_widths) {
         data = the_data;

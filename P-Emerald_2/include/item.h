@@ -34,6 +34,7 @@ public:
     bool load;
     std::string getDisplayName();
     std::string getDescription();
+    std::string getShortDescription();
     EFFEKT getEffekt();
     ITEM_TYPE getItemType();
     int getPrice();

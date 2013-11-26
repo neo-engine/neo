@@ -6,7 +6,7 @@ namespace font{
     #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
     const u8 SCREEN_TOP = 1;
     const u8 SCREEN_BOTTOM = 0;
-    void putrec(int x1,int y1,int x2,int y2, bool bottom = true, bool striped = false);
+    void putrec(int x1,int y1,int x2,int y2, bool bottom = true, bool striped = false,int color = 42);
 
     class Font{
     public:

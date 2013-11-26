@@ -214,6 +214,40 @@ std::string berry::getDescription2(){
     return s;
 }
 
+std::string item::getShortDescription(){
+    std::stringstream FILENAME;
+    FILENAME << ITEM_PATH << this->Name << ".data";
+    FILE* f = fopen(FILENAME.str().c_str(),"r");
+    if(f == 0)
+        return "FEHLER";
+    //this->itemtype = BERRIES;
+    int ac;
+    fscanf(f,"%i",&ac);
+    //this->effekt = item::EFFEKT(ac);
+    //fscanf(f,"%i\n",&(this->price));
+    fscanf(f,"%i",&ac);
+    /*this->displayName = */readString(f);
+    /*this->dscrpt = "  "+ */readString(f);
+    /*this->effekt_script = */readString(f);
+
+    fscanf(f,"%hi",&(ac));
+    fscanf(f,"%i",&ac);
+    //this->Guete = berry::Guete_Type(ac);
+    fscanf(f,"%i",&ac);
+    //this->BeerenKr_Type = Type(ac);
+    fscanf(f,"%hhu",&(ac));
+    for(int i= 0; i< 5; ++i)
+        fscanf(f,"%hhu",&(ac));
+    fscanf(f,"%hhu",&(ac));
+    fscanf(f,"%hhu",&(ac));
+    fscanf(f,"%hhu\n",&(ac));
+    
+    readString(f);
+    std::string s = readString(f);
+    fclose(f);
+    return s;
+}
+
 item ItemList[700] = {
     item("Null"),
     ball("Meisterball"),    ball("Hyperball"),

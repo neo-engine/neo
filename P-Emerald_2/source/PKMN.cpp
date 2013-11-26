@@ -651,14 +651,28 @@ namespace POKEMON{
             this->_status.Asleep = this->_status.Burned = this->_status.Frozen = this->_status.Paralyzed = this->_status.Poisoned = this->_status.Toxic = false;
         }
 
+        void setDefaultConsoleTextColors(u16* palette,int start = 1){
+            palette[start * 16 - 1] = RGB15(0,0,0); //30 normal black
+            palette[start * 16 - 1] = RGB15(15,0,0); //31 normal red
+            palette[start * 16 - 1] = RGB15(0,15,0); //32 normal green
+            palette[start * 16 - 1] = RGB15(15,15,0); //33 normal yellow
+            
+            palette[start * 16 - 1] = RGB15(0,0,15); //34 normal blue
+            palette[start * 16 - 1] = RGB15(15,0,15); //35 normal magenta
+            palette[start * 16 - 1] = RGB15(0,15,15); //36 normal cyan
+            palette[start * 16 - 1] = RGB15(24,24,24); //37 normal white
+        }
+
     void PKMN::drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom)
     {
         loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","ClearD");
         //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
         dmaCopy( PKMNInfoScreenBitmap, bgGetGfxPtr(bg3), 256*256 );
-        dmaCopy( PKMNInfoScreenPal, BG_PALETTE, 96*2); 
+        dmaCopy( PKMNInfoScreenPal, BG_PALETTE, 256*2); 
+        setDefaultConsoleTextColors(BG_PALETTE,5);
 
         consoleSelect(Top);	
+        consoleSetWindow(Top, 0,0,32,24);
         consoleClear();	
         consoleSelect(Bottom);
         consoleClear();
@@ -669,33 +683,23 @@ namespace POKEMON{
         updateOAMSub(oam);
 
         consoleSetWindow(Top, 20,1,13,2);
-        printf("\x1b[33m");
+        printf("\x1b[36m");
         wprintf(&(this->boxdata.Name[0]));
         int G = this->boxdata.gender(),a2 = 0,b2= 0,c2 =0;
-        printf("\x1b[39m");
 
         if(G==0)
-            printf("/\n (");
+            printf("\n (");
         else if (G == 1)
-            printf("\x1b[37m"" %c\x1b[39m/\n (",141);
+            printf("\x1b[34m""%c\x1b[36m\n (",141);
         else
-            printf("\x1b[34m"" %c\x1b[39m/\n (",147);
+            printf("\x1b[32m""%c\x1b[36m\n (",147);
         PKMNDATA::getAll(this->boxdata.SPEC,data);
         printf(PKMNDATA::getDisplayName(this->boxdata.SPEC));
-        printf(")");
+        printf(")\x1b[39m/");
         consoleSetWindow(Top, 7,21,30,4);
         printf(ItemList[this->boxdata.getItem()].getDisplayName().c_str());
         if(this->boxdata.getItem()){
-            std::string des = ItemList[this->boxdata.getItem()].getDescription();
-            printf(": "); bool b = true;
-            for(std::string::iterator SI = des.begin(); SI != des.end(); SI++)
-                if((*SI) != '\n')
-                    printf("%c",(*SI));
-                else{
-                    if(b)
-                        printf("\n");
-                    b = !b;
-                }
+            printf("\n%s",ItemList[this->boxdata.getItem()].getDescription().c_str());
             drawItemIcon(oamTop,spriteInfoTop,ItemList[this->boxdata.getItem()].Name,0,152,a2,b2,c2,false);
         }
         //consoleSetWindow(Top, 14,3,18,21);
@@ -714,18 +718,25 @@ namespace POKEMON{
         case 0: 
             consoleSetWindow(Top, 5,1,20,2);
             printf("Pokemon-Info");
-        //    cust_font.print_string("POK\x7B""MON-INFO",2,1,2,false);
-        //    printf("\x1b[34m""KP.\x1b[37m     %hi""/%hi\n%3hi""/31,%3hi""/255\n\n",stats.acHP,stats.maxHP,
-        //        boxdata.IV.get(0),boxdata.EV[0]);
-        //    printf("\x1b[34m""Angr.\x1b[37m   %3hi\n%hi""/31,%3hi""/255\n\n",stats.Atk,boxdata.IV.get(1),boxdata.EV[1]);
-        //    printf("\x1b[34m""Vert.\x1b[37m   %3hi\n%hi""/31,%3hi""/255\n\n",stats.Def,boxdata.IV.get(2),boxdata.EV[2]);
-        //    printf("\x1b[34m""SpAngr.\x1b[37m %3hi\n%hi""/31,%3hi""/255\n\n",stats.SAtk,boxdata.IV.get(4),boxdata.EV[4]);
-        //    printf("\x1b[34m""SpVert.\x1b[37m %3hi\n%hi""/31,%3hi""/255\n\n",stats.SDef,boxdata.IV.get(5),boxdata.EV[5]);
-        //    printf("\x1b[34m""Init.\x1b[37m   %3hi\n%hi""/31,%3hi""/255\n\n",stats.Spd,boxdata.IV.get(3),boxdata.EV[3]);
-        //    printf("\x1b[34m""Gesamt\x1b[37m\n %3hi""/186,%3hi""/510",
-        //        boxdata.IV.get(0)+boxdata.IV.get(1)+boxdata.IV.get(2)+boxdata.IV.get(3)+boxdata.IV.get(4)+boxdata.IV.get(5),
-        //        boxdata.EV[0]+boxdata.EV[1]+boxdata.EV[2]+boxdata.EV[3]+boxdata.EV[4]+boxdata.EV[5]);		
-        //    printf("\x1b[39m");
+            
+            consoleSetWindow(Top, 16,6,32,24);
+            printf("KP           %3i\n\n\n",stats.maxHP);
+            printf("ANG          %3i\n\n",stats.Atk);
+            printf("VER          %3i\n\n",stats.Def);
+            printf("INI          %3i\n\n",stats.Spd);
+            printf("SAN          %3i\n\n",stats.SAtk);
+            printf("SVE          %3i\n\n",stats.SDef);
+            
+            font::putrec(158,46,158+68,46+12,false,false,4*16-1);
+            
+            font::putrec(158,46,158+int(68.0*boxdata.IV.get(0)/31),46+6,false,false,7*16-1);
+            font::putrec(158,46+6,158+int(68.0*boxdata.EV[0]/255),46+12,false,false,7*16-1);
+
+            for(int i= 1; i < 6; ++i){
+                font::putrec(158,54+(16*i),158+68,54+12+(16*i),false,false,4*16-1);
+                font::putrec(158,54+(16*i),158+int(68.0*boxdata.IV.get(i)/31),54+6+(16*i),false,false,(7+i)*16-1);
+                font::putrec(158,54+6+(16*i),158+int(68.0*boxdata.EV[i]/255),54+12+(16*i),false,false,(7+i)*16-1);
+            }
             break;
         case 1:
             {		
