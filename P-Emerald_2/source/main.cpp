@@ -83,7 +83,7 @@ enum GameMod{
     BETA,
     RELEASE,
     EMULATOR
-} gMod = ALPHA;
+} gMod = DEVELOPER;
 std::string CodeName = "Raging Gyarados";
 
 int bg3sub;

@@ -11,7 +11,6 @@
 
 #include "attack.h"
 #include "PKMNInfoScreen.h"
-#include "PKMNInfoScreenBottom.h"
 #include "ability.h"
 #include "item.h"
 #include "berry.h"

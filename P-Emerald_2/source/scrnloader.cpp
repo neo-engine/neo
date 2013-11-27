@@ -545,7 +545,7 @@ int borders[6][2] = {
 extern SpriteInfo spriteInfo[SPRITE_COUNT];
 extern OAMTable *oam;
 
-void initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
+int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     static const int BYTES_PER_16_COLOR_TILE = 32;
     static const int COLORS_PER_PALETTE = 16;
     static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
@@ -1268,6 +1268,7 @@ void initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
 
     nextAvailableTileIdx += ChSq_bTilesLen / BYTES_PER_16_COLOR_TILE;
     ++palcnt;
+    return nextAvailableTileIdx;
 }
 void setMainSpriteVisibility(bool hidden){
     for(int i = PKMN_ID; i<= NAV_ID; ++i)

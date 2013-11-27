@@ -134,6 +134,8 @@ inline void setSpritePriority(SpriteEntry* spriteEntry,ObjPriority priority){
     spriteEntry->priority = priority;
 }
 
+
+//deprecated
 void initTypes(OAMTable * oam, SpriteInfo *spriteInfo,Type T1, Type T2) {
     
     static const int BYTES_PER_16_COLOR_TILE = 32;

@@ -93,6 +93,8 @@ bool loadPKMNSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const
 bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX,
                     const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny = false,bool female = false,bool flipx = false);
 
+void drawTypeIcon (OAMTable *oam, SpriteInfo * spriteInfo, int& oamIndex, int& palcnt, int & nextTile, Type t ,int x,int y, bool bottom);
+
 extern std::string bagnames[8];
 class scrnloader{
 private:

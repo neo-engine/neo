@@ -77,4 +77,4 @@ inline void setSpritePriority(SpriteEntry* spriteEntry,ObjPriority priority);
 
 //Some specific things
 void initTypes(OAMTable * oam, SpriteInfo *spriteInfo,Type T1, Type T2);
-void initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo);
+int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo);

@@ -39,12 +39,7 @@ int drawBox(short PkmnInd)
     consoleSetWindow(&Top,0,0,SCREEN_WIDTH/8,SCREEN_HEIGHT/8);
     consoleSelect(&Top);	
     consoleClear();	
-    // Load bitmap to bottom background
-    if(!POKEMON::drawInfoSub(bgGetGfxPtr(bg3sub), PkmnInd+1))
-    {
-        dmaCopy( PKMNInfoScreenBottomBitmap, bgGetGfxPtr(bg3sub), 256*256 );
-        dmaCopy( PKMNInfoScreenBottomPal, BG_PALETTE_SUB, 256*2); 
-    }
+
     consoleSelect(&Bottom);
     consoleClear();
     

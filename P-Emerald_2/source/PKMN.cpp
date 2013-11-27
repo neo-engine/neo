@@ -665,7 +665,6 @@ namespace POKEMON{
 
     void PKMN::drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom)
     {
-        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","ClearD");
         //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
         dmaCopy( PKMNInfoScreenBitmap, bgGetGfxPtr(bg3), 256*256 );
         dmaCopy( PKMNInfoScreenPal, BG_PALETTE, 256*2); 
@@ -742,15 +741,27 @@ namespace POKEMON{
             {		
                 consoleSetWindow(Top, 5,1,20,2);
                 printf("Attacken");	
-        //        cust_font.print_string("ATTACKEN",2,1,4,false);
-        //        for (int i = 0; i < 4; i++)
-        //        {
-        //            if(this->boxdata.Attack[i] == 0)
-        //                break;
-        //            printf("\x1b[34m""%s\x1b[37m %i""/""%i\n",
-        //                &(AttackList[this->boxdata.Attack[i]].Name[0]),this->boxdata.AcPP[i],AttackList[this->boxdata.Attack[i]].PP* ((5 +this->boxdata.PPUps[i]) / 5));
-        //            printf("%s\n\n",TypeList[(int)AttackList[this->boxdata.Attack[i]].type].c_str());
-        //        }
+                
+                consoleSetWindow(Top, 16,5,32,24);
+                for (int i = 0; i < 4; i++)
+                {
+                    if(this->boxdata.Attack[i] == 0)
+                        break;
+                    Type t = AttackList[this->boxdata.Attack[i]].type;
+                    drawTypeIcon(oamTop,spriteInfoTop,a2,b2,c2,t,126,43+32*i,false);
+
+                    if(t == data.Types[0] || t == data.Types[1])
+                        printf("\x1b[32m");
+
+                    printf("    %s\n    AP %2i""/""%2i %s\n    S %3i  G %3i",
+                        &(AttackList[this->boxdata.Attack[i]].Name[0]),this->boxdata.AcPP[i],
+                        AttackList[this->boxdata.Attack[i]].PP* ((5 +this->boxdata.PPUps[i]) / 5),
+                        "STS",AttackList[this->boxdata.Attack[i]].Base_Power,
+                        AttackList[this->boxdata.Attack[i]].Accuracy);
+                    printf("\n\n");
+                    updateOAM(oamTop);
+                    printf("\x1b[39m");
+                }
                 break;
             }
         case 2:
@@ -761,11 +772,43 @@ namespace POKEMON{
             return;
         }
     
-        //consoleSelect(Bottom);	
+        consoleSelect(Bottom);	
+        printf("\x1b[32m");
+        oam->oamBuffer[13].isHidden = false;
+        oam->oamBuffer[14].isHidden = false;
+        oam->oamBuffer[14].y = 196 - 28 - 24;
+        oam->oamBuffer[13].x = 256 - 28 - 24;
+        oam->oamBuffer[13].y = 196 - 28 + 4;
+        oam->oamBuffer[14].x = 256 - 28 + 4;
+        int o2s = 50,p2s = 2,t2s = 716;
+        if(data.Types[0] == data.Types[1]){
+            drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[0],256-50,24,true);
+            oam->oamBuffer[++o2s].isHidden = true;
+        }
+        else{
+            drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[0],256-68,24,true);
+            drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[1],256-32,24,true);
+        }
+        drawItemIcon(oam,spriteInfo,"Pokeball",256-100,0,o2s,p2s,t2s,true);
+        
+        oam->oamBuffer[15].isHidden = false;
+        oam->oamBuffer[15].y = 0;
+        oam->oamBuffer[15].x = 256-96;
+        oam->oamBuffer[16].isHidden = false;
+        oam->oamBuffer[16].y = 0;
+        oam->oamBuffer[16].x = 256-32;
+        updateOAMSub(oam);
 
-        //initOAMTableSub(oam);
-        //initTypes(oam, spriteInfo,data.Types[0],data.Types[1]);
-        //updateOAMSub(oam);
+        consoleSetWindow(Bottom,23,1,20,5);
+        if(this->boxdata.isShiny()){
+            printf("\x1b[39m""#%03i*\x1b[32m ",this->boxdata.SPEC);
+        }
+        else
+            printf("#%03i  ",this->boxdata.SPEC);
+
+        if(this->boxdata.PKRUS){
+            printf("PKRS");
+        }
 
         //printf("\x1b[32");
 
@@ -830,11 +873,7 @@ namespace POKEMON{
         //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
         dmaCopy( PKMNInfoScreenBitmap, bgGetGfxPtr(bg3), 256*256 );
         dmaCopy( PKMNInfoScreenPal, BG_PALETTE, 96*2); 
-
-        // Load bitmap to bottom background
-        dmaCopy( PKMNInfoScreenBottomBitmap, bgGetGfxPtr(bg3sub), 256*256 );
-        dmaCopy( PKMNInfoScreenBottomPal, BG_PALETTE_SUB, 32); 
-
+        
         consoleSetWindow(&Bottom,0,0,32,24);
         consoleSelect(&Top);
         consoleClear();
@@ -954,7 +993,7 @@ namespace POKEMON{
 
     bool PKMN::BOX_PKMN::isShiny()
     {
-        return ((this->ID^this->SID)^((PID>>16)^(PID%(1<<16))))<8;
+        return (((this->ID^this->SID)>>3)^(((PID>>16)^(PID%(1<<16))))>>3) == 0;
     }
     bool PKMN::BOX_PKMN::isCloned()
     {
