@@ -642,11 +642,11 @@ namespace POKEMON{
                 stats.acHP = stats.maxHP = 1;
         
             Natures nature = this->boxdata.getNature();
-            stats.Atk = ((boxdata.IV.Attack+2*data.Bases[1]+(boxdata.EV[1]/4)*level/100)+5)*NatMod[nature][0];
-            stats.Def = ((boxdata.IV.Defense+2*data.Bases[2]+(boxdata.EV[1]/4)*level/100)+5)*NatMod[nature][1];
-            stats.Spd = ((boxdata.IV.Speed+2*data.Bases[3]+(boxdata.EV[1]/4)*level/100)+5)*NatMod[nature][2];
-            stats.SAtk = ((boxdata.IV.SAttack+2*data.Bases[4]+(boxdata.EV[1]/4)*level/100)+5)*NatMod[nature][3];
-            stats.SDef = ((boxdata.IV.SDefense+2*data.Bases[5]+(boxdata.EV[1]/4)*level/100)+5)*NatMod[nature][4];
+            stats.Atk = (((boxdata.IV.Attack+2*data.Bases[1]+(boxdata.EV[1]>>2))*level/100.0)+5)*NatMod[nature][0];
+            stats.Def = (((boxdata.IV.Defense+2*data.Bases[2]+(boxdata.EV[2]>>2))*level/100.0)+5)*NatMod[nature][1];
+            stats.Spd = (((boxdata.IV.Speed+2*data.Bases[3]+(boxdata.EV[3]>>2))*level/100.0)+5)*NatMod[nature][2];
+            stats.SAtk = (((boxdata.IV.SAttack+2*data.Bases[4]+(boxdata.EV[4]>>2))*level/100.0)+5)*NatMod[nature][3];
+            stats.SDef = (((boxdata.IV.SDefense+2*data.Bases[5]+(boxdata.EV[5]>>2))*level/100.0)+5)*NatMod[nature][4];
 
             this->_status.Asleep = this->_status.Burned = this->_status.Frozen = this->_status.Paralyzed = this->_status.Poisoned = this->_status.Toxic = false;
         }
