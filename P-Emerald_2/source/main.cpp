@@ -1010,7 +1010,7 @@ START:
                     for(int i = 0;i<6;++i)
                     {
                         POKEMON::PKMN a(A,HILFSCOUNTER,0,
-                        1+rand()%100,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,false,true,rand()%2,true,rand()%2,false,HILFSCOUNTER,0,0);
+                        1+rand()%100,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,false,true,rand()%2,true,rand()%2,false,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;
                         a.stats.acHP = i*a.stats.maxHP/5;
                         SAV.PKMN_team.push_back(a);
@@ -1033,6 +1033,7 @@ START:
                     SAV.Bag.addItem(ItemList[j].itemtype,j,(rand()%999) +1);
                 break;
             case 2:
+                SAV.PKMN_team[0].boxdata.exp += 100;
                 mbox(item(),42);
                 mbox(berry("Ginemabeere"),31);
             }

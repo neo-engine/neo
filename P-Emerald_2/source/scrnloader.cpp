@@ -887,7 +887,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     Fwd->size = OBJSIZE_32;
     Fwd->gfxIndex = nextAvailableTileIdx;
     nextAvailableTileIdx += ForwardTilesLen / BYTES_PER_16_COLOR_TILE;
-    Fwd->priority = OBJPRIORITY_2;
+    Fwd->priority = OBJPRIORITY_1;
     Fwd->palette = palcnt;
 
     
@@ -919,7 +919,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     Bwd->size = OBJSIZE_32;
     Bwd->gfxIndex = nextAvailableTileIdx;
     nextAvailableTileIdx += BackwardTilesLen / BYTES_PER_16_COLOR_TILE;
-    Bwd->priority = OBJPRIORITY_2;
+    Bwd->priority = OBJPRIORITY_1;
     Bwd->palette = palcnt;
 
     
@@ -1049,7 +1049,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     Bo4->x = 192;
     Bo4->size = OBJSIZE_64;
     Bo4->gfxIndex = nextAvailableTileIdx;
-    Bo4->priority = OBJPRIORITY_2;
+    Bo4->priority = OBJPRIORITY_1;
     Bo4->palette = palcnt;
     Bo4->vFlip = false;
     Bo4->hFlip = false;
@@ -1091,7 +1091,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     Bo3->x = 128;
     Bo3->size = OBJSIZE_64;
     Bo3->gfxIndex = nextAvailableTileIdx;
-    Bo3->priority = OBJPRIORITY_2;
+    Bo3->priority = OBJPRIORITY_1;
     Bo3->palette = palcnt;
     Bo3->vFlip = false;
     Bo3->hFlip = false;
@@ -1132,7 +1132,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     Bo2->x = 64;
     Bo2->size = OBJSIZE_64;
     Bo2->gfxIndex = nextAvailableTileIdx;
-    Bo2->priority = OBJPRIORITY_2;
+    Bo2->priority = OBJPRIORITY_1;
     Bo2->palette = palcnt;
     Bo2->vFlip = false;
     Bo2->hFlip = false;
@@ -1173,7 +1173,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     Bo1->x = 0;
     Bo1->size = OBJSIZE_64;
     Bo1->gfxIndex = nextAvailableTileIdx;
-    Bo1->priority = OBJPRIORITY_2;
+    Bo1->priority = OBJPRIORITY_1;
     Bo1->palette = palcnt;
     Bo1->vFlip = false;
     Bo1->hFlip = false;
@@ -1268,6 +1268,65 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
 
     nextAvailableTileIdx += ChSq_bTilesLen / BYTES_PER_16_COLOR_TILE;
     ++palcnt;
+
+    SpriteInfo * ButtonInfo = &spriteInfo[90];
+    SpriteEntry * Button = &oam->oamBuffer[90];
+    ButtonInfo->oamId = 90;
+    ButtonInfo->width = 32;
+    ButtonInfo->height = 32;
+    ButtonInfo->angle = 0;
+    ButtonInfo->entry = Button;
+    Button->y = 0;
+    Button->isRotateScale = false;
+    Button->blendMode = OBJMODE_NORMAL;
+    Button->colorMode = OBJCOLOR_16;
+    Button->shape = OBJSHAPE_SQUARE;
+    Button->isHidden = true;
+    Button->x = 0;
+    Button->size = OBJSIZE_32;
+    Button->gfxIndex = nextAvailableTileIdx;
+    Button->priority = OBJPRIORITY_0;
+    Button->palette = palcnt;
+    
+    Button = &oam->oamBuffer[91];
+    ButtonInfo->oamId = 91;
+    ButtonInfo->width = 32;
+    ButtonInfo->height = 32;
+    ButtonInfo->angle = 0;
+    ButtonInfo->entry = Button;
+    Button->y = 0;
+    Button->isRotateScale = false;
+    Button->blendMode = OBJMODE_NORMAL;
+    Button->colorMode = OBJCOLOR_16;
+    Button->shape = OBJSHAPE_SQUARE;
+    Button->isHidden = true;
+    Button->x = 0;
+    Button->size = OBJSIZE_32;
+    Button->gfxIndex = nextAvailableTileIdx;
+    Button->priority = OBJPRIORITY_0;
+    Button->palette = palcnt;
+
+    Button = &oam->oamBuffer[92];
+    ButtonInfo->oamId = 92;
+    ButtonInfo->width = 32;
+    ButtonInfo->height = 32;
+    ButtonInfo->angle = 0;
+    ButtonInfo->entry = Button;
+    Button->y = 0;
+    Button->isRotateScale = false;
+    Button->blendMode = OBJMODE_NORMAL;
+    Button->colorMode = OBJCOLOR_16;
+    Button->shape = OBJSHAPE_SQUARE;
+    Button->isHidden = true;
+    Button->x = 0;
+    Button->size = OBJSIZE_32;
+    Button->gfxIndex = nextAvailableTileIdx;
+    Button->priority = OBJPRIORITY_0;
+    Button->palette = palcnt;
+    
+    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    BagSprPal,    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],    32);
+    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    BagSprTiles,  &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    BagSprTilesLen); 
+
     return nextAvailableTileIdx;
 }
 void setMainSpriteVisibility(bool hidden){

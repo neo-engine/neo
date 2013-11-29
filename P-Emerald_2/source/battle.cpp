@@ -74,24 +74,25 @@ namespace BATTLE{
             displayHP(HPstart,HP,x,y,freecolor1,freecolor2,delay,8,12);
     }
     void displayHP(int HPstart,int HP,int x,int y,int freecolor1,int freecolor2,bool delay,int innerR,int outerR){
+        int factor = std::max(1,outerR / 15);
         if(HP > 100 || HP < 0){
             BG_PALETTE[freecolor1] = GREEN;
-            for(int i= 0; i < 100; ++i)
+            for(int i= 0; i < factor *100; ++i)
                 for(int j= innerR; j <= outerR; ++j){
-                    u8 nx = x + 16 + j * sin((50-i)*acos(0) / 30),ny = y + 16 + j * cos((50-i)*acos(0) / 30);
+                    u8 nx = x + 16 + j * sin((50-i/(1.0*factor))*acos(0) / 30),ny = y + 16 + j * cos((50-i/(1.0*factor))*acos(0) / 30);
                     ((Color *)BG_BMP_RAM(1))[(nx + ny * SCREEN_WIDTH)*font::FONT_MULTIPLY/4] = (((u8)freecolor1)<<8) | (u8)freecolor1;
                     //printf("%i %i; ",nx,ny);
             }
         }
         else {
             BG_PALETTE[freecolor2] = NORMAL_;
-            for(int i= 100-HPstart; i < HP; ++i){
+            for(int i= 300-3*HPstart; i < 3*HP; ++i){
                 for(int j= innerR; j <= outerR; ++j){
-                    u8 nx = x + 16 + j * sin((50-i)*acos(0) / 30),ny = y + 16 + j * cos((50-i)*acos(0) / 30);
+                    u8 nx = x + 16 + j * sin((50-i/(1.0*factor))*acos(0) / 30),ny = y + 16 + j * cos((50-i/(1.0*factor))*acos(0) / 30);
                     ((Color *)BG_BMP_RAM(1))[(nx + ny * SCREEN_WIDTH)/2] = (((u8)freecolor2)<<8) | (u8)freecolor2;
-                    if(i == 50)
+                    if(i ==  factor * 50)
                         BG_PALETTE[freecolor1] = YELLOW;
-                    if(i == 80)
+                    if(i == factor * 80)
                         BG_PALETTE[freecolor1] = RED;
                 }
                 if(delay)
@@ -102,18 +103,18 @@ namespace BATTLE{
     void displayEP(int EPstart,int EP,int x,int y,int freecolor1,int freecolor2,bool delay,int innerR,int outerR){
         if(EPstart >= 100 || EP > 100){
             BG_PALETTE[freecolor1] = NORMAL_;
-            for(int i= 0; i < 100; ++i)
+            for(int i= 0; i < 300; ++i)
                 for(int j= innerR; j <= outerR; ++j){
-                    int nx = x + 16 + j * sin((50-i)*acos(0) / 30),ny = y + 16 + j * cos((50-i)*acos(0) / 30);
+                    int nx = x + 16 + j * sin((50-i/3.0)*acos(0) / 30),ny = y + 16 + j * cos((50-i/3.0)*acos(0) / 30);
                     ((Color *)BG_BMP_RAM(1))[(nx + ny * SCREEN_WIDTH)/2] = (((u8)freecolor1)<<8) | (u8)freecolor1;
                     //printf("%i %i; ",nx,ny);
             }
         }
         else {
             BG_PALETTE[freecolor2] = ICE;
-            for(int i= EPstart; i <= EP; ++i){
+            for(int i= EPstart*3; i <= EP*3; ++i){
                 for(int j= innerR; j <= outerR; ++j){
-                    int nx = x + 16 + j * sin((50-i)*acos(0) / 30),ny = y + 16 + j * cos((50-i)*acos(0) / 30);
+                    int nx = x + 16 + j * sin((50-i/3.0)*acos(0) / 30),ny = y + 16 + j * cos((50-i/3.0)*acos(0) / 30);
                     ((Color *)BG_BMP_RAM(1))[(nx + ny * SCREEN_WIDTH)/2] = (((u8)freecolor2)<<8) | (u8)freecolor2;
                 }
                 if(delay)

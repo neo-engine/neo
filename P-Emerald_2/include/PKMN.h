@@ -381,7 +381,7 @@ namespace POKEMON{
         void devolve();
 
         int draw();
-        void drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom);
+        void drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom,bool newpok);
     
         //std::pair<std::string,std::string> typesToString()
         //{

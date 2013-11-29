@@ -653,22 +653,21 @@ namespace POKEMON{
 
         void setDefaultConsoleTextColors(u16* palette,int start = 1){
             palette[start * 16 - 1] = RGB15(0,0,0); //30 normal black
-            palette[start * 16 - 1] = RGB15(15,0,0); //31 normal red
-            palette[start * 16 - 1] = RGB15(0,15,0); //32 normal green
-            palette[start * 16 - 1] = RGB15(15,15,0); //33 normal yellow
+            palette[(start+1) * 16 - 1] = RGB15(15,0,0); //31 normal red
+            palette[(start+2) * 16 - 1] = RGB15(0,15,0); //32 normal green
+            palette[(start+3) * 16 - 1] = RGB15(15,15,0); //33 normal yellow
             
-            palette[start * 16 - 1] = RGB15(0,0,15); //34 normal blue
-            palette[start * 16 - 1] = RGB15(15,0,15); //35 normal magenta
-            palette[start * 16 - 1] = RGB15(0,15,15); //36 normal cyan
-            palette[start * 16 - 1] = RGB15(24,24,24); //37 normal white
+            palette[(start+4) * 16 - 1] = RGB15(0,0,15); //34 normal blue
+            palette[(start+5) * 16 - 1] = RGB15(15,0,15); //35 normal magenta
+            palette[(start+6) * 16 - 1] = RGB15(0,15,15); //36 normal cyan
+            palette[(start+7) * 16 - 1] = RGB15(24,24,24); //37 normal white
         }
 
-    void PKMN::drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom)
+    void PKMN::drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom, bool newpok)
     {
         //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
         dmaCopy( PKMNInfoScreenBitmap, bgGetGfxPtr(bg3), 256*256 );
         dmaCopy( PKMNInfoScreenPal, BG_PALETTE, 256*2); 
-        setDefaultConsoleTextColors(BG_PALETTE,5);
 
         consoleSelect(Top);	
         consoleSetWindow(Top, 0,0,32,24);
@@ -701,24 +700,14 @@ namespace POKEMON{
             printf("\n%s",ItemList[this->boxdata.getItem()].getDescription().c_str());
             drawItemIcon(oamTop,spriteInfoTop,ItemList[this->boxdata.getItem()].Name,0,152,a2,b2,c2,false);
         }
-        //consoleSetWindow(Top, 14,3,18,21);
-        //consoleSetWindow(Bottom,1,1,31,22);
 
-        if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),this->boxdata.isFemale,true))
-            loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),!this->boxdata.isFemale,true);
-        consoleSetWindow(Top, 4,5,12,2);
-        printf("EP(%3i%%)\nKP(%3i%%)",(this->boxdata.exp-POKEMON::EXP[this->Level-1][0]) *100/(POKEMON::EXP[this->Level][0]-POKEMON::EXP[this->Level-1][0]),this->stats.acHP*100/this->stats.maxHP);
-        BATTLE::displayHP(100,101,46,80,97,98,false,50,56);   
-        BATTLE::displayHP(100,100-this->stats.acHP*100/this->stats.maxHP,46,80,97,98,false,50,56); 
-        
-        BATTLE::displayEP(100,101,46,80,99,100,false,59,62);   
-        BATTLE::displayEP(0,(this->boxdata.exp-POKEMON::EXP[this->Level-1][0]) *100/(POKEMON::EXP[this->Level][0]-POKEMON::EXP[this->Level-1][0]),46,80,99,100,false,59,62); 
         switch(Page){
         case 0: 
             consoleSetWindow(Top, 5,1,20,2);
             printf("Pokemon-Info");
             
-            consoleSetWindow(Top, 16,6,32,24);
+            consoleSetWindow(Top, 16,4,32,24);
+            printf("     Lv.%3i\n\n",this->Level);
             printf("KP           %3i\n\n\n",stats.maxHP);
             printf("ANG          %3i\n\n",stats.Atk);
             printf("VER          %3i\n\n",stats.Def);
@@ -773,14 +762,16 @@ namespace POKEMON{
         }
     
         consoleSelect(Bottom);	
-        printf("\x1b[32m");
+        printf("\x1b[39m");
+        oam->oamBuffer[0].x = 256 - 24;
+        oam->oamBuffer[0].y = 196 - 28;
         oam->oamBuffer[13].isHidden = false;
         oam->oamBuffer[14].isHidden = false;
-        oam->oamBuffer[14].y = 196 - 28 - 24;
-        oam->oamBuffer[13].x = 256 - 28 - 24;
-        oam->oamBuffer[13].y = 196 - 28 + 4;
-        oam->oamBuffer[14].x = 256 - 28 + 4;
-        int o2s = 50,p2s = 2,t2s = 716;
+        oam->oamBuffer[14].x = 256 - 24;
+        oam->oamBuffer[14].y = 196 - 28 - 22;
+        oam->oamBuffer[13].x = 256 - 28 - 18;
+        oam->oamBuffer[13].y = 196 - 28;
+        int o2s = 50,p2s = 2,t2s = 780;
         if(data.Types[0] == data.Types[1]){
             drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[0],256-50,24,true);
             oam->oamBuffer[++o2s].isHidden = true;
@@ -789,7 +780,7 @@ namespace POKEMON{
             drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[0],256-68,24,true);
             drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[1],256-32,24,true);
         }
-        drawItemIcon(oam,spriteInfo,"Pokeball",256-100,0,o2s,p2s,t2s,true);
+        drawItemIcon(oam,spriteInfo,this->boxdata.Ball == 0 ? "Pokeball" : ItemList[this->boxdata.Ball].Name,256-100,0,o2s,p2s,t2s,true);
         
         oam->oamBuffer[15].isHidden = false;
         oam->oamBuffer[15].y = 0;
@@ -801,70 +792,118 @@ namespace POKEMON{
 
         consoleSetWindow(Bottom,23,1,20,5);
         if(this->boxdata.isShiny()){
-            printf("\x1b[39m""#%03i*\x1b[32m ",this->boxdata.SPEC);
+            printf("\x1b[34m""*%03i ",this->boxdata.SPEC);
         }
         else
-            printf("#%03i  ",this->boxdata.SPEC);
+            printf("\x1b[33m""#%03i ",this->boxdata.SPEC);
 
         if(this->boxdata.PKRUS){
-            printf("PKRS");
+            printf("\x1b[39m""PKRS");
         }
 
-        //printf("\x1b[32");
+        
+        oam->oamBuffer[90].isHidden = false;
+        oam->oamBuffer[90].y = -4;
+        oam->oamBuffer[90].x = -8;
+        oam->oamBuffer[90].priority = OBJPRIORITY_1;
+        oam->oamBuffer[91].isHidden = false;
+        oam->oamBuffer[91].y = 18;
+        oam->oamBuffer[91].x = -8;
+        oam->oamBuffer[91].priority = OBJPRIORITY_1;
+        oam->oamBuffer[92].isHidden = false;
+        oam->oamBuffer[92].y = -8;
+        oam->oamBuffer[92].x = 14;
+        oam->oamBuffer[92].priority = OBJPRIORITY_1;
 
-        ////printf("Nr %03i\n",this->SPEC);
-        //if(Level > 0 && Level < 100)
-        //    printf("Lv %i\n(noch %u EP)\n\n",Level,(EXP[Level][Pkmn_LevelUpTypes[this->boxdata.SPEC]] - this->boxdata.exp));
-        //else printf("Lv %i\n\n\n",Level);
-        //wprintf(L"OT %ls (%05i/%05i)\n\n",&(boxdata.OT[0]),this->boxdata.ID,this->boxdata.SID);
-        //    
+        oam->oamBuffer[90+page].isHidden = true;
+        
+        printf("\x1b[33m");
+        for(int i = 0; i< 4; ++i){
+            oam->oamBuffer[9+i].isHidden = false;
+            oam->oamBuffer[9+i].hFlip = true;            
+            oam->oamBuffer[9+i].priority = OBJPRIORITY_2;
+            oam->oamBuffer[9+i].y = 192-48;
+        }
+        oam->oamBuffer[18].isHidden = false;
+        oam->oamBuffer[18].y = 192-12;
+        oam->oamBuffer[18].x = 76;
+        oam->oamBuffer[18].priority = OBJPRIORITY_1;
+        oam->oamBuffer[28].isHidden = false;
+        oam->oamBuffer[28].y = 192-12;
+        oam->oamBuffer[28].x = 0;
+        oam->oamBuffer[28].priority = OBJPRIORITY_1;
+        oam->oamBuffer[27].isHidden = false;
+        oam->oamBuffer[27].y = 192-12;
+        oam->oamBuffer[27].x = 20;
+        oam->oamBuffer[27].priority = OBJPRIORITY_1;
+        updateOAMSub(oam);
+        consoleSetWindow(Bottom,0,23,20,5);
+        printf("%s",abilities[this->boxdata.ability].Name.c_str());
+        consoleSetWindow(Bottom,2,19,28,5);
+        printf("%s",abilities[this->boxdata.ability].FlavourText.c_str());
+        
+        consoleSetWindow(Bottom,3,3,27,15);
+        
+        printf("\x1b[37m");
+        wprintf(L"  OT %ls\n  (%05i/%05i)\n\n",&(boxdata.OT[0]),this->boxdata.ID,this->boxdata.SID);
 
-        //if(this->boxdata.ID == SAV.ID && this->boxdata.SID == SAV.SID) //Trainer is OT
-        //{
-        //    if(!(this->boxdata.gotDate[0] && this->boxdata.hatchDate[0]))
-        //    {
-        //        printf("Gefangen am %i.%i.%i\n in/bei ""%s\n mit Level %i.\n\n",
-        //            boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace),boxdata.gotLevel);
-        //        printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
-        //        printf("Mag %s""e Pok\x82""riegel.\n\n",&(this->boxdata.getTasteStr()[0]));
-        //    }
-        //    else
-        //    {
-        //        printf("Als Ei erhalten am %i.%i.%i\n in/bei ""%s"".\n",boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2],getLoc(boxdata.gotPlace));
-        //        if(!(this->boxdata.IV.isEgg))
-        //        {
-        //            printf("Geschl\x81""pft am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
-        //            printf("Besitzt ein %s""es Wesen,\n %s"".\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
-        //            printf("Mag %s""e Pok\x82""riegel.\n\n",&(this->boxdata.getTasteStr()[0]));
-        //        }
-        //    }
-        //    if (this->boxdata.fateful)
-        //        printf("Schicksalhafte Begegnung.\n\n");		
-        //}
-        //else
-        //{
-        //    if(!(this->boxdata.gotDate[0] && this->boxdata.hatchDate[0]))
-        //    {
-        //        printf("Offenbar gef. am %i.%i.%i\n in/bei ""%s\n mit Level %i.\n\n",
-        //            boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace),boxdata.gotLevel);
-        //        printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
-        //        printf("Mag %s""e Pok\x82""riegel.\n\n",&(this->boxdata.getTasteStr()[0]));
-        //    }
-        //    else
-        //    {
-        //        printf("Off. als Ei erh. am %i.%i.%i\n in/bei ""%s"".\n",boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2],getLoc(boxdata.gotPlace));
-        //        if(!(this->boxdata.IV.isEgg))
-        //        {
-        //            printf("Geschl\x81""pft am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
-        //            printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
-        //            printf("Mag %s""e Pok\x82""riegel.\n\n",&(this->boxdata.getTasteStr()[0]));
-        //        }
-        //    }
-        //    if (this->boxdata.fateful)
-        //        printf("Off. schicks. Begegnung.\n\n");		
-        //}	
-        //printf("F\x84""higkeit:""%s\n""%s",&(abilities[this->boxdata.getAbility()].Name[0])
-        //    ,&(abilities[this->boxdata.getAbility()].FlavourText[0]));
+        if(this->boxdata.ID == SAV.ID && this->boxdata.SID == SAV.SID) //Trainer is OT
+        {
+            if(!(this->boxdata.gotDate[0] && this->boxdata.hatchDate[0]))
+            {
+                printf("Gefangen am %i.%i.%i\n in/bei ""%s\n mit Level %i.\n\n",
+                    boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace),boxdata.gotLevel);
+                printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
+                printf("Mag %s""e Pok\x82""riegel.\n\n",&(this->boxdata.getTasteStr()[0]));
+            }
+            else
+            {
+                printf("Als Ei erhalten am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2],getLoc(boxdata.gotPlace));
+                if(!(this->boxdata.IV.isEgg))
+                {
+                    printf("Geschl\x81""pft am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
+                    printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
+                    printf("Mag %s""e Pok\x82""riegel.\n\n",&(this->boxdata.getTasteStr()[0]));
+                }
+            }
+            if (this->boxdata.fateful)
+                printf("Schicksalhafte Begegnung.");		
+        }
+        else
+        {
+            if(!(this->boxdata.gotDate[0] && this->boxdata.hatchDate[0]))
+            {
+                printf("Offenbar gef. am %i.%i.%i\n in/bei ""%s\n mit Level %i.\n\n",
+                    boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace),boxdata.gotLevel);
+                printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
+                printf("Mag %s""e Pok\x82""riegel.\n\n",&(this->boxdata.getTasteStr()[0]));
+            }
+            else
+            {
+                printf("Off. als Ei erh. am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2],getLoc(boxdata.gotPlace));
+                if(!(this->boxdata.IV.isEgg))
+                {
+                    printf("Geschl\x81""pft am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
+                    printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
+                    printf("Mag %s""e Pok\x82""riegel.\n\n",&(this->boxdata.getTasteStr()[0]));
+                }
+            }
+            if (this->boxdata.fateful)
+                printf("Off. schicks. Begegnung.");		
+        }	
+        printf("\x1b[33m");
+        
+        consoleSelect(Top);	
+        consoleSetWindow(Top, 4,5,12,2);
+        printf("EP(%3i%%)\nKP(%3i%%)",(this->boxdata.exp-POKEMON::EXP[this->Level-1][0]) *100/(POKEMON::EXP[this->Level][0]-POKEMON::EXP[this->Level-1][0]),this->stats.acHP*100/this->stats.maxHP);
+        BATTLE::displayHP(100,101,46,80,97,98,false,50,56);   
+        BATTLE::displayHP(100,100-this->stats.acHP*100/this->stats.maxHP,46,80,97,98,false,50,56); 
+        
+        BATTLE::displayEP(100,101,46,80,99,100,false,59,62);   
+        BATTLE::displayEP(0,(this->boxdata.exp-POKEMON::EXP[this->Level-1][0]) *100/(POKEMON::EXP[this->Level][0]-POKEMON::EXP[this->Level-1][0]),46,80,99,100,false,59,62); 
+        
+        if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),this->boxdata.isFemale,true))
+            loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),!this->boxdata.isFemale,true);
     }
     extern bool drawInfoSub(u16* layer,int PKMN);
     int PKMN::draw(){
@@ -874,9 +913,9 @@ namespace POKEMON{
         dmaCopy( PKMNInfoScreenBitmap, bgGetGfxPtr(bg3), 256*256 );
         dmaCopy( PKMNInfoScreenPal, BG_PALETTE, 96*2); 
         
-        consoleSetWindow(&Bottom,0,0,32,24);
         consoleSelect(&Top);
         consoleClear();
+        consoleSetWindow(&Bottom,0,0,32,24);
         consoleSelect(&Bottom);
         consoleClear();
 
@@ -887,58 +926,17 @@ namespace POKEMON{
         consoleSelect(&Bottom);
         wprintf(&(this->boxdata.Name[0]));
     
-        this->drawPage(page,&Top,&Bottom);	
+        this->drawPage(page,&Top,&Bottom,true);	
         touchPosition touch;
         while (1)
         {		
             touchRead(&touch);
             swiWaitForVBlank();
             updateOAMSub(oam);
+            updateTime();
             scanKeys();
             int pressed = keysDown();
-            if((pressed & KEY_DOWN) || ((touch.py>178)&&(touch.px <= 220)&&(touch.px > 200)))
-            {
-                while(1)
-                {
-                    scanKeys();
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                    if(keysUp() & KEY_DOWN)
-                        break;
-                }
-                consoleSelect(&Bottom);
-                consoleClear();
-                consoleSelect(&Top);
-                consoleSetWindow(&Top, 0,0,30,30);
-                consoleClear();
-                swiWaitForVBlank();		
-
-                //initOAMTableSub(oam);
-
-                return pressed | KEY_DOWN;
-            }
-            else if((pressed & KEY_UP)|| ((touch.py>178)&&(touch.px <= 240)&&(touch.px > 220)))
-            {
-                while(1)
-                {
-                    scanKeys();
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                    if(keysUp() & KEY_UP)
-                        break;
-                }
-                consoleSelect(&Bottom);
-                consoleClear();
-                consoleSelect(&Top);
-                consoleSetWindow(&Top, 0,0,30,30);
-                consoleClear();
-                swiWaitForVBlank();		
-
-                //initOAMTableSub(oam);
-
-                return pressed | KEY_UP;
-            }
-            else if((pressed & KEY_B)||((touch.py>178)&&(touch.px > 240)))
+            if((pressed & KEY_B)||(sqrt(sq(248-touch.px) + sq(184-touch.py)) <= 16))
             {
                 while(1)
                 {
@@ -948,6 +946,7 @@ namespace POKEMON{
                     if(keysUp() & KEY_B)
                         break;
                 }
+                consoleSetWindow(&Bottom,0,0,32,24);
                 consoleSelect(&Bottom);
                 consoleClear();
                 consoleSelect(&Top);
@@ -959,7 +958,51 @@ namespace POKEMON{
 
                 return pressed | KEY_B;
             }
-            else if (pressed & KEY_RIGHT|| ((touch.py>178)&&(touch.px > 20)&&(touch.px <= 40)))
+            else if((pressed & KEY_DOWN) || (sqrt(sq(220-touch.px) + sq(184-touch.py)) <= 16))
+            {
+                while(1)
+                {
+                    scanKeys();
+                    if(keysUp() & KEY_TOUCH)
+                        break;
+                    if(keysUp() & KEY_DOWN)
+                        break;
+                }
+                consoleSetWindow(&Bottom,0,0,32,24);
+                consoleSelect(&Bottom);
+                consoleClear();
+                consoleSelect(&Top);
+                consoleSetWindow(&Top, 0,0,30,30);
+                consoleClear();
+                swiWaitForVBlank();		
+
+                //initOAMTableSub(oam);
+
+                return pressed | KEY_DOWN;
+            }
+            else if((pressed & KEY_UP)|| (sqrt(sq(248-touch.px) + sq(162-touch.py)) <= 16))
+            {
+                while(1)
+                {
+                    scanKeys();
+                    if(keysUp() & KEY_TOUCH)
+                        break;
+                    if(keysUp() & KEY_UP)
+                        break;
+                }
+                consoleSetWindow(&Bottom,0,0,32,24);
+                consoleSelect(&Bottom);
+                consoleClear();
+                consoleSelect(&Top);
+                consoleSetWindow(&Top, 0,0,30,30);
+                consoleClear();
+                swiWaitForVBlank();		
+
+                //initOAMTableSub(oam);
+
+                return pressed | KEY_UP;
+            }
+            else if (pressed & KEY_RIGHT)
             {
                 if (++page == pagemax)
                     page = 0;
@@ -971,9 +1014,9 @@ namespace POKEMON{
                     if(keysUp() & KEY_RIGHT)
                         break;
                 }
-                this->drawPage(page,&Top,&Bottom);
+                this->drawPage(page,&Top,&Bottom,false);
             }
-            else if (pressed & KEY_LEFT|| ((touch.py>178)&&(touch.px <= 20)))
+            else if (pressed & KEY_LEFT)
             {
                 if (--page == -1)
                     page = pagemax-1;
@@ -985,9 +1028,42 @@ namespace POKEMON{
                     if(keysUp() & KEY_LEFT)
                         break;
                 }
-                this->drawPage(page,&Top,&Bottom);
+                this->drawPage(page,&Top,&Bottom,false);
             }
-
+            
+            else if (page != 0 && (sqrt(sq(16-4-touch.px) + sq(16-4-touch.py)) <= 16))
+            {
+                page = 0;
+                while(1)
+                {
+                    scanKeys();
+                    if(keysUp() & KEY_TOUCH)
+                        break;
+                }
+                this->drawPage(page,&Top,&Bottom,false);
+            }
+            else if (page != 1 && (sqrt(sq(16-8-touch.px) + sq(16+18-touch.py)) <= 16))
+            {
+                page = 1;
+                while(1)
+                {
+                    scanKeys();
+                    if(keysUp() & KEY_TOUCH)
+                        break;
+                }
+                this->drawPage(page,&Top,&Bottom,false);
+            }
+            else if (page != 2 && (sqrt(sq(16+18-touch.px) + sq(16-6-touch.py)) <= 16))
+            {
+                page = 2;
+                while(1)
+                {
+                    scanKeys();
+                    if(keysUp() & KEY_TOUCH)
+                        break;
+                }
+                this->drawPage(page,&Top,&Bottom,false);
+            }
         }
     }
 
