@@ -61,7 +61,7 @@ BG_set BGs[MAXBG] = {{"Raging_Gyarados",&(BG1Bitmap[0]),&(BG1Pal[0]),false,false
     {"Waiting_Suicune",NAV_DATA,NAV_DATA_PAL,true,true},
     {"Fighting_Groudon",NAV_DATA,NAV_DATA_PAL,true,false},
     {"Fighting_Kyogre",NAV_DATA,NAV_DATA_PAL,true,false}};
-int BG_ind = 0;
+int BG_ind = 2;
 extern POKEMON::PKMN::BOX_PKMN stored_pkmn[MAXSTOREDPKMN];
 extern std::vector<int> box_of_st_pkmn[MAXPKMN];
 extern std::vector<int> free_spaces;

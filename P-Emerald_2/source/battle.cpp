@@ -86,7 +86,7 @@ namespace BATTLE{
         }
         else {
             BG_PALETTE[freecolor2] = NORMAL_;
-            for(int i= 300-3*HPstart; i < 3*HP; ++i){
+            for(int i= factor*100-factor*HPstart; i < factor*HP; ++i){
                 for(int j= innerR; j <= outerR; ++j){
                     u8 nx = x + 16 + j * sin((50-i/(1.0*factor))*acos(0) / 30),ny = y + 16 + j * cos((50-i/(1.0*factor))*acos(0) / 30);
                     ((Color *)BG_BMP_RAM(1))[(nx + ny * SCREEN_WIDTH)/2] = (((u8)freecolor2)<<8) | (u8)freecolor2;
@@ -1369,8 +1369,7 @@ namespace BATTLE{
         consoleSelect(&Bottom);
         consoleClear();
         if((*this->player->pkmn_team)[acpokpos[toSwitch][0]].stats.acHP)
-            printf("\n Auf die Bank,\n %ls!",(*this->player->pkmn_team)[acpokpos[toSwitch][0]].boxdata.Name,
-                trainerclassnames[this->player->trainer_class],this->player->Name);
+            printf("\n Auf die Bank,\n %ls!",(*this->player->pkmn_team)[acpokpos[toSwitch][0]].boxdata.Name);
         
         std::swap(acpokpos[newPok][0],acpokpos[toSwitch][0]);
 
@@ -1643,11 +1642,10 @@ namespace BATTLE{
         printf("Lv%d%4dKP",(*this->opponent->pkmn_team)[acpokpos[0][1]].Level,
             (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP);
 
-
         if(this->battlemode == DOUBLE && this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO){
             oamTop->oamBuffer[3].isHidden = oamTop->oamBuffer[11].isHidden = true;
             updateOAM(oamTop);
-            for(int i= 0; i < 40; ++i)
+            for(int i= 0; i < 80; ++i)
                 swiWaitForVBlank();
             consoleSelect(&Bottom);
             printf("und\n %ls ",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Name);
@@ -1680,7 +1678,7 @@ namespace BATTLE{
 
         consoleSelect(&Bottom);
         printf("in den Kampf.");
-
+        
         for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i){
             oamTop->oamBuffer[11+i].x = -4+ 18*i;
             oamTop->oamBuffer[11+i].y = -4;
@@ -1702,8 +1700,28 @@ namespace BATTLE{
             }
         }
         updateOAM(oamTop);
-        for(int i= 0; i < 20; ++i)
+        for(int i= 0; i < 80; ++i)
             swiWaitForVBlank();
+
+        if(abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].T & ablty::BEFORE_BATTLE){
+            consoleClear();
+            printf("\n %s von\n %ls (Gegn.) wirkt!\n",
+                abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].Name.c_str(),
+                (*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.Name);
+            //abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].run();
+            for(int i= 0; i < 100; ++i)
+                swiWaitForVBlank();
+        }
+        if(this->battlemode == DOUBLE && abilities[(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.ability].T & ablty::BEFORE_BATTLE){
+            consoleClear();
+            printf("\n %s von\n %ls (Gegn.) wirkt!\n",
+                abilities[(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.ability].Name.c_str(),
+                (*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Name);
+            //abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].run();
+            for(int i= 0; i < 100; ++i)
+                swiWaitForVBlank();
+        }
+
 
         //Own Side
         consoleSelect(&Bottom);
@@ -1730,7 +1748,7 @@ namespace BATTLE{
             
         oamTop->oamBuffer[6].isHidden = oamTop->oamBuffer[2].isHidden = false;
         updateOAM(oamTop);
-        for(int i= 0; i < 40; ++i)
+        for(int i= 0; i < 80; ++i)
             swiWaitForVBlank();
 
         if(this->battlemode == DOUBLE && this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO){
@@ -1789,11 +1807,31 @@ namespace BATTLE{
             }
         }
         updateOAM(oamTop);
-        for(int i= 0; i < 100; ++i)
+        for(int i= 0; i < 80; ++i)
             swiWaitForVBlank();
+        
+        consoleSelect(&Bottom);
+        if(abilities[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.ability].T & ablty::BEFORE_BATTLE){
+            consoleClear();
+            printf("\n %s von\n %ls wirkt!\n",
+                abilities[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.ability].Name.c_str(),
+                (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name);
+            //abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].run();
+            for(int i= 0; i < 100; ++i)
+                swiWaitForVBlank();
+        }
+        if(this->battlemode == DOUBLE && abilities[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.ability].T & ablty::BEFORE_BATTLE){
+            consoleClear();
+            printf("\n %s von\n %ls wirkt!\n",
+                abilities[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.ability].Name.c_str(),
+                (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name);
+            //abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].run();
+            for(int i= 0; i < 100; ++i)
+                swiWaitForVBlank();
+        }
+
         oamTop->oamBuffer[4].isHidden = oamTop->oamBuffer[12].isHidden = false;
 
-        
         updateOAM(oamTop);
         
         for(int i = 0; i<= 4; ++i)
@@ -1803,8 +1841,6 @@ namespace BATTLE{
         consoleSelect(&Bottom);
         consoleClear();
 
-        printf("PAL: %d; OAM: %d; TILE: %d\n",palcntS,oamIndexS,nextAvailableTileIdxS);
-
         while((this->round--) != 0){
 ACR:
             setMainBattleVisibility(false);
@@ -1812,6 +1848,10 @@ ACR:
             drawPKMNIcon(oam,spriteInfo,(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,112,64,os2,pS2,ts2,true);
             printf("\n Was soll %ls tun?          ",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name);
             updateOAMSub(oam);
+
+            std::pair<int,int> ownAtk[2]; //AtkIdx; Target 1->opp[0]/2->opp[1]/3->both_opp/4->self/8->partner
+            std::pair<int,int> oppAtk[2]; //AtkIdx; Target 1->own[0]/2->own[1]/3->both_opp/4->self/8->partner
+            int aprest = 0;
             while(42){
                 updateTime();
                 swiWaitForVBlank();
@@ -1819,7 +1859,123 @@ ACR:
                 if(t.px > 64 && t.px < 64 + 128 && t.py > 72 && t.py < 72 + 64){ //FIGHT
                     waitForTouchUp();
                     setMainBattleVisibility(true);
+                    oam->oamBuffer[oamIndexS+1].isHidden = true;
+                    consoleClear();
 
+                    aprest = 0;
+                    for(int i= 0; i < 4; ++i)
+                        aprest += (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.AcPP[i];
+                    if(aprest == 0){
+                        printf("\n %ls hat keine\n restlichen Attacken...",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name);
+                        ownAtk[0] = std::pair<int,int>(0,1|2|4|8);
+                    }
+                    else {
+                        (oam->oamBuffer[20]).isHidden = false;
+
+                        for(int i = 21; i < 29; i+=2){
+                            (oam->oamBuffer[i]).isHidden = false;
+                            (oam->oamBuffer[i+1]).isHidden = false;
+                            (oam->oamBuffer[i+1]).y += 8+16 * ((i-21)/4);
+                            (oam->oamBuffer[i]).y += 8+16 * ((i-21)/4);
+                            if((i/2)%2)
+                                (oam->oamBuffer[i]).x -= 16;
+                            else
+                                (oam->oamBuffer[i+1]).x += 16;
+                            updateOAMSub(oam); 
+                        
+                            consoleSetWindow(&Bottom,(oam->oamBuffer[i]).x/8+1,(oam->oamBuffer[i]).y/8+1,20,5);
+                            drawTypeIcon(oam,spriteInfo,os2,pS2,ts2,
+                                AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]].type,
+                                (oam->oamBuffer[i]).x+8,(oam->oamBuffer[i]).y-8,true);
+                            printf("    %2i/%2i AP\n%s\nS %3i  G %3i", (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.AcPP[(i-21)/2],
+                                AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]].PP *
+                                ((5 +(*this->player->pkmn_team)[acpokpos[0][0]]. boxdata.PPUps[i]) / 5),
+                                AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]].Name.c_str(),
+                                AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]].Base_Power,
+                                AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]].Accuracy);
+                        }
+
+                        updateOAMSub(oam);
+                        consoleSetWindow(&Bottom,0,0,32,5);
+                        printf("\n Welchen Angriff?");
+
+
+                        while(42){
+                            updateTime();
+                            swiWaitForVBlank();
+                            touchRead(&t);
+                            if ( t.px>224 && t.py>164){ //Back  
+                                while(1) {
+                                    scanKeys();
+                                    swiWaitForVBlank();
+                                    updateTime();
+                                    if(keysUp() & KEY_TOUCH)
+                                    break;
+                                }
+                                consoleSelect(&Bottom);
+                                consoleSetWindow(&Bottom,0,0,32,24);
+                                consoleClear();
+                                for(int i= 20; i <= os2; ++i)
+                                    (oam->oamBuffer[i]).isHidden = true;
+                                setMainBattleVisibility(false);
+
+                            
+                                for(int i = 21; i < 29; i+=2){
+                                    (oam->oamBuffer[i]).isHidden = true;
+                                    (oam->oamBuffer[i+1]).isHidden = true;
+                                    (oam->oamBuffer[i+1]).y -= 8+16 * ((i-21)/4);
+                                    (oam->oamBuffer[i]).y -= 8+16 * ((i-21)/4);
+                        
+                                    if((i/2)%2)
+                                        (oam->oamBuffer[i]).x += 16;
+                                    else
+                                        (oam->oamBuffer[i+1]).x -= 16;
+                                    updateOAMSub(oam); 
+                                }
+
+                                goto ACR;
+                            }
+                            
+                            for(int i = 21; i < 29; i+=2)
+                                if(t.px>(oam->oamBuffer[i].x) && t.px < (oam->oamBuffer[i+1].x + 64) &&
+                                    t.py>(oam->oamBuffer[i]).y && t.py < (oam->oamBuffer[i+1].y + 64)){
+                                        while(1) {
+                                            scanKeys();
+                                            swiWaitForVBlank();
+                                            updateTime();
+                                            if(keysUp() & KEY_TOUCH)
+                                            break;
+                                        }
+                                        int trg = 0;
+
+                                        //CHOOSE TARGET
+                                        printf("CHOSE ATK %i",(i-21)/2);
+                                        
+                                        ownAtk[0] = std::pair<int,int>((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2],trg);
+                                        goto ATTACKCHOSEN;
+                                }
+                        }
+                        ATTACKCHOSEN:
+                        for(int i = 21; i < 29; i+=2){
+                            (oam->oamBuffer[i]).isHidden = true;
+                            (oam->oamBuffer[i+1]).isHidden = true;
+                            (oam->oamBuffer[i+1]).y -= 8+16 * ((i-21)/4);
+                            (oam->oamBuffer[i]).y -= 8+16 * ((i-21)/4);
+                        
+                            if((i/2)%2)
+                                (oam->oamBuffer[i]).x += 16;
+                            else
+                                (oam->oamBuffer[i+1]).x -= 16;
+                            
+                            updateOAMSub(oam); 
+                        }
+                        for(int i= os2; i >= os2 - 3; --i)
+                            (oam->oamBuffer[i]).isHidden = true;
+                        updateOAMSub(oam); 
+                        consoleSetWindow(&Bottom,0,0,32,24);
+                        consoleClear();
+                        consoleSetWindow(&Bottom,0,0,32,5);
+                    }
 
                     if(this->battlemode == DOUBLE){
 ACR2:
@@ -1972,7 +2128,7 @@ OUT:
                             }
                         }
                     }
-                    (oam->oamBuffer[os2-1]).isHidden = true;
+                    (oam->oamBuffer[os2]).isHidden = true;
                     updateOAMSub(oam);
 
                     //OPP'S ACTIONS

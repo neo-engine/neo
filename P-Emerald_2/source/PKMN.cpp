@@ -589,7 +589,7 @@ namespace POKEMON{
             for(int i= 0; i< 6; ++i) this->ConStats[i] = 0;
             for(int i= 0; i< 4; ++i) this->ribbons1[i] = 0;
             for(int i= 0; i< 4; ++i) this->Attack[i] = Attacks[i];
-            for(int i= 0; i< 4; ++i) this->AcPP[i] = 0; /// ...
+            for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[Attacks[i]].PP; /// ...
             for(int i= 0; i< 4; ++i) this->PPUps[i] = 0;
             this->IV = IV_struct(rand()%32,rand()%32,rand()%32,rand()%32,rand()%32,rand()%32,false,_isEgg);
             for(int i= 0; i< 4; ++i) this->ribbons0[i] = 0;
@@ -950,7 +950,7 @@ namespace POKEMON{
                 consoleSelect(&Bottom);
                 consoleClear();
                 consoleSelect(&Top);
-                consoleSetWindow(&Top, 0,0,30,30);
+                consoleSetWindow(&Top, 0,0,32,30);
                 consoleClear();
                 swiWaitForVBlank();		
 
@@ -972,7 +972,7 @@ namespace POKEMON{
                 consoleSelect(&Bottom);
                 consoleClear();
                 consoleSelect(&Top);
-                consoleSetWindow(&Top, 0,0,30,30);
+                consoleSetWindow(&Top, 0,0,32,30);
                 consoleClear();
                 swiWaitForVBlank();		
 
@@ -994,7 +994,7 @@ namespace POKEMON{
                 consoleSelect(&Bottom);
                 consoleClear();
                 consoleSelect(&Top);
-                consoleSetWindow(&Top, 0,0,30,30);
+                consoleSetWindow(&Top, 0,0,32,30);
                 consoleClear();
                 swiWaitForVBlank();		
 

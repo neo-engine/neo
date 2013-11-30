@@ -3,7 +3,7 @@
 ablty abilities[180]={
 	ablty("Energieaufladung"   ,"Sch\x81""tzt vor L\x84""rmattacken.",1),
 	ablty("Duftnote"           ,"Macht Begegnungen mit wilden\nPKMN unwahrscheinlicher.",8),
-	ablty("Niesel"             ,"Betritt das PKMN den Kampf,\nbeginntes zu regnen.",16),
+	ablty("Niesel"             ,"Betritt das PKMN den Kampf,\nbeginntes zu regnen.",18),
 	ablty("Temposchub"         ,"Erh\x94""ht im Kampf kontinuierlich\ndie Initiative.",32),
 	ablty("Kampfpanzer"        ,"Sch\x81""tzt vor Volltreffern.",1),
 	ablty("Robustheit"         ,"Sch\x81""tzt vor K.O.-Attacken.",1),

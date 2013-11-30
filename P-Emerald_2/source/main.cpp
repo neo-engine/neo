@@ -1024,6 +1024,7 @@ START:
                     for(int i= 0; i< 649; ++i)
                         SAV.inDex[i] = true;
                     SAV.hasPKMN = true;
+                    SAV.PKMN_team[1].boxdata.ability = 2;
                     swiWaitForVBlank();
                     setMainSpriteVisibility(false);
                     break;
