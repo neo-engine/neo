@@ -80,7 +80,7 @@ namespace BATTLE{
             for(int i= 0; i < factor *100; ++i)
                 for(int j= innerR; j <= outerR; ++j){
                     u8 nx = x + 16 + j * sin((50-i/(1.0*factor))*acos(0) / 30),ny = y + 16 + j * cos((50-i/(1.0*factor))*acos(0) / 30);
-                    ((Color *)BG_BMP_RAM(1))[(nx + ny * SCREEN_WIDTH)*font::FONT_MULTIPLY/4] = (((u8)freecolor1)<<8) | (u8)freecolor1;
+                    ((Color *)BG_BMP_RAM(1))[(nx + ny * SCREEN_WIDTH)/2] = (((u8)freecolor1)<<8) | (u8)freecolor1;
                     //printf("%i %i; ",nx,ny);
             }
         }

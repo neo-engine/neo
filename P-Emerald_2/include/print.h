@@ -19,12 +19,12 @@ namespace font{
         Color get_color(int num) const { return color[num]; }
         
         // Methods
-        void print_char(char ch, s16 x, s16 y,int scale,bool bottom);
-        void print_string(const char *string, s16 x, s16 y,int scale,bool bottom);
-        void print_string_center(const char *string,int scale,bool bottom);
-        void print_string_d(const char *string, s16 x, s16 y,int scale,bool bottom);
-        void print_string_center_d(const char *string,int scale,bool bottom);
-        void print_number(s32 num, s16 x, s16 y,int scale,bool bottom);
+        void print_char(char ch, s16 x, s16 y,bool bottom);
+        void print_string(const char *string, s16 x, s16 y,bool bottom);
+        void print_string_center(const char *string,bool bottom);
+        void print_string_d(const char *string, s16 x, s16 y,bool bottom);
+        void print_string_center_d(const char *string,bool bottom);
+        void print_number(s32 num, s16 x, s16 y,bool bottom);
         u32 string_width(const char *string) const;
         
     private:
@@ -36,5 +36,5 @@ namespace font{
 
 void top_screen_darken();
 void btm_screen_darken();
-void top_screen_plot(u8 x, u8 y, Color color,int scale);
-void btm_screen_plot(u8 x, u8 y, Color color,int scale);
+void top_screen_plot(u8 x, u8 y, Color color);
+void btm_screen_plot(u8 x, u8 y, Color color);

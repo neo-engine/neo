@@ -756,6 +756,14 @@ namespace POKEMON{
         case 2:
             consoleSetWindow(Top, 5,1,20,2);
             printf("Bänder");
+            
+            cust_font.set_color(0,0);
+            cust_font.set_color(5,1);
+            cust_font.set_color(4,2);
+            
+            cust_font.print_string("Dies ist ein Test",100,100,false);
+            cust_font.print_string("Wer ist genial?",100,116,false);
+
             break;
         default:
             return;
