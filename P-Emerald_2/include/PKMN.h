@@ -36,6 +36,7 @@ extern savgm SAV;
 
 extern PrintConsole Top,Bottom;
 extern font::Font cust_font;
+extern font::Font cust_font2;
 
 extern item ItemList[700];
 extern ablty abilities[164];
@@ -317,7 +318,7 @@ namespace POKEMON{
                 if(NatMod[getNature()][1] == 1.2)
                     return "saur";
                 if(NatMod[getNature()][2] == 1.2)
-                    return "s\x81\x9D";
+                    return "s\xFE\xFF";
                 if(NatMod[getNature()][3] == 1.2)
                     return "trocken";
                 if(NatMod[getNature()][4] == 1.2)
@@ -341,6 +342,7 @@ namespace POKEMON{
             ~BOX_PKMN() {}
 
             int draw(){ return 0;}
+
         }boxdata;
 
         struct status{

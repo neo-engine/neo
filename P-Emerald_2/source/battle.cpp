@@ -1534,7 +1534,7 @@ namespace BATTLE{
             this->acpokpos[i][0] = this->acpokpos[i][1] = i;
             if(this->player->pkmn_team->size() > i){
                 POKEMON::PKMN::status tmp = (*this->player->pkmn_team)[i]._status;
-                if((*this->player->pkmn_team)[i].stats.acHP == 0)
+                if((*this->player->pkmn_team)[i].stats.acHP == 0 || (*this->player->pkmn_team)[i].boxdata.IV.isEgg)
                     this->acpoksts[i][0] = KO;
                 else if(tmp.Asleep || tmp.Burned || tmp.Frozen || tmp.Paralyzed || tmp.Poisoned || tmp.Toxic)
                     this->acpoksts[i][0] = STS;
@@ -1545,7 +1545,7 @@ namespace BATTLE{
                 this->acpoksts[i][0] = NA;
             if(this->opponent->pkmn_team->size() > i){
                 POKEMON::PKMN::status tmp = (*this->opponent->pkmn_team)[i]._status;
-                if ((*this->opponent->pkmn_team)[i].stats.acHP == 0)
+                if ((*this->opponent->pkmn_team)[i].stats.acHP == 0 || (*this->opponent->pkmn_team)[i].boxdata.IV.isEgg)
                     this->acpoksts[i][1] = KO;
                 else if(tmp.Asleep || tmp.Burned || tmp.Frozen || tmp.Paralyzed || tmp.Poisoned || tmp.Toxic)
                     this->acpoksts[i][1] = STS;

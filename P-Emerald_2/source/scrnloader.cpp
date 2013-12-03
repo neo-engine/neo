@@ -134,9 +134,9 @@ bool loadSprite(SpriteInfo* spriteInfo,const std::string& Path, const std::strin
                                         * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
     sizeof(SPRITE_GFX[0]);
-    std::stringstream ss;
-    ss << Path << Name << ".raw";
-    FILE* fd = fopen(&(ss.str()[0]),"rb");
+    char pt[100];
+    sprintf(pt, "%s%s.raw",Path.c_str(),Name.c_str());
+    FILE* fd = fopen(pt,"rb");
 
     if(fd == 0){
         fclose(fd);
@@ -1509,27 +1509,33 @@ void initTop()
     initOAMTable(oamTop);
     for (size_t i = 0; i < SAV.PKMN_team.size(); i++)
     {
-        if(i%2 == 0){
-            drawPKMNIcon(oamTop,spriteInfoTop,SAV.PKMN_team[i].boxdata.SPEC,borders[i][0]*8-28,borders[i][1]*8,a,b,c,false);
-            BATTLE::displayHP(100,101,borders[i][0]*8-13,borders[i][1]*8+8-(i!= 2 ? 4:0),142+2*i,143+2*i,false,true);   
-            BATTLE::displayHP(100,100-SAV.PKMN_team[i].stats.acHP*100/SAV.PKMN_team[i].stats.maxHP,borders[i][0]*8-13,borders[i][1]*8+8-(i!= 2? 4:0),142+2*i,143+2*i,false,true); 
+        if(!SAV.PKMN_team[i].boxdata.IV.isEgg){
+            if(i%2 == 0){
+                drawPKMNIcon(oamTop,spriteInfoTop,SAV.PKMN_team[i].boxdata.SPEC,borders[i][0]*8-28,borders[i][1]*8,a,b,c,false);
+                BATTLE::displayHP(100,101,borders[i][0]*8-13,borders[i][1]*8+8-(i!= 2 ? 4:0),142+2*i,143+2*i,false,true);   
+                BATTLE::displayHP(100,100-SAV.PKMN_team[i].stats.acHP*100/SAV.PKMN_team[i].stats.maxHP,borders[i][0]*8-13,borders[i][1]*8+8-(i!= 2? 4:0),142+2*i,143+2*i,false,true);             
+            }
+            else{
+                drawPKMNIcon(oamTop,spriteInfoTop,SAV.PKMN_team[i].boxdata.SPEC,borders[i][0]*8+76,borders[i][1]*8,a,b,c,false);
+                BATTLE::displayHP(100,101,borders[i][0]*8+63,borders[i][1]*8+8-(i!= 3 ? 4:0),142+2*i,143+2*i,false,true);   
+                BATTLE::displayHP(100,100-SAV.PKMN_team[i].stats.acHP*100/SAV.PKMN_team[i].stats.maxHP,borders[i][0]*8+63,borders[i][1]*8+8-(i!= 3 ? 4:0),142+2*i,143+2*i,false,true); 
+            }
+            updateOAM(oamTop);
+            consoleSetWindow(&Top,borders[i][0],borders[i][1],12,6);		
+            wprintf(SAV.PKMN_team[i].boxdata.Name);
+
+            //if(SAV.PKMN_team[i].Name.length < 10)
+            printf("\n");
+            printf(POKEMON::PKMNDATA::getDisplayName(SAV.PKMN_team[i].boxdata.SPEC));
+
+            printf("\n\n");
+            printf("\n""%hi""/%hi KP\n",SAV.PKMN_team[i].stats.acHP,SAV.PKMN_team[i].stats.maxHP);
+            printf(ItemList[SAV.PKMN_team[i].boxdata.getItem()].getDisplayName().c_str());
         }
         else{
-            drawPKMNIcon(oamTop,spriteInfoTop,SAV.PKMN_team[i].boxdata.SPEC,borders[i][0]*8+76,borders[i][1]*8,a,b,c,false);
-            BATTLE::displayHP(100,101,borders[i][0]*8+63,borders[i][1]*8+8-(i!= 3 ? 4:0),142+2*i,143+2*i,false,true);   
-            BATTLE::displayHP(100,100-SAV.PKMN_team[i].stats.acHP*100/SAV.PKMN_team[i].stats.maxHP,borders[i][0]*8+63,borders[i][1]*8+8-(i!= 3 ? 4:0),142+2*i,143+2*i,false,true); 
+            consoleSetWindow(&Top,borders[i][0],borders[i][1],12,6);		
+            printf("Ei");
         }
-        updateOAM(oamTop);
-        consoleSetWindow(&Top,borders[i][0],borders[i][1],12,6);		
-        wprintf(SAV.PKMN_team[i].boxdata.Name);
-
-        //if(SAV.PKMN_team[i].Name.length < 10)
-        printf("\n");
-        printf(POKEMON::PKMNDATA::getDisplayName(SAV.PKMN_team[i].boxdata.SPEC));
-
-        printf("\n\n");
-        printf("\n""%hi""/%hi KP\n",SAV.PKMN_team[i].stats.acHP,SAV.PKMN_team[i].stats.maxHP);
-        printf(ItemList[SAV.PKMN_team[i].boxdata.getItem()].getDisplayName().c_str());
     }
     updateOAM(oamTop);
 }

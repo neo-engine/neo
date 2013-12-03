@@ -32,20 +32,20 @@ extern OAMTable *oam,*oamTop;
 namespace POKEMON{
     std::string NatureList[25]= {
         "robust","einsam","mutig","hart",
-        "frech","k\x81""hn","sanft","locker",
+        "frech","kühn","sanft","locker",
         "pfiffig","lasch","scheu","hastig",
-        "ernst","froh","naiv","m\x84\x9D""ig",
+        "ernst","froh","naiv","mäßig",
         "mild","ruhig","zaghaft","hitzig",
         "still","zart","forsch","sacht",
         "kauzig"
     };
     std::string PersonalityList[30] ={
-        "liebt es, zu essen","nickt oft ein","schl\x84""ft gerne","macht oft Unordnung","liebt es, zu entspannen",
-        "ist stolz auf seine St\x84""rke","pr\x81""gelt sich gerne","besitzt Temperament","liebt es, zu k\x84""mpfen","ist impulsiv",
-        "hat einen robusten K\x94""rper","kann Treffer gut verkraften","ist \x84""u\x9D""erst ausdauernd","hat eine gute Ausdauer","ist beharrlich",
-        "ist sehr neugierig","ist hinterh\x84""ltig","ist \x84""u\x9D""erst gerissen","ist oft in Gedanken","ist sehr pedantisch",
-        "besitzt starken Willen","ist irgendwie eitel","ist sehr aufs\x84""ssig","hasst Niederlagen","ist dickk\x94""pfig",
-        "liebt es, zu rennen","achtet auf Ger\x84""usche","ist ungest\x81""m und einf\x84""ltig","ist fast wie eine Clown","fl\x81""chtet schnell"
+        "liebt es, zu essen","nickt oft ein","schläft gerne","macht oft Unordnung","liebt es, zu entspannen",
+        "ist stolz auf seine Stärke","prügelt sich gerne","besitzt Temperament","liebt es, zu kämpfen","ist impulsiv",
+        "hat einen robusten Körper","kann Treffer gut verkraften","ist äußerst ausdauernd","hat eine gute Ausdauer","ist beharrlich",
+        "ist sehr neugierig","ist hinterhältig","ist äußerst gerissen","ist oft in Gedanken","ist sehr pedantisch",
+        "besitzt starken Willen","ist irgendwie eitel","ist sehr aufsässig","hasst Niederlagen","ist dickköpfig",
+        "liebt es, zu rennen","achtet auf Geräusche","ist ungestüm und einfältig","ist fast wie eine Clown","flüchtet schnell"
     };
 
     const char LOC_PATH[] = "nitro:/LOCATIONS/";
@@ -558,7 +558,10 @@ namespace POKEMON{
 
             this->ID = ID_;
             this->SID = SID_;
-            this->exp = EXP[level-1][Pkmn_LevelUpTypes[this->SPEC]];
+            if(!_isEgg)
+                this->exp = EXP[level-1][Pkmn_LevelUpTypes[this->SPEC]];
+            else
+                this->exp = 0;
 
             time_t unixTime = time(NULL);
             tm* timeStruct = gmtime((const time_t *)&unixTime);
@@ -665,6 +668,13 @@ namespace POKEMON{
 
     void PKMN::drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom, bool newpok)
     {
+        cust_font.set_color(0,0);
+        cust_font.set_color(5,1);
+        cust_font.set_color(4,2);
+        cust_font2.set_color(0,0);
+        cust_font2.set_color(5,1);
+        cust_font2.set_color(6,2);
+
         //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
         dmaCopy( PKMNInfoScreenBitmap, bgGetGfxPtr(bg3), 256*256 );
         dmaCopy( PKMNInfoScreenPal, BG_PALETTE, 256*2); 
@@ -679,57 +689,131 @@ namespace POKEMON{
     
         initOAMTable(oamTop);
         updateOAMSub(oam);
+        
+        int a2 = 0,b2= 0,c2 =0;
+        if(!(this->boxdata.IV.isEgg)){
+            consoleSetWindow(Top, 20,1,13,2);
+            printf("\x1b[36m");
+            wprintf(&(this->boxdata.Name[0]));
+            int G = this->boxdata.gender();
 
-        consoleSetWindow(Top, 20,1,13,2);
-        printf("\x1b[36m");
-        wprintf(&(this->boxdata.Name[0]));
-        int G = this->boxdata.gender(),a2 = 0,b2= 0,c2 =0;
-
-        if(G==0)
-            printf("\n (");
-        else if (G == 1)
-            printf("\x1b[34m""%c\x1b[36m\n (",141);
-        else
-            printf("\x1b[32m""%c\x1b[36m\n (",147);
-        PKMNDATA::getAll(this->boxdata.SPEC,data);
-        printf(PKMNDATA::getDisplayName(this->boxdata.SPEC));
-        printf(")\x1b[39m/");
-        consoleSetWindow(Top, 7,21,30,4);
-        printf(ItemList[this->boxdata.getItem()].getDisplayName().c_str());
-        if(this->boxdata.getItem()){
-            printf("\n%s",ItemList[this->boxdata.getItem()].getDescription().c_str());
-            drawItemIcon(oamTop,spriteInfoTop,ItemList[this->boxdata.getItem()].Name,0,152,a2,b2,c2,false);
+            if(G==0)
+                printf("\n (");
+            else if (G == 1)
+                printf("\x1b[34m""%c\x1b[36m\n (",141);
+            else
+                printf("\x1b[32m""%c\x1b[36m\n (",147);
+            PKMNDATA::getAll(this->boxdata.SPEC,data);
+            printf(PKMNDATA::getDisplayName(this->boxdata.SPEC));
+            printf(")\x1b[39m/");
+            consoleSetWindow(Top, 7,21,30,4);
+            printf(ItemList[this->boxdata.getItem()].getDisplayName().c_str());
+            if(this->boxdata.getItem()){
+                printf("\n%s",ItemList[this->boxdata.getItem()].getDescription().c_str());
+                drawItemIcon(oamTop,spriteInfoTop,ItemList[this->boxdata.getItem()].Name,0,152,a2,b2,c2,false);
+            }
         }
-
+        else{
+            Page = 0;
+            
+            consoleSetWindow(Top, 20,1,13,2);
+            printf("\x1b[36mEi \n (Ei)\x1b[39m/");
+        }
         switch(Page){
         case 0: 
-            consoleSetWindow(Top, 5,1,20,2);
-            printf("Pokemon-Info");
-            
-            consoleSetWindow(Top, 16,4,32,24);
-            printf("     Lv.%3i\n\n",this->Level);
-            printf("KP           %3i\n\n\n",stats.maxHP);
-            printf("ANG          %3i\n\n",stats.Atk);
-            printf("VER          %3i\n\n",stats.Def);
-            printf("INI          %3i\n\n",stats.Spd);
-            printf("SAN          %3i\n\n",stats.SAtk);
-            printf("SVE          %3i\n\n",stats.SDef);
-            
-            font::putrec(158,46,158+68,46+12,false,false,4*16-1);
-            
-            font::putrec(158,46,158+int(68.0*boxdata.IV.get(0)/31),46+6,false,false,7*16-1);
-            font::putrec(158,46+6,158+int(68.0*boxdata.EV[0]/255),46+12,false,false,7*16-1);
+            cust_font.print_string("Pokémon-Info",36,4,false);
+            if(!(this->boxdata.IV.isEgg)){
+                consoleSetWindow(Top, 16,4,32,24);
+                printf("     Lv.%3i",this->Level);
+                
+                BG_PALETTE[254] = RGB15(31,0,0);
+                BG_PALETTE[255] = RGB15(0,0,31);
 
-            for(int i= 1; i < 6; ++i){
-                font::putrec(158,54+(16*i),158+68,54+12+(16*i),false,false,4*16-1);
-                font::putrec(158,54+(16*i),158+int(68.0*boxdata.IV.get(i)/31),54+6+(16*i),false,false,(7+i)*16-1);
-                font::putrec(158,54+6+(16*i),158+int(68.0*boxdata.EV[i]/255),54+12+(16*i),false,false,(7+i)*16-1);
+                char buf[50];
+                sprintf(buf,"KP                     %3i",stats.maxHP);
+                cust_font.print_string(buf,130,44,false);
+                
+                if(NatMod[this->boxdata.getNature()][0] == 1.2)
+                    cust_font.set_color(254,1);
+                else if(NatMod[this->boxdata.getNature()][0] == 0.8)
+                    cust_font.set_color(255,1);
+                else
+                    cust_font.set_color(5,1);
+                sprintf(buf,"ANG                   %3i",stats.Atk);
+                cust_font.print_string(buf,130,69,false);
+
+                if(NatMod[this->boxdata.getNature()][1] == 1.2)
+                    cust_font.set_color(254,1);
+                else if(NatMod[this->boxdata.getNature()][1] == 0.8)
+                    cust_font.set_color(255,1);
+                else
+                    cust_font.set_color(5,1);
+                sprintf(buf,"VER                   %3i",stats.Def);
+                cust_font.print_string(buf,130,86,false);
+                
+                if(NatMod[this->boxdata.getNature()][2] == 1.2)
+                    cust_font.set_color(254,1);
+                else if(NatMod[this->boxdata.getNature()][2] == 0.8)
+                    cust_font.set_color(255,1);
+                else
+                    cust_font.set_color(5,1);
+                sprintf(buf,"INI                   \xC3\xC3""%3i",stats.Spd);
+                cust_font.print_string(buf,130,103,false);
+                                
+                if(NatMod[this->boxdata.getNature()][3] == 1.2)
+                    cust_font.set_color(254,1);
+                else if(NatMod[this->boxdata.getNature()][3] == 0.8)
+                    cust_font.set_color(255,1);
+                else
+                    cust_font.set_color(5,1);
+                sprintf(buf,"SAN                   %3i",stats.SAtk);
+                cust_font.print_string(buf,130,120,false);
+                
+                if(NatMod[this->boxdata.getNature()][4] == 1.2)
+                    cust_font.set_color(254,1);
+                else if(NatMod[this->boxdata.getNature()][4] == 0.8)
+                    cust_font.set_color(255,1);
+                else
+                    cust_font.set_color(5,1);
+                sprintf(buf,"SVE                   %3i",stats.SDef);
+                cust_font.print_string(buf,130,137,false);
+            
+                font::putrec(158,46,158+68,46+12,false,false,4*16-1);
+            
+                font::putrec(158,46,158+int(68.0*boxdata.IV.get(0)/31),46+6,false,false,7*16-1);
+                font::putrec(158,46+6,158+int(68.0*boxdata.EV[0]/255),46+12,false,false,7*16-1);
+
+                for(int i= 1; i < 6; ++i){
+                    font::putrec(158,54+(17*i),158+68,54+12+(17*i),false,false,4*16-1);
+                    font::putrec(158,54+(17*i),158+int(68.0*boxdata.IV.get(i)/31),54+6+(17*i),false,false,(7+i)*16-1);
+                    font::putrec(158,54+6+(17*i),158+int(68.0*boxdata.EV[i]/255),54+12+(17*i),false,false,(7+i)*16-1);
+                }
+            }
+            else{
+                consoleSetWindow(Top, 16,4,32,24);
+                if(this->boxdata.steps > 10){
+                    cust_font.print_string("Was da wohl",16*8,50,false);
+                    cust_font.print_string("schlüpfen wird?",16*8,70,false);
+                    cust_font.print_string("Es dauert wohl",16*8,100,false);
+                    cust_font.print_string("noch lange.",16*8,120,false);
+                }
+                else if(this->boxdata.steps > 5){
+                    cust_font.print_string("Hat es sich",16*8,50,false);
+                    cust_font.print_string("gerade bewegt?",16*8,70,false);
+                    cust_font.print_string("Da tut sich",16*8,100,false);
+                    cust_font.print_string("wohl bald was.",16*8,120,false);
+                }
+                else{
+                    cust_font.print_string("Jetzt macht es",16*8,50,false);
+                    cust_font.print_string("schon Geräusche!",16*8,70,false);
+                    cust_font.print_string("Bald ist es",16*8,100,false);
+                    cust_font.print_string("wohl soweit.",16*8,120,false);
+                }
             }
             break;
         case 1:
             {		
-                consoleSetWindow(Top, 5,1,20,2);
-                printf("Attacken");	
+                cust_font.print_string("Attacken",36,4,false);
                 
                 consoleSetWindow(Top, 16,5,32,24);
                 for (int i = 0; i < 4; i++)
@@ -754,16 +838,8 @@ namespace POKEMON{
                 break;
             }
         case 2:
-            consoleSetWindow(Top, 5,1,20,2);
-            printf("Bänder");
+            cust_font.print_string("Bänder",36,4,false);
             
-            cust_font.set_color(0,0);
-            cust_font.set_color(5,1);
-            cust_font.set_color(4,2);
-            
-            cust_font.print_string("Dies ist ein Test",100,100,false);
-            cust_font.print_string("Wer ist genial?",100,116,false);
-
             break;
         default:
             return;
@@ -771,6 +847,8 @@ namespace POKEMON{
     
         consoleSelect(Bottom);	
         printf("\x1b[39m");
+        int o2s = 50,p2s = 2,t2s = 780;
+
         oam->oamBuffer[0].x = 256 - 24;
         oam->oamBuffer[0].y = 196 - 28;
         oam->oamBuffer[13].isHidden = false;
@@ -779,52 +857,69 @@ namespace POKEMON{
         oam->oamBuffer[14].y = 196 - 28 - 22;
         oam->oamBuffer[13].x = 256 - 28 - 18;
         oam->oamBuffer[13].y = 196 - 28;
-        int o2s = 50,p2s = 2,t2s = 780;
-        if(data.Types[0] == data.Types[1]){
-            drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[0],256-50,24,true);
-            oam->oamBuffer[++o2s].isHidden = true;
+
+        if(!(this->boxdata.IV.isEgg)){
+            if(data.Types[0] == data.Types[1]){
+                drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[0],256-50,24,true);
+                oam->oamBuffer[++o2s].isHidden = true;
+            }
+            else{
+                drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[0],256-68,24,true);
+                drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[1],256-32,24,true);
+            }
+            drawItemIcon(oam,spriteInfo,this->boxdata.Ball == 0 ? "Pokeball" : ItemList[this->boxdata.Ball].Name,256-100,0,o2s,p2s,t2s,true);
+        
+            oam->oamBuffer[15].isHidden = false;
+            oam->oamBuffer[15].y = 0;
+            oam->oamBuffer[15].x = 256-96;
+            oam->oamBuffer[16].isHidden = false;
+            oam->oamBuffer[16].y = 0;
+            oam->oamBuffer[16].x = 256-32;
+            updateOAMSub(oam);
+
+            consoleSetWindow(Bottom,23,1,20,5);
+
+            if(this->boxdata.isShiny()){
+                printf("\x1b[34m""*%03i ",this->boxdata.SPEC);
+            }
+            else
+                printf("\x1b[33m""#%03i ",this->boxdata.SPEC);
+
+            if(this->boxdata.PKRUS){
+                printf("\x1b[39m""PKRS");
+            }
+        
+            oam->oamBuffer[90].isHidden = false;
+            oam->oamBuffer[90].y = -4;
+            oam->oamBuffer[90].x = -8;
+            oam->oamBuffer[90].priority = OBJPRIORITY_1;
+            oam->oamBuffer[91].isHidden = false;
+            oam->oamBuffer[91].y = 18;
+            oam->oamBuffer[91].x = -8;
+            oam->oamBuffer[91].priority = OBJPRIORITY_1;
+            oam->oamBuffer[92].isHidden = false;
+            oam->oamBuffer[92].y = -8;
+            oam->oamBuffer[92].x = 14;
+            oam->oamBuffer[92].priority = OBJPRIORITY_1;
+
+            oam->oamBuffer[90+page].isHidden = true;
+        
         }
         else{
-            drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[0],256-68,24,true);
-            drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[1],256-32,24,true);
+            oam->oamBuffer[90].isHidden = true;
+            oam->oamBuffer[91].isHidden = true;
+            oam->oamBuffer[92].isHidden = true;
+            
+            oam->oamBuffer[15].isHidden = false;
+            oam->oamBuffer[15].y = 0;
+            oam->oamBuffer[15].x = 256-32;
+            oam->oamBuffer[16].isHidden = true;
+            
+            oam->oamBuffer[o2s++].isHidden = true;
+            oam->oamBuffer[o2s++].isHidden = true;
+            drawItemIcon(oam,spriteInfo,this->boxdata.Ball == 0 ? "Pokeball" : ItemList[this->boxdata.Ball].Name,256-36,0,o2s,p2s,t2s,true);
+            updateOAMSub(oam);
         }
-        drawItemIcon(oam,spriteInfo,this->boxdata.Ball == 0 ? "Pokeball" : ItemList[this->boxdata.Ball].Name,256-100,0,o2s,p2s,t2s,true);
-        
-        oam->oamBuffer[15].isHidden = false;
-        oam->oamBuffer[15].y = 0;
-        oam->oamBuffer[15].x = 256-96;
-        oam->oamBuffer[16].isHidden = false;
-        oam->oamBuffer[16].y = 0;
-        oam->oamBuffer[16].x = 256-32;
-        updateOAMSub(oam);
-
-        consoleSetWindow(Bottom,23,1,20,5);
-        if(this->boxdata.isShiny()){
-            printf("\x1b[34m""*%03i ",this->boxdata.SPEC);
-        }
-        else
-            printf("\x1b[33m""#%03i ",this->boxdata.SPEC);
-
-        if(this->boxdata.PKRUS){
-            printf("\x1b[39m""PKRS");
-        }
-
-        
-        oam->oamBuffer[90].isHidden = false;
-        oam->oamBuffer[90].y = -4;
-        oam->oamBuffer[90].x = -8;
-        oam->oamBuffer[90].priority = OBJPRIORITY_1;
-        oam->oamBuffer[91].isHidden = false;
-        oam->oamBuffer[91].y = 18;
-        oam->oamBuffer[91].x = -8;
-        oam->oamBuffer[91].priority = OBJPRIORITY_1;
-        oam->oamBuffer[92].isHidden = false;
-        oam->oamBuffer[92].y = -8;
-        oam->oamBuffer[92].x = 14;
-        oam->oamBuffer[92].priority = OBJPRIORITY_1;
-
-        oam->oamBuffer[90+page].isHidden = true;
-        
         printf("\x1b[33m");
         for(int i = 0; i< 4; ++i){
             oam->oamBuffer[9+i].isHidden = false;
@@ -845,46 +940,90 @@ namespace POKEMON{
         oam->oamBuffer[27].x = 20;
         oam->oamBuffer[27].priority = OBJPRIORITY_1;
         updateOAMSub(oam);
-        consoleSetWindow(Bottom,0,23,20,5);
-        printf("%s",abilities[this->boxdata.ability].Name.c_str());
-        consoleSetWindow(Bottom,2,19,28,5);
-        printf("%s",abilities[this->boxdata.ability].FlavourText.c_str());
+        if(!(this->boxdata.IV.isEgg)){
+            consoleSetWindow(Bottom,0,23,20,5);
+            printf("%s",abilities[this->boxdata.ability].Name.c_str());
+            consoleSetWindow(Bottom,2,19,28,5);
+            printf("%s",abilities[this->boxdata.ability].FlavourText.c_str());
+        }
         
         consoleSetWindow(Bottom,3,3,27,15);
         
-        printf("\x1b[37m");
-        wprintf(L"  OT %ls\n  (%05i/%05i)\n\n",&(boxdata.OT[0]),this->boxdata.ID,this->boxdata.SID);
+        //wprintf(L"  OT %ls\n  (%05i/%05i)\n\n",&(boxdata.OT[0]),this->boxdata.ID,this->boxdata.SID);
+        
+        if(!BGs[BG_ind].load_from_rom){
+            dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+            dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+        }
+        else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
+            dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+            dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+            BG_ind = 0;
+        }
+
+        cust_font2.set_color(0,0);
+        cust_font2.set_color(254,1);
+        cust_font2.set_color(255,2);
+        BG_PALETTE_SUB[253] = this->boxdata.OTisFemale ? RGB15(31,15,0) : RGB15(0,15,31);
+        BG_PALETTE_SUB[254] = BG_PALETTE[5];
+        BG_PALETTE_SUB[255] = BG_PALETTE[6];
+        
+        cust_font2.print_string("OT:",28,22,true);
+        cust_font2.set_color(253,2);
+        cust_font2.print_string(boxdata.OT,56,16,true);
+        cust_font2.set_color(255,2);
+
+        char buf[50];
+        sprintf(buf, "(%05i/%05i)",this->boxdata.ID,this->boxdata.SID);
+        cust_font2.print_string(buf,50,30,true);
 
         if(this->boxdata.ID == SAV.ID && this->boxdata.SID == SAV.SID) //Trainer is OT
         {
-            if(!(this->boxdata.gotDate[0] && this->boxdata.hatchDate[0]))
+            if (this->boxdata.fateful)
+                cust_font2.print_string("Schicksalhafte Begegnung",28,120,true);	
+            if(!(this->boxdata.gotDate[0]))
             {
-                printf("Gefangen am %i.%i.%i\n in/bei ""%s\n mit Level %i.\n\n",
-                    boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace),boxdata.gotLevel);
-                printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
-                printf("Mag %s""e Pok\x82""riegel.\n\n",&(this->boxdata.getTasteStr()[0]));
+                sprintf(buf, "Gefangen am %i.%i.%i mit Level %i", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
+                cust_font2.print_string(buf,28,44,true);
+                sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
+                cust_font2.print_string(buf,35,58,true);
+                sprintf(buf, "Besitzt ein %s""es Wesen,",&(NatureList[this->boxdata.getNature()][0]));
+                cust_font2.print_string(buf,28,76,true);
+                sprintf(buf, "%s"".",&(PersonalityList[this->boxdata.getPersonality()][0]));
+                cust_font2.print_string(buf,35,90,true);
+                
+                sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
+                cust_font2.print_string(buf,28,104,true);
             }
             else
             {
-                printf("Als Ei erhalten am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2],getLoc(boxdata.gotPlace));
+                sprintf(buf, "Als Ei erhalten am %i.%i.%i", boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2]);
+                cust_font2.print_string(buf,28,44,true);
+                sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
+                cust_font2.print_string(buf,35,58,true);
                 if(!(this->boxdata.IV.isEgg))
                 {
-                    printf("Geschl\x81""pft am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
+                    printf("Geschlüpft am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
                     printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
-                    printf("Mag %s""e Pok\x82""riegel.\n\n",&(this->boxdata.getTasteStr()[0]));
+                    printf("Mag %s""e Pokériegel.\n\n",&(this->boxdata.getTasteStr()[0]));
                 }
-            }
-            if (this->boxdata.fateful)
-                printf("Schicksalhafte Begegnung.");		
+            }	
         }
         else
         {
-            if(!(this->boxdata.gotDate[0] && this->boxdata.hatchDate[0]))
+            if(!(this->boxdata.gotDate[0]))
             {
-                printf("Offenbar gef. am %i.%i.%i\n in/bei ""%s\n mit Level %i.\n\n",
-                    boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace),boxdata.gotLevel);
-                printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
-                printf("Mag %s""e Pok\x82""riegel.\n\n",&(this->boxdata.getTasteStr()[0]));
+                sprintf(buf, "Off. gef. am %i.%i.%i mit Level %i.", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
+                cust_font2.print_string(buf,28,44,true);
+                sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
+                cust_font2.print_string(buf,35,58,true);
+                sprintf(buf, "Besitzt ein %s""es Wesen,",&(NatureList[this->boxdata.getNature()][0]));
+                cust_font2.print_string(buf,28,76,true);
+                sprintf(buf, "%s"".",&(PersonalityList[this->boxdata.getPersonality()][0]));
+                cust_font2.print_string(buf,35,90,true);
+                
+                sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
+                cust_font2.print_string(buf,28,104,true);
             }
             else
             {
@@ -893,25 +1032,28 @@ namespace POKEMON{
                 {
                     printf("Geschl\x81""pft am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
                     printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
-                    printf("Mag %s""e Pok\x82""riegel.\n\n",&(this->boxdata.getTasteStr()[0]));
+                    printf("Mag %s""e Pok\x82""riegel.\n\n",this->boxdata.getTasteStr().c_str());
                 }
             }
             if (this->boxdata.fateful)
-                printf("Off. schicks. Begegnung.");		
+                cust_font2.print_string("Off. schicks. Begegnung.",28,120,true);	
         }	
-        printf("\x1b[33m");
+
+        if(!(this->boxdata.IV.isEgg)) {
+            printf("\x1b[33m");
         
-        consoleSelect(Top);	
-        consoleSetWindow(Top, 4,5,12,2);
-        printf("EP(%3i%%)\nKP(%3i%%)",(this->boxdata.exp-POKEMON::EXP[this->Level-1][0]) *100/(POKEMON::EXP[this->Level][0]-POKEMON::EXP[this->Level-1][0]),this->stats.acHP*100/this->stats.maxHP);
-        BATTLE::displayHP(100,101,46,80,97,98,false,50,56);   
-        BATTLE::displayHP(100,100-this->stats.acHP*100/this->stats.maxHP,46,80,97,98,false,50,56); 
+            consoleSelect(Top);	
+            consoleSetWindow(Top, 4,5,12,2);
+            printf("EP(%3i%%)\nKP(%3i%%)",(this->boxdata.exp-POKEMON::EXP[this->Level-1][0]) *100/(POKEMON::EXP[this->Level][0]-POKEMON::EXP[this->Level-1][0]),this->stats.acHP*100/this->stats.maxHP);
+            BATTLE::displayHP(100,101,46,80,97,98,false,50,56);   
+            BATTLE::displayHP(100,100-this->stats.acHP*100/this->stats.maxHP,46,80,97,98,false,50,56); 
         
-        BATTLE::displayEP(100,101,46,80,99,100,false,59,62);   
-        BATTLE::displayEP(0,(this->boxdata.exp-POKEMON::EXP[this->Level-1][0]) *100/(POKEMON::EXP[this->Level][0]-POKEMON::EXP[this->Level-1][0]),46,80,99,100,false,59,62); 
+            BATTLE::displayEP(100,101,46,80,99,100,false,59,62);   
+            BATTLE::displayEP(0,(this->boxdata.exp-POKEMON::EXP[this->Level-1][0]) *100/(POKEMON::EXP[this->Level][0]-POKEMON::EXP[this->Level-1][0]),46,80,99,100,false,59,62); 
         
-        if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),this->boxdata.isFemale,true))
-            loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),!this->boxdata.isFemale,true);
+            if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),this->boxdata.isFemale,true))
+                loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),!this->boxdata.isFemale,true);
+        }
     }
     extern bool drawInfoSub(u16* layer,int PKMN);
     int PKMN::draw(){

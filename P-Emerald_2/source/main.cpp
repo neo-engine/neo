@@ -94,7 +94,8 @@ int bg2;
 extern PrintConsole Top,Bottom;
 ConsoleFont cfont;
 Keyboard* kbd;
-font::Font cust_font(font::font_data, font::font_widths);
+font::Font cust_font(font::font1::font_data, font::font1::font_widths,font::font1::shiftchar);
+font::Font cust_font2(font::font2::font_data, font::font2::font_widths,font::font2::shiftchar);
 
 //extern Map Maps[];
 
@@ -1010,7 +1011,7 @@ START:
                     for(int i = 0;i<6;++i)
                     {
                         POKEMON::PKMN a(A,HILFSCOUNTER,0,
-                        1+rand()%100,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,false,true,rand()%2,true,rand()%2,false,HILFSCOUNTER,i+1,i);
+                        1+rand()%100,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;
                         a.stats.acHP = i*a.stats.maxHP/5;
                         SAV.PKMN_team.push_back(a);
