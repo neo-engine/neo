@@ -42,6 +42,7 @@
     <ClCompile Include="source\font_data.cpp" />
     <ClCompile Include="source\hex2dec.c" />
     <ClCompile Include="source\item.cpp" />
+    <ClCompile Include="source\keyboard.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Map.cpp" />
     <ClCompile Include="source\maploader.cpp" />

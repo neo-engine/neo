@@ -418,7 +418,7 @@ bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,co
         updateOAM(oam);
     return true;
 }
-bool loadPicture(u16* layer,const char* Path, const char* Name,int palsize){
+bool loadPicture(u16* layer,const char* Path, const char* Name,int palsize,int tilecnt){
     char pt[100];
     sprintf(pt, "%s%s.raw",Path,Name);
     FILE* fd = fopen(pt,"rb");
@@ -431,13 +431,13 @@ bool loadPicture(u16* layer,const char* Path, const char* Name,int palsize){
     fread(TEMP,  sizeof(unsigned int),12288, fd);
     fread(TEMP_PAL,  sizeof(unsigned short int),256, fd);
 
-    dmaCopy(TEMP, layer, 256*192 );
+    dmaCopy(TEMP, layer, tilecnt );
     dmaCopy( TEMP_PAL, BG_PALETTE, palsize); 
     fclose(fd);
     
     return true;
 }
-bool loadPictureSub(u16* layer,const char* Path, const char* Name,int palsize){
+bool loadPictureSub(u16* layer,const char* Path, const char* Name,int palsize,int tilecnt){
     char pt[100];
     sprintf(pt, "%s%s.raw",Path,Name);
     FILE* fd = fopen(pt,"rb");
@@ -450,7 +450,7 @@ bool loadPictureSub(u16* layer,const char* Path, const char* Name,int palsize){
     fread(TEMP,  sizeof(unsigned int),12288, fd);
     fread(TEMP_PAL,  sizeof(unsigned short int),256, fd);
 
-    dmaCopy(TEMP, layer, 256*192 );
+    dmaCopy(TEMP, layer,tilecnt);
     dmaCopy( TEMP_PAL, BG_PALETTE_SUB, palsize); 
     fclose(fd);
     

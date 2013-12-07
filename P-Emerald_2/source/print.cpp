@@ -44,8 +44,14 @@ namespace font{
     void Font::print_string(const char *string, s16 x, s16 y,bool bottom) {
         u32 current_char = 0;
         s16 put_x = x, put_y = y;
-    
+
         while (string[current_char]) {
+            if(string[current_char] == '\n'){
+                put_y += FONT_HEIGHT;
+                put_x = x;
+                current_char++;
+                continue;
+            }
             print_char(string[current_char], put_x, put_y,bottom);
             
             u16 c = (u16)string[current_char];
@@ -60,6 +66,12 @@ namespace font{
         s16 put_x = x, put_y = y;
     
         while (string[current_char]) {
+            if(string[current_char] == '\n'){
+                put_y += FONT_HEIGHT;
+                put_x = x;
+                current_char++;
+                continue;
+            }
             print_char(string[current_char], put_x, put_y,bottom);
             
             u16 c = (u16)string[current_char];
@@ -74,6 +86,12 @@ namespace font{
         s16 put_x = x, put_y = y;
     
         while (string[current_char]) {
+            if(string[current_char] == '\n'){
+                put_y += 16;
+                put_x = x;
+                current_char++;
+                continue;
+            }
             print_char(string[current_char], put_x, put_y,bottom);
 
             u16 c = (u16)string[current_char];
@@ -90,6 +108,12 @@ namespace font{
         s16 put_x = x, put_y = y;
     
         while (string[current_char]) {
+            if(string[current_char] == '\n'){
+                put_y += FONT_HEIGHT;
+                put_x = x;
+                current_char++;
+                continue;
+            }
             print_char(string[current_char], put_x, put_y,bottom);
 
             u16 c = (u16)string[current_char];
@@ -165,6 +189,8 @@ namespace font{
         u32 width = 0;
     
         while (string[current_char]) {
+            if(current_char == '\n')
+                break;
             width += widths[(u8)string[current_char]] + 1;
         
             current_char++;
@@ -177,6 +203,8 @@ namespace font{
         u32 width = 0;
     
         while (string[current_char]) {
+            if(current_char == '\n')
+                break;
             width += widths[(u8)string[current_char]] + 1;
         
             current_char++;

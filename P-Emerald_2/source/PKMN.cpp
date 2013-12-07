@@ -917,7 +917,7 @@ namespace POKEMON{
             
             oam->oamBuffer[o2s++].isHidden = true;
             oam->oamBuffer[o2s++].isHidden = true;
-            drawItemIcon(oam,spriteInfo,this->boxdata.Ball == 0 ? "Pokeball" : ItemList[this->boxdata.Ball].Name,256-36,0,o2s,p2s,t2s,true);
+            drawItemIcon(oam,spriteInfo,this->boxdata.Ball == 0 ? "Pokeball" : ItemList[this->boxdata.Ball].Name,256-32,0,o2s,p2s,t2s,true);
             updateOAMSub(oam);
         }
         printf("\x1b[33m");

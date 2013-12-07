@@ -52,31 +52,6 @@ SpriteInfo spriteInfoTop[SPRITE_COUNT];
 int mainSpritesPositions[6][2] 
 = {{130,60},{160,80},{160,115},{130,135},{100,115},{100,80}};
 
-//Map* acMap;
-
-//extern N3DDEVICE g_device;
-
-//void SetupMatrices();
-//void RenderScene(const N3DFLOAT _timeStep);
-//void SetupMatrices()
-//{   
-//    // Build the projection matrix
-//    N3DMATRIX projMatrix;
-//
-//    N3DMatrixPerspectiveFovLH(projMatrix, N3DFLOAT(N3DPI / 4.0f), N3DFLOAT(4.0f / 3.0f), N3DFLOAT(1.0f), N3DFLOAT(100.0f));
-//    g_device.SetTransform(N3DTS_PROJECTION, projMatrix);
-//
-//
-//    // Build the view matrix
-//    N3DMATRIX   viewMatrix;
-//    N3DVECTOR3  eye(N3DFLOAT(0), N3DFLOAT(0), N3DFLOAT(0));
-//    N3DVECTOR3  at(N3DFLOAT(1), N3DFLOAT(1.75), N3DFLOAT(4));
-//    N3DVECTOR3  up(N3DFLOAT(0), N3DFLOAT(1), N3DFLOAT(0));
-//
-//    N3DMatrixLookAtLH(viewMatrix, eye, at, up);
-//    g_device.SetTransform(N3DTS_VIEW, viewMatrix);
-//}
-
 enum GameMod{
     DEVELOPER,
     ALPHA,
@@ -284,24 +259,6 @@ ChoiceResult opScreen(int type)
     }
 }
 
-void printText(const char* text){    
-    int indx = 0;
-    while(text[indx] != '\0'){/*
-        if(text[indx] == ' ' || text[indx] == '\n')
-            for(int i= 0; i < 120/TEXTSPEED; ++i)
-                swiWaitForVBlank();*/
-        for(int i= 0; i < 80/TEXTSPEED; ++i)
-        swiWaitForVBlank();
-        printf("%c",text[indx++]);
-    }
-    while(1)
-    {
-        scanKeys();
-        if(keysUp() & KEY_TOUCH) break;
-        if(keysUp() & KEY_A) break;
-    }
-}
-
 void initNewGame()
 {
     SAV = savgm();
@@ -324,12 +281,36 @@ void initNewGame()
     consoleSetWindow(&Bottom,3,10,26,5);
 
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","ClearD");
-    for(int i = 1;i<256;++i)
-    BG_PALETTE_SUB[i] = RGB15(31,31,31);
+      
+    cust_font.set_color(0,0);
+    cust_font.set_color(251,1);
+    cust_font.set_color(252,2);
+    cust_font2.set_color(0,0);
+    cust_font2.set_color(253,1);
+    cust_font2.set_color(254,2);
     
-    printText("Haaaaalt!\n");
-    printText("Hier lang.");
-    consoleClear();	
+    BG_PALETTE_SUB[250] = RGB15(31,31,31);
+    BG_PALETTE_SUB[251] = RGB15(30,30,30);
+    BG_PALETTE_SUB[252] = RGB15(15,15,15);
+    BG_PALETTE_SUB[253] = RGB15(15,15,15);
+    BG_PALETTE_SUB[254] = RGB15(31,31,31);
+
+    cust_font.print_string_d("Haaaaalt!",24,84,true);
+    while(1)
+    {
+        scanKeys();
+        if(keysUp() & KEY_TOUCH) break;
+        if(keysUp() & KEY_A) break;
+    }    
+    cust_font.print_string_d("Hier lang!",100,84,true);
+    while(1)
+    {
+        scanKeys();
+        if(keysUp() & KEY_TOUCH) break;
+        if(keysUp() & KEY_A) break;
+    }
+    loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
+
     free_spaces.clear();
     for (int i = 0; i < MAXPKMN; i++){
         SAV.inDex[i] = false;
@@ -342,52 +323,63 @@ void initNewGame()
         free_spaces.push_back(i);
     }
 
-    /*dmaCopy( NewGameBitmap, bgGetGfxPtr(bg3), 256*256 );
-    dmaCopy( NewGamePal,BG_PALETTE, 256*2); 
+    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
+    cust_font.print_string_d("Hi, ich bin Maike, die\n""Tochter von Prof. Birk.",24,76,true);
     
     while(1)
     {
         scanKeys();
-        if(keysUp() & KEY_TOUCH)
-            break;
-        if(keysUp() & KEY_A)
-            break;
-    }*/
+        if(keysUp() & KEY_TOUCH) break;
+        if(keysUp() & KEY_A) break;
+    }
+    loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
-    printf("\x1b[37m");
-    printText("Hi, ich bin Maike, die\n""Tochter von Prof. Birk.");
-    consoleClear();
+    cust_font.print_string_d("Da er gerade leider nicht in Hoenn\nist, werde ich euch heute euren\nPokéNav und euren PokéDex\nüberreichen.",8,68,true);
     
-    printText("Da er gerade leider nicht in Hoenn ist, werde ich\n""euch heute euren Pok\x82""Nav  und euren Pok\x82""Dex\n\x81""berreichen.");
-    consoleClear();
-    printText("So hier ist zun\x84""chst\n""der Pok\x82""Nav!");
-    consoleClear();
-    printText("Ich gehe dann jetzt mal\ndie Dexe holen.\nIhr k\x94""nnt solange eure\nPok\x82""Nav einrichten");	
-    consoleClear();
+    while(1)
+    {
+        scanKeys();
+        if(keysUp() & KEY_TOUCH) break;
+        if(keysUp() & KEY_A) break;
+    }
+    loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");  
+    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
+    cust_font.print_string_d("So hier ist erstmal der PokéNav!",8,84,true);
+    
+    while(1)
+    {
+        scanKeys();
+        if(keysUp() & KEY_TOUCH) break;
+        if(keysUp() & KEY_A) break;
+    }
+    loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
+    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
+    cust_font.print_string_d("Ich gehe dann jetzt mal\ndie Dexe holen.\nIhr könnt solange eure\nPokéNav einrichten.",24,68,true);
+    while(1)
+    {
+        scanKeys();
+        if(keysUp() & KEY_TOUCH) break;
+        if(keysUp() & KEY_A) break;
+    }
+    loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
+
     consoleSelect(&Bottom);
-    printf("\x1b[39m");
-    //BG_PALETTE_SUB[255] = RGB15(0,0,0);
-    std::wstring S_ = L"Du erh\x84""lst einen Pok\x82""Nav.";
+    std::wstring S_;
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PokeNav");
     scrn.init();
     setMainSpriteVisibility(true);
     oam->oamBuffer[1].isHidden = true;
     updateOAMSub(oam);
-    mbox M(S_.c_str());
+    mbox M("Du erhälst einen PokéNav.");
     M.clear();
-    consoleClear();
     
-    for(int i= 9;i <= 12; ++i) {
-        oam->oamBuffer[i].isHidden = false;
-        updateOAMSub(oam);
-    }
     M.put("Beginne automatische\nInitialisierung.",false);
     for(int i = 0; i < 120;++i)
     swiWaitForVBlank();
-    M.put("\nSetze Heimatregion: Hoenn.",false);
+    M.put("Setze Heimatregion: Hoenn.",false);
     for(int i = 0; i < 120;++i)
     swiWaitForVBlank();
-    M.put("\nSetze Heimatstadt: Klippdelta City.",false);
+    M.put("Setze Heimatstadt: Klippdelta City.",false);
     for(int i = 0; i < 120;++i)
     swiWaitForVBlank();
     std::stringstream s2,s3;
@@ -398,12 +390,12 @@ void initNewGame()
     B.insert(B.begin(),5-B.length(),'0');
     C.insert(C.begin(),5-C.length(),'0');
 
-    B = "\nSetze ID: " + B;
+    B = "Setze ID: " + B;
     M.put(&(B[0]),false);
     for(int i = 0; i < 120;++i)
     swiWaitForVBlank();
     
-    C = "\nSetze SID: " + C;
+    C = "Setze SID: " + C;
     M.put(&(C[0]),false);
     for(int i = 0; i < 120;++i)
     swiWaitForVBlank();
@@ -415,6 +407,7 @@ void initNewGame()
 INDIVIDUALISIERUNG:
     M = mbox("Beginne Individualisierung.");
     ynbox yn  = ynbox(M);
+    consoleSetWindow(&Bottom, 1,1,22,MAXLINES);	
     SAV.IsMale = !yn.getResult("Bist du ein M\x84""dchen?");
     consoleClear();
     M.clear();
@@ -478,8 +471,8 @@ INDIVIDUALISIERUNG:
         loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind);
         for (int k = 0; k < 30; k++)
         swiWaitForVBlank();
-        M = mbox("Das hei\x9D""t eigentlich.","Lari",true,true,false,mbox::sprite_trainer,0);
-        M = mbox("Als alle Kanto ver-\nlassen haben, sind wir""nach Klippdelta\ngezogen.","Lari",true,true,true,mbox::sprite_trainer,0);
+        M = mbox("Das heißt eigentlich.","Lari",true,true,false,mbox::sprite_trainer,0);
+        M = mbox("Als alle Kanto verlassen\nhaben, sind wir nach Klippdelta\ngezogen.","Lari",true,true,true,mbox::sprite_trainer,0);
         consoleClear();
         loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind);
         for (int k = 0; k < 30; k++)
@@ -489,7 +482,7 @@ INDIVIDUALISIERUNG:
         loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind);
         for (int k = 0; k < 30; k++)
         swiWaitForVBlank();
-        M = mbox("Na dann sehen wir uns ja wahrscheinlich\nnoch \x94""fter...","Lari",true,true,true,mbox::sprite_trainer,0);
+        M = mbox("Na dann sehen wir uns ja\nwahrscheinlich noch öfter...","Lari",true,true,true,mbox::sprite_trainer,0);
         consoleClear();
         loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind);
     }
@@ -503,55 +496,53 @@ INDIVIDUALISIERUNG:
         consoleClear();
         dmaCopy( BrotherBitmap, bgGetGfxPtr(bg3), 256*256 );
         dmaCopy( BrotherPal,BG_PALETTE, 256*2); 
-        M = mbox("Bist doch\nnur neidisch!","???",true,true,false,mbox::sprite_pkmn,0);
+        M = mbox("Bist doch nur neidisch!","???",true,true,false,mbox::sprite_pkmn,0);
         consoleClear();
         dmaCopy( MaleBitmap, bgGetGfxPtr(bg3), 256*256 );
         dmaCopy( MalePal,BG_PALETTE, 256*2); 
         M = mbox("Wozu...\n","???",true,true,false,mbox::sprite_pkmn,0);
         consoleClear();
         M = mbox("Hi, ich bin Sebastian.","???",true,true,false,mbox::sprite_trainer,0);
-        M = mbox("Aber nenn' mich ruhig Basti.","Basti",true,true,false,mbox::sprite_trainer,0);
-        M = mbox("Das da ist mein\n""kleiner Bruder Moritz.","Basti",true,true,false,mbox::sprite_trainer,0);
+        M = mbox("Nenn' mich ruhig Basti.","Basti",true,true,false,mbox::sprite_trainer,0);
+        M = mbox("Das da ist mein\nkleiner Bruder Moritz.","Basti",true,true,false,mbox::sprite_trainer,0);
         M = mbox("Wir kommen aus Azuria.","Basti",true,true,true,mbox::sprite_trainer,0);
         loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind);
         for (int k = 0; k < 30; k++)
         swiWaitForVBlank();
-        M = mbox("Das hei\x9D""t eigentlich.","Basti",true,true,false,mbox::sprite_trainer,0);
-        M = mbox("Als alle Kanto ver-\nlassen haben, sind wir""nach Klippdelta\ngezogen.","Basti",true,true,true,mbox::sprite_trainer,0);
+        M = mbox("Das heißt eigentlich.","Basti",true,true,false,mbox::sprite_trainer,0);
+        M = mbox("Als alle Kanto verlassen\nhaben, sind wir\nnach Klippdelta.","Basti",true,true,true,mbox::sprite_trainer,0);
         consoleClear();
         M = mbox("Du lebst auch in\nKlippdelta, nich? ","Basti",true,true,false,mbox::sprite_trainer,0);	
         consoleClear();
-        M = mbox("Als erstes werde ich\nein Trasla fangen.\nDann habe ich bald einGuardevoir.","Basti",true,true,false,mbox::sprite_trainer,0);
-        M = mbox("Dann k\x94""nnen wir ja malk\x84""mpfen, ich meine,\ndu wohnst ja nur ein\nHaus weiter.","Basti",true,true,true,mbox::sprite_trainer,0);
+        M = mbox("Als erstes werde ich\nein Trasla fangen.","Basti",true,true,false,mbox::sprite_trainer,0);
+        M = mbox("Dann habe ich bald ein\nGuardevoir.","Basti",true,true,false,mbox::sprite_trainer,0);
+        M = mbox("Dann können wir ja mal\nkämpfen, du wohnst ja\nnur ein Haus weiter.","Basti",true,true,true,mbox::sprite_trainer,0);
         consoleClear();
     }	
     for (int k = 0; k < 45; k++)
     swiWaitForVBlank();
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
-    mbox("So, hier habt ihr das Pok\x82""Dex-Modul f\x81""r den Pok\x82""Nav.","Maike",true,true,false,mbox::sprite_trainer,0);
-    S_ = L"Einmal f\x81""r " +SAV.getName();
-    mbox(S_.c_str(),L"Maike",true,true,false,mbox::sprite_trainer,0);	
-    mbox("Einmal f\x81""r Moritz.","Maike",true,true,false,mbox::sprite_trainer,0);
+    mbox("So, hier habt ihr das\nPokéDex-Modul für den\nPokéNav.","Maike",true,true,false,mbox::sprite_trainer,0);
+    mbox("Einmal für dich.","Maike",true,true,false,mbox::sprite_trainer,0);	
+    mbox("Einmal für Moritz.","Maike",true,true,false,mbox::sprite_trainer,0);
     if(SAV.IsMale)
-    mbox("Und einmal f\x81""r Lari.","Maike",true,true,true,mbox::sprite_trainer,0);
+    mbox("Und einmal für Lari.","Maike",true,true,true,mbox::sprite_trainer,0);
     else
-    mbox("Und einmal f\x81""r Basti.","Maike",true,true,true,mbox::sprite_trainer,0);
-    consoleClear();
-    loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind);
-    S_ = SAV.getName(); S_ += L" erh\x84""lt\ndas Pok\x82""Dex-Modul.";
-    M = mbox(S_.c_str());
+    mbox("Und einmal für Basti.","Maike",true,true,true,mbox::sprite_trainer,0);
+
+    M = mbox("Du erhälst das\nPokéDex-Modul für den PokéNav!");
     
     
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
-    mbox("Der Pok\x82""Nav ist in derLage, euch s\x84""mtliche\nDaten \x81""ber eure\nPok\x82""mon zu liefern.","Maike",true,true,false,mbox::sprite_trainer,0);
-    mbox("Auch kann man mit ihm andere Trainer anrufenund er besitzt eine\nKartenfunktion.","Maike",true,true,false,mbox::sprite_trainer,0);
+    mbox("Der PokéNav kann euch\nalles über eure\nPokémon liefern.","Maike",true,true,false,mbox::sprite_trainer,0);
+    mbox("Man kann mit ihm andere\nTrainer anrufen und er\nhat 'ne Kartenfunktion.","Maike",true,true,false,mbox::sprite_trainer,0);
     dmaCopy( BrotherBitmap, bgGetGfxPtr(bg3), 256*256 );
     dmaCopy( BrotherPal,BG_PALETTE, 256*2); 
-    mbox("Und er organisiert\neinem auch so den\nBeutel, dass er\noptimal gef\x81""llt ist!","Moritz",true,true,false,mbox::sprite_trainer,0);
+    mbox("Und er zeigt einem,\nwie man den Beutel\nam Besten packt!","Moritz",true,true,false,mbox::sprite_trainer,0);
     mbox("Moritz!",SAV.getName().c_str());
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
     mbox("...","Maike",true,false,false,mbox::sprite_trainer,0);
-    mbox("Also, vergesst ihn ja nicht bei euch zu\nHause, wenn ihr auf\nReisen geht!","Maike",true,true,false,mbox::sprite_trainer,0);
+    mbox("Also, vergesst ihn ja nich'\nbei euch zu Hause, wenn\nihr auf Reisen geht!","Maike",true,true,false,mbox::sprite_trainer,0);
     mbox("Also dann, bis bald!","Maike",true,true,true,mbox::sprite_trainer,0);
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
     

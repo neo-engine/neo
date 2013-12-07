@@ -4,6 +4,8 @@
 #include "item.h"
 #include <cmath>
 #include <vector>
+
+#include "print.h"
     
 extern void setMainSpriteVisibility(bool hidden);
 extern BG_set BGs[MAXBG];
@@ -11,11 +13,67 @@ extern int BG_ind;
 extern SpriteInfo spriteInfo[SPRITE_COUNT];
 extern OAMTable *oam;
 extern ConsoleFont cfont;
+extern font::Font cust_font;
+extern font::Font cust_font2;
 
 bool back_, save_,main_;
 SpriteEntry * back, *save;
 int TEXTSPEED  = 35;
 
+void init(){
+    if(!BGs[BG_ind].load_from_rom){
+        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+        dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+    }
+    else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
+        dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+        dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+        BG_ind = 0;
+    }
+
+    for(int i= 0; i< 4; ++i)
+        oam->oamBuffer[31+2*i].isHidden = true;
+    
+    updateOAMSub(oam);
+    
+    cust_font.set_color(0,0);
+    cust_font.set_color(251,1);
+    cust_font.set_color(252,2);
+    cust_font2.set_color(0,0);
+    cust_font2.set_color(253,1);
+    cust_font2.set_color(254,2);
+    
+    BG_PALETTE_SUB[250] = RGB15(31,31,31);
+    BG_PALETTE_SUB[251] = RGB15(15,15,15);
+    BG_PALETTE_SUB[252] = RGB15(3,3,3);
+    BG_PALETTE_SUB[253] = RGB15(15,15,15);
+    BG_PALETTE_SUB[254] = RGB15(31,31,31);
+    font::putrec(0,0,256,63,true,false,250);
+    
+    updateOAMSub(oam);
+}
+void dinit(){
+    if(!BGs[BG_ind].load_from_rom){
+        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+        dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+    }
+    else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
+        dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+        dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+        BG_ind = 0;
+    }
+
+    for(int i= 0; i< 4; ++i)
+        oam->oamBuffer[31+2*i].isHidden = false;
+}
+
+void mbox::clear(){
+    font::putrec(0,0,256,63,true,false,250);
+}
+void mbox::clearButName()
+{
+    font::putrec(72,0,256,63,true,false,250);
+}
 
 mbox::mbox(item item, const int count){
     back = &oam->oamBuffer[0];
@@ -90,27 +148,12 @@ mbox::mbox(const char* text,bool time,bool remsprites)
     setSpriteVisibility(back,true);
     setSpriteVisibility(save,true);
     setMainSpriteVisibility(true);
-    for(int i= 9;i <= 12; ++i)
-        oam->oamBuffer[i].isHidden = false;
-    updateOAMSub(oam);
-    
-    //Bottom = *consoleInit(&Bottom,  0, BgType_Text4bpp, BgSize_T_256x256, 2,0, false,true );
-    //consoleSetFont(&Bottom, &cfont);
-    
+
+    init();
+
     if(time) updateTime();
 
-    loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind);
-    consoleSetWindow(&Bottom, 1,1,30,MAXLINES);
-    consoleSelect(&Bottom);
-    int indx = 0;
-    while(text[indx] != '\0'){/*
-        if(text[indx] == ' ' || text[indx] == '\n')
-            for(int i= 0; i < 120/TEXTSPEED; ++i)
-                swiWaitForVBlank();*/
-        for(int i= 0; i < 80/TEXTSPEED; ++i)
-            swiWaitForVBlank();
-        printf("%c",text[indx++]);
-    }
+    cust_font.print_string_d(text,8,8,true);
     oam->oamBuffer[8].isHidden = false;
     updateOAMSub(oam);
     touchPosition touch;
@@ -142,11 +185,8 @@ mbox::mbox(const char* text,bool time,bool remsprites)
     setSpriteVisibility(back,back_);
     setSpriteVisibility(save,save_);
     setMainSpriteVisibility(main_);
-    oam->oamBuffer[8].isHidden = true;
-    for(int i= 9;i <= 12; ++i) {
-        oam->oamBuffer[i].isHidden = remsprites;
-        swiWaitForVBlank();
-    }
+    oam->oamBuffer[8].isHidden = true;    
+    dinit();
     updateOAMSub(oam);
     swiWaitForVBlank();
 }
@@ -160,30 +200,12 @@ mbox::mbox(const wchar_t* text,bool time,bool remsprites)
     setSpriteVisibility(back,true);
     setSpriteVisibility(save,true);
     setMainSpriteVisibility(true);
-    for(int i= 9;i <= 12; ++i) {
-        oam->oamBuffer[i].isHidden = false;
-    }
-    updateOAMSub(oam);
     
-    //dmaCopy( BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256 );
-    //dmaCopy( BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2);
-    //Bottom = *consoleInit(&Bottom,  0, BgType_Text4bpp, BgSize_T_256x256,2,0, false,true );
-    //consoleSetFont(&Bottom, &cfont);
+    init();
     
     if(time) updateTime();
 
-    loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind);
-    consoleSetWindow(&Bottom, 1,1,30,MAXLINES);
-    consoleSelect(&Bottom);
-    int indx = 0;
-    while(text[indx] != '\0'){/*
-        if(text[indx] == ' ' || text[indx] == '\n')
-            for(int i= 0; i < 120/TEXTSPEED; ++i)
-                swiWaitForVBlank();*/
-        for(int i= 0; i < 80/TEXTSPEED; ++i)
-            swiWaitForVBlank();
-        printf("%c",text[indx++]);
-    }
+    cust_font.print_string_d(text,8,8,true);
     oam->oamBuffer[8].isHidden = false;
     updateOAMSub(oam);
     touchPosition touch;
@@ -220,6 +242,7 @@ mbox::mbox(const wchar_t* text,bool time,bool remsprites)
         oam->oamBuffer[i].isHidden = remsprites;
         swiWaitForVBlank();
     }
+    dinit();
     updateOAMSub(oam);
     swiWaitForVBlank();
 }
@@ -233,10 +256,6 @@ mbox::mbox(const char* text,const char* name,bool time,bool a,bool remsprites,sp
     setSpriteVisibility(back,true);
     setSpriteVisibility(save,true);
     setMainSpriteVisibility(true);
-    for(int i= 9;i <= 12; ++i) {
-        oam->oamBuffer[i].isHidden = false;
-        swiWaitForVBlank();
-    }
     if(sprt != no_sprite){
         int a= 0,b = 0,c = 0;
         if(sprt == sprite_pkmn){
@@ -246,26 +265,13 @@ mbox::mbox(const char* text,const char* name,bool time,bool a,bool remsprites,sp
             loadPKMNSpriteTop(oam,spriteInfo,"nitro:/PICS/SPRITES/TRAINER/",sprind,(u16)-16,0,a,b,c,true);
         }
     }
-    updateOAMSub(oam);
+
+    init();
+        
+    if(time) updateTime();
     
-    //Bottom = *consoleInit(&Bottom,  0, BgType_Text4bpp, BgSize_T_256x256, 2,0, false,true );
-    //consoleSetFont(&Bottom, &cfont);
-    
-    dmaCopy( BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256 );
-    dmaCopy( BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2);
-    consoleSetWindow(&Bottom,1,1,8,MAXLINES-1);
-    consoleSelect(&Bottom);
-    printf(name);
-    consoleSetWindow(&Bottom, 9,1,22,MAXLINES);
-    int indx = 0;
-    while(text[indx] != '\0'){/*
-        if(text[indx] == ' ' || text[indx] == '\n')
-            for(int i= 0; i < 120/TEXTSPEED; ++i)
-                swiWaitForVBlank();*/
-        for(int i= 0; i < 80/TEXTSPEED; ++i)
-            swiWaitForVBlank();
-        printf("%c",text[indx++]);
-    }
+    cust_font.print_string(name,8,8,true);
+    cust_font.print_string_d(text,72,8,true);
     if(a)
         oam->oamBuffer[8].isHidden = false;
     updateOAMSub(oam);
@@ -310,6 +316,7 @@ mbox::mbox(const char* text,const char* name,bool time,bool a,bool remsprites,sp
         oam->oamBuffer[i].isHidden = remsprites;
         swiWaitForVBlank();
     }
+    dinit();
     updateOAMSub(oam);
     swiWaitForVBlank();
 }
@@ -323,10 +330,6 @@ mbox::mbox(const wchar_t* text,const wchar_t* name,bool time,bool a,bool remspri
     setSpriteVisibility(back,true);
     setSpriteVisibility(save,true);
     setMainSpriteVisibility(true);
-    for(int i= 9;i <= 12; ++i) {
-        oam->oamBuffer[i].isHidden = false;
-        swiWaitForVBlank();
-    }
     if(sprt != no_sprite){
         int a= 0,b = 0,c = 0;
         if(sprt == sprite_pkmn){
@@ -338,29 +341,14 @@ mbox::mbox(const wchar_t* text,const wchar_t* name,bool time,bool a,bool remspri
     }
     updateOAMSub(oam);
     
-    //dmaCopy( BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256 );
-    //dmaCopy( BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2);
-    //Bottom = *consoleInit(&Bottom,  0, BgType_Text4bpp, BgSize_T_256x256,2,0, false,true );
-    //consoleSetFont(&Bottom, &cfont);
+    init();
     
     if(name){
-        consoleSetWindow(&Bottom,1,1,8,MAXLINES-1);
-        consoleSelect(&Bottom);
-        wprintf(name);
-        consoleSetWindow(&Bottom, 9,1,22,MAXLINES);
+        cust_font.print_string(name,8,8,true);
+        cust_font.print_string_d(text,72,8,true);
     }
     else{
-        consoleSetWindow(&Bottom,1,1,30,MAXLINES-1);
-        consoleSelect(&Bottom);
-    }
-    int indx = 0;
-    while(text[indx] != L'\0'){/*
-        if(text[indx] == ' ' || text[indx] == '\n')
-            for(int i= 0; i < 120/TEXTSPEED; ++i)
-                swiWaitForVBlank();*/
-        for(int i= 0; i < 80/TEXTSPEED; ++i)
-            swiWaitForVBlank();
-        printf("%lc",text[indx++]);
+        cust_font.print_string_d(text,8,8,true);
     }
     if(a)
         oam->oamBuffer[8].isHidden = false;
@@ -406,24 +394,16 @@ mbox::mbox(const wchar_t* text,const wchar_t* name,bool time,bool a,bool remspri
         oam->oamBuffer[i].isHidden = remsprites;
         swiWaitForVBlank();
     }
+    dinit();
     updateOAMSub(oam);
     swiWaitForVBlank();
 }
 
 void mbox::put(const char* text,bool a,bool time)
 {
-    dmaCopy( BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256 );
-    dmaCopy( BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2);
-    consoleSelect(&Bottom);
-    int indx = 0;
-    while(text[indx] != '\0'){/*
-        if(text[indx] == ' ' || text[indx] == '\n')
-            for(int i= 0; i < 120/TEXTSPEED; ++i)
-                swiWaitForVBlank();*/
-        for(int i= 0; i < 80/TEXTSPEED; ++i)
-            swiWaitForVBlank();
-        printf("%c",text[indx++]);
-    }
+    init();
+    
+    cust_font.print_string_d(text,8,8,true);
 
     if(a)
     {

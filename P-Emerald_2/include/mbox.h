@@ -2,6 +2,7 @@
 #include <string>
 #include <cstdio>
 
+
 #ifndef __MBOX__
 #define __MBOX__
 extern int bg3sub;
@@ -32,29 +33,10 @@ public:
     mbox(const wchar_t* text,const wchar_t* name,bool time = true,bool a = true,bool remsprites = true,sprite_type sprt = no_sprite,int sprind = 0);
     ~mbox()
     {
-        consoleSetWindow(&Bottom, 9,1,22,MAXLINES);	
-        consoleSelect(&Bottom);
-        consoleClear();
-        consoleSetWindow(&Bottom,1,1,8,MAXLINES-1);
-        consoleClear();
-        consoleSetWindow(&Bottom, 1,1,30,MAXLINES);
-        consoleClear();
     }
     void put(const char* text,bool a = true,bool time = true);
-    void clear(){
-        consoleSelect(&Bottom);
-        consoleClear();
-        consoleSetWindow(&Bottom,1,1,8,MAXLINES-1);
-        consoleClear();
-        consoleSetWindow(&Bottom, 1,1,30,MAXLINES);
-        consoleClear();
-    }
-    void clearButName()
-    {
-        consoleSelect(&Bottom);
-        consoleClear();
-        consoleSetWindow(&Bottom, 9,1,22,MAXLINES);	
-    }
+    void clear();
+    void clearButName();
 };
 
 class ynbox
