@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
-#include <sstream>
 
 #include "attack.h"
 #include "PKMNInfoScreen.h"

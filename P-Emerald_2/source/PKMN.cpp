@@ -48,12 +48,11 @@ namespace POKEMON{
         "liebt es, zu rennen","achtet auf Geräusche","ist ungestüm und einfältig","ist fast wie eine Clown","flüchtet schnell"
     };
 
-    const char LOC_PATH[] = "nitro:/LOCATIONS/";
     const char* getLoc(int ind) {
-        std::stringstream FILENAME;
-        FILENAME << LOC_PATH << ind << ".data";
-        FILE* f = fopen(FILENAME.str().c_str(),"r");
-        if(f == 0){
+        char buf[50];
+        sprintf(buf,"nitro:/LOCATIONS/%i.data",ind);
+        FILE* f = fopen(buf,"r");
+        if(f == 0){ 
             fclose(f);
             return "Entfernter Ort";
         }

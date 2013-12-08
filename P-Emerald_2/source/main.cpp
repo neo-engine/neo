@@ -15,7 +15,6 @@
 //#include "submesh0_n3dmesh_bin.h"
 
 #include <string>
-#include <sstream>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -128,13 +127,11 @@ void fillWeiter()
     printf(&W[0]);
     printf("\n");
 
-    std::wstringstream ss;
-    ss << SAV.PLAYTIME / 60<<":"<<((SAV.PLAYTIME-(SAV.PLAYTIME / 60 * 60)) / 10)<< ((SAV.PLAYTIME-(SAV.PLAYTIME / 60 * 60)) % 10);
-    P = ss.str();
-    P.insert(P.begin(),20-P.size(),' ');
-    P = L"SPIELZEIT "+P;
-    wprintf(P.c_str());	
-    printf("\n");
+    char buf1[20],buf2[50];
+    sprintf(buf1,"%i:%02i",SAV.PLAYTIME / 60,(SAV.PLAYTIME-(SAV.PLAYTIME / 60 * 60)));
+    sprintf(buf2,"SPIELZEIT %20s\n",buf1);
+
+    printf(buf2);
     if(SAV.Orden/10!=0)
     printf("ORDEN                       %i""%i\n",SAV.Orden/10,SAV.Orden%10);	
     else
@@ -382,21 +379,17 @@ void initNewGame()
     M.put("Setze Heimatstadt: Klippdelta City.",false);
     for(int i = 0; i < 120;++i)
     swiWaitForVBlank();
-    std::stringstream s2,s3;
-    s2<<SAV.ID;
-    std::string B = s2.str();
-    s3<<SAV.SID;
-    std::string C = s3.str();
-    B.insert(B.begin(),5-B.length(),'0');
-    C.insert(C.begin(),5-C.length(),'0');
 
-    B = "Setze ID: " + B;
-    M.put(&(B[0]),false);
+    char buf[20];
+    sprintf(buf,"Setze ID: %05i",SAV.ID);
+    M.put(buf,false);
+
     for(int i = 0; i < 120;++i)
     swiWaitForVBlank();
     
-    C = "Setze SID: " + C;
-    M.put(&(C[0]),false);
+    sprintf(buf,"Setze SID: %05i",SAV.SID);
+    M.put(buf,false);
+
     for(int i = 0; i < 120;++i)
     swiWaitForVBlank();
     consoleClear();
@@ -408,7 +401,7 @@ INDIVIDUALISIERUNG:
     M = mbox("Beginne Individualisierung.");
     ynbox yn  = ynbox(M);
     consoleSetWindow(&Bottom, 1,1,22,MAXLINES);	
-    SAV.IsMale = !yn.getResult("Bist du ein M\x84""dchen?");
+    SAV.IsMale = !yn.getResult("Bist du ein Mädchen?");
     consoleClear();
     M.clear();
     keyboard K = keyboard();
@@ -472,7 +465,7 @@ INDIVIDUALISIERUNG:
         for (int k = 0; k < 30; k++)
         swiWaitForVBlank();
         M = mbox("Das heißt eigentlich.","Lari",true,true,false,mbox::sprite_trainer,0);
-        M = mbox("Als alle Kanto verlassen\nhaben, sind wir nach Klippdelta\ngezogen.","Lari",true,true,true,mbox::sprite_trainer,0);
+        M = mbox("Als alle Kanto verlassen\nhaben, sind wir nach\nKlippdelta gezogen.","Lari",true,true,true,mbox::sprite_trainer,0);
         consoleClear();
         loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind);
         for (int k = 0; k < 30; k++)
@@ -514,7 +507,8 @@ INDIVIDUALISIERUNG:
         consoleClear();
         M = mbox("Du lebst auch in\nKlippdelta, nich? ","Basti",true,true,false,mbox::sprite_trainer,0);	
         consoleClear();
-        M = mbox("Als erstes werde ich\nein Trasla fangen.","Basti",true,true,false,mbox::sprite_trainer,0);
+        M = mbox("Im hohen Gras dort sollen\nja Trasla auftauchen.","Basti",true,true,false,mbox::sprite_trainer,0);
+        M = mbox("Da muss ich mir dann\ngleich eins fangen!","Basti",true,true,false,mbox::sprite_trainer,0);
         M = mbox("Dann habe ich bald ein\nGuardevoir.","Basti",true,true,false,mbox::sprite_trainer,0);
         M = mbox("Dann können wir ja mal\nkämpfen, du wohnst ja\nnur ein Haus weiter.","Basti",true,true,true,mbox::sprite_trainer,0);
         consoleClear();
@@ -1131,15 +1125,15 @@ START:
             bool mappy = showmappointer;
             showmappointer = false;
             updateOAMSub(oam);
-            ynbox Save("Pok\x82""Nav ");
-            if(Save.getResult("M\x94""chtest du deinen\nFortschritt sichern?\n"))
+            ynbox Save("PokéNav ");
+            if(Save.getResult("Möchtest du deinen\nFortschritt sichern?\n"))
             { 
                 if(gMod == EMULATOR)
-                    mbox Succ("Speichern?\nIn einem Emulator?","Pok\x82""Nav");
+                    mbox Succ("Speichern?\nIn einem Emulator?","PokéNav");
                 else if(SAV.save(progress))
-                    mbox Succ("Fortschritt\nerfolgreich gesichert!","Pok\x82""Nav");
+                    mbox Succ("Fortschritt\nerfolgreich gesichert!","PokéNav");
                 else
-                    mbox Succ("Es trat ein Fehler aufSpiel nicht gesichert","Pok\x82""Nav");
+                    mbox Succ("Es trat ein Fehler auf\nSpiel nicht gesichert.","PokéNav");
             }
             consoleClear();
             oam->oamBuffer[SQCH_ID].isHidden = sqa;

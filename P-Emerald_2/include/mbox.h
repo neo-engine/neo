@@ -37,6 +37,8 @@ public:
     void put(const char* text,bool a = true,bool time = true);
     void clear();
     void clearButName();
+
+    const char* isNamed;
 };
 
 class ynbox
@@ -59,6 +61,8 @@ public:
         consoleSetWindow(&Bottom, 1,1,30,MAXLINES);
         consoleClear();
     }
+private:
+    bool isNamed;
 };
 
 

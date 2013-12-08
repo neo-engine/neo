@@ -496,40 +496,7 @@ namespace POKEMON{
     bool drawInfoSub(u16* layer,int PKMN) /*--deprecated*/
     //Bilder für InfoScrn von SD laden
     {
-        for(int i= 0; i < 6; ++i)
-        if(cachedPKMN[i] == PKMN){
-            dmaCopy( BTMs[i], layer, 256*256 );
-            dmaCopy( PALs[i], BG_PALETTE_SUB, 256*2); 
-            ac = (ac+1)%6;  
-            BG_PALETTE_SUB[3] = RGB15(0,0,0);
-            return true;
-        }
-        std::stringstream ss;
-        ss << "nitro:/PICS/PKMN_SUB_SCREEN/_";
-        if(PKMN < 10) ss << "0";
-        if(PKMN < 100) ss << "0";
-        ss << PKMN << "Info.raw";
-        FILE* fd = fopen(&(ss.str()[0]),"rb");
-
-        if(fd == 0){
-            return false;
-        }
-        ac = (ac+1)%6;
-    
-        fread(&BTMs[ac][0],  sizeof(unsigned int),12288, fd);
-        fread(&PALs[ac][0],  sizeof(unsigned short int),256, fd);
-
-        dmaCopy( BTMs[ac], layer, 256*256 );
-        dmaCopy( PALs[ac], BG_PALETTE_SUB, 256*2); 
-        cachedPKMN[ac] = PKMN;
-        fclose(fd);
-
-        for(int i= 9;i <= 12; ++i) 
-        oam->oamBuffer[i].isHidden = true;
-        updateOAMSub(oam);
-    
-        BG_PALETTE_SUB[3] = RGB15(0,0,0);
-        return true;
+        return false;
     }
 }
 int positions[6][2] = {
@@ -1353,6 +1320,14 @@ void scrnloader::draw(int m){
             BG_ind = 0;
         }
         setMainSpriteVisibility(true);
+        
+        for(int i = 0; i< 3; ++i){
+            oam->oamBuffer[90+i].isHidden = false;
+            oam->oamBuffer[90+i].x = mainSpritesPositions[2*i][0]-16;
+            oam->oamBuffer[90+i].y = mainSpritesPositions[2*i][1]-16;
+            oam->oamBuffer[90+i].priority = OBJPRIORITY_1;
+        }
+        updateOAMSub(oam);
     }
     else if(m== 1){
         loadPictureSub(bgGetGfxPtr(bg3sub),"nitro:/PICS/","BottomScreen2");
@@ -1361,6 +1336,10 @@ void scrnloader::draw(int m){
         printf(" Hoenn");
         acMapRegion = HOENN;
         setMainSpriteVisibility(true);
+
+        for(int i = 0; i< 3; ++i)
+            oam->oamBuffer[90+i].isHidden = true;
+        updateOAMSub(oam);
     }
     else if(m== 2){
         loadPictureSub(bgGetGfxPtr(bg3sub),"nitro:/PICS/","BottomScreen3");
@@ -1369,6 +1348,9 @@ void scrnloader::draw(int m){
         printf(" Kanto");
         acMapRegion = KANTO;
         setMainSpriteVisibility(true);
+        for(int i = 0; i< 3; ++i)
+            oam->oamBuffer[90+i].isHidden = true;
+        updateOAMSub(oam);
     }
     else if(m== 3){
         loadPictureSub(bgGetGfxPtr(bg3sub),"nitro:/PICS/","BottomScreen2_BG3_KJ");
@@ -1377,6 +1359,9 @@ void scrnloader::draw(int m){
         printf(" Johto");
         acMapRegion = JOHTO;
         setMainSpriteVisibility(true);
+        for(int i = 0; i< 3; ++i)
+            oam->oamBuffer[90+i].isHidden = true;
+        updateOAMSub(oam);
     }
     else{		 
         if(!BGs[BG_ind].load_from_rom){
@@ -1390,6 +1375,9 @@ void scrnloader::draw(int m){
         }
         setSpriteVisibility(back,true);
         setMainSpriteVisibility(false);
+        for(int i = 0; i< 3; ++i)
+            oam->oamBuffer[90+i].isHidden = true;
+        updateOAMSub(oam);
         /*initOAMTableSub(oam);
         initMainSprites(oam,spriteInfo);*/
     }

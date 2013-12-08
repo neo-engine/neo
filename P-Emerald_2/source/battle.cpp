@@ -57,13 +57,15 @@
 #include "Shiny1.h"
 #include "Shiny2.h"
 
-#include <sstream>
 
 extern OAMTable *oam;
 extern SpriteInfo spriteInfo[SPRITE_COUNT];
 
 extern OAMTable *oamTop;
 extern SpriteInfo spriteInfoTop[SPRITE_COUNT];
+
+extern font::Font cust_font;
+extern font::Font cust_font2;
 namespace BATTLE{
     const char* trainerclassnames[] = { "Pok\x82mon-Trainer" };
 
@@ -398,8 +400,9 @@ namespace BATTLE{
     }
     
     void battle::initBattleScreen(){
-        std::stringstream ss;
-        ss << this->opponent->trainer_class << ".raw";
+        char buf[100];
+        sprintf(buf,"%i.raw",this->opponent->trainer_class);
+
         loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
         initinitBattleScrnSprites(oamTop,spriteInfoTop,6,6);
 

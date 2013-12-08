@@ -7,7 +7,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <math.h>
-#include <sstream>
 
 #include "item.h"
 #include "berry.h"
@@ -96,10 +95,11 @@ bool item::_load(){
 //    fclose(f);
     return load = true;
 }
+char buf[100];
 bool berry::_load(){
-    std::stringstream FILENAME;
-    FILENAME << ITEM_PATH << this->Name << ".data";
-    FILE* f = fopen(FILENAME.str().c_str(),"r");
+    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
+    FILE* f = fopen(buf,"r");
+
     if(f == 0)
         return load = false;
     //this->itemtype = BERRIES;
@@ -128,9 +128,8 @@ bool berry::_load(){
 }
 
 std::string item::getDescription(){
-    std::stringstream FILENAME;
-    FILENAME << ITEM_PATH << this->Name << ".data";
-    FILE* f = fopen(FILENAME.str().c_str(),"r");
+    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
+    FILE* f = fopen(buf,"r");
     if(f == 0)
         return "FEHLER";
     int ac;
@@ -142,9 +141,8 @@ std::string item::getDescription(){
     return s;
 }
 std::string item::getDisplayName(){
-    std::stringstream FILENAME;
-    FILENAME << ITEM_PATH << this->Name << ".data";
-    FILE* f = fopen(FILENAME.str().c_str(),"r");
+    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
+    FILE* f = fopen(buf,"r");
     if(f == 0)
         return this->Name;
     int ac;
@@ -155,9 +153,8 @@ std::string item::getDisplayName(){
     return s;
 }
 item::EFFEKT item::getEffekt(){
-    std::stringstream FILENAME;
-    FILENAME << ITEM_PATH << this->Name << ".data";
-    FILE* f = fopen(FILENAME.str().c_str(),"r");
+    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
+    FILE* f = fopen(buf,"r");
     if(f == 0)
         return (item::EFFEKT::NONE);
     int ac;
@@ -169,9 +166,8 @@ item::ITEM_TYPE item::getItemType(){
     return this->itemtype;
 }
 int item::getPrice(){ 
-    std::stringstream FILENAME;
-    FILENAME << ITEM_PATH << this->Name << ".data";
-    FILE* f = fopen(FILENAME.str().c_str(),"r");
+    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
+    FILE* f = fopen(buf,"r");
     if(f == 0)
         return 0;
     int ac;
@@ -182,9 +178,8 @@ int item::getPrice(){
 }
 
 std::string berry::getDescription2(){
-    std::stringstream FILENAME;
-    FILENAME << ITEM_PATH << this->Name << ".data";
-    FILE* f = fopen(FILENAME.str().c_str(),"r");
+    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
+    FILE* f = fopen(buf,"r");
     if(f == 0)
         return "FEHLER";
     //this->itemtype = BERRIES;
@@ -215,9 +210,8 @@ std::string berry::getDescription2(){
 }
 
 std::string item::getShortDescription(){
-    std::stringstream FILENAME;
-    FILENAME << ITEM_PATH << this->Name << ".data";
-    FILE* f = fopen(FILENAME.str().c_str(),"r");
+    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
+    FILE* f = fopen(buf,"r");
     if(f == 0)
         return "FEHLER";
     //this->itemtype = BERRIES;

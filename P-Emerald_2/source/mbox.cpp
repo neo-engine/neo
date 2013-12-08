@@ -21,18 +21,22 @@ SpriteEntry * back, *save;
 int TEXTSPEED  = 35;
 
 void init(){
-    if(!BGs[BG_ind].load_from_rom){
-        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-    }
-    else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-        dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-        BG_ind = 0;
-    }
+    //if(!BGs[BG_ind].load_from_rom){
+    //    dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+    //    dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+    //}
+    //else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
+    //    dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+    //    dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+    //    BG_ind = 0;
+    //}
 
     for(int i= 0; i< 4; ++i)
         oam->oamBuffer[31+2*i].isHidden = true;
+    for(int i= 9;i <= 12; ++i) {
+        oam->oamBuffer[i].isHidden = true;
+        swiWaitForVBlank();
+    }
     
     updateOAMSub(oam);
     
@@ -76,6 +80,7 @@ void mbox::clearButName()
 }
 
 mbox::mbox(item item, const int count){
+    this->isNamed = false;
     back = &oam->oamBuffer[0];
     save = &oam->oamBuffer[1];
     back_ = back->isHidden;
@@ -84,8 +89,7 @@ mbox::mbox(item item, const int count){
     setSpriteVisibility(back,true);
     setSpriteVisibility(save,true);
     setMainSpriteVisibility(true);
-    for(int i= 9;i <= 12; ++i)
-        oam->oamBuffer[i].isHidden = false;
+    init();
     int a = 0, b = 0, c = 0;
     drawItemIcon(oam,spriteInfo,item.Name,4,4,a,b,c);
     updateOAMSub(oam);
@@ -96,8 +100,18 @@ mbox::mbox(item item, const int count){
     consoleSetWindow(&Bottom, 5,2,30,MAXLINES);
     consoleSelect(&Bottom);
 
-    printf("%3d %s in der\n%c%c\n%c%c%s-Tasche verstaut.",count,item.getDisplayName().c_str(),214+4*item.getItemType(),
-        215+4*item.itemtype,216+4*item.itemtype,217+4*item.itemtype, bagnames[item.itemtype].c_str());
+    cust_font.set_color(253,3);
+    cust_font.set_color(254,4);
+    
+    BG_PALETTE_SUB[253] = RGB15(15,15,15);
+    BG_PALETTE_SUB[254] = RGB15(0,0,15);
+
+    char buf[40];
+    sprintf(buf,"%3d %s in der",count,item.getDisplayName().c_str());
+    cust_font.print_string_d(buf,32,8,true);
+    cust_font.print_char(489-21+item.getItemType(),32,24,true);
+    sprintf(buf,"%s-Tasche verstaut.", bagnames[item.itemtype].c_str());
+    cust_font.print_string_d(buf,46,24,true);
 
     oam->oamBuffer[8].isHidden = false;
     updateOAMSub(oam);
@@ -128,18 +142,16 @@ mbox::mbox(item item, const int count){
     initMainSprites(oam,spriteInfo);
     setMainSpriteVisibility(false);
     setSpriteVisibility(back,true);
-    setSpriteVisibility(save,true);
+    setSpriteVisibility(save,false);
     oam->oamBuffer[8].isHidden = true;
-    for(int i= 9;i <= 12; ++i) {
-        oam->oamBuffer[i].isHidden = true;
-        swiWaitForVBlank();
-    }
+    dinit();
     updateOAMSub(oam);
     swiWaitForVBlank();
 }
 
 mbox::mbox(const char* text,bool time,bool remsprites)
 {
+    this->isNamed = false;
     back = &oam->oamBuffer[0];
     save = &oam->oamBuffer[1];
     back_ = back->isHidden;
@@ -192,6 +204,7 @@ mbox::mbox(const char* text,bool time,bool remsprites)
 }
 mbox::mbox(const wchar_t* text,bool time,bool remsprites)
 {
+    this->isNamed = false;
     back = &oam->oamBuffer[0];
     save = &oam->oamBuffer[1];
     back_ = back->isHidden;
@@ -248,6 +261,7 @@ mbox::mbox(const wchar_t* text,bool time,bool remsprites)
 }
 mbox::mbox(const char* text,const char* name,bool time,bool a,bool remsprites,sprite_type sprt,int sprind)
 {
+    this->isNamed = name;
     back = &oam->oamBuffer[0];
     save = &oam->oamBuffer[1];
     back_ = back->isHidden;
@@ -322,6 +336,7 @@ mbox::mbox(const char* text,const char* name,bool time,bool a,bool remsprites,sp
 }
 mbox::mbox(const wchar_t* text,const wchar_t* name,bool time,bool a,bool remsprites,sprite_type sprt,int sprind)
 {
+    this->isNamed = false;
     back = &oam->oamBuffer[0];
     save = &oam->oamBuffer[1];
     back_ = back->isHidden;
@@ -403,7 +418,12 @@ void mbox::put(const char* text,bool a,bool time)
 {
     init();
     
-    cust_font.print_string_d(text,8,8,true);
+    if(this->isNamed){
+        cust_font.print_string(this->isNamed,8,8,true);
+        cust_font.print_string_d(text,72,8,true);
+    }
+    else
+        cust_font.print_string_d(text,8,8,true);
 
     if(a)
     {
@@ -447,15 +467,12 @@ ynbox::ynbox()
     setSpriteVisibility(save,true);
     setMainSpriteVisibility(true);
     oam->oamBuffer[8].isHidden = true;
-    for(int i= 9;i <= 12; ++i) {
-        oam->oamBuffer[i].isHidden = false;
-    }
+    init();
     updateOAMSub(oam);
     
-    dmaCopy( BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256 );
-    dmaCopy( BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2);
     consoleSetWindow(&Bottom, 1,1,30,MAXLINES);
     consoleSelect(&Bottom);
+    this->isNamed = false;
 }
 ynbox::ynbox(const char* name)
 {
@@ -468,18 +485,16 @@ ynbox::ynbox(const char* name)
     setSpriteVisibility(save,true);
     setMainSpriteVisibility(true);
     oam->oamBuffer[8].isHidden = true;
-    for(int i= 9;i <= 12; ++i) {
-        oam->oamBuffer[i].isHidden = false;
-    }
-    
-    dmaCopy( BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256 );
-    dmaCopy( BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2);	 
+
+    init();
+
     consoleSetWindow(&Bottom,1,1,8,MAXLINES-1);
     consoleSelect(&Bottom);
-    printf(name);
+    cust_font.print_string(name,8,8,true);
     consoleSetWindow(&Bottom, 9,1,22,MAXLINES);	
         
     swiWaitForVBlank();
+    this->isNamed = true;
 }
 ynbox::ynbox(mbox Box)
 {		
@@ -492,14 +507,9 @@ ynbox::ynbox(mbox Box)
     setSpriteVisibility(save,true);
     setMainSpriteVisibility(true);
     oam->oamBuffer[8].isHidden = true;
-    for(int i= 9;i <= 12; ++i) {
-        oam->oamBuffer[i].isHidden = false;
-    }
+    init();
     updateOAMSub(oam);
-    
-    dmaCopy( BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256 );
-    dmaCopy( BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2);
-    
+    this->isNamed = Box.isNamed;
 }
 
 bool ynbox::getResult(const char* Text=0,bool time){
@@ -507,15 +517,10 @@ bool ynbox::getResult(const char* Text=0,bool time){
     updateOAMSub(oam);
     consoleSelect(&Bottom);
     if(Text){
-        int indx = 0;
-        while(Text[indx] != '\0'){/*
-            if(Text[indx] == ' ' || Text[indx] == '\n')
-                for(int i= 0; i < 120/TEXTSPEED; ++i)
-                    swiWaitForVBlank();*/
-            for(int i= 0; i < 80/TEXTSPEED; ++i)
-                swiWaitForVBlank();
-            printf("%c",Text[indx++]);
-        }
+        if(this->isNamed)
+            cust_font.print_string_d(Text,72,8,true);
+        else
+            cust_font.print_string_d(Text,8,8,true);
     }
     for(int i = 19; i <= 22; ++i)
         oam->oamBuffer[i].isHidden = false;
@@ -556,6 +561,7 @@ bool ynbox::getResult(const char* Text=0,bool time){
             updateOAMSub(oam);
             consoleSetWindow(&Bottom, 1,1,30,24);   
             consoleClear();
+            dinit();
             return true;//YES
         }
         else if (t.px > 127 && t.py > 99 && t.px < 225 && t.py <133){
@@ -583,9 +589,11 @@ bool ynbox::getResult(const char* Text=0,bool time){
             updateOAMSub(oam);
             consoleSetWindow(&Bottom, 1,1,30,24);   
             consoleClear();
+            dinit();
             return false;//No
         }
     }
+    dinit();
     return false;
 }
 bool ynbox::getResult(const wchar_t* Text=0,bool time){
@@ -593,15 +601,10 @@ bool ynbox::getResult(const wchar_t* Text=0,bool time){
     updateOAMSub(oam);
     consoleSelect(&Bottom);
     if(Text){
-        int indx = 0;
-        while(Text[indx] != '\0'){/*
-            if(Text[indx] == ' ' || Text[indx] == '\n')
-                for(int i= 0; i < 120/TEXTSPEED; ++i)
-                    swiWaitForVBlank();*/
-            for(int i= 0; i < 80/TEXTSPEED; ++i)
-                swiWaitForVBlank();
-            putchar(Text[indx++]);
-        }
+        if(this->isNamed)
+            cust_font.print_string_d(Text,72,8,true);
+        else
+            cust_font.print_string_d(Text,8,8,true);
     }
     for(int i = 19; i <= 22; ++i)
         oam->oamBuffer[i].isHidden = false;
@@ -642,6 +645,7 @@ bool ynbox::getResult(const wchar_t* Text=0,bool time){
             updateOAMSub(oam);
             consoleSetWindow(&Bottom, 1,1,30,24);   
             consoleClear();
+            dinit();
             return true;//YES
         }
         else if (t.px > 127 && t.py > 99 && t.px < 225 && t.py <133){
@@ -669,9 +673,11 @@ bool ynbox::getResult(const wchar_t* Text=0,bool time){
             updateOAMSub(oam);
             consoleSetWindow(&Bottom, 1,1,30,24);   
             consoleClear();
+            dinit();
             return false;//No
         }
     }
+    dinit();
     return false;
 }
 
