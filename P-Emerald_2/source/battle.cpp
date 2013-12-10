@@ -67,7 +67,7 @@ extern SpriteInfo spriteInfoTop[SPRITE_COUNT];
 extern font::Font cust_font;
 extern font::Font cust_font2;
 namespace BATTLE{
-    const char* trainerclassnames[] = { "Pok\x82mon-Trainer" };
+    const char* trainerclassnames[] = { "Pokémon-Trainer" };
 
     void displayHP(int HPstart,int HP,int x,int y,int freecolor1,int freecolor2,bool delay,bool big){
         if(big)
@@ -1055,6 +1055,57 @@ namespace BATTLE{
         ++palcntS;
         oamIndexS += 15;
     }
+    
+    void init(){
+        for(int i= 5;i <= 8; ++i) {
+            oam->oamBuffer[i].isHidden = true;
+            swiWaitForVBlank();
+        }
+        for(int i= 0;i < 4; ++i) {
+            oam->oamBuffer[9+2*i].isHidden = true;
+            swiWaitForVBlank();
+        }
+    
+        updateOAMSub(oam);
+    
+        cust_font.set_color(0,0);
+        cust_font.set_color(251,1);
+        cust_font.set_color(252,2);
+        cust_font2.set_color(0,0);
+        cust_font2.set_color(253,1);
+        cust_font2.set_color(254,2);
+    
+        BG_PALETTE_SUB[250] = RGB15(31,31,31);
+        BG_PALETTE_SUB[251] = RGB15(15,15,15);
+        BG_PALETTE_SUB[252] = RGB15(3,3,3);
+        BG_PALETTE_SUB[253] = RGB15(15,15,15);
+        BG_PALETTE_SUB[254] = RGB15(31,31,31);
+        font::putrec(0,0,256,63,true,false,250);
+    
+        updateOAMSub(oam);
+    }
+    void clear(){
+        font::putrec(0,0,256,63,true,false,250);
+    }
+    void dinit(){
+        if(!BGs[BG_ind].load_from_rom){
+            dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+            dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+        }
+        else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
+            dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+            dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+            BG_ind = 0;
+        }
+
+        for(int i= 5; i< 8; ++i)
+            oam->oamBuffer[31+2*i].isHidden = false;
+        for(int i= 0;i < 4; ++i) {
+            oam->oamBuffer[9+2*i].isHidden = false;
+            swiWaitForVBlank();
+        }
+        updateOAMSub(oam);
+    }
 
     void animatePB(int x,int y){
         static const int BYTES_PER_16_COLOR_TILE = 32;
@@ -1234,14 +1285,22 @@ namespace BATTLE{
 
         consoleSelect(&Bottom);
         consoleClear();
-        if((*this->opponent->pkmn_team)[acpokpos[toSwitch][1]].stats.acHP)
-            printf("\n %ls wird von\n %s %s\n auf die Bank geschickt. ",(*this->opponent->pkmn_team)[acpokpos[toSwitch][1]].boxdata.Name,
+        char buf[100];
+        if((*this->opponent->pkmn_team)[acpokpos[toSwitch][1]].stats.acHP){
+            clear();
+            sprintf(buf,"%ls wird von\n%s %s\nauf die Bank geschickt. ",(*this->opponent->pkmn_team)[acpokpos[toSwitch][1]].boxdata.Name,
                 trainerclassnames[this->opponent->trainer_class],this->opponent->Name);
+            cust_font.print_string(buf,8,8,true);
+        }
         
         std::swap(acpokpos[newPok][1],acpokpos[toSwitch][1]);
 
-        for(int i= 0; i < 20; ++i)
+        for(int i= 0; i < 150; ++i)
             swiWaitForVBlank();
+        
+        clear();
+        sprintf(buf,"%s %s\nschickt %ls in den Kampf.",trainerclassnames[this->opponent->trainer_class],this->opponent->Name,(*this->opponent->pkmn_team)[acpokpos[toSwitch][1]].boxdata.Name);
+        cust_font.print_string(buf,8,8,true);
 
         consoleSelect(&Top);
         
@@ -1255,9 +1314,9 @@ namespace BATTLE{
                 oamTop->oamBuffer[oamIndex + i].isHidden = true;
             updateOAM(oamTop);
             
-            oamIndex += 16;
+            oamIndex += 17;
             animatePB(206,50); 
-            oamIndex -= 16;
+            oamIndex -= 17;
 
             oamTop->oamBuffer[12].isHidden = false;
 
@@ -1271,9 +1330,13 @@ namespace BATTLE{
             nextAvailableTileIdx += (3)*(144);
 
             updateOAM(oamTop);
-
+            
+            oamIndex += (1);
+            palcnt += (1);
             if((*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny())
                 animateShiny(176+16,36);
+            oamIndex -= (1);
+            palcnt -= (1);
 
             displayHP(100,101 ,88,32,44,45,false);
             displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,42,43,false);      
@@ -1302,9 +1365,11 @@ namespace BATTLE{
                 oamTop->oamBuffer[oamIndex + i].isHidden = true;
             updateOAM(oamTop);
             
-            oamIndex += (12);
+            oamIndex += (13);
+            palcnt += (5);
             animatePB(142,34); 
-            oamIndex -= (12);
+            oamIndex -= (13);
+            palcnt -= (5);
             oamTop->oamBuffer[11].isHidden = false;
             
 
@@ -1312,8 +1377,13 @@ namespace BATTLE{
                 (*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny(),(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isFemale))
                 loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.SPEC,112,4,oamIndex,palcnt,nextAvailableTileIdx,false,
                 (*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny(),!(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isFemale);
+            
+            oamIndex += (9);
+            palcnt += (3);
             if((*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny())
                 animateShiny(112+16,20);
+            oamIndex -= (9);
+            palcnt -= (3);
            
             oamIndex += (8);
             palcnt += (2);
@@ -1331,8 +1401,6 @@ namespace BATTLE{
             }
 
         consoleSelect(&Bottom);
-        printf("\n %s %s\n schickt %ls ",trainerclassnames[this->opponent->trainer_class],this->opponent->Name,(*this->opponent->pkmn_team)[acpokpos[newPok][1]].boxdata.Name);
-        printf("in den Kampf.");
 
         
         oamTop->oamBuffer[11+newPok].x = -4+ 18*newPok;
@@ -1364,44 +1432,73 @@ namespace BATTLE{
         }
         
         updateOAM(oamTop);
+        for(int i= 0; i < 200; ++i)
+            swiWaitForVBlank();
     }
     void battle::switchOwnPkmn(int newPok,int toSwitch){
         if((*this->player->pkmn_team)[acpokpos[newPok][0]].stats.acHP == 0)
             return;
-
+        init();
+        for(int i = 1 + (this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i){
+            oamTop->oamBuffer[5+i].x = 236 - 18*i;
+            oamTop->oamBuffer[5+i].y = 196 - 16;
+            oamTop->oamBuffer[5+i].isHidden = false;
+            switch(this->acpoksts[acpokpos[i][0]][0]){
+            case KO:
+                oamTop->oamBuffer[5+i].palette--;
+                oamTop->oamBuffer[5+i].gfxIndex -= BattleBall1TilesLen / 32;
+                break;
+            case STS:
+                oamTop->oamBuffer[5+i].palette-=2;
+                oamTop->oamBuffer[5+i].gfxIndex -= BattleBall1TilesLen / 16;
+                break;
+            default:
+                break;
+            }
+        }
+        updateOAM(oamTop);
         consoleSelect(&Bottom);
         consoleClear();
-        if((*this->player->pkmn_team)[acpokpos[toSwitch][0]].stats.acHP)
-            printf("\n Auf die Bank,\n %ls!",(*this->player->pkmn_team)[acpokpos[toSwitch][0]].boxdata.Name);
-        
+        char buf[100];
+        if((*this->player->pkmn_team)[acpokpos[toSwitch][0]].stats.acHP){
+            clear();
+            sprintf(buf,"Auf die Bank,\n %ls!",(*this->player->pkmn_team)[acpokpos[toSwitch][0]].boxdata.Name);
+            cust_font.print_string(buf,8,8,true);
+        }
         std::swap(acpokpos[newPok][0],acpokpos[toSwitch][0]);
 
-        for(int i= 0; i < 20; ++i)
+        for(int i= 0; i < 100; ++i)
             swiWaitForVBlank();
 
-        consoleSelect(&Top);
         
+        consoleSelect(&Bottom);
+        clear();
+        sprintf(buf,"Los %ls!",(*this->player->pkmn_team)[acpokpos[toSwitch][0]].boxdata.Name);
+        cust_font.print_string(buf,8,8,true);
+        
+        consoleSelect(&Top);
         if(toSwitch == 0){
             oamIndex -= 8;
             palcnt -= 3;
             nextAvailableTileIdx -= (2)*(144);
 
-            oamTop->oamBuffer[5].isHidden = true;
-            for(int i = 1; i <= 4; ++i)
-                oamTop->oamBuffer[oamIndex + i].isHidden = true;
+            oamTop->oamBuffer[6].isHidden = true;
+            //for(int i = 1; i <= 4; ++i)
+            //    oamTop->oamBuffer[oamIndex + i].isHidden = true;
             updateOAM(oamTop);
             
-            oamIndex += 8;
+            oamIndex += 9;
+            palcnt += 4;
             animatePB(80,170);
-            oamIndex -= 8;
-            
+            oamIndex -= 9;
+            palcnt -= 4;            
 
             oamIndex += 4;
             palcnt++;
             nextAvailableTileIdx += 144;
 
             
-            oamTop->oamBuffer[5].isHidden = false;
+            oamTop->oamBuffer[6].isHidden = false;
 
             /*if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->player->pkmn_team)[acpokpos[0][1]].boxdata.SPEC,176,20,oamIndex,palcnt,nextAvailableTileIdx,false,
                 (*this->player->pkmn_team)[acpokpos[0][1]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[0][1]].boxdata.isFemale))
@@ -1417,37 +1514,39 @@ namespace BATTLE{
             //if((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny())
             //    animateShiny(176+16,36);
             
-            displayHP(100,101,256-36,192-40,42,43,false);   
-            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-36,192-40,42,43,false);        
-            displayEP(100,100,256-36,192-40,46,47,false);
-            oamTop->oamBuffer[5].x = 256-32+4;
-            oamTop->oamBuffer[5].y = 192-31;
-            consoleSetWindow(&Top,16,20,20,5);
-            printf("%10ls%c\n",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[0][0]]));
-            if((*this->player->pkmn_team)[acpokpos[0][0]].Level < 10)
-                printf(" ");
-            if((*this->player->pkmn_team)[acpokpos[0][0]].Level < 100)
-                printf(" ");
-            printf("Lv%d%4dKP",(*this->player->pkmn_team)[acpokpos[1][0]].Level,
+            displayHP(100,101,256-96-28,192-32-8-32,44,45,false);
+            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,42,43,false);       
+            displayEP(100,100,256-96-28,192-32-8-32,46,47,false);
+            oamTop->oamBuffer[6].x = 256-88-32+4;
+            oamTop->oamBuffer[6].y = 192-31-32;
+            consoleSetWindow(&Top,21,16,20,4);
+            consoleClear();
+            printf("%ls%c\nLv%d%4dKP",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[0][0]]),(*this->player->pkmn_team)[acpokpos[0][0]].Level,
                 (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP);
+
+            
+            oamTop->oamBuffer[6].isHidden = oamTop->oamBuffer[2].isHidden = false;
+            updateOAM(oamTop);
         } 
         else
         {
-            oamTop->oamBuffer[11].isHidden = true;
+            oamTop->oamBuffer[5].isHidden = true;
             updateOAM(oamTop);
             consoleSelect(&Top);
             oamIndex -= (4);
             palcnt -= (2);
             nextAvailableTileIdx -= (1)*(144);
 
-            for(int i = 1; i <= 4; ++i)
-                oamTop->oamBuffer[oamIndex + i].isHidden = true;
+            //for(int i = 1; i <= 4; ++i) //hide PKMN sprite
+            //    oamTop->oamBuffer[oamIndex + i].isHidden = true;
             updateOAM(oamTop);
             
-            oamIndex += (4);
+            oamIndex += (5);
+            palcnt += 3;
             animatePB(142,34); 
-            oamIndex -= (4);
-            oamTop->oamBuffer[11].isHidden = false;
+            oamIndex -= (5);
+            palcnt -= 3;
+            oamTop->oamBuffer[5].isHidden = false;
             
             
             oamIndex += (4);
@@ -1468,6 +1567,7 @@ namespace BATTLE{
             oamTop->oamBuffer[5].x = 256-32+4;
             oamTop->oamBuffer[5].y = 192-31;
             consoleSetWindow(&Top,16,20,20,5);
+            consoleClear();
             printf("%10ls%c\n",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[1][0]]));
             if((*this->player->pkmn_team)[acpokpos[1][0]].Level < 10)
                 printf(" ");
@@ -1475,40 +1575,34 @@ namespace BATTLE{
                 printf(" ");
             printf("Lv%d%4dKP",(*this->player->pkmn_team)[acpokpos[1][0]].Level,
                 (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP);
-        }
-
-        consoleSelect(&Bottom);
-        printf("\n Los %ls!",(*this->player->pkmn_team)[acpokpos[newPok][0]].boxdata.Name);
-
-        
-        oamTop->oamBuffer[5+newPok].x = -4+ 18*newPok;
-        oamTop->oamBuffer[5+newPok].y = -4;
-        oamTop->oamBuffer[5+newPok].isHidden = false;
-        switch(this->acpoksts[acpokpos[toSwitch][0]][0]){
-        case KO:
-            oamTop->oamBuffer[5+newPok].palette--;
-            oamTop->oamBuffer[5+newPok].gfxIndex -= BattleBall1TilesLen / 32;
-            break;
-        case STS:
-            oamTop->oamBuffer[5+newPok].palette-=2;
-            oamTop->oamBuffer[5+newPok].gfxIndex -= BattleBall1TilesLen / 16;
-            break;
-        default:
-            break;
-        }
-        switch(this->acpoksts[acpokpos[newPok][0]][0]){
-        case KO:
-            oamTop->oamBuffer[5+newPok].palette++;
-            oamTop->oamBuffer[5+newPok].gfxIndex += BattleBall1TilesLen / 32;
-            break;
-        case STS:
-            oamTop->oamBuffer[5+newPok].palette+=2;
-            oamTop->oamBuffer[5+newPok].gfxIndex += BattleBall1TilesLen / 16;
-            break;
-        default:
-            break;
+            
+            oamTop->oamBuffer[5].isHidden = oamTop->oamBuffer[1].isHidden = false;
+            updateOAM(oamTop);
         }
         
+        for(int i = 1 + (this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i){
+            oamTop->oamBuffer[5+i].x = 236 - 18*i;
+            oamTop->oamBuffer[5+i].y = 196 - 16;
+            oamTop->oamBuffer[5+i].isHidden = false;
+            switch(this->acpoksts[acpokpos[i][0]][0]){
+            case NA:
+                oamTop->oamBuffer[5+i].isHidden = true;
+                break;
+            case KO:
+                oamTop->oamBuffer[5+i].palette++;
+                oamTop->oamBuffer[5+i].gfxIndex += BattleBall1TilesLen / 32;
+                break;
+            case STS:
+                oamTop->oamBuffer[5+i].palette+=2;
+                oamTop->oamBuffer[5+i].gfxIndex += BattleBall1TilesLen / 16;
+                break;
+            default:
+                break;
+            }
+        }
+        
+        for(int i= 0; i < 100; ++i)
+            swiWaitForVBlank();
         updateOAM(oamTop);
     }
 
@@ -1532,7 +1626,7 @@ namespace BATTLE{
         }
     }
 
-    int battle::start(int battle_back,Weather weather){
+    void battle::initBattleScene(int battle_back,Weather weather){        
         for(int i = 0; i < 6; ++i){
             this->acpokpos[i][0] = this->acpokpos[i][1] = i;
             if(this->player->pkmn_team->size() > i){
@@ -1613,11 +1707,17 @@ namespace BATTLE{
         for(int i= 1; i <= 4; ++i)
             oamTop->oamBuffer[i].isHidden = true;
         updateOAM(oamTop);
-
+        
+        init();
         //Opp's Side
         consoleSelect(&Bottom);
         consoleClear();
-        printf("\n %s %s\n schickt %ls ",trainerclassnames[this->opponent->trainer_class],this->opponent->Name,(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.Name);
+        char buf[100];
+        if(this->battlemode == DOUBLE && this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO)
+            sprintf(buf,"%s %s\nschickt %ls ",trainerclassnames[this->opponent->trainer_class],this->opponent->Name,(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.Name);
+        else
+            sprintf(buf,"%s %s\nschickt %ls in den Kampf.",trainerclassnames[this->opponent->trainer_class],this->opponent->Name,(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.Name);
+        cust_font.print_string(buf,8,8,true);
         consoleSelect(&Top);
             
         animatePB(206,50); 
@@ -1651,7 +1751,9 @@ namespace BATTLE{
             for(int i= 0; i < 80; ++i)
                 swiWaitForVBlank();
             consoleSelect(&Bottom);
-            printf("und\n %ls ",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Name);
+            clear();
+            sprintf(buf,"und %ls in den Kampf.",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Name);
+            cust_font.print_string(buf,8,8,true);
             consoleSelect(&Top);
 
             animatePB(142,34); 
@@ -1678,10 +1780,8 @@ namespace BATTLE{
             palcnt++;
             nextAvailableTileIdx += 144;
         }
-
-        consoleSelect(&Bottom);
-        printf("in den Kampf.");
         
+        consoleSelect(&Bottom);
         for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i){
             oamTop->oamBuffer[11+i].x = -4+ 18*i;
             oamTop->oamBuffer[11+i].y = -4;
@@ -1707,19 +1807,21 @@ namespace BATTLE{
             swiWaitForVBlank();
 
         if(abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].T & ablty::BEFORE_BATTLE){
-            consoleClear();
-            printf("\n %s von\n %ls (Gegn.) wirkt!\n",
+            clear();
+            sprintf(buf,"%s von\n %ls (Gegn.) wirkt!\n",
                 abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].Name.c_str(),
                 (*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.Name);
+            cust_font.print_string(buf,8,8,true);
             //abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].run();
             for(int i= 0; i < 100; ++i)
                 swiWaitForVBlank();
         }
         if(this->battlemode == DOUBLE && abilities[(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.ability].T & ablty::BEFORE_BATTLE){
-            consoleClear();
-            printf("\n %s von\n %ls (Gegn.) wirkt!\n",
+            clear();
+            sprintf(buf,"%s von\n %ls (Gegn.) wirkt!\n",
                 abilities[(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.ability].Name.c_str(),
                 (*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Name);
+            cust_font.print_string(buf,8,8,true);
             //abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].run();
             for(int i= 0; i < 100; ++i)
                 swiWaitForVBlank();
@@ -1728,8 +1830,9 @@ namespace BATTLE{
 
         //Own Side
         consoleSelect(&Bottom);
-        consoleClear();
-        printf("\n Los %ls! ",(*this->opponent->pkmn_team)[acpokpos[0][0]].boxdata.Name);
+        clear();
+        sprintf(buf,"Los %ls! ",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name);
+        cust_font.print_string(buf,8,8,true);
         consoleSelect(&Top);
 
         animatePB(20,150);
@@ -1756,7 +1859,9 @@ namespace BATTLE{
 
         if(this->battlemode == DOUBLE && this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO){
             consoleSelect(&Bottom);
-            printf("\n Auf in den Kampf %ls! ",(*this->opponent->pkmn_team)[acpokpos[1][0]].boxdata.Name);
+            clear();
+            sprintf(buf,"Auf in den Kampf %ls! ",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name);
+            cust_font.print_string(buf,8,8,true);
             consoleSelect(&Top);
                 
             animatePB(80,170);
@@ -1789,7 +1894,7 @@ namespace BATTLE{
             nextAvailableTileIdx += 144;
         }
 
-        for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i){
+        for(int i = 1 + (this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i){
             oamTop->oamBuffer[5+i].x = 236 - 18*i;
             oamTop->oamBuffer[5+i].y = 196 - 16;
             oamTop->oamBuffer[5+i].isHidden = false;
@@ -1815,19 +1920,21 @@ namespace BATTLE{
         
         consoleSelect(&Bottom);
         if(abilities[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.ability].T & ablty::BEFORE_BATTLE){
-            consoleClear();
-            printf("\n %s von\n %ls wirkt!\n",
+            clear();
+            sprintf(buf,"%s von\n %ls wirkt!\n",
                 abilities[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.ability].Name.c_str(),
                 (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name);
+            cust_font.print_string(buf,8,8,true);
             //abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].run();
             for(int i= 0; i < 100; ++i)
                 swiWaitForVBlank();
         }
         if(this->battlemode == DOUBLE && abilities[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.ability].T & ablty::BEFORE_BATTLE){
-            consoleClear();
-            printf("\n %s von\n %ls wirkt!\n",
+            clear();
+            sprintf(buf,"%s von\n %ls wirkt!\n",
                 abilities[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.ability].Name.c_str(),
                 (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name);
+            cust_font.print_string(buf,8,8,true);
             //abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].run();
             for(int i= 0; i < 100; ++i)
                 swiWaitForVBlank();
@@ -1843,17 +1950,28 @@ namespace BATTLE{
         updateOAMSub(oam);
         consoleSelect(&Bottom);
         consoleClear();
+    }
 
-        while((this->round--) != 0){
+    int battle::start(int battle_back,Weather weather){
+        initBattleScene(battle_back, weather);
+        char buf[100];
+        touchPosition t;
+
+        while((this->round--) != 0) {
 ACR:
             setMainBattleVisibility(false);
             int os2 = oamIndexS, pS2 = palcntS, ts2 = nextAvailableTileIdxS;
             drawPKMNIcon(oam,spriteInfo,(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,112,64,os2,pS2,ts2,true);
-            printf("\n Was soll %ls tun?          ",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name);
+            clear();
+            sprintf(buf,"Was soll %ls tun?          ",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name);
+            cust_font.print_string(buf,8,8,true);
             updateOAMSub(oam);
 
             std::pair<int,int> ownAtk[2]; //AtkIdx; Target 1->opp[0]/2->opp[1]/3->both_opp/4->self/8->partner
             std::pair<int,int> oppAtk[2]; //AtkIdx; Target 1->own[0]/2->own[1]/3->both_opp/4->self/8->partner
+
+            int switchWith[2][2] = {{0}};
+
             int aprest = 0;
             while(42){
                 updateTime();
@@ -1869,7 +1987,9 @@ ACR:
                     for(int i= 0; i < 4; ++i)
                         aprest += (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.AcPP[i];
                     if(aprest == 0){
-                        printf("\n %ls hat keine\n restlichen Attacken...",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name);
+                        clear();
+                        printf("%ls hat keine\n restlichen Attacken...",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name);
+                        cust_font.print_string(buf,8,8,true);
                         ownAtk[0] = std::pair<int,int>(0,1|2|4|8);
                     }
                     else {
@@ -1900,8 +2020,9 @@ ACR:
 
                         updateOAMSub(oam);
                         consoleSetWindow(&Bottom,0,0,32,5);
-                        printf("\n Welchen Angriff?");
-
+                        clear();
+                        sprintf(buf,"Welchen Angriff?");
+                        cust_font.print_string(buf,8,8,true);
 
                         while(42){
                             updateTime();
@@ -1985,7 +2106,9 @@ ACR2:
                         os2 = oamIndexS; pS2 = palcntS; ts2 = nextAvailableTileIdxS;
                         setMainBattleVisibility(false);
                         drawPKMNIcon(oam,spriteInfo,(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,112,64,os2,pS2,ts2,true);
-                        printf("\n Was soll %ls tun?          ",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name);
+                        clear();
+                        sprintf(buf,"Was soll %ls tun?          ",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name);
+                        cust_font.print_string(buf,8,8,true);
                         (oam->oamBuffer[20]).isHidden = false;
                         updateOAMSub(oam);
                         while(42){
@@ -2008,15 +2131,133 @@ ACR2:
                                     (oam->oamBuffer[i]).isHidden = true;
                                 setMainBattleVisibility(false);
 
-                                
-
                                 goto ACR;
                             }
                             else if(t.px > 64 && t.px < 64 + 128 && t.py > 72 && t.py < 72 + 64){ //FIGHT
                                 waitForTouchUp();
                                 setMainBattleVisibility(true);
+                                (oam->oamBuffer[20]).isHidden = false;
 
+                                updateOAMSub(oam);
+                                oam->oamBuffer[oamIndexS+1].isHidden = true;
+                                consoleClear();
 
+                                aprest = 0;
+                                for(int i= 0; i < 4; ++i)
+                                    aprest += (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.AcPP[i];
+                                if(aprest == 0){
+                                    clear();
+                                    printf("%ls hat keine\n restlichen Attacken...",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name);
+                                    cust_font.print_string(buf,8,8,true);
+                                    ownAtk[0] = std::pair<int,int>(0,1|2|4|8);
+                                }
+                                else {
+                                    for(int i = 21; i < 29; i+=2){
+                                        (oam->oamBuffer[i]).isHidden = false;
+                                        (oam->oamBuffer[i+1]).isHidden = false;
+                                        (oam->oamBuffer[i+1]).y += 8+16 * ((i-21)/4);
+                                        (oam->oamBuffer[i]).y += 8+16 * ((i-21)/4);
+                                        if((i/2)%2)
+                                            (oam->oamBuffer[i]).x -= 16;
+                                        else
+                                            (oam->oamBuffer[i+1]).x += 16;
+                                        updateOAMSub(oam); 
+                        
+                                        consoleSetWindow(&Bottom,(oam->oamBuffer[i]).x/8+1,(oam->oamBuffer[i]).y/8+1,20,5);
+                                        drawTypeIcon(oam,spriteInfo,os2,pS2,ts2,
+                                            AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]].type,
+                                            (oam->oamBuffer[i]).x+8,(oam->oamBuffer[i]).y-8,true);
+                                        printf("    %2i/%2i AP\n%s\nS %3i  G %3i", (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.AcPP[(i-21)/2],
+                                            AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]].PP *
+                                            ((5 +(*this->player->pkmn_team)[acpokpos[1][0]]. boxdata.PPUps[i]) / 5),
+                                            AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]].Name.c_str(),
+                                            AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]].Base_Power,
+                                            AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]].Accuracy);
+                                    }
+
+                                    updateOAMSub(oam);
+                                    consoleSetWindow(&Bottom,0,0,32,5);
+                                    clear();
+                                    sprintf(buf,"Welchen Angriff?");
+                                    cust_font.print_string(buf,8,8,true);
+
+                                    while(42){
+                                        updateTime();
+                                        swiWaitForVBlank();
+                                        touchRead(&t);
+                                        if ( t.px>224 && t.py>164){ //Back  
+                                            while(1) {
+                                                scanKeys();
+                                                swiWaitForVBlank();
+                                                updateTime();
+                                                if(keysUp() & KEY_TOUCH)
+                                                break;
+                                            }
+                                            consoleSelect(&Bottom);
+                                            consoleSetWindow(&Bottom,0,0,32,24);
+                                            consoleClear();
+                                            for(int i= 20; i <= os2; ++i)
+                                                (oam->oamBuffer[i]).isHidden = true;
+                                            setMainBattleVisibility(false);
+
+                            
+                                            for(int i = 21; i < 29; i+=2){
+                                                (oam->oamBuffer[i]).isHidden = true;
+                                                (oam->oamBuffer[i+1]).isHidden = true;
+                                                (oam->oamBuffer[i+1]).y -= 8+16 * ((i-21)/4);
+                                                (oam->oamBuffer[i]).y -= 8+16 * ((i-21)/4);
+                        
+                                                if((i/2)%2)
+                                                    (oam->oamBuffer[i]).x += 16;
+                                                else
+                                                    (oam->oamBuffer[i+1]).x -= 16;
+                                                updateOAMSub(oam); 
+                                            }
+
+                                            goto ACR;
+                                        }
+                            
+                                        for(int i = 21; i < 29; i+=2)
+                                            if(t.px>(oam->oamBuffer[i].x) && t.px < (oam->oamBuffer[i+1].x + 64) &&
+                                                t.py>(oam->oamBuffer[i]).y && t.py < (oam->oamBuffer[i+1].y + 64)){
+                                                    while(1) {
+                                                        scanKeys();
+                                                        swiWaitForVBlank();
+                                                        updateTime();
+                                                        if(keysUp() & KEY_TOUCH)
+                                                        break;
+                                                    }
+                                                    int trg = 0;
+
+                                                    //CHOOSE TARGET
+                                                    printf("CHOSE ATK %i",(i-21)/2);
+                                        
+                                                    ownAtk[1] = std::pair<int,int>((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2],trg);
+                                                    goto ATTACKCHOSEN2;
+                                            }
+                                    }
+                                    ATTACKCHOSEN2:
+                                    for(int i = 21; i < 29; i+=2){
+                                        (oam->oamBuffer[i]).isHidden = true;
+                                        (oam->oamBuffer[i+1]).isHidden = true;
+                                        (oam->oamBuffer[i+1]).y -= 8+16 * ((i-21)/4);
+                                        (oam->oamBuffer[i]).y -= 8+16 * ((i-21)/4);
+                        
+                                        if((i/2)%2)
+                                            (oam->oamBuffer[i]).x += 16;
+                                        else
+                                            (oam->oamBuffer[i+1]).x -= 16;
+                            
+                                        updateOAMSub(oam); 
+                                    }
+                                    for(int i= os2; i >= os2 - 3; --i)
+                                        (oam->oamBuffer[i]).isHidden = true;
+                                    updateOAMSub(oam); 
+                                    consoleSetWindow(&Bottom,0,0,32,24);
+                                    consoleClear();
+                                    consoleSetWindow(&Bottom,0,0,32,5);
+                            
+                                }
                                 break;
                             }
                             else if(t.px > 16 && t.px < 16 + 64 && t.py > 144 && t.py < 144 + 32){ //BAG
@@ -2032,6 +2273,7 @@ ACR2:
                                 waitForTouchUp();
                                 setMainBattleVisibility(true);
                                 consoleClear();
+                                dinit();
                                 for(int i= 0; i <= 8; ++i)
                                     (oam->oamBuffer[i]).isHidden = true;
                                 updateOAMSub(oam);
@@ -2048,10 +2290,16 @@ ACR2:
                                     (oam->oamBuffer[i]).y -= 16 * (2-((i-21)/4));
                                     updateOAMSub(oam); 
                                     consoleSetWindow(&Bottom,((oam->oamBuffer[i]).x+6)/8,((oam->oamBuffer[i]).y+6)/8,12,3);
-                                    printf("   %3i/%3i\n ",(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.acHP,(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.maxHP);
-                                    wprintf((*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.Name); printf("\n");
-                                    printf("%11s",ItemList[(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.Item].getDisplayName().c_str());
-                                    drawPKMNIcon(oam,spriteInfo,(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.SPEC,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,os2,pS2,ts2,true);
+                                    if(!(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.IV.isEgg){
+                                        printf("   %3i/%3i\n ",(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.acHP,(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.maxHP);
+                                        wprintf((*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.Name); printf("\n");
+                                        printf("%11s",ItemList[(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.Item].getDisplayName().c_str());
+                                        drawPKMNIcon(oam,spriteInfo,(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.SPEC,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,os2,pS2,ts2,true);
+                                    }
+                                    else{
+                                        printf("\n Ei");
+                                        drawEggIcon(oam,spriteInfo,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,os2,pS2,ts2,true);                                    
+                                    }
                                     updateOAMSub(oam); 
                                 }
 
@@ -2084,37 +2332,28 @@ ACR2:
                                             (oam->oamBuffer[i+1]).y += 16 * (2-((i-21)/4));
                                             (oam->oamBuffer[i]).y += 16 * (2-((i-21)/4));
                                         }
+                                        init();
                                         goto ACR2;
                                     }
                                     for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
                                         if((((i-21)/2)^1) >= num)
                                             break;
                                         else if (t.px > oam->oamBuffer[i].x && t.py > oam->oamBuffer[i].y && t.px-64 < oam->oamBuffer[i+1].x && t.py-32 < oam->oamBuffer[i].y){  
+                                            if((*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.IV.isEgg || 
+                                                (*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.acHP == 0 || (((i-21)/2)^1) < 2 || 
+                                                (((i-21)/2)^1) == switchWith[0][0])
+                                                continue;
+
                                             (oam->oamBuffer[i]).isHidden = true;
                                             (oam->oamBuffer[i+1]).isHidden = true;
                                             (oam->oamBuffer[3 + (((i-21)/2)^1)]).isHidden = true;
                                             updateOAMSub(oam);
-                                            while(1)
-                                            {
-                                                swiWaitForVBlank();
-                                                scanKeys();
-                                                updateTime();
-                                                if(keysUp() & KEY_TOUCH)
-                                                break;
-                                            }
-                                            consoleSetWindow(&Bottom, 1,1,30,24);   
-                                            consoleClear();
-                                            {
-                                                //POKEMON::PKMN& ac = (*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]];
-                                                switchOwnPkmn(((i-21)/2)^1,1);      
+                                            
+                                            waitForTouchUp();
+ 
+                                            switchWith[1][0] = ((i-21)/2)^1;
+                                            goto OUT;
 
-                                                
-                                                for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
-                                                    (oam->oamBuffer[i+1]).y += 16 * (2-((i-21)/4));
-                                                    (oam->oamBuffer[i]).y += 16 * (2-((i-21)/4));
-                                                }
-                                                goto OUT;
-                                            }
                                         }
                                     }
                                 }                                
@@ -2122,10 +2361,14 @@ OUT:
                                 consoleSelect(&Bottom);
                                 consoleSetWindow(&Bottom,0,0,32,24);
                                 consoleClear();
-                                for(int i= 5; i <= 8; ++i)
-                                    (oam->oamBuffer[i]).isHidden = false;
+                                init();
                                 for(int i= 20; i <= os2; ++i)
                                     (oam->oamBuffer[i]).isHidden = true;
+                                          
+                                for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
+                                    (oam->oamBuffer[i+1]).y += 16 * (2-((i-21)/4));
+                                    (oam->oamBuffer[i]).y += 16 * (2-((i-21)/4));
+                                }
                                 updateOAMSub(oam);
                                 break;
                             }
@@ -2135,11 +2378,24 @@ OUT:
                     updateOAMSub(oam);
 
                     //OPP'S ACTIONS
+                    switchWith[0][1] = switchWith[0][0];
+                    switchWith[1][1] = switchWith[1][0];
 OPPTURN:
                     
                     consoleClear();
                     for(int i = 0; i< 40; ++i)
                         swiWaitForVBlank();
+                    
+                    if(switchWith[0][0])
+                        switchOwnPkmn(switchWith[0][0],0);
+                    if(switchWith[1][0])
+                        switchOwnPkmn(switchWith[1][0],1);
+
+                    if(switchWith[0][1])
+                        switchOppPkmn(switchWith[0][1],0);
+                    if(switchWith[1][1])
+                        switchOppPkmn(switchWith[1][1],1);
+
 
                     break;
                 }
@@ -2156,6 +2412,7 @@ OPPTURN:
                     waitForTouchUp();
                     setMainBattleVisibility(true);
                     consoleClear();
+                    dinit();
                     for(int i= 0; i <= 8; ++i)
                         (oam->oamBuffer[i]).isHidden = true;
                     (oam->oamBuffer[20]).isHidden = false;
@@ -2164,6 +2421,7 @@ OPPTURN:
                     os2 = oamIndexS; pS2 = palcntS; ts2 = nextAvailableTileIdxS;
                     int num = (int)this->player->pkmn_team->size();
                     consoleSelect(&Bottom);
+
                     for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
                         if((((i-21)/2)^1) >= num)
                         break;
@@ -2173,10 +2431,16 @@ OPPTURN:
                         (oam->oamBuffer[i]).y -= 16 * (2-((i-21)/4));
                         updateOAMSub(oam); 
                         consoleSetWindow(&Bottom,((oam->oamBuffer[i]).x+6)/8,((oam->oamBuffer[i]).y+6)/8,12,3);
-                        printf("   %3i/%3i\n ",(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.acHP,(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.maxHP);
-                        wprintf((*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.Name); printf("\n");
-                        printf("%11s",ItemList[(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.Item].getDisplayName().c_str());
-                        drawPKMNIcon(oam,spriteInfo,(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.SPEC,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,os2,pS2,ts2,true);
+                        if(!(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.IV.isEgg){
+                            printf("   %3i/%3i\n ",(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.acHP,(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.maxHP);
+                            wprintf((*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.Name); printf("\n");
+                            printf("%11s",ItemList[(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.Item].getDisplayName().c_str());
+                            drawPKMNIcon(oam,spriteInfo,(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.SPEC,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,os2,pS2,ts2,true);
+                        }
+                        else{
+                            printf("\n Ei");
+                            drawEggIcon(oam,spriteInfo,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,os2,pS2,ts2,true);                                    
+                        }
                         updateOAMSub(oam); 
                     }
 
@@ -2209,37 +2473,27 @@ OPPTURN:
                                 (oam->oamBuffer[i+1]).y += 16 * (2-((i-21)/4));
                                 (oam->oamBuffer[i]).y += 16 * (2-((i-21)/4));
                             }
+                            init();
                             goto ACR;
                         }
                         for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
                             if((((i-21)/2)^1) >= num)
                                 break;
                             else if (t.px > oam->oamBuffer[i].x && t.py > oam->oamBuffer[i].y && t.px-64 < oam->oamBuffer[i+1].x && t.py-32 < oam->oamBuffer[i].y){  
+                                if((*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.IV.isEgg || 
+                                    (*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.acHP == 0 || (((i-21)/2)^1) < 2)
+                                    continue;
+
                                 (oam->oamBuffer[i]).isHidden = true;
                                 (oam->oamBuffer[i+1]).isHidden = true;
                                 (oam->oamBuffer[3 + (((i-21)/2)^1)]).isHidden = true;
                                 updateOAMSub(oam);
-                                while(1)
-                                {
-                                    swiWaitForVBlank();
-                                    scanKeys();
-                                    updateTime();
-                                    if(keysUp() & KEY_TOUCH)
-                                    break;
-                                }
-                                consoleSetWindow(&Bottom, 1,1,30,24);   
-                                consoleClear();
-                                {
-                                    //POKEMON::PKMN& ac = (*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]];
-                                    switchOwnPkmn(((i-21)/2)^1,0);      
+                                            
+                                waitForTouchUp();
+ 
+                                switchWith[0][0] = ((i-21)/2)^1;
+                                goto OUT2;
 
-                                                
-                                    for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
-                                        (oam->oamBuffer[i+1]).y += 16 * (2-((i-21)/4));
-                                        (oam->oamBuffer[i]).y += 16 * (2-((i-21)/4));
-                                    }
-                                    goto OUT2;
-                                }
                             }
                         }
                     }
@@ -2250,13 +2504,19 @@ OUT2:
                     for(int i= 5; i <= 8; ++i)
                         (oam->oamBuffer[i]).isHidden = false;
                     for(int i= 20; i <= os2; ++i)
-                        (oam->oamBuffer[i]).isHidden = true;
+                        (oam->oamBuffer[i]).isHidden = true;          
+                    for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
+                        (oam->oamBuffer[i+1]).y += 16 * (2-((i-21)/4));
+                        (oam->oamBuffer[i]).y += 16 * (2-((i-21)/4));
+                    }
                     updateOAMSub(oam);
-                    goto OPPTURN;
+                    init();
+                    goto ACR2;
                 }
             }
         }
-        BATTLE_END:
+BATTLE_END:
+        dinit();
         consoleSetWindow(&Bottom,0,0,32,24);
         consoleSelect(&Bottom);
         consoleClear();

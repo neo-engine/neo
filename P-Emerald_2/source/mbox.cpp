@@ -21,16 +21,6 @@ SpriteEntry * back, *save;
 int TEXTSPEED  = 35;
 
 void init(){
-    //if(!BGs[BG_ind].load_from_rom){
-    //    dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-    //    dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-    //}
-    //else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-    //    dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-    //    dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-    //    BG_ind = 0;
-    //}
-
     for(int i= 0; i< 4; ++i)
         oam->oamBuffer[31+2*i].isHidden = true;
     for(int i= 9;i <= 12; ++i) {
@@ -694,25 +684,19 @@ cbox::cbox(int num,const char** choices,const char* name = 0,bool big = false)
     setSpriteVisibility(&(oam->oamBuffer[1]),true);
     setMainSpriteVisibility(true);
     oam->oamBuffer[8].isHidden = true;
-    for(int i= 9;i <= 12; ++i) {
-        oam->oamBuffer[i].isHidden = false;
-    }
+    init();
 
     for(int i= 13;i <= 29; ++i) {
         oam->oamBuffer[i].isHidden = true;
     }
     updateOAMSub(oam);
-    
-    dmaCopy( BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256 );
-    dmaCopy( BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2);	 
+     
     if(name){
-        consoleSetWindow(&Bottom,1,1,8,MAXLINES-1);
-        consoleSelect(&Bottom);
-        printf(name);
-        consoleSetWindow(&Bottom, 9,1,22,MAXLINES);	
+        this->name = true;
+        cust_font.print_string(name,8,8,true);
     }
     else
-        consoleSetWindow(&Bottom, 1,1,30,MAXLINES);	
+        this->name = false;
         
     swiWaitForVBlank();
 }
@@ -722,6 +706,7 @@ int fwdPos[2][2] = {{SCREEN_WIDTH - 12,SCREEN_HEIGHT - 12},{SCREEN_WIDTH - 11,SC
 
 cbox::~cbox()
 {
+    dinit();
     consoleSetWindow(&Bottom, 9,1,22,MAXLINES);	
     consoleSelect(&Bottom);
     consoleClear();
@@ -744,15 +729,10 @@ int cbox::getResult(const char* Text=0,bool time = true){
    int ret = 0;
    consoleSelect(&Bottom);
     if(Text){
-        int indx = 0;
-        while(Text[indx] != '\0'){/*
-            if(Text[indx] == ' ' || Text[indx] == '\n')
-                for(int i= 0; i < 120/TEXTSPEED; ++i)
-                    swiWaitForVBlank();*/
-            for(int i= 0; i < 80/TEXTSPEED; ++i)
-                swiWaitForVBlank();
-            printf("%c",Text[indx++]);
-        }
+        if(this->name)
+            cust_font.print_string(Text,72,8,true);
+        else
+            cust_font.print_string(Text,8,8,true);
     }
    if(num <1)
        return -1;

@@ -1441,6 +1441,57 @@ int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen = true){
     nextAvailableTileIdx +=  512 / 32;
     ++palcnt;
 }
+void drawEggIcon(OAMTable* oam,SpriteInfo* spriteInfo,const int posX,const int posY,
+int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen = true){
+    
+    static const int OFFSET_MULTIPLIER = 32 / sizeof(SPRITE_GFX_SUB[0]);
+    SpriteInfo *ItemInfo = &spriteInfo[++oamIndex];
+    SpriteEntry *Item = &oam->oamBuffer[oamIndex];
+    ItemInfo->oamId = oamIndex;
+    ItemInfo->width = ItemInfo->height = 32;
+    ItemInfo->angle = 0;
+    ItemInfo->entry = Item;
+    Item->isRotateScale = false;
+    Item->blendMode = OBJMODE_NORMAL;
+    Item->isMosaic = false;
+    Item->colorMode = OBJCOLOR_16;
+    Item->shape = OBJSHAPE_SQUARE;
+    Item->isHidden = false;
+    Item->size = OBJSIZE_32;
+    Item->gfxIndex = nextAvailableTileIdx;
+    Item->priority = subScreen? OBJPRIORITY_1:OBJPRIORITY_0;
+    Item->palette = palcnt;
+    Item->x = posX;
+    Item->y = posY;
+    char pt[100];
+    sprintf(pt, "Icon_egg");
+    if(subScreen){
+        if(!loadSpriteSub(ItemInfo,"nitro:/PICS/ICONS/",pt,128,16)){
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+            NoItemPal,
+            &SPRITE_PALETTE_SUB[palcnt * 16],
+            32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+            NoItemTiles,
+            &SPRITE_GFX_SUB[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
+            NoItemTilesLen);
+        }
+    }
+    else{
+        if(!loadSprite(ItemInfo,"nitro:/PICS/ICONS/",pt,128,16)){
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+            NoItemPal,
+            &SPRITE_PALETTE[palcnt * 16],
+            32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+            NoItemTiles,
+            &SPRITE_GFX[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
+            NoItemTilesLen);
+        }
+    }
+    nextAvailableTileIdx +=  512 / 32;
+    ++palcnt;
+}
 void drawItemIcon(OAMTable* oam,SpriteInfo* spriteInfo,const std::string& item_name,const int posX,const int posY,
 int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen){
     
@@ -1523,6 +1574,13 @@ void initTop()
         else{
             consoleSetWindow(&Top,borders[i][0],borders[i][1],12,6);		
             printf("Ei");
+            if(i%2 == 0){
+                drawEggIcon(oamTop,spriteInfoTop,borders[i][0]*8-28,borders[i][1]*8,a,b,c,false);      
+            }
+            else{
+                drawEggIcon(oamTop,spriteInfoTop,borders[i][0]*8+76,borders[i][1]*8,a,b,c,false);
+            }
+            updateOAM(oamTop);
         }
     }
     updateOAM(oamTop);

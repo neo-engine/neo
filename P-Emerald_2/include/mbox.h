@@ -80,6 +80,7 @@ private:
     const char** choices_;
     bool big;
     int num;
+    bool name;
 };
 
 #endif

@@ -189,7 +189,7 @@ namespace font{
         u32 width = 0;
     
         while (string[current_char]) {
-            if(current_char == '\n')
+            if(string[current_char] == '\n')
                 break;
             width += widths[(u8)string[current_char]] + 1;
         
@@ -203,7 +203,7 @@ namespace font{
         u32 width = 0;
     
         while (string[current_char]) {
-            if(current_char == '\n')
+            if(string[current_char] == '\n')
                 break;
             width += widths[(u8)string[current_char]] + 1;
         

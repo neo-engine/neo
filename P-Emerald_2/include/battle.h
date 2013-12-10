@@ -24,6 +24,7 @@ namespace BATTLE{
         int money_earned;
         const char* Msg1,*Msg2,*Msg3,*Msg4;
 
+
     public:
         battle_trainer(const char* Name, const char* Msg1,const char* Msg2,const char* Msg3,const char* Msg4,std::vector<POKEMON::PKMN>* pkmnTeam,std::vector<item>* Items,TrainerClass t = PKMN_TRAINER)
             : Name(Name),trainer_class(t),pkmn_team(pkmnTeam),items(Items),Msg1(Msg1),Msg2(Msg2),Msg3(Msg3),Msg4(Msg4) { }
@@ -49,6 +50,7 @@ namespace BATTLE{
             KO = 2,
             NA = 3
         } acpoksts[6][2];
+
     public:
         enum Weather{
             NONE = 0,
@@ -69,5 +71,7 @@ namespace BATTLE{
         int start(int battle_back,Weather weather); //Runs battle; returns -1 if opponent wins, 1 otherwise
         void switchOppPkmn(int newPok,int toSwitch = 0);
         void switchOwnPkmn(int newPok,int toSwitch = 0);
+    private:
+        void initBattleScene(int battle_back,Weather weather);
     };
 }

@@ -82,6 +82,8 @@ void drawItemIcon(OAMTable* oam,SpriteInfo* spriteInfo,const std::string& item_n
 int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen = true);
 void drawPKMNIcon(OAMTable* oam,SpriteInfo* spriteInfo,const int& pkmn_no,const int posX,const int posY,
 int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen);
+void drawEggIcon(OAMTable* oam,SpriteInfo* spriteInfo,const int posX,const int posY,
+int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen);
 
 bool loadNavScreen(u16* layer,const char* Name,int no);
 bool loadPicture(u16* layer,const char* Path, const char* Name,int palsize = 512,int tilecnt = 192*256);

@@ -956,8 +956,19 @@ START:
             videoSetMode(MODE_5_2D |DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
             VRAM_F_CR = VRAM_ENABLE | VRAM_OFFSET(1);
             BATTLE::battle_trainer me("TEST",0,0,0,0,&SAV.PKMN_team,0);
-            std::vector<POKEMON::PKMN> cpy = SAV.PKMN_team;
-            BATTLE::battle_trainer opp("TEST_OPP","DER TEST ISt DER BESTE MSG1","DER TEST VERLIERT GERADE... MSG2","DER TEST GEWINNT HAHA! MSG3","DER TEST VERLIERT... MSG4",&(cpy),0);
+            std::vector<POKEMON::PKMN> cpy;
+            
+            char A []= {1,2,3,4};
+            for(int i = 0;i<6;++i)
+            {
+                POKEMON::PKMN a(A,HILFSCOUNTER,0,
+                1+rand()%100,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
+                a.stats.acHP = i*a.stats.maxHP/5;
+                cpy.push_back(a);
+                HILFSCOUNTER= 1+((HILFSCOUNTER)%649);
+            }
+
+            BATTLE::battle_trainer opp("TEST_OPP","DeR TeST iST DeR BeSTe MSG1","DeR TeST VeRLieRT GeRaDe... MSG2","DeR TeST GEWiNNT HaHa! MSG3","DeR TeST VeRLieRT... MSG4",&(cpy),0);
 
             BATTLE::battle test_battle(&me,&opp,100,5,BATTLE::battle::DOUBLE);
             test_battle.start(100,BATTLE::battle::NONE);
