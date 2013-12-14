@@ -125,6 +125,57 @@ namespace BATTLE{
         }
     }
 
+    void init(){
+        for(int i= 5;i <= 8; ++i) {
+            oam->oamBuffer[i].isHidden = true;
+            swiWaitForVBlank();
+        }
+        for(int i= 0;i < 4; ++i) {
+            oam->oamBuffer[9+2*i].isHidden = true;
+            swiWaitForVBlank();
+        }
+    
+        updateOAMSub(oam);
+    
+        cust_font.set_color(0,0);
+        cust_font.set_color(251,1);
+        cust_font.set_color(252,2);
+        cust_font2.set_color(0,0);
+        cust_font2.set_color(253,1);
+        cust_font2.set_color(254,2);
+    
+        BG_PALETTE_SUB[250] = RGB15(31,31,31);
+        BG_PALETTE_SUB[251] = RGB15(15,15,15);
+        BG_PALETTE_SUB[252] = RGB15(3,3,3);
+        BG_PALETTE_SUB[253] = RGB15(15,15,15);
+        BG_PALETTE_SUB[254] = RGB15(31,31,31);
+        font::putrec(0,0,256,63,true,false,250);
+    
+        updateOAMSub(oam);
+    }
+    void clear(){
+        font::putrec(0,0,256,63,true,false,250);
+    }
+    void dinit(){
+        if(!BGs[BG_ind].load_from_rom){
+            dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+            dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+        }
+        else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
+            dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+            dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+            BG_ind = 0;
+        }
+
+        for(int i= 5; i< 8; ++i)
+            oam->oamBuffer[31+2*i].isHidden = false;
+        for(int i= 0;i < 4; ++i) {
+            oam->oamBuffer[9+2*i].isHidden = false;
+            swiWaitForVBlank();
+        }
+        updateOAMSub(oam);
+    }
+
     battle::battle(battle_trainer* player, battle_trainer* opponent,int max_round,int AI_level,BattleMode battlemode){
         this->max_round = max_round;
         this->AI_level = AI_level;
@@ -450,9 +501,24 @@ namespace BATTLE{
         consoleClear();
         consoleSetWindow(&Bottom,2,11,32,24);
         consoleSelect(&Bottom);
-        printf("Eine Herausforderung von\n %s %s!",trainerclassnames[this->opponent->trainer_class],this->opponent->Name);
+         
+        cust_font.set_color(0,0);
+        cust_font.set_color(251,1);
+        cust_font.set_color(252,2);
+        cust_font2.set_color(0,0);
+        cust_font2.set_color(253,1);
+        cust_font2.set_color(254,2);
+    
+        BG_PALETTE_SUB[250] = RGB15(31,31,31);
+        BG_PALETTE_SUB[251] = RGB15(30,30,30);
+        BG_PALETTE_SUB[252] = RGB15(15,15,15);
+        BG_PALETTE_SUB[253] = RGB15(15,15,15);
+        BG_PALETTE_SUB[254] = RGB15(31,31,31);
+        sprintf(buf,"Eine Herausforderung von\n %s %s!",trainerclassnames[this->opponent->trainer_class],this->opponent->Name);
+        cust_font.print_string(buf,16,80,true);
         for(int i = 0; i< 140; ++i)
             swiWaitForVBlank();
+        loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
         consoleSetWindow(&Bottom,0,0,32,24);
         consoleClear();
     }
@@ -1056,56 +1122,6 @@ namespace BATTLE{
         oamIndexS += 15;
     }
     
-    void init(){
-        for(int i= 5;i <= 8; ++i) {
-            oam->oamBuffer[i].isHidden = true;
-            swiWaitForVBlank();
-        }
-        for(int i= 0;i < 4; ++i) {
-            oam->oamBuffer[9+2*i].isHidden = true;
-            swiWaitForVBlank();
-        }
-    
-        updateOAMSub(oam);
-    
-        cust_font.set_color(0,0);
-        cust_font.set_color(251,1);
-        cust_font.set_color(252,2);
-        cust_font2.set_color(0,0);
-        cust_font2.set_color(253,1);
-        cust_font2.set_color(254,2);
-    
-        BG_PALETTE_SUB[250] = RGB15(31,31,31);
-        BG_PALETTE_SUB[251] = RGB15(15,15,15);
-        BG_PALETTE_SUB[252] = RGB15(3,3,3);
-        BG_PALETTE_SUB[253] = RGB15(15,15,15);
-        BG_PALETTE_SUB[254] = RGB15(31,31,31);
-        font::putrec(0,0,256,63,true,false,250);
-    
-        updateOAMSub(oam);
-    }
-    void clear(){
-        font::putrec(0,0,256,63,true,false,250);
-    }
-    void dinit(){
-        if(!BGs[BG_ind].load_from_rom){
-            dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-            dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-        }
-        else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-            dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-            dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-            BG_ind = 0;
-        }
-
-        for(int i= 5; i< 8; ++i)
-            oam->oamBuffer[31+2*i].isHidden = false;
-        for(int i= 0;i < 4; ++i) {
-            oam->oamBuffer[9+2*i].isHidden = false;
-            swiWaitForVBlank();
-        }
-        updateOAMSub(oam);
-    }
 
     void animatePB(int x,int y){
         static const int BYTES_PER_16_COLOR_TILE = 32;
@@ -1291,7 +1307,23 @@ namespace BATTLE{
             sprintf(buf,"%ls wird von\n%s %s\nauf die Bank geschickt. ",(*this->opponent->pkmn_team)[acpokpos[toSwitch][1]].boxdata.Name,
                 trainerclassnames[this->opponent->trainer_class],this->opponent->Name);
             cust_font.print_string(buf,8,8,true);
+        }        
+        for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i){
+            switch(this->acpoksts[acpokpos[i][1]][1]){
+            case KO:
+                oamTop->oamBuffer[11+i].palette--;
+                oamTop->oamBuffer[11+i].gfxIndex -= BattleBall1TilesLen / 32;
+                break;
+            case STS:
+                oamTop->oamBuffer[11+i].palette-=2;
+                oamTop->oamBuffer[11+i].gfxIndex -= BattleBall1TilesLen / 16;
+                break;
+            default:
+                break;
+            }
         }
+
+        updateOAM(oamTop);
         
         std::swap(acpokpos[newPok][1],acpokpos[toSwitch][1]);
 
@@ -1315,7 +1347,9 @@ namespace BATTLE{
             updateOAM(oamTop);
             
             oamIndex += 17;
+            palcnt += (1);
             animatePB(206,50); 
+            palcnt -= (1);
             oamIndex -= 17;
 
             oamTop->oamBuffer[12].isHidden = false;
@@ -1338,7 +1372,7 @@ namespace BATTLE{
             oamIndex -= (1);
             palcnt -= (1);
 
-            displayHP(100,101 ,88,32,44,45,false);
+            displayHP(100,101 ,88,32,42,43,false);
             displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,42,43,false);      
             oamTop->oamBuffer[12].x = 96;
             oamTop->oamBuffer[12].y = 41;
@@ -1380,6 +1414,7 @@ namespace BATTLE{
             
             oamIndex += (9);
             palcnt += (3);
+            nextAvailableTileIdx += (2)*(144);
             if((*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny())
                 animateShiny(112+16,20);
             oamIndex -= (9);
@@ -1387,11 +1422,10 @@ namespace BATTLE{
            
             oamIndex += (8);
             palcnt += (2);
-            nextAvailableTileIdx += (2)*(144);
             updateOAM(oamTop);
 
-            displayHP(100,101,0,8,42,43,false);   
-            displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,42,43,false); 
+            displayHP(100,101,0,8,45,44,false);   
+            displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,45,44,false); 
             oamTop->oamBuffer[11].x = 8;
             oamTop->oamBuffer[11].y = 17;
             consoleSetWindow(&Top,4,2,20,2);
@@ -1401,36 +1435,27 @@ namespace BATTLE{
             }
 
         consoleSelect(&Bottom);
-
         
-        oamTop->oamBuffer[11+newPok].x = -4+ 18*newPok;
-        oamTop->oamBuffer[11+newPok].y = -4;
-        oamTop->oamBuffer[11+newPok].isHidden = false;
-        switch(this->acpoksts[acpokpos[toSwitch][1]][1]){
-        case KO:
-            oamTop->oamBuffer[11+newPok].palette--;
-            oamTop->oamBuffer[11+newPok].gfxIndex -= BattleBall1TilesLen / 32;
-            break;
-        case STS:
-            oamTop->oamBuffer[11+newPok].palette-=2;
-            oamTop->oamBuffer[11+newPok].gfxIndex -= BattleBall1TilesLen / 16;
-            break;
-        default:
-            break;
+        for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i){
+            oamTop->oamBuffer[11+i].x = -4+ 18*i;
+            oamTop->oamBuffer[11+i].y = -4;
+            oamTop->oamBuffer[11+i].isHidden = false;
+            switch(this->acpoksts[acpokpos[i][1]][1]){
+            case NA:
+                oamTop->oamBuffer[11+i].isHidden = true;
+                break;
+            case KO:
+                oamTop->oamBuffer[11+i].palette++;
+                oamTop->oamBuffer[11+i].gfxIndex += BattleBall1TilesLen / 32;
+                break;
+            case STS:
+                oamTop->oamBuffer[11+i].palette+=2;
+                oamTop->oamBuffer[11+i].gfxIndex += BattleBall1TilesLen / 16;
+                break;
+            default:
+                break;
+            }
         }
-        switch(this->acpoksts[acpokpos[newPok][1]][1]){
-        case KO:
-            oamTop->oamBuffer[11+newPok].palette++;
-            oamTop->oamBuffer[11+newPok].gfxIndex += BattleBall1TilesLen / 32;
-            break;
-        case STS:
-            oamTop->oamBuffer[11+newPok].palette+=2;
-            oamTop->oamBuffer[11+newPok].gfxIndex += BattleBall1TilesLen / 16;
-            break;
-        default:
-            break;
-        }
-        
         updateOAM(oamTop);
         for(int i= 0; i < 200; ++i)
             swiWaitForVBlank();
@@ -1483,8 +1508,8 @@ namespace BATTLE{
             nextAvailableTileIdx -= (2)*(144);
 
             oamTop->oamBuffer[6].isHidden = true;
-            //for(int i = 1; i <= 4; ++i)
-            //    oamTop->oamBuffer[oamIndex + i].isHidden = true;
+            for(int i = 1; i <= 4; ++i)
+                oamTop->oamBuffer[oamIndex + i].isHidden = true;
             updateOAM(oamTop);
             
             oamIndex += 9;
@@ -1492,30 +1517,25 @@ namespace BATTLE{
             animatePB(80,170);
             oamIndex -= 9;
             palcnt -= 4;            
-
-            oamIndex += 4;
-            palcnt++;
-            nextAvailableTileIdx += 144;
-
-            
+                        
             oamTop->oamBuffer[6].isHidden = false;
-
-            /*if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->player->pkmn_team)[acpokpos[0][1]].boxdata.SPEC,176,20,oamIndex,palcnt,nextAvailableTileIdx,false,
-                (*this->player->pkmn_team)[acpokpos[0][1]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[0][1]].boxdata.isFemale))
-                loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->player->pkmn_team)[acpokpos[0][1]].boxdata.SPEC,176,20,oamIndex,palcnt,nextAvailableTileIdx,false,
-                    (*this->player->pkmn_team)[acpokpos[0][1]].boxdata.isShiny(),!(*this->player->pkmn_team)[acpokpos[0][1]].boxdata.isFemale);*/
+            
+            if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,-10,100,oamIndex,palcnt,nextAvailableTileIdx,false,
+                (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isFemale))
+                loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,-10,100,oamIndex,palcnt,nextAvailableTileIdx,false,
+                (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny(),!(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isFemale);
+        
+            updateOAM(oamTop);
             
             oamIndex += (4);
-            palcnt += (2);
-            nextAvailableTileIdx += (1)*(144);
+            palcnt += (1);
+            nextAvailableTileIdx += (144);
 
-            updateOAM(oamTop);
-
-            //if((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny())
-            //    animateShiny(176+16,36);
+            if((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny())
+                animateShiny(6,116);
             
-            displayHP(100,101,256-96-28,192-32-8-32,44,45,false);
-            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,42,43,false);       
+            displayHP(100,101,256-96-28,192-32-8-32,42,49,false);
+            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,42,49,false);       
             displayEP(100,100,256-96-28,192-32-8-32,46,47,false);
             oamTop->oamBuffer[6].x = 256-88-32+4;
             oamTop->oamBuffer[6].y = 192-31-32;
@@ -1537,8 +1557,8 @@ namespace BATTLE{
             palcnt -= (2);
             nextAvailableTileIdx -= (1)*(144);
 
-            //for(int i = 1; i <= 4; ++i) //hide PKMN sprite
-            //    oamTop->oamBuffer[oamIndex + i].isHidden = true;
+            for(int i = 1; i <= 4; ++i) //hide PKMN sprite
+                oamTop->oamBuffer[oamIndex + i].isHidden = true;
             updateOAM(oamTop);
             
             oamIndex += (5);
@@ -1548,21 +1568,19 @@ namespace BATTLE{
             palcnt -= 3;
             oamTop->oamBuffer[5].isHidden = false;
             
-            
-            oamIndex += (4);
-            palcnt += (2);
-            nextAvailableTileIdx += (1)*(144);
-            //if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->player->pkmn_team)[acpokpos[1][1]].boxdata.SPEC,112,4,oamIndex,palcnt,nextAvailableTileIdx,false,
-            //    (*this->player->pkmn_team)[acpokpos[1][1]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[1][1]].boxdata.isFemale))
-            //    loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->player->pkmn_team)[acpokpos[1][1]].boxdata.SPEC,112,4,oamIndex,palcnt,nextAvailableTileIdx,false,
-            //    (*this->player->pkmn_team)[acpokpos[1][1]].boxdata.isShiny(),!(*this->player->pkmn_team)[acpokpos[1][1]].boxdata.isFemale);
-            //if((*this->player->pkmn_team)[acpokpos[1][1]].boxdata.isShiny())
-            //    animateShiny(112+16,20);
+
+            if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,50,120,oamIndex,palcnt,nextAvailableTileIdx,false,
+                (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isFemale))
+                loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,50,120,oamIndex,palcnt,nextAvailableTileIdx,false,
+                (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny(),!(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isFemale);
+            if((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny())
+                animateShiny(50+16,136);
+
            
             updateOAM(oamTop);
             
-            displayHP(100,101,256-36,192-40,42,43,false);   
-            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,42,43,false);        
+            displayHP(100,101,256-36,192-40,51,50,false);   
+            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,51,50,false);        
             displayEP(100,100,256-36,192-40,46,47,false);
             oamTop->oamBuffer[5].x = 256-32+4;
             oamTop->oamBuffer[5].y = 192-31;
@@ -1732,7 +1750,7 @@ namespace BATTLE{
             animateShiny(176+16,36);
 
         displayHP(100,101 ,88,32,44,45,false);
-        displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,42,43,false);      
+        displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,44,45,false);      
         oamTop->oamBuffer[12].x = 96;
         oamTop->oamBuffer[12].y = 41;
         consoleSetWindow(&Top,0,5,20,5);
@@ -1836,13 +1854,15 @@ namespace BATTLE{
         consoleSelect(&Top);
 
         animatePB(20,150);
-
-        oamIndex += 4;
-        palcnt++;
-        nextAvailableTileIdx += 144;
-
-        displayHP(100,101,256-96-28,192-32-8-32,44,45,false);
-        displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,42,43,false);       
+        if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,-10,100,oamIndex,palcnt,nextAvailableTileIdx,false,
+            (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isFemale))
+            loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,-10,100,oamIndex,palcnt,nextAvailableTileIdx,false,
+            (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny(),!(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isFemale);
+        if((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny())
+            animateShiny(6,116);
+        
+        displayHP(100,101,256-96-28,192-32-8-32,48,49,false);
+        displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,48,49,false);       
         displayEP(100,100,256-96-28,192-32-8-32,46,47,false);
         oamTop->oamBuffer[6].x = 256-88-32+4;
         oamTop->oamBuffer[6].y = 192-31-32;
@@ -1865,16 +1885,19 @@ namespace BATTLE{
             consoleSelect(&Top);
                 
             animatePB(80,170);
-
-            oamIndex += 4;
-            palcnt++;
-            nextAvailableTileIdx += 144;
-
+            
+            if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,50,120,oamIndex,palcnt,nextAvailableTileIdx,false,
+                (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isFemale))
+                loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,50,120,oamIndex,palcnt,nextAvailableTileIdx,false,
+                (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny(),!(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isFemale);
+            if((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny())
+                animateShiny(50+16,136);
+            
             oamTop->oamBuffer[5].isHidden = oamTop->oamBuffer[1].isHidden = false;
             updateOAM(oamTop);
 
-            displayHP(100,101,256-36,192-40,42,43,false);   
-            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,42,43,false);        
+            displayHP(100,101,256-36,192-40,50,51,false);   
+            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,50,51,false);        
             displayEP(100,100,256-36,192-40,46,47,false);
             oamTop->oamBuffer[5].x = 256-32+4;
             oamTop->oamBuffer[5].y = 192-31;

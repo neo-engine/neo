@@ -418,6 +418,7 @@ bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,co
         updateOAM(oam);
     return true;
 }
+
 bool loadPicture(u16* layer,const char* Path, const char* Name,int palsize,int tilecnt){
     char pt[100];
     sprintf(pt, "%s%s.raw",Path,Name);
