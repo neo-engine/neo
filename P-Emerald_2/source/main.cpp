@@ -9,10 +9,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-//#include <n3d.h>
-//#include <n3d\nds\arm9\n3ddevice.h>
-//#include "n3dsampleframework.h"
-//#include "submesh0_n3dmesh_bin.h"
+#include "map2d.h"
 
 #include <string>
 #include <iostream>
@@ -58,7 +55,7 @@ enum GameMod{
     RELEASE,
     EMULATOR
 } gMod = DEVELOPER;
-std::string CodeName = "Raging Gyarados";
+std::string CodeName = "Charming Lari";
 
 int bg3sub;
 int bg2sub;
@@ -950,39 +947,26 @@ START:
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
-            //g_device.EndScene();
-            //vramSetup();
-            initVideo();
-            videoSetMode(MODE_5_2D |DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-            VRAM_F_CR = VRAM_ENABLE | VRAM_OFFSET(1);
-            BATTLE::battle_trainer me("TEST",0,0,0,0,&SAV.PKMN_team,0);
-            std::vector<POKEMON::PKMN> cpy;
             
-            char A []= {1,2,3,4};
-            for(int i = 0;i<6;++i)
-            {
-                POKEMON::PKMN a(A,HILFSCOUNTER,0,
-                1+rand()%100,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
-                a.stats.acHP = i*a.stats.maxHP/5;
-                cpy.push_back(a);
-                HILFSCOUNTER= 1+((HILFSCOUNTER)%649);
-            }
-
-            BATTLE::battle_trainer opp("TEST_OPP","DeR TeST iST DeR BeSTe MSG1","DeR TeST VeRLieRT GeRaDe... MSG2","DeR TeST GEWiNNT HaHa! MSG3","DeR TeST VeRLieRT... MSG4",&(cpy),0);
-
-            BATTLE::battle test_battle(&me,&opp,100,5,BATTLE::battle::DOUBLE);
-            test_battle.start(100,BATTLE::battle::NONE);
-
-            //for(s16 i= 0; i<256;i++)
-            //    for(s16 j = 0; j< 192; ++j)
-            //        ((Color *)BG_BMP_RAM(1))[(i + j * SCREEN_WIDTH)/2] = (u8)1;
-            //scrn.draw(mode);
+            //map2d::BlockSet b;
+            //char buffer[100];
+            //sprintf(buffer,"nitro://MAPS/TILESETS/0.bvd");
+            //map2d::readBlockSet(fopen(buffer,"rb"),b);
             //
-            //powerOn(POWER_ALL);
-            //videoSetMode(MODE_0_3D | DISPLAY_BG0_ACTIVE);
-            //vramSetBankA(VRAM_A_TEXTURE);
-            //vramSetBankB(VRAM_B_TEXTURE);
-            //vramSetBankF(VRAM_F_TEX_PALETTE);
+            //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","Clear");
+            //consoleSelect(&Bottom);
+            //consoleSetWindow(&Bottom,4,4,20,20);
+
+            //for(int k= 0; k < 5; ++k){
+            //        printf("%i",b.blocks[k].bottombehave);
+            //    printf("\n");
+            //}
+
+            powerOn(POWER_ALL);
+            videoSetMode(MODE_0_3D | DISPLAY_BG0_ACTIVE);
+            vramSetBankA(VRAM_A_TEXTURE);
+            vramSetBankB(VRAM_B_TEXTURE);
+            vramSetBankF(VRAM_F_TEX_PALETTE);
         }
         //StartID
         else if (sqrt(sq(mainSpritesPositions[1][0]-touch.px) + sq(mainSpritesPositions[1][1]-touch.py)) <= 16 && mode == -1)
@@ -995,8 +979,8 @@ START:
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
-            const char *someText[7]= {"\n     PKMN-Spawn","\n    Item-Spawn","\n 1-Item_Test","  Nicht\n  jetzt.","\nWie bitte?","\n   ...","\n    42"};
-            cbox test(3,&someText[0],0,false);
+            const char *someText[7]= {"\n     PKMN-Spawn","\n    Item-Spawn","\n 1-Item_Test","\n  Battle SPWN.","\nWie bitte?","\n   Trainerpass","\n    42"};
+            cbox test(4,&someText[0],0,true);
             int res = test.getResult("...",true);
             switch(res)
             {
@@ -1032,9 +1016,29 @@ START:
                 break;
             case 2:
                 SAV.PKMN_team[0].boxdata.exp += 100;
-                mbox(item(),42);
                 mbox(berry("Ginemabeere"),31);
+                break;
+            case 3:
+                BATTLE::battle_trainer me("TEST",0,0,0,0,&SAV.PKMN_team,0);
+                std::vector<POKEMON::PKMN> cpy;
+            
+                char A []= {1,2,3,4};
+                for(int i = 0;i<6;++i)
+                {
+                    POKEMON::PKMN a(A,HILFSCOUNTER,0,
+                    1+rand()%100,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
+                    a.stats.acHP = i*a.stats.maxHP/5;
+                    cpy.push_back(a);
+                    HILFSCOUNTER= 1+((HILFSCOUNTER)%649);
+                }
+
+                BATTLE::battle_trainer opp("TEST_OPP","DeR TeST iST DeR BeSTe MSG1","DeR TeST VeRLieRT GeRaDe... MSG2","DeR TeST GEWiNNT HaHa! MSG3","DeR TeST VeRLieRT... MSG4",&(cpy),0);
+
+                BATTLE::battle test_battle(&me,&opp,100,5,BATTLE::battle::DOUBLE);
+                test_battle.start(100,BATTLE::battle::NONE);
+                break;
             }
+            setMainSpriteVisibility(false);
             scrn.draw(mode);
         }
         //StartPok\x82""nav

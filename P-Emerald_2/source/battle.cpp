@@ -453,8 +453,9 @@ namespace BATTLE{
     void battle::initBattleScreen(){
         char buf[100];
         sprintf(buf,"%i.raw",this->opponent->trainer_class);
-
+        
         loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
+        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
         initinitBattleScrnSprites(oamTop,spriteInfoTop,6,6);
 
         for(int i= 0; i< 6; ++i)
@@ -516,8 +517,43 @@ namespace BATTLE{
         BG_PALETTE_SUB[254] = RGB15(31,31,31);
         sprintf(buf,"Eine Herausforderung von\n %s %s!",trainerclassnames[this->opponent->trainer_class],this->opponent->Name);
         cust_font.print_string(buf,16,80,true);
-        for(int i = 0; i< 140; ++i)
+
+        loadTrainerSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/TRAINER/", "n",144,16,oamIndex,palcnt,nextAvailableTileIdx,false);
+        updateOAM(oamTop);
+        for(int i = 0; i< 8; ++i)
             swiWaitForVBlank();
+        oamIndex -= 4;
+        --palcnt;
+            --palcnt;
+        nextAvailableTileIdx -= 144;
+        loadTrainerSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/TRAINER/", "n2",144,16,oamIndex,palcnt,nextAvailableTileIdx,false);
+        updateOAM(oamTop);
+        for(int i = 0; i< 8; ++i)
+            swiWaitForVBlank();
+        oamIndex -= 4;
+        --palcnt;
+            --palcnt;
+        nextAvailableTileIdx -= 144;
+        loadTrainerSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/TRAINER/", "n3",144,16,oamIndex,palcnt,nextAvailableTileIdx,false);
+        updateOAM(oamTop);
+        oamIndex -= 4;
+        --palcnt;
+            --palcnt;
+        nextAvailableTileIdx -= 144;
+        for(int i = 0; i< 20; ++i)
+            swiWaitForVBlank();
+
+        for(int l = 0; l < 25; ++l){
+            loadTrainerSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/TRAINER/", "n3",144+4*l,16,oamIndex,palcnt,nextAvailableTileIdx,false);
+            updateOAM(oamTop);
+            oamIndex -= 4;
+            --palcnt;
+            --palcnt;
+            nextAvailableTileIdx -= 144;
+            for(int i = 0; i< 3; ++i)
+                swiWaitForVBlank();
+        }
+
         loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
         consoleSetWindow(&Bottom,0,0,32,24);
         consoleClear();
@@ -1403,7 +1439,7 @@ namespace BATTLE{
             palcnt += (5);
             animatePB(142,34); 
             oamIndex -= (13);
-            palcnt -= (5);
+            palcnt -= (6);
             oamTop->oamBuffer[11].isHidden = false;
             
 
@@ -1459,6 +1495,17 @@ namespace BATTLE{
         updateOAM(oamTop);
         for(int i= 0; i < 200; ++i)
             swiWaitForVBlank();
+        
+        if(abilities[(*this->opponent->pkmn_team)[acpokpos[toSwitch][1]].boxdata.ability].T & ablty::BEFORE_BATTLE){
+            clear();
+            sprintf(buf,"%s von\n %ls (Gegn.) wirkt!\n",
+                abilities[(*this->opponent->pkmn_team)[acpokpos[toSwitch][1]].boxdata.ability].Name.c_str(),
+                (*this->opponent->pkmn_team)[acpokpos[toSwitch][1]].boxdata.Name);
+            cust_font.print_string(buf,8,8,true);
+            //abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].run();
+            for(int i= 0; i < 100; ++i)
+                swiWaitForVBlank();
+        }
     }
     void battle::switchOwnPkmn(int newPok,int toSwitch){
         if((*this->player->pkmn_team)[acpokpos[newPok][0]].stats.acHP == 0)
@@ -1622,6 +1669,17 @@ namespace BATTLE{
         for(int i= 0; i < 100; ++i)
             swiWaitForVBlank();
         updateOAM(oamTop);
+
+        if(abilities[(*this->player->pkmn_team)[acpokpos[toSwitch][0]].boxdata.ability].T & ablty::BEFORE_BATTLE){
+            clear();
+            sprintf(buf,"%s von\n %ls wirkt!\n",
+                abilities[(*this->player->pkmn_team)[acpokpos[toSwitch][0]].boxdata.ability].Name.c_str(),
+                (*this->player->pkmn_team)[acpokpos[toSwitch][0]].boxdata.Name);
+            cust_font.print_string(buf,8,8,true);
+            //abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].run();
+            for(int i= 0; i < 100; ++i)
+                swiWaitForVBlank();
+        }
     }
 
     void setMainBattleVisibility(bool hidden){

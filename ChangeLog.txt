@@ -1,16 +1,24 @@
 @@Prerelease Builds@@
-@Raging Gyarados[WIP]@
+@Charming Lari [WIP]@
+
+@Raging Gyarados [2013-12-14]@
  - Speichern von Spielständen (ô)
  - Pokémon-Datenstruktur (+)
- - Rudimentäre variabel-breite Schrift (+)
+ - variabel-breite Schrift (+)
  - PokéDex (ô)
  - PokéDex: Pokémon-Bases (+)
  - PokéDex: Dex-Einträge (+)
  - PokéDex / Pokémon-Screen: Pokémon-Sprites [m/w] (+)
  - PokéDex / Pokémon-Screen: Pokémon-Sprites [shiny][m/w] (+)
+ - PokéDex / Pokémon-Screen: Pokémon-BackSprites [m] (+)
+ - PokéDex / Pokémon-Screen: Pokémon-BackSprites [shiny][m] (+)
  - PokéDex: sp. Formen (+)
+ - Pokémon-Screen: Recode
 #! N3Dlib entfernt (-)
  - Emulator-Version (+); extrem langsam bei DeSmuME
+ - PKMN-Kampf: DS (+)
+ - PKMN-Kampf: Init, PKMNSwitch, rud. AttackChoice (+)
+ - Spritebehaftete MBoxen (+)
 
 @Waiting Suicune [2013-08-01]@
  - PKMNMenuSprites (+)

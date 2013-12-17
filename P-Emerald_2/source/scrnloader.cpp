@@ -419,6 +419,219 @@ bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,co
     return true;
 }
 
+bool loadTrainerSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const char* name,const int posX,
+                    const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool flipx){
+    static const int COLORS_PER_PALETTE = 16;
+    static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
+                                        * (can be set in REG_DISPCNT) */
+    static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
+    
+    char pt[100];
+    sprintf(pt, "%sSprite_%s.raw",Path,name);
+    FILE* fd = fopen(pt,"rb");
+     
+    if(fd == 0){
+        fclose(fd); 
+        return false;
+    }
+    int PalCnt = 16;
+    for(int i= 0; i< 16; ++i)
+        TEMP_PAL[i] = 0;
+    fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
+    for(int i = 0; i< 96*96; ++i)
+        TEMP[i] = 0;
+    fread(TEMP,  sizeof(unsigned int),96*96, fd);
+    fclose(fd);
+
+    if(bottom)
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
+    else
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
+
+    SpriteInfo * backInfo = &spriteInfo[++oamIndex];
+    SpriteEntry * back = &oam->oamBuffer[oamIndex];
+    backInfo->oamId = oamIndex;
+    backInfo->width = 64;
+    backInfo->height = 64;
+    backInfo->angle = 0;
+    backInfo->entry = back;
+    back->y = posY;
+    back->isRotateScale = false;
+    back->blendMode = OBJMODE_NORMAL; 
+    back->isMosaic = false;
+    back->isHidden = false;
+    back->colorMode = OBJCOLOR_16;
+    back->shape = OBJSHAPE_SQUARE;
+    back->x = flipx ? 32 + posX : posX;
+    back->hFlip = flipx;
+    back->size = OBJSIZE_64;
+    back->gfxIndex = nextAvailableTileIdx;
+    back->priority = OBJPRIORITY_0;
+    back->palette = palcnt;
+    if(bottom)
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+    else
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+    nextAvailableTileIdx += 64;
+
+    backInfo = &spriteInfo[++oamIndex];
+    back = &oam->oamBuffer[oamIndex];
+    backInfo->oamId = oamIndex;
+    backInfo->width = 32;
+    backInfo->height = 64;
+    backInfo->angle = 0;
+    backInfo->entry = back;
+    back->y = posY;
+    back->isRotateScale = false;
+    back->blendMode = OBJMODE_NORMAL;
+    back->isMosaic = false;
+    back->isHidden = false;
+    back->colorMode = OBJCOLOR_16;
+    back->shape = OBJSHAPE_TALL;
+    back->x = flipx ?  posX : 64 +posX;
+    back->hFlip = flipx;
+    back->size = OBJSIZE_64;
+    back->gfxIndex = nextAvailableTileIdx;
+    back->priority = OBJPRIORITY_0;
+    back->palette = palcnt; 
+    nextAvailableTileIdx += 32;
+
+    backInfo = &spriteInfo[++oamIndex];
+    back = &oam->oamBuffer[oamIndex];
+    backInfo->oamId = oamIndex;
+    backInfo->width = 64;
+    backInfo->height = 32;
+    backInfo->angle = 0;
+    backInfo->entry = back;
+    back->y = posY + 64;
+    back->isRotateScale = false;
+    back->blendMode = OBJMODE_NORMAL;
+    back->isMosaic = false;
+    back->isHidden = false;
+    back->colorMode = OBJCOLOR_16;
+    back->shape = OBJSHAPE_WIDE;
+    back->x = flipx ? 32 + posX : posX;
+    back->hFlip = flipx;
+    back->size = OBJSIZE_64;
+    back->gfxIndex = nextAvailableTileIdx;
+    back->priority = OBJPRIORITY_0;
+    back->palette = palcnt; 
+    nextAvailableTileIdx += 32;
+
+    backInfo = &spriteInfo[++oamIndex];
+    back = &oam->oamBuffer[oamIndex];
+    backInfo->oamId = oamIndex;  
+    backInfo->width = 32; 
+    backInfo->height = 32;
+    backInfo->angle = 0;
+    backInfo->entry = back;
+    back->y = posY + 64;
+    back->isRotateScale = false;
+    back->blendMode = OBJMODE_NORMAL;
+    back->isMosaic = false;
+    back->isHidden = false;
+    back->colorMode = OBJCOLOR_16;
+    back->shape = OBJSHAPE_SQUARE;
+    back->x = flipx ?  posX : 64 +posX;
+    back->hFlip = flipx;
+    back->size = OBJSIZE_32;
+    back->gfxIndex = nextAvailableTileIdx;
+    back->priority = OBJPRIORITY_0;
+    back->palette = palcnt;
+    nextAvailableTileIdx += 16;
+
+    ++palcnt;
+    if(bottom)
+        updateOAMSub(oam);
+    else
+        updateOAM(oam);
+    return true;
+}
+bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const char* name,const int posX,
+                    const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool flipx){
+    static const int COLORS_PER_PALETTE = 16;
+    static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
+                                        * (can be set in REG_DISPCNT) */
+    static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
+    
+    char pt[100];
+    sprintf(pt, "%sSprite_%s.raw",Path,name);
+    FILE* fd = fopen(pt,"rb");
+     
+    if(fd == 0){
+        fclose(fd); 
+        return false;
+    }
+    int PalCnt = 16;
+    for(int i= 0; i< 16; ++i)
+        TEMP_PAL[i] = 0;
+    fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
+    for(int i = 0; i< 96*96; ++i)
+        TEMP[i] = 0;
+    fread(TEMP,  sizeof(unsigned int),96*64, fd);
+    fclose(fd);
+
+    if(bottom)
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
+    else
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
+
+    SpriteInfo * backInfo = &spriteInfo[++oamIndex];
+    SpriteEntry * back = &oam->oamBuffer[oamIndex];
+    backInfo->oamId = oamIndex;
+    backInfo->width = 64;
+    backInfo->height = 64;
+    backInfo->angle = 0;
+    backInfo->entry = back;
+    back->y = posY;
+    back->isRotateScale = false;
+    back->blendMode = OBJMODE_NORMAL; 
+    back->isMosaic = false;
+    back->isHidden = false;
+    back->colorMode = OBJCOLOR_16;
+    back->shape = OBJSHAPE_SQUARE;
+    back->x = flipx ? 32 + posX : posX;
+    back->hFlip = flipx;
+    back->size = OBJSIZE_64;
+    back->gfxIndex = nextAvailableTileIdx;
+    back->priority = OBJPRIORITY_0;
+    back->palette = palcnt;
+    if(bottom)
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+    else
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+    nextAvailableTileIdx += 64;
+
+    backInfo = &spriteInfo[++oamIndex];
+    back = &oam->oamBuffer[oamIndex];
+    backInfo->oamId = oamIndex;
+    backInfo->width = 32;
+    backInfo->height = 64;
+    backInfo->angle = 0;
+    backInfo->entry = back;
+    back->y = posY;
+    back->isRotateScale = false;
+    back->blendMode = OBJMODE_NORMAL;
+    back->isMosaic = false;
+    back->isHidden = false;
+    back->colorMode = OBJCOLOR_16;
+    back->shape = OBJSHAPE_TALL;
+    back->x = flipx ?  posX : 64 +posX;
+    back->hFlip = flipx;
+    back->size = OBJSIZE_64;
+    back->gfxIndex = nextAvailableTileIdx;
+    back->priority = OBJPRIORITY_0;
+    back->palette = palcnt; 
+    nextAvailableTileIdx += 32;
+
+    ++palcnt;
+    if(bottom)
+        updateOAMSub(oam);
+    else
+        updateOAM(oam);
+    return true;
+}
+
 bool loadPicture(u16* layer,const char* Path, const char* Name,int palsize,int tilecnt){
     char pt[100];
     sprintf(pt, "%s%s.raw",Path,Name);

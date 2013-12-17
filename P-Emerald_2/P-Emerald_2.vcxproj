@@ -17,6 +17,7 @@
     <ClInclude Include="include\battle.h" />
     <ClInclude Include="include\berry.h" />
     <ClInclude Include="include\font_data.h" />
+    <ClInclude Include="include\map2d.h" />
     <ClInclude Include="include\Map_Obj.h" />
     <ClInclude Include="include\nitrofs.h" />
     <ClInclude Include="include\item.h" />
@@ -29,6 +30,7 @@
     <ClInclude Include="include\print.h" />
     <ClInclude Include="include\savgm.h" />
     <ClInclude Include="include\scrnloader.h" />
+    <ClInclude Include="include\sound.h" />
     <ClInclude Include="include\sprite.h" />
     <ClInclude Include="include\type.h" />
     <ClInclude Include="include\unistd.h" />
@@ -45,6 +47,7 @@
     <ClCompile Include="source\keyboard.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Map.cpp" />
+    <ClCompile Include="source\map2d.cpp" />
     <ClCompile Include="source\maploader.cpp" />
     <ClCompile Include="source\Map_Obj.cpp" />
     <ClCompile Include="source\mbox.cpp" />
@@ -55,6 +58,7 @@
     <ClCompile Include="source\savgm.cpp" />
     <ClCompile Include="source\nitrofs.c" />
     <ClCompile Include="source\scrnloader.cpp" />
+    <ClCompile Include="source\sound.cpp" />
     <ClCompile Include="source\sprite.cpp" />
     <ClCompile Include="source\type.cpp" />
   </ItemGroup>
