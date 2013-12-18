@@ -69,6 +69,7 @@ font::Font cust_font(font::font1::font_data, font::font1::font_widths,font::font
 font::Font cust_font2(font::font2::font_data, font::font2::font_widths,font::font2::shiftchar);
 
 //extern Map Maps[];
+map2d::Map* acMap;
 
 int hours, seconds, minutes, day, month, year;
 int achours, acseconds, acminutes, acday, acmonth, acyear;
@@ -772,6 +773,10 @@ START:
     //g_device.Init();
     //SetupMatrices();
     
+    acMap = new map2d::Map("nitro://MAPS/","0");
+    int acposx = 0, acposy = 0;
+    acMap->draw(acposx,acposy);
+    
     cust_font.set_color(RGB(0,31,31),0);
 
     std::pair<int,int> dirs[4] = {std::pair<int,int>(0,1),std::pair<int,int>(1,0),std::pair<int,int>(0,-1),std::pair<int,int>(-1,0)};
@@ -787,9 +792,13 @@ START:
 
     SAV.hasGDex = true;
 
+    int MOV = 14;
+
     while(42) 
     {
         updateTime();
+        swiWaitForVBlank();
+        swiWaitForVBlank();
         swiWaitForVBlank();
         updateOAMSub(oam);
         scanKeys();
@@ -820,51 +829,87 @@ START:
             }
             continue;
         }
-        else if(held & KEY_DOWN)
+        else*/ if(held & KEY_DOWN)
         {
-            int newX = acMap->acPos.x + dirs[(acDir)%4].first;
+            //for(int i = 0; i < 5; ++i){
+            //    scanKeys();
+            //    swiWaitForVBlank();
+            //    updateTime();
+            //    if(keysUp() & KEY_DOWN)
+            //    break;
+            //}
+            /*int newX = acMap->acPos.x + dirs[(acDir)%4].first;
             int newY = acMap->acPos.y + dirs[(acDir)%4].second;
             int newZ = acMap->moveData[((acMap->acPos.x/10)+(acMap->SX/2)) * acMap->SY + (acMap->acPos.y/10)] == 0 ? 
                 (acMap->moveData[((newX/10)+(acMap->SX/2)) * acMap->SY + (newY/10)]-2)/8.0 : acMap->acPos.z;
             Point newPos = Point(newX,newY,newZ);
             acMap->setPos(newPos);
-            N3DSampleFrameworkWaitForVBlank();
+            N3DSampleFrameworkWaitForVBlank();*/
+            acposy+=MOV; 
+            acMap->draw(acposx/20,acposy/20);
             continue;
         }
         else if (held & KEY_LEFT)
         {
-            int newX = acMap->acPos.x + dirs[(acDir+1)%4].first;
+            //for(int i = 0; i < 5; ++i){
+            //    scanKeys();
+            //    swiWaitForVBlank();
+            //    updateTime();
+            //    if(keysUp() & KEY_LEFT)
+            //    break;
+            //}
+           /* int newX = acMap->acPos.x + dirs[(acDir+1)%4].first;
             int newY = acMap->acPos.y + dirs[(acDir+1)%4].second;
             int newZ = acMap->moveData[((acMap->acPos.x/10)+(acMap->SX/2)) * acMap->SY + (acMap->acPos.y/10)] == 0 ? 
                 (acMap->moveData[((newX/10)+(acMap->SX/2)) * acMap->SY + (newY/10)]-2)/8.0 : acMap->acPos.z;
             Point newPos = Point(newX,newY,newZ);
             acMap->setPos(newPos);
-            N3DSampleFrameworkWaitForVBlank();
+            N3DSampleFrameworkWaitForVBlank();*/
+            acposx-=MOV;
+            acMap->draw(acposx/20,acposy/20);
             continue;
         }
         else if (held & KEY_RIGHT)
         {
-            int newX = acMap->acPos.x + dirs[(acDir+3)%4].first;
+            //for(int i = 0; i < 5; ++i){
+            //    scanKeys();
+            //    swiWaitForVBlank();
+            //    updateTime();
+            //    if(keysUp() & KEY_RIGHT)
+            //    break;
+            //}
+            /*int newX = acMap->acPos.x + dirs[(acDir+3)%4].first;
             
             int newY = acMap->acPos.y + dirs[(acDir+3)%4].second;
             int newZ = acMap->moveData[((acMap->acPos.x/10)+(acMap->SX/2)) * acMap->SY + (acMap->acPos.y/10)] == 0 ? 
                 (acMap->moveData[((newX/10)+(acMap->SX/2)) * acMap->SY + (newY/10)]-2)/8.0 : acMap->acPos.z;
             Point newPos = Point(newX,newY,newZ);
             acMap->setPos(newPos);
-            N3DSampleFrameworkWaitForVBlank();
+            N3DSampleFrameworkWaitForVBlank();*/
+            acposx+=MOV;
+            acMap->draw(acposx/20,acposy/20);
             continue;
         }
         else if (held & KEY_UP)
         {
-            int newX = acMap->acPos.x + dirs[(acDir+2)%4].first;
+            //for(int i = 0; i < 5; ++i){
+            //    scanKeys();
+            //    swiWaitForVBlank();
+            //    updateTime();
+            //    if(keysUp() & KEY_UP)
+            //    break;
+            //}
+            /*int newX = acMap->acPos.x + dirs[(acDir+2)%4].first;
             int newY = acMap->acPos.y + dirs[(acDir+2)%4].second;
             int newZ = acMap->moveData[((acMap->acPos.x/10)+(acMap->SX/2)) * acMap->SY + (acMap->acPos.y/10)] == 0 ? 
                 (acMap->moveData[((newX/10)+(acMap->SX/2)) * acMap->SY + (newY/10)]-2)/8.0 : acMap->acPos.z;
             Point newPos = Point(newX,newY,newZ);
             acMap->setPos(newPos);
-            N3DSampleFrameworkWaitForVBlank();
+            N3DSampleFrameworkWaitForVBlank();*/
+            acposy-=MOV;
+            acMap->draw(acposx/20,acposy/20);
             continue;
-        }*/
+        }
         //StartBag
         //Centers o t circles.
         //PKMN -> ID -> DEX -> Bag -> Opt -> Nav
@@ -947,6 +992,7 @@ START:
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
+            
             
             //map2d::BlockSet b;
             //char buffer[100];

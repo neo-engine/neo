@@ -12,13 +12,16 @@ namespace map2d{
         u16 pal[16];
     };
     typedef struct{
-        u8 tile[8][8];
+        u8 tile[64];
     } Tile;
     typedef u8 PalNo;
-    typedef struct{
-        u16 tileidx      : 12;
-        PalNo palno      :  4;
-    }BlockAtom;
+    //typedef struct{
+    //    u16 tileidx      : 10;
+    //    u8 vflip         :  1;
+    //    u8 hflip         :  1;
+    //    PalNo palno      :  4;
+    //}BlockAtom;
+    typedef u16 BlockAtom;
 
     class Block{
     public:
@@ -37,7 +40,7 @@ namespace map2d{
     };
     class BlockSet{
     public:
-        Block blocks[512];
+        Block blocks[1024];
     };
 
     
@@ -56,6 +59,7 @@ namespace map2d{
 
 
         //WildePKMN, Events...
+        Map() { }
 
         Map(int sizex,int sizey,Palette pals[16],u8* blocks,u8* move, TileSet t,BlockSet b) 
             : sizex(sizex), sizey(sizey), t(t), b(b){
