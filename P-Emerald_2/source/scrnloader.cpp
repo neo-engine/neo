@@ -17,7 +17,6 @@
 #include "item.h"
 #include "battle.h"
 
-#include "DexTop.h"
 //Sprites
 #include "Back.h"
 #include "Save.h"
@@ -55,7 +54,7 @@ PrintConsole Top,Bottom;
 
 unsigned int NAV_DATA[12288] = {0};
 unsigned short int NAV_DATA_PAL[256] = {0};
-BG_set BGs[MAXBG] = {{"Raging_Gyarados",&(BG1Bitmap[0]),&(BG1Pal[0]),false,false},
+BG_set BGs[MAXBG] = {{"Raging_Gyarados",NAV_DATA,NAV_DATA_PAL,true,false},
     {"Sleeping_Eevee",NAV_DATA,NAV_DATA_PAL,true,false},
     {"Mystic_Guardevoir",NAV_DATA,NAV_DATA_PAL,true,true},
     {"Waiting_Suicune",NAV_DATA,NAV_DATA_PAL,true,true},
@@ -1869,12 +1868,12 @@ void scrnloader::run_pkmn()
             {
                 scanKeys();
                 if(keysUp() & KEY_TOUCH)
-                break;
+                break; 
             }
             break;
         }
         else if(pressed & KEY_A || (sqrt(sq(touch.px-128)+sq(touch.py-96)) <= 16))
-        {
+        { 
             while(2)
             {
                 scanKeys();
@@ -2616,12 +2615,11 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
     int newformepkmn = pkmn;
     if(page < 4){
         POKEMON::PKMNDATA::getAll(pkmn,acpkmndata);
-        dmaCopy(DexTopBitmap, bgGetGfxPtr(bg3), 256*192);
-        dmaCopy(DexTopPal, BG_PALETTE, 32); 
+        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","DexTop");
         if(page == 2)
             memset(bgGetGfxPtr(bg3)+7168,1,256*192-14336);
         if(SAV.inDex[pkmn - 1]){
-            BG_PALETTE[1] = POKEMON::PKMNDATA::getColor(acpkmndata.Types[0]);
+            BG_PALETTE[0] = POKEMON::PKMNDATA::getColor(acpkmndata.Types[0]);
 
             bool isFixed = (acpkmndata.gender == POKEMON::GENDERLESS) || (acpkmndata.gender == POKEMON::MALE) || (acpkmndata.gender == POKEMON::FEMALE);
             forme %= acpkmndata.formecnt ? ((isFixed ? 1 : 2)*acpkmndata.formecnt) : 2;
@@ -2652,7 +2650,7 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
             if(SAV.inDex[pkmn - 1]){
                 BG_PALETTE[42] = POKEMON::PKMNDATA::getColor(acpkmndata.Types[1]);
                 for(int i= 0; i< 6; ++i){
-                    font::putrec(17 + 40 * i,std::max(56, 103- acpkmndata.Bases[i] / 3),39 + 40 * i,103,false,true);
+                    font::putrec(19 + 40 * i,std::max(56, 102- acpkmndata.Bases[i] / 3),37 + 40 * i,102,false,true);
                     //font::putrec(17 + 40 * i,std::min(103, 56 + acpkmndata.Bases[i] / 3),(6* (acpkmndata.Bases[i] % 3)) + 16 + 40 * i,std::min(103, 58 + acpkmndata.Bases[i] / 3),statColor[i],false);
                 }
                 printf("\n\n  KP   ANG  DEF  SAN  SDF  INT");
@@ -2693,7 +2691,8 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
 }
 void scrnloader::run_dex(int num){
     vramSetup();
-    videoSetMode(MODE_5_2D |DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );		
+    videoSetMode(MODE_5_2D |DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );	
+
     Top = *consoleInit(&Top, 0, BgType_Text4bpp, BgSize_T_256x256,2,0, true ,true);
     consoleSetFont(&Top,&cfont);
     
@@ -2701,8 +2700,7 @@ void scrnloader::run_dex(int num){
     consoleSetFont(&Bottom, &cfont);
     
     touchPosition t;	int acForme = 0;
-    dmaCopy(DexTopBitmap, bgGetGfxPtr(bg3), 256*256);
-    dmaCopy(DexTopPal, BG_PALETTE, 32); 
+    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","DexTop",32);
 
     if(!BGs[BG_ind].load_from_rom){
         dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);

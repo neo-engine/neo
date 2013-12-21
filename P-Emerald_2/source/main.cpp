@@ -36,6 +36,8 @@
 #include "Male.h"
 #include "Female.h"
 
+#include "ChSq_a.h"
+
 OAMTable *oam = new OAMTable();
 SpriteInfo spriteInfo[SPRITE_COUNT];
 
@@ -556,13 +558,12 @@ void initVideo() {
 
     vramSetBankE(VRAM_E_MAIN_SPRITE);
 
-    /*  Set the video mode on the main screen. */
-    videoSetMode(MODE_5_2D | // Set the graphics mode to Mode 5
-    DISPLAY_BG2_ACTIVE | // Enable BG2 for display
-    DISPLAY_BG3_ACTIVE | // Enable BG3 for display
-    DISPLAY_SPR_ACTIVE | // Enable sprites for display
-    DISPLAY_SPR_1D       // Enable 1D tiled sprites
-    );
+    videoSetMode(MODE_5_2D |DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );	
+
+    // set up our top bitmap background
+    bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 1 , 0 );
+    bgSetPriority( bg3, 3 );
+    bgUpdate();
 }
 void initVideoSub() {
 
@@ -587,16 +588,7 @@ void vramSetup()
     vramSetBankH(VRAM_H_LCD);
 }
 
-int main(int argc, char** argv) 
-{
-    //Init
-    powerOn(POWER_ALL_2D);
-    
-    fatInitDefault();
-    nitroFSInit(argv[0]);
-
-    //PRE-Intro
-    touchPosition touch;
+void startScreen(){
     
     vramSetup();
 
@@ -645,7 +637,7 @@ int main(int argc, char** argv)
     }
 START:
     //Intro
-    //StartScreen
+        //StartScreen
     
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Title");
     loadPictureSub(bgGetGfxPtr(bg3sub),"nitro:/PICS/","Clear");
@@ -759,40 +751,112 @@ START:
         initNewGame();
     }
     swiWaitForVBlank();
+}
+
+enum MoveMode{
+    WALK,
+    SURF,
+    BIKE
+} playermoveMode = WALK;
+int acposx = 0*20, acposy = 6*20, acposz = 3;
+bool movePlayerOnMap(int x,int y, int z){
+    if(x < 0 || y < 0 ||x >= acMap->sizey || y >= acMap->sizex)
+        return false;
+
+    int lastmovedata = acMap->blocks[acposy/20][acposx/20].movedata;
+    int acmovedata = acMap->blocks[y][x].movedata;
+
+    if(acmovedata == 1)
+        return false ;
+    if(acmovedata == 4 && playermoveMode != SURF 
+        || acmovedata != 4 && playermoveMode == SURF )
+        return false;
+    
+    if(lastmovedata == 0 && acmovedata %4 == 0)
+        acposz = z = acmovedata / 4;
+    
+    oamTop->oamBuffer[0].priority = OBJPRIORITY_2;
+    if(acmovedata == 60)
+        if(z <= 3)
+            oamTop->oamBuffer[0].priority = OBJPRIORITY_3;
+        else
+            oamTop->oamBuffer[0].priority = OBJPRIORITY_1;
+
+    if(acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
+        acMap->draw(x-8,y-6);
+    else
+        return false;
+
+    updateOAM(oamTop);
+
+    char buf[100];
+    sprintf(buf,"x: %i  y: %i  z: %i\nacmove %i",x,y,z,acmovedata);
+    //mbox b(buf,false,false);
+    return true;
+}
+
+void initMapSprites(){
+        initOAMTable(oamTop);
+    SpriteInfo * SQCHAInfo = &spriteInfoTop[0];
+    SpriteEntry * SQCHA = &oamTop->oamBuffer[0];
+    SQCHAInfo->oamId = 0;
+    SQCHAInfo->width = 16;
+    SQCHAInfo->height = 16;
+    SQCHAInfo->angle = 0;
+    SQCHAInfo->entry = SQCHA;
+    SQCHA->y = 96;
+    SQCHA->isRotateScale = false;
+    SQCHA->blendMode = OBJMODE_NORMAL;
+    SQCHA->isMosaic = true;
+    SQCHA->colorMode = OBJCOLOR_16;
+    SQCHA->shape = OBJSHAPE_SQUARE;
+    SQCHA->isHidden = false;
+    SQCHA->x = 128;
+    SQCHA->size = OBJSIZE_16;
+    SQCHA->gfxIndex = 0;
+    SQCHA->priority = OBJPRIORITY_2;
+    SQCHA->palette = 0;
+
+    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    ChSq_aPal,    &SPRITE_PALETTE[0],    32);
+    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    ChSq_aTiles,    &SPRITE_GFX[0],    ChSq_aTilesLen);
+}
+
+int main(int argc, char** argv) 
+{
+    //Init
+    powerOn(POWER_ALL_2D);
+    
+    fatInitDefault();
+    nitroFSInit(argv[0]);
+
+    //PRE-Intro
+    touchPosition touch;
+
+    startScreen();
+
+
     int mode = -1;
     scrn.draw(mode);
-
-    powerOn(POWER_ALL);
-    videoSetMode(MODE_0_3D | DISPLAY_BG0_ACTIVE);
-    vramSetBankA(VRAM_A_TEXTURE);
-    vramSetBankB(VRAM_B_TEXTURE);
-    vramSetBankF(VRAM_F_TEX_PALETTE);
-    
-    //N3DSampleFrameworkInit();
-
-    //g_device.Init();
-    //SetupMatrices();
-    
-    acMap = new map2d::Map("nitro://MAPS/","0");
-    int acposx = 0, acposy = 0;
-    acMap->draw(acposx,acposy);
+        
+    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
+    acMap = new map2d::Map("nitro://MAPS/","17");
+    movePlayerOnMap(acposx/20,acposy/20,acposz);
     
     cust_font.set_color(RGB(0,31,31),0);
 
     std::pair<int,int> dirs[4] = {std::pair<int,int>(0,1),std::pair<int,int>(1,0),std::pair<int,int>(0,-1),std::pair<int,int>(-1,0)};
     int acDir = 0;
-    //acMap = Maps;
     
     int HILFSCOUNTER = 251;
-    //N3DMATRIX ro;
-    //N3DMatrixRotationY(ro, DegreeToRadian(0));
-    //g_device.SetTransform(N3DTS_VIEW,ro);
     oam->oamBuffer[PKMN_ID].isHidden = !(SAV.hasPKMN && SAV.PKMN_team.size());
     updateOAMSub(oam);
 
     SAV.hasGDex = true;
 
-    int MOV = 14;
+    int MOV = 20;
+
+    initMapSprites();
+    updateOAM(oamTop);
 
     while(42) 
     {
@@ -800,114 +864,34 @@ START:
         swiWaitForVBlank();
         swiWaitForVBlank();
         swiWaitForVBlank();
-        updateOAMSub(oam);
+        updateOAMSub(oam); 
         scanKeys();
         touchRead(&touch);
         int pressed = keysUp(),held = keysHeld();
         
         //Moving
-        /*if(held & KEY_R){
-            if (pressed & KEY_RIGHT)
-            {
-                N3DMATRIX rot;
-                acMap->rotation = acMap->rotation+90 == 360 ? 0:(acMap->rotation+90);
-                N3DMatrixRotationY(rot, DegreeToRadian(acMap->rotation));
-                g_device.SetTransform(N3DTS_VIEW,rot);
-                acMap->render();
-                //acMap->setRot(New);			
-                N3DSampleFrameworkWaitForVBlank();
-            }
-            else if (pressed & KEY_LEFT)
-            {				
-                N3DMATRIX rot;
-                acMap->rotation = acMap->rotation-90 == -90 ? 270:(acMap->rotation-90);
-                N3DMatrixRotationY(rot, DegreeToRadian(acMap->rotation));
-                g_device.SetTransform(N3DTS_VIEW,rot);
-                acMap->render();
-                //acMap->setRot(New);			
-                N3DSampleFrameworkWaitForVBlank();
-            }
-            continue;
-        }
-        else*/ if(held & KEY_DOWN)
+        if(held & KEY_DOWN)
         {
-            //for(int i = 0; i < 5; ++i){
-            //    scanKeys();
-            //    swiWaitForVBlank();
-            //    updateTime();
-            //    if(keysUp() & KEY_DOWN)
-            //    break;
-            //}
-            /*int newX = acMap->acPos.x + dirs[(acDir)%4].first;
-            int newY = acMap->acPos.y + dirs[(acDir)%4].second;
-            int newZ = acMap->moveData[((acMap->acPos.x/10)+(acMap->SX/2)) * acMap->SY + (acMap->acPos.y/10)] == 0 ? 
-                (acMap->moveData[((newX/10)+(acMap->SX/2)) * acMap->SY + (newY/10)]-2)/8.0 : acMap->acPos.z;
-            Point newPos = Point(newX,newY,newZ);
-            acMap->setPos(newPos);
-            N3DSampleFrameworkWaitForVBlank();*/
-            acposy+=MOV; 
-            acMap->draw(acposx/20,acposy/20);
+            if(movePlayerOnMap(acposx/20,(acposy+MOV)/20,acposz))
+                acposy+=MOV; 
             continue;
         }
         else if (held & KEY_LEFT)
         {
-            //for(int i = 0; i < 5; ++i){
-            //    scanKeys();
-            //    swiWaitForVBlank();
-            //    updateTime();
-            //    if(keysUp() & KEY_LEFT)
-            //    break;
-            //}
-           /* int newX = acMap->acPos.x + dirs[(acDir+1)%4].first;
-            int newY = acMap->acPos.y + dirs[(acDir+1)%4].second;
-            int newZ = acMap->moveData[((acMap->acPos.x/10)+(acMap->SX/2)) * acMap->SY + (acMap->acPos.y/10)] == 0 ? 
-                (acMap->moveData[((newX/10)+(acMap->SX/2)) * acMap->SY + (newY/10)]-2)/8.0 : acMap->acPos.z;
-            Point newPos = Point(newX,newY,newZ);
-            acMap->setPos(newPos);
-            N3DSampleFrameworkWaitForVBlank();*/
-            acposx-=MOV;
-            acMap->draw(acposx/20,acposy/20);
+            if(movePlayerOnMap((acposx-MOV)/20,acposy/20,acposz))
+                acposx-=MOV;
             continue;
         }
         else if (held & KEY_RIGHT)
         {
-            //for(int i = 0; i < 5; ++i){
-            //    scanKeys();
-            //    swiWaitForVBlank();
-            //    updateTime();
-            //    if(keysUp() & KEY_RIGHT)
-            //    break;
-            //}
-            /*int newX = acMap->acPos.x + dirs[(acDir+3)%4].first;
-            
-            int newY = acMap->acPos.y + dirs[(acDir+3)%4].second;
-            int newZ = acMap->moveData[((acMap->acPos.x/10)+(acMap->SX/2)) * acMap->SY + (acMap->acPos.y/10)] == 0 ? 
-                (acMap->moveData[((newX/10)+(acMap->SX/2)) * acMap->SY + (newY/10)]-2)/8.0 : acMap->acPos.z;
-            Point newPos = Point(newX,newY,newZ);
-            acMap->setPos(newPos);
-            N3DSampleFrameworkWaitForVBlank();*/
-            acposx+=MOV;
-            acMap->draw(acposx/20,acposy/20);
+            if(movePlayerOnMap((acposx+MOV)/20,acposy/20,acposz))
+                acposx+=MOV;
             continue;
         }
         else if (held & KEY_UP)
         {
-            //for(int i = 0; i < 5; ++i){
-            //    scanKeys();
-            //    swiWaitForVBlank();
-            //    updateTime();
-            //    if(keysUp() & KEY_UP)
-            //    break;
-            //}
-            /*int newX = acMap->acPos.x + dirs[(acDir+2)%4].first;
-            int newY = acMap->acPos.y + dirs[(acDir+2)%4].second;
-            int newZ = acMap->moveData[((acMap->acPos.x/10)+(acMap->SX/2)) * acMap->SY + (acMap->acPos.y/10)] == 0 ? 
-                (acMap->moveData[((newX/10)+(acMap->SX/2)) * acMap->SY + (newY/10)]-2)/8.0 : acMap->acPos.z;
-            Point newPos = Point(newX,newY,newZ);
-            acMap->setPos(newPos);
-            N3DSampleFrameworkWaitForVBlank();*/
-            acposy-=MOV;
-            acMap->draw(acposx/20,acposy/20);
+            if(movePlayerOnMap(acposx/20,(acposy-MOV)/20,acposz))
+                acposy-=MOV;
             continue;
         }
         //StartBag
@@ -926,15 +910,9 @@ START:
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
-            //scrn.run_bag
-            //g_device.EndScene();
             SAV.Bag.draw();
-            
-            powerOn(POWER_ALL);
-            videoSetMode(MODE_0_3D | DISPLAY_BG0_ACTIVE);
-            vramSetBankA(VRAM_A_TEXTURE);
-            vramSetBankB(VRAM_B_TEXTURE);
-            vramSetBankF(VRAM_F_TEX_PALETTE);
+            initMapSprites();
+            movePlayerOnMap(acposx/20,acposy/20,acposz);
         }
         //StartPkmn
         else if (SAV.PKMN_team.size() && (sqrt(sq(mainSpritesPositions[0][0]-touch.px) + sq(mainSpritesPositions[0][1]-touch.py)) <= 16 )&& mode == -1)
@@ -948,17 +926,11 @@ START:
                 break;
             }
 
-            //g_device.EndScene();
-
             scrn.run_pkmn();
 
-            powerOn(POWER_ALL);
-            videoSetMode(MODE_0_3D | DISPLAY_BG0_ACTIVE);
-            vramSetBankA(VRAM_A_TEXTURE);
-            vramSetBankB(VRAM_B_TEXTURE);
-            vramSetBankF(VRAM_F_TEX_PALETTE);
-
             scrn.draw(mode);
+            initMapSprites();
+            movePlayerOnMap(acposx/20,acposy/20,acposz);
         }
         //StartDex
         else if (sqrt(sq(mainSpritesPositions[2][0]-touch.px) + sq(mainSpritesPositions[2][1]-touch.py)) <= 16 && mode == -1)
@@ -971,15 +943,11 @@ START:
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
-            //g_device.EndScene();
+
             scrn.run_dex();
             scrn.draw(mode);
-            
-            powerOn(POWER_ALL);
-            videoSetMode(MODE_0_3D | DISPLAY_BG0_ACTIVE);
-            vramSetBankA(VRAM_A_TEXTURE);
-            vramSetBankB(VRAM_B_TEXTURE);
-            vramSetBankF(VRAM_F_TEX_PALETTE);
+            initMapSprites();
+            movePlayerOnMap(acposx/20,acposy/20,acposz);
         }
         //StartOptions
         else if (sqrt(sq(mainSpritesPositions[4][0]-touch.px) + sq(mainSpritesPositions[4][1]-touch.py)) <= 16 && mode == -1)
@@ -992,27 +960,6 @@ START:
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
-            
-            
-            //map2d::BlockSet b;
-            //char buffer[100];
-            //sprintf(buffer,"nitro://MAPS/TILESETS/0.bvd");
-            //map2d::readBlockSet(fopen(buffer,"rb"),b);
-            //
-            //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","Clear");
-            //consoleSelect(&Bottom);
-            //consoleSetWindow(&Bottom,4,4,20,20);
-
-            //for(int k= 0; k < 5; ++k){
-            //        printf("%i",b.blocks[k].bottombehave);
-            //    printf("\n");
-            //}
-
-            powerOn(POWER_ALL);
-            videoSetMode(MODE_0_3D | DISPLAY_BG0_ACTIVE);
-            vramSetBankA(VRAM_A_TEXTURE);
-            vramSetBankB(VRAM_B_TEXTURE);
-            vramSetBankF(VRAM_F_TEX_PALETTE);
         }
         //StartID
         else if (sqrt(sq(mainSpritesPositions[1][0]-touch.px) + sq(mainSpritesPositions[1][1]-touch.py)) <= 16 && mode == -1)
@@ -1086,6 +1033,8 @@ START:
             }
             setMainSpriteVisibility(false);
             scrn.draw(mode);
+            initMapSprites();
+            movePlayerOnMap(acposx/20,acposy/20,acposz);
         }
         //StartPok\x82""nav
         else if (sqrt(sq(mainSpritesPositions[5][0]-touch.px) + sq(mainSpritesPositions[5][1]-touch.py)) <= 16 && mode == -1)
@@ -1100,6 +1049,7 @@ START:
             }
             mode = 0;
             scrn.draw(mode);
+            movePlayerOnMap(acposx/20,acposy/20,acposz);
         }
         //StartMaps
         else if (sqrt(sq(mainSpritesPositions[0][0]-touch.px) + sq(mainSpritesPositions[0][1]-touch.py)) <= 16 && mode == 0)
@@ -1203,9 +1153,6 @@ START:
             updateOAMSub(oam);
             scrn.draw(mode);
         }
-        //drawMap		
-        //acMap->render();
-        //N3DSampleFrameworkWaitForVBlank();
         //End 
 
     }

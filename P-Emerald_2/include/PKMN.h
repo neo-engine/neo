@@ -9,7 +9,6 @@
 #include <fstream>
 
 #include "attack.h"
-#include "PKMNInfoScreen.h"
 #include "ability.h"
 #include "item.h"
 #include "berry.h"

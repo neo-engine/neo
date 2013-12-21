@@ -674,9 +674,7 @@ namespace POKEMON{
         cust_font2.set_color(5,1);
         cust_font2.set_color(6,2);
 
-        //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
-        dmaCopy( PKMNInfoScreenBitmap, bgGetGfxPtr(bg3), 256*256 );
-        dmaCopy( PKMNInfoScreenPal, BG_PALETTE, 256*2); 
+        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
 
         consoleSelect(Top);	
         consoleSetWindow(Top, 0,0,32,24);
@@ -1023,7 +1021,7 @@ namespace POKEMON{
                 
                 sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
                 cust_font2.print_string(buf,28,104,true);
-            }
+            } 
             else
             {
                 printf("Off. als Ei erh. am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2],getLoc(boxdata.gotPlace));
@@ -1040,7 +1038,7 @@ namespace POKEMON{
 
         if(!(this->boxdata.IV.isEgg)) {
             printf("\x1b[33m");
-        
+         
             consoleSelect(Top);	
             consoleSetWindow(Top, 4,5,12,2);
             printf("EP(%3i%%)\nKP(%3i%%)",(this->boxdata.exp-POKEMON::EXP[this->Level-1][0]) *100/(POKEMON::EXP[this->Level][0]-POKEMON::EXP[this->Level-1][0]),this->stats.acHP*100/this->stats.maxHP);
@@ -1055,12 +1053,10 @@ namespace POKEMON{
         }
     }
     extern bool drawInfoSub(u16* layer,int PKMN);
-    int PKMN::draw(){
+    int PKMN::draw(){ 
         
         // Load bitmap to top background
-        //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
-        dmaCopy( PKMNInfoScreenBitmap, bgGetGfxPtr(bg3), 256*256 );
-        dmaCopy( PKMNInfoScreenPal, BG_PALETTE, 96*2); 
+        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
         
         consoleSelect(&Top);
         consoleClear();

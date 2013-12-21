@@ -2,7 +2,6 @@
 
 #include <nds.h>
 
-#include "BG1.h"
 #include "sprite.h"
 #include <string>
 
