@@ -122,8 +122,8 @@ namespace map2d{
         }
           
         int c = 0;
-        for(int x = by; x < by + 12; x++){
-            for(int y = bx; y < bx + 16; y++){
+        for(int x = by; x < by + 13; x++){
+            for(int y = bx; y < bx + 17; y++){
                 int toplayer = 1, bottomlayer = 3;
 
                 Block acBlock = this->b.blocks[blocks[x][y].blockidx];
@@ -138,18 +138,27 @@ namespace map2d{
                 if(acBlock.bottombehave == 0x10)
                     toplayer++;
 
-
-                mapMemory[toplayer][c] = (acBlock.top[0][0]);
-                mapMemory[toplayer][c+1] = acBlock.top[0][1];
-                mapMemory[toplayer][c+32] = acBlock.top[1][0];
-                mapMemory[toplayer][c+33] = acBlock.top[1][1];
+                if(x > by && y > bx)
+                    mapMemory[toplayer][c-33] = (acBlock.top[0][0]);
+                if(x > by && y < bx + 16)
+                    mapMemory[toplayer][c-32] = acBlock.top[0][1];
+                if(x < by +12 && y > bx)
+                    mapMemory[toplayer][c-1] = acBlock.top[1][0];
+                if(x < by +12&& y < bx + 16)
+                    mapMemory[toplayer][c] = acBlock.top[1][1];
                 
-                mapMemory[bottomlayer][c] = acBlock.bottom[0][0];
-                mapMemory[bottomlayer][c+1] = acBlock.bottom[0][1];
-                mapMemory[bottomlayer][c+32] = acBlock.bottom[1][0];
-                mapMemory[bottomlayer][c+33] = acBlock.bottom[1][1];
+                
+                if(x > by && y > bx)
+                    mapMemory[bottomlayer][c-33] = acBlock.bottom[0][0];
+                if(x > by && y < bx + 16)
+                    mapMemory[bottomlayer][c-32] = acBlock.bottom[0][1];
+                if(x < by +12 && y > bx)
+                    mapMemory[bottomlayer][c-1] = acBlock.bottom[1][0];
+                if(x < by +12&& y < bx + 16)
+                    mapMemory[bottomlayer][c] = acBlock.bottom[1][1];
 
-                c += 2;
+                if(y < bx + 16)
+                    c+=2;
             }
             c += 32;
         }

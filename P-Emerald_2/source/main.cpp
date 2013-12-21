@@ -758,7 +758,7 @@ enum MoveMode{
     SURF,
     BIKE
 } playermoveMode = WALK;
-int acposx = 0*20, acposy = 6*20, acposz = 3;
+int acposx = 39*20, acposy = 7*20, acposz = 3;
 bool movePlayerOnMap(int x,int y, int z){
     if(x < 0 || y < 0 ||x >= acMap->sizey || y >= acMap->sizex)
         return false;
@@ -804,14 +804,14 @@ void initMapSprites(){
     SQCHAInfo->height = 16;
     SQCHAInfo->angle = 0;
     SQCHAInfo->entry = SQCHA;
-    SQCHA->y = 96;
+    SQCHA->y = 88;
     SQCHA->isRotateScale = false;
     SQCHA->blendMode = OBJMODE_NORMAL;
     SQCHA->isMosaic = true;
     SQCHA->colorMode = OBJCOLOR_16;
     SQCHA->shape = OBJSHAPE_SQUARE;
     SQCHA->isHidden = false;
-    SQCHA->x = 128;
+    SQCHA->x = 120;
     SQCHA->size = OBJSIZE_16;
     SQCHA->gfxIndex = 0;
     SQCHA->priority = OBJPRIORITY_2;
@@ -839,7 +839,7 @@ int main(int argc, char** argv)
     scrn.draw(mode);
         
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
-    acMap = new map2d::Map("nitro://MAPS/","17");
+    acMap = new map2d::Map("nitro://MAPS/","0/34");
     movePlayerOnMap(acposx/20,acposy/20,acposz);
     
     cust_font.set_color(RGB(0,31,31),0);
@@ -853,7 +853,7 @@ int main(int argc, char** argv)
 
     SAV.hasGDex = true;
 
-    int MOV = 20;
+    int MOV = 10;
 
     initMapSprites();
     updateOAM(oamTop);
