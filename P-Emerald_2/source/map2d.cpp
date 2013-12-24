@@ -55,6 +55,7 @@ namespace map2d{
         if(mapF == 0)
             return;
         
+        
         fread(&this->sizey,sizeof(u32),1,mapF);
         fread(&this->sizex,sizeof(u32),1,mapF);
 
@@ -62,7 +63,7 @@ namespace map2d{
         fread(&tsidx1,sizeof(u8),1,mapF);  
         readNop(mapF,3);
         fread(&tsidx2,sizeof(u8),1,mapF);
-        readNop(mapF,3);
+        readNop(mapF,3);  
                 
         sprintf(buf,"nitro://MAPS/TILESETS/%i.ts",tsidx1);
         readTileSet(fopen(buf,"rb"),this->t);
@@ -70,7 +71,7 @@ namespace map2d{
         readBlockSet(fopen(buf,"rb"),this->b);
 
         sprintf(buf,"nitro://MAPS/TILESETS/%i.ts",tsidx2);
-        readTileSet(fopen(buf,"rb"),this->t,512);
+        readTileSet(fopen(buf,"rb"),this->t,512); 
         sprintf(buf,"nitro://MAPS/TILESETS/%i.bvd",tsidx2);
         readBlockSet(fopen(buf,"rb"),this->b,512);
         
@@ -80,12 +81,45 @@ namespace map2d{
         readPal(fopen(buf,"rb"),this->pals);
 
         readNop(mapF,4);
-        this->blocks.assign(this->sizex,std::vector<MapBlockAtom>(this->sizey));
+        this->blocks.assign(this->sizex+20,std::vector<MapBlockAtom>(this->sizey+20));
+
+        sprintf(buf,"%s%s.anb",Path,Name);
+        FILE* A = fopen(buf,"r");
+        if(A){
+            int N; fscanf(A,"%d",&N);
+            for(int i= 0; i < N; ++i){
+                Anbindung ac;
+                fscanf(A,"%s %c %d %d",ac.name, &ac.direction,&ac.move,&ac.mapidx);
+                sprintf(buf,"%s%s.m2p",Path,ac.name);
+                FILE* mapF2 = fopen(buf,"rb");
+                if(mapF2 == 0)
+                    continue;
+                fread(&ac.mapsy,sizeof(u32),1,mapF2);
+                fread(&ac.mapsx,sizeof(u32),1,mapF2);
+
+                readNop(mapF2,12);
+                for(int x = 0; x < ac.mapsx; ++x)
+                    for(int y = 0; y < ac.mapsy; ++y){
+                        if(ac.direction == 'W' && y >= ac.mapsy - 10 && x + ac.move >= -10 && x + ac.move < sizex + 20)
+                            fread(&(blocks[x + ac.move + 10][y - ac.mapsy + 10]),sizeof(MapBlockAtom),1,mapF2);
+                        else if(ac.direction == 'N' && x >= ac.mapsx - 10 && y + ac.move >= -10 && y + ac.move < sizey + 20)
+                            fread(&(blocks[x - ac.mapsx + 10][y + ac.move + 10]),sizeof(MapBlockAtom),1,mapF2);
+                        else if(ac.direction == 'E' && y < 10 && x + ac.move >= -10 && x + ac.move < sizex + 20)
+                            fread(&(blocks[x + ac.move + 10][y+sizey+10]),sizeof(MapBlockAtom),1,mapF2);
+                        else if(ac.direction == 'S' && x < 10 && y + ac.move >= -10 && y + ac.move < sizey + 20)
+                            fread(&(blocks[x+sizex+10][y + ac.move + 10]),sizeof(MapBlockAtom),1,mapF2);
+                        else{
+                            readNop(mapF2,sizeof(MapBlockAtom));
+                        }
+                    }
+
+                this->anbindungen.push_back(ac);
+            }
+        }
 
         for(int x = 0; x < sizex; ++x)
             for(int y = 0; y < sizey; ++y)
-                fread(&this->blocks[x][y],sizeof(MapBlockAtom),1,mapF);
-        
+                fread(&this->blocks[x+10][y+10],sizeof(MapBlockAtom),1,mapF);
     }
 
     void Map::draw(int bx,int by){
@@ -93,7 +127,7 @@ namespace map2d{
             DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
         vramSetBankA(VRAM_A_MAIN_BG_0x06000000);
         
-        REG_BG0CNT = BG_32x32 | BG_COLOR_256 |  BG_MAP_BASE(0) | BG_TILE_BASE(1)|  BG_PRIORITY(0);
+        //REG_BG0CNT = BG_32x32 | BG_COLOR_256 |  BG_MAP_BASE(0) | BG_TILE_BASE(1)|  BG_PRIORITY(0);
         REG_BG1CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(1) | BG_TILE_BASE(1)| BG_PRIORITY(1);
         REG_BG2CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(2) | BG_TILE_BASE(1)| BG_PRIORITY(2);
         REG_BG3CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(3) | BG_TILE_BASE(1)| BG_PRIORITY(3);
@@ -104,8 +138,6 @@ namespace map2d{
         u16* mapMemory[4];
 
         for(int i= 0; i< 4; ++i){
-            //bg[i] = bgInit( i, BgType_Bmp8, BgSize_B8_256x256, i, 1);
-            //loadPicture(bgGetGfxPtr(bg[i]),"nitro:/PICS/","ClearD");
             mapMemory[i] = (u16*)BG_MAP_RAM(i);
         }
         bgUpdate();
@@ -122,22 +154,21 @@ namespace map2d{
         }
           
         int c = 0;
+        bx += 10;
+        by += 10;
         for(int x = by; x < by + 13; x++){
             for(int y = bx; y < bx + 17; y++){
                 int toplayer = 1, bottomlayer = 3;
 
                 Block acBlock = this->b.blocks[blocks[x][y].blockidx];
-                if(x < 0 || y < 0 ||x >= this->sizex || y >= this->sizey)
-                    acBlock  = this->rand[x%2][y%2];
-                else{
+                if(x < 0 || y < 0 ||x >= this->sizex + 20 || y >= this->sizey + 20){
+                    acBlock  = Block();
+                }else{
                     //consoleSelect(&Top);
-                    //consoleSetWindow(&Top,2*(y-bx),2*(x-by),2,2);
-                    //printf("%i %i",acBlock.top[0][0]>>12,acBlock.bottom[0][0]>>12);
+                    //consoleSetWindow(&Top,2*(y-bx)-1,2*(x-by)-1,2,2);
+                    //printf("%i",acBlock.topbehave);
                 }
-
-                if(acBlock.bottombehave == 0x10)
-                    toplayer++;
-
+                
                 if(x > by && y > bx)
                     mapMemory[toplayer][c-33] = (acBlock.top[0][0]);
                 if(x > by && y < bx + 16)

@@ -758,19 +758,33 @@ enum MoveMode{
     SURF,
     BIKE
 } playermoveMode = WALK;
-int acposx = 39*20, acposy = 7*20, acposz = 3;
+int acposx = 2*20, acposy = 4*20, acposz = 3;
 bool movePlayerOnMap(int x,int y, int z){
-    if(x < 0 || y < 0 ||x >= acMap->sizey || y >= acMap->sizex)
+    bool WTW = (gMod == DEVELOPER) && (keysHeld() & KEY_R);
+
+
+    x += 10;
+    y += 10;
+
+    if(x < 0)
+        return false;
+    if(y < 0)
+        return false;
+    if(x >= (int)acMap->sizey + 20)
+        return false;
+    if(y >= (int)acMap->sizex + 20)
         return false;
 
-    int lastmovedata = acMap->blocks[acposy/20][acposx/20].movedata;
+    int lastmovedata = acMap->blocks[acposy/20 + 10][acposx/20 + 10].movedata;
     int acmovedata = acMap->blocks[y][x].movedata;
-
-    if(acmovedata == 1)
-        return false ;
-    if(acmovedata == 4 && playermoveMode != SURF 
-        || acmovedata != 4 && playermoveMode == SURF )
-        return false;
+    
+    if(!WTW){
+        if(acmovedata == 1)
+            return false ;
+        if(acmovedata == 4 && playermoveMode != SURF 
+            || acmovedata != 4 && playermoveMode == SURF )
+            return false;
+    }
     
     if(lastmovedata == 0 && acmovedata %4 == 0)
         acposz = z = acmovedata / 4;
@@ -782,16 +796,81 @@ bool movePlayerOnMap(int x,int y, int z){
         else
             oamTop->oamBuffer[0].priority = OBJPRIORITY_1;
 
-    if(acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
-        acMap->draw(x-8,y-6);
+
+    if(x < 10){
+        if(WTW || acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
+            for(auto a : acMap->anbindungen)
+                if(a.direction == 'W'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
+                    //delete acMap;
+                    acMap = new map2d::Map("nitro://MAPS/",a.name);
+                    y -= a.move;
+                    x = a.mapsy + 9;
+                    acposx = 20 * (x-10);
+                    acposy = 20 * (y-10);
+                    acMap->draw(x-18,y-16);
+                    return true; 
+                }
+        return false;
+    } 
+    if(y < 10){
+        if(WTW || acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
+            for(auto a : acMap->anbindungen)
+                if(a.direction == 'N'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
+                    //delete acMap;
+                    acMap = new map2d::Map("nitro://MAPS/",a.name);
+                    x -= a.move;
+                    y = a.mapsx + 9;
+                    acposx = 20 * (x-10);
+                    acposy = 20 * (y-10);
+                    acMap->draw(x-18,y-16);
+                    return true;
+                }
+        return false;
+    }
+    if(x >= (int)acMap->sizey + 10) {
+        if(WTW || acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
+            for(auto a : acMap->anbindungen)
+                if(a.direction == 'E'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
+                    //delete acMap;
+                    acMap = new map2d::Map("nitro://MAPS/",a.name);
+                    y -= a.move;
+                    x = 10;
+                    acposx = 20 * (x-10);
+                    acposy = 20 * (y-10);
+                    acMap->draw(x-18,y-16);
+                    return true;
+                }
+        return false;
+    }
+    if(y >= (int)acMap->sizex + 10){
+        
+        if(WTW || acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
+            for(auto a : acMap->anbindungen)
+                if(a.direction == 'S'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
+                    //delete acMap;
+                    acMap = new map2d::Map("nitro://MAPS/",a.name);
+                    x -= a.move;
+                    y = 10;
+                    acposx = 20 * (x-10);
+                    acposy = 20 * (y-10);
+                    acMap->draw(x-18,y-16);
+                    return true;
+                }
+            return false;
+    }
+
+    if(WTW || (acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60))
+        acMap->draw(x-18,y-16);
     else
         return false;
 
+    map2d::Block acBlock = acMap->b.blocks[acMap->blocks[y][x].blockidx];
+
+    if(acBlock.topbehave == 0x10)
+        oamTop->oamBuffer[0].priority = OBJPRIORITY_1;
+
     updateOAM(oamTop);
 
-    char buf[100];
-    sprintf(buf,"x: %i  y: %i  z: %i\nacmove %i",x,y,z,acmovedata);
-    //mbox b(buf,false,false);
     return true;
 }
 
@@ -831,15 +910,15 @@ int main(int argc, char** argv)
 
     //PRE-Intro
     touchPosition touch;
-
+   
     startScreen();
-
-
+    
     int mode = -1;
-    scrn.draw(mode);
+    scrn.draw(mode); 
         
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
-    acMap = new map2d::Map("nitro://MAPS/","0/34");
+    acMap = new map2d::Map("nitro://MAPS/","0/0");
+
     movePlayerOnMap(acposx/20,acposy/20,acposz);
     
     cust_font.set_color(RGB(0,31,31),0);
@@ -870,6 +949,10 @@ int main(int argc, char** argv)
         int pressed = keysUp(),held = keysHeld();
         
         //Moving
+        if(held & KEY_L && gMod == DEVELOPER){
+            consoleSelect(&Bottom);
+            printf("\n\n     %i %i\n    %i %i\n",acMap->sizex,acMap->sizey,acposx/20,(acposy)/20);
+        }
         if(held & KEY_DOWN)
         {
             if(movePlayerOnMap(acposx/20,(acposy+MOV)/20,acposz))
@@ -1156,5 +1239,6 @@ int main(int argc, char** argv)
         //End 
 
     }
+    delete acMap;
     return 0;
 }

@@ -667,14 +667,21 @@ namespace POKEMON{
 
     void PKMN::drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom, bool newpok)
     {
-        cust_font.set_color(0,0);
-        cust_font.set_color(5,1);
-        cust_font.set_color(4,2);
-        cust_font2.set_color(0,0);
-        cust_font2.set_color(5,1);
-        cust_font2.set_color(6,2);
-
         loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
+
+        cust_font.set_color(0,0);
+        cust_font.set_color(252,1);
+        cust_font.set_color(253,2);
+        cust_font2.set_color(0,0);
+        cust_font2.set_color(253,1);
+        cust_font2.set_color(254,2);
+    
+        BG_PALETTE_SUB[250] = RGB15(31,31,31);
+        BG_PALETTE_SUB[251] = RGB15(15,15,15);
+        BG_PALETTE_SUB[252] = RGB15(3,3,3);
+        BG_PALETTE_SUB[253] = RGB15(15,15,15);
+        BG_PALETTE_SUB[254] = RGB15(31,31,31);
+
 
         consoleSelect(Top);	
         consoleSetWindow(Top, 0,0,32,24);
@@ -957,13 +964,13 @@ namespace POKEMON{
             dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
             BG_ind = 0;
         }
-
+        
         cust_font2.set_color(0,0);
         cust_font2.set_color(254,1);
         cust_font2.set_color(255,2);
         BG_PALETTE_SUB[253] = this->boxdata.OTisFemale ? RGB15(31,15,0) : RGB15(0,15,31);
-        BG_PALETTE_SUB[254] = BG_PALETTE[5];
-        BG_PALETTE_SUB[255] = BG_PALETTE[6];
+        BG_PALETTE_SUB[254] = RGB15(15,15,15);
+        BG_PALETTE_SUB[255] = RGB15(31,31,31);
         
         cust_font2.print_string("OT:",28,22,true);
         cust_font2.set_color(253,2);

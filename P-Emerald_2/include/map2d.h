@@ -46,34 +46,39 @@ namespace map2d{
     
     typedef struct{
         u16 blockidx      : 10;
-        u8 movedata       :  6;
+        u8 movedata       :  6;  
     }MapBlockAtom;
-    class Map{
+
+    class Anbindung{
     public:
+        char name[100];
+        char direction;
+        int move;
+        int mapidx;
+
+        int mapsx;
+        int mapsy;
+
+        Anbindung() {}
+        Anbindung(const char name[100], char dir, int mv, int mpidx) 
+            :  direction(dir), move(mv), mapidx(mpidx) {
+            memcpy(this->name,name,100);
+        }
+    };
+
+    class Map{
+    public: 
         u32 sizex,sizey;
 
         Palette pals[16];
         std::vector< std::vector <MapBlockAtom> > blocks;
         TileSet t;
         BlockSet b;
-        Block rand[2][2];
-
+        std::vector< Anbindung> anbindungen;
 
         //WildePKMN, Events...
         Map() { }
 
-        Map(int sizex,int sizey,Palette pals[16],u8* blocks,u8* move, TileSet t,BlockSet b) 
-            : sizex(sizex), sizey(sizey), t(t), b(b){
-                for(int i= 0; i < 16; ++i)
-                    this->pals[i] = pals[i];
-                this->blocks.assign(sizex,std::vector<MapBlockAtom>(sizey));
-                int c = 0;
-                for(int i= 0; i < sizex; ++i)
-                    for(int j= 0; j < sizey; ++j,++c){
-                        this->blocks[i][j].blockidx = blocks[c];
-                        this->blocks[i][j].movedata = move[c];
-                    }
-            }
         Map(const char* Path, const char* Name);
 
         void draw(int bx,int by);

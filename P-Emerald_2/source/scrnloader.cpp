@@ -60,7 +60,7 @@ BG_set BGs[MAXBG] = {{"Raging_Gyarados",NAV_DATA,NAV_DATA_PAL,true,false},
     {"Waiting_Suicune",NAV_DATA,NAV_DATA_PAL,true,true},
     {"Fighting_Groudon",NAV_DATA,NAV_DATA_PAL,true,false},
     {"Fighting_Kyogre",NAV_DATA,NAV_DATA_PAL,true,false}};
-int BG_ind = 0;
+int BG_ind = 2;
 extern POKEMON::PKMN::BOX_PKMN stored_pkmn[MAXSTOREDPKMN];
 extern std::vector<int> box_of_st_pkmn[MAXPKMN];
 extern std::vector<int> free_spaces;
@@ -215,11 +215,13 @@ bool loadPKMNSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const
         fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
         fclose(fd);
     }
-    if(bottom)
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
-    else
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
-
+    if(bottom){
+        swiCopy(TEMP_PAL,&SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
+        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
+    }else{
+        swiCopy(TEMP_PAL,&SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
+        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
+    }
     SpriteInfo * backInfo = &spriteInfo[++oamIndex];
     SpriteEntry * back = &oam->oamBuffer[oamIndex];
     backInfo->oamId = oamIndex;
@@ -240,10 +242,13 @@ bool loadPKMNSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const
     back->gfxIndex = nextAvailableTileIdx;
     back->priority = OBJPRIORITY_0;
     back->palette = palcnt;
-    if(bottom)
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-    else
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+    if(bottom){
+        swiCopy(TEMP,&SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
+        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+    }else{
+        swiCopy(TEMP,&SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
+        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+    }
     nextAvailableTileIdx += 64;
 
     backInfo = &spriteInfo[++oamIndex];
@@ -2676,7 +2681,7 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
         }
     case 4:{
             loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BottomScreen2");
-            break;
+            break; 
         }
     case 5:{
             loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BottomScreen3");
