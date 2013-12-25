@@ -92,7 +92,7 @@ void printMapLocation(const MapRegionPos& m){
     consoleSelect(&Bottom);
     consoleClear();
     printf(POKEMON::getLoc(m.ind));
-    acMapPoint = std::pair<int,int>((m.lx + m.rx )/ 2 - 8, (m.ly + m.ry) /2 - 8);
+    acMapPoint = std::pair<int,int>((m.lx + m.rx )/ 2, (m.ly + m.ry) /2);
     updateTime();
     return;
 }

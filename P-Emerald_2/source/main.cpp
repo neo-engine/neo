@@ -771,6 +771,10 @@ void showNewMap(int mapIdx){
             showmappointer = true;
             scrn.draw(mode = 1+i);
             printMapLocation(m);
+            oam->oamBuffer[SQCH_ID].x = oam->oamBuffer[SQCH_ID + 1].x = (m.lx+m.rx) / 2 -8;
+            oam->oamBuffer[SQCH_ID].y = oam->oamBuffer[SQCH_ID + 1].y = (m.ly + m.ry) /2  -8;
+            oam->oamBuffer[SQCH_ID].isHidden = oam->oamBuffer[SQCH_ID + 1].isHidden = false;
+            updateOAMSub(oam);
             return;
         }
 }
