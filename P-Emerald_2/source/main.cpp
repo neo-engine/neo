@@ -759,9 +759,27 @@ enum MoveMode{
     BIKE
 } playermoveMode = WALK;
 int acposx = 2*20, acposy = 4*20, acposz = 3;
+
+int mode = -1;
+void showNewMap(int mapIdx){
+    for(int i= 0; i < 3; ++i)
+        for(int j = 0; j < 75; ++j){
+            MapRegionPos m = MapLocations[i][j];
+            if(m.ind != mapIdx)
+                continue;
+            acMapRegion = Region(i + 1);
+            showmappointer = true;
+            scrn.draw(mode = 1+i);
+            printMapLocation(m);
+            return;
+        }
+}
+
 bool movePlayerOnMap(int x,int y, int z){
     bool WTW = (gMod == DEVELOPER) && (keysHeld() & KEY_R);
 
+    if(x == acposx/20 && y == acposy/20 && z == acposz)
+        return true;
 
     x += 10;
     y += 10;
@@ -802,13 +820,14 @@ bool movePlayerOnMap(int x,int y, int z){
             for(auto a : acMap->anbindungen)
                 if(a.direction == 'W'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
                     //delete acMap;
+                    showNewMap(a.mapidx);
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     y -= a.move;
                     x = a.mapsy + 9;
                     acposx = 20 * (x-10);
-                    acposy = 20 * (y-10);
+                    acposy = 20 * (y-10); 
                     acMap->draw(x-18,y-16);
-                    return true; 
+                    return true;  
                 }
         return false;
     } 
@@ -817,6 +836,7 @@ bool movePlayerOnMap(int x,int y, int z){
             for(auto a : acMap->anbindungen)
                 if(a.direction == 'N'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
                     //delete acMap;
+                    showNewMap(a.mapidx);
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     x -= a.move;
                     y = a.mapsx + 9;
@@ -832,6 +852,7 @@ bool movePlayerOnMap(int x,int y, int z){
             for(auto a : acMap->anbindungen)
                 if(a.direction == 'E'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
                     //delete acMap;
+                    showNewMap(a.mapidx);
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     y -= a.move;
                     x = 10;
@@ -848,6 +869,7 @@ bool movePlayerOnMap(int x,int y, int z){
             for(auto a : acMap->anbindungen)
                 if(a.direction == 'S'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
                     //delete acMap;
+                    showNewMap(a.mapidx);
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     x -= a.move;
                     y = 10;
@@ -913,7 +935,6 @@ int main(int argc, char** argv)
    
     startScreen();
     
-    int mode = -1;
     scrn.draw(mode); 
         
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
@@ -951,7 +972,8 @@ int main(int argc, char** argv)
         //Moving
         if(held & KEY_L && gMod == DEVELOPER){
             consoleSelect(&Bottom);
-            printf("\n\n     %i %i\n    %i %i\n",acMap->sizex,acMap->sizey,acposx/20,(acposy)/20);
+            consoleSetWindow(&Bottom,4,4,20,5);
+            printf("%3i %3i\n%3i %3i\n",acMap->sizex,acMap->sizey,acposx/20,(acposy)/20);
         }
         if(held & KEY_DOWN)
         {

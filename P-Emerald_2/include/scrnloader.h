@@ -24,6 +24,11 @@ extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;
 extern unsigned int ticks;
 
+#define MAXMAPPOS 75
+struct MapRegionPos{int lx,ly,rx,ry,ind;};
+extern MapRegionPos MapLocations[3][MAXMAPPOS];
+void printMapLocation(const MapRegionPos& m);
+
 namespace POKEMON{bool drawInfoSub(u16* layer,int PKMN);}
 
 enum Region{
