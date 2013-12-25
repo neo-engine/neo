@@ -678,9 +678,9 @@ namespace POKEMON{
         cust_font2.set_color(254,2);
     
         BG_PALETTE[250] = RGB15(31,31,31);
-        BG_PALETTE[251] = RGB15(15,15,15);
+        BG_PALETTE[251] = RGB15(20,20,20);
         BG_PALETTE[252] = RGB15(3,3,3);
-        BG_PALETTE_SUB[253] = RGB15(15,15,15);
+        BG_PALETTE_SUB[253] = RGB15(10,10,10);
         BG_PALETTE_SUB[254] = RGB15(31,31,31);
 
 
@@ -697,32 +697,47 @@ namespace POKEMON{
         
         int a2 = 0,b2= 0,c2 =0;
         if(!(this->boxdata.IV.isEgg)){
-            consoleSetWindow(Top, 20,1,13,2);
-            printf("\x1b[36m");
-            wprintf(&(this->boxdata.Name[0]));
-            int G = this->boxdata.gender();
+            
+            BG_PALETTE[254] = RGB15(31,0,0);
+            BG_PALETTE[255] = RGB15(0,0,31);
+            BG_PALETTE[253] = RGB15(31,31,31);
+            cust_font.set_color(253,1);
 
-            if(G==0)
-                printf("\n (");
-            else if (G == 1)
-                printf("\x1b[34m""%c\x1b[36m\n (",141);
-            else
-                printf("\x1b[32m""%c\x1b[36m\n (",147);
+            consoleSetWindow(Top, 20,1,13,2);
+
+            cust_font.print_string(&(this->boxdata.Name[0]),150,2,false);
+            int G = this->boxdata.gender();
+            
+            cust_font.print_char('/',234,2,false);
+            if (G == 1){
+                cust_font.set_color(255,1);
+                cust_font.print_char(136,246,8,false);
+            }else{
+                cust_font.set_color(254,1);
+                cust_font.print_char(137,246,8,false);
+            }
+            cust_font.set_color(253,1);
+
             PKMNDATA::getAll(this->boxdata.SPEC,data);
-            printf(PKMNDATA::getDisplayName(this->boxdata.SPEC));
-            printf(")\x1b[39m/");
+            cust_font.print_string(PKMNDATA::getDisplayName(this->boxdata.SPEC),160,16,false);
+
             consoleSetWindow(Top, 7,21,30,4);
             printf(ItemList[this->boxdata.getItem()].getDisplayName().c_str());
             if(this->boxdata.getItem()){
                 printf("\n%s",ItemList[this->boxdata.getItem()].getDescription().c_str());
                 drawItemIcon(oamTop,spriteInfoTop,ItemList[this->boxdata.getItem()].Name,0,152,a2,b2,c2,false);
             }
+            cust_font.set_color(251,1);
         }
         else{
             Page = 0;
+            BG_PALETTE[253] = RGB15(31,31,31);
+            cust_font.set_color(253,1);
             
-            consoleSetWindow(Top, 20,1,13,2);
-            printf("\x1b[36mEi \n (Ei)\x1b[39m/");
+            cust_font.print_string("Ei",150,2,false);
+            cust_font.print_char('/',234,2,false);
+            cust_font.print_string("Ei",160,18,false);
+            cust_font.set_color(251,1);
         }
         switch(Page){
         case 0: 
@@ -988,7 +1003,7 @@ namespace POKEMON{
                 cust_font2.print_string("Schicksalhafte Begegnung",28,120,true);	
             if(!(this->boxdata.gotDate[0]))
             {
-                sprintf(buf, "Gefangen am %i.%i.%i mit Level %i", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
+                sprintf(buf, "Gefangen am %i.%i.%i mit Lv. %i", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
                 cust_font2.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
                 cust_font2.print_string(buf,35,58,true);
@@ -1018,7 +1033,7 @@ namespace POKEMON{
         {
             if(!(this->boxdata.gotDate[0]))
             {
-                sprintf(buf, "Off. gef. am %i.%i.%i mit Level %i.", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
+                sprintf(buf, "Off. gef. am %i.%i.%i mit Lv. %i.", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
                 cust_font2.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
                 cust_font2.print_string(buf,35,58,true);
