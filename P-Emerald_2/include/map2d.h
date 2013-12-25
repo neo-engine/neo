@@ -75,6 +75,7 @@ namespace map2d{
         TileSet t;
         BlockSet b;
         std::vector< Anbindung> anbindungen;
+        u16 rand[2][2];
 
         //WildePKMN, Events...
         Map() { }

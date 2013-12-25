@@ -47,7 +47,6 @@ namespace map2d{
             fread(&tileSet.blocks[startidx+i].topbehave,sizeof(u8),1,file);
         }
     }
-
     Map::Map(const char* Path, const char* Name){
         char buf[100]; 
         sprintf(buf,"%s%s.m2p",Path,Name);
@@ -64,7 +63,7 @@ namespace map2d{
         readNop(mapF,3);
         fread(&tsidx2,sizeof(u8),1,mapF);
         readNop(mapF,3);  
-                
+               
         sprintf(buf,"nitro://MAPS/TILESETS/%i.ts",tsidx1);
         readTileSet(fopen(buf,"rb"),this->t);
         sprintf(buf,"nitro://MAPS/TILESETS/%i.bvd",tsidx1);
@@ -75,9 +74,9 @@ namespace map2d{
         sprintf(buf,"nitro://MAPS/TILESETS/%i.bvd",tsidx2);
         readBlockSet(fopen(buf,"rb"),this->b,512);
         
-
+         
         sprintf(buf,"nitro://MAPS/TILESETS/%i.p2l",tsidx1);
-        readBlockSet(fopen(buf,"rb"),this->b,512);
+        readBlockSet(fopen(buf,"rb"), this->b,512);
         readPal(fopen(buf,"rb"),this->pals);
 
         readNop(mapF,4);
@@ -85,28 +84,30 @@ namespace map2d{
 
         sprintf(buf,"%s%s.anb",Path,Name);
         FILE* A = fopen(buf,"r");
-        if(A){
-            int N; fscanf(A,"%d",&N);
+        if(A){ 
+            int N; fscanf(A,"%d",&N); 
             for(int i= 0; i < N; ++i){
                 Anbindung ac;
-                fscanf(A,"%s %c %d %d",ac.name, &ac.direction,&ac.move,&ac.mapidx);
+                fscanf(A,"%s ",ac.name);
+
+                fscanf(A,"%c %d %d", &ac.direction,&ac.move,&ac.mapidx);
                 sprintf(buf,"%s%s.m2p",Path,ac.name);
                 FILE* mapF2 = fopen(buf,"rb");
                 if(mapF2 == 0)
                     continue;
                 fread(&ac.mapsy,sizeof(u32),1,mapF2);
                 fread(&ac.mapsx,sizeof(u32),1,mapF2);
-
+                
                 readNop(mapF2,12);
                 for(int x = 0; x < ac.mapsx; ++x)
                     for(int y = 0; y < ac.mapsy; ++y){
-                        if(ac.direction == 'W' && y >= ac.mapsy - 10 && x + ac.move >= -10 && x + ac.move < sizex + 20)
+                        if(ac.direction == 'W' && y >= ac.mapsy - 10 && x + ac.move + 10 >= 0 && (x + ac.move < 0 || x + ac.move < sizex + 20))
                             fread(&(blocks[x + ac.move + 10][y - ac.mapsy + 10]),sizeof(MapBlockAtom),1,mapF2);
-                        else if(ac.direction == 'N' && x >= ac.mapsx - 10 && y + ac.move >= -10 && y + ac.move < sizey + 20)
+                        else if(ac.direction == 'N' && x >= ac.mapsx - 10  && y + ac.move >= -10 && (y + ac.move < 0 || y + ac.move < sizey + 20))
                             fread(&(blocks[x - ac.mapsx + 10][y + ac.move + 10]),sizeof(MapBlockAtom),1,mapF2);
-                        else if(ac.direction == 'E' && y < 10 && x + ac.move >= -10 && x + ac.move < sizex + 20)
+                        else if(ac.direction == 'E' && y < 10 && x + ac.move >= -10 && (x + ac.move < 0 || x + ac.move < sizex + 20))
                             fread(&(blocks[x + ac.move + 10][y+sizey+10]),sizeof(MapBlockAtom),1,mapF2);
-                        else if(ac.direction == 'S' && x < 10 && y + ac.move >= -10 && y + ac.move < sizey + 20)
+                        else if(ac.direction == 'S' && x < 10 && y + ac.move >= -10 && (y + ac.move < 0 || y + ac.move < sizey + 20))
                             fread(&(blocks[x+sizex+10][y + ac.move + 10]),sizeof(MapBlockAtom),1,mapF2);
                         else{
                             readNop(mapF2,sizeof(MapBlockAtom));
@@ -115,6 +116,12 @@ namespace map2d{
 
                 this->anbindungen.push_back(ac);
             }
+            consoleSelect(&Bottom);
+            for(int i= 0; i< 2; ++i)
+                for(int j= 0; j < 2; ++j){
+                    if(fscanf(A,"%hd",&rand[i][j]) == EOF)
+                        rand[i][j] = 0;
+                }
         }
 
         for(int x = 0; x < sizex; ++x)
@@ -162,8 +169,12 @@ namespace map2d{
 
                 Block acBlock = this->b.blocks[blocks[x][y].blockidx];
                 if(x < 0 || y < 0 ||x >= this->sizex + 20 || y >= this->sizey + 20){
-                    acBlock  = Block();
-                }else{
+                    acBlock = this->b.blocks[rand[x%2][y%2]];
+                }
+                else if((x < 10 || y < 10 ||x >= this->sizex + 10 || y >= this->sizey + 10) && blocks[x][y].blockidx == 0){
+                    acBlock = this->b.blocks[rand[x%2][y%2]];
+                }
+                else{
                     //consoleSelect(&Top);
                     //consoleSetWindow(&Top,2*(y-bx)-1,2*(x-by)-1,2,2);
                     //printf("%i",acBlock.topbehave);
