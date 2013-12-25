@@ -204,8 +204,8 @@ namespace map2d{
             }
             c += 32;
         }
-        bgUpdate();
+        //bgUpdate();
         consoleSelect(&Bottom);
-        swiWaitForVBlank();
+        //swiWaitForVBlank();
     }
 }

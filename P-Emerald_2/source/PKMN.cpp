@@ -667,18 +667,19 @@ namespace POKEMON{
 
     void PKMN::drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom, bool newpok)
     {
-        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
+        setDefaultConsoleTextColors(BG_PALETTE,6);
+        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen",32);
 
         cust_font.set_color(0,0);
-        cust_font.set_color(252,1);
-        cust_font.set_color(253,2);
+        cust_font.set_color(251,1);
+        cust_font.set_color(252,2);
         cust_font2.set_color(0,0);
         cust_font2.set_color(253,1);
         cust_font2.set_color(254,2);
     
-        BG_PALETTE_SUB[250] = RGB15(31,31,31);
-        BG_PALETTE_SUB[251] = RGB15(15,15,15);
-        BG_PALETTE_SUB[252] = RGB15(3,3,3);
+        BG_PALETTE[250] = RGB15(31,31,31);
+        BG_PALETTE[251] = RGB15(15,15,15);
+        BG_PALETTE[252] = RGB15(3,3,3);
         BG_PALETTE_SUB[253] = RGB15(15,15,15);
         BG_PALETTE_SUB[254] = RGB15(31,31,31);
 
@@ -742,7 +743,7 @@ namespace POKEMON{
                 else if(NatMod[this->boxdata.getNature()][0] == 0.8)
                     cust_font.set_color(255,1);
                 else
-                    cust_font.set_color(5,1);
+                    cust_font.set_color(251,1);
                 sprintf(buf,"ANG                   %3i",stats.Atk);
                 cust_font.print_string(buf,130,69,false);
 
@@ -751,7 +752,7 @@ namespace POKEMON{
                 else if(NatMod[this->boxdata.getNature()][1] == 0.8)
                     cust_font.set_color(255,1);
                 else
-                    cust_font.set_color(5,1);
+                    cust_font.set_color(251,1);
                 sprintf(buf,"VER                   %3i",stats.Def);
                 cust_font.print_string(buf,130,86,false);
                 
@@ -760,7 +761,7 @@ namespace POKEMON{
                 else if(NatMod[this->boxdata.getNature()][2] == 0.8)
                     cust_font.set_color(255,1);
                 else
-                    cust_font.set_color(5,1);
+                    cust_font.set_color(251,1);
                 sprintf(buf,"INI                   \xC3\xC3""%3i",stats.Spd);
                 cust_font.print_string(buf,130,103,false);
                                 
@@ -769,7 +770,7 @@ namespace POKEMON{
                 else if(NatMod[this->boxdata.getNature()][3] == 0.8)
                     cust_font.set_color(255,1);
                 else
-                    cust_font.set_color(5,1);
+                    cust_font.set_color(251,1);
                 sprintf(buf,"SAN                   %3i",stats.SAtk);
                 cust_font.print_string(buf,130,120,false);
                 
@@ -778,17 +779,17 @@ namespace POKEMON{
                 else if(NatMod[this->boxdata.getNature()][4] == 0.8)
                     cust_font.set_color(255,1);
                 else
-                    cust_font.set_color(5,1);
+                    cust_font.set_color(251,1);
                 sprintf(buf,"SVE                   %3i",stats.SDef);
                 cust_font.print_string(buf,130,137,false);
             
-                font::putrec(158,46,158+68,46+12,false,false,4*16-1);
+                font::putrec(158,46,158+68,46+12,false,false,251);
             
                 font::putrec(158,46,158+int(68.0*boxdata.IV.get(0)/31),46+6,false,false,7*16-1);
                 font::putrec(158,46+6,158+int(68.0*boxdata.EV[0]/255),46+12,false,false,7*16-1);
 
                 for(int i= 1; i < 6; ++i){
-                    font::putrec(158,54+(17*i),158+68,54+12+(17*i),false,false,4*16-1);
+                    font::putrec(158,54+(17*i),158+68,54+12+(17*i),false,false,251);
                     font::putrec(158,54+(17*i),158+int(68.0*boxdata.IV.get(i)/31),54+6+(17*i),false,false,(7+i)*16-1);
                     font::putrec(158,54+6+(17*i),158+int(68.0*boxdata.EV[i]/255),54+12+(17*i),false,false,(7+i)*16-1);
                 }
