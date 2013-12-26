@@ -945,7 +945,7 @@ int main(int argc, char** argv)
     scrn.draw(mode); 
         
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
-    acMap = new map2d::Map("nitro://MAPS/","0/11");
+    acMap = new map2d::Map("nitro://MAPS/","0/0");
 
     movePlayerOnMap(acposx/20,acposy/20,acposz);
     
