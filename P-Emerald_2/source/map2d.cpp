@@ -23,11 +23,13 @@ namespace map2d{
             return;
         for(int i= 0; i < 16; ++i)
             fread(pal[i].pal,sizeof(u16),16,file);
+        fclose(file);
     }
     inline void readTileSet(FILE* file, TileSet& tileSet, int startidx = 0, int size = 512){
         if(file == 0)
             return;
         fread(&tileSet.blocks[startidx],sizeof(Tile),size,file);
+        fclose(file);
     }
     inline void readNop(FILE* file, int cnt){
         if(file == 0)
@@ -46,14 +48,20 @@ namespace map2d{
             fread(&tileSet.blocks[startidx+i].bottombehave,sizeof(u8),1,file);
             fread(&tileSet.blocks[startidx+i].topbehave,sizeof(u8),1,file);
         }
+        fclose(file);
     }
     Map::Map(const char* Path, const char* Name){
+        consoleSelect(&Bottom);
+        consoleSetWindow(&Bottom,4,4,25,20);
+        consoleClear();
+
         char buf[100]; 
         sprintf(buf,"%s%s.m2p",Path,Name);
         FILE* mapF = fopen(buf,"rb");
         if(mapF == 0)
             return;
-        
+
+        //printf("TEST1\n");        
         
         fread(&this->sizey,sizeof(u32),1,mapF);
         fread(&this->sizex,sizeof(u32),1,mapF);
@@ -81,16 +89,20 @@ namespace map2d{
 
         readNop(mapF,4);
         this->blocks.assign(this->sizex+20,std::vector<MapBlockAtom>(this->sizey+20));
+             
+        //printf("TEST2\n");
 
         sprintf(buf,"%s%s.anb",Path,Name);
         FILE* A = fopen(buf,"r");
         if(A){ 
             int N; fscanf(A,"%d",&N); 
+            this->anbindungen = std::vector<Anbindung>(N);
+            //printf("TEST3 : %i\n",N);
             for(int i= 0; i < N; ++i){
-                Anbindung ac;
-                fscanf(A,"%s ",ac.name);
+                Anbindung& ac = this->anbindungen[i];
+                fscanf(A,"%s %c %d %d",ac.name, &ac.direction,&ac.move,&ac.mapidx);
+                //printf("TEST4 : %s %c %d %d\n",ac.name, ac.direction,ac.move,ac.mapidx);
 
-                fscanf(A,"%c %d %d", &ac.direction,&ac.move,&ac.mapidx);
                 sprintf(buf,"%s%s.m2p",Path,ac.name);
                 FILE* mapF2 = fopen(buf,"rb");
                 if(mapF2 == 0)
@@ -101,65 +113,68 @@ namespace map2d{
                 readNop(mapF2,12);
                 for(int x = 0; x < ac.mapsx; ++x)
                     for(int y = 0; y < ac.mapsy; ++y){
-                        if(ac.direction == 'W' && y >= ac.mapsy - 10 && x + ac.move + 10 >= 0 && (x + ac.move < 0 || x + ac.move < sizex + 20))
+                        if(ac.direction == 'W' && y >= ac.mapsy - 10 && x + ac.move + 10 >= 0 && x + ac.move < (int)sizex + 10)
                             fread(&(blocks[x + ac.move + 10][y - ac.mapsy + 10]),sizeof(MapBlockAtom),1,mapF2);
-                        else if(ac.direction == 'N' && x >= ac.mapsx - 10  && y + ac.move >= -10 && (y + ac.move < 0 || y + ac.move < sizey + 20))
+
+                        else if(ac.direction == 'N' && x - ac.mapsx + 10 >= 0 && y + ac.move >= -10 && y + ac.move < (int)sizey + 10)
                             fread(&(blocks[x - ac.mapsx + 10][y + ac.move + 10]),sizeof(MapBlockAtom),1,mapF2);
-                        else if(ac.direction == 'E' && y < 10 && x + ac.move >= -10 && (x + ac.move < 0 || x + ac.move < sizex + 20))
+
+                        else if(ac.direction == 'E' && y < 10 && x + ac.move +10 >= 0 && x + ac.move < (int)sizex + 10)
                             fread(&(blocks[x + ac.move + 10][y+sizey+10]),sizeof(MapBlockAtom),1,mapF2);
-                        else if(ac.direction == 'S' && x < 10 && y + ac.move >= -10 && (y + ac.move < 0 || y + ac.move < sizey + 20))
+
+                        else if(ac.direction == 'S' && x < 10 && y + ac.move +10 >= 0 && y + ac.move < (int)sizey + 10)
                             fread(&(blocks[x+sizex+10][y + ac.move + 10]),sizeof(MapBlockAtom),1,mapF2);
                         else{
                             readNop(mapF2,sizeof(MapBlockAtom));
                         }
-                    }
-
-                this->anbindungen.push_back(ac);
+                    } 
+                fclose(mapF2);
             }
             consoleSelect(&Bottom);
             for(int i= 0; i< 2; ++i)
                 for(int j= 0; j < 2; ++j){
-                    if(fscanf(A,"%hd",&rand[i][j]) == EOF)
+                    if(fscanf(A,"%hu",&rand[i][j]) == EOF)
                         rand[i][j] = 0;
+                    else
+                        printf("%hu ",rand[i][j]);
                 }
+            fclose(A);
         }
 
-        for(int x = 0; x < sizex; ++x)
-            for(int y = 0; y < sizey; ++y)
+        for(int x = 0; x < (int)sizex; ++x)
+            for(int y = 0; y < (int)sizey; ++y)
                 fread(&this->blocks[x+10][y+10],sizeof(MapBlockAtom),1,mapF);
+        //printf("Test5 %i",this->anbindungen.size());
+        fclose(mapF);
     }
 
-    void Map::draw(int bx,int by){
+    int tcnt = 0;
+    void Map::draw(int bx,int by, bool tile_deb_test){
         videoSetMode(MODE_0_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG1_ACTIVE |
             DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
         vramSetBankA(VRAM_A_MAIN_BG_0x06000000);
         
-        //REG_BG0CNT = BG_32x32 | BG_COLOR_256 |  BG_MAP_BASE(0) | BG_TILE_BASE(1)|  BG_PRIORITY(0);
+        //REG_BG0CNT = BG_32x32 | BG_COLOR_16 |  BG_MAP_BASE(0) | BG_TILE_BASE(1)|  BG_PRIORITY(0);
         REG_BG1CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(1) | BG_TILE_BASE(1)| BG_PRIORITY(1);
         REG_BG2CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(2) | BG_TILE_BASE(1)| BG_PRIORITY(2);
         REG_BG3CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(3) | BG_TILE_BASE(1)| BG_PRIORITY(3);
 
         //Top = *consoleInit(&Top, 0, BgType_Text4bpp, BgSize_T_256x256, 0, 5, true ,true);
 
-        int bg[4];
+        //int bg[4];
         u16* mapMemory[4];
 
         for(int i= 0; i< 4; ++i){
             mapMemory[i] = (u16*)BG_MAP_RAM(i);
         }
-        bgUpdate();
+        //bgUpdate();
         u8* tileMemory = (u8*)BG_TILE_RAM(1);
         
         for(int i= 0; i < 1024; ++i)
             swiCopy(this->t.blocks[i].tile, tileMemory + i * 32, 16);
 
         dmaCopy(this->pals, BG_PALETTE, 512); 
-        
-        for(int i= 0; i < 32*32; ++i){
-            mapMemory[0][i] = 0;
-            mapMemory[1][i] =mapMemory[2][i] =mapMemory[3][i] = 0;
-        }
-          
+         
         int c = 0;
         bx += 10;
         by += 10;
@@ -168,10 +183,14 @@ namespace map2d{
                 int toplayer = 1, bottomlayer = 3;
 
                 Block acBlock = this->b.blocks[blocks[x][y].blockidx];
-                if(x < 0 || y < 0 ||x >= this->sizex + 20 || y >= this->sizey + 20){
+                if(tile_deb_test){
+                    acBlock = this->b.blocks[tcnt];
+                    tcnt = (tcnt +1)%1024;
+                }
+                if(x < 0 || y < 0 ||x >= (int)this->sizex + 20 || y >= (int)this->sizey + 20){
                     acBlock = this->b.blocks[rand[x%2][y%2]];
                 }
-                else if((x < 10 || y < 10 ||x >= this->sizex + 10 || y >= this->sizey + 10) && blocks[x][y].blockidx == 0){
+                else if((x < 10 || y < 10 ||x >= (int)this->sizex + 10 || y >= (int)this->sizey + 10) && blocks[x][y].blockidx == 0){
                     acBlock = this->b.blocks[rand[x%2][y%2]];
                 }
                 else{
@@ -198,7 +217,7 @@ namespace map2d{
                     mapMemory[bottomlayer][c-1] = acBlock.bottom[1][0];
                 if(x < by +12&& y < bx + 16)
                     mapMemory[bottomlayer][c] = acBlock.bottom[1][1];
-
+                
                 if(y < bx + 16)
                     c+=2;
             }

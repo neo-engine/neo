@@ -2929,6 +2929,10 @@ void scrnloader::run_dex(int num){
     consoleSetWindow(&Bottom,0,0,32,24);
     consoleSelect(&Bottom);
     consoleClear();
+    consoleSetWindow(&Top,0,0,32,24);
+    consoleSelect(&Top);
+    consoleClear();
+    initOAMTable(oamTop);
     initOAMTableSub(oam);
     initMainSprites(oam,spriteInfo);
     setMainSpriteVisibility(false);
@@ -4259,6 +4263,10 @@ void bag::draw(){
     consoleSetWindow(&Bottom,0,0,32,24);
     consoleSelect(&Bottom);
     consoleClear();
+    consoleSetWindow(&Top,0,0,32,24);
+    consoleSelect(&Top);
+    consoleClear();
+    initOAMTable(oamTop);
     initOAMTableSub(oam);
     initMainSprites(oam,spriteInfo);
     setMainSpriteVisibility(false);

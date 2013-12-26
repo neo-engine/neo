@@ -82,6 +82,6 @@ namespace map2d{
 
         Map(const char* Path, const char* Name);
 
-        void draw(int bx,int by);
+        void draw(int bx,int by,bool tile_deb_test = false);
     };
 }
