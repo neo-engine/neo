@@ -118,7 +118,7 @@ namespace map2d{
 
                         else if(ac.direction == 'N' && x - ac.mapsx + 10 >= 0 && y + ac.move >= -10 && y + ac.move < (int)sizey + 10)
                             fread(&(blocks[x - ac.mapsx + 10][y + ac.move + 10]),sizeof(MapBlockAtom),1,mapF2);
-
+                        
                         else if(ac.direction == 'E' && y < 10 && x + ac.move +10 >= 0 && x + ac.move < (int)sizex + 10)
                             fread(&(blocks[x + ac.move + 10][y+sizey+10]),sizeof(MapBlockAtom),1,mapF2);
 
@@ -135,8 +135,6 @@ namespace map2d{
                 for(int j= 0; j < 2; ++j){
                     if(fscanf(A,"%hu",&rand[i][j]) == EOF)
                         rand[i][j] = 0;
-                    else
-                        printf("%hu ",rand[i][j]);
                 }
             fclose(A);
         }
