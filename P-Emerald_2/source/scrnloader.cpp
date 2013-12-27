@@ -56,11 +56,11 @@ unsigned int NAV_DATA[12288] = {0};
 unsigned short int NAV_DATA_PAL[256] = {0};
 BG_set BGs[MAXBG] = {{"Raging_Gyarados",NAV_DATA,NAV_DATA_PAL,true,false},
     {"Sleeping_Eevee",NAV_DATA,NAV_DATA_PAL,true,false},
-    {"Mystic_Guardevoir",NAV_DATA,NAV_DATA_PAL,true,true},
-    {"Waiting_Suicune",NAV_DATA,NAV_DATA_PAL,true,true},
+    {"Mystic_Guardevoir",NAV_DATA,NAV_DATA_PAL,true,false},
+    {"Waiting_Suicune",NAV_DATA,NAV_DATA_PAL,true,false},
     {"Fighting_Groudon",NAV_DATA,NAV_DATA_PAL,true,false},
     {"Fighting_Kyogre",NAV_DATA,NAV_DATA_PAL,true,false}};
-int BG_ind = 2;
+int BG_ind = 0;
 extern POKEMON::PKMN::BOX_PKMN stored_pkmn[MAXSTOREDPKMN];
 extern std::vector<int> box_of_st_pkmn[MAXPKMN];
 extern std::vector<int> free_spaces;

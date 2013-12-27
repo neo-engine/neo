@@ -18,10 +18,10 @@ extern PrintConsole Top,Bottom;
 namespace map2d{
 #define PLAYERSPRITE 0
 
-    inline void readPal(FILE* file, Palette pal[16]){
+    inline void readPal(FILE* file, Palette* pal){
         if(file == 0)
             return;
-        for(int i= 0; i < 16; ++i)
+        for(int i= 0; i < 6; ++i)
             fread(pal[i].pal,sizeof(u16),16,file);
         fclose(file);
     }
@@ -76,16 +76,16 @@ namespace map2d{
         readTileSet(fopen(buf,"rb"),this->t);
         sprintf(buf,"nitro://MAPS/TILESETS/%i.bvd",tsidx1);
         readBlockSet(fopen(buf,"rb"),this->b);
+        sprintf(buf,"nitro://MAPS/TILESETS/%i.p2l",tsidx1);
+        readPal(fopen(buf,"rb"),this->pals);
 
         sprintf(buf,"nitro://MAPS/TILESETS/%i.ts",tsidx2);
         readTileSet(fopen(buf,"rb"),this->t,512); 
         sprintf(buf,"nitro://MAPS/TILESETS/%i.bvd",tsidx2);
         readBlockSet(fopen(buf,"rb"),this->b,512);
+        sprintf(buf,"nitro://MAPS/TILESETS/%i.p2l",tsidx2);
+        readPal(fopen(buf,"rb"),this->pals + 6);
         
-         
-        sprintf(buf,"nitro://MAPS/TILESETS/%i.p2l",tsidx1);
-        readBlockSet(fopen(buf,"rb"), this->b,512);
-        readPal(fopen(buf,"rb"),this->pals);
 
         readNop(mapF,4);
         this->blocks.assign(this->sizex+20,std::vector<MapBlockAtom>(this->sizey+20));

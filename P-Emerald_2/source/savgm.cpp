@@ -51,6 +51,9 @@ savgm::savgm(void Func(int))
     fscanf(fd,"%i",&booltemp);
     this->hasPKMN = bool(booltemp);
     Func(30);
+    
+    fscanf(fd,"%i %i %i %i %s ",&acposx,&acposy,&acposz,&acMapIdx,acMapName);
+
     int a; fscanf(fd,"%i ",&a);
     this->PKMN_team = std::vector<POKEMON::PKMN>(a);
     for(int i= 0; i< a; ++i)
@@ -101,6 +104,9 @@ bool savgm::save(void Func(int))
     booltemp = this->hasPKMN;
     fprintf(fd,"%i %lld %i ",this->Money,this->PLAYTIME,booltemp);
     Func(30);
+    
+    fprintf(fd,"%i %i %i %i %s ",acposx,acposy,acposz,acMapIdx,acMapName);
+
     fprintf(fd,"%i ",(this->PKMN_team).size());
     for(size_t i = 0; i < this->PKMN_team.size(); ++i)
         //I->save(fd);

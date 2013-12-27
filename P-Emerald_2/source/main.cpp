@@ -122,13 +122,13 @@ void fillWeiter()
     P = L"        " + P+L"\n";
     wprintf(P.c_str());	
 
-    std::string W(POKEMON::getLoc(SAV.Loc[0]));
+    std::string W(POKEMON::getLoc(SAV.acMapIdx));
     W.insert(W.begin(),30-W.size(),' ');
     printf(&W[0]);
     printf("\n");
 
     char buf1[20],buf2[50];
-    sprintf(buf1,"%i:%02i",SAV.PLAYTIME / 60,(SAV.PLAYTIME-(SAV.PLAYTIME / 60 * 60)));
+    sprintf(buf1,"%lli:%02lli",SAV.PLAYTIME / 60,(SAV.PLAYTIME-(SAV.PLAYTIME / 60 * 60)));
     sprintf(buf2,"SPIELZEIT %20s\n",buf1);
 
     printf(buf2);
@@ -746,6 +746,10 @@ START:
             //stored_pkmn[i] = 0;
             free_spaces.push_back(i);
         }
+       
+        strcpy(SAV.acMapName ,"0/1");
+        SAV.acMapIdx = 243;
+        SAV.acposx = 2*20, SAV.acposy = 4*20, SAV.acposz = 3;
         break;
     case NEW_GAME:
         initNewGame();
@@ -758,7 +762,6 @@ enum MoveMode{
     SURF,
     BIKE
 } playermoveMode = WALK;
-int acposx = 2*20, acposy = 4*20, acposz = 3;
 
 int mode = -1;
 void showNewMap(int mapIdx) {
@@ -782,7 +785,7 @@ void showNewMap(int mapIdx) {
 bool movePlayerOnMap(int x,int y, int z){
     bool WTW = (gMod == DEVELOPER) && (keysHeld() & KEY_R);
 
-    //if(x == acposx/20 && y == acposy/20 && z == acposz)
+    //if(x == SAV.acposx/20 && y == SAV.acposy/20 && z == SAV.acposz)
     //    return true;
 
     x += 10;
@@ -797,7 +800,7 @@ bool movePlayerOnMap(int x,int y, int z){
     if(y >= (int)acMap->sizex + 20)
         return false;
 
-    int lastmovedata = acMap->blocks[acposy/20 + 10][acposx/20 + 10].movedata;
+    int lastmovedata = acMap->blocks[SAV.acposy/20 + 10][SAV.acposx/20 + 10].movedata;
     int acmovedata = acMap->blocks[y][x].movedata;
     
     if(!WTW){
@@ -809,7 +812,7 @@ bool movePlayerOnMap(int x,int y, int z){
     }
    
     if(lastmovedata == 0 && acmovedata %4 == 0)
-        acposz = z = acmovedata / 4;
+        SAV.acposz = z = acmovedata / 4;
     
     oamTop->oamBuffer[0].priority = OBJPRIORITY_2;
     if(acmovedata == 60)
@@ -825,11 +828,13 @@ bool movePlayerOnMap(int x,int y, int z){
                 if(a.direction == 'W'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
                     showNewMap(a.mapidx);
                     free(acMap);
+                    strcpy(SAV.acMapName,a.name);
+                    SAV.acMapIdx = a.mapidx;
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     y -= a.move;
                     x = a.mapsy + 9;
-                    acposx = 20 * (x-10);
-                    acposy = 20 * (y-10); 
+                    SAV.acposx = 20 * (x-10);
+                    SAV.acposy = 20 * (y-10); 
                     acMap->draw(x-18,y-16);
                     return true;  
                 }
@@ -842,11 +847,13 @@ bool movePlayerOnMap(int x,int y, int z){
                     //delete acMap;
                     showNewMap(a.mapidx);
                     free(acMap);
+                    strcpy(SAV.acMapName,a.name);
+                    SAV.acMapIdx = a.mapidx;
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     x -= a.move;
                     y = a.mapsx + 9;
-                    acposx = 20 * (x-10);
-                    acposy = 20 * (y-10);
+                    SAV.acposx = 20 * (x-10);
+                    SAV.acposy = 20 * (y-10);
                     acMap->draw(x-18,y-16);
                     return true;
                 }
@@ -859,11 +866,13 @@ bool movePlayerOnMap(int x,int y, int z){
                     //delete acMap;
                     showNewMap(a.mapidx);
                     free(acMap);
+                    strcpy(SAV.acMapName,a.name);
+                    SAV.acMapIdx = a.mapidx;
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     y -= a.move;
                     x = 10;
-                    acposx = 20 * (x-10);
-                    acposy = 20 * (y-10);
+                    SAV.acposx = 20 * (x-10);
+                    SAV.acposy = 20 * (y-10);
                     acMap->draw(x-18,y-16);
                     return true;
                 }
@@ -877,11 +886,13 @@ bool movePlayerOnMap(int x,int y, int z){
                     //delete acMap;
                     showNewMap(a.mapidx);
                     free(acMap);
+                    strcpy(SAV.acMapName,a.name);
+                    SAV.acMapIdx = a.mapidx;
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     x -= a.move;
                     y = 10;
-                    acposx = 20 * (x-10);
-                    acposy = 20 * (y-10);
+                    SAV.acposx = 20 * (x-10);
+                    SAV.acposy = 20 * (y-10);
                     acMap->draw(x-18,y-16);
                     return true;
                 }
@@ -945,14 +956,14 @@ int main(int argc, char** argv)
     scrn.draw(mode); 
         
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
-    acMap = new map2d::Map("nitro://MAPS/","0/0");
+    acMap = new map2d::Map("nitro://MAPS/",SAV.acMapName);
 
-    movePlayerOnMap(acposx/20,acposy/20,acposz);
+    movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz);
     
     cust_font.set_color(RGB(0,31,31),0);
 
-    std::pair<int,int> dirs[4] = {std::pair<int,int>(0,1),std::pair<int,int>(1,0),std::pair<int,int>(0,-1),std::pair<int,int>(-1,0)};
-    int acDir = 0;
+    //std::pair<int,int> dirs[4] = {std::pair<int,int>(0,1),std::pair<int,int>(1,0),std::pair<int,int>(0,-1),std::pair<int,int>(-1,0)};
+    //int acDir = 0;
     
     int HILFSCOUNTER = 251;
     oam->oamBuffer[PKMN_ID].isHidden = !(SAV.hasPKMN && SAV.PKMN_team.size());
@@ -977,11 +988,26 @@ int main(int argc, char** argv)
         int pressed = keysUp(),held = keysHeld();
         
         //Moving
+        //jump to MainSCrn immediatly
+        if(pressed & KEY_X){   
+            consoleSelect(&Bottom);
+            consoleSetWindow(&Bottom,4,0,20,3);
+            consoleClear();
+            showmappointer = false;
+            oam->oamBuffer[SQCH_ID].isHidden = true;
+            oam->oamBuffer[SQCH_ID+1].isHidden = true;
+            setMainSpriteVisibility(false);
+            oam->oamBuffer[SAVE_ID].isHidden = false;
+            updateOAMSub(oam);
+            mode = -1;
+            scrn.draw(mode);
+        }
+
         if(held & KEY_L && gMod == DEVELOPER){
             consoleSelect(&Bottom);
             consoleSetWindow(&Bottom,4,4,20,5);
-            printf("%3i %3i\n%3i %3i\n",acMap->sizex,acMap->sizey,acposx/20,(acposy)/20);
-            printf("%i %i",acMap, sizeof(&acMap));
+            printf("%3i %3i\n%3i %3i\n",acMap->sizex,acMap->sizey,SAV.acposx/20,(SAV.acposy)/20);
+            printf("%i",&acMap);
         }        
         if(held & KEY_START && gMod == DEVELOPER){
             acMap->draw(0,0,true);
@@ -989,26 +1015,26 @@ int main(int argc, char** argv)
         }
         if(held & KEY_DOWN)
         {
-            if(movePlayerOnMap(acposx/20,(acposy+MOV)/20,acposz))
-                acposy+=MOV; 
+            if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy+MOV)/20,SAV.acposz))
+                SAV.acposy+=MOV; 
             continue;
         }
         else if (held & KEY_LEFT)
         {
-            if(movePlayerOnMap((acposx-MOV)/20,acposy/20,acposz))
-                acposx-=MOV;
+            if(movePlayerOnMap((SAV.acposx-MOV)/20,SAV.acposy/20,SAV.acposz))
+                SAV.acposx-=MOV;
             continue;
         }
         else if (held & KEY_RIGHT)
         {
-            if(movePlayerOnMap((acposx+MOV)/20,acposy/20,acposz))
-                acposx+=MOV;
+            if(movePlayerOnMap((SAV.acposx+MOV)/20,SAV.acposy/20,SAV.acposz))
+                SAV.acposx+=MOV;
             continue;
         }
         else if (held & KEY_UP)
         {
-            if(movePlayerOnMap(acposx/20,(acposy-MOV)/20,acposz))
-                acposy-=MOV;
+            if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy-MOV)/20,SAV.acposz))
+                SAV.acposy-=MOV;
             continue;
         }
         //StartBag
@@ -1029,7 +1055,7 @@ int main(int argc, char** argv)
             }
             SAV.Bag.draw();
             initMapSprites();
-            movePlayerOnMap(acposx/20,acposy/20,acposz);
+            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz);
         }
         //StartPkmn
         else if (SAV.PKMN_team.size() && (sqrt(sq(mainSpritesPositions[0][0]-touch.px) + sq(mainSpritesPositions[0][1]-touch.py)) <= 16 )&& mode == -1)
@@ -1047,7 +1073,7 @@ int main(int argc, char** argv)
 
             scrn.draw(mode);
             initMapSprites();
-            movePlayerOnMap(acposx/20,acposy/20,acposz);
+            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz);
         }
         //StartDex
         else if (sqrt(sq(mainSpritesPositions[2][0]-touch.px) + sq(mainSpritesPositions[2][1]-touch.py)) <= 16 && mode == -1)
@@ -1064,7 +1090,7 @@ int main(int argc, char** argv)
             scrn.run_dex();
             scrn.draw(mode);
             initMapSprites();
-            movePlayerOnMap(acposx/20,acposy/20,acposz);
+            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz);
         }
         //StartOptions
         else if (sqrt(sq(mainSpritesPositions[4][0]-touch.px) + sq(mainSpritesPositions[4][1]-touch.py)) <= 16 && mode == -1)
@@ -1151,7 +1177,7 @@ int main(int argc, char** argv)
             setMainSpriteVisibility(false);
             scrn.draw(mode);
             initMapSprites();
-            movePlayerOnMap(acposx/20,acposy/20,acposz);
+            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz);
         }
         //StartPok\x82""nav
         else if (sqrt(sq(mainSpritesPositions[5][0]-touch.px) + sq(mainSpritesPositions[5][1]-touch.py)) <= 16 && mode == -1)
@@ -1166,7 +1192,7 @@ int main(int argc, char** argv)
             }
             mode = 0;
             scrn.draw(mode);
-            movePlayerOnMap(acposx/20,acposy/20,acposz);
+            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz);
         }
         //StartMaps
         else if (sqrt(sq(mainSpritesPositions[0][0]-touch.px) + sq(mainSpritesPositions[0][1]-touch.py)) <= 16 && mode == 0)

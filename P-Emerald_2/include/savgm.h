@@ -39,8 +39,13 @@ class savgm
 
         //Team
         std::vector<POKEMON::PKMN> PKMN_team;
-        int Loc[5];
         
+        u8 flags[1000];
+        
+        int acposx, acposy, acposz;
+        int acMapIdx;
+        char acMapName[100];
+
         //GameFlags
         bool hasGDex;
 
@@ -62,4 +67,13 @@ class savgm
         bool save(void Func(int));
         std::wstring getName() { return this->PLAYERNAME; }
         void setName(const std::wstring& val) { this->PLAYERNAME = val; }
+
+        bool checkflag(int idx){
+            return flags[idx >> 3] & ( 1 << (idx % 8));
+        }
+        void setflag(int idx, bool value){
+            if(value != checkflag(idx))
+                flags[idx >> 3] ^= ( 1 << (idx % 8));
+            return;
+        }
     };	
