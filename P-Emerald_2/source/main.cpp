@@ -94,12 +94,7 @@ extern std::vector<int> free_spaces;
 void updateTime();
 
 void whoCares(int){	return; }
-void progress(int j)
-{
-    consoleSelect(&Bottom);
-    consoleSetWindow(&Bottom,0,0,10,1);
-    printf("%3i%%",j);
-}
+void progress(int j){ return; }
 
 enum ChoiceResult{
     CONTINUE,
@@ -113,30 +108,39 @@ namespace POKEMON{ extern char* getLoc(int ind); }
 
 void fillWeiter()
 {
-    consoleSetWindow(&Bottom, 1,1,33,22);
-    consoleSelect(&Bottom);
-    BG_PALETTE_SUB[3] = RGB15(0,0,0);
-
-    std::wstring P(SAV.getName());
-    P.insert(P.begin(),22-P.size(),' ');
-    P = L"        " + P+L"\n";
-    wprintf(P.c_str());	
-
-    std::string W(POKEMON::getLoc(SAV.acMapIdx));
-    W.insert(W.begin(),30-W.size(),' ');
-    printf(&W[0]);
-    printf("\n");
-
-    char buf1[20],buf2[50];
-    sprintf(buf1,"%lli:%02lli",SAV.PLAYTIME / 60,(SAV.PLAYTIME-(SAV.PLAYTIME / 60 * 60)));
-    sprintf(buf2,"SPIELZEIT %20s\n",buf1);
-
-    printf(buf2);
-    if(SAV.Orden/10!=0)
-    printf("ORDEN                       %i""%i\n",SAV.Orden/10,SAV.Orden%10);	
+    cust_font.set_color(0,0);
+    cust_font.set_color(251,1);
+    cust_font.set_color(252,2);
+    
+    BG_PALETTE_SUB[250] = RGB15(31,31,31);
+    BG_PALETTE_SUB[251] = RGB15(15,15,15);
+    BG_PALETTE_SUB[252] = RGB15(3,3,3);
+    if(SAV.IsMale)
+        BG_PALETTE_SUB[252] = RGB15(0,0,31);
     else
-    printf("ORDEN                        %i\n",SAV.Orden%10);	
-    printf("POK\x82""DEX                    %3i",SAV.Dex);
+        BG_PALETTE_SUB[252] = RGB15(31,0,0);
+
+    char buf1[50];
+
+    sprintf(buf1,"%ls",SAV.getName().c_str());
+    cust_font.print_string(buf1,128,5,true);
+    
+    sprintf(buf1,"%s",POKEMON::getLoc(SAV.acMapIdx));
+    cust_font.print_string("Ort:",16,23,true);
+    cust_font.print_string(buf1,128,23,true);
+    
+
+    sprintf(buf1,"%lli:%02lli",SAV.PLAYTIME / 60,(SAV.PLAYTIME-(SAV.PLAYTIME / 60 * 60)));
+    cust_font.print_string("Spielzeit:",16,37,true);
+    cust_font.print_string(buf1,128,37,true);
+
+    sprintf(buf1,"%i",SAV.Orden);	
+    cust_font.print_string("Orden:",16,51,true);
+    cust_font.print_string(buf1,128,51,true);
+
+    sprintf(buf1,"%i",SAV.Dex);
+    cust_font.print_string("PokéDex:",16,65,true);
+    cust_font.print_string(buf1,128,65,true);
 }
 void killWeiter()
 {
@@ -734,6 +738,7 @@ START:
         SAV.JOHTO_Badges=0;
         SAV.Orden=0;
         SAV.Dex=0;
+        SAV.hasPKMN = false;
         
         SAV.PKMN_team.clear();
         free_spaces.clear();
@@ -761,7 +766,7 @@ enum MoveMode{
     WALK,
     SURF,
     BIKE
-} playermoveMode = WALK;
+};
 
 int mode = -1;
 void showNewMap(int mapIdx) {
@@ -785,11 +790,10 @@ void showNewMap(int mapIdx) {
 bool movePlayerOnMap(int x,int y, int z){
     bool WTW = (gMod == DEVELOPER) && (keysHeld() & KEY_R);
 
-    //if(x == SAV.acposx/20 && y == SAV.acposy/20 && z == SAV.acposz)
-    //    return true;
-
+    MoveMode playermoveMode = (MoveMode)SAV.acMoveMode;
+    
     x += 10;
-    y += 10;
+    y += 10; 
 
     if(x < 0)
         return false;
@@ -825,14 +829,14 @@ bool movePlayerOnMap(int x,int y, int z){
     if(x < 10){
         if(WTW || acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
             for(auto a : acMap->anbindungen)
-                if(a.direction == 'W'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
+                if(a.direction == 'W' && y >= a.move + 10 && y < a.move + a.mapsx + 10){
                     showNewMap(a.mapidx);
                     free(acMap);
                     strcpy(SAV.acMapName,a.name);
                     SAV.acMapIdx = a.mapidx;
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     y -= a.move;
-                    x = a.mapsy + 9;
+                    x = a.mapsy + 10;
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10); 
                     acMap->draw(x-18,y-16);
@@ -843,15 +847,14 @@ bool movePlayerOnMap(int x,int y, int z){
     if(y < 10){
         if(WTW || acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
             for(auto a : acMap->anbindungen)
-                if(a.direction == 'N'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
-                    //delete acMap;
+                if(a.direction == 'N' && x >= a.move+ 10 && x < a.move + a.mapsy+ 10){  
                     showNewMap(a.mapidx);
                     free(acMap);
                     strcpy(SAV.acMapName,a.name);
                     SAV.acMapIdx = a.mapidx;
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     x -= a.move;
-                    y = a.mapsx + 9;
+                    y = a.mapsx + 10;
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10);
                     acMap->draw(x-18,y-16);
@@ -862,8 +865,7 @@ bool movePlayerOnMap(int x,int y, int z){
     if(x >= (int)acMap->sizey + 10) {
         if(WTW || acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
             for(auto a : acMap->anbindungen)
-                if(a.direction == 'E'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
-                    //delete acMap;
+                if(a.direction == 'E' && y >= a.move+ 10 && y < a.move + a.mapsx+ 10){  
                     showNewMap(a.mapidx);
                     free(acMap);
                     strcpy(SAV.acMapName,a.name);
@@ -882,8 +884,7 @@ bool movePlayerOnMap(int x,int y, int z){
         
         if(WTW || acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
             for(auto a : acMap->anbindungen)
-                if(a.direction == 'S'/* && y + a.move < a.mapsy && x < a.mapsx*/){  
-                    //delete acMap;
+                if(a.direction == 'S'  && x >= a.move + 10&& x < a.move + a.mapsy+ 10){  
                     showNewMap(a.mapidx);
                     free(acMap);
                     strcpy(SAV.acMapName,a.name);
@@ -998,6 +999,7 @@ int main(int argc, char** argv)
             oam->oamBuffer[SQCH_ID+1].isHidden = true;
             setMainSpriteVisibility(false);
             oam->oamBuffer[SAVE_ID].isHidden = false;
+            oam->oamBuffer[PKMN_ID].isHidden = !(SAV.hasPKMN && SAV.PKMN_team.size());
             updateOAMSub(oam);
             mode = -1;
             scrn.draw(mode);
@@ -1006,8 +1008,8 @@ int main(int argc, char** argv)
         if(held & KEY_L && gMod == DEVELOPER){
             consoleSelect(&Bottom);
             consoleSetWindow(&Bottom,4,4,20,5);
-            printf("%3i %3i\n%3i %3i\n",acMap->sizex,acMap->sizey,SAV.acposx/20,(SAV.acposy)/20);
-            printf("%i",&acMap);
+            printf("%3i %3i\nx: %3i y: %3i z: %3i\n",acMap->sizex,acMap->sizey,SAV.acposx/20,(SAV.acposy)/20,SAV.acposz);
+            printf("%s %i",SAV.acMapName,SAV.acMapIdx);
         }        
         if(held & KEY_START && gMod == DEVELOPER){
             acMap->draw(0,0,true);
@@ -1279,6 +1281,9 @@ int main(int argc, char** argv)
             bool mappy = showmappointer;
             showmappointer = false;
             updateOAMSub(oam);
+            consoleSelect(&Bottom);
+            consoleSetWindow(&Bottom,0,0,32,5);
+            consoleClear();
             ynbox Save("PokéNav ");
             if(Save.getResult("Möchtest du deinen\nFortschritt sichern?\n"))
             { 
@@ -1289,7 +1294,6 @@ int main(int argc, char** argv)
                 else
                     mbox Succ("Es trat ein Fehler auf\nSpiel nicht gesichert.","PokéNav");
             }
-            consoleClear();
             oam->oamBuffer[SQCH_ID].isHidden = sqa;
             oam->oamBuffer[SQCH_ID+1].isHidden = sqb;
             showmappointer = mappy;
@@ -1299,6 +1303,6 @@ int main(int argc, char** argv)
         //End 
 
     }
-    delete acMap;
+    free(acMap);
     return 0;
 }

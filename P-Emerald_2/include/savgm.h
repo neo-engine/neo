@@ -44,6 +44,7 @@ class savgm
         
         int acposx, acposy, acposz;
         int acMapIdx;
+        int acMoveMode;
         char acMapName[100];
 
         //GameFlags
