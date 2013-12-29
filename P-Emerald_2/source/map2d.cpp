@@ -171,7 +171,7 @@ namespace map2d{
     int tcnt = 0;
     void Map::draw(int bx,int by,bool init){
         if(init){
-            videoSetMode(MODE_0_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG1_ACTIVE |
+            videoSetMode(MODE_0_2D /*| DISPLAY_BG0_ACTIVE*/ | DISPLAY_BG1_ACTIVE |
                 DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
             vramSetBankA(VRAM_A_MAIN_BG_0x06000000);
         
@@ -191,8 +191,9 @@ namespace map2d{
         }
         u16* mapMemory[4];
 
-        for(int i= 0; i< 4; ++i)  mapMemory[i] = (u16*)BG_MAP_RAM(i);
 
+        for(int i= 0; i< 4; ++i)  mapMemory[i] = (u16*)BG_MAP_RAM(i);
+        
         int c = 0;
         bx += 10;
         by += 10;
@@ -201,6 +202,7 @@ namespace map2d{
                 int toplayer = 1, bottomlayer = 3;
 
                 Block acBlock = this->b.blocks[blocks[x][y].blockidx];
+
                 //if(tile_deb_test){
                 //    acBlock = this->b.blocks[tcnt];
                 //    tcnt = (tcnt +1)%1024;
@@ -217,15 +219,44 @@ namespace map2d{
                     //printf("%i",acBlock.topbehave);
                 }
                 
-                if(x > by && y > bx)
-                    mapMemory[toplayer][c-33] = (acBlock.top[0][0]);
-                if(x > by && y < bx + 16)
-                    mapMemory[toplayer][c-32] = acBlock.top[0][1];
-                if(x < by +12 && y > bx)
-                    mapMemory[toplayer][c-1] = acBlock.top[1][0];
-                if(x < by +12&& y < bx + 16)
-                    mapMemory[toplayer][c] = acBlock.top[1][1];
-                
+                if(acBlock.topbehave == 0x10){                    
+                    if(x > by && y > bx)
+                        mapMemory[toplayer + 1][c-33] = (acBlock.top[0][0]);
+                    if(x > by && y < bx + 16)
+                        mapMemory[toplayer + 1][c-32] = acBlock.top[0][1];
+                    if(x < by +12 && y > bx)
+                        mapMemory[toplayer + 1][c-1] = acBlock.top[1][0];
+                    if(x < by +12&& y < bx + 16)
+                        mapMemory[toplayer + 1][c] = acBlock.top[1][1];
+
+                    if(x > by && y > bx)
+                        mapMemory[toplayer][c-33] = 0;
+                    if(x > by && y < bx + 16)
+                        mapMemory[toplayer][c-32] = 0;
+                    if(x < by +12 && y > bx)
+                        mapMemory[toplayer][c-1] = 0;
+                    if(x < by +12&& y < bx + 16)
+                        mapMemory[toplayer][c] = 0;
+                }
+                else{
+                    if(x > by && y > bx)
+                        mapMemory[toplayer][c-33] = (acBlock.top[0][0]);
+                    if(x > by && y < bx + 16)
+                        mapMemory[toplayer][c-32] = acBlock.top[0][1];
+                    if(x < by +12 && y > bx)
+                        mapMemory[toplayer][c-1] = acBlock.top[1][0];
+                    if(x < by +12&& y < bx + 16)
+                        mapMemory[toplayer][c] = acBlock.top[1][1];
+                    
+                    if(x > by && y > bx)
+                        mapMemory[toplayer+1][c-33] = 0;
+                    if(x > by && y < bx + 16)
+                        mapMemory[toplayer+1][c-32] = 0;
+                    if(x < by +12 && y > bx)
+                        mapMemory[toplayer+1][c-1] = 0;
+                    if(x < by +12&& y < bx + 16)
+                        mapMemory[toplayer+1][c] = 0;
+                }
                 
                 if(x > by && y > bx)
                     mapMemory[bottomlayer][c-33] = acBlock.bottom[0][0];

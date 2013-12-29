@@ -36,7 +36,15 @@
 #include "Male.h"
 #include "Female.h"
 
-#include "ChSq_a.h"
+#include "Sprite_0_0.h"
+#include "Sprite_0_1.h"
+#include "Sprite_0_2.h"
+#include "Sprite_0_3.h"
+#include "Sprite_0_4.h"
+#include "Sprite_0_5.h"
+#include "Sprite_0_6.h"
+#include "Sprite_0_7.h"
+#include "Sprite_0_8.h"
 
 OAMTable *oam = new OAMTable();
 SpriteInfo spriteInfo[SPRITE_COUNT];
@@ -791,6 +799,217 @@ void showNewMap(int mapIdx) {
         }
 }
 
+void animateHero(int dir,int frame){
+    int plsval = 0;
+    if((MoveMode)SAV.acMoveMode == BIKE)
+        plsval += 3;
+    if(keysHeld() & KEY_B)
+        plsval += 2;
+    
+    if(frame == 0){
+        switch (dir)
+        {
+        case 0:
+            oamTop->oamBuffer[0].hFlip = false;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_0TilesLen);
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            swiWaitForVBlank();
+            return;
+        case 1:
+            oamTop->oamBuffer[0].hFlip = true;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Tiles,    &SPRITE_GFX[0],    Sprite_0_7TilesLen);
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            oamTop->oamBuffer[0].x+=plsval;
+            updateOAM(oamTop);
+            oamTop->oamBuffer[0].x+=plsval;
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            swiWaitForVBlank();
+            if(plsval == 0){
+                swiWaitForVBlank();
+                swiWaitForVBlank();
+            }
+            return;
+        case 2:
+            oamTop->oamBuffer[0].hFlip = false;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_3Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_3Tiles,    &SPRITE_GFX[0],    Sprite_0_3TilesLen);
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            oamTop->oamBuffer[0].y+=plsval;
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            swiWaitForVBlank();
+            oamTop->oamBuffer[0].y+=plsval;
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            if(plsval == 0){
+                swiWaitForVBlank();
+                swiWaitForVBlank();
+            }
+            return;
+        case 3:
+            oamTop->oamBuffer[0].hFlip = false;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Tiles,    &SPRITE_GFX[0],    Sprite_0_7TilesLen);
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            oamTop->oamBuffer[0].x-=plsval;
+            updateOAM(oamTop);
+            oamTop->oamBuffer[0].x-=plsval;
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            if(plsval == 0){
+                swiWaitForVBlank();
+                swiWaitForVBlank();
+            }
+            return;
+        case 4:
+            oamTop->oamBuffer[0].hFlip = false;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_5Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_5Tiles,    &SPRITE_GFX[0],    Sprite_0_5TilesLen);
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            oamTop->oamBuffer[0].y-=plsval;
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            swiWaitForVBlank();
+            oamTop->oamBuffer[0].y-=plsval;
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            if(plsval == 0){
+                swiWaitForVBlank();
+                swiWaitForVBlank();
+            }
+            return;
+        default:
+            break;
+        }
+    }
+    if(frame == 1){
+        switch (dir)
+        {
+        case 0:
+            oamTop->oamBuffer[0].hFlip = false;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_0TilesLen);
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            swiWaitForVBlank();
+            return;
+        case 1:
+            oamTop->oamBuffer[0].hFlip = true;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Tiles,    &SPRITE_GFX[0],    Sprite_0_8TilesLen);
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            oamTop->oamBuffer[0].x-=plsval;
+            updateOAM(oamTop);
+            oamTop->oamBuffer[0].x-=plsval;
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            if(plsval == 0){
+                swiWaitForVBlank();
+                swiWaitForVBlank();
+            }
+            return;
+        case 2:
+            oamTop->oamBuffer[0].hFlip = false;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_4Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_4Tiles,    &SPRITE_GFX[0],    Sprite_0_4TilesLen);
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            oamTop->oamBuffer[0].y-=plsval;
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            swiWaitForVBlank();
+            oamTop->oamBuffer[0].y-=plsval;
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            if(plsval == 0){
+                swiWaitForVBlank();
+                swiWaitForVBlank();
+            }
+            return;
+        case 3:
+            oamTop->oamBuffer[0].hFlip = false;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Tiles,    &SPRITE_GFX[0],    Sprite_0_8TilesLen);
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            oamTop->oamBuffer[0].x+=plsval;
+            updateOAM(oamTop);
+            oamTop->oamBuffer[0].x+=plsval;
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            if(plsval == 0){
+                swiWaitForVBlank();
+                swiWaitForVBlank();
+            }
+            return;
+        case 4:
+            oamTop->oamBuffer[0].hFlip = false;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_6Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_6Tiles,    &SPRITE_GFX[0],    Sprite_0_6TilesLen);
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            oamTop->oamBuffer[0].y+=plsval;
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            swiWaitForVBlank();
+            if(plsval == 0){
+                swiWaitForVBlank();
+                swiWaitForVBlank();
+            }
+            oamTop->oamBuffer[0].y+=plsval;
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            return;
+        default:
+            break;
+        }
+    }
+    if(frame == 2){
+        switch (dir)
+        {
+        case 0:
+            oamTop->oamBuffer[0].hFlip = false;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_0TilesLen);
+            updateOAM(oamTop);
+            return;
+        case 1:
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            updateOAM(oamTop);
+            return;
+        case 2:
+            oamTop->oamBuffer[0].hFlip = false;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_0TilesLen);
+            updateOAM(oamTop);
+            return;
+        case 3:
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            updateOAM(oamTop);
+            return;
+        case 4:
+            oamTop->oamBuffer[0].hFlip = false;
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_1Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_1Tiles,    &SPRITE_GFX[0],    Sprite_0_1TilesLen);
+            updateOAM(oamTop);
+            return;
+        default:
+            break;
+        }
+    }
+}
+
 bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
     bool WTW = (gMod == DEVELOPER) && (keysHeld() & KEY_R);
 
@@ -816,14 +1035,13 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
     if(verhalten == 0xa0 && playermoveMode != WALK) //nur normales laufen möglich
         return false;
 
-    if(verhalten == 0xc0 && y != SAV.acposy/20 + 10) //Rechts-Links-Blockung
+    if(verhalten == 0xc1 && y != SAV.acposy/20 + 10) //Rechts-Links-Blockung
         return false;
-    if(verhalten == 0xc1 && x != SAV.acposx/20 + 10) //Rechts-Links-Blockung
+    if(verhalten == 0xc0 && x != SAV.acposx/20 + 10) //Oben-Unten-Blockung
         return false;
     if(verhalten >= 0xd3 && verhalten <= 0xd7) //fester block
         return false;
 
-    
     if(!WTW){
         if(acmovedata == 1)
             return false ;
@@ -831,6 +1049,18 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
             || (acmovedata != 4 && playermoveMode == SURF) )
             return false;
     }
+
+    int movedir = 0;
+    int oldx = SAV.acposy/20 +10, oldy = SAV.acposx/20 +10;
+    if(oldy < x)
+        movedir = 1;
+    else if(oldy > x)
+        movedir = 3;
+    else if(oldx < y)
+        movedir = 2;
+    else if(oldx > y)
+        movedir = 4;
+
    
     if(lastmovedata == 0 && acmovedata %4 == 0)
         SAV.acposz = z = acmovedata / 4;
@@ -844,9 +1074,13 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
         else
             oamTop->oamBuffer[0].priority = OBJPRIORITY_1;
 
-    if(hintergrund == 0x10)
-        oamTop->oamBuffer[0].priority = OBJPRIORITY_1;
-
+    if(WTW || (acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60))
+        animateHero(movedir,0);
+    else{
+        animateHero(movedir,2);
+        return false;
+    }
+    
     if(x < 10){
         if(WTW || acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
             for(auto a : acMap->anbindungen)
@@ -861,6 +1095,8 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10); 
                     acMap->draw(x-18,y-16,true);
+                    animateHero(movedir,1);
+                    animateHero(movedir,2);
                     return true;  
                 }
         return false;
@@ -879,6 +1115,8 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10);
                     acMap->draw(x-18,y-16,true);
+                    animateHero(movedir,1);
+                    animateHero(movedir,2);
                     return true;
                 }
         return false;
@@ -897,6 +1135,8 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10);
                     acMap->draw(x-18,y-16,true);
+                    animateHero(movedir,1);
+                    animateHero(movedir,2);
                     return true;
                 }
         return false; 
@@ -916,6 +1156,8 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10);
                     acMap->draw(x-18,y-16,true);
+                    animateHero(movedir,1);
+                    animateHero(movedir,2);
                     return true;
                 }
             return false;
@@ -925,6 +1167,10 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
         acMap->draw(x-18,y-16,init);
     else
         return false;
+    
+    animateHero(movedir,1);
+    if(movedir % 2)
+        animateHero(movedir,2);
 
     updateOAM(oamTop);
 
@@ -948,24 +1194,24 @@ void initMapSprites(){
     SpriteEntry * SQCHA = &oamTop->oamBuffer[0];
     SQCHAInfo->oamId = 0;
     SQCHAInfo->width = 16;
-    SQCHAInfo->height = 16;
+    SQCHAInfo->height = 32;
     SQCHAInfo->angle = 0;
     SQCHAInfo->entry = SQCHA;
-    SQCHA->y = 88;
+    SQCHA->y = 72;
     SQCHA->isRotateScale = false;
     SQCHA->blendMode = OBJMODE_NORMAL;
     SQCHA->isMosaic = true;
     SQCHA->colorMode = OBJCOLOR_16;
-    SQCHA->shape = OBJSHAPE_SQUARE;
+    SQCHA->shape = OBJSHAPE_TALL;
     SQCHA->isHidden = false;
     SQCHA->x = 120;
-    SQCHA->size = OBJSIZE_16;
+    SQCHA->size = OBJSIZE_32;
     SQCHA->gfxIndex = 0;
     SQCHA->priority = OBJPRIORITY_2;
     SQCHA->palette = 0;
 
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    ChSq_aPal,    &SPRITE_PALETTE[0],    32);
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    ChSq_aTiles,    &SPRITE_GFX[0],    ChSq_aTilesLen);
+    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
+    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_0TilesLen);
 }
 
 int main(int argc, char** argv) 
@@ -1045,8 +1291,26 @@ int main(int argc, char** argv)
             continue;
         }
         //Moving
+        if(pressed & KEY_DOWN){
+            animateHero(2,2);
+            continue;
+        }
+        if(pressed & KEY_RIGHT){
+            animateHero(1,2);
+            continue;
+        }
+        if(pressed & KEY_UP){
+            animateHero(4,2);
+            continue;
+        }
+        if(pressed & KEY_LEFT){
+            animateHero(3,2);
+            continue;
+        }
+
         if(held & KEY_DOWN)
         {
+            scanKeys();
             if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy+MOV)/20,SAV.acposz,false))
                 SAV.acposy+=MOV; 
             if(SAV.acMoveMode != BIKE)
@@ -1054,6 +1318,7 @@ int main(int argc, char** argv)
         }
         if (held & KEY_LEFT)
         {
+            scanKeys();
             if(movePlayerOnMap((SAV.acposx-MOV)/20,SAV.acposy/20,SAV.acposz,false))
                 SAV.acposx-=MOV;
             if(SAV.acMoveMode != BIKE)
@@ -1061,6 +1326,7 @@ int main(int argc, char** argv)
         }
         if (held & KEY_RIGHT)
         {
+            scanKeys();
             if(movePlayerOnMap((SAV.acposx+MOV)/20,SAV.acposy/20,SAV.acposz,false))
                 SAV.acposx+=MOV;
             if(SAV.acMoveMode != BIKE)
@@ -1068,6 +1334,7 @@ int main(int argc, char** argv)
         }
         if (held & KEY_UP)
         {
+            scanKeys();
             if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy-MOV)/20,SAV.acposz,false))
                 SAV.acposy-=MOV;
             if(SAV.acMoveMode != BIKE)
