@@ -4,7 +4,7 @@
 
 extern PrintConsole Bottom;
 #define MAXKEYBOARDS 3
-extern void updateTime();
+extern void updateTime(bool);
 class keyboard
 {
 public:

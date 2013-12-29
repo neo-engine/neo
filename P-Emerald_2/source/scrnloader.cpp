@@ -60,7 +60,7 @@ BG_set BGs[MAXBG] = {{"Raging_Gyarados",NAV_DATA,NAV_DATA_PAL,true,false},
     {"Waiting_Suicune",NAV_DATA,NAV_DATA_PAL,true,false},
     {"Fighting_Groudon",NAV_DATA,NAV_DATA_PAL,true,false},
     {"Fighting_Kyogre",NAV_DATA,NAV_DATA_PAL,true,false}};
-int BG_ind = 0;
+int BG_ind = 2;
 extern POKEMON::PKMN::BOX_PKMN stored_pkmn[MAXSTOREDPKMN];
 extern std::vector<int> box_of_st_pkmn[MAXPKMN];
 extern std::vector<int> free_spaces;
@@ -96,9 +96,13 @@ void printMapLocation(const MapRegionPos& m){
     updateTime();
     return;
 }
-
-void updateTime()
+u8 frame = 0;
+void updateTime(bool mapMode)
 {
+    frame = (frame + 1) % 256;
+    if(mapMode)
+        animateMap(frame);
+
     time_t unixTime = time(NULL);
     struct tm* timeStruct = gmtime((const time_t *)&unixTime);
 
@@ -2704,7 +2708,7 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
 }
 void scrnloader::run_dex(int num){
     vramSetup();
-    videoSetMode(MODE_5_2D |DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );	
+    videoSetMode(MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );	
 
     Top = *consoleInit(&Top, 0, BgType_Text4bpp, BgSize_T_256x256,2,0, true ,true);
     consoleSetFont(&Top,&cfont);

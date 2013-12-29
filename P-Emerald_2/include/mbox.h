@@ -8,7 +8,7 @@
 extern int bg3sub;
 extern PrintConsole Bottom;
 
-void updateTime();
+extern void updateTime(bool mapMode);
 
 bool operator==(touchPosition R,touchPosition L);
 

@@ -91,10 +91,10 @@ extern POKEMON::PKMN::BOX_PKMN stored_pkmn[MAXSTOREDPKMN];
 extern std::vector<int> box_of_st_pkmn[MAXPKMN];
 extern std::vector<int> free_spaces;
 
-void updateTime();
+extern void updateTime(bool);
 
 void whoCares(int){	return; }
-void progress(int j){ return; }
+void progress(int){ return; }
 
 enum ChoiceResult{
     CONTINUE,
@@ -548,7 +548,11 @@ INDIVIDUALISIERUNG:
     M = mbox(&(S_[0]),L"Moritz",true,true,true,mbox::sprite_trainer,0);	
     consoleSelect(&Top);
     SAV.hasPKMN = false;
-    
+    strcpy(SAV.acMapName,"0/98");
+    SAV.acMapIdx = 1000;
+    SAV.acposx = 2*20;
+    SAV.acposy = 25*20;
+    SAV.acposz = 3;
     setMainSpriteVisibility(false);
     oam->oamBuffer[1].isHidden = false;
     updateOAMSub(oam);   
@@ -754,7 +758,7 @@ START:
        
         strcpy(SAV.acMapName ,"0/1");
         SAV.acMapIdx = 243;
-        SAV.acposx = 2*20, SAV.acposy = 4*20, SAV.acposz = 3;
+        SAV.acposx = 16*20, SAV.acposy = 16*20, SAV.acposz = 3;
         break;
     case NEW_GAME:
         initNewGame();
@@ -787,7 +791,7 @@ void showNewMap(int mapIdx) {
         }
 }
 
-bool movePlayerOnMap(int x,int y, int z){
+bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
     bool WTW = (gMod == DEVELOPER) && (keysHeld() & KEY_R);
 
     MoveMode playermoveMode = (MoveMode)SAV.acMoveMode;
@@ -806,6 +810,19 @@ bool movePlayerOnMap(int x,int y, int z){
 
     int lastmovedata = acMap->blocks[SAV.acposy/20 + 10][SAV.acposx/20 + 10].movedata;
     int acmovedata = acMap->blocks[y][x].movedata;
+    map2d::Block acBlock = acMap->b.blocks[acMap->blocks[y][x].blockidx];
+
+    int verhalten = acBlock.bottombehave, hintergrund = acBlock.topbehave;
+    if(verhalten == 0xa0 && playermoveMode != WALK) //nur normales laufen möglich
+        return false;
+
+    if(verhalten == 0xc0 && y != SAV.acposy/20 + 10) //Rechts-Links-Blockung
+        return false;
+    if(verhalten == 0xc1 && x != SAV.acposx/20 + 10) //Rechts-Links-Blockung
+        return false;
+    if(verhalten >= 0xd3 && verhalten <= 0xd7) //fester block
+        return false;
+
     
     if(!WTW){
         if(acmovedata == 1)
@@ -819,12 +836,16 @@ bool movePlayerOnMap(int x,int y, int z){
         SAV.acposz = z = acmovedata / 4;
     
     oamTop->oamBuffer[0].priority = OBJPRIORITY_2;
+    if(verhalten == 0x70) 
+        oamTop->oamBuffer[0].priority = OBJPRIORITY_1;
     if(acmovedata == 60)
         if(z <= 3)
             oamTop->oamBuffer[0].priority = OBJPRIORITY_3;
         else
             oamTop->oamBuffer[0].priority = OBJPRIORITY_1;
 
+    if(hintergrund == 0x10)
+        oamTop->oamBuffer[0].priority = OBJPRIORITY_1;
 
     if(x < 10){
         if(WTW || acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
@@ -836,10 +857,10 @@ bool movePlayerOnMap(int x,int y, int z){
                     SAV.acMapIdx = a.mapidx;
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     y -= a.move;
-                    x = a.mapsy + 10;
+                    x = a.mapsy + 9;
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10); 
-                    acMap->draw(x-18,y-16);
+                    acMap->draw(x-18,y-16,true);
                     return true;  
                 }
         return false;
@@ -854,10 +875,10 @@ bool movePlayerOnMap(int x,int y, int z){
                     SAV.acMapIdx = a.mapidx;
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     x -= a.move;
-                    y = a.mapsx + 10;
+                    y = a.mapsx + 9;
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10);
-                    acMap->draw(x-18,y-16);
+                    acMap->draw(x-18,y-16,true);
                     return true;
                 }
         return false;
@@ -875,7 +896,7 @@ bool movePlayerOnMap(int x,int y, int z){
                     x = 10;
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10);
-                    acMap->draw(x-18,y-16);
+                    acMap->draw(x-18,y-16,true);
                     return true;
                 }
         return false; 
@@ -894,30 +915,36 @@ bool movePlayerOnMap(int x,int y, int z){
                     y = 10;
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10);
-                    acMap->draw(x-18,y-16);
+                    acMap->draw(x-18,y-16,true);
                     return true;
                 }
             return false;
     }
 
     if(WTW || (acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60))
-        acMap->draw(x-18,y-16);
+        acMap->draw(x-18,y-16,init);
     else
         return false;
-
-    map2d::Block acBlock = acMap->b.blocks[acMap->blocks[y][x].blockidx];
-
-    if(acBlock.topbehave == 0x10)
-        oamTop->oamBuffer[0].priority = OBJPRIORITY_1;
 
     updateOAM(oamTop);
 
     return true;
 }
 
+void animateMap(u8 frame){
+    u8* tileMemory = (u8*)BG_TILE_RAM(1);
+    for(int i = 0; i < acMap->animations.size(); ++i){
+        map2d::Animation& a = acMap->animations[i];
+        if( (frame) % (a.speed) == 0 || a.speed == 1){
+            a.acFrame = (a.acFrame + 1) % a.maxFrame;
+            swiCopy(&a.animationTiles[a.acFrame], tileMemory + a.tileIdx * 32, 16);
+        }
+    }
+}
+
 void initMapSprites(){
         initOAMTable(oamTop);
-    SpriteInfo * SQCHAInfo = &spriteInfoTop[0];
+    SpriteInfo * SQCHAInfo = &spriteInfoTop[0]; 
     SpriteEntry * SQCHA = &oamTop->oamBuffer[0];
     SQCHAInfo->oamId = 0;
     SQCHAInfo->width = 16;
@@ -959,7 +986,7 @@ int main(int argc, char** argv)
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
     acMap = new map2d::Map("nitro://MAPS/",SAV.acMapName);
 
-    movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz);
+    movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
     
     cust_font.set_color(RGB(0,31,31),0);
 
@@ -972,14 +999,14 @@ int main(int argc, char** argv)
 
     SAV.hasGDex = true;
 
-    int MOV = 10;
+    int MOV = 20;
 
     initMapSprites();
     updateOAM(oamTop);
 
     while(42) 
     {
-        updateTime();
+        updateTime(true);
         swiWaitForVBlank();
         swiWaitForVBlank();
         swiWaitForVBlank();
@@ -988,7 +1015,6 @@ int main(int argc, char** argv)
         touchRead(&touch);
         int pressed = keysUp(),held = keysHeld();
         
-        //Moving
         //jump to MainSCrn immediatly
         if(pressed & KEY_X){   
             consoleSelect(&Bottom);
@@ -1007,37 +1033,45 @@ int main(int argc, char** argv)
 
         if(held & KEY_L && gMod == DEVELOPER){
             consoleSelect(&Bottom);
-            consoleSetWindow(&Bottom,4,4,20,5);
+            consoleSetWindow(&Bottom,4,4,20,10);
+            consoleClear();
             printf("%3i %3i\nx: %3i y: %3i z: %3i\n",acMap->sizex,acMap->sizey,SAV.acposx/20,(SAV.acposy)/20,SAV.acposz);
-            printf("%s %i",SAV.acMapName,SAV.acMapIdx);
+            printf("%s %i\n",SAV.acMapName,SAV.acMapIdx);
+            printf("topbehave %i;\n bottombehave %i",acMap->b.blocks[acMap->blocks[SAV.acposy/20 + 10][SAV.acposx/20 + 10].blockidx].topbehave,
+                acMap->b.blocks[acMap->blocks[SAV.acposy/20 + 10][SAV.acposx/20 + 10].blockidx].bottombehave);
         }        
         if(held & KEY_START && gMod == DEVELOPER){
             acMap->draw(0,0,true);
             continue;
         }
+        //Moving
         if(held & KEY_DOWN)
         {
-            if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy+MOV)/20,SAV.acposz))
+            if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy+MOV)/20,SAV.acposz,false))
                 SAV.acposy+=MOV; 
-            continue;
+            if(SAV.acMoveMode != BIKE)
+                continue;
         }
-        else if (held & KEY_LEFT)
+        if (held & KEY_LEFT)
         {
-            if(movePlayerOnMap((SAV.acposx-MOV)/20,SAV.acposy/20,SAV.acposz))
+            if(movePlayerOnMap((SAV.acposx-MOV)/20,SAV.acposy/20,SAV.acposz,false))
                 SAV.acposx-=MOV;
-            continue;
+            if(SAV.acMoveMode != BIKE)
+                continue;
         }
-        else if (held & KEY_RIGHT)
+        if (held & KEY_RIGHT)
         {
-            if(movePlayerOnMap((SAV.acposx+MOV)/20,SAV.acposy/20,SAV.acposz))
+            if(movePlayerOnMap((SAV.acposx+MOV)/20,SAV.acposy/20,SAV.acposz,false))
                 SAV.acposx+=MOV;
-            continue;
+            if(SAV.acMoveMode != BIKE)
+                continue;
         }
-        else if (held & KEY_UP)
+        if (held & KEY_UP)
         {
-            if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy-MOV)/20,SAV.acposz))
+            if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy-MOV)/20,SAV.acposz,false))
                 SAV.acposy-=MOV;
-            continue;
+            if(SAV.acMoveMode != BIKE)
+                continue;
         }
         //StartBag
         //Centers o t circles.
@@ -1051,13 +1085,13 @@ int main(int argc, char** argv)
             {
                 scanKeys();
                 swiWaitForVBlank();
-                updateTime();
+                updateTime(true);
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
             SAV.Bag.draw();
             initMapSprites();
-            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz);
+            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
         }
         //StartPkmn
         else if (SAV.PKMN_team.size() && (sqrt(sq(mainSpritesPositions[0][0]-touch.px) + sq(mainSpritesPositions[0][1]-touch.py)) <= 16 )&& mode == -1)
@@ -1066,7 +1100,7 @@ int main(int argc, char** argv)
             {
                 scanKeys();
                 swiWaitForVBlank();
-                updateTime();
+                updateTime(true);
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
@@ -1075,7 +1109,7 @@ int main(int argc, char** argv)
 
             scrn.draw(mode);
             initMapSprites();
-            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz);
+            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
         }
         //StartDex
         else if (sqrt(sq(mainSpritesPositions[2][0]-touch.px) + sq(mainSpritesPositions[2][1]-touch.py)) <= 16 && mode == -1)
@@ -1084,7 +1118,7 @@ int main(int argc, char** argv)
             {
                 scanKeys();
                 swiWaitForVBlank();
-                updateTime();
+                updateTime(true);
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
@@ -1092,7 +1126,7 @@ int main(int argc, char** argv)
             scrn.run_dex();
             scrn.draw(mode);
             initMapSprites();
-            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz);
+            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
         }
         //StartOptions
         else if (sqrt(sq(mainSpritesPositions[4][0]-touch.px) + sq(mainSpritesPositions[4][1]-touch.py)) <= 16 && mode == -1)
@@ -1101,7 +1135,7 @@ int main(int argc, char** argv)
             {
                 scanKeys();
                 swiWaitForVBlank();
-                updateTime();
+                updateTime(true);
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
@@ -1113,7 +1147,7 @@ int main(int argc, char** argv)
             {
                 scanKeys();
                 swiWaitForVBlank();
-                updateTime();
+                updateTime(true);
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
@@ -1179,7 +1213,7 @@ int main(int argc, char** argv)
             setMainSpriteVisibility(false);
             scrn.draw(mode);
             initMapSprites();
-            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz);
+            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
         }
         //StartPok\x82""nav
         else if (sqrt(sq(mainSpritesPositions[5][0]-touch.px) + sq(mainSpritesPositions[5][1]-touch.py)) <= 16 && mode == -1)
@@ -1188,13 +1222,13 @@ int main(int argc, char** argv)
             {
                 scanKeys();
                 swiWaitForVBlank();
-                updateTime();
+                updateTime(true);
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
             mode = 0;
             scrn.draw(mode);
-            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz);
+            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,false);
         }
         //StartMaps
         else if (sqrt(sq(mainSpritesPositions[0][0]-touch.px) + sq(mainSpritesPositions[0][1]-touch.py)) <= 16 && mode == 0)
@@ -1203,7 +1237,7 @@ int main(int argc, char** argv)
             {
                 scanKeys();
                 swiWaitForVBlank();
-                updateTime();
+                updateTime(true);
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
@@ -1220,7 +1254,7 @@ int main(int argc, char** argv)
             {
                 scanKeys();
                 swiWaitForVBlank();
-                updateTime();
+                updateTime(true);
                 if(keysUp() & KEY_TOUCH)
                     break;
             }
@@ -1234,7 +1268,7 @@ int main(int argc, char** argv)
             {
                 scanKeys();
                 swiWaitForVBlank();
-                updateTime();
+                updateTime(true);
                 if(keysUp() & KEY_TOUCH)
                     break;
             }
@@ -1263,6 +1297,7 @@ int main(int argc, char** argv)
             oam->oamBuffer[SQCH_ID].y = oam->oamBuffer[SQCH_ID + 1].y = touch.py-8;
             printMapLocation(touch);
             updateOAMSub(oam);
+            updateTime(true);
         }
         else if(touch.px != 0 && touch.py != 0 && sqrt(sq(touch.px-8)+sq(touch.py-12)) <= 17)
         {
@@ -1270,7 +1305,7 @@ int main(int argc, char** argv)
             {
                 scanKeys();
                 swiWaitForVBlank();
-                updateTime();
+                updateTime(true);
                 if(keysUp() & KEY_TOUCH)
                 break;
             }

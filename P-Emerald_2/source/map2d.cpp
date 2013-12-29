@@ -50,6 +50,24 @@ namespace map2d{
         }
         fclose(file);
     }
+    inline void readAnimations(FILE* file, std::vector<Animation>& animations){
+        if(file == 0)
+            return;
+        u8 N; 
+        fread(&N,sizeof (u8),1,file);
+        for(int i= 0; i < N; ++i){
+            Animation a;            
+            fread(&a.tileIdx,sizeof (u16),1,file);
+            fread(&a.speed,sizeof (u8),1,file);
+            fread(&a.maxFrame,sizeof (u8),1,file);
+            a.acFrame = 0;
+            a.animationTiles.assign(a.maxFrame, Tile());
+            for(int i = 0; i < a.maxFrame; ++i)
+                fread(&a.animationTiles[i],sizeof(Tile),1,file);
+            animations.push_back(a);
+        }
+        fclose(file);
+    }
     Map::Map(const char* Path, const char* Name){
         consoleSelect(&Bottom);
         consoleSetWindow(&Bottom,4,4,25,20);
@@ -78,6 +96,8 @@ namespace map2d{
         readBlockSet(fopen(buf,"rb"),this->b);
         sprintf(buf,"nitro://MAPS/TILESETS/%i.p2l",tsidx1);
         readPal(fopen(buf,"rb"),this->pals);
+        sprintf(buf,"nitro://MAPS/TILESETS/%i.anm",tsidx1);
+        readAnimations(fopen(buf,"rb"),this->animations);
 
         sprintf(buf,"nitro://MAPS/TILESETS/%i.ts",tsidx2);
         readTileSet(fopen(buf,"rb"),this->t,512); 
@@ -85,6 +105,8 @@ namespace map2d{
         readBlockSet(fopen(buf,"rb"),this->b,512);
         sprintf(buf,"nitro://MAPS/TILESETS/%i.p2l",tsidx2);
         readPal(fopen(buf,"rb"),this->pals + 6);
+        sprintf(buf,"nitro://MAPS/TILESETS/%i.anm",tsidx2);
+        readAnimations(fopen(buf,"rb"),this->animations);
         
 
         readNop(mapF,4);
@@ -147,32 +169,30 @@ namespace map2d{
     }
 
     int tcnt = 0;
-    void Map::draw(int bx,int by, bool tile_deb_test){
-        videoSetMode(MODE_0_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG1_ACTIVE |
-            DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-        vramSetBankA(VRAM_A_MAIN_BG_0x06000000);
+    void Map::draw(int bx,int by,bool init){
+        if(init){
+            videoSetMode(MODE_0_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG1_ACTIVE |
+                DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
+            vramSetBankA(VRAM_A_MAIN_BG_0x06000000);
         
-        //REG_BG0CNT = BG_32x32 | BG_COLOR_16 |  BG_MAP_BASE(0) | BG_TILE_BASE(1)|  BG_PRIORITY(0);
-        REG_BG1CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(1) | BG_TILE_BASE(1)| BG_PRIORITY(1);
-        REG_BG2CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(2) | BG_TILE_BASE(1)| BG_PRIORITY(2);
-        REG_BG3CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(3) | BG_TILE_BASE(1)| BG_PRIORITY(3);
+            //REG_BG0CNT = BG_32x32 | BG_COLOR_16 |  BG_MAP_BASE(0) | BG_TILE_BASE(1)|  BG_PRIORITY(0);
+            REG_BG1CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(1) | BG_TILE_BASE(1)| BG_PRIORITY(1);
+            REG_BG2CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(2) | BG_TILE_BASE(1)| BG_PRIORITY(2);
+            REG_BG3CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(3) | BG_TILE_BASE(1)| BG_PRIORITY(3);
 
-        //Top = *consoleInit(&Top, 0, BgType_Text4bpp, BgSize_T_256x256, 0, 5, true ,true);
+            //Top = *consoleInit(&Top, 0, BgType_Text4bpp, BgSize_T_256x256, 0, 5, true ,true);
 
-        //int bg[4];
+            u8* tileMemory = (u8*)BG_TILE_RAM(1);
+        
+            for(int i= 0; i < 1024; ++i)
+                swiCopy(this->t.blocks[i].tile, tileMemory + i * 32, 16);
+
+            dmaCopy(this->pals, BG_PALETTE, 512); 
+        }
         u16* mapMemory[4];
 
-        for(int i= 0; i< 4; ++i){
-            mapMemory[i] = (u16*)BG_MAP_RAM(i);
-        }
-        //bgUpdate();
-        u8* tileMemory = (u8*)BG_TILE_RAM(1);
-        
-        for(int i= 0; i < 1024; ++i)
-            swiCopy(this->t.blocks[i].tile, tileMemory + i * 32, 16);
+        for(int i= 0; i< 4; ++i)  mapMemory[i] = (u16*)BG_MAP_RAM(i);
 
-        dmaCopy(this->pals, BG_PALETTE, 512); 
-         
         int c = 0;
         bx += 10;
         by += 10;
@@ -181,10 +201,10 @@ namespace map2d{
                 int toplayer = 1, bottomlayer = 3;
 
                 Block acBlock = this->b.blocks[blocks[x][y].blockidx];
-                if(tile_deb_test){
-                    acBlock = this->b.blocks[tcnt];
-                    tcnt = (tcnt +1)%1024;
-                }
+                //if(tile_deb_test){
+                //    acBlock = this->b.blocks[tcnt];
+                //    tcnt = (tcnt +1)%1024;
+                //}
                 if(x < 0 || y < 0 ||x >= (int)this->sizex + 20 || y >= (int)this->sizey + 20){
                     acBlock = this->b.blocks[rand[x%2][y%2]];
                 }

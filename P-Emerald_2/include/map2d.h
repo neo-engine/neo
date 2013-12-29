@@ -7,13 +7,8 @@
 
 namespace map2d{
 
-    class Palette{
-    public:
-        u16 pal[16];
-    };
-    typedef struct{
-        u8 tile[32];
-    } Tile;
+    typedef struct { u16 pal[16]; } Palette;
+    typedef struct{ u8 tile[32]; } Tile;
     typedef u8 PalNo;
     //typedef struct{
     //    u16 tileidx      : 10;
@@ -34,16 +29,9 @@ namespace map2d{
 
     };
     
-    class TileSet{
-    public:
-        Tile blocks[1024];
-    };
-    class BlockSet{
-    public:
-        Block blocks[1024];
-    };
+    typedef struct{ Tile blocks[1024]; } TileSet;
+    typedef struct{ Block blocks[1024]; } BlockSet;
 
-    
     typedef struct{
         u16 blockidx      : 10;
         u8 movedata       :  6;  
@@ -65,6 +53,14 @@ namespace map2d{
             memcpy(this->name,name,100);
         }
     };
+    class Animation{
+    public:
+        u16 tileIdx;
+        u8 acFrame;
+        u8 maxFrame;
+        u8 speed;
+        std::vector<Tile> animationTiles;
+    };
 
     class Map{
     public: 
@@ -76,12 +72,13 @@ namespace map2d{
         BlockSet b;
         std::vector< Anbindung> anbindungen;
         u16 rand[2][2];
+        std::vector< Animation> animations;
 
         //WildePKMN, Events...
         Map() { }
 
         Map(const char* Path, const char* Name);
 
-        void draw(int bx,int by,bool tile_deb_test = false);
+        void draw(int bx,int by,bool init = false);
     };
 }
