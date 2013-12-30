@@ -799,13 +799,15 @@ void showNewMap(int mapIdx) {
         }
 }
 
+bool left = false;
+
 void animateHero(int dir,int frame){
+    left = !left;
     int plsval = 0;
     if((MoveMode)SAV.acMoveMode == BIKE)
         plsval += 3;
     if(keysHeld() & KEY_B)
         plsval += 2;
-    
     if(frame == 0){
         switch (dir)
         {
@@ -818,73 +820,118 @@ void animateHero(int dir,int frame){
             swiWaitForVBlank();
             return;
         case 1:
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],2,0);
+            bgUpdate();
             oamTop->oamBuffer[0].hFlip = true;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Tiles,    &SPRITE_GFX[0],    Sprite_0_7TilesLen);
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            oamTop->oamBuffer[0].x+=plsval;
-            updateOAM(oamTop);
-            oamTop->oamBuffer[0].x+=plsval;
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            swiWaitForVBlank();
-            if(plsval == 0){
-                swiWaitForVBlank();
-                swiWaitForVBlank();
+            if(left){
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Pal,    &SPRITE_PALETTE[0],    32);
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Tiles,    &SPRITE_GFX[0],    Sprite_0_7TilesLen);
             }
+            else{
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Pal,    &SPRITE_PALETTE[0],    32);
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Tiles,    &SPRITE_GFX[0],    Sprite_0_8TilesLen);
+            }
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],2,0);
+            bgUpdate();
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],2,0);
+            bgUpdate();
+            swiWaitForVBlank();
+            updateOAM(oamTop);
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],2,0);
+            bgUpdate();
+            swiWaitForVBlank();
             return;
         case 2:
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,2);
+            bgUpdate();
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_3Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_3Tiles,    &SPRITE_GFX[0],    Sprite_0_3TilesLen);
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            oamTop->oamBuffer[0].y+=plsval;
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            swiWaitForVBlank();
-            oamTop->oamBuffer[0].y+=plsval;
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            if(plsval == 0){
-                swiWaitForVBlank();
-                swiWaitForVBlank();
+            if(left){
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_3Pal,    &SPRITE_PALETTE[0],    32);
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_3Tiles,    &SPRITE_GFX[0],    Sprite_0_3TilesLen);
             }
+            else{
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_4Pal,    &SPRITE_PALETTE[0],    32);
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_4Tiles,    &SPRITE_GFX[0],    Sprite_0_4TilesLen);
+            }
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,2);
+            bgUpdate();
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,2);
+            bgUpdate();
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,2);
+            bgUpdate();
+            swiWaitForVBlank();
             return;
         case 3:
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],-2,0);
+            bgUpdate();
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Tiles,    &SPRITE_GFX[0],    Sprite_0_7TilesLen);
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            oamTop->oamBuffer[0].x-=plsval;
-            updateOAM(oamTop);
-            oamTop->oamBuffer[0].x-=plsval;
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            if(plsval == 0){
-                swiWaitForVBlank();
-                swiWaitForVBlank();
+            if(left){
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Pal,    &SPRITE_PALETTE[0],    32);
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Tiles,    &SPRITE_GFX[0],    Sprite_0_7TilesLen);
             }
+            else{
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Pal,    &SPRITE_PALETTE[0],    32);
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Tiles,    &SPRITE_GFX[0],    Sprite_0_8TilesLen);
+            }
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],-2,0);
+            bgUpdate();
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],-2,0);
+            bgUpdate();
+            swiWaitForVBlank();
+            updateOAM(oamTop);
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],-2,0);
+            bgUpdate();
+            swiWaitForVBlank();
             return;
         case 4:
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,-2);
+            bgUpdate();
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_5Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_5Tiles,    &SPRITE_GFX[0],    Sprite_0_5TilesLen);
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            oamTop->oamBuffer[0].y-=plsval;
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            swiWaitForVBlank();
-            oamTop->oamBuffer[0].y-=plsval;
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            if(plsval == 0){
-                swiWaitForVBlank();
-                swiWaitForVBlank();
+            if(left){
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_5Pal,    &SPRITE_PALETTE[0],    32);
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_5Tiles,    &SPRITE_GFX[0],    Sprite_0_5TilesLen);
             }
+            else{
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_6Pal,    &SPRITE_PALETTE[0],    32);
+                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_6Tiles,    &SPRITE_GFX[0],    Sprite_0_6TilesLen);
+            }
+            updateOAM(oamTop);
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,-2);
+            bgUpdate();
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,-2);
+            bgUpdate();
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,-2);
+            bgUpdate();
+            swiWaitForVBlank();
             return;
         default:
             break;
@@ -898,76 +945,92 @@ void animateHero(int dir,int frame){
             dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
             dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_0TilesLen);
             updateOAM(oamTop);
-            swiWaitForVBlank();
-            swiWaitForVBlank();
             return;
         case 1:
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],2,0);
+            bgUpdate();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],2,0);
+            bgUpdate();
+            swiWaitForVBlank();
             oamTop->oamBuffer[0].hFlip = true;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Tiles,    &SPRITE_GFX[0],    Sprite_0_8TilesLen);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],2,0);
             updateOAM(oamTop);
+            bgUpdate();
             swiWaitForVBlank();
-            oamTop->oamBuffer[0].x-=plsval;
-            updateOAM(oamTop);
-            oamTop->oamBuffer[0].x-=plsval;
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            if(plsval == 0){
-                swiWaitForVBlank();
-                swiWaitForVBlank();
-            }
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],2,0);
+            bgUpdate();
             return;
         case 2:
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,2);
+            bgUpdate();
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,2);
+            updateOAM(oamTop);
+            swiWaitForVBlank();
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_4Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_4Tiles,    &SPRITE_GFX[0],    Sprite_0_4TilesLen);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
             updateOAM(oamTop);
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,2);
+            bgUpdate();
             swiWaitForVBlank();
-            oamTop->oamBuffer[0].y-=plsval;
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            swiWaitForVBlank();
-            oamTop->oamBuffer[0].y-=plsval;
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            if(plsval == 0){
-                swiWaitForVBlank();
-                swiWaitForVBlank();
-            }
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,2);
+            bgUpdate();
             return;
         case 3:
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],-2,0);
+            bgUpdate();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],-2,0);
+            bgUpdate();
+            swiWaitForVBlank();
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Tiles,    &SPRITE_GFX[0],    Sprite_0_8TilesLen);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],-2,0);
             updateOAM(oamTop);
+            bgUpdate();
             swiWaitForVBlank();
-            oamTop->oamBuffer[0].x+=plsval;
-            updateOAM(oamTop);
-            oamTop->oamBuffer[0].x+=plsval;
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            if(plsval == 0){
-                swiWaitForVBlank();
-                swiWaitForVBlank();
-            }
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],-2,0);
+            bgUpdate();
             return;
         case 4:
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,-2);
+            bgUpdate();
+            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,-2);
+            bgUpdate();
+            swiWaitForVBlank();
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_6Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_6Tiles,    &SPRITE_GFX[0],    Sprite_0_6TilesLen);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_1Pal,    &SPRITE_PALETTE[0],    32);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_1Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,-2);
             updateOAM(oamTop);
+            bgUpdate();
             swiWaitForVBlank();
-            oamTop->oamBuffer[0].y+=plsval;
-            updateOAM(oamTop);
-            swiWaitForVBlank();
-            swiWaitForVBlank();
-            if(plsval == 0){
-                swiWaitForVBlank();
-                swiWaitForVBlank();
-            }
-            oamTop->oamBuffer[0].y+=plsval;
-            updateOAM(oamTop);
-            swiWaitForVBlank();
+            for(int i= 1; i < 4; ++i)
+                bgScroll(map2d::bgs[i],0,-2);
+            bgUpdate();
             return;
         default:
             break;
@@ -983,6 +1046,7 @@ void animateHero(int dir,int frame){
             updateOAM(oamTop);
             return;
         case 1:
+            oamTop->oamBuffer[0].hFlip = true;
             dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Pal,    &SPRITE_PALETTE[0],    32);
             dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
             updateOAM(oamTop);
@@ -990,10 +1054,11 @@ void animateHero(int dir,int frame){
         case 2:
             oamTop->oamBuffer[0].hFlip = false;
             dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_0TilesLen);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
             updateOAM(oamTop);
             return;
         case 3:
+            oamTop->oamBuffer[0].hFlip = false;
             dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Pal,    &SPRITE_PALETTE[0],    32);
             dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
             updateOAM(oamTop);
@@ -1001,7 +1066,7 @@ void animateHero(int dir,int frame){
         case 4:
             oamTop->oamBuffer[0].hFlip = false;
             dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_1Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_1Tiles,    &SPRITE_GFX[0],    Sprite_0_1TilesLen);
+            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_1Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
             updateOAM(oamTop);
             return;
         default:
@@ -1078,9 +1143,10 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
         animateHero(movedir,0);
     else{
         animateHero(movedir,2);
+        bgUpdate();
         return false;
     }
-    
+
     if(x < 10){
         if(WTW || acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60)
             for(auto a : acMap->anbindungen)
@@ -1091,11 +1157,11 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
                     SAV.acMapIdx = a.mapidx;
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     y -= a.move;
-                    x = a.mapsy + 9;
+                    x = a.mapsy + 10;
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10); 
-                    acMap->draw(x-18,y-16,true);
                     animateHero(movedir,1);
+                    acMap->draw(x-17,y-18,true);
                     animateHero(movedir,2);
                     return true;  
                 }
@@ -1111,11 +1177,11 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
                     SAV.acMapIdx = a.mapidx;
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     x -= a.move;
-                    y = a.mapsx + 9;
+                    y = a.mapsx + 10;
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10);
-                    acMap->draw(x-18,y-16,true);
                     animateHero(movedir,1);
+                    acMap->draw(x-16,y-19,true);
                     animateHero(movedir,2);
                     return true;
                 }
@@ -1131,11 +1197,11 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
                     SAV.acMapIdx = a.mapidx;
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     y -= a.move;
-                    x = 10;
+                    x = 9;
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10);
-                    acMap->draw(x-18,y-16,true);
                     animateHero(movedir,1);
+                    acMap->draw(x-15,y-18,true);
                     animateHero(movedir,2);
                     return true;
                 }
@@ -1152,25 +1218,23 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
                     SAV.acMapIdx = a.mapidx;
                     acMap = new map2d::Map("nitro://MAPS/",a.name);
                     x -= a.move;
-                    y = 10;
+                    y = 9;
                     SAV.acposx = 20 * (x-10);
                     SAV.acposy = 20 * (y-10);
-                    acMap->draw(x-18,y-16,true);
                     animateHero(movedir,1);
+                    acMap->draw(x-16,y-17,true);
                     animateHero(movedir,2);
                     return true;
                 }
             return false;
     }
-
-    if(WTW || (acmovedata == 4 || (acmovedata % 4 == 0 && acmovedata / 4 == z) || acmovedata == 0 ||acmovedata == 60))
-        acMap->draw(x-18,y-16,init);
+    if(init)
+        acMap->draw(x-16,y-18,init);    
     else
-        return false;
+        acMap->movePlayer(movedir);
     
     animateHero(movedir,1);
-    if(movedir % 2)
-        animateHero(movedir,2);
+    animateHero(movedir,2);
 
     updateOAM(oamTop);
 
@@ -1232,6 +1296,7 @@ int main(int argc, char** argv)
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
     acMap = new map2d::Map("nitro://MAPS/",SAV.acMapName);
 
+    //acMap->draw(SAV.acposx/20-6,SAV.acposy/20-8,true);
     movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
     
     cust_font.set_color(RGB(0,31,31),0);

@@ -6,6 +6,8 @@
 #include <stdio.h>
 
 namespace map2d{
+    extern int bgs[4];
+
 
     typedef struct { u16 pal[16]; } Palette;
     typedef struct{ u8 tile[32]; } Tile;
@@ -80,5 +82,6 @@ namespace map2d{
         Map(const char* Path, const char* Name);
 
         void draw(int bx,int by,bool init = false);
+        void movePlayer(int direction);
     };
 }
