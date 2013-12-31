@@ -139,14 +139,14 @@ void updateTime(bool mapMode)
 unsigned int TEMP[12288] = {0};
 unsigned short int TEMP_PAL[256] = {0};
 
-bool loadSprite(SpriteInfo* spriteInfo,const std::string& Path, const std::string& Name,const int TileCnt,const int PalCnt){
+bool loadSprite(SpriteInfo* spriteInfo,const char* Path, const char* Name,const int TileCnt,const int PalCnt){
     static const int COLORS_PER_PALETTE = 16;
     static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
                                         * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
     sizeof(SPRITE_GFX[0]);
     char pt[100];
-    sprintf(pt, "%s%s.raw",Path.c_str(),Name.c_str());
+    sprintf(pt, "%s%s.raw",Path,Name);
     FILE* fd = fopen(pt,"rb");
 
     if(fd == 0){
@@ -189,6 +189,7 @@ bool loadSpriteSub(SpriteInfo* spriteInfo,const char* Path, const char* Name,con
     fclose(fd);
     return true;
 }
+
 bool loadPKMNSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX,
                     const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny,bool female,bool flipx){
     static const int COLORS_PER_PALETTE = 16;
@@ -1826,6 +1827,43 @@ void clearTop()
     initOAMTable(oamTop);
 }
 
+int fieldCnt = 0;
+
+void initSub(int pkmIdx){
+    consoleSelect(&Bottom);
+    consoleSetWindow(&Bottom,16,0,16,16);
+    consoleClear();
+    for(int i= 0; i < 4; ++i){
+        oam->oamBuffer[15 + 2*i].isHidden = true;
+        oam->oamBuffer[16 + 2*i].isHidden = true;
+    }
+    updateOAMSub(oam);
+    if(pkmIdx < 0 || pkmIdx >= (int)SAV.PKMN_team.size() || SAV.PKMN_team[pkmIdx].boxdata.IV.isEgg){
+        consoleSelect(&Top);
+        return;
+    }
+    int u= 0;
+    for(int i= 0; i < 4; ++i)
+        if(AttackList[SAV.PKMN_team[pkmIdx].boxdata.Attack[i]].isFieldAttack){
+            oam->oamBuffer[15 + 2*(u)].isHidden = false;
+            oam->oamBuffer[16 + 2*(u)].isHidden = false;
+            oam->oamBuffer[15 + 2*(u)].y = 4 + 32 * u;
+            oam->oamBuffer[16 + 2*(u)].y = 4 + 32 * u;
+            
+            oam->oamBuffer[15 + 2*(u)].x = 152;
+            oam->oamBuffer[16 + 2*(u)].x = 192 + 24;
+            updateOAMSub(oam);
+
+            consoleSetWindow(&Bottom,16,4*u + 2,16,16);
+            printf("    %s",AttackList[SAV.PKMN_team[pkmIdx].boxdata.Attack[i]].Name.c_str());
+            ++u;
+        }
+        consoleSelect(&Top);
+
+    fieldCnt = u;
+}
+extern void initMapSprites();
+extern void movePlayerOnMap(int,int,int,bool);
 void scrnloader::run_pkmn()
 {		
     vramSetup();
@@ -1852,6 +1890,7 @@ void scrnloader::run_pkmn()
     consoleSelect(&Top);
     consoleClear();
     initTop();
+    initSub(acIn);
     consoleSetWindow(&Top,positions[acIn][0],positions[acIn][1],2,2);
     if(acIn&1)
     printf(">");
@@ -1893,9 +1932,9 @@ void scrnloader::run_pkmn()
         { 
             while(2)
             {
-                scanKeys();
                 if(keysUp() & KEY_TOUCH || keysUp() & KEY_A)
-                break;
+                    break;
+                scanKeys();
             }
             consoleClear();
             clearTop();
@@ -1904,6 +1943,7 @@ void scrnloader::run_pkmn()
             swiWaitForVBlank();
             while (1)
             {
+                initSub(-1);
                 int p = SAV.PKMN_team[acIn].draw();
                 if(p & KEY_B)
                 {
@@ -1936,6 +1976,8 @@ void scrnloader::run_pkmn()
                     printf(">");
                     else
                     printf("<");
+                    
+                    initSub(acIn);
 
                     break;
                 }
@@ -1985,6 +2027,7 @@ void scrnloader::run_pkmn()
             printf(">");
             else
             printf("<");
+            initSub(acIn);
         }
         else if (pressed & KEY_DOWN)
         {
@@ -1996,7 +2039,59 @@ void scrnloader::run_pkmn()
             printf(">");
             else
             printf("<");
+            initSub(acIn);
         }
+        for(int i= 0; i < fieldCnt; ++i)
+            if(touch.px >= 152 && touch.py >= (4 + 32*i) && touch.py < (36 + 32 * i)){
+                while(1)
+                {
+                    scanKeys();
+                    if(keysUp() & KEY_TOUCH)
+                    break; 
+                }
+                if(AttackList[SAV.PKMN_team[acIn].boxdata.Attack[i]].possible()){
+                    for (int i = 0; i < max; i++) {
+                        consoleSetWindow(&Top,positions[i][0],positions[i][1],2,2);
+                        consoleClear();
+                    }
+                    clearTop();
+                    initSub(-1);
+
+                    initOAMTableSub(oam);
+                    initMainSprites(oam,spriteInfo);
+                    setSpriteVisibility(back,true);
+                    setSpriteVisibility(save,false);
+                    setMainSpriteVisibility(false);
+                    oam->oamBuffer[8].isHidden = true;
+                    
+                    this->draw(-1);
+                    initMapSprites();
+                    movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
+
+                    AttackList[SAV.PKMN_team[acIn].boxdata.Attack[i]].use();
+                }
+                else{
+                    initSub(-1);
+
+                    initOAMTableSub(oam);
+                    initMainSprites(oam,spriteInfo);
+                    setSpriteVisibility(back,true);
+                    setSpriteVisibility(save,false);
+                    setMainSpriteVisibility(true);
+                    oam->oamBuffer[8].isHidden = true;
+                    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
+                    mbox("Diese Attacke kann jetzt\nnicht eingesetzt werden.","PokéNav");
+                    
+                    setSpriteVisibility(back,false);
+                    setSpriteVisibility(save,true);
+                    setMainSpriteVisibility(true);
+                    oam->oamBuffer[8].isHidden = false;
+                    oam->oamBuffer[8].x = SCREEN_WIDTH / 2 - 16;
+                    oam->oamBuffer[8].y = SCREEN_HEIGHT / 2 - 16;
+                    updateOAMSub(oam);
+                    initSub(acIn);
+                }
+            }
     }
     for (int i = 0; i < max; i++)
     {
@@ -2004,6 +2099,7 @@ void scrnloader::run_pkmn()
         consoleClear();
     }
     clearTop();
+    initSub(-1);
 
     initOAMTableSub(oam);
     initMainSprites(oam,spriteInfo);

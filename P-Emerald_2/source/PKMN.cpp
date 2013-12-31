@@ -1023,9 +1023,24 @@ namespace POKEMON{
                 cust_font2.print_string(buf,35,58,true);
                 if(!(this->boxdata.IV.isEgg))
                 {
-                    printf("Geschlüpft am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
-                    printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
-                    printf("Mag %s""e Pokériegel.\n\n",&(this->boxdata.getTasteStr()[0]));
+                    sprintf(buf,"Geschlüpft am %i.%i.%i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
+                    cust_font2.print_string(buf,28,72,true);
+                    sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
+                    cust_font2.print_string(buf,35,86,true);
+
+                    if(!this->boxdata.fateful){
+                        sprintf(buf, "Besitzt ein %s""es Wesen,",&(NatureList[this->boxdata.getNature()][0]));
+                        cust_font2.print_string(buf,28,100,true);
+                        sprintf(buf, "%s"".",&(PersonalityList[this->boxdata.getPersonality()][0]));
+                        cust_font2.print_string(buf,35,114,true);
+                
+                        sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
+                        cust_font2.print_string(buf,28,128,true);
+                    }
+                    else{
+                        sprintf(buf, "Besitzt ein %s""es Wesen.",&(NatureList[this->boxdata.getNature()][0]));
+                        cust_font2.print_string(buf,28,100,true);
+                    }
                 }
             }	
         }
@@ -1047,12 +1062,30 @@ namespace POKEMON{
             } 
             else
             {
-                printf("Off. als Ei erh. am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2],getLoc(boxdata.gotPlace));
+                sprintf(buf, "Off. Als Ei erh. am %i.%i.%i", boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2]);
+                cust_font2.print_string(buf,28,44,true);
+                sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
+                cust_font2.print_string(buf,35,58,true);
                 if(!(this->boxdata.IV.isEgg))
                 {
-                    printf("Geschl\x81""pft am %i.%i.%i\n in/bei ""%s"".\n\n",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
-                    printf("Besitzt ein %s""es Wesen,\n %s"".\n\n",&(NatureList[this->boxdata.getNature()][0]),&(PersonalityList[this->boxdata.getPersonality()][0]));
-                    printf("Mag %s""e Pok\x82""riegel.\n\n",this->boxdata.getTasteStr().c_str());
+                    sprintf(buf,"Geschlüpft am %i.%i.%i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
+                    cust_font2.print_string(buf,28,72,true);
+                    sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
+                    cust_font2.print_string(buf,35,86,true);
+
+                    if(!this->boxdata.fateful){
+                        sprintf(buf, "Besitzt ein %s""es Wesen,",&(NatureList[this->boxdata.getNature()][0]));
+                        cust_font2.print_string(buf,28,100,true);
+                        sprintf(buf, "%s"".",&(PersonalityList[this->boxdata.getPersonality()][0]));
+                        cust_font2.print_string(buf,35,114,true);
+                
+                        sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
+                        cust_font2.print_string(buf,28,128,true);
+                    }
+                    else{
+                        sprintf(buf, "Besitzt ein %s""es Wesen.",&(NatureList[this->boxdata.getNature()][0]));
+                        cust_font2.print_string(buf,28,100,true);
+                    }
                 }
             }
             if (this->boxdata.fateful)

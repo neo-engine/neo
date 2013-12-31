@@ -93,8 +93,8 @@ int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen);
 bool loadNavScreen(u16* layer,const char* Name,int no);
 bool loadPicture(u16* layer,const char* Path, const char* Name,int palsize = 512,int tilecnt = 192*256);
 bool loadPictureSub(u16* layer,const char* Path, const char* Name,int palsize = 512,int tilecnt = 192*256);
-bool laodSprite(SpriteInfo* spriteInfo,const char* Path, const char* Name);
-bool laodSpriteSub(SpriteInfo* spriteInfo,const char* Path, const char* Name);
+bool loadSprite(SpriteInfo* spriteInfo,const char* Path, const char* Name,const int TileCnt,const int PalCnt);
+bool loadSpriteSub(SpriteInfo* spriteInfo,const char* Path, const char* Name,const int TileCnt,const int PalCnt);
 bool loadPKMNSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX,
                     const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny = false,bool female = false,bool flipx = false);
 bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX,

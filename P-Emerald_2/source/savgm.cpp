@@ -53,6 +53,7 @@ savgm::savgm(void Func(int))
     Func(30);
     
     fscanf(fd,"%i %i %i %i %s %i ",&acposx,&acposy,&acposz,&acMapIdx,acMapName,&acMoveMode);
+    fscanf(fd,"%hi ",&this->owIdx);
 
     int a; fscanf(fd,"%i ",&a);
     this->PKMN_team = std::vector<POKEMON::PKMN>(a);
@@ -69,6 +70,7 @@ savgm::savgm(void Func(int))
             box_of_st_pkmn[stored_pkmn[i].SPEC].push_back(i);
     }
     Func(40);
+
     for (int i = 0; i < 649; i++)
     {
         fscanf(fd,"%i ",&booltemp);
@@ -106,6 +108,7 @@ bool savgm::save(void Func(int))
     Func(30);
     
     fprintf(fd,"%i %i %i %i %s %i ",acposx,acposy,acposz,acMapIdx,acMapName,acMoveMode);
+    fprintf(fd,"%hi ",this->owIdx);
 
     fprintf(fd,"%i ",(this->PKMN_team).size());
     for(size_t i = 0; i < this->PKMN_team.size(); ++i)

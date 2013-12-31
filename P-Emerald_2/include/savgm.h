@@ -40,6 +40,9 @@ class savgm
         //Team
         std::vector<POKEMON::PKMN> PKMN_team;
         
+        u8 owIdx;
+        bool showBlackBorder;
+
         u8 flags[1000];
         
         int acposx, acposy, acposz;

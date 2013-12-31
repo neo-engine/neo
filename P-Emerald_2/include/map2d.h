@@ -82,6 +82,6 @@ namespace map2d{
         Map(const char* Path, const char* Name);
 
         void draw(int bx,int by,bool init = false);
-        void movePlayer(int direction);
+        void movePlayer(int direction,bool clear = false);
     };
 }

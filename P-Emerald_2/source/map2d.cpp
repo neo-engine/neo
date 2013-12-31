@@ -174,7 +174,7 @@ namespace map2d{
     int lastrow, lastcol;
     int lastbx, lastby;
 
-    void Map::movePlayer(int direction) {
+    void Map::movePlayer(int direction,bool clear) {
         int c = 0;
         u16* mapMemory[4];
         for(int i= 0; i< 4; ++i)  mapMemory[i] = (u16*)BG_MAP_RAM(i);
@@ -198,6 +198,10 @@ namespace map2d{
             ymax = lastbx + 17;
             plsval = 60;
             
+            if(clear){
+                lastrow = (lastrow + 15) % 16;
+                lastbx--;
+            }
             break;
         case 3:
             c = lastrow * 2;
@@ -211,6 +215,10 @@ namespace map2d{
             ymax = lastbx + 2;
             plsval = 60;
             
+            if(clear){
+                lastrow = (lastrow + 1) % 16;
+                lastbx++;
+            }
             break;
         case 2:
             lastcol = (lastcol + 1) % 16;
@@ -224,6 +232,10 @@ namespace map2d{
             ymax = lastbx + 17;
             plsval = 32;
             
+            if(clear){
+                lastcol = (lastcol + 15) % 16;
+                lastby--;
+            }
             break;
         case 4:
             c = lastcol * 64;
@@ -236,7 +248,12 @@ namespace map2d{
             xmax = lastby + 2;
             ymin = lastbx;
             ymax = lastbx + 17;
-            plsval = 32;
+            plsval = 32;  
+            
+            if(clear){
+                lastcol = (lastcol + 1) % 16;
+                lastby++;
+            }
         }
         int c2 = c;
         for(int x = xmin; x < xmax; x++){
@@ -250,7 +267,9 @@ namespace map2d{
                     acBlock = this->b.blocks[rand[x%2][y%2]];                    
                 else
                     acBlock = this->b.blocks[blocks[x][y].blockidx];
-                    
+
+                if(clear)
+                    acBlock = this->b.blocks[0];                    
                 
                 if(acBlock.topbehave != 0x10)
                     std::swap(toplayer,betw);
@@ -282,43 +301,43 @@ namespace map2d{
             c += plsval;
         }
         
-        
-        switch(direction) {
-        case 2: case 4:
-            for(int i = 1; i < 4; ++i){
-                u16 q[32];
-                for(int g = 0; g < 32; ++g)
-                    q[g] = mapMemory[i][c2 + g];
-                for(int o = 0; o < 32; ++o)
-                    mapMemory[i][c2 + o] = q[(o + 32 - 2*(lr+1))%32];
+        if(!clear)
+            switch(direction) {
+            case 2: case 4:
+                for(int i = 1; i < 4; ++i){
+                    u16 q[32];
+                    for(int g = 0; g < 32; ++g)
+                        q[g] = mapMemory[i][c2 + g];
+                    for(int o = 0; o < 32; ++o)
+                        mapMemory[i][c2 + o] = q[(o + 32 - 2*(lr+1))%32];
+                }
+                c2 += 32;
+                for(int i = 1; i < 4; ++i){
+                    u16 q[32];
+                    for(int g = 0; g < 32; ++g)
+                        q[g] = mapMemory[i][c2 + g];
+                    for(int o = 0; o < 32; ++o)
+                        mapMemory[i][c2 + o] = q[(o + 32 - 2*(lr+1))%32];
+                }
+                break;
+            case 1: case 3:
+                for(int i = 1; i < 4; ++i){
+                    u16 q[32];
+                    for(int g = 0; g < 32; ++g)
+                        q[g] = mapMemory[i][c2 + 32*g];
+                    for(int o = 0; o < 32; ++o)
+                        mapMemory[i][c2 + 32*o] = q[(o + 32 - 2*(lc+1))%32];
+                }
+                c2++;
+                for(int i = 1; i < 4; ++i){
+                    u16 q[32];
+                    for(int g = 0; g < 32; ++g)
+                        q[g] = mapMemory[i][c2 + 32*g];
+                    for(int o = 0; o < 32; ++o)
+                        mapMemory[i][c2 + 32*o] = q[(o + 32 - 2*(lc+1))%32];
+                }
+                break;
             }
-            c2 += 32;
-            for(int i = 1; i < 4; ++i){
-                u16 q[32];
-                for(int g = 0; g < 32; ++g)
-                    q[g] = mapMemory[i][c2 + g];
-                for(int o = 0; o < 32; ++o)
-                    mapMemory[i][c2 + o] = q[(o + 32 - 2*(lr+1))%32];
-            }
-            break;
-        case 1: case 3:
-            for(int i = 1; i < 4; ++i){
-                u16 q[32];
-                for(int g = 0; g < 32; ++g)
-                    q[g] = mapMemory[i][c2 + 32*g];
-                for(int o = 0; o < 32; ++o)
-                    mapMemory[i][c2 + 32*o] = q[(o + 32 - 2*(lc+1))%32];
-            }
-            c2++;
-            for(int i = 1; i < 4; ++i){
-                u16 q[32];
-                for(int g = 0; g < 32; ++g)
-                    q[g] = mapMemory[i][c2 + 32*g];
-                for(int o = 0; o < 32; ++o)
-                    mapMemory[i][c2 + 32*o] = q[(o + 32 - 2*(lc+1))%32];
-            }
-            break;
-        }
     }
     
     void Map::draw(int bx,int by,bool init){

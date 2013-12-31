@@ -36,15 +36,15 @@
 #include "Male.h"
 #include "Female.h"
 
-#include "Sprite_0_0.h"
-#include "Sprite_0_1.h"
-#include "Sprite_0_2.h"
-#include "Sprite_0_3.h"
-#include "Sprite_0_4.h"
-#include "Sprite_0_5.h"
-#include "Sprite_0_6.h"
-#include "Sprite_0_7.h"
-#include "Sprite_0_8.h"
+//#include "Sprite_0_0.h"
+//#include "Sprite_0_1.h"
+//#include "Sprite_0_2.h"
+//#include "Sprite_0_3.h"
+//#include "Sprite_0_4.h"
+//#include "Sprite_0_5.h"
+//#include "Sprite_0_6.h"
+//#include "Sprite_0_7.h"
+//#include "Sprite_0_8.h"
 
 OAMTable *oam = new OAMTable();
 SpriteInfo spriteInfo[SPRITE_COUNT];
@@ -414,6 +414,10 @@ INDIVIDUALISIERUNG:
     ynbox yn  = ynbox(M);
     consoleSetWindow(&Bottom, 1,1,22,MAXLINES);	
     SAV.IsMale = !yn.getResult("Bist du ein Mädchen?");
+    if(SAV.IsMale)
+        SAV.owIdx = 0;
+    else
+        SAV.owIdx = 1;
     consoleClear();
     M.clear();
     keyboard K = keyboard();
@@ -604,6 +608,35 @@ void vramSetup()
     vramSetBankH(VRAM_H_LCD);
 }
 
+bool cut::possible(){
+    return false;
+}
+bool rock_smash::possible(){
+    return false;
+}
+bool fly::possible(){
+    return false;
+}
+bool flash::possible(){
+    return false;
+}
+bool whirlpool::possible(){
+    return false;
+}
+bool surf::possible(){
+    return false;
+}
+
+
+void cut::use(){ }
+void rock_smash::use(){ }
+void fly::use(){ }
+void flash::use(){ }
+void whirlpool::use(){ }
+void surf::use(){
+
+}
+
 void startScreen(){
     
     vramSetup();
@@ -764,6 +797,7 @@ START:
             free_spaces.push_back(i);
         }
        
+        SAV.owIdx = 0;
         strcpy(SAV.acMapName ,"0/1");
         SAV.acMapIdx = 243;
         SAV.acposx = 16*20, SAV.acposy = 16*20, SAV.acposz = 3;
@@ -800,21 +834,21 @@ void showNewMap(int mapIdx) {
 }
 
 bool left = false;
+void loadframe(SpriteInfo* si, int idx, int frame){
+    char buf[50];
+    sprintf(buf,"Sprite_%i_%i",idx,frame);
+    loadSprite(si,"nitro://PICS/SPRITES/OW/",buf,64,16);
+}
 
 void animateHero(int dir,int frame){
     left = !left;
-    int plsval = 0;
-    if((MoveMode)SAV.acMoveMode == BIKE)
-        plsval += 3;
-    if(keysHeld() & KEY_B)
-        plsval += 2;
+    bool bike = (MoveMode)SAV.acMoveMode == BIKE, run = keysHeld() & KEY_B;
     if(frame == 0){
         switch (dir)
         {
         case 0:
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_0TilesLen);
+            loadframe(&spriteInfoTop[0],SAV.owIdx,0);
             updateOAM(oamTop);
             swiWaitForVBlank();
             swiWaitForVBlank();
@@ -824,20 +858,26 @@ void animateHero(int dir,int frame){
                 bgScroll(map2d::bgs[i],2,0);
             bgUpdate();
             oamTop->oamBuffer[0].hFlip = true;
-            if(left){
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Pal,    &SPRITE_PALETTE[0],    32);
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Tiles,    &SPRITE_GFX[0],    Sprite_0_7TilesLen);
+            if(!run){
+                if(left)
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,7);            
+                else
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,8);
             }
             else{
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Pal,    &SPRITE_PALETTE[0],    32);
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Tiles,    &SPRITE_GFX[0],    Sprite_0_8TilesLen);
+                if(left)
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,16);            
+                else
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,17);
             }
+            
             updateOAM(oamTop);
             swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],2,0);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],2,0);
             bgUpdate();
@@ -846,27 +886,33 @@ void animateHero(int dir,int frame){
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],2,0);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             return;
         case 2:
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,2);
             bgUpdate();
             oamTop->oamBuffer[0].hFlip = false;
-            if(left){
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_3Pal,    &SPRITE_PALETTE[0],    32);
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_3Tiles,    &SPRITE_GFX[0],    Sprite_0_3TilesLen);
+            if(!run){
+                if(left)
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,3);            
+                else
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,4);
             }
             else{
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_4Pal,    &SPRITE_PALETTE[0],    32);
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_4Tiles,    &SPRITE_GFX[0],    Sprite_0_4TilesLen);
+                if(left)
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,12);            
+                else
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,13);
             }
             updateOAM(oamTop);
             swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,2);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,2);
             bgUpdate();
@@ -874,27 +920,33 @@ void animateHero(int dir,int frame){
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,2);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             return;
         case 3:
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],-2,0);
             bgUpdate();
             oamTop->oamBuffer[0].hFlip = false;
-            if(left){
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Pal,    &SPRITE_PALETTE[0],    32);
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_7Tiles,    &SPRITE_GFX[0],    Sprite_0_7TilesLen);
+            if(!run){
+                if(left)
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,7);            
+                else
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,8);
             }
             else{
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Pal,    &SPRITE_PALETTE[0],    32);
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_8Tiles,    &SPRITE_GFX[0],    Sprite_0_8TilesLen);
+                if(left)
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,16);            
+                else
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,17);
             }
             updateOAM(oamTop);
             swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],-2,0);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],-2,0);
             bgUpdate();
@@ -903,27 +955,33 @@ void animateHero(int dir,int frame){
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],-2,0);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             return;
         case 4:
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,-2);
             bgUpdate();
             oamTop->oamBuffer[0].hFlip = false;
-            if(left){
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_5Pal,    &SPRITE_PALETTE[0],    32);
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_5Tiles,    &SPRITE_GFX[0],    Sprite_0_5TilesLen);
+            if(!run){
+                if(left)
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,5);            
+                else
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,6);
             }
             else{
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_6Pal,    &SPRITE_PALETTE[0],    32);
-                dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_6Tiles,    &SPRITE_GFX[0],    Sprite_0_6TilesLen);
+                if(left)
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,14);            
+                else
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,15);
             }
             updateOAM(oamTop);
             swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,-2);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,-2);
             bgUpdate();
@@ -931,7 +989,8 @@ void animateHero(int dir,int frame){
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,-2);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             return;
         default:
             break;
@@ -942,22 +1001,25 @@ void animateHero(int dir,int frame){
         {
         case 0:
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_0TilesLen);
+            loadframe(&spriteInfoTop[0],SAV.owIdx,0);
             updateOAM(oamTop);
             return;
         case 1:
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],2,0);
             bgUpdate();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],2,0);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             oamTop->oamBuffer[0].hFlip = true;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            if(!run)
+                loadframe(&spriteInfoTop[0],SAV.owIdx,2);
+            else
+                loadframe(&spriteInfoTop[0],SAV.owIdx,11);
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],2,0);
             updateOAM(oamTop);
@@ -968,18 +1030,23 @@ void animateHero(int dir,int frame){
             bgUpdate();
             return;
         case 2:
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,2);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,2);
             updateOAM(oamTop);
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            if(!run)
+                loadframe(&spriteInfoTop[0],SAV.owIdx,0);
+            else
+                loadframe(&spriteInfoTop[0],SAV.owIdx,9);
             updateOAM(oamTop);
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,2);
@@ -990,17 +1057,21 @@ void animateHero(int dir,int frame){
             bgUpdate();
             return;
         case 3:
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],-2,0);
             bgUpdate();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],-2,0);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            if(!run)
+                loadframe(&spriteInfoTop[0],SAV.owIdx,2);
+            else
+                loadframe(&spriteInfoTop[0],SAV.owIdx,11);
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],-2,0);
             updateOAM(oamTop);
@@ -1011,18 +1082,23 @@ void animateHero(int dir,int frame){
             bgUpdate();
             return;
         case 4:
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,-2);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,-2);
             bgUpdate();
-            swiWaitForVBlank();
+            if(!run)
+                swiWaitForVBlank();
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_1Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_1Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            if(!run)
+                loadframe(&spriteInfoTop[0],SAV.owIdx,1);
+            else
+                loadframe(&spriteInfoTop[0],SAV.owIdx,10);
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,-2);
             updateOAM(oamTop);
@@ -1041,38 +1117,46 @@ void animateHero(int dir,int frame){
         {
         case 0:
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_0TilesLen);
+            loadframe(&spriteInfoTop[0],SAV.owIdx,0);
             updateOAM(oamTop);
             return;
         case 1:
             oamTop->oamBuffer[0].hFlip = true;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            if(!run)
+                loadframe(&spriteInfoTop[0],SAV.owIdx,2);
+            else
+                loadframe(&spriteInfoTop[0],SAV.owIdx,11);
             updateOAM(oamTop);
             return;
         case 2:
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            if(!run)
+                loadframe(&spriteInfoTop[0],SAV.owIdx,0);
+            else
+                loadframe(&spriteInfoTop[0],SAV.owIdx,9);
             updateOAM(oamTop);
             return;
         case 3:
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_2Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            if(!run)
+                loadframe(&spriteInfoTop[0],SAV.owIdx,2);
+            else
+                loadframe(&spriteInfoTop[0],SAV.owIdx,11);
+            loadframe(&spriteInfoTop[0],SAV.owIdx,2);
             updateOAM(oamTop);
             return;
         case 4:
             oamTop->oamBuffer[0].hFlip = false;
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_1Pal,    &SPRITE_PALETTE[0],    32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_1Tiles,    &SPRITE_GFX[0],    Sprite_0_2TilesLen);
+            if(!run)
+                loadframe(&spriteInfoTop[0],SAV.owIdx,1);
+            else
+                loadframe(&spriteInfoTop[0],SAV.owIdx,10);
             updateOAM(oamTop);
             return;
         default:
             break;
         }
-    }
+    } 
 }
 
 bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
@@ -1125,7 +1209,9 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
         movedir = 2;
     else if(oldx > y)
         movedir = 4;
-
+    
+    if(!init && SAV.showBlackBorder) //Show black border instead of mapTiles while moving
+        acMap->movePlayer(movedir,true);
    
     if(lastmovedata == 0 && acmovedata %4 == 0)
         SAV.acposz = z = acmovedata / 4;
@@ -1274,8 +1360,33 @@ void initMapSprites(){
     SQCHA->priority = OBJPRIORITY_2;
     SQCHA->palette = 0;
 
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Pal,    &SPRITE_PALETTE[0],    32);
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Sprite_0_0Tiles,    &SPRITE_GFX[0],    Sprite_0_0TilesLen);
+    loadframe(SQCHAInfo,SAV.owIdx,0);
+}
+
+int stepcnt = 0;
+void stepincrease(){
+    stepcnt = (stepcnt + 1)%256;
+    if(stepcnt == 0){
+        for(size_t s = 0; s < SAV.PKMN_team.size(); ++s){
+            POKEMON::PKMN& ac = SAV.PKMN_team[s];
+
+            if(ac.boxdata.IV.isEgg){
+                ac.boxdata.steps--;
+                if(ac.boxdata.steps == 0){
+                    ac.boxdata.IV.isEgg = false;
+                    ac.boxdata.hatchPlace = SAV.acMapIdx;
+                    ac.boxdata.hatchDate[0] = acday;
+                    ac.boxdata.hatchDate[1] = acmonth + 1;
+                    ac.boxdata.hatchDate[2] = (acyear + 1900) % 100 ;
+                    char buf[50];
+                    sprintf(buf,"%ls schüpfte\naus dem Ei!",ac.boxdata.Name);
+                    mbox M(buf);
+                }
+            }
+            else
+                ac.boxdata.steps = std::min(255, ac.boxdata.steps + 1);
+        }
+    }
 }
 
 int main(int argc, char** argv) 
@@ -1295,8 +1406,8 @@ int main(int argc, char** argv)
         
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
     acMap = new map2d::Map("nitro://MAPS/",SAV.acMapName);
+    SAV.showBlackBorder = false;
 
-    //acMap->draw(SAV.acposx/20-6,SAV.acposy/20-8,true);
     movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
     
     cust_font.set_color(RGB(0,31,31),0);
@@ -1350,11 +1461,7 @@ int main(int argc, char** argv)
             printf("%s %i\n",SAV.acMapName,SAV.acMapIdx);
             printf("topbehave %i;\n bottombehave %i",acMap->b.blocks[acMap->blocks[SAV.acposy/20 + 10][SAV.acposx/20 + 10].blockidx].topbehave,
                 acMap->b.blocks[acMap->blocks[SAV.acposy/20 + 10][SAV.acposx/20 + 10].blockidx].bottombehave);
-        }        
-        if(held & KEY_START && gMod == DEVELOPER){
-            acMap->draw(0,0,true);
-            continue;
-        }
+        }   
         //Moving
         if(pressed & KEY_DOWN){
             animateHero(2,2);
@@ -1376,32 +1483,40 @@ int main(int argc, char** argv)
         if(held & KEY_DOWN)
         {
             scanKeys();
-            if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy+MOV)/20,SAV.acposz,false))
+            if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy+MOV)/20,SAV.acposz,false)){
                 SAV.acposy+=MOV; 
+                stepincrease();
+            }
             if(SAV.acMoveMode != BIKE)
                 continue;
         }
         if (held & KEY_LEFT)
         {
             scanKeys();
-            if(movePlayerOnMap((SAV.acposx-MOV)/20,SAV.acposy/20,SAV.acposz,false))
+            if(movePlayerOnMap((SAV.acposx-MOV)/20,SAV.acposy/20,SAV.acposz,false)){
                 SAV.acposx-=MOV;
+                stepincrease();
+            }
             if(SAV.acMoveMode != BIKE)
                 continue;
         }
         if (held & KEY_RIGHT)
         {
             scanKeys();
-            if(movePlayerOnMap((SAV.acposx+MOV)/20,SAV.acposy/20,SAV.acposz,false))
+            if(movePlayerOnMap((SAV.acposx+MOV)/20,SAV.acposy/20,SAV.acposz,false)){
                 SAV.acposx+=MOV;
+                stepincrease();
+            }
             if(SAV.acMoveMode != BIKE)
                 continue;
         }
         if (held & KEY_UP)
         {
             scanKeys();
-            if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy-MOV)/20,SAV.acposz,false))
+            if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy-MOV)/20,SAV.acposz,false)){
                 SAV.acposy-=MOV;
+                stepincrease();
+            }
             if(SAV.acMoveMode != BIKE)
                 continue;
         }
@@ -1494,6 +1609,10 @@ int main(int argc, char** argv)
                     char A []= {1,2,3,4};
                     for(int i = 0;i<6;++i)
                     {
+                        A[0] = 5 + HILFSCOUNTER % 6;
+                        A[1] = 5 + (HILFSCOUNTER+1) % 6;
+                        A[2] = 5 + (HILFSCOUNTER+2) % 6;
+                        A[3] = 5 + (HILFSCOUNTER+3) % 6;
                         POKEMON::PKMN a(A,HILFSCOUNTER,0,
                         1+rand()%100,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;
@@ -1529,6 +1648,8 @@ int main(int argc, char** argv)
                 char A []= {1,2,3,4};
                 for(int i = 0;i<6;++i)
                 {
+                    A[0] = HILFSCOUNTER % 10;
+                    A[1] = (HILFSCOUNTER+1) % 10;
                     POKEMON::PKMN a(A,HILFSCOUNTER,0,
                     1+rand()%100,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                     a.stats.acHP = i*a.stats.maxHP/5;
