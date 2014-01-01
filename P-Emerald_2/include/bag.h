@@ -40,6 +40,6 @@ public:
 
     std::pair<int,int> element_at(BAGTYPE,int);
     void draw();
-private:
+
     std::vector<std::pair<int,int> > bags[8];
 };

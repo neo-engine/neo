@@ -2049,9 +2049,14 @@ void scrnloader::run_pkmn()
                     if(keysUp() & KEY_TOUCH)
                     break; 
                 }
-                if(AttackList[SAV.PKMN_team[acIn].boxdata.Attack[i]]->possible()){
-                    for (int i = 0; i < max; i++) {
-                        consoleSetWindow(&Top,positions[i][0],positions[i][1],2,2);
+                int u = 0,o;
+                for(o = 0; o < 4 && u <= i; ++o)
+                    if(AttackList[SAV.PKMN_team[acIn].boxdata.Attack[o]]->isFieldAttack)
+                        u++;
+                o--;
+                if(AttackList[SAV.PKMN_team[acIn].boxdata.Attack[o]]->possible()){
+                    for (int i2 = 0; i2 < max; i2++) {
+                        consoleSetWindow(&Top,positions[i2][0],positions[i2][1],2,2);
                         consoleClear();
                     }
                     clearTop();
@@ -2068,7 +2073,12 @@ void scrnloader::run_pkmn()
                     initMapSprites();
                     movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
 
-                    AttackList[SAV.PKMN_team[acIn].boxdata.Attack[i]]->use();
+                    char buf[50];
+                    sprintf(buf,"%ls setzt %s\nein!",SAV.PKMN_team[acIn].boxdata.Name,AttackList[SAV.PKMN_team[acIn].boxdata.Attack[o]]->Name.c_str());
+                    mbox(buf,true,true);
+                    shoUseAttack(SAV.PKMN_team[acIn].boxdata.SPEC,SAV.PKMN_team[acIn].boxdata.isFemale,SAV.PKMN_team[acIn].boxdata.isShiny());
+                    AttackList[SAV.PKMN_team[acIn].boxdata.Attack[o]]->use();
+                    return;
                 }
                 else{
                     initSub(-1);

@@ -53,9 +53,16 @@ savgm::savgm(void Func(int))
     Func(30);
     
     fscanf(fd,"%i %i %i %i %s %i ",&acposx,&acposy,&acposz,&acMapIdx,acMapName,&acMoveMode);
-    fscanf(fd,"%hhu ",&this->owIdx);
+    fscanf(fd,"%hhu",&this->owIdx);
 
-    int a; fscanf(fd,"%i ",&a);
+    int a;
+    for(int i= 0; i < 8; ++i){
+        fscanf(fd," %i ",&a);
+        this->Bag.bags[i].assign(a,std::pair<int,int>(0,0));
+        fread(&this->Bag.bags[i][0],sizeof(std::pair<int,int>),a,fd);
+    }
+    
+    fscanf(fd," %i ",&a);
     this->PKMN_team = std::vector<POKEMON::PKMN>(a);
     for(int i= 0; i< a; ++i)
         fread(&this->PKMN_team[i],sizeof(POKEMON::PKMN),1,fd);
@@ -73,13 +80,14 @@ savgm::savgm(void Func(int))
 
     for (int i = 0; i < 649; i++)
     {
-        fscanf(fd,"%i ",&booltemp);
+        fscanf(fd," %i ",&booltemp);
         inDex[i] = bool(booltemp);
         Func(40 + (30*(i/649)));
     }
     
-    fscanf(fd,"%i ",&booltemp);
+    fscanf(fd," %i ",&booltemp);
     hasGDex = bool(booltemp);
+    fread(this->flags,1,1000,fd);
     Func(100);
     fclose(fd);
     good = true;
@@ -108,9 +116,14 @@ bool savgm::save(void Func(int))
     Func(30);
     
     fprintf(fd,"%i %i %i %i %s %i ",acposx,acposy,acposz,acMapIdx,acMapName,acMoveMode);
-    fprintf(fd,"%hhc ",this->owIdx);
+    fprintf(fd,"%hhu",this->owIdx);
 
-    fprintf(fd,"%i ",(this->PKMN_team).size());
+    for(int i= 0; i < 8; ++i){
+        fprintf(fd," %i ",this->Bag.bags[i].size());
+        fwrite(this->Bag.bags[i].data(),sizeof(std::pair<int,int>),this->Bag.bags[i].size(),fd);
+    }
+
+    fprintf(fd," %i ",(this->PKMN_team).size());
     for(size_t i = 0; i < this->PKMN_team.size(); ++i)
         //I->save(fd);
         fwrite(&(PKMN_team[i]),1,sizeof(POKEMON::PKMN),fd);
@@ -123,13 +136,15 @@ bool savgm::save(void Func(int))
     for (int i = 0; i < 649; i++)
     {
         booltemp = (inDex[i]?1:0);
-        fprintf(fd,"%i ",booltemp);
+        fprintf(fd," %i",booltemp);
     }
     Func(50);
 
     
     booltemp = hasGDex;
-    fprintf(fd,"%i ",booltemp);
+    fprintf(fd," %i ",booltemp);
+
+    fwrite(this->flags,1,1000,fd);
     Func(100);
     fclose(fd);
     return true;
