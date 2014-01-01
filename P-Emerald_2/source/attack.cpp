@@ -4,36 +4,36 @@
 #define A (attack::AffectsTypes)
 #define F (attack::Flags)
 #define H (attack::HitTypes)
-attack AttackList[560] = {
+attack* AttackList[560] = {
     //attack(_Name,     _Effect,_Base_Power,_type,    _Accuracy, _PP,_E.Accuracy,_Aff._whom,_Priority,Flags,_HitType)
-    attack("----",          C 0,    C 0,    UNBEKANNT,  C 0,     C 0,    C 0,        A 0,    C 0,    F 0,    H 0),
-    attack("Pfund",         C 0,    C 40,   NORMAL,     C 0,     C 35,   C 0,        A 0,    C 1,    F 35,   H 0),
-    attack("Karateschlag",  C 0,    C 50,   KAMPF,      C 90,    C 25,   C 0,        A 0,    C 1,    F 35,   H 0),
-    attack("Duplexhieb",    C 5,    C 15,   NORMAL,     C 85,    C 25,   C 0,        A 0,    C 1,    F 35,   H 0),
-    attack("Kometenhieb",   C 5,    C 18,   NORMAL,     C 85,    C 25,   C 0,        A 0,    C 1,    F 35,   H 0),
-    attack("Megahieb",      C 0,    C 80,   NORMAL,     C 85,    C 20,   C 0,        A 0,    C 1,    F 35,   H 0),
-    attack("Zahltag",       C 6,    C 40,   NORMAL,     C 0,     C 20,   C 0,        A 0,    C 1,    F 50,   H 0),
-    attack("Feuerschlag",   C 7,    C 80,   FEUER,      C 0,     C 15,   C 30,       A 0,    C 1,    F 35,   H 0),
-    attack("Eishieb",       C 8,    C 80,   EIS,        C 0,     C 15,   C 30,       A 0,    C 1,    F 35,   H 0),
-    attack("Donnerschlag",  C 9,    C 80,   ELEKTRO,    C 0,     C 15,   C 30,       A 0,    C 1,    F 35,   H 0),
-    attack("Kratzer",       C 0,    C 40,   NORMAL,     C 0,     C 35,   C 0,        A 0,    C 1,    F 35,   H 0),
-    attack("Klammer",       C 0,    C 55,   NORMAL,     C 0,     C 30,   C 0,        A 0,    C 1,    F 35,   H 0),
-    attack("Guillotine",    C 10,   C 0,    NORMAL,     C 0,     C 5,    C 30,       A 0,    C 1,    F 35,   H 0),
-    attack("Klingensturm",  C 11,   C 80,   NORMAL,     C 0,     C 10,   C 0,        A 0,    C 1,    F 34,   H 1),
-    attack("Schwerttanz",   C 12,   C 0,    NORMAL,     C 0,     C 30,   C 0,        A 16,   C 1,    F 8,    H 2),
-    cut(),
-    attack("Windstoß",      C 0,    C 40,   FLUG,       C 0,     C 35,   C 0,        A 0,    C 1,    F 34,   H 1),
-    attack("Flügelschlag",  C 0,    C 60,   FLUG,       C 0,     C 35,   C 0,        A 0,    C 1,    F 35,   H 0),
-    attack("Wirbelwind",    C 13,   C 0,    FLUG,       C 0,     C 20,   C 0,        A 0,    C 1,    F 38,   H 2),
-    fly(),
-    attack("Klammergriff",  C 14,   C 15,   NORMAL,     C 75,    C 20,   C 0,        A 0,    C 1,    F 35,   H 0),    
-    attack("Slam",          C 0,    C 80,   NORMAL,     C 75,    C 20,   C 0,        A 0,    C 1,    F 35,   H 0),    
-    attack("Rankenhieb",    C 0,    C 35,   PFLANZE,    C 0,     C 15,   C 0,        A 0,    C 1,    F 35,   H 0),    
+    new attack("----",          C 0,    C 0,    UNBEKANNT,  C 100,     C 0,    C 0,        A 0,    C 0,    F 0,    H 0),
+    new attack("Pfund",         C 0,    C 40,   NORMAL,     C 100,     C 35,   C 0,        A 0,    C 1,    F 35,   H 0),
+    new attack("Karateschlag",  C 0,    C 50,   KAMPF,      C 90,    C 25,   C 0,        A 0,    C 1,    F 35,   H 0),
+    new attack("Duplexhieb",    C 5,    C 15,   NORMAL,     C 85,    C 25,   C 0,        A 0,    C 1,    F 35,   H 0),
+    new attack("Kometenhieb",   C 5,    C 18,   NORMAL,     C 85,    C 25,   C 0,        A 0,    C 1,    F 35,   H 0),
+    new attack("Megahieb",      C 0,    C 80,   NORMAL,     C 85,    C 20,   C 0,        A 0,    C 1,    F 35,   H 0),
+    new attack("Zahltag",       C 6,    C 40,   NORMAL,     C 100,     C 20,   C 0,        A 0,    C 1,    F 50,   H 0),
+    new attack("Feuerschlag",   C 7,    C 80,   FEUER,      C 100,     C 15,   C 30,       A 0,    C 1,    F 35,   H 0),
+    new attack("Eishieb",       C 8,    C 80,   EIS,        C 100,     C 15,   C 30,       A 0,    C 1,    F 35,   H 0),
+    new attack("Donnerschlag",  C 9,    C 80,   ELEKTRO,    C 100,     C 15,   C 30,       A 0,    C 1,    F 35,   H 0),
+    new attack("Kratzer",       C 0,    C 40,   NORMAL,     C 100,     C 35,   C 0,        A 0,    C 1,    F 35,   H 0),
+    new attack("Klammer",       C 0,    C 55,   NORMAL,     C 100,     C 30,   C 0,        A 0,    C 1,    F 35,   H 0),
+    new attack("Guillotine",    C 10,   C 0,    NORMAL,     C 30,     C 5,    C 0,       A 0,    C 1,    F 35,   H 0),
+    new attack("Klingensturm",  C 11,   C 80,   NORMAL,     C 100,     C 10,   C 0,        A 0,    C 1,    F 34,   H 1),
+    new attack("Schwerttanz",   C 12,   C 0,    NORMAL,     C 100,     C 30,   C 0,        A 16,   C 1,    F 8,    H 2),
+    new cut(),
+    new attack("Windstoß",      C 0,    C 40,   FLUG,       C 100,     C 35,   C 0,        A 0,    C 1,    F 34,   H 1),
+    new attack("Flügelschlag",  C 0,    C 60,   FLUG,       C 100,     C 35,   C 0,        A 0,    C 1,    F 35,   H 0),
+    new attack("Wirbelwind",    C 13,   C 0,    FLUG,       C 100,     C 20,   C 0,        A 0,    C 1,    F 38,   H 2),
+    new fly(),
+    new attack("Klammergriff",  C 14,   C 15,   NORMAL,     C 75,    C 20,   C 0,        A 0,    C 1,    F 35,   H 0),    
+    new attack("Slam",          C 0,    C 80,   NORMAL,     C 75,    C 20,   C 0,        A 0,    C 1,    F 35,   H 0),    
+    new attack("Rankenhieb",    C 0,    C 35,   PFLANZE,    C 100,     C 15,   C 0,        A 0,    C 1,    F 35,   H 0),    
 
-    rock_smash(),
-    flash(),
-    whirlpool(),
-    surf()
+    new rock_smash(),
+    new flash(),
+    new whirlpool(),
+    new surf()
     /*
 
 023 | Stampfer | Normal | Physisch | 65 | 100 | 20 | Stärke 

@@ -1844,7 +1844,7 @@ void initSub(int pkmIdx){
     }
     int u= 0;
     for(int i= 0; i < 4; ++i)
-        if(AttackList[SAV.PKMN_team[pkmIdx].boxdata.Attack[i]].isFieldAttack){
+        if(AttackList[SAV.PKMN_team[pkmIdx].boxdata.Attack[i]]->isFieldAttack){
             oam->oamBuffer[15 + 2*(u)].isHidden = false;
             oam->oamBuffer[16 + 2*(u)].isHidden = false;
             oam->oamBuffer[15 + 2*(u)].y = 4 + 32 * u;
@@ -1855,7 +1855,7 @@ void initSub(int pkmIdx){
             updateOAMSub(oam);
 
             consoleSetWindow(&Bottom,16,4*u + 2,16,16);
-            printf("    %s",AttackList[SAV.PKMN_team[pkmIdx].boxdata.Attack[i]].Name.c_str());
+            printf("    %s",AttackList[SAV.PKMN_team[pkmIdx].boxdata.Attack[i]]->Name.c_str());
             ++u;
         }
         consoleSelect(&Top);
@@ -2049,7 +2049,7 @@ void scrnloader::run_pkmn()
                     if(keysUp() & KEY_TOUCH)
                     break; 
                 }
-                if(AttackList[SAV.PKMN_team[acIn].boxdata.Attack[i]].possible()){
+                if(AttackList[SAV.PKMN_team[acIn].boxdata.Attack[i]]->possible()){
                     for (int i = 0; i < max; i++) {
                         consoleSetWindow(&Top,positions[i][0],positions[i][1],2,2);
                         consoleClear();
@@ -2068,7 +2068,7 @@ void scrnloader::run_pkmn()
                     initMapSprites();
                     movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
 
-                    AttackList[SAV.PKMN_team[acIn].boxdata.Attack[i]].use();
+                    AttackList[SAV.PKMN_team[acIn].boxdata.Attack[i]]->use();
                 }
                 else{
                     initSub(-1);

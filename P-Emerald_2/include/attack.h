@@ -3,14 +3,7 @@
 #include "type.h"
 #include <string>
 
-
-class field_attack {
-public:
-    virtual void use() {  }
-    virtual bool possible() { return false; }
-};
-
-class attack : public field_attack
+class attack
 {
 public:
     std::string Name;
@@ -56,8 +49,9 @@ public:
         Effect_accuracy(_Effect_accuracy),Affects_whom(_Affects_whom),Priority(_Priority),Flag(_Flag), HitType(_HitType) { }
     ~attack() { }
 
-    bool possible() { return false; }
-    void use() { }
+    virtual bool possible() { return false; }
+    virtual void use() { }
+    virtual const char* text() { return 0;}
 };
 class cut : public attack{                                                //VM01
 public: 
@@ -66,6 +60,7 @@ public:
         (char)0, SELECTED, (char)1, (Flags)(MAKES_CONTACT | PROTECT | KINGS_ROCK),PHYS) {
         this->isFieldAttack = true;
     }
+    const char* text() override { return "Ein kleiner Baum."; }
 };         
 class rock_smash : public attack{                                                //VM02
 public: 
@@ -74,6 +69,7 @@ public:
         (char)30, SELECTED, (char)1, (Flags)(MAKES_CONTACT | PROTECT | KINGS_ROCK),PHYS) {
         this->isFieldAttack = true;
     }
+    const char* text() override { return "Ein kleiner Felsen"; }
 };            
 class fly : public attack{                                                //VM03
 public: 
@@ -82,6 +78,7 @@ public:
         (char)100, SELECTED, (char)1, (Flags)(MAKES_CONTACT | PROTECT | KINGS_ROCK),PHYS) {
         this->isFieldAttack = true;
     }
+    const char* text() override { return "Freier Himmel."; }
 };         
 class flash : public attack{                                                //VM04
 public: 
@@ -90,6 +87,7 @@ public:
         (char)100, SELECTED, (char)1, (Flags)(PROTECT | MAGIC_COAT),STAT) {
         this->isFieldAttack = true;
     }
+    const char* text() override { return "Eine dunkle Höhle."; }
 };        
 class whirlpool : public attack{                                                //VM05
 public: 
@@ -98,6 +96,7 @@ public:
         (char)100, SELECTED, (char)1, (Flags)(PROTECT | KINGS_ROCK),SPEC) {
         this->isFieldAttack = true;
     }
+    const char* text() override { return "Ein Strudel."; }
 };      
 class surf : public attack{                                                //VM06
 public: 
@@ -106,12 +105,22 @@ public:
         (char)100, BOTH_FOES_AND_PARTNER, (char)1, (Flags)(PROTECT | KINGS_ROCK),SPEC) {
         this->isFieldAttack = true;
     }
+    const char* text() override { return "Das Wasser ist tiefblau."; }
 }; 
-class dive : public attack{public: void use(){} bool possible(){return false;} };         //VM07
-class defog : public attack{public: void use(){} bool possible(){return false;} };        //VM08
-class strength : public attack{public: void use(){} bool possible(){return false;} };     //VM09
-class rock_climb : public attack{public: void use(){} bool possible(){return false;} };   //VM10
-class kaskade : public attack{public: void use(){} bool possible(){return false;} };      //VM11
+class dive : public attack{public: void use(){} bool possible(){return false;} 
+    const char* text() override { return "Das Meer scheint hier\nbesonders tief."; }};         //VM07
+class defog : public attack{public: void use(){} bool possible(){return false;}
+    const char* text() override { return "Dichter Nebel."; } };        //VM08
+class strength : public attack{public: void use(){} bool possible(){return false;} 
+    const char* text() override { return "Ein großer Felsen."; }};     //VM09
+class rock_climb : public attack{public: void use(){} bool possible(){return false;} 
+    const char* text() override { return "Eine steile Felswand."; }};   //VM10
+class kaskade : public attack{public: void use(){} bool possible(){return false;}
+    const char* text() override { return "Ein Wasselfall."; } };      //VM11
 
-class teleport : public attack{public: void use(){} bool possible(){return false;} };
-class headbutt : public attack{public: void use(){} bool possible(){return false;} };
+class teleport : public attack{public: void use(){} bool possible(){return false;} 
+    const char* text() override { return "Zu gefährlich hier?"; }};
+class headbutt : public attack{public: void use(){} bool possible(){return false;} 
+    const char* text() override { return "Da hat sich etwas bewegt!"; }};
+class lockduft : public attack{public: void use(){} bool possible(){return false;} 
+    const char* text() override { return "Der Geruch wilder Pokémon\nliegt in der Luft."; }};

@@ -508,122 +508,69 @@ item ItemList[700] = {
     key_item("Aschetasche"),    key_item("Wailmerkanne"),
     key_item("Sphaerensegm"),   key_item("GrueneKugel"),
     key_item("Tresorkapsel"),   key_item("RoteKugel"),
-    key_item("BlaueKugel"),     key_item("Mytokristall")
+    key_item("BlaueKugel"),     key_item("Mytokristall"),
+
+    item("Schoenschuppe"),      item("Evolith"),
+    item("Leichtstein"),        item("Beulenhelm"),
+    item("Luftballon"),         item("RoteKarte"),
+    item("Zielscheibe"),        item("Klammerband"),
+    item("Knolle"),             item("Akku"),
+    item("Fluchtknopf"),   
+
+    item("Feuerjuwel"),         item("Wasserjuwel"),
+    item("Elektrojuwel"),       item("Pflanzjuwel"),
+    item("Eisjuwel"),           item("Kampfjuwel"),
+    item("Giftjuwel"),          item("Bodenjuwel"),
+    item("Flugjuwel"),          item("Psychojuwel"),
+    item("Kaeferjuwel"),        item("Gesteinjuwel"),
+    item("Geistjuwel"),         item("Drakojuwel"),
+    item("Unlichtjuwel"),       item("Stahljuwel"),
+    item("Normaljuwel"),
+
+    medicine("Heilfeder"),      medicine("Kraftfeder"),
+    medicine("Abwehrfeder"),    medicine("Geniefeder"),
+    medicine("Espritfeder"),    medicine("Flinkfeder"),
+    item("Prachtfeder"),
+
+    item("Schildfossil"),       item("Federfossil"),
+
+    key_item("Gartenpass"),
+    item("Transferorb"),        item("Traumball"),
+    key_item("Deko-Box"),       key_item("Drakoschaedel"),
+
+    item("Duftpilz"),           item("Riesennugget"),
+    item("Triperle"),           item("Kometstück"),
+    item("AlterHeller"),        item("AlterTaler"),
+    item("AlterDukat"),         item("AlteVase"),
+    item("AlterReif"),          item("AlteStatue"),
+    item("AlteKrone"),          
+    
+    medicine("Stratos-Eis"),
+
+    item("Null"),    item("Null"),    item("Null"),    item("Null"),
+    item("Null"),    item("Null"),    item("Null"),    item("Null"),
+    item("Null"),    item("Null"),    item("Null"),    item("Null"),
+    item("Null"),    item("Null"),    item("Null"),    item("Null"),
+    item("Null"),    item("Null"),    item("Null"),    item("Null"),
+    item("Null"),    item("Null"),    item("Null"),    item("Null"),
+
+    key_item("Lichtstein"),
+    key_item("Dunkelstein"),
+    TM("TM93"),
+    TM("TM94"),
+    TM("TM95"),
+    key_item("Viso-Caster"),
+    key_item("Briefpost"),
+    key_item("Briefpost"),
+    key_item("Briefpost"),
+    key_item("Medaillenbox"),
+    key_item("DNS-Keil"),
+    key_item("Genehmigung"),
+    key_item("Ovalpin"),
+    key_item("Schillerpin"),
+    key_item("Plasmakarte"),
+    key_item("Schnaeuztuch"),
+    key_item("Achromat"),
+    key_item("Fundsache"),
+    key_item("Wahrspiegel")
 };
-
-/*
-
-537	 0x0219	Prism Scale	Prism Scale	Bag Items pocket icon.png	 Items pocket
-538	 0x021A	Eviolite	Eviolite	Bag Items pocket icon.png	 Items pocket
-539	 0x021B	Float Stone	Float Stone	Bag Items pocket icon.png	 Items pocket
-540	 0x021C	Rocky Helmet	Rocky Helmet	Bag Items pocket icon.png	 Items pocket
-541	 0x021D	Air Balloon	Air Balloon	Bag Items pocket icon.png	 Items pocket
-542	 0x021E	Red Card	Red Card	Bag Items pocket icon.png	 Items pocket
-543	 0x021F	Ring Target	Ring Target	Bag Items pocket icon.png	 Items pocket
-544	 0x0220	Binding Band	Binding Band	Bag Items pocket icon.png	 Items pocket
-545	 0x0221	Absorb Bulb	Absorb Bulb	Bag Items pocket icon.png	 Items pocket
-546	 0x0222	Cell Battery	Cell Battery	Bag Items pocket icon.png	 Items pocket
-547	 0x0223	Eject Button	Eject Button	Bag Items pocket icon.png	 Items pocket
-548	 0x0224	Fire Gem	Fire Gem	Bag Items pocket icon.png	 Items pocket
-549	 0x0225	Water Gem	Water Gem	Bag Items pocket icon.png	 Items pocket
-550	 0x0226	Electric Gem	Electric Gem	Bag Items pocket icon.png	 Items pocket
-551	 0x0227	Grass Gem	Grass Gem	Bag Items pocket icon.png	 Items pocket
-552	 0x0228	Ice Gem	Ice Gem	Bag Items pocket icon.png	 Items pocket
-553	 0x0229	Fighting Gem	Fighting Gem	Bag Items pocket icon.png	 Items pocket
-554	 0x022A	Poison Gem	Poison Gem	Bag Items pocket icon.png	 Items pocket
-555	 0x022B	Ground Gem	Ground Gem	Bag Items pocket icon.png	 Items pocket
-556	 0x022C	Flying Gem	Flying Gem	Bag Items pocket icon.png	 Items pocket
-557	 0x022D	Psychic Gem	Psychic Gem	Bag Items pocket icon.png	 Items pocket
-558	 0x022E	Bug Gem	Bug Gem	Bag Items pocket icon.png	 Items pocket
-559	 0x022F	Rock Gem	Rock Gem	Bag Items pocket icon.png	 Items pocket
-560	 0x0230	Ghost Gem	Ghost Gem	Bag Items pocket icon.png	 Items pocket
-561	 0x0231	Dragon Gem	Dragon Gem	Bag Items pocket icon.png	 Items pocket
-562	 0x0232	Dark Gem	Dark Gem	Bag Items pocket icon.png	 Items pocket
-563	 0x0233	Steel Gem	Steel Gem	Bag Items pocket icon.png	 Items pocket
-564	 0x0234	Normal Gem	Normal Gem	Bag Items pocket icon.png	 Items pocket
-
-565	 0x0235	Health Wing	Health Wing	Bag Medicine pocket icon.png	 Medicine pocket
-566	 0x0236	Muscle Wing	Muscle Wing	Bag Medicine pocket icon.png	 Medicine pocket
-567	 0x0237	Resist Wing	Resist Wing	Bag Medicine pocket icon.png	 Medicine pocket
-568	 0x0238	Genius Wing	Genius Wing	Bag Medicine pocket icon.png	 Medicine pocket
-569	 0x0239	Clever Wing	Clever Wing	Bag Medicine pocket icon.png	 Medicine pocket
-570	 0x023A	Swift Wing	Swift Wing	Bag Medicine pocket icon.png	 Medicine pocket
-
-571	 0x023B	Pretty Wing	Pretty Wing	Bag Items pocket icon.png	 Items pocket
-572	 0x023C	Cover Fossil	Cover Fossil	Bag Items pocket icon.png	 Items pocket
-573	 0x023D	Plume Fossil	Plume Fossil	Bag Items pocket icon.png	 Items pocket
-
-574	 0x023E	Liberty Pass	Liberty Pass	Bag Key items pocket icon.png	 Key items pocket
-
-575	 0x023F	Pass Orb	Pass Orb	Bag Items pocket icon.png	 Items pocket
-
-576	 0x0240	Dream Ball	Dream Ball	Bag Poké Balls pocket icon.png	 Poké Balls pocket
-
-577	 0x0241	Poké Toy	Poké Toy	Bag Items pocket icon.png	 Items pocket
-
-578	 0x0242	Prop Case	Prop Case	Bag Key items pocket icon.png	 Key items pocket
-579	 0x0243	Dragon Skull	Dragon Skull	Bag Key items pocket icon.png	 Key items pocket
-
-580	 0x0244	BalmMushroom	BalmMushroom	Bag Items pocket icon.png	 Items pocket
-581	 0x0245	Big Nugget	Big Nugget	Bag Items pocket icon.png	 Items pocket
-582	 0x0246	Pearl String	Pearl String	Bag Items pocket icon.png	 Items pocket
-583	 0x0247	Comet Shard	Comet Shard	Bag Items pocket icon.png	 Items pocket
-584	 0x0248	Relic Copper	Relic Copper	Bag Items pocket icon.png	 Items pocket
-585	 0x0249	Relic Silver	Relic Silver	Bag Items pocket icon.png	 Items pocket
-586	 0x024A	Relic Gold	Relic Gold	Bag Items pocket icon.png	 Items pocket
-587	 0x024B	Relic Vase	Relic Vase	Bag Items pocket icon.png	 Items pocket
-588	 0x024C	Relic Band	Relic Band	Bag Items pocket icon.png	 Items pocket
-589	 0x024D	Relic Statue	Relic Statue	Bag Items pocket icon.png	 Items pocket
-590	 0x024E	Relic Crown	Relic Crown	Bag Items pocket icon.png	 Items pocket
-
-591	 0x024F	Casteliacone	Casteliacone	Bag Medicine pocket icon.png	 Medicine pocket
-
-592	 0x0250	Dire Hit 2	Dire Hit 2	Bag Unknown pocket icon.png	 Unknown pocket
-593	 0x0251	X Speed 2	X Speed 2	Bag Unknown pocket icon.png	 Unknown pocket
-594	 0x0252	X Special 2	X Special 2	Bag Unknown pocket icon.png	 Unknown pocket
-595	 0x0253	X Sp. Def 2	X Sp. Def 2	Bag Unknown pocket icon.png	 Unknown pocket
-596	 0x0254	X Defend 2	X Defend 2	Bag Unknown pocket icon.png	 Unknown pocket
-597	 0x0255	X Attack 2	X Attack 2	Bag Unknown pocket icon.png	 Unknown pocket
-598	 0x0256	X Accuracy 2	X Accuracy 2	Bag Unknown pocket icon.png	 Unknown pocket
-599	 0x0257	X Speed 3	X Speed 3	Bag Unknown pocket icon.png	 Unknown pocket
-600	 0x0258	X Special 3	X Special 3	Bag Unknown pocket icon.png	 Unknown pocket
-601	 0x0259	X Sp. Def 3	X Sp. Def 3	Bag Unknown pocket icon.png	 Unknown pocket
-602	 0x025A	X Defend 3	X Defend 3	Bag Unknown pocket icon.png	 Unknown pocket
-603	 0x025B	X Attack 3	X Attack 3	Bag Unknown pocket icon.png	 Unknown pocket
-604	 0x025C	X Accuracy 3	X Accuracy 3	Bag Unknown pocket icon.png	 Unknown pocket
-605	 0x025D	X Speed 6	X Speed 6	Bag Unknown pocket icon.png	 Unknown pocket
-606	 0x025E	X Special 6	X Special 6	Bag Unknown pocket icon.png	 Unknown pocket
-607	 0x025F	X Sp. Def 6	X Sp. Def 6	Bag Unknown pocket icon.png	 Unknown pocket
-608	 0x0260	X Defend 6	X Defend 6	Bag Unknown pocket icon.png	 Unknown pocket
-609	 0x0261	X Attack 6	X Attack 6	Bag Unknown pocket icon.png	 Unknown pocket
-610	 0x0262	X Accuracy 6	X Accuracy 6	Bag Unknown pocket icon.png	 Unknown pocket
-611	 0x0263	Ability Urge	Ability Urge	Bag Unknown pocket icon.png	 Unknown pocket
-612	 0x0264	Item Drop	Item Drop	Bag Unknown pocket icon.png	 Unknown pocket
-613	 0x0265	Item Urge	Item Urge	Bag Unknown pocket icon.png	 Unknown pocket
-614	 0x0266	Reset Urge	Reset Urge	Bag Unknown pocket icon.png	 Unknown pocket
-615	 0x0267	Dire Hit 3	Dire Hit 3	Bag Unknown pocket icon.png	 Unknown pocket
-
-616	 0x0268	Light Stone	Light Stone	Bag Key items pocket icon.png	 Key items pocket
-617	 0x0269	Dark Stone	Dark Stone	Bag Key items pocket icon.png	 Key items pocket
-618	 0x026A	TM Electric	TM93	Bag TMs and HMs pocket icon.png	 TMs and HMs pocket
-619	 0x026B	TM Fighting	TM94	Bag TMs and HMs pocket icon.png	 TMs and HMs pocket
-620	 0x026C	TM Dark	TM95	Bag TMs and HMs pocket icon.png	 TMs and HMs pocket
-621	 0x026D	Xtransceiver-m	Xtransceiver	Bag Key items pocket icon.png	 Key items pocket
-622	 0x026E	God Stone	God Stone	Bag Key items pocket icon.png	 Key items pocket
-623	 0x026F	Gram	Gram 1	Bag Key items pocket icon.png	 Key items pocket
-624	 0x0270	Gram	Gram 2	Bag Key items pocket icon.png	 Key items pocket
-625	 0x0271	Gram	Gram 3	Bag Key items pocket icon.png	 Key items pocket
-626	 0x0272	Xtransceiver-f	Xtransceiver	Bag Key items pocket icon.png	 Key items pocket
-627	 0x0273	Medal Box	Medal Box*	Bag Key items pocket icon.png	 Key items pocket
-628	 0x0274	DNA Splicers	DNA Splicers*	Bag Key items pocket icon.png	 Key items pocket
-629	 0x0275	DNA Splicers	DNA Splicers*	Bag Key items pocket icon.png	 Key items pocket
-630	 0x0276	Permit	Permit*	Bag Key items pocket icon.png	 Key items pocket
-631	 0x0277	Oval Charm	Oval Charm*	Bag Key items pocket icon.png	 Key items pocket
-632	 0x0278	Shiny Charm	Shiny Charm*	Bag Key items pocket icon.png	 Key items pocket
-633	 0x0279	Plasma Card	Plasma Card*	Bag Key items pocket icon.png	 Key items pocket
-634	 0x027A	Grubby Hanky	Grubby Hanky*	Bag Key items pocket icon.png	 Key items pocket
-635	 0x027B	Colress MCHN	Colress MCHN*	Bag Key items pocket icon.png	 Key items pocket
-636	 0x027C	Dropped Item-m	Dropped Item*	Bag Key items pocket icon.png	 Key items pocket
-637	 0x027D	Dropped Item-f	Dropped Item*	Bag Key items pocket icon.png	 Key items pocket
-638	 0x027E	Reveal Glass	Reveal Glass*	Bag Key items pocket icon.png	 Key items pocket
-*/

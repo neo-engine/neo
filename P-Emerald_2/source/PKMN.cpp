@@ -19,7 +19,7 @@
 extern std::string readString(FILE*);
 extern std::wstring readWString(FILE*);
 
-extern attack AttackList[560];
+extern attack* AttackList[560];
 std::string PKMNBallList[30];
 std::string TMList[100];
 std::string KeyItemList[50];
@@ -591,7 +591,7 @@ namespace POKEMON{
             for(int i= 0; i< 6; ++i) this->ConStats[i] = 0;
             for(int i= 0; i< 4; ++i) this->ribbons1[i] = 0;
             for(int i= 0; i< 4; ++i) this->Attack[i] = Attacks[i];
-            for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[Attacks[i]].PP; /// ...
+            for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[Attacks[i]]->PP; /// ...
             for(int i= 0; i< 4; ++i) this->PPUps[i] = 0;
             this->IV = IV_struct(rand()%32,rand()%32,rand()%32,rand()%32,rand()%32,rand()%32,false,_isEgg);
             for(int i= 0; i< 4; ++i) this->ribbons0[i] = 0;
@@ -840,17 +840,38 @@ namespace POKEMON{
                 {
                     if(this->boxdata.Attack[i] == 0)
                         break;
-                    Type t = AttackList[this->boxdata.Attack[i]].type;
+                    Type t = AttackList[this->boxdata.Attack[i]]->type;
                     drawTypeIcon(oamTop,spriteInfoTop,a2,b2,c2,t,126,43+32*i,false);
 
                     if(t == data.Types[0] || t == data.Types[1])
                         printf("\x1b[32m");
 
-                    printf("    %s\n    AP %2i""/""%2i %s\n    S %3i  G %3i",
-                        &(AttackList[this->boxdata.Attack[i]].Name[0]),this->boxdata.AcPP[i],
-                        AttackList[this->boxdata.Attack[i]].PP* ((5 +this->boxdata.PPUps[i]) / 5),
-                        "STS",AttackList[this->boxdata.Attack[i]].Base_Power,
-                        AttackList[this->boxdata.Attack[i]].Accuracy);
+                    printf("    %s\n    AP %2i""/""%2i ",
+                        &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
+                        AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.PPUps[i]) / 5));
+                    switch (AttackList[this->boxdata.Attack[i]]->HitType)
+                    {
+                    case attack::PHYS:
+                        printf("PHS");
+                        break;
+                    case attack::SPEC:
+                        printf("SPC");
+                        break;
+                    case attack::STAT:
+                        printf("STS");
+                        break;
+                    }
+                    printf("\n    S ");
+                    if(AttackList[this->boxdata.Attack[i]]->Base_Power)
+                        printf("%3i",AttackList[this->boxdata.Attack[i]]->Base_Power);
+                    else
+                        printf("---");
+                    printf(" G ");
+                    if(AttackList[this->boxdata.Attack[i]]->Accuracy)
+                        printf("%3i",AttackList[this->boxdata.Attack[i]]->Accuracy);
+                    else
+                        printf("---");
+
                     printf("\n\n");
                     updateOAM(oamTop);
                     printf("\x1b[39m");

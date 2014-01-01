@@ -36,15 +36,7 @@
 #include "Male.h"
 #include "Female.h"
 
-//#include "Sprite_0_0.h"
-//#include "Sprite_0_1.h"
-//#include "Sprite_0_2.h"
-//#include "Sprite_0_3.h"
-//#include "Sprite_0_4.h"
-//#include "Sprite_0_5.h"
-//#include "Sprite_0_6.h"
-//#include "Sprite_0_7.h"
-//#include "Sprite_0_8.h"
+#include "BigCirc1.h"
 
 OAMTable *oam = new OAMTable();
 SpriteInfo spriteInfo[SPRITE_COUNT];
@@ -608,6 +600,15 @@ void vramSetup()
     vramSetBankH(VRAM_H_LCD);
 }
 
+int lastdir;
+int dir[5][2] = {{0,0},{0,1},{1,0},{0,-1},{-1,0}};
+enum MoveMode{
+    WALK,
+    SURF,
+    BIKE
+};
+int MOV = 20;
+
 bool cut::possible(){
     return false;
 }
@@ -624,18 +625,10 @@ bool whirlpool::possible(){
     return false;
 }
 bool surf::possible(){
-    return false;
+    return SAV.acMoveMode != SURF && acMap->blocks[SAV.acposy/20 + 10 + dir[lastdir][0]][SAV.acposx/20 + 10 + dir[lastdir][1]].movedata == 4;
 }
 
-
-void cut::use(){ }
-void rock_smash::use(){ }
-void fly::use(){ }
-void flash::use(){ }
-void whirlpool::use(){ }
-void surf::use(){
-
-}
+bool heroIsBig = false;
 
 void startScreen(){
     
@@ -696,7 +689,7 @@ START:
 
     BG_PALETTE[3] = BG_PALETTE_SUB[3] = RGB15(0,0,0);
 
-    printf("@ RedArceus 2012 - 2013\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+    printf("@ RedArceus 2012 - 2014\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     if(gMod == DEVELOPER)
     printf("             Developer's version\n");
     else if(gMod == BETA)
@@ -808,11 +801,6 @@ START:
     swiWaitForVBlank();
 }
 
-enum MoveMode{
-    WALK,
-    SURF,
-    BIKE
-};
 
 int mode = -1;
 void showNewMap(int mapIdx) {
@@ -834,10 +822,13 @@ void showNewMap(int mapIdx) {
 }
 
 bool left = false;
-void loadframe(SpriteInfo* si, int idx, int frame){
+void loadframe(SpriteInfo* si, int idx, int frame,bool big = false){
     char buf[50];
     sprintf(buf,"Sprite_%i_%i",idx,frame);
-    loadSprite(si,"nitro://PICS/SPRITES/OW/",buf,64,16);
+    if(!big)
+        loadSprite(si,"nitro://PICS/SPRITES/OW/",buf,64,16);
+    else
+        loadSprite(si,"nitro://PICS/SPRITES/OW/",buf,128,16);
 }
 
 void animateHero(int dir,int frame){
@@ -848,7 +839,7 @@ void animateHero(int dir,int frame){
         {
         case 0:
             oamTop->oamBuffer[0].hFlip = false;
-            loadframe(&spriteInfoTop[0],SAV.owIdx,0);
+            loadframe(&spriteInfoTop[0],SAV.owIdx,0,heroIsBig);
             updateOAM(oamTop);
             swiWaitForVBlank();
             swiWaitForVBlank();
@@ -860,15 +851,15 @@ void animateHero(int dir,int frame){
             oamTop->oamBuffer[0].hFlip = true;
             if(!run){
                 if(left)
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,7);            
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,7,heroIsBig);            
                 else
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,8);
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,8,heroIsBig);
             }
             else{
                 if(left)
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,16);            
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,16,heroIsBig);            
                 else
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,17);
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,17,heroIsBig);
             }
             
             updateOAM(oamTop);
@@ -896,15 +887,15 @@ void animateHero(int dir,int frame){
             oamTop->oamBuffer[0].hFlip = false;
             if(!run){
                 if(left)
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,3);            
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,3,heroIsBig);            
                 else
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,4);
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,4,heroIsBig);
             }
             else{
                 if(left)
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,12);            
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,12,heroIsBig);            
                 else
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,13);
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,13,heroIsBig);
             }
             updateOAM(oamTop);
             swiWaitForVBlank();
@@ -930,15 +921,15 @@ void animateHero(int dir,int frame){
             oamTop->oamBuffer[0].hFlip = false;
             if(!run){
                 if(left)
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,7);            
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,7,heroIsBig);            
                 else
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,8);
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,8,heroIsBig);
             }
             else{
                 if(left)
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,16);            
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,16,heroIsBig);            
                 else
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,17);
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,17,heroIsBig);
             }
             updateOAM(oamTop);
             swiWaitForVBlank();
@@ -965,15 +956,15 @@ void animateHero(int dir,int frame){
             oamTop->oamBuffer[0].hFlip = false;
             if(!run){
                 if(left)
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,5);            
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,5,heroIsBig);            
                 else
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,6);
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,6,heroIsBig);
             }
             else{
                 if(left)
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,14);            
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,14,heroIsBig);            
                 else
-                    loadframe(&spriteInfoTop[0],SAV.owIdx,15);
+                    loadframe(&spriteInfoTop[0],SAV.owIdx,15,heroIsBig);
             }
             updateOAM(oamTop);
             swiWaitForVBlank();
@@ -1001,7 +992,7 @@ void animateHero(int dir,int frame){
         {
         case 0:
             oamTop->oamBuffer[0].hFlip = false;
-            loadframe(&spriteInfoTop[0],SAV.owIdx,0);
+            loadframe(&spriteInfoTop[0],SAV.owIdx,0,heroIsBig);
             updateOAM(oamTop);
             return;
         case 1:
@@ -1017,9 +1008,9 @@ void animateHero(int dir,int frame){
                 swiWaitForVBlank();
             oamTop->oamBuffer[0].hFlip = true;
             if(!run)
-                loadframe(&spriteInfoTop[0],SAV.owIdx,2);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,2,heroIsBig);
             else
-                loadframe(&spriteInfoTop[0],SAV.owIdx,11);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,11,heroIsBig);
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],2,0);
             updateOAM(oamTop);
@@ -1044,9 +1035,9 @@ void animateHero(int dir,int frame){
                 swiWaitForVBlank();
             oamTop->oamBuffer[0].hFlip = false;
             if(!run)
-                loadframe(&spriteInfoTop[0],SAV.owIdx,0);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,0,heroIsBig);
             else
-                loadframe(&spriteInfoTop[0],SAV.owIdx,9);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,9,heroIsBig);
             updateOAM(oamTop);
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,2);
@@ -1069,9 +1060,9 @@ void animateHero(int dir,int frame){
                 swiWaitForVBlank();
             oamTop->oamBuffer[0].hFlip = false;
             if(!run)
-                loadframe(&spriteInfoTop[0],SAV.owIdx,2);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,2,heroIsBig);
             else
-                loadframe(&spriteInfoTop[0],SAV.owIdx,11);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,11,heroIsBig);
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],-2,0);
             updateOAM(oamTop);
@@ -1096,9 +1087,9 @@ void animateHero(int dir,int frame){
                 swiWaitForVBlank();
             oamTop->oamBuffer[0].hFlip = false;
             if(!run)
-                loadframe(&spriteInfoTop[0],SAV.owIdx,1);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,1,heroIsBig);
             else
-                loadframe(&spriteInfoTop[0],SAV.owIdx,10);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,10,heroIsBig);
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],0,-2);
             updateOAM(oamTop);
@@ -1123,34 +1114,34 @@ void animateHero(int dir,int frame){
         case 1:
             oamTop->oamBuffer[0].hFlip = true;
             if(!run)
-                loadframe(&spriteInfoTop[0],SAV.owIdx,2);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,2,heroIsBig);
             else
-                loadframe(&spriteInfoTop[0],SAV.owIdx,11);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,11,heroIsBig);
             updateOAM(oamTop);
             return;
         case 2:
             oamTop->oamBuffer[0].hFlip = false;
             if(!run)
-                loadframe(&spriteInfoTop[0],SAV.owIdx,0);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,0,heroIsBig);
             else
-                loadframe(&spriteInfoTop[0],SAV.owIdx,9);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,9,heroIsBig);
             updateOAM(oamTop);
             return;
         case 3:
             oamTop->oamBuffer[0].hFlip = false;
             if(!run)
-                loadframe(&spriteInfoTop[0],SAV.owIdx,2);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,2,heroIsBig);
             else
-                loadframe(&spriteInfoTop[0],SAV.owIdx,11);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,11,heroIsBig);
             loadframe(&spriteInfoTop[0],SAV.owIdx,2);
             updateOAM(oamTop);
             return;
         case 4:
             oamTop->oamBuffer[0].hFlip = false;
             if(!run)
-                loadframe(&spriteInfoTop[0],SAV.owIdx,1);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,1,heroIsBig);
             else
-                loadframe(&spriteInfoTop[0],SAV.owIdx,10);
+                loadframe(&spriteInfoTop[0],SAV.owIdx,10,heroIsBig);
             updateOAM(oamTop);
             return;
         default:
@@ -1194,9 +1185,12 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
     if(!WTW){
         if(acmovedata == 1)
             return false ;
-        if( (acmovedata == 4 && playermoveMode != SURF )
-            || (acmovedata != 4 && playermoveMode == SURF) )
+        if( (acmovedata == 4 && playermoveMode != SURF ) )
             return false;
+    }
+    if(acmovedata == 0xc && playermoveMode == SURF){
+        SAV.acMoveMode = WALK;
+
     }
 
     int movedir = 0;
@@ -1361,6 +1355,96 @@ void initMapSprites(){
     SQCHA->palette = 0;
 
     loadframe(SQCHAInfo,SAV.owIdx,0);
+
+    SQCHAInfo = &spriteInfoTop[1]; 
+    SQCHA = &oamTop->oamBuffer[1];
+    SQCHAInfo->oamId = 1;
+    SQCHAInfo->width = 32;
+    SQCHAInfo->height = 32;
+    SQCHAInfo->angle = 0;
+    SQCHAInfo->entry = SQCHA;
+    SQCHA->y = 72;
+    SQCHA->isRotateScale = false;
+    SQCHA->blendMode = OBJMODE_NORMAL;
+    SQCHA->isMosaic = true;
+    SQCHA->colorMode = OBJCOLOR_16;
+    SQCHA->shape = OBJSHAPE_SQUARE;
+    SQCHA->isHidden = true;
+    SQCHA->x = 112;
+    SQCHA->size = OBJSIZE_32;
+    SQCHA->gfxIndex = 16;
+    SQCHA->priority = OBJPRIORITY_2;
+    SQCHA->palette = 0;
+
+    SpriteInfo * B2Info = &spriteInfoTop[2];
+    SpriteEntry * B2 = &oamTop->oamBuffer[2];
+    B2Info->oamId = 2;
+    B2Info->width = 64;
+    B2Info->height = 64;
+    B2Info->angle = 0;
+    B2Info->entry = B2;
+    B2->isRotateScale = false;
+    B2->blendMode = OBJMODE_NORMAL;
+    B2->isMosaic = false;
+    B2->colorMode = OBJCOLOR_16;
+    B2->shape = OBJSHAPE_SQUARE;
+    B2->isHidden = true;
+    B2->size = OBJSIZE_64;
+    B2->gfxIndex = 32;
+    B2->priority = OBJPRIORITY_1;
+    B2->palette = 1;
+    B2->x = 64;
+    B2->y = 32;
+    
+    B2 = &oamTop->oamBuffer[3];
+    B2->isRotateScale = false;
+    B2->blendMode = OBJMODE_NORMAL;
+    B2->isMosaic = false;
+    B2->colorMode = OBJCOLOR_16;
+    B2->shape = OBJSHAPE_SQUARE;
+    B2->isHidden = true;
+    B2->size = OBJSIZE_64;
+    B2->gfxIndex = 32;
+    B2->priority = OBJPRIORITY_1;
+    B2->palette = 1;
+    B2->x = 128;
+    B2->y = 32;
+    B2->hFlip = true;
+    
+    B2 = &oamTop->oamBuffer[4];
+    B2->isRotateScale = false;
+    B2->blendMode = OBJMODE_NORMAL;
+    B2->isMosaic = false;
+    B2->colorMode = OBJCOLOR_16;
+    B2->shape = OBJSHAPE_SQUARE;
+    B2->isHidden = true;
+    B2->size = OBJSIZE_64;
+    B2->gfxIndex = 32;
+    B2->priority = OBJPRIORITY_1;
+    B2->palette = 1;
+    B2->x = 64;
+    B2->y = 96;
+    B2->hFlip = false;
+    B2->vFlip = true;
+
+    B2 = &oamTop->oamBuffer[5];
+    B2->isRotateScale = false;
+    B2->blendMode = OBJMODE_NORMAL;
+    B2->isMosaic = false;
+    B2->colorMode = OBJCOLOR_16;
+    B2->shape = OBJSHAPE_SQUARE;
+    B2->isHidden = true;
+    B2->size = OBJSIZE_64;
+    B2->gfxIndex = 32;
+    B2->priority = OBJPRIORITY_1;
+    B2->palette = 1;
+    B2->x = 128;
+    B2->y = 96;
+    B2->hFlip = true;
+    B2->vFlip = true;
+    
+    dmaCopyHalfWords(SPRITE_DMA_CHANNEL, BigCirc1Pal, &SPRITE_PALETTE[16],  32);
+    dmaCopyHalfWords(SPRITE_DMA_CHANNEL, BigCirc1Tiles, &SPRITE_GFX[32 * 32 / sizeof(SPRITE_GFX[0])], BigCirc1TilesLen);
 }
 
 int stepcnt = 0;
@@ -1389,6 +1473,47 @@ void stepincrease(){
     }
 }
 
+void cut::use(){ }
+void rock_smash::use(){ }
+void fly::use(){ }
+void flash::use(){ }
+void whirlpool::use(){ }
+void surf::use(){
+    //heroIsBig = true;
+    SAV.acMoveMode = SURF;
+    movePlayerOnMap(SAV.acposx/20 +dir[lastdir][1] ,SAV.acposy/20 + dir[lastdir][0],SAV.acposz,false);
+    SAV.acposx += 20 * dir[lastdir][1];
+    SAV.acposy += 20 * dir[lastdir][0];
+}
+
+
+void shoUseAttack(int pkmIdx,bool female, bool shiny){
+    oamTop->oamBuffer[0].isHidden = true;
+    oamTop->oamBuffer[1].isHidden = false;
+    for(int i = 0; i < 5; ++i){
+        loadframe(&spriteInfoTop[1],SAV.owIdx + 4,i,true);
+        updateOAM(oamTop);
+        swiWaitForVBlank();
+        swiWaitForVBlank();
+        swiWaitForVBlank();
+    }
+    for(int i= 0; i < 4; ++i)
+        oamTop->oamBuffer[2+i].isHidden = false;
+    int a = 5,b = 2, c = 96 ;
+    loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",pkmIdx,80,48,a,b,c,false,shiny,female);
+    updateOAM(oamTop);
+
+    for(int i= 0; i < 40; ++i)
+        swiWaitForVBlank();
+
+    //animateHero(lastdir,2);
+    oamTop->oamBuffer[0].isHidden = false;
+    oamTop->oamBuffer[1].isHidden = true;
+    for(int i= 0; i < 8; ++i)
+        oamTop->oamBuffer[2+i].isHidden = true;
+    updateOAM(oamTop);
+}
+
 int main(int argc, char** argv) 
 {
     //Init
@@ -1401,7 +1526,8 @@ int main(int argc, char** argv)
     touchPosition touch;
    
     startScreen();
-    
+    heroIsBig = SAV.acMoveMode != WALK;
+
     scrn.draw(mode); 
         
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
@@ -1409,19 +1535,15 @@ int main(int argc, char** argv)
     SAV.showBlackBorder = false;
 
     movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
+    lastdir = 0;
     
     cust_font.set_color(RGB(0,31,31),0);
 
-    //std::pair<int,int> dirs[4] = {std::pair<int,int>(0,1),std::pair<int,int>(1,0),std::pair<int,int>(0,-1),std::pair<int,int>(-1,0)};
-    //int acDir = 0;
-    
     int HILFSCOUNTER = 251;
     oam->oamBuffer[PKMN_ID].isHidden = !(SAV.hasPKMN && SAV.PKMN_team.size());
     updateOAMSub(oam);
 
     SAV.hasGDex = true;
-
-    int MOV = 20;
 
     initMapSprites();
     updateOAM(oamTop);
@@ -1462,21 +1584,52 @@ int main(int argc, char** argv)
             printf("topbehave %i;\n bottombehave %i",acMap->b.blocks[acMap->blocks[SAV.acposy/20 + 10][SAV.acposx/20 + 10].blockidx].topbehave,
                 acMap->b.blocks[acMap->blocks[SAV.acposy/20 + 10][SAV.acposx/20 + 10].blockidx].bottombehave);
         }   
+        if(pressed & KEY_A){
+            for(auto a : SAV.PKMN_team)
+                if(!a.boxdata.IV.isEgg)
+                    for(int i= 0; i < 4; ++i)
+                        if(AttackList[a.boxdata.Attack[i]]->isFieldAttack && AttackList[a.boxdata.Attack[i]]->possible()){
+                            consoleSelect(&Bottom);
+                            consoleSetWindow(&Bottom,4,0,20,3);
+                            consoleClear();
+                            showmappointer = false;
+                            oam->oamBuffer[SQCH_ID].isHidden = true;
+                            oam->oamBuffer[SQCH_ID+1].isHidden = true;
+                            updateOAMSub(oam);
+                            scrn.draw(mode = -1);
+                            char buf[50];
+                            sprintf(buf,"%s\nMöchtest du %s nutzen?",AttackList[a.boxdata.Attack[i]]->text(),AttackList[a.boxdata.Attack[i]]->Name.c_str());
+                            ynbox yn;
+                            if(yn.getResult(buf)){
+                                sprintf(buf,"%ls setzt %s\nein!",a.boxdata.Name,AttackList[a.boxdata.Attack[i]]->Name.c_str());
+                                mbox(buf,true,true);
+                                shoUseAttack(a.boxdata.SPEC,a.boxdata.isFemale,a.boxdata.isShiny());
+                                AttackList[a.boxdata.Attack[i]]->use();
+                                goto OUT;
+                            }
+                        }
+            OUT:
+            scrn.draw(mode);
+        }
         //Moving
         if(pressed & KEY_DOWN){
             animateHero(2,2);
+            lastdir = 2;
             continue;
         }
         if(pressed & KEY_RIGHT){
             animateHero(1,2);
+            lastdir = 1;
             continue;
         }
         if(pressed & KEY_UP){
             animateHero(4,2);
+            lastdir = 4;
             continue;
         }
         if(pressed & KEY_LEFT){
             animateHero(3,2);
+            lastdir = 3;
             continue;
         }
 
@@ -1486,6 +1639,7 @@ int main(int argc, char** argv)
             if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy+MOV)/20,SAV.acposz,false)){
                 SAV.acposy+=MOV; 
                 stepincrease();
+                lastdir = 2;
             }
             if(SAV.acMoveMode != BIKE)
                 continue;
@@ -1496,6 +1650,7 @@ int main(int argc, char** argv)
             if(movePlayerOnMap((SAV.acposx-MOV)/20,SAV.acposy/20,SAV.acposz,false)){
                 SAV.acposx-=MOV;
                 stepincrease();
+                lastdir = 3;
             }
             if(SAV.acMoveMode != BIKE)
                 continue;
@@ -1506,6 +1661,7 @@ int main(int argc, char** argv)
             if(movePlayerOnMap((SAV.acposx+MOV)/20,SAV.acposy/20,SAV.acposz,false)){
                 SAV.acposx+=MOV;
                 stepincrease();
+                lastdir = 1;
             }
             if(SAV.acMoveMode != BIKE)
                 continue;
@@ -1516,6 +1672,7 @@ int main(int argc, char** argv)
             if(movePlayerOnMap(SAV.acposx/20,(SAV.acposy-MOV)/20,SAV.acposz,false)){
                 SAV.acposy-=MOV;
                 stepincrease();
+                lastdir = 4;
             }
             if(SAV.acMoveMode != BIKE)
                 continue;
@@ -1609,10 +1766,10 @@ int main(int argc, char** argv)
                     char A []= {1,2,3,4};
                     for(int i = 0;i<6;++i)
                     {
-                        A[0] = 5 + HILFSCOUNTER % 6;
-                        A[1] = 5 + (HILFSCOUNTER+1) % 6;
-                        A[2] = 5 + (HILFSCOUNTER+2) % 6;
-                        A[3] = 5 + (HILFSCOUNTER+3) % 6;
+                        A[0] = 5 + HILFSCOUNTER % 22;
+                        A[1] = 5 + (HILFSCOUNTER+6) % 22;
+                        A[2] = 5 + (HILFSCOUNTER+12) % 22;
+                        A[3] = 5 + (HILFSCOUNTER+18) % 22;
                         POKEMON::PKMN a(A,HILFSCOUNTER,0,
                         1+rand()%100,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;

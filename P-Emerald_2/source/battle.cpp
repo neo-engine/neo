@@ -2089,14 +2089,35 @@ ACR:
                         
                             consoleSetWindow(&Bottom,(oam->oamBuffer[i]).x/8+1,(oam->oamBuffer[i]).y/8+1,20,5);
                             drawTypeIcon(oam,spriteInfo,os2,pS2,ts2,
-                                AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]].type,
+                                AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->type,
                                 (oam->oamBuffer[i]).x+8,(oam->oamBuffer[i]).y-8,true);
-                            printf("    %2i/%2i AP\n%s\nS %3i  G %3i", (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.AcPP[(i-21)/2],
-                                AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]].PP *
-                                ((5 +(*this->player->pkmn_team)[acpokpos[0][0]]. boxdata.PPUps[i]) / 5),
-                                AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]].Name.c_str(),
-                                AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]].Base_Power,
-                                AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]].Accuracy);
+                            printf("    %s\n    AP %2i""/""%2i ",
+                                &(AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->Name[0]),
+                                (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.AcPP[i],
+                                AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->PP *
+                                ((5 +(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.PPUps[i]) / 5));
+                            switch (AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->HitType)
+                            {
+                            case attack::PHYS:
+                                printf("PHS");
+                                break;
+                            case attack::SPEC:
+                                printf("SPC");
+                                break;
+                            case attack::STAT:
+                                printf("STS");
+                                break;
+                            }
+                            printf("\n    S ");
+                            if(AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->Base_Power)
+                                printf("%3i",AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->Base_Power);
+                            else
+                                printf("---");
+                            printf(" G ");
+                            if(AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->Accuracy)
+                                printf("%3i",AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->Accuracy);
+                            else
+                                printf("---");
                         }
 
                         updateOAMSub(oam);
@@ -2246,14 +2267,35 @@ ACR2:
                         
                                         consoleSetWindow(&Bottom,(oam->oamBuffer[i]).x/8+1,(oam->oamBuffer[i]).y/8+1,20,5);
                                         drawTypeIcon(oam,spriteInfo,os2,pS2,ts2,
-                                            AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]].type,
+                                            AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]]->type,
                                             (oam->oamBuffer[i]).x+8,(oam->oamBuffer[i]).y-8,true);
-                                        printf("    %2i/%2i AP\n%s\nS %3i  G %3i", (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.AcPP[(i-21)/2],
-                                            AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]].PP *
-                                            ((5 +(*this->player->pkmn_team)[acpokpos[1][0]]. boxdata.PPUps[i]) / 5),
-                                            AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]].Name.c_str(),
-                                            AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]].Base_Power,
-                                            AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]].Accuracy);
+                                        printf("    %s\n    AP %2i""/""%2i ",
+                                            &(AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]]->Name[0]),
+                                            (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.AcPP[i],
+                                            AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]]->PP *
+                                            ((5 +(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.PPUps[i]) / 5));
+                                        switch (AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]]->HitType)
+                                        {
+                                        case attack::PHYS:
+                                            printf("PHS");
+                                            break;
+                                        case attack::SPEC:
+                                            printf("SPC");
+                                            break;
+                                        case attack::STAT:
+                                            printf("STS");
+                                            break;
+                                        }
+                                        printf("\n    S ");
+                                        if(AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]]->Base_Power)
+                                            printf("%3i",AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]]->Base_Power);
+                                        else
+                                            printf("---");
+                                        printf(" G ");
+                                        if(AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]]->Accuracy)
+                                            printf("%3i",AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]]->Accuracy);
+                                        else
+                                            printf("---");
                                     }
 
                                     updateOAMSub(oam);
