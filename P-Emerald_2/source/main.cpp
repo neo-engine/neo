@@ -619,7 +619,7 @@ bool fly::possible(){
     return false;
 }
 bool flash::possible(){
-    return false;
+    return true;
 }
 bool whirlpool::possible(){
     return false;
@@ -832,6 +832,8 @@ void loadframe(SpriteInfo* si, int idx, int frame,bool big = false){
 }
 
 void animateHero(int dir,int frame){
+    heroIsBig = false;
+
     left = !left;
     bool bike = (MoveMode)SAV.acMoveMode == BIKE, run = keysHeld() & KEY_B;
     if(frame == 0){
@@ -1115,24 +1117,24 @@ void animateHero(int dir,int frame){
             oamTop->oamBuffer[0].hFlip = true;
             if(!run)
                 loadframe(&spriteInfoTop[0],SAV.owIdx,2,heroIsBig);
-            else
-                loadframe(&spriteInfoTop[0],SAV.owIdx,11,heroIsBig);
+            //else
+            //    loadframe(&spriteInfoTop[0],SAV.owIdx,11,heroIsBig);
             updateOAM(oamTop);
             return;
         case 2:
             oamTop->oamBuffer[0].hFlip = false;
             if(!run)
                 loadframe(&spriteInfoTop[0],SAV.owIdx,0,heroIsBig);
-            else
-                loadframe(&spriteInfoTop[0],SAV.owIdx,9,heroIsBig);
+            //else
+            //    loadframe(&spriteInfoTop[0],SAV.owIdx,9,heroIsBig);
             updateOAM(oamTop);
             return;
         case 3:
             oamTop->oamBuffer[0].hFlip = false;
             if(!run)
                 loadframe(&spriteInfoTop[0],SAV.owIdx,2,heroIsBig);
-            else
-                loadframe(&spriteInfoTop[0],SAV.owIdx,11,heroIsBig);
+            //else
+            //    loadframe(&spriteInfoTop[0],SAV.owIdx,11,heroIsBig);
             loadframe(&spriteInfoTop[0],SAV.owIdx,2);
             updateOAM(oamTop);
             return;
@@ -1140,8 +1142,8 @@ void animateHero(int dir,int frame){
             oamTop->oamBuffer[0].hFlip = false;
             if(!run)
                 loadframe(&spriteInfoTop[0],SAV.owIdx,1,heroIsBig);
-            else
-                loadframe(&spriteInfoTop[0],SAV.owIdx,10,heroIsBig);
+            //else
+            //    loadframe(&spriteInfoTop[0],SAV.owIdx,10,heroIsBig);
             updateOAM(oamTop);
             return;
         default:
@@ -1203,7 +1205,7 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
         movedir = 2;
     else if(oldx > y)
         movedir = 4;
-    
+        
     if(!init && SAV.showBlackBorder) //Show black border instead of mapTiles while moving
         acMap->movePlayer(movedir,true);
    
@@ -1315,6 +1317,8 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
     
     animateHero(movedir,1);
     animateHero(movedir,2);
+    if(init)
+        animateHero(lastdir,2);
 
     updateOAM(oamTop);
 
@@ -1604,9 +1608,9 @@ int main(int argc, char** argv)
                                 sprintf(buf,"%ls setzt %s\nein!",a.boxdata.Name,AttackList[a.boxdata.Attack[i]]->Name.c_str());
                                 mbox(buf,true,true);
                                 shoUseAttack(a.boxdata.SPEC,a.boxdata.isFemale,a.boxdata.isShiny());
-                                AttackList[a.boxdata.Attack[i]]->use();
-                                goto OUT;
+                                AttackList[a.boxdata.Attack[i]]->use();                                
                             }
+                            goto OUT;
                         }
             OUT:
             scrn.draw(mode);
@@ -1771,7 +1775,7 @@ int main(int argc, char** argv)
                         A[2] = 5 + (HILFSCOUNTER+12) % 22;
                         A[3] = 5 + (HILFSCOUNTER+18) % 22;
                         POKEMON::PKMN a(A,HILFSCOUNTER,0,
-                        1+rand()%100,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
+                        1+rand()%100,SAV.ID,SAV.SID,SAV.getName().c_str(),i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;
                         a.stats.acHP = i*a.stats.maxHP/5;
                         SAV.PKMN_team.push_back(a);
@@ -1791,7 +1795,7 @@ int main(int argc, char** argv)
                     break;
                 }
             case 1:
-                for(int j = 0; j< 700; ++j)
+                for(int j = 1; j< 700; ++j)
                     SAV.Bag.addItem(ItemList[j].itemtype,j,(rand()%999) +1);
                 break;
             case 2:

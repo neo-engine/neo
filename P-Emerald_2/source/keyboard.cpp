@@ -210,7 +210,7 @@ void keyboard::draw(){
             }
             rw_cnt+= 4;
             cl_cnt = 3;
-            char pt[14] = "הצüßי §$%&/\#";
+            char pt[14] = "הצüßי §$%&/\\#";
             for(int i= 0; i < 13; ++i){
                 cust_font2.print_char(pt[i],cl_cnt*8,rw_cnt*8,true);
                 chars[std::pair<int,int>(cl_cnt,rw_cnt)] = pt[i];

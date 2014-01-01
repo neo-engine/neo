@@ -527,7 +527,6 @@ namespace POKEMON{
         PKMN::BOX_PKMN::BOX_PKMN(char* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
         bool OTFemale,bool Cloned,bool Shiny,bool h_a,bool fatef ,bool _isEgg,short gPlace,char BALL, char Prus)
         {	
-            size_t I= 0;        
             PKMNDATA::getAll(SPE,data);
             
             srand(LastPID);
@@ -591,7 +590,7 @@ namespace POKEMON{
             for(int i= 0; i< 6; ++i) this->ConStats[i] = 0;
             for(int i= 0; i< 4; ++i) this->ribbons1[i] = 0;
             for(int i= 0; i< 4; ++i) this->Attack[i] = Attacks[i];
-            for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[Attacks[i]]->PP; /// ...
+            for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[(int)Attacks[i]]->PP; /// ...
             for(int i= 0; i< 4; ++i) this->PPUps[i] = 0;
             this->IV = IV_struct(rand()%32,rand()%32,rand()%32,rand()%32,rand()%32,rand()%32,false,_isEgg);
             for(int i= 0; i< 4; ++i) this->ribbons0[i] = 0;
@@ -1044,7 +1043,7 @@ namespace POKEMON{
                 cust_font2.print_string(buf,35,58,true);
                 if(!(this->boxdata.IV.isEgg))
                 {
-                    sprintf(buf,"Geschlüpft am %i.%i.%i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
+                    sprintf(buf,"Geschlüpft am %i.%i.%i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2]);
                     cust_font2.print_string(buf,28,72,true);
                     sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
                     cust_font2.print_string(buf,35,86,true);
@@ -1089,7 +1088,7 @@ namespace POKEMON{
                 cust_font2.print_string(buf,35,58,true);
                 if(!(this->boxdata.IV.isEgg))
                 {
-                    sprintf(buf,"Geschlüpft am %i.%i.%i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],getLoc(boxdata.hatchPlace));
+                    sprintf(buf,"Geschlüpft am %i.%i.%i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2]);
                     cust_font2.print_string(buf,28,72,true);
                     sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
                     cust_font2.print_string(buf,35,86,true);

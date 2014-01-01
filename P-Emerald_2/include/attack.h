@@ -6,9 +6,9 @@
 class attack
 {
 public:
+    bool isFieldAttack;
     std::string Name;
     
-    bool isFieldAttack;
     char Effect;
     char Base_Power;
     Type type;
@@ -55,7 +55,7 @@ public:
 };
 class cut : public attack{                                                //VM01
 public: 
-    void use(); bool possible();
+    void use() override; bool possible() override;
     cut() : attack(std::string("Zerschneider"),(char)0,(char) 60,NORMAL, (char)100, (char)15,
         (char)0, SELECTED, (char)1, (Flags)(MAKES_CONTACT | PROTECT | KINGS_ROCK),PHYS) {
         this->isFieldAttack = true;
@@ -64,7 +64,7 @@ public:
 };         
 class rock_smash : public attack{                                                //VM02
 public: 
-    void use(); bool possible();
+    void use() override; bool possible() override;
     rock_smash() : attack(std::string("Zertr\x81""mmerer"),(char)1,(char) 60,KAMPF, (char)100, (char)15,
         (char)30, SELECTED, (char)1, (Flags)(MAKES_CONTACT | PROTECT | KINGS_ROCK),PHYS) {
         this->isFieldAttack = true;
@@ -73,7 +73,7 @@ public:
 };            
 class fly : public attack{                                                //VM03
 public: 
-    void use(); bool possible();
+    void use() override; bool possible() override;
     fly() : attack(std::string("Fliegen"),(char)2,(char) 90,FLUG, (char)100, (char)15,
         (char)100, SELECTED, (char)1, (Flags)(MAKES_CONTACT | PROTECT | KINGS_ROCK),PHYS) {
         this->isFieldAttack = true;
@@ -82,7 +82,7 @@ public:
 };         
 class flash : public attack{                                                //VM04
 public: 
-    void use(); bool possible();
+    void use() override; bool possible() override;
     flash() : attack(std::string("Blitz"),(char)3,(char) 0,ELEKTRO, (char)80, (char)15,
         (char)100, SELECTED, (char)1, (Flags)(PROTECT | MAGIC_COAT),STAT) {
         this->isFieldAttack = true;
@@ -91,7 +91,7 @@ public:
 };        
 class whirlpool : public attack{                                                //VM05
 public: 
-    void use(); bool possible();
+    void use() override; bool possible() override;
     whirlpool() : attack(std::string("Whirlpool"),(char)4,(char) 35,WASSER, (char)85, (char)15,
         (char)100, SELECTED, (char)1, (Flags)(PROTECT | KINGS_ROCK),SPEC) {
         this->isFieldAttack = true;
@@ -100,7 +100,7 @@ public:
 };      
 class surf : public attack{                                                //VM06
 public: 
-    void use(); bool possible();
+    void use() override; bool possible() override;
     surf() : attack(std::string("Surfer"),(char)0,(char) 95,WASSER, (char)95, (char)15,
         (char)100, BOTH_FOES_AND_PARTNER, (char)1, (Flags)(PROTECT | KINGS_ROCK),SPEC) {
         this->isFieldAttack = true;
