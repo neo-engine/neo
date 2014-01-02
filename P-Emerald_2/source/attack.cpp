@@ -1099,7 +1099,7 @@ attack* AttackList[560] = {
 552 | Feuerreigen | Feuer | Spezial | 80 | 100 | 10 | - |Gen. V
    
 553 | Frostvolt | Eis | Physisch | 140 | 90 | 5 | - |Gen. V
-   
+    
 554 | Frosthauch | Eis | Spezial | 140 | 90 | 5 | - |Gen. V
    
 555 | Standpauke | Unlicht | Spezial | 55 | 95 | 15 | - |Gen. V

@@ -131,7 +131,7 @@ std::string item::getDescription(){
     sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
     FILE* f = fopen(buf,"r");
     if(f == 0)
-        return "FEHLER";
+        return "Keine Daten.";
     int ac;
     fscanf(f,"%i",&ac);
     fscanf(f,"%i\n",&ac);
@@ -181,7 +181,7 @@ std::string berry::getDescription2(){
     sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
     FILE* f = fopen(buf,"r");
     if(f == 0)
-        return "FEHLER";
+        return "Keine Daten.";
     //this->itemtype = BERRIES;
     int ac;
     fscanf(f,"%i",&ac);
@@ -213,8 +213,7 @@ std::string item::getShortDescription(){
     sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
     FILE* f = fopen(buf,"r");
     if(f == 0)
-        return "FEHLER";
-    //this->itemtype = BERRIES;
+        return "Keine Daten.";
     int ac;
     fscanf(f,"%i",&ac);
     //this->effekt = item::EFFEKT(ac);
@@ -277,9 +276,9 @@ item ItemList[700] = {
     battle_item("X-Tempo"),         battle_item("X-Treffer"),
     battle_item("X-Spezial"),       battle_item("X-SpezialVer"),
     battle_item("Pokepuppe"),       battle_item("Eneco-Rute"),
-    battle_item("Blaue Floete"),    battle_item("Gelbe Floete"),
-    battle_item("Rote Floete"),     battle_item("Schwarze Floete"),
-    battle_item("Weisse Floete"),
+    battle_item("BlaueFloete"),    battle_item("GelbeFloete"),
+    battle_item("RoteFloete"),     battle_item("SchwarzeFloete"),
+    battle_item("WeisseFloete"),
     
     item("Kuestensalz"),        item("Kuestenschale"),
     item("Purpurstueck"),       item("Indigostueck"),
@@ -301,7 +300,7 @@ item ItemList[700] = {
     item("Schildfossil"),       item("Kopffossil"),
     item("Steinknochen"),       item("Funkelstein"),
     item("Finsterstein"),       item("Leuchtstein"),
-    item("Ovaler Stein"),       item("Spiritkern"),
+    item("OvalerStein"),       item("Spiritkern"),
     item("Platin-Orb"),         
 
     item("Null"),
@@ -327,9 +326,9 @@ item ItemList[700] = {
     mail("Grussbrief"),     mail("Faiblebrief"), 
     mail("Einladebrief"),   mail("Dankesbrief"),
     mail("Fragebrief"),     mail("Insiderbrief"),
-    mail("Antwortbrief"),   mail("Brueckbrief H"),
-    mail("Brueckbrief M"),  mail("Brueckbrief Z"),
-    mail("Brueckbrief D"),  mail("Brueckbrief W"),
+    mail("Antwortbrief"),   mail("BrueckbriefH"),
+    mail("BrueckbriefM"),  mail("BrueckbriefZ"),
+    mail("BrueckbriefD"),  mail("BrueckbriefW"),
 
     berry("Amrenabeere"),   berry("Maronbeere"),
     berry("Pirsifbeere"),	berry("Fragiabeere"),
@@ -558,7 +557,7 @@ item ItemList[700] = {
     key_item("Dunkelstein"),
     TM("TM93"),
     TM("TM94"),
-    TM("TM95"),
+    TM("TM95"), 
     key_item("Viso-Caster"),
     key_item("Briefpost"),
     key_item("Briefpost"),

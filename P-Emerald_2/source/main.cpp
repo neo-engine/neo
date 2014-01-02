@@ -1775,7 +1775,7 @@ int main(int argc, char** argv)
                         A[2] = 5 + (HILFSCOUNTER+12) % 22;
                         A[3] = 5 + (HILFSCOUNTER+18) % 22;
                         POKEMON::PKMN a(A,HILFSCOUNTER,0,
-                        1+rand()%100,SAV.ID,SAV.SID,SAV.getName().c_str(),i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
+                        1+rand()%100,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;
                         a.stats.acHP = i*a.stats.maxHP/5;
                         SAV.PKMN_team.push_back(a);
@@ -1834,15 +1834,15 @@ int main(int argc, char** argv)
         {  
             while(1)
             {
-                scanKeys();
                 swiWaitForVBlank();
                 updateTime(true);
                 if(keysUp() & KEY_TOUCH)
-                break;
+                    break;
+                scanKeys();
             }
             mode = 0;
             scrn.draw(mode);
-            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,false);
+            //movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,false);
         }
         //StartMaps
         else if (sqrt(sq(mainSpritesPositions[0][0]-touch.px) + sq(mainSpritesPositions[0][1]-touch.py)) <= 16 && mode == 0)

@@ -724,7 +724,9 @@ namespace POKEMON{
             printf(ItemList[this->boxdata.getItem()].getDisplayName().c_str());
             if(this->boxdata.getItem()){
                 printf("\n%s",ItemList[this->boxdata.getItem()].getDescription().c_str());
-                drawItemIcon(oamTop,spriteInfoTop,ItemList[this->boxdata.getItem()].Name,0,152,a2,b2,c2,false);
+                drawItemIcon(oamTop,spriteInfoTop,ItemList[this->boxdata.getItem()].Name,2,152,a2,b2,c2,false);
+                cust_font.print_string("Item",2,176,false);
+                updateOAM(oamTop);
             }
             cust_font.set_color(251,1);
         }
@@ -1020,7 +1022,7 @@ namespace POKEMON{
         if(this->boxdata.ID == SAV.ID && this->boxdata.SID == SAV.SID) //Trainer is OT
         {
             if (this->boxdata.fateful)
-                cust_font2.print_string("Schicksalhafte Begegnung",28,120,true);	
+                cust_font2.print_string("Schicksalhafte Begegnung.",28,120,true);	
             if(!(this->boxdata.gotDate[0]))
             {
                 sprintf(buf, "Gefangen am %i.%i.%i mit Lv. %i", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
