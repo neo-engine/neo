@@ -1796,7 +1796,8 @@ int main(int argc, char** argv)
                 }
             case 1:
                 for(int j = 1; j< 700; ++j)
-                    SAV.Bag.addItem(ItemList[j].itemtype,j,(rand()%999) +1);
+                    if(ItemList[j].Name != "Null")
+                        SAV.Bag.addItem(ItemList[j].itemtype,j,(rand()%999) +1);
                 break;
             case 2:
                 SAV.PKMN_team[0].boxdata.exp += 100;

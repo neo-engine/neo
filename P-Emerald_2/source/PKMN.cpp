@@ -1025,7 +1025,7 @@ namespace POKEMON{
                 cust_font2.print_string("Schicksalhafte Begegnung.",28,120,true);	
             if(!(this->boxdata.gotDate[0]))
             {
-                sprintf(buf, "Gefangen am %i.%i.%i mit Lv. %i", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
+                sprintf(buf, "Gefangen am %02i.%02i.%02i mit Lv. %i", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
                 cust_font2.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
                 cust_font2.print_string(buf,35,58,true);
@@ -1039,7 +1039,7 @@ namespace POKEMON{
             }
             else
             {
-                sprintf(buf, "Als Ei erhalten am %i.%i.%i", boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2]);
+                sprintf(buf, "Als Ei erhalten am %02i.%02i.%02i", boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2]);
                 cust_font2.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
                 cust_font2.print_string(buf,35,58,true);
@@ -1070,7 +1070,7 @@ namespace POKEMON{
         {
             if(!(this->boxdata.gotDate[0]))
             {
-                sprintf(buf, "Off. gef. am %i.%i.%i mit Lv. %i.", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
+                sprintf(buf, "Off. gef. am %02i.%02i.%02i mit Lv. %i.", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
                 cust_font2.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
                 cust_font2.print_string(buf,35,58,true);
@@ -1084,13 +1084,13 @@ namespace POKEMON{
             } 
             else
             {
-                sprintf(buf, "Off. Als Ei erh. am %i.%i.%i", boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2]);
+                sprintf(buf, "Off. Als Ei erh. am %02i.%02i.%02i", boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2]);
                 cust_font2.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
                 cust_font2.print_string(buf,35,58,true);
                 if(!(this->boxdata.IV.isEgg))
                 {
-                    sprintf(buf,"Geschlüpft am %i.%i.%i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2]);
+                    sprintf(buf,"Geschlüpft am %02i.%02i.%02i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2]);
                     cust_font2.print_string(buf,28,72,true);
                     sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
                     cust_font2.print_string(buf,35,86,true);
