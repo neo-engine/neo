@@ -17,6 +17,7 @@
     <ClInclude Include="include\battle.h" />
     <ClInclude Include="include\berry.h" />
     <ClInclude Include="include\font_data.h" />
+    <ClInclude Include="include\Gen.h" />
     <ClInclude Include="include\map2d.h" />
     <ClInclude Include="include\Map_Obj.h" />
     <ClInclude Include="include\nitrofs.h" />
@@ -42,6 +43,7 @@
     <ClCompile Include="source\battle.cpp" />
     <ClCompile Include="source\Box.cpp" />
     <ClCompile Include="source\font_data.cpp" />
+    <ClCompile Include="source\Gen.cpp" />
     <ClCompile Include="source\hex2dec.c" />
     <ClCompile Include="source\item.cpp" />
     <ClCompile Include="source\keyboard.cpp" />

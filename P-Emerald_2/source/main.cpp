@@ -59,6 +59,8 @@ enum GameMod{
 } gMod = DEVELOPER;
 std::string CodeName = "Charming Lari";
 
+char acSlot2Game[5];
+
 int bg3sub;
 int bg2sub;
 int bg3;
@@ -163,11 +165,19 @@ ChoiceResult opScreen(int type)
     };
     int MaxVal;
     std::pair<int,int> ranges[5] = {
-        std::pair<int,int>(0,80),
-        std::pair<int,int>(85,105),
-        std::pair<int,int>(112,132),
-        std::pair<int,int>(165,185)
+        std::pair<int,int>(0,84),
+        std::pair<int,int>(87,108),
+        std::pair<int,int>(113,134),
+        std::pair<int,int>(139,160),
+        std::pair<int,int>(165,186)
     };
+
+    if(gMod == DEVELOPER){
+        type = 3;
+        consoleSelect(&Bottom);
+        consoleSetWindow(&Bottom,0,23,30,2);
+        printf("Slot 2: %s",acSlot2Game);
+    }
 
     switch (type)
     {
@@ -750,14 +760,40 @@ START:
     //StartMenu
     switch(opScreen(SAV.SavTyp))
     {
+    case TRANSFER_GAME:
+        {
+            char *cmpgm[5] = {"BPR","BPG","BPE","AXP","AXV"};
+            int acgame = -1;
+
+            for(int i= 0; i < 5; ++i){
+                for(int j = 0; j < 3; ++j)
+                    if(cmpgm[i][j] != acSlot2Game[j])
+                        goto CONT;
+                acgame = i;
+CONT:
+                ;
+            }
+            if(acgame == -1)
+                goto START;
+
+            ynbox yn;
+            if(yn.getResult("Möchtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?")){
+                mbox("Solltest du im Folgenden\nspeichern, so werden Daten\nauf das GBA-Modul geschrieben.");
+                mbox("Bitte entferne daher das\nGBA-Modul nicht, es könnte\nden Spielstand beschädigen.");
+                mbox("Auch das Speichern an sich\nkann den Spielstand\nbeschädigen.");
+                if(yn.getResult("Möchtest du fortfahren?")){
+                    mbox("Lade Spielstand...");
+                    int loadgame = acgame > 2 ? 1 : 0;
+                }
+                else goto START;
+            }
+            else goto START;
+        }
+    case GEHEIMGESCHEHEN:
     case CANCEL:
         //printf("%i",SAV.SavTyp);
         //while(1);
         goto START;
-    case GEHEIMGESCHEHEN:
-    case TRANSFER_GAME:
-
-        //goto START;
     case CONTINUE:
         scrn.init();
         break;
@@ -1518,6 +1554,7 @@ void shoUseAttack(int pkmIdx,bool female, bool shiny){
     updateOAM(oamTop);
 }
 
+
 int main(int argc, char** argv) 
 {
     //Init
@@ -1529,6 +1566,9 @@ int main(int argc, char** argv)
     //PRE-Intro
     touchPosition touch;
    
+    sysSetBusOwners(true, true);
+    memcpy(acSlot2Game, (char*)0x080000AC, 4);
+
     startScreen();
     heroIsBig = SAV.acMoveMode != WALK;
 
@@ -1759,8 +1799,8 @@ int main(int argc, char** argv)
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
-            const char *someText[7]= {"\n     PKMN-Spawn","\n    Item-Spawn","\n 1-Item_Test","\n  Battle SPWN.","\nWie bitte?","\n   Trainerpass","\n    42"};
-            cbox test(4,&someText[0],0,true);
+            const char *someText[7]= {"\n     PKMN-Spawn","\n    Item-Spawn","\n 1-Item_Test","\n  Battle SPWN.","\nF***ing Slot2","\n   Trainerpass","\n    42"};
+            cbox test(5,&someText[0],0,true);
             int res = test.getResult("...",true);
             switch(res)
             {
@@ -1803,7 +1843,7 @@ int main(int argc, char** argv)
                 SAV.PKMN_team[0].boxdata.exp += 100;
                 mbox(berry("Ginemabeere"),31);
                 break;
-            case 3:
+            case 3:{
                 BATTLE::battle_trainer me("TEST",0,0,0,0,&SAV.PKMN_team,0);
                 std::vector<POKEMON::PKMN> cpy;
             
@@ -1823,12 +1863,23 @@ int main(int argc, char** argv)
 
                 BATTLE::battle test_battle(&me,&opp,100,5,BATTLE::battle::DOUBLE);
                 test_battle.start(100,BATTLE::battle::NONE);
-                break;
+                break;}
+            case 4:{
+                videoSetMode(MODE_0_2D | DISPLAY_BG0_ACTIVE );
+                
+                sysSetBusOwners(true, true);
+                loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
+                consoleSelect(&Top);
+                consoleSetWindow(&Top,0,0,32,24);
+                for(int i= 0; i < 512; ++i)
+                    printf("%hhu ",SRAM[i]);
+            }   
             }
+            if(res != 4){
             setMainSpriteVisibility(false);
             scrn.draw(mode);
             initMapSprites();
-            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
+            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);}
         }
         //StartPok\x82""nav
         else if (sqrt(sq(mainSpritesPositions[5][0]-touch.px) + sq(mainSpritesPositions[5][1]-touch.py)) <= 16 && mode == -1)

@@ -84,6 +84,9 @@
     <ClInclude Include="include\map2d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Gen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\ability.cpp">
@@ -159,6 +162,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\map2d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Gen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
