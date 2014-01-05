@@ -13,34 +13,33 @@ extern savgm SAV;
 namespace gen3{
     #define MAX_TRAINER_NAME_LEN 7
     #define MAX_NICKNAME_LEN 10
+
+    char text[] = {"                                                                                                                                                                 0123456789!?.- ?\"\"''?? , /ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz                 "};
         
+    int getNItemIdx(int gen3Idx){
+        return gen3Idx;
+    }
+
     SaveParser* SaveParser::spInstance = NULL;
 
-    int SaveParser::get_newest_save(block *blocks[NUM_BLOCKS_TOTAL])
-    {
+    int SaveParser::get_newest_save(block *blocks[NUM_BLOCKS_TOTAL]) {
         int i, newestSave = 0;
 
         for (i = 0; i < NUM_BLOCKS_TOTAL; i++)
-        {
             if (blocks[i]->footer.savenumber > newestSave)
                 newestSave = blocks[i]->footer.savenumber;
-        }
-
         return newestSave;
     }
 
-    unsigned short int SaveParser::get_block_checksum(block* b)
-    {
+    u16 SaveParser::get_block_checksum(block* b) {
         int checksum = 0;
         int i;
-        for (i = 0; i < BLOCK_DATA_LEN; i+=4)
-        {
+        for (i = 0; i < BLOCK_DATA_LEN; i+=4) 
             checksum += *((int*)b+i/4);
-        }
         checksum += checksum >> 16;
         checksum &= 0xFFFF;
 
-        return (unsigned short int)checksum;
+        return (u16)checksum;
     }
 
     char* SaveParser::parse_save(block *blocks[NUM_BLOCKS_TOTAL])
@@ -93,7 +92,7 @@ namespace gen3{
         return 0;
     }
 
-    char* SaveParser::get_text(unsigned char* raw, bool is_nickname)
+    char* SaveParser::get_text(u8* raw, bool is_nickname)
     {
         char* actual_text;
         int len;
@@ -209,10 +208,10 @@ namespace gen3{
      *	Encrypts/decrypts the 48 byte data buffer based on the xored pv and otid values
      *  TODO: Make it encrypt its own data/not need arguments
      */
-    unsigned short int SaveParser::encrypt(unsigned char *data, unsigned int pv, unsigned int otid) {
-        unsigned int xorkey = pv ^ otid;
-        unsigned short int checksum = 0;
-        unsigned int i;
+    u16 SaveParser::encrypt(u8 *data, u32 pv, u32 otid) {
+        u32 xorkey = pv ^ otid;
+        u16 checksum = 0;
+        u32 i;
 
         for (i = 0; i < POKEMON_DATA_LENGTH; i+=4)
         {

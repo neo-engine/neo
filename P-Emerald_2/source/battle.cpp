@@ -1706,10 +1706,9 @@ namespace BATTLE{
         for(int i = 0; i < 6; ++i){
             this->acpokpos[i][0] = this->acpokpos[i][1] = i;
             if(this->player->pkmn_team->size() > i){
-                POKEMON::PKMN::status tmp = (*this->player->pkmn_team)[i]._status;
                 if((*this->player->pkmn_team)[i].stats.acHP == 0 || (*this->player->pkmn_team)[i].boxdata.IV.isEgg)
                     this->acpoksts[i][0] = KO;
-                else if(tmp.Asleep || tmp.Burned || tmp.Frozen || tmp.Paralyzed || tmp.Poisoned || tmp.Toxic)
+                else if((*this->player->pkmn_team)[i].statusint)
                     this->acpoksts[i][0] = STS;
                 else
                     this->acpoksts[i][0] = OK;
@@ -1717,10 +1716,9 @@ namespace BATTLE{
             else
                 this->acpoksts[i][0] = NA;
             if(this->opponent->pkmn_team->size() > i){
-                POKEMON::PKMN::status tmp = (*this->opponent->pkmn_team)[i]._status;
                 if ((*this->opponent->pkmn_team)[i].stats.acHP == 0 || (*this->opponent->pkmn_team)[i].boxdata.IV.isEgg)
                     this->acpoksts[i][1] = KO;
-                else if(tmp.Asleep || tmp.Burned || tmp.Frozen || tmp.Paralyzed || tmp.Poisoned || tmp.Toxic)
+                else if((*this->opponent->pkmn_team)[i].statusint)
                     this->acpoksts[i][1] = STS;
                 else this->acpoksts[i][1] = OK;
             }
@@ -2095,7 +2093,7 @@ ACR:
                                 &(AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->Name[0]),
                                 (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.AcPP[i],
                                 AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->PP *
-                                ((5 +(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.PPUps[i]) / 5));
+                                ((5 +(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.PPupget(i)) / 5));
                             switch (AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->HitType)
                             {
                             case attack::PHYS:
@@ -2273,7 +2271,7 @@ ACR2:
                                             &(AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]]->Name[0]),
                                             (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.AcPP[i],
                                             AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]]->PP *
-                                            ((5 +(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.PPUps[i]) / 5));
+                                            ((5 +(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.PPupget(i)) / 5));
                                         switch (AttackList[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Attack[(i-21)/2]]->HitType)
                                         {
                                         case attack::PHYS:

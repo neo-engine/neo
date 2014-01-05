@@ -9,10 +9,10 @@ class savgm;
 
 namespace gen3 //using code from "pokehack" originally by "Grazfather"
 {
-    char text[] = {"                                                                                                                                                                 0123456789!?.- ?\"\"''?? , /ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz                 "};
+    extern char text[];
     bool isValidItem(int gen5Idx);
     int getItemIdx(int gen5Idx);
-    int getItemIdx(int gen3Idx);
+    int getNItemIdx(int gen3Idx);
     
     #define SAVEFILE_LEN (1 << 17)
     #define NUM_BLOCKS_SLOT 14
@@ -39,158 +39,178 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
 
 
     typedef struct {
-        unsigned char blocknum;
-        unsigned char padding;
-        unsigned short checksum;
-        unsigned int validation; // 0x08012025
+        u8 blocknum;
+        u8 padding;
+        u16 checksum;
+        u32 validation; // 0x08012025
         int savenumber;
     } block_footer;
 
     typedef struct {
-        unsigned char data[BLOCK_DATA_LEN];
-        unsigned char padding[BLOCK_PADDING_LEN];
+        u8 data[BLOCK_DATA_LEN];
+        u8 padding[BLOCK_PADDING_LEN];
         block_footer footer;
     } block;
 
-    unsigned short get_checksum( block* );
+    u16 get_checksum( block* );
 
     typedef struct {
-        unsigned int personality;
-        unsigned int otid;
-        unsigned char name[10];
-        unsigned short language;
-        unsigned char otname[7];
+        u32 personality;
+        u32 otid;
+        u8 name[10];
+        u16 language;
+        u8 otname[7];
         union {
             struct {
-                unsigned char circle:1;
-                unsigned char triangle:1;
-                unsigned char square:1;
-                unsigned char heart:1;
-                unsigned char xbit:4; // unused
+                u8 circle:1;
+                u8 triangle:1;
+                u8 square:1;
+                u8 heart:1;
+                u8 xbit:4; // unused
             } mark;
-            unsigned char markint;
+            u8 markint;
         };
-        unsigned short int checksum;
-        unsigned short int x1;				// unused
-        unsigned char data[POKEMON_DATA_LENGTH];
-        unsigned int status;
-        unsigned char level;
-        unsigned char pokerus;
-        unsigned short int currentHP;
-        unsigned short int maxHP;
-        unsigned short attack;
-        unsigned short defense;
-        unsigned short speed;
-        unsigned short spatk;
-        unsigned short spdef;
+        u16 checksum;
+        u16 x1;				// unused
+        u8 data[POKEMON_DATA_LENGTH];
+        u32 status;
+        u8 level;
+        u8 pokerus;
+        u16 currentHP;
+        u16 maxHP;
+        u16 attack;
+        u16 defense;
+        u16 speed;
+        u16 spatk;
+        u16 spdef;
     } belt_pokemon_t;
 
     typedef struct {
-        unsigned int personality;
-        unsigned int otid;
-        unsigned char name[10];
-        unsigned short language;
-        unsigned char otname[7];
-        unsigned char mark;
-        unsigned short int checksum;
-        unsigned short int x1;				// unused
-        unsigned char data[POKEMON_DATA_LENGTH];
+        u32 personality;
+        u32 otid;
+        u8 name[10];
+        u16 language;
+        u8 otname[7];
+        u8 mark;
+        u16 checksum;
+        u16 x1;				// unused
+        u8 data[POKEMON_DATA_LENGTH];
     } box_pokemon_t;
 
     class PKMN {
     public:
         typedef struct{
-            unsigned short int species;
-            unsigned short int held;
-            unsigned int xp;
-            unsigned char ppbonuses;
-            unsigned char happiness;
-            unsigned char x;				// unused
+            u16 species;
+            u16 held;
+            u32 xp;
+            u8 ppbonuses;
+            u8 happiness;
+            u8 x;				// unused
         } pokemon_growth_t ;
 
         typedef struct {
-            unsigned short int atk1;
-            unsigned short int atk2;
-            unsigned short int atk3;
-            unsigned short int atk4;
-            unsigned char pp1;
-            unsigned char pp2;
-            unsigned char pp3;
-            unsigned char pp4;
+            union{
+                struct {
+                    u16 atk1;
+                    u16 atk2;
+                    u16 atk3;
+                    u16 atk4;
+                }_atk;
+                u16 atk[4];
+            };
+            union{
+                struct {
+                    u16 pp1;
+                    u16 pp2;
+                    u16 pp3;
+                    u16 pp4;
+                }_pp;
+                u16 pp[4];
+            };
         } pokemon_attacks_t;
 
         typedef struct
         {
-            unsigned char hp;
-            unsigned char attack;
-            unsigned char defense;
-            unsigned char speed;
-            unsigned char spatk;
-            unsigned char spdef;
-            unsigned char coolness;
-            unsigned char beauty;
-            unsigned char cuteness;
-            unsigned char smartness;
-            unsigned char toughness;
-            unsigned char feel;
+            union{
+                struct{
+                    u8 hp;
+                    u8 attack;
+                    u8 defense;
+                    u8 speed;
+                    u8 spatk;
+                    u8 spdef;
+                }_ev;
+                u8 EV[6];
+            };
+            union{
+                struct{
+                    u8 coolness;
+                    u8 beauty;
+                    u8 cuteness;
+                    u8 smartness;
+                    u8 toughness;
+                    u8 feel;
+                }_con;
+                u8 ConStat[6];
+            };
         } pokemon_effort_t;
 
         typedef struct {
-            unsigned char pokerus;
-            unsigned char locationcaught;
+            u8 pokerus;
+            u8 locationcaught;
             signed char levelcaught:7;
-            unsigned char game:4;
-            unsigned char pokeball:4;
-            unsigned char tgender:1;
+            u8 game:4;
+            u8 pokeball:4;
+            u8 tgender:1;
             union {
                 struct {
-                    unsigned int hp:5;
-                    unsigned int atk:5;
-                    unsigned int def:5;
-                    unsigned int spd:5;
-                    unsigned int spatk:5;
-                    unsigned int spdef:5;
-                    unsigned int egg:1;
-                    unsigned int ability:1;
+                    u32 hp:5;
+                    u32 atk:5;
+                    u32 def:5;
+                    u32 spd:5;
+                    u32 spatk:5;
+                    u32 spdef:5;
+                    u32 egg:1;
+                    u32 ability:1;
                 } IVs;
-                unsigned int IVint;
+                u32 IVint;
             };
             union {
                 struct {
-                    unsigned char coolnormal:1;
-                    unsigned char coolsuper:1;
-                    unsigned char coolhyper:1;
-                    unsigned char coolmaster:1;
-                    unsigned char beautynormal:1;
-                    unsigned char beautysuper:1;
-                    unsigned char beautyhyper:1;
-                    unsigned char beautymaster:1;
-                    unsigned char cutenormal:1;
-                    unsigned char cutesuper:1;
-                    unsigned char cutehyper:1;
-                    unsigned char cutemaster:1;
-                    unsigned char smartnormal:1;
-                    unsigned char smartsuper:1;
-                    unsigned char smarthyper:1;
-                    unsigned char smartmaster:1;
-                    unsigned char toughnormal:1;
-                    unsigned char toughsuper:1;
-                    unsigned char toughhyper:1;
-                    unsigned char toughmaster:1;
-                    unsigned char champion:1;
-                    unsigned char winning:1;
-                    unsigned char victory:1;
-                    unsigned char artist:1;
-                    unsigned char effort:1;
-                    unsigned char marine:1;
-                    unsigned char land:1;
-                    unsigned char sky:1;
-                    unsigned char country:1;
-                    unsigned char national:1;
-                    unsigned char earth:1;
-                    unsigned char world:1;
+                    u8 coolnormal:1;
+                    u8 coolsuper:1;
+                    u8 coolhyper:1;
+                    u8 coolmaster:1;
+                    u8 beautynormal:1;
+                    u8 beautysuper:1;
+                    u8 beautyhyper:1;
+                    u8 beautymaster:1;
+                    u8 cutenormal:1;
+                    u8 cutesuper:1;
+                    u8 cutehyper:1;
+                    u8 cutemaster:1;
+                    u8 smartnormal:1;
+                    u8 smartsuper:1;
+                    u8 smarthyper:1;
+                    u8 smartmaster:1;
+                    u8 toughnormal:1;
+                    u8 toughsuper:1;
+                    u8 toughhyper:1;
+                    u8 toughmaster:1;
+                    u8 champion:1;
+                    u8 winning:1;
+                    u8 victory:1;
+                    u8 artist:1;
+                    u8 effort:1;
+                    u8 marine:1;
+                    u8 land:1;
+                    u8 sky:1;
+                    u8 country:1;
+                    u8 national:1;
+                    u8 earth:1;
+                    u8 world:1;
                 } ribbons;
-                unsigned int ribbonint;
+                u32 ribbonint;
             };
         } pokemon_misc_t;
     };
@@ -239,12 +259,12 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         static SaveParser* Instance();
         int get_newest_save(block *[NUM_BLOCKS_TOTAL]);
         char* parse_save(block*[NUM_BLOCKS_TOTAL]);
-        unsigned short int get_block_checksum(block* b);
+        u16 get_block_checksum(block* b);
         int pack_save(char *, block *[NUM_BLOCKS_TOTAL], char[SAVEFILE_LEN]);
-        char* get_text(unsigned char* raw, bool is_nickname);
+        char* get_text(u8* raw, bool is_nickname);
         //void print_pokemon(box_pokemon_t*);
         int parse_pokemon(char*, int, void**, PKMN::pokemon_attacks_t**, PKMN::pokemon_effort_t**, PKMN::pokemon_growth_t**, PKMN::pokemon_misc_t**, int, int);
-        unsigned short int encrypt(unsigned char*, unsigned int, unsigned int);
+        u16 encrypt(u8*, u32, u32);
         int load(int);
         int save();
         belt_pokemon_t *pokemon[NUM_BELT_POKEMON];
@@ -260,8 +280,8 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         static SaveParser* spInstance;
     };
 
-    unsigned short int encrypt(unsigned char *data, unsigned int pv, unsigned int otid);
-    char* get_text(unsigned char* raw, int max_len);
+    u16 encrypt(u8 *data, u32 pv, u32 otid);
+    char* get_text(u8* raw, int max_len);
     int parse_pokemon(char* buf, int offset, void** pokemon, PKMN::pokemon_attacks_t** pa, PKMN::pokemon_effort_t** pe,
         PKMN::pokemon_growth_t** pg, PKMN::pokemon_misc_t** pm, int num, int size);
     void print_pokemon(box_pokemon_t* pokemon);

@@ -585,14 +585,17 @@ namespace POKEMON{
             this->ability = h_a ? ( (PID&1||( Pkmn_Abilities[this->SPEC][3] ==0)) ? Pkmn_Abilities[SPE][2] : Pkmn_Abilities[SPE][3]):
                 (( PID&1||( Pkmn_Abilities[this->SPEC][1] ==0)) ? Pkmn_Abilities[SPE][0] : Pkmn_Abilities[SPE][1]);
             this->markings = NONE;
-            this->orig_lang = GER;
+            this->orig_lang = 5;
             for(int i= 0; i< 6; ++i) this->EV[i] = 0;
             for(int i= 0; i< 6; ++i) this->ConStats[i] = 0;
             for(int i= 0; i< 4; ++i) this->ribbons1[i] = 0;
             for(int i= 0; i< 4; ++i) this->Attack[i] = Attacks[i];
             for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[(int)Attacks[i]]->PP; /// ...
-            for(int i= 0; i< 4; ++i) this->PPUps[i] = 0;
-            this->IV = IV_struct(rand()%32,rand()%32,rand()%32,rand()%32,rand()%32,rand()%32,false,_isEgg);
+            
+            this->PPUps = 0;
+            this->IVint = ((rand() % (1 << 30)) << 2);
+            this->IV.isNicked = false;
+            this->IV.isEgg = _isEgg;
             for(int i= 0; i< 4; ++i) this->ribbons0[i] = 0;
             this->fateful = fatef;
 
@@ -801,12 +804,12 @@ namespace POKEMON{
             
                 font::putrec(158,46,158+68,46+12,false,false,251);
             
-                font::putrec(158,46,158+int(68.0*boxdata.IV.get(0)/31),46+6,false,false,7*16-1);
+                font::putrec(158,46,158+int(68.0*boxdata.IVget(0)/31),46+6,false,false,7*16-1);
                 font::putrec(158,46+6,158+int(68.0*boxdata.EV[0]/255),46+12,false,false,7*16-1);
 
                 for(int i= 1; i < 6; ++i){
                     font::putrec(158,54+(17*i),158+68,54+12+(17*i),false,false,251);
-                    font::putrec(158,54+(17*i),158+int(68.0*boxdata.IV.get(i)/31),54+6+(17*i),false,false,(7+i)*16-1);
+                    font::putrec(158,54+(17*i),158+int(68.0*boxdata.IVget(i)/31),54+6+(17*i),false,false,(7+i)*16-1);
                     font::putrec(158,54+6+(17*i),158+int(68.0*boxdata.EV[i]/255),54+12+(17*i),false,false,(7+i)*16-1);
                 }
             }
@@ -846,10 +849,23 @@ namespace POKEMON{
 
                     if(t == data.Types[0] || t == data.Types[1])
                         printf("\x1b[32m");
-
-                    printf("    %s\n    AP %2i""/""%2i ",
-                        &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
-                        AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.PPUps[i]) / 5));
+                    
+                    if(i == 0)
+                        printf("    %s\n    AP %2i""/""%2i ",
+                            &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
+                            AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up1) / 5));
+                    if(i == 1)
+                        printf("    %s\n    AP %2i""/""%2i ",
+                            &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
+                            AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up2) / 5));
+                    if(i == 2)
+                        printf("    %s\n    AP %2i""/""%2i ",
+                            &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
+                            AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up3) / 5));
+                    if(i == 3)
+                        printf("    %s\n    AP %2i""/""%2i ",
+                            &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
+                            AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up4) / 5));
                     switch (AttackList[this->boxdata.Attack[i]]->HitType)
                     {
                     case attack::PHYS:

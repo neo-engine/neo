@@ -32,6 +32,8 @@
 #include "keyboard.h"
 #include "sprite.h"
 
+#include "Gen.h"
+
 #include "Brother.h"
 #include "Male.h"
 #include "Female.h"
@@ -151,7 +153,7 @@ void killWeiter()
     consoleClear();
 }
 
-ChoiceResult opScreen(int type)
+ChoiceResult opScreen()
 {
     consoleSelect(&Top);
     consoleClear();
@@ -173,13 +175,12 @@ ChoiceResult opScreen(int type)
     };
 
     if(gMod == DEVELOPER){
-        type = 3;
         consoleSelect(&Bottom);
         consoleSetWindow(&Bottom,0,23,30,2);
         printf("Slot 2: %s",acSlot2Game);
     }
 
-    switch (type)
+    switch (SAV.SavTyp)
     {
     case 3:
         {
@@ -234,13 +235,15 @@ ChoiceResult opScreen(int type)
         {			
             killWeiter();
             consoleClear();
-            return opScreen(++SAV.SavTyp);
+            ++SAV.SavTyp;
+            return opScreen();
         }
         else if ((gMod==DEVELOPER)&&(SAV.SavTyp == 2) && (k & KEY_START) && (k & KEY_LEFT) && (k & KEY_L) && (k & KEY_R))
         {			
             killWeiter();
             consoleClear();
-            return opScreen(++SAV.SavTyp);
+            ++SAV.SavTyp;
+            return opScreen();
         }
         else if (p & KEY_B)
         {
@@ -758,11 +761,11 @@ START:
     POKEMON::LastPID = rand();
 
     //StartMenu
-    switch(opScreen(SAV.SavTyp))
+    switch(opScreen())
     {
     case TRANSFER_GAME:
         {
-            char *cmpgm[5] = {"BPR","BPG","BPE","AXP","AXV"};
+            char *cmpgm[5] = {"BPE","AXP","AXV","BPR","BPG"};
             int acgame = -1;
 
             for(int i= 0; i < 5; ++i){
@@ -775,15 +778,99 @@ CONT:
             }
             if(acgame == -1)
                 goto START;
-
-            ynbox yn;
-            if(yn.getResult("Möchtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?")){
-                mbox("Solltest du im Folgenden\nspeichern, so werden Daten\nauf das GBA-Modul geschrieben.");
-                mbox("Bitte entferne daher das\nGBA-Modul nicht, es könnte\nden Spielstand beschädigen.");
-                mbox("Auch das Speichern an sich\nkann den Spielstand\nbeschädigen.");
-                if(yn.getResult("Möchtest du fortfahren?")){
-                    mbox("Lade Spielstand...");
+            
+            scrn.init();
+            ynbox yn = ynbox(mbox("",0,false,false,false));
+            if(yn.getResult("Möchtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?",false)){
+                mbox("Solltest du im Folgenden\nspeichern, so werden Daten\nauf das GBA-Modul geschrieben.",false,false);
+                mbox("Bitte entferne daher das\nGBA-Modul nicht, es könnte\nden Spielstand beschädigen.",false,false);
+                mbox("Auch das Speichern an sich\nkann den Spielstand\nbeschädigen.",false,false);
+                if(yn.getResult("Möchtest du fortfahren?",false)){
+                    mbox("Lade Spielstand...",0,false,false,false);
                     int loadgame = acgame > 2 ? 1 : 0;
+
+                    SAV = savgm();
+                    //load player to default pos
+                    strcpy(SAV.acMapName,"0/98");
+                    SAV.acMapIdx = 1000;
+                    SAV.acposx = 2*20;
+                    SAV.acposy = 25*20;
+                    SAV.acposz = 3;
+
+                    SAV.owIdx = 0 ; // 20 * (acgame + 1)/2; until others are finished ...
+
+                    gen3::SaveParser* save3 = gen3::SaveParser::Instance();
+
+                    save3->load(loadgame);
+                    for(int i= 0; i < 6; ++i){
+                        if(save3->pokemon[i]->personality){
+                            SAV.PKMN_team.push_back(POKEMON::PKMN());
+
+                            POKEMON::PKMN &acPkmn = SAV.PKMN_team[i];
+                            gen3::belt_pokemon_t* &acBeltP = save3->pokemon[i];
+
+                            acPkmn.boxdata.PID = acBeltP->personality;  
+                            acPkmn.boxdata.ID = acBeltP->otid >> (1<<16);
+                            acPkmn.boxdata.SID = acBeltP->otid % (1<<16);   
+                            for(int i= 0; i < 10; ++i)
+                                acPkmn.boxdata.Name[i] = acBeltP->name[i];
+                            acPkmn.boxdata.Name[i] = 0;
+                            acPkmn.boxdata.hometown = acBeltP->language;
+                            for(int i = 0; i < 7; ++i)
+                                acPkmn.boxdata.OT[i] = acBeltP->otname[i];
+                            acPkmn.boxdata.OT[7] = 0;
+                            acPkmn.boxdata.markings = acBeltP->markint;
+                            
+                            acPkmn.statusint = acBeltP->status;
+                            acPkmn.Level = acBeltP->level;
+                            acPkmn.boxdata.PKRUS = acBeltP->pokerus;
+
+                            acPkmn.stats.acHP = acBeltP->currentHP;
+                            acPkmn.stats.maxHP = acBeltP->maxHP;
+                            acPkmn.stats.Atk = acBeltP->attack;
+                            acPkmn.stats.Def = acBeltP->defense;
+                            acPkmn.stats.SAtk = acBeltP->spatk;
+                            acPkmn.stats.SDef = acBeltP->spdef;
+                            acPkmn.stats.Spd = acBeltP->speed;
+
+                            gen3::PKMN::pokemon_growth_t* &acBG = save3->pokemon_growth[i];
+                            acPkmn.boxdata.SPEC = acBG->species;
+                            acPkmn.boxdata.Item = gen3::getNItemIdx(acBG->held);
+                            acPkmn.boxdata.exp = acBG->xp;
+                            acPkmn.boxdata.steps = acBG->happiness;
+                            acPkmn.boxdata.PPUps = acBG->ppbonuses;
+
+                            gen3::PKMN::pokemon_attacks_t* &acBA = save3->pokemon_attacks[i];
+                            for(int i= 0; i < 4; ++i){
+                                acPkmn.boxdata.Attack[i] = acBA->atk[i];
+                                acPkmn.boxdata.AcPP[i] = acBA->pp[i];
+                            }
+
+                            gen3::PKMN::pokemon_effort_t* &acBE = save3->pokemon_effort[i];
+                            for(int i= 0; i < 6; ++i){
+                                acPkmn.boxdata.EV[i] = acBE->EV[i];
+                                acPkmn.boxdata.ConStats[i] = acBE->ConStat[i];
+                            }
+
+                            gen3::PKMN::pokemon_misc_t* &acBM = save3->pokemon_misc[i];
+                            acPkmn.boxdata.IVint = acBM->IVint;
+                            acPkmn.boxdata.ability = POKEMON::Pkmn_Abilities[acPkmn.boxdata.SPEC][acPkmn.boxdata.IV.isEgg];
+                            acPkmn.boxdata.IV.isEgg = acPkmn.boxdata.IV.isNicked;
+                            acPkmn.boxdata.hatchPlace = acBM->locationcaught;
+                            acPkmn.boxdata.gotLevel = acBM->levelcaught;
+                            if(acPkmn.boxdata.IV.isEgg || acBM->levelcaught == 0){
+                                acPkmn.boxdata.gotPlace = 999;
+                                acPkmn.boxdata.gotLevel = 5;
+                            } 
+                            acPkmn.boxdata.OTisFemale = acBM->tgender;
+                            acPkmn.boxdata.Ball = acBM->pokeball;
+
+                            SAV.hasPKMN = true;
+                        }
+                    }
+                     
+                    mbox("Abgeschlossen.");
+                    break;
                 }
                 else goto START;
             }

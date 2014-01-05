@@ -194,24 +194,19 @@ namespace POKEMON{
             unsigned int exp                : 32;
             unsigned char steps             : 8; //StepstoHatch/256 // Happiness 
             unsigned char ability           : 8;
-            enum mark : char{
-                NONE = 0,
-                CIRCLE = 1,
-                TRIANGLE = 2,
-                SQUARE = 4,
-                HEART = 8,
-                STAR = 16,
-                DIAMOND = 32
-            } markings  : 8;
-            enum OL : char{
-                JAP = 1,
-                ENG = 2,
-                FRA = 3,
-                ITA = 4,
-                GER = 5,
-                ESP = 7,
-                KOR = 8
-            } orig_lang   : 8;
+            union {
+                struct {
+                    u8 circle:1;
+                    u8 triangle:1;
+                    u8 square:1;
+                    u8 heart:1;
+                    u8 star:1;
+                    u8 diamond:1;
+                    u8 xbit:2; // unused
+                } mark;
+                u8 markings;
+            };
+            u8 orig_lang;
             unsigned char EV[6];	//HP,Attack,Defense,SAttack,SDefense,Speed
             unsigned char ConStats[6]; //Cool, Beauty, Cute, Smart, Tough, Sheen
             unsigned char ribbons1[4];
@@ -220,34 +215,29 @@ namespace POKEMON{
             //BLOCKB{
             unsigned short Attack[4];
             unsigned char AcPP[4]; //
-            unsigned char PPUps[4]; //
+            union {
+                struct{
+                    u8 Up1 : 2;
+                    u8 Up2 : 2;
+                    u8 Up3 : 2;
+                    u8 Up4 : 2;
+                }ppup;
+                u8 PPUps;
+            };
 
-            struct IV_struct{
-                unsigned char HP         : 5;
-                unsigned char Attack     : 5;
-                unsigned char Defense    : 5;
-                unsigned char Speed      : 5;
-                unsigned char SAttack    : 5;
-                unsigned char SDefense   : 5;
-                bool isNicked           : 1;
-                bool isEgg              : 1;
-
-                IV_struct() { }
-                IV_struct(unsigned int a,unsigned int b,unsigned int c,unsigned int d,unsigned int e,unsigned int f,bool g,bool h) :
-                    HP(a),Attack(b),Defense(c),Speed(d),SAttack(e),SDefense(f),isNicked(g),isEgg(h) {}
-
-                unsigned char get(int i){
-                    switch(i){
-                    case 0: return this->HP;
-                    case 1: return this->Attack;
-                    case 2: return this->Defense;
-                    case 3: return this->Speed;
-                    case 4: return this->SAttack;
-                    case 5: return this->SDefense;
-                    default: return 0;
-                    }
-                }
-            } IV; //HP,Attack,Defense,Speed,SAttack,SDefense
+            union{
+                struct{
+                    unsigned char HP         : 5;
+                    unsigned char Attack     : 5;
+                    unsigned char Defense    : 5;
+                    unsigned char Speed      : 5;
+                    unsigned char SAttack    : 5;
+                    unsigned char SDefense   : 5;
+                    bool isNicked           : 1;
+                    bool isEgg              : 1;
+                } IV; //HP,Attack,Defense,Speed,SAttack,SDefense
+                u32 IVint;
+            };
             unsigned char ribbons0[4];
             bool fateful                : 1;
             bool isFemale               : 1;
@@ -294,16 +284,37 @@ namespace POKEMON{
             bool isShiny();
             bool isCloned();
             int gender();
+
+            unsigned char IVget(int i){
+                switch(i){
+                case 0: return this->IV.HP;
+                case 1: return this->IV.Attack;
+                case 2: return this->IV.Defense;
+                case 3: return this->IV.Speed;
+                case 4: return this->IV.SAttack;
+                case 5: return this->IV.SDefense;
+                default: return 0;
+                }
+            }
+            u8 PPupget(int i){
+                switch(i){
+                case 0: return this->ppup.Up1;
+                case 1: return this->ppup.Up2;
+                case 2: return this->ppup.Up3;
+                case 3: return this->ppup.Up4;
+                default: return 0;
+                }
+            }
             int getPersonality(){
                 int counter = 1, i = PID%6;
 
-                short max = i,maxval=IV.get(i);
+                short max = i,maxval=IVget(i);
                 for(;counter < 6;++counter)
                 {
                     i = (i+1)%6;
-                    if(IV.get(i)>maxval)
+                    if(IVget(i)>maxval)
                     {
-                        maxval = IV.get(i);
+                        maxval = IVget(i);
                         max = i;
                     }
                 }
@@ -326,11 +337,11 @@ namespace POKEMON{
             }
             int getItem(){ return this->Item; }
             Type getHPType(){
-                int a =((IV.get(0)&1)+2*(IV.get(1)&1)+4*(IV.get(2)&1)+8*(IV.get(3)&1)+16*(IV.get(4)&1)+32*(IV.get(5)&1)*15)/63;
+                int a =((IVget(0)&1)+2*(IVget(1)&1)+4*(IVget(2)&1)+8*(IVget(3)&1)+16*(IVget(4)&1)+32*(IVget(5)&1)*15)/63;
                 return a<9?(Type)a:Type(a+1);
             }
             int getHPPower(){		
-                return 30+((((IV.get(0)>>1)&1)+2*((IV.get(1)>>1)&1)+4*((IV.get(2)>>1)&1)+8*((IV.get(3)>>1)&1)+16*((IV.get(4)>>1)&1)+32*((IV.get(5)>>1)&1)*40)/63);
+                return 30+((((IVget(0)>>1)&1)+2*((IVget(1)>>1)&1)+4*((IVget(2)>>1)&1)+8*((IVget(3)>>1)&1)+16*((IVget(4)>>1)&1)+32*((IVget(5)>>1)&1)*40)/63);
                 }
         
             BOX_PKMN(){}
@@ -343,14 +354,17 @@ namespace POKEMON{
 
         }boxdata;
 
-        struct status{
-            unsigned char Asleep : 3;
-            bool Poisoned       : 1;
-            bool Burned         : 1;
-            bool Frozen         : 1;
-            bool Paralyzed      : 1;
-            bool Toxic          : 1;
-        } _status;
+        union{
+            struct{
+                unsigned char Asleep : 3;
+                bool Poisoned       : 1;
+                bool Burned         : 1;
+                bool Frozen         : 1;
+                bool Paralyzed      : 1;
+                bool Toxic          : 1;
+            } _status;
+            u32 statusint;
+        };
         unsigned char                   : 8;
         unsigned char                   : 8;
         unsigned char                   : 8;
