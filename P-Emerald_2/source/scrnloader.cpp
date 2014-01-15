@@ -1844,19 +1844,20 @@ void initSub(int pkmIdx){
     }
     int u= 0;
     for(int i= 0; i < 4; ++i)
-        if(AttackList[SAV.PKMN_team[pkmIdx].boxdata.Attack[i]]->isFieldAttack){
-            oam->oamBuffer[15 + 2*(u)].isHidden = false;
-            oam->oamBuffer[16 + 2*(u)].isHidden = false;
-            oam->oamBuffer[15 + 2*(u)].y = -7 + 24 * u;
-            oam->oamBuffer[16 + 2*(u)].y = -7 + 24 * u;
+        if(SAV.PKMN_team[pkmIdx].boxdata.Attack[i] < MAXATTACK && 
+            AttackList[SAV.PKMN_team[pkmIdx].boxdata.Attack[i]]->isFieldAttack){
+                oam->oamBuffer[15 + 2*(u)].isHidden = false;
+                oam->oamBuffer[16 + 2*(u)].isHidden = false;
+                oam->oamBuffer[15 + 2*(u)].y = -7 + 24 * u;
+                oam->oamBuffer[16 + 2*(u)].y = -7 + 24 * u;
             
-            oam->oamBuffer[15 + 2*(u)].x = 152;
-            oam->oamBuffer[16 + 2*(u)].x = 192 + 24;
-            updateOAMSub(oam);
+                oam->oamBuffer[15 + 2*(u)].x = 152;
+                oam->oamBuffer[16 + 2*(u)].x = 192 + 24;
+                updateOAMSub(oam);
 
-            consoleSetWindow(&Bottom,16,3*u + 1,16,16);
-            printf("    %s",AttackList[SAV.PKMN_team[pkmIdx].boxdata.Attack[i]]->Name.c_str());
-            ++u;
+                consoleSetWindow(&Bottom,16,3*u + 1,16,16);
+                printf("    %s",AttackList[SAV.PKMN_team[pkmIdx].boxdata.Attack[i]]->Name.c_str());
+                ++u;
         }
         consoleSelect(&Top);
 

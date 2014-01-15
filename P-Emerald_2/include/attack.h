@@ -3,6 +3,8 @@
 #include "type.h"
 #include <string>
 
+#define MAXATTACK 20
+
 class attack
 {
 public:

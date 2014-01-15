@@ -13,6 +13,8 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
     bool isValidItem(int gen5Idx);
     int getItemIdx(int gen5Idx);
     int getNItemIdx(int gen3Idx);
+    int getNLocation(int gen3Idx);
+    int getLocation(int gen5Idx);
     
     #define SAVEFILE_LEN (1 << 17)
     #define NUM_BLOCKS_SLOT 14
@@ -158,10 +160,15 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         typedef struct {
             u8 pokerus;
             u8 locationcaught;
-            signed char levelcaught:7;
-            u8 game:4;
-            u8 pokeball:4;
-            u8 tgender:1;
+            union{
+                struct{
+                    signed char levelcaught:7;
+                    u8 game:4;
+                    u8 pokeball:4;
+                    u8 tgender:1;
+                };
+                u16 all;
+            };
             union {
                 struct {
                     u32 hp:5;
@@ -273,9 +280,9 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         PKMN::pokemon_growth_t *pokemon_growth[NUM_BELT_POKEMON];
         PKMN::pokemon_misc_t *pokemon_misc[NUM_BELT_POKEMON];
 
+        char *unpackeddata;
     private:
         SaveParser(){};	// Private constructor because this is a singleton
-        char *unpackeddata;
         block *blocks[NUM_BLOCKS_TOTAL];
         static SaveParser* spInstance;
     };

@@ -60,6 +60,7 @@ enum GameMod{
     EMULATOR
 } gMod = DEVELOPER;
 std::string CodeName = "Charming Lari";
+SavMod savMod = _NDS;
 
 char acSlot2Game[5];
 
@@ -785,23 +786,18 @@ CONT:
                 mbox("Solltest du im Folgenden\nspeichern, so werden Daten\nauf das GBA-Modul geschrieben.",false,false);
                 mbox("Bitte entferne daher das\nGBA-Modul nicht, es könnte\nden Spielstand beschädigen.",false,false);
                 mbox("Auch das Speichern an sich\nkann den Spielstand\nbeschädigen.",false,false);
+                yn = ynbox();
                 if(yn.getResult("Möchtest du fortfahren?",false)){
                     mbox("Lade Spielstand...",0,false,false,false);
                     int loadgame = acgame > 2 ? 1 : 0;
-
-                    SAV = savgm();
-                    //load player to default pos
-                    strcpy(SAV.acMapName,"0/98");
-                    SAV.acMapIdx = 1000;
-                    SAV.acposx = 2*20;
-                    SAV.acposy = 25*20;
-                    SAV.acposz = 3;
-
-                    SAV.owIdx = 0 ; // 20 * (acgame + 1)/2; until others are finished ...
-
+                                        
                     gen3::SaveParser* save3 = gen3::SaveParser::Instance();
 
-                    save3->load(loadgame);
+                    if(save3->load(loadgame) == -1){
+                        mbox("Ein Fehler ist aufgetreten.\nKehre zum Hauptmenü zurück.");
+                        goto START;
+                    }
+                    SAV = savgm();
                     for(int i= 0; i < 6; ++i){
                         if(save3->pokemon[i]->personality){
                             SAV.PKMN_team.push_back(POKEMON::PKMN());
@@ -810,14 +806,14 @@ CONT:
                             gen3::belt_pokemon_t* &acBeltP = save3->pokemon[i];
 
                             acPkmn.boxdata.PID = acBeltP->personality;  
-                            acPkmn.boxdata.ID = acBeltP->otid >> (1<<16);
-                            acPkmn.boxdata.SID = acBeltP->otid % (1<<16);   
+                            acPkmn.boxdata.SID = acBeltP->otid >> 16;
+                            acPkmn.boxdata.ID = acBeltP->otid % (1<<16);   
                             for(int i= 0; i < 10; ++i)
-                                acPkmn.boxdata.Name[i] = acBeltP->name[i];
-                            acPkmn.boxdata.Name[i] = 0;
+                                acPkmn.boxdata.Name[i] = gen3::text[acBeltP->name[i]];
+                            acPkmn.boxdata.Name[10] = 0;
                             acPkmn.boxdata.hometown = acBeltP->language;
                             for(int i = 0; i < 7; ++i)
-                                acPkmn.boxdata.OT[i] = acBeltP->otname[i];
+                                acPkmn.boxdata.OT[i] = gen3::text[acBeltP->otname[i]];
                             acPkmn.boxdata.OT[7] = 0;
                             acPkmn.boxdata.markings = acBeltP->markint;
                             
@@ -856,19 +852,39 @@ CONT:
                             acPkmn.boxdata.IVint = acBM->IVint;
                             acPkmn.boxdata.ability = POKEMON::Pkmn_Abilities[acPkmn.boxdata.SPEC][acPkmn.boxdata.IV.isEgg];
                             acPkmn.boxdata.IV.isEgg = acPkmn.boxdata.IV.isNicked;
-                            acPkmn.boxdata.hatchPlace = acBM->locationcaught;
+                            acPkmn.boxdata.gotPlace = gen3::getNLocation(acBM->locationcaught);
                             acPkmn.boxdata.gotLevel = acBM->levelcaught;
                             if(acPkmn.boxdata.IV.isEgg || acBM->levelcaught == 0){
-                                acPkmn.boxdata.gotPlace = 999;
+                                acPkmn.boxdata.hatchPlace = 999;
                                 acPkmn.boxdata.gotLevel = 5;
+                                acPkmn.boxdata.hatchDate[0] = 
+                                    acPkmn.boxdata.hatchDate[1] =
+                                    acPkmn.boxdata.hatchDate[2] = 0;
+                                acPkmn.boxdata.gotDate[0] = 
+                                    acPkmn.boxdata.gotDate[1] =
+                                    acPkmn.boxdata.gotDate[2] = 1;
                             } 
                             acPkmn.boxdata.OTisFemale = acBM->tgender;
                             acPkmn.boxdata.Ball = acBM->pokeball;
+                            acPkmn.boxdata.gotDate[0] = 
+                                acPkmn.boxdata.gotDate[1] =
+                                acPkmn.boxdata.gotDate[2] = 0;
 
                             SAV.hasPKMN = true;
                         }
                     }
-                     
+                    savMod = _GBA;
+                    //load player to default pos
+                    strcpy(SAV.acMapName,"0/98");
+                    SAV.acMapIdx = 1000;
+                    SAV.acposx = 2*20;
+                    SAV.acposy = 25*20;
+                    SAV.acposz = 3;
+
+                    SAV.owIdx = 0 ; // 20 * (acgame + 1)/2; until others are finished ...
+
+                    oam->oamBuffer[SAVE_ID].isHidden = false;
+
                     mbox("Abgeschlossen.");
                     break;
                 }
@@ -1275,6 +1291,10 @@ void animateHero(int dir,int frame){
     } 
 }
 
+void movePlayer(int direction){
+    acMap->movePlayer(direction);
+}
+
 bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
     bool WTW = (gMod == DEVELOPER) && (keysHeld() & KEY_R);
 
@@ -1328,10 +1348,7 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
         movedir = 2;
     else if(oldx > y)
         movedir = 4;
-        
-    if(!init && SAV.showBlackBorder) //Show black border instead of mapTiles while moving
-        acMap->movePlayer(movedir,true);
-   
+          
     if(lastmovedata == 0 && acmovedata %4 == 0)
         SAV.acposz = z = acmovedata / 4;
     
@@ -1436,7 +1453,7 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
     if(init)
         acMap->draw(x-16,y-18,init);    
     else
-        acMap->movePlayer(movedir);
+        movePlayer(movedir);
     
     animateHero(movedir,1);
     animateHero(movedir,2);
@@ -1663,7 +1680,6 @@ int main(int argc, char** argv)
         
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
     acMap = new map2d::Map("nitro://MAPS/",SAV.acMapName);
-    SAV.showBlackBorder = false;
 
     movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
     lastdir = 0;

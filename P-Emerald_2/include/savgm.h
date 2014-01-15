@@ -8,7 +8,10 @@ namespace POKEMON{
     class PKMN;
 }
 class BOX;
-
+enum SavMod{
+    _NDS,
+    _GBA
+};
 class savgm
     {
     public:	
@@ -41,7 +44,6 @@ class savgm
         std::vector<POKEMON::PKMN> PKMN_team;
         
         u8 owIdx;
-        bool showBlackBorder;
 
         u8 flags[1000];
         

@@ -38,17 +38,12 @@ extern font::Font cust_font2;
 
 extern item ItemList[700];
 extern ablty abilities[164];
-extern std::string PKMNBallList[30];
-extern std::string TMList[100];
-extern std::string KeyItemList[50];
 
 extern attack* AttackList[560];
-extern std::string MetList[20];
 extern std::string NatureList[25];
 extern std::string TypeList[19];
 extern std::string PersonalityList[30];
 extern std::map<int,std::string> Locations;
-extern std::string Games[10];
 
 enum Type;//defined in "berry.h"
 namespace POKEMON{

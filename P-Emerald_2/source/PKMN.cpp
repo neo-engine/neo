@@ -20,14 +20,11 @@ extern std::string readString(FILE*);
 extern std::wstring readWString(FILE*);
 
 extern attack* AttackList[560];
-std::string PKMNBallList[30];
-std::string TMList[100];
-std::string KeyItemList[50];
-std::string MetList[20];
 
 extern SpriteInfo spriteInfo[SPRITE_COUNT];
 extern SpriteInfo spriteInfoTop[SPRITE_COUNT];
 extern OAMTable *oam,*oamTop;
+extern SavMod savMod;
 
 namespace POKEMON{
     std::string NatureList[25]= {
@@ -49,11 +46,16 @@ namespace POKEMON{
     };
 
     const char* getLoc(int ind) {
+        if(ind < 0 || ind > 5000)
+            return "Entfernter Ort";
         char buf[50];
         sprintf(buf,"nitro:/LOCATIONS/%i.data",ind);
         FILE* f = fopen(buf,"r");
         if(f == 0){ 
             fclose(f);
+            if(savMod == SavMod::_NDS && ind > 322 && ind < 1000)
+                return getLoc(3002);
+
             return "Entfernter Ort";
         }
         std::string ret = readString(f);
@@ -409,7 +411,7 @@ namespace POKEMON{
             return WHITE;
         }
     }
-
+    
     LevelUp_Type Pkmn_LevelUpTypes[669];
     char Pkmn_Abilities[669][4] = {
         {0},
@@ -522,151 +524,152 @@ namespace POKEMON{
         {600000,800000,1000000,1059860,1250000,1640000,100,0,0,0,0,0,0}};
             
     
-        PKMNDATA::PKMNDATA data;
+    PKMNDATA::PKMNDATA data;
     
-        PKMN::BOX_PKMN::BOX_PKMN(char* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
-        bool OTFemale,bool Cloned,bool Shiny,bool h_a,bool fatef ,bool _isEgg,short gPlace,char BALL, char Prus)
-        {	
-            PKMNDATA::getAll(SPE,data);
+    PKMN::BOX_PKMN::BOX_PKMN(char* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
+    bool OTFemale,bool Cloned,bool Shiny,bool h_a,bool fatef ,bool _isEgg,short gPlace,char BALL, char Prus)
+    {	
+        PKMNDATA::getAll(SPE,data);
             
-            srand(LastPID);
-            LastPID = this->PID = rand();
-            if (Shiny)
-                while(!isShiny())	
-                    LastPID = PID = rand();
-            else 
-                while(isShiny())
-                    LastPID = PID = rand();
-            this->checksum = 0;
-            this->SPEC = SPE;
+        srand(LastPID);
+        LastPID = this->PID = rand();
+        if (Shiny)
+            while(!isShiny())	
+                LastPID = PID = rand();
+        else 
+            while(isShiny())
+                LastPID = PID = rand();
+        this->checksum = 0;
+        this->SPEC = SPE;
 
-            if(data.Items[3])
-                this->Item = data.Items[3];
-            else{
-                b1 = rand()%100;
-                if(b1 < 5 && data.Items[0])
-                    this->Item = data.Items[0];
-                else if(b1 < 20 && data.Items[1])
-                    this->Item = data.Items[1];
-                else if(b1 < 80 && data.Items[2])
-                    this->Item = data.Items[2];
-                else
-                    this->Item = 0;
-            }
-
-            this->ID = ID_;
-            this->SID = SID_;
-            if(!_isEgg)
-                this->exp = EXP[level-1][Pkmn_LevelUpTypes[this->SPEC]];
+        if(data.Items[3])
+            this->Item = data.Items[3];
+        else{
+            b1 = rand()%100;
+            if(b1 < 5 && data.Items[0])
+                this->Item = data.Items[0];
+            else if(b1 < 20 && data.Items[1])
+                this->Item = data.Items[1];
+            else if(b1 < 80 && data.Items[2])
+                this->Item = data.Items[2];
             else
-                this->exp = 0;
+                this->Item = 0;
+        }
 
-            time_t unixTime = time(NULL);
-            tm* timeStruct = gmtime((const time_t *)&unixTime);
+        this->ID = ID_;
+        this->SID = SID_;
+        if(!_isEgg)
+            this->exp = EXP[level-1][Pkmn_LevelUpTypes[this->SPEC]];
+        else
+            this->exp = 0;
+
+        time_t unixTime = time(NULL);
+        tm* timeStruct = gmtime((const time_t *)&unixTime);
             
-            if(_isEgg)
-            {
-                steps = data.eggcyc;
-                gotDate[0] = timeStruct->tm_mday;
-                gotDate[1] =timeStruct->tm_mon+1;
-                gotDate[2] = (timeStruct->tm_year +1900) % 100;
-                gotPlace = gPlace;
-                hatchDate[0] =  hatchDate[1] = hatchDate[2] =  hatchPlace = 0;
-            }
-            else
-            {
-                steps = data.baseFriend;
-                gotDate[0] =  gotDate[1] = gotDate[2] = gotPlace = 0;
-                hatchDate[0] = timeStruct->tm_mday;
-                hatchDate[1] =timeStruct->tm_mon+1;
-                hatchDate[2] =(timeStruct->tm_year +1900) % 100;
-                hatchPlace = gPlace;
-            }
-            this->ability = h_a ? ( (PID&1||( Pkmn_Abilities[this->SPEC][3] ==0)) ? Pkmn_Abilities[SPE][2] : Pkmn_Abilities[SPE][3]):
-                (( PID&1||( Pkmn_Abilities[this->SPEC][1] ==0)) ? Pkmn_Abilities[SPE][0] : Pkmn_Abilities[SPE][1]);
-            this->markings = NONE;
-            this->orig_lang = 5;
-            for(int i= 0; i< 6; ++i) this->EV[i] = 0;
-            for(int i= 0; i< 6; ++i) this->ConStats[i] = 0;
-            for(int i= 0; i< 4; ++i) this->ribbons1[i] = 0;
-            for(int i= 0; i< 4; ++i) this->Attack[i] = Attacks[i];
-            for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[(int)Attacks[i]]->PP; /// ...
+        if(_isEgg)
+        {
+            steps = data.eggcyc;
+            gotDate[0] = timeStruct->tm_mday;
+            gotDate[1] =timeStruct->tm_mon+1;
+            gotDate[2] = (timeStruct->tm_year +1900) % 100;
+            gotPlace = gPlace;
+            hatchDate[0] =  hatchDate[1] = hatchDate[2] =  hatchPlace = 0;
+        }
+        else
+        {
+            steps = data.baseFriend;
+            gotDate[0] =  gotDate[1] = gotDate[2] = gotPlace = 0;
+            hatchDate[0] = timeStruct->tm_mday;
+            hatchDate[1] =timeStruct->tm_mon+1;
+            hatchDate[2] =(timeStruct->tm_year +1900) % 100;
+            hatchPlace = gPlace;
+        }
+        this->ability = h_a ? ( (PID&1||( Pkmn_Abilities[this->SPEC][3] ==0)) ? Pkmn_Abilities[SPE][2] : Pkmn_Abilities[SPE][3]):
+            (( PID&1||( Pkmn_Abilities[this->SPEC][1] ==0)) ? Pkmn_Abilities[SPE][0] : Pkmn_Abilities[SPE][1]);
+        this->markings = NONE;
+        this->orig_lang = 5;
+        for(int i= 0; i< 6; ++i) this->EV[i] = 0;
+        for(int i= 0; i< 6; ++i) this->ConStats[i] = 0;
+        for(int i= 0; i< 4; ++i) this->ribbons1[i] = 0;
+        for(int i= 0; i< 4; ++i) this->Attack[i] = Attacks[i];
+        for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[(int)Attacks[i]]->PP; /// ...
             
-            this->PPUps = 0;
-            this->IVint = ((rand() % (1 << 30)) << 2);
+        this->PPUps = 0;
+        this->IVint = ((rand() % (1 << 30)) << 2);
+        this->IV.isNicked = false;
+        this->IV.isEgg = _isEgg;
+        for(int i= 0; i< 4; ++i) this->ribbons0[i] = 0;
+        this->fateful = fatef;
+
+            
+        Gender_Type A = data.gender;
+        if(A == MALE)
+            this->isFemale = this->isGenderless = false;
+        else if (A == FEMALE)
+            this->isFemale = true,
+            this->isGenderless = false;
+        else if (A==GENDERLESS)
+            this->isFemale = false,
+            this->isGenderless = true;
+        else if ((this->PID % 256) >= A)
+            this->isFemale = this->isGenderless = false;
+        else this->isFemale = true,
+            this->isGenderless = false;
+
+        this->alt_forme = 0;
+        this->cloned = Cloned;
+        if(N){
+            wcscpy(Name,N);
+            this->IV.isNicked = true;
+        }
+        else{
+            PKMNDATA::getWDisplayName(SPE,Name);
             this->IV.isNicked = false;
-            this->IV.isEgg = _isEgg;
-            for(int i= 0; i< 4; ++i) this->ribbons0[i] = 0;
-            this->fateful = fatef;
-
-            
-            Gender_Type A = data.gender;
-            if(A == MALE)
-                this->isFemale = this->isGenderless = false;
-            else if (A == FEMALE)
-                this->isFemale = true,
-                this->isGenderless = false;
-            else if (A==GENDERLESS)
-                this->isFemale = false,
-                this->isGenderless = true;
-            else if ((this->PID % 256) >= A)
-                this->isFemale = this->isGenderless = false;
-            else this->isFemale = true,
-                this->isGenderless = false;
-
-            this->alt_forme = 0;
-            this->cloned = Cloned;
-            if(N){
-                wcscpy(Name,N);
-                this->IV.isNicked = true;
-            }
-            else{
-                PKMNDATA::getWDisplayName(SPE,Name);
-                this->IV.isNicked = false;
-            }
-            this->hometown = 4;
-            for(int i= 0; i< 4; ++i) this->ribbons2[i] = 0;
-            wcscpy(OT,ot);
-            this->PKRUS = Prus;
-            this->Ball = BALL;
-            this->gotLevel = level;
-            this->OTisFemale = OTFemale;
-            this->encounter = (enc)0;
-            this->HGSSBall = 0;
-
         }
-        PKMN::PKMN(char* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
-            bool OTFemale,bool Cloned,bool Shiny,bool h_a = false,bool fatef = false,bool _isEgg = false,short gPlace = 0,char BALL = 0, char Prus = 0)
-            :boxdata(Attacks,SPE,N,level,ID_,SID_,ot,OTFemale,Cloned,Shiny,h_a,fatef,_isEgg,gPlace,BALL,Prus),Level(level)
-        {	
-            PKMNDATA::getAll(SPE,data);
-            if(SPE != 292)
-                stats.acHP = stats.maxHP = ((boxdata.IV.HP+2*data.Bases[0]+(boxdata.EV[0]/4)+100)*level/100)+10;
-            else
-                stats.acHP = stats.maxHP = 1;
+        this->hometown = 4;
+        for(int i= 0; i< 4; ++i) this->ribbons2[i] = 0;
+        wcscpy(OT,ot);
+        this->PKRUS = Prus;
+        this->Ball = BALL;
+        this->gotLevel = level;
+        this->OTisFemale = OTFemale;
+        this->encounter = (enc)0;
+        this->HGSSBall = 0;
+
+    }
+    PKMN::PKMN(char* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
+        bool OTFemale,bool Cloned,bool Shiny,bool h_a = false,bool fatef = false,bool _isEgg = false,short gPlace = 0,char BALL = 0, char Prus = 0)
+        :boxdata(Attacks,SPE,N,level,ID_,SID_,ot,OTFemale,Cloned,Shiny,h_a,fatef,_isEgg,gPlace,BALL,Prus),Level(level)
+    {	
+        PKMNDATA::getAll(SPE,data);
+        if(SPE != 292)
+            stats.acHP = stats.maxHP = ((boxdata.IV.HP+2*data.Bases[0]+(boxdata.EV[0]/4)+100)*level/100)+10;
+        else
+            stats.acHP = stats.maxHP = 1;
         
-            Natures nature = this->boxdata.getNature();
-            stats.Atk = (((boxdata.IV.Attack+2*data.Bases[1]+(boxdata.EV[1]>>2))*level/100.0)+5)*NatMod[nature][0];
-            stats.Def = (((boxdata.IV.Defense+2*data.Bases[2]+(boxdata.EV[2]>>2))*level/100.0)+5)*NatMod[nature][1];
-            stats.Spd = (((boxdata.IV.Speed+2*data.Bases[3]+(boxdata.EV[3]>>2))*level/100.0)+5)*NatMod[nature][2];
-            stats.SAtk = (((boxdata.IV.SAttack+2*data.Bases[4]+(boxdata.EV[4]>>2))*level/100.0)+5)*NatMod[nature][3];
-            stats.SDef = (((boxdata.IV.SDefense+2*data.Bases[5]+(boxdata.EV[5]>>2))*level/100.0)+5)*NatMod[nature][4];
+        Natures nature = this->boxdata.getNature();
+        stats.Atk = (((boxdata.IV.Attack+2*data.Bases[1]+(boxdata.EV[1]>>2))*level/100.0)+5)*NatMod[nature][0];
+        stats.Def = (((boxdata.IV.Defense+2*data.Bases[2]+(boxdata.EV[2]>>2))*level/100.0)+5)*NatMod[nature][1];
+        stats.Spd = (((boxdata.IV.Speed+2*data.Bases[3]+(boxdata.EV[3]>>2))*level/100.0)+5)*NatMod[nature][2];
+        stats.SAtk = (((boxdata.IV.SAttack+2*data.Bases[4]+(boxdata.EV[4]>>2))*level/100.0)+5)*NatMod[nature][3];
+        stats.SDef = (((boxdata.IV.SDefense+2*data.Bases[5]+(boxdata.EV[5]>>2))*level/100.0)+5)*NatMod[nature][4];
 
-            this->_status.Asleep = this->_status.Burned = this->_status.Frozen = this->_status.Paralyzed = this->_status.Poisoned = this->_status.Toxic = false;
-        }
+        this->_status.Asleep = this->_status.Burned = this->_status.Frozen = this->_status.Paralyzed = this->_status.Poisoned = this->_status.Toxic = false;
+    }
 
-        void setDefaultConsoleTextColors(u16* palette,int start = 1){
-            palette[start * 16 - 1] = RGB15(0,0,0); //30 normal black
-            palette[(start+1) * 16 - 1] = RGB15(15,0,0); //31 normal red
-            palette[(start+2) * 16 - 1] = RGB15(0,15,0); //32 normal green
-            palette[(start+3) * 16 - 1] = RGB15(15,15,0); //33 normal yellow
+    void setDefaultConsoleTextColors(u16* palette,int start = 1){
+        palette[start * 16 - 1] = RGB15(0,0,0); //30 normal black
+        palette[(start+1) * 16 - 1] = RGB15(15,0,0); //31 normal red
+        palette[(start+2) * 16 - 1] = RGB15(0,15,0); //32 normal green
+        palette[(start+3) * 16 - 1] = RGB15(15,15,0); //33 normal yellow
             
-            palette[(start+4) * 16 - 1] = RGB15(0,0,15); //34 normal blue
-            palette[(start+5) * 16 - 1] = RGB15(15,0,15); //35 normal magenta
-            palette[(start+6) * 16 - 1] = RGB15(0,15,15); //36 normal cyan
-            palette[(start+7) * 16 - 1] = RGB15(24,24,24); //37 normal white
-        }
-
+        palette[(start+4) * 16 - 1] = RGB15(0,0,15); //34 normal blue
+        palette[(start+5) * 16 - 1] = RGB15(15,0,15); //35 normal magenta
+        palette[(start+6) * 16 - 1] = RGB15(0,15,15); //36 normal cyan
+        palette[(start+7) * 16 - 1] = RGB15(24,24,24); //37 normal white
+    }
+        
+        
     void PKMN::drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom, bool newpok)
     {
         setDefaultConsoleTextColors(BG_PALETTE,6);
@@ -1041,7 +1044,10 @@ namespace POKEMON{
                 cust_font2.print_string("Schicksalhafte Begegnung.",28,120,true);	
             if(!(this->boxdata.gotDate[0]))
             {
-                sprintf(buf, "Gefangen am %02i.%02i.%02i mit Lv. %i", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
+                if(savMod == SavMod::_NDS)
+                    sprintf(buf, "Gefangen am %02i.%02i.%02i mit Lv. %i", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
+                else
+                    sprintf(buf, "Gefangen mit Lv. %i", boxdata.gotLevel);
                 cust_font2.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
                 cust_font2.print_string(buf,35,58,true);
@@ -1055,17 +1061,26 @@ namespace POKEMON{
             }
             else
             {
-                sprintf(buf, "Als Ei erhalten am %02i.%02i.%02i", boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2]);
+                if(savMod == SavMod::_NDS)
+                    sprintf(buf, "Als Ei erhalten am %02i.%02i.%02i", boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2]);
+                else
+                    sprintf(buf, "Als Ei erhalten.");
                 cust_font2.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
                 cust_font2.print_string(buf,35,58,true);
                 if(!(this->boxdata.IV.isEgg))
                 {
-                    sprintf(buf,"Geschlüpft am %i.%i.%i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2]);
-                    cust_font2.print_string(buf,28,72,true);
-                    sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
-                    cust_font2.print_string(buf,35,86,true);
-
+                    
+                    if(savMod == SavMod::_NDS){
+                        sprintf(buf,"Geschlüpft am %02i.%02i.%02i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2]);
+                        cust_font2.print_string(buf,28,72,true);
+                        sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
+                        cust_font2.print_string(buf,35,86,true);
+                    }
+                    else{
+                        sprintf(buf,"Geschlüpft in/bei %s.", getLoc(boxdata.hatchPlace));
+                        cust_font2.print_string(buf,28,72,true);
+                    }
                     if(!this->boxdata.fateful){
                         sprintf(buf, "Besitzt ein %s""es Wesen,",&(NatureList[this->boxdata.getNature()][0]));
                         cust_font2.print_string(buf,28,100,true);
@@ -1086,7 +1101,10 @@ namespace POKEMON{
         {
             if(!(this->boxdata.gotDate[0]))
             {
-                sprintf(buf, "Off. gef. am %02i.%02i.%02i mit Lv. %i.", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
+                if(savMod == SavMod::_NDS)
+                    sprintf(buf, "Off. gef. am %02i.%02i.%02i mit Lv. %i.", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
+                else
+                    sprintf(buf, "Offenbar gefangen mit Lv. %i.",boxdata.gotLevel);
                 cust_font2.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
                 cust_font2.print_string(buf,35,58,true);
@@ -1100,17 +1118,25 @@ namespace POKEMON{
             } 
             else
             {
-                sprintf(buf, "Off. Als Ei erh. am %02i.%02i.%02i", boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2]);
+                if(savMod == SavMod::_NDS)
+                    sprintf(buf, "Off. Als Ei erh. am %02i.%02i.%02i", boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2]);
+                else
+                    sprintf(buf,"Offenbar als Ei erhalten.");
                 cust_font2.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
                 cust_font2.print_string(buf,35,58,true);
                 if(!(this->boxdata.IV.isEgg))
                 {
-                    sprintf(buf,"Geschlüpft am %02i.%02i.%02i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2]);
-                    cust_font2.print_string(buf,28,72,true);
-                    sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
-                    cust_font2.print_string(buf,35,86,true);
-
+                    if(savMod == SavMod::_NDS){
+                        sprintf(buf,"Geschlüpft am %02i.%02i.%02i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2]);
+                        cust_font2.print_string(buf,28,72,true);
+                        sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
+                        cust_font2.print_string(buf,35,86,true);
+                    }
+                    else{
+                        sprintf(buf,"Geschlüpft in/bei %s.", getLoc(boxdata.hatchPlace));
+                        cust_font2.print_string(buf,28,72,true);
+                    }
                     if(!this->boxdata.fateful){
                         sprintf(buf, "Besitzt ein %s""es Wesen,",&(NatureList[this->boxdata.getNature()][0]));
                         cust_font2.print_string(buf,28,100,true);
@@ -1135,12 +1161,16 @@ namespace POKEMON{
          
             consoleSelect(Top);	
             consoleSetWindow(Top, 4,5,12,2);
-            printf("EP(%3i%%)\nKP(%3i%%)",(this->boxdata.exp-POKEMON::EXP[this->Level-1][0]) *100/(POKEMON::EXP[this->Level][0]-POKEMON::EXP[this->Level-1][0]),this->stats.acHP*100/this->stats.maxHP);
+
+            int exptype = Pkmn_LevelUpTypes[this->boxdata.SPEC];
+
+            printf("EP(%3i%%)\nKP(%3i%%)",(this->boxdata.exp-POKEMON::EXP[this->Level-1][exptype]) *100/(POKEMON::EXP[this->Level][exptype]-POKEMON::EXP[this->Level-1][exptype]),
+                this->stats.acHP*100/this->stats.maxHP);
             BATTLE::displayHP(100,101,46,80,97,98,false,50,56);   
             BATTLE::displayHP(100,100-this->stats.acHP*100/this->stats.maxHP,46,80,97,98,false,50,56); 
         
             BATTLE::displayEP(100,101,46,80,99,100,false,59,62);   
-            BATTLE::displayEP(0,(this->boxdata.exp-POKEMON::EXP[this->Level-1][0]) *100/(POKEMON::EXP[this->Level][0]-POKEMON::EXP[this->Level-1][0]),46,80,99,100,false,59,62); 
+            BATTLE::displayEP(0,(this->boxdata.exp-POKEMON::EXP[this->Level-1][exptype]) *100/(POKEMON::EXP[this->Level][exptype]-POKEMON::EXP[this->Level-1][exptype]),46,80,99,100,false,59,62); 
         
             if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),this->boxdata.isFemale,true))
                 loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),!this->boxdata.isFemale,true);

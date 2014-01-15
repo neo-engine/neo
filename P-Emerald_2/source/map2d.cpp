@@ -174,10 +174,46 @@ namespace map2d{
     int lastrow, lastcol;
     int lastbx, lastby;
 
-    void Map::movePlayer(int direction,bool clear) {
+    void Map::fill(u16* mapMemory[4],int xmin,int x,int xmax,int ymin,int y, int ymax, int c){
+        int toplayer = 1,betw = 2, bottomlayer = 3;
+
+        Block acBlock;
+        if(x < 0 || y < 0 ||x >= (int)this->sizex + 20 || y >= (int)this->sizey + 20)
+            acBlock = this->b.blocks[rand[x%2][y%2]];                    
+        else if((x < 10 || y < 10 ||x >= (int)this->sizex + 10 || y >= (int)this->sizey + 10) && blocks[x][y].blockidx == 0)
+            acBlock = this->b.blocks[rand[x%2][y%2]];                    
+        else
+            acBlock = this->b.blocks[blocks[x][y].blockidx];
+ 
+        if(acBlock.topbehave != 0x10)
+            std::swap(toplayer,betw);
+
+        if(x > xmin && y > ymin){
+            mapMemory[toplayer][c-33] = 0;
+            mapMemory[betw][c-33] = (acBlock.top[0][0]);
+            mapMemory[bottomlayer][c-33] = acBlock.bottom[0][0];
+        }
+        if(x > xmin && y < ymax - 1){
+            mapMemory[toplayer][c-32] = 0;
+            mapMemory[betw][c-32] = acBlock.top[0][1];
+            mapMemory[bottomlayer][c-32] = acBlock.bottom[0][1];
+        }
+        if(x < xmax - 1 && y > ymin){
+            mapMemory[toplayer][c-1] = 0;
+            mapMemory[betw][c-1] = acBlock.top[1][0];
+            mapMemory[bottomlayer][c-1] = acBlock.bottom[1][0];
+        }
+        if(x < xmax -1 && y < ymax - 1){
+            mapMemory[toplayer][c] = 0;
+            mapMemory[betw][c] = acBlock.top[1][1];
+            mapMemory[bottomlayer][c] = acBlock.bottom[1][1];
+        }
+    }
+
+    void Map::movePlayer(int direction) {
         int c = 0;
         u16* mapMemory[4];
-        for(int i= 0; i< 4; ++i)  mapMemory[i] = (u16*)BG_MAP_RAM(i);
+        for(int i= 1; i< 4; ++i)  mapMemory[i] = (u16*)BG_MAP_RAM(2*i-1);
 
         int bx = lastbx, by = lastby;
 
@@ -187,7 +223,7 @@ namespace map2d{
         switch(direction) 
         {
         case 1: 
-            lastrow = (lastrow + 1) % 16;
+            lastrow = (lastrow + 1) % 32;
             c = lastrow * 2;
             lastbx++;
             bx += 16;
@@ -198,14 +234,10 @@ namespace map2d{
             ymax = lastbx + 17;
             plsval = 60;
             
-            if(clear){
-                lastrow = (lastrow + 15) % 16;
-                lastbx--;
-            }
             break;
         case 3:
             c = lastrow * 2;
-            lastrow = (lastrow + 15) % 16;
+            lastrow = (lastrow + 31) % 32;
             lastbx--;
             bx += 14;
 
@@ -215,10 +247,6 @@ namespace map2d{
             ymax = lastbx + 2;
             plsval = 60;
             
-            if(clear){
-                lastrow = (lastrow + 1) % 16;
-                lastbx++;
-            }
             break;
         case 2:
             lastcol = (lastcol + 1) % 16;
@@ -232,10 +260,6 @@ namespace map2d{
             ymax = lastbx + 17;
             plsval = 32;
             
-            if(clear){
-                lastcol = (lastcol + 15) % 16;
-                lastby--;
-            }
             break;
         case 4:
             c = lastcol * 64;
@@ -250,94 +274,72 @@ namespace map2d{
             ymax = lastbx + 17;
             plsval = 32;  
             
-            if(clear){
-                lastcol = (lastcol + 1) % 16;
-                lastby++;
-            }
         }
         int c2 = c;
-        for(int x = xmin; x < xmax; x++){
-            for(int y = ymin; y < ymax; y++){
-                int toplayer = 1,betw = 2, bottomlayer = 3;
-
-                Block acBlock;
-                if(x < 0 || y < 0 ||x >= (int)this->sizex + 20 || y >= (int)this->sizey + 20)
-                    acBlock = this->b.blocks[rand[x%2][y%2]];                    
-                else if((x < 10 || y < 10 ||x >= (int)this->sizex + 10 || y >= (int)this->sizey + 10) && blocks[x][y].blockidx == 0)
-                    acBlock = this->b.blocks[rand[x%2][y%2]];                    
-                else
-                    acBlock = this->b.blocks[blocks[x][y].blockidx];
-
-                if(clear)
-                    acBlock = this->b.blocks[0];                    
-                
-                if(acBlock.topbehave != 0x10)
-                    std::swap(toplayer,betw);
-
-                if(x > xmin && y > ymin){
-                    mapMemory[toplayer][c-33] = 0;
-                    mapMemory[betw][c-33] = (acBlock.top[0][0]);
-                    mapMemory[bottomlayer][c-33] = acBlock.bottom[0][0];
-                }
-                if(x > xmin && y < ymax - 1){
-                    mapMemory[toplayer][c-32] = 0;
-                    mapMemory[betw][c-32] = acBlock.top[0][1];
-                    mapMemory[bottomlayer][c-32] = acBlock.bottom[0][1];
-                }
-                if(x < xmax - 1 && y > ymin){
-                    mapMemory[toplayer][c-1] = 0;
-                    mapMemory[betw][c-1] = acBlock.top[1][0];
-                    mapMemory[bottomlayer][c-1] = acBlock.bottom[1][0];
-                }
-                if(x < xmax -1 && y < ymax - 1){
-                    mapMemory[toplayer][c] = 0;
-                    mapMemory[betw][c] = acBlock.top[1][1];
-                    mapMemory[bottomlayer][c] = acBlock.bottom[1][1];
-                }
-                
-                if(y < bx + 16)
-                    c+=2;
-            }
-            c += plsval;
+        if(direction != 3){
+            ymin += 16;
+            ymax += 16;
         }
-        
-        if(!clear)
-            switch(direction) {
-            case 2: case 4:
-                for(int i = 1; i < 4; ++i){
-                    u16 q[32];
-                    for(int g = 0; g < 32; ++g)
-                        q[g] = mapMemory[i][c2 + g];
-                    for(int o = 0; o < 32; ++o)
-                        mapMemory[i][c2 + o] = q[(o + 32 - 2*(lr+1))%32];
+        for(int i= 0; i < 2; ++i){
+            if((direction % 2 == 0) || (i == ((lastrow+(direction == 3 ? 1:0))%32) / 16))
+                for(int x = xmin; x < xmax; x++){
+                    for(int y = ymin; y < ymax; y++){
+                        
+                        fill(mapMemory,xmin,x,xmax,ymin,y,ymax,c);
+                
+                        if(y < bx + 16 * ( 2+ i))
+                            c+=2;
+                    }
+                    c += plsval;
                 }
-                c2 += 32;
-                for(int i = 1; i < 4; ++i){
-                    u16 q[32];
-                    for(int g = 0; g < 32; ++g)
-                        q[g] = mapMemory[i][c2 + g];
-                    for(int o = 0; o < 32; ++o)
-                        mapMemory[i][c2 + o] = q[(o + 32 - 2*(lr+1))%32];
-                }
-                break;
-            case 1: case 3:
-                for(int i = 1; i < 4; ++i){
-                    u16 q[32];
-                    for(int g = 0; g < 32; ++g)
-                        q[g] = mapMemory[i][c2 + 32*g];
-                    for(int o = 0; o < 32; ++o)
-                        mapMemory[i][c2 + 32*o] = q[(o + 32 - 2*(lc+1))%32];
-                }
-                c2++;
-                for(int i = 1; i < 4; ++i){
-                    u16 q[32];
-                    for(int g = 0; g < 32; ++g)
-                        q[g] = mapMemory[i][c2 + 32*g];
-                    for(int o = 0; o < 32; ++o)
-                        mapMemory[i][c2 + 32*o] = q[(o + 32 - 2*(lc+1))%32];
-                }
-                break;
+            c = c2 + 1024 - 32;
+        }
+        switch(direction) {
+        case 2: case 4:
+            for(int i = 1; i < 4; ++i){
+                u16 q[64];
+                for(int g = 0; g < 32; ++g)
+                    q[g] = mapMemory[i][c2 + g];
+                for(int g = 0; g < 32; ++g)
+                    q[g + 32] = mapMemory[i][c2 + g + 1024 -32];
+                for(int o = 0; o < 32; ++o)
+                    mapMemory[i][c2 + o] = q[(o + 64 - 2*(lr+1))%64];
+                for(int o = 0; o < 32; ++o)
+                    mapMemory[i][c2 + o + 1024 -32] = q[(o + 32 - 2*(lr+1))%64];
             }
+            c2 += 32;
+            for(int i = 1; i < 4; ++i){
+                u16 q[64];
+                for(int g = 0; g < 32; ++g)
+                    q[g] = mapMemory[i][c2 + g];
+                for(int g = 0; g < 32; ++g)
+                    q[g + 32] = mapMemory[i][c2 + g + 1024-32];
+                for(int o = 0; o < 32; ++o)
+                    mapMemory[i][c2 + o] = q[(o + 64 - 2*(lr))%64];
+                for(int o = 0; o < 32; ++o)
+                    mapMemory[i][c2 + o + 1024-32] = q[(o + 32 - 2*(lr+1))%64];
+            }
+            break;
+        case 1: case 3:
+            c2 += (((lastrow+(direction == 3 ? 1:0))%32) / 16) * (1024 - 32);
+
+            for(int i = 1; i < 4; ++i){
+                u16 q[32];
+                for(int g = 0; g < 32; ++g)
+                    q[g] = mapMemory[i][c2 + 32*g];
+                for(int o = 0; o < 32; ++o)
+                    mapMemory[i][c2 + 32*o] = q[(o + 32 - 2*(lc+1))%32];
+            }
+            c2++;
+            for(int i = 1; i < 4; ++i){
+                u16 q[32];
+                for(int g = 0; g < 32; ++g)
+                    q[g] = mapMemory[i][c2 + 32*g];
+                for(int o = 0; o < 32; ++o)
+                    mapMemory[i][c2 + 32*o] = q[(o + 32 - 2*(lc+1))%32];
+            }
+            break;
+        }
     }
     
     void Map::draw(int bx,int by,bool init){
@@ -352,9 +354,9 @@ namespace map2d{
             //REG_BG3CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(3) | BG_TILE_BASE(1)| BG_PRIORITY(3);
 
             for(int i= 1; i < 4; ++i){
-                bgs[i] = bgInit(i, BgType_Text4bpp, BgSize_T_256x256, i, 1);
+                bgs[i] = bgInit(i, BgType_Text4bpp, BgSize_T_512x256, 2*i - 1, 1);
                 bgSetPriority(bgs[i],i);
-                bgScroll(bgs[i],0,32);
+                bgScroll(bgs[i],128,32);
             }
 
             //Top = *consoleInit(&Top, 0, BgType_Text4bpp, BgSize_T_256x256, 0, 5, true ,true);
@@ -367,91 +369,96 @@ namespace map2d{
             dmaCopy(this->pals, BG_PALETTE, 512); 
         }
         u16* mapMemory[4];
-        for(int i= 0; i< 4; ++i)  mapMemory[i] = (u16*)BG_MAP_RAM(i);
+        for(int i= 1; i< 4; ++i)  mapMemory[i] = (u16*)BG_MAP_RAM(2*i-1);
         
-        lastrow = 15;
+        lastrow = 31;
         lastcol = 15;
 
         int c = 0;
-        bx += 8;
+        bx += 0;
         by += 10;
+        
         
         lastbx = bx;
         lastby = by;
-        for(int x = by; x < by + 17; x++){
-            for(int y = bx; y < bx + 17; y++){
-                int toplayer = 1, bottomlayer = 3;
+        for(int i= 0; i < 2; ++i){
+            for(int x = by; x < by + 17; x++){
+                for(int y = bx; y < bx + 17; y++){
+                    int toplayer = 1, bottomlayer = 3;
 
-                Block acBlock = this->b.blocks[blocks[x][y].blockidx];
+                    Block acBlock = this->b.blocks[blocks[x][y].blockidx];
 
-                //if(tile_deb_test){
-                //    acBlock = this->b.blocks[tcnt];
-                //    tcnt = (tcnt +1)%1024;
-                //}
-                if(x < 0 || y < 0 ||x >= (int)this->sizex + 20 || y >= (int)this->sizey + 20){
-                    acBlock = this->b.blocks[rand[x%2][y%2]];
-                }
-                else if((x < 10 || y < 10 ||x >= (int)this->sizex + 10 || y >= (int)this->sizey + 10) && blocks[x][y].blockidx == 0){
-                    acBlock = this->b.blocks[rand[x%2][y%2]];
-                }
-                else{
-                    //consoleSelect(&Top);
-                    //consoleSetWindow(&Top,2*(y-bx)-1,2*(x-by)-1,2,2);
-                    //printf("%i",acBlock.topbehave);
-                }
+                    //if(tile_deb_test){
+                    //    acBlock = this->b.blocks[tcnt];
+                    //    tcnt = (tcnt +1)%1024;
+                    //}
+                    if(x < 0 || y < 0 ||x >= (int)this->sizex + 20 || y >= (int)this->sizey + 20){
+                        acBlock = this->b.blocks[rand[x%2][y%2]];
+                    }
+                    else if((x < 10 || y < 10 ||x >= (int)this->sizex + 10 || y >= (int)this->sizey + 10) && blocks[x][y].blockidx == 0){
+                        acBlock = this->b.blocks[rand[x%2][y%2]];
+                    }
+                    else{
+                        //consoleSelect(&Top);
+                        //consoleSetWindow(&Top,2*(y-bx)-1,2*(x-by)-1,2,2);
+                        //printf("%i",acBlock.topbehave);
+                    }
                 
-                if(acBlock.topbehave == 0x10){                    
-                    if(x > by && y > bx)
-                        mapMemory[toplayer + 1][c-33] = (acBlock.top[0][0]);
-                    if(x > by && y < bx + 16)
-                        mapMemory[toplayer + 1][c-32] = acBlock.top[0][1];
-                    if(x < by +16 && y > bx)
-                        mapMemory[toplayer + 1][c-1] = acBlock.top[1][0];
-                    if(x < by +16&& y < bx + 16)
-                        mapMemory[toplayer + 1][c] = acBlock.top[1][1];
+                    if(acBlock.topbehave == 0x10){                    
+                        if(x > by && y > bx)
+                            mapMemory[toplayer + 1][c-33] = (acBlock.top[0][0]);
+                        if(x > by && y < bx + 16)
+                            mapMemory[toplayer + 1][c-32] = acBlock.top[0][1];
+                        if(x < by +16 && y > bx)
+                            mapMemory[toplayer + 1][c-1] = acBlock.top[1][0];
+                        if(x < by +16&& y < bx + 16)
+                            mapMemory[toplayer + 1][c] = acBlock.top[1][1];
 
-                    if(x > by && y > bx)
-                        mapMemory[toplayer][c-33] = 0;
-                    if(x > by && y < bx + 16)
-                        mapMemory[toplayer][c-32] = 0;
-                    if(x < by +16 && y > bx)
-                        mapMemory[toplayer][c-1] = 0;
-                    if(x < by +16&& y < bx + 16)
-                        mapMemory[toplayer][c] = 0;
-                }
-                else{
-                    if(x > by && y > bx)
-                        mapMemory[toplayer][c-33] = (acBlock.top[0][0]);
-                    if(x > by && y < bx + 16)
-                        mapMemory[toplayer][c-32] = acBlock.top[0][1];
-                    if(x < by +16 && y > bx)
-                        mapMemory[toplayer][c-1] = acBlock.top[1][0];
-                    if(x < by +16&& y < bx + 16)
-                        mapMemory[toplayer][c] = acBlock.top[1][1];
+                        if(x > by && y > bx)
+                            mapMemory[toplayer][c-33] = 0;
+                        if(x > by && y < bx + 16)
+                            mapMemory[toplayer][c-32] = 0;
+                        if(x < by +16 && y > bx)
+                            mapMemory[toplayer][c-1] = 0;
+                        if(x < by +16&& y < bx + 16)
+                            mapMemory[toplayer][c] = 0;
+                    }
+                    else{
+                        if(x > by && y > bx)
+                            mapMemory[toplayer][c-33] = (acBlock.top[0][0]);
+                        if(x > by && y < bx + 16)
+                            mapMemory[toplayer][c-32] = acBlock.top[0][1];
+                        if(x < by +16 && y > bx)
+                            mapMemory[toplayer][c-1] = acBlock.top[1][0];
+                        if(x < by +16&& y < bx + 16)
+                            mapMemory[toplayer][c] = acBlock.top[1][1];
                     
+                        if(x > by && y > bx)
+                            mapMemory[toplayer+1][c-33] = 0;
+                        if(x > by && y < bx + 16)
+                            mapMemory[toplayer+1][c-32] = 0;
+                        if(x < by +16 && y > bx)
+                            mapMemory[toplayer+1][c-1] = 0;
+                        if(x < by +16&& y < bx + 16)
+                            mapMemory[toplayer+1][c] = 0;
+                    }
+                
                     if(x > by && y > bx)
-                        mapMemory[toplayer+1][c-33] = 0;
+                        mapMemory[bottomlayer][c-33] = acBlock.bottom[0][0];
                     if(x > by && y < bx + 16)
-                        mapMemory[toplayer+1][c-32] = 0;
+                        mapMemory[bottomlayer][c-32] = acBlock.bottom[0][1];
                     if(x < by +16 && y > bx)
-                        mapMemory[toplayer+1][c-1] = 0;
+                        mapMemory[bottomlayer][c-1] = acBlock.bottom[1][0];
                     if(x < by +16&& y < bx + 16)
-                        mapMemory[toplayer+1][c] = 0;
+                        mapMemory[bottomlayer][c] = acBlock.bottom[1][1];
+                
+                    if(y < bx + 16)
+                        c+=2;
                 }
-                
-                if(x > by && y > bx)
-                    mapMemory[bottomlayer][c-33] = acBlock.bottom[0][0];
-                if(x > by && y < bx + 16)
-                    mapMemory[bottomlayer][c-32] = acBlock.bottom[0][1];
-                if(x < by +16 && y > bx)
-                    mapMemory[bottomlayer][c-1] = acBlock.bottom[1][0];
-                if(x < by +16&& y < bx + 16)
-                    mapMemory[bottomlayer][c] = acBlock.bottom[1][1];
-                
-                if(y < bx + 16)
-                    c+=2;
+                c += 32;
             }
-            c += 32;
+            c -= 64;
+            bx += 16;
         }
         bgUpdate();
         consoleSelect(&Bottom);

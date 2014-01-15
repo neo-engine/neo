@@ -12,8 +12,11 @@
 
 #include "PKMN.h"
 #include "savgm.h"
+#include "Gen.h"
 
 std::string sav_nam = "./p_smaragd_2.sav";/*"nitro:/SAV";*/ //as nitro:/SAV doesn't seem to work :( ...
+std::string sav_nam_2 = "./p_smaragd_2.gba.sav";/*"nitro:/SAV";*/ //as nitro:/SAV doesn't seem to work :( ...
+extern SavMod savMod;
 #define PKMN_DATALENGTH 128
 extern const short POKEMON::OTLENGTH;
 extern const short POKEMON::PKMN_NAMELENGTH;
@@ -93,8 +96,20 @@ savgm::savgm(void Func(int))
     good = true;
 }
 
+bool saveGBA(void Func(int)){
+    FILE* fd = fopen(&sav_nam_2[0],"wb");
+    if(fd == 0)
+        return false;
+    fwrite(gen3::SaveParser::Instance()->unpackeddata,sizeof(u8),14 * sizeof(gen3::block),fd);
+    fclose(fd);
+    return true;
+}
+
 bool savgm::save(void Func(int))
 {
+    if(savMod == _GBA)
+        return saveGBA(Func);
+
     int booltemp;
     FILE* fd = fopen(&sav_nam[0],"w");
     if(fd == 0)

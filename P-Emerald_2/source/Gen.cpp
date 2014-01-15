@@ -19,7 +19,24 @@ namespace gen3{
     int getNItemIdx(int gen3Idx){
         return gen3Idx;
     }
+    int getNLocation(int gen3Idx){
+        if(gen3Idx < 88)
+            return gen3Idx + 235;
+        if(gen3Idx < 99)
+            return gen3Idx - 88 + 138;
+        if(gen3Idx == 99)
+            return 152;
+        if(gen3Idx == 100)
+            return 158;
+        if(gen3Idx < 126)
+            return gen3Idx - 101 + 149;
 
+        return 322 + gen3Idx;
+    }
+    static void smemcpy(u8* dest, const u8* src, int size) {
+        while(size--) 
+            *dest++ = *src++;
+    }
     SaveParser* SaveParser::spInstance = NULL;
 
     int SaveParser::get_newest_save(block *blocks[NUM_BLOCKS_TOTAL]) {
@@ -44,12 +61,13 @@ namespace gen3{
 
     char* SaveParser::parse_save(block *blocks[NUM_BLOCKS_TOTAL])
     {
-        FILE *f;
         char *data;
         int i, newestSave;
 
-        for (i = 0; i < NUM_BLOCKS_TOTAL; i++)
-            blocks[i] = (block*)(SRAM + i*(sizeof(block)));
+        for (i = 0; i < NUM_BLOCKS_TOTAL; i++){
+            blocks[i] = new block();
+            smemcpy((u8*)(blocks[i]),SRAM + i*(sizeof(block)),sizeof(block));
+        }
 
         newestSave = get_newest_save(blocks);
 
@@ -125,21 +143,21 @@ namespace gen3{
     //    PKMN::pokemon_misc_t *pm;
     //    int o, totalIVs, totalEVs;
     //    char* nickname = get_text(pokemon->name, true);
-
+    //
     //    // Figure out the order
     //    o = pokemon->personality % 24;
     //    pa = (PKMN::pokemon_attacks_t *)(pokemon->data + DataOrderTable[o][0] * sizeof(PKMN::pokemon_attacks_t));
     //    pe = (PKMN::pokemon_effort_t *)(pokemon->data + DataOrderTable[o][1] * sizeof(PKMN::pokemon_effort_t));
     //    pg = (PKMN::pokemon_growth_t *)(pokemon->data + DataOrderTable[o][2] * sizeof(PKMN::pokemon_growth_t));
     //    pm = (PKMN::pokemon_misc_t *)(pokemon->data + DataOrderTable[o][3] * sizeof(PKMN::pokemon_misc_t));
-
+    //
     //    totalIVs = pm->IVs.hp + pm->IVs.atk + pm->IVs.def + pm->IVs.spatk + pm->IVs.spdef + pm->IVs.spd;
     //    totalEVs = pe->hp + pe->attack + pe->defense + pe->spatk + pe->spdef + pe->speed;
     //    fprintf(stdout, "Species: %s, Nickname: %s, held: %s, Nature: %s\n", pokemon_species[pg->species], nickname, items[pg->held], natures[pokemon->personality % 25]);
     //    fprintf(stdout, "Attacks: 1:%s, 2:%s, 3:%s, 4:%s\n", attacks[pa->atk1], attacks[pa->atk2], attacks[pa->atk3], attacks[pa->atk4] );
     //    fprintf(stdout, "IVs:\tHP:%d\tAtk:%d\tDef:%d\tSpA:%d\tSpD:%d\tSpe:%d\tTotal:%d\n", pm->IVs.hp, pm->IVs.atk, pm->IVs.def, pm->IVs.spatk, pm->IVs.spdef, pm->IVs.spd, totalIVs );
     //    fprintf(stdout, "EVs:\tHP:%d\tAtk:%d\tDef:%d\tSpA:%d\tSpD:%d\tSpe:%d\tTotal:%d\n", pe->hp, pe->attack, pe->defense, pe->spatk, pe->spdef, pe->speed, totalEVs );
-
+    //
     //    delete[] nickname;
     //}
 
