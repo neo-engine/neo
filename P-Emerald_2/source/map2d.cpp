@@ -311,7 +311,7 @@ namespace map2d{
                     mapMemory[i][c2 + o] = q[(o + 64 - 2*((lr+1)%32))%64];
                 for(int o = 0; o < 32; ++o)
                     mapMemory[i][c2 + o + 1024] = q[(o + 96 - 2*((lr+1)%32))%64];
-            }
+            } 
             c2 += 32;
             for(int i = 1; i < 4; ++i){
                 u16 q[64];

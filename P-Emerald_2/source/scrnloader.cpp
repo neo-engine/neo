@@ -1528,11 +1528,11 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     return nextAvailableTileIdx;
 }
 void setMainSpriteVisibility(bool hidden){
-    for(int i = PKMN_ID; i<= NAV_ID; ++i)
-    if(i == PKMN_ID && !SAV.hasPKMN)
-    setSpriteVisibility(&oam->oamBuffer[i],true);
-    else
-    setSpriteVisibility(&oam->oamBuffer[i],hidden);
+    for(int i = 2; i<= 7; ++i)
+        if(i == 2 && !SAV.hasPKMN)
+            setSpriteVisibility(&oam->oamBuffer[i],true);
+        else
+            setSpriteVisibility(&oam->oamBuffer[i],hidden);
     updateOAMSub(oam);
 }
 

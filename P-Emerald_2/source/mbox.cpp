@@ -85,11 +85,7 @@ mbox::mbox(item item, const int count){
     updateOAMSub(oam);
 
     updateTime();
-
-    loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind);
-    consoleSetWindow(&Bottom, 5,2,30,MAXLINES);
-    consoleSelect(&Bottom);
-
+    
     cust_font.set_color(253,3);
     cust_font.set_color(254,4);
     
@@ -130,13 +126,12 @@ mbox::mbox(item item, const int count){
     }
         
     initMainSprites(oam,spriteInfo);
-    setMainSpriteVisibility(false);
+    //setMainSpriteVisibility(false);
     setSpriteVisibility(back,true);
     setSpriteVisibility(save,false);
     oam->oamBuffer[8].isHidden = true;
     dinit();
     updateOAMSub(oam);
-    swiWaitForVBlank();
 }
 
 mbox::mbox(const char* text,bool time,bool remsprites)

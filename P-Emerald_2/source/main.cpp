@@ -175,11 +175,11 @@ ChoiceResult opScreen()
         std::pair<int,int>(165,186)
     };
 
-    if(gMod == DEVELOPER){
+   /* if(gMod == DEVELOPER){
         consoleSelect(&Bottom);
         consoleSetWindow(&Bottom,0,23,30,2);
         printf("Slot 2: %s",acSlot2Game);
-    }
+    }*/
 
     switch (SAV.SavTyp)
     {
@@ -930,9 +930,9 @@ CONT:
         }
        
         SAV.owIdx = 0; 
-        strcpy(SAV.acMapName ,"0/3"); 
-        SAV.acMapIdx = 243;
-        SAV.acposx = 16*20, SAV.acposy = 16*20, SAV.acposz = 3;
+        strcpy(SAV.acMapName ,"0/98"); 
+        SAV.acMapIdx = 1000;
+        SAV.acposx = 2*20, SAV.acposy = 25*20, SAV.acposz = 3;
         break;
     case NEW_GAME:
         initNewGame();
@@ -1902,8 +1902,8 @@ int main(int argc, char** argv)
                 if(keysUp() & KEY_TOUCH)
                 break;
             }
-            const char *someText[7]= {"\n     PKMN-Spawn","\n    Item-Spawn","\n 1-Item_Test","\n  Battle SPWN.","\nF***ing Slot2","\n   Trainerpass","\n    42"};
-            cbox test(5,&someText[0],0,true);
+            const char *someText[7]= {"\n     PKMN-Spawn","\n    Item-Spawn","\n 1-Item_Test","\n  Battle SPWN.","\n   Trainerpass","\n    42"};
+            cbox test(4,&someText[0],0,true);
             int res = test.getResult("...",true);
             switch(res)
             {
@@ -1945,6 +1945,7 @@ int main(int argc, char** argv)
             case 2:
                 SAV.PKMN_team[0].boxdata.exp += 100;
                 mbox(berry("Ginemabeere"),31);
+                setMainSpriteVisibility(false);
                 break;
             case 3:{
                 BATTLE::battle_trainer me("TEST",0,0,0,0,&SAV.PKMN_team,0);
@@ -1966,23 +1967,13 @@ int main(int argc, char** argv)
 
                 BATTLE::battle test_battle(&me,&opp,100,5,BATTLE::battle::DOUBLE);
                 test_battle.start(100,BATTLE::battle::NONE);
-                break;}
-            case 4:{
-                videoSetMode(MODE_0_2D | DISPLAY_BG0_ACTIVE );
-                
-                sysSetBusOwners(true, true);
-                loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
-                consoleSelect(&Top);
-                consoleSetWindow(&Top,0,0,32,24);
-                for(int i= 0; i < 512; ++i)
-                    printf("%hhu ",SRAM[i]);
-            }   
+                break;
+                   }
             }
-            if(res != 4){
             setMainSpriteVisibility(false);
             scrn.draw(mode);
             initMapSprites();
-            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);}
+            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
         }
         //StartPok\x82""nav
         else if (sqrt(sq(mainSpritesPositions[5][0]-touch.px) + sq(mainSpritesPositions[5][1]-touch.py)) <= 16 && mode == -1)
