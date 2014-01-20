@@ -929,8 +929,8 @@ CONT:
             free_spaces.push_back(i);
         }
        
-        SAV.owIdx = 0;
-        strcpy(SAV.acMapName ,"0/1");
+        SAV.owIdx = 0; 
+        strcpy(SAV.acMapName ,"0/3"); 
         SAV.acMapIdx = 243;
         SAV.acposx = 16*20, SAV.acposy = 16*20, SAV.acposz = 3;
         break;

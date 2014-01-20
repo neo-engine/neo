@@ -276,7 +276,7 @@ namespace map2d{
             
         }
         int c2 = c;
-        if(direction != 3){
+        if(direction == 1){
             ymin += 16;
             ymax += 16;
         }
@@ -287,12 +287,17 @@ namespace map2d{
                         
                         fill(mapMemory,xmin,x,xmax,ymin,y,ymax,c);
                 
-                        if(y < bx + 16 * ( 2+ i))
+                        if((direction % 2 == 1 && y < bx + 16 * ( 2+ i)) || (direction % 2 == 0 && y < bx + 16 * (1 + i)))
                             c+=2;
                     }
                     c += plsval;
                 }
             c = c2 + 1024 - 32;
+            if(direction % 2 == 0){
+                c += 32;
+                ymin += 16;
+                ymax += 16;
+            }
         }
         switch(direction) {
         case 2: case 4:
@@ -301,11 +306,11 @@ namespace map2d{
                 for(int g = 0; g < 32; ++g)
                     q[g] = mapMemory[i][c2 + g];
                 for(int g = 0; g < 32; ++g)
-                    q[g + 32] = mapMemory[i][c2 + g + 1024 -32];
+                    q[g + 32] = mapMemory[i][c2 + g + 1024];
                 for(int o = 0; o < 32; ++o)
-                    mapMemory[i][c2 + o] = q[(o + 64 - 2*(lr+1))%64];
+                    mapMemory[i][c2 + o] = q[(o + 64 - 2*((lr+1)%32))%64];
                 for(int o = 0; o < 32; ++o)
-                    mapMemory[i][c2 + o + 1024 -32] = q[(o + 32 - 2*(lr+1))%64];
+                    mapMemory[i][c2 + o + 1024] = q[(o + 96 - 2*((lr+1)%32))%64];
             }
             c2 += 32;
             for(int i = 1; i < 4; ++i){
@@ -313,11 +318,11 @@ namespace map2d{
                 for(int g = 0; g < 32; ++g)
                     q[g] = mapMemory[i][c2 + g];
                 for(int g = 0; g < 32; ++g)
-                    q[g + 32] = mapMemory[i][c2 + g + 1024-32];
+                    q[g + 32] = mapMemory[i][c2 + g + 1024];
                 for(int o = 0; o < 32; ++o)
-                    mapMemory[i][c2 + o] = q[(o + 64 - 2*(lr))%64];
+                    mapMemory[i][c2 + o] = q[(o + 64 - 2*((lr+1)%32))%64];
                 for(int o = 0; o < 32; ++o)
-                    mapMemory[i][c2 + o + 1024-32] = q[(o + 32 - 2*(lr+1))%64];
+                    mapMemory[i][c2 + o + 1024] = q[(o + 96 - 2*((lr+1)%32))%64];
             }
             break;
         case 1: case 3:
