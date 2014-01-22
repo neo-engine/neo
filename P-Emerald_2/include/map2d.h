@@ -30,7 +30,7 @@ namespace map2d{
 
 
     };
-    
+
     typedef struct{ Tile blocks[1024]; } TileSet;
     typedef struct{ Block blocks[1024]; } BlockSet;
 
@@ -52,7 +52,7 @@ namespace map2d{
         Anbindung() {}
         Anbindung(const char name[100], char dir, int mv, int mpidx) 
             :  direction(dir), move(mv), mapidx(mpidx) {
-            memcpy(this->name,name,100);
+                memcpy(this->name,name,100);
         }
     };
     class Animation{

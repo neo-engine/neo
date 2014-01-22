@@ -29,7 +29,7 @@ namespace font{
         s16 put_x, put_y;
         u8 get_x, get_y;
         u32 offset = ch * FONT_WIDTH * FONT_HEIGHT;
-    
+
         for (put_y = y,get_y = 0; put_y < y + FONT_HEIGHT; ++put_y,++get_y) 
             for (put_x = x, get_x = 0; put_x < x + widths[ch]; put_x+= 2, get_x+=2)
                 if (put_x >= 0 && put_x < SCREEN_WIDTH && put_y >= 0 && put_y < SCREEN_HEIGHT)
@@ -40,7 +40,7 @@ namespace font{
                         btm_screen_plot(put_x, put_y, ((u8)(color[data[1+offset + (get_x + get_y * FONT_WIDTH)]]) << 8) | 
                         (u8) (color[data[offset + ( get_x + get_y * FONT_WIDTH)]] ));
     }
-    
+
     void Font::print_string(const char *string, s16 x, s16 y,bool bottom) {
         u32 current_char = 0;
         s16 put_x = x, put_y = y;
@@ -53,18 +53,18 @@ namespace font{
                 continue;
             }
             print_char(string[current_char], put_x, put_y,bottom);
-            
+
             u16 c = (u16)string[current_char];
             shiftchar(c);
             put_x += widths[c];
-        
+
             current_char++;
         }
     }
     void Font::print_string(const wchar_t *string, s16 x, s16 y,bool bottom) {
         u32 current_char = 0;
         s16 put_x = x, put_y = y;
-    
+
         while (string[current_char]) {
             if(string[current_char] == '\n'){
                 put_y += FONT_HEIGHT;
@@ -73,18 +73,18 @@ namespace font{
                 continue;
             }
             print_char(string[current_char], put_x, put_y,bottom);
-            
+
             u16 c = (u16)string[current_char];
             shiftchar(c);
             put_x += widths[c];
-        
+
             current_char++;
         }
     }
     void Font::print_string_d(const char *string, s16 x, s16 y,bool bottom) {
         u32 current_char = 0;
         s16 put_x = x, put_y = y;
-    
+
         while (string[current_char]) {
             if(string[current_char] == '\n'){
                 put_y += 16;
@@ -97,7 +97,7 @@ namespace font{
             u16 c = (u16)string[current_char];
             shiftchar(c);
             put_x += widths[c];
-            
+
             for(int i= 0; i < 80/TEXTSPEED; ++i)
                 swiWaitForVBlank();
             current_char++;
@@ -106,7 +106,7 @@ namespace font{
     void Font::print_string_d(const wchar_t *string, s16 x, s16 y,bool bottom) {
         u32 current_char = 0;
         s16 put_x = x, put_y = y;
-    
+
         while (string[current_char]) {
             if(string[current_char] == '\n'){
                 put_y += FONT_HEIGHT;
@@ -119,35 +119,35 @@ namespace font{
             u16 c = (u16)string[current_char];
             shiftchar(c);
             put_x += widths[c];
-            
+
             for(int i= 0; i < 80/TEXTSPEED; ++i)
                 swiWaitForVBlank();
             current_char++;
         }
     }
-    
+
     void Font::print_string_center(const char *string,bool bottom) {
         s16 x = SCREEN_WIDTH / 2 - string_width(string) / 2;
         s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
-    
+
         print_string(string, x, y,bottom);
     }
     void Font::print_string_center_d(const char *string,bool bottom) {
         s16 x = (SCREEN_WIDTH / 2 - string_width(string) / 2);
         s16 y = (SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2);
-    
+
         print_string_d(string, x, y,bottom);
     }
     void Font::print_string_center(const wchar_t *string,bool bottom) {
         s16 x = SCREEN_WIDTH / 2 - string_width(string) / 2;
         s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
-    
+
         print_string(string, x, y,bottom);
     }
     void Font::print_string_center_d(const wchar_t *string,bool bottom) {
         s16 x = (SCREEN_WIDTH / 2 - string_width(string) / 2);
         s16 y = (SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2);
-    
+
         print_string_d(string, x, y,bottom);
     }
 
@@ -157,7 +157,7 @@ namespace font{
         char remainder_str[3] = "";
         u32 current_char = 0, current_char2 = 0;
         static char string[100];
-    
+
         if (number == 0) {
             strcpy(string, "0");
         } else {
@@ -169,7 +169,7 @@ namespace font{
                 strcat(numstring, remainder_str);
                 number = quotient;
             }
-        
+
             current_char = strlen(numstring)-1;
             while (current_char != 0) {
                 string[current_char2] = numstring[current_char];
@@ -179,37 +179,37 @@ namespace font{
             string[current_char2] = numstring[current_char];
             string[current_char2 + 1] = '\0';
         }
-    
+
         print_string(string, x, y,bottom);
     }
 
-    
+
     u32 Font::string_width(const char *string) const {
         u32 current_char = 0;
         u32 width = 0;
-    
+
         while (string[current_char]) {
             if(string[current_char] == '\n')
                 break;
             width += widths[(u8)string[current_char]] + 1;
-        
+
             current_char++;
         }
-    
+
         return width - 1;
     }
     u32 Font::string_width(const wchar_t *string) const {
         u32 current_char = 0;
         u32 width = 0;
-    
+
         while (string[current_char]) {
             if(string[current_char] == '\n')
                 break;
             width += widths[(u8)string[current_char]] + 1;
-        
+
             current_char++;
         }
-    
+
         return width - 1;
     }
 }
@@ -217,13 +217,13 @@ namespace font{
 void top_screen_darken() {
     u16 i;
     Color pixel;
-    
+
     for (i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
         pixel = ((Color *)BG_BMP_RAM(1))[i];
         ((Color *)BG_BMP_RAM(1))[i] = ((pixel & 0x1F) >> 1) |
-                                  ((((pixel >> 5) & 0x1F) >> 1) << 5) |
-                                  ((((pixel >> 10) & 0x1F) >> 1) << 10) |
-                                  (1 << 15);
+            ((((pixel >> 5) & 0x1F) >> 1) << 5) |
+            ((((pixel >> 10) & 0x1F) >> 1) << 10) |
+            (1 << 15);
     }
 }
 void top_screen_plot(u8 x, u8 y, Color color) {
@@ -237,13 +237,13 @@ void top_screen_plot(u8 x, u8 y, Color color) {
 void btm_screen_darken() {
     u16 i;
     Color pixel;
-    
+
     for (i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
         pixel = ((Color *)BG_BMP_RAM_SUB(1))[i];
         ((Color *)BG_BMP_RAM_SUB(1))[i] = ((pixel & 0x1F) >> 1) |
-                                  ((((pixel >> 5) & 0x1F) >> 1) << 5) |
-                                  ((((pixel >> 10) & 0x1F) >> 1) << 10) |
-                                  (1 << 15);
+            ((((pixel >> 5) & 0x1F) >> 1) << 5) |
+            ((((pixel >> 10) & 0x1F) >> 1) << 10) |
+            (1 << 15);
     }
 }
 void btm_screen_plot(u8 x, u8 y, Color color) {

@@ -3,102 +3,102 @@
 
 namespace font{
     namespace font1{
-        
+
         void shiftchar(u16& val){
-        if('0' <= val && val <= '9'){
-            val = (val - '0');
-            return;
-        }
-        if('A' <= val && val <= 'Z'){
-            val = (val - 'A') + 10;
-            return;
-        }
-        if('a' <= val && val <= 'z'){
-            val = (val - 'a') + 10 + 26;
-            return;
-        }
-        
-        if(val == 'ä'){
-            val = 49 + 40;
-            return;
-        }
-        if(val == 'ö'){
-            val = 49+55;
-            return;
-        }
-        if(val == 'ü'){
-            val = 49+60;
-            return;
-        }
-        if(val == 'Ä'){
-            val = 65;
-            return;
-        }
-        if(val == 'Ö'){
-            val = 79;
-            return;
-        }
-        if(val == 'Ü'){
-            val = 84;
-            return;
-        }
-        if(val == 'ß'){
-            val = 85;
-            return;
-        }
-        
-        if(val =='é'){
-            val = 49+44;
-            return;
-        }
+            if('0' <= val && val <= '9'){
+                val = (val - '0');
+                return;
+            }
+            if('A' <= val && val <= 'Z'){
+                val = (val - 'A') + 10;
+                return;
+            }
+            if('a' <= val && val <= 'z'){
+                val = (val - 'a') + 10 + 26;
+                return;
+            }
 
-        if(val == '!'){
-            val = 98 + 7+16-1;
-            return;
-        }
-        if(val == '?'){
-            val = 98 + 8+16-1;
-            return;
-        }
-        if(val == ','){
-            val = 98 + 9+16-1;
-            return;
-        }
-        if(val == '.'){
-            val = 98 + 10+16-1;
-            return;
-        }
-        if(val == '/'){
-            val = 98 + 13+16-1;
-            return;
-        }
-        if(val == '('){
-            val = 98 + 21+16-1;
-            return;
-        }
-        if(val == ')'){
-            val = 98 + 22+16-1;
-            return;
-        }
-        if(val == ':'){
-            val = 3*49-1;
-            return;
-        }
-        if(val == 45){
-            val = 98 + 41;
-            return;
-        }
-        if(val == '\''){
-            val = 98 + 13+16+1;
-            return;
-        }
-        if(val == ' '){
-            val = 489;
-            return;
-        }
+            if(val == 'ä'){
+                val = 49 + 40;
+                return;
+            }
+            if(val == 'ö'){
+                val = 49+55;
+                return;
+            }
+            if(val == 'ü'){
+                val = 49+60;
+                return;
+            }
+            if(val == 'Ä'){
+                val = 65;
+                return;
+            }
+            if(val == 'Ö'){
+                val = 79;
+                return;
+            }
+            if(val == 'Ü'){
+                val = 84;
+                return;
+            }
+            if(val == 'ß'){
+                val = 85;
+                return;
+            }
 
-        return;
-    }
+            if(val =='é'){
+                val = 49+44;
+                return;
+            }
+
+            if(val == '!'){
+                val = 98 + 7+16-1;
+                return;
+            }
+            if(val == '?'){
+                val = 98 + 8+16-1;
+                return;
+            }
+            if(val == ','){
+                val = 98 + 9+16-1;
+                return;
+            }
+            if(val == '.'){
+                val = 98 + 10+16-1;
+                return;
+            }
+            if(val == '/'){
+                val = 98 + 13+16-1;
+                return;
+            }
+            if(val == '('){
+                val = 98 + 21+16-1;
+                return;
+            }
+            if(val == ')'){
+                val = 98 + 22+16-1;
+                return;
+            }
+            if(val == ':'){
+                val = 3*49-1;
+                return;
+            }
+            if(val == 45){
+                val = 98 + 41;
+                return;
+            }
+            if(val == '\''){
+                val = 98 + 13+16+1;
+                return;
+            }
+            if(val == ' '){
+                val = 489;
+                return;
+            }
+
+            return;
+        }
         //NUM_CHARS = 490
         //FONT_WIDTH = 16
         //FONT_HEIGHT = 16
@@ -8453,98 +8453,98 @@ namespace font{
         //NUM_CHARS = 490
         //FONT_WIDTH = 16
         //FONT_HEIGHT = 16
-        
+
         void shiftchar(u16& val){
-        if('0' <= val && val <= '9'){
-            val = (val - '0');
-            return;
-        }
-        if('A' <= val && val <= 'Z'){
-            val = (val - 'A') + 10;
-            return;
-        }
-        if('a' <= val && val <= 'z'){
-            val = (val - 'a') + 10 + 26;
-            return;
-        }
-        
-        if(val == 'ä'){
-            val = 49 + 41;
-            return;
-        }
-        if(val == 'ö'){
-            val = 49+565;
-            return;
-        }
-        if(val == 'ü' || val == 254){
-            val = 49+61;
-            return;
-        }
-        if(val == 'Ä'){
-            val = 65;
-            return;
-        }
-        if(val == 'Ö'){
-            val = 79;
-            return;
-        }
-        if(val == 'Ü'){
-            val = 84;
-            return;
-        }
-        if(val == 'ß' || val == 255){
-            val = 85;
-            return;
-        }
-        
-        if(val =='é'){
-            val = 49+45;
-            return;
-        }
+            if('0' <= val && val <= '9'){
+                val = (val - '0');
+                return;
+            }
+            if('A' <= val && val <= 'Z'){
+                val = (val - 'A') + 10;
+                return;
+            }
+            if('a' <= val && val <= 'z'){
+                val = (val - 'a') + 10 + 26;
+                return;
+            }
 
-        if(val == '!'){
-            val = 98 + 7+16;
-            return;
-        }
-        if(val == '?'){
-            val = 98 + 8+16;
-            return;
-        }
-        if(val == ','){
-            val = 98 + 9+16;
-            return;
-        }
-        if(val == '.'){
-            val = 98 + 10+16;
-            return;
-        }
-        if(val == '/'){
-            val = 98 + 13+16;
-            return;
-        }
-        if(val == '('){
-            val = 98 + 21+16;
-            return;
-        }
-        if(val == ')'){
-            val = 98 + 22+16;
-            return;
-        }
-        if(val == ':'){
-            val = 3*49-1;
-            return;
-        }
-        if(val == 45){
-            val = 98 + 41;
-            return;
-        }
-        if(val == ' '){
-            val = 489;
-            return;
-        }
+            if(val == 'ä'){
+                val = 49 + 41;
+                return;
+            }
+            if(val == 'ö'){
+                val = 49+565;
+                return;
+            }
+            if(val == 'ü' || val == 254){
+                val = 49+61;
+                return;
+            }
+            if(val == 'Ä'){
+                val = 65;
+                return;
+            }
+            if(val == 'Ö'){
+                val = 79;
+                return;
+            }
+            if(val == 'Ü'){
+                val = 84;
+                return;
+            }
+            if(val == 'ß' || val == 255){
+                val = 85;
+                return;
+            }
 
-        return;
-    }
+            if(val =='é'){
+                val = 49+45;
+                return;
+            }
+
+            if(val == '!'){
+                val = 98 + 7+16;
+                return;
+            }
+            if(val == '?'){
+                val = 98 + 8+16;
+                return;
+            }
+            if(val == ','){
+                val = 98 + 9+16;
+                return;
+            }
+            if(val == '.'){
+                val = 98 + 10+16;
+                return;
+            }
+            if(val == '/'){
+                val = 98 + 13+16;
+                return;
+            }
+            if(val == '('){
+                val = 98 + 21+16;
+                return;
+            }
+            if(val == ')'){
+                val = 98 + 22+16;
+                return;
+            }
+            if(val == ':'){
+                val = 3*49-1;
+                return;
+            }
+            if(val == 45){
+                val = 98 + 41;
+                return;
+            }
+            if(val == ' '){
+                val = 489;
+                return;
+            }
+
+            return;
+        }
         u8 font_widths[NUM_CHARS] = {
 
             8, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6, 8, 8, 4, 6, 8, 5, 8, 
@@ -16890,5 +16890,5 @@ namespace font{
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
         };
-   }
+    }
 }

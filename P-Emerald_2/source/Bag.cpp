@@ -13,8 +13,8 @@ void bag::addItem(BAGTYPE bag_type,int item_id,int cnt){
             I->second = MAXITEMCOUNT;
             cnt -= MAXITEMCOUNT - I->second;
         }
-    this->bags[bag_type].push_back(std::pair<int,int>(item_id,cnt));
-    std::sort(this->bags[bag_type].begin(),this->bags[bag_type].end());
+        this->bags[bag_type].push_back(std::pair<int,int>(item_id,cnt));
+        std::sort(this->bags[bag_type].begin(),this->bags[bag_type].end());
 }
 void bag::removeItem(BAGTYPE bag_type,int item_id,int cnt){
     for(auto I = this->bags[bag_type].begin();
@@ -31,7 +31,7 @@ void bag::removeItem(BAGTYPE bag_type,int item_id,int cnt){
                 cnt -= num;
             }
         }
-    std::sort(this->bags[bag_type].begin(),this->bags[bag_type].end());
+        std::sort(this->bags[bag_type].begin(),this->bags[bag_type].end());
 }
 int bag::countItem(BAGTYPE bag_type,int item_id){
     int cnt = 0;

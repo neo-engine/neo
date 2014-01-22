@@ -80,7 +80,7 @@ namespace map2d{
             return;
 
         //printf("TEST1\n");        
-        
+
         fread(&this->sizey,sizeof(u32),1,mapF);
         fread(&this->sizex,sizeof(u32),1,mapF);
 
@@ -89,7 +89,7 @@ namespace map2d{
         readNop(mapF,3);
         fread(&tsidx2,sizeof(u8),1,mapF);
         readNop(mapF,3);  
-               
+
         sprintf(buf,"nitro://MAPS/TILESETS/%i.ts",tsidx1);
         readTileSet(fopen(buf,"rb"),this->t);
         sprintf(buf,"nitro://MAPS/TILESETS/%i.bvd",tsidx1);
@@ -107,11 +107,11 @@ namespace map2d{
         readPal(fopen(buf,"rb"),this->pals + 6);
         sprintf(buf,"nitro://MAPS/TILESETS/%i.anm",tsidx2);
         readAnimations(fopen(buf,"rb"),this->animations);
-        
+
 
         readNop(mapF,4);
         this->blocks.assign(this->sizex+20,std::vector<MapBlockAtom>(this->sizey+20));
-             
+
         //printf("TEST2\n");
 
         sprintf(buf,"%s%s.anb",Path,Name);
@@ -131,7 +131,7 @@ namespace map2d{
                     continue;
                 fread(&ac.mapsy,sizeof(u32),1,mapF2);
                 fread(&ac.mapsx,sizeof(u32),1,mapF2);
-                
+
                 readNop(mapF2,12);
                 for(int x = 0; x < ac.mapsx; ++x)
                     for(int y = 0; y < ac.mapsy; ++y){
@@ -140,7 +140,7 @@ namespace map2d{
 
                         else if(ac.direction == 'N' && x - ac.mapsx + 10 >= 0 && y + ac.move >= -10 && y + ac.move < (int)sizey + 10)
                             fread(&(blocks[x - ac.mapsx + 10][y + ac.move + 10]),sizeof(MapBlockAtom),1,mapF2);
-                        
+
                         else if(ac.direction == 'E' && y < 10 && x + ac.move +10 >= 0 && x + ac.move < (int)sizex + 10)
                             fread(&(blocks[x + ac.move + 10][y+sizey+10]),sizeof(MapBlockAtom),1,mapF2);
 
@@ -150,7 +150,7 @@ namespace map2d{
                             readNop(mapF2,sizeof(MapBlockAtom));
                         }
                     } 
-                fclose(mapF2);
+                    fclose(mapF2);
             }
             consoleSelect(&Bottom);
             for(int i= 0; i< 2; ++i)
@@ -158,7 +158,7 @@ namespace map2d{
                     if(fscanf(A,"%hu",&rand[i][j]) == EOF)
                         rand[i][j] = 0;
                 }
-            fclose(A);
+                fclose(A);
         }
 
         for(int x = 0; x < (int)sizex; ++x)
@@ -184,7 +184,7 @@ namespace map2d{
             acBlock = this->b.blocks[rand[x%2][y%2]];                    
         else
             acBlock = this->b.blocks[blocks[x][y].blockidx];
- 
+
         if(acBlock.topbehave != 0x10)
             std::swap(toplayer,betw);
 
@@ -233,7 +233,7 @@ namespace map2d{
             ymin = lastbx+15;
             ymax = lastbx + 17;
             plsval = 60;
-            
+
             break;
         case 3:
             c = lastrow * 2;
@@ -246,7 +246,7 @@ namespace map2d{
             ymin = lastbx ;
             ymax = lastbx + 2;
             plsval = 60;
-            
+
             break;
         case 2:
             lastcol = (lastcol + 1) % 16;
@@ -259,7 +259,7 @@ namespace map2d{
             ymin = lastbx;
             ymax = lastbx + 17;
             plsval = 32;
-            
+
             break;
         case 4:
             c = lastcol * 64;
@@ -273,7 +273,7 @@ namespace map2d{
             ymin = lastbx;
             ymax = lastbx + 17;
             plsval = 32;  
-            
+
         }
         int c2 = c;
         if(direction == 1){
@@ -284,20 +284,20 @@ namespace map2d{
             if((direction % 2 == 0) || (i == ((lastrow+(direction == 3 ? 1:0))%32) / 16))
                 for(int x = xmin; x < xmax; x++){
                     for(int y = ymin; y < ymax; y++){
-                        
+
                         fill(mapMemory,xmin,x,xmax,ymin,y,ymax,c);
-                
+
                         if((direction % 2 == 1 && y < bx + 16 * ( 2+ i)) || (direction % 2 == 0 && y < bx + 16 * (1 + i)))
                             c+=2;
                     }
                     c += plsval;
                 }
-            c = c2 + 1024 - 32;
-            if(direction % 2 == 0){
-                c += 32;
-                ymin += 16;
-                ymax += 16;
-            }
+                c = c2 + 1024 - 32;
+                if(direction % 2 == 0){
+                    c += 32;
+                    ymin += 16;
+                    ymax += 16;
+                }
         }
         switch(direction) {
         case 2: case 4:
@@ -346,13 +346,13 @@ namespace map2d{
             break;
         }
     }
-    
+
     void Map::draw(int bx,int by,bool init){
         if(init){
             videoSetMode(MODE_0_2D /*| DISPLAY_BG0_ACTIVE*/ | DISPLAY_BG1_ACTIVE |
                 DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
             vramSetBankA(VRAM_A_MAIN_BG_0x06000000);
-        
+
             //REG_BG0CNT = BG_32x32 | BG_COLOR_16 |  BG_MAP_BASE(0) | BG_TILE_BASE(1)|  BG_PRIORITY(0);
             //REG_BG1CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(1) | BG_TILE_BASE(1)| BG_PRIORITY(1);
             //REG_BG2CNT = BG_32x32 | BG_COLOR_16 |   BG_MAP_BASE(2) | BG_TILE_BASE(1)| BG_PRIORITY(2);
@@ -367,7 +367,7 @@ namespace map2d{
             //Top = *consoleInit(&Top, 0, BgType_Text4bpp, BgSize_T_256x256, 0, 5, true ,true);
 
             u8* tileMemory = (u8*)BG_TILE_RAM(1);
-        
+
             for(int i= 0; i < 1024; ++i)
                 swiCopy(this->t.blocks[i].tile, tileMemory + i * 32, 16);
 
@@ -375,15 +375,15 @@ namespace map2d{
         }
         u16* mapMemory[4];
         for(int i= 1; i< 4; ++i)  mapMemory[i] = (u16*)BG_MAP_RAM(2*i-1);
-        
+
         lastrow = 31;
         lastcol = 15;
 
         int c = 0;
         bx += 0;
         by += 10;
-        
-        
+
+
         lastbx = bx;
         lastby = by;
         for(int i= 0; i < 2; ++i){
@@ -408,7 +408,7 @@ namespace map2d{
                         //consoleSetWindow(&Top,2*(y-bx)-1,2*(x-by)-1,2,2);
                         //printf("%i",acBlock.topbehave);
                     }
-                
+
                     if(acBlock.topbehave == 0x10){                    
                         if(x > by && y > bx)
                             mapMemory[toplayer + 1][c-33] = (acBlock.top[0][0]);
@@ -437,7 +437,7 @@ namespace map2d{
                             mapMemory[toplayer][c-1] = acBlock.top[1][0];
                         if(x < by +16&& y < bx + 16)
                             mapMemory[toplayer][c] = acBlock.top[1][1];
-                    
+
                         if(x > by && y > bx)
                             mapMemory[toplayer+1][c-33] = 0;
                         if(x > by && y < bx + 16)
@@ -447,7 +447,7 @@ namespace map2d{
                         if(x < by +16&& y < bx + 16)
                             mapMemory[toplayer+1][c] = 0;
                     }
-                
+
                     if(x > by && y > bx)
                         mapMemory[bottomlayer][c-33] = acBlock.bottom[0][0];
                     if(x > by && y < bx + 16)
@@ -456,7 +456,7 @@ namespace map2d{
                         mapMemory[bottomlayer][c-1] = acBlock.bottom[1][0];
                     if(x < by +16&& y < bx + 16)
                         mapMemory[bottomlayer][c] = acBlock.bottom[1][1];
-                
+
                     if(y < bx + 16)
                         c+=2;
                 }

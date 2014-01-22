@@ -15,29 +15,29 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
     int getNItemIdx(int gen3Idx);
     int getNLocation(int gen3Idx);
     int getLocation(int gen5Idx);
-    
-    #define SAVEFILE_LEN (1 << 17)
-    #define NUM_BLOCKS_SLOT 14
-    #define NUM_BLOCKS_EXTRA 4
-    #define NUM_BLOCKS_TOTAL 32
-    #define BLOCK_DATA_LEN 3968
-    #define BLOCK_PADDING_LEN 116
-    #define BLOCK_FOOTER_LEN 12
-    #define BLOCK_TOTAL_LEN (BLOCK_DATA_LEN + BLOCK_PADDING_LEN + BLOCK_FOOTER_LEN)
-    #define SAVESLOT_LEN (14 * 3968)
-    #define BELT_OFFSET_RSE 0x11B8
-    #define BELT_OFFSET_FRLG 0xFB8
-    #define BOX_OFFSET 0x4D84
 
-    #define NUM_BELT_POKEMON 6
-    #define NUM_BOXES 14
-    #define NUM_POKEMON_PER_BOX 30
-    #define NUM_BOX_POKEMON (NUM_BOXES * NUM_POKEMON_PER_BOX)
-    #define POKEMON_DATA_LENGTH 48
+#define SAVEFILE_LEN (1 << 17)
+#define NUM_BLOCKS_SLOT 14
+#define NUM_BLOCKS_EXTRA 4
+#define NUM_BLOCKS_TOTAL 32
+#define BLOCK_DATA_LEN 3968
+#define BLOCK_PADDING_LEN 116
+#define BLOCK_FOOTER_LEN 12
+#define BLOCK_TOTAL_LEN (BLOCK_DATA_LEN + BLOCK_PADDING_LEN + BLOCK_FOOTER_LEN)
+#define SAVESLOT_LEN (14 * 3968)
+#define BELT_OFFSET_RSE 0x11B8
+#define BELT_OFFSET_FRLG 0xFB8
+#define BOX_OFFSET 0x4D84
 
-    #define NUM_POKEMON_SPECIES 440
-    #define NUM_ITEMS 377
-    #define NUM_ATTACKS 355
+#define NUM_BELT_POKEMON 6
+#define NUM_BOXES 14
+#define NUM_POKEMON_PER_BOX 30
+#define NUM_BOX_POKEMON (NUM_BOXES * NUM_POKEMON_PER_BOX)
+#define POKEMON_DATA_LENGTH 48
+
+#define NUM_POKEMON_SPECIES 440
+#define NUM_ITEMS 377
+#define NUM_ATTACKS 355
 
 
     typedef struct {
@@ -162,60 +162,60 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
             u8 locationcaught;
             union{
                 struct{
-                    signed char levelcaught:7;
-                    u8 game:4;
-                    u8 pokeball:4;
-                    u8 tgender:1;
+                    u8 tgender      :1;
+                    u8 pokeball     :4;
+                    u8 game         :4;
+                    s8 levelcaught  :7;
                 };
                 u16 all;
             };
             union {
                 struct {
-                    u32 hp:5;
-                    u32 atk:5;
-                    u32 def:5;
-                    u32 spd:5;
-                    u32 spatk:5;
-                    u32 spdef:5;
-                    u32 egg:1;
-                    u32 ability:1;
+                    u32 hp          :5;
+                    u32 atk         :5;
+                    u32 def         :5;
+                    u32 spd         :5;
+                    u32 spatk       :5;
+                    u32 spdef       :5;
+                    u32 egg         :1;
+                    u32 ability     :1;
                 } IVs;
                 u32 IVint;
             };
             union {
                 struct {
-                    u8 coolnormal:1;
-                    u8 coolsuper:1;
-                    u8 coolhyper:1;
-                    u8 coolmaster:1;
-                    u8 beautynormal:1;
-                    u8 beautysuper:1;
-                    u8 beautyhyper:1;
-                    u8 beautymaster:1;
-                    u8 cutenormal:1;
-                    u8 cutesuper:1;
-                    u8 cutehyper:1;
-                    u8 cutemaster:1;
-                    u8 smartnormal:1;
-                    u8 smartsuper:1;
-                    u8 smarthyper:1;
-                    u8 smartmaster:1;
-                    u8 toughnormal:1;
-                    u8 toughsuper:1;
-                    u8 toughhyper:1;
-                    u8 toughmaster:1;
-                    u8 champion:1;
-                    u8 winning:1;
-                    u8 victory:1;
-                    u8 artist:1;
-                    u8 effort:1;
-                    u8 marine:1;
-                    u8 land:1;
-                    u8 sky:1;
-                    u8 country:1;
-                    u8 national:1;
-                    u8 earth:1;
-                    u8 world:1;
+                    u8 coolnormal   :1;
+                    u8 coolsuper    :1;
+                    u8 coolhyper    :1;
+                    u8 coolmaster   :1;
+                    u8 beautynormal :1;
+                    u8 beautysuper  :1;
+                    u8 beautyhyper  :1;
+                    u8 beautymaster :1;
+                    u8 cutenormal   :1;
+                    u8 cutesuper    :1;
+                    u8 cutehyper    :1;
+                    u8 cutemaster   :1;
+                    u8 smartnormal  :1;
+                    u8 smartsuper   :1;
+                    u8 smarthyper   :1;
+                    u8 smartmaster  :1;
+                    u8 toughnormal  :1;
+                    u8 toughsuper   :1;
+                    u8 toughhyper   :1;
+                    u8 toughmaster  :1;
+                    u8 champion     :1;
+                    u8 winning      :1;
+                    u8 victory      :1;
+                    u8 artist       :1;
+                    u8 effort       :1;
+                    u8 marine       :1;
+                    u8 land         :1;
+                    u8 sky          :1;
+                    u8 country      :1;
+                    u8 national     :1;
+                    u8 earth        :1;
+                    u8 world        :1;
                 } ribbons;
                 u32 ribbonint;
             };
@@ -223,41 +223,41 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
     };
 
     /* Order:
-        00. GAEM	 06. AGEM	 12. EGAM	 18. MGAE
-        01. GAME	 07. AGME	 13. EGMA	 19. MGEA
-        02. GEAM	 08. AEGM	 14. EAGM	 20. MAGE
-        03. GEMA	 09. AEMG	 15. EAMG	 21. MAEG
-        04. GMAE	 10. AMGE	 16. EMGA	 22. MEGA
-        05. GMEA	 11. AMEG	 17. EMAG	 23. MEAG
+    00. GAEM	 06. AGEM	 12. EGAM	 18. MGAE
+    01. GAME	 07. AGME	 13. EGMA	 19. MGEA
+    02. GEAM	 08. AEGM	 14. EAGM	 20. MAGE
+    03. GEMA	 09. AEMG	 15. EAMG	 21. MAEG
+    04. GMAE	 10. AMGE	 16. EMGA	 22. MEGA
+    05. GMEA	 11. AMEG	 17. EMAG	 23. MEAG
     */
     // Where in data each struct is, based on AEGM order
     static const int DataOrderTable[24][4] = { \
-    /*          A  E  G  M */ \
-    /* GAEM */ {1, 2, 0, 3}, \
-    /* GAME */ {1, 3, 0, 2}, \
-    /* GEAM */ {2, 1, 0, 3}, \
-    /* GEMA */ {3, 1, 0, 2}, \
-    /* GMAE */ {2, 3, 0, 1}, \
-    /* GMEA */ {3, 2, 0, 1}, \
-    /* AGEM */ {0, 2, 1, 3}, \
-    /* AGME */ {0, 3, 1, 2}, \
-    /* AEGM */ {0, 1, 2, 3}, \
-    /* AEMG */ {0, 1, 3, 2}, \
-    /* AMGE */ {0, 3, 2, 1}, \
-    /* AMEG */ {0, 2, 3, 1}, \
-    /* EGAM */ {2, 0, 1, 3}, \
-    /* EGMA */ {3, 0, 1, 2}, \
-    /* EAGM */ {1, 0, 2, 3}, \
-    /* EAMG */ {1, 0, 3, 2}, \
-    /* EMGA */ {3, 0, 2, 1}, \
-    /* EMAG */ {2, 0, 3, 1}, \
-    /* MGAE */ {2, 3, 1, 0}, \
-    /* MGEA */ {3, 2, 1, 0}, \
-    /* MAGE */ {1, 3, 2, 0}, \
-    /* MAEG */ {1, 2, 3, 0}, \
-    /* MEGA */ {3, 1, 2, 0}, \
-    /* MEAG */ {2, 1, 3, 0} };
-    
+        /*          A  E  G  M */ \
+        /* GAEM */ {1, 2, 0, 3}, \
+        /* GAME */ {1, 3, 0, 2}, \
+        /* GEAM */ {2, 1, 0, 3}, \
+        /* GEMA */ {3, 1, 0, 2}, \
+        /* GMAE */ {2, 3, 0, 1}, \
+        /* GMEA */ {3, 2, 0, 1}, \
+        /* AGEM */ {0, 2, 1, 3}, \
+        /* AGME */ {0, 3, 1, 2}, \
+        /* AEGM */ {0, 1, 2, 3}, \
+        /* AEMG */ {0, 1, 3, 2}, \
+        /* AMGE */ {0, 3, 2, 1}, \
+        /* AMEG */ {0, 2, 3, 1}, \
+        /* EGAM */ {2, 0, 1, 3}, \
+        /* EGMA */ {3, 0, 1, 2}, \
+        /* EAGM */ {1, 0, 2, 3}, \
+        /* EAMG */ {1, 0, 3, 2}, \
+        /* EMGA */ {3, 0, 2, 1}, \
+        /* EMAG */ {2, 0, 3, 1}, \
+        /* MGAE */ {2, 3, 1, 0}, \
+        /* MGEA */ {3, 2, 1, 0}, \
+        /* MAGE */ {1, 3, 2, 0}, \
+        /* MAEG */ {1, 2, 3, 0}, \
+        /* MEGA */ {3, 1, 2, 0}, \
+        /* MEAG */ {2, 1, 3, 0} };
+
     static const int belt_offsets[] = { BELT_OFFSET_RSE, BELT_OFFSET_FRLG };
 
     class SaveParser
@@ -292,7 +292,7 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
     int parse_pokemon(char* buf, int offset, void** pokemon, PKMN::pokemon_attacks_t** pa, PKMN::pokemon_effort_t** pe,
         PKMN::pokemon_growth_t** pg, PKMN::pokemon_misc_t** pm, int num, int size);
     void print_pokemon(box_pokemon_t* pokemon);
-    
+
     POKEMON::PKMN getGen5Pkmn(PKMN gen3Pkmn);
     PKMN getGen3Pkmn(POKEMON::PKMN gen5Pkmn);
 }

@@ -34,16 +34,16 @@ std::wstring keyboard::getText(int length,const char* msg,bool time)
     oam->oamBuffer[14].y = 196 - 28;
     oam->oamBuffer[A_ID].x = 256 - 24;
     oam->oamBuffer[A_ID].y = 196 - 28;
-    
+
     updateOAMSub(oam);
-    
+
     cust_font.set_color(0,0);
     cust_font.set_color(251,1);
     cust_font.set_color(252,2);
     cust_font2.set_color(0,0);
     cust_font2.set_color(253,1);
     cust_font2.set_color(254,2);
-    
+
     BG_PALETTE_SUB[250] = RGB15(31,31,31);
     BG_PALETTE_SUB[251] = RGB15(15,15,15);
     BG_PALETTE_SUB[252] = RGB15(3,3,3);
@@ -101,7 +101,7 @@ std::wstring keyboard::getText(int length,const char* msg,bool time)
             draw(); 
             if(time)
                 updateTime();
-            
+
             font::putrec(8*(13-i/3),40,8*(13-i/3+length + 1),56,true,false,250);
             cust_font.print_string(out.c_str(),8*(13-i/3),40,true);
         }

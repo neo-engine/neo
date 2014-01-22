@@ -62,7 +62,7 @@ namespace POKEMON{
         fclose(f);
         return ret.c_str();
     }
-    
+
     std::string Games[10] = {};
 
     double NatMod[25][5] = {
@@ -411,7 +411,7 @@ namespace POKEMON{
             return WHITE;
         }
     }
-    
+
     LevelUp_Type Pkmn_LevelUpTypes[669];
     char Pkmn_Abilities[669][4] = {
         {0},
@@ -522,15 +522,15 @@ namespace POKEMON{
         {583539,752953,941192,995030,1176490,1524731,98,8343,23286,29107,32073,36383,47153},
         {591882,776239,970299,1027103,1212873,1571884,99,8118,23761,29701,32757,37127,68116},
         {600000,800000,1000000,1059860,1250000,1640000,100,0,0,0,0,0,0}};
-            
-    
+
+
     PKMNDATA::PKMNDATA data;
-    
+
     PKMN::BOX_PKMN::BOX_PKMN(char* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
-    bool OTFemale,bool Cloned,bool Shiny,bool h_a,bool fatef ,bool _isEgg,short gPlace,char BALL, char Prus)
+        bool OTFemale,bool Cloned,bool Shiny,bool h_a,bool fatef ,bool _isEgg,short gPlace,char BALL, char Prus)
     {	
         PKMNDATA::getAll(SPE,data);
-            
+
         srand(LastPID);
         LastPID = this->PID = rand();
         if (Shiny)
@@ -565,7 +565,7 @@ namespace POKEMON{
 
         time_t unixTime = time(NULL);
         tm* timeStruct = gmtime((const time_t *)&unixTime);
-            
+
         if(_isEgg)
         {
             steps = data.eggcyc;
@@ -578,11 +578,11 @@ namespace POKEMON{
         else
         {
             steps = data.baseFriend;
-            gotDate[0] =  gotDate[1] = gotDate[2] = gotPlace = 0;
+            gotDate[0] =  gotDate[1] = gotDate[2] = hatchPlace = 0;
             hatchDate[0] = timeStruct->tm_mday;
             hatchDate[1] =timeStruct->tm_mon+1;
             hatchDate[2] =(timeStruct->tm_year +1900) % 100;
-            hatchPlace = gPlace;
+            gotPlace = gPlace;
         }
         this->ability = h_a ? ( (PID&1||( Pkmn_Abilities[this->SPEC][3] ==0)) ? Pkmn_Abilities[SPE][2] : Pkmn_Abilities[SPE][3]):
             (( PID&1||( Pkmn_Abilities[this->SPEC][1] ==0)) ? Pkmn_Abilities[SPE][0] : Pkmn_Abilities[SPE][1]);
@@ -593,7 +593,7 @@ namespace POKEMON{
         for(int i= 0; i< 4; ++i) this->ribbons1[i] = 0;
         for(int i= 0; i< 4; ++i) this->Attack[i] = Attacks[i];
         for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[(int)Attacks[i]]->PP; /// ...
-            
+
         this->PPUps = 0;
         this->IVint = ((rand() % (1 << 30)) << 2);
         this->IV.isNicked = false;
@@ -601,7 +601,7 @@ namespace POKEMON{
         for(int i= 0; i< 4; ++i) this->ribbons0[i] = 0;
         this->fateful = fatef;
 
-            
+
         Gender_Type A = data.gender;
         if(A == MALE)
             this->isFemale = this->isGenderless = false;
@@ -646,7 +646,7 @@ namespace POKEMON{
             stats.acHP = stats.maxHP = ((boxdata.IV.HP+2*data.Bases[0]+(boxdata.EV[0]/4)+100)*level/100)+10;
         else
             stats.acHP = stats.maxHP = 1;
-        
+
         Natures nature = this->boxdata.getNature();
         stats.Atk = (((boxdata.IV.Attack+2*data.Bases[1]+(boxdata.EV[1]>>2))*level/100.0)+5)*NatMod[nature][0];
         stats.Def = (((boxdata.IV.Defense+2*data.Bases[2]+(boxdata.EV[2]>>2))*level/100.0)+5)*NatMod[nature][1];
@@ -662,14 +662,14 @@ namespace POKEMON{
         palette[(start+1) * 16 - 1] = RGB15(15,0,0); //31 normal red
         palette[(start+2) * 16 - 1] = RGB15(0,15,0); //32 normal green
         palette[(start+3) * 16 - 1] = RGB15(15,15,0); //33 normal yellow
-            
+
         palette[(start+4) * 16 - 1] = RGB15(0,0,15); //34 normal blue
         palette[(start+5) * 16 - 1] = RGB15(15,0,15); //35 normal magenta
         palette[(start+6) * 16 - 1] = RGB15(0,15,15); //36 normal cyan
         palette[(start+7) * 16 - 1] = RGB15(24,24,24); //37 normal white
     }
-        
-        
+
+
     void PKMN::drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom, bool newpok)
     {
         setDefaultConsoleTextColors(BG_PALETTE,6);
@@ -681,7 +681,7 @@ namespace POKEMON{
         cust_font2.set_color(0,0);
         cust_font2.set_color(253,1);
         cust_font2.set_color(254,2);
-    
+
         BG_PALETTE[250] = RGB15(31,31,31);
         BG_PALETTE[251] = RGB15(20,20,20);
         BG_PALETTE[252] = RGB15(3,3,3);
@@ -694,15 +694,15 @@ namespace POKEMON{
         consoleClear();	
         consoleSelect(Bottom);
         consoleClear();
-    
+
         consoleSelect(Top);
-    
+
         initOAMTable(oamTop);
         updateOAMSub(oam);
-        
+
         int a2 = 0,b2= 0,c2 =0;
         if(!(this->boxdata.IV.isEgg)){
-            
+
             BG_PALETTE[254] = RGB15(31,0,0);
             BG_PALETTE[255] = RGB15(0,0,31);
             BG_PALETTE[253] = RGB15(31,31,31);
@@ -712,7 +712,7 @@ namespace POKEMON{
 
             cust_font.print_string(&(this->boxdata.Name[0]),150,2,false);
             int G = this->boxdata.gender();
-            
+
             cust_font.print_char('/',234,2,false);
             if (G == 1){
                 cust_font.set_color(255,1);
@@ -740,7 +740,7 @@ namespace POKEMON{
             Page = 0;
             BG_PALETTE[253] = RGB15(31,31,31);
             cust_font.set_color(253,1);
-            
+
             cust_font.print_string("Ei",150,2,false);
             cust_font.print_char('/',234,2,false);
             cust_font.print_string("Ei",160,18,false);
@@ -752,14 +752,14 @@ namespace POKEMON{
             if(!(this->boxdata.IV.isEgg)){
                 consoleSetWindow(Top, 16,4,32,24);
                 printf("     Lv.%3i",this->Level);
-                
+
                 BG_PALETTE[254] = RGB15(31,0,0);
                 BG_PALETTE[255] = RGB15(0,0,31);
 
                 char buf[50];
                 sprintf(buf,"KP                     %3i",stats.maxHP);
                 cust_font.print_string(buf,130,44,false);
-                
+
                 if(NatMod[this->boxdata.getNature()][0] == 1.2)
                     cust_font.set_color(254,1);
                 else if(NatMod[this->boxdata.getNature()][0] == 0.8)
@@ -777,7 +777,7 @@ namespace POKEMON{
                     cust_font.set_color(251,1);
                 sprintf(buf,"VER                   %3i",stats.Def);
                 cust_font.print_string(buf,130,86,false);
-                
+
                 if(NatMod[this->boxdata.getNature()][2] == 1.2)
                     cust_font.set_color(254,1);
                 else if(NatMod[this->boxdata.getNature()][2] == 0.8)
@@ -786,7 +786,7 @@ namespace POKEMON{
                     cust_font.set_color(251,1);
                 sprintf(buf,"INI                   \xC3\xC3""%3i",stats.Spd);
                 cust_font.print_string(buf,130,103,false);
-                                
+
                 if(NatMod[this->boxdata.getNature()][3] == 1.2)
                     cust_font.set_color(254,1);
                 else if(NatMod[this->boxdata.getNature()][3] == 0.8)
@@ -795,7 +795,7 @@ namespace POKEMON{
                     cust_font.set_color(251,1);
                 sprintf(buf,"SAN                   %3i",stats.SAtk);
                 cust_font.print_string(buf,130,120,false);
-                
+
                 if(NatMod[this->boxdata.getNature()][4] == 1.2)
                     cust_font.set_color(254,1);
                 else if(NatMod[this->boxdata.getNature()][4] == 0.8)
@@ -804,9 +804,9 @@ namespace POKEMON{
                     cust_font.set_color(251,1);
                 sprintf(buf,"SVE                   %3i",stats.SDef);
                 cust_font.print_string(buf,130,137,false);
-            
+
                 font::putrec(158,46,158+68,46+12,false,false,251);
-            
+
                 font::putrec(158,46,158+int(68.0*boxdata.IVget(0)/31),46+6,false,false,7*16-1);
                 font::putrec(158,46+6,158+int(68.0*boxdata.EV[0]/255),46+12,false,false,7*16-1);
 
@@ -841,7 +841,7 @@ namespace POKEMON{
         case 1:
             {		
                 cust_font.print_string("Attacken",36,4,false);
-                
+
                 consoleSetWindow(Top, 16,5,32,24);
                 for (int i = 0; i < 4; i++)
                 {
@@ -852,23 +852,23 @@ namespace POKEMON{
 
                     if(t == data.Types[0] || t == data.Types[1])
                         printf("\x1b[32m");
-                    
+
                     if(i == 0)
                         printf("    %s\n    AP %2i""/""%2i ",
-                            &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
-                            AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up1) / 5));
+                        &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
+                        AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up1) / 5));
                     if(i == 1)
                         printf("    %s\n    AP %2i""/""%2i ",
-                            &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
-                            AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up2) / 5));
+                        &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
+                        AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up2) / 5));
                     if(i == 2)
                         printf("    %s\n    AP %2i""/""%2i ",
-                            &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
-                            AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up3) / 5));
+                        &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
+                        AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up3) / 5));
                     if(i == 3)
                         printf("    %s\n    AP %2i""/""%2i ",
-                            &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
-                            AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up4) / 5));
+                        &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
+                        AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up4) / 5));
                     switch (AttackList[this->boxdata.Attack[i]]->HitType)
                     {
                     case attack::PHYS:
@@ -900,12 +900,12 @@ namespace POKEMON{
             }
         case 2:
             cust_font.print_string("Bänder",36,4,false);
-            
+
             break;
         default:
             return;
         }
-    
+
         consoleSelect(Bottom);	
         printf("\x1b[39m");
         int o2s = 50,p2s = 2,t2s = 780;
@@ -929,7 +929,7 @@ namespace POKEMON{
                 drawTypeIcon(oam,spriteInfo,o2s,p2s,t2s,data.Types[1],256-32,24,true);
             }
             drawItemIcon(oam,spriteInfo,this->boxdata.Ball == 0 ? "Pokeball" : ItemList[this->boxdata.Ball].Name,256-100,0,o2s,p2s,t2s,true);
-        
+
             oam->oamBuffer[15].isHidden = false;
             oam->oamBuffer[15].y = 0;
             oam->oamBuffer[15].x = 256-96;
@@ -949,7 +949,7 @@ namespace POKEMON{
             if(this->boxdata.PKRUS){
                 printf("\x1b[39m""PKRS");
             }
-        
+
             oam->oamBuffer[90].isHidden = false;
             oam->oamBuffer[90].y = -4;
             oam->oamBuffer[90].x = -8;
@@ -964,18 +964,18 @@ namespace POKEMON{
             oam->oamBuffer[92].priority = OBJPRIORITY_1;
 
             oam->oamBuffer[90+page].isHidden = true;
-        
+
         }
         else{
             oam->oamBuffer[90].isHidden = true;
             oam->oamBuffer[91].isHidden = true;
             oam->oamBuffer[92].isHidden = true;
-            
+
             oam->oamBuffer[15].isHidden = false;
             oam->oamBuffer[15].y = 0;
             oam->oamBuffer[15].x = 256-32;
             oam->oamBuffer[16].isHidden = true;
-            
+
             oam->oamBuffer[o2s++].isHidden = true;
             oam->oamBuffer[o2s++].isHidden = true;
             drawItemIcon(oam,spriteInfo,this->boxdata.Ball == 0 ? "Pokeball" : ItemList[this->boxdata.Ball].Name,256-32,0,o2s,p2s,t2s,true);
@@ -1007,11 +1007,11 @@ namespace POKEMON{
             consoleSetWindow(Bottom,2,19,28,5);
             printf("%s",abilities[this->boxdata.ability].FlavourText.c_str());
         }
-        
+
         consoleSetWindow(Bottom,3,3,27,15);
-        
+
         //wprintf(L"  OT %ls\n  (%05i/%05i)\n\n",&(boxdata.OT[0]),this->boxdata.ID,this->boxdata.SID);
-        
+
         if(!BGs[BG_ind].load_from_rom){
             dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
             dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
@@ -1021,14 +1021,14 @@ namespace POKEMON{
             dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
             BG_ind = 0;
         }
-        
+
         cust_font2.set_color(0,0);
         cust_font2.set_color(254,1);
         cust_font2.set_color(255,2);
         BG_PALETTE_SUB[253] = this->boxdata.OTisFemale ? RGB15(31,15,0) : RGB15(0,15,31);
         BG_PALETTE_SUB[254] = RGB15(15,15,15);
         BG_PALETTE_SUB[255] = RGB15(31,31,31);
-        
+
         cust_font2.print_string("OT:",28,22,true);
         cust_font2.set_color(253,2);
         cust_font2.print_string(boxdata.OT,56,16,true);
@@ -1049,13 +1049,13 @@ namespace POKEMON{
                 else
                     sprintf(buf, "Gefangen mit Lv. %i", boxdata.gotLevel);
                 cust_font2.print_string(buf,28,44,true);
-                sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
+                sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
                 cust_font2.print_string(buf,35,58,true);
                 sprintf(buf, "Besitzt ein %s""es Wesen,",&(NatureList[this->boxdata.getNature()][0]));
                 cust_font2.print_string(buf,28,76,true);
                 sprintf(buf, "%s"".",&(PersonalityList[this->boxdata.getPersonality()][0]));
                 cust_font2.print_string(buf,35,90,true);
-                
+
                 sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
                 cust_font2.print_string(buf,28,104,true);
             }
@@ -1070,7 +1070,7 @@ namespace POKEMON{
                 cust_font2.print_string(buf,35,58,true);
                 if(!(this->boxdata.IV.isEgg))
                 {
-                    
+
                     if(savMod == SavMod::_NDS){
                         sprintf(buf,"Geschlüpft am %02i.%02i.%02i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2]);
                         cust_font2.print_string(buf,28,72,true);
@@ -1086,7 +1086,7 @@ namespace POKEMON{
                         cust_font2.print_string(buf,28,100,true);
                         sprintf(buf, "%s"".",&(PersonalityList[this->boxdata.getPersonality()][0]));
                         cust_font2.print_string(buf,35,114,true);
-                
+
                         sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
                         cust_font2.print_string(buf,28,128,true);
                     }
@@ -1112,7 +1112,7 @@ namespace POKEMON{
                 cust_font2.print_string(buf,28,76,true);
                 sprintf(buf, "%s"".",&(PersonalityList[this->boxdata.getPersonality()][0]));
                 cust_font2.print_string(buf,35,90,true);
-                
+
                 sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
                 cust_font2.print_string(buf,28,104,true);
             } 
@@ -1142,7 +1142,7 @@ namespace POKEMON{
                         cust_font2.print_string(buf,28,100,true);
                         sprintf(buf, "%s"".",&(PersonalityList[this->boxdata.getPersonality()][0]));
                         cust_font2.print_string(buf,35,114,true);
-                
+
                         sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
                         cust_font2.print_string(buf,28,128,true);
                     }
@@ -1158,7 +1158,7 @@ namespace POKEMON{
 
         if(!(this->boxdata.IV.isEgg)) {
             printf("\x1b[33m");
-         
+
             consoleSelect(Top);	
             consoleSetWindow(Top, 4,5,12,2);
 
@@ -1168,20 +1168,20 @@ namespace POKEMON{
                 this->stats.acHP*100/this->stats.maxHP);
             BATTLE::displayHP(100,101,46,80,97,98,false,50,56);   
             BATTLE::displayHP(100,100-this->stats.acHP*100/this->stats.maxHP,46,80,97,98,false,50,56); 
-        
+
             BATTLE::displayEP(100,101,46,80,99,100,false,59,62);   
             BATTLE::displayEP(0,(this->boxdata.exp-POKEMON::EXP[this->Level-1][exptype]) *100/(POKEMON::EXP[this->Level][exptype]-POKEMON::EXP[this->Level-1][exptype]),46,80,99,100,false,59,62); 
-        
+
             if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),this->boxdata.isFemale,true))
                 loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),!this->boxdata.isFemale,true);
         }
     }
     extern bool drawInfoSub(u16* layer,int PKMN);
     int PKMN::draw(){ 
-        
+
         // Load bitmap to top background
         loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
-        
+
         consoleSelect(&Top);
         consoleClear();
         consoleSetWindow(&Bottom,0,0,32,24);
@@ -1191,10 +1191,10 @@ namespace POKEMON{
         bgUpdate();
 
         int pagemax = 3;
-        
+
         consoleSelect(&Bottom);
         wprintf(&(this->boxdata.Name[0]));
-    
+
         this->drawPage(page,&Top,&Bottom,true);	
         touchPosition touch;
         while (1)
@@ -1299,7 +1299,7 @@ namespace POKEMON{
                 }
                 this->drawPage(page,&Top,&Bottom,false);
             }
-            
+
             else if (page != 0 && (sqrt(sq(16-4-touch.px) + sq(16-4-touch.py)) <= 16))
             {
                 page = 0;

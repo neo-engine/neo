@@ -47,10 +47,10 @@ public:
     ynbox();
     ynbox(const char* name);
     ynbox(mbox Box);
-    
+
     bool getResult(const char* Text,bool time = true);
     bool getResult(const wchar_t* Text,bool time = true);
-    
+
     ~ynbox()
     {
         consoleSetWindow(&Bottom, 9,1,22,MAXLINES);	

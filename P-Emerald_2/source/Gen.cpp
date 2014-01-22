@@ -11,11 +11,11 @@
 extern savgm SAV;
 
 namespace gen3{
-    #define MAX_TRAINER_NAME_LEN 7
-    #define MAX_NICKNAME_LEN 10
+#define MAX_TRAINER_NAME_LEN 7
+#define MAX_NICKNAME_LEN 10
 
     char text[] = {"                                                                                                                                                                 0123456789!?.- ?\"\"''?? , /ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz                 "};
-        
+
     int getNItemIdx(int gen3Idx){
         return gen3Idx;
     }
@@ -94,20 +94,20 @@ namespace gen3{
                 blocks[i]->footer.checksum = get_block_checksum(blocks[i]);
                 tempCount++;
             }
-        free(unpackeddata);
+            free(unpackeddata);
 
-        // Save back to file
-        if ((f = fopen((char*) SRAM, "wb")) == NULL)
-            return -1;
+            // Save back to file
+            if ((f = fopen((char*) SRAM, "wb")) == NULL)
+                return -1;
 
-        if (fwrite(savefile, SAVEFILE_LEN, 1, f) != 1) {
+            if (fwrite(savefile, SAVEFILE_LEN, 1, f) != 1) {
+                fclose(f);
+
+                return -1;
+            }
             fclose(f);
 
-            return -1;
-        }
-        fclose(f);
-
-        return 0;
+            return 0;
     }
 
     char* SaveParser::get_text(u8* raw, bool is_nickname)
@@ -223,9 +223,9 @@ namespace gen3{
     }
 
     /*
-     *	Encrypts/decrypts the 48 byte data buffer based on the xored pv and otid values
-     *  TODO: Make it encrypt its own data/not need arguments
-     */
+    *	Encrypts/decrypts the 48 byte data buffer based on the xored pv and otid values
+    *  TODO: Make it encrypt its own data/not need arguments
+    */
     u16 SaveParser::encrypt(u8 *data, u32 pv, u32 otid) {
         u32 xorkey = pv ^ otid;
         u16 checksum = 0;

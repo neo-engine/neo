@@ -79,20 +79,20 @@ int item::getID(){
 }
 
 bool item::_load(){
-//    std::stringstream FILENAME;
-//    FILENAME << ITEM_PATH << this->Name << ".data";
-//    FILE* f = fopen(FILENAME.str().c_str(),"r");
-//    if(f == 0)
-//        return false;
-//    //this->itemtype = GOODS;
-//    int ac;
-//    fscanf(f,"%i",&ac);
-//    this->effekt = item::EFFEKT(ac);
-//    fscanf(f,"%i\n",&(this->price));
-//    this->displayName = readString(f);
-//    this->dscrpt = readString(f);
-//    this->effekt_script = readString(f);
-//    fclose(f);
+    //    std::stringstream FILENAME;
+    //    FILENAME << ITEM_PATH << this->Name << ".data";
+    //    FILE* f = fopen(FILENAME.str().c_str(),"r");
+    //    if(f == 0)
+    //        return false;
+    //    //this->itemtype = GOODS;
+    //    int ac;
+    //    fscanf(f,"%i",&ac);
+    //    this->effekt = item::EFFEKT(ac);
+    //    fscanf(f,"%i\n",&(this->price));
+    //    this->displayName = readString(f);
+    //    this->dscrpt = readString(f);
+    //    this->effekt_script = readString(f);
+    //    fclose(f);
     return load = true;
 }
 char buf[100];
@@ -203,7 +203,7 @@ std::string berry::getDescription2(){
     fscanf(f,"%hhu",&(ac));
     fscanf(f,"%hhu",&(ac));
     fscanf(f,"%hhu\n",&(ac));
-    
+
     std::string s = readString(f);
     fclose(f);
     return s;
@@ -234,7 +234,7 @@ std::string item::getShortDescription(){
     fscanf(f,"%hhu",&(ac));
     fscanf(f,"%hhu",&(ac));
     fscanf(f,"%hhu\n",&(ac));
-    
+
     readString(f);
     std::string s = readString(f);
     fclose(f);
@@ -270,7 +270,7 @@ item ItemList[700] = {
     medicine("Kalzium"),        medicine("Sonderbonbon"),
     medicine("AP-Plus"),        medicine("Zink"),
     medicine("AP-Top"),         medicine("Spezialitaet"),
-    
+
     battle_item("Megablock"),       battle_item("Angriffsplus"),
     battle_item("X-Angriff"),       battle_item("X-Abwehr"),
     battle_item("X-Tempo"),         battle_item("X-Treffer"),
@@ -279,7 +279,7 @@ item ItemList[700] = {
     battle_item("BlaueFloete"),    battle_item("GelbeFloete"),
     battle_item("RoteFloete"),     battle_item("SchwarzeFloete"),
     battle_item("WeisseFloete"),
-    
+
     item("Kuestensalz"),        item("Kuestenschale"),
     item("Purpurstueck"),       item("Indigostueck"),
     item("Gelbstueck"),         item("Gruenstueck"),
@@ -362,7 +362,7 @@ item ItemList[700] = {
     berry("Krambobeere"),	berry("Enigmabeere"),
     berry("Wunfrubeere"),	berry("Eipfelbeere"),
     berry("Jabocabeere"),	berry("Roselbeere"),
-    
+
     item("Blendpuder"),     item("Schlohkraut"),
     item("Machoband"),      item("EP-Teiler"),
     item("Flinkklaue"),     item("Sanftglocke"),
@@ -421,7 +421,7 @@ item ItemList[700] = {
     item("Magmaisierer"),   item("Dubiosdisk"),
     item("Duesterumhang"),  item("Scharfklaue"),
     item("Scharfzahn"),
-    
+
     TM("TM01"),    TM("TM02"),    TM("TM03"),    TM("TM04"),
     TM("TM05"),    TM("TM06"),    TM("TM07"),    TM("TM08"),
     TM("TM09"),    TM("TM10"),    TM("TM11"),    TM("TM12"),
@@ -478,7 +478,7 @@ item ItemList[700] = {
     key_item("Silberfluegel"),  key_item("Buntschwinge"),
     key_item("Raetsel-Ei"),     key_item("Devon-Scope"), 
     key_item("Auroraticket"),   key_item("AlteKarte"),
- 
+
     TM("VM09"),    TM("VM10"),
     TM("VM11"),    TM("VM12"),
 
@@ -497,7 +497,7 @@ item ItemList[700] = {
     berry("Ginemabeere"),	berry("Kuobeere"),
     berry("Yagobeere"), 	berry("Tougabeere"),
     berry("Ninikubeere"),	berry("Topobeere"),
-  
+
     key_item("K1-Schluessel"),  key_item("K2-Schluessel"),
     key_item("K4-Schluessel"),  key_item("K6-Schluessel"),
     key_item("Meteorit"),       key_item("Wuestenglas"),
@@ -543,7 +543,7 @@ item ItemList[700] = {
     item("AlterDukat"),         item("AlteVase"),
     item("AlterReif"),          item("AlteStatue"),
     item("AlteKrone"),          
-    
+
     medicine("Stratos-Eis"),
 
     item("Null"),    item("Null"),    item("Null"),    item("Null"),

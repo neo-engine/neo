@@ -86,13 +86,13 @@ void animateBack();
 void setMainSpriteVisibility(bool hidden);
 
 void drawItem(OAMTable* oam,SpriteInfo* spriteInfo,const std::string& item_name,const int posX,const int posY,const int cnt,
-int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen,bool showcnt);
+              int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen,bool showcnt);
 void drawItemIcon(OAMTable* oam,SpriteInfo* spriteInfo,const std::string& item_name,const int posX,const int posY,
-int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen = true);
+                  int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen = true);
 void drawPKMNIcon(OAMTable* oam,SpriteInfo* spriteInfo,const int& pkmn_no,const int posX,const int posY,
-int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen);
+                  int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen);
 void drawEggIcon(OAMTable* oam,SpriteInfo* spriteInfo,const int posX,const int posY,
-int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen);
+                 int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen);
 
 bool loadNavScreen(u16* layer,const char* Name,int no);
 bool loadPicture(u16* layer,const char* Path, const char* Name,int palsize = 512,int tilecnt = 192*256);
@@ -102,12 +102,12 @@ bool loadSpriteSub(SpriteInfo* spriteInfo,const char* Path, const char* Name,con
 bool loadPKMNSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX,
                     const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny = false,bool female = false,bool flipx = false);
 bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX,
-                    const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny = false,bool female = false,bool flipx = false);
+                       const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny = false,bool female = false,bool flipx = false);
 
 bool loadTrainerSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const char* name,const int posX,
-                    const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool flipx = false);
+                       const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool flipx = false);
 bool loadTrainerSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const char* name,const int posX,
-                    const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool flipx = false);
+                          const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool flipx = false);
 
 void drawTypeIcon (OAMTable *oam, SpriteInfo * spriteInfo, int& oamIndex, int& palcnt, int & nextTile, Type t ,int x,int y, bool bottom);
 
@@ -118,7 +118,7 @@ private:
 
 public:
     scrnloader(int p):pos(p){}
-    
+
     void draw(int m);
     void init();
 

@@ -50,11 +50,11 @@ savgm::savgm(void Func(int))
     fscanf(fd,"%i %i",&booltemp,&this->HOENN_Badges);
     this->IsMale = bool(booltemp);
     Func(20);
-    fscanf(fd,"%i %i %hi %i %i %lld",&this->KANTO_Badges,&this->JOHTO_Badges,&this->Orden,&this->Dex,&this->Money,&this->PLAYTIME);
+    fscanf(fd,"%i %i %hi %i %i %u",&this->KANTO_Badges,&this->JOHTO_Badges,&this->Orden,&this->Dex,&this->Money,&this->PLAYTIME);
     fscanf(fd,"%i",&booltemp);
     this->hasPKMN = bool(booltemp);
     Func(30);
-    
+
     fscanf(fd,"%i %i %i %i %s %i ",&acposx,&acposy,&acposz,&acMapIdx,acMapName,&acMoveMode);
     fscanf(fd,"%hhu",&this->owIdx);
 
@@ -64,7 +64,7 @@ savgm::savgm(void Func(int))
         this->Bag.bags[i].assign(a,std::pair<int,int>(0,0));
         fread(&this->Bag.bags[i][0],sizeof(std::pair<int,int>),a,fd);
     }
-    
+
     fscanf(fd," %i ",&a);
     this->PKMN_team = std::vector<POKEMON::PKMN>(a);
     for(int i= 0; i< a; ++i)
@@ -87,7 +87,7 @@ savgm::savgm(void Func(int))
         inDex[i] = bool(booltemp);
         Func(40 + (30*(i/649)));
     }
-    
+
     fscanf(fd," %i ",&booltemp);
     hasGDex = bool(booltemp);
     fread(this->flags,1,1000,fd);
@@ -127,9 +127,9 @@ bool savgm::save(void Func(int))
     Func(20);
     fprintf(fd,"%i %i %hi %i ",this->KANTO_Badges,this->JOHTO_Badges,this->Orden,this->Dex);
     booltemp = this->hasPKMN;
-    fprintf(fd,"%i %lld %i ",this->Money,this->PLAYTIME,booltemp);
+    fprintf(fd,"%i %u %i ",this->Money,this->PLAYTIME,booltemp);
     Func(30);
-    
+
     fprintf(fd,"%i %i %i %i %s %i ",acposx,acposy,acposz,acMapIdx,acMapName,acMoveMode);
     fprintf(fd,"%hhu",this->owIdx);
 
@@ -141,7 +141,7 @@ bool savgm::save(void Func(int))
     fprintf(fd," %i ",(this->PKMN_team).size());
     for(size_t i = 0; i < this->PKMN_team.size(); ++i)
         //I->save(fd);
-        fwrite(&(PKMN_team[i]),1,sizeof(POKEMON::PKMN),fd);
+            fwrite(&(PKMN_team[i]),1,sizeof(POKEMON::PKMN),fd);
     for (int i = 0; i < MAXSTOREDPKMN; i++){
         //stored_pkmn[i].save(fd);
         fwrite(&(stored_pkmn[i]),sizeof(POKEMON::PKMN::BOX_PKMN),1,fd);
@@ -155,7 +155,7 @@ bool savgm::save(void Func(int))
     }
     Func(50);
 
-    
+
     booltemp = hasGDex;
     fprintf(fd," %i ",booltemp);
 

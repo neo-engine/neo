@@ -11,17 +11,17 @@ namespace font{
     const u8 FONT_HEIGHT = 16;
 
     void putrec(int x1,int y1,int x2,int y2, bool bottom = true, bool striped = false,int color = 42);
-    
+
     class Font{
     public:
         // Constructors
         Font(u8 *the_data, u8 *the_widths, void (*shiftchar)(u16& val));
         ~Font();
-        
+
         // Accessors
         void set_color(Color new_color,int num) { color[num] = new_color; }
         Color get_color(int num) const { return color[num]; }
-        
+
         // Methods
         void print_char(u16 ch, s16 x, s16 y,bool bottom);
         void print_string(const char *string, s16 x, s16 y,bool bottom);
@@ -30,7 +30,7 @@ namespace font{
         void print_string_center_d(const char *string,bool bottom);
         void print_number(s32 num, s16 x, s16 y,bool bottom);
         u32 string_width(const char *string) const;
-        
+
         void print_string(const wchar_t *string, s16 x, s16 y,bool bottom);
         void print_string_center(const wchar_t *string,bool bottom);
         void print_string_d(const wchar_t *string, s16 x, s16 y,bool bottom);

@@ -33,7 +33,7 @@ int drawBox(short PkmnInd)
     for(int i= BORDER_ID; i< BORDER_ID + 10; ++i)
         oam->oamBuffer[i].isHidden = true;
     updateOAMSub(oam);
-    
+
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNInfoScreen");
 
     consoleSetWindow(&Top,0,0,SCREEN_WIDTH/8,SCREEN_HEIGHT/8);
@@ -42,7 +42,7 @@ int drawBox(short PkmnInd)
 
     consoleSelect(&Bottom);
     consoleClear();
-    
+
     consoleSelect(&Bottom);
     consoleSetWindow(&Bottom,1,1,32,24);
     printf("Pok\x82""mon in dieser Box:\n\n>");
@@ -64,7 +64,7 @@ int drawBox(short PkmnInd)
         //printf(" %s\n",&status_[acPKMN._status][0]);
     }
     dPage(page);
-    
+
     touchPosition touch;
     while(1)
     {
@@ -73,7 +73,7 @@ int drawBox(short PkmnInd)
         scanKeys();
         int pressed = keysDown();
 
-        
+
         if((pressed & KEY_DOWN) || ((touch.py>178)&&(touch.px <= 220)&&(touch.px > 200)))
         {
             while(1)
@@ -84,8 +84,8 @@ int drawBox(short PkmnInd)
                 if(keysUp() & KEY_DOWN)
                     break;
             }
-            DOWN:
-            
+DOWN:
+
             consoleSelect(&Bottom);
             consoleClear();
             if((int)box_of_st_pkmn[PkmnInd].size()-acin-1)
@@ -113,8 +113,8 @@ int drawBox(short PkmnInd)
                 if(keysUp() & KEY_UP)
                     break;
             }
-            UP:
-            
+UP:
+
             consoleSelect(&Bottom);
             consoleClear();
             if((int)box_of_st_pkmn[PkmnInd].size()-acin-1)
@@ -196,9 +196,9 @@ int drawBox(short PkmnInd)
             consoleClear();
             int ret = stored_pkmn[box_of_st_pkmn[PkmnInd][acin]].draw();
             /*if(ret & KEY_UP)
-                goto UP;
+            goto UP;
             else if(ret & KEY_DOWN)
-                goto DOWN;*/
+            goto DOWN;*/
             consoleSetWindow(&Bottom,1,1,32,24);
             consoleSelect(&Bottom);
             printf("Pok\x82""mon in dieser Box:\n\n>");

@@ -70,7 +70,7 @@ namespace POKEMON{
     enum Gender_Type{
         GENDERLESS=255,
         FEMALE=254,
-    //   MALE_125=223,
+        //   MALE_125=223,
         MALE_250=191,
         MALE_500=127,
         MALE_750=63,
@@ -110,26 +110,26 @@ namespace POKEMON{
     };
 
     namespace PKMNDATA{
-        #define GREEN RGB(0,24,0)
-        #define RED RGB(24,0,0)
-        #define BLUE RGB(0,0,24)
-        #define WHITE RGB(31,31,31)
-        #define NORMAL_ RGB(27,27,27)
-        #define BLACK RGB(0,0,0)
-        #define YELLOW RGB(24,24,0)
-        #define PURPLE RGB(24,0,24)
-        #define TURQOISE RGB(0,24,24)
-        #define ICE RGB(15,31,31)
-        #define FAIRY RGB(31,15,31)
-        #define GROUND RGB(31,31,15)
-        #define POISON RGB(31,0,15)
-        #define ORANGE RGB(31,15,0)
-        #define GHOST RGB(15,0,31)
-        #define ROCK RGB(28,23,7)    
-        #define BUG RGB(15,28,7)    
-        #define STEEL RGB(24,24,24)
-        #define DRAGON RGB(7,7,24)
-        #define UNKNOWN RGB(0,42,42)
+#define GREEN RGB(0,24,0)
+#define RED RGB(24,0,0)
+#define BLUE RGB(0,0,24)
+#define WHITE RGB(31,31,31)
+#define NORMAL_ RGB(27,27,27)
+#define BLACK RGB(0,0,0)
+#define YELLOW RGB(24,24,0)
+#define PURPLE RGB(24,0,24)
+#define TURQOISE RGB(0,24,24)
+#define ICE RGB(15,31,31)
+#define FAIRY RGB(31,15,31)
+#define GROUND RGB(31,31,15)
+#define POISON RGB(31,0,15)
+#define ORANGE RGB(31,15,0)
+#define GHOST RGB(15,0,31)
+#define ROCK RGB(28,23,7)    
+#define BUG RGB(15,28,7)    
+#define STEEL RGB(24,24,24)
+#define DRAGON RGB(7,7,24)
+#define UNKNOWN RGB(0,42,42)
         struct PKMNDATA
         {
             Type Types[2];
@@ -337,12 +337,12 @@ namespace POKEMON{
             }
             int getHPPower(){		
                 return 30+((((IVget(0)>>1)&1)+2*((IVget(1)>>1)&1)+4*((IVget(2)>>1)&1)+8*((IVget(3)>>1)&1)+16*((IVget(4)>>1)&1)+32*((IVget(5)>>1)&1)*40)/63);
-                }
-        
+            }
+
             BOX_PKMN(){}
             BOX_PKMN(char* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
                 bool OTFemale,bool Cloned,bool Shiny,bool h_a = false,bool fatef = false,bool _isEgg = false,short gPlace = 0,char BALL = 0, char Prus = 0);
-        
+
             ~BOX_PKMN() {}
 
             int draw(){ return 0;}
@@ -391,7 +391,7 @@ namespace POKEMON{
 
         int draw();
         void drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom,bool newpok);
-    
+
         //std::pair<std::string,std::string> typesToString()
         //{
         //    std::pair<std::string,std::string> ret = std::pair<std::string,std::string>();

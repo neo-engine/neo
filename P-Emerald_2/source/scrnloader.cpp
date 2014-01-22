@@ -55,11 +55,11 @@ PrintConsole Top,Bottom;
 unsigned int NAV_DATA[12288] = {0};
 unsigned short int NAV_DATA_PAL[256] = {0};
 BG_set BGs[MAXBG] = {{"Raging_Gyarados",NAV_DATA,NAV_DATA_PAL,true,false},
-    {"Sleeping_Eevee",NAV_DATA,NAV_DATA_PAL,true,false},
-    {"Mystic_Guardevoir",NAV_DATA,NAV_DATA_PAL,true,false},
-    {"Waiting_Suicune",NAV_DATA,NAV_DATA_PAL,true,false},
-    {"Fighting_Groudon",NAV_DATA,NAV_DATA_PAL,true,false},
-    {"Fighting_Kyogre",NAV_DATA,NAV_DATA_PAL,true,false}};
+{"Sleeping_Eevee",NAV_DATA,NAV_DATA_PAL,true,false},
+{"Mystic_Guardevoir",NAV_DATA,NAV_DATA_PAL,true,false},
+{"Waiting_Suicune",NAV_DATA,NAV_DATA_PAL,true,false},
+{"Fighting_Groudon",NAV_DATA,NAV_DATA_PAL,true,false},
+{"Fighting_Kyogre",NAV_DATA,NAV_DATA_PAL,true,false}};
 int BG_ind = 2;
 extern POKEMON::PKMN::BOX_PKMN stored_pkmn[MAXSTOREDPKMN];
 extern std::vector<int> box_of_st_pkmn[MAXPKMN];
@@ -81,11 +81,11 @@ void printMapLocation(const touchPosition& t){
     consoleSelect(&Bottom);
     consoleClear();
     for(int i=0; i < MAXMAPPOS; ++i)
-    if(t.px > MapLocations[acMapRegion-1][i].lx && t.px < MapLocations[acMapRegion-1][i].rx &&
+        if(t.px > MapLocations[acMapRegion-1][i].lx && t.px < MapLocations[acMapRegion-1][i].rx &&
             t.py > MapLocations[acMapRegion-1][i].ly &&t.py < MapLocations[acMapRegion-1][i].ry){
-        printf(POKEMON::getLoc(MapLocations[acMapRegion-1][i].ind));
-        return;
-    }
+                printf(POKEMON::getLoc(MapLocations[acMapRegion-1][i].ind));
+                return;
+        }
 }
 void printMapLocation(const MapRegionPos& m){
     consoleSetWindow(&Bottom,5,0,20,1);
@@ -127,7 +127,7 @@ void updateTime(bool mapMode)
     acday = timeStruct->tm_mday;
     acmonth = timeStruct->tm_mon;
     acyear = timeStruct->tm_year +1900;
-    
+
     int oX = Bottom.windowX, oY = Bottom.windowY,wX = Bottom.windowWidth,wY = Bottom.windowHeight;
     consoleSetWindow(&Bottom,18,23,8,1);
     consoleSelect(&Bottom);
@@ -142,9 +142,9 @@ unsigned short int TEMP_PAL[256] = {0};
 bool loadSprite(SpriteInfo* spriteInfo,const char* Path, const char* Name,const int TileCnt,const int PalCnt){
     static const int COLORS_PER_PALETTE = 16;
     static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                        * (can be set in REG_DISPCNT) */
+                                          * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
-    sizeof(SPRITE_GFX[0]);
+        sizeof(SPRITE_GFX[0]);
     char pt[100];
     sprintf(pt, "%s%s.raw",Path,Name);
     FILE* fd = fopen(pt,"rb");
@@ -164,13 +164,13 @@ bool loadSprite(SpriteInfo* spriteInfo,const char* Path, const char* Name,const 
 bool loadSpriteSub(SpriteInfo* spriteInfo,const char* Path, const char* Name,const int TileCnt,const int PalCnt){
     static const int COLORS_PER_PALETTE = 16;
     static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                        * (can be set in REG_DISPCNT) */
+                                          * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
-    sizeof(SPRITE_GFX_SUB[0]);
+        sizeof(SPRITE_GFX_SUB[0]);
     char pt[100];
     sprintf(pt, "%s%s.raw",Path,Name);
     FILE* fd = fopen(pt,"rb");
-    
+
     if(fd == 0){
         fclose(fd);
         return false;
@@ -179,474 +179,474 @@ bool loadSpriteSub(SpriteInfo* spriteInfo,const char* Path, const char* Name,con
     fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
 
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    TEMP,
-    &SPRITE_GFX_SUB[spriteInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
-    4*TileCnt);
+        TEMP,
+        &SPRITE_GFX_SUB[spriteInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
+        4*TileCnt);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    TEMP_PAL,
-    &SPRITE_PALETTE_SUB[spriteInfo->entry->palette * COLORS_PER_PALETTE],
-    2*PalCnt);
+        TEMP_PAL,
+        &SPRITE_PALETTE_SUB[spriteInfo->entry->palette * COLORS_PER_PALETTE],
+        2*PalCnt);
     fclose(fd);
     return true;
 }
 
 bool loadPKMNSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX,
                     const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny,bool female,bool flipx){
-    static const int COLORS_PER_PALETTE = 16;
-    static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                        * (can be set in REG_DISPCNT) */
-    static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
-    
-    char pt[100];
-    if(!female)
-        sprintf(pt, "%sSprite_%d.raw",Path,pkmn_no);
-    else
-        sprintf(pt, "%sSprite_%df.raw",Path,pkmn_no);
-    FILE* fd = fopen(pt,"rb");
-     
-    if(fd == 0){
-        fclose(fd); 
-        return false;
-    }
-    int PalCnt = 16;
-    for(int i= 0; i< 16; ++i)
-        TEMP_PAL[i] = 0;
-    fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
-    for(int i = 0; i< 96*96; ++i)
-        TEMP[i] = 0;
-    fread(TEMP,  sizeof(unsigned int),96*96, fd);
-    fclose(fd);
-    if(shiny){
-        memset(pt,0,sizeof(pt));
-        if(!female)
-            sprintf(pt, "%sSprite_%ds.raw",Path,pkmn_no);
-        else
-            sprintf(pt, "%sSprite_%dsf.raw",Path,pkmn_no);
-        fd = fopen(pt,"rb");
-        for(int i= 0; i< 16; ++i)
-            TEMP_PAL[i] = 0; 
-        fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
-        fclose(fd);
-    }
-    if(bottom){
-        swiCopy(TEMP_PAL,&SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
-        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
-    }else{
-        swiCopy(TEMP_PAL,&SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
-        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
-    }
-    SpriteInfo * backInfo = &spriteInfo[++oamIndex];
-    SpriteEntry * back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 64;
-    backInfo->height = 64;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL; 
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_SQUARE;
-    back->x = flipx ? 32 + posX : posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt;
-    if(bottom){
-        swiCopy(TEMP,&SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
-        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-    }else{
-        swiCopy(TEMP,&SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
-        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-    }
-    nextAvailableTileIdx += 64;
+                        static const int COLORS_PER_PALETTE = 16;
+                        static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
+                                                              * (can be set in REG_DISPCNT) */
+                        static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
 
-    backInfo = &spriteInfo[++oamIndex];
-    back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 32;
-    backInfo->height = 64;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL;
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_TALL;
-    back->x = flipx ?  posX : 64 +posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt; 
-    nextAvailableTileIdx += 32;
+                        char pt[100];
+                        if(!female)
+                            sprintf(pt, "%sSprite_%d.raw",Path,pkmn_no);
+                        else
+                            sprintf(pt, "%sSprite_%df.raw",Path,pkmn_no);
+                        FILE* fd = fopen(pt,"rb");
 
-    backInfo = &spriteInfo[++oamIndex];
-    back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 64;
-    backInfo->height = 32;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY + 64;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL;
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_WIDE;
-    back->x = flipx ? 32 + posX : posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt; 
-    nextAvailableTileIdx += 32;
+                        if(fd == 0){
+                            fclose(fd); 
+                            return false;
+                        }
+                        int PalCnt = 16;
+                        for(int i= 0; i< 16; ++i)
+                            TEMP_PAL[i] = 0;
+                        fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
+                        for(int i = 0; i< 96*96; ++i)
+                            TEMP[i] = 0;
+                        fread(TEMP,  sizeof(unsigned int),96*96, fd);
+                        fclose(fd);
+                        if(shiny){
+                            memset(pt,0,sizeof(pt));
+                            if(!female)
+                                sprintf(pt, "%sSprite_%ds.raw",Path,pkmn_no);
+                            else
+                                sprintf(pt, "%sSprite_%dsf.raw",Path,pkmn_no);
+                            fd = fopen(pt,"rb");
+                            for(int i= 0; i< 16; ++i)
+                                TEMP_PAL[i] = 0; 
+                            fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
+                            fclose(fd);
+                        }
+                        if(bottom){
+                            swiCopy(TEMP_PAL,&SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
+                            //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
+                        }else{
+                            swiCopy(TEMP_PAL,&SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
+                            //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
+                        }
+                        SpriteInfo * backInfo = &spriteInfo[++oamIndex];
+                        SpriteEntry * back = &oam->oamBuffer[oamIndex];
+                        backInfo->oamId = oamIndex;
+                        backInfo->width = 64;
+                        backInfo->height = 64;
+                        backInfo->angle = 0;
+                        backInfo->entry = back;
+                        back->y = posY;
+                        back->isRotateScale = false;
+                        back->blendMode = OBJMODE_NORMAL; 
+                        back->isMosaic = false;
+                        back->isHidden = false;
+                        back->colorMode = OBJCOLOR_16;
+                        back->shape = OBJSHAPE_SQUARE;
+                        back->x = flipx ? 32 + posX : posX;
+                        back->hFlip = flipx;
+                        back->size = OBJSIZE_64;
+                        back->gfxIndex = nextAvailableTileIdx;
+                        back->priority = OBJPRIORITY_0;
+                        back->palette = palcnt;
+                        if(bottom){
+                            swiCopy(TEMP,&SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
+                            //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+                        }else{
+                            swiCopy(TEMP,&SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
+                            //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+                        }
+                        nextAvailableTileIdx += 64;
 
-    backInfo = &spriteInfo[++oamIndex];
-    back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;  
-    backInfo->width = 32; 
-    backInfo->height = 32;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY + 64;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL;
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_SQUARE;
-    back->x = flipx ?  posX : 64 +posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_32;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt;
-    nextAvailableTileIdx += 16;
+                        backInfo = &spriteInfo[++oamIndex];
+                        back = &oam->oamBuffer[oamIndex];
+                        backInfo->oamId = oamIndex;
+                        backInfo->width = 32;
+                        backInfo->height = 64;
+                        backInfo->angle = 0;
+                        backInfo->entry = back;
+                        back->y = posY;
+                        back->isRotateScale = false;
+                        back->blendMode = OBJMODE_NORMAL;
+                        back->isMosaic = false;
+                        back->isHidden = false;
+                        back->colorMode = OBJCOLOR_16;
+                        back->shape = OBJSHAPE_TALL;
+                        back->x = flipx ?  posX : 64 +posX;
+                        back->hFlip = flipx;
+                        back->size = OBJSIZE_64;
+                        back->gfxIndex = nextAvailableTileIdx;
+                        back->priority = OBJPRIORITY_0;
+                        back->palette = palcnt; 
+                        nextAvailableTileIdx += 32;
 
-    ++palcnt;
-    if(bottom)
-        updateOAMSub(oam);
-    else
-        updateOAM(oam);
-    return true;
+                        backInfo = &spriteInfo[++oamIndex];
+                        back = &oam->oamBuffer[oamIndex];
+                        backInfo->oamId = oamIndex;
+                        backInfo->width = 64;
+                        backInfo->height = 32;
+                        backInfo->angle = 0;
+                        backInfo->entry = back;
+                        back->y = posY + 64;
+                        back->isRotateScale = false;
+                        back->blendMode = OBJMODE_NORMAL;
+                        back->isMosaic = false;
+                        back->isHidden = false;
+                        back->colorMode = OBJCOLOR_16;
+                        back->shape = OBJSHAPE_WIDE;
+                        back->x = flipx ? 32 + posX : posX;
+                        back->hFlip = flipx;
+                        back->size = OBJSIZE_64;
+                        back->gfxIndex = nextAvailableTileIdx;
+                        back->priority = OBJPRIORITY_0;
+                        back->palette = palcnt; 
+                        nextAvailableTileIdx += 32;
+
+                        backInfo = &spriteInfo[++oamIndex];
+                        back = &oam->oamBuffer[oamIndex];
+                        backInfo->oamId = oamIndex;  
+                        backInfo->width = 32; 
+                        backInfo->height = 32;
+                        backInfo->angle = 0;
+                        backInfo->entry = back;
+                        back->y = posY + 64;
+                        back->isRotateScale = false;
+                        back->blendMode = OBJMODE_NORMAL;
+                        back->isMosaic = false;
+                        back->isHidden = false;
+                        back->colorMode = OBJCOLOR_16;
+                        back->shape = OBJSHAPE_SQUARE;
+                        back->x = flipx ?  posX : 64 +posX;
+                        back->hFlip = flipx;
+                        back->size = OBJSIZE_32;
+                        back->gfxIndex = nextAvailableTileIdx;
+                        back->priority = OBJPRIORITY_0;
+                        back->palette = palcnt;
+                        nextAvailableTileIdx += 16;
+
+                        ++palcnt;
+                        if(bottom)
+                            updateOAMSub(oam);
+                        else
+                            updateOAM(oam);
+                        return true;
 }
 bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX,
-                    const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny,bool female,bool flipx){
-    static const int COLORS_PER_PALETTE = 16;
-    static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                        * (can be set in REG_DISPCNT) */
-    static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
-    
-    char pt[100];
-    if(!female)
-        sprintf(pt, "%sSprite_%d.raw",Path,pkmn_no);
-    else
-        sprintf(pt, "%sSprite_%df.raw",Path,pkmn_no);
-    FILE* fd = fopen(pt,"rb");
-     
-    if(fd == 0){
-        fclose(fd); 
-        return false;
-    }
-    int PalCnt = 16;
-    for(int i= 0; i< 16; ++i)
-        TEMP_PAL[i] = 0;
-    fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
-    for(int i = 0; i< 96*96; ++i)
-        TEMP[i] = 0;
-    fread(TEMP,  sizeof(unsigned int),96*64, fd);
-    fclose(fd);
-    if(shiny){
-        memset(pt,0,sizeof(pt));
-        if(!female)
-            sprintf(pt, "%sSprite_%ds.raw",Path,pkmn_no);
-        else
-            sprintf(pt, "%sSprite_%dsf.raw",Path,pkmn_no);
-        fd = fopen(pt,"rb");
-        for(int i= 0; i< 16; ++i)
-            TEMP_PAL[i] = 0; 
-        fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
-        fclose(fd);
-    }
-    if(bottom)
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
-    else
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
+                       const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny,bool female,bool flipx){
+                           static const int COLORS_PER_PALETTE = 16;
+                           static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
+                                                                 * (can be set in REG_DISPCNT) */
+                           static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
 
-    SpriteInfo * backInfo = &spriteInfo[++oamIndex];
-    SpriteEntry * back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 64;
-    backInfo->height = 64;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL; 
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_SQUARE;
-    back->x = flipx ? 32 + posX : posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt;
-    if(bottom)
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-    else
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-    nextAvailableTileIdx += 64;
+                           char pt[100];
+                           if(!female)
+                               sprintf(pt, "%sSprite_%d.raw",Path,pkmn_no);
+                           else
+                               sprintf(pt, "%sSprite_%df.raw",Path,pkmn_no);
+                           FILE* fd = fopen(pt,"rb");
 
-    backInfo = &spriteInfo[++oamIndex];
-    back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 32;
-    backInfo->height = 64;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL;
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_TALL;
-    back->x = flipx ?  posX : 64 +posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt; 
-    nextAvailableTileIdx += 32;
+                           if(fd == 0){
+                               fclose(fd); 
+                               return false;
+                           }
+                           int PalCnt = 16;
+                           for(int i= 0; i< 16; ++i)
+                               TEMP_PAL[i] = 0;
+                           fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
+                           for(int i = 0; i< 96*96; ++i)
+                               TEMP[i] = 0;
+                           fread(TEMP,  sizeof(unsigned int),96*64, fd);
+                           fclose(fd);
+                           if(shiny){
+                               memset(pt,0,sizeof(pt));
+                               if(!female)
+                                   sprintf(pt, "%sSprite_%ds.raw",Path,pkmn_no);
+                               else
+                                   sprintf(pt, "%sSprite_%dsf.raw",Path,pkmn_no);
+                               fd = fopen(pt,"rb");
+                               for(int i= 0; i< 16; ++i)
+                                   TEMP_PAL[i] = 0; 
+                               fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
+                               fclose(fd);
+                           }
+                           if(bottom)
+                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
+                           else
+                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
 
-    ++palcnt;
-    if(bottom)
-        updateOAMSub(oam);
-    else
-        updateOAM(oam);
-    return true;
+                           SpriteInfo * backInfo = &spriteInfo[++oamIndex];
+                           SpriteEntry * back = &oam->oamBuffer[oamIndex];
+                           backInfo->oamId = oamIndex;
+                           backInfo->width = 64;
+                           backInfo->height = 64;
+                           backInfo->angle = 0;
+                           backInfo->entry = back;
+                           back->y = posY;
+                           back->isRotateScale = false;
+                           back->blendMode = OBJMODE_NORMAL; 
+                           back->isMosaic = false;
+                           back->isHidden = false;
+                           back->colorMode = OBJCOLOR_16;
+                           back->shape = OBJSHAPE_SQUARE;
+                           back->x = flipx ? 32 + posX : posX;
+                           back->hFlip = flipx;
+                           back->size = OBJSIZE_64;
+                           back->gfxIndex = nextAvailableTileIdx;
+                           back->priority = OBJPRIORITY_0;
+                           back->palette = palcnt;
+                           if(bottom)
+                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+                           else
+                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+                           nextAvailableTileIdx += 64;
+
+                           backInfo = &spriteInfo[++oamIndex];
+                           back = &oam->oamBuffer[oamIndex];
+                           backInfo->oamId = oamIndex;
+                           backInfo->width = 32;
+                           backInfo->height = 64;
+                           backInfo->angle = 0;
+                           backInfo->entry = back;
+                           back->y = posY;
+                           back->isRotateScale = false;
+                           back->blendMode = OBJMODE_NORMAL;
+                           back->isMosaic = false;
+                           back->isHidden = false;
+                           back->colorMode = OBJCOLOR_16;
+                           back->shape = OBJSHAPE_TALL;
+                           back->x = flipx ?  posX : 64 +posX;
+                           back->hFlip = flipx;
+                           back->size = OBJSIZE_64;
+                           back->gfxIndex = nextAvailableTileIdx;
+                           back->priority = OBJPRIORITY_0;
+                           back->palette = palcnt; 
+                           nextAvailableTileIdx += 32;
+
+                           ++palcnt;
+                           if(bottom)
+                               updateOAMSub(oam);
+                           else
+                               updateOAM(oam);
+                           return true;
 }
 
 bool loadTrainerSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const char* name,const int posX,
-                    const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool flipx){
-    static const int COLORS_PER_PALETTE = 16;
-    static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                        * (can be set in REG_DISPCNT) */
-    static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
-    
-    char pt[100];
-    sprintf(pt, "%sSprite_%s.raw",Path,name);
-    FILE* fd = fopen(pt,"rb");
-     
-    if(fd == 0){
-        fclose(fd); 
-        return false;
-    }
-    int PalCnt = 16;
-    for(int i= 0; i< 16; ++i)
-        TEMP_PAL[i] = 0;
-    fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
-    for(int i = 0; i< 96*96; ++i)
-        TEMP[i] = 0;
-    fread(TEMP,  sizeof(unsigned int),96*96, fd);
-    fclose(fd);
+                       const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool flipx){
+                           static const int COLORS_PER_PALETTE = 16;
+                           static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
+                                                                 * (can be set in REG_DISPCNT) */
+                           static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
 
-    if(bottom)
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
-    else
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
+                           char pt[100];
+                           sprintf(pt, "%sSprite_%s.raw",Path,name);
+                           FILE* fd = fopen(pt,"rb");
 
-    SpriteInfo * backInfo = &spriteInfo[++oamIndex];
-    SpriteEntry * back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 64;
-    backInfo->height = 64;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL; 
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_SQUARE;
-    back->x = flipx ? 32 + posX : posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt;
-    if(bottom)
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-    else
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-    nextAvailableTileIdx += 64;
+                           if(fd == 0){
+                               fclose(fd); 
+                               return false;
+                           }
+                           int PalCnt = 16;
+                           for(int i= 0; i< 16; ++i)
+                               TEMP_PAL[i] = 0;
+                           fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
+                           for(int i = 0; i< 96*96; ++i)
+                               TEMP[i] = 0;
+                           fread(TEMP,  sizeof(unsigned int),96*96, fd);
+                           fclose(fd);
 
-    backInfo = &spriteInfo[++oamIndex];
-    back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 32;
-    backInfo->height = 64;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL;
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_TALL;
-    back->x = flipx ?  posX : 64 +posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt; 
-    nextAvailableTileIdx += 32;
+                           if(bottom)
+                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
+                           else
+                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
 
-    backInfo = &spriteInfo[++oamIndex];
-    back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 64;
-    backInfo->height = 32;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY + 64;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL;
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_WIDE;
-    back->x = flipx ? 32 + posX : posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt; 
-    nextAvailableTileIdx += 32;
+                           SpriteInfo * backInfo = &spriteInfo[++oamIndex];
+                           SpriteEntry * back = &oam->oamBuffer[oamIndex];
+                           backInfo->oamId = oamIndex;
+                           backInfo->width = 64;
+                           backInfo->height = 64;
+                           backInfo->angle = 0;
+                           backInfo->entry = back;
+                           back->y = posY;
+                           back->isRotateScale = false;
+                           back->blendMode = OBJMODE_NORMAL; 
+                           back->isMosaic = false;
+                           back->isHidden = false;
+                           back->colorMode = OBJCOLOR_16;
+                           back->shape = OBJSHAPE_SQUARE;
+                           back->x = flipx ? 32 + posX : posX;
+                           back->hFlip = flipx;
+                           back->size = OBJSIZE_64;
+                           back->gfxIndex = nextAvailableTileIdx;
+                           back->priority = OBJPRIORITY_0;
+                           back->palette = palcnt;
+                           if(bottom)
+                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+                           else
+                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+                           nextAvailableTileIdx += 64;
 
-    backInfo = &spriteInfo[++oamIndex];
-    back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;  
-    backInfo->width = 32; 
-    backInfo->height = 32;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY + 64;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL;
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_SQUARE;
-    back->x = flipx ?  posX : 64 +posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_32;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt;
-    nextAvailableTileIdx += 16;
+                           backInfo = &spriteInfo[++oamIndex];
+                           back = &oam->oamBuffer[oamIndex];
+                           backInfo->oamId = oamIndex;
+                           backInfo->width = 32;
+                           backInfo->height = 64;
+                           backInfo->angle = 0;
+                           backInfo->entry = back;
+                           back->y = posY;
+                           back->isRotateScale = false;
+                           back->blendMode = OBJMODE_NORMAL;
+                           back->isMosaic = false;
+                           back->isHidden = false;
+                           back->colorMode = OBJCOLOR_16;
+                           back->shape = OBJSHAPE_TALL;
+                           back->x = flipx ?  posX : 64 +posX;
+                           back->hFlip = flipx;
+                           back->size = OBJSIZE_64;
+                           back->gfxIndex = nextAvailableTileIdx;
+                           back->priority = OBJPRIORITY_0;
+                           back->palette = palcnt; 
+                           nextAvailableTileIdx += 32;
 
-    ++palcnt;
-    if(bottom)
-        updateOAMSub(oam);
-    else
-        updateOAM(oam);
-    return true;
+                           backInfo = &spriteInfo[++oamIndex];
+                           back = &oam->oamBuffer[oamIndex];
+                           backInfo->oamId = oamIndex;
+                           backInfo->width = 64;
+                           backInfo->height = 32;
+                           backInfo->angle = 0;
+                           backInfo->entry = back;
+                           back->y = posY + 64;
+                           back->isRotateScale = false;
+                           back->blendMode = OBJMODE_NORMAL;
+                           back->isMosaic = false;
+                           back->isHidden = false;
+                           back->colorMode = OBJCOLOR_16;
+                           back->shape = OBJSHAPE_WIDE;
+                           back->x = flipx ? 32 + posX : posX;
+                           back->hFlip = flipx;
+                           back->size = OBJSIZE_64;
+                           back->gfxIndex = nextAvailableTileIdx;
+                           back->priority = OBJPRIORITY_0;
+                           back->palette = palcnt; 
+                           nextAvailableTileIdx += 32;
+
+                           backInfo = &spriteInfo[++oamIndex];
+                           back = &oam->oamBuffer[oamIndex];
+                           backInfo->oamId = oamIndex;  
+                           backInfo->width = 32; 
+                           backInfo->height = 32;
+                           backInfo->angle = 0;
+                           backInfo->entry = back;
+                           back->y = posY + 64;
+                           back->isRotateScale = false;
+                           back->blendMode = OBJMODE_NORMAL;
+                           back->isMosaic = false;
+                           back->isHidden = false;
+                           back->colorMode = OBJCOLOR_16;
+                           back->shape = OBJSHAPE_SQUARE;
+                           back->x = flipx ?  posX : 64 +posX;
+                           back->hFlip = flipx;
+                           back->size = OBJSIZE_32;
+                           back->gfxIndex = nextAvailableTileIdx;
+                           back->priority = OBJPRIORITY_0;
+                           back->palette = palcnt;
+                           nextAvailableTileIdx += 16;
+
+                           ++palcnt;
+                           if(bottom)
+                               updateOAMSub(oam);
+                           else
+                               updateOAM(oam);
+                           return true;
 }
 bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const char* name,const int posX,
-                    const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool flipx){
-    static const int COLORS_PER_PALETTE = 16;
-    static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                        * (can be set in REG_DISPCNT) */
-    static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
-    
-    char pt[100];
-    sprintf(pt, "%sSprite_%s.raw",Path,name);
-    FILE* fd = fopen(pt,"rb");
-     
-    if(fd == 0){
-        fclose(fd); 
-        return false;
-    }
-    int PalCnt = 16;
-    for(int i= 0; i< 16; ++i)
-        TEMP_PAL[i] = 0;
-    fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
-    for(int i = 0; i< 96*96; ++i)
-        TEMP[i] = 0;
-    fread(TEMP,  sizeof(unsigned int),96*64, fd);
-    fclose(fd);
+                       const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool flipx){
+                           static const int COLORS_PER_PALETTE = 16;
+                           static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
+                                                                 * (can be set in REG_DISPCNT) */
+                           static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
 
-    if(bottom)
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
-    else
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
+                           char pt[100];
+                           sprintf(pt, "%sSprite_%s.raw",Path,name);
+                           FILE* fd = fopen(pt,"rb");
 
-    SpriteInfo * backInfo = &spriteInfo[++oamIndex];
-    SpriteEntry * back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 64;
-    backInfo->height = 64;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL; 
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_SQUARE;
-    back->x = flipx ? 32 + posX : posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt;
-    if(bottom)
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-    else
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-    nextAvailableTileIdx += 64;
+                           if(fd == 0){
+                               fclose(fd); 
+                               return false;
+                           }
+                           int PalCnt = 16;
+                           for(int i= 0; i< 16; ++i)
+                               TEMP_PAL[i] = 0;
+                           fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
+                           for(int i = 0; i< 96*96; ++i)
+                               TEMP[i] = 0;
+                           fread(TEMP,  sizeof(unsigned int),96*64, fd);
+                           fclose(fd);
 
-    backInfo = &spriteInfo[++oamIndex];
-    back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 32;
-    backInfo->height = 64;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL;
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_TALL;
-    back->x = flipx ?  posX : 64 +posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt; 
-    nextAvailableTileIdx += 32;
+                           if(bottom)
+                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
+                           else
+                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
 
-    ++palcnt;
-    if(bottom)
-        updateOAMSub(oam);
-    else
-        updateOAM(oam);
-    return true;
+                           SpriteInfo * backInfo = &spriteInfo[++oamIndex];
+                           SpriteEntry * back = &oam->oamBuffer[oamIndex];
+                           backInfo->oamId = oamIndex;
+                           backInfo->width = 64;
+                           backInfo->height = 64;
+                           backInfo->angle = 0;
+                           backInfo->entry = back;
+                           back->y = posY;
+                           back->isRotateScale = false;
+                           back->blendMode = OBJMODE_NORMAL; 
+                           back->isMosaic = false;
+                           back->isHidden = false;
+                           back->colorMode = OBJCOLOR_16;
+                           back->shape = OBJSHAPE_SQUARE;
+                           back->x = flipx ? 32 + posX : posX;
+                           back->hFlip = flipx;
+                           back->size = OBJSIZE_64;
+                           back->gfxIndex = nextAvailableTileIdx;
+                           back->priority = OBJPRIORITY_0;
+                           back->palette = palcnt;
+                           if(bottom)
+                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+                           else
+                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+                           nextAvailableTileIdx += 64;
+
+                           backInfo = &spriteInfo[++oamIndex];
+                           back = &oam->oamBuffer[oamIndex];
+                           backInfo->oamId = oamIndex;
+                           backInfo->width = 32;
+                           backInfo->height = 64;
+                           backInfo->angle = 0;
+                           backInfo->entry = back;
+                           back->y = posY;
+                           back->isRotateScale = false;
+                           back->blendMode = OBJMODE_NORMAL;
+                           back->isMosaic = false;
+                           back->isHidden = false;
+                           back->colorMode = OBJCOLOR_16;
+                           back->shape = OBJSHAPE_TALL;
+                           back->x = flipx ?  posX : 64 +posX;
+                           back->hFlip = flipx;
+                           back->size = OBJSIZE_64;
+                           back->gfxIndex = nextAvailableTileIdx;
+                           back->priority = OBJPRIORITY_0;
+                           back->palette = palcnt; 
+                           nextAvailableTileIdx += 32;
+
+                           ++palcnt;
+                           if(bottom)
+                               updateOAMSub(oam);
+                           else
+                               updateOAM(oam);
+                           return true;
 }
 
 bool loadPicture(u16* layer,const char* Path, const char* Name,int palsize,int tilecnt){
@@ -658,14 +658,14 @@ bool loadPicture(u16* layer,const char* Path, const char* Name,int palsize,int t
         fclose(fd);
         return false;
     }    
-    
+
     fread(TEMP,  sizeof(unsigned int),12288, fd);
     fread(TEMP_PAL,  sizeof(unsigned short int),256, fd);
 
     dmaCopy(TEMP, layer, tilecnt );
     dmaCopy( TEMP_PAL, BG_PALETTE, palsize); 
     fclose(fd);
-    
+
     return true;
 }
 bool loadPictureSub(u16* layer,const char* Path, const char* Name,int palsize,int tilecnt){
@@ -677,15 +677,15 @@ bool loadPictureSub(u16* layer,const char* Path, const char* Name,int palsize,in
         fclose(fd);
         return false;
     }
-    
+
     fread(TEMP,  sizeof(unsigned int),12288, fd);
     fread(TEMP_PAL,  sizeof(unsigned short int),256, fd);
 
     dmaCopy(TEMP, layer,tilecnt);
     dmaCopy( TEMP_PAL, BG_PALETTE_SUB, palsize); 
     fclose(fd);
-    
-    
+
+
     return true;
 }
 
@@ -695,16 +695,16 @@ bool loadNavScreen(u16* layer,const char* Name,int no){
         dmaCopy( NAV_DATA_PAL, BG_PALETTE_SUB, 256*2); 
         return true;
     }
-    
+
     char pt[100];
     sprintf(pt, "nitro:/PICS/NAV/%s.raw",Name);
     FILE* fd = fopen(pt,"rb");
-    
+
     if(fd == 0){
         fclose(fd);
         return false;
     }
-    
+
     fread(NAV_DATA,  sizeof(unsigned int),12288, fd);
     fread(NAV_DATA_PAL,  sizeof(unsigned short int),256, fd);
 
@@ -725,7 +725,7 @@ extern int mainSpritesPositions[6][2];
 int ac = 0;
 namespace POKEMON{
     bool drawInfoSub(u16* layer,int PKMN) /*--deprecated*/
-    //Bilder für InfoScrn von SD laden
+        //Bilder für InfoScrn von SD laden
     {
         return false;
     }
@@ -747,13 +747,13 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     static const int BYTES_PER_16_COLOR_TILE = 32;
     static const int COLORS_PER_PALETTE = 16;
     static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                        * (can be set in REG_DISPCNT) */
+                                          * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
-    sizeof(SPRITE_GFX_SUB[0]);
+        sizeof(SPRITE_GFX_SUB[0]);
 
     /* Keep track of the available tiles */
     int nextAvailableTileIdx = 0;
-    
+
     SpriteInfo * backInfo = &spriteInfo[BACK_ID];
     SpriteEntry * back = &oam->oamBuffer[BACK_ID];
     backInfo->oamId = BACK_ID;
@@ -822,7 +822,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     opts->priority = OBJPRIORITY_0;
     opts->palette = optsInfo->oamId;
 
-    
+
     SpriteInfo * pkmnInfo = &spriteInfo[PKMN_ID];
     SpriteEntry * pkmn = &oam->oamBuffer[PKMN_ID];
     pkmnInfo->oamId = PKMN_ID;
@@ -844,7 +844,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     pkmn->priority = OBJPRIORITY_0;
     pkmn->palette = pkmnInfo->oamId;
 
-    
+
     SpriteInfo * navInfo = &spriteInfo[NAV_ID];
     SpriteEntry * nav = &oam->oamBuffer[NAV_ID];
     navInfo->oamId = NAV_ID;
@@ -866,7 +866,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     nav->priority = OBJPRIORITY_0;
     nav->palette = navInfo->oamId;
 
-    
+
     SpriteInfo * idInfo = &spriteInfo[ID_ID];
     SpriteEntry * id = &oam->oamBuffer[ID_ID];
     idInfo->oamId = ID_ID;
@@ -888,7 +888,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     id->priority = OBJPRIORITY_0;
     id->palette = idInfo->oamId;
 
-    
+
     SpriteInfo * dexInfo = &spriteInfo[DEX_ID];
     SpriteEntry * dex = &oam->oamBuffer[DEX_ID];
     dexInfo->oamId = DEX_ID;
@@ -910,7 +910,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     dex->priority = OBJPRIORITY_0;
     dex->palette = dexInfo->oamId;
 
-    
+
     SpriteInfo * bagInfo = &spriteInfo[BAG_ID];
     SpriteEntry * bag = &oam->oamBuffer[BAG_ID];
     bagInfo->oamId = BAG_ID;
@@ -931,7 +931,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     nextAvailableTileIdx += SPBagTilesLen / BYTES_PER_16_COLOR_TILE;
     bag->priority = OBJPRIORITY_0;
     bag->palette = bagInfo->oamId;
-    
+
     //"A"-Button
     SpriteInfo * AInfo = &spriteInfo[A_ID];
     SpriteEntry * A = &oam->oamBuffer[A_ID];
@@ -954,84 +954,84 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     A->priority = OBJPRIORITY_0;
     A->palette = AInfo->oamId;
 
-    
+
     /* Copy over the sprite palettes */
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    BackPal,
-    &SPRITE_PALETTE_SUB[backInfo->oamId * COLORS_PER_PALETTE],
-    32);
+        BackPal,
+        &SPRITE_PALETTE_SUB[backInfo->oamId * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    SavePal,
-    &SPRITE_PALETTE_SUB[saveInfo->oamId * COLORS_PER_PALETTE],
-    32);
+        SavePal,
+        &SPRITE_PALETTE_SUB[saveInfo->oamId * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    PokemonPal,
-    &SPRITE_PALETTE_SUB[pkmnInfo->oamId * COLORS_PER_PALETTE],
-    32);
+        PokemonPal,
+        &SPRITE_PALETTE_SUB[pkmnInfo->oamId * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    IdPal,
-    &SPRITE_PALETTE_SUB[idInfo->oamId * COLORS_PER_PALETTE],
-    32);
+        IdPal,
+        &SPRITE_PALETTE_SUB[idInfo->oamId * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    PokeDexPal,
-    &SPRITE_PALETTE_SUB[dexInfo->oamId * COLORS_PER_PALETTE],
-    32);
+        PokeDexPal,
+        &SPRITE_PALETTE_SUB[dexInfo->oamId * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    SPBagPal,
-    &SPRITE_PALETTE_SUB[bagInfo->oamId * COLORS_PER_PALETTE],
-    32);
+        SPBagPal,
+        &SPRITE_PALETTE_SUB[bagInfo->oamId * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    OptionPal,
-    &SPRITE_PALETTE_SUB[optsInfo->oamId * COLORS_PER_PALETTE],
-    32);
+        OptionPal,
+        &SPRITE_PALETTE_SUB[optsInfo->oamId * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    NavPal,
-    &SPRITE_PALETTE_SUB[navInfo->oamId * COLORS_PER_PALETTE],
-    32);
+        NavPal,
+        &SPRITE_PALETTE_SUB[navInfo->oamId * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    APal,
-    &SPRITE_PALETTE_SUB[AInfo->oamId * COLORS_PER_PALETTE],
-    32);
+        APal,
+        &SPRITE_PALETTE_SUB[AInfo->oamId * COLORS_PER_PALETTE],
+        32);
 
 
     /* Copy the sprite graphics to sprite graphics memory */
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    BackTiles,
-    &SPRITE_GFX_SUB[back->gfxIndex * OFFSET_MULTIPLIER],
-    BackTilesLen);
+        BackTiles,
+        &SPRITE_GFX_SUB[back->gfxIndex * OFFSET_MULTIPLIER],
+        BackTilesLen);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    SaveTiles,
-    &SPRITE_GFX_SUB[save->gfxIndex * OFFSET_MULTIPLIER],
-    SaveTilesLen);
+        SaveTiles,
+        &SPRITE_GFX_SUB[save->gfxIndex * OFFSET_MULTIPLIER],
+        SaveTilesLen);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    PokemonTiles,
-    &SPRITE_GFX_SUB[pkmn->gfxIndex * OFFSET_MULTIPLIER],
-    PokemonTilesLen);
+        PokemonTiles,
+        &SPRITE_GFX_SUB[pkmn->gfxIndex * OFFSET_MULTIPLIER],
+        PokemonTilesLen);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    IdTiles,
-    &SPRITE_GFX_SUB[id->gfxIndex * OFFSET_MULTIPLIER],
-    IdTilesLen);
+        IdTiles,
+        &SPRITE_GFX_SUB[id->gfxIndex * OFFSET_MULTIPLIER],
+        IdTilesLen);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    PokeDexTiles,
-    &SPRITE_GFX_SUB[dex->gfxIndex * OFFSET_MULTIPLIER],
-    PokeDexTilesLen);
+        PokeDexTiles,
+        &SPRITE_GFX_SUB[dex->gfxIndex * OFFSET_MULTIPLIER],
+        PokeDexTilesLen);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    SPBagTiles,
-    &SPRITE_GFX_SUB[bag->gfxIndex * OFFSET_MULTIPLIER],
-    SPBagTilesLen);
+        SPBagTiles,
+        &SPRITE_GFX_SUB[bag->gfxIndex * OFFSET_MULTIPLIER],
+        SPBagTilesLen);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    OptionTiles,
-    &SPRITE_GFX_SUB[opts->gfxIndex * OFFSET_MULTIPLIER],
-    OptionTilesLen);
+        OptionTiles,
+        &SPRITE_GFX_SUB[opts->gfxIndex * OFFSET_MULTIPLIER],
+        OptionTilesLen);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    NavTiles,
-    &SPRITE_GFX_SUB[nav->gfxIndex * OFFSET_MULTIPLIER],
-    NavTilesLen);
+        NavTiles,
+        &SPRITE_GFX_SUB[nav->gfxIndex * OFFSET_MULTIPLIER],
+        NavTilesLen);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    ATiles,
-    &SPRITE_GFX_SUB[A->gfxIndex * OFFSET_MULTIPLIER],
-    ATilesLen);
-    
+        ATiles,
+        &SPRITE_GFX_SUB[A->gfxIndex * OFFSET_MULTIPLIER],
+        ATilesLen);
+
     int palcnt = M_ID;
 
     //Message
@@ -1057,13 +1057,13 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
         M->palette = palcnt;    
     }
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    MessagePal,
-    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-    32);
+        MessagePal,
+        &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    MessageTiles,
-    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-    MessageTilesLen);
+        MessageTiles,
+        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+        MessageTilesLen);
     nextAvailableTileIdx += MessageTilesLen / BYTES_PER_16_COLOR_TILE;
     ++palcnt;
 
@@ -1088,17 +1088,17 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     Fwd->priority = OBJPRIORITY_1;
     Fwd->palette = palcnt;
 
-    
+
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    ForwardPal,
-    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-    MessagePalLen);
+        ForwardPal,
+        &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
+        MessagePalLen);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    ForwardTiles,
-    &SPRITE_GFX_SUB[Fwd->gfxIndex * OFFSET_MULTIPLIER],
-    ForwardTilesLen);
+        ForwardTiles,
+        &SPRITE_GFX_SUB[Fwd->gfxIndex * OFFSET_MULTIPLIER],
+        ForwardTilesLen);
     ++palcnt;
-    
+
     SpriteInfo * BwdInfo = &spriteInfo[BWD_ID];
     SpriteEntry * Bwd = &oam->oamBuffer[BWD_ID];
     BwdInfo->oamId = BWD_ID;
@@ -1120,15 +1120,15 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     Bwd->priority = OBJPRIORITY_1;
     Bwd->palette = palcnt;
 
-    
+
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    BackwardPal,
-    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-    MessagePalLen);
+        BackwardPal,
+        &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
+        MessagePalLen);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    BackwardTiles,
-    &SPRITE_GFX_SUB[Bwd->gfxIndex * OFFSET_MULTIPLIER],
-    BackwardTilesLen);
+        BackwardTiles,
+        &SPRITE_GFX_SUB[Bwd->gfxIndex * OFFSET_MULTIPLIER],
+        BackwardTilesLen);
     ++palcnt;
 
     //cbox
@@ -1152,10 +1152,10 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
         C1->x = ((i%2)? 32 : 128);
         C1->size = OBJSIZE_64;
         C1->gfxIndex = nextAvailableTileIdx;
-        
+
         C1->priority = OBJPRIORITY_2;
         C1->palette = palcnt;
-        
+
         SpriteInfo * C3Info = &spriteInfo[2*i+CHOICE_ID+1];
         SpriteEntry * C3 = &oam->oamBuffer[2*i+CHOICE_ID+1];
         C3Info->oamId = CHOICE_ID;
@@ -1177,17 +1177,17 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
         C3->palette = palcnt;
     }
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    Choice_1Pal,
-    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-    Choice_1PalLen);
+        Choice_1Pal,
+        &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
+        Choice_1PalLen);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    Choice_1Tiles,
-    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-    Choice_1TilesLen);
+        Choice_1Tiles,
+        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+        Choice_1TilesLen);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    Choice_3Tiles,
-    &SPRITE_GFX_SUB[nextnext * OFFSET_MULTIPLIER],
-    Choice_3TilesLen);
+        Choice_3Tiles,
+        &SPRITE_GFX_SUB[nextnext * OFFSET_MULTIPLIER],
+        Choice_3TilesLen);
     nextAvailableTileIdx = nextnext + Choice_1TilesLen / BYTES_PER_16_COLOR_TILE;
     for(int i= 0; i <3; ++i){
         SpriteInfo * C2Info = &spriteInfo[i+CHOICE_ID+12];
@@ -1255,7 +1255,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Border_4Pal,    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],    32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Border_4Tiles,    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    Border_4TilesLen);
     nextAvailableTileIdx += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
-    
+
     SpriteInfo * Bo3Info = &spriteInfo[BORDER_ID+2];
     SpriteEntry * Bo3 = &oam->oamBuffer[BORDER_ID+2];
     Bo3Info->oamId = BORDER_ID;
@@ -1296,7 +1296,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
 
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Border_3Tiles,    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    Border_3TilesLen);
     nextAvailableTileIdx += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
-    
+
     SpriteInfo * Bo2Info = &spriteInfo[BORDER_ID+4];
     SpriteEntry * Bo2 = &oam->oamBuffer[BORDER_ID+4];
     Bo2Info->oamId = BORDER_ID;
@@ -1337,7 +1337,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
 
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Border_2Tiles,    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    Border_2TilesLen);
     nextAvailableTileIdx += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
-    
+
     SpriteInfo * Bo1Info = &spriteInfo[BORDER_ID+6];
     SpriteEntry * Bo1 = &oam->oamBuffer[BORDER_ID+6];
     Bo1Info->oamId = BORDER_ID;
@@ -1378,7 +1378,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
 
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Border_1Tiles,    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    Border_1TilesLen);
     nextAvailableTileIdx += Border_1TilesLen / BYTES_PER_16_COLOR_TILE;
-    
+
     SpriteInfo * Bo5Info = &spriteInfo[BORDER_ID+8];
     SpriteEntry * Bo5 = &oam->oamBuffer[BORDER_ID+8];
     Bo5Info->oamId = BORDER_ID;
@@ -1445,7 +1445,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    ChSq_aPal,    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],    32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    ChSq_aTiles,    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    ChSq_aTilesLen);
     nextAvailableTileIdx += ChSq_aTilesLen / BYTES_PER_16_COLOR_TILE;
-    
+
     SQCHA = &oam->oamBuffer[SQCH_ID+1];
     SQCHA->y = acMapPoint.second;
     SQCHA->isRotateScale = false;
@@ -1460,9 +1460,9 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     SQCHA->priority = OBJPRIORITY_0;
     SQCHA->palette = palcnt;
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    ChSq_bTiles,
-    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-    ChSq_bTilesLen);
+        ChSq_bTiles,
+        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+        ChSq_bTilesLen);
 
     nextAvailableTileIdx += ChSq_bTilesLen / BYTES_PER_16_COLOR_TILE;
     ++palcnt;
@@ -1485,7 +1485,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     Button->gfxIndex = nextAvailableTileIdx;
     Button->priority = OBJPRIORITY_0;
     Button->palette = palcnt;
-    
+
     Button = &oam->oamBuffer[91];
     ButtonInfo->oamId = 91;
     ButtonInfo->width = 32;
@@ -1521,7 +1521,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     Button->gfxIndex = nextAvailableTileIdx;
     Button->priority = OBJPRIORITY_0;
     Button->palette = palcnt;
-    
+
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    BagSprPal,    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],    32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    BagSprTiles,  &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    BagSprTilesLen); 
 
@@ -1551,7 +1551,7 @@ void scrnloader::draw(int m){
             BG_ind = 0;
         }
         setMainSpriteVisibility(true);
-        
+
         for(int i = 0; i< 3; ++i){
             oam->oamBuffer[90+i].isHidden = false;
             oam->oamBuffer[90+i].x = mainSpritesPositions[2*i][0]-16;
@@ -1622,155 +1622,155 @@ void scrnloader::init(){
 }
 
 void drawPKMNIcon(OAMTable* oam,SpriteInfo* spriteInfo,const int& pkmn_no,const int posX,const int posY,
-int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen = true){
-    
-    static const int OFFSET_MULTIPLIER = 32 / sizeof(SPRITE_GFX_SUB[0]);
-    SpriteInfo *ItemInfo = &spriteInfo[++oamIndex];
-    SpriteEntry *Item = &oam->oamBuffer[oamIndex];
-    ItemInfo->oamId = oamIndex;
-    ItemInfo->width = ItemInfo->height = 32;
-    ItemInfo->angle = 0;
-    ItemInfo->entry = Item;
-    Item->isRotateScale = false;
-    Item->blendMode = OBJMODE_NORMAL;
-    Item->isMosaic = false;
-    Item->colorMode = OBJCOLOR_16;
-    Item->shape = OBJSHAPE_SQUARE;
-    Item->isHidden = false;
-    Item->size = OBJSIZE_32;
-    Item->gfxIndex = nextAvailableTileIdx;
-    Item->priority = subScreen? OBJPRIORITY_1:OBJPRIORITY_0;
-    Item->palette = palcnt;
-    Item->x = posX;
-    Item->y = posY;
-    char pt[100];
-    sprintf(pt, "Icon_%d",pkmn_no);
-    if(subScreen){
-        if(!loadSpriteSub(ItemInfo,"nitro:/PICS/ICONS/",pt,128,16)){
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-            NoItemPal,
-            &SPRITE_PALETTE_SUB[palcnt * 16],
-            32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-            NoItemTiles,
-            &SPRITE_GFX_SUB[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
-            NoItemTilesLen);
-        }
-    }
-    else{
-        if(!loadSprite(ItemInfo,"nitro:/PICS/ICONS/",pt,128,16)){
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-            NoItemPal,
-            &SPRITE_PALETTE[palcnt * 16],
-            32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-            NoItemTiles,
-            &SPRITE_GFX[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
-            NoItemTilesLen);
-        }
-    }
-    nextAvailableTileIdx +=  512 / 32;
-    ++palcnt;
+                  int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen = true){
+
+                      static const int OFFSET_MULTIPLIER = 32 / sizeof(SPRITE_GFX_SUB[0]);
+                      SpriteInfo *ItemInfo = &spriteInfo[++oamIndex];
+                      SpriteEntry *Item = &oam->oamBuffer[oamIndex];
+                      ItemInfo->oamId = oamIndex;
+                      ItemInfo->width = ItemInfo->height = 32;
+                      ItemInfo->angle = 0;
+                      ItemInfo->entry = Item;
+                      Item->isRotateScale = false;
+                      Item->blendMode = OBJMODE_NORMAL;
+                      Item->isMosaic = false;
+                      Item->colorMode = OBJCOLOR_16;
+                      Item->shape = OBJSHAPE_SQUARE;
+                      Item->isHidden = false;
+                      Item->size = OBJSIZE_32;
+                      Item->gfxIndex = nextAvailableTileIdx;
+                      Item->priority = subScreen? OBJPRIORITY_1:OBJPRIORITY_0;
+                      Item->palette = palcnt;
+                      Item->x = posX;
+                      Item->y = posY;
+                      char pt[100];
+                      sprintf(pt, "Icon_%d",pkmn_no);
+                      if(subScreen){
+                          if(!loadSpriteSub(ItemInfo,"nitro:/PICS/ICONS/",pt,128,16)){
+                              dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+                                  NoItemPal,
+                                  &SPRITE_PALETTE_SUB[palcnt * 16],
+                                  32);
+                              dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+                                  NoItemTiles,
+                                  &SPRITE_GFX_SUB[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
+                                  NoItemTilesLen);
+                          }
+                      }
+                      else{
+                          if(!loadSprite(ItemInfo,"nitro:/PICS/ICONS/",pt,128,16)){
+                              dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+                                  NoItemPal,
+                                  &SPRITE_PALETTE[palcnt * 16],
+                                  32);
+                              dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+                                  NoItemTiles,
+                                  &SPRITE_GFX[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
+                                  NoItemTilesLen);
+                          }
+                      }
+                      nextAvailableTileIdx +=  512 / 32;
+                      ++palcnt;
 }
 void drawEggIcon(OAMTable* oam,SpriteInfo* spriteInfo,const int posX,const int posY,
-int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen = true){
-    
-    static const int OFFSET_MULTIPLIER = 32 / sizeof(SPRITE_GFX_SUB[0]);
-    SpriteInfo *ItemInfo = &spriteInfo[++oamIndex];
-    SpriteEntry *Item = &oam->oamBuffer[oamIndex];
-    ItemInfo->oamId = oamIndex;
-    ItemInfo->width = ItemInfo->height = 32;
-    ItemInfo->angle = 0;
-    ItemInfo->entry = Item;
-    Item->isRotateScale = false;
-    Item->blendMode = OBJMODE_NORMAL;
-    Item->isMosaic = false;
-    Item->colorMode = OBJCOLOR_16;
-    Item->shape = OBJSHAPE_SQUARE;
-    Item->isHidden = false;
-    Item->size = OBJSIZE_32;
-    Item->gfxIndex = nextAvailableTileIdx;
-    Item->priority = subScreen? OBJPRIORITY_1:OBJPRIORITY_0;
-    Item->palette = palcnt;
-    Item->x = posX;
-    Item->y = posY;
-    char pt[100];
-    sprintf(pt, "Icon_egg");
-    if(subScreen){
-        if(!loadSpriteSub(ItemInfo,"nitro:/PICS/ICONS/",pt,128,16)){
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-            NoItemPal,
-            &SPRITE_PALETTE_SUB[palcnt * 16],
-            32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-            NoItemTiles,
-            &SPRITE_GFX_SUB[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
-            NoItemTilesLen);
-        }
-    }
-    else{
-        if(!loadSprite(ItemInfo,"nitro:/PICS/ICONS/",pt,128,16)){
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-            NoItemPal,
-            &SPRITE_PALETTE[palcnt * 16],
-            32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-            NoItemTiles,
-            &SPRITE_GFX[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
-            NoItemTilesLen);
-        }
-    }
-    nextAvailableTileIdx +=  512 / 32;
-    ++palcnt;
+                 int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen = true){
+
+                     static const int OFFSET_MULTIPLIER = 32 / sizeof(SPRITE_GFX_SUB[0]);
+                     SpriteInfo *ItemInfo = &spriteInfo[++oamIndex];
+                     SpriteEntry *Item = &oam->oamBuffer[oamIndex];
+                     ItemInfo->oamId = oamIndex;
+                     ItemInfo->width = ItemInfo->height = 32;
+                     ItemInfo->angle = 0;
+                     ItemInfo->entry = Item;
+                     Item->isRotateScale = false;
+                     Item->blendMode = OBJMODE_NORMAL;
+                     Item->isMosaic = false;
+                     Item->colorMode = OBJCOLOR_16;
+                     Item->shape = OBJSHAPE_SQUARE;
+                     Item->isHidden = false;
+                     Item->size = OBJSIZE_32;
+                     Item->gfxIndex = nextAvailableTileIdx;
+                     Item->priority = subScreen? OBJPRIORITY_1:OBJPRIORITY_0;
+                     Item->palette = palcnt;
+                     Item->x = posX;
+                     Item->y = posY;
+                     char pt[100];
+                     sprintf(pt, "Icon_egg");
+                     if(subScreen){
+                         if(!loadSpriteSub(ItemInfo,"nitro:/PICS/ICONS/",pt,128,16)){
+                             dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+                                 NoItemPal,
+                                 &SPRITE_PALETTE_SUB[palcnt * 16],
+                                 32);
+                             dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+                                 NoItemTiles,
+                                 &SPRITE_GFX_SUB[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
+                                 NoItemTilesLen);
+                         }
+                     }
+                     else{
+                         if(!loadSprite(ItemInfo,"nitro:/PICS/ICONS/",pt,128,16)){
+                             dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+                                 NoItemPal,
+                                 &SPRITE_PALETTE[palcnt * 16],
+                                 32);
+                             dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+                                 NoItemTiles,
+                                 &SPRITE_GFX[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
+                                 NoItemTilesLen);
+                         }
+                     }
+                     nextAvailableTileIdx +=  512 / 32;
+                     ++palcnt;
 }
 void drawItemIcon(OAMTable* oam,SpriteInfo* spriteInfo,const std::string& item_name,const int posX,const int posY,
-int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen){
-    
-    static const int OFFSET_MULTIPLIER = 32 / sizeof(SPRITE_GFX_SUB[0]);
-    SpriteInfo *ItemInfo = &spriteInfo[++oamIndex];
-    SpriteEntry *Item = &oam->oamBuffer[oamIndex];
-    ItemInfo->oamId = oamIndex;
-    ItemInfo->width = ItemInfo->height = 32;
-    ItemInfo->angle = 0;
-    ItemInfo->entry = Item;
-    Item->isRotateScale = false;
-    Item->blendMode = OBJMODE_NORMAL;
-    Item->isMosaic = false;
-    Item->colorMode = OBJCOLOR_16;
-    Item->shape = OBJSHAPE_SQUARE;
-    Item->isHidden = false;
-    Item->size = OBJSIZE_32;
-    Item->gfxIndex = nextAvailableTileIdx;
-    Item->priority = subScreen? OBJPRIORITY_1:OBJPRIORITY_0;
-    Item->palette = palcnt;
-    Item->x = posX;
-    Item->y = posY;
-    if(subScreen){
-        if(!loadSpriteSub(ItemInfo,"nitro:/PICS/SPRITES/ITEMS/",item_name.c_str(),128,16)){
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-            NoItemPal,
-            &SPRITE_PALETTE_SUB[palcnt * 16],
-            32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-            NoItemTiles,
-            &SPRITE_GFX_SUB[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
-            NoItemTilesLen);
-        }
-    }
-    else{
-        if(!loadSprite(ItemInfo,"nitro:/PICS/SPRITES/ITEMS/",item_name.c_str(),128,16)){
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-            NoItemPal,
-            &SPRITE_PALETTE[palcnt * 16],
-            32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-            NoItemTiles,
-            &SPRITE_GFX[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
-            NoItemTilesLen);
-        }
-    }
-    nextAvailableTileIdx +=  512 / 32;
-    ++palcnt;
+                  int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen){
+
+                      static const int OFFSET_MULTIPLIER = 32 / sizeof(SPRITE_GFX_SUB[0]);
+                      SpriteInfo *ItemInfo = &spriteInfo[++oamIndex];
+                      SpriteEntry *Item = &oam->oamBuffer[oamIndex];
+                      ItemInfo->oamId = oamIndex;
+                      ItemInfo->width = ItemInfo->height = 32;
+                      ItemInfo->angle = 0;
+                      ItemInfo->entry = Item;
+                      Item->isRotateScale = false;
+                      Item->blendMode = OBJMODE_NORMAL;
+                      Item->isMosaic = false;
+                      Item->colorMode = OBJCOLOR_16;
+                      Item->shape = OBJSHAPE_SQUARE;
+                      Item->isHidden = false;
+                      Item->size = OBJSIZE_32;
+                      Item->gfxIndex = nextAvailableTileIdx;
+                      Item->priority = subScreen? OBJPRIORITY_1:OBJPRIORITY_0;
+                      Item->palette = palcnt;
+                      Item->x = posX;
+                      Item->y = posY;
+                      if(subScreen){
+                          if(!loadSpriteSub(ItemInfo,"nitro:/PICS/SPRITES/ITEMS/",item_name.c_str(),128,16)){
+                              dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+                                  NoItemPal,
+                                  &SPRITE_PALETTE_SUB[palcnt * 16],
+                                  32);
+                              dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+                                  NoItemTiles,
+                                  &SPRITE_GFX_SUB[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
+                                  NoItemTilesLen);
+                          }
+                      }
+                      else{
+                          if(!loadSprite(ItemInfo,"nitro:/PICS/SPRITES/ITEMS/",item_name.c_str(),128,16)){
+                              dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+                                  NoItemPal,
+                                  &SPRITE_PALETTE[palcnt * 16],
+                                  32);
+                              dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+                                  NoItemTiles,
+                                  &SPRITE_GFX[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER],
+                                  NoItemTilesLen);
+                          }
+                      }
+                      nextAvailableTileIdx +=  512 / 32;
+                      ++palcnt;
 }
 void initTop()
 {	
@@ -1850,7 +1850,7 @@ void initSub(int pkmIdx){
                 oam->oamBuffer[16 + 2*(u)].isHidden = false;
                 oam->oamBuffer[15 + 2*(u)].y = -7 + 24 * u;
                 oam->oamBuffer[16 + 2*(u)].y = -7 + 24 * u;
-            
+
                 oam->oamBuffer[15 + 2*(u)].x = 152;
                 oam->oamBuffer[16 + 2*(u)].x = 192 + 24;
                 updateOAMSub(oam);
@@ -1861,7 +1861,7 @@ void initSub(int pkmIdx){
         }
         consoleSelect(&Top);
 
-    fieldCnt = u;
+        fieldCnt = u;
 }
 extern void initMapSprites();
 extern void movePlayerOnMap(int,int,int,bool);
@@ -1886,7 +1886,7 @@ void scrnloader::run_pkmn()
         dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
         BG_ind = 0;
     }
-    
+
     int acIn= 0,max = SAV.PKMN_team.size();
     consoleSelect(&Top);
     consoleClear();
@@ -1894,10 +1894,10 @@ void scrnloader::run_pkmn()
     initSub(acIn);
     consoleSetWindow(&Top,positions[acIn][0],positions[acIn][1],2,2);
     if(acIn&1)
-    printf(">");
+        printf(">");
     else
-    printf("<");
-    
+        printf("<");
+
     SpriteEntry * back = &oam->oamBuffer[BACK_ID];
     SpriteEntry * save = &oam->oamBuffer[SAVE_ID];
     setSpriteVisibility(back,false);
@@ -1925,7 +1925,7 @@ void scrnloader::run_pkmn()
             {
                 scanKeys();
                 if(keysUp() & KEY_TOUCH)
-                break; 
+                    break; 
             }
             break;
         }
@@ -1956,7 +1956,7 @@ void scrnloader::run_pkmn()
                     oam->oamBuffer[8].isHidden = false;
                     oam->oamBuffer[8].x = SCREEN_WIDTH / 2 - 16;
                     oam->oamBuffer[8].y = SCREEN_HEIGHT / 2 - 16;
-                    
+
                     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
                     if(!BGs[BG_ind].load_from_rom){
                         dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
@@ -1974,10 +1974,10 @@ void scrnloader::run_pkmn()
                     initTop();
                     consoleSetWindow(&Top,positions[acIn][0],positions[acIn][1],2,2);
                     if(acIn&1)
-                    printf(">");
+                        printf(">");
                     else
-                    printf("<");
-                    
+                        printf("<");
+
                     initSub(acIn);
 
                     break;
@@ -1990,7 +1990,7 @@ void scrnloader::run_pkmn()
                     setSpriteVisibility(save,true);
                     setMainSpriteVisibility(true);*/
                     if(--acIn <= -1)
-                    acIn = max-1;
+                        acIn = max-1;
                 }
                 else if(p & KEY_DOWN)
                 {
@@ -2000,7 +2000,7 @@ void scrnloader::run_pkmn()
                     setSpriteVisibility(save,true);
                     setMainSpriteVisibility(true);*/
                     if(++acIn >= max)
-                    acIn = 0;
+                        acIn = 0;
                 }
 
             }
@@ -2021,25 +2021,25 @@ void scrnloader::run_pkmn()
         else if (pressed & KEY_UP)
         {
             if(--acIn <= -1)
-            acIn = max-1;
+                acIn = max-1;
             consoleClear();
             consoleSetWindow(&Top,positions[acIn][0],positions[acIn][1],2,2);
             if(acIn&1)
-            printf(">");
+                printf(">");
             else
-            printf("<");
+                printf("<");
             initSub(acIn);
         }
         else if (pressed & KEY_DOWN)
         {
             if(++acIn >= max)
-            acIn = 0;
+                acIn = 0;
             consoleClear();
             consoleSetWindow(&Top,positions[acIn][0],positions[acIn][1],2,2);
             if(acIn&1)
-            printf(">");
+                printf(">");
             else
-            printf("<");
+                printf("<");
             initSub(acIn);
         }
         for(int i= 0; i < fieldCnt; ++i)
@@ -2048,7 +2048,7 @@ void scrnloader::run_pkmn()
                 {
                     scanKeys();
                     if(keysUp() & KEY_TOUCH)
-                    break; 
+                        break; 
                 }
                 int u = 0,o;
                 for(o = 0; o < 4 && u <= i; ++o)
@@ -2069,7 +2069,7 @@ void scrnloader::run_pkmn()
                     setSpriteVisibility(save,false);
                     setMainSpriteVisibility(false);
                     oam->oamBuffer[8].isHidden = true;
-                    
+
                     this->draw(-1);
                     initMapSprites();
                     movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
@@ -2092,7 +2092,7 @@ void scrnloader::run_pkmn()
                     oam->oamBuffer[8].isHidden = true;
                     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
                     mbox("Diese Attacke kann jetzt\nnicht eingesetzt werden.","PokéNav");
-                    
+
                     setSpriteVisibility(back,false);
                     setSpriteVisibility(save,true);
                     setMainSpriteVisibility(true);
@@ -2124,7 +2124,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     static const int BYTES_PER_16_COLOR_TILE = 32;
     static const int COLORS_PER_PALETTE = 16;
     static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                        * (can be set in REG_DISPCNT) */
+                                          * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
     /* Keep track of the available tiles */
     nextAvailableTileIdx = 0;
@@ -2152,15 +2152,15 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     back->palette = backInfo->oamId;
 
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    BackTiles,
-    &SPRITE_GFX_SUB[back->gfxIndex * OFFSET_MULTIPLIER],
-    BackTilesLen);
+        BackTiles,
+        &SPRITE_GFX_SUB[back->gfxIndex * OFFSET_MULTIPLIER],
+        BackTilesLen);
     nextAvailableTileIdx += BackTilesLen / BYTES_PER_16_COLOR_TILE;
 
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    BackPal,
-    &SPRITE_PALETTE_SUB[backInfo->oamId * COLORS_PER_PALETTE],
-    32);
+        BackPal,
+        &SPRITE_PALETTE_SUB[backInfo->oamId * COLORS_PER_PALETTE],
+        32);
     palcnt = backInfo->oamId + 1;
 
     SpriteInfo * Bo4Info = &spriteInfo[++oamIndex];
@@ -2202,16 +2202,16 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo4->hFlip = false;
 
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    Border_4Pal,
-    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-    32);
+        Border_4Pal,
+        &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    Border_4Tiles,
-    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-    Border_4TilesLen);
-    
+        Border_4Tiles,
+        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+        Border_4TilesLen);
+
     nextAvailableTileIdx += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
-    
+
     SpriteInfo * Bo3Info = &spriteInfo[++oamIndex];
     SpriteEntry * Bo3 = &oam->oamBuffer[oamIndex];
     Bo3Info->oamId = 3;
@@ -2251,12 +2251,12 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo3->hFlip = false;
 
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    Border_3Tiles,
-    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-    Border_3TilesLen);
-    
+        Border_3Tiles,
+        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+        Border_3TilesLen);
+
     nextAvailableTileIdx += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
-    
+
     SpriteInfo * Bo2Info = &spriteInfo[++oamIndex];
     SpriteEntry * Bo2 = &oam->oamBuffer[oamIndex];
     Bo2Info->oamId = 3;
@@ -2296,11 +2296,11 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo2->hFlip = false;
 
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    Border_2Tiles,
-    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-    Border_2TilesLen);
+        Border_2Tiles,
+        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+        Border_2TilesLen);
     nextAvailableTileIdx += Border_2TilesLen / BYTES_PER_16_COLOR_TILE;
-    
+
     SpriteInfo * Bo1Info = &spriteInfo[++oamIndex];
     SpriteEntry * Bo1 = &oam->oamBuffer[oamIndex];
     Bo1Info->oamId = 3;
@@ -2340,11 +2340,11 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo1->hFlip = false;
 
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    Border_1Tiles,
-    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-    Border_1TilesLen);
+        Border_1Tiles,
+        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+        Border_1TilesLen);
     nextAvailableTileIdx += Border_1TilesLen / BYTES_PER_16_COLOR_TILE;
-    
+
     SpriteInfo * Bo5Info = &spriteInfo[++oamIndex];
     SpriteEntry * Bo5 = &oam->oamBuffer[oamIndex];
     Bo5Info->oamId = 3;
@@ -2384,9 +2384,9 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo5->hFlip = false;
 
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    Border_5Tiles,
-    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-    Border_5TilesLen);
+        Border_5Tiles,
+        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+        Border_5TilesLen);
     nextAvailableTileIdx += Border_5TilesLen / BYTES_PER_16_COLOR_TILE;
 
     ++palcnt;
@@ -2413,14 +2413,14 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
         BagSpr->palette = palcnt;
     }
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    BagSprPal,
-    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-    32);
+        BagSprPal,
+        &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    BagSprTiles,
-    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-    BagSprTilesLen); 
-    
+        BagSprTiles,
+        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+        BagSprTilesLen); 
+
     nextAvailableTileIdx += BagSprTilesLen / BYTES_PER_16_COLOR_TILE;
     ++palcnt;
     SpriteInfo * B2Info = &spriteInfo[++oamIndex];
@@ -2442,7 +2442,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     B2->palette = palcnt;
     B2->x = dexsppos[0][8];
     B2->y = dexsppos[1][8];
-    
+
     B2 = &oam->oamBuffer[++oamIndex];
     B2->isRotateScale = false;
     B2->blendMode = OBJMODE_NORMAL;
@@ -2457,7 +2457,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     B2->x = dexsppos[0][8]+64;
     B2->y = dexsppos[1][8];
     B2->hFlip = true;
-    
+
     B2 = &oam->oamBuffer[++oamIndex];
     B2->isRotateScale = false;
     B2->blendMode = OBJMODE_NORMAL;
@@ -2489,15 +2489,15 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     B2->y = dexsppos[1][8]+64;
     B2->hFlip = true;
     B2->vFlip = true;
-    
+
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    BigCirc1Pal,
-    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-    32);
+        BigCirc1Pal,
+        &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    BigCirc1Tiles,
-    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-    BigCirc1TilesLen);
+        BigCirc1Tiles,
+        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+        BigCirc1TilesLen);
     nextAvailableTileIdx += BigCirc1TilesLen / BYTES_PER_16_COLOR_TILE;
     ++palcnt;
     updateOAMSub(oam);
@@ -2507,7 +2507,7 @@ void drawTypeIcon (OAMTable *oam, SpriteInfo * spriteInfo, int& oamIndex, int& p
     static const int BYTES_PER_16_COLOR_TILE = 32;
     static const int COLORS_PER_PALETTE = 16;
     static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                        * (can be set in REG_DISPCNT) */
+                                          * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
 
     SpriteInfo * type1Info = &spriteInfo[++oamIndex];
@@ -2529,28 +2529,28 @@ void drawTypeIcon (OAMTable *oam, SpriteInfo * spriteInfo, int& oamIndex, int& p
     type1->gfxIndex = nextTile;
     type1->priority = OBJPRIORITY_0;
     type1->palette = palcnt;
-    
+
     if(bottom){
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        TypePals[t],
-        &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-        32);
+            TypePals[t],
+            &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
+            32);
         /* Copy the sprite graphics to sprite graphics memory */
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        TypeTiles[t],
-        &SPRITE_GFX_SUB[nextTile * OFFSET_MULTIPLIER],
-        KampfTilesLen);
+            TypeTiles[t],
+            &SPRITE_GFX_SUB[nextTile * OFFSET_MULTIPLIER],
+            KampfTilesLen);
     }
     else{
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        TypePals[t],
-        &SPRITE_PALETTE[palcnt * COLORS_PER_PALETTE],
-        32);
+            TypePals[t],
+            &SPRITE_PALETTE[palcnt * COLORS_PER_PALETTE],
+            32);
         /* Copy the sprite graphics to sprite graphics memory */
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        TypeTiles[t],
-        &SPRITE_GFX[nextTile * OFFSET_MULTIPLIER],
-        KampfTilesLen);
+            TypeTiles[t],
+            &SPRITE_GFX[nextTile * OFFSET_MULTIPLIER],
+            KampfTilesLen);
     }
     nextTile += KampfTilesLen / BYTES_PER_16_COLOR_TILE;
     ++palcnt;
@@ -2561,7 +2561,7 @@ void formes(OAMTable *oam, SpriteInfo * spriteInfo, int& oamIndex, int& palcnt, 
     static const int COLORS_PER_PALETTE = 16;
     static const int BOUNDARY_VALUE = 32; 
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX[0]);
-    
+
     SpriteInfo * B2Info = &spriteInfo[++oamIndex];
     SpriteEntry * B2 = &oam->oamBuffer[oamIndex];
     B2Info->oamId = 12;
@@ -2583,7 +2583,7 @@ void formes(OAMTable *oam, SpriteInfo * spriteInfo, int& oamIndex, int& palcnt, 
     B2->y = 48;
     spriteInfo[++oamIndex] = *B2Info;
     oam->oamBuffer[oamIndex] = *B2;
-    
+
     B2 = &oam->oamBuffer[++oamIndex];
     B2->isRotateScale = false;
     B2->blendMode = OBJMODE_NORMAL;
@@ -2600,7 +2600,7 @@ void formes(OAMTable *oam, SpriteInfo * spriteInfo, int& oamIndex, int& palcnt, 
     B2->hFlip = true;
     spriteInfo[++oamIndex] = *B2Info;
     oam->oamBuffer[oamIndex] = *B2;
-    
+
     B2 = &oam->oamBuffer[++oamIndex];
     B2->isRotateScale = false;
     B2->blendMode = OBJMODE_NORMAL;
@@ -2636,15 +2636,15 @@ void formes(OAMTable *oam, SpriteInfo * spriteInfo, int& oamIndex, int& palcnt, 
     B2->vFlip = true;
     spriteInfo[++oamIndex] = *B2Info;
     oam->oamBuffer[oamIndex] = *B2;
-    
+
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    BigCirc1Pal,
-    &SPRITE_PALETTE[palcnt * COLORS_PER_PALETTE],
-    32);
+        BigCirc1Pal,
+        &SPRITE_PALETTE[palcnt * COLORS_PER_PALETTE],
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    BigCirc1Tiles,
-    &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-    BigCirc1TilesLen);
+        BigCirc1Tiles,
+        &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+        BigCirc1TilesLen);
     nextAvailableTileIdx += BigCirc1TilesLen / BYTES_PER_16_COLOR_TILE;
     if(pkmn == 0){
         updateOAM(oam);
@@ -2681,14 +2681,14 @@ void formes(OAMTable *oam, SpriteInfo * spriteInfo, int& oamIndex, int& palcnt, 
     C1->x = -8;
     C1->size = OBJSIZE_64;
     C1->gfxIndex = nextAvailableTileIdx;
-        
+
     C1->priority = OBJPRIORITY_2;
     C1->palette = palcnt;
     spriteInfo[++oamIndex] = *C1Info;
     oam->oamBuffer[oamIndex] = *C1;
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Choice_1Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], Choice_1TilesLen);
     nextAvailableTileIdx += Choice_1TilesLen / BYTES_PER_16_COLOR_TILE;
-        
+
     SpriteInfo * C3Info = &spriteInfo[++oamIndex];
     SpriteEntry * C3 = &oam->oamBuffer[oamIndex];
     C3Info->oamId = oamIndex;
@@ -2770,46 +2770,46 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
     }
     switch(page){
     case 0:{
-            printf("\x1b[37m");
-            if(SAV.inDex[pkmn - 1]){
-                BG_PALETTE[42] = POKEMON::PKMNDATA::getColor(acpkmndata.Types[1]);
-                for(int i= 0; i< 6; ++i){
-                    font::putrec(19 + 40 * i,std::max(56, 102- acpkmndata.Bases[i] / 3),37 + 40 * i,102,false,true);
-                    //font::putrec(17 + 40 * i,std::min(103, 56 + acpkmndata.Bases[i] / 3),(6* (acpkmndata.Bases[i] % 3)) + 16 + 40 * i,std::min(103, 58 + acpkmndata.Bases[i] / 3),statColor[i],false);
-                }
-                printf("\n\n  KP   ANG  DEF  SAN  SDF  INT");
-                printf("\n\n\n\n\n\n\n GW %5.1fkg GR %6.1fm\n\n", 42 / 10.0, 4200/ 10.0);
-                consoleSetWindow(&Top, 1,16,30,24);
-                printf(POKEMON::PKMNDATA::getDexEntry(pkmn));
+        printf("\x1b[37m");
+        if(SAV.inDex[pkmn - 1]){
+            BG_PALETTE[42] = POKEMON::PKMNDATA::getColor(acpkmndata.Types[1]);
+            for(int i= 0; i< 6; ++i){
+                font::putrec(19 + 40 * i,std::max(56, 102- acpkmndata.Bases[i] / 3),37 + 40 * i,102,false,true);
+                //font::putrec(17 + 40 * i,std::min(103, 56 + acpkmndata.Bases[i] / 3),(6* (acpkmndata.Bases[i] % 3)) + 16 + 40 * i,std::min(103, 58 + acpkmndata.Bases[i] / 3),statColor[i],false);
             }
-            else{
-                printf("\n\n  KP   ANG  DEF  SAN  SDF  INT");
-                printf("\n\n\n\n\n\n\n GW ???.?kg GR ???.?m\n");
-                consoleSetWindow(&Top, 1,16,30,24); 
-                printf(POKEMON::PKMNDATA::getDexEntry(0));
-            }
-            break;
+            printf("\n\n  KP   ANG  DEF  SAN  SDF  INT");
+            printf("\n\n\n\n\n\n\n GW %5.1fkg GR %6.1fm\n\n", 42 / 10.0, 4200/ 10.0);
+            consoleSetWindow(&Top, 1,16,30,24);
+            printf(POKEMON::PKMNDATA::getDexEntry(pkmn));
         }
+        else{
+            printf("\n\n  KP   ANG  DEF  SAN  SDF  INT");
+            printf("\n\n\n\n\n\n\n GW ???.?kg GR ???.?m\n");
+            consoleSetWindow(&Top, 1,16,30,24); 
+            printf(POKEMON::PKMNDATA::getDexEntry(0));
+        }
+        break;
+           }
     case 2:{
-            if(SAV.inDex[pkmn - 1]){
-                formes(oamTop,spriteInfoTop,a,b,c, newformepkmn ,forme%2,acG);
-            }
-            else
-                formes(oamTop,spriteInfoTop,a,b,c,0,0,POKEMON::GENDERLESS);
-            break;
+        if(SAV.inDex[pkmn - 1]){
+            formes(oamTop,spriteInfoTop,a,b,c, newformepkmn ,forme%2,acG);
         }
+        else
+            formes(oamTop,spriteInfoTop,a,b,c,0,0,POKEMON::GENDERLESS);
+        break;
+           }
     case 4:{
-            loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BottomScreen2");
-            break; 
-        }
+        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BottomScreen2");
+        break; 
+           }
     case 5:{
-            loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BottomScreen3");
-            break;
-        }
+        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BottomScreen3");
+        break;
+           }
     case 6:{
-            loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BottomScreen2_BG3_KJ");
-            break;
-        }
+        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BottomScreen2_BG3_KJ");
+        break;
+           }
     }
     swiWaitForVBlank();
 }
@@ -2819,10 +2819,10 @@ void scrnloader::run_dex(int num){
 
     Top = *consoleInit(&Top, 0, BgType_Text4bpp, BgSize_T_256x256,2,0, true ,true);
     consoleSetFont(&Top,&cfont);
-    
+
     Bottom = *consoleInit(&Bottom,  0, BgType_Text4bpp, BgSize_T_256x256, 2,0, false,true );
     consoleSetFont(&Bottom, &cfont);
-    
+
     touchPosition t;	int acForme = 0;
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","DexTop",32);
 
@@ -2839,7 +2839,7 @@ void scrnloader::run_dex(int num){
     initOAMTable(oamTop);
     int palcnt = 0,tilecnt = 0,oamInd = 0;
     initDexSprites(oam,spriteInfo,oamInd,palcnt,tilecnt);
-    
+
     consoleSetWindow(&Bottom,0,0,32,24);
     consoleSelect(&Bottom);
     consoleClear();
@@ -2851,15 +2851,15 @@ void scrnloader::run_dex(int num){
     consoleSelect(&Top);
     consoleClear();
     for(int i = (acNum + maxn - 3)%maxn,j = 0; j < 5; i = (i+1)%maxn,++j)
-    if(i == acNum){
-        drawTopDexPage(acPage,i+1,acForme);
-        loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true);
-        --j; 
-        continue;
-    }
-    else
-        drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
-    
+        if(i == acNum){
+            drawTopDexPage(acPage,i+1,acForme);
+            loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true);
+            --j; 
+            continue;
+        }
+        else
+            drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
+
     spriteInfo[16].entry->isHidden = true;
     updateOAMSub(oam);
     while(42){
@@ -2874,7 +2874,7 @@ void scrnloader::run_dex(int num){
             while((t.px>224 && t.py>164))
             {
                 if((keysUp() & KEY_TOUCH))
-                break;
+                    break;
                 scanKeys();
                 swiWaitForVBlank();
                 updateTime();
@@ -2888,7 +2888,7 @@ void scrnloader::run_dex(int num){
             while(1)
             {
                 if(keysUp() & KEY_DOWN)
-                break;
+                    break;
                 swiWaitForVBlank();
                 updateTime();
                 scanKeys();
@@ -2896,16 +2896,16 @@ void scrnloader::run_dex(int num){
             o2=oamInd;p2=palcnt;t2=tilecnt;
             acNum = (acNum + 1) % maxn;
             for(int i = (acNum + maxn - 3)%maxn,j = 0; j < 5; i = (i+1)%maxn,++j)
-            if(i == acNum){drawTopDexPage(acPage == 1 ? 4 + acMap: acPage,i+1,acForme);--j;
-        loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
-            else
-            drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
+                if(i == acNum){drawTopDexPage(acPage == 1 ? 4 + acMap: acPage,i+1,acForme);--j;
+            loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
+                else
+                    drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
         }
         else if((pressed & KEY_UP)){
             while(1)
             {
                 if(keysUp() & KEY_UP)
-                break;
+                    break;
                 scanKeys();
                 swiWaitForVBlank();
                 updateTime();
@@ -2913,16 +2913,16 @@ void scrnloader::run_dex(int num){
             o2=oamInd;p2=palcnt;t2=tilecnt;
             acNum = (acNum + maxn - 1) % maxn;
             for(int i = (acNum + maxn - 3)%maxn,j = 0; j < 5; i = (i+1)%maxn,++j)
-            if(i == acNum){ drawTopDexPage(acPage == 1 ?  4 + acMap: acPage,i+1,acForme);--j;
-        loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
-            else
-            drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
+                if(i == acNum){ drawTopDexPage(acPage == 1 ?  4 + acMap: acPage,i+1,acForme);--j;
+            loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
+                else
+                    drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
         }
         else if((pressed & KEY_R)){
             while(1)
             {
                 if(keysUp() & KEY_R)
-                break;
+                    break;
                 swiWaitForVBlank();
                 updateTime();
                 scanKeys();
@@ -2930,16 +2930,16 @@ void scrnloader::run_dex(int num){
             o2=oamInd;p2=palcnt;t2=tilecnt;
             acNum = (acNum + 15) % maxn;
             for(int i = (acNum + maxn - 3)%maxn,j = 0; j < 5; i = (i+1)%maxn,++j)
-            if(i == acNum){drawTopDexPage(acPage == 1 ? 4 + acMap: acPage,i+1,acForme);--j;
-        loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
-            else
-            drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
+                if(i == acNum){drawTopDexPage(acPage == 1 ? 4 + acMap: acPage,i+1,acForme);--j;
+            loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
+                else
+                    drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
         }
         else if((pressed & KEY_L)){
             while(1)
             {
                 if(keysUp() & KEY_L)
-                break;
+                    break;
                 scanKeys();
                 swiWaitForVBlank();
                 updateTime();
@@ -2947,16 +2947,16 @@ void scrnloader::run_dex(int num){
             o2=oamInd;p2=palcnt;t2=tilecnt;
             acNum = (acNum + maxn - 15) % maxn;
             for(int i = (acNum + maxn - 3)%maxn,j = 0; j < 5; i = (i+1)%maxn,++j)
-            if(i == acNum){drawTopDexPage(acPage == 1 ? 4 + acMap: acPage,i+1,acForme);--j;
-        loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
-            else
-            drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
+                if(i == acNum){drawTopDexPage(acPage == 1 ? 4 + acMap: acPage,i+1,acForme);--j;
+            loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
+                else
+                    drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
         }
         else if((pressed & KEY_LEFT)){
             while(1)
             {
                 if(keysUp() & KEY_LEFT) 
-                break;
+                    break;
                 scanKeys();
                 swiWaitForVBlank();
                 updateTime();
@@ -2973,7 +2973,7 @@ void scrnloader::run_dex(int num){
             while(1)
             {
                 if(keysUp() & KEY_RIGHT)
-                break;
+                    break;
                 scanKeys();
                 swiWaitForVBlank();
                 updateTime();
@@ -2991,16 +2991,16 @@ void scrnloader::run_dex(int num){
                 while(1)
                 {
                     if(keysUp() & KEY_SELECT)
-                    break;
+                        break;
                     scanKeys();
                     swiWaitForVBlank();
                     updateTime();
                 }
-            if(acPage == 1)
-                acMap = (acMap + 1) %3;
-            else
-                acForme = (acForme + 1)%60;
-            drawTopDexPage(acPage == 1 ? 4 + acMap: acPage,acNum+1,acForme);
+                if(acPage == 1)
+                    acMap = (acMap + 1) %3;
+                else
+                    acForme = (acForme + 1)%60;
+                drawTopDexPage(acPage == 1 ? 4 + acMap: acPage,acNum+1,acForme);
         }
         for(int q = 0; q < 5; ++q)
             if(sqrt(sq(dexsppos[0][q]-t.px+16) + sq(dexsppos[1][q]-t.py+16)) <= 16){
@@ -3014,28 +3014,28 @@ void scrnloader::run_dex(int num){
                 o2=oamInd;p2=palcnt;t2=tilecnt;
                 acNum = (acNum + maxn - 3 + q + (q > 2 ? 1: 0)) % maxn;
                 for(int i = (acNum + maxn - 3)%maxn,j = 0; j < 5; i = (i+1)%maxn,++j)
-                if(i == acNum){drawTopDexPage(acPage == 1 ? 4 + acMap: acPage,i+1,acForme);--j;
-        loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
-                else
-                    drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
-        }
-        for(int q = 5; q < 8; ++q)
-            if(sqrt(sq(dexsppos[0][q]-t.px+16) + sq(dexsppos[1][q]-t.py+16)) <= 16){
-                while(1)
-                {
-                    if(keysUp() & KEY_TOUCH) break;
-                    scanKeys();
-                    swiWaitForVBlank();
-                    updateTime();
+                    if(i == acNum){drawTopDexPage(acPage == 1 ? 4 + acMap: acPage,i+1,acForme);--j;
+                loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
+                    else
+                        drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
+            }
+            for(int q = 5; q < 8; ++q)
+                if(sqrt(sq(dexsppos[0][q]-t.px+16) + sq(dexsppos[1][q]-t.py+16)) <= 16){
+                    while(1)
+                    {
+                        if(keysUp() & KEY_TOUCH) break;
+                        scanKeys();
+                        swiWaitForVBlank();
+                        updateTime();
+                    }
+                    if(acPage == 1)
+                        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","ClearD");
+                    spriteInfo[16+acPage].entry->isHidden = false;
+                    acPage = (q + 1) %3;
+                    spriteInfo[16+acPage].entry->isHidden = true;
+                    updateOAMSub(oam);
+                    drawTopDexPage(acPage == 1 ? 4 + acMap: acPage,acNum+1,acForme);
                 }
-                if(acPage == 1)
-                    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","ClearD");
-                spriteInfo[16+acPage].entry->isHidden = false;
-                acPage = (q + 1) %3;
-                spriteInfo[16+acPage].entry->isHidden = true;
-                updateOAMSub(oam);
-                drawTopDexPage(acPage == 1 ? 4 + acMap: acPage,acNum+1,acForme);
-        }
     }
     consoleSetWindow(&Bottom,0,0,32,24);
     consoleSelect(&Bottom);
@@ -3057,9 +3057,9 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
     static const int BYTES_PER_16_COLOR_TILE = 32;
     static const int COLORS_PER_PALETTE = 16;
     static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                        * (can be set in REG_DISPCNT) */
+                                          * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
-    (subScreen?sizeof(SPRITE_GFX_SUB[0]):sizeof(SPRITE_GFX[0]));
+        (subScreen?sizeof(SPRITE_GFX_SUB[0]):sizeof(SPRITE_GFX[0]));
     /* Keep track of the available tiles */
     nextAvailableTileIdx = 0;
     oamIndex = 0;
@@ -3087,15 +3087,15 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
         back->palette = backInfo->oamId;
 
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        BackTiles,
-        &SPRITE_GFX_SUB[back->gfxIndex * OFFSET_MULTIPLIER],
-        BackTilesLen);
+            BackTiles,
+            &SPRITE_GFX_SUB[back->gfxIndex * OFFSET_MULTIPLIER],
+            BackTilesLen);
         nextAvailableTileIdx += BackTilesLen / BYTES_PER_16_COLOR_TILE;
 
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        BackPal,
-        &SPRITE_PALETTE_SUB[backInfo->oamId * COLORS_PER_PALETTE],
-        32);
+            BackPal,
+            &SPRITE_PALETTE_SUB[backInfo->oamId * COLORS_PER_PALETTE],
+            32);
         palcnt = backInfo->oamId + 1;
 
         SpriteInfo * Bo4Info = &spriteInfo[++oamIndex];
@@ -3137,16 +3137,16 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
         Bo4->hFlip = false;
 
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        Border_4Pal,
-        &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-        32);
+            Border_4Pal,
+            &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
+            32);
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        Border_4Tiles,
-        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        Border_4TilesLen);
-        
+            Border_4Tiles,
+            &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+            Border_4TilesLen);
+
         nextAvailableTileIdx += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
-        
+
         SpriteInfo * Bo3Info = &spriteInfo[++oamIndex];
         SpriteEntry * Bo3 = &oam->oamBuffer[oamIndex];
         Bo3Info->oamId = 3;
@@ -3186,12 +3186,12 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
         Bo3->hFlip = false;
 
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        Border_3Tiles,
-        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        Border_3TilesLen);
-        
+            Border_3Tiles,
+            &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+            Border_3TilesLen);
+
         nextAvailableTileIdx += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
-        
+
         SpriteInfo * Bo2Info = &spriteInfo[++oamIndex];
         SpriteEntry * Bo2 = &oam->oamBuffer[oamIndex];
         Bo2Info->oamId = 3;
@@ -3231,11 +3231,11 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
         Bo2->hFlip = false;
 
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        Border_2Tiles,
-        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        Border_2TilesLen);
+            Border_2Tiles,
+            &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+            Border_2TilesLen);
         nextAvailableTileIdx += Border_2TilesLen / BYTES_PER_16_COLOR_TILE;
-        
+
         SpriteInfo * Bo1Info = &spriteInfo[++oamIndex];
         SpriteEntry * Bo1 = &oam->oamBuffer[oamIndex];
         Bo1Info->oamId = 3;
@@ -3275,11 +3275,11 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
         Bo1->hFlip = false;
 
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        Border_1Tiles,
-        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        Border_1TilesLen);
+            Border_1Tiles,
+            &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+            Border_1TilesLen);
         nextAvailableTileIdx += Border_1TilesLen / BYTES_PER_16_COLOR_TILE;
-        
+
         SpriteInfo * Bo5Info = &spriteInfo[++oamIndex];
         SpriteEntry * Bo5 = &oam->oamBuffer[oamIndex];
         Bo5Info->oamId = 3;
@@ -3319,9 +3319,9 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
         Bo5->hFlip = false;
 
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        Border_5Tiles,
-        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        Border_5TilesLen);
+            Border_5Tiles,
+            &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+            Border_5TilesLen);
         nextAvailableTileIdx += Border_5TilesLen / BYTES_PER_16_COLOR_TILE;
     }
     else{
@@ -3344,17 +3344,17 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
         Box->gfxIndex = nextAvailableTileIdx;
         Box->priority = OBJPRIORITY_3;
         Box->palette = palcnt;
-        
+
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        ItemSpr1Tiles,
-        &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        ItemSpr1TilesLen);
+            ItemSpr1Tiles,
+            &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+            ItemSpr1TilesLen);
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        ItemSpr1Pal,
-        &SPRITE_PALETTE[palcnt * COLORS_PER_PALETTE],
-        32);
+            ItemSpr1Pal,
+            &SPRITE_PALETTE[palcnt * COLORS_PER_PALETTE],
+            32);
         nextAvailableTileIdx += ItemSpr1TilesLen / BYTES_PER_16_COLOR_TILE;
-        
+
         Box = &oam->oamBuffer[++oamIndex];
         Box->y = 0;
         Box->isRotateScale = false;
@@ -3368,13 +3368,13 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
         Box->gfxIndex = nextAvailableTileIdx;
         Box->priority = OBJPRIORITY_3;
         Box->palette = palcnt;
-        
+
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        ItemSpr2Tiles,
-        &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        ItemSpr2TilesLen);
+            ItemSpr2Tiles,
+            &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+            ItemSpr2TilesLen);
         nextAvailableTileIdx += ItemSpr2TilesLen / BYTES_PER_16_COLOR_TILE;
-        
+
         Box = &oam->oamBuffer[++oamIndex];
         Box->y = 0;
         Box->isRotateScale = false;
@@ -3388,11 +3388,11 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
         Box->gfxIndex = nextAvailableTileIdx;
         Box->priority = OBJPRIORITY_3;
         Box->palette = palcnt;
-        
+
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        ItemSpr3Tiles,
-        &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        ItemSpr3TilesLen);
+            ItemSpr3Tiles,
+            &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+            ItemSpr3TilesLen);
         nextAvailableTileIdx += ItemSpr3TilesLen / BYTES_PER_16_COLOR_TILE;
     }
     ++palcnt;
@@ -3417,28 +3417,28 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
         BagSpr->gfxIndex = nextAvailableTileIdx;
         BagSpr->priority = BGs[BG_ind].allowsOverlay? OBJPRIORITY_3 : OBJPRIORITY_2;
         if(!subScreen)
-        BagSpr->priority = OBJPRIORITY_2;
+            BagSpr->priority = OBJPRIORITY_2;
         BagSpr->palette = palcnt;
     }
     if(subScreen){
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        BagSprPal,
-        &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-        32);
+            BagSprPal,
+            &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
+            32);
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        BagSprTiles,
-        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        BagSprTilesLen);
+            BagSprTiles,
+            &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+            BagSprTilesLen);
     }
     else{
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        BagSprPal,
-        &SPRITE_PALETTE[palcnt * COLORS_PER_PALETTE],
-        32);
+            BagSprPal,
+            &SPRITE_PALETTE[palcnt * COLORS_PER_PALETTE],
+            32);
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        BagSprTiles,
-        &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        BagSprTilesLen);
+            BagSprTiles,
+            &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+            BagSprTilesLen);
     }
     nextAvailableTileIdx += BagSprTilesLen / BYTES_PER_16_COLOR_TILE;
     ++palcnt;
@@ -3465,80 +3465,80 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
     }
     if(subScreen){
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        BagSpr2Pal,
-        &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-        32);
+            BagSpr2Pal,
+            &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
+            32);
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        BagSpr2Tiles,
-        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        BagSpr2TilesLen);
+            BagSpr2Tiles,
+            &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+            BagSpr2TilesLen);
     }
     else{
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        BagSpr2Pal,
-        &SPRITE_PALETTE[palcnt * COLORS_PER_PALETTE],
-        32);
+            BagSpr2Pal,
+            &SPRITE_PALETTE[palcnt * COLORS_PER_PALETTE],
+            32);
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        BagSpr2Tiles,
-        &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        BagSpr2TilesLen);
+            BagSpr2Tiles,
+            &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+            BagSpr2TilesLen);
     }
     nextAvailableTileIdx += BagSpr2TilesLen / BYTES_PER_16_COLOR_TILE;
     ++palcnt;
 }
 
 void drawItem(OAMTable* oam,SpriteInfo* spriteInfo,const std::string& item_name,const int posX,const int posY,const int cnt,
-int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen = true,bool showcnt = false){
-    
-    static const int OFFSET_MULTIPLIER = 32 / sizeof(SPRITE_GFX_SUB[0]);
-    SpriteInfo *ItemInfo = &spriteInfo[++oamIndex];
-    SpriteEntry *Item = &oam->oamBuffer[oamIndex];
-    ItemInfo->oamId = oamIndex;
-    ItemInfo->width = ItemInfo->height = 32;
-    ItemInfo->angle = 0;
-    ItemInfo->entry = Item;
-    oam->oamBuffer[oamIndex-2*MAXITEMSPERPAGE].x = Item->x = posX;
-    oam->oamBuffer[oamIndex-MAXITEMSPERPAGE].x = posX + 8;
-    oam->oamBuffer[oamIndex-2*MAXITEMSPERPAGE].y = Item->y = posY;
-    oam->oamBuffer[oamIndex-MAXITEMSPERPAGE].y = posY + 28;
-    oam->oamBuffer[oamIndex-2*MAXITEMSPERPAGE].isHidden = false;
-    oam->oamBuffer[oamIndex-MAXITEMSPERPAGE].isHidden = showcnt;
-    Item->isRotateScale = false;
-    Item->blendMode = OBJMODE_NORMAL;
-    Item->isMosaic = false;
-    Item->colorMode = OBJCOLOR_16;
-    Item->shape = OBJSHAPE_SQUARE;
-    Item->isHidden = false;
-    Item->size = OBJSIZE_32;
-    Item->gfxIndex = nextAvailableTileIdx;
-    Item->priority = subScreen? OBJPRIORITY_1:OBJPRIORITY_0;
-    Item->palette = palcnt;
-    if(subScreen){
-        if(!loadSpriteSub(ItemInfo,"nitro:/PICS/SPRITES/ITEMS/",item_name.c_str(),128,16)){
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL, NoItemPal, &SPRITE_PALETTE_SUB[palcnt * 16], 32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL, NoItemTiles, &SPRITE_GFX_SUB[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER], NoItemTilesLen);
-        }
-    }
-    else{
-        if(!loadSprite(ItemInfo,"nitro:/PICS/SPRITES/ITEMS/",item_name.c_str(),128,16)){
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL, NoItemPal, &SPRITE_PALETTE[palcnt * 16], 32);
-            dmaCopyHalfWords(SPRITE_DMA_CHANNEL, NoItemTiles, &SPRITE_GFX[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER], NoItemTilesLen);
-        }
-    }
-    nextAvailableTileIdx +=  spriteInfo->height * spriteInfo->width / 32;
-    ++palcnt;
-    if(subScreen){
-        updateOAMSub(oam);
-        consoleSelect(&Bottom);
-        consoleSetWindow(&Bottom,(posX+10)/8,(posY+32)/8,3,1);
-    }
-    else{
-        updateOAM(oam);
-        consoleSelect(&Top);
-        consoleSetWindow(&Top,(posX+10)/8,(posY+32)/8,3,1);
-    }
-    if(!showcnt)
-        printf("%3i",cnt);
+              int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool subScreen = true,bool showcnt = false){
+
+                  static const int OFFSET_MULTIPLIER = 32 / sizeof(SPRITE_GFX_SUB[0]);
+                  SpriteInfo *ItemInfo = &spriteInfo[++oamIndex];
+                  SpriteEntry *Item = &oam->oamBuffer[oamIndex];
+                  ItemInfo->oamId = oamIndex;
+                  ItemInfo->width = ItemInfo->height = 32;
+                  ItemInfo->angle = 0;
+                  ItemInfo->entry = Item;
+                  oam->oamBuffer[oamIndex-2*MAXITEMSPERPAGE].x = Item->x = posX;
+                  oam->oamBuffer[oamIndex-MAXITEMSPERPAGE].x = posX + 8;
+                  oam->oamBuffer[oamIndex-2*MAXITEMSPERPAGE].y = Item->y = posY;
+                  oam->oamBuffer[oamIndex-MAXITEMSPERPAGE].y = posY + 28;
+                  oam->oamBuffer[oamIndex-2*MAXITEMSPERPAGE].isHidden = false;
+                  oam->oamBuffer[oamIndex-MAXITEMSPERPAGE].isHidden = showcnt;
+                  Item->isRotateScale = false;
+                  Item->blendMode = OBJMODE_NORMAL;
+                  Item->isMosaic = false;
+                  Item->colorMode = OBJCOLOR_16;
+                  Item->shape = OBJSHAPE_SQUARE;
+                  Item->isHidden = false;
+                  Item->size = OBJSIZE_32;
+                  Item->gfxIndex = nextAvailableTileIdx;
+                  Item->priority = subScreen? OBJPRIORITY_1:OBJPRIORITY_0;
+                  Item->palette = palcnt;
+                  if(subScreen){
+                      if(!loadSpriteSub(ItemInfo,"nitro:/PICS/SPRITES/ITEMS/",item_name.c_str(),128,16)){
+                          dmaCopyHalfWords(SPRITE_DMA_CHANNEL, NoItemPal, &SPRITE_PALETTE_SUB[palcnt * 16], 32);
+                          dmaCopyHalfWords(SPRITE_DMA_CHANNEL, NoItemTiles, &SPRITE_GFX_SUB[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER], NoItemTilesLen);
+                      }
+                  }
+                  else{
+                      if(!loadSprite(ItemInfo,"nitro:/PICS/SPRITES/ITEMS/",item_name.c_str(),128,16)){
+                          dmaCopyHalfWords(SPRITE_DMA_CHANNEL, NoItemPal, &SPRITE_PALETTE[palcnt * 16], 32);
+                          dmaCopyHalfWords(SPRITE_DMA_CHANNEL, NoItemTiles, &SPRITE_GFX[ItemInfo->entry->gfxIndex * OFFSET_MULTIPLIER], NoItemTilesLen);
+                      }
+                  }
+                  nextAvailableTileIdx +=  spriteInfo->height * spriteInfo->width / 32;
+                  ++palcnt;
+                  if(subScreen){
+                      updateOAMSub(oam);
+                      consoleSelect(&Bottom);
+                      consoleSetWindow(&Bottom,(posX+10)/8,(posY+32)/8,3,1);
+                  }
+                  else{
+                      updateOAM(oam);
+                      consoleSelect(&Top);
+                      consoleSetWindow(&Top,(posX+10)/8,(posY+32)/8,3,1);
+                  }
+                  if(!showcnt)
+                      printf("%3i",cnt);
 }
 const int MAXPERM = 14;
 void getRanPerm(int* arr,int* out){
@@ -3546,7 +3546,7 @@ void getRanPerm(int* arr,int* out){
     for(int i=0; i < MAXPERM; ++i){
         int newInd = rand() % MAXPERM;
         while(used & (1 << newInd))
-        newInd = rand() % MAXPERM;
+            newInd = rand() % MAXPERM;
         out[newInd] = arr[i];
         used |= (1 << newInd);
     }
@@ -3570,15 +3570,15 @@ int getAnswer(item::ITEM_TYPE bagtype){
         (oam->oamBuffer[25]).y -= 32;
         (oam->oamBuffer[29]).y -= 32;
         updateOAMSub(oam);
-        
+
         consoleSetWindow(&Bottom,5,9,22,3);
         printf(choi[0].c_str());
 
         consoleSetWindow(&Bottom,5,13,22,3);
         if(bagtype != item::KEY_ITEM )
-        printf(choi[1].c_str());
+            printf(choi[1].c_str());
         else
-        printf(choi[2].c_str());
+            printf(choi[2].c_str());
 
         while(42)
         {
@@ -3595,7 +3595,7 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     swiWaitForVBlank();
                     updateTime();
                     if(keysUp() & KEY_TOUCH)
-                    break;
+                        break;
                 }
                 consoleSelect(&Bottom);
                 consoleSetWindow(&Bottom,0,0,32,24);
@@ -3615,7 +3615,7 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     scanKeys();
                     updateTime();
                     if(keysUp() & KEY_TOUCH)
-                    break;
+                        break;
                 }
                 (oam->oamBuffer[24]).isHidden = true;
                 (oam->oamBuffer[25]).isHidden = true;
@@ -3644,7 +3644,7 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     scanKeys();
                     updateTime();
                     if(keysUp() & KEY_TOUCH)
-                    break;
+                        break;
                 }
                 (oam->oamBuffer[20]).isHidden = true;
                 (oam->oamBuffer[21]).isHidden = true;
@@ -3675,7 +3675,7 @@ int getAnswer(item::ITEM_TYPE bagtype){
             updateOAMSub(oam); 
             consoleSetWindow(&Bottom,5,7+4*i,22,3);
             if(i == 2)
-            ++i;
+                ++i;
             printf(choi[i].c_str());
         }
         while(42)
@@ -3693,7 +3693,7 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     swiWaitForVBlank();
                     updateTime();
                     if(keysUp() & KEY_TOUCH)
-                    break;
+                        break;
                 }
                 consoleSelect(&Bottom);
                 consoleSetWindow(&Bottom,0,0,32,24);
@@ -3712,7 +3712,7 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     scanKeys();
                     updateTime();
                     if(keysUp() & KEY_TOUCH)
-                    break;
+                        break;
                 }
                 consoleSetWindow(&Bottom, 1,1,30,24);   
                 consoleClear();
@@ -3740,7 +3740,7 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     scanKeys();
                     updateTime();
                     if(keysUp() & KEY_TOUCH)
-                    break;
+                        break;
                 }
                 consoleSetWindow(&Bottom, 1,1,30,24);   
                 consoleClear();
@@ -3768,11 +3768,11 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     scanKeys();
                     updateTime();
                     if(keysUp() & KEY_TOUCH)
-                    break;
+                        break;
                 }
                 consoleSetWindow(&Bottom, 1,1,30,24);   
                 consoleClear();
-                
+
                 for(int i= 0; i<3; ++i)
                 {
                     (oam->oamBuffer[17+4*i]).isHidden = true;
@@ -3799,7 +3799,7 @@ void drawBagPage(int page,int* pos,int &oamIndex,int& palcnt,int& nextAvTileIdx,
     }
     int ind = 214 + 4 * (page), maxpage = 1 + ((int(SAV.Bag.size(bag::BAGTYPE(page))))-1) / 12;
     printf("%c%c %s\n%c%c  1/%i",ind,ind+1,bagnames[page].c_str(),ind +2,ind +3, maxpage);
-    
+
     oam->oamBuffer[11].x = SCREEN_WIDTH - 22;
     oam->oamBuffer[11].y = SCREEN_HEIGHT - 49;
     oam->oamBuffer[11].priority = OBJPRIORITY_1;
@@ -3813,11 +3813,11 @@ void drawBagPage(int page,int* pos,int &oamIndex,int& palcnt,int& nextAvTileIdx,
         consoleSetWindow(&Bottom,31,19,2,2);
         printf("%c\n%c",246,247);
     }
-    
+
     int cpy[MAXPERM];
     getRanPerm(pos,cpy);
     for(int i = 0; i < MAXPERM; ++i)
-    pos[i] = cpy[i];
+        pos[i] = cpy[i];
 
     int acpage = 0,oam2 = oamIndex,pal2 = palcnt,tile2 = nextAvTileIdx;
     touchPosition t;
@@ -3826,14 +3826,14 @@ void drawBagPage(int page,int* pos,int &oamIndex,int& palcnt,int& nextAvTileIdx,
         scanKeys();
         touchRead(&t);
         if(sqrt(sq(SCREEN_WIDTH - 6 -t.px) + sq(SCREEN_HEIGHT - 33-t.py)) <= 16 && acpage < maxpage - 1)
-        goto NEXT;
+            goto NEXT;
         if(sqrt(sq(SCREEN_WIDTH - 33 -t.px) + sq(SCREEN_HEIGHT - 6-t.py)) <= 16 && acpage > 0)
-        goto PREV;
+            goto PREV;
         if ( t.px>224 && t.py>164)
-        goto BACK;
+            goto BACK;
         std::pair<int,int> acElem = SAV.Bag.element_at(bag::BAGTYPE(page),i);
         drawItem(oam,spriteInfo,ItemList[acElem.first].Name,38 + (pos[i - (acpage*12)]%4*48),
-        18 + (pos[i - (acpage*12)]/4)*40,acElem.second,oam2,pal2,tile2,true,page == item::KEY_ITEM);
+            18 + (pos[i - (acpage*12)]/4)*40,acElem.second,oam2,pal2,tile2,true,page == item::KEY_ITEM);
     }
     while(42){
         updateTime();
@@ -3851,7 +3851,7 @@ BACK:
                 swiWaitForVBlank();
                 updateTime();
                 if(keysUp() & KEY_TOUCH)
-                break;
+                    break;
             }
             consoleSelect(&Bottom);
             consoleSetWindow(&Bottom,0,0,32,24);
@@ -3866,13 +3866,13 @@ NEXT:
                 swiWaitForVBlank();
                 updateTime();
                 if(keysUp() & KEY_TOUCH)
-                break;
+                    break;
             }
             acpage++;
             consoleSetWindow(&Bottom,0,0,32,24);
             consoleClear();
             printf("%c%c %s\n%c%c %2i/%i",ind,ind+1,bagnames[page].c_str(),ind +2,ind +3,acpage+1, maxpage);
-            
+
             oam->oamBuffer[12].isHidden = false;
             consoleSetWindow(&Bottom,27,22,2,2);
             printf("%c\n%c",248,249);
@@ -3886,7 +3886,7 @@ NEXT:
             updateOAMSub(oam);        
             getRanPerm(pos,cpy);
             for(int i = 0; i < MAXPERM; ++i)
-            pos[i] = cpy[i];
+                pos[i] = cpy[i];
             oam2 = oamIndex;
             pal2 = palcnt;
             tile2 = nextAvTileIdx;
@@ -3897,14 +3897,14 @@ NEXT:
                 scanKeys();
                 touchRead(&t);
                 if(sqrt(sq(SCREEN_WIDTH - 6 -t.px) + sq(SCREEN_HEIGHT - 33-t.py)) <= 16 && acpage < maxpage - 1)
-                goto NEXT;
+                    goto NEXT;
                 if(sqrt(sq(SCREEN_WIDTH - 33 -t.px) + sq(SCREEN_HEIGHT - 6-t.py)) <= 16 && acpage > 0)
-                goto PREV;
+                    goto PREV;
                 if ( t.px>224 && t.py>164)
-                goto BACK;
+                    goto BACK;
                 std::pair<int,int> acElem = SAV.Bag.element_at(bag::BAGTYPE(page),i);
                 drawItem(oam,spriteInfo,ItemList[acElem.first].Name,38 + (pos[i - (acpage*12)]%4*48),
-                18 + (pos[i - (acpage*12)]/4)*40,acElem.second,oam2,pal2,tile2,true,page == item::KEY_ITEM);
+                    18 + (pos[i - (acpage*12)]/4)*40,acElem.second,oam2,pal2,tile2,true,page == item::KEY_ITEM);
             }
         }
         else if(sqrt(sq(SCREEN_WIDTH - 33 -t.px) + sq(SCREEN_HEIGHT - 6-t.py)) <= 16 && acpage > 0){
@@ -3915,13 +3915,13 @@ PREV:
                 swiWaitForVBlank();
                 updateTime();
                 if(keysUp() & KEY_TOUCH)
-                break;
+                    break;
             }
             acpage--;
             consoleSetWindow(&Bottom,0,0,32,24);
             consoleClear();
             printf("%c%c %s\n%c%c %2i/%i",ind,ind+1,bagnames[page].c_str(),ind +2,ind +3,acpage+1, maxpage);
-            
+
             oam->oamBuffer[11].isHidden = false;
             consoleSetWindow(&Bottom,31,19,2,2);
             printf("%c\n%c",246,247);
@@ -3935,7 +3935,7 @@ PREV:
             updateOAMSub(oam);        
             getRanPerm(pos,cpy);
             for(int i = 0; i < MAXPERM; ++i)
-            pos[i] = cpy[i];
+                pos[i] = cpy[i];
             oam2 = oamIndex;
             pal2 = palcnt;
             tile2 = nextAvTileIdx;
@@ -3946,288 +3946,288 @@ PREV:
                 scanKeys();
                 touchRead(&t);
                 if((sqrt(sq(SCREEN_WIDTH - 6 -t.px) + sq(SCREEN_HEIGHT - 33-t.py)) <= 16) && acpage < maxpage - 1)
-                goto NEXT;
+                    goto NEXT;
                 if(sqrt(sq(SCREEN_WIDTH - 33 -t.px) + sq(SCREEN_HEIGHT - 6-t.py)) <= 16 && acpage > 0)
-                goto PREV;
+                    goto PREV;
                 if ( t.px>224 && t.py>164)
-                goto BACK;
+                    goto BACK;
                 std::pair<int,int> acElem = SAV.Bag.element_at(bag::BAGTYPE(page),i);
                 drawItem(oam,spriteInfo,ItemList[acElem.first].Name,38 + (pos[i - (acpage*12)]%4*48),
-                18 + (pos[i - (acpage*12)]/4)*40,acElem.second,oam2,pal2,tile2,true,page == item::KEY_ITEM);
+                    18 + (pos[i - (acpage*12)]/4)*40,acElem.second,oam2,pal2,tile2,true,page == item::KEY_ITEM);
             }
         }
         else
-        for(int io= 0; io< std::min(int(SAV.Bag.size(bag::BAGTYPE(page))) - acpage * 12,12);++io)
-        if(sqrt(sq((54 + (pos[io]%4*48)) -t.px) + sq((34 + (pos[io]/4)*40)-t.py)) <= 16){
-            while(1)
-            {
-                scanKeys();
-                swiWaitForVBlank();
-                updateTime();
-                if(keysUp() & KEY_TOUCH)
-                break;
-            }
-            oam2 = oamIndex;
-            pal2 = palcnt;
-            tile2 = nextAvTileIdx;
-            consoleSelect(&Top);
-            consoleSetWindow(&Top,0,0,32,24);
-            consoleClear();
-            loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","ClearD");
-            oamTop->oamBuffer[1].isHidden = oamTop->oamBuffer[2].isHidden = oamTop->oamBuffer[3].isHidden = false;
-            oamTop->oamBuffer[1].x = 36;
-            oamTop->oamBuffer[2].x = 100;
-            oamTop->oamBuffer[3].x = 164;
-            oamTop->oamBuffer[1].y = oamTop->oamBuffer[2].y = oamTop->oamBuffer[3].y = 69;
-            updateOAM(oamTop);	
+            for(int io= 0; io< std::min(int(SAV.Bag.size(bag::BAGTYPE(page))) - acpage * 12,12);++io)
+                if(sqrt(sq((54 + (pos[io]%4*48)) -t.px) + sq((34 + (pos[io]/4)*40)-t.py)) <= 16){
+                    while(1)
+                    {
+                        scanKeys();
+                        swiWaitForVBlank();
+                        updateTime();
+                        if(keysUp() & KEY_TOUCH)
+                            break;
+                    }
+                    oam2 = oamIndex;
+                    pal2 = palcnt;
+                    tile2 = nextAvTileIdx;
+                    consoleSelect(&Top);
+                    consoleSetWindow(&Top,0,0,32,24);
+                    consoleClear();
+                    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","ClearD");
+                    oamTop->oamBuffer[1].isHidden = oamTop->oamBuffer[2].isHidden = oamTop->oamBuffer[3].isHidden = false;
+                    oamTop->oamBuffer[1].x = 36;
+                    oamTop->oamBuffer[2].x = 100;
+                    oamTop->oamBuffer[3].x = 164;
+                    oamTop->oamBuffer[1].y = oamTop->oamBuffer[2].y = oamTop->oamBuffer[3].y = 69;
+                    updateOAM(oamTop);	
 
-            std::pair<int,int> acElem = SAV.Bag.element_at(bag::BAGTYPE(page),acpage * 12 + io);
-            drawItem(oamTop,spriteInfo,ItemList[acElem.first].Name,22,
-            50,acElem.second,oam2,pal2,tile2,false,page == item::KEY_ITEM);
-            consoleSetWindow(&Top,7,9,13,1);
-            consoleSelect(&Top);
-            printf(ItemList[acElem.first].getDisplayName().c_str());
-            consoleSetWindow(&Top,6,11,23,10);
-            printf(("  "+ItemList[acElem.first].getDescription()).c_str());
-            //printf("   %i  %i  %i",ItemList[acElem.first].getItemType(),ItemList[acElem.first].itemtype,ItemList[SAV.Bag.element_at((bag::BAGTYPE)page,acpage * 12 +io).first].getItemType());   
+                    std::pair<int,int> acElem = SAV.Bag.element_at(bag::BAGTYPE(page),acpage * 12 + io);
+                    drawItem(oamTop,spriteInfo,ItemList[acElem.first].Name,22,
+                        50,acElem.second,oam2,pal2,tile2,false,page == item::KEY_ITEM);
+                    consoleSetWindow(&Top,7,9,13,1);
+                    consoleSelect(&Top);
+                    printf(ItemList[acElem.first].getDisplayName().c_str());
+                    consoleSetWindow(&Top,6,11,23,10);
+                    printf(("  "+ItemList[acElem.first].getDescription()).c_str());
+                    //printf("   %i  %i  %i",ItemList[acElem.first].getItemType(),ItemList[acElem.first].itemtype,ItemList[SAV.Bag.element_at((bag::BAGTYPE)page,acpage * 12 +io).first].getItemType());   
 
-            for(int i= acpage * 12; i< acpage * 12+ std::min(int(SAV.Bag.size(bag::BAGTYPE(page))) - acpage * 12,12);++i){
-                acElem = SAV.Bag.element_at(bag::BAGTYPE(page),i);
-                if(i-acpage * 12 == io)
-                continue;
-                else if(pos[i-acpage * 12] < 6)
-                drawItem(oamTop,spriteInfo,ItemList[acElem.first].Name,6 + pos[i-acpage * 12]*40,
-                10,acElem.second,oam2,pal2,tile2,false,page == item::KEY_ITEM);
-                else if(pos[i-acpage * 12] < 12)
-                drawItem(oamTop,spriteInfo,ItemList[acElem.first].Name,6 + (pos[i-acpage * 12]-6)*40,
-                138,acElem.second,oam2,pal2,tile2,false,page == item::KEY_ITEM);
-                else if(pos[i-acpage * 12] == 12)
-                drawItem(oamTop,spriteInfo,ItemList[acElem.first].Name,238,
-                82,acElem.second,oam2,pal2,tile2,false,page == item::KEY_ITEM);
-                else if(pos[i-acpage * 12] == 13)
-                drawItem(oamTop,spriteInfo,ItemList[acElem.first].Name,-10,
-                82,acElem.second,oam2,pal2,tile2,false,page == item::KEY_ITEM);
+                    for(int i= acpage * 12; i< acpage * 12+ std::min(int(SAV.Bag.size(bag::BAGTYPE(page))) - acpage * 12,12);++i){
+                        acElem = SAV.Bag.element_at(bag::BAGTYPE(page),i);
+                        if(i-acpage * 12 == io)
+                            continue;
+                        else if(pos[i-acpage * 12] < 6)
+                            drawItem(oamTop,spriteInfo,ItemList[acElem.first].Name,6 + pos[i-acpage * 12]*40,
+                            10,acElem.second,oam2,pal2,tile2,false,page == item::KEY_ITEM);
+                        else if(pos[i-acpage * 12] < 12)
+                            drawItem(oamTop,spriteInfo,ItemList[acElem.first].Name,6 + (pos[i-acpage * 12]-6)*40,
+                            138,acElem.second,oam2,pal2,tile2,false,page == item::KEY_ITEM);
+                        else if(pos[i-acpage * 12] == 12)
+                            drawItem(oamTop,spriteInfo,ItemList[acElem.first].Name,238,
+                            82,acElem.second,oam2,pal2,tile2,false,page == item::KEY_ITEM);
+                        else if(pos[i-acpage * 12] == 13)
+                            drawItem(oamTop,spriteInfo,ItemList[acElem.first].Name,-10,
+                            82,acElem.second,oam2,pal2,tile2,false,page == item::KEY_ITEM);
 
-                updateTime();
-            }
+                        updateTime();
+                    }
 
 
-            initOAMTableSub(oam);
-            initMainSprites(oam,spriteInfo);
-            setMainSpriteVisibility(true);
-            oam->oamBuffer[8].isHidden = true;
-            oam->oamBuffer[0].isHidden = false;
-            oam->oamBuffer[1].isHidden = true;
-            for(int i= 9;i <= 12; ++i) 
-            oam->oamBuffer[i].isHidden = true;
+                    initOAMTableSub(oam);
+                    initMainSprites(oam,spriteInfo);
+                    setMainSpriteVisibility(true);
+                    oam->oamBuffer[8].isHidden = true;
+                    oam->oamBuffer[0].isHidden = false;
+                    oam->oamBuffer[1].isHidden = true;
+                    for(int i= 9;i <= 12; ++i) 
+                        oam->oamBuffer[i].isHidden = true;
 
-            consoleSelect(&Bottom);
-            consoleSetWindow(&Bottom,0,0,32,24);
-            consoleClear();
-            consoleSetWindow(&Bottom, 1,1,30,MAXLINES);	
-            swiWaitForVBlank();
-            updateOAMSub(oam);
-            
-            int acItem = SAV.Bag.element_at((bag::BAGTYPE)page,acpage * 12 +io).first;
-            int ret =  getAnswer(ItemList[acItem].getItemType());
-            
-            if(ret == 0){
-
-            }
-            else if(ret == 1 &&
-                    ItemList[SAV.Bag.element_at((bag::BAGTYPE)page,acpage * 12 +io).first].getItemType() != item::KEY_ITEM){
-                int a = 2,b = 2,c = 81;
-                int num = (int)SAV.PKMN_team.size();
-                consoleSelect(&Bottom);
-                for(int i = 17; i < 26; i+=(((i-15)/2)%2?-2:+6)){
-                    if((((i-15)/2)^1) >= num)
-                    break;
-                    (oam->oamBuffer[i]).isHidden = false;
-                    (oam->oamBuffer[i+1]).isHidden = false;
-                    (oam->oamBuffer[i+1]).y -= 16 * (2-((i-15)/4));
-                    (oam->oamBuffer[i]).y -= 16 * (2-((i-15)/4));
-                    updateOAMSub(oam); 
-                    consoleSetWindow(&Bottom,((oam->oamBuffer[i]).x+6)/8,((oam->oamBuffer[i]).y+6)/8,12,3);
-                    printf("   %3i/%3i\n ",SAV.PKMN_team[((i-15)/2)^1].stats.acHP,SAV.PKMN_team[((i-15)/2)^1].stats.maxHP);
-                    wprintf(SAV.PKMN_team[((i-15)/2)^1].boxdata.Name); printf("\n");
-                    printf("%11s",ItemList[SAV.PKMN_team[((i-15)/2)^1].boxdata.Item].getDisplayName().c_str());
-                    drawPKMNIcon(oam,spriteInfo,SAV.PKMN_team[((i-15)/2)^1].boxdata.SPEC,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,a,b,c);
-                    updateOAMSub(oam); 
-                }
-                updateOAMSub(oam);
-                while(42){
+                    consoleSelect(&Bottom);
+                    consoleSetWindow(&Bottom,0,0,32,24);
+                    consoleClear();
+                    consoleSetWindow(&Bottom, 1,1,30,MAXLINES);	
                     swiWaitForVBlank();
                     updateOAMSub(oam);
-                    updateTime();
-                    touchRead(&t);
 
-                    if ( t.px>224 && t.py>164)
-                    {  
-                        while(1)
-                        {
-                            scanKeys();
-                            swiWaitForVBlank();
-                            updateTime();
-                            if(keysUp() & KEY_TOUCH)
-                            break;
-                        }
-                        consoleSelect(&Bottom);
-                        consoleSetWindow(&Bottom,0,0,32,24);
-                        consoleClear();
-                        break;
+                    int acItem = SAV.Bag.element_at((bag::BAGTYPE)page,acpage * 12 +io).first;
+                    int ret =  getAnswer(ItemList[acItem].getItemType());
+
+                    if(ret == 0){
+
                     }
-                    for(int i = 17; i < 26; i+=(((i-15)/2)%2?-2:+6)){
-                        if((((i-15)/2)^1) >= num)
-                        break;
-                        else if (t.px > oam->oamBuffer[i].x && t.py > oam->oamBuffer[i].y && t.px-64 < oam->oamBuffer[i+1].x && t.py-32 < oam->oamBuffer[i].y){  
-                            (oam->oamBuffer[i]).isHidden = true;
-                            (oam->oamBuffer[i+1]).isHidden = true;
-                            (oam->oamBuffer[3 + (((i-15)/2)^1)]).isHidden = true;
+                    else if(ret == 1 &&
+                        ItemList[SAV.Bag.element_at((bag::BAGTYPE)page,acpage * 12 +io).first].getItemType() != item::KEY_ITEM){
+                            int a = 2,b = 2,c = 81;
+                            int num = (int)SAV.PKMN_team.size();
+                            consoleSelect(&Bottom);
+                            for(int i = 17; i < 26; i+=(((i-15)/2)%2?-2:+6)){
+                                if((((i-15)/2)^1) >= num)
+                                    break;
+                                (oam->oamBuffer[i]).isHidden = false;
+                                (oam->oamBuffer[i+1]).isHidden = false;
+                                (oam->oamBuffer[i+1]).y -= 16 * (2-((i-15)/4));
+                                (oam->oamBuffer[i]).y -= 16 * (2-((i-15)/4));
+                                updateOAMSub(oam); 
+                                consoleSetWindow(&Bottom,((oam->oamBuffer[i]).x+6)/8,((oam->oamBuffer[i]).y+6)/8,12,3);
+                                printf("   %3i/%3i\n ",SAV.PKMN_team[((i-15)/2)^1].stats.acHP,SAV.PKMN_team[((i-15)/2)^1].stats.maxHP);
+                                wprintf(SAV.PKMN_team[((i-15)/2)^1].boxdata.Name); printf("\n");
+                                printf("%11s",ItemList[SAV.PKMN_team[((i-15)/2)^1].boxdata.Item].getDisplayName().c_str());
+                                drawPKMNIcon(oam,spriteInfo,SAV.PKMN_team[((i-15)/2)^1].boxdata.SPEC,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,a,b,c);
+                                updateOAMSub(oam); 
+                            }
                             updateOAMSub(oam);
-                            while(1)
-                            {
+                            while(42){
                                 swiWaitForVBlank();
-                                scanKeys();
+                                updateOAMSub(oam);
                                 updateTime();
-                                if(keysUp() & KEY_TOUCH)
-                                break;
-                            }
-                            consoleSetWindow(&Bottom, 1,1,30,24);   
-                            consoleClear();
-                            {
-                                POKEMON::PKMN& ac = SAV.PKMN_team[(((i-15)/2)^1)];
-                                initOAMTableSub(oam);
-                                initMainSprites(oam,spriteInfo);
-                                setMainSpriteVisibility(true);
-                                oam->oamBuffer[8].isHidden = true;
-                                oam->oamBuffer[0].isHidden = false;
-                                oam->oamBuffer[1].isHidden = true;
-                                if(ac.boxdata.Item != 0){//PKMN hat schon Item 
-                                    std::wstring ws(ac.boxdata.Name);
-                                    ws += L" h\x84""lt bereits\ndas Item ";
-                                    mbox M = mbox(ws.c_str(),0,true,false,false);
-                                    M.put((ItemList[ac.boxdata.Item].getDisplayName()+".").c_str(),false);
-                                    if(ynbox(M).getResult("\n\nSollen die Items ausgetauscht werden?")){
-                                        int pkmnOldItem = ac.boxdata.Item;
-                                        ac.boxdata.Item = acItem;
-                                        SAV.Bag.removeItem(bag::BAGTYPE(page),acItem,1);
-                                        SAV.Bag.addItem(ItemList[pkmnOldItem].itemtype,pkmnOldItem,1);
+                                touchRead(&t);
+
+                                if ( t.px>224 && t.py>164)
+                                {  
+                                    while(1)
+                                    {
+                                        scanKeys();
+                                        swiWaitForVBlank();
+                                        updateTime();
+                                        if(keysUp() & KEY_TOUCH)
+                                            break;
                                     }
-                                    else{
-                                        goto OUT;
+                                    consoleSelect(&Bottom);
+                                    consoleSetWindow(&Bottom,0,0,32,24);
+                                    consoleClear();
+                                    break;
+                                }
+                                for(int i = 17; i < 26; i+=(((i-15)/2)%2?-2:+6)){
+                                    if((((i-15)/2)^1) >= num)
+                                        break;
+                                    else if (t.px > oam->oamBuffer[i].x && t.py > oam->oamBuffer[i].y && t.px-64 < oam->oamBuffer[i+1].x && t.py-32 < oam->oamBuffer[i].y){  
+                                        (oam->oamBuffer[i]).isHidden = true;
+                                        (oam->oamBuffer[i+1]).isHidden = true;
+                                        (oam->oamBuffer[3 + (((i-15)/2)^1)]).isHidden = true;
+                                        updateOAMSub(oam);
+                                        while(1)
+                                        {
+                                            swiWaitForVBlank();
+                                            scanKeys();
+                                            updateTime();
+                                            if(keysUp() & KEY_TOUCH)
+                                                break;
+                                        }
+                                        consoleSetWindow(&Bottom, 1,1,30,24);   
+                                        consoleClear();
+                                        {
+                                            POKEMON::PKMN& ac = SAV.PKMN_team[(((i-15)/2)^1)];
+                                            initOAMTableSub(oam);
+                                            initMainSprites(oam,spriteInfo);
+                                            setMainSpriteVisibility(true);
+                                            oam->oamBuffer[8].isHidden = true;
+                                            oam->oamBuffer[0].isHidden = false;
+                                            oam->oamBuffer[1].isHidden = true;
+                                            if(ac.boxdata.Item != 0){//PKMN hat schon Item 
+                                                std::wstring ws(ac.boxdata.Name);
+                                                ws += L" h\x84""lt bereits\ndas Item ";
+                                                mbox M = mbox(ws.c_str(),0,true,false,false);
+                                                M.put((ItemList[ac.boxdata.Item].getDisplayName()+".").c_str(),false);
+                                                if(ynbox(M).getResult("\n\nSollen die Items ausgetauscht werden?")){
+                                                    int pkmnOldItem = ac.boxdata.Item;
+                                                    ac.boxdata.Item = acItem;
+                                                    SAV.Bag.removeItem(bag::BAGTYPE(page),acItem,1);
+                                                    SAV.Bag.addItem(ItemList[pkmnOldItem].itemtype,pkmnOldItem,1);
+                                                }
+                                                else{
+                                                    goto OUT;
+                                                }
+                                            }
+                                            else{
+                                                ac.boxdata.Item = acItem;
+                                                SAV.Bag.removeItem(bag::BAGTYPE(page),acItem,1);
+                                            }
+
+                                            goto OUT;
+                                        }
                                     }
                                 }
-                                else{
-                                    ac.boxdata.Item = acItem;
-                                    SAV.Bag.removeItem(bag::BAGTYPE(page),acItem,1);
-                                }
-                                
-                                goto OUT;
                             }
-                        }
+OUT:
+                            ;
+                    }
+                    else if( ret == 2){}
+                    else if(ret == 3) {}
+
+                    //todo: some code's still missing
+
+                    initOAMTable(oamTop);
+                    initOAMTableSub(oam);
+
+                    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BagTop");	
+
+                    consoleSelect(&Top);
+                    consoleSetWindow(&Top,0,0,32,24);
+                    consoleClear();
+                    for(int i= 0; i< 8; ++i){
+                        consoleSetWindow(&Top,0,3*i,12,3);
+                        int acIn = 214 + 4*i;
+                        int s = SAV.Bag.size((bag::BAGTYPE)i);
+                        printf("%c%c\n%c%c ",(acIn),(acIn+1),(acIn+2),(acIn+3));
+                        if(s == 0)      printf("  0 Items");
+                        else if( s==1)  printf("  1 Item");
+                        else            printf("%3i Items", s);
+                    }
+                    oam2 = oamIndex;
+                    pal2 = palcnt;
+                    tile2 = nextAvTileIdx;
+
+                    initBagSprites(oamTop,spriteInfoTop,oamIndexT,palcntT,nextAvTileIdxT,false); 
+                    updateOAM(oamTop);
+                    initBagSprites(oam,spriteInfo,oamIndex,palcnt,nextAvTileIdx);
+                    swiWaitForVBlank();
+                    updateOAMSub(oam);
+
+                    oam->oamBuffer[11].x = SCREEN_WIDTH - 22;
+                    oam->oamBuffer[11].y = SCREEN_HEIGHT - 49;
+                    oam->oamBuffer[11].priority = OBJPRIORITY_1;
+                    oam->oamBuffer[12].x = SCREEN_WIDTH - 49;
+                    oam->oamBuffer[12].y = SCREEN_HEIGHT - 22;
+                    oam->oamBuffer[12].priority = OBJPRIORITY_1;
+                    consoleSelect(&Bottom); 
+                    consoleSetWindow(&Bottom,0,0,32,24);
+                    printf("%c%c %s        \n%c%c %2i/%i",ind,ind+1,bagnames[page].c_str(),ind +2,ind +3,acpage+1, maxpage);
+
+                    oam->oamBuffer[11].isHidden = false;
+                    oam->oamBuffer[12].isHidden = false;
+                    swiWaitForVBlank();
+                    updateOAMSub(oam);
+
+                    consoleSetWindow(&Bottom,31,19,2,2);
+                    printf("%c\n%c",246,247);
+                    consoleSetWindow(&Bottom,27,22,2,2);
+                    printf("%c\n%c",248,249);
+                    if(0 == acpage){
+                        oam->oamBuffer[12].isHidden = true;
+                        updateOAMSub(oam);  
+                        consoleSetWindow(&Bottom,27,22,2,2);
+                        consoleClear();
+                    }
+                    if(maxpage == acpage +1){
+                        oam->oamBuffer[11].isHidden = true;
+                        updateOAMSub(oam);
+                        consoleSetWindow(&Bottom,31,19,2,2);
+                        consoleClear();
+                    }       
+                    getRanPerm(pos,cpy);
+                    for(int i = 0; i < MAXPERM; ++i)
+                        pos[i] = cpy[i];
+
+                    for(int j = 0; j <= 10; ++j)
+                        oam->oamBuffer[j].isHidden = false;
+                    swiWaitForVBlank();
+                    updateOAMSub(oam);
+                    for(int i= acpage * 12; i< acpage * 12+ std::min(int(SAV.Bag.size(bag::BAGTYPE(page))) - acpage * 12,12);++i){
+                        updateTime();
+                        scanKeys();
+                        touchRead(&t);
+                        if((sqrt(sq(SCREEN_WIDTH - 6 -t.px) + sq(SCREEN_HEIGHT - 33-t.py)) <= 16) && acpage < maxpage - 1)
+                            goto NEXT;
+                        if(sqrt(sq(SCREEN_WIDTH - 33 -t.px) + sq(SCREEN_HEIGHT - 6-t.py)) <= 16 && acpage > 0)
+                            goto PREV;
+                        if ( t.px>224 && t.py>164)
+                            goto BACK;
+                        auto acElem = SAV.Bag.element_at(bag::BAGTYPE(page),i);
+                        drawItem(oam,spriteInfo,ItemList[acElem.first].Name,38 + (pos[i - (acpage*12)]%4*48),
+                            18 + (pos[i - (acpage*12)]/4)*40,acElem.second,oam2,pal2,tile2,true,page == item::KEY_ITEM);
+                        updateTime();
                     }
                 }
-OUT:
-                ;
-            }
-            else if( ret == 2){}
-            else if(ret == 3) {}
-
-            //todo: some code's still missing
-            
-            initOAMTable(oamTop);
-            initOAMTableSub(oam);
-            
-            loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BagTop");	
-            
-            consoleSelect(&Top);
-            consoleSetWindow(&Top,0,0,32,24);
-            consoleClear();
-            for(int i= 0; i< 8; ++i){
-                consoleSetWindow(&Top,0,3*i,12,3);
-                int acIn = 214 + 4*i;
-                int s = SAV.Bag.size((bag::BAGTYPE)i);
-                printf("%c%c\n%c%c ",(acIn),(acIn+1),(acIn+2),(acIn+3));
-                if(s == 0)      printf("  0 Items");
-                else if( s==1)  printf("  1 Item");
-                else            printf("%3i Items", s);
-            }
-            oam2 = oamIndex;
-            pal2 = palcnt;
-            tile2 = nextAvTileIdx;
-            
-            initBagSprites(oamTop,spriteInfoTop,oamIndexT,palcntT,nextAvTileIdxT,false); 
-            updateOAM(oamTop);
-            initBagSprites(oam,spriteInfo,oamIndex,palcnt,nextAvTileIdx);
-            swiWaitForVBlank();
-            updateOAMSub(oam);
-            
-            oam->oamBuffer[11].x = SCREEN_WIDTH - 22;
-            oam->oamBuffer[11].y = SCREEN_HEIGHT - 49;
-            oam->oamBuffer[11].priority = OBJPRIORITY_1;
-            oam->oamBuffer[12].x = SCREEN_WIDTH - 49;
-            oam->oamBuffer[12].y = SCREEN_HEIGHT - 22;
-            oam->oamBuffer[12].priority = OBJPRIORITY_1;
-            consoleSelect(&Bottom); 
-            consoleSetWindow(&Bottom,0,0,32,24);
-            printf("%c%c %s        \n%c%c %2i/%i",ind,ind+1,bagnames[page].c_str(),ind +2,ind +3,acpage+1, maxpage);
-            
-            oam->oamBuffer[11].isHidden = false;
-            oam->oamBuffer[12].isHidden = false;
-            swiWaitForVBlank();
-            updateOAMSub(oam);
-
-            consoleSetWindow(&Bottom,31,19,2,2);
-            printf("%c\n%c",246,247);
-            consoleSetWindow(&Bottom,27,22,2,2);
-            printf("%c\n%c",248,249);
-            if(0 == acpage){
-                oam->oamBuffer[12].isHidden = true;
-                updateOAMSub(oam);  
-                consoleSetWindow(&Bottom,27,22,2,2);
-                consoleClear();
-            }
-            if(maxpage == acpage +1){
-                oam->oamBuffer[11].isHidden = true;
-                updateOAMSub(oam);
-                consoleSetWindow(&Bottom,31,19,2,2);
-                consoleClear();
-            }       
-            getRanPerm(pos,cpy);
-            for(int i = 0; i < MAXPERM; ++i)
-            pos[i] = cpy[i];
-            
-            for(int j = 0; j <= 10; ++j)
-            oam->oamBuffer[j].isHidden = false;
-            swiWaitForVBlank();
-            updateOAMSub(oam);
-            for(int i= acpage * 12; i< acpage * 12+ std::min(int(SAV.Bag.size(bag::BAGTYPE(page))) - acpage * 12,12);++i){
-                updateTime();
-                scanKeys();
-                touchRead(&t);
-                if((sqrt(sq(SCREEN_WIDTH - 6 -t.px) + sq(SCREEN_HEIGHT - 33-t.py)) <= 16) && acpage < maxpage - 1)
-                goto NEXT;
-                if(sqrt(sq(SCREEN_WIDTH - 33 -t.px) + sq(SCREEN_HEIGHT - 6-t.py)) <= 16 && acpage > 0)
-                goto PREV;
-                if ( t.px>224 && t.py>164)
-                goto BACK;
-                auto acElem = SAV.Bag.element_at(bag::BAGTYPE(page),i);
-                drawItem(oam,spriteInfo,ItemList[acElem.first].Name,38 + (pos[i - (acpage*12)]%4*48),
-                18 + (pos[i - (acpage*12)]/4)*40,acElem.second,oam2,pal2,tile2,true,page == item::KEY_ITEM);
-                updateTime();
-            }
-        }
     }
 }
 void bag::draw(){
     vramSetup();
-    videoSetMode(MODE_5_2D |DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );		
+    videoSetMode(MODE_5_2D  | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );		
     Top = *consoleInit(&Top, 0, BgType_Text4bpp, BgSize_T_256x256,2,0, true ,true);
     consoleSetFont(&Top,&cfont);
-    
+
     Bottom = *consoleInit(&Bottom,  0, BgType_Text4bpp, BgSize_T_256x256, 2,0, false,true );
     consoleSetFont(&Bottom, &cfont);
-    
+
     touchPosition t;
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BagTop");	
 
@@ -4238,11 +4238,11 @@ void bag::draw(){
         int s = (int)this->bags[i].size();
         printf("%c%c\n%c%c ",(acIn),(acIn+1),(acIn+2),(acIn+3));
         if(s == 0)
-        printf("  0 Items");
+            printf("  0 Items");
         else if( s==1)
-        printf("  1 Item");
+            printf("  1 Item");
         else
-        printf("%3i Items", s);
+            printf("%3i Items", s);
     }
     if(!BGs[BG_ind].load_from_rom){
         dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
@@ -4261,7 +4261,7 @@ void bag::draw(){
     initOAMTable(oamTop);
     int palcntT = 0,tilecntT = 0,oamIndT = 0;
     initBagSprites(oamTop,spriteInfoTop,oamIndT,palcntT,tilecntT,false);    
-    
+
     consoleSetWindow(&Bottom,0,0,32,24);
     consoleSelect(&Bottom);
     consoleClear();
@@ -4273,18 +4273,18 @@ void bag::draw(){
         oam->oamBuffer[i+2].y = positions[i-11][1];
         oam->oamBuffer[i+2].isHidden = false;
         updateOAMSub(oam);
-        
+
         int nx = positions[i-11][0]/8 + 1, ny = positions[i-11][1]/ 8 +1,ind = 214 + 4 * (i-11);
         consoleSetWindow(&Bottom,nx,ny,2,2);
         for(int p= 0; p < 4; ++p)
-        printf("%c",ind+p);
+            printf("%c",ind+p);
     }
     int pos[MAXPERM],cpy[MAXPERM] = {0};
     for(int i= 0; i< MAXPERM; ++i)
-    pos[i] = i;
+        pos[i] = i;
     getRanPerm(pos,cpy);
     for(int i = 0; i < MAXPERM; ++i)
-    pos[i] = cpy[i];
+        pos[i] = cpy[i];
 
     while(42){
         updateTime();
@@ -4301,7 +4301,7 @@ void bag::draw(){
                 swiWaitForVBlank();
                 updateTime();
                 if(keysUp() & KEY_TOUCH)
-                break;
+                    break;
             }
             consoleSelect(&Bottom);
             consoleSetWindow(&Bottom,4,0,20,3);
@@ -4309,68 +4309,68 @@ void bag::draw(){
             break;
         }
         for(int i = 0; i < 8; ++i)
-        if(sqrt(sq(16+positions[i][0]-t.px) + sq(16+positions[i][1]-t.py)) <= 16){
-            while(1)
-            {
-                scanKeys();
-                swiWaitForVBlank();
-                updateTime();
-                if(keysUp() & KEY_TOUCH)
-                break;
-            }
-            drawBagPage(i,pos,oamInd,palcnt,tilecnt,oamIndT,palcntT,tilecntT);
-            
-            //initOAMTableSub(oam);
-            /*
+            if(sqrt(sq(16+positions[i][0]-t.px) + sq(16+positions[i][1]-t.py)) <= 16){
+                while(1)
+                {
+                    scanKeys();
+                    swiWaitForVBlank();
+                    updateTime();
+                    if(keysUp() & KEY_TOUCH)
+                        break;
+                }
+                drawBagPage(i,pos,oamInd,palcnt,tilecnt,oamIndT,palcntT,tilecntT);
+
+                //initOAMTableSub(oam);
+                /*
                 initBagSprites(oam,spriteInfo,oamInd,palcnt,tilecnt);
                 initBagSprites(oamTop,spriteInfoTop,oamIndT,palcntT,tilecntT,false);  
 
                 loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BagTop");
                 consoleSelect(&Top);
                 for(int i= 0; i< 8; ++i){
-                    consoleSetWindow(&Top,0,3*i,12,3);
-                    int acIn = 214 + 4*i;
-                    int s = (int)this->bags[i].size();
-                    printf("%c%c\n%c%c ",(acIn),(acIn+1),(acIn+2),(acIn+3));
-                    if(s == 0)
-                        printf("  0 Items");
-                    else if( s==1)
-                        printf("  1 Item");
-                    else
-                        printf("%3i Items", s);
+                consoleSetWindow(&Top,0,3*i,12,3);
+                int acIn = 214 + 4*i;
+                int s = (int)this->bags[i].size();
+                printf("%c%c\n%c%c ",(acIn),(acIn+1),(acIn+2),(acIn+3));
+                if(s == 0)
+                printf("  0 Items");
+                else if( s==1)
+                printf("  1 Item");
+                else
+                printf("%3i Items", s);
                 }
                 if(!BGs[BG_ind].load_from_rom){
-                    dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-                    dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+                dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+                dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
                 }
                 else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name,BG_ind)){
-                    dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-                    dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-                    BG_ind = 0;
+                dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+                dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+                BG_ind = 0;
                 }*/
-            
-            consoleSetWindow(&Bottom,0,0,32,24);
-            consoleSelect(&Bottom);
-            consoleClear();
-            for(int j = 0; j <= 10; ++j)
-            oam->oamBuffer[j].isHidden = false;
-            for(int j = 11; j <= 60; ++j)
-            oam->oamBuffer[j].isHidden = true;
-            for(int j= 11; j< 19; ++j){
-                oam->oamBuffer[j+2].x = positions[j-11][0];
-                oam->oamBuffer[j+2].y = positions[j-11][1];
-                oam->oamBuffer[j+2].isHidden = false;
+
+                consoleSetWindow(&Bottom,0,0,32,24);
+                consoleSelect(&Bottom);
+                consoleClear();
+                for(int j = 0; j <= 10; ++j)
+                    oam->oamBuffer[j].isHidden = false;
+                for(int j = 11; j <= 60; ++j)
+                    oam->oamBuffer[j].isHidden = true;
+                for(int j= 11; j< 19; ++j){
+                    oam->oamBuffer[j+2].x = positions[j-11][0];
+                    oam->oamBuffer[j+2].y = positions[j-11][1];
+                    oam->oamBuffer[j+2].isHidden = false;
+                    updateOAMSub(oam);
+
+                    int nx = positions[j-11][0]/8 + 1, ny = positions[j-11][1]/ 8 +1,ind = 214 + 4 * (j-11);
+                    consoleSetWindow(&Bottom,nx,ny,2,2);
+                    for(int p= 0; p < 4; ++p)
+                        printf("%c",ind+p);
+                }
                 updateOAMSub(oam);
-                
-                int nx = positions[j-11][0]/8 + 1, ny = positions[j-11][1]/ 8 +1,ind = 214 + 4 * (j-11);
-                consoleSetWindow(&Bottom,nx,ny,2,2);
-                for(int p= 0; p < 4; ++p)
-                printf("%c",ind+p);
             }
-            updateOAMSub(oam);
-        }
     }
-    
+
     consoleSetWindow(&Bottom,0,0,32,24);
     consoleSelect(&Bottom);
     consoleClear();

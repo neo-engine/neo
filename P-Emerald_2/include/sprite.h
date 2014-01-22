@@ -38,38 +38,38 @@ struct SpriteInfo{
 };
 
 /*
- *  updateOAM
- *
- *  Update the OAM.
- *
- */
+*  updateOAM
+*
+*  Update the OAM.
+*
+*/
 void updateOAM(OAMTable * oam);
 void updateOAMSub(OAMTable * oam);
 
 /*
- *  initOAM
- *
- *  Initialize the OAM.
- *
- */
+*  initOAM
+*
+*  Initialize the OAM.
+*
+*/
 void initOAMTable(OAMTable * oam);
 void initOAMTableSub(OAMTable * oam);
 
 /*
- *  rotateSprite
- *
- *  Rotate a sprite.
- *
- */
+*  rotateSprite
+*
+*  Rotate a sprite.
+*
+*/
 void rotateSprite(SpriteRotation * spriteRotation, int angle);
 
 /*
- *  setSpriteVisibility
- *
- *  Hide or show a sprite of a certain type: affine double bound, affine
- *  non-double bound, or ordinary.
- *
- */
+*  setSpriteVisibility
+*
+*  Hide or show a sprite of a certain type: affine double bound, affine
+*  non-double bound, or ordinary.
+*
+*/
 void setSpriteVisibility(SpriteEntry * spriteEntry, bool hidden, bool affine = false, bool doubleBound = false);
 
 inline void setSpritePosition(SpriteEntry* spriteEntry,u16 x = 0,u16 y = 0);
