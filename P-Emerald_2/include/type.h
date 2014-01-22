@@ -6,3 +6,5 @@ enum Type{
     WASSER=10,	FEUER=11,	PFLANZE=12,	ELEKTRO=13,	PSYCHO=14,
     EIS=15,     DRACHE=16,	UNLICHT=17, FEE = 18
 };
+
+float getEffectiveness(const Type& t1, const Type& t2);

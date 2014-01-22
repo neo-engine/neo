@@ -991,11 +991,11 @@ void loadframe(SpriteInfo* si, int idx, int frame,bool big = false){
         loadSprite(si,"nitro://PICS/SPRITES/OW/",buf,128,16);
 }
 
-void animateHero(int dir,int frame){
+void animateHero(int dir,int frame,bool rundisable = false){
     heroIsBig = false;
 
     left = !left;
-    bool bike = (MoveMode)SAV.acMoveMode == BIKE, run = keysHeld() & KEY_B;
+    bool bike = (MoveMode)SAV.acMoveMode == BIKE, run = (keysHeld() & KEY_B) && !rundisable;
     if(frame == 0){
         switch (dir)
         {
@@ -1334,9 +1334,10 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
 
     int lastmovedata = acMap->blocks[SAV.acposy/20 + 10][SAV.acposx/20 + 10].movedata;
     int acmovedata = acMap->blocks[y][x].movedata;
-    map2d::Block acBlock = acMap->b.blocks[acMap->blocks[y][x].blockidx];
-
+    map2d::Block acBlock = acMap->b.blocks[acMap->blocks[y][x].blockidx], lastBlock = acMap->b.blocks[acMap->blocks[SAV.acposy/20 + 10][SAV.acposx/20 + 10].blockidx];
+    
     int verhalten = acBlock.bottombehave, hintergrund = acBlock.topbehave;
+    int lstverhalten = lastBlock.bottombehave, lsthintergrund = lastBlock.topbehave;
     if(verhalten == 0xa0 && playermoveMode != WALK) //nur normales laufen möglich
         return false;
 
@@ -1373,8 +1374,8 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
         SAV.acposz = z = acmovedata / 4;
 
     oamTop->oamBuffer[0].priority = OBJPRIORITY_2;
-    if(verhalten == 0x70) 
-        oamTop->oamBuffer[0].priority = OBJPRIORITY_1;
+    if((verhalten == 0x70 || lstverhalten == 0x70) && z >= 4)
+        oamTop->oamBuffer[0].priority = OBJPRIORITY_1; 
     if(acmovedata == 60)
         if(z <= 3)
             oamTop->oamBuffer[0].priority = OBJPRIORITY_3;
@@ -1780,22 +1781,22 @@ OUT:
         }
         //Moving
         if(pressed & KEY_DOWN){
-            animateHero(2,2);
+            animateHero(2,2,true);
             lastdir = 2;
             continue;
         }
         if(pressed & KEY_RIGHT){
-            animateHero(1,2);
+            animateHero(1,2,true);
             lastdir = 1;
             continue;
         }
         if(pressed & KEY_UP){
-            animateHero(4,2);
+            animateHero(4,2,true);
             lastdir = 4;
             continue;
         }
         if(pressed & KEY_LEFT){
-            animateHero(3,2);
+            animateHero(3,2,true);
             lastdir = 3;
             continue;
         }
