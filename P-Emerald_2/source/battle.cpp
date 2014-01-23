@@ -57,6 +57,7 @@
 #include "Shiny1.h"
 #include "Shiny2.h"
 
+#include "TestBattleBack.h"
 
 extern OAMTable *oam;
 extern SpriteInfo spriteInfo[SPRITE_COUNT];
@@ -148,12 +149,17 @@ namespace BATTLE{
         cust_font2.set_color(0,0);
         cust_font2.set_color(253,1);
         cust_font2.set_color(254,2);
-
+        
         BG_PALETTE_SUB[250] = RGB15(31,31,31);
         BG_PALETTE_SUB[251] = RGB15(15,15,15);
         BG_PALETTE_SUB[252] = RGB15(3,3,3);
         BG_PALETTE_SUB[253] = RGB15(15,15,15);
         BG_PALETTE_SUB[254] = RGB15(31,31,31);
+        BG_PALETTE[250] = RGB15(31,31,31);
+        BG_PALETTE[251] = RGB15(15,15,15);
+        BG_PALETTE[252] = RGB15(3,3,3);
+        BG_PALETTE[253] = RGB15(15,15,15);
+        BG_PALETTE[254] = RGB15(31,31,31);
         font::putrec(0,0,256,63,true,false,250);
 
         updateOAMSub(oam);
@@ -484,12 +490,14 @@ namespace BATTLE{
         ++palcnt;
     }
 
+    void drawTopBack();
+
     void battle::initBattleScreen(){
         char buf[100];
         sprintf(buf,"%i.raw",this->opponent->trainer_class);
 
-        loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
-        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
+        loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");	
+        drawTopBack();
         initinitBattleScrnSprites(oamTop,spriteInfoTop,6,6);
 
         for(int i= 0; i< 6; ++i)
@@ -509,7 +517,7 @@ namespace BATTLE{
             default:
                 break;
         }
-        for(int i= 6; i< 12; ++i)
+        for(int i= 6; i< 12; ++i) 
             switch (this->acpoksts[acpokpos[i-6][0]][0])
         {
             case NA:
@@ -1432,8 +1440,8 @@ namespace BATTLE{
             if((*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny())
                 animateShiny(176+16,36);
 
-            displayHP(100,101 ,88,32,42,43,false);
-            displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,42,43,false);      
+            displayHP(100,101 ,88,32,142,143,false);
+            displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,142,143,false);      
             oamTop->oamBuffer[OPP_PB_START + 1].x = 96;
             oamTop->oamBuffer[OPP_PB_START + 1].y = 41;
             consoleSetWindow(&Top,0,5,20,2);
@@ -1480,8 +1488,8 @@ namespace BATTLE{
 
             updateOAM(oamTop);
 
-            displayHP(100,101,0,8,45,44,false);   
-            displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,45,44,false); 
+            displayHP(100,101,0,8,145,144,false);   
+            displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,145,144,false); 
             oamTop->oamBuffer[OPP_PB_START].x = 8;
             oamTop->oamBuffer[OPP_PB_START].y = 17;
             consoleSetWindow(&Top,4,2,20,2);
@@ -1596,8 +1604,8 @@ namespace BATTLE{
             if((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny())
                 animateShiny(6,116);
 
-            displayHP(100,101,256-96-28,192-32-8-32,42,49,false);
-            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,42,49,false);       
+            displayHP(100,101,256-96-28,192-32-8-32,142,149,false);
+            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,142,149,false);       
             displayEP(100,100,256-96-28,192-32-8-32,46,47,false);
             oamTop->oamBuffer[OWN_PB_START +1].x = 256-88-32+4;
             oamTop->oamBuffer[OWN_PB_START + 1].y = 192-31-32;
@@ -1636,8 +1644,8 @@ namespace BATTLE{
             
             updateOAM(oamTop);
 
-            displayHP(100,101,256-36,192-40,51,50,false);   
-            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,51,50,false);        
+            displayHP(100,101,256-36,192-40,151,150,false);   
+            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,151,150,false);        
             displayEP(100,100,256-36,192-40,46,47,false);
             oamTop->oamBuffer[OWN_PB_START].x = 256-32+4;
             oamTop->oamBuffer[OWN_PB_START].y = 192-31;
@@ -1713,6 +1721,11 @@ namespace BATTLE{
         }
     }
 
+    void drawTopBack(){
+        dmaCopy(TestBattleBackBitmap, bgGetGfxPtr(bg3), 256*256);
+        dmaCopy(TestBattleBackPal, BG_PALETTE, 128*2);
+    }
+
     void battle::initBattleScene(int battle_back,Weather weather){        
         for(int i = 0; i < 6; ++i){
             this->acpokpos[i][0] = this->acpokpos[i][1] = i;
@@ -1755,7 +1768,8 @@ namespace BATTLE{
                     std::swap(acpokpos[1][1],acpokpos[i][1]);
 
         vramSetup();
-        videoSetMode(MODE_5_2D |DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );		
+        videoSetMode(MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );		
+        drawTopBack();
         Top = *consoleInit(&Top, 0, BgType_Text4bpp, BgSize_T_256x256,2,0, true ,true);
         consoleSetFont(&Top,&cfont);
 
@@ -1767,7 +1781,8 @@ namespace BATTLE{
         initOAMTableSub(oam);
         initOAMTable(oamTop);
         this->round = this->max_round;
-        this->initBattleScreen(); 
+        this->initBattleScreen(); 	
+        drawTopBack();
 
 
         if(!BGs[BG_ind].load_from_rom){
@@ -1779,7 +1794,9 @@ namespace BATTLE{
             dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
             BG_ind = 0;
         }
-        loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
+        
+        drawTopBack();
+
         initOAMTableSub(oam);
         initOAMTable(oamTop);
         initBattleScreenSprites(oamTop,spriteInfoTop);
@@ -1823,8 +1840,8 @@ namespace BATTLE{
         if((*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny())
             animateShiny(176+16,36);
 
-        displayHP(100,101 ,88,32,44,45,false);
-        displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,44,45,false);      
+        displayHP(100,101 ,88,32,144,145,false);
+        displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,144,145,false);      
         oamTop->oamBuffer[OPP_PB_START + 1].x = 96;
         oamTop->oamBuffer[OPP_PB_START + 1].y = 41;
         consoleSetWindow(&Top,0,5,20,5);
@@ -1866,8 +1883,8 @@ namespace BATTLE{
                 animateShiny(112+16,20);
 
 
-            displayHP(100,101,0,8,42,43,false);   
-            displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,42,43,false); 
+            displayHP(100,101,0,8,142,143,false);   
+            displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,142,143,false); 
             oamTop->oamBuffer[OPP_PB_START].x = 8;
             oamTop->oamBuffer[OPP_PB_START].y = 17;
             consoleSetWindow(&Top,4,2,20,5);
@@ -1944,8 +1961,8 @@ namespace BATTLE{
         if((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny())
             animateShiny(6,116);
 
-        displayHP(100,101,256-96-28,192-32-8-32,48,49,false);
-        displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,48,49,false);       
+        displayHP(100,101,256-96-28,192-32-8-32,148,149,false);
+        displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,148,149,false);       
         displayEP(100,100,256-96-28,192-32-8-32,46,47,false);
         oamTop->oamBuffer[OWN_PB_START + 1].x = 256-88-32+4;
         oamTop->oamBuffer[OWN_PB_START + 1].y = 192-31-32;
@@ -1987,8 +2004,8 @@ namespace BATTLE{
             oamTop->oamBuffer[OWN_PB_START].isHidden = oamTop->oamBuffer[OWN_HP_2].isHidden = false;
             updateOAM(oamTop);
 
-            displayHP(100,101,256-36,192-40,50,51,false);   
-            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,50,51,false);        
+            displayHP(100,101,256-36,192-40,150,151,false);   
+            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,150,151,false);        
             displayEP(100,100,256-36,192-40,46,47,false);
             oamTop->oamBuffer[OWN_PB_START].x = 256-32+4;
             oamTop->oamBuffer[OWN_PB_START].y = 192-31;
@@ -2090,11 +2107,13 @@ namespace BATTLE{
         return std::max(1,baseDmg);
     }
 
-    int battle::start(int battle_back,Weather weather){
+    int battle::start(int battle_back,Weather weather){ 
+        videoSetMode(MODE_5_2D  | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );	
+        drawTopBack();
         initBattleScene(battle_back, weather);
         char buf[100];
         touchPosition t;
-
+        
         while((this->round--) != 0) {
 ACR:
             setMainBattleVisibility(false);
