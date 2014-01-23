@@ -1,23 +1,44 @@
 @@Prerelease Builds@@
 @Charming Lari [WIP]@
+ - Speichern von Spielständen (^?ô)
+ - Pokémon-Datenstruktur (^)
+
+ - Maps: Gen3-like 2D-Maps (+) {Alle Hoenn Routen/ Städte}
+ - Maps: Anbindungen (+)
+ - Maps: Animationen (+)
+ - Maps: OW-Player-Sprites (+) {E1; FR/BG}
+ - Maps: OW-Attacken (+)
+ - Maps / OW-Moves: Surfer; Attackenanimation (+)
+
+ - Laden von Gen3-Spielständen (zumindest teilweise) (+)
+
+ - Beutel: Alle Item-Icons (+)
+
+ - PKMN-Kampf: TypeChart (+) 
 
 @Raging Gyarados [2013-12-14]@
  - Speichern von Spielständen (ô)
- - Pokémon-Datenstruktur (+)
+ - Pokémon-Datenstruktur (^)
  - variabel-breite Schrift (+)
+
  - PokéDex (ô)
  - PokéDex: Pokémon-Bases (+)
  - PokéDex: Dex-Einträge (+)
- - PokéDex / Pokémon-Screen: Pokémon-Sprites [m/w] (+)
- - PokéDex / Pokémon-Screen: Pokémon-Sprites [shiny][m/w] (+)
- - PokéDex / Pokémon-Screen: Pokémon-BackSprites [m] (+)
- - PokéDex / Pokémon-Screen: Pokémon-BackSprites [shiny][m] (+)
+ - PokéDex / Pokémon-Screen: Pokémon-Sprites (+) {m/w}
+ - PokéDex / Pokémon-Screen: Pokémon-Sprites (+) {shiny; m/w}
+ - PokéDex / Pokémon-Screen: Pokémon-BackSprites (+) {m}
+ - PokéDex / Pokémon-Screen: Pokémon-BackSprites (+) {shiny; m}
  - PokéDex: sp. Formen (+)
+
  - Pokémon-Screen: Recode
+
 #! N3Dlib entfernt (-)
+
  - Emulator-Version (+); extrem langsam bei DeSmuME
+
  - PKMN-Kampf: DS (+)
  - PKMN-Kampf: Init, PKMNSwitch, rud. AttackChoice (+)
+
  - Spritebehaftete MBoxen (+)
 
 @Waiting Suicune [2013-08-01]@

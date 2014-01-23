@@ -134,8 +134,13 @@ namespace BATTLE{
             oam->oamBuffer[9+2*i].isHidden = true;
             swiWaitForVBlank();
         }
-
-        updateOAMSub(oam);
+        
+        oam->oamBuffer[20].isHidden = true;
+        for(int i= 0; i < 20; ++i)
+            oam->oamBuffer[36 + i].isHidden = true;
+        //oamIndexS = 36;
+        //nextAvailableTileIdxS = oam->oamBuffer[36].gfxIndex;
+        //palcntS = oam->oamBuffer[36].palette;
 
         cust_font.set_color(0,0);
         cust_font.set_color(251,1);
@@ -185,6 +190,35 @@ namespace BATTLE{
     }
     int oamIndex, palcnt,  nextAvailableTileIdx;
     int oamIndexS, palcntS,  nextAvailableTileIdxS;
+
+#define OWN_HP_1              1
+#define OWN_HP_2              2
+#define OPP_HP_1              3
+#define OPP_HP_2              4
+#define OWN_PB_START          5
+#define OPP_PB_START         11
+#define OPP_PKMN_1_START     17-1
+#define OPP_PKMN_2_START     21-1
+#define OWN_PKMN_1_START     25-1
+#define OWN_PKMN_2_START     29-1
+    
+#define PB_ANIM             127
+#define SHINY_ANIM          127
+    
+#define OPP_PKMN_1_PAL        0-1
+#define OPP_PKMN_2_PAL        1-1
+#define OWN_PKMN_1_PAL        2-1
+#define OWN_PKMN_2_PAL        3-1
+
+#define PB_PAL_START          4
+#define HP_PAL                7
+
+#define OPP_PKMN_1_TILE      44
+#define OPP_PKMN_2_TILE     188
+#define OWN_PKMN_1_TILE     332
+#define OWN_PKMN_2_TILE     476
+
+    
     void initinitBattleScrnSprites(OAMTable* oam, SpriteInfo* spriteInfo,int ownPok,int oppPok){
         static const int BYTES_PER_16_COLOR_TILE = 32;
         static const int COLORS_PER_PALETTE = 16;
@@ -566,9 +600,9 @@ namespace BATTLE{
         static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX[0]);
         oamIndex = palcnt = nextAvailableTileIdx = 0;
 
-        SpriteInfo * type1Info = &spriteInfo[++oamIndex];
-        SpriteEntry * type1 = &oam->oamBuffer[oamIndex];
-        type1Info->oamId = oamIndex;
+        SpriteInfo * type1Info = &spriteInfo[OWN_HP_2];
+        SpriteEntry * type1 = &oam->oamBuffer[OWN_HP_2];
+        type1Info->oamId = OWN_HP_2;
         type1Info->width = 32;
         type1Info->height = 32;
         type1Info->angle = 0;
@@ -584,21 +618,21 @@ namespace BATTLE{
         type1->size = OBJSIZE_32;
         type1->gfxIndex = nextAvailableTileIdx;
         type1->priority = OBJPRIORITY_2;
-        type1->palette = palcnt;
+        type1->palette = HP_PAL;
 
-        spriteInfo[++oamIndex] = *type1Info;
-        oam->oamBuffer[oamIndex] = *type1;
-        oam->oamBuffer[oamIndex].x -= 88;
-        oam->oamBuffer[oamIndex].y -= 32;
-        oam->oamBuffer[oamIndex].priority = OBJPRIORITY_2;
+        spriteInfo[OWN_HP_1] = *type1Info;
+        oam->oamBuffer[OWN_HP_1] = *type1;
+        oam->oamBuffer[OWN_HP_1].x -= 88;
+        oam->oamBuffer[OWN_HP_1].y -= 32;
+        oam->oamBuffer[OWN_HP_1].priority = OBJPRIORITY_2;
 
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Battle1Pal, &SPRITE_PALETTE[(palcnt++) * COLORS_PER_PALETTE], 32);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Battle1Pal, &SPRITE_PALETTE[(HP_PAL) * COLORS_PER_PALETTE], 32);
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Battle1Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], Battle1TilesLen);
         nextAvailableTileIdx += Battle1TilesLen / BYTES_PER_16_COLOR_TILE;
 
-        type1Info = &spriteInfo[++oamIndex];
-        type1 = &oam->oamBuffer[oamIndex];
-        type1Info->oamId = oamIndex;
+        type1Info = &spriteInfo[OPP_HP_2];
+        type1 = &oam->oamBuffer[OPP_HP_2];
+        type1Info->oamId = OPP_HP_2;
         type1Info->width = 32;
         type1Info->height = 32;
         type1Info->angle = 0;
@@ -614,22 +648,22 @@ namespace BATTLE{
         type1->size = OBJSIZE_32;
         type1->gfxIndex = nextAvailableTileIdx;
         type1->priority = OBJPRIORITY_2;
-        type1->palette = palcnt;
+        type1->palette = HP_PAL + 1;
 
-        spriteInfo[++oamIndex] = *type1Info;
-        oam->oamBuffer[oamIndex] = *type1;
-        oam->oamBuffer[oamIndex].x += 88;
-        oam->oamBuffer[oamIndex].y += 24;
-        oam->oamBuffer[oamIndex].priority = OBJPRIORITY_2;
+        spriteInfo[OPP_HP_1] = *type1Info;
+        oam->oamBuffer[OPP_HP_1] = *type1;
+        oam->oamBuffer[OPP_HP_1].x += 88;
+        oam->oamBuffer[OPP_HP_1].y += 24;
+        oam->oamBuffer[OPP_HP_1].priority = OBJPRIORITY_2;
 
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Battle2Pal, &SPRITE_PALETTE[(palcnt++) * COLORS_PER_PALETTE], 32);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Battle2Pal, &SPRITE_PALETTE[(HP_PAL + 1) * COLORS_PER_PALETTE], 32);
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Battle2Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], Battle2TilesLen);
         nextAvailableTileIdx += Battle2TilesLen / BYTES_PER_16_COLOR_TILE;
 
 
-        type1Info = &spriteInfo[++oamIndex];
-        type1 = &oam->oamBuffer[oamIndex];
-        type1Info->oamId = oamIndex;
+        type1Info = &spriteInfo[OWN_PB_START];
+        type1 = &oam->oamBuffer[OWN_PB_START];
+        type1Info->oamId = OWN_PB_START;
         type1Info->width = 16;
         type1Info->height = 16;
         type1Info->angle = 0;
@@ -645,20 +679,20 @@ namespace BATTLE{
         type1->size = OBJSIZE_16;
         type1->gfxIndex = nextAvailableTileIdx;
         type1->priority = OBJPRIORITY_0;
-        type1->palette = palcnt;
+        type1->palette = PB_PAL_START;
 
         for(int i = 1; i < 12; ++i){
-            spriteInfo[++oamIndex] = *type1Info;
-            oam->oamBuffer[oamIndex] = *type1;
+            spriteInfo[OWN_PB_START + i] = *type1Info;
+            oam->oamBuffer[OWN_PB_START + i] = *type1;
         }
 
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, BattleBall1Pal, &SPRITE_PALETTE[(palcnt++) * COLORS_PER_PALETTE], 32);        
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, BattleBall1Pal, &SPRITE_PALETTE[(PB_PAL_START) * COLORS_PER_PALETTE], 32);        
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL, BattleBall1Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], BattleBall1TilesLen);
         nextAvailableTileIdx += BattleBall1TilesLen / BYTES_PER_16_COLOR_TILE;
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, BattleBall2Pal, &SPRITE_PALETTE[(palcnt++) * COLORS_PER_PALETTE], 32);        
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, BattleBall2Pal, &SPRITE_PALETTE[(PB_PAL_START + 1) * COLORS_PER_PALETTE], 32);        
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL, BattleBall2Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], BattleBall2TilesLen);
         nextAvailableTileIdx += BattleBall2TilesLen / BYTES_PER_16_COLOR_TILE;
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, BattleBall3Pal, &SPRITE_PALETTE[(palcnt++) * COLORS_PER_PALETTE], 32);        
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, BattleBall3Pal, &SPRITE_PALETTE[(PB_PAL_START + 2) * COLORS_PER_PALETTE], 32);        
         dmaCopyHalfWords(SPRITE_DMA_CHANNEL, BattleBall3Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], BattleBall3TilesLen);
         nextAvailableTileIdx += BattleBall3TilesLen / BYTES_PER_16_COLOR_TILE;
 
@@ -1157,18 +1191,18 @@ namespace BATTLE{
         ++palcntS;
         oamIndexS += 15;
     }
-
-
-    void animatePB(int x,int y){
+    
+#define PB_ANIM_TILES 700
+    void animatePB(int x,int y){   
         static const int BYTES_PER_16_COLOR_TILE = 32;
         static const int COLORS_PER_PALETTE = 16;
         static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
                                               * (can be set in REG_DISPCNT) */
         static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX[0]);
         x += 8; y += 8;
-        SpriteInfo * type1Info = &spriteInfoTop[++oamIndex];
-        SpriteEntry * type1 = &oamTop->oamBuffer[oamIndex];
-        type1Info->oamId = oamIndex;
+        SpriteInfo * type1Info = &spriteInfoTop[PB_ANIM];
+        SpriteEntry * type1 = &oamTop->oamBuffer[PB_ANIM];
+        type1Info->oamId = PB_ANIM;
         type1Info->width = 16;
         type1Info->height = 16;
         type1Info->angle = 0;
@@ -1182,58 +1216,58 @@ namespace BATTLE{
         type1->shape = OBJSHAPE_SQUARE;
         type1->x = x;
         type1->size = OBJSIZE_16;
-        type1->gfxIndex = nextAvailableTileIdx;
+        type1->gfxIndex = PB_ANIM_TILES;
         type1->priority = OBJPRIORITY_0;
-        type1->palette = palcnt;
+        type1->palette = 15;
 
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall1Pal, &SPRITE_PALETTE[(palcnt) * COLORS_PER_PALETTE], 32);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall1Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], PokeBall1TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall1Pal, &SPRITE_PALETTE[(15) * COLORS_PER_PALETTE], 32);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall1Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], PokeBall1TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall2Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], PokeBall2TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall2Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], PokeBall2TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall3Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], PokeBall3TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall3Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], PokeBall3TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall4Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], PokeBall4TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall4Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], PokeBall4TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall5Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], PokeBall5TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall5Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], PokeBall5TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall6Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], PokeBall6TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall6Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], PokeBall6TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall7Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], PokeBall7TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall7Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], PokeBall7TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall8Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], PokeBall8TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall8Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], PokeBall8TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall9Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], PokeBall9TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall9Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], PokeBall9TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall10Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], PokeBall10TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall10Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], PokeBall10TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall11Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], PokeBall11TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, PokeBall11Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], PokeBall11TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 3; ++i)
             swiWaitForVBlank();
         type1->isHidden = true;
 
-        type1Info->oamId = oamIndex;
+        type1Info->oamId = PB_ANIM;
         type1Info->width = 64;
         type1Info->height = 64;
         type1Info->angle = 0;
@@ -1247,24 +1281,22 @@ namespace BATTLE{
         type1->shape = OBJSHAPE_SQUARE;
         type1->x = x -22;
         type1->size = OBJSIZE_64;
-        type1->gfxIndex = nextAvailableTileIdx;
+        type1->gfxIndex = PB_ANIM_TILES;
         type1->priority = OBJPRIORITY_0;
-        type1->palette = palcnt;
+        type1->palette = 15;
 
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[(palcnt) * COLORS_PER_PALETTE], 32);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], Shiny1TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[(15) * COLORS_PER_PALETTE], 32);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], Shiny1TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[(palcnt) * COLORS_PER_PALETTE], 32);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], Shiny2TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[(15) * COLORS_PER_PALETTE], 32);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], Shiny2TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
         type1->isHidden = true;
         updateOAM(oamTop);
-
-        --oamIndex;
     }
     void animateShiny(int x,int y){
         static const int BYTES_PER_16_COLOR_TILE = 32;
@@ -1273,9 +1305,9 @@ namespace BATTLE{
                                               * (can be set in REG_DISPCNT) */
         static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX[0]);
 
-        SpriteInfo * type1Info = &spriteInfoTop[++oamIndex];
-        SpriteEntry * type1 = &oamTop->oamBuffer[oamIndex];
-        type1Info->oamId = oamIndex;
+        SpriteInfo * type1Info = &spriteInfoTop[SHINY_ANIM];
+        SpriteEntry * type1 = &oamTop->oamBuffer[SHINY_ANIM];
+        type1Info->oamId = SHINY_ANIM;
         type1Info->width = 64;
         type1Info->height = 64;
         type1Info->angle = 0;
@@ -1289,44 +1321,42 @@ namespace BATTLE{
         type1->shape = OBJSHAPE_SQUARE;
         type1->x = x;
         type1->size = OBJSIZE_64;
-        type1->gfxIndex = nextAvailableTileIdx;
+        type1->gfxIndex = PB_ANIM_TILES;
         type1->priority = OBJPRIORITY_0;
-        type1->palette = palcnt;
+        type1->palette = 15;
 
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[(palcnt) * COLORS_PER_PALETTE], 32);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], Shiny1TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[(15) * COLORS_PER_PALETTE], 32);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], Shiny1TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[(palcnt) * COLORS_PER_PALETTE], 32);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], Shiny2TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[(15) * COLORS_PER_PALETTE], 32);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], Shiny2TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[(palcnt) * COLORS_PER_PALETTE], 32);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], Shiny1TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[(15) * COLORS_PER_PALETTE], 32);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], Shiny1TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[(palcnt) * COLORS_PER_PALETTE], 32);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], Shiny2TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[(15) * COLORS_PER_PALETTE], 32);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], Shiny2TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[(palcnt) * COLORS_PER_PALETTE], 32);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], Shiny1TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[(15) * COLORS_PER_PALETTE], 32);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], Shiny1TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[(palcnt) * COLORS_PER_PALETTE], 32);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], Shiny2TilesLen);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[(15) * COLORS_PER_PALETTE], 32);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[PB_ANIM_TILES * OFFSET_MULTIPLIER], Shiny2TilesLen);
         updateOAM(oamTop);
         for(int i= 0; i< 2; ++i)
             swiWaitForVBlank();
         type1->isHidden = true;
         updateOAM(oamTop);
-
-        --oamIndex;
     }
 
 #define GENDER(a) (a.boxdata.isFemale? 147 : (a.boxdata.isGenderless ? ' ' : 141))
@@ -1334,6 +1364,8 @@ namespace BATTLE{
     void battle::switchOppPkmn(int newPok,int toSwitch){
         if((*this->opponent->pkmn_team)[acpokpos[newPok][1]].stats.acHP == 0)
             return;
+
+        init();
 
         consoleSelect(&Bottom);
         consoleClear();
@@ -1344,22 +1376,21 @@ namespace BATTLE{
                 trainerclassnames[this->opponent->trainer_class],this->opponent->Name);
             cust_font.print_string(buf,8,8,true);
         }        
-        for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i){
-            switch(this->acpoksts[acpokpos[i][1]][1]){
-            case KO:
-                oamTop->oamBuffer[11+i].palette--;
-                oamTop->oamBuffer[11+i].gfxIndex -= BattleBall1TilesLen / 32;
-                break;
-            case STS:
-                oamTop->oamBuffer[11+i].palette-=2;
-                oamTop->oamBuffer[11+i].gfxIndex -= BattleBall1TilesLen / 16;
-                break;
-            default:
-                break;
+        for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i)
+            if(i == newPok || i == toSwitch) {
+                switch(this->acpoksts[acpokpos[i][1]][1]){
+                case KO:
+                    oamTop->oamBuffer[OPP_PB_START+i].palette--;
+                    oamTop->oamBuffer[OPP_PB_START+i].gfxIndex -= BattleBall1TilesLen / 32;
+                    break;
+                case STS:
+                    oamTop->oamBuffer[OPP_PB_START+i].palette-=2;
+                    oamTop->oamBuffer[OPP_PB_START+i].gfxIndex -= BattleBall1TilesLen / 16;
+                    break;
+                default:
+                    break;
+                }
             }
-        }
-
-        updateOAM(oamTop);
 
         std::swap(acpokpos[newPok][1],acpokpos[toSwitch][1]);
 
@@ -1373,45 +1404,38 @@ namespace BATTLE{
         consoleSelect(&Top);
 
         if(toSwitch == 0){
-            oamIndex -= 16;
-            palcnt -= 5;
-            nextAvailableTileIdx -= (4)*(144);
+            oamIndex = OPP_PKMN_1_START;
+            palcnt   = OPP_PKMN_1_PAL;
+            nextAvailableTileIdx = OPP_PKMN_1_TILE;
 
-            oamTop->oamBuffer[12].isHidden = true;
+            oamTop->oamBuffer[OPP_PB_START + 1].isHidden = true;
             for(int i = 1; i <= 4; ++i)
-                oamTop->oamBuffer[oamIndex + i].isHidden = true;
+                oamTop->oamBuffer[OPP_PKMN_1_START + i].isHidden = true;
             updateOAM(oamTop);
 
-            oamIndex += 17;
-            palcnt += (1);
             animatePB(206,50); 
-            palcnt -= (1);
-            oamIndex -= 17;
 
-            oamTop->oamBuffer[12].isHidden = false;
+            oamTop->oamBuffer[OPP_PB_START + 1].isHidden = false;
 
             if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.SPEC,176,20,oamIndex,palcnt,nextAvailableTileIdx,false,
-                (*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny(),(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isFemale))
+                (*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny(),(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isFemale)){
+                oamIndex = OPP_PKMN_1_START;
+                palcnt   = OPP_PKMN_1_PAL;
+                nextAvailableTileIdx = OPP_PKMN_1_TILE;
                 loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.SPEC,176,20,oamIndex,palcnt,nextAvailableTileIdx,false,
                 (*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny(),!(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isFemale);
-
-            oamIndex += (12);
-            palcnt += (3);
-            nextAvailableTileIdx += (3)*(144);
-
+            }
+            for(int i = 1; i <= 4; ++i)
+                oamTop->oamBuffer[OPP_PKMN_1_START + i].isHidden = false;
             updateOAM(oamTop);
-
-            oamIndex += (1);
-            palcnt += (1);
+            
             if((*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny())
                 animateShiny(176+16,36);
-            oamIndex -= (1);
-            palcnt -= (1);
 
             displayHP(100,101 ,88,32,42,43,false);
             displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,42,43,false);      
-            oamTop->oamBuffer[12].x = 96;
-            oamTop->oamBuffer[12].y = 41;
+            oamTop->oamBuffer[OPP_PB_START + 1].x = 96;
+            oamTop->oamBuffer[OPP_PB_START + 1].y = 41;
             consoleSetWindow(&Top,0,5,20,2);
             consoleClear();
             printf("%10ls%c\n",(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[0][1]]));
@@ -1424,46 +1448,42 @@ namespace BATTLE{
         } 
         else
         {
-            oamTop->oamBuffer[11].isHidden = true;
+            oamTop->oamBuffer[OPP_PB_START].isHidden = true;
             updateOAM(oamTop);
             consoleSelect(&Top);
-            oamIndex -= (12);
-            palcnt -= (4);
-            nextAvailableTileIdx -= (3)*(144);
+            oamIndex = OPP_PKMN_2_START;
+            palcnt   = OPP_PKMN_2_PAL;
+            nextAvailableTileIdx = OPP_PKMN_2_TILE;
 
             for(int i = 1; i <= 4; ++i)
-                oamTop->oamBuffer[oamIndex + i].isHidden = true;
+                oamTop->oamBuffer[OPP_PKMN_2_START + i].isHidden = true;
             updateOAM(oamTop);
 
-            oamIndex += (13);
-            palcnt += (5);
             animatePB(142,34); 
-            oamIndex -= (13);
-            palcnt -= (6);
-            oamTop->oamBuffer[11].isHidden = false;
-
+            oamTop->oamBuffer[OPP_PB_START].isHidden = false;
 
             if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.SPEC,112,4,oamIndex,palcnt,nextAvailableTileIdx,false,
-                (*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny(),(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isFemale))
+                (*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny(),(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isFemale)){
+                oamIndex = OPP_PKMN_2_START;
+                palcnt   = OPP_PKMN_2_PAL;
+                nextAvailableTileIdx = OPP_PKMN_2_TILE;
                 loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.SPEC,112,4,oamIndex,palcnt,nextAvailableTileIdx,false,
                 (*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny(),!(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isFemale);
+            }
+            
+            for(int i = 1; i <= 4; ++i)
+                oamTop->oamBuffer[OPP_PKMN_2_START + i].isHidden = false;
+            updateOAM(oamTop);
 
-            oamIndex += (9);
-            palcnt += (3);
-            nextAvailableTileIdx += (2)*(144);
             if((*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny())
                 animateShiny(112+16,20);
-            oamIndex -= (9);
-            palcnt -= (3);
 
-            oamIndex += (8);
-            palcnt += (2);
             updateOAM(oamTop);
 
             displayHP(100,101,0,8,45,44,false);   
             displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,45,44,false); 
-            oamTop->oamBuffer[11].x = 8;
-            oamTop->oamBuffer[11].y = 17;
+            oamTop->oamBuffer[OPP_PB_START].x = 8;
+            oamTop->oamBuffer[OPP_PB_START].y = 17;
             consoleSetWindow(&Top,4,2,20,2);
             consoleClear();
             printf("%ls%c\nLv%d%4dKP",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[1][1]]),
@@ -1472,26 +1492,27 @@ namespace BATTLE{
 
         consoleSelect(&Bottom);
 
-        for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i){
-            oamTop->oamBuffer[11+i].x = -4+ 18*i;
-            oamTop->oamBuffer[11+i].y = -4;
-            oamTop->oamBuffer[11+i].isHidden = false;
-            switch(this->acpoksts[acpokpos[i][1]][1]){
-            case NA:
-                oamTop->oamBuffer[11+i].isHidden = true;
-                break;
-            case KO:
-                oamTop->oamBuffer[11+i].palette++;
-                oamTop->oamBuffer[11+i].gfxIndex += BattleBall1TilesLen / 32;
-                break;
-            case STS:
-                oamTop->oamBuffer[11+i].palette+=2;
-                oamTop->oamBuffer[11+i].gfxIndex += BattleBall1TilesLen / 16;
-                break;
-            default:
-                break;
+        for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i)
+            if(i == newPok || i == toSwitch){
+                oamTop->oamBuffer[OPP_PB_START+i].x = -4+ 18*i;
+                oamTop->oamBuffer[OPP_PB_START+i].y = -4;
+                oamTop->oamBuffer[OPP_PB_START+i].isHidden = false;
+                switch(this->acpoksts[acpokpos[i][1]][1]){
+                case NA:
+                    oamTop->oamBuffer[OPP_PB_START+i].isHidden = true;
+                    break;
+                case KO:
+                    oamTop->oamBuffer[OPP_PB_START+i].palette++;
+                    oamTop->oamBuffer[OPP_PB_START+i].gfxIndex += BattleBall1TilesLen / 32;
+                    break;
+                case STS:
+                    oamTop->oamBuffer[OPP_PB_START+i].palette+=2;
+                    oamTop->oamBuffer[OPP_PB_START+i].gfxIndex += BattleBall1TilesLen / 16;
+                    break;
+                default:
+                    break;
+                }
             }
-        }
         updateOAM(oamTop);
         for(int i= 0; i < 200; ++i)
             swiWaitForVBlank();
@@ -1511,23 +1532,24 @@ namespace BATTLE{
         if((*this->player->pkmn_team)[acpokpos[newPok][0]].stats.acHP == 0)
             return;
         init();
-        for(int i = 1 + (this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i){
-            oamTop->oamBuffer[5+i].x = 236 - 18*i;
-            oamTop->oamBuffer[5+i].y = 196 - 16;
-            oamTop->oamBuffer[5+i].isHidden = false;
-            switch(this->acpoksts[acpokpos[i][0]][0]){
-            case KO:
-                oamTop->oamBuffer[5+i].palette--;
-                oamTop->oamBuffer[5+i].gfxIndex -= BattleBall1TilesLen / 32;
-                break;
-            case STS:
-                oamTop->oamBuffer[5+i].palette-=2;
-                oamTop->oamBuffer[5+i].gfxIndex -= BattleBall1TilesLen / 16;
-                break;
-            default:
-                break;
+        for(int i = 1 + (this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i)
+            if(i == newPok || i == toSwitch){
+                oamTop->oamBuffer[OWN_PB_START+i].x = 236 - 18*i;
+                oamTop->oamBuffer[OWN_PB_START+i].y = 196 - 16;
+                oamTop->oamBuffer[OWN_PB_START+i].isHidden = false;
+                switch(this->acpoksts[acpokpos[i][0]][0]){
+                case KO:
+                    oamTop->oamBuffer[OWN_PB_START+i].palette--;
+                    oamTop->oamBuffer[OWN_PB_START+i].gfxIndex -= BattleBall1TilesLen / 32;
+                    break;
+                case STS:
+                    oamTop->oamBuffer[OWN_PB_START+i].palette-=2;
+                    oamTop->oamBuffer[OWN_PB_START+i].gfxIndex -= BattleBall1TilesLen / 16;
+                    break;
+                default:
+                    break;
+                }
             }
-        }
         updateOAM(oamTop);
         consoleSelect(&Bottom);
         consoleClear();
@@ -1550,33 +1572,26 @@ namespace BATTLE{
 
         consoleSelect(&Top);
         if(toSwitch == 0){
-            oamIndex -= 8;
-            palcnt -= 3;
-            nextAvailableTileIdx -= (2)*(144);
+            oamIndex = OWN_PKMN_1_START;
+            palcnt   = OWN_PKMN_1_PAL;
+            nextAvailableTileIdx = OWN_PKMN_1_TILE;
 
-            oamTop->oamBuffer[6].isHidden = true;
-            for(int i = 1; i <= 4; ++i)
-                oamTop->oamBuffer[oamIndex + i].isHidden = true;
+            oamTop->oamBuffer[OWN_PB_START + 1].isHidden = true;
+            for(int i = 0; i < 4; ++i)
+                oamTop->oamBuffer[OWN_PKMN_1_START + i].isHidden = true;
             updateOAM(oamTop);
 
-            oamIndex += 9;
-            palcnt += 4;
             animatePB(80,170);
-            oamIndex -= 9;
-            palcnt -= 4;            
 
-            oamTop->oamBuffer[6].isHidden = false;
 
             if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,-10,100,oamIndex,palcnt,nextAvailableTileIdx,false,
                 (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isFemale))
                 loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,-10,100,oamIndex,palcnt,nextAvailableTileIdx,false,
                 (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny(),!(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isFemale);
 
-            updateOAM(oamTop);
+            oamTop->oamBuffer[OWN_PB_START + 1].isHidden = false;
 
-            oamIndex += (4);
-            palcnt += (1);
-            nextAvailableTileIdx += (144);
+            updateOAM(oamTop);
 
             if((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny())
                 animateShiny(6,116);
@@ -1584,53 +1599,48 @@ namespace BATTLE{
             displayHP(100,101,256-96-28,192-32-8-32,42,49,false);
             displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,42,49,false);       
             displayEP(100,100,256-96-28,192-32-8-32,46,47,false);
-            oamTop->oamBuffer[6].x = 256-88-32+4;
-            oamTop->oamBuffer[6].y = 192-31-32;
+            oamTop->oamBuffer[OWN_PB_START +1].x = 256-88-32+4;
+            oamTop->oamBuffer[OWN_PB_START + 1].y = 192-31-32;
             consoleSetWindow(&Top,21,16,20,4);
             consoleClear();
             printf("%ls%c\nLv%d%4dKP",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[0][0]]),(*this->player->pkmn_team)[acpokpos[0][0]].Level,
                 (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP);
 
-
-            oamTop->oamBuffer[6].isHidden = oamTop->oamBuffer[2].isHidden = false;
+            //oamTop->oamBuffer[OWN_PB_START + 1].isHidden = oamTop->oamBuffer[2].isHidden = false;
             updateOAM(oamTop);
         } 
         else
         {
-            oamTop->oamBuffer[5].isHidden = true;
+            oamTop->oamBuffer[OWN_PB_START].isHidden = true;
             updateOAM(oamTop);
             consoleSelect(&Top);
-            oamIndex -= (4);
-            palcnt -= (2);
-            nextAvailableTileIdx -= (1)*(144);
+            oamIndex = OWN_PKMN_2_START;
+            palcnt   = OWN_PKMN_2_PAL;
+            nextAvailableTileIdx = OWN_PKMN_2_TILE;
 
-            for(int i = 1; i <= 4; ++i) //hide PKMN sprite
-                oamTop->oamBuffer[oamIndex + i].isHidden = true;
+            for(int i = 0; i < 4; ++i) //hide PKMN sprite
+                oamTop->oamBuffer[OWN_PKMN_2_START + i].isHidden = true;
             updateOAM(oamTop);
 
-            oamIndex += (5);
-            palcnt += 3;
             animatePB(142,34); 
-            oamIndex -= (5);
-            palcnt -= 3;
-            oamTop->oamBuffer[5].isHidden = false;
 
+            oamTop->oamBuffer[OWN_PB_START].isHidden = false;
 
             if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,50,120,oamIndex,palcnt,nextAvailableTileIdx,false,
                 (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isFemale))
                 loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,50,120,oamIndex,palcnt,nextAvailableTileIdx,false,
                 (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny(),!(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isFemale);
+
             if((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny())
                 animateShiny(50+16,136);
-
-
+            
             updateOAM(oamTop);
 
             displayHP(100,101,256-36,192-40,51,50,false);   
             displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,51,50,false);        
             displayEP(100,100,256-36,192-40,46,47,false);
-            oamTop->oamBuffer[5].x = 256-32+4;
-            oamTop->oamBuffer[5].y = 192-31;
+            oamTop->oamBuffer[OWN_PB_START].x = 256-32+4;
+            oamTop->oamBuffer[OWN_PB_START].y = 192-31;
             consoleSetWindow(&Top,16,20,20,5);
             consoleClear();
             printf("%10ls%c\n",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[1][0]]));
@@ -1641,30 +1651,31 @@ namespace BATTLE{
             printf("Lv%d%4dKP",(*this->player->pkmn_team)[acpokpos[1][0]].Level,
                 (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP);
 
-            oamTop->oamBuffer[5].isHidden = oamTop->oamBuffer[1].isHidden = false;
+            //oamTop->oamBuffer[5].isHidden = oamTop->oamBuffer[1].isHidden = false;
             updateOAM(oamTop);
         }
 
-        for(int i = 1 + (this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i){
-            oamTop->oamBuffer[5+i].x = 236 - 18*i;
-            oamTop->oamBuffer[5+i].y = 196 - 16;
-            oamTop->oamBuffer[5+i].isHidden = false;
-            switch(this->acpoksts[acpokpos[i][0]][0]){
-            case NA:
-                oamTop->oamBuffer[5+i].isHidden = true;
-                break;
-            case KO:
-                oamTop->oamBuffer[5+i].palette++;
-                oamTop->oamBuffer[5+i].gfxIndex += BattleBall1TilesLen / 32;
-                break;
-            case STS:
-                oamTop->oamBuffer[5+i].palette+=2;
-                oamTop->oamBuffer[5+i].gfxIndex += BattleBall1TilesLen / 16;
-                break;
-            default:
-                break;
+        for(int i = 1 + (this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i)
+            if(i == newPok || i == toSwitch){
+                oamTop->oamBuffer[OWN_PB_START+i].x = 236 - 18*i;
+                oamTop->oamBuffer[OWN_PB_START+i].y = 196 - 16;
+                oamTop->oamBuffer[OWN_PB_START+i].isHidden = false;
+                switch(this->acpoksts[acpokpos[i][0]][0]){
+                case NA:
+                    oamTop->oamBuffer[OWN_PB_START+i].isHidden = true;
+                    break;
+                case KO:
+                    oamTop->oamBuffer[OWN_PB_START+i].palette++;
+                    oamTop->oamBuffer[OWN_PB_START+i].gfxIndex += BattleBall1TilesLen / 32;
+                    break;
+                case STS:
+                    oamTop->oamBuffer[OWN_PB_START+i].palette+=2;
+                    oamTop->oamBuffer[OWN_PB_START+i].gfxIndex += BattleBall1TilesLen / 16;
+                    break;
+                default:
+                    break;
+                }
             }
-        }
 
         for(int i= 0; i < 100; ++i)
             swiWaitForVBlank();
@@ -1796,19 +1807,26 @@ namespace BATTLE{
 
         animatePB(206,50); 
 
-        oamTop->oamBuffer[4].isHidden = oamTop->oamBuffer[12].isHidden = false;
+        oamTop->oamBuffer[OPP_HP_1].isHidden = oamTop->oamBuffer[OPP_PB_START + 1].isHidden = false;
+        oamIndex = OPP_PKMN_1_START;
+        palcnt = OPP_PKMN_1_PAL;
+        nextAvailableTileIdx = OPP_PKMN_1_TILE;
 
         if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.SPEC,176,20,oamIndex,palcnt,nextAvailableTileIdx,false,
-            (*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny(),(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isFemale))
+            (*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny(),(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isFemale)){
+            oamIndex = OPP_PKMN_1_START;
+            palcnt = OPP_PKMN_1_PAL;
+            nextAvailableTileIdx = OPP_PKMN_1_TILE;
             loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.SPEC,176,20,oamIndex,palcnt,nextAvailableTileIdx,false,
             (*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny(),!(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isFemale);
+        }
         if((*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny())
             animateShiny(176+16,36);
 
         displayHP(100,101 ,88,32,44,45,false);
         displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,44,45,false);      
-        oamTop->oamBuffer[12].x = 96;
-        oamTop->oamBuffer[12].y = 41;
+        oamTop->oamBuffer[OPP_PB_START + 1].x = 96;
+        oamTop->oamBuffer[OPP_PB_START + 1].y = 41;
         consoleSetWindow(&Top,0,5,20,5);
 
         printf("%10ls%c\n",(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[0][1]]));
@@ -1820,7 +1838,7 @@ namespace BATTLE{
             (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP);
 
         if(this->battlemode == DOUBLE && this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO){
-            oamTop->oamBuffer[3].isHidden = oamTop->oamBuffer[11].isHidden = true;
+            oamTop->oamBuffer[OPP_HP_2].isHidden = oamTop->oamBuffer[OPP_PB_START].isHidden = true;
             updateOAM(oamTop);
             for(int i= 0; i < 80; ++i)
                 swiWaitForVBlank();
@@ -1831,46 +1849,48 @@ namespace BATTLE{
             consoleSelect(&Top);
 
             animatePB(142,34); 
-            oamTop->oamBuffer[3].isHidden = oamTop->oamBuffer[11].isHidden = false;
+            oamTop->oamBuffer[OPP_HP_2].isHidden = oamTop->oamBuffer[OPP_PB_START].isHidden = false;
+            oamIndex = OPP_PKMN_2_START;
+            palcnt = OPP_PKMN_2_PAL;
+            nextAvailableTileIdx = OPP_PKMN_2_TILE;
 
             if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.SPEC,112,4,oamIndex,palcnt,nextAvailableTileIdx,false,
-                (*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny(),(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isFemale))
+                (*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny(),(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isFemale)){                    
+                oamIndex = OPP_PKMN_2_START;
+                palcnt = OPP_PKMN_2_PAL;
+                nextAvailableTileIdx = OPP_PKMN_2_TILE;
                 loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.SPEC,112,4,oamIndex,palcnt,nextAvailableTileIdx,false,
                 (*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny(),!(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isFemale);
+            }
             if((*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny())
                 animateShiny(112+16,20);
 
 
             displayHP(100,101,0,8,42,43,false);   
             displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,42,43,false); 
-            oamTop->oamBuffer[11].x = 8;
-            oamTop->oamBuffer[11].y = 17;
+            oamTop->oamBuffer[OPP_PB_START].x = 8;
+            oamTop->oamBuffer[OPP_PB_START].y = 17;
             consoleSetWindow(&Top,4,2,20,5);
             printf("%ls%c\nLv%d%4dKP",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[1][1]]),
                 (*this->opponent->pkmn_team)[acpokpos[1][1]].Level, (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP);
         }
-        else{
-            oamIndex += 4;
-            palcnt++;
-            nextAvailableTileIdx += 144;
-        }
 
         consoleSelect(&Bottom);
         for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i){
-            oamTop->oamBuffer[11+i].x = -4+ 18*i;
-            oamTop->oamBuffer[11+i].y = -4;
-            oamTop->oamBuffer[11+i].isHidden = false;
+            oamTop->oamBuffer[OPP_PB_START+i].x = -4+ 18*i;
+            oamTop->oamBuffer[OPP_PB_START+i].y = -4;
+            oamTop->oamBuffer[OPP_PB_START+i].isHidden = false;
             switch(this->acpoksts[acpokpos[i][1]][1]){
             case NA:
-                oamTop->oamBuffer[11+i].isHidden = true;
+                oamTop->oamBuffer[OPP_PB_START+i].isHidden = true;
                 break;
             case KO:
-                oamTop->oamBuffer[11+i].palette++;
-                oamTop->oamBuffer[11+i].gfxIndex += BattleBall1TilesLen / 32;
+                oamTop->oamBuffer[OPP_PB_START+i].palette = PB_PAL_START + 1;
+                oamTop->oamBuffer[OPP_PB_START+i].gfxIndex += BattleBall1TilesLen / 32;
                 break;
             case STS:
-                oamTop->oamBuffer[11+i].palette+=2;
-                oamTop->oamBuffer[11+i].gfxIndex += BattleBall1TilesLen / 16;
+                oamTop->oamBuffer[OPP_PB_START+i].palette = PB_PAL_START + 2;
+                oamTop->oamBuffer[OPP_PB_START+i].gfxIndex += BattleBall1TilesLen / 16;
                 break;
             default:
                 break;
@@ -1910,25 +1930,32 @@ namespace BATTLE{
         consoleSelect(&Top);
 
         animatePB(20,150);
+        oamIndex = OWN_PKMN_1_START;
+        palcnt = OWN_PKMN_1_PAL;
+        nextAvailableTileIdx = OWN_PKMN_1_TILE;
         if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,-10,100,oamIndex,palcnt,nextAvailableTileIdx,false,
-            (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isFemale))
+            (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isFemale)){
+            oamIndex = OWN_PKMN_1_START;
+            palcnt = OWN_PKMN_1_PAL;
+            nextAvailableTileIdx = OWN_PKMN_1_TILE;
             loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,-10,100,oamIndex,palcnt,nextAvailableTileIdx,false,
             (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny(),!(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isFemale);
+        }
         if((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny())
             animateShiny(6,116);
 
         displayHP(100,101,256-96-28,192-32-8-32,48,49,false);
         displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,48,49,false);       
         displayEP(100,100,256-96-28,192-32-8-32,46,47,false);
-        oamTop->oamBuffer[6].x = 256-88-32+4;
-        oamTop->oamBuffer[6].y = 192-31-32;
+        oamTop->oamBuffer[OWN_PB_START + 1].x = 256-88-32+4;
+        oamTop->oamBuffer[OWN_PB_START + 1].y = 192-31-32;
         consoleSetWindow(&Top,21,16,20,5);
 
         printf("%ls%c\nLv%d%4dKP",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[0][0]]),(*this->player->pkmn_team)[acpokpos[0][0]].Level,
             (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP);
 
 
-        oamTop->oamBuffer[6].isHidden = oamTop->oamBuffer[2].isHidden = false;
+        oamTop->oamBuffer[OWN_PB_START + 1].isHidden = oamTop->oamBuffer[OWN_HP_1].isHidden = false;
         updateOAM(oamTop);
         for(int i= 0; i < 80; ++i)
             swiWaitForVBlank();
@@ -1941,22 +1968,30 @@ namespace BATTLE{
             consoleSelect(&Top);
 
             animatePB(80,170);
+            
+            oamIndex = OWN_PKMN_2_START;
+            palcnt = OWN_PKMN_2_PAL;
+            nextAvailableTileIdx = OWN_PKMN_2_TILE;
 
             if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,50,120,oamIndex,palcnt,nextAvailableTileIdx,false,
-                (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isFemale))
+                (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isFemale)){
+                oamIndex = OWN_PKMN_2_START;
+                palcnt = OWN_PKMN_2_PAL;
+                nextAvailableTileIdx = OWN_PKMN_2_TILE;
                 loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,50,120,oamIndex,palcnt,nextAvailableTileIdx,false,
                 (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny(),!(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isFemale);
+            }
             if((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny())
                 animateShiny(50+16,136);
 
-            oamTop->oamBuffer[5].isHidden = oamTop->oamBuffer[1].isHidden = false;
+            oamTop->oamBuffer[OWN_PB_START].isHidden = oamTop->oamBuffer[OWN_HP_2].isHidden = false;
             updateOAM(oamTop);
 
             displayHP(100,101,256-36,192-40,50,51,false);   
             displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,50,51,false);        
             displayEP(100,100,256-36,192-40,46,47,false);
-            oamTop->oamBuffer[5].x = 256-32+4;
-            oamTop->oamBuffer[5].y = 192-31;
+            oamTop->oamBuffer[OWN_PB_START].x = 256-32+4;
+            oamTop->oamBuffer[OWN_PB_START].y = 192-31;
             consoleSetWindow(&Top,16,20,20,5);
             printf("%10ls%c\n",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[1][0]]));
             if((*this->player->pkmn_team)[acpokpos[1][0]].Level < 10)
@@ -1967,27 +2002,22 @@ namespace BATTLE{
                 (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP);
 
         }
-        else{
-            oamIndex += 4;
-            palcnt++;
-            nextAvailableTileIdx += 144;
-        }
 
         for(int i = 1 + (this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i){
-            oamTop->oamBuffer[5+i].x = 236 - 18*i;
-            oamTop->oamBuffer[5+i].y = 196 - 16;
-            oamTop->oamBuffer[5+i].isHidden = false;
+            oamTop->oamBuffer[OWN_PB_START+i].x = 236 - 18*i;
+            oamTop->oamBuffer[OWN_PB_START+i].y = 196 - 16;
+            oamTop->oamBuffer[OWN_PB_START+i].isHidden = false;
             switch(this->acpoksts[acpokpos[i][0]][0]){
             case NA:
-                oamTop->oamBuffer[5+i].isHidden = true;
+                oamTop->oamBuffer[OWN_PB_START+i].isHidden = true;
                 break;
             case KO:
-                oamTop->oamBuffer[5+i].palette++;
-                oamTop->oamBuffer[5+i].gfxIndex += BattleBall1TilesLen / 32;
+                oamTop->oamBuffer[OWN_PB_START+i].palette = PB_PAL_START + 1;
+                oamTop->oamBuffer[OWN_PB_START+i].gfxIndex += BattleBall1TilesLen / 32;
                 break;
             case STS:
-                oamTop->oamBuffer[5+i].palette+=2;
-                oamTop->oamBuffer[5+i].gfxIndex += BattleBall1TilesLen / 16;
+                oamTop->oamBuffer[OWN_PB_START+i].palette = PB_PAL_START + 2;
+                oamTop->oamBuffer[OWN_PB_START+i].gfxIndex += BattleBall1TilesLen / 16;
                 break;
             default:
                 break;
@@ -2019,7 +2049,7 @@ namespace BATTLE{
                 swiWaitForVBlank();
         }
 
-        oamTop->oamBuffer[4].isHidden = oamTop->oamBuffer[12].isHidden = false;
+        //oamTop->oamBuffer[4].isHidden = oamTop->oamBuffer[12].isHidden = false;
 
         updateOAM(oamTop);
 
@@ -2029,6 +2059,35 @@ namespace BATTLE{
         updateOAMSub(oam);
         consoleSelect(&Bottom);
         consoleClear();
+    }
+
+    float volltreffer[5] = {0.0625,0.125,0.25,0.3333,0.5};
+    int calcDamage(const attack& atk, const POKEMON::PKMN& atg, const POKEMON::PKMN& def,int rndVal){
+        if(atk.HitType == attack::HitTypes::STAT)
+            return 0;
+        int atkval = (atk.HitType == attack::HitTypes::SPEC ? atg.stats.SAtk : atg.stats.Atk);
+        int defval = (atk.HitType == attack::HitTypes::SPEC ? def.stats.SDef : def.stats.Def);
+
+        int baseDmg = ((((2 * atg.Level) / 5 + 2) * atk.Base_Power * atkval) / defval) / 50 + 2;
+
+        POKEMON::PKMNDATA::PKMNDATA p1,p2;
+        POKEMON::PKMNDATA::getAll(atg.boxdata.SPEC,p1);
+        POKEMON::PKMNDATA::getAll(def.boxdata.SPEC,p2);
+
+        int vs = 1;
+        if(rndVal <= 15)
+            if(rand() / RAND_MAX <= volltreffer[vs])
+                baseDmg <<= 1;
+
+        baseDmg = (baseDmg * (100 - rndVal)) / 100;
+
+        if(atk.type == p1.Types[0] || atk.type == p1.Types[1])
+            baseDmg = (baseDmg * 3) / 2;
+
+        baseDmg = baseDmg * (getEffectiveness(atk.type,p2.Types[0]) * getEffectiveness(atk.type,p2.Types[1]));
+
+
+        return std::max(1,baseDmg);
     }
 
     int battle::start(int battle_back,Weather weather){
@@ -2173,7 +2232,6 @@ ACR:
                                         int trg = 0;
 
                                         //CHOOSE TARGET
-                                        printf("CHOSE ATK %i",(i-21)/2);
 
                                         ownAtk[0] = std::pair<int,int>((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2],trg);
                                         goto ATTACKCHOSEN;
@@ -2243,7 +2301,7 @@ ACR2:
                                 consoleClear();
 
                                 aprest = 0;
-                                for(int i= 0; i < 4; ++i)
+                                for(int i= 0; i < 4; ++i) 
                                     aprest += (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.AcPP[i];
                                 if(aprest == 0){
                                     clear();

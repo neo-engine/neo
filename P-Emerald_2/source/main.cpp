@@ -984,11 +984,11 @@ void showNewMap(int mapIdx) {
 bool left = false;
 void loadframe(SpriteInfo* si, int idx, int frame,bool big = false){
     char buf[50];
-    sprintf(buf,"Sprite_%i_%i",idx,frame);
+    sprintf(buf,"%i/%i",idx,frame);
     if(!big)
         loadSprite(si,"nitro://PICS/SPRITES/OW/",buf,64,16);
     else
-        loadSprite(si,"nitro://PICS/SPRITES/OW/",buf,128,16);
+        loadSprite(si,"nitro://PICS/SPRITES/OW/",buf,128,16); 
 }
 
 void animateHero(int dir,int frame,bool rundisable = false){
@@ -1322,7 +1322,7 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
 
     x += 10;
     y += 10; 
-
+     
     if(x < 0)
         return false;
     if(y < 0)

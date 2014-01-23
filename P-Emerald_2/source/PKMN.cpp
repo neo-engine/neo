@@ -1162,6 +1162,9 @@ namespace POKEMON{
             consoleSelect(Top);	
             consoleSetWindow(Top, 4,5,12,2);
 
+            if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),this->boxdata.isFemale,true))
+                loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),!this->boxdata.isFemale,true);
+
             int exptype = Pkmn_LevelUpTypes[this->boxdata.SPEC];
 
             printf("EP(%3i%%)\nKP(%3i%%)",(this->boxdata.exp-POKEMON::EXP[this->Level-1][exptype]) *100/(POKEMON::EXP[this->Level][exptype]-POKEMON::EXP[this->Level-1][exptype]),
@@ -1172,8 +1175,6 @@ namespace POKEMON{
             BATTLE::displayEP(100,101,46,80,99,100,false,59,62);   
             BATTLE::displayEP(0,(this->boxdata.exp-POKEMON::EXP[this->Level-1][exptype]) *100/(POKEMON::EXP[this->Level][exptype]-POKEMON::EXP[this->Level-1][exptype]),46,80,99,100,false,59,62); 
 
-            if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),this->boxdata.isFemale,true))
-                loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),!this->boxdata.isFemale,true);
         }
     }
     extern bool drawInfoSub(u16* layer,int PKMN);

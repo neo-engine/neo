@@ -7,10 +7,14 @@ namespace POKEMON{
 }
 class item;
 struct SpriteInfo;
+class attack;
+
 namespace BATTLE{
     void displayHP(int HPstart,int HP,int x,int y,int freecolor1,int freecolor2,bool delay,bool big = false); //HP in %
     void displayHP(int HPstart,int HP,int x,int y,int freecolor1,int freecolor2,bool delay,int innerR,int outerR); //HP in %
     void displayEP(int EPstart,int EP,int x,int y,int freecolor1,int freecolor2,bool delay,int innerR = 14,int outerR = 15);
+
+    int calcDamage(const attack& atk, const POKEMON::PKMN& atg, const POKEMON::PKMN& def,int rndVal);
 
     class battle_trainer{
     public:

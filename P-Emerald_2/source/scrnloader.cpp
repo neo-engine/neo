@@ -190,152 +190,152 @@ bool loadSpriteSub(SpriteInfo* spriteInfo,const char* Path, const char* Name,con
     return true;
 }
 
-bool loadPKMNSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX,
+bool loadPKMNSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX, 
                     const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny,bool female,bool flipx){
-                        static const int COLORS_PER_PALETTE = 16;
-                        static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                                              * (can be set in REG_DISPCNT) */
-                        static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
+    static const int COLORS_PER_PALETTE = 16;
+    static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
+                                          * (can be set in REG_DISPCNT) */
+    static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
 
-                        char pt[100];
-                        if(!female)
-                            sprintf(pt, "%sSprite_%d.raw",Path,pkmn_no);
-                        else
-                            sprintf(pt, "%sSprite_%df.raw",Path,pkmn_no);
-                        FILE* fd = fopen(pt,"rb");
+    char pt[100];
+    if(!female)
+        sprintf(pt, "%s%d/%d.raw",Path,pkmn_no,pkmn_no);
+    else
+        sprintf(pt, "%s%d/%df.raw",Path,pkmn_no,pkmn_no);
+    FILE* fd = fopen(pt,"rb");
 
-                        if(fd == 0){
-                            fclose(fd); 
-                            return false;
-                        }
-                        int PalCnt = 16;
-                        for(int i= 0; i< 16; ++i)
-                            TEMP_PAL[i] = 0;
-                        fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
-                        for(int i = 0; i< 96*96; ++i)
-                            TEMP[i] = 0;
-                        fread(TEMP,  sizeof(unsigned int),96*96, fd);
-                        fclose(fd);
-                        if(shiny){
-                            memset(pt,0,sizeof(pt));
-                            if(!female)
-                                sprintf(pt, "%sSprite_%ds.raw",Path,pkmn_no);
-                            else
-                                sprintf(pt, "%sSprite_%dsf.raw",Path,pkmn_no);
-                            fd = fopen(pt,"rb");
-                            for(int i= 0; i< 16; ++i)
-                                TEMP_PAL[i] = 0; 
-                            fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
-                            fclose(fd);
-                        }
-                        if(bottom){
-                            swiCopy(TEMP_PAL,&SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
-                            //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
-                        }else{
-                            swiCopy(TEMP_PAL,&SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
-                            //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
-                        }
-                        SpriteInfo * backInfo = &spriteInfo[++oamIndex];
-                        SpriteEntry * back = &oam->oamBuffer[oamIndex];
-                        backInfo->oamId = oamIndex;
-                        backInfo->width = 64;
-                        backInfo->height = 64;
-                        backInfo->angle = 0;
-                        backInfo->entry = back;
-                        back->y = posY;
-                        back->isRotateScale = false;
-                        back->blendMode = OBJMODE_NORMAL; 
-                        back->isMosaic = false;
-                        back->isHidden = false;
-                        back->colorMode = OBJCOLOR_16;
-                        back->shape = OBJSHAPE_SQUARE;
-                        back->x = flipx ? 32 + posX : posX;
-                        back->hFlip = flipx;
-                        back->size = OBJSIZE_64;
-                        back->gfxIndex = nextAvailableTileIdx;
-                        back->priority = OBJPRIORITY_0;
-                        back->palette = palcnt;
-                        if(bottom){
-                            swiCopy(TEMP,&SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
-                            //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-                        }else{
-                            swiCopy(TEMP,&SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
-                            //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-                        }
-                        nextAvailableTileIdx += 64;
+    if(fd == 0){
+        fclose(fd); 
+        return false;
+    }
+    int PalCnt = 16;
+    for(int i= 0; i< 16; ++i)
+        TEMP_PAL[i] = 0;
+    fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
+    for(int i = 0; i< 96*96; ++i)
+        TEMP[i] = 0;
+    fread(TEMP,  sizeof(unsigned int),96*96, fd);
+    fclose(fd);
+    if(shiny){
+        memset(pt,0,sizeof(pt));
+        if(!female)
+            sprintf(pt, "%s%d/%ds.raw",Path,pkmn_no,pkmn_no);
+        else
+            sprintf(pt, "%s%d/%dsf.raw",Path,pkmn_no,pkmn_no);
+        fd = fopen(pt,"rb");
+        for(int i= 0; i< 16; ++i)
+            TEMP_PAL[i] = 0; 
+        fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
+        fclose(fd);
+    }
+    if(bottom){
+        //swiCopy(TEMP_PAL,&SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
+    }else{
+        //swiCopy(TEMP_PAL,&SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
+    }
+    SpriteInfo * backInfo = &spriteInfo[++oamIndex];
+    SpriteEntry * back = &oam->oamBuffer[oamIndex];
+    backInfo->oamId = oamIndex;
+    backInfo->width = 64;
+    backInfo->height = 64;
+    backInfo->angle = 0;
+    backInfo->entry = back;
+    back->y = posY;
+    back->isRotateScale = false;
+    back->blendMode = OBJMODE_NORMAL; 
+    back->isMosaic = false;
+    back->isHidden = false;
+    back->colorMode = OBJCOLOR_16;
+    back->shape = OBJSHAPE_SQUARE;
+    back->x = flipx ? 32 + posX : posX;
+    back->hFlip = flipx;
+    back->size = OBJSIZE_64;
+    back->gfxIndex = nextAvailableTileIdx;
+    back->priority = OBJPRIORITY_0;
+    back->palette = palcnt;
+    if(bottom){
+        //swiCopy(TEMP,&SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+    }else{
+        //swiCopy(TEMP,&SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
+        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+    }
+    nextAvailableTileIdx += 64;
 
-                        backInfo = &spriteInfo[++oamIndex];
-                        back = &oam->oamBuffer[oamIndex];
-                        backInfo->oamId = oamIndex;
-                        backInfo->width = 32;
-                        backInfo->height = 64;
-                        backInfo->angle = 0;
-                        backInfo->entry = back;
-                        back->y = posY;
-                        back->isRotateScale = false;
-                        back->blendMode = OBJMODE_NORMAL;
-                        back->isMosaic = false;
-                        back->isHidden = false;
-                        back->colorMode = OBJCOLOR_16;
-                        back->shape = OBJSHAPE_TALL;
-                        back->x = flipx ?  posX : 64 +posX;
-                        back->hFlip = flipx;
-                        back->size = OBJSIZE_64;
-                        back->gfxIndex = nextAvailableTileIdx;
-                        back->priority = OBJPRIORITY_0;
-                        back->palette = palcnt; 
-                        nextAvailableTileIdx += 32;
+    backInfo = &spriteInfo[++oamIndex];
+    back = &oam->oamBuffer[oamIndex];
+    backInfo->oamId = oamIndex;
+    backInfo->width = 32;
+    backInfo->height = 64;
+    backInfo->angle = 0;
+    backInfo->entry = back;
+    back->y = posY;
+    back->isRotateScale = false;
+    back->blendMode = OBJMODE_NORMAL;
+    back->isMosaic = false;
+    back->isHidden = false;
+    back->colorMode = OBJCOLOR_16;
+    back->shape = OBJSHAPE_TALL;
+    back->x = flipx ?  posX : 64 +posX;
+    back->hFlip = flipx;
+    back->size = OBJSIZE_64;
+    back->gfxIndex = nextAvailableTileIdx;
+    back->priority = OBJPRIORITY_0;
+    back->palette = palcnt; 
+    nextAvailableTileIdx += 32;
 
-                        backInfo = &spriteInfo[++oamIndex];
-                        back = &oam->oamBuffer[oamIndex];
-                        backInfo->oamId = oamIndex;
-                        backInfo->width = 64;
-                        backInfo->height = 32;
-                        backInfo->angle = 0;
-                        backInfo->entry = back;
-                        back->y = posY + 64;
-                        back->isRotateScale = false;
-                        back->blendMode = OBJMODE_NORMAL;
-                        back->isMosaic = false;
-                        back->isHidden = false;
-                        back->colorMode = OBJCOLOR_16;
-                        back->shape = OBJSHAPE_WIDE;
-                        back->x = flipx ? 32 + posX : posX;
-                        back->hFlip = flipx;
-                        back->size = OBJSIZE_64;
-                        back->gfxIndex = nextAvailableTileIdx;
-                        back->priority = OBJPRIORITY_0;
-                        back->palette = palcnt; 
-                        nextAvailableTileIdx += 32;
+    backInfo = &spriteInfo[++oamIndex];
+    back = &oam->oamBuffer[oamIndex];
+    backInfo->oamId = oamIndex;
+    backInfo->width = 64;
+    backInfo->height = 32;
+    backInfo->angle = 0;
+    backInfo->entry = back;
+    back->y = posY + 64;
+    back->isRotateScale = false;
+    back->blendMode = OBJMODE_NORMAL;
+    back->isMosaic = false;
+    back->isHidden = false;
+    back->colorMode = OBJCOLOR_16;
+    back->shape = OBJSHAPE_WIDE;
+    back->x = flipx ? 32 + posX : posX;
+    back->hFlip = flipx;
+    back->size = OBJSIZE_64;
+    back->gfxIndex = nextAvailableTileIdx;
+    back->priority = OBJPRIORITY_0;
+    back->palette = palcnt; 
+    nextAvailableTileIdx += 32;
 
-                        backInfo = &spriteInfo[++oamIndex];
-                        back = &oam->oamBuffer[oamIndex];
-                        backInfo->oamId = oamIndex;  
-                        backInfo->width = 32; 
-                        backInfo->height = 32;
-                        backInfo->angle = 0;
-                        backInfo->entry = back;
-                        back->y = posY + 64;
-                        back->isRotateScale = false;
-                        back->blendMode = OBJMODE_NORMAL;
-                        back->isMosaic = false;
-                        back->isHidden = false;
-                        back->colorMode = OBJCOLOR_16;
-                        back->shape = OBJSHAPE_SQUARE;
-                        back->x = flipx ?  posX : 64 +posX;
-                        back->hFlip = flipx;
-                        back->size = OBJSIZE_32;
-                        back->gfxIndex = nextAvailableTileIdx;
-                        back->priority = OBJPRIORITY_0;
-                        back->palette = palcnt;
-                        nextAvailableTileIdx += 16;
+    backInfo = &spriteInfo[++oamIndex];
+    back = &oam->oamBuffer[oamIndex];
+    backInfo->oamId = oamIndex;  
+    backInfo->width = 32; 
+    backInfo->height = 32;
+    backInfo->angle = 0;
+    backInfo->entry = back;
+    back->y = posY + 64;
+    back->isRotateScale = false;
+    back->blendMode = OBJMODE_NORMAL;
+    back->isMosaic = false;
+    back->isHidden = false;
+    back->colorMode = OBJCOLOR_16;
+    back->shape = OBJSHAPE_SQUARE;
+    back->x = flipx ?  posX : 64 +posX;
+    back->hFlip = flipx;
+    back->size = OBJSIZE_32;
+    back->gfxIndex = nextAvailableTileIdx;
+    back->priority = OBJPRIORITY_0;
+    back->palette = palcnt;
+    nextAvailableTileIdx += 16;
 
-                        ++palcnt;
-                        if(bottom)
-                            updateOAMSub(oam);
-                        else
-                            updateOAM(oam);
-                        return true;
+    ++palcnt;
+    if(bottom)
+        updateOAMSub(oam);
+    else
+        updateOAM(oam);
+    return true;
 }
 bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX,
                        const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny,bool female,bool flipx){
@@ -346,9 +346,9 @@ bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,co
 
                            char pt[100];
                            if(!female)
-                               sprintf(pt, "%sSprite_%d.raw",Path,pkmn_no);
+                               sprintf(pt, "%s%d/%d.raw",Path,pkmn_no,pkmn_no);
                            else
-                               sprintf(pt, "%sSprite_%df.raw",Path,pkmn_no);
+                               sprintf(pt, "%s%d/%df.raw",Path,pkmn_no,pkmn_no);
                            FILE* fd = fopen(pt,"rb");
 
                            if(fd == 0){
@@ -366,9 +366,9 @@ bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,co
                            if(shiny){
                                memset(pt,0,sizeof(pt));
                                if(!female)
-                                   sprintf(pt, "%sSprite_%ds.raw",Path,pkmn_no);
+                                   sprintf(pt, "%s%d/%ds.raw",Path,pkmn_no,pkmn_no);
                                else
-                                   sprintf(pt, "%sSprite_%dsf.raw",Path,pkmn_no);
+                                   sprintf(pt, "%s%d/%dsf.raw",Path,pkmn_no,pkmn_no);
                                fd = fopen(pt,"rb");
                                for(int i= 0; i< 16; ++i)
                                    TEMP_PAL[i] = 0; 
@@ -1644,9 +1644,9 @@ void drawPKMNIcon(OAMTable* oam,SpriteInfo* spriteInfo,const int& pkmn_no,const 
                       Item->x = posX;
                       Item->y = posY;
                       char pt[100];
-                      sprintf(pt, "Icon_%d",pkmn_no);
+                      sprintf(pt, "%d/Icon_%d",pkmn_no,pkmn_no);
                       if(subScreen){
-                          if(!loadSpriteSub(ItemInfo,"nitro:/PICS/ICONS/",pt,128,16)){
+                          if(!loadSpriteSub(ItemInfo,"nitro:/PICS/SPRITES/PKMN/",pt,128,16)){
                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
                                   NoItemPal,
                                   &SPRITE_PALETTE_SUB[palcnt * 16],
@@ -1658,7 +1658,7 @@ void drawPKMNIcon(OAMTable* oam,SpriteInfo* spriteInfo,const int& pkmn_no,const 
                           }
                       }
                       else{
-                          if(!loadSprite(ItemInfo,"nitro:/PICS/ICONS/",pt,128,16)){
+                          if(!loadSprite(ItemInfo,"nitro:/PICS/SPRITES/PKMN/",pt,128,16)){
                               dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
                                   NoItemPal,
                                   &SPRITE_PALETTE[palcnt * 16],
@@ -2742,6 +2742,13 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
         loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","DexTop");
         if(page == 2)
             memset(bgGetGfxPtr(bg3)+7168,1,256*192-14336);
+
+        cust_font.set_color(0,0);
+        cust_font.set_color(251,1);
+        cust_font.set_color(252,2);
+        BG_PALETTE[251] = RGB15(3,3,3);
+        BG_PALETTE[252] = RGB15(31,31,31);
+
         if(SAV.inDex[pkmn - 1]){
             BG_PALETTE[0] = POKEMON::PKMNDATA::getColor(acpkmndata.Types[0]);
 
@@ -2758,13 +2765,17 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
             if(acpkmndata.Types[0] != acpkmndata.Types[1])
                 drawTypeIcon(oamTop,spriteInfoTop,a,b,c,acpkmndata.Types[1],65,35,false);
             updateOAM(oamTop);
-            printf("\n    Du hast %i dieser PKMN.",box_of_st_pkmn[pkmn-1].size());
-            printf("\n\n     %s - %s",POKEMON::PKMNDATA::getDisplayName(pkmn),POKEMON::PKMNDATA::getSpecies(pkmn));
+            printf("\n    Du hast %i dieser PKMN.\n\n",box_of_st_pkmn[pkmn-1].size());
+            char buf[50];
+            sprintf(buf,"%s - %s",POKEMON::PKMNDATA::getDisplayName(pkmn),POKEMON::PKMNDATA::getSpecies(pkmn));
+            cust_font.print_string(buf,36,20,false);
             printf("\n\n %03i",pkmn);
         }
         else{
-            printf("\n    Keine Daten vorhanden."); 
-            printf("\n\n     ???????????? - %s",POKEMON::PKMNDATA::getSpecies(0));
+            printf("\n    Keine Daten vorhanden.\n\n");
+            char buf[50]; 
+            sprintf(buf,"???????????? - %s",POKEMON::PKMNDATA::getSpecies(0));
+            cust_font.print_string(buf,36,20,false);
             printf("\n\n %03i",pkmn);
         }
     }
@@ -2778,7 +2789,7 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
                 //font::putrec(17 + 40 * i,std::min(103, 56 + acpkmndata.Bases[i] / 3),(6* (acpkmndata.Bases[i] % 3)) + 16 + 40 * i,std::min(103, 58 + acpkmndata.Bases[i] / 3),statColor[i],false);
             }
             printf("\n\n  KP   ANG  DEF  SAN  SDF  INT");
-            printf("\n\n\n\n\n\n\n GW %5.1fkg GR %6.1fm\n\n", 42 / 10.0, 4200/ 10.0);
+            printf("\n\n\n\n\n\n\n GW %5.1fkg GR %6.1fm\n\n", 4200 / 10.0, 420/ 10.0);
             consoleSetWindow(&Top, 1,16,30,24);
             printf(POKEMON::PKMNDATA::getDexEntry(pkmn));
         }
@@ -2866,9 +2877,9 @@ void scrnloader::run_dex(int num){
         updateTime();
         swiWaitForVBlank();
         updateOAMSub(oam);
-        scanKeys();
         touchRead(&t);
-        int pressed = keysUp(),held = keysHeld();
+        scanKeys();
+        int pressed = keysDown(), up = keysUp(), held = keysHeld();
         if ( (t.px>224 && t.py>164))
         {  
             while((t.px>224 && t.py>164))
@@ -2884,15 +2895,11 @@ void scrnloader::run_dex(int num){
             consoleClear();
             break;
         }
-        else if((pressed & KEY_DOWN)){
-            while(1)
-            {
-                if(keysUp() & KEY_DOWN)
-                    break;
-                swiWaitForVBlank();
-                updateTime();
-                scanKeys();
-            }
+        else if((pressed & KEY_DOWN) || ((held & ~up) & KEY_DOWN)){
+            scanKeys();
+            if(keysUp() & KEY_DOWN)
+                continue;
+            swiWaitForVBlank();
             o2=oamInd;p2=palcnt;t2=tilecnt;
             acNum = (acNum + 1) % maxn;
             for(int i = (acNum + maxn - 3)%maxn,j = 0; j < 5; i = (i+1)%maxn,++j)
@@ -2900,16 +2907,13 @@ void scrnloader::run_dex(int num){
             loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
                 else
                     drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
+            continue;
         }
-        else if((pressed & KEY_UP)){
-            while(1)
-            {
-                if(keysUp() & KEY_UP)
-                    break;
-                scanKeys();
-                swiWaitForVBlank();
-                updateTime();
-            }
+        else if((pressed & KEY_UP) || ((held & ~up) & KEY_UP)){
+            scanKeys();
+            if(keysUp() & KEY_UP)
+                continue;
+            swiWaitForVBlank();
             o2=oamInd;p2=palcnt;t2=tilecnt;
             acNum = (acNum + maxn - 1) % maxn;
             for(int i = (acNum + maxn - 3)%maxn,j = 0; j < 5; i = (i+1)%maxn,++j)
@@ -2917,16 +2921,13 @@ void scrnloader::run_dex(int num){
             loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
                 else
                     drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
+            continue;
         }
-        else if((pressed & KEY_R)){
-            while(1)
-            {
-                if(keysUp() & KEY_R)
-                    break;
-                swiWaitForVBlank();
-                updateTime();
-                scanKeys();
-            }
+        else if((pressed & KEY_R) || ((held & ~up) & KEY_R)){
+            scanKeys();
+            if(keysUp() & KEY_R)
+                continue;
+            swiWaitForVBlank();
             o2=oamInd;p2=palcnt;t2=tilecnt;
             acNum = (acNum + 15) % maxn;
             for(int i = (acNum + maxn - 3)%maxn,j = 0; j < 5; i = (i+1)%maxn,++j)
@@ -2934,16 +2935,13 @@ void scrnloader::run_dex(int num){
             loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
                 else
                     drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
+            continue;
         }
-        else if((pressed & KEY_L)){
-            while(1)
-            {
-                if(keysUp() & KEY_L)
-                    break;
-                scanKeys();
-                swiWaitForVBlank();
-                updateTime();
-            }
+        else if((pressed & KEY_L) || ((held & ~up) & KEY_L)){
+            scanKeys();
+            if(keysUp() & KEY_L)
+                continue;
+            swiWaitForVBlank();
             o2=oamInd;p2=palcnt;t2=tilecnt;
             acNum = (acNum + maxn - 15) % maxn;
             for(int i = (acNum + maxn - 3)%maxn,j = 0; j < 5; i = (i+1)%maxn,++j)
@@ -2951,6 +2949,7 @@ void scrnloader::run_dex(int num){
             loadPKMNSprite(oam,spriteInfo,"nitro:/PICS/SPRITES/PKMN/",SAV.inDex[i]?i + 1:0,dexsppos[0][8]+16,dexsppos[1][8]+16,o2,p2,t2,true); continue;}
                 else
                     drawPKMNIcon(oam,spriteInfo,SAV.inDex[i]?i + 1:0,dexsppos[0][j],dexsppos[1][j],o2,p2,t2,true);
+            continue;
         }
         else if((pressed & KEY_LEFT)){
             while(1)
