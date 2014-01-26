@@ -526,7 +526,7 @@ namespace POKEMON{
 
     PKMNDATA::PKMNDATA data;
 
-    PKMN::BOX_PKMN::BOX_PKMN(char* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
+    PKMN::BOX_PKMN::BOX_PKMN(u16* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
         bool OTFemale,bool Cloned,bool Shiny,bool h_a,bool fatef ,bool _isEgg,short gPlace,char BALL, char Prus)
     {	
         PKMNDATA::getAll(SPE,data);
@@ -637,7 +637,7 @@ namespace POKEMON{
         this->HGSSBall = 0;
 
     }
-    PKMN::PKMN(char* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
+    PKMN::PKMN(u16* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
         bool OTFemale,bool Cloned,bool Shiny,bool h_a = false,bool fatef = false,bool _isEgg = false,short gPlace = 0,char BALL = 0, char Prus = 0)
         :boxdata(Attacks,SPE,N,level,ID_,SID_,ot,OTFemale,Cloned,Shiny,h_a,fatef,_isEgg,gPlace,BALL,Prus),Level(level)
     {	

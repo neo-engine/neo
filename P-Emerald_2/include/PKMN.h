@@ -340,7 +340,7 @@ namespace POKEMON{
             }
 
             BOX_PKMN(){}
-            BOX_PKMN(char* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
+            BOX_PKMN(u16* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
                 bool OTFemale,bool Cloned,bool Shiny,bool h_a = false,bool fatef = false,bool _isEgg = false,short gPlace = 0,char BALL = 0, char Prus = 0);
 
             ~BOX_PKMN() {}
@@ -376,7 +376,7 @@ namespace POKEMON{
         }stats;
 
         PKMN(){}
-        PKMN(char* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
+        PKMN(u16* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
             bool OTFemale,bool Cloned,bool Shiny,bool h_a,bool fatef,bool _isEgg,short gPlace,char BALL, char Prus);
         //PKMN(const PKMN& pkmn){
         //    this->boxdata = pkmn.boxdata;

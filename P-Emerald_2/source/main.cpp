@@ -1931,13 +1931,13 @@ OUT:
             case 0:
                 {
                     SAV.PKMN_team.clear();
-                    char A []= {1,2,3,4};
+                    u16 A []= {1,2,3,4};
                     for(int i = 0;i<6;++i)
                     {
-                        A[0] = 5 + HILFSCOUNTER % 22;
-                        A[1] = 5 + (HILFSCOUNTER+6) % 22;
-                        A[2] = 5 + (HILFSCOUNTER+12) % 22;
-                        A[3] = 5 + (HILFSCOUNTER+18) % 22;
+                        A[0] =  57;
+                        A[1] = 19;
+                        A[2] = 431;
+                        A[3] = 432;
                         POKEMON::PKMN a(A,HILFSCOUNTER,0,
                             1+rand()%100,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;
@@ -1972,7 +1972,7 @@ OUT:
                 BATTLE::battle_trainer me("TEST",0,0,0,0,&SAV.PKMN_team,0);
                 std::vector<POKEMON::PKMN> cpy;
 
-                char A []= {1,2,3,4};
+                u16 A []= {1,2,3,4};
                 for(int i = 0;i<6;++i)
                 {
                     A[0] = HILFSCOUNTER % 10;
