@@ -143,6 +143,9 @@ namespace POKEMON{
             short EVYield[6];
             short EXPYield;
             short formecnt;
+            short size;
+            short weight;
+            short expType;
         };
         Type getType(int pkmnind,int type);
         short getBase(int pkmnind,int base);
@@ -160,7 +163,6 @@ namespace POKEMON{
     }
 
     extern double NatMod[25][5];
-    extern LevelUp_Type Pkmn_LevelUpTypes[669];
     extern char Pkmn_Abilities[669][4];
     extern char Pkmn_SafariCatchRate[669];
     extern Color_Type Pkmn_Color[669];

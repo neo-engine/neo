@@ -2755,7 +2755,7 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
             bool isFixed = (acpkmndata.gender == POKEMON::GENDERLESS) || (acpkmndata.gender == POKEMON::MALE) || (acpkmndata.gender == POKEMON::FEMALE);
             forme %= acpkmndata.formecnt ? ((isFixed ? 1 : 2)*acpkmndata.formecnt) : 2;
             newformepkmn = acpkmndata.formecnt ? POKEMON::PKMNDATA::getForme(pkmn,forme/(isFixed ? 1 : 2) ,0): pkmn;
-            acG = acpkmndata.gender;
+            acG = acpkmndata.gender;            
             if(acpkmndata.formecnt)
                 POKEMON::PKMNDATA::getAll(newformepkmn,acpkmndata);
 
@@ -2767,7 +2767,8 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
             updateOAM(oamTop);
             printf("\n    Du hast %i dieser PKMN.\n\n",box_of_st_pkmn[pkmn-1].size());
             char buf[50];
-            sprintf(buf,"%s - %s",POKEMON::PKMNDATA::getDisplayName(pkmn),POKEMON::PKMNDATA::getSpecies(pkmn));
+            sprintf(buf,"%s",POKEMON::PKMNDATA::getDisplayName(pkmn));
+            sprintf(buf,"%s - %s",buf,POKEMON::PKMNDATA::getSpecies(pkmn));
             cust_font.print_string(buf,36,20,false);
             printf("\n\n %03i",pkmn);
         }
@@ -2788,14 +2789,22 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
                 font::putrec(19 + 40 * i,std::max(56, 102- acpkmndata.Bases[i] / 3),37 + 40 * i,102,false,true);
                 //font::putrec(17 + 40 * i,std::min(103, 56 + acpkmndata.Bases[i] / 3),(6* (acpkmndata.Bases[i] % 3)) + 16 + 40 * i,std::min(103, 58 + acpkmndata.Bases[i] / 3),statColor[i],false);
             }
-            printf("\n\n  KP   ANG  DEF  SAN  SDF  INT");
-            printf("\n\n\n\n\n\n\n GW %5.1fkg GR %6.1fm\n\n", 4200 / 10.0, 420/ 10.0);
+            printf("\n\n  KP   ANG  DEF  SAN  SDF  INT\n\n\n\n\n\n\n\n\n");
+            char buf[50]; 
+            sprintf(buf,"GW.  %5.1fkg", acpkmndata.weight / 10.0);
+            cust_font.print_string(buf,10,109,false);
+            sprintf(buf,"GR.  %6.1fm", acpkmndata.size / 10.0);
+            cust_font.print_string(buf,100,109,false);
             consoleSetWindow(&Top, 1,16,30,24);
             printf(POKEMON::PKMNDATA::getDexEntry(pkmn));
         }
         else{
-            printf("\n\n  KP   ANG  DEF  SAN  SDF  INT");
-            printf("\n\n\n\n\n\n\n GW ???.?kg GR ???.?m\n");
+            printf("\n\n  KP   ANG  DEF  SAN  SDF  INT\n\n\n\n\n\n\n\n\n");
+            char buf[50]; 
+            sprintf(buf,"GW.  ???.?kg", acpkmndata.weight / 10.0);
+            cust_font.print_string(buf,10,109,false);
+            sprintf(buf,"GR.  ???.?m", acpkmndata.size / 10.0);
+            cust_font.print_string(buf,100,109,false);
             consoleSetWindow(&Top, 1,16,30,24); 
             printf(POKEMON::PKMNDATA::getDexEntry(0));
         }

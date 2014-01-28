@@ -13,7 +13,7 @@
 
 const char ITEM_PATH[] = "nitro:/ITEMS/";
 
-std::string readString(FILE* fd){
+std::string readString(FILE* fd, bool _new ){
     std::string ret = "";
     char ac; 
     while((ac= fgetc(fd)) == '\n' || ac == '\r');
@@ -21,28 +21,32 @@ std::string readString(FILE* fd){
         return ret;
     else ret += ac;
     while(((ac = fgetc(fd)) != '*')){
-        if(ac == 'ä')
-            ret += '\x84';
-        else if(ac == 'Ä')
-            ret += '\x8E';
-        else if(ac == 'ü')
-            ret += '\x81';
-        else if(ac == 'Ü')
-            ret += '\x9A';
-        else if(ac == 'ö')
-            ret += '\x94';
-        else if(ac == 'Ö')
-            ret += '\x99';
-        else if(ac == 'ß')
-            ret += '\x9D';
-        else if(ac == 'é')
-            ret += '\x82';
+        if(!_new){
+            if(ac == 'ä')
+                ret += '\x84';
+            else if(ac == 'Ä')
+                ret += '\x8E';
+            else if(ac == 'ü')
+                ret += '\x81';
+            else if(ac == 'Ü')
+                ret += '\x9A';
+            else if(ac == 'ö')
+                ret += '\x94';
+            else if(ac == 'Ö')
+                ret += '\x99';
+            else if(ac == 'ß')
+                ret += '\x9D';
+            else if(ac == 'é')
+                ret += '\x82';
+            else
+                ret += ac;
+        }
         else
             ret += ac;
     }
     return ret;
 }
-std::wstring readWString(FILE* fd){
+std::wstring readWString(FILE* fd, bool _new ){
     std::wstring ret = L"";
     char ac; 
     while((ac= fgetc(fd)) == '\n' || ac == '\r');
@@ -50,22 +54,26 @@ std::wstring readWString(FILE* fd){
         return ret;
     else ret += ac;
     while(((ac = fgetc(fd)) != '*')){
-        if(ac == 'ä')
-            ret += '\x84';
-        else if(ac == 'Ä')
-            ret += '\x8E';
-        else if(ac == 'ü')
-            ret += '\x81';
-        else if(ac == 'Ü')
-            ret += '\x9A';
-        else if(ac == 'ö')
-            ret += '\x94';
-        else if(ac == 'Ö')
-            ret += '\x99';
-        else if(ac == 'ß')
-            ret += '\x9D';
-        else if(ac == 'é')
-            ret += '\x82';
+        if(!_new){
+            if(ac == 'ä')
+                ret += '\x84';
+            else if(ac == 'Ä')
+                ret += '\x8E';
+            else if(ac == 'ü')
+                ret += '\x81';
+            else if(ac == 'Ü')
+                ret += '\x9A';
+            else if(ac == 'ö')
+                ret += '\x94';
+            else if(ac == 'Ö')
+                ret += '\x99';
+            else if(ac == 'ß')
+                ret += '\x9D';
+            else if(ac == 'é')
+                ret += '\x82';
+            else
+                ret += ac;
+        }
         else
             ret += ac;
     }
@@ -108,9 +116,9 @@ bool berry::_load(){
     //this->effekt = item::EFFEKT(ac);
     //fscanf(f,"%i\n",&(this->price));
     fscanf(f,"%i",&ac);
-    /*this->displayName = */readString(f);
-    /*this->dscrpt = "  "+ */readString(f);
-    /*this->effekt_script = */readString(f);
+    /*this->displayName = */readString(f,false);
+    /*this->dscrpt = "  "+ */readString(f,false);
+    /*this->effekt_script = */readString(f,false);
 
     fscanf(f,"%hi",&(this->size));
     fscanf(f,"%i",&ac);
@@ -135,8 +143,8 @@ std::string item::getDescription(){
     int ac;
     fscanf(f,"%i",&ac);
     fscanf(f,"%i\n",&ac);
-    std::string s = readString(f);
-    s = readString(f);
+    std::string s = readString(f,false);
+    s = readString(f,false);
     fclose(f);
     return s;
 }
@@ -148,7 +156,7 @@ std::string item::getDisplayName(){
     int ac;
     fscanf(f,"%i",&ac);
     fscanf(f,"%i\n",&ac);
-    std::string s = readString(f);
+    std::string s = readString(f,false);
     fclose(f);
     return s;
 }
@@ -188,9 +196,9 @@ std::string berry::getDescription2(){
     //this->effekt = item::EFFEKT(ac);
     //fscanf(f,"%i\n",&(this->price));
     fscanf(f,"%i",&ac);
-    /*this->displayName = */readString(f);
-    /*this->dscrpt = "  "+ */readString(f);
-    /*this->effekt_script = */readString(f);
+    /*this->displayName = */readString(f,false);
+    /*this->dscrpt = "  "+ */readString(f,false);
+    /*this->effekt_script = */readString(f,false);
 
     fscanf(f,"%hi",&(ac));
     fscanf(f,"%i",&ac);
@@ -204,7 +212,7 @@ std::string berry::getDescription2(){
     fscanf(f,"%hhu",&(ac));
     fscanf(f,"%hhu\n",&(ac));
 
-    std::string s = readString(f);
+    std::string s = readString(f,false);
     fclose(f);
     return s;
 }
@@ -219,9 +227,9 @@ std::string item::getShortDescription(){
     //this->effekt = item::EFFEKT(ac);
     //fscanf(f,"%i\n",&(this->price));
     fscanf(f,"%i",&ac);
-    /*this->displayName = */readString(f);
-    /*this->dscrpt = "  "+ */readString(f);
-    /*this->effekt_script = */readString(f);
+    /*this->displayName = */readString(f,false);
+    /*this->dscrpt = "  "+ */readString(f,false);
+    /*this->effekt_script = */readString(f,false);
 
     fscanf(f,"%hi",&(ac));
     fscanf(f,"%i",&ac);
@@ -235,8 +243,8 @@ std::string item::getShortDescription(){
     fscanf(f,"%hhu",&(ac));
     fscanf(f,"%hhu\n",&(ac));
 
-    readString(f);
-    std::string s = readString(f);
+    readString(f,false);
+    std::string s = readString(f,false);
     fclose(f);
     return s;
 }

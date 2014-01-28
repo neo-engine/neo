@@ -16,8 +16,8 @@
 #include <nds.h>
 #include <vector>
 
-extern std::string readString(FILE*);
-extern std::wstring readWString(FILE*);
+extern std::string readString(FILE* ,bool _new = false);
+extern std::wstring readWString(FILE*,bool _new = false);
 
 extern attack* AttackList[560];
 
@@ -151,7 +151,7 @@ namespace POKEMON{
                 fgetc(f);
             short buf; fscanf(f,"%hi",&buf);
             fgetc(f);
-            std::string ret = readString(f);
+            std::string ret = readString(f,true);
             fclose(f);
             return ret.c_str();
         }
@@ -304,6 +304,46 @@ namespace POKEMON{
             ret_form_name = ret.c_str();
             return d;
         }
+        const char* getSpecies(int pkmn){
+            char pt[100];
+            sprintf(pt, "%s%d.data",PKMNDATA_PATH,pkmn);
+            FILE* f = fopen(pt,"r");
+
+            if(f == 0){
+                fclose(f);
+                return "UNBEKANNT";
+            }
+            for(int i= 0; i< 2; ++i)
+                fgetc(f);
+            for(int i = 2; i< 8;++i)
+                fgetc(f);
+            short s;
+            fscanf(f,"%hi",&s);
+            fgetc(f);
+            readString(f);
+            for(int i= 0; i< 4; ++i)
+                fscanf(f,"%hi",&s);  
+            fscanf(f,"%hi",&s);  
+            fgetc(f);
+            for(int i= 0; i< 2; ++i)
+                fgetc(f);
+            fgetc(f);
+            fgetc(f);
+            for(int i= 0; i< 6; ++i)
+                fgetc(f);
+            fscanf(f,"%hi",&s);  
+            fgetc(f);
+            readString(f);
+            fscanf(f,"%hi",&s);
+            short d; std::string ret2;
+            for(int i = 0; i< s; ++i){
+                fscanf(f,"%hi",&d); readString(f);
+            }
+            fscanf(f," "); 
+            ret2 = readString(f,true);
+            fclose(f);
+            return ret2.c_str();
+        }
 
         void getAll(int pkmnind,PKMNDATA& out){
             char pt[100];
@@ -335,12 +375,17 @@ namespace POKEMON{
             fgetc(f);
             readString(f); 
             fscanf(f,"%hi",&out.formecnt); 
+            short d;
+            for(int i = 0; i< out.formecnt; ++i){ 
+                fscanf(f,"%hi",&d); readString(f);
+            }
+            fscanf(f," "); 
+            readString(f,true);
+            fscanf(f,"%hi",&out.size);
+            fscanf(f,"%hi",&out.weight); 
+            fscanf(f,"%hi",&out.expType);  
             fclose(f);
             return;
-        }
-
-        const char* getSpecies(int pkmnind){
-            return "UNBEKANNT";
         }
 
 
@@ -412,7 +457,6 @@ namespace POKEMON{
         }
     }
 
-    LevelUp_Type Pkmn_LevelUpTypes[669];
     char Pkmn_Abilities[669][4] = {
         {0},
         {8,8,8,8},
@@ -559,7 +603,7 @@ namespace POKEMON{
         this->ID = ID_;
         this->SID = SID_;
         if(!_isEgg)
-            this->exp = EXP[level-1][Pkmn_LevelUpTypes[this->SPEC]];
+            this->exp = EXP[level-1][data.expType];
         else
             this->exp = 0;
 
@@ -1165,7 +1209,7 @@ namespace POKEMON{
             if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),this->boxdata.isFemale,true))
                 loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",this->boxdata.SPEC,16,48,a2,b2,c2,false,this->boxdata.isShiny(),!this->boxdata.isFemale,true);
 
-            int exptype = Pkmn_LevelUpTypes[this->boxdata.SPEC];
+            int exptype = data.expType;
 
             printf("EP(%3i%%)\nKP(%3i%%)",(this->boxdata.exp-POKEMON::EXP[this->Level-1][exptype]) *100/(POKEMON::EXP[this->Level][exptype]-POKEMON::EXP[this->Level-1][exptype]),
                 this->stats.acHP*100/this->stats.maxHP);
