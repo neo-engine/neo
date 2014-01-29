@@ -639,7 +639,12 @@ namespace POKEMON{
         for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[(int)Attacks[i]]->PP; /// ...
 
         this->PPUps = 0;
-        this->IVint = rand();
+        this->IV.Attack = rand() % 32;
+        this->IV.Defense = rand() % 32;
+        this->IV.HP = rand() % 32;
+        this->IV.SAttack = rand() % 32;
+        this->IV.SDefense = rand() % 32;
+        this->IV.Speed = rand() % 32;
         this->IV.isNicked = false;
         this->IV.isEgg = _isEgg;
         for(int i= 0; i< 4; ++i) this->ribbons0[i] = 0;

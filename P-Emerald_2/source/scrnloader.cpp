@@ -1777,6 +1777,14 @@ void initTop()
     consoleSelect(&Top);
     printf("\x1b[39m");	int a = 0,b= 0,c = 0;
     initOAMTable(oamTop);
+    cust_font.set_color(0,0);
+    cust_font.set_color(251,1);
+    cust_font.set_color(252,2);
+
+    BG_PALETTE[250] = RGB15(31,31,31);
+    BG_PALETTE[252] = RGB15(15,15,15);
+    BG_PALETTE[251] = RGB15(3,3,3);
+
     for (size_t i = 0; i < SAV.PKMN_team.size(); i++)
     {
         if(!SAV.PKMN_team[i].boxdata.IV.isEgg){
@@ -1791,16 +1799,21 @@ void initTop()
                 BATTLE::displayHP(100,100-SAV.PKMN_team[i].stats.acHP*100/SAV.PKMN_team[i].stats.maxHP,borders[i][0]*8+63,borders[i][1]*8+8-(i!= 3 ? 4:0),142+2*i,143+2*i,false,true); 
             }
             updateOAM(oamTop);
-            consoleSetWindow(&Top,borders[i][0],borders[i][1],12,6);		
-            wprintf(SAV.PKMN_team[i].boxdata.Name);
+            char buf[100];
 
-            //if(SAV.PKMN_team[i].Name.length < 10)
-            printf("\n");
-            printf(POKEMON::PKMNDATA::getDisplayName(SAV.PKMN_team[i].boxdata.SPEC));
+            int mval = 1 + ((i/2 == 1) ? 4 : 8);
 
-            printf("\n\n");
-            printf("\n""%hi""/%hi KP\n",SAV.PKMN_team[i].stats.acHP,SAV.PKMN_team[i].stats.maxHP);
-            printf(ItemList[SAV.PKMN_team[i].boxdata.getItem()].getDisplayName().c_str());
+            sprintf(buf,"%ls",SAV.PKMN_team[i].boxdata.Name);
+            cust_font.print_string(buf,borders[i][0]*8,borders[i][1]*8 - mval,false);
+            sprintf(buf,"%s",POKEMON::PKMNDATA::getDisplayName(SAV.PKMN_team[i].boxdata.SPEC));
+            cust_font.print_string(buf,borders[i][0]*8,borders[i][1]*8 + 14 - mval,false);
+                
+            sprintf(buf,"%hi/%hi KP",SAV.PKMN_team[i].stats.acHP, SAV.PKMN_team[i].stats.maxHP);
+            cust_font.print_string(buf,borders[i][0]*8,borders[i][1]*8 + 28 - mval,false);
+
+            sprintf(buf,"%s",ItemList[SAV.PKMN_team[i].boxdata.getItem()].getDisplayName().c_str());
+            cust_font.print_string(buf,borders[i][0]*8,borders[i][1]*8 + 42 - mval,false);
+
         }
         else{
             consoleSetWindow(&Top,borders[i][0],borders[i][1],12,6);		
