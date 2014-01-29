@@ -22,27 +22,27 @@ namespace map2d{
         if(file == 0)
             return;
         for(int i= 0; i < 6; ++i)
-            fread(pal[i].pal,sizeof(u16),16,file);
+            fread(pal[i].pal,sizeof(u16)*16,1,file);
         fclose(file);
     }
     inline void readTileSet(FILE* file, TileSet& tileSet, int startidx = 0, int size = 512){
         if(file == 0)
             return;
-        fread(&tileSet.blocks[startidx],sizeof(Tile),size,file);
+        fread(&tileSet.blocks[startidx],sizeof(Tile)*size,1,file);
         fclose(file);
     }
     inline void readNop(FILE* file, int cnt){
         if(file == 0)
             return;
-        fread(0,sizeof(u8),cnt,file);
+        fread(0,sizeof(u8)*cnt,1,file);
     }
     inline void readBlockSet(FILE* file, BlockSet& tileSet, int startidx = 0, int size = 512){
         if(file == 0)
             return;
         readNop(file,4); 
         for(int i = 0; i < size; ++i){
-            fread(tileSet.blocks[startidx+i].bottom,sizeof(BlockAtom),4,file);
-            fread(tileSet.blocks[startidx+i].top,sizeof(BlockAtom),4,file);
+            fread(tileSet.blocks[startidx+i].bottom,4*sizeof(BlockAtom),1,file);
+            fread(tileSet.blocks[startidx+i].top,4*sizeof(BlockAtom),1,file);
         }
         for(int i = 0; i < size; ++i){
             fread(&tileSet.blocks[startidx+i].bottombehave,sizeof(u8),1,file);
@@ -133,6 +133,8 @@ namespace map2d{
                 fread(&ac.mapsx,sizeof(u32),1,mapF2);
 
                 readNop(mapF2,12);
+
+                //TODO: SPEED-UP this Part
                 for(int x = 0; x < ac.mapsx; ++x)
                     for(int y = 0; y < ac.mapsy; ++y){
                         if(ac.direction == 'W' && y >= ac.mapsy - 10 && x + ac.move + 10 >= 0 && x + ac.move < (int)sizex + 10)
@@ -162,8 +164,7 @@ namespace map2d{
         }
 
         for(int x = 0; x < (int)sizex; ++x)
-            for(int y = 0; y < (int)sizey; ++y)
-                fread(&this->blocks[x+10][y+10],sizeof(MapBlockAtom),1,mapF);
+            fread(&this->blocks[x+10][10],sizeof(MapBlockAtom)*sizey,1,mapF);
         //printf("Test5 %i",this->anbindungen.size());
         fclose(mapF);
     }
