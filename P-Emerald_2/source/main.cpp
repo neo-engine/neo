@@ -59,7 +59,7 @@ enum GameMod{
     RELEASE,
     EMULATOR
 } gMod = DEVELOPER;
-std::string CodeName = "Charming Lari";
+std::string CodeName = "Awakening Xerneas";
 SavMod savMod = _NDS;
 
 char acSlot2Game[5];
@@ -1322,7 +1322,7 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
 
     x += 10;
     y += 10; 
-     
+
     if(x < 0)
         return false;
     if(y < 0)
@@ -1335,7 +1335,7 @@ bool movePlayerOnMap(int x,int y, int z,bool init /*= true*/){
     int lastmovedata = acMap->blocks[SAV.acposy/20 + 10][SAV.acposx/20 + 10].movedata;
     int acmovedata = acMap->blocks[y][x].movedata;
     map2d::Block acBlock = acMap->b.blocks[acMap->blocks[y][x].blockidx], lastBlock = acMap->b.blocks[acMap->blocks[SAV.acposy/20 + 10][SAV.acposx/20 + 10].blockidx];
-    
+
     int verhalten = acBlock.bottombehave, hintergrund = acBlock.topbehave;
     int lstverhalten = lastBlock.bottombehave, lsthintergrund = lastBlock.topbehave;
     if(verhalten == 0xa0 && playermoveMode != WALK) //nur normales laufen möglich
@@ -1987,14 +1987,15 @@ OUT:
                 BATTLE::battle_trainer opp("TEST-OPP","DeR TeST iST DeR BeSTe MSG1","DeR TeST VeRLieRT GeRaDe... MSG2","DeR TeST GEWiNNT HaHa! MSG3","DeR TeST VeRLieRT... MSG4",&(cpy),0);
 
                 BATTLE::battle test_battle(&me,&opp,100,5,BATTLE::battle::DOUBLE);
-                test_battle.start(100,BATTLE::battle::NONE);
+                test_battle.start(100,BATTLE::battle::NONE);       
+                initMapSprites();
+                movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
                 break;
                    }
             }
             setMainSpriteVisibility(false);
             scrn.draw(mode);
-            initMapSprites();
-            movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
+
         }
         //StartPok\x82""nav
         else if (sqrt(sq(mainSpritesPositions[5][0]-touch.px) + sq(mainSpritesPositions[5][1]-touch.py)) <= 16 && mode == -1)

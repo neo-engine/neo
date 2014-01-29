@@ -763,12 +763,14 @@ namespace POKEMON{
             int G = this->boxdata.gender();
 
             cust_font.print_char('/',234,2,false);
-            if (G == 1){
-                cust_font.set_color(255,1);
-                cust_font.print_char(136,246,8,false);
-            }else{
-                cust_font.set_color(254,1);
-                cust_font.print_char(137,246,8,false);
+            if(this->boxdata.SPEC != 29 && this->boxdata.SPEC != 32){
+                if (G == 1){
+                    cust_font.set_color(255,1);
+                    cust_font.print_char(136,246,8,false);
+                }else{
+                    cust_font.set_color(254,1);
+                    cust_font.print_char(137,246,8,false);
+                }
             }
             cust_font.set_color(253,1);
 

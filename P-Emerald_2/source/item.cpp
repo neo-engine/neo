@@ -38,9 +38,18 @@ std::string readString(FILE* fd, bool _new ){
                 ret += '\x9D';
             else if(ac == 'é')
                 ret += '\x82';
+            else if(ac == '|')
+                ret += (char)136;
+            else if(ac == '#')
+                ret += (char)137;
             else
                 ret += ac;
+            continue;
         }
+        if(ac == '|')
+            ret += (char)136;
+        else if(ac == '#')
+            ret += (char)137;
         else
             ret += ac;
     }
@@ -54,7 +63,7 @@ std::wstring readWString(FILE* fd, bool _new ){
         return ret;
     else ret += ac;
     while(((ac = fgetc(fd)) != '*')){
-        if(!_new){
+        if(!_new){ 
             if(ac == 'ä')
                 ret += '\x84';
             else if(ac == 'Ä')
@@ -73,7 +82,12 @@ std::wstring readWString(FILE* fd, bool _new ){
                 ret += '\x82';
             else
                 ret += ac;
+            continue;
         }
+        if(ac == '|')
+            ret += (char)136;
+        else if(ac == '#')
+            ret += (char)137;
         else
             ret += ac;
     }

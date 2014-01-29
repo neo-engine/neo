@@ -58,9 +58,11 @@ BG_set BGs[MAXBG] = {{"Raging_Gyarados",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Sleeping_Eevee",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Mystic_Guardevoir",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Waiting_Suicune",NAV_DATA,NAV_DATA_PAL,true,false},
+{"Awakening_Xerneas",NAV_DATA,NAV_DATA_PAL,true,false},
+{"Awakening_Yveltal",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Fighting_Groudon",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Fighting_Kyogre",NAV_DATA,NAV_DATA_PAL,true,false}};
-int BG_ind = 2;
+int BG_ind = 5;
 extern POKEMON::PKMN::BOX_PKMN stored_pkmn[MAXSTOREDPKMN];
 extern std::vector<int> box_of_st_pkmn[MAXPKMN];
 extern std::vector<int> free_spaces;
@@ -69,7 +71,7 @@ extern SpriteInfo spriteInfo[SPRITE_COUNT];
 extern SpriteInfo spriteInfoTop[SPRITE_COUNT];
 extern OAMTable *oam,*oamTop;
 
-extern int drawBox(short);
+extern int drawBox(short); 
 namespace POKEMON { extern const char* getLoc(int ind); }
 Region acMapRegion = NONE;
 std::pair<int,int> acMapPoint = std::pair<int,int>(32,24);
@@ -744,11 +746,11 @@ extern SpriteInfo spriteInfo[SPRITE_COUNT];
 extern OAMTable *oam;
 
 int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
-    static const int BYTES_PER_16_COLOR_TILE = 32;
-    static const int COLORS_PER_PALETTE = 16;
-    static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
+    const int BYTES_PER_16_COLOR_TILE = 32;
+    const int COLORS_PER_PALETTE = 16;
+    const int BOUNDARY_VALUE = 32; /* This is the default boundary value
                                           * (can be set in REG_DISPCNT) */
-    static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
+    const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
         sizeof(SPRITE_GFX_SUB[0]);
 
     /* Keep track of the available tiles */
@@ -1092,7 +1094,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
         ForwardPal,
         &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-        MessagePalLen);
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
         ForwardTiles,
         &SPRITE_GFX_SUB[Fwd->gfxIndex * OFFSET_MULTIPLIER],
@@ -1124,7 +1126,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
         BackwardPal,
         &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-        MessagePalLen);
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
         BackwardTiles,
         &SPRITE_GFX_SUB[Bwd->gfxIndex * OFFSET_MULTIPLIER],
@@ -1179,7 +1181,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
         Choice_1Pal,
         &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-        Choice_1PalLen);
+        32);
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
         Choice_1Tiles,
         &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
@@ -2103,7 +2105,7 @@ void scrnloader::run_pkmn()
                     setSpriteVisibility(save,false);
                     setMainSpriteVisibility(true);
                     oam->oamBuffer[8].isHidden = true;
-                    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
+                    //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
                     mbox("Diese Attacke kann jetzt\nnicht eingesetzt werden.","PokéNav");
 
                     setSpriteVisibility(back,false);
@@ -2114,6 +2116,7 @@ void scrnloader::run_pkmn()
                     oam->oamBuffer[8].y = SCREEN_HEIGHT / 2 - 16;
                     updateOAMSub(oam);
                     initSub(acIn);
+                    //initTop();
                 }
             }
     }

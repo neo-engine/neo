@@ -745,7 +745,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
             swiWaitForVBlank();
             updateOAMSub(oam);
             if(time)
-                updateTime();
+                updateTime(true);
             touchPosition t;
             touchRead(&t);
 
@@ -760,7 +760,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }
@@ -797,7 +797,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
             swiWaitForVBlank();
             updateOAMSub(oam);
             if(time)
-                updateTime();
+                updateTime(true);
             touchPosition t;
             touchRead(&t);
 
@@ -812,7 +812,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }
@@ -842,7 +842,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }
@@ -879,7 +879,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
             swiWaitForVBlank();
             updateOAMSub(oam);
             if(time)
-                updateTime();
+                updateTime(true);
             touchPosition t;
             touchRead(&t);
 
@@ -894,7 +894,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }
@@ -920,7 +920,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }
@@ -946,7 +946,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }
@@ -983,7 +983,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
             swiWaitForVBlank();
             updateOAMSub(oam);
             if(time)
-                updateTime();
+                updateTime(true);
             touchPosition t;
             touchRead(&t);
 
@@ -998,7 +998,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }
@@ -1024,7 +1024,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }
@@ -1050,7 +1050,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }
@@ -1071,7 +1071,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }
@@ -1114,7 +1114,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }
@@ -1167,7 +1167,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
             swiWaitForVBlank();
             updateOAMSub(oam);
             if(time)
-                updateTime();
+                updateTime(true);
             touchPosition t;
             touchRead(&t);
 
@@ -1182,7 +1182,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                         swiWaitForVBlank();
                         scanKeys();
                         if(time)
-                            updateTime();
+                            updateTime(true);
                         if(keysUp() & KEY_TOUCH)
                             break;
                     }
@@ -1198,7 +1198,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }
@@ -1238,7 +1238,7 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     swiWaitForVBlank();
                     scanKeys();
                     if(time)
-                        updateTime();
+                        updateTime(true);
                     if(keysUp() & KEY_TOUCH)
                         break;
                 }

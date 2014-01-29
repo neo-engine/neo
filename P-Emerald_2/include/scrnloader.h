@@ -64,7 +64,7 @@ enum Region{
 #define SQCH_ID 41
 // 42 used
 
-#define MAXBG 6
+#define MAXBG 8
 struct BG_set {
     std::string Name;
     const unsigned int *MainMenu;

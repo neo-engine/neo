@@ -67,6 +67,9 @@
   <ItemGroup>
     <None Include="Makefile" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\ChangeLog.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{516845C0-8C30-4C35-80DF-F3ED8E61213B}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
