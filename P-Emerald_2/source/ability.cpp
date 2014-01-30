@@ -31,6 +31,7 @@ ablty abilities[180]={
     ablty("Sporenwirt"        ,"Verursacht evtl.\nSp. Zustand bei\ngegn. PKMN nach\ndirektem Treffer.",32),
     ablty("Synchro"           ,"Gibt Sp. Zustand\nan gegn. PKMN\nweiter.",32),
     ablty("Neutraltorso"      ,"Sch\x81""tzt vor\nStatusver\x84""nd.",1),
+    ablty("Innere Kraft"      ,"Sch\x81""tzt vor\nStatusver\x84""nd.",1),
     ablty("Blitzf\x84""nger" ,"Sch\x81""tzt vor\n\x9e\x9f\xa0\xa1 Attacken.",1),
     ablty("Edelmut"           ,"Macht Zusatz-\neffekte von eig.\nAttacken wahr-\nscheinlicher.",1),
     ablty("Wassertempo"       ,"Erh\x94""ht eigene\nInitiative bei\nRegen.",16),

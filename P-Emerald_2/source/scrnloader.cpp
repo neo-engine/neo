@@ -2817,10 +2817,10 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
         else{
             printf("\n\n  KP   ANG  DEF  SAN  SDF  INT\n\n\n\n\n\n\n\n\n");
             char buf[50]; 
-            sprintf(buf,"GW.  ???.?kg", acpkmndata.weight / 10.0);
+            sprintf(buf,"GW.  ???.?kg");
             cust_font.print_string(buf,10,109,false);
-            sprintf(buf,"GR.  ???.?m", acpkmndata.size / 10.0);
-            cust_font.print_string(buf,100,109,false);
+            sprintf(buf,"GR.  ???.?m");
+            cust_font.print_string(buf,100,109,false); 
             consoleSetWindow(&Top, 1,16,30,24); 
             printf(POKEMON::PKMNDATA::getDexEntry(0));
         }

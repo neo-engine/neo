@@ -17,8 +17,10 @@ std::string readString(FILE* fd, bool _new ){
     std::string ret = "";
     char ac; 
     while((ac= fgetc(fd)) == '\n' || ac == '\r');
-    if (ac == '*')
+    if (ac == '*'){
+        ret += '\0';
         return ret;
+    }
     else ret += ac;
     while(((ac = fgetc(fd)) != '*')){
         if(!_new){
@@ -53,14 +55,17 @@ std::string readString(FILE* fd, bool _new ){
         else
             ret += ac;
     }
+    ret += '\0';
     return ret;
 }
 std::wstring readWString(FILE* fd, bool _new ){
     std::wstring ret = L"";
     char ac; 
     while((ac= fgetc(fd)) == '\n' || ac == '\r');
-    if (ac == '*')
+    if (ac == '*'){
+        ret += L'\0';
         return ret;
+    }
     else ret += ac;
     while(((ac = fgetc(fd)) != '*')){
         if(!_new){ 
@@ -91,6 +96,7 @@ std::wstring readWString(FILE* fd, bool _new ){
         else
             ret += ac;
     }
+    ret += L'\0';
     return ret;
 }
 

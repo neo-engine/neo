@@ -815,12 +815,14 @@ CONT:
 
                     SAV.gba.gameid = (save3->unpackeddata[0xaf] << 24) |(save3->unpackeddata[0xae] << 16) |(save3->unpackeddata[0xad] << 8) |save3->unpackeddata[0xac];
 
+                    POKEMON::PKMNDATA::PKMNDATA p;
                     for(int i= 0; i < 6; ++i){
                         if(save3->pokemon[i]->personality){
                             SAV.PKMN_team.push_back(POKEMON::PKMN());
 
                             POKEMON::PKMN &acPkmn = SAV.PKMN_team[i];
                             gen3::belt_pokemon_t* &acBeltP = save3->pokemon[i];
+
 
                             acPkmn.boxdata.PID = acBeltP->personality;  
                             acPkmn.boxdata.SID = acBeltP->otid >> 16;
@@ -867,7 +869,9 @@ CONT:
 
                             gen3::PKMN::pokemon_misc_t* &acBM = save3->pokemon_misc[i];
                             acPkmn.boxdata.IVint = acBM->IVint;
-                            acPkmn.boxdata.ability = POKEMON::Pkmn_Abilities[acPkmn.boxdata.SPEC][acPkmn.boxdata.IV.isEgg];
+
+                            POKEMON::PKMNDATA::getAll(acPkmn.boxdata.SPEC,p);
+                            acPkmn.boxdata.ability = p.abilities[acPkmn.boxdata.IV.isEgg];
                             acPkmn.boxdata.IV.isEgg = acPkmn.boxdata.IV.isNicked;
                             acPkmn.boxdata.gotPlace = gen3::getNLocation(acBM->locationcaught);
 
@@ -1707,7 +1711,7 @@ int main(int argc, char** argv)
 
     cust_font.set_color(RGB(0,31,31),0);
 
-    int HILFSCOUNTER = 251;
+    int HILFSCOUNTER = 1;
     oam->oamBuffer[PKMN_ID].isHidden = !(SAV.hasPKMN && SAV.PKMN_team.size());
     updateOAMSub(oam);
 
@@ -1925,7 +1929,7 @@ OUT:
             }
             const char *someText[7]= {"\n     PKMN-Spawn","\n    Item-Spawn","\n 1-Item_Test","\n  Battle SPWN.","\n   Trainerpass","\n    42"};
             cbox test(4,&someText[0],0,true);
-            int res = test.getResult("...",true);
+            int res = test.getResult("Tokens of god-being...",true);
             switch(res)
             {
             case 0:
@@ -1939,7 +1943,7 @@ OUT:
                         A[2] = 431;
                         A[3] = 432;
                         POKEMON::PKMN a(A,HILFSCOUNTER,0,
-                            1+rand()%100,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
+                            1+rand()%100,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,rand()%2,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;
                         a.stats.acHP = i*a.stats.maxHP/5;
                         SAV.PKMN_team.push_back(a);
@@ -1953,7 +1957,6 @@ OUT:
                     for(int i= 0; i< 649; ++i)
                         SAV.inDex[i] = true;
                     SAV.hasPKMN = true;
-                    SAV.PKMN_team[1].boxdata.ability = 2;
                     swiWaitForVBlank();
                     setMainSpriteVisibility(false);
                     break;
@@ -1961,9 +1964,9 @@ OUT:
             case 1:
                 for(int j = 1; j< 700; ++j)
                     if(ItemList[j].Name != "Null")
-                        SAV.Bag.addItem(ItemList[j].itemtype,j,(rand()%999) +1);
+                        SAV.Bag.addItem(ItemList[j].itemtype,j,1);
                 break;
-            case 2:
+            case 2: 
                 SAV.PKMN_team[0].boxdata.exp += 100;
                 mbox(berry("Ginemabeere"),31);
                 setMainSpriteVisibility(false);

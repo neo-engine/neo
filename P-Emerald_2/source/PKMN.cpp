@@ -384,6 +384,8 @@ namespace POKEMON{
             fscanf(f,"%hi",&out.size);
             fscanf(f,"%hi",&out.weight); 
             fscanf(f,"%hi",&out.expType);  
+            for(int i= 0; i < 4; ++i)
+                fscanf(f,"%hhi",&out.abilities[i]);  
             fclose(f);
             return;
         }
@@ -457,13 +459,7 @@ namespace POKEMON{
         }
     }
 
-    char Pkmn_Abilities[669][4] = {
-        {0},
-        {8,8,8,8},
-        {18,18,18,18},
-        {162,162,162,162}};
     char Pkmn_SafariCatchRate[669];
-    Color_Type Pkmn_Color[669];
 
     int EXP[100][13] = {
         {0,0,0,0,0,0,1,15,6,8,9,10,4},
@@ -628,8 +624,8 @@ namespace POKEMON{
             hatchDate[2] =(timeStruct->tm_year +1900) % 100;
             gotPlace = gPlace;
         }
-        this->ability = h_a ? ( (PID&1||( Pkmn_Abilities[this->SPEC][3] ==0)) ? Pkmn_Abilities[SPE][2] : Pkmn_Abilities[SPE][3]):
-            (( PID&1||( Pkmn_Abilities[this->SPEC][1] ==0)) ? Pkmn_Abilities[SPE][0] : Pkmn_Abilities[SPE][1]);
+        this->ability = h_a ? ( (PID&1||( data.abilities[3] ==0)) ? data.abilities[2] : data.abilities[3]):
+            (( PID&1||( data.abilities[1] ==0)) ? data.abilities[0] : data.abilities[1]);
         this->markings = NONE;
         this->orig_lang = 5;
         for(int i= 0; i< 6; ++i) this->EV[i] = 0;
@@ -639,7 +635,7 @@ namespace POKEMON{
         for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[(int)Attacks[i]]->PP; /// ...
 
         this->PPUps = 0;
-        this->IV.Attack = rand() % 32;
+        this->IV.Attack = rand() % 32; 
         this->IV.Defense = rand() % 32;
         this->IV.HP = rand() % 32;
         this->IV.SAttack = rand() % 32;
@@ -1029,6 +1025,7 @@ namespace POKEMON{
 
             oam->oamBuffer[o2s++].isHidden = true;
             oam->oamBuffer[o2s++].isHidden = true;
+            oam->oamBuffer[o2s].isHidden = true;
             drawItemIcon(oam,spriteInfo,this->boxdata.Ball == 0 ? "Pokeball" : ItemList[this->boxdata.Ball].Name,256-32,0,o2s,p2s,t2s,true);
             updateOAMSub(oam);
         }
@@ -1055,7 +1052,7 @@ namespace POKEMON{
         if(!(this->boxdata.IV.isEgg)){
             consoleSetWindow(Bottom,0,23,20,5);
             printf("%s",abilities[this->boxdata.ability].Name.c_str());
-            consoleSetWindow(Bottom,2,19,28,5);
+            consoleSetWindow(Bottom,1,19,28,5);
             printf("%s",abilities[this->boxdata.ability].FlavourText.c_str());
         }
 

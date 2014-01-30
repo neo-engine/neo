@@ -146,6 +146,7 @@ namespace POKEMON{
             short size;
             short weight;
             short expType;
+            u8 abilities[4];
         };
         Type getType(int pkmnind,int type);
         short getBase(int pkmnind,int base);
@@ -163,9 +164,7 @@ namespace POKEMON{
     }
 
     extern double NatMod[25][5];
-    extern char Pkmn_Abilities[669][4];
     extern char Pkmn_SafariCatchRate[669];
-    extern Color_Type Pkmn_Color[669];
 
     extern int EXP[100][13];
 
