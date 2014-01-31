@@ -41,7 +41,7 @@ std::string readString(FILE* fd, bool _new ){
             else if(ac == 'é')
                 ret += '\x82';
             else if(ac == '|')
-                ret += (char)136;
+                ret += (char)136; 
             else if(ac == '#')
                 ret += (char)137;
             else
@@ -96,7 +96,7 @@ std::wstring readWString(FILE* fd, bool _new ){
         else
             ret += ac;
     }
-    ret += L'\0';
+    ret += L'\0';  
     return ret;
 }
 
@@ -131,7 +131,7 @@ bool berry::_load(){
     if(f == 0)
         return load = false;
     //this->itemtype = BERRIES;
-    int ac;
+    int ac; 
     fscanf(f,"%i",&ac);
     //this->effekt = item::EFFEKT(ac);
     //fscanf(f,"%i\n",&(this->price));
@@ -155,7 +155,7 @@ bool berry::_load(){
     return load = true;
 }
 
-std::string item::getDescription(){
+std::string item::getDescription(bool new_){
     sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
     FILE* f = fopen(buf,"r");
     if(f == 0)
@@ -163,12 +163,12 @@ std::string item::getDescription(){
     int ac;
     fscanf(f,"%i",&ac);
     fscanf(f,"%i\n",&ac);
-    std::string s = readString(f,false);
-    s = readString(f,false);
+    std::string s = readString(f,new_);
+    s = readString(f,new_);
     fclose(f);
     return s;
 }
-std::string item::getDisplayName(){
+std::string item::getDisplayName(bool new_){
     sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
     FILE* f = fopen(buf,"r");
     if(f == 0)
@@ -176,7 +176,7 @@ std::string item::getDisplayName(){
     int ac;
     fscanf(f,"%i",&ac);
     fscanf(f,"%i\n",&ac);
-    std::string s = readString(f,false);
+    std::string s = readString(f,new_);
     fclose(f);
     return s;
 }
@@ -205,7 +205,7 @@ int item::getPrice(){
     return ac;
 }
 
-std::string berry::getDescription2(){
+std::string berry::getDescription2(bool new_){
     sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
     FILE* f = fopen(buf,"r");
     if(f == 0)
@@ -216,9 +216,9 @@ std::string berry::getDescription2(){
     //this->effekt = item::EFFEKT(ac);
     //fscanf(f,"%i\n",&(this->price));
     fscanf(f,"%i",&ac);
-    /*this->displayName = */readString(f,false);
-    /*this->dscrpt = "  "+ */readString(f,false);
-    /*this->effekt_script = */readString(f,false);
+    /*this->displayName = */readString(f,new_);
+    /*this->dscrpt = "  "+ */readString(f,new_);
+    /*this->effekt_script = */readString(f,new_);
 
     fscanf(f,"%hi",&(ac));
     fscanf(f,"%i",&ac);
@@ -232,26 +232,27 @@ std::string berry::getDescription2(){
     fscanf(f,"%hhu",&(ac));
     fscanf(f,"%hhu\n",&(ac));
 
-    std::string s = readString(f,false);
+    std::string s = readString(f,new_);
     fclose(f);
     return s;
 }
 
-std::string item::getShortDescription(){
+std::string item::getShortDescription(bool new_){
     sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
     FILE* f = fopen(buf,"r");
     if(f == 0)
         return "Keine Daten.";
     int ac;
-    fscanf(f,"%i",&ac);
+    fscanf(f,"%i",&ac); 
     //this->effekt = item::EFFEKT(ac);
     //fscanf(f,"%i\n",&(this->price));
     fscanf(f,"%i",&ac);
-    /*this->displayName = */readString(f,false);
-    /*this->dscrpt = "  "+ */readString(f,false);
-    /*this->effekt_script = */readString(f,false);
+    /*this->displayName = */readString(f,new_);
+    /*this->dscrpt = "  "+ */readString(f,new_);
+    /*this->effekt_script = */readString(f,new_);
 
-    fscanf(f,"%hi",&(ac));
+    if(fscanf(f,"%hi",&(ac)) == EOF)
+        return "Keine Daten.";
     fscanf(f,"%i",&ac);
     //this->Guete = berry::Guete_Type(ac);
     fscanf(f,"%i",&ac);
@@ -263,8 +264,8 @@ std::string item::getShortDescription(){
     fscanf(f,"%hhu",&(ac));
     fscanf(f,"%hhu\n",&(ac));
 
-    readString(f,false);
-    std::string s = readString(f,false);
+    readString(f,new_);
+    std::string s = readString(f,new_);
     fclose(f);
     return s;
 }

@@ -1819,7 +1819,17 @@ void initTop()
         }
         else{
             consoleSetWindow(&Top,borders[i][0],borders[i][1],12,6);		
-            printf("Ei");
+            
+            char buf[100];
+            int mval = 1 + ((i/2 == 1) ? 4 : 8);
+            sprintf(buf,"Ei");
+            cust_font.print_string(buf,borders[i][0]*8,borders[i][1]*8 - mval,false);
+            sprintf(buf,"Ei");
+            cust_font.print_string(buf,borders[i][0]*8,borders[i][1]*8 + 14 - mval,false);
+
+            sprintf(buf,"%s",ItemList[SAV.PKMN_team[i].boxdata.getItem()].getDisplayName().c_str());
+            cust_font.print_string(buf,borders[i][0]*8,borders[i][1]*8 + 42 - mval,false);
+
             if(i%2 == 0){
                 drawEggIcon(oamTop,spriteInfoTop,borders[i][0]*8-28,borders[i][1]*8,a,b,c,false);      
             }

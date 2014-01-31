@@ -763,7 +763,7 @@ namespace POKEMON{
                 if (G == 1){
                     cust_font.set_color(255,1);
                     cust_font.print_char(136,246,8,false);
-                }else{
+                }else{ 
                     cust_font.set_color(254,1);
                     cust_font.print_char(137,246,8,false);
                 }
@@ -773,15 +773,20 @@ namespace POKEMON{
             PKMNDATA::getAll(this->boxdata.SPEC,data);
             cust_font.print_string(PKMNDATA::getDisplayName(this->boxdata.SPEC),160,16,false);
 
-            consoleSetWindow(Top, 7,21,30,4);
-            printf(ItemList[this->boxdata.getItem()].getDisplayName().c_str());
             if(this->boxdata.getItem()){
-                printf("\n%s",ItemList[this->boxdata.getItem()].getDescription().c_str());
-                drawItemIcon(oamTop,spriteInfoTop,ItemList[this->boxdata.getItem()].Name,2,152,a2,b2,c2,false);
                 cust_font.print_string("Item",2,176,false);
+                cust_font.set_color(251,1);
+                char buf[200];
+                sprintf(buf,"%s: %s",ItemList[this->boxdata.getItem()].getDisplayName(true).c_str(),
+                    ItemList[this->boxdata.getItem()].getShortDescription(true).c_str());
+                cust_font.print_string(buf,50,158,false);
+                drawItemIcon(oamTop,spriteInfoTop,ItemList[this->boxdata.getItem()].Name,2,152,a2,b2,c2,false);
                 updateOAM(oamTop);
             }
-            cust_font.set_color(251,1);
+            else{
+                cust_font.set_color(251,1);
+                cust_font.print_string(ItemList[this->boxdata.getItem()].getDisplayName().c_str(),56,168,false);
+            }
         }
         else{
             Page = 0;
@@ -897,8 +902,8 @@ namespace POKEMON{
                     Type t = AttackList[this->boxdata.Attack[i]]->type;
                     drawTypeIcon(oamTop,spriteInfoTop,a2,b2,c2,t,126,43+32*i,false);
 
-                    if(t == data.Types[0] || t == data.Types[1])
-                        printf("\x1b[32m");
+                    /* if(t == data.Types[0] || t == data.Types[1])
+                    printf("\x1b[32m");*/
 
                     if(i == 0)
                         printf("    %s\n    AP %2i""/""%2i ",
@@ -1034,7 +1039,7 @@ namespace POKEMON{
             oam->oamBuffer[9+i].isHidden = false;
             oam->oamBuffer[9+i].hFlip = true;            
             oam->oamBuffer[9+i].priority = OBJPRIORITY_2;
-            oam->oamBuffer[9+i].y = 192-48;
+            oam->oamBuffer[9+i].y = 192-54;
         }
         oam->oamBuffer[18].isHidden = false;
         oam->oamBuffer[18].y = 192-12;
@@ -1052,7 +1057,7 @@ namespace POKEMON{
         if(!(this->boxdata.IV.isEgg)){
             consoleSetWindow(Bottom,0,23,20,5);
             printf("%s",abilities[this->boxdata.ability].Name.c_str());
-            consoleSetWindow(Bottom,1,19,28,5);
+            consoleSetWindow(Bottom,1,18,28,5);
             printf("%s",abilities[this->boxdata.ability].FlavourText.c_str());
         }
 

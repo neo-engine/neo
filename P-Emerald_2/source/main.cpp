@@ -874,10 +874,8 @@ CONT:
                             acPkmn.boxdata.ability = p.abilities[acPkmn.boxdata.IV.isEgg];
                             acPkmn.boxdata.IV.isEgg = acPkmn.boxdata.IV.isNicked;
                             acPkmn.boxdata.gotPlace = gen3::getNLocation(acBM->locationcaught);
-
-                            acBM->all = ((acBM->all >> 8) | ((acBM->all % (1 << 8)) << 8));
-
-                            acPkmn.boxdata.gotLevel = acBM->all % (1 << 7);
+                            
+                            acPkmn.boxdata.gotLevel = acBM->levelcaught;
 
                             if(acPkmn.boxdata.IV.isEgg || acPkmn.boxdata.gotLevel){
                                 acPkmn.boxdata.hatchPlace = 999;
@@ -889,8 +887,8 @@ CONT:
                                     acPkmn.boxdata.gotDate[1] =
                                     acPkmn.boxdata.gotDate[2] = 1;
                             } 
-                            acPkmn.boxdata.OTisFemale = acBM->all >> 15;
-                            acPkmn.boxdata.Ball = (acBM->all >> 11) % (1 << 4);
+                            acPkmn.boxdata.OTisFemale = acBM->tgender;
+                            acPkmn.boxdata.Ball = acBM->pokeball;
                             acPkmn.boxdata.gotDate[0] = 
                                 acPkmn.boxdata.gotDate[1] =
                                 acPkmn.boxdata.gotDate[2] = 0;

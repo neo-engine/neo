@@ -122,12 +122,12 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
             };
             union{
                 struct {
-                    u16 pp1;
-                    u16 pp2;
-                    u16 pp3;
-                    u16 pp4;
+                    u8 pp1;
+                    u8 pp2;
+                    u8 pp3;
+                    u8 pp4;
                 }_pp;
-                u16 pp[4];
+                u8 pp[4];
             };
         } pokemon_attacks_t;
 
@@ -160,15 +160,10 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         typedef struct {
             u8 pokerus;
             u8 locationcaught;
-            union{
-                struct{
-                    u8 tgender      :1;
-                    u8 pokeball     :4;
-                    u8 game         :4;
-                    s8 levelcaught  :7;
-                };
-                u16 all;
-            };
+            s8 levelcaught:7;
+            u8 game:4;
+            u8 pokeball:4;
+            u8 tgender:1;
             union {
                 struct {
                     u32 hp          :5;

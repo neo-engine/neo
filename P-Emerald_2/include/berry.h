@@ -8,14 +8,14 @@
 class berry : public item
 {
 public:
-	enum Guete_Type{
+    enum Guete_Type{
         Super_Weich = 0,
         Sehr_Weich = 1,
-		Weich = 2,
+        Weich = 2,
         Hart = 3,
         Sehr_Hart = 4,
         Super_Hart = 5
-	};
+    };
     enum Tastes{
         Spicy,
         Dry,
@@ -24,15 +24,15 @@ public:
         Sour
     };
 
-	//std::string dscrpt2;
-	short  size;
-	Guete_Type Guete;
-	Type BeerenKr_Type;
-	unsigned char BeerenKr_Str;
-	unsigned char Taste[5];//Spicy,Dry,Sweet,Bitter,Sour
-	unsigned char HoursPerStage, minBerries, maxBerries;
+    //std::string dscrpt2;
+    short  size;
+    Guete_Type Guete;
+    Type BeerenKr_Type;
+    unsigned char BeerenKr_Str;
+    unsigned char Taste[5];//Spicy,Dry,Sweet,Bitter,Sour
+    unsigned char HoursPerStage, minBerries, maxBerries;
 
-    std::string getDescription2();
+    std::string getDescription2(bool new_ = false);
     short getMass();
     short getSize();
     Guete_Type getGuete();

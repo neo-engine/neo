@@ -25,16 +25,16 @@ public:
         BATTLE_ITEM
     };
 
-	std::string Name;//, displayName, dscrpt;
+    std::string Name;//, displayName, dscrpt;
     //EFFEKT effekt;
     ITEM_TYPE itemtype;
     //std::string effekt_script;
     //int price;
 
     bool load;
-    std::string getDisplayName();
-    std::string getDescription();
-    std::string getShortDescription();
+    std::string getDisplayName(bool new_ = false);
+    std::string getDescription(bool new_ = false);
+    std::string getShortDescription(bool new_ = false);
     EFFEKT getEffekt();
     ITEM_TYPE getItemType();
     int getPrice();
@@ -42,7 +42,7 @@ public:
 
     virtual bool _load();
 
-	item(const std::string& name): Name(name){/* load = false;*/}
+    item(const std::string& name): Name(name){/* load = false;*/}
     item():Name("Null"){ /*load = false;*/ }
 
     void use(...);
