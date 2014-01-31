@@ -194,150 +194,150 @@ bool loadSpriteSub(SpriteInfo* spriteInfo,const char* Path, const char* Name,con
 
 bool loadPKMNSprite(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX, 
                     const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny,bool female,bool flipx){
-    static const int COLORS_PER_PALETTE = 16;
-    static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                          * (can be set in REG_DISPCNT) */
-    static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
+                        static const int COLORS_PER_PALETTE = 16;
+                        static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
+                                                              * (can be set in REG_DISPCNT) */
+                        static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
 
-    char pt[100];
-    if(!female)
-        sprintf(pt, "%s%d/%d.raw",Path,pkmn_no,pkmn_no);
-    else
-        sprintf(pt, "%s%d/%df.raw",Path,pkmn_no,pkmn_no);
-    FILE* fd = fopen(pt,"rb");
+                        char pt[100];
+                        if(!female)
+                            sprintf(pt, "%s%d/%d.raw",Path,pkmn_no,pkmn_no);
+                        else
+                            sprintf(pt, "%s%d/%df.raw",Path,pkmn_no,pkmn_no);
+                        FILE* fd = fopen(pt,"rb");
 
-    if(fd == 0){
-        fclose(fd); 
-        return false;
-    }
-    int PalCnt = 16;
-    for(int i= 0; i< 16; ++i)
-        TEMP_PAL[i] = 0;
-    fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
-    for(int i = 0; i< 96*96; ++i)
-        TEMP[i] = 0;
-    fread(TEMP,  sizeof(unsigned int),96*96, fd);
-    fclose(fd);
-    if(shiny){
-        memset(pt,0,sizeof(pt));
-        if(!female)
-            sprintf(pt, "%s%d/%ds.raw",Path,pkmn_no,pkmn_no);
-        else
-            sprintf(pt, "%s%d/%dsf.raw",Path,pkmn_no,pkmn_no);
-        fd = fopen(pt,"rb");
-        for(int i= 0; i< 16; ++i)
-            TEMP_PAL[i] = 0; 
-        fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
-        fclose(fd);
-    }
-    if(bottom){
-        //swiCopy(TEMP_PAL,&SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
-    }else{
-        //swiCopy(TEMP_PAL,&SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
-    }
-    SpriteInfo * backInfo = &spriteInfo[++oamIndex];
-    SpriteEntry * back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 64;
-    backInfo->height = 64;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL; 
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_SQUARE;
-    back->x = flipx ? 32 + posX : posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt;
-    if(bottom){
-        //swiCopy(TEMP,&SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-    }else{
-        //swiCopy(TEMP,&SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
-    }
-    nextAvailableTileIdx += 64;
+                        if(fd == 0){
+                            fclose(fd); 
+                            return false;
+                        }
+                        int PalCnt = 16;
+                        for(int i= 0; i< 16; ++i)
+                            TEMP_PAL[i] = 0;
+                        fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
+                        for(int i = 0; i< 96*96; ++i)
+                            TEMP[i] = 0;
+                        fread(TEMP,  sizeof(unsigned int),96*96, fd);
+                        fclose(fd);
+                        if(shiny){
+                            memset(pt,0,sizeof(pt));
+                            if(!female)
+                                sprintf(pt, "%s%d/%ds.raw",Path,pkmn_no,pkmn_no);
+                            else
+                                sprintf(pt, "%s%d/%dsf.raw",Path,pkmn_no,pkmn_no);
+                            fd = fopen(pt,"rb");
+                            for(int i= 0; i< 16; ++i)
+                                TEMP_PAL[i] = 0; 
+                            fread(TEMP_PAL,  sizeof(unsigned short int),PalCnt, fd);
+                            fclose(fd);
+                        }
+                        if(bottom){
+                            //swiCopy(TEMP_PAL,&SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
+                            dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[(++palcnt) * COLORS_PER_PALETTE], 32);
+                        }else{
+                            //swiCopy(TEMP_PAL,&SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
+                            dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[(++palcnt) * COLORS_PER_PALETTE], 32);
+                        }
+                        SpriteInfo * backInfo = &spriteInfo[++oamIndex];
+                        SpriteEntry * back = &oam->oamBuffer[oamIndex];
+                        backInfo->oamId = oamIndex;
+                        backInfo->width = 64;
+                        backInfo->height = 64;
+                        backInfo->angle = 0;
+                        backInfo->entry = back;
+                        back->y = posY;
+                        back->isRotateScale = false;
+                        back->blendMode = OBJMODE_NORMAL; 
+                        back->isMosaic = false;
+                        back->isHidden = false;
+                        back->colorMode = OBJCOLOR_16;
+                        back->shape = OBJSHAPE_SQUARE;
+                        back->x = flipx ? 32 + posX : posX;
+                        back->hFlip = flipx;
+                        back->size = OBJSIZE_64;
+                        back->gfxIndex = nextAvailableTileIdx;
+                        back->priority = OBJPRIORITY_0;
+                        back->palette = palcnt;
+                        if(bottom){
+                            //swiCopy(TEMP,&SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
+                            dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+                        }else{
+                            //swiCopy(TEMP,&SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
+                            dmaCopyHalfWords(SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[nextAvailableTileIdx * OFFSET_MULTIPLIER], 96*96/2);
+                        }
+                        nextAvailableTileIdx += 64;
 
-    backInfo = &spriteInfo[++oamIndex];
-    back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 32;
-    backInfo->height = 64;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL;
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_TALL;
-    back->x = flipx ?  posX : 64 +posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt; 
-    nextAvailableTileIdx += 32;
+                        backInfo = &spriteInfo[++oamIndex];
+                        back = &oam->oamBuffer[oamIndex];
+                        backInfo->oamId = oamIndex;
+                        backInfo->width = 32;
+                        backInfo->height = 64;
+                        backInfo->angle = 0;
+                        backInfo->entry = back;
+                        back->y = posY;
+                        back->isRotateScale = false;
+                        back->blendMode = OBJMODE_NORMAL;
+                        back->isMosaic = false;
+                        back->isHidden = false;
+                        back->colorMode = OBJCOLOR_16;
+                        back->shape = OBJSHAPE_TALL;
+                        back->x = flipx ?  posX : 64 +posX;
+                        back->hFlip = flipx;
+                        back->size = OBJSIZE_64;
+                        back->gfxIndex = nextAvailableTileIdx;
+                        back->priority = OBJPRIORITY_0;
+                        back->palette = palcnt; 
+                        nextAvailableTileIdx += 32;
 
-    backInfo = &spriteInfo[++oamIndex];
-    back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;
-    backInfo->width = 64;
-    backInfo->height = 32;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY + 64;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL;
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_WIDE;
-    back->x = flipx ? 32 + posX : posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_64;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt; 
-    nextAvailableTileIdx += 32;
+                        backInfo = &spriteInfo[++oamIndex];
+                        back = &oam->oamBuffer[oamIndex];
+                        backInfo->oamId = oamIndex;
+                        backInfo->width = 64;
+                        backInfo->height = 32;
+                        backInfo->angle = 0;
+                        backInfo->entry = back;
+                        back->y = posY + 64;
+                        back->isRotateScale = false;
+                        back->blendMode = OBJMODE_NORMAL;
+                        back->isMosaic = false;
+                        back->isHidden = false;
+                        back->colorMode = OBJCOLOR_16;
+                        back->shape = OBJSHAPE_WIDE;
+                        back->x = flipx ? 32 + posX : posX;
+                        back->hFlip = flipx;
+                        back->size = OBJSIZE_64;
+                        back->gfxIndex = nextAvailableTileIdx;
+                        back->priority = OBJPRIORITY_0;
+                        back->palette = palcnt; 
+                        nextAvailableTileIdx += 32;
 
-    backInfo = &spriteInfo[++oamIndex];
-    back = &oam->oamBuffer[oamIndex];
-    backInfo->oamId = oamIndex;  
-    backInfo->width = 32; 
-    backInfo->height = 32;
-    backInfo->angle = 0;
-    backInfo->entry = back;
-    back->y = posY + 64;
-    back->isRotateScale = false;
-    back->blendMode = OBJMODE_NORMAL;
-    back->isMosaic = false;
-    back->isHidden = false;
-    back->colorMode = OBJCOLOR_16;
-    back->shape = OBJSHAPE_SQUARE;
-    back->x = flipx ?  posX : 64 +posX;
-    back->hFlip = flipx;
-    back->size = OBJSIZE_32;
-    back->gfxIndex = nextAvailableTileIdx;
-    back->priority = OBJPRIORITY_0;
-    back->palette = palcnt;
-    nextAvailableTileIdx += 16;
+                        backInfo = &spriteInfo[++oamIndex];
+                        back = &oam->oamBuffer[oamIndex];
+                        backInfo->oamId = oamIndex;  
+                        backInfo->width = 32; 
+                        backInfo->height = 32;
+                        backInfo->angle = 0;
+                        backInfo->entry = back;
+                        back->y = posY + 64;
+                        back->isRotateScale = false;
+                        back->blendMode = OBJMODE_NORMAL;
+                        back->isMosaic = false;
+                        back->isHidden = false;
+                        back->colorMode = OBJCOLOR_16;
+                        back->shape = OBJSHAPE_SQUARE;
+                        back->x = flipx ?  posX : 64 +posX;
+                        back->hFlip = flipx;
+                        back->size = OBJSIZE_32;
+                        back->gfxIndex = nextAvailableTileIdx;
+                        back->priority = OBJPRIORITY_0;
+                        back->palette = palcnt;
+                        nextAvailableTileIdx += 16;
 
-    ++palcnt;
-    if(bottom)
-        updateOAMSub(oam);
-    else
-        updateOAM(oam);
-    return true;
+                        ++palcnt;
+                        if(bottom)
+                            updateOAMSub(oam);
+                        else
+                            updateOAM(oam);
+                        return true;
 }
 bool loadPKMNSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path,const int& pkmn_no,const int posX,
                        const int posY, int& oamIndex,int& palcnt, int& nextAvailableTileIdx,bool bottom,bool shiny,bool female,bool flipx){
@@ -749,7 +749,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     const int BYTES_PER_16_COLOR_TILE = 32;
     const int COLORS_PER_PALETTE = 16;
     const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                          * (can be set in REG_DISPCNT) */
+                                   * (can be set in REG_DISPCNT) */
     const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
         sizeof(SPRITE_GFX_SUB[0]);
 
@@ -1809,7 +1809,7 @@ void initTop()
             cust_font.print_string(buf,borders[i][0]*8,borders[i][1]*8 - mval,false);
             sprintf(buf,"%s",POKEMON::PKMNDATA::getDisplayName(SAV.PKMN_team[i].boxdata.SPEC));
             cust_font.print_string(buf,borders[i][0]*8,borders[i][1]*8 + 14 - mval,false);
-                
+
             sprintf(buf,"%hi/%hi KP",SAV.PKMN_team[i].stats.acHP, SAV.PKMN_team[i].stats.maxHP);
             cust_font.print_string(buf,borders[i][0]*8,borders[i][1]*8 + 28 - mval,false);
 
@@ -1819,7 +1819,7 @@ void initTop()
         }
         else{
             consoleSetWindow(&Top,borders[i][0],borders[i][1],12,6);		
-            
+
             char buf[100];
             int mval = 1 + ((i/2 == 1) ? 4 : 8);
             sprintf(buf,"Ei");
@@ -4082,10 +4082,17 @@ PREV:
                                 (oam->oamBuffer[i]).y -= 16 * (2-((i-15)/4));
                                 updateOAMSub(oam); 
                                 consoleSetWindow(&Bottom,((oam->oamBuffer[i]).x+6)/8,((oam->oamBuffer[i]).y+6)/8,12,3);
-                                printf("   %3i/%3i\n ",SAV.PKMN_team[((i-15)/2)^1].stats.acHP,SAV.PKMN_team[((i-15)/2)^1].stats.maxHP);
-                                wprintf(SAV.PKMN_team[((i-15)/2)^1].boxdata.Name); printf("\n");
-                                printf("%11s",ItemList[SAV.PKMN_team[((i-15)/2)^1].boxdata.Item].getDisplayName().c_str());
-                                drawPKMNIcon(oam,spriteInfo,SAV.PKMN_team[((i-15)/2)^1].boxdata.SPEC,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,a,b,c);
+                                if(!SAV.PKMN_team[((i-15)/2)^1].boxdata.IV.isEgg){
+                                    printf("   %3i/%3i\n ",SAV.PKMN_team[((i-15)/2)^1].stats.acHP,SAV.PKMN_team[((i-15)/2)^1].stats.maxHP);
+                                    wprintf(SAV.PKMN_team[((i-15)/2)^1].boxdata.Name); printf("\n");
+                                    printf("%11s",ItemList[SAV.PKMN_team[((i-15)/2)^1].boxdata.Item].getDisplayName().c_str());
+                                    drawPKMNIcon(oam,spriteInfo,SAV.PKMN_team[((i-15)/2)^1].boxdata.SPEC,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,a,b,c);
+                                }
+                                else{
+                                    printf(" \n ");
+                                    printf("Ei"); printf("\n");
+                                    drawEggIcon(oam,spriteInfo,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,a,b,c);
+                                }
                                 updateOAMSub(oam); 
                             }
                             updateOAMSub(oam);
@@ -4113,6 +4120,8 @@ PREV:
                                 for(int i = 17; i < 26; i+=(((i-15)/2)%2?-2:+6)){
                                     if((((i-15)/2)^1) >= num)
                                         break;
+                                    else if(SAV.PKMN_team[((i-15)/2)^1].boxdata.IV.isEgg)
+                                        continue;
                                     else if (t.px > oam->oamBuffer[i].x && t.py > oam->oamBuffer[i].y && t.px-64 < oam->oamBuffer[i+1].x && t.py-32 < oam->oamBuffer[i].y){  
                                         (oam->oamBuffer[i]).isHidden = true;
                                         (oam->oamBuffer[i+1]).isHidden = true;
@@ -4137,11 +4146,11 @@ PREV:
                                             oam->oamBuffer[0].isHidden = false;
                                             oam->oamBuffer[1].isHidden = true;
                                             if(ac.boxdata.Item != 0){//PKMN hat schon Item 
-                                                std::wstring ws(ac.boxdata.Name);
-                                                ws += L" h\x84""lt bereits\ndas Item ";
-                                                mbox M = mbox(ws.c_str(),0,true,false,false);
-                                                M.put((ItemList[ac.boxdata.Item].getDisplayName()+".").c_str(),false);
-                                                if(ynbox(M).getResult("\n\nSollen die Items ausgetauscht werden?")){
+
+                                                char buf[100];
+                                                sprintf(buf,"%ls hält bereits\ndas Item %s.\nSollen die Items getauscht werden?", ac.boxdata.Name,ItemList[ac.boxdata.Item].getDisplayName().c_str());
+                                                mbox M = mbox("",0,true,false,false);
+                                                if(ynbox(M).getResult(buf)){
                                                     int pkmnOldItem = ac.boxdata.Item;
                                                     ac.boxdata.Item = acItem;
                                                     SAV.Bag.removeItem(bag::BAGTYPE(page),acItem,1);

@@ -775,18 +775,22 @@ namespace POKEMON{
 
             if(this->boxdata.getItem()){
                 cust_font.print_string("Item",2,176,false);
-                cust_font.set_color(251,1);
+                cust_font.set_color(252,1);
+                cust_font.set_color(0,2);
                 char buf[200];
                 sprintf(buf,"%s: %s",ItemList[this->boxdata.getItem()].getDisplayName(true).c_str(),
                     ItemList[this->boxdata.getItem()].getShortDescription(true).c_str());
-                cust_font.print_string(buf,50,158,false);
+                cust_font.print_string(buf,50,159,false);
                 drawItemIcon(oamTop,spriteInfoTop,ItemList[this->boxdata.getItem()].Name,2,152,a2,b2,c2,false);
                 updateOAM(oamTop);
             }
             else{
-                cust_font.set_color(251,1);
+                cust_font.set_color(252,1);
+                cust_font.set_color(0,2);
                 cust_font.print_string(ItemList[this->boxdata.getItem()].getDisplayName().c_str(),56,168,false);
             }
+            cust_font.set_color(251,1);
+            cust_font.set_color(252,2);
         }
         else{
             Page = 0;
