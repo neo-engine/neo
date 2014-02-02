@@ -1,5 +1,10 @@
 1
 -1
-<style>.edition { font-size:0.9em;background-color:#eeeeee;padding:2px; }</style>*
-Ein Item, das einem Pokémon zum Tragen gegeben werden kann. Zusätzlich zu den erhaltenen EVs gibt dieses Item 4 EVs für die Verteidigung, aber solange es das Item trägt wird die Initiative halbiert.*
+Machtgurt*
+   Item (Tragen):
+Zusätzlich zu den
+erhaltenen EV gibt
+dieses Item 4 EVs für
+die Vert., aber
+Halbierung der Init.*
 0*

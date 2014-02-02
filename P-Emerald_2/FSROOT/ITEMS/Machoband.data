@@ -1,5 +1,8 @@
 1
 -1
-<style>.edition { font-size:0.9em;background-color:#eeeeee;padding:2px; }</style>*
-Ein Item, das einem Pokémon zum Tragen gegeben werden kann. Verdoppelt die Anzahl der erhaltenen EVs, aber solange es das Item trägt wird die Initiative halbiert.*
+Machoband*
+   Item (Tragen):
+Verdoppelt die Anzahl
+der erhaltenen EV,
+halbiert Init.*
 0*

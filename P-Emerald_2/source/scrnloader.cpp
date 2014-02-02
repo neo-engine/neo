@@ -4021,13 +4021,12 @@ PREV:
                     consoleSetWindow(&Top,7,9,13,1);
                     consoleSelect(&Top);
                     printf(ItemList[acElem.first].getDisplayName().c_str());
-                    consoleSetWindow(&Top,6,11,23,10);
-                    printf(("  "+ItemList[acElem.first].getDescription()).c_str());
-                    //printf("   %i  %i  %i",ItemList[acElem.first].getItemType(),ItemList[acElem.first].itemtype,ItemList[SAV.Bag.element_at((bag::BAGTYPE)page,acpage * 12 +io).first].getItemType());   
+                    consoleSetWindow(&Top,5,11,23,10);
+                    printf((ItemList[acElem.first].getDescription()).c_str());
 
                     for(int i= acpage * 12; i< acpage * 12+ std::min(int(SAV.Bag.size(bag::BAGTYPE(page))) - acpage * 12,12);++i){
                         acElem = SAV.Bag.element_at(bag::BAGTYPE(page),i);
-                        if(i-acpage * 12 == io)
+                        if(i-acpage * 12 == io) 
                             continue;
                         else if(pos[i-acpage * 12] < 6)
                             drawItem(oamTop,spriteInfo,ItemList[acElem.first].Name,6 + pos[i-acpage * 12]*40,
