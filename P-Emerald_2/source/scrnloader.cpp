@@ -4007,7 +4007,6 @@ PREV:
                     consoleSelect(&Top);
                     consoleSetWindow(&Top,0,0,32,24);
                     consoleClear();
-                    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","ClearD");
                     oamTop->oamBuffer[1].isHidden = oamTop->oamBuffer[2].isHidden = oamTop->oamBuffer[3].isHidden = false;
                     oamTop->oamBuffer[1].x = 36;
                     oamTop->oamBuffer[2].x = 100;
@@ -4189,10 +4188,16 @@ OUT:
                         consoleSetWindow(&Top,0,3*i,12,3);
                         int acIn = 214 + 4*i;
                         int s = SAV.Bag.size((bag::BAGTYPE)i);
+                        char buf[50];
                         printf("%c%c\n%c%c ",(acIn),(acIn+1),(acIn+2),(acIn+3));
-                        if(s == 0)      printf("  0 Items");
-                        else if( s==1)  printf("  1 Item");
-                        else            printf("%3i Items", s);
+                        if(s == 0)
+                            sprintf(buf, "  0 Items");
+                        else if( s==1)
+                            sprintf(buf, "  1 Item");
+                        else 
+                            sprintf(buf, "%3i Items", s);
+
+                        cust_font.print_string(buf,20,24*i + 3,false);
                     }
                     oam2 = oamIndex;
                     pal2 = palcnt;
@@ -4278,13 +4283,16 @@ void bag::draw(){
         consoleSetWindow(&Top,0,3*i,12,3);
         int acIn = 214 + 4*i;
         int s = (int)this->bags[i].size();
+        char buf[50];
         printf("%c%c\n%c%c ",(acIn),(acIn+1),(acIn+2),(acIn+3));
         if(s == 0)
-            printf("  0 Items");
+            sprintf(buf, "  0 Items");
         else if( s==1)
-            printf("  1 Item");
-        else
-            printf("%3i Items", s);
+            sprintf(buf, "  1 Item");
+        else 
+            sprintf(buf, "%3i Items", s);
+
+        cust_font.print_string(buf,20,24*i + 3,false);
     }
     if(!BGs[BG_ind].load_from_rom){
         dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
@@ -4361,35 +4369,6 @@ void bag::draw(){
                         break;
                 }
                 drawBagPage(i,pos,oamInd,palcnt,tilecnt,oamIndT,palcntT,tilecntT);
-
-                //initOAMTableSub(oam);
-                /*
-                initBagSprites(oam,spriteInfo,oamInd,palcnt,tilecnt);
-                initBagSprites(oamTop,spriteInfoTop,oamIndT,palcntT,tilecntT,false);  
-
-                loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","BagTop");
-                consoleSelect(&Top);
-                for(int i= 0; i< 8; ++i){
-                consoleSetWindow(&Top,0,3*i,12,3);
-                int acIn = 214 + 4*i;
-                int s = (int)this->bags[i].size();
-                printf("%c%c\n%c%c ",(acIn),(acIn+1),(acIn+2),(acIn+3));
-                if(s == 0)
-                printf("  0 Items");
-                else if( s==1)
-                printf("  1 Item");
-                else
-                printf("%3i Items", s);
-                }
-                if(!BGs[BG_ind].load_from_rom){
-                dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-                dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-                }
-                else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name,BG_ind)){
-                dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-                dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-                BG_ind = 0;
-                }*/
 
                 consoleSetWindow(&Bottom,0,0,32,24);
                 consoleSelect(&Bottom);

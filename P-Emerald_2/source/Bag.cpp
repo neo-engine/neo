@@ -29,6 +29,7 @@ void bag::removeItem(BAGTYPE bag_type,int item_id,int cnt){
             else{
                 this->bags[bag_type].erase(I);
                 cnt -= num;
+                break;
             }
         }
         std::sort(this->bags[bag_type].begin(),this->bags[bag_type].end());

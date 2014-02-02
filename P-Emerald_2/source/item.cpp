@@ -40,6 +40,8 @@ std::string readString(FILE* fd, bool _new ){
                 ret += '\x9D';
             else if(ac == 'é')
                 ret += '\x82';
+            else if(ac == '%')
+                ret += ' ';
             else if(ac == '|')
                 ret += (char)136; 
             else if(ac == '#')
@@ -85,6 +87,8 @@ std::wstring readWString(FILE* fd, bool _new ){
                 ret += '\x9D';
             else if(ac == 'é')
                 ret += '\x82';
+            else if(ac == '%')
+                ret += ' ';
             else
                 ret += ac;
             continue;
