@@ -1418,7 +1418,7 @@ namespace BATTLE{
 
                 oamTop->oamBuffer[OPP_PB_START + 1].isHidden = true;
                 for(int i = 1; i <= 4; ++i)
-                    oamTop->oamBuffer[OPP_PKMN_1_START + i].isHidden = true;
+                    oamTop->oamBuffer[OPP_PKMN_1_START + i + 1].isHidden = true;
                 updateOAM(oamTop);
 
                 animatePB(206,50); 
@@ -1434,7 +1434,7 @@ namespace BATTLE{
                             (*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny(),!(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isFemale);
                 }
                 for(int i = 1; i <= 4; ++i)
-                    oamTop->oamBuffer[OPP_PKMN_1_START + i].isHidden = false;
+                    oamTop->oamBuffer[OPP_PKMN_1_START + i + 1].isHidden = false;
                 updateOAM(oamTop);
 
                 if((*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny())
@@ -1464,7 +1464,7 @@ namespace BATTLE{
                 nextAvailableTileIdx = OPP_PKMN_2_TILE;
 
                 for(int i = 1; i <= 4; ++i)
-                    oamTop->oamBuffer[OPP_PKMN_2_START + i].isHidden = true;
+                    oamTop->oamBuffer[OPP_PKMN_2_START + i + 1].isHidden = true;
                 updateOAM(oamTop);
 
                 animatePB(142,34); 
@@ -1480,7 +1480,7 @@ namespace BATTLE{
                 }
 
                 for(int i = 1; i <= 4; ++i)
-                    oamTop->oamBuffer[OPP_PKMN_2_START + i].isHidden = false;
+                    oamTop->oamBuffer[OPP_PKMN_2_START + i + 1].isHidden = false;
                 updateOAM(oamTop);
 
                 if((*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny())
@@ -1586,7 +1586,7 @@ namespace BATTLE{
 
                 oamTop->oamBuffer[OWN_PB_START + 1].isHidden = true;
                 for(int i = 0; i < 4; ++i)
-                    oamTop->oamBuffer[OWN_PKMN_1_START + i].isHidden = true;
+                    oamTop->oamBuffer[OWN_PKMN_1_START + i + 1].isHidden = true;
                 updateOAM(oamTop);
 
                 animatePB(80,170);
@@ -1627,7 +1627,7 @@ namespace BATTLE{
                 nextAvailableTileIdx = OWN_PKMN_2_TILE;
 
                 for(int i = 0; i < 4; ++i) //hide PKMN sprite
-                    oamTop->oamBuffer[OWN_PKMN_2_START + i].isHidden = true;
+                    oamTop->oamBuffer[OWN_PKMN_2_START + i + 1].isHidden = true;
                 updateOAM(oamTop);
 
                 animatePB(142,34); 
@@ -2201,7 +2201,7 @@ namespace BATTLE{
                     clear();
                     printf("%ls hat keine\n restlichen Attacken...",(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Name);
                     cust_font.print_string(buf,8,8,true);
-                    ownAtk[PKMNSlot] = std::pair<int,int>(0,1|2|4|8);
+                    ownAtk[PKMNSlot] = std::pair<int,int>(165,1|2|4|8);
                 }
                 else {
                     (oam->oamBuffer[20]).isHidden = false;
@@ -2438,10 +2438,10 @@ BEFORE_1:
             //OPP'S ACTIONS
             switchWith[0][1] = switchWith[0][0];
             switchWith[1][1] = switchWith[1][0];
+            oppAtk[0] = std::pair<int,int>((*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.Attack[0],1);
+            oppAtk[1] = std::pair<int,int>((*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Attack[0],2);
 
             consoleClear();
-            for(int i = 0; i< 40; ++i)
-                swiWaitForVBlank();
 
             int inits[4] = {0}, ranking[4] = {0};
 
@@ -2458,40 +2458,84 @@ BEFORE_1:
                         max = inits[j];
                         ranking[i] = j;
                     }
-            for(int i= 0; i < maxst;++i){
-                int prio = 0;
-                if(i % 2)
-                    prio = AttackList[oppAtk[i/2].first]->Priority;
-                else
-                    prio = AttackList[ownAtk[i/2].first]->Priority;
-                ranking[i] -= 4 * prio;
-            }
-
-            for(int i= 0; i < maxst; ++i){
-                int acin = 0;
-                for(int j = 0, min = 100; j < maxst; ++j)
-                    if(ranking[j] < min){
-                        acin = j;
-                        min = ranking[j];
+                    for(int i= 0; i < maxst;++i){
+                        int prio = 0;
+                        if(i % 2)
+                            prio = AttackList[acpokpos[i/2][1]]->Priority;
+                        else
+                            prio = AttackList[acpokpos[i/2][0]]->Priority;
+                        ranking[i] -= 4 * prio;
                     }
-                ranking[acin] = 42442;
 
-                bool opp = acin % 2;
+                    for(int i= 0; i < maxst; ++i){
+                        int acin = 0;
+                        for(int j = 0, min = 100; j < maxst; ++j)
+                            if(ranking[j] < min){
+                                acin = j;
+                                min = ranking[j];
+                            }
+                            ranking[acin] = 42442;
 
-                if(switchWith[acin/2][opp]){
-                    if(opp)
-                        switchOppPkmn(switchWith[acin/2][opp],acin/2);
-                    else
-                        switchOwnPkmn(switchWith[acin/2][opp],acin/2);
-                    continue;
-                }
-                if(opp){
-                    sprintf(buf,"%ls (Gegner)\nsetzt %s ein!",(*this->opponent->pkmn_team)[acin/2].boxdata.Name,AttackList[oppAtk[acin/2].first]->Name.c_str());
-                }
-                else{
-                    sprintf(buf,"%ls setzt\n%s ein!",(*this->player->pkmn_team)[acin/2].boxdata.Name,AttackList[ownAtk[acin/2].first]->Name.c_str());
-                }
-            }
+                            bool opp = acin % 2;
+
+                            if(switchWith[acin/2][opp]){
+                                if(opp)
+                                    switchOppPkmn(switchWith[acin/2][opp],acin/2);
+                                else
+                                    switchOwnPkmn(switchWith[acin/2][opp],acin/2);
+                                continue;
+                            }
+                            if(opp)
+                                sprintf(buf,"%ls (Gegner)\nsetzt %s ein!",(*this->opponent->pkmn_team)[acpokpos[acin/2][1]].boxdata.Name,AttackList[oppAtk[acin/2].first]->Name.c_str());                
+                            else
+                                sprintf(buf,"%ls setzt\n%s ein!",(*this->player->pkmn_team)[acpokpos[acin/2][0]].boxdata.Name,AttackList[ownAtk[acin/2].first]->Name.c_str());
+                            clear();
+                            cust_font.print_string(buf,8,8,true);
+                            for(int i = 0; i< 70; ++i)
+                                swiWaitForVBlank();
+                            if(opp){
+                                int tg = oppAtk[acin/2].second;
+                                int dmg1 = 0, dmg2 = 0,dmg3;
+                                if(tg & 1){
+                                    dmg1 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],(*this->player->pkmn_team)[acpokpos[0][0]],rand() / RAND_MAX);
+                                    int old = (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP;
+                                    (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP = std::max(0,(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP - dmg1);
+
+                                    displayHP(old,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,
+                                        256-96-28,192-32-8-32,142,149,true);     
+                                }
+                                if(tg & 2){
+                                    dmg2 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],(*this->player->pkmn_team)[acpokpos[1][0]],rand() / RAND_MAX);
+                                    int old = (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP;
+                                    (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP = std::max(0,(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP - dmg2);
+
+                                    displayHP(old,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,151,150,true);  
+                                }
+                                if(tg & 8){
+                                    dmg3 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],
+                                        (*this->opponent->pkmn_team)[acpokpos[1 - (acin/2)][1]],rand() / RAND_MAX);
+                                    int old = 0;
+                                    if(acin/2 == 0)
+                                        old = (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP;                                   
+                                    else
+                                        old = (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP;                                  
+
+                                    (*this->opponent->pkmn_team)[acpokpos[1 - (acin/2)][1]].stats.acHP = std::max(0,(*this->opponent->pkmn_team)[acpokpos[1 - (acin/2)][1]].stats.acHP-dmg3);
+                                    if(acin/2 == 0){
+                                        displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,142,143,true);    
+                                    }
+                                    else{
+                                        displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,145,144,true); 
+                                    }
+                                }
+                            }
+                            else{
+
+                            }
+                            
+                            for(int i = 0; i< 70; ++i)
+                                swiWaitForVBlank();
+                    }
         }
 END:
         dinit();
