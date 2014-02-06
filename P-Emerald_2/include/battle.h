@@ -75,6 +75,9 @@ namespace BATTLE{
         int start(int battle_back,Weather weather); //Runs battle; returns -1 if opponent wins, 1 otherwise
         void switchOppPkmn(int newPok,int toSwitch = 0);
         void switchOwnPkmn(int newPok,int toSwitch = 0);
+
+        int getChoice(int);
+        void printAttackChoiceScreen(int,int&,int&,int&);
     private:
         void initBattleScene(int battle_back,Weather weather);
     };
