@@ -1263,7 +1263,7 @@ namespace POKEMON{
             updateTime();
             scanKeys();
             int pressed = keysDown();
-            if((pressed & KEY_B)||(sqrt(sq(248-touch.px) + sq(184-touch.py)) <= 16))
+            if((pressed & KEY_B)||(pressed & KEY_X)||(sqrt(sq(248-touch.px) + sq(184-touch.py)) <= 16))
             {
                 while(1)
                 {
@@ -1271,6 +1271,8 @@ namespace POKEMON{
                     if(keysUp() & KEY_TOUCH)
                         break;
                     if(keysUp() & KEY_B)
+                        break;
+                    if(keysUp() & KEY_X)
                         break;
                 }
                 consoleSetWindow(&Bottom,0,0,32,24);

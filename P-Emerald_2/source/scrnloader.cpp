@@ -1858,7 +1858,7 @@ void initSub(int pkmIdx){
     consoleSelect(&Bottom);
     consoleSetWindow(&Bottom,16,0,16,16);
     consoleClear();
-    for(int i= 0; i < 4; ++i){
+    for(int i= 0; i < 5; ++i){
         oam->oamBuffer[15 + 2*i].isHidden = true;
         oam->oamBuffer[16 + 2*i].isHidden = true;
     }
@@ -1883,6 +1883,19 @@ void initSub(int pkmIdx){
                 consoleSetWindow(&Bottom,16,3*u + 1,16,16);
                 printf("    %s",AttackList[SAV.PKMN_team[pkmIdx].boxdata.Attack[i]]->Name.c_str());
                 ++u;
+        }
+        if(SAV.PKMN_team[pkmIdx].boxdata.Item){
+            oam->oamBuffer[15 + 2*(u)].isHidden = false;
+            oam->oamBuffer[16 + 2*(u)].isHidden = false;
+            oam->oamBuffer[15 + 2*(u)].y = -7 + 24 * u;
+            oam->oamBuffer[16 + 2*(u)].y = -7 + 24 * u;
+
+            oam->oamBuffer[15 + 2*(u)].x = 152;
+            oam->oamBuffer[16 + 2*(u)].x = 192 + 24;
+            updateOAMSub(oam);
+
+            consoleSetWindow(&Bottom,16,3*u + 1,16,16);
+            printf("    Item nehmen");
         }
         consoleSelect(&Top);
 
@@ -1944,13 +1957,13 @@ void scrnloader::run_pkmn()
         int pressed = keysUp();
         touchRead(&touch);
 
-        if ( touch.px>224 && touch.py>164)
+        if (pressed & KEY_X || ( touch.px>224 && touch.py>164) )
         {
             while(1)
             {
-                scanKeys();
-                if(keysUp() & KEY_TOUCH)
+                if((keysUp() & KEY_X) || (keysUp() & KEY_TOUCH) )
                     break; 
+                scanKeys();
             }
             break;
         }
@@ -1971,7 +1984,24 @@ void scrnloader::run_pkmn()
             {
                 initSub(-1);
                 int p = SAV.PKMN_team[acIn].draw();
-                if(p & KEY_B)
+                if(p & KEY_X){
+                    for (int i = 0; i < max; i++)
+                    {
+                        consoleSetWindow(&Top,positions[i][0],positions[i][1],2,2);
+                        consoleClear();
+                    }
+                    clearTop();
+                    initSub(-1);
+
+                    initOAMTableSub(oam);
+                    initMainSprites(oam,spriteInfo);
+                    setSpriteVisibility(back,true);
+                    setSpriteVisibility(save,false);
+                    setMainSpriteVisibility(false);
+                    oam->oamBuffer[8].isHidden = true;
+                    return;
+                }
+                else if(p & KEY_B)
                 {
                     initOAMTableSub(oam);
                     initMainSprites(oam,spriteInfo);
@@ -2009,40 +2039,17 @@ void scrnloader::run_pkmn()
                 }
                 else if(p & KEY_UP)
                 {
-                    /*initOAMTableSub(oam);
-                    initMainSprites(oam,spriteInfo);
-                    setSpriteVisibility(back,true);
-                    setSpriteVisibility(save,true);
-                    setMainSpriteVisibility(true);*/
                     if(--acIn <= -1)
                         acIn = max-1;
                 }
                 else if(p & KEY_DOWN)
                 {
-                    /* initOAMTableSub(oam);
-                    initMainSprites(oam,spriteInfo);
-                    setSpriteVisibility(back,true);
-                    setSpriteVisibility(save,true);
-                    setMainSpriteVisibility(true);*/
                     if(++acIn >= max)
                         acIn = 0;
                 }
 
             }
         }
-        //else if (touch.px>117 && touch.py>52&&touch.px<141 && touch.py<75 && !(touch==lstTch) && bbb > 20){
-        //	//Item Geben
-        //	mbox("Nicht Implementiert!");			
-        //	dmaCopy( BGs[BG_ind].PKMNMenu, bgGetGfxPtr(bg3sub), 256*256 );
-        //	dmaCopy( BGs[BG_ind].PKMNMenuPal,BG_PALETTE_SUB, 256*2);
-        //}
-        //else if (touch.px>116 && touch.py>119&&touch.px<140 && touch.py<143 && !(touch==lstTch) && bbb > 20)
-        //{  
-        //	//Item nehmen			
-        //	mbox("Nicht Implementiert!");			
-        //	dmaCopy( BGs[BG_ind].PKMNMenu, bgGetGfxPtr(bg3sub), 256*256 );
-        //	dmaCopy( BGs[BG_ind].PKMNMenuPal,BG_PALETTE_SUB, 256*2);
-        //}
         else if (pressed & KEY_UP)
         {
             if(--acIn <= -1)
@@ -2065,6 +2072,36 @@ void scrnloader::run_pkmn()
                 printf(">");
             else
                 printf("<");
+            initSub(acIn);
+        }
+        else if(SAV.PKMN_team[acIn].boxdata.Item && touch.px >= 152 && touch.py >= (-7 + 24 *fieldCnt) && touch.py < (17 + 24 * fieldCnt)){
+            while(1)
+            {
+                scanKeys();
+                if(keysUp() & KEY_TOUCH)
+                    break; 
+            }
+            char buf[50];
+            item acI = ItemList[SAV.PKMN_team[acIn].boxdata.Item];
+            SAV.PKMN_team[acIn].boxdata.Item = 0;
+
+            initSub(-1);
+            setSpriteVisibility(back,true);
+            oam->oamBuffer[8].isHidden = true;
+            oam->oamBuffer[8].x = SCREEN_WIDTH -28;
+            oam->oamBuffer[8].y = SCREEN_HEIGHT -28;
+            updateOAMSub(oam);
+            sprintf(buf,"%s von %ls\nim Beutel verstaut.",acI.getDisplayName().c_str(),SAV.PKMN_team[acIn].boxdata.Name);
+            mbox(buf,true,true);
+            SAV.Bag.addItem(acI.getItemType(),acI.getID(),1);
+
+            oam->oamBuffer[8].x = SCREEN_WIDTH / 2 - 16;
+            oam->oamBuffer[8].y = SCREEN_HEIGHT / 2 - 16;
+            loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
+            initTop();
+            setSpriteVisibility(back,false);
+            oam->oamBuffer[8].isHidden = false;
+            updateOAMSub(oam);
             initSub(acIn);
         }
         for(int i= 0; i < fieldCnt; ++i)
