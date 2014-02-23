@@ -38,6 +38,9 @@
 #include "Border_3.h"
 #include "Border_4.h"
 #include "Border_5.h"
+
+#include "Border.h"
+
 #include "ChSq_a.h"
 #include "ChSq_b.h"
 #include "BigCirc1.h"
@@ -50,6 +53,8 @@
 #include "BagSpr.h"
 #include "BagSpr2.h"
 
+#include "BG1.h"
+
 PrintConsole Top,Bottom;
 
 unsigned int NAV_DATA[12288] = {0};
@@ -61,8 +66,9 @@ BG_set BGs[MAXBG] = {{"Raging_Gyarados",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Awakening_Xerneas",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Awakening_Yveltal",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Fighting_Groudon",NAV_DATA,NAV_DATA_PAL,true,false},
-{"Fighting_Kyogre",NAV_DATA,NAV_DATA_PAL,true,false}};
-int BG_ind = 4;
+{"Fighting_Kyogre",NAV_DATA,NAV_DATA_PAL,true,false},
+{"Working_Kling",BG1Bitmap,BG1Pal,false,false}};
+int BG_ind = 8;
 extern POKEMON::PKMN::BOX_PKMN stored_pkmn[MAXSTOREDPKMN];
 extern std::vector<int> box_of_st_pkmn[MAXPKMN];
 extern std::vector<int> free_spaces;
@@ -101,6 +107,12 @@ void printMapLocation(const MapRegionPos& m){
 u8 frame = 0;
 void updateTime(bool mapMode)
 {
+    cust_font2.set_color(0,0);
+    cust_font2.set_color(0,1);
+    cust_font2.set_color(252,2);
+    BG_PALETTE_SUB[251] = RGB15(15,15,15);
+    BG_PALETTE_SUB[252] = RGB15(3,3,3);
+
     frame = (frame + 1) % 256;
     if(mapMode)
         animateMap(frame);
@@ -125,17 +137,14 @@ void updateTime(bool mapMode)
             }
             updateOAMSub(oam);
         }
+        char buf[15];
+        sprintf(buf,"%02i:%02i:%02i", achours, acminutes,acseconds);
+        dmaCopy(BorderBitmap + 6144 + 3072, bgGetGfxPtr(bg2sub) + 6*3072, 64*256);
+        cust_font2.print_string(buf,18*8,192-16,true);
     }
     acday = timeStruct->tm_mday;
     acmonth = timeStruct->tm_mon;
     acyear = timeStruct->tm_year +1900;
-
-    int oX = Bottom.windowX, oY = Bottom.windowY,wX = Bottom.windowWidth,wY = Bottom.windowHeight;
-    consoleSetWindow(&Bottom,18,23,8,1);
-    consoleSelect(&Bottom);
-    consoleClear();
-    printf("%02i:%02i:%02i", achours, acminutes,acseconds);
-    consoleSetWindow(&Bottom,oX,oY,wX,wY);
 }
 
 unsigned int TEMP[12288] = {0};
@@ -754,7 +763,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
         sizeof(SPRITE_GFX_SUB[0]);
 
     /* Keep track of the available tiles */
-    int nextAvailableTileIdx = 0;
+    int nextAvailableTileIdx = 16;
 
     SpriteInfo * backInfo = &spriteInfo[BACK_ID];
     SpriteEntry * back = &oam->oamBuffer[BACK_ID];
@@ -1055,7 +1064,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
         M->x = (i-M_ID)*64;
         M->size = OBJSIZE_64;
         M->gfxIndex = nextAvailableTileIdx;
-        M->priority = OBJPRIORITY_2;
+        M->priority = OBJPRIORITY_3;
         M->palette = palcnt;    
     }
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
@@ -1215,214 +1224,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Choice_2Tiles,    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    Choice_2TilesLen);
     nextAvailableTileIdx += Choice_2TilesLen / BYTES_PER_16_COLOR_TILE;
     ++palcnt;
-
-    SpriteInfo * Bo4Info = &spriteInfo[BORDER_ID];
-    SpriteEntry * Bo4 = &oam->oamBuffer[BORDER_ID];
-    Bo4Info->oamId = BORDER_ID;
-    Bo4Info->width = 64;
-    Bo4Info->height = 64;
-    Bo4Info->angle = 0;
-    Bo4Info->entry = Bo4;
-    Bo4->y = 0;
-    Bo4->isRotateScale = false;
-    Bo4->blendMode = OBJMODE_NORMAL;
-    Bo4->isMosaic = true;
-    Bo4->colorMode = OBJCOLOR_16;
-    Bo4->shape = OBJSHAPE_SQUARE;
-    Bo4->isHidden = false;
-    Bo4->x = 0;
-    Bo4->size = OBJSIZE_64;
-    Bo4->gfxIndex = nextAvailableTileIdx;
-    Bo4->priority = OBJPRIORITY_2;
-    Bo4->palette = palcnt;
-    Bo4->vFlip = true;
-    Bo4->hFlip = true;
-
-    Bo4 = &oam->oamBuffer[BORDER_ID+1];
-    Bo4->y = 128;
-    Bo4->isRotateScale = false;
-    Bo4->blendMode = OBJMODE_NORMAL;
-    Bo4->isMosaic = true;
-    Bo4->colorMode = OBJCOLOR_16;
-    Bo4->shape = OBJSHAPE_SQUARE;
-    Bo4->isHidden = false;
-    Bo4->x = 192;
-    Bo4->size = OBJSIZE_64;
-    Bo4->gfxIndex = nextAvailableTileIdx;
-    Bo4->priority = OBJPRIORITY_1;
-    Bo4->palette = palcnt;
-    Bo4->vFlip = false;
-    Bo4->hFlip = false;
-
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Border_4Pal,    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],    32);
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Border_4Tiles,    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    Border_4TilesLen);
-    nextAvailableTileIdx += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
-
-    SpriteInfo * Bo3Info = &spriteInfo[BORDER_ID+2];
-    SpriteEntry * Bo3 = &oam->oamBuffer[BORDER_ID+2];
-    Bo3Info->oamId = BORDER_ID;
-    Bo3Info->width = 64;
-    Bo3Info->height = 64;
-    Bo3Info->angle = 0;
-    Bo3Info->entry = Bo3;
-    Bo3->y = 0;
-    Bo3->isRotateScale = false;
-    Bo3->blendMode = OBJMODE_NORMAL;
-    Bo3->isMosaic = true;
-    Bo3->colorMode = OBJCOLOR_16;
-    Bo3->shape = OBJSHAPE_SQUARE;
-    Bo3->isHidden = false;
-    Bo3->x = 64;
-    Bo3->size = OBJSIZE_64;
-    Bo3->gfxIndex = nextAvailableTileIdx;
-    Bo3->priority = OBJPRIORITY_2;
-    Bo3->palette = palcnt;
-    Bo3->vFlip = true;
-    Bo3->hFlip = true;
-
-    Bo3 = &oam->oamBuffer[BORDER_ID+3];
-    Bo3->y = 128;
-    Bo3->isRotateScale = false;
-    Bo3->blendMode = OBJMODE_NORMAL;
-    Bo3->isMosaic = true;
-    Bo3->colorMode = OBJCOLOR_16;
-    Bo3->shape = OBJSHAPE_SQUARE;
-    Bo3->isHidden = false;
-    Bo3->x = 128;
-    Bo3->size = OBJSIZE_64;
-    Bo3->gfxIndex = nextAvailableTileIdx;
-    Bo3->priority = OBJPRIORITY_1;
-    Bo3->palette = palcnt;
-    Bo3->vFlip = false;
-    Bo3->hFlip = false;
-
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Border_3Tiles,    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    Border_3TilesLen);
-    nextAvailableTileIdx += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
-
-    SpriteInfo * Bo2Info = &spriteInfo[BORDER_ID+4];
-    SpriteEntry * Bo2 = &oam->oamBuffer[BORDER_ID+4];
-    Bo2Info->oamId = BORDER_ID;
-    Bo2Info->width = 64;
-    Bo2Info->height = 64;
-    Bo2Info->angle = 0;
-    Bo2Info->entry = Bo2;
-    Bo2->y = 0;
-    Bo2->isRotateScale = false;
-    Bo2->blendMode = OBJMODE_NORMAL;
-    Bo2->isMosaic = true;
-    Bo2->colorMode = OBJCOLOR_16;
-    Bo2->shape = OBJSHAPE_SQUARE;
-    Bo2->isHidden = false;
-    Bo2->x = 128;
-    Bo2->size = OBJSIZE_64;
-    Bo2->gfxIndex = nextAvailableTileIdx;
-    Bo2->priority = OBJPRIORITY_2;
-    Bo2->palette = palcnt;
-    Bo2->vFlip = true;
-    Bo2->hFlip = true;
-
-    Bo2 = &oam->oamBuffer[BORDER_ID+5];
-    Bo2->y = 128;
-    Bo2->isRotateScale = false;
-    Bo2->blendMode = OBJMODE_NORMAL;
-    Bo2->isMosaic = true;
-    Bo2->colorMode = OBJCOLOR_16;
-    Bo2->shape = OBJSHAPE_SQUARE;
-    Bo2->isHidden = false;
-    Bo2->x = 64;
-    Bo2->size = OBJSIZE_64;
-    Bo2->gfxIndex = nextAvailableTileIdx;
-    Bo2->priority = OBJPRIORITY_1;
-    Bo2->palette = palcnt;
-    Bo2->vFlip = false;
-    Bo2->hFlip = false;
-
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Border_2Tiles,    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    Border_2TilesLen);
-    nextAvailableTileIdx += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
-
-    SpriteInfo * Bo1Info = &spriteInfo[BORDER_ID+6];
-    SpriteEntry * Bo1 = &oam->oamBuffer[BORDER_ID+6];
-    Bo1Info->oamId = BORDER_ID;
-    Bo1Info->width = 64;
-    Bo1Info->height = 64;
-    Bo1Info->angle = 0;
-    Bo1Info->entry = Bo2;
-    Bo1->y = 0;
-    Bo1->isRotateScale = false;
-    Bo1->blendMode = OBJMODE_NORMAL;
-    Bo1->isMosaic = true;
-    Bo1->colorMode = OBJCOLOR_16;
-    Bo1->shape = OBJSHAPE_SQUARE;
-    Bo1->isHidden = false;
-    Bo1->x = 192;
-    Bo1->size = OBJSIZE_64;
-    Bo1->gfxIndex = nextAvailableTileIdx;
-    Bo1->priority = OBJPRIORITY_2;
-    Bo1->palette = palcnt;
-    Bo1->vFlip = true;
-    Bo1->hFlip = true;
-
-    Bo1 = &oam->oamBuffer[BORDER_ID+7];
-    Bo1->y = 128;
-    Bo1->isRotateScale = false;
-    Bo1->blendMode = OBJMODE_NORMAL;
-    Bo1->isMosaic = true;
-    Bo1->colorMode = OBJCOLOR_16;
-    Bo1->shape = OBJSHAPE_SQUARE;
-    Bo1->isHidden = false;
-    Bo1->x = 0;
-    Bo1->size = OBJSIZE_64;
-    Bo1->gfxIndex = nextAvailableTileIdx;
-    Bo1->priority = OBJPRIORITY_1;
-    Bo1->palette = palcnt;
-    Bo1->vFlip = false;
-    Bo1->hFlip = false;
-
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Border_1Tiles,    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    Border_1TilesLen);
-    nextAvailableTileIdx += Border_1TilesLen / BYTES_PER_16_COLOR_TILE;
-
-    SpriteInfo * Bo5Info = &spriteInfo[BORDER_ID+8];
-    SpriteEntry * Bo5 = &oam->oamBuffer[BORDER_ID+8];
-    Bo5Info->oamId = BORDER_ID;
-    Bo5Info->width = 64;
-    Bo5Info->height = 64;
-    Bo5Info->angle = 0;
-    Bo5Info->entry = Bo2;
-    Bo5->y = 64;
-    Bo5->isRotateScale = false;
-    Bo5->blendMode = OBJMODE_NORMAL;
-    Bo5->isMosaic = true;
-    Bo5->colorMode = OBJCOLOR_16;
-    Bo5->shape = OBJSHAPE_SQUARE;
-    Bo5->isHidden = false;
-    Bo5->x = 0;
-    Bo5->size = OBJSIZE_64;
-    Bo5->gfxIndex = nextAvailableTileIdx;
-    Bo5->priority = OBJPRIORITY_2;
-    Bo5->palette = palcnt;
-    Bo5->vFlip = true;
-    Bo5->hFlip = true;
-
-    Bo5 = &oam->oamBuffer[BORDER_ID+9];
-    Bo5->y = 64;
-    Bo5->isRotateScale = false;
-    Bo5->blendMode = OBJMODE_NORMAL;
-    Bo5->isMosaic = true;
-    Bo5->colorMode = OBJCOLOR_16;
-    Bo5->shape = OBJSHAPE_SQUARE;
-    Bo5->isHidden = false;
-    Bo5->x = 192;
-    Bo5->size = OBJSIZE_64;
-    Bo5->gfxIndex = nextAvailableTileIdx;
-    Bo5->priority = OBJPRIORITY_2;
-    Bo5->palette = palcnt;
-    Bo5->vFlip = false;
-    Bo5->hFlip = false;
-
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Border_5Tiles,    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    Border_5TilesLen);
-    nextAvailableTileIdx += Border_5TilesLen / BYTES_PER_16_COLOR_TILE;
-    ++palcnt;
-
+    
     SpriteInfo * SQCHAInfo = &spriteInfo[SQCH_ID];
     SpriteEntry * SQCHA = &oam->oamBuffer[SQCH_ID];
     SQCHAInfo->oamId = SQCH_ID;
@@ -1538,20 +1340,26 @@ void setMainSpriteVisibility(bool hidden){
     updateOAMSub(oam);
 }
 
+void drawSub(){
+    dmaCopy(BorderBitmap, bgGetGfxPtr(bg2sub), 256*256);
+    dmaCopy(BorderPal, BG_PALETTE_SUB, 256*2); 
+    if(!BGs[BG_ind].load_from_rom){
+        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+        dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+    }
+    else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
+        dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+        dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
+        BG_ind = 0;
+    }
+}
+
 void scrnloader::draw(int m){
     pos = m;
     SpriteEntry * back = &oam->oamBuffer[BACK_ID];
     setSpriteVisibility(back,false);
     if(m== 0){
-        if(!BGs[BG_ind].load_from_rom){
-            dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-            dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-        }
-        else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-            dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-            dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-            BG_ind = 0;
-        }
+        drawSub();
         setMainSpriteVisibility(true);
 
         for(int i = 0; i< 3; ++i){
@@ -1597,15 +1405,8 @@ void scrnloader::draw(int m){
         updateOAMSub(oam);
     }
     else{		 
-        if(!BGs[BG_ind].load_from_rom){
-            dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-            dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-        }
-        else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-            dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-            dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-            BG_ind = 0;
-        }
+        
+        drawSub();
         setSpriteVisibility(back,true);
         setMainSpriteVisibility(false);
         for(int i = 0; i< 3; ++i)
@@ -1915,16 +1716,7 @@ void scrnloader::run_pkmn()
 
     touchPosition touch;
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
-    if(!BGs[BG_ind].load_from_rom){
-        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-    }
-    else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-        dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-        BG_ind = 0;
-    }
-
+    drawSub();
     int acIn= 0,max = SAV.PKMN_team.size();
     consoleSelect(&Top);
     consoleClear();
@@ -2013,15 +1805,7 @@ void scrnloader::run_pkmn()
                     oam->oamBuffer[8].y = SCREEN_HEIGHT / 2 - 16;
 
                     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
-                    if(!BGs[BG_ind].load_from_rom){
-                        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-                        dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-                    }
-                    else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-                        dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-                        dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-                        BG_ind = 0;
-                    }
+                    drawSub();
 
                     acIn %= max;
                     consoleSelect(&Top);
@@ -2909,15 +2693,7 @@ void scrnloader::run_dex(int num){
     touchPosition t;	int acForme = 0;
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","DexTop",32);
 
-    if(!BGs[BG_ind].load_from_rom){
-        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-    }
-    else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-        dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-        BG_ind = 0;
-    }
+    drawSub();
     initOAMTableSub(oam);
     initOAMTable(oamTop);
     int palcnt = 0,tilecnt = 0,oamInd = 0;
@@ -4331,15 +4107,7 @@ void bag::draw(){
 
         cust_font.print_string(buf,20,24*i + 3,false);
     }
-    if(!BGs[BG_ind].load_from_rom){
-        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-    }
-    else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-        dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-        BG_ind = 0;
-    }
+    drawSub();
     initOAMTableSub(oam);
     int palcnt = 0,tilecnt = 0,oamInd = 0;
     initBagSprites(oam,spriteInfo,oamInd,palcnt,tilecnt);

@@ -64,7 +64,7 @@ enum Region{
 #define SQCH_ID 41
 // 42 used
 
-#define MAXBG 8
+#define MAXBG 9
 struct BG_set {
     std::string Name;
     const unsigned int *MainMenu;
@@ -81,6 +81,7 @@ void updateTime(bool mapMode = false);
 void animateMap(u8 frame);
 
 void initVideoSub();
+void drawSub();
 
 void animateBack();
 void setMainSpriteVisibility(bool hidden);

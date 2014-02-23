@@ -47,15 +47,7 @@ void init(){
     updateOAMSub(oam);
 }
 void dinit(){
-    if(!BGs[BG_ind].load_from_rom){
-        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-    }
-    else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-        dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-        BG_ind = 0;
-    }
+    drawSub();
 
     for(int i= 0; i< 4; ++i)
         oam->oamBuffer[31+2*i].isHidden = false;

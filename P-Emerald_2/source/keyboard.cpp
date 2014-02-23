@@ -13,15 +13,7 @@ extern OAMTable *oam,*oamTop;
 
 std::wstring keyboard::getText(int length,const char* msg,bool time)
 {
-    if(!BGs[BG_ind].load_from_rom){
-        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-    }
-    else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-        dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-        BG_ind = 0;
-    }
+    drawSub();
 
     for(int i= 0; i< 4; ++i)
         oam->oamBuffer[31+2*i].isHidden = true;
@@ -139,15 +131,7 @@ std::wstring keyboard::getText(int length,const char* msg,bool time)
 }
 
 void keyboard::undraw(){
-    if(!BGs[BG_ind].load_from_rom){
-        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-    }
-    else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-        dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-        BG_ind = 0;
-    }
+    drawSub();
     BG_PALETTE_SUB[250] = RGB15(31,31,31);
     BG_PALETTE_SUB[251] = RGB15(15,15,15);
     BG_PALETTE_SUB[252] = RGB15(3,3,3);

@@ -449,15 +449,7 @@ INDIVIDUALISIERUNG:
     M.clear();
     M = mbox("Individualisierung\nabgeschlossen!");
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","ClearD");
-    if(!BGs[BG_ind].load_from_rom){
-        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-    }
-    else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-        dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-        dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-        BG_ind = 0;
-    }
+    drawSub();
     for (int i = 0; i < 30; i++)
         swiWaitForVBlank();
     dmaCopy( BrotherBitmap, bgGetGfxPtr(bg3), 256*256 );
@@ -658,14 +650,14 @@ void startScreen(){
     bgUpdate();
 
     // set up our bottom bitmap background
-    bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 1 , 0 );
+    bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5 , 0 );
     // bgSet( bg3sub, 0, 1<<8, 1<<8, 0, 0, 0, 0 );
-    bgSetPriority( bg3sub, 2 );
+    bgSetPriority( bg3sub, 3 );
     bgUpdate();
     //// set up our bottom bitmap background
-    //bg2sub = bgInitSub( 2, BgType_Bmp8, BgSize_B8_256x256, 2 , 0 );
+    bg2sub = bgInitSub( 2, BgType_Bmp8, BgSize_B8_256x256, 1 , 0 );
     //// bgSet( bg2sub, 0, 1<<8, 1<<8, 0, 0, 0, 0 );
-    //bgSetPriority( bg2sub, 3 );
+    bgSetPriority( bg2sub, 2 );
     //bgUpdate();
 
     Top = *consoleInit(0, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true ,true);

@@ -1042,7 +1042,7 @@ namespace POKEMON{
         for(int i = 0; i< 4; ++i){
             oam->oamBuffer[9+i].isHidden = false;
             oam->oamBuffer[9+i].hFlip = true;            
-            oam->oamBuffer[9+i].priority = OBJPRIORITY_2;
+            oam->oamBuffer[9+i].priority = OBJPRIORITY_3;
             oam->oamBuffer[9+i].y = 192-54;
         }
         oam->oamBuffer[18].isHidden = false;
@@ -1069,15 +1069,7 @@ namespace POKEMON{
 
         //wprintf(L"  OT %ls\n  (%05i/%05i)\n\n",&(boxdata.OT[0]),this->boxdata.ID,this->boxdata.SID);
 
-        if(!BGs[BG_ind].load_from_rom){
-            dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-            dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-        }
-        else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
-            dmaCopy(BGs[0].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
-            dmaCopy(BGs[0].MainMenuPal, BG_PALETTE_SUB, 256*2); 
-            BG_ind = 0;
-        }
+        drawSub();
 
         cust_font2.set_color(0,0);
         cust_font2.set_color(254,1);
