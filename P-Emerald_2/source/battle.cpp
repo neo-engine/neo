@@ -104,20 +104,21 @@ namespace BATTLE{
         }
     }
     void displayEP(int EPstart,int EP,int x,int y,int freecolor1,int freecolor2,bool delay,int innerR,int outerR){
+        int factor = std::max(1,outerR / 15);
         if(EPstart >= 100 || EP > 100){
             BG_PALETTE[freecolor1] = NORMAL_;
-            for(int i= 0; i < 300; ++i)
+            for(int i= 0; i < factor *100; ++i)
                 for(int j= innerR; j <= outerR; ++j){
-                    int nx = x + 16 + j * sin((50-i/3.0)*acos(0) / 30),ny = y + 16 + j * cos((50-i/3.0)*acos(0) / 30);
+                    int nx = x + 16 + j * sin((50-i/(1.0*factor))*acos(0) / 30),ny = y + 16 + j * cos((50-i/(1.0*factor))*acos(0) / 30);
                     ((Color *)BG_BMP_RAM(1))[(nx + ny * SCREEN_WIDTH)/2] = (((u8)freecolor1)<<8) | (u8)freecolor1;
                     //printf("%i %i; ",nx,ny);
                 }
         }
         else {
             BG_PALETTE[freecolor2] = ICE;
-            for(int i= EPstart*3; i <= EP*3; ++i){
+            for(int i= EPstart*factor; i <= EP*factor; ++i){
                 for(int j= innerR; j <= outerR; ++j){
-                    int nx = x + 16 + j * sin((50-i/3.0)*acos(0) / 30),ny = y + 16 + j * cos((50-i/3.0)*acos(0) / 30);
+                    int nx = x + 16 + j * sin((50-i/(1.0*factor))*acos(0) / 30),ny = y + 16 + j * cos((50-i/(1.0*factor))*acos(0) / 30);
                     ((Color *)BG_BMP_RAM(1))[(nx + ny * SCREEN_WIDTH)/2] = (((u8)freecolor2)<<8) | (u8)freecolor2;
                 }
                 if(delay)
@@ -168,7 +169,7 @@ namespace BATTLE{
         font::putrec(0,0,256,63,true,false,250);
     }
     void dinit(){
-        
+
         drawSub();
 
         for(int i= 5; i< 8; ++i)
@@ -897,8 +898,8 @@ namespace BATTLE{
         Bo4->vFlip = false;
         Bo4->hFlip = false;
 
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Border_4Pal, &SPRITE_PALETTE_SUB[palcntS * COLORS_PER_PALETTE], 32);
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Border_4Tiles, &SPRITE_GFX_SUB[nextAvailableTileIdxS * OFFSET_MULTIPLIER], Border_4TilesLen);
+        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Border_4Pal, &SPRITE_PALETTE_SUB[palcntS * COLORS_PER_PALETTE], 32);
+        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Border_4Tiles, &SPRITE_GFX_SUB[nextAvailableTileIdxS * OFFSET_MULTIPLIER], Border_4TilesLen);
         nextAvailableTileIdxS += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
 
         SpriteInfo * Bo3Info = &spriteInfo[++oamIndexS];
@@ -939,10 +940,10 @@ namespace BATTLE{
         Bo3->vFlip = false;
         Bo3->hFlip = false;
 
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+        /*dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
             Border_3Tiles,
             &SPRITE_GFX_SUB[nextAvailableTileIdxS * OFFSET_MULTIPLIER],
-            Border_3TilesLen);
+            Border_3TilesLen);*/
 
         nextAvailableTileIdxS += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
 
@@ -984,10 +985,10 @@ namespace BATTLE{
         Bo2->vFlip = false;
         Bo2->hFlip = false;
 
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+        /*dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
             Border_2Tiles,
             &SPRITE_GFX_SUB[nextAvailableTileIdxS * OFFSET_MULTIPLIER],
-            Border_2TilesLen);
+            Border_2TilesLen);*/
         nextAvailableTileIdxS += Border_2TilesLen / BYTES_PER_16_COLOR_TILE;
 
         SpriteInfo * Bo1Info = &spriteInfo[++oamIndexS];
@@ -1028,10 +1029,10 @@ namespace BATTLE{
         Bo1->vFlip = false;
         Bo1->hFlip = false;
 
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+        /*dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
             Border_1Tiles,
             &SPRITE_GFX_SUB[nextAvailableTileIdxS * OFFSET_MULTIPLIER],
-            Border_1TilesLen);
+            Border_1TilesLen);*/
         nextAvailableTileIdxS += Border_1TilesLen / BYTES_PER_16_COLOR_TILE;
 
         SpriteInfo * Bo5Info = &spriteInfo[++oamIndexS];
@@ -1072,7 +1073,7 @@ namespace BATTLE{
         Bo5->vFlip = false;
         Bo5->hFlip = false;
 
-        dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Border_5Tiles, &SPRITE_GFX_SUB[nextAvailableTileIdxS * OFFSET_MULTIPLIER], Border_5TilesLen);
+        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Border_5Tiles, &SPRITE_GFX_SUB[nextAvailableTileIdxS * OFFSET_MULTIPLIER], Border_5TilesLen);
         nextAvailableTileIdxS += Border_5TilesLen / BYTES_PER_16_COLOR_TILE;
 
         ++palcntS;
@@ -2065,9 +2066,23 @@ namespace BATTLE{
 
     float volltreffer[5] = {0.0625,0.125,0.25,0.3333,0.5};
     bool volltreffer_occ = false;
+    float eff = 1;
+    bool missed = false;
     int calcDamage(const attack& atk, const POKEMON::PKMN& atg, const POKEMON::PKMN& def,int rndVal){
         if(atk.HitType == attack::HitTypes::STAT)
             return 0;
+
+        missed = false;
+        if(atk.Accuracy && rand() * 1.0 / RAND_MAX > atk.Accuracy / 100.0){
+            missed = true;
+            return 0;
+        }
+
+        if(def.stats.acHP == 0){
+            missed = true;
+            return 0;
+        }
+
         int atkval = (atk.HitType == attack::HitTypes::SPEC ? atg.stats.SAtk : atg.stats.Atk);
         int defval = (atk.HitType == attack::HitTypes::SPEC ? def.stats.SDef : def.stats.Def);
 
@@ -2080,20 +2095,20 @@ namespace BATTLE{
         int vs = 1;
         volltreffer_occ = false;
         if(rndVal <= 15)
-            if(rand() / RAND_MAX <= volltreffer[vs]){
+            if(rand() * 1.0 / RAND_MAX <= volltreffer[vs]){
                 baseDmg <<= 1;
                 volltreffer_occ = true;
             }
 
-        baseDmg = (baseDmg * (100 - rndVal)) / 100;
+            baseDmg = (baseDmg * (100 - rndVal)) / 100;
 
-        if(atk.type == p1.Types[0] || atk.type == p1.Types[1])
-            baseDmg = (baseDmg * 3) / 2;
+            if(atk.type == p1.Types[0] || atk.type == p1.Types[1])
+                baseDmg = (baseDmg * 3) / 2;
 
-        baseDmg = baseDmg * (getEffectiveness(atk.type,p2.Types[0]) * getEffectiveness(atk.type,p2.Types[1]));
+            eff = (getEffectiveness(atk.type,p2.Types[0]) * getEffectiveness(atk.type,p2.Types[1]));
+            baseDmg = baseDmg * eff;
 
-
-        return std::max(1,baseDmg);
+            return std::max(1,baseDmg);
     }
 
     std::pair<int,int> ownAtk[2]; //AtkIdx; Target 1->opp[0]/2->opp[1]/3->both_opp/4->self/8->partner
@@ -2236,7 +2251,7 @@ namespace BATTLE{
 
                         for(int i = 21; i < 29; i+=2)
                             if(t.px>(oam->oamBuffer[i].x) && t.px < (oam->oamBuffer[i+1].x + 64) &&
-                                t.py>(oam->oamBuffer[i]).y && t.py < (oam->oamBuffer[i+1].y + 64)){
+                                t.py>(oam->oamBuffer[i]).y && t.py < (oam->oamBuffer[i].y + 32)){
                                     while(1) {
                                         scanKeys();
                                         swiWaitForVBlank();
@@ -2430,6 +2445,10 @@ BEFORE_1:
             oppAtk[0] = std::pair<int,int>((*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.Attack[0],1);
             oppAtk[1] = std::pair<int,int>((*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Attack[0],2);
 
+
+            ownAtk[0].second = 1;
+            ownAtk[1].second = 2;
+
             consoleClear();
 
             int inits[4] = {0}, ranking[4] = {0};
@@ -2441,7 +2460,10 @@ BEFORE_1:
                     inits[i] = (*this->opponent->pkmn_team)[acpokpos[i/2][1]].stats.Spd;
                 else
                     inits[i] = (*this->player->pkmn_team)[acpokpos[i/2][0]].stats.Spd;
-            for(int i= 0; i < maxst; ++i)
+
+            bool ko[2][2] = {{false}};
+
+            for(int i= 0; i < maxst; ++i){
                 for(int j= 0,max = -1; j < maxst; ++j)
                     if(inits[j] > max && (!i || (ranking[i-1] != j && inits[ranking[i-1]] >= inits[j]))){
                         max = inits[j];
@@ -2455,122 +2477,232 @@ BEFORE_1:
                             prio = AttackList[acpokpos[i/2][0]]->Priority;
                         ranking[i] -= 4 * prio;
                     }
+            }
+            for(int i= 0; i < maxst; ++i){
+                int acin = 0;
+                for(int j = 0, min = 100; j < maxst; ++j)
+                    if(ranking[j] < min){
+                        acin = j;
+                        min = ranking[j];
+                    }
+                    ranking[acin] = 42442;
 
-                    for(int i= 0; i < maxst; ++i){
-                        int acin = 0;
-                        for(int j = 0, min = 100; j < maxst; ++j)
-                            if(ranking[j] < min){
-                                acin = j;
-                                min = ranking[j];
-                            }
-                            ranking[acin] = 42442;
+                    bool opp = acin % 2;
 
-                            bool opp = acin % 2;
+                    if(opp){
+                        if((*this->opponent->pkmn_team)[acpokpos[acin/2][1]].stats.acHP == 0)
+                            continue;
+                    }
+                    else
+                        if((*this->player->pkmn_team)[acpokpos[acin/2][0]].stats.acHP == 0)
+                            continue;
 
-                            if(opp){
-                                if((*this->opponent->pkmn_team)[acpokpos[acin/2][1]].stats.acHP == 0)
-                                    continue;
-                            }
+                    if(switchWith[acin/2][opp]){
+                        if(opp)
+                            switchOppPkmn(switchWith[acin/2][opp],acin/2);
+                        else
+                            switchOwnPkmn(switchWith[acin/2][opp],acin/2);
+                        continue;
+                    }
+                    if(opp)
+                        sprintf(buf,"%ls (Gegner)\nsetzt %s ein!",(*this->opponent->pkmn_team)[acpokpos[acin/2][1]].boxdata.Name,AttackList[oppAtk[acin/2].first]->Name.c_str());                
+                    else
+                        sprintf(buf,"%ls setzt\n%s ein!",(*this->player->pkmn_team)[acpokpos[acin/2][0]].boxdata.Name,AttackList[ownAtk[acin/2].first]->Name.c_str());
+                    clear();
+                    cust_font.print_string(buf,8,8,true);
+                    for(int i = 0; i< 70; ++i)
+                        swiWaitForVBlank();
+                    if(opp){
+                        int tg = oppAtk[acin/2].second;
+                        int dmg1 = 0, dmg2 = 0,dmg3;
+                        if(tg & 1){
+                            dmg1 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],(*this->player->pkmn_team)[acpokpos[0][0]],rand() / RAND_MAX);
+
+                            if(missed)
+                                goto MISSED;
+
+                            int old = (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP;
+                            (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP = std::max(0,(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP - dmg1);
+
+                            ko[0][0] = ((*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP == 0);
+
+                            displayHP(old,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,
+                                256-96-28,192-32-8-32,142,149,true);     
+                        }
+                        if(tg & 2){
+                            dmg2 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],(*this->player->pkmn_team)[acpokpos[1][0]],rand() / RAND_MAX);
+                            if(missed)
+                                goto MISSED;
+                            int old = (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP;
+                            (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP = std::max(0,(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP - dmg2);
+
+                            ko[1][0] = ((*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP == 0);
+
+                            displayHP(old,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,151,150,true);  
+                        }
+                        if(tg & 8){
+                            dmg3 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],
+                                (*this->opponent->pkmn_team)[acpokpos[1 - (acin/2)][1]],rand() / RAND_MAX);
+                            if(missed)
+                                goto MISSED;
+                            int old = 0;
+                            if(acin/2 == 0)
+                                old = (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP;                                   
                             else
-                                if((*this->player->pkmn_team)[acpokpos[acin/2][0]].stats.acHP == 0)
-                                    continue;
+                                old = (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP;                                  
 
-                            if(switchWith[acin/2][opp]){
-                                if(opp)
-                                    switchOppPkmn(switchWith[acin/2][opp],acin/2);
-                                else
-                                    switchOwnPkmn(switchWith[acin/2][opp],acin/2);
-                                continue;
-                            }
-                            if(opp)
-                                sprintf(buf,"%ls (Gegner)\nsetzt %s ein!",(*this->opponent->pkmn_team)[acpokpos[acin/2][1]].boxdata.Name,AttackList[oppAtk[acin/2].first]->Name.c_str());                
-                            else
-                                sprintf(buf,"%ls setzt\n%s ein!",(*this->player->pkmn_team)[acpokpos[acin/2][0]].boxdata.Name,AttackList[ownAtk[acin/2].first]->Name.c_str());
-                            clear();
-                            cust_font.print_string(buf,8,8,true);
-                            for(int i = 0; i< 70; ++i)
-                                swiWaitForVBlank();
-                            if(opp){
-                                int tg = oppAtk[acin/2].second;
-                                int dmg1 = 0, dmg2 = 0,dmg3;
-                                if(tg & 1){
-                                    dmg1 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],(*this->player->pkmn_team)[acpokpos[0][0]],rand() / RAND_MAX);
-                                    int old = (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP;
-                                    (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP = std::max(0,(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP - dmg1);
-
-                                    displayHP(old,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,
-                                        256-96-28,192-32-8-32,142,149,true);     
-                                }
-                                if(tg & 2){
-                                    dmg2 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],(*this->player->pkmn_team)[acpokpos[1][0]],rand() / RAND_MAX);
-                                    int old = (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP;
-                                    (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP = std::max(0,(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP - dmg2);
-
-                                    displayHP(old,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,151,150,true);  
-                                }
-                                if(tg & 8){
-                                    dmg3 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],
-                                        (*this->opponent->pkmn_team)[acpokpos[1 - (acin/2)][1]],rand() / RAND_MAX);
-                                    int old = 0;
-                                    if(acin/2 == 0)
-                                        old = (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP;                                   
-                                    else
-                                        old = (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP;                                  
-
-                                    (*this->opponent->pkmn_team)[acpokpos[1 - (acin/2)][1]].stats.acHP = std::max(0,(*this->opponent->pkmn_team)[acpokpos[1 - (acin/2)][1]].stats.acHP-dmg3);
-                                    if(acin/2 == 0){
-                                        displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,142,143,true);    
-                                    }
-                                    else{
-                                        displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,145,144,true); 
-                                    }
-                                }
+                            (*this->opponent->pkmn_team)[acpokpos[1 - (acin/2)][1]].stats.acHP = std::max(0,(*this->opponent->pkmn_team)[acpokpos[1 - (acin/2)][1]].stats.acHP-dmg3);
+                            if(!(*this->opponent->pkmn_team)[acpokpos[1 - (acin/2)][1]].stats.acHP)
+                                ko[1 - (acin/2)][1] = true;
+                            if(acin/2 == 0){
+                                displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,142,143,true);    
                             }
                             else{
-                                int tg = oppAtk[acin/2].second;
-                                int dmg1 = 0, dmg2 = 0,dmg3;
-                                if(tg & 1){
-                                    dmg1 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->player->pkmn_team)[acpokpos[acin/2][0]],(*this->opponent->pkmn_team)[acpokpos[0][1]],rand() / RAND_MAX);
-                                    int old = (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP;
-                                    (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP = std::max(0,(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP - dmg1);
-
-                                    displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,
-                                        256-96-28,192-32-8-32,142,149,true);     
-                                }
-                                if(tg & 2){
-                                    dmg2 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->player->pkmn_team)[acpokpos[acin/2][0]],(*this->opponent->pkmn_team)[acpokpos[1][1]],rand() / RAND_MAX);
-                                    int old = (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP;
-                                    (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP = std::max(0,(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP - dmg2);
-
-                                    displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,256-36,192-40,151,150,true);  
-                                }
-                                if(tg & 8){
-                                    dmg3 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->player->pkmn_team)[acpokpos[acin/2][0]],
-                                        (*this->player->pkmn_team)[acpokpos[1 - (acin/2)][0]],rand() / RAND_MAX);
-                                    int old = 0;
-                                    if(acin/2 == 0)
-                                        old = (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP;                                   
-                                    else
-                                        old = (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP;                                  
-
-                                    (*this->player->pkmn_team)[acpokpos[1 - (acin/2)][0]].stats.acHP = std::max(0,(*this->player->pkmn_team)[acpokpos[1 - (acin/2)][0]].stats.acHP-dmg3);
-                                    if(acin/2 == 0){
-                                        displayHP(old,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,88,32,142,143,true);    
-                                    }
-                                    else{
-                                        displayHP(old,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,0,8,145,144,true); 
-                                    }
-                                }
+                                displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,145,144,true); 
                             }
-                            for(int i = 0; i< 60; ++i)
-                                swiWaitForVBlank();
-                            if(volltreffer_occ){
-                                clear();
-                                cust_font.print_string("Ein Volltreffer!",8,8,true);
-                                for(int i = 0; i< 60; ++i)
-                                    swiWaitForVBlank();
-                            }
+                        }
                     }
+                    else{
+                        int tg = oppAtk[acin/2].second;
+                        int dmg1 = 0, dmg2 = 0,dmg3;
+                        if(tg & 1){
+                            dmg1 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->player->pkmn_team)[acpokpos[acin/2][0]],(*this->opponent->pkmn_team)[acpokpos[0][1]],rand() / RAND_MAX);
+                            if(missed)
+                                goto MISSED;
+                            int old = (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP;
+                            (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP = std::max(0,(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP - dmg1);
+                            if(!(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP)
+                                ko[0][1] = true;
+                            displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,
+                                88,32,142,143,true);     
+                        }
+                        if(tg & 2){
+                            dmg2 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->player->pkmn_team)[acpokpos[acin/2][0]],(*this->opponent->pkmn_team)[acpokpos[1][1]],rand() / RAND_MAX);
+                            if(missed)
+                                goto MISSED;
+                            int old = (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP;
+                            (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP = std::max(0,(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP - dmg2);
+                            if(!(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP)
+                                ko[1][1] = true;
+                            displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,145,144,true);  
+                        }
+                        if(tg & 8){
+                            dmg3 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->player->pkmn_team)[acpokpos[acin/2][0]],
+                                (*this->player->pkmn_team)[acpokpos[1 - (acin/2)][0]],rand() / RAND_MAX);
+                            if(missed)
+                                goto MISSED;
+                            int old = 0;
+                            if(acin/2 == 0)
+                                old = (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP;                                   
+                            else
+                                old = (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP;                                  
+
+                            (*this->player->pkmn_team)[acpokpos[1 - (acin/2)][0]].stats.acHP = std::max(0,(*this->player->pkmn_team)[acpokpos[1 - (acin/2)][0]].stats.acHP-dmg3);
+                            if(!(*this->player->pkmn_team)[acpokpos[1 - (acin/2)][0]].stats.acHP)
+                                ko[1 - (acin/2)][0] = true;
+                            if(acin/2 == 0){
+                                displayHP(old,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/
+                                    (*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,142,149,true);    
+                            }
+                            else{
+                                displayHP(old,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,151,150,true); 
+                            }
+                        }
+                    }
+                    for(int i = 0; i< 60; ++i)
+                        swiWaitForVBlank();
+                    if(volltreffer_occ){
+                        clear();
+                        cust_font.print_string("Ein Volltreffer!",8,8,true);
+                        for(int i = 0; i< 75; ++i)
+                            swiWaitForVBlank();
+                    }
+                    if(eff != 1)
+                        clear();
+                    if(eff > 3)
+                        cust_font.print_string("Das ist enorm effektiv!",8,8,true);
+                    else if(eff > 1)
+                        cust_font.print_string("Das ist sehr effektiv!",8,8,true);
+                    else if(eff == 0)
+                        cust_font.print_string("Hat die Attacke getroffen?",8,8,true);
+                    else if(eff < 0.3)
+                        cust_font.print_string("Das ist nur enorm wenig\neffektiv...",8,8,true);
+                    else if(eff < 1)
+                        cust_font.print_string("Das ist nicht sehr\neffektiv.",8,8,true);
+
+                    if(eff != 1)
+                        for(int i = 0; i< 75; ++i)
+                            swiWaitForVBlank();
+
+                    if(ko[0][0]){
+                        clear();
+                        sprintf(buf,"%ls wurde besiegt.",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name);
+                        cust_font.print_string(buf,8,8,true);
+
+                        for(int i = 0; i < 4; ++i)
+                            oamTop->oamBuffer[OWN_PKMN_1_START + i + 1].isHidden = true;
+                        updateOAM(oamTop);
+
+                        consoleSetWindow(&Top,21,16,20,4);     
+                        displayEP(100,100,256-36,192-40,46,47,false);
+                        consoleClear();
+
+                        for(int i = 0; i< 75; ++i)
+                            swiWaitForVBlank();
+                    }
+                    if(ko[1][0]){
+                        clear();
+                        sprintf(buf,"%ls wurde besiegt.",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name);
+                        cust_font.print_string(buf,8,8,true);
+
+                        for(int i = 0; i < 4; ++i)
+                            oamTop->oamBuffer[OWN_PKMN_2_START + i + 1].isHidden = true;
+                        updateOAM(oamTop);
+
+                        consoleSetWindow(&Top,16,20,20,5);
+                        consoleClear();
+                        displayEP(100,100,256-36,192-40,46,47,false);
+                        for(int i = 0; i< 75; ++i)
+                            swiWaitForVBlank();
+                    }
+
+                    if(ko[0][1]){
+                        clear();
+                        sprintf(buf,"%ls (Gegner)\nwurde besiegt.",(*this->player->pkmn_team)[acpokpos[0][1]].boxdata.Name);
+                        cust_font.print_string(buf,8,8,true);
+
+                        for(int i = 0; i < 4; ++i)
+                            oamTop->oamBuffer[OPP_PKMN_1_START + i + 1].isHidden = true;
+                        updateOAM(oamTop);
+
+                        for(int i = 0; i< 75; ++i)
+                            swiWaitForVBlank();
+                    }
+                    if(ko[1][1]){
+                        clear();
+                        sprintf(buf,"%ls (Gegner)\nwurde besiegt.",(*this->player->pkmn_team)[acpokpos[1][1]].boxdata.Name);
+                        cust_font.print_string(buf,8,8,true);
+
+                        for(int i = 0; i < 4; ++i)
+                            oamTop->oamBuffer[OPP_PKMN_2_START + i + 1].isHidden = true;
+                        updateOAM(oamTop);
+
+                        for(int i = 0; i< 75; ++i)
+                            swiWaitForVBlank();
+                    }
+
+
+MISSED:
+                    if(missed){
+                        clear();
+                        cust_font.print_string("Die Attacke ging daneben...",8,8,true);
+                        for(int i = 0; i< 75; ++i)
+                            swiWaitForVBlank();
+                    }
+            }
+
+
+
         }
 END:
         dinit();
