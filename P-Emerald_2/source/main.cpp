@@ -59,7 +59,7 @@ enum GameMod{
     RELEASE,
     EMULATOR
 } gMod = DEVELOPER;
-std::string CodeName = "Awakening Xerneas";
+std::string CodeName = "Working Kling";
 SavMod savMod = _NDS;
 
 char acSlot2Game[5];
@@ -695,7 +695,7 @@ START:
 
     BG_PALETTE[3] = BG_PALETTE_SUB[3] = RGB15(0,0,0);
 
-    printf("@ RedArceus 2012 - 2014\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+    printf("@ Philip \"RedArceus\" Wellnitz\n                     2012 - 2014\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     if(gMod == DEVELOPER)
         printf("             Developer's version\n");
     else if(gMod == BETA)
@@ -866,7 +866,7 @@ CONT:
                             acPkmn.boxdata.ability = p.abilities[acPkmn.boxdata.IV.isEgg];
                             acPkmn.boxdata.IV.isEgg = acPkmn.boxdata.IV.isNicked;
                             acPkmn.boxdata.gotPlace = gen3::getNLocation(acBM->locationcaught);
-                            
+
                             acPkmn.boxdata.gotLevel = acBM->levelcaught;
 
                             if(acPkmn.boxdata.IV.isEgg || acPkmn.boxdata.gotLevel){
@@ -1917,8 +1917,8 @@ OUT:
                 if(keysUp() & KEY_TOUCH)
                     break;
             }
-            const char *someText[7]= {"\n     PKMN-Spawn","\n    Item-Spawn","\n 1-Item_Test","\n  Battle SPWN.","\n   Trainerpass","\n    42"};
-            cbox test(4,&someText[0],0,true);
+            const char *someText[7]= {"\n     PKMN-Spawn","\n    Item-Spawn","\n 1-Item_Test","\n  Battle SPWN.","\n   Battle SPWN 2","\n    42"};
+            cbox test(5,&someText[0],0,true);
             int res = test.getResult("Tokens of god-being...",true);
             switch(res)
             {
@@ -1933,7 +1933,7 @@ OUT:
                         A[2] = 431;
                         A[3] = 432;
                         POKEMON::PKMN a(A,HILFSCOUNTER,0,
-                            1+rand()%100,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,rand()%2,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
+                            50,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,rand()%2,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;
                         a.stats.acHP = i*a.stats.maxHP/5;
                         SAV.PKMN_team.push_back(a);
@@ -1957,7 +1957,6 @@ OUT:
                         SAV.Bag.addItem(ItemList[j].itemtype,j,1);
                 break;
             case 2: 
-                SAV.PKMN_team[0].boxdata.exp += 100;
                 mbox(berry("Ginemabeere"),31);
                 setMainSpriteVisibility(false);
                 break;
@@ -1971,7 +1970,7 @@ OUT:
                     A[0] = HILFSCOUNTER % 10;
                     A[1] = (HILFSCOUNTER+1) % 10;
                     POKEMON::PKMN a(A,HILFSCOUNTER,0,
-                        1+rand()%100,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
+                        50,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                     a.stats.acHP = i*a.stats.maxHP/5;
                     cpy.push_back(a);
                     HILFSCOUNTER= 1+((HILFSCOUNTER)%649);
@@ -1980,6 +1979,30 @@ OUT:
                 BATTLE::battle_trainer opp("TEST-OPP","DeR TeST iST DeR BeSTe MSG1","DeR TeST VeRLieRT GeRaDe... MSG2","DeR TeST GEWiNNT HaHa! MSG3","DeR TeST VeRLieRT... MSG4",&(cpy),0);
 
                 BATTLE::battle test_battle(&me,&opp,100,5,BATTLE::battle::DOUBLE);
+                test_battle.start(100,BATTLE::battle::NONE);       
+                initMapSprites();
+                movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);
+                break;
+                   }
+            case 4:{
+                BATTLE::battle_trainer me("TEST",0,0,0,0,&SAV.PKMN_team,0);
+                std::vector<POKEMON::PKMN> cpy;
+
+                u16 A []= {1,2,3,4};
+                for(int i = 0;i<6;++i)
+                {
+                    A[0] = HILFSCOUNTER % 10;
+                    A[1] = (HILFSCOUNTER+1) % 10;
+                    POKEMON::PKMN a(A,HILFSCOUNTER,0,
+                        50,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
+                    a.stats.acHP = i*a.stats.maxHP/5;
+                    cpy.push_back(a);
+                    HILFSCOUNTER= 1+((HILFSCOUNTER)%649);
+                }
+
+                BATTLE::battle_trainer opp("TEST-OPP","DeR TeST iST DeR BeSTe MSG1","DeR TeST VeRLieRT GeRaDe... MSG2","DeR TeST GEWiNNT HaHa! MSG3","DeR TeST VeRLieRT... MSG4",&(cpy),0);
+
+                BATTLE::battle test_battle(&me,&opp,100,5,BATTLE::battle::SINGLE);
                 test_battle.start(100,BATTLE::battle::NONE);       
                 initMapSprites();
                 movePlayerOnMap(SAV.acposx/20,SAV.acposy/20,SAV.acposz,true);

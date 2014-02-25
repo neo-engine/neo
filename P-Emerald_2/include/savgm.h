@@ -60,6 +60,9 @@ public:
     int acMoveMode;
     char acMapName[100];
 
+    bool EXPShareEnabled;
+    bool EvolveInBattle;
+
     //GameFlags
     bool hasGDex;
 

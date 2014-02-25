@@ -397,7 +397,7 @@ item ItemList[700] = {
     berry("Jabocabeere"),	berry("Roselbeere"),
 
     item("Blendpuder"),     item("Schlohkraut"),
-    item("Machoband"),      item("EP-Teiler"),
+    item("Machoband"),      key_item("EP-Teiler"),
     item("Flinkklaue"),     item("Sanftglocke"),
     item("Mentalkraut"),    item("Wahlband"),
     item("King-Stein"),     item("Silberstaub"),

@@ -36,11 +36,11 @@ namespace BATTLE{
         POKEMON::PKMN& sendNewPKMN(bool choice = true);
         item& useItem(bool choice = true);
 
-        const char* getLooseMsg() const;
-        int getLooseMoney() const;
-        const char* getWinMsg() const;
-        const char* getCriticalMsg() const;
-        const char* getInitMsg() const;
+        const char* getLooseMsg() const { return Msg4; }
+        int getLooseMoney() const { return money_earned; }
+        const char* getWinMsg() const { return Msg3; }
+        const char* getCriticalMsg() const { return Msg2; }
+        const char* getInitMsg() const { return Msg1; }
     };
     class battle{
     private:
@@ -56,6 +56,8 @@ namespace BATTLE{
         } acpoksts[6][2];
 
     public:
+        bool distributeEXP;
+
         enum Weather{
             NONE = 0,
             RAIN = 1,
@@ -75,8 +77,9 @@ namespace BATTLE{
         int start(int battle_back,Weather weather); //Runs battle; returns -1 if opponent wins, 1 otherwise
         void switchOppPkmn(int newPok,int toSwitch = 0);
         void switchOwnPkmn(int newPok,int toSwitch = 0);
-
+        
         int getChoice(int);
+        int getTarget(int);
         void printAttackChoiceScreen(int,int&,int&,int&);
     private:
         void initBattleScene(int battle_back,Weather weather);

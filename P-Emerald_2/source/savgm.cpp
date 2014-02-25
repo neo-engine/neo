@@ -94,6 +94,10 @@ savgm::savgm(void Func(int))
     Func(100);
     fclose(fd);
     good = true;
+
+    //todo
+    EXPShareEnabled = false;
+    EvolveInBattle = true;
 }
 
 bool saveGBA(void Func(int)){
