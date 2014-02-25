@@ -1767,21 +1767,29 @@ namespace BATTLE{
         }
         if(acpoksts[acpokpos[0][0]][0] == KO)
             for(int i= 2; i< 6; ++i)
-                if(acpoksts[acpokpos[i][0]][0] != KO)
+                if(acpoksts[acpokpos[i][0]][0] != KO){
                     std::swap(acpokpos[0][0],acpokpos[i][0]);
+                    break;
+                }
         if(this->battlemode == DOUBLE && acpoksts[acpokpos[1][0]][0] == KO)
             for(int i= 2; i< 6; ++i)
-                if(acpoksts[acpokpos[i][0]][0] != KO)
+                if(acpoksts[acpokpos[i][0]][0] != KO){
                     std::swap(acpokpos[1][0],acpokpos[i][0]);
+                    break;
+                }
 
         if(acpoksts[acpokpos[0][1]][1] == KO)
             for(int i= 2; i< 6; ++i)
-                if(acpoksts[acpokpos[i][1]][1] != KO)
+                if(acpoksts[acpokpos[i][1]][1] != KO){
                     std::swap(acpokpos[0][1],acpokpos[i][1]);
+                    break;
+                }
         if(this->battlemode == DOUBLE && acpoksts[acpokpos[1][1]][1] == KO)
             for(int i= 2; i< 6; ++i)
-                if(acpoksts[acpokpos[i][1]][1] != KO)
+                if(acpoksts[acpokpos[i][1]][1] != KO){
                     std::swap(acpokpos[1][1],acpokpos[i][1]);
+                    break;
+                }
 
         vramSetup();
         videoSetMode(MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );		
@@ -2512,6 +2520,8 @@ OUT2:
     }
 
     int battle::start(int battle_back,Weather weather){ 
+        drawSub();
+
         for(int i = 0; i < 6; ++i)
             participated[i] = false;
 
@@ -2610,18 +2620,19 @@ OUT2:
             consoleSelect(&Bottom);
 
 BEFORE_0:
-            switch(getChoice(0)){
-            case SUCCESS:
-                goto BEFORE_1;
-            case RETRY:
-                switchWith[0][0] = 0;
-                goto BEFORE_0;
-            case BATTLE_END:
-                goto END;
+            if(acpoksts[acpokpos[0][0]][0] != KO){
+                switch(getChoice(0)){
+                case SUCCESS:
+                    goto BEFORE_1;
+                case RETRY:
+                    switchWith[0][0] = 0;
+                    goto BEFORE_0;
+                case BATTLE_END:
+                    goto END;
+                }
             }
-
 BEFORE_1:
-            if(this->battlemode == DOUBLE)
+            if(this->battlemode == DOUBLE && acpoksts[acpokpos[1][0]][0] != KO)
                 switch(getChoice(1)){
                 case RETRY:
                     switchWith[1][0] = 0;
@@ -2987,7 +2998,7 @@ BEFORE_1:
                                         displayEP(old,nw, 256-96-28,192-32-8-32,46,47,true);
 
                                     if(this->battlemode == DOUBLE && i == 1)
-                                        displayEP(old,nw, 256-36,192-40,46,47,true);
+                                        displayEP(old,nw, 256-36,192-40,48,49,true);
                                     for(int i = 0; i< 75; ++i)
                                         swiWaitForVBlank();
                                     bool newLevel = acPK.Level < 100 && POKEMON::EXP[acPK.Level][p.expType] <= acPK.boxdata.exp;
@@ -3007,8 +3018,8 @@ BEFORE_1:
                                             displayEP(100,nw, 256-96-28,192-32-8-32,46,47,true);
                                         }
                                         if(this->battlemode == DOUBLE && i == 1){
-                                            displayEP(100,100, 256-36,192-40,46,47,false);
-                                            displayEP(100,nw, 256-36,192-40,46,47,true);
+                                            displayEP(100,100, 256-36,192-40,48,49,false);
+                                            displayEP(100,nw, 256-36,192-40,48,49,true);
                                         }
                                         newLevel = acPK.Level < 100 && POKEMON::EXP[acPK.Level][p.expType] <= acPK.boxdata.exp;
                                     }

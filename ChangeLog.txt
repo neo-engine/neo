@@ -1,8 +1,9 @@
 @@Prerelease Builds@@
-@Awakening Xerneas [WIP]@
+@Working Kling [WIP]@
  - PokéNav-Skin hinzugefügt (+) {Awakening Xerneas}
  - PokéNav-Skin hinzugefügt (+) {Awakening Yveltal}
  - PokéNav-Skin hinzugefügt (+) {Working Kling}
+ - PKMN-Kampf (+)
 
 @Charming Lari [2014-01-29]@
  - Speichern von Spielständen (ô)

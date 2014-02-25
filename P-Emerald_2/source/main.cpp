@@ -1701,7 +1701,7 @@ int main(int argc, char** argv)
 
     cust_font.set_color(RGB(0,31,31),0);
 
-    int HILFSCOUNTER = 1;
+    int HILFSCOUNTER = 252;
     oam->oamBuffer[PKMN_ID].isHidden = !(SAV.hasPKMN && SAV.PKMN_team.size());
     updateOAMSub(oam);
 
@@ -1930,12 +1930,12 @@ OUT:
                     {
                         A[0] =  57;
                         A[1] = 19;
-                        A[2] = 431;
+                        A[2] = HILFSCOUNTER;
                         A[3] = 432;
                         POKEMON::PKMN a(A,HILFSCOUNTER,0,
                             50,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,rand()%2,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;
-                        a.stats.acHP = i*a.stats.maxHP/5;
+                        //a.stats.acHP = i*a.stats.maxHP/5;
                         SAV.PKMN_team.push_back(a);
 
                         SAV.inDex[a.boxdata.SPEC-1] = true;
@@ -1971,7 +1971,7 @@ OUT:
                     A[1] = (HILFSCOUNTER+1) % 10;
                     POKEMON::PKMN a(A,HILFSCOUNTER,0,
                         50,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
-                    a.stats.acHP = i*a.stats.maxHP/5;
+                    //a.stats.acHP = i*a.stats.maxHP/5;
                     cpy.push_back(a);
                     HILFSCOUNTER= 1+((HILFSCOUNTER)%649);
                 }
@@ -1995,7 +1995,7 @@ OUT:
                     A[1] = (HILFSCOUNTER+1) % 10;
                     POKEMON::PKMN a(A,HILFSCOUNTER,0,
                         50,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
-                    a.stats.acHP = i*a.stats.maxHP/5;
+                    //a.stats.acHP = i*a.stats.maxHP/5;
                     cpy.push_back(a);
                     HILFSCOUNTER= 1+((HILFSCOUNTER)%649);
                 }
