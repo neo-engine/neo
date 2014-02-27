@@ -112,6 +112,8 @@ bool loadTrainerSpriteTop(OAMTable* oam,SpriteInfo* spriteInfo, const char* Path
 
 void drawTypeIcon (OAMTable *oam, SpriteInfo * spriteInfo, int& oamIndex, int& palcnt, int & nextTile, Type t ,int x,int y, bool bottom);
 
+int getCurrentDaytime();
+
 extern std::string bagnames[8];
 class scrnloader{
 private:

@@ -59,7 +59,7 @@ enum GameMod{
     RELEASE,
     EMULATOR
 } gMod = DEVELOPER;
-std::string CodeName = "Working Kling";
+std::string CodeName = "Working Klink";
 SavMod savMod = _NDS;
 
 char acSlot2Game[5];
@@ -250,6 +250,7 @@ ChoiceResult opScreen()
         {
             killWeiter();
             consoleClear();
+            loadPictureSub(bgGetGfxPtr(bg2sub),"nitro:/PICS/","ClearD");
             loadPictureSub(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");		
             for(int i = 1;i<256;++i)
                 BG_PALETTE_SUB[i] = RGB15(31,31,31);
@@ -265,6 +266,7 @@ ChoiceResult opScreen()
                         break;
                 }
                 killWeiter();
+                loadPictureSub(bgGetGfxPtr(bg2sub),"nitro:/PICS/","ClearD");
                 loadPictureSub(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");	
                 for(int j = 1;j<256;++j)
                     BG_PALETTE_SUB[j] = RGB15(31,31,31);
@@ -324,7 +326,8 @@ void initNewGame()
         if(keysUp() & KEY_TOUCH) break;
         if(keysUp() & KEY_A) break;
     }
-    loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
+    loadPictureSub(bgGetGfxPtr(bg2sub),"nitro:/PICS/","ClearD",16);
+    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
 
     free_spaces.clear();
     for (int i = 0; i < MAXPKMN; i++){
@@ -347,8 +350,9 @@ void initNewGame()
         if(keysUp() & KEY_TOUCH) break;
         if(keysUp() & KEY_A) break;
     }
-    loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
-    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
+    loadPictureSub(bgGetGfxPtr(bg2sub),"nitro:/PICS/","ClearD",16);
+    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
+    //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
     cust_font.print_string_d("Da er gerade leider nicht in Hoenn\nist, werde ich euch heute euren\nPokéNav und euren PokéDex\nüberreichen.",8,68,true);
 
     while(1)
@@ -357,8 +361,9 @@ void initNewGame()
         if(keysUp() & KEY_TOUCH) break;
         if(keysUp() & KEY_A) break;
     }
-    loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");  
-    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
+    loadPictureSub(bgGetGfxPtr(bg2sub),"nitro:/PICS/","ClearD",16); 
+    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
+    //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
     cust_font.print_string_d("So hier ist erstmal der PokéNav!",8,84,true);
 
     while(1)
@@ -367,8 +372,9 @@ void initNewGame()
         if(keysUp() & KEY_TOUCH) break;
         if(keysUp() & KEY_A) break;
     }
-    loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
-    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
+    loadPictureSub(bgGetGfxPtr(bg2sub),"nitro:/PICS/","ClearD",16);
+    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
+    //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
     cust_font.print_string_d("Ich gehe dann jetzt mal\ndie Dexe holen.\nIhr könnt solange eure\nPokéNav einrichten.",24,68,true);
     while(1)
     {
@@ -376,7 +382,8 @@ void initNewGame()
         if(keysUp() & KEY_TOUCH) break;
         if(keysUp() & KEY_A) break;
     }
-    loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
+    loadPictureSub(bgGetGfxPtr(bg2sub),"nitro:/PICS/","ClearD",16);
+    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
 
     consoleSelect(&Bottom);
     std::wstring S_;
@@ -1690,7 +1697,9 @@ int main(int argc, char** argv)
 
     startScreen();
     heroIsBig = SAV.acMoveMode != WALK;
-
+    
+    loadPictureSub(bgGetGfxPtr(bg3sub),"nitro:/PICS/","Clear");
+    loadPictureSub(bgGetGfxPtr(bg2sub),"nitro:/PICS/","Clear");
     scrn.draw(mode); 
 
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Clear");
@@ -1706,6 +1715,7 @@ int main(int argc, char** argv)
     updateOAMSub(oam);
 
     SAV.hasGDex = true;
+    SAV.EvolveInBattle = true;
 
     initMapSprites();
     updateOAM(oamTop);
@@ -1933,7 +1943,7 @@ OUT:
                         A[2] = HILFSCOUNTER;
                         A[3] = 432;
                         POKEMON::PKMN a(A,HILFSCOUNTER,0,
-                            50,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,rand()%2,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
+                            20,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,rand()%2,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         SAV.PKMN_team.push_back(a);
@@ -1970,7 +1980,7 @@ OUT:
                     A[0] = HILFSCOUNTER % 10;
                     A[1] = (HILFSCOUNTER+1) % 10;
                     POKEMON::PKMN a(A,HILFSCOUNTER,0,
-                        50,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
+                        30,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                     //a.stats.acHP = i*a.stats.maxHP/5;
                     cpy.push_back(a);
                     HILFSCOUNTER= 1+((HILFSCOUNTER)%649);
@@ -1994,7 +2004,7 @@ OUT:
                     A[0] = HILFSCOUNTER % 10;
                     A[1] = (HILFSCOUNTER+1) % 10;
                     POKEMON::PKMN a(A,HILFSCOUNTER,0,
-                        50,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
+                        15,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                     //a.stats.acHP = i*a.stats.maxHP/5;
                     cpy.push_back(a);
                     HILFSCOUNTER= 1+((HILFSCOUNTER)%649);

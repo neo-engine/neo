@@ -2,7 +2,7 @@
 @Working Kling [WIP]@
  - PokéNav-Skin hinzugefügt (+) {Awakening Xerneas}
  - PokéNav-Skin hinzugefügt (+) {Awakening Yveltal}
- - PokéNav-Skin hinzugefügt (+) {Working Kling}
+ - PokéNav-Skin hinzugefügt (+) {Working Klink}
  - PKMN-Kampf (+)
 
 @Charming Lari [2014-01-29]@

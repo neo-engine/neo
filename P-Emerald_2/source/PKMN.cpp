@@ -1407,8 +1407,67 @@ namespace POKEMON{
     unsigned int LastPID = 42;
     int page =0;
 
-    bool operator==(touchPosition R,touchPosition L)
-    {
-        return (R.px/10 == L.px/10 )&&(R.py/10 == L.py/10);
+
+    bool PKMN::canEvolve(int Item){
+        return true;
+        if(this->boxdata.IV.isEgg)
+            return false;
+
+        PKMNDATA::getAll(this->boxdata.SPEC,data);
+
+        for(int i = 0; i< 9; ++i){
+            if(this->Level < data.evolutions[i].evolveLevel)
+                continue;
+            if(this->boxdata.steps < data.evolutions[i].evolveFriendship)
+                continue;
+            if(Item != data.evolutions[i].evolveItem)
+                continue;
+            if(getCurrentDaytime() != data.evolutions[i].evolveDayTime)
+                continue;
+
+            return true;
+        }
+        return false;
+    }
+
+    void PKMN::evolve(int Item){
+        if(this->boxdata.IV.isEgg)
+            return;
+
+        PKMNDATA::getAll(this->boxdata.SPEC,data);
+
+        int into = this->boxdata.SPEC + 1; //0
+
+        for(int i = 0; i< 9; ++i){
+            if(this->Level < data.evolutions[i].evolveLevel)
+                continue;
+            if(this->boxdata.steps < data.evolutions[i].evolveFriendship)
+                continue;
+            if(Item != data.evolutions[i].evolveItem)
+                continue;
+            if(getCurrentDaytime() != data.evolutions[i].evolveDayTime)
+                continue;
+            into = data.evolutions[i].evolvesInto;
+            break;
+        }
+        if (into == 0)
+            return;
+
+        this->boxdata.SPEC = into;
+        PKMNDATA::getAll(this->boxdata.SPEC,data);
+        if(this->boxdata.SPEC != 292)
+            stats.acHP = stats.maxHP = ((boxdata.IV.HP+2*data.Bases[0]+(boxdata.EV[0]/4)+100)*this->Level/100)+10;
+        else
+            stats.acHP = stats.maxHP = 1;
+
+        if(!this->boxdata.IV.isNicked)
+            wcscpy(this->boxdata.Name,PKMNDATA::getWDisplayName(this->boxdata.SPEC));
+
+        Natures nature = this->boxdata.getNature();
+        stats.Atk = (((boxdata.IV.Attack+2*data.Bases[1]+(boxdata.EV[1]>>2))*this->Level/100.0)+5)*NatMod[nature][0];
+        stats.Def = (((boxdata.IV.Defense+2*data.Bases[2]+(boxdata.EV[2]>>2))*this->Level/100.0)+5)*NatMod[nature][1];
+        stats.Spd = (((boxdata.IV.Speed+2*data.Bases[3]+(boxdata.EV[3]>>2))*this->Level/100.0)+5)*NatMod[nature][2];
+        stats.SAtk = (((boxdata.IV.SAttack+2*data.Bases[4]+(boxdata.EV[4]>>2))*this->Level/100.0)+5)*NatMod[nature][3];
+        stats.SDef = (((boxdata.IV.SDefense+2*data.Bases[5]+(boxdata.EV[5]>>2))*this->Level/100.0)+5)*NatMod[nature][4];
     }
 }

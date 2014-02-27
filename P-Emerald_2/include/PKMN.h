@@ -147,6 +147,14 @@ namespace POKEMON{
             short weight;
             short expType;
             u8 abilities[4];
+
+            struct evolvestruct{
+                u8 evolveLevel;
+                u8 evolveItem;
+                u8 evolveFriendship;
+                u8 evolveDayTime;
+                u8 evolvesInto;
+            }evolutions[9];
         };
         Type getType(int pkmnind,int type);
         short getBase(int pkmnind,int base);
@@ -387,8 +395,8 @@ namespace POKEMON{
         //}
         ~PKMN() { }
 
-        void evolve();
-        void devolve();
+        void evolve(int suppliedItem = 0);
+        bool canEvolve(int suppliedItem = 0);
 
         int draw();
         void drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom,bool newpok);

@@ -67,7 +67,7 @@ BG_set BGs[MAXBG] = {{"Raging_Gyarados",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Awakening_Yveltal",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Fighting_Groudon",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Fighting_Kyogre",NAV_DATA,NAV_DATA_PAL,true,false},
-{"Working_Kling",BG1Bitmap,BG1Pal,false,false}};
+{"Working_Klink",BG1Bitmap,BG1Pal,false,false}};
 int BG_ind = 8;
 extern POKEMON::PKMN::BOX_PKMN stored_pkmn[MAXSTOREDPKMN];
 extern std::vector<int> box_of_st_pkmn[MAXPKMN];
@@ -145,6 +145,25 @@ void updateTime(bool mapMode)
     acday = timeStruct->tm_mday;
     acmonth = timeStruct->tm_mon;
     acyear = timeStruct->tm_year +1900;
+}
+
+int DayTimes[4][5] = {
+    {7,10,15,17,23},
+    {6,9,12,18,23},
+    {5,8,10,20,23},
+    {7,9,13,19,23}
+};
+
+int getCurrentDaytime(){
+    time_t unixTime = time(NULL);
+    struct tm* timeStruct = gmtime((const time_t *)&unixTime);
+
+    int t = timeStruct->tm_hour, m = timeStruct->tm_mon;
+    
+    for(int i = 0; i < 5; ++i)
+        if(DayTimes[m / 4][i] >= t)
+            return i;
+    return -1;
 }
 
 unsigned int TEMP[12288] = {0};
@@ -1224,7 +1243,7 @@ int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo){
     dmaCopyHalfWords(SPRITE_DMA_CHANNEL,    Choice_2Tiles,    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],    Choice_2TilesLen);
     nextAvailableTileIdx += Choice_2TilesLen / BYTES_PER_16_COLOR_TILE;
     ++palcnt;
-    
+
     SpriteInfo * SQCHAInfo = &spriteInfo[SQCH_ID];
     SpriteEntry * SQCHA = &oam->oamBuffer[SQCH_ID];
     SQCHAInfo->oamId = SQCH_ID;
@@ -1405,7 +1424,7 @@ void scrnloader::draw(int m){
         updateOAMSub(oam);
     }
     else{		 
-        
+
         drawSub();
         setSpriteVisibility(back,true);
         setMainSpriteVisibility(false);
@@ -1659,7 +1678,7 @@ void initSub(int pkmIdx){
     consoleSelect(&Bottom);
     consoleSetWindow(&Bottom,16,0,16,16);
     consoleClear();
-    for(int i= 0; i < 5; ++i){
+    for(int i= 0; i < 6; ++i){
         oam->oamBuffer[15 + 2*i].isHidden = true;
         oam->oamBuffer[16 + 2*i].isHidden = true;
     }
@@ -1698,6 +1717,18 @@ void initSub(int pkmIdx){
             consoleSetWindow(&Bottom,16,3*u + 1,16,16);
             printf("    Item nehmen");
         }
+        int s = u + SAV.PKMN_team[pkmIdx].boxdata.Item;
+        oam->oamBuffer[15 + 2*(s)].isHidden = false;
+        oam->oamBuffer[16 + 2*(s)].isHidden = false;
+        oam->oamBuffer[15 + 2*(s)].y = -7 + 24 * u;
+        oam->oamBuffer[16 + 2*(s)].y = -7 + 24 * u;
+
+        oam->oamBuffer[15 + 2*(s)].x = 152;
+        oam->oamBuffer[16 + 2*(s)].x = 192 + 24;
+        updateOAMSub(oam);
+
+        consoleSetWindow(&Bottom,16,3*s + 1,16,16);
+        printf("    Dexeintrag");
         consoleSelect(&Top);
 
         fieldCnt = u;
@@ -1888,6 +1919,44 @@ void scrnloader::run_pkmn()
             updateOAMSub(oam);
             initSub(acIn);
         }
+        else if(touch.px >= 152 && touch.py >= (-7 + 24 *(SAV.PKMN_team[acIn].boxdata.Item+fieldCnt)) && touch.py < (17 + 24 * (fieldCnt+SAV.PKMN_team[acIn].boxdata.Item))){
+            while(1)
+            {
+                scanKeys();
+                if(keysUp() & KEY_TOUCH)
+                    break; 
+            }
+            char buf[50];
+            item acI = ItemList[SAV.PKMN_team[acIn].boxdata.Item];
+            SAV.PKMN_team[acIn].boxdata.Item = 0;
+
+            initSub(-1);
+            setSpriteVisibility(back,true);
+            oam->oamBuffer[8].isHidden = true;
+            oam->oamBuffer[8].x = SCREEN_WIDTH -28;
+            oam->oamBuffer[8].y = SCREEN_HEIGHT -28;
+            updateOAMSub(oam);
+
+            this->run_dex(SAV.PKMN_team[acIn].boxdata.SPEC - 1);
+
+            setSpriteVisibility(back,false);
+            setSpriteVisibility(save,true);
+            setMainSpriteVisibility(true);
+            oam->oamBuffer[8].isHidden = false;
+            oam->oamBuffer[8].x = SCREEN_WIDTH / 2 - 16;
+            oam->oamBuffer[8].y = SCREEN_HEIGHT / 2 - 16;
+            loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
+            initTop();
+            setSpriteVisibility(back,false);
+            oam->oamBuffer[8].isHidden = false;
+            updateOAMSub(oam);
+            initSub(acIn);
+            consoleSetWindow(&Top,positions[acIn][0],positions[acIn][1],2,2);
+            if(acIn&1)
+                printf(">");
+            else
+                printf("<");
+        }
         for(int i= 0; i < fieldCnt; ++i)
             if(touch.px >= 152 && touch.py >= (-7 + 24 *i) && touch.py < (17 + 24 * i)){
                 while(1)
@@ -1974,7 +2043,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
                                           * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
     /* Keep track of the available tiles */
-    nextAvailableTileIdx = 0;
+    nextAvailableTileIdx = 16;
     oamIndex = 0;
     palcnt = 0;
     SpriteInfo * backInfo = &spriteInfo[oamIndex];
@@ -2908,7 +2977,7 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
         (subScreen?sizeof(SPRITE_GFX_SUB[0]):sizeof(SPRITE_GFX[0]));
     /* Keep track of the available tiles */
-    nextAvailableTileIdx = 0;
+    nextAvailableTileIdx = 16;
     oamIndex = 0;
     palcnt = 0;
     if(subScreen){
