@@ -169,6 +169,8 @@ namespace POKEMON{
         const char* getDexEntry(int pkmnind);
         short getForme(int pkmn,int formeId,const char* ret_forme_name);
         void getAll(int pkmnind,PKMNDATA& out);
+
+        void getLearnMoves(int pkmn, int fromLevel, int toLevel, int mode, int num, int* res);
     }
 
     extern double NatMod[25][5];

@@ -390,6 +390,47 @@ namespace POKEMON{
             return;
         }
 
+        void getLearnMoves(int pkmn, int fromLevel, int toLevel, int mode, int num, u16* res){
+
+            char pt[100];
+            sprintf(pt, "%s/LEARNSETS/%d.learnset.data",PKMNDATA_PATH,pkmn);
+            FILE* f = fopen(pt,"r");
+
+            int rescnt = 0;
+
+            if(fromLevel > toLevel){
+                std::vector<int> reses;
+                for(int i = 0; i<= toLevel; ++i){
+                    rescnt = 0;
+                    int z; fscanf(f,"%d",&z);
+                    for(int j = 0; j < z; ++z){
+                        int g,h;
+                        fscanf(f,"%d %d",&g,&h);
+                        if(i >= fromLevel && h == mode){
+                            reses.push_back(g);
+                            if(++rescnt == num)
+                                break;
+                        }
+                    }
+                }
+                for(int i = 0; i < num; ++i)
+                    res[i] = reses[reses.size() - 1 - i];
+                return;
+            }
+            else
+                for(int i = 0; i<= toLevel; ++i){
+                    int z; fscanf(f,"%d",&z);
+                    for(int j = 0; j < z; ++z){
+                        int g,h;
+                        fscanf(f,"%d %d",&g,&h);
+                        if(i >= fromLevel && h == mode){
+                            res[rescnt] = g;
+                            if(++rescnt == num)
+                                return;
+                        }
+                    }
+                }
+        }
 
         u16 getColor(Type T1){
             switch (T1)
@@ -631,7 +672,11 @@ namespace POKEMON{
         for(int i= 0; i< 6; ++i) this->EV[i] = 0;
         for(int i= 0; i< 6; ++i) this->ConStats[i] = 0;
         for(int i= 0; i< 4; ++i) this->ribbons1[i] = 0;
-        for(int i= 0; i< 4; ++i) this->Attack[i] = Attacks[i];
+
+        if(Attacks)
+            for(int i= 0; i< 4; ++i) this->Attack[i] = Attacks[i];
+        else
+            PKMNDATA::getLearnMoves(SPE,0,level,1,4,this->Attack);
         for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[(int)Attacks[i]]->PP; /// ...
 
         this->PPUps = 0;
@@ -1409,7 +1454,6 @@ namespace POKEMON{
 
 
     bool PKMN::canEvolve(int Item){
-        return true;
         if(this->boxdata.IV.isEgg)
             return false;
 
@@ -1436,7 +1480,7 @@ namespace POKEMON{
 
         PKMNDATA::getAll(this->boxdata.SPEC,data);
 
-        int into = this->boxdata.SPEC + 1; //0
+        int into = 0;
 
         for(int i = 0; i< 9; ++i){
             if(this->Level < data.evolutions[i].evolveLevel)
