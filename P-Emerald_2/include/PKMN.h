@@ -149,12 +149,23 @@ namespace POKEMON{
             u8 abilities[4];
 
             struct evolvestruct{
-                u8 evolveLevel;
-                u8 evolveItem;
-                u8 evolveFriendship;
-                u8 evolveDayTime;
                 u8 evolvesInto;
-            }evolutions[9];
+                u8 evolutionTrigger;
+                u8 evolveItem;
+                u8 evolveLevel;
+                u8 evolveGender;
+                u8 evolveLocation;
+                u8 evolveHeldItem;
+                u8 evolveDayTime;
+                u8 evolveKnownMove;
+                u8 evolveKnownMoveType;
+                u8 evolveFriendship;
+                u8 evolveMinimumBeauty;
+                u8 evolveAtkDefRelation; //1: >; 2: ==; 3 <
+                u8 evolveAdditionalPartyMember;
+                u8 evolveTradeSpecies;
+
+            }evolutions[7];
         };
         Type getType(int pkmnind,int type);
         short getBase(int pkmnind,int base);
@@ -390,12 +401,6 @@ namespace POKEMON{
         PKMN(){}
         PKMN(u16* Attacks,int SPE,const wchar_t* N,short level,unsigned short ID_,unsigned short SID_,const wchar_t* ot,
             bool OTFemale,bool Cloned,bool Shiny,bool h_a,bool fatef,bool _isEgg,short gPlace,char BALL, char Prus);
-        //PKMN(const PKMN& pkmn){
-        //    this->boxdata = pkmn.boxdata;
-        //    this->_status = pkmn._status;
-        //    this->Level = pkmn.Level;
-        //    this->stats = pkmn.stats;
-        //}
         ~PKMN() { }
 
         void evolve(int suppliedItem = 0);
@@ -403,14 +408,5 @@ namespace POKEMON{
 
         int draw();
         void drawPage(int Page,PrintConsole* Top,PrintConsole* Bottom,bool newpok);
-
-        //std::pair<std::string,std::string> typesToString()
-        //{
-        //    std::pair<std::string,std::string> ret = std::pair<std::string,std::string>();
-        //    ret.first = TypeList[Pkmn_Types[this->SPEC][0]];
-        //    if(Pkmn_Types[this->SPEC][0]!=Pkmn_Types[this->SPEC][1])
-        //         ret.second = TypeList[Pkmn_Types[this->SPEC][1]];
-        //    return ret;
-        //}
     };
 }

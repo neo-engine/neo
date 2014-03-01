@@ -433,7 +433,6 @@ namespace POKEMON{
                 fclose(f);
         }
         bool canLearn(int pkmn, int moveId, int mode){
-
             char pt[150];
             sprintf(pt, "%s/LEARNSETS/%d.learnset.data",PKMNDATA_PATH,pkmn);
             FILE* f = fopen(pt,"r");
@@ -445,13 +444,10 @@ namespace POKEMON{
                 for(int j = 0; j < z; ++j){
                     u16 g,h;
                     fscanf(f,"%hd %hd",&g,&h);
-                    if(g == moveId && h == mode){
-                        fclose(f);
+                    if(g == moveId && h == mode)
                         return true;
-                    }
                 }
             }
-            fclose(f);
             return false;
         }
 
