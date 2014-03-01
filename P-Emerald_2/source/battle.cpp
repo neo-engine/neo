@@ -2168,6 +2168,9 @@ namespace BATTLE{
 
     void battle::printAttackChoiceScreen(int PKMNSlot,int& os2,int& pS2,int& ts2){
         for(int i = 21; i < 29; i+=2){
+            if(!((*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]))
+                continue;
+
             (oam->oamBuffer[i]).isHidden = false;
             (oam->oamBuffer[i+1]).isHidden = false;
             (oam->oamBuffer[i+1]).y += 14+16 * ((i-21)/4);
@@ -2303,6 +2306,9 @@ namespace BATTLE{
                         for(int i = 21; i < 29; i+=2)
                             if(t.px>(oam->oamBuffer[i].x) && t.px < (oam->oamBuffer[i+1].x + 64) &&
                                 t.py>(oam->oamBuffer[i]).y && t.py < (oam->oamBuffer[i].y + 32)){
+                                    if(!(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2])
+                                        continue;
+
                                     while(1) {
                                         scanKeys();
                                         swiWaitForVBlank();
@@ -2552,6 +2558,8 @@ OUT2:
                 for(int i= 1 + (this->battlemode == DOUBLE); i< 6; ++i)
                     if(acpoksts[acpokpos[i][0]][0] != KO){
                         switchOwnPkmn(i,0);
+                        for(int i = 0; i < 6; ++i)
+                            participated[i] = false;
                         break;
                     }
 
@@ -2559,6 +2567,8 @@ OUT2:
                 for(int i= 2; i< 6; ++i)
                     if(acpoksts[acpokpos[i][0]][0] != KO){
                         switchOwnPkmn(i,1);
+                        for(int i = 0; i < 6; ++i)
+                            participated[i] = false;
                         break;
                     }
 
@@ -2587,12 +2597,16 @@ OUT2:
                 for(int i= 1 + (this->battlemode == DOUBLE); i< 6; ++i)
                     if(acpoksts[acpokpos[i][1]][1] != KO){
                         switchOppPkmn(i,0);
+                        for(int i = 0; i < 6; ++i)
+                            participated[i] = false;
                         break;
                     }
             if((this->battlemode == DOUBLE) && acpoksts[acpokpos[1][1]][1] == KO)
                 for(int i= 2; i< 6; ++i)
                     if(acpoksts[acpokpos[i][1]][1] != KO){
                         switchOppPkmn(i,1);
+                        for(int i = 0; i < 6; ++i)
+                            participated[i] = false;
                         break;
                     }
             if(acpoksts[acpokpos[0][1]][1] == KO && (this->battlemode != DOUBLE || acpoksts[acpokpos[1][1]][1] == KO || acpoksts[acpokpos[1][1]][1] == NA)){

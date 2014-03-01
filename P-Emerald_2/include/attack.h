@@ -15,7 +15,7 @@ public:
     char Base_Power;
     Type type;
     char Accuracy;
-    char PP;
+    unsigned char PP;
     char Effect_accuracy;
     enum AffectsTypes
     {

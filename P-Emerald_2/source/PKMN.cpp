@@ -392,37 +392,37 @@ namespace POKEMON{
 
         void getLearnMoves(int pkmn, int fromLevel, int toLevel, int mode, int num, u16* res){
 
-            char pt[100];
+            char pt[150];
             sprintf(pt, "%s/LEARNSETS/%d.learnset.data",PKMNDATA_PATH,pkmn);
             FILE* f = fopen(pt,"r");
+            if(!f)
+                return;
 
             int rescnt = 0;
 
             if(fromLevel > toLevel){
-                std::vector<int> reses;
-                for(int i = 0; i<= toLevel; ++i){
-                    rescnt = 0;
+                std::vector<u16> reses;
+                for(int i = 0; i<= fromLevel; ++i){
                     int z; fscanf(f,"%d",&z);
-                    for(int j = 0; j < z; ++z){
-                        int g,h;
-                        fscanf(f,"%d %d",&g,&h);
-                        if(i >= fromLevel && h == mode){
+                    for(int j = 0; j < z; ++j){
+                        u16 g,h;
+                        fscanf(f,"%hd %hd",&g,&h);
+                        if(i >= toLevel && h == (u16)mode)
                             reses.push_back(g);
-                            if(++rescnt == num)
-                                break;
-                        }
                     }
                 }
-                for(int i = 0; i < num; ++i)
-                    res[i] = reses[reses.size() - 1 - i];
+                auto I = reses.rbegin();
+                for(int i = 0; i < num && I != reses.rend(); ++i,++I)
+                    res[i] = *I;
+                fclose(f);
                 return;
             }
             else
                 for(int i = 0; i<= toLevel; ++i){
                     int z; fscanf(f,"%d",&z);
-                    for(int j = 0; j < z; ++z){
-                        int g,h;
-                        fscanf(f,"%d %d",&g,&h);
+                    for(int j = 0; j < z; ++j){
+                        u16 g,h;
+                        fscanf(f,"%hd %hd",&g,&h);
                         if(i >= fromLevel && h == mode){
                             res[rescnt] = g;
                             if(++rescnt == num)
@@ -430,6 +430,29 @@ namespace POKEMON{
                         }
                     }
                 }
+                fclose(f);
+        }
+        bool canLearn(int pkmn, int moveId, int mode){
+
+            char pt[150];
+            sprintf(pt, "%s/LEARNSETS/%d.learnset.data",PKMNDATA_PATH,pkmn);
+            FILE* f = fopen(pt,"r");
+            if(!f)
+                return false;
+
+            for(int i = 0; i<= 100; ++i){
+                int z; fscanf(f,"%d",&z);
+                for(int j = 0; j < z; ++j){
+                    u16 g,h;
+                    fscanf(f,"%hd %hd",&g,&h);
+                    if(g == moveId && h == mode){
+                        fclose(f);
+                        return true;
+                    }
+                }
+            }
+            fclose(f);
+            return false;
         }
 
         u16 getColor(Type T1){
@@ -676,10 +699,13 @@ namespace POKEMON{
         if(Attacks)
             for(int i= 0; i< 4; ++i) this->Attack[i] = Attacks[i];
         else
-            PKMNDATA::getLearnMoves(SPE,0,level,1,4,this->Attack);
-        for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[(int)Attacks[i]]->PP; /// ...
-
-        this->PPUps = 0;
+            PKMNDATA::getLearnMoves(SPE,level,0,1,4,this->Attack);
+        for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[(int)Attacks[i]]->PP;
+        
+        this->ppup.Up1 = 0;
+        this->ppup.Up2 = 0;
+        this->ppup.Up3 = 0;
+        this->ppup.Up4 = 0;
         this->IV.Attack = rand() % 32; 
         this->IV.Defense = rand() % 32;
         this->IV.HP = rand() % 32;
@@ -947,7 +973,7 @@ namespace POKEMON{
                 for (int i = 0; i < 4; i++)
                 {
                     if(this->boxdata.Attack[i] == 0)
-                        break;
+                        continue;
                     Type t = AttackList[this->boxdata.Attack[i]]->type;
                     drawTypeIcon(oamTop,spriteInfoTop,a2,b2,c2,t,126,43+32*i,false);
 
@@ -955,21 +981,21 @@ namespace POKEMON{
                     printf("\x1b[32m");*/
 
                     if(i == 0)
-                        printf("    %s\n    AP %2i""/""%2i ",
-                        &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
-                        AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up1) / 5));
+                        printf("    %s\n    AP %2hhu""/""%2hhu ",
+                        (AttackList[this->boxdata.Attack[0]]->Name.c_str()),this->boxdata.AcPP[0],
+                        AttackList[this->boxdata.Attack[0]]->PP* ((5 +this->boxdata.ppup.Up1) / 5));
                     if(i == 1)
-                        printf("    %s\n    AP %2i""/""%2i ",
-                        &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
-                        AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up2) / 5));
+                        printf("    %s\n    AP %2hhu""/""%2hhu ",
+                        (AttackList[this->boxdata.Attack[1]]->Name.c_str()),this->boxdata.AcPP[1],
+                        AttackList[this->boxdata.Attack[1]]->PP* ((5 +this->boxdata.ppup.Up2) / 5));
                     if(i == 2)
-                        printf("    %s\n    AP %2i""/""%2i ",
-                        &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
-                        AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up3) / 5));
+                        printf("    %s\n    AP %2hhu""/""%2hhu ",
+                        (AttackList[this->boxdata.Attack[2]]->Name.c_str()),this->boxdata.AcPP[2],
+                        AttackList[this->boxdata.Attack[2]]->PP* ((5 +this->boxdata.ppup.Up3) / 5));
                     if(i == 3)
-                        printf("    %s\n    AP %2i""/""%2i ",
-                        &(AttackList[this->boxdata.Attack[i]]->Name[0]),this->boxdata.AcPP[i],
-                        AttackList[this->boxdata.Attack[i]]->PP* ((5 +this->boxdata.ppup.Up4) / 5));
+                        printf("    %s\n    AP %2hhu""/""%2hhu ",
+                        (AttackList[this->boxdata.Attack[3]]->Name.c_str()),this->boxdata.AcPP[3],
+                        AttackList[this->boxdata.Attack[3]]->PP* ((5 +this->boxdata.ppup.Up4) / 5));
                     switch (AttackList[this->boxdata.Attack[i]]->HitType)
                     {
                     case attack::PHYS:
@@ -1466,7 +1492,9 @@ namespace POKEMON{
                 continue;
             if(Item != data.evolutions[i].evolveItem)
                 continue;
-            if(getCurrentDaytime() != data.evolutions[i].evolveDayTime)
+            if(data.evolutions[i].evolveDayTime != -1 && getCurrentDaytime() != data.evolutions[i].evolveDayTime)
+                continue;
+            if(data.evolutions[i].evolvesInto == 0)
                 continue;
 
             return true;
@@ -1489,7 +1517,7 @@ namespace POKEMON{
                 continue;
             if(Item != data.evolutions[i].evolveItem)
                 continue;
-            if(getCurrentDaytime() != data.evolutions[i].evolveDayTime)
+            if(data.evolutions[i].evolveDayTime != -1 && getCurrentDaytime() != data.evolutions[i].evolveDayTime)
                 continue;
             into = data.evolutions[i].evolvesInto;
             break;

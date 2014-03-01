@@ -2094,8 +2094,8 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo4->shape = OBJSHAPE_SQUARE;
     Bo4->isHidden = false;
     Bo4->x = 0;
-    Bo4->size = OBJSIZE_64;
-    Bo4->gfxIndex = nextAvailableTileIdx;
+    Bo4->size = OBJSIZE_16;//64;
+    Bo4->gfxIndex = 0;//nextAvailableTileIdx;
     Bo4->priority = OBJPRIORITY_2;
     Bo4->palette = palcnt;
     Bo4->vFlip = true;
@@ -2110,21 +2110,21 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo4->shape = OBJSHAPE_SQUARE;
     Bo4->isHidden = false;
     Bo4->x = 192;
-    Bo4->size = OBJSIZE_64;
-    Bo4->gfxIndex = nextAvailableTileIdx;
+    Bo4->size = OBJSIZE_16;//64;
+    Bo4->gfxIndex = 0;//nextAvailableTileIdx;
     Bo4->priority = OBJPRIORITY_2;
     Bo4->palette = palcnt;
     Bo4->vFlip = false;
     Bo4->hFlip = false;
 
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        Border_4Pal,
-        &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-        32);
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        Border_4Tiles,
-        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        Border_4TilesLen);
+    //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+    //    Border_4Pal,
+    //    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
+    //    32);
+    //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+    //    Border_4Tiles,
+    //    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+    //    Border_4TilesLen);
 
     nextAvailableTileIdx += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
 
@@ -2143,8 +2143,8 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo3->shape = OBJSHAPE_SQUARE;
     Bo3->isHidden = false;
     Bo3->x = 64;
-    Bo3->size = OBJSIZE_64;
-    Bo3->gfxIndex = nextAvailableTileIdx;
+    Bo3->size = OBJSIZE_16;//64;
+    Bo3->gfxIndex = 0;//nextAvailableTileIdx;
     Bo3->priority = OBJPRIORITY_2;
     Bo3->palette = palcnt;
     Bo3->vFlip = true;
@@ -2159,17 +2159,17 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo3->shape = OBJSHAPE_SQUARE;
     Bo3->isHidden = false;
     Bo3->x = 128;
-    Bo3->size = OBJSIZE_64;
-    Bo3->gfxIndex = nextAvailableTileIdx;
+    Bo3->size = OBJSIZE_16;//64;
+    Bo3->gfxIndex =0;// nextAvailableTileIdx;
     Bo3->priority = OBJPRIORITY_2;
     Bo3->palette = palcnt;
     Bo3->vFlip = false;
     Bo3->hFlip = false;
 
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        Border_3Tiles,
-        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        Border_3TilesLen);
+    //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+    //    Border_3Tiles,
+    //    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+    //    Border_3TilesLen);
 
     nextAvailableTileIdx += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
 
@@ -2188,8 +2188,8 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo2->shape = OBJSHAPE_SQUARE;
     Bo2->isHidden = false;
     Bo2->x = 128;
-    Bo2->size = OBJSIZE_64;
-    Bo2->gfxIndex = nextAvailableTileIdx;
+    Bo2->size = OBJSIZE_16;//64;
+    Bo2->gfxIndex = 0;//nextAvailableTileIdx;
     Bo2->priority = OBJPRIORITY_2;
     Bo2->palette = palcnt;
     Bo2->vFlip = true;
@@ -2204,17 +2204,17 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo2->shape = OBJSHAPE_SQUARE;
     Bo2->isHidden = false;
     Bo2->x = 64;
-    Bo2->size = OBJSIZE_64;
-    Bo2->gfxIndex = nextAvailableTileIdx;
+    Bo2->size = OBJSIZE_16;//64;
+    Bo2->gfxIndex = 0;//nextAvailableTileIdx;
     Bo2->priority = OBJPRIORITY_2;
     Bo2->palette = palcnt;
     Bo2->vFlip = false;
     Bo2->hFlip = false;
 
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        Border_2Tiles,
-        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        Border_2TilesLen);
+    //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+    //    Border_2Tiles,
+    //    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+    //    Border_2TilesLen);
     nextAvailableTileIdx += Border_2TilesLen / BYTES_PER_16_COLOR_TILE;
 
     SpriteInfo * Bo1Info = &spriteInfo[++oamIndex];
@@ -2232,8 +2232,8 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo1->shape = OBJSHAPE_SQUARE;
     Bo1->isHidden = false;
     Bo1->x = 192;
-    Bo1->size = OBJSIZE_64;
-    Bo1->gfxIndex = nextAvailableTileIdx;
+    Bo1->size = OBJSIZE_16;//64;
+    Bo1->gfxIndex = 0;//nextAvailableTileIdx;
     Bo1->priority = OBJPRIORITY_2;
     Bo1->palette = palcnt;
     Bo1->vFlip = true;
@@ -2248,17 +2248,17 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo1->shape = OBJSHAPE_SQUARE;
     Bo1->isHidden = false;
     Bo1->x = 0;
-    Bo1->size = OBJSIZE_64;
-    Bo1->gfxIndex = nextAvailableTileIdx;
+    Bo1->size = OBJSIZE_16;//64;
+    Bo1->gfxIndex = 0;//nextAvailableTileIdx;
     Bo1->priority = OBJPRIORITY_2;
     Bo1->palette = palcnt;
     Bo1->vFlip = false;
     Bo1->hFlip = false;
 
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        Border_1Tiles,
-        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        Border_1TilesLen);
+    //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+    //    Border_1Tiles,
+    //    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+    //    Border_1TilesLen);
     nextAvailableTileIdx += Border_1TilesLen / BYTES_PER_16_COLOR_TILE;
 
     SpriteInfo * Bo5Info = &spriteInfo[++oamIndex];
@@ -2276,8 +2276,8 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo5->shape = OBJSHAPE_SQUARE;
     Bo5->isHidden = false;
     Bo5->x = 0;
-    Bo5->size = OBJSIZE_64;
-    Bo5->gfxIndex = nextAvailableTileIdx;
+    Bo5->size = OBJSIZE_16;//64;
+    Bo5->gfxIndex = 0;//nextAvailableTileIdx;
     Bo5->priority = OBJPRIORITY_2;
     Bo5->palette = palcnt;
     Bo5->vFlip = true;
@@ -2292,17 +2292,17 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo5->shape = OBJSHAPE_SQUARE;
     Bo5->isHidden = false;
     Bo5->x = 192;
-    Bo5->size = OBJSIZE_64;
-    Bo5->gfxIndex = nextAvailableTileIdx;
+    Bo5->size = OBJSIZE_16;//64;
+    Bo5->gfxIndex = 0;//nextAvailableTileIdx;
     Bo5->priority = OBJPRIORITY_2;
     Bo5->palette = palcnt;
     Bo5->vFlip = false;
     Bo5->hFlip = false;
 
-    dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        Border_5Tiles,
-        &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        Border_5TilesLen);
+    //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
+    //    Border_5Tiles,
+    //    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
+    //    Border_5TilesLen);
     nextAvailableTileIdx += Border_5TilesLen / BYTES_PER_16_COLOR_TILE;
 
     ++palcnt;
@@ -3021,46 +3021,14 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
         Bo4Info->height = 64;
         Bo4Info->angle = 0;
         Bo4Info->entry = Bo4;
-        Bo4->y = 0;
-        Bo4->isRotateScale = false;
-        Bo4->blendMode = OBJMODE_NORMAL;
-        Bo4->isMosaic = false;
-        Bo4->colorMode = OBJCOLOR_16;
         Bo4->shape = OBJSHAPE_SQUARE;
-        Bo4->isHidden = false;
-        Bo4->x = 0;
         Bo4->size = OBJSIZE_16;//
         Bo4->gfxIndex = 0;//nextAvailableTileIdx;
-        Bo4->priority = OBJPRIORITY_2;
-        Bo4->palette = palcnt;
-        Bo4->vFlip = true;
-        Bo4->hFlip = true;
 
         Bo4 = &oam->oamBuffer[++oamIndex];
-        Bo4->y = 128;
-        Bo4->isRotateScale = false;
-        Bo4->blendMode = OBJMODE_NORMAL;
-        Bo4->isMosaic = false;
-        Bo4->colorMode = OBJCOLOR_16;
-        Bo4->shape = OBJSHAPE_SQUARE;
-        Bo4->isHidden = false;
-        Bo4->x = 192;
         Bo4->size = OBJSIZE_16;//64;
         Bo4->gfxIndex = 0;//nextAvailableTileIdx;
-        Bo4->priority = OBJPRIORITY_2;
-        Bo4->palette = palcnt;
-        Bo4->vFlip = false;
-        Bo4->hFlip = false;
-
-        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        //    Border_4Pal,
-        //    &SPRITE_PALETTE_SUB[palcnt * COLORS_PER_PALETTE],
-        //    32);
-        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        //    Border_4Tiles,
-        //    &SPRITE_GFX_SUB[nextAvailableTileIdx * OFFSET_MULTIPLIER],
-        //    Border_4TilesLen);
-
+        
         nextAvailableTileIdx += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
 
         SpriteInfo * Bo3Info = &spriteInfo[++oamIndex];

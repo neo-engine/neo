@@ -1941,8 +1941,10 @@ OUT:
                             20,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,rand()%2,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;
                         //a.stats.acHP = i*a.stats.maxHP/5;
-                        a.boxdata.Attack[0] = 57;
-                        a.boxdata.Attack[1] = 19;
+                        if(POKEMON::PKMNDATA::canLearn(HILFSCOUNTER,57,4))
+                            a.boxdata.Attack[2] = 57;
+                        if(POKEMON::PKMNDATA::canLearn(HILFSCOUNTER,19,4))
+                            a.boxdata.Attack[1] = 19;
                         SAV.PKMN_team.push_back(a);
 
                         SAV.inDex[a.boxdata.SPEC-1] = true;

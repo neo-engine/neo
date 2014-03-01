@@ -171,6 +171,7 @@ namespace POKEMON{
         void getAll(int pkmnind,PKMNDATA& out);
 
         void getLearnMoves(int pkmn, int fromLevel, int toLevel, int mode, int num, int* res);
+        bool canLearn(int pkmn, int moveId, int mode);
     }
 
     extern double NatMod[25][5];
