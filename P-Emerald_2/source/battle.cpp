@@ -2200,11 +2200,11 @@ namespace BATTLE{
             drawTypeIcon(oam,spriteInfo,os2,pS2,ts2,
                 AttackList[(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]]->type,
                 (oam->oamBuffer[i]).x+4,(oam->oamBuffer[i]).y-10,true);
-            printf("    %s\n    AP %2i""/""%2i ",
+            printf("    %s\n    AP %2hhu""/""%2hhu ",
                 &(AttackList[(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]]->Name[0]),
-                (*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.AcPP[i],
+                (*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.AcPP[(i-21)/2],
                 AttackList[(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]]->PP *
-                ((5 +(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.PPupget(i)) / 5));
+                ((5 +(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.PPupget((i-21)/2)) / 5));
             switch (AttackList[(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]]->HitType)
             {
             case attack::PHYS:
@@ -2323,6 +2323,8 @@ namespace BATTLE{
                                 t.py>(oam->oamBuffer[i]).y && t.py < (oam->oamBuffer[i].y + 32)){
                                     if(!(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2])
                                         continue;
+                                    if(!(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.AcPP[(i-21)/2])
+                                        continue;
 
                                     while(1) {
                                         scanKeys();
@@ -2336,6 +2338,7 @@ namespace BATTLE{
                                     //CHOOSE TARGET
 
                                     ownAtk[PKMNSlot] = std::pair<int,int>((*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2],trg);
+                                    (*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.AcPP[(i-21)/2]--;
                                     goto ATTACKCHOSEN;
                             }
                     }
@@ -2482,7 +2485,7 @@ OUT2:
 #define ME      4
 #define PARTNER 8
     int battle::getTarget(int PKMNSlot){
-
+        //todo;
     }
 
     bool participated[6] = {false};

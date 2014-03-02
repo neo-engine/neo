@@ -56,7 +56,7 @@ savgm::savgm(void Func(int))
     Func(30);
 
     fscanf(fd,"%i %i %i %i %s %i ",&acposx,&acposy,&acposz,&acMapIdx,acMapName,&acMoveMode);
-    fscanf(fd,"%hhu",&this->owIdx);
+    fscanf(fd,"%hu",&this->owIdx);
 
     int a;
     for(int i= 0; i < 8; ++i){
@@ -135,7 +135,7 @@ bool savgm::save(void Func(int))
     Func(30);
 
     fprintf(fd,"%i %i %i %i %s %i ",acposx,acposy,acposz,acMapIdx,acMapName,acMoveMode);
-    fprintf(fd,"%hhu",this->owIdx);
+    fprintf(fd,"%hu",this->owIdx);
 
     for(int i= 0; i < 8; ++i){
         fprintf(fd," %i ",this->Bag.bags[i].size());

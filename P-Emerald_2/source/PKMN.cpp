@@ -712,7 +712,7 @@ NEXT:
             for(int i= 0; i< 4; ++i) this->Attack[i] = Attacks[i];
         else
             PKMNDATA::getLearnMoves(SPE,level,0,1,4,this->Attack);
-        for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[(int)Attacks[i]]->PP;
+        for(int i= 0; i< 4; ++i) this->AcPP[i] = (unsigned char) (AttackList[this->Attack[i]]->PP);
 
         this->ppup.Up1 = 0;
         this->ppup.Up2 = 0;

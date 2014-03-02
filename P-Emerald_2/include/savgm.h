@@ -51,9 +51,9 @@ public:
     //Team
     std::vector<POKEMON::PKMN> PKMN_team;
 
-    u8 owIdx;
+    u16 owIdx;
 
-    u8 flags[1000];
+    u16 flags[500];
 
     int acposx, acposy, acposz;
     int acMapIdx;
@@ -69,7 +69,7 @@ public:
     bool good; //FailBit
 
     struct {
-        u8 gameid;
+        u16 gameid;
     }gba;
 
     savgm():PLAYERNAME(),IsMale(true),ID(0),SID(0)
