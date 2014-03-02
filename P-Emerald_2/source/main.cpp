@@ -1945,6 +1945,7 @@ OUT:
                             a.boxdata.Attack[2] = 57;
                         if(POKEMON::PKMNDATA::canLearn(HILFSCOUNTER,19,4))
                             a.boxdata.Attack[1] = 19;
+                        a.boxdata.exp += 750;
                         SAV.PKMN_team.push_back(a);
 
                         SAV.inDex[a.boxdata.SPEC-1] = true;

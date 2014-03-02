@@ -385,12 +385,12 @@ namespace POKEMON{
             fscanf(f,"%hi",&out.weight); 
             fscanf(f,"%hi",&out.expType);  
             for(int i= 0; i < 4; ++i)
-                fscanf(f,"%hhi",&out.abilities[i]);  
+                fscanf(f,"%hu ",&out.abilities[i]);  
             for(int i = 0; i < 7; ++i)
                 for(int j = 0; j < 15; ++j)
-                    fscanf(f,"%hhu",&out.evolutions[i].evolveData[j]);
+                    fscanf(f,"%hi ",&(out.evolutions[i].evolveData[j]));
             fclose(f);
-            return;
+            return; 
         }
 
         void getLearnMoves(int pkmn, int fromLevel, int toLevel, int mode, int num, u16* res){
@@ -1498,47 +1498,54 @@ NEXT:
         PKMNDATA::getAll(this->boxdata.SPEC,data);
 
         for(int i = 0; i< 7; ++i){
-            //if(this->Level < data.evolutions[i].e.evolveLevel)
-            //    continue;
-            //if(this->boxdata.steps < data.evolutions[i].e.evolveFriendship)
-            //    continue;
-            //if(data.evolutions[i].e.evolveItem && Item != data.evolutions[i].e.evolveItem)
-            //    continue;
-            //if(data.evolutions[i].e.evolveDayTime != -1 && getCurrentDaytime() != data.evolutions[i].e.evolveDayTime)
-            //    continue;
-            //if(data.evolutions[i].e.evolvesInto == 0)
-            //    continue;
-            //if(data.evolutions[i].e.evolveGender && this->boxdata.gender() != data.evolutions[i].e.evolveGender)
-            //    continue;
-            //if(data.evolutions[i].e.evolveLocation && SAV.acMapIdx != data.evolutions[i].e.evolveLocation)
-            //    continue;
-            //if(data.evolutions[i].e.evolveHeldItem && this->boxdata.Item != data.evolutions[i].e.evolveHeldItem)
-            //    continue;
-            //if(data.evolutions[i].e.evolveKnownMove){
-            //    bool b = false;
-            //    for(int j = 0; j < 4; ++j)
-            //        b |= (data.evolutions[i].e.evolveKnownMove == this->boxdata.Attack[j]);
-            //    if(!b)
-            //        continue;
-            //}
-            //if(data.evolutions[i].e.evolveKnownMoveType){
-            //    bool b = false;
-            //    for(int j = 0; j < 4; ++j)
-            //        b |= (data.evolutions[i].e.evolveKnownMoveType == AttackList[this->boxdata.Attack[j]]->type);
-            //    if(!b)
-            //        continue;
-            //}
-            //if(data.evolutions[i].e.evolveMinimumBeauty && data.evolutions[i].e.evolveMinimumBeauty < this->boxdata.ConStats[1])
-            //    continue;
-            //if(data.evolutions[i].e.evolveAdditionalPartyMember){
-            //    bool b = false;
-            //    for(int j = 0; j < 6; ++j)
-            //        b |= (data.evolutions[i].e.evolveAdditionalPartyMember == SAV.PKMN_team[i].boxdata.SPEC);
-            //    if(!b)
-            //        continue;
-            //}
-            //if(Method != data.evolutions[i].e.evolutionTrigger)
-            //    continue;
+            consoleSetWindow(&Top,0,10+3*i,32,5);
+            for(int j = 0;  j< 4; ++j)
+                printf("%d ",data.abilities[j]);
+            printf("\n");
+            for(int j = 0; j < 15; ++j)
+                printf("%d ",data.evolutions[i].evolveData[j]);
+
+            if(this->Level < data.evolutions[i].e.evolveLevel)
+                continue;
+            if(this->boxdata.steps < data.evolutions[i].e.evolveFriendship)
+                continue;
+            if(data.evolutions[i].e.evolveItem && Item != data.evolutions[i].e.evolveItem)
+                continue;
+            if(data.evolutions[i].e.evolveDayTime != -1 && getCurrentDaytime() != data.evolutions[i].e.evolveDayTime)
+                continue;
+            if(data.evolutions[i].e.evolvesInto == 0)
+                continue;
+            if(data.evolutions[i].e.evolveGender && this->boxdata.gender() != data.evolutions[i].e.evolveGender)
+                continue;
+            if(data.evolutions[i].e.evolveLocation && SAV.acMapIdx != data.evolutions[i].e.evolveLocation)
+                continue;
+            if(data.evolutions[i].e.evolveHeldItem && this->boxdata.Item != data.evolutions[i].e.evolveHeldItem)
+                continue;
+            if(data.evolutions[i].e.evolveKnownMove){
+                bool b = false;
+                for(int j = 0; j < 4; ++j)
+                    b |= (data.evolutions[i].e.evolveKnownMove == this->boxdata.Attack[j]);
+                if(!b)
+                    continue;
+            }
+            if(data.evolutions[i].e.evolveKnownMoveType){
+                bool b = false;
+                for(int j = 0; j < 4; ++j)
+                    b |= (data.evolutions[i].e.evolveKnownMoveType == AttackList[this->boxdata.Attack[j]]->type);
+                if(!b)
+                    continue;
+            }
+            if(data.evolutions[i].e.evolveMinimumBeauty && data.evolutions[i].e.evolveMinimumBeauty < this->boxdata.ConStats[1])
+                continue;
+            if(data.evolutions[i].e.evolveAdditionalPartyMember){
+                bool b = false;
+                for(int j = 0; j < 6; ++j)
+                    b |= (data.evolutions[i].e.evolveAdditionalPartyMember == SAV.PKMN_team[i].boxdata.SPEC);
+                if(!b)
+                    continue;
+            }
+            if(Method != data.evolutions[i].e.evolutionTrigger)
+                continue;
             return true;
         }
         return false;
@@ -1553,47 +1560,47 @@ NEXT:
         int into = 0;
 
         for(int i = 0; i< 7; ++i){
-            //if(this->Level < data.evolutions[i].e.evolveLevel)
-            //    continue;
-            //if(this->boxdata.steps < data.evolutions[i].e.evolveFriendship)
-            //    continue;
-            //if(data.evolutions[i].e.evolveItem && Item != data.evolutions[i].e.evolveItem)
-            //    continue;
-            //if(data.evolutions[i].e.evolveDayTime != -1 && getCurrentDaytime() != data.evolutions[i].e.evolveDayTime)
-            //    continue;
-            //if(data.evolutions[i].e.evolvesInto == 0)
-            //    continue;
-            //if(data.evolutions[i].e.evolveGender && this->boxdata.gender() != data.evolutions[i].e.evolveGender)
-            //    continue;
-            //if(data.evolutions[i].e.evolveLocation && SAV.acMapIdx != data.evolutions[i].e.evolveLocation)
-            //    continue;
-            //if(data.evolutions[i].e.evolveHeldItem && this->boxdata.Item != data.evolutions[i].e.evolveHeldItem)
-            //    continue;
-            //if(data.evolutions[i].e.evolveKnownMove){
-            //    bool b = false;
-            //    for(int j = 0; j < 4; ++j)
-            //        b |= (data.evolutions[i].e.evolveKnownMove == this->boxdata.Attack[j]);
-            //    if(!b)
-            //        continue;
-            //}
-            //if(data.evolutions[i].e.evolveKnownMoveType){
-            //    bool b = false;
-            //    for(int j = 0; j < 4; ++j)
-            //        b |= (data.evolutions[i].e.evolveKnownMoveType == AttackList[this->boxdata.Attack[j]]->type);
-            //    if(!b)
-            //        continue;
-            //}
-            //if(data.evolutions[i].e.evolveMinimumBeauty && data.evolutions[i].e.evolveMinimumBeauty < this->boxdata.ConStats[1])
-            //    continue;
-            //if(data.evolutions[i].e.evolveAdditionalPartyMember){
-            //    bool b = false;
-            //    for(int j = 0; j < 6; ++j)
-            //        b |= (data.evolutions[i].e.evolveAdditionalPartyMember == SAV.PKMN_team[i].boxdata.SPEC);
-            //    if(!b)
-            //        continue;
-            //}
-            //if(Method != data.evolutions[i].e.evolutionTrigger)
-            //    continue;
+            if(this->Level < data.evolutions[i].e.evolveLevel)
+                continue;
+            if(this->boxdata.steps < data.evolutions[i].e.evolveFriendship)
+                continue;
+            if(data.evolutions[i].e.evolveItem && Item != data.evolutions[i].e.evolveItem)
+                continue;
+            if(data.evolutions[i].e.evolveDayTime != -1 && getCurrentDaytime() != data.evolutions[i].e.evolveDayTime)
+                continue;
+            if(data.evolutions[i].e.evolvesInto == 0)
+                continue;
+            if(data.evolutions[i].e.evolveGender && this->boxdata.gender() != data.evolutions[i].e.evolveGender)
+                continue;
+            if(data.evolutions[i].e.evolveLocation && SAV.acMapIdx != data.evolutions[i].e.evolveLocation)
+                continue;
+            if(data.evolutions[i].e.evolveHeldItem && this->boxdata.Item != data.evolutions[i].e.evolveHeldItem)
+                continue;
+            if(data.evolutions[i].e.evolveKnownMove){
+                bool b = false;
+                for(int j = 0; j < 4; ++j)
+                    b |= (data.evolutions[i].e.evolveKnownMove == this->boxdata.Attack[j]);
+                if(!b)
+                    continue;
+            }
+            if(data.evolutions[i].e.evolveKnownMoveType){
+                bool b = false;
+                for(int j = 0; j < 4; ++j)
+                    b |= (data.evolutions[i].e.evolveKnownMoveType == AttackList[this->boxdata.Attack[j]]->type);
+                if(!b)
+                    continue;
+            }
+            if(data.evolutions[i].e.evolveMinimumBeauty && data.evolutions[i].e.evolveMinimumBeauty < this->boxdata.ConStats[1])
+                continue;
+            if(data.evolutions[i].e.evolveAdditionalPartyMember){
+                bool b = false;
+                for(int j = 0; j < 6; ++j)
+                    b |= (data.evolutions[i].e.evolveAdditionalPartyMember == SAV.PKMN_team[i].boxdata.SPEC);
+                if(!b)
+                    continue;
+            }
+            if(Method != data.evolutions[i].e.evolutionTrigger)
+                continue;
             into = data.evolutions[i].e.evolvesInto;
             break;
         }

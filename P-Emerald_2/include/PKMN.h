@@ -146,27 +146,27 @@ namespace POKEMON{
             short size;
             short weight;
             short expType;
-            u8 abilities[4];
+            u16 abilities[4];
 
             union{
                 struct evolvestruct{
-                    u8 evolvesInto;
-                    u8 evolutionTrigger;
-                    u8 evolveItem;
-                    u8 evolveLevel;
-                    u8 evolveGender;
-                    u8 evolveLocation;
-                    u8 evolveHeldItem;
-                    u8 evolveDayTime;
-                    u8 evolveKnownMove;
-                    u8 evolveKnownMoveType;
-                    u8 evolveFriendship;
-                    u8 evolveMinimumBeauty;
-                    u8 evolveAtkDefRelation; //1: >; 2: ==; 3 <
-                    u8 evolveAdditionalPartyMember;
-                    u8 evolveTradeSpecies;
+                    s16 evolvesInto;
+                    s16 evolutionTrigger;
+                    s16 evolveItem;
+                    s16 evolveLevel;
+                    s16 evolveGender;
+                    s16 evolveLocation;
+                    s16 evolveHeldItem;
+                    s16 evolveDayTime;
+                    s16 evolveKnownMove;
+                    s16 evolveKnownMoveType;
+                    s16 evolveFriendship;
+                    s16 evolveMinimumBeauty;
+                    s16 evolveAtkDefRelation; //1: >; 2: ==; 3 <
+                    s16 evolveAdditionalPartyMember;
+                    s16 evolveTradeSpecies;
                 }e;
-                u8 evolveData[15];
+                s16 evolveData[15];
             }evolutions[7];
         };
         Type getType(int pkmnind,int type);
