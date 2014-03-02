@@ -1498,13 +1498,6 @@ NEXT:
         PKMNDATA::getAll(this->boxdata.SPEC,data);
 
         for(int i = 0; i< 7; ++i){
-            consoleSetWindow(&Top,0,10+3*i,32,5);
-            for(int j = 0;  j< 4; ++j)
-                printf("%d ",data.abilities[j]);
-            printf("\n");
-            for(int j = 0; j < 15; ++j)
-                printf("%d ",data.evolutions[i].evolveData[j]);
-
             if(this->Level < data.evolutions[i].e.evolveLevel)
                 continue;
             if(this->boxdata.steps < data.evolutions[i].e.evolveFriendship)
@@ -1610,9 +1603,9 @@ NEXT:
         this->boxdata.SPEC = into;
         PKMNDATA::getAll(this->boxdata.SPEC,data);
         if(this->boxdata.SPEC != 292)
-            stats.acHP = stats.maxHP = ((boxdata.IV.HP+2*data.Bases[0]+(boxdata.EV[0]/4)+100)*this->Level/100)+10;
+            stats.maxHP = ((boxdata.IV.HP+2*data.Bases[0]+(boxdata.EV[0]/4)+100)*this->Level/100)+10;
         else
-            stats.acHP = stats.maxHP = 1;
+            stats.maxHP = 1;
 
         if(!this->boxdata.IV.isNicked)
             wcscpy(this->boxdata.Name,PKMNDATA::getWDisplayName(this->boxdata.SPEC));

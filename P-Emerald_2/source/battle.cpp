@@ -222,6 +222,16 @@ namespace BATTLE{
 #define OWN_PKMN_1_TILE     332
 #define OWN_PKMN_2_TILE     476
 
+#define OPPONENT 1
+#define PLAYER 0
+    
+#define OWN1_EP_COL         160
+#define OWN2_EP_COL         OWN1_EP_COL
+    
+#define OWN_HP_COL          150
+#define OPP_HP_COL          155
+
+#define HP_COL(a,b) (((a) == OPPONENT )? (OPP_HP_COL + (b)*2 ): (OWN_HP_COL + (b)*2 ))
 
     void initinitBattleScrnSprites(OAMTable* oam, SpriteInfo* spriteInfo,int ownPok,int oppPok){
         static const int BYTES_PER_16_COLOR_TILE = 32;
@@ -1387,7 +1397,7 @@ namespace BATTLE{
                 trainerclassnames[this->opponent->trainer_class],this->opponent->Name);
             cust_font.print_string(buf,8,8,true);
         }        
-        for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i)
+        for(int i = 1 + (this->battlemode == DOUBLE && this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i)
             if(i == newPok || i == toSwitch) {
                 switch(this->acpoksts[acpokpos[i][1]][1]){
                 case KO:
@@ -1419,14 +1429,14 @@ namespace BATTLE{
                 palcnt   = OPP_PKMN_1_PAL;
                 nextAvailableTileIdx = OPP_PKMN_1_TILE;
 
-                oamTop->oamBuffer[OPP_PB_START + 1].isHidden = true;
+                oamTop->oamBuffer[OPP_PB_START].isHidden = true;
                 for(int i = 1; i <= 4; ++i)
                     oamTop->oamBuffer[OPP_PKMN_1_START + i].isHidden = true;
                 updateOAM(oamTop);
 
                 animatePB(206,50); 
 
-                oamTop->oamBuffer[OPP_PB_START + 1].isHidden = false;
+                oamTop->oamBuffer[OPP_PB_START].isHidden = false;
 
                 if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.SPEC,176,20,oamIndex,palcnt,nextAvailableTileIdx,false,
                     (*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny(),(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isFemale)){
@@ -1443,10 +1453,11 @@ namespace BATTLE{
                 if((*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny())
                     animateShiny(176+16,36);
 
-                displayHP(100,101 ,88,32,142,143,false);
-                displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,142,143,false);      
-                oamTop->oamBuffer[OPP_PB_START + 1].x = 96;
-                oamTop->oamBuffer[OPP_PB_START + 1].y = 41;
+                displayHP(100,101 ,88,32,HP_COL(1,toSwitch),HP_COL(1,toSwitch) + 1,false);
+                displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,
+                    88,32,HP_COL(1,toSwitch),HP_COL(1,toSwitch) + 1,false);      
+                oamTop->oamBuffer[OPP_PB_START].x = 96;
+                oamTop->oamBuffer[OPP_PB_START].y = 41;
                 consoleSetWindow(&Top,0,5,20,2);
                 consoleClear();
                 printf("%10ls%c\n",(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[0][1]]));
@@ -1459,7 +1470,7 @@ namespace BATTLE{
             } 
             else
             {
-                oamTop->oamBuffer[OPP_PB_START].isHidden = true;
+                oamTop->oamBuffer[OPP_PB_START+1].isHidden = true;
                 updateOAM(oamTop);
                 consoleSelect(&Top);
                 oamIndex = OPP_PKMN_2_START;
@@ -1471,7 +1482,7 @@ namespace BATTLE{
                 updateOAM(oamTop);
 
                 animatePB(142,34); 
-                oamTop->oamBuffer[OPP_PB_START].isHidden = false;
+                oamTop->oamBuffer[OPP_PB_START+1].isHidden = false;
 
                 if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.SPEC,112,4,oamIndex,palcnt,nextAvailableTileIdx,false,
                     (*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isShiny(),(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.isFemale)){
@@ -1491,10 +1502,10 @@ namespace BATTLE{
 
                 updateOAM(oamTop);
 
-                displayHP(100,101,0,8,145,144,false);   
-                displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,145,144,false); 
-                oamTop->oamBuffer[OPP_PB_START].x = 8;
-                oamTop->oamBuffer[OPP_PB_START].y = 17;
+                displayHP(100,101,0,8,HP_COL(1,toSwitch),HP_COL(1,toSwitch) + 1,false);   
+                displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,HP_COL(1,toSwitch),HP_COL(1,toSwitch) + 1,false); 
+                oamTop->oamBuffer[OPP_PB_START+1].x = 8;
+                oamTop->oamBuffer[OPP_PB_START+1].y = 17;
                 consoleSetWindow(&Top,4,2,20,2);
                 consoleClear();
                 printf("%ls%c\nLv%d%4dKP",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[1][1]]),
@@ -1503,7 +1514,7 @@ namespace BATTLE{
 
             consoleSelect(&Bottom);
 
-            for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i)
+            for(int i = 1 + (this->battlemode == DOUBLE && this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i)
                 if(i == newPok || i == toSwitch){
                     oamTop->oamBuffer[OPP_PB_START+i].x = -4+ 18*i;
                     oamTop->oamBuffer[OPP_PB_START+i].y = -4;
@@ -1543,7 +1554,7 @@ namespace BATTLE{
         if((*this->player->pkmn_team)[acpokpos[newPok][0]].stats.acHP == 0)
             return;
         init();
-        for(int i = 1 + (this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i)
+        for(int i = 1 + (this->battlemode == DOUBLE && this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i)
             if(i == newPok || i == toSwitch){
                 oamTop->oamBuffer[OWN_PB_START+i].x = 236 - 18*i;
                 oamTop->oamBuffer[OWN_PB_START+i].y = 196 - 16;
@@ -1587,7 +1598,7 @@ namespace BATTLE{
                 palcnt   = OWN_PKMN_1_PAL;
                 nextAvailableTileIdx = OWN_PKMN_1_TILE;
 
-                oamTop->oamBuffer[OWN_PB_START + 1].isHidden = true;
+                oamTop->oamBuffer[OWN_PB_START].isHidden = true;
                 for(int i = 0; i < 4; ++i)
                     oamTop->oamBuffer[OWN_PKMN_1_START + i +1].isHidden = true;
                 updateOAM(oamTop);
@@ -1600,24 +1611,25 @@ namespace BATTLE{
                     loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,-10,100,oamIndex,palcnt,nextAvailableTileIdx,false,
                     (*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny(),!(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isFemale);
 
-                oamTop->oamBuffer[OWN_PB_START + 1].isHidden = false;
+                oamTop->oamBuffer[OWN_PB_START].isHidden = false;
 
                 updateOAM(oamTop);
 
                 if((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny())
                     animateShiny(6,116);
 
-                displayHP(100,101,256-96-28,192-32-8-32,142,149,false);
-                displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,142,149,false);       
-                displayEP(100,100,256-96-28,192-32-8-32,46,47,false);   
+                displayHP(100,101,256-96-28,192-32-8-32,HP_COL(0,toSwitch),HP_COL(0,toSwitch) + 1,false);
+                displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,
+                    256-96-28,192-32-8-32,HP_COL(0,toSwitch),HP_COL(0,toSwitch) + 1,false);       
+                displayEP(100,100,256-96-28,192-32-8-32,OWN1_EP_COL,OWN1_EP_COL + 1,false);   
 
                 POKEMON::PKMNDATA::getAll((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,p);
 
                 displayEP(100,((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level-1][p.expType]) *100/
                     (POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level][p.expType]-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level-1][p.expType]),
-                    256-96-28,192-32-8-32,46,47,false);
-                oamTop->oamBuffer[OWN_PB_START +1].x = 256-88-32+4;
-                oamTop->oamBuffer[OWN_PB_START + 1].y = 192-31-32;
+                    256-96-28,192-32-8-32,OWN1_EP_COL,OWN1_EP_COL+1,false);
+                oamTop->oamBuffer[OWN_PB_START].x = 256-88-32+4;
+                oamTop->oamBuffer[OWN_PB_START].y = 192-31-32;
                 consoleSetWindow(&Top,21,16,20,4);
                 consoleClear();
                 printf("%ls%c\nLv%d%4dKP",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[0][0]]),(*this->player->pkmn_team)[acpokpos[0][0]].Level,
@@ -1628,7 +1640,7 @@ namespace BATTLE{
             } 
             else
             {
-                oamTop->oamBuffer[OWN_PB_START].isHidden = true;
+                oamTop->oamBuffer[OWN_PB_START+1].isHidden = true;
                 updateOAM(oamTop);
                 consoleSelect(&Top);
                 oamIndex = OWN_PKMN_2_START;
@@ -1641,7 +1653,7 @@ namespace BATTLE{
 
                 animatePB(142,34); 
 
-                oamTop->oamBuffer[OWN_PB_START].isHidden = false;
+                oamTop->oamBuffer[OWN_PB_START+1].isHidden = false;
 
                 if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMNBACK/",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,50,120,oamIndex,palcnt,nextAvailableTileIdx,false,
                     (*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny(),(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isFemale))
@@ -1653,18 +1665,19 @@ namespace BATTLE{
 
                 updateOAM(oamTop);
 
-                displayHP(100,101,256-36,192-40,151,150,false);   
-                displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,151,150,false);        
-                displayEP(100,100,256-36,192-40,46,47,false);
+                displayHP(100,101,256-36,192-40,HP_COL(0,toSwitch),HP_COL(0,toSwitch) + 1,false);   
+                displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,
+                    256-36,192-40,HP_COL(0,toSwitch),HP_COL(0,toSwitch) + 1,false);        
+                displayEP(100,100,256-36,192-40,OWN2_EP_COL,OWN2_EP_COL + 1,false);
 
                 POKEMON::PKMNDATA::getAll((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,p);
 
                 displayEP(100,((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level-1][p.expType]) *100/
                     (POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level][p.expType]-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level-1][p.expType]),
-                    256-36,192-40,46,47,false);
+                    256-36,192-40,OWN2_EP_COL,OWN2_EP_COL,false);
 
-                oamTop->oamBuffer[OWN_PB_START].x = 256-32+4;
-                oamTop->oamBuffer[OWN_PB_START].y = 192-31;
+                oamTop->oamBuffer[OWN_PB_START+1].x = 256-32+4;
+                oamTop->oamBuffer[OWN_PB_START+1].y = 192-31;
                 consoleSetWindow(&Top,16,20,20,5);
                 consoleClear();
                 printf("%10ls%c\n",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[1][0]]));
@@ -1679,7 +1692,7 @@ namespace BATTLE{
                 updateOAM(oamTop);
             }
 
-            for(int i = 1 + (this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i)
+            for(int i = 1 + (this->battlemode == DOUBLE && this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i)
                 if(i == newPok || i == toSwitch){
                     oamTop->oamBuffer[OWN_PB_START+i].x = 236 - 18*i;
                     oamTop->oamBuffer[OWN_PB_START+i].y = 196 - 16;
@@ -1850,7 +1863,7 @@ namespace BATTLE{
 
         animatePB(206,50); 
 
-        oamTop->oamBuffer[OPP_HP_1].isHidden = oamTop->oamBuffer[OPP_PB_START + 1].isHidden = false;
+        oamTop->oamBuffer[OPP_HP_1].isHidden = oamTop->oamBuffer[OPP_PB_START].isHidden = false;
         oamIndex = OPP_PKMN_1_START;
         palcnt = OPP_PKMN_1_PAL;
         nextAvailableTileIdx = OPP_PKMN_1_TILE;
@@ -1866,10 +1879,10 @@ namespace BATTLE{
         if((*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.isShiny())
             animateShiny(176+16,36);
 
-        displayHP(100,101 ,88,32,144,145,false);
-        displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,144,145,false); 
-        oamTop->oamBuffer[OPP_PB_START + 1].x = 96;
-        oamTop->oamBuffer[OPP_PB_START + 1].y = 41;
+        displayHP(100,101 ,88,32,HP_COL(1,0),HP_COL(1,0) + 1,false);
+        displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,HP_COL(1,0),HP_COL(1,0) + 1,false); 
+        oamTop->oamBuffer[OPP_PB_START ].x = 96;
+        oamTop->oamBuffer[OPP_PB_START ].y = 41;
         consoleSetWindow(&Top,0,5,20,5);
 
         printf("%10ls%c\n",(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[0][1]]));
@@ -1881,7 +1894,7 @@ namespace BATTLE{
             (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP);
 
         if((this->battlemode == DOUBLE) && this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO){
-            oamTop->oamBuffer[OPP_HP_2].isHidden = oamTop->oamBuffer[OPP_PB_START].isHidden = true;
+            oamTop->oamBuffer[OPP_HP_2].isHidden = oamTop->oamBuffer[OPP_PB_START+1].isHidden = true;
             updateOAM(oamTop);
             for(int i= 0; i < 80; ++i)
                 swiWaitForVBlank();
@@ -1892,7 +1905,7 @@ namespace BATTLE{
             consoleSelect(&Top);
 
             animatePB(142,34); 
-            oamTop->oamBuffer[OPP_HP_2].isHidden = oamTop->oamBuffer[OPP_PB_START].isHidden = false;
+            oamTop->oamBuffer[OPP_HP_2].isHidden = oamTop->oamBuffer[OPP_PB_START+1].isHidden = false;
             oamIndex = OPP_PKMN_2_START;
             palcnt = OPP_PKMN_2_PAL;
             nextAvailableTileIdx = OPP_PKMN_2_TILE;
@@ -1909,17 +1922,17 @@ namespace BATTLE{
                 animateShiny(112+16,20);
 
 
-            displayHP(100,101,0,8,142,143,false);   
-            displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,142,143,false); 
-            oamTop->oamBuffer[OPP_PB_START].x = 8;
-            oamTop->oamBuffer[OPP_PB_START].y = 17;
+            displayHP(100,101,0,8,HP_COL(1,1),HP_COL(1,1) + 1,false);   
+            displayHP(100,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,HP_COL(1,1),HP_COL(1,1) + 1,false); 
+            oamTop->oamBuffer[OPP_PB_START+1].x = 8;
+            oamTop->oamBuffer[OPP_PB_START+1].y = 17;
             consoleSetWindow(&Top,4,2,20,5);
             printf("%ls%c\nLv%d%4dKP",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[1][1]]),
                 (*this->opponent->pkmn_team)[acpokpos[1][1]].Level, (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP);
         }
 
         consoleSelect(&Bottom);
-        for(int i = 1 + (this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i){
+        for(int i = 1 + (this->battlemode == DOUBLE && this->opponent->pkmn_team->size() > 1 && acpoksts[acpokpos[1][1]][1] != KO); i < 6; ++i){
             oamTop->oamBuffer[OPP_PB_START+i].x = -4+ 18*i;
             oamTop->oamBuffer[OPP_PB_START+i].y = -4;
             oamTop->oamBuffer[OPP_PB_START+i].isHidden = false;
@@ -1987,23 +2000,24 @@ namespace BATTLE{
         if((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.isShiny())
             animateShiny(6,116);
 
-        displayHP(100,101,256-96-28,192-32-8-32,148,149,false);
-        displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,148,149,false);       
-        displayEP(100,100,256-96-28,192-32-8-32,46,47,false);
+        displayHP(100,101,256-96-28,192-32-8-32,HP_COL(0,0),HP_COL(0,0) + 1,false);
+        displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,
+            256-96-28,192-32-8-32,HP_COL(0,0),HP_COL(0,0) + 1,false);       
+        displayEP(100,101,256-96-28,192-32-8-32,OWN1_EP_COL,OWN1_EP_COL+1,false);
 
         POKEMON::PKMNDATA::getAll((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,p);
-        displayEP(100,((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level-1][p.expType]) *100/
+        displayEP(0,((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level-1][p.expType]) *100/
             (POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level][p.expType]-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level-1][p.expType]),
-            256-96-28,192-32-8-32,46,47,false);
-        oamTop->oamBuffer[OWN_PB_START + 1].x = 256-88-32+4;
-        oamTop->oamBuffer[OWN_PB_START + 1].y = 192-31-32;
+            256-96-28,192-32-8-32,OWN1_EP_COL,OWN1_EP_COL+1,false);
+        oamTop->oamBuffer[OWN_PB_START].x = 256-88-32+4;
+        oamTop->oamBuffer[OWN_PB_START].y = 192-31-32;
         consoleSetWindow(&Top,21,16,20,5);
 
         printf("%ls%c\nLv%d%4dKP",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[0][0]]),(*this->player->pkmn_team)[acpokpos[0][0]].Level,
             (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP);
 
 
-        oamTop->oamBuffer[OWN_PB_START + 1].isHidden = oamTop->oamBuffer[OWN_HP_1].isHidden = false;
+        oamTop->oamBuffer[OWN_PB_START].isHidden = oamTop->oamBuffer[OWN_HP_1].isHidden = false;
         updateOAM(oamTop);
         for(int i= 0; i < 80; ++i)
             swiWaitForVBlank();
@@ -2032,18 +2046,19 @@ namespace BATTLE{
             if((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.isShiny())
                 animateShiny(50+16,136);
 
-            oamTop->oamBuffer[OWN_PB_START].isHidden = oamTop->oamBuffer[OWN_HP_2].isHidden = false;
+            oamTop->oamBuffer[OWN_PB_START+1].isHidden = oamTop->oamBuffer[OWN_HP_2].isHidden = false;
             updateOAM(oamTop);
 
-            displayHP(100,101,256-36,192-40,150,151,false);   
-            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,150,151,false);        
-            displayEP(100,100,256-36,192-40,46,47,false);
+            displayHP(100,101,256-36,192-40,HP_COL(0,1),HP_COL(0,1) + 1,false);   
+            displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,
+                256-36,192-40,HP_COL(0,1),HP_COL(0,1) + 1,false);        
+            displayEP(100,100,256-36,192-40,OWN2_EP_COL,OWN2_EP_COL+1,false);
             POKEMON::PKMNDATA::getAll((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,p);
-            displayEP(100,((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level-1][p.expType]) *100/
+            displayEP(0,((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level-1][p.expType]) *100/
                 (POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level][p.expType]-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level-1][p.expType]),
-                256-36,192-40,46,47,false);
-            oamTop->oamBuffer[OWN_PB_START].x = 256-32+4;
-            oamTop->oamBuffer[OWN_PB_START].y = 192-31;
+                256-36,192-40,OWN2_EP_COL,OWN2_EP_COL+1,false);
+            oamTop->oamBuffer[OWN_PB_START+1].x = 256-32+4;
+            oamTop->oamBuffer[OWN_PB_START+1].y = 192-31;
             consoleSetWindow(&Top,16,20,20,5);
             printf("%10ls%c\n",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[1][0]]));
             if((*this->player->pkmn_team)[acpokpos[1][0]].Level < 10)
@@ -2055,7 +2070,7 @@ namespace BATTLE{
 
         }
 
-        for(int i = 1 + (this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i){
+        for(int i = 1 + (this->battlemode == DOUBLE && this->player->pkmn_team->size() > 1 && acpoksts[acpokpos[1][0]][0] != KO); i < 6; ++i){
             oamTop->oamBuffer[OWN_PB_START+i].x = 236 - 18*i;
             oamTop->oamBuffer[OWN_PB_START+i].y = 196 - 16;
             oamTop->oamBuffer[OWN_PB_START+i].isHidden = false;
@@ -2493,9 +2508,9 @@ OUT2:
         return int((a * t* b* e* L)/(7* s));
     }
 
-    void printEFFLOG(const POKEMON::PKMN& P){
-        //for(int i = 0; i< 60; ++i)
-        //    swiWaitForVBlank();
+    void printEFFLOG(const POKEMON::PKMN& P, int atk){
+        if(AttackList[atk]->HitType == attack::HitTypes::STAT)
+            return;
 
         char buf[70];
         if(missed){
@@ -2761,13 +2776,13 @@ BEFORE_1:
                                     acpoksts[acpokpos[0][0]][0] = KO;
 
                                 displayHP(old,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,
-                                    256-96-28,192-32-8-32,142,149,true); 
+                                    256-96-28,192-32-8-32,HP_COL(0,0),HP_COL(0,0) + 1,true); 
                                 consoleSetWindow(&Top,21,16,20,4);
                                 consoleClear();
                                 printf("%ls%c\nLv%d%4dKP",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name,
                                     GENDER((*this->player->pkmn_team)[acpokpos[0][0]]),(*this->player->pkmn_team)[acpokpos[0][0]].Level,
                                     (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP);
-                            }printEFFLOG(((*this->player->pkmn_team)[acpokpos[0][0]])) ;
+                            }printEFFLOG(((*this->player->pkmn_team)[acpokpos[0][0]]),oppAtk[acin/2].first) ;
                         }
                         if((this->battlemode == DOUBLE) && (tg & 2)){
                             missed = false;
@@ -2790,9 +2805,10 @@ BEFORE_1:
                                 printf("Lv%d%4dKP",(*this->player->pkmn_team)[acpokpos[1][0]].Level,
                                     (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP);
 
-                                displayHP(old,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,151,150,true);  
+                                displayHP(old,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,
+                                    256-36,192-40,HP_COL(0,1),HP_COL(0,1) + 1,true);  
 
-                            }printEFFLOG(((*this->player->pkmn_team)[acpokpos[1][0]]) );
+                            }printEFFLOG(((*this->player->pkmn_team)[acpokpos[1][0]]),oppAtk[acin/2].first );
                         }
                         if((this->battlemode == DOUBLE)&&(tg & 8)){
                             missed = false;
@@ -2821,17 +2837,19 @@ BEFORE_1:
                                         printf(" ");
                                     printf("Lv%d%4dKP",(*this->opponent->pkmn_team)[acpokpos[0][1]].Level,
                                         (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP);
-                                    displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,88,32,142,143,true);    
+                                    displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,
+                                        88,32,HP_COL(1,0),HP_COL(1,0) + 1,true);    
                                 }
                                 else{
                                     consoleSetWindow(&Top,4,2,20,2);
                                     consoleClear();
                                     printf("%ls%c\nLv%d%4dKP",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[1][1]]),
                                         (*this->opponent->pkmn_team)[acpokpos[1][1]].Level, (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP);
-                                    displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,145,144,true); 
+                                    displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,
+                                        0,8,HP_COL(1,1),HP_COL(1,1) + 1,true); 
                                 }
                             }
-                            printEFFLOG((*this->opponent->pkmn_team)[acpokpos[1-acin/2][1]]) ;
+                            printEFFLOG((*this->opponent->pkmn_team)[acpokpos[1-acin/2][1]],oppAtk[acin/2].first) ;
                         }
                     }
                     else{
@@ -2857,9 +2875,9 @@ BEFORE_1:
                                 printf("Lv%d%4dKP",(*this->opponent->pkmn_team)[acpokpos[0][1]].Level,
                                     (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP);
                                 displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP,
-                                    88,32,142,143,true);    
+                                    88,32,HP_COL(1,0),HP_COL(1,0) + 1,true);    
                             }
-                            printEFFLOG((*this->opponent->pkmn_team)[acpokpos[0][1]]) ;
+                            printEFFLOG((*this->opponent->pkmn_team)[acpokpos[0][1]],ownAtk[acin/2].first) ;
                         }
                         if((this->battlemode == DOUBLE) && (tg & 2)){
                             missed = false;
@@ -2875,10 +2893,11 @@ BEFORE_1:
                                 consoleClear();
                                 printf("%ls%c\nLv%d%4dKP",(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[1][1]]),
                                     (*this->opponent->pkmn_team)[acpokpos[1][1]].Level, (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP);
-                                displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,0,8,145,144,true);
+                                displayHP(old,100-(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP,
+                                    0,8,HP_COL(1,1),HP_COL(1,1) + 1,true);
 
                             }
-                            printEFFLOG((*this->opponent->pkmn_team)[acpokpos[1][1]]) ;
+                            printEFFLOG((*this->opponent->pkmn_team)[acpokpos[1][1]],ownAtk[acin/2].first) ;
                         }
                         if((this->battlemode == DOUBLE) && (tg & 8)){
                             missed = false;
@@ -2898,7 +2917,7 @@ BEFORE_1:
                                 }
                                 if(acin/2 == 1){
                                     displayHP(old,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/
-                                        (*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,142,149,true); 
+                                        (*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,HP_COL(0,0),HP_COL(0,0) + 1,true); 
                                     consoleSetWindow(&Top,21,16,20,4);
                                     consoleClear();
                                     printf("%ls%c\nLv%d%4dKP",(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Name,
@@ -2906,7 +2925,8 @@ BEFORE_1:
                                         (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP);
                                 }
                                 else{
-                                    displayHP(old,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,151,150,true); 
+                                    displayHP(old,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,
+                                        256-36,192-40,HP_COL(0,1),HP_COL(0,1) + 1,true); 
                                     consoleSetWindow(&Top,16,20,20,5);
                                     consoleClear();
                                     printf("%10ls%c\n",(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.Name,GENDER((*this->player->pkmn_team)[acpokpos[1][0]]));
@@ -2919,7 +2939,7 @@ BEFORE_1:
 
                                 }
                             }
-                            printEFFLOG((*this->player->pkmn_team)[acpokpos[1-acin/2][0]]) ;
+                            printEFFLOG((*this->player->pkmn_team)[acpokpos[1-acin/2][0]],ownAtk[acin/2].first) ;
                         }
                     }
 
@@ -3019,10 +3039,10 @@ BEFORE_1:
 
 
                                     if(i == 0)
-                                        displayEP(old,nw, 256-96-28,192-32-8-32,46,47,true);
+                                        displayEP(old,nw, 256-96-28,192-32-8-32,OWN1_EP_COL,OWN1_EP_COL+1,true);
 
                                     if((this->battlemode == DOUBLE) && i == 1)
-                                        displayEP(old,nw, 256-36,192-40,48,49,true);
+                                        displayEP(old,nw, 256-36,192-40,OWN2_EP_COL,OWN2_EP_COL+1,true);
                                     for(int i = 0; i< 75; ++i)
                                         swiWaitForVBlank();
                                     bool newLevel = acPK.Level < 100 && POKEMON::EXP[acPK.Level][p.expType] <= acPK.boxdata.exp;
@@ -3034,9 +3054,9 @@ BEFORE_1:
                                         acPK.Level++;
                                         
                                         if( acPK.boxdata.SPEC != 292)
-                                             acPK.stats.acHP =  acPK.stats.maxHP = (( acPK.boxdata.IV.HP+2*p.Bases[0]+( acPK.boxdata.EV[0]/4)+100)* acPK.Level/100)+10;
+                                             acPK.stats.maxHP = (( acPK.boxdata.IV.HP+2*p.Bases[0]+( acPK.boxdata.EV[0]/4)+100)* acPK.Level/100)+10;
                                         else
-                                             acPK.stats.acHP =  acPK.stats.maxHP = 1;
+                                             acPK.stats.maxHP = 1;
                                         POKEMON::Natures nature = acPK.boxdata.getNature();
                                         acPK.stats.Atk = (((acPK.boxdata.IV.Attack+2*p.Bases[1]+(acPK.boxdata.EV[1]>>2))*acPK.Level/100.0)+5)*POKEMON::NatMod[nature][0];
                                         acPK.stats.Def = (((acPK.boxdata.IV.Defense+2*p.Bases[2]+(acPK.boxdata.EV[2]>>2))*acPK.Level/100.0)+5)*POKEMON::NatMod[nature][1];
@@ -3056,8 +3076,8 @@ BEFORE_1:
                                             (POKEMON::EXP[acPK.Level][p.expType]-POKEMON::EXP[acPK.Level-1][p.expType]));
                                         
                                         if(i == 0){
-                                            displayEP(100,100, 256-96-28,192-32-8-32,46,47,false);
-                                            displayEP(100,nw, 256-96-28,192-32-8-32,46,47,true);
+                                            displayEP(100,101, 256-96-28,192-32-8-32,OWN1_EP_COL,OWN1_EP_COL+1,false);
+                                            displayEP(0,nw, 256-96-28,192-32-8-32,OWN1_EP_COL,OWN1_EP_COL+1,true);
                                         consoleSelect(&Top);
                                             consoleSetWindow(&Top,21,16,20,4);
                                             consoleClear();
@@ -3066,8 +3086,8 @@ BEFORE_1:
                                                 (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP);
                                         }
                                         if((this->battlemode == DOUBLE) && i == 1){
-                                            displayEP(100,100, 256-36,192-40,48,49,false);
-                                            displayEP(100,nw, 256-36,192-40,48,49,true);
+                                            displayEP(100,101, 256-36,192-40,OWN2_EP_COL,OWN2_EP_COL+1,false);
+                                            displayEP(0,nw, 256-36,192-40,OWN2_EP_COL,OWN2_EP_COL+1,true);
                                         consoleSelect(&Top);
                                             consoleSetWindow(&Top,16,20,20,5);
                                             consoleClear();
@@ -3109,17 +3129,17 @@ BEFORE_1:
                                                 updateOAM(oamTop);
 
 
-                                                displayHP(100,101,256-96-28,192-32-8-32,142,149,false);
+                                                displayHP(100,101,256-96-28,192-32-8-32,HP_COL(0,0),HP_COL(0,0) + 1,false);
                                                 displayHP(100,100-(*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100
-                                                    /(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,142,149,false);       
-                                                displayEP(100,100,256-96-28,192-32-8-32,46,47,false);   
+                                                    /(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP,256-96-28,192-32-8-32,HP_COL(0,0),HP_COL(0,0) + 1,false);       
+                                                displayEP(100,101,256-96-28,192-32-8-32,OWN1_EP_COL,OWN1_EP_COL+1,false);   
 
                                                 POKEMON::PKMNDATA::getAll((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,p);
 
-                                                displayEP(100,((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level-1][p.expType]) *100/
+                                                displayEP(0,((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level-1][p.expType]) *100/
                                                     (POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level][p.expType]-
                                                     POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level-1][p.expType]),
-                                                    256-96-28,192-32-8-32,46,47,false);
+                                                    256-96-28,192-32-8-32,OWN1_EP_COL,OWN1_EP_COL+1,false);
                                         consoleSelect(&Top);
                                                 consoleSetWindow(&Top,21,16,20,4);
                                                 consoleClear();
@@ -3142,17 +3162,17 @@ BEFORE_1:
                                                 
                                                 updateOAM(oamTop);
 
-                                                displayHP(100,101,256-36,192-40,151,150,false);   
+                                                displayHP(100,101,256-36,192-40,HP_COL(0,1),HP_COL(0,1) + 1,false);   
                                                 displayHP(100,100-(*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/
-                                                    (*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,151,150,false);        
-                                                displayEP(100,100,256-36,192-40,46,47,false);
+                                                    (*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP,256-36,192-40,HP_COL(0,1),HP_COL(0,1) + 1,false);        
+                                                displayEP(100,100,256-36,192-40,OWN2_EP_COL,OWN2_EP_COL+1,false);
 
                                                 POKEMON::PKMNDATA::getAll((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,p);
 
-                                                displayEP(100,((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level-1][p.expType]) *100/
+                                                displayEP(0,((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level-1][p.expType]) *100/
                                                     (POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level][p.expType]-
                                                     POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level-1][p.expType]),
-                                                    256-36,192-40,46,47,false);
+                                                    256-36,192-40,OWN2_EP_COL,OWN2_EP_COL+1,false);
                                                 
                                         consoleSelect(&Top);
                                                 consoleSetWindow(&Top,16,20,20,5);
