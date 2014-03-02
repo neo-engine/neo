@@ -3027,8 +3027,25 @@ BEFORE_1:
                                         swiWaitForVBlank();
                                     bool newLevel = acPK.Level < 100 && POKEMON::EXP[acPK.Level][p.expType] <= acPK.boxdata.exp;
                                     bool nL = newLevel;
+
+                                    int HPdif = acPK.stats.maxHP - acPK.stats.acHP;
+
                                     while(newLevel){
                                         acPK.Level++;
+                                        
+                                        if( acPK.boxdata.SPEC != 292)
+                                             acPK.stats.acHP =  acPK.stats.maxHP = (( acPK.boxdata.IV.HP+2*p.Bases[0]+( acPK.boxdata.EV[0]/4)+100)* acPK.Level/100)+10;
+                                        else
+                                             acPK.stats.acHP =  acPK.stats.maxHP = 1;
+                                        POKEMON::Natures nature = acPK.boxdata.getNature();
+                                        acPK.stats.Atk = (((acPK.boxdata.IV.Attack+2*p.Bases[1]+(acPK.boxdata.EV[1]>>2))*acPK.Level/100.0)+5)*POKEMON::NatMod[nature][0];
+                                        acPK.stats.Def = (((acPK.boxdata.IV.Defense+2*p.Bases[2]+(acPK.boxdata.EV[2]>>2))*acPK.Level/100.0)+5)*POKEMON::NatMod[nature][1];
+                                        acPK.stats.Spd = (((acPK.boxdata.IV.Speed+2*p.Bases[3]+(acPK.boxdata.EV[3]>>2))*acPK.Level/100.0)+5)*POKEMON::NatMod[nature][2];
+                                        acPK.stats.SAtk = (((acPK.boxdata.IV.SAttack+2*p.Bases[4]+(acPK.boxdata.EV[4]>>2))*acPK.Level/100.0)+5)*POKEMON::NatMod[nature][3];
+                                        acPK.stats.SDef = (((acPK.boxdata.IV.SDefense+2*p.Bases[5]+(acPK.boxdata.EV[5]>>2))*acPK.Level/100.0)+5)*POKEMON::NatMod[nature][4];
+
+                                        acPK.stats.acHP = acPK.stats.maxHP - HPdif;
+
                                         clear();
                                         sprintf(buf,"%ls erreicht Level %d.",acPK.boxdata.Name,acPK.Level);
                                         cust_font.print_string(buf,8,8,true);
@@ -3037,7 +3054,7 @@ BEFORE_1:
 
                                         nw = std::min(100u,(acPK.boxdata.exp-POKEMON::EXP[acPK.Level-1][p.expType]) *100/
                                             (POKEMON::EXP[acPK.Level][p.expType]-POKEMON::EXP[acPK.Level-1][p.expType]));
-
+                                        
                                         if(i == 0){
                                             displayEP(100,100, 256-96-28,192-32-8-32,46,47,false);
                                             displayEP(100,nw, 256-96-28,192-32-8-32,46,47,true);

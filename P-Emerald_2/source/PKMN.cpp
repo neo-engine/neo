@@ -386,6 +386,9 @@ namespace POKEMON{
             fscanf(f,"%hi",&out.expType);  
             for(int i= 0; i < 4; ++i)
                 fscanf(f,"%hhi",&out.abilities[i]);  
+            for(int i = 0; i < 7; ++i)
+                for(int j = 0; j < 15; ++j)
+                    fscanf(f,"%hhu",&out.evolutions[i].evolveData[j]);
             fclose(f);
             return;
         }
@@ -412,8 +415,16 @@ namespace POKEMON{
                     }
                 }
                 auto I = reses.rbegin();
-                for(int i = 0; i < num && I != reses.rend(); ++i,++I)
-                    res[i] = *I;
+                for(int i = 0; i < num && I != reses.rend(); ++i,++I){
+                    for(int z = 0; z < i; ++z)
+                        if(*I == res[z]){
+                            --i;
+                            goto N;
+                        }
+                        res[i] = *I;
+N:
+                        ;
+                }
                 fclose(f);
                 return;
             }
@@ -424,9 +435,14 @@ namespace POKEMON{
                         u16 g,h;
                         fscanf(f,"%hd %hd",&g,&h);
                         if(i >= fromLevel && h == mode){
+                            for(int z = 0; z < rescnt; ++z)
+                                if(g == res[z])
+                                    goto NEXT;
                             res[rescnt] = g;
                             if(++rescnt == num)
                                 return;
+NEXT:
+                            ;
                         }
                     }
                 }
@@ -697,7 +713,7 @@ namespace POKEMON{
         else
             PKMNDATA::getLearnMoves(SPE,level,0,1,4,this->Attack);
         for(int i= 0; i< 4; ++i) this->AcPP[i] = AttackList[(int)Attacks[i]]->PP;
-        
+
         this->ppup.Up1 = 0;
         this->ppup.Up2 = 0;
         this->ppup.Up3 = 0;
@@ -1475,30 +1491,60 @@ namespace POKEMON{
     int page =0;
 
 
-    bool PKMN::canEvolve(int Item){
+    bool PKMN::canEvolve(int Item,int Method){
         if(this->boxdata.IV.isEgg)
             return false;
 
         PKMNDATA::getAll(this->boxdata.SPEC,data);
 
-        for(int i = 0; i< 9; ++i){
-            if(this->Level < data.evolutions[i].evolveLevel)
-                continue;
-            if(this->boxdata.steps < data.evolutions[i].evolveFriendship)
-                continue;
-            if(Item != data.evolutions[i].evolveItem)
-                continue;
-            if(data.evolutions[i].evolveDayTime != -1 && getCurrentDaytime() != data.evolutions[i].evolveDayTime)
-                continue;
-            if(data.evolutions[i].evolvesInto == 0)
-                continue;
-
+        for(int i = 0; i< 7; ++i){
+            //if(this->Level < data.evolutions[i].e.evolveLevel)
+            //    continue;
+            //if(this->boxdata.steps < data.evolutions[i].e.evolveFriendship)
+            //    continue;
+            //if(data.evolutions[i].e.evolveItem && Item != data.evolutions[i].e.evolveItem)
+            //    continue;
+            //if(data.evolutions[i].e.evolveDayTime != -1 && getCurrentDaytime() != data.evolutions[i].e.evolveDayTime)
+            //    continue;
+            //if(data.evolutions[i].e.evolvesInto == 0)
+            //    continue;
+            //if(data.evolutions[i].e.evolveGender && this->boxdata.gender() != data.evolutions[i].e.evolveGender)
+            //    continue;
+            //if(data.evolutions[i].e.evolveLocation && SAV.acMapIdx != data.evolutions[i].e.evolveLocation)
+            //    continue;
+            //if(data.evolutions[i].e.evolveHeldItem && this->boxdata.Item != data.evolutions[i].e.evolveHeldItem)
+            //    continue;
+            //if(data.evolutions[i].e.evolveKnownMove){
+            //    bool b = false;
+            //    for(int j = 0; j < 4; ++j)
+            //        b |= (data.evolutions[i].e.evolveKnownMove == this->boxdata.Attack[j]);
+            //    if(!b)
+            //        continue;
+            //}
+            //if(data.evolutions[i].e.evolveKnownMoveType){
+            //    bool b = false;
+            //    for(int j = 0; j < 4; ++j)
+            //        b |= (data.evolutions[i].e.evolveKnownMoveType == AttackList[this->boxdata.Attack[j]]->type);
+            //    if(!b)
+            //        continue;
+            //}
+            //if(data.evolutions[i].e.evolveMinimumBeauty && data.evolutions[i].e.evolveMinimumBeauty < this->boxdata.ConStats[1])
+            //    continue;
+            //if(data.evolutions[i].e.evolveAdditionalPartyMember){
+            //    bool b = false;
+            //    for(int j = 0; j < 6; ++j)
+            //        b |= (data.evolutions[i].e.evolveAdditionalPartyMember == SAV.PKMN_team[i].boxdata.SPEC);
+            //    if(!b)
+            //        continue;
+            //}
+            //if(Method != data.evolutions[i].e.evolutionTrigger)
+            //    continue;
             return true;
         }
         return false;
     }
 
-    void PKMN::evolve(int Item){
+    void PKMN::evolve(int Item,int Method){
         if(this->boxdata.IV.isEgg)
             return;
 
@@ -1506,16 +1552,49 @@ namespace POKEMON{
 
         int into = 0;
 
-        for(int i = 0; i< 9; ++i){
-            if(this->Level < data.evolutions[i].evolveLevel)
-                continue;
-            if(this->boxdata.steps < data.evolutions[i].evolveFriendship)
-                continue;
-            if(Item != data.evolutions[i].evolveItem)
-                continue;
-            if(data.evolutions[i].evolveDayTime != -1 && getCurrentDaytime() != data.evolutions[i].evolveDayTime)
-                continue;
-            into = data.evolutions[i].evolvesInto;
+        for(int i = 0; i< 7; ++i){
+            //if(this->Level < data.evolutions[i].e.evolveLevel)
+            //    continue;
+            //if(this->boxdata.steps < data.evolutions[i].e.evolveFriendship)
+            //    continue;
+            //if(data.evolutions[i].e.evolveItem && Item != data.evolutions[i].e.evolveItem)
+            //    continue;
+            //if(data.evolutions[i].e.evolveDayTime != -1 && getCurrentDaytime() != data.evolutions[i].e.evolveDayTime)
+            //    continue;
+            //if(data.evolutions[i].e.evolvesInto == 0)
+            //    continue;
+            //if(data.evolutions[i].e.evolveGender && this->boxdata.gender() != data.evolutions[i].e.evolveGender)
+            //    continue;
+            //if(data.evolutions[i].e.evolveLocation && SAV.acMapIdx != data.evolutions[i].e.evolveLocation)
+            //    continue;
+            //if(data.evolutions[i].e.evolveHeldItem && this->boxdata.Item != data.evolutions[i].e.evolveHeldItem)
+            //    continue;
+            //if(data.evolutions[i].e.evolveKnownMove){
+            //    bool b = false;
+            //    for(int j = 0; j < 4; ++j)
+            //        b |= (data.evolutions[i].e.evolveKnownMove == this->boxdata.Attack[j]);
+            //    if(!b)
+            //        continue;
+            //}
+            //if(data.evolutions[i].e.evolveKnownMoveType){
+            //    bool b = false;
+            //    for(int j = 0; j < 4; ++j)
+            //        b |= (data.evolutions[i].e.evolveKnownMoveType == AttackList[this->boxdata.Attack[j]]->type);
+            //    if(!b)
+            //        continue;
+            //}
+            //if(data.evolutions[i].e.evolveMinimumBeauty && data.evolutions[i].e.evolveMinimumBeauty < this->boxdata.ConStats[1])
+            //    continue;
+            //if(data.evolutions[i].e.evolveAdditionalPartyMember){
+            //    bool b = false;
+            //    for(int j = 0; j < 6; ++j)
+            //        b |= (data.evolutions[i].e.evolveAdditionalPartyMember == SAV.PKMN_team[i].boxdata.SPEC);
+            //    if(!b)
+            //        continue;
+            //}
+            //if(Method != data.evolutions[i].e.evolutionTrigger)
+            //    continue;
+            into = data.evolutions[i].e.evolvesInto;
             break;
         }
         if (into == 0)
@@ -1531,11 +1610,14 @@ namespace POKEMON{
         if(!this->boxdata.IV.isNicked)
             wcscpy(this->boxdata.Name,PKMNDATA::getWDisplayName(this->boxdata.SPEC));
 
+        int HPdif = stats.maxHP - stats.acHP;
         Natures nature = this->boxdata.getNature();
         stats.Atk = (((boxdata.IV.Attack+2*data.Bases[1]+(boxdata.EV[1]>>2))*this->Level/100.0)+5)*NatMod[nature][0];
         stats.Def = (((boxdata.IV.Defense+2*data.Bases[2]+(boxdata.EV[2]>>2))*this->Level/100.0)+5)*NatMod[nature][1];
         stats.Spd = (((boxdata.IV.Speed+2*data.Bases[3]+(boxdata.EV[3]>>2))*this->Level/100.0)+5)*NatMod[nature][2];
         stats.SAtk = (((boxdata.IV.SAttack+2*data.Bases[4]+(boxdata.EV[4]>>2))*this->Level/100.0)+5)*NatMod[nature][3];
         stats.SDef = (((boxdata.IV.SDefense+2*data.Bases[5]+(boxdata.EV[5]>>2))*this->Level/100.0)+5)*NatMod[nature][4];
+
+        stats.acHP = stats.maxHP - HPdif;
     }
 }
