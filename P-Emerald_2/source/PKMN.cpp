@@ -410,7 +410,7 @@ namespace POKEMON{
                     for(int j = 0; j < z; ++j){
                         u16 g,h;
                         fscanf(f,"%hd %hd",&g,&h);
-                        if(i >= toLevel && h == (u16)mode)
+                        if(i >= toLevel && h == (u16)mode && g < MAXATTACK)
                             reses.push_back(g);
                     }
                 }
@@ -434,7 +434,7 @@ N:
                     for(int j = 0; j < z; ++j){
                         u16 g,h;
                         fscanf(f,"%hd %hd",&g,&h);
-                        if(i >= fromLevel && h == mode){
+                        if(i >= fromLevel && h == mode && g < MAXATTACK){
                             for(int z = 0; z < rescnt; ++z)
                                 if(g == res[z])
                                     goto NEXT;

@@ -4,7 +4,7 @@
 #define A (attack::AffectsTypes)
 #define F (attack::Flags)
 #define H (attack::HitTypes)
-attack* AttackList[560] = {
+attack* AttackList[MAXATTACK] = {
     //attack(_Name,     _Effect,_Base_Power,_type,    _Accuracy, _PP,_E.Accuracy,_Aff._whom,_Priority,Flags,_HitType)
     new attack("----",          C 0,    C 0,    UNBEKANNT,  C 100,     C 0,    C 0,        A 0,    C 0,    F 0,    H 0),
     new attack("Pfund",         C 0,    C 40,   NORMAL,     C 100,     C 35,   C 0,        A 0,    C 1,    F 35,   H 0),

@@ -67,7 +67,7 @@ BG_set BGs[MAXBG] = {{"Raging_Gyarados",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Awakening_Yveltal",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Fighting_Groudon",NAV_DATA,NAV_DATA_PAL,true,false},
 {"Fighting_Kyogre",NAV_DATA,NAV_DATA_PAL,true,false},
-{"Working_Klink",BG1Bitmap,BG1Pal,false,false}};
+{"Working_Klink",BG1Bitmap,BG1Pal,false,true}};
 int BG_ind = 8;
 extern POKEMON::PKMN::BOX_PKMN stored_pkmn[MAXSTOREDPKMN];
 extern std::vector<int> box_of_st_pkmn[MAXPKMN];
@@ -1360,10 +1360,12 @@ void setMainSpriteVisibility(bool hidden){
 }
 
 void drawSub(){
-    dmaCopy(BorderBitmap, bgGetGfxPtr(bg2sub), 256*256);
+    memset(bgGetGfxPtr(bg2sub),0,256*192);
+    memset(bgGetGfxPtr(bg3sub),0,256*192);
+    dmaCopy(BorderBitmap, bgGetGfxPtr(bg2sub), 256*192);
     dmaCopy(BorderPal, BG_PALETTE_SUB, 256*2); 
     if(!BGs[BG_ind].load_from_rom){
-        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*256);
+        dmaCopy(BGs[BG_ind].MainMenu, bgGetGfxPtr(bg3sub), 256*192);
         dmaCopy(BGs[BG_ind].MainMenuPal, BG_PALETTE_SUB, 256*2); 
     }
     else if(!loadNavScreen(bgGetGfxPtr(bg3sub),BGs[BG_ind].Name.c_str(),BG_ind)){
@@ -2043,6 +2045,9 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
                                           * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof(SPRITE_GFX_SUB[0]);
     /* Keep track of the available tiles */
+
+    memset(SPRITE_GFX_SUB,0,32);
+
     nextAvailableTileIdx = 16;
     oamIndex = 0;
     palcnt = 0;

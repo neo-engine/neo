@@ -695,7 +695,9 @@ START:
     //StartScreen
 
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Title");
-    loadPictureSub(bgGetGfxPtr(bg3sub),"nitro:/PICS/","Clear");
+    if(BGs[BG_ind].allowsOverlay)
+        drawSub();
+    loadPictureSub(bgGetGfxPtr(bg2sub),"nitro:/PICS/","Clear");
 
     consoleSetWindow(&Bottom, 0,0,32,24);
     consoleSelect(&Bottom);
@@ -1666,7 +1668,9 @@ void shoUseAttack(int pkmIdx,bool female, bool shiny){
     for(int i= 0; i < 4; ++i)
         oamTop->oamBuffer[2+i].isHidden = false;
     int a = 5,b = 2, c = 96 ;
-    loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",pkmIdx,80,48,a,b,c,false,shiny,female);
+    if(!loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",pkmIdx,80,48,a,b,c,false,shiny,female)){
+        loadPKMNSprite(oamTop,spriteInfoTop,"nitro:/PICS/SPRITES/PKMN/",pkmIdx,80,48,a,b,c,false,shiny,!female);
+    }
     updateOAM(oamTop);
 
     for(int i= 0; i < 40; ++i)
