@@ -58,6 +58,7 @@
 #include "Shiny2.h"
 
 #include "TestBattleBack.h"
+#include "Border.h"
 
 extern OAMTable *oam;
 extern SpriteInfo spriteInfo[SPRITE_COUNT];
@@ -505,6 +506,8 @@ namespace BATTLE{
         sprintf(buf,"%i.raw",this->opponent->trainer_class);
 
         loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");	
+        dmaCopy(BorderBitmap, bgGetGfxPtr(bg2sub), 256*192);
+        dmaCopy(BorderPal, BG_PALETTE_SUB, 256*2); 
         drawTopBack();
         initinitBattleScrnSprites(oamTop,spriteInfoTop,6,6);
 
@@ -1789,26 +1792,26 @@ namespace BATTLE{
                 this->acpoksts[i][1] = NA;
         }
         if(acpoksts[acpokpos[0][0]][0] == KO)
-            for(int i= 1 + (this->battlemode == DOUBLE); i< 6; ++i)
+            for(int i= 1 + (this->battlemode == DOUBLE); i< this->player->pkmn_team->size(); ++i)
                 if(acpoksts[acpokpos[i][0]][0] != KO){
                     std::swap(acpokpos[0][0],acpokpos[i][0]);
                     break;
                 }
         if((this->battlemode == DOUBLE) && acpoksts[acpokpos[1][0]][0] == KO)
-            for(int i= 2; i< 6; ++i)
+            for(int i= 2; i< this->player->pkmn_team->size(); ++i)
                 if(acpoksts[acpokpos[i][0]][0] != KO){
                     std::swap(acpokpos[1][0],acpokpos[i][0]);
                     break;
                 }
 
         if(acpoksts[acpokpos[0][1]][1] == KO)
-            for(int i= 1 + (this->battlemode == DOUBLE); i< 6; ++i)
+            for(int i= 1 + (this->battlemode == DOUBLE); i< this->opponent->pkmn_team->size(); ++i)
                 if(acpoksts[acpokpos[i][1]][1] != KO){
                     std::swap(acpokpos[0][1],acpokpos[i][1]);
                     break;
                 }
         if((this->battlemode == DOUBLE) && acpoksts[acpokpos[1][1]][1] == KO)
-            for(int i= 2; i< 6; ++i)
+            for(int i= 2; i< this->opponent->pkmn_team->size(); ++i)
                 if(acpoksts[acpokpos[i][1]][1] != KO){
                     std::swap(acpokpos[1][1],acpokpos[i][1]);
                     break;
@@ -2158,11 +2161,17 @@ namespace BATTLE{
 
         int vs = 1;
         volltreffer_occ = false;
+
         if(rndVal <= 15)
-            if(rand() * 1.0 / RAND_MAX <= volltreffer[vs]){
+            if(rndVal >= 0 && rand() * 1.0 / RAND_MAX <= volltreffer[vs]){
                 baseDmg <<= 1;
                 volltreffer_occ = true;
             }
+
+            if(rndVal == -1)
+                rndVal = 0;
+            if(rndVal == -2)
+                rndVal = 15;
 
             baseDmg = (baseDmg * (100 - rndVal)) / 100;
 
@@ -2180,7 +2189,7 @@ namespace BATTLE{
     std::pair<int,int> ownAtk[2]; //AtkIdx; Target 1->opp[0]/2->opp[1]/3->both_opp/4->self/8->partner
     std::pair<int,int> oppAtk[2]; //AtkIdx; Target 1->own[0]/2->own[1]/3->both_opp/4->self/8->partner
     int switchWith[2][2] = {{0}};
-
+    
     void battle::printAttackChoiceScreen(int PKMNSlot,int& os2,int& pS2,int& ts2){
         for(int i = 21; i < 29; i+=2){
             if(!((*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]))
@@ -2218,15 +2227,73 @@ namespace BATTLE{
                 break;
             }
             printf("\n    S ");
-            if(AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->Base_Power)
-                printf("%3i",AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->Base_Power);
+            if(AttackList[(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]]->Base_Power)
+                printf("%3i",AttackList[(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]]->Base_Power);
             else
                 printf("---");
             printf(" G ");
-            if(AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->Accuracy)
-                printf("%3i",AttackList[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.Attack[(i-21)/2]]->Accuracy);
+            if(AttackList[(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]]->Accuracy)
+                printf("%3i",AttackList[(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]]->Accuracy);
             else
                 printf("---");
+        }
+    }
+    void battle::printTargetChoiceScreen(int PKMNSlot,int atk,int& os2,int& pS2,int& ts2){
+        int poss = AttackList[atk]->Affects_whom;
+        //Opp1, Opp2, ME, Partner, 
+        bool validTrg[4] = {
+            poss == 0 || poss == 8 || poss == 32 || poss == 64,
+            poss == 0 || poss == 8 || poss == 32 || poss == 64,
+            poss == 16 || poss == 2 || poss == 4,
+            poss == 0 || poss == 2 || poss == 32
+        };
+        if(!PKMNSlot)
+            std::swap(validTrg[2],validTrg[3]);
+        POKEMON::PKMN& atg = (*this->player->pkmn_team)[acpokpos[PKMNSlot][0]];
+
+        for(int i = 0; i < 5; ++i)
+            oam->oamBuffer[os2 + i].isHidden = true;
+        updateOAMSub(oam); 
+
+        for(int i = 21; i < 29; i+=2){
+            int u = (i-21)/2;
+            if(this->battlemode != DOUBLE && (u == 2 || u == 1)){
+                (oam->oamBuffer[i]).isHidden = true;
+                (oam->oamBuffer[i+1]).isHidden = true;
+                consoleSetWindow(&Bottom,(oam->oamBuffer[i]).x/8-3,(oam->oamBuffer[i]).y/8+1,20,5);
+                consoleClear();
+                continue;
+            }
+
+            POKEMON::PKMN &acPK= (u/2 ? (*this->player->pkmn_team)[acpokpos[1 - u%2][0]] : (*this->opponent->pkmn_team)[acpokpos[u%2][1]]);
+
+            if(acPK.stats.acHP == 0){
+                (oam->oamBuffer[i]).isHidden = true;
+                (oam->oamBuffer[i+1]).isHidden = true;
+                consoleSetWindow(&Bottom,(oam->oamBuffer[i]).x/8-3,(oam->oamBuffer[i]).y/8+1,20,5);
+                consoleClear();
+                continue;
+            }
+
+            (oam->oamBuffer[i]).isHidden = false;
+            (oam->oamBuffer[i+1]).isHidden = false;
+            updateOAMSub(oam); 
+
+            consoleSetWindow(&Bottom,(oam->oamBuffer[i]).x/8-3,(oam->oamBuffer[i]).y/8+1,20,5);
+            consoleClear();
+
+
+            drawPKMNIcon(oam,spriteInfo,acPK.boxdata.SPEC,(oam->oamBuffer[i]).x - 4,(oam->oamBuffer[i]).y-16,os2,pS2,ts2,true);
+            
+            updateOAMSub(oam); 
+
+            printf("      %ls",acPK.boxdata.Name);
+            if(validTrg[u]){
+                if(AttackList[atk]->HitType != attack::HitTypes::STAT)
+                    printf("\n      %3d-%2d KP\n        Schaden",std::max(1,calcDamage(*AttackList[atk],atg,acPK,-2)),std::max(1,calcDamage(*AttackList[atk],atg,acPK,-1)));
+                else
+                    printf("\n       Keinen\n        Schaden");
+            }
         }
     }
 
@@ -2245,7 +2312,7 @@ namespace BATTLE{
         int os2 = oamIndexS, pS2 = palcntS, ts2 = nextAvailableTileIdxS;
         drawPKMNIcon(oam,spriteInfo,(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.SPEC,112,64,os2,pS2,ts2,true);
         clear();
-        sprintf(buf,"Was soll %ls tun?          ",(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Name);
+        sprintf(buf,"Was soll %ls tun?",(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Name);
         cust_font.print_string(buf,8,8,true);
         updateOAMSub(oam);
 
@@ -2269,7 +2336,7 @@ namespace BATTLE{
 
                 aprest = 0;
                 for(int i= 0; i < 4; ++i)
-                    aprest += (*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.AcPP[i];
+                    aprest += (*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.AcPP[i]; 
                 if(aprest == 0){
                     clear();
                     printf("%ls hat keine\n restlichen Attacken...",(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Name);
@@ -2278,7 +2345,8 @@ namespace BATTLE{
                 }
                 else {
                     (oam->oamBuffer[20]).isHidden = false;
-
+                    
+                    os2 = oamIndexS; pS2 = palcntS; ts2 = nextAvailableTileIdxS;
                     printAttackChoiceScreen(PKMNSlot,os2,pS2,ts2);
 
                     updateOAMSub(oam);
@@ -2333,9 +2401,31 @@ namespace BATTLE{
                                         if(keysUp() & KEY_TOUCH)
                                             break;
                                     }
-                                    int trg = 0;
+                                    int trg = getTarget(PKMNSlot,(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]);
+                                    if(trg == 0){
+                                        os2 = oamIndexS; pS2 = palcntS; ts2 = nextAvailableTileIdxS;
+                                        for(int i = 21; i < 29; i+=2){
+                                            (oam->oamBuffer[i]).isHidden = true;
+                                            (oam->oamBuffer[i+1]).isHidden = true;
+                                            (oam->oamBuffer[i+1]).y -= 14+16 * ((i-21)/4);
+                                            (oam->oamBuffer[i]).y -= 14+16 * ((i-21)/4);
 
-                                    //CHOOSE TARGET
+                                            if((i/2)%2)
+                                                (oam->oamBuffer[i]).x += 16;
+                                            else
+                                                (oam->oamBuffer[i+1]).x -= 16;
+
+                                            updateOAMSub(oam); 
+                                        }
+                                        printAttackChoiceScreen(PKMNSlot,os2,pS2,ts2);
+
+                                        updateOAMSub(oam);
+                                        consoleSetWindow(&Bottom,0,0,32,5);
+                                        clear();
+                                        sprintf(buf,"Welchen Angriff?");
+                                        cust_font.print_string(buf,8,8,true);
+                                        break;
+                                    }
 
                                     ownAtk[PKMNSlot] = std::pair<int,int>((*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2],trg);
                                     (*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.AcPP[(i-21)/2]--;
@@ -2484,8 +2574,88 @@ OUT2:
 #define OPP_2   2
 #define ME      4
 #define PARTNER 8
-    int battle::getTarget(int PKMNSlot){
-        //todo;
+#define OWN_FIELD 16
+#define OPP_FIELD 32
+    int battle::getTarget(int PKMNSlot, int atk){
+        int ret = 0;
+
+        char buf[100];
+        touchPosition t;
+
+
+        (oam->oamBuffer[20]).isHidden = false;
+        updateOAMSub(oam);
+
+        clear();
+        sprintf(buf,"Wen soll %ls angreifen?",(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Name);
+        cust_font.print_string(buf,8,8,true);
+        
+        int os2 = oamIndexS, pS2 = palcntS, ts2 = nextAvailableTileIdxS;
+        printTargetChoiceScreen(PKMNSlot,atk,os2,pS2,ts2);
+
+        int poss = AttackList[atk]->Affects_whom;
+        //Opp1, Opp2, ME, Partner
+        bool validTrg[4] = {
+            poss == 0 || poss == 8 || poss == 32 || poss == 64,
+            poss == 0 || poss == 8 || poss == 32 || poss == 64,
+            poss == 16 || poss == 2 || poss == 4,
+            poss == 0 || poss == 2 || poss == 32
+        };
+        if(!PKMNSlot)
+            std::swap(validTrg[2],validTrg[3]);
+
+        while(42){
+            updateTime();
+            swiWaitForVBlank();
+            touchRead(&t);
+            if ( t.px>224 && t.py>164){ //Back  
+                waitForTouchUp();
+                return 0;
+            }
+
+            for(int i = 21; i < 29; i+=2)
+                if(t.px>(oam->oamBuffer[i].x) && t.px < (oam->oamBuffer[i+1].x + 64) &&
+                    t.py>(oam->oamBuffer[i]).y && t.py < (oam->oamBuffer[i].y + 32)){
+                        int u = (i-21)/2;
+                        if(this->battlemode != DOUBLE && (u == 2 || u == 1))
+                            continue;
+                        if(!validTrg[u])
+                            continue;
+
+                        POKEMON::PKMN &acPK= (u/2 ? (*this->player->pkmn_team)[acpokpos[1 - u%2][0]] : (*this->opponent->pkmn_team)[acpokpos[u%2][1]]);
+
+                        if(acPK.stats.acHP == 0){
+                            (oam->oamBuffer[i]).isHidden = true;
+                            (oam->oamBuffer[i+1]).isHidden = true;
+                            consoleSetWindow(&Bottom,(oam->oamBuffer[i]).x/8-3,(oam->oamBuffer[i]).y/8+1,20,5);
+                            consoleClear();
+                            continue;
+                        }
+
+                        while(1) {
+                            scanKeys();
+                            swiWaitForVBlank();
+                            updateTime();
+                            if(keysUp() & KEY_TOUCH)
+                                break;
+                        }
+                        ret = (1 << u);
+                        if(u == 2 && PKMNSlot == 0)
+                            ret = PARTNER;
+                        if(poss & 2)
+                            ret = OWN_FIELD;
+                        if(poss & 4)
+                            ret = (2 << (rand() %3));
+                        if((poss & 8) || (poss & 32))
+                            ret |= OPP_1 |OPP_2;
+                        if(poss & 32)
+                            ret |= PARTNER;
+                        if(poss & 64)
+                            ret = OPP_FIELD;
+
+                        return ret;
+                }
+        }
     }
 
     bool participated[6] = {false};
@@ -2576,7 +2746,7 @@ OUT2:
                 for(int i= 1 + (this->battlemode == DOUBLE); i< 6; ++i)
                     if(acpoksts[acpokpos[i][0]][0] != KO){
                         switchOwnPkmn(i,0);
-                        for(int i = 0; i < 6; ++i)
+                        for(int i = 0; i < this->player->pkmn_team->size(); ++i)
                             participated[i] = false;
                         break;
                     }
@@ -2585,7 +2755,7 @@ OUT2:
                 for(int i= 2; i< 6; ++i)
                     if(acpoksts[acpokpos[i][0]][0] != KO){
                         switchOwnPkmn(i,1);
-                        for(int i = 0; i < 6; ++i)
+                        for(int i = 0; i < this->player->pkmn_team->size(); ++i)
                             participated[i] = false;
                         break;
                     }
@@ -2612,7 +2782,7 @@ OUT2:
 
             //Opp
             if(acpoksts[acpokpos[0][1]][1] == KO)
-                for(int i= 1 + (this->battlemode == DOUBLE); i< 6; ++i)
+                for(int i= 1 + (this->battlemode == DOUBLE); i< this->opponent->pkmn_team->size(); ++i)
                     if(acpoksts[acpokpos[i][1]][1] != KO){
                         switchOppPkmn(i,0);
                         for(int i = 0; i < 6; ++i)
@@ -2620,7 +2790,7 @@ OUT2:
                         break;
                     }
             if((this->battlemode == DOUBLE) && acpoksts[acpokpos[1][1]][1] == KO)
-                for(int i= 2; i< 6; ++i)
+                for(int i= 2; i< this->opponent->pkmn_team->size(); ++i)
                     if(acpoksts[acpokpos[i][1]][1] != KO){
                         switchOppPkmn(i,1);
                         for(int i = 0; i < 6; ++i)
@@ -2685,17 +2855,16 @@ BEFORE_1:
                 case BATTLE_END:
                     goto END;
             }
-
+            
+            (oam->oamBuffer[20]).isHidden = true;
+            updateOAMSub(oam);
             //OPP'S ACTIONS
             switchWith[0][1] = switchWith[0][0];
             switchWith[1][1] = switchWith[1][0];
             oppAtk[0] = std::pair<int,int>((*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.Attack[0],1);
             oppAtk[1] = std::pair<int,int>((*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.Attack[0],2);
 
-
-            ownAtk[0].second = 11;
-            ownAtk[1].second = 11;
-
+            
             consoleClear();
 
             int inits[4] = {0}, ranking[4] = {0};
@@ -2908,7 +3077,7 @@ BEFORE_1:
                                 (*this->player->pkmn_team)[acpokpos[1 - (acin/2)][0]],rand() / RAND_MAX);
                             if(!missed){
                                 int old = 0;
-                                if(acin/2 == 0)
+                                if(acin/2 == 1)
                                     old = (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP;                                   
                                 else
                                     old = (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP;                                  

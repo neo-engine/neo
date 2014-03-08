@@ -1939,7 +1939,7 @@ OUT:
             case 0:
                 {
                     SAV.PKMN_team.clear();
-                    for(int i = 0;i<6;++i)
+                    for(int i = 0;i<3;++i)
                     {
                         POKEMON::PKMN a(0,HILFSCOUNTER,0,
                             20,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,rand()%2,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
@@ -1978,7 +1978,7 @@ OUT:
                 BATTLE::battle_trainer me("TEST",0,0,0,0,&SAV.PKMN_team,0);
                 std::vector<POKEMON::PKMN> cpy;
 
-                for(int i = 0;i<6;++i)
+                for(int i = 0;i<3;++i)
                 {
                     POKEMON::PKMN a(0,HILFSCOUNTER,0,
                         30,SAV.ID,SAV.SID,L"TEST"/*SAV.getName()*/,i%2,true,rand()%2,true,rand()%2,i == 3,HILFSCOUNTER,i+1,i);

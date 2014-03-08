@@ -79,8 +79,9 @@ namespace BATTLE{
         void switchOwnPkmn(int newPok,int toSwitch = 0);
         
         int getChoice(int);
-        int getTarget(int);
+        int getTarget(int,int);
         void printAttackChoiceScreen(int,int&,int&,int&);
+        void printTargetChoiceScreen(int,int,int&,int&,int&);
     private:
         void initBattleScene(int battle_back,Weather weather);
     };
