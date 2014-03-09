@@ -2097,7 +2097,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo4->isMosaic = false;
     Bo4->colorMode = OBJCOLOR_16;
     Bo4->shape = OBJSHAPE_SQUARE;
-    Bo4->isHidden = false;
+    Bo4->isHidden = true;//
     Bo4->x = 0;
     Bo4->size = OBJSIZE_16;//64;
     Bo4->gfxIndex = 0;//nextAvailableTileIdx;
@@ -2113,7 +2113,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo4->isMosaic = false;
     Bo4->colorMode = OBJCOLOR_16;
     Bo4->shape = OBJSHAPE_SQUARE;
-    Bo4->isHidden = false;
+    Bo4->isHidden = true;//false;
     Bo4->x = 192;
     Bo4->size = OBJSIZE_16;//64;
     Bo4->gfxIndex = 0;//nextAvailableTileIdx;
@@ -2146,7 +2146,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo3->isMosaic = false;
     Bo3->colorMode = OBJCOLOR_16;
     Bo3->shape = OBJSHAPE_SQUARE;
-    Bo3->isHidden = false;
+    Bo3->isHidden = true;//false;
     Bo3->x = 64;
     Bo3->size = OBJSIZE_16;//64;
     Bo3->gfxIndex = 0;//nextAvailableTileIdx;
@@ -2162,7 +2162,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo3->isMosaic = false;
     Bo3->colorMode = OBJCOLOR_16;
     Bo3->shape = OBJSHAPE_SQUARE;
-    Bo3->isHidden = false;
+    Bo3->isHidden = true;//false;
     Bo3->x = 128;
     Bo3->size = OBJSIZE_16;//64;
     Bo3->gfxIndex =0;// nextAvailableTileIdx;
@@ -2191,7 +2191,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo2->isMosaic = false;
     Bo2->colorMode = OBJCOLOR_16;
     Bo2->shape = OBJSHAPE_SQUARE;
-    Bo2->isHidden = false;
+    Bo2->isHidden =true;// false;
     Bo2->x = 128;
     Bo2->size = OBJSIZE_16;//64;
     Bo2->gfxIndex = 0;//nextAvailableTileIdx;
@@ -2207,7 +2207,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo2->isMosaic = false;
     Bo2->colorMode = OBJCOLOR_16;
     Bo2->shape = OBJSHAPE_SQUARE;
-    Bo2->isHidden = false;
+    Bo2->isHidden =true;// false;
     Bo2->x = 64;
     Bo2->size = OBJSIZE_16;//64;
     Bo2->gfxIndex = 0;//nextAvailableTileIdx;
@@ -2235,7 +2235,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo1->isMosaic = false;
     Bo1->colorMode = OBJCOLOR_16;
     Bo1->shape = OBJSHAPE_SQUARE;
-    Bo1->isHidden = false;
+    Bo1->isHidden =true;// false;
     Bo1->x = 192;
     Bo1->size = OBJSIZE_16;//64;
     Bo1->gfxIndex = 0;//nextAvailableTileIdx;
@@ -2251,7 +2251,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo1->isMosaic = false;
     Bo1->colorMode = OBJCOLOR_16;
     Bo1->shape = OBJSHAPE_SQUARE;
-    Bo1->isHidden = false;
+    Bo1->isHidden = true;//false;
     Bo1->x = 0;
     Bo1->size = OBJSIZE_16;//64;
     Bo1->gfxIndex = 0;//nextAvailableTileIdx;
@@ -2279,7 +2279,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo5->isMosaic = false;
     Bo5->colorMode = OBJCOLOR_16;
     Bo5->shape = OBJSHAPE_SQUARE;
-    Bo5->isHidden = false;
+    Bo5->isHidden = true;//false;
     Bo5->x = 0;
     Bo5->size = OBJSIZE_16;//64;
     Bo5->gfxIndex = 0;//nextAvailableTileIdx;
@@ -2295,7 +2295,7 @@ void initDexSprites(OAMTable* oam, SpriteInfo* spriteInfo,int& oamIndex,int& pal
     Bo5->isMosaic = false;
     Bo5->colorMode = OBJCOLOR_16;
     Bo5->shape = OBJSHAPE_SQUARE;
-    Bo5->isHidden = false;
+    Bo5->isHidden =true;// false;
     Bo5->x = 192;
     Bo5->size = OBJSIZE_16;//64;
     Bo5->gfxIndex = 0;//nextAvailableTileIdx;
@@ -2653,6 +2653,7 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
     initOAMTable(oamTop);
     consoleSetWindow(&Top,0,0,32,24);
     consoleSelect(&Top);
+        printf("\x1b[37m");
     consoleClear();
     int a = 0, b = 0,c = 0;
     POKEMON::PKMNDATA::PKMNDATA acpkmndata;

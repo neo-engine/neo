@@ -2937,7 +2937,7 @@ BEFORE_1:
                         int dmg1 = 0, dmg2 = 0,dmg3 = 0;
                         if(tg & 1){
                             missed = false;
-                            dmg1 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],(*this->player->pkmn_team)[acpokpos[0][0]],rand() / RAND_MAX);
+                            dmg1 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],(*this->player->pkmn_team)[acpokpos[0][0]],rand() %15);
 
                             if(!missed){
                                 int old = (*this->player->pkmn_team)[acpokpos[0][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[0][0]].stats.maxHP;
@@ -2958,7 +2958,7 @@ BEFORE_1:
                         }
                         if((this->battlemode == DOUBLE) && (tg & 2)){
                             missed = false;
-                            dmg2 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],(*this->player->pkmn_team)[acpokpos[1][0]],rand() / RAND_MAX);
+                            dmg2 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],(*this->player->pkmn_team)[acpokpos[1][0]],rand() %15);
 
                             if(!missed){
                                 int old = (*this->player->pkmn_team)[acpokpos[1][0]].stats.acHP*100/(*this->player->pkmn_team)[acpokpos[1][0]].stats.maxHP;
@@ -2985,7 +2985,7 @@ BEFORE_1:
                         if((this->battlemode == DOUBLE)&&(tg & 8)){
                             missed = false;
                             dmg3 = calcDamage(*AttackList[oppAtk[acin/2].first],(*this->opponent->pkmn_team)[acpokpos[acin/2][1]],
-                                (*this->opponent->pkmn_team)[acpokpos[1 - (acin/2)][1]],rand() / RAND_MAX);
+                                (*this->opponent->pkmn_team)[acpokpos[1 - (acin/2)][1]],rand() %15);
 
                             if(!missed){
                                 int old = 0;
@@ -3029,7 +3029,7 @@ BEFORE_1:
                         int dmg1 = 0, dmg2 = 0,dmg3 =0;
                         if(tg & 1){
                             missed = false;
-                            dmg1 = calcDamage(*AttackList[ownAtk[acin/2].first],(*this->player->pkmn_team)[acpokpos[acin/2][0]],(*this->opponent->pkmn_team)[acpokpos[0][1]],rand() / RAND_MAX);
+                            dmg1 = calcDamage(*AttackList[ownAtk[acin/2].first],(*this->player->pkmn_team)[acpokpos[acin/2][0]],(*this->opponent->pkmn_team)[acpokpos[0][1]],rand()%15);
                             if(!missed){
                                 int old = (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.maxHP;
                                 (*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP = std::max(0,(*this->opponent->pkmn_team)[acpokpos[0][1]].stats.acHP - dmg1);
@@ -3053,7 +3053,7 @@ BEFORE_1:
                         }
                         if((this->battlemode == DOUBLE) && (tg & 2)){
                             missed = false;
-                            dmg2 = calcDamage(*AttackList[ownAtk[acin/2].first],(*this->player->pkmn_team)[acpokpos[acin/2][0]],(*this->opponent->pkmn_team)[acpokpos[1][1]],rand() / RAND_MAX);
+                            dmg2 = calcDamage(*AttackList[ownAtk[acin/2].first],(*this->player->pkmn_team)[acpokpos[acin/2][0]],(*this->opponent->pkmn_team)[acpokpos[1][1]],rand()%15);
                             if(!missed){
                                 int old = (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP*100/(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.maxHP;
                                 (*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP = std::max(0,(*this->opponent->pkmn_team)[acpokpos[1][1]].stats.acHP - dmg2);
@@ -3074,7 +3074,7 @@ BEFORE_1:
                         if((this->battlemode == DOUBLE) && (tg & 8)){
                             missed = false;
                             dmg3 = calcDamage(*AttackList[ownAtk[acin/2].first],(*this->player->pkmn_team)[acpokpos[acin/2][0]],
-                                (*this->player->pkmn_team)[acpokpos[1 - (acin/2)][0]],rand() / RAND_MAX);
+                                (*this->player->pkmn_team)[acpokpos[1 - (acin/2)][0]],rand() %15);
                             if(!missed){
                                 int old = 0;
                                 if(acin/2 == 1)

@@ -1714,7 +1714,7 @@ int main(int argc, char** argv)
 
     cust_font.set_color(RGB(0,31,31),0);
 
-    int HILFSCOUNTER = 1;
+    int HILFSCOUNTER = 252;
     oam->oamBuffer[PKMN_ID].isHidden = !(SAV.hasPKMN && SAV.PKMN_team.size());
     updateOAMSub(oam);
 
