@@ -8,6 +8,28 @@
 class attack
 {
 public:
+    enum Ailment{
+        none,
+        Paralysis,
+        Sleep,
+        Freeze,
+        Burn,
+        Poison,
+        Confusion,
+        Infatuation,
+        Trap,
+        Nightmare,
+        Torment,
+        Disable,
+        Yawn,
+        Heal_Block,
+        No_type_immunity,
+        Leech_Seed,
+        Embargo,
+        Perish_Song,
+        Ingrain
+    };
+
     bool isFieldAttack;
     std::string Name;
 

@@ -72,6 +72,28 @@ namespace BATTLE{
     POKEMON::PKMNDATA::PKMNDATA p;
     const char* trainerclassnames[] = { "Pokémon-Trainer" };
 
+    const char* ailmentnames[] = {
+        "none",
+        "wurde paralysiert.",
+        "schläft ein.",
+        "wurde eingefroren.",
+        "fängt an zu brennen.",
+        "wurde vergiftet.",
+        "wurde verwirrt.",
+        "Infatuation",
+        "ist gefangen.",
+        "wurde in Nachtmahr\ngefangen.",
+        "wurde Folterknecht\nunterworfen.",
+        "Disable",
+        "gähnt.",
+        "Heal_Block",
+        "No_type_immunity",
+        "wurde bepflanzt",
+        "Embargo",
+        "hört Abgesang.",
+        "Ingrain"
+    };
+
     void displayHP(int HPstart,int HP,int x,int y,int freecolor1,int freecolor2,bool delay,bool big){
         if(big)
             displayHP(HPstart,HP,x,y,freecolor1,freecolor2,delay,20,24);

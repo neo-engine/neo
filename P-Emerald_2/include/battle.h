@@ -55,6 +55,9 @@ namespace BATTLE{
             NA = 3
         } acpoksts[6][2];
 
+        attack::Ailment ailments[6][2];
+        int ailmentcnt[6][2];
+
     public:
         bool distributeEXP;
 
