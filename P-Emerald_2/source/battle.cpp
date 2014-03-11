@@ -2320,6 +2320,112 @@ namespace BATTLE{
         }
     }
 
+    void battle::printPKMNSwitchScreen(int& os2,int& pS2,int& ts2){
+        setMainBattleVisibility(true);
+        consoleClear();
+        dinit();
+        for(int i= 0; i <= 8; ++i)
+            (oam->oamBuffer[i]).isHidden = true;
+        (oam->oamBuffer[20]).isHidden = false;
+        updateOAMSub(oam);
+
+        int num = (int)this->player->pkmn_team->size();
+        consoleSelect(&Bottom);
+
+        for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
+            if((((i-21)/2)^1) >= num)
+                break;
+            (oam->oamBuffer[i]).isHidden = false;
+            (oam->oamBuffer[i+1]).isHidden = false;
+            (oam->oamBuffer[i+1]).y -= 16 * (2-((i-21)/4));
+            (oam->oamBuffer[i]).y -= 16 * (2-((i-21)/4));
+            updateOAMSub(oam); 
+            consoleSetWindow(&Bottom,((oam->oamBuffer[i]).x+6)/8,((oam->oamBuffer[i]).y+6)/8,12,3);
+            if(!(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.IV.isEgg){
+                printf("   %3i/%3i\n ",(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.acHP,(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.maxHP);
+                wprintf((*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.Name); printf("\n");
+                printf("%11s",ItemList[(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.Item].getDisplayName().c_str());
+                drawPKMNIcon(oam,spriteInfo,(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.SPEC,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,os2,pS2,ts2,true);
+            }
+            else{
+                printf("\n Ei");
+                drawEggIcon(oam,spriteInfo,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,os2,pS2,ts2,true);                                    
+            }
+            updateOAMSub(oam); 
+        }
+    }
+
+    int battle::getSwitchPkmn(int& os2,int& pS2,int& ts2, bool retA){
+        int res = -1;
+        int num = (int)this->player->pkmn_team->size();
+        touchPosition t;
+        (oam->oamBuffer[20]).isHidden = !retA;
+        while(42){
+            swiWaitForVBlank();
+            updateOAMSub(oam);
+            updateTime();
+            touchRead(&t);
+
+            if (retA && t.px>224 && t.py>164) {  
+                waitForTouchUp();
+
+                consoleSelect(&Bottom);
+                consoleSetWindow(&Bottom,0,0,32,24);
+                consoleClear();
+                for(int i= 5; i <= 8; ++i)
+                    (oam->oamBuffer[i]).isHidden = false;
+                for(int i= 20; i <= os2; ++i)
+                    (oam->oamBuffer[i]).isHidden = true;
+                updateOAMSub(oam);
+
+                for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
+                    if((((i-21)/2)^1) >= num)
+                        break;
+                    (oam->oamBuffer[i+1]).y += 16 * (2-((i-21)/4));
+                    (oam->oamBuffer[i]).y += 16 * (2-((i-21)/4));
+                }
+                init();
+                return -1;
+            }
+            for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6))
+                if((((i-21)/2)^1) >= num)
+                    break;
+                else if (t.px > oam->oamBuffer[i].x && t.py > oam->oamBuffer[i].y && t.px-64 < oam->oamBuffer[i+1].x && t.py-32 < oam->oamBuffer[i].y){  
+                    if((*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.IV.isEgg || 
+                        (*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.acHP == 0 || (((i-21)/2)^1) < (1 + (this->battlemode == DOUBLE)))
+                        continue;
+
+                    (oam->oamBuffer[i]).isHidden = true;
+                    (oam->oamBuffer[i+1]).isHidden = true;
+                    (oam->oamBuffer[3 + (((i-21)/2)^1)]).isHidden = true;
+                    updateOAMSub(oam);
+
+                    waitForTouchUp();
+
+                    res =( ((i-21)/2)^1);
+                    goto OUT2;
+                }
+        }
+OUT2:
+        consoleSelect(&Bottom);
+        consoleSetWindow(&Bottom,0,0,32,24);
+        consoleClear();
+        for(int i= 5; i <= 8; ++i)
+            (oam->oamBuffer[i]).isHidden = false;
+        for(int i= 20; i <= os2; ++i)
+            (oam->oamBuffer[i]).isHidden = true;          
+        for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
+            if((((i-21)/2)^1) >= num)
+                break;
+            (oam->oamBuffer[i+1]).y += 16 * (2-((i-21)/4));
+            (oam->oamBuffer[i]).y += 16 * (2-((i-21)/4));
+        }
+        updateOAMSub(oam);
+        init();
+
+        return res;
+    }
+
 #define BATTLE_END  -1
 #define RETRY       +1
 #define RETRY2       -2
@@ -2495,100 +2601,16 @@ ATTACKCHOSEN:
             else if(t.px > 176 && t.px < 176 + 64 && t.py > 144 && t.py < 144 + 32){                 
                 waitForTouchUp();
 
-                setMainBattleVisibility(true);
-                consoleClear();
-                dinit();
-                for(int i= 0; i <= 8; ++i)
-                    (oam->oamBuffer[i]).isHidden = true;
-                (oam->oamBuffer[20]).isHidden = false;
-                updateOAMSub(oam);
-
                 os2 = oamIndexS; pS2 = palcntS; ts2 = nextAvailableTileIdxS;
-                int num = (int)this->player->pkmn_team->size();
-                consoleSelect(&Bottom);
+                printPKMNSwitchScreen(os2,pS2,ts2);
 
-                for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
-                    if((((i-21)/2)^1) >= num)
-                        break;
-                    (oam->oamBuffer[i]).isHidden = false;
-                    (oam->oamBuffer[i+1]).isHidden = false;
-                    (oam->oamBuffer[i+1]).y -= 16 * (2-((i-21)/4));
-                    (oam->oamBuffer[i]).y -= 16 * (2-((i-21)/4));
-                    updateOAMSub(oam); 
-                    consoleSetWindow(&Bottom,((oam->oamBuffer[i]).x+6)/8,((oam->oamBuffer[i]).y+6)/8,12,3);
-                    if(!(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.IV.isEgg){
-                        printf("   %3i/%3i\n ",(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.acHP,(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.maxHP);
-                        wprintf((*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.Name); printf("\n");
-                        printf("%11s",ItemList[(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.Item].getDisplayName().c_str());
-                        drawPKMNIcon(oam,spriteInfo,(*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.SPEC,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,os2,pS2,ts2,true);
-                    }
-                    else{
-                        printf("\n Ei");
-                        drawEggIcon(oam,spriteInfo,(oam->oamBuffer[i]).x-4,(oam->oamBuffer[i]).y-20,os2,pS2,ts2,true);                                    
-                    }
-                    updateOAMSub(oam); 
-                }
+                int res = getSwitchPkmn(os2,pS2,ts2,true);
 
-                while(42){
-                    swiWaitForVBlank();
-                    updateOAMSub(oam);
-                    updateTime();
-                    touchRead(&t);
+                if(res == -1)
+                    return RETRY;
 
-                    if ( t.px>224 && t.py>164) {  
-                        waitForTouchUp();
+                switchWith[PKMNSlot][0] = res;
 
-                        consoleSelect(&Bottom);
-                        consoleSetWindow(&Bottom,0,0,32,24);
-                        consoleClear();
-                        for(int i= 5; i <= 8; ++i)
-                            (oam->oamBuffer[i]).isHidden = false;
-                        for(int i= 20; i <= os2; ++i)
-                            (oam->oamBuffer[i]).isHidden = true;
-                        updateOAMSub(oam);
-
-                        for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
-                            if((((i-21)/2)^1) >= num)
-                                break;
-                            (oam->oamBuffer[i+1]).y += 16 * (2-((i-21)/4));
-                            (oam->oamBuffer[i]).y += 16 * (2-((i-21)/4));
-                        }
-                        init();
-                        return RETRY;
-                    }
-                    for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6))
-                        if((((i-21)/2)^1) >= num)
-                            break;
-                        else if (t.px > oam->oamBuffer[i].x && t.py > oam->oamBuffer[i].y && t.px-64 < oam->oamBuffer[i+1].x && t.py-32 < oam->oamBuffer[i].y){  
-                            if((*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].boxdata.IV.isEgg || 
-                                (*this->player->pkmn_team)[acpokpos[((i-21)/2)^1][0]].stats.acHP == 0 || (((i-21)/2)^1) < 2)
-                                continue;
-
-                            (oam->oamBuffer[i]).isHidden = true;
-                            (oam->oamBuffer[i+1]).isHidden = true;
-                            (oam->oamBuffer[3 + (((i-21)/2)^1)]).isHidden = true;
-                            updateOAMSub(oam);
-
-                            waitForTouchUp();
-
-                            switchWith[PKMNSlot][0] = ((i-21)/2)^1;
-                            goto OUT2;
-                        }
-                }
-OUT2:
-                consoleSelect(&Bottom);
-                consoleSetWindow(&Bottom,0,0,32,24);
-                consoleClear();
-                for(int i= 5; i <= 8; ++i)
-                    (oam->oamBuffer[i]).isHidden = false;
-                for(int i= 20; i <= os2; ++i)
-                    (oam->oamBuffer[i]).isHidden = true;          
-                for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
-                    (oam->oamBuffer[i+1]).y += 16 * (2-((i-21)/4));
-                    (oam->oamBuffer[i]).y += 16 * (2-((i-21)/4));
-                }
-                updateOAMSub(oam);
-                init();
                 return SUCCESS;
             }
             //END PKMN
@@ -2794,23 +2816,42 @@ OUT2:
             //Switch Out KOed PKMN
 
             //Own
-            if(acpoksts[acpokpos[0][0]][0] == KO)
+            if(acpoksts[acpokpos[0][0]][0] == KO){
+                int pcnt = 0, at = 0;
                 for(int i= 1 + (this->battlemode == DOUBLE); i< 6; ++i)
                     if(acpoksts[acpokpos[i][0]][0] != KO){
-                        switchOwnPkmn(i,0);
-                        for(int i = 0; i < this->player->pkmn_team->size(); ++i)
-                            participated[i] = false;
-                        break;
+                        //switchOwnPkmn(i,0);
+                        pcnt++;
+                        at = i;
                     }
+                if(pcnt == 1)
+                    switchOwnPkmn(at,0);
+                else if(pcnt > 1){
+                    int os2 = oamIndexS, pS2 = palcntS, ts2 = nextAvailableTileIdxS;
+                    printPKMNSwitchScreen(os2,pS2,ts2);
 
-            if((this->battlemode == DOUBLE) && acpoksts[acpokpos[1][0]][0] == KO)
+                    int res = getSwitchPkmn(os2,pS2,ts2,false);
+                    switchOwnPkmn(res,0);
+                }
+            }
+            if((this->battlemode == DOUBLE) && acpoksts[acpokpos[1][0]][0] == KO){
+                int pcnt = 0, at = 0;
                 for(int i= 2; i< 6; ++i)
                     if(acpoksts[acpokpos[i][0]][0] != KO){
-                        switchOwnPkmn(i,1);
-                        for(int i = 0; i < this->player->pkmn_team->size(); ++i)
-                            participated[i] = false;
-                        break;
+                        //switchOwnPkmn(i,0);
+                        pcnt++;
+                        at = i;
                     }
+                if(pcnt == 1)
+                    switchOwnPkmn(at,1);
+                else if(pcnt > 1){
+                    int os2 = oamIndexS, pS2 = palcntS, ts2 = nextAvailableTileIdxS;
+                    printPKMNSwitchScreen(os2,pS2,ts2);
+
+                    int res = getSwitchPkmn(os2,pS2,ts2,false);
+                    switchOwnPkmn(res,1);
+                }
+            }
 
             if(acpoksts[acpokpos[0][0]][0] == KO && (this->battlemode != DOUBLE || acpoksts[acpokpos[1][0]][0] == KO || acpoksts[acpokpos[1][0]][0] == NA)){
                 //Player lost

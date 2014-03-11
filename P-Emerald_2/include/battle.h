@@ -83,8 +83,10 @@ namespace BATTLE{
         
         int getChoice(int);
         int getTarget(int,int);
+        int getSwitchPkmn(int&,int&,int&,bool);
         void printAttackChoiceScreen(int,int&,int&,int&);
         void printTargetChoiceScreen(int,int,int&,int&,int&);
+        void printPKMNSwitchScreen(int& os2,int& pS2,int& ts2);
     private:
         void initBattleScene(int battle_back,Weather weather);
     };
