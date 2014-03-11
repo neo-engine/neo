@@ -1,13 +1,13 @@
 #pragma once
 #include <vector>
 #include <nds.h>
+#include "attack.h"
 
 namespace POKEMON{
     class PKMN;
 }
 class item;
 struct SpriteInfo;
-class attack;
 
 namespace BATTLE{
     void displayHP(int HPstart,int HP,int x,int y,int freecolor1,int freecolor2,bool delay,bool big = false); //HP in %

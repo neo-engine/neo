@@ -84,12 +84,12 @@ namespace BATTLE{
         "ist gefangen.",
         "wurde in Nachtmahr\ngefangen.",
         "wurde Folterknecht\nunterworfen.",
-        "Disable",
+        "wurde blockiert.",
         "gähnt.",
-        "Heal_Block",
+        "kann nicht mehr\ngeheilt werden.",
         "No_type_immunity",
         "wurde bepflanzt",
-        "Embargo",
+        "fällt unter ein\nEmbargo.",
         "hört Abgesang.",
         "Ingrain"
     };
@@ -1650,7 +1650,7 @@ namespace BATTLE{
 
                 POKEMON::PKMNDATA::getAll((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.SPEC,p);
 
-                displayEP(100,((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level-1][p.expType]) *100/
+                displayEP(0,((*this->player->pkmn_team)[acpokpos[0][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level-1][p.expType]) *100/
                     (POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level][p.expType]-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[0][0]].Level-1][p.expType]),
                     256-96-28,192-32-8-32,OWN1_EP_COL,OWN1_EP_COL+1,false);
                 oamTop->oamBuffer[OWN_PB_START].x = 256-88-32+4;
@@ -1697,7 +1697,7 @@ namespace BATTLE{
 
                 POKEMON::PKMNDATA::getAll((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.SPEC,p);
 
-                displayEP(100,((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level-1][p.expType]) *100/
+                displayEP(0,((*this->player->pkmn_team)[acpokpos[1][0]].boxdata.exp-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level-1][p.expType]) *100/
                     (POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level][p.expType]-POKEMON::EXP[(*this->player->pkmn_team)[acpokpos[1][0]].Level-1][p.expType]),
                     256-36,192-40,OWN2_EP_COL,OWN2_EP_COL,false);
 
@@ -2227,7 +2227,8 @@ namespace BATTLE{
                 (oam->oamBuffer[i+1]).x += 16;
             updateOAMSub(oam); 
 
-            consoleSetWindow(&Bottom,(oam->oamBuffer[i]).x/8-3,(oam->oamBuffer[i]).y/8+1,20,5);
+            consoleSetWindow(&Bottom,(oam->oamBuffer[i]).x/8-3,(oam->oamBuffer[i]).y/8+1,17,5);
+            consoleClear();
             drawTypeIcon(oam,spriteInfo,os2,pS2,ts2,
                 AttackList[(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]]->type,
                 (oam->oamBuffer[i]).x+4,(oam->oamBuffer[i]).y-10,true);
@@ -2547,6 +2548,8 @@ ATTACKCHOSEN:
                         updateOAMSub(oam);
 
                         for(int i = 23; i < 32; i+=(((i-21)/2)%2?-2:+6)){
+                            if((((i-21)/2)^1) >= num)
+                                break;
                             (oam->oamBuffer[i+1]).y += 16 * (2-((i-21)/4));
                             (oam->oamBuffer[i]).y += 16 * (2-((i-21)/4));
                         }
@@ -2626,7 +2629,34 @@ OUT2:
         if(!PKMNSlot)
             std::swap(validTrg[2],validTrg[3]);
 
+        int change = 0;
+
         while(42){
+            if(++change == 60){
+                bool changeA[4] = {false};
+
+                if(poss & 2)
+                    changeA[2] = changeA[3] = true;
+                if((poss & 8) || (poss & 32) ||(poss & 64))
+                    changeA[0] = changeA[1] = true;
+                if(poss & 32)
+                    changeA[2 + (PKMNSlot)] = true;
+
+                for(int i = 21; i < 29; i+=2)
+                    if(this->battlemode == DOUBLE && changeA[(i-21)/2]){
+                        int u = (i-21)/2;
+                        
+                        POKEMON::PKMN &acPK= (u/2 ? (*this->player->pkmn_team)[acpokpos[1 - u%2][0]] : (*this->opponent->pkmn_team)[acpokpos[u%2][1]]);
+
+                        if(acPK.stats.acHP == 0)
+                            continue;
+
+                      oam->oamBuffer[i].isHidden = !oam->oamBuffer[i].isHidden;
+                      oam->oamBuffer[i+1].isHidden = !oam->oamBuffer[i+1].isHidden;
+                    }
+                updateOAMSub(oam);
+                change = 0;
+            }
             updateTime();
             swiWaitForVBlank();
             touchRead(&t);
