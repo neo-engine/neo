@@ -104,7 +104,7 @@ attack* AttackList[MAXATTACK] = {
     new attack("Hypnose",    C 0,    C 0,   PSYCHO,    C 70,     C 20,   C 0,        A 0,    C 1,    F 6,   H 2),
     new attack("Meditation",    C 0,    C 0,   PSYCHO,    C 100,     C 40,   C 0,        A 0,    C 1,    F 8,   H 2),
     new attack("Agilität",    C 0,    C 0,   PSYCHO,    C 100,     C 30,   C 0,        A 0,    C 1,    F 8,   H 2),
-    new attack("Ruckzuckhieb",    C 0,    C 40,   NORMAL,    C 100,     C 30,   C 0,        A 0,    C 1,    F 35,   H 0),
+    new attack("Ruckzuckhieb",    C 0,    C 40,   NORMAL,    C 100,     C 30,   C 0,        A 0,    C 2,    F 35,   H 0),
     new attack("Raserei",    C 0,    C 20,   NORMAL,    C 100,     C 20,   C 0,        A 0,    C 1,    F 35,   H 0),
     new teleport(),
     new attack("Nachtnebel",    C 0,    C 0,   GEIST,    C 100,     C 15,   C 0,        A 0,    C 1,    F 34,   H 1),

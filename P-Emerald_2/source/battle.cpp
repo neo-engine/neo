@@ -2262,6 +2262,14 @@ namespace BATTLE{
         }
     }
     void battle::printTargetChoiceScreen(int PKMNSlot,int atk,int& os2,int& pS2,int& ts2){
+        for(int i = 0; i < 5; ++i)
+            oam->oamBuffer[os2 + i].isHidden = true;
+        for(int i = 21; i < 29; i+=2){
+            (oam->oamBuffer[i]).isHidden = false;
+            (oam->oamBuffer[i+1]).isHidden = false;
+        }
+        updateOAMSub(oam); 
+
         int poss = AttackList[atk]->Affects_whom;
         //Opp1, Opp2, ME, Partner, 
         bool validTrg[4] = {
@@ -2274,9 +2282,6 @@ namespace BATTLE{
             std::swap(validTrg[2],validTrg[3]);
         POKEMON::PKMN& atg = (*this->player->pkmn_team)[acpokpos[PKMNSlot][0]];
 
-        for(int i = 0; i < 5; ++i)
-            oam->oamBuffer[os2 + i].isHidden = true;
-        updateOAMSub(oam); 
 
         for(int i = 21; i < 29; i+=2){
             int u = (i-21)/2;
@@ -2981,9 +2986,9 @@ BEFORE_1:
                     for(int i= 0; i < maxst;++i){
                         int prio = 0;
                         if(i % 2)
-                            prio = AttackList[acpokpos[i/2][1]]->Priority;
+                            prio = AttackList[oppAtk[i/2].first]->Priority;
                         else
-                            prio = AttackList[acpokpos[i/2][0]]->Priority;
+                            prio = AttackList[ownAtk[i/2].first]->Priority;
                         ranking[i] -= 4 * prio;
                     }
             }
