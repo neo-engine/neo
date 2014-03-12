@@ -802,7 +802,7 @@ CONT:
 
                     wchar_t savname[8] = {0};
                     for(int i= 0; i < 7; ++i)
-                        savname[i] = gen3::text[save3->unpackeddata[i]];
+                        savname[i] = gen3::getNText(save3->unpackeddata[i]);
                     SAV.setName(savname);
 
                     SAV.IsMale = !save3->unpackeddata[8];
@@ -829,11 +829,11 @@ CONT:
                             acPkmn.boxdata.SID = acBeltP->otid >> 16;
                             acPkmn.boxdata.ID = acBeltP->otid % (1<<16);   
                             for(int i= 0; i < 10; ++i)
-                                acPkmn.boxdata.Name[i] = gen3::text[acBeltP->name[i]];
+                                acPkmn.boxdata.Name[i] = gen3::getNText(acBeltP->name[i]);
                             acPkmn.boxdata.Name[10] = 0;
                             acPkmn.boxdata.hometown = acBeltP->language;
                             for(int i = 0; i < 7; ++i)
-                                acPkmn.boxdata.OT[i] = gen3::text[acBeltP->otname[i]];
+                                acPkmn.boxdata.OT[i] = gen3::getNText(acBeltP->otname[i]);
                             acPkmn.boxdata.OT[7] = 0;
                             acPkmn.boxdata.markings = acBeltP->markint;
 
@@ -850,7 +850,7 @@ CONT:
                             acPkmn.stats.Spd = acBeltP->speed;
 
                             gen3::PKMN::pokemon_growth_t* &acBG = save3->pokemon_growth[i];
-                            acPkmn.boxdata.SPEC = acBG->species;
+                            acPkmn.boxdata.SPEC = gen3::getNPKMNIdx(acBG->species);
                             acPkmn.boxdata.Item = gen3::getNItemIdx(acBG->held);
                             acPkmn.boxdata.exp = acBG->xp;
                             acPkmn.boxdata.steps = acBG->happiness;
@@ -1939,7 +1939,7 @@ OUT:
             case 0:
                 {
                     SAV.PKMN_team.clear();
-                    for(int i = 0;i<3;++i)
+                    for(int i = 0;i<5;++i)
                     {
                         POKEMON::PKMN a(0,HILFSCOUNTER,0,
                             20,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,rand()%2,rand()%2,i == 3,HILFSCOUNTER,i+1,i);

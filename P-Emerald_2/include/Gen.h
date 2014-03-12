@@ -9,12 +9,14 @@ class savgm;
 
 namespace gen3 //using code from "pokehack" originally by "Grazfather"
 {
-    extern char text[];
     bool isValidItem(int gen5Idx);
     int getItemIdx(int gen5Idx);
     int getNItemIdx(int gen3Idx);
+    int getPKMNIdx(int gen5Idx);
+    int getNPKMNIdx(int gen3Idx);
     int getNLocation(int gen3Idx);
     int getLocation(int gen5Idx);
+    int getNText(int in);
 
 #define SAVEFILE_LEN (1 << 17)
 #define NUM_BLOCKS_SLOT 14
@@ -288,8 +290,8 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         PKMN::pokemon_growth_t** pg, PKMN::pokemon_misc_t** pm, int num, int size);
     void print_pokemon(box_pokemon_t* pokemon);
 
-    POKEMON::PKMN getGen5Pkmn(PKMN gen3Pkmn);
-    PKMN getGen3Pkmn(POKEMON::PKMN gen5Pkmn);
+    POKEMON::PKMN getGen5Pkmn(const PKMN& gen3Pkmn);
+    PKMN getGen3Pkmn(const POKEMON::PKMN &gen5Pkmn);
 }
 namespace gen4{
     bool isValidItem(int gen5Idx);
