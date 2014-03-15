@@ -87,6 +87,9 @@
     <ClInclude Include="arm9\include\unistd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\include\as_lib9.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm9\source\ability.cpp">
@@ -165,6 +168,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\type.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\as_lib9.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

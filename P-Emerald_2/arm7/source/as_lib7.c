@@ -22,6 +22,7 @@
 
 #include <nds.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "./helix/mp3dec.h"
 #include "./helix/mp3common.h"

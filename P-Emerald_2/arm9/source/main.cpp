@@ -9,6 +9,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "as_lib9.h" 
+
 #include "map2d.h"
 
 #include <string>
@@ -646,6 +648,10 @@ bool heroIsBig = false;
 void startScreen(){
 
     vramSetup();
+    
+    //irqInit();
+    //irqEnable(IRQ_VBLANK);
+    //irqSet(IRQ_VBLANK, AS_SoundVBL);    // needed for mp3 streaming
 
     videoSetMode(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
     videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D);
@@ -1723,8 +1729,17 @@ int main(int argc, char** argv)
     initMapSprites();
     updateOAM(oamTop);
 
+    // init the ASlib
+    AS_Init(AS_MODE_MP3 | AS_MODE_SURROUND | AS_MODE_16CH);
+    
+    // set default sound settings
+    //AS_SetDefaultSettings(AS_PCM_8BIT, 11025, AS_SURROUND);
+
+    AS_MP3StreamPlay("nitro:/SOUND/TEST.mp3");
+    //AS_SetMP3Loop(true);
     while(42) 
     {
+
         updateTime(true);
         swiWaitForVBlank();
         swiWaitForVBlank();

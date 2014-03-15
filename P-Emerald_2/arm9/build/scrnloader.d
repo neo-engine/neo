@@ -58,6 +58,7 @@ scrnloader.o: \
  c:/devkitPro/libnds/include/nds/arm9/trig_lut.h \
  c:/devkitPro/libnds/include/nds/arm9/video.h \
  c:/devkitPro/libnds/include/nds/arm9/videoGL.h \
+ c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/as_lib9.h \
  c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/mbox.h \
  c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/scrnloader.h \
  c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/sprite.h \
@@ -239,6 +240,8 @@ c:/devkitPro/libnds/include/nds/arm9/trig_lut.h:
 c:/devkitPro/libnds/include/nds/arm9/video.h:
 
 c:/devkitPro/libnds/include/nds/arm9/videoGL.h:
+
+c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/as_lib9.h:
 
 c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/mbox.h:
 

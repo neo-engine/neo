@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <math.h>
 
+#include "as_lib9.h"
+
 #include "mbox.h"
 #include "scrnloader.h"
 #include "savgm.h"
@@ -105,8 +107,11 @@ void printMapLocation(const MapRegionPos& m){
     return;
 }
 u8 frame = 0;
+
 void updateTime(bool mapMode)
 {
+    //AS_SoundVBL();
+
     cust_font2.set_color(0,0);
     cust_font2.set_color(0,1);
     cust_font2.set_color(252,2);

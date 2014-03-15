@@ -81,37 +81,38 @@ volatile bool exitflag = false;
 //---------------------------------------------------------------------------------
 void powerButtonCB() {
 //---------------------------------------------------------------------------------
-	exitflag = true;
+    exitflag = true;
 }
 
 
 int main(int argc, char ** argv) {
-	readUserSettings();
+    readUserSettings();
 
-	irqInit();
-	// Start the RTC tracking IRQ
-	initClockIRQ();
-	fifoInit();
+    irqInit();
+    // Start the RTC tracking IRQ
+    initClockIRQ();
+    fifoInit();
 
-	SetYtrigger(80);
+    SetYtrigger(80);
 
-	installSystemFIFO();
- 
-	irqSet(IRQ_VCOUNT, VcountHandler);
+    installSystemFIFO();
+
+    irqSet(IRQ_VCOUNT, VcountHandler);
     irqSet(IRQ_VBLANK, AS_SoundVBL);    // the sound engine
 
-	irqEnable( IRQ_VBLANK | IRQ_VCOUNT | IRQ_NETWORK);
-	
-	setPowerButtonCB(powerButtonCB);   
+    irqEnable( IRQ_VBLANK | IRQ_VCOUNT | IRQ_NETWORK);
+    
+    setPowerButtonCB(powerButtonCB);   
 
-	// Keep the ARM7 mostly idle
-	while (!exitflag) {
-		if ( 0 == (REG_KEYINPUT & (KEY_SELECT | KEY_START | KEY_L | KEY_R))) {
-			exitflag = true;
-		}
-		swiWaitForVBlank();
-	}
-	return 0;
+    // Keep the ARM7 mostly idle
+    while (!exitflag) {
+        if ( 0 == (REG_KEYINPUT & (KEY_SELECT | KEY_START | KEY_L | KEY_R))) {
+            exitflag = true;
+        }
+        AS_MP3Engine();
+        swiWaitForVBlank();
+    }
+    return 0;
 //    readUserSettings();
 //
 //	irqInit();

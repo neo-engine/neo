@@ -134,118 +134,117 @@ Linker script and memory map
  .text          0x037f8edc       0x24 main.o
                 0x037f8edc                powerButtonCB
                 0x037f8ef0                VcountHandler
- .text.startup  0x037f8f00       0xa4 main.o
+ .text.startup  0x037f8f00       0xa8 main.o
                 0x037f8f00                main
- .text          0x037f8fa4      0x7b4 mp3dec.o
-                0x037f8fa4                MP3InitDecoder
-                0x037f8fb4                MP3FreeDecoder
-                0x037f8fc8                MP3FindSyncWord
-                0x037f901c                MP3GetLastFrameInfo
-                0x037f90a4                MP3GetNextFrameInfo
-                0x037f90f8                MP3Decode
- .text          0x037f9758        0x0 mp3tabs.o
- .text          0x037f9758      0x7ac bitstream.o
-                0x037f9758                xmp3_SetBitstreamPointer
-                0x037f976c                xmp3_GetBits
-                0x037f988c                xmp3_CalcBitsUsed
-                0x037f98a4                xmp3_CheckPadBit
-                0x037f98d0                xmp3_UnpackFrameHeader
-                0x037f9b60                xmp3_UnpackSideInfo
- .text          0x037f9f04      0x23c buffers.o
-                0x037f9f04                xmp3_FreeBuffers
-                0x037f9fac                xmp3_AllocateBuffers
- .text          0x037fa140      0x97c dct32.o
-                0x037fa140                xmp3_FDCT32
- .text          0x037faabc      0x370 dequant.o
-                0x037faabc                xmp3_Dequantize
- .text          0x037fae2c      0x594 dqchan.o
-                0x037fb018                xmp3_DequantChannel
- .text          0x037fb3c0      0x9cc huffman.o
-                0x037fb3c0                xmp3_DecodeHuffman
- .text          0x037fbd8c        0x0 hufftabs.o
- .text          0x037fbd8c     0x1734 imdct.o
-                0x037fc108                xmp3_IMDCT
- .text          0x037fd4c0      0x8a0 scalfact.o
-                0x037fd4c0                xmp3_UnpackScaleFactors
- .text          0x037fdd60      0x9e0 stproc.o
-                0x037fdd60                xmp3_MidSideProc
-                0x037fddf8                xmp3_IntensityProcMPEG1
-                0x037fe284                xmp3_IntensityProcMPEG2
- .text          0x037fe740      0x164 subband.o
-                0x037fe740                xmp3_Subband
- .text          0x037fe8a4        0x0 trigtabs.o
- .text          0x037fe8a4      0x8b8 asmpoly_gcc.o
-                0x037fe8a4                xmp3_PolyphaseStereo
-                0x037fee10                xmp3_PolyphaseMono
- .text          0x037ff15c      0x3b4 c:/devkitPro/libnds/lib\libnds7.a(clock.o)
-                0x037ff15c                syncRTC
-                0x037ff16c                BCDToInteger
-                0x037ff18e                integerToBCD
-                0x037ff1b8                rtcTransaction
-                0x037ff2ac                rtcReset
-                0x037ff2ec                rtcGetTimeAndDate
-                0x037ff334                rtcSetTimeAndDate
-                0x037ff35c                rtcGetTime
-                0x037ff3a4                rtcSetTime
-                0x037ff3ca                resyncClock
-                0x037ff490                initClockIRQ
- .text          0x037ff510       0xb4 c:/devkitPro/libnds/lib\libnds7.a(input.o)
-                0x037ff510                inputGetAndSend
- .text          0x037ff5c4      0x1a8 c:/devkitPro/libnds/lib\libnds7.a(system.o)
-                0x037ff5c4                powerValueHandler
-                0x037ff70c                systemSleep
-                0x037ff72c                sleepEnabled
-                0x037ff738                installSystemFIFO
- .text          0x037ff76c      0x718 c:/devkitPro/libnds/lib\libnds7.a(touch.o)
-                0x037ff780                readTSCReg
-                0x037ff7c0                readTSCRegArray
-                0x037ff810                writeTSCReg
-                0x037ff854                CheckStylus
-                0x037ff8dc                touchRead
-                0x037ff940                touchReadTemperature
-                0x037ff970                readTouchValue
-                0x037ffac8                UpdateRange
-                0x037ffb30                touchReadDSMode
-                0x037ffc4c                touchPenDown
-                0x037ffca4                touchReadDSiMode
-                0x037ffd24                touchReadXY
- .text          0x037ffe84       0xd8 c:/devkitPro/libnds/lib\libnds7.a(userSettings.o)
-                0x037ffe84                readUserSettings
- .text          0x037fff5c      0xa6c c:/devkitPro/libnds/lib\libnds7.a(fifosystem.o)
-                0x038001c0                fifoSendAddress
-                0x038001ec                fifoSendValue32
-                0x03800226                fifoSendDatamsg
-                0x03800290                fifoGetAddress
-                0x038002e0                fifoGetValue32
-                0x0380032c                fifoGetDatamsg
-                0x038006a4                fifoCheckAddress
-                0x038006c8                fifoSetAddressHandler
-                0x03800720                fifoCheckDatamsg
-                0x03800744                fifoSetDatamsgHandler
-                0x038007c8                fifoCheckValue32
-                0x038007ec                fifoSetValue32Handler
-                0x03800844                fifoInit
- .text          0x038009c8      0x340 c:/devkitPro/libnds/lib\libnds7.a(interrupts.o)
-                0x038009c8                irqDummy
-                0x03800a0e                i2cIRQHandler
-                0x03800a68                setPowerButtonCB
-                0x03800a78                irqSet
-                0x03800ad4                irqInitHandler
-                0x03800b18                irqEnable
-                0x03800b7c                irqDisable
-                0x03800be4                irqClear
-                0x03800c0c                irqSetAUX
-                0x03800c34                irqClearAUX
-                0x03800c5c                irqDisableAUX
-                0x03800c80                irqEnableAUX
-                0x03800ca4                irqInit
- .text          0x03800d08       0x50 c:/devkitPro/libnds/lib\libnds7.a(libnds_exit.arm.o)
-                0x03800d08                systemErrorExit
-                0x03800d0c                __libnds_exit
- .text          0x03800d58       0x54 c:/devkitPro/libnds/lib\libnds7.a(intrwait.o)
-                0x03800d58                swiWaitForVBlank
-                0x03800d68                swiIntrWait
- *fill*         0x03800dac        0x4 ff
+ .text          0x037f8fa8      0x7b4 mp3dec.o
+                0x037f8fa8                MP3InitDecoder
+                0x037f8fb8                MP3FreeDecoder
+                0x037f8fcc                MP3FindSyncWord
+                0x037f9020                MP3GetLastFrameInfo
+                0x037f90a8                MP3GetNextFrameInfo
+                0x037f90fc                MP3Decode
+ .text          0x037f975c        0x0 mp3tabs.o
+ .text          0x037f975c      0x7ac bitstream.o
+                0x037f975c                xmp3_SetBitstreamPointer
+                0x037f9770                xmp3_GetBits
+                0x037f9890                xmp3_CalcBitsUsed
+                0x037f98a8                xmp3_CheckPadBit
+                0x037f98d4                xmp3_UnpackFrameHeader
+                0x037f9b64                xmp3_UnpackSideInfo
+ .text          0x037f9f08      0x23c buffers.o
+                0x037f9f08                xmp3_FreeBuffers
+                0x037f9fb0                xmp3_AllocateBuffers
+ .text          0x037fa144      0x97c dct32.o
+                0x037fa144                xmp3_FDCT32
+ .text          0x037faac0      0x370 dequant.o
+                0x037faac0                xmp3_Dequantize
+ .text          0x037fae30      0x594 dqchan.o
+                0x037fb01c                xmp3_DequantChannel
+ .text          0x037fb3c4      0x9cc huffman.o
+                0x037fb3c4                xmp3_DecodeHuffman
+ .text          0x037fbd90        0x0 hufftabs.o
+ .text          0x037fbd90     0x1734 imdct.o
+                0x037fc10c                xmp3_IMDCT
+ .text          0x037fd4c4      0x8a0 scalfact.o
+                0x037fd4c4                xmp3_UnpackScaleFactors
+ .text          0x037fdd64      0x9e0 stproc.o
+                0x037fdd64                xmp3_MidSideProc
+                0x037fddfc                xmp3_IntensityProcMPEG1
+                0x037fe288                xmp3_IntensityProcMPEG2
+ .text          0x037fe744      0x164 subband.o
+                0x037fe744                xmp3_Subband
+ .text          0x037fe8a8        0x0 trigtabs.o
+ .text          0x037fe8a8      0x8b8 asmpoly_gcc.o
+                0x037fe8a8                xmp3_PolyphaseStereo
+                0x037fee14                xmp3_PolyphaseMono
+ .text          0x037ff160      0x3b4 c:/devkitPro/libnds/lib\libnds7.a(clock.o)
+                0x037ff160                syncRTC
+                0x037ff170                BCDToInteger
+                0x037ff192                integerToBCD
+                0x037ff1bc                rtcTransaction
+                0x037ff2b0                rtcReset
+                0x037ff2f0                rtcGetTimeAndDate
+                0x037ff338                rtcSetTimeAndDate
+                0x037ff360                rtcGetTime
+                0x037ff3a8                rtcSetTime
+                0x037ff3ce                resyncClock
+                0x037ff494                initClockIRQ
+ .text          0x037ff514       0xb4 c:/devkitPro/libnds/lib\libnds7.a(input.o)
+                0x037ff514                inputGetAndSend
+ .text          0x037ff5c8      0x1a8 c:/devkitPro/libnds/lib\libnds7.a(system.o)
+                0x037ff5c8                powerValueHandler
+                0x037ff710                systemSleep
+                0x037ff730                sleepEnabled
+                0x037ff73c                installSystemFIFO
+ .text          0x037ff770      0x718 c:/devkitPro/libnds/lib\libnds7.a(touch.o)
+                0x037ff784                readTSCReg
+                0x037ff7c4                readTSCRegArray
+                0x037ff814                writeTSCReg
+                0x037ff858                CheckStylus
+                0x037ff8e0                touchRead
+                0x037ff944                touchReadTemperature
+                0x037ff974                readTouchValue
+                0x037ffacc                UpdateRange
+                0x037ffb34                touchReadDSMode
+                0x037ffc50                touchPenDown
+                0x037ffca8                touchReadDSiMode
+                0x037ffd28                touchReadXY
+ .text          0x037ffe88       0xd8 c:/devkitPro/libnds/lib\libnds7.a(userSettings.o)
+                0x037ffe88                readUserSettings
+ .text          0x037fff60      0xa6c c:/devkitPro/libnds/lib\libnds7.a(fifosystem.o)
+                0x038001c4                fifoSendAddress
+                0x038001f0                fifoSendValue32
+                0x0380022a                fifoSendDatamsg
+                0x03800294                fifoGetAddress
+                0x038002e4                fifoGetValue32
+                0x03800330                fifoGetDatamsg
+                0x038006a8                fifoCheckAddress
+                0x038006cc                fifoSetAddressHandler
+                0x03800724                fifoCheckDatamsg
+                0x03800748                fifoSetDatamsgHandler
+                0x038007cc                fifoCheckValue32
+                0x038007f0                fifoSetValue32Handler
+                0x03800848                fifoInit
+ .text          0x038009cc      0x340 c:/devkitPro/libnds/lib\libnds7.a(interrupts.o)
+                0x038009cc                irqDummy
+                0x03800a12                i2cIRQHandler
+                0x03800a6c                setPowerButtonCB
+                0x03800a7c                irqSet
+                0x03800ad8                irqInitHandler
+                0x03800b1c                irqEnable
+                0x03800b80                irqDisable
+                0x03800be8                irqClear
+                0x03800c10                irqSetAUX
+                0x03800c38                irqClearAUX
+                0x03800c60                irqDisableAUX
+                0x03800c84                irqEnableAUX
+                0x03800ca8                irqInit
+ .text          0x03800d0c       0x50 c:/devkitPro/libnds/lib\libnds7.a(libnds_exit.arm.o)
+                0x03800d0c                systemErrorExit
+                0x03800d10                __libnds_exit
+ .text          0x03800d5c       0x54 c:/devkitPro/libnds/lib\libnds7.a(intrwait.o)
+                0x03800d5c                swiWaitForVBlank
+                0x03800d6c                swiIntrWait
  .text          0x03800db0       0x70 c:/devkitPro/libnds/lib\libnds7.a(biosCalls.o)
                 0x03800db0                swiDelay
                 0x03800db4                swiSleep
@@ -902,41 +901,41 @@ Linker script and memory map
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000    0x1415a
+.debug_info     0x00000000    0x14172
  *(.debug_info)
  .debug_info    0x00000000     0x10f1 as_lib7.o
- .debug_info    0x000010f1      0x413 main.o
- .debug_info    0x00001504      0xb98 mp3dec.o
- .debug_info    0x0000209c      0x1ab mp3tabs.o
- .debug_info    0x00002247      0xb74 bitstream.o
- .debug_info    0x00002dbb      0xaef buffers.o
- .debug_info    0x000038aa      0xb9d dct32.o
- .debug_info    0x00004447      0xa76 dequant.o
- .debug_info    0x00004ebd      0x9c2 dqchan.o
- .debug_info    0x0000587f      0xc09 huffman.o
- .debug_info    0x00006488      0x1a1 hufftabs.o
- .debug_info    0x00006629     0x31db imdct.o
- .debug_info    0x00009804      0xc5a scalfact.o
- .debug_info    0x0000a45e      0xd07 stproc.o
- .debug_info    0x0000b165      0x4fd subband.o
- .debug_info    0x0000b662      0x1a2 trigtabs.o
- .debug_info    0x0000b804       0xc2 asmpoly_gcc.o
- .debug_info    0x0000b8c6      0xaad c:/devkitPro/libnds/lib\libnds7.a(clock.o)
- .debug_info    0x0000c373      0x57f c:/devkitPro/libnds/lib\libnds7.a(input.o)
- .debug_info    0x0000c8f2      0x769 c:/devkitPro/libnds/lib\libnds7.a(system.o)
- .debug_info    0x0000d05b      0xc5f c:/devkitPro/libnds/lib\libnds7.a(touch.o)
- .debug_info    0x0000dcba      0x5ac c:/devkitPro/libnds/lib\libnds7.a(userSettings.o)
- .debug_info    0x0000e266     0x13cc c:/devkitPro/libnds/lib\libnds7.a(fifosystem.o)
- .debug_info    0x0000f632      0xb64 c:/devkitPro/libnds/lib\libnds7.a(interrupts.o)
- .debug_info    0x00010196      0x29f c:/devkitPro/libnds/lib\libnds7.a(libnds_exit.arm.o)
- .debug_info    0x00010435       0xbc c:/devkitPro/libnds/lib\libnds7.a(intrwait.o)
- .debug_info    0x000104f1       0xbf c:/devkitPro/libnds/lib\libnds7.a(biosCalls.o)
- .debug_info    0x000105b0       0xc9 c:/devkitPro/libnds/lib\libnds7.a(interruptDispatcher.o)
- .debug_info    0x00010679       0xc2 c:/devkitPro/libnds/lib\libnds7.a(swiSoftReset.o)
- .debug_info    0x0001073b      0x436 c:/devkitPro/libnds/lib\libnds7.a(i2c.o)
- .debug_info    0x00010b71     0x3072 c:/devkitPro/libnds/lib\libnds7.a(sdmmc.o)
- .debug_info    0x00013be3      0x332 c:/devkitPro/libnds/lib\libnds7.a(spi.o)
- .debug_info    0x00013f15      0x245 c:/devkitPro/libnds/lib\libnds7.a(systemShutDown.o)
+ .debug_info    0x000010f1      0x42b main.o
+ .debug_info    0x0000151c      0xb98 mp3dec.o
+ .debug_info    0x000020b4      0x1ab mp3tabs.o
+ .debug_info    0x0000225f      0xb74 bitstream.o
+ .debug_info    0x00002dd3      0xaef buffers.o
+ .debug_info    0x000038c2      0xb9d dct32.o
+ .debug_info    0x0000445f      0xa76 dequant.o
+ .debug_info    0x00004ed5      0x9c2 dqchan.o
+ .debug_info    0x00005897      0xc09 huffman.o
+ .debug_info    0x000064a0      0x1a1 hufftabs.o
+ .debug_info    0x00006641     0x31db imdct.o
+ .debug_info    0x0000981c      0xc5a scalfact.o
+ .debug_info    0x0000a476      0xd07 stproc.o
+ .debug_info    0x0000b17d      0x4fd subband.o
+ .debug_info    0x0000b67a      0x1a2 trigtabs.o
+ .debug_info    0x0000b81c       0xc2 asmpoly_gcc.o
+ .debug_info    0x0000b8de      0xaad c:/devkitPro/libnds/lib\libnds7.a(clock.o)
+ .debug_info    0x0000c38b      0x57f c:/devkitPro/libnds/lib\libnds7.a(input.o)
+ .debug_info    0x0000c90a      0x769 c:/devkitPro/libnds/lib\libnds7.a(system.o)
+ .debug_info    0x0000d073      0xc5f c:/devkitPro/libnds/lib\libnds7.a(touch.o)
+ .debug_info    0x0000dcd2      0x5ac c:/devkitPro/libnds/lib\libnds7.a(userSettings.o)
+ .debug_info    0x0000e27e     0x13cc c:/devkitPro/libnds/lib\libnds7.a(fifosystem.o)
+ .debug_info    0x0000f64a      0xb64 c:/devkitPro/libnds/lib\libnds7.a(interrupts.o)
+ .debug_info    0x000101ae      0x29f c:/devkitPro/libnds/lib\libnds7.a(libnds_exit.arm.o)
+ .debug_info    0x0001044d       0xbc c:/devkitPro/libnds/lib\libnds7.a(intrwait.o)
+ .debug_info    0x00010509       0xbf c:/devkitPro/libnds/lib\libnds7.a(biosCalls.o)
+ .debug_info    0x000105c8       0xc9 c:/devkitPro/libnds/lib\libnds7.a(interruptDispatcher.o)
+ .debug_info    0x00010691       0xc2 c:/devkitPro/libnds/lib\libnds7.a(swiSoftReset.o)
+ .debug_info    0x00010753      0x436 c:/devkitPro/libnds/lib\libnds7.a(i2c.o)
+ .debug_info    0x00010b89     0x3072 c:/devkitPro/libnds/lib\libnds7.a(sdmmc.o)
+ .debug_info    0x00013bfb      0x332 c:/devkitPro/libnds/lib\libnds7.a(spi.o)
+ .debug_info    0x00013f2d      0x245 c:/devkitPro/libnds/lib\libnds7.a(systemShutDown.o)
 
 .debug_abbrev   0x00000000     0x3a4b
  *(.debug_abbrev)
@@ -974,41 +973,41 @@ Linker script and memory map
  .debug_abbrev  0x000037a4      0x1c4 c:/devkitPro/libnds/lib\libnds7.a(spi.o)
  .debug_abbrev  0x00003968       0xe3 c:/devkitPro/libnds/lib\libnds7.a(systemShutDown.o)
 
-.debug_line     0x00000000     0x5c1a
+.debug_line     0x00000000     0x5c6b
  *(.debug_line)
  .debug_line    0x00000000      0x3d7 as_lib7.o
- .debug_line    0x000003d7      0x1bf main.o
- .debug_line    0x00000596      0x327 mp3dec.o
- .debug_line    0x000008bd       0x81 mp3tabs.o
- .debug_line    0x0000093e      0x2f1 bitstream.o
- .debug_line    0x00000c2f      0x2b8 buffers.o
- .debug_line    0x00000ee7      0x5a7 dct32.o
- .debug_line    0x0000148e      0x1de dequant.o
- .debug_line    0x0000166c      0x2e6 dqchan.o
- .debug_line    0x00001952      0x339 huffman.o
- .debug_line    0x00001c8b       0x83 hufftabs.o
- .debug_line    0x00001d0e      0xa6c imdct.o
- .debug_line    0x0000277a      0x295 scalfact.o
- .debug_line    0x00002a0f      0x5af stproc.o
- .debug_line    0x00002fbe      0x16f subband.o
- .debug_line    0x0000312d       0x78 trigtabs.o
- .debug_line    0x000031a5      0x2b7 asmpoly_gcc.o
- .debug_line    0x0000345c      0x374 c:/devkitPro/libnds/lib\libnds7.a(clock.o)
- .debug_line    0x000037d0      0x1e7 c:/devkitPro/libnds/lib\libnds7.a(input.o)
- .debug_line    0x000039b7      0x25a c:/devkitPro/libnds/lib\libnds7.a(system.o)
- .debug_line    0x00003c11      0x445 c:/devkitPro/libnds/lib\libnds7.a(touch.o)
- .debug_line    0x00004056      0x1d0 c:/devkitPro/libnds/lib\libnds7.a(userSettings.o)
- .debug_line    0x00004226      0x4b6 c:/devkitPro/libnds/lib\libnds7.a(fifosystem.o)
- .debug_line    0x000046dc      0x342 c:/devkitPro/libnds/lib\libnds7.a(interrupts.o)
- .debug_line    0x00004a1e      0x1c0 c:/devkitPro/libnds/lib\libnds7.a(libnds_exit.arm.o)
- .debug_line    0x00004bde       0x97 c:/devkitPro/libnds/lib\libnds7.a(intrwait.o)
- .debug_line    0x00004c75       0xc5 c:/devkitPro/libnds/lib\libnds7.a(biosCalls.o)
- .debug_line    0x00004d3a       0xcd c:/devkitPro/libnds/lib\libnds7.a(interruptDispatcher.o)
- .debug_line    0x00004e07       0x90 c:/devkitPro/libnds/lib\libnds7.a(swiSoftReset.o)
- .debug_line    0x00004e97      0x1ff c:/devkitPro/libnds/lib\libnds7.a(i2c.o)
- .debug_line    0x00005096      0x7bb c:/devkitPro/libnds/lib\libnds7.a(sdmmc.o)
- .debug_line    0x00005851      0x228 c:/devkitPro/libnds/lib\libnds7.a(spi.o)
- .debug_line    0x00005a79      0x1a1 c:/devkitPro/libnds/lib\libnds7.a(systemShutDown.o)
+ .debug_line    0x000003d7      0x210 main.o
+ .debug_line    0x000005e7      0x327 mp3dec.o
+ .debug_line    0x0000090e       0x81 mp3tabs.o
+ .debug_line    0x0000098f      0x2f1 bitstream.o
+ .debug_line    0x00000c80      0x2b8 buffers.o
+ .debug_line    0x00000f38      0x5a7 dct32.o
+ .debug_line    0x000014df      0x1de dequant.o
+ .debug_line    0x000016bd      0x2e6 dqchan.o
+ .debug_line    0x000019a3      0x339 huffman.o
+ .debug_line    0x00001cdc       0x83 hufftabs.o
+ .debug_line    0x00001d5f      0xa6c imdct.o
+ .debug_line    0x000027cb      0x295 scalfact.o
+ .debug_line    0x00002a60      0x5af stproc.o
+ .debug_line    0x0000300f      0x16f subband.o
+ .debug_line    0x0000317e       0x78 trigtabs.o
+ .debug_line    0x000031f6      0x2b7 asmpoly_gcc.o
+ .debug_line    0x000034ad      0x374 c:/devkitPro/libnds/lib\libnds7.a(clock.o)
+ .debug_line    0x00003821      0x1e7 c:/devkitPro/libnds/lib\libnds7.a(input.o)
+ .debug_line    0x00003a08      0x25a c:/devkitPro/libnds/lib\libnds7.a(system.o)
+ .debug_line    0x00003c62      0x445 c:/devkitPro/libnds/lib\libnds7.a(touch.o)
+ .debug_line    0x000040a7      0x1d0 c:/devkitPro/libnds/lib\libnds7.a(userSettings.o)
+ .debug_line    0x00004277      0x4b6 c:/devkitPro/libnds/lib\libnds7.a(fifosystem.o)
+ .debug_line    0x0000472d      0x342 c:/devkitPro/libnds/lib\libnds7.a(interrupts.o)
+ .debug_line    0x00004a6f      0x1c0 c:/devkitPro/libnds/lib\libnds7.a(libnds_exit.arm.o)
+ .debug_line    0x00004c2f       0x97 c:/devkitPro/libnds/lib\libnds7.a(intrwait.o)
+ .debug_line    0x00004cc6       0xc5 c:/devkitPro/libnds/lib\libnds7.a(biosCalls.o)
+ .debug_line    0x00004d8b       0xcd c:/devkitPro/libnds/lib\libnds7.a(interruptDispatcher.o)
+ .debug_line    0x00004e58       0x90 c:/devkitPro/libnds/lib\libnds7.a(swiSoftReset.o)
+ .debug_line    0x00004ee8      0x1ff c:/devkitPro/libnds/lib\libnds7.a(i2c.o)
+ .debug_line    0x000050e7      0x7bb c:/devkitPro/libnds/lib\libnds7.a(sdmmc.o)
+ .debug_line    0x000058a2      0x228 c:/devkitPro/libnds/lib\libnds7.a(spi.o)
+ .debug_line    0x00005aca      0x1a1 c:/devkitPro/libnds/lib\libnds7.a(systemShutDown.o)
 
 .debug_frame    0x00000000     0x10a8
  *(.debug_frame)
@@ -1043,7 +1042,7 @@ Linker script and memory map
  .debug_str     0x00000000      0x725 as_lib7.o
                                 0x800 (size before relaxing)
  .debug_str     0x00000725      0x2a1 main.o
-                                0x377 (size before relaxing)
+                                0x384 (size before relaxing)
  .debug_str     0x000009c6      0x32e mp3dec.o
                                 0x5c2 (size before relaxing)
  .debug_str     0x00000cf4       0xc6 mp3tabs.o

@@ -63,6 +63,7 @@ SOURCES		:=	source
 DATA		:=  dat
 INCLUDES	:=	include
 GRAPHICS	:=	data
+SOUNDS		:=  sounds
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -114,6 +115,7 @@ CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 PNGFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
+MP3FILES	:=	$(foreach dir,$(SOUNDS),$(notdir $(wildcard $(dir)/*.mp3)))
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -172,6 +174,12 @@ $(ARM9ELF)	:	$(OFILES)
 
 #---------------------------------------------------------------------------------
 %.bin.o	:	%.bin
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
+
+#---------------------------------------------------------------------------------
+%.o	:	%.mp3
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@$(bin2o)

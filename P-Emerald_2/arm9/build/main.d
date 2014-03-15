@@ -59,6 +59,7 @@ main.o: \
  c:/devkitPro/libnds/include/libfatversion.h \
  c:/devkitPro/libnds/include/nds/disc_io.h \
  c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/nitrofs.h \
+ c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/as_lib9.h \
  c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/map2d.h \
  c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/mbox.h \
  c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/item.h \
@@ -220,6 +221,8 @@ c:/devkitPro/libnds/include/libfatversion.h:
 c:/devkitPro/libnds/include/nds/disc_io.h:
 
 c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/nitrofs.h:
+
+c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/as_lib9.h:
 
 c:/Users/Philip/Desktop/P-Erm/P-Emerald_2/P-Emerald_2/arm9/include/map2d.h:
 
