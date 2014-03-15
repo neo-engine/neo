@@ -101,7 +101,7 @@
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make rebuild 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>ARM7;ARM9;WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\arm9\include;C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\arm9\build\;C:\devkitPro\libnds\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\arm9\include;C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\arm9\build;C:\devkitPro\libnds\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <ExecutablePath>C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

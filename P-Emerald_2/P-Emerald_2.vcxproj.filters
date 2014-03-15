@@ -15,156 +15,156 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ability.h">
+    <ClInclude Include="arm9\include\ability.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\berry.h">
+    <ClInclude Include="arm9\include\attack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\item.h">
+    <ClInclude Include="arm9\include\bag.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mbox.h">
+    <ClInclude Include="arm9\include\battle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PKMN.h">
+    <ClInclude Include="arm9\include\berry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\savgm.h">
+    <ClInclude Include="arm9\include\font_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\scrnloader.h">
+    <ClInclude Include="arm9\include\Gen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\attack.h">
+    <ClInclude Include="arm9\include\map2d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\n3dsampleframework.h">
+    <ClInclude Include="arm9\include\Map_Obj.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Map.h">
+    <ClInclude Include="arm9\include\nitrofs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\sprite.h">
+    <ClInclude Include="arm9\include\item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\keyboard.h">
+    <ClInclude Include="arm9\include\keyboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\unistd.h">
+    <ClInclude Include="arm9\include\Map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\nitrofs.h">
+    <ClInclude Include="arm9\include\mbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Map_Obj.h">
+    <ClInclude Include="arm9\include\n3dsampleframework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\type.h">
+    <ClInclude Include="arm9\include\nsbmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\bag.h">
+    <ClInclude Include="arm9\include\PKMN.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\print.h">
+    <ClInclude Include="arm9\include\print.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\font_data.h">
+    <ClInclude Include="arm9\include\savgm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\nsbmd.h">
+    <ClInclude Include="arm9\include\scrnloader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\battle.h">
+    <ClInclude Include="arm9\include\sound.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\sound.h">
+    <ClInclude Include="arm9\include\sprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\map2d.h">
+    <ClInclude Include="arm9\include\type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Gen.h">
+    <ClInclude Include="arm9\include\unistd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\ability.cpp">
+    <ClCompile Include="arm9\source\ability.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\main.cpp">
+    <ClCompile Include="arm9\source\attack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\PKMN.cpp">
+    <ClCompile Include="arm9\source\Bag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\savgm.cpp">
+    <ClCompile Include="arm9\source\battle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\attack.cpp">
+    <ClCompile Include="arm9\source\Box.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\n3dsampleframework_nds.cpp">
+    <ClCompile Include="arm9\source\font_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\Map.cpp">
+    <ClCompile Include="arm9\source\Gen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mbox.cpp">
+    <ClCompile Include="arm9\source\hex2dec.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\Box.cpp">
+    <ClCompile Include="arm9\source\item.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\hex2dec.c">
+    <ClCompile Include="arm9\source\keyboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\nitrofs.c">
+    <ClCompile Include="arm9\source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\options.cpp">
+    <ClCompile Include="arm9\source\Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\Map_Obj.cpp">
+    <ClCompile Include="arm9\source\map2d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\sprite.cpp">
+    <ClCompile Include="arm9\source\maploader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\scrnloader.cpp">
+    <ClCompile Include="arm9\source\Map_Obj.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\Bag.cpp">
+    <ClCompile Include="arm9\source\mbox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\type.cpp">
+    <ClCompile Include="arm9\source\n3dsampleframework_nds.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\item.cpp">
+    <ClCompile Include="arm9\source\options.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\print.cpp">
+    <ClCompile Include="arm9\source\PKMN.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\font_data.cpp">
+    <ClCompile Include="arm9\source\print.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\maploader.cpp">
+    <ClCompile Include="arm9\source\savgm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\battle.cpp">
+    <ClCompile Include="arm9\source\nitrofs.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\keyboard.cpp">
+    <ClCompile Include="arm9\source\scrnloader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\sound.cpp">
+    <ClCompile Include="arm9\source\sound.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\map2d.cpp">
+    <ClCompile Include="arm9\source\sprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\Gen.cpp">
+    <ClCompile Include="arm9\source\type.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

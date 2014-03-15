@@ -26,18 +26,14 @@ ifeq ($(strip $(GAME_ICON)),)
 GAME_ICON      :=      $(DEVKITPRO)/libnds/icon2.bmp
 endif
 
-ifneq ($(strip $(NITRO_FILES)),)
-_ADDFILES	:=	-d $(NITRO_FILES)
-endif
-
 #---------------------------------------------------------------------------------
 %.nds: %.arm9
-	@ndstool -c $@ -9 $< -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES) -d ../FSROOT 
+	@ndstool -c $@ -9 $< -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES)
 	@echo built ... $(notdir $@)
 
 #---------------------------------------------------------------------------------
 %.nds: %.elf
-	@ndstool -c $@ -9 $< -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES) -d ../FSROOT
+	@ndstool -c $@ -9 $< -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES)
 	@echo built ... $(notdir $@)
 
 #---------------------------------------------------------------------------------

@@ -38,7 +38,7 @@
 #include "Male.h"
 #include "Female.h"
 
-#include "BigCirc1.h"
+#include "BigCirc1.h" 
 
 OAMTable *oam = new OAMTable();
 SpriteInfo spriteInfo[SPRITE_COUNT];
@@ -60,7 +60,7 @@ enum GameMod{
     EMULATOR
 } gMod = DEVELOPER;
 std::string CodeName = "Working Klink";
-SavMod savMod = _NDS;
+SavMod savMod = _NDS; 
 
 char acSlot2Game[5];
 
