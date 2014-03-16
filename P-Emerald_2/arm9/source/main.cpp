@@ -649,9 +649,9 @@ void startScreen(){
 
     vramSetup();
     
-    //irqInit();
-    //irqEnable(IRQ_VBLANK);
-    //irqSet(IRQ_VBLANK, AS_SoundVBL);    // needed for mp3 streaming
+    irqInit();
+    irqEnable(IRQ_VBLANK);
+    irqSet(IRQ_VBLANK, AS_SoundVBL);    // needed for mp3 streaming
 
     videoSetMode(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
     videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D);
@@ -698,6 +698,16 @@ void startScreen(){
     }
 START:
     //Intro
+
+    // init the ASlib
+    AS_Init(AS_MODE_MP3 | AS_MODE_SURROUND | AS_MODE_16CH);
+    
+    // set default sound settings
+    AS_SetDefaultSettings(AS_PCM_16BIT, 44100, AS_NO_DELAY);
+
+    AS_MP3StreamPlay("nitro:/SOUND/TEST.mp3");
+    AS_SetMP3Loop(true);
+
     //StartScreen
 
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","Title");
@@ -1729,14 +1739,6 @@ int main(int argc, char** argv)
     initMapSprites();
     updateOAM(oamTop);
 
-    // init the ASlib
-    AS_Init(AS_MODE_MP3 | AS_MODE_SURROUND | AS_MODE_16CH);
-    
-    // set default sound settings
-    //AS_SetDefaultSettings(AS_PCM_8BIT, 11025, AS_SURROUND);
-
-    AS_MP3StreamPlay("nitro:/SOUND/TEST.mp3");
-    //AS_SetMP3Loop(true);
     while(42) 
     {
 
