@@ -110,9 +110,6 @@
     <ClCompile Include="arm7\source\main.c">
       <Filter>Source Files\arm7</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\as_lib9.c">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\attack.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
@@ -192,6 +189,9 @@
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\type.cpp">
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\as_lib9.c">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
   </ItemGroup>

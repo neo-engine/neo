@@ -108,8 +108,18 @@ void printMapLocation(const MapRegionPos& m){
 }
 u8 frame = 0;
 
-void updateTime(bool mapMode)
+bool used = false;
+bool usin = false;
+
+void updateTime(int mapMode)
 {
+    used = true;
+    static bool mm = false;
+    if(-1 != mapMode)
+        mm = mapMode;
+
+    if(!usin)
+        return;
     //AS_SoundVBL();
 
     cust_font2.set_color(0,0);
@@ -119,7 +129,7 @@ void updateTime(bool mapMode)
     BG_PALETTE_SUB[252] = RGB15(3,3,3);
 
     frame = (frame + 1) % 256;
-    if(mapMode)
+    if(mm)
         animateMap(frame);
 
     time_t unixTime = time(NULL);
@@ -127,7 +137,8 @@ void updateTime(bool mapMode)
 
     achours = timeStruct->tm_hour;
     acminutes = timeStruct->tm_min;
-    if(acseconds != timeStruct->tm_sec){
+    //if(acseconds != timeStruct->tm_sec)
+    {
         acseconds = timeStruct->tm_sec;
         if(showmappointer){
             if(showfirst){
@@ -150,6 +161,22 @@ void updateTime(bool mapMode)
     acday = timeStruct->tm_mday;
     acmonth = timeStruct->tm_mon;
     acyear = timeStruct->tm_year +1900;
+}
+
+
+// regenerate buffers for mp3 stream, must be called each VBlank (only needed if mp3 is used)
+void AS_SoundVBL()
+{
+    usin = true;
+    if(used)
+        updateTime(-1);
+    usin = false;
+    // refill mp3 file  buffer if needed
+    if(IPC_Sound->mp3.needdata) {
+        AS_MP3FillBuffer(IPC_Sound->mp3.mp3buffer + AS_FILEBUFFER_SIZE, AS_FILEBUFFER_SIZE);
+        IPC_Sound->mp3.needdata = false;
+    }
+    scanKeys();
 }
 
 int DayTimes[4][5] = {

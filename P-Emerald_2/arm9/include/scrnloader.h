@@ -77,7 +77,7 @@ extern int BG_ind;
 
 void vramSetup();
 
-void updateTime(bool mapMode = false);
+void updateTime(int mapMode = 0);
 void animateMap(u8 frame);
 
 void initVideoSub();

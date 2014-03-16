@@ -98,7 +98,7 @@ extern POKEMON::PKMN::BOX_PKMN stored_pkmn[MAXSTOREDPKMN];
 extern std::vector<int> box_of_st_pkmn[MAXPKMN];
 extern std::vector<int> free_spaces;
 
-extern void updateTime(bool);
+extern void updateTime(int);
 
 void whoCares(int){	return; }
 void progress(int){ return; }
@@ -227,13 +227,15 @@ ChoiceResult opScreen()
         }
     }
 
+    return OPTIONS;
+
     touchPosition touch;
     while(1)
     {
         scanKeys();
-        touchRead(&touch);
+        touch = touchReadXY();
         int p = keysUp();
-        int k = keysHeld();
+        int k = keysHeld() | keysDown();
         if ((SAV.SavTyp == 1) && (k & KEY_SELECT) && (k & KEY_RIGHT) && (k & KEY_L) && (k & KEY_R))
         {			
             killWeiter();
@@ -259,7 +261,7 @@ ChoiceResult opScreen()
             return CANCEL;
         }
         for (int i = 0; i < MaxVal; i++)
-            if(touch.py > ranges[i].first && touch.py < ranges[i].second)
+            if((k & KEY_A) || (touch.py > ranges[i].first && touch.py < ranges[i].second))
             {
                 while(1)
                 {
@@ -275,6 +277,7 @@ ChoiceResult opScreen()
 
                 return results[i];
             }
+         swiWaitForVBlank();
     }
 }
 
@@ -703,7 +706,7 @@ START:
     AS_Init(AS_MODE_MP3 | AS_MODE_SURROUND | AS_MODE_16CH);
     
     // set default sound settings
-    AS_SetDefaultSettings(AS_PCM_16BIT, 44100, AS_NO_DELAY);
+    AS_SetDefaultSettings(AS_PCM_8BIT, 40000, AS_NO_DELAY);
 
     AS_MP3StreamPlay("nitro:/SOUND/TEST.mp3");
     AS_SetMP3Loop(true);
@@ -731,7 +734,7 @@ START:
         printf("                        Emulator\n");
     if(gMod != RELEASE)
     {
-        std::string s = "\""+CodeName+"\"";
+        std::string s = "\""+CodeName+"\""; 
         s.insert(s.begin(),32-s.length(),' ');
         printf(&(s[0]));
     }
@@ -982,6 +985,12 @@ CONT:
 
 int mode = -1;
 void showNewMap(int mapIdx) {
+    AS_MP3Stop();
+
+    char buf[120];
+    sprintf(buf,"nitro:/SOUND/%d.mp3",mapIdx);
+    AS_MP3StreamPlay(buf);
+
     for(int i= 0; i < 3; ++i)
         for(int j = 0; j < 75; ++j){
             MapRegionPos m = MapLocations[i][j];
@@ -1715,6 +1724,9 @@ int main(int argc, char** argv)
     memcpy(acSlot2Game, (char*)0x080000AC, 4);
 
     startScreen();
+
+    AS_MP3Stop();
+
     heroIsBig = SAV.acMoveMode != WALK;
     
     loadPictureSub(bgGetGfxPtr(bg3sub),"nitro:/PICS/","Clear");
@@ -1741,7 +1753,6 @@ int main(int argc, char** argv)
 
     while(42) 
     {
-
         updateTime(true);
         swiWaitForVBlank();
         swiWaitForVBlank();
