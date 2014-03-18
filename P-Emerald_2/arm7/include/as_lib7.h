@@ -18,32 +18,21 @@
 #define __SOUND7_H__
 
 #include <nds.h>
+#include <nds\arm7\audio.h>
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define 	SOUND_VOL(n)   (n)
-#define 	SOUND_FREQ(n)   ((-0x1000000 / (n)))
-#define 	SOUND_ENABLE   BIT(15)
-#define 	SOUND_REPEAT   BIT(27)
-#define 	SOUND_ONE_SHOT   BIT(28)
-#define 	SOUND_FORMAT_16BIT   (1<<29)
-#define 	SOUND_FORMAT_8BIT   (0<<29)
-#define 	SOUND_FORMAT_PSG   (3<<29)
-#define 	SOUND_FORMAT_ADPCM   (2<<29)
-#define 	SOUND_16BIT   (1<<29)
-#define 	SOUND_8BIT   (0)
-#define 	SOUND_PAN(n)   ((n) << 16)
-#define 	SOUND_CR   (*(vuint16*)0x04000500)
-#define 	SOUND_MASTER_VOL   (*(vuint8*)0x04000500)
-#define 	SOUND_BIAS   (*(vuint16*)0x04000504)
-#define 	SOUND508   (*(vuint16*)0x04000508)
-#define 	SOUND510   (*(vuint16*)0x04000510)
-#define 	SOUND514   (*(vuint16*)0x04000514)
-#define 	SOUND518   (*(vuint16*)0x04000518)
-#define 	SOUND51C   (*(vuint16*)0x0400051C)
+#define 	SOUND_CR   REG_SOUNDCNT
+#define 	SOUND_MASTER_VOL       REG_MASTER_VOLUME
+#define 	SOUND_BIAS   REG_SOUNDBIAS
+#define 	SOUND508   REG_SNDCAP0CNT
+#define 	SOUND510   REG_SNDCAP0DAD
+#define 	SOUND514   REG_SNDCAP0LEN
+#define 	SOUND518   REG_SNDCAP1DAD
+#define 	SOUND51C   REG_SNDCAP1LEN
 
 // mp3 static defines
 #define AS_DECODEBUFFER_SIZE    MAX_NCHAN * MAX_NGRAN * MAX_NSAMP   

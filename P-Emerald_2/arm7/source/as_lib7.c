@@ -21,6 +21,7 @@
 */
 
 #include <nds.h>
+#include <nds/arm7/audio.h>
 #include <string.h>
 #include <stdbool.h>
 

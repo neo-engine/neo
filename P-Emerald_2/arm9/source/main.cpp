@@ -706,9 +706,9 @@ START:
     AS_Init(AS_MODE_MP3 | AS_MODE_SURROUND | AS_MODE_16CH);
     
     // set default sound settings
-    AS_SetDefaultSettings(AS_PCM_8BIT, 40000, AS_NO_DELAY);
+    AS_SetDefaultSettings(AS_PCM_16BIT, 22050, AS_NO_DELAY);
 
-    AS_MP3StreamPlay("nitro:/SOUND/TEST.mp3");
+    AS_MP3StreamPlay("nitro:/SOUND/Intro.mp3"); 
     AS_SetMP3Loop(true);
 
     //StartScreen
@@ -976,10 +976,11 @@ CONT:
         SAV.acMapIdx = 1000;
         SAV.acposx = 2*20, SAV.acposy = 25*20, SAV.acposz = 3;
         break;
-    case NEW_GAME:
+    case NEW_GAME: 
         initNewGame();
     }
     swiWaitForVBlank();
+    swiWaitForIRQ();
 }
 
 
@@ -987,9 +988,6 @@ int mode = -1;
 void showNewMap(int mapIdx) {
     AS_MP3Stop();
 
-    char buf[120];
-    sprintf(buf,"nitro:/SOUND/%d.mp3",mapIdx);
-    AS_MP3StreamPlay(buf);
 
     for(int i= 0; i < 3; ++i)
         for(int j = 0; j < 75; ++j){
@@ -998,12 +996,18 @@ void showNewMap(int mapIdx) {
                 continue;
             acMapRegion = Region(i + 1);
             showmappointer = true;
-            scrn.draw(mode = 1+i);
+            scrn.draw(mode = 1+i); 
             printMapLocation(m);
             oam->oamBuffer[SQCH_ID].x = oam->oamBuffer[SQCH_ID + 1].x = (m.lx+m.rx) / 2 -8;
             oam->oamBuffer[SQCH_ID].y = oam->oamBuffer[SQCH_ID + 1].y = (m.ly + m.ry) /2  -8;
             oam->oamBuffer[SQCH_ID].isHidden = oam->oamBuffer[SQCH_ID + 1].isHidden = false;
             updateOAMSub(oam);
+
+            char buf[120] = {0};
+            sprintf(buf,"nitro:/SOUND/%d.mp3",mapIdx);
+            AS_MP3StreamPlay(buf);
+            swiWaitForIRQ();
+            swiWaitForVBlank();
             return;
         }
 }
@@ -1032,6 +1036,7 @@ void animateHero(int dir,int frame,bool rundisable = false){
             updateOAM(oamTop);
             swiWaitForVBlank();
             swiWaitForVBlank();
+            swiWaitForIRQ();
             return;
         case 1:
             for(int i= 1; i < 4; ++i)
@@ -1053,6 +1058,7 @@ void animateHero(int dir,int frame,bool rundisable = false){
 
             updateOAM(oamTop);
             swiWaitForVBlank();
+            swiWaitForIRQ();
             for(int i= 1; i < 4; ++i)
                 bgScroll(map2d::bgs[i],2,0);
             bgUpdate();
@@ -1751,12 +1757,20 @@ int main(int argc, char** argv)
     initMapSprites();
     updateOAM(oamTop);
 
+    
+    char buf[120] = {0};
+    sprintf(buf,"nitro:/SOUND/%d.mp3",SAV.acMapIdx);
+    AS_MP3StreamPlay(buf);
+    swiWaitForIRQ();
+    swiWaitForVBlank();
+
     while(42) 
     {
         updateTime(true);
         swiWaitForVBlank();
         swiWaitForVBlank();
         swiWaitForVBlank();
+        swiWaitForIRQ();
         updateOAMSub(oam); 
         scanKeys();
         touchRead(&touch);
