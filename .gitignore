@@ -41,3 +41,6 @@ Thumbs.db
 *.lnk
 
 P-Emerald_2/build/
+P-Emerald_2/arm7/build/
+P-Emerald_2/arm9/build
+
