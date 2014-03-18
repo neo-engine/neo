@@ -1,1 +1,0 @@
-Elek.o: Elek.s

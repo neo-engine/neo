@@ -1,1 +1,0 @@
-BagSpr.o: BagSpr.s

@@ -1,1 +1,0 @@
-SPBag.o: SPBag.s

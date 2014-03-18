@@ -1,1 +1,0 @@
-Unbek.o: Unbek.s

@@ -1,1 +1,0 @@
-Gest.o: Gest.s

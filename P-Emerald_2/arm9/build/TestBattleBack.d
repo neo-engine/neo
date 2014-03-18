@@ -1,1 +1,0 @@
-TestBattleBack.o: TestBattleBack.s

@@ -1,1 +1,0 @@
-Normal.o: Normal.s

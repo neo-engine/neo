@@ -1,1 +1,0 @@
-Kampf.o: Kampf.s
