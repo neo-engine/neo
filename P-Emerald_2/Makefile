@@ -7,6 +7,18 @@ endif
 
 include $(DEVKITARM)/ds_rules
 
+ifeq ($(strip $(GAME_TITLE)),)
+GAME_TITLE	:=	Pok\emon
+endif
+
+ifeq ($(strip $(GAME_SUBTITLE1)),)
+GAME_SUBTITLE1	:= Smaragd Edition 2
+endif
+
+ifeq ($(strip $(GAME_ICON)),)
+GAME_ICON      :=      $(DEVKITPRO)/libnds/icon2.bmp
+endif
+
 export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
 

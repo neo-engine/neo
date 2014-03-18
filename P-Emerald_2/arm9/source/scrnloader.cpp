@@ -137,7 +137,7 @@ void updateTime(int mapMode)
 
     achours = timeStruct->tm_hour;
     acminutes = timeStruct->tm_min;
-    //if(acseconds != timeStruct->tm_sec)
+    if(acseconds != timeStruct->tm_sec)
     {
         acseconds = timeStruct->tm_sec;
         if(showmappointer){

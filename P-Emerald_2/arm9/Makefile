@@ -14,18 +14,6 @@ include $(DEVKITARM)/base_rules
 
 LIBNDS	:=	$(DEVKITPRO)/libnds
 
-ifeq ($(strip $(GAME_TITLE)),)
-GAME_TITLE	:=	Pok\emon
-endif
-
-ifeq ($(strip $(GAME_SUBTITLE1)),)
-GAME_SUBTITLE1	:= Smaragd Edition 2
-endif
-
-ifeq ($(strip $(GAME_ICON)),)
-GAME_ICON      :=      $(DEVKITPRO)/libnds/icon2.bmp
-endif
-
 #---------------------------------------------------------------------------------
 %.nds: %.arm9
 	@ndstool -c $@ -9 $< -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES)

@@ -113,6 +113,26 @@ enum ChoiceResult{
 };
 namespace POKEMON{ extern char* getLoc(int ind); }
 
+//---------------------------------------------------------------------------------
+touchPosition tweakReadXY() {
+//---------------------------------------------------------------------------------
+	
+    touchPosition touchPos = {0};
+
+    fifoSendValue32(FIFO_USER_01,0);
+    if(fifoCheckValue32(FIFO_USER_01))
+        touchPos.px = fifoGetValue32(FIFO_USER_01);
+    if(fifoCheckValue32(FIFO_USER_01))
+        touchPos.py = fifoGetValue32(FIFO_USER_01);
+    
+    if(fifoCheckValue32(FIFO_USER_01))
+        touchPos.rawx = fifoGetValue32(FIFO_USER_01);
+    if(fifoCheckValue32(FIFO_USER_01))
+        touchPos.rawx = fifoGetValue32(FIFO_USER_01);
+	return touchPos;
+
+}
+
 void fillWeiter()
 {
     cust_font.set_color(0,0);
@@ -230,13 +250,19 @@ ChoiceResult opScreen()
     return OPTIONS;
 
     touchPosition touch;
+        consoleSelect(&Bottom);
+        consoleSetWindow(&Bottom,0,0,32,24);
     while(1)
     {
+        swiWaitForVBlank();
+
         scanKeys();
-        touch = touchReadXY();
+        touch = tweakReadXY();
+        printf("(%d|%d|%d|%d)\n",touch.px,touch.py,touch.rawx,touch.rawy);
+        fflush(stdout);
         int p = keysUp();
         int k = keysHeld() | keysDown();
-        if ((SAV.SavTyp == 1) && (k & KEY_SELECT) && (k & KEY_RIGHT) && (k & KEY_L) && (k & KEY_R))
+        if ((SAV.SavTyp == 1) && (k & KEY_SELECT) && (k & KEY_RIGHT) && (k & KEY_L) && (k & KEY_R)) 
         {			
             killWeiter();
             consoleClear();
@@ -649,12 +675,12 @@ bool surf::possible(){
 bool heroIsBig = false;
 
 void startScreen(){
-
-    vramSetup();
     
     irqInit();
     irqEnable(IRQ_VBLANK);
     irqSet(IRQ_VBLANK, AS_SoundVBL);    // needed for mp3 streaming
+
+    vramSetup();
 
     videoSetMode(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
     videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D);
@@ -746,8 +772,9 @@ START:
     {
         scanKeys();
         swiWaitForVBlank();
-        int pressed = keysUp();
-        if ((pressed & KEY_A)||(pressed & KEY_START||(pressed & KEY_TOUCH)) )
+        
+        int pressed = keysCurrent();
+        if ((pressed & KEY_A)||(pressed & KEY_START)||(pressed & KEY_TOUCH))
             break;
         ++D0000;
         if (!(D0000 % 120))

@@ -104,6 +104,7 @@ void AS_Init(u8 mode)
         while(IPC_Sound->mp3.cmd & MP3CMD_INIT)
             swiWaitForVBlank();
     }
+    
     AS_SetMasterVolume(127);
 }
 
@@ -267,8 +268,7 @@ void AS_MP3StreamPlay(char *path)
     if(mp3file) {
     
         // allocate the file buffer the first time
-        if(!mp3filebuffer) 
-        {
+        if(!mp3filebuffer) {
             mp3filebuffer = (u8*)memalign(4, AS_FILEBUFFER_SIZE * 2);   // 2 buffers, to swap
             IPC_Sound->mp3.mp3buffer = mp3filebuffer;
             IPC_Sound->mp3.mp3buffersize = AS_FILEBUFFER_SIZE;
@@ -279,7 +279,7 @@ void AS_MP3StreamPlay(char *path)
         IPC_Sound->mp3.mp3filesize = FILE_TELL(mp3file);
         
         // fill the file buffer
-        FILE_SEEK(mp3file, 0, SEEK_SET); 
+        FILE_SEEK(mp3file, 0, SEEK_SET);
         AS_MP3FillBuffer(mp3filebuffer, AS_FILEBUFFER_SIZE * 2);
         
         // start playing

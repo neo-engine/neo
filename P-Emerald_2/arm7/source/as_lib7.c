@@ -21,13 +21,12 @@
 */
 
 #include <nds.h>
-#include <nds/arm7/audio.h>
 #include <string.h>
-#include <stdbool.h>
+#include <nds\arm7\audio.h>
 
-#include "./helix/mp3dec.h"
-#include "./helix/mp3common.h"
-#include "./helix/real/coder.h"
+#include "helix/mp3dec.h"
+#include "helix/mp3common.h"
+#include "helix/real/coder.h"
 #include "as_lib7.h"
 
 
@@ -156,6 +155,7 @@ void AS_SoundVBL()
 // the mp3 decoding engine, must be called on a regular basis (like after VBlank)
 void AS_MP3Engine()
 {
+    resyncClock();
     s32 curtimer, numsamples;
 
     // time-varying mp3 functions are placed oustide the VBL function
