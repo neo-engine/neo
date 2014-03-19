@@ -113,6 +113,22 @@ enum ChoiceResult{
 };
 namespace POKEMON{ extern char* getLoc(int ind); }
 
+bool playMp3(const char* path,const char* name){
+    char buf[100] = {0};
+    sprintf(buf,"%s%s",path,name);
+    auto f = fopen(buf,"rb");
+    if(!f){
+        fclose(f);
+        return false;
+    }
+    fclose(f);
+    AS_MP3StreamPlay(buf);
+    return true;
+}
+#define PLAYMp(buf) if(!playMp3("./PERM2/SOUND/",(buf)))\
+                playMp3("nitro:/SOUND/",(buf));
+
+
 void fillWeiter()
 {
     cust_font.set_color(0,0);
@@ -288,8 +304,12 @@ ChoiceResult opScreen()
     }
 }
 
+
 void initNewGame()
 {
+    AS_MP3Stop();
+    PLAYMp("Opening.mp3");
+
     SAV = savgm();
     SAV.activatedPNav = false;
     SAV.Money = 3000;
@@ -655,18 +675,6 @@ bool surf::possible(){
 
 bool heroIsBig = false;
 
-bool playMp3(const char* path,const char* name){
-    char buf[100] = {0};
-    sprintf(buf,"%s%s",path,name);
-    auto f = fopen(buf,"rb");
-    if(!f){
-        fclose(f);
-        return false;
-    }
-    fclose(f);
-    AS_MP3StreamPlay(buf);
-    return true;
-}
 
 void startScreen(){
 
