@@ -1,22 +1,20 @@
 /*
 
-  Advanced Sound Library (ASlib)
-  ------------------------------
+Advanced Sound Library (ASlib)
+------------------------------
 
-  file        : main.c 
-  author      : Lasorsa Yohan (Noda)
-  description : ARM7 main program
+file        : main.c 
+author      : Lasorsa Yohan (Noda)
+description : ARM7 main program
 
-  history : 
+history : 
 
-    28/11/2007 - v1.0
-      = Original release
+28/11/2007 - v1.0
+= Original release
 
 */
 
 #include <nds.h>
-#include <stdlib.h>
-
 #include "as_lib7.h"
 
 int vcount;
@@ -30,388 +28,370 @@ static u8 min_range = 20;
 
 //---------------------------------------------------------------------------------
 u8 tweakCheckStylus(){
-//---------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------
 
-	SerialWaitBusy();
+    SerialWaitBusy();
 
-	REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH | SPI_CONTINUOUS; //0x8A01;
-	REG_SPIDATA = TSC_MEASURE_TEMP1;
+    REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH | SPI_CONTINUOUS; //0x8A01;
+    REG_SPIDATA = TSC_MEASURE_TEMP1;
 
-	SerialWaitBusy();
+    SerialWaitBusy();
 
-	REG_SPIDATA = 0;
+    REG_SPIDATA = 0;
 
-	SerialWaitBusy();
+    SerialWaitBusy();
 
-	REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH;// 0x8201;
-	REG_SPIDATA = 0;
+    REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH;// 0x8201;
+    REG_SPIDATA = 0;
 
-	SerialWaitBusy();
+    SerialWaitBusy();
 
-	if(last_time_touched == 1){
-		if( !(REG_KEYXY & 0x40) )
-			return 1;
-		else{
-			REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH | SPI_CONTINUOUS;
-			REG_SPIDATA = TSC_MEASURE_TEMP1;
+    if(last_time_touched == 1){
+        if( !(REG_KEYXY & 0x40) )
+            return 1;
+        else{
+            REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH | SPI_CONTINUOUS;
+            REG_SPIDATA = TSC_MEASURE_TEMP1;
 
-			SerialWaitBusy();
+            SerialWaitBusy();
 
-			REG_SPIDATA = 0;
+            REG_SPIDATA = 0;
 
-			SerialWaitBusy();
+            SerialWaitBusy();
 
-			REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH;
-			REG_SPIDATA = 0;
+            REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH;
+            REG_SPIDATA = 0;
 
-			SerialWaitBusy();
+            SerialWaitBusy();
 
-			return !(REG_KEYXY & 0x40) ? 2 : 0;
-		}
-	}else{
-		return !(REG_KEYXY & 0x40) ? 1 : 0;
-	}
+            return !(REG_KEYXY & 0x40) ? 2 : 0;
+        }
+    }else{
+        return !(REG_KEYXY & 0x40) ? 1 : 0;
+    }
+
 }
 
 //---------------------------------------------------------------------------------
 uint16 tweakRead(uint32 command) {
-//---------------------------------------------------------------------------------
-	uint16 result, result2;
+    //---------------------------------------------------------------------------------
+    uint16 result, result2;
 
-	uint32 oldIME = REG_IME;
+    uint32 oldIME = REG_IME;
 
-	REG_IME = 0;
-	
-	SerialWaitBusy();
+    REG_IME = 0;
 
-	// Write the command and wait for it to complete
-	REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH | SPI_CONTINUOUS; //0x8A01;
-	REG_SPIDATA = command;
-	SerialWaitBusy();
+    SerialWaitBusy();
 
-	// Write the second command and clock in part of the data
-	REG_SPIDATA = 0;
-	SerialWaitBusy();
-	result = REG_SPIDATA;
+    // Write the command and wait for it to complete
+    REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH | SPI_CONTINUOUS; //0x8A01;
+    REG_SPIDATA = command;
+    SerialWaitBusy();
 
-	// Clock in the rest of the data (last transfer)
-	REG_SPICNT = SPI_ENABLE | 0x201;
-	REG_SPIDATA = 0;
-	SerialWaitBusy();
+    // Write the second command and clock in part of the data
+    REG_SPIDATA = 0;
+    SerialWaitBusy();
+    result = REG_SPIDATA;
 
-	result2 = REG_SPIDATA >>3;
+    // Clock in the rest of the data (last transfer)
+    REG_SPICNT = SPI_ENABLE | 0x201;
+    REG_SPIDATA = 0;
+    SerialWaitBusy();
 
-	REG_IME = oldIME;
+    result2 = REG_SPIDATA >>3;
 
-	// Return the result
-	return ((result & 0x7F) << 5) | result2;
+    REG_IME = oldIME;
+
+    // Return the result
+    return ((result & 0x7F) << 5) | result2;
 }
 
 
 //---------------------------------------------------------------------------------
 uint32 tweakReadTemperature(int * t1, int * t2) {
-//---------------------------------------------------------------------------------
-	*t1 = tweakRead(TSC_MEASURE_TEMP1);
-	*t2 = tweakRead(TSC_MEASURE_TEMP2);
-	return 8490 * (*t2 - *t1) - 273*4096;
+    //---------------------------------------------------------------------------------
+    *t1 = tweakRead(TSC_MEASURE_TEMP1);
+    *t2 = tweakRead(TSC_MEASURE_TEMP2);
+    return 8490 * (*t2 - *t1) - 273*4096;
 }
 
-
-static bool touchInit = false;
 static s32 xscale, yscale;
 static s32 xoffset, yoffset;
 
 //---------------------------------------------------------------------------------
 int16 readTweakValue(uint32 command, int16 *dist_max, u8 *err){
-//---------------------------------------------------------------------------------
-	int16 values[5];
-	int32 aux1, aux2, aux3, dist, dist2, result = 0;
-	u8 i, j, k;
+    //---------------------------------------------------------------------------------
+    int16 values[5];
+    int32 aux1, aux2, aux3, dist, dist2, result = 0;
+    u8 i, j, k;
 
-	*err = 1;
+    *err = 1;
 
-	SerialWaitBusy();
+    SerialWaitBusy();
 
-	REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH | SPI_CONTINUOUS;
-	REG_SPIDATA = command;
+    REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH | SPI_CONTINUOUS;
+    REG_SPIDATA = command;
 
-	SerialWaitBusy();
+    SerialWaitBusy();
 
-	for(i=0; i<5; i++){
-		REG_SPIDATA = 0;
-		SerialWaitBusy();
+    for(i=0; i<5; i++){
+        REG_SPIDATA = 0;
+        SerialWaitBusy();
 
-		aux1 = REG_SPIDATA;
-		aux1 = aux1 & 0xFF;
-		aux1 = aux1 << 16;
-		aux1 = aux1 >> 8;
+        aux1 = REG_SPIDATA;
+        aux1 = aux1 & 0xFF;
+        aux1 = aux1 << 16;
+        aux1 = aux1 >> 8;
 
-		values[4-i] = aux1;
+        values[4-i] = aux1;
 
-		REG_SPIDATA = command;
-		SerialWaitBusy();
+        REG_SPIDATA = command;
+        SerialWaitBusy();
 
-		aux1 = REG_SPIDATA;
-		aux1 = aux1 & 0xFF;
-		aux1 = aux1 << 16;
+        aux1 = REG_SPIDATA;
+        aux1 = aux1 & 0xFF;
+        aux1 = aux1 << 16;
 
-		aux1 = values[4-i] | (aux1 >> 16);
-		values[4-i] = ((aux1 & 0x7FF8) >> 3);
-	}
+        aux1 = values[4-i] | (aux1 >> 16);
+        values[4-i] = ((aux1 & 0x7FF8) >> 3);
+    }
 
-	REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH;
-	REG_SPIDATA = 0;
-	SerialWaitBusy();
+    REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH;
+    REG_SPIDATA = 0;
+    SerialWaitBusy();
 
-	dist = 0;
-	for(i=0; i<4; i++){
-		aux1 = values[i];
+    dist = 0;
+    for(i=0; i<4; i++){
+        aux1 = values[i];
 
-		for(j=i+1; j<5; j++){
-			aux2 = values[j];
-			aux2 = abs(aux1 - aux2);
-			if(aux2>dist) dist = aux2;
-		}
-	}
+        for(j=i+1; j<5; j++){
+            aux2 = values[j];
+            aux2 = abs(aux1 - aux2);
+            if(aux2>dist) dist = aux2;
+        }
+    }
 
-	*dist_max = dist;
+    *dist_max = dist;
 
-	for(i=0; i<3; i++){
-		aux1 = values[i];
+    for(i=0; i<3; i++){
+        aux1 = values[i];
 
-		for(j=i+1; j<4; j++){
-			aux2 = values[j];
-			dist = abs(aux1 - aux2);
+        for(j=i+1; j<4; j++){
+            aux2 = values[j];
+            dist = abs(aux1 - aux2);
 
-			if( dist <= range ){
-				for(k=j+1; k<5; k++){
-					aux3 = values[k];
-					dist2 = abs(aux1 - aux3);
+            if( dist <= range ){
+                for(k=j+1; k<5; k++){
+                    aux3 = values[k];
+                    dist2 = abs(aux1 - aux3);
 
-					if( dist2 <= range ){
-						result = aux2 + (aux1 << 1);
-						result = result + aux3;
-						result = result >> 2;
-						result = result & (~7);
+                    if( dist2 <= range ){
+                        result = aux2 + (aux1 << 1);
+                        result = result + aux3;
+                        result = result >> 2;
+                        result = result & (~7);
 
-						*err = 0;
+                        *err = 0;
 
-						break;
-					}
-				}
-			}
-		}
-	}
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
-	if((*err) == 1){
-		result = values[0] + values[4];
-		result = result >> 1;
-		result = result & (~7);
-	}
+    if((*err) == 1){
+        result = values[0] + values[4];
+        result = result >> 1;
+        result = result & (~7);
+    }
 
-	return (result & 0xFFF);
+    return (result & 0xFFF);
 }
 
 //---------------------------------------------------------------------------------
 void tweakUpdateRange(uint8 *this_range, int16 last_dist_max, u8 data_error, u8 tsc_touched){
-//---------------------------------------------------------------------------------
-	//range_counter_1 = counter_0x380A98C
-	//range_counter_2 = counter_0x380A990
-	//Initial values:
-	// range = 20
-	// min_range = 20
+    //---------------------------------------------------------------------------------
+    //range_counter_1 = counter_0x380A98C
+    //range_counter_2 = counter_0x380A990
+    //Initial values:
+    // range = 20
+    // min_range = 20
 
-	if(tsc_touched != 0){
-		if( data_error == 0){
-			range_counter_2 = 0;
+    if(tsc_touched != 0){
+        if( data_error == 0){
+            range_counter_2 = 0;
 
-			if( last_dist_max >= ((*this_range) >> 1)){
-				range_counter_1 = 0;
-			}else{
-				range_counter_1++;
+            if( last_dist_max >= ((*this_range) >> 1)){
+                range_counter_1 = 0;
+            }else{
+                range_counter_1++;
 
-				if(range_counter_1 >= 4){
-					range_counter_1 = 0;
+                if(range_counter_1 >= 4){
+                    range_counter_1 = 0;
 
-					if((*this_range) > min_range){
-						(*this_range)--;
-						range_counter_2 = 3;
-					}
-				}
-			}
-		}else{
-			range_counter_1 = 0;
-			range_counter_2++;
+                    if((*this_range) > min_range){
+                        (*this_range)--;
+                        range_counter_2 = 3;
+                    }
+                }
+            }
+        }else{
+            range_counter_1 = 0;
+            range_counter_2++;
 
-			if(range_counter_2 >= 4){
+            if(range_counter_2 >= 4){
 
-				range_counter_2 = 0;
+                range_counter_2 = 0;
 
-				if((*this_range) < 35){  //0x23 = 35
-					*this_range = (*this_range) + 1;
-				}
-			}
-		}
-	}else{
-		range_counter_2 = 0;
-		range_counter_1 = 0;
-	}
+                if((*this_range) < 35){  //0x23 = 35
+                    *this_range = (*this_range) + 1;
+                }
+            }
+        }
+    }else{
+        range_counter_2 = 0;
+        range_counter_1 = 0;
+    }
 }
 
-touchPosition tweakReadXY(){
+void tweakReadDSMode(touchPosition *touchPos) {
+    //---------------------------------------------------------------------------------
+
     int16 dist_max_y, dist_max_x, dist_max;
-	u8 error, error_where, first_check, i;
+    u8 error, error_where, first_check, i;
 
-	touchPosition touchPos = { 0, 0, 0, 0, 0, 0 };
+    uint32 oldIME = REG_IME;
 
-	if ( !touchInit ) {
+    REG_IME = 0;
 
-		xscale = ((PersonalData->calX2px - PersonalData->calX1px) << 19) / ((PersonalData->calX2) - (PersonalData->calX1));
-		yscale = ((PersonalData->calY2px - PersonalData->calY1px) << 19) / ((PersonalData->calY2) - (PersonalData->calY1));
+    first_check = tweakCheckStylus();
+    if(first_check != 0){
+        error_where = 0;
 
-		xoffset = ((PersonalData->calX1 + PersonalData->calX2) * xscale  - ((PersonalData->calX1px + PersonalData->calX2px) << 19) ) / 2;
-		yoffset = ((PersonalData->calY1 + PersonalData->calY2) * yscale  - ((PersonalData->calY1px + PersonalData->calY2px) << 19) ) / 2;
-		touchInit = true;
-	}
-     
-	uint32 oldIME = REG_IME; 
+        touchPos->z1 =  readTweakValue(TSC_MEASURE_Z1 | 1, &dist_max, &error);
+        touchPos->z2 =  readTweakValue(TSC_MEASURE_Z2 | 1, &dist_max, &error);
 
-	REG_IME = 0;
+        touchPos->rawx = readTweakValue(TSC_MEASURE_X | 1, &dist_max_x, &error);
+        if(error==1) error_where += 1;
 
-	first_check = tweakCheckStylus();
-	if(first_check != 0){
-		error_where = 0;
+        touchPos->rawy = readTweakValue(TSC_MEASURE_Y | 1, &dist_max_y, &error);
+        if(error==1) error_where += 2;
 
-		touchPos.z1 =  readTweakValue(TSC_MEASURE_Z1 | 1, &dist_max, &error);
-		touchPos.z2 =  readTweakValue(TSC_MEASURE_Z2 | 1, &dist_max, &error);
+        REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH | SPI_CONTINUOUS;
+        for(i=0; i<12; i++){
+            REG_SPIDATA = 0;
 
-		touchPos.rawx = readTweakValue(TSC_MEASURE_X | 1, &dist_max_x, &error);
-		if(error==1) error_where += 1;
+            SerialWaitBusy();
+        }
 
-		touchPos.rawy = readTweakValue(TSC_MEASURE_Y | 1, &dist_max_y, &error);
-		if(error==1) error_where += 2;
+        REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH;
+        REG_SPIDATA = 0;
 
-		REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH | SPI_CONTINUOUS;
-		for(i=0; i<12; i++){
-			REG_SPIDATA = 0;
+        SerialWaitBusy();
 
-			SerialWaitBusy();
-		}
+        if(first_check == 2) error_where = 3;
 
-		REG_SPICNT = SPI_ENABLE | SPI_BAUD_2MHz | SPI_DEVICE_TOUCH;
-		REG_SPIDATA = 0;
+        switch( tweakCheckStylus() ){
+        case 0:
+            last_time_touched = 0;
+            break;
+        case 1:
+            last_time_touched = 1;
 
-		SerialWaitBusy();
+            if(dist_max_x > dist_max_y)
+                dist_max = dist_max_x;
+            else
+                dist_max = dist_max_y;
 
-		if(first_check == 2) error_where = 3;
+            break;
+        case 2:
+            last_time_touched = 0;
+            error_where = 3;
 
-		switch( tweakCheckStylus() ){
-		case 0:
-			last_time_touched = 0;
-			break;
-		case 1:
-			last_time_touched = 1;
+            break;
+        }
 
-			if(dist_max_x > dist_max_y)
-				dist_max = dist_max_x;
-			else
-				dist_max = dist_max_y;
+    }else{
+        error_where = 3;
+        touchPos->rawx = 0;
+        touchPos->rawy = 0;
+        last_time_touched = 0;
+    }
 
-			break;
-		case 2:
-			last_time_touched = 0;
-			error_where = 3;
+    tweakUpdateRange(&range, dist_max, error_where, last_time_touched);
 
-			break;
-		}
-
-		s16 px = ( touchPos.rawx * xscale - xoffset + xscale/2 ) >>19;
-		s16 py = ( touchPos.rawy * yscale - yoffset + yscale/2 ) >>19;
-
-		if ( px < 0) px = 0;
-		if ( py < 0) py = 0;
-		if ( px > (SCREEN_WIDTH -1)) px = SCREEN_WIDTH -1;
-		if ( py > (SCREEN_HEIGHT -1)) py = SCREEN_HEIGHT -1;
-
-		touchPos.px = px;
-		touchPos.py = py;
-
-
-	}else{
-		error_where = 3;
-		touchPos.rawx = 0;
-		touchPos.rawy = 0;
-		last_time_touched = 0;
-	}
-
-	tweakUpdateRange(&range, dist_max, error_where, last_time_touched);
-
-	REG_IME = oldIME;
-
-
-	return touchPos;
+    REG_IME = oldIME;
 
 }
+
+
+void tweakReadXY(touchPosition *touchPos) {
+    //---------------------------------------------------------------------------------
+    tweakReadDSMode(touchPos);
+
+    s16 px = ( touchPos->rawx * xscale - xoffset + xscale/2 ) >>19;
+    s16 py = ( touchPos->rawy * yscale - yoffset + yscale/2 ) >>19;
+
+    if ( px < 0) px = 0;
+    if ( py < 0) py = 0;
+    if ( px > (SCREEN_WIDTH -1)) px = SCREEN_WIDTH -1;
+    if ( py > (SCREEN_HEIGHT -1)) py = SCREEN_HEIGHT -1;
+
+    touchPos->px = px;
+    touchPos->py = py;
+
+}
+
+
 
 // read stylus position
 void VcountHandler() 
 {
     static touchPosition first, tempPos;
-    static int lastbut = -1;
-    
-    uint16 but=0, x=0, y=0, xpx=0, ypx=0, z1=0, z2=0;
+    	static int lastbut = -1;
+	
+	uint16 but=0, x=0, y=0, xpx=0, ypx=0, z1=0, z2=0;
 
-    but = REG_KEYXY;
+	but = REG_KEYXY;
 
-    if (!( (but ^ lastbut) & (1 << 6))) {
+	if (!( (but ^ lastbut) & (1<<6))) {
  
-        tempPos = tweakReadXY();
+		 tweakReadXY(&tempPos);
 
-        if ( tempPos.rawx == 0 || tempPos.rawy == 0 ) {
-            but |= (1 << 6);
-            lastbut = but;
-        } else {
-            x = tempPos.rawx;
-            y = tempPos.rawy;
-            xpx = tempPos.px;
-            ypx = tempPos.py;
-            z1 = tempPos.z1;
-            z2 = tempPos.z2;
-        }
-        
-    } else {
-        lastbut = but;
-        but |= (1 << 6);
-    }
+		if ( tempPos.rawx == 0 || tempPos.rawy == 0 ) {
+			but |= (1 <<6);
+			lastbut = but;
+		} else {
+			x = tempPos.rawx;
+			y = tempPos.rawy;
+			xpx = tempPos.px;
+			ypx = tempPos.py;
+			z1 = tempPos.z1;
+			z2 = tempPos.z2;
+		}
+		
+	} else {
+		lastbut = but;
+		but |= (1 <<6);
+	}
 
-    if ( vcount == 80 ) {
-        first = tempPos;
-    } else {
-        if ( abs( xpx - first.px) > 10 || abs( ypx - first.py) > 10 || (but & (1 << 6)) ) {
-            but |= (1 << 6);
-            lastbut = but;
-        } else {     
-            IPC->mailBusy = 1;
-            IPC->touchX   = x;
-            IPC->touchY   = y;
-            IPC->touchXpx = xpx;
-            IPC->touchYpx = ypx;
-            IPC->touchZ1  = z1;
-            IPC->touchZ2  = z2;
-            IPC->mailBusy = 0;
-        }
-    }
-    IPC->buttons = but;
-    vcount ^= (80 ^ 130);
-    SetYtrigger(vcount);
+	IPC->touchX			= x;
+	IPC->touchY			= y;
+	IPC->touchXpx		= xpx;
+	IPC->touchYpx		= ypx;
+	IPC->touchZ1		= z1;
+	IPC->touchZ2		= z2;
+	IPC->buttons		= but;
+
 }
 
 
 volatile bool exitflag = false;
 //---------------------------------------------------------------------------------
 void powerButtonCB() {
-//---------------------------------------------------------------------------------
-	exitflag = true;
+    //---------------------------------------------------------------------------------
+    exitflag = true;
 }
 int main(int argc, char ** argv) {
     rtcReset();
@@ -424,8 +404,8 @@ int main(int argc, char ** argv) {
 
     // set interrupts
     irqInit();
-	// Start the RTC tracking IRQ
-	initClockIRQ();
+    // Start the RTC tracking IRQ
+    initClockIRQ();
 
     SetYtrigger(80);
     vcount = 80;
@@ -433,11 +413,17 @@ int main(int argc, char ** argv) {
     irqSet(IRQ_VBLANK, AS_SoundVBL);    // the sound engine
     irqEnable(IRQ_VBLANK | IRQ_VCOUNT);
 
+    xscale = ((PersonalData->calX2px - PersonalData->calX1px) << 19) / ((PersonalData->calX2) - (PersonalData->calX1));
+    yscale = ((PersonalData->calY2px - PersonalData->calY1px) << 19) / ((PersonalData->calY2) - (PersonalData->calY1));
+
+    xoffset = ((PersonalData->calX1 + PersonalData->calX2) * xscale  - ((PersonalData->calX1px + PersonalData->calX2px) << 19) ) / 2;
+    yoffset = ((PersonalData->calY1 + PersonalData->calY2) * yscale  - ((PersonalData->calY1px + PersonalData->calY2px) << 19) ) / 2;
+
     // main loop
     while (1) {        
         if ( 0 == (REG_KEYINPUT & (KEY_SELECT | KEY_START | KEY_L | KEY_R))) {
-			exitflag = true;
-		}
+            exitflag = true;
+        }
         AS_MP3Engine();     // the mp3 engine
 
         // don't wait for for VBlank if your plan to use high bitrates
@@ -448,7 +434,7 @@ int main(int argc, char ** argv) {
         // freeze/glitches with high birates/faster pitched mp3s.
         swiWaitForVBlank();
     }
-    
+
     return 0;
 }
 

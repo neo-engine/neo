@@ -113,26 +113,6 @@ enum ChoiceResult{
 };
 namespace POKEMON{ extern char* getLoc(int ind); }
 
-//---------------------------------------------------------------------------------
-touchPosition tweakReadXY() {
-//---------------------------------------------------------------------------------
-	
-    touchPosition touchPos = {0};
-
-    fifoSendValue32(FIFO_USER_01,0);
-    if(fifoCheckValue32(FIFO_USER_01))
-        touchPos.px = fifoGetValue32(FIFO_USER_01);
-    if(fifoCheckValue32(FIFO_USER_01))
-        touchPos.py = fifoGetValue32(FIFO_USER_01);
-    
-    if(fifoCheckValue32(FIFO_USER_01))
-        touchPos.rawx = fifoGetValue32(FIFO_USER_01);
-    if(fifoCheckValue32(FIFO_USER_01))
-        touchPos.rawx = fifoGetValue32(FIFO_USER_01);
-	return touchPos;
-
-}
-
 void fillWeiter()
 {
     cust_font.set_color(0,0);
@@ -247,19 +227,20 @@ ChoiceResult opScreen()
         }
     }
 
-    return OPTIONS;
+    //return OPTIONS;
 
     touchPosition touch;
-        consoleSelect(&Bottom);
-        consoleSetWindow(&Bottom,0,0,32,24);
+    consoleSelect(&Bottom);
+    consoleSetWindow(&Bottom,0,0,32,24);
     while(1)
     {
         swiWaitForVBlank();
 
         scanKeys();
-        touch = tweakReadXY();
-        printf("(%d|%d|%d|%d)\n",touch.px,touch.py,touch.rawx,touch.rawy);
+        touch = touchReadXY();
+        //printf("(%d|%d|%d|%d)\n",touch.px,touch.py,touch.rawx,touch.rawy);
         fflush(stdout);
+
         int p = keysUp();
         int k = keysHeld() | keysDown();
         if ((SAV.SavTyp == 1) && (k & KEY_SELECT) && (k & KEY_RIGHT) && (k & KEY_L) && (k & KEY_R)) 
@@ -287,12 +268,13 @@ ChoiceResult opScreen()
             return CANCEL;
         }
         for (int i = 0; i < MaxVal; i++)
-            if((k & KEY_A) || (touch.py > ranges[i].first && touch.py < ranges[i].second))
+            if((touch.py > ranges[i].first && touch.py < ranges[i].second))
             {
                 while(1)
                 {
                     scanKeys();
-                    if(keysUp() & KEY_TOUCH)
+                    touch = touchReadXY();
+                    if(touch.px == 0 && touch.py == 0)
                         break;
                 }
                 killWeiter();
@@ -303,7 +285,6 @@ ChoiceResult opScreen()
 
                 return results[i];
             }
-         swiWaitForVBlank();
     }
 }
 
@@ -675,7 +656,7 @@ bool surf::possible(){
 bool heroIsBig = false;
 
 void startScreen(){
-    
+
     irqInit();
     irqEnable(IRQ_VBLANK);
     irqSet(IRQ_VBLANK, AS_SoundVBL);    // needed for mp3 streaming
@@ -730,7 +711,7 @@ START:
 
     // init the ASlib
     AS_Init(AS_MODE_MP3 | AS_MODE_SURROUND | AS_MODE_16CH);
-    
+
     // set default sound settings
     AS_SetDefaultSettings(AS_PCM_16BIT, 22050, AS_NO_DELAY);
 
@@ -768,13 +749,15 @@ START:
     consoleSetWindow(&Top, 0,23,32,1);
     consoleSelect(&Top);
     int D0000 = 0;
+    touchPosition tp;
     while(1)
     {
         scanKeys();
+        tp = touchReadXY();
         swiWaitForVBlank();
-        
+
         int pressed = keysCurrent();
-        if ((pressed & KEY_A)||(pressed & KEY_START)||(pressed & KEY_TOUCH))
+        if ((pressed & KEY_A)||(pressed & KEY_START)||(tp.px ||tp.py))
             break;
         ++D0000;
         if (!(D0000 % 120))
@@ -1761,7 +1744,7 @@ int main(int argc, char** argv)
     AS_MP3Stop();
 
     heroIsBig = SAV.acMoveMode != WALK;
-    
+
     loadPictureSub(bgGetGfxPtr(bg3sub),"nitro:/PICS/","Clear");
     loadPictureSub(bgGetGfxPtr(bg2sub),"nitro:/PICS/","Clear");
     scrn.draw(mode); 
@@ -1784,7 +1767,7 @@ int main(int argc, char** argv)
     initMapSprites();
     updateOAM(oamTop);
 
-    
+
     char buf[120] = {0};
     sprintf(buf,"nitro:/SOUND/%d.mp3",SAV.acMapIdx);
     AS_MP3StreamPlay(buf);
@@ -1929,12 +1912,14 @@ OUT:
         //= {{130,60},{160,80},{160,115},{130,135},{100,115},{100,80}};
         if (sqrt(sq(mainSpritesPositions[3][0]-touch.px) + sq(mainSpritesPositions[3][1]-touch.py)) <= 16 && mode == -1)
         {  
+
             while(1)
             {
-                scanKeys();
                 swiWaitForVBlank();
                 updateTime(true);
-                if(keysUp() & KEY_TOUCH)
+                scanKeys();
+                touch = touchReadXY();
+                if(touch.px == 0 && touch.py == 0)
                     break;
             }
             SAV.Bag.draw();
@@ -1946,10 +1931,11 @@ OUT:
         {  
             while(1)
             {
-                scanKeys();
                 swiWaitForVBlank();
                 updateTime(true);
-                if(keysUp() & KEY_TOUCH)
+                scanKeys();
+                touch = touchReadXY();
+                if(touch.px == 0 && touch.py == 0)
                     break;
             }
 
@@ -1964,10 +1950,11 @@ OUT:
         {  			
             while(1)
             {
-                scanKeys();
                 swiWaitForVBlank();
                 updateTime(true);
-                if(keysUp() & KEY_TOUCH)
+                scanKeys();
+                touch = touchReadXY();
+                if(touch.px == 0 && touch.py == 0)
                     break;
             }
 
@@ -1981,10 +1968,11 @@ OUT:
         {  			
             while(1)
             {
-                scanKeys();
                 swiWaitForVBlank();
                 updateTime(true);
-                if(keysUp() & KEY_TOUCH)
+                scanKeys();
+                touch = touchReadXY();
+                if(touch.px == 0 && touch.py == 0)
                     break;
             }
         }
@@ -1993,10 +1981,11 @@ OUT:
         {  
             while(1)
             {
-                scanKeys();
                 swiWaitForVBlank();
                 updateTime(true);
-                if(keysUp() & KEY_TOUCH)
+                scanKeys();
+                touch = touchReadXY();
+                if(touch.px == 0 && touch.py == 0)
                     break;
             }
             const char *someText[7]= {"\n     PKMN-Spawn","\n    Item-Spawn","\n 1-Item_Test","\n  Battle SPWN.","\n   Battle SPWN 2","\n    42"};
@@ -2096,9 +2085,10 @@ OUT:
             {
                 swiWaitForVBlank();
                 updateTime(true);
-                if(keysUp() & KEY_TOUCH)
-                    break;
                 scanKeys();
+                touch = touchReadXY();
+                if(touch.px == 0 && touch.py == 0)
+                    break;
             }
             mode = 0;
             scrn.draw(mode);
@@ -2109,10 +2099,11 @@ OUT:
         {  
             while(1)
             {
-                scanKeys();
                 swiWaitForVBlank();
                 updateTime(true);
-                if(keysUp() & KEY_TOUCH)
+                scanKeys();
+                touch = touchReadXY();
+                if(touch.px == 0 && touch.py == 0)
                     break;
             }
             if(acMapRegion == NONE)
@@ -2126,10 +2117,11 @@ OUT:
         {  
             while(1)
             {
-                scanKeys();
                 swiWaitForVBlank();
                 updateTime(true);
-                if(keysUp() & KEY_TOUCH)
+                scanKeys();
+                touch = touchReadXY();
+                if(touch.px == 0 && touch.py == 0)
                     break;
             }
             mode = -1;
@@ -2140,10 +2132,11 @@ OUT:
         {  
             while(1)
             {
-                scanKeys();
                 swiWaitForVBlank();
                 updateTime(true);
-                if(keysUp() & KEY_TOUCH)
+                scanKeys();
+                touch = touchReadXY();
+                if(touch.px == 0 && touch.py == 0)
                     break;
             }
             consoleSelect(&Bottom);
@@ -2177,10 +2170,11 @@ OUT:
         {
             while(1)
             {
-                scanKeys();
                 swiWaitForVBlank();
                 updateTime(true);
-                if(keysUp() & KEY_TOUCH)
+                scanKeys();
+                touch = touchReadXY();
+                if(touch.px == 0 && touch.py == 0)
                     break;
             }
             bool sqa = oam->oamBuffer[SQCH_ID].isHidden,
