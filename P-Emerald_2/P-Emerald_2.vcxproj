@@ -11,58 +11,63 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ability.h" />
-    <ClInclude Include="include\attack.h" />
-    <ClInclude Include="include\bag.h" />
-    <ClInclude Include="include\battle.h" />
-    <ClInclude Include="include\berry.h" />
-    <ClInclude Include="include\font_data.h" />
-    <ClInclude Include="include\Gen.h" />
-    <ClInclude Include="include\map2d.h" />
-    <ClInclude Include="include\Map_Obj.h" />
-    <ClInclude Include="include\nitrofs.h" />
-    <ClInclude Include="include\item.h" />
-    <ClInclude Include="include\keyboard.h" />
-    <ClInclude Include="include\Map.h" />
-    <ClInclude Include="include\mbox.h" />
-    <ClInclude Include="include\n3dsampleframework.h" />
-    <ClInclude Include="include\nsbmd.h" />
-    <ClInclude Include="include\PKMN.h" />
-    <ClInclude Include="include\print.h" />
-    <ClInclude Include="include\savgm.h" />
-    <ClInclude Include="include\scrnloader.h" />
-    <ClInclude Include="include\sound.h" />
-    <ClInclude Include="include\sprite.h" />
-    <ClInclude Include="include\type.h" />
-    <ClInclude Include="include\unistd.h" />
+    <ClInclude Include="arm7\include\as_lib7.h" />
+    <ClInclude Include="arm9\include\ability.h" />
+    <ClInclude Include="arm9\include\as_lib9.h" />
+    <ClInclude Include="arm9\include\attack.h" />
+    <ClInclude Include="arm9\include\bag.h" />
+    <ClInclude Include="arm9\include\battle.h" />
+    <ClInclude Include="arm9\include\berry.h" />
+    <ClInclude Include="arm9\include\font_data.h" />
+    <ClInclude Include="arm9\include\Gen.h" />
+    <ClInclude Include="arm9\include\map2d.h" />
+    <ClInclude Include="arm9\include\Map_Obj.h" />
+    <ClInclude Include="arm9\include\nitrofs.h" />
+    <ClInclude Include="arm9\include\item.h" />
+    <ClInclude Include="arm9\include\keyboard.h" />
+    <ClInclude Include="arm9\include\Map.h" />
+    <ClInclude Include="arm9\include\mbox.h" />
+    <ClInclude Include="arm9\include\n3dsampleframework.h" />
+    <ClInclude Include="arm9\include\nsbmd.h" />
+    <ClInclude Include="arm9\include\PKMN.h" />
+    <ClInclude Include="arm9\include\print.h" />
+    <ClInclude Include="arm9\include\savgm.h" />
+    <ClInclude Include="arm9\include\scrnloader.h" />
+    <ClInclude Include="arm9\include\sound.h" />
+    <ClInclude Include="arm9\include\sprite.h" />
+    <ClInclude Include="arm9\include\type.h" />
+    <ClInclude Include="arm9\include\unistd.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\ability.cpp" />
-    <ClCompile Include="source\attack.cpp" />
-    <ClCompile Include="source\Bag.cpp" />
-    <ClCompile Include="source\battle.cpp" />
-    <ClCompile Include="source\Box.cpp" />
-    <ClCompile Include="source\font_data.cpp" />
-    <ClCompile Include="source\Gen.cpp" />
-    <ClCompile Include="source\hex2dec.c" />
-    <ClCompile Include="source\item.cpp" />
-    <ClCompile Include="source\keyboard.cpp" />
-    <ClCompile Include="source\main.cpp" />
-    <ClCompile Include="source\Map.cpp" />
-    <ClCompile Include="source\map2d.cpp" />
-    <ClCompile Include="source\maploader.cpp" />
-    <ClCompile Include="source\Map_Obj.cpp" />
-    <ClCompile Include="source\mbox.cpp" />
-    <ClCompile Include="source\n3dsampleframework_nds.cpp" />
-    <ClCompile Include="source\options.cpp" />
-    <ClCompile Include="source\PKMN.cpp" />
-    <ClCompile Include="source\print.cpp" />
-    <ClCompile Include="source\savgm.cpp" />
-    <ClCompile Include="source\nitrofs.c" />
-    <ClCompile Include="source\scrnloader.cpp" />
-    <ClCompile Include="source\sound.cpp" />
-    <ClCompile Include="source\sprite.cpp" />
-    <ClCompile Include="source\type.cpp" />
+    <ClCompile Include="arm7\source\as_lib7.c" />
+    <ClCompile Include="arm7\source\main.c" />
+    <ClCompile Include="arm9\source\ability.cpp" />
+    <ClCompile Include="arm9\source\as_lib9.c" />
+    <ClCompile Include="arm9\source\attack.cpp" />
+    <ClCompile Include="arm9\source\Bag.cpp" />
+    <ClCompile Include="arm9\source\battle.cpp" />
+    <ClCompile Include="arm9\source\Box.cpp" />
+    <ClCompile Include="arm9\source\font_data.cpp" />
+    <ClCompile Include="arm9\source\Gen.cpp" />
+    <ClCompile Include="arm9\source\hex2dec.c" />
+    <ClCompile Include="arm9\source\item.cpp" />
+    <ClCompile Include="arm9\source\keyboard.cpp" />
+    <ClCompile Include="arm9\source\main.cpp" />
+    <ClCompile Include="arm9\source\Map.cpp" />
+    <ClCompile Include="arm9\source\map2d.cpp" />
+    <ClCompile Include="arm9\source\maploader.cpp" />
+    <ClCompile Include="arm9\source\Map_Obj.cpp" />
+    <ClCompile Include="arm9\source\mbox.cpp" />
+    <ClCompile Include="arm9\source\n3dsampleframework_nds.cpp" />
+    <ClCompile Include="arm9\source\options.cpp" />
+    <ClCompile Include="arm9\source\PKMN.cpp" />
+    <ClCompile Include="arm9\source\print.cpp" />
+    <ClCompile Include="arm9\source\savgm.cpp" />
+    <ClCompile Include="arm9\source\nitrofs.c" />
+    <ClCompile Include="arm9\source\scrnloader.cpp" />
+    <ClCompile Include="arm9\source\sound.cpp" />
+    <ClCompile Include="arm9\source\sprite.cpp" />
+    <ClCompile Include="arm9\source\type.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
@@ -101,7 +106,7 @@
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make rebuild 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>ARM7;ARM9;WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\include;C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\build\;C:\devkitPro\libnds\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\arm7\include;C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\arm7\build;C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\arm9\include;C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\arm9\build;C:\devkitPro\libnds\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <ExecutablePath>C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
