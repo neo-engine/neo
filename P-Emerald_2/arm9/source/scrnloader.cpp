@@ -191,7 +191,7 @@ int getCurrentDaytime(){
     struct tm* timeStruct = gmtime((const time_t *)&unixTime);
 
     int t = timeStruct->tm_hour, m = timeStruct->tm_mon;
-    
+
     for(int i = 0; i < 5; ++i)
         if(DayTimes[m / 4][i] >= t)
             return i;
@@ -1818,8 +1818,13 @@ void scrnloader::run_pkmn()
         {
             while(1)
             {
-                if((keysUp() & KEY_X) || (keysUp() & KEY_TOUCH) )
+                if((keysUp() & KEY_X))
                     break; 
+
+                auto t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
+                    break;
+                swiWaitForVBlank();
                 scanKeys();
             }
             break;
@@ -1828,8 +1833,13 @@ void scrnloader::run_pkmn()
         { 
             while(2)
             {
-                if(keysUp() & KEY_TOUCH || keysUp() & KEY_A)
+                if( keysUp() & KEY_A)
                     break;
+
+                auto t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
+                    break;
+                swiWaitForVBlank();
                 scanKeys();
             }
             consoleClear();
@@ -1927,8 +1937,10 @@ void scrnloader::run_pkmn()
             while(1)
             {
                 scanKeys();
-                if(keysUp() & KEY_TOUCH)
-                    break; 
+                auto t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
+                    break;
+                swiWaitForVBlank();
             }
             char buf[50];
             item acI = ItemList[SAV.PKMN_team[acIn].boxdata.Item];
@@ -1957,8 +1969,10 @@ void scrnloader::run_pkmn()
             while(1)
             {
                 scanKeys();
-                if(keysUp() & KEY_TOUCH)
-                    break; 
+                auto t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
+                    break;
+                swiWaitForVBlank();
             }
             char buf[50];
             item acI = ItemList[SAV.PKMN_team[acIn].boxdata.Item];
@@ -1996,8 +2010,10 @@ void scrnloader::run_pkmn()
                 while(1)
                 {
                     scanKeys();
-                    if(keysUp() & KEY_TOUCH)
-                        break; 
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
+                        break;
+                    swiWaitForVBlank();
                 }
                 int u = 0,o;
                 for(o = 0; o < 4 && u <= i; ++o)
@@ -2685,7 +2701,7 @@ void drawTopDexPage(int page, int pkmn,int forme = 0){
     initOAMTable(oamTop);
     consoleSetWindow(&Top,0,0,32,24);
     consoleSelect(&Top);
-        printf("\x1b[37m");
+    printf("\x1b[37m");
     consoleClear();
     int a = 0, b = 0,c = 0;
     POKEMON::PKMNDATA::PKMNDATA acpkmndata;
@@ -2839,7 +2855,8 @@ void scrnloader::run_dex(int num){
         {  
             while((t.px>224 && t.py>164))
             {
-                if((keysUp() & KEY_TOUCH))
+                auto t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
                     break;
                 scanKeys();
                 swiWaitForVBlank();
@@ -2960,8 +2977,10 @@ void scrnloader::run_dex(int num){
             if(sqrt(sq(dexsppos[0][q]-t.px+16) + sq(dexsppos[1][q]-t.py+16)) <= 16){
                 while(1)
                 {
-                    if(keysUp() & KEY_TOUCH) break;
                     scanKeys();
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
+                        break;
                     swiWaitForVBlank();
                     updateTime();
                 }
@@ -2977,8 +2996,10 @@ void scrnloader::run_dex(int num){
                 if(sqrt(sq(dexsppos[0][q]-t.px+16) + sq(dexsppos[1][q]-t.py+16)) <= 16){
                     while(1)
                     {
-                        if(keysUp() & KEY_TOUCH) break;
                         scanKeys();
+                        auto t = touchReadXY();
+                        if(t.px == 0 && t.py == 0)
+                            break;
                         swiWaitForVBlank();
                         updateTime();
                     }
@@ -3066,7 +3087,7 @@ void initBagSprites(OAMTable* oam,SpriteInfo* spriteInfo,int& oamIndex,int& palc
         Bo4 = &oam->oamBuffer[++oamIndex];
         Bo4->size = OBJSIZE_16;//64;
         Bo4->gfxIndex = 0;//nextAvailableTileIdx;
-        
+
         nextAvailableTileIdx += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
 
         SpriteInfo * Bo3Info = &spriteInfo[++oamIndex];
@@ -3516,7 +3537,8 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     scanKeys();
                     swiWaitForVBlank();
                     updateTime();
-                    if(keysUp() & KEY_TOUCH)
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
                         break;
                 }
                 consoleSelect(&Bottom);
@@ -3536,7 +3558,8 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     swiWaitForVBlank();
                     scanKeys();
                     updateTime();
-                    if(keysUp() & KEY_TOUCH)
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
                         break;
                 }
                 (oam->oamBuffer[24]).isHidden = true;
@@ -3565,7 +3588,8 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     swiWaitForVBlank();
                     scanKeys();
                     updateTime();
-                    if(keysUp() & KEY_TOUCH)
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
                         break;
                 }
                 (oam->oamBuffer[20]).isHidden = true;
@@ -3614,7 +3638,8 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     scanKeys();
                     swiWaitForVBlank();
                     updateTime();
-                    if(keysUp() & KEY_TOUCH)
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
                         break;
                 }
                 consoleSelect(&Bottom);
@@ -3633,7 +3658,8 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     swiWaitForVBlank();
                     scanKeys();
                     updateTime();
-                    if(keysUp() & KEY_TOUCH)
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
                         break;
                 }
                 consoleSetWindow(&Bottom, 1,1,30,24);   
@@ -3661,7 +3687,8 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     swiWaitForVBlank();
                     scanKeys();
                     updateTime();
-                    if(keysUp() & KEY_TOUCH)
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
                         break;
                 }
                 consoleSetWindow(&Bottom, 1,1,30,24);   
@@ -3689,7 +3716,8 @@ int getAnswer(item::ITEM_TYPE bagtype){
                     swiWaitForVBlank();
                     scanKeys();
                     updateTime();
-                    if(keysUp() & KEY_TOUCH)
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
                         break;
                 }
                 consoleSetWindow(&Bottom, 1,1,30,24);   
@@ -3772,7 +3800,8 @@ BACK:
                 scanKeys();
                 swiWaitForVBlank();
                 updateTime();
-                if(keysUp() & KEY_TOUCH)
+                auto t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
                     break;
             }
             consoleSelect(&Bottom);
@@ -3787,7 +3816,8 @@ NEXT:
                 scanKeys();
                 swiWaitForVBlank();
                 updateTime();
-                if(keysUp() & KEY_TOUCH)
+                auto t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
                     break;
             }
             acpage++;
@@ -3836,7 +3866,8 @@ PREV:
                 scanKeys();
                 swiWaitForVBlank();
                 updateTime();
-                if(keysUp() & KEY_TOUCH)
+                auto t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
                     break;
             }
             acpage--;
@@ -3886,7 +3917,8 @@ PREV:
                         scanKeys();
                         swiWaitForVBlank();
                         updateTime();
-                        if(keysUp() & KEY_TOUCH)
+                        auto t = touchReadXY();
+                        if(t.px == 0 && t.py == 0)
                             break;
                     }
                     oam2 = oamIndex;
@@ -3995,7 +4027,8 @@ PREV:
                                         scanKeys();
                                         swiWaitForVBlank();
                                         updateTime();
-                                        if(keysUp() & KEY_TOUCH)
+                                        auto t = touchReadXY();
+                                        if(t.px == 0 && t.py == 0)
                                             break;
                                     }
                                     consoleSelect(&Bottom);
@@ -4018,7 +4051,8 @@ PREV:
                                             swiWaitForVBlank();
                                             scanKeys();
                                             updateTime();
-                                            if(keysUp() & KEY_TOUCH)
+                                            auto t = touchReadXY();
+                                            if(t.px == 0 && t.py == 0)
                                                 break;
                                         }
                                         consoleSetWindow(&Bottom, 1,1,30,24);   
@@ -4230,7 +4264,8 @@ void bag::draw(){
                 scanKeys();
                 swiWaitForVBlank();
                 updateTime();
-                if(keysUp() & KEY_TOUCH)
+                auto t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
                     break;
             }
             consoleSelect(&Bottom);
@@ -4245,7 +4280,8 @@ void bag::draw(){
                     scanKeys();
                     swiWaitForVBlank();
                     updateTime();
-                    if(keysUp() & KEY_TOUCH)
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
                         break;
                 }
                 drawBagPage(i,pos,oamInd,palcnt,tilecnt,oamIndT,palcntT,tilecntT);

@@ -61,6 +61,19 @@ void mbox::clearButName()
     font::putrec(72,0,256,63,true,false,250);
 }
 
+void waitForTouchUp(bool uTime,bool tpar = false){
+    while(1)
+    {
+        swiWaitForVBlank();
+        scanKeys();
+        if(uTime)
+            updateTime(tpar);
+        auto touch = touchReadXY();
+        if(touch.px == 0 && touch.py == 0)
+            break;
+    }
+}
+
 mbox::mbox(item item, const int count){
     this->isNamed = false;
     back = &oam->oamBuffer[0];
@@ -105,14 +118,7 @@ mbox::mbox(item item, const int count){
 
         if ( touch.px>224 && touch.py>164)
         {
-            while(1)
-            {
-                swiWaitForVBlank();
-                scanKeys();
-                updateTime();
-                if(keysUp() & KEY_TOUCH)
-                    break;
-            }
+            waitForTouchUp(true);
             break;
         }
     }
@@ -158,15 +164,8 @@ mbox::mbox(const char* text,bool time,bool remsprites)
 
         if ( touch.px>224 && touch.py>164)
         {
-            while(1)
-            {
-                swiWaitForVBlank();
-                scanKeys();
-                if(time)
-                    updateTime();
-                if(keysUp() & KEY_TOUCH)
-                    break;
-            }
+
+            waitForTouchUp(time);
             break;
         }
     }
@@ -211,15 +210,8 @@ mbox::mbox(const wchar_t* text,bool time,bool remsprites)
 
         if ( touch.px>224 && touch.py>164)
         {
-            while(1)
-            {
-                swiWaitForVBlank();
-                scanKeys();
-                if(time)
-                    updateTime();
-                if(keysUp() & KEY_TOUCH)
-                    break;
-            }
+
+            waitForTouchUp(time);
             break;
         }
     }
@@ -282,15 +274,8 @@ mbox::mbox(const char* text,const char* name,bool time,bool a,bool remsprites,sp
 
             if ( touch.px>224 && touch.py>164)
             {
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime();
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+                waitForTouchUp(time);
                 break;
             }
         }
@@ -361,15 +346,8 @@ mbox::mbox(const wchar_t* text,const wchar_t* name,bool time,bool a,bool remspri
 
             if ( touch.px>224 && touch.py>164)
             {
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime();
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+    
+                 waitForTouchUp(time);
                 break;
             }
         }
@@ -417,15 +395,8 @@ void mbox::put(const char* text,bool a,bool time)
 
             if ( touch.px>224 && touch.py>164)
             {
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime();
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time);
                 break;
             }
         }
@@ -518,15 +489,8 @@ bool ynbox::getResult(const char* Text=0,bool time){
             oam->oamBuffer[21].isHidden = true;
             oam->oamBuffer[22].isHidden = true;
             updateOAMSub(oam);
-            while(1)
-            {
-                swiWaitForVBlank();
-                scanKeys();
-                if(time)
-                    updateTime();
-                if(keysUp() & KEY_TOUCH)
-                    break;
-            }
+
+            waitForTouchUp(time);
             oam->oamBuffer[19].isHidden = true;
             oam->oamBuffer[20].isHidden = true;
             setSpriteVisibility(back,back_);
@@ -546,15 +510,7 @@ bool ynbox::getResult(const char* Text=0,bool time){
             oam->oamBuffer[20].isHidden = true;
             updateOAMSub(oam);
 
-            while(1)
-            {
-                swiWaitForVBlank();
-                scanKeys();
-                if(time)
-                    updateTime();
-                if(keysUp() & KEY_TOUCH)
-                    break;
-            }
+            waitForTouchUp(time);
             oam->oamBuffer[21].isHidden = true;
             oam->oamBuffer[22].isHidden = true;
             setSpriteVisibility(back,back_);
@@ -602,15 +558,8 @@ bool ynbox::getResult(const wchar_t* Text=0,bool time){
             oam->oamBuffer[21].isHidden = true;
             oam->oamBuffer[22].isHidden = true;
             updateOAMSub(oam);
-            while(1)
-            {
-                swiWaitForVBlank();
-                scanKeys();
-                if(time)
-                    updateTime();
-                if(keysUp() & KEY_TOUCH)
-                    break;
-            }
+
+            waitForTouchUp(time);
             oam->oamBuffer[19].isHidden = true;
             oam->oamBuffer[20].isHidden = true;
             setSpriteVisibility(back,back_);
@@ -630,15 +579,8 @@ bool ynbox::getResult(const wchar_t* Text=0,bool time){
             oam->oamBuffer[20].isHidden = true;
             updateOAMSub(oam);
 
-            while(1)
-            {
-                swiWaitForVBlank();
-                scanKeys();
-                if(time)
-                    updateTime();
-                if(keysUp() & KEY_TOUCH)
-                    break;
-            }
+
+            waitForTouchUp(time);
             oam->oamBuffer[21].isHidden = true;
             oam->oamBuffer[22].isHidden = true;
             setSpriteVisibility(back,back_);
@@ -747,15 +689,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                 oam->oamBuffer[21].isHidden = true;
                 oam->oamBuffer[28].isHidden = true;
                 updateOAMSub(oam);
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 consoleSetWindow(&Bottom, 1,1,30,24);   
                 consoleClear();
 
@@ -799,15 +734,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                 (oam->oamBuffer[21]).isHidden = true;
                 (oam->oamBuffer[28]).isHidden = true;
                 updateOAMSub(oam);
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 (oam->oamBuffer[24]).isHidden = true;
                 (oam->oamBuffer[25]).isHidden = true;
                 (oam->oamBuffer[29]).isHidden = true;
@@ -829,15 +757,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                 (oam->oamBuffer[25]).isHidden = true;
                 (oam->oamBuffer[29]).isHidden = true;
                 updateOAMSub(oam);
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 (oam->oamBuffer[20]).isHidden = true;
                 (oam->oamBuffer[21]).isHidden = true;
                 (oam->oamBuffer[28]).isHidden = true;
@@ -881,15 +802,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                 oam->oamBuffer[16].isHidden = true;
                 oam->oamBuffer[27].isHidden = true;
                 updateOAMSub(oam);
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 consoleSetWindow(&Bottom, 1,1,30,24);   
                 consoleClear();
 
@@ -907,15 +821,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                 oam->oamBuffer[21].isHidden = true;
                 oam->oamBuffer[28].isHidden = true;
                 updateOAMSub(oam);
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 consoleSetWindow(&Bottom, 1,1,30,24);   
                 consoleClear();
 
@@ -933,15 +840,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                 oam->oamBuffer[25].isHidden = true;
                 oam->oamBuffer[29].isHidden = true;
                 updateOAMSub(oam);
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 consoleSetWindow(&Bottom, 1,1,30,24);   
                 consoleClear();
 
@@ -985,15 +885,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                 oam->oamBuffer[16].isHidden = true;
                 oam->oamBuffer[27].isHidden = true;
                 updateOAMSub(oam);
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 consoleSetWindow(&Bottom, 1,1,30,24);   
                 consoleClear();
 
@@ -1011,15 +904,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                 oam->oamBuffer[21].isHidden = true;
                 oam->oamBuffer[28].isHidden = true;
                 updateOAMSub(oam);
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 consoleSetWindow(&Bottom, 1,1,30,24);   
                 consoleClear();
 
@@ -1037,15 +923,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                 oam->oamBuffer[25].isHidden = true;
                 oam->oamBuffer[29].isHidden = true;
                 updateOAMSub(oam);
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 consoleSetWindow(&Bottom, 1,1,30,24);   
                 consoleClear();
 
@@ -1058,15 +937,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                 return 2+3*page;
             }
             else if((page == 0 && sqrt(sq(t.px-fwdPos[0][0])+sq(t.py-fwdPos[0][1])) < 17) || (page && sqrt(sq(t.px-fwdPos[1][0])+sq(t.py-fwdPos[1][1])) < 17)){
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 if((++page) >= ((num-1)/3)){
                     (oam->oamBuffer[13]).isHidden = true;
                     (oam->oamBuffer[14]).isHidden = false;
@@ -1101,15 +973,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                 updateOAMSub(oam);
             }
             else if((page == (num-1)/3 && sqrt(sq(t.px-bwdPos[0][0])+sq(t.py-bwdPos[0][1])) < 17) || (page && sqrt(sq(t.px-bwdPos[1][0])+sq(t.py-bwdPos[1][1])) < 17)){
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 if((--page) <= 0){
                     (oam->oamBuffer[14]).isHidden = true;
                     (oam->oamBuffer[13]).isHidden = false;
@@ -1169,15 +1034,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                     (oam->oamBuffer[inds[i]]).isHidden = true;
                     (oam->oamBuffer[inds[i]+1]).isHidden = true;
                     updateOAMSub(oam);
-                    while(1)
-                    {
-                        swiWaitForVBlank();
-                        scanKeys();
-                        if(time)
-                            updateTime(true);
-                        if(keysUp() & KEY_TOUCH)
-                            break;
-                    }
+
+            waitForTouchUp(time,true);
                     consoleSetWindow(&Bottom, 1,1,30,24);   
                     consoleClear();
                     return i+6*page;
@@ -1185,15 +1043,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
             }
 
             if((page == 0 && sqrt(sq(t.px-fwdPos[0][0])+sq(t.py-fwdPos[0][1])) < 17) || (page && sqrt(sq(t.px-fwdPos[1][0])+sq(t.py-fwdPos[1][1])) < 17)){
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 if((++page) >= (num/6)){
                     (oam->oamBuffer[13]).isHidden = true;
                     (oam->oamBuffer[14]).isHidden = false;
@@ -1225,15 +1076,8 @@ int cbox::getResult(const char* Text=0,bool time = true){
                 }
             }
             else if((page == num/6 && sqrt(sq(t.px-bwdPos[0][0])+sq(t.py-bwdPos[0][1])) < 17) || (page && sqrt(sq(t.px-bwdPos[1][0])+sq(t.py-bwdPos[1][1])) < 17)){
-                while(1)
-                {
-                    swiWaitForVBlank();
-                    scanKeys();
-                    if(time)
-                        updateTime(true);
-                    if(keysUp() & KEY_TOUCH)
-                        break;
-                }
+
+            waitForTouchUp(time,true);
                 if((--page) <= 0){
                     (oam->oamBuffer[14]).isHidden = true;
                     (oam->oamBuffer[13]).isHidden = false;

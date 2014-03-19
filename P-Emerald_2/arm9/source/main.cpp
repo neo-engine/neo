@@ -769,6 +769,12 @@ START:
             consoleClear();
     }
 
+    while(tp.px || tp.py){
+        scanKeys();
+        tp = touchReadXY();
+        swiWaitForVBlank();
+    }
+
     consoleSetWindow(&Bottom, 0,0,32,24);
     consoleSelect(&Bottom);
     consoleClear();

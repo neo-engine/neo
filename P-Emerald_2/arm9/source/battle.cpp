@@ -1767,10 +1767,11 @@ namespace BATTLE{
     void waitForTouchUp(){
         while(1)
         {
-            scanKeys();
             swiWaitForVBlank();
-            updateTime();
-            if(keysUp() & KEY_TOUCH)
+            updateTime(false);
+            scanKeys();
+            auto t = touchReadXY();
+            if(t.px == 0 && t.py == 0)
                 break;
         }
     }
@@ -2528,11 +2529,13 @@ OUT2:
                                     if(!(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.AcPP[(i-21)/2])
                                         continue;
 
-                                    while(1) {
-                                        scanKeys();
+                                    while(1)
+                                    {
                                         swiWaitForVBlank();
-                                        updateTime();
-                                        if(keysUp() & KEY_TOUCH)
+                                        updateTime(false);
+                                        scanKeys();
+                                        t = touchReadXY();
+                                        if(t.px == 0 && t.py == 0)
                                             break;
                                     }
                                     int trg = getTarget(PKMNSlot,(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]);
@@ -2711,11 +2714,13 @@ ATTACKCHOSEN:
                             continue;
                         }
 
-                        while(1) {
-                            scanKeys();
+                        while(1)
+                        {
                             swiWaitForVBlank();
-                            updateTime();
-                            if(keysUp() & KEY_TOUCH)
+                            updateTime(false);
+                            scanKeys();
+                            t = touchReadXY();
+                            if(t.px == 0 && t.py == 0)
                                 break;
                         }
                         ret = (1 << u);

@@ -363,6 +363,7 @@ void VcountHandler()
 			but |= (1 <<6);
 			lastbut = but;
 		} else {
+			but &= ~(1 <<6);
 			x = tempPos.rawx;
 			y = tempPos.rawy;
 			xpx = tempPos.px;

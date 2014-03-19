@@ -64,7 +64,8 @@ std::wstring keyboard::getText(int length,const char* msg,bool time)
                 scanKeys();
                 if(time)
                     updateTime();
-                if(keysUp() & KEY_TOUCH)
+                t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
                     break;
             }
             ++i;
@@ -81,7 +82,8 @@ std::wstring keyboard::getText(int length,const char* msg,bool time)
                 scanKeys();
                 if(time)
                     updateTime();
-                if(keysUp() & KEY_TOUCH)
+                t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
                     break;
             }
             ind = (ind +1) % MAXKEYBOARDS;
@@ -104,7 +106,8 @@ std::wstring keyboard::getText(int length,const char* msg,bool time)
                 scanKeys();
                 if(time)
                     updateTime();
-                if(keysUp() & KEY_TOUCH)
+                t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
                     break;
             }
             undraw();
@@ -118,7 +121,8 @@ std::wstring keyboard::getText(int length,const char* msg,bool time)
                 scanKeys();
                 if(time)
                     updateTime();
-                if(keysUp() & KEY_TOUCH)
+                t = touchReadXY();
+                if(t.px == 0 && t.py == 0)
                     break;
             }
             out.erase((out.end() - 1));

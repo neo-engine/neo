@@ -1343,12 +1343,14 @@ NEXT:
                 while(1)
                 {
                     scanKeys();
-                    if(keysUp() & KEY_TOUCH)
-                        break;
                     if(keysUp() & KEY_B)
                         break;
                     if(keysUp() & KEY_X)
                         break;
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
+                        break;
+                    swiWaitForVBlank();
                 }
                 consoleSetWindow(&Bottom,0,0,32,24);
                 consoleSelect(&Bottom);
@@ -1367,10 +1369,12 @@ NEXT:
                 while(1)
                 {
                     scanKeys();
-                    if(keysUp() & KEY_TOUCH)
-                        break;
                     if(keysUp() & KEY_DOWN)
                         break;
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
+                        break;
+                    swiWaitForVBlank();
                 }
                 consoleSetWindow(&Bottom,0,0,32,24);
                 consoleSelect(&Bottom);
@@ -1389,10 +1393,12 @@ NEXT:
                 while(1)
                 {
                     scanKeys();
-                    if(keysUp() & KEY_TOUCH)
-                        break;
                     if(keysUp() & KEY_UP)
                         break;
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
+                        break;
+                    swiWaitForVBlank();
                 }
                 consoleSetWindow(&Bottom,0,0,32,24);
                 consoleSelect(&Bottom);
@@ -1413,10 +1419,12 @@ NEXT:
                 while(1)
                 {
                     scanKeys();
-                    if(keysUp() & KEY_TOUCH)
-                        break;
                     if(keysUp() & KEY_RIGHT)
                         break;
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
+                        break;
+                    swiWaitForVBlank();
                 }
                 this->drawPage(page,&Top,&Bottom,false);
             }
@@ -1427,10 +1435,12 @@ NEXT:
                 while(1)
                 {
                     scanKeys();
-                    if(keysUp() & KEY_TOUCH)
-                        break;
                     if(keysUp() & KEY_LEFT)
                         break;
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
+                        break;
+                    swiWaitForVBlank();
                 }
                 this->drawPage(page,&Top,&Bottom,false);
             }
@@ -1441,8 +1451,10 @@ NEXT:
                 while(1)
                 {
                     scanKeys();
-                    if(keysUp() & KEY_TOUCH)
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
                         break;
+                    swiWaitForVBlank();
                 }
                 this->drawPage(page,&Top,&Bottom,false);
             }
@@ -1452,8 +1464,10 @@ NEXT:
                 while(1)
                 {
                     scanKeys();
-                    if(keysUp() & KEY_TOUCH)
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
                         break;
+                    swiWaitForVBlank();
                 }
                 this->drawPage(page,&Top,&Bottom,false);
             }
@@ -1463,8 +1477,10 @@ NEXT:
                 while(1)
                 {
                     scanKeys();
-                    if(keysUp() & KEY_TOUCH)
+                    auto t = touchReadXY();
+                    if(t.px == 0 && t.py == 0)
                         break;
+                    swiWaitForVBlank();
                 }
                 this->drawPage(page,&Top,&Bottom,false);
             }
