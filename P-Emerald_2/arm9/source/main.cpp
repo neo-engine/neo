@@ -655,6 +655,19 @@ bool surf::possible(){
 
 bool heroIsBig = false;
 
+bool playMp3(const char* path,const char* name){
+    char buf[100] = {0};
+    sprintf(buf,"%s%s",path,name);
+    auto f = fopen(buf,"rb");
+    if(!f){
+        fclose(f);
+        return false;
+    }
+    fclose(f);
+    AS_MP3StreamPlay(buf);
+    return true;
+}
+
 void startScreen(){
 
     irqInit();
@@ -715,8 +728,10 @@ START:
     // set default sound settings
     AS_SetDefaultSettings(AS_PCM_16BIT, 22050, AS_NO_DELAY);
 
-    AS_MP3StreamPlay("nitro:/SOUND/Intro.mp3"); 
+    if(!playMp3("./PERM2/SOUND/","Intro.mp3"))
+        playMp3("nitro:/SOUND/","Intro.mp3");
     AS_SetMP3Loop(true);
+    AS_SetMP3Volume(127);
 
     //StartScreen
 
@@ -798,6 +813,8 @@ START:
     POKEMON::LastPID = rand();
 
     //StartMenu
+    AS_SetMP3Volume(31);
+
     switch(opScreen())
     {
     case TRANSFER_GAME:
@@ -1020,8 +1037,9 @@ void showNewMap(int mapIdx) {
             updateOAMSub(oam);
 
             char buf[120] = {0};
-            sprintf(buf,"nitro:/SOUND/%d.mp3",mapIdx);
-            AS_MP3StreamPlay(buf);
+            sprintf(buf,"%d.mp3",mapIdx);
+            if(!playMp3("./PERM2/SOUND/",buf))
+                playMp3("nitro:/SOUND/",buf);
             swiWaitForIRQ();
             swiWaitForVBlank();
             return;
@@ -1746,6 +1764,8 @@ int main(int argc, char** argv)
     memcpy(acSlot2Game, (char*)0x080000AC, 4);
 
     startScreen();
+
+    AS_SetMP3Volume(127);
 
     AS_MP3Stop();
 
