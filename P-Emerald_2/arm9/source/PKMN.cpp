@@ -1337,7 +1337,7 @@ NEXT:
             updateOAMSub(oam);
             updateTime();
             scanKeys();
-            int pressed = keysDown();
+            int pressed = keysCurrent();
             if((pressed & KEY_B)||(pressed & KEY_X)||(sqrt(sq(248-touch.px) + sq(184-touch.py)) <= 16))
             {
                 while(1)

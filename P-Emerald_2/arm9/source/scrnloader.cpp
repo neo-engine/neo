@@ -1781,6 +1781,8 @@ void scrnloader::run_pkmn()
 
     touchPosition touch;
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
+    swiWaitForVBlank();
+    loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
     drawSub();
     int acIn= 0,max = SAV.PKMN_team.size();
     consoleSelect(&Top);
@@ -1811,7 +1813,7 @@ void scrnloader::run_pkmn()
 
         swiWaitForVBlank();
         scanKeys();	
-        int pressed = keysUp();
+        int pressed = keysCurrent();
         touchRead(&touch);
 
         if (pressed & KEY_X || ( touch.px>224 && touch.py>164) )

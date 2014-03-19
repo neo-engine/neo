@@ -125,8 +125,8 @@ bool playMp3(const char* path,const char* name){
     AS_MP3StreamPlay(buf);
     return true;
 }
-#define PLAYMp(buf) if(!playMp3("./PERM2/SOUND/",(buf)))\
-                playMp3("nitro:/SOUND/",(buf));
+#define PLAYMp(path) if(!playMp3("./PERM2/SOUND/",(path)))\
+    playMp3("nitro:/SOUND/",(path));
 
 
 void fillWeiter()
@@ -255,9 +255,10 @@ ChoiceResult opScreen()
         scanKeys();
         touch = touchReadXY();
         //printf("(%d|%d|%d|%d)\n",touch.px,touch.py,touch.rawx,touch.rawy);
-        fflush(stdout);
+        //fflush(stdout);
 
-        int p = keysUp();
+        scanKeys();
+        int p = keysCurrent();
         int k = keysHeld() | keysDown();
         if ((SAV.SavTyp == 1) && (k & KEY_SELECT) && (k & KEY_RIGHT) && (k & KEY_L) && (k & KEY_R)) 
         {			
@@ -301,6 +302,9 @@ ChoiceResult opScreen()
 
                 return results[i];
             }
+
+            if(AS_GetMP3Status() != MP3ST_PLAYING)
+                return CANCEL;
     }
 }
 
@@ -308,7 +312,6 @@ ChoiceResult opScreen()
 void initNewGame()
 {
     AS_MP3Stop();
-    PLAYMp("Opening.mp3");
 
     SAV = savgm();
     SAV.activatedPNav = false;
@@ -336,7 +339,7 @@ void initNewGame()
     cust_font.set_color(252,2);
     cust_font2.set_color(0,0);
     cust_font2.set_color(253,1);
-    cust_font2.set_color(254,2);
+    cust_font2.set_color(254,2); 
 
     BG_PALETTE_SUB[250] = RGB15(31,31,31);
     BG_PALETTE_SUB[251] = RGB15(30,30,30);
@@ -344,19 +347,23 @@ void initNewGame()
     BG_PALETTE_SUB[253] = RGB15(15,15,15);
     BG_PALETTE_SUB[254] = RGB15(31,31,31);
 
+    PLAYMp("1001.mp3");
+
     cust_font.print_string_d("Haaaaalt!",24,84,true);
     while(1)
     {
+        swiWaitForVBlank();
         scanKeys();
-        if(keysUp() & KEY_TOUCH) break;
-        if(keysUp() & KEY_A) break;
+        if(keysCurrent() & KEY_TOUCH) break;
+        if(keysCurrent() & KEY_A) break;
     }    
     cust_font.print_string_d("Hier lang!",100,84,true);
     while(1)
     {
+        swiWaitForVBlank();
         scanKeys();
-        if(keysUp() & KEY_TOUCH) break;
-        if(keysUp() & KEY_A) break;
+        if(keysCurrent() & KEY_TOUCH) break;
+        if(keysCurrent() & KEY_A) break;
     }
     loadPictureSub(bgGetGfxPtr(bg2sub),"nitro:/PICS/","ClearD",16);
     //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
@@ -396,6 +403,7 @@ void initNewGame()
     loadPictureSub(bgGetGfxPtr(bg2sub),"nitro:/PICS/","ClearD",16); 
     //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
     //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
+
     cust_font.print_string_d("So hier ist erstmal der PokéNav!",8,84,true);
 
     while(1)
@@ -419,17 +427,33 @@ void initNewGame()
 
     consoleSelect(&Bottom);
     std::wstring S_;
+
     loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PokeNav");
     scrn.init();
     setMainSpriteVisibility(true);
     oam->oamBuffer[1].isHidden = true;
     updateOAMSub(oam);
+    AS_MP3Stop();
+    swiWaitForIRQ();
+
+    PLAYMp("KeyItemGet.mp3");
+    AS_SetMP3Loop(false);
     mbox M("Du erhälst einen PokéNav.");
+    while (AS_GetMP3Status() == MP3ST_PLAYING)
+    {
+        swiWaitForIRQ();
+    }
     M.clear();
 
     M.put("Beginne automatische\nInitialisierung.",false);
     for(int i = 0; i < 120;++i)
         swiWaitForVBlank();
+    
+
+    AS_MP3Stop();
+
+    PLAYMp("1000.mp3");
+    AS_SetMP3Loop(true);
     M.put("Setze Heimatregion: Hoenn.",false);
     for(int i = 0; i < 120;++i)
         swiWaitForVBlank();
@@ -727,18 +751,18 @@ void startScreen(){
         SAV.hasPKMN = false;
         SAV.SavTyp = 0;
     }
-START:
-    //Intro
-
     // init the ASlib
-    AS_Init(AS_MODE_MP3 | AS_MODE_SURROUND | AS_MODE_16CH);
+    AS_Init(AS_MODE_MP3  | AS_MODE_16CH);
 
     // set default sound settings
     AS_SetDefaultSettings(AS_PCM_16BIT, 22050, AS_NO_DELAY);
+START:
+    //Intro
+
 
     if(!playMp3("./PERM2/SOUND/","Intro.mp3"))
         playMp3("nitro:/SOUND/","Intro.mp3");
-    AS_SetMP3Loop(true);
+    AS_SetMP3Loop(false);
     AS_SetMP3Volume(127);
 
     //StartScreen
@@ -790,6 +814,8 @@ START:
         }
         else if ((D0000 % 120) == 60)
             consoleClear();
+        if(AS_GetMP3Status() != MP3ST_PLAYING)
+            goto START;
     }
 
     while(tp.px || tp.py){
@@ -1803,8 +1829,9 @@ int main(int argc, char** argv)
 
 
     char buf[120] = {0};
-    sprintf(buf,"nitro:/SOUND/%d.mp3",SAV.acMapIdx);
-    AS_MP3StreamPlay(buf);
+    sprintf(buf,"%d.mp3",SAV.acMapIdx);
+    PLAYMp(buf);
+    AS_SetMP3Loop(true);
     swiWaitForIRQ();
     swiWaitForVBlank();
 
