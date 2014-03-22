@@ -60,28 +60,16 @@
     <ClInclude Include="arm9\include\keyboard.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\include\Map.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\map2d.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\include\Map_Obj.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\mbox.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\n3dsampleframework.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
     <ClInclude Include="arm9\include\nitrofs.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
     <ClInclude Include="arm9\include\PKMN.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\nsbmd.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
     <ClInclude Include="arm9\include\print.h">
@@ -93,9 +81,6 @@
     <ClInclude Include="arm9\include\scrnloader.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\include\sound.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\sprite.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
@@ -104,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="arm9\include\unistd.h">
       <Filter>Header Files\arm9</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\mapconfig.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -143,28 +131,13 @@
     <ClCompile Include="arm9\source\main.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\Map.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\map2d.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\Map_Obj.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\maploader.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\mbox.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\n3dsampleframework_nds.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\nitrofs.c">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\options.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\PKMN.cpp">
@@ -182,9 +155,6 @@
     <ClCompile Include="arm9\source\sprite.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\sound.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\type.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
@@ -193,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="arm7\source\main.c">
       <Filter>Source Files\arm7</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\mapconfig.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
