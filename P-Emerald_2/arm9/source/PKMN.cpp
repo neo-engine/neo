@@ -1154,42 +1154,43 @@ NEXT:
 
         drawSub();
 
-        cust_font2.set_color(0,0);
-        cust_font2.set_color(254,1);
-        cust_font2.set_color(255,2);
-        BG_PALETTE_SUB[253] = this->boxdata.OTisFemale ? RGB15(31,15,0) : RGB15(0,15,31);
-        BG_PALETTE_SUB[254] = RGB15(15,15,15);
-        BG_PALETTE_SUB[255] = RGB15(31,31,31);
 
-        cust_font2.print_string("OT:",28,22,true);
-        cust_font2.set_color(253,2);
-        cust_font2.print_string(boxdata.OT,56,16,true);
-        cust_font2.set_color(255,2);
+        cust_font.set_color(0,0);
+        cust_font.set_color(254,1);
+        cust_font.set_color(255,2);
+        BG_PALETTE_SUB[253] = this->boxdata.OTisFemale ? RGB15(31,15,0) : RGB15(0,15,31);
+        BG_PALETTE_SUB[255] = RGB15(15,15,15);
+        BG_PALETTE_SUB[254] = RGB15(31,31,31);
+
+        cust_font.print_string("OT:",28,22,true);
+        cust_font.set_color(253,2);
+        cust_font.print_string(boxdata.OT,56,16,true);
+        cust_font.set_color(255,2);
 
         char buf[50];
         sprintf(buf, "(%05i/%05i)",this->boxdata.ID,this->boxdata.SID);
-        cust_font2.print_string(buf,50,30,true);
+        cust_font.print_string(buf,50,30,true);
 
         if(this->boxdata.ID == SAV.ID && this->boxdata.SID == SAV.SID) //Trainer is OT
         {
             if (this->boxdata.fateful)
-                cust_font2.print_string("Schicksalhafte Begegnung.",28,120,true);	
+                cust_font.print_string("Schicksalhafte Begegnung.",28,120,true);	
             if(!(this->boxdata.gotDate[0]))
             {
                 if(savMod == SavMod::_NDS)
                     sprintf(buf, "Gefangen am %02i.%02i.%02i mit Lv. %i", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
                 else
                     sprintf(buf, "Gefangen mit Lv. %i", boxdata.gotLevel);
-                cust_font2.print_string(buf,28,44,true);
+                cust_font.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
-                cust_font2.print_string(buf,35,58,true);
+                cust_font.print_string(buf,35,58,true);
                 sprintf(buf, "Besitzt ein %s""es Wesen,",&(NatureList[this->boxdata.getNature()][0]));
-                cust_font2.print_string(buf,28,76,true);
+                cust_font.print_string(buf,28,76,true);
                 sprintf(buf, "%s"".",&(PersonalityList[this->boxdata.getPersonality()][0]));
-                cust_font2.print_string(buf,35,90,true);
+                cust_font.print_string(buf,35,90,true);
 
                 sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
-                cust_font2.print_string(buf,28,104,true);
+                cust_font.print_string(buf,28,104,true);
             }
             else
             {
@@ -1197,34 +1198,34 @@ NEXT:
                     sprintf(buf, "Als Ei erhalten am %02i.%02i.%02i", boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2]);
                 else
                     sprintf(buf, "Als Ei erhalten.");
-                cust_font2.print_string(buf,28,44,true);
+                cust_font.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
-                cust_font2.print_string(buf,35,58,true);
+                cust_font.print_string(buf,35,58,true);
                 if(!(this->boxdata.IV.isEgg))
                 {
 
                     if(savMod == SavMod::_NDS){
                         sprintf(buf,"Geschlüpft am %02i.%02i.%02i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2]);
-                        cust_font2.print_string(buf,28,72,true);
+                        cust_font.print_string(buf,28,72,true);
                         sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
-                        cust_font2.print_string(buf,35,86,true);
+                        cust_font.print_string(buf,35,86,true);
                     }
                     else{
                         sprintf(buf,"Geschlüpft in/bei %s.", getLoc(boxdata.hatchPlace));
-                        cust_font2.print_string(buf,28,72,true);
+                        cust_font.print_string(buf,28,72,true);
                     }
                     if(!this->boxdata.fateful){
                         sprintf(buf, "Besitzt ein %s""es Wesen,",&(NatureList[this->boxdata.getNature()][0]));
-                        cust_font2.print_string(buf,28,100,true);
+                        cust_font.print_string(buf,28,100,true);
                         sprintf(buf, "%s"".",&(PersonalityList[this->boxdata.getPersonality()][0]));
-                        cust_font2.print_string(buf,35,114,true);
+                        cust_font.print_string(buf,35,114,true);
 
                         sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
-                        cust_font2.print_string(buf,28,128,true);
+                        cust_font.print_string(buf,28,128,true);
                     }
                     else{
                         sprintf(buf, "Besitzt ein %s""es Wesen.",&(NatureList[this->boxdata.getNature()][0]));
-                        cust_font2.print_string(buf,28,100,true);
+                        cust_font.print_string(buf,28,100,true);
                     }
                 }
             }	
@@ -1237,16 +1238,16 @@ NEXT:
                     sprintf(buf, "Off. gef. am %02i.%02i.%02i mit Lv. %i.", boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2],boxdata.gotLevel);
                 else
                     sprintf(buf, "Offenbar gefangen mit Lv. %i.",boxdata.gotLevel);
-                cust_font2.print_string(buf,28,44,true);
+                cust_font.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
-                cust_font2.print_string(buf,35,58,true);
+                cust_font.print_string(buf,35,58,true);
                 sprintf(buf, "Besitzt ein %s""es Wesen,",&(NatureList[this->boxdata.getNature()][0]));
-                cust_font2.print_string(buf,28,76,true);
+                cust_font.print_string(buf,28,76,true);
                 sprintf(buf, "%s"".",&(PersonalityList[this->boxdata.getPersonality()][0]));
-                cust_font2.print_string(buf,35,90,true);
+                cust_font.print_string(buf,35,90,true);
 
                 sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
-                cust_font2.print_string(buf,28,104,true);
+                cust_font.print_string(buf,28,104,true);
             } 
             else
             {
@@ -1254,38 +1255,38 @@ NEXT:
                     sprintf(buf, "Off. Als Ei erh. am %02i.%02i.%02i", boxdata.gotDate[0],boxdata.gotDate[1],boxdata.gotDate[2]);
                 else
                     sprintf(buf,"Offenbar als Ei erhalten.");
-                cust_font2.print_string(buf,28,44,true);
+                cust_font.print_string(buf,28,44,true);
                 sprintf(buf, "in/bei %s.", getLoc(boxdata.gotPlace));
-                cust_font2.print_string(buf,35,58,true);
+                cust_font.print_string(buf,35,58,true);
                 if(!(this->boxdata.IV.isEgg))
                 {
                     if(savMod == SavMod::_NDS){
                         sprintf(buf,"Geschlüpft am %02i.%02i.%02i",boxdata.hatchDate[0],boxdata.hatchDate[1],boxdata.hatchDate[2]);
-                        cust_font2.print_string(buf,28,72,true);
+                        cust_font.print_string(buf,28,72,true);
                         sprintf(buf, "in/bei %s.", getLoc(boxdata.hatchPlace));
-                        cust_font2.print_string(buf,35,86,true);
+                        cust_font.print_string(buf,35,86,true);
                     }
                     else{
                         sprintf(buf,"Geschlüpft in/bei %s.", getLoc(boxdata.hatchPlace));
-                        cust_font2.print_string(buf,28,72,true);
+                        cust_font.print_string(buf,28,72,true);
                     }
                     if(!this->boxdata.fateful){
                         sprintf(buf, "Besitzt ein %s""es Wesen,",&(NatureList[this->boxdata.getNature()][0]));
-                        cust_font2.print_string(buf,28,100,true);
+                        cust_font.print_string(buf,28,100,true);
                         sprintf(buf, "%s"".",&(PersonalityList[this->boxdata.getPersonality()][0]));
-                        cust_font2.print_string(buf,35,114,true);
+                        cust_font.print_string(buf,35,114,true);
 
                         sprintf(buf, "Mag %s""e Pokériegel.",&(this->boxdata.getTasteStr()[0]));
-                        cust_font2.print_string(buf,28,128,true);
+                        cust_font.print_string(buf,28,128,true);
                     }
                     else{
                         sprintf(buf, "Besitzt ein %s""es Wesen.",&(NatureList[this->boxdata.getNature()][0]));
-                        cust_font2.print_string(buf,28,100,true);
+                        cust_font.print_string(buf,28,100,true);
                     }
                 }
             }
             if (this->boxdata.fateful)
-                cust_font2.print_string("Off. schicks. Begegnung.",28,120,true);	
+                cust_font.print_string("Off. schicks. Begegnung.",28,120,true);	
         }	
 
         if(!(this->boxdata.IV.isEgg)) {
@@ -1343,9 +1344,9 @@ NEXT:
                 while(1)
                 {
                     scanKeys();
-                    if(keysUp() & KEY_B)
+                    if(!(keysCurrent() & KEY_B))
                         break;
-                    if(keysUp() & KEY_X)
+                    if(!(keysCurrent() & KEY_X))
                         break;
                     auto t = touchReadXY();
                     if(t.px == 0 && t.py == 0)

@@ -1912,7 +1912,13 @@ void scrnloader::run_pkmn()
             }
         }
         else if (pressed & KEY_UP)
-        {
+        {            
+            while(1)
+            {
+                scanKeys();
+                if( keysUp() & KEY_UP)
+                    break;
+            }
             if(--acIn <= -1)
                 acIn = max-1;
             consoleClear();
@@ -1924,7 +1930,13 @@ void scrnloader::run_pkmn()
             initSub(acIn);
         }
         else if (pressed & KEY_DOWN)
-        {
+        {           
+            while(1)
+            {
+                scanKeys();
+                if( keysUp() & KEY_DOWN)
+                    break;
+            }
             if(++acIn >= max)
                 acIn = 0;
             consoleClear();

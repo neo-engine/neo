@@ -2060,7 +2060,7 @@ OUT:
                     for(int i = 0;i<5;++i)
                     {
                         POKEMON::PKMN a(0,HILFSCOUNTER,0,
-                            20,SAV.ID,SAV.SID,SAV.getName().c_str(),!SAV.IsMale,false,rand()%2,rand()%2,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
+                            20,SAV.ID,SAV.SID,L"TEST"/*SAV.getName().c_str()*/,!SAV.IsMale,false,rand()%2,rand()%2,rand()%2,i == 3,HILFSCOUNTER,i+1,i);
                         stored_pkmn[*free_spaces.rbegin()] = a.boxdata;
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         if(POKEMON::PKMNDATA::canLearn(HILFSCOUNTER,57,4))
