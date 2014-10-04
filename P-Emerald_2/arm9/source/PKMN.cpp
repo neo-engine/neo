@@ -34,7 +34,7 @@
 #include "ability.h"
 #include "item.h"
 #include "berry.h"
-#include "attack.h"
+#include "move.h"
 
 #include "PKMN.h"
 #include "battle.h"
@@ -52,7 +52,7 @@
 extern std::string readString(FILE* ,bool _new = false);
 extern std::wstring readWString(FILE*,bool _new = false);
 
-extern attack* AttackList[560];
+extern move* AttackList[560];
 
 extern SpriteInfo spriteInfo[SPRITE_COUNT];
 extern SpriteInfo spriteInfoTop[SPRITE_COUNT];
@@ -1043,13 +1043,13 @@ NEXT:
                         AttackList[this->boxdata.Attack[3]]->PP* ((5 +this->boxdata.ppup.Up4) / 5));
                     switch (AttackList[this->boxdata.Attack[i]]->HitType)
                     {
-                    case attack::PHYS:
+                    case move::PHYS:
                         printf("PHS");
                         break;
-                    case attack::SPEC:
+                    case move::SPEC:
                         printf("SPC");
                         break;
-                    case attack::STAT:
+                    case move::STAT:
                         printf("STS");
                         break;
                     }

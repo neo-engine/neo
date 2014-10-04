@@ -68,6 +68,6 @@ float TypeEffectiveness[19][19] = {
     {   1,  2,  1,  .5, 1,  1,  1,  1,  .5, .75,    1,  .5, 1,  1,  1,  1,  2,  2,  1   }  //Fairy
 };
 
-float getEffectiveness(const Type& t1, const Type& t2){ //t1 is attacking
+float getEffectiveness(const Type& t1, const Type& t2){ //t1 is moveing
     return TypeEffectiveness[(int)t1][(int)t2];
 }

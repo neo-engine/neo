@@ -36,9 +36,6 @@
     <ClInclude Include="arm9\include\as_lib9.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\include\attack.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\bag.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
@@ -93,11 +90,14 @@
     <ClInclude Include="arm9\include\mapconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\include\hmMoves.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\move.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="arm9\source\attack.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\ability.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
@@ -166,6 +166,9 @@
     </ClCompile>
     <ClCompile Include="arm9\source\mapconfig.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\move.cpp">
+      <Filter>Source Files\arm9</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

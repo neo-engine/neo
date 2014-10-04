@@ -35,43 +35,52 @@
 #include "item.h"
 
 #define MAXITEMCOUNT 999
-class bag
-{
+class bag {
 public:
-    
     //Goods,Keys,TMs,Mails,Medicine,Berries,PokéBalls,BattleItems
-    typedef item::ITEM_TYPE BAGTYPE;
-    bag(){
-        for(int i= 0; i< 8; ++i)
-            this->bags[i].clear();
+    typedef item::itemType bagtype;
+
+    std::vector<std::pair<int, int> > m_bags[ 8 ];
+
+    bag( ) {
+        for( int i = 0; i < 8; ++i )
+            this->m_bags[ i ].clear( );
     }
-    ~bag(){}
+    ~bag( ) { }
 
-    /** Adds cnt items with mo. item_id to the bag.
-    */
-    void addItem(BAGTYPE,int item_id,int cnt);
-    /** Removes cnt items with no. item_id from the bag.
-      * cnt == -1: removes all items of desired kind
-      */
-    void removeItem(BAGTYPE,int item_id,int cnt = -1);
-    /** Returnes the number of items with no. item_id in the bag.
-    */
-    int countItem(BAGTYPE,int item_id);
+    /*
+     * Adds cnt items with mo. item_id to the bag.
+     */
+    void            addItem( bagtype, int p_itemId, int p_cnt );
 
-    /** Returnes true if the specified bag is empty.
-    */
-    bool empty(BAGTYPE);
+    /*
+     * Removes cnt items with no. item_id from the bag.
+     * cnt == -1: removes all items of desired kind
+     */
+    void            removeItem( bagtype, int p_itemId, int p_cnt = -1 );
 
-    /** Clears the specified bag.
-    */
-    void clear(BAGTYPE);
-    
-    /** Returnes the number of items in the specified bag.
-    */
-    std::size_t size(BAGTYPE);
+    /*
+     * Returnes the number of items with no. item_id in the bag.
+     */
+    int             countItem( bagtype, int p_itemId );
 
-    std::pair<int,int> element_at(BAGTYPE,int);
-    void draw();
+    /*
+     * Returnes true if the specified bag is empty.
+     */
+    bool            empty( bagtype );
 
-    std::vector<std::pair<int,int> > bags[8];
+    /*
+     * Clears the specified bag.
+     */
+    void            clear( bagtype );
+
+    /*
+     * Returnes the number of items in the specified bag.
+     */
+    std::size_t     size( bagtype );
+
+    std::pair<int, int> 
+                    elementAt( bagtype, int );
+
+    void            draw( );
 };

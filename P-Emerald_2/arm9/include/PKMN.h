@@ -40,7 +40,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "attack.h"
+#include "move.h"
 #include "ability.h"
 #include "item.h"
 #include "berry.h"
@@ -69,9 +69,9 @@ extern font::Font cust_font;
 extern font::Font cust_font2;
 
 extern item ItemList[700];
-extern ablty abilities[164];
+extern ability abilities[164];
 
-extern attack* AttackList[560];
+extern move* AttackList[560];
 extern std::string NatureList[25];
 extern std::string TypeList[19];
 extern std::string PersonalityList[30];

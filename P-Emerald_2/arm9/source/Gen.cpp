@@ -849,14 +849,14 @@ namespace gen3{
             pkm->country = Countries::english;
         }
         pkm->encounter = Encounters::palpark_egg_hatched_specialevent;
-        pkm->evs.attack = gbapkm->data.evs.attack;
+        pkm->evs.move = gbapkm->data.evs.move;
         pkm->evs.defense = gbapkm->data.evs.defense;
         pkm->evs.hp = gbapkm->data.evs.hp;
         pkm->evs.spatk = gbapkm->data.evs.spatk;
         pkm->evs.spdef = gbapkm->data.evs.spdef;
         pkm->evs.speed = gbapkm->data.evs.speed;
         pkm->exp = gbapkm->data.exp;
-        pkm->ivs.attack = gbapkm->data.ivs.attack;
+        pkm->ivs.move = gbapkm->data.ivs.move;
         pkm->ivs.defense = gbapkm->data.ivs.defense;
         pkm->ivs.hp = gbapkm->data.ivs.hp;
         pkm->ivs.spatk = gbapkm->data.ivs.spatk;
@@ -1240,7 +1240,7 @@ namespace gen3{
 
     //void SaveParser::print_pokemon(box_pokemon_t* pokemon)
     //{
-    //    PKMN::pokemon_attacks_t *pa;
+    //    PKMN::pokemon_moves_t *pa;
     //    PKMN::pokemon_effort_t *pe;
     //    PKMN::pokemon_growth_t *pg;
     //    PKMN::pokemon_misc_t *pm;
@@ -1249,22 +1249,22 @@ namespace gen3{
     //
     //    // Figure out the order
     //    o = pokemon->personality % 24;
-    //    pa = (PKMN::pokemon_attacks_t *)(pokemon->data + DataOrderTable[o][0] * sizeof(PKMN::pokemon_attacks_t));
+    //    pa = (PKMN::pokemon_moves_t *)(pokemon->data + DataOrderTable[o][0] * sizeof(PKMN::pokemon_moves_t));
     //    pe = (PKMN::pokemon_effort_t *)(pokemon->data + DataOrderTable[o][1] * sizeof(PKMN::pokemon_effort_t));
     //    pg = (PKMN::pokemon_growth_t *)(pokemon->data + DataOrderTable[o][2] * sizeof(PKMN::pokemon_growth_t));
     //    pm = (PKMN::pokemon_misc_t *)(pokemon->data + DataOrderTable[o][3] * sizeof(PKMN::pokemon_misc_t));
     //
     //    totalIVs = pm->IVs.hp + pm->IVs.atk + pm->IVs.def + pm->IVs.spatk + pm->IVs.spdef + pm->IVs.spd;
-    //    totalEVs = pe->hp + pe->attack + pe->defense + pe->spatk + pe->spdef + pe->speed;
+    //    totalEVs = pe->hp + pe->move + pe->defense + pe->spatk + pe->spdef + pe->speed;
     //    fprintf(stdout, "Species: %s, Nickname: %s, held: %s, Nature: %s\n", pokemon_species[pg->species], nickname, items[pg->held], natures[pokemon->personality % 25]);
-    //    fprintf(stdout, "Attacks: 1:%s, 2:%s, 3:%s, 4:%s\n", attacks[pa->atk1], attacks[pa->atk2], attacks[pa->atk3], attacks[pa->atk4] );
+    //    fprintf(stdout, "Attacks: 1:%s, 2:%s, 3:%s, 4:%s\n", moves[pa->atk1], moves[pa->atk2], moves[pa->atk3], moves[pa->atk4] );
     //    fprintf(stdout, "IVs:\tHP:%d\tAtk:%d\tDef:%d\tSpA:%d\tSpD:%d\tSpe:%d\tTotal:%d\n", pm->IVs.hp, pm->IVs.atk, pm->IVs.def, pm->IVs.spatk, pm->IVs.spdef, pm->IVs.spd, totalIVs );
-    //    fprintf(stdout, "EVs:\tHP:%d\tAtk:%d\tDef:%d\tSpA:%d\tSpD:%d\tSpe:%d\tTotal:%d\n", pe->hp, pe->attack, pe->defense, pe->spatk, pe->spdef, pe->speed, totalEVs );
+    //    fprintf(stdout, "EVs:\tHP:%d\tAtk:%d\tDef:%d\tSpA:%d\tSpD:%d\tSpe:%d\tTotal:%d\n", pe->hp, pe->move, pe->defense, pe->spatk, pe->spdef, pe->speed, totalEVs );
     //
     //    delete[] nickname;
     //}
 
-    int SaveParser::parse_pokemon(char* buf, int offset, void** pokemon, PKMN::pokemon_attacks_t** pa, PKMN::pokemon_effort_t** pe,
+    int SaveParser::parse_pokemon(char* buf, int offset, void** pokemon, PKMN::pokemon_moves_t** pa, PKMN::pokemon_effort_t** pe,
         PKMN::pokemon_growth_t** pg, PKMN::pokemon_misc_t** pm, int num, int size)
     {
         int i;
@@ -1286,7 +1286,7 @@ namespace gen3{
 
             // Figure out the order
             o = ((box_pokemon_t*)pokemon[i])->personality % 24;
-            pa[i] = (PKMN::pokemon_attacks_t *)(((box_pokemon_t*)pokemon[i])->data + DataOrderTable[o][0] * sizeof(PKMN::pokemon_attacks_t));
+            pa[i] = (PKMN::pokemon_moves_t *)(((box_pokemon_t*)pokemon[i])->data + DataOrderTable[o][0] * sizeof(PKMN::pokemon_moves_t));
             pe[i] = (PKMN::pokemon_effort_t *)(((box_pokemon_t*)pokemon[i])->data + DataOrderTable[o][1] * sizeof(PKMN::pokemon_effort_t));
             pg[i] = (PKMN::pokemon_growth_t *)(((box_pokemon_t*)pokemon[i])->data + DataOrderTable[o][2] * sizeof(PKMN::pokemon_growth_t));
             pm[i] = (PKMN::pokemon_misc_t *)(((box_pokemon_t*)pokemon[i])->data + DataOrderTable[o][3] * sizeof(PKMN::pokemon_misc_t));
@@ -1309,7 +1309,7 @@ namespace gen3{
         if (unpackeddata == NULL)
             return -1;
         // Decode belt part
-        parse_pokemon(unpackeddata, belt_offsets[game], (void**)pokemon, pokemon_attacks,
+        parse_pokemon(unpackeddata, belt_offsets[game], (void**)pokemon, pokemon_moves,
             pokemon_effort, pokemon_growth, pokemon_misc, NUM_BELT_POKEMON, sizeof(belt_pokemon_t));
 
         return 0;

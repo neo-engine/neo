@@ -82,7 +82,7 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         u8 pokerus;
         u16 currentHP;
         u16 maxHP;
-        u16 attack;
+        u16 move;
         u16 defense;
         u16 speed;
         u16 spatk;
@@ -131,14 +131,14 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
                 }_pp;
                 u8 pp[4];
             };
-        } pokemon_attacks_t;
+        } pokemon_moves_t;
 
         typedef struct
         {
             union{
                 struct{
                     u8 hp;
-                    u8 attack;
+                    u8 move;
                     u8 defense;
                     u8 speed;
                     u8 spatk;
@@ -267,12 +267,12 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         int pack_save(char *, block *[NUM_BLOCKS_TOTAL], char[SAVEFILE_LEN]);
         char* get_text(u8* raw, bool is_nickname);
         //void print_pokemon(box_pokemon_t*);
-        int parse_pokemon(char*, int, void**, PKMN::pokemon_attacks_t**, PKMN::pokemon_effort_t**, PKMN::pokemon_growth_t**, PKMN::pokemon_misc_t**, int, int);
+        int parse_pokemon(char*, int, void**, PKMN::pokemon_moves_t**, PKMN::pokemon_effort_t**, PKMN::pokemon_growth_t**, PKMN::pokemon_misc_t**, int, int);
         u16 encrypt(u8*, u32, u32);
         int load(int);
         int save();
         belt_pokemon_t *pokemon[NUM_BELT_POKEMON];
-        PKMN::pokemon_attacks_t *pokemon_attacks[NUM_BELT_POKEMON];
+        PKMN::pokemon_moves_t *pokemon_moves[NUM_BELT_POKEMON];
         PKMN::pokemon_effort_t *pokemon_effort[NUM_BELT_POKEMON];
         PKMN::pokemon_growth_t *pokemon_growth[NUM_BELT_POKEMON];
         PKMN::pokemon_misc_t *pokemon_misc[NUM_BELT_POKEMON];
@@ -286,7 +286,7 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
 
     u16 encrypt(u8 *data, u32 pv, u32 otid);
     char* get_text(u8* raw, int max_len);
-    int parse_pokemon(char* buf, int offset, void** pokemon, PKMN::pokemon_attacks_t** pa, PKMN::pokemon_effort_t** pe,
+    int parse_pokemon(char* buf, int offset, void** pokemon, PKMN::pokemon_moves_t** pa, PKMN::pokemon_effort_t** pe,
         PKMN::pokemon_growth_t** pg, PKMN::pokemon_misc_t** pm, int num, int size);
     void print_pokemon(box_pokemon_t* pokemon);
 

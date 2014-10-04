@@ -61,8 +61,8 @@ struct MapRegionPos{int lx,ly,rx,ry,ind;};
 extern MapRegionPos MapLocations[3][MAXMAPPOS];
 void printMapLocation(const MapRegionPos& m);
 
-class attack;
-extern attack* AttackList[560];
+class move;
+extern move* AttackList[560];
 extern void shoUseAttack(int pkmIdx,bool female, bool shiny);
 
 namespace POKEMON{bool drawInfoSub(u16* layer,int PKMN);}

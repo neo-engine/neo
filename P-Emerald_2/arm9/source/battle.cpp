@@ -35,7 +35,7 @@
 
 #include "battle.h"
 #include "PKMN.h"
-#include "attack.h"
+#include "move.h"
 #include "sprite.h"
 #include "item.h"
 #include "scrnloader.h"
@@ -1597,7 +1597,7 @@ namespace BATTLE{
                 for(int i= 0; i < 200; ++i)
                     swiWaitForVBlank();
 
-                if(abilities[(*this->opponent->pkmn_team)[acpokpos[toSwitch][1]].boxdata.ability].T & ablty::BEFORE_BATTLE){
+                if(abilities[(*this->opponent->pkmn_team)[acpokpos[toSwitch][1]].boxdata.ability].T & ability::BEFORE_BATTLE){
                     clear();
                     sprintf(buf,"%s von\n %ls (Gegn.) wirkt!\n",
                         abilities[(*this->opponent->pkmn_team)[acpokpos[toSwitch][1]].boxdata.ability].Name.c_str(),
@@ -1776,7 +1776,7 @@ namespace BATTLE{
                     swiWaitForVBlank();
                 updateOAM(oamTop);
 
-                if(abilities[(*this->player->pkmn_team)[acpokpos[toSwitch][0]].boxdata.ability].T & ablty::BEFORE_BATTLE){
+                if(abilities[(*this->player->pkmn_team)[acpokpos[toSwitch][0]].boxdata.ability].T & ability::BEFORE_BATTLE){
                     clear();
                     sprintf(buf,"%s von\n %ls wirkt!\n",
                         abilities[(*this->player->pkmn_team)[acpokpos[toSwitch][0]].boxdata.ability].Name.c_str(),
@@ -2015,7 +2015,7 @@ namespace BATTLE{
         for(int i= 0; i < 80; ++i)
             swiWaitForVBlank();
 
-        if(abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].T & ablty::BEFORE_BATTLE){
+        if(abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].T & ability::BEFORE_BATTLE){
             clear();
             sprintf(buf,"%s von\n %ls (Gegn.) wirkt!\n",
                 abilities[(*this->opponent->pkmn_team)[acpokpos[0][1]].boxdata.ability].Name.c_str(),
@@ -2025,7 +2025,7 @@ namespace BATTLE{
             for(int i= 0; i < 100; ++i)
                 swiWaitForVBlank();
         }
-        if((this->battlemode == DOUBLE) && abilities[(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.ability].T & ablty::BEFORE_BATTLE){
+        if((this->battlemode == DOUBLE) && abilities[(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.ability].T & ability::BEFORE_BATTLE){
             clear();
             sprintf(buf,"%s von\n %ls (Gegn.) wirkt!\n",
                 abilities[(*this->opponent->pkmn_team)[acpokpos[1][1]].boxdata.ability].Name.c_str(),
@@ -2154,7 +2154,7 @@ namespace BATTLE{
             swiWaitForVBlank();
 
         consoleSelect(&Bottom);
-        if(abilities[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.ability].T & ablty::BEFORE_BATTLE){
+        if(abilities[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.ability].T & ability::BEFORE_BATTLE){
             clear();
             sprintf(buf,"%s von\n %ls wirkt!\n",
                 abilities[(*this->player->pkmn_team)[acpokpos[0][0]].boxdata.ability].Name.c_str(),
@@ -2164,7 +2164,7 @@ namespace BATTLE{
             for(int i= 0; i < 100; ++i)
                 swiWaitForVBlank();
         }
-        if((this->battlemode == DOUBLE) && abilities[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.ability].T & ablty::BEFORE_BATTLE){
+        if((this->battlemode == DOUBLE) && abilities[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.ability].T & ability::BEFORE_BATTLE){
             clear();
             sprintf(buf,"%s von\n %ls wirkt!\n",
                 abilities[(*this->player->pkmn_team)[acpokpos[1][0]].boxdata.ability].Name.c_str(),
@@ -2191,8 +2191,8 @@ namespace BATTLE{
     bool volltreffer_occ = false;
     float eff = 1;
     bool missed = false;
-    int calcDamage(const attack& atk, const POKEMON::PKMN& atg, const POKEMON::PKMN& def,int rndVal){
-        if(atk.HitType == attack::HitTypes::STAT)
+    int calcDamage(const move& atk, const POKEMON::PKMN& atg, const POKEMON::PKMN& def,int rndVal){
+        if(atk.HitType == move::HitTypes::STAT)
             return 0;
         eff = 1;
         missed = false;
@@ -2206,8 +2206,8 @@ namespace BATTLE{
             return 0;
         }
 
-        int atkval = (atk.HitType == attack::HitTypes::SPEC ? atg.stats.SAtk : atg.stats.Atk);
-        int defval = (atk.HitType == attack::HitTypes::SPEC ? def.stats.SDef : def.stats.Def);
+        int atkval = (atk.HitType == move::HitTypes::SPEC ? atg.stats.SAtk : atg.stats.Atk);
+        int defval = (atk.HitType == move::HitTypes::SPEC ? def.stats.SDef : def.stats.Def);
 
         int baseDmg = ((((2 * atg.Level) / 5 + 2) * atk.Base_Power * atkval) / defval) / 50 + 2;
 
@@ -2273,13 +2273,13 @@ namespace BATTLE{
                 ((5 +(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.PPupget((i-21)/2)) / 5));
             switch (AttackList[(*this->player->pkmn_team)[acpokpos[PKMNSlot][0]].boxdata.Attack[(i-21)/2]]->HitType)
             {
-            case attack::PHYS:
+            case move::PHYS:
                 printf("PHS");
                 break;
-            case attack::SPEC:
+            case move::SPEC:
                 printf("SPC");
                 break;
-            case attack::STAT:
+            case move::STAT:
                 printf("STS");
                 break;
             }
@@ -2351,7 +2351,7 @@ namespace BATTLE{
 
             printf("      %ls",acPK.boxdata.Name);
             if(validTrg[u]){
-                if(AttackList[atk]->HitType != attack::HitTypes::STAT)
+                if(AttackList[atk]->HitType != move::HitTypes::STAT)
                     printf("\n      %3d-%2d KP\n        Schaden",std::max(1,calcDamage(*AttackList[atk],atg,acPK,-2)),std::max(1,calcDamage(*AttackList[atk],atg,acPK,-1)));
                 else
                     printf("\n       Keinen\n        Schaden");
@@ -2799,7 +2799,7 @@ ATTACKCHOSEN:
     }
 
     void printEFFLOG(const POKEMON::PKMN& P, int atk){
-        if(AttackList[atk]->HitType == attack::HitTypes::STAT)
+        if(AttackList[atk]->HitType == move::HitTypes::STAT)
             return;
 
         char buf[70];

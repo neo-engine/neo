@@ -29,31 +29,35 @@
     3.	This notice may not be removed or altered from any source
         distribution.
 */
+#pragma once
 
 #include <string>
 
-#ifndef __ABIL__
-#define __ABIL__
-
-class ablty{
+class ability {
 public:
-    enum type{
-        ATTACK=1,
-        BEFORE_BATTLE=2,
-        AFTER_BATTLE=4,
-        GRASS=8,
-        BEFORE_ATTACK=16,
-        AFTER_ATTACK=32
-    }; 
-    const std::string Name;
-    std::string FlavourText;
-    type T;
-    ablty(){}
-    ablty(const std::string S):Name(S){}
-    ablty(const std::string S,int t):Name(S),T((type)t){}
-    ablty(const std::string S,const std::string FText,int t):Name(S),FlavourText(FText),T(type(t)){}
+    enum abilityType {
+        ATTACK = 1,
+        BEFORE_BATTLE = 2,
+        AFTER_BATTLE = 4,
+        GRASS = 8,
+        BEFORE_ATTACK = 16,
+        AFTER_ATTACK = 32
+    };
+    const std::string   m_abilityName;
+    std::string         m_flavourText;
+    abilityType         m_type;
 
-    void run(...);
+    ///Constructors
+    ability( ) { }
+    
+    ability( const std::string p_abilityName )
+        : m_abilityName( p_abilityName ) { }
+
+    ability( const std::string p_abilityName, int p_type )
+        : m_abilityName( p_abilityName ), m_type( (abilityType)p_type ) { }
+
+    ability( const std::string p_abilityName, const std::string p_flavourText, int p_type )
+        : m_abilityName( p_abilityName ), m_flavourText( p_flavourText ), m_type( (abilityType)p_type ) { }
+
+    void run( ... );
 };
-
-#endif

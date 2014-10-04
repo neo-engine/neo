@@ -14,12 +14,13 @@
     <ClInclude Include="arm7\include\as_lib7.h" />
     <ClInclude Include="arm9\include\ability.h" />
     <ClInclude Include="arm9\include\as_lib9.h" />
-    <ClInclude Include="arm9\include\attack.h" />
+    <ClInclude Include="arm9\include\move.h" />
     <ClInclude Include="arm9\include\bag.h" />
     <ClInclude Include="arm9\include\battle.h" />
     <ClInclude Include="arm9\include\berry.h" />
     <ClInclude Include="arm9\include\font_data.h" />
     <ClInclude Include="arm9\include\Gen.h" />
+    <ClInclude Include="arm9\include\hmMoves.h" />
     <ClInclude Include="arm9\include\map2d.h" />
     <ClInclude Include="arm9\include\mapconfig.h" />
     <ClInclude Include="arm9\include\nitrofs.h" />
@@ -39,7 +40,7 @@
     <ClCompile Include="arm7\source\main.c" />
     <ClCompile Include="arm9\source\ability.cpp" />
     <ClCompile Include="arm9\source\as_lib9.c" />
-    <ClCompile Include="arm9\source\attack.cpp" />
+    <ClCompile Include="arm9\source\move.cpp" />
     <ClCompile Include="arm9\source\Bag.cpp" />
     <ClCompile Include="arm9\source\battle.cpp" />
     <ClCompile Include="arm9\source\Box.cpp" />
@@ -97,8 +98,9 @@
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make rebuild 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>ARM7;ARM9;WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\arm7\include;C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\arm7\build;C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\arm9\include;C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\arm9\build;C:\devkitPro\libnds\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
-    <ExecutablePath>C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2;$(ExecutablePath)</ExecutablePath>
+    <NMakeIncludeSearchPath>$(DEVKITPRO)\libnds\include;$(ProjectDir)arm9\include;$(ProjectDir)arm7\include;$(IncludePath);$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <ExecutablePath>$(ProjectDir);$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(ProjectDir)arm9\include;$(ProjectDir)arm7\include;$(DEVKITARM)\libnds\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>make</NMakeBuildCommandLine>

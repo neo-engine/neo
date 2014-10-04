@@ -4252,7 +4252,7 @@ void bag::draw(){
     for(int i= 0; i< 8; ++i){
         consoleSetWindow(&Top,0,3*i,12,3);
         int acIn = 214 + 4*i;
-        int s = (int)this->bags[i].size();
+        int s = (int)this->m_bags[i].size();
         char buf[50];
         printf("%c%c\n%c%c ",(acIn),(acIn+1),(acIn+2),(acIn+3));
         if(s == 0)

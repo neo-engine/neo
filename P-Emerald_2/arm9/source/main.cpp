@@ -961,7 +961,7 @@ CONT:
 
                             acPkmn.stats.acHP = acBeltP->currentHP;
                             acPkmn.stats.maxHP = acBeltP->maxHP;
-                            acPkmn.stats.Atk = acBeltP->attack;
+                            acPkmn.stats.Atk = acBeltP->move;
                             acPkmn.stats.Def = acBeltP->defense;
                             acPkmn.stats.SAtk = acBeltP->spatk;
                             acPkmn.stats.SDef = acBeltP->spdef;
@@ -974,7 +974,7 @@ CONT:
                             acPkmn.boxdata.steps = acBG->happiness;
                             acPkmn.boxdata.PPUps = acBG->ppbonuses;
 
-                            gen3::PKMN::pokemon_attacks_t* &acBA = save3->pokemon_attacks[i];
+                            gen3::PKMN::pokemon_moves_t* &acBA = save3->pokemon_moves[i];
                             for(int i= 0; i < 4; ++i){
                                 acPkmn.boxdata.Attack[i] = acBA->atk[i];
                                 acPkmn.boxdata.AcPP[i] = acBA->pp[i];

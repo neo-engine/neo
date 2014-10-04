@@ -37,16 +37,16 @@
 
 extern const char ITEM_PATH[];
 
-class item{
+class item {
 public:
-    enum EFFEKT{
+    enum itemEffectType {
         NONE = 0,
         IN_BATTLE = 1,
         HOLD = 2,
         OUT_OF_BATTLE = 4,
         USE_ON_PKMN = 8
     };
-    enum ITEM_TYPE{
+    enum itemType {
         GOODS,
         KEY_ITEM,
         TM_HM,
@@ -57,34 +57,98 @@ public:
         BATTLE_ITEM
     };
 
-    std::string Name;//, displayName, dscrpt;
+    std::string     m_itemName;//, displayName, dscrpt;
     //EFFEKT effekt;
-    ITEM_TYPE itemtype;
+    itemType        m_itemType;
     //std::string effekt_script;
     //int price;
 
-    bool load;
-    std::string getDisplayName(bool new_ = false);
-    std::string getDescription(bool new_ = false);
-    std::string getShortDescription(bool new_ = false);
-    EFFEKT getEffekt();
-    ITEM_TYPE getItemType();
-    int getPrice();
-    int getID();
+    bool            m_loaded; //Specifies whether the item data has been loaded
 
-    virtual bool _load();
+    //Functions
+    std::string     getDisplayName( bool p_new = false );
 
-    item(const std::string& name): Name(name){/* load = false;*/}
-    item():Name("Null"){ /*load = false;*/ }
+    std::string     getDescription( bool p_new = false );
 
-    void use(...);
+    std::string     getShortDescription( bool p_new = false );
+
+    itemEffectType  getEffectType( );
+
+    itemType        getItemType( );
+
+    int             getPrice( );
+
+    int             getItemId( );
+
+    virtual bool    load( );
+
+    void            use( ... );
+
+    //Constructors
+
+    item( const std::string& p_itemName )
+        : m_itemName( p_itemName ) {/* load = false;*/
+    }
+
+    item( )
+        : m_itemName( "Null" ) { /*load = false;*/
+    }
+
 };
 
-class ball : public item{public: ball(const std::string& Name):item(Name){ this->itemtype = POKE_BALLS;}};
-class medicine : public item{public:  medicine(const std::string& Name):item(Name){ this->itemtype = MEDICINE;}};
-class TM : public item{public:  TM(const std::string& Name):item(Name){ this->itemtype = TM_HM;}};
-class battle_item : public item{public:  battle_item(const std::string& Name):item(Name){ this->itemtype = BATTLE_ITEM;} };
-class key_item : public item{public:  key_item(const std::string& Name):item(Name){ this->itemtype = KEY_ITEM;} };
-class mail : public item{public:  mail(const std::string& Name):item(Name){ this->itemtype = MAILS;} };
+class ball
+    : public item {
+public:
+    ball( const std::string& Name )
+        : item( Name ) {
+        this->m_itemType = POKE_BALLS;
+    }
+};
+
+class medicine 
+    : public item {
+public:  
+    medicine( const std::string& Name )
+        : item( Name ) {
+        this->m_itemType = MEDICINE;
+    }
+};
+
+class TM 
+    : public item {
+public: 
+    TM( const std::string& Name )
+        : item( Name ) {
+        this->m_itemType = TM_HM;
+    }
+};
+
+class battleItem 
+    : public item {
+public:  
+    battleItem( const std::string& Name )
+        : item( Name ) {
+        this->m_itemType = BATTLE_ITEM;
+    }
+};
+
+class keyItem 
+    : public item {
+public:  
+    keyItem( const std::string& Name ) 
+        : item( Name ) {
+        this->m_itemType = KEY_ITEM;
+    }
+};
+
+class mail 
+    : public item {
+public:  
+    mail( const std::string& Name )
+        : item( Name ) {
+        this->m_itemType = MAILS;
+    }
+};
+
 
 extern item ItemList[700];

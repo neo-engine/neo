@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommand>C:\Users\Philip\Desktop\ROM Hackers GBA Tool Pack\no%24gba 2.6a debug version\NO%24GBA 2.6A Debug Version\NO%24GBA.EXE</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>C:\Users\Philip\Desktop\P-Erm\P-Emerald_2\P-Emerald_2\P-Emerald_2.nds</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommand>$(ProjectDir)\NO%24GBA 2.6A Debug Version\NO%24GBA.EXE</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>$(ProjectDir)P-Emerald_2.nds</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

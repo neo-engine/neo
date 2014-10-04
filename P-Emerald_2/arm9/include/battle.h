@@ -33,7 +33,7 @@
 #pragma once
 #include <vector>
 #include <nds.h>
-#include "attack.h"
+#include "move.h"
 
 namespace POKEMON{
     class PKMN;
@@ -46,7 +46,7 @@ namespace BATTLE{
     void displayHP(int HPstart,int HP,int x,int y,int freecolor1,int freecolor2,bool delay,int innerR,int outerR); //HP in %
     void displayEP(int EPstart,int EP,int x,int y,int freecolor1,int freecolor2,bool delay,int innerR = 14,int outerR = 15);
 
-    int calcDamage(const attack& atk, const POKEMON::PKMN& atg, const POKEMON::PKMN& def,int rndVal);
+    int calcDamage(const move& atk, const POKEMON::PKMN& atg, const POKEMON::PKMN& def,int rndVal);
 
     class battle_trainer{
     public:
@@ -87,7 +87,7 @@ namespace BATTLE{
             NA = 3
         } acpoksts[6][2];
 
-        attack::Ailment ailments[6][2];
+        move::Ailment ailments[6][2];
         int ailmentcnt[6][2];
 
     public:

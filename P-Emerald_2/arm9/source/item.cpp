@@ -43,49 +43,52 @@
 
 #include "item.h"
 #include "berry.h"
+#include "buffer.h"
 
 const char ITEM_PATH[] = "nitro:/ITEMS/";
 
-std::string readString(FILE* fd, bool _new ){
+std::string readString( FILE* p_file, bool p_new ) {
     std::string ret = "";
-    char ac; 
-    while((ac= fgetc(fd)) == '\n' || ac == '\r');
-    if (ac == '*'){
+    char ac;
+    
+    while( ( ac = fgetc( p_file ) ) == '\n' || ac == '\r' );
+    
+    if( ac == '*' ) {
         ret += '\0';
         return ret;
-    }
-    else ret += ac;
-    while(((ac = fgetc(fd)) != '*')){
-        if(!_new){
-            if(ac == 'ä')
+    } else ret += ac;
+
+    while( ( ac = fgetc( p_file ) ) != '*' ) {
+        if( !p_new ) {
+            if( ac == 'ä' )
                 ret += '\x84';
-            else if(ac == 'Ä')
+            else if( ac == 'Ä' )
                 ret += '\x8E';
-            else if(ac == 'ü')
+            else if( ac == 'ü' )
                 ret += '\x81';
-            else if(ac == 'Ü')
+            else if( ac == 'Ü' )
                 ret += '\x9A';
-            else if(ac == 'ö')
+            else if( ac == 'ö' )
                 ret += '\x94';
-            else if(ac == 'Ö')
+            else if( ac == 'Ö' )
                 ret += '\x99';
-            else if(ac == 'ß')
+            else if( ac == 'ß' )
                 ret += '\x9D';
-            else if(ac == 'é')
+            else if( ac == 'é' )
                 ret += '\x82';
-            else if(ac == '%')
+            else if( ac == '%' )
                 ret += ' ';
-            else if(ac == '|')
-                ret += (char)136; 
-            else if(ac == '#')
+            else if( ac == '|' )
+                ret += (char)136;
+            else if( ac == '#' )
                 ret += (char)137;
             else
                 ret += ac;
             continue;
         }
-        if(ac == '|')
+        if( ac == '|' )
             ret += (char)136;
-        else if(ac == '#')
+        else if( ac == '#' )
             ret += (char)137;
         else
             ret += ac;
@@ -93,57 +96,57 @@ std::string readString(FILE* fd, bool _new ){
     ret += '\0';
     return ret;
 }
-std::wstring readWString(FILE* fd, bool _new ){
+
+std::wstring readWString( FILE* p_file, bool p_new ) {
     std::wstring ret = L"";
-    char ac; 
-    while((ac= fgetc(fd)) == '\n' || ac == '\r');
-    if (ac == '*'){
+    char ac;
+    while( ( ac = fgetc( p_file ) ) == '\n' || ac == '\r' );
+    if( ac == '*' ) {
         ret += L'\0';
         return ret;
-    }
-    else ret += ac;
-    while(((ac = fgetc(fd)) != '*')){
-        if(!_new){ 
-            if(ac == 'ä')
+    } else ret += ac;
+    while( ( ac = fgetc( p_file ) ) != '*' ) {
+        if( !p_new ) {
+            if( ac == 'ä' )
                 ret += '\x84';
-            else if(ac == 'Ä')
+            else if( ac == 'Ä' )
                 ret += '\x8E';
-            else if(ac == 'ü')
+            else if( ac == 'ü' )
                 ret += '\x81';
-            else if(ac == 'Ü')
+            else if( ac == 'Ü' )
                 ret += '\x9A';
-            else if(ac == 'ö')
+            else if( ac == 'ö' )
                 ret += '\x94';
-            else if(ac == 'Ö')
+            else if( ac == 'Ö' )
                 ret += '\x99';
-            else if(ac == 'ß')
+            else if( ac == 'ß' )
                 ret += '\x9D';
-            else if(ac == 'é')
+            else if( ac == 'é' )
                 ret += '\x82';
-            else if(ac == '%')
+            else if( ac == '%' )
                 ret += ' ';
             else
                 ret += ac;
             continue;
         }
-        if(ac == '|')
+        if( ac == '|' )
             ret += (char)136;
-        else if(ac == '#')
+        else if( ac == '#' )
             ret += (char)137;
         else
             ret += ac;
     }
-    ret += L'\0';  
+    ret += L'\0';
     return ret;
 }
 
-int item::getID(){
-    for(int i= 0; i <700; ++i)
-        if(ItemList[i].Name == this->Name)
+int item::getItemId( ) {
+    for( int i = 0; i < 700; ++i )
+        if( ItemList[ i ].m_itemName == this->m_itemName )
             return i;
 }
 
-bool item::_load(){
+bool item::load(){
     //    std::stringstream FILENAME;
     //    FILENAME << ITEM_PATH << this->Name << ".data";
     //    FILE* f = fopen(FILENAME.str().c_str(),"r");
@@ -158,152 +161,164 @@ bool item::_load(){
     //    this->dscrpt = readString(f);
     //    this->effekt_script = readString(f);
     //    fclose(f);
-    return load = true;
+    return this->m_loaded = true;
 }
-char buf[100];
-bool berry::_load(){
-    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
-    FILE* f = fopen(buf,"r");
 
-    if(f == 0)
-        return load = false;
+bool berry::load( ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, this->m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+
+    if( f == 0 )
+        return this->m_loaded = false;
     //this->itemtype = BERRIES;
-    int ac; 
-    fscanf(f,"%i",&ac);
+    int ac;
+    fscanf( f, "%i", &ac );
     //this->effekt = item::EFFEKT(ac);
     //fscanf(f,"%i\n",&(this->price));
-    fscanf(f,"%i",&ac);
-    /*this->displayName = */readString(f,false);
-    /*this->dscrpt = "  "+ */readString(f,false);
-    /*this->effekt_script = */readString(f,false);
+    fscanf( f, "%i", &ac );
+    /*this->displayName = */readString( f, false );
+    /*this->dscrpt = "  "+ */readString( f, false );
+    /*this->effekt_script = */readString( f, false );
 
-    fscanf(f,"%hi",&(this->size));
-    fscanf(f,"%i",&ac);
-    this->Guete = berry::Guete_Type(ac);
-    fscanf(f,"%i",&ac);
-    this->BeerenKr_Type = Type(ac);
-    fscanf(f,"%hhu",&(this->BeerenKr_Str));
-    for(int i= 0; i< 5; ++i)
-        fscanf(f,"%hhu",&(this->Taste[i]));
-    fscanf(f,"%hhu",&(this->HoursPerStage));
-    fscanf(f,"%hhu",&(this->minBerries));
-    fscanf(f,"%hhu\n",&(this->maxBerries));
-    fclose(f);
-    return load = true;
+    fscanf( f, "%hi", &( this->m_berrySize ) );
+
+    fscanf( f, "%i", &ac );
+    this->m_berryGuete = berry::berryGueteType( ac );
+
+    fscanf( f, "%i", &ac );
+    this->m_naturalGiftType = Type( ac );
+
+    fscanf( f, "%hhu", &( this->m_naturalGiftStrength ) );
+
+    for( int i = 0; i < 5; ++i )
+        fscanf( f, "%hhu", &( this->m_berryTaste[ i ] ) );
+
+    fscanf( f, "%hhu", &( this->m_hoursPerGrowthStage ) );
+
+    fscanf( f, "%hhu", &( this->m_minBerries ) );
+
+    fscanf( f, "%hhu\n", &( this->m_maxBerries ) );
+
+    fclose( f );
+    return this->m_loaded = true;
 }
 
-std::string item::getDescription(bool new_){
-    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
-    FILE* f = fopen(buf,"r");
-    if(f == 0)
+std::string item::getDescription( bool p_new ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, this->m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
         return "Keine Daten.";
     int ac;
-    fscanf(f,"%i",&ac);
-    fscanf(f,"%i\n",&ac);
-    std::string s = readString(f,new_);
-    s = readString(f,new_);
-    fclose(f);
+    fscanf( f, "%i", &ac );
+    fscanf( f, "%i\n", &ac );
+    std::string s = readString( f, p_new );
+    s = readString( f, p_new );
+    fclose( f );
     return s;
 }
-std::string item::getDisplayName(bool new_){
-    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
-    FILE* f = fopen(buf,"r");
-    if(f == 0)
-        return this->Name;
+
+std::string item::getDisplayName( bool p_new ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, this->m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
+        return this->m_itemName;
     int ac;
-    fscanf(f,"%i",&ac);
-    fscanf(f,"%i\n",&ac);
-    std::string s = readString(f,new_);
-    fclose(f);
+    fscanf( f, "%i", &ac );
+    fscanf( f, "%i\n", &ac );
+    std::string s = readString( f, p_new );
+    fclose( f );
     return s;
 }
-item::EFFEKT item::getEffekt(){
-    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
-    FILE* f = fopen(buf,"r");
-    if(f == 0)
-        return (item::EFFEKT::NONE);
+
+item::itemEffectType item::getEffectType( ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, this->m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
+        return ( item::itemEffectType::NONE );
     int ac;
-    fscanf(f,"%i",&ac);
-    fclose(f);
-    return (item::EFFEKT)ac;
+    fscanf( f, "%i", &ac );
+    fclose( f );
+    return ( item::itemEffectType )ac;
 }
-item::ITEM_TYPE item::getItemType(){
-    return this->itemtype;
+
+item::itemType item::getItemType(){
+    return this->m_itemType;
 }
-int item::getPrice(){ 
-    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
-    FILE* f = fopen(buf,"r");
-    if(f == 0)
+
+int item::getPrice( ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, this->m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
         return 0;
     int ac;
-    fscanf(f,"%i",&ac);
-    fscanf(f,"%i\n",&ac);
-    fclose(f);
+    fscanf( f, "%i", &ac );
+    fscanf( f, "%i\n", &ac );
+    fclose( f );
     return ac;
 }
 
-std::string berry::getDescription2(bool new_){
-    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
-    FILE* f = fopen(buf,"r");
-    if(f == 0)
+std::string berry::getDescription2( bool p_new ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, this->m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
         return "Keine Daten.";
     //this->itemtype = BERRIES;
     int ac;
-    fscanf(f,"%i",&ac);
+    fscanf( f, "%i", &ac );
     //this->effekt = item::EFFEKT(ac);
     //fscanf(f,"%i\n",&(this->price));
-    fscanf(f,"%i",&ac);
-    /*this->displayName = */readString(f,new_);
-    /*this->dscrpt = "  "+ */readString(f,new_);
-    /*this->effekt_script = */readString(f,new_);
+    fscanf( f, "%i", &ac );
+    /*this->displayName = */readString( f, p_new );
+    /*this->dscrpt = "  "+ */readString( f, p_new );
+    /*this->effekt_script = */readString( f, p_new );
 
-    fscanf(f,"%hi",&(ac));
-    fscanf(f,"%i",&ac);
+    fscanf( f, "%hi", &( ac ) );
+    fscanf( f, "%i", &ac );
     //this->Guete = berry::Guete_Type(ac);
-    fscanf(f,"%i",&ac);
+    fscanf( f, "%i", &ac );
     //this->BeerenKr_Type = Type(ac);
-    fscanf(f,"%hhu",&(ac));
-    for(int i= 0; i< 5; ++i)
-        fscanf(f,"%hhu",&(ac));
-    fscanf(f,"%hhu",&(ac));
-    fscanf(f,"%hhu",&(ac));
-    fscanf(f,"%hhu\n",&(ac));
+    fscanf( f, "%hhu", &( ac ) );
+    for( int i = 0; i < 5; ++i )
+        fscanf( f, "%hhu", &( ac ) );
+    fscanf( f, "%hhu", &( ac ) );
+    fscanf( f, "%hhu", &( ac ) );
+    fscanf( f, "%hhu\n", &( ac ) );
 
-    std::string s = readString(f,new_);
-    fclose(f);
+    std::string s = readString( f, p_new );
+    fclose( f );
     return s;
 }
 
-std::string item::getShortDescription(bool new_){
-    sprintf(buf,"%s%s.data",ITEM_PATH,this->Name.c_str());
-    FILE* f = fopen(buf,"r");
-    if(f == 0)
+std::string item::getShortDescription( bool p_new ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, this->m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
         return "Keine Daten.";
     int ac;
-    fscanf(f,"%i",&ac); 
+    fscanf( f, "%i", &ac );
     //this->effekt = item::EFFEKT(ac);
     //fscanf(f,"%i\n",&(this->price));
-    fscanf(f,"%i",&ac);
-    /*this->displayName = */readString(f,new_);
-    /*this->dscrpt = "  "+ */readString(f,new_);
-    /*this->effekt_script = */readString(f,new_);
+    fscanf( f, "%i", &ac );
+    /*this->displayName = */readString( f, p_new );
+    /*this->dscrpt = "  "+ */readString( f, p_new );
+    /*this->effekt_script = */readString( f, p_new );
 
-    if(fscanf(f,"%hi",&(ac)) == EOF)
+    if( fscanf( f, "%hi", &( ac ) ) == EOF )
         return "Keine Daten.";
-    fscanf(f,"%i",&ac);
+    fscanf( f, "%i", &ac );
     //this->Guete = berry::Guete_Type(ac);
-    fscanf(f,"%i",&ac);
+    fscanf( f, "%i", &ac );
     //this->BeerenKr_Type = Type(ac);
-    fscanf(f,"%hhu",&(ac));
-    for(int i= 0; i< 5; ++i)
-        fscanf(f,"%hhu",&(ac));
-    fscanf(f,"%hhu",&(ac));
-    fscanf(f,"%hhu",&(ac));
-    fscanf(f,"%hhu\n",&(ac));
+    fscanf( f, "%hhu", &( ac ) );
+    for( int i = 0; i < 5; ++i )
+        fscanf( f, "%hhu", &( ac ) );
+    fscanf( f, "%hhu", &( ac ) );
+    fscanf( f, "%hhu", &( ac ) );
+    fscanf( f, "%hhu\n", &( ac ) );
 
-    readString(f,new_);
-    std::string s = readString(f,new_);
-    fclose(f);
+    readString( f, p_new );
+    std::string s = readString( f, p_new );
+    fclose( f );
     return s;
 }
 
@@ -337,14 +352,14 @@ item ItemList[700] = {
     medicine("AP-Plus"),        medicine("Zink"),
     medicine("AP-Top"),         medicine("Spezialitaet"),
 
-    battle_item("Megablock"),       battle_item("Angriffsplus"),
-    battle_item("X-Angriff"),       battle_item("X-Abwehr"),
-    battle_item("X-Tempo"),         battle_item("X-Treffer"),
-    battle_item("X-Spezial"),       battle_item("X-SpezialVer"),
-    battle_item("Pokepuppe"),       battle_item("Eneco-Rute"),
-    battle_item("BlaueFloete"),    battle_item("GelbeFloete"),
-    battle_item("RoteFloete"),     battle_item("SchwarzeFloete"),
-    battle_item("WeisseFloete"),
+    battleItem("Megablock"),       battleItem("Angriffsplus"),
+    battleItem("X-Angriff"),       battleItem("X-Abwehr"),
+    battleItem("X-Tempo"),         battleItem("X-Treffer"),
+    battleItem("X-Spezial"),       battleItem("X-SpezialVer"),
+    battleItem("Pokepuppe"),       battleItem("Eneco-Rute"),
+    battleItem("BlaueFloete"),    battleItem("GelbeFloete"),
+    battleItem("RoteFloete"),     battleItem("SchwarzeFloete"),
+    battleItem("WeisseFloete"),
 
     item("Kuestensalz"),        item("Kuestenschale"),
     item("Purpurstueck"),       item("Indigostueck"),
@@ -430,7 +445,7 @@ item ItemList[700] = {
     berry("Jabocabeere"),	berry("Roselbeere"),
 
     item("Blendpuder"),     item("Schlohkraut"),
-    item("Machoband"),      key_item("EP-Teiler"),
+    item("Machoband"),      keyItem("EP-Teiler"),
     item("Flinkklaue"),     item("Sanftglocke"),
     item("Mentalkraut"),    item("Wahlband"),
     item("King-Stein"),     item("Silberstaub"),
@@ -444,7 +459,7 @@ item ItemList[700] = {
     item("Pudersand"),      item("Granitstein"),
     item("Wundersaat"),     item("Schattenglas"),
     item("Schwarzgurt"),    item("Magnet"),
-    item("Zauberwasser"),   item("Hackattack"),
+    item("Zauberwasser"),   item("Hackmove"),
     item("Giftstich"),      item("EwigesEis"),
     item("Bannsticker"),    item("Krummloeffel"),
     item("Holzkohle"),      item("Drachenzahn"),
@@ -514,36 +529,36 @@ item ItemList[700] = {
     TM("VM01"),    TM("VM02"),    TM("VM03"),    TM("VM04"),
     TM("VM05"),    TM("VM06"),    TM("VM07"),    TM("VM08"),
 
-    key_item("Forschersack"),   key_item("Beutesack"),
-    key_item("Regelbuch"),      key_item("Poke-Radar"),
-    key_item("Punktekarte"),    key_item("Tagebuch"),
-    key_item("StickKoffer"),    key_item("Modekoffer"),
-    key_item("Stickertuete"),   key_item("Adressbuch"),
-    key_item("K-Schluessel"),   key_item("Talisman"),
-    key_item("G-Schluessel"),   key_item("RoteKette"),
-    key_item("Karte"),          key_item("Kampffahnder"),
-    key_item("Muenzkorb"),      key_item("Angel"),
-    key_item("Profiangel"),     key_item("Superangel"),
-    key_item("Entonkanne"),     key_item("Knurspbox"),
-    key_item("Fahrrad"),        key_item("B-Schluessel"),
-    key_item("EichsBrief"),     key_item("Lunarfeder"),
-    key_item("Mitglkarte"),     key_item("Azurfloete"),
-    key_item("Bootsticket"),    key_item("Wettb-karte"),
-    key_item("Magmastein"),     key_item("Paket"),
-    key_item("Kupon1"),         key_item("Kupon2"),
-    key_item("Kupon3"),         key_item("L-Schluessel"),
-    key_item("Geheimtrank"),    key_item("Kampfkamera"),
-    key_item("Gracidea"),       key_item("F-OEffner"),
-    key_item("Aprikokobox"),    key_item("Icognitoheft"),
-    key_item("Pflanzset"),      key_item("Itemradar"),
-    key_item("BlaueKarte"),     key_item("Flegmon-Rute"),
-    key_item("Klarglocke"),     key_item("Tueroeffner"),
-    key_item("Kelleroeffner"),  key_item("Schiggykanne"),
-    key_item("RoteHaut"),       key_item("Fundsache"),
-    key_item("Fahrschein"),      key_item("Spule"),
-    key_item("Silberfluegel"),  key_item("Buntschwinge"),
-    key_item("Raetsel-Ei"),     key_item("Devon-Scope"), 
-    key_item("Auroraticket"),   key_item("AlteKarte"),
+    keyItem("Forschersack"),   keyItem("Beutesack"),
+    keyItem("Regelbuch"),      keyItem("Poke-Radar"),
+    keyItem("Punktekarte"),    keyItem("Tagebuch"),
+    keyItem("StickKoffer"),    keyItem("Modekoffer"),
+    keyItem("Stickertuete"),   keyItem("Adressbuch"),
+    keyItem("K-Schluessel"),   keyItem("Talisman"),
+    keyItem("G-Schluessel"),   keyItem("RoteKette"),
+    keyItem("Karte"),          keyItem("Kampffahnder"),
+    keyItem("Muenzkorb"),      keyItem("Angel"),
+    keyItem("Profiangel"),     keyItem("Superangel"),
+    keyItem("Entonkanne"),     keyItem("Knurspbox"),
+    keyItem("Fahrrad"),        keyItem("B-Schluessel"),
+    keyItem("EichsBrief"),     keyItem("Lunarfeder"),
+    keyItem("Mitglkarte"),     keyItem("Azurfloete"),
+    keyItem("Bootsticket"),    keyItem("Wettb-karte"),
+    keyItem("Magmastein"),     keyItem("Paket"),
+    keyItem("Kupon1"),         keyItem("Kupon2"),
+    keyItem("Kupon3"),         keyItem("L-Schluessel"),
+    keyItem("Geheimtrank"),    keyItem("Kampfkamera"),
+    keyItem("Gracidea"),       keyItem("F-OEffner"),
+    keyItem("Aprikokobox"),    keyItem("Icognitoheft"),
+    keyItem("Pflanzset"),      keyItem("Itemradar"),
+    keyItem("BlaueKarte"),     keyItem("Flegmon-Rute"),
+    keyItem("Klarglocke"),     keyItem("Tueroeffner"),
+    keyItem("Kelleroeffner"),  keyItem("Schiggykanne"),
+    keyItem("RoteHaut"),       keyItem("Fundsache"),
+    keyItem("Fahrschein"),      keyItem("Spule"),
+    keyItem("Silberfluegel"),  keyItem("Buntschwinge"),
+    keyItem("Raetsel-Ei"),     keyItem("Devon-Scope"), 
+    keyItem("Auroraticket"),   keyItem("AlteKarte"),
 
     TM("VM09"),    TM("VM10"),
     TM("VM11"),    TM("VM12"),
@@ -554,8 +569,8 @@ item ItemList[700] = {
     ball("Mondball"),       ball("Turnierball"),
     ball("Parkball"),
 
-    key_item("Fotoalbum"),      key_item("GB-Player"),
-    key_item("Gischtglocke"),   medicine("Wutkeks"),
+    keyItem("Fotoalbum"),      keyItem("GB-Player"),
+    keyItem("Gischtglocke"),   medicine("Wutkeks"),
 
     berry("Pumkinbeere"),	berry("Drashbeere"), 
     berry("Eggantbeere"),	berry("Stribbeere"),
@@ -564,16 +579,16 @@ item ItemList[700] = {
     berry("Yagobeere"), 	berry("Tougabeere"),
     berry("Ninikubeere"),	berry("Topobeere"),
 
-    key_item("K1-Schluessel"),  key_item("K2-Schluessel"),
-    key_item("K4-Schluessel"),  key_item("K6-Schluessel"),
-    key_item("Meteorit"),       key_item("Wuestenglas"),
-    key_item("AEon-Ticket"),    key_item("Scanner"),
-    key_item("PokeRiegelBox"),  key_item("Devon-Waren"),
-    key_item("Kunstrad"),       key_item("Eilrad"),
-    key_item("Aschetasche"),    key_item("Wailmerkanne"),
-    key_item("Sphaerensegm"),   key_item("GrueneKugel"),
-    key_item("Tresorkapsel"),   key_item("RoteKugel"),
-    key_item("BlaueKugel"),     key_item("Mytokristall"),
+    keyItem("K1-Schluessel"),  keyItem("K2-Schluessel"),
+    keyItem("K4-Schluessel"),  keyItem("K6-Schluessel"),
+    keyItem("Meteorit"),       keyItem("Wuestenglas"),
+    keyItem("AEon-Ticket"),    keyItem("Scanner"),
+    keyItem("PokeRiegelBox"),  keyItem("Devon-Waren"),
+    keyItem("Kunstrad"),       keyItem("Eilrad"),
+    keyItem("Aschetasche"),    keyItem("Wailmerkanne"),
+    keyItem("Sphaerensegm"),   keyItem("GrueneKugel"),
+    keyItem("Tresorkapsel"),   keyItem("RoteKugel"),
+    keyItem("BlaueKugel"),     keyItem("Mytokristall"),
 
     item("Schoenschuppe"),      item("Evolith"),
     item("Leichtstein"),        item("Beulenhelm"),
@@ -599,9 +614,9 @@ item ItemList[700] = {
 
     item("Schildfossil"),       item("Federfossil"),
 
-    key_item("Gartenpass"),
+    keyItem("Gartenpass"),
     item("Transferorb"),        item("Traumball"),
-    key_item("Deko-Box"),       key_item("Drakoschaedel"),
+    keyItem("Deko-Box"),       keyItem("Drakoschaedel"),
 
     item("Duftpilz"),           item("Riesennugget"),
     item("Triperle"),           item("Kometstueck"),
@@ -619,25 +634,25 @@ item ItemList[700] = {
     item("Null"),    item("Null"),    item("Null"),    item("Null"),
     item("Null"),    item("Null"),    item("Null"),    item("Null"),
 
-    key_item("Lichtstein"),
-    key_item("Dunkelstein"),
+    keyItem("Lichtstein"),
+    keyItem("Dunkelstein"),
     TM("TM93"),
     TM("TM94"),
     TM("TM95"), 
-    key_item("Viso-Casterm"),
-    key_item("Nebelstein"),
-    key_item("Briefpost"),
-    key_item("Briefpost"),
-    key_item("Briefpost"),
-    key_item("Viso-Caster"),
-    key_item("Medaillenbox"),
-    key_item("DNS-Keil"),
-    key_item("Genehmigung"),
-    key_item("Ovalpin"),
-    key_item("Schillerpin"),
-    key_item("Plasmakarte"),
-    key_item("Schnaeuztuch"),
-    key_item("Achromat"),  
-    key_item("Fundsache"),
-    key_item("Wahrspiegel")
+    keyItem("Viso-Casterm"),
+    keyItem("Nebelstein"),
+    keyItem("Briefpost"),
+    keyItem("Briefpost"),
+    keyItem("Briefpost"),
+    keyItem("Viso-Caster"),
+    keyItem("Medaillenbox"),
+    keyItem("DNS-Keil"),
+    keyItem("Genehmigung"),
+    keyItem("Ovalpin"),
+    keyItem("Schillerpin"),
+    keyItem("Plasmakarte"),
+    keyItem("Schnaeuztuch"),
+    keyItem("Achromat"),  
+    keyItem("Fundsache"),
+    keyItem("Wahrspiegel")
 }; 
