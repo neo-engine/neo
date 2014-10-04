@@ -96,6 +96,9 @@
     <ClInclude Include="arm9\include\move.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\include\buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm9\source\ability.cpp">
@@ -103,9 +106,6 @@
     </ClCompile>
     <ClCompile Include="arm7\source\as_lib7.c">
       <Filter>Source Files\arm7</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\Bag.cpp">
-      <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\Box.cpp">
       <Filter>Source Files\arm9</Filter>
@@ -168,6 +168,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\move.cpp">
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\bag.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
   </ItemGroup>

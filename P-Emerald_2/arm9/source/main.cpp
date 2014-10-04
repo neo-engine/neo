@@ -2126,7 +2126,7 @@ OUT:
                 setMainSpriteVisibility(false);
                 break;
             case 3:{
-                BATTLE::battle_trainer me("TEST",0,0,0,0,&SAV.PKMN_team,0);
+                BATTLE::battleTrainer me("TEST",0,0,0,0,&SAV.PKMN_team,0);
                 std::vector<POKEMON::PKMN> cpy;
 
                 for(int i = 0;i<3;++i)
@@ -2138,7 +2138,7 @@ OUT:
                     HILFSCOUNTER= 1+((HILFSCOUNTER)%649);
                 }
 
-                BATTLE::battle_trainer opp("TEST-OPP","DeR TeST iST DeR BeSTe MSG1","DeR TeST VeRLieRT GeRaDe... MSG2","DeR TeST GEWiNNT HaHa! MSG3","DeR TeST VeRLieRT... MSG4",&(cpy),0);
+                BATTLE::battleTrainer opp("TEST-OPP","DeR TeST iST DeR BeSTe MSG1","DeR TeST VeRLieRT GeRaDe... MSG2","DeR TeST GEWiNNT HaHa! MSG3","DeR TeST VeRLieRT... MSG4",&(cpy),0);
 
                 BATTLE::battle test_battle(&me,&opp,100,5,BATTLE::battle::DOUBLE);
                 test_battle.start(100,BATTLE::battle::NONE);       
@@ -2147,7 +2147,7 @@ OUT:
                 break;
                    }
             case 4:{
-                BATTLE::battle_trainer me("TEST",0,0,0,0,&SAV.PKMN_team,0);
+                BATTLE::battleTrainer me("TEST",0,0,0,0,&SAV.PKMN_team,0);
                 std::vector<POKEMON::PKMN> cpy;
 
                 for(int i = 0;i<6;++i)
@@ -2159,7 +2159,7 @@ OUT:
                     HILFSCOUNTER= 1+((HILFSCOUNTER)%649);
                 }
 
-                BATTLE::battle_trainer opp("TEST-OPP","DeR TeST iST DeR BeSTe MSG1","DeR TeST VeRLieRT GeRaDe... MSG2","DeR TeST GEWiNNT HaHa! MSG3","DeR TeST VeRLieRT... MSG4",&(cpy),0);
+                BATTLE::battleTrainer opp("TEST-OPP","DeR TeST iST DeR BeSTe MSG1","DeR TeST VeRLieRT GeRaDe... MSG2","DeR TeST GEWiNNT HaHa! MSG3","DeR TeST VeRLieRT... MSG4",&(cpy),0);
 
                 BATTLE::battle test_battle(&me,&opp,100,5,BATTLE::battle::SINGLE);
                 test_battle.start(100,BATTLE::battle::NONE);       
