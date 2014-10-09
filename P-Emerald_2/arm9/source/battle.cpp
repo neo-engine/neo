@@ -38,9 +38,9 @@
 #include "move.h"
 #include "sprite.h"
 #include "item.h"
-#include "scrnloader.h"
-#include "mbox.h"
-#include "savgm.h"
+#include "screenLoader.h"
+#include "messageBox.h"
+#include "saveGame.h"
 #include "bag.h"
 #include "buffer.h"
 
@@ -143,7 +143,7 @@ namespace BATTLE {
             for( int i = 0; i < factor * 100; ++i )
                 for( int j = innerR; j <= outerR; ++j ) {
                 u8 nx = x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                ( (Color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)freecolor1 ) << 8 ) | (u8)freecolor1;
+                ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)freecolor1 ) << 8 ) | (u8)freecolor1;
                 //printf("%i %i; ",nx,ny);
                 }
         } else {
@@ -151,7 +151,7 @@ namespace BATTLE {
             for( int i = factor * 100 - factor*HPstart; i < factor*HP; ++i ) {
                 for( int j = innerR; j <= outerR; ++j ) {
                     u8 nx = x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                    ( (Color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)freecolor2 ) << 8 ) | (u8)freecolor2;
+                    ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)freecolor2 ) << 8 ) | (u8)freecolor2;
                     if( i == factor * 50 )
                         BG_PALETTE[ freecolor1 ] = YELLOW;
                     if( i == factor * 80 )
@@ -169,7 +169,7 @@ namespace BATTLE {
             for( int i = 0; i < factor * 100; ++i )
                 for( int j = innerR; j <= outerR; ++j ) {
                 int nx = x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                ( (Color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)freecolor1 ) << 8 ) | (u8)freecolor1;
+                ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)freecolor1 ) << 8 ) | (u8)freecolor1;
                 //printf("%i %i; ",nx,ny);
                 }
         } else {
@@ -177,7 +177,7 @@ namespace BATTLE {
             for( int i = EPstart*factor; i <= EP*factor; ++i ) {
                 for( int j = innerR; j <= outerR; ++j ) {
                     int nx = x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                    ( (Color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)freecolor2 ) << 8 ) | (u8)freecolor2;
+                    ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)freecolor2 ) << 8 ) | (u8)freecolor2;
                 }
                 if( delay )
                     swiWaitForVBlank( );
@@ -202,12 +202,12 @@ namespace BATTLE {
         //nextAvailableTileIdxS = p_oam->oamBuffer[36].gfxIndex;
         //palcntS = p_oam->oamBuffer[36].palette;
 
-        cust_font.set_color( 0, 0 );
-        cust_font.set_color( 251, 1 );
-        cust_font.set_color( 252, 2 );
-        cust_font2.set_color( 0, 0 );
-        cust_font2.set_color( 253, 1 );
-        cust_font2.set_color( 254, 2 );
+        cust_font.setColor( 0, 0 );
+        cust_font.setColor( 251, 1 );
+        cust_font.setColor( 252, 2 );
+        cust_font2.setColor( 0, 0 );
+        cust_font2.setColor( 253, 1 );
+        cust_font2.setColor( 254, 2 );
 
         BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
         BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
@@ -240,13 +240,13 @@ namespace BATTLE {
     }
 
     battle::battle( battleTrainer* p_player, battleTrainer* p_opponent, int p_maxRounds, int p_AILevel, battleMode p_battleMode ) {
-        this->_maxRounds = p_maxRounds;
-        this->_AILevel = p_AILevel;
-        this->_player = p_player;
-        this->_opponent = p_opponent;
-        this->m_battleMode = p_battleMode;
+        _maxRounds = p_maxRounds;
+        _AILevel = p_AILevel;
+        _player = p_player;
+        _opponent = p_opponent;
+        m_battleMode = p_battleMode;
 
-        this->m_distributeEXP = true;
+        m_distributeEXP = true;
     }
 
     int oamIndex, palcnt, nextAvailableTileIdx;
@@ -294,7 +294,7 @@ namespace BATTLE {
 #define ACPKMNSTS(i,p) _acPkmnStatus[ ACPOS((i),(p)) ][ p ]
 #define ACPKMNAIL(i,p) _acPkmnAilments[ ACPOS((i),(p)) ][ p ]
 #define ACPKMNAILCNT(i,p) _acPkmnAilmentCounts[ ACPOS((i),(p)) ][ p ]
-#define ACPKMN(i,p) (((p) == OPPONENT) ? (( *this->_opponent->m_pkmnTeam )[ ACPOS( (i), OPPONENT ) ]) : (( *this->_player->m_pkmnTeam )[ ACPOS( (i), PLAYER ) ]))
+#define ACPKMN(i,p) (((p) == OPPONENT) ? (( *_opponent->m_pkmnTeam )[ ACPOS( (i), OPPONENT ) ]) : (( *_player->m_pkmnTeam )[ ACPOS( (i), PLAYER ) ]))
 
     void initinitBattleScrnSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo, int p_ownPok, int p_oppPok ) {
         static const int BYTES_PER_16_COLOR_TILE = 32;
@@ -564,7 +564,7 @@ namespace BATTLE {
     void drawTopBack( );
 
     void battle::initBattleScreen( ) {
-        sprintf( buffer, "%i.raw", this->_opponent->m_trainerClass );
+        sprintf( buffer, "%i.raw", _opponent->m_trainerClass );
 
         loadPicture( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "ClearD" );
         dmaCopy( BorderBitmap, bgGetGfxPtr( bg2sub ), 256 * 192 );
@@ -573,7 +573,7 @@ namespace BATTLE {
         initinitBattleScrnSprites( OamTop, spriteInfoTop, 6, 6 );
 
         for( int i = 0; i < 6; ++i )
-            switch( this->ACPKMNSTS( i, OPPONENT ) ) {
+            switch( ACPKMNSTS( i, OPPONENT ) ) {
                 case NA:
                     OamTop->oamBuffer[ i ].isHidden = true;
                     break;
@@ -589,7 +589,7 @@ namespace BATTLE {
                     break;
         }
         for( int i = 6; i < 12; ++i )
-            switch( this->_acPkmnStatus[ _acPkmnPosition[ i - 6 ][ PLAYER ] ][ PLAYER ] ) {
+            switch( _acPkmnStatus[ _acPkmnPosition[ i - 6 ][ PLAYER ] ][ PLAYER ] ) {
                 case NA:
                     OamTop->oamBuffer[ i ].isHidden = true;
                     break;
@@ -615,19 +615,19 @@ namespace BATTLE {
         consoleSetWindow( &Bottom, 2, 11, 32, 24 );
         consoleSelect( &Bottom );
 
-        cust_font.set_color( 0, 0 );
-        cust_font.set_color( 251, 1 );
-        cust_font.set_color( 252, 2 );
-        cust_font2.set_color( 0, 0 );
-        cust_font2.set_color( 253, 1 );
-        cust_font2.set_color( 254, 2 );
+        cust_font.setColor( 0, 0 );
+        cust_font.setColor( 251, 1 );
+        cust_font.setColor( 252, 2 );
+        cust_font2.setColor( 0, 0 );
+        cust_font2.setColor( 253, 1 );
+        cust_font2.setColor( 254, 2 );
 
         BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
         BG_PALETTE_SUB[ 251 ] = RGB15( 30, 30, 30 );
         BG_PALETTE_SUB[ 252 ] = RGB15( 15, 15, 15 );
         BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
         BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-        sprintf( buffer, "Eine Herausforderung von\n %s %s!", trainerclassnames[ this->_opponent->m_trainerClass ], this->_opponent->m_battleTrainerName );
+        sprintf( buffer, "Eine Herausforderung von\n %s %s!", trainerclassnames[ _opponent->m_trainerClass ], _opponent->m_battleTrainerName );
         cust_font.print_string( buffer, 16, 80, true );
 
         loadTrainerSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/TRAINER/", "n", 144, 16, oamIndex, palcnt, nextAvailableTileIdx, false );
@@ -1444,25 +1444,25 @@ namespace BATTLE {
         updateOAM( OamTop );
     }
 
-#define GENDER(a) (a.boxdata.isFemale? 147 : (a.boxdata.isGenderless ? ' ' : 141))
+#define GENDER(a) (a.m_boxdata.m_isFemale? 147 : (a.m_boxdata.m_isGenderless ? ' ' : 141))
 
     void battle::switchOppPkmn( int p_newPok, int p_toSwitch ) {
-        if( ACPKMN( p_newPok, OPPONENT ).stats.acHP == 0 )
+        if( ACPKMN( p_newPok, OPPONENT ).m_stats.m_acHP == 0 )
             return;
 
         init( );
 
         consoleSelect( &Bottom );
         consoleClear( );
-        if( ACPKMN( p_toSwitch, OPPONENT ).stats.acHP ) {
+        if( ACPKMN( p_toSwitch, OPPONENT ).m_stats.m_acHP ) {
             clear( );
-            sprintf( buffer, "%ls wird von\n%s %s\nauf die Bank geschickt. ", ACPKMN( p_toSwitch, OPPONENT ).boxdata.Name,
-                     trainerclassnames[ this->_opponent->m_trainerClass ], this->_opponent->m_battleTrainerName );
+            sprintf( buffer, "%ls wird von\n%s %s\nauf die Bank geschickt. ", ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_Name,
+                     trainerclassnames[ _opponent->m_trainerClass ], _opponent->m_battleTrainerName );
             cust_font.print_string( buffer, 8, 8, true );
         }
-        for( int i = 1 + ( this->m_battleMode == DOUBLE && this->_opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ); i < 6; ++i )
+        for( int i = 1 + ( m_battleMode == DOUBLE && _opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ); i < 6; ++i )
             if( i == p_newPok || i == p_toSwitch ) {
-            switch( this->ACPKMNSTS( i, OPPONENT ) ) {
+            switch( ACPKMNSTS( i, OPPONENT ) ) {
                 case KO:
                     OamTop->oamBuffer[ OPP_PB_START + i ].palette--;
                     OamTop->oamBuffer[ OPP_PB_START + i ].gfxIndex -= BattleBall1TilesLen / 32;
@@ -1483,9 +1483,9 @@ namespace BATTLE {
 
         clear( );
         sprintf( buffer, "%s %s\nschickt %ls in den Kampf.",
-                 trainerclassnames[ this->_opponent->m_trainerClass ],
-                 this->_opponent->m_battleTrainerName,
-                 ACPKMN( p_toSwitch, OPPONENT ).boxdata.Name );
+                 trainerclassnames[ _opponent->m_trainerClass ],
+                 _opponent->m_battleTrainerName,
+                 ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_Name );
         cust_font.print_string( buffer, 8, 8, true );
 
         consoleSelect( &Top );
@@ -1506,40 +1506,40 @@ namespace BATTLE {
 
             if( !loadPKMNSprite( OamTop, spriteInfoTop,
                 "nitro:/PICS/SPRITES/PKMN/",
-                ACPKMN( 0, OPPONENT ).boxdata.SPEC,
+                ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
                 176,
                 20,
                 oamIndex,
                 palcnt,
                 nextAvailableTileIdx,
                 false,
-                ACPKMN( 0, OPPONENT ).boxdata.isShiny( ),
-                ACPKMN( 0, OPPONENT ).boxdata.isFemale ) ) {
+                ACPKMN( 0, OPPONENT ).m_boxdata.isShiny( ),
+                ACPKMN( 0, OPPONENT ).m_boxdata.m_isFemale ) ) {
                 oamIndex = OPP_PKMN_1_START;
                 palcnt = OPP_PKMN_1_PAL;
                 nextAvailableTileIdx = OPP_PKMN_1_TILE;
                 loadPKMNSprite( OamTop,
                                 spriteInfoTop,
                                 "nitro:/PICS/SPRITES/PKMN/",
-                                ACPKMN( 0, OPPONENT ).boxdata.SPEC,
+                                ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
                                 176,
                                 20,
                                 oamIndex,
                                 palcnt,
                                 nextAvailableTileIdx,
                                 false,
-                                ACPKMN( 0, OPPONENT ).boxdata.isShiny( ),
-                                !ACPKMN( 0, OPPONENT ).boxdata.isFemale );
+                                ACPKMN( 0, OPPONENT ).m_boxdata.isShiny( ),
+                                !ACPKMN( 0, OPPONENT ).m_boxdata.m_isFemale );
             }
             for( int i = 1; i <= 4; ++i )
                 OamTop->oamBuffer[ OPP_PKMN_1_START + i ].isHidden = false;
             updateOAM( OamTop );
 
-            if( ACPKMN( 0, OPPONENT ).boxdata.isShiny( ) )
+            if( ACPKMN( 0, OPPONENT ).m_boxdata.isShiny( ) )
                 animateShiny( 176 + 16, 36 );
 
             displayHP( 100, 101, 88, 32, HP_COL( 1, p_toSwitch ), HP_COL( 1, p_toSwitch ) + 1, false );
-            displayHP( 100, 100 - ACPKMN( 0, OPPONENT ).stats.acHP * 100 / ACPKMN( 0, OPPONENT ).stats.maxHP,
+            displayHP( 100, 100 - ACPKMN( 0, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 0, OPPONENT ).m_stats.m_maxHP,
                        88, 32, HP_COL( 1, p_toSwitch ), HP_COL( 1, p_toSwitch ) + 1, false );
             OamTop->oamBuffer[ OPP_PB_START ].x = 96;
             OamTop->oamBuffer[ OPP_PB_START ].y = 41;
@@ -1547,15 +1547,15 @@ namespace BATTLE {
             consoleClear( );
 
             printf( "%10ls%c\n",
-                    ACPKMN( 0, OPPONENT ).boxdata.Name,
-                    GENDER( ( *this->_player->m_pkmnTeam )[ ACPOS( 0, OPPONENT ) ] ) );
+                    ACPKMN( 0, OPPONENT ).m_boxdata.m_Name,
+                    GENDER( ( *_player->m_pkmnTeam )[ ACPOS( 0, OPPONENT ) ] ) );
 
-            if( ACPKMN( 0, OPPONENT ).Level < 10 )
+            if( ACPKMN( 0, OPPONENT ).m_Level < 10 )
                 printf( " " );
-            if( ACPKMN( 0, OPPONENT ).Level < 100 )
+            if( ACPKMN( 0, OPPONENT ).m_Level < 100 )
                 printf( " " );
-            printf( "Lv%d%4dKP", ACPKMN( 0, OPPONENT ).Level,
-                    ACPKMN( 0, OPPONENT ).stats.acHP );
+            printf( "Lv%d%4dKP", ACPKMN( 0, OPPONENT ).m_Level,
+                    ACPKMN( 0, OPPONENT ).m_stats.m_acHP );
         } else {
             OamTop->oamBuffer[ OPP_PB_START + 1 ].isHidden = true;
             updateOAM( OamTop );
@@ -1574,62 +1574,62 @@ namespace BATTLE {
             if( !loadPKMNSprite( OamTop,
                 spriteInfoTop,
                 "nitro:/PICS/SPRITES/PKMN/",
-                ACPKMN( 1, OPPONENT ).boxdata.SPEC,
+                ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC,
                 112,
                 4,
                 oamIndex,
                 palcnt,
                 nextAvailableTileIdx,
                 false,
-                ACPKMN( 1, OPPONENT ).boxdata.isShiny( ),
-                ACPKMN( 1, OPPONENT ).boxdata.isFemale ) ) {
+                ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ),
+                ACPKMN( 1, OPPONENT ).m_boxdata.m_isFemale ) ) {
                 oamIndex = OPP_PKMN_2_START;
                 palcnt = OPP_PKMN_2_PAL;
                 nextAvailableTileIdx = OPP_PKMN_2_TILE;
                 loadPKMNSprite( OamTop,
                                 spriteInfoTop,
                                 "nitro:/PICS/SPRITES/PKMN/",
-                                ACPKMN( 1, OPPONENT ).boxdata.SPEC,
+                                ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC,
                                 112,
                                 4,
                                 oamIndex,
                                 palcnt,
                                 nextAvailableTileIdx,
                                 false,
-                                ACPKMN( 1, OPPONENT ).boxdata.isShiny( ),
-                                !ACPKMN( 1, OPPONENT ).boxdata.isFemale );
+                                ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ),
+                                !ACPKMN( 1, OPPONENT ).m_boxdata.m_isFemale );
             }
 
             for( int i = 1; i <= 4; ++i )
                 OamTop->oamBuffer[ OPP_PKMN_2_START + i ].isHidden = false;
             updateOAM( OamTop );
 
-            if( ACPKMN( 1, OPPONENT ).boxdata.isShiny( ) )
+            if( ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ) )
                 animateShiny( 112 + 16, 20 );
 
             updateOAM( OamTop );
 
             displayHP( 100, 101, 0, 8, HP_COL( 1, p_toSwitch ), HP_COL( 1, p_toSwitch ) + 1, false );
-            displayHP( 100, 100 - ACPKMN( 1, OPPONENT ).stats.acHP * 100 / ACPKMN( 1, OPPONENT ).stats.maxHP, 0, 8, HP_COL( 1, p_toSwitch ), HP_COL( 1, p_toSwitch ) + 1, false );
+            displayHP( 100, 100 - ACPKMN( 1, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 1, OPPONENT ).m_stats.m_maxHP, 0, 8, HP_COL( 1, p_toSwitch ), HP_COL( 1, p_toSwitch ) + 1, false );
             OamTop->oamBuffer[ OPP_PB_START + 1 ].x = 8;
             OamTop->oamBuffer[ OPP_PB_START + 1 ].y = 17;
             consoleSetWindow( &Top, 4, 2, 20, 2 );
             consoleClear( );
             printf( "%ls%c\nLv%d%4dKP",
-                    ACPKMN( 1, OPPONENT ).boxdata.Name,
+                    ACPKMN( 1, OPPONENT ).m_boxdata.m_Name,
                     GENDER( ACPKMN( 1, OPPONENT ) ),
-                    ACPKMN( 1, OPPONENT ).Level,
-                    ACPKMN( 1, OPPONENT ).stats.acHP );
+                    ACPKMN( 1, OPPONENT ).m_Level,
+                    ACPKMN( 1, OPPONENT ).m_stats.m_acHP );
         }
 
         consoleSelect( &Bottom );
 
-        for( int i = 1 + ( this->m_battleMode == DOUBLE && this->_opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ); i < 6; ++i )
+        for( int i = 1 + ( m_battleMode == DOUBLE && _opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ); i < 6; ++i )
             if( i == p_newPok || i == p_toSwitch ) {
             OamTop->oamBuffer[ OPP_PB_START + i ].x = -4 + 18 * i;
             OamTop->oamBuffer[ OPP_PB_START + i ].y = -4;
             OamTop->oamBuffer[ OPP_PB_START + i ].isHidden = false;
-            switch( this->ACPKMNSTS( i, OPPONENT ) ) {
+            switch( ACPKMNSTS( i, OPPONENT ) ) {
                 case NA:
                     OamTop->oamBuffer[ OPP_PB_START + i ].isHidden = true;
                     break;
@@ -1649,28 +1649,28 @@ namespace BATTLE {
         for( int i = 0; i < 200; ++i )
             swiWaitForVBlank( );
 
-        if( abilities[ ACPKMN( p_toSwitch, OPPONENT ).boxdata.ability ].m_type & ability::BEFORE_BATTLE ) {
+        if( abilities[ ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_ability ].m_type & ability::BEFORE_BATTLE ) {
             clear( );
             sprintf( buffer, "%s von\n %ls (Gegn.) wirkt!\n",
-                     abilities[ ACPKMN( p_toSwitch, OPPONENT ).boxdata.ability ].m_abilityName.c_str( ),
-                     ACPKMN( p_toSwitch, OPPONENT ).boxdata.Name );
+                     abilities[ ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_ability ].m_abilityName.c_str( ),
+                     ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_Name );
             cust_font.print_string( buffer, 8, 8, true );
-            //abilities[(*this->_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].boxdata.ability].run();
+            //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
             for( int i = 0; i < 100; ++i )
                 swiWaitForVBlank( );
         }
     }
 
     void battle::switchOwnPkmn( int p_newPok, int p_toSwitch ) {
-        if( ACPKMN( p_newPok, PLAYER ).stats.acHP == 0 )
+        if( ACPKMN( p_newPok, PLAYER ).m_stats.m_acHP == 0 )
             return;
         init( );
-        for( int i = 1 + ( this->m_battleMode == DOUBLE && this->_player->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, PLAYER ) != KO ); i < 6; ++i ) {
+        for( int i = 1 + ( m_battleMode == DOUBLE && _player->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, PLAYER ) != KO ); i < 6; ++i ) {
             if( i == p_newPok || i == p_toSwitch ) {
                 OamTop->oamBuffer[ OWN_PB_START + i ].x = 236 - 18 * i;
                 OamTop->oamBuffer[ OWN_PB_START + i ].y = 196 - 16;
                 OamTop->oamBuffer[ OWN_PB_START + i ].isHidden = false;
-                switch( this->ACPKMNSTS( i, PLAYER ) ) {
+                switch( ACPKMNSTS( i, PLAYER ) ) {
                     case KO:
                         OamTop->oamBuffer[ OWN_PB_START + i ].palette--;
                         OamTop->oamBuffer[ OWN_PB_START + i ].gfxIndex -= BattleBall1TilesLen / 32;
@@ -1687,9 +1687,9 @@ namespace BATTLE {
         updateOAM( OamTop );
         consoleSelect( &Bottom );
         consoleClear( );
-        if( ACPKMN( p_toSwitch, PLAYER ).stats.acHP ) {
+        if( ACPKMN( p_toSwitch, PLAYER ).m_stats.m_acHP ) {
             clear( );
-            sprintf( buffer, "Auf die Bank,\n %ls!", ACPKMN( p_toSwitch, PLAYER ).boxdata.Name );
+            sprintf( buffer, "Auf die Bank,\n %ls!", ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_Name );
             cust_font.print_string( buffer, 8, 8, true );
         }
         std::swap( ACPOS( p_newPok, PLAYER ), ACPOS( p_toSwitch, PLAYER ) );
@@ -1700,7 +1700,7 @@ namespace BATTLE {
 
         consoleSelect( &Bottom );
         clear( );
-        sprintf( buffer, "Los %ls!", ACPKMN( p_toSwitch, PLAYER ).boxdata.Name );
+        sprintf( buffer, "Los %ls!", ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_Name );
         cust_font.print_string( buffer, 8, 8, true );
 
         consoleSelect( &Top );
@@ -1717,37 +1717,37 @@ namespace BATTLE {
             animatePB( 80, 170 );
 
 
-            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 0, PLAYER ).boxdata.SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
-                ACPKMN( 0, PLAYER ).boxdata.isShiny( ), ACPKMN( 0, PLAYER ).boxdata.isFemale ) )
-                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 0, PLAYER ).boxdata.SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
-                ACPKMN( 0, PLAYER ).boxdata.isShiny( ), !ACPKMN( 0, PLAYER ).boxdata.isFemale );
+            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
+                ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ), ACPKMN( 0, PLAYER ).m_boxdata.m_isFemale ) )
+                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
+                ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ), !ACPKMN( 0, PLAYER ).m_boxdata.m_isFemale );
 
             OamTop->oamBuffer[ OWN_PB_START ].isHidden = false;
 
             updateOAM( OamTop );
 
-            if( ACPKMN( 0, PLAYER ).boxdata.isShiny( ) )
+            if( ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ) )
                 animateShiny( 6, 116 );
 
             displayHP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, p_toSwitch ), HP_COL( 0, p_toSwitch ) + 1, false );
-            displayHP( 100, 100 - ACPKMN( 0, PLAYER ).stats.acHP * 100 / ACPKMN( 0, PLAYER ).stats.maxHP,
+            displayHP( 100, 100 - ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 0, PLAYER ).m_stats.m_maxHP,
                        256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, p_toSwitch ), HP_COL( 0, p_toSwitch ) + 1, false );
             displayEP( 100, 100, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
 
-            POKEMON::PKMNDATA::getAll( ACPKMN( 0, PLAYER ).boxdata.SPEC, p );
+            POKEMON::PKMNDATA::getAll( ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, p );
 
-            displayEP( 0, ( ACPKMN( 0, PLAYER ).boxdata.exp - POKEMON::EXP[ ACPKMN( 0, PLAYER ).Level - 1 ][ p.expType ] ) * 100 /
-                       ( POKEMON::EXP[ ACPKMN( 0, PLAYER ).Level ][ p.expType ] - POKEMON::EXP[ ACPKMN( 0, PLAYER ).Level - 1 ][ p.expType ] ),
+            displayEP( 0, ( ACPKMN( 0, PLAYER ).m_boxdata.m_exp - POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level - 1 ][ p.m_expType ] ) * 100 /
+                       ( POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level ][ p.m_expType ] - POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level - 1 ][ p.m_expType ] ),
                        256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
             OamTop->oamBuffer[ OWN_PB_START ].x = 256 - 88 - 32 + 4;
             OamTop->oamBuffer[ OWN_PB_START ].y = 192 - 31 - 32;
             consoleSetWindow( &Top, 21, 16, 20, 4 );
             consoleClear( );
             printf( "%ls%c\nLv%d%4dKP",
-                    ACPKMN( 0, PLAYER ).boxdata.Name,
+                    ACPKMN( 0, PLAYER ).m_boxdata.m_Name,
                     GENDER( ACPKMN( 0, PLAYER ) ),
-                    ACPKMN( 0, PLAYER ).Level,
-                    ACPKMN( 0, PLAYER ).stats.acHP );
+                    ACPKMN( 0, PLAYER ).m_Level,
+                    ACPKMN( 0, PLAYER ).m_stats.m_acHP );
 
             //OamTop->oamBuffer[OWN_PB_START + 1].isHidden = OamTop->oamBuffer[2].isHidden = false;
             updateOAM( OamTop );
@@ -1767,26 +1767,26 @@ namespace BATTLE {
 
             OamTop->oamBuffer[ OWN_PB_START + 1 ].isHidden = false;
 
-            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 1, PLAYER ).boxdata.SPEC, 50, 120, oamIndex, palcnt, nextAvailableTileIdx, false,
-                ACPKMN( 1, PLAYER ).boxdata.isShiny( ), ACPKMN( 1, PLAYER ).boxdata.isFemale ) )
-                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 1, PLAYER ).boxdata.SPEC, 50, 120, oamIndex, palcnt, nextAvailableTileIdx, false,
-                ACPKMN( 1, PLAYER ).boxdata.isShiny( ), !ACPKMN( 1, PLAYER ).boxdata.isFemale );
+            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, 50, 120, oamIndex, palcnt, nextAvailableTileIdx, false,
+                ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ), ACPKMN( 1, PLAYER ).m_boxdata.m_isFemale ) )
+                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, 50, 120, oamIndex, palcnt, nextAvailableTileIdx, false,
+                ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ), !ACPKMN( 1, PLAYER ).m_boxdata.m_isFemale );
 
-            if( ACPKMN( 1, PLAYER ).boxdata.isShiny( ) )
+            if( ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ) )
                 animateShiny( 50 + 16, 136 );
 
             updateOAM( OamTop );
 
             displayHP( 100, 101, 256 - 36, 192 - 40, HP_COL( 0, p_toSwitch ), HP_COL( 0, p_toSwitch ) + 1, false );
-            displayHP( 100, 100 - ACPKMN( 1, PLAYER ).stats.acHP * 100 / ACPKMN( 1, PLAYER ).stats.maxHP,
+            displayHP( 100, 100 - ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 1, PLAYER ).m_stats.m_maxHP,
                        256 - 36, 192 - 40, HP_COL( 0, p_toSwitch ), HP_COL( 0, p_toSwitch ) + 1, false );
             displayEP( 100, 100, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
 
-            POKEMON::PKMNDATA::getAll( ACPKMN( 1, PLAYER ).boxdata.SPEC, p );
+            POKEMON::PKMNDATA::getAll( ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, p );
 
             displayEP( 0,
-                       ( ACPKMN( 1, PLAYER ).boxdata.exp - POKEMON::EXP[ ACPKMN( 1, PLAYER ).Level - 1 ][ p.expType ] ) * 100 /
-                       ( POKEMON::EXP[ ACPKMN( 1, PLAYER ).Level ][ p.expType ] - POKEMON::EXP[ ACPKMN( 1, PLAYER ).Level - 1 ][ p.expType ] ),
+                       ( ACPKMN( 1, PLAYER ).m_boxdata.m_exp - POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level - 1 ][ p.m_expType ] ) * 100 /
+                       ( POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level ][ p.m_expType ] - POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level - 1 ][ p.m_expType ] ),
                        256 - 36,
                        192 - 40,
                        OWN2_EP_COL,
@@ -1798,25 +1798,25 @@ namespace BATTLE {
             consoleSetWindow( &Top, 16, 20, 20, 5 );
             consoleClear( );
             printf( "%10ls%c\n",
-                    ACPKMN( 1, PLAYER ).boxdata.Name,
+                    ACPKMN( 1, PLAYER ).m_boxdata.m_Name,
                     GENDER( ACPKMN( 1, PLAYER ) ) );
-            if( ACPKMN( 1, PLAYER ).Level < 10 )
+            if( ACPKMN( 1, PLAYER ).m_Level < 10 )
                 printf( " " );
-            if( ACPKMN( 1, PLAYER ).Level < 100 )
+            if( ACPKMN( 1, PLAYER ).m_Level < 100 )
                 printf( " " );
-            printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).Level,
-                    ACPKMN( 1, PLAYER ).stats.acHP );
+            printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
+                    ACPKMN( 1, PLAYER ).m_stats.m_acHP );
 
             //OamTop->oamBuffer[5].isHidden = OamTop->oamBuffer[1].isHidden = false;
             updateOAM( OamTop );
         }
 
-        for( int i = 1 + ( this->m_battleMode == DOUBLE && this->_player->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, PLAYER ) != KO ); i < 6; ++i )
+        for( int i = 1 + ( m_battleMode == DOUBLE && _player->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, PLAYER ) != KO ); i < 6; ++i )
             if( i == p_newPok || i == p_toSwitch ) {
             OamTop->oamBuffer[ OWN_PB_START + i ].x = 236 - 18 * i;
             OamTop->oamBuffer[ OWN_PB_START + i ].y = 196 - 16;
             OamTop->oamBuffer[ OWN_PB_START + i ].isHidden = false;
-            switch( this->ACPKMNSTS( i, PLAYER ) ) {
+            switch( ACPKMNSTS( i, PLAYER ) ) {
                 case NA:
                     OamTop->oamBuffer[ OWN_PB_START + i ].isHidden = true;
                     break;
@@ -1837,13 +1837,13 @@ namespace BATTLE {
             swiWaitForVBlank( );
         updateOAM( OamTop );
 
-        if( abilities[ ACPKMN( p_toSwitch, PLAYER ).boxdata.ability ].m_type & ability::BEFORE_BATTLE ) {
+        if( abilities[ ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_ability ].m_type & ability::BEFORE_BATTLE ) {
             clear( );
             sprintf( buffer, "%s von\n %ls wirkt!\n",
-                     abilities[ ACPKMN( p_toSwitch, PLAYER ).boxdata.ability ].m_abilityName.c_str( ),
-                     ACPKMN( p_toSwitch, PLAYER ).boxdata.Name );
+                     abilities[ ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_ability ].m_abilityName.c_str( ),
+                     ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_Name );
             cust_font.print_string( buffer, 8, 8, true );
-            //abilities[(*this->_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].boxdata.ability].run();
+            //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
             for( int i = 0; i < 100; ++i )
                 swiWaitForVBlank( );
         }
@@ -1852,7 +1852,7 @@ namespace BATTLE {
     void setMainBattleVisibility( bool p_hidden ) {
         for( int i = 0; i <= 4; ++i )
             Oam->oamBuffer[ i ].isHidden = p_hidden;
-        Oam->oamBuffer[ 2 ].isHidden |= !p_hidden & !SAV.activatedPNav;
+        Oam->oamBuffer[ 2 ].isHidden |= !p_hidden & !SAV.m_activatedPNav;
         for( int i = 19; i <= 19; ++i )
             Oam->oamBuffer[ i ].isHidden = p_hidden;
         updateOAMSub( Oam );
@@ -1886,34 +1886,34 @@ namespace BATTLE {
     void battle::initBattleScene( int p_battleBack, weather p_weather ) {
         for( int i = 0; i < 6; ++i ) {
             ACPOS( i, PLAYER ) = ACPOS( i, OPPONENT ) = i;
-            if( this->_player->m_pkmnTeam->size( ) > i ) {
-                if( ACPKMN( i, PLAYER ).stats.acHP == 0 || ACPKMN( i, PLAYER ).boxdata.IV.isEgg )
+            if( _player->m_pkmnTeam->size( ) > i ) {
+                if( ACPKMN( i, PLAYER ).m_stats.m_acHP == 0 || ACPKMN( i, PLAYER ).m_boxdata.m_IV.m_isEgg )
                     ACPKMNSTS( i, PLAYER ) = KO;
-                else if( ACPKMN( i, PLAYER ).statusint )
+                else if( ACPKMN( i, PLAYER ).m_statusint )
                     ACPKMNSTS( i, PLAYER ) = STS;
                 else
                     ACPKMNSTS( i, PLAYER ) = OK;
             } else
                 ACPKMNSTS( i, PLAYER ) = NA;
-            if( this->_opponent->m_pkmnTeam->size( ) > i ) {
-                if( ACPKMN( i, OPPONENT ).stats.acHP == 0 || ACPKMN( i, OPPONENT ).boxdata.IV.isEgg )
+            if( _opponent->m_pkmnTeam->size( ) > i ) {
+                if( ACPKMN( i, OPPONENT ).m_stats.m_acHP == 0 || ACPKMN( i, OPPONENT ).m_boxdata.m_IV.m_isEgg )
                     ACPKMNSTS( i, OPPONENT ) = KO;
-                else if( ACPKMN( i, OPPONENT ).statusint )
+                else if( ACPKMN( i, OPPONENT ).m_statusint )
                     ACPKMNSTS( i, OPPONENT ) = STS;
                 else ACPKMNSTS( i, OPPONENT ) = OK;
             } else
                 ACPKMNSTS( i, OPPONENT ) = NA;
         }
         if( ACPKMNSTS( 0, PLAYER ) == KO ) {
-            for( int i = 1 + ( this->m_battleMode == DOUBLE ); i < this->_player->m_pkmnTeam->size( ); ++i ) {
+            for( int i = 1 + ( m_battleMode == DOUBLE ); i < _player->m_pkmnTeam->size( ); ++i ) {
                 if( ACPKMNSTS( i, PLAYER ) != KO ) {
                     std::swap( ACPOS( 0, PLAYER ), ACPOS( i, PLAYER ) );
                     break;
                 }
             }
         }
-        if( ( this->m_battleMode == DOUBLE ) && ACPKMNSTS( 1, PLAYER ) == KO ) {
-            for( int i = 2; i < this->_player->m_pkmnTeam->size( ); ++i ) {
+        if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, PLAYER ) == KO ) {
+            for( int i = 2; i < _player->m_pkmnTeam->size( ); ++i ) {
                 if( ACPKMNSTS( i, PLAYER ) != KO ) {
                     std::swap( ACPOS( 1, PLAYER ), ACPOS( i, PLAYER ) );
                     break;
@@ -1921,15 +1921,15 @@ namespace BATTLE {
             }
         }
         if( ACPKMNSTS( 0, OPPONENT ) == KO ) {
-            for( int i = 1 + ( this->m_battleMode == DOUBLE ); i < this->_opponent->m_pkmnTeam->size( ); ++i ) {
+            for( int i = 1 + ( m_battleMode == DOUBLE ); i < _opponent->m_pkmnTeam->size( ); ++i ) {
                 if( ACPKMNSTS( i, OPPONENT ) != KO ) {
                     std::swap( ACPOS( 0, OPPONENT ), ACPOS( i, OPPONENT ) );
                     break;
                 }
             }
         }
-        if( ( this->m_battleMode == DOUBLE ) && ACPKMNSTS( 1, OPPONENT ) == KO ) {
-            for( int i = 2; i < this->_opponent->m_pkmnTeam->size( ); ++i ) {
+        if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, OPPONENT ) == KO ) {
+            for( int i = 2; i < _opponent->m_pkmnTeam->size( ); ++i ) {
                 if( ACPKMNSTS( i, OPPONENT ) != KO ) {
                     std::swap( ACPOS( 1, OPPONENT ), ACPOS( i, OPPONENT ) );
                     break;
@@ -1949,8 +1949,8 @@ namespace BATTLE {
 
         initOAMTableSub( Oam );
         initOAMTable( OamTop );
-        this->_round = this->_maxRounds;
-        this->initBattleScreen( );
+        _round = _maxRounds;
+        initBattleScreen( );
         drawTopBack( );
 
         drawSub( );
@@ -1961,7 +1961,7 @@ namespace BATTLE {
         initOAMTable( OamTop );
         initBattleScreenSprites( OamTop, spriteInfoTop );
 
-        initBattleSubScreenSprites( Oam, spriteInfo, false, SAV.activatedPNav );
+        initBattleSubScreenSprites( Oam, spriteInfo, false, SAV.m_activatedPNav );
         for( int i = 5; i <= 19; ++i )
             Oam->oamBuffer[ i ].isHidden = false;
         updateOAMSub( Oam );
@@ -1975,16 +1975,16 @@ namespace BATTLE {
         consoleSelect( &Bottom );
         consoleClear( );
 
-        if( ( this->m_battleMode == DOUBLE ) && this->_opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO )
+        if( ( m_battleMode == DOUBLE ) && _opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO )
             sprintf( buffer, "%s %s\nschickt %ls ",
-            trainerclassnames[ this->_opponent->m_trainerClass ],
-            this->_opponent->m_battleTrainerName,
-            ACPKMN( 0, OPPONENT ).boxdata.Name );
+            trainerclassnames[ _opponent->m_trainerClass ],
+            _opponent->m_battleTrainerName,
+            ACPKMN( 0, OPPONENT ).m_boxdata.m_Name );
         else
             sprintf( buffer, "%s %s\nschickt %ls in den Kampf.",
-            trainerclassnames[ this->_opponent->m_trainerClass ],
-            this->_opponent->m_battleTrainerName,
-            ACPKMN( 0, OPPONENT ).boxdata.Name );
+            trainerclassnames[ _opponent->m_trainerClass ],
+            _opponent->m_battleTrainerName,
+            ACPKMN( 0, OPPONENT ).m_boxdata.m_Name );
         cust_font.print_string( buffer, 8, 8, true );
         consoleSelect( &Top );
 
@@ -1998,15 +1998,15 @@ namespace BATTLE {
         if( !loadPKMNSprite( OamTop,
             spriteInfoTop,
             "nitro:/PICS/SPRITES/PKMN/",
-            ACPKMN( 0, OPPONENT ).boxdata.SPEC,
+            ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
             176,
             20,
             oamIndex,
             palcnt,
             nextAvailableTileIdx,
             false,
-            ACPKMN( 0, OPPONENT ).boxdata.isShiny( ),
-            ACPKMN( 0, OPPONENT ).boxdata.isFemale ) ) {
+            ACPKMN( 0, OPPONENT ).m_boxdata.isShiny( ),
+            ACPKMN( 0, OPPONENT ).m_boxdata.m_isFemale ) ) {
 
             oamIndex = OPP_PKMN_1_START;
             palcnt = OPP_PKMN_1_PAL;
@@ -2014,41 +2014,41 @@ namespace BATTLE {
             loadPKMNSprite( OamTop,
                             spriteInfoTop,
                             "nitro:/PICS/SPRITES/PKMN/",
-                            ACPKMN( 0, OPPONENT ).boxdata.SPEC,
+                            ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
                             176,
                             20,
                             oamIndex,
                             palcnt,
                             nextAvailableTileIdx,
                             false,
-                            ACPKMN( 0, OPPONENT ).boxdata.isShiny( ),
-                            !ACPKMN( 0, OPPONENT ).boxdata.isFemale );
+                            ACPKMN( 0, OPPONENT ).m_boxdata.isShiny( ),
+                            !ACPKMN( 0, OPPONENT ).m_boxdata.m_isFemale );
         }
-        if( ACPKMN( 0, OPPONENT ).boxdata.isShiny( ) )
+        if( ACPKMN( 0, OPPONENT ).m_boxdata.isShiny( ) )
             animateShiny( 176 + 16, 36 );
 
         displayHP( 100, 101, 88, 32, HP_COL( 1, 0 ), HP_COL( 1, 0 ) + 1, false );
-        displayHP( 100, 100 - ACPKMN( 0, OPPONENT ).stats.acHP * 100 / ACPKMN( 0, OPPONENT ).stats.maxHP, 88, 32, HP_COL( 1, 0 ), HP_COL( 1, 0 ) + 1, false );
+        displayHP( 100, 100 - ACPKMN( 0, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 0, OPPONENT ).m_stats.m_maxHP, 88, 32, HP_COL( 1, 0 ), HP_COL( 1, 0 ) + 1, false );
         OamTop->oamBuffer[ OPP_PB_START ].x = 96;
         OamTop->oamBuffer[ OPP_PB_START ].y = 41;
         consoleSetWindow( &Top, 0, 5, 20, 5 );
 
-        printf( "%10ls%c\n", ACPKMN( 0, OPPONENT ).boxdata.Name, GENDER( ( *this->_player->m_pkmnTeam )[ ACPOS( 0, OPPONENT ) ] ) );
-        if( ACPKMN( 0, OPPONENT ).Level < 10 )
+        printf( "%10ls%c\n", ACPKMN( 0, OPPONENT ).m_boxdata.m_Name, GENDER( ( *_player->m_pkmnTeam )[ ACPOS( 0, OPPONENT ) ] ) );
+        if( ACPKMN( 0, OPPONENT ).m_Level < 10 )
             printf( " " );
-        if( ACPKMN( 0, OPPONENT ).Level < 100 )
+        if( ACPKMN( 0, OPPONENT ).m_Level < 100 )
             printf( " " );
-        printf( "Lv%d%4dKP", ACPKMN( 0, OPPONENT ).Level,
-                ACPKMN( 0, OPPONENT ).stats.acHP );
+        printf( "Lv%d%4dKP", ACPKMN( 0, OPPONENT ).m_Level,
+                ACPKMN( 0, OPPONENT ).m_stats.m_acHP );
 
-        if( ( this->m_battleMode == DOUBLE ) && this->_opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ) {
+        if( ( m_battleMode == DOUBLE ) && _opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ) {
             OamTop->oamBuffer[ OPP_HP_2 ].isHidden = OamTop->oamBuffer[ OPP_PB_START + 1 ].isHidden = true;
             updateOAM( OamTop );
             for( int i = 0; i < 80; ++i )
                 swiWaitForVBlank( );
             consoleSelect( &Bottom );
             clear( );
-            sprintf( buffer, "und %ls in den Kampf.", ACPKMN( 1, OPPONENT ).boxdata.Name );
+            sprintf( buffer, "und %ls in den Kampf.", ACPKMN( 1, OPPONENT ).m_boxdata.m_Name );
             cust_font.print_string( buffer, 8, 8, true );
             consoleSelect( &Top );
 
@@ -2058,33 +2058,33 @@ namespace BATTLE {
             palcnt = OPP_PKMN_2_PAL;
             nextAvailableTileIdx = OPP_PKMN_2_TILE;
 
-            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", ACPKMN( 1, OPPONENT ).boxdata.SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
-                ACPKMN( 1, OPPONENT ).boxdata.isShiny( ), ACPKMN( 1, OPPONENT ).boxdata.isFemale ) ) {
+            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
+                ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ), ACPKMN( 1, OPPONENT ).m_boxdata.m_isFemale ) ) {
                 oamIndex = OPP_PKMN_2_START;
                 palcnt = OPP_PKMN_2_PAL;
                 nextAvailableTileIdx = OPP_PKMN_2_TILE;
-                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", ACPKMN( 1, OPPONENT ).boxdata.SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
-                                ACPKMN( 1, OPPONENT ).boxdata.isShiny( ), !ACPKMN( 1, OPPONENT ).boxdata.isFemale );
+                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
+                                ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ), !ACPKMN( 1, OPPONENT ).m_boxdata.m_isFemale );
             }
-            if( ACPKMN( 1, OPPONENT ).boxdata.isShiny( ) )
+            if( ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ) )
                 animateShiny( 112 + 16, 20 );
 
 
             displayHP( 100, 101, 0, 8, HP_COL( 1, 1 ), HP_COL( 1, 1 ) + 1, false );
-            displayHP( 100, 100 - ACPKMN( 1, OPPONENT ).stats.acHP * 100 / ACPKMN( 1, OPPONENT ).stats.maxHP, 0, 8, HP_COL( 1, 1 ), HP_COL( 1, 1 ) + 1, false );
+            displayHP( 100, 100 - ACPKMN( 1, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 1, OPPONENT ).m_stats.m_maxHP, 0, 8, HP_COL( 1, 1 ), HP_COL( 1, 1 ) + 1, false );
             OamTop->oamBuffer[ OPP_PB_START + 1 ].x = 8;
             OamTop->oamBuffer[ OPP_PB_START + 1 ].y = 17;
             consoleSetWindow( &Top, 4, 2, 20, 5 );
-            printf( "%ls%c\nLv%d%4dKP", ACPKMN( 1, OPPONENT ).boxdata.Name, GENDER( ( *this->_player->m_pkmnTeam )[ ACPOS( 1, OPPONENT ) ] ),
-                    ACPKMN( 1, OPPONENT ).Level, ACPKMN( 1, OPPONENT ).stats.acHP );
+            printf( "%ls%c\nLv%d%4dKP", ACPKMN( 1, OPPONENT ).m_boxdata.m_Name, GENDER( ( *_player->m_pkmnTeam )[ ACPOS( 1, OPPONENT ) ] ),
+                    ACPKMN( 1, OPPONENT ).m_Level, ACPKMN( 1, OPPONENT ).m_stats.m_acHP );
         }
 
         consoleSelect( &Bottom );
-        for( int i = 1 + ( this->m_battleMode == DOUBLE && this->_opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ); i < 6; ++i ) {
+        for( int i = 1 + ( m_battleMode == DOUBLE && _opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ); i < 6; ++i ) {
             OamTop->oamBuffer[ OPP_PB_START + i ].x = -4 + 18 * i;
             OamTop->oamBuffer[ OPP_PB_START + i ].y = -4;
             OamTop->oamBuffer[ OPP_PB_START + i ].isHidden = false;
-            switch( this->ACPKMNSTS( i, OPPONENT ) ) {
+            switch( ACPKMNSTS( i, OPPONENT ) ) {
                 case NA:
                     OamTop->oamBuffer[ OPP_PB_START + i ].isHidden = true;
                     break;
@@ -2104,23 +2104,23 @@ namespace BATTLE {
         for( int i = 0; i < 80; ++i )
             swiWaitForVBlank( );
 
-        if( abilities[ ACPKMN( 0, OPPONENT ).boxdata.ability ].m_type & ability::BEFORE_BATTLE ) {
+        if( abilities[ ACPKMN( 0, OPPONENT ).m_boxdata.m_ability ].m_type & ability::BEFORE_BATTLE ) {
             clear( );
             sprintf( buffer, "%s von\n %ls (Gegn.) wirkt!\n",
-                     abilities[ ACPKMN( 0, OPPONENT ).boxdata.ability ].m_abilityName.c_str( ),
-                     ACPKMN( 0, OPPONENT ).boxdata.Name );
+                     abilities[ ACPKMN( 0, OPPONENT ).m_boxdata.m_ability ].m_abilityName.c_str( ),
+                     ACPKMN( 0, OPPONENT ).m_boxdata.m_Name );
             cust_font.print_string( buffer, 8, 8, true );
-            //abilities[(*this->_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].boxdata.ability].run();
+            //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
             for( int i = 0; i < 100; ++i )
                 swiWaitForVBlank( );
         }
-        if( ( this->m_battleMode == DOUBLE ) && abilities[ ACPKMN( 1, OPPONENT ).boxdata.ability ].m_type & ability::BEFORE_BATTLE ) {
+        if( ( m_battleMode == DOUBLE ) && abilities[ ACPKMN( 1, OPPONENT ).m_boxdata.m_ability ].m_type & ability::BEFORE_BATTLE ) {
             clear( );
             sprintf( buffer, "%s von\n %ls (Gegn.) wirkt!\n",
-                     abilities[ ACPKMN( 1, OPPONENT ).boxdata.ability ].m_abilityName.c_str( ),
-                     ACPKMN( 1, OPPONENT ).boxdata.Name );
+                     abilities[ ACPKMN( 1, OPPONENT ).m_boxdata.m_ability ].m_abilityName.c_str( ),
+                     ACPKMN( 1, OPPONENT ).m_boxdata.m_Name );
             cust_font.print_string( buffer, 8, 8, true );
-            //abilities[(*this->_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].boxdata.ability].run();
+            //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
             for( int i = 0; i < 100; ++i )
                 swiWaitForVBlank( );
         }
@@ -2129,7 +2129,7 @@ namespace BATTLE {
         //Own Side
         consoleSelect( &Bottom );
         clear( );
-        sprintf( buffer, "Los %ls! ", ACPKMN( 0, PLAYER ).boxdata.Name );
+        sprintf( buffer, "Los %ls! ", ACPKMN( 0, PLAYER ).m_boxdata.m_Name );
         cust_font.print_string( buffer, 8, 8, true );
         consoleSelect( &Top );
 
@@ -2137,32 +2137,32 @@ namespace BATTLE {
         oamIndex = OWN_PKMN_1_START;
         palcnt = OWN_PKMN_1_PAL;
         nextAvailableTileIdx = OWN_PKMN_1_TILE;
-        if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 0, PLAYER ).boxdata.SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
-            ACPKMN( 0, PLAYER ).boxdata.isShiny( ), ACPKMN( 0, PLAYER ).boxdata.isFemale ) ) {
+        if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
+            ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ), ACPKMN( 0, PLAYER ).m_boxdata.m_isFemale ) ) {
             oamIndex = OWN_PKMN_1_START;
             palcnt = OWN_PKMN_1_PAL;
             nextAvailableTileIdx = OWN_PKMN_1_TILE;
-            loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 0, PLAYER ).boxdata.SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
-                            ACPKMN( 0, PLAYER ).boxdata.isShiny( ), !ACPKMN( 0, PLAYER ).boxdata.isFemale );
+            loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
+                            ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ), !ACPKMN( 0, PLAYER ).m_boxdata.m_isFemale );
         }
-        if( ACPKMN( 0, PLAYER ).boxdata.isShiny( ) )
+        if( ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ) )
             animateShiny( 6, 116 );
 
         displayHP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, false );
-        displayHP( 100, 100 - ACPKMN( 0, PLAYER ).stats.acHP * 100 / ACPKMN( 0, PLAYER ).stats.maxHP,
+        displayHP( 100, 100 - ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 0, PLAYER ).m_stats.m_maxHP,
                    256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, false );
         displayEP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
 
-        POKEMON::PKMNDATA::getAll( ACPKMN( 0, PLAYER ).boxdata.SPEC, p );
-        displayEP( 0, ( ACPKMN( 0, PLAYER ).boxdata.exp - POKEMON::EXP[ ACPKMN( 0, PLAYER ).Level - 1 ][ p.expType ] ) * 100 /
-                   ( POKEMON::EXP[ ACPKMN( 0, PLAYER ).Level ][ p.expType ] - POKEMON::EXP[ ACPKMN( 0, PLAYER ).Level - 1 ][ p.expType ] ),
+        POKEMON::PKMNDATA::getAll( ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, p );
+        displayEP( 0, ( ACPKMN( 0, PLAYER ).m_boxdata.m_exp - POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level - 1 ][ p.m_expType ] ) * 100 /
+                   ( POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level ][ p.m_expType ] - POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level - 1 ][ p.m_expType ] ),
                    256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
         OamTop->oamBuffer[ OWN_PB_START ].x = 256 - 88 - 32 + 4;
         OamTop->oamBuffer[ OWN_PB_START ].y = 192 - 31 - 32;
         consoleSetWindow( &Top, 21, 16, 20, 5 );
 
-        printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).boxdata.Name, GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).Level,
-                ACPKMN( 0, PLAYER ).stats.acHP );
+        printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).m_boxdata.m_Name, GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).m_Level,
+                ACPKMN( 0, PLAYER ).m_stats.m_acHP );
 
 
         OamTop->oamBuffer[ OWN_PB_START ].isHidden = OamTop->oamBuffer[ OWN_HP_1 ].isHidden = false;
@@ -2170,10 +2170,10 @@ namespace BATTLE {
         for( int i = 0; i < 80; ++i )
             swiWaitForVBlank( );
 
-        if( ( this->m_battleMode == DOUBLE ) && this->_player->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, PLAYER ) != KO ) {
+        if( ( m_battleMode == DOUBLE ) && _player->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, PLAYER ) != KO ) {
             consoleSelect( &Bottom );
             clear( );
-            sprintf( buffer, "Auf in den Kampf %ls! ", ACPKMN( 1, PLAYER ).boxdata.Name );
+            sprintf( buffer, "Auf in den Kampf %ls! ", ACPKMN( 1, PLAYER ).m_boxdata.m_Name );
             cust_font.print_string( buffer, 8, 8, true );
             consoleSelect( &Top );
 
@@ -2186,15 +2186,15 @@ namespace BATTLE {
             if( !loadPKMNSprite( OamTop,
                 spriteInfoTop,
                 "nitro:/PICS/SPRITES/PKMNBACK/",
-                ACPKMN( 1, PLAYER ).boxdata.SPEC,
+                ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC,
                 50,
                 120,
                 oamIndex,
                 palcnt,
                 nextAvailableTileIdx,
                 false,
-                ACPKMN( 1, PLAYER ).boxdata.isShiny( ),
-                ACPKMN( 1, PLAYER ).boxdata.isFemale ) ) {
+                ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ),
+                ACPKMN( 1, PLAYER ).m_boxdata.m_isFemale ) ) {
 
                 oamIndex = OWN_PKMN_2_START;
                 palcnt = OWN_PKMN_2_PAL;
@@ -2202,50 +2202,50 @@ namespace BATTLE {
                 loadPKMNSprite( OamTop,
                                 spriteInfoTop,
                                 "nitro:/PICS/SPRITES/PKMNBACK/",
-                                ACPKMN( 1, PLAYER ).boxdata.SPEC,
+                                ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC,
                                 50,
                                 120,
                                 oamIndex,
                                 palcnt,
                                 nextAvailableTileIdx,
                                 false,
-                                ACPKMN( 1, PLAYER ).boxdata.isShiny( ),
-                                !ACPKMN( 1, PLAYER ).boxdata.isFemale );
+                                ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ),
+                                !ACPKMN( 1, PLAYER ).m_boxdata.m_isFemale );
             }
-            if( ACPKMN( 1, PLAYER ).boxdata.isShiny( ) )
+            if( ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ) )
                 animateShiny( 50 + 16, 136 );
 
             OamTop->oamBuffer[ OWN_PB_START + 1 ].isHidden = OamTop->oamBuffer[ OWN_HP_2 ].isHidden = false;
             updateOAM( OamTop );
 
             displayHP( 100, 101, 256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, false );
-            displayHP( 100, 100 - ACPKMN( 1, PLAYER ).stats.acHP * 100 / ACPKMN( 1, PLAYER ).stats.maxHP,
+            displayHP( 100, 100 - ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 1, PLAYER ).m_stats.m_maxHP,
                        256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, false );
             displayEP( 100, 100, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
-            POKEMON::PKMNDATA::getAll( ACPKMN( 1, PLAYER ).boxdata.SPEC, p );
-            displayEP( 0, ( ACPKMN( 1, PLAYER ).boxdata.exp - POKEMON::EXP[ ACPKMN( 1, PLAYER ).Level - 1 ][ p.expType ] ) * 100 /
-                       ( POKEMON::EXP[ ACPKMN( 1, PLAYER ).Level ][ p.expType ] - POKEMON::EXP[ ACPKMN( 1, PLAYER ).Level - 1 ][ p.expType ] ),
+            POKEMON::PKMNDATA::getAll( ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, p );
+            displayEP( 0, ( ACPKMN( 1, PLAYER ).m_boxdata.m_exp - POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level - 1 ][ p.m_expType ] ) * 100 /
+                       ( POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level ][ p.m_expType ] - POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level - 1 ][ p.m_expType ] ),
                        256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
 
             OamTop->oamBuffer[ OWN_PB_START + 1 ].x = 256 - 32 + 4;
             OamTop->oamBuffer[ OWN_PB_START + 1 ].y = 192 - 31;
             consoleSetWindow( &Top, 16, 20, 20, 5 );
 
-            printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).boxdata.Name, GENDER( ACPKMN( 1, PLAYER ) ) );
-            if( ACPKMN( 1, PLAYER ).Level < 10 )
+            printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).m_boxdata.m_Name, GENDER( ACPKMN( 1, PLAYER ) ) );
+            if( ACPKMN( 1, PLAYER ).m_Level < 10 )
                 printf( " " );
-            if( ACPKMN( 1, PLAYER ).Level < 100 )
+            if( ACPKMN( 1, PLAYER ).m_Level < 100 )
                 printf( " " );
-            printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).Level,
-                    ACPKMN( 1, PLAYER ).stats.acHP );
+            printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
+                    ACPKMN( 1, PLAYER ).m_stats.m_acHP );
 
         }
 
-        for( int i = 1 + ( this->m_battleMode == DOUBLE && this->_player->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, PLAYER ) != KO ); i < 6; ++i ) {
+        for( int i = 1 + ( m_battleMode == DOUBLE && _player->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, PLAYER ) != KO ); i < 6; ++i ) {
             OamTop->oamBuffer[ OWN_PB_START + i ].x = 236 - 18 * i;
             OamTop->oamBuffer[ OWN_PB_START + i ].y = 196 - 16;
             OamTop->oamBuffer[ OWN_PB_START + i ].isHidden = false;
-            switch( this->ACPKMNSTS( i, PLAYER ) ) {
+            switch( ACPKMNSTS( i, PLAYER ) ) {
                 case NA:
                     OamTop->oamBuffer[ OWN_PB_START + i ].isHidden = true;
                     break;
@@ -2266,23 +2266,23 @@ namespace BATTLE {
             swiWaitForVBlank( );
 
         consoleSelect( &Bottom );
-        if( abilities[ ACPKMN( 0, PLAYER ).boxdata.ability ].m_type & ability::BEFORE_BATTLE ) {
+        if( abilities[ ACPKMN( 0, PLAYER ).m_boxdata.m_ability ].m_type & ability::BEFORE_BATTLE ) {
             clear( );
             sprintf( buffer, "%s von\n %ls wirkt!\n",
-                     abilities[ ACPKMN( 0, PLAYER ).boxdata.ability ].m_abilityName.c_str( ),
-                     ACPKMN( 0, PLAYER ).boxdata.Name );
+                     abilities[ ACPKMN( 0, PLAYER ).m_boxdata.m_ability ].m_abilityName.c_str( ),
+                     ACPKMN( 0, PLAYER ).m_boxdata.m_Name );
             cust_font.print_string( buffer, 8, 8, true );
-            //abilities[(*this->_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].boxdata.ability].run();
+            //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
             for( int i = 0; i < 100; ++i )
                 swiWaitForVBlank( );
         }
-        if( ( this->m_battleMode == DOUBLE ) && abilities[ ACPKMN( 1, PLAYER ).boxdata.ability ].m_type & ability::BEFORE_BATTLE ) {
+        if( ( m_battleMode == DOUBLE ) && abilities[ ACPKMN( 1, PLAYER ).m_boxdata.m_ability ].m_type & ability::BEFORE_BATTLE ) {
             clear( );
             sprintf( buffer, "%s von\n %ls wirkt!\n",
-                     abilities[ ACPKMN( 1, PLAYER ).boxdata.ability ].m_abilityName.c_str( ),
-                     ACPKMN( 1, PLAYER ).boxdata.Name );
+                     abilities[ ACPKMN( 1, PLAYER ).m_boxdata.m_ability ].m_abilityName.c_str( ),
+                     ACPKMN( 1, PLAYER ).m_boxdata.m_Name );
             cust_font.print_string( buffer, 8, 8, true );
-            //abilities[(*this->_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].boxdata.ability].run();
+            //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
             for( int i = 0; i < 100; ++i )
                 swiWaitForVBlank( );
         }
@@ -2293,7 +2293,7 @@ namespace BATTLE {
 
         for( int i = 0; i <= 4; ++i )
             Oam->oamBuffer[ i ].isHidden = false;
-        Oam->oamBuffer[ 2 ].isHidden = !SAV.activatedPNav;
+        Oam->oamBuffer[ 2 ].isHidden = !SAV.m_activatedPNav;
         updateOAMSub( Oam );
         consoleSelect( &Bottom );
         consoleClear( );
@@ -2313,19 +2313,19 @@ namespace BATTLE {
             return 0;
         }
 
-        if( p_defendingPkmn.stats.acHP == 0 ) {
+        if( p_defendingPkmn.m_stats.m_acHP == 0 ) {
             missed = true;
             return 0;
         }
 
-        int atkval = ( p_move.m_moveHitType == move::moveHitTypes::SPEC ? p_attackingPkmn.stats.SAtk : p_attackingPkmn.stats.Atk );
-        int defval = ( p_move.m_moveHitType == move::moveHitTypes::SPEC ? p_defendingPkmn.stats.SDef : p_defendingPkmn.stats.Def );
+        int atkval = ( p_move.m_moveHitType == move::moveHitTypes::SPEC ? p_attackingPkmn.m_stats.m_SAtk : p_attackingPkmn.m_stats.m_Atk );
+        int defval = ( p_move.m_moveHitType == move::moveHitTypes::SPEC ? p_defendingPkmn.m_stats.m_SDef : p_defendingPkmn.m_stats.m_Def );
 
-        int baseDmg = ( ( ( ( 2 * p_attackingPkmn.Level ) / 5 + 2 ) * p_move.m_moveBasePower * atkval ) / defval ) / 50 + 2;
+        int baseDmg = ( ( ( ( 2 * p_attackingPkmn.m_Level ) / 5 + 2 ) * p_move.m_moveBasePower * atkval ) / defval ) / 50 + 2;
 
         POKEMON::PKMNDATA::PKMNDATA p1, p2;
-        POKEMON::PKMNDATA::getAll( p_attackingPkmn.boxdata.SPEC, p1 );
-        POKEMON::PKMNDATA::getAll( p_defendingPkmn.boxdata.SPEC, p2 );
+        POKEMON::PKMNDATA::getAll( p_attackingPkmn.m_boxdata.m_SPEC, p1 );
+        POKEMON::PKMNDATA::getAll( p_defendingPkmn.m_boxdata.m_SPEC, p2 );
 
         int vs = 1;
         criticalOccured = false;
@@ -2343,12 +2343,12 @@ namespace BATTLE {
 
         baseDmg = ( baseDmg * ( 100 - p_randomValue ) ) / 100;
 
-        if( p_move.m_moveType == p1.Types[ 0 ] || p_move.m_moveType == p1.Types[ 1 ] )
+        if( p_move.m_moveType == p1.m_types[ 0 ] || p_move.m_moveType == p1.m_types[ 1 ] )
             baseDmg = ( baseDmg * 3 ) / 2;
 
-        eff = getEffectiveness( p_move.m_moveType, p2.Types[ 0 ] );
-        if( p2.Types[ 1 ] != p2.Types[ 0 ] )
-            eff *= getEffectiveness( p_move.m_moveType, p2.Types[ 1 ] );
+        eff = getEffectiveness( p_move.m_moveType, p2.m_types[ 0 ] );
+        if( p2.m_types[ 1 ] != p2.m_types[ 0 ] )
+            eff *= getEffectiveness( p_move.m_moveType, p2.m_types[ 1 ] );
         baseDmg = baseDmg * eff;
 
         return std::max( 1, baseDmg );
@@ -2360,7 +2360,7 @@ namespace BATTLE {
 
     void battle::printAttackChoiceScreen( int p_pkmnSlot, int& p_oamIndex, int& p_paletteIndex, int& p_tileIndex ) {
         for( int i = 21; i < 29; i += 2 ) {
-            if( !( ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Attack[ ( i - 21 ) / 2 ] ) )
+            if( !( ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ) )
                 continue;
 
             ( Oam->oamBuffer[ i ] ).isHidden = false;
@@ -2376,14 +2376,14 @@ namespace BATTLE {
             consoleSetWindow( &Bottom, ( Oam->oamBuffer[ i ] ).x / 8 - 3, ( Oam->oamBuffer[ i ] ).y / 8 + 1, 17, 5 );
             consoleClear( );
             drawTypeIcon( Oam, spriteInfo, p_oamIndex, p_paletteIndex, p_tileIndex,
-                          AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Attack[ ( i - 21 ) / 2 ] ]->m_moveType,
+                          AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveType,
                           ( Oam->oamBuffer[ i ] ).x + 4, ( Oam->oamBuffer[ i ] ).y - 10, true );
             printf( "    %s\n    AP %2hhu""/""%2hhu ",
-                    &( AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Attack[ ( i - 21 ) / 2 ] ]->m_moveName[ 0 ] ),
-                    ACPKMN( p_pkmnSlot, PLAYER ).boxdata.AcPP[ ( i - 21 ) / 2 ],
-                    AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Attack[ ( i - 21 ) / 2 ] ]->m_movePP *
-                    ( ( 5 + ACPKMN( p_pkmnSlot, PLAYER ).boxdata.PPupget( ( i - 21 ) / 2 ) ) / 5 ) );
-            switch( AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Attack[ ( i - 21 ) / 2 ] ]->m_moveHitType ) {
+                    &( AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveName[ 0 ] ),
+                    ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_AcPP[ ( i - 21 ) / 2 ],
+                    AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_movePP *
+                    ( ( 5 + ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.PPupget( ( i - 21 ) / 2 ) ) / 5 ) );
+            switch( AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveHitType ) {
                 case move::PHYS:
                     printf( "PHS" );
                     break;
@@ -2395,13 +2395,13 @@ namespace BATTLE {
                     break;
             }
             printf( "\n    S " );
-            if( AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Attack[ ( i - 21 ) / 2 ] ]->m_moveBasePower )
-                printf( "%3i", AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Attack[ ( i - 21 ) / 2 ] ]->m_moveBasePower );
+            if( AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveBasePower )
+                printf( "%3i", AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveBasePower );
             else
                 printf( "---" );
             printf( " G " );
-            if( AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Attack[ ( i - 21 ) / 2 ] ]->m_moveAccuracy )
-                printf( "%3i", AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Attack[ ( i - 21 ) / 2 ] ]->m_moveAccuracy );
+            if( AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveAccuracy )
+                printf( "%3i", AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveAccuracy );
             else
                 printf( "---" );
         }
@@ -2431,7 +2431,7 @@ namespace BATTLE {
 
         for( int i = 21; i < 29; i += 2 ) {
             int u = ( i - 21 ) / 2;
-            if( this->m_battleMode != DOUBLE && ( u == 2 || u == 1 ) ) {
+            if( m_battleMode != DOUBLE && ( u == 2 || u == 1 ) ) {
                 ( Oam->oamBuffer[ i ] ).isHidden = true;
                 ( Oam->oamBuffer[ i + 1 ] ).isHidden = true;
                 consoleSetWindow( &Bottom, ( Oam->oamBuffer[ i ] ).x / 8 - 3, ( Oam->oamBuffer[ i ] ).y / 8 + 1, 20, 5 );
@@ -2441,7 +2441,7 @@ namespace BATTLE {
 
             POKEMON::PKMN &acPK = ( u / 2 ? ACPKMN( 1 - u % 2, PLAYER ) : ACPKMN( u % 2, OPPONENT ) );
 
-            if( acPK.stats.acHP == 0 ) {
+            if( acPK.m_stats.m_acHP == 0 ) {
                 ( Oam->oamBuffer[ i ] ).isHidden = true;
                 ( Oam->oamBuffer[ i + 1 ] ).isHidden = true;
                 consoleSetWindow( &Bottom, ( Oam->oamBuffer[ i ] ).x / 8 - 3, ( Oam->oamBuffer[ i ] ).y / 8 + 1, 20, 5 );
@@ -2457,11 +2457,11 @@ namespace BATTLE {
             consoleClear( );
 
 
-            drawPKMNIcon( Oam, spriteInfo, acPK.boxdata.SPEC, ( Oam->oamBuffer[ i ] ).x - 4, ( Oam->oamBuffer[ i ] ).y - 16, p_oamIndex, p_paletteIndex, p_tileIndex, true );
+            drawPKMNIcon( Oam, spriteInfo, acPK.m_boxdata.m_SPEC, ( Oam->oamBuffer[ i ] ).x - 4, ( Oam->oamBuffer[ i ] ).y - 16, p_oamIndex, p_paletteIndex, p_tileIndex, true );
 
             updateOAMSub( Oam );
 
-            printf( "      %ls", acPK.boxdata.Name );
+            printf( "      %ls", acPK.m_boxdata.m_Name );
             if( validTrg[ u ] ) {
                 if( AttackList[ p_move ]->m_moveHitType != move::moveHitTypes::STAT )
                     printf( "\n      %3d-%2d KP\n        Schaden",
@@ -2482,7 +2482,7 @@ namespace BATTLE {
         ( Oam->oamBuffer[ 20 ] ).isHidden = false;
         updateOAMSub( Oam );
 
-        int num = ( int )this->_player->m_pkmnTeam->size( );
+        int num = ( int )_player->m_pkmnTeam->size( );
         consoleSelect( &Bottom );
 
         for( int i = 23; i < 32; i += ( ( ( i - 21 ) / 2 ) % 2 ? -2 : +6 ) ) {
@@ -2494,17 +2494,17 @@ namespace BATTLE {
             ( Oam->oamBuffer[ i ] ).y -= 16 * ( 2 - ( ( i - 21 ) / 4 ) );
             updateOAMSub( Oam );
             consoleSetWindow( &Bottom, ( ( Oam->oamBuffer[ i ] ).x + 6 ) / 8, ( ( Oam->oamBuffer[ i ] ).y + 6 ) / 8, 12, 3 );
-            if( !ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).boxdata.IV.isEgg ) {
+            if( !ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_boxdata.m_IV.m_isEgg ) {
                 printf( "   %3i/%3i\n ",
-                        ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).stats.acHP,
-                        ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).stats.maxHP );
-                wprintf( ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).boxdata.Name );
+                        ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_stats.m_acHP,
+                        ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_stats.m_maxHP );
+                wprintf( ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_boxdata.m_Name );
                 printf( "\n" );
                 printf( "%11s",
-                        ItemList[ ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).boxdata.Item ].getDisplayName( ).c_str( ) );
+                        ItemList[ ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_boxdata.m_Item ].getDisplayName( ).c_str( ) );
                 drawPKMNIcon( Oam,
                               spriteInfo,
-                              ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).boxdata.SPEC,
+                              ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_boxdata.m_SPEC,
                               ( Oam->oamBuffer[ i ] ).x - 4,
                               ( Oam->oamBuffer[ i ] ).y - 20,
                               p_oamIndex,
@@ -2528,7 +2528,7 @@ namespace BATTLE {
 
     int battle::getSwitchPkmn( int& p_oamIndex, int& p_paletteIndex, int& p_tileIndex, bool p_retA ) {
         int res = -1;
-        int num = ( int )this->_player->m_pkmnTeam->size( );
+        int num = ( int )_player->m_pkmnTeam->size( );
         touchPosition t;
         ( Oam->oamBuffer[ 20 ] ).isHidden = !p_retA;
         while( 42 ) {
@@ -2562,9 +2562,9 @@ namespace BATTLE {
                 if( ( ( ( i - 21 ) / 2 ) ^ 1 ) >= num )
                     break;
                 else if( t.px > Oam->oamBuffer[ i ].x && t.py > Oam->oamBuffer[ i ].y && t.px - 64 < Oam->oamBuffer[ i + 1 ].x && t.py - 32 < Oam->oamBuffer[ i ].y ) {
-                    if( ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).boxdata.IV.isEgg ||
-                        ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).stats.acHP == 0 ||
-                        ( ( ( i - 21 ) / 2 ) ^ 1 ) < ( 1 + ( this->m_battleMode == DOUBLE ) ) )
+                    if( ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_boxdata.m_IV.m_isEgg ||
+                        ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_stats.m_acHP == 0 ||
+                        ( ( ( i - 21 ) / 2 ) ^ 1 ) < ( 1 + ( m_battleMode == DOUBLE ) ) )
                         continue;
 
                     ( Oam->oamBuffer[ i ] ).isHidden = true;
@@ -2610,9 +2610,9 @@ OUT2:
 
         setMainBattleVisibility( false );
         int oamIndex = oamIndexS, paletteIndex = palcntS, tileIndex = nextAvailableTileIdxS;
-        drawPKMNIcon( Oam, spriteInfo, ACPKMN( p_pkmnSlot, PLAYER ).boxdata.SPEC, 112, 64, oamIndex, paletteIndex, tileIndex, true );
+        drawPKMNIcon( Oam, spriteInfo, ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_SPEC, 112, 64, oamIndex, paletteIndex, tileIndex, true );
         clear( );
-        sprintf( buffer, "Was soll %ls tun?", ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Name );
+        sprintf( buffer, "Was soll %ls tun?", ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Name );
         cust_font.print_string( buffer, 8, 8, true );
         updateOAMSub( Oam );
 
@@ -2636,10 +2636,10 @@ OUT2:
 
                 aprest = 0;
                 for( int i = 0; i < 4; ++i )
-                    aprest += ACPKMN( p_pkmnSlot, PLAYER ).boxdata.AcPP[ i ];
+                    aprest += ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_AcPP[ i ];
                 if( aprest == 0 ) {
                     clear( );
-                    printf( "%ls hat keine\n restlichen Attacken...", ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Name );
+                    printf( "%ls hat keine\n restlichen Attacken...", ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Name );
                     cust_font.print_string( buffer, 8, 8, true );
                     ownAtk[ p_pkmnSlot ] = std::pair<int, int>( 165, 1 | 2 | 4 | 8 );
                 } else {
@@ -2688,9 +2688,9 @@ OUT2:
                         for( int i = 21; i < 29; i += 2 )
                             if( t.px>( Oam->oamBuffer[ i ].x ) && t.px < ( Oam->oamBuffer[ i + 1 ].x + 64 ) &&
                                 t.py>( Oam->oamBuffer[ i ] ).y && t.py < ( Oam->oamBuffer[ i ].y + 32 ) ) {
-                            if( !ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Attack[ ( i - 21 ) / 2 ] )
+                            if( !ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] )
                                 continue;
-                            if( !ACPKMN( p_pkmnSlot, PLAYER ).boxdata.AcPP[ ( i - 21 ) / 2 ] )
+                            if( !ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_AcPP[ ( i - 21 ) / 2 ] )
                                 continue;
 
                             while( 1 ) {
@@ -2701,7 +2701,7 @@ OUT2:
                                 if( t.px == 0 && t.py == 0 )
                                     break;
                             }
-                            int trg = getTarget( p_pkmnSlot, ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Attack[ ( i - 21 ) / 2 ] );
+                            int trg = getTarget( p_pkmnSlot, ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] );
                             if( trg == 0 ) {
                                 oamIndex = oamIndexS; paletteIndex = palcntS; tileIndex = nextAvailableTileIdxS;
                                 for( int i = 21; i < 29; i += 2 ) {
@@ -2727,8 +2727,8 @@ OUT2:
                                 break;
                             }
 
-                            ownAtk[ p_pkmnSlot ] = std::pair<int, int>( ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Attack[ ( i - 21 ) / 2 ], trg );
-                            ACPKMN( p_pkmnSlot, PLAYER ).boxdata.AcPP[ ( i - 21 ) / 2 ]--;
+                            ownAtk[ p_pkmnSlot ] = std::pair<int, int>( ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ], trg );
+                            ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_AcPP[ ( i - 21 ) / 2 ]--;
                             goto ATTACKCHOSEN;
                             }
                     }
@@ -2763,7 +2763,7 @@ ATTACKCHOSEN:
             }
             //END BAG
             //BEGIN POKENAV
-            else if( SAV.activatedPNav && t.px > 96 && t.px < 96 + 64 && t.py > 152 && t.py < 152 + 32 ) {
+            else if( SAV.m_activatedPNav && t.px > 96 && t.px < 96 + 64 && t.py > 152 && t.py < 152 + 32 ) {
                 waitForTouchUp( );
                 printf( "TEST3" );
             }
@@ -2803,7 +2803,7 @@ ATTACKCHOSEN:
         updateOAMSub( Oam );
 
         clear( );
-        sprintf( buffer, "Wen soll %ls angreifen?", ACPKMN( p_pkmnSlot, PLAYER ).boxdata.Name );
+        sprintf( buffer, "Wen soll %ls angreifen?", ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Name );
         cust_font.print_string( buffer, 8, 8, true );
 
         int oamIndex = oamIndexS, paletteIndex = palcntS, tileIndex = nextAvailableTileIdxS;
@@ -2834,12 +2834,12 @@ ATTACKCHOSEN:
                     changeA[ 2 + ( p_pkmnSlot ) ] = true;
 
                 for( int i = 21; i < 29; i += 2 ) {
-                    if( this->m_battleMode == DOUBLE && changeA[ ( i - 21 ) / 2 ] ) {
+                    if( m_battleMode == DOUBLE && changeA[ ( i - 21 ) / 2 ] ) {
                         int u = ( i - 21 ) / 2;
 
                         POKEMON::PKMN &acPK = ( ( u / 2 ) ? ACPKMN( 1 - u % 2, PLAYER ) : ACPKMN( u % 2, OPPONENT ) );
 
-                        if( acPK.stats.acHP == 0 )
+                        if( acPK.m_stats.m_acHP == 0 )
                             continue;
 
                         Oam->oamBuffer[ i ].isHidden = !Oam->oamBuffer[ i ].isHidden;
@@ -2861,14 +2861,14 @@ ATTACKCHOSEN:
                 if( t.px>( Oam->oamBuffer[ i ].x ) && t.px < ( Oam->oamBuffer[ i + 1 ].x + 64 ) &&
                     t.py>( Oam->oamBuffer[ i ] ).y && t.py < ( Oam->oamBuffer[ i ].y + 32 ) ) {
                     int u = ( i - 21 ) / 2;
-                    if( this->m_battleMode != DOUBLE && ( u == 2 || u == 1 ) )
+                    if( m_battleMode != DOUBLE && ( u == 2 || u == 1 ) )
                         continue;
                     if( !validTrg[ u ] )
                         continue;
 
                     POKEMON::PKMN &acPK = ( ( u / 2 ) ? ACPKMN( 1 - u % 2, PLAYER ) : ACPKMN( u % 2, OPPONENT ) );
 
-                    if( acPK.stats.acHP == 0 ) {
+                    if( acPK.m_stats.m_acHP == 0 ) {
                         ( Oam->oamBuffer[ i ] ).isHidden = true;
                         ( Oam->oamBuffer[ i + 1 ] ).isHidden = true;
                         consoleSetWindow( &Bottom, ( Oam->oamBuffer[ i ] ).x / 8 - 3, ( Oam->oamBuffer[ i ] ).y / 8 + 1, 20, 5 );
@@ -2907,22 +2907,22 @@ ATTACKCHOSEN:
     bool participated[ 6 ] = { false };
 #define LUCKY_EGG_EFFEKT     42
     int calcEXP( const POKEMON::PKMN& p_move, int p_atkind, const POKEMON::PKMN& p_defendingPkmn, bool p_wild ) {
-        if( !SAV.EXPShareEnabled && !participated[ p_atkind ] )
+        if( !SAV.m_EXPShareEnabled && !participated[ p_atkind ] )
             return 0;
 
         float a = p_wild ? 1 : 1.5;
-        POKEMON::PKMNDATA::getAll( p_defendingPkmn.boxdata.SPEC, p );
-        int b = p.EXPYield;
+        POKEMON::PKMNDATA::getAll( p_defendingPkmn.m_boxdata.m_SPEC, p );
+        int b = p.m_EXPYield;
 
-        float e = ItemList[ p_move.boxdata.Item ].getEffectType( ) == LUCKY_EGG_EFFEKT ? 1.5 : 1;
+        float e = ItemList[ p_move.m_boxdata.m_Item ].getEffectType( ) == LUCKY_EGG_EFFEKT ? 1.5 : 1;
 
-        int L = p_move.Level;
+        int L = p_move.m_Level;
 
         int s = 1;
-        if( SAV.EXPShareEnabled && !participated[ p_atkind ] )
+        if( SAV.m_EXPShareEnabled && !participated[ p_atkind ] )
             s = 2;
 
-        float t = ( p_move.boxdata.ID == SAV.ID && p_move.boxdata.SID == SAV.SID ? 1 : 1.5 );
+        float t = ( p_move.m_boxdata.m_ID == SAV.m_Id && p_move.m_boxdata.m_SID == SAV.m_Sid ? 1 : 1.5 );
 
         return int( ( a * t* b* e* L ) / ( 7 * s ) );
     }
@@ -2933,8 +2933,8 @@ ATTACKCHOSEN:
 
         if( missed ) {
             clear( );
-            if( P.stats.acHP )
-                sprintf( buffer, "%ls wich der Attacke aus.", P.boxdata.Name );
+            if( P.m_stats.m_acHP )
+                sprintf( buffer, "%ls wich der Attacke aus.", P.m_boxdata.m_Name );
             else
                 sprintf( buffer, "Die Attacke ging daneben..." );
             cust_font.print_string( buffer, 8, 8, true );
@@ -2945,15 +2945,15 @@ ATTACKCHOSEN:
         if( eff != 1 )
             clear( );
         if( eff > 3 )
-            sprintf( buffer, "Das ist enorm effektiv\ngegen %ls!", P.boxdata.Name );
+            sprintf( buffer, "Das ist enorm effektiv\ngegen %ls!", P.m_boxdata.m_Name );
         else if( eff > 1 )
-            sprintf( buffer, "Das ist sehr effektiv\ngegen %ls!", P.boxdata.Name );
+            sprintf( buffer, "Das ist sehr effektiv\ngegen %ls!", P.m_boxdata.m_Name );
         else if( eff == 0 )
-            sprintf( buffer, "Hat die Attacke\n%lsgetroffen?", P.boxdata.Name );
+            sprintf( buffer, "Hat die Attacke\n%lsgetroffen?", P.m_boxdata.m_Name );
         else if( eff < 0.3 )
-            sprintf( buffer, "Das ist nur enorm wenig\neffektiv gegen %ls...", P.boxdata.Name );
+            sprintf( buffer, "Das ist nur enorm wenig\neffektiv gegen %ls...", P.m_boxdata.m_Name );
         else if( eff < 1 )
-            sprintf( buffer, "Das ist nicht sehr effektiv\ngegen %ls.", P.boxdata.Name );
+            sprintf( buffer, "Das ist nicht sehr effektiv\ngegen %ls.", P.m_boxdata.m_Name );
 
         if( eff != 1 ) {
             cust_font.print_string( buffer, 8, 8, true );
@@ -2979,7 +2979,7 @@ ATTACKCHOSEN:
         initBattleScene( p_battleBack, p_weather );
         touchPosition t;
 
-        while( ( this->_round-- ) != 0 ) {
+        while( ( _round-- ) != 0 ) {
             switchWith[ 0 ][ OPPONENT ] = switchWith[ 0 ][ PLAYER ] =
                 switchWith[ 1 ][ OPPONENT ] = switchWith[ 1 ][ PLAYER ] = 0;
 
@@ -2988,7 +2988,7 @@ ATTACKCHOSEN:
             //Own
             if( ACPKMNSTS( 0, PLAYER ) == KO ) {
                 int pcnt = 0, at = 0;
-                for( int i = 1 + ( this->m_battleMode == DOUBLE ); i < 6; ++i )
+                for( int i = 1 + ( m_battleMode == DOUBLE ); i < 6; ++i )
                     if( ACPKMNSTS( i, PLAYER ) != KO ) {
                     //switchOwnPkmn(i,0);
                     pcnt++;
@@ -3006,7 +3006,7 @@ ATTACKCHOSEN:
                     switchOwnPkmn( res, 0 );
                 }
             }
-            if( ( this->m_battleMode == DOUBLE ) && ACPKMNSTS( 1, PLAYER ) == KO ) {
+            if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, PLAYER ) == KO ) {
                 int pcnt = 0, at = 0;
                 for( int i = 2; i < 6; ++i ) {
                     if( ACPKMNSTS( i, PLAYER ) != KO ) {
@@ -3028,10 +3028,10 @@ ATTACKCHOSEN:
                 }
             }
 
-            if( ACPKMNSTS( 0, PLAYER ) == KO && ( this->m_battleMode != DOUBLE || ACPKMNSTS( 1, PLAYER ) == KO || ACPKMNSTS( 1, PLAYER ) == NA ) ) {
+            if( ACPKMNSTS( 0, PLAYER ) == KO && ( m_battleMode != DOUBLE || ACPKMNSTS( 1, PLAYER ) == KO || ACPKMNSTS( 1, PLAYER ) == NA ) ) {
                 //Player lost
                 clear( );
-                cust_font.print_string( this->_opponent->getWinMsg( ), 8, 8, true );
+                cust_font.print_string( _opponent->getWinMsg( ), 8, 8, true );
                 for( int i = 0; i < 75; ++i )
                     swiWaitForVBlank( );
 
@@ -3050,31 +3050,31 @@ ATTACKCHOSEN:
 
             //Opp
             if( ACPKMNSTS( 0, OPPONENT ) == KO )
-                for( int i = 1 + ( this->m_battleMode == DOUBLE ); i < this->_opponent->m_pkmnTeam->size( ); ++i )
+                for( int i = 1 + ( m_battleMode == DOUBLE ); i < _opponent->m_pkmnTeam->size( ); ++i )
                     if( ACPKMNSTS( i, OPPONENT ) != KO ) {
                 switchOppPkmn( i, 0 );
                 for( int i = 0; i < 6; ++i )
                     participated[ i ] = false;
                 break;
                     }
-            if( ( this->m_battleMode == DOUBLE ) && ACPKMNSTS( 1, OPPONENT ) == KO )
-                for( int i = 2; i < this->_opponent->m_pkmnTeam->size( ); ++i )
+            if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, OPPONENT ) == KO )
+                for( int i = 2; i < _opponent->m_pkmnTeam->size( ); ++i )
                     if( ACPKMNSTS( i, OPPONENT ) != KO ) {
                 switchOppPkmn( i, 1 );
                 for( int i = 0; i < 6; ++i )
                     participated[ i ] = false;
                 break;
                     }
-            if( ACPKMNSTS( 0, OPPONENT ) == KO && ( this->m_battleMode != DOUBLE || ACPKMNSTS( 1, OPPONENT ) == KO || ACPKMNSTS( 1, OPPONENT ) == NA ) ) {
+            if( ACPKMNSTS( 0, OPPONENT ) == KO && ( m_battleMode != DOUBLE || ACPKMNSTS( 1, OPPONENT ) == KO || ACPKMNSTS( 1, OPPONENT ) == NA ) ) {
                 //Opp lost
                 clear( );
-                cust_font.print_string( this->_opponent->getLooseMsg( ), 8, 8, true );
+                cust_font.print_string( _opponent->getLooseMsg( ), 8, 8, true );
                 for( int i = 0; i < 75; ++i )
                     swiWaitForVBlank( );
 
-                SAV.Money += this->_opponent->getLooseMoney( );
+                SAV.m_money += _opponent->getLooseMoney( );
                 clear( );
-                sprintf( buffer, "Du gewinnst %dP!", this->_opponent->getLooseMoney( ) );
+                sprintf( buffer, "Du gewinnst %dP!", _opponent->getLooseMoney( ) );
                 cust_font.print_string( buffer, 8, 8, true );
                 for( int i = 0; i < 75; ++i )
                     swiWaitForVBlank( );
@@ -3094,7 +3094,7 @@ ATTACKCHOSEN:
             //End of Switch Out
 
             participated[ ACPOS( 0, PLAYER ) ] = true;
-            if( ( this->m_battleMode == DOUBLE ) )
+            if( ( m_battleMode == DOUBLE ) )
                 participated[ ACPOS( 1, PLAYER ) ] = true;
 
             consoleSelect( &Bottom );
@@ -3112,7 +3112,7 @@ BEFORE_0:
                 }
             }
 BEFORE_1:
-            if( ( this->m_battleMode == DOUBLE ) && ACPKMNSTS( 1, PLAYER ) != KO )
+            if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, PLAYER ) != KO )
                 switch( getChoice( 1 ) ) {
                     case RETRY:
                         switchWith[ 1 ][ PLAYER ] = 0;
@@ -3129,21 +3129,21 @@ BEFORE_1:
             //OPP'S ACTIONS
             switchWith[ 0 ][ OPPONENT ] = switchWith[ 0 ][ PLAYER ];
             switchWith[ 1 ][ OPPONENT ] = switchWith[ 1 ][ PLAYER ];
-            oppAtk[ 0 ] = std::pair<int, int>( ACPKMN( 0, OPPONENT ).boxdata.Attack[ 0 ], 1 );
-            oppAtk[ 1 ] = std::pair<int, int>( ACPKMN( 1, OPPONENT ).boxdata.Attack[ 0 ], 2 );
+            oppAtk[ 0 ] = std::pair<int, int>( ACPKMN( 0, OPPONENT ).m_boxdata.m_Attack[ 0 ], 1 );
+            oppAtk[ 1 ] = std::pair<int, int>( ACPKMN( 1, OPPONENT ).m_boxdata.m_Attack[ 0 ], 2 );
 
 
             consoleClear( );
 
             int inits[ 4 ] = { 0 }, ranking[ 4 ] = { 0 };
 
-            int maxst = ( this->m_battleMode == DOUBLE ) ? 4 : 2;
+            int maxst = ( m_battleMode == DOUBLE ) ? 4 : 2;
 
             for( int i = 0; i < maxst; ++i )
                 if( i % 2 )
-                    inits[ i ] = ( *this->_opponent->m_pkmnTeam )[ _acPkmnPosition[ i / 2 ][ OPPONENT ] ].stats.Spd;
+                    inits[ i ] = ( *_opponent->m_pkmnTeam )[ _acPkmnPosition[ i / 2 ][ OPPONENT ] ].m_stats.m_Spd;
                 else
-                    inits[ i ] = ( *this->_player->m_pkmnTeam )[ _acPkmnPosition[ i / 2 ][ PLAYER ] ].stats.Spd;
+                    inits[ i ] = ( *_player->m_pkmnTeam )[ _acPkmnPosition[ i / 2 ][ PLAYER ] ].m_stats.m_Spd;
 
             bool ko[ 2 ][ 2 ] = { { false } };
 
@@ -3174,10 +3174,10 @@ BEFORE_1:
                 bool opp = acin % 2;
 
                 if( opp ) {
-                    if( ACPKMN( acin / 2, OPPONENT ).stats.acHP == 0 )
+                    if( ACPKMN( acin / 2, OPPONENT ).m_stats.m_acHP == 0 )
                         continue;
                 } else
-                    if( ACPKMN( acin / 2, PLAYER ).stats.acHP == 0 )
+                    if( ACPKMN( acin / 2, PLAYER ).m_stats.m_acHP == 0 )
                         continue;
 
                 if( switchWith[ acin / 2 ][ opp ] ) {
@@ -3194,12 +3194,12 @@ BEFORE_1:
                 if( opp )
                     sprintf( buffer,
                     "%ls (Gegner)\nsetzt %s ein!",
-                    ACPKMN( acin / 2, OPPONENT ).boxdata.Name,
+                    ACPKMN( acin / 2, OPPONENT ).m_boxdata.m_Name,
                     AttackList[ oppAtk[ acin / 2 ].first ]->m_moveName.c_str( ) );
                 else
                     sprintf( buffer,
                     "%ls setzt\n%s ein!",
-                    ACPKMN( acin / 2, PLAYER ).boxdata.Name,
+                    ACPKMN( acin / 2, PLAYER ).m_boxdata.m_Name,
                     AttackList[ ownAtk[ acin / 2 ].first ]->m_moveName.c_str( ) );
                 clear( );
                 cust_font.print_string( buffer, 8, 8, true );
@@ -3213,51 +3213,51 @@ BEFORE_1:
                         dmg1 = calcDamage( *AttackList[ oppAtk[ acin / 2 ].first ], ACPKMN( acin / 2, OPPONENT ), ACPKMN( 0, PLAYER ), rand( ) % 15 );
 
                         if( !missed ) {
-                            int old = ACPKMN( 0, PLAYER ).stats.acHP * 100 / ACPKMN( 0, PLAYER ).stats.maxHP;
-                            ACPKMN( 0, PLAYER ).stats.acHP = std::max( 0, ACPKMN( 0, PLAYER ).stats.acHP - dmg1 );
+                            int old = ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 0, PLAYER ).m_stats.m_maxHP;
+                            ACPKMN( 0, PLAYER ).m_stats.m_acHP = std::max( 0, ACPKMN( 0, PLAYER ).m_stats.m_acHP - dmg1 );
 
-                            ko[ 0 ][ PLAYER ] = ( ACPKMN( 0, PLAYER ).stats.acHP == 0 );
+                            ko[ 0 ][ PLAYER ] = ( ACPKMN( 0, PLAYER ).m_stats.m_acHP == 0 );
                             if( ko[ 0 ][ PLAYER ] )
                                 ACPKMNSTS( 0, PLAYER ) = KO;
 
-                            displayHP( old, 100 - ACPKMN( 0, PLAYER ).stats.acHP * 100 / ACPKMN( 0, PLAYER ).stats.maxHP,
+                            displayHP( old, 100 - ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 0, PLAYER ).m_stats.m_maxHP,
                                        256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, true );
                             consoleSetWindow( &Top, 21, 16, 20, 4 );
                             consoleClear( );
-                            printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).boxdata.Name,
-                                    GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).Level,
-                                    ACPKMN( 0, PLAYER ).stats.acHP );
+                            printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).m_boxdata.m_Name,
+                                    GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).m_Level,
+                                    ACPKMN( 0, PLAYER ).m_stats.m_acHP );
                         }
                         printEFFLOG( ( ACPKMN( 0, PLAYER ) ), oppAtk[ acin / 2 ].first );
                     }
-                    if( ( this->m_battleMode == DOUBLE ) && ( tg & 2 ) ) {
+                    if( ( m_battleMode == DOUBLE ) && ( tg & 2 ) ) {
                         missed = false;
                         dmg2 = calcDamage( *AttackList[ oppAtk[ acin / 2 ].first ], ACPKMN( acin / 2, OPPONENT ), ACPKMN( 1, PLAYER ), rand( ) % 15 );
 
                         if( !missed ) {
-                            int old = ACPKMN( 1, PLAYER ).stats.acHP * 100 / ACPKMN( 1, PLAYER ).stats.maxHP;
-                            ACPKMN( 1, PLAYER ).stats.acHP = std::max( 0, ACPKMN( 1, PLAYER ).stats.acHP - dmg2 );
+                            int old = ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 1, PLAYER ).m_stats.m_maxHP;
+                            ACPKMN( 1, PLAYER ).m_stats.m_acHP = std::max( 0, ACPKMN( 1, PLAYER ).m_stats.m_acHP - dmg2 );
 
-                            ko[ 1 ][ PLAYER ] = ( ACPKMN( 1, PLAYER ).stats.acHP == 0 );
+                            ko[ 1 ][ PLAYER ] = ( ACPKMN( 1, PLAYER ).m_stats.m_acHP == 0 );
                             if( ko[ 1 ][ PLAYER ] )
                                 ACPKMNSTS( 1, PLAYER ) = KO;
                             consoleSetWindow( &Top, 16, 20, 20, 5 );
                             consoleClear( );
-                            printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).boxdata.Name, GENDER( ACPKMN( 1, PLAYER ) ) );
-                            if( ACPKMN( 1, PLAYER ).Level < 10 )
+                            printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).m_boxdata.m_Name, GENDER( ACPKMN( 1, PLAYER ) ) );
+                            if( ACPKMN( 1, PLAYER ).m_Level < 10 )
                                 printf( " " );
-                            if( ACPKMN( 1, PLAYER ).Level < 100 )
+                            if( ACPKMN( 1, PLAYER ).m_Level < 100 )
                                 printf( " " );
-                            printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).Level,
-                                    ACPKMN( 1, PLAYER ).stats.acHP );
+                            printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
+                                    ACPKMN( 1, PLAYER ).m_stats.m_acHP );
 
-                            displayHP( old, 100 - ACPKMN( 1, PLAYER ).stats.acHP * 100 / ACPKMN( 1, PLAYER ).stats.maxHP,
+                            displayHP( old, 100 - ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 1, PLAYER ).m_stats.m_maxHP,
                                        256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, true );
 
                         }
                         printEFFLOG( ( ACPKMN( 1, PLAYER ) ), oppAtk[ acin / 2 ].first );
                     }
-                    if( ( this->m_battleMode == DOUBLE ) && ( tg & 8 ) ) {
+                    if( ( m_battleMode == DOUBLE ) && ( tg & 8 ) ) {
                         missed = false;
                         dmg3 = calcDamage( *AttackList[ oppAtk[ acin / 2 ].first ], ACPKMN( acin / 2, OPPONENT ),
                                            ACPKMN( 1 - acin / 2, OPPONENT ), rand( ) % 15 );
@@ -3265,33 +3265,33 @@ BEFORE_1:
                         if( !missed ) {
                             int old = 0;
                             if( acin / 2 == 0 )
-                                old = ACPKMN( 0, OPPONENT ).stats.acHP * 100 / ACPKMN( 0, OPPONENT ).stats.maxHP;
+                                old = ACPKMN( 0, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 0, OPPONENT ).m_stats.m_maxHP;
                             else
-                                old = ACPKMN( 1, OPPONENT ).stats.acHP * 100 / ACPKMN( 1, OPPONENT ).stats.maxHP;
+                                old = ACPKMN( 1, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 1, OPPONENT ).m_stats.m_maxHP;
 
-                            ACPKMN( 1 - acin / 2, OPPONENT ).stats.acHP = std::max( 0, ACPKMN( 1 - acin / 2, OPPONENT ).stats.acHP - dmg3 );
-                            if( !ACPKMN( 1 - acin / 2, OPPONENT ).stats.acHP ) {
+                            ACPKMN( 1 - acin / 2, OPPONENT ).m_stats.m_acHP = std::max( 0, ACPKMN( 1 - acin / 2, OPPONENT ).m_stats.m_acHP - dmg3 );
+                            if( !ACPKMN( 1 - acin / 2, OPPONENT ).m_stats.m_acHP ) {
                                 ko[ 1 - ( acin / 2 ) ][ OPPONENT ] = true;
                                 ACPKMNSTS( 1 - ( acin / 2 ), OPPONENT ) = KO;
                             }
                             if( acin / 2 == 0 ) {
                                 consoleSetWindow( &Top, 0, 5, 20, 2 );
                                 consoleClear( );
-                                printf( "%10ls%c\n", ACPKMN( 0, OPPONENT ).boxdata.Name, GENDER( ACPKMN( 0, OPPONENT ) ) );
-                                if( ACPKMN( 0, OPPONENT ).Level < 10 )
+                                printf( "%10ls%c\n", ACPKMN( 0, OPPONENT ).m_boxdata.m_Name, GENDER( ACPKMN( 0, OPPONENT ) ) );
+                                if( ACPKMN( 0, OPPONENT ).m_Level < 10 )
                                     printf( " " );
-                                if( ACPKMN( 0, OPPONENT ).Level < 100 )
+                                if( ACPKMN( 0, OPPONENT ).m_Level < 100 )
                                     printf( " " );
-                                printf( "Lv%d%4dKP", ACPKMN( 0, OPPONENT ).Level,
-                                        ACPKMN( 0, OPPONENT ).stats.acHP );
-                                displayHP( old, 100 - ACPKMN( 0, OPPONENT ).stats.acHP * 100 / ACPKMN( 0, OPPONENT ).stats.maxHP,
+                                printf( "Lv%d%4dKP", ACPKMN( 0, OPPONENT ).m_Level,
+                                        ACPKMN( 0, OPPONENT ).m_stats.m_acHP );
+                                displayHP( old, 100 - ACPKMN( 0, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 0, OPPONENT ).m_stats.m_maxHP,
                                            88, 32, HP_COL( 1, 0 ), HP_COL( 1, 0 ) + 1, true );
                             } else {
                                 consoleSetWindow( &Top, 4, 2, 20, 2 );
                                 consoleClear( );
-                                printf( "%ls%c\nLv%d%4dKP", ACPKMN( 1, OPPONENT ).boxdata.Name, GENDER( ACPKMN( 1, OPPONENT ) ),
-                                        ACPKMN( 1, OPPONENT ).Level, ACPKMN( 1, OPPONENT ).stats.acHP );
-                                displayHP( old, 100 - ACPKMN( 1, OPPONENT ).stats.acHP * 100 / ACPKMN( 1, OPPONENT ).stats.maxHP,
+                                printf( "%ls%c\nLv%d%4dKP", ACPKMN( 1, OPPONENT ).m_boxdata.m_Name, GENDER( ACPKMN( 1, OPPONENT ) ),
+                                        ACPKMN( 1, OPPONENT ).m_Level, ACPKMN( 1, OPPONENT ).m_stats.m_acHP );
+                                displayHP( old, 100 - ACPKMN( 1, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 1, OPPONENT ).m_stats.m_maxHP,
                                            0, 8, HP_COL( 1, 1 ), HP_COL( 1, 1 ) + 1, true );
                             }
                         }
@@ -3304,42 +3304,42 @@ BEFORE_1:
                         missed = false;
                         dmg1 = calcDamage( *AttackList[ ownAtk[ acin / 2 ].first ], ACPKMN( acin / 2, PLAYER ), ACPKMN( 0, OPPONENT ), rand( ) % 15 );
                         if( !missed ) {
-                            int old = ACPKMN( 0, OPPONENT ).stats.acHP * 100 / ACPKMN( 0, OPPONENT ).stats.maxHP;
-                            ACPKMN( 0, OPPONENT ).stats.acHP = std::max( 0, ACPKMN( 0, OPPONENT ).stats.acHP - dmg1 );
-                            if( !ACPKMN( 0, OPPONENT ).stats.acHP ) {
+                            int old = ACPKMN( 0, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 0, OPPONENT ).m_stats.m_maxHP;
+                            ACPKMN( 0, OPPONENT ).m_stats.m_acHP = std::max( 0, ACPKMN( 0, OPPONENT ).m_stats.m_acHP - dmg1 );
+                            if( !ACPKMN( 0, OPPONENT ).m_stats.m_acHP ) {
                                 ko[ 0 ][ OPPONENT ] = true;
                                 ACPKMNSTS( 0, OPPONENT ) = KO;
                             }
                             consoleSetWindow( &Top, 0, 5, 20, 2 );
                             consoleClear( );
-                            printf( "%10ls%c\n", ACPKMN( 0, OPPONENT ).boxdata.Name, GENDER( ACPKMN( 0, OPPONENT ) ) );
+                            printf( "%10ls%c\n", ACPKMN( 0, OPPONENT ).m_boxdata.m_Name, GENDER( ACPKMN( 0, OPPONENT ) ) );
 
-                            if( ACPKMN( 0, OPPONENT ).Level < 10 )
+                            if( ACPKMN( 0, OPPONENT ).m_Level < 10 )
                                 printf( " " );
-                            if( ACPKMN( 0, OPPONENT ).Level < 100 )
+                            if( ACPKMN( 0, OPPONENT ).m_Level < 100 )
                                 printf( " " );
 
                             printf( "Lv%d%4dKP",
-                                    ACPKMN( 0, OPPONENT ).Level,
-                                    ACPKMN( 0, OPPONENT ).stats.acHP );
+                                    ACPKMN( 0, OPPONENT ).m_Level,
+                                    ACPKMN( 0, OPPONENT ).m_stats.m_acHP );
 
-                            displayHP( old, 100 - ACPKMN( 0, OPPONENT ).stats.acHP * 100 / ACPKMN( 0, OPPONENT ).stats.maxHP,
+                            displayHP( old, 100 - ACPKMN( 0, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 0, OPPONENT ).m_stats.m_maxHP,
                                        88, 32, HP_COL( 1, 0 ), HP_COL( 1, 0 ) + 1, true );
                         }
                         printEFFLOG( ACPKMN( 0, OPPONENT ), ownAtk[ acin / 2 ].first );
                     }
-                    if( ( this->m_battleMode == DOUBLE ) && ( tg & 2 ) ) {
+                    if( ( m_battleMode == DOUBLE ) && ( tg & 2 ) ) {
                         missed = false;
                         dmg2 = calcDamage( *AttackList[ ownAtk[ acin / 2 ].first ],
                                            ACPKMN( acin / 2, PLAYER ),
                                            ACPKMN( 1, OPPONENT ),
                                            rand( ) % 15 );
                         if( !missed ) {
-                            int old = ACPKMN( 1, OPPONENT ).stats.acHP * 100 / ACPKMN( 1, OPPONENT ).stats.maxHP;
+                            int old = ACPKMN( 1, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 1, OPPONENT ).m_stats.m_maxHP;
 
-                            ACPKMN( 1, OPPONENT ).stats.acHP = std::max( 0, ACPKMN( 1, OPPONENT ).stats.acHP - dmg2 );
+                            ACPKMN( 1, OPPONENT ).m_stats.m_acHP = std::max( 0, ACPKMN( 1, OPPONENT ).m_stats.m_acHP - dmg2 );
 
-                            if( !ACPKMN( 1, OPPONENT ).stats.acHP ) {
+                            if( !ACPKMN( 1, OPPONENT ).m_stats.m_acHP ) {
                                 ko[ 1 ][ OPPONENT ] = true;
                                 ACPKMNSTS( 1, OPPONENT ) = KO;
                             }
@@ -3347,17 +3347,17 @@ BEFORE_1:
                             consoleSetWindow( &Top, 4, 2, 20, 2 );
                             consoleClear( );
                             printf( "%ls%c\nLv%d%4dKP",
-                                    ACPKMN( 1, OPPONENT ).boxdata.Name,
+                                    ACPKMN( 1, OPPONENT ).m_boxdata.m_Name,
                                     GENDER( ACPKMN( 1, OPPONENT ) ),
-                                    ACPKMN( 1, OPPONENT ).Level,
-                                    ACPKMN( 1, OPPONENT ).stats.acHP );
-                            displayHP( old, 100 - ACPKMN( 1, OPPONENT ).stats.acHP * 100 / ACPKMN( 1, OPPONENT ).stats.maxHP,
+                                    ACPKMN( 1, OPPONENT ).m_Level,
+                                    ACPKMN( 1, OPPONENT ).m_stats.m_acHP );
+                            displayHP( old, 100 - ACPKMN( 1, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 1, OPPONENT ).m_stats.m_maxHP,
                                        0, 8, HP_COL( 1, 1 ), HP_COL( 1, 1 ) + 1, true );
 
                         }
                         printEFFLOG( ACPKMN( 1, OPPONENT ), ownAtk[ acin / 2 ].first );
                     }
-                    if( ( this->m_battleMode == DOUBLE ) && ( tg & 8 ) ) {
+                    if( ( m_battleMode == DOUBLE ) && ( tg & 8 ) ) {
                         missed = false;
                         dmg3 = calcDamage( *AttackList[ ownAtk[ acin / 2 ].first ],
                                            ACPKMN( acin / 2, PLAYER ),
@@ -3366,35 +3366,35 @@ BEFORE_1:
                         if( !missed ) {
                             int old = 0;
                             if( acin / 2 == 1 )
-                                old = ACPKMN( 0, PLAYER ).stats.acHP * 100 / ACPKMN( 0, PLAYER ).stats.maxHP;
+                                old = ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 0, PLAYER ).m_stats.m_maxHP;
                             else
-                                old = ACPKMN( 1, PLAYER ).stats.acHP * 100 / ACPKMN( 1, PLAYER ).stats.maxHP;
+                                old = ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 1, PLAYER ).m_stats.m_maxHP;
 
-                            ACPKMN( 1 - acin / 2, PLAYER ).stats.acHP = std::max( 0, ACPKMN( 1 - acin / 2, PLAYER ).stats.acHP - dmg3 );
-                            if( !ACPKMN( 1 - acin / 2, PLAYER ).stats.acHP ) {
+                            ACPKMN( 1 - acin / 2, PLAYER ).m_stats.m_acHP = std::max( 0, ACPKMN( 1 - acin / 2, PLAYER ).m_stats.m_acHP - dmg3 );
+                            if( !ACPKMN( 1 - acin / 2, PLAYER ).m_stats.m_acHP ) {
                                 ko[ 1 - ( acin / 2 ) ][ PLAYER ] = true;
                                 ACPKMNSTS( 1 - ( acin / 2 ), PLAYER ) = KO;
                             }
                             if( acin / 2 == 1 ) {
-                                displayHP( old, 100 - ACPKMN( 0, PLAYER ).stats.acHP * 100 /
-                                           ACPKMN( 0, PLAYER ).stats.maxHP, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, true );
+                                displayHP( old, 100 - ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100 /
+                                           ACPKMN( 0, PLAYER ).m_stats.m_maxHP, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, true );
                                 consoleSetWindow( &Top, 21, 16, 20, 4 );
                                 consoleClear( );
-                                printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).boxdata.Name,
-                                        GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).Level,
-                                        ACPKMN( 0, PLAYER ).stats.acHP );
+                                printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).m_boxdata.m_Name,
+                                        GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).m_Level,
+                                        ACPKMN( 0, PLAYER ).m_stats.m_acHP );
                             } else {
-                                displayHP( old, 100 - ACPKMN( 1, PLAYER ).stats.acHP * 100 / ACPKMN( 1, PLAYER ).stats.maxHP,
+                                displayHP( old, 100 - ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 1, PLAYER ).m_stats.m_maxHP,
                                            256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, true );
                                 consoleSetWindow( &Top, 16, 20, 20, 5 );
                                 consoleClear( );
-                                printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).boxdata.Name, GENDER( ACPKMN( 1, PLAYER ) ) );
-                                if( ACPKMN( 1, PLAYER ).Level < 10 )
+                                printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).m_boxdata.m_Name, GENDER( ACPKMN( 1, PLAYER ) ) );
+                                if( ACPKMN( 1, PLAYER ).m_Level < 10 )
                                     printf( " " );
-                                if( ACPKMN( 1, PLAYER ).Level < 100 )
+                                if( ACPKMN( 1, PLAYER ).m_Level < 100 )
                                     printf( " " );
-                                printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).Level,
-                                        ACPKMN( 1, PLAYER ).stats.acHP );
+                                printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
+                                        ACPKMN( 1, PLAYER ).m_stats.m_acHP );
 
                             }
                         }
@@ -3405,7 +3405,7 @@ BEFORE_1:
 
                 if( ko[ 0 ][ PLAYER ] ) {
                     clear( );
-                    sprintf( buffer, "%ls wurde besiegt.", ACPKMN( 0, PLAYER ).boxdata.Name );
+                    sprintf( buffer, "%ls wurde besiegt.", ACPKMN( 0, PLAYER ).m_boxdata.m_Name );
                     cust_font.print_string( buffer, 8, 8, true );
 
                     consoleSetWindow( &Top, 21, 16, 20, 4 );
@@ -3421,7 +3421,7 @@ BEFORE_1:
                 }
                 if( ko[ 1 ][ PLAYER ] ) {
                     clear( );
-                    sprintf( buffer, "%ls wurde besiegt.", ACPKMN( 1, PLAYER ).boxdata.Name );
+                    sprintf( buffer, "%ls wurde besiegt.", ACPKMN( 1, PLAYER ).m_boxdata.m_Name );
                     cust_font.print_string( buffer, 8, 8, true );
 
                     consoleSetWindow( &Top, 16, 20, 20, 5 );
@@ -3437,7 +3437,7 @@ BEFORE_1:
 
                 if( ko[ 0 ][ OPPONENT ] ) {
                     clear( );
-                    sprintf( buffer, "%ls (Gegner)\nwurde besiegt.", ACPKMN( 0, OPPONENT ).boxdata.Name );
+                    sprintf( buffer, "%ls (Gegner)\nwurde besiegt.", ACPKMN( 0, OPPONENT ).m_boxdata.m_Name );
                     cust_font.print_string( buffer, 8, 8, true );
                     consoleSetWindow( &Top, 0, 5, 20, 2 );
                     consoleClear( );
@@ -3451,7 +3451,7 @@ BEFORE_1:
                 }
                 if( ko[ 1 ][ OPPONENT ] ) {
                     clear( );
-                    sprintf( buffer, "%ls (Gegner)\nwurde besiegt.", ACPKMN( 1, OPPONENT ).boxdata.Name );
+                    sprintf( buffer, "%ls (Gegner)\nwurde besiegt.", ACPKMN( 1, OPPONENT ).m_boxdata.m_Name );
                     cust_font.print_string( buffer, 8, 8, true );
 
                     consoleSetWindow( &Top, 4, 2, 20, 2 );
@@ -3468,194 +3468,195 @@ BEFORE_1:
                 consoleSelect( &Bottom );
 
                 if( ko[ 0 ][ OPPONENT ] || ko[ 1 ][ OPPONENT ] ) {
-                    for( int i = 0; i < 6; ++i )
-                        if( this->m_distributeEXP && ACPKMNSTS( i, PLAYER ) != acStatus::NA && ACPKMNSTS( i, PLAYER ) != acStatus::KO ) {
-                        POKEMON::PKMN& acPK = ( *this->_player->m_pkmnTeam )[ ACPOS( i, PLAYER ) ];
-                        POKEMON::PKMN& acDF = ACPKMN( 0, OPPONENT );
+                    for( int i = 0; i < 6; ++i ) {
+                        if( m_distributeEXP && ACPKMNSTS( i, PLAYER ) != acStatus::NA && ACPKMNSTS( i, PLAYER ) != acStatus::KO ) {
+                            POKEMON::PKMN& acPK = ( *_player->m_pkmnTeam )[ ACPOS( i, PLAYER ) ];
+                            POKEMON::PKMN& acDF = ACPKMN( 0, OPPONENT );
 
-                        POKEMON::PKMNDATA::getAll( ACPKMN( 0, OPPONENT ).boxdata.SPEC, p );
-                        int exp = calcEXP( acPK, ACPOS( i, PLAYER ), acDF, false );
-                        if( exp && acPK.Level < 100 ) {
-                            int evsum = 0;
+                            POKEMON::PKMNDATA::getAll( ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC, p );
+                            int exp = calcEXP( acPK, ACPOS( i, PLAYER ), acDF, false );
+                            if( exp && acPK.m_Level < 100 ) {
+                                int evsum = 0;
 
-                            for( int j = 0; j < 6; ++j ) {
-                                evsum += p.EVYield[ j ];
-                                acPK.boxdata.EV[ j ] += p.EVYield[ j ];
-                            }
-
-                            clear( );
-                            sprintf( buffer, "%ls erhält %d EV\nund %d E.-Punkte.", acPK.boxdata.Name, evsum, exp );
-                            cust_font.print_string( buffer, 8, 8, true );
-
-                            POKEMON::PKMNDATA::getAll( ( *this->_player->m_pkmnTeam )[ ACPOS( i, PLAYER ) ].boxdata.SPEC, p );
-                            int old = ( acPK.boxdata.exp - POKEMON::EXP[ acPK.Level - 1 ][ p.expType ] ) * 100 /
-                                ( POKEMON::EXP[ acPK.Level ][ p.expType ] - POKEMON::EXP[ acPK.Level - 1 ][ p.expType ] );
-
-                            acPK.boxdata.exp += exp;
-
-                            int nw = std::min( 100u, ( acPK.boxdata.exp - POKEMON::EXP[ acPK.Level - 1 ][ p.expType ] ) * 100 /
-                                               ( POKEMON::EXP[ acPK.Level ][ p.expType ] - POKEMON::EXP[ acPK.Level - 1 ][ p.expType ] ) );
-
-
-                            if( i == 0 )
-                                displayEP( old, nw, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, true );
-
-                            if( ( this->m_battleMode == DOUBLE ) && i == 1 )
-                                displayEP( old, nw, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, true );
-                            for( int i = 0; i < 75; ++i )
-                                swiWaitForVBlank( );
-                            bool newLevel = acPK.Level < 100 && POKEMON::EXP[ acPK.Level ][ p.expType ] <= acPK.boxdata.exp;
-                            bool nL = newLevel;
-
-                            int HPdif = acPK.stats.maxHP - acPK.stats.acHP;
-
-                            while( newLevel ) {
-                                acPK.Level++;
-
-                                if( acPK.boxdata.SPEC != 292 )
-                                    acPK.stats.maxHP = ( ( acPK.boxdata.IV.HP + 2 * p.Bases[ 0 ] + ( acPK.boxdata.EV[ 0 ] / 4 ) + 100 )* acPK.Level / 100 ) + 10;
-                                else
-                                    acPK.stats.maxHP = 1;
-                                POKEMON::Natures nature = acPK.boxdata.getNature( );
-                                acPK.stats.Atk = ( ( ( acPK.boxdata.IV.Attack + 2 * p.Bases[ 1 ] + ( acPK.boxdata.EV[ 1 ] >> 2 ) )*acPK.Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ PLAYER ];
-                                acPK.stats.Def = ( ( ( acPK.boxdata.IV.Defense + 2 * p.Bases[ 2 ] + ( acPK.boxdata.EV[ 2 ] >> 2 ) )*acPK.Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ OPPONENT ];
-                                acPK.stats.Spd = ( ( ( acPK.boxdata.IV.Speed + 2 * p.Bases[ 3 ] + ( acPK.boxdata.EV[ 3 ] >> 2 ) )*acPK.Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 2 ];
-                                acPK.stats.SAtk = ( ( ( acPK.boxdata.IV.SAttack + 2 * p.Bases[ 4 ] + ( acPK.boxdata.EV[ 4 ] >> 2 ) )*acPK.Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 3 ];
-                                acPK.stats.SDef = ( ( ( acPK.boxdata.IV.SDefense + 2 * p.Bases[ 5 ] + ( acPK.boxdata.EV[ 5 ] >> 2 ) )*acPK.Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 4 ];
-
-                                acPK.stats.acHP = acPK.stats.maxHP - HPdif;
+                                for( int j = 0; j < 6; ++j ) {
+                                    evsum += p.m_EVYield[ j ];
+                                    acPK.m_boxdata.m_EV[ j ] += p.m_EVYield[ j ];
+                                }
 
                                 clear( );
-                                sprintf( buffer, "%ls erreicht Level %d.", acPK.boxdata.Name, acPK.Level );
+                                sprintf( buffer, "%ls erhält %d EV\nund %d E.-Punkte.", acPK.m_boxdata.m_Name, evsum, exp );
                                 cust_font.print_string( buffer, 8, 8, true );
+
+                                POKEMON::PKMNDATA::getAll( ( *_player->m_pkmnTeam )[ ACPOS( i, PLAYER ) ].m_boxdata.m_SPEC, p );
+                                int old = ( acPK.m_boxdata.m_exp - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
+                                    ( POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] );
+
+                                acPK.m_boxdata.m_exp += exp;
+
+                                int nw = std::min( 100u, ( acPK.m_boxdata.m_exp - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
+                                                   ( POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) );
+
+
+                                if( i == 0 )
+                                    displayEP( old, nw, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, true );
+
+                                if( ( m_battleMode == DOUBLE ) && i == 1 )
+                                    displayEP( old, nw, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, true );
                                 for( int i = 0; i < 75; ++i )
                                     swiWaitForVBlank( );
+                                bool newLevel = acPK.m_Level < 100 && POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] <= acPK.m_boxdata.m_exp;
+                                bool nL = newLevel;
 
-                                nw = std::min( 100u, ( acPK.boxdata.exp - POKEMON::EXP[ acPK.Level - 1 ][ p.expType ] ) * 100 /
-                                               ( POKEMON::EXP[ acPK.Level ][ p.expType ] - POKEMON::EXP[ acPK.Level - 1 ][ p.expType ] ) );
+                                int HPdif = acPK.m_stats.m_maxHP - acPK.m_stats.m_acHP;
 
-                                if( i == 0 ) {
-                                    displayEP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-                                    displayEP( 0, nw, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, true );
-                                    consoleSelect( &Top );
-                                    consoleSetWindow( &Top, 21, 16, 20, 4 );
-                                    consoleClear( );
-                                    printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).boxdata.Name,
-                                            GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).Level,
-                                            ACPKMN( 0, PLAYER ).stats.acHP );
-                                }
-                                if( ( this->m_battleMode == DOUBLE ) && i == 1 ) {
-                                    displayEP( 100, 101, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
-                                    displayEP( 0, nw, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, true );
-                                    consoleSelect( &Top );
-                                    consoleSetWindow( &Top, 16, 20, 20, 5 );
-                                    consoleClear( );
-                                    printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).boxdata.Name, GENDER( ACPKMN( 1, PLAYER ) ) );
-                                    if( ACPKMN( 1, PLAYER ).Level < 10 )
-                                        printf( " " );
-                                    if( ACPKMN( 1, PLAYER ).Level < 100 )
-                                        printf( " " );
-                                    printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).Level,
-                                            ACPKMN( 1, PLAYER ).stats.acHP );
-                                }
-                                newLevel = acPK.Level < 100 && POKEMON::EXP[ acPK.Level ][ p.expType ] <= acPK.boxdata.exp;
-                            }
+                                while( newLevel ) {
+                                    acPK.m_Level++;
 
-                            if( nL && SAV.EvolveInBattle ) {
-                                consoleSelect( &Top );
-                                if( acPK.canEvolve( ) ) {
+                                    if( acPK.m_boxdata.m_SPEC != 292 )
+                                        acPK.m_stats.m_maxHP = ( ( acPK.m_boxdata.m_IV.m_HP + 2 * p.m_bases[ 0 ] + ( acPK.m_boxdata.m_EV[ 0 ] / 4 ) + 100 )* acPK.m_Level / 100 ) + 10;
+                                    else
+                                        acPK.m_stats.m_maxHP = 1;
+                                    POKEMON::pkmnNatures nature = acPK.m_boxdata.getNature( );
+                                    acPK.m_stats.m_Atk = ( ( ( acPK.m_boxdata.m_IV.m_Attack + 2 * p.m_bases[ 1 ] + ( acPK.m_boxdata.m_EV[ 1 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ PLAYER ];
+                                    acPK.m_stats.m_Def = ( ( ( acPK.m_boxdata.m_IV.m_Defense + 2 * p.m_bases[ 2 ] + ( acPK.m_boxdata.m_EV[ 2 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ OPPONENT ];
+                                    acPK.m_stats.m_Spd = ( ( ( acPK.m_boxdata.m_IV.m_Speed + 2 * p.m_bases[ 3 ] + ( acPK.m_boxdata.m_EV[ 3 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 2 ];
+                                    acPK.m_stats.m_SAtk = ( ( ( acPK.m_boxdata.m_IV.m_SAttack + 2 * p.m_bases[ 4 ] + ( acPK.m_boxdata.m_EV[ 4 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 3 ];
+                                    acPK.m_stats.m_SDef = ( ( ( acPK.m_boxdata.m_IV.m_SDefense + 2 * p.m_bases[ 5 ] + ( acPK.m_boxdata.m_EV[ 5 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 4 ];
+
+                                    acPK.m_stats.m_acHP = acPK.m_stats.m_maxHP - HPdif;
+
                                     clear( );
-                                    sprintf( buffer, "%ls entwickelt sich!", acPK.boxdata.Name );
+                                    sprintf( buffer, "%ls erreicht Level %d.", acPK.m_boxdata.m_Name, acPK.m_Level );
                                     cust_font.print_string( buffer, 8, 8, true );
                                     for( int i = 0; i < 75; ++i )
                                         swiWaitForVBlank( );
 
-                                    acPK.evolve( );
+                                    nw = std::min( 100u, ( acPK.m_boxdata.m_exp - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
+                                                   ( POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) );
 
                                     if( i == 0 ) {
-
-                                        oamIndex = OWN_PKMN_1_START;
-                                        palcnt = OWN_PKMN_1_PAL;
-                                        nextAvailableTileIdx = OWN_PKMN_1_TILE;
-
-                                        if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
-                                            ACPKMN( 0, PLAYER ).boxdata.SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
-                                            ACPKMN( 0, PLAYER ).boxdata.isShiny( ), ACPKMN( 0, PLAYER ).boxdata.isFemale ) )
-                                            loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
-                                            ACPKMN( 0, PLAYER ).boxdata.SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
-                                            ACPKMN( 0, PLAYER ).boxdata.isShiny( ), !ACPKMN( 0, PLAYER ).boxdata.isFemale );
-
-                                        updateOAM( OamTop );
-
-
-                                        displayHP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, false );
-                                        displayHP( 100, 100 - ACPKMN( 0, PLAYER ).stats.acHP * 100
-                                                   / ACPKMN( 0, PLAYER ).stats.maxHP, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, false );
                                         displayEP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-
-                                        POKEMON::PKMNDATA::getAll( ACPKMN( 0, PLAYER ).boxdata.SPEC, p );
-
-                                        displayEP( 0, ( ACPKMN( 0, PLAYER ).boxdata.exp - POKEMON::EXP[ ACPKMN( 0, PLAYER ).Level - 1 ][ p.expType ] ) * 100 /
-                                                   ( POKEMON::EXP[ ACPKMN( 0, PLAYER ).Level ][ p.expType ] -
-                                                   POKEMON::EXP[ ACPKMN( 0, PLAYER ).Level - 1 ][ p.expType ] ),
-                                                   256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
+                                        displayEP( 0, nw, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, true );
                                         consoleSelect( &Top );
                                         consoleSetWindow( &Top, 21, 16, 20, 4 );
                                         consoleClear( );
-                                        printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).boxdata.Name,
-                                                GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).Level,
-                                                ACPKMN( 0, PLAYER ).stats.acHP );
-
+                                        printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).m_boxdata.m_Name,
+                                                GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).m_Level,
+                                                ACPKMN( 0, PLAYER ).m_stats.m_acHP );
                                     }
-                                    if( ( this->m_battleMode == DOUBLE ) && i == 1 ) {
-                                        oamIndex = OWN_PKMN_2_START;
-                                        palcnt = OWN_PKMN_2_PAL;
-                                        nextAvailableTileIdx = OWN_PKMN_2_TILE;
-
-                                        if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
-                                            ACPKMN( 1, PLAYER ).boxdata.SPEC, 50, 120, oamIndex, palcnt, nextAvailableTileIdx, false,
-                                            ACPKMN( 1, PLAYER ).boxdata.isShiny( ), ACPKMN( 1, PLAYER ).boxdata.isFemale ) )
-                                            loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
-                                            ACPKMN( 1, PLAYER ).boxdata.SPEC, 50, 120, oamIndex, palcnt, nextAvailableTileIdx, false,
-                                            ACPKMN( 1, PLAYER ).boxdata.isShiny( ), !ACPKMN( 1, PLAYER ).boxdata.isFemale );
-
-                                        updateOAM( OamTop );
-
-                                        displayHP( 100, 101, 256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, false );
-                                        displayHP( 100, 100 - ACPKMN( 1, PLAYER ).stats.acHP * 100 /
-                                                   ACPKMN( 1, PLAYER ).stats.maxHP, 256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, false );
-                                        displayEP( 100, 100, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
-
-                                        POKEMON::PKMNDATA::getAll( ACPKMN( 1, PLAYER ).boxdata.SPEC, p );
-
-                                        displayEP( 0, ( ACPKMN( 1, PLAYER ).boxdata.exp - POKEMON::EXP[ ACPKMN( 1, PLAYER ).Level - 1 ][ p.expType ] ) * 100 /
-                                                   ( POKEMON::EXP[ ACPKMN( 1, PLAYER ).Level ][ p.expType ] -
-                                                   POKEMON::EXP[ ACPKMN( 1, PLAYER ).Level - 1 ][ p.expType ] ),
-                                                   256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
-
+                                    if( ( m_battleMode == DOUBLE ) && i == 1 ) {
+                                        displayEP( 100, 101, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
+                                        displayEP( 0, nw, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, true );
                                         consoleSelect( &Top );
                                         consoleSetWindow( &Top, 16, 20, 20, 5 );
                                         consoleClear( );
-                                        printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).boxdata.Name, GENDER( ACPKMN( 1, PLAYER ) ) );
-                                        if( ACPKMN( 1, PLAYER ).Level < 10 )
+                                        printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).m_boxdata.m_Name, GENDER( ACPKMN( 1, PLAYER ) ) );
+                                        if( ACPKMN( 1, PLAYER ).m_Level < 10 )
                                             printf( " " );
-                                        if( ACPKMN( 1, PLAYER ).Level < 100 )
+                                        if( ACPKMN( 1, PLAYER ).m_Level < 100 )
                                             printf( " " );
-                                        printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).Level,
-                                                ACPKMN( 1, PLAYER ).stats.acHP );
-
+                                        printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
+                                                ACPKMN( 1, PLAYER ).m_stats.m_acHP );
                                     }
+                                    newLevel = acPK.m_Level < 100 && POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] <= acPK.m_boxdata.m_exp;
+                                }
 
-                                    clear( );
-                                    sprintf( buffer, "Und wurde zu einem\n%ls.", acPK.boxdata.Name );
-                                    cust_font.print_string( buffer, 8, 8, true );
+                                if( nL && SAV.m_evolveInBattle ) {
+                                    consoleSelect( &Top );
+                                    if( acPK.canEvolve( ) ) {
+                                        clear( );
+                                        sprintf( buffer, "%ls entwickelt sich!", acPK.m_boxdata.m_Name );
+                                        cust_font.print_string( buffer, 8, 8, true );
+                                        for( int i = 0; i < 75; ++i )
+                                            swiWaitForVBlank( );
 
-                                    for( int i = 0; i < 75; ++i )
-                                        swiWaitForVBlank( );
+                                        acPK.evolve( );
+
+                                        if( i == 0 ) {
+
+                                            oamIndex = OWN_PKMN_1_START;
+                                            palcnt = OWN_PKMN_1_PAL;
+                                            nextAvailableTileIdx = OWN_PKMN_1_TILE;
+
+                                            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
+                                                ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
+                                                ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ), ACPKMN( 0, PLAYER ).m_boxdata.m_isFemale ) )
+                                                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
+                                                ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
+                                                ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ), !ACPKMN( 0, PLAYER ).m_boxdata.m_isFemale );
+
+                                            updateOAM( OamTop );
+
+
+                                            displayHP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, false );
+                                            displayHP( 100, 100 - ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100
+                                                       / ACPKMN( 0, PLAYER ).m_stats.m_maxHP, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, false );
+                                            displayEP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
+
+                                            POKEMON::PKMNDATA::getAll( ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, p );
+
+                                            displayEP( 0, ( ACPKMN( 0, PLAYER ).m_boxdata.m_exp - POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level - 1 ][ p.m_expType ] ) * 100 /
+                                                       ( POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level ][ p.m_expType ] -
+                                                       POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level - 1 ][ p.m_expType ] ),
+                                                       256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
+                                            consoleSelect( &Top );
+                                            consoleSetWindow( &Top, 21, 16, 20, 4 );
+                                            consoleClear( );
+                                            printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).m_boxdata.m_Name,
+                                                    GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).m_Level,
+                                                    ACPKMN( 0, PLAYER ).m_stats.m_acHP );
+
+                                        }
+                                        if( ( m_battleMode == DOUBLE ) && i == 1 ) {
+                                            oamIndex = OWN_PKMN_2_START;
+                                            palcnt = OWN_PKMN_2_PAL;
+                                            nextAvailableTileIdx = OWN_PKMN_2_TILE;
+
+                                            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
+                                                ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, 50, 120, oamIndex, palcnt, nextAvailableTileIdx, false,
+                                                ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ), ACPKMN( 1, PLAYER ).m_boxdata.m_isFemale ) )
+                                                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
+                                                ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, 50, 120, oamIndex, palcnt, nextAvailableTileIdx, false,
+                                                ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ), !ACPKMN( 1, PLAYER ).m_boxdata.m_isFemale );
+
+                                            updateOAM( OamTop );
+
+                                            displayHP( 100, 101, 256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, false );
+                                            displayHP( 100, 100 - ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 /
+                                                       ACPKMN( 1, PLAYER ).m_stats.m_maxHP, 256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, false );
+                                            displayEP( 100, 100, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
+
+                                            POKEMON::PKMNDATA::getAll( ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, p );
+
+                                            displayEP( 0, ( ACPKMN( 1, PLAYER ).m_boxdata.m_exp - POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level - 1 ][ p.m_expType ] ) * 100 /
+                                                       ( POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level ][ p.m_expType ] -
+                                                       POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level - 1 ][ p.m_expType ] ),
+                                                       256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
+
+                                            consoleSelect( &Top );
+                                            consoleSetWindow( &Top, 16, 20, 20, 5 );
+                                            consoleClear( );
+                                            printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).m_boxdata.m_Name, GENDER( ACPKMN( 1, PLAYER ) ) );
+                                            if( ACPKMN( 1, PLAYER ).m_Level < 10 )
+                                                printf( " " );
+                                            if( ACPKMN( 1, PLAYER ).m_Level < 100 )
+                                                printf( " " );
+                                            printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
+                                                    ACPKMN( 1, PLAYER ).m_stats.m_acHP );
+
+                                        }
+
+                                        clear( );
+                                        sprintf( buffer, "Und wurde zu einem\n%ls.", acPK.m_boxdata.m_Name );
+                                        cust_font.print_string( buffer, 8, 8, true );
+
+                                        for( int i = 0; i < 75; ++i )
+                                            swiWaitForVBlank( );
+                                    }
                                 }
                             }
                         }
-                        }
+                    }
                 }
 
             }

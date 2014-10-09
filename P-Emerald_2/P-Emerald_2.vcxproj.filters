@@ -45,9 +45,6 @@
     <ClInclude Include="arm9\include\berry.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\include\font_data.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\Gen.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
@@ -60,9 +57,6 @@
     <ClInclude Include="arm9\include\map2d.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\include\mbox.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\nitrofs.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
@@ -70,12 +64,6 @@
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
     <ClInclude Include="arm9\include\print.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\savgm.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\scrnloader.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
     <ClInclude Include="arm9\include\sprite.h">
@@ -99,6 +87,18 @@
     <ClInclude Include="arm9\include\buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\include\screenLoader.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\saveGame.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\fontData.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\messageBox.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm9\source\ability.cpp">
@@ -111,9 +111,6 @@
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\battle.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\font_data.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\Gen.cpp">
@@ -134,22 +131,13 @@
     <ClCompile Include="arm9\source\map2d.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\mbox.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\nitrofs.c">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\PKMN.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\savgm.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\print.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\scrnloader.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\sprite.cpp">
@@ -174,6 +162,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\bag.cpp">
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\screenLoader.cpp">
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\saveGame.cpp">
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\fontData.cpp">
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\messageBox.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
   </ItemGroup>

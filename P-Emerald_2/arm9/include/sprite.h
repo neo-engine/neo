@@ -7,7 +7,7 @@
     description : Header file. See corresponding source file for details.
 
     Copyright (C) 2012 - 2014
-        Philip Wellnitz (RedArceus)
+    Philip Wellnitz (RedArceus)
 
     This software is provided 'as-is', without any express or implied
     warranty.  In no event will the authors be held liable for any
@@ -19,16 +19,16 @@
 
 
     1.	The origin of this software must not be misrepresented; you
-        must not claim that you wrote the original software. If you use
-        this software in a product, an acknowledgment in the product
-        is required.
+    must not claim that you wrote the original software. If you use
+    this software in a product, an acknowledgment in the product
+    is required.
 
     2.	Altered source versions must be plainly marked as such, and
-        must not be misrepresented as being the original software.
+    must not be misrepresented as being the original software.
 
     3.	This notice may not be removed or altered from any source
-        distribution.
-*/
+    distribution.
+    */
 
 #pragma once
 
@@ -56,12 +56,12 @@
 
 #include "type.h"
 
-extern const unsigned int* TypeTiles[19];
-extern const unsigned short* TypePals[19];
+extern const unsigned int* TypeTiles[ 19 ];
+extern const unsigned short* TypePals[ 19 ];
 
 static const int SPRITE_DMA_CHANNEL = 2;
 
-struct SpriteInfo{
+struct SpriteInfo {
     int oamId;
     int width;
     int height;
@@ -75,8 +75,8 @@ struct SpriteInfo{
 *  Update the OAM.
 *
 */
-void updateOAM(OAMTable * oam);
-void updateOAMSub(OAMTable * oam);
+void updateOAM( OAMTable * p_oam );
+void updateOAMSub( OAMTable * p_oam );
 
 /*
 *  initOAM
@@ -84,8 +84,8 @@ void updateOAMSub(OAMTable * oam);
 *  Initialize the OAM.
 *
 */
-void initOAMTable(OAMTable * oam);
-void initOAMTableSub(OAMTable * oam);
+void initOAMTable( OAMTable * p_oam );
+void initOAMTableSub( OAMTable * p_oam );
 
 /*
 *  rotateSprite
@@ -93,7 +93,7 @@ void initOAMTableSub(OAMTable * oam);
 *  Rotate a sprite.
 *
 */
-void rotateSprite(SpriteRotation * spriteRotation, int angle);
+void rotateSprite( SpriteRotation * p_spriteRotation, int p_angle );
 
 /*
 *  setSpriteVisibility
@@ -102,11 +102,11 @@ void rotateSprite(SpriteRotation * spriteRotation, int angle);
 *  non-double bound, or ordinary.
 *
 */
-void setSpriteVisibility(SpriteEntry * spriteEntry, bool hidden, bool affine = false, bool doubleBound = false);
+void setSpriteVisibility( SpriteEntry * p_spriteEntry, bool p_hidden, bool p_affine = false, bool p_doubleBound = false );
 
-inline void setSpritePosition(SpriteEntry* spriteEntry,u16 x = 0,u16 y = 0);
-inline void setSpritePriority(SpriteEntry* spriteEntry,ObjPriority priority);
+inline void setSpritePosition( SpriteEntry* p_spriteEntry, u16 p_x = 0, u16 p_y = 0 );
+inline void setSpritePriority( SpriteEntry* p_spriteEntry, ObjPriority p_priority );
 
 //Some specific things
-void initTypes(OAMTable * oam, SpriteInfo *spriteInfo,Type T1, Type T2);
-int initMainSprites(OAMTable * oam, SpriteInfo *spriteInfo);
+void initTypes( OAMTable * p_oam, SpriteInfo *p_spriteInfo, Type p_T1, Type p_T2 );
+int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo );

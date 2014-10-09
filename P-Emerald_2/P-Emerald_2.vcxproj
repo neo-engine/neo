@@ -19,7 +19,7 @@
     <ClInclude Include="arm9\include\bag.h" />
     <ClInclude Include="arm9\include\battle.h" />
     <ClInclude Include="arm9\include\berry.h" />
-    <ClInclude Include="arm9\include\font_data.h" />
+    <ClInclude Include="arm9\include\fontData.h" />
     <ClInclude Include="arm9\include\Gen.h" />
     <ClInclude Include="arm9\include\hmMoves.h" />
     <ClInclude Include="arm9\include\map2d.h" />
@@ -27,11 +27,11 @@
     <ClInclude Include="arm9\include\nitrofs.h" />
     <ClInclude Include="arm9\include\item.h" />
     <ClInclude Include="arm9\include\keyboard.h" />
-    <ClInclude Include="arm9\include\mbox.h" />
+    <ClInclude Include="arm9\include\messageBox.h" />
     <ClInclude Include="arm9\include\PKMN.h" />
     <ClInclude Include="arm9\include\print.h" />
-    <ClInclude Include="arm9\include\savgm.h" />
-    <ClInclude Include="arm9\include\scrnloader.h" />
+    <ClInclude Include="arm9\include\saveGame.h" />
+    <ClInclude Include="arm9\include\screenLoader.h" />
     <ClInclude Include="arm9\include\sprite.h" />
     <ClInclude Include="arm9\include\type.h" />
     <ClInclude Include="arm9\include\unistd.h" />
@@ -46,7 +46,7 @@
     <ClCompile Include="arm9\source\bag.cpp" />
     <ClCompile Include="arm9\source\battle.cpp" />
     <ClCompile Include="arm9\source\Box.cpp" />
-    <ClCompile Include="arm9\source\font_data.cpp" />
+    <ClCompile Include="arm9\source\fontData.cpp" />
     <ClCompile Include="arm9\source\Gen.cpp" />
     <ClCompile Include="arm9\source\hex2dec.c" />
     <ClCompile Include="arm9\source\item.cpp" />
@@ -54,12 +54,12 @@
     <ClCompile Include="arm9\source\main.cpp" />
     <ClCompile Include="arm9\source\map2d.cpp" />
     <ClCompile Include="arm9\source\mapconfig.cpp" />
-    <ClCompile Include="arm9\source\mbox.cpp" />
+    <ClCompile Include="arm9\source\messageBox.cpp" />
     <ClCompile Include="arm9\source\PKMN.cpp" />
     <ClCompile Include="arm9\source\print.cpp" />
-    <ClCompile Include="arm9\source\savgm.cpp" />
+    <ClCompile Include="arm9\source\saveGame.cpp" />
     <ClCompile Include="arm9\source\nitrofs.c" />
-    <ClCompile Include="arm9\source\scrnloader.cpp" />
+    <ClCompile Include="arm9\source\screenLoader.cpp" />
     <ClCompile Include="arm9\source\sprite.cpp" />
     <ClCompile Include="arm9\source\type.cpp" />
   </ItemGroup>

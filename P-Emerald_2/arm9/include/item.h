@@ -7,7 +7,7 @@
     description : Header file. See corresponding source file for details.
 
     Copyright (C) 2012 - 2014
-        Philip Wellnitz (RedArceus)
+    Philip Wellnitz (RedArceus)
 
     This software is provided 'as-is', without any express or implied
     warranty.  In no event will the authors be held liable for any
@@ -19,23 +19,23 @@
 
 
     1.	The origin of this software must not be misrepresented; you
-        must not claim that you wrote the original software. If you use
-        this software in a product, an acknowledgment in the product
-        is required.
+    must not claim that you wrote the original software. If you use
+    this software in a product, an acknowledgment in the product
+    is required.
 
     2.	Altered source versions must be plainly marked as such, and
-        must not be misrepresented as being the original software.
+    must not be misrepresented as being the original software.
 
     3.	This notice may not be removed or altered from any source
-        distribution.
-*/
+    distribution.
+    */
 
 #pragma once
 
 #include <string>
 #include <map>
 
-extern const char ITEM_PATH[];
+extern const char ITEM_PATH[ ];
 
 class item {
 public:
@@ -99,56 +99,56 @@ public:
 class ball
     : public item {
 public:
-    ball( const std::string& Name )
-        : item( Name ) {
+    ball( const std::string& p_name )
+        : item( p_name ) {
         this->m_itemType = POKE_BALLS;
     }
 };
 
-class medicine 
+class medicine
     : public item {
-public:  
-    medicine( const std::string& Name )
-        : item( Name ) {
+public:
+    medicine( const std::string& p_name )
+        : item( p_name ) {
         this->m_itemType = MEDICINE;
     }
 };
 
-class TM 
+class TM
     : public item {
-public: 
-    TM( const std::string& Name )
-        : item( Name ) {
+public:
+    TM( const std::string& p_name )
+        : item( p_name ) {
         this->m_itemType = TM_HM;
     }
 };
 
-class battleItem 
+class battleItem
     : public item {
-public:  
-    battleItem( const std::string& Name )
-        : item( Name ) {
+public:
+    battleItem( const std::string& p_name )
+        : item( p_name ) {
         this->m_itemType = BATTLE_ITEM;
     }
 };
 
-class keyItem 
+class keyItem
     : public item {
-public:  
-    keyItem( const std::string& Name ) 
-        : item( Name ) {
+public:
+    keyItem( const std::string& p_name )
+        : item( p_name ) {
         this->m_itemType = KEY_ITEM;
     }
 };
 
-class mail 
+class mail
     : public item {
-public:  
-    mail( const std::string& Name )
-        : item( Name ) {
+public:
+    mail( const std::string& p_name )
+        : item( p_name ) {
         this->m_itemType = MAILS;
     }
 };
 
 
-extern item ItemList[700];
+extern item ItemList[ 700 ];

@@ -38,9 +38,9 @@ static const long hextable[] = {
     ['A'] = 10, 11, 12, 13, 14, 15,       // for the space conscious, reduce to
     ['a'] = 10, 11, 12, 13, 14, 15        // signed char.
 };
-long hexdec(unsigned const char *hex) {
+long hexdec(unsigned const char *p_hex) {
     long ret = 0; 
-    while (*hex && ret >= 0) 
-        ret = (ret << 4) | hextable[*hex++];
+    while (*p_hex && ret >= 0) 
+        ret = (ret << 4) | hextable[*p_hex++];
     return ret; 
 }

@@ -1,22 +1,22 @@
 #pragma once
 #include "nds.h"
 
-namespace POKEMON{
+namespace POKEMON {
     class PKMN;
 }
 
-class savgm;
+class saveGame;
 
 namespace gen3 //using code from "pokehack" originally by "Grazfather"
 {
-    bool isValidItem(int gen5Idx);
-    int getItemIdx(int gen5Idx);
-    int getNItemIdx(int gen3Idx);
-    int getPKMNIdx(int gen5Idx);
-    int getNPKMNIdx(int gen3Idx);
-    int getNLocation(int gen3Idx);
-    int getLocation(int gen5Idx);
-    int getNText(int in);
+    bool isValidItem( int gen5Idx );
+    int getItemIdx( int gen5Idx );
+    int getNItemIdx( int gen3Idx );
+    int getPKMNIdx( int gen5Idx );
+    int getNPKMNIdx( int gen3Idx );
+    int getNLocation( int gen3Idx );
+    int getLocation( int gen5Idx );
+    int getNText( int in );
 
 #define SAVEFILE_LEN (1 << 17)
 #define NUM_BLOCKS_SLOT 14
@@ -51,8 +51,8 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
     } block_footer;
 
     typedef struct {
-        u8 data[BLOCK_DATA_LEN];
-        u8 padding[BLOCK_PADDING_LEN];
+        u8 data[ BLOCK_DATA_LEN ];
+        u8 padding[ BLOCK_PADDING_LEN ];
         block_footer footer;
     } block;
 
@@ -61,22 +61,22 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
     typedef struct {
         u32 personality;
         u32 otid;
-        u8 name[10];
+        u8 name[ 10 ];
         u16 language;
-        u8 otname[7];
+        u8 otname[ 7 ];
         union {
             struct {
-                u8 circle:1;
-                u8 triangle:1;
-                u8 square:1;
-                u8 heart:1;
-                u8 xbit:4; // unused
+                u8 circle : 1;
+                u8 triangle : 1;
+                u8 square : 1;
+                u8 heart : 1;
+                u8 xbit : 4; // unused
             } mark;
             u8 markint;
         };
         u16 checksum;
         u16 x1;				// unused
-        u8 data[POKEMON_DATA_LENGTH];
+        u8 data[ POKEMON_DATA_LENGTH ];
         u32 status;
         u8 level;
         u8 pokerus;
@@ -92,51 +92,50 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
     typedef struct {
         u32 personality;
         u32 otid;
-        u8 name[10];
+        u8 name[ 10 ];
         u16 language;
-        u8 otname[7];
+        u8 otname[ 7 ];
         u8 mark;
         u16 checksum;
         u16 x1;				// unused
-        u8 data[POKEMON_DATA_LENGTH];
+        u8 data[ POKEMON_DATA_LENGTH ];
     } box_pokemon_t;
 
     class PKMN {
     public:
-        typedef struct{
+        typedef struct {
             u16 species;
             u16 held;
             u32 xp;
             u8 ppbonuses;
             u8 happiness;
-            u8 x;				// unused
-        } pokemon_growth_t ;
+            u8 p_x;				// unused
+        } pokemon_growth_t;
 
         typedef struct {
-            union{
+            union {
                 struct {
                     u16 atk1;
                     u16 atk2;
                     u16 atk3;
                     u16 atk4;
                 }_atk;
-                u16 atk[4];
+                u16 atk[ 4 ];
             };
-            union{
+            union {
                 struct {
                     u8 pp1;
                     u8 pp2;
                     u8 pp3;
                     u8 pp4;
                 }_pp;
-                u8 pp[4];
+                u8 pp[ 4 ];
             };
         } pokemon_moves_t;
 
-        typedef struct
-        {
-            union{
-                struct{
+        typedef struct {
+            union {
+                struct {
                     u8 hp;
                     u8 move;
                     u8 defense;
@@ -144,10 +143,10 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
                     u8 spatk;
                     u8 spdef;
                 }_ev;
-                u8 EV[6];
+                u8 EV[ 6 ];
             };
-            union{
-                struct{
+            union {
+                struct {
                     u8 coolness;
                     u8 beauty;
                     u8 cuteness;
@@ -155,64 +154,64 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
                     u8 toughness;
                     u8 feel;
                 }_con;
-                u8 ConStat[6];
+                u8 ConStat[ 6 ];
             };
         } pokemon_effort_t;
 
         typedef struct {
             u8 pokerus;
             u8 locationcaught;
-            s8 levelcaught:7;
-            u8 game:4;
-            u8 pokeball:4;
-            u8 tgender:1;
+            s8 levelcaught : 7;
+            u8 game : 4;
+            u8 pokeball : 4;
+            u8 tgender : 1;
             union {
                 struct {
-                    u32 hp          :5;
-                    u32 atk         :5;
-                    u32 def         :5;
-                    u32 spd         :5;
-                    u32 spatk       :5;
-                    u32 spdef       :5;
-                    u32 egg         :1;
-                    u32 ability     :1;
+                    u32 hp : 5;
+                    u32 atk : 5;
+                    u32 def : 5;
+                    u32 spd : 5;
+                    u32 spatk : 5;
+                    u32 spdef : 5;
+                    u32 egg : 1;
+                    u32 ability : 1;
                 } IVs;
                 u32 IVint;
             };
             union {
                 struct {
-                    u8 coolnormal   :1;
-                    u8 coolsuper    :1;
-                    u8 coolhyper    :1;
-                    u8 coolmaster   :1;
-                    u8 beautynormal :1;
-                    u8 beautysuper  :1;
-                    u8 beautyhyper  :1;
-                    u8 beautymaster :1;
-                    u8 cutenormal   :1;
-                    u8 cutesuper    :1;
-                    u8 cutehyper    :1;
-                    u8 cutemaster   :1;
-                    u8 smartnormal  :1;
-                    u8 smartsuper   :1;
-                    u8 smarthyper   :1;
-                    u8 smartmaster  :1;
-                    u8 toughnormal  :1;
-                    u8 toughsuper   :1;
-                    u8 toughhyper   :1;
-                    u8 toughmaster  :1;
-                    u8 champion     :1;
-                    u8 winning      :1;
-                    u8 victory      :1;
-                    u8 artist       :1;
-                    u8 effort       :1;
-                    u8 marine       :1;
-                    u8 land         :1;
-                    u8 sky          :1;
-                    u8 country      :1;
-                    u8 national     :1;
-                    u8 earth        :1;
-                    u8 world        :1;
+                    u8 coolnormal : 1;
+                    u8 coolsuper : 1;
+                    u8 coolhyper : 1;
+                    u8 coolmaster : 1;
+                    u8 beautynormal : 1;
+                    u8 beautysuper : 1;
+                    u8 beautyhyper : 1;
+                    u8 beautymaster : 1;
+                    u8 cutenormal : 1;
+                    u8 cutesuper : 1;
+                    u8 cutehyper : 1;
+                    u8 cutemaster : 1;
+                    u8 smartnormal : 1;
+                    u8 smartsuper : 1;
+                    u8 smarthyper : 1;
+                    u8 smartmaster : 1;
+                    u8 toughnormal : 1;
+                    u8 toughsuper : 1;
+                    u8 toughhyper : 1;
+                    u8 toughmaster : 1;
+                    u8 champion : 1;
+                    u8 winning : 1;
+                    u8 victory : 1;
+                    u8 artist : 1;
+                    u8 effort : 1;
+                    u8 marine : 1;
+                    u8 land : 1;
+                    u8 sky : 1;
+                    u8 country : 1;
+                    u8 national : 1;
+                    u8 earth : 1;
+                    u8 world : 1;
                 } ribbons;
                 u32 ribbonint;
             };
@@ -228,7 +227,7 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
     05. GMEA	 11. AMEG	 17. EMAG	 23. MEAG
     */
     // Where in data each struct is, based on AEGM order
-    static const int DataOrderTable[24][4] = { \
+    static const int DataOrderTable[ 24 ][ 4 ] = { \
         /*          A  E  G  M */ \
         /* GAEM */ {1, 2, 0, 3}, \
         /* GAME */ {1, 3, 0, 2}, \
@@ -255,57 +254,56 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         /* MEGA */ {3, 1, 2, 0}, \
         /* MEAG */ {2, 1, 3, 0} };
 
-    static const int belt_offsets[] = { BELT_OFFSET_RSE, BELT_OFFSET_FRLG };
+    static const int belt_offsets[ ] = { BELT_OFFSET_RSE, BELT_OFFSET_FRLG };
 
-    class SaveParser
-    {
+    class SaveParser {
     public:
-        static SaveParser* Instance();
-        int get_newest_save(block *[NUM_BLOCKS_TOTAL]);
-        char* parse_save(block*[NUM_BLOCKS_TOTAL]);
-        u16 get_block_checksum(block* b);
-        int pack_save(char *, block *[NUM_BLOCKS_TOTAL], char[SAVEFILE_LEN]);
-        char* get_text(u8* raw, bool is_nickname);
+        static SaveParser* Instance( );
+        int get_newest_save( block *[ NUM_BLOCKS_TOTAL ] );
+        char* parse_save( block*[ NUM_BLOCKS_TOTAL ] );
+        u16 get_block_checksum( block* b );
+        int pack_save( char *, block *[ NUM_BLOCKS_TOTAL ], char[ SAVEFILE_LEN ] );
+        char* get_text( u8* raw, bool is_nickname );
         //void print_pokemon(box_pokemon_t*);
-        int parse_pokemon(char*, int, void**, PKMN::pokemon_moves_t**, PKMN::pokemon_effort_t**, PKMN::pokemon_growth_t**, PKMN::pokemon_misc_t**, int, int);
-        u16 encrypt(u8*, u32, u32);
-        int load(int);
-        int save();
-        belt_pokemon_t *pokemon[NUM_BELT_POKEMON];
-        PKMN::pokemon_moves_t *pokemon_moves[NUM_BELT_POKEMON];
-        PKMN::pokemon_effort_t *pokemon_effort[NUM_BELT_POKEMON];
-        PKMN::pokemon_growth_t *pokemon_growth[NUM_BELT_POKEMON];
-        PKMN::pokemon_misc_t *pokemon_misc[NUM_BELT_POKEMON];
+        int parse_pokemon( char*, int, void**, PKMN::pokemon_moves_t**, PKMN::pokemon_effort_t**, PKMN::pokemon_growth_t**, PKMN::pokemon_misc_t**, int, int );
+        u16 encrypt( u8*, u32, u32 );
+        int load( int );
+        int save( );
+        belt_pokemon_t *pokemon[ NUM_BELT_POKEMON ];
+        PKMN::pokemon_moves_t *pokemon_moves[ NUM_BELT_POKEMON ];
+        PKMN::pokemon_effort_t *pokemon_effort[ NUM_BELT_POKEMON ];
+        PKMN::pokemon_growth_t *pokemon_growth[ NUM_BELT_POKEMON ];
+        PKMN::pokemon_misc_t *pokemon_misc[ NUM_BELT_POKEMON ];
 
         char *unpackeddata;
     private:
-        SaveParser(){};	// Private constructor because this is a singleton
-        block *blocks[NUM_BLOCKS_TOTAL];
+        SaveParser( ) { };	// Private constructor because this is a singleton
+        block *m_blocks[ NUM_BLOCKS_TOTAL ];
         static SaveParser* spInstance;
     };
 
-    u16 encrypt(u8 *data, u32 pv, u32 otid);
-    char* get_text(u8* raw, int max_len);
-    int parse_pokemon(char* buf, int offset, void** pokemon, PKMN::pokemon_moves_t** pa, PKMN::pokemon_effort_t** pe,
-        PKMN::pokemon_growth_t** pg, PKMN::pokemon_misc_t** pm, int num, int size);
-    void print_pokemon(box_pokemon_t* pokemon);
+    u16 encrypt( u8 *data, u32 pv, u32 otid );
+    char* get_text( u8* raw, int max_len );
+    int parse_pokemon( char* buf, int offset, void** pokemon, PKMN::pokemon_moves_t** pa, PKMN::pokemon_effort_t** pe,
+                       PKMN::pokemon_growth_t** pg, PKMN::pokemon_misc_t** pm, int num, int size );
+    void print_pokemon( box_pokemon_t* pokemon );
 
-    POKEMON::PKMN getGen5Pkmn(const PKMN& gen3Pkmn);
-    PKMN getGen3Pkmn(const POKEMON::PKMN &gen5Pkmn);
+    POKEMON::PKMN getGen5Pkmn( const PKMN& gen3Pkmn );
+    PKMN getGen3Pkmn( const POKEMON::PKMN &gen5Pkmn );
 }
-namespace gen4{
-    bool isValidItem(int gen5Idx);
-    int getItemIdx(int gen5Idx);
-    int getItemIdx(int gen4Idx);
+namespace gen4 {
+    bool isValidItem( int gen5Idx );
+    int getItemIdx( int gen5Idx );
+    int getItemIdx( int gen4Idx );
 
-    class PKMN{
+    class PKMN {
 
     };
 
-    POKEMON::PKMN getGen5Pkmn(PKMN gen4Pkmn);
-    PKMN getGen4Pkmn(POKEMON::PKMN gen5Pkmn);
+    POKEMON::PKMN getGen5Pkmn( PKMN gen4Pkmn );
+    PKMN getGen4Pkmn( POKEMON::PKMN gen5Pkmn );
 
-    enum GAME{
+    enum GAME {
         DIAMANT = 0,
         PERL = 1,
         PLATIN = 2,

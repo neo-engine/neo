@@ -39,4 +39,4 @@ enum Type{
     EIS=15,     DRACHE=16,	UNLICHT=17, FEE = 18
 };
 
-float getEffectiveness(const Type& t1, const Type& t2);
+float getEffectiveness( const Type& p_t1, const Type& p_t2 );

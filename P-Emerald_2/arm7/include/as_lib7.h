@@ -3,16 +3,16 @@
   Advanced Sound Library (ASlib)
   ------------------------------
 
-  file        : sound7.c 
+  file        : sound7.c
   author      : Lasorsa Yohan (Noda)
   description : ARM7 sound definitions
 
-  history : 
+  history :
 
-    28/11/2007 - v1.0
-      = Original release
+  28/11/2007 - v1.0
+  = Original release
 
-*/
+  */
 
 #ifndef __SOUND7_H__
 #define __SOUND7_H__
@@ -24,152 +24,142 @@
 extern "C" {
 #endif 
 
-// mp3 static defines
+    // mp3 static defines
 #define AS_DECODEBUFFER_SIZE    MAX_NCHAN * MAX_NGRAN * MAX_NSAMP   
 
-// locate the IPC structure after the libnds one
+    // locate the IPC structure after the libnds one
 #define IPC_Sound   ((IPC_SoundSystem*)((u32)(IPC) + sizeof(TransferRegion)))
 
-// mp3 commands
-typedef enum 
-{
-    // internal commands
-    MP3CMD_NONE = 0,
-    MP3CMD_MIX = 1,
-    MP3CMD_MIXING = 2,
-    MP3CMD_WAITING = 4,
-    
-    // user commands
-    MP3CMD_INIT = 8,
-    MP3CMD_STOP = 16,
-    MP3CMD_PLAY = 32,
-    MP3CMD_PAUSE = 64,
-    MP3CMD_SETRATE = 128
-    
-} MP3Command;
+    // mp3 commands
+    typedef enum {
+        // internal commands
+        MP3CMD_NONE = 0,
+        MP3CMD_MIX = 1,
+        MP3CMD_MIXING = 2,
+        MP3CMD_WAITING = 4,
 
-// sound commands
-typedef enum
-{
-    // internal commands
-    SNDCMD_NONE = 0,
-    SNDCMD_DELAY = 1,
+        // user commands
+        MP3CMD_INIT = 8,
+        MP3CMD_STOP = 16,
+        MP3CMD_PLAY = 32,
+        MP3CMD_PAUSE = 64,
+        MP3CMD_SETRATE = 128
 
-    // user commands
-    SNDCMD_STOP = 2,
-    SNDCMD_PLAY = 4,
-    SNDCMD_SETVOLUME = 8,
-    SNDCMD_SETPAN = 16,
-    SNDCMD_SETRATE = 32,
-    SNDCMD_SETMASTERVOLUME = 64
-    
-} SoundCommand;
+    } MP3Command;
 
-// mp3 states
-typedef enum
-{
-    MP3ST_STOPPED = 0,
-    MP3ST_PLAYING = 1,
-    MP3ST_PAUSED = 2,
-    MP3ST_OUT_OF_DATA = 4,
-    MP3ST_DECODE_ERROR = 8
-    
-} MP3Status;
+    // sound commands
+    typedef enum {
+        // internal commands
+        SNDCMD_NONE = 0,
+        SNDCMD_DELAY = 1,
 
-// ASlib modes
-typedef enum
-{
-    AS_MODE_MP3 = 1,        // use mp3
-    AS_MODE_SURROUND = 2,   // use surround
-    AS_MODE_16CH = 4,       // use all DS channels
-    AS_MODE_8CH = 8         // use DS channels 1-8 only
-    
-} AS_MODE;
+        // user commands
+        SNDCMD_STOP = 2,
+        SNDCMD_PLAY = 4,
+        SNDCMD_SETVOLUME = 8,
+        SNDCMD_SETPAN = 16,
+        SNDCMD_SETRATE = 32,
+        SNDCMD_SETMASTERVOLUME = 64
 
-// delay values
-typedef enum
-{
-    AS_NO_DELAY = 0,    // 0 ms delay
-    AS_SURROUND = 1,    // 16 ms delay
-    AS_REVERB = 4,      // 66 ms delay
-    
-} AS_DELAY;
+    } SoundCommand;
 
-// sound formats
-typedef enum
-{
-    AS_PCM_8BIT = 0,
-    AS_PCM_16BIT = 1, 
-    AS_ADPCM = 2
-    
-} AS_SOUNDFORMAT;
+    // mp3 states
+    typedef enum {
+        MP3ST_STOPPED = 0,
+        MP3ST_PLAYING = 1,
+        MP3ST_PAUSED = 2,
+        MP3ST_OUT_OF_DATA = 4,
+        MP3ST_DECODE_ERROR = 8
 
-// sound info
-typedef struct
-{
-    u8  *data;
-    u32 size;
-    u8  format;
-    s32 rate;
-    u8  volume;
-    s8  pan;
-    u8  loop;
-    u8  priority;
-    u8  delay;
-    
-} SoundInfo;
+    } MP3Status;
 
-// sound channel info
-typedef struct
-{
-    SoundInfo snd;;
-    u8  busy;
-    u8  reserved;
-    s8  volume;
-    s8  pan;    
-    u8  cmd;
+    // ASlib modes
+    typedef enum {
+        AS_MODE_MP3 = 1,        // use mp3
+        AS_MODE_SURROUND = 2,   // use surround
+        AS_MODE_16CH = 4,       // use all DS channels
+        AS_MODE_8CH = 8         // use DS channels 1-8 only
 
-} SoundChannel;
+    } AS_MODE;
 
-// MP3 player info
-typedef struct
-{
-    s8  *mixbuffer;
-    u32 buffersize;
-    s32 rate;
-    u32 state;
-    u32 soundcursor;
-    u32 numsamples;
-    s32 prevtimer;
-    u8  *mp3buffer;
-    u32 mp3buffersize;    
-    u32 mp3filesize;    
-    u32 cmd;    
-    u8  channelL, channelR;
-    u8  loop;
-    u8  stream;
-    u8  needdata;
-    u8  delay;
+    // delay values
+    typedef enum {
+        AS_NO_DELAY = 0,    // 0 ms delay
+        AS_SURROUND = 1,    // 16 ms delay
+        AS_REVERB = 4,      // 66 ms delay
 
-} MP3Player;
+    } AS_DELAY;
 
-// IPC structure for the sound system
-typedef struct
-{
-    MP3Player mp3;
-    SoundChannel chan[16];
-    u8 surround;
-    u8 num_chan;
-    u8 volume;
-    
-} IPC_SoundSystem;
+    // sound formats
+    typedef enum {
+        AS_PCM_8BIT = 0,
+        AS_PCM_16BIT = 1,
+        AS_ADPCM = 2
+
+    } AS_SOUNDFORMAT;
+
+    // sound info
+    typedef struct {
+        u8  *data;
+        u32 size;
+        u8  format;
+        s32 rate;
+        u8  volume;
+        s8  pan;
+        u8  loop;
+        u8  priority;
+        u8  delay;
+
+    } SoundInfo;
+
+    // sound channel info
+    typedef struct {
+        SoundInfo snd;;
+        u8  busy;
+        u8  reserved;
+        s8  volume;
+        s8  pan;
+        u8  cmd;
+
+    } SoundChannel;
+
+    // MP3 player info
+    typedef struct {
+        s8  *mixbuffer;
+        u32 buffersize;
+        s32 rate;
+        u32 state;
+        u32 soundcursor;
+        u32 numsamples;
+        s32 prevtimer;
+        u8  *mp3buffer;
+        u32 mp3buffersize;
+        u32 mp3filesize;
+        u32 cmd;
+        u8  channelL, channelR;
+        u8  loop;
+        u8  stream;
+        u8  needdata;
+        u8  delay;
+
+    } MP3Player;
+
+    // IPC structure for the sound system
+    typedef struct {
+        MP3Player mp3;
+        SoundChannel chan[ 16 ];
+        u8 surround;
+        u8 num_chan;
+        u8 volume;
+
+    } IPC_SoundSystem;
 
 
-// the sound engine, must be called each VBlank
-void AS_SoundVBL();
+    // the sound engine, must be called each VBlank
+    void AS_SoundVBL( );
 
-// the mp3 decoding engine, must be called on a regular basis (like after VBlank)
-void AS_MP3Engine();
+    // the mp3 decoding engine, must be called on a regular basis (like after VBlank)
+    void AS_MP3Engine( );
 
 
 #ifdef __cplusplus
