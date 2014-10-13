@@ -44,7 +44,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "PKMN.h"
+#include "pokemon.h"
 #include "saveGame.h"
 #include "Gen.h"
 
@@ -55,7 +55,7 @@ extern SavMod savMod;
 extern const short POKEMON::OTLENGTH;
 extern const short POKEMON::PKMN_NAMELENGTH;
 
-extern POKEMON::PKMN::BOX_PKMN stored_pkmn[ MAXSTOREDPKMN ];
+extern POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
 extern std::vector<int> box_of_st_pkmn[ MAXPKMN ];
 extern std::vector<int> free_spaces;
 
@@ -98,14 +98,14 @@ saveGame::saveGame( void p_func( int ) ) {
     }
 
     fscanf( fd, " %i ", &a );
-    m_PkmnTeam = std::vector<POKEMON::PKMN>( a );
+    m_PkmnTeam = std::vector<POKEMON::pokemon>( a );
     for( int i = 0; i < a; ++i )
-        fread( &m_PkmnTeam[ i ], sizeof( POKEMON::PKMN ), 1, fd );
+        fread( &m_PkmnTeam[ i ], sizeof( POKEMON::pokemon ), 1, fd );
 
     free_spaces.clear( );
     for( int i = 0; i < MAXSTOREDPKMN; i++ ) {
-        //stored_pkmn[i] = PKMN(fd);
-        fread( &stored_pkmn[ i ], sizeof( POKEMON::PKMN::BOX_PKMN ), 1, fd );
+        //stored_pkmn[i] = pokemon(fd);
+        fread( &stored_pkmn[ i ], sizeof( POKEMON::pokemon::boxPokemon ), 1, fd );
         if( stored_pkmn[ i ].m_SPEC == 0 || stored_pkmn[ i ].m_SPEC > MAXPKMN )
             free_spaces.push_back( i );
         else
@@ -175,10 +175,10 @@ bool saveGame::save( void p_func( int ) ) {
     fprintf( fd, " %i ", m_PkmnTeam.size( ) );
     for( size_t i = 0; i < m_PkmnTeam.size( ); ++i )
         //I->save(fd);
-        fwrite( &( m_PkmnTeam[ i ] ), 1, sizeof( POKEMON::PKMN ), fd );
+        fwrite( &( m_PkmnTeam[ i ] ), 1, sizeof( POKEMON::pokemon ), fd );
     for( int i = 0; i < MAXSTOREDPKMN; i++ ) {
         //stored_pkmn[i].save(fd);
-        fwrite( &( stored_pkmn[ i ] ), sizeof( POKEMON::PKMN::BOX_PKMN ), 1, fd );
+        fwrite( &( stored_pkmn[ i ] ), sizeof( POKEMON::pokemon::boxPokemon ), 1, fd );
     }
 
     p_func( 40 );

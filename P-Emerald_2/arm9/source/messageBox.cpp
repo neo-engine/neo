@@ -264,7 +264,7 @@ messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, boo
     if( p_sprt != no_sprite ) {
         int a = 0, b = 0, c = 0;
         if( p_sprt == sprite_pkmn ) {
-            loadPKMNSpriteTop( oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, a, b, c, true );
+            loadPKMNSpriteTop( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", p_sprind, (u16)-16, 0, a, b, c, true );
         }
         if( p_sprt == sprite_trainer ) {
             loadPKMNSpriteTop( oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
@@ -328,7 +328,7 @@ messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_tim
     if( p_sprt != no_sprite ) {
         int a = 0, b = 0, c = 0;
         if( p_sprt == sprite_pkmn ) {
-            loadPKMNSpriteTop( oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, a, b, c, true );
+            loadPKMNSpriteTop( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", p_sprind, (u16)-16, 0, a, b, c, true );
         }
         if( p_sprt == sprite_trainer ) {
             loadPKMNSpriteTop( oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );

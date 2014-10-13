@@ -32,7 +32,7 @@
 
 
 #include "screenLoader.h"
-#include "PKMN.h"
+#include "pokemon.h"
 #include <vector>
 
 class berry;
@@ -45,7 +45,7 @@ extern saveGame SAV;
 
 extern PrintConsole Top, Bottom;
 
-POKEMON::PKMN::BOX_PKMN stored_pkmn[ MAXSTOREDPKMN ];
+POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
 std::vector<int> box_of_st_pkmn[ MAXPKMN ];
 std::vector<int> free_spaces;
 
@@ -84,7 +84,7 @@ int drawBox( short p_pkmnId ) {
     int acin = 0, max_ = std::min( MAXPKMNINBOXLIST, (int)box_of_st_pkmn[ p_pkmnId ].size( ) );
     std::string status_[ ] = { "   ", "BSG", "BRT", "GIF", "SLF", "PAR", "GFR" };
     for( int i = 0; i < max_; i++ ) {
-        POKEMON::PKMN::BOX_PKMN& acPKMN = stored_pkmn[ box_of_st_pkmn[ p_pkmnId ][ i ] ];
+        POKEMON::pokemon::boxPokemon& acPKMN = stored_pkmn[ box_of_st_pkmn[ p_pkmnId ][ i ] ];
         wprintf( &acPKMN.m_Name[ 0 ] );
         if( acPKMN.m_PKRUS % 16 )
             printf( " PKRS" );
@@ -119,7 +119,7 @@ DOWN:
                 ++acin;
             max_ = acin + std::min( MAXPKMNINBOXLIST, (int)box_of_st_pkmn[ p_pkmnId ].size( ) );
             for( int i = acin; i < max_; i++ ) {
-                POKEMON::PKMN::BOX_PKMN& acPKMN = stored_pkmn[ box_of_st_pkmn[ p_pkmnId ][ i ] ];
+                POKEMON::pokemon::boxPokemon& acPKMN = stored_pkmn[ box_of_st_pkmn[ p_pkmnId ][ i ] ];
                 wprintf( &acPKMN.m_Name[ 0 ] );
                 if( acPKMN.m_PKRUS % 16 )
                     printf( " PKRS" );
@@ -144,7 +144,7 @@ UP:
                 --acin;
             max_ = acin + std::min( MAXPKMNINBOXLIST, (int)box_of_st_pkmn[ p_pkmnId ].size( ) );
             for( int i = acin; i < max_; i++ ) {
-                POKEMON::PKMN::BOX_PKMN& acPKMN = stored_pkmn[ box_of_st_pkmn[ p_pkmnId ][ i ] ];
+                POKEMON::pokemon::boxPokemon& acPKMN = stored_pkmn[ box_of_st_pkmn[ p_pkmnId ][ i ] ];
                 wprintf( &acPKMN.m_Name[ 0 ] );
                 if( acPKMN.m_PKRUS % 16 )
                     printf( " PKRS" );
@@ -211,7 +211,7 @@ UP:
             printf( "Pok\x82""mon in dieser Box:\n\n>" );
             consoleSetWindow( &Bottom, 2, 3, 30, 20 );
             for( int i = acin; i < max_; i++ ) {
-                POKEMON::PKMN::BOX_PKMN& acPKMN = stored_pkmn[ box_of_st_pkmn[ p_pkmnId ][ i ] ];
+                POKEMON::pokemon::boxPokemon& acPKMN = stored_pkmn[ box_of_st_pkmn[ p_pkmnId ][ i ] ];
                 wprintf( &acPKMN.m_Name[ 0 ] );
                 if( acPKMN.m_PKRUS % 16 )
                     printf( " PKRS" );

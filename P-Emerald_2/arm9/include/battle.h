@@ -36,7 +36,7 @@
 #include "move.h"
 
 namespace POKEMON {
-    class PKMN;
+    class pokemon;
 }
 class item;
 struct SpriteInfo;
@@ -46,7 +46,7 @@ namespace BATTLE {
     void displayHP( int HPstart, int HP, int x, int y, int freecolor1, int freecolor2, bool delay, int innerR, int outerR ); //HP in %
     void displayEP( int EPstart, int EP, int x, int y, int freecolor1, int freecolor2, bool delay, int innerR = 14, int outerR = 15 );
 
-    int calcDamage( const move& atk, const POKEMON::PKMN& atg, const POKEMON::PKMN& def, int rndVal );
+    int calcDamage( const move& atk, const POKEMON::pokemon& atg, const POKEMON::pokemon& def, int rndVal );
 
     class battleTrainer {
     public:
@@ -56,7 +56,7 @@ namespace BATTLE {
 
         const char*         m_battleTrainerName;
         trainerClass        m_trainerClass;
-        std::vector < POKEMON::PKMN >
+        std::vector < POKEMON::pokemon >
             *m_pkmnTeam;
     private:
         std::vector<item>   *_items;
@@ -72,7 +72,7 @@ namespace BATTLE {
                        const char* p_msg2,
                        const char* p_msg3,
                        const char* p_msg4,
-                       std::vector<POKEMON::PKMN>* p_pkmnTeam,
+                       std::vector<POKEMON::pokemon>* p_pkmnTeam,
                        std::vector<item>* p_items,
                        trainerClass p_trainerClass = PKMN_TRAINER )
                        : m_battleTrainerName( p_battleTrainerName ),
@@ -84,7 +84,7 @@ namespace BATTLE {
                        _msg3( p_msg3 ),
                        _msg4( p_msg4 ) { }
 
-        POKEMON::PKMN&      sendNewPKMN( bool p_choice = true );
+        POKEMON::pokemon&      sendNewPKMN( bool p_choice = true );
         item& useItem( bool choice = true );
 
         const char*         getLooseMsg( ) const {

@@ -47,7 +47,7 @@
 #include "messageBox.h"
 #include "screenLoader.h"
 #include "saveGame.h"
-#include "PKMN.h"
+#include "pokemon.h"
 #include "sprite.h"
 #include "bag.h"
 #include "item.h"
@@ -58,7 +58,7 @@
 #include "Back.h"
 #include "Save.h"
 #include "Option.h"
-#include "Pokemon.h"
+#include "PokemonSp.h"
 #include "Id.h"
 #include "SPBag.h"
 #include "Nav.h"
@@ -106,7 +106,7 @@ backgroundSet BGs[ MAXBG ] = { { "Raging_Gyarados", NAV_DATA, NAV_DATA_PAL, true
 { "Fighting_Kyogre", NAV_DATA, NAV_DATA_PAL, true, false },
 { "Working_Klink", BG1Bitmap, BG1Pal, false, true } };
 int BG_ind = 8;
-extern POKEMON::PKMN::BOX_PKMN stored_pkmn[ MAXSTOREDPKMN ];
+extern POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
 extern std::vector<int> box_of_st_pkmn[ MAXPKMN ];
 extern std::vector<int> free_spaces;
 
@@ -304,7 +304,7 @@ bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_pa
         fclose( fd );
         return false;
     }
-    int p_palCnt = 16;
+    p_palCnt = 16;
     for( int i = 0; i < 16; ++i )
         TEMP_PAL[ i ] = 0;
     fread( TEMP_PAL, sizeof( unsigned short int ), p_palCnt, fd );
@@ -451,7 +451,7 @@ bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
         fclose( fd );
         return false;
     }
-    int p_palCnt = 16;
+    p_palCnt = 16;
     for( int i = 0; i < 16; ++i )
         TEMP_PAL[ i ] = 0;
     fread( TEMP_PAL, sizeof( unsigned short int ), p_palCnt, fd );
@@ -547,7 +547,7 @@ bool loadTrainerSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
         fclose( fd );
         return false;
     }
-    int p_palCnt = 16;
+    p_palCnt = 16;
     for( int i = 0; i < 16; ++i )
         TEMP_PAL[ i ] = 0;
     fread( TEMP_PAL, sizeof( unsigned short int ), p_palCnt, fd );
@@ -675,7 +675,7 @@ bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
         fclose( fd );
         return false;
     }
-    int p_palCnt = 16;
+    p_palCnt = 16;
     for( int i = 0; i < 16; ++i )
         TEMP_PAL[ i ] = 0;
     fread( TEMP_PAL, sizeof( unsigned short int ), p_palCnt, fd );
@@ -928,7 +928,7 @@ int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     pkmn->x = mainSpritesPositions[ PKMN_ID - 2 ][ 0 ] - pkmnInfo->width / 2;
     pkmn->size = OBJSIZE_32;
     pkmn->gfxIndex = nextAvailableTileIdx;
-    nextAvailableTileIdx += PokemonTilesLen / BYTES_PER_16_COLOR_TILE;
+    nextAvailableTileIdx += PokemonSpTilesLen / BYTES_PER_16_COLOR_TILE;
     pkmn->priority = OBJPRIORITY_0;
     pkmn->palette = pkmnInfo->oamId;
 
@@ -1053,7 +1053,7 @@ int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
                       &SPRITE_PALETTE_SUB[ saveInfo->oamId * COLORS_PER_PALETTE ],
                       32 );
     dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                      PokemonPal,
+                      PokemonSpPal,
                       &SPRITE_PALETTE_SUB[ pkmnInfo->oamId * COLORS_PER_PALETTE ],
                       32 );
     dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
@@ -1092,9 +1092,9 @@ int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
                       &SPRITE_GFX_SUB[ save->gfxIndex * OFFSET_MULTIPLIER ],
                       SaveTilesLen );
     dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                      PokemonTiles,
+                      PokemonSpTiles,
                       &SPRITE_GFX_SUB[ pkmn->gfxIndex * OFFSET_MULTIPLIER ],
-                      PokemonTilesLen );
+                      PokemonSpTilesLen );
     dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
                       IdTiles,
                       &SPRITE_GFX_SUB[ id->gfxIndex * OFFSET_MULTIPLIER ],
@@ -1523,7 +1523,7 @@ void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const int& p_pkmnI
 
     sprintf( buffer, "%d/Icon_%d", p_pkmnId, p_pkmnId );
     if( p_subScreen ) {
-        if( !loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/PKMN/", buffer, 128, 16 ) ) {
+        if( !loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/pokemon/", buffer, 128, 16 ) ) {
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
                               NoItemPal,
                               &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
@@ -1534,7 +1534,7 @@ void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const int& p_pkmnI
                               NoItemTilesLen );
         }
     } else {
-        if( !loadSprite( ItemInfo, "nitro:/PICS/SPRITES/PKMN/", buffer, 128, 16 ) ) {
+        if( !loadSprite( ItemInfo, "nitro:/PICS/SPRITES/pokemon/", buffer, 128, 16 ) ) {
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
                               NoItemPal,
                               &SPRITE_PALETTE[ p_palCnt * 16 ],
@@ -1974,7 +1974,6 @@ void screenLoader::run_pkmn( ) {
                     break;
                 swiWaitForVBlank( );
             }
-            char buf[ 50 ];
             item acI = ItemList[ SAV.m_PkmnTeam[ acIn ].m_boxdata.m_Item ];
             SAV.m_PkmnTeam[ acIn ].m_boxdata.m_Item = 0;
 
@@ -2614,7 +2613,7 @@ void formes( OAMTable *p_oam, SpriteInfo * p_spriteInfo, int& p_oamIndex, int& p
     p_tileCnt += BigCirc1TilesLen / BYTES_PER_16_COLOR_TILE;
     if( p_pkmnId == 0 ) {
         updateOAM( p_oam );
-        loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 80, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, p_female );
+        loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, p_female );
         return;
     } else {
         for( int i = p_oamIndex; i > p_oamIndex - 8; --i )
@@ -2623,11 +2622,11 @@ void formes( OAMTable *p_oam, SpriteInfo * p_spriteInfo, int& p_oamIndex, int& p
             else
                 p_oam->oamBuffer[ i ].x += 50;
         updateOAM( p_oam );
-        if( !loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 80 - 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, p_female, true ) )
-            loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 80 - 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, !p_female, true );
+        if( !loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 - 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, p_female, true ) )
+            loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 - 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, !p_female, true );
         --p_palCnt;
-        if( !loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 80 + 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, true, p_female ) )
-            loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 80 + 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, true, !p_female );
+        if( !loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 + 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, true, p_female ) )
+            loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 + 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, true, !p_female );
     }
     SpriteInfo * C1Info = &p_spriteInfo[ ++p_oamIndex ];
     SpriteEntry * C1 = &p_oam->oamBuffer[ p_oamIndex ];
@@ -2700,7 +2699,7 @@ void drawTopDexPage( int p_page, int p_pkmnId, int p_pkmnFormeId = 0 ) {
     printf( "\x1b[37m" );
     consoleClear( );
     int a = 0, b = 0, c = 0;
-    POKEMON::PKMNDATA::PKMNDATA acpkmndata;
+    POKEMON::PKMNDATA::pokemonData acpkmndata;
     POKEMON::pkmnGenderType acG = POKEMON::GENDERLESS;
     int newformepkmn = p_pkmnId;
     if( p_page < 4 ) {
@@ -2731,7 +2730,7 @@ void drawTopDexPage( int p_page, int p_pkmnId, int p_pkmnFormeId = 0 ) {
             if( acpkmndata.m_types[ 0 ] != acpkmndata.m_types[ 1 ] )
                 drawTypeIcon( oamTop, spriteInfoTop, a, b, c, acpkmndata.m_types[ 1 ], 65, 35, false );
             updateOAM( oamTop );
-            printf( "\n    Du hast %i dieser PKMN.\n\n", box_of_st_pkmn[ p_pkmnId - 1 ].size( ) );
+            printf( "\n    Du hast %i dieser pokemon.\n\n", box_of_st_pkmn[ p_pkmnId - 1 ].size( ) );
             char buf[ 50 ];
             sprintf( buf, "%s", POKEMON::PKMNDATA::getDisplayName( p_pkmnId ) );
             sprintf( buf, "%s - %s", buf, POKEMON::PKMNDATA::getSpecies( p_pkmnId ) );
@@ -2828,7 +2827,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
     for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
         if( i == acNum ) {
         drawTopDexPage( acPage, i + 1, acForme );
-        loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true );
+        loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true );
         --j;
         continue;
         } else
@@ -2866,7 +2865,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
                         drawPKMNIcon( oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
@@ -2880,7 +2879,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
                         drawPKMNIcon( oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
@@ -2894,7 +2893,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
                         drawPKMNIcon( oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
@@ -2908,7 +2907,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
                         drawPKMNIcon( oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
@@ -2972,7 +2971,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
                         drawPKMNIcon( oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                 }
@@ -3473,7 +3472,7 @@ void getRanPerm( int* p_array, int* p_out ) {
     }
 }
 
-const std::string choi[ 6 ] = { "\nEinsetzen.", "\nEinem PKMN geben.", "\nRegistrieren.", "\nWeitere Daten ansehen." };
+const std::string choi[ 6 ] = { "\nEinsetzen.", "\nEinem pokemon geben.", "\nRegistrieren.", "\nWeitere Daten ansehen." };
 int getAnswer( item::itemType p_bagtype ) {
     touchPosition t;
     if( p_bagtype != item::BERRIES ) {
@@ -3998,14 +3997,14 @@ PREV:
                             consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                             consoleClear( );
                             {
-                                POKEMON::PKMN& ac = SAV.m_PkmnTeam[ ( ( ( i - 15 ) / 2 ) ^ 1 ) ];
+                                POKEMON::pokemon& ac = SAV.m_PkmnTeam[ ( ( ( i - 15 ) / 2 ) ^ 1 ) ];
                                 initOAMTableSub( oam );
                                 initMainSprites( oam, spriteInfo );
                                 setMainSpriteVisibility( true );
                                 oam->oamBuffer[ 8 ].isHidden = true;
                                 oam->oamBuffer[ 0 ].isHidden = false;
                                 oam->oamBuffer[ 1 ].isHidden = true;
-                                if( ac.m_boxdata.m_Item != 0 ) {//PKMN hat schon Item 
+                                if( ac.m_boxdata.m_Item != 0 ) {//pokemon hat schon Item 
 
                                     char buf[ 100 ];
                                     sprintf( buf, "%ls hält bereits\ndas Item %s.\nSollen die Items getauscht werden?", ac.m_boxdata.m_Name, ItemList[ ac.m_boxdata.m_Item ].getDisplayName( ).c_str( ) );

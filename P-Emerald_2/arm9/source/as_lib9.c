@@ -45,8 +45,8 @@ extern "C" {
 
         // initialize channels
         for( i = 0; i < 16; i++ ) {
-            IPC_Sound->chan[ i ].busy = false;
-            IPC_Sound->chan[ i ].reserved = false;
+            IPC_Sound->chan[ i ].busy = 0;
+            IPC_Sound->chan[ i ].reserved = 0;
             IPC_Sound->chan[ i ].volume = 0;
             IPC_Sound->chan[ i ].pan = 64;
             IPC_Sound->chan[ i ].cmd = SNDCMD_NONE;
@@ -57,18 +57,18 @@ extern "C" {
 
             nb_chan = 8;
             for( i = 8; i < 16; i++ )
-                IPC_Sound->chan[ i ].reserved = true;
+                IPC_Sound->chan[ i ].reserved = 1;
         }
 
         // use surround
         if( mode & AS_MODE_SURROUND ) {
 
-            IPC_Sound->surround = true;
+            IPC_Sound->surround = 1;
             for( i = nb_chan / 2; i < nb_chan; i++ )
-                IPC_Sound->chan[ i ].reserved = true;
+                IPC_Sound->chan[ i ].reserved = 1;
 
         } else {
-            IPC_Sound->surround = false;
+            IPC_Sound->surround = 0;
         }
 
         IPC_Sound->num_chan = nb_chan / 2;
@@ -86,14 +86,14 @@ extern "C" {
             IPC_Sound->mp3.cmd = MP3CMD_INIT;
             IPC_Sound->mp3.state = MP3ST_STOPPED;
 
-            IPC_Sound->chan[ 0 ].reserved = true;
+            IPC_Sound->chan[ 0 ].reserved = 1;
 
             if( IPC_Sound->surround ) {
                 IPC_Sound->mp3.channelR = nb_chan / 2;
-                IPC_Sound->chan[ nb_chan / 2 ].reserved = true;
+                IPC_Sound->chan[ nb_chan / 2 ].reserved = 1;
             } else {
                 IPC_Sound->mp3.channelR = 1;
-                IPC_Sound->chan[ 1 ].reserved = true;
+                IPC_Sound->chan[ 1 ].reserved = 1;
             }
 
             IPC_Sound->chan[ IPC_Sound->mp3.channelL ].snd.pan = 64;
@@ -211,13 +211,13 @@ extern "C" {
     // play a sound directly using the given channel
     void AS_SoundDirectPlay( u8 chan, SoundInfo sound ) {
         IPC_Sound->chan[ chan ].snd = sound;
-        IPC_Sound->chan[ chan ].busy = true;
+        IPC_Sound->chan[ chan ].busy = 1;
         IPC_Sound->chan[ chan ].cmd = SNDCMD_PLAY;
         IPC_Sound->chan[ chan ].volume = sound.volume;
 
         if( IPC_Sound->surround ) {
             IPC_Sound->chan[ chan + IPC_Sound->num_chan ].snd = sound;
-            IPC_Sound->chan[ chan + IPC_Sound->num_chan ].busy = true;
+            IPC_Sound->chan[ chan + IPC_Sound->num_chan ].busy = 1;
             IPC_Sound->chan[ chan + IPC_Sound->num_chan ].cmd = SNDCMD_DELAY;
 
             // set the correct surround volume & pan
@@ -242,7 +242,7 @@ extern "C" {
 
         IPC_Sound->mp3.mp3buffer = mp3_data;
         IPC_Sound->mp3.mp3filesize = size;
-        IPC_Sound->mp3.stream = false;
+        IPC_Sound->mp3.stream = 0;
         IPC_Sound->mp3.cmd = MP3CMD_PLAY;
     }
 
@@ -274,7 +274,7 @@ extern "C" {
             AS_MP3FillBuffer( mp3filebuffer, AS_FILEBUFFER_SIZE * 2 );
 
             // start playing
-            IPC_Sound->mp3.stream = true;
+            IPC_Sound->mp3.stream = 1;
             IPC_Sound->mp3.cmd = MP3CMD_PLAY;
         } else {
             AS_MP3Stop( );
@@ -308,7 +308,7 @@ extern "C" {
     }
 
     void AS_ReserveChannel( u8 channel ) {
-        IPC_Sound->chan[ channel ].reserved = true;
+        IPC_Sound->chan[ channel ].reserved = 1;
     }
 
     // set the master volume (0..127)
@@ -383,7 +383,7 @@ extern "C" {
         IPC_Sound->mp3.delay = delay;
     }
 
-    // set the mp3 loop mode (false = one shot, true = loop indefinitely)
+    // set the mp3 loop mode (0 = one shot, 1 = loop indefinitely)
     void AS_SetMP3Loop( u8 loop ) {
         IPC_Sound->mp3.loop = loop;
     }

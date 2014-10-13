@@ -39,120 +39,120 @@
 #include "messageBox.h"
 
 namespace font {
-    void putrec( int x1, int y1, int x2, int y2, bool bottom, bool striped, int color ) {
-        for( int x = x1; x <= x2; ++x ) for( int y = y1; y < y2; ++y )
-            if( bottom )
-                ( (Color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = !striped ? ( ( (u8)color ) << 8 ) | ( (u8)color ) : color;
+    void putrec( int p_x1, int p_y1, int p_x2, int p_y2, bool p_bottom, bool p_striped, int p_color ) {
+        for( int x = p_x1; x <= p_x2; ++x ) for( int y = p_y1; y < p_y2; ++y )
+            if( p_bottom )
+                ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
             else
-                ( (Color *)BG_BMP_RAM( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = !striped ? ( ( (u8)color ) << 8 ) | ( (u8)color ) : color;
+                ( (color *)BG_BMP_RAM( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
     }
-    Font::Font( u8 *the_data, u8 *the_widths, void( *shiftchar )( u16& val ) ) {
-        data = the_data;
-        widths = the_widths;
-        color[ 0 ] = color[ 1 ] = color[ 2 ]
-            = color[ 3 ] = color[ 4 ] = RGB( 31, 31, 31 );
-        this->shiftchar = shiftchar;
+    Font::Font( u8 *p_data, u8 *p_widths, void( *p_shiftchar )( u16& val ) ) {
+        _data = p_data;
+        _widths = p_widths;
+        _color[ 0 ] = _color[ 1 ] = _color[ 2 ]
+            = _color[ 3 ] = _color[ 4 ] = RGB( 31, 31, 31 );
+        _shiftchar = p_shiftchar;
     }
 
     Font::~Font( ) { }
 
 
-    void Font::print_char( u16 ch, s16 x, s16 y, bool bottom ) {
-        shiftchar( ch );
+    void Font::print_char( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom ) {
+        _shiftchar( p_ch );
 
-        s16 put_x, put_y;
-        u8 get_x, get_y;
-        u32 offset = ch * FONT_WIDTH * FONT_HEIGHT;
+        s16 putX, putY;
+        u8 getX, getY;
+        u32 offset = p_ch * FONT_WIDTH * FONT_HEIGHT;
 
-        for( put_y = y, get_y = 0; put_y < y + FONT_HEIGHT; ++put_y, ++get_y )
-            for( put_x = x, get_x = 0; put_x < x + widths[ ch ]; put_x += 2, get_x += 2 )
-                if( put_x >= 0 && put_x < SCREEN_WIDTH && put_y >= 0 && put_y < SCREEN_HEIGHT )
-                    if( !bottom )
-                        top_screen_plot( put_x, put_y, ( (u8)( color[ data[ 1 + offset + ( get_x + get_y * FONT_WIDTH ) ] ] ) << 8 ) |
-                        (u8)( color[ data[ offset + ( get_x + get_y * FONT_WIDTH ) ] ] ) );
+        for( putY = p_y, getY = 0; putY < p_y + FONT_HEIGHT; ++putY, ++getY )
+            for( putX = p_x, getX = 0; putX < p_x + _widths[ p_ch ]; putX += 2, getX += 2 )
+                if( putX >= 0 && putX < SCREEN_WIDTH && putY >= 0 && putY < SCREEN_HEIGHT )
+                    if( !p_bottom )
+                        top_screen_plot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
+                        (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     else
-                        btm_screen_plot( put_x, put_y, ( (u8)( color[ data[ 1 + offset + ( get_x + get_y * FONT_WIDTH ) ] ] ) << 8 ) |
-                        (u8)( color[ data[ offset + ( get_x + get_y * FONT_WIDTH ) ] ] ) );
+                        btm_screen_plot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
+                        (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
     }
 
-    void Font::print_string( const char *string, s16 x, s16 y, bool bottom ) {
+    void Font::print_string( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
-        s16 put_x = x, put_y = y;
+        s16 putX = p_x, putY = p_y;
 
-        while( string[ current_char ] ) {
-            if( string[ current_char ] == '\n' ) {
-                put_y += FONT_HEIGHT;
-                put_x = x;
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' ) {
+                putY += FONT_HEIGHT;
+                putX = p_x;
                 current_char++;
                 continue;
             }
-            print_char( string[ current_char ], put_x, put_y, bottom );
+            print_char( p_string[ current_char ], putX, putY, p_bottom );
 
-            u16 c = (u16)string[ current_char ];
-            shiftchar( c );
-            put_x += widths[ c ];
+            u16 c = (u16)p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ];
 
             current_char++;
         }
     }
-    void Font::print_string( const wchar_t *string, s16 x, s16 y, bool bottom ) {
+    void Font::print_string( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
-        s16 put_x = x, put_y = y;
+        s16 putX = p_x, putY = p_y;
 
-        while( string[ current_char ] ) {
-            if( string[ current_char ] == '\n' ) {
-                put_y += FONT_HEIGHT;
-                put_x = x;
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' ) {
+                putY += FONT_HEIGHT;
+                putX = p_x;
                 current_char++;
                 continue;
             }
-            print_char( string[ current_char ], put_x, put_y, bottom );
+            print_char( p_string[ current_char ], putX, putY, p_bottom );
 
-            u16 c = (u16)string[ current_char ];
-            shiftchar( c );
-            put_x += widths[ c ];
+            u16 c = (u16)p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ];
 
             current_char++;
         }
     }
-    void Font::print_string_d( const char *string, s16 x, s16 y, bool bottom ) {
+    void Font::print_string_d( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
-        s16 put_x = x, put_y = y;
+        s16 putX = p_x, putY = p_y;
 
-        while( string[ current_char ] ) {
-            if( string[ current_char ] == '\n' ) {
-                put_y += 16;
-                put_x = x;
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' ) {
+                putY += 16;
+                putX = p_x;
                 current_char++;
                 continue;
             }
-            print_char( string[ current_char ], put_x, put_y, bottom );
+            print_char( p_string[ current_char ], putX, putY, p_bottom );
 
-            u16 c = (u16)string[ current_char ];
-            shiftchar( c );
-            put_x += widths[ c ];
+            u16 c = (u16)p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ];
 
             for( int i = 0; i < 80 / TEXTSPEED; ++i )
                 swiWaitForVBlank( );
             current_char++;
         }
     }
-    void Font::print_string_d( const wchar_t *string, s16 x, s16 y, bool bottom ) {
+    void Font::print_string_d( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
-        s16 put_x = x, put_y = y;
+        s16 putX = p_x, putY = p_y;
 
-        while( string[ current_char ] ) {
-            if( string[ current_char ] == '\n' ) {
-                put_y += FONT_HEIGHT;
-                put_x = x;
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' ) {
+                putY += FONT_HEIGHT;
+                putX = p_x;
                 current_char++;
                 continue;
             }
-            print_char( string[ current_char ], put_x, put_y, bottom );
+            print_char( p_string[ current_char ], putX, putY, p_bottom );
 
-            u16 c = (u16)string[ current_char ];
-            shiftchar( c );
-            put_x += widths[ c ];
+            u16 c = (u16)p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ];
 
             for( int i = 0; i < 80 / TEXTSPEED; ++i )
                 swiWaitForVBlank( );
@@ -160,34 +160,34 @@ namespace font {
         }
     }
 
-    void Font::print_string_center( const char *string, bool bottom ) {
-        s16 x = SCREEN_WIDTH / 2 - string_width( string ) / 2;
+    void Font::print_string_center( const char *p_string, bool p_bottom ) {
+        s16 x = SCREEN_WIDTH / 2 - string_width( p_string ) / 2;
         s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
 
-        print_string( string, x, y, bottom );
+        print_string( p_string, x, y, p_bottom );
     }
-    void Font::print_string_center_d( const char *string, bool bottom ) {
-        s16 x = ( SCREEN_WIDTH / 2 - string_width( string ) / 2 );
+    void Font::print_string_center_d( const char *p_string, bool p_bottom ) {
+        s16 x = ( SCREEN_WIDTH / 2 - string_width( p_string ) / 2 );
         s16 y = ( SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2 );
 
-        print_string_d( string, x, y, bottom );
+        print_string_d( p_string, x, y, p_bottom );
     }
-    void Font::print_string_center( const wchar_t *string, bool bottom ) {
-        s16 x = SCREEN_WIDTH / 2 - string_width( string ) / 2;
+    void Font::print_string_center( const wchar_t *p_string, bool p_bottom ) {
+        s16 x = SCREEN_WIDTH / 2 - string_width( p_string ) / 2;
         s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
 
-        print_string( string, x, y, bottom );
+        print_string( p_string, x, y, p_bottom );
     }
-    void Font::print_string_center_d( const wchar_t *string, bool bottom ) {
-        s16 x = ( SCREEN_WIDTH / 2 - string_width( string ) / 2 );
+    void Font::print_string_center_d( const wchar_t *p_string, bool p_bottom ) {
+        s16 x = ( SCREEN_WIDTH / 2 - string_width( p_string ) / 2 );
         s16 y = ( SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2 );
 
-        print_string_d( string, x, y, bottom );
+        print_string_d( p_string, x, y, p_bottom );
     }
 
-    void Font::print_number( s32 num, s16 x, s16 y, bool bottom ) {
+    void Font::print_number( s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
         char numstring[ 10 ] = "";
-        u32 number = num, quotient = 1, remainder = 0;
+        u32 number = p_num, quotient = 1, remainder = 0;
         char remainder_str[ 3 ] = "";
         u32 current_char = 0, current_char2 = 0;
         static char string[ 100 ];
@@ -214,32 +214,32 @@ namespace font {
             string[ current_char2 + 1 ] = '\0';
         }
 
-        print_string( string, x, y, bottom );
+        print_string( string, p_x, p_y, p_bottom );
     }
 
 
-    u32 Font::string_width( const char *string ) const {
+    u32 Font::string_width( const char *p_string ) const {
         u32 current_char = 0;
         u32 width = 0;
 
-        while( string[ current_char ] ) {
-            if( string[ current_char ] == '\n' )
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' )
                 break;
-            width += widths[ (u8)string[ current_char ] ] + 1;
+            width += _widths[ (u8)p_string[ current_char ] ] + 1;
 
             current_char++;
         }
 
         return width - 1;
     }
-    u32 Font::string_width( const wchar_t *string ) const {
+    u32 Font::string_width( const wchar_t *p_string ) const {
         u32 current_char = 0;
         u32 width = 0;
 
-        while( string[ current_char ] ) {
-            if( string[ current_char ] == '\n' )
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' )
                 break;
-            width += widths[ (u8)string[ current_char ] ] + 1;
+            width += _widths[ (u8)p_string[ current_char ] ] + 1;
 
             current_char++;
         }
@@ -250,41 +250,41 @@ namespace font {
 
 void top_screen_darken( ) {
     u16 i;
-    Color pixel;
+    color pixel;
 
     for( i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++ ) {
-        pixel = ( (Color *)BG_BMP_RAM( 1 ) )[ i ];
-        ( (Color *)BG_BMP_RAM( 1 ) )[ i ] = ( ( pixel & 0x1F ) >> 1 ) |
+        pixel = ( (color *)BG_BMP_RAM( 1 ) )[ i ];
+        ( (color *)BG_BMP_RAM( 1 ) )[ i ] = ( ( pixel & 0x1F ) >> 1 ) |
             ( ( ( ( pixel >> 5 ) & 0x1F ) >> 1 ) << 5 ) |
             ( ( ( ( pixel >> 10 ) & 0x1F ) >> 1 ) << 10 ) |
             ( 1 << 15 );
     }
 }
-void top_screen_plot( u8 x, u8 y, Color color ) {
-    if( ( color >> 8 ) != 0 && ( color % ( 1 << 8 ) ) != 0 )
-        ( (Color *)BG_BMP_RAM( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = color;
-    else if( ( color >> 8 ) != 0 )
-        ( (Color *)BG_BMP_RAM( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = color | ( ( (Color *)BG_BMP_RAM( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
-    else if( ( color % ( 1 << 8 ) ) != 0 )
-        ( (Color *)BG_BMP_RAM( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = color | ( ( (Color *)BG_BMP_RAM( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] << 8 );
+void top_screen_plot( u8 p_x, u8 p_y, color p_color ) {
+    if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
+        ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
+    else if( ( p_color >> 8 ) != 0 )
+        ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
+    else if( ( p_color % ( 1 << 8 ) ) != 0 )
+        ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
 }
 void btm_screen_darken( ) {
     u16 i;
-    Color pixel;
+    color pixel;
 
     for( i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++ ) {
-        pixel = ( (Color *)BG_BMP_RAM_SUB( 1 ) )[ i ];
-        ( (Color *)BG_BMP_RAM_SUB( 1 ) )[ i ] = ( ( pixel & 0x1F ) >> 1 ) |
+        pixel = ( (color *)BG_BMP_RAM_SUB( 1 ) )[ i ];
+        ( (color *)BG_BMP_RAM_SUB( 1 ) )[ i ] = ( ( pixel & 0x1F ) >> 1 ) |
             ( ( ( ( pixel >> 5 ) & 0x1F ) >> 1 ) << 5 ) |
             ( ( ( ( pixel >> 10 ) & 0x1F ) >> 1 ) << 10 ) |
             ( 1 << 15 );
     }
 }
-void btm_screen_plot( u8 x, u8 y, Color color ) {
-    if( ( color >> 8 ) != 0 && ( color % ( 1 << 8 ) ) != 0 )
-        ( (Color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = color;
-    else if( ( color >> 8 ) != 0 )
-        ( (Color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = color | ( ( (Color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
-    else if( ( color % ( 1 << 8 ) ) != 0 )
-        ( (Color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = color | ( ( (Color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] << 8 );
+void btm_screen_plot( u8 p_x, u8 p_y, color p_color ) {
+    if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
+        ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
+    else if( ( p_color >> 8 ) != 0 )
+        ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
+    else if( ( p_color % ( 1 << 8 ) ) != 0 )
+        ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
 }

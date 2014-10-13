@@ -4,7 +4,7 @@
 
     file        : type.cpp
     author      : Philip Wellnitz (RedArceus)
-    description : PKMN-Type definition and move effectiveness table.
+    description : pokemon-Type definition and move effectiveness table.
 
     Copyright (C) 2012 - 2014
     Philip Wellnitz (RedArceus)

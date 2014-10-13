@@ -63,9 +63,9 @@
 #include "battle.h"
 
 #include "screenLoader.h"
-#include "PKMN.h"
+#include "pokemon.h"
 #include "saveGame.h"
-#include "Map.h"
+//#include "Map.h"
 #include "keyboard.h"
 #include "sprite.h"
 
@@ -77,14 +77,14 @@
 
 #include "BigCirc1.h" 
 
-OAMTable *p_oam = new OAMTable( );
+OAMTable *oam = new OAMTable( );
 SpriteInfo spriteInfo[ SPRITE_COUNT ];
 
 OAMTable *oamTop = new OAMTable( );
 SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 
 //Centers o t circles.
-//PKMN -> ID -> DEX -> Bag -> Opt -> Nav
+//pokemon -> ID -> DEX -> Bag -> Opt -> Nav
 // X|Y
 int mainSpritesPositions[ 6 ][ 2 ]
 = { { 130, 60 }, { 160, 80 }, { 160, 115 }, { 130, 135 }, { 100, 115 }, { 100, 80 } };
@@ -95,7 +95,9 @@ enum GameMod {
     BETA,
     RELEASE,
     EMULATOR
-} gMod = DEVELOPER;
+};
+#define gMod DEVELOPER
+
 std::string CodeName = "Working Klink";
 SavMod savMod = _NDS;
 
@@ -129,7 +131,7 @@ extern void printMapLocation( const touchPosition& t );
 
 screenLoader scrn( -2 );
 
-extern POKEMON::PKMN::BOX_PKMN stored_pkmn[ MAXSTOREDPKMN ];
+extern POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
 extern std::vector<int> box_of_st_pkmn[ MAXPKMN ];
 extern std::vector<int> free_spaces;
 
@@ -708,7 +710,7 @@ bool whirlpool::possible( ) {
     return false;
 }
 bool surf::possible( ) {
-    return SAV.m_acMoveMode != SURF && acMap->blocks[ SAV.m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ SAV.m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].movedata == 4;
+    return SAV.m_acMoveMode != SURF && acMap->m_blocks[ SAV.m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ SAV.m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].m_movedata == 4;
 }
 
 bool heroIsBig = false;
@@ -909,12 +911,12 @@ CONT:
 
                     SAV.m_gba.m_gameid = ( save3->unpackeddata[ 0xaf ] << 24 ) | ( save3->unpackeddata[ 0xae ] << 16 ) | ( save3->unpackeddata[ 0xad ] << 8 ) | save3->unpackeddata[ 0xac ];
 
-                    POKEMON::PKMNDATA::PKMNDATA p;
+                    POKEMON::PKMNDATA::pokemonData p;
                     for( int i = 0; i < 6; ++i ) {
                         if( save3->pokemon[ i ]->personality ) {
-                            SAV.m_PkmnTeam.push_back( POKEMON::PKMN( ) );
+                            SAV.m_PkmnTeam.push_back( POKEMON::pokemon( ) );
 
-                            POKEMON::PKMN &acPkmn = SAV.m_PkmnTeam[ i ];
+                            POKEMON::pokemon &acPkmn = SAV.m_PkmnTeam[ i ];
                             gen3::belt_pokemon_t* &acBeltP = save3->pokemon[ i ];
 
 
@@ -942,26 +944,26 @@ CONT:
                             acPkmn.m_stats.m_SDef = acBeltP->spdef;
                             acPkmn.m_stats.m_Spd = acBeltP->speed;
 
-                            gen3::PKMN::pokemon_growth_t* &acBG = save3->pokemon_growth[ i ];
+                            gen3::pokemon::pokemon_growth_t* &acBG = save3->pokemon_growth[ i ];
                             acPkmn.m_boxdata.m_SPEC = gen3::getNPKMNIdx( acBG->species );
                             acPkmn.m_boxdata.m_Item = gen3::getNItemIdx( acBG->held );
                             acPkmn.m_boxdata.m_exp = acBG->xp;
                             acPkmn.m_boxdata.m_steps = acBG->happiness;
                             acPkmn.m_boxdata.m_PPUps = acBG->ppbonuses;
 
-                            gen3::PKMN::pokemon_moves_t* &acBA = save3->pokemon_moves[ i ];
+                            gen3::pokemon::pokemon_moves_t* &acBA = save3->pokemon_moves[ i ];
                             for( int i = 0; i < 4; ++i ) {
                                 acPkmn.m_boxdata.m_Attack[ i ] = acBA->atk[ i ];
                                 acPkmn.m_boxdata.m_AcPP[ i ] = acBA->pp[ i ];
                             }
 
-                            gen3::PKMN::pokemon_effort_t* &acBE = save3->pokemon_effort[ i ];
+                            gen3::pokemon::pokemon_effort_t* &acBE = save3->pokemon_effort[ i ];
                             for( int i = 0; i < 6; ++i ) {
                                 acPkmn.m_boxdata.m_EV[ i ] = acBE->EV[ i ];
                                 acPkmn.m_boxdata.m_ConStats[ i ] = acBE->ConStat[ i ];
                             }
 
-                            gen3::PKMN::pokemon_misc_t* &acBM = save3->pokemon_misc[ i ];
+                            gen3::pokemon::pokemon_misc_t* &acBM = save3->pokemon_misc[ i ];
                             acPkmn.m_boxdata.m_IVint = acBM->IVint;
 
                             POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_SPEC, p );
@@ -1426,18 +1428,18 @@ bool movePlayerOnMap( int p_x, int p_y, int p_z, bool p_init /*= true*/ ) {
         return false;
     if( p_y < 0 )
         return false;
-    if( p_x >= (int)acMap->sizey + 20 )
+    if( p_x >= (int)acMap->m_sizey + 20 )
         return false;
-    if( p_y >= (int)acMap->sizex + 20 )
+    if( p_y >= (int)acMap->m_sizex + 20 )
         return false;
 
-    int lastmovedata = acMap->blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].movedata;
-    int acmovedata = acMap->blocks[ p_y ][ p_x ].movedata;
-    map2d::Block acBlock = acMap->b.blocks[ acMap->blocks[ p_y ][ p_x ].blockidx ],
-        lastBlock = acMap->b.blocks[ acMap->blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].blockidx ];
+    int lastmovedata = acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_movedata;
+    int acmovedata = acMap->m_blocks[ p_y ][ p_x ].m_movedata;
+    map2d::Block acBlock = acMap->m_blockSets.m_blocks[ acMap->m_blocks[ p_y ][ p_x ].m_blockidx ],
+        lastBlock = acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ];
 
-    int verhalten = acBlock.bottombehave, hintergrund = acBlock.topbehave;
-    int lstverhalten = lastBlock.bottombehave, lsthintergrund = lastBlock.topbehave;
+    int verhalten = acBlock.m_bottombehave, hintergrund = acBlock.m_topbehave;
+    int lstverhalten = lastBlock.m_bottombehave, lsthintergrund = lastBlock.m_topbehave;
     if( verhalten == 0xa0 && playermoveMode != WALK ) //nur normales laufen möglich
         return false;
 
@@ -1492,15 +1494,15 @@ bool movePlayerOnMap( int p_x, int p_y, int p_z, bool p_init /*= true*/ ) {
 
     if( p_x < 10 ) {
         if( WTW || acmovedata == 4 || ( acmovedata % 4 == 0 && acmovedata / 4 == p_z ) || acmovedata == 0 || acmovedata == 60 ) {
-            for( auto a : acMap->anbindungen ) {
-                if( a.direction == 'W' && p_y >= a.move + 10 && p_y < a.move + a.mapsx + 10 ) {
-                    showNewMap( a.mapidx );
+            for( auto a : acMap->m_anbindungen ) {
+                if( a.m_direction == 'W' && p_y >= a.m_move + 10 && p_y < a.m_move + a.m_mapsx + 10 ) {
+                    showNewMap( a.m_mapidx );
                     free( acMap );
-                    strcpy( SAV.m_acMapName, a.name );
-                    SAV.m_acMapIdx = a.mapidx;
-                    acMap = new map2d::Map( "nitro://MAPS/", a.name );
-                    p_y -= a.move;
-                    p_x = a.mapsy + 10;
+                    strcpy( SAV.m_acMapName, a.m_name );
+                    SAV.m_acMapIdx = a.m_mapidx;
+                    acMap = new map2d::Map( "nitro://MAPS/", a.m_name );
+                    p_y -= a.m_move;
+                    p_x = a.m_mapsy + 10;
                     SAV.m_acposx = 20 * ( p_x - 10 );
                     SAV.m_acposy = 20 * ( p_y - 10 );
                     animateHero( movedir, 1 );
@@ -1514,15 +1516,15 @@ bool movePlayerOnMap( int p_x, int p_y, int p_z, bool p_init /*= true*/ ) {
     }
     if( p_y < 10 ) {
         if( WTW || acmovedata == 4 || ( acmovedata % 4 == 0 && acmovedata / 4 == p_z ) || acmovedata == 0 || acmovedata == 60 ) {
-            for( auto a : acMap->anbindungen ) {
-                if( a.direction == 'N' && p_x >= a.move + 10 && p_x < a.move + a.mapsy + 10 ) {
-                    showNewMap( a.mapidx );
+            for( auto a : acMap->m_anbindungen ) {
+                if( a.m_direction == 'N' && p_x >= a.m_move + 10 && p_x < a.m_move + a.m_mapsy + 10 ) {
+                    showNewMap( a.m_mapidx );
                     free( acMap );
-                    strcpy( SAV.m_acMapName, a.name );
-                    SAV.m_acMapIdx = a.mapidx;
-                    acMap = new map2d::Map( "nitro://MAPS/", a.name );
-                    p_x -= a.move;
-                    p_y = a.mapsx + 10;
+                    strcpy( SAV.m_acMapName, a.m_name );
+                    SAV.m_acMapIdx = a.m_mapidx;
+                    acMap = new map2d::Map( "nitro://MAPS/", a.m_name );
+                    p_x -= a.m_move;
+                    p_y = a.m_mapsx + 10;
                     SAV.m_acposx = 20 * ( p_x - 10 );
                     SAV.m_acposy = 20 * ( p_y - 10 );
                     animateHero( movedir, 1 );
@@ -1534,16 +1536,16 @@ bool movePlayerOnMap( int p_x, int p_y, int p_z, bool p_init /*= true*/ ) {
         }
         return false;
     }
-    if( p_x >= (int)acMap->sizey + 10 ) {
+    if( p_x >= (int)acMap->m_sizey + 10 ) {
         if( WTW || acmovedata == 4 || ( acmovedata % 4 == 0 && acmovedata / 4 == p_z ) || acmovedata == 0 || acmovedata == 60 ) {
-            for( auto a : acMap->anbindungen ) {
-                if( a.direction == 'E' && p_y >= a.move + 10 && p_y < a.move + a.mapsx + 10 ) {
-                    showNewMap( a.mapidx );
+            for( auto a : acMap->m_anbindungen ) {
+                if( a.m_direction == 'E' && p_y >= a.m_move + 10 && p_y < a.m_move + a.m_mapsx + 10 ) {
+                    showNewMap( a.m_mapidx );
                     free( acMap );
-                    strcpy( SAV.m_acMapName, a.name );
-                    SAV.m_acMapIdx = a.mapidx;
-                    acMap = new map2d::Map( "nitro://MAPS/", a.name );
-                    p_y -= a.move;
+                    strcpy( SAV.m_acMapName, a.m_name );
+                    SAV.m_acMapIdx = a.m_mapidx;
+                    acMap = new map2d::Map( "nitro://MAPS/", a.m_name );
+                    p_y -= a.m_move;
                     p_x = 9;
                     SAV.m_acposx = 20 * ( p_x - 10 );
                     SAV.m_acposy = 20 * ( p_y - 10 );
@@ -1556,17 +1558,17 @@ bool movePlayerOnMap( int p_x, int p_y, int p_z, bool p_init /*= true*/ ) {
         }
         return false;
     }
-    if( p_y >= (int)acMap->sizex + 10 ) {
+    if( p_y >= (int)acMap->m_sizex + 10 ) {
 
         if( WTW || acmovedata == 4 || ( acmovedata % 4 == 0 && acmovedata / 4 == p_z ) || acmovedata == 0 || acmovedata == 60 ) {
-            for( auto a : acMap->anbindungen ) {
-                if( a.direction == 'S'  && p_x >= a.move + 10 && p_x < a.move + a.mapsy + 10 ) {
-                    showNewMap( a.mapidx );
+            for( auto a : acMap->m_anbindungen ) {
+                if( a.m_direction == 'S'  && p_x >= a.m_move + 10 && p_x < a.m_move + a.m_mapsy + 10 ) {
+                    showNewMap( a.m_mapidx );
                     free( acMap );
-                    strcpy( SAV.m_acMapName, a.name );
-                    SAV.m_acMapIdx = a.mapidx;
-                    acMap = new map2d::Map( "nitro://MAPS/", a.name );
-                    p_x -= a.move;
+                    strcpy( SAV.m_acMapName, a.m_name );
+                    SAV.m_acMapIdx = a.m_mapidx;
+                    acMap = new map2d::Map( "nitro://MAPS/", a.m_name );
+                    p_x -= a.m_move;
                     p_y = 9;
                     SAV.m_acposx = 20 * ( p_x - 10 );
                     SAV.m_acposy = 20 * ( p_y - 10 );
@@ -1596,11 +1598,11 @@ bool movePlayerOnMap( int p_x, int p_y, int p_z, bool p_init /*= true*/ ) {
 
 void animateMap( u8 p_frame ) {
     u8* tileMemory = (u8*)BG_TILE_RAM( 1 );
-    for( int i = 0; i < acMap->animations.size( ); ++i ) {
-        map2d::Animation& a = acMap->animations[ i ];
-        if( ( p_frame ) % ( a.speed ) == 0 || a.speed == 1 ) {
-            a.acFrame = ( a.acFrame + 1 ) % a.maxFrame;
-            swiCopy( &a.animationTiles[ a.acFrame ], tileMemory + a.tileIdx * 32, 16 );
+    for( int i = 0; i < acMap->m_animations.size( ); ++i ) {
+        map2d::Animation& a = acMap->m_animations[ i ];
+        if( ( p_frame ) % ( a.m_speed ) == 0 || a.m_speed == 1 ) {
+            a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
+            swiCopy( &a.m_animationTiles[ a.m_acFrame ], tileMemory + a.m_tileIdx * 32, 16 );
         }
     }
 }
@@ -1725,7 +1727,7 @@ void stepincrease( ) {
     stepcnt = ( stepcnt + 1 ) % 256;
     if( stepcnt == 0 ) {
         for( size_t s = 0; s < SAV.m_PkmnTeam.size( ); ++s ) {
-            POKEMON::PKMN& ac = SAV.m_PkmnTeam[ s ];
+            POKEMON::pokemon& ac = SAV.m_PkmnTeam[ s ];
 
             if( ac.m_boxdata.m_IV.m_isEgg ) {
                 ac.m_boxdata.m_steps--;
@@ -1772,8 +1774,8 @@ void shoUseAttack( int p_pkmIdx, bool p_female, bool p_shiny ) {
     for( int i = 0; i < 4; ++i )
         oamTop->oamBuffer[ 2 + i ].isHidden = false;
     int a = 5, b = 2, c = 96;
-    if( !loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, p_female ) ) {
-        loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, !p_female );
+    if( !loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, p_female ) ) {
+        loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, !p_female );
     }
     updateOAM( oamTop );
 
@@ -1871,10 +1873,10 @@ int main( int p_argc, char** p_argv ) {
             consoleSelect( &Bottom );
             consoleSetWindow( &Bottom, 4, 4, 20, 10 );
             consoleClear( );
-            printf( "%3i %3i\nx: %3i y: %3i z: %3i\n", acMap->sizex, acMap->sizey, SAV.m_acposx / 20, ( SAV.m_acposy ) / 20, SAV.m_acposz );
+            printf( "%3i %3i\nx: %3i y: %3i z: %3i\n", acMap->m_sizex, acMap->m_sizey, SAV.m_acposx / 20, ( SAV.m_acposy ) / 20, SAV.m_acposz );
             printf( "%s %i\n", SAV.m_acMapName, SAV.m_acMapIdx );
-            printf( "topbehave %i;\n bottombehave %i", acMap->b.blocks[ acMap->blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].blockidx ].topbehave,
-                    acMap->b.blocks[ acMap->blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].blockidx ].bottombehave );
+            printf( "topbehave %i;\n bottombehave %i", acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ].m_topbehave,
+                    acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ].m_bottombehave );
         }
         if( pressed & KEY_A ) {
             for( auto a : SAV.m_PkmnTeam )
@@ -1967,7 +1969,7 @@ OUT:
         }
         //StartBag
         //Centers o t circles.
-        //PKMN -> ID -> DEX -> Bag -> Opt -> Nav
+        //pokemon -> ID -> DEX -> Bag -> Opt -> Nav
         // X|Y
         //int mainSpritesPositions[6][2] 
         //= {{130,60},{160,80},{160,115},{130,135},{100,115},{100,80}};
@@ -2039,7 +2041,7 @@ OUT:
                 if( touch.px == 0 && touch.py == 0 )
                     break;
             }
-            const char *someText[ 7 ] = { "\n     PKMN-Spawn", "\n    Item-Spawn", "\n 1-Item_Test", "\n  Battle SPWN.", "\n   Battle SPWN 2", "\n    42" };
+            const char *someText[ 7 ] = { "\n     pokemon-Spawn", "\n    Item-Spawn", "\n 1-Item_Test", "\n  Battle SPWN.", "\n   Battle SPWN 2", "\n    42" };
             choiceBox test( 5, &someText[ 0 ], 0, true );
             int res = test.getResult( "Tokens of god-being...", true );
             switch( res ) {
@@ -2047,7 +2049,7 @@ OUT:
                 {
                     SAV.m_PkmnTeam.clear( );
                     for( int i = 0; i < 5; ++i ) {
-                        POKEMON::PKMN a( 0, HILFSCOUNTER, 0,
+                        POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
                                          20, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName().c_str()*/, !SAV.m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         stored_pkmn[ *free_spaces.rbegin( ) ] = a.m_boxdata;
                         //a.stats.acHP = i*a.stats.maxHP/5;
@@ -2082,10 +2084,10 @@ OUT:
                     break;
                 case 3:{
                     BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &SAV.m_PkmnTeam, 0 );
-                    std::vector<POKEMON::PKMN> cpy;
+                    std::vector<POKEMON::pokemon> cpy;
 
                     for( int i = 0; i < 3; ++i ) {
-                        POKEMON::PKMN a( 0, HILFSCOUNTER, 0,
+                        POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
                                          30, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
@@ -2102,10 +2104,10 @@ OUT:
                 }
                 case 4:{
                     BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &SAV.m_PkmnTeam, 0 );
-                    std::vector<POKEMON::PKMN> cpy;
+                    std::vector<POKEMON::pokemon> cpy;
 
                     for( int i = 0; i < 6; ++i ) {
-                        POKEMON::PKMN a( 0, HILFSCOUNTER, 0,
+                        POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
                                          15, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );

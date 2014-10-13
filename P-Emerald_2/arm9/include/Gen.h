@@ -2,21 +2,21 @@
 #include "nds.h"
 
 namespace POKEMON {
-    class PKMN;
+    class pokemon;
 }
 
 class saveGame;
 
 namespace gen3 //using code from "pokehack" originally by "Grazfather"
 {
-    bool isValidItem( int gen5Idx );
-    int getItemIdx( int gen5Idx );
-    int getNItemIdx( int gen3Idx );
-    int getPKMNIdx( int gen5Idx );
-    int getNPKMNIdx( int gen3Idx );
-    int getNLocation( int gen3Idx );
-    int getLocation( int gen5Idx );
-    int getNText( int in );
+    bool isValidItem( int p_gen5Idx );
+    int getItemIdx( int p_gen5Idx );
+    int getNItemIdx( int p_gen3Idx );
+    int getPKMNIdx( int p_gen5Idx );
+    int getNPKMNIdx( int p_gen3Idx );
+    int getNLocation( int p_gen3Idx );
+    int getLocation( int p_gen5Idx );
+    int getNText( int p_in );
 
 #define SAVEFILE_LEN (1 << 17)
 #define NUM_BLOCKS_SLOT 14
@@ -101,7 +101,7 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         u8 data[ POKEMON_DATA_LENGTH ];
     } box_pokemon_t;
 
-    class PKMN {
+    class pokemon {
     public:
         typedef struct {
             u16 species;
@@ -263,17 +263,17 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         char* parse_save( block*[ NUM_BLOCKS_TOTAL ] );
         u16 get_block_checksum( block* b );
         int pack_save( char *, block *[ NUM_BLOCKS_TOTAL ], char[ SAVEFILE_LEN ] );
-        char* get_text( u8* raw, bool is_nickname );
+        char* get_text( u8* p_raw, bool p_isNickname );
         //void print_pokemon(box_pokemon_t*);
-        int parse_pokemon( char*, int, void**, PKMN::pokemon_moves_t**, PKMN::pokemon_effort_t**, PKMN::pokemon_growth_t**, PKMN::pokemon_misc_t**, int, int );
+        int parse_pokemon( char*, int, void**, pokemon::pokemon_moves_t**, pokemon::pokemon_effort_t**, pokemon::pokemon_growth_t**, pokemon::pokemon_misc_t**, int, int );
         u16 encrypt( u8*, u32, u32 );
         int load( int );
         int save( );
         belt_pokemon_t *pokemon[ NUM_BELT_POKEMON ];
-        PKMN::pokemon_moves_t *pokemon_moves[ NUM_BELT_POKEMON ];
-        PKMN::pokemon_effort_t *pokemon_effort[ NUM_BELT_POKEMON ];
-        PKMN::pokemon_growth_t *pokemon_growth[ NUM_BELT_POKEMON ];
-        PKMN::pokemon_misc_t *pokemon_misc[ NUM_BELT_POKEMON ];
+        pokemon::pokemon_moves_t *pokemon_moves[ NUM_BELT_POKEMON ];
+        pokemon::pokemon_effort_t *pokemon_effort[ NUM_BELT_POKEMON ];
+        pokemon::pokemon_growth_t *pokemon_growth[ NUM_BELT_POKEMON ];
+        pokemon::pokemon_misc_t *pokemon_misc[ NUM_BELT_POKEMON ];
 
         char *unpackeddata;
     private:
@@ -282,26 +282,26 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         static SaveParser* spInstance;
     };
 
-    u16 encrypt( u8 *data, u32 pv, u32 otid );
-    char* get_text( u8* raw, int max_len );
-    int parse_pokemon( char* buf, int offset, void** pokemon, PKMN::pokemon_moves_t** pa, PKMN::pokemon_effort_t** pe,
-                       PKMN::pokemon_growth_t** pg, PKMN::pokemon_misc_t** pm, int num, int size );
-    void print_pokemon( box_pokemon_t* pokemon );
+    u16 encrypt( u8 *p_data, u32 p_pv, u32 p_otid );
+    char* get_text( u8* p_raw, int p_maxLen );
+    int parse_pokemon( char* p_buf, int p_offset, void** p_pokemon, pokemon::pokemon_moves_t** p_pa, pokemon::pokemon_effort_t** p_pe,
+                       pokemon::pokemon_growth_t** p_pg, pokemon::pokemon_misc_t** p_pm, int p_num, int p_size );
+    void print_pokemon( box_pokemon_t* p_pokemon );
 
-    POKEMON::PKMN getGen5Pkmn( const PKMN& gen3Pkmn );
-    PKMN getGen3Pkmn( const POKEMON::PKMN &gen5Pkmn );
+    POKEMON::pokemon getGen5Pkmn( const pokemon& p_gen3Pkmn );
+    pokemon getGen3Pkmn( const POKEMON::pokemon &p_gen5Pkmn );
 }
 namespace gen4 {
-    bool isValidItem( int gen5Idx );
-    int getItemIdx( int gen5Idx );
-    int getItemIdx( int gen4Idx );
+    bool isValidItem( int p_gen5Idx );
+    int getItemIdx( int p_gen5Idx );
+    int getItemIdx( int p_gen4Idx );
 
-    class PKMN {
+    class pokemon {
 
     };
 
-    POKEMON::PKMN getGen5Pkmn( PKMN gen4Pkmn );
-    PKMN getGen4Pkmn( POKEMON::PKMN gen5Pkmn );
+    POKEMON::pokemon getGen5Pkmn( pokemon p_gen4Pkmn );
+    pokemon getGen4Pkmn( POKEMON::pokemon p_gen5Pkmn );
 
     enum GAME {
         DIAMANT = 0,

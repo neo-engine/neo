@@ -14,8 +14,13 @@ history :
 
 */
 
+#define NDS_IPC_INCLUDE
+
 #include <nds.h>
 #include "as_lib7.h"
+#include "ipc.h"
+
+#include <nds/ipc.h>
 
 int vcount;
 
@@ -386,12 +391,11 @@ void VcountHandler( ) {
 
 }
 
-
-volatile bool exitflag = false;
+volatile u8 exitflag = 0;
 //---------------------------------------------------------------------------------
 void powerButtonCB( ) {
     //---------------------------------------------------------------------------------
-    exitflag = true;
+    exitflag = 1;
 }
 int main( int argc, char ** argv ) {
     rtcReset( );
@@ -422,7 +426,7 @@ int main( int argc, char ** argv ) {
     // main loop
     while( 1 ) {
         if( 0 == ( REG_KEYINPUT & ( KEY_SELECT | KEY_START | KEY_L | KEY_R ) ) ) {
-            exitflag = true;
+            exitflag = 1;
         }
         AS_MP3Engine( );     // the mp3 engine
 

@@ -34,7 +34,7 @@
 #include <nds.h>
 
 #include "battle.h"
-#include "PKMN.h"
+#include "pokemon.h"
 #include "move.h"
 #include "sprite.h"
 #include "item.h"
@@ -104,7 +104,7 @@ extern font::Font cust_font;
 extern font::Font cust_font2;
 
 namespace BATTLE {
-    POKEMON::PKMNDATA::PKMNDATA p;
+    POKEMON::PKMNDATA::pokemonData p;
     const char* trainerclassnames[ ] = { "Pokémon-Trainer" };
 
     const char* ailmentnames[ ] = {
@@ -1505,7 +1505,7 @@ namespace BATTLE {
             OamTop->oamBuffer[ OPP_PB_START ].isHidden = false;
 
             if( !loadPKMNSprite( OamTop, spriteInfoTop,
-                "nitro:/PICS/SPRITES/PKMN/",
+                "nitro:/PICS/SPRITES/pokemon/",
                 ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
                 176,
                 20,
@@ -1520,7 +1520,7 @@ namespace BATTLE {
                 nextAvailableTileIdx = OPP_PKMN_1_TILE;
                 loadPKMNSprite( OamTop,
                                 spriteInfoTop,
-                                "nitro:/PICS/SPRITES/PKMN/",
+                                "nitro:/PICS/SPRITES/pokemon/",
                                 ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
                                 176,
                                 20,
@@ -1573,7 +1573,7 @@ namespace BATTLE {
 
             if( !loadPKMNSprite( OamTop,
                 spriteInfoTop,
-                "nitro:/PICS/SPRITES/PKMN/",
+                "nitro:/PICS/SPRITES/pokemon/",
                 ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC,
                 112,
                 4,
@@ -1588,7 +1588,7 @@ namespace BATTLE {
                 nextAvailableTileIdx = OPP_PKMN_2_TILE;
                 loadPKMNSprite( OamTop,
                                 spriteInfoTop,
-                                "nitro:/PICS/SPRITES/PKMN/",
+                                "nitro:/PICS/SPRITES/pokemon/",
                                 ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC,
                                 112,
                                 4,
@@ -1759,7 +1759,7 @@ namespace BATTLE {
             palcnt = OWN_PKMN_2_PAL;
             nextAvailableTileIdx = OWN_PKMN_2_TILE;
 
-            for( int i = 0; i < 4; ++i ) //hide PKMN sprite
+            for( int i = 0; i < 4; ++i ) //hide pokemon sprite
                 OamTop->oamBuffer[ OWN_PKMN_2_START + i + 1 ].isHidden = true;
             updateOAM( OamTop );
 
@@ -1997,7 +1997,7 @@ namespace BATTLE {
 
         if( !loadPKMNSprite( OamTop,
             spriteInfoTop,
-            "nitro:/PICS/SPRITES/PKMN/",
+            "nitro:/PICS/SPRITES/pokemon/",
             ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
             176,
             20,
@@ -2013,7 +2013,7 @@ namespace BATTLE {
             nextAvailableTileIdx = OPP_PKMN_1_TILE;
             loadPKMNSprite( OamTop,
                             spriteInfoTop,
-                            "nitro:/PICS/SPRITES/PKMN/",
+                            "nitro:/PICS/SPRITES/pokemon/",
                             ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
                             176,
                             20,
@@ -2058,12 +2058,12 @@ namespace BATTLE {
             palcnt = OPP_PKMN_2_PAL;
             nextAvailableTileIdx = OPP_PKMN_2_TILE;
 
-            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
+            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
                 ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ), ACPKMN( 1, OPPONENT ).m_boxdata.m_isFemale ) ) {
                 oamIndex = OPP_PKMN_2_START;
                 palcnt = OPP_PKMN_2_PAL;
                 nextAvailableTileIdx = OPP_PKMN_2_TILE;
-                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
+                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
                                 ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ), !ACPKMN( 1, OPPONENT ).m_boxdata.m_isFemale );
             }
             if( ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ) )
@@ -2303,7 +2303,7 @@ namespace BATTLE {
     bool criticalOccured = false;
     float eff = 1;
     bool missed = false;
-    int calcDamage( const move& p_move, const POKEMON::PKMN& p_attackingPkmn, const POKEMON::PKMN& p_defendingPkmn, int p_randomValue ) {
+    int calcDamage( const move& p_move, const POKEMON::pokemon& p_attackingPkmn, const POKEMON::pokemon& p_defendingPkmn, int p_randomValue ) {
         if( p_move.m_moveHitType == move::moveHitTypes::STAT )
             return 0;
         eff = 1;
@@ -2323,7 +2323,7 @@ namespace BATTLE {
 
         int baseDmg = ( ( ( ( 2 * p_attackingPkmn.m_Level ) / 5 + 2 ) * p_move.m_moveBasePower * atkval ) / defval ) / 50 + 2;
 
-        POKEMON::PKMNDATA::PKMNDATA p1, p2;
+        POKEMON::PKMNDATA::pokemonData p1, p2;
         POKEMON::PKMNDATA::getAll( p_attackingPkmn.m_boxdata.m_SPEC, p1 );
         POKEMON::PKMNDATA::getAll( p_defendingPkmn.m_boxdata.m_SPEC, p2 );
 
@@ -2426,7 +2426,7 @@ namespace BATTLE {
         };
         if( !p_pkmnSlot )
             std::swap( validTrg[ 2 ], validTrg[ 3 ] );
-        POKEMON::PKMN& p_attackingPkmn = ACPKMN( p_pkmnSlot, PLAYER );
+        POKEMON::pokemon& p_attackingPkmn = ACPKMN( p_pkmnSlot, PLAYER );
 
 
         for( int i = 21; i < 29; i += 2 ) {
@@ -2439,7 +2439,7 @@ namespace BATTLE {
                 continue;
             }
 
-            POKEMON::PKMN &acPK = ( u / 2 ? ACPKMN( 1 - u % 2, PLAYER ) : ACPKMN( u % 2, OPPONENT ) );
+            POKEMON::pokemon &acPK = ( u / 2 ? ACPKMN( 1 - u % 2, PLAYER ) : ACPKMN( u % 2, OPPONENT ) );
 
             if( acPK.m_stats.m_acHP == 0 ) {
                 ( Oam->oamBuffer[ i ] ).isHidden = true;
@@ -2768,7 +2768,7 @@ ATTACKCHOSEN:
                 printf( "TEST3" );
             }
             //END POKENAV
-            //BEGIN PKMN
+            //BEGIN pokemon
             else if( t.px > 176 && t.px < 176 + 64 && t.py > 144 && t.py < 144 + 32 ) {
                 waitForTouchUp( );
 
@@ -2784,7 +2784,7 @@ ATTACKCHOSEN:
 
                 return SUCCESS;
             }
-            //END PKMN
+            //END pokemon
         }
     }
 
@@ -2837,7 +2837,7 @@ ATTACKCHOSEN:
                     if( m_battleMode == DOUBLE && changeA[ ( i - 21 ) / 2 ] ) {
                         int u = ( i - 21 ) / 2;
 
-                        POKEMON::PKMN &acPK = ( ( u / 2 ) ? ACPKMN( 1 - u % 2, PLAYER ) : ACPKMN( u % 2, OPPONENT ) );
+                        POKEMON::pokemon &acPK = ( ( u / 2 ) ? ACPKMN( 1 - u % 2, PLAYER ) : ACPKMN( u % 2, OPPONENT ) );
 
                         if( acPK.m_stats.m_acHP == 0 )
                             continue;
@@ -2866,7 +2866,7 @@ ATTACKCHOSEN:
                     if( !validTrg[ u ] )
                         continue;
 
-                    POKEMON::PKMN &acPK = ( ( u / 2 ) ? ACPKMN( 1 - u % 2, PLAYER ) : ACPKMN( u % 2, OPPONENT ) );
+                    POKEMON::pokemon &acPK = ( ( u / 2 ) ? ACPKMN( 1 - u % 2, PLAYER ) : ACPKMN( u % 2, OPPONENT ) );
 
                     if( acPK.m_stats.m_acHP == 0 ) {
                         ( Oam->oamBuffer[ i ] ).isHidden = true;
@@ -2906,7 +2906,7 @@ ATTACKCHOSEN:
 
     bool participated[ 6 ] = { false };
 #define LUCKY_EGG_EFFEKT     42
-    int calcEXP( const POKEMON::PKMN& p_move, int p_atkind, const POKEMON::PKMN& p_defendingPkmn, bool p_wild ) {
+    int calcEXP( const POKEMON::pokemon& p_move, int p_atkind, const POKEMON::pokemon& p_defendingPkmn, bool p_wild ) {
         if( !SAV.m_EXPShareEnabled && !participated[ p_atkind ] )
             return 0;
 
@@ -2927,7 +2927,7 @@ ATTACKCHOSEN:
         return int( ( a * t* b* e* L ) / ( 7 * s ) );
     }
 
-    void printEFFLOG( const POKEMON::PKMN& P, int p_move ) {
+    void printEFFLOG( const POKEMON::pokemon& P, int p_move ) {
         if( AttackList[ p_move ]->m_moveHitType == move::moveHitTypes::STAT )
             return;
 
@@ -2983,7 +2983,7 @@ ATTACKCHOSEN:
             switchWith[ 0 ][ OPPONENT ] = switchWith[ 0 ][ PLAYER ] =
                 switchWith[ 1 ][ OPPONENT ] = switchWith[ 1 ][ PLAYER ] = 0;
 
-            //Switch Out KOed PKMN
+            //Switch Out KOed pokemon
 
             //Own
             if( ACPKMNSTS( 0, PLAYER ) == KO ) {
@@ -3470,8 +3470,8 @@ BEFORE_1:
                 if( ko[ 0 ][ OPPONENT ] || ko[ 1 ][ OPPONENT ] ) {
                     for( int i = 0; i < 6; ++i ) {
                         if( m_distributeEXP && ACPKMNSTS( i, PLAYER ) != acStatus::NA && ACPKMNSTS( i, PLAYER ) != acStatus::KO ) {
-                            POKEMON::PKMN& acPK = ( *_player->m_pkmnTeam )[ ACPOS( i, PLAYER ) ];
-                            POKEMON::PKMN& acDF = ACPKMN( 0, OPPONENT );
+                            POKEMON::pokemon& acPK = ( *_player->m_pkmnTeam )[ ACPOS( i, PLAYER ) ];
+                            POKEMON::pokemon& acDF = ACPKMN( 0, OPPONENT );
 
                             POKEMON::PKMNDATA::getAll( ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC, p );
                             int exp = calcEXP( acPK, ACPOS( i, PLAYER ), acDF, false );

@@ -17,12 +17,109 @@
 #ifndef __SOUND7_H__
 #define __SOUND7_H__
 
-#include <nds.h>
+#define NDS_IPC_INCLUDE
 
+#include <nds.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif 
+
+#ifndef SOUND_VOL
+#define SOUND_VOL(n)	(n)
+#endif
+#ifndef SOUND_FREQ
+#define SOUND_FREQ(n)	((-0x1000000 / (n)))
+#endif
+#ifndef SOUND_ENABLE
+#define SOUND_ENABLE	BIT(15)
+#endif
+#ifndef SOUND_REPEAT
+#define SOUND_REPEAT    BIT(27)
+#endif
+#ifndef SOUND_ONE_SHOT
+#define SOUND_ONE_SHOT  BIT(28)
+#endif
+#ifndef SOUND_FORMAT_16BIT
+#define SOUND_FORMAT_16BIT (1<<29)
+#endif
+#ifndef SOUND_FORMAT_8BIT
+#define SOUND_FORMAT_8BIT	(0<<29)
+#endif
+#ifndef SOUND_FORMAT_PSG
+#define SOUND_FORMAT_PSG    (3<<29)
+#endif
+#ifndef SOUND_FORMAT_ADPCM
+#define SOUND_FORMAT_ADPCM  (2<<29)
+#endif
+#ifndef SOUND_16BIT
+#define SOUND_16BIT      (1<<29)
+#endif
+#ifndef SOUND_8BIT
+#define SOUND_8BIT       (0)
+#endif
+
+#ifndef SOUND_PAN
+#define SOUND_PAN(n)	((n) << 16)
+#endif
+
+#ifndef SCHANNEL_ENABLE
+#define SCHANNEL_ENABLE BIT(31)
+#endif
+
+    //---------------------------------------------------------------------------------
+    // registers
+    //---------------------------------------------------------------------------------
+#ifndef SCHANNEL_CR
+#define SCHANNEL_CR(n)				(*(vuint32*)(0x04000400 + ((n)<<4)))
+#endif
+#ifndef SCHANNEL_VOL
+#define SCHANNEL_VOL(n)				(*(vuint8*)(0x04000400 + ((n)<<4)))
+#endif
+#ifndef SCHANNEL_PAN
+#define SCHANNEL_PAN(n)				(*(vuint8*)(0x04000402 + ((n)<<4)))
+#endif
+#ifndef SCHANNEL_SOURCE
+#define SCHANNEL_SOURCE(n)			(*(vuint32*)(0x04000404 + ((n)<<4)))
+#endif
+#ifndef SCHANNEL_TIMER
+#define SCHANNEL_TIMER(n)			(*(vint16*)(0x04000408 + ((n)<<4)))
+#endif
+#ifndef SCHANNEL_REPEAT_POINT
+#define SCHANNEL_REPEAT_POINT(n)	(*(vuint16*)(0x0400040A + ((n)<<4)))
+#endif
+#ifndef SCHANNEL_LENGTH
+#define SCHANNEL_LENGTH(n)			(*(vuint32*)(0x0400040C + ((n)<<4)))
+#endif
+
+#ifndef SOUND_CR
+#define SOUND_CR          (*(vuint16*)0x04000500)
+#endif
+#ifndef SOUND_MASTER_VOL
+#define SOUND_MASTER_VOL  (*(vuint8*)0x04000500)
+#endif
+    //---------------------------------------------------------------------------------
+    // not sure on the following
+    //---------------------------------------------------------------------------------
+#ifndef SOUND_BIAS
+#define SOUND_BIAS        (*(vuint16*)0x04000504)
+#endif
+#ifndef SOUND508
+#define SOUND508          (*(vuint16*)0x04000508)
+#endif
+#ifndef SOUND510
+#define SOUND510          (*(vuint16*)0x04000510)
+#endif
+#ifndef SOUND514
+#define SOUND514		  (*(vuint16*)0x04000514)
+#endif
+#ifndef SOUND518
+#define SOUND518          (*(vuint16*)0x04000518)
+#endif
+#ifndef SOUND51C
+#define SOUND51C          (*(vuint16*)0x0400051C)
+#endif
+
 
     // mp3 static defines
 #define AS_DECODEBUFFER_SIZE    MAX_NCHAN * MAX_NGRAN * MAX_NSAMP   

@@ -37,7 +37,7 @@
 #include "bag.h"
 
 namespace POKEMON {
-    class PKMN;
+    class pokemon;
 }
 class BOX;
 enum SavMod {
@@ -80,7 +80,7 @@ public:
     bag                 m_bag;
 
     //Team
-    std::vector < POKEMON::PKMN >
+    std::vector < POKEMON::pokemon >
         m_PkmnTeam;
 
     u16                 m_overWorldIdx;

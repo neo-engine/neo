@@ -3,7 +3,7 @@
  - PokéNav-Skin hinzugefügt (+) {Awakening Xerneas}
  - PokéNav-Skin hinzugefügt (+) {Awakening Yveltal}
  - PokéNav-Skin hinzugefügt (+) {Working Klink}
- - PKMN-Kampf (+)
+ - pokemon-Kampf (+)
 
 @Charming Lari [2014-01-29]@
  - Speichern von Spielständen (ô)
@@ -20,7 +20,7 @@
 
  - Beutel: Alle Item-Icons (+)
 
- - PKMN-Kampf: TypeChart (+) 
+ - pokemon-Kampf: TypeChart (+) 
 
 @Raging Gyarados [2013-12-14]@
  - Speichern von Spielständen (ô)
@@ -42,8 +42,8 @@
 
  - Emulator-Version (+); extrem langsam bei DeSmuME
 
- - PKMN-Kampf: DS (+)
- - PKMN-Kampf: Init, PKMNSwitch, rud. AttackChoice (+)
+ - pokemon-Kampf: DS (+)
+ - pokemon-Kampf: Init, PKMNSwitch, rud. AttackChoice (+)
 
  - Spritebehaftete MBoxen (+)
 
@@ -58,8 +58,8 @@
  - PKMNSubScreen: Pokémondaten sind jetzt lesbar... (^) 
 
  - Beutel (+)
- - Beutel: Item von PKMN tauschen (+)
- - Beutel: PKMN Item geben (+)
+ - Beutel: Item von pokemon tauschen (+)
+ - Beutel: pokemon Item geben (+)
 
  - PokéDex / PokéBox funktioniert jetzt (zumindest teilweise) (^)
  - PokéNav-Skin hinzugefügt (+) {Waiting Suicune}
@@ -71,7 +71,7 @@
 
 @Mystic Guardevoir [2013-07-01]@
  - SubScreen (^) {SubSprites}
- - PKMN-Box Struktur (+)
+ - pokemon-Box Struktur (+)
  - PKMNScreen (+)
  - PKMNSubScreen (+)
  - TitleScreen (^)

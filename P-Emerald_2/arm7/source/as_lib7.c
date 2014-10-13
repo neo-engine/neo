@@ -20,9 +20,12 @@
 
   */
 
+#define NDS_IPC_INCLUDE
+
 #include <nds.h>
 #include <string.h>
 #include <nds\arm7\audio.h>
+#include "ipc.h"
 
 #include "helix/mp3dec.h"
 #include "helix/mp3common.h"
@@ -218,7 +221,7 @@ extern "C" {
             IPC_Sound->chan[ IPC_Sound->mp3.channelL ].snd.size = IPC_Sound->mp3.buffersize << 1;
             IPC_Sound->chan[ IPC_Sound->mp3.channelL ].snd.format = AS_PCM_16BIT;
             IPC_Sound->chan[ IPC_Sound->mp3.channelL ].snd.rate = IPC_Sound->mp3.rate;
-            IPC_Sound->chan[ IPC_Sound->mp3.channelL ].snd.loop = true;
+            IPC_Sound->chan[ IPC_Sound->mp3.channelL ].snd.loop = 1;
             IPC_Sound->chan[ IPC_Sound->mp3.channelL ].snd.delay = 0;
             IPC_Sound->chan[ IPC_Sound->mp3.channelL ].cmd |= SNDCMD_PLAY;
 
@@ -227,7 +230,7 @@ extern "C" {
             IPC_Sound->chan[ IPC_Sound->mp3.channelR ].snd.size = IPC_Sound->mp3.buffersize << 1;
             IPC_Sound->chan[ IPC_Sound->mp3.channelR ].snd.format = AS_PCM_16BIT;
             IPC_Sound->chan[ IPC_Sound->mp3.channelR ].snd.rate = IPC_Sound->mp3.rate;
-            IPC_Sound->chan[ IPC_Sound->mp3.channelR ].snd.loop = true;
+            IPC_Sound->chan[ IPC_Sound->mp3.channelR ].snd.loop = 1;
             IPC_Sound->chan[ IPC_Sound->mp3.channelR ].snd.delay = IPC_Sound->mp3.delay;
             IPC_Sound->chan[ IPC_Sound->mp3.channelR ].cmd |= SNDCMD_DELAY;
 
@@ -357,7 +360,7 @@ extern "C" {
         if( IPC_Sound->mp3.stream && ( readPtr >= IPC_Sound->mp3.mp3buffer + IPC_Sound->mp3.mp3buffersize ) ) {
             memcpy( IPC_Sound->mp3.mp3buffer, IPC_Sound->mp3.mp3buffer + IPC_Sound->mp3.mp3buffersize, IPC_Sound->mp3.mp3buffersize );
             readPtr = readPtr - IPC_Sound->mp3.mp3buffersize;
-            IPC_Sound->mp3.needdata = true;
+            IPC_Sound->mp3.needdata = 1;
         }
 
     }

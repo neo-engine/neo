@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arm7\include\as_lib7.h" />
+    <ClInclude Include="arm7\include\ipc.h" />
     <ClInclude Include="arm9\include\ability.h" />
     <ClInclude Include="arm9\include\as_lib9.h" />
     <ClInclude Include="arm9\include\buffer.h" />
@@ -28,7 +29,7 @@
     <ClInclude Include="arm9\include\item.h" />
     <ClInclude Include="arm9\include\keyboard.h" />
     <ClInclude Include="arm9\include\messageBox.h" />
-    <ClInclude Include="arm9\include\PKMN.h" />
+    <ClInclude Include="arm9\include\pokemon.h" />
     <ClInclude Include="arm9\include\print.h" />
     <ClInclude Include="arm9\include\saveGame.h" />
     <ClInclude Include="arm9\include\screenLoader.h" />
@@ -55,7 +56,7 @@
     <ClCompile Include="arm9\source\map2d.cpp" />
     <ClCompile Include="arm9\source\mapconfig.cpp" />
     <ClCompile Include="arm9\source\messageBox.cpp" />
-    <ClCompile Include="arm9\source\PKMN.cpp" />
+    <ClCompile Include="arm9\source\pokemon.cpp" />
     <ClCompile Include="arm9\source\print.cpp" />
     <ClCompile Include="arm9\source\saveGame.cpp" />
     <ClCompile Include="arm9\source\nitrofs.c" />
