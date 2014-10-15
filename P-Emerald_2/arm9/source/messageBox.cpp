@@ -44,7 +44,7 @@ extern void setMainSpriteVisibility( bool p_hidden );
 extern backgroundSet BGs[ MAXBG ];
 extern int BG_ind;
 extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
-extern OAMTable *oam;
+extern OAMTable *Oam;
 extern ConsoleFont cfont;
 extern font::Font cust_font;
 extern font::Font cust_font2;
@@ -55,13 +55,13 @@ int TEXTSPEED = 35;
 
 void init( ) {
     for( int i = 0; i < 4; ++i )
-        oam->oamBuffer[ 31 + 2 * i ].isHidden = true;
+        Oam->oamBuffer[ 31 + 2 * i ].isHidden = true;
     for( int i = 9; i <= 12; ++i ) {
-        oam->oamBuffer[ i ].isHidden = true;
+        Oam->oamBuffer[ i ].isHidden = true;
         swiWaitForVBlank( );
     }
 
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
 
     cust_font.setColor( 0, 0 );
     cust_font.setColor( 251, 1 );
@@ -77,13 +77,13 @@ void init( ) {
     BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
     font::putrec( 0, 0, 256, 63, true, false, 250 );
 
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
 }
 void dinit( ) {
     drawSub( );
 
     for( int i = 0; i < 4; ++i )
-        oam->oamBuffer[ 31 + 2 * i ].isHidden = false;
+        Oam->oamBuffer[ 31 + 2 * i ].isHidden = false;
 }
 
 void messageBox::clear( ) {
@@ -106,19 +106,19 @@ void waitForTouchUp( bool p_uTime, bool p_tpar = false ) {
 }
 
 messageBox::messageBox( item p_item, const int p_count ) {
-    m_isNamed = false;
-    back = &oam->oamBuffer[ 0 ];
-    save = &oam->oamBuffer[ 1 ];
+    m_isNamed = NULL;
+    back = &Oam->oamBuffer[ 0 ];
+    save = &Oam->oamBuffer[ 1 ];
     back_ = back->isHidden;
     save_ = save->isHidden;
-    main_ = ( oam->oamBuffer[ BAG_ID ] ).isHidden;
+    main_ = ( Oam->oamBuffer[ BAG_ID ] ).isHidden;
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, true );
     setMainSpriteVisibility( true );
     init( );
     int a = 0, b = 0, c = 0;
-    drawItemIcon( oam, spriteInfo, p_item.m_itemName, 4, 4, a, b, c );
-    updateOAMSub( oam );
+    drawItemIcon( Oam, spriteInfo, p_item.m_itemName, 4, 4, a, b, c );
+    updateOAMSub( Oam );
 
     updateTime( );
 
@@ -135,8 +135,8 @@ messageBox::messageBox( item p_item, const int p_count ) {
     sprintf( buf, "%s-Tasche verstaut.", bagnames[ p_item.m_itemType ].c_str( ) );
     cust_font.print_string_d( buf, 46, 24, true );
 
-    oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( oam );
+    Oam->oamBuffer[ 8 ].isHidden = false;
+    updateOAMSub( Oam );
     touchPosition touch;
     while( 1 ) {
         swiWaitForVBlank( );
@@ -152,22 +152,22 @@ messageBox::messageBox( item p_item, const int p_count ) {
         }
     }
 
-    initMainSprites( oam, spriteInfo );
+    initMainSprites( Oam, spriteInfo );
     //setMainSpriteVisibility(false);
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, false );
-    oam->oamBuffer[ 8 ].isHidden = true;
+    Oam->oamBuffer[ 8 ].isHidden = true;
     dinit( );
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
 }
 
 messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {
-    m_isNamed = false;
-    back = &oam->oamBuffer[ 0 ];
-    save = &oam->oamBuffer[ 1 ];
+    m_isNamed = NULL;
+    back = &Oam->oamBuffer[ 0 ];
+    save = &Oam->oamBuffer[ 1 ];
     back_ = back->isHidden;
     save_ = save->isHidden;
-    main_ = ( oam->oamBuffer[ BAG_ID ] ).isHidden;
+    main_ = ( Oam->oamBuffer[ BAG_ID ] ).isHidden;
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, true );
     setMainSpriteVisibility( true );
@@ -177,8 +177,8 @@ messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {
     if( p_time ) updateTime( );
 
     cust_font.print_string_d( p_text, 8, 8, true );
-    oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( oam );
+    Oam->oamBuffer[ 8 ].isHidden = false;
+    updateOAMSub( Oam );
     touchPosition touch;
     while( 1 ) {
         swiWaitForVBlank( );
@@ -199,18 +199,18 @@ messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {
     setSpriteVisibility( back, back_ );
     setSpriteVisibility( save, save_ );
     setMainSpriteVisibility( main_ );
-    oam->oamBuffer[ 8 ].isHidden = true;
+    Oam->oamBuffer[ 8 ].isHidden = true;
     dinit( );
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
     swiWaitForVBlank( );
 }
 messageBox::messageBox( const wchar_t* p_text, bool p_time, bool p_remsprites ) {
-    m_isNamed = false;
-    back = &oam->oamBuffer[ 0 ];
-    save = &oam->oamBuffer[ 1 ];
+    m_isNamed = NULL;
+    back = &Oam->oamBuffer[ 0 ];
+    save = &Oam->oamBuffer[ 1 ];
     back_ = back->isHidden;
     save_ = save->isHidden;
-    main_ = ( oam->oamBuffer[ BAG_ID ] ).isHidden;
+    main_ = ( Oam->oamBuffer[ BAG_ID ] ).isHidden;
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, true );
     setMainSpriteVisibility( true );
@@ -220,8 +220,8 @@ messageBox::messageBox( const wchar_t* p_text, bool p_time, bool p_remsprites ) 
     if( p_time ) updateTime( );
 
     cust_font.print_string_d( p_text, 8, 8, true );
-    oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( oam );
+    Oam->oamBuffer[ 8 ].isHidden = false;
+    updateOAMSub( Oam );
     touchPosition touch;
     while( 1 ) {
         swiWaitForVBlank( );
@@ -242,32 +242,32 @@ messageBox::messageBox( const wchar_t* p_text, bool p_time, bool p_remsprites ) 
     setSpriteVisibility( back, back_ );
     setSpriteVisibility( save, save_ );
     setMainSpriteVisibility( main_ );
-    oam->oamBuffer[ 8 ].isHidden = true;
+    Oam->oamBuffer[ 8 ].isHidden = true;
     for( int i = 9; i <= 12; ++i ) {
-        oam->oamBuffer[ i ].isHidden = p_remsprites;
+        Oam->oamBuffer[ i ].isHidden = p_remsprites;
         swiWaitForVBlank( );
     }
     dinit( );
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
     swiWaitForVBlank( );
 }
 messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, bool p_a, bool p_remsprites, sprite_type p_sprt, int p_sprind ) {
     m_isNamed = p_name;
-    back = &oam->oamBuffer[ 0 ];
-    save = &oam->oamBuffer[ 1 ];
+    back = &Oam->oamBuffer[ 0 ];
+    save = &Oam->oamBuffer[ 1 ];
     back_ = back->isHidden;
     save_ = save->isHidden;
-    main_ = ( oam->oamBuffer[ BAG_ID ] ).isHidden;
+    main_ = ( Oam->oamBuffer[ BAG_ID ] ).isHidden;
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, true );
     setMainSpriteVisibility( true );
     if( p_sprt != no_sprite ) {
         int a = 0, b = 0, c = 0;
         if( p_sprt == sprite_pkmn ) {
-            loadPKMNSpriteTop( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", p_sprind, (u16)-16, 0, a, b, c, true );
+            loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", p_sprind, (u16)-16, 0, a, b, c, true );
         }
         if( p_sprt == sprite_trainer ) {
-            loadPKMNSpriteTop( oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
+            loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
         }
     }
 
@@ -278,8 +278,8 @@ messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, boo
     cust_font.print_string( p_name, 8, 8, true );
     cust_font.print_string_d( p_text, 72, 8, true );
     if( p_a )
-        oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( oam );
+        Oam->oamBuffer[ 8 ].isHidden = false;
+    updateOAMSub( Oam );
 
     if( p_a ) {
         touchPosition touch;
@@ -302,39 +302,39 @@ messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, boo
     if( !p_remsprites )
         return;
     if( p_sprt != no_sprite )
-        initMainSprites( oam, spriteInfo );
+        initMainSprites( Oam, spriteInfo );
     setSpriteVisibility( back, back_ );
     setSpriteVisibility( save, save_ );
     setMainSpriteVisibility( main_ );
-    oam->oamBuffer[ 8 ].isHidden = true;
+    Oam->oamBuffer[ 8 ].isHidden = true;
     for( int i = 9; i <= 12; ++i ) {
-        oam->oamBuffer[ i ].isHidden = p_remsprites;
+        Oam->oamBuffer[ i ].isHidden = p_remsprites;
         swiWaitForVBlank( );
     }
     dinit( );
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
     swiWaitForVBlank( );
 }
 messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_time, bool p_a, bool p_remsprites, sprite_type p_sprt, int p_sprind ) {
-    m_isNamed = false;
-    back = &oam->oamBuffer[ 0 ];
-    save = &oam->oamBuffer[ 1 ];
+    m_isNamed = NULL;
+    back = &Oam->oamBuffer[ 0 ];
+    save = &Oam->oamBuffer[ 1 ];
     back_ = back->isHidden;
     save_ = save->isHidden;
-    main_ = ( oam->oamBuffer[ BAG_ID ] ).isHidden;
+    main_ = ( Oam->oamBuffer[ BAG_ID ] ).isHidden;
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, true );
     setMainSpriteVisibility( true );
     if( p_sprt != no_sprite ) {
         int a = 0, b = 0, c = 0;
         if( p_sprt == sprite_pkmn ) {
-            loadPKMNSpriteTop( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", p_sprind, (u16)-16, 0, a, b, c, true );
+            loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", p_sprind, (u16)-16, 0, a, b, c, true );
         }
         if( p_sprt == sprite_trainer ) {
-            loadPKMNSpriteTop( oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
+            loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
         }
     }
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
 
     init( );
 
@@ -345,8 +345,8 @@ messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_tim
         cust_font.print_string_d( p_text, 8, 8, true );
     }
     if( p_a )
-        oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( oam );
+        Oam->oamBuffer[ 8 ].isHidden = false;
+    updateOAMSub( Oam );
 
     if( p_a ) {
         touchPosition touch;
@@ -369,17 +369,17 @@ messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_tim
     if( !p_remsprites )
         return;
     if( p_sprt != no_sprite )
-        initMainSprites( oam, spriteInfo );
+        initMainSprites( Oam, spriteInfo );
     setSpriteVisibility( back, back_ );
     setSpriteVisibility( save, save_ );
     setMainSpriteVisibility( main_ );
-    oam->oamBuffer[ 8 ].isHidden = true;
+    Oam->oamBuffer[ 8 ].isHidden = true;
     for( int i = 9; i <= 12; ++i ) {
-        oam->oamBuffer[ i ].isHidden = p_remsprites;
+        Oam->oamBuffer[ i ].isHidden = p_remsprites;
         swiWaitForVBlank( );
     }
     dinit( );
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
     swiWaitForVBlank( );
 }
 
@@ -414,32 +414,32 @@ void messageBox::put( const char* p_text, bool p_a, bool p_time ) {
 }
 
 yesNoBox::yesNoBox( ) {
-    back = &oam->oamBuffer[ 0 ];
-    save = &oam->oamBuffer[ 1 ];
+    back = &Oam->oamBuffer[ 0 ];
+    save = &Oam->oamBuffer[ 1 ];
     back_ = back->isHidden;
     save_ = save->isHidden;
-    main_ = ( oam->oamBuffer[ BAG_ID ] ).isHidden;
+    main_ = ( Oam->oamBuffer[ BAG_ID ] ).isHidden;
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, true );
     setMainSpriteVisibility( true );
-    oam->oamBuffer[ 8 ].isHidden = true;
+    Oam->oamBuffer[ 8 ].isHidden = true;
     init( );
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
 
     consoleSetWindow( &Bottom, 1, 1, 30, MAXLINES );
     consoleSelect( &Bottom );
     _isNamed = false;
 }
 yesNoBox::yesNoBox( const char* p_name ) {
-    back = &oam->oamBuffer[ 0 ];
-    save = &oam->oamBuffer[ 1 ];
+    back = &Oam->oamBuffer[ 0 ];
+    save = &Oam->oamBuffer[ 1 ];
     back_ = back->isHidden;
     save_ = save->isHidden;
-    main_ = ( oam->oamBuffer[ BAG_ID ] ).isHidden;
+    main_ = ( Oam->oamBuffer[ BAG_ID ] ).isHidden;
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, true );
     setMainSpriteVisibility( true );
-    oam->oamBuffer[ 8 ].isHidden = true;
+    Oam->oamBuffer[ 8 ].isHidden = true;
 
     init( );
 
@@ -452,23 +452,23 @@ yesNoBox::yesNoBox( const char* p_name ) {
     _isNamed = true;
 }
 yesNoBox::yesNoBox( messageBox p_box ) {
-    back = &oam->oamBuffer[ 0 ];
-    save = &oam->oamBuffer[ 1 ];
+    back = &Oam->oamBuffer[ 0 ];
+    save = &Oam->oamBuffer[ 1 ];
     back_ = back->isHidden;
     save_ = save->isHidden;
-    main_ = ( oam->oamBuffer[ BAG_ID ] ).isHidden;
+    main_ = ( Oam->oamBuffer[ BAG_ID ] ).isHidden;
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, true );
     setMainSpriteVisibility( true );
-    oam->oamBuffer[ 8 ].isHidden = true;
+    Oam->oamBuffer[ 8 ].isHidden = true;
     init( );
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
     _isNamed = p_box.m_isNamed;
 }
 
 bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
 
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
     consoleSelect( &Bottom );
     if( p_text ) {
         if( _isNamed )
@@ -477,8 +477,8 @@ bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
             cust_font.print_string_d( p_text, 8, 8, true );
     }
     for( int i = 19; i <= 22; ++i )
-        oam->oamBuffer[ i ].isHidden = false;
-    updateOAMSub( oam );
+        Oam->oamBuffer[ i ].isHidden = false;
+    updateOAMSub( Oam );
     consoleSetWindow( &Bottom, 5, 13, 10, 3 );
     printf( "\n    Ja" );
     consoleSetWindow( &Bottom, 17, 13, 10, 3 );
@@ -486,45 +486,45 @@ bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
 
     while( 42 ) {
         swiWaitForVBlank( );
-        updateOAMSub( oam );
+        updateOAMSub( Oam );
         if( p_time )
             updateTime( );
         touchPosition t;
         touchRead( &t );
         if( t.px > 31 && t.py > 99 && t.px < 129 && t.py < 133 ) {
-            oam->oamBuffer[ 21 ].isHidden = true;
-            oam->oamBuffer[ 22 ].isHidden = true;
-            updateOAMSub( oam );
+            Oam->oamBuffer[ 21 ].isHidden = true;
+            Oam->oamBuffer[ 22 ].isHidden = true;
+            updateOAMSub( Oam );
 
             waitForTouchUp( p_time );
-            oam->oamBuffer[ 19 ].isHidden = true;
-            oam->oamBuffer[ 20 ].isHidden = true;
+            Oam->oamBuffer[ 19 ].isHidden = true;
+            Oam->oamBuffer[ 20 ].isHidden = true;
             setSpriteVisibility( back, back_ );
             setSpriteVisibility( save, save_ );
-            oam->oamBuffer[ 8 ].isHidden = true;
+            Oam->oamBuffer[ 8 ].isHidden = true;
             for( int i = 9; i <= 12; ++i ) {
-                oam->oamBuffer[ i ].isHidden = true;
+                Oam->oamBuffer[ i ].isHidden = true;
             }
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             consoleSetWindow( &Bottom, 1, 1, 30, 24 );
             consoleClear( );
             dinit( );
             return true;//YES
         } else if( t.px > 127 && t.py > 99 && t.px < 225 && t.py < 133 ) {
-            oam->oamBuffer[ 19 ].isHidden = true;
-            oam->oamBuffer[ 20 ].isHidden = true;
-            updateOAMSub( oam );
+            Oam->oamBuffer[ 19 ].isHidden = true;
+            Oam->oamBuffer[ 20 ].isHidden = true;
+            updateOAMSub( Oam );
 
             waitForTouchUp( p_time );
-            oam->oamBuffer[ 21 ].isHidden = true;
-            oam->oamBuffer[ 22 ].isHidden = true;
+            Oam->oamBuffer[ 21 ].isHidden = true;
+            Oam->oamBuffer[ 22 ].isHidden = true;
             setSpriteVisibility( back, back_ );
             setSpriteVisibility( save, save_ );
-            oam->oamBuffer[ 8 ].isHidden = true;
+            Oam->oamBuffer[ 8 ].isHidden = true;
             for( int i = 9; i <= 12; ++i ) {
-                oam->oamBuffer[ i ].isHidden = true;
+                Oam->oamBuffer[ i ].isHidden = true;
             }
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             consoleSetWindow( &Bottom, 1, 1, 30, 24 );
             consoleClear( );
             dinit( );
@@ -536,7 +536,7 @@ bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
 }
 bool yesNoBox::getResult( const wchar_t* p_text = 0, bool time ) {
 
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
     consoleSelect( &Bottom );
     if( p_text ) {
         if( _isNamed )
@@ -545,8 +545,8 @@ bool yesNoBox::getResult( const wchar_t* p_text = 0, bool time ) {
             cust_font.print_string_d( p_text, 8, 8, true );
     }
     for( int i = 19; i <= 22; ++i )
-        oam->oamBuffer[ i ].isHidden = false;
-    updateOAMSub( oam );
+        Oam->oamBuffer[ i ].isHidden = false;
+    updateOAMSub( Oam );
     consoleSetWindow( &Bottom, 5, 13, 10, 3 );
     printf( "\n    Ja" );
     consoleSetWindow( &Bottom, 17, 13, 10, 3 );
@@ -554,46 +554,46 @@ bool yesNoBox::getResult( const wchar_t* p_text = 0, bool time ) {
 
     while( 42 ) {
         swiWaitForVBlank( );
-        updateOAMSub( oam );
+        updateOAMSub( Oam );
         if( time )
             updateTime( );
         touchPosition t;
         touchRead( &t );
         if( t.px > 31 && t.py > 99 && t.px < 129 && t.py < 133 ) {
-            oam->oamBuffer[ 21 ].isHidden = true;
-            oam->oamBuffer[ 22 ].isHidden = true;
-            updateOAMSub( oam );
+            Oam->oamBuffer[ 21 ].isHidden = true;
+            Oam->oamBuffer[ 22 ].isHidden = true;
+            updateOAMSub( Oam );
 
             waitForTouchUp( time );
-            oam->oamBuffer[ 19 ].isHidden = true;
-            oam->oamBuffer[ 20 ].isHidden = true;
+            Oam->oamBuffer[ 19 ].isHidden = true;
+            Oam->oamBuffer[ 20 ].isHidden = true;
             setSpriteVisibility( back, back_ );
             setSpriteVisibility( save, save_ );
-            oam->oamBuffer[ 8 ].isHidden = true;
+            Oam->oamBuffer[ 8 ].isHidden = true;
             for( int i = 9; i <= 12; ++i ) {
-                oam->oamBuffer[ i ].isHidden = true;
+                Oam->oamBuffer[ i ].isHidden = true;
             }
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             consoleSetWindow( &Bottom, 1, 1, 30, 24 );
             consoleClear( );
             dinit( );
             return true;//YES
         } else if( t.px > 127 && t.py > 99 && t.px < 225 && t.py < 133 ) {
-            oam->oamBuffer[ 19 ].isHidden = true;
-            oam->oamBuffer[ 20 ].isHidden = true;
-            updateOAMSub( oam );
+            Oam->oamBuffer[ 19 ].isHidden = true;
+            Oam->oamBuffer[ 20 ].isHidden = true;
+            updateOAMSub( Oam );
 
 
             waitForTouchUp( time );
-            oam->oamBuffer[ 21 ].isHidden = true;
-            oam->oamBuffer[ 22 ].isHidden = true;
+            Oam->oamBuffer[ 21 ].isHidden = true;
+            Oam->oamBuffer[ 22 ].isHidden = true;
             setSpriteVisibility( back, back_ );
             setSpriteVisibility( save, save_ );
-            oam->oamBuffer[ 8 ].isHidden = true;
+            Oam->oamBuffer[ 8 ].isHidden = true;
             for( int i = 9; i <= 12; ++i ) {
-                oam->oamBuffer[ i ].isHidden = true;
+                Oam->oamBuffer[ i ].isHidden = true;
             }
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             consoleSetWindow( &Bottom, 1, 1, 30, 24 );
             consoleClear( );
             dinit( );
@@ -609,19 +609,19 @@ choiceBox::choiceBox( int p_num, const char** p_choices, const char* p_name = 0,
     _choices = p_choices;
     _big = p_big || ( p_num <= 3 );
 
-    back_ = oam->oamBuffer[ 0 ].isHidden;
-    save_ = oam->oamBuffer[ 1 ].isHidden;
-    main_ = ( oam->oamBuffer[ BAG_ID ] ).isHidden;
-    setSpriteVisibility( &( oam->oamBuffer[ 0 ] ), true );
-    setSpriteVisibility( &( oam->oamBuffer[ 1 ] ), true );
+    back_ = Oam->oamBuffer[ 0 ].isHidden;
+    save_ = Oam->oamBuffer[ 1 ].isHidden;
+    main_ = ( Oam->oamBuffer[ BAG_ID ] ).isHidden;
+    setSpriteVisibility( &( Oam->oamBuffer[ 0 ] ), true );
+    setSpriteVisibility( &( Oam->oamBuffer[ 1 ] ), true );
     setMainSpriteVisibility( true );
-    oam->oamBuffer[ 8 ].isHidden = true;
+    Oam->oamBuffer[ 8 ].isHidden = true;
     init( );
 
     for( int i = 13; i <= 29; ++i ) {
-        oam->oamBuffer[ i ].isHidden = true;
+        Oam->oamBuffer[ i ].isHidden = true;
     }
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
 
     if( p_name ) {
         _name = true;
@@ -645,18 +645,17 @@ choiceBox::~choiceBox( ) {
     consoleSetWindow( &Bottom, 1, 1, 30, 24 );
     consoleClear( );
     setMainSpriteVisibility( main_ );
-    oam->oamBuffer[ 8 ].isHidden = true;
+    Oam->oamBuffer[ 8 ].isHidden = true;
     for( int i = 9; i <= 29; ++i )
-        oam->oamBuffer[ i ].isHidden = true;
+        Oam->oamBuffer[ i ].isHidden = true;
 
-    setSpriteVisibility( &( oam->oamBuffer[ 0 ] ), back_ );
-    setSpriteVisibility( &( oam->oamBuffer[ 1 ] ), save_ );
-    updateOAMSub( oam );
+    setSpriteVisibility( &( Oam->oamBuffer[ 0 ] ), back_ );
+    setSpriteVisibility( &( Oam->oamBuffer[ 1 ] ), save_ );
+    updateOAMSub( Oam );
     swiWaitForVBlank( );
 }
 
 int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
-    int ret = 0;
     consoleSelect( &Bottom );
     if( p_text ) {
         if( _name )
@@ -667,17 +666,17 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
     if( _num < 1 )
         return -1;
     else if( _num == 1 ) {
-        ( oam->oamBuffer[ 20 ] ).isHidden = false;
-        ( oam->oamBuffer[ 21 ] ).isHidden = false;
-        ( oam->oamBuffer[ 28 ] ).isHidden = false;
-        updateOAMSub( oam );
+        ( Oam->oamBuffer[ 20 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 21 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 28 ] ).isHidden = false;
+        updateOAMSub( Oam );
 
         consoleSetWindow( &Bottom, 5, 13, 22, 3 );
         printf( _choices[ 0 ] );
 
         while( 42 ) {
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             if( p_time )
                 updateTime( true );
             touchPosition t;
@@ -685,10 +684,10 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
 
             if( t.px > 31 && t.py > 99 && t.px < 225 && t.py < 133 ) {
 
-                oam->oamBuffer[ 20 ].isHidden = true;
-                oam->oamBuffer[ 21 ].isHidden = true;
-                oam->oamBuffer[ 28 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 20 ].isHidden = true;
+                Oam->oamBuffer[ 21 ].isHidden = true;
+                Oam->oamBuffer[ 28 ].isHidden = true;
+                updateOAMSub( Oam );
 
                 waitForTouchUp( p_time, true );
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
@@ -698,19 +697,19 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             }
         }
     } else if( _num == 2 ) {
-        ( oam->oamBuffer[ 20 ] ).isHidden = false;
-        ( oam->oamBuffer[ 21 ] ).isHidden = false;
-        ( oam->oamBuffer[ 29 ] ).isHidden = false;
-        ( oam->oamBuffer[ 24 ] ).isHidden = false;
-        ( oam->oamBuffer[ 25 ] ).isHidden = false;
-        ( oam->oamBuffer[ 28 ] ).isHidden = false;
-        ( oam->oamBuffer[ 20 ] ).y -= 16;
-        ( oam->oamBuffer[ 21 ] ).y -= 16;
-        ( oam->oamBuffer[ 28 ] ).y -= 16;
-        ( oam->oamBuffer[ 24 ] ).y -= 16;
-        ( oam->oamBuffer[ 25 ] ).y -= 16;
-        ( oam->oamBuffer[ 29 ] ).y -= 16;
-        updateOAMSub( oam );
+        ( Oam->oamBuffer[ 20 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 21 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 29 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 24 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 25 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 28 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 20 ] ).y -= 16;
+        ( Oam->oamBuffer[ 21 ] ).y -= 16;
+        ( Oam->oamBuffer[ 28 ] ).y -= 16;
+        ( Oam->oamBuffer[ 24 ] ).y -= 16;
+        ( Oam->oamBuffer[ 25 ] ).y -= 16;
+        ( Oam->oamBuffer[ 29 ] ).y -= 16;
+        updateOAMSub( Oam );
 
         consoleSetWindow( &Bottom, 5, 11, 22, 3 );
         printf( _choices[ 0 ] );
@@ -719,50 +718,50 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
 
         while( 42 ) {
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             if( p_time )
                 updateTime( true );
             touchPosition t;
             touchRead( &t );
 
             if( t.px > 31 && t.py > 83 && t.px < 225 && t.py < 117 ) {
-                ( oam->oamBuffer[ 20 ] ).isHidden = true;
-                ( oam->oamBuffer[ 21 ] ).isHidden = true;
-                ( oam->oamBuffer[ 28 ] ).isHidden = true;
-                updateOAMSub( oam );
+                ( Oam->oamBuffer[ 20 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 21 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 28 ] ).isHidden = true;
+                updateOAMSub( Oam );
 
                 waitForTouchUp( p_time, true );
-                ( oam->oamBuffer[ 24 ] ).isHidden = true;
-                ( oam->oamBuffer[ 25 ] ).isHidden = true;
-                ( oam->oamBuffer[ 29 ] ).isHidden = true;
-                ( oam->oamBuffer[ 20 ] ).y += 16;
-                ( oam->oamBuffer[ 21 ] ).y += 16;
-                ( oam->oamBuffer[ 28 ] ).y += 16;
-                ( oam->oamBuffer[ 24 ] ).y += 16;
-                ( oam->oamBuffer[ 25 ] ).y += 16;
-                ( oam->oamBuffer[ 29 ] ).y += 16;
-                updateOAMSub( oam );
+                ( Oam->oamBuffer[ 24 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 25 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 29 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 20 ] ).y += 16;
+                ( Oam->oamBuffer[ 21 ] ).y += 16;
+                ( Oam->oamBuffer[ 28 ] ).y += 16;
+                ( Oam->oamBuffer[ 24 ] ).y += 16;
+                ( Oam->oamBuffer[ 25 ] ).y += 16;
+                ( Oam->oamBuffer[ 29 ] ).y += 16;
+                updateOAMSub( Oam );
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                 consoleClear( );
 
                 return 0;
             } else if( t.px > 31 && t.py > 115 && t.px < 225 && t.py < 159 ) {
-                ( oam->oamBuffer[ 24 ] ).isHidden = true;
-                ( oam->oamBuffer[ 25 ] ).isHidden = true;
-                ( oam->oamBuffer[ 29 ] ).isHidden = true;
-                updateOAMSub( oam );
+                ( Oam->oamBuffer[ 24 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 25 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 29 ] ).isHidden = true;
+                updateOAMSub( Oam );
 
                 waitForTouchUp( p_time, true );
-                ( oam->oamBuffer[ 20 ] ).isHidden = true;
-                ( oam->oamBuffer[ 21 ] ).isHidden = true;
-                ( oam->oamBuffer[ 28 ] ).isHidden = true;
-                ( oam->oamBuffer[ 20 ] ).y += 16;
-                ( oam->oamBuffer[ 21 ] ).y += 16;
-                ( oam->oamBuffer[ 28 ] ).y += 16;
-                ( oam->oamBuffer[ 24 ] ).y += 16;
-                ( oam->oamBuffer[ 25 ] ).y += 16;
-                ( oam->oamBuffer[ 29 ] ).y += 16;
-                updateOAMSub( oam );
+                ( Oam->oamBuffer[ 20 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 21 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 28 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 20 ] ).y += 16;
+                ( Oam->oamBuffer[ 21 ] ).y += 16;
+                ( Oam->oamBuffer[ 28 ] ).y += 16;
+                ( Oam->oamBuffer[ 24 ] ).y += 16;
+                ( Oam->oamBuffer[ 25 ] ).y += 16;
+                ( Oam->oamBuffer[ 29 ] ).y += 16;
+                updateOAMSub( Oam );
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                 consoleClear( );
 
@@ -771,169 +770,169 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
         }
     } else if( _num == 3 ) {
         for( int i = 0; i < 3; ++i ) {
-            ( oam->oamBuffer[ 17 + 4 * i ] ).isHidden = false;
-            ( oam->oamBuffer[ 16 + 4 * i ] ).isHidden = false;
-            ( oam->oamBuffer[ 27 + i ] ).isHidden = false;
-            updateOAMSub( oam );
+            ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = false;
+            ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = false;
+            ( Oam->oamBuffer[ 27 + i ] ).isHidden = false;
+            updateOAMSub( Oam );
             consoleSetWindow( &Bottom, 5, 9 + 4 * i, 22, 3 );
             printf( _choices[ i ] );
         }
         while( 42 ) {
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             if( p_time )
                 updateTime( true );
             touchPosition t;
             touchRead( &t );
 
             if( t.px > 31 && t.py > 67 && t.px < 225 && t.py < 101 ) {
-                oam->oamBuffer[ 17 ].isHidden = true;
-                oam->oamBuffer[ 16 ].isHidden = true;
-                oam->oamBuffer[ 27 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 17 ].isHidden = true;
+                Oam->oamBuffer[ 16 ].isHidden = true;
+                Oam->oamBuffer[ 27 ].isHidden = true;
+                updateOAMSub( Oam );
 
                 waitForTouchUp( p_time, true );
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                 consoleClear( );
 
-                oam->oamBuffer[ 24 ].isHidden = true;
-                oam->oamBuffer[ 25 ].isHidden = true;
-                oam->oamBuffer[ 29 ].isHidden = true;
-                oam->oamBuffer[ 21 ].isHidden = true;
-                oam->oamBuffer[ 20 ].isHidden = true;
-                oam->oamBuffer[ 28 ].isHidden = true;
+                Oam->oamBuffer[ 24 ].isHidden = true;
+                Oam->oamBuffer[ 25 ].isHidden = true;
+                Oam->oamBuffer[ 29 ].isHidden = true;
+                Oam->oamBuffer[ 21 ].isHidden = true;
+                Oam->oamBuffer[ 20 ].isHidden = true;
+                Oam->oamBuffer[ 28 ].isHidden = true;
                 return 0;
             } else if( t.px > 31 && t.py > 99 && t.px < 225 && t.py < 133 ) {
-                oam->oamBuffer[ 20 ].isHidden = true;
-                oam->oamBuffer[ 21 ].isHidden = true;
-                oam->oamBuffer[ 28 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 20 ].isHidden = true;
+                Oam->oamBuffer[ 21 ].isHidden = true;
+                Oam->oamBuffer[ 28 ].isHidden = true;
+                updateOAMSub( Oam );
 
                 waitForTouchUp( p_time, true );
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                 consoleClear( );
 
-                oam->oamBuffer[ 24 ].isHidden = true;
-                oam->oamBuffer[ 25 ].isHidden = true;
-                oam->oamBuffer[ 29 ].isHidden = true;
-                oam->oamBuffer[ 17 ].isHidden = true;
-                oam->oamBuffer[ 16 ].isHidden = true;
-                oam->oamBuffer[ 27 ].isHidden = true;
+                Oam->oamBuffer[ 24 ].isHidden = true;
+                Oam->oamBuffer[ 25 ].isHidden = true;
+                Oam->oamBuffer[ 29 ].isHidden = true;
+                Oam->oamBuffer[ 17 ].isHidden = true;
+                Oam->oamBuffer[ 16 ].isHidden = true;
+                Oam->oamBuffer[ 27 ].isHidden = true;
                 return 1;
             } else if( t.px > 31 && t.py > 131 && t.px < 225 && t.py < 165 ) {
-                oam->oamBuffer[ 24 ].isHidden = true;
-                oam->oamBuffer[ 25 ].isHidden = true;
-                oam->oamBuffer[ 29 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 24 ].isHidden = true;
+                Oam->oamBuffer[ 25 ].isHidden = true;
+                Oam->oamBuffer[ 29 ].isHidden = true;
+                updateOAMSub( Oam );
 
                 waitForTouchUp( p_time, true );
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                 consoleClear( );
 
-                oam->oamBuffer[ 20 ].isHidden = true;
-                oam->oamBuffer[ 21 ].isHidden = true;
-                oam->oamBuffer[ 28 ].isHidden = true;
-                oam->oamBuffer[ 17 ].isHidden = true;
-                oam->oamBuffer[ 16 ].isHidden = true;
-                oam->oamBuffer[ 27 ].isHidden = true;
+                Oam->oamBuffer[ 20 ].isHidden = true;
+                Oam->oamBuffer[ 21 ].isHidden = true;
+                Oam->oamBuffer[ 28 ].isHidden = true;
+                Oam->oamBuffer[ 17 ].isHidden = true;
+                Oam->oamBuffer[ 16 ].isHidden = true;
+                Oam->oamBuffer[ 27 ].isHidden = true;
                 return 2;
             }
         }
     } else if( _num > 3 && _big ) {
         int page = 0;
-        ( oam->oamBuffer[ 13 ] ).isHidden = false;
-        ( oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
-        ( oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
+        ( Oam->oamBuffer[ 13 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
+        ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
         for( int i = 0; i < 3; ++i ) {
-            ( oam->oamBuffer[ 17 + 4 * i ] ).isHidden = false;
-            ( oam->oamBuffer[ 16 + 4 * i ] ).isHidden = false;
-            ( oam->oamBuffer[ 27 + i ] ).isHidden = false;
-            updateOAMSub( oam );
+            ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = false;
+            ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = false;
+            ( Oam->oamBuffer[ 27 + i ] ).isHidden = false;
+            updateOAMSub( Oam );
             consoleSetWindow( &Bottom, 5, 9 + 4 * i, 22, 3 );
             printf( _choices[ i ] );
         }
         while( 42 ) {
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             if( p_time )
                 updateTime( true );
             touchPosition t;
             touchRead( &t );
 
             if( t.px > 31 && t.py > 67 && t.px < 225 && t.py < 101 ) {
-                oam->oamBuffer[ 17 ].isHidden = true;
-                oam->oamBuffer[ 16 ].isHidden = true;
-                oam->oamBuffer[ 27 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 17 ].isHidden = true;
+                Oam->oamBuffer[ 16 ].isHidden = true;
+                Oam->oamBuffer[ 27 ].isHidden = true;
+                updateOAMSub( Oam );
 
                 waitForTouchUp( p_time, true );
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                 consoleClear( );
 
-                oam->oamBuffer[ 24 ].isHidden = true;
-                oam->oamBuffer[ 25 ].isHidden = true;
-                oam->oamBuffer[ 29 ].isHidden = true;
-                oam->oamBuffer[ 21 ].isHidden = true;
-                oam->oamBuffer[ 20 ].isHidden = true;
-                oam->oamBuffer[ 28 ].isHidden = true;
+                Oam->oamBuffer[ 24 ].isHidden = true;
+                Oam->oamBuffer[ 25 ].isHidden = true;
+                Oam->oamBuffer[ 29 ].isHidden = true;
+                Oam->oamBuffer[ 21 ].isHidden = true;
+                Oam->oamBuffer[ 20 ].isHidden = true;
+                Oam->oamBuffer[ 28 ].isHidden = true;
                 return 0 + 3 * page;
             } else if( _num >= 3 * page + 2 && t.px > 31 && t.py > 99 && t.px < 225 && t.py < 133 ) {
-                oam->oamBuffer[ 20 ].isHidden = true;
-                oam->oamBuffer[ 21 ].isHidden = true;
-                oam->oamBuffer[ 28 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 20 ].isHidden = true;
+                Oam->oamBuffer[ 21 ].isHidden = true;
+                Oam->oamBuffer[ 28 ].isHidden = true;
+                updateOAMSub( Oam );
 
                 waitForTouchUp( p_time, true );
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                 consoleClear( );
 
-                oam->oamBuffer[ 24 ].isHidden = true;
-                oam->oamBuffer[ 25 ].isHidden = true;
-                oam->oamBuffer[ 29 ].isHidden = true;
-                oam->oamBuffer[ 17 ].isHidden = true;
-                oam->oamBuffer[ 16 ].isHidden = true;
-                oam->oamBuffer[ 27 ].isHidden = true;
+                Oam->oamBuffer[ 24 ].isHidden = true;
+                Oam->oamBuffer[ 25 ].isHidden = true;
+                Oam->oamBuffer[ 29 ].isHidden = true;
+                Oam->oamBuffer[ 17 ].isHidden = true;
+                Oam->oamBuffer[ 16 ].isHidden = true;
+                Oam->oamBuffer[ 27 ].isHidden = true;
                 return 1 + 3 * page;
             } else if( _num >= 3 * page + 3 && t.px > 31 && t.py > 131 && t.px < 225 && t.py < 165 ) {
-                oam->oamBuffer[ 24 ].isHidden = true;
-                oam->oamBuffer[ 25 ].isHidden = true;
-                oam->oamBuffer[ 29 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 24 ].isHidden = true;
+                Oam->oamBuffer[ 25 ].isHidden = true;
+                Oam->oamBuffer[ 29 ].isHidden = true;
+                updateOAMSub( Oam );
 
                 waitForTouchUp( p_time, true );
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                 consoleClear( );
 
-                oam->oamBuffer[ 20 ].isHidden = true;
-                oam->oamBuffer[ 21 ].isHidden = true;
-                oam->oamBuffer[ 28 ].isHidden = true;
-                oam->oamBuffer[ 17 ].isHidden = true;
-                oam->oamBuffer[ 16 ].isHidden = true;
-                oam->oamBuffer[ 27 ].isHidden = true;
+                Oam->oamBuffer[ 20 ].isHidden = true;
+                Oam->oamBuffer[ 21 ].isHidden = true;
+                Oam->oamBuffer[ 28 ].isHidden = true;
+                Oam->oamBuffer[ 17 ].isHidden = true;
+                Oam->oamBuffer[ 16 ].isHidden = true;
+                Oam->oamBuffer[ 27 ].isHidden = true;
                 return 2 + 3 * page;
             } else if( ( page == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 ) || ( page && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
 
                 waitForTouchUp( p_time, true );
                 if( ( ++page ) >= ( ( _num - 1 ) / 3 ) ) {
-                    ( oam->oamBuffer[ 13 ] ).isHidden = true;
-                    ( oam->oamBuffer[ 14 ] ).isHidden = false;
-                    ( oam->oamBuffer[ 14 ] ).x = bwdPos[ 0 ][ 0 ] - 16;
-                    ( oam->oamBuffer[ 14 ] ).y = bwdPos[ 0 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 14 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 0 ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 0 ][ 1 ] - 16;
                     page = ( ( _num - 1 ) / 3 );
                 } else {
-                    ( oam->oamBuffer[ 14 ] ).isHidden = false;
-                    ( oam->oamBuffer[ 13 ] ).isHidden = false;
-                    ( oam->oamBuffer[ 14 ] ).x = bwdPos[ 1 ][ 0 ] - 16;
-                    ( oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
-                    ( oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
-                    ( oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 13 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 1 ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
                 }
                 for( int i = 0; i < 3; ++i ) {
                     if( 3 * page + i >= _num ) {
-                        ( oam->oamBuffer[ 17 + 4 * i ] ).isHidden = true;
-                        ( oam->oamBuffer[ 16 + 4 * i ] ).isHidden = true;
-                        ( oam->oamBuffer[ 27 + i ] ).isHidden = true;
-                        updateOAMSub( oam );
+                        ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = true;
+                        ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = true;
+                        ( Oam->oamBuffer[ 27 + i ] ).isHidden = true;
+                        updateOAMSub( Oam );
                         consoleSetWindow( &Bottom, 5, 9 + 4 * i, 22, 3 );
                         consoleClear( );
                     } else {
@@ -942,55 +941,55 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
                         printf( _choices[ 3 * page + i ] );
                     }
                 }
-                updateOAMSub( oam );
+                updateOAMSub( Oam );
             } else if( ( page == ( _num - 1 ) / 3 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 ) || ( page && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
 
                 waitForTouchUp( p_time, true );
                 if( ( --page ) <= 0 ) {
-                    ( oam->oamBuffer[ 14 ] ).isHidden = true;
-                    ( oam->oamBuffer[ 13 ] ).isHidden = false;
-                    ( oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
-                    ( oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 13 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
                     page = 0;
                 } else {
-                    ( oam->oamBuffer[ 13 ] ).isHidden = false;
-                    ( oam->oamBuffer[ 14 ] ).isHidden = false;
-                    ( oam->oamBuffer[ 14 ] ).x = bwdPos[ 1 ][ 0 ] - 16;
-                    ( oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
-                    ( oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
-                    ( oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 14 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 1 ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
                 }
                 for( int i = 0; i < 3; ++i ) {
-                    ( oam->oamBuffer[ 17 + 4 * i ] ).isHidden = false;
-                    ( oam->oamBuffer[ 16 + 4 * i ] ).isHidden = false;
-                    ( oam->oamBuffer[ 27 + i ] ).isHidden = false;
-                    updateOAMSub( oam );
+                    ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 27 + i ] ).isHidden = false;
+                    updateOAMSub( Oam );
                     consoleSetWindow( &Bottom, 5, 9 + 4 * i, 22, 3 );
                     consoleClear( );
                     printf( _choices[ 3 * page + i ] );
                 }
-                updateOAMSub( oam );
+                updateOAMSub( Oam );
             }
         }
     } else {
         int page = 0,
             inds[ ] = { 17, 15, 21, 19, 25, 23 };
         for( int i = 0; i < std::min( 6, _num ); ++i ) {
-            ( oam->oamBuffer[ inds[ i ] ] ).isHidden = false;
-            ( oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = false;
-            updateOAMSub( oam );
+            ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = false;
+            ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = false;
+            updateOAMSub( Oam );
             consoleSetWindow( &Bottom, 5 + ( ( i % 2 ) * 12 ), 9 + 4 * ( i / 2 ), 10, 3 );
             printf( _choices[ i ] );
         }
         if( _num > 6 ) {
-            ( oam->oamBuffer[ 13 ] ).isHidden = false;
-            ( oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
-            ( oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
+            ( Oam->oamBuffer[ 13 ] ).isHidden = false;
+            ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
+            ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
         }
-        updateOAMSub( oam );
+        updateOAMSub( Oam );
         while( 42 ) {
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             if( p_time )
                 updateTime( true );
             touchPosition t;
@@ -998,9 +997,9 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
 
             for( int i = 0; i < std::min( 6, _num - 6 * page ); ++i ) {
                 if( t.px > 31 + ( ( i % 2 ) * 96 ) && t.py > 71 + 32 * ( i / 2 ) && t.px < 225 - ( ( ( i + 1 ) % 2 ) * 96 ) && t.py < 105 + 32 * ( i / 2 ) ) {
-                    ( oam->oamBuffer[ inds[ i ] ] ).isHidden = true;
-                    ( oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = true;
-                    updateOAMSub( oam );
+                    ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = true;
+                    ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = true;
+                    updateOAMSub( Oam );
 
                     waitForTouchUp( p_time, true );
                     consoleSetWindow( &Bottom, 1, 1, 30, 24 );
@@ -1013,61 +1012,61 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
 
                 waitForTouchUp( p_time, true );
                 if( ( ++page ) >= ( _num / 6 ) ) {
-                    ( oam->oamBuffer[ 13 ] ).isHidden = true;
-                    ( oam->oamBuffer[ 14 ] ).isHidden = false;
-                    ( oam->oamBuffer[ 14 ] ).x = bwdPos[ 0 ][ 0 ] - 16;
-                    ( oam->oamBuffer[ 14 ] ).y = bwdPos[ 0 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 14 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 0 ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 0 ][ 1 ] - 16;
                     page = ( _num / 6 );
                 } else {
-                    ( oam->oamBuffer[ 14 ] ).isHidden = false;
-                    ( oam->oamBuffer[ 13 ] ).isHidden = false;
-                    ( oam->oamBuffer[ 14 ] ).x = bwdPos[ 1 ][ 0 ] - 16;
-                    ( oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
-                    ( oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
-                    ( oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 13 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 1 ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
                 }
                 for( int i = 0; i < 6; ++i ) {
                     consoleSetWindow( &Bottom, 5 + ( ( i % 2 ) * 12 ), 9 + 4 * ( i / 2 ), 10, 3 );
                     consoleClear( );
                     if( i < _num - 6 * page ) {
-                        ( oam->oamBuffer[ inds[ i ] ] ).isHidden = false;
-                        ( oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = false;
+                        ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = false;
+                        ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = false;
                         printf( _choices[ i + 6 * page ] );
                     } else {
-                        ( oam->oamBuffer[ inds[ i ] ] ).isHidden = true;
-                        ( oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = true;
+                        ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = true;
+                        ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = true;
                     }
-                    updateOAMSub( oam );
+                    updateOAMSub( Oam );
                 }
             } else if( ( page == _num / 6 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 ) || ( page && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
 
                 waitForTouchUp( p_time, true );
                 if( ( --page ) <= 0 ) {
-                    ( oam->oamBuffer[ 14 ] ).isHidden = true;
-                    ( oam->oamBuffer[ 13 ] ).isHidden = false;
-                    ( oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
-                    ( oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 13 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
                     page = 0;
                 } else {
-                    ( oam->oamBuffer[ 13 ] ).isHidden = false;
-                    ( oam->oamBuffer[ 14 ] ).isHidden = false;
-                    ( oam->oamBuffer[ 14 ] ).x = bwdPos[ 1 ][ 0 ] - 16;
-                    ( oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
-                    ( oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
-                    ( oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 14 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 1 ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
                 }
                 for( int i = 0; i < 6; ++i ) {
                     consoleSetWindow( &Bottom, 5 + ( ( i % 2 ) * 12 ), 9 + 4 * ( i / 2 ), 10, 3 );
                     consoleClear( );
                     if( i < _num - 6 * page ) {
-                        ( oam->oamBuffer[ inds[ i ] ] ).isHidden = false;
-                        ( oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = false;
+                        ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = false;
+                        ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = false;
                         printf( _choices[ i + 6 * page ] );
                     } else {
-                        ( oam->oamBuffer[ inds[ i ] ] ).isHidden = true;
-                        ( oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = true;
+                        ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = true;
+                        ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = true;
                     }
-                    updateOAMSub( oam );
+                    updateOAMSub( Oam );
                 }
             }
         }

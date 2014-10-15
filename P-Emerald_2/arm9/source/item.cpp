@@ -144,6 +144,7 @@ int item::getItemId( ) {
     for( int i = 0; i < 700; ++i )
         if( ItemList[ i ].m_itemName == m_itemName )
             return i;
+    return 0;
 }
 
 bool item::load( ) {

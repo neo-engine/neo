@@ -52,7 +52,7 @@
 #include "bag.h"
 #include "item.h"
 #include "battle.h"
-#include "buffer.h"
+//#include "buffer.h"
 
 //Sprites
 #include "Back.h"
@@ -112,7 +112,7 @@ extern std::vector<int> free_spaces;
 
 extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
 extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
-extern OAMTable *oam, *oamTop;
+extern OAMTable *Oam, *OamTop;
 
 extern int drawBox( short );
 namespace POKEMON {
@@ -179,14 +179,14 @@ void updateTime( int p_mapMode ) {
         if( showmappointer ) {
             if( showfirst ) {
                 showfirst = false;
-                oam->oamBuffer[ SQCH_ID ].isHidden = true;
-                oam->oamBuffer[ SQCH_ID + 1 ].isHidden = false;
+                Oam->oamBuffer[ SQCH_ID ].isHidden = true;
+                Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = false;
             } else {
                 showfirst = true;
-                oam->oamBuffer[ SQCH_ID ].isHidden = false;
-                oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
+                Oam->oamBuffer[ SQCH_ID ].isHidden = false;
+                Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
             }
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
         }
         char buf[ 15 ];
         sprintf( buf, "%02i:%02i:%02i", achours, acminutes, acseconds );
@@ -242,6 +242,7 @@ bool loadSprite( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_nam
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
         sizeof( SPRITE_GFX[ 0 ] );
 
+    char buffer[ 100 ];
     sprintf( buffer, "%s%s.raw", p_path, p_name );
     FILE* fd = fopen( buffer, "rb" );
 
@@ -264,6 +265,7 @@ bool loadSpriteSub( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
         sizeof( SPRITE_GFX_SUB[ 0 ] );
 
+    char buffer[ 100 ];
     sprintf( buffer, "%s%s.raw", p_path, p_name );
     FILE* fd = fopen( buffer, "rb" );
 
@@ -294,6 +296,7 @@ bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_pa
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] );
 
 
+    char buffer[ 100 ];
     if( !p_female )
         sprintf( buffer, "%s%d/%d.raw", p_path, p_pkmnId, p_pkmnId );
     else
@@ -440,6 +443,7 @@ bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
                                           * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] );
 
+    char buffer[ 100 ];
 
     if( !p_female )
         sprintf( buffer, "%s%d/%d.raw", p_path, p_pkmnId, p_pkmnId );
@@ -539,6 +543,7 @@ bool loadTrainerSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
                                           * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] );
 
+    char buffer[ 100 ];
 
     sprintf( buffer, "%sSprite_%s.raw", p_path, p_name );
     FILE* fd = fopen( buffer, "rb" );
@@ -667,6 +672,7 @@ bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
                                           * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] );
 
+    char buffer[ 100 ];
 
     sprintf( buffer, "%sSprite_%s.raw", p_path, p_name );
     FILE* fd = fopen( buffer, "rb" );
@@ -747,6 +753,7 @@ bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
 
 bool loadPicture( u16* p_layer, const char* p_path, const char* p_name, int p_palSize, int p_tileCnt ) {
 
+    char buffer[ 100 ];
     sprintf( buffer, "%s%s.raw", p_path, p_name );
     FILE* fd = fopen( buffer, "rb" );
 
@@ -766,6 +773,7 @@ bool loadPicture( u16* p_layer, const char* p_path, const char* p_name, int p_pa
 }
 bool loadPictureSub( u16* p_layer, const char* p_path, const char* p_name, int p_palSize, int p_tileCnt ) {
 
+    char buffer[ 100 ];
     sprintf( buffer, "%s%s.raw", p_path, p_name );
     FILE* fd = fopen( buffer, "rb" );
 
@@ -792,6 +800,7 @@ bool loadNavScreen( u16* p_layer, const char* p_name, int p_no ) {
         return true;
     }
 
+    char buffer[ 100 ];
     sprintf( buffer, "nitro:/PICS/NAV/%s.raw", p_name );
     FILE* fd = fopen( buffer, "rb" );
 
@@ -829,7 +838,7 @@ int borders[ 6 ][ 2 ] = {
 };
 
 extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
-extern OAMTable *oam;
+extern OAMTable *Oam;
 
 int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     const int BYTES_PER_16_COLOR_TILE = 32;
@@ -1411,10 +1420,10 @@ int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
 void setMainSpriteVisibility( bool p_hidden ) {
     for( int i = 2; i <= 7; ++i )
         if( i == 2 && !SAV.m_hasPKMN )
-            setSpriteVisibility( &oam->oamBuffer[ i ], true );
+            setSpriteVisibility( &Oam->oamBuffer[ i ], true );
         else
-            setSpriteVisibility( &oam->oamBuffer[ i ], p_hidden );
-    updateOAMSub( oam );
+            setSpriteVisibility( &Oam->oamBuffer[ i ], p_hidden );
+    updateOAMSub( Oam );
 }
 
 void drawSub( ) {
@@ -1434,19 +1443,19 @@ void drawSub( ) {
 
 void screenLoader::draw( int p_mode ) {
     _pos = p_mode;
-    SpriteEntry * back = &oam->oamBuffer[ BACK_ID ];
+    SpriteEntry * back = &Oam->oamBuffer[ BACK_ID ];
     setSpriteVisibility( back, false );
     if( p_mode == 0 ) {
         drawSub( );
         setMainSpriteVisibility( true );
 
         for( int i = 0; i < 3; ++i ) {
-            oam->oamBuffer[ 90 + i ].isHidden = false;
-            oam->oamBuffer[ 90 + i ].x = mainSpritesPositions[ 2 * i ][ 0 ] - 16;
-            oam->oamBuffer[ 90 + i ].y = mainSpritesPositions[ 2 * i ][ 1 ] - 16;
-            oam->oamBuffer[ 90 + i ].priority = OBJPRIORITY_1;
+            Oam->oamBuffer[ 90 + i ].isHidden = false;
+            Oam->oamBuffer[ 90 + i ].x = mainSpritesPositions[ 2 * i ][ 0 ] - 16;
+            Oam->oamBuffer[ 90 + i ].y = mainSpritesPositions[ 2 * i ][ 1 ] - 16;
+            Oam->oamBuffer[ 90 + i ].priority = OBJPRIORITY_1;
         }
-        updateOAMSub( oam );
+        updateOAMSub( Oam );
     } else if( p_mode == 1 ) {
         loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen2" );
         consoleSelect( &Bottom );
@@ -1456,8 +1465,8 @@ void screenLoader::draw( int p_mode ) {
         setMainSpriteVisibility( true );
 
         for( int i = 0; i < 3; ++i )
-            oam->oamBuffer[ 90 + i ].isHidden = true;
-        updateOAMSub( oam );
+            Oam->oamBuffer[ 90 + i ].isHidden = true;
+        updateOAMSub( Oam );
     } else if( p_mode == 2 ) {
         loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen3" );
         consoleSelect( &Bottom );
@@ -1466,8 +1475,8 @@ void screenLoader::draw( int p_mode ) {
         acMapRegion = KANTO;
         setMainSpriteVisibility( true );
         for( int i = 0; i < 3; ++i )
-            oam->oamBuffer[ 90 + i ].isHidden = true;
-        updateOAMSub( oam );
+            Oam->oamBuffer[ 90 + i ].isHidden = true;
+        updateOAMSub( Oam );
     } else if( p_mode == 3 ) {
         loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen2_BG3_KJ" );
         consoleSelect( &Bottom );
@@ -1476,25 +1485,25 @@ void screenLoader::draw( int p_mode ) {
         acMapRegion = JOHTO;
         setMainSpriteVisibility( true );
         for( int i = 0; i < 3; ++i )
-            oam->oamBuffer[ 90 + i ].isHidden = true;
-        updateOAMSub( oam );
+            Oam->oamBuffer[ 90 + i ].isHidden = true;
+        updateOAMSub( Oam );
     } else {
 
         drawSub( );
         setSpriteVisibility( back, true );
         setMainSpriteVisibility( false );
         for( int i = 0; i < 3; ++i )
-            oam->oamBuffer[ 90 + i ].isHidden = true;
-        updateOAMSub( oam );
-        /*initOAMTableSub(oam);
-        initMainSprites(oam,spriteInfo);*/
+            Oam->oamBuffer[ 90 + i ].isHidden = true;
+        updateOAMSub( Oam );
+        /*initOAMTableSub(Oam);
+        initMainSprites(Oam,spriteInfo);*/
     }
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
 }
 void screenLoader::init( ) {
     //initVideoSub();
-    initOAMTableSub( oam );
-    initMainSprites( oam, spriteInfo );
+    initOAMTableSub( Oam );
+    initMainSprites( Oam, spriteInfo );
     this->draw( this->_pos );
 }
 
@@ -1521,6 +1530,7 @@ void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const int& p_pkmnI
     Item->x = p_posX;
     Item->y = p_posY;
 
+    char buffer[ 100 ];
     sprintf( buffer, "%d/Icon_%d", p_pkmnId, p_pkmnId );
     if( p_subScreen ) {
         if( !loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/pokemon/", buffer, 128, 16 ) ) {
@@ -1571,6 +1581,7 @@ void drawEggIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const int p_posX, c
     Item->x = p_posX;
     Item->y = p_posY;
 
+    char buffer[ 100 ];
     sprintf( buffer, "Icon_egg" );
     if( p_subScreen ) {
         if( !loadSpriteSub( ItemInfo, "nitro:/PICS/ICONS/", buffer, 128, 16 ) ) {
@@ -1649,7 +1660,7 @@ void drawItemIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string&
 void initTop( ) {
     consoleSelect( &Top );
     printf( "\x1b[39m" );	int a = 0, b = 0, c = 0;
-    initOAMTable( oamTop );
+    initOAMTable( OamTop );
     cust_font.setColor( 0, 0 );
     cust_font.setColor( 251, 1 );
     cust_font.setColor( 252, 2 );
@@ -1661,15 +1672,15 @@ void initTop( ) {
     for( size_t i = 0; i < SAV.m_PkmnTeam.size( ); i++ ) {
         if( !SAV.m_PkmnTeam[ i ].m_boxdata.m_IV.m_isEgg ) {
             if( i % 2 == 0 ) {
-                drawPKMNIcon( oamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_SPEC, borders[ i ][ 0 ] * 8 - 28, borders[ i ][ 1 ] * 8, a, b, c, false );
+                drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_SPEC, borders[ i ][ 0 ] * 8 - 28, borders[ i ][ 1 ] * 8, a, b, c, false );
                 BATTLE::displayHP( 100, 101, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
                 BATTLE::displayHP( 100, 100 - SAV.m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV.m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
             } else {
-                drawPKMNIcon( oamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_SPEC, borders[ i ][ 0 ] * 8 + 76, borders[ i ][ 1 ] * 8, a, b, c, false );
+                drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_SPEC, borders[ i ][ 0 ] * 8 + 76, borders[ i ][ 1 ] * 8, a, b, c, false );
                 BATTLE::displayHP( 100, 101, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
                 BATTLE::displayHP( 100, 100 - SAV.m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV.m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
             }
-            updateOAM( oamTop );
+            updateOAM( OamTop );
             char buf[ 100 ];
 
             int mval = 1 + ( ( i / 2 == 1 ) ? 4 : 8 );
@@ -1699,14 +1710,14 @@ void initTop( ) {
             cust_font.print_string( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
             if( i % 2 == 0 ) {
-                drawEggIcon( oamTop, spriteInfoTop, borders[ i ][ 0 ] * 8 - 28, borders[ i ][ 1 ] * 8, a, b, c, false );
+                drawEggIcon( OamTop, spriteInfoTop, borders[ i ][ 0 ] * 8 - 28, borders[ i ][ 1 ] * 8, a, b, c, false );
             } else {
-                drawEggIcon( oamTop, spriteInfoTop, borders[ i ][ 0 ] * 8 + 76, borders[ i ][ 1 ] * 8, a, b, c, false );
+                drawEggIcon( OamTop, spriteInfoTop, borders[ i ][ 0 ] * 8 + 76, borders[ i ][ 1 ] * 8, a, b, c, false );
             }
-            updateOAM( oamTop );
+            updateOAM( OamTop );
         }
     }
-    updateOAM( oamTop );
+    updateOAM( OamTop );
 }
 void clearTop( ) {
     consoleSelect( &Top );
@@ -1714,7 +1725,7 @@ void clearTop( ) {
         consoleSetWindow( &Top, borders[ i ][ 0 ], borders[ i ][ 1 ], 12, 6 );
         consoleClear( );
     }
-    initOAMTable( oamTop );
+    initOAMTable( OamTop );
 }
 
 int fieldCnt = 0;
@@ -1724,10 +1735,10 @@ void initSub( int pkmIdx ) {
     consoleSetWindow( &Bottom, 16, 0, 16, 16 );
     consoleClear( );
     for( int i = 0; i < 6; ++i ) {
-        oam->oamBuffer[ 15 + 2 * i ].isHidden = true;
-        oam->oamBuffer[ 16 + 2 * i ].isHidden = true;
+        Oam->oamBuffer[ 15 + 2 * i ].isHidden = true;
+        Oam->oamBuffer[ 16 + 2 * i ].isHidden = true;
     }
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
     if( pkmIdx < 0 || pkmIdx >= (int)SAV.m_PkmnTeam.size( ) || SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_IV.m_isEgg ) {
         consoleSelect( &Top );
         return;
@@ -1736,41 +1747,41 @@ void initSub( int pkmIdx ) {
     for( int i = 0; i < 4; ++i )
         if( SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_Attack[ i ] < MAXATTACK &&
             AttackList[ SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_Attack[ i ] ]->m_isFieldAttack ) {
-        oam->oamBuffer[ 15 + 2 * ( u ) ].isHidden = false;
-        oam->oamBuffer[ 16 + 2 * ( u ) ].isHidden = false;
-        oam->oamBuffer[ 15 + 2 * ( u ) ].y = -7 + 24 * u;
-        oam->oamBuffer[ 16 + 2 * ( u ) ].y = -7 + 24 * u;
+        Oam->oamBuffer[ 15 + 2 * ( u ) ].isHidden = false;
+        Oam->oamBuffer[ 16 + 2 * ( u ) ].isHidden = false;
+        Oam->oamBuffer[ 15 + 2 * ( u ) ].y = -7 + 24 * u;
+        Oam->oamBuffer[ 16 + 2 * ( u ) ].y = -7 + 24 * u;
 
-        oam->oamBuffer[ 15 + 2 * ( u ) ].x = 152;
-        oam->oamBuffer[ 16 + 2 * ( u ) ].x = 192 + 24;
-        updateOAMSub( oam );
+        Oam->oamBuffer[ 15 + 2 * ( u ) ].x = 152;
+        Oam->oamBuffer[ 16 + 2 * ( u ) ].x = 192 + 24;
+        updateOAMSub( Oam );
 
         consoleSetWindow( &Bottom, 16, 3 * u + 1, 16, 16 );
         printf( "    %s", AttackList[ SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_Attack[ i ] ]->m_moveName.c_str( ) );
         ++u;
         }
     if( SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_Item ) {
-        oam->oamBuffer[ 15 + 2 * ( u ) ].isHidden = false;
-        oam->oamBuffer[ 16 + 2 * ( u ) ].isHidden = false;
-        oam->oamBuffer[ 15 + 2 * ( u ) ].y = -7 + 24 * u;
-        oam->oamBuffer[ 16 + 2 * ( u ) ].y = -7 + 24 * u;
+        Oam->oamBuffer[ 15 + 2 * ( u ) ].isHidden = false;
+        Oam->oamBuffer[ 16 + 2 * ( u ) ].isHidden = false;
+        Oam->oamBuffer[ 15 + 2 * ( u ) ].y = -7 + 24 * u;
+        Oam->oamBuffer[ 16 + 2 * ( u ) ].y = -7 + 24 * u;
 
-        oam->oamBuffer[ 15 + 2 * ( u ) ].x = 152;
-        oam->oamBuffer[ 16 + 2 * ( u ) ].x = 192 + 24;
-        updateOAMSub( oam );
+        Oam->oamBuffer[ 15 + 2 * ( u ) ].x = 152;
+        Oam->oamBuffer[ 16 + 2 * ( u ) ].x = 192 + 24;
+        updateOAMSub( Oam );
 
         consoleSetWindow( &Bottom, 16, 3 * u + 1, 16, 16 );
         printf( "    Item nehmen" );
     }
     int s = u + SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_Item;
-    oam->oamBuffer[ 15 + 2 * ( s ) ].isHidden = false;
-    oam->oamBuffer[ 16 + 2 * ( s ) ].isHidden = false;
-    oam->oamBuffer[ 15 + 2 * ( s ) ].y = -7 + 24 * u;
-    oam->oamBuffer[ 16 + 2 * ( s ) ].y = -7 + 24 * u;
+    Oam->oamBuffer[ 15 + 2 * ( s ) ].isHidden = false;
+    Oam->oamBuffer[ 16 + 2 * ( s ) ].isHidden = false;
+    Oam->oamBuffer[ 15 + 2 * ( s ) ].y = -7 + 24 * u;
+    Oam->oamBuffer[ 16 + 2 * ( s ) ].y = -7 + 24 * u;
 
-    oam->oamBuffer[ 15 + 2 * ( s ) ].x = 152;
-    oam->oamBuffer[ 16 + 2 * ( s ) ].x = 192 + 24;
-    updateOAMSub( oam );
+    Oam->oamBuffer[ 15 + 2 * ( s ) ].x = 152;
+    Oam->oamBuffer[ 16 + 2 * ( s ) ].x = 192 + 24;
+    updateOAMSub( Oam );
 
     consoleSetWindow( &Bottom, 16, 3 * s + 1, 16, 16 );
     printf( "    Dexeintrag" );
@@ -1805,20 +1816,20 @@ void screenLoader::run_pkmn( ) {
     else
         printf( "<" );
 
-    SpriteEntry * back = &oam->oamBuffer[ BACK_ID ];
-    SpriteEntry * save = &oam->oamBuffer[ SAVE_ID ];
+    SpriteEntry * back = &Oam->oamBuffer[ BACK_ID ];
+    SpriteEntry * save = &Oam->oamBuffer[ SAVE_ID ];
     setSpriteVisibility( back, false );
     setSpriteVisibility( save, true );
     setMainSpriteVisibility( true );
-    oam->oamBuffer[ 8 ].isHidden = false;
-    oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
-    oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
-    updateOAMSub( oam );
+    Oam->oamBuffer[ 8 ].isHidden = false;
+    Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
+    Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
+    updateOAMSub( Oam );
 
     while( 1 ) {
         updateTime( );
         consoleSelect( &Top );
-        updateOAMSub( oam );
+        updateOAMSub( Oam );
 
         swiWaitForVBlank( );
         scanKeys( );
@@ -1850,8 +1861,8 @@ void screenLoader::run_pkmn( ) {
             }
             consoleClear( );
             clearTop( );
-            oam->oamBuffer[ 8 ].isHidden = true;
-            updateOAMSub( oam );
+            Oam->oamBuffer[ 8 ].isHidden = true;
+            updateOAMSub( Oam );
             swiWaitForVBlank( );
             while( 1 ) {
                 initSub( -1 );
@@ -1864,22 +1875,22 @@ void screenLoader::run_pkmn( ) {
                     clearTop( );
                     initSub( -1 );
 
-                    initOAMTableSub( oam );
-                    initMainSprites( oam, spriteInfo );
+                    initOAMTableSub( Oam );
+                    initMainSprites( Oam, spriteInfo );
                     setSpriteVisibility( back, true );
                     setSpriteVisibility( save, false );
                     setMainSpriteVisibility( false );
-                    oam->oamBuffer[ 8 ].isHidden = true;
+                    Oam->oamBuffer[ 8 ].isHidden = true;
                     return;
                 } else if( p & KEY_B ) {
-                    initOAMTableSub( oam );
-                    initMainSprites( oam, spriteInfo );
+                    initOAMTableSub( Oam );
+                    initMainSprites( Oam, spriteInfo );
                     setSpriteVisibility( back, false );
                     setSpriteVisibility( save, true );
                     setMainSpriteVisibility( true );
-                    oam->oamBuffer[ 8 ].isHidden = false;
-                    oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
-                    oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
+                    Oam->oamBuffer[ 8 ].isHidden = false;
+                    Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
+                    Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
 
                     loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNScreen" );
                     drawSub( );
@@ -1950,21 +1961,21 @@ void screenLoader::run_pkmn( ) {
 
             initSub( -1 );
             setSpriteVisibility( back, true );
-            oam->oamBuffer[ 8 ].isHidden = true;
-            oam->oamBuffer[ 8 ].x = SCREEN_WIDTH - 28;
-            oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT - 28;
-            updateOAMSub( oam );
+            Oam->oamBuffer[ 8 ].isHidden = true;
+            Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH - 28;
+            Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT - 28;
+            updateOAMSub( Oam );
             sprintf( buf, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( ).c_str( ), SAV.m_PkmnTeam[ acIn ].m_boxdata.m_Name );
             messageBox( buf, true, true );
             SAV.m_bag.addItem( acI.getItemType( ), acI.getItemId( ), 1 );
 
-            oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
-            oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
+            Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
+            Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
             loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNScreen" );
             initTop( );
             setSpriteVisibility( back, false );
-            oam->oamBuffer[ 8 ].isHidden = false;
-            updateOAMSub( oam );
+            Oam->oamBuffer[ 8 ].isHidden = false;
+            updateOAMSub( Oam );
             initSub( acIn );
         } else if( touch.px >= 152 && touch.py >= ( -7 + 24 * ( SAV.m_PkmnTeam[ acIn ].m_boxdata.m_Item + fieldCnt ) ) && touch.py < ( 17 + 24 * ( fieldCnt + SAV.m_PkmnTeam[ acIn ].m_boxdata.m_Item ) ) ) {
             while( 1 ) {
@@ -1979,24 +1990,24 @@ void screenLoader::run_pkmn( ) {
 
             initSub( -1 );
             setSpriteVisibility( back, true );
-            oam->oamBuffer[ 8 ].isHidden = true;
-            oam->oamBuffer[ 8 ].x = SCREEN_WIDTH - 28;
-            oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT - 28;
-            updateOAMSub( oam );
+            Oam->oamBuffer[ 8 ].isHidden = true;
+            Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH - 28;
+            Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT - 28;
+            updateOAMSub( Oam );
 
             this->run_dex( SAV.m_PkmnTeam[ acIn ].m_boxdata.m_SPEC - 1 );
 
             setSpriteVisibility( back, false );
             setSpriteVisibility( save, true );
             setMainSpriteVisibility( true );
-            oam->oamBuffer[ 8 ].isHidden = false;
-            oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
-            oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
+            Oam->oamBuffer[ 8 ].isHidden = false;
+            Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
+            Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
             loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNScreen" );
             initTop( );
             setSpriteVisibility( back, false );
-            oam->oamBuffer[ 8 ].isHidden = false;
-            updateOAMSub( oam );
+            Oam->oamBuffer[ 8 ].isHidden = false;
+            updateOAMSub( Oam );
             initSub( acIn );
             consoleSetWindow( &Top, positions[ acIn ][ 0 ], positions[ acIn ][ 1 ], 2, 2 );
             if( acIn & 1 )
@@ -2026,12 +2037,12 @@ void screenLoader::run_pkmn( ) {
                 clearTop( );
                 initSub( -1 );
 
-                initOAMTableSub( oam );
-                initMainSprites( oam, spriteInfo );
+                initOAMTableSub( Oam );
+                initMainSprites( Oam, spriteInfo );
                 setSpriteVisibility( back, true );
                 setSpriteVisibility( save, false );
                 setMainSpriteVisibility( false );
-                oam->oamBuffer[ 8 ].isHidden = true;
+                Oam->oamBuffer[ 8 ].isHidden = true;
 
                 this->draw( -1 );
                 initMapSprites( );
@@ -2046,22 +2057,22 @@ void screenLoader::run_pkmn( ) {
             } else {
                 initSub( -1 );
 
-                initOAMTableSub( oam );
-                initMainSprites( oam, spriteInfo );
+                initOAMTableSub( Oam );
+                initMainSprites( Oam, spriteInfo );
                 setSpriteVisibility( back, true );
                 setSpriteVisibility( save, false );
                 setMainSpriteVisibility( true );
-                oam->oamBuffer[ 8 ].isHidden = true;
+                Oam->oamBuffer[ 8 ].isHidden = true;
                 //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
                 messageBox( "Diese Attacke kann jetzt\nnicht eingesetzt werden.", "PokéNav" );
 
                 setSpriteVisibility( back, false );
                 setSpriteVisibility( save, true );
                 setMainSpriteVisibility( true );
-                oam->oamBuffer[ 8 ].isHidden = false;
-                oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
-                oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 8 ].isHidden = false;
+                Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
+                Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
+                updateOAMSub( Oam );
                 initSub( acIn );
                 //initTop();
             }
@@ -2074,12 +2085,12 @@ void screenLoader::run_pkmn( ) {
     clearTop( );
     initSub( -1 );
 
-    initOAMTableSub( oam );
-    initMainSprites( oam, spriteInfo );
+    initOAMTableSub( Oam );
+    initMainSprites( Oam, spriteInfo );
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, false );
     setMainSpriteVisibility( false );
-    oam->oamBuffer[ 8 ].isHidden = true;
+    Oam->oamBuffer[ 8 ].isHidden = true;
 }
 
 const int dexsppos[ 2 ][ 9 ] = { { 160, 128, 96, 19, 6, 120, 158, 196, 8 }, { -16, 0, 24, 138, 173, 108, 126, 144, 32 } };
@@ -2613,7 +2624,7 @@ void formes( OAMTable *p_oam, SpriteInfo * p_spriteInfo, int& p_oamIndex, int& p
     p_tileCnt += BigCirc1TilesLen / BYTES_PER_16_COLOR_TILE;
     if( p_pkmnId == 0 ) {
         updateOAM( p_oam );
-        loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, p_female );
+        loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, p_female );
         return;
     } else {
         for( int i = p_oamIndex; i > p_oamIndex - 8; --i )
@@ -2622,11 +2633,11 @@ void formes( OAMTable *p_oam, SpriteInfo * p_spriteInfo, int& p_oamIndex, int& p
             else
                 p_oam->oamBuffer[ i ].x += 50;
         updateOAM( p_oam );
-        if( !loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 - 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, p_female, true ) )
-            loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 - 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, !p_female, true );
+        if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 - 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, p_female, true ) )
+            loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 - 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, !p_female, true );
         --p_palCnt;
-        if( !loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 + 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, true, p_female ) )
-            loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 + 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, true, !p_female );
+        if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 + 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, true, p_female ) )
+            loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 + 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, true, !p_female );
     }
     SpriteInfo * C1Info = &p_spriteInfo[ ++p_oamIndex ];
     SpriteEntry * C1 = &p_oam->oamBuffer[ p_oamIndex ];
@@ -2693,7 +2704,7 @@ void formes( OAMTable *p_oam, SpriteInfo * p_spriteInfo, int& p_oamIndex, int& p
     updateOAM( p_oam );
 }
 void drawTopDexPage( int p_page, int p_pkmnId, int p_pkmnFormeId = 0 ) {
-    initOAMTable( oamTop );
+    initOAMTable( OamTop );
     consoleSetWindow( &Top, 0, 0, 32, 24 );
     consoleSelect( &Top );
     printf( "\x1b[37m" );
@@ -2725,11 +2736,11 @@ void drawTopDexPage( int p_page, int p_pkmnId, int p_pkmnFormeId = 0 ) {
                 POKEMON::PKMNDATA::getAll( newformepkmn, acpkmndata );
 
             BG_PALETTE[ 1 ] = POKEMON::PKMNDATA::getColor( acpkmndata.m_types[ 0 ] );
-            drawPKMNIcon( oamTop, spriteInfoTop, ( p_pkmnId == 493 || p_pkmnId == 649 ) ? p_pkmnId : newformepkmn, 0, 8, a, b, c, false );
-            drawTypeIcon( oamTop, spriteInfoTop, a, b, c, acpkmndata.m_types[ 0 ], 33, 35, false );
+            drawPKMNIcon( OamTop, spriteInfoTop, ( p_pkmnId == 493 || p_pkmnId == 649 ) ? p_pkmnId : newformepkmn, 0, 8, a, b, c, false );
+            drawTypeIcon( OamTop, spriteInfoTop, a, b, c, acpkmndata.m_types[ 0 ], 33, 35, false );
             if( acpkmndata.m_types[ 0 ] != acpkmndata.m_types[ 1 ] )
-                drawTypeIcon( oamTop, spriteInfoTop, a, b, c, acpkmndata.m_types[ 1 ], 65, 35, false );
-            updateOAM( oamTop );
+                drawTypeIcon( OamTop, spriteInfoTop, a, b, c, acpkmndata.m_types[ 1 ], 65, 35, false );
+            updateOAM( OamTop );
             printf( "\n    Du hast %i dieser pokemon.\n\n", box_of_st_pkmn[ p_pkmnId - 1 ].size( ) );
             char buf[ 50 ];
             sprintf( buf, "%s", POKEMON::PKMNDATA::getDisplayName( p_pkmnId ) );
@@ -2775,9 +2786,9 @@ void drawTopDexPage( int p_page, int p_pkmnId, int p_pkmnFormeId = 0 ) {
         }
         case 2:{
             if( SAV.m_inDex[ p_pkmnId - 1 ] ) {
-                formes( oamTop, spriteInfoTop, a, b, c, newformepkmn, p_pkmnFormeId % 2, acG );
+                formes( OamTop, spriteInfoTop, a, b, c, newformepkmn, p_pkmnFormeId % 2, acG );
             } else
-                formes( oamTop, spriteInfoTop, a, b, c, 0, 0, POKEMON::GENDERLESS );
+                formes( OamTop, spriteInfoTop, a, b, c, 0, 0, POKEMON::GENDERLESS );
             break;
         }
         case 4:{
@@ -2809,10 +2820,10 @@ void screenLoader::run_dex( int p_pkmnId ) {
     loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "DexTop", 32 );
 
     drawSub( );
-    initOAMTableSub( oam );
-    initOAMTable( oamTop );
+    initOAMTableSub( Oam );
+    initOAMTable( OamTop );
     int palcnt = 0, tilecnt = 0, oamInd = 0;
-    initDexSprites( oam, spriteInfo, oamInd, palcnt, tilecnt );
+    initDexSprites( Oam, spriteInfo, oamInd, palcnt, tilecnt );
 
     consoleSetWindow( &Bottom, 0, 0, 32, 24 );
     consoleSelect( &Bottom );
@@ -2827,18 +2838,18 @@ void screenLoader::run_dex( int p_pkmnId ) {
     for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
         if( i == acNum ) {
         drawTopDexPage( acPage, i + 1, acForme );
-        loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true );
+        loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true );
         --j;
         continue;
         } else
-            drawPKMNIcon( oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+            drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
 
         spriteInfo[ 16 ].entry->isHidden = true;
-        updateOAMSub( oam );
+        updateOAMSub( Oam );
         while( 42 ) {
             updateTime( );
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             touchRead( &t );
             scanKeys( );
             int pressed = keysDown( ), up = keysUp( ), held = keysHeld( );
@@ -2865,9 +2876,9 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        drawPKMNIcon( oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( pressed & KEY_UP ) || ( ( held & ~up ) & KEY_UP ) ) {
                 scanKeys( );
@@ -2879,9 +2890,9 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        drawPKMNIcon( oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( pressed & KEY_R ) || ( ( held & ~up ) & KEY_R ) ) {
                 scanKeys( );
@@ -2893,9 +2904,9 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        drawPKMNIcon( oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( pressed & KEY_L ) || ( ( held & ~up ) & KEY_L ) ) {
                 scanKeys( );
@@ -2907,9 +2918,9 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        drawPKMNIcon( oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( pressed & KEY_LEFT ) ) {
                 while( 1 ) {
@@ -2924,7 +2935,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 spriteInfo[ 16 + acPage ].entry->isHidden = false;
                 acPage = ( acPage + 2 ) % 3;
                 spriteInfo[ 16 + acPage ].entry->isHidden = true;
-                updateOAMSub( oam );
+                updateOAMSub( Oam );
                 drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, acNum + 1, acForme );
             } else if( ( pressed & KEY_RIGHT ) ) {
                 while( 1 ) {
@@ -2939,7 +2950,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 spriteInfo[ 16 + acPage ].entry->isHidden = false;
                 acPage = ( acPage + 1 ) % 3;
                 spriteInfo[ 16 + acPage ].entry->isHidden = true;
-                updateOAMSub( oam );
+                updateOAMSub( Oam );
                 drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, acNum + 1, acForme );
             } else if( ( pressed & KEY_SELECT ) ) {
                 if( acPage > 1 )
@@ -2971,9 +2982,9 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        drawPKMNIcon( oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                 }
             for( int q = 5; q < 8; ++q )
                 if( sqrt( sq( dexsppos[ 0 ][ q ] - t.px + 16 ) + sq( dexsppos[ 1 ][ q ] - t.py + 16 ) ) <= 16 ) {
@@ -2990,7 +3001,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 spriteInfo[ 16 + acPage ].entry->isHidden = false;
                 acPage = ( q + 1 ) % 3;
                 spriteInfo[ 16 + acPage ].entry->isHidden = true;
-                updateOAMSub( oam );
+                updateOAMSub( Oam );
                 drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, acNum + 1, acForme );
                 }
         }
@@ -3000,13 +3011,13 @@ void screenLoader::run_dex( int p_pkmnId ) {
         consoleSetWindow( &Top, 0, 0, 32, 24 );
         consoleSelect( &Top );
         consoleClear( );
-        initOAMTable( oamTop );
-        initOAMTableSub( oam );
-        initMainSprites( oam, spriteInfo );
+        initOAMTable( OamTop );
+        initOAMTableSub( Oam );
+        initMainSprites( Oam, spriteInfo );
         setMainSpriteVisibility( false );
-        oam->oamBuffer[ 8 ].isHidden = true;
-        oam->oamBuffer[ 0 ].isHidden = true;
-        oam->oamBuffer[ 1 ].isHidden = false;
+        Oam->oamBuffer[ 8 ].isHidden = true;
+        Oam->oamBuffer[ 0 ].isHidden = true;
+        Oam->oamBuffer[ 1 ].isHidden = false;
 }
 
 #define MAXITEMSPERPAGE 12
@@ -3476,19 +3487,19 @@ const std::string choi[ 6 ] = { "\nEinsetzen.", "\nEinem pokemon geben.", "\nReg
 int getAnswer( item::itemType p_bagtype ) {
     touchPosition t;
     if( p_bagtype != item::BERRIES ) {
-        ( oam->oamBuffer[ 20 ] ).isHidden = false;
-        ( oam->oamBuffer[ 21 ] ).isHidden = false;
-        ( oam->oamBuffer[ 29 ] ).isHidden = false;
-        ( oam->oamBuffer[ 24 ] ).isHidden = false;
-        ( oam->oamBuffer[ 25 ] ).isHidden = false;
-        ( oam->oamBuffer[ 28 ] ).isHidden = false;
-        ( oam->oamBuffer[ 20 ] ).y -= 32;
-        ( oam->oamBuffer[ 21 ] ).y -= 32;
-        ( oam->oamBuffer[ 28 ] ).y -= 32;
-        ( oam->oamBuffer[ 24 ] ).y -= 32;
-        ( oam->oamBuffer[ 25 ] ).y -= 32;
-        ( oam->oamBuffer[ 29 ] ).y -= 32;
-        updateOAMSub( oam );
+        ( Oam->oamBuffer[ 20 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 21 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 29 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 24 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 25 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 28 ] ).isHidden = false;
+        ( Oam->oamBuffer[ 20 ] ).y -= 32;
+        ( Oam->oamBuffer[ 21 ] ).y -= 32;
+        ( Oam->oamBuffer[ 28 ] ).y -= 32;
+        ( Oam->oamBuffer[ 24 ] ).y -= 32;
+        ( Oam->oamBuffer[ 25 ] ).y -= 32;
+        ( Oam->oamBuffer[ 29 ] ).y -= 32;
+        updateOAMSub( Oam );
 
         consoleSetWindow( &Bottom, 5, 9, 22, 3 );
         printf( choi[ 0 ].c_str( ) );
@@ -3502,7 +3513,7 @@ int getAnswer( item::itemType p_bagtype ) {
         while( 42 ) {
             updateTime( );
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             scanKeys( );
             touchRead( &t );
             if( t.px > 224 && t.py > 164 ) {
@@ -3521,10 +3532,10 @@ int getAnswer( item::itemType p_bagtype ) {
             }
 
             if( t.px > 31 && t.py > 67 && t.px < 225 && t.py < 101 ) {
-                ( oam->oamBuffer[ 20 ] ).isHidden = true;
-                ( oam->oamBuffer[ 21 ] ).isHidden = true;
-                ( oam->oamBuffer[ 28 ] ).isHidden = true;
-                updateOAMSub( oam );
+                ( Oam->oamBuffer[ 20 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 21 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 28 ] ).isHidden = true;
+                updateOAMSub( Oam );
                 while( 1 ) {
                     swiWaitForVBlank( );
                     scanKeys( );
@@ -3533,25 +3544,25 @@ int getAnswer( item::itemType p_bagtype ) {
                     if( t.px == 0 && t.py == 0 )
                         break;
                 }
-                ( oam->oamBuffer[ 24 ] ).isHidden = true;
-                ( oam->oamBuffer[ 25 ] ).isHidden = true;
-                ( oam->oamBuffer[ 29 ] ).isHidden = true;
-                ( oam->oamBuffer[ 20 ] ).y += 32;
-                ( oam->oamBuffer[ 21 ] ).y += 32;
-                ( oam->oamBuffer[ 28 ] ).y += 32;
-                ( oam->oamBuffer[ 24 ] ).y += 32;
-                ( oam->oamBuffer[ 25 ] ).y += 32;
-                ( oam->oamBuffer[ 29 ] ).y += 32;
-                updateOAMSub( oam );
+                ( Oam->oamBuffer[ 24 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 25 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 29 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 20 ] ).y += 32;
+                ( Oam->oamBuffer[ 21 ] ).y += 32;
+                ( Oam->oamBuffer[ 28 ] ).y += 32;
+                ( Oam->oamBuffer[ 24 ] ).y += 32;
+                ( Oam->oamBuffer[ 25 ] ).y += 32;
+                ( Oam->oamBuffer[ 29 ] ).y += 32;
+                updateOAMSub( Oam );
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                 consoleClear( );
 
                 return 0;
             } else if( t.px > 31 && t.py > 99 && t.px < 225 && t.py < 143 ) {
-                ( oam->oamBuffer[ 24 ] ).isHidden = true;
-                ( oam->oamBuffer[ 25 ] ).isHidden = true;
-                ( oam->oamBuffer[ 29 ] ).isHidden = true;
-                updateOAMSub( oam );
+                ( Oam->oamBuffer[ 24 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 25 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 29 ] ).isHidden = true;
+                updateOAMSub( Oam );
                 while( 1 ) {
                     swiWaitForVBlank( );
                     scanKeys( );
@@ -3560,16 +3571,16 @@ int getAnswer( item::itemType p_bagtype ) {
                     if( t.px == 0 && t.py == 0 )
                         break;
                 }
-                ( oam->oamBuffer[ 20 ] ).isHidden = true;
-                ( oam->oamBuffer[ 21 ] ).isHidden = true;
-                ( oam->oamBuffer[ 28 ] ).isHidden = true;
-                ( oam->oamBuffer[ 20 ] ).y += 32;
-                ( oam->oamBuffer[ 21 ] ).y += 32;
-                ( oam->oamBuffer[ 28 ] ).y += 32;
-                ( oam->oamBuffer[ 24 ] ).y += 32;
-                ( oam->oamBuffer[ 25 ] ).y += 32;
-                ( oam->oamBuffer[ 29 ] ).y += 32;
-                updateOAMSub( oam );
+                ( Oam->oamBuffer[ 20 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 21 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 28 ] ).isHidden = true;
+                ( Oam->oamBuffer[ 20 ] ).y += 32;
+                ( Oam->oamBuffer[ 21 ] ).y += 32;
+                ( Oam->oamBuffer[ 28 ] ).y += 32;
+                ( Oam->oamBuffer[ 24 ] ).y += 32;
+                ( Oam->oamBuffer[ 25 ] ).y += 32;
+                ( Oam->oamBuffer[ 29 ] ).y += 32;
+                updateOAMSub( Oam );
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                 consoleClear( );
 
@@ -3578,13 +3589,13 @@ int getAnswer( item::itemType p_bagtype ) {
         }
     } else {
         for( int i = 0; i < 3; ++i ) {
-            ( oam->oamBuffer[ 17 + 4 * i ] ).isHidden = false;
-            ( oam->oamBuffer[ 17 + 4 * i ] ).y -= 16;
-            ( oam->oamBuffer[ 16 + 4 * i ] ).isHidden = false;
-            ( oam->oamBuffer[ 16 + 4 * i ] ).y -= 16;
-            ( oam->oamBuffer[ 27 + i ] ).isHidden = false;
-            ( oam->oamBuffer[ 27 + i ] ).y -= 16;
-            updateOAMSub( oam );
+            ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = false;
+            ( Oam->oamBuffer[ 17 + 4 * i ] ).y -= 16;
+            ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = false;
+            ( Oam->oamBuffer[ 16 + 4 * i ] ).y -= 16;
+            ( Oam->oamBuffer[ 27 + i ] ).isHidden = false;
+            ( Oam->oamBuffer[ 27 + i ] ).y -= 16;
+            updateOAMSub( Oam );
             consoleSetWindow( &Bottom, 5, 7 + 4 * i, 22, 3 );
             if( i == 2 )
                 ++i;
@@ -3593,7 +3604,7 @@ int getAnswer( item::itemType p_bagtype ) {
         while( 42 ) {
             updateTime( );
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             scanKeys( );
             touchRead( &t );
             if( t.px>224 && t.py > 164 ) {
@@ -3611,10 +3622,10 @@ int getAnswer( item::itemType p_bagtype ) {
                 return 4;
             }
             if( t.px > 31 && t.py > 51 && t.px < 225 && t.py < 85 ) {
-                oam->oamBuffer[ 17 ].isHidden = true;
-                oam->oamBuffer[ 16 ].isHidden = true;
-                oam->oamBuffer[ 27 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 17 ].isHidden = true;
+                Oam->oamBuffer[ 16 ].isHidden = true;
+                Oam->oamBuffer[ 27 ].isHidden = true;
+                updateOAMSub( Oam );
                 while( 1 ) {
                     swiWaitForVBlank( );
                     scanKeys( );
@@ -3626,20 +3637,20 @@ int getAnswer( item::itemType p_bagtype ) {
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                 consoleClear( );
                 for( int i = 0; i < 3; ++i ) {
-                    ( oam->oamBuffer[ 17 + 4 * i ] ).isHidden = true;
-                    ( oam->oamBuffer[ 17 + 4 * i ] ).y += 16;
-                    ( oam->oamBuffer[ 16 + 4 * i ] ).isHidden = true;
-                    ( oam->oamBuffer[ 16 + 4 * i ] ).y += 16;
-                    ( oam->oamBuffer[ 27 + i ] ).isHidden = true;
-                    ( oam->oamBuffer[ 27 + i ] ).y += 16;
-                    updateOAMSub( oam );
+                    ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 17 + 4 * i ] ).y += 16;
+                    ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 16 + 4 * i ] ).y += 16;
+                    ( Oam->oamBuffer[ 27 + i ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 27 + i ] ).y += 16;
+                    updateOAMSub( Oam );
                 }
                 return 0;
             } else if( t.px > 31 && t.py > 83 && t.px < 225 && t.py < 116 ) {
-                oam->oamBuffer[ 20 ].isHidden = true;
-                oam->oamBuffer[ 21 ].isHidden = true;
-                oam->oamBuffer[ 28 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 20 ].isHidden = true;
+                Oam->oamBuffer[ 21 ].isHidden = true;
+                Oam->oamBuffer[ 28 ].isHidden = true;
+                updateOAMSub( Oam );
                 while( 1 ) {
                     swiWaitForVBlank( );
                     scanKeys( );
@@ -3651,20 +3662,20 @@ int getAnswer( item::itemType p_bagtype ) {
                 consoleSetWindow( &Bottom, 1, 1, 30, 24 );
                 consoleClear( );
                 for( int i = 0; i < 3; ++i ) {
-                    ( oam->oamBuffer[ 17 + 4 * i ] ).isHidden = true;
-                    ( oam->oamBuffer[ 17 + 4 * i ] ).y += 16;
-                    ( oam->oamBuffer[ 16 + 4 * i ] ).isHidden = true;
-                    ( oam->oamBuffer[ 16 + 4 * i ] ).y += 16;
-                    ( oam->oamBuffer[ 27 + i ] ).isHidden = true;
-                    ( oam->oamBuffer[ 27 + i ] ).y += 16;
-                    updateOAMSub( oam );
+                    ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 17 + 4 * i ] ).y += 16;
+                    ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 16 + 4 * i ] ).y += 16;
+                    ( Oam->oamBuffer[ 27 + i ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 27 + i ] ).y += 16;
+                    updateOAMSub( Oam );
                 }
                 return 1;
             } else if( t.px > 31 && t.py > 115 && t.px < 225 && t.py < 148 ) {
-                oam->oamBuffer[ 24 ].isHidden = true;
-                oam->oamBuffer[ 25 ].isHidden = true;
-                oam->oamBuffer[ 29 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 24 ].isHidden = true;
+                Oam->oamBuffer[ 25 ].isHidden = true;
+                Oam->oamBuffer[ 29 ].isHidden = true;
+                updateOAMSub( Oam );
                 while( 1 ) {
                     swiWaitForVBlank( );
                     scanKeys( );
@@ -3677,13 +3688,13 @@ int getAnswer( item::itemType p_bagtype ) {
                 consoleClear( );
 
                 for( int i = 0; i < 3; ++i ) {
-                    ( oam->oamBuffer[ 17 + 4 * i ] ).isHidden = true;
-                    ( oam->oamBuffer[ 17 + 4 * i ] ).y += 16;
-                    ( oam->oamBuffer[ 16 + 4 * i ] ).isHidden = true;
-                    ( oam->oamBuffer[ 16 + 4 * i ] ).y += 16;
-                    ( oam->oamBuffer[ 27 + i ] ).isHidden = true;
-                    ( oam->oamBuffer[ 27 + i ] ).y += 16;
-                    updateOAMSub( oam );
+                    ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 17 + 4 * i ] ).y += 16;
+                    ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 16 + 4 * i ] ).y += 16;
+                    ( Oam->oamBuffer[ 27 + i ] ).isHidden = true;
+                    ( Oam->oamBuffer[ 27 + i ] ).y += 16;
+                    updateOAMSub( Oam );
                 }
                 return 2;
             }
@@ -3696,22 +3707,22 @@ void drawBagPage( int p_page, int* p_position, int &p_oamIndex, int& p_palCnt, i
     consoleSelect( &Bottom );
     consoleClear( );
     for( int j = 11; j < 19; ++j ) {
-        oam->oamBuffer[ j + 2 ].isHidden = true;
-        updateOAMSub( oam );
+        Oam->oamBuffer[ j + 2 ].isHidden = true;
+        updateOAMSub( Oam );
     }
     int ind = 214 + 4 * ( p_page ), maxpage = 1 + ( ( int( SAV.m_bag.size( bag::bagtype( p_page ) ) ) ) - 1 ) / 12;
     printf( "%c%c %s\n%c%c  1/%i", ind, ind + 1, bagnames[ p_page ].c_str( ), ind + 2, ind + 3, maxpage );
 
-    oam->oamBuffer[ 11 ].x = SCREEN_WIDTH - 22;
-    oam->oamBuffer[ 11 ].y = SCREEN_HEIGHT - 49;
-    oam->oamBuffer[ 11 ].priority = OBJPRIORITY_1;
-    oam->oamBuffer[ 12 ].x = SCREEN_WIDTH - 49;
-    oam->oamBuffer[ 12 ].y = SCREEN_HEIGHT - 22;
-    oam->oamBuffer[ 12 ].priority = OBJPRIORITY_1;
+    Oam->oamBuffer[ 11 ].x = SCREEN_WIDTH - 22;
+    Oam->oamBuffer[ 11 ].y = SCREEN_HEIGHT - 49;
+    Oam->oamBuffer[ 11 ].priority = OBJPRIORITY_1;
+    Oam->oamBuffer[ 12 ].x = SCREEN_WIDTH - 49;
+    Oam->oamBuffer[ 12 ].y = SCREEN_HEIGHT - 22;
+    Oam->oamBuffer[ 12 ].priority = OBJPRIORITY_1;
 
     if( maxpage > 1 ) {
-        oam->oamBuffer[ 11 ].isHidden = false;
-        updateOAMSub( oam );
+        Oam->oamBuffer[ 11 ].isHidden = false;
+        updateOAMSub( Oam );
         consoleSetWindow( &Bottom, 31, 19, 2, 2 );
         printf( "%c\n%c", 246, 247 );
     }
@@ -3734,13 +3745,13 @@ void drawBagPage( int p_page, int* p_position, int &p_oamIndex, int& p_palCnt, i
         if( t.px>224 && t.py > 164 )
             goto BACK;
         std::pair<int, int> acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), i );
-        drawItem( oam, spriteInfo, ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
+        drawItem( Oam, spriteInfo, ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
                   18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == item::KEY_ITEM );
     }
     while( 42 ) {
         updateTime( );
         swiWaitForVBlank( );
-        updateOAMSub( oam );
+        updateOAMSub( Oam );
         scanKeys( );
         touchRead( &t );
         //int pressed = keysUp(),held = keysHeld();
@@ -3773,25 +3784,25 @@ NEXT:
             consoleClear( );
             printf( "%c%c %s\n%c%c %2i/%i", ind, ind + 1, bagnames[ p_page ].c_str( ), ind + 2, ind + 3, acpage + 1, maxpage );
 
-            oam->oamBuffer[ 12 ].isHidden = false;
+            Oam->oamBuffer[ 12 ].isHidden = false;
             consoleSetWindow( &Bottom, 27, 22, 2, 2 );
             printf( "%c\n%c", 248, 249 );
             consoleSetWindow( &Bottom, 31, 19, 2, 2 );
             printf( "%c\n%c", 246, 247 );
             if( maxpage == acpage + 1 ) {
-                oam->oamBuffer[ 11 ].isHidden = true;
+                Oam->oamBuffer[ 11 ].isHidden = true;
                 consoleSetWindow( &Bottom, 31, 19, 2, 2 );
                 consoleClear( );
             }
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             getRanPerm( p_position, cpy );
             for( int i = 0; i < MAXPERM; ++i )
                 p_position[ i ] = cpy[ i ];
             oam2 = p_oamIndex;
             pal2 = p_palCnt;
             tile2 = p_tileCnt;
-            for( int i = 13; i < oam2 + 13; ++i ) oam->oamBuffer[ i ].isHidden = true;
-            updateOAMSub( oam );
+            for( int i = 13; i < oam2 + 13; ++i ) Oam->oamBuffer[ i ].isHidden = true;
+            updateOAMSub( Oam );
             for( int i = acpage * 12; i < acpage * 12 + std::min( int( SAV.m_bag.size( bag::bagtype( p_page ) ) ) - acpage * 12, 12 ); ++i ) {
                 updateTime( );
                 scanKeys( );
@@ -3803,7 +3814,7 @@ NEXT:
                 if( t.px>224 && t.py > 164 )
                     goto BACK;
                 std::pair<int, int> acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), i );
-                drawItem( oam, spriteInfo, ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
+                drawItem( Oam, spriteInfo, ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
                           18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == item::KEY_ITEM );
             }
         } else if( sqrt( sq( SCREEN_WIDTH - 33 - t.px ) + sq( SCREEN_HEIGHT - 6 - t.py ) ) <= 16 && acpage > 0 ) {
@@ -3821,25 +3832,25 @@ PREV:
             consoleClear( );
             printf( "%c%c %s\n%c%c %2i/%i", ind, ind + 1, bagnames[ p_page ].c_str( ), ind + 2, ind + 3, acpage + 1, maxpage );
 
-            oam->oamBuffer[ 11 ].isHidden = false;
+            Oam->oamBuffer[ 11 ].isHidden = false;
             consoleSetWindow( &Bottom, 31, 19, 2, 2 );
             printf( "%c\n%c", 246, 247 );
             consoleSetWindow( &Bottom, 27, 22, 2, 2 );
             printf( "%c\n%c", 248, 249 );
             if( 0 == acpage ) {
-                oam->oamBuffer[ 12 ].isHidden = true;
+                Oam->oamBuffer[ 12 ].isHidden = true;
                 consoleSetWindow( &Bottom, 27, 22, 2, 2 );
                 consoleClear( );
             }
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             getRanPerm( p_position, cpy );
             for( int i = 0; i < MAXPERM; ++i )
                 p_position[ i ] = cpy[ i ];
             oam2 = p_oamIndex;
             pal2 = p_palCnt;
             tile2 = p_tileCnt;
-            for( int i = 13; i < oam2 + 13; ++i ) oam->oamBuffer[ i ].isHidden = true;
-            updateOAMSub( oam );
+            for( int i = 13; i < oam2 + 13; ++i ) Oam->oamBuffer[ i ].isHidden = true;
+            updateOAMSub( Oam );
             for( int i = acpage * 12; i < acpage * 12 + std::min( int( SAV.m_bag.size( bag::bagtype( p_page ) ) ) - acpage * 12, 12 ); ++i ) {
                 updateTime( );
                 scanKeys( );
@@ -3851,7 +3862,7 @@ PREV:
                 if( t.px>224 && t.py > 164 )
                     goto BACK;
                 std::pair<int, int> acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), i );
-                drawItem( oam, spriteInfo, ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
+                drawItem( Oam, spriteInfo, ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
                           18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == item::KEY_ITEM );
             }
         } else
@@ -3871,15 +3882,15 @@ PREV:
             consoleSelect( &Top );
             consoleSetWindow( &Top, 0, 0, 32, 24 );
             consoleClear( );
-            oamTop->oamBuffer[ 1 ].isHidden = oamTop->oamBuffer[ 2 ].isHidden = oamTop->oamBuffer[ 3 ].isHidden = false;
-            oamTop->oamBuffer[ 1 ].x = 36;
-            oamTop->oamBuffer[ 2 ].x = 100;
-            oamTop->oamBuffer[ 3 ].x = 164;
-            oamTop->oamBuffer[ 1 ].y = oamTop->oamBuffer[ 2 ].y = oamTop->oamBuffer[ 3 ].y = 69;
-            updateOAM( oamTop );
+            OamTop->oamBuffer[ 1 ].isHidden = OamTop->oamBuffer[ 2 ].isHidden = OamTop->oamBuffer[ 3 ].isHidden = false;
+            OamTop->oamBuffer[ 1 ].x = 36;
+            OamTop->oamBuffer[ 2 ].x = 100;
+            OamTop->oamBuffer[ 3 ].x = 164;
+            OamTop->oamBuffer[ 1 ].y = OamTop->oamBuffer[ 2 ].y = OamTop->oamBuffer[ 3 ].y = 69;
+            updateOAM( OamTop );
 
             std::pair<int, int> acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), acpage * 12 + io );
-            drawItem( oamTop, spriteInfo, ItemList[ acElem.first ].m_itemName, 22,
+            drawItem( OamTop, spriteInfo, ItemList[ acElem.first ].m_itemName, 22,
                       50, acElem.second, oam2, pal2, tile2, false, p_page == item::KEY_ITEM );
             consoleSetWindow( &Top, 7, 9, 13, 1 );
             consoleSelect( &Top );
@@ -3892,37 +3903,37 @@ PREV:
                 if( i - acpage * 12 == io )
                     continue;
                 else if( p_position[ i - acpage * 12 ] < 6 )
-                    drawItem( oamTop, spriteInfo, ItemList[ acElem.first ].m_itemName, 6 + p_position[ i - acpage * 12 ] * 40,
+                    drawItem( OamTop, spriteInfo, ItemList[ acElem.first ].m_itemName, 6 + p_position[ i - acpage * 12 ] * 40,
                     10, acElem.second, oam2, pal2, tile2, false, p_page == item::KEY_ITEM );
                 else if( p_position[ i - acpage * 12 ] < 12 )
-                    drawItem( oamTop, spriteInfo, ItemList[ acElem.first ].m_itemName, 6 + ( p_position[ i - acpage * 12 ] - 6 ) * 40,
+                    drawItem( OamTop, spriteInfo, ItemList[ acElem.first ].m_itemName, 6 + ( p_position[ i - acpage * 12 ] - 6 ) * 40,
                     138, acElem.second, oam2, pal2, tile2, false, p_page == item::KEY_ITEM );
                 else if( p_position[ i - acpage * 12 ] == 12 )
-                    drawItem( oamTop, spriteInfo, ItemList[ acElem.first ].m_itemName, 238,
+                    drawItem( OamTop, spriteInfo, ItemList[ acElem.first ].m_itemName, 238,
                     82, acElem.second, oam2, pal2, tile2, false, p_page == item::KEY_ITEM );
                 else if( p_position[ i - acpage * 12 ] == 13 )
-                    drawItem( oamTop, spriteInfo, ItemList[ acElem.first ].m_itemName, -10,
+                    drawItem( OamTop, spriteInfo, ItemList[ acElem.first ].m_itemName, -10,
                     82, acElem.second, oam2, pal2, tile2, false, p_page == item::KEY_ITEM );
 
                 updateTime( );
             }
 
 
-            initOAMTableSub( oam );
-            initMainSprites( oam, spriteInfo );
+            initOAMTableSub( Oam );
+            initMainSprites( Oam, spriteInfo );
             setMainSpriteVisibility( true );
-            oam->oamBuffer[ 8 ].isHidden = true;
-            oam->oamBuffer[ 0 ].isHidden = false;
-            oam->oamBuffer[ 1 ].isHidden = true;
+            Oam->oamBuffer[ 8 ].isHidden = true;
+            Oam->oamBuffer[ 0 ].isHidden = false;
+            Oam->oamBuffer[ 1 ].isHidden = true;
             for( int i = 9; i <= 12; ++i )
-                oam->oamBuffer[ i ].isHidden = true;
+                Oam->oamBuffer[ i ].isHidden = true;
 
             consoleSelect( &Bottom );
             consoleSetWindow( &Bottom, 0, 0, 32, 24 );
             consoleClear( );
             consoleSetWindow( &Bottom, 1, 1, 30, MAXLINES );
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
 
             int acItem = SAV.m_bag.elementAt( ( bag::bagtype )p_page, acpage * 12 + io ).first;
             int ret = getAnswer( ItemList[ acItem ].getItemType( ) );
@@ -3937,28 +3948,28 @@ PREV:
                 for( int i = 17; i < 26; i += ( ( ( i - 15 ) / 2 ) % 2 ? -2 : +6 ) ) {
                     if( ( ( ( i - 15 ) / 2 ) ^ 1 ) >= num )
                         break;
-                    ( oam->oamBuffer[ i ] ).isHidden = false;
-                    ( oam->oamBuffer[ i + 1 ] ).isHidden = false;
-                    ( oam->oamBuffer[ i + 1 ] ).y -= 16 * ( 2 - ( ( i - 15 ) / 4 ) );
-                    ( oam->oamBuffer[ i ] ).y -= 16 * ( 2 - ( ( i - 15 ) / 4 ) );
-                    updateOAMSub( oam );
-                    consoleSetWindow( &Bottom, ( ( oam->oamBuffer[ i ] ).x + 6 ) / 8, ( ( oam->oamBuffer[ i ] ).y + 6 ) / 8, 12, 3 );
+                    ( Oam->oamBuffer[ i ] ).isHidden = false;
+                    ( Oam->oamBuffer[ i + 1 ] ).isHidden = false;
+                    ( Oam->oamBuffer[ i + 1 ] ).y -= 16 * ( 2 - ( ( i - 15 ) / 4 ) );
+                    ( Oam->oamBuffer[ i ] ).y -= 16 * ( 2 - ( ( i - 15 ) / 4 ) );
+                    updateOAMSub( Oam );
+                    consoleSetWindow( &Bottom, ( ( Oam->oamBuffer[ i ] ).x + 6 ) / 8, ( ( Oam->oamBuffer[ i ] ).y + 6 ) / 8, 12, 3 );
                     if( !SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_boxdata.m_IV.m_isEgg ) {
                         printf( "   %3i/%3i\n ", SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_stats.m_acHP, SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_stats.m_maxHP );
                         wprintf( SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_boxdata.m_Name ); printf( "\n" );
                         printf( "%11s", ItemList[ SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_boxdata.m_Item ].getDisplayName( ).c_str( ) );
-                        drawPKMNIcon( oam, spriteInfo, SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_boxdata.m_SPEC, ( oam->oamBuffer[ i ] ).x - 4, ( oam->oamBuffer[ i ] ).y - 20, a, b, c );
+                        drawPKMNIcon( Oam, spriteInfo, SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_boxdata.m_SPEC, ( Oam->oamBuffer[ i ] ).x - 4, ( Oam->oamBuffer[ i ] ).y - 20, a, b, c );
                     } else {
                         printf( " \n " );
                         printf( "Ei" ); printf( "\n" );
-                        drawEggIcon( oam, spriteInfo, ( oam->oamBuffer[ i ] ).x - 4, ( oam->oamBuffer[ i ] ).y - 20, a, b, c );
+                        drawEggIcon( Oam, spriteInfo, ( Oam->oamBuffer[ i ] ).x - 4, ( Oam->oamBuffer[ i ] ).y - 20, a, b, c );
                     }
-                    updateOAMSub( oam );
+                    updateOAMSub( Oam );
                 }
-                updateOAMSub( oam );
+                updateOAMSub( Oam );
                 while( 42 ) {
                     swiWaitForVBlank( );
-                    updateOAMSub( oam );
+                    updateOAMSub( Oam );
                     updateTime( );
                     touchRead( &t );
 
@@ -3981,11 +3992,11 @@ PREV:
                             break;
                         else if( SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_boxdata.m_IV.m_isEgg )
                             continue;
-                        else if( t.px > oam->oamBuffer[ i ].x && t.py > oam->oamBuffer[ i ].y && t.px - 64 < oam->oamBuffer[ i + 1 ].x && t.py - 32 < oam->oamBuffer[ i ].y ) {
-                            ( oam->oamBuffer[ i ] ).isHidden = true;
-                            ( oam->oamBuffer[ i + 1 ] ).isHidden = true;
-                            ( oam->oamBuffer[ 3 + ( ( ( i - 15 ) / 2 ) ^ 1 ) ] ).isHidden = true;
-                            updateOAMSub( oam );
+                        else if( t.px > Oam->oamBuffer[ i ].x && t.py > Oam->oamBuffer[ i ].y && t.px - 64 < Oam->oamBuffer[ i + 1 ].x && t.py - 32 < Oam->oamBuffer[ i ].y ) {
+                            ( Oam->oamBuffer[ i ] ).isHidden = true;
+                            ( Oam->oamBuffer[ i + 1 ] ).isHidden = true;
+                            ( Oam->oamBuffer[ 3 + ( ( ( i - 15 ) / 2 ) ^ 1 ) ] ).isHidden = true;
+                            updateOAMSub( Oam );
                             while( 1 ) {
                                 swiWaitForVBlank( );
                                 scanKeys( );
@@ -3998,12 +4009,12 @@ PREV:
                             consoleClear( );
                             {
                                 POKEMON::pokemon& ac = SAV.m_PkmnTeam[ ( ( ( i - 15 ) / 2 ) ^ 1 ) ];
-                                initOAMTableSub( oam );
-                                initMainSprites( oam, spriteInfo );
+                                initOAMTableSub( Oam );
+                                initMainSprites( Oam, spriteInfo );
                                 setMainSpriteVisibility( true );
-                                oam->oamBuffer[ 8 ].isHidden = true;
-                                oam->oamBuffer[ 0 ].isHidden = false;
-                                oam->oamBuffer[ 1 ].isHidden = true;
+                                Oam->oamBuffer[ 8 ].isHidden = true;
+                                Oam->oamBuffer[ 0 ].isHidden = false;
+                                Oam->oamBuffer[ 1 ].isHidden = true;
                                 if( ac.m_boxdata.m_Item != 0 ) {//pokemon hat schon Item 
 
                                     char buf[ 100 ];
@@ -4035,8 +4046,8 @@ OUT:
 
             //todo: some code's still missing
 
-            initOAMTable( oamTop );
-            initOAMTableSub( oam );
+            initOAMTable( OamTop );
+            initOAMTableSub( Oam );
 
             loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "BagTop" );
 
@@ -4062,40 +4073,40 @@ OUT:
             pal2 = p_palCnt;
             tile2 = p_tileCnt;
 
-            initBagSprites( oamTop, spriteInfoTop, p_oamIndexTop, p_palCntTop, p_tileCntTop, false );
-            updateOAM( oamTop );
-            initBagSprites( oam, spriteInfo, p_oamIndex, p_palCnt, p_tileCnt );
+            initBagSprites( OamTop, spriteInfoTop, p_oamIndexTop, p_palCntTop, p_tileCntTop, false );
+            updateOAM( OamTop );
+            initBagSprites( Oam, spriteInfo, p_oamIndex, p_palCnt, p_tileCnt );
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
 
-            oam->oamBuffer[ 11 ].x = SCREEN_WIDTH - 22;
-            oam->oamBuffer[ 11 ].y = SCREEN_HEIGHT - 49;
-            oam->oamBuffer[ 11 ].priority = OBJPRIORITY_1;
-            oam->oamBuffer[ 12 ].x = SCREEN_WIDTH - 49;
-            oam->oamBuffer[ 12 ].y = SCREEN_HEIGHT - 22;
-            oam->oamBuffer[ 12 ].priority = OBJPRIORITY_1;
+            Oam->oamBuffer[ 11 ].x = SCREEN_WIDTH - 22;
+            Oam->oamBuffer[ 11 ].y = SCREEN_HEIGHT - 49;
+            Oam->oamBuffer[ 11 ].priority = OBJPRIORITY_1;
+            Oam->oamBuffer[ 12 ].x = SCREEN_WIDTH - 49;
+            Oam->oamBuffer[ 12 ].y = SCREEN_HEIGHT - 22;
+            Oam->oamBuffer[ 12 ].priority = OBJPRIORITY_1;
             consoleSelect( &Bottom );
             consoleSetWindow( &Bottom, 0, 0, 32, 24 );
             printf( "%c%c %s        \n%c%c %2i/%i", ind, ind + 1, bagnames[ p_page ].c_str( ), ind + 2, ind + 3, acpage + 1, maxpage );
 
-            oam->oamBuffer[ 11 ].isHidden = false;
-            oam->oamBuffer[ 12 ].isHidden = false;
+            Oam->oamBuffer[ 11 ].isHidden = false;
+            Oam->oamBuffer[ 12 ].isHidden = false;
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
 
             consoleSetWindow( &Bottom, 31, 19, 2, 2 );
             printf( "%c\n%c", 246, 247 );
             consoleSetWindow( &Bottom, 27, 22, 2, 2 );
             printf( "%c\n%c", 248, 249 );
             if( 0 == acpage ) {
-                oam->oamBuffer[ 12 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 12 ].isHidden = true;
+                updateOAMSub( Oam );
                 consoleSetWindow( &Bottom, 27, 22, 2, 2 );
                 consoleClear( );
             }
             if( maxpage == acpage + 1 ) {
-                oam->oamBuffer[ 11 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ 11 ].isHidden = true;
+                updateOAMSub( Oam );
                 consoleSetWindow( &Bottom, 31, 19, 2, 2 );
                 consoleClear( );
             }
@@ -4104,9 +4115,9 @@ OUT:
                 p_position[ i ] = cpy[ i ];
 
             for( int j = 0; j <= 10; ++j )
-                oam->oamBuffer[ j ].isHidden = false;
+                Oam->oamBuffer[ j ].isHidden = false;
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             for( int i = acpage * 12; i < acpage * 12 + std::min( int( SAV.m_bag.size( bag::bagtype( p_page ) ) ) - acpage * 12, 12 ); ++i ) {
                 updateTime( );
                 scanKeys( );
@@ -4118,7 +4129,7 @@ OUT:
                 if( t.px>224 && t.py > 164 )
                     goto BACK;
                 auto acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), i );
-                drawItem( oam, spriteInfo, ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
+                drawItem( Oam, spriteInfo, ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
                           18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == item::KEY_ITEM );
                 updateTime( );
             }
@@ -4154,14 +4165,14 @@ void bag::draw( ) {
         cust_font.print_string( buf, 20, 24 * i + 3, false );
     }
     drawSub( );
-    initOAMTableSub( oam );
+    initOAMTableSub( Oam );
     int palcnt = 0, tilecnt = 0, oamInd = 0;
-    initBagSprites( oam, spriteInfo, oamInd, palcnt, tilecnt );
+    initBagSprites( Oam, spriteInfo, oamInd, palcnt, tilecnt );
 
 
-    initOAMTable( oamTop );
+    initOAMTable( OamTop );
     int palcntT = 0, tilecntT = 0, oamIndT = 0;
-    initBagSprites( oamTop, spriteInfoTop, oamIndT, palcntT, tilecntT, false );
+    initBagSprites( OamTop, spriteInfoTop, oamIndT, palcntT, tilecntT, false );
 
     consoleSetWindow( &Bottom, 0, 0, 32, 24 );
     consoleSelect( &Bottom );
@@ -4170,10 +4181,10 @@ void bag::draw( ) {
     int positions[ 8 ][ 2 ] = { { 112, 32 }, { 144, 48 }, { 160, 80 }, { 144, 112 }, { 112, 128 }, { 80, 112 }, { 64, 80 }, { 80, 48 } };
     //Goods,Keys,TMs,Mails,Medicine,Berries,PokéBalls,BattleItems
     for( int i = 11; i < 19; ++i ) {
-        oam->oamBuffer[ i + 2 ].x = positions[ i - 11 ][ 0 ];
-        oam->oamBuffer[ i + 2 ].y = positions[ i - 11 ][ 1 ];
-        oam->oamBuffer[ i + 2 ].isHidden = false;
-        updateOAMSub( oam );
+        Oam->oamBuffer[ i + 2 ].x = positions[ i - 11 ][ 0 ];
+        Oam->oamBuffer[ i + 2 ].y = positions[ i - 11 ][ 1 ];
+        Oam->oamBuffer[ i + 2 ].isHidden = false;
+        updateOAMSub( Oam );
 
         int nx = positions[ i - 11 ][ 0 ] / 8 + 1, ny = positions[ i - 11 ][ 1 ] / 8 + 1, ind = 214 + 4 * ( i - 11 );
         consoleSetWindow( &Bottom, nx, ny, 2, 2 );
@@ -4190,7 +4201,7 @@ void bag::draw( ) {
     while( 42 ) {
         updateTime( );
         swiWaitForVBlank( );
-        updateOAMSub( oam );
+        updateOAMSub( Oam );
         scanKeys( );
         touchRead( &t );
         //int pressed = keysUp(),held = keysHeld();
@@ -4224,21 +4235,21 @@ void bag::draw( ) {
             consoleSelect( &Bottom );
             consoleClear( );
             for( int j = 0; j <= 10; ++j )
-                oam->oamBuffer[ j ].isHidden = false;
+                Oam->oamBuffer[ j ].isHidden = false;
             for( int j = 11; j <= 60; ++j )
-                oam->oamBuffer[ j ].isHidden = true;
+                Oam->oamBuffer[ j ].isHidden = true;
             for( int j = 11; j < 19; ++j ) {
-                oam->oamBuffer[ j + 2 ].x = positions[ j - 11 ][ 0 ];
-                oam->oamBuffer[ j + 2 ].y = positions[ j - 11 ][ 1 ];
-                oam->oamBuffer[ j + 2 ].isHidden = false;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ j + 2 ].x = positions[ j - 11 ][ 0 ];
+                Oam->oamBuffer[ j + 2 ].y = positions[ j - 11 ][ 1 ];
+                Oam->oamBuffer[ j + 2 ].isHidden = false;
+                updateOAMSub( Oam );
 
                 int nx = positions[ j - 11 ][ 0 ] / 8 + 1, ny = positions[ j - 11 ][ 1 ] / 8 + 1, ind = 214 + 4 * ( j - 11 );
                 consoleSetWindow( &Bottom, nx, ny, 2, 2 );
                 for( int p = 0; p < 4; ++p )
                     printf( "%c", ind + p );
             }
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             }
     }
 
@@ -4248,11 +4259,11 @@ void bag::draw( ) {
     consoleSetWindow( &Top, 0, 0, 32, 24 );
     consoleSelect( &Top );
     consoleClear( );
-    initOAMTable( oamTop );
-    initOAMTableSub( oam );
-    initMainSprites( oam, spriteInfo );
+    initOAMTable( OamTop );
+    initOAMTableSub( Oam );
+    initMainSprites( Oam, spriteInfo );
     setMainSpriteVisibility( false );
-    oam->oamBuffer[ 8 ].isHidden = true;
-    oam->oamBuffer[ 0 ].isHidden = true;
-    oam->oamBuffer[ 1 ].isHidden = false;
+    Oam->oamBuffer[ 8 ].isHidden = true;
+    Oam->oamBuffer[ 0 ].isHidden = true;
+    Oam->oamBuffer[ 1 ].isHidden = false;
 }

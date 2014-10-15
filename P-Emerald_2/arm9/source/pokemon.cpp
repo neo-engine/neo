@@ -56,7 +56,7 @@ extern move* AttackList[ 560 ];
 
 extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
 extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
-extern OAMTable *oam, *oamTop;
+extern OAMTable *Oam, *OamTop;
 extern SavMod savMod;
 
 namespace POKEMON {
@@ -892,8 +892,8 @@ NEXT:
 
         consoleSelect( p_top );
 
-        initOAMTable( oamTop );
-        updateOAMSub( oam );
+        initOAMTable( OamTop );
+        updateOAMSub( Oam );
 
         int a2 = 0, b2 = 0, c2 = 0;
         if( !( m_boxdata.m_IV.m_isEgg ) ) {
@@ -931,8 +931,8 @@ NEXT:
                 sprintf( buf, "%s: %s", ItemList[ m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
                          ItemList[ m_boxdata.getItem( ) ].getShortDescription( true ).c_str( ) );
                 cust_font.print_string( buf, 50, 159, false );
-                drawItemIcon( oamTop, spriteInfoTop, ItemList[ m_boxdata.getItem( ) ].m_itemName, 2, 152, a2, b2, c2, false );
-                updateOAM( oamTop );
+                drawItemIcon( OamTop, spriteInfoTop, ItemList[ m_boxdata.getItem( ) ].m_itemName, 2, 152, a2, b2, c2, false );
+                updateOAM( OamTop );
             } else {
                 cust_font.setColor( 252, 1 );
                 cust_font.setColor( 0, 2 );
@@ -1048,7 +1048,7 @@ NEXT:
                     if( m_boxdata.m_Attack[ i ] == 0 )
                         continue;
                     Type t = AttackList[ m_boxdata.m_Attack[ i ] ]->m_moveType;
-                    drawTypeIcon( oamTop, spriteInfoTop, a2, b2, c2, t, 126, 43 + 32 * i, false );
+                    drawTypeIcon( OamTop, spriteInfoTop, a2, b2, c2, t, 126, 43 + 32 * i, false );
 
                     /* if(t == data.Types[0] || t == data.Types[1])
                     printf("\x1b[32m");*/
@@ -1092,7 +1092,7 @@ NEXT:
                         printf( "---" );
 
                     printf( "\n\n" );
-                    updateOAM( oamTop );
+                    updateOAM( OamTop );
                     printf( "\x1b[39m" );
                 }
                 break;
@@ -1109,32 +1109,32 @@ NEXT:
         printf( "\x1b[39m" );
         int o2s = 50, p2s = 2, t2s = 780;
 
-        oam->oamBuffer[ 0 ].x = 256 - 24;
-        oam->oamBuffer[ 0 ].y = 196 - 28;
-        oam->oamBuffer[ 13 ].isHidden = false;
-        oam->oamBuffer[ 14 ].isHidden = false;
-        oam->oamBuffer[ 14 ].x = 256 - 24;
-        oam->oamBuffer[ 14 ].y = 196 - 28 - 22;
-        oam->oamBuffer[ 13 ].x = 256 - 28 - 18;
-        oam->oamBuffer[ 13 ].y = 196 - 28;
+        Oam->oamBuffer[ 0 ].x = 256 - 24;
+        Oam->oamBuffer[ 0 ].y = 196 - 28;
+        Oam->oamBuffer[ 13 ].isHidden = false;
+        Oam->oamBuffer[ 14 ].isHidden = false;
+        Oam->oamBuffer[ 14 ].x = 256 - 24;
+        Oam->oamBuffer[ 14 ].y = 196 - 28 - 22;
+        Oam->oamBuffer[ 13 ].x = 256 - 28 - 18;
+        Oam->oamBuffer[ 13 ].y = 196 - 28;
 
         if( !( m_boxdata.m_IV.m_isEgg ) ) {
             if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
-                drawTypeIcon( oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 0 ], 256 - 50, 24, true );
-                oam->oamBuffer[ ++o2s ].isHidden = true;
+                drawTypeIcon( Oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 0 ], 256 - 50, 24, true );
+                Oam->oamBuffer[ ++o2s ].isHidden = true;
             } else {
-                drawTypeIcon( oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 0 ], 256 - 68, 24, true );
-                drawTypeIcon( oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 1 ], 256 - 32, 24, true );
+                drawTypeIcon( Oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 0 ], 256 - 68, 24, true );
+                drawTypeIcon( Oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 1 ], 256 - 32, 24, true );
             }
-            drawItemIcon( oam, spriteInfo, m_boxdata.m_Ball == 0 ? "Pokeball" : ItemList[ m_boxdata.m_Ball ].m_itemName, 256 - 100, 0, o2s, p2s, t2s, true );
+            drawItemIcon( Oam, spriteInfo, m_boxdata.m_Ball == 0 ? "Pokeball" : ItemList[ m_boxdata.m_Ball ].m_itemName, 256 - 100, 0, o2s, p2s, t2s, true );
 
-            oam->oamBuffer[ 15 ].isHidden = false;
-            oam->oamBuffer[ 15 ].y = 0;
-            oam->oamBuffer[ 15 ].x = 256 - 96;
-            oam->oamBuffer[ 16 ].isHidden = false;
-            oam->oamBuffer[ 16 ].y = 0;
-            oam->oamBuffer[ 16 ].x = 256 - 32;
-            updateOAMSub( oam );
+            Oam->oamBuffer[ 15 ].isHidden = false;
+            Oam->oamBuffer[ 15 ].y = 0;
+            Oam->oamBuffer[ 15 ].x = 256 - 96;
+            Oam->oamBuffer[ 16 ].isHidden = false;
+            Oam->oamBuffer[ 16 ].y = 0;
+            Oam->oamBuffer[ 16 ].x = 256 - 32;
+            updateOAMSub( Oam );
 
             consoleSetWindow( p_bottom, 23, 1, 20, 5 );
 
@@ -1147,57 +1147,57 @@ NEXT:
                 printf( "\x1b[39m""PKRS" );
             }
 
-            oam->oamBuffer[ 90 ].isHidden = false;
-            oam->oamBuffer[ 90 ].y = -4;
-            oam->oamBuffer[ 90 ].x = -8;
-            oam->oamBuffer[ 90 ].priority = OBJPRIORITY_1;
-            oam->oamBuffer[ 91 ].isHidden = false;
-            oam->oamBuffer[ 91 ].y = 18;
-            oam->oamBuffer[ 91 ].x = -8;
-            oam->oamBuffer[ 91 ].priority = OBJPRIORITY_1;
-            oam->oamBuffer[ 92 ].isHidden = false;
-            oam->oamBuffer[ 92 ].y = -8;
-            oam->oamBuffer[ 92 ].x = 14;
-            oam->oamBuffer[ 92 ].priority = OBJPRIORITY_1;
+            Oam->oamBuffer[ 90 ].isHidden = false;
+            Oam->oamBuffer[ 90 ].y = -4;
+            Oam->oamBuffer[ 90 ].x = -8;
+            Oam->oamBuffer[ 90 ].priority = OBJPRIORITY_1;
+            Oam->oamBuffer[ 91 ].isHidden = false;
+            Oam->oamBuffer[ 91 ].y = 18;
+            Oam->oamBuffer[ 91 ].x = -8;
+            Oam->oamBuffer[ 91 ].priority = OBJPRIORITY_1;
+            Oam->oamBuffer[ 92 ].isHidden = false;
+            Oam->oamBuffer[ 92 ].y = -8;
+            Oam->oamBuffer[ 92 ].x = 14;
+            Oam->oamBuffer[ 92 ].priority = OBJPRIORITY_1;
 
-            oam->oamBuffer[ 90 + page ].isHidden = true;
+            Oam->oamBuffer[ 90 + page ].isHidden = true;
 
         } else {
-            oam->oamBuffer[ 90 ].isHidden = true;
-            oam->oamBuffer[ 91 ].isHidden = true;
-            oam->oamBuffer[ 92 ].isHidden = true;
+            Oam->oamBuffer[ 90 ].isHidden = true;
+            Oam->oamBuffer[ 91 ].isHidden = true;
+            Oam->oamBuffer[ 92 ].isHidden = true;
 
-            oam->oamBuffer[ 15 ].isHidden = false;
-            oam->oamBuffer[ 15 ].y = 0;
-            oam->oamBuffer[ 15 ].x = 256 - 32;
-            oam->oamBuffer[ 16 ].isHidden = true;
+            Oam->oamBuffer[ 15 ].isHidden = false;
+            Oam->oamBuffer[ 15 ].y = 0;
+            Oam->oamBuffer[ 15 ].x = 256 - 32;
+            Oam->oamBuffer[ 16 ].isHidden = true;
 
-            oam->oamBuffer[ o2s++ ].isHidden = true;
-            oam->oamBuffer[ o2s++ ].isHidden = true;
-            oam->oamBuffer[ o2s ].isHidden = true;
-            drawItemIcon( oam, spriteInfo, m_boxdata.m_Ball == 0 ? "Pokeball" : ItemList[ m_boxdata.m_Ball ].m_itemName, 256 - 32, 0, o2s, p2s, t2s, true );
-            updateOAMSub( oam );
+            Oam->oamBuffer[ o2s++ ].isHidden = true;
+            Oam->oamBuffer[ o2s++ ].isHidden = true;
+            Oam->oamBuffer[ o2s ].isHidden = true;
+            drawItemIcon( Oam, spriteInfo, m_boxdata.m_Ball == 0 ? "Pokeball" : ItemList[ m_boxdata.m_Ball ].m_itemName, 256 - 32, 0, o2s, p2s, t2s, true );
+            updateOAMSub( Oam );
         }
         printf( "\x1b[33m" );
         for( int i = 0; i < 4; ++i ) {
-            oam->oamBuffer[ 9 + i ].isHidden = false;
-            oam->oamBuffer[ 9 + i ].hFlip = true;
-            oam->oamBuffer[ 9 + i ].priority = OBJPRIORITY_3;
-            oam->oamBuffer[ 9 + i ].y = 192 - 54;
+            Oam->oamBuffer[ 9 + i ].isHidden = false;
+            Oam->oamBuffer[ 9 + i ].hFlip = true;
+            Oam->oamBuffer[ 9 + i ].priority = OBJPRIORITY_3;
+            Oam->oamBuffer[ 9 + i ].y = 192 - 54;
         }
-        oam->oamBuffer[ 18 ].isHidden = false;
-        oam->oamBuffer[ 18 ].y = 192 - 12;
-        oam->oamBuffer[ 18 ].x = 76;
-        oam->oamBuffer[ 18 ].priority = OBJPRIORITY_1;
-        oam->oamBuffer[ 28 ].isHidden = false;
-        oam->oamBuffer[ 28 ].y = 192 - 12;
-        oam->oamBuffer[ 28 ].x = 0;
-        oam->oamBuffer[ 28 ].priority = OBJPRIORITY_1;
-        oam->oamBuffer[ 27 ].isHidden = false;
-        oam->oamBuffer[ 27 ].y = 192 - 12;
-        oam->oamBuffer[ 27 ].x = 20;
-        oam->oamBuffer[ 27 ].priority = OBJPRIORITY_1;
-        updateOAMSub( oam );
+        Oam->oamBuffer[ 18 ].isHidden = false;
+        Oam->oamBuffer[ 18 ].y = 192 - 12;
+        Oam->oamBuffer[ 18 ].x = 76;
+        Oam->oamBuffer[ 18 ].priority = OBJPRIORITY_1;
+        Oam->oamBuffer[ 28 ].isHidden = false;
+        Oam->oamBuffer[ 28 ].y = 192 - 12;
+        Oam->oamBuffer[ 28 ].x = 0;
+        Oam->oamBuffer[ 28 ].priority = OBJPRIORITY_1;
+        Oam->oamBuffer[ 27 ].isHidden = false;
+        Oam->oamBuffer[ 27 ].y = 192 - 12;
+        Oam->oamBuffer[ 27 ].x = 20;
+        Oam->oamBuffer[ 27 ].priority = OBJPRIORITY_1;
+        updateOAMSub( Oam );
         if( !( m_boxdata.m_IV.m_isEgg ) ) {
             consoleSetWindow( p_bottom, 0, 23, 20, 5 );
             printf( "%s", abilities[ m_boxdata.m_ability ].m_abilityName.c_str( ) );
@@ -1338,8 +1338,8 @@ NEXT:
             consoleSelect( p_top );
             consoleSetWindow( p_top, 4, 5, 12, 2 );
 
-            if( !loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", m_boxdata.m_SPEC, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), m_boxdata.m_isFemale, true ) )
-                loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", m_boxdata.m_SPEC, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), !m_boxdata.m_isFemale, true );
+            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", m_boxdata.m_SPEC, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), m_boxdata.m_isFemale, true ) )
+                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", m_boxdata.m_SPEC, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), !m_boxdata.m_isFemale, true );
 
             int exptype = data.m_expType;
 
@@ -1377,7 +1377,7 @@ NEXT:
         while( 1 ) {
             touchRead( &touch );
             swiWaitForVBlank( );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             updateTime( );
             scanKeys( );
             int pressed = keysCurrent( );
@@ -1401,7 +1401,7 @@ NEXT:
                 consoleClear( );
                 swiWaitForVBlank( );
 
-                initOAMTableSub( oam );
+                initOAMTableSub( Oam );
 
                 return pressed | KEY_B;
             } else if( ( pressed & KEY_DOWN ) || ( sqrt( sq( 220 - touch.px ) + sq( 184 - touch.py ) ) <= 16 ) ) {
@@ -1422,7 +1422,7 @@ NEXT:
                 consoleClear( );
                 swiWaitForVBlank( );
 
-                //initOAMTableSub(oam);
+                //initOAMTableSub(Oam);
 
                 return pressed | KEY_DOWN;
             } else if( ( pressed & KEY_UP ) || ( sqrt( sq( 248 - touch.px ) + sq( 162 - touch.py ) ) <= 16 ) ) {
@@ -1443,7 +1443,7 @@ NEXT:
                 consoleClear( );
                 swiWaitForVBlank( );
 
-                //initOAMTableSub(oam);
+                //initOAMTableSub(Oam);
 
                 return pressed | KEY_UP;
             } else if( pressed & KEY_RIGHT ) {

@@ -77,10 +77,10 @@
 
 #include "BigCirc1.h" 
 
-OAMTable *oam = new OAMTable( );
+OAMTable *Oam = new OAMTable( );
 SpriteInfo spriteInfo[ SPRITE_COUNT ];
 
-OAMTable *oamTop = new OAMTable( );
+OAMTable *OamTop = new OAMTable( );
 SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 
 //Centers o t circles.
@@ -98,7 +98,7 @@ enum GameMod {
 };
 #define gMod DEVELOPER
 
-std::string CodeName = "Working Klink";
+std::string CodeName = "Reborn Ho-Oh";
 SavMod savMod = _NDS;
 
 char acSlot2Game[ 5 ];
@@ -452,8 +452,8 @@ void initNewGame( ) {
     loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PokeNav" );
     scrn.init( );
     setMainSpriteVisibility( true );
-    oam->oamBuffer[ 1 ].isHidden = true;
-    updateOAMSub( oam );
+    Oam->oamBuffer[ 1 ].isHidden = true;
+    updateOAMSub( Oam );
     AS_MP3Stop( );
     swiWaitForIRQ( );
 
@@ -644,8 +644,8 @@ INDIVIDUALISIERUNG:
     SAV.m_acposy = 25 * 20;
     SAV.m_acposz = 3;
     setMainSpriteVisibility( false );
-    oam->oamBuffer[ 1 ].isHidden = false;
-    updateOAMSub( oam );
+    Oam->oamBuffer[ 1 ].isHidden = false;
+    updateOAMSub( Oam );
     loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
 }
 
@@ -1002,7 +1002,7 @@ CONT:
 
                     SAV.m_overWorldIdx = 20 * ( ( acgame + 1 ) / 2 ) + ( SAV.m_isMale ? 0 : 10 );
 
-                    oam->oamBuffer[ SAVE_ID ].isHidden = false;
+                    Oam->oamBuffer[ SAVE_ID ].isHidden = false;
 
                     messageBox( "Abgeschlossen." );
                     break;
@@ -1071,10 +1071,10 @@ void showNewMap( int p_mapIdx ) {
             showmappointer = true;
             scrn.draw( mode = 1 + i );
             printMapLocation( m );
-            oam->oamBuffer[ SQCH_ID ].x = oam->oamBuffer[ SQCH_ID + 1 ].x = ( m.m_lx + m.m_rx ) / 2 - 8;
-            oam->oamBuffer[ SQCH_ID ].y = oam->oamBuffer[ SQCH_ID + 1 ].y = ( m.m_ly + m.m_ry ) / 2 - 8;
-            oam->oamBuffer[ SQCH_ID ].isHidden = oam->oamBuffer[ SQCH_ID + 1 ].isHidden = false;
-            updateOAMSub( oam );
+            Oam->oamBuffer[ SQCH_ID ].x = Oam->oamBuffer[ SQCH_ID + 1 ].x = ( m.m_lx + m.m_rx ) / 2 - 8;
+            Oam->oamBuffer[ SQCH_ID ].y = Oam->oamBuffer[ SQCH_ID + 1 ].y = ( m.m_ly + m.m_ry ) / 2 - 8;
+            Oam->oamBuffer[ SQCH_ID ].isHidden = Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = false;
+            updateOAMSub( Oam );
 
             char buffer[ 120 ] = { 0 };
             sprintf( buffer, "%d.mp3", p_mapIdx );
@@ -1105,9 +1105,9 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
     if( p_frame == 0 ) {
         switch( p_dir ) {
             case 0:
-                oamTop->oamBuffer[ 0 ].hFlip = false;
+                OamTop->oamBuffer[ 0 ].hFlip = false;
                 loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 0, heroIsBig );
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 swiWaitForVBlank( );
                 swiWaitForVBlank( );
                 swiWaitForIRQ( );
@@ -1116,7 +1116,7 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 2, 0 );
                 bgUpdate( );
-                oamTop->oamBuffer[ 0 ].hFlip = true;
+                OamTop->oamBuffer[ 0 ].hFlip = true;
                 if( !run ) {
                     if( left )
                         loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 7, heroIsBig );
@@ -1129,7 +1129,7 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                         loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 17, heroIsBig );
                 }
 
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 swiWaitForVBlank( );
                 swiWaitForIRQ( );
                 for( int i = 1; i < 4; ++i )
@@ -1151,7 +1151,7 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 0, 2 );
                 bgUpdate( );
-                oamTop->oamBuffer[ 0 ].hFlip = false;
+                OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run ) {
                     if( left )
                         loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 3, heroIsBig );
@@ -1163,7 +1163,7 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                     else
                         loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 13, heroIsBig );
                 }
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 swiWaitForVBlank( );
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 0, 2 );
@@ -1184,7 +1184,7 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], -2, 0 );
                 bgUpdate( );
-                oamTop->oamBuffer[ 0 ].hFlip = false;
+                OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run ) {
                     if( left )
                         loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 7, heroIsBig );
@@ -1196,7 +1196,7 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                     else
                         loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 17, heroIsBig );
                 }
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 swiWaitForVBlank( );
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], -2, 0 );
@@ -1217,7 +1217,7 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 0, -2 );
                 bgUpdate( );
-                oamTop->oamBuffer[ 0 ].hFlip = false;
+                OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run ) {
                     if( left )
                         loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 5, heroIsBig );
@@ -1229,7 +1229,7 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                     else
                         loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 15, heroIsBig );
                 }
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 swiWaitForVBlank( );
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 0, -2 );
@@ -1253,9 +1253,9 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
     if( p_frame == 1 ) {
         switch( p_dir ) {
             case 0:
-                oamTop->oamBuffer[ 0 ].hFlip = false;
+                OamTop->oamBuffer[ 0 ].hFlip = false;
                 loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 0, heroIsBig );
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 return;
             case 1:
                 if( !run )
@@ -1267,15 +1267,15 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                     swiWaitForVBlank( );
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 2, 0 );
-                oamTop->oamBuffer[ 0 ].hFlip = true;
-                updateOAM( oamTop );
+                OamTop->oamBuffer[ 0 ].hFlip = true;
+                updateOAM( OamTop );
                 if( !run )
                     swiWaitForVBlank( );
                 if( !run )
                     loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 2, heroIsBig );
                 else
                     loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 11, heroIsBig );
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 2, 0 );
                 bgUpdate( );
@@ -1294,15 +1294,15 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                     swiWaitForVBlank( );
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 0, 2 );
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 if( !run )
                     swiWaitForVBlank( );
-                oamTop->oamBuffer[ 0 ].hFlip = false;
+                OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run )
                     loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 0, heroIsBig );
                 else
                     loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 9, heroIsBig );
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 0, 2 );
                 bgUpdate( );
@@ -1321,13 +1321,13 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                     swiWaitForVBlank( );
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], -2, 0 );
-                oamTop->oamBuffer[ 0 ].hFlip = false;
-                updateOAM( oamTop );
+                OamTop->oamBuffer[ 0 ].hFlip = false;
+                updateOAM( OamTop );
                 if( !run )
                     loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 2, heroIsBig );
                 else
                     loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 11, heroIsBig );
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], -2, 0 );
                 bgUpdate( );
@@ -1349,14 +1349,14 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 bgUpdate( );
                 if( !run )
                     swiWaitForVBlank( );
-                oamTop->oamBuffer[ 0 ].hFlip = false;
+                OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run )
                     loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 1, heroIsBig );
                 else
                     loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 10, heroIsBig );
                 for( int i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 0, -2 );
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 bgUpdate( );
                 swiWaitForVBlank( );
                 for( int i = 1; i < 4; ++i )
@@ -1370,41 +1370,41 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
     if( p_frame == 2 ) {
         switch( p_dir ) {
             case 0:
-                oamTop->oamBuffer[ 0 ].hFlip = false;
+                OamTop->oamBuffer[ 0 ].hFlip = false;
                 loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 0 );
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 return;
             case 1:
-                oamTop->oamBuffer[ 0 ].hFlip = true;
+                OamTop->oamBuffer[ 0 ].hFlip = true;
                 if( !run )
                     loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 2, heroIsBig );
                 //else
                 //    loadframe(&spriteInfoTop[0],SAV.owIdx,11,heroIsBig);
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 return;
             case 2:
-                oamTop->oamBuffer[ 0 ].hFlip = false;
+                OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run )
                     loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 0, heroIsBig );
                 //else
                 //    loadframe(&spriteInfoTop[0],SAV.owIdx,9,heroIsBig);
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 return;
             case 3:
-                oamTop->oamBuffer[ 0 ].hFlip = false;
+                OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run )
                     loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 2, heroIsBig );
                 //else
                 //    loadframe(&spriteInfoTop[0],SAV.owIdx,11,heroIsBig);
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 return;
             case 4:
-                oamTop->oamBuffer[ 0 ].hFlip = false;
+                OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run )
                     loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 1, heroIsBig );
                 //else
                 //    loadframe(&spriteInfoTop[0],SAV.owIdx,10,heroIsBig);
-                updateOAM( oamTop );
+                updateOAM( OamTop );
                 return;
             default:
                 break;
@@ -1475,15 +1475,15 @@ bool movePlayerOnMap( int p_x, int p_y, int p_z, bool p_init /*= true*/ ) {
     if( lastmovedata == 0 && acmovedata % 4 == 0 )
         SAV.m_acposz = p_z = acmovedata / 4;
 
-    oamTop->oamBuffer[ 0 ].priority = OBJPRIORITY_2;
+    OamTop->oamBuffer[ 0 ].priority = OBJPRIORITY_2;
     if( ( verhalten == 0x70 || lstverhalten == 0x70 ) && p_z >= 4 )
-        oamTop->oamBuffer[ 0 ].priority = OBJPRIORITY_1;
-    if( acmovedata == 60 )
+        OamTop->oamBuffer[ 0 ].priority = OBJPRIORITY_1;
+    if( acmovedata == 60 ) {
         if( p_z <= 3 )
-            oamTop->oamBuffer[ 0 ].priority = OBJPRIORITY_3;
+            OamTop->oamBuffer[ 0 ].priority = OBJPRIORITY_3;
         else
-            oamTop->oamBuffer[ 0 ].priority = OBJPRIORITY_1;
-
+            OamTop->oamBuffer[ 0 ].priority = OBJPRIORITY_1;
+    }
     if( WTW || ( acmovedata == 4 || ( acmovedata % 4 == 0 && acmovedata / 4 == p_z ) || acmovedata == 0 || acmovedata == 60 ) )
         animateHero( movedir, 0 );
     else {
@@ -1591,14 +1591,14 @@ bool movePlayerOnMap( int p_x, int p_y, int p_z, bool p_init /*= true*/ ) {
     if( p_init )
         animateHero( lastdir, 2 );
 
-    updateOAM( oamTop );
+    updateOAM( OamTop );
 
     return true;
 }
 
 void animateMap( u8 p_frame ) {
     u8* tileMemory = (u8*)BG_TILE_RAM( 1 );
-    for( int i = 0; i < acMap->m_animations.size( ); ++i ) {
+    for( size_t i = 0; i < acMap->m_animations.size( ); ++i ) {
         map2d::Animation& a = acMap->m_animations[ i ];
         if( ( p_frame ) % ( a.m_speed ) == 0 || a.m_speed == 1 ) {
             a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
@@ -1608,9 +1608,9 @@ void animateMap( u8 p_frame ) {
 }
 
 void initMapSprites( ) {
-    initOAMTable( oamTop );
+    initOAMTable( OamTop );
     SpriteInfo * SQCHAInfo = &spriteInfoTop[ 0 ];
-    SpriteEntry * SQCHA = &oamTop->oamBuffer[ 0 ];
+    SpriteEntry * SQCHA = &OamTop->oamBuffer[ 0 ];
     SQCHAInfo->oamId = 0;
     SQCHAInfo->width = 16;
     SQCHAInfo->height = 32;
@@ -1632,7 +1632,7 @@ void initMapSprites( ) {
     loadframe( SQCHAInfo, SAV.m_overWorldIdx, 0 );
 
     SQCHAInfo = &spriteInfoTop[ 1 ];
-    SQCHA = &oamTop->oamBuffer[ 1 ];
+    SQCHA = &OamTop->oamBuffer[ 1 ];
     SQCHAInfo->oamId = 1;
     SQCHAInfo->width = 32;
     SQCHAInfo->height = 32;
@@ -1652,7 +1652,7 @@ void initMapSprites( ) {
     SQCHA->palette = 0;
 
     SpriteInfo * B2Info = &spriteInfoTop[ 2 ];
-    SpriteEntry * B2 = &oamTop->oamBuffer[ 2 ];
+    SpriteEntry * B2 = &OamTop->oamBuffer[ 2 ];
     B2Info->oamId = 2;
     B2Info->width = 64;
     B2Info->height = 64;
@@ -1671,7 +1671,7 @@ void initMapSprites( ) {
     B2->x = 64;
     B2->y = 32;
 
-    B2 = &oamTop->oamBuffer[ 3 ];
+    B2 = &OamTop->oamBuffer[ 3 ];
     B2->isRotateScale = false;
     B2->blendMode = OBJMODE_NORMAL;
     B2->isMosaic = false;
@@ -1686,7 +1686,7 @@ void initMapSprites( ) {
     B2->y = 32;
     B2->hFlip = true;
 
-    B2 = &oamTop->oamBuffer[ 4 ];
+    B2 = &OamTop->oamBuffer[ 4 ];
     B2->isRotateScale = false;
     B2->blendMode = OBJMODE_NORMAL;
     B2->isMosaic = false;
@@ -1702,7 +1702,7 @@ void initMapSprites( ) {
     B2->hFlip = false;
     B2->vFlip = true;
 
-    B2 = &oamTop->oamBuffer[ 5 ];
+    B2 = &OamTop->oamBuffer[ 5 ];
     B2->isRotateScale = false;
     B2->blendMode = OBJMODE_NORMAL;
     B2->isMosaic = false;
@@ -1762,32 +1762,32 @@ void surf::use( ) {
 
 
 void shoUseAttack( int p_pkmIdx, bool p_female, bool p_shiny ) {
-    oamTop->oamBuffer[ 0 ].isHidden = true;
-    oamTop->oamBuffer[ 1 ].isHidden = false;
+    OamTop->oamBuffer[ 0 ].isHidden = true;
+    OamTop->oamBuffer[ 1 ].isHidden = false;
     for( int i = 0; i < 5; ++i ) {
         loadframe( &spriteInfoTop[ 1 ], SAV.m_overWorldIdx + 4, i, true );
-        updateOAM( oamTop );
+        updateOAM( OamTop );
         swiWaitForVBlank( );
         swiWaitForVBlank( );
         swiWaitForVBlank( );
     }
     for( int i = 0; i < 4; ++i )
-        oamTop->oamBuffer[ 2 + i ].isHidden = false;
+        OamTop->oamBuffer[ 2 + i ].isHidden = false;
     int a = 5, b = 2, c = 96;
-    if( !loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, p_female ) ) {
-        loadPKMNSprite( oamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, !p_female );
+    if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, p_female ) ) {
+        loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, !p_female );
     }
-    updateOAM( oamTop );
+    updateOAM( OamTop );
 
     for( int i = 0; i < 40; ++i )
         swiWaitForVBlank( );
 
     //animateHero(lastdir,2);
-    oamTop->oamBuffer[ 0 ].isHidden = false;
-    oamTop->oamBuffer[ 1 ].isHidden = true;
+    OamTop->oamBuffer[ 0 ].isHidden = false;
+    OamTop->oamBuffer[ 1 ].isHidden = true;
     for( int i = 0; i < 8; ++i )
-        oamTop->oamBuffer[ 2 + i ].isHidden = true;
-    updateOAM( oamTop );
+        OamTop->oamBuffer[ 2 + i ].isHidden = true;
+    updateOAM( OamTop );
 }
 
 
@@ -1825,14 +1825,14 @@ int main( int p_argc, char** p_argv ) {
     cust_font.setColor( RGB( 0, 31, 31 ), 0 );
 
     int HILFSCOUNTER = 252;
-    oam->oamBuffer[ PKMN_ID ].isHidden = !( SAV.m_hasPKMN && SAV.m_PkmnTeam.size( ) );
-    updateOAMSub( oam );
+    Oam->oamBuffer[ PKMN_ID ].isHidden = !( SAV.m_hasPKMN && SAV.m_PkmnTeam.size( ) );
+    updateOAMSub( Oam );
 
     SAV.m_hasGDex = true;
     SAV.m_evolveInBattle = true;
 
     initMapSprites( );
-    updateOAM( oamTop );
+    updateOAM( OamTop );
 
 
     char buffer[ 120 ] = { 0 };
@@ -1848,7 +1848,7 @@ int main( int p_argc, char** p_argv ) {
         swiWaitForVBlank( );
         swiWaitForVBlank( );
         swiWaitForIRQ( );
-        updateOAMSub( oam );
+        updateOAMSub( Oam );
         scanKeys( );
         touchRead( &touch );
         int pressed = keysUp( ), held = keysHeld( );
@@ -1859,12 +1859,12 @@ int main( int p_argc, char** p_argv ) {
             consoleSetWindow( &Bottom, 4, 0, 20, 3 );
             consoleClear( );
             showmappointer = false;
-            oam->oamBuffer[ SQCH_ID ].isHidden = true;
-            oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
+            Oam->oamBuffer[ SQCH_ID ].isHidden = true;
+            Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
             setMainSpriteVisibility( false );
-            oam->oamBuffer[ SAVE_ID ].isHidden = false;
-            oam->oamBuffer[ PKMN_ID ].isHidden = !( SAV.m_hasPKMN && SAV.m_PkmnTeam.size( ) );
-            updateOAMSub( oam );
+            Oam->oamBuffer[ SAVE_ID ].isHidden = false;
+            Oam->oamBuffer[ PKMN_ID ].isHidden = !( SAV.m_hasPKMN && SAV.m_PkmnTeam.size( ) );
+            updateOAMSub( Oam );
             mode = -1;
             scrn.draw( mode );
         }
@@ -1887,9 +1887,9 @@ int main( int p_argc, char** p_argv ) {
                 consoleSetWindow( &Bottom, 4, 0, 20, 3 );
                 consoleClear( );
                 showmappointer = false;
-                oam->oamBuffer[ SQCH_ID ].isHidden = true;
-                oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
-                updateOAMSub( oam );
+                Oam->oamBuffer[ SQCH_ID ].isHidden = true;
+                Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
+                updateOAMSub( Oam );
                 scrn.draw( mode = -1 );
                 char buffer[ 50 ];
                 sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_Attack[ i ] ]->text( ), AttackList[ a.m_boxdata.m_Attack[ i ] ]->m_moveName.c_str( ) );
@@ -2184,9 +2184,9 @@ OUT:
             consoleSetWindow( &Bottom, 4, 0, 20, 3 );
             consoleClear( );
             showmappointer = false;
-            oam->oamBuffer[ SQCH_ID ].isHidden = true;
-            oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
-            updateOAMSub( oam );
+            Oam->oamBuffer[ SQCH_ID ].isHidden = true;
+            Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
+            updateOAMSub( Oam );
             mode = 0;
             scrn.draw( mode );
         }
@@ -2200,10 +2200,10 @@ OUT:
         }
         //MapCourser
         else if( touch.px > 39 && touch.px < SCREEN_WIDTH - 39 && touch.py > 31 && touch.py < SCREEN_HEIGHT - 31 && mode > 0 ) {
-            oam->oamBuffer[ SQCH_ID ].x = oam->oamBuffer[ SQCH_ID + 1 ].x = touch.px - 8;
-            oam->oamBuffer[ SQCH_ID ].y = oam->oamBuffer[ SQCH_ID + 1 ].y = touch.py - 8;
+            Oam->oamBuffer[ SQCH_ID ].x = Oam->oamBuffer[ SQCH_ID + 1 ].x = touch.px - 8;
+            Oam->oamBuffer[ SQCH_ID ].y = Oam->oamBuffer[ SQCH_ID + 1 ].y = touch.py - 8;
             printMapLocation( touch );
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             updateTime( true );
         } else if( touch.px != 0 && touch.py != 0 && sqrt( sq( touch.px - 8 ) + sq( touch.py - 12 ) ) <= 17 ) {
             while( 1 ) {
@@ -2214,13 +2214,13 @@ OUT:
                 if( touch.px == 0 && touch.py == 0 )
                     break;
             }
-            bool sqa = oam->oamBuffer[ SQCH_ID ].isHidden,
-                sqb = oam->oamBuffer[ SQCH_ID + 1 ].isHidden;
-            oam->oamBuffer[ SQCH_ID ].isHidden = true;
-            oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
+            bool sqa = Oam->oamBuffer[ SQCH_ID ].isHidden,
+                sqb = Oam->oamBuffer[ SQCH_ID + 1 ].isHidden;
+            Oam->oamBuffer[ SQCH_ID ].isHidden = true;
+            Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
             bool mappy = showmappointer;
             showmappointer = false;
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             consoleSelect( &Bottom );
             consoleSetWindow( &Bottom, 0, 0, 32, 5 );
             consoleClear( );
@@ -2233,10 +2233,10 @@ OUT:
                 else
                     messageBox Succ( "Es trat ein Fehler auf\nSpiel nicht gesichert.", "PokéNav" );
             }
-            oam->oamBuffer[ SQCH_ID ].isHidden = sqa;
-            oam->oamBuffer[ SQCH_ID + 1 ].isHidden = sqb;
+            Oam->oamBuffer[ SQCH_ID ].isHidden = sqa;
+            Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = sqb;
             showmappointer = mappy;
-            updateOAMSub( oam );
+            updateOAMSub( Oam );
             scrn.draw( mode );
         }
         //End 

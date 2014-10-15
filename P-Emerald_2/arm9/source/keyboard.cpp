@@ -42,24 +42,24 @@ extern font::Font cust_font;
 extern font::Font cust_font2;
 extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
 extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
-extern OAMTable *oam, *oamTop;
+extern OAMTable *Oam, *OamTop;
 
 std::wstring keyboard::getText( int p_length, const char* p_msg, bool p_time ) {
     drawSub( );
 
     for( int i = 0; i < 4; ++i )
-        oam->oamBuffer[ 31 + 2 * i ].isHidden = true;
-    oam->oamBuffer[ A_ID ].isHidden = false;
-    oam->oamBuffer[ BWD_ID ].isHidden = false;
-    oam->oamBuffer[ FWD_ID ].isHidden = false;
-    oam->oamBuffer[ 13 ].x = 256 - 24;
-    oam->oamBuffer[ 13 ].y = 196 - 28 - 22;
-    oam->oamBuffer[ 14 ].x = 256 - 28 - 18;
-    oam->oamBuffer[ 14 ].y = 196 - 28;
-    oam->oamBuffer[ A_ID ].x = 256 - 24;
-    oam->oamBuffer[ A_ID ].y = 196 - 28;
+        Oam->oamBuffer[ 31 + 2 * i ].isHidden = true;
+    Oam->oamBuffer[ A_ID ].isHidden = false;
+    Oam->oamBuffer[ BWD_ID ].isHidden = false;
+    Oam->oamBuffer[ FWD_ID ].isHidden = false;
+    Oam->oamBuffer[ 13 ].x = 256 - 24;
+    Oam->oamBuffer[ 13 ].y = 196 - 28 - 22;
+    Oam->oamBuffer[ 14 ].x = 256 - 28 - 18;
+    Oam->oamBuffer[ 14 ].y = 196 - 28;
+    Oam->oamBuffer[ A_ID ].x = 256 - 24;
+    Oam->oamBuffer[ A_ID ].y = 196 - 28;
 
-    updateOAMSub( oam );
+    updateOAMSub( Oam );
 
     cust_font.setColor( 0, 0 );
     cust_font.setColor( 251, 1 );
@@ -134,7 +134,7 @@ std::wstring keyboard::getText( int p_length, const char* p_msg, bool p_time ) {
                     break;
             }
             undraw( );
-            initMainSprites( oam, spriteInfo );
+            initMainSprites( Oam, spriteInfo );
             return out;
         } else if( ( sqrt( sq( 220 - t.px ) + sq( 184 - t.py ) ) <= 16 ) ) {
             while( 1 ) {

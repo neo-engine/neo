@@ -58,13 +58,13 @@ SOUNDS		:=  sounds
 #---------------------------------------------------------------------------------
 ARCH	:=	-mthumb -mthumb-interwork
 
-CFLAGS	:=	-g -Wall -Wextra\
+CFLAGS	:=	-g -Wall\
 			-march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 			-ffast-math \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM9 -DNDSFILENAME=\"$(TARGET).nds\"
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++11 -Os
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++11 -O2
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH)  -Wl,-Map,$(notdir $*.map)
@@ -72,7 +72,7 @@ LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH)  -Wl,-Map,$(notdir $*.map)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:= -lfat -ln3d -lnds9
+LIBS	:= -lfat -lnds9
  
  
 #---------------------------------------------------------------------------------

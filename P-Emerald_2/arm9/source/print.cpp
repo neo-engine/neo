@@ -64,15 +64,19 @@ namespace font {
         u8 getX, getY;
         u32 offset = p_ch * FONT_WIDTH * FONT_HEIGHT;
 
-        for( putY = p_y, getY = 0; putY < p_y + FONT_HEIGHT; ++putY, ++getY )
-            for( putX = p_x, getX = 0; putX < p_x + _widths[ p_ch ]; putX += 2, getX += 2 )
-                if( putX >= 0 && putX < SCREEN_WIDTH && putY >= 0 && putY < SCREEN_HEIGHT )
-                    if( !p_bottom )
+        for( putY = p_y, getY = 0; putY < p_y + FONT_HEIGHT; ++putY, ++getY ) {
+            for( putX = p_x, getX = 0; putX < p_x + _widths[ p_ch ]; putX += 2, getX += 2 ) {
+                if( putX >= 0 && putX < SCREEN_WIDTH && putY >= 0 && putY < SCREEN_HEIGHT ) {
+                    if( !p_bottom ) {
                         top_screen_plot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
-                        (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
-                    else
+                                         (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                    } else {
                         btm_screen_plot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
-                        (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                                         (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                    }
+                }
+            }
+        }
     }
 
     void Font::print_string( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {

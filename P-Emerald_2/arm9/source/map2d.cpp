@@ -253,7 +253,11 @@ namespace map2d {
 
         int bx = lastbx, by = lastby;
 
-        int xmin, xmax, ymin, ymax, plsval;
+        int xmin = 0,
+            xmax = 0,
+            ymin = 0,
+            ymax = 0,
+            plsval = 0;
         int lc = lastcol, lr = lastrow;
 
         switch( p_direction ) {

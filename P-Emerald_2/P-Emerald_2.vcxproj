@@ -103,7 +103,7 @@
     <NMakePreprocessorDefinitions>ARM7;ARM9;WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(ProjectDir)arm9\build;$(ProjectDir)arm7\build;C:\devkitPro\libnds\include\;$(DEVKITPRO)\libnds\include;$(ProjectDir)arm9\include;$(ProjectDir)arm7\include;$(IncludePath);$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <ExecutablePath>$(ProjectDir);$(ExecutablePath)</ExecutablePath>
-    <IncludePath>$(ProjectDir)arm9\build;$(ProjectDir)arm7\build;C:\devkitPro\libnds\include\;$(ProjectDir)arm9\include;$(ProjectDir)arm7\include;$(DEVKITARM)\libnds\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)arm9\build;$(ProjectDir)arm7\build;C:\devkitPro\libnds\include;$(ProjectDir)arm9\include;$(ProjectDir)arm7\include;$(DEVKITARM)\libnds\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>make</NMakeBuildCommandLine>

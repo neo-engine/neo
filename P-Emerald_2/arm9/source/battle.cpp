@@ -1278,7 +1278,6 @@ namespace BATTLE {
 
 #define PB_ANIM_TILES 700
     void animatePB( int p_x, int p_y ) {
-        static const int BYTES_PER_16_COLOR_TILE = 32;
         static const int COLORS_PER_PALETTE = 16;
         static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
                                               * (can be set in REG_DISPCNT) */
@@ -1384,7 +1383,6 @@ namespace BATTLE {
     }
 
     void animateShiny( int p_x, int p_y ) {
-        static const int BYTES_PER_16_COLOR_TILE = 32;
         static const int COLORS_PER_PALETTE = 16;
         static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
                                               * (can be set in REG_DISPCNT) */
@@ -1884,7 +1882,7 @@ namespace BATTLE {
     }
 
     void battle::initBattleScene( int p_battleBack, weather p_weather ) {
-        for( int i = 0; i < 6; ++i ) {
+        for( size_t i = 0; i < 6; ++i ) {
             ACPOS( i, PLAYER ) = ACPOS( i, OPPONENT ) = i;
             if( _player->m_pkmnTeam->size( ) > i ) {
                 if( ACPKMN( i, PLAYER ).m_stats.m_acHP == 0 || ACPKMN( i, PLAYER ).m_boxdata.m_IV.m_isEgg )
@@ -1905,7 +1903,7 @@ namespace BATTLE {
                 ACPKMNSTS( i, OPPONENT ) = NA;
         }
         if( ACPKMNSTS( 0, PLAYER ) == KO ) {
-            for( int i = 1 + ( m_battleMode == DOUBLE ); i < _player->m_pkmnTeam->size( ); ++i ) {
+            for( size_t i = 1 + ( m_battleMode == DOUBLE ); i < _player->m_pkmnTeam->size( ); ++i ) {
                 if( ACPKMNSTS( i, PLAYER ) != KO ) {
                     std::swap( ACPOS( 0, PLAYER ), ACPOS( i, PLAYER ) );
                     break;
@@ -1913,7 +1911,7 @@ namespace BATTLE {
             }
         }
         if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, PLAYER ) == KO ) {
-            for( int i = 2; i < _player->m_pkmnTeam->size( ); ++i ) {
+            for( size_t i = 2; i < _player->m_pkmnTeam->size( ); ++i ) {
                 if( ACPKMNSTS( i, PLAYER ) != KO ) {
                     std::swap( ACPOS( 1, PLAYER ), ACPOS( i, PLAYER ) );
                     break;
@@ -1921,7 +1919,7 @@ namespace BATTLE {
             }
         }
         if( ACPKMNSTS( 0, OPPONENT ) == KO ) {
-            for( int i = 1 + ( m_battleMode == DOUBLE ); i < _opponent->m_pkmnTeam->size( ); ++i ) {
+            for( size_t i = 1 + ( m_battleMode == DOUBLE ); i < _opponent->m_pkmnTeam->size( ); ++i ) {
                 if( ACPKMNSTS( i, OPPONENT ) != KO ) {
                     std::swap( ACPOS( 0, OPPONENT ), ACPOS( i, OPPONENT ) );
                     break;
@@ -1929,7 +1927,7 @@ namespace BATTLE {
             }
         }
         if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, OPPONENT ) == KO ) {
-            for( int i = 2; i < _opponent->m_pkmnTeam->size( ); ++i ) {
+            for( size_t i = 2; i < _opponent->m_pkmnTeam->size( ); ++i ) {
                 if( ACPKMNSTS( i, OPPONENT ) != KO ) {
                     std::swap( ACPOS( 1, OPPONENT ), ACPOS( i, OPPONENT ) );
                     break;
@@ -1945,7 +1943,7 @@ namespace BATTLE {
         Bottom = *consoleInit( &Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
         consoleSetFont( &Bottom, &cfont );
 
-        touchPosition t;
+        //touchPosition t;
 
         initOAMTableSub( Oam );
         initOAMTable( OamTop );
@@ -2482,7 +2480,7 @@ namespace BATTLE {
         ( Oam->oamBuffer[ 20 ] ).isHidden = false;
         updateOAMSub( Oam );
 
-        int num = ( int )_player->m_pkmnTeam->size( );
+        int num = (int)_player->m_pkmnTeam->size( );
         consoleSelect( &Bottom );
 
         for( int i = 23; i < 32; i += ( ( ( i - 21 ) / 2 ) % 2 ? -2 : +6 ) ) {
@@ -2528,7 +2526,7 @@ namespace BATTLE {
 
     int battle::getSwitchPkmn( int& p_oamIndex, int& p_paletteIndex, int& p_tileIndex, bool p_retA ) {
         int res = -1;
-        int num = ( int )_player->m_pkmnTeam->size( );
+        int num = (int)_player->m_pkmnTeam->size( );
         touchPosition t;
         ( Oam->oamBuffer[ 20 ] ).isHidden = !p_retA;
         while( 42 ) {
@@ -2977,7 +2975,7 @@ ATTACKCHOSEN:
         videoSetMode( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
         drawTopBack( );
         initBattleScene( p_battleBack, p_weather );
-        touchPosition t;
+        //touchPosition t;
 
         while( ( _round-- ) != 0 ) {
             switchWith[ 0 ][ OPPONENT ] = switchWith[ 0 ][ PLAYER ] =
@@ -3050,7 +3048,7 @@ ATTACKCHOSEN:
 
             //Opp
             if( ACPKMNSTS( 0, OPPONENT ) == KO )
-                for( int i = 1 + ( m_battleMode == DOUBLE ); i < _opponent->m_pkmnTeam->size( ); ++i )
+                for( size_t i = 1 + ( m_battleMode == DOUBLE ); i < _opponent->m_pkmnTeam->size( ); ++i )
                     if( ACPKMNSTS( i, OPPONENT ) != KO ) {
                 switchOppPkmn( i, 0 );
                 for( int i = 0; i < 6; ++i )
@@ -3058,7 +3056,7 @@ ATTACKCHOSEN:
                 break;
                     }
             if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, OPPONENT ) == KO )
-                for( int i = 2; i < _opponent->m_pkmnTeam->size( ); ++i )
+                for( size_t i = 2; i < _opponent->m_pkmnTeam->size( ); ++i )
                     if( ACPKMNSTS( i, OPPONENT ) != KO ) {
                 switchOppPkmn( i, 1 );
                 for( int i = 0; i < 6; ++i )
@@ -3507,7 +3505,7 @@ BEFORE_1:
                                 bool newLevel = acPK.m_Level < 100 && POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] <= acPK.m_boxdata.m_exp;
                                 bool nL = newLevel;
 
-                                int HPdif = acPK.m_stats.m_maxHP - acPK.m_stats.m_acHP;
+                                unsigned short HPdif = acPK.m_stats.m_maxHP - acPK.m_stats.m_acHP;
 
                                 while( newLevel ) {
                                     acPK.m_Level++;
@@ -3558,7 +3556,7 @@ BEFORE_1:
                                         printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
                                                 ACPKMN( 1, PLAYER ).m_stats.m_acHP );
                                     }
-                                    newLevel = acPK.m_Level < 100 && POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] <= acPK.m_boxdata.m_exp;
+                                    newLevel = acPK.m_Level < 100 && (unsigned)POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] <= acPK.m_boxdata.m_exp;
                                 }
 
                                 if( nL && SAV.m_evolveInBattle ) {

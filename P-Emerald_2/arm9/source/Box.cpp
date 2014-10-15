@@ -54,16 +54,16 @@ void dPage( int p_Page ) {
 
 }
 
-extern OAMTable *oam;
+extern OAMTable *Oam;
 extern SpriteInfo* spriteInfo;
 const int MAXPKMNINBOXLIST = 7;
 int drawBox( short p_pkmnId ) {
     --p_pkmnId;
-    oam->oamBuffer[ A_ID ].isHidden = true;
-    oam->oamBuffer[ BACK_ID ].isHidden = true;
+    Oam->oamBuffer[ A_ID ].isHidden = true;
+    Oam->oamBuffer[ BACK_ID ].isHidden = true;
     for( int i = BORDER_ID; i < BORDER_ID + 10; ++i )
-        oam->oamBuffer[ i ].isHidden = true;
-    updateOAMSub( oam );
+        Oam->oamBuffer[ i ].isHidden = true;
+    updateOAMSub( Oam );
 
     loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNInfoScreen" );
 
