@@ -57,7 +57,7 @@ namespace font {
     Font::~Font( ) { }
 
 
-    void Font::print_char( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom ) {
+    void Font::printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom ) {
         _shiftchar( p_ch );
 
         s16 putX, putY;
@@ -68,10 +68,10 @@ namespace font {
             for( putX = p_x, getX = 0; putX < p_x + _widths[ p_ch ]; putX += 2, getX += 2 ) {
                 if( putX >= 0 && putX < SCREEN_WIDTH && putY >= 0 && putY < SCREEN_HEIGHT ) {
                     if( !p_bottom ) {
-                        top_screen_plot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
+                        topScreenPlot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
                                          (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     } else {
-                        btm_screen_plot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
+                        btmScreenPlot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
                                          (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     }
                 }
@@ -79,7 +79,7 @@ namespace font {
         }
     }
 
-    void Font::print_string( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void Font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -90,7 +90,7 @@ namespace font {
                 current_char++;
                 continue;
             }
-            print_char( p_string[ current_char ], putX, putY, p_bottom );
+            printChar( p_string[ current_char ], putX, putY, p_bottom );
 
             u16 c = (u16)p_string[ current_char ];
             _shiftchar( c );
@@ -99,7 +99,7 @@ namespace font {
             current_char++;
         }
     }
-    void Font::print_string( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void Font::printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -110,7 +110,7 @@ namespace font {
                 current_char++;
                 continue;
             }
-            print_char( p_string[ current_char ], putX, putY, p_bottom );
+            printChar( p_string[ current_char ], putX, putY, p_bottom );
 
             u16 c = (u16)p_string[ current_char ];
             _shiftchar( c );
@@ -119,7 +119,7 @@ namespace font {
             current_char++;
         }
     }
-    void Font::print_string_d( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void Font::printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -130,7 +130,7 @@ namespace font {
                 current_char++;
                 continue;
             }
-            print_char( p_string[ current_char ], putX, putY, p_bottom );
+            printChar( p_string[ current_char ], putX, putY, p_bottom );
 
             u16 c = (u16)p_string[ current_char ];
             _shiftchar( c );
@@ -141,7 +141,7 @@ namespace font {
             current_char++;
         }
     }
-    void Font::print_string_d( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void Font::printStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -152,7 +152,7 @@ namespace font {
                 current_char++;
                 continue;
             }
-            print_char( p_string[ current_char ], putX, putY, p_bottom );
+            printChar( p_string[ current_char ], putX, putY, p_bottom );
 
             u16 c = (u16)p_string[ current_char ];
             _shiftchar( c );
@@ -164,32 +164,32 @@ namespace font {
         }
     }
 
-    void Font::print_string_center( const char *p_string, bool p_bottom ) {
-        s16 x = SCREEN_WIDTH / 2 - string_width( p_string ) / 2;
+    void Font::printStringCenter( const char *p_string, bool p_bottom ) {
+        s16 x = SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2;
         s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
 
-        print_string( p_string, x, y, p_bottom );
+        printString( p_string, x, y, p_bottom );
     }
-    void Font::print_string_center_d( const char *p_string, bool p_bottom ) {
-        s16 x = ( SCREEN_WIDTH / 2 - string_width( p_string ) / 2 );
+    void Font::printStringCenterD( const char *p_string, bool p_bottom ) {
+        s16 x = ( SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2 );
         s16 y = ( SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2 );
 
-        print_string_d( p_string, x, y, p_bottom );
+        printStringD( p_string, x, y, p_bottom );
     }
-    void Font::print_string_center( const wchar_t *p_string, bool p_bottom ) {
-        s16 x = SCREEN_WIDTH / 2 - string_width( p_string ) / 2;
+    void Font::printStringCenter( const wchar_t *p_string, bool p_bottom ) {
+        s16 x = SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2;
         s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
 
-        print_string( p_string, x, y, p_bottom );
+        printString( p_string, x, y, p_bottom );
     }
-    void Font::print_string_center_d( const wchar_t *p_string, bool p_bottom ) {
-        s16 x = ( SCREEN_WIDTH / 2 - string_width( p_string ) / 2 );
+    void Font::printStringCenterD( const wchar_t *p_string, bool p_bottom ) {
+        s16 x = ( SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2 );
         s16 y = ( SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2 );
 
-        print_string_d( p_string, x, y, p_bottom );
+        printStringD( p_string, x, y, p_bottom );
     }
 
-    void Font::print_number( s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
+    void Font::printNumber( s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
         char numstring[ 10 ] = "";
         u32 number = p_num, quotient = 1, remainder = 0;
         char remainder_str[ 3 ] = "";
@@ -218,11 +218,11 @@ namespace font {
             string[ current_char2 + 1 ] = '\0';
         }
 
-        print_string( string, p_x, p_y, p_bottom );
+        printString( string, p_x, p_y, p_bottom );
     }
 
 
-    u32 Font::string_width( const char *p_string ) const {
+    u32 Font::stringWidth( const char *p_string ) const {
         u32 current_char = 0;
         u32 width = 0;
 
@@ -236,7 +236,7 @@ namespace font {
 
         return width - 1;
     }
-    u32 Font::string_width( const wchar_t *p_string ) const {
+    u32 Font::stringWidth( const wchar_t *p_string ) const {
         u32 current_char = 0;
         u32 width = 0;
 
@@ -252,7 +252,7 @@ namespace font {
     }
 }
 
-void top_screen_darken( ) {
+void topScreenDarken( ) {
     u16 i;
     color pixel;
 
@@ -264,7 +264,7 @@ void top_screen_darken( ) {
             ( 1 << 15 );
     }
 }
-void top_screen_plot( u8 p_x, u8 p_y, color p_color ) {
+void topScreenPlot( u8 p_x, u8 p_y, color p_color ) {
     if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
         ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
     else if( ( p_color >> 8 ) != 0 )
@@ -272,7 +272,7 @@ void top_screen_plot( u8 p_x, u8 p_y, color p_color ) {
     else if( ( p_color % ( 1 << 8 ) ) != 0 )
         ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
 }
-void btm_screen_darken( ) {
+void btmScreenDarken( ) {
     u16 i;
     color pixel;
 
@@ -284,7 +284,7 @@ void btm_screen_darken( ) {
             ( 1 << 15 );
     }
 }
-void btm_screen_plot( u8 p_x, u8 p_y, color p_color ) {
+void btmScreenPlot( u8 p_x, u8 p_y, color p_color ) {
     if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
         ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
     else if( ( p_color >> 8 ) != 0 )

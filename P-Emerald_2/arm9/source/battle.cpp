@@ -628,7 +628,7 @@ namespace BATTLE {
         BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
         BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
         sprintf( buffer, "Eine Herausforderung von\n %s %s!", trainerclassnames[ _opponent->m_trainerClass ], _opponent->m_battleTrainerName );
-        cust_font.print_string( buffer, 16, 80, true );
+        cust_font.printString( buffer, 16, 80, true );
 
         loadTrainerSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/TRAINER/", "n", 144, 16, oamIndex, palcnt, nextAvailableTileIdx, false );
         updateOAM( OamTop );
@@ -1456,7 +1456,7 @@ namespace BATTLE {
             clear( );
             sprintf( buffer, "%ls wird von\n%s %s\nauf die Bank geschickt. ", ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_Name,
                      trainerclassnames[ _opponent->m_trainerClass ], _opponent->m_battleTrainerName );
-            cust_font.print_string( buffer, 8, 8, true );
+            cust_font.printString( buffer, 8, 8, true );
         }
         for( int i = 1 + ( m_battleMode == DOUBLE && _opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ); i < 6; ++i )
             if( i == p_newPok || i == p_toSwitch ) {
@@ -1484,7 +1484,7 @@ namespace BATTLE {
                  trainerclassnames[ _opponent->m_trainerClass ],
                  _opponent->m_battleTrainerName,
                  ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_Name );
-        cust_font.print_string( buffer, 8, 8, true );
+        cust_font.printString( buffer, 8, 8, true );
 
         consoleSelect( &Top );
 
@@ -1503,7 +1503,7 @@ namespace BATTLE {
             OamTop->oamBuffer[ OPP_PB_START ].isHidden = false;
 
             if( !loadPKMNSprite( OamTop, spriteInfoTop,
-                "nitro:/PICS/SPRITES/pokemon/",
+                "nitro:/PICS/SPRITES/PKMN/",
                 ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
                 176,
                 20,
@@ -1518,7 +1518,7 @@ namespace BATTLE {
                 nextAvailableTileIdx = OPP_PKMN_1_TILE;
                 loadPKMNSprite( OamTop,
                                 spriteInfoTop,
-                                "nitro:/PICS/SPRITES/pokemon/",
+                                "nitro:/PICS/SPRITES/PKMN/",
                                 ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
                                 176,
                                 20,
@@ -1571,7 +1571,7 @@ namespace BATTLE {
 
             if( !loadPKMNSprite( OamTop,
                 spriteInfoTop,
-                "nitro:/PICS/SPRITES/pokemon/",
+                "nitro:/PICS/SPRITES/PKMN/",
                 ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC,
                 112,
                 4,
@@ -1586,7 +1586,7 @@ namespace BATTLE {
                 nextAvailableTileIdx = OPP_PKMN_2_TILE;
                 loadPKMNSprite( OamTop,
                                 spriteInfoTop,
-                                "nitro:/PICS/SPRITES/pokemon/",
+                                "nitro:/PICS/SPRITES/PKMN/",
                                 ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC,
                                 112,
                                 4,
@@ -1652,7 +1652,7 @@ namespace BATTLE {
             sprintf( buffer, "%s von\n %ls (Gegn.) wirkt!\n",
                      abilities[ ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_ability ].m_abilityName.c_str( ),
                      ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_Name );
-            cust_font.print_string( buffer, 8, 8, true );
+            cust_font.printString( buffer, 8, 8, true );
             //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
             for( int i = 0; i < 100; ++i )
                 swiWaitForVBlank( );
@@ -1688,7 +1688,7 @@ namespace BATTLE {
         if( ACPKMN( p_toSwitch, PLAYER ).m_stats.m_acHP ) {
             clear( );
             sprintf( buffer, "Auf die Bank,\n %ls!", ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_Name );
-            cust_font.print_string( buffer, 8, 8, true );
+            cust_font.printString( buffer, 8, 8, true );
         }
         std::swap( ACPOS( p_newPok, PLAYER ), ACPOS( p_toSwitch, PLAYER ) );
 
@@ -1699,7 +1699,7 @@ namespace BATTLE {
         consoleSelect( &Bottom );
         clear( );
         sprintf( buffer, "Los %ls!", ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_Name );
-        cust_font.print_string( buffer, 8, 8, true );
+        cust_font.printString( buffer, 8, 8, true );
 
         consoleSelect( &Top );
         if( p_toSwitch == 0 ) {
@@ -1840,7 +1840,7 @@ namespace BATTLE {
             sprintf( buffer, "%s von\n %ls wirkt!\n",
                      abilities[ ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_ability ].m_abilityName.c_str( ),
                      ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_Name );
-            cust_font.print_string( buffer, 8, 8, true );
+            cust_font.printString( buffer, 8, 8, true );
             //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
             for( int i = 0; i < 100; ++i )
                 swiWaitForVBlank( );
@@ -1983,7 +1983,7 @@ namespace BATTLE {
             trainerclassnames[ _opponent->m_trainerClass ],
             _opponent->m_battleTrainerName,
             ACPKMN( 0, OPPONENT ).m_boxdata.m_Name );
-        cust_font.print_string( buffer, 8, 8, true );
+        cust_font.printString( buffer, 8, 8, true );
         consoleSelect( &Top );
 
         animatePB( 206, 50 );
@@ -1995,7 +1995,7 @@ namespace BATTLE {
 
         if( !loadPKMNSprite( OamTop,
             spriteInfoTop,
-            "nitro:/PICS/SPRITES/pokemon/",
+            "nitro:/PICS/SPRITES/PKMN/",
             ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
             176,
             20,
@@ -2011,7 +2011,7 @@ namespace BATTLE {
             nextAvailableTileIdx = OPP_PKMN_1_TILE;
             loadPKMNSprite( OamTop,
                             spriteInfoTop,
-                            "nitro:/PICS/SPRITES/pokemon/",
+                            "nitro:/PICS/SPRITES/PKMN/",
                             ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
                             176,
                             20,
@@ -2047,7 +2047,7 @@ namespace BATTLE {
             consoleSelect( &Bottom );
             clear( );
             sprintf( buffer, "und %ls in den Kampf.", ACPKMN( 1, OPPONENT ).m_boxdata.m_Name );
-            cust_font.print_string( buffer, 8, 8, true );
+            cust_font.printString( buffer, 8, 8, true );
             consoleSelect( &Top );
 
             animatePB( 142, 34 );
@@ -2056,12 +2056,12 @@ namespace BATTLE {
             palcnt = OPP_PKMN_2_PAL;
             nextAvailableTileIdx = OPP_PKMN_2_TILE;
 
-            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
+            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
                 ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ), ACPKMN( 1, OPPONENT ).m_boxdata.m_isFemale ) ) {
                 oamIndex = OPP_PKMN_2_START;
                 palcnt = OPP_PKMN_2_PAL;
                 nextAvailableTileIdx = OPP_PKMN_2_TILE;
-                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
+                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
                                 ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ), !ACPKMN( 1, OPPONENT ).m_boxdata.m_isFemale );
             }
             if( ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ) )
@@ -2107,7 +2107,7 @@ namespace BATTLE {
             sprintf( buffer, "%s von\n %ls (Gegn.) wirkt!\n",
                      abilities[ ACPKMN( 0, OPPONENT ).m_boxdata.m_ability ].m_abilityName.c_str( ),
                      ACPKMN( 0, OPPONENT ).m_boxdata.m_Name );
-            cust_font.print_string( buffer, 8, 8, true );
+            cust_font.printString( buffer, 8, 8, true );
             //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
             for( int i = 0; i < 100; ++i )
                 swiWaitForVBlank( );
@@ -2117,7 +2117,7 @@ namespace BATTLE {
             sprintf( buffer, "%s von\n %ls (Gegn.) wirkt!\n",
                      abilities[ ACPKMN( 1, OPPONENT ).m_boxdata.m_ability ].m_abilityName.c_str( ),
                      ACPKMN( 1, OPPONENT ).m_boxdata.m_Name );
-            cust_font.print_string( buffer, 8, 8, true );
+            cust_font.printString( buffer, 8, 8, true );
             //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
             for( int i = 0; i < 100; ++i )
                 swiWaitForVBlank( );
@@ -2128,7 +2128,7 @@ namespace BATTLE {
         consoleSelect( &Bottom );
         clear( );
         sprintf( buffer, "Los %ls! ", ACPKMN( 0, PLAYER ).m_boxdata.m_Name );
-        cust_font.print_string( buffer, 8, 8, true );
+        cust_font.printString( buffer, 8, 8, true );
         consoleSelect( &Top );
 
         animatePB( 20, 150 );
@@ -2172,7 +2172,7 @@ namespace BATTLE {
             consoleSelect( &Bottom );
             clear( );
             sprintf( buffer, "Auf in den Kampf %ls! ", ACPKMN( 1, PLAYER ).m_boxdata.m_Name );
-            cust_font.print_string( buffer, 8, 8, true );
+            cust_font.printString( buffer, 8, 8, true );
             consoleSelect( &Top );
 
             animatePB( 80, 170 );
@@ -2269,7 +2269,7 @@ namespace BATTLE {
             sprintf( buffer, "%s von\n %ls wirkt!\n",
                      abilities[ ACPKMN( 0, PLAYER ).m_boxdata.m_ability ].m_abilityName.c_str( ),
                      ACPKMN( 0, PLAYER ).m_boxdata.m_Name );
-            cust_font.print_string( buffer, 8, 8, true );
+            cust_font.printString( buffer, 8, 8, true );
             //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
             for( int i = 0; i < 100; ++i )
                 swiWaitForVBlank( );
@@ -2279,7 +2279,7 @@ namespace BATTLE {
             sprintf( buffer, "%s von\n %ls wirkt!\n",
                      abilities[ ACPKMN( 1, PLAYER ).m_boxdata.m_ability ].m_abilityName.c_str( ),
                      ACPKMN( 1, PLAYER ).m_boxdata.m_Name );
-            cust_font.print_string( buffer, 8, 8, true );
+            cust_font.printString( buffer, 8, 8, true );
             //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
             for( int i = 0; i < 100; ++i )
                 swiWaitForVBlank( );
@@ -2611,7 +2611,7 @@ OUT2:
         drawPKMNIcon( Oam, spriteInfo, ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_SPEC, 112, 64, oamIndex, paletteIndex, tileIndex, true );
         clear( );
         sprintf( buffer, "Was soll %ls tun?", ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Name );
-        cust_font.print_string( buffer, 8, 8, true );
+        cust_font.printString( buffer, 8, 8, true );
         updateOAMSub( Oam );
 
         int aprest = 0;
@@ -2638,7 +2638,7 @@ OUT2:
                 if( aprest == 0 ) {
                     clear( );
                     printf( "%ls hat keine\n restlichen Attacken...", ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Name );
-                    cust_font.print_string( buffer, 8, 8, true );
+                    cust_font.printString( buffer, 8, 8, true );
                     ownAtk[ p_pkmnSlot ] = std::pair<int, int>( 165, 1 | 2 | 4 | 8 );
                 } else {
                     ( Oam->oamBuffer[ 20 ] ).isHidden = false;
@@ -2650,7 +2650,7 @@ OUT2:
                     consoleSetWindow( &Bottom, 0, 0, 32, 5 );
                     clear( );
                     sprintf( buffer, "Welchen Angriff?" );
-                    cust_font.print_string( buffer, 8, 8, true );
+                    cust_font.printString( buffer, 8, 8, true );
 
                     while( 42 ) {
                         updateTime( );
@@ -2721,7 +2721,7 @@ OUT2:
                                 consoleSetWindow( &Bottom, 0, 0, 32, 5 );
                                 clear( );
                                 sprintf( buffer, "Welchen Angriff?" );
-                                cust_font.print_string( buffer, 8, 8, true );
+                                cust_font.printString( buffer, 8, 8, true );
                                 break;
                             }
 
@@ -2802,7 +2802,7 @@ ATTACKCHOSEN:
 
         clear( );
         sprintf( buffer, "Wen soll %ls angreifen?", ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Name );
-        cust_font.print_string( buffer, 8, 8, true );
+        cust_font.printString( buffer, 8, 8, true );
 
         int oamIndex = oamIndexS, paletteIndex = palcntS, tileIndex = nextAvailableTileIdxS;
         printTargetChoiceScreen( p_pkmnSlot, p_move, oamIndex, paletteIndex, tileIndex );
@@ -2935,7 +2935,7 @@ ATTACKCHOSEN:
                 sprintf( buffer, "%ls wich der Attacke aus.", P.m_boxdata.m_Name );
             else
                 sprintf( buffer, "Die Attacke ging daneben..." );
-            cust_font.print_string( buffer, 8, 8, true );
+            cust_font.printString( buffer, 8, 8, true );
             for( int i = 0; i < 75; ++i )
                 swiWaitForVBlank( );
             return;
@@ -2954,13 +2954,13 @@ ATTACKCHOSEN:
             sprintf( buffer, "Das ist nicht sehr effektiv\ngegen %ls.", P.m_boxdata.m_Name );
 
         if( eff != 1 ) {
-            cust_font.print_string( buffer, 8, 8, true );
+            cust_font.printString( buffer, 8, 8, true );
             for( int i = 0; i < 75; ++i )
                 swiWaitForVBlank( );
         }
         if( criticalOccured ) {
             clear( );
-            cust_font.print_string( "Ein Volltreffer!", 8, 8, true );
+            cust_font.printString( "Ein Volltreffer!", 8, 8, true );
             for( int i = 0; i < 75; ++i )
                 swiWaitForVBlank( );
         }
@@ -3029,7 +3029,7 @@ ATTACKCHOSEN:
             if( ACPKMNSTS( 0, PLAYER ) == KO && ( m_battleMode != DOUBLE || ACPKMNSTS( 1, PLAYER ) == KO || ACPKMNSTS( 1, PLAYER ) == NA ) ) {
                 //Player lost
                 clear( );
-                cust_font.print_string( _opponent->getWinMsg( ), 8, 8, true );
+                cust_font.printString( _opponent->getWinMsg( ), 8, 8, true );
                 for( int i = 0; i < 75; ++i )
                     swiWaitForVBlank( );
 
@@ -3066,14 +3066,14 @@ ATTACKCHOSEN:
             if( ACPKMNSTS( 0, OPPONENT ) == KO && ( m_battleMode != DOUBLE || ACPKMNSTS( 1, OPPONENT ) == KO || ACPKMNSTS( 1, OPPONENT ) == NA ) ) {
                 //Opp lost
                 clear( );
-                cust_font.print_string( _opponent->getLooseMsg( ), 8, 8, true );
+                cust_font.printString( _opponent->getLooseMsg( ), 8, 8, true );
                 for( int i = 0; i < 75; ++i )
                     swiWaitForVBlank( );
 
                 SAV.m_money += _opponent->getLooseMoney( );
                 clear( );
                 sprintf( buffer, "Du gewinnst %dP!", _opponent->getLooseMoney( ) );
-                cust_font.print_string( buffer, 8, 8, true );
+                cust_font.printString( buffer, 8, 8, true );
                 for( int i = 0; i < 75; ++i )
                     swiWaitForVBlank( );
 
@@ -3200,7 +3200,7 @@ BEFORE_1:
                     ACPKMN( acin / 2, PLAYER ).m_boxdata.m_Name,
                     AttackList[ ownAtk[ acin / 2 ].first ]->m_moveName.c_str( ) );
                 clear( );
-                cust_font.print_string( buffer, 8, 8, true );
+                cust_font.printString( buffer, 8, 8, true );
                 for( int i = 0; i < 70; ++i )
                     swiWaitForVBlank( );
                 if( opp ) {
@@ -3404,7 +3404,7 @@ BEFORE_1:
                 if( ko[ 0 ][ PLAYER ] ) {
                     clear( );
                     sprintf( buffer, "%ls wurde besiegt.", ACPKMN( 0, PLAYER ).m_boxdata.m_Name );
-                    cust_font.print_string( buffer, 8, 8, true );
+                    cust_font.printString( buffer, 8, 8, true );
 
                     consoleSetWindow( &Top, 21, 16, 20, 4 );
                     consoleClear( );
@@ -3420,7 +3420,7 @@ BEFORE_1:
                 if( ko[ 1 ][ PLAYER ] ) {
                     clear( );
                     sprintf( buffer, "%ls wurde besiegt.", ACPKMN( 1, PLAYER ).m_boxdata.m_Name );
-                    cust_font.print_string( buffer, 8, 8, true );
+                    cust_font.printString( buffer, 8, 8, true );
 
                     consoleSetWindow( &Top, 16, 20, 20, 5 );
                     consoleClear( );
@@ -3436,7 +3436,7 @@ BEFORE_1:
                 if( ko[ 0 ][ OPPONENT ] ) {
                     clear( );
                     sprintf( buffer, "%ls (Gegner)\nwurde besiegt.", ACPKMN( 0, OPPONENT ).m_boxdata.m_Name );
-                    cust_font.print_string( buffer, 8, 8, true );
+                    cust_font.printString( buffer, 8, 8, true );
                     consoleSetWindow( &Top, 0, 5, 20, 2 );
                     consoleClear( );
                     for( int i = 0; i < 4; ++i )
@@ -3450,7 +3450,7 @@ BEFORE_1:
                 if( ko[ 1 ][ OPPONENT ] ) {
                     clear( );
                     sprintf( buffer, "%ls (Gegner)\nwurde besiegt.", ACPKMN( 1, OPPONENT ).m_boxdata.m_Name );
-                    cust_font.print_string( buffer, 8, 8, true );
+                    cust_font.printString( buffer, 8, 8, true );
 
                     consoleSetWindow( &Top, 4, 2, 20, 2 );
                     consoleClear( );
@@ -3483,7 +3483,7 @@ BEFORE_1:
 
                                 clear( );
                                 sprintf( buffer, "%ls erhält %d EV\nund %d E.-Punkte.", acPK.m_boxdata.m_Name, evsum, exp );
-                                cust_font.print_string( buffer, 8, 8, true );
+                                cust_font.printString( buffer, 8, 8, true );
 
                                 POKEMON::PKMNDATA::getAll( ( *_player->m_pkmnTeam )[ ACPOS( i, PLAYER ) ].m_boxdata.m_SPEC, p );
                                 int old = ( acPK.m_boxdata.m_exp - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
@@ -3525,7 +3525,7 @@ BEFORE_1:
 
                                     clear( );
                                     sprintf( buffer, "%ls erreicht Level %d.", acPK.m_boxdata.m_Name, acPK.m_Level );
-                                    cust_font.print_string( buffer, 8, 8, true );
+                                    cust_font.printString( buffer, 8, 8, true );
                                     for( int i = 0; i < 75; ++i )
                                         swiWaitForVBlank( );
 
@@ -3564,7 +3564,7 @@ BEFORE_1:
                                     if( acPK.canEvolve( ) ) {
                                         clear( );
                                         sprintf( buffer, "%ls entwickelt sich!", acPK.m_boxdata.m_Name );
-                                        cust_font.print_string( buffer, 8, 8, true );
+                                        cust_font.printString( buffer, 8, 8, true );
                                         for( int i = 0; i < 75; ++i )
                                             swiWaitForVBlank( );
 
@@ -3646,7 +3646,7 @@ BEFORE_1:
 
                                         clear( );
                                         sprintf( buffer, "Und wurde zu einem\n%ls.", acPK.m_boxdata.m_Name );
-                                        cust_font.print_string( buffer, 8, 8, true );
+                                        cust_font.printString( buffer, 8, 8, true );
 
                                         for( int i = 0; i < 75; ++i )
                                             swiWaitForVBlank( );

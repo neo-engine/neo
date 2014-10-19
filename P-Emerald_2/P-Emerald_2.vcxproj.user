@@ -5,4 +5,9 @@
     <LocalDebuggerCommandArguments>$(ProjectDir)P-Emerald_2.nds</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NDS|Win32'">
+    <LocalDebuggerCommand>$(ProjectDir)NO%24GBA.EXE</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>$(ProjectDir)P-Emerald_2.nds</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

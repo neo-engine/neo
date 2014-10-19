@@ -76,7 +76,7 @@ std::wstring keyboard::getText( int p_length, const char* p_msg, bool p_time ) {
     font::putrec( 0, 0, 256, 63, true, false, 250 );
 
     if( p_msg != 0 )
-        cust_font.print_string( p_msg, 8, 4, true );
+        cust_font.printString( p_msg, 8, 4, true );
 
     draw( );
     std::wstring out;
@@ -101,7 +101,7 @@ std::wstring keyboard::getText( int p_length, const char* p_msg, bool p_time ) {
             out += _chars[ std::pair<int, int>( t.px / 8, t.py / 8 ) ];
 
             font::putrec( 8 * ( 13 - i / 3 ), 40, 8 * ( 13 - i / 3 + p_length + 1 ), 56, true, false, 250 );
-            cust_font.print_string( out.c_str( ), 8 * ( 13 - i / 3 ), 40, true );
+            cust_font.printString( out.c_str( ), 8 * ( 13 - i / 3 ), 40, true );
             swiWaitForVBlank( );
         } else if( ( sqrt( sq( 248 - t.px ) + sq( 162 - t.py ) ) <= 16 ) ) {
             while( 1 ) {
@@ -116,14 +116,14 @@ std::wstring keyboard::getText( int p_length, const char* p_msg, bool p_time ) {
             undraw( );
             if( p_msg != 0 ) {
                 font::putrec( 0, 0, 256, 63, true, false, 250 );
-                cust_font.print_string( p_msg, 8, 4, true );
+                cust_font.printString( p_msg, 8, 4, true );
             }
             draw( );
             if( p_time )
                 updateTime( );
 
             font::putrec( 8 * ( 13 - i / 3 ), 40, 8 * ( 13 - i / 3 + p_length + 1 ), 56, true, false, 250 );
-            cust_font.print_string( out.c_str( ), 8 * ( 13 - i / 3 ), 40, true );
+            cust_font.printString( out.c_str( ), 8 * ( 13 - i / 3 ), 40, true );
         } else if( sqrt( sq( 248 - t.px ) + sq( 184 - t.py ) ) <= 16 ) {
             while( 1 ) {
                 scanKeys( );
@@ -148,7 +148,7 @@ std::wstring keyboard::getText( int p_length, const char* p_msg, bool p_time ) {
             out.erase( ( out.end( ) - 1 ) );
             font::putrec( 8 * ( 13 - i / 3 ), 40, 8 * ( 13 - i / 3 + p_length + 1 ), 56, true, false, 250 );
             --i;
-            cust_font.print_string( out.c_str( ), 8 * ( 13 - i / 3 ), 40, true );
+            cust_font.printString( out.c_str( ), 8 * ( 13 - i / 3 ), 40, true );
         }
         swiWaitForVBlank( );
     }
@@ -180,7 +180,7 @@ void keyboard::draw( ) {
                     cl_cnt = 3;
                     rw_cnt += 3;
                 }
-                cust_font2.print_char( i, cl_cnt * 8, rw_cnt * 8, true );
+                cust_font2.printChar( i, cl_cnt * 8, rw_cnt * 8, true );
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt ) ] = i;
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt + 1 ) ] = i;
                 cl_cnt += 2;
@@ -189,7 +189,7 @@ void keyboard::draw( ) {
             cl_cnt = 3;
             char pt[ 14 ] = "ÄÖÜ .!?()[]{}";
             for( int i = 0; i < 13; ++i ) {
-                cust_font2.print_char( pt[ i ], cl_cnt * 8, rw_cnt * 8, true );
+                cust_font2.printChar( pt[ i ], cl_cnt * 8, rw_cnt * 8, true );
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt ) ] = pt[ i ];
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt + 1 ) ] = pt[ i ];
                 cl_cnt += 2;
@@ -206,7 +206,7 @@ void keyboard::draw( ) {
                     cl_cnt = 3;
                     rw_cnt += 3;
                 }
-                cust_font2.print_char( i, cl_cnt * 8, rw_cnt * 8, true );
+                cust_font2.printChar( i, cl_cnt * 8, rw_cnt * 8, true );
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt ) ] = i;
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt + 1 ) ] = i;
                 cl_cnt += 2;
@@ -215,7 +215,7 @@ void keyboard::draw( ) {
             cl_cnt = 3;
             char pt[ 14 ] = "äöüßé §$%&/\\#";
             for( int i = 0; i < 13; ++i ) {
-                cust_font2.print_char( pt[ i ], cl_cnt * 8, rw_cnt * 8, true );
+                cust_font2.printChar( pt[ i ], cl_cnt * 8, rw_cnt * 8, true );
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt ) ] = pt[ i ];
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt + 1 ) ] = pt[ i ];
                 cl_cnt += 2;
@@ -228,7 +228,7 @@ void keyboard::draw( ) {
 
             char pt[ 14 ] = "0123456789,;:";
             for( int i = 0; i < 13; ++i ) {
-                cust_font2.print_char( pt[ i ], cl_cnt * 8, rw_cnt * 8, true );
+                cust_font2.printChar( pt[ i ], cl_cnt * 8, rw_cnt * 8, true );
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt ) ] = pt[ i ];
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt + 1 ) ] = pt[ i ];
                 cl_cnt += 2;
@@ -236,7 +236,7 @@ void keyboard::draw( ) {
             rw_cnt += 3;
             cl_cnt = 3;
             for( int i = 3 * 49 - 10; i < 3 * 49 + 3; ++i ) {
-                cust_font2.print_char( i, cl_cnt * 8, rw_cnt * 8, true );
+                cust_font2.printChar( i, cl_cnt * 8, rw_cnt * 8, true );
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt ) ] = i;
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt + 1 ) ] = i;
                 cl_cnt += 2;
@@ -244,7 +244,7 @@ void keyboard::draw( ) {
             rw_cnt += 4;
             cl_cnt = 3;
             for( int i = 3 * 49 + 3; i < 3 * 49 + 16; ++i ) {
-                cust_font2.print_char( i, cl_cnt * 8, rw_cnt * 8, true );
+                cust_font2.printChar( i, cl_cnt * 8, rw_cnt * 8, true );
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt ) ] = i;
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt + 1 ) ] = i;
                 cl_cnt += 2;

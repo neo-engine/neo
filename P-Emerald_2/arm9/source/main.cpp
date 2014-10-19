@@ -83,11 +83,7 @@ SpriteInfo spriteInfo[ SPRITE_COUNT ];
 OAMTable *OamTop = new OAMTable( );
 SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 
-//Centers o t circles.
-//pokemon -> ID -> DEX -> Bag -> Opt -> Nav
-// X|Y
-int mainSpritesPositions[ 6 ][ 2 ]
-= { { 130, 60 }, { 160, 80 }, { 160, 115 }, { 130, 135 }, { 100, 115 }, { 100, 80 } };
+#define _EMULATOR
 
 enum GameMod {
     DEVELOPER,
@@ -96,7 +92,11 @@ enum GameMod {
     RELEASE,
     EMULATOR
 };
-#define gMod DEVELOPER
+#ifndef _EMULATOR
+GameMod gMod = DEVELOPER;
+#else
+GameMod gMod = EMULATOR;
+#endif
 
 std::string CodeName = "Reborn Ho-Oh";
 SavMod savMod = _NDS;
@@ -185,24 +185,24 @@ void fillWeiter( ) {
         BG_PALETTE_SUB[ 252 ] = RGB15( 31, 0, 0 );
 
     sprintf( buffer, "%ls", SAV.getName( ).c_str( ) );
-    cust_font.print_string( buffer, 128, 5, true );
+    cust_font.printString( buffer, 128, 5, true );
 
     sprintf( buffer, "%s", POKEMON::getLoc( SAV.m_acMapIdx ) );
-    cust_font.print_string( "Ort:", 16, 23, true );
-    cust_font.print_string( buffer, 128, 23, true );
+    cust_font.printString( "Ort:", 16, 23, true );
+    cust_font.printString( buffer, 128, 23, true );
 
 
     sprintf( buffer, "%d:%02d", SAV.m_pt.m_hours, SAV.m_pt.m_mins );
-    cust_font.print_string( "Spielzeit:", 16, 37, true );
-    cust_font.print_string( buffer, 128, 37, true );
+    cust_font.printString( "Spielzeit:", 16, 37, true );
+    cust_font.printString( buffer, 128, 37, true );
 
     sprintf( buffer, "%i", SAV.m_badges );
-    cust_font.print_string( "Orden:", 16, 51, true );
-    cust_font.print_string( buffer, 128, 51, true );
+    cust_font.printString( "Orden:", 16, 51, true );
+    cust_font.printString( buffer, 128, 51, true );
 
     sprintf( buffer, "%i", SAV.m_dex );
-    cust_font.print_string( "PokéDex:", 16, 65, true );
-    cust_font.print_string( buffer, 128, 65, true );
+    cust_font.printString( "PokéDex:", 16, 65, true );
+    cust_font.printString( buffer, 128, 65, true );
 }
 void killWeiter( ) {
     consoleSetWindow( &Bottom, 1, 1, 30, 22 );
@@ -376,14 +376,14 @@ void initNewGame( ) {
 
     PLAYMp( "1001.mp3" );
 
-    cust_font.print_string_d( "Haaaaalt!", 24, 84, true );
+    cust_font.printStringD( "Haaaaalt!", 24, 84, true );
     while( 1 ) {
         swiWaitForVBlank( );
         scanKeys( );
         if( keysCurrent( ) & KEY_TOUCH ) break;
         if( keysCurrent( ) & KEY_A ) break;
     }
-    cust_font.print_string_d( "Hier lang!", 100, 84, true );
+    cust_font.printStringD( "Hier lang!", 100, 84, true );
     while( 1 ) {
         swiWaitForVBlank( );
         scanKeys( );
@@ -406,7 +406,7 @@ void initNewGame( ) {
     }
 
     loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
-    cust_font.print_string_d( "Hi, ich bin Maike, die\n""Tochter von Prof. Birk.", 24, 76, true );
+    cust_font.printStringD( "Hi, ich bin Maike, die\n""Tochter von Prof. Birk.", 24, 76, true );
 
     while( 1 ) {
         scanKeys( );
@@ -416,7 +416,7 @@ void initNewGame( ) {
     loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
     //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
     //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
-    cust_font.print_string_d( "Da er gerade leider nicht in Hoenn\nist, werde ich euch heute euren\nPokéNav und euren PokéDex\nüberreichen.", 8, 68, true );
+    cust_font.printStringD( "Da er gerade leider nicht in Hoenn\nist, werde ich euch heute euren\nPokéNav und euren PokéDex\nüberreichen.", 8, 68, true );
 
     while( 1 ) {
         scanKeys( );
@@ -427,7 +427,7 @@ void initNewGame( ) {
     //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
     //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
 
-    cust_font.print_string_d( "So hier ist erstmal der PokéNav!", 8, 84, true );
+    cust_font.printStringD( "So hier ist erstmal der PokéNav!", 8, 84, true );
 
     while( 1 ) {
         scanKeys( );
@@ -437,7 +437,7 @@ void initNewGame( ) {
     loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
     //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
     //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
-    cust_font.print_string_d( "Ich gehe dann jetzt mal\ndie Dexe holen.\nIhr könnt solange eure\nPokéNav einrichten.", 24, 68, true );
+    cust_font.printStringD( "Ich gehe dann jetzt mal\ndie Dexe holen.\nIhr könnt solange eure\nPokéNav einrichten.", 24, 68, true );
     while( 1 ) {
         scanKeys( );
         if( keysUp( ) & KEY_TOUCH ) break;
@@ -1013,10 +1013,8 @@ CONT:
         case CANCEL:
             //printf("%i",SAV.SavTyp);
             //while(1);
-            goto START;
-        case CONTINUE:
-            scrn.init( );
-            break;
+            if( gMod != EMULATOR )
+                goto START;
         case OPTIONS:
             scrn.init( );
             SAV = saveGame( );
@@ -1050,6 +1048,9 @@ CONT:
             strcpy( SAV.m_acMapName, "0/98" );
             SAV.m_acMapIdx = 1000;
             SAV.m_acposx = 2 * 20, SAV.m_acposy = 25 * 20, SAV.m_acposz = 3;
+            break;
+        case CONTINUE:
+            scrn.init( );
             break;
         case NEW_GAME:
             initNewGame( );
@@ -1774,8 +1775,8 @@ void shoUseAttack( int p_pkmIdx, bool p_female, bool p_shiny ) {
     for( int i = 0; i < 4; ++i )
         OamTop->oamBuffer[ 2 + i ].isHidden = false;
     int a = 5, b = 2, c = 96;
-    if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, p_female ) ) {
-        loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, !p_female );
+    if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, p_female ) ) {
+        loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, !p_female );
     }
     updateOAM( OamTop );
 
@@ -1973,7 +1974,7 @@ OUT:
         // X|Y
         //int mainSpritesPositions[6][2] 
         //= {{130,60},{160,80},{160,115},{130,135},{100,115},{100,80}};
-        if( sqrt( sq( mainSpritesPositions[ 3 ][ 0 ] - touch.px ) + sq( mainSpritesPositions[ 3 ][ 1 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 6 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 7 ] - touch.py ) ) <= 16 && mode == -1 ) {
 
             while( 1 ) {
                 swiWaitForVBlank( );
@@ -1988,7 +1989,7 @@ OUT:
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
         //StartPkmn
-        else if( SAV.m_PkmnTeam.size( ) && ( sqrt( sq( mainSpritesPositions[ 0 ][ 0 ] - touch.px ) + sq( mainSpritesPositions[ 0 ][ 1 ] - touch.py ) ) <= 16 ) && mode == -1 ) {
+        else if( SAV.m_PkmnTeam.size( ) && ( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 0 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 ) && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( true );
@@ -2005,7 +2006,7 @@ OUT:
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
         //StartDex
-        else if( sqrt( sq( mainSpritesPositions[ 2 ][ 0 ] - touch.px ) + sq( mainSpritesPositions[ 2 ][ 1 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 4 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 5 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( true );
@@ -2021,7 +2022,7 @@ OUT:
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
         //StartOptions
-        else if( sqrt( sq( mainSpritesPositions[ 4 ][ 0 ] - touch.px ) + sq( mainSpritesPositions[ 4 ][ 1 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 8 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 9 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( true );
@@ -2032,7 +2033,7 @@ OUT:
             }
         }
         //StartID
-        else if( sqrt( sq( mainSpritesPositions[ 1 ][ 0 ] - touch.px ) + sq( mainSpritesPositions[ 1 ][ 1 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 3 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( true );
@@ -2050,7 +2051,7 @@ OUT:
                     SAV.m_PkmnTeam.clear( );
                     for( int i = 0; i < 5; ++i ) {
                         POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
-                                         20, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName().c_str()*/, !SAV.m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                            20, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName().c_str()*/, !SAV.m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         stored_pkmn[ *free_spaces.rbegin( ) ] = a.m_boxdata;
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         if( POKEMON::PKMNDATA::canLearn( HILFSCOUNTER, 57, 4 ) )
@@ -2088,7 +2089,7 @@ OUT:
 
                     for( int i = 0; i < 3; ++i ) {
                         POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
-                                         30, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                            30, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                         HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
@@ -2108,7 +2109,7 @@ OUT:
 
                     for( int i = 0; i < 6; ++i ) {
                         POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
-                                         15, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                            15, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                         HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
@@ -2128,7 +2129,7 @@ OUT:
 
         }
         //StartPok\x82""nav
-        else if( sqrt( sq( mainSpritesPositions[ 5 ][ 0 ] - touch.px ) + sq( mainSpritesPositions[ 5 ][ 1 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 10 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 11 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( true );
@@ -2142,7 +2143,7 @@ OUT:
             //movePlayerOnMap(SAV.m_acposx/20,SAV.m_acposy/20,SAV.m_acposz,false);
         }
         //StartMaps
-        else if( sqrt( sq( mainSpritesPositions[ 0 ][ 0 ] - touch.px ) + sq( mainSpritesPositions[ 0 ][ 1 ] - touch.py ) ) <= 16 && mode == 0 ) {
+        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 0 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 && mode == 0 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( true );

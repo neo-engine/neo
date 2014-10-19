@@ -102,6 +102,9 @@
     <ClInclude Include="arm9\include\pokemon.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\include\script.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm9\source\ability.cpp">
@@ -178,6 +181,9 @@
     </ClCompile>
     <ClCompile Include="arm9\source\pokemon.cpp">
       <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\script.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

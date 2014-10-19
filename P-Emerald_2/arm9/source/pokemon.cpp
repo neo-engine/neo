@@ -905,38 +905,38 @@ NEXT:
 
             consoleSetWindow( p_top, 20, 1, 13, 2 );
 
-            cust_font.print_string( &( m_boxdata.m_Name[ 0 ] ), 150, 2, false );
+            cust_font.printString( &( m_boxdata.m_Name[ 0 ] ), 150, 2, false );
             int G = m_boxdata.gender( );
 
-            cust_font.print_char( '/', 234, 2, false );
+            cust_font.printChar( '/', 234, 2, false );
             if( m_boxdata.m_SPEC != 29 && m_boxdata.m_SPEC != 32 ) {
                 if( G == 1 ) {
                     cust_font.setColor( 255, 1 );
-                    cust_font.print_char( 136, 246, 8, false );
+                    cust_font.printChar( 136, 246, 8, false );
                 } else {
                     cust_font.setColor( 254, 1 );
-                    cust_font.print_char( 137, 246, 8, false );
+                    cust_font.printChar( 137, 246, 8, false );
                 }
             }
             cust_font.setColor( 253, 1 );
 
             PKMNDATA::getAll( m_boxdata.m_SPEC, data );
-            cust_font.print_string( PKMNDATA::getDisplayName( m_boxdata.m_SPEC ), 160, 16, false );
+            cust_font.printString( PKMNDATA::getDisplayName( m_boxdata.m_SPEC ), 160, 16, false );
 
             if( m_boxdata.getItem( ) ) {
-                cust_font.print_string( "Item", 2, 176, false );
+                cust_font.printString( "Item", 2, 176, false );
                 cust_font.setColor( 252, 1 );
                 cust_font.setColor( 0, 2 );
                 char buf[ 200 ];
                 sprintf( buf, "%s: %s", ItemList[ m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
                          ItemList[ m_boxdata.getItem( ) ].getShortDescription( true ).c_str( ) );
-                cust_font.print_string( buf, 50, 159, false );
+                cust_font.printString( buf, 50, 159, false );
                 drawItemIcon( OamTop, spriteInfoTop, ItemList[ m_boxdata.getItem( ) ].m_itemName, 2, 152, a2, b2, c2, false );
                 updateOAM( OamTop );
             } else {
                 cust_font.setColor( 252, 1 );
                 cust_font.setColor( 0, 2 );
-                cust_font.print_string( ItemList[ m_boxdata.getItem( ) ].getDisplayName( ).c_str( ), 56, 168, false );
+                cust_font.printString( ItemList[ m_boxdata.getItem( ) ].getDisplayName( ).c_str( ), 56, 168, false );
             }
             cust_font.setColor( 251, 1 );
             cust_font.setColor( 252, 2 );
@@ -945,14 +945,14 @@ NEXT:
             BG_PALETTE[ 253 ] = RGB15( 31, 31, 31 );
             cust_font.setColor( 253, 1 );
 
-            cust_font.print_string( "Ei", 150, 2, false );
-            cust_font.print_char( '/', 234, 2, false );
-            cust_font.print_string( "Ei", 160, 18, false );
+            cust_font.printString( "Ei", 150, 2, false );
+            cust_font.printChar( '/', 234, 2, false );
+            cust_font.printString( "Ei", 160, 18, false );
             cust_font.setColor( 251, 1 );
         }
         switch( p_page ) {
             case 0:
-                cust_font.print_string( "Pokémon-Info", 36, 4, false );
+                cust_font.printString( "Pokémon-Info", 36, 4, false );
                 if( !( m_boxdata.m_IV.m_isEgg ) ) {
                     consoleSetWindow( p_top, 16, 4, 32, 24 );
                     printf( "     Lv.%3i", m_Level );
@@ -962,7 +962,7 @@ NEXT:
 
                     char buf[ 50 ];
                     sprintf( buf, "KP                     %3i", m_stats.m_maxHP );
-                    cust_font.print_string( buf, 130, 44, false );
+                    cust_font.printString( buf, 130, 44, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 0 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -971,7 +971,7 @@ NEXT:
                     else
                         cust_font.setColor( 251, 1 );
                     sprintf( buf, "ANG                   %3i", m_stats.m_Atk );
-                    cust_font.print_string( buf, 130, 69, false );
+                    cust_font.printString( buf, 130, 69, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 1 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -980,7 +980,7 @@ NEXT:
                     else
                         cust_font.setColor( 251, 1 );
                     sprintf( buf, "VER                   %3i", m_stats.m_Def );
-                    cust_font.print_string( buf, 130, 86, false );
+                    cust_font.printString( buf, 130, 86, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 2 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -989,7 +989,7 @@ NEXT:
                     else
                         cust_font.setColor( 251, 1 );
                     sprintf( buf, "INI                   \xC3\xC3""%3i", m_stats.m_Spd );
-                    cust_font.print_string( buf, 130, 103, false );
+                    cust_font.printString( buf, 130, 103, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 3 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -998,7 +998,7 @@ NEXT:
                     else
                         cust_font.setColor( 251, 1 );
                     sprintf( buf, "SAN                   %3i", m_stats.m_SAtk );
-                    cust_font.print_string( buf, 130, 120, false );
+                    cust_font.printString( buf, 130, 120, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 4 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -1007,7 +1007,7 @@ NEXT:
                     else
                         cust_font.setColor( 251, 1 );
                     sprintf( buf, "SVE                   %3i", m_stats.m_SDef );
-                    cust_font.print_string( buf, 130, 137, false );
+                    cust_font.printString( buf, 130, 137, false );
 
                     font::putrec( 158, 46, 158 + 68, 46 + 12, false, false, 251 );
 
@@ -1022,26 +1022,26 @@ NEXT:
                 } else {
                     consoleSetWindow( p_top, 16, 4, 32, 24 );
                     if( m_boxdata.m_steps > 10 ) {
-                        cust_font.print_string( "Was da wohl", 16 * 8, 50, false );
-                        cust_font.print_string( "schlüpfen wird?", 16 * 8, 70, false );
-                        cust_font.print_string( "Es dauert wohl", 16 * 8, 100, false );
-                        cust_font.print_string( "noch lange.", 16 * 8, 120, false );
+                        cust_font.printString( "Was da wohl", 16 * 8, 50, false );
+                        cust_font.printString( "schlüpfen wird?", 16 * 8, 70, false );
+                        cust_font.printString( "Es dauert wohl", 16 * 8, 100, false );
+                        cust_font.printString( "noch lange.", 16 * 8, 120, false );
                     } else if( m_boxdata.m_steps > 5 ) {
-                        cust_font.print_string( "Hat es sich", 16 * 8, 50, false );
-                        cust_font.print_string( "gerade bewegt?", 16 * 8, 70, false );
-                        cust_font.print_string( "Da tut sich", 16 * 8, 100, false );
-                        cust_font.print_string( "wohl bald was.", 16 * 8, 120, false );
+                        cust_font.printString( "Hat es sich", 16 * 8, 50, false );
+                        cust_font.printString( "gerade bewegt?", 16 * 8, 70, false );
+                        cust_font.printString( "Da tut sich", 16 * 8, 100, false );
+                        cust_font.printString( "wohl bald was.", 16 * 8, 120, false );
                     } else {
-                        cust_font.print_string( "Jetzt macht es", 16 * 8, 50, false );
-                        cust_font.print_string( "schon Geräusche!", 16 * 8, 70, false );
-                        cust_font.print_string( "Bald ist es", 16 * 8, 100, false );
-                        cust_font.print_string( "wohl soweit.", 16 * 8, 120, false );
+                        cust_font.printString( "Jetzt macht es", 16 * 8, 50, false );
+                        cust_font.printString( "schon Geräusche!", 16 * 8, 70, false );
+                        cust_font.printString( "Bald ist es", 16 * 8, 100, false );
+                        cust_font.printString( "wohl soweit.", 16 * 8, 120, false );
                     }
                 }
                 break;
             case 1:
             {
-                cust_font.print_string( "Attacken", 36, 4, false );
+                cust_font.printString( "Attacken", 36, 4, false );
 
                 consoleSetWindow( p_top, 16, 5, 32, 24 );
                 for( int i = 0; i < 4; i++ ) {
@@ -1098,7 +1098,7 @@ NEXT:
                 break;
             }
             case 2:
-                cust_font.print_string( "Bänder", 36, 4, false );
+                cust_font.printString( "Bänder", 36, 4, false );
 
                 break;
             default:
@@ -1219,64 +1219,64 @@ NEXT:
         BG_PALETTE_SUB[ 255 ] = RGB15( 15, 15, 15 );
         BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
 
-        cust_font.print_string( "OT:", 28, 22, true );
+        cust_font.printString( "OT:", 28, 22, true );
         cust_font.setColor( 253, 2 );
-        cust_font.print_string( m_boxdata.m_OT, 56, 16, true );
+        cust_font.printString( m_boxdata.m_OT, 56, 16, true );
         cust_font.setColor( 255, 2 );
 
         char buf[ 50 ];
         sprintf( buf, "(%05i/%05i)", m_boxdata.m_ID, m_boxdata.m_SID );
-        cust_font.print_string( buf, 50, 30, true );
+        cust_font.printString( buf, 50, 30, true );
 
         if( m_boxdata.m_ID == SAV.m_Id && m_boxdata.m_SID == SAV.m_Sid ) //Trainer is OT
         {
             if( m_boxdata.m_fateful )
-                cust_font.print_string( "Schicksalhafte Begegnung.", 28, 120, true );
+                cust_font.printString( "Schicksalhafte Begegnung.", 28, 120, true );
             if( !( m_boxdata.m_gotDate[ 0 ] ) ) {
                 if( savMod == SavMod::_NDS )
                     sprintf( buf, "Gefangen am %02i.%02i.%02i mit Lv. %i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ], m_boxdata.m_gotLevel );
                 else
                     sprintf( buf, "Gefangen mit Lv. %i", m_boxdata.m_gotLevel );
-                cust_font.print_string( buf, 28, 44, true );
+                cust_font.printString( buf, 28, 44, true );
                 sprintf( buf, "in/bei %s.", getLoc( m_boxdata.m_gotPlace ) );
-                cust_font.print_string( buf, 35, 58, true );
+                cust_font.printString( buf, 35, 58, true );
                 sprintf( buf, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                cust_font.print_string( buf, 28, 76, true );
+                cust_font.printString( buf, 28, 76, true );
                 sprintf( buf, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
-                cust_font.print_string( buf, 35, 90, true );
+                cust_font.printString( buf, 35, 90, true );
 
                 sprintf( buf, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
-                cust_font.print_string( buf, 28, 104, true );
+                cust_font.printString( buf, 28, 104, true );
             } else {
                 if( savMod == SavMod::_NDS )
                     sprintf( buf, "Als Ei erhalten am %02i.%02i.%02i", m_boxdata.m_gotDate[ 0 ], m_boxdata.m_gotDate[ 1 ], m_boxdata.m_gotDate[ 2 ] );
                 else
                     sprintf( buf, "Als Ei erhalten." );
-                cust_font.print_string( buf, 28, 44, true );
+                cust_font.printString( buf, 28, 44, true );
                 sprintf( buf, "in/bei %s.", getLoc( m_boxdata.m_gotPlace ) );
-                cust_font.print_string( buf, 35, 58, true );
+                cust_font.printString( buf, 35, 58, true );
                 if( !( m_boxdata.m_IV.m_isEgg ) ) {
 
                     if( savMod == SavMod::_NDS ) {
                         sprintf( buf, "Geschlüpft am %02i.%02i.%02i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ] );
-                        cust_font.print_string( buf, 28, 72, true );
+                        cust_font.printString( buf, 28, 72, true );
                         sprintf( buf, "in/bei %s.", getLoc( m_boxdata.m_hatchPlace ) );
-                        cust_font.print_string( buf, 35, 86, true );
+                        cust_font.printString( buf, 35, 86, true );
                     } else {
                         sprintf( buf, "Geschlüpft in/bei %s.", getLoc( m_boxdata.m_hatchPlace ) );
-                        cust_font.print_string( buf, 28, 72, true );
+                        cust_font.printString( buf, 28, 72, true );
                     }
                     if( !m_boxdata.m_fateful ) {
                         sprintf( buf, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                        cust_font.print_string( buf, 28, 100, true );
+                        cust_font.printString( buf, 28, 100, true );
                         sprintf( buf, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
-                        cust_font.print_string( buf, 35, 114, true );
+                        cust_font.printString( buf, 35, 114, true );
 
                         sprintf( buf, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
-                        cust_font.print_string( buf, 28, 128, true );
+                        cust_font.printString( buf, 28, 128, true );
                     } else {
                         sprintf( buf, "Besitzt ein %s""es Wesen.", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                        cust_font.print_string( buf, 28, 100, true );
+                        cust_font.printString( buf, 28, 100, true );
                     }
                 }
             }
@@ -1286,50 +1286,50 @@ NEXT:
                     sprintf( buf, "Off. gef. am %02i.%02i.%02i mit Lv. %i.", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ], m_boxdata.m_gotLevel );
                 else
                     sprintf( buf, "Offenbar gefangen mit Lv. %i.", m_boxdata.m_gotLevel );
-                cust_font.print_string( buf, 28, 44, true );
+                cust_font.printString( buf, 28, 44, true );
                 sprintf( buf, "in/bei %s.", getLoc( m_boxdata.m_gotPlace ) );
-                cust_font.print_string( buf, 35, 58, true );
+                cust_font.printString( buf, 35, 58, true );
                 sprintf( buf, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                cust_font.print_string( buf, 28, 76, true );
+                cust_font.printString( buf, 28, 76, true );
                 sprintf( buf, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
-                cust_font.print_string( buf, 35, 90, true );
+                cust_font.printString( buf, 35, 90, true );
 
                 sprintf( buf, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
-                cust_font.print_string( buf, 28, 104, true );
+                cust_font.printString( buf, 28, 104, true );
             } else {
                 if( savMod == SavMod::_NDS )
                     sprintf( buf, "Off. Als Ei erh. am %02i.%02i.%02i", m_boxdata.m_gotDate[ 0 ], m_boxdata.m_gotDate[ 1 ], m_boxdata.m_gotDate[ 2 ] );
                 else
                     sprintf( buf, "Offenbar als Ei erhalten." );
-                cust_font.print_string( buf, 28, 44, true );
+                cust_font.printString( buf, 28, 44, true );
                 sprintf( buf, "in/bei %s.", getLoc( m_boxdata.m_gotPlace ) );
-                cust_font.print_string( buf, 35, 58, true );
+                cust_font.printString( buf, 35, 58, true );
                 if( !( m_boxdata.m_IV.m_isEgg ) ) {
                     if( savMod == SavMod::_NDS ) {
                         sprintf( buf, "Geschlüpft am %02i.%02i.%02i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ] );
-                        cust_font.print_string( buf, 28, 72, true );
+                        cust_font.printString( buf, 28, 72, true );
                         sprintf( buf, "in/bei %s.", getLoc( m_boxdata.m_hatchPlace ) );
-                        cust_font.print_string( buf, 35, 86, true );
+                        cust_font.printString( buf, 35, 86, true );
                     } else {
                         sprintf( buf, "Geschlüpft in/bei %s.", getLoc( m_boxdata.m_hatchPlace ) );
-                        cust_font.print_string( buf, 28, 72, true );
+                        cust_font.printString( buf, 28, 72, true );
                     }
                     if( !m_boxdata.m_fateful ) {
                         sprintf( buf, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                        cust_font.print_string( buf, 28, 100, true );
+                        cust_font.printString( buf, 28, 100, true );
                         sprintf( buf, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
-                        cust_font.print_string( buf, 35, 114, true );
+                        cust_font.printString( buf, 35, 114, true );
 
                         sprintf( buf, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
-                        cust_font.print_string( buf, 28, 128, true );
+                        cust_font.printString( buf, 28, 128, true );
                     } else {
                         sprintf( buf, "Besitzt ein %s""es Wesen.", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                        cust_font.print_string( buf, 28, 100, true );
+                        cust_font.printString( buf, 28, 100, true );
                     }
                 }
             }
             if( m_boxdata.m_fateful )
-                cust_font.print_string( "Off. schicks. Begegnung.", 28, 120, true );
+                cust_font.printString( "Off. schicks. Begegnung.", 28, 120, true );
         }
 
         if( !( m_boxdata.m_IV.m_isEgg ) ) {
@@ -1338,8 +1338,8 @@ NEXT:
             consoleSelect( p_top );
             consoleSetWindow( p_top, 4, 5, 12, 2 );
 
-            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", m_boxdata.m_SPEC, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), m_boxdata.m_isFemale, true ) )
-                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", m_boxdata.m_SPEC, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), !m_boxdata.m_isFemale, true );
+            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", m_boxdata.m_SPEC, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), m_boxdata.m_isFemale, true ) )
+                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", m_boxdata.m_SPEC, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), !m_boxdata.m_isFemale, true );
 
             int exptype = data.m_expType;
 
@@ -1509,7 +1509,7 @@ NEXT:
     }
 
     bool pokemon::boxPokemon::isShiny( ) {
-        return ( ( ( m_ID^m_SID ) >> 3 ) ^ ( ( ( m_PID >> 16 ) ^ ( m_PID % ( 1 << 16 ) ) ) ) >> 3 ) == 0;
+        return ( ( ( m_ID ^ m_SID ) >> 3 ) ^ ( ( ( m_PID >> 16 ) ^ ( m_PID % ( 1 << 16 ) ) ) ) >> 3 ) == 0;
     }
     bool pokemon::boxPokemon::isCloned( ) {
         return ( ( m_PID >> 16 )&( m_PID % ( 1 << 16 ) ) ) < ( ( m_PID >> 16 ) ^ ( m_PID % ( 1 << 16 ) ) );

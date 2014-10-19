@@ -52,7 +52,7 @@
 #include "bag.h"
 #include "item.h"
 #include "battle.h"
-//#include "buffer.h"
+#include "buffer.h"
 
 //Sprites
 #include "Back.h"
@@ -91,21 +91,38 @@
 #include "BagSpr2.h"
 
 #include "BG1.h"
+#include "BG2.h"
 
 PrintConsole Top, Bottom;
 
 unsigned int NAV_DATA[ 12288 ] = { 0 };
 unsigned short int NAV_DATA_PAL[ 256 ] = { 0 };
-backgroundSet BGs[ MAXBG ] = { { "Raging_Gyarados", NAV_DATA, NAV_DATA_PAL, true, false },
-{ "Sleeping_Eevee", NAV_DATA, NAV_DATA_PAL, true, false },
-{ "Mystic_Guardevoir", NAV_DATA, NAV_DATA_PAL, true, false },
-{ "Waiting_Suicune", NAV_DATA, NAV_DATA_PAL, true, false },
-{ "Awakening_Xerneas", NAV_DATA, NAV_DATA_PAL, true, false },
-{ "Awakening_Yveltal", NAV_DATA, NAV_DATA_PAL, true, false },
-{ "Fighting_Groudon", NAV_DATA, NAV_DATA_PAL, true, false },
-{ "Fighting_Kyogre", NAV_DATA, NAV_DATA_PAL, true, false },
-{ "Working_Klink", BG1Bitmap, BG1Pal, false, true } };
-int BG_ind = 8;
+//Centers o t circles.
+//pokemon -> ID -> DEX -> Bag -> Opt -> Nav
+// X|Y
+int mainSpritesPositions[ 12 ] = { 130, 60,
+160, 80,
+160, 115,
+130, 135,
+100, 115,
+100, 80 };
+int mainSpritesPositions2[ 12 ] = { 24, 64,
+236, 96,
+20, 128,
+238, 64,
+22, 96,
+234, 128 };
+backgroundSet BGs[ MAXBG ] = { { "Raging_Gyarados", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+{ "Sleeping_Eevee", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+{ "Mystic_Guardevoir", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+{ "Waiting_Suicune", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+{ "Awakening_Xerneas", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+{ "Awakening_Yveltal", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+{ "Fighting_Groudon", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+{ "Fighting_Kyogre", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+{ "Working_Klink", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions },
+{ "Reborn_Ho-Oh", BG2Bitmap, BG2Pal, false, true, mainSpritesPositions2 } };
+int BG_ind = 9;
 extern POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
 extern std::vector<int> box_of_st_pkmn[ MAXPKMN ];
 extern std::vector<int> free_spaces;
@@ -122,7 +139,78 @@ Region acMapRegion = NONE;
 std::pair<int, int> acMapPoint = std::pair<int, int>( 32, 24 );
 bool showfirst = true, showmappointer = false;
 
-struct MapRegionPos MapLocations[ 3 ][ MAXMAPPOS ] = { { { 90, 66, 96, 73, 1010 }, { 115, 139, 121, 146, 308 }, { 57, 36, 66, 47, 239 }, { 46, 53, 51, 59, 298 }, { 37, 73, 47, 89, 245 }, { 39, 98, 45, 104, 294 }, { 45, 104, 53, 112, 242 }, { 47, 136, 54, 142, 291 }, { 50, 136, 59, 148, 237 }, { 64, 103, 72, 111, 236 }, { 64, 117, 72, 125, 235 }, { 64, 80, 72, 88, 240 }, { 65, 75, 71, 80, 295 }, { 69, 59, 78, 67, 238 }, { 77, 47, 85, 60, 292 }, { 79, 60, 84, 66, 312 }, { 89, 80, 105, 96, 244 }, { 89, 109, 98, 126, 243 }, { 114, 36, 123, 46, 246 }, { 140, 52, 149, 62, 202 }, { 142, 71, 147, 77, 300 }, { 121, 94, 130, 104, 1000 }, { 146, 109, 154, 118, 241 }, { 168, 112, 174, 116, 306 }, { 161, 112, 167, 116, 320 }, { 110, 112, 116, 116, 313 }, { 179, 122, 187, 131, 293 }, { 210, 95, 219, 111, 250 }, { 173, 88, 180, 97, 249 }, { 192, 74, 206, 82, 248 }, { 200, 60, 204, 66, 302 }, { 153, 59, 168, 67, 247 }, { 93, 111, 115, 117, 285 }, { 114, 111, 130, 117, 284 }, { 129, 111, 150, 117, 283 }, { 149, 111, 174, 117, 282 }, { 173, 111, 191, 117, 281 }, { 190, 111, 205, 117, 280 }, { 187, 104, 212, 112, 279 }, { 187, 80, 205, 105, 278 }, { 168, 80, 188, 101, 277 }, { 168, 60, 189, 81, 275 }, { 190, 60, 205, 76, 276 }, { 128, 60, 153, 66, 272 }, { 142, 65, 147, 83, 273 }, { 115, 82, 147, 88, 274 }, { 122, 87, 128, 95, 1001 }, { 103, 82, 115, 88, 269 }, { 109, 39, 114, 83, 270 }, { 122, 39, 128, 66, 271 }, { 90, 39, 96, 83, 262 }, { 76, 60, 91, 66, 263 }, { 62, 37, 96, 44, 264 }, { 39, 54, 45, 75, 266 }, { 46, 39, 51, 53, 265 }, { 46, 39, 60, 44, 265 }, { 45, 75, 66, 81, 267 }, { 39, 90, 45, 109, 254 }, { 39, 108, 45, 133, 255 }, { 39, 132, 57, 139, 256 }, { 57, 140, 70, 146, 258 }, { 69, 140, 91, 146, 259 }, { 90, 122, 96, 146, 260 }, { 90, 85, 96, 116, 261 }, { 69, 82, 94, 88, 268 }, { 50, 103, 66, 110, 252 }, { 64, 109, 70, 119, 251 }, { 65, 96, 91, 103, 253 } } };
+const MapRegionPos MapLocations[ 3 ][ MAXMAPPOS ] = {
+        {
+            { 90, 66, 96, 73, 1010 },
+            { 115, 139, 121, 146, 308 },
+            { 57, 36, 66, 47, 239 },
+            { 46, 53, 51, 59, 298 },
+            { 37, 73, 47, 89, 245 },
+            { 39, 98, 45, 104, 294 },
+            { 45, 104, 53, 112, 242 },
+            { 47, 136, 54, 142, 291 },
+            { 50, 136, 59, 148, 237 },
+            { 64, 103, 72, 111, 236 },
+            { 64, 117, 72, 125, 235 },
+            { 64, 80, 72, 88, 240 },
+            { 65, 75, 71, 80, 295 },
+            { 69, 59, 78, 67, 238 },
+            { 77, 47, 85, 60, 292 },
+            { 79, 60, 84, 66, 312 },
+            { 89, 80, 105, 96, 244 },
+            { 89, 109, 98, 126, 243 },
+            { 114, 36, 123, 46, 246 },
+            { 140, 52, 149, 62, 202 },
+            { 142, 71, 147, 77, 300 },
+            { 121, 94, 130, 104, 1000 },
+            { 146, 109, 154, 118, 241 },
+            { 168, 112, 174, 116, 306 },
+            { 161, 112, 167, 116, 320 },
+            { 110, 112, 116, 116, 313 },
+            { 179, 122, 187, 131, 293 },
+            { 210, 95, 219, 111, 250 },
+            { 173, 88, 180, 97, 249 },
+            { 192, 74, 206, 82, 248 },
+            { 200, 60, 204, 66, 302 },
+            { 153, 59, 168, 67, 247 },
+            { 93, 111, 115, 117, 285 },
+            { 114, 111, 130, 117, 284 },
+            { 129, 111, 150, 117, 283 },
+            { 149, 111, 174, 117, 282 },
+            { 173, 111, 191, 117, 281 },
+            { 190, 111, 205, 117, 280 },
+            { 187, 104, 212, 112, 279 },
+            { 187, 80, 205, 105, 278 },
+            { 168, 80, 188, 101, 277 },
+            { 168, 60, 189, 81, 275 },
+            { 190, 60, 205, 76, 276 },
+            { 128, 60, 153, 66, 272 },
+            { 142, 65, 147, 83, 273 },
+            { 115, 82, 147, 88, 274 },
+            { 122, 87, 128, 95, 1001 },
+            { 103, 82, 115, 88, 269 },
+            { 109, 39, 114, 83, 270 },
+            { 122, 39, 128, 66, 271 },
+            { 90, 39, 96, 83, 262 },
+            { 76, 60, 91, 66, 263 },
+            { 62, 37, 96, 44, 264 },
+            { 39, 54, 45, 75, 266 },
+            { 46, 39, 51, 53, 265 },
+            { 46, 39, 60, 44, 265 },
+            { 45, 75, 66, 81, 267 },
+            { 39, 90, 45, 109, 254 },
+            { 39, 108, 45, 133, 255 },
+            { 39, 132, 57, 139, 256 },
+            { 57, 140, 70, 146, 258 },
+            { 69, 140, 91, 146, 259 },
+            { 90, 122, 96, 146, 260 },
+            { 90, 85, 96, 116, 261 },
+            { 69, 82, 94, 88, 268 },
+            { 50, 103, 66, 110, 252 },
+            { 64, 109, 70, 119, 251 },
+            { 65, 96, 91, 103, 253 }
+        }
+};
 void printMapLocation( const touchPosition& p_t ) {
     consoleSetWindow( &Bottom, 5, 0, 20, 1 );
     consoleSelect( &Bottom );
@@ -191,7 +279,7 @@ void updateTime( int p_mapMode ) {
         char buf[ 15 ];
         sprintf( buf, "%02i:%02i:%02i", achours, acminutes, acseconds );
         dmaCopy( BorderBitmap + 6144 + 3072, bgGetGfxPtr( bg2sub ) + 6 * 3072, 64 * 256 );
-        cust_font2.print_string( buf, 18 * 8, 192 - 16, true );
+        cust_font2.printString( buf, 18 * 8, 192 - 16, true );
     }
     acday = timeStruct->tm_mday;
     acmonth = timeStruct->tm_mon;
@@ -242,7 +330,7 @@ bool loadSprite( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_nam
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
         sizeof( SPRITE_GFX[ 0 ] );
 
-    char buffer[ 100 ];
+    //char buffer[100];
     sprintf( buffer, "%s%s.raw", p_path, p_name );
     FILE* fd = fopen( buffer, "rb" );
 
@@ -265,7 +353,7 @@ bool loadSpriteSub( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
         sizeof( SPRITE_GFX_SUB[ 0 ] );
 
-    char buffer[ 100 ];
+    //char buffer[100];
     sprintf( buffer, "%s%s.raw", p_path, p_name );
     FILE* fd = fopen( buffer, "rb" );
 
@@ -296,7 +384,7 @@ bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_pa
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] );
 
 
-    char buffer[ 100 ];
+    //char buffer[100];
     if( !p_female )
         sprintf( buffer, "%s%d/%d.raw", p_path, p_pkmnId, p_pkmnId );
     else
@@ -307,10 +395,10 @@ bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_pa
         fclose( fd );
         return false;
     }
-    p_palCnt = 16;
+    //p_palCnt = 16;
     for( int i = 0; i < 16; ++i )
         TEMP_PAL[ i ] = 0;
-    fread( TEMP_PAL, sizeof( unsigned short int ), p_palCnt, fd );
+    fread( TEMP_PAL, sizeof( unsigned short int ), 16, fd );
     for( int i = 0; i < 96 * 96; ++i )
         TEMP[ i ] = 0;
     fread( TEMP, sizeof( unsigned int ), 96 * 96, fd );
@@ -324,7 +412,7 @@ bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_pa
         fd = fopen( buffer, "rb" );
         for( int i = 0; i < 16; ++i )
             TEMP_PAL[ i ] = 0;
-        fread( TEMP_PAL, sizeof( unsigned short int ), p_palCnt, fd );
+        fread( TEMP_PAL, sizeof( unsigned short int ), 16, fd );
         fclose( fd );
     }
     if( p_bottom ) {
@@ -443,7 +531,7 @@ bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
                                           * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] );
 
-    char buffer[ 100 ];
+    //char buffer[100];
 
     if( !p_female )
         sprintf( buffer, "%s%d/%d.raw", p_path, p_pkmnId, p_pkmnId );
@@ -455,10 +543,10 @@ bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
         fclose( fd );
         return false;
     }
-    p_palCnt = 16;
+    //p_palCnt = 16;
     for( int i = 0; i < 16; ++i )
         TEMP_PAL[ i ] = 0;
-    fread( TEMP_PAL, sizeof( unsigned short int ), p_palCnt, fd );
+    fread( TEMP_PAL, sizeof( unsigned short int ), 16, fd );
     for( int i = 0; i < 96 * 96; ++i )
         TEMP[ i ] = 0;
     fread( TEMP, sizeof( unsigned int ), 96 * 64, fd );
@@ -472,7 +560,7 @@ bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
         fd = fopen( buffer, "rb" );
         for( int i = 0; i < 16; ++i )
             TEMP_PAL[ i ] = 0;
-        fread( TEMP_PAL, sizeof( unsigned short int ), p_palCnt, fd );
+        fread( TEMP_PAL, sizeof( unsigned short int ), 16, fd );
         fclose( fd );
     }
     if( p_bottom )
@@ -543,7 +631,7 @@ bool loadTrainerSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
                                           * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] );
 
-    char buffer[ 100 ];
+    //char buffer[100];
 
     sprintf( buffer, "%sSprite_%s.raw", p_path, p_name );
     FILE* fd = fopen( buffer, "rb" );
@@ -552,10 +640,10 @@ bool loadTrainerSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
         fclose( fd );
         return false;
     }
-    p_palCnt = 16;
+    //p_palCnt = 16;
     for( int i = 0; i < 16; ++i )
         TEMP_PAL[ i ] = 0;
-    fread( TEMP_PAL, sizeof( unsigned short int ), p_palCnt, fd );
+    fread( TEMP_PAL, sizeof( unsigned short int ), 16, fd );
     for( int i = 0; i < 96 * 96; ++i )
         TEMP[ i ] = 0;
     fread( TEMP, sizeof( unsigned int ), 96 * 96, fd );
@@ -672,7 +760,7 @@ bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
                                           * (can be set in REG_DISPCNT) */
     static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] );
 
-    char buffer[ 100 ];
+    //char buffer[100];
 
     sprintf( buffer, "%sSprite_%s.raw", p_path, p_name );
     FILE* fd = fopen( buffer, "rb" );
@@ -681,10 +769,10 @@ bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
         fclose( fd );
         return false;
     }
-    p_palCnt = 16;
+    //p_palCnt = 16;
     for( int i = 0; i < 16; ++i )
         TEMP_PAL[ i ] = 0;
-    fread( TEMP_PAL, sizeof( unsigned short int ), p_palCnt, fd );
+    fread( TEMP_PAL, sizeof( unsigned short int ), 16, fd );
     for( int i = 0; i < 96 * 96; ++i )
         TEMP[ i ] = 0;
     fread( TEMP, sizeof( unsigned int ), 96 * 64, fd );
@@ -753,7 +841,7 @@ bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p
 
 bool loadPicture( u16* p_layer, const char* p_path, const char* p_name, int p_palSize, int p_tileCnt ) {
 
-    char buffer[ 100 ];
+    //char buffer[100];
     sprintf( buffer, "%s%s.raw", p_path, p_name );
     FILE* fd = fopen( buffer, "rb" );
 
@@ -773,7 +861,7 @@ bool loadPicture( u16* p_layer, const char* p_path, const char* p_name, int p_pa
 }
 bool loadPictureSub( u16* p_layer, const char* p_path, const char* p_name, int p_palSize, int p_tileCnt ) {
 
-    char buffer[ 100 ];
+    //char buffer[100];
     sprintf( buffer, "%s%s.raw", p_path, p_name );
     FILE* fd = fopen( buffer, "rb" );
 
@@ -800,7 +888,7 @@ bool loadNavScreen( u16* p_layer, const char* p_name, int p_no ) {
         return true;
     }
 
-    char buffer[ 100 ];
+    //char buffer[100];
     sprintf( buffer, "nitro:/PICS/NAV/%s.raw", p_name );
     FILE* fd = fopen( buffer, "rb" );
 
@@ -823,8 +911,6 @@ unsigned int BTMs[ 6 ][ 12288 ];
 unsigned short int PALs[ 6 ][ 256 ];
 
 unsigned short int cachedPKMN[ 6 ] = { 0 };
-
-extern int mainSpritesPositions[ 6 ][ 2 ];
 
 int ac = 0;
 int positions[ 6 ][ 2 ] = {
@@ -905,14 +991,14 @@ int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     optsInfo->height = 32;
     optsInfo->angle = 0;
     optsInfo->entry = opts;
-    opts->y = mainSpritesPositions[ OPTS_ID - 2 ][ 1 ] - optsInfo->height / 2;
+    opts->y = BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 * ( OPTS_ID - 2 ) + 1 ] - optsInfo->height / 2;
     opts->isRotateScale = false;
     opts->isSizeDouble = false;
     opts->blendMode = OBJMODE_NORMAL;
     opts->isMosaic = false;
     opts->colorMode = OBJCOLOR_16;
     opts->shape = OBJSHAPE_SQUARE;
-    opts->x = mainSpritesPositions[ OPTS_ID - 2 ][ 0 ] - optsInfo->width / 2;
+    opts->x = BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 * ( OPTS_ID - 2 ) ] - optsInfo->width / 2;
     opts->size = OBJSIZE_32;
     opts->gfxIndex = nextAvailableTileIdx;
     nextAvailableTileIdx += OptionTilesLen / BYTES_PER_16_COLOR_TILE;
@@ -927,14 +1013,14 @@ int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     pkmnInfo->height = 32;
     pkmnInfo->angle = 0;
     pkmnInfo->entry = pkmn;
-    pkmn->y = mainSpritesPositions[ PKMN_ID - 2 ][ 1 ] - pkmnInfo->height / 2;
+    pkmn->y = BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 * ( PKMN_ID - 2 ) + 1 ] - pkmnInfo->height / 2;
     pkmn->isRotateScale = false;
     pkmn->isSizeDouble = false;
     pkmn->blendMode = OBJMODE_NORMAL;
     pkmn->isMosaic = false;
     pkmn->colorMode = OBJCOLOR_16;
     pkmn->shape = OBJSHAPE_SQUARE;
-    pkmn->x = mainSpritesPositions[ PKMN_ID - 2 ][ 0 ] - pkmnInfo->width / 2;
+    pkmn->x = BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 * ( PKMN_ID - 2 ) ] - pkmnInfo->width / 2;
     pkmn->size = OBJSIZE_32;
     pkmn->gfxIndex = nextAvailableTileIdx;
     nextAvailableTileIdx += PokemonSpTilesLen / BYTES_PER_16_COLOR_TILE;
@@ -949,14 +1035,14 @@ int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     navInfo->height = 32;
     navInfo->angle = 0;
     navInfo->entry = nav;
-    nav->y = mainSpritesPositions[ NAV_ID - 2 ][ 1 ] - navInfo->height / 2;
+    nav->y = BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 * ( NAV_ID - 2 ) + 1 ] - navInfo->height / 2;
     nav->isRotateScale = false;
     nav->isSizeDouble = false;
     nav->blendMode = OBJMODE_NORMAL;
     nav->isMosaic = false;
     nav->colorMode = OBJCOLOR_16;
     nav->shape = OBJSHAPE_SQUARE;
-    nav->x = mainSpritesPositions[ NAV_ID - 2 ][ 0 ] - navInfo->width / 2;
+    nav->x = BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 * ( NAV_ID - 2 ) ] - navInfo->width / 2;
     nav->size = OBJSIZE_32;
     nav->gfxIndex = nextAvailableTileIdx;
     nextAvailableTileIdx += NavTilesLen / BYTES_PER_16_COLOR_TILE;
@@ -971,14 +1057,14 @@ int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     idInfo->height = 32;
     idInfo->angle = 0;
     idInfo->entry = id;
-    id->y = mainSpritesPositions[ ID_ID - 2 ][ 1 ] - idInfo->height / 2;
+    id->y = BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 * ( ID_ID - 2 ) + 1 ] - idInfo->height / 2;
     id->isRotateScale = false;
     id->isSizeDouble = false;
     id->blendMode = OBJMODE_NORMAL;
     id->isMosaic = false;
     id->colorMode = OBJCOLOR_16;
     id->shape = OBJSHAPE_SQUARE;
-    id->x = mainSpritesPositions[ ID_ID - 2 ][ 0 ] - idInfo->width / 2;
+    id->x = BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 * ( ID_ID - 2 ) ] - idInfo->width / 2;
     id->size = OBJSIZE_32;
     id->gfxIndex = nextAvailableTileIdx;
     nextAvailableTileIdx += IdTilesLen / BYTES_PER_16_COLOR_TILE;
@@ -993,14 +1079,14 @@ int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     dexInfo->height = 32;
     dexInfo->angle = 0;
     dexInfo->entry = dex;
-    dex->y = mainSpritesPositions[ DEX_ID - 2 ][ 1 ] - dexInfo->height / 2;
+    dex->y = BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 * ( DEX_ID - 2 ) + 1 ] - dexInfo->height / 2;
     dex->isRotateScale = false;
     dex->isSizeDouble = false;
     dex->blendMode = OBJMODE_NORMAL;
     dex->isMosaic = false;
     dex->colorMode = OBJCOLOR_16;
     dex->shape = OBJSHAPE_SQUARE;
-    dex->x = mainSpritesPositions[ DEX_ID - 2 ][ 0 ] - dexInfo->width / 2;
+    dex->x = BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 * ( DEX_ID - 2 ) ] - dexInfo->width / 2;
     dex->size = OBJSIZE_32;
     dex->gfxIndex = nextAvailableTileIdx;
     nextAvailableTileIdx += PokeDexTilesLen / BYTES_PER_16_COLOR_TILE;
@@ -1015,14 +1101,14 @@ int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     bagInfo->height = 32;
     bagInfo->angle = 0;
     bagInfo->entry = bag;
-    bag->y = mainSpritesPositions[ BAG_ID - 2 ][ 1 ] - bagInfo->height / 2;
+    bag->y = BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 * ( BAG_ID - 2 ) + 1 ] - bagInfo->height / 2;
     bag->isRotateScale = false;
     bag->isSizeDouble = false;
     bag->blendMode = OBJMODE_NORMAL;
     bag->isMosaic = false;
     bag->colorMode = OBJCOLOR_16;
     bag->shape = OBJSHAPE_SQUARE;
-    bag->x = mainSpritesPositions[ BAG_ID - 2 ][ 0 ] - bagInfo->width / 2;
+    bag->x = BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 * ( BAG_ID - 2 ) ] - bagInfo->width / 2;
     bag->size = OBJSIZE_32;
     bag->gfxIndex = nextAvailableTileIdx;
     nextAvailableTileIdx += SPBagTilesLen / BYTES_PER_16_COLOR_TILE;
@@ -1451,8 +1537,8 @@ void screenLoader::draw( int p_mode ) {
 
         for( int i = 0; i < 3; ++i ) {
             Oam->oamBuffer[ 90 + i ].isHidden = false;
-            Oam->oamBuffer[ 90 + i ].x = mainSpritesPositions[ 2 * i ][ 0 ] - 16;
-            Oam->oamBuffer[ 90 + i ].y = mainSpritesPositions[ 2 * i ][ 1 ] - 16;
+            Oam->oamBuffer[ 90 + i ].x = BGs[ BG_ind ].m_mainMenuSpritePoses[ 4 * i ] - 16;
+            Oam->oamBuffer[ 90 + i ].y = BGs[ BG_ind ].m_mainMenuSpritePoses[ 4 * i + 1 ] - 16;
             Oam->oamBuffer[ 90 + i ].priority = OBJPRIORITY_1;
         }
         updateOAMSub( Oam );
@@ -1530,10 +1616,10 @@ void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const int& p_pkmnI
     Item->x = p_posX;
     Item->y = p_posY;
 
-    char buffer[ 100 ];
+    //char buffer[100];
     sprintf( buffer, "%d/Icon_%d", p_pkmnId, p_pkmnId );
     if( p_subScreen ) {
-        if( !loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/pokemon/", buffer, 128, 16 ) ) {
+        if( !loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/PKMN/", buffer, 128, 16 ) ) {
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
                               NoItemPal,
                               &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
@@ -1544,7 +1630,7 @@ void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const int& p_pkmnI
                               NoItemTilesLen );
         }
     } else {
-        if( !loadSprite( ItemInfo, "nitro:/PICS/SPRITES/pokemon/", buffer, 128, 16 ) ) {
+        if( !loadSprite( ItemInfo, "nitro:/PICS/SPRITES/PKMN/", buffer, 128, 16 ) ) {
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
                               NoItemPal,
                               &SPRITE_PALETTE[ p_palCnt * 16 ],
@@ -1581,7 +1667,7 @@ void drawEggIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const int p_posX, c
     Item->x = p_posX;
     Item->y = p_posY;
 
-    char buffer[ 100 ];
+    //char buffer[100];
     sprintf( buffer, "Icon_egg" );
     if( p_subScreen ) {
         if( !loadSpriteSub( ItemInfo, "nitro:/PICS/ICONS/", buffer, 128, 16 ) ) {
@@ -1686,15 +1772,15 @@ void initTop( ) {
             int mval = 1 + ( ( i / 2 == 1 ) ? 4 : 8 );
 
             sprintf( buf, "%ls", SAV.m_PkmnTeam[ i ].m_boxdata.m_Name );
-            cust_font.print_string( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 - mval, false );
+            cust_font.printString( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 - mval, false );
             sprintf( buf, "%s", POKEMON::PKMNDATA::getDisplayName( SAV.m_PkmnTeam[ i ].m_boxdata.m_SPEC ) );
-            cust_font.print_string( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
+            cust_font.printString( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
             sprintf( buf, "%hi/%hi KP", SAV.m_PkmnTeam[ i ].m_stats.m_acHP, SAV.m_PkmnTeam[ i ].m_stats.m_maxHP );
-            cust_font.print_string( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 28 - mval, false );
+            cust_font.printString( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 28 - mval, false );
 
             sprintf( buf, "%s", ItemList[ SAV.m_PkmnTeam[ i ].m_boxdata.getItem( ) ].getDisplayName( ).c_str( ) );
-            cust_font.print_string( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
+            cust_font.printString( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
         } else {
             consoleSetWindow( &Top, borders[ i ][ 0 ], borders[ i ][ 1 ], 12, 6 );
@@ -1702,12 +1788,12 @@ void initTop( ) {
             char buf[ 100 ];
             int mval = 1 + ( ( i / 2 == 1 ) ? 4 : 8 );
             sprintf( buf, "Ei" );
-            cust_font.print_string( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 - mval, false );
+            cust_font.printString( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 - mval, false );
             sprintf( buf, "Ei" );
-            cust_font.print_string( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
+            cust_font.printString( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
             sprintf( buf, "%s", ItemList[ SAV.m_PkmnTeam[ i ].m_boxdata.getItem( ) ].getDisplayName( ).c_str( ) );
-            cust_font.print_string( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
+            cust_font.printString( buf, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
             if( i % 2 == 0 ) {
                 drawEggIcon( OamTop, spriteInfoTop, borders[ i ][ 0 ] * 8 - 28, borders[ i ][ 1 ] * 8, a, b, c, false );
@@ -2624,7 +2710,7 @@ void formes( OAMTable *p_oam, SpriteInfo * p_spriteInfo, int& p_oamIndex, int& p
     p_tileCnt += BigCirc1TilesLen / BYTES_PER_16_COLOR_TILE;
     if( p_pkmnId == 0 ) {
         updateOAM( p_oam );
-        loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, p_female );
+        loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 80, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, p_female );
         return;
     } else {
         for( int i = p_oamIndex; i > p_oamIndex - 8; --i )
@@ -2633,11 +2719,11 @@ void formes( OAMTable *p_oam, SpriteInfo * p_spriteInfo, int& p_oamIndex, int& p
             else
                 p_oam->oamBuffer[ i ].x += 50;
         updateOAM( p_oam );
-        if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 - 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, p_female, true ) )
-            loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 - 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, !p_female, true );
+        if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 80 - 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, p_female, true ) )
+            loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 80 - 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, false, !p_female, true );
         --p_palCnt;
-        if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 + 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, true, p_female ) )
-            loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/pokemon/", p_pkmnId, 80 + 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, true, !p_female );
+        if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 80 + 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, true, p_female ) )
+            loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 80 + 50, 64, p_oamIndex, p_palCnt, p_tileCnt, false, true, !p_female );
     }
     SpriteInfo * C1Info = &p_spriteInfo[ ++p_oamIndex ];
     SpriteEntry * C1 = &p_oam->oamBuffer[ p_oamIndex ];
@@ -2745,13 +2831,13 @@ void drawTopDexPage( int p_page, int p_pkmnId, int p_pkmnFormeId = 0 ) {
             char buf[ 50 ];
             sprintf( buf, "%s", POKEMON::PKMNDATA::getDisplayName( p_pkmnId ) );
             sprintf( buf, "%s - %s", buf, POKEMON::PKMNDATA::getSpecies( p_pkmnId ) );
-            cust_font.print_string( buf, 36, 20, false );
+            cust_font.printString( buf, 36, 20, false );
             printf( "\n\n %03i", p_pkmnId );
         } else {
             printf( "\n    Keine Daten vorhanden.\n\n" );
             char buf[ 50 ];
             sprintf( buf, "???????????? - %s", POKEMON::PKMNDATA::getSpecies( 0 ) );
-            cust_font.print_string( buf, 36, 20, false );
+            cust_font.printString( buf, 36, 20, false );
             printf( "\n\n %03i", p_pkmnId );
         }
     }
@@ -2767,18 +2853,18 @@ void drawTopDexPage( int p_page, int p_pkmnId, int p_pkmnFormeId = 0 ) {
                 printf( "\n\n  KP   ANG  DEF  SAN  SDF  INT\n\n\n\n\n\n\n\n\n" );
                 char buf[ 50 ];
                 sprintf( buf, "GW.  %5.1fkg", acpkmndata.m_weight / 10.0 );
-                cust_font.print_string( buf, 10, 109, false );
+                cust_font.printString( buf, 10, 109, false );
                 sprintf( buf, "GR.  %6.1fm", acpkmndata.m_size / 10.0 );
-                cust_font.print_string( buf, 100, 109, false );
+                cust_font.printString( buf, 100, 109, false );
                 consoleSetWindow( &Top, 1, 16, 30, 24 );
                 printf( POKEMON::PKMNDATA::getDexEntry( p_pkmnId ) );
             } else {
                 printf( "\n\n  KP   ANG  DEF  SAN  SDF  INT\n\n\n\n\n\n\n\n\n" );
                 char buf[ 50 ];
                 sprintf( buf, "GW.  ???.?kg" );
-                cust_font.print_string( buf, 10, 109, false );
+                cust_font.printString( buf, 10, 109, false );
                 sprintf( buf, "GR.  ???.?m" );
-                cust_font.print_string( buf, 100, 109, false );
+                cust_font.printString( buf, 100, 109, false );
                 consoleSetWindow( &Top, 1, 16, 30, 24 );
                 printf( POKEMON::PKMNDATA::getDexEntry( 0 ) );
             }
@@ -2838,7 +2924,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
     for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
         if( i == acNum ) {
         drawTopDexPage( acPage, i + 1, acForme );
-        loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true );
+        loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true );
         --j;
         continue;
         } else
@@ -2876,7 +2962,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
                         drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
@@ -2890,7 +2976,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
                         drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
@@ -2904,7 +2990,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
                         drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
@@ -2918,7 +3004,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
                         drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
@@ -2982,7 +3068,7 @@ void screenLoader::run_dex( int p_pkmnId ) {
                 for( int i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                    loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
                         drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                 }
@@ -4067,7 +4153,7 @@ OUT:
                 else
                     sprintf( buf, "%3i Items", s );
 
-                cust_font.print_string( buf, 20, 24 * i + 3, false );
+                cust_font.printString( buf, 20, 24 * i + 3, false );
             }
             oam2 = p_oamIndex;
             pal2 = p_palCnt;
@@ -4162,7 +4248,7 @@ void bag::draw( ) {
         else
             sprintf( buf, "%3i Items", s );
 
-        cust_font.print_string( buf, 20, 24 * i + 3, false );
+        cust_font.printString( buf, 20, 24 * i + 3, false );
     }
     drawSub( );
     initOAMTableSub( Oam );

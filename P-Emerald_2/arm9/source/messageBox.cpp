@@ -130,10 +130,10 @@ messageBox::messageBox( item p_item, const int p_count ) {
 
     char buf[ 40 ];
     sprintf( buf, "%3d %s in der", p_count, p_item.getDisplayName( ).c_str( ) );
-    cust_font.print_string_d( buf, 32, 8, true );
-    cust_font.print_char( 489 - 21 + p_item.getItemType( ), 32, 24, true );
+    cust_font.printStringD( buf, 32, 8, true );
+    cust_font.printChar( 489 - 21 + p_item.getItemType( ), 32, 24, true );
     sprintf( buf, "%s-Tasche verstaut.", bagnames[ p_item.m_itemType ].c_str( ) );
-    cust_font.print_string_d( buf, 46, 24, true );
+    cust_font.printStringD( buf, 46, 24, true );
 
     Oam->oamBuffer[ 8 ].isHidden = false;
     updateOAMSub( Oam );
@@ -176,7 +176,7 @@ messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {
 
     if( p_time ) updateTime( );
 
-    cust_font.print_string_d( p_text, 8, 8, true );
+    cust_font.printStringD( p_text, 8, 8, true );
     Oam->oamBuffer[ 8 ].isHidden = false;
     updateOAMSub( Oam );
     touchPosition touch;
@@ -219,7 +219,7 @@ messageBox::messageBox( const wchar_t* p_text, bool p_time, bool p_remsprites ) 
 
     if( p_time ) updateTime( );
 
-    cust_font.print_string_d( p_text, 8, 8, true );
+    cust_font.printStringD( p_text, 8, 8, true );
     Oam->oamBuffer[ 8 ].isHidden = false;
     updateOAMSub( Oam );
     touchPosition touch;
@@ -264,7 +264,7 @@ messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, boo
     if( p_sprt != no_sprite ) {
         int a = 0, b = 0, c = 0;
         if( p_sprt == sprite_pkmn ) {
-            loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", p_sprind, (u16)-16, 0, a, b, c, true );
+            loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, a, b, c, true );
         }
         if( p_sprt == sprite_trainer ) {
             loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
@@ -275,8 +275,8 @@ messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, boo
 
     if( p_time ) updateTime( );
 
-    cust_font.print_string( p_name, 8, 8, true );
-    cust_font.print_string_d( p_text, 72, 8, true );
+    cust_font.printString( p_name, 8, 8, true );
+    cust_font.printStringD( p_text, 72, 8, true );
     if( p_a )
         Oam->oamBuffer[ 8 ].isHidden = false;
     updateOAMSub( Oam );
@@ -328,7 +328,7 @@ messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_tim
     if( p_sprt != no_sprite ) {
         int a = 0, b = 0, c = 0;
         if( p_sprt == sprite_pkmn ) {
-            loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/pokemon/", p_sprind, (u16)-16, 0, a, b, c, true );
+            loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, a, b, c, true );
         }
         if( p_sprt == sprite_trainer ) {
             loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
@@ -339,10 +339,10 @@ messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_tim
     init( );
 
     if( p_name ) {
-        cust_font.print_string( p_name, 8, 8, true );
-        cust_font.print_string_d( p_text, 72, 8, true );
+        cust_font.printString( p_name, 8, 8, true );
+        cust_font.printStringD( p_text, 72, 8, true );
     } else {
-        cust_font.print_string_d( p_text, 8, 8, true );
+        cust_font.printStringD( p_text, 8, 8, true );
     }
     if( p_a )
         Oam->oamBuffer[ 8 ].isHidden = false;
@@ -387,10 +387,10 @@ void messageBox::put( const char* p_text, bool p_a, bool p_time ) {
     init( );
 
     if( m_isNamed ) {
-        cust_font.print_string( m_isNamed, 8, 8, true );
-        cust_font.print_string_d( p_text, 72, 8, true );
+        cust_font.printString( m_isNamed, 8, 8, true );
+        cust_font.printStringD( p_text, 72, 8, true );
     } else
-        cust_font.print_string_d( p_text, 8, 8, true );
+        cust_font.printStringD( p_text, 8, 8, true );
 
     if( p_a ) {
         touchPosition touch;
@@ -445,7 +445,7 @@ yesNoBox::yesNoBox( const char* p_name ) {
 
     consoleSetWindow( &Bottom, 1, 1, 8, MAXLINES - 1 );
     consoleSelect( &Bottom );
-    cust_font.print_string( p_name, 8, 8, true );
+    cust_font.printString( p_name, 8, 8, true );
     consoleSetWindow( &Bottom, 9, 1, 22, MAXLINES );
 
     swiWaitForVBlank( );
@@ -472,9 +472,9 @@ bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
     consoleSelect( &Bottom );
     if( p_text ) {
         if( _isNamed )
-            cust_font.print_string_d( p_text, 72, 8, true );
+            cust_font.printStringD( p_text, 72, 8, true );
         else
-            cust_font.print_string_d( p_text, 8, 8, true );
+            cust_font.printStringD( p_text, 8, 8, true );
     }
     for( int i = 19; i <= 22; ++i )
         Oam->oamBuffer[ i ].isHidden = false;
@@ -540,9 +540,9 @@ bool yesNoBox::getResult( const wchar_t* p_text = 0, bool time ) {
     consoleSelect( &Bottom );
     if( p_text ) {
         if( _isNamed )
-            cust_font.print_string_d( p_text, 72, 8, true );
+            cust_font.printStringD( p_text, 72, 8, true );
         else
-            cust_font.print_string_d( p_text, 8, 8, true );
+            cust_font.printStringD( p_text, 8, 8, true );
     }
     for( int i = 19; i <= 22; ++i )
         Oam->oamBuffer[ i ].isHidden = false;
@@ -625,7 +625,7 @@ choiceBox::choiceBox( int p_num, const char** p_choices, const char* p_name = 0,
 
     if( p_name ) {
         _name = true;
-        cust_font.print_string( p_name, 8, 8, true );
+        cust_font.printString( p_name, 8, 8, true );
     } else
         _name = false;
 
@@ -659,9 +659,9 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
     consoleSelect( &Bottom );
     if( p_text ) {
         if( _name )
-            cust_font.print_string( p_text, 72, 8, true );
+            cust_font.printString( p_text, 72, 8, true );
         else
-            cust_font.print_string( p_text, 8, 8, true );
+            cust_font.printString( p_text, 8, 8, true );
     }
     if( _num < 1 )
         return -1;

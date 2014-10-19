@@ -65,19 +65,19 @@ namespace font {
         }
 
         // Methods
-        void print_char( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom );
-        void print_string( const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
-        void print_string_center( const char *p_string, bool p_bottom );
-        void print_string_d( const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
-        void print_string_center_d( const char *p_string, bool p_bottom );
-        void print_number( s32 p_num, s16 p_x, s16 p_y, bool p_bottom );
-        u32 string_width( const char *p_string ) const;
+        void printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom );
+        void printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
+        void printStringCenter( const char *p_string, bool p_bottom );
+        void printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
+        void printStringCenterD( const char *p_string, bool p_bottom );
+        void printNumber( s32 p_num, s16 p_x, s16 p_y, bool p_bottom );
+        u32 stringWidth( const char *p_string ) const;
 
-        void print_string( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
-        void print_string_center( const wchar_t *p_string, bool p_bottom );
-        void print_string_d( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
-        void print_string_center_d( const wchar_t *p_string, bool p_bottom );
-        u32 string_width( const wchar_t *p_string ) const;
+        void printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
+        void printStringCenter( const wchar_t *p_string, bool p_bottom );
+        void printStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
+        void printStringCenterD( const wchar_t *p_string, bool p_bottom );
+        u32 stringWidth( const wchar_t *p_string ) const;
 
     private:
         u8 *_data;
@@ -87,7 +87,7 @@ namespace font {
     };
 }
 
-void top_screen_darken( );
-void btm_screen_darken( );
-void top_screen_plot( u8 p_x, u8 p_y, color p_color );
-void btm_screen_plot( u8 p_x, u8 p_y, color p_color );
+void topScreenDarken( );
+void btmScreenDarken( );
+void topScreenPlot( u8 p_x, u8 p_y, color p_color );
+void btmScreenPlot( u8 p_x, u8 p_y, color p_color );

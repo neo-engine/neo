@@ -61,7 +61,7 @@ struct MapRegionPos {
         m_ry,
         m_ind;
 };
-extern MapRegionPos MapLocations[ 3 ][ MAXMAPPOS ];
+extern const MapRegionPos MapLocations[ 3 ][ MAXMAPPOS ];
 void printMapLocation( const MapRegionPos& p_m );
 
 class move;
@@ -101,13 +101,14 @@ enum Region {
 #define SQCH_ID 41
 // 42 used
 
-#define MAXBG 9
+#define MAXBG 10
 struct backgroundSet {
     std::string             m_name;
     const unsigned int      *m_mainMenu;
     const unsigned short    *m_mainMenuPal;
     bool                    m_loadFromRom;
     bool                    m_allowsOverlay;
+    int                     *m_mainMenuSpritePoses;
 };
 extern backgroundSet BGs[ MAXBG ];
 extern int BG_ind;
