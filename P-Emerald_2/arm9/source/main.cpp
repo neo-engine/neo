@@ -920,21 +920,21 @@ CONT:
                             gen3::belt_pokemon_t* &acBeltP = save3->pokemon[ i ];
 
 
-                            acPkmn.m_boxdata.m_PID = acBeltP->personality;
-                            acPkmn.m_boxdata.m_SID = acBeltP->otid >> 16;
-                            acPkmn.m_boxdata.m_ID = acBeltP->otid % ( 1 << 16 );
+                            acPkmn.m_boxdata.m_pid = acBeltP->personality;
+                            acPkmn.m_boxdata.m_oTSid = acBeltP->otid >> 16;
+                            acPkmn.m_boxdata.m_oTId = acBeltP->otid % ( 1 << 16 );
                             for( int i = 0; i < 10; ++i )
-                                acPkmn.m_boxdata.m_Name[ i ] = gen3::getNText( acBeltP->name[ i ] );
-                            acPkmn.m_boxdata.m_Name[ 10 ] = 0;
+                                acPkmn.m_boxdata.m_name[ i ] = gen3::getNText( acBeltP->name[ i ] );
+                            acPkmn.m_boxdata.m_name[ 10 ] = 0;
                             acPkmn.m_boxdata.m_hometown = acBeltP->language;
                             for( int i = 0; i < 7; ++i )
-                                acPkmn.m_boxdata.m_OT[ i ] = gen3::getNText( acBeltP->otname[ i ] );
-                            acPkmn.m_boxdata.m_OT[ 7 ] = 0;
+                                acPkmn.m_boxdata.m_oT[ i ] = gen3::getNText( acBeltP->otname[ i ] );
+                            acPkmn.m_boxdata.m_oT[ 7 ] = 0;
                             acPkmn.m_boxdata.m_markings = acBeltP->markint;
 
                             acPkmn.m_statusint = acBeltP->status;
                             acPkmn.m_Level = acBeltP->level;
-                            acPkmn.m_boxdata.m_PKRUS = acBeltP->pokerus;
+                            acPkmn.m_boxdata.m_pokerus = acBeltP->pokerus;
 
                             acPkmn.m_stats.m_acHP = acBeltP->currentHP;
                             acPkmn.m_stats.m_maxHP = acBeltP->maxHP;
@@ -945,35 +945,35 @@ CONT:
                             acPkmn.m_stats.m_Spd = acBeltP->speed;
 
                             gen3::pokemon::pokemon_growth_t* &acBG = save3->pokemon_growth[ i ];
-                            acPkmn.m_boxdata.m_SPEC = gen3::getNPKMNIdx( acBG->species );
-                            acPkmn.m_boxdata.m_Item = gen3::getNItemIdx( acBG->held );
-                            acPkmn.m_boxdata.m_exp = acBG->xp;
+                            acPkmn.m_boxdata.m_speciesId = gen3::getNPKMNIdx( acBG->species );
+                            acPkmn.m_boxdata.m_holdItem = gen3::getNItemIdx( acBG->held );
+                            acPkmn.m_boxdata.m_experienceGained = acBG->xp;
                             acPkmn.m_boxdata.m_steps = acBG->happiness;
-                            acPkmn.m_boxdata.m_PPUps = acBG->ppbonuses;
+                            acPkmn.m_boxdata.m_pPUps = acBG->ppbonuses;
 
                             gen3::pokemon::pokemon_moves_t* &acBA = save3->pokemon_moves[ i ];
                             for( int i = 0; i < 4; ++i ) {
-                                acPkmn.m_boxdata.m_Attack[ i ] = acBA->atk[ i ];
-                                acPkmn.m_boxdata.m_AcPP[ i ] = acBA->pp[ i ];
+                                acPkmn.m_boxdata.m_moves[ i ] = acBA->atk[ i ];
+                                acPkmn.m_boxdata.m_acPP[ i ] = acBA->pp[ i ];
                             }
 
                             gen3::pokemon::pokemon_effort_t* &acBE = save3->pokemon_effort[ i ];
                             for( int i = 0; i < 6; ++i ) {
-                                acPkmn.m_boxdata.m_EV[ i ] = acBE->EV[ i ];
-                                acPkmn.m_boxdata.m_ConStats[ i ] = acBE->ConStat[ i ];
+                                acPkmn.m_boxdata.m_effortValues[ i ] = acBE->EV[ i ];
+                                acPkmn.m_boxdata.m_contestStats[ i ] = acBE->ConStat[ i ];
                             }
 
                             gen3::pokemon::pokemon_misc_t* &acBM = save3->pokemon_misc[ i ];
-                            acPkmn.m_boxdata.m_IVint = acBM->IVint;
+                            acPkmn.m_boxdata.m_iVint = acBM->IVint;
 
-                            POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_SPEC, p );
-                            acPkmn.m_boxdata.m_ability = p.m_abilities[ acPkmn.m_boxdata.m_IV.m_isEgg ];
-                            acPkmn.m_boxdata.m_IV.m_isEgg = acPkmn.m_boxdata.m_IV.m_isNicked;
+                            POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_speciesId, p );
+                            acPkmn.m_boxdata.m_ability = p.m_abilities[ acPkmn.m_boxdata.m_individualValues.m_isEgg ];
+                            acPkmn.m_boxdata.m_individualValues.m_isEgg = acPkmn.m_boxdata.m_individualValues.m_isNicked;
                             acPkmn.m_boxdata.m_gotPlace = gen3::getNLocation( acBM->locationcaught );
 
                             acPkmn.m_boxdata.m_gotLevel = acBM->levelcaught;
 
-                            if( acPkmn.m_boxdata.m_IV.m_isEgg || acPkmn.m_boxdata.m_gotLevel ) {
+                            if( acPkmn.m_boxdata.m_individualValues.m_isEgg || acPkmn.m_boxdata.m_gotLevel ) {
                                 acPkmn.m_boxdata.m_hatchPlace = 999;
                                 acPkmn.m_boxdata.m_gotLevel = 5;
                                 acPkmn.m_boxdata.m_hatchDate[ 0 ] =
@@ -983,8 +983,8 @@ CONT:
                                     acPkmn.m_boxdata.m_gotDate[ 1 ] =
                                     acPkmn.m_boxdata.m_gotDate[ 2 ] = 1;
                             }
-                            acPkmn.m_boxdata.m_OTisFemale = acBM->tgender;
-                            acPkmn.m_boxdata.m_Ball = acBM->pokeball;
+                            acPkmn.m_boxdata.m_oTisFemale = acBM->tgender;
+                            acPkmn.m_boxdata.m_ball = acBM->pokeball;
                             acPkmn.m_boxdata.m_gotDate[ 0 ] =
                                 acPkmn.m_boxdata.m_gotDate[ 1 ] =
                                 acPkmn.m_boxdata.m_gotDate[ 2 ] = 0;
@@ -1730,16 +1730,16 @@ void stepincrease( ) {
         for( size_t s = 0; s < SAV.m_PkmnTeam.size( ); ++s ) {
             POKEMON::pokemon& ac = SAV.m_PkmnTeam[ s ];
 
-            if( ac.m_boxdata.m_IV.m_isEgg ) {
+            if( ac.m_boxdata.m_individualValues.m_isEgg ) {
                 ac.m_boxdata.m_steps--;
                 if( ac.m_boxdata.m_steps == 0 ) {
-                    ac.m_boxdata.m_IV.m_isEgg = false;
+                    ac.m_boxdata.m_individualValues.m_isEgg = false;
                     ac.m_boxdata.m_hatchPlace = SAV.m_acMapIdx;
                     ac.m_boxdata.m_hatchDate[ 0 ] = acday;
                     ac.m_boxdata.m_hatchDate[ 1 ] = acmonth + 1;
                     ac.m_boxdata.m_hatchDate[ 2 ] = ( acyear + 1900 ) % 100;
                     char buffer[ 50 ];
-                    sprintf( buffer, "%ls schüpfte\naus dem Ei!", ac.m_boxdata.m_Name );
+                    sprintf( buffer, "%ls schüpfte\naus dem Ei!", ac.m_boxdata.m_name );
                     messageBox M( buffer );
                 }
             } else
@@ -1881,9 +1881,9 @@ int main( int p_argc, char** p_argv ) {
         }
         if( pressed & KEY_A ) {
             for( auto a : SAV.m_PkmnTeam )
-                if( !a.m_boxdata.m_IV.m_isEgg )
+                if( !a.m_boxdata.m_individualValues.m_isEgg )
                     for( int i = 0; i < 4; ++i )
-                        if( AttackList[ a.m_boxdata.m_Attack[ i ] ]->m_isFieldAttack && AttackList[ a.m_boxdata.m_Attack[ i ] ]->possible( ) ) {
+                        if( AttackList[ a.m_boxdata.m_moves[ i ] ]->m_isFieldAttack && AttackList[ a.m_boxdata.m_moves[ i ] ]->possible( ) ) {
                 consoleSelect( &Bottom );
                 consoleSetWindow( &Bottom, 4, 0, 20, 3 );
                 consoleClear( );
@@ -1893,13 +1893,13 @@ int main( int p_argc, char** p_argv ) {
                 updateOAMSub( Oam );
                 scrn.draw( mode = -1 );
                 char buffer[ 50 ];
-                sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_Attack[ i ] ]->text( ), AttackList[ a.m_boxdata.m_Attack[ i ] ]->m_moveName.c_str( ) );
+                sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ i ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
                 yesNoBox yn;
                 if( yn.getResult( buffer ) ) {
-                    sprintf( buffer, "%ls setzt %s\nein!", a.m_boxdata.m_Name, AttackList[ a.m_boxdata.m_Attack[ i ] ]->m_moveName.c_str( ) );
+                    sprintf( buffer, "%ls setzt %s\nein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
                     messageBox( buffer, true, true );
-                    shoUseAttack( a.m_boxdata.m_SPEC, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
-                    AttackList[ a.m_boxdata.m_Attack[ i ] ]->use( );
+                    shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
+                    AttackList[ a.m_boxdata.m_moves[ i ] ]->use( );
                 }
                 goto OUT;
                         }
@@ -2055,14 +2055,14 @@ OUT:
                         stored_pkmn[ *free_spaces.rbegin( ) ] = a.m_boxdata;
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         if( POKEMON::PKMNDATA::canLearn( HILFSCOUNTER, 57, 4 ) )
-                            a.m_boxdata.m_Attack[ 2 ] = 57;
+                            a.m_boxdata.m_moves[ 2 ] = 57;
                         if( POKEMON::PKMNDATA::canLearn( HILFSCOUNTER, 19, 4 ) )
-                            a.m_boxdata.m_Attack[ 1 ] = 19;
-                        a.m_boxdata.m_exp += 750;
+                            a.m_boxdata.m_moves[ 1 ] = 19;
+                        a.m_boxdata.m_experienceGained += 750;
                         SAV.m_PkmnTeam.push_back( a );
 
-                        SAV.m_inDex[ a.m_boxdata.m_SPEC - 1 ] = true;
-                        box_of_st_pkmn[ a.m_boxdata.m_SPEC - 1 ].push_back( *free_spaces.rbegin( ) );
+                        SAV.m_inDex[ a.m_boxdata.m_speciesId - 1 ] = true;
+                        box_of_st_pkmn[ a.m_boxdata.m_speciesId - 1 ].push_back( *free_spaces.rbegin( ) );
                         //printf("%i",(*free_spaces.rbegin()));
                         free_spaces.pop_back( );
                         HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );

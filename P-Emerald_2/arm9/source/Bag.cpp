@@ -35,8 +35,8 @@
 #include <algorithm>
 
 void bag::addItem( bagtype p_bagType, int p_itemId, int p_cnt ) {
-    for( auto I = this->m_bags[ p_bagType ].begin( );
-         I != this->m_bags[ p_bagType ].end( ); ++I ) {
+    for( auto I = m_bags[ p_bagType ].begin( );
+         I != m_bags[ p_bagType ].end( ); ++I ) {
         if( I->first == p_itemId ) {
             if( p_cnt + I->second <= MAXITEMCOUNT ) {
                 I->second += p_cnt;
@@ -46,50 +46,50 @@ void bag::addItem( bagtype p_bagType, int p_itemId, int p_cnt ) {
             p_cnt -= MAXITEMCOUNT - I->second;
         }
     }
-    this->m_bags[ p_bagType ].push_back( std::pair<int, int>( p_itemId, p_cnt ) );
-    std::sort( this->m_bags[ p_bagType ].begin( ), this->m_bags[ p_bagType ].end( ) );
+    m_bags[ p_bagType ].push_back( std::pair<int, int>( p_itemId, p_cnt ) );
+    std::sort( m_bags[ p_bagType ].begin( ), m_bags[ p_bagType ].end( ) );
 }
 
 void bag::removeItem( bagtype p_bagType, int p_itemId, int p_cnt ) {
-    for( auto I = this->m_bags[ p_bagType ].begin( );
-         I != this->m_bags[ p_bagType ].end( ); ++I ) {
+    for( auto I = m_bags[ p_bagType ].begin( );
+         I != m_bags[ p_bagType ].end( ); ++I ) {
         if( I->first == p_itemId ) {
             int num = I->second;
             if( p_cnt && ( ( I->second - p_cnt ) > 0 ) ) {
                 I->second -= p_cnt;
-                std::sort( this->m_bags[ p_bagType ].begin( ), this->m_bags[ p_bagType ].end( ) );
+                std::sort( m_bags[ p_bagType ].begin( ), m_bags[ p_bagType ].end( ) );
                 return;
             } else {
-                this->m_bags[ p_bagType ].erase( I );
+                m_bags[ p_bagType ].erase( I );
                 p_cnt -= num;
                 break;
             }
         }
     }
-    std::sort( this->m_bags[ p_bagType ].begin( ), this->m_bags[ p_bagType ].end( ) );
+    std::sort( m_bags[ p_bagType ].begin( ), m_bags[ p_bagType ].end( ) );
 }
 
 int bag::countItem( bagtype p_bagType, int p_itemId ) {
     int cnt = 0;
-    for( auto I = this->m_bags[ p_bagType ].begin( );
-         I != this->m_bags[ p_bagType ].end( ); ++I )
+    for( auto I = m_bags[ p_bagType ].begin( );
+         I != m_bags[ p_bagType ].end( ); ++I )
          if( I->first == p_itemId )
              cnt += I->second;
     return cnt;
 }
 
 bool bag::empty( bagtype p_bagType ) {
-    return this->m_bags[ p_bagType ].empty( );
+    return m_bags[ p_bagType ].empty( );
 }
 
 std::size_t bag::size( bagtype p_bagType ) {
-    return this->m_bags[ p_bagType ].size( );
+    return m_bags[ p_bagType ].size( );
 }
 
 std::pair<int, int> bag::elementAt( bagtype p_bagType, int index ) {
-    return this->m_bags[ int( p_bagType ) ][ index ];
+    return m_bags[ int( p_bagType ) ][ index ];
 }
 
 void bag::clear( bagtype p_bagType ) {
-    this->m_bags[ p_bagType ].clear( );
+    m_bags[ p_bagType ].clear( );
 }

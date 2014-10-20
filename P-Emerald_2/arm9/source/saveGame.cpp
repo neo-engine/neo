@@ -106,10 +106,10 @@ saveGame::saveGame( void p_func( int ) ) {
     for( int i = 0; i < MAXSTOREDPKMN; i++ ) {
         //stored_pkmn[i] = pokemon(fd);
         fread( &stored_pkmn[ i ], sizeof( POKEMON::pokemon::boxPokemon ), 1, fd );
-        if( stored_pkmn[ i ].m_SPEC == 0 || stored_pkmn[ i ].m_SPEC > MAXPKMN )
+        if( stored_pkmn[ i ].m_speciesId == 0 || stored_pkmn[ i ].m_speciesId > MAXPKMN )
             free_spaces.push_back( i );
         else
-            box_of_st_pkmn[ stored_pkmn[ i ].m_SPEC ].push_back( i );
+            box_of_st_pkmn[ stored_pkmn[ i ].m_speciesId ].push_back( i );
     }
     p_func( 40 );
 

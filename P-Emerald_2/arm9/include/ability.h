@@ -4,7 +4,7 @@
 
     file        : ability.h
     author      : Philip Wellnitz (RedArceus)
-    description : Header file. See corresponding source file for details.
+    description : Abilitíes
 
     Copyright (C) 2012 - 2014
     Philip Wellnitz (RedArceus)
@@ -43,21 +43,20 @@ public:
         BEFORE_ATTACK = 16,
         AFTER_ATTACK = 32
     };
-    const std::string   m_abilityName;
+    std::string         m_abilityName;
     std::string         m_flavourText;
     abilityType         m_type;
 
     ///Constructors
     ability( ) { }
 
-    ability( const std::string p_abilityName )
-        : m_abilityName( p_abilityName ) { }
-
-    ability( const std::string p_abilityName, int p_type )
-        : m_abilityName( p_abilityName ), m_type( (abilityType)p_type ) { }
-
-    ability( const std::string p_abilityName, const std::string p_flavourText, int p_type )
-        : m_abilityName( p_abilityName ), m_flavourText( p_flavourText ), m_type( (abilityType)p_type ) { }
+    ability( int p_abilityId );
 
     void run( ... );
 };
+
+#define AIR_LOCK 1
+#define HYDRATION 2
+#define DRY_SKIN 3
+#define RAIN_DISH 4
+#define CLOUD_NINE 5

@@ -16,6 +16,7 @@
     <ClInclude Include="arm9\include\ability.h" />
     <ClInclude Include="arm9\include\as_lib9.h" />
     <ClInclude Include="arm9\include\buffer.h" />
+    <ClInclude Include="arm9\include\fs.h" />
     <ClInclude Include="arm9\include\move.h" />
     <ClInclude Include="arm9\include\bag.h" />
     <ClInclude Include="arm9\include\battle.h" />
@@ -41,9 +42,9 @@
   <ItemGroup>
     <ClCompile Include="arm7\source\as_lib7.c" />
     <ClCompile Include="arm7\source\main.c" />
-    <ClCompile Include="arm9\source\ability.cpp" />
     <ClCompile Include="arm9\source\as_lib9.c" />
     <ClCompile Include="arm9\source\buffer.cpp" />
+    <ClCompile Include="arm9\source\fs.cpp" />
     <ClCompile Include="arm9\source\move.cpp" />
     <ClCompile Include="arm9\source\bag.cpp" />
     <ClCompile Include="arm9\source\battle.cpp" />

@@ -132,22 +132,6 @@ void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const int& p_pkmnN
                    int& p_oamIndex, int& p_palcnt, int& p_nextAvailableTileIdx, bool p_subScreen );
 void drawEggIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const int p_posX, const int p_posY,
                   int& p_oamIndex, int& p_palcnt, int& p_nextAvailableTileIdx, bool p_subScreen );
-
-bool loadNavScreen( u16* p_layer, const char* p_name, int p_no );
-bool loadPicture( u16* p_layer, const char* p_Path, const char* p_name, int p_paletteSize = 512, int p_tileCnt = 192 * 256 );
-bool loadPictureSub( u16* p_layer, const char* p_path, const char* p_name, int p_paletteSize = 512, int p_tileCnt = 192 * 256 );
-bool loadSprite( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_tileCnt, const int p_palCnt );
-bool loadSpriteSub( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_tileCnt, const int p_palCnt );
-bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const int& p_pkmnNo, const int p_posX,
-                     const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_nextAvailableTileIdx, bool p_bottom, bool p_shiny = false, bool p_female = false, bool p_flipX = false );
-bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const int& p_pkmnNo, const int p_posX,
-                        const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_nextAvailableTileIdx, bool p_bottom, bool p_shiny = false, bool p_female = false, bool p_flipX = false );
-
-bool loadTrainerSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_posX,
-                        const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false );
-bool loadTrainerSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_posX,
-                           const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false );
-
 void drawTypeIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, int& p_oamIndex, int& p_palCnt, int & p_nextAvailableTileIdx, Type p_type, int p_posX, int p_posY, bool p_bottom );
 
 int getCurrentDaytime( );

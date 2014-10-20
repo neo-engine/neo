@@ -33,6 +33,7 @@
 
 #include "screenLoader.h"
 #include "pokemon.h"
+#include "fs.h"
 #include <vector>
 
 class berry;
@@ -65,7 +66,7 @@ int drawBox( short p_pkmnId ) {
         Oam->oamBuffer[ i ].isHidden = true;
     updateOAMSub( Oam );
 
-    loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNInfoScreen" );
+    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNInfoScreen" );
 
     consoleSetWindow( &Top, 0, 0, SCREEN_WIDTH / 8, SCREEN_HEIGHT / 8 );
     consoleSelect( &Top );
@@ -85,10 +86,10 @@ int drawBox( short p_pkmnId ) {
     std::string status_[ ] = { "   ", "BSG", "BRT", "GIF", "SLF", "PAR", "GFR" };
     for( int i = 0; i < max_; i++ ) {
         POKEMON::pokemon::boxPokemon& acPKMN = stored_pkmn[ box_of_st_pkmn[ p_pkmnId ][ i ] ];
-        wprintf( &acPKMN.m_Name[ 0 ] );
-        if( acPKMN.m_PKRUS % 16 )
+        wprintf( &acPKMN.m_name[ 0 ] );
+        if( acPKMN.m_pokerus % 16 )
             printf( " PKRS" );
-        else if( acPKMN.m_PKRUS )
+        else if( acPKMN.m_pokerus )
             printf( " *" );
         //printf(" %i/%i KP",acPKMN.acHP,acPKMN.maxStats[0]);
         //printf(" %s\n",&status_[acPKMN._status][0]);
@@ -120,10 +121,10 @@ DOWN:
             max_ = acin + std::min( MAXPKMNINBOXLIST, (int)box_of_st_pkmn[ p_pkmnId ].size( ) );
             for( int i = acin; i < max_; i++ ) {
                 POKEMON::pokemon::boxPokemon& acPKMN = stored_pkmn[ box_of_st_pkmn[ p_pkmnId ][ i ] ];
-                wprintf( &acPKMN.m_Name[ 0 ] );
-                if( acPKMN.m_PKRUS % 16 )
+                wprintf( &acPKMN.m_name[ 0 ] );
+                if( acPKMN.m_pokerus % 16 )
                     printf( " PKRS" );
-                else if( acPKMN.m_PKRUS )
+                else if( acPKMN.m_pokerus )
                     printf( " *" );
                 //printf(" %i/%i KP",acPKMN.acHP,acPKMN.maxStats[0]);
                 //printf(" %s\n",&status_[acPKMN._status][0]);
@@ -145,10 +146,10 @@ UP:
             max_ = acin + std::min( MAXPKMNINBOXLIST, (int)box_of_st_pkmn[ p_pkmnId ].size( ) );
             for( int i = acin; i < max_; i++ ) {
                 POKEMON::pokemon::boxPokemon& acPKMN = stored_pkmn[ box_of_st_pkmn[ p_pkmnId ][ i ] ];
-                wprintf( &acPKMN.m_Name[ 0 ] );
-                if( acPKMN.m_PKRUS % 16 )
+                wprintf( &acPKMN.m_name[ 0 ] );
+                if( acPKMN.m_pokerus % 16 )
                     printf( " PKRS" );
-                else if( acPKMN.m_PKRUS )
+                else if( acPKMN.m_pokerus )
                     printf( " *" );
                 //printf(" %i/%i KP",acPKMN.acHP,acPKMN.maxStats[0]);
                 //printf(" %s\n",&status_[acPKMN._status][0]);
@@ -212,10 +213,10 @@ UP:
             consoleSetWindow( &Bottom, 2, 3, 30, 20 );
             for( int i = acin; i < max_; i++ ) {
                 POKEMON::pokemon::boxPokemon& acPKMN = stored_pkmn[ box_of_st_pkmn[ p_pkmnId ][ i ] ];
-                wprintf( &acPKMN.m_Name[ 0 ] );
-                if( acPKMN.m_PKRUS % 16 )
+                wprintf( &acPKMN.m_name[ 0 ] );
+                if( acPKMN.m_pokerus % 16 )
                     printf( " PKRS" );
-                else if( acPKMN.m_PKRUS )
+                else if( acPKMN.m_pokerus )
                     printf( " *" );
                 //printf(" %i/%i KP",acPKMN.acHP,acPKMN.maxStats[0]);
                 //printf(" %s\n",&status_[acPKMN._status][0]);

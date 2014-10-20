@@ -279,9 +279,6 @@ namespace BATTLE {
 #define OWN_PKMN_1_TILE     332
 #define OWN_PKMN_2_TILE     476
 
-#define OPPONENT 1
-#define PLAYER 0
-
 #define OWN1_EP_COL         160
 #define OWN2_EP_COL         OWN1_EP_COL
 
@@ -289,12 +286,6 @@ namespace BATTLE {
 #define OPP_HP_COL          155
 
 #define HP_COL(a,b) (((a) == OPPONENT )? (OPP_HP_COL + (b)*2 ): (OWN_HP_COL + (b)*2 ))
-
-#define ACPOS(i,p) _acPkmnPosition[ i ][ p ]
-#define ACPKMNSTS(i,p) _acPkmnStatus[ ACPOS((i),(p)) ][ p ]
-#define ACPKMNAIL(i,p) _acPkmnAilments[ ACPOS((i),(p)) ][ p ]
-#define ACPKMNAILCNT(i,p) _acPkmnAilmentCounts[ ACPOS((i),(p)) ][ p ]
-#define ACPKMN(i,p) (((p) == OPPONENT) ? (( *_opponent->m_pkmnTeam )[ ACPOS( (i), OPPONENT ) ]) : (( *_player->m_pkmnTeam )[ ACPOS( (i), PLAYER ) ]))
 
     void initinitBattleScrnSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo, int p_ownPok, int p_oppPok ) {
         static const int BYTES_PER_16_COLOR_TILE = 32;
@@ -2322,8 +2313,8 @@ namespace BATTLE {
         int baseDmg = ( ( ( ( 2 * p_attackingPkmn.m_Level ) / 5 + 2 ) * p_move.m_moveBasePower * atkval ) / defval ) / 50 + 2;
 
         POKEMON::PKMNDATA::pokemonData p1, p2;
-        POKEMON::PKMNDATA::getAll( p_attackingPkmn.m_boxdata.m_SPEC, p1 );
-        POKEMON::PKMNDATA::getAll( p_defendingPkmn.m_boxdata.m_SPEC, p2 );
+        POKEMON::PKMNDATA::getAll( p_attackingPkmn.m_boxdata.m_speciesId, p1 );
+        POKEMON::PKMNDATA::getAll( p_defendingPkmn.m_boxdata.m_speciesId, p2 );
 
         int vs = 1;
         criticalOccured = false;
@@ -2455,11 +2446,11 @@ namespace BATTLE {
             consoleClear( );
 
 
-            drawPKMNIcon( Oam, spriteInfo, acPK.m_boxdata.m_SPEC, ( Oam->oamBuffer[ i ] ).x - 4, ( Oam->oamBuffer[ i ] ).y - 16, p_oamIndex, p_paletteIndex, p_tileIndex, true );
+            drawPKMNIcon( Oam, spriteInfo, acPK.m_boxdata.m_speciesId, ( Oam->oamBuffer[ i ] ).x - 4, ( Oam->oamBuffer[ i ] ).y - 16, p_oamIndex, p_paletteIndex, p_tileIndex, true );
 
             updateOAMSub( Oam );
 
-            printf( "      %ls", acPK.m_boxdata.m_Name );
+            printf( "      %ls", acPK.m_boxdata.m_name );
             if( validTrg[ u ] ) {
                 if( AttackList[ p_move ]->m_moveHitType != move::moveHitTypes::STAT )
                     printf( "\n      %3d-%2d KP\n        Schaden",
@@ -2909,10 +2900,10 @@ ATTACKCHOSEN:
             return 0;
 
         float a = p_wild ? 1 : 1.5;
-        POKEMON::PKMNDATA::getAll( p_defendingPkmn.m_boxdata.m_SPEC, p );
+        POKEMON::PKMNDATA::getAll( p_defendingPkmn.m_boxdata.m_speciesId, p );
         int b = p.m_EXPYield;
 
-        float e = ItemList[ p_move.m_boxdata.m_Item ].getEffectType( ) == LUCKY_EGG_EFFEKT ? 1.5 : 1;
+        float e = ItemList[ p_move.m_boxdata.m_holdItem ].getEffectType( ) == LUCKY_EGG_EFFEKT ? 1.5 : 1;
 
         int L = p_move.m_Level;
 
@@ -2920,7 +2911,7 @@ ATTACKCHOSEN:
         if( SAV.m_EXPShareEnabled && !participated[ p_atkind ] )
             s = 2;
 
-        float t = ( p_move.m_boxdata.m_ID == SAV.m_Id && p_move.m_boxdata.m_SID == SAV.m_Sid ? 1 : 1.5 );
+        float t = ( p_move.m_boxdata.m_oTId == SAV.m_Id && p_move.m_boxdata.m_oTSid == SAV.m_Sid ? 1 : 1.5 );
 
         return int( ( a * t* b* e* L ) / ( 7 * s ) );
     }
@@ -2932,7 +2923,7 @@ ATTACKCHOSEN:
         if( missed ) {
             clear( );
             if( P.m_stats.m_acHP )
-                sprintf( buffer, "%ls wich der Attacke aus.", P.m_boxdata.m_Name );
+                sprintf( buffer, "%ls wich der Attacke aus.", P.m_boxdata.m_name );
             else
                 sprintf( buffer, "Die Attacke ging daneben..." );
             cust_font.printString( buffer, 8, 8, true );
@@ -2943,15 +2934,15 @@ ATTACKCHOSEN:
         if( eff != 1 )
             clear( );
         if( eff > 3 )
-            sprintf( buffer, "Das ist enorm effektiv\ngegen %ls!", P.m_boxdata.m_Name );
+            sprintf( buffer, "Das ist enorm effektiv\ngegen %ls!", P.m_boxdata.m_name );
         else if( eff > 1 )
-            sprintf( buffer, "Das ist sehr effektiv\ngegen %ls!", P.m_boxdata.m_Name );
+            sprintf( buffer, "Das ist sehr effektiv\ngegen %ls!", P.m_boxdata.m_name );
         else if( eff == 0 )
-            sprintf( buffer, "Hat die Attacke\n%lsgetroffen?", P.m_boxdata.m_Name );
+            sprintf( buffer, "Hat die Attacke\n%lsgetroffen?", P.m_boxdata.m_name );
         else if( eff < 0.3 )
-            sprintf( buffer, "Das ist nur enorm wenig\neffektiv gegen %ls...", P.m_boxdata.m_Name );
+            sprintf( buffer, "Das ist nur enorm wenig\neffektiv gegen %ls...", P.m_boxdata.m_name );
         else if( eff < 1 )
-            sprintf( buffer, "Das ist nicht sehr effektiv\ngegen %ls.", P.m_boxdata.m_Name );
+            sprintf( buffer, "Das ist nicht sehr effektiv\ngegen %ls.", P.m_boxdata.m_name );
 
         if( eff != 1 ) {
             cust_font.printString( buffer, 8, 8, true );
@@ -3478,20 +3469,20 @@ BEFORE_1:
 
                                 for( int j = 0; j < 6; ++j ) {
                                     evsum += p.m_EVYield[ j ];
-                                    acPK.m_boxdata.m_EV[ j ] += p.m_EVYield[ j ];
+                                    acPK.m_boxdata.m_effortValues[ j ] += p.m_EVYield[ j ];
                                 }
 
                                 clear( );
-                                sprintf( buffer, "%ls erhält %d EV\nund %d E.-Punkte.", acPK.m_boxdata.m_Name, evsum, exp );
+                                sprintf( buffer, "%ls erhält %d EV\nund %d E.-Punkte.", acPK.m_boxdata.m_name, evsum, exp );
                                 cust_font.printString( buffer, 8, 8, true );
 
                                 POKEMON::PKMNDATA::getAll( ( *_player->m_pkmnTeam )[ ACPOS( i, PLAYER ) ].m_boxdata.m_SPEC, p );
-                                int old = ( acPK.m_boxdata.m_exp - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
+                                int old = ( acPK.m_boxdata.m_experienceGained - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
                                     ( POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] );
 
-                                acPK.m_boxdata.m_exp += exp;
+                                acPK.m_boxdata.m_experienceGained += exp;
 
-                                int nw = std::min( 100u, ( acPK.m_boxdata.m_exp - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
+                                int nw = std::min( 100u, ( acPK.m_boxdata.m_experienceGained - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
                                                    ( POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) );
 
 
@@ -3502,7 +3493,7 @@ BEFORE_1:
                                     displayEP( old, nw, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, true );
                                 for( int i = 0; i < 75; ++i )
                                     swiWaitForVBlank( );
-                                bool newLevel = acPK.m_Level < 100 && POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] <= acPK.m_boxdata.m_exp;
+                                bool newLevel = acPK.m_Level < 100 && POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] <= acPK.m_boxdata.m_experienceGained;
                                 bool nL = newLevel;
 
                                 unsigned short HPdif = acPK.m_stats.m_maxHP - acPK.m_stats.m_acHP;
@@ -3510,26 +3501,26 @@ BEFORE_1:
                                 while( newLevel ) {
                                     acPK.m_Level++;
 
-                                    if( acPK.m_boxdata.m_SPEC != 292 )
-                                        acPK.m_stats.m_maxHP = ( ( acPK.m_boxdata.m_IV.m_HP + 2 * p.m_bases[ 0 ] + ( acPK.m_boxdata.m_EV[ 0 ] / 4 ) + 100 )* acPK.m_Level / 100 ) + 10;
+                                    if( acPK.m_boxdata.m_speciesId != 292 )
+                                        acPK.m_stats.m_maxHP = ( ( acPK.m_boxdata.m_individualValues.m_hp + 2 * p.m_bases[ 0 ] + ( acPK.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPK.m_Level / 100 ) + 10;
                                     else
                                         acPK.m_stats.m_maxHP = 1;
                                     POKEMON::pkmnNatures nature = acPK.m_boxdata.getNature( );
-                                    acPK.m_stats.m_Atk = ( ( ( acPK.m_boxdata.m_IV.m_Attack + 2 * p.m_bases[ 1 ] + ( acPK.m_boxdata.m_EV[ 1 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ PLAYER ];
-                                    acPK.m_stats.m_Def = ( ( ( acPK.m_boxdata.m_IV.m_Defense + 2 * p.m_bases[ 2 ] + ( acPK.m_boxdata.m_EV[ 2 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ OPPONENT ];
-                                    acPK.m_stats.m_Spd = ( ( ( acPK.m_boxdata.m_IV.m_Speed + 2 * p.m_bases[ 3 ] + ( acPK.m_boxdata.m_EV[ 3 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 2 ];
-                                    acPK.m_stats.m_SAtk = ( ( ( acPK.m_boxdata.m_IV.m_SAttack + 2 * p.m_bases[ 4 ] + ( acPK.m_boxdata.m_EV[ 4 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 3 ];
-                                    acPK.m_stats.m_SDef = ( ( ( acPK.m_boxdata.m_IV.m_SDefense + 2 * p.m_bases[ 5 ] + ( acPK.m_boxdata.m_EV[ 5 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 4 ];
+                                    acPK.m_stats.m_Atk = ( ( ( acPK.m_boxdata.m_individualValues.m_moves + 2 * p.m_bases[ 1 ] + ( acPK.m_boxdata.m_effortValues[ 1 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ PLAYER ];
+                                    acPK.m_stats.m_Def = ( ( ( acPK.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ 2 ] + ( acPK.m_boxdata.m_effortValues[ 2 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ OPPONENT ];
+                                    acPK.m_stats.m_Spd = ( ( ( acPK.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ 3 ] + ( acPK.m_boxdata.m_effortValues[ 3 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 2 ];
+                                    acPK.m_stats.m_SAtk = ( ( ( acPK.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ 4 ] + ( acPK.m_boxdata.m_effortValues[ 4 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 3 ];
+                                    acPK.m_stats.m_SDef = ( ( ( acPK.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ 5 ] + ( acPK.m_boxdata.m_effortValues[ 5 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 4 ];
 
                                     acPK.m_stats.m_acHP = acPK.m_stats.m_maxHP - HPdif;
 
                                     clear( );
-                                    sprintf( buffer, "%ls erreicht Level %d.", acPK.m_boxdata.m_Name, acPK.m_Level );
+                                    sprintf( buffer, "%ls erreicht Level %d.", acPK.m_boxdata.m_name, acPK.m_Level );
                                     cust_font.printString( buffer, 8, 8, true );
                                     for( int i = 0; i < 75; ++i )
                                         swiWaitForVBlank( );
 
-                                    nw = std::min( 100u, ( acPK.m_boxdata.m_exp - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
+                                    nw = std::min( 100u, ( acPK.m_boxdata.m_experienceGained - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
                                                    ( POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) );
 
                                     if( i == 0 ) {
@@ -3556,14 +3547,14 @@ BEFORE_1:
                                         printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
                                                 ACPKMN( 1, PLAYER ).m_stats.m_acHP );
                                     }
-                                    newLevel = acPK.m_Level < 100 && (unsigned)POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] <= acPK.m_boxdata.m_exp;
+                                    newLevel = acPK.m_Level < 100 && (unsigned)POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] <= acPK.m_boxdata.m_experienceGained;
                                 }
 
                                 if( nL && SAV.m_evolveInBattle ) {
                                     consoleSelect( &Top );
                                     if( acPK.canEvolve( ) ) {
                                         clear( );
-                                        sprintf( buffer, "%ls entwickelt sich!", acPK.m_boxdata.m_Name );
+                                        sprintf( buffer, "%ls entwickelt sich!", acPK.m_boxdata.m_name );
                                         cust_font.printString( buffer, 8, 8, true );
                                         for( int i = 0; i < 75; ++i )
                                             swiWaitForVBlank( );
@@ -3645,7 +3636,7 @@ BEFORE_1:
                                         }
 
                                         clear( );
-                                        sprintf( buffer, "Und wurde zu einem\n%ls.", acPK.m_boxdata.m_Name );
+                                        sprintf( buffer, "Und wurde zu einem\n%ls.", acPK.m_boxdata.m_name );
                                         cust_font.printString( buffer, 8, 8, true );
 
                                         for( int i = 0; i < 75; ++i )
