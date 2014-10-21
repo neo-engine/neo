@@ -106,9 +106,9 @@ namespace POKEMON {
             { 1.0, 1.0, 1.0, 1.0, 1.0 }
     };
 
-    char Pkmn_SafariCatchRate[ 669 ];
+    u8 Pkmn_SafariCatchRate[ 669 ];
 
-    int EXP[ 100 ][ 13 ] = {
+    u32 EXP[ 100 ][ 13 ] = {
             { 0, 0, 0, 0, 0, 0, 1, 15, 6, 8, 9, 10, 4 },
             { 15, 6, 8, 9, 10, 4, 2, 37, 15, 19, 48, 23, 9 },
             { 52, 21, 27, 57, 33, 13, 3, 70, 30, 37, 39, 47, 19 },
@@ -213,22 +213,22 @@ namespace POKEMON {
 
     PKMNDATA::pokemonData data;
 
-    pokemon::boxPokemon::boxPokemon( u16* p_moves,
-                                     int p_pkmnId,
+    pokemon::boxPokemon::boxPokemon( u16*           p_moves,
+                                     u16            p_pkmnId,
                                      const wchar_t* p_name,
-                                     short p_level,
-                                     unsigned short p_id,
-                                     unsigned short p_sid,
+                                     u16            p_level,
+                                     u16            p_id,
+                                     u16            p_sid,
                                      const wchar_t* p_oT,
-                                     bool p_oTFemale,
-                                     bool p_cloned,
-                                     bool p_shiny,
-                                     bool p_hiddenAbility,
-                                     bool p_fatefulEncounter,
-                                     bool p_isEgg,
-                                     short p_gotPlace,
-                                     char p_ball,
-                                     char p_pokerus ) {
+                                     bool           p_oTFemale,
+                                     bool           p_cloned,
+                                     bool           p_shiny,
+                                     bool           p_hiddenAbility,
+                                     bool           p_fatefulEncounter,
+                                     bool           p_isEgg,
+                                     u16            p_gotPlace,
+                                     u8             p_ball,
+                                     u8             p_pokerus ) {
         PKMNDATA::getAll( p_pkmnId, data );
 
         srand( LastPID );
@@ -293,7 +293,7 @@ namespace POKEMON {
             for( int i = 0; i < 4; ++i ) m_moves[ i ] = p_moves[ i ];
         else
             PKMNDATA::getLearnMoves( p_pkmnId, p_level, 0, 1, 4, m_moves );
-        for( int i = 0; i < 4; ++i ) m_acPP[ i ] = (unsigned char)( AttackList[ m_moves[ i ] ]->m_movePP );
+        for( int i = 0; i < 4; ++i ) m_acPP[ i ] = (u8)( AttackList[ m_moves[ i ] ]->m_movePP );
 
         m_ppup.m_Up1 = 0;
         m_ppup.m_Up2 = 0;
@@ -345,22 +345,22 @@ namespace POKEMON {
         m_HGSSBall = 0;
 
     }
-    pokemon::pokemon( u16* p_moves,
-                      int p_pkmnId,
-                      const wchar_t* p_name,
-                      short p_level,
-                      unsigned short p_id,
-                      unsigned short p_sid,
-                      const wchar_t* p_oT,
-                      bool p_oTFemale,
-                      bool p_cloned,
-                      bool p_shiny,
-                      bool p_hiddenAbility,
-                      bool p_fatefulEncounter,
-                      bool p_isEgg,
-                      short p_gotPlace,
-                      char p_ball,
-                      char p_pokerus )
+    pokemon::pokemon( u16*              p_moves,
+                      u16               p_pkmnId,
+                      const wchar_t*    p_name,
+                      u16               p_level,
+                      u16               p_id,
+                      u16               p_sid,
+                      const wchar_t*    p_oT,
+                      bool              p_oTFemale,
+                      bool              p_cloned,
+                      bool              p_shiny,
+                      bool              p_hiddenAbility,
+                      bool              p_fatefulEncounter,
+                      bool              p_isEgg,
+                      u16               p_gotPlace,
+                      u8                p_ball,
+                      u8                p_pokerus )
                       : m_boxdata( p_moves,
                       p_pkmnId,
                       p_name,
@@ -392,7 +392,7 @@ namespace POKEMON {
         m_status.m_Asleep = m_status.m_Burned = m_status.m_Frozen = m_status.m_Paralyzed = m_status.m_Poisoned = m_status.m_Toxic = false;
     }
 
-    void setDefaultConsoleTextColors( u16* p_palette, int p_start = 1 ) {
+    void setDefaultConsoleTextColors( u16* p_palette, u8 p_start = 1 ) {
         p_palette[ p_start * 16 - 1 ] = RGB15( 0, 0, 0 ); //30 normal black
         p_palette[ ( p_start + 1 ) * 16 - 1 ] = RGB15( 15, 0, 0 ); //31 normal red
         p_palette[ ( p_start + 2 ) * 16 - 1 ] = RGB15( 0, 15, 0 ); //32 normal green
@@ -405,7 +405,7 @@ namespace POKEMON {
     }
 
 
-    void pokemon::drawPage( int p_page, PrintConsole* p_top, PrintConsole* p_bottom, bool p_newpok ) {
+    void pokemon::drawPage( u8 p_page, PrintConsole* p_top, PrintConsole* p_bottom, bool p_newpok ) {
         setDefaultConsoleTextColors( BG_PALETTE, 6 );
         FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 32 );
 
@@ -548,15 +548,15 @@ namespace POKEMON {
                     sprintf( buf, "SVE                   %3i", m_stats.m_SDef );
                     cust_font.printString( buf, 130, 137, false );
 
-                    font::putrec( 158, 46, 158 + 68, 46 + 12, false, false, 251 );
+                    FONT::putrec( 158, 46, 158 + 68, 46 + 12, false, false, 251 );
 
-                    font::putrec( 158, 46, 158 + int( 68.0*m_boxdata.IVget( 0 ) / 31 ), 46 + 6, false, false, 7 * 16 - 1 );
-                    font::putrec( 158, 46 + 6, 158 + int( 68.0*m_boxdata.m_effortValues[ 0 ] / 255 ), 46 + 12, false, false, 7 * 16 - 1 );
+                    FONT::putrec( 158, 46, 158 + int( 68.0*m_boxdata.IVget( 0 ) / 31 ), 46 + 6, false, false, 7 * 16 - 1 );
+                    FONT::putrec( 158, 46 + 6, 158 + int( 68.0*m_boxdata.m_effortValues[ 0 ] / 255 ), 46 + 12, false, false, 7 * 16 - 1 );
 
                     for( int i = 1; i < 6; ++i ) {
-                        font::putrec( 158, 54 + ( 17 * i ), 158 + 68, 54 + 12 + ( 17 * i ), false, false, 251 );
-                        font::putrec( 158, 54 + ( 17 * i ), 158 + int( 68.0*m_boxdata.IVget( i ) / 31 ), 54 + 6 + ( 17 * i ), false, false, ( 7 + i ) * 16 - 1 );
-                        font::putrec( 158, 54 + 6 + ( 17 * i ), 158 + int( 68.0*m_boxdata.m_effortValues[ i ] / 255 ), 54 + 12 + ( 17 * i ), false, false, ( 7 + i ) * 16 - 1 );
+                        FONT::putrec( 158, 54 + ( 17 * i ), 158 + 68, 54 + 12 + ( 17 * i ), false, false, 251 );
+                        FONT::putrec( 158, 54 + ( 17 * i ), 158 + int( 68.0*m_boxdata.IVget( i ) / 31 ), 54 + 6 + ( 17 * i ), false, false, ( 7 + i ) * 16 - 1 );
+                        FONT::putrec( 158, 54 + 6 + ( 17 * i ), 158 + int( 68.0*m_boxdata.m_effortValues[ i ] / 255 ), 54 + 12 + ( 17 * i ), false, false, ( 7 + i ) * 16 - 1 );
                     }
                 } else {
                     consoleSetWindow( p_top, 16, 4, 32, 24 );
@@ -894,7 +894,7 @@ namespace POKEMON {
         }
     }
     extern bool drawInfoSub( u16* p_layer, int p_pkmnId );
-    int pokemon::draw( ) {
+    s8 pokemon::draw( ) {
 
         // Load bitmap to top background
         FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNInfoScreen" );
@@ -1054,7 +1054,7 @@ namespace POKEMON {
     bool pokemon::boxPokemon::isCloned( ) {
         return ( ( m_pid >> 16 )&( m_pid % ( 1 << 16 ) ) ) < ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) );
     }
-    int pokemon::boxPokemon::gender( ) {
+    s8 pokemon::boxPokemon::gender( ) {
         if( m_isGenderless )
             return 0;
         else if( m_isFemale )
@@ -1062,11 +1062,11 @@ namespace POKEMON {
         return 1;
     }
 
-    unsigned int LastPID = 42;
+    u32 LastPID = 42;
     int page = 0;
 
 
-    bool pokemon::canEvolve( int p_item, int p_method ) {
+    bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
         if( m_boxdata.m_individualValues.m_isEgg )
             return false;
 
@@ -1119,7 +1119,7 @@ namespace POKEMON {
         return false;
     }
 
-    void pokemon::evolve( int p_item, int p_method ) {
+    void pokemon::evolve( u16 p_item, u16 p_method ) {
         if( m_boxdata.m_individualValues.m_isEgg )
             return;
 

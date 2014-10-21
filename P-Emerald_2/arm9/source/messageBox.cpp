@@ -46,8 +46,8 @@ extern int BG_ind;
 extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
 extern OAMTable *Oam;
 extern ConsoleFont cfont;
-extern font::Font cust_font;
-extern font::Font cust_font2;
+extern FONT::Font cust_font;
+extern FONT::Font cust_font2;
 
 bool back_, save_, main_;
 SpriteEntry * back, *save;
@@ -75,7 +75,7 @@ void init( ) {
     BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
     BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
     BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-    font::putrec( 0, 0, 256, 63, true, false, 250 );
+    FONT::putrec( 0, 0, 256, 63, true, false, 250 );
 
     updateOAMSub( Oam );
 }
@@ -87,10 +87,10 @@ void dinit( ) {
 }
 
 void messageBox::clear( ) {
-    font::putrec( 0, 0, 256, 63, true, false, 250 );
+    FONT::putrec( 0, 0, 256, 63, true, false, 250 );
 }
 void messageBox::clearButName( ) {
-    font::putrec( 72, 0, 256, 63, true, false, 250 );
+    FONT::putrec( 72, 0, 256, 63, true, false, 250 );
 }
 
 void waitForTouchUp( bool p_uTime, bool p_tpar = false ) {

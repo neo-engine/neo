@@ -95,7 +95,7 @@ public:
     char            m_moveBasePower;
     Type            m_moveType;
     char            m_moveAccuracy;
-    unsigned char   m_movePP;
+    u8   m_movePP;
     char            m_moveEffectAccuracy;
     moveAffectsTypes
         m_moveAffectsWhom;

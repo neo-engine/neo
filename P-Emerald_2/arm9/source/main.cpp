@@ -68,6 +68,7 @@
 //#include "Map.h"
 #include "keyboard.h"
 #include "sprite.h"
+#include "fs.h"
 
 #include "Gen.h"
 
@@ -111,15 +112,15 @@ int bg2;
 extern PrintConsole Top, Bottom;
 ConsoleFont cfont;
 Keyboard* kbd;
-font::Font cust_font( font::font1::fontData, font::font1::fontWidths, font::font1::shiftchar );
-font::Font cust_font2( font::font2::fontData, font::font2::fontWidths, font::font2::shiftchar );
+FONT::Font cust_font( FONT::font1::fontData, FONT::font1::fontWidths, FONT::font1::shiftchar );
+FONT::Font cust_font2( FONT::font2::fontData, FONT::font2::fontWidths, FONT::font2::shiftchar );
 
 //extern Map Maps[];
 map2d::Map* acMap;
 
 int hours, seconds, minutes, day, month, year;
 int achours, acseconds, acminutes, acday, acmonth, acyear;
-unsigned int ticks;
+u32 ticks;
 
 saveGame SAV;
 const std::string sav_nam = "nitro:/SAV";
@@ -239,21 +240,21 @@ ChoiceResult opScreen( ) {
     switch( SAV.m_savTyp ) {
         case 3:
         {
-            loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "MainMenu0" );
+            FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "MainMenu0" );
             MaxVal = 5;
             fillWeiter( );
             break;
         }
         case 2:
         {
-            loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "MainMenu1" );
+            FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "MainMenu1" );
             MaxVal = 4;
             fillWeiter( );
             break;
         }
         case 1:
         {
-            loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "MainMenu2" );
+            FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "MainMenu2" );
             MaxVal = 3;
             results[ 2 ] = OPTIONS;
 
@@ -262,7 +263,7 @@ ChoiceResult opScreen( ) {
         }
         case 0:
         {
-            loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "MainMenu3" );
+            FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "MainMenu3" );
 
             MaxVal = 2;
             ranges[ 0 ] = std::pair<int, int>( 0, 20 );
@@ -308,8 +309,8 @@ ChoiceResult opScreen( ) {
         } else if( p & KEY_B ) {
             killWeiter( );
             consoleClear( );
-            loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD" );
-            loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "ClearD" );
+            FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD" );
+            FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "ClearD" );
             for( int i = 1; i < 256; ++i )
                 BG_PALETTE_SUB[ i ] = RGB15( 31, 31, 31 );
             return CANCEL;
@@ -323,8 +324,8 @@ ChoiceResult opScreen( ) {
                     break;
             }
             killWeiter( );
-            loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD" );
-            loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "ClearD" );
+            FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD" );
+            FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "ClearD" );
             for( int j = 1; j < 256; ++j )
                 BG_PALETTE_SUB[ j ] = RGB15( 31, 31, 31 );
 
@@ -359,7 +360,7 @@ void initNewGame( ) {
     consoleClear( );
     consoleSetWindow( &Bottom, 3, 10, 26, 5 );
 
-    loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "ClearD" );
+    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "ClearD" );
 
     cust_font.setColor( 0, 0 );
     cust_font.setColor( 251, 1 );
@@ -390,7 +391,7 @@ void initNewGame( ) {
         if( keysCurrent( ) & KEY_TOUCH ) break;
         if( keysCurrent( ) & KEY_A ) break;
     }
-    loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
+    FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
     //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
 
     free_spaces.clear( );
@@ -405,7 +406,7 @@ void initNewGame( ) {
         free_spaces.push_back( i );
     }
 
-    loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
+    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
     cust_font.printStringD( "Hi, ich bin Maike, die\n""Tochter von Prof. Birk.", 24, 76, true );
 
     while( 1 ) {
@@ -413,7 +414,7 @@ void initNewGame( ) {
         if( keysUp( ) & KEY_TOUCH ) break;
         if( keysUp( ) & KEY_A ) break;
     }
-    loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
+    FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
     //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
     //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
     cust_font.printStringD( "Da er gerade leider nicht in Hoenn\nist, werde ich euch heute euren\nPokéNav und euren PokéDex\nüberreichen.", 8, 68, true );
@@ -423,7 +424,7 @@ void initNewGame( ) {
         if( keysUp( ) & KEY_TOUCH ) break;
         if( keysUp( ) & KEY_A ) break;
     }
-    loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
+    FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
     //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
     //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
 
@@ -434,7 +435,7 @@ void initNewGame( ) {
         if( keysUp( ) & KEY_TOUCH ) break;
         if( keysUp( ) & KEY_A ) break;
     }
-    loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
+    FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
     //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
     //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
     cust_font.printStringD( "Ich gehe dann jetzt mal\ndie Dexe holen.\nIhr könnt solange eure\nPokéNav einrichten.", 24, 68, true );
@@ -443,13 +444,13 @@ void initNewGame( ) {
         if( keysUp( ) & KEY_TOUCH ) break;
         if( keysUp( ) & KEY_A ) break;
     }
-    loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
+    FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
     //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
 
     consoleSelect( &Bottom );
     std::wstring S_;
 
-    loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PokeNav" );
+    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PokeNav" );
     scrn.init( );
     setMainSpriteVisibility( true );
     Oam->oamBuffer[ 1 ].isHidden = true;
@@ -531,7 +532,7 @@ INDIVIDUALISIERUNG:
     consoleClear( );
     M.clear( );
     M = messageBox( "Individualisierung\nabgeschlossen!" );
-    loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "ClearD" );
+    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "ClearD" );
     drawSub( );
     for( int i = 0; i < 30; i++ )
         swiWaitForVBlank( );
@@ -557,23 +558,23 @@ INDIVIDUALISIERUNG:
         M = messageBox( "Hi, ich bin Larissa,\n""aber Lari reicht auch.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Das da ist mein\nkleiner Bruder Moritz.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Wir kommen aus Azuria", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
-        loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
         for( int k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Das heißt eigentlich.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Als alle Kanto verlassen\nhaben, sind wir nach\nKlippdelta gezogen.", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
         consoleClear( );
-        loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
         for( int k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Du kommst auch aus\nKlippdelta?!", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Oh...\n", "Lari", messageBox::sprite_trainer, 0 );
-        loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
         for( int k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Na dann sehen wir uns ja\nwahrscheinlich noch öfter...", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
         consoleClear( );
-        loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
     } else {
         M = messageBox( "Mir wird sie den Dex\nzuerst geben!", "???", true, true, false, messageBox::sprite_pkmn, 0 );
         consoleClear( );
@@ -593,7 +594,7 @@ INDIVIDUALISIERUNG:
         M = messageBox( "Nenn' mich ruhig Basti.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Das da ist mein\nkleiner Bruder Moritz.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Wir kommen aus Azuria.", "Basti", true, true, true, messageBox::sprite_trainer, 0 );
-        loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
         for( int k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Das heißt eigentlich.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
@@ -609,7 +610,7 @@ INDIVIDUALISIERUNG:
     }
     for( int k = 0; k < 45; k++ )
         swiWaitForVBlank( );
-    loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
+    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
     messageBox( "So, hier habt ihr das\nPokéDex-Modul für den\nPokéNav.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
     messageBox( "Einmal für dich.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
     messageBox( "Einmal für Moritz.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
@@ -621,18 +622,18 @@ INDIVIDUALISIERUNG:
     M = messageBox( "Du erhälst das\nPokéDex-Modul für den PokéNav!" );
 
 
-    loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
+    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
     messageBox( "Der PokéNav kann euch\nalles über eure\nPokémon liefern.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
     messageBox( "Man kann mit ihm andere\nTrainer anrufen und er\nhat 'ne Kartenfunktion.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
     dmaCopy( BrotherBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
     dmaCopy( BrotherPal, BG_PALETTE, 256 * 2 );
     messageBox( "Und er zeigt einem,\nwie man den Beutel\nam Besten packt!", "Moritz", true, true, false, messageBox::sprite_trainer, 0 );
     messageBox( "Moritz!", SAV.getName( ).c_str( ) );
-    loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
+    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
     messageBox( "...", "Maike", true, false, false, messageBox::sprite_trainer, 0 );
     messageBox( "Also, vergesst ihn ja nich'\nbei euch zu Hause, wenn\nihr auf Reisen geht!", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
     messageBox( "Also dann, bis bald!", "Maike", true, true, true, messageBox::sprite_trainer, 0 );
-    loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Clear" );
+    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Clear" );
 
     S_ = SAV.getName( ); S_ += L",\n wir seh'n uns noch!";
     M = messageBox( &( S_[ 0 ] ), L"Moritz", true, true, true, messageBox::sprite_trainer, 0 );
@@ -646,7 +647,7 @@ INDIVIDUALISIERUNG:
     setMainSpriteVisibility( false );
     Oam->oamBuffer[ 1 ].isHidden = false;
     updateOAMSub( Oam );
-    loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+    FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
 }
 
 void initVideo( ) {
@@ -782,10 +783,10 @@ START:
 
     //StartScreen
 
-    loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Title" );
+    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Title" );
     if( BGs[ BG_ind ].m_allowsOverlay )
         drawSub( );
-    loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "Clear" );
+    FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "Clear" );
 
     consoleSetWindow( &Bottom, 0, 0, 32, 24 );
     consoleSelect( &Bottom );
@@ -1093,9 +1094,9 @@ void loadframe( SpriteInfo* p_si, int p_idx, int p_frame, bool p_big = false ) {
     char buffer[ 50 ];
     sprintf( buffer, "%i/%i", p_idx, p_frame );
     if( !p_big )
-        loadSprite( p_si, "nitro://PICS/SPRITES/OW/", buffer, 64, 16 );
+        FS::loadSprite( p_si, "nitro://PICS/SPRITES/OW/", buffer, 64, 16 );
     else
-        loadSprite( p_si, "nitro://PICS/SPRITES/OW/", buffer, 128, 16 );
+        FS::loadSprite( p_si, "nitro://PICS/SPRITES/OW/", buffer, 128, 16 );
 }
 
 void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
@@ -1612,11 +1613,11 @@ void initMapSprites( ) {
     initOAMTable( OamTop );
     SpriteInfo * SQCHAInfo = &spriteInfoTop[ 0 ];
     SpriteEntry * SQCHA = &OamTop->oamBuffer[ 0 ];
-    SQCHAInfo->oamId = 0;
-    SQCHAInfo->width = 16;
-    SQCHAInfo->height = 32;
-    SQCHAInfo->angle = 0;
-    SQCHAInfo->entry = SQCHA;
+    SQCHAInfo->m_oamId = 0;
+    SQCHAInfo->m_width = 16;
+    SQCHAInfo->m_height = 32;
+    SQCHAInfo->m_angle = 0;
+    SQCHAInfo->m_entry = SQCHA;
     SQCHA->y = 72;
     SQCHA->isRotateScale = false;
     SQCHA->blendMode = OBJMODE_NORMAL;
@@ -1634,11 +1635,11 @@ void initMapSprites( ) {
 
     SQCHAInfo = &spriteInfoTop[ 1 ];
     SQCHA = &OamTop->oamBuffer[ 1 ];
-    SQCHAInfo->oamId = 1;
-    SQCHAInfo->width = 32;
-    SQCHAInfo->height = 32;
-    SQCHAInfo->angle = 0;
-    SQCHAInfo->entry = SQCHA;
+    SQCHAInfo->m_oamId = 1;
+    SQCHAInfo->m_width = 32;
+    SQCHAInfo->m_height = 32;
+    SQCHAInfo->m_angle = 0;
+    SQCHAInfo->m_entry = SQCHA;
     SQCHA->y = 72;
     SQCHA->isRotateScale = false;
     SQCHA->blendMode = OBJMODE_NORMAL;
@@ -1654,11 +1655,11 @@ void initMapSprites( ) {
 
     SpriteInfo * B2Info = &spriteInfoTop[ 2 ];
     SpriteEntry * B2 = &OamTop->oamBuffer[ 2 ];
-    B2Info->oamId = 2;
-    B2Info->width = 64;
-    B2Info->height = 64;
-    B2Info->angle = 0;
-    B2Info->entry = B2;
+    B2Info->m_oamId = 2;
+    B2Info->m_width = 64;
+    B2Info->m_height = 64;
+    B2Info->m_angle = 0;
+    B2Info->m_entry = B2;
     B2->isRotateScale = false;
     B2->blendMode = OBJMODE_NORMAL;
     B2->isMosaic = false;
@@ -1775,8 +1776,8 @@ void shoUseAttack( int p_pkmIdx, bool p_female, bool p_shiny ) {
     for( int i = 0; i < 4; ++i )
         OamTop->oamBuffer[ 2 + i ].isHidden = false;
     int a = 5, b = 2, c = 96;
-    if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, p_female ) ) {
-        loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, !p_female );
+    if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, p_female ) ) {
+        FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, !p_female );
     }
     updateOAM( OamTop );
 
@@ -1813,11 +1814,11 @@ int main( int p_argc, char** p_argv ) {
 
     heroIsBig = SAV.m_acMoveMode != WALK;
 
-    loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "Clear" );
-    loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "Clear" );
+    FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "Clear" );
+    FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "Clear" );
     scrn.draw( mode );
 
-    loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Clear" );
+    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Clear" );
     acMap = new map2d::Map( "nitro://MAPS/", SAV.m_acMapName );
 
     movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
@@ -2080,7 +2081,7 @@ OUT:
                             SAV.m_bag.addItem( ItemList[ j ].m_itemType, j, 1 );
                     break;
                 case 2:
-                    messageBox( berry( "Ginemabeere" ), 31 );
+                    messageBox( ITEMS::berry( "Ginemabeere" ), 31 );
                     setMainSpriteVisibility( false );
                     break;
                 case 3:{

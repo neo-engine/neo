@@ -33,7 +33,7 @@
 #pragma once
 #include <nds.h>
 
-namespace font {
+namespace FONT {
     namespace font1 {
 #define NUM_CHARS 490
         void shiftchar( u16& val );

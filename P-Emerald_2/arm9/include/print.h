@@ -34,7 +34,7 @@
 #include <nds.h>
 
 typedef u16 color;
-namespace font {
+namespace FONT {
 #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 #define NUMFONTS 2
     const u8 SCREEN_TOP = 1;
@@ -42,13 +42,13 @@ namespace font {
     const u8 FONT_WIDTH = 16;
     const u8 FONT_HEIGHT = 16;
 
-    void putrec( int p_x1,
-                 int p_y1,
-                 int p_x2,
-                 int p_y2,
+    void putrec( u8 p_x1,
+                 u8 p_y1,
+                 u8 p_x2,
+                 u8 p_y2,
                  bool p_bottom = true,
                  bool p_striped = false,
-                 int p_color = 42 );
+                 u8 p_color = 42 );
 
     class Font {
     public:
@@ -74,6 +74,7 @@ namespace font {
         u32 stringWidth( const char *p_string ) const;
 
         void printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
+        void printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
         void printStringCenter( const wchar_t *p_string, bool p_bottom );
         void printStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
         void printStringCenterD( const wchar_t *p_string, bool p_bottom );

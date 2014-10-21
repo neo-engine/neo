@@ -54,6 +54,7 @@ public:
 
     void run( ... );
 };
+std::wstring getWAbilityName( int p_abilityId )
 
 #define AIR_LOCK 1
 #define HYDRATION 2

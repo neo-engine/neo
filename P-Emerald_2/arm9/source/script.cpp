@@ -277,7 +277,7 @@ namespace BATTLE {
                 }
                 break;
             case BATTLE::battleScript::command::END:
-                p_target.end( );
+                p_target.endBattle( battle::NONE );
                 break;
             default:
                 break;

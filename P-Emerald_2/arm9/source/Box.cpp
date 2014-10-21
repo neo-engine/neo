@@ -58,7 +58,7 @@ void dPage( int p_Page ) {
 extern OAMTable *Oam;
 extern SpriteInfo* spriteInfo;
 const int MAXPKMNINBOXLIST = 7;
-int drawBox( short p_pkmnId ) {
+int drawBox( u16 p_pkmnId ) {
     --p_pkmnId;
     Oam->oamBuffer[ A_ID ].isHidden = true;
     Oam->oamBuffer[ BACK_ID ].isHidden = true;

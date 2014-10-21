@@ -56,17 +56,22 @@
 
 #include "type.h"
 
-extern const unsigned int* TypeTiles[ 19 ];
-extern const unsigned short* TypePals[ 19 ];
+extern const u32* TypeTiles[ 19 ];
+extern const u16* TypePals[ 19 ];
 
-static const int SPRITE_DMA_CHANNEL = 2;
+static const u8 SPRITE_DMA_CHANNEL = 2;
+
+#define BYTES_PER_16_COLOR_TILE 32
+#define COLORS_PER_PALETTE      16
+#define BOUNDARY_VALUE          32
+#define OFFSET_MULTIPLIER       (BOUNDARY_VALUE / sizeof( SPRITE_GFX[ 0 ] ))
 
 struct SpriteInfo {
-    int oamId;
-    int width;
-    int height;
-    int angle;
-    SpriteEntry * entry;
+    u8 m_oamId;
+    u8 m_width;
+    u8 m_height;
+    u16 m_angle;
+    SpriteEntry * m_entry;
 };
 
 /*
@@ -93,7 +98,7 @@ void initOAMTableSub( OAMTable * p_oam );
 *  Rotate a sprite.
 *
 */
-void rotateSprite( SpriteRotation * p_spriteRotation, int p_angle );
+void rotateSprite( SpriteRotation * p_spriteRotation, u16 p_angle );
 
 /*
 *  setSpriteVisibility
@@ -107,6 +112,22 @@ void setSpriteVisibility( SpriteEntry * p_spriteEntry, bool p_hidden, bool p_aff
 inline void setSpritePosition( SpriteEntry* p_spriteEntry, u16 p_x = 0, u16 p_y = 0 );
 inline void setSpritePriority( SpriteEntry* p_spriteEntry, ObjPriority p_priority );
 
+u16 loadSprite( OAMTable    *p_oam,
+                SpriteInfo  *p_spriteInfo,
+                const u8    p_oamIdx,
+                const u8    p_palIdx,
+                const u16   p_tileIdx,
+                const u16   p_posX,
+                const u16   p_posY,
+                const u8    p_width,
+                const u8    p_height,
+                const u16   *p_spritePal,
+                const u32   *p_spriteData,
+                const u32   p_spriteDataLen,
+                bool        p_flipX,
+                bool        p_flipY,
+                bool        p_hidden,
+                ObjPriority p_priority,
+                bool        p_subScreen );
 //Some specific things
-void initTypes( OAMTable * p_oam, SpriteInfo *p_spriteInfo, Type p_T1, Type p_T2 );
-int initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo );
+u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo );

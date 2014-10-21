@@ -62,9 +62,9 @@ namespace ITEMS {
         short           m_berrySize;
         berryGueteType  m_berryGuete;
         Type            m_naturalGiftType;  //Type that Natural Gift becomes when holding this berry
-        unsigned char   m_naturalGiftStrength;
-        unsigned char   m_berryTaste[ 5 ];       //Spicy, Dry, Sweet, Bitter, Sour
-        unsigned char   m_hoursPerGrowthStage,
+        u8   m_naturalGiftStrength;
+        u8   m_berryTaste[ 5 ];       //Spicy, Dry, Sweet, Bitter, Sour
+        u8   m_hoursPerGrowthStage,
             m_minBerries,
             m_maxBerries;
 
@@ -76,16 +76,16 @@ namespace ITEMS {
 
         berryGueteType  getGuete( );
 
-        std::pair < Type, unsigned char >
+        std::pair < Type, u8 >
             getNaturalGiftStats( );
 
-        unsigned char   getTaste( berryTaste p_taste );
+        u8   getTaste( berryTaste p_taste );
 
-        unsigned char   getHoursPerGrowthStage( );
+        u8   getHoursPerGrowthStage( );
 
-        unsigned char   getMinBerries( );
+        u8   getMinBerries( );
 
-        unsigned char   getMaxBerries( );
+        u8   getMaxBerries( );
 
         bool load( );
 

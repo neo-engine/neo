@@ -38,9 +38,9 @@
 #include "print.h"
 #include "messageBox.h"
 
-namespace font {
-    void putrec( int p_x1, int p_y1, int p_x2, int p_y2, bool p_bottom, bool p_striped, int p_color ) {
-        for( int x = p_x1; x <= p_x2; ++x ) for( int y = p_y1; y < p_y2; ++y )
+namespace FONT {
+    void putrec( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
+        for( u8 x = p_x1; x <= p_x2; ++x ) for( u8 y = p_y1; y < p_y2; ++y )
             if( p_bottom )
                 ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
             else
@@ -69,10 +69,10 @@ namespace font {
                 if( putX >= 0 && putX < SCREEN_WIDTH && putY >= 0 && putY < SCREEN_HEIGHT ) {
                     if( !p_bottom ) {
                         topScreenPlot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
-                                         (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                                       (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     } else {
                         btmScreenPlot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
-                                         (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                                       (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     }
                 }
             }
@@ -99,12 +99,62 @@ namespace font {
             current_char++;
         }
     }
+
+    void drawContinue( Font p_font, u8 p_x, u8 p_y ) {
+        p_font.printChar( 172, p_x, p_y, true );
+    }
+    void hideContinue( u8 p_x, u8 p_y ) {
+        putrec( p_x, p_y, p_x + 10, p_y + 10, true, false, 250 );
+    }
+
+    void Font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+        u32 current_char = 0;
+        s16 putX = p_x, putY = p_y;
+
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == L'\n' ) {
+                putY += FONT_HEIGHT;
+                putX = p_x;
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == L'`' ) {
+                u8 c = 0;
+                bool on = false;
+                while( 1 ) {
+                    scanKeys( );
+                    swiWaitForVBlank( );
+                    if( ++c == 45 ) {
+                        c = 0;
+                        if( on )
+                            hideContinue( 246, 54 );
+                        else
+                            drawContinue( *this, 246, 54 );
+                    }
+                    updateTime( 0 );
+                    if( keysUp( ) & KEY_A )
+                        break;
+                    auto t = touchReadXY( );
+                    if( t.px == 0 && t.py == 0 )
+                        break;
+                }
+                continue;
+            }
+            printChar( p_string[ current_char ], putX, putY, p_bottom );
+
+            u16 c = (u16)p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ];
+
+            current_char++;
+        }
+    }
     void Font::printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
         while( p_string[ current_char ] ) {
-            if( p_string[ current_char ] == '\n' ) {
+            if( p_string[ current_char ] == L'\n' ) {
                 putY += FONT_HEIGHT;
                 putX = p_x;
                 current_char++;
@@ -136,7 +186,7 @@ namespace font {
             _shiftchar( c );
             putX += _widths[ c ];
 
-            for( int i = 0; i < 80 / TEXTSPEED; ++i )
+            for( u8 i = 0; i < 80 / TEXTSPEED; ++i )
                 swiWaitForVBlank( );
             current_char++;
         }
@@ -158,7 +208,7 @@ namespace font {
             _shiftchar( c );
             putX += _widths[ c ];
 
-            for( int i = 0; i < 80 / TEXTSPEED; ++i )
+            for( u8 i = 0; i < 80 / TEXTSPEED; ++i )
                 swiWaitForVBlank( );
             current_char++;
         }

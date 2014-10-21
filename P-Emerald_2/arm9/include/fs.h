@@ -39,8 +39,8 @@ distribution.
 #include "sprite.h"
 #include "saveGame.h"
 
-extern unsigned int NAV_DATA[ 12288 ];
-extern unsigned short int NAV_DATA_PAL[ 256 ];
+extern u32 NAV_DATA[ 12288 ];
+extern u16 NAV_DATA_PAL[ 256 ];
 extern int BG_ind;
 extern SavMod savMod;
 

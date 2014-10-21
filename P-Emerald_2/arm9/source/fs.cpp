@@ -31,6 +31,8 @@ distribution.
 */
 
 
+#include <string>
+
 #include "fs.h"
 #include "buffer.h"
 #include "ability.h"
@@ -39,8 +41,8 @@ distribution.
 #include "berry.h"
 
 
-unsigned int TEMP[ 12288 ] = { 0 };
-unsigned short int TEMP_PAL[ 256 ] = { 0 };
+u32 TEMP[ 12288 ] = { 0 };
+u16 TEMP_PAL[ 256 ] = { 0 };
 const char ITEM_PATH[ ] = "nitro:/ITEMS/";
 const char PKMNDATA_PATH[ ] = "nitro:/PKMNDATA/";
 const char ABILITYDATA_PATH[ ] = "nitro:/PKMNDATA/ABILITIES/";
@@ -56,6 +58,17 @@ ability::ability( int p_abilityId ) {
     m_flavourText = FS::readString( f, false );
     fscanf( f, "%u", &( m_type ) );
     fclose( f );
+}
+
+std::wstring getWAbilityName( int p_abilityId ) {
+    sprintf( buffer, "nitro:/LOCATIONS/%i.data", p_abilityId );
+    FILE* f = fopen( buffer, "r" );
+
+    if( !f )
+        return L"---";
+    auto ret = FS::readWString( f, false );
+    fclose( f );
+    return ret;
 }
 
 namespace FS {
@@ -74,11 +87,11 @@ namespace FS {
             fclose( fd );
             return false;
         }
-        fread( TEMP, sizeof( unsigned int ), p_tileCnt, fd );
-        fread( TEMP_PAL, sizeof( unsigned short int ), p_palCnt, fd );
+        fread( TEMP, sizeof( u32 ), p_tileCnt, fd );
+        fread( TEMP_PAL, sizeof( u16 ), p_palCnt, fd );
 
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_spriteInfo->entry->gfxIndex * OFFSET_MULTIPLIER ], 4 * p_tileCnt );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ p_spriteInfo->entry->palette * COLORS_PER_PALETTE ], 2 * p_palCnt );
+        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_spriteInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ], 4 * p_tileCnt );
+        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ p_spriteInfo->m_entry->palette * COLORS_PER_PALETTE ], 2 * p_palCnt );
         fclose( fd );
         return true;
     }
@@ -97,16 +110,16 @@ namespace FS {
             fclose( fd );
             return false;
         }
-        fread( TEMP, sizeof( unsigned int ), p_tileCnt, fd );
-        fread( TEMP_PAL, sizeof( unsigned short int ), p_palCnt, fd );
+        fread( TEMP, sizeof( u32 ), p_tileCnt, fd );
+        fread( TEMP_PAL, sizeof( u16 ), p_palCnt, fd );
 
         dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
                           TEMP,
-                          &SPRITE_GFX_SUB[ p_spriteInfo->entry->gfxIndex * OFFSET_MULTIPLIER ],
+                          &SPRITE_GFX_SUB[ p_spriteInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
                           4 * p_tileCnt );
         dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
                           TEMP_PAL,
-                          &SPRITE_PALETTE_SUB[ p_spriteInfo->entry->palette * COLORS_PER_PALETTE ],
+                          &SPRITE_PALETTE_SUB[ p_spriteInfo->m_entry->palette * COLORS_PER_PALETTE ],
                           2 * p_palCnt );
         fclose( fd );
         return true;
@@ -134,10 +147,10 @@ namespace FS {
         //p_palCnt = 16;
         for( int i = 0; i < 16; ++i )
             TEMP_PAL[ i ] = 0;
-        fread( TEMP_PAL, sizeof( unsigned short int ), 16, fd );
+        fread( TEMP_PAL, sizeof( u16 ), 16, fd );
         for( int i = 0; i < 96 * 96; ++i )
             TEMP[ i ] = 0;
-        fread( TEMP, sizeof( unsigned int ), 96 * 96, fd );
+        fread( TEMP, sizeof( u32 ), 96 * 96, fd );
         fclose( fd );
         if( p_shiny ) {
             memset( buffer, 0, sizeof( buffer ) );
@@ -148,7 +161,7 @@ namespace FS {
             fd = fopen( buffer, "rb" );
             for( int i = 0; i < 16; ++i )
                 TEMP_PAL[ i ] = 0;
-            fread( TEMP_PAL, sizeof( unsigned short int ), 16, fd );
+            fread( TEMP_PAL, sizeof( u16 ), 16, fd );
             fclose( fd );
         }
         if( p_bottom ) {
@@ -160,11 +173,11 @@ namespace FS {
         }
         SpriteInfo * backInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry * back = &p_oam->oamBuffer[ p_oamIndex ];
-        backInfo->oamId = p_oamIndex;
-        backInfo->width = 64;
-        backInfo->height = 64;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = p_oamIndex;
+        backInfo->m_width = 64;
+        backInfo->m_height = 64;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = p_posY;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -189,11 +202,11 @@ namespace FS {
 
         backInfo = &p_spriteInfo[ ++p_oamIndex ];
         back = &p_oam->oamBuffer[ p_oamIndex ];
-        backInfo->oamId = p_oamIndex;
-        backInfo->width = 32;
-        backInfo->height = 64;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = p_oamIndex;
+        backInfo->m_width = 32;
+        backInfo->m_height = 64;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = p_posY;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -211,11 +224,11 @@ namespace FS {
 
         backInfo = &p_spriteInfo[ ++p_oamIndex ];
         back = &p_oam->oamBuffer[ p_oamIndex ];
-        backInfo->oamId = p_oamIndex;
-        backInfo->width = 64;
-        backInfo->height = 32;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = p_oamIndex;
+        backInfo->m_width = 64;
+        backInfo->m_height = 32;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = p_posY + 64;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -233,11 +246,11 @@ namespace FS {
 
         backInfo = &p_spriteInfo[ ++p_oamIndex ];
         back = &p_oam->oamBuffer[ p_oamIndex ];
-        backInfo->oamId = p_oamIndex;
-        backInfo->width = 32;
-        backInfo->height = 32;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = p_oamIndex;
+        backInfo->m_width = 32;
+        backInfo->m_height = 32;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = p_posY + 64;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -282,10 +295,10 @@ namespace FS {
         //p_palCnt = 16;
         for( int i = 0; i < 16; ++i )
             TEMP_PAL[ i ] = 0;
-        fread( TEMP_PAL, sizeof( unsigned short int ), 16, fd );
+        fread( TEMP_PAL, sizeof( u16 ), 16, fd );
         for( int i = 0; i < 96 * 96; ++i )
             TEMP[ i ] = 0;
-        fread( TEMP, sizeof( unsigned int ), 96 * 64, fd );
+        fread( TEMP, sizeof( u32 ), 96 * 64, fd );
         fclose( fd );
         if( p_shiny ) {
             memset( buffer, 0, sizeof( buffer ) );
@@ -296,7 +309,7 @@ namespace FS {
             fd = fopen( buffer, "rb" );
             for( int i = 0; i < 16; ++i )
                 TEMP_PAL[ i ] = 0;
-            fread( TEMP_PAL, sizeof( unsigned short int ), 16, fd );
+            fread( TEMP_PAL, sizeof( u16 ), 16, fd );
             fclose( fd );
         }
         if( p_bottom )
@@ -306,11 +319,11 @@ namespace FS {
 
         SpriteInfo * backInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry * back = &p_oam->oamBuffer[ p_oamIndex ];
-        backInfo->oamId = p_oamIndex;
-        backInfo->width = 64;
-        backInfo->height = 64;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = p_oamIndex;
+        backInfo->m_width = 64;
+        backInfo->m_height = 64;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = p_posY;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -332,11 +345,11 @@ namespace FS {
 
         backInfo = &p_spriteInfo[ ++p_oamIndex ];
         back = &p_oam->oamBuffer[ p_oamIndex ];
-        backInfo->oamId = p_oamIndex;
-        backInfo->width = 32;
-        backInfo->height = 64;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = p_oamIndex;
+        backInfo->m_width = 32;
+        backInfo->m_height = 64;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = p_posY;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -379,10 +392,10 @@ namespace FS {
         //p_palCnt = 16;
         for( int i = 0; i < 16; ++i )
             TEMP_PAL[ i ] = 0;
-        fread( TEMP_PAL, sizeof( unsigned short int ), 16, fd );
+        fread( TEMP_PAL, sizeof( u16 ), 16, fd );
         for( int i = 0; i < 96 * 96; ++i )
             TEMP[ i ] = 0;
-        fread( TEMP, sizeof( unsigned int ), 96 * 96, fd );
+        fread( TEMP, sizeof( u32 ), 96 * 96, fd );
         fclose( fd );
 
         if( p_bottom )
@@ -392,11 +405,11 @@ namespace FS {
 
         SpriteInfo * backInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry * back = &p_oam->oamBuffer[ p_oamIndex ];
-        backInfo->oamId = p_oamIndex;
-        backInfo->width = 64;
-        backInfo->height = 64;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = p_oamIndex;
+        backInfo->m_width = 64;
+        backInfo->m_height = 64;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = p_posY;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -418,11 +431,11 @@ namespace FS {
 
         backInfo = &p_spriteInfo[ ++p_oamIndex ];
         back = &p_oam->oamBuffer[ p_oamIndex ];
-        backInfo->oamId = p_oamIndex;
-        backInfo->width = 32;
-        backInfo->height = 64;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = p_oamIndex;
+        backInfo->m_width = 32;
+        backInfo->m_height = 64;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = p_posY;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -440,11 +453,11 @@ namespace FS {
 
         backInfo = &p_spriteInfo[ ++p_oamIndex ];
         back = &p_oam->oamBuffer[ p_oamIndex ];
-        backInfo->oamId = p_oamIndex;
-        backInfo->width = 64;
-        backInfo->height = 32;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = p_oamIndex;
+        backInfo->m_width = 64;
+        backInfo->m_height = 32;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = p_posY + 64;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -462,11 +475,11 @@ namespace FS {
 
         backInfo = &p_spriteInfo[ ++p_oamIndex ];
         back = &p_oam->oamBuffer[ p_oamIndex ];
-        backInfo->oamId = p_oamIndex;
-        backInfo->width = 32;
-        backInfo->height = 32;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = p_oamIndex;
+        backInfo->m_width = 32;
+        backInfo->m_height = 32;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = p_posY + 64;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -508,10 +521,10 @@ namespace FS {
         //p_palCnt = 16;
         for( int i = 0; i < 16; ++i )
             TEMP_PAL[ i ] = 0;
-        fread( TEMP_PAL, sizeof( unsigned short int ), 16, fd );
+        fread( TEMP_PAL, sizeof( u16 ), 16, fd );
         for( int i = 0; i < 96 * 96; ++i )
             TEMP[ i ] = 0;
-        fread( TEMP, sizeof( unsigned int ), 96 * 64, fd );
+        fread( TEMP, sizeof( u32 ), 96 * 64, fd );
         fclose( fd );
 
         if( p_bottom )
@@ -521,11 +534,11 @@ namespace FS {
 
         SpriteInfo * backInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry * back = &p_oam->oamBuffer[ p_oamIndex ];
-        backInfo->oamId = p_oamIndex;
-        backInfo->width = 64;
-        backInfo->height = 64;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = p_oamIndex;
+        backInfo->m_width = 64;
+        backInfo->m_height = 64;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = p_posY;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -547,11 +560,11 @@ namespace FS {
 
         backInfo = &p_spriteInfo[ ++p_oamIndex ];
         back = &p_oam->oamBuffer[ p_oamIndex ];
-        backInfo->oamId = p_oamIndex;
-        backInfo->width = 32;
-        backInfo->height = 64;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = p_oamIndex;
+        backInfo->m_width = 32;
+        backInfo->m_height = 64;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = p_posY;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -586,8 +599,8 @@ namespace FS {
             return false;
         }
 
-        fread( TEMP, sizeof( unsigned int ), 12288, fd );
-        fread( TEMP_PAL, sizeof( unsigned short int ), 256, fd );
+        fread( TEMP, sizeof( u32 ), 12288, fd );
+        fread( TEMP_PAL, sizeof( u16 ), 256, fd );
 
         dmaCopy( TEMP, p_layer, p_tileCnt );
         dmaCopy( TEMP_PAL, BG_PALETTE, p_palSize );
@@ -606,8 +619,8 @@ namespace FS {
             return false;
         }
 
-        fread( TEMP, sizeof( unsigned int ), 12288, fd );
-        fread( TEMP_PAL, sizeof( unsigned short int ), 256, fd );
+        fread( TEMP, sizeof( u32 ), 12288, fd );
+        fread( TEMP_PAL, sizeof( u16 ), 256, fd );
 
         dmaCopy( TEMP, p_layer, p_tileCnt );
         dmaCopy( TEMP_PAL, BG_PALETTE_SUB, p_palSize );
@@ -633,8 +646,8 @@ namespace FS {
             return false;
         }
 
-        fread( NAV_DATA, sizeof( unsigned int ), 12288, fd );
-        fread( NAV_DATA_PAL, sizeof( unsigned short int ), 256, fd );
+        fread( NAV_DATA, sizeof( u32 ), 12288, fd );
+        fread( NAV_DATA_PAL, sizeof( u16 ), 256, fd );
 
         dmaCopy( NAV_DATA, p_layer, 256 * 192 );
         dmaCopy( NAV_DATA_PAL, BG_PALETTE_SUB, 256 * 2 );
@@ -852,7 +865,7 @@ namespace POKEMON {
             fclose( f );
             wcscpy( p_name, ret.c_str( ) );
         }
-        void getHoldItems( int p_pkmnId, unsigned short* p_items ) {
+        void getHoldItems( int p_pkmnId, u16* p_items ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );

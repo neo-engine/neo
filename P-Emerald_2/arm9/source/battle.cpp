@@ -31,6 +31,9 @@
     */
 
 
+#include <cwchar>
+#include <cstdio>
+
 #include <nds.h>
 
 #include "battle.h"
@@ -100,11 +103,10 @@ extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
 extern OAMTable *OamTop;
 extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 
-extern font::Font cust_font;
-extern font::Font cust_font2;
+extern FONT::Font cust_font;
+extern FONT::Font cust_font2;
 
 namespace BATTLE {
-    POKEMON::PKMNDATA::pokemonData p;
     const char* trainerclassnames[ ] = { "Pokémon-Trainer" };
 
     const char* ailmentnames[ ] = {
@@ -129,62 +131,228 @@ namespace BATTLE {
         "Ingrain"
     };
 
-    void displayHP( int HPstart, int HP, int x, int y, int freecolor1, int freecolor2, bool delay, bool big ) {
-        if( big )
-            displayHP( HPstart, HP, x, y, freecolor1, freecolor2, delay, 20, 24 );
+    void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big ) {
+        if( p_big )
+            displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 20, 24 );
         else
-            displayHP( HPstart, HP, x, y, freecolor1, freecolor2, delay, 8, 12 );
+            displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 8, 12 );
     }
-    void displayHP( int HPstart, int HP, int x, int y, int freecolor1, int freecolor2, bool delay, int innerR, int outerR ) {
-        HP = std::max( std::min( 101, HP ), 0 );
-        int factor = std::max( 1, outerR / 15 );
-        if( HP > 100 || HP < 0 ) {
-            BG_PALETTE[ freecolor1 ] = GREEN;
+    void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR ) {
+        p_HP = std::max( std::min( 101, p_HP ), 0 );
+        int factor = std::max( 1, p_outerR / 15 );
+        if( p_HP > 100 || p_HP < 0 ) {
+            BG_PALETTE[ p_freecolor1 ] = GREEN;
             for( int i = 0; i < factor * 100; ++i )
-                for( int j = innerR; j <= outerR; ++j ) {
-                u8 nx = x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)freecolor1 ) << 8 ) | (u8)freecolor1;
+                for( int j = p_innerR; j <= p_outerR; ++j ) {
+                u8 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
+                ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
                 //printf("%i %i; ",nx,ny);
                 }
         } else {
-            BG_PALETTE[ freecolor2 ] = NORMAL_;
-            for( int i = factor * 100 - factor*HPstart; i < factor*HP; ++i ) {
-                for( int j = innerR; j <= outerR; ++j ) {
-                    u8 nx = x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                    ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)freecolor2 ) << 8 ) | (u8)freecolor2;
+            BG_PALETTE[ p_freecolor2 ] = NORMAL_;
+            for( int i = factor * 100 - factor*p_HPstart; i < factor*p_HP; ++i ) {
+                for( int j = p_innerR; j <= p_outerR; ++j ) {
+                    u8 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
+                    ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
                     if( i == factor * 50 )
-                        BG_PALETTE[ freecolor1 ] = YELLOW;
+                        BG_PALETTE[ p_freecolor1 ] = YELLOW;
                     if( i == factor * 80 )
-                        BG_PALETTE[ freecolor1 ] = RED;
+                        BG_PALETTE[ p_freecolor1 ] = RED;
                 }
-                if( delay )
+                if( p_delay )
                     swiWaitForVBlank( );
             }
         }
     }
-    void displayEP( int EPstart, int EP, int x, int y, int freecolor1, int freecolor2, bool delay, int innerR, int outerR ) {
-        int factor = std::max( 1, outerR / 15 );
-        if( EPstart >= 100 || EP > 100 ) {
-            BG_PALETTE[ freecolor1 ] = NORMAL_;
+    void displayEP( u16 p_EPstart, u16 p_EP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR ) {
+        int factor = std::max( 1, p_outerR / 15 );
+        if( p_EPstart >= 100 || p_EP > 100 ) {
+            BG_PALETTE[ p_freecolor1 ] = NORMAL_;
             for( int i = 0; i < factor * 100; ++i )
-                for( int j = innerR; j <= outerR; ++j ) {
-                int nx = x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)freecolor1 ) << 8 ) | (u8)freecolor1;
+                for( int j = p_innerR; j <= p_outerR; ++j ) {
+                int nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
+                ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
                 //printf("%i %i; ",nx,ny);
                 }
         } else {
-            BG_PALETTE[ freecolor2 ] = ICE;
-            for( int i = EPstart*factor; i <= EP*factor; ++i ) {
-                for( int j = innerR; j <= outerR; ++j ) {
-                    int nx = x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                    ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)freecolor2 ) << 8 ) | (u8)freecolor2;
+            BG_PALETTE[ p_freecolor2 ] = ICE;
+            for( int i = p_EPstart*factor; i <= p_EP*factor; ++i ) {
+                for( int j = p_innerR; j <= p_outerR; ++j ) {
+                    int nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
+                    ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
                 }
-                if( delay )
+                if( p_delay )
                     swiWaitForVBlank( );
             }
         }
     }
 
+    void initScreen( ) {
+        cust_font.setColor( 0, 0 );
+        cust_font.setColor( 251, 1 );
+        cust_font.setColor( 252, 2 );
+        cust_font2.setColor( 0, 0 );
+        cust_font2.setColor( 253, 1 );
+        cust_font2.setColor( 254, 2 );
+
+        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
+        BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
+        BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
+        BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
+        BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
+        BG_PALETTE[ 250 ] = RGB15( 31, 31, 31 );
+        BG_PALETTE[ 251 ] = RGB15( 15, 15, 15 );
+        BG_PALETTE[ 252 ] = RGB15( 3, 3, 3 );
+        BG_PALETTE[ 253 ] = RGB15( 15, 15, 15 );
+        BG_PALETTE[ 254 ] = RGB15( 31, 31, 31 );
+        FONT::putrec( 0, 0, 256, 63, true, false, 250 );
+    }
+    void clearScreen( ) {
+        FONT::putrec( 0, 0, 256, 63, true, false, 250 );
+    }
+    void setTextColor( u16 p_color ) {
+        BG_PALETTE_SUB[ 251 ] = BG_PALETTE[ 251 ] = p_color;
+    }
+    void setText2Color( u16 p_color ) {
+        BG_PALETTE_SUB[ 253 ] = BG_PALETTE[ 253 ] = p_color;
+    }
+    void writeText( const std::wstring& p_message ) {
+        cust_font.printMBString( p_message.c_str( ), 8, 8, true );
+    }
+
+    void waitForTouchUp( ) {
+        while( 1 ) {
+            swiWaitForVBlank( );
+            updateTime( false );
+            scanKeys( );
+            auto t = touchReadXY( );
+            if( t.px == 0 && t.py == 0 )
+                break;
+        }
+    }
+    void waitForKeyUp( int p_key ) {
+        while( 1 ) {
+            scanKeys( );
+            swiWaitForVBlank( );
+            updateTime( );
+            if( keysUp( ) & p_key )
+                break;
+        }
+    }
+
+#define C2I(a) ((a) - L'0')
+    std::wstring parseLogCmd( const battle& p_battle, const std::wstring& p_cmd ) {
+        if( p_cmd == L"A" )
+            return L"`";
+        if( p_cmd == L"CLEAR" ) {
+            clearScreen( );
+            return L"";
+        }
+        if( p_cmd.substr( 0, 4 ) == L"COLR" ) {
+            u8 r, g, b;
+
+            r = 10 * C2I( p_cmd[ 5 ] ) + C2I( p_cmd[ 6 ] );
+            g = 10 * C2I( p_cmd[ 8 ] ) + C2I( p_cmd[ 9 ] );
+            b = 10 * C2I( p_cmd[ 11 ] ) + C2I( p_cmd[ 12 ] );
+
+            setTextColor( RGB15( r, g, b ) );
+            return L"";
+        }
+
+        POKEMON::pokemon& target = ACPKMN2( p_battle, 0, PLAYER );
+        bool isPkmn = false;
+
+        if( p_cmd.substr( 0, 4 ) == L"OWN1" ) {
+            target = ACPKMN2( p_battle, 0, PLAYER );
+            isPkmn = true;
+        }
+        if( p_cmd.substr( 0, 4 ) == L"OWN2" ) {
+            target = ACPKMN2( p_battle, 1, PLAYER );
+            isPkmn = true;
+        }
+        if( p_cmd.substr( 0, 4 ) == L"OPP1" ) {
+            target = ACPKMN2( p_battle, 0, OPPONENT );
+            isPkmn = true;
+        }
+        if( p_cmd.substr( 0, 4 ) == L"OPP2" ) {
+            target = ACPKMN2( p_battle, 1, OPPONENT );
+            isPkmn = true;
+        }
+
+        if( isPkmn && p_cmd.length( ) == 4 )
+            return target.m_boxdata.m_name;
+
+        if( isPkmn ) {
+            auto specifier = p_cmd.substr( 5 );
+            if( specifier == L"ABILITY" )
+                return getWAbilityName( target.m_boxdata.m_ability );
+            if( specifier.substr( 0, 4 ) == L"MOVE" ) {
+                std::swprintf( wbuffer, L"%s", AttackList[ target.m_boxdata.m_moves[ C2I( specifier[ 4 ] ) - 1 ] ]->m_moveName.c_str( ) );
+                return std::wstring( wbuffer );
+            }
+            if( specifier == L"ITEM" ) {
+                std::swprintf( wbuffer, L"%s", ItemList[ target.m_boxdata.m_holdItem ].m_itemName.c_str( ) );
+                return std::wstring( wbuffer );
+            }
+            if( specifier == L"LEVEL" )
+                return ( L"" + target.m_Level );
+        }
+
+        return L"";
+    }
+
+    void battle::log( const std::wstring& p_message ) {
+        std::wstring msg = L"";
+        for( size_t i = 0; i < p_message.length( ); i++ ) {
+            if( p_message[ i ] == L'[' ) {
+                std::wstring accmd = L"";
+                while( p_message[ ++i ] != L']' )
+                    accmd += p_message[ i ];
+                msg += parseLogCmd( *this, accmd );
+            } else
+                msg += p_message[ i ];
+        }
+
+        writeText( msg );
+    }
+
+    s8 battle::start( ) {
+        battleEndReason battleEnd;
+
+        initBattle( );
+
+        while( _round++ < _maxRounds ) {
+            if( canMove( 0 ) )
+                declareBattleMove( 0 );
+            if( m_battleMode == DOUBLE && canMove( 1 ) )
+                declareBattleMove( 1 );
+
+            doMoves( );
+
+            if( endConditionHit( battleEnd ) ) {
+                endBattle( battleEnd );
+                break;
+            }
+            if( _round >= _maxRounds ) {
+                endBattle( battleEnd = ROUND_LIMIT );
+                break;
+            }
+            doWeather( );
+        }
+
+        return battleEnd;
+    }
+
+    
+
+
+    void battle::initBattle( ) {
+
+    }
+
+    //OLD STUFF -> deprcated
+
+    POKEMON::PKMNDATA::pokemonData pd;
     void init( ) {
         for( int i = 5; i <= 8; ++i ) {
             Oam->oamBuffer[ i ].isHidden = true;
@@ -219,12 +387,12 @@ namespace BATTLE {
         BG_PALETTE[ 252 ] = RGB15( 3, 3, 3 );
         BG_PALETTE[ 253 ] = RGB15( 15, 15, 15 );
         BG_PALETTE[ 254 ] = RGB15( 31, 31, 31 );
-        font::putrec( 0, 0, 256, 63, true, false, 250 );
+        FONT::putrec( 0, 0, 256, 63, true, false, 250 );
 
         updateOAMSub( Oam );
     }
     void clear( ) {
-        font::putrec( 0, 0, 256, 63, true, false, 250 );
+        FONT::putrec( 0, 0, 256, 63, true, false, 250 );
     }
     void dinit( ) {
 
@@ -288,20 +456,15 @@ namespace BATTLE {
 #define HP_COL(a,b) (((a) == OPPONENT )? (OPP_HP_COL + (b)*2 ): (OWN_HP_COL + (b)*2 ))
 
     void initinitBattleScrnSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo, int p_ownPok, int p_oppPok ) {
-        static const int BYTES_PER_16_COLOR_TILE = 32;
-        static const int COLORS_PER_PALETTE = 16;
-        static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                              * (can be set in REG_DISPCNT) */
-        static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX[ 0 ] );
         oamIndex = palcnt = nextAvailableTileIdx = 0;
 
         SpriteInfo * type1Info = &p_spriteInfo[ oamIndex ];
         SpriteEntry * type1 = &p_oam->oamBuffer[ oamIndex ];
-        type1Info->oamId = oamIndex;
-        type1Info->width = 16;
-        type1Info->height = 16;
-        type1Info->angle = 0;
-        type1Info->entry = type1;
+        type1Info->m_oamId = oamIndex;
+        type1Info->m_width = 16;
+        type1Info->m_height = 16;
+        type1Info->m_angle = 0;
+        type1Info->m_entry = type1;
         type1->y = 0;
         type1->isRotateScale = false;
         type1->isHidden = false;
@@ -335,11 +498,11 @@ namespace BATTLE {
 
         SpriteInfo * Bo4Info = &p_spriteInfo[ ++oamIndex ];
         SpriteEntry * Bo4 = &p_oam->oamBuffer[ oamIndex ];
-        Bo4Info->oamId = oamIndex;
-        Bo4Info->width = 64;
-        Bo4Info->height = 64;
-        Bo4Info->angle = 0;
-        Bo4Info->entry = Bo4;
+        Bo4Info->m_oamId = oamIndex;
+        Bo4Info->m_width = 64;
+        Bo4Info->m_height = 64;
+        Bo4Info->m_angle = 0;
+        Bo4Info->m_entry = Bo4;
         Bo4->y = 0;
         Bo4->isRotateScale = false;
         Bo4->blendMode = OBJMODE_NORMAL;
@@ -377,11 +540,11 @@ namespace BATTLE {
 
         SpriteInfo * Bo3Info = &p_spriteInfo[ ++oamIndex ];
         SpriteEntry * Bo3 = &p_oam->oamBuffer[ oamIndex ];
-        Bo3Info->oamId = oamIndex;
-        Bo3Info->width = 64;
-        Bo3Info->height = 64;
-        Bo3Info->angle = 0;
-        Bo3Info->entry = Bo3;
+        Bo3Info->m_oamId = oamIndex;
+        Bo3Info->m_width = 64;
+        Bo3Info->m_height = 64;
+        Bo3Info->m_angle = 0;
+        Bo3Info->m_entry = Bo3;
         Bo3->y = 0;
         Bo3->isRotateScale = false;
         Bo3->blendMode = OBJMODE_NORMAL;
@@ -422,11 +585,11 @@ namespace BATTLE {
 
         SpriteInfo * Bo2Info = &p_spriteInfo[ ++oamIndex ];
         SpriteEntry * Bo2 = &p_oam->oamBuffer[ oamIndex ];
-        Bo2Info->oamId = oamIndex;
-        Bo2Info->width = 64;
-        Bo2Info->height = 64;
-        Bo2Info->angle = 0;
-        Bo2Info->entry = Bo2;
+        Bo2Info->m_oamId = oamIndex;
+        Bo2Info->m_width = 64;
+        Bo2Info->m_height = 64;
+        Bo2Info->m_angle = 0;
+        Bo2Info->m_entry = Bo2;
         Bo2->y = 0;
         Bo2->isRotateScale = false;
         Bo2->blendMode = OBJMODE_NORMAL;
@@ -466,11 +629,11 @@ namespace BATTLE {
 
         SpriteInfo * Bo1Info = &p_spriteInfo[ ++oamIndex ];
         SpriteEntry * Bo1 = &p_oam->oamBuffer[ oamIndex ];
-        Bo1Info->oamId = oamIndex;
-        Bo1Info->width = 64;
-        Bo1Info->height = 64;
-        Bo1Info->angle = 0;
-        Bo1Info->entry = Bo1;
+        Bo1Info->m_oamId = oamIndex;
+        Bo1Info->m_width = 64;
+        Bo1Info->m_height = 64;
+        Bo1Info->m_angle = 0;
+        Bo1Info->m_entry = Bo1;
         Bo1->y = 0;
         Bo1->isRotateScale = false;
         Bo1->blendMode = OBJMODE_NORMAL;
@@ -510,11 +673,11 @@ namespace BATTLE {
 
         SpriteInfo * Bo5Info = &p_spriteInfo[ ++oamIndex ];
         SpriteEntry * Bo5 = &p_oam->oamBuffer[ oamIndex ];
-        Bo5Info->oamId = oamIndex;
-        Bo5Info->width = 64;
-        Bo5Info->height = 64;
-        Bo5Info->angle = 0;
-        Bo5Info->entry = Bo5;
+        Bo5Info->m_oamId = oamIndex;
+        Bo5Info->m_width = 64;
+        Bo5Info->m_height = 64;
+        Bo5Info->m_angle = 0;
+        Bo5Info->m_entry = Bo5;
         Bo5->y = 64;
         Bo5->isRotateScale = false;
         Bo5->blendMode = OBJMODE_NORMAL;
@@ -672,11 +835,11 @@ namespace BATTLE {
 
         SpriteInfo * type1Info = &p_spriteInfo[ OWN_HP_2 ];
         SpriteEntry * type1 = &p_oam->oamBuffer[ OWN_HP_2 ];
-        type1Info->oamId = OWN_HP_2;
-        type1Info->width = 32;
-        type1Info->height = 32;
-        type1Info->angle = 0;
-        type1Info->entry = type1;
+        type1Info->m_oamId = OWN_HP_2;
+        type1Info->m_width = 32;
+        type1Info->m_height = 32;
+        type1Info->m_angle = 0;
+        type1Info->m_entry = type1;
         type1->y = 192 - 32 - 8;
         type1->isRotateScale = false;
         type1->isHidden = false;
@@ -702,11 +865,11 @@ namespace BATTLE {
 
         type1Info = &p_spriteInfo[ OPP_HP_2 ];
         type1 = &p_oam->oamBuffer[ OPP_HP_2 ];
-        type1Info->oamId = OPP_HP_2;
-        type1Info->width = 32;
-        type1Info->height = 32;
-        type1Info->angle = 0;
-        type1Info->entry = type1;
+        type1Info->m_oamId = OPP_HP_2;
+        type1Info->m_width = 32;
+        type1Info->m_height = 32;
+        type1Info->m_angle = 0;
+        type1Info->m_entry = type1;
         type1->y = 8;
         type1->isRotateScale = false;
         type1->isHidden = false;
@@ -733,11 +896,11 @@ namespace BATTLE {
 
         type1Info = &p_spriteInfo[ OWN_PB_START ];
         type1 = &p_oam->oamBuffer[ OWN_PB_START ];
-        type1Info->oamId = OWN_PB_START;
-        type1Info->width = 16;
-        type1Info->height = 16;
-        type1Info->angle = 0;
-        type1Info->entry = type1;
+        type1Info->m_oamId = OWN_PB_START;
+        type1Info->m_width = 16;
+        type1Info->m_height = 16;
+        type1Info->m_angle = 0;
+        type1Info->m_entry = type1;
         type1->y = 0;
         type1->isRotateScale = false;
         type1->isHidden = true;
@@ -780,11 +943,11 @@ namespace BATTLE {
 
         SpriteInfo * type1Info = &p_spriteInfo[ oamIndexS ];
         SpriteEntry * type1 = &p_oam->oamBuffer[ oamIndexS ];
-        type1Info->oamId = oamIndexS;
-        type1Info->width = 64;
-        type1Info->height = 64;
-        type1Info->angle = 0;
-        type1Info->entry = type1;
+        type1Info->m_oamId = oamIndexS;
+        type1Info->m_width = 64;
+        type1Info->m_height = 64;
+        type1Info->m_angle = 0;
+        type1Info->m_entry = type1;
         type1->y = 72;
         type1->isRotateScale = false;
         type1->isHidden = true;
@@ -803,11 +966,11 @@ namespace BATTLE {
 
         type1Info = &p_spriteInfo[ ++oamIndexS ];
         type1 = &p_oam->oamBuffer[ oamIndexS ];
-        type1Info->oamId = oamIndexS;
-        type1Info->width = 64;
-        type1Info->height = 64;
-        type1Info->angle = 0;
-        type1Info->entry = type1;
+        type1Info->m_oamId = oamIndexS;
+        type1Info->m_width = 64;
+        type1Info->m_height = 64;
+        type1Info->m_angle = 0;
+        type1Info->m_entry = type1;
         type1->y = 72;
         type1->isRotateScale = false;
         type1->isHidden = true;
@@ -827,11 +990,11 @@ namespace BATTLE {
 
         type1Info = &p_spriteInfo[ ++oamIndexS ];
         type1 = &p_oam->oamBuffer[ oamIndexS ];
-        type1Info->oamId = oamIndexS;
-        type1Info->width = 64;
-        type1Info->height = 32;
-        type1Info->angle = 0;
-        type1Info->entry = type1;
+        type1Info->m_oamId = oamIndexS;
+        type1Info->m_width = 64;
+        type1Info->m_height = 32;
+        type1Info->m_angle = 0;
+        type1Info->m_entry = type1;
         type1->y = 152;
         type1->isRotateScale = false;
         type1->isHidden = true;
@@ -857,11 +1020,11 @@ namespace BATTLE {
 
         type1Info = &p_spriteInfo[ ++oamIndexS ];
         type1 = &p_oam->oamBuffer[ oamIndexS ];
-        type1Info->oamId = oamIndexS;
-        type1Info->width = 64;
-        type1Info->height = 32;
-        type1Info->angle = 0;
-        type1Info->entry = type1;
+        type1Info->m_oamId = oamIndexS;
+        type1Info->m_width = 64;
+        type1Info->m_height = 32;
+        type1Info->m_angle = 0;
+        type1Info->m_entry = type1;
         type1->y = 144;
         type1->isRotateScale = false;
         type1->isHidden = true;
@@ -881,11 +1044,11 @@ namespace BATTLE {
 
         type1Info = &p_spriteInfo[ ++oamIndexS ];
         type1 = &p_oam->oamBuffer[ oamIndexS ];
-        type1Info->oamId = oamIndexS;
-        type1Info->width = 64;
-        type1Info->height = 32;
-        type1Info->angle = 0;
-        type1Info->entry = type1;
+        type1Info->m_oamId = oamIndexS;
+        type1Info->m_width = 64;
+        type1Info->m_height = 32;
+        type1Info->m_angle = 0;
+        type1Info->m_entry = type1;
         type1->y = 144;
         type1->isRotateScale = false;
         type1->isHidden = true;
@@ -906,11 +1069,11 @@ namespace BATTLE {
         for( int i = 0; i < 4; ++i ) {
             SpriteInfo * MInfo = &p_spriteInfo[ ++oamIndexS ];
             SpriteEntry * M = &p_oam->oamBuffer[ oamIndexS ];
-            MInfo->oamId = oamIndexS;
-            MInfo->width = 64;
-            MInfo->height = 64;
-            MInfo->angle = 0;
-            MInfo->entry = M;
+            MInfo->m_oamId = oamIndexS;
+            MInfo->m_width = 64;
+            MInfo->m_height = 64;
+            MInfo->m_angle = 0;
+            MInfo->m_entry = M;
             M->y = 0;
             M->isRotateScale = false;
             M->blendMode = OBJMODE_NORMAL;
@@ -930,11 +1093,11 @@ namespace BATTLE {
 
         SpriteInfo * Bo4Info = &p_spriteInfo[ ++oamIndexS ];
         SpriteEntry * Bo4 = &p_oam->oamBuffer[ oamIndexS ];
-        Bo4Info->oamId = oamIndexS;
-        Bo4Info->width = 64;
-        Bo4Info->height = 64;
-        Bo4Info->angle = 0;
-        Bo4Info->entry = Bo4;
+        Bo4Info->m_oamId = oamIndexS;
+        Bo4Info->m_width = 64;
+        Bo4Info->m_height = 64;
+        Bo4Info->m_angle = 0;
+        Bo4Info->m_entry = Bo4;
         Bo4->y = 0;
         Bo4->isRotateScale = false;
         Bo4->blendMode = OBJMODE_NORMAL;
@@ -973,11 +1136,11 @@ namespace BATTLE {
 
         SpriteInfo * Bo3Info = &p_spriteInfo[ ++oamIndexS ];
         SpriteEntry * Bo3 = &p_oam->oamBuffer[ oamIndexS ];
-        Bo3Info->oamId = oamIndexS;
-        Bo3Info->width = 64;
-        Bo3Info->height = 64;
-        Bo3Info->angle = 0;
-        Bo3Info->entry = Bo3;
+        Bo3Info->m_oamId = oamIndexS;
+        Bo3Info->m_width = 64;
+        Bo3Info->m_height = 64;
+        Bo3Info->m_angle = 0;
+        Bo3Info->m_entry = Bo3;
         Bo3->y = 0;
         Bo3->isRotateScale = false;
         Bo3->blendMode = OBJMODE_NORMAL;
@@ -1019,11 +1182,11 @@ namespace BATTLE {
 
         SpriteInfo * Bo2Info = &p_spriteInfo[ ++oamIndexS ];
         SpriteEntry * Bo2 = &p_oam->oamBuffer[ oamIndexS ];
-        Bo2Info->oamId = oamIndexS;
-        Bo2Info->width = 64;
-        Bo2Info->height = 64;
-        Bo2Info->angle = 0;
-        Bo2Info->entry = Bo2;
+        Bo2Info->m_oamId = oamIndexS;
+        Bo2Info->m_width = 64;
+        Bo2Info->m_height = 64;
+        Bo2Info->m_angle = 0;
+        Bo2Info->m_entry = Bo2;
         Bo2->y = 0;
         Bo2->isRotateScale = false;
         Bo2->blendMode = OBJMODE_NORMAL;
@@ -1064,11 +1227,11 @@ namespace BATTLE {
 
         SpriteInfo * Bo1Info = &p_spriteInfo[ ++oamIndexS ];
         SpriteEntry * Bo1 = &p_oam->oamBuffer[ oamIndexS ];
-        Bo1Info->oamId = oamIndexS;
-        Bo1Info->width = 64;
-        Bo1Info->height = 64;
-        Bo1Info->angle = 0;
-        Bo1Info->entry = Bo1;
+        Bo1Info->m_oamId = oamIndexS;
+        Bo1Info->m_width = 64;
+        Bo1Info->m_height = 64;
+        Bo1Info->m_angle = 0;
+        Bo1Info->m_entry = Bo1;
         Bo1->y = 0;
         Bo1->isRotateScale = false;
         Bo1->blendMode = OBJMODE_NORMAL;
@@ -1109,11 +1272,11 @@ namespace BATTLE {
 
         SpriteInfo * Bo5Info = &p_spriteInfo[ ++oamIndexS ];
         SpriteEntry * Bo5 = &p_oam->oamBuffer[ oamIndexS ];
-        Bo5Info->oamId = oamIndexS;
-        Bo5Info->width = 64;
-        Bo5Info->height = 64;
-        Bo5Info->angle = 0;
-        Bo5Info->entry = Bo5;
+        Bo5Info->m_oamId = oamIndexS;
+        Bo5Info->m_width = 64;
+        Bo5Info->m_height = 64;
+        Bo5Info->m_angle = 0;
+        Bo5Info->m_entry = Bo5;
         Bo5->y = 64;
         Bo5->isRotateScale = false;
         Bo5->blendMode = OBJMODE_NORMAL;
@@ -1168,11 +1331,11 @@ namespace BATTLE {
         Bo5->hFlip = false;
         SpriteInfo * backInfo = &p_spriteInfo[ ++oamIndexS ];
         SpriteEntry * back = &p_oam->oamBuffer[ oamIndexS ];
-        backInfo->oamId = oamIndexS;
-        backInfo->width = 32;
-        backInfo->height = 32;
-        backInfo->angle = 0;
-        backInfo->entry = back;
+        backInfo->m_oamId = oamIndexS;
+        backInfo->m_width = 32;
+        backInfo->m_height = 32;
+        backInfo->m_angle = 0;
+        backInfo->m_entry = back;
         back->y = SCREEN_HEIGHT - 28;
         back->isRotateScale = false;
         back->blendMode = OBJMODE_NORMAL;
@@ -1196,11 +1359,11 @@ namespace BATTLE {
         for( int i = 0; i < 6; ++i ) {
             SpriteInfo * C1Info = &p_spriteInfo[ 2 * i + oamIndexS ];
             SpriteEntry * C1 = &p_oam->oamBuffer[ 2 * i + oamIndexS ];
-            C1Info->oamId = oamIndexS;
-            C1Info->width = 64;
-            C1Info->height = 32;
-            C1Info->angle = 0;
-            C1Info->entry = C1;
+            C1Info->m_oamId = oamIndexS;
+            C1Info->m_width = 64;
+            C1Info->m_height = 32;
+            C1Info->m_angle = 0;
+            C1Info->m_entry = C1;
             C1->y = 68 + ( i / 2 ) * 32;
             C1->isRotateScale = false;
             C1->blendMode = OBJMODE_NORMAL;
@@ -1217,11 +1380,11 @@ namespace BATTLE {
 
             SpriteInfo * C3Info = &p_spriteInfo[ 2 * i + oamIndexS + 1 ];
             SpriteEntry * C3 = &p_oam->oamBuffer[ 2 * i + oamIndexS + 1 ];
-            C3Info->oamId = oamIndexS;
-            C3Info->width = 64;
-            C3Info->height = 32;
-            C3Info->angle = 0;
-            C3Info->entry = C3;
+            C3Info->m_oamId = oamIndexS;
+            C3Info->m_width = 64;
+            C3Info->m_height = 32;
+            C3Info->m_angle = 0;
+            C3Info->m_entry = C3;
             C3->y = 68 + ( i / 2 ) * 32;
             C3->isRotateScale = false;
             C3->blendMode = OBJMODE_NORMAL;
@@ -1243,11 +1406,11 @@ namespace BATTLE {
         for( int i = 0; i < 3; ++i ) {
             SpriteInfo * C2Info = &p_spriteInfo[ i + oamIndexS + 12 ];
             SpriteEntry * C2 = &p_oam->oamBuffer[ i + oamIndexS + 12 ];
-            C2Info->oamId = oamIndexS;
-            C2Info->width = 64;
-            C2Info->height = 32;
-            C2Info->angle = 0;
-            C2Info->entry = C2;
+            C2Info->m_oamId = oamIndexS;
+            C2Info->m_width = 64;
+            C2Info->m_height = 32;
+            C2Info->m_angle = 0;
+            C2Info->m_entry = C2;
             C2->y = 68 + (i)* 32;
             C2->isRotateScale = false;
             C2->blendMode = OBJMODE_NORMAL;
@@ -1276,11 +1439,11 @@ namespace BATTLE {
         p_x += 8; p_y += 8;
         SpriteInfo * type1Info = &spriteInfoTop[ PB_ANIM ];
         SpriteEntry * type1 = &OamTop->oamBuffer[ PB_ANIM ];
-        type1Info->oamId = PB_ANIM;
-        type1Info->width = 16;
-        type1Info->height = 16;
-        type1Info->angle = 0;
-        type1Info->entry = type1;
+        type1Info->m_oamId = PB_ANIM;
+        type1Info->m_width = 16;
+        type1Info->m_height = 16;
+        type1Info->m_angle = 0;
+        type1Info->m_entry = type1;
         type1->y = p_y;
         type1->isRotateScale = false;
         type1->isHidden = false;
@@ -1341,11 +1504,11 @@ namespace BATTLE {
             swiWaitForVBlank( );
         type1->isHidden = true;
 
-        type1Info->oamId = PB_ANIM;
-        type1Info->width = 64;
-        type1Info->height = 64;
-        type1Info->angle = 0;
-        type1Info->entry = type1;
+        type1Info->m_oamId = PB_ANIM;
+        type1Info->m_width = 64;
+        type1Info->m_height = 64;
+        type1Info->m_angle = 0;
+        type1Info->m_entry = type1;
         type1->y = p_y - 22;
         type1->isRotateScale = false;
         type1->isHidden = false;
@@ -1381,11 +1544,11 @@ namespace BATTLE {
 
         SpriteInfo * type1Info = &spriteInfoTop[ SHINY_ANIM ];
         SpriteEntry * type1 = &OamTop->oamBuffer[ SHINY_ANIM ];
-        type1Info->oamId = SHINY_ANIM;
-        type1Info->width = 64;
-        type1Info->height = 64;
-        type1Info->angle = 0;
-        type1Info->entry = type1;
+        type1Info->m_oamId = SHINY_ANIM;
+        type1Info->m_width = 64;
+        type1Info->m_height = 64;
+        type1Info->m_angle = 0;
+        type1Info->m_entry = type1;
         type1->y = p_y;
         type1->isRotateScale = false;
         type1->isHidden = false;
@@ -1847,25 +2010,6 @@ namespace BATTLE {
         updateOAMSub( Oam );
     }
 
-    void waitForTouchUp( ) {
-        while( 1 ) {
-            swiWaitForVBlank( );
-            updateTime( false );
-            scanKeys( );
-            auto t = touchReadXY( );
-            if( t.px == 0 && t.py == 0 )
-                break;
-        }
-    }
-    void waitForKeyUp( int p_key ) {
-        while( 1 ) {
-            scanKeys( );
-            swiWaitForVBlank( );
-            updateTime( );
-            if( keysUp( ) & p_key )
-                break;
-        }
-    }
 
     void drawTopBack( ) {
         dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
@@ -3496,7 +3640,7 @@ BEFORE_1:
                                 bool newLevel = acPK.m_Level < 100 && POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] <= acPK.m_boxdata.m_experienceGained;
                                 bool nL = newLevel;
 
-                                unsigned short HPdif = acPK.m_stats.m_maxHP - acPK.m_stats.m_acHP;
+                                u16 HPdif = acPK.m_stats.m_maxHP - acPK.m_stats.m_acHP;
 
                                 while( newLevel ) {
                                     acPK.m_Level++;
