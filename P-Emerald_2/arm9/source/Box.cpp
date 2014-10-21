@@ -31,12 +31,14 @@
     */
 
 
+//DEPRECATED
+
 #include "screenLoader.h"
 #include "pokemon.h"
 #include "fs.h"
 #include <vector>
 
-class berry;
+class ITEMS::berry;
 
 extern int bg3sub;
 extern int bg3;
@@ -62,7 +64,7 @@ int drawBox( u16 p_pkmnId ) {
     --p_pkmnId;
     Oam->oamBuffer[ A_ID ].isHidden = true;
     Oam->oamBuffer[ BACK_ID ].isHidden = true;
-    for( int i = BORDER_ID; i < BORDER_ID + 10; ++i )
+    for( u8 i = BORDER_ID; i < BORDER_ID + 10; ++i )
         Oam->oamBuffer[ i ].isHidden = true;
     updateOAMSub( Oam );
 

@@ -200,22 +200,22 @@ namespace POKEMON {
         };
 
 
-        Type            getType( int p_pkmnId, int p_type );
-        u16             getBase( int p_pkmnId, int p_base );
-        u16             getCatchRate( int p_pkmnId );
-        const char*     getDisplayName( int p_pkmnId );
-        const wchar_t*  getWDisplayName( int p_pkmnId );
-        void            getWDisplayName( int p_pkmnId, wchar_t* p_name );
-        void            getHoldItems( int p_pkmnId, u16* p_items );
-        pkmnGenderType  getGenderType( int p_pkmnId );
-        const char*     getSpecies( int p_pkmnId );
+        Type            getType( u16 p_pkmnId, u16 p_type );
+        u16             getBase( u16 p_pkmnId, u16 p_base );
+        u16             getCatchRate( u16 p_pkmnId );
+        const char*     getDisplayName( u16 p_pkmnId );
+        const wchar_t*  getWDisplayName( u16 p_pkmnId );
+        void            getWDisplayName( u16 p_pkmnId, wchar_t* p_name );
+        void            getHoldItems( u16 p_pkmnId, u16* p_items );
+        pkmnGenderType  getGenderType( u16 p_pkmnId );
+        const char*     getSpecies( u16 p_pkmnId );
         u16             getColor( Type p_type );
-        const char*     getDexEntry( int p_pkmnId );
-        u16             getForme( int p_pkmnId, int p_formeId, const char* p_formeName );
-        void            getAll( int p_pkmnId, pokemonData& out );
+        const char*     getDexEntry( u16 p_pkmnId );
+        u16             getForme( u16 p_pkmnId, u16 p_formeId, const char* p_formeName );
+        void            getAll( u16 p_pkmnId, pokemonData& out );
 
-        void            getLearnMoves( int p_pkmnId, int p_fromLevel, int p_toLevel, int p_mode, int p_num, u16* p_res );
-        bool            canLearn( int p_pkmnId, int p_moveId, int p_mode );
+        void            getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num, u16* p_res );
+        bool            canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode );
     }
 
     extern double NatMod[ 25 ][ 5 ];
@@ -226,7 +226,7 @@ namespace POKEMON {
     bool operator==( touchPosition R, touchPosition L );
 
     extern u32 LastPID;
-    extern u8 page;
+    extern u16 page;
 
     const u16 OTLENGTH = 8;
     const u16 PKMN_NAMELENGTH = 11;

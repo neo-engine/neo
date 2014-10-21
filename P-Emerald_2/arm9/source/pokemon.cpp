@@ -434,7 +434,8 @@ namespace POKEMON {
         initOAMTable( OamTop );
         updateOAMSub( Oam );
 
-        int a2 = 0, b2 = 0, c2 = 0;
+        u8 a2 = 0, b2 = 0;
+        u16 c2 = 0;
         if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
 
             BG_PALETTE[ 254 ] = RGB15( 31, 0, 0 );
@@ -445,7 +446,7 @@ namespace POKEMON {
             consoleSetWindow( p_top, 20, 1, 13, 2 );
 
             cust_font.printString( &( m_boxdata.m_name[ 0 ] ), 150, 2, false );
-            int G = m_boxdata.gender( );
+            s8 G = m_boxdata.gender( );
 
             cust_font.printChar( '/', 234, 2, false );
             if( m_boxdata.m_speciesId != 29 && m_boxdata.m_speciesId != 32 ) {
@@ -466,10 +467,10 @@ namespace POKEMON {
                 cust_font.printString( "Item", 2, 176, false );
                 cust_font.setColor( 252, 1 );
                 cust_font.setColor( 0, 2 );
-                char buf[ 200 ];
-                sprintf( buf, "%s: %s", ItemList[ m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
+                char buffer[ 200 ];
+                sprintf( buffer, "%s: %s", ItemList[ m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
                          ItemList[ m_boxdata.getItem( ) ].getShortDescription( true ).c_str( ) );
-                cust_font.printString( buf, 50, 159, false );
+                cust_font.printString( buffer, 50, 159, false );
                 drawItemIcon( OamTop, spriteInfoTop, ItemList[ m_boxdata.getItem( ) ].m_itemName, 2, 152, a2, b2, c2, false );
                 updateOAM( OamTop );
             } else {
@@ -499,9 +500,9 @@ namespace POKEMON {
                     BG_PALETTE[ 254 ] = RGB15( 31, 0, 0 );
                     BG_PALETTE[ 255 ] = RGB15( 0, 0, 31 );
 
-                    char buf[ 50 ];
-                    sprintf( buf, "KP                     %3i", m_stats.m_maxHP );
-                    cust_font.printString( buf, 130, 44, false );
+                    char buffer[ 50 ];
+                    sprintf( buffer, "KP                     %3i", m_stats.m_maxHP );
+                    cust_font.printString( buffer, 130, 44, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 0 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -509,8 +510,8 @@ namespace POKEMON {
                         cust_font.setColor( 255, 1 );
                     else
                         cust_font.setColor( 251, 1 );
-                    sprintf( buf, "ANG                   %3i", m_stats.m_Atk );
-                    cust_font.printString( buf, 130, 69, false );
+                    sprintf( buffer, "ANG                   %3i", m_stats.m_Atk );
+                    cust_font.printString( buffer, 130, 69, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 1 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -518,8 +519,8 @@ namespace POKEMON {
                         cust_font.setColor( 255, 1 );
                     else
                         cust_font.setColor( 251, 1 );
-                    sprintf( buf, "VER                   %3i", m_stats.m_Def );
-                    cust_font.printString( buf, 130, 86, false );
+                    sprintf( buffer, "VER                   %3i", m_stats.m_Def );
+                    cust_font.printString( buffer, 130, 86, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 2 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -527,8 +528,8 @@ namespace POKEMON {
                         cust_font.setColor( 255, 1 );
                     else
                         cust_font.setColor( 251, 1 );
-                    sprintf( buf, "INI                   \xC3\xC3""%3i", m_stats.m_Spd );
-                    cust_font.printString( buf, 130, 103, false );
+                    sprintf( buffer, "INI                   \xC3\xC3""%3i", m_stats.m_Spd );
+                    cust_font.printString( buffer, 130, 103, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 3 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -536,8 +537,8 @@ namespace POKEMON {
                         cust_font.setColor( 255, 1 );
                     else
                         cust_font.setColor( 251, 1 );
-                    sprintf( buf, "SAN                   %3i", m_stats.m_SAtk );
-                    cust_font.printString( buf, 130, 120, false );
+                    sprintf( buffer, "SAN                   %3i", m_stats.m_SAtk );
+                    cust_font.printString( buffer, 130, 120, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 4 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -545,8 +546,8 @@ namespace POKEMON {
                         cust_font.setColor( 255, 1 );
                     else
                         cust_font.setColor( 251, 1 );
-                    sprintf( buf, "SVE                   %3i", m_stats.m_SDef );
-                    cust_font.printString( buf, 130, 137, false );
+                    sprintf( buffer, "SVE                   %3i", m_stats.m_SDef );
+                    cust_font.printString( buffer, 130, 137, false );
 
                     FONT::putrec( 158, 46, 158 + 68, 46 + 12, false, false, 251 );
 
@@ -646,7 +647,8 @@ namespace POKEMON {
 
         consoleSelect( p_bottom );
         printf( "\x1b[39m" );
-        int o2s = 50, p2s = 2, t2s = 780;
+        u8 o2s = 50, p2s = 2;
+        u16 t2s = 780;
 
         Oam->oamBuffer[ 0 ].x = 256 - 24;
         Oam->oamBuffer[ 0 ].y = 196 - 28;
@@ -764,9 +766,8 @@ namespace POKEMON {
         cust_font.printString( m_boxdata.m_oT, 56, 16, true );
         cust_font.setColor( 255, 2 );
 
-        char buf[ 50 ];
-        sprintf( buf, "(%05i/%05i)", m_boxdata.m_oTId, m_boxdata.m_oTSid );
-        cust_font.printString( buf, 50, 30, true );
+        sprintf( buffer, "(%05i/%05i)", m_boxdata.m_oTId, m_boxdata.m_oTSid );
+        cust_font.printString( buffer, 50, 30, true );
 
         if( m_boxdata.m_oTId == SAV.m_Id && m_boxdata.m_oTSid == SAV.m_Sid ) //Trainer is OT
         {
@@ -774,97 +775,97 @@ namespace POKEMON {
                 cust_font.printString( "Schicksalhafte Begegnung.", 28, 120, true );
             if( !( m_boxdata.m_gotDate[ 0 ] ) ) {
                 if( savMod == SavMod::_NDS )
-                    sprintf( buf, "Gefangen am %02i.%02i.%02i mit Lv. %i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ], m_boxdata.m_gotLevel );
+                    sprintf( buffer, "Gefangen am %02i.%02i.%02i mit Lv. %i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ], m_boxdata.m_gotLevel );
                 else
-                    sprintf( buf, "Gefangen mit Lv. %i", m_boxdata.m_gotLevel );
-                cust_font.printString( buf, 28, 44, true );
-                sprintf( buf, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
-                cust_font.printString( buf, 35, 58, true );
-                sprintf( buf, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                cust_font.printString( buf, 28, 76, true );
-                sprintf( buf, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
-                cust_font.printString( buf, 35, 90, true );
+                    sprintf( buffer, "Gefangen mit Lv. %i", m_boxdata.m_gotLevel );
+                cust_font.printString( buffer, 28, 44, true );
+                sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
+                cust_font.printString( buffer, 35, 58, true );
+                sprintf( buffer, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                cust_font.printString( buffer, 28, 76, true );
+                sprintf( buffer, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
+                cust_font.printString( buffer, 35, 90, true );
 
-                sprintf( buf, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
-                cust_font.printString( buf, 28, 104, true );
+                sprintf( buffer, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
+                cust_font.printString( buffer, 28, 104, true );
             } else {
                 if( savMod == SavMod::_NDS )
-                    sprintf( buf, "Als Ei erhalten am %02i.%02i.%02i", m_boxdata.m_gotDate[ 0 ], m_boxdata.m_gotDate[ 1 ], m_boxdata.m_gotDate[ 2 ] );
+                    sprintf( buffer, "Als Ei erhalten am %02i.%02i.%02i", m_boxdata.m_gotDate[ 0 ], m_boxdata.m_gotDate[ 1 ], m_boxdata.m_gotDate[ 2 ] );
                 else
-                    sprintf( buf, "Als Ei erhalten." );
-                cust_font.printString( buf, 28, 44, true );
-                sprintf( buf, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
-                cust_font.printString( buf, 35, 58, true );
+                    sprintf( buffer, "Als Ei erhalten." );
+                cust_font.printString( buffer, 28, 44, true );
+                sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
+                cust_font.printString( buffer, 35, 58, true );
                 if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
 
                     if( savMod == SavMod::_NDS ) {
-                        sprintf( buf, "Geschlüpft am %02i.%02i.%02i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ] );
-                        cust_font.printString( buf, 28, 72, true );
-                        sprintf( buf, "in/bei %s.", FS::getLoc( m_boxdata.m_hatchPlace ) );
-                        cust_font.printString( buf, 35, 86, true );
+                        sprintf( buffer, "Geschlüpft am %02i.%02i.%02i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ] );
+                        cust_font.printString( buffer, 28, 72, true );
+                        sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_hatchPlace ) );
+                        cust_font.printString( buffer, 35, 86, true );
                     } else {
-                        sprintf( buf, "Geschlüpft in/bei %s.", FS::getLoc( m_boxdata.m_hatchPlace ) );
-                        cust_font.printString( buf, 28, 72, true );
+                        sprintf( buffer, "Geschlüpft in/bei %s.", FS::getLoc( m_boxdata.m_hatchPlace ) );
+                        cust_font.printString( buffer, 28, 72, true );
                     }
                     if( !m_boxdata.m_fateful ) {
-                        sprintf( buf, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                        cust_font.printString( buf, 28, 100, true );
-                        sprintf( buf, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
-                        cust_font.printString( buf, 35, 114, true );
+                        sprintf( buffer, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                        cust_font.printString( buffer, 28, 100, true );
+                        sprintf( buffer, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
+                        cust_font.printString( buffer, 35, 114, true );
 
-                        sprintf( buf, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
-                        cust_font.printString( buf, 28, 128, true );
+                        sprintf( buffer, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
+                        cust_font.printString( buffer, 28, 128, true );
                     } else {
-                        sprintf( buf, "Besitzt ein %s""es Wesen.", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                        cust_font.printString( buf, 28, 100, true );
+                        sprintf( buffer, "Besitzt ein %s""es Wesen.", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                        cust_font.printString( buffer, 28, 100, true );
                     }
                 }
             }
         } else {
             if( !( m_boxdata.m_gotDate[ 0 ] ) ) {
                 if( savMod == SavMod::_NDS )
-                    sprintf( buf, "Off. gef. am %02i.%02i.%02i mit Lv. %i.", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ], m_boxdata.m_gotLevel );
+                    sprintf( buffer, "Off. gef. am %02i.%02i.%02i mit Lv. %i.", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ], m_boxdata.m_gotLevel );
                 else
-                    sprintf( buf, "Offenbar gefangen mit Lv. %i.", m_boxdata.m_gotLevel );
-                cust_font.printString( buf, 28, 44, true );
-                sprintf( buf, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
-                cust_font.printString( buf, 35, 58, true );
-                sprintf( buf, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                cust_font.printString( buf, 28, 76, true );
-                sprintf( buf, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
-                cust_font.printString( buf, 35, 90, true );
+                    sprintf( buffer, "Offenbar gefangen mit Lv. %i.", m_boxdata.m_gotLevel );
+                cust_font.printString( buffer, 28, 44, true );
+                sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
+                cust_font.printString( buffer, 35, 58, true );
+                sprintf( buffer, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                cust_font.printString( buffer, 28, 76, true );
+                sprintf( buffer, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
+                cust_font.printString( buffer, 35, 90, true );
 
-                sprintf( buf, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
-                cust_font.printString( buf, 28, 104, true );
+                sprintf( buffer, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
+                cust_font.printString( buffer, 28, 104, true );
             } else {
                 if( savMod == SavMod::_NDS )
-                    sprintf( buf, "Off. Als Ei erh. am %02i.%02i.%02i", m_boxdata.m_gotDate[ 0 ], m_boxdata.m_gotDate[ 1 ], m_boxdata.m_gotDate[ 2 ] );
+                    sprintf( buffer, "Off. Als Ei erh. am %02i.%02i.%02i", m_boxdata.m_gotDate[ 0 ], m_boxdata.m_gotDate[ 1 ], m_boxdata.m_gotDate[ 2 ] );
                 else
-                    sprintf( buf, "Offenbar als Ei erhalten." );
-                cust_font.printString( buf, 28, 44, true );
-                sprintf( buf, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
-                cust_font.printString( buf, 35, 58, true );
+                    sprintf( buffer, "Offenbar als Ei erhalten." );
+                cust_font.printString( buffer, 28, 44, true );
+                sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
+                cust_font.printString( buffer, 35, 58, true );
                 if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
                     if( savMod == SavMod::_NDS ) {
-                        sprintf( buf, "Geschlüpft am %02i.%02i.%02i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ] );
-                        cust_font.printString( buf, 28, 72, true );
-                        sprintf( buf, "in/bei %s.", FS::getLoc( m_boxdata.m_hatchPlace ) );
-                        cust_font.printString( buf, 35, 86, true );
+                        sprintf( buffer, "Geschlüpft am %02i.%02i.%02i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ] );
+                        cust_font.printString( buffer, 28, 72, true );
+                        sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_hatchPlace ) );
+                        cust_font.printString( buffer, 35, 86, true );
                     } else {
-                        sprintf( buf, "Geschlüpft in/bei %s.", FS::getLoc( m_boxdata.m_hatchPlace ) );
-                        cust_font.printString( buf, 28, 72, true );
+                        sprintf( buffer, "Geschlüpft in/bei %s.", FS::getLoc( m_boxdata.m_hatchPlace ) );
+                        cust_font.printString( buffer, 28, 72, true );
                     }
                     if( !m_boxdata.m_fateful ) {
-                        sprintf( buf, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                        cust_font.printString( buf, 28, 100, true );
-                        sprintf( buf, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
-                        cust_font.printString( buf, 35, 114, true );
+                        sprintf( buffer, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                        cust_font.printString( buffer, 28, 100, true );
+                        sprintf( buffer, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
+                        cust_font.printString( buffer, 35, 114, true );
 
-                        sprintf( buf, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
-                        cust_font.printString( buf, 28, 128, true );
+                        sprintf( buffer, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
+                        cust_font.printString( buffer, 28, 128, true );
                     } else {
-                        sprintf( buf, "Besitzt ein %s""es Wesen.", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                        cust_font.printString( buf, 28, 100, true );
+                        sprintf( buffer, "Besitzt ein %s""es Wesen.", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                        cust_font.printString( buffer, 28, 100, true );
                     }
                 }
             }
@@ -881,7 +882,7 @@ namespace POKEMON {
             if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", m_boxdata.m_speciesId, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), m_boxdata.m_isFemale, true ) )
                 FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", m_boxdata.m_speciesId, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), !m_boxdata.m_isFemale, true );
 
-            int exptype = data.m_expType;
+            u16 exptype = data.m_expType;
 
             printf( "EP(%3i%%)\nKP(%3i%%)", ( m_boxdata.m_experienceGained - POKEMON::EXP[ m_Level - 1 ][ exptype ] ) * 100 / ( POKEMON::EXP[ m_Level ][ exptype ] - POKEMON::EXP[ m_Level - 1 ][ exptype ] ),
                     m_stats.m_acHP * 100 / m_stats.m_maxHP );
@@ -893,7 +894,7 @@ namespace POKEMON {
 
         }
     }
-    extern bool drawInfoSub( u16* p_layer, int p_pkmnId );
+    extern bool drawInfoSub( u16* p_layer, u16 p_pkmnId );
     s8 pokemon::draw( ) {
 
         // Load bitmap to top background
@@ -1063,7 +1064,7 @@ namespace POKEMON {
     }
 
     u32 LastPID = 42;
-    int page = 0;
+    u16 page = 0;
 
 
     bool pokemon::canEvolve( u16 p_item, u16 p_method ) {

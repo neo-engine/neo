@@ -104,18 +104,18 @@ enum Region {
 #define MAXBG 10
 struct backgroundSet {
     std::string             m_name;
-    const u32               *m_mainMenu;
-    const u16               *m_mainMenuPal;
+    const unsigned int      *m_mainMenu;
+    const unsigned short    *m_mainMenuPal;
     bool                    m_loadFromRom;
     bool                    m_allowsOverlay;
     u8                      *m_mainMenuSpritePoses;
 };
 extern backgroundSet BGs[ MAXBG ];
-extern int BG_ind;
+extern u8 BG_ind;
 
 void vramSetup( );
 
-void updateTime( int p_mapMode = 0 );
+void updateTime( s8 p_mapMode = 0 );
 void animateMap( u8 p_frame );
 
 void initVideoSub( );
@@ -134,7 +134,7 @@ void drawEggIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16 p_posX, c
                   u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen );
 void drawTypeIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16 & p_nextAvailableTileIdx, Type p_type, u16 p_posX, u16 p_posY, bool p_bottom );
 
-int getCurrentDaytime( );
+u8 getCurrentDaytime( );
 
 extern std::string bagnames[ 8 ];
 class screenLoader {

@@ -4,9 +4,13 @@
 #include <vector>
 
 #include "buffer.h"
-#include "battle.h"
+#include "pokemon.h"
+//#include "battle.h"
 
 namespace BATTLE {
+
+    class battle;
+
     class battleScript {
     public:
         struct command {
@@ -229,7 +233,7 @@ namespace BATTLE {
 
         battleScript( std::string p_path );
 
-        battleScript( std::vector<command>& p_commands )
+        battleScript( std::vector<command> p_commands )
             : _commands( p_commands ) { }
 
         void                            execute( battle& p_battle, void* p_self );

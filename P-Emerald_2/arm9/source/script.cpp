@@ -1,5 +1,6 @@
 #include "script.h"
 #include "pokemon.h"
+#include "battle.h"
 
 namespace BATTLE {
     bool battleScript::command::condition::evaluate( int p_other ) {
@@ -28,20 +29,26 @@ namespace BATTLE {
             case BATTLE::battleScript::command::PKMN_TYPE2:
                 return int( POKEMON::PKMNDATA::getType( p_target.m_boxdata.m_speciesId, 1 ) );
             case BATTLE::battleScript::command::PKMN_TYPE1o2:
+            {
                 int a = int( POKEMON::PKMNDATA::getType( p_target.m_boxdata.m_speciesId, 1 ) );
                 if( m_target == a )
                     return a;
                 else
                     return int( POKEMON::PKMNDATA::getType( p_target.m_boxdata.m_speciesId, 0 ) );
                 break;
+            }
             case BATTLE::battleScript::command::PKMN_SIZE:
+            {
                 POKEMON::PKMNDATA::pokemonData pd;
                 POKEMON::PKMNDATA::getAll( p_target.m_boxdata.m_speciesId, pd );
                 return int( pd.m_size );
+            }
             case BATTLE::battleScript::command::PKMN_WEIGHT:
+            {
                 POKEMON::PKMNDATA::pokemonData pd;
                 POKEMON::PKMNDATA::getAll( p_target.m_boxdata.m_speciesId, pd );
                 return int( pd.m_weight );
+            }
             case BATTLE::battleScript::command::PKMN_SPECIES:
                 return p_target.m_boxdata.m_speciesId;
             case BATTLE::battleScript::command::PKMN_ITEM:

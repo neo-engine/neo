@@ -38,12 +38,12 @@
 class bag {
 public:
     //Goods,Keys,TMs,Mails,Medicine,Berries,PokéBalls,BattleItems
-    typedef item::itemType bagtype;
+    typedef ITEMS::item::itemType bagtype;
 
-    std::vector<std::pair<int, int> > m_bags[ 8 ];
+    std::vector<std::pair<u16, u16> > m_bags[ 8 ];
 
     bag( ) {
-        for( int i = 0; i < 8; ++i )
+        for( u8 i = 0; i < 8; ++i )
             this->m_bags[ i ].clear( );
     }
     ~bag( ) { }
@@ -51,18 +51,18 @@ public:
     /*
      * Adds cnt items with mo. item_id to the bag.
      */
-    void            addItem( bagtype, int p_itemId, int p_cnt );
+    void            addItem( bagtype, u16 p_itemId, u16 p_cnt );
 
     /*
      * Removes cnt items with no. item_id from the bag.
      * cnt == -1: removes all items of desired kind
      */
-    void            removeItem( bagtype, int p_itemId, int p_cnt = -1 );
+    void            removeItem( bagtype, u16 p_itemId, u16 p_cnt = -1 );
 
     /*
      * Returnes the number of items with no. item_id in the bag.
      */
-    int             countItem( bagtype, int p_itemId );
+    u16             countItem( bagtype, u16 p_itemId );
 
     /*
      * Returnes true if the specified bag is empty.
@@ -79,8 +79,8 @@ public:
      */
     std::size_t     size( bagtype );
 
-    std::pair<int, int>
-        elementAt( bagtype, int );
+    std::pair<u16, u16>
+        elementAt( bagtype, u16 );
 
     void            draw( );
 };

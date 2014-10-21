@@ -30,11 +30,12 @@
     distribution.
     */
 
-
+#include "pokemon.h"
 #include "messageBox.h"
 #include "sprite.h"
 #include "screenLoader.h"
 #include "item.h"
+#include "fs.h"
 #include <cmath>
 #include <vector>
 
@@ -42,7 +43,7 @@
 
 extern void setMainSpriteVisibility( bool p_hidden );
 extern backgroundSet BGs[ MAXBG ];
-extern int BG_ind;
+extern u8 BG_ind;
 extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
 extern OAMTable *Oam;
 extern ConsoleFont cfont;
@@ -51,12 +52,12 @@ extern FONT::Font cust_font2;
 
 bool back_, save_, main_;
 SpriteEntry * back, *save;
-int TEXTSPEED = 35;
+u8 TEXTSPEED = 35;
 
 void init( ) {
-    for( int i = 0; i < 4; ++i )
+    for( u8 i = 0; i < 4; ++i )
         Oam->oamBuffer[ 31 + 2 * i ].isHidden = true;
-    for( int i = 9; i <= 12; ++i ) {
+    for( u8 i = 9; i <= 12; ++i ) {
         Oam->oamBuffer[ i ].isHidden = true;
         swiWaitForVBlank( );
     }
@@ -82,7 +83,7 @@ void init( ) {
 void dinit( ) {
     drawSub( );
 
-    for( int i = 0; i < 4; ++i )
+    for( u8 i = 0; i < 4; ++i )
         Oam->oamBuffer[ 31 + 2 * i ].isHidden = false;
 }
 
@@ -105,7 +106,7 @@ void waitForTouchUp( bool p_uTime, bool p_tpar = false ) {
     }
 }
 
-messageBox::messageBox( item p_item, const int p_count ) {
+messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
     m_isNamed = NULL;
     back = &Oam->oamBuffer[ 0 ];
     save = &Oam->oamBuffer[ 1 ];
@@ -116,7 +117,8 @@ messageBox::messageBox( item p_item, const int p_count ) {
     setSpriteVisibility( save, true );
     setMainSpriteVisibility( true );
     init( );
-    int a = 0, b = 0, c = 0;
+    u8 a = 0, b = 0;
+    u16 c = 0;
     drawItemIcon( Oam, spriteInfo, p_item.m_itemName, 4, 4, a, b, c );
     updateOAMSub( Oam );
 
@@ -251,7 +253,7 @@ messageBox::messageBox( const wchar_t* p_text, bool p_time, bool p_remsprites ) 
     updateOAMSub( Oam );
     swiWaitForVBlank( );
 }
-messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, bool p_a, bool p_remsprites, sprite_type p_sprt, int p_sprind ) {
+messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, bool p_a, bool p_remsprites, sprite_type p_sprt, u16 p_sprind ) {
     m_isNamed = p_name;
     back = &Oam->oamBuffer[ 0 ];
     save = &Oam->oamBuffer[ 1 ];
@@ -262,12 +264,13 @@ messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, boo
     setSpriteVisibility( save, true );
     setMainSpriteVisibility( true );
     if( p_sprt != no_sprite ) {
-        int a = 0, b = 0, c = 0;
+        u8 a = 0, b = 0;
+        u16 c = 0;
         if( p_sprt == sprite_pkmn ) {
-            loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, a, b, c, true );
+            FS::loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, a, b, c, true );
         }
         if( p_sprt == sprite_trainer ) {
-            loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
+            FS::loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
         }
     }
 
@@ -315,7 +318,7 @@ messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, boo
     updateOAMSub( Oam );
     swiWaitForVBlank( );
 }
-messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_time, bool p_a, bool p_remsprites, sprite_type p_sprt, int p_sprind ) {
+messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_time, bool p_a, bool p_remsprites, sprite_type p_sprt, u16 p_sprind ) {
     m_isNamed = NULL;
     back = &Oam->oamBuffer[ 0 ];
     save = &Oam->oamBuffer[ 1 ];
@@ -326,12 +329,13 @@ messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_tim
     setSpriteVisibility( save, true );
     setMainSpriteVisibility( true );
     if( p_sprt != no_sprite ) {
-        int a = 0, b = 0, c = 0;
+        u8 a = 0, b = 0;
+        u16 c = 0;
         if( p_sprt == sprite_pkmn ) {
-            loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, a, b, c, true );
+            FS::loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, a, b, c, true );
         }
         if( p_sprt == sprite_trainer ) {
-            loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
+            FS::loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
         }
     }
     updateOAMSub( Oam );
@@ -476,7 +480,7 @@ bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
         else
             cust_font.printStringD( p_text, 8, 8, true );
     }
-    for( int i = 19; i <= 22; ++i )
+    for( u8 i = 19; i <= 22; ++i )
         Oam->oamBuffer[ i ].isHidden = false;
     updateOAMSub( Oam );
     consoleSetWindow( &Bottom, 5, 13, 10, 3 );
@@ -502,7 +506,7 @@ bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
             setSpriteVisibility( back, back_ );
             setSpriteVisibility( save, save_ );
             Oam->oamBuffer[ 8 ].isHidden = true;
-            for( int i = 9; i <= 12; ++i ) {
+            for( u8 i = 9; i <= 12; ++i ) {
                 Oam->oamBuffer[ i ].isHidden = true;
             }
             updateOAMSub( Oam );
@@ -521,7 +525,7 @@ bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
             setSpriteVisibility( back, back_ );
             setSpriteVisibility( save, save_ );
             Oam->oamBuffer[ 8 ].isHidden = true;
-            for( int i = 9; i <= 12; ++i ) {
+            for( u8 i = 9; i <= 12; ++i ) {
                 Oam->oamBuffer[ i ].isHidden = true;
             }
             updateOAMSub( Oam );
@@ -544,7 +548,7 @@ bool yesNoBox::getResult( const wchar_t* p_text = 0, bool time ) {
         else
             cust_font.printStringD( p_text, 8, 8, true );
     }
-    for( int i = 19; i <= 22; ++i )
+    for( u8 i = 19; i <= 22; ++i )
         Oam->oamBuffer[ i ].isHidden = false;
     updateOAMSub( Oam );
     consoleSetWindow( &Bottom, 5, 13, 10, 3 );
@@ -570,7 +574,7 @@ bool yesNoBox::getResult( const wchar_t* p_text = 0, bool time ) {
             setSpriteVisibility( back, back_ );
             setSpriteVisibility( save, save_ );
             Oam->oamBuffer[ 8 ].isHidden = true;
-            for( int i = 9; i <= 12; ++i ) {
+            for( u8 i = 9; i <= 12; ++i ) {
                 Oam->oamBuffer[ i ].isHidden = true;
             }
             updateOAMSub( Oam );
@@ -590,7 +594,7 @@ bool yesNoBox::getResult( const wchar_t* p_text = 0, bool time ) {
             setSpriteVisibility( back, back_ );
             setSpriteVisibility( save, save_ );
             Oam->oamBuffer[ 8 ].isHidden = true;
-            for( int i = 9; i <= 12; ++i ) {
+            for( u8 i = 9; i <= 12; ++i ) {
                 Oam->oamBuffer[ i ].isHidden = true;
             }
             updateOAMSub( Oam );
@@ -618,7 +622,7 @@ choiceBox::choiceBox( int p_num, const char** p_choices, const char* p_name = 0,
     Oam->oamBuffer[ 8 ].isHidden = true;
     init( );
 
-    for( int i = 13; i <= 29; ++i ) {
+    for( u8 i = 13; i <= 29; ++i ) {
         Oam->oamBuffer[ i ].isHidden = true;
     }
     updateOAMSub( Oam );
@@ -646,7 +650,7 @@ choiceBox::~choiceBox( ) {
     consoleClear( );
     setMainSpriteVisibility( main_ );
     Oam->oamBuffer[ 8 ].isHidden = true;
-    for( int i = 9; i <= 29; ++i )
+    for( u8 i = 9; i <= 29; ++i )
         Oam->oamBuffer[ i ].isHidden = true;
 
     setSpriteVisibility( &( Oam->oamBuffer[ 0 ] ), back_ );
@@ -972,9 +976,9 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             }
         }
     } else {
-        int page = 0,
+        u8 page = 0,
             inds[ ] = { 17, 15, 21, 19, 25, 23 };
-        for( int i = 0; i < std::min( 6, _num ); ++i ) {
+        for( int i = 0; i < std::min( (u8)6, _num ); ++i ) {
             ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = false;
             ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = false;
             updateOAMSub( Oam );
@@ -995,7 +999,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             touchPosition t;
             touchRead( &t );
 
-            for( int i = 0; i < std::min( 6, _num - 6 * page ); ++i ) {
+            for( u8 i = 0; i < std::min( 6, _num - 6 * page ); ++i ) {
                 if( t.px > 31 + ( ( i % 2 ) * 96 ) && t.py > 71 + 32 * ( i / 2 ) && t.px < 225 - ( ( ( i + 1 ) % 2 ) * 96 ) && t.py < 105 + 32 * ( i / 2 ) ) {
                     ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = true;
                     ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = true;
@@ -1025,7 +1029,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
                     ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
                     ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
                 }
-                for( int i = 0; i < 6; ++i ) {
+                for( u8 i = 0; i < 6; ++i ) {
                     consoleSetWindow( &Bottom, 5 + ( ( i % 2 ) * 12 ), 9 + 4 * ( i / 2 ), 10, 3 );
                     consoleClear( );
                     if( i < _num - 6 * page ) {
@@ -1055,7 +1059,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
                     ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
                     ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
                 }
-                for( int i = 0; i < 6; ++i ) {
+                for( u8 i = 0; i < 6; ++i ) {
                     consoleSetWindow( &Bottom, 5 + ( ( i % 2 ) * 12 ), 9 + 4 * ( i / 2 ), 10, 3 );
                     consoleClear( );
                     if( i < _num - 6 * page ) {

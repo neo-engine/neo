@@ -33,8 +33,9 @@
 #include "bag.h"
 
 #include <algorithm>
+#include <nds/ndstypes.h>
 
-void bag::addItem( bagtype p_bagType, int p_itemId, int p_cnt ) {
+void bag::addItem( bagtype p_bagType, u16 p_itemId, u16 p_cnt ) {
     for( auto I = m_bags[ p_bagType ].begin( );
          I != m_bags[ p_bagType ].end( ); ++I ) {
         if( I->first == p_itemId ) {
@@ -46,15 +47,15 @@ void bag::addItem( bagtype p_bagType, int p_itemId, int p_cnt ) {
             p_cnt -= MAXITEMCOUNT - I->second;
         }
     }
-    m_bags[ p_bagType ].push_back( std::pair<int, int>( p_itemId, p_cnt ) );
+    m_bags[ p_bagType ].push_back( std::pair<u16, u16>( p_itemId, p_cnt ) );
     std::sort( m_bags[ p_bagType ].begin( ), m_bags[ p_bagType ].end( ) );
 }
 
-void bag::removeItem( bagtype p_bagType, int p_itemId, int p_cnt ) {
+void bag::removeItem( bagtype p_bagType, u16 p_itemId, u16 p_cnt ) {
     for( auto I = m_bags[ p_bagType ].begin( );
          I != m_bags[ p_bagType ].end( ); ++I ) {
         if( I->first == p_itemId ) {
-            int num = I->second;
+            u16 num = I->second;
             if( p_cnt && ( ( I->second - p_cnt ) > 0 ) ) {
                 I->second -= p_cnt;
                 std::sort( m_bags[ p_bagType ].begin( ), m_bags[ p_bagType ].end( ) );
@@ -69,8 +70,8 @@ void bag::removeItem( bagtype p_bagType, int p_itemId, int p_cnt ) {
     std::sort( m_bags[ p_bagType ].begin( ), m_bags[ p_bagType ].end( ) );
 }
 
-int bag::countItem( bagtype p_bagType, int p_itemId ) {
-    int cnt = 0;
+u16 bag::countItem( bagtype p_bagType, u16 p_itemId ) {
+    u16 cnt = 0;
     for( auto I = m_bags[ p_bagType ].begin( );
          I != m_bags[ p_bagType ].end( ); ++I )
          if( I->first == p_itemId )
@@ -86,8 +87,8 @@ std::size_t bag::size( bagtype p_bagType ) {
     return m_bags[ p_bagType ].size( );
 }
 
-std::pair<int, int> bag::elementAt( bagtype p_bagType, int index ) {
-    return m_bags[ int( p_bagType ) ][ index ];
+std::pair<u16, u16> bag::elementAt( bagtype p_bagType, u16 index ) {
+    return m_bags[ u16( p_bagType ) ][ index ];
 }
 
 void bag::clear( bagtype p_bagType ) {

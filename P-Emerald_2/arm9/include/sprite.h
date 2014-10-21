@@ -56,8 +56,8 @@
 
 #include "type.h"
 
-extern const u32* TypeTiles[ 19 ];
-extern const u16* TypePals[ 19 ];
+extern const unsigned int* TypeTiles[ 19 ];
+extern const unsigned short* TypePals[ 19 ];
 
 static const u8 SPRITE_DMA_CHANNEL = 2;
 
@@ -121,8 +121,8 @@ u16 loadSprite( OAMTable    *p_oam,
                 const u16   p_posY,
                 const u8    p_width,
                 const u8    p_height,
-                const u16   *p_spritePal,
-                const u32   *p_spriteData,
+                const unsigned short *p_spritePal,
+                const unsigned int   *p_spriteData,
                 const u32   p_spriteDataLen,
                 bool        p_flipX,
                 bool        p_flipY,

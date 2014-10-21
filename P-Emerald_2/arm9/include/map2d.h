@@ -38,7 +38,7 @@
 #include <stdio.h>
 
 namespace map2d {
-    extern int bgs[ 4 ];
+    extern u16 bgs[ 4 ];
 
 
     typedef struct {
@@ -81,14 +81,14 @@ namespace map2d {
     public:
         char        m_name[ 100 ];
         char        m_direction;
-        int         m_move;
-        int         m_mapidx;
+        u16         m_move;
+        u16         m_mapidx;
 
-        int         m_mapsx;
-        int         m_mapsy;
+        u16         m_mapsx;
+        u16         m_mapsy;
 
         Anbindung( ) { }
-        Anbindung( const char p_name[ 100 ], char p_dir, int p_mv, int p_mpidx )
+        Anbindung( const char p_name[ 100 ], char p_dir, u16 p_mv, u16 p_mpidx )
             : m_direction( p_dir ),
             m_move( p_mv ),
             m_mapidx( p_mpidx ) {
@@ -107,7 +107,7 @@ namespace map2d {
 
     class Map {
     public:
-        u32         m_sizex, m_sizey;
+        u16         m_sizex, m_sizey;
 
         Palette     m_pals[ 16 ];
         std::vector< std::vector < MapBlockAtom > > 
@@ -125,9 +125,9 @@ namespace map2d {
 
         Map( const char* p_path, const char* p_name );
 
-        void            draw( int p_bx, int p_by, bool p_init = false );
-        void            movePlayer( int p_direction );
+        void            draw( u16 p_bx, u16 p_by, bool p_init = false );
+        void            movePlayer( u16 p_direction );
     private:
-        void            fill( u16* mapMemory[ 4 ], int p_xmin, int p_x, int p_xmax, int p_ymin, int p_y, int p_ymax, int p_c );
+        void            fill( u16* mapMemory[ 4 ], u16 p_xmin, u16 p_x, u16 p_xmax, u16 p_ymin, u16 p_y, u16 p_ymax, u16 p_c );
     };
 }

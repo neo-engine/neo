@@ -35,6 +35,8 @@
 #include <string>
 #include <map>
 
+#include <nds/ndstypes.h>
+
 extern const char ITEM_PATH[ ];
 
 namespace ITEMS {
@@ -78,9 +80,9 @@ namespace ITEMS {
 
         itemType        getItemType( );
 
-        int             getPrice( );
+        u32             getPrice( );
 
-        int             getItemId( );
+        u16             getItemId( );
 
         virtual bool    load( );
 

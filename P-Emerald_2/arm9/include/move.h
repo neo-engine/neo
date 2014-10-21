@@ -34,6 +34,7 @@
 
 #include "type.h"
 #include <string>
+#include <nds/ndstypes.h>
 
 #define MAXATTACK 560
 
@@ -95,7 +96,7 @@ public:
     char            m_moveBasePower;
     Type            m_moveType;
     char            m_moveAccuracy;
-    u8   m_movePP;
+    u8              m_movePP;
     char            m_moveEffectAccuracy;
     moveAffectsTypes
         m_moveAffectsWhom;

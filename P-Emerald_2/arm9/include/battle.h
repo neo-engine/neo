@@ -71,7 +71,7 @@ namespace BATTLE {
         std::vector < POKEMON::pokemon >
             *m_pkmnTeam;
     private:
-        std::vector<item>   *_items;
+        std::vector<ITEMS::item>   *_items;
         int                 _moneyEarned;
         const char          *_msg1,
             *_msg2,
@@ -85,7 +85,7 @@ namespace BATTLE {
                        const char* p_msg3,
                        const char* p_msg4,
                        std::vector<POKEMON::pokemon>* p_pkmnTeam,
-                       std::vector<item>* p_items,
+                       std::vector<ITEMS::item>* p_items,
                        trainerClass p_trainerClass = PKMN_TRAINER )
                        : m_battleTrainerName( p_battleTrainerName ),
                        m_trainerClass( p_trainerClass ),
@@ -97,7 +97,7 @@ namespace BATTLE {
                        _msg4( p_msg4 ) { }
 
         POKEMON::pokemon&      sendNewPKMN( bool p_choice = true );
-        item& useItem( bool choice = true );
+        ITEMS::item& useItem( bool choice = true );
 
         const char*         getLooseMsg( ) const {
             return _msg4;
@@ -172,7 +172,7 @@ namespace BATTLE {
             battleScript( ),
             //Rain
             battleScript( std::vector<cmd>( {
-                cmd( "Es regnet.[A]" ),
+                cmd( L"Es regnet.[A]" ),
 
                 //Hydration
                 cmd( std::vector<con>( { con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, AIR_LOCK ), con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, AIR_LOCK ),
@@ -268,7 +268,7 @@ namespace BATTLE {
         friend std::wstring parseLogCmd( const battle& p_battle, const std::wstring& p_cmd );
 
         enum weather {
-            NONE = 0,
+            NO_WEATHER = 0,
             RAIN = 1,
             HAIL = 2,
             FOG = 3,

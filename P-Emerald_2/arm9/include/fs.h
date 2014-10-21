@@ -39,9 +39,9 @@ distribution.
 #include "sprite.h"
 #include "saveGame.h"
 
-extern u32 NAV_DATA[ 12288 ];
-extern u16 NAV_DATA_PAL[ 256 ];
-extern int BG_ind;
+extern unsigned int NAV_DATA[ 12288 ];
+extern unsigned short NAV_DATA_PAL[ 256 ];
+extern u8 BG_ind;
 extern SavMod savMod;
 
 namespace FS {
@@ -52,19 +52,19 @@ namespace FS {
     std::string breakString( const std::string& p_string, int p_lineLength );
 
     bool loadNavScreen( u16* p_layer, const char* p_name, int p_no );
-    bool loadPicture( u16* p_layer, const char* p_Path, const char* p_name, int p_paletteSize = 512, int p_tileCnt = 192 * 256 );
-    bool loadPictureSub( u16* p_layer, const char* p_path, const char* p_name, int p_paletteSize = 512, int p_tileCnt = 192 * 256 );
-    bool loadSprite( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_tileCnt, const int p_palCnt );
-    bool loadSpriteSub( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_tileCnt, const int p_palCnt );
-    bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const int& p_pkmnNo, const int p_posX,
-                         const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_nextAvailableTileIdx, bool p_bottom, bool p_shiny = false, bool p_female = false, bool p_flipX = false );
-    bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const int& p_pkmnNo, const int p_posX,
-                            const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_nextAvailableTileIdx, bool p_bottom, bool p_shiny = false, bool p_female = false, bool p_flipX = false );
+    bool loadPicture( u16* p_layer, const char* p_Path, const char* p_name, u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256 );
+    bool loadPictureSub( u16* p_layer, const char* p_path, const char* p_name, u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256 );
+    bool loadSprite( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_tileCnt, const u16 p_palCnt );
+    bool loadSpriteSub( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_tileCnt, const u16 p_palCnt );
+    bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnNo, const u16 p_posX,
+                         const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_nextAvailableTileIdx, bool p_bottom, bool p_shiny = false, bool p_female = false, bool p_flipX = false );
+    bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnNo, const u16 p_posX,
+                            const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_nextAvailableTileIdx, bool p_bottom, bool p_shiny = false, bool p_female = false, bool p_flipX = false );
 
-    bool loadTrainerSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_posX,
-                            const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false );
-    bool loadTrainerSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_posX,
-                               const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false );
+    bool loadTrainerSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_posX,
+                            const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false );
+    bool loadTrainerSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_posX,
+                               const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false );
 
-    const char* getLoc( int p_ind );
+    const char* getLoc( u16 p_ind );
 }

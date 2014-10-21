@@ -34,14 +34,14 @@
 #include "sprite.h"
 #include "berry.h"
 
-const u32* TypeTiles[ 19 ] =
+const unsigned int* TypeTiles[ 19 ] =
 {
     NormalTiles, KampfTiles, FlugTiles, GiftTiles, BodenTiles,
     GestTiles, KaeferTiles, GeistTiles, StahlTiles, UnbekTiles,
     WasserTiles, FeuerTiles, PflTiles, ElekTiles, PsychoTiles,
     EisTiles, DraTiles, UnlTiles, FeeTiles
 };
-const u16* TypePals[ 19 ] =
+const unsigned short* TypePals[ 19 ] =
 {
     NormalPal, KampfPal, FlugPal, GiftPal, BodenPal,
     GestPal, KaeferPal, GeistPal, StahlPal, UnbekPal,
@@ -176,8 +176,8 @@ u16 loadSprite( OAMTable   *p_oam,
                 const u16   p_posY,
                 const u8    p_width,
                 const u8    p_height,
-                const u16  *p_spritePal,
-                const u32  *p_spriteData,
+                const unsigned short *p_spritePal,
+                const unsigned int   *p_spriteData,
                 const u32   p_spriteDataLen,
                 bool        p_flipX,
                 bool        p_flipY,

@@ -72,13 +72,7 @@ std::wstring getWAbilityName( int p_abilityId ) {
 }
 
 namespace FS {
-    bool loadSprite( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_tileCnt, const int p_palCnt ) {
-        static const int COLORS_PER_PALETTE = 16;
-        static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                              * (can be set in REG_DISPCNT) */
-        static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
-            sizeof( SPRITE_GFX[ 0 ] );
-
+    bool loadSprite( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt ) {
         //char buffer[100];
         sprintf( buffer, "%s%s.raw", p_path, p_name );
         FILE* fd = fopen( buffer, "rb" );
@@ -95,13 +89,7 @@ namespace FS {
         fclose( fd );
         return true;
     }
-    bool loadSpriteSub( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_tileCnt, const int p_palCnt ) {
-        static const int COLORS_PER_PALETTE = 16;
-        static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                              * (can be set in REG_DISPCNT) */
-        static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
-            sizeof( SPRITE_GFX_SUB[ 0 ] );
-
+    bool loadSpriteSub( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt ) {
         //char buffer[100];
         sprintf( buffer, "%s%s.raw", p_path, p_name );
         FILE* fd = fopen( buffer, "rb" );
@@ -125,14 +113,8 @@ namespace FS {
         return true;
     }
 
-    bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const int& p_pkmnId, const int p_posX,
-                         const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx ) {
-        static const int COLORS_PER_PALETTE = 16;
-        static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                              * (can be set in REG_DISPCNT) */
-        static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] );
-
-
+    bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnId, const u16 p_posX,
+                         const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx ) {
         //char buffer[100];
         if( !p_female )
             sprintf( buffer, "%s%d/%d.raw", p_path, p_pkmnId, p_pkmnId );
@@ -273,14 +255,8 @@ namespace FS {
             updateOAM( p_oam );
         return true;
     }
-    bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const int& p_pkmnId, const int p_posX,
-                            const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx ) {
-        static const int COLORS_PER_PALETTE = 16;
-        static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                              * (can be set in REG_DISPCNT) */
-        static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] );
-
-        //char buffer[100];
+    bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnId, const u16 p_posX,
+                            const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx ) {
 
         if( !p_female )
             sprintf( buffer, "%s%d/%d.raw", p_path, p_pkmnId, p_pkmnId );
@@ -373,13 +349,8 @@ namespace FS {
         return true;
     }
 
-    bool loadTrainerSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_posX,
-                            const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_tileCnt, bool p_bottom, bool p_flipx ) {
-        static const int COLORS_PER_PALETTE = 16;
-        static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                              * (can be set in REG_DISPCNT) */
-        static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] );
-
+    bool loadTrainerSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_posX,
+                            const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_bottom, bool p_flipx ) {
         //char buffer[100];
 
         sprintf( buffer, "%sSprite_%s.raw", p_path, p_name );
@@ -502,14 +473,8 @@ namespace FS {
             updateOAM( p_oam );
         return true;
     }
-    bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_posX,
-                            const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_tileCnt, bool p_bottom, bool p_flipx ) {
-        static const int COLORS_PER_PALETTE = 16;
-        static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                              * (can be set in REG_DISPCNT) */
-        static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] );
-
-        //char buffer[100];
+    bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_posX,
+                            const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_bottom, bool p_flipx ) {
 
         sprintf( buffer, "%sSprite_%s.raw", p_path, p_name );
         FILE* fd = fopen( buffer, "rb" );
@@ -588,7 +553,7 @@ namespace FS {
         return true;
     }
 
-    bool loadPicture( u16* p_layer, const char* p_path, const char* p_name, int p_palSize, int p_tileCnt ) {
+    bool loadPicture( u16* p_layer, const char* p_path, const char* p_name, u16 p_palSize, u32 p_tileCnt ) {
 
         //char buffer[100];
         sprintf( buffer, "%s%s.raw", p_path, p_name );
@@ -608,7 +573,7 @@ namespace FS {
 
         return true;
     }
-    bool loadPictureSub( u16* p_layer, const char* p_path, const char* p_name, int p_palSize, int p_tileCnt ) {
+    bool loadPictureSub( u16* p_layer, const char* p_path, const char* p_name, u16 p_palSize, u32 p_tileCnt ) {
 
         //char buffer[100];
         sprintf( buffer, "%s%s.raw", p_path, p_name );
@@ -630,7 +595,7 @@ namespace FS {
         return true;
     }
 
-    bool loadNavScreen( u16* p_layer, const char* p_name, int p_no ) {
+    bool loadNavScreen( u16* p_layer, const char* p_name, u8 p_no ) {
         if( p_no == BG_ind && NAV_DATA[ 0 ] ) {
             dmaCopy( NAV_DATA, p_layer, 256 * 192 );
             dmaCopy( NAV_DATA_PAL, BG_PALETTE_SUB, 256 * 2 );
@@ -749,7 +714,7 @@ namespace FS {
         return ret;
     }
 
-    const char* getLoc( int p_ind ) {
+    const char* getLoc( u16 p_ind ) {
         if( p_ind < 0 || p_ind > 5000 )
             return "Entfernter Ort";
 
@@ -770,7 +735,7 @@ namespace FS {
 
 namespace POKEMON {
     namespace PKMNDATA {
-        Type getType( int p_pkmnId, int p_type ) {
+        Type getType( u16 p_pkmnId, u16 p_type ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -784,7 +749,7 @@ namespace POKEMON {
             fclose( f );
             return (Type)( buf[ p_type ] - 42 );
         }
-        short getBase( int p_pkmnId, int p_base ) {
+        u16 getBase( u16 p_pkmnId, u16 p_base ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -798,7 +763,7 @@ namespace POKEMON {
             fclose( f );
             return (short)buf[ 2 + p_base ];
         }
-        short getCatchRate( int p_pkmnId ) {
+        u16 getCatchRate( u16 p_pkmnId ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -813,7 +778,7 @@ namespace POKEMON {
             fclose( f );
             return buf;
         }
-        const char* getDisplayName( int p_pkmnId ) {
+        const char* getDisplayName( u16 p_pkmnId ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -830,7 +795,7 @@ namespace POKEMON {
             fclose( f );
             return ret.c_str( );
         }
-        const wchar_t* getWDisplayName( int p_pkmnId ) {
+        const wchar_t* getWDisplayName( u16 p_pkmnId ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -847,7 +812,7 @@ namespace POKEMON {
             fclose( f );
             return ret.c_str( );
         }
-        void getWDisplayName( int p_pkmnId, wchar_t* p_name ) {
+        void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -865,7 +830,7 @@ namespace POKEMON {
             fclose( f );
             wcscpy( p_name, ret.c_str( ) );
         }
-        void getHoldItems( int p_pkmnId, u16* p_items ) {
+        void getHoldItems( u16 p_pkmnId, u16* p_items ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -886,7 +851,7 @@ namespace POKEMON {
             fclose( f );
             return;
         }
-        pkmnGenderType getGenderType( int p_pkmnId ) {
+        pkmnGenderType getGenderType( u16 p_pkmnId ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -905,7 +870,7 @@ namespace POKEMON {
             fclose( f );
             return (pkmnGenderType)buf;
         }
-        const char* getDexEntry( int p_pkmnId ) {
+        const char* getDexEntry( u16 p_pkmnId ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -938,7 +903,7 @@ namespace POKEMON {
             fclose( f );
             return ret.c_str( );
         }
-        short getForme( int p_pkmnId, int p_formeId, const char* p_retFormeName ) {
+        u16 getForme( u16 p_pkmnId, u16 p_formeId, const char* p_retFormeName ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -951,7 +916,7 @@ namespace POKEMON {
                 fgetc( f );
             for( int i = 2; i < 8; ++i )
                 fgetc( f );
-            short s;
+            u16 s;
             fscanf( f, "%hi", &s );
             fgetc( f );
             FS::readString( f );
@@ -969,8 +934,8 @@ namespace POKEMON {
             fgetc( f );
             FS::readString( f );
             fscanf( f, "%hi", &s );
-            short d; std::string ret;
-            for( int i = 0; i <= std::min( (int)s, p_formeId ); ++i ) {
+            u16 d; std::string ret;
+            for( int i = 0; i <= std::min( s, p_formeId ); ++i ) {
                 fscanf( f, "%hi", &d ); ret = FS::readString( f );
             }
             //fscanf(f,"%hi",d); 
@@ -979,7 +944,7 @@ namespace POKEMON {
             p_retFormeName = ret.c_str( );
             return d;
         }
-        const char* getSpecies( int p_pkmnId ) {
+        const char* getSpecies( u16 p_pkmnId ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -1020,7 +985,7 @@ namespace POKEMON {
             return ret2.c_str( );
         }
 
-        void getAll( int p_pkmnId, pokemonData& p_out ) {
+        void getAll( u16 p_pkmnId, pokemonData& p_out ) {
             char pt[ 100 ];
             sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -1068,7 +1033,7 @@ namespace POKEMON {
             return;
         }
 
-        void getLearnMoves( int p_pkmnId, int p_fromLevel, int p_toLevel, int p_mode, int p_amount, u16* p_result ) {
+        void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount, u16* p_result ) {
 
             char pt[ 150 ];
             sprintf( pt, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
@@ -1123,7 +1088,7 @@ NEXT:
             }
             fclose( f );
         }
-        bool canLearn( int p_pkmnId, int p_moveId, int p_mode ) {
+        bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
             char pt[ 150 ];
             sprintf( pt, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( pt, "r" );
@@ -1211,7 +1176,7 @@ NEXT:
 }
 
 namespace ITEMS {
-    int item::getItemId( ) {
+    u16 item::getItemId( ) {
         for( int i = 0; i < 700; ++i )
             if( ItemList[ i ].m_itemName == m_itemName )
                 return i;
@@ -1317,7 +1282,7 @@ namespace ITEMS {
         return m_itemType;
     }
 
-    int item::getPrice( ) {
+    u32 item::getPrice( ) {
         sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
         FILE* f = fopen( buffer, "r" );
         if( f == 0 )

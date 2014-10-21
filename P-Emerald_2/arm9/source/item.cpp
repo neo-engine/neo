@@ -41,6 +41,7 @@
 #include <unistd.h>
 #include <math.h>
 
+#include "pokemon.h"
 #include "item.h"
 #include "berry.h"
 #include "buffer.h"

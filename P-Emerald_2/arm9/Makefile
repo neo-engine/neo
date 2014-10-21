@@ -64,7 +64,7 @@ CFLAGS	:=	-g -Wall\
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM9 -DNDSFILENAME=\"$(TARGET).nds\"
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++11 -O2
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++11 -O2 -w
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH)  -Wl,-Map,$(notdir $*.map)
