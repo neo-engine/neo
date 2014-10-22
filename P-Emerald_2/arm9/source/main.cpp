@@ -136,7 +136,7 @@ extern POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
 extern std::vector<int> box_of_st_pkmn[ MAXPKMN ];
 extern std::vector<int> free_spaces;
 
-extern void updateTime( int );
+extern void updateTime( s8 );
 
 void whoCares( int ) {
     return;
@@ -153,9 +153,6 @@ enum ChoiceResult {
     TRANSFER_GAME,
     CANCEL
 };
-namespace POKEMON {
-    extern char* getLoc( int p_ind );
-}
 
 bool playMp3( const char* p_path, const char* p_name ) {
     sprintf( buffer, "%s%s", p_path, p_name );
@@ -188,7 +185,7 @@ void fillWeiter( ) {
     sprintf( buffer, "%ls", SAV.getName( ).c_str( ) );
     cust_font.printString( buffer, 128, 5, true );
 
-    sprintf( buffer, "%s", POKEMON::getLoc( SAV.m_acMapIdx ) );
+    sprintf( buffer, "%s", FS::getLoc( SAV.m_acMapIdx ) );
     cust_font.printString( "Ort:", 16, 23, true );
     cust_font.printString( buffer, 128, 23, true );
 
@@ -1760,7 +1757,7 @@ void surf::use( ) {
 }
 
 
-void shoUseAttack( int p_pkmIdx, bool p_female, bool p_shiny ) {
+void shoUseAttack( u16 p_pkmIdx, bool p_female, bool p_shiny ) {
     OamTop->oamBuffer[ 0 ].isHidden = true;
     OamTop->oamBuffer[ 1 ].isHidden = false;
     for( u8 i = 0; i < 5; ++i ) {
@@ -2075,8 +2072,8 @@ OUT:
                 }
                 case 1:
                     for( u16 j = 1; j < 700; ++j )
-                        if( ItemList[ j ].m_itemName != "Null" )
-                            SAV.m_bag.addItem( ItemList[ j ].m_itemType, j, 1 );
+                        if( ITEMS::ItemList[ j ].m_itemName != "Null" )
+                            SAV.m_bag.addItem( ITEMS::ItemList[ j ].m_itemType, j, 1 );
                     break;
                 case 2:
                     messageBox( ITEMS::berry( "Ginemabeere" ), 31 );

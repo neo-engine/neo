@@ -33,6 +33,9 @@
 
 #include <cwchar>
 #include <cstdio>
+#include <vector>
+#include <algorithm>
+#include <functional>
 
 #include <nds.h>
 
@@ -292,7 +295,7 @@ namespace BATTLE {
                 return std::wstring( wbuffer );
             }
             if( specifier == L"ITEM" ) {
-                std::swprintf( wbuffer, 50, L"%s", ItemList[ target.m_boxdata.m_holdItem ].m_itemName.c_str( ) );
+                std::swprintf( wbuffer, 50, L"%s", ITEMS::ItemList[ target.m_boxdata.m_holdItem ].m_itemName.c_str( ) );
                 return std::wstring( wbuffer );
             }
             if( specifier == L"LEVEL" )
@@ -315,8 +318,13 @@ namespace BATTLE {
         }
 
         writeText( msg );
+        clearScreen( );
     }
 
+    /**
+     *  @brief      Runs the battle.
+     *  @returns    -1 if opponent won, 0 if the battle resulted in a tie, 1 otherwise
+     */
     s8 battle::start( ) {
         battleEndReason battleEnd;
 
@@ -344,12 +352,148 @@ namespace BATTLE {
         return battleEnd;
     }
 
-
-
-
+    /**
+     *  @brief Initialize the battle.
+     */
     void battle::initBattle( ) {
+        //Some basic initialization stuff
+        initScreen( );
+
+        for( u8 i = 0; i < 6; ++i ) {
+            ACPOS( i, PLAYER ) = ACPOS( i, OPPONENT ) = i;
+            if( _player->m_pkmnTeam->size( ) > i ) {
+                if( ACPKMN( i, PLAYER ).m_stats.m_acHP == 0 || ACPKMN( i, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                    ACPKMNSTS( i, PLAYER ) = KO;
+                else if( ACPKMN( i, PLAYER ).m_statusint )
+                    ACPKMNSTS( i, PLAYER ) = STS;
+                else
+                    ACPKMNSTS( i, PLAYER ) = OK;
+            } else
+                ACPKMNSTS( i, PLAYER ) = NA;
+            if( _opponent->m_pkmnTeam->size( ) > i ) {
+                if( ACPKMN( i, OPPONENT ).m_stats.m_acHP == 0 || ACPKMN( i, OPPONENT ).m_boxdata.m_individualValues.m_isEgg )
+                    ACPKMNSTS( i, OPPONENT ) = KO;
+                else if( ACPKMN( i, OPPONENT ).m_statusint )
+                    ACPKMNSTS( i, OPPONENT ) = STS;
+                else ACPKMNSTS( i, OPPONENT ) = OK;
+            } else
+                ACPKMNSTS( i, OPPONENT ) = NA;
+        }
+
+        for( u8 p = 0; p < 2; ++p ) {
+            _battleSpotOccupied[ 0 ][ p ] = false;
+            _battleSpotOccupied[ 1 ][ p ] = !( m_battleMode == DOUBLE );
+        }
+
+        trainerIntro( );
+
+        refillBattleSpots( false );
+
+        if( m_weather != NO_WEATHER ) {
+            log( _weatherMessage[ m_weather ] );
+        }
+
+        doAbilities( ability::BEFORE_BATTLE );
+    }
+
+    /**
+     *  @brief Shows Battle intro: Trainer mugshot and the "You're challenged by ..." message
+     */
+    void battle::trainerIntro( ) {
+        //TODO
+    }
+
+    /**
+     *  @brief send in PKMN for fainted ones, if possible
+     *  @param p_choice: Specifies whether the player can choose the PKMN which is/are being sent
+     */
+    void battle::refillBattleSpots( bool p_choice ) {
+        acStatus oldSts[ 2 ] = { };
+        std::vector< std::pair<u16, u8> > inits;
+
+        for( u8 i = 0; i < 2; ++i ) {
+            for( u8 j = 0; j < 2; ++j ) {
+                if( !_battleSpotOccupied[ i ][ j ] ) {
+                    u8 nextSpot;
+                    if( !p_choice || j )
+                        nextSpot = getNextPKMN( j );
+                    else
+                        nextSpot = choosePKMN( );
+
+                    std::swap( ACPOS( i, j ), ACPOS( nextSpot, j ) );
+
+                    if( !i ) {
+                        oldSts[ j ] = ACPKMNSTS( 0, j );
+                        ACPKMNSTS( 0, j ) = SELECTED;
+                    }
+
+                    u16 acSpd = ACPKMN( i, j ).m_stats.m_Spd;
+                    inits.push_back( std::pair<u16, u8>( acSpd, 2u * i + ( 1u - j ) ) );
+                }
+            }
+        }
+
+        std::sort( inits.begin( ), inits.end( ), std::greater<std::pair<u16, u8>>( ) );
+
+        for( auto i : inits ) {
+            bool isOpp = i.second % 2,
+                isSnd = i.second / 2;
+
+            if( !isSnd )
+                ACPKMNSTS( 0, isOpp ) = oldSts[ isOpp ];
+
+            sendPKMN( isOpp, isSnd );
+            _battleSpotOccupied[ isSnd ][ isOpp ];
+        }
+    }
+
+    /**
+     *  @brief Gets the index of the next PKMN that is not koed.
+     *  @param p_opponent: true iff the next opponent's PKMN is requested.
+     *  @returns Minimum i for which ACPKMNSTS(i,p_opponent) != KO and != SELECTED, 7 iff all PKMN fainted
+     */
+    u8 battle::getNextPKMN( bool p_opponent ) {
+        u8 max = ( p_opponent ? _opponent->m_pkmnTeam->size( ) : _player->m_pkmnTeam->size( ) );
+
+        for( u8 i = 0; i < max; ++i )
+            if( ACPKMNSTS( i, p_opponent ) != KO
+                && ACPKMNSTS( i, p_opponent ) != SELECTED )
+                return i;
+        return 7;
+    }
+
+    /**
+     *  @brief Applies all possible abilities ordered by their PKMNs speed.
+     *  @param p_situation: Current situation, on which an ability may be useable
+     */
+    void battle::doAbilities( ability::abilityType p_situation ) {
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     //OLD STUFF -> deprcated
 
@@ -2000,6 +2144,8 @@ namespace BATTLE {
     //        dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
     //    }
     //
+
+
     //    void battle::initBattleScene( int p_battleBack, weather p_weather ) {
     //        for( size_t i = 0; i < 6; ++i ) {
     //            ACPOS( i, PLAYER ) = ACPOS( i, OPPONENT ) = i;

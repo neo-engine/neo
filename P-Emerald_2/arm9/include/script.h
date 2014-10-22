@@ -3,9 +3,15 @@
 #include <string>
 #include <vector>
 
+#include <nds/ndstypes.h>
+
 #include "buffer.h"
-#include "pokemon.h"
+//#include "pokemon.h"
 //#include "battle.h"
+
+namespace POKEMON {
+    class pokemon;
+}
 
 namespace BATTLE {
 
@@ -140,10 +146,8 @@ namespace BATTLE {
                        m_multiplier( p_multiplier ),
                        m_additiveConstant( p_additiveConstant ) { }
 
-                int             get( ) {
-                    return m_additiveConstant;
-                }
-                int             get( battle& p_battle, void* p_self, POKEMON::pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition );
+                int             get( battle& p_battle, void* p_self );
+                int             get( battle& p_battle, POKEMON::pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition );
                 int             get( battle& p_target );
             };
 
@@ -224,7 +228,7 @@ namespace BATTLE {
 
             void                    execute( battle& p_battle, void* p_self );
             void                    evaluateOnTargetVal( battle& p_battle, void* p_self, POKEMON::pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition );
-            void                    evaluateOnTargetVal( battle& p_target );
+            void                    evaluateOnTargetVal( battle& p_battle, void* p_self );
         };
 
         std::vector<command>            _commands;
@@ -237,5 +241,13 @@ namespace BATTLE {
             : _commands( p_commands ) { }
 
         void                            execute( battle& p_battle, void* p_self );
+
+        friend int                      getTargetSpecifierValue( const battle&                      p_battle,
+                                                                 const POKEMON::pokemon&                        p_target,
+                                                                 bool                                           p_targetIsOpp,
+                                                                 u8                                             p_targetPosition,
+                                                                 const battleScript::command::targetSpecifier&  p_targetSpecifier );
+        friend int                      getTargetSpecifierValue( const battle&                                  p_target,
+                                                                 const battleScript::command::targetSpecifier&  p_targetSpecifier );
     };
 }

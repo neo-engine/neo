@@ -131,9 +131,6 @@ extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 extern OAMTable *Oam, *OamTop;
 
 extern int drawBox( u16 );
-namespace POKEMON {
-    extern const char* getLoc( u16 ind );
-}
 Region acMapRegion = NONE;
 std::pair<u8, u8> acMapPoint = std::pair<u8, u8>( 32, 24 );
 bool showfirst = true, showmappointer = false;
@@ -217,7 +214,7 @@ void printMapLocation( const touchPosition& p_t ) {
     for( u16 i = 0; i < MAXMAPPOS; ++i ) {
         if( p_t.px > MapLocations[ acMapRegion - 1 ][ i ].m_lx && p_t.px < MapLocations[ acMapRegion - 1 ][ i ].m_rx &&
             p_t.py > MapLocations[ acMapRegion - 1 ][ i ].m_ly && p_t.py < MapLocations[ acMapRegion - 1 ][ i ].m_ry ) {
-            printf( POKEMON::getLoc( MapLocations[ acMapRegion - 1 ][ i ].m_ind ) );
+            printf( FS::getLoc( MapLocations[ acMapRegion - 1 ][ i ].m_ind ) );
             return;
         }
     }
@@ -227,7 +224,7 @@ void printMapLocation( const MapRegionPos& p_m ) {
     consoleSetWindow( &Bottom, 5, 0, 20, 1 );
     consoleSelect( &Bottom );
     consoleClear( );
-    printf( POKEMON::getLoc( p_m.m_ind ) );
+    printf( FS::getLoc( p_m.m_ind ) );
     acMapPoint = std::pair<u8, u8>( ( p_m.m_lx + p_m.m_rx ) / 2, ( p_m.m_ly + p_m.m_ry ) / 2 );
     updateTime( );
     return;
@@ -808,7 +805,7 @@ void initSub( u16 pkmIdx ) {
     fieldCnt = u;
 }
 extern void initMapSprites( );
-extern void movePlayerOnMap( int, int, int, bool );
+extern void movePlayerOnMap( u16, u16, u16, bool );
 void screenLoader::run_pkmn( ) {
     vramSetup( );
     videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );

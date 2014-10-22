@@ -51,11 +51,11 @@ namespace FS {
 
     std::string breakString( const std::string& p_string, int p_lineLength );
 
-    bool loadNavScreen( u16* p_layer, const char* p_name, int p_no );
+    bool loadNavScreen( u16* p_layer, const char* p_name, u8 p_no );
     bool loadPicture( u16* p_layer, const char* p_Path, const char* p_name, u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256 );
     bool loadPictureSub( u16* p_layer, const char* p_path, const char* p_name, u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256 );
-    bool loadSprite( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_tileCnt, const u16 p_palCnt );
-    bool loadSpriteSub( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_tileCnt, const u16 p_palCnt );
+    bool loadSprite( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt );
+    bool loadSpriteSub( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt );
     bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnNo, const u16 p_posX,
                          const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_nextAvailableTileIdx, bool p_bottom, bool p_shiny = false, bool p_female = false, bool p_flipX = false );
     bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnNo, const u16 p_posX,
