@@ -340,6 +340,7 @@ namespace BATTLE {
         void        switchPKMN( bool p_opponent, u8 p_toSwitch, u8 p_newPokemonPos );
 
         void        doAbilities( ability::abilityType p_situation );
+        void        doAbility( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation );
 
         bool        canMove( u8 p_pokemonPos );
         void        declareBattleMove( u8 p_pokemonPos );

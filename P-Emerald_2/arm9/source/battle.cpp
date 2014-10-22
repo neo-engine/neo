@@ -265,6 +265,7 @@ namespace BATTLE {
 
         POKEMON::pokemon& target = ACPKMN2( p_battle, 0, PLAYER );
         bool isPkmn = false;
+        bool isOpp = false;
 
         if( p_cmd.substr( 0, 4 ) == L"OWN1" ) {
             target = ACPKMN2( p_battle, 0, PLAYER );
@@ -276,15 +277,17 @@ namespace BATTLE {
         }
         if( p_cmd.substr( 0, 4 ) == L"OPP1" ) {
             target = ACPKMN2( p_battle, 0, OPPONENT );
+            isOpp = true;
             isPkmn = true;
         }
         if( p_cmd.substr( 0, 4 ) == L"OPP2" ) {
             target = ACPKMN2( p_battle, 1, OPPONENT );
+            isOpp = true;
             isPkmn = true;
         }
 
         if( isPkmn && p_cmd.length( ) == 4 )
-            return target.m_boxdata.m_name;
+            return target.m_boxdata.m_name + std::wstring( isOpp ? L" (Gegner)" : L"" );
 
         if( isPkmn ) {
             auto specifier = p_cmd.substr( 5 );
@@ -404,46 +407,75 @@ namespace BATTLE {
     }
 
     /**
+     *  @brief Orders the PKMN according to their speed.
+     */
+    void battle::orderPKMN( ) {
+        _moveOrder[ 0 ][ 0 ]
+            = _moveOrder[ 0 ][ 1 ]
+            = _moveOrder[ 1 ][ 0 ]
+            = _moveOrder[ 1 ][ 1 ] = 42;
+
+        std::vector< std::pair<u16, u8> > inits;
+        for( u8 i = 0; i < ( ( m_battleMode == DOUBLE ) ? 2 : 1 ); ++i ) {
+            for( u8 j = 0; j < 2; ++j ) {
+                u16 acSpd = ACPKMN( i, j ).m_stats.m_Spd;
+                inits.push_back( std::pair<u16, u8>( acSpd, 2u * i + ( 1u - j ) ) );
+            }
+        }
+        std::sort( inits.begin( ), inits.end( ), std::greater<std::pair<u16, u8>>( ) );
+
+        u8 c = 0;
+        for( auto i : inits ) {
+            bool isOpp = i.second % 2,
+                isSnd = i.second / 2;
+
+            _moveOrder[ isSnd ][ isOpp ] = c++;
+        }
+    }
+
+    /**
      *  @brief send in PKMN for fainted ones, if possible
      *  @param p_choice: Specifies whether the player can choose the PKMN which is/are being sent
      */
     void battle::refillBattleSpots( bool p_choice ) {
         acStatus oldSts[ 2 ] = { };
-        std::vector< std::pair<u16, u8> > inits;
 
-        for( u8 i = 0; i < 2; ++i ) {
-            for( u8 j = 0; j < 2; ++j ) {
-                if( !_battleSpotOccupied[ i ][ j ] ) {
-                    u8 nextSpot;
-                    if( !p_choice || j )
-                        nextSpot = getNextPKMN( j );
-                    else
-                        nextSpot = choosePKMN( );
+        for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
+            if( !_battleSpotOccupied[ i ][ j ] ) {
+                u8 nextSpot;
+                if( !p_choice || j )
+                    nextSpot = getNextPKMN( j );
+                else
+                    nextSpot = choosePKMN( );
 
-                    std::swap( ACPOS( i, j ), ACPOS( nextSpot, j ) );
+                std::swap( ACPOS( i, j ), ACPOS( nextSpot, j ) );
 
-                    if( !i ) {
-                        oldSts[ j ] = ACPKMNSTS( 0, j );
-                        ACPKMNSTS( 0, j ) = SELECTED;
-                    }
-
-                    u16 acSpd = ACPKMN( i, j ).m_stats.m_Spd;
-                    inits.push_back( std::pair<u16, u8>( acSpd, 2u * i + ( 1u - j ) ) );
+                if( !i ) {
+                    oldSts[ j ] = ACPKMNSTS( 0, j );
+                    ACPKMNSTS( 0, j ) = SELECTED;
                 }
+
+                u16 acSpd = ACPKMN( i, j ).m_stats.m_Spd;
             }
         }
 
-        std::sort( inits.begin( ), inits.end( ), std::greater<std::pair<u16, u8>>( ) );
+        orderPKMN( );
 
-        for( auto i : inits ) {
-            bool isOpp = i.second % 2,
-                isSnd = i.second / 2;
+        for( u8 p = 0; p < 4; ++p ) {
+            for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
+                if( _moveOrder[ i ][ j ] == p ) {
+                    if( !_battleSpotOccupied[ i ][ j ] ) {
+                        if( !i )
+                            ACPKMNSTS( 0, j ) = oldSts[ j ];
 
-            if( !isSnd )
-                ACPKMNSTS( 0, isOpp ) = oldSts[ isOpp ];
-
-            sendPKMN( isOpp, isSnd );
-            _battleSpotOccupied[ isSnd ][ isOpp ];
+                        sendPKMN( j, i );
+                        _battleSpotOccupied[ i ][ j ];
+                    }
+                    goto NEXT;
+                }
+            }
+NEXT:
+            ;
         }
     }
 
@@ -467,9 +499,39 @@ namespace BATTLE {
      *  @param p_situation: Current situation, on which an ability may be useable
      */
     void battle::doAbilities( ability::abilityType p_situation ) {
+        orderPKMN( );
 
+        for( u8 p = 0; p < 4; ++p ) {
+            for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
+                if( _moveOrder[ i ][ j ] == p ) {
+                    doAbility( j, i, p_situation );
+                    goto NEXT;
+                }
+            }
+NEXT:
+            ;
+        }
     }
 
+    /**
+    *  @brief Applies all possible abilities ordered by their PKMNs speed.
+    *  @param p_opponent: true iff the next opponent's PKMN is requested.
+    *  @param p_pokemonPos: Position of the target PKMN (0 or 1)
+    *  @param p_situation: Current situation, on which an ability may be useable
+    */
+    void battle::doAbility( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation ) {
+        auto ab = ability( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability );
+
+        if( ab.m_type & p_situation ) {
+            std::swprintf( wbuffer, 50, L"%s von %ls%s wirkt.[A]",
+                           ab.m_abilityName.c_str( ),
+                           ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                           ( p_opponent ? "\n(Gegner)" : "\n" ) );
+
+            log( wbuffer );
+            ab.m_effect.execute( *this, &( ACPKMN( p_pokemonPos, p_opponent ) ) );
+        }
+    }
 
 
 
