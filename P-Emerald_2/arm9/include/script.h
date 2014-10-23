@@ -59,6 +59,7 @@ namespace BATTLE {
                 PKMN_SATK,
                 PKMN_SDEF,
                 PKMN_ACCURACY,
+                PKMN_ATTACK_BLOCKED,
 
                 PKMN_LEVEL,
 

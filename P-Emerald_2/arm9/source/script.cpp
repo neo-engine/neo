@@ -78,6 +78,8 @@ namespace BATTLE {
                 return ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ SDEF ];
             case BATTLE::battleScript::command::PKMN_ACCURACY:
                 return ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ACCURACY ];
+            case BATTLE::battleScript::command::PKMN_ATTACK_BLOCKED:
+                return ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ATTACK_BLOCKED ];
             case BATTLE::battleScript::command::PKMN_LEVEL:
                 return p_target.m_Level;
             default:
@@ -321,6 +323,10 @@ namespace BATTLE {
                             ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ACCURACY ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
                             ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ACCURACY ] += m_value.get( p_battle, p_self );
+                        break;
+                    case BATTLE::battleScript::command::PKMN_ATTACK_BLOCKED:
+                        if( m_action == SET )
+                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ATTACK_BLOCKED ] = !!m_value.get( p_battle, p_self );
                         break;
                     default:
                         break;
