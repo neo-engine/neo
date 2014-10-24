@@ -886,11 +886,11 @@ namespace POKEMON {
 
             printf( "EP(%3i%%)\nKP(%3i%%)", ( m_boxdata.m_experienceGained - POKEMON::EXP[ m_Level - 1 ][ exptype ] ) * 100 / ( POKEMON::EXP[ m_Level ][ exptype ] - POKEMON::EXP[ m_Level - 1 ][ exptype ] ),
                     m_stats.m_acHP * 100 / m_stats.m_maxHP );
-            BATTLE::displayHP( 100, 101, 46, 80, 97, 98, false, 50, 56 );
-            BATTLE::displayHP( 100, 100 - m_stats.m_acHP * 100 / m_stats.m_maxHP, 46, 80, 97, 98, false, 50, 56 );
+            BATTLE::battleUI::displayHP( 100, 101, 46, 80, 97, 98, false, 50, 56 );
+            BATTLE::battleUI::displayHP( 100, 100 - m_stats.m_acHP * 100 / m_stats.m_maxHP, 46, 80, 97, 98, false, 50, 56 );
 
-            BATTLE::displayEP( 100, 101, 46, 80, 99, 100, false, 59, 62 );
-            BATTLE::displayEP( 0, ( m_boxdata.m_experienceGained - POKEMON::EXP[ m_Level - 1 ][ exptype ] ) * 100 / ( POKEMON::EXP[ m_Level ][ exptype ] - POKEMON::EXP[ m_Level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62 );
+            BATTLE::battleUI::displayEP( 100, 101, 46, 80, 99, 100, false, 59, 62 );
+            BATTLE::battleUI::displayEP( 0, ( m_boxdata.m_experienceGained - POKEMON::EXP[ m_Level - 1 ][ exptype ] ) * 100 / ( POKEMON::EXP[ m_Level ][ exptype ] - POKEMON::EXP[ m_Level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62 );
 
         }
     }

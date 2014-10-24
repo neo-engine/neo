@@ -115,11 +115,12 @@ namespace BATTLE {
 
     class battleUI {
         battle* _battle;
+        s8      _oldPKMNStats[ 6 ][ 2 ][ 10 ];
 
     public:
-        void    displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, bool big = false ); //HP in %
-        void    displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR, u8 outerR ); //HP in %
-        void    displayEP( u16 EPstart, u16 EP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR = 14, u8 outerR = 15 );
+        static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, bool big = false ); //HP in %
+        static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR, u8 outerR ); //HP in %
+        static void displayEP( u16 EPstart, u16 EP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR = 14, u8 outerR = 15 );
 
         void    initScreen( );
         void    clearScreen( );
@@ -141,6 +142,8 @@ namespace BATTLE {
         void    useNav( );
 
         void    showAttack( u8 p_moveNo );
+        void    updateHP( bool p_opponent, u8 p_pokemonPos );
+        void    updateStats( bool p_opponent, u8 p_pokemonPos );
 
         void    hidePKMN( bool p_opponent, u8 p_pokemonPos );
         void    sendPKMN( bool p_opponent, u8 p_pokemonPos );
@@ -175,6 +178,7 @@ namespace BATTLE {
 
         bool _battleSpotOccupied[ 2 ][ 2 ];
 
+#define MAX_STATS 7
 #define ATK 0
 #define DEF 1
 #define SPD 2
@@ -183,7 +187,7 @@ namespace BATTLE {
 #define ACCURACY 5
 #define ATTACK_BLOCKED 6
 
-        u8 _acPkmnStatChanges[ 6 ][ 2 ][ 10 ];
+        s8 _acPkmnStatChanges[ 6 ][ 2 ][ 10 ];
 
         struct battleMove {
         public:
@@ -205,8 +209,14 @@ namespace BATTLE {
         u16         _lstOwnMove;
         u16         _lstOppMove;
         u16         _lstMove;
+
+        //Current turn's current move's "consequences"
         u8          _acMove;
-        u16         _acDamage;
+        s16         _acDamage[ 2 ][ 2 ];
+        u8          _critical[ 2 ][ 2 ];
+        u8          _criticalChance[ 2 ][ 2 ];
+        float       _effectivity[ 2 ][ 2 ];
+        s8          _acStatChange[ 2 ][ 2 ][ 10 ];
 
         battleScript _undoScript[ 6 ][ 2 ]; //script to undo changes done to the own pkmn
 
@@ -214,7 +224,7 @@ namespace BATTLE {
         bool        _allowMegaEvolution;
         u8          _weatherLength;
 
-        battleScript _weatherEffects[ 6 ] = {
+        battleScript _weatherEffects[ 9 ] = {
             battleScript( ),
             //Rain
             battleScript( std::vector<cmd>( {
@@ -294,21 +304,27 @@ namespace BATTLE {
 
             //SUN
         };
-        std::wstring _weatherMessage[ 6 ] = {
+        std::wstring _weatherMessage[ 9 ] = {
             L"",
             L"Es regnet.[A]",
             L"Es hagelt.[A]",
             L"Es herrscht dichter Nebel...[A]",
             L"Der Sandsturm wirkt.[A]",
-            L"Das Sonnenlicht ist stark.[A]"
+            L"Das Sonnenlicht ist stark.[A]",
+            L"Enormer Regen.[A]",
+            L"Extremes Sonnenlicht.[A]",
+            L"Starke Winde wehen.[A]"
         };
-        std::wstring _weatherEndMessage[ 6 ] = {
+        std::wstring _weatherEndMessage[ 9 ] = {
             L"",
             L"Der Regen stoppte.[A]",
             L"Der Hagel stoppte.[A]",
             L"Der Nebel verzog sich.[A]",
             L"Der Sandsturm verzog sich.[A]",
-            L"Das Sonnenlicht wurde wieder normal.[A]"
+            L"Das Sonnenlicht wurde wieder normal.[A]",
+            L"Der Regen stoppte.[A]",
+            L"Das Sonnenlicht wurde wieder normal.[A]",
+            L"Windstille...[A]"
         };
 
         battleUI    _battleUI;
@@ -347,7 +363,10 @@ namespace BATTLE {
             HAIL = 2,
             FOG = 3,
             SANDSTORM = 4,
-            SUN = 5
+            SUN = 5,
+            HEAVY_RAIN = 6,
+            HEAVY_SUNSHINE = 7,
+            HEAVY_WINDS = 8
         };
 
         enum battleMode {
@@ -383,7 +402,7 @@ namespace BATTLE {
         u8          getNextPKMN( bool p_opponent );
         void        orderPKMN( bool p_includeMovePriority = false ); //orders PKMN according to their speed, their move's priority, ... and stores result in _moveOrder
         void        switchPKMN( bool p_opponent, u8 p_toSwitch, u8 p_newPokemonPos );
-        
+
         void        doItems( ability::abilityType p_situation );
         void        doItem( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation );
 
@@ -398,7 +417,7 @@ namespace BATTLE {
         void        doMoves( );
         void        doMove( bool p_opponent, u8 p_pokemonPos );
 
-        void        calcDamage( u8 p_moveNo );
+        void        calcDamage( u8 p_moveNo, u8 p_randInt );
         void        doAttack( u8 p_moveNo );
 
         void        doWeather( );

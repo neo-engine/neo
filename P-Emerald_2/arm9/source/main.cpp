@@ -2094,7 +2094,7 @@ OUT:
                     BATTLE::battleTrainer opp( "TEST-OPP", "DeR TeST iST DeR BeSTe MSG1", "DeR TeST VeRLieRT GeRaDe... MSG2", "DeR TeST GEWiNNT HaHa! MSG3", "DeR TeST VeRLieRT... MSG4", &( cpy ), 0 );
 
                     BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::DOUBLE );
-                    test_battle.start( 100, BATTLE::battle::NO_WEATHER );
+                    test_battle.start( );
                     initMapSprites( );
                     movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
                     break;
@@ -2114,7 +2114,7 @@ OUT:
                     BATTLE::battleTrainer opp( "TEST-OPP", "DeR TeST iST DeR BeSTe MSG1", "DeR TeST VeRLieRT GeRaDe... MSG2", "DeR TeST GEWiNNT HaHa! MSG3", "DeR TeST VeRLieRT... MSG4", &( cpy ), 0 );
 
                     BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::SINGLE );
-                    test_battle.start( 100, BATTLE::battle::NO_WEATHER );
+                    test_battle.start( );
                     initMapSprites( );
                     movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
                     break;

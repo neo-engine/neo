@@ -35,9 +35,12 @@
 #include <string>
 #include <map>
 
+#include "ability.h"
+
 #include <nds/ndstypes.h>
 
 extern const char ITEM_PATH[ ];
+class ability;
 
 namespace ITEMS {
 
@@ -64,6 +67,11 @@ namespace ITEMS {
         std::string     m_itemName;//, displayName, dscrpt;
         //EFFEKT effekt;
         itemType        m_itemType;
+        ability::abilityType
+            m_inBattleEffect;
+        BATTLE::battleScript
+            m_inBattleScript;
+
         //std::string effekt_script;
         //int price;
 

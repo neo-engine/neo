@@ -28,7 +28,8 @@ namespace BATTLE {
                 OWN2,
                 BATTLE_,
                 SELF_PKMN,
-                SELF_BATTLE
+                SELF_BATTLE,
+                SELF_DAMAGE
             };
             enum targetSpecifier {
                 NONE,

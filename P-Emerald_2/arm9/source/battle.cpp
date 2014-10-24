@@ -541,6 +541,13 @@ NEXT:
 
             log( wbuffer );
             ab.m_effect.execute( *this, &( ACPKMN( p_pokemonPos, p_opponent ) ) );
+
+            for( u8 k = 0; k < 4; ++k ) {
+                bool isOpp = k % 2,
+                    isSnd = k / 2;
+                _battleUI.updateHP( isOpp, isSnd );
+                _battleUI.updateStats( isOpp, isSnd );
+            }
         }
     }
 
@@ -689,7 +696,7 @@ NEXT:
                     }
                 }
 
-                calcDamage( _acMove );
+                calcDamage( _acMove, rand( ) % 16 );
 
                 doAbilities( ability::BEFORE_ATTACK );
                 doItems( ability::BEFORE_ATTACK );
@@ -733,6 +740,321 @@ NEXT:
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+    *  @brief Calculates the current move's dealt damage.
+    *  @param p_moveNo: The number of the attack that shall be done.
+    *  @param p_randInt: A random integer between 0 and 15 used to adjust the dealt damage
+    */
+    void battle::calcDamage( u8 p_moveNo, u8 p_randInt ) {
+        for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
+            if( _moveOrder[ i ][ j ] == p_moveNo ) {
+                auto& bm = _battleMoves[ i ][ j ];
+
+                //Calculate critical hit chance
+                int mod = 16;
+                switch( _criticalChance[ i ][ j ] ) {
+                    case 1:
+                        mod = 8;
+                        break;
+                    case 2:
+                        mod = 4;
+                        break;
+                    case 3:
+                        mod = 3;
+                        break;
+                    case 4:
+                        mod = 2;
+                        break;
+                    default:
+                        break;
+                }
+
+                for( u8 k = 0; k < 4; ++k ) {
+                    bool isOpp = k % 2,
+                        isSnd = k / 2;
+
+                    if( !( bm.m_target & ( 1 << k ) ) )
+                        continue;
+
+                    auto move = AttackList[ ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] ];
+
+                    if( move->m_moveHitType == move::STAT ) {
+                        _acDamage[ isSnd ][ isOpp ] = 0;
+                        return;
+                    }
+
+                    POKEMON::PKMNDATA::pokemonData pd;
+                    POKEMON::PKMNDATA::getAll( ACPKMN( i, j ).m_boxdata.m_speciesId, pd );
+
+                    //Calculate effectivity
+                    _effectivity[ isSnd ][ isOpp ] = getEffectiveness( move->m_moveType, pd.m_types[ 0 ] );
+                    if( pd.m_types[ 0 ] != pd.m_types[ 1 ] )
+                        _effectivity[ isSnd ][ isOpp ] *= getEffectiveness( move->m_moveType, pd.m_types[ 1 ] );
+
+                    //Calculate critical hit
+                    if( p_randInt <= 15 )
+                        _critical[ isSnd ][ isOpp ] = !( rand( ) % mod );
+                    else {
+                        _critical[ isSnd ][ isOpp ] = false;
+
+                        if( p_randInt == 16 )
+                            p_randInt = 0;
+                        else
+                            p_randInt = 15;
+                    }
+                    //STAB
+                    float STAB = 1.5f;
+                    if( ACPKMN( i, j ).m_boxdata.m_ability == A_ADAPTABILITY )
+                        STAB = 2.0f;
+
+                    //Weather
+                    float weather = 1.0f;
+
+                    bool weatherPossible = true;
+                    for( u8 a = 0; a < 2; ++a ) for( u8 b = 0; b < 2; ++b )
+                        weatherPossible &= ( ACPKMN( i, j ).m_boxdata.m_ability != A_AIR_LOCK
+                        && ACPKMN( i, j ).m_boxdata.m_ability != A_CLOUD_NINE );
+
+                    if( weatherPossible ) {
+                        if( m_weather == SUN && move->m_moveType == WASSER )
+                            weather = 0.5f;
+                        if( m_weather == HEAVY_SUNSHINE && move->m_moveType == WASSER )
+                            weather = 0.0f;
+
+                        if( m_weather == SUN && move->m_moveType == FEUER )
+                            weather = 1.5f;
+                        if( m_weather == HEAVY_SUNSHINE && move->m_moveType == FEUER )
+                            weather = 1.5f;
+
+                        if( m_weather == RAIN && move->m_moveType == FEUER )
+                            weather = 0.5f;
+                        if( m_weather == HEAVY_RAIN && move->m_moveType == FEUER )
+                            weather = 0.0f;
+
+                        if( m_weather == RAIN && move->m_moveType == WASSER )
+                            weather = 1.5f;
+                        if( m_weather == HEAVY_RAIN && move->m_moveType == WASSER )
+                            weather = 1.5f;
+                    }
+
+                    //Multi-Target modifier
+                    int tcnt = 0;
+                    for( u8 o = 0; o < 4; ++o )
+                        if( ( bm.m_target & ( 1 << o ) ) )
+                            tcnt++;
+
+                    float target = 1.0f;
+                    if( tcnt > 1 )
+                        target = 0.75f;
+
+                    //Burn
+                    float burn = 1.0f;
+                    if( ACPKMNAIL( i, j ) == move::ailment::BURN
+                        && move->m_moveHitType == move::PHYS
+                        && ACPKMN( i, j ).m_boxdata.m_ability != A_GUTS ) {
+                        burn = 0.5f;
+                    }
+
+                    //Base damage calculation
+                    auto moveAtkHitType = move->m_moveHitType;
+                    auto moveDefHitType = move->m_moveHitType;
+
+                    if( ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] == M_PSYSHOCK )
+                        moveDefHitType = move::PHYS;
+                    if( ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] == M_PSYSTRIKE )
+                        moveDefHitType = move::PHYS;
+                    if( ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] == M_SECRET_SWORD )
+                        moveDefHitType = move::PHYS;
+
+                    float atk = ( ( moveAtkHitType == move::PHYS ) ? ACPKMN( i, j ).m_stats.m_Atk : ACPKMN( i, j ).m_stats.m_SAtk );
+                    if( ACPKMN( i, j ).m_boxdata.m_ability != A_UNAWARE
+                        && ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] != M_FOULPLAY ) {
+                        if( moveAtkHitType == move::PHYS ) {
+                            if( ACPKMNSTATCHG( i, j )[ ATK ] > 0 )
+                                atk = atk * ACPKMNSTATCHG( i, j )[ ATK ] / 2.0;
+                            if( ACPKMNSTATCHG( i, j )[ ATK ] < 0 )
+                                atk = atk  * 2.0 / ( -ACPKMNSTATCHG( i, j )[ ATK ] );
+                        }
+                        if( moveAtkHitType == move::SPEC ) {
+                            if( ACPKMNSTATCHG( i, j )[ SATK ] > 0 )
+                                atk = atk * ACPKMNSTATCHG( i, j )[ SATK ] / 2.0;
+                            if( ACPKMNSTATCHG( i, j )[ SATK ] < 0 )
+                                atk = atk  * 2.0 / ( -ACPKMNSTATCHG( i, j )[ SATK ] );
+                        }
+                    }
+                    if( ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] == M_FOULPLAY ) {
+                        atk = ACPKMN( isSnd, isOpp ).m_stats.m_Atk;
+
+                        if( ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] > 0 )
+                            atk = atk * ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] / 2.0;
+                        if( ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] < 0 )
+                            atk = atk  * 2.0 / ( -ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] );
+                    }
+
+                    float def = ( ( moveDefHitType == move::PHYS ) ? ACPKMN( isSnd, isOpp ).m_stats.m_Def : ACPKMN( isSnd, isOpp ).m_stats.m_SDef );
+                    if( ACPKMN( isSnd, isOpp ).m_boxdata.m_ability != A_UNAWARE
+                        && ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] != M_CHIP_AWAY ) {
+                        if( moveDefHitType == move::PHYS ) {
+                            if( ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] > 0 )
+                                atk = atk * ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] / 2.0;
+                            if( ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] < 0 )
+                                atk = atk  * 2.0 / ( -ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] );
+                        }
+                        if( moveDefHitType == move::SPEC ) {
+                            if( ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] > 0 )
+                                atk = atk * ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] / 2.0;
+                            if( ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] < 0 )
+                                atk = atk  * 2.0 / ( -ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] );
+                        }
+                    }
+
+                    _acDamage[ isSnd ][ isOpp ] = s16( ( ( 2 * ACPKMN( i, j ).m_Level + 10 ) / 250 ) * ( atk / def ) * move->m_moveBasePower + 2 );
+                    float modifier = _effectivity[ isSnd ][ isOpp ] * ( _critical[ isSnd ][ isOpp ] ? 2 : 1 ) * STAB * weather * target * burn;
+                    _acDamage[ isSnd ][ isOpp ] *= s16( modifier );
+                }
+            }
+        }
+    }
+
+    /**
+    *  @brief Applies all possible hold Items ordered by their PKMNs speed.
+    *  @param p_situation: Current situation, on which an Item may be useable
+    */
+    void battle::doItems( ability::abilityType p_situation ) {
+        orderPKMN( );
+
+        for( u8 p = 0; p < 4; ++p ) {
+            for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
+                if( _moveOrder[ i ][ j ] == p ) {
+                    doItem( j, i, p_situation );
+                    goto NEXT;
+                }
+            }
+NEXT:
+            ;
+        }
+    }
+
+    /**
+    *  @brief Applies all possible hold items ordered by their PKMNs speed.
+    *  @param p_opponent: true iff the next opponent's PKMN is requested.
+    *  @param p_pokemonPos: Position of the target PKMN (0 or 1)
+    *  @param p_situation: Current situation, on which an item may be useable
+    */
+    void battle::doItem( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation ) {
+        auto im = ITEMS::ItemList[ ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability ];
+
+        if( ( im.getEffectType( ) & ITEMS::item::itemEffectType::IN_BATTLE ) && ( im.m_inBattleEffect & p_situation ) ) {
+            std::swprintf( wbuffer, 50, L"%s von %ls%s wirkt.[A]",
+                           im.getDisplayName( ).c_str( ),
+                           ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                           ( p_opponent ? "\n(Gegner)" : "\n" ) );
+
+            log( wbuffer );
+            im.m_inBattleScript.execute( *this, &( ACPKMN( p_pokemonPos, p_opponent ) ) );
+            for( u8 k = 0; k < 4; ++k ) {
+                bool isOpp = k % 2,
+                    isSnd = k / 2;
+                _battleUI.updateHP( isOpp, isSnd );
+                _battleUI.updateStats( isOpp, isSnd );
+            }
+        }
+    }
+
+    /**
+     *  @brief does the p_moveNo positioned attack of this turn
+     *  @param p_moveNo: The number of the attack that shall be done.
+     */
+    void battle::doAttack( u8 p_moveNo ) {
+        bool messagePrinted = false;
+        for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
+            if( _moveOrder[ i ][ j ] == p_moveNo ) {
+                auto& bm = _battleMoves[ i ][ j ];
+                if( bm.m_type != battleMove::ATTACK )
+                    return;
+                auto acMove = AttackList[ ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] ];
+
+                //"Preview" Attacks effect
+                if( rand( ) % 100 < acMove->m_moveEffectAccuracy )
+                    acMove->m_moveEffect.execute( *this, &ACPKMN( i, j ) );
+
+                for( u8 k = 0; k < 4; ++k ) {
+                    bool isOpp = k % 2,
+                        isSnd = k / 2;
+
+                    if( !( bm.m_target & ( 1 << k ) ) )
+                        continue;
+                    bool doesChange = !!_acDamage[ isSnd ][ isOpp ];
+
+                    for( u8 s = 0; s < MAX_STATS; s++ )
+                        doesChange |= !!_acStatChange[ isSnd ][ isOpp ][ s ];
+
+                    if( !messagePrinted ) {
+                        std::swprintf( wbuffer, 100, L"%ls%s setzt\n%s ein.[A]",
+                                       ( ACPKMN( i, j ).m_boxdata.m_name ),
+                                       ( j ? "\n(Gegner)" : "\n" ),
+                                       acMove->m_moveName.c_str( ) );
+                        log( wbuffer );
+                        messagePrinted = true;
+                    }
+                    if( doesChange ) {
+
+                        ACPKMN( isSnd, isOpp ).m_stats.m_acHP = std::max( u16( 0 ),
+                                                                          std::min( u16( ACPKMN( isSnd, isOpp ).m_stats.m_acHP - _acDamage[ isSnd ][ isOpp ] ),
+                                                                          ACPKMN( isSnd, isOpp ).m_stats.m_maxHP ) );
+                        for( u8 s = 0; s < MAX_STATS; s++ )
+                            ACPKMNSTATCHG( isSnd, isOpp )[ s ] += _acStatChange[ isSnd ][ isOpp ][ s ];
+
+                        _battleUI.showAttack( p_moveNo );
+                        _battleUI.updateHP( isOpp, isSnd );
+                        if( _critical[ isSnd ][ isOpp ] )
+                            log( L"[COLR:15:15:00]Ein Volltreffer![A][COLR:15:15:15]" );
+                        if( _effectivity[ isSnd ][ isOpp ] != 1.0f ) {
+                            float effectivity = _effectivity[ isSnd ][ isOpp ];
+                            if( effectivity > 3.0f )
+                                std::swprintf( wbuffer, 100, L"[COLR:00:31:00]Das ist enorm effektiv\ngegen %ls![A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                            else if( effectivity > 1.0f )
+                                std::swprintf( wbuffer, 100, L"[COLR:00:15:00]Das ist sehr effektiv\ngegen %ls![A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                            else if( effectivity == 0.0f )
+                                std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Hat die Attacke\n%lsgetroffen?[A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                            else if( effectivity < 0.3f )
+                                std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %ls...[A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                            else if( effectivity < 1.0f )
+                                std::swprintf( wbuffer, 100, L"[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %ls.[A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                            log( wbuffer );
+                        }
+                        _battleUI.updateStats( isOpp, isSnd );
+                    } else {
+                        std::swprintf( wbuffer, 100, L"%ls%s bleibt von\nder Attacke unbeeindruckt...[A]",
+                                       ( ACPKMN( isSnd, isOpp ).m_boxdata.m_name ),
+                                       ( isOpp ? "\n(Gegner)" : "\n" ) );
+                        log( wbuffer );
+                    }
+                }
+                for( u8 k = 4; k < 6; ++k ) {
+                    if( !( bm.m_target & ( 1 << k ) ) )
+                        continue;
+                    if( !messagePrinted ) {
+                        std::swprintf( wbuffer, 100, L"%ls%s setzt\n%s ein.[A]",
+                                       ( ACPKMN( i, j ).m_boxdata.m_name ),
+                                       ( j ? "\n(Gegner)" : "\n" ),
+                                       acMove->m_moveName.c_str( ) );
+                        log( wbuffer );
+                        messagePrinted = true;
+                    }
+                    //acMove->m_moveEffect.execute( *this, &( ACPKMN( i, j ) ) );
+                }
+
+                _lstMove = ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ];
+                if( j )
+                    _lstOppMove = _lstMove;
+                else
+                    _lstOwnMove = _lstMove;
+                return;
+            }
         }
     }
 

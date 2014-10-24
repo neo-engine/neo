@@ -178,6 +178,8 @@ namespace BATTLE {
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
                 return evaluate( getTargetVal( *( (battle*)p_self ) ) );
+            case BATTLE::battleScript::command::SELF_DAMAGE:
+                return evaluate( *( (int*)p_self ) );
             default:
                 break;
         }
@@ -222,6 +224,8 @@ namespace BATTLE {
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
                 return get( *( (battle*)p_self ) );
+            case BATTLE::battleScript::command::SELF_DAMAGE:
+                return m_additiveConstant + m_multiplier * ( *( (int*)p_self ) ) / 100;
             default:
             case BATTLE::battleScript::command::NO_TARGET:
                 return m_additiveConstant;
@@ -396,6 +400,23 @@ namespace BATTLE {
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
                 return evaluateOnTargetVal( *( (battle*)p_self ), p_self );
+
+            case BATTLE::battleScript::command::SELF_DAMAGE:
+            {
+                switch( m_action ) {
+                    case BATTLE::battleScript::command::SET:
+                        *( (int*)p_self ) = m_value.get( p_battle, p_self );
+                        break;
+                    case BATTLE::battleScript::command::ADD:
+                        *( (int*)p_self ) += m_value.get( p_battle, p_self );
+                        break;
+                    case BATTLE::battleScript::command::MULTIPLY:
+                        *( (int*)p_self ) = int( *( (int*)p_self ) * m_value.get( p_battle, p_self ) / 100.f );
+                        break;
+                    default:
+                        break;
+                }
+            }
             default:
                 break;
         }

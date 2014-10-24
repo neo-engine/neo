@@ -687,12 +687,12 @@ void initTop( ) {
         if( !SAV.m_PkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
             if( i % 2 == 0 ) {
                 drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId, borders[ i ][ 0 ] * 8 - 28, borders[ i ][ 1 ] * 8, a, b, c, false );
-                BATTLE::displayHP( 100, 101, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
-                BATTLE::displayHP( 100, 100 - SAV.m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV.m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
+                BATTLE::battleUI::displayHP( 100, 101, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
+                BATTLE::battleUI::displayHP( 100, 100 - SAV.m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV.m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
             } else {
                 drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId, borders[ i ][ 0 ] * 8 + 76, borders[ i ][ 1 ] * 8, a, b, c, false );
-                BATTLE::displayHP( 100, 101, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
-                BATTLE::displayHP( 100, 100 - SAV.m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV.m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
+                BATTLE::battleUI::displayHP( 100, 101, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
+                BATTLE::battleUI::displayHP( 100, 100 - SAV.m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV.m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
             }
             updateOAM( OamTop );
             //char buffer[ 100 ];

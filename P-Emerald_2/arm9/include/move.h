@@ -33,6 +33,7 @@
 #pragma once
 
 #include "type.h"
+#include "script.h"
 #include <string>
 #include <nds/ndstypes.h>
 
@@ -92,7 +93,7 @@ public:
     bool            m_isFieldAttack;
 
     std::string     m_moveName;
-    char            m_moveEffect;
+    BATTLE::battleScript    m_moveEffect;
     char            m_moveBasePower;
     Type            m_moveType;
     char            m_moveAccuracy;
@@ -121,7 +122,7 @@ public:
             moveHitTypes p_moveHitType )
             : m_isFieldAttack( false ),
             m_moveName( p_moveName ),
-            m_moveEffect( p_moveEffect ),
+            m_moveEffect( BATTLE::battleScript() ), // <-- TODO 
             m_moveBasePower( p_moveBasePower ),
             m_moveType( p_moveType ),
             m_moveAccuracy( p_moveAccuracy ),
@@ -144,3 +145,9 @@ public:
         return 0;
     }
 };
+
+#define M_FOULPLAY 42
+#define M_CHIP_AWAY 43
+#define M_PSYSHOCK 44
+#define M_PSYSTRIKE 45
+#define M_SECRET_SWORD 46
