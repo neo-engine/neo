@@ -709,24 +709,7 @@ NEXT:
                 break;
             }
             case battleMove::SWITCH:
-                if( p_opponent )
-                    std::swprintf( wbuffer, 100, L"[%ls] wurde von [TRAINER]\n([TCLASS]) auf die Bank geschickt.[A]", acPkmnStr.c_str( ) );
-                else
-                    std::swprintf( wbuffer, 100, L"Auf die Bank [%ls]![A]", acPkmnStr.c_str( ) );
-                log( wbuffer );
-
-                _battleUI.hidePKMN( p_opponent, p_pokemonPos );
-
-                std::swap( ACPOS( p_pokemonPos, p_opponent ), ACPOS( acMove.m_value, p_opponent ) );
-
-                if( p_opponent )
-                    std::swprintf( wbuffer, 100, L"[TRAINER] ([TCLASS]) schickt\n[%s] in den Kampf.[A]", acPkmnStr.c_str( ) );
-                else
-                    std::swprintf( wbuffer, 100, L"Los [%ls]![A]", acPkmnStr.c_str( ) );
-                log( wbuffer );
-
-                _battleUI.sendPKMN( p_opponent, p_pokemonPos );
-
+                battle::switchPKMN( p_opponent, p_pokemonPos, acMove.m_value );
                 break;
             case battleMove::USE_ITEM:
             {
@@ -1136,8 +1119,51 @@ NEXT:
         _battleUI.dinit( );
     }
 
-    void battle::doWeather( ) {
+    /**
+     *  @brief Swithes the PKMN
+     *  @param p_opponent: true iff the next opponent's PKMN is requested.
+     *  @param p_pokemonPos: Position of the target PKMN (0 or 1)
+     *  @param p_newPokemonPos: The new PKMNs current Pos
+     */
+    void battle::switchPKMN( bool p_opponent, u8 p_pokemonPos, u8 p_newPokemonPos ) {
 
+        std::wstring acPkmnStr = L"";
+        if( p_opponent )
+            acPkmnStr = L"OPP" + ( p_pokemonPos + 1 );
+        else
+            acPkmnStr = L"OWN" + ( p_pokemonPos + 1 );
+
+        auto& acPkmn = ACPKMN( p_pokemonPos, p_opponent );
+        if( p_opponent )
+            std::swprintf( wbuffer, 100, L"[%ls] wurde von [TRAINER]\n([TCLASS]) auf die Bank geschickt.[A]", acPkmnStr.c_str( ) );
+        else
+            std::swprintf( wbuffer, 100, L"Auf die Bank [%ls]![A]", acPkmnStr.c_str( ) );
+        log( wbuffer );
+
+        _battleUI.hidePKMN( p_opponent, p_pokemonPos );
+
+        std::swap( ACPOS( p_pokemonPos, p_opponent ), ACPOS( p_newPokemonPos, p_opponent ) );
+
+        if( p_opponent )
+            std::swprintf( wbuffer, 100, L"[TRAINER] ([TCLASS]) schickt\n[%s] in den Kampf.[A]", acPkmnStr.c_str( ) );
+        else
+            std::swprintf( wbuffer, 100, L"Los [%ls]![A]", acPkmnStr.c_str( ) );
+        log( wbuffer );
+
+        _battleUI.sendPKMN( p_opponent, p_pokemonPos );
+    }
+
+    /**
+     *  @brief Applys weather effects.
+     */
+    void battle::doWeather( ) {
+        if( m_weather != NO_WEATHER ) if( --_weatherLength ) {
+            log( _weatherMessage[ m_weather ] );
+            _weatherEffects[ m_weather ].execute( *this, this );
+        } else {
+            log( _weatherEndMessage[ m_weather ] );
+            m_weather = NO_WEATHER;
+        }
     }
 
 
