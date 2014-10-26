@@ -1075,6 +1075,7 @@ void showNewMap( u16 p_mapIdx ) {
 
 bool left = false;
 void loadframe( SpriteInfo* p_si, int p_idx, int p_frame, bool p_big = false ) {
+    char buffer[ 50 ];
     sprintf( buffer, "%i/%i", p_idx, p_frame );
     if( !p_big )
         FS::loadSprite( p_si, "nitro:/PICS/SPRITES/OW/", buffer, 64, 16 );
@@ -1401,7 +1402,7 @@ inline void movePlayer( u16 p_direction ) {
     acMap->movePlayer( p_direction );
 }
 
-bool movePlayerOnMap( s16 p_x, s16 p_y, u16 p_z, bool p_init /*= true*/ ) {
+bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
     bool WTW = ( gMod == DEVELOPER ) && ( keysHeld( ) & KEY_R );
 
     MoveMode playermoveMode = (MoveMode)SAV.m_acMoveMode;

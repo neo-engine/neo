@@ -65,7 +65,7 @@ extern OAMTable *Oam, *OamTop;
 extern int drawBox( u16 );
 
 extern void initMapSprites( );
-extern bool movePlayerOnMap( s16, s16, u16, bool );
+extern bool movePlayerOnMap( s16, s16, s16, bool );
 
 #define MAXMAPPOS 75
 struct MapRegionPos {
