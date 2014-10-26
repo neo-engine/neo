@@ -122,15 +122,7 @@ backgroundSet BGs[ MAXBG ] = { { "Raging_Gyarados", NAV_DATA, NAV_DATA_PAL, true
 { "Working_Klink", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions },
 { "Reborn_Ho-Oh", BG2Bitmap, BG2Pal, false, true, mainSpritesPositions2 } };
 u8 BG_ind = 9;
-extern POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
-extern std::vector<int> box_of_st_pkmn[ MAXPKMN ];
-extern std::vector<int> free_spaces;
 
-extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
-extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
-extern OAMTable *Oam, *OamTop;
-
-extern int drawBox( u16 );
 Region acMapRegion = NONE;
 std::pair<u8, u8> acMapPoint = std::pair<u8, u8>( 32, 24 );
 bool showfirst = true, showmappointer = false;
@@ -331,9 +323,6 @@ u8 borders[ 6 ][ 2 ] = {
         { 4, 9 }, { 18, 10 },
         { 4, 17 }, { 18, 18 }
 };
-
-extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
-extern OAMTable *Oam;
 
 u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     /* Keep track of the available tiles */
@@ -804,8 +793,7 @@ void initSub( u16 pkmIdx ) {
 
     fieldCnt = u;
 }
-extern void initMapSprites( );
-extern void movePlayerOnMap( u16, u16, u16, bool );
+
 void screenLoader::run_pkmn( ) {
     vramSetup( );
     videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );

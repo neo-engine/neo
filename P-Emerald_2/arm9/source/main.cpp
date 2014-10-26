@@ -84,7 +84,7 @@ SpriteInfo spriteInfo[ SPRITE_COUNT ];
 OAMTable *OamTop = new OAMTable( );
 SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 
-#define _EMULATOR
+#undef _EMULATOR
 
 enum GameMod {
     DEVELOPER,
@@ -109,13 +109,11 @@ int bg2sub;
 int bg3;
 int bg2;
 
-extern PrintConsole Top, Bottom;
 ConsoleFont cfont;
 Keyboard* kbd;
 FONT::Font cust_font( FONT::font1::fontData, FONT::font1::fontWidths, FONT::font1::shiftchar );
 FONT::Font cust_font2( FONT::font2::fontData, FONT::font2::fontWidths, FONT::font2::shiftchar );
 
-//extern Map Maps[];
 map2d::Map* acMap;
 
 int hours, seconds, minutes, day, month, year;
@@ -124,19 +122,10 @@ u32 ticks;
 
 saveGame SAV;
 const std::string sav_nam = "nitro:/SAV";
-extern std::map<u16, std::string> Locations;
 Region acRegion = HOENN;
-extern Region acMapRegion;
-extern bool showmappointer;
-extern void printMapLocation( const touchPosition& t );
 
 screenLoader scrn( -2 );
 
-extern POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
-extern std::vector<int> box_of_st_pkmn[ MAXPKMN ];
-extern std::vector<int> free_spaces;
-
-extern void updateTime( s8 );
 
 void whoCares( int ) {
     return;

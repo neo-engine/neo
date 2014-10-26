@@ -53,6 +53,19 @@ extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;
 extern u32 ticks;
 
+extern POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
+extern std::vector<int> box_of_st_pkmn[ MAXPKMN ];
+extern std::vector<int> free_spaces;
+
+extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
+extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
+extern OAMTable *Oam, *OamTop;
+
+extern int drawBox( u16 );
+
+extern void initMapSprites( );
+extern bool movePlayerOnMap( u16, u16, u16, bool );
+
 #define MAXMAPPOS 75
 struct MapRegionPos {
     u8 m_lx,
@@ -63,10 +76,17 @@ struct MapRegionPos {
 };
 extern const MapRegionPos MapLocations[ 3 ][ MAXMAPPOS ];
 void printMapLocation( const MapRegionPos& p_m );
+extern void printMapLocation( const touchPosition& t );
 
 class move;
 extern move* AttackList[ 560 ];
 extern void shoUseAttack( u16 p_pkmIdx, bool p_female, bool p_shiny );
+
+extern std::map<u16, std::string> Locations;
+extern Region acMapRegion;
+extern bool showmappointer;
+
+
 
 namespace POKEMON {
     bool drawInfoSub( u16* p_layer, int p_PKMN );

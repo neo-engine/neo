@@ -1035,18 +1035,18 @@ namespace POKEMON {
 
         void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount, u16* p_result ) {
 
-            char pt[ 150 ];
-            sprintf( pt, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
+            sprintf( buffer, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
+            FILE* f = fopen( buffer, "r" );
             if( !f )
                 return;
 
-            int rescnt = 0;
+            u16 rescnt = 0;
 
             if( p_fromLevel > p_toLevel ) {
                 std::vector<u16> reses;
-                for( int i = 0; i <= p_fromLevel; ++i ) {
-                    int z; fscanf( f, "%d", &z );
+                for( u16 i = 0; i <= p_fromLevel; ++i ) {
+                    u16 z;
+                    fscanf( f, "%hd", &z );
                     for( int j = 0; j < z; ++j ) {
                         u16 g, h;
                         fscanf( f, "%hd %hd", &g, &h );
@@ -1055,8 +1055,8 @@ namespace POKEMON {
                     }
                 }
                 auto I = reses.rbegin( );
-                for( int i = 0; i < p_amount && I != reses.rend( ); ++i, ++I ) {
-                    for( int z = 0; z < i; ++z )
+                for( u16 i = 0; i < p_amount && I != reses.rend( ); ++i, ++I ) {
+                    for( u16 z = 0; z < i; ++z )
                         if( *I == p_result[ z ] ) {
                         --i;
                         goto N;
@@ -1068,13 +1068,14 @@ N:
                 fclose( f );
                 return;
             } else {
-                for( int i = 0; i <= p_toLevel; ++i ) {
-                    int z; fscanf( f, "%d", &z );
-                    for( int j = 0; j < z; ++j ) {
+                for( u16 i = 0; i <= p_toLevel; ++i ) {
+                    u16 z;
+                    fscanf( f, "%hd", &z );
+                    for( u16 j = 0; j < z; ++j ) {
                         u16 g, h;
                         fscanf( f, "%hd %hd", &g, &h );
                         if( i >= p_fromLevel && h == p_mode && g < MAXATTACK ) {
-                            for( int z = 0; z < rescnt; ++z )
+                            for( u16 z = 0; z < rescnt; ++z )
                                 if( g == p_result[ z ] )
                                     goto NEXT;
                             p_result[ rescnt ] = g;

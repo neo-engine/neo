@@ -32,12 +32,16 @@
 
 #pragma once
 #include <vector>
+#include <map>
+#include <set>
 
 #include <nds.h>
 
 #include "move.h"
 #include "script.h"
 #include "ability.h"
+#include "sprite.h"
+#include "print.h"
 
 
 namespace POKEMON {
@@ -47,7 +51,15 @@ namespace ITEMS {
     class item;
 }
 
-struct SpriteInfo;
+extern OAMTable *Oam;
+extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
+
+extern OAMTable *OamTop;
+extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
+
+extern FONT::Font cust_font;
+extern FONT::Font cust_font2;
+
 
 namespace BATTLE {
     typedef battleScript::command               cmd;
@@ -117,6 +129,21 @@ namespace BATTLE {
         battle* _battle;
         s8      _oldPKMNStats[ 6 ][ 2 ][ 10 ];
 
+        u16     _usedPals;
+
+        s8      getNextFreePal( ) {
+            for( u8 i = 0; i < 16; ++i )if( !( _usedPals & ( 1 << i ) ) ) {
+                _usedPals |= ( 1 << i );
+                return i;
+            }
+            return -1;
+        }
+        void    freePal( u16 p_palNo ) {
+            _usedPals &= ~( 1 << p_palNo );
+        }
+
+
+
     public:
         static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, bool big = false ); //HP in %
         static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR, u8 outerR ); //HP in %
@@ -142,11 +169,15 @@ namespace BATTLE {
         void    useNav( );
 
         void    showAttack( u8 p_moveNo );
-        void    updateHP( bool p_opponent, u8 p_pokemonPos );
+        void    updateHP( bool p_opponent, u8 p_pokemonPos ); 
+        void    applyEXPChanges( );
         void    updateStats( bool p_opponent, u8 p_pokemonPos );
 
         void    hidePKMN( bool p_opponent, u8 p_pokemonPos );
         void    sendPKMN( bool p_opponent, u8 p_pokemonPos );
+        void    evolvePKMN( bool p_opponent, u8 p_pokemonPos );
+
+        void    learnMove( u8 p_pokemonPos, u16 p_move );
 
         void    dinit( );
 
@@ -209,6 +240,8 @@ namespace BATTLE {
         u16         _lstOwnMove;
         u16         _lstOppMove;
         u16         _lstMove;
+
+        std::map<POKEMON::pokemon&, std::set<POKEMON::pokemon&> > _participatedPKMN;
 
         //Current turn's current move's "consequences"
         u8          _acMove;
@@ -327,6 +360,8 @@ namespace BATTLE {
             L"Windstille...[A]"
         };
 
+
+
         battleUI    _battleUI;
     public:
 #define OPPONENT 1
@@ -382,6 +417,7 @@ namespace BATTLE {
         };
 
         bool        m_distributeEXP;
+        bool        m_isWildBattle;
 
         weather     m_weather;
         battleMode  m_battleMode;
@@ -413,6 +449,9 @@ namespace BATTLE {
         bool        canMove( bool p_opponent, u8 p_pokemonPos );
         void        run( );
 
+        void        registerParticipatedPKMN( );
+        void        distributeEXP( bool p_opponent, u8 p_pokemonPos );
+        void        evolve( bool p_opponent, u8 p_pokemonPos );
         void        megaEvolve( bool p_opponent, u8 p_pokemonPos );
         void        doMoves( );
         void        doMove( bool p_opponent, u8 p_pokemonPos );
@@ -424,5 +463,8 @@ namespace BATTLE {
 
         bool        endConditionHit( battleEndReason& p_battleEndReason );
         void        endBattle( battleEndReason p_battleEndReason );
+
+        void        checkForAttackLearn( u8 p_pokemonPos );
+        void        checkForEvolution( bool p_opponent, u8 p_pokemonPos );
     };
 }

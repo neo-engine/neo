@@ -165,3 +165,5 @@ namespace ITEMS {
 
     extern item ItemList[ 700 ];
 }
+
+#define I_LUCKY_EGG 42
