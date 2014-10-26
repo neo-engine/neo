@@ -44,3 +44,10 @@ P-Emerald_2/build/
 P-Emerald_2/arm7/build/
 P-Emerald_2/arm9/build
 
+*.FNT
+*.arm7
+*.arm9
+*.elf
+*.stackdump
+*.dsm
+*desmume*
