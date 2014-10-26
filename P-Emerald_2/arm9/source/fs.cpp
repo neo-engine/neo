@@ -51,7 +51,7 @@ const char PKMNDATA_PATH[ ] = "nitro:/PKMNDATA/";
 const char ABILITYDATA_PATH[ ] = "nitro:/PKMNDATA/ABILITIES/";
 
 ability::ability( int p_abilityId ) {
-    sprintf( buffer, "nitro:/LOCATIONS/%i.data", p_abilityId );
+    sprintf( buffer, "nitro:/PKMNDATA/ABILITIES/%i.data", p_abilityId );
     FILE* f = fopen( buffer, "r" );
 
     if( !f )
@@ -696,7 +696,7 @@ namespace FS {
         Item->x = p_posX;
         Item->y = p_posY;
 
-        //char buffer[100];
+        char buffer[100];
         sprintf( buffer, "Icon_egg" );
         if( p_subScreen ) {
             if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/ICONS/", buffer, 128, 16 ) ) {

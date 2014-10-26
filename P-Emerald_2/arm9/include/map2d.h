@@ -125,9 +125,9 @@ namespace map2d {
 
         Map( const char* p_path, const char* p_name );
 
-        void            draw( int p_bx, int p_by, bool p_init = false );
+        void            draw( s16 p_bx, s16 p_by, bool p_init = false );
         void            movePlayer( int p_direction );
     private:
-        void            fill( u16* mapMemory[ 4 ], int p_xmin, int p_x, int p_xmax, int p_ymin, int p_y, int p_ymax, int p_c );
+        void            fill( u16* mapMemory[ 4 ], s16 p_xmin, s16 p_x, s16 p_xmax, s16 p_ymin, s16 p_y, s16 p_ymax, s16 p_c );
     };
 }

@@ -736,7 +736,7 @@ namespace POKEMON {
         Oam->oamBuffer[ 28 ].priority = OBJPRIORITY_1;
         Oam->oamBuffer[ 27 ].isHidden = false;
         Oam->oamBuffer[ 27 ].y = 192 - 12;
-        Oam->oamBuffer[ 27 ].x = 20;
+        Oam->oamBuffer[ 27 ].x = 20;  
         Oam->oamBuffer[ 27 ].priority = OBJPRIORITY_1;
         updateOAMSub( Oam );
         if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
