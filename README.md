@@ -29,7 +29,7 @@ Features
     * Strict and intuitive naming conventions
     * _Good_ documentation
 
-Features that still have to be implemented yet are _italic_
+Features that still have to be implemented yet are _italic_.
 
 Some screens
 ------------
@@ -49,3 +49,5 @@ Some screens
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_29_10070.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_01_10175.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_09_10201.png)
+
+_More to come_, as this README.md is still under construction!
