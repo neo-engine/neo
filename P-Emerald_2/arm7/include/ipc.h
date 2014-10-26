@@ -80,7 +80,7 @@ enum IPC_SYNC_BITS {
 };
 
 //---------------------------------------------------------------------------------
-static inline void IPC_SendSync( unsigned int sync ) {
+static inline void IPC_SendSync( u32 sync ) {
     //---------------------------------------------------------------------------------
     REG_IPC_SYNC = ( REG_IPC_SYNC & 0xf0ff ) | ( ( (sync)& 0x0f ) << 8 ) | IPC_SYNC_IRQ_REQUEST;
 }

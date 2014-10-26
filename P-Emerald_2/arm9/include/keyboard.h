@@ -36,13 +36,13 @@
 
 extern PrintConsole Bottom;
 #define MAXKEYBOARDS 3
-extern void updateTime( int );
+extern void updateTime( s8 );
 class keyboard {
 public:
     keyboard( )
         : _ind( 0 ) { }
 
-    std::wstring getText( int p_length, const char* p_msg = 0, bool p_time = true );
+    std::wstring getText( u16 p_length, const char* p_msg = 0, bool p_time = true );
 
 private:
     int _ind;

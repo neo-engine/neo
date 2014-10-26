@@ -82,14 +82,14 @@ extern "C" {
     };
 
     struct nitroFSStruct {
-        unsigned int	pos;	//where in the file am i?
-        unsigned int 	start;	//where in the rom this file starts
-        unsigned int 	end;	//where in the rom this file ends
+        u32	pos;	//where in the file am i?
+        u32 	start;	//where in the rom this file starts
+        u32 	end;	//where in the rom this file ends
     };
 
     struct nitroDIRStruct {
-        unsigned int	pos;	//where in the file am i?
-        unsigned int 	namepos;	//ptr to next name to lookup in list
+        u32	pos;	//where in the file am i?
+        u32 	namepos;	//ptr to next name to lookup in list
         struct ROM_FAT  romfat;
         u16		entry_id;	//which entry this is (for files only) incremented with each new file in dir?
         u16		dir_id;		//which directory entry this is.. used ofc for dirs only

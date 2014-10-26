@@ -35,6 +35,7 @@
 #include <nds.h>
 
 #include "sprite.h"
+#include "pokemon.h"
 #include <string>
 
 #define sq(a) ((a)*(a))
@@ -51,26 +52,36 @@ extern PrintConsole Top, Bottom;
 extern ConsoleFont cfont;
 extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;
-extern unsigned int ticks;
+extern u32 ticks;
+
+extern POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
+extern std::vector<int> box_of_st_pkmn[ MAXPKMN ];
+extern std::vector<int> free_spaces;
+
+extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
+extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
+extern OAMTable *Oam, *OamTop;
+
+extern int drawBox( u16 );
+
+extern void initMapSprites( );
+extern bool movePlayerOnMap( s16, s16, s16, bool );
 
 #define MAXMAPPOS 75
 struct MapRegionPos {
-    int m_lx,
+    u8 m_lx,
         m_ly,
         m_rx,
-        m_ry,
-        m_ind;
+        m_ry;
+    u16 m_ind;
 };
 extern const MapRegionPos MapLocations[ 3 ][ MAXMAPPOS ];
 void printMapLocation( const MapRegionPos& p_m );
+extern void printMapLocation( const touchPosition& t );
 
 class move;
 extern move* AttackList[ 560 ];
-extern void shoUseAttack( int p_pkmIdx, bool p_female, bool p_shiny );
-
-namespace POKEMON {
-    bool drawInfoSub( u16* p_layer, int p_PKMN );
-}
+extern void shoUseAttack( u16 p_pkmIdx, bool p_female, bool p_shiny );
 
 enum Region {
     NONE = 0,
@@ -78,6 +89,11 @@ enum Region {
     KANTO = 2,
     JOHTO = 3
 };
+extern std::map<u16, std::string> Locations;
+extern Region acMapRegion;
+extern bool showmappointer;
+
+
 
 #define BACK_ID  0
 #define SAVE_ID  1
@@ -88,10 +104,10 @@ enum Region {
 #define OPTS_ID  6
 #define NAV_ID  7
 #define A_ID  8
-#define M_ID  9
-// 10 - used
-// 11 - used
-// 12 - used
+//  9 - unused
+// 10 - unused
+// 11 - unused
+// 12 - unused
 #define FWD_ID  13
 #define BWD_ID  14
 #define CHOICE_ID  15
@@ -108,14 +124,14 @@ struct backgroundSet {
     const unsigned short    *m_mainMenuPal;
     bool                    m_loadFromRom;
     bool                    m_allowsOverlay;
-    int                     *m_mainMenuSpritePoses;
+    u8                      *m_mainMenuSpritePoses;
 };
 extern backgroundSet BGs[ MAXBG ];
-extern int BG_ind;
+extern u8 BG_ind;
 
 void vramSetup( );
 
-void updateTime( int p_mapMode = 0 );
+void updateTime( s8 p_mapMode = 0 );
 void animateMap( u8 p_frame );
 
 void initVideoSub( );
@@ -124,46 +140,22 @@ void drawSub( );
 void animateBack( );
 void setMainSpriteVisibility( bool p_hidden );
 
-void drawItem( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const int p_posX, const int p_posY, const int p_cnt,
-               int& p_oamIndex, int& p_palcnt, int& p_nextAvailableTileIdx, bool p_subScreen, bool p_showcnt );
-void drawItemIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const int p_posX, const int p_posY,
-                   int& p_oamIndex, int& p_palcnt, int& p_nextAvailableTileIdx, bool p_subScreen = true );
-void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const int& p_pkmnNo, const int p_posX, const int p_posY,
-                   int& p_oamIndex, int& p_palcnt, int& p_nextAvailableTileIdx, bool p_subScreen );
-void drawEggIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const int p_posX, const int p_posY,
-                  int& p_oamIndex, int& p_palcnt, int& p_nextAvailableTileIdx, bool p_subScreen );
+void drawTypeIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16 & p_nextAvailableTileIdx, Type p_type, u16 p_posX, u16 p_posY, bool p_bottom );
 
-bool loadNavScreen( u16* p_layer, const char* p_name, int p_no );
-bool loadPicture( u16* p_layer, const char* p_Path, const char* p_name, int p_paletteSize = 512, int p_tileCnt = 192 * 256 );
-bool loadPictureSub( u16* p_layer, const char* p_path, const char* p_name, int p_paletteSize = 512, int p_tileCnt = 192 * 256 );
-bool loadSprite( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_tileCnt, const int p_palCnt );
-bool loadSpriteSub( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_tileCnt, const int p_palCnt );
-bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const int& p_pkmnNo, const int p_posX,
-                     const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_nextAvailableTileIdx, bool p_bottom, bool p_shiny = false, bool p_female = false, bool p_flipX = false );
-bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const int& p_pkmnNo, const int p_posX,
-                        const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_nextAvailableTileIdx, bool p_bottom, bool p_shiny = false, bool p_female = false, bool p_flipX = false );
-
-bool loadTrainerSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_posX,
-                        const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false );
-bool loadTrainerSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const int p_posX,
-                           const int p_posY, int& p_oamIndex, int& p_palCnt, int& p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false );
-
-void drawTypeIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, int& p_oamIndex, int& p_palCnt, int & p_nextAvailableTileIdx, Type p_type, int p_posX, int p_posY, bool p_bottom );
-
-int getCurrentDaytime( );
+u8 getCurrentDaytime( );
 
 extern std::string bagnames[ 8 ];
 class screenLoader {
 private:
-    int _pos;
+    s8 _pos;
 
 public:
-    screenLoader( int p_pos ) : _pos( p_pos ) { }
+    screenLoader( s8 p_pos ) : _pos( p_pos ) { }
 
-    void draw( int p_mode );
+    void draw( s8 p_mode );
     void init( );
 
     void run_bag( );
     void run_pkmn( );
-    void run_dex( int p_num = 0 );
+    void run_dex( u16 p_num = 0 );
 };

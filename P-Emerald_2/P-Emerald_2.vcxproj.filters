@@ -72,17 +72,8 @@
     <ClInclude Include="arm9\include\unistd.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\include\mapconfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\hmMoves.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\move.h">
       <Filter>Header Files\arm9</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\buffer.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="arm9\include\screenLoader.h">
       <Filter>Header Files\arm9</Filter>
@@ -102,14 +93,23 @@
     <ClInclude Include="arm9\include\pokemon.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\include\buffer.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\fs.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\hmMoves.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\mapconfig.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
     <ClInclude Include="arm9\include\script.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\arm9</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="arm9\source\ability.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
     <ClCompile Include="arm7\source\as_lib7.c">
       <Filter>Source Files\arm7</Filter>
     </ClCompile>
@@ -155,14 +155,8 @@
     <ClCompile Include="arm7\source\main.c">
       <Filter>Source Files\arm7</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\mapconfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\move.cpp">
       <Filter>Source Files\arm9</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\buffer.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\bag.cpp">
       <Filter>Source Files\arm9</Filter>
@@ -182,8 +176,17 @@
     <ClCompile Include="arm9\source\pokemon.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
+    <ClCompile Include="arm9\source\buffer.cpp">
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\fs.cpp">
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\mapconfig.cpp">
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
     <ClCompile Include="arm9\source\script.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\arm9</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

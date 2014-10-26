@@ -38,16 +38,16 @@
 #include "screenLoader.h"
 #include "print.h"
 
-extern font::Font cust_font;
-extern font::Font cust_font2;
+extern FONT::font cust_font;
+extern FONT::font cust_font2;
 extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
 extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 extern OAMTable *Oam, *OamTop;
 
-std::wstring keyboard::getText( int p_length, const char* p_msg, bool p_time ) {
+std::wstring keyboard::getText( u16 p_length, const char* p_msg, bool p_time ) {
     drawSub( );
 
-    for( int i = 0; i < 4; ++i )
+    for( u8 i = 0; i < 4; ++i )
         Oam->oamBuffer[ 31 + 2 * i ].isHidden = true;
     Oam->oamBuffer[ A_ID ].isHidden = false;
     Oam->oamBuffer[ BWD_ID ].isHidden = false;
@@ -73,7 +73,7 @@ std::wstring keyboard::getText( int p_length, const char* p_msg, bool p_time ) {
     BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
     BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
     BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-    font::putrec( 0, 0, 256, 63, true, false, 250 );
+    FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
 
     if( p_msg != 0 )
         cust_font.printString( p_msg, 8, 4, true );
@@ -82,7 +82,7 @@ std::wstring keyboard::getText( int p_length, const char* p_msg, bool p_time ) {
     std::wstring out;
     consoleSelect( &Bottom );
     touchPosition t;
-    int i = 0;
+    u8 i = 0;
     while( 1 ) {
         scanKeys( );
         touchRead( &t );
@@ -100,7 +100,7 @@ std::wstring keyboard::getText( int p_length, const char* p_msg, bool p_time ) {
             ++i;
             out += _chars[ std::pair<int, int>( t.px / 8, t.py / 8 ) ];
 
-            font::putrec( 8 * ( 13 - i / 3 ), 40, 8 * ( 13 - i / 3 + p_length + 1 ), 56, true, false, 250 );
+            FONT::putrec( u8( 8 * ( 13 - i / 3 ) ), u8( 40 ), u8( 8 * ( 13 - i / 3 + p_length + 1 ) ), (u8)56, true, false, (u8)250 );
             cust_font.printString( out.c_str( ), 8 * ( 13 - i / 3 ), 40, true );
             swiWaitForVBlank( );
         } else if( ( sqrt( sq( 248 - t.px ) + sq( 162 - t.py ) ) <= 16 ) ) {
@@ -115,14 +115,14 @@ std::wstring keyboard::getText( int p_length, const char* p_msg, bool p_time ) {
             _ind = ( _ind + 1 ) % MAXKEYBOARDS;
             undraw( );
             if( p_msg != 0 ) {
-                font::putrec( 0, 0, 256, 63, true, false, 250 );
+                FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
                 cust_font.printString( p_msg, 8, 4, true );
             }
             draw( );
             if( p_time )
                 updateTime( );
 
-            font::putrec( 8 * ( 13 - i / 3 ), 40, 8 * ( 13 - i / 3 + p_length + 1 ), 56, true, false, 250 );
+            FONT::putrec( u8( 8 * ( 13 - i / 3 ) ), u8( 40 ), u8( 8 * ( 13 - i / 3 + p_length + 1 ) ), u8( 56 ), true, false, u8( 250 ) );
             cust_font.printString( out.c_str( ), 8 * ( 13 - i / 3 ), 40, true );
         } else if( sqrt( sq( 248 - t.px ) + sq( 184 - t.py ) ) <= 16 ) {
             while( 1 ) {
@@ -146,7 +146,7 @@ std::wstring keyboard::getText( int p_length, const char* p_msg, bool p_time ) {
                     break;
             }
             out.erase( ( out.end( ) - 1 ) );
-            font::putrec( 8 * ( 13 - i / 3 ), 40, 8 * ( 13 - i / 3 + p_length + 1 ), 56, true, false, 250 );
+            FONT::putrec( u8( 8 * ( 13 - i / 3 ) ), (u8)40, u8( 8 * ( 13 - i / 3 + p_length + 1 ) ), (u8)56, true, false, (u8)250 );
             --i;
             cust_font.printString( out.c_str( ), 8 * ( 13 - i / 3 ), 40, true );
         }
@@ -161,7 +161,7 @@ void keyboard::undraw( ) {
     BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
     BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
     BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-    font::putrec( 0, 0, 256, 63, true, false, 250 );
+    FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
 }
 
 void keyboard::draw( ) {
@@ -171,8 +171,8 @@ void keyboard::draw( ) {
     switch( _ind ) {
         case 0://UPPER
         {
-            int cnt = 0;
-            int rw_cnt = 9, cl_cnt = 3;
+            u8 cnt = 0;
+            u8 rw_cnt = 9, cl_cnt = 3;
             _chars.clear( );
             for( char i = 'A'; i <= 'Z'; i++ ) {
                 if( cnt++ == 13 ) {
@@ -188,7 +188,7 @@ void keyboard::draw( ) {
             rw_cnt += 4;
             cl_cnt = 3;
             char pt[ 14 ] = "ÄÖÜ .!?()[]{}";
-            for( int i = 0; i < 13; ++i ) {
+            for( u8 i = 0; i < 13; ++i ) {
                 cust_font2.printChar( pt[ i ], cl_cnt * 8, rw_cnt * 8, true );
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt ) ] = pt[ i ];
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt + 1 ) ] = pt[ i ];
@@ -198,8 +198,8 @@ void keyboard::draw( ) {
         }
         case 1://LOWER
         {
-            int cnt = 0;
-            int rw_cnt = 9, cl_cnt = 3;
+            u8 cnt = 0;
+            u8 rw_cnt = 9, cl_cnt = 3;
             for( char i = 'a'; i <= 'z'; i++ ) {
                 if( cnt++ == 13 ) {
                     cnt = 0;
@@ -214,7 +214,7 @@ void keyboard::draw( ) {
             rw_cnt += 4;
             cl_cnt = 3;
             char pt[ 14 ] = "äöüßé §$%&/\\#";
-            for( int i = 0; i < 13; ++i ) {
+            for( u8 i = 0; i < 13; ++i ) {
                 cust_font2.printChar( pt[ i ], cl_cnt * 8, rw_cnt * 8, true );
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt ) ] = pt[ i ];
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt + 1 ) ] = pt[ i ];
@@ -224,10 +224,10 @@ void keyboard::draw( ) {
         }
         case 2://NUM
         {
-            int rw_cnt = 9, cl_cnt = 3;
+            u8 rw_cnt = 9, cl_cnt = 3;
 
             char pt[ 14 ] = "0123456789,;:";
-            for( int i = 0; i < 13; ++i ) {
+            for( u8 i = 0; i < 13; ++i ) {
                 cust_font2.printChar( pt[ i ], cl_cnt * 8, rw_cnt * 8, true );
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt ) ] = pt[ i ];
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt + 1 ) ] = pt[ i ];
@@ -235,7 +235,7 @@ void keyboard::draw( ) {
             }
             rw_cnt += 3;
             cl_cnt = 3;
-            for( int i = 3 * 49 - 10; i < 3 * 49 + 3; ++i ) {
+            for( u8 i = 3 * 49 - 10; i < 3 * 49 + 3; ++i ) {
                 cust_font2.printChar( i, cl_cnt * 8, rw_cnt * 8, true );
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt ) ] = i;
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt + 1 ) ] = i;
@@ -243,7 +243,7 @@ void keyboard::draw( ) {
             }
             rw_cnt += 4;
             cl_cnt = 3;
-            for( int i = 3 * 49 + 3; i < 3 * 49 + 16; ++i ) {
+            for( u8 i = 3 * 49 + 3; i < 3 * 49 + 16; ++i ) {
                 cust_font2.printChar( i, cl_cnt * 8, rw_cnt * 8, true );
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt ) ] = i;
                 _chars[ std::pair<int, int>( cl_cnt, rw_cnt + 1 ) ] = i;

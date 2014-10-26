@@ -52,8 +52,8 @@ std::string sav_nam = "./p_smaragd_2.sav";/*"nitro:/SAV";*/ //as nitro:/SAV does
 std::string sav_nam_2 = "./p_smaragd_2.gba.sav";/*"nitro:/SAV";*/ //as nitro:/SAV doesn't seem to work :( ...
 extern SavMod savMod;
 #define PKMN_DATALENGTH 128
-extern const short POKEMON::OTLENGTH;
-extern const short POKEMON::PKMN_NAMELENGTH;
+extern const u16 POKEMON::OTLENGTH;
+extern const u16 POKEMON::PKMN_NAMELENGTH;
 
 extern POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
 extern std::vector<int> box_of_st_pkmn[ MAXPKMN ];
@@ -62,7 +62,7 @@ extern std::vector<int> free_spaces;
 extern "C"{    extern long hexdec( unsigned const char *p_hex ); }
 
 saveGame::saveGame( void p_func( int ) ) {
-    int booltemp = true;
+    u16 booltemp = true;
     FILE* fd = fopen( &sav_nam[ 0 ], "r" );
     if( fd == 0 ) {
         m_good = false;
@@ -90,30 +90,30 @@ saveGame::saveGame( void p_func( int ) ) {
     fscanf( fd, "%i %i %i %i %s %i ", &m_acposx, &m_acposy, &m_acposz, &m_acMapIdx, m_acMapName, &m_acMoveMode );
     fscanf( fd, "%hu", &m_overWorldIdx );
 
-    int a;
-    for( int i = 0; i < 8; ++i ) {
+    u16 a;
+    for( u8 i = 0; i < 8; ++i ) {
         fscanf( fd, " %i ", &a );
-        m_bag.m_bags[ i ].assign( a, std::pair<int, int>( 0, 0 ) );
-        fread( &m_bag.m_bags[ i ][ 0 ], sizeof( std::pair<int, int> ), a, fd );
+        m_bag.m_bags[ i ].assign( a, std::pair<u16, u16>( 0, 0 ) );
+        fread( &m_bag.m_bags[ i ][ 0 ], sizeof( std::pair<u16, u16> ), a, fd );
     }
 
     fscanf( fd, " %i ", &a );
     m_PkmnTeam = std::vector<POKEMON::pokemon>( a );
-    for( int i = 0; i < a; ++i )
+    for( u16 i = 0; i < a; ++i )
         fread( &m_PkmnTeam[ i ], sizeof( POKEMON::pokemon ), 1, fd );
 
     free_spaces.clear( );
-    for( int i = 0; i < MAXSTOREDPKMN; i++ ) {
+    for( u16 i = 0; i < MAXSTOREDPKMN; i++ ) {
         //stored_pkmn[i] = pokemon(fd);
         fread( &stored_pkmn[ i ], sizeof( POKEMON::pokemon::boxPokemon ), 1, fd );
-        if( stored_pkmn[ i ].m_SPEC == 0 || stored_pkmn[ i ].m_SPEC > MAXPKMN )
+        if( stored_pkmn[ i ].m_speciesId == 0 || stored_pkmn[ i ].m_speciesId > MAXPKMN )
             free_spaces.push_back( i );
         else
-            box_of_st_pkmn[ stored_pkmn[ i ].m_SPEC ].push_back( i );
+            box_of_st_pkmn[ stored_pkmn[ i ].m_speciesId ].push_back( i );
     }
     p_func( 40 );
 
-    for( int i = 0; i < 649; i++ ) {
+    for( u16 i = 0; i < 649; i++ ) {
         fscanf( fd, " %i ", &booltemp );
         m_inDex[ i ] = bool( booltemp );
         p_func( 40 + ( 30 * ( i / 649 ) ) );
@@ -144,7 +144,7 @@ bool saveGame::save( void p_func( int ) ) {
     if( savMod == _GBA )
         return saveGBA( p_func );
 
-    int booltemp;
+    u16 booltemp;
     FILE* fd = fopen( &sav_nam[ 0 ], "w" );
     if( fd == 0 )
         return false;
@@ -167,22 +167,22 @@ bool saveGame::save( void p_func( int ) ) {
     fprintf( fd, "%i %i %i %i %s %i ", m_acposx, m_acposy, m_acposz, m_acMapIdx, m_acMapName, m_acMoveMode );
     fprintf( fd, "%hu", m_overWorldIdx );
 
-    for( int i = 0; i < 8; ++i ) {
+    for( u8 i = 0; i < 8; ++i ) {
         fprintf( fd, " %i ", m_bag.m_bags[ i ].size( ) );
-        fwrite( m_bag.m_bags[ i ].data( ), sizeof( std::pair<int, int> ), m_bag.m_bags[ i ].size( ), fd );
+        fwrite( m_bag.m_bags[ i ].data( ), sizeof( std::pair<u16, u16> ), m_bag.m_bags[ i ].size( ), fd );
     }
 
     fprintf( fd, " %i ", m_PkmnTeam.size( ) );
     for( size_t i = 0; i < m_PkmnTeam.size( ); ++i )
         //I->save(fd);
         fwrite( &( m_PkmnTeam[ i ] ), 1, sizeof( POKEMON::pokemon ), fd );
-    for( int i = 0; i < MAXSTOREDPKMN; i++ ) {
+    for( u16 i = 0; i < MAXSTOREDPKMN; i++ ) {
         //stored_pkmn[i].save(fd);
         fwrite( &( stored_pkmn[ i ] ), sizeof( POKEMON::pokemon::boxPokemon ), 1, fd );
     }
 
     p_func( 40 );
-    for( int i = 0; i < 649; i++ ) {
+    for( u16 i = 0; i < 649; i++ ) {
         booltemp = ( m_inDex[ i ] ? 1 : 0 );
         fprintf( fd, " %i", booltemp );
     }

@@ -8,14 +8,16 @@
 extern int bg3sub;
 extern PrintConsole Bottom;
 
-extern void updateTime( int p_mapMode );
+extern void updateTime( s8 p_mapMode );
 
 bool operator==( touchPosition p_r, touchPosition p_l );
 
 #define MAXLINES 6
-extern int TEXTSPEED;
+extern u8 TEXTSPEED;
 
-class item;
+namespace ITEMS {
+    class item;
+}
 class messageBox {
 public:
     enum sprite_type {
@@ -24,12 +26,12 @@ public:
         sprite_trainer = 2
     };
 
-    messageBox( item p_item, const int p_count );
+    messageBox( ITEMS::item p_item, const u16 p_count );
 
     messageBox( const char* p_text, bool p_time = true, bool p_remsprites = true );
     messageBox( const wchar_t* p_text, bool p_time = true, bool p_remsprites = true );
-    messageBox( const char* p_text, const char* p_name, bool p_time = true, bool p_a = true, bool p_remsprites = true, sprite_type p_sprt = no_sprite, int p_sprind = 0 );
-    messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_time = true, bool p_a = true, bool p_remsprites = true, sprite_type p_sprt = no_sprite, int p_sprind = 0 );
+    messageBox( const char* p_text, const char* p_name, bool p_time = true, bool p_a = true, bool p_remsprites = true, sprite_type p_sprt = no_sprite, u16 p_sprind = 0 );
+    messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_time = true, bool p_a = true, bool p_remsprites = true, sprite_type p_sprt = no_sprite, u16 p_sprind = 0 );
     ~messageBox( ) { }
     void put( const char* p_text, bool p_a = true, bool p_time = true );
     void clear( );
@@ -73,7 +75,7 @@ public:
 private:
     const char** _choices;
     bool _big;
-    int _num;
+    u8 _num;
     bool _name;
 };
 

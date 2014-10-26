@@ -1,34 +1,34 @@
-/*
-    Pok�mon Emerald 2 Version
-    ------------------------------
+﻿/*
+Pokémon Emerald 2 Version
+------------------------------
 
-    file        : map2d.h
-    author      : Philip Wellnitz (RedArceus)
-    description : Header file. See corresponding source file for details.
+file        : map2d.h
+author      : Philip Wellnitz (RedArceus)
+description : Header file. See corresponding source file for details.
 
-    Copyright (C) 2012 - 2014
-    Philip Wellnitz (RedArceus)
+Copyright (C) 2012 - 2014
+Philip Wellnitz (RedArceus)
 
-    This software is provided 'as-is', without any express or implied
-    warranty.  In no event will the authors be held liable for any
-    damages arising from the use of this software.
+This software is provided 'as-is', without any express or implied
+warranty.  In no event will the authors be held liable for any
+damages arising from the use of this software.
 
-    Permission is granted to anyone to use this software for any
-    purpose, including commercial applications, and to alter it and
-    redistribute it freely, subject to the following restrictions:
+Permission is granted to anyone to use this software for any
+purpose, including commercial applications, and to alter it and
+redistribute it freely, subject to the following restrictions:
 
 
-    1.	The origin of this software must not be misrepresented; you
-    must not claim that you wrote the original software. If you use
-    this software in a product, an acknowledgment in the product
-    is required.
+1.	The origin of this software must not be misrepresented; you
+must not claim that you wrote the original software. If you use
+this software in a product, an acknowledgment in the product
+is required.
 
-    2.	Altered source versions must be plainly marked as such, and
-    must not be misrepresented as being the original software.
+2.	Altered source versions must be plainly marked as such, and
+must not be misrepresented as being the original software.
 
-    3.	This notice may not be removed or altered from any source
-    distribution.
-    */
+3.	This notice may not be removed or altered from any source
+distribution.
+*/
 
 #pragma once
 #include <nds.h>
@@ -110,14 +110,14 @@ namespace map2d {
         u32         m_sizex, m_sizey;
 
         Palette     m_pals[ 16 ];
-        std::vector< std::vector < MapBlockAtom > > 
+        std::vector< std::vector < MapBlockAtom > >
             m_blocks;
         TileSet     m_tileset;
         BlockSet    m_blockSets;
-        std::vector< Anbindung > 
+        std::vector< Anbindung >
             m_anbindungen;
         u16         m_rand[ 2 ][ 2 ];
-        std::vector< Animation > 
+        std::vector< Animation >
             m_animations;
 
         //WildePKMN, Events...
@@ -125,9 +125,9 @@ namespace map2d {
 
         Map( const char* p_path, const char* p_name );
 
-        void            draw( int p_bx, int p_by, bool p_init = false );
+        void            draw( s16 p_bx, s16 p_by, bool p_init = false );
         void            movePlayer( int p_direction );
     private:
-        void            fill( u16* mapMemory[ 4 ], int p_xmin, int p_x, int p_xmax, int p_ymin, int p_y, int p_ymax, int p_c );
+        void            fill( u16* mapMemory[ 4 ], s16 p_xmin, s16 p_x, s16 p_xmax, s16 p_ymin, s16 p_y, s16 p_ymax, s16 p_c );
     };
 }

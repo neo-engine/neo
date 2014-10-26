@@ -65,17 +65,16 @@ extern int bg2;
 extern saveGame SAV;
 
 extern PrintConsole Top, Bottom;
-extern font::Font cust_font;
-extern font::Font cust_font2;
+extern FONT::font cust_font;
+extern FONT::font cust_font2;
 
-extern item ItemList[ 700 ];
-extern ability abilities[ 164 ];
+extern ITEMS::item ItemList[ 700 ];
 
 extern move* AttackList[ 560 ];
 extern std::string NatureList[ 25 ];
 extern std::string TypeList[ 19 ];
 extern std::string PersonalityList[ 30 ];
-extern std::map<int, std::string> Locations;
+extern std::map<u16, std::string> Locations;
 
 enum Type;//defined in "berry.h"
 namespace POKEMON {
@@ -163,19 +162,19 @@ namespace POKEMON {
 #define UNKNOWN RGB(0,42,42)
         struct pokemonData {
             Type            m_types[ 2 ];
-            short           m_bases[ 6 ];
-            short           m_catchrate;
-            unsigned short  m_items[ 4 ];
+            u16             m_bases[ 6 ];
+            u16             m_catchrate;
+            u16             m_items[ 4 ];
             pkmnGenderType  m_gender;
             pkmnEggType     m_eggT[ 2 ];
-            short           m_eggcyc;
-            short           m_baseFriend;
-            short           m_EVYield[ 6 ];
-            short           m_EXPYield;
-            short           m_formecnt;
-            short           m_size;
-            short           m_weight;
-            short           m_expType;
+            u16             m_eggcyc;
+            u16             m_baseFriend;
+            u16             m_EVYield[ 6 ];
+            u16             m_EXPYield;
+            u16             m_formecnt;
+            u16             m_size;
+            u16             m_weight;
+            u16             m_expType;
             u16             m_abilities[ 4 ];
 
             union {
@@ -201,50 +200,50 @@ namespace POKEMON {
         };
 
 
-        Type            getType( int p_pkmnId, int p_type );
-        short           getBase( int p_pkmnId, int p_base );
-        short           getCatchRate( int p_pkmnId );
-        const char*     getDisplayName( int p_pkmnId );
-        const wchar_t*  getWDisplayName( int p_pkmnId );
-        void            getWDisplayName( int p_pkmnId, wchar_t* p_name );
-        void            getHoldItems( int p_pkmnId, unsigned short* p_items );
-        pkmnGenderType  getGenderType( int p_pkmnId );
-        const char*     getSpecies( int p_pkmnId );
+        Type            getType( u16 p_pkmnId, u16 p_type );
+        u16             getBase( u16 p_pkmnId, u16 p_base );
+        u16             getCatchRate( u16 p_pkmnId );
+        const char*     getDisplayName( u16 p_pkmnId );
+        const wchar_t*  getWDisplayName( u16 p_pkmnId );
+        void            getWDisplayName( u16 p_pkmnId, wchar_t* p_name );
+        void            getHoldItems( u16 p_pkmnId, u16* p_items );
+        pkmnGenderType  getGenderType( u16 p_pkmnId );
+        const char*     getSpecies( u16 p_pkmnId );
         u16             getColor( Type p_type );
-        const char*     getDexEntry( int p_pkmnId );
-        short           getForme( int p_pkmnId, int p_formeId, const char* p_formeName );
-        void            getAll( int p_pkmnId, pokemonData& out );
+        const char*     getDexEntry( u16 p_pkmnId );
+        u16             getForme( u16 p_pkmnId, u16 p_formeId, const char* p_formeName );
+        void            getAll( u16 p_pkmnId, pokemonData& out );
 
-        void            getLearnMoves( int p_pkmnId, int p_fromLevel, int p_toLevel, int p_mode, int p_num, int* p_res );
-        bool            canLearn( int p_pkmnId, int p_moveId, int p_mode );
+        void            getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num, u16* p_res );
+        bool            canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode );
     }
 
     extern double NatMod[ 25 ][ 5 ];
-    extern char Pkmn_SafariCatchRate[ 669 ];
+    extern u8 Pkmn_SafariCatchRate[ 669 ];
 
-    extern int EXP[ 100 ][ 13 ];
+    extern u32 EXP[ 100 ][ 13 ];
 
     bool operator==( touchPosition R, touchPosition L );
 
-    extern unsigned int LastPID;
-    extern int page;
+    extern u32 LastPID;
+    extern u16 page;
 
-    const short OTLENGTH = 8;
-    const short PKMN_NAMELENGTH = 11;
+    const u16 OTLENGTH = 8;
+    const u16 PKMN_NAMELENGTH = 11;
     struct pokemon {
     public:
         struct boxPokemon {
-            unsigned int            m_PID : 32;
-            unsigned short int      m_b1 : 16;
-            unsigned short int      m_checksum : 16;
+            u32            m_pid : 32;
+            u16      m_b1 : 16;
+            u16      m_checksum : 16;
             //BLOCKA{
-            unsigned short int      m_SPEC : 16;
-            unsigned short int      m_Item : 16;
-            unsigned short int      m_ID : 16;
-            unsigned short int      m_SID : 16;
-            unsigned int            m_exp : 32;
-            unsigned char           m_steps : 8; //StepstoHatch/256 // Happiness 
-            unsigned char           m_ability : 8;
+            u16      m_speciesId : 16;
+            u16      m_holdItem : 16;
+            u16      m_oTId : 16;
+            u16      m_oTSid : 16;
+            u32            m_experienceGained : 32;
+            u8           m_steps : 8; //StepstoHatch/256 // Happiness 
+            u8           m_ability : 8;
             union {
                 struct {
                     u8 m_circle : 1;
@@ -258,14 +257,14 @@ namespace POKEMON {
                 u8 m_markings;
             };
             u8                      m_origLang;
-            unsigned char           m_EV[ 6 ];	//HP,Attack,Defense,SAttack,SDefense,Speed
-            unsigned char           m_ConStats[ 6 ]; //Cool, Beauty, Cute, Smart, Tough, Sheen
-            unsigned char           m_ribbons1[ 4 ];
+            u8           m_effortValues[ 6 ];	//HP,Attack,Defense,SAttack,SDefense,Speed
+            u8           m_contestStats[ 6 ]; //Cool, Beauty, Cute, Smart, Tough, Sheen
+            u8           m_ribbons1[ 4 ];
             //}
 
             //BLOCKB{
-            unsigned short          m_Attack[ 4 ];
-            unsigned char           m_AcPP[ 4 ]; //
+            u16          m_moves[ 4 ];
+            u8           m_acPP[ 4 ]; //
             union {
                 struct {
                     u8 m_Up1 : 2;
@@ -273,49 +272,49 @@ namespace POKEMON {
                     u8 m_Up3 : 2;
                     u8 m_Up4 : 2;
                 }m_ppup;
-                u8 m_PPUps;
+                u8 m_pPUps;
             };
 
             union {
                 struct {
-                    unsigned char m_HP : 5;
-                    unsigned char m_Attack : 5;
-                    unsigned char m_Defense : 5;
-                    unsigned char m_Speed : 5;
-                    unsigned char m_SAttack : 5;
-                    unsigned char m_SDefense : 5;
+                    u8 m_hp : 5;
+                    u8 m_attack : 5;
+                    u8 m_defense : 5;
+                    u8 m_speed : 5;
+                    u8 m_sAttack : 5;
+                    u8 m_sDefense : 5;
                     bool m_isNicked : 1;
                     bool m_isEgg : 1;
-                } m_IV; //HP,Attack,Defense,Speed,SAttack,SDefense
-                u32 m_IVint;
+                } m_individualValues; //HP,Attack,Defense,Speed,SAttack,SDefense
+                u32 m_iVint;
             };
-            unsigned char           m_ribbons0[ 4 ];
+            u8                      m_ribbons0[ 4 ];
             bool                    m_fateful : 1;
             bool                    m_isFemale : 1;
             bool                    m_isGenderless : 1;
-            unsigned char           m_altForme : 5;
+            u8                      m_altForme : 5;
             bool                    m_cloned : 1;
-            unsigned short int : 15;
-            unsigned short          m_hatchPlace : 16; //PT-like
-            unsigned short          m_gotPlace : 16; //PT-like
+u16: 15;
+            u16                     m_hatchPlace : 16; //PT-like
+            u16                     m_gotPlace : 16; //PT-like
             //}
 
             //BLOCKC{
-            wchar_t                 m_Name[ PKMN_NAMELENGTH ];
-            unsigned short          m_hometown : 16;
-            unsigned char           m_ribbons2[ 4 ];
-            unsigned int : 32;
+            wchar_t                 m_name[ PKMN_NAMELENGTH ];
+            u16                     m_hometown : 16;
+            u8                      m_ribbons2[ 4 ];
+u32: 32;
             //}
 
             //BLOCKD{
-            wchar_t                 m_OT[ OTLENGTH ];
-            unsigned char           m_gotDate[ 3 ];//(EGG)
-            unsigned char           m_hatchDate[ 3 ]; //gotDate for nonEgg
-            unsigned int : 32;
-            unsigned char           m_PKRUS : 8;//
-            unsigned char           m_Ball : 8;//
-            unsigned short int      m_gotLevel : 7;
-            bool                    m_OTisFemale : 1;
+            wchar_t                 m_oT[ OTLENGTH ];
+            u8                      m_gotDate[ 3 ];//(EGG)
+            u8                      m_hatchDate[ 3 ]; //gotDate for nonEgg
+u32: 32;
+            u8                      m_pokerus : 8;//
+            u8                      m_ball : 8;//
+            u16      m_gotLevel : 7;
+            bool                    m_oTisFemale : 1;
             enum encounter : char {
                 EGG = 0x0,
                 GRASS = 0x2,
@@ -325,33 +324,33 @@ namespace POKEMON {
                 BUILDING = 0x9,
                 SAFZONE = 0xA,
                 STARTER = 0xC
-            }m_encounter: 8;
-            unsigned char m_HGSSBall;
-            unsigned char : 8;
+            } m_encounter: 8;
+            u8           m_HGSSBall;
+u8: 8;
             //}
 
-            pkmnNatures getNature( ) {
-                return (pkmnNatures)( m_PID % 25 );
+            pkmnNatures             getNature( ) {
+                return (pkmnNatures)( m_pid % 25 );
             }
-            int getAbility( ) {
+            u16                     getAbility( ) {
                 return m_ability;
             }
-            bool isShiny( );
-            bool isCloned( );
-            int gender( );
+            bool                    isShiny( );
+            bool                    isCloned( );
+            s8                      gender( );
 
-            unsigned inline char IVget( int p_i ) {
+            unsigned inline char    IVget( u8 p_i ) {
                 switch( p_i ) {
-                    case 0: return m_IV.m_HP;
-                    case 1: return m_IV.m_Attack;
-                    case 2: return m_IV.m_Defense;
-                    case 3: return m_IV.m_Speed;
-                    case 4: return m_IV.m_SAttack;
-                    case 5: return m_IV.m_SDefense;
+                    case 0: return m_individualValues.m_hp;
+                    case 1: return m_individualValues.m_attack;
+                    case 2: return m_individualValues.m_defense;
+                    case 3: return m_individualValues.m_speed;
+                    case 4: return m_individualValues.m_sAttack;
+                    case 5: return m_individualValues.m_sDefense;
                     default: return 0;
                 }
             }
-            u8 inline PPupget( int p_i ) {
+            u8 inline               PPupget( u8 p_i ) {
                 switch( p_i ) {
                     case 0: return m_ppup.m_Up1;
                     case 1: return m_ppup.m_Up2;
@@ -360,10 +359,10 @@ namespace POKEMON {
                     default: return 0;
                 }
             }
-            int getPersonality( ) {
-                int counter = 1, i = m_PID % 6;
+            u8                      getPersonality( ) {
+                u8 counter = 1, i = m_pid % 6;
 
-                short max = i, maxval = IVget( i );
+                u8 max = i, maxval = IVget( i );
                 for( ; counter < 6; ++counter ) {
                     i = ( i + 1 ) % 6;
                     if( IVget( i ) > maxval ) {
@@ -374,7 +373,7 @@ namespace POKEMON {
 
                 return ( max * 5 ) + ( maxval % 5 );
             }
-            std::string getTasteStr( ) {
+            std::string             getTasteStr( ) {
                 if( NatMod[ getNature( ) ][ 0 ] == 1.2 )
                     return "scharf";
                 if( NatMod[ getNature( ) ][ 1 ] == 1.2 )
@@ -388,34 +387,34 @@ namespace POKEMON {
                 else
                     return "all";
             }
-            int getItem( ) {
-                return m_Item;
+            u16                     getItem( ) {
+                return m_holdItem;
             }
-            Type getHPType( ) {
+            Type                    getHPType( ) {
                 int a = ( ( IVget( 0 ) & 1 ) + 2 * ( IVget( 1 ) & 1 ) + 4 * ( IVget( 2 ) & 1 ) + 8 * ( IVget( 3 ) & 1 ) + 16 * ( IVget( 4 ) & 1 ) + 32 * ( IVget( 5 ) & 1 ) * 15 ) / 63;
                 return a < 9 ? (Type)a : Type( a + 1 );
             }
-            int getHPPower( ) {
+            u8                      getHPPower( ) {
                 return 30 + ( ( ( ( IVget( 0 ) >> 1 ) & 1 ) + 2 * ( ( IVget( 1 ) >> 1 ) & 1 ) + 4 * ( ( IVget( 2 ) >> 1 ) & 1 ) + 8 * ( ( IVget( 3 ) >> 1 ) & 1 ) + 16 * ( ( IVget( 4 ) >> 1 ) & 1 ) + 32 * ( ( IVget( 5 ) >> 1 ) & 1 ) * 40 ) / 63 );
             }
 
             boxPokemon( ) { }
-            boxPokemon( u16* p_attacks,
-                      int p_species,
-                      const wchar_t* p_name,
-                      short p_level,
-                      unsigned short p_id,
-                      unsigned short p_sid,
-                      const wchar_t* p_ot,
-                      bool p_oTFemale,
-                      bool p_cloned,
-                      bool p_shiny,
-                      bool p_hiddenAbility = false,
-                      bool p_fatefulEncounter = false,
-                      bool p_isEgg = false,
-                      short p_gotPlace = 0,
-                      char p_ball = 0,
-                      char p_pokerus = 0 );
+            boxPokemon( u16*            p_moves,
+                        u16             p_pkmnId,
+                        const wchar_t*  p_name,
+                        u16             p_level,
+                        u16             p_id,
+                        u16             p_sid,
+                        const wchar_t*  p_ot,
+                        bool            p_oTFemale,
+                        bool            p_cloned,
+                        bool            p_shiny,
+                        bool            p_hiddenAbility = false,
+                        bool            p_fatefulEncounter = false,
+                        bool            p_isEgg = false,
+                        u16             p_gotPlace = 0,
+                        u8              p_ball = 0,
+                        u8              p_pokerus = 0 );
 
             ~boxPokemon( ) { }
 
@@ -423,57 +422,59 @@ namespace POKEMON {
                 return 0;
             }
 
-        }m_boxdata;
+        } m_boxdata;
 
         union {
             struct {
-                unsigned char m_Asleep : 3;
-                bool m_Poisoned : 1;
-                bool m_Burned : 1;
-                bool m_Frozen : 1;
-                bool m_Paralyzed : 1;
-                bool m_Toxic : 1;
+                u8   m_Asleep : 3;
+                bool            m_Poisoned : 1;
+                bool            m_Burned : 1;
+                bool            m_Frozen : 1;
+                bool            m_Paralyzed : 1;
+                bool            m_Toxic : 1;
             } m_status;
-            u32 m_statusint;
+            u32                 m_statusint;
         };
-        unsigned char : 8;
-        unsigned char : 8;
-        unsigned char : 8;
-        unsigned char m_Level : 8;
-        unsigned char : 8;
+u8: 8;
+u8: 8;
+u8: 8;
+        u8 m_Level : 8;
+u8: 8;
         struct stats {
-            unsigned short m_acHP : 16;	//Aktuelle HP
-            unsigned short m_maxHP : 16;
-            unsigned short m_Atk : 16;
-            unsigned short m_Def : 16;
-            unsigned short m_Spd : 16;
-            unsigned short m_SAtk : 16;
-            unsigned short m_SDef : 16;
+            u16 m_acHP : 16;	//Aktuelle HP
+            u16 m_maxHP : 16;
+            u16 m_Atk : 16;
+            u16 m_Def : 16;
+            u16 m_Spd : 16;
+            u16 m_SAtk : 16;
+            u16 m_SDef : 16;
         }m_stats;
 
         pokemon( ) { }
-        pokemon( u16* p_moves,
-              int p_species,
-              const wchar_t* p_name,
-              short p_level,
-              unsigned short p_id,
-              unsigned short p_sid,
-              const wchar_t* p_ot,
-              bool p_oTFemale,
-              bool p_cloned,
-              bool p_shiny,
-              bool p_hiddenAbility = false,
-              bool p_fatefulEncounter = false,
-              bool p_isEgg = false,
-              short p_gotPlace = 0,
-              char p_ball = 0,
-              char p_pokerus = 0 );
+        pokemon( u16*           p_moves,
+                 u16            p_species,
+                 const wchar_t* p_name,
+                 u16            p_level,
+                 u16            p_id,
+                 u16            p_sid,
+                 const wchar_t* p_ot,
+                 bool           p_oTFemale,
+                 bool           p_cloned,
+                 bool           p_shiny,
+                 bool           p_hiddenAbility = false,
+                 bool           p_fatefulEncounter = false,
+                 bool           p_isEgg = false,
+                 u16            p_gotPlace = 0,
+                 u8             p_ball = 0,
+                 u8             p_pokerus = 0 );
         ~pokemon( ) { }
 
-        void evolve( int p_suppliedItem = 0, int p_Trigger = 1 );
-        bool canEvolve( int p_suppliedItem = 0, int p_Trigger = 1 );
+        void            evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
+        bool            canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
 
-        int draw( );
-        void drawPage( int p_Page, PrintConsole* p_Top, PrintConsole* p_Bottom, bool p_newpok );
+        s8              draw( );
+        void            drawPage( u8 p_Page, PrintConsole* p_Top, PrintConsole* p_Bottom, bool p_newpok );
+
+        bool      operator==( const pokemon& p_other ) const;
     };
 }

@@ -38,15 +38,15 @@
 #include "print.h"
 #include "messageBox.h"
 
-namespace font {
-    void putrec( int p_x1, int p_y1, int p_x2, int p_y2, bool p_bottom, bool p_striped, int p_color ) {
-        for( int x = p_x1; x <= p_x2; ++x ) for( int y = p_y1; y < p_y2; ++y )
+namespace FONT {
+    void putrec( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
+        for( u16 x = p_x1; x <= p_x2; ++x ) for( u16 y = p_y1; y < p_y2; ++y )
             if( p_bottom )
-                ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
+                ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * (u16)SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
             else
-                ( (color *)BG_BMP_RAM( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
+                ( (color *)BG_BMP_RAM( 1 ) )[ ( x + y * (u16)SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
     }
-    Font::Font( u8 *p_data, u8 *p_widths, void( *p_shiftchar )( u16& val ) ) {
+    font::font( u8 *p_data, u8 *p_widths, void( *p_shiftchar )( u16& val ) ) {
         _data = p_data;
         _widths = p_widths;
         _color[ 0 ] = _color[ 1 ] = _color[ 2 ]
@@ -54,10 +54,10 @@ namespace font {
         _shiftchar = p_shiftchar;
     }
 
-    Font::~Font( ) { }
+    font::~font( ) { }
 
 
-    void Font::printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom ) {
         _shiftchar( p_ch );
 
         s16 putX, putY;
@@ -69,17 +69,17 @@ namespace font {
                 if( putX >= 0 && putX < SCREEN_WIDTH && putY >= 0 && putY < SCREEN_HEIGHT ) {
                     if( !p_bottom ) {
                         topScreenPlot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
-                                         (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                                       (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     } else {
                         btmScreenPlot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
-                                         (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                                       (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     }
                 }
             }
         }
     }
 
-    void Font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -99,12 +99,62 @@ namespace font {
             current_char++;
         }
     }
-    void Font::printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+
+    void drawContinue( font p_font, u8 p_x, u8 p_y ) {
+        p_font.printChar( 172, p_x, p_y, true );
+    }
+    void hideContinue( u8 p_x, u8 p_y ) {
+        putrec( p_x, p_y, p_x + 10, p_y + 10, true, false, (u8)250 );
+    }
+
+    void font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
         while( p_string[ current_char ] ) {
-            if( p_string[ current_char ] == '\n' ) {
+            if( p_string[ current_char ] == L'\n' ) {
+                putY += FONT_HEIGHT;
+                putX = p_x;
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == L'`' ) {
+                u8 c = 0;
+                bool on = false;
+                while( 1 ) {
+                    scanKeys( );
+                    swiWaitForVBlank( );
+                    if( ++c == 45 ) {
+                        c = 0;
+                        if( on )
+                            hideContinue( 246, 54 );
+                        else
+                            drawContinue( *this, 246, 54 );
+                    }
+                    updateTime( 0 );
+                    if( keysUp( ) & KEY_A )
+                        break;
+                    auto t = touchReadXY( );
+                    if( t.px == 0 && t.py == 0 )
+                        break;
+                }
+                continue;
+            }
+            printChar( p_string[ current_char ], putX, putY, p_bottom );
+
+            u16 c = (u16)p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ];
+
+            current_char++;
+        }
+    }
+    void font::printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+        u32 current_char = 0;
+        s16 putX = p_x, putY = p_y;
+
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == L'\n' ) {
                 putY += FONT_HEIGHT;
                 putX = p_x;
                 current_char++;
@@ -119,7 +169,7 @@ namespace font {
             current_char++;
         }
     }
-    void Font::printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -136,12 +186,12 @@ namespace font {
             _shiftchar( c );
             putX += _widths[ c ];
 
-            for( int i = 0; i < 80 / TEXTSPEED; ++i )
+            for( u8 i = 0; i < 80 / TEXTSPEED; ++i )
                 swiWaitForVBlank( );
             current_char++;
         }
     }
-    void Font::printStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -158,38 +208,38 @@ namespace font {
             _shiftchar( c );
             putX += _widths[ c ];
 
-            for( int i = 0; i < 80 / TEXTSPEED; ++i )
+            for( u8 i = 0; i < 80 / TEXTSPEED; ++i )
                 swiWaitForVBlank( );
             current_char++;
         }
     }
 
-    void Font::printStringCenter( const char *p_string, bool p_bottom ) {
+    void font::printStringCenter( const char *p_string, bool p_bottom ) {
         s16 x = SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2;
         s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
 
         printString( p_string, x, y, p_bottom );
     }
-    void Font::printStringCenterD( const char *p_string, bool p_bottom ) {
+    void font::printStringCenterD( const char *p_string, bool p_bottom ) {
         s16 x = ( SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2 );
         s16 y = ( SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2 );
 
         printStringD( p_string, x, y, p_bottom );
     }
-    void Font::printStringCenter( const wchar_t *p_string, bool p_bottom ) {
+    void font::printStringCenter( const wchar_t *p_string, bool p_bottom ) {
         s16 x = SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2;
         s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
 
         printString( p_string, x, y, p_bottom );
     }
-    void Font::printStringCenterD( const wchar_t *p_string, bool p_bottom ) {
+    void font::printStringCenterD( const wchar_t *p_string, bool p_bottom ) {
         s16 x = ( SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2 );
         s16 y = ( SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2 );
 
         printStringD( p_string, x, y, p_bottom );
     }
 
-    void Font::printNumber( s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printNumber( s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
         char numstring[ 10 ] = "";
         u32 number = p_num, quotient = 1, remainder = 0;
         char remainder_str[ 3 ] = "";
@@ -222,7 +272,7 @@ namespace font {
     }
 
 
-    u32 Font::stringWidth( const char *p_string ) const {
+    u32 font::stringWidth( const char *p_string ) const {
         u32 current_char = 0;
         u32 width = 0;
 
@@ -236,7 +286,7 @@ namespace font {
 
         return width - 1;
     }
-    u32 Font::stringWidth( const wchar_t *p_string ) const {
+    u32 font::stringWidth( const wchar_t *p_string ) const {
         u32 current_char = 0;
         u32 width = 0;
 

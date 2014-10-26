@@ -167,88 +167,61 @@ inline void setSpritePriority( SpriteEntry* p_spriteEntry, ObjPriority p_priorit
     p_spriteEntry->priority = p_priority;
 }
 
+u16 loadSprite( OAMTable   *p_oam,
+                SpriteInfo *p_spriteInfo,
+                const u8    p_oamIdx,
+                const u8    p_palIdx,
+                const u16   p_tileIdx,
+                const u16   p_posX,
+                const u16   p_posY,
+                const u8    p_width,
+                const u8    p_height,
+                const unsigned short *p_spritePal,
+                const unsigned int   *p_spriteData,
+                const u32   p_spriteDataLen,
+                bool        p_flipX,
+                bool        p_flipY,
+                bool        p_hidden,
+                ObjPriority p_priority,
+                bool        p_subScreen ) {
 
-//deprecated
-void initTypes( OAMTable * p_oam, SpriteInfo *p_spriteInfo, Type p_T1, Type p_T2 ) {
+    SpriteInfo * spriteInfo = &p_spriteInfo[ p_oamIdx ];
+    SpriteEntry * spriteEntry = &p_oam->oamBuffer[ p_oamIdx ];
 
-    static const int BYTES_PER_16_COLOR_TILE = 32;
-    static const int COLORS_PER_PALETTE = 16;
-    static const int BOUNDARY_VALUE = 32; /* This is the default boundary value
-                                          * (can be set in REG_DISPCNT) */
-    static const int OFFSET_MULTIPLIER = BOUNDARY_VALUE /
-        sizeof( SPRITE_GFX_SUB[ 0 ] );
+    spriteInfo->m_oamId = p_oamIdx;
+    spriteInfo->m_width = p_width;
+    spriteInfo->m_height = p_height;
+    spriteInfo->m_angle = 0;
+    spriteInfo->m_entry = spriteEntry;
 
-    /* Keep track of the available tiles */
-    int nextAvailableTileIdx = 0;
+    spriteEntry->palette = p_palIdx;
+    spriteEntry->gfxIndex = p_tileIdx;
+    spriteEntry->x = p_posX;
+    spriteEntry->y = p_posY;
+    spriteEntry->vFlip = p_flipX;
+    spriteEntry->hFlip = p_flipY;
+    spriteEntry->isHidden = p_hidden;
+    spriteEntry->priority = p_priority;
 
-    static const int TYPE_1_ID = 0;
-    SpriteInfo * type1Info = &p_spriteInfo[ TYPE_1_ID ];
-    SpriteEntry * type1 = &p_oam->oamBuffer[ TYPE_1_ID ];
-    type1Info->oamId = TYPE_1_ID;
-    type1Info->width = 32;
-    type1Info->height = 16;
-    type1Info->angle = 0;
-    type1Info->entry = type1;
-    type1->y = 5;
-    type1->isRotateScale = false;
-    type1->isHidden = false;
-    type1->blendMode = OBJMODE_NORMAL;
-    type1->isMosaic = false;
-    type1->colorMode = OBJCOLOR_16;
-    type1->shape = OBJSHAPE_WIDE;
-    type1->x = SCREEN_WIDTH - 5 - type1Info->width - ( p_T1 != p_T2 ? ( 2 + type1Info->width ) : 0 );
-    type1->size = OBJSIZE_32;
-    type1->gfxIndex = nextAvailableTileIdx;
-    nextAvailableTileIdx += KampfTilesLen / BYTES_PER_16_COLOR_TILE;
-    type1->priority = OBJPRIORITY_0;
-    type1->palette = type1Info->oamId;
+    spriteEntry->isRotateScale = false;
+    spriteEntry->isMosaic = false;
+    spriteEntry->blendMode = OBJMODE_NORMAL;
+    spriteEntry->colorMode = OBJCOLOR_16;
 
-    static const int TYPE_2_ID = 1;
-    SpriteInfo * type2Info = &p_spriteInfo[ TYPE_2_ID ];
-    SpriteEntry * type2 = &p_oam->oamBuffer[ TYPE_2_ID ];
+    spriteEntry->shape = ( ( p_width == p_height ) ? OBJSHAPE_SQUARE : ( ( p_width > p_height ) ? OBJSHAPE_WIDE : OBJSHAPE_TALL ) );
 
-    if( p_T1 != p_T2 ) {
-        type2Info->oamId = TYPE_2_ID;
-        type2Info->width = 32;
-        type2Info->height = 16;
-        type2Info->angle = 0;
-        type2Info->entry = type2;
-        type2->y = 5;
-        type2->isRotateScale = false;
-        type2->isHidden = false;
-        type2->blendMode = OBJMODE_NORMAL;
-        type2->isMosaic = false;
-        type2->colorMode = OBJCOLOR_16;
-        type2->shape = OBJSHAPE_WIDE;
-        type2->x = SCREEN_WIDTH - 5 - type2Info->width;
-        type2->size = OBJSIZE_32;
-        type2->gfxIndex = nextAvailableTileIdx;
-        nextAvailableTileIdx += KampfTilesLen / BYTES_PER_16_COLOR_TILE;
-        type2->priority = OBJPRIORITY_0;
-        type2->palette = type2Info->oamId;
-    };
+    u8 maxSize = std::max( p_width, p_height );
+    spriteEntry->size = ( ( maxSize == 64 ) ? OBJSIZE_64 :
+                          ( ( maxSize == 32 ) ? OBJSIZE_32 :
+                          ( ( maxSize == 16 ) ? OBJSIZE_16 : OBJSIZE_8 ) ) );
 
-    /*************************************************************************/
-
-    /* Copy over the sprite palettes */
-
-    dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                      TypePals[ p_T1 ],
-                      &SPRITE_PALETTE_SUB[ type1Info->oamId * COLORS_PER_PALETTE ],
-                      COLORS_PER_PALETTE * 2 );
-    if( p_T1 != p_T2 )
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-        TypePals[ p_T2 ],
-        &SPRITE_PALETTE_SUB[ type2Info->oamId * COLORS_PER_PALETTE ],
-        COLORS_PER_PALETTE * 2 );
-    /* Copy the sprite graphics to sprite graphics memory */
-    dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                      TypeTiles[ p_T1 ],
-                      &SPRITE_GFX_SUB[ type1->gfxIndex * OFFSET_MULTIPLIER ],
-                      KampfTilesLen );
-    if( p_T1 != p_T2 )
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-        TypeTiles[ p_T2 ],
-        &SPRITE_GFX_SUB[ type2->gfxIndex * OFFSET_MULTIPLIER ],
-        KampfTilesLen );
+    if( !p_subScreen ) {
+        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE[ p_palIdx * COLORS_PER_PALETTE ], 32 );
+        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER ], p_spriteDataLen );
+    }
+    else {
+        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE_SUB[ p_palIdx * COLORS_PER_PALETTE ], 32 );
+        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER_SUB ], p_spriteDataLen );
+    }
+    return p_tileIdx + (p_spriteDataLen / BYTES_PER_16_COLOR_TILE);
 }

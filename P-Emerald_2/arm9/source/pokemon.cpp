@@ -45,12 +45,10 @@
 #include "screenLoader.h"
 
 #include "print.h"
+#include "fs.h"
 
 #include <nds.h>
 #include <vector>
-
-extern std::string readString( FILE*, bool p_new = false );
-extern std::wstring readWString( FILE*, bool p_new = false );
 
 extern move* AttackList[ 560 ];
 
@@ -77,24 +75,6 @@ namespace POKEMON {
         "besitzt starken Willen", "ist irgendwie eitel", "ist sehr aufsässig", "hasst Niederlagen", "ist dickköpfig",
         "liebt es, zu rennen", "achtet auf Geräusche", "ist ungestüm und einfältig", "ist fast wie eine Clown", "flüchtet schnell"
     };
-
-    const char* getLoc( int p_ind ) {
-        if( p_ind < 0 || p_ind > 5000 )
-            return "Entfernter Ort";
-        char buf[ 50 ];
-        sprintf( buf, "nitro:/LOCATIONS/%i.data", p_ind );
-        FILE* f = fopen( buf, "r" );
-        if( f == 0 ) {
-            fclose( f );
-            if( savMod == SavMod::_NDS && p_ind > 322 && p_ind < 1000 )
-                return getLoc( 3002 );
-
-            return "Entfernter Ort";
-        }
-        std::string ret = readString( f );
-        fclose( f );
-        return ret.c_str( );
-    }
 
     std::string Games[ 10 ] = { };
 
@@ -126,450 +106,9 @@ namespace POKEMON {
             { 1.0, 1.0, 1.0, 1.0, 1.0 }
     };
 
-    namespace PKMNDATA {
-        const char PKMNDATA_PATH[ ] = "nitro:/PKMNDATA/";
-        Type getType( int p_pkmnId, int p_type ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
+    u8 Pkmn_SafariCatchRate[ 669 ];
 
-            if( f == 0 ) {
-                fclose( f );
-                return UNBEKANNT;
-            }
-            char buf[ 12 ];
-            fscanf( f, "%s", buf );
-            fclose( f );
-            return (Type)( buf[ p_type ] - 42 );
-        }
-        short getBase( int p_pkmnId, int p_base ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return 0;
-            }
-            char buf[ 12 ];
-            fscanf( f, "%s", buf );
-            fclose( f );
-            return (short)buf[ 2 + p_base ];
-        }
-        short getCatchRate( int p_pkmnId ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return 0;
-            }
-            for( int i = 0; i < 8; ++i )
-                fgetc( f );
-            short buf; fscanf( f, "%hi", &buf );
-            fclose( f );
-            return buf;
-        }
-        const char* getDisplayName( int p_pkmnId ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return "???";
-            }
-            for( int i = 0; i < 8; ++i )
-                fgetc( f );
-            short buf; fscanf( f, "%hi", &buf );
-            fgetc( f );
-            std::string ret = readString( f, true );
-            fclose( f );
-            return ret.c_str( );
-        }
-        const wchar_t* getWDisplayName( int p_pkmnId ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return L"???";
-            }
-            for( int i = 0; i < 8; ++i )
-                fgetc( f );
-            short buf; fscanf( f, "%hi", &buf );
-            fgetc( f );
-            std::wstring ret = readWString( f );
-            fclose( f );
-            return ret.c_str( );
-        }
-        void getWDisplayName( int p_pkmnId, wchar_t* p_name ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                wcscpy( p_name, L"???" );
-                return;
-            }
-            for( int i = 0; i < 8; ++i )
-                fgetc( f );
-            short buf; fscanf( f, "%hi", &buf );
-            fgetc( f );
-            std::wstring ret = readWString( f );
-            fclose( f );
-            wcscpy( p_name, ret.c_str( ) );
-        }
-        void getHoldItems( int p_pkmnId, unsigned short* p_items ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                p_items[ 0 ] = p_items[ 1 ] = p_items[ 2 ] = p_items[ 3 ] = 0;
-                return;
-            }
-            for( int i = 0; i < 8; ++i )
-                fgetc( f );
-            short buf; fscanf( f, "%hi", &buf );
-            fgetc( f );
-            readString( f );
-            p_items[ 0 ] = p_items[ 1 ] = p_items[ 2 ] = p_items[ 3 ] = 0;
-            for( int i = 0; i < 4; ++i )
-                fscanf( f, "%hi", &p_items[ i ] );
-            fclose( f );
-            return;
-        }
-        pkmnGenderType getGenderType( int p_pkmnId ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return (pkmnGenderType)0;
-            }
-            for( int i = 0; i < 8; ++i )
-                fgetc( f );
-            short buf; fscanf( f, "%hi", &buf );
-            fgetc( f );
-            readString( f );
-            for( int i = 0; i < 5; ++i )
-                fscanf( f, "%hi", &buf );
-            fclose( f );
-            return (pkmnGenderType)buf;
-        }
-        const char* getDexEntry( int p_pkmnId ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return "Keine Daten vorhanden.";
-            }
-            for( int i = 0; i < 2; ++i )
-                fgetc( f );
-            for( int i = 2; i < 8; ++i )
-                fgetc( f );
-            short s;
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            readString( f );
-            for( int i = 0; i < 4; ++i )
-                fscanf( f, "%hi", &s );
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            for( int i = 0; i < 2; ++i )
-                fgetc( f );
-            fgetc( f );
-            fgetc( f );
-            for( int i = 0; i < 6; ++i )
-                fgetc( f );
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            std::string ret = readString( f );
-            fclose( f );
-            return ret.c_str( );
-        }
-        short getForme( int p_pkmnId, int p_formeId, const char* p_retFormeName ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return p_pkmnId;
-            }
-            for( int i = 0; i < 2; ++i )
-                fgetc( f );
-            for( int i = 2; i < 8; ++i )
-                fgetc( f );
-            short s;
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            readString( f );
-            for( int i = 0; i < 4; ++i )
-                fscanf( f, "%hi", &s );
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            for( int i = 0; i < 2; ++i )
-                fgetc( f );
-            fgetc( f );
-            fgetc( f );
-            for( int i = 0; i < 6; ++i )
-                fgetc( f );
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            readString( f );
-            fscanf( f, "%hi", &s );
-            short d; std::string ret;
-            for( int i = 0; i <= std::min( (int)s, p_formeId ); ++i ) {
-                fscanf( f, "%hi", &d ); ret = readString( f );
-            }
-            //fscanf(f,"%hi",d); 
-            //ret = readString(f);
-            fclose( f );
-            p_retFormeName = ret.c_str( );
-            return d;
-        }
-        const char* getSpecies( int p_pkmnId ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return "UNBEKANNT";
-            }
-            for( int i = 0; i < 2; ++i )
-                fgetc( f );
-            for( int i = 2; i < 8; ++i )
-                fgetc( f );
-            short s;
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            readString( f );
-            for( int i = 0; i < 4; ++i )
-                fscanf( f, "%hi", &s );
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            for( int i = 0; i < 2; ++i )
-                fgetc( f );
-            fgetc( f );
-            fgetc( f );
-            for( int i = 0; i < 6; ++i )
-                fgetc( f );
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            readString( f );
-            fscanf( f, "%hi", &s );
-            short d; std::string ret2;
-            for( int i = 0; i < s; ++i ) {
-                fscanf( f, "%hi", &d ); readString( f );
-            }
-            fscanf( f, " " );
-            ret2 = readString( f, true );
-            fclose( f );
-            return ret2.c_str( );
-        }
-
-        void getAll( int p_pkmnId, pokemonData& p_out ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return;
-            }
-            for( int i = 0; i < 2; ++i )
-                p_out.m_types[ i ] = (Type)( ( fgetc( f ) ) - 42 );
-            for( int i = 2; i < 8; ++i )
-                p_out.m_bases[ i - 2 ] = (short)fgetc( f );
-            fscanf( f, "%hi", &p_out.m_catchrate );
-            fgetc( f );
-            readString( f );
-            for( int i = 0; i < 4; ++i )
-                fscanf( f, "%hi", &p_out.m_items[ i ] );
-            fscanf( f, "%hi", &p_out.m_gender );
-            fgetc( f );
-            for( int i = 0; i < 2; ++i )
-                p_out.m_eggT[ i ] = (pkmnEggType)( ( fgetc( f ) ) - 42 );
-            p_out.m_eggcyc = ( ( fgetc( f ) ) - 42 );
-            p_out.m_baseFriend = ( ( fgetc( f ) ) - 42 );
-            for( int i = 0; i < 6; ++i )
-                p_out.m_EVYield[ i ] = ( ( fgetc( f ) ) - 42 );
-            fscanf( f, "%hi", &p_out.m_EXPYield );
-            fgetc( f );
-            readString( f );
-            fscanf( f, "%hi", &p_out.m_formecnt );
-            short d;
-            for( int i = 0; i < p_out.m_formecnt; ++i ) {
-                fscanf( f, "%hi", &d ); readString( f );
-            }
-            fscanf( f, " " );
-            readString( f, true );
-            fscanf( f, "%hi", &p_out.m_size );
-            fscanf( f, "%hi", &p_out.m_weight );
-            fscanf( f, "%hi", &p_out.m_expType );
-            for( int i = 0; i < 4; ++i )
-                fscanf( f, "%hu ", &p_out.m_abilities[ i ] );
-            for( int i = 0; i < 7; ++i )
-                for( int j = 0; j < 15; ++j )
-                    fscanf( f, "%hi ", &( p_out.m_evolutions[ i ].m_evolveData[ j ] ) );
-            fclose( f );
-            return;
-        }
-
-        void getLearnMoves( int p_pkmnId, int p_fromLevel, int p_toLevel, int p_mode, int p_amount, u16* p_result ) {
-
-            char pt[ 150 ];
-            sprintf( pt, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-            if( !f )
-                return;
-
-            int rescnt = 0;
-
-            if( p_fromLevel > p_toLevel ) {
-                std::vector<u16> reses;
-                for( int i = 0; i <= p_fromLevel; ++i ) {
-                    int z; fscanf( f, "%d", &z );
-                    for( int j = 0; j < z; ++j ) {
-                        u16 g, h;
-                        fscanf( f, "%hd %hd", &g, &h );
-                        if( i >= p_toLevel && h == (u16)p_mode && g < MAXATTACK )
-                            reses.push_back( g );
-                    }
-                }
-                auto I = reses.rbegin( );
-                for( int i = 0; i < p_amount && I != reses.rend( ); ++i, ++I ) {
-                    for( int z = 0; z < i; ++z )
-                        if( *I == p_result[ z ] ) {
-                        --i;
-                        goto N;
-                        }
-                    p_result[ i ] = *I;
-N:
-                    ;
-                }
-                fclose( f );
-                return;
-            } else {
-                for( int i = 0; i <= p_toLevel; ++i ) {
-                    int z; fscanf( f, "%d", &z );
-                    for( int j = 0; j < z; ++j ) {
-                        u16 g, h;
-                        fscanf( f, "%hd %hd", &g, &h );
-                        if( i >= p_fromLevel && h == p_mode && g < MAXATTACK ) {
-                            for( int z = 0; z < rescnt; ++z )
-                                if( g == p_result[ z ] )
-                                    goto NEXT;
-                            p_result[ rescnt ] = g;
-                            if( ++rescnt == p_amount )
-                                return;
-NEXT:
-                            ;
-                        }
-                    }
-                }
-            }
-            fclose( f );
-        }
-        bool canLearn( int p_pkmnId, int p_moveId, int p_mode ) {
-            char pt[ 150 ];
-            sprintf( pt, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-            if( !f )
-                return false;
-
-            for( int i = 0; i <= 100; ++i ) {
-                int z; fscanf( f, "%d", &z );
-                for( int j = 0; j < z; ++j ) {
-                    u16 g, h;
-                    fscanf( f, "%hd %hd", &g, &h );
-                    if( g == p_moveId && h == p_mode )
-                        return true;
-                }
-            }
-            return false;
-        }
-
-        u16 getColor( Type p_type ) {
-            switch( p_type ) {
-                case NORMAL:
-                    return NORMAL_;
-                    break;
-                case KAMPF:
-                    return RED;
-                    break;
-                case FLUG:
-                    return TURQOISE;
-                    break;
-                case GIFT:
-                    return POISON;
-                    break;
-                case BODEN:
-                    return GROUND;
-                    break;
-                case GESTEIN:
-                    return ROCK;
-                    break;
-                case KAEFER:
-                    return BUG;
-                    break;
-                case GEIST:
-                    return GHOST;
-                    break;
-                case STAHL:
-                    return STEEL;
-                    break;
-                case UNBEKANNT:
-                    return UNKNOWN;
-                    break;
-                case WASSER:
-                    return BLUE;
-                    break;
-                case FEUER:
-                    return ORANGE;
-                    break;
-                case PFLANZE:
-                    return GREEN;
-                    break;
-                case ELEKTRO:
-                    return YELLOW;
-                    break;
-                case PSYCHO:
-                    return PURPLE;
-                    break;
-                case EIS:
-                    return ICE;
-                    break;
-                case DRACHE:
-                    return DRAGON;
-                    break;
-                case UNLICHT:
-                    return BLACK;
-                    break;
-                case FEE:
-                    return FAIRY;
-                    break;
-                default:
-                    return DRAGON;
-                    break;
-            }
-            return WHITE;
-        }
-    }
-
-    char Pkmn_SafariCatchRate[ 669 ];
-
-    int EXP[ 100 ][ 13 ] = {
+    u32 EXP[ 100 ][ 13 ] = {
             { 0, 0, 0, 0, 0, 0, 1, 15, 6, 8, 9, 10, 4 },
             { 15, 6, 8, 9, 10, 4, 2, 37, 15, 19, 48, 23, 9 },
             { 52, 21, 27, 57, 33, 13, 3, 70, 30, 37, 39, 47, 19 },
@@ -674,55 +213,55 @@ NEXT:
 
     PKMNDATA::pokemonData data;
 
-    pokemon::boxPokemon::boxPokemon( u16* p_moves,
-                                     int p_pkmnId,
+    pokemon::boxPokemon::boxPokemon( u16*           p_moves,
+                                     u16            p_pkmnId,
                                      const wchar_t* p_name,
-                                     short p_level,
-                                     unsigned short p_id,
-                                     unsigned short p_sid,
+                                     u16            p_level,
+                                     u16            p_id,
+                                     u16            p_sid,
                                      const wchar_t* p_oT,
-                                     bool p_oTFemale,
-                                     bool p_cloned,
-                                     bool p_shiny,
-                                     bool p_hiddenAbility,
-                                     bool p_fatefulEncounter,
-                                     bool p_isEgg,
-                                     short p_gotPlace,
-                                     char p_ball,
-                                     char p_pokerus ) {
+                                     bool           p_oTFemale,
+                                     bool           p_cloned,
+                                     bool           p_shiny,
+                                     bool           p_hiddenAbility,
+                                     bool           p_fatefulEncounter,
+                                     bool           p_isEgg,
+                                     u16            p_gotPlace,
+                                     u8             p_ball,
+                                     u8             p_pokerus ) {
         PKMNDATA::getAll( p_pkmnId, data );
 
         srand( LastPID );
-        LastPID = m_PID = rand( );
+        LastPID = m_pid = rand( );
         if( p_shiny )
             while( !isShiny( ) )
-                LastPID = m_PID = rand( );
+                LastPID = m_pid = rand( );
         else
             while( isShiny( ) )
-                LastPID = m_PID = rand( );
+                LastPID = m_pid = rand( );
         m_checksum = 0;
-        m_SPEC = p_pkmnId;
+        m_speciesId = p_pkmnId;
 
         if( data.m_items[ 3 ] )
-            m_Item = data.m_items[ 3 ];
+            m_holdItem = data.m_items[ 3 ];
         else {
             m_b1 = rand( ) % 100;
             if( m_b1 < 5 && data.m_items[ 0 ] )
-                m_Item = data.m_items[ 0 ];
+                m_holdItem = data.m_items[ 0 ];
             else if( m_b1 < 20 && data.m_items[ 1 ] )
-                m_Item = data.m_items[ 1 ];
+                m_holdItem = data.m_items[ 1 ];
             else if( m_b1 < 80 && data.m_items[ 2 ] )
-                m_Item = data.m_items[ 2 ];
+                m_holdItem = data.m_items[ 2 ];
             else
-                m_Item = 0;
+                m_holdItem = 0;
         }
 
-        m_ID = p_id;
-        m_SID = p_sid;
+        m_oTId = p_id;
+        m_oTSid = p_sid;
         if( !p_isEgg )
-            m_exp = EXP[ p_level - 1 ][ data.m_expType ];
+            m_experienceGained = EXP[ p_level - 1 ][ data.m_expType ];
         else
-            m_exp = 0;
+            m_experienceGained = 0;
 
         time_t unixTime = time( NULL );
         tm* timeStruct = gmtime( (const time_t *)&unixTime );
@@ -742,32 +281,32 @@ NEXT:
             m_hatchDate[ 2 ] = ( timeStruct->tm_year + 1900 ) % 100;
             m_gotPlace = p_gotPlace;
         }
-        m_ability = p_hiddenAbility ? ( ( m_PID & 1 || ( data.m_abilities[ 3 ] == 0 ) ) ? data.m_abilities[ 2 ] : data.m_abilities[ 3 ] ) :
-            ( ( m_PID & 1 || ( data.m_abilities[ 1 ] == 0 ) ) ? data.m_abilities[ 0 ] : data.m_abilities[ 1 ] );
+        m_ability = p_hiddenAbility ? ( ( m_pid & 1 || ( data.m_abilities[ 3 ] == 0 ) ) ? data.m_abilities[ 2 ] : data.m_abilities[ 3 ] ) :
+            ( ( m_pid & 1 || ( data.m_abilities[ 1 ] == 0 ) ) ? data.m_abilities[ 0 ] : data.m_abilities[ 1 ] );
         m_markings = NONE;
         m_origLang = 5;
-        for( int i = 0; i < 6; ++i ) m_EV[ i ] = 0;
-        for( int i = 0; i < 6; ++i ) m_ConStats[ i ] = 0;
+        for( int i = 0; i < 6; ++i ) m_effortValues[ i ] = 0;
+        for( int i = 0; i < 6; ++i ) m_contestStats[ i ] = 0;
         for( int i = 0; i < 4; ++i ) m_ribbons1[ i ] = 0;
 
         if( p_moves )
-            for( int i = 0; i < 4; ++i ) m_Attack[ i ] = p_moves[ i ];
+            for( int i = 0; i < 4; ++i ) m_moves[ i ] = p_moves[ i ];
         else
-            PKMNDATA::getLearnMoves( p_pkmnId, p_level, 0, 1, 4, m_Attack );
-        for( int i = 0; i < 4; ++i ) m_AcPP[ i ] = (unsigned char)( AttackList[ m_Attack[ i ] ]->m_movePP );
+            PKMNDATA::getLearnMoves( p_pkmnId, p_level, 0, 1, 4, m_moves );
+        for( int i = 0; i < 4; ++i ) m_acPP[ i ] = (u8)( AttackList[ m_moves[ i ] ]->m_movePP );
 
         m_ppup.m_Up1 = 0;
         m_ppup.m_Up2 = 0;
         m_ppup.m_Up3 = 0;
         m_ppup.m_Up4 = 0;
-        m_IV.m_Attack = rand( ) % 32;
-        m_IV.m_Defense = rand( ) % 32;
-        m_IV.m_HP = rand( ) % 32;
-        m_IV.m_SAttack = rand( ) % 32;
-        m_IV.m_SDefense = rand( ) % 32;
-        m_IV.m_Speed = rand( ) % 32;
-        m_IV.m_isNicked = false;
-        m_IV.m_isEgg = p_isEgg;
+        m_individualValues.m_attack = rand( ) % 32;
+        m_individualValues.m_defense = rand( ) % 32;
+        m_individualValues.m_hp = rand( ) % 32;
+        m_individualValues.m_sAttack = rand( ) % 32;
+        m_individualValues.m_sDefense = rand( ) % 32;
+        m_individualValues.m_speed = rand( ) % 32;
+        m_individualValues.m_isNicked = false;
+        m_individualValues.m_isEgg = p_isEgg;
         for( int i = 0; i < 4; ++i ) m_ribbons0[ i ] = 0;
         m_fateful = p_fatefulEncounter;
 
@@ -781,7 +320,7 @@ NEXT:
         else if( A == GENDERLESS )
             m_isFemale = false,
             m_isGenderless = true;
-        else if( ( m_PID % 256 ) >= A )
+        else if( ( m_pid % 256 ) >= A )
             m_isFemale = m_isGenderless = false;
         else m_isFemale = true,
             m_isGenderless = false;
@@ -789,39 +328,39 @@ NEXT:
         m_altForme = 0;
         m_cloned = p_cloned;
         if( p_name ) {
-            wcscpy( m_Name, p_name );
-            m_IV.m_isNicked = true;
+            wcscpy( m_name, p_name );
+            m_individualValues.m_isNicked = true;
         } else {
-            PKMNDATA::getWDisplayName( p_pkmnId, m_Name );
-            m_IV.m_isNicked = false;
+            PKMNDATA::getWDisplayName( p_pkmnId, m_name );
+            m_individualValues.m_isNicked = false;
         }
         m_hometown = 4;
         for( int i = 0; i < 4; ++i ) m_ribbons2[ i ] = 0;
-        wcscpy( m_OT, p_oT );
-        m_PKRUS = p_pokerus;
-        m_Ball = p_ball;
+        wcscpy( m_oT, p_oT );
+        m_pokerus = p_pokerus;
+        m_ball = p_ball;
         m_gotLevel = p_level;
-        m_OTisFemale = p_oTFemale;
+        m_oTisFemale = p_oTFemale;
         m_encounter = (encounter)0;
         m_HGSSBall = 0;
 
     }
-    pokemon::pokemon( u16* p_moves,
-                      int p_pkmnId,
-                      const wchar_t* p_name,
-                      short p_level,
-                      unsigned short p_id,
-                      unsigned short p_sid,
-                      const wchar_t* p_oT,
-                      bool p_oTFemale,
-                      bool p_cloned,
-                      bool p_shiny,
-                      bool p_hiddenAbility,
-                      bool p_fatefulEncounter,
-                      bool p_isEgg,
-                      short p_gotPlace,
-                      char p_ball,
-                      char p_pokerus )
+    pokemon::pokemon( u16*              p_moves,
+                      u16               p_pkmnId,
+                      const wchar_t*    p_name,
+                      u16               p_level,
+                      u16               p_id,
+                      u16               p_sid,
+                      const wchar_t*    p_oT,
+                      bool              p_oTFemale,
+                      bool              p_cloned,
+                      bool              p_shiny,
+                      bool              p_hiddenAbility,
+                      bool              p_fatefulEncounter,
+                      bool              p_isEgg,
+                      u16               p_gotPlace,
+                      u8                p_ball,
+                      u8                p_pokerus )
                       : m_boxdata( p_moves,
                       p_pkmnId,
                       p_name,
@@ -839,21 +378,21 @@ NEXT:
                       m_Level( p_level ) {
         PKMNDATA::getAll( p_pkmnId, data );
         if( p_pkmnId != 292 )
-            m_stats.m_acHP = m_stats.m_maxHP = ( ( m_boxdata.m_IV.m_HP + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_EV[ 0 ] / 4 ) + 100 )*p_level / 100 ) + 10;
+            m_stats.m_acHP = m_stats.m_maxHP = ( ( m_boxdata.m_individualValues.m_hp + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )*p_level / 100 ) + 10;
         else
             m_stats.m_acHP = m_stats.m_maxHP = 1;
 
         pkmnNatures nature = m_boxdata.getNature( );
-        m_stats.m_Atk = ( ( ( m_boxdata.m_IV.m_Attack + 2 * data.m_bases[ 1 ] + ( m_boxdata.m_EV[ 1 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];
-        m_stats.m_Def = ( ( ( m_boxdata.m_IV.m_Defense + 2 * data.m_bases[ 2 ] + ( m_boxdata.m_EV[ 2 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 1 ];
-        m_stats.m_Spd = ( ( ( m_boxdata.m_IV.m_Speed + 2 * data.m_bases[ 3 ] + ( m_boxdata.m_EV[ 3 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 2 ];
-        m_stats.m_SAtk = ( ( ( m_boxdata.m_IV.m_SAttack + 2 * data.m_bases[ 4 ] + ( m_boxdata.m_EV[ 4 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 3 ];
-        m_stats.m_SDef = ( ( ( m_boxdata.m_IV.m_SDefense + 2 * data.m_bases[ 5 ] + ( m_boxdata.m_EV[ 5 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 4 ];
+        m_stats.m_Atk = ( ( ( m_boxdata.m_individualValues.m_attack + 2 * data.m_bases[ 1 ] + ( m_boxdata.m_effortValues[ 1 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];
+        m_stats.m_Def = ( ( ( m_boxdata.m_individualValues.m_defense + 2 * data.m_bases[ 2 ] + ( m_boxdata.m_effortValues[ 2 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 1 ];
+        m_stats.m_Spd = ( ( ( m_boxdata.m_individualValues.m_speed + 2 * data.m_bases[ 3 ] + ( m_boxdata.m_effortValues[ 3 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 2 ];
+        m_stats.m_SAtk = ( ( ( m_boxdata.m_individualValues.m_sAttack + 2 * data.m_bases[ 4 ] + ( m_boxdata.m_effortValues[ 4 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 3 ];
+        m_stats.m_SDef = ( ( ( m_boxdata.m_individualValues.m_sDefense + 2 * data.m_bases[ 5 ] + ( m_boxdata.m_effortValues[ 5 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 4 ];
 
         m_status.m_Asleep = m_status.m_Burned = m_status.m_Frozen = m_status.m_Paralyzed = m_status.m_Poisoned = m_status.m_Toxic = false;
     }
 
-    void setDefaultConsoleTextColors( u16* p_palette, int p_start = 1 ) {
+    void setDefaultConsoleTextColors( u16* p_palette, u8 p_start = 1 ) {
         p_palette[ p_start * 16 - 1 ] = RGB15( 0, 0, 0 ); //30 normal black
         p_palette[ ( p_start + 1 ) * 16 - 1 ] = RGB15( 15, 0, 0 ); //31 normal red
         p_palette[ ( p_start + 2 ) * 16 - 1 ] = RGB15( 0, 15, 0 ); //32 normal green
@@ -866,9 +405,9 @@ NEXT:
     }
 
 
-    void pokemon::drawPage( int p_page, PrintConsole* p_top, PrintConsole* p_bottom, bool p_newpok ) {
+    void pokemon::drawPage( u8 p_page, PrintConsole* p_top, PrintConsole* p_bottom, bool p_newpok ) {
         setDefaultConsoleTextColors( BG_PALETTE, 6 );
-        loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 32 );
+        FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 32 );
 
         cust_font.setColor( 0, 0 );
         cust_font.setColor( 251, 1 );
@@ -895,8 +434,9 @@ NEXT:
         initOAMTable( OamTop );
         updateOAMSub( Oam );
 
-        int a2 = 0, b2 = 0, c2 = 0;
-        if( !( m_boxdata.m_IV.m_isEgg ) ) {
+        u8 a2 = 0, b2 = 0;
+        u16 c2 = 0;
+        if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
 
             BG_PALETTE[ 254 ] = RGB15( 31, 0, 0 );
             BG_PALETTE[ 255 ] = RGB15( 0, 0, 31 );
@@ -905,11 +445,11 @@ NEXT:
 
             consoleSetWindow( p_top, 20, 1, 13, 2 );
 
-            cust_font.printString( &( m_boxdata.m_Name[ 0 ] ), 150, 2, false );
-            int G = m_boxdata.gender( );
+            cust_font.printString( &( m_boxdata.m_name[ 0 ] ), 150, 2, false );
+            s8 G = m_boxdata.gender( );
 
             cust_font.printChar( '/', 234, 2, false );
-            if( m_boxdata.m_SPEC != 29 && m_boxdata.m_SPEC != 32 ) {
+            if( m_boxdata.m_speciesId != 29 && m_boxdata.m_speciesId != 32 ) {
                 if( G == 1 ) {
                     cust_font.setColor( 255, 1 );
                     cust_font.printChar( 136, 246, 8, false );
@@ -920,23 +460,23 @@ NEXT:
             }
             cust_font.setColor( 253, 1 );
 
-            PKMNDATA::getAll( m_boxdata.m_SPEC, data );
-            cust_font.printString( PKMNDATA::getDisplayName( m_boxdata.m_SPEC ), 160, 16, false );
+            PKMNDATA::getAll( m_boxdata.m_speciesId, data );
+            cust_font.printString( PKMNDATA::getDisplayName( m_boxdata.m_speciesId ), 160, 16, false );
 
             if( m_boxdata.getItem( ) ) {
                 cust_font.printString( "Item", 2, 176, false );
                 cust_font.setColor( 252, 1 );
                 cust_font.setColor( 0, 2 );
-                char buf[ 200 ];
-                sprintf( buf, "%s: %s", ItemList[ m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
-                         ItemList[ m_boxdata.getItem( ) ].getShortDescription( true ).c_str( ) );
-                cust_font.printString( buf, 50, 159, false );
-                drawItemIcon( OamTop, spriteInfoTop, ItemList[ m_boxdata.getItem( ) ].m_itemName, 2, 152, a2, b2, c2, false );
+                //char buffer[ 200 ];
+                sprintf( buffer, "%s: %s", ITEMS::ItemList[ m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
+                         ITEMS::ItemList[ m_boxdata.getItem( ) ].getShortDescription( true ).c_str( ) );
+                cust_font.printString( buffer, 50, 159, false );
+                FS::drawItemIcon( OamTop, spriteInfoTop, ITEMS::ItemList[ m_boxdata.getItem( ) ].m_itemName, 2, 152, a2, b2, c2, false );
                 updateOAM( OamTop );
             } else {
                 cust_font.setColor( 252, 1 );
                 cust_font.setColor( 0, 2 );
-                cust_font.printString( ItemList[ m_boxdata.getItem( ) ].getDisplayName( ).c_str( ), 56, 168, false );
+                cust_font.printString( ITEMS::ItemList[ m_boxdata.getItem( ) ].getDisplayName( ).c_str( ), 56, 168, false );
             }
             cust_font.setColor( 251, 1 );
             cust_font.setColor( 252, 2 );
@@ -953,16 +493,16 @@ NEXT:
         switch( p_page ) {
             case 0:
                 cust_font.printString( "Pokémon-Info", 36, 4, false );
-                if( !( m_boxdata.m_IV.m_isEgg ) ) {
+                if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
                     consoleSetWindow( p_top, 16, 4, 32, 24 );
                     printf( "     Lv.%3i", m_Level );
 
                     BG_PALETTE[ 254 ] = RGB15( 31, 0, 0 );
                     BG_PALETTE[ 255 ] = RGB15( 0, 0, 31 );
 
-                    char buf[ 50 ];
-                    sprintf( buf, "KP                     %3i", m_stats.m_maxHP );
-                    cust_font.printString( buf, 130, 44, false );
+                    //char buffer[ 50 ];
+                    sprintf( buffer, "KP                     %3i", m_stats.m_maxHP );
+                    cust_font.printString( buffer, 130, 44, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 0 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -970,8 +510,8 @@ NEXT:
                         cust_font.setColor( 255, 1 );
                     else
                         cust_font.setColor( 251, 1 );
-                    sprintf( buf, "ANG                   %3i", m_stats.m_Atk );
-                    cust_font.printString( buf, 130, 69, false );
+                    sprintf( buffer, "ANG                   %3i", m_stats.m_Atk );
+                    cust_font.printString( buffer, 130, 69, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 1 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -979,8 +519,8 @@ NEXT:
                         cust_font.setColor( 255, 1 );
                     else
                         cust_font.setColor( 251, 1 );
-                    sprintf( buf, "VER                   %3i", m_stats.m_Def );
-                    cust_font.printString( buf, 130, 86, false );
+                    sprintf( buffer, "VER                   %3i", m_stats.m_Def );
+                    cust_font.printString( buffer, 130, 86, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 2 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -988,8 +528,8 @@ NEXT:
                         cust_font.setColor( 255, 1 );
                     else
                         cust_font.setColor( 251, 1 );
-                    sprintf( buf, "INI                   \xC3\xC3""%3i", m_stats.m_Spd );
-                    cust_font.printString( buf, 130, 103, false );
+                    sprintf( buffer, "INI                   \xC3\xC3""%3i", m_stats.m_Spd );
+                    cust_font.printString( buffer, 130, 103, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 3 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -997,8 +537,8 @@ NEXT:
                         cust_font.setColor( 255, 1 );
                     else
                         cust_font.setColor( 251, 1 );
-                    sprintf( buf, "SAN                   %3i", m_stats.m_SAtk );
-                    cust_font.printString( buf, 130, 120, false );
+                    sprintf( buffer, "SAN                   %3i", m_stats.m_SAtk );
+                    cust_font.printString( buffer, 130, 120, false );
 
                     if( NatMod[ m_boxdata.getNature( ) ][ 4 ] == 1.2 )
                         cust_font.setColor( 254, 1 );
@@ -1006,18 +546,18 @@ NEXT:
                         cust_font.setColor( 255, 1 );
                     else
                         cust_font.setColor( 251, 1 );
-                    sprintf( buf, "SVE                   %3i", m_stats.m_SDef );
-                    cust_font.printString( buf, 130, 137, false );
+                    sprintf( buffer, "SVE                   %3i", m_stats.m_SDef );
+                    cust_font.printString( buffer, 130, 137, false );
 
-                    font::putrec( 158, 46, 158 + 68, 46 + 12, false, false, 251 );
+                    FONT::putrec( (u8)158, (u8)46, u8( 158 + 68 ), u8( 46 + 12 ), false, false, (u8)251 );
 
-                    font::putrec( 158, 46, 158 + int( 68.0*m_boxdata.IVget( 0 ) / 31 ), 46 + 6, false, false, 7 * 16 - 1 );
-                    font::putrec( 158, 46 + 6, 158 + int( 68.0*m_boxdata.m_EV[ 0 ] / 255 ), 46 + 12, false, false, 7 * 16 - 1 );
+                    FONT::putrec( (u8)158, (u8)46, u8( 158 + ( 68.0*m_boxdata.IVget( 0 ) / 31 ) ), u8( 46 + 6 ), false, false, u8( 7 * 16 - 1 ) );
+                    FONT::putrec( (u8)158, u8( 46 + 6 ), u8( 158 + ( 68.0*m_boxdata.m_effortValues[ 0 ] / 255 ) ), u8( 46 + 12 ), false, false, u8( 7 * 16 - 1 ) );
 
                     for( int i = 1; i < 6; ++i ) {
-                        font::putrec( 158, 54 + ( 17 * i ), 158 + 68, 54 + 12 + ( 17 * i ), false, false, 251 );
-                        font::putrec( 158, 54 + ( 17 * i ), 158 + int( 68.0*m_boxdata.IVget( i ) / 31 ), 54 + 6 + ( 17 * i ), false, false, ( 7 + i ) * 16 - 1 );
-                        font::putrec( 158, 54 + 6 + ( 17 * i ), 158 + int( 68.0*m_boxdata.m_EV[ i ] / 255 ), 54 + 12 + ( 17 * i ), false, false, ( 7 + i ) * 16 - 1 );
+                        FONT::putrec( (u8)158, u8( 54 + ( 17 * i ) ), u8( 158 + 68 ), u8( 54 + 12 + ( 17 * i ) ), false, false, (u8)251 );
+                        FONT::putrec( (u8)158, u8( 54 + ( 17 * i ) ), u8( 158 + ( 68.0*m_boxdata.IVget( i ) / 31 ) ), u8( 54 + 6 + ( 17 * i ) ), false, false, u8( ( 7 + i ) * 16 - 1 ) );
+                        FONT::putrec( (u8)158, u8( 54 + 6 + ( 17 * i ) ), u8( 158 + ( 68.0*m_boxdata.m_effortValues[ i ] / 255 ) ), u8( 54 + 12 + ( 17 * i ) ), false, false, u8( ( 7 + i ) * 16 - 1 ) );
                     }
                 } else {
                     consoleSetWindow( p_top, 16, 4, 32, 24 );
@@ -1045,9 +585,9 @@ NEXT:
 
                 consoleSetWindow( p_top, 16, 5, 32, 24 );
                 for( int i = 0; i < 4; i++ ) {
-                    if( m_boxdata.m_Attack[ i ] == 0 )
+                    if( m_boxdata.m_moves[ i ] == 0 )
                         continue;
-                    Type t = AttackList[ m_boxdata.m_Attack[ i ] ]->m_moveType;
+                    Type t = AttackList[ m_boxdata.m_moves[ i ] ]->m_moveType;
                     drawTypeIcon( OamTop, spriteInfoTop, a2, b2, c2, t, 126, 43 + 32 * i, false );
 
                     /* if(t == data.Types[0] || t == data.Types[1])
@@ -1055,21 +595,21 @@ NEXT:
 
                     if( i == 0 )
                         printf( "    %s\n    AP %2hhu""/""%2hhu ",
-                        ( AttackList[ m_boxdata.m_Attack[ 0 ] ]->m_moveName.c_str( ) ), m_boxdata.m_AcPP[ 0 ],
-                        AttackList[ m_boxdata.m_Attack[ 0 ] ]->m_movePP* ( ( 5 + m_boxdata.m_ppup.m_Up1 ) / 5 ) );
+                        ( AttackList[ m_boxdata.m_moves[ 0 ] ]->m_moveName.c_str( ) ), m_boxdata.m_acPP[ 0 ],
+                        AttackList[ m_boxdata.m_moves[ 0 ] ]->m_movePP* ( ( 5 + m_boxdata.m_ppup.m_Up1 ) / 5 ) );
                     if( i == 1 )
                         printf( "    %s\n    AP %2hhu""/""%2hhu ",
-                        ( AttackList[ m_boxdata.m_Attack[ 1 ] ]->m_moveName.c_str( ) ), m_boxdata.m_AcPP[ 1 ],
-                        AttackList[ m_boxdata.m_Attack[ 1 ] ]->m_movePP* ( ( 5 + m_boxdata.m_ppup.m_Up2 ) / 5 ) );
+                        ( AttackList[ m_boxdata.m_moves[ 1 ] ]->m_moveName.c_str( ) ), m_boxdata.m_acPP[ 1 ],
+                        AttackList[ m_boxdata.m_moves[ 1 ] ]->m_movePP* ( ( 5 + m_boxdata.m_ppup.m_Up2 ) / 5 ) );
                     if( i == 2 )
                         printf( "    %s\n    AP %2hhu""/""%2hhu ",
-                        ( AttackList[ m_boxdata.m_Attack[ 2 ] ]->m_moveName.c_str( ) ), m_boxdata.m_AcPP[ 2 ],
-                        AttackList[ m_boxdata.m_Attack[ 2 ] ]->m_movePP* ( ( 5 + m_boxdata.m_ppup.m_Up3 ) / 5 ) );
+                        ( AttackList[ m_boxdata.m_moves[ 2 ] ]->m_moveName.c_str( ) ), m_boxdata.m_acPP[ 2 ],
+                        AttackList[ m_boxdata.m_moves[ 2 ] ]->m_movePP* ( ( 5 + m_boxdata.m_ppup.m_Up3 ) / 5 ) );
                     if( i == 3 )
                         printf( "    %s\n    AP %2hhu""/""%2hhu ",
-                        ( AttackList[ m_boxdata.m_Attack[ 3 ] ]->m_moveName.c_str( ) ), m_boxdata.m_AcPP[ 3 ],
-                        AttackList[ m_boxdata.m_Attack[ 3 ] ]->m_movePP* ( ( 5 + m_boxdata.m_ppup.m_Up4 ) / 5 ) );
-                    switch( AttackList[ m_boxdata.m_Attack[ i ] ]->m_moveHitType ) {
+                        ( AttackList[ m_boxdata.m_moves[ 3 ] ]->m_moveName.c_str( ) ), m_boxdata.m_acPP[ 3 ],
+                        AttackList[ m_boxdata.m_moves[ 3 ] ]->m_movePP* ( ( 5 + m_boxdata.m_ppup.m_Up4 ) / 5 ) );
+                    switch( AttackList[ m_boxdata.m_moves[ i ] ]->m_moveHitType ) {
                         case move::PHYS:
                             printf( "PHS" );
                             break;
@@ -1081,13 +621,13 @@ NEXT:
                             break;
                     }
                     printf( "\n    S " );
-                    if( AttackList[ m_boxdata.m_Attack[ i ] ]->m_moveBasePower )
-                        printf( "%3i", AttackList[ m_boxdata.m_Attack[ i ] ]->m_moveBasePower );
+                    if( AttackList[ m_boxdata.m_moves[ i ] ]->m_moveBasePower )
+                        printf( "%3i", AttackList[ m_boxdata.m_moves[ i ] ]->m_moveBasePower );
                     else
                         printf( "---" );
                     printf( " G " );
-                    if( AttackList[ m_boxdata.m_Attack[ i ] ]->m_moveAccuracy )
-                        printf( "%3i", AttackList[ m_boxdata.m_Attack[ i ] ]->m_moveAccuracy );
+                    if( AttackList[ m_boxdata.m_moves[ i ] ]->m_moveAccuracy )
+                        printf( "%3i", AttackList[ m_boxdata.m_moves[ i ] ]->m_moveAccuracy );
                     else
                         printf( "---" );
 
@@ -1107,7 +647,8 @@ NEXT:
 
         consoleSelect( p_bottom );
         printf( "\x1b[39m" );
-        int o2s = 50, p2s = 2, t2s = 780;
+        u8 o2s = 50, p2s = 2;
+        u16 t2s = 780;
 
         Oam->oamBuffer[ 0 ].x = 256 - 24;
         Oam->oamBuffer[ 0 ].y = 196 - 28;
@@ -1118,7 +659,7 @@ NEXT:
         Oam->oamBuffer[ 13 ].x = 256 - 28 - 18;
         Oam->oamBuffer[ 13 ].y = 196 - 28;
 
-        if( !( m_boxdata.m_IV.m_isEgg ) ) {
+        if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
             if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
                 drawTypeIcon( Oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 0 ], 256 - 50, 24, true );
                 Oam->oamBuffer[ ++o2s ].isHidden = true;
@@ -1126,7 +667,7 @@ NEXT:
                 drawTypeIcon( Oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 0 ], 256 - 68, 24, true );
                 drawTypeIcon( Oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 1 ], 256 - 32, 24, true );
             }
-            drawItemIcon( Oam, spriteInfo, m_boxdata.m_Ball == 0 ? "Pokeball" : ItemList[ m_boxdata.m_Ball ].m_itemName, 256 - 100, 0, o2s, p2s, t2s, true );
+            FS::drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ].m_itemName, 256 - 100, 0, o2s, p2s, t2s, true );
 
             Oam->oamBuffer[ 15 ].isHidden = false;
             Oam->oamBuffer[ 15 ].y = 0;
@@ -1139,11 +680,11 @@ NEXT:
             consoleSetWindow( p_bottom, 23, 1, 20, 5 );
 
             if( m_boxdata.isShiny( ) ) {
-                printf( "\x1b[34m""*%03i ", m_boxdata.m_SPEC );
+                printf( "\x1b[34m""*%03i ", m_boxdata.m_speciesId );
             } else
-                printf( "\x1b[33m""#%03i ", m_boxdata.m_SPEC );
+                printf( "\x1b[33m""#%03i ", m_boxdata.m_speciesId );
 
-            if( m_boxdata.m_PKRUS ) {
+            if( m_boxdata.m_pokerus ) {
                 printf( "\x1b[39m""PKRS" );
             }
 
@@ -1175,156 +716,139 @@ NEXT:
             Oam->oamBuffer[ o2s++ ].isHidden = true;
             Oam->oamBuffer[ o2s++ ].isHidden = true;
             Oam->oamBuffer[ o2s ].isHidden = true;
-            drawItemIcon( Oam, spriteInfo, m_boxdata.m_Ball == 0 ? "Pokeball" : ItemList[ m_boxdata.m_Ball ].m_itemName, 256 - 32, 0, o2s, p2s, t2s, true );
+            FS::drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ].m_itemName, 256 - 32, 0, o2s, p2s, t2s, true );
             updateOAMSub( Oam );
         }
         printf( "\x1b[33m" );
-        for( int i = 0; i < 4; ++i ) {
-            Oam->oamBuffer[ 9 + i ].isHidden = false;
-            Oam->oamBuffer[ 9 + i ].hFlip = true;
-            Oam->oamBuffer[ 9 + i ].priority = OBJPRIORITY_3;
-            Oam->oamBuffer[ 9 + i ].y = 192 - 54;
-        }
-        Oam->oamBuffer[ 18 ].isHidden = false;
-        Oam->oamBuffer[ 18 ].y = 192 - 12;
-        Oam->oamBuffer[ 18 ].x = 76;
-        Oam->oamBuffer[ 18 ].priority = OBJPRIORITY_1;
-        Oam->oamBuffer[ 28 ].isHidden = false;
-        Oam->oamBuffer[ 28 ].y = 192 - 12;
-        Oam->oamBuffer[ 28 ].x = 0;
-        Oam->oamBuffer[ 28 ].priority = OBJPRIORITY_1;
-        Oam->oamBuffer[ 27 ].isHidden = false;
-        Oam->oamBuffer[ 27 ].y = 192 - 12;
-        Oam->oamBuffer[ 27 ].x = 20;
-        Oam->oamBuffer[ 27 ].priority = OBJPRIORITY_1;
         updateOAMSub( Oam );
-        if( !( m_boxdata.m_IV.m_isEgg ) ) {
-            consoleSetWindow( p_bottom, 0, 23, 20, 5 );
-            printf( "%s", abilities[ m_boxdata.m_ability ].m_abilityName.c_str( ) );
-            consoleSetWindow( p_bottom, 1, 18, 28, 5 );
-            printf( "%s", abilities[ m_boxdata.m_ability ].m_flavourText.c_str( ) );
-        }
 
         consoleSetWindow( p_bottom, 3, 3, 27, 15 );
-
-        //wprintf(L"  OT %ls\n  (%05i/%05i)\n\n",&(m_boxdata.OT[0]),m_boxdata.ID,m_boxdata.SID);
-
         drawSub( );
-
 
         cust_font.setColor( 0, 0 );
         cust_font.setColor( 254, 1 );
         cust_font.setColor( 255, 2 );
-        BG_PALETTE_SUB[ 253 ] = m_boxdata.m_OTisFemale ? RGB15( 31, 15, 0 ) : RGB15( 0, 15, 31 );
-        BG_PALETTE_SUB[ 255 ] = RGB15( 15, 15, 15 );
+        BG_PALETTE_SUB[ 253 ] = m_boxdata.m_oTisFemale ? RGB15( 31, 15, 0 ) : RGB15( 0, 15, 31 );
+        BG_PALETTE_SUB[ 255 ] = RGB15( 0, 0, 0 );
         BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
 
         cust_font.printString( "OT:", 28, 22, true );
         cust_font.setColor( 253, 2 );
-        cust_font.printString( m_boxdata.m_OT, 56, 16, true );
+        cust_font.printString( m_boxdata.m_oT, 56, 16, true );
         cust_font.setColor( 255, 2 );
 
-        char buf[ 50 ];
-        sprintf( buf, "(%05i/%05i)", m_boxdata.m_ID, m_boxdata.m_SID );
-        cust_font.printString( buf, 50, 30, true );
+        if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
+            auto acAbility = ability( m_boxdata.m_ability );
 
-        if( m_boxdata.m_ID == SAV.m_Id && m_boxdata.m_SID == SAV.m_Sid ) //Trainer is OT
+            BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
+            FONT::putrec( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false, 250 );
+            cust_font.setColor( 253, 2 );
+            cust_font.printString( FS::breakString( acAbility.m_flavourText, cust_font, 240 ).c_str( ), 0, 138, true );
+            cust_font.printString( acAbility.m_abilityName.c_str( ), 5, 176, true );
+            cust_font.setColor( 254, 1 );
+            cust_font.setColor( 255, 2 );
+        }
+
+        sprintf( buffer, "(%05i/%05i)", m_boxdata.m_oTId, m_boxdata.m_oTSid );
+        cust_font.printString( buffer, 50, 30, true );
+
+        if( m_boxdata.m_oTId == SAV.m_Id && m_boxdata.m_oTSid == SAV.m_Sid ) //Trainer is OT
         {
             if( m_boxdata.m_fateful )
                 cust_font.printString( "Schicksalhafte Begegnung.", 28, 120, true );
             if( !( m_boxdata.m_gotDate[ 0 ] ) ) {
                 if( savMod == SavMod::_NDS )
-                    sprintf( buf, "Gefangen am %02i.%02i.%02i mit Lv. %i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ], m_boxdata.m_gotLevel );
+                    sprintf( buffer, "Gefangen am %02i.%02i.%02i mit Lv. %i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ], m_boxdata.m_gotLevel );
                 else
-                    sprintf( buf, "Gefangen mit Lv. %i", m_boxdata.m_gotLevel );
-                cust_font.printString( buf, 28, 44, true );
-                sprintf( buf, "in/bei %s.", getLoc( m_boxdata.m_gotPlace ) );
-                cust_font.printString( buf, 35, 58, true );
-                sprintf( buf, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                cust_font.printString( buf, 28, 76, true );
-                sprintf( buf, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
-                cust_font.printString( buf, 35, 90, true );
+                    sprintf( buffer, "Gefangen mit Lv. %i", m_boxdata.m_gotLevel );
+                cust_font.printString( buffer, 28, 44, true );
+                sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
+                cust_font.printString( buffer, 35, 58, true );
+                sprintf( buffer, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                cust_font.printString( buffer, 28, 76, true );
+                sprintf( buffer, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
+                cust_font.printString( buffer, 35, 90, true );
 
-                sprintf( buf, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
-                cust_font.printString( buf, 28, 104, true );
+                sprintf( buffer, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
+                cust_font.printString( buffer, 28, 104, true );
             } else {
                 if( savMod == SavMod::_NDS )
-                    sprintf( buf, "Als Ei erhalten am %02i.%02i.%02i", m_boxdata.m_gotDate[ 0 ], m_boxdata.m_gotDate[ 1 ], m_boxdata.m_gotDate[ 2 ] );
+                    sprintf( buffer, "Als Ei erhalten am %02i.%02i.%02i", m_boxdata.m_gotDate[ 0 ], m_boxdata.m_gotDate[ 1 ], m_boxdata.m_gotDate[ 2 ] );
                 else
-                    sprintf( buf, "Als Ei erhalten." );
-                cust_font.printString( buf, 28, 44, true );
-                sprintf( buf, "in/bei %s.", getLoc( m_boxdata.m_gotPlace ) );
-                cust_font.printString( buf, 35, 58, true );
-                if( !( m_boxdata.m_IV.m_isEgg ) ) {
+                    sprintf( buffer, "Als Ei erhalten." );
+                cust_font.printString( buffer, 28, 44, true );
+                sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
+                cust_font.printString( buffer, 35, 58, true );
+                if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
 
                     if( savMod == SavMod::_NDS ) {
-                        sprintf( buf, "Geschlüpft am %02i.%02i.%02i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ] );
-                        cust_font.printString( buf, 28, 72, true );
-                        sprintf( buf, "in/bei %s.", getLoc( m_boxdata.m_hatchPlace ) );
-                        cust_font.printString( buf, 35, 86, true );
+                        sprintf( buffer, "Geschlüpft am %02i.%02i.%02i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ] );
+                        cust_font.printString( buffer, 28, 72, true );
+                        sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_hatchPlace ) );
+                        cust_font.printString( buffer, 35, 86, true );
                     } else {
-                        sprintf( buf, "Geschlüpft in/bei %s.", getLoc( m_boxdata.m_hatchPlace ) );
-                        cust_font.printString( buf, 28, 72, true );
+                        sprintf( buffer, "Geschlüpft in/bei %s.", FS::getLoc( m_boxdata.m_hatchPlace ) );
+                        cust_font.printString( buffer, 28, 72, true );
                     }
                     if( !m_boxdata.m_fateful ) {
-                        sprintf( buf, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                        cust_font.printString( buf, 28, 100, true );
-                        sprintf( buf, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
-                        cust_font.printString( buf, 35, 114, true );
+                        sprintf( buffer, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                        cust_font.printString( buffer, 28, 100, true );
+                        sprintf( buffer, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
+                        cust_font.printString( buffer, 35, 114, true );
 
-                        sprintf( buf, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
-                        cust_font.printString( buf, 28, 128, true );
+                        sprintf( buffer, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
+                        cust_font.printString( buffer, 28, 128, true );
                     } else {
-                        sprintf( buf, "Besitzt ein %s""es Wesen.", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                        cust_font.printString( buf, 28, 100, true );
+                        sprintf( buffer, "Besitzt ein %s""es Wesen.", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                        cust_font.printString( buffer, 28, 100, true );
                     }
                 }
             }
         } else {
             if( !( m_boxdata.m_gotDate[ 0 ] ) ) {
                 if( savMod == SavMod::_NDS )
-                    sprintf( buf, "Off. gef. am %02i.%02i.%02i mit Lv. %i.", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ], m_boxdata.m_gotLevel );
+                    sprintf( buffer, "Off. gef. am %02i.%02i.%02i mit Lv. %i.", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ], m_boxdata.m_gotLevel );
                 else
-                    sprintf( buf, "Offenbar gefangen mit Lv. %i.", m_boxdata.m_gotLevel );
-                cust_font.printString( buf, 28, 44, true );
-                sprintf( buf, "in/bei %s.", getLoc( m_boxdata.m_gotPlace ) );
-                cust_font.printString( buf, 35, 58, true );
-                sprintf( buf, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                cust_font.printString( buf, 28, 76, true );
-                sprintf( buf, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
-                cust_font.printString( buf, 35, 90, true );
+                    sprintf( buffer, "Offenbar gefangen mit Lv. %i.", m_boxdata.m_gotLevel );
+                cust_font.printString( buffer, 28, 44, true );
+                sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
+                cust_font.printString( buffer, 35, 58, true );
+                sprintf( buffer, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                cust_font.printString( buffer, 28, 76, true );
+                sprintf( buffer, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
+                cust_font.printString( buffer, 35, 90, true );
 
-                sprintf( buf, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
-                cust_font.printString( buf, 28, 104, true );
+                sprintf( buffer, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
+                cust_font.printString( buffer, 28, 104, true );
             } else {
                 if( savMod == SavMod::_NDS )
-                    sprintf( buf, "Off. Als Ei erh. am %02i.%02i.%02i", m_boxdata.m_gotDate[ 0 ], m_boxdata.m_gotDate[ 1 ], m_boxdata.m_gotDate[ 2 ] );
+                    sprintf( buffer, "Off. Als Ei erh. am %02i.%02i.%02i", m_boxdata.m_gotDate[ 0 ], m_boxdata.m_gotDate[ 1 ], m_boxdata.m_gotDate[ 2 ] );
                 else
-                    sprintf( buf, "Offenbar als Ei erhalten." );
-                cust_font.printString( buf, 28, 44, true );
-                sprintf( buf, "in/bei %s.", getLoc( m_boxdata.m_gotPlace ) );
-                cust_font.printString( buf, 35, 58, true );
-                if( !( m_boxdata.m_IV.m_isEgg ) ) {
+                    sprintf( buffer, "Offenbar als Ei erhalten." );
+                cust_font.printString( buffer, 28, 44, true );
+                sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
+                cust_font.printString( buffer, 35, 58, true );
+                if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
                     if( savMod == SavMod::_NDS ) {
-                        sprintf( buf, "Geschlüpft am %02i.%02i.%02i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ] );
-                        cust_font.printString( buf, 28, 72, true );
-                        sprintf( buf, "in/bei %s.", getLoc( m_boxdata.m_hatchPlace ) );
-                        cust_font.printString( buf, 35, 86, true );
+                        sprintf( buffer, "Geschlüpft am %02i.%02i.%02i", m_boxdata.m_hatchDate[ 0 ], m_boxdata.m_hatchDate[ 1 ], m_boxdata.m_hatchDate[ 2 ] );
+                        cust_font.printString( buffer, 28, 72, true );
+                        sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_hatchPlace ) );
+                        cust_font.printString( buffer, 35, 86, true );
                     } else {
-                        sprintf( buf, "Geschlüpft in/bei %s.", getLoc( m_boxdata.m_hatchPlace ) );
-                        cust_font.printString( buf, 28, 72, true );
+                        sprintf( buffer, "Geschlüpft in/bei %s.", FS::getLoc( m_boxdata.m_hatchPlace ) );
+                        cust_font.printString( buffer, 28, 72, true );
                     }
                     if( !m_boxdata.m_fateful ) {
-                        sprintf( buf, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                        cust_font.printString( buf, 28, 100, true );
-                        sprintf( buf, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
-                        cust_font.printString( buf, 35, 114, true );
+                        sprintf( buffer, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                        cust_font.printString( buffer, 28, 100, true );
+                        sprintf( buffer, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
+                        cust_font.printString( buffer, 35, 114, true );
 
-                        sprintf( buf, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
-                        cust_font.printString( buf, 28, 128, true );
+                        sprintf( buffer, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
+                        cust_font.printString( buffer, 28, 128, true );
                     } else {
-                        sprintf( buf, "Besitzt ein %s""es Wesen.", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
-                        cust_font.printString( buf, 28, 100, true );
+                        sprintf( buffer, "Besitzt ein %s""es Wesen.", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                        cust_font.printString( buffer, 28, 100, true );
                     }
                 }
             }
@@ -1332,32 +856,32 @@ NEXT:
                 cust_font.printString( "Off. schicks. Begegnung.", 28, 120, true );
         }
 
-        if( !( m_boxdata.m_IV.m_isEgg ) ) {
+        if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
             printf( "\x1b[33m" );
 
             consoleSelect( p_top );
             consoleSetWindow( p_top, 4, 5, 12, 2 );
 
-            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", m_boxdata.m_SPEC, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), m_boxdata.m_isFemale, true ) )
-                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", m_boxdata.m_SPEC, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), !m_boxdata.m_isFemale, true );
+            if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", m_boxdata.m_speciesId, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), m_boxdata.m_isFemale, true ) )
+                FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", m_boxdata.m_speciesId, 16, 48, a2, b2, c2, false, m_boxdata.isShiny( ), !m_boxdata.m_isFemale, true );
 
-            int exptype = data.m_expType;
+            u16 exptype = data.m_expType;
 
-            printf( "EP(%3i%%)\nKP(%3i%%)", ( m_boxdata.m_exp - POKEMON::EXP[ m_Level - 1 ][ exptype ] ) * 100 / ( POKEMON::EXP[ m_Level ][ exptype ] - POKEMON::EXP[ m_Level - 1 ][ exptype ] ),
+            printf( "EP(%3i%%)\nKP(%3i%%)", ( m_boxdata.m_experienceGained - POKEMON::EXP[ m_Level - 1 ][ exptype ] ) * 100 / ( POKEMON::EXP[ m_Level ][ exptype ] - POKEMON::EXP[ m_Level - 1 ][ exptype ] ),
                     m_stats.m_acHP * 100 / m_stats.m_maxHP );
-            BATTLE::displayHP( 100, 101, 46, 80, 97, 98, false, 50, 56 );
-            BATTLE::displayHP( 100, 100 - m_stats.m_acHP * 100 / m_stats.m_maxHP, 46, 80, 97, 98, false, 50, 56 );
+            BATTLE::battleUI::displayHP( 100, 101, 46, 80, 97, 98, false, 50, 56 );
+            BATTLE::battleUI::displayHP( 100, 100 - m_stats.m_acHP * 100 / m_stats.m_maxHP, 46, 80, 97, 98, false, 50, 56 );
 
-            BATTLE::displayEP( 100, 101, 46, 80, 99, 100, false, 59, 62 );
-            BATTLE::displayEP( 0, ( m_boxdata.m_exp - POKEMON::EXP[ m_Level - 1 ][ exptype ] ) * 100 / ( POKEMON::EXP[ m_Level ][ exptype ] - POKEMON::EXP[ m_Level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62 );
+            BATTLE::battleUI::displayEP( 100, 101, 46, 80, 99, 100, false, 59, 62 );
+            BATTLE::battleUI::displayEP( 0, ( m_boxdata.m_experienceGained - POKEMON::EXP[ m_Level - 1 ][ exptype ] ) * 100 / ( POKEMON::EXP[ m_Level ][ exptype ] - POKEMON::EXP[ m_Level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62 );
 
         }
     }
-    extern bool drawInfoSub( u16* p_layer, int p_pkmnId );
-    int pokemon::draw( ) {
+    extern bool drawInfoSub( u16* p_layer, u16 p_pkmnId );
+    s8 pokemon::draw( ) {
 
         // Load bitmap to top background
-        loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNInfoScreen" );
+        FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNInfoScreen" );
 
         consoleSelect( &Top );
         consoleClear( );
@@ -1370,7 +894,7 @@ NEXT:
         int pagemax = 3;
 
         consoleSelect( &Bottom );
-        wprintf( &( m_boxdata.m_Name[ 0 ] ) );
+        wprintf( &( m_boxdata.m_name[ 0 ] ) );
 
         drawPage( page, &Top, &Bottom, true );
         touchPosition touch;
@@ -1460,8 +984,10 @@ NEXT:
                 }
                 drawPage( page, &Top, &Bottom, false );
             } else if( pressed & KEY_LEFT ) {
-                if( --page == -1 )
+                if( page == 0 )
                     page = pagemax - 1;
+                else
+                    --page;
                 while( 1 ) {
                     scanKeys( );
                     if( keysUp( ) & KEY_LEFT )
@@ -1509,12 +1035,12 @@ NEXT:
     }
 
     bool pokemon::boxPokemon::isShiny( ) {
-        return ( ( ( m_ID ^ m_SID ) >> 3 ) ^ ( ( ( m_PID >> 16 ) ^ ( m_PID % ( 1 << 16 ) ) ) ) >> 3 ) == 0;
+        return ( ( ( m_oTId ^ m_oTSid ) >> 3 ) ^ ( ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) ) ) >> 3 ) == 0;
     }
     bool pokemon::boxPokemon::isCloned( ) {
-        return ( ( m_PID >> 16 )&( m_PID % ( 1 << 16 ) ) ) < ( ( m_PID >> 16 ) ^ ( m_PID % ( 1 << 16 ) ) );
+        return ( ( m_pid >> 16 )&( m_pid % ( 1 << 16 ) ) ) < ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) );
     }
-    int pokemon::boxPokemon::gender( ) {
+    s8 pokemon::boxPokemon::gender( ) {
         if( m_isGenderless )
             return 0;
         else if( m_isFemale )
@@ -1522,15 +1048,15 @@ NEXT:
         return 1;
     }
 
-    unsigned int LastPID = 42;
-    int page = 0;
+    u32 LastPID = 42;
+    u16 page = 0;
 
 
-    bool pokemon::canEvolve( int p_item, int p_method ) {
-        if( m_boxdata.m_IV.m_isEgg )
+    bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
+        if( m_boxdata.m_individualValues.m_isEgg )
             return false;
 
-        PKMNDATA::getAll( m_boxdata.m_SPEC, data );
+        PKMNDATA::getAll( m_boxdata.m_speciesId, data );
 
         for( int i = 0; i < 7; ++i ) {
             if( m_Level < data.m_evolutions[ i ].m_e.m_evolveLevel )
@@ -1547,28 +1073,28 @@ NEXT:
                 continue;
             if( data.m_evolutions[ i ].m_e.m_evolveLocation && SAV.m_acMapIdx != data.m_evolutions[ i ].m_e.m_evolveLocation )
                 continue;
-            if( data.m_evolutions[ i ].m_e.m_evolveHeldItem && m_boxdata.m_Item != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
+            if( data.m_evolutions[ i ].m_e.m_evolveHeldItem && m_boxdata.m_holdItem != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
                 continue;
             if( data.m_evolutions[ i ].m_e.m_evolveKnownMove ) {
                 bool b = false;
                 for( int j = 0; j < 4; ++j )
-                    b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMove == m_boxdata.m_Attack[ j ] );
+                    b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMove == m_boxdata.m_moves[ j ] );
                 if( !b )
                     continue;
             }
             if( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType ) {
                 bool b = false;
                 for( int j = 0; j < 4; ++j )
-                    b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType == AttackList[ m_boxdata.m_Attack[ j ] ]->m_moveType );
+                    b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType == AttackList[ m_boxdata.m_moves[ j ] ]->m_moveType );
                 if( !b )
                     continue;
             }
-            if( data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty && data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty < m_boxdata.m_ConStats[ 1 ] )
+            if( data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty && data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty < m_boxdata.m_contestStats[ 1 ] )
                 continue;
             if( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember ) {
                 bool b = false;
                 for( int j = 0; j < 6; ++j )
-                    b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == SAV.m_PkmnTeam[ i ].m_boxdata.m_SPEC );
+                    b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId );
                 if( !b )
                     continue;
             }
@@ -1579,11 +1105,11 @@ NEXT:
         return false;
     }
 
-    void pokemon::evolve( int p_item, int p_method ) {
-        if( m_boxdata.m_IV.m_isEgg )
+    void pokemon::evolve( u16 p_item, u16 p_method ) {
+        if( m_boxdata.m_individualValues.m_isEgg )
             return;
 
-        PKMNDATA::getAll( m_boxdata.m_SPEC, data );
+        PKMNDATA::getAll( m_boxdata.m_speciesId, data );
 
         int into = 0;
 
@@ -1602,28 +1128,28 @@ NEXT:
                 continue;
             if( data.m_evolutions[ i ].m_e.m_evolveLocation && SAV.m_acMapIdx != data.m_evolutions[ i ].m_e.m_evolveLocation )
                 continue;
-            if( data.m_evolutions[ i ].m_e.m_evolveHeldItem && m_boxdata.m_Item != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
+            if( data.m_evolutions[ i ].m_e.m_evolveHeldItem && m_boxdata.m_holdItem != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
                 continue;
             if( data.m_evolutions[ i ].m_e.m_evolveKnownMove ) {
                 bool b = false;
                 for( int j = 0; j < 4; ++j )
-                    b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMove == m_boxdata.m_Attack[ j ] );
+                    b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMove == m_boxdata.m_moves[ j ] );
                 if( !b )
                     continue;
             }
             if( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType ) {
                 bool b = false;
                 for( int j = 0; j < 4; ++j )
-                    b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType == AttackList[ m_boxdata.m_Attack[ j ] ]->m_moveType );
+                    b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType == AttackList[ m_boxdata.m_moves[ j ] ]->m_moveType );
                 if( !b )
                     continue;
             }
-            if( data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty && data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty < m_boxdata.m_ConStats[ 1 ] )
+            if( data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty && data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty < m_boxdata.m_contestStats[ 1 ] )
                 continue;
             if( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember ) {
                 bool b = false;
                 for( int j = 0; j < 6; ++j )
-                    b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == SAV.m_PkmnTeam[ i ].m_boxdata.m_SPEC );
+                    b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId );
                 if( !b )
                     continue;
             }
@@ -1635,24 +1161,42 @@ NEXT:
         if( into == 0 )
             return;
 
-        m_boxdata.m_SPEC = into;
-        PKMNDATA::getAll( m_boxdata.m_SPEC, data );
-        if( m_boxdata.m_SPEC != 292 )
-            m_stats.m_maxHP = ( ( m_boxdata.m_IV.m_HP + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_EV[ 0 ] / 4 ) + 100 )*m_Level / 100 ) + 10;
+        m_boxdata.m_speciesId = into;
+        PKMNDATA::getAll( m_boxdata.m_speciesId, data );
+        if( m_boxdata.m_speciesId != 292 )
+            m_stats.m_maxHP = ( ( m_boxdata.m_individualValues.m_hp + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )*m_Level / 100 ) + 10;
         else
             m_stats.m_maxHP = 1;
 
-        if( !m_boxdata.m_IV.m_isNicked )
-            wcscpy( m_boxdata.m_Name, PKMNDATA::getWDisplayName( m_boxdata.m_SPEC ) );
+        if( !m_boxdata.m_individualValues.m_isNicked )
+            wcscpy( m_boxdata.m_name, PKMNDATA::getWDisplayName( m_boxdata.m_speciesId ) );
 
         int HPdif = m_stats.m_maxHP - m_stats.m_acHP;
         pkmnNatures nature = m_boxdata.getNature( );
-        m_stats.m_Atk = ( ( ( m_boxdata.m_IV.m_Attack + 2 * data.m_bases[ 1 ] + ( m_boxdata.m_EV[ 1 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];
-        m_stats.m_Def = ( ( ( m_boxdata.m_IV.m_Defense + 2 * data.m_bases[ 2 ] + ( m_boxdata.m_EV[ 2 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 1 ];
-        m_stats.m_Spd = ( ( ( m_boxdata.m_IV.m_Speed + 2 * data.m_bases[ 3 ] + ( m_boxdata.m_EV[ 3 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 2 ];
-        m_stats.m_SAtk = ( ( ( m_boxdata.m_IV.m_SAttack + 2 * data.m_bases[ 4 ] + ( m_boxdata.m_EV[ 4 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 3 ];
-        m_stats.m_SDef = ( ( ( m_boxdata.m_IV.m_SDefense + 2 * data.m_bases[ 5 ] + ( m_boxdata.m_EV[ 5 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 4 ];
+        m_stats.m_Atk = ( ( ( m_boxdata.m_individualValues.m_attack + 2 * data.m_bases[ 1 ] + ( m_boxdata.m_effortValues[ 1 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];
+        m_stats.m_Def = ( ( ( m_boxdata.m_individualValues.m_defense + 2 * data.m_bases[ 2 ] + ( m_boxdata.m_effortValues[ 2 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 1 ];
+        m_stats.m_Spd = ( ( ( m_boxdata.m_individualValues.m_speed + 2 * data.m_bases[ 3 ] + ( m_boxdata.m_effortValues[ 3 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 2 ];
+        m_stats.m_SAtk = ( ( ( m_boxdata.m_individualValues.m_sAttack + 2 * data.m_bases[ 4 ] + ( m_boxdata.m_effortValues[ 4 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 3 ];
+        m_stats.m_SDef = ( ( ( m_boxdata.m_individualValues.m_sDefense + 2 * data.m_bases[ 5 ] + ( m_boxdata.m_effortValues[ 5 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 4 ];
 
         m_stats.m_acHP = m_stats.m_maxHP - HPdif;
+    }
+
+    //TODO: enhance equality test
+    bool pokemon::operator==( const pokemon& p_other ) const {
+        if( m_boxdata.m_pid != p_other.m_boxdata.m_pid
+            || m_boxdata.m_b1 != p_other.m_boxdata.m_b1
+            || m_boxdata.m_checksum != p_other.m_boxdata.m_checksum
+            || m_boxdata.m_speciesId != p_other.m_boxdata.m_speciesId
+            || m_boxdata.m_holdItem != p_other.m_boxdata.m_holdItem
+            || m_boxdata.m_oTId != p_other.m_boxdata.m_oTId
+            || m_boxdata.m_oTSid != p_other.m_boxdata.m_oTSid
+            || m_boxdata.m_experienceGained != p_other.m_boxdata.m_experienceGained
+            || m_boxdata.m_steps != p_other.m_boxdata.m_steps
+            || m_boxdata.m_ability != p_other.m_boxdata.m_ability
+            || m_boxdata.m_markings != p_other.m_boxdata.m_markings
+            || m_boxdata.m_origLang != p_other.m_boxdata.m_origLang )
+            return false;
+        return true;
     }
 }
