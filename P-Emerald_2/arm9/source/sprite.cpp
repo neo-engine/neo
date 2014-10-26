@@ -221,7 +221,7 @@ u16 loadSprite( OAMTable   *p_oam,
     }
     else {
         dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE_SUB[ p_palIdx * COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER ], p_spriteDataLen );
+        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER_SUB ], p_spriteDataLen );
     }
-    return p_spriteDataLen / BYTES_PER_16_COLOR_TILE;
+    return p_tileIdx + (p_spriteDataLen / BYTES_PER_16_COLOR_TILE);
 }

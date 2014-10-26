@@ -672,7 +672,7 @@ void vramSetup( ) {
 }
 
 u8 lastdir;
-u8 dir[ 5 ][ 2 ] = { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } };
+s8 dir[ 5 ][ 2 ] = { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } };
 enum MoveMode {
     WALK,
     SURF,
@@ -1074,15 +1074,15 @@ void showNewMap( u16 p_mapIdx ) {
 }
 
 bool left = false;
-void loadframe( SpriteInfo* p_si, u8 p_idx, u8 p_frame, bool p_big = false ) {
+void loadframe( SpriteInfo* p_si, int p_idx, int p_frame, bool p_big = false ) {
     sprintf( buffer, "%i/%i", p_idx, p_frame );
     if( !p_big )
-        FS::loadSprite( p_si, "nitro://PICS/SPRITES/OW/", buffer, 64, 16 );
+        FS::loadSprite( p_si, "nitro:/PICS/SPRITES/OW/", buffer, 64, 16 );
     else
-        FS::loadSprite( p_si, "nitro://PICS/SPRITES/OW/", buffer, 128, 16 );
+        FS::loadSprite( p_si, "nitro:/PICS/SPRITES/OW/", buffer, 128, 16 );
 }
 
-void animateHero( u8 p_dir, u8 p_frame, bool p_runDisable = false ) {
+void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
     heroIsBig = false;
 
     left = !left;
@@ -1401,7 +1401,7 @@ inline void movePlayer( u16 p_direction ) {
     acMap->movePlayer( p_direction );
 }
 
-bool movePlayerOnMap( u16 p_x, u16 p_y, u16 p_z, bool p_init /*= true*/ ) {
+bool movePlayerOnMap( s16 p_x, s16 p_y, u16 p_z, bool p_init /*= true*/ ) {
     bool WTW = ( gMod == DEVELOPER ) && ( keysHeld( ) & KEY_R );
 
     MoveMode playermoveMode = (MoveMode)SAV.m_acMoveMode;
@@ -1485,7 +1485,7 @@ bool movePlayerOnMap( u16 p_x, u16 p_y, u16 p_z, bool p_init /*= true*/ ) {
                     free( acMap );
                     strcpy( SAV.m_acMapName, a.m_name );
                     SAV.m_acMapIdx = a.m_mapidx;
-                    acMap = new map2d::Map( "nitro://MAPS/", a.m_name );
+                    acMap = new map2d::Map( "nitro:/MAPS/", a.m_name );
                     p_y -= a.m_move;
                     p_x = a.m_mapsy + 10;
                     SAV.m_acposx = 20 * ( p_x - 10 );
@@ -1507,7 +1507,7 @@ bool movePlayerOnMap( u16 p_x, u16 p_y, u16 p_z, bool p_init /*= true*/ ) {
                     free( acMap );
                     strcpy( SAV.m_acMapName, a.m_name );
                     SAV.m_acMapIdx = a.m_mapidx;
-                    acMap = new map2d::Map( "nitro://MAPS/", a.m_name );
+                    acMap = new map2d::Map( "nitro:/MAPS/", a.m_name );
                     p_x -= a.m_move;
                     p_y = a.m_mapsx + 10;
                     SAV.m_acposx = 20 * ( p_x - 10 );
@@ -1521,7 +1521,7 @@ bool movePlayerOnMap( u16 p_x, u16 p_y, u16 p_z, bool p_init /*= true*/ ) {
         }
         return false;
     }
-    if( p_x >= acMap->m_sizey + 10 ) {
+    if( p_x >= s32( acMap->m_sizey + 10 ) ) {
         if( WTW || acmovedata == 4 || ( acmovedata % 4 == 0 && acmovedata / 4 == p_z ) || acmovedata == 0 || acmovedata == 60 ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'E' && p_y >= a.m_move + 10 && p_y < a.m_move + a.m_mapsx + 10 ) {
@@ -1529,7 +1529,7 @@ bool movePlayerOnMap( u16 p_x, u16 p_y, u16 p_z, bool p_init /*= true*/ ) {
                     free( acMap );
                     strcpy( SAV.m_acMapName, a.m_name );
                     SAV.m_acMapIdx = a.m_mapidx;
-                    acMap = new map2d::Map( "nitro://MAPS/", a.m_name );
+                    acMap = new map2d::Map( "nitro:/MAPS/", a.m_name );
                     p_y -= a.m_move;
                     p_x = 9;
                     SAV.m_acposx = 20 * ( p_x - 10 );
@@ -1543,7 +1543,7 @@ bool movePlayerOnMap( u16 p_x, u16 p_y, u16 p_z, bool p_init /*= true*/ ) {
         }
         return false;
     }
-    if( p_y >= acMap->m_sizex + 10 ) {
+    if( p_y >= s32( acMap->m_sizex + 10 ) ) {
 
         if( WTW || acmovedata == 4 || ( acmovedata % 4 == 0 && acmovedata / 4 == p_z ) || acmovedata == 0 || acmovedata == 60 ) {
             for( auto a : acMap->m_anbindungen ) {
@@ -1552,7 +1552,7 @@ bool movePlayerOnMap( u16 p_x, u16 p_y, u16 p_z, bool p_init /*= true*/ ) {
                     free( acMap );
                     strcpy( SAV.m_acMapName, a.m_name );
                     SAV.m_acMapIdx = a.m_mapidx;
-                    acMap = new map2d::Map( "nitro://MAPS/", a.m_name );
+                    acMap = new map2d::Map( "nitro:/MAPS/", a.m_name );
                     p_x -= a.m_move;
                     p_y = 9;
                     SAV.m_acposx = 20 * ( p_x - 10 );
@@ -1803,7 +1803,7 @@ int main( int p_argc, char** p_argv ) {
     scrn.draw( mode );
 
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Clear" );
-    acMap = new map2d::Map( "nitro://MAPS/", SAV.m_acMapName );
+    acMap = new map2d::Map( "nitro:/MAPS/", SAV.m_acMapName );
 
     movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
     lastdir = 0;

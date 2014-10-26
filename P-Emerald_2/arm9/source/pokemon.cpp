@@ -471,7 +471,7 @@ namespace POKEMON {
                 sprintf( buffer, "%s: %s", ITEMS::ItemList[ m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
                          ITEMS::ItemList[ m_boxdata.getItem( ) ].getShortDescription( true ).c_str( ) );
                 cust_font.printString( buffer, 50, 159, false );
-                drawItemIcon( OamTop, spriteInfoTop, ITEMS::ItemList[ m_boxdata.getItem( ) ].m_itemName, 2, 152, a2, b2, c2, false );
+                FS::drawItemIcon( OamTop, spriteInfoTop, ITEMS::ItemList[ m_boxdata.getItem( ) ].m_itemName, 2, 152, a2, b2, c2, false );
                 updateOAM( OamTop );
             } else {
                 cust_font.setColor( 252, 1 );
@@ -549,15 +549,15 @@ namespace POKEMON {
                     sprintf( buffer, "SVE                   %3i", m_stats.m_SDef );
                     cust_font.printString( buffer, 130, 137, false );
 
-                    FONT::putrec( 158, 46, 158 + 68, 46 + 12, false, false, 251 );
+                    FONT::putrec( (u8)158, (u8)46, u8( 158 + 68 ), u8( 46 + 12 ), false, false, (u8)251 );
 
-                    FONT::putrec( 158, 46, 158 + int( 68.0*m_boxdata.IVget( 0 ) / 31 ), 46 + 6, false, false, 7 * 16 - 1 );
-                    FONT::putrec( 158, 46 + 6, 158 + int( 68.0*m_boxdata.m_effortValues[ 0 ] / 255 ), 46 + 12, false, false, 7 * 16 - 1 );
+                    FONT::putrec( (u8)158, (u8)46, u8( 158 + ( 68.0*m_boxdata.IVget( 0 ) / 31 ) ), u8( 46 + 6 ), false, false, u8( 7 * 16 - 1 ) );
+                    FONT::putrec( (u8)158, u8( 46 + 6 ), u8( 158 + ( 68.0*m_boxdata.m_effortValues[ 0 ] / 255 ) ), u8( 46 + 12 ), false, false, u8( 7 * 16 - 1 ) );
 
                     for( int i = 1; i < 6; ++i ) {
-                        FONT::putrec( 158, 54 + ( 17 * i ), 158 + 68, 54 + 12 + ( 17 * i ), false, false, 251 );
-                        FONT::putrec( 158, 54 + ( 17 * i ), 158 + int( 68.0*m_boxdata.IVget( i ) / 31 ), 54 + 6 + ( 17 * i ), false, false, ( 7 + i ) * 16 - 1 );
-                        FONT::putrec( 158, 54 + 6 + ( 17 * i ), 158 + int( 68.0*m_boxdata.m_effortValues[ i ] / 255 ), 54 + 12 + ( 17 * i ), false, false, ( 7 + i ) * 16 - 1 );
+                        FONT::putrec( (u8)158, u8( 54 + ( 17 * i ) ), u8( 158 + 68 ), u8( 54 + 12 + ( 17 * i ) ), false, false, (u8)251 );
+                        FONT::putrec( (u8)158, u8( 54 + ( 17 * i ) ), u8( 158 + ( 68.0*m_boxdata.IVget( i ) / 31 ) ), u8( 54 + 6 + ( 17 * i ) ), false, false, u8( ( 7 + i ) * 16 - 1 ) );
+                        FONT::putrec( (u8)158, u8( 54 + 6 + ( 17 * i ) ), u8( 158 + ( 68.0*m_boxdata.m_effortValues[ i ] / 255 ) ), u8( 54 + 12 + ( 17 * i ) ), false, false, u8( ( 7 + i ) * 16 - 1 ) );
                     }
                 } else {
                     consoleSetWindow( p_top, 16, 4, 32, 24 );
@@ -667,7 +667,7 @@ namespace POKEMON {
                 drawTypeIcon( Oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 0 ], 256 - 68, 24, true );
                 drawTypeIcon( Oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 1 ], 256 - 32, 24, true );
             }
-            drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ].m_itemName, 256 - 100, 0, o2s, p2s, t2s, true );
+            FS::drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ].m_itemName, 256 - 100, 0, o2s, p2s, t2s, true );
 
             Oam->oamBuffer[ 15 ].isHidden = false;
             Oam->oamBuffer[ 15 ].y = 0;
@@ -716,7 +716,7 @@ namespace POKEMON {
             Oam->oamBuffer[ o2s++ ].isHidden = true;
             Oam->oamBuffer[ o2s++ ].isHidden = true;
             Oam->oamBuffer[ o2s ].isHidden = true;
-            drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ].m_itemName, 256 - 32, 0, o2s, p2s, t2s, true );
+            FS::drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ].m_itemName, 256 - 32, 0, o2s, p2s, t2s, true );
             updateOAMSub( Oam );
         }
         printf( "\x1b[33m" );
@@ -1001,8 +1001,10 @@ namespace POKEMON {
                 }
                 drawPage( page, &Top, &Bottom, false );
             } else if( pressed & KEY_LEFT ) {
-                if( --page == -1 )
+                if( page == 0 )
                     page = pagemax - 1;
+                else
+                    --page;
                 while( 1 ) {
                     scanKeys( );
                     if( keysUp( ) & KEY_LEFT )

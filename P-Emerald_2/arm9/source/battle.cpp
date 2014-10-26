@@ -123,6 +123,10 @@ namespace BATTLE {
         "Ingrain"
     };
 
+    //////////////////////////////////////////////////////////////////////////
+    // BEGIN BATTLE_UI
+    //////////////////////////////////////////////////////////////////////////
+
     void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big ) {
         if( p_big )
             displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 20, 24 );
@@ -132,7 +136,7 @@ namespace BATTLE {
     void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR ) {
         p_HP = std::max( std::min( (u16)101, p_HP ), u16( 0 ) );
         u16 factor = std::max( 1, p_outerR / 15 );
-        if( p_HP > 100 || p_HP < 0 ) {
+        if( p_HP > 100 ) {
             BG_PALETTE[ p_freecolor1 ] = GREEN;
             for( u16 i = 0; i < factor * 100; ++i )
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
@@ -179,7 +183,7 @@ namespace BATTLE {
         }
     }
 
-    void battleUI::initScreen( ) {
+    void battleUI::initLogScreen( ) {
         cust_font.setColor( 0, 0 );
         cust_font.setColor( 251, 1 );
         cust_font.setColor( 252, 2 );
@@ -197,18 +201,18 @@ namespace BATTLE {
         BG_PALETTE[ 252 ] = RGB15( 3, 3, 3 );
         BG_PALETTE[ 253 ] = RGB15( 15, 15, 15 );
         BG_PALETTE[ 254 ] = RGB15( 31, 31, 31 );
-        FONT::putrec( 0, 0, 256, 63, true, false, 250 );
+        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
     }
-    void battleUI::clearScreen( ) {
-        FONT::putrec( 0, 0, 256, 63, true, false, 250 );
+    void battleUI::clearLogScreen( ) {
+        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
     }
-    void battleUI::setTextColor( u16 p_color ) {
+    void battleUI::setLogTextColor( u16 p_color ) {
         BG_PALETTE_SUB[ 251 ] = BG_PALETTE[ 251 ] = p_color;
     }
-    void battleUI::setText2Color( u16 p_color ) {
+    void battleUI::setLogText2Color( u16 p_color ) {
         BG_PALETTE_SUB[ 253 ] = BG_PALETTE[ 253 ] = p_color;
     }
-    void battleUI::writeText( const std::wstring& p_message ) {
+    void battleUI::writeLogText( const std::wstring& p_message ) {
         cust_font.printMBString( p_message.c_str( ), 8, 8, true );
     }
 
@@ -232,6 +236,169 @@ namespace BATTLE {
         }
     }
 
+    //Some defines of indices in the OAM for the used sprites
+#define HP_START                 1
+#define HP_IDX( p_pokemonPos, p_opponent ) ( HP_START + ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
+
+#define STSBALL_START            5
+#define STSBALL_IDX( p_pokemonPos, p_opponent ) ( STSBALL_START + ( ( p_opponent ) * 6 + ( p_pokemonPos ) ) )
+
+#define PKMN_START               17
+#define PKMN_IDX( p_pokemonPos, p_opponent ) ( PKMN_START + 4 * ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
+
+#define PB_ANIM             127
+#define SHINY_ANIM          127
+
+    //Some analogous defines for thei pal indices
+#define PKMN_PAL_START
+#define OPP_PKMN_1_PAL        0-1
+#define OPP_PKMN_2_PAL        1-1
+#define OWN_PKMN_1_PAL        2-1
+#define OWN_PKMN_2_PAL        3-1
+
+#define PB_PAL_START          4
+#define HP_PAL                7
+
+#define OPP_PKMN_1_TILE      44
+#define OPP_PKMN_2_TILE     188
+#define OWN_PKMN_1_TILE     332
+#define OWN_PKMN_2_TILE     476
+
+#define OWN1_EP_COL         160
+#define OWN2_EP_COL         OWN1_EP_COL
+
+#define OWN_HP_COL          150
+#define OPP_HP_COL          155
+
+#define HP_COL(a,b) (((a) == OPPONENT )? (OPP_HP_COL + (b)*2 ): (OWN_HP_COL + (b)*2 ))
+
+#define GENDER(a) (a.m_boxdata.m_isFemale? 147 : (a.m_boxdata.m_isGenderless ? ' ' : 141))
+
+    void initStsBalls( ) {
+
+    }
+    void setStsBallVisibility( bool p_opponent, u8 p_pokemonPos, bool p_visibility ) {
+
+    }
+    void setStsBallSts( bool p_opponent, u8 p_pokemonPos, battle::acStatus p_status ) {
+
+    }
+
+    /**
+     *  @brief Loads all the required graphics and sprites
+     */
+    void battleUI::init( ) {
+
+    }
+
+    void battleUI::trainerIntro( ) {
+
+    }
+
+    void battleUI::declareBattleMove( u8 p_pokemonPos ) {
+
+    }
+
+    void battleUI::declareBattleMoveChoose( ) {
+
+    }
+
+    void battleUI::chooseAttack( ) {
+
+    }
+
+    void battleUI::chooseItem( ) {
+
+    }
+
+    u8 battleUI::choosePKMN( ) {
+
+    }
+
+    void battleUI::useNav( ) {
+
+    }
+
+    void battleUI::showAttack( u8 p_moveNo ) {
+
+    }
+
+    void battleUI::updateHP( bool p_opponent, u8 p_pokemonPos ) {
+
+    }
+
+    void battleUI::applyEXPChanges( ) {
+
+    }
+
+    void battleUI::updateStats( bool p_opponent, u8 p_pokemonPos ) {
+
+    }
+
+    void battleUI::hidePKMN( bool p_opponent, u8 p_pokemonPos ) {
+
+    }
+
+    void battleUI::sendPKMN( bool p_opponent, u8 p_pokemonPos ) {
+
+    }
+
+    void battleUI::evolvePKMN( bool p_opponent, u8 p_pokemonPos ) {
+
+    }
+
+    void battleUI::learnMove( u8 p_pokemonPos, u16 p_move ) {
+
+    }
+
+    void battleUI::dinit( ) {
+
+    }
+
+#undef OWN_HP_1
+#undef OWN_HP_2              
+#undef OPP_HP_1              
+#undef OPP_HP_2              
+#undef OWN_PB_START          
+#undef OPP_PB_START         
+#undef OPP_PKMN_1_START     
+#undef OPP_PKMN_2_START    
+#undef OWN_PKMN_1_START     
+#undef OWN_PKMN_2_START     
+
+#undef PB_ANIM             
+#undef SHINY_ANIM          
+
+#undef OPP_PKMN_1_PAL        
+#undef OPP_PKMN_2_PAL       
+#undef OWN_PKMN_1_PAL       
+#undef OWN_PKMN_2_PAL        
+
+#undef PB_PAL_START          
+#undef HP_PAL                
+
+#undef OPP_PKMN_1_TILE      
+#undef OPP_PKMN_2_TILE     
+#undef OWN_PKMN_1_TILE     
+#undef OWN_PKMN_2_TILE     
+
+#undef OWN1_EP_COL         
+#undef OWN2_EP_COL         
+
+#undef OWN_HP_COL          
+#undef OPP_HP_COL          
+
+#undef HP_COL
+
+#undef GENDER
+
+    //////////////////////////////////////////////////////////////////////////
+    // END BATTLE_UI
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////
+    // BEGIN BATTLE
+    //////////////////////////////////////////////////////////////////////////
 #define C2I(a) ((a) - L'0')
     std::wstring parseLogCmd( battle& p_battle, const std::wstring& p_cmd ) {
         if( p_cmd == L"A" )
@@ -254,7 +421,7 @@ namespace BATTLE {
             g = 10 * C2I( p_cmd[ 8 ] ) + C2I( p_cmd[ 9 ] );
             b = 10 * C2I( p_cmd[ 11 ] ) + C2I( p_cmd[ 12 ] );
 
-            p_battle._battleUI.setTextColor( RGB15( r, g, b ) );
+            p_battle._battleUI.setLogTextColor( RGB15( r, g, b ) );
             return L"";
         }
 
@@ -303,6 +470,10 @@ namespace BATTLE {
         return L"";
     }
 
+    /**
+     *  @brief Write the message p_message to the battle log
+     *  @param p_message: The message to be written
+     */
     void battle::log( const std::wstring& p_message ) {
         std::wstring msg = L"";
         for( size_t i = 0; i < p_message.length( ); i++ ) {
@@ -312,15 +483,15 @@ namespace BATTLE {
                     accmd += p_message[ i ];
                 msg += parseLogCmd( *this, accmd );
                 if( accmd == L"CLEAR" ) {
-                    _battleUI.writeText( msg );
-                    _battleUI.clearScreen( );
+                    _battleUI.writeLogText( msg );
+                    _battleUI.clearLogScreen( );
                 }
             } else
                 msg += p_message[ i ];
         }
 
-        _battleUI.writeText( msg );
-        _battleUI.clearScreen( );
+        _battleUI.writeLogText( msg );
+        _battleUI.clearLogScreen( );
     }
 
     /**
@@ -422,8 +593,6 @@ namespace BATTLE {
                     oldSts[ j ] = ACPKMNSTS( 0, j );
                     ACPKMNSTS( 0, j ) = SELECTED;
                 }
-
-                u16 acSpd = ACPKMN( i, j ).m_stats.m_Spd;
             }
         }
 
@@ -437,7 +606,7 @@ namespace BATTLE {
                             ACPKMNSTS( 0, j ) = oldSts[ j ];
 
                         _battleUI.sendPKMN( j, i );
-                        _battleSpotOccupied[ i ][ j ];
+                        _battleSpotOccupied[ i ][ j ] = true;
                     }
                     goto NEXT;
                 }
@@ -1077,32 +1246,32 @@ NEXT:
     void battle::registerParticipatedPKMN( ) {
         if( ACPKMNSTS( 0, PLAYER ) != KO && ACPKMNSTS( 0, OPPONENT ) != KO
             && ACPKMNSTS( 0, PLAYER ) != NA && ACPKMNSTS( 0, OPPONENT ) != NA )
-            _participatedPKMN[ ACPKMN( 0, PLAYER ) ].insert( ACPKMN( 0, OPPONENT ) );
+            _participatedPKMN[ &ACPKMN( 0, PLAYER ) ].insert( &ACPKMN( 0, OPPONENT ) );
         if( ACPKMNSTS( 0, PLAYER ) != KO && ACPKMNSTS( 0, OPPONENT ) != KO
             && ACPKMNSTS( 0, PLAYER ) != NA && ACPKMNSTS( 0, OPPONENT ) != NA )
-            _participatedPKMN[ ACPKMN( 0, OPPONENT ) ].insert( ACPKMN( 0, PLAYER ) );
+            _participatedPKMN[ &ACPKMN( 0, OPPONENT ) ].insert( &ACPKMN( 0, PLAYER ) );
 
         if( m_battleMode == DOUBLE ) {
             if( ACPKMNSTS( 0, PLAYER ) != KO && ACPKMNSTS( 1, OPPONENT ) != KO
                 && ACPKMNSTS( 0, PLAYER ) != NA && ACPKMNSTS( 1, OPPONENT ) != NA )
-                _participatedPKMN[ ACPKMN( 0, PLAYER ) ].insert( ACPKMN( 1, OPPONENT ) );
+                _participatedPKMN[ &ACPKMN( 0, PLAYER ) ].insert( &ACPKMN( 1, OPPONENT ) );
             if( ACPKMNSTS( 1, PLAYER ) != KO && ACPKMNSTS( 0, OPPONENT ) != KO
                 && ACPKMNSTS( 1, PLAYER ) != NA && ACPKMNSTS( 0, OPPONENT ) != NA )
-                _participatedPKMN[ ACPKMN( 0, OPPONENT ) ].insert( ACPKMN( 1, PLAYER ) );
+                _participatedPKMN[ &ACPKMN( 0, OPPONENT ) ].insert( &ACPKMN( 1, PLAYER ) );
 
             if( ACPKMNSTS( 1, PLAYER ) != KO && ACPKMNSTS( 0, OPPONENT ) != KO
                 && ACPKMNSTS( 1, PLAYER ) != NA && ACPKMNSTS( 0, OPPONENT ) != NA )
-                _participatedPKMN[ ACPKMN( 1, PLAYER ) ].insert( ACPKMN( 0, OPPONENT ) );
+                _participatedPKMN[ &ACPKMN( 1, PLAYER ) ].insert( &ACPKMN( 0, OPPONENT ) );
             if( ACPKMNSTS( 0, PLAYER ) != KO && ACPKMNSTS( 1, OPPONENT ) != KO
                 && ACPKMNSTS( 0, PLAYER ) != NA && ACPKMNSTS( 1, OPPONENT ) != NA )
-                _participatedPKMN[ ACPKMN( 1, OPPONENT ) ].insert( ACPKMN( 0, PLAYER ) );
+                _participatedPKMN[ &ACPKMN( 1, OPPONENT ) ].insert( &ACPKMN( 0, PLAYER ) );
 
             if( ACPKMNSTS( 1, PLAYER ) != KO && ACPKMNSTS( 1, OPPONENT ) != KO
                 && ACPKMNSTS( 1, PLAYER ) != NA && ACPKMNSTS( 1, OPPONENT ) != NA )
-                _participatedPKMN[ ACPKMN( 1, PLAYER ) ].insert( ACPKMN( 1, OPPONENT ) );
+                _participatedPKMN[ &ACPKMN( 1, PLAYER ) ].insert( &ACPKMN( 1, OPPONENT ) );
             if( ACPKMNSTS( 1, PLAYER ) != KO && ACPKMNSTS( 1, OPPONENT ) != KO
                 && ACPKMNSTS( 1, PLAYER ) != NA && ACPKMNSTS( 1, OPPONENT ) != NA )
-                _participatedPKMN[ ACPKMN( 1, OPPONENT ) ].insert( ACPKMN( 1, PLAYER ) );
+                _participatedPKMN[ &ACPKMN( 1, OPPONENT ) ].insert( &ACPKMN( 1, PLAYER ) );
         }
     }
 
@@ -1112,7 +1281,7 @@ NEXT:
     *  @param p_pokemonPos: Position of the fainted PKMN (0 or 1)
     */
     void battle::distributeEXP( bool p_opponent, u8 p_pokemonPos ) {
-        auto& receivingPKMN = _participatedPKMN[ ACPKMN( p_pokemonPos, p_opponent ) ];
+        auto& receivingPKMN = _participatedPKMN[ &ACPKMN( p_pokemonPos, p_opponent ) ];
 
         float wildModifer = m_isWildBattle ? 1 : 1.5;
         POKEMON::PKMNDATA::pokemonData p;
@@ -1120,22 +1289,22 @@ NEXT:
         u16 b = p.m_EXPYield;
 
         for( auto i : receivingPKMN ) {
-            if( i.m_stats.m_acHP ) {
-                if( i.m_Level == 100 )
+            if( i->m_stats.m_acHP ) {
+                if( i->m_Level == 100 )
                     continue;
-                float e = ( i.m_boxdata.m_holdItem == I_LUCKY_EGG ) ? 1.5 : 1;
+                float e = ( i->m_boxdata.m_holdItem == I_LUCKY_EGG ) ? 1.5 : 1;
 
-                u8 L = i.m_Level;
+                u8 L = i->m_Level;
 
-                float t = ( i.m_boxdata.m_oTId == SAV.m_Id && i.m_boxdata.m_oTSid == SAV.m_Sid ? 1 : 1.5 );
+                float t = ( i->m_boxdata.m_oTId == SAV.m_Id && i->m_boxdata.m_oTSid == SAV.m_Sid ? 1 : 1.5 );
 
                 u32 exp = u32( ( wildModifer * t* b* e* L ) / 7 );
 
-                i.m_boxdata.m_experienceGained += exp;
+                i->m_boxdata.m_experienceGained += exp;
 
                 //Distribute EV
                 for( u8 j = 0; j < 6; ++j )
-                    i.m_boxdata.m_effortValues[ j ] += p.m_EVYield[ j ];
+                    i->m_boxdata.m_effortValues[ j ] += p.m_EVYield[ j ];
             }
         }
 
@@ -1170,9 +1339,6 @@ NEXT:
 
                 POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_speciesId, p );
 
-                int nw = std::min( 100u, ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ L - 1 ][ p.m_expType ] ) * 100 /
-                                   ( POKEMON::EXP[ L ][ p.m_expType ] - POKEMON::EXP[ L - 1 ][ p.m_expType ] ) );
-
                 bool newLevel = POKEMON::EXP[ L ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
                 u16 HPdif = acPkmn.m_stats.m_maxHP - acPkmn.m_stats.m_acHP;
 
@@ -1201,9 +1367,6 @@ NEXT:
 
                     std::swprintf( wbuffer, 50, L"%ls erreicht Level %d.[A]", acPkmn.m_boxdata.m_name, acPkmn.m_Level );
                     log( wbuffer );
-
-                    nw = std::min( 100u, ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
-                                   ( POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) );
 
                     u8 oldSpec = acPkmn.m_boxdata.m_speciesId;
                     checkForAttackLearn( i );
@@ -1351,7 +1514,6 @@ NEXT:
         else
             acPkmnStr = L"OWN" + ( p_pokemonPos + 1 );
 
-        auto& acPkmn = ACPKMN( p_pokemonPos, p_opponent );
         if( p_opponent )
             std::swprintf( wbuffer, 100, L"[%ls] wurde von [TRAINER]\n([TCLASS]) auf die Bank geschickt.[A]", acPkmnStr.c_str( ) );
         else
@@ -1375,16 +1537,20 @@ NEXT:
      *  @brief Applys weather effects.
      */
     void battle::doWeather( ) {
-        if( m_weather != NO_WEATHER ) if( --_weatherLength ) {
-            log( _weatherMessage[ m_weather ] );
-            _weatherEffects[ m_weather ].execute( *this, this );
-        } else {
-            log( _weatherEndMessage[ m_weather ] );
-            m_weather = NO_WEATHER;
+        if( m_weather != NO_WEATHER ) {
+            if( --_weatherLength ) {
+                log( _weatherMessage[ m_weather ] );
+                _weatherEffects[ m_weather ].execute( *this, this );
+            } else {
+                log( _weatherEndMessage[ m_weather ] );
+                m_weather = NO_WEATHER;
+            }
         }
     }
 
-
+    //////////////////////////////////////////////////////////////////////////
+    // END BATTLE
+    //////////////////////////////////////////////////////////////////////////
 
 
 
@@ -1446,7 +1612,6 @@ NEXT:
 
     //OLD STUFF -> deprcated
 
-    POKEMON::PKMNDATA::pokemonData pd;
     void init( ) {
         for( int i = 5; i <= 8; ++i ) {
             Oam->oamBuffer[ i ].isHidden = true;
@@ -1481,12 +1646,12 @@ NEXT:
         BG_PALETTE[ 252 ] = RGB15( 3, 3, 3 );
         BG_PALETTE[ 253 ] = RGB15( 15, 15, 15 );
         BG_PALETTE[ 254 ] = RGB15( 31, 31, 31 );
-        FONT::putrec( 0, 0, 256, 63, true, false, 250 );
+        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
 
         updateOAMSub( Oam );
     }
     void clear( ) {
-        FONT::putrec( 0, 0, 256, 63, true, false, 250 );
+        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
     }
     void dinit( ) {
 
@@ -1511,45 +1676,8 @@ NEXT:
         m_distributeEXP = true;
     }
 
-    u8 oamIndex, palcnt;
-    u16 nextAvailableTileIdx;
-    u8 oamIndexS, palcntS;
-    u16 nextAvailableTileIdxS;
 
-#define OWN_HP_1              1
-#define OWN_HP_2              2
-#define OPP_HP_1              3
-#define OPP_HP_2              4
-#define OWN_PB_START          5
-#define OPP_PB_START         11
-#define OPP_PKMN_1_START     17-1
-#define OPP_PKMN_2_START     21-1
-#define OWN_PKMN_1_START     25-1
-#define OWN_PKMN_2_START     29-1
 
-#define PB_ANIM             127
-#define SHINY_ANIM          127
-
-#define OPP_PKMN_1_PAL        0-1
-#define OPP_PKMN_2_PAL        1-1
-#define OWN_PKMN_1_PAL        2-1
-#define OWN_PKMN_2_PAL        3-1
-
-#define PB_PAL_START          4
-#define HP_PAL                7
-
-#define OPP_PKMN_1_TILE      44
-#define OPP_PKMN_2_TILE     188
-#define OWN_PKMN_1_TILE     332
-#define OWN_PKMN_2_TILE     476
-
-#define OWN1_EP_COL         160
-#define OWN2_EP_COL         OWN1_EP_COL
-
-#define OWN_HP_COL          150
-#define OPP_HP_COL          155
-
-#define HP_COL(a,b) (((a) == OPPONENT )? (OPP_HP_COL + (b)*2 ): (OWN_HP_COL + (b)*2 ))
     //
     //    void initinitBattleScrnSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo, int p_ownPok, int p_oppPok ) {
     //        oamIndex = palcnt = nextAvailableTileIdx = 0;
@@ -2672,9 +2800,7 @@ NEXT:
     //        type1->isHidden = true;
     //        updateOAM( OamTop );
     //    }
-    //
-#define GENDER(a) (a.m_boxdata.m_isFemale? 147 : (a.m_boxdata.m_isGenderless ? ' ' : 141))
-    //
+    ////
     //    void battle::switchOppPkmn( int p_newPok, int p_toSwitch ) {
     //        if( ACPKMN( p_newPok, OPPONENT ).m_stats.m_acHP == 0 )
     //            return;

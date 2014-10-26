@@ -64,7 +64,8 @@ static const u8 SPRITE_DMA_CHANNEL = 2;
 #define BYTES_PER_16_COLOR_TILE 32
 #define COLORS_PER_PALETTE      16
 #define BOUNDARY_VALUE          32
-#define OFFSET_MULTIPLIER       (BOUNDARY_VALUE / sizeof( SPRITE_GFX[ 0 ] ))
+static const u16 OFFSET_MULTIPLIER = ( BOUNDARY_VALUE / sizeof( SPRITE_GFX[ 0 ] ) );
+static const u16 OFFSET_MULTIPLIER_SUB = ( BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] ) );
 
 struct SpriteInfo {
     u8 m_oamId;

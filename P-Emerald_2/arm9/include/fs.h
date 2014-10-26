@@ -46,6 +46,8 @@ extern SavMod savMod;
 
 namespace FS {
 
+#define MAXITEMSPERPAGE 12
+
     std::string readString( FILE*, bool p_new = false );
     std::wstring readWString( FILE*, bool p_new = false );
 
@@ -65,6 +67,19 @@ namespace FS {
                             const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false );
     bool loadTrainerSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_posX,
                                const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false );
+
+    void drawItem( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY, const u16 p_cnt,
+                   u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen, bool p_showcnt );
+    void drawItemIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY,
+                       u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen = true );
+    void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16& p_pkmnNo, const u16 p_posX, const u16 p_posY,
+                       u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen = true );
+    void drawEggIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16 p_posX, const u16 p_posY,
+                      u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen = true );
+    void drawTypeIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16 & p_nextAvailableTileIdx, Type p_type, u16 p_posX, u16 p_posY, bool p_bottom );
+
+    void drawItem( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY, const u16 p_cnt,
+                   u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen = true, bool p_showcnt = false );
 
     const char* getLoc( u16 p_ind );
 }

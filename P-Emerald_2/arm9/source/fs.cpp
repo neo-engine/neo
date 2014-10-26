@@ -41,6 +41,9 @@ distribution.
 #include "berry.h"
 
 
+#include "NoItem.h"
+
+
 u32 TEMP[ 12288 ] = { 0 };
 u16 TEMP_PAL[ 256 ] = { 0 };
 const char ITEM_PATH[ ] = "nitro:/ITEMS/";
@@ -621,6 +624,204 @@ namespace FS {
         return true;
     }
 
+
+    void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16& p_pkmnId, const u16 p_posX, const u16 p_posY,
+                       u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen ) {
+
+        SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
+        SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
+        ItemInfo->m_oamId = p_oamIndex;
+        ItemInfo->m_width = ItemInfo->m_height = 32;
+        ItemInfo->m_angle = 0;
+        ItemInfo->m_entry = Item;
+        Item->isRotateScale = false;
+        Item->blendMode = OBJMODE_NORMAL;
+        Item->isMosaic = false;
+        Item->colorMode = OBJCOLOR_16;
+        Item->shape = OBJSHAPE_SQUARE;
+        Item->isHidden = false;
+        Item->size = OBJSIZE_32;
+        Item->gfxIndex = p_tileCnt;
+        Item->priority = p_subScreen ? OBJPRIORITY_1 : OBJPRIORITY_0;
+        Item->palette = p_palCnt;
+        Item->x = p_posX;
+        Item->y = p_posY;
+
+        char buffer[100];
+        sprintf( buffer, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
+        if( p_subScreen ) {
+            if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/PKMN/", buffer, 128, 16 ) ) {
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemPal,
+                                  &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
+                                  32 );
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemTiles,
+                                  &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  NoItemTilesLen );
+            }
+        } else {
+            if( !FS::loadSprite( ItemInfo, "nitro:/PICS/SPRITES/PKMN/", buffer, 128, 16 ) ) {
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemPal,
+                                  &SPRITE_PALETTE[ p_palCnt * 16 ],
+                                  32 );
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemTiles,
+                                  &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  NoItemTilesLen );
+            }
+        }
+        p_tileCnt += 512 / 32;
+        ++p_palCnt;
+    }
+    void drawEggIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16 p_posX, const u16 p_posY,
+                      u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen ) {
+        SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
+        SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
+        ItemInfo->m_oamId = p_oamIndex;
+        ItemInfo->m_width = ItemInfo->m_height = 32;
+        ItemInfo->m_angle = 0;
+        ItemInfo->m_entry = Item;
+        Item->isRotateScale = false;
+        Item->blendMode = OBJMODE_NORMAL;
+        Item->isMosaic = false;
+        Item->colorMode = OBJCOLOR_16;
+        Item->shape = OBJSHAPE_SQUARE;
+        Item->isHidden = false;
+        Item->size = OBJSIZE_32;
+        Item->gfxIndex = p_tileCnt;
+        Item->priority = p_subScreen ? OBJPRIORITY_1 : OBJPRIORITY_0;
+        Item->palette = p_palCnt;
+        Item->x = p_posX;
+        Item->y = p_posY;
+
+        //char buffer[100];
+        sprintf( buffer, "Icon_egg" );
+        if( p_subScreen ) {
+            if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/ICONS/", buffer, 128, 16 ) ) {
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemPal,
+                                  &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
+                                  32 );
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemTiles,
+                                  &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  NoItemTilesLen );
+            }
+        } else {
+            if( !FS::loadSprite( ItemInfo, "nitro:/PICS/ICONS/", buffer, 128, 16 ) ) {
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemPal,
+                                  &SPRITE_PALETTE[ p_palCnt * 16 ],
+                                  32 );
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemTiles,
+                                  &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  NoItemTilesLen );
+            }
+        }
+        p_tileCnt += 512 / 32;
+        ++p_palCnt;
+    }
+    void drawItemIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY,
+                       u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen ) {
+        SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
+        SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
+        ItemInfo->m_oamId = p_oamIndex;
+        ItemInfo->m_width = ItemInfo->m_height = 32;
+        ItemInfo->m_angle = 0;
+        ItemInfo->m_entry = Item;
+        Item->isRotateScale = false;
+        Item->blendMode = OBJMODE_NORMAL;
+        Item->isMosaic = false;
+        Item->colorMode = OBJCOLOR_16;
+        Item->shape = OBJSHAPE_SQUARE;
+        Item->isHidden = false;
+        Item->size = OBJSIZE_32;
+        Item->gfxIndex = p_tileCnt;
+        Item->priority = p_subScreen ? OBJPRIORITY_1 : OBJPRIORITY_0;
+        Item->palette = p_palCnt;
+        Item->x = p_posX;
+        Item->y = p_posY;
+        if( p_subScreen ) {
+            if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemPal,
+                                  &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
+                                  32 );
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemTiles,
+                                  &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  NoItemTilesLen );
+            }
+        } else {
+            if( !FS::loadSprite( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemPal,
+                                  &SPRITE_PALETTE[ p_palCnt * 16 ],
+                                  32 );
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemTiles,
+                                  &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  NoItemTilesLen );
+            }
+        }
+        p_tileCnt += 512 / 32;
+        ++p_palCnt;
+    }
+
+    void drawItem( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY, const u16 p_itemCount,
+                   u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen, bool p_showItemCount ) {
+
+        SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
+        SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
+        ItemInfo->m_oamId = p_oamIndex;
+        ItemInfo->m_width = ItemInfo->m_height = 32;
+        ItemInfo->m_angle = 0;
+        ItemInfo->m_entry = Item;
+        p_oam->oamBuffer[ p_oamIndex - 2 * MAXITEMSPERPAGE ].x = Item->x = p_posX;
+        p_oam->oamBuffer[ p_oamIndex - MAXITEMSPERPAGE ].x = p_posX + 8;
+        p_oam->oamBuffer[ p_oamIndex - 2 * MAXITEMSPERPAGE ].y = Item->y = p_posY;
+        p_oam->oamBuffer[ p_oamIndex - MAXITEMSPERPAGE ].y = p_posY + 28;
+        p_oam->oamBuffer[ p_oamIndex - 2 * MAXITEMSPERPAGE ].isHidden = false;
+        p_oam->oamBuffer[ p_oamIndex - MAXITEMSPERPAGE ].isHidden = p_showItemCount;
+        Item->isRotateScale = false;
+        Item->blendMode = OBJMODE_NORMAL;
+        Item->isMosaic = false;
+        Item->colorMode = OBJCOLOR_16;
+        Item->shape = OBJSHAPE_SQUARE;
+        Item->isHidden = false;
+        Item->size = OBJSIZE_32;
+        Item->gfxIndex = p_tileCnt;
+        Item->priority = p_subScreen ? OBJPRIORITY_1 : OBJPRIORITY_0;
+        Item->palette = p_palCnt;
+        if( p_subScreen ) {
+            if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, NoItemPal, &SPRITE_PALETTE_SUB[ p_palCnt * 16 ], 32 );
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, NoItemTiles, &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ], NoItemTilesLen );
+            }
+        } else {
+            if( !FS::loadSprite( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, NoItemPal, &SPRITE_PALETTE[ p_palCnt * 16 ], 32 );
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, NoItemTiles, &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ], NoItemTilesLen );
+            }
+        }
+        p_tileCnt += p_spriteInfo->m_height * p_spriteInfo->m_width / 32;
+        ++p_palCnt;
+        if( p_subScreen ) {
+            updateOAMSub( p_oam );
+            consoleSelect( &Bottom );
+            consoleSetWindow( &Bottom, ( p_posX + 10 ) / 8, ( p_posY + 32 ) / 8, 3, 1 );
+        } else {
+            updateOAM( p_oam );
+            consoleSelect( &Top );
+            consoleSetWindow( &Top, ( p_posX + 10 ) / 8, ( p_posY + 32 ) / 8, 3, 1 );
+        }
+        if( !p_showItemCount )
+            printf( "%3i", p_itemCount );
+    }
+
     std::string readString( FILE* p_file, bool p_new ) {
         std::string ret = "";
         char ac;
@@ -1034,7 +1235,6 @@ namespace POKEMON {
         }
 
         void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount, u16* p_result ) {
-
             sprintf( buffer, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
             FILE* f = fopen( buffer, "r" );
             if( !f )

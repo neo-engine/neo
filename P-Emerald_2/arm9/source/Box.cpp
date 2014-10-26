@@ -38,8 +38,6 @@
 #include "fs.h"
 #include <vector>
 
-class ITEMS::berry;
-
 extern int bg3sub;
 extern int bg3;
 extern int bg2sub;
@@ -52,13 +50,10 @@ POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
 std::vector<int> box_of_st_pkmn[ MAXPKMN ];
 std::vector<int> free_spaces;
 
-extern PrintConsole Top, Bottom;
 void dPage( int p_Page ) {
 
 }
 
-extern OAMTable *Oam;
-extern SpriteInfo* spriteInfo;
 const int MAXPKMNINBOXLIST = 7;
 int drawBox( u16 p_pkmnId ) {
     --p_pkmnId;

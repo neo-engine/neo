@@ -58,13 +58,13 @@ SOUNDS		:=  sounds
 #---------------------------------------------------------------------------------
 ARCH	:=	-mthumb -mthumb-interwork
 
-CFLAGS	:=	-g -Wall\
+CFLAGS	:=	-g -Wall -Wextra\
 			-march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 			-ffast-math \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM9 -DNDSFILENAME=\"$(TARGET).nds\"
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++11 -O2 -w
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++11 -Os
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH)  -Wl,-Map,$(notdir $*.map)

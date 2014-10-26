@@ -35,6 +35,7 @@
 #include <nds.h>
 
 #include "sprite.h"
+#include "pokemon.h"
 #include <string>
 
 #define sq(a) ((a)*(a))
@@ -64,7 +65,7 @@ extern OAMTable *Oam, *OamTop;
 extern int drawBox( u16 );
 
 extern void initMapSprites( );
-extern bool movePlayerOnMap( u16, u16, u16, bool );
+extern bool movePlayerOnMap( s16, s16, u16, bool );
 
 #define MAXMAPPOS 75
 struct MapRegionPos {
@@ -82,22 +83,17 @@ class move;
 extern move* AttackList[ 560 ];
 extern void shoUseAttack( u16 p_pkmIdx, bool p_female, bool p_shiny );
 
-extern std::map<u16, std::string> Locations;
-extern Region acMapRegion;
-extern bool showmappointer;
-
-
-
-namespace POKEMON {
-    bool drawInfoSub( u16* p_layer, int p_PKMN );
-}
-
 enum Region {
     NONE = 0,
     HOENN = 1,
     KANTO = 2,
     JOHTO = 3
 };
+extern std::map<u16, std::string> Locations;
+extern Region acMapRegion;
+extern bool showmappointer;
+
+
 
 #define BACK_ID  0
 #define SAVE_ID  1
@@ -144,14 +140,6 @@ void drawSub( );
 void animateBack( );
 void setMainSpriteVisibility( bool p_hidden );
 
-void drawItem( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY, const u16 p_cnt,
-               u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen, bool p_showcnt );
-void drawItemIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY,
-                   u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen = true );
-void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16& p_pkmnNo, const u16 p_posX, const u16 p_posY,
-                   u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen );
-void drawEggIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16 p_posX, const u16 p_posY,
-                  u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen );
 void drawTypeIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16 & p_nextAvailableTileIdx, Type p_type, u16 p_posX, u16 p_posY, bool p_bottom );
 
 u8 getCurrentDaytime( );

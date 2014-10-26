@@ -149,11 +149,11 @@ namespace BATTLE {
         static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR, u8 outerR ); //HP in %
         static void displayEP( u16 EPstart, u16 EP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR = 14, u8 outerR = 15 );
 
-        void    initScreen( );
-        void    clearScreen( );
-        void    setTextColor( u16 p_color );
-        void    setText2Color( u16 p_color );
-        void    writeText( const std::wstring& p_message );
+        void    initLogScreen( );
+        void    clearLogScreen( );
+        void    setLogTextColor( u16 p_color );
+        void    setLogText2Color( u16 p_color );
+        void    writeLogText( const std::wstring& p_message );
         void    waitForTouchUp( );
         void    waitForKeyUp( int p_key );
 
@@ -169,7 +169,7 @@ namespace BATTLE {
         void    useNav( );
 
         void    showAttack( u8 p_moveNo );
-        void    updateHP( bool p_opponent, u8 p_pokemonPos ); 
+        void    updateHP( bool p_opponent, u8 p_pokemonPos );
         void    applyEXPChanges( );
         void    updateStats( bool p_opponent, u8 p_pokemonPos );
 
@@ -196,13 +196,16 @@ namespace BATTLE {
             *_opponent;
 
         u8 _acPkmnPosition[ 6 ][ 2 ]; //me; opp; maps the Pkmn's positions in the teams to their real in-battle positions
+    public:
         enum acStatus {
             OK = 0,
             STS = 1,
             KO = 2,
             NA = 3,
             SELECTED = 4
-        }   _acPkmnStatus[ 6 ][ 2 ];
+        };
+    private:
+        acStatus _acPkmnStatus[ 6 ][ 2 ];
 
         move::ailment _acPkmnAilments[ 6 ][ 2 ];
         u8 _acPkmnAilmentCounts[ 6 ][ 2 ];
@@ -241,7 +244,7 @@ namespace BATTLE {
         u16         _lstOppMove;
         u16         _lstMove;
 
-        std::map<POKEMON::pokemon&, std::set<POKEMON::pokemon&> > _participatedPKMN;
+        std::map<POKEMON::pokemon*, std::set<POKEMON::pokemon*> > _participatedPKMN;
 
         //Current turn's current move's "consequences"
         u8          _acMove;

@@ -76,7 +76,7 @@ void init( ) {
     BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
     BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
     BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-    FONT::putrec( 0, 0, 256, 63, true, false, 250 );
+    FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
 
     updateOAMSub( Oam );
 }
@@ -88,10 +88,10 @@ void dinit( ) {
 }
 
 void messageBox::clear( ) {
-    FONT::putrec( 0, 0, 256, 63, true, false, 250 );
+    FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
 }
 void messageBox::clearButName( ) {
-    FONT::putrec( 72, 0, 256, 63, true, false, 250 );
+    FONT::putrec( (u8)72, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
 }
 
 void waitForTouchUp( bool p_uTime, bool p_tpar = false ) {
@@ -119,7 +119,7 @@ messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
     init( );
     u8 a = 0, b = 0;
     u16 c = 0;
-    drawItemIcon( Oam, spriteInfo, p_item.m_itemName, 4, 4, a, b, c );
+    FS::drawItemIcon( Oam, spriteInfo, p_item.m_itemName, 4, 4, a, b, c );
     updateOAMSub( Oam );
 
     updateTime( );

@@ -57,7 +57,7 @@ public:
 };
 std::wstring getWAbilityName( int p_abilityId );
 
-#define A_SOUNDPROOF 0
+#define A_CACOPHONY 0
 #define A_STENCH 1
 #define A_DRIZZLE 2
 #define A_SPEED_BOOST 3

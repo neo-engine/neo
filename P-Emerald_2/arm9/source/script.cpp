@@ -136,7 +136,7 @@ namespace BATTLE {
         return getTargetSpecifierValue( p_battle, p_target, p_targetIsOpp, p_targetPosition, m_targetSpecifier );
     }
     int battleScript::command::condition::getTargetVal( const battle& p_target ) {
-        getTargetSpecifierValue( p_target, m_targetSpecifier );
+        return getTargetSpecifierValue( p_target, m_targetSpecifier );
     }
 
     bool battleScript::command::condition::check( battle& p_battle, void* p_self ) {
@@ -183,6 +183,7 @@ namespace BATTLE {
             default:
                 break;
         }
+        return false;
     }
 
     int battleScript::command::value::get( battle& p_battle, void* p_self ) {

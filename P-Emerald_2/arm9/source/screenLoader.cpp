@@ -334,7 +334,7 @@ u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
 
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, SAVE_ID, SAVE_ID, nextAvailableTileIdx,
                                        -20, -20, 64, 64, SavePal,
-                                       SaveTiles, SaveTilesLen, false, false, true, OBJPRIORITY_0, true );
+                                       SaveTiles, SaveTilesLen, false, false, true, OBJPRIORITY_0, false );
 
     //Main menu sprites
 
@@ -394,12 +394,12 @@ u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
                                Choice_1Tiles, Choice_1TilesLen, false, false, true, OBJPRIORITY_2, true );
 
         nn2 = loadSprite( p_oam, p_spriteInfo, 2 * i + CHOICE_ID + 1, palcnt, nextnext,
-                          ( ( i % 2 ) ? 62 : 160 ), 68 + ( i / 2 ) * 32, 64, 32, Choice_3Pal,
+                          ( ( i % 2 ) ? 62 : 160 ), 68 + ( i / 2 ) * 32, 64, 32, Choice_1Pal,
                           Choice_3Tiles, Choice_3TilesLen, false, false, true, OBJPRIORITY_2, true );
     }
     for( u8 i = 0; i < 3; ++i ) {
         nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, i + CHOICE_ID + 12, palcnt, nn2,
-                                           96, 68 + (i)* 32, 64, 32, Choice_2Pal,
+                                           96, 68 + (i)* 32, 64, 32, Choice_1Pal,
                                            Choice_2Tiles, Choice_2TilesLen, false, false, true, OBJPRIORITY_2, true );
     }
 
@@ -513,151 +513,6 @@ void screenLoader::init( ) {
     this->draw( this->_pos );
 }
 
-void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16& p_pkmnId, const u16 p_posX, const u16 p_posY,
-                   u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen = true ) {
-
-    SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
-    SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
-    ItemInfo->m_oamId = p_oamIndex;
-    ItemInfo->m_width = ItemInfo->m_height = 32;
-    ItemInfo->m_angle = 0;
-    ItemInfo->m_entry = Item;
-    Item->isRotateScale = false;
-    Item->blendMode = OBJMODE_NORMAL;
-    Item->isMosaic = false;
-    Item->colorMode = OBJCOLOR_16;
-    Item->shape = OBJSHAPE_SQUARE;
-    Item->isHidden = false;
-    Item->size = OBJSIZE_32;
-    Item->gfxIndex = p_tileCnt;
-    Item->priority = p_subScreen ? OBJPRIORITY_1 : OBJPRIORITY_0;
-    Item->palette = p_palCnt;
-    Item->x = p_posX;
-    Item->y = p_posY;
-
-    //char buffer[100];
-    sprintf( buffer, "%d/Icon_%d", p_pkmnId, p_pkmnId );
-    if( p_subScreen ) {
-        if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/PKMN/", buffer, 128, 16 ) ) {
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                              NoItemPal,
-                              &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
-                              32 );
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                              NoItemTiles,
-                              &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
-                              NoItemTilesLen );
-        }
-    } else {
-        if( !FS::loadSprite( ItemInfo, "nitro:/PICS/SPRITES/PKMN/", buffer, 128, 16 ) ) {
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                              NoItemPal,
-                              &SPRITE_PALETTE[ p_palCnt * 16 ],
-                              32 );
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                              NoItemTiles,
-                              &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
-                              NoItemTilesLen );
-        }
-    }
-    p_tileCnt += 512 / 32;
-    ++p_palCnt;
-}
-void drawEggIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16 p_posX, const u16 p_posY,
-                  u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen = true ) {
-    SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
-    SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
-    ItemInfo->m_oamId = p_oamIndex;
-    ItemInfo->m_width = ItemInfo->m_height = 32;
-    ItemInfo->m_angle = 0;
-    ItemInfo->m_entry = Item;
-    Item->isRotateScale = false;
-    Item->blendMode = OBJMODE_NORMAL;
-    Item->isMosaic = false;
-    Item->colorMode = OBJCOLOR_16;
-    Item->shape = OBJSHAPE_SQUARE;
-    Item->isHidden = false;
-    Item->size = OBJSIZE_32;
-    Item->gfxIndex = p_tileCnt;
-    Item->priority = p_subScreen ? OBJPRIORITY_1 : OBJPRIORITY_0;
-    Item->palette = p_palCnt;
-    Item->x = p_posX;
-    Item->y = p_posY;
-
-    //char buffer[100];
-    sprintf( buffer, "Icon_egg" );
-    if( p_subScreen ) {
-        if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/ICONS/", buffer, 128, 16 ) ) {
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                              NoItemPal,
-                              &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
-                              32 );
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                              NoItemTiles,
-                              &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
-                              NoItemTilesLen );
-        }
-    } else {
-        if( !FS::loadSprite( ItemInfo, "nitro:/PICS/ICONS/", buffer, 128, 16 ) ) {
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                              NoItemPal,
-                              &SPRITE_PALETTE[ p_palCnt * 16 ],
-                              32 );
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                              NoItemTiles,
-                              &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
-                              NoItemTilesLen );
-        }
-    }
-    p_tileCnt += 512 / 32;
-    ++p_palCnt;
-}
-void drawItemIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY,
-                   u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen ) {
-    SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
-    SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
-    ItemInfo->m_oamId = p_oamIndex;
-    ItemInfo->m_width = ItemInfo->m_height = 32;
-    ItemInfo->m_angle = 0;
-    ItemInfo->m_entry = Item;
-    Item->isRotateScale = false;
-    Item->blendMode = OBJMODE_NORMAL;
-    Item->isMosaic = false;
-    Item->colorMode = OBJCOLOR_16;
-    Item->shape = OBJSHAPE_SQUARE;
-    Item->isHidden = false;
-    Item->size = OBJSIZE_32;
-    Item->gfxIndex = p_tileCnt;
-    Item->priority = p_subScreen ? OBJPRIORITY_1 : OBJPRIORITY_0;
-    Item->palette = p_palCnt;
-    Item->x = p_posX;
-    Item->y = p_posY;
-    if( p_subScreen ) {
-        if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                              NoItemPal,
-                              &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
-                              32 );
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                              NoItemTiles,
-                              &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
-                              NoItemTilesLen );
-        }
-    } else {
-        if( !FS::loadSprite( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                              NoItemPal,
-                              &SPRITE_PALETTE[ p_palCnt * 16 ],
-                              32 );
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                              NoItemTiles,
-                              &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
-                              NoItemTilesLen );
-        }
-    }
-    p_tileCnt += 512 / 32;
-    ++p_palCnt;
-}
 void initTop( ) {
     consoleSelect( &Top );
     printf( "\x1b[39m" );
@@ -675,11 +530,11 @@ void initTop( ) {
     for( size_t i = 0; i < SAV.m_PkmnTeam.size( ); i++ ) {
         if( !SAV.m_PkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
             if( i % 2 == 0 ) {
-                drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId, borders[ i ][ 0 ] * 8 - 28, borders[ i ][ 1 ] * 8, a, b, c, false );
+                FS::drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId, u16(borders[ i ][ 0 ] * 8 - 28), u16(borders[ i ][ 1 ] * 8), a, b, c, false );
                 BATTLE::battleUI::displayHP( 100, 101, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
                 BATTLE::battleUI::displayHP( 100, 100 - SAV.m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV.m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
             } else {
-                drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId, borders[ i ][ 0 ] * 8 + 76, borders[ i ][ 1 ] * 8, a, b, c, false );
+                FS::drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId, u16(borders[ i ][ 0 ] * 8 + 76), u16(borders[ i ][ 1 ] * 8), a, b, c, false );
                 BATTLE::battleUI::displayHP( 100, 101, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
                 BATTLE::battleUI::displayHP( 100, 100 - SAV.m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV.m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
             }
@@ -713,9 +568,9 @@ void initTop( ) {
             cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
             if( i % 2 == 0 ) {
-                drawEggIcon( OamTop, spriteInfoTop, borders[ i ][ 0 ] * 8 - 28, borders[ i ][ 1 ] * 8, a, b, c, false );
+                FS::drawEggIcon( OamTop, spriteInfoTop, u16(borders[ i ][ 0 ] * 8 - 28), u16(borders[ i ][ 1 ] * 8), a, b, c, false );
             } else {
-                drawEggIcon( OamTop, spriteInfoTop, borders[ i ][ 0 ] * 8 + 76, borders[ i ][ 1 ] * 8, a, b, c, false );
+                FS::drawEggIcon( OamTop, spriteInfoTop, u16(borders[ i ][ 0 ] * 8 + 76), u16(borders[ i ][ 1 ] * 8), a, b, c, false );
             }
             updateOAM( OamTop );
         }
@@ -742,7 +597,7 @@ void initSub( u16 pkmIdx ) {
         Oam->oamBuffer[ 16 + 2 * i ].isHidden = true;
     }
     updateOAMSub( Oam );
-    if( pkmIdx < 0 || pkmIdx >= SAV.m_PkmnTeam.size( ) || SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_individualValues.m_isEgg ) {
+    if( pkmIdx >= SAV.m_PkmnTeam.size( ) || SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_individualValues.m_isEgg ) {
         consoleSelect( &Top );
         return;
     }
@@ -912,8 +767,10 @@ void screenLoader::run_pkmn( ) {
 
                     break;
                 } else if( p & KEY_UP ) {
-                    if( --acIn <= -1 )
+                    if( acIn == 0 )
                         acIn = max - 1;
+                    else
+                        --acIn;
                 } else if( p & KEY_DOWN ) {
                     if( ++acIn >= max )
                         acIn = 0;
@@ -926,8 +783,10 @@ void screenLoader::run_pkmn( ) {
                 if( keysUp( ) & KEY_UP )
                     break;
             }
-            if( --acIn <= -1 )
+            if( acIn == 0 )
                 acIn = max - 1;
+            else
+                --acIn;
             consoleClear( );
             consoleSetWindow( &Top, positions[ acIn ][ 0 ], positions[ acIn ][ 1 ], 2, 2 );
             if( acIn & 1 )
@@ -1688,7 +1547,7 @@ void drawTopDexPage( u8 p_page, u16 p_pkmnId, u8 p_pkmnFormeId = 0 ) {
                 POKEMON::PKMNDATA::getAll( newformepkmn, acpkmndata );
 
             BG_PALETTE[ 1 ] = POKEMON::PKMNDATA::getColor( acpkmndata.m_types[ 0 ] );
-            drawPKMNIcon( OamTop, spriteInfoTop, ( p_pkmnId == 493 || p_pkmnId == 649 ) ? p_pkmnId : newformepkmn, 0, 8, a, b, c, false );
+            FS::drawPKMNIcon( OamTop, spriteInfoTop, ( p_pkmnId == 493 || p_pkmnId == 649 ) ? p_pkmnId : newformepkmn, 0, 8, a, b, c, false );
             drawTypeIcon( OamTop, spriteInfoTop, a, b, c, acpkmndata.m_types[ 0 ], 33, 35, false );
             if( acpkmndata.m_types[ 0 ] != acpkmndata.m_types[ 1 ] )
                 drawTypeIcon( OamTop, spriteInfoTop, a, b, c, acpkmndata.m_types[ 1 ], 65, 35, false );
@@ -1713,7 +1572,7 @@ void drawTopDexPage( u8 p_page, u16 p_pkmnId, u8 p_pkmnFormeId = 0 ) {
             if( SAV.m_inDex[ p_pkmnId - 1 ] ) {
                 BG_PALETTE[ 42 ] = POKEMON::PKMNDATA::getColor( acpkmndata.m_types[ 1 ] );
                 for( u8 i = 0; i < 6; ++i ) {
-                    FONT::putrec( 19 + 40 * i, std::max( 56, 102 - acpkmndata.m_bases[ i ] / 3 ), 37 + 40 * i, 102, false, true );
+                    FONT::putrec( u8( 19 + 40 * i ), u8( std::max( 56, 102 - acpkmndata.m_bases[ i ] / 3 ) ), u8( 37 + 40 * i ), (u8)102, false, true );
                     //font::putrec(17 + 40 * i,std::min(103, 56 + acpkmndata.Bases[i] / 3),(6* (acpkmndata.Bases[i] % 3)) + 16 + 40 * i,std::min(103, 58 + acpkmndata.Bases[i] / 3),statColor[i],false);
                 }
                 printf( "\n\n  KP   ANG  DEF  SAN  SDF  INT\n\n\n\n\n\n\n\n\n" );
@@ -1797,7 +1656,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
         --j;
         continue;
         } else
-            drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+            FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
 
         spriteInfo[ 16 ].m_entry->isHidden = true;
         updateOAMSub( Oam );
@@ -1833,7 +1692,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
                     FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( pressed & KEY_UP ) || ( ( held & ~up ) & KEY_UP ) ) {
                 scanKeys( );
@@ -1847,7 +1706,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
                     FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( pressed & KEY_R ) || ( ( held & ~up ) & KEY_R ) ) {
                 scanKeys( );
@@ -1861,7 +1720,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
                     FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( pressed & KEY_L ) || ( ( held & ~up ) & KEY_L ) ) {
                 scanKeys( );
@@ -1875,7 +1734,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
                     FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( pressed & KEY_LEFT ) ) {
                 while( 1 ) {
@@ -1939,7 +1798,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
                     FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                 }
             for( u8 q = 5; q < 8; ++q )
                 if( sqrt( sq( dexsppos[ 0 ][ q ] - t.px + 16 ) + sq( dexsppos[ 1 ][ q ] - t.py + 16 ) ) <= 16 ) {
@@ -1975,7 +1834,6 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
         Oam->oamBuffer[ 1 ].isHidden = false;
 }
 
-#define MAXITEMSPERPAGE 12
 void initBagSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen = true ) {
     /* Keep track of the available tiles */
     p_tileCnt = 16;
@@ -2369,56 +2227,6 @@ void initBagSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo, u8& p_oamIndex, 
     ++p_palCnt;
 }
 
-void drawItem( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY, const u16 p_itemCount,
-               u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen = true, bool p_showItemCount = false ) {
-
-    SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
-    SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
-    ItemInfo->m_oamId = p_oamIndex;
-    ItemInfo->m_width = ItemInfo->m_height = 32;
-    ItemInfo->m_angle = 0;
-    ItemInfo->m_entry = Item;
-    p_oam->oamBuffer[ p_oamIndex - 2 * MAXITEMSPERPAGE ].x = Item->x = p_posX;
-    p_oam->oamBuffer[ p_oamIndex - MAXITEMSPERPAGE ].x = p_posX + 8;
-    p_oam->oamBuffer[ p_oamIndex - 2 * MAXITEMSPERPAGE ].y = Item->y = p_posY;
-    p_oam->oamBuffer[ p_oamIndex - MAXITEMSPERPAGE ].y = p_posY + 28;
-    p_oam->oamBuffer[ p_oamIndex - 2 * MAXITEMSPERPAGE ].isHidden = false;
-    p_oam->oamBuffer[ p_oamIndex - MAXITEMSPERPAGE ].isHidden = p_showItemCount;
-    Item->isRotateScale = false;
-    Item->blendMode = OBJMODE_NORMAL;
-    Item->isMosaic = false;
-    Item->colorMode = OBJCOLOR_16;
-    Item->shape = OBJSHAPE_SQUARE;
-    Item->isHidden = false;
-    Item->size = OBJSIZE_32;
-    Item->gfxIndex = p_tileCnt;
-    Item->priority = p_subScreen ? OBJPRIORITY_1 : OBJPRIORITY_0;
-    Item->palette = p_palCnt;
-    if( p_subScreen ) {
-        if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, NoItemPal, &SPRITE_PALETTE_SUB[ p_palCnt * 16 ], 32 );
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, NoItemTiles, &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ], NoItemTilesLen );
-        }
-    } else {
-        if( !FS::loadSprite( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, NoItemPal, &SPRITE_PALETTE[ p_palCnt * 16 ], 32 );
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, NoItemTiles, &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ], NoItemTilesLen );
-        }
-    }
-    p_tileCnt += p_spriteInfo->m_height * p_spriteInfo->m_width / 32;
-    ++p_palCnt;
-    if( p_subScreen ) {
-        updateOAMSub( p_oam );
-        consoleSelect( &Bottom );
-        consoleSetWindow( &Bottom, ( p_posX + 10 ) / 8, ( p_posY + 32 ) / 8, 3, 1 );
-    } else {
-        updateOAM( p_oam );
-        consoleSelect( &Top );
-        consoleSetWindow( &Top, ( p_posX + 10 ) / 8, ( p_posY + 32 ) / 8, 3, 1 );
-    }
-    if( !p_showItemCount )
-        printf( "%3i", p_itemCount );
-}
 const u8 MAXPERM = 14;
 void getRanPerm( u8* p_array, u8* p_out ) {
     u16 used = 0;
@@ -2694,7 +2502,7 @@ void drawBagPage( u8 p_page, u8* p_position, u8 &p_oamIndex, u8& p_palCnt, u16& 
         if( t.px>224 && t.py > 164 )
             goto BACK;
         std::pair<u16, u16> acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), i );
-        drawItem( Oam, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
+        FS::drawItem( Oam, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
                   18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == ITEMS::item::KEY_ITEM );
     }
     while( 42 ) {
@@ -2763,7 +2571,7 @@ NEXT:
                 if( t.px>224 && t.py > 164 )
                     goto BACK;
                 std::pair<u16, u16> acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), i );
-                drawItem( Oam, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
+                FS::drawItem( Oam, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
                           18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == ITEMS::item::KEY_ITEM );
             }
         } else if( sqrt( sq( SCREEN_WIDTH - 33 - t.px ) + sq( SCREEN_HEIGHT - 6 - t.py ) ) <= 16 && acpage > 0 ) {
@@ -2811,7 +2619,7 @@ PREV:
                 if( t.px>224 && t.py > 164 )
                     goto BACK;
                 std::pair<u16, u16> acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), i );
-                drawItem( Oam, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
+                FS::drawItem( Oam, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
                           18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == ITEMS::item::KEY_ITEM );
             }
         } else {
@@ -2839,7 +2647,7 @@ PREV:
                     updateOAM( OamTop );
 
                     std::pair<u16, u16> acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), acpage * 12 + io );
-                    drawItem( OamTop, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 22,
+                    FS::drawItem( OamTop, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 22,
                               50, acElem.second, oam2, pal2, tile2, false, p_page == ITEMS::item::KEY_ITEM );
                     consoleSetWindow( &Top, 7, 9, 13, 1 );
                     consoleSelect( &Top );
@@ -2852,16 +2660,16 @@ PREV:
                         if( i - acpage * 12 == io )
                             continue;
                         else if( p_position[ i - acpage * 12 ] < 6 )
-                            drawItem( OamTop, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 6 + p_position[ i - acpage * 12 ] * 40,
+                            FS::drawItem( OamTop, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 6 + p_position[ i - acpage * 12 ] * 40,
                             10, acElem.second, oam2, pal2, tile2, false, p_page == ITEMS::item::KEY_ITEM );
                         else if( p_position[ i - acpage * 12 ] < 12 )
-                            drawItem( OamTop, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 6 + ( p_position[ i - acpage * 12 ] - 6 ) * 40,
+                            FS::drawItem( OamTop, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 6 + ( p_position[ i - acpage * 12 ] - 6 ) * 40,
                             138, acElem.second, oam2, pal2, tile2, false, p_page == ITEMS::item::KEY_ITEM );
                         else if( p_position[ i - acpage * 12 ] == 12 )
-                            drawItem( OamTop, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 238,
+                            FS::drawItem( OamTop, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 238,
                             82, acElem.second, oam2, pal2, tile2, false, p_page == ITEMS::item::KEY_ITEM );
                         else if( p_position[ i - acpage * 12 ] == 13 )
-                            drawItem( OamTop, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, -10,
+                            FS::drawItem( OamTop, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, -10,
                             82, acElem.second, oam2, pal2, tile2, false, p_page == ITEMS::item::KEY_ITEM );
 
                         updateTime( );
@@ -2907,11 +2715,11 @@ PREV:
                                 printf( "   %3i/%3i\n ", SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_stats.m_acHP, SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_stats.m_maxHP );
                                 wprintf( SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_boxdata.m_name ); printf( "\n" );
                                 printf( "%11s", ITEMS::ItemList[ SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_boxdata.m_holdItem ].getDisplayName( ).c_str( ) );
-                                drawPKMNIcon( Oam, spriteInfo, SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_boxdata.m_speciesId, ( Oam->oamBuffer[ i ] ).x - 4, ( Oam->oamBuffer[ i ] ).y - 20, a, b, c );
+                                FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_PkmnTeam[ ( ( i - 15 ) / 2 ) ^ 1 ].m_boxdata.m_speciesId, ( Oam->oamBuffer[ i ] ).x - 4, ( Oam->oamBuffer[ i ] ).y - 20, a, b, c );
                             } else {
                                 printf( " \n " );
                                 printf( "Ei" ); printf( "\n" );
-                                drawEggIcon( Oam, spriteInfo, ( Oam->oamBuffer[ i ] ).x - 4, ( Oam->oamBuffer[ i ] ).y - 20, a, b, c );
+                                FS::drawEggIcon( Oam, spriteInfo, ( Oam->oamBuffer[ i ] ).x - 4, ( Oam->oamBuffer[ i ] ).y - 20, a, b, c );
                             }
                             updateOAMSub( Oam );
                         }
@@ -3078,7 +2886,7 @@ OUT:
                         if( t.px>224 && t.py > 164 )
                             goto BACK;
                         auto acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), i );
-                        drawItem( Oam, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
+                        FS::drawItem( Oam, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
                                   18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == ITEMS::item::KEY_ITEM );
                         updateTime( );
                     }

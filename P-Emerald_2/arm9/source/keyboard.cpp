@@ -73,7 +73,7 @@ std::wstring keyboard::getText( u16 p_length, const char* p_msg, bool p_time ) {
     BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
     BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
     BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-    FONT::putrec( 0, 0, 256, 63, true, false, 250 );
+    FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
 
     if( p_msg != 0 )
         cust_font.printString( p_msg, 8, 4, true );
@@ -100,7 +100,7 @@ std::wstring keyboard::getText( u16 p_length, const char* p_msg, bool p_time ) {
             ++i;
             out += _chars[ std::pair<int, int>( t.px / 8, t.py / 8 ) ];
 
-            FONT::putrec( 8 * ( 13 - i / 3 ), 40, 8 * ( 13 - i / 3 + p_length + 1 ), 56, true, false, 250 );
+            FONT::putrec( u8( 8 * ( 13 - i / 3 ) ), u8( 40 ), u8( 8 * ( 13 - i / 3 + p_length + 1 ) ), (u8)56, true, false, (u8)250 );
             cust_font.printString( out.c_str( ), 8 * ( 13 - i / 3 ), 40, true );
             swiWaitForVBlank( );
         } else if( ( sqrt( sq( 248 - t.px ) + sq( 162 - t.py ) ) <= 16 ) ) {
@@ -115,14 +115,14 @@ std::wstring keyboard::getText( u16 p_length, const char* p_msg, bool p_time ) {
             _ind = ( _ind + 1 ) % MAXKEYBOARDS;
             undraw( );
             if( p_msg != 0 ) {
-                FONT::putrec( 0, 0, 256, 63, true, false, 250 );
+                FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
                 cust_font.printString( p_msg, 8, 4, true );
             }
             draw( );
             if( p_time )
                 updateTime( );
 
-            FONT::putrec( 8 * ( 13 - i / 3 ), 40, 8 * ( 13 - i / 3 + p_length + 1 ), 56, true, false, 250 );
+            FONT::putrec( u8( 8 * ( 13 - i / 3 ) ), u8( 40 ), u8( 8 * ( 13 - i / 3 + p_length + 1 ) ), u8( 56 ), true, false, u8( 250 ) );
             cust_font.printString( out.c_str( ), 8 * ( 13 - i / 3 ), 40, true );
         } else if( sqrt( sq( 248 - t.px ) + sq( 184 - t.py ) ) <= 16 ) {
             while( 1 ) {
@@ -146,7 +146,7 @@ std::wstring keyboard::getText( u16 p_length, const char* p_msg, bool p_time ) {
                     break;
             }
             out.erase( ( out.end( ) - 1 ) );
-            FONT::putrec( 8 * ( 13 - i / 3 ), 40, 8 * ( 13 - i / 3 + p_length + 1 ), 56, true, false, 250 );
+            FONT::putrec( u8( 8 * ( 13 - i / 3 ) ), (u8)40, u8( 8 * ( 13 - i / 3 + p_length + 1 ) ), (u8)56, true, false, (u8)250 );
             --i;
             cust_font.printString( out.c_str( ), 8 * ( 13 - i / 3 ), 40, true );
         }
@@ -161,7 +161,7 @@ void keyboard::undraw( ) {
     BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
     BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
     BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-    FONT::putrec( 0, 0, 256, 63, true, false, 250 );
+    FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
 }
 
 void keyboard::draw( ) {

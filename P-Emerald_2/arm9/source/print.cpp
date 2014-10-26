@@ -40,11 +40,11 @@
 
 namespace FONT {
     void putrec( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
-        for( u8 x = p_x1; x <= p_x2; ++x ) for( u8 y = p_y1; y < p_y2; ++y )
+        for( u16 x = p_x1; x <= p_x2; ++x ) for( u16 y = p_y1; y < p_y2; ++y )
             if( p_bottom )
-                ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
+                ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * (u16)SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
             else
-                ( (color *)BG_BMP_RAM( 1 ) )[ ( x + y * SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
+                ( (color *)BG_BMP_RAM( 1 ) )[ ( x + y * (u16)SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
     }
     Font::Font( u8 *p_data, u8 *p_widths, void( *p_shiftchar )( u16& val ) ) {
         _data = p_data;
@@ -104,7 +104,7 @@ namespace FONT {
         p_font.printChar( 172, p_x, p_y, true );
     }
     void hideContinue( u8 p_x, u8 p_y ) {
-        putrec( p_x, p_y, p_x + 10, p_y + 10, true, false, 250 );
+        putrec( p_x, p_y, p_x + 10, p_y + 10, true, false, (u8)250 );
     }
 
     void Font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {

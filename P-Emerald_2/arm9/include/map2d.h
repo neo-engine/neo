@@ -1,34 +1,34 @@
-/*
-    Pok�mon Emerald 2 Version
-    ------------------------------
+﻿/*
+Pokémon Emerald 2 Version
+------------------------------
 
-    file        : map2d.h
-    author      : Philip Wellnitz (RedArceus)
-    description : Header file. See corresponding source file for details.
+file        : map2d.h
+author      : Philip Wellnitz (RedArceus)
+description : Header file. See corresponding source file for details.
 
-    Copyright (C) 2012 - 2014
-    Philip Wellnitz (RedArceus)
+Copyright (C) 2012 - 2014
+Philip Wellnitz (RedArceus)
 
-    This software is provided 'as-is', without any express or implied
-    warranty.  In no event will the authors be held liable for any
-    damages arising from the use of this software.
+This software is provided 'as-is', without any express or implied
+warranty.  In no event will the authors be held liable for any
+damages arising from the use of this software.
 
-    Permission is granted to anyone to use this software for any
-    purpose, including commercial applications, and to alter it and
-    redistribute it freely, subject to the following restrictions:
+Permission is granted to anyone to use this software for any
+purpose, including commercial applications, and to alter it and
+redistribute it freely, subject to the following restrictions:
 
 
-    1.	The origin of this software must not be misrepresented; you
-    must not claim that you wrote the original software. If you use
-    this software in a product, an acknowledgment in the product
-    is required.
+1.	The origin of this software must not be misrepresented; you
+must not claim that you wrote the original software. If you use
+this software in a product, an acknowledgment in the product
+is required.
 
-    2.	Altered source versions must be plainly marked as such, and
-    must not be misrepresented as being the original software.
+2.	Altered source versions must be plainly marked as such, and
+must not be misrepresented as being the original software.
 
-    3.	This notice may not be removed or altered from any source
-    distribution.
-    */
+3.	This notice may not be removed or altered from any source
+distribution.
+*/
 
 #pragma once
 #include <nds.h>
@@ -38,7 +38,7 @@
 #include <stdio.h>
 
 namespace map2d {
-    extern u16 bgs[ 4 ];
+    extern int bgs[ 4 ];
 
 
     typedef struct {
@@ -81,14 +81,14 @@ namespace map2d {
     public:
         char        m_name[ 100 ];
         char        m_direction;
-        u16         m_move;
-        u16         m_mapidx;
+        int         m_move;
+        int         m_mapidx;
 
-        u16         m_mapsx;
-        u16         m_mapsy;
+        int         m_mapsx;
+        int         m_mapsy;
 
         Anbindung( ) { }
-        Anbindung( const char p_name[ 100 ], char p_dir, u16 p_mv, u16 p_mpidx )
+        Anbindung( const char p_name[ 100 ], char p_dir, int p_mv, int p_mpidx )
             : m_direction( p_dir ),
             m_move( p_mv ),
             m_mapidx( p_mpidx ) {
@@ -107,17 +107,17 @@ namespace map2d {
 
     class Map {
     public:
-        u16         m_sizex, m_sizey;
+        u32         m_sizex, m_sizey;
 
         Palette     m_pals[ 16 ];
-        std::vector< std::vector < MapBlockAtom > > 
+        std::vector< std::vector < MapBlockAtom > >
             m_blocks;
         TileSet     m_tileset;
         BlockSet    m_blockSets;
-        std::vector< Anbindung > 
+        std::vector< Anbindung >
             m_anbindungen;
         u16         m_rand[ 2 ][ 2 ];
-        std::vector< Animation > 
+        std::vector< Animation >
             m_animations;
 
         //WildePKMN, Events...
@@ -125,9 +125,9 @@ namespace map2d {
 
         Map( const char* p_path, const char* p_name );
 
-        void            draw( u16 p_bx, u16 p_by, bool p_init = false );
-        void            movePlayer( u16 p_direction );
+        void            draw( int p_bx, int p_by, bool p_init = false );
+        void            movePlayer( int p_direction );
     private:
-        void            fill( u16* mapMemory[ 4 ], u16 p_xmin, u16 p_x, u16 p_xmax, u16 p_ymin, u16 p_y, u16 p_ymax, u16 p_c );
+        void            fill( u16* mapMemory[ 4 ], int p_xmin, int p_x, int p_xmax, int p_ymin, int p_y, int p_ymax, int p_c );
     };
 }
