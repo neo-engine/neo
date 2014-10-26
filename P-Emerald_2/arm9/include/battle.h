@@ -57,8 +57,8 @@ extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
 extern OAMTable *OamTop;
 extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 
-extern FONT::Font cust_font;
-extern FONT::Font cust_font2;
+extern FONT::font cust_font;
+extern FONT::font cust_font2;
 
 
 namespace BATTLE {

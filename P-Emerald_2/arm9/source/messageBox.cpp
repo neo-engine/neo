@@ -47,8 +47,8 @@ extern u8 BG_ind;
 extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
 extern OAMTable *Oam;
 extern ConsoleFont cfont;
-extern FONT::Font cust_font;
-extern FONT::Font cust_font2;
+extern FONT::font cust_font;
+extern FONT::font cust_font2;
 
 bool back_, save_, main_;
 SpriteEntry * back, *save;

@@ -50,11 +50,11 @@ namespace FONT {
                  bool p_striped = false,
                  u8 p_color = 42 );
 
-    class Font {
+    class font {
     public:
         // Constructors
-        Font( u8 *p_fontData, u8 *p_characterWidths, void( *p_shiftchar )( u16& val ) );
-        ~Font( );
+        font( u8 *p_fontData, u8 *p_characterWidths, void( *p_shiftchar )( u16& val ) );
+        ~font( );
 
         // Accessors
         void setColor( color p_newColor, int p_num ) {

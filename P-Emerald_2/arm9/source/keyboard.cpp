@@ -38,8 +38,8 @@
 #include "screenLoader.h"
 #include "print.h"
 
-extern FONT::Font cust_font;
-extern FONT::Font cust_font2;
+extern FONT::font cust_font;
+extern FONT::font cust_font2;
 extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
 extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 extern OAMTable *Oam, *OamTop;

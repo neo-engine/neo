@@ -65,8 +65,8 @@ extern int bg2;
 extern saveGame SAV;
 
 extern PrintConsole Top, Bottom;
-extern FONT::Font cust_font;
-extern FONT::Font cust_font2;
+extern FONT::font cust_font;
+extern FONT::font cust_font2;
 
 extern ITEMS::item ItemList[ 700 ];
 

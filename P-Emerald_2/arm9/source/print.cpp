@@ -46,7 +46,7 @@ namespace FONT {
             else
                 ( (color *)BG_BMP_RAM( 1 ) )[ ( x + y * (u16)SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
     }
-    Font::Font( u8 *p_data, u8 *p_widths, void( *p_shiftchar )( u16& val ) ) {
+    font::font( u8 *p_data, u8 *p_widths, void( *p_shiftchar )( u16& val ) ) {
         _data = p_data;
         _widths = p_widths;
         _color[ 0 ] = _color[ 1 ] = _color[ 2 ]
@@ -54,10 +54,10 @@ namespace FONT {
         _shiftchar = p_shiftchar;
     }
 
-    Font::~Font( ) { }
+    font::~font( ) { }
 
 
-    void Font::printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom ) {
         _shiftchar( p_ch );
 
         s16 putX, putY;
@@ -79,7 +79,7 @@ namespace FONT {
         }
     }
 
-    void Font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -100,14 +100,14 @@ namespace FONT {
         }
     }
 
-    void drawContinue( Font p_font, u8 p_x, u8 p_y ) {
+    void drawContinue( font p_font, u8 p_x, u8 p_y ) {
         p_font.printChar( 172, p_x, p_y, true );
     }
     void hideContinue( u8 p_x, u8 p_y ) {
         putrec( p_x, p_y, p_x + 10, p_y + 10, true, false, (u8)250 );
     }
 
-    void Font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -149,7 +149,7 @@ namespace FONT {
             current_char++;
         }
     }
-    void Font::printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -169,7 +169,7 @@ namespace FONT {
             current_char++;
         }
     }
-    void Font::printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -191,7 +191,7 @@ namespace FONT {
             current_char++;
         }
     }
-    void Font::printStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -214,32 +214,32 @@ namespace FONT {
         }
     }
 
-    void Font::printStringCenter( const char *p_string, bool p_bottom ) {
+    void font::printStringCenter( const char *p_string, bool p_bottom ) {
         s16 x = SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2;
         s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
 
         printString( p_string, x, y, p_bottom );
     }
-    void Font::printStringCenterD( const char *p_string, bool p_bottom ) {
+    void font::printStringCenterD( const char *p_string, bool p_bottom ) {
         s16 x = ( SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2 );
         s16 y = ( SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2 );
 
         printStringD( p_string, x, y, p_bottom );
     }
-    void Font::printStringCenter( const wchar_t *p_string, bool p_bottom ) {
+    void font::printStringCenter( const wchar_t *p_string, bool p_bottom ) {
         s16 x = SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2;
         s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
 
         printString( p_string, x, y, p_bottom );
     }
-    void Font::printStringCenterD( const wchar_t *p_string, bool p_bottom ) {
+    void font::printStringCenterD( const wchar_t *p_string, bool p_bottom ) {
         s16 x = ( SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2 );
         s16 y = ( SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2 );
 
         printStringD( p_string, x, y, p_bottom );
     }
 
-    void Font::printNumber( s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printNumber( s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
         char numstring[ 10 ] = "";
         u32 number = p_num, quotient = 1, remainder = 0;
         char remainder_str[ 3 ] = "";
@@ -272,7 +272,7 @@ namespace FONT {
     }
 
 
-    u32 Font::stringWidth( const char *p_string ) const {
+    u32 font::stringWidth( const char *p_string ) const {
         u32 current_char = 0;
         u32 width = 0;
 
@@ -286,7 +286,7 @@ namespace FONT {
 
         return width - 1;
     }
-    u32 Font::stringWidth( const wchar_t *p_string ) const {
+    u32 font::stringWidth( const wchar_t *p_string ) const {
         u32 current_char = 0;
         u32 width = 0;
 

@@ -69,11 +69,6 @@
 #include "Choice_2.h"
 #include "Choice_3.h"
 #include "Message.h"
-#include "Border_1.h"
-#include "Border_2.h"
-#include "Border_3.h"
-#include "Border_4.h"
-#include "Border_5.h"
 
 #include "Border.h"
 
@@ -120,7 +115,7 @@ backgroundSet BGs[ MAXBG ] = { { "Raging_Gyarados", NAV_DATA, NAV_DATA_PAL, true
 { "Fighting_Groudon", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
 { "Fighting_Kyogre", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
 { "Working_Klink", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions },
-{ "Reborn_Ho-Oh", BG2Bitmap, BG2Pal, false, true, mainSpritesPositions2 } };
+{ "Reborn_Ho-Oh", BG2Bitmap, BG2Pal, false, false, mainSpritesPositions2 } };
 u8 BG_ind = 9;
 
 Region acMapRegion = NONE;
@@ -249,10 +244,7 @@ void updateTime( s8 p_mapMode ) {
     time_t unixTime = time( NULL );
     struct tm* timeStruct = gmtime( (const time_t *)&unixTime );
 
-    achours = timeStruct->tm_hour;
-    acminutes = timeStruct->tm_min;
     if( acseconds != timeStruct->tm_sec ) {
-        acseconds = timeStruct->tm_sec;
         if( showmappointer ) {
             if( showfirst ) {
                 showfirst = false;
@@ -265,10 +257,25 @@ void updateTime( s8 p_mapMode ) {
             }
             updateOAMSub( Oam );
         }
+
+        BG_PALETTE_SUB[ 249 ] = RGB15( 31, 31, 31 );
+        cust_font2.setColor( 249, 1 );
+        cust_font2.setColor( 249, 2 );
+
         sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-        dmaCopy( BorderBitmap + 6144 + 3072, bgGetGfxPtr( bg2sub ) + 6 * 3072, 64 * 256 );
+        cust_font2.printString( buffer, 18 * 8, 192 - 16, true );
+
+        achours = timeStruct->tm_hour;
+        acminutes = timeStruct->tm_min;
+        acseconds = timeStruct->tm_sec;
+
+        cust_font2.setColor( 0, 1 );
+        cust_font2.setColor( 252, 2 );
+        sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
         cust_font2.printString( buffer, 18 * 8, 192 - 16, true );
     }
+    achours = timeStruct->tm_hour;
+    acminutes = timeStruct->tm_min;
     acday = timeStruct->tm_mday;
     acmonth = timeStruct->tm_mon;
     acyear = timeStruct->tm_year + 1900;
@@ -330,11 +337,11 @@ u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
 
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, BACK_ID, BACK_ID, nextAvailableTileIdx,
                                        SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                                       BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, true );
+                                       BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
 
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, SAVE_ID, SAVE_ID, nextAvailableTileIdx,
                                        -20, -20, 64, 64, SavePal,
-                                       SaveTiles, SaveTilesLen, false, false, true, OBJPRIORITY_0, false );
+                                       SaveTiles, SaveTilesLen, false, false, false, OBJPRIORITY_0, true );
 
     //Main menu sprites
 
@@ -432,11 +439,14 @@ void setMainSpriteVisibility( bool p_hidden ) {
     updateOAMSub( Oam );
 }
 
-void drawSub( ) {
-    memset( bgGetGfxPtr( bg2sub ), 0, 256 * 192 );
-    memset( bgGetGfxPtr( bg3sub ), 0, 256 * 192 );
+void drawBorder( ) {
     dmaCopy( BorderBitmap, bgGetGfxPtr( bg2sub ), 256 * 192 );
-    dmaCopy( BorderPal, BG_PALETTE_SUB, 256 * 2 );
+    dmaCopy( BorderPal, BG_PALETTE_SUB, 64 );
+}
+
+void drawSub( ) {
+    //memset( bgGetGfxPtr( bg2sub ), 0, 256 * 192 );
+    //memset( bgGetGfxPtr( bg3sub ), 0, 256 * 192 );
     if( !BGs[ BG_ind ].m_loadFromRom ) {
         dmaCopy( BGs[ BG_ind ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 192 );
         dmaCopy( BGs[ BG_ind ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
@@ -445,9 +455,10 @@ void drawSub( ) {
         dmaCopy( BGs[ 0 ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
         BG_ind = 0;
     }
+    drawBorder( );
 }
 
-void screenLoader::draw( u8 p_mode ) {
+void screenLoader::draw( s8 p_mode ) {
     _pos = p_mode;
     SpriteEntry * back = &Oam->oamBuffer[ BACK_ID ];
     setSpriteVisibility( back, false );
@@ -464,6 +475,7 @@ void screenLoader::draw( u8 p_mode ) {
         updateOAMSub( Oam );
     } else if( p_mode == 1 ) {
         FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen2" );
+        drawBorder( );
         consoleSelect( &Bottom );
         consoleSetWindow( &Bottom, 4, 1, 12, 1 );
         printf( " Hoenn" );
@@ -475,6 +487,7 @@ void screenLoader::draw( u8 p_mode ) {
         updateOAMSub( Oam );
     } else if( p_mode == 2 ) {
         FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen3" );
+        drawBorder( );
         consoleSelect( &Bottom );
         consoleSetWindow( &Bottom, 4, 1, 12, 1 );
         printf( " Kanto" );
@@ -485,6 +498,7 @@ void screenLoader::draw( u8 p_mode ) {
         updateOAMSub( Oam );
     } else if( p_mode == 3 ) {
         FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen2_BG3_KJ" );
+        drawBorder( );
         consoleSelect( &Bottom );
         consoleSetWindow( &Bottom, 4, 1, 12, 1 );
         printf( " Johto" );
@@ -530,11 +544,11 @@ void initTop( ) {
     for( size_t i = 0; i < SAV.m_PkmnTeam.size( ); i++ ) {
         if( !SAV.m_PkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
             if( i % 2 == 0 ) {
-                FS::drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId, u16(borders[ i ][ 0 ] * 8 - 28), u16(borders[ i ][ 1 ] * 8), a, b, c, false );
+                FS::drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId, u16( borders[ i ][ 0 ] * 8 - 28 ), u16( borders[ i ][ 1 ] * 8 ), a, b, c, false );
                 BATTLE::battleUI::displayHP( 100, 101, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
                 BATTLE::battleUI::displayHP( 100, 100 - SAV.m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV.m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
             } else {
-                FS::drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId, u16(borders[ i ][ 0 ] * 8 + 76), u16(borders[ i ][ 1 ] * 8), a, b, c, false );
+                FS::drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId, u16( borders[ i ][ 0 ] * 8 + 76 ), u16( borders[ i ][ 1 ] * 8 ), a, b, c, false );
                 BATTLE::battleUI::displayHP( 100, 101, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
                 BATTLE::battleUI::displayHP( 100, 100 - SAV.m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV.m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
             }
@@ -568,9 +582,9 @@ void initTop( ) {
             cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
             if( i % 2 == 0 ) {
-                FS::drawEggIcon( OamTop, spriteInfoTop, u16(borders[ i ][ 0 ] * 8 - 28), u16(borders[ i ][ 1 ] * 8), a, b, c, false );
+                FS::drawEggIcon( OamTop, spriteInfoTop, u16( borders[ i ][ 0 ] * 8 - 28 ), u16( borders[ i ][ 1 ] * 8 ), a, b, c, false );
             } else {
-                FS::drawEggIcon( OamTop, spriteInfoTop, u16(borders[ i ][ 0 ] * 8 + 76), u16(borders[ i ][ 1 ] * 8), a, b, c, false );
+                FS::drawEggIcon( OamTop, spriteInfoTop, u16( borders[ i ][ 0 ] * 8 + 76 ), u16( borders[ i ][ 1 ] * 8 ), a, b, c, false );
             }
             updateOAM( OamTop );
         }
@@ -652,6 +666,7 @@ void initSub( u16 pkmIdx ) {
 void screenLoader::run_pkmn( ) {
     vramSetup( );
     videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
+    swiWaitForVBlank( );
     Top = *consoleInit( &Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
     consoleSetFont( &Top, &cfont );
 
@@ -659,13 +674,16 @@ void screenLoader::run_pkmn( ) {
     consoleSetFont( &Bottom, &cfont );
 
     touchPosition touch;
-    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNScreen" );
     swiWaitForVBlank( );
-    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNScreen" );
     drawSub( );
     u8 acIn = 0, max = SAV.m_PkmnTeam.size( );
     consoleSelect( &Top );
     consoleClear( );
+
+    clearTop( );
+
+    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNScreen" );
+    bgUpdate( );
     initTop( );
     initSub( acIn );
     consoleSetWindow( &Top, positions[ acIn ][ 0 ], positions[ acIn ][ 1 ], 2, 2 );
@@ -723,7 +741,7 @@ void screenLoader::run_pkmn( ) {
             updateOAMSub( Oam );
             swiWaitForVBlank( );
             while( 1 ) {
-                initSub( -1 );
+                initSub( acIn );
                 s8 p = SAV.m_PkmnTeam[ acIn ].draw( );
                 if( p & KEY_X ) {
                     for( u8 i = 0; i < max; i++ ) {
@@ -966,226 +984,7 @@ void initDexSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo, u8& p_oamIndex, 
 
     p_tileCnt = loadSprite( p_oam, p_spriteInfo, p_oamIndex++, p_palCnt++, p_tileCnt,
                             SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                            BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, false );
-
-
-    SpriteInfo * Bo4Info = &p_spriteInfo[ p_oamIndex ];
-    SpriteEntry * Bo4 = &p_oam->oamBuffer[ p_oamIndex ];
-    Bo4Info->m_oamId = p_oamIndex;
-    Bo4Info->m_width = 64;
-    Bo4Info->m_height = 64;
-    Bo4Info->m_angle = 0;
-    Bo4Info->m_entry = Bo4;
-    Bo4->y = 0;
-    Bo4->isRotateScale = false;
-    Bo4->blendMode = OBJMODE_NORMAL;
-    Bo4->isMosaic = false;
-    Bo4->colorMode = OBJCOLOR_16;
-    Bo4->shape = OBJSHAPE_SQUARE;
-    Bo4->isHidden = true;//
-    Bo4->x = 0;
-    Bo4->size = OBJSIZE_16;//64;
-    Bo4->gfxIndex = 0;//p_tileCnt;
-    Bo4->priority = OBJPRIORITY_2;
-    Bo4->palette = p_palCnt;
-    Bo4->vFlip = true;
-    Bo4->hFlip = true;
-
-    Bo4 = &p_oam->oamBuffer[ ++p_oamIndex ];
-    Bo4->y = 128;
-    Bo4->isRotateScale = false;
-    Bo4->blendMode = OBJMODE_NORMAL;
-    Bo4->isMosaic = false;
-    Bo4->colorMode = OBJCOLOR_16;
-    Bo4->shape = OBJSHAPE_SQUARE;
-    Bo4->isHidden = true;//false;
-    Bo4->x = 192;
-    Bo4->size = OBJSIZE_16;//64;
-    Bo4->gfxIndex = 0;//p_tileCnt;
-    Bo4->priority = OBJPRIORITY_2;
-    Bo4->palette = p_palCnt;
-    Bo4->vFlip = false;
-    Bo4->hFlip = false;
-
-    p_tileCnt += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
-
-    SpriteInfo * Bo3Info = &p_spriteInfo[ ++p_oamIndex ];
-    SpriteEntry * Bo3 = &p_oam->oamBuffer[ p_oamIndex ];
-    Bo3Info->m_oamId = 3;
-    Bo3Info->m_width = 64;
-    Bo3Info->m_height = 64;
-    Bo3Info->m_angle = 0;
-    Bo3Info->m_entry = Bo3;
-    Bo3->y = 0;
-    Bo3->isRotateScale = false;
-    Bo3->blendMode = OBJMODE_NORMAL;
-    Bo3->isMosaic = false;
-    Bo3->colorMode = OBJCOLOR_16;
-    Bo3->shape = OBJSHAPE_SQUARE;
-    Bo3->isHidden = true;//false;
-    Bo3->x = 64;
-    Bo3->size = OBJSIZE_16;//64;
-    Bo3->gfxIndex = 0;//p_tileCnt;
-    Bo3->priority = OBJPRIORITY_2;
-    Bo3->palette = p_palCnt;
-    Bo3->vFlip = true;
-    Bo3->hFlip = true;
-
-    Bo3 = &p_oam->oamBuffer[ ++p_oamIndex ];
-    Bo3->y = 128;
-    Bo3->isRotateScale = false;
-    Bo3->blendMode = OBJMODE_NORMAL;
-    Bo3->isMosaic = false;
-    Bo3->colorMode = OBJCOLOR_16;
-    Bo3->shape = OBJSHAPE_SQUARE;
-    Bo3->isHidden = true;//false;
-    Bo3->x = 128;
-    Bo3->size = OBJSIZE_16;//64;
-    Bo3->gfxIndex = 0;// p_tileCnt;
-    Bo3->priority = OBJPRIORITY_2;
-    Bo3->palette = p_palCnt;
-    Bo3->vFlip = false;
-    Bo3->hFlip = false;
-
-    //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    //    Border_3Tiles,
-    //    &SPRITE_GFX_SUB[p_tileCnt * OFFSET_MULTIPLIER],
-    //    Border_3TilesLen);
-
-    p_tileCnt += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
-
-    SpriteInfo * Bo2Info = &p_spriteInfo[ ++p_oamIndex ];
-    SpriteEntry * Bo2 = &p_oam->oamBuffer[ p_oamIndex ];
-    Bo2Info->m_oamId = 3;
-    Bo2Info->m_width = 64;
-    Bo2Info->m_height = 64;
-    Bo2Info->m_angle = 0;
-    Bo2Info->m_entry = Bo2;
-    Bo2->y = 0;
-    Bo2->isRotateScale = false;
-    Bo2->blendMode = OBJMODE_NORMAL;
-    Bo2->isMosaic = false;
-    Bo2->colorMode = OBJCOLOR_16;
-    Bo2->shape = OBJSHAPE_SQUARE;
-    Bo2->isHidden = true;// false;
-    Bo2->x = 128;
-    Bo2->size = OBJSIZE_16;//64;
-    Bo2->gfxIndex = 0;//p_tileCnt;
-    Bo2->priority = OBJPRIORITY_2;
-    Bo2->palette = p_palCnt;
-    Bo2->vFlip = true;
-    Bo2->hFlip = true;
-
-    Bo2 = &p_oam->oamBuffer[ ++p_oamIndex ];
-    Bo2->y = 128;
-    Bo2->isRotateScale = false;
-    Bo2->blendMode = OBJMODE_NORMAL;
-    Bo2->isMosaic = false;
-    Bo2->colorMode = OBJCOLOR_16;
-    Bo2->shape = OBJSHAPE_SQUARE;
-    Bo2->isHidden = true;// false;
-    Bo2->x = 64;
-    Bo2->size = OBJSIZE_16;//64;
-    Bo2->gfxIndex = 0;//p_tileCnt;
-    Bo2->priority = OBJPRIORITY_2;
-    Bo2->palette = p_palCnt;
-    Bo2->vFlip = false;
-    Bo2->hFlip = false;
-
-    //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    //    Border_2Tiles,
-    //    &SPRITE_GFX_SUB[p_tileCnt * OFFSET_MULTIPLIER],
-    //    Border_2TilesLen);
-    p_tileCnt += Border_2TilesLen / BYTES_PER_16_COLOR_TILE;
-
-    SpriteInfo * Bo1Info = &p_spriteInfo[ ++p_oamIndex ];
-    SpriteEntry * Bo1 = &p_oam->oamBuffer[ p_oamIndex ];
-    Bo1Info->m_oamId = 3;
-    Bo1Info->m_width = 64;
-    Bo1Info->m_height = 64;
-    Bo1Info->m_angle = 0;
-    Bo1Info->m_entry = Bo1;
-    Bo1->y = 0;
-    Bo1->isRotateScale = false;
-    Bo1->blendMode = OBJMODE_NORMAL;
-    Bo1->isMosaic = false;
-    Bo1->colorMode = OBJCOLOR_16;
-    Bo1->shape = OBJSHAPE_SQUARE;
-    Bo1->isHidden = true;// false;
-    Bo1->x = 192;
-    Bo1->size = OBJSIZE_16;//64;
-    Bo1->gfxIndex = 0;//p_tileCnt;
-    Bo1->priority = OBJPRIORITY_2;
-    Bo1->palette = p_palCnt;
-    Bo1->vFlip = true;
-    Bo1->hFlip = true;
-
-    Bo1 = &p_oam->oamBuffer[ ++p_oamIndex ];
-    Bo1->y = 128;
-    Bo1->isRotateScale = false;
-    Bo1->blendMode = OBJMODE_NORMAL;
-    Bo1->isMosaic = false;
-    Bo1->colorMode = OBJCOLOR_16;
-    Bo1->shape = OBJSHAPE_SQUARE;
-    Bo1->isHidden = true;//false;
-    Bo1->x = 0;
-    Bo1->size = OBJSIZE_16;//64;
-    Bo1->gfxIndex = 0;//p_tileCnt;
-    Bo1->priority = OBJPRIORITY_2;
-    Bo1->palette = p_palCnt;
-    Bo1->vFlip = false;
-    Bo1->hFlip = false;
-
-    //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    //    Border_1Tiles,
-    //    &SPRITE_GFX_SUB[p_tileCnt * OFFSET_MULTIPLIER],
-    //    Border_1TilesLen);
-    p_tileCnt += Border_1TilesLen / BYTES_PER_16_COLOR_TILE;
-
-    SpriteInfo * Bo5Info = &p_spriteInfo[ ++p_oamIndex ];
-    SpriteEntry * Bo5 = &p_oam->oamBuffer[ p_oamIndex ];
-    Bo5Info->m_oamId = 3;
-    Bo5Info->m_width = 64;
-    Bo5Info->m_height = 64;
-    Bo5Info->m_angle = 0;
-    Bo5Info->m_entry = Bo5;
-    Bo5->y = 64;
-    Bo5->isRotateScale = false;
-    Bo5->blendMode = OBJMODE_NORMAL;
-    Bo5->isMosaic = false;
-    Bo5->colorMode = OBJCOLOR_16;
-    Bo5->shape = OBJSHAPE_SQUARE;
-    Bo5->isHidden = true;//false;
-    Bo5->x = 0;
-    Bo5->size = OBJSIZE_16;//64;
-    Bo5->gfxIndex = 0;//p_tileCnt;
-    Bo5->priority = OBJPRIORITY_2;
-    Bo5->palette = p_palCnt;
-    Bo5->vFlip = true;
-    Bo5->hFlip = true;
-
-    Bo5 = &p_oam->oamBuffer[ ++p_oamIndex ];
-    Bo5->y = 64;
-    Bo5->isRotateScale = false;
-    Bo5->blendMode = OBJMODE_NORMAL;
-    Bo5->isMosaic = false;
-    Bo5->colorMode = OBJCOLOR_16;
-    Bo5->shape = OBJSHAPE_SQUARE;
-    Bo5->isHidden = true;// false;
-    Bo5->x = 192;
-    Bo5->size = OBJSIZE_16;//64;
-    Bo5->gfxIndex = 0;//p_tileCnt;
-    Bo5->priority = OBJPRIORITY_2;
-    Bo5->palette = p_palCnt;
-    Bo5->vFlip = false;
-    Bo5->hFlip = false;
-
-    //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    //    Border_5Tiles,
-    //    &SPRITE_GFX_SUB[p_tileCnt * OFFSET_MULTIPLIER],
-    //    Border_5TilesLen);
-    p_tileCnt += Border_5TilesLen / BYTES_PER_16_COLOR_TILE;
-
+                            BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, false );
     ++p_palCnt;
     p_oamIndex = 10;
     for( u8 i = 0; i < 8; ++i ) {
@@ -1552,7 +1351,7 @@ void drawTopDexPage( u8 p_page, u16 p_pkmnId, u8 p_pkmnFormeId = 0 ) {
             if( acpkmndata.m_types[ 0 ] != acpkmndata.m_types[ 1 ] )
                 drawTypeIcon( OamTop, spriteInfoTop, a, b, c, acpkmndata.m_types[ 1 ], 65, 35, false );
             updateOAM( OamTop );
-            printf( "\n    Du hast %i dieser pokemon.\n\n", box_of_st_pkmn[ p_pkmnId - 1 ].size( ) );
+            printf( "\n    Du hast %i dieser Pok\x82""mon.\n\n", box_of_st_pkmn[ p_pkmnId - 1 ].size( ) );
             char buffer[ 50 ];
             sprintf( buffer, "%s", POKEMON::PKMNDATA::getDisplayName( p_pkmnId ) );
             sprintf( buffer, "%s - %s", buffer, POKEMON::PKMNDATA::getSpecies( p_pkmnId ) );
@@ -1873,199 +1672,7 @@ void initBagSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo, u8& p_oamIndex, 
                           32 );
         p_palCnt = backInfo->m_oamId + 1;
 
-        SpriteInfo * Bo4Info = &p_spriteInfo[ ++p_oamIndex ];
-        SpriteEntry * Bo4 = &p_oam->oamBuffer[ p_oamIndex ];
-        Bo4Info->m_oamId = p_oamIndex;
-        Bo4Info->m_width = 64;
-        Bo4Info->m_height = 64;
-        Bo4Info->m_angle = 0;
-        Bo4Info->m_entry = Bo4;
-        Bo4->shape = OBJSHAPE_SQUARE;
-        Bo4->size = OBJSIZE_16;//
-        Bo4->gfxIndex = 0;//p_tileCnt;
 
-        Bo4 = &p_oam->oamBuffer[ ++p_oamIndex ];
-        Bo4->size = OBJSIZE_16;//64;
-        Bo4->gfxIndex = 0;//p_tileCnt;
-
-        p_tileCnt += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
-
-        SpriteInfo * Bo3Info = &p_spriteInfo[ ++p_oamIndex ];
-        SpriteEntry * Bo3 = &p_oam->oamBuffer[ p_oamIndex ];
-        Bo3Info->m_oamId = 3;
-        Bo3Info->m_width = 64;
-        Bo3Info->m_height = 64;
-        Bo3Info->m_angle = 0;
-        Bo3Info->m_entry = Bo3;
-        Bo3->y = 0;
-        Bo3->isRotateScale = false;
-        Bo3->blendMode = OBJMODE_NORMAL;
-        Bo3->isMosaic = false;
-        Bo3->colorMode = OBJCOLOR_16;
-        Bo3->shape = OBJSHAPE_SQUARE;
-        Bo3->isHidden = false;
-        Bo3->x = 64;
-        Bo3->size = OBJSIZE_16;//64;
-        Bo3->gfxIndex = 0;//p_tileCnt;
-        Bo3->priority = OBJPRIORITY_2;
-        Bo3->palette = p_palCnt;
-        Bo3->vFlip = true;
-        Bo3->hFlip = true;
-
-        Bo3 = &p_oam->oamBuffer[ ++p_oamIndex ];
-        Bo3->y = 128;
-        Bo3->isRotateScale = false;
-        Bo3->blendMode = OBJMODE_NORMAL;
-        Bo3->isMosaic = false;
-        Bo3->colorMode = OBJCOLOR_16;
-        Bo3->shape = OBJSHAPE_SQUARE;
-        Bo3->isHidden = false;
-        Bo3->x = 128;
-        Bo3->size = OBJSIZE_16;//64;
-        Bo3->gfxIndex = 0;//p_tileCnt;
-        Bo3->priority = OBJPRIORITY_2;
-        Bo3->palette = p_palCnt;
-        Bo3->vFlip = false;
-        Bo3->hFlip = false;
-
-        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        //    Border_3Tiles,
-        //    &SPRITE_GFX_SUB[p_tileCnt * OFFSET_MULTIPLIER],
-        //    Border_3TilesLen);
-
-        p_tileCnt += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
-
-        SpriteInfo * Bo2Info = &p_spriteInfo[ ++p_oamIndex ];
-        SpriteEntry * Bo2 = &p_oam->oamBuffer[ p_oamIndex ];
-        Bo2Info->m_oamId = 3;
-        Bo2Info->m_width = 64;
-        Bo2Info->m_height = 64;
-        Bo2Info->m_angle = 0;
-        Bo2Info->m_entry = Bo2;
-        Bo2->y = 0;
-        Bo2->isRotateScale = false;
-        Bo2->blendMode = OBJMODE_NORMAL;
-        Bo2->isMosaic = false;
-        Bo2->colorMode = OBJCOLOR_16;
-        Bo2->shape = OBJSHAPE_SQUARE;
-        Bo2->isHidden = false;
-        Bo2->x = 128;
-        Bo2->size = OBJSIZE_16;//64;
-        Bo2->gfxIndex = 0;//p_tileCnt;
-        Bo2->priority = OBJPRIORITY_2;
-        Bo2->palette = p_palCnt;
-        Bo2->vFlip = true;
-        Bo2->hFlip = true;
-
-        Bo2 = &p_oam->oamBuffer[ ++p_oamIndex ];
-        Bo2->y = 128;
-        Bo2->isRotateScale = false;
-        Bo2->blendMode = OBJMODE_NORMAL;
-        Bo2->isMosaic = false;
-        Bo2->colorMode = OBJCOLOR_16;
-        Bo2->shape = OBJSHAPE_SQUARE;
-        Bo2->isHidden = false;
-        Bo2->x = 64;
-        Bo2->size = OBJSIZE_16;//64;
-        Bo2->gfxIndex = 0;//p_tileCnt;
-        Bo2->priority = OBJPRIORITY_2;
-        Bo2->palette = p_palCnt;
-        Bo2->vFlip = false;
-        Bo2->hFlip = false;
-
-        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        //    Border_2Tiles,
-        //    &SPRITE_GFX_SUB[p_tileCnt * OFFSET_MULTIPLIER],
-        //    Border_2TilesLen);
-        p_tileCnt += Border_2TilesLen / BYTES_PER_16_COLOR_TILE;
-
-        SpriteInfo * Bo1Info = &p_spriteInfo[ ++p_oamIndex ];
-        SpriteEntry * Bo1 = &p_oam->oamBuffer[ p_oamIndex ];
-        Bo1Info->m_oamId = 3;
-        Bo1Info->m_width = 64;
-        Bo1Info->m_height = 64;
-        Bo1Info->m_angle = 0;
-        Bo1Info->m_entry = Bo1;
-        Bo1->y = 0;
-        Bo1->isRotateScale = false;
-        Bo1->blendMode = OBJMODE_NORMAL;
-        Bo1->isMosaic = false;
-        Bo1->colorMode = OBJCOLOR_16;
-        Bo1->shape = OBJSHAPE_SQUARE;
-        Bo1->isHidden = false;
-        Bo1->x = 192;
-        Bo1->size = OBJSIZE_16;//64;
-        Bo1->gfxIndex = 0;//p_tileCnt;
-        Bo1->priority = OBJPRIORITY_2;
-        Bo1->palette = p_palCnt;
-        Bo1->vFlip = true;
-        Bo1->hFlip = true;
-
-        Bo1 = &p_oam->oamBuffer[ ++p_oamIndex ];
-        Bo1->y = 128;
-        Bo1->isRotateScale = false;
-        Bo1->blendMode = OBJMODE_NORMAL;
-        Bo1->isMosaic = false;
-        Bo1->colorMode = OBJCOLOR_16;
-        Bo1->shape = OBJSHAPE_SQUARE;
-        Bo1->isHidden = false;
-        Bo1->x = 0;
-        Bo1->size = OBJSIZE_16;//64;
-        Bo1->gfxIndex = 0;//p_tileCnt;
-        Bo1->priority = OBJPRIORITY_2;
-        Bo1->palette = p_palCnt;
-        Bo1->vFlip = false;
-        Bo1->hFlip = false;
-
-        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        //    Border_1Tiles,
-        //    &SPRITE_GFX_SUB[p_tileCnt * OFFSET_MULTIPLIER],
-        //    Border_1TilesLen);
-        p_tileCnt += Border_1TilesLen / BYTES_PER_16_COLOR_TILE;
-
-        SpriteInfo * Bo5Info = &p_spriteInfo[ ++p_oamIndex ];
-        SpriteEntry * Bo5 = &p_oam->oamBuffer[ p_oamIndex ];
-        Bo5Info->m_oamId = 3;
-        Bo5Info->m_width = 64;
-        Bo5Info->m_height = 64;
-        Bo5Info->m_angle = 0;
-        Bo5Info->m_entry = Bo5;
-        Bo5->y = 64;
-        Bo5->isRotateScale = false;
-        Bo5->blendMode = OBJMODE_NORMAL;
-        Bo5->isMosaic = false;
-        Bo5->colorMode = OBJCOLOR_16;
-        Bo5->shape = OBJSHAPE_SQUARE;
-        Bo5->isHidden = false;
-        Bo5->x = 0;
-        Bo5->size = OBJSIZE_16;//64;
-        Bo5->gfxIndex = 0;//p_tileCnt;
-        Bo5->priority = OBJPRIORITY_2;
-        Bo5->palette = p_palCnt;
-        Bo5->vFlip = true;
-        Bo5->hFlip = true;
-
-        Bo5 = &p_oam->oamBuffer[ ++p_oamIndex ];
-        Bo5->y = 64;
-        Bo5->isRotateScale = false;
-        Bo5->blendMode = OBJMODE_NORMAL;
-        Bo5->isMosaic = false;
-        Bo5->colorMode = OBJCOLOR_16;
-        Bo5->shape = OBJSHAPE_SQUARE;
-        Bo5->isHidden = false;
-        Bo5->x = 192;
-        Bo5->size = OBJSIZE_16;//64;
-        Bo5->gfxIndex = 0;//p_tileCnt;
-        Bo5->priority = OBJPRIORITY_2;
-        Bo5->palette = p_palCnt;
-        Bo5->vFlip = false;
-        Bo5->hFlip = false;
-
-        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-        //    Border_5Tiles,
-        //    &SPRITE_GFX_SUB[p_tileCnt * OFFSET_MULTIPLIER],
-        //    Border_5TilesLen);
-        p_tileCnt += Border_5TilesLen / BYTES_PER_16_COLOR_TILE;
     } else {
         SpriteInfo * BoxInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry * Box = &p_oam->oamBuffer[ p_oamIndex ];
@@ -2239,7 +1846,7 @@ void getRanPerm( u8* p_array, u8* p_out ) {
     }
 }
 
-const std::string choi[ 6 ] = { "\nEinsetzen.", "\nEinem pokemon geben.", "\nRegistrieren.", "\nWeitere Daten ansehen." };
+const std::string choi[ 6 ] = { "\nEinsetzen.", "\nEinem Pok\x82""mon geben.", "\nRegistrieren.", "\nWeitere Daten ansehen." };
 u8 getAnswer( ITEMS::item::itemType p_bagtype ) {
     touchPosition t;
     if( p_bagtype != ITEMS::item::BERRIES ) {
@@ -2503,7 +2110,7 @@ void drawBagPage( u8 p_page, u8* p_position, u8 &p_oamIndex, u8& p_palCnt, u16& 
             goto BACK;
         std::pair<u16, u16> acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), i );
         FS::drawItem( Oam, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
-                  18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == ITEMS::item::KEY_ITEM );
+                      18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == ITEMS::item::KEY_ITEM );
     }
     while( 42 ) {
         updateTime( );
@@ -2572,7 +2179,7 @@ NEXT:
                     goto BACK;
                 std::pair<u16, u16> acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), i );
                 FS::drawItem( Oam, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
-                          18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == ITEMS::item::KEY_ITEM );
+                              18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == ITEMS::item::KEY_ITEM );
             }
         } else if( sqrt( sq( SCREEN_WIDTH - 33 - t.px ) + sq( SCREEN_HEIGHT - 6 - t.py ) ) <= 16 && acpage > 0 ) {
 PREV:
@@ -2620,7 +2227,7 @@ PREV:
                     goto BACK;
                 std::pair<u16, u16> acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), i );
                 FS::drawItem( Oam, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
-                          18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == ITEMS::item::KEY_ITEM );
+                              18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == ITEMS::item::KEY_ITEM );
             }
         } else {
             for( u8 io = 0; io < std::min( int( SAV.m_bag.size( bag::bagtype( p_page ) ) ) - acpage * 12, 12 ); ++io ) {
@@ -2648,7 +2255,7 @@ PREV:
 
                     std::pair<u16, u16> acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), acpage * 12 + io );
                     FS::drawItem( OamTop, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 22,
-                              50, acElem.second, oam2, pal2, tile2, false, p_page == ITEMS::item::KEY_ITEM );
+                                  50, acElem.second, oam2, pal2, tile2, false, p_page == ITEMS::item::KEY_ITEM );
                     consoleSetWindow( &Top, 7, 9, 13, 1 );
                     consoleSelect( &Top );
                     printf( ITEMS::ItemList[ acElem.first ].getDisplayName( ).c_str( ) );
@@ -2887,7 +2494,7 @@ OUT:
                             goto BACK;
                         auto acElem = SAV.m_bag.elementAt( bag::bagtype( p_page ), i );
                         FS::drawItem( Oam, spriteInfo, ITEMS::ItemList[ acElem.first ].m_itemName, 38 + ( p_position[ i - ( acpage * 12 ) ] % 4 * 48 ),
-                                  18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == ITEMS::item::KEY_ITEM );
+                                      18 + ( p_position[ i - ( acpage * 12 ) ] / 4 ) * 40, acElem.second, oam2, pal2, tile2, true, p_page == ITEMS::item::KEY_ITEM );
                         updateTime( );
                     }
                 }
@@ -2898,6 +2505,8 @@ OUT:
 void bag::draw( ) {
     vramSetup( );
     videoSetMode( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
+    memset( bgGetGfxPtr( bg2 ), 0, 256 * 192 );
+    memset( bgGetGfxPtr( bg3 ), 0, 256 * 192 );
     Top = *consoleInit( &Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
     consoleSetFont( &Top, &cfont );
 
@@ -2907,12 +2516,21 @@ void bag::draw( ) {
     touchPosition t;
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "BagTop" );
 
+
+    cust_font.setColor( 0, 0 );
+    cust_font.setColor( 251, 1 );
+    cust_font.setColor( 252, 2 );
+
+    BG_PALETTE[ 250 ] = RGB15( 31, 31, 31 );
+    BG_PALETTE[ 251 ] = RGB15( 20, 20, 20 );
+    BG_PALETTE[ 252 ] = RGB15( 3, 3, 3 );
+
     consoleSelect( &Top );
     for( u8 i = 0; i < 8; ++i ) {
         consoleSetWindow( &Top, 0, 3 * i, 12, 3 );
         u16 acIn = 214 + 4 * i;
         u16 s = this->m_bags[ i ].size( );
-        char buffer[ 50 ];
+        //char buffer[ 50 ];
         printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
         if( s == 0 )
             sprintf( buffer, "  0 Items" );

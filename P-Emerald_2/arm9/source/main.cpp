@@ -111,8 +111,8 @@ int bg2;
 
 ConsoleFont cfont;
 Keyboard* kbd;
-FONT::Font cust_font( FONT::font1::fontData, FONT::font1::fontWidths, FONT::font1::shiftchar );
-FONT::Font cust_font2( FONT::font2::fontData, FONT::font2::fontWidths, FONT::font2::shiftchar );
+FONT::font cust_font( FONT::font1::fontData, FONT::font1::fontWidths, FONT::font1::shiftchar );
+FONT::font cust_font2( FONT::font2::fontData, FONT::font2::fontWidths, FONT::font2::shiftchar );
 
 map2d::Map* acMap;
 
@@ -2028,7 +2028,7 @@ OUT:
                 if( touch.px == 0 && touch.py == 0 )
                     break;
             }
-            const char *someText[ 7 ] = { "\n     pokemon-Spawn", "\n    Item-Spawn", "\n 1-Item_Test", "\n  Battle SPWN.", "\n   Battle SPWN 2", "\n    42" };
+            const char *someText[ 7 ] = { "\n     PKMN-Spawn", "\n    Item-Spawn", "\n 1-Item_Test", "\n  Battle SPWN.", "\n   Battle SPWN 2", "\n    42" };
             choiceBox test( 5, &someText[ 0 ], 0, true );
             int res = test.getResult( "Tokens of god-being...", true );
             switch( res ) {

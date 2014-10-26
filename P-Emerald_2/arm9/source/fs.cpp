@@ -57,8 +57,8 @@ ability::ability( int p_abilityId ) {
     if( !f )
         return;
 
-    m_abilityName = FS::readString( f, false );
-    m_flavourText = FS::readString( f, false );
+    m_abilityName = FS::readString( f, true );
+    m_flavourText = FS::readString( f, true );
     fscanf( f, "%u", &( m_type ) );
     fclose( f );
 }
@@ -647,7 +647,7 @@ namespace FS {
         Item->x = p_posX;
         Item->y = p_posY;
 
-        char buffer[100];
+        char buffer[ 100 ];
         sprintf( buffer, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
         if( p_subScreen ) {
             if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/PKMN/", buffer, 128, 16 ) ) {
@@ -696,7 +696,7 @@ namespace FS {
         Item->x = p_posX;
         Item->y = p_posY;
 
-        char buffer[100];
+        char buffer[ 100 ];
         sprintf( buffer, "Icon_egg" );
         if( p_subScreen ) {
             if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/ICONS/", buffer, 128, 16 ) ) {
@@ -913,6 +913,65 @@ namespace FS {
         }
         ret += L'\0';
         return ret;
+    }
+
+    std::string breakString( const std::string& p_string, u8 p_lineLength ) {
+        std::string result = "";
+
+        u8 acLineLength = 0;
+        std::string tmp = "";
+        for( auto c : p_string ) {
+            if( c == ' ' ) {
+                if( acLineLength + tmp.length( ) > p_lineLength ) {
+                    if( acLineLength ) {
+                        result += "\n" + tmp + " ";
+                        acLineLength = tmp.length( );
+                        tmp = "";
+                    } else {
+                        result += tmp + "\n";
+                        acLineLength = 0;
+                        tmp = "";
+                    }
+                } else {
+                    result += tmp + ' ';
+                    tmp = "";
+                    acLineLength += tmp.length( ) + 1;
+                }
+            } else
+                tmp += c;
+        }
+
+        return result + tmp;
+    }
+
+    std::string breakString( const std::string& p_string, FONT::font p_font, u8 p_lineLength ) {
+        std::string result = "";
+
+        u8 acLineLength = 0;
+        std::string tmp = "";
+        for( auto c : p_string ) {
+            if( c == ' ' ) {
+                u8 tmpLen = p_font.stringWidth( tmp.c_str( ) );
+                if( acLineLength + tmpLen > p_lineLength ) {
+                    if( acLineLength ) {
+                        result += "\n" + tmp + " ";
+                        acLineLength = tmpLen + 4;
+                        tmp = "";
+                    } else {
+                        result += tmp + "\n";
+                        acLineLength = 0;
+                        tmp = "";
+                    }
+                } else {
+                    result += tmp + ' ';
+                    tmp = "";
+                    acLineLength += tmpLen + 4;
+                }
+            } else
+                tmp += c;
+        }
+
+        return result + tmp;
     }
 
     const char* getLoc( u16 p_ind ) {

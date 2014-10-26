@@ -467,7 +467,7 @@ namespace POKEMON {
                 cust_font.printString( "Item", 2, 176, false );
                 cust_font.setColor( 252, 1 );
                 cust_font.setColor( 0, 2 );
-                char buffer[ 200 ];
+                //char buffer[ 200 ];
                 sprintf( buffer, "%s: %s", ITEMS::ItemList[ m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
                          ITEMS::ItemList[ m_boxdata.getItem( ) ].getShortDescription( true ).c_str( ) );
                 cust_font.printString( buffer, 50, 159, false );
@@ -500,7 +500,7 @@ namespace POKEMON {
                     BG_PALETTE[ 254 ] = RGB15( 31, 0, 0 );
                     BG_PALETTE[ 255 ] = RGB15( 0, 0, 31 );
 
-                    char buffer[ 50 ];
+                    //char buffer[ 50 ];
                     sprintf( buffer, "KP                     %3i", m_stats.m_maxHP );
                     cust_font.printString( buffer, 130, 44, false );
 
@@ -720,51 +720,34 @@ namespace POKEMON {
             updateOAMSub( Oam );
         }
         printf( "\x1b[33m" );
-        for( int i = 0; i < 4; ++i ) {
-            Oam->oamBuffer[ 9 + i ].isHidden = false;
-            Oam->oamBuffer[ 9 + i ].hFlip = true;
-            Oam->oamBuffer[ 9 + i ].priority = OBJPRIORITY_3;
-            Oam->oamBuffer[ 9 + i ].y = 192 - 54;
-        }
-        Oam->oamBuffer[ 18 ].isHidden = false;
-        Oam->oamBuffer[ 18 ].y = 192 - 12;
-        Oam->oamBuffer[ 18 ].x = 76;
-        Oam->oamBuffer[ 18 ].priority = OBJPRIORITY_1;
-        Oam->oamBuffer[ 28 ].isHidden = false;
-        Oam->oamBuffer[ 28 ].y = 192 - 12;
-        Oam->oamBuffer[ 28 ].x = 0;
-        Oam->oamBuffer[ 28 ].priority = OBJPRIORITY_1;
-        Oam->oamBuffer[ 27 ].isHidden = false;
-        Oam->oamBuffer[ 27 ].y = 192 - 12;
-        Oam->oamBuffer[ 27 ].x = 20;  
-        Oam->oamBuffer[ 27 ].priority = OBJPRIORITY_1;
         updateOAMSub( Oam );
-        if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
-            auto acAbility = ability( m_boxdata.m_ability );
-            consoleSetWindow( p_bottom, 0, 23, 20, 5 );
-            printf( "%s", acAbility.m_abilityName.c_str( ) );
-            consoleSetWindow( p_bottom, 1, 18, 28, 5 );
-            printf( "%s", acAbility.m_flavourText.c_str( ) );
-        }
 
         consoleSetWindow( p_bottom, 3, 3, 27, 15 );
-
-        //wprintf(L"  OT %ls\n  (%05i/%05i)\n\n",&(m_boxdata.OT[0]),m_boxdata.ID,m_boxdata.SID);
-
         drawSub( );
-
 
         cust_font.setColor( 0, 0 );
         cust_font.setColor( 254, 1 );
         cust_font.setColor( 255, 2 );
         BG_PALETTE_SUB[ 253 ] = m_boxdata.m_oTisFemale ? RGB15( 31, 15, 0 ) : RGB15( 0, 15, 31 );
-        BG_PALETTE_SUB[ 255 ] = RGB15( 15, 15, 15 );
+        BG_PALETTE_SUB[ 255 ] = RGB15( 0, 0, 0 );
         BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
 
         cust_font.printString( "OT:", 28, 22, true );
         cust_font.setColor( 253, 2 );
         cust_font.printString( m_boxdata.m_oT, 56, 16, true );
         cust_font.setColor( 255, 2 );
+
+        if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
+            auto acAbility = ability( m_boxdata.m_ability );
+
+            BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
+            FONT::putrec( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false, 250 );
+            cust_font.setColor( 253, 2 );
+            cust_font.printString( FS::breakString( acAbility.m_flavourText, cust_font, 240 ).c_str( ), 0, 138, true );
+            cust_font.printString( acAbility.m_abilityName.c_str( ), 5, 176, true );
+            cust_font.setColor( 254, 1 );
+            cust_font.setColor( 255, 2 );
+        }
 
         sprintf( buffer, "(%05i/%05i)", m_boxdata.m_oTId, m_boxdata.m_oTSid );
         cust_font.printString( buffer, 50, 30, true );

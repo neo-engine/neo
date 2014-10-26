@@ -38,6 +38,7 @@ distribution.
 
 #include "sprite.h"
 #include "saveGame.h"
+#include "print.h"
 
 extern unsigned int NAV_DATA[ 12288 ];
 extern unsigned short NAV_DATA_PAL[ 256 ];
@@ -51,7 +52,8 @@ namespace FS {
     std::string readString( FILE*, bool p_new = false );
     std::wstring readWString( FILE*, bool p_new = false );
 
-    std::string breakString( const std::string& p_string, int p_lineLength );
+    std::string breakString( const std::string& p_string, u8 p_lineLength ); 
+    std::string breakString( const std::string& p_string, FONT::font p_font, u8 p_lineLength );
 
     bool loadNavScreen( u16* p_layer, const char* p_name, u8 p_no );
     bool loadPicture( u16* p_layer, const char* p_Path, const char* p_name, u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256 );

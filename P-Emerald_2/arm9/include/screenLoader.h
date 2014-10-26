@@ -147,12 +147,12 @@ u8 getCurrentDaytime( );
 extern std::string bagnames[ 8 ];
 class screenLoader {
 private:
-    u8 _pos;
+    s8 _pos;
 
 public:
-    screenLoader( u8 p_pos ) : _pos( p_pos ) { }
+    screenLoader( s8 p_pos ) : _pos( p_pos ) { }
 
-    void draw( u8 p_mode );
+    void draw( s8 p_mode );
     void init( );
 
     void run_bag( );
