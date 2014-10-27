@@ -74,7 +74,7 @@ u8 tweakCheckStylus( ) {
     } else {
         return !( REG_KEYXY & 0x40 ) ? 1 : 0;
     }
-
+    inputGetAndSend( );
 }
 
 //---------------------------------------------------------------------------------
@@ -436,7 +436,7 @@ int main( int argc, char ** argv ) {
         // ending up to ~5-7% arm9 cpu usage increase.
         // uncomment it to use nearly no arm9 cpu usage, but this may cause
         // freeze/glitches with high birates/faster pitched mp3s.
-        //swiWaitForVBlank();
+        swiWaitForVBlank();
     }
 
     return 0;

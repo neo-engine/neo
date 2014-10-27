@@ -79,13 +79,13 @@ namespace FONT {
         }
     }
 
-    void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) {
-                putY += FONT_HEIGHT;
+                putY += p_yDistance;
                 putX = p_x;
                 current_char++;
                 continue;
@@ -113,7 +113,7 @@ namespace FONT {
 
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == L'\n' ) {
-                putY += FONT_HEIGHT;
+                putY += FONT_HEIGHT - 5;
                 putX = p_x;
                 current_char++;
                 continue;
@@ -149,13 +149,13 @@ namespace FONT {
             current_char++;
         }
     }
-    void font::printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == L'\n' ) {
-                putY += FONT_HEIGHT;
+                putY += p_yDistance;
                 putX = p_x;
                 current_char++;
                 continue;
@@ -196,7 +196,7 @@ namespace FONT {
         s16 putX = p_x, putY = p_y;
 
         while( p_string[ current_char ] ) {
-            if( p_string[ current_char ] == '\n' ) {
+            if( p_string[ current_char ] == L'\n' ) {
                 putY += FONT_HEIGHT;
                 putX = p_x;
                 current_char++;

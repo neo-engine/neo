@@ -30,10 +30,13 @@
     distribution.
     */
 
+#include <memory>
 
 #include <nds.h>
 #include <fat.h>
 #include "nitrofs.h"
+
+#include "libnds_internal.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,7 +117,7 @@ Keyboard* kbd;
 FONT::font cust_font( FONT::font1::fontData, FONT::font1::fontWidths, FONT::font1::shiftchar );
 FONT::font cust_font2( FONT::font2::fontData, FONT::font2::fontWidths, FONT::font2::shiftchar );
 
-map2d::Map* acMap;
+std::unique_ptr<map2d::Map> acMap;
 
 int hours, seconds, minutes, day, month, year;
 int achours, acseconds, acminutes, acday, acmonth, acyear;
@@ -144,6 +147,7 @@ enum ChoiceResult {
 };
 
 bool playMp3( const char* p_path, const char* p_name ) {
+    char buffer[ 120 ];
     sprintf( buffer, "%s%s", p_path, p_name );
     auto f = fopen( buffer, "rb" );
     if( !f ) {
@@ -154,7 +158,7 @@ bool playMp3( const char* p_path, const char* p_name ) {
     AS_MP3StreamPlay( buffer );
     return true;
 }
-#define PLAYMp(path) if(!playMp3("./PERM2/SOUND/",(path)))\
+#define PLAYMp(path) if(gMod != EMULATOR && !playMp3("./PERM2/SOUND/",(path)))\
     playMp3("nitro:/SOUND/",(path));
 
 
@@ -1063,9 +1067,11 @@ void showNewMap( u16 p_mapIdx ) {
             Oam->oamBuffer[ SQCH_ID ].isHidden = Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = false;
             updateOAMSub( Oam );
 
-            sprintf( buffer, "%d.mp3", p_mapIdx );
-            if( !playMp3( "./PERM2/SOUND/", buffer ) )
-                playMp3( "nitro:/SOUND/", buffer );
+            SAV.m_acMapIdx = p_mapIdx;
+
+            char buffer[ 120 ];
+            sprintf( buffer, "%d.mp3", SAV.m_acMapIdx );
+            PLAYMp( buffer );
             swiWaitForIRQ( );
             swiWaitForVBlank( );
             return;
@@ -1483,10 +1489,9 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'W' && p_y >= a.m_move + 10 && p_y < a.m_move + a.m_mapsx + 10 ) {
                     showNewMap( a.m_mapidx );
-                    free( acMap );
                     strcpy( SAV.m_acMapName, a.m_name );
                     SAV.m_acMapIdx = a.m_mapidx;
-                    acMap = new map2d::Map( "nitro:/MAPS/", a.m_name );
+                    acMap = std::unique_ptr<map2d::Map>( new map2d::Map( "nitro:/MAPS/", a.m_name ) );
                     p_y -= a.m_move;
                     p_x = a.m_mapsy + 10;
                     SAV.m_acposx = 20 * ( p_x - 10 );
@@ -1505,10 +1510,9 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'N' && p_x >= a.m_move + 10 && p_x < a.m_move + a.m_mapsy + 10 ) {
                     showNewMap( a.m_mapidx );
-                    free( acMap );
                     strcpy( SAV.m_acMapName, a.m_name );
                     SAV.m_acMapIdx = a.m_mapidx;
-                    acMap = new map2d::Map( "nitro:/MAPS/", a.m_name );
+                    acMap = std::unique_ptr<map2d::Map>( new map2d::Map( "nitro:/MAPS/", a.m_name ) );
                     p_x -= a.m_move;
                     p_y = a.m_mapsx + 10;
                     SAV.m_acposx = 20 * ( p_x - 10 );
@@ -1527,10 +1531,9 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'E' && p_y >= a.m_move + 10 && p_y < a.m_move + a.m_mapsx + 10 ) {
                     showNewMap( a.m_mapidx );
-                    free( acMap );
                     strcpy( SAV.m_acMapName, a.m_name );
                     SAV.m_acMapIdx = a.m_mapidx;
-                    acMap = new map2d::Map( "nitro:/MAPS/", a.m_name );
+                    acMap = std::unique_ptr<map2d::Map>( new map2d::Map( "nitro:/MAPS/", a.m_name ) );
                     p_y -= a.m_move;
                     p_x = 9;
                     SAV.m_acposx = 20 * ( p_x - 10 );
@@ -1550,10 +1553,9 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'S'  && p_x >= a.m_move + 10 && p_x < a.m_move + a.m_mapsy + 10 ) {
                     showNewMap( a.m_mapidx );
-                    free( acMap );
                     strcpy( SAV.m_acMapName, a.m_name );
                     SAV.m_acMapIdx = a.m_mapidx;
-                    acMap = new map2d::Map( "nitro:/MAPS/", a.m_name );
+                    acMap = std::unique_ptr<map2d::Map>( new map2d::Map( "nitro:/MAPS/", a.m_name ) );
                     p_x -= a.m_move;
                     p_y = 9;
                     SAV.m_acposx = 20 * ( p_x - 10 );
@@ -1804,7 +1806,7 @@ int main( int p_argc, char** p_argv ) {
     scrn.draw( mode );
 
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Clear" );
-    acMap = new map2d::Map( "nitro:/MAPS/", SAV.m_acMapName );
+    acMap = std::unique_ptr<map2d::Map>( new map2d::Map( "nitro:/MAPS/", SAV.m_acMapName ) );
 
     movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
     lastdir = 0;
@@ -1836,12 +1838,11 @@ int main( int p_argc, char** p_argv ) {
         swiWaitForVBlank( );
         swiWaitForIRQ( );
         updateOAMSub( Oam );
-        scanKeys( );
         touchRead( &touch );
         int pressed = keysUp( ), held = keysHeld( );
 
         //jump to MainSCrn immediatly
-        if( pressed & KEY_X ) {
+        if( held & KEY_X ) {
             consoleSelect( &Bottom );
             consoleSetWindow( &Bottom, 4, 0, 20, 3 );
             consoleClear( );
@@ -1857,14 +1858,28 @@ int main( int p_argc, char** p_argv ) {
         }
 
         if( held & KEY_L && gMod == DEVELOPER ) {
-            consoleSelect( &Bottom );
-            consoleSetWindow( &Bottom, 4, 4, 20, 10 );
-            consoleClear( );
-            printf( "%3i %3i\nx: %3i y: %3i z: %3i\n", acMap->m_sizex, acMap->m_sizey, SAV.m_acposx / 20, ( SAV.m_acposy ) / 20, SAV.m_acposz );
-            printf( "%s %i\n", SAV.m_acMapName, SAV.m_acMapIdx );
-            printf( "topbehave %i;\n bottombehave %i", acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ].m_topbehave,
-                    acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ].m_bottombehave );
+            u32 KEYS_CUR = ( ( ( ( ~REG_KEYINPUT ) & 0x3ff ) | ( ( ( ~__transferRegion( )->buttons ) & 3 ) << 10 ) | ( ( ( ~__transferRegion( )->buttons ) << 6 ) & ( KEY_TOUCH | KEY_LID ) ) ) ^ KEY_LID );
+
+            std::sprintf( buffer, "Keys: %lu, H: %lu, D: %lu, U: %lu, C: %lu\nMap: %3i %3i, x: %3i y: %3i z: %3i\n%s %i",
+                          KEYS_CUR,
+                          keysHeld( ),
+                          keysDown( ),
+                          keysUp( ),
+                          keysCurrent( ),
+                          acMap->m_sizex,
+                          acMap->m_sizey,
+                          SAV.m_acposx / 20,
+                          ( SAV.m_acposy ) / 20,
+                          SAV.m_acposz,
+                          SAV.m_acMapName,
+                          SAV.m_acMapIdx );
+            messageBox m( buffer );
+
+            /*
+                        printf( "topbehave %i;\n bottombehave %i", acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ].m_topbehave,
+                        acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ].m_bottombehave );*/
         }
+
         if( pressed & KEY_A ) {
             for( auto a : SAV.m_PkmnTeam )
                 if( !a.m_boxdata.m_individualValues.m_isEgg )
@@ -1975,7 +1990,11 @@ OUT:
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
         //StartPkmn
-        else if( SAV.m_PkmnTeam.size( ) && ( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 0 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 ) && mode == -1 ) {
+        else if( SAV.m_PkmnTeam.size( )
+                 && ( ( held & KEY_START )
+                 || ( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 0 ] - touch.px )
+                 + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 )
+                 && mode == -1 ) ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( true );
@@ -1985,9 +2004,13 @@ OUT:
                     break;
             }
 
+            bool omp = showmappointer;
+            showmappointer = false;
+
             scrn.run_pkmn( );
 
             scrn.draw( mode );
+            showmappointer = omp;
             initMapSprites( );
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
@@ -2057,7 +2080,9 @@ OUT:
                         SAV.m_inDex[ i ] = true;
                     SAV.m_hasPKMN = true;
                     swiWaitForVBlank( );
-                    setMainSpriteVisibility( false );
+
+
+                    setMainSpriteVisibility( false, true );
                     break;
                 }
                 case 1:
@@ -2066,8 +2091,8 @@ OUT:
                             SAV.m_bag.addItem( ITEMS::ItemList[ j ].m_itemType, j, 1 );
                     break;
                 case 2:
+                    setMainSpriteVisibility( false, true );
                     messageBox( ITEMS::berry( "Ginemabeere" ), 31 );
-                    setMainSpriteVisibility( false );
                     break;
                 case 3:{
                     BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &SAV.m_PkmnTeam, 0 );
@@ -2178,7 +2203,14 @@ OUT:
             scrn.draw( mode );
         }
         //SwitchMap
-        else if( ( pressed & KEY_SELECT ) && mode > 0 ) {
+        else if( ( held & KEY_SELECT ) && mode > 0 ) {
+            while( 1 ) {
+                if( !( keysHeld( ) & KEY_SELECT ) )
+                    break;
+                scanKeys( );
+                swiWaitForVBlank( );
+                updateTime( true );
+            }
             mode = ( ( mode + 1 ) % 3 ) + 1;
             consoleSetWindow( &Bottom, 5, 0, 20, 1 );
             consoleSelect( &Bottom );
@@ -2228,7 +2260,7 @@ OUT:
         }
         //End 
 
+        scanKeys( );
     }
-    free( acMap );
     return 0;
 }

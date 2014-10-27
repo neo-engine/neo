@@ -379,7 +379,7 @@ u8: 8;
                 if( NatMod[ getNature( ) ][ 1 ] == 1.2 )
                     return "saur";
                 if( NatMod[ getNature( ) ][ 2 ] == 1.2 )
-                    return "s\xFE\xFF";
+                    return "süß";
                 if( NatMod[ getNature( ) ][ 3 ] == 1.2 )
                     return "trocken";
                 if( NatMod[ getNature( ) ][ 4 ] == 1.2 )

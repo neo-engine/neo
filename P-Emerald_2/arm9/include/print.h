@@ -66,14 +66,14 @@ namespace FONT {
 
         // Methods
         void printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom );
-        void printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
+        void printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16 );
         void printStringCenter( const char *p_string, bool p_bottom );
         void printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
         void printStringCenterD( const char *p_string, bool p_bottom );
         void printNumber( s32 p_num, s16 p_x, s16 p_y, bool p_bottom );
         u32 stringWidth( const char *p_string ) const;
 
-        void printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
+        void printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16 );
         void printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
         void printStringCenter( const wchar_t *p_string, bool p_bottom );
         void printStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
