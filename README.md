@@ -37,15 +37,12 @@ Some screens
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_09_9809.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_44_9923.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_07_1429.png)
-
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_46_10126.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_54_30142.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_01_30165.png)
-
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_08_30188.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_10_10008.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_19_10037.png)
-
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_29_10070.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_01_10175.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_09_10201.png)
