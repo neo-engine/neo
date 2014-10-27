@@ -719,6 +719,8 @@ namespace POKEMON {
             FS::drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ].m_itemName, 256 - 32, 0, o2s, p2s, t2s, true );
             updateOAMSub( Oam );
         }
+        Oam->oamBuffer[ 17 ].isHidden = true;
+        Oam->oamBuffer[ 18 ].isHidden = true;
         printf( "\x1b[33m" );
         updateOAMSub( Oam );
 
@@ -743,7 +745,12 @@ namespace POKEMON {
             BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
             FONT::putrec( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false, 250 );
             cust_font.setColor( 253, 2 );
-            cust_font.printString( FS::breakString( acAbility.m_flavourText, cust_font, 240 ).c_str( ), 0, 138, true );
+            u8 nlCnt = 0;
+            auto nStr = FS::breakString( acAbility.m_flavourText, cust_font, 250 );
+            for( auto c : nStr )
+                if( c == '\n' )
+                    nlCnt++;
+            cust_font.printString( nStr.c_str( ), 0, 138, true, u8( 16 - 2 * nlCnt ) );
             cust_font.printString( acAbility.m_abilityName.c_str( ), 5, 176, true );
             cust_font.setColor( 254, 1 );
             cust_font.setColor( 255, 2 );
@@ -764,12 +771,12 @@ namespace POKEMON {
                 cust_font.printString( buffer, 28, 44, true );
                 sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
                 cust_font.printString( buffer, 35, 58, true );
-                sprintf( buffer, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                sprintf( buffer, "Besitzt ein %s""es Wesen,", NatureList[ m_boxdata.getNature( ) ].c_str( ) );
                 cust_font.printString( buffer, 28, 76, true );
-                sprintf( buffer, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
+                sprintf( buffer, "%s"".", PersonalityList[ m_boxdata.getPersonality( ) ].c_str( ) );
                 cust_font.printString( buffer, 35, 90, true );
 
-                sprintf( buffer, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
+                sprintf( buffer, "Mag %s""e Pokériegel.", m_boxdata.getTasteStr( ).c_str( ) );
                 cust_font.printString( buffer, 28, 104, true );
             } else {
                 if( savMod == SavMod::_NDS )
@@ -791,15 +798,15 @@ namespace POKEMON {
                         cust_font.printString( buffer, 28, 72, true );
                     }
                     if( !m_boxdata.m_fateful ) {
-                        sprintf( buffer, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                        sprintf( buffer, "Besitzt ein %s""es Wesen,", NatureList[ m_boxdata.getNature( ) ].c_str( ) );
                         cust_font.printString( buffer, 28, 100, true );
-                        sprintf( buffer, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
+                        sprintf( buffer, "%s"".", PersonalityList[ m_boxdata.getPersonality( ) ].c_str( ) );
                         cust_font.printString( buffer, 35, 114, true );
 
-                        sprintf( buffer, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
+                        sprintf( buffer, "Mag %s""e Pokériegel.", m_boxdata.getTasteStr( ).c_str( ) );
                         cust_font.printString( buffer, 28, 128, true );
                     } else {
-                        sprintf( buffer, "Besitzt ein %s""es Wesen.", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                        sprintf( buffer, "Besitzt ein %s""es Wesen.", NatureList[ m_boxdata.getNature( ) ].c_str( ) );
                         cust_font.printString( buffer, 28, 100, true );
                     }
                 }
@@ -813,12 +820,12 @@ namespace POKEMON {
                 cust_font.printString( buffer, 28, 44, true );
                 sprintf( buffer, "in/bei %s.", FS::getLoc( m_boxdata.m_gotPlace ) );
                 cust_font.printString( buffer, 35, 58, true );
-                sprintf( buffer, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                sprintf( buffer, "Besitzt ein %s""es Wesen,", NatureList[ m_boxdata.getNature( ) ].c_str( ) );
                 cust_font.printString( buffer, 28, 76, true );
-                sprintf( buffer, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
+                sprintf( buffer, "%s"".", PersonalityList[ m_boxdata.getPersonality( ) ].c_str( ) );
                 cust_font.printString( buffer, 35, 90, true );
 
-                sprintf( buffer, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
+                sprintf( buffer, "Mag %s""e Pokériegel.", m_boxdata.getTasteStr( ).c_str( ) );
                 cust_font.printString( buffer, 28, 104, true );
             } else {
                 if( savMod == SavMod::_NDS )
@@ -839,15 +846,15 @@ namespace POKEMON {
                         cust_font.printString( buffer, 28, 72, true );
                     }
                     if( !m_boxdata.m_fateful ) {
-                        sprintf( buffer, "Besitzt ein %s""es Wesen,", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                        sprintf( buffer, "Besitzt ein %s""es Wesen,", NatureList[ m_boxdata.getNature( ) ].c_str( ) );
                         cust_font.printString( buffer, 28, 100, true );
-                        sprintf( buffer, "%s"".", &( PersonalityList[ m_boxdata.getPersonality( ) ][ 0 ] ) );
+                        sprintf( buffer, "%s"".", PersonalityList[ m_boxdata.getPersonality( ) ].c_str( ) );
                         cust_font.printString( buffer, 35, 114, true );
 
-                        sprintf( buffer, "Mag %s""e Pokériegel.", &( m_boxdata.getTasteStr( )[ 0 ] ) );
+                        sprintf( buffer, "Mag %s""e Pokériegel.", m_boxdata.getTasteStr( ).c_str( ) );
                         cust_font.printString( buffer, 28, 128, true );
                     } else {
-                        sprintf( buffer, "Besitzt ein %s""es Wesen.", &( NatureList[ m_boxdata.getNature( ) ][ 0 ] ) );
+                        sprintf( buffer, "Besitzt ein %s""es Wesen.", NatureList[ m_boxdata.getNature( ) ].c_str( ) );
                         cust_font.printString( buffer, 28, 100, true );
                     }
                 }

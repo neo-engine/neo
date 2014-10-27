@@ -35,6 +35,8 @@
 #include <fat.h>
 #include "nitrofs.h"
 
+#include "libnds_internal.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
@@ -1836,12 +1838,11 @@ int main( int p_argc, char** p_argv ) {
         swiWaitForVBlank( );
         swiWaitForIRQ( );
         updateOAMSub( Oam );
-        scanKeys( );
         touchRead( &touch );
         int pressed = keysUp( ), held = keysHeld( );
 
         //jump to MainSCrn immediatly
-        if( pressed & KEY_X ) {
+        if( held & KEY_X ) {
             consoleSelect( &Bottom );
             consoleSetWindow( &Bottom, 4, 0, 20, 3 );
             consoleClear( );
@@ -1857,14 +1858,28 @@ int main( int p_argc, char** p_argv ) {
         }
 
         if( held & KEY_L && gMod == DEVELOPER ) {
-            consoleSelect( &Bottom );
-            consoleSetWindow( &Bottom, 4, 4, 20, 10 );
-            consoleClear( );
-            printf( "%3i %3i\nx: %3i y: %3i z: %3i\n", acMap->m_sizex, acMap->m_sizey, SAV.m_acposx / 20, ( SAV.m_acposy ) / 20, SAV.m_acposz );
-            printf( "%s %i\n", SAV.m_acMapName, SAV.m_acMapIdx );
-            printf( "topbehave %i;\n bottombehave %i", acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ].m_topbehave,
-                    acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ].m_bottombehave );
+            u32 KEYS_CUR = ( ( ( ( ~REG_KEYINPUT ) & 0x3ff ) | ( ( ( ~__transferRegion( )->buttons ) & 3 ) << 10 ) | ( ( ( ~__transferRegion( )->buttons ) << 6 ) & ( KEY_TOUCH | KEY_LID ) ) ) ^ KEY_LID );
+
+            std::sprintf( buffer, "Keys: %lu, H: %lu, D: %lu, U: %lu, C: %lu\nMap: %3i %3i, x: %3i y: %3i z: %3i\n%s %i",
+                          KEYS_CUR,
+                          keysHeld( ),
+                          keysDown( ),
+                          keysUp( ),
+                          keysCurrent( ),
+                          acMap->m_sizex,
+                          acMap->m_sizey,
+                          SAV.m_acposx / 20,
+                          ( SAV.m_acposy ) / 20,
+                          SAV.m_acposz,
+                          SAV.m_acMapName,
+                          SAV.m_acMapIdx );
+            messageBox m( buffer );
+
+            /*
+                        printf( "topbehave %i;\n bottombehave %i", acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ].m_topbehave,
+                        acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ].m_bottombehave );*/
         }
+
         if( pressed & KEY_A ) {
             for( auto a : SAV.m_PkmnTeam )
                 if( !a.m_boxdata.m_individualValues.m_isEgg )
@@ -1975,7 +1990,11 @@ OUT:
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
         //StartPkmn
-        else if( SAV.m_PkmnTeam.size( ) && ( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 0 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 ) && mode == -1 ) {
+        else if( SAV.m_PkmnTeam.size( )
+                 && ( ( held & KEY_START )
+                 || ( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 0 ] - touch.px )
+                 + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 )
+                 && mode == -1 ) ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( true );
@@ -1985,9 +2004,13 @@ OUT:
                     break;
             }
 
+            bool omp = showmappointer;
+            showmappointer = false;
+
             scrn.run_pkmn( );
 
             scrn.draw( mode );
+            showmappointer = omp;
             initMapSprites( );
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
@@ -2057,7 +2080,9 @@ OUT:
                         SAV.m_inDex[ i ] = true;
                     SAV.m_hasPKMN = true;
                     swiWaitForVBlank( );
-                    setMainSpriteVisibility( false );
+
+
+                    setMainSpriteVisibility( false, true );
                     break;
                 }
                 case 1:
@@ -2066,8 +2091,8 @@ OUT:
                             SAV.m_bag.addItem( ITEMS::ItemList[ j ].m_itemType, j, 1 );
                     break;
                 case 2:
+                    setMainSpriteVisibility( false, true );
                     messageBox( ITEMS::berry( "Ginemabeere" ), 31 );
-                    setMainSpriteVisibility( false );
                     break;
                 case 3:{
                     BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &SAV.m_PkmnTeam, 0 );
@@ -2178,7 +2203,14 @@ OUT:
             scrn.draw( mode );
         }
         //SwitchMap
-        else if( ( pressed & KEY_SELECT ) && mode > 0 ) {
+        else if( ( held & KEY_SELECT ) && mode > 0 ) {
+            while( 1 ) {
+                if( !( keysHeld( ) & KEY_SELECT ) )
+                    break;
+                scanKeys( );
+                swiWaitForVBlank( );
+                updateTime( true );
+            }
             mode = ( ( mode + 1 ) % 3 ) + 1;
             consoleSetWindow( &Bottom, 5, 0, 20, 1 );
             consoleSelect( &Bottom );
@@ -2228,6 +2260,7 @@ OUT:
         }
         //End 
 
+        scanKeys( );
     }
     free( acMap );
     return 0;

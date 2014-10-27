@@ -138,7 +138,7 @@ void initVideoSub( );
 void drawSub( );
 
 void animateBack( );
-void setMainSpriteVisibility( bool p_hidden );
+void setMainSpriteVisibility( bool p_hidden, bool p_save = false );
 
 void drawTypeIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16 & p_nextAvailableTileIdx, Type p_type, u16 p_posX, u16 p_posY, bool p_bottom );
 

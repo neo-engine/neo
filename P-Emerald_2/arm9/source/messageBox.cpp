@@ -41,11 +41,6 @@
 
 #include "print.h"
 
-extern void setMainSpriteVisibility( bool p_hidden );
-extern backgroundSet BGs[ MAXBG ];
-extern u8 BG_ind;
-extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
-extern OAMTable *Oam;
 extern ConsoleFont cfont;
 extern FONT::font cust_font;
 extern FONT::font cust_font2;
@@ -122,7 +117,7 @@ messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
     FS::drawItemIcon( Oam, spriteInfo, p_item.m_itemName, 4, 4, a, b, c );
     updateOAMSub( Oam );
 
-    updateTime( );
+    updateTime( true );
 
     cust_font.setColor( 253, 3 );
     cust_font.setColor( 254, 4 );
@@ -142,7 +137,7 @@ messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
     touchPosition touch;
     while( 1 ) {
         swiWaitForVBlank( );
-        updateTime( );
+        updateTime( true );
         scanKeys( );
         if( keysUp( ) & KEY_A )
             break;
@@ -155,7 +150,7 @@ messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
     }
 
     initMainSprites( Oam, spriteInfo );
-    //setMainSpriteVisibility(false);
+    setMainSpriteVisibility( main_ );
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, false );
     Oam->oamBuffer[ 8 ].isHidden = true;
@@ -176,7 +171,7 @@ messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {
 
     init( );
 
-    if( p_time ) updateTime( );
+    if( p_time ) updateTime( true );
 
     cust_font.printStringD( p_text, 8, 8, true );
     Oam->oamBuffer[ 8 ].isHidden = false;
@@ -185,7 +180,7 @@ messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {
     while( 1 ) {
         swiWaitForVBlank( );
         if( p_time )
-            updateTime( );
+            updateTime( true );
         scanKeys( );
         if( keysUp( ) & KEY_A )
             break;

@@ -256,6 +256,10 @@ void updateTime( s8 p_mapMode ) {
                 Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
             }
             updateOAMSub( Oam );
+        } else {
+            Oam->oamBuffer[ SQCH_ID ].isHidden = true;
+            Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
+            updateOAMSub( Oam );
         }
 
         BG_PALETTE_SUB[ 249 ] = RGB15( 31, 31, 31 );
@@ -379,7 +383,7 @@ u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     //"A"-Button
 
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, A_ID, A_ID, nextAvailableTileIdx,
-                                       SCREEN_HEIGHT - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
+                                       SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                                        ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
 
     int palcnt = A_ID + 1;
@@ -387,10 +391,10 @@ u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     // Choice Box Sprites
 
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, FWD_ID, palcnt++, nextAvailableTileIdx,
-                                       SCREEN_HEIGHT - 28, SCREEN_HEIGHT - 28, 32, 32, ForwardPal,
+                                       SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, ForwardPal,
                                        ForwardTiles, ForwardTilesLen, false, false, true, OBJPRIORITY_1, true );
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, BWD_ID, palcnt++, nextAvailableTileIdx,
-                                       SCREEN_HEIGHT - 28, SCREEN_HEIGHT - 28, 32, 32, BackwardPal,
+                                       SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackwardPal,
                                        BackwardTiles, BackwardTilesLen, false, false, true, OBJPRIORITY_1, true );
 
     u16 nextnext, nn2;
@@ -430,12 +434,15 @@ u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
 
     return nextAvailableTileIdx;
 }
-void setMainSpriteVisibility( bool p_hidden ) {
+void setMainSpriteVisibility( bool p_hidden, bool p_save ) {
     for( u8 i = 2; i <= 7; ++i )
         if( i == 2 && !SAV.m_hasPKMN )
             setSpriteVisibility( &Oam->oamBuffer[ i ], true );
         else
             setSpriteVisibility( &Oam->oamBuffer[ i ], p_hidden );
+
+    if( p_save )
+        setSpriteVisibility( &Oam->oamBuffer[ SAVE_ID ], p_hidden );
     updateOAMSub( Oam );
 }
 
@@ -476,6 +483,7 @@ void screenLoader::draw( s8 p_mode ) {
     } else if( p_mode == 1 ) {
         FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen2" );
         drawBorder( );
+        updateTime( true );
         consoleSelect( &Bottom );
         consoleSetWindow( &Bottom, 4, 1, 12, 1 );
         printf( " Hoenn" );
@@ -488,6 +496,7 @@ void screenLoader::draw( s8 p_mode ) {
     } else if( p_mode == 2 ) {
         FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen3" );
         drawBorder( );
+        updateTime( true );
         consoleSelect( &Bottom );
         consoleSetWindow( &Bottom, 4, 1, 12, 1 );
         printf( " Kanto" );
@@ -499,6 +508,7 @@ void screenLoader::draw( s8 p_mode ) {
     } else if( p_mode == 3 ) {
         FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen2_BG3_KJ" );
         drawBorder( );
+        updateTime( true );
         consoleSelect( &Bottom );
         consoleSetWindow( &Bottom, 4, 1, 12, 1 );
         printf( " Johto" );
@@ -510,6 +520,7 @@ void screenLoader::draw( s8 p_mode ) {
     } else {
 
         drawSub( );
+        updateTime( true );
         setSpriteVisibility( back, true );
         setMainSpriteVisibility( false );
         for( u8 i = 0; i < 3; ++i )
@@ -519,6 +530,7 @@ void screenLoader::draw( s8 p_mode ) {
         initMainSprites(Oam,spriteInfo);*/
     }
     updateOAMSub( Oam );
+    updateTime( true );
 }
 void screenLoader::init( ) {
     //initVideoSub();
@@ -710,9 +722,10 @@ void screenLoader::run_pkmn( ) {
         swiWaitForVBlank( );
         scanKeys( );
         u32 pressed = keysCurrent( );
+        u32 held = keysHeld( );
         touchRead( &touch );
 
-        if( pressed & KEY_X || ( touch.px > 224 && touch.py > 164 ) ) {
+        if( held & KEY_X || ( touch.px > 224 && touch.py > 164 ) ) {
             while( 1 ) {
                 if( ( keysUp( ) & KEY_X ) )
                     break;
@@ -724,7 +737,7 @@ void screenLoader::run_pkmn( ) {
                 scanKeys( );
             }
             break;
-        } else if( pressed & KEY_A || ( sqrt( sq( touch.px - 128 ) + sq( touch.py - 96 ) ) <= 16 ) ) {
+        } else if( ( pressed & KEY_A ) || ( sqrt( sq( touch.px - 128 ) + sq( touch.py - 96 ) ) <= 16 ) ) {
             while( 2 ) {
                 if( keysUp( ) & KEY_A )
                     break;
@@ -741,24 +754,25 @@ void screenLoader::run_pkmn( ) {
             updateOAMSub( Oam );
             swiWaitForVBlank( );
             while( 1 ) {
-                initSub( acIn );
+                initSub( -1 );
                 s8 p = SAV.m_PkmnTeam[ acIn ].draw( );
-                if( p & KEY_X ) {
-                    for( u8 i = 0; i < max; i++ ) {
-                        consoleSetWindow( &Top, positions[ i ][ 0 ], positions[ i ][ 1 ], 2, 2 );
-                        consoleClear( );
-                    }
-                    clearTop( );
-                    initSub( -1 );
+                /*                if( p & KEY_X ) {
+                                    for( u8 i = 0; i < max; i++ ) {
+                                    consoleSetWindow( &Top, positions[ i ][ 0 ], positions[ i ][ 1 ], 2, 2 );
+                                    consoleClear( );
+                                    }
+                                    clearTop( );
+                                    initSub( -1 );
 
-                    initOAMTableSub( Oam );
-                    initMainSprites( Oam, spriteInfo );
-                    setSpriteVisibility( back, true );
-                    setSpriteVisibility( save, false );
-                    setMainSpriteVisibility( false );
-                    Oam->oamBuffer[ 8 ].isHidden = true;
-                    return;
-                } else if( p & KEY_B ) {
+                                    initOAMTableSub( Oam );
+                                    initMainSprites( Oam, spriteInfo );
+                                    setSpriteVisibility( back, true );
+                                    setSpriteVisibility( save, false );
+                                    setMainSpriteVisibility( false );
+                                    Oam->oamBuffer[ 8 ].isHidden = true;
+                                    return;
+                                    } else*/
+                if( p & KEY_B ) {
                     initOAMTableSub( Oam );
                     initMainSprites( Oam, spriteInfo );
                     setSpriteVisibility( back, false );
@@ -1535,7 +1549,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                     } else
                         FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
-            } else if( ( pressed & KEY_LEFT ) ) {
+            } else if( ( held & KEY_LEFT ) ) {
                 while( 1 ) {
                     if( keysUp( ) & KEY_LEFT )
                         break;
@@ -1550,7 +1564,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                 spriteInfo[ 16 + acPage ].m_entry->isHidden = true;
                 updateOAMSub( Oam );
                 drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, acNum + 1, acForme );
-            } else if( ( pressed & KEY_RIGHT ) ) {
+            } else if( ( held & KEY_RIGHT ) ) {
                 while( 1 ) {
                     if( keysUp( ) & KEY_RIGHT )
                         break;
@@ -1565,15 +1579,16 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                 spriteInfo[ 16 + acPage ].m_entry->isHidden = true;
                 updateOAMSub( Oam );
                 drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, acNum + 1, acForme );
-            } else if( ( pressed & KEY_SELECT ) ) {
-                if( acPage > 1 )
+            } else if( ( held & KEY_SELECT ) ) {
+                if( acPage > 1 ) {
                     while( 1 ) {
-                    if( keysUp( ) & KEY_SELECT )
-                        break;
-                    scanKeys( );
-                    swiWaitForVBlank( );
-                    updateTime( );
+                        if( !( keysHeld( ) & KEY_SELECT ) )
+                            break;
+                        scanKeys( );
+                        swiWaitForVBlank( );
+                        updateTime( );
                     }
+                }
                 if( acPage == 1 )
                     acMap = ( acMap + 1 ) % 3;
                 else

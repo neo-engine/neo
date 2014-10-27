@@ -941,7 +941,11 @@ namespace FS {
                 tmp += c;
         }
 
-        return result + tmp;
+        if( acLineLength + tmp.length( ) > p_lineLength  && acLineLength )
+            result += "\n" + tmp + " ";
+        else
+            result += tmp;
+        return result;
     }
 
     std::string breakString( const std::string& p_string, FONT::font p_font, u8 p_lineLength ) {
@@ -955,7 +959,7 @@ namespace FS {
                 if( acLineLength + tmpLen > p_lineLength ) {
                     if( acLineLength ) {
                         result += "\n" + tmp + " ";
-                        acLineLength = tmpLen + 4;
+                        acLineLength = tmpLen;
                         tmp = "";
                     } else {
                         result += tmp + "\n";
@@ -965,13 +969,17 @@ namespace FS {
                 } else {
                     result += tmp + ' ';
                     tmp = "";
-                    acLineLength += tmpLen + 4;
+                    acLineLength += tmpLen;
                 }
             } else
                 tmp += c;
         }
 
-        return result + tmp;
+        if( acLineLength + p_font.stringWidth( tmp.c_str( ) ) > p_lineLength  && acLineLength )
+            result += "\n" + tmp + " ";
+        else
+            result += tmp;
+        return result;
     }
 
     const char* getLoc( u16 p_ind ) {

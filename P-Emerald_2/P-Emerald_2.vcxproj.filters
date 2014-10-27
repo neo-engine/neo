@@ -87,9 +87,6 @@
     <ClInclude Include="arm9\include\messageBox.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
-    <ClInclude Include="arm7\include\ipc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\pokemon.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
@@ -106,6 +103,12 @@
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
     <ClInclude Include="arm9\include\script.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
+    <ClInclude Include="arm7\include\ipc.h">
+      <Filter>Header Files\arm7</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\libnds_internal.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
   </ItemGroup>
