@@ -447,12 +447,13 @@ void initNewGame( ) {
     updateOAMSub( Oam );
     AS_MP3Stop( );
     swiWaitForIRQ( );
+    swiWaitForVBlank( );
 
-    PLAYMp( "KeyItemGet.mp3" );
+    //PLAYMp( "KeyItemGet.mp3" );
     AS_SetMP3Loop( false );
     messageBox M( "Du erhälst einen PokéNav." );
     while( AS_GetMP3Status( ) == MP3ST_PLAYING ) {
-        swiWaitForIRQ( );
+        swiWaitForVBlank( );
     }
     M.clear( );
 

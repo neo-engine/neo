@@ -44,6 +44,11 @@
 #include "messageBox.h"
 #include "screenLoader.h"
 
+#include "memo.h"
+#include "atks.h"
+#include "Contest.h"
+
+
 #include "print.h"
 #include "fs.h"
 
@@ -492,6 +497,9 @@ namespace POKEMON {
         }
         switch( p_page ) {
             case 0:
+                c2 = loadSprite( OamTop, spriteInfoTop, 90, ++b2, c2, 0, 0, 32, 32, memoPal,
+                                 memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, false );
+
                 cust_font.printString( "Pokémon-Info", 36, 4, false );
                 if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
                     consoleSetWindow( p_top, 16, 4, 32, 24 );
@@ -582,6 +590,8 @@ namespace POKEMON {
             case 1:
             {
                 cust_font.printString( "Attacken", 36, 4, false );
+                c2 = loadSprite( OamTop, spriteInfoTop, 90, ( ++b2 )++, c2, 0, 0, 32, 32, atksPal,
+                                 atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, false );
 
                 consoleSetWindow( p_top, 16, 5, 32, 24 );
                 for( int i = 0; i < 4; i++ ) {
@@ -593,7 +603,7 @@ namespace POKEMON {
                     /* if(t == data.Types[0] || t == data.Types[1])
                     printf("\x1b[32m");*/
 
-                    if( i == 0 )
+                    if( i == 0 ) 
                         printf( "    %s\n    AP %2hhu""/""%2hhu ",
                         ( AttackList[ m_boxdata.m_moves[ 0 ] ]->m_moveName.c_str( ) ), m_boxdata.m_acPP[ 0 ],
                         AttackList[ m_boxdata.m_moves[ 0 ] ]->m_movePP* ( ( 5 + m_boxdata.m_ppup.m_Up1 ) / 5 ) );
@@ -638,6 +648,8 @@ namespace POKEMON {
                 break;
             }
             case 2:
+                c2 = loadSprite( OamTop, spriteInfoTop, 90, ++b2, c2, 0, 0, 32, 32, ContestPal,
+                                 ContestTiles, ContestTilesLen, false, false, false, OBJPRIORITY_0, false );
                 cust_font.printString( "Bänder", 36, 4, false );
 
                 break;

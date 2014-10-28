@@ -65,6 +65,8 @@
 #include "A.h"
 #include "Forward.h"
 #include "Backward.h"
+#include "Up.h"
+#include "Down.h"
 #include "Choice_1.h"
 #include "Choice_2.h"
 #include "Choice_3.h"
@@ -79,6 +81,10 @@
 #include "ItemSpr1.h"
 #include "ItemSpr2.h"
 #include "ItemSpr3.h"
+
+#include "memo.h"
+#include "atks.h"
+#include "Contest.h"
 
 #include "NoItem.h"
 #include "BagSpr.h"
@@ -272,7 +278,7 @@ void updateTime( s8 p_mapMode ) {
         achours = timeStruct->tm_hour;
         acminutes = timeStruct->tm_min;
         acseconds = timeStruct->tm_sec;
-
+       
         cust_font2.setColor( 0, 1 );
         cust_font2.setColor( 252, 2 );
         sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
@@ -423,14 +429,14 @@ u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
 
 
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, 90, ++palcnt, nextAvailableTileIdx,
-                                       acMapPoint.first, acMapPoint.second, 32, 32, BagSprPal,
-                                       BagSprTiles, BagSprTilesLen, false, false, true, OBJPRIORITY_0, true );
-    nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, 91, palcnt, nextAvailableTileIdx,
-                                       acMapPoint.first, acMapPoint.second, 32, 32, BagSprPal,
-                                       BagSprTiles, BagSprTilesLen, false, false, true, OBJPRIORITY_0, true );
-    nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, 92, palcnt, nextAvailableTileIdx,
-                                       acMapPoint.first, acMapPoint.second, 32, 32, BagSprPal,
-                                       BagSprTiles, BagSprTilesLen, false, false, true, OBJPRIORITY_0, true );
+                                       acMapPoint.first, acMapPoint.second, 32, 32, memoPal,
+                                       memoTiles, memoTilesLen, false, false, true, OBJPRIORITY_0, true );
+    nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, 91, ++palcnt, nextAvailableTileIdx,
+                                       acMapPoint.first, acMapPoint.second, 32, 32, atksPal,
+                                       atksTiles, atksTilesLen, false, false, true, OBJPRIORITY_0, true );
+    nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, 92, ++palcnt, nextAvailableTileIdx,
+                                       acMapPoint.first, acMapPoint.second, 32, 32, ContestPal,
+                                       ContestTiles, ContestTilesLen, false, false, true, OBJPRIORITY_0, true );
 
     return nextAvailableTileIdx;
 }
@@ -675,6 +681,20 @@ void initSub( u16 pkmIdx ) {
     fieldCnt = u;
 }
 
+void loadPKMNSprites( ) {
+    int palcnt = A_ID + 1;
+    u16 nextAvailableTileIdx = 208;
+
+    // Choice Box Sprites
+
+    nextAvailableTileIdx = loadSprite( Oam, spriteInfo, FWD_ID, palcnt++, nextAvailableTileIdx,
+                                       SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, DownPal,
+                                       DownTiles, DownTilesLen, false, false, true, OBJPRIORITY_1, true );
+    nextAvailableTileIdx = loadSprite( Oam, spriteInfo, BWD_ID, palcnt++, nextAvailableTileIdx,
+                                       SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, UpPal,
+                                       UpTiles, UpTilesLen, false, false, true, OBJPRIORITY_1, true );
+}
+
 void screenLoader::run_pkmn( ) {
     vramSetup( );
     videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
@@ -698,6 +718,7 @@ void screenLoader::run_pkmn( ) {
     bgUpdate( );
     initTop( );
     initSub( acIn );
+    loadPKMNSprites( );
     consoleSetWindow( &Top, positions[ acIn ][ 0 ], positions[ acIn ][ 1 ], 2, 2 );
     if( acIn & 1 )
         printf( ">" );
@@ -778,6 +799,7 @@ void screenLoader::run_pkmn( ) {
                     setSpriteVisibility( back, false );
                     setSpriteVisibility( save, true );
                     setMainSpriteVisibility( true );
+                    loadPKMNSprites( );
                     Oam->oamBuffer[ 8 ].isHidden = false;
                     Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
                     Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
@@ -942,6 +964,9 @@ void screenLoader::run_pkmn( ) {
                 initMapSprites( );
                 movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
 
+                bgUpdate( );
+                swiWaitForVBlank( );
+
                 char buffer[ 50 ];
                 sprintf( buffer, "%ls setzt %s\nein!", SAV.m_PkmnTeam[ acIn ].m_boxdata.m_name, AttackList[ SAV.m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
                 messageBox( buffer, true, true );
@@ -956,6 +981,7 @@ void screenLoader::run_pkmn( ) {
                 setSpriteVisibility( back, true );
                 setSpriteVisibility( save, false );
                 setMainSpriteVisibility( true );
+                loadPKMNSprites( );
                 Oam->oamBuffer[ 8 ].isHidden = true;
                 //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
                 messageBox( "Diese Attacke kann jetzt\nnicht eingesetzt werden.", "PokéNav" );
@@ -2255,9 +2281,9 @@ PREV:
                         if( t.px == 0 && t.py == 0 )
                             break;
                     }
-                    oam2 = p_oamIndex;
-                    pal2 = p_palCnt;
-                    tile2 = p_tileCnt;
+                    oam2 = p_oamIndexTop;
+                    pal2 = p_palCntTop;
+                    tile2 = p_tileCntTop;
                     consoleSelect( &Top );
                     consoleSetWindow( &Top, 0, 0, 32, 24 );
                     consoleClear( );

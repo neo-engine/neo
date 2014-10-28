@@ -114,7 +114,7 @@ extern bool showmappointer;
 // 14 additional spaces used
 #define BORDER_ID 31
 // 9 additional spaces used
-#define SQCH_ID 41
+#define SQCH_ID 240
 // 42 used
 
 #define MAXBG 10

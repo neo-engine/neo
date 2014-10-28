@@ -284,12 +284,21 @@ namespace BATTLE {
 
     }
 
+    void loadSpritesTop( ) {
+
+    }
+
+    void loadSpritesSub( ) {
+
+    }
+
     /**
      *  @brief Loads all the required graphics and sprites
      */
     void battleUI::init( ) {
-
-    }
+        //Use a 2D Map as top background for trainer intro
+          
+    } 
 
     void battleUI::trainerIntro( ) {
 
