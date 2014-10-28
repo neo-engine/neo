@@ -167,3 +167,10 @@ namespace ITEMS {
 }
 
 #define I_LUCKY_EGG 42
+#define I_MACHO_BRACE 43
+#define I_POWER_WEIGHT 44
+#define I_POWER_BRACER 45
+#define I_POWER_BELT 46
+#define I_POWER_LENS 47
+#define I_POWER_BAND 48
+#define I_POWER_ANKLET 49

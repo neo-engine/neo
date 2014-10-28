@@ -297,8 +297,8 @@ namespace BATTLE {
      */
     void battleUI::init( ) {
         //Use a 2D Map as top background for trainer intro
-          
-    } 
+
+    }
 
     void battleUI::trainerIntro( ) {
 
@@ -1312,8 +1312,17 @@ NEXT:
                 i->m_boxdata.m_experienceGained += exp;
 
                 //Distribute EV
-                for( u8 j = 0; j < 6; ++j )
-                    i->m_boxdata.m_effortValues[ j ] += p.m_EVYield[ j ];
+                auto acItem = i->m_boxdata.m_holdItem;
+                auto hasPKRS = i->m_boxdata.m_pokerus;
+
+                u8 multiplier = ( 1 << ( hasPKRS + ( acItem == I_MACHO_BRACE ) ) );
+
+                i->m_boxdata.m_effortValues[ 0 ] += ( multiplier * ( p.m_EVYield[ 0 ] / 2 + 4 * ( acItem == I_POWER_WEIGHT ) ) );
+                i->m_boxdata.m_effortValues[ 1 ] += ( multiplier * ( p.m_EVYield[ 1 ] / 2 + 4 * ( acItem == I_POWER_BRACER ) ) );
+                i->m_boxdata.m_effortValues[ 2 ] += ( multiplier * ( p.m_EVYield[ 2 ] / 2 + 4 * ( acItem == I_POWER_BELT ) ) );
+                i->m_boxdata.m_effortValues[ 3 ] += ( multiplier * ( p.m_EVYield[ 3 ] / 2 + 4 * ( acItem == I_POWER_ANKLET ) ) );
+                i->m_boxdata.m_effortValues[ 4 ] += ( multiplier * ( p.m_EVYield[ 4 ] / 2 + 4 * ( acItem == I_POWER_LENS ) ) );
+                i->m_boxdata.m_effortValues[ 5 ] += ( multiplier * ( p.m_EVYield[ 5 ] / 2 + 4 * ( acItem == I_POWER_BAND ) ) );
             }
         }
 
@@ -1341,8 +1350,18 @@ NEXT:
                 acPkmn.m_boxdata.m_experienceGained += exp / 2;
 
                 //Distribute EV
-                for( u8 j = 0; j < 6; ++j )
-                    acPkmn.m_boxdata.m_effortValues[ j ] += p.m_EVYield[ j ] / 2;
+                //Check for EV-enhancing stuff
+                auto acItem = acPkmn.m_boxdata.m_holdItem;
+                auto hasPKRS = acPkmn.m_boxdata.m_pokerus;
+
+                u8 multiplier = ( 1 << ( hasPKRS + ( acItem == I_MACHO_BRACE ) ) );
+
+                acPkmn.m_boxdata.m_effortValues[ 0 ] += ( multiplier * ( p.m_EVYield[ 0 ] / 2 + 4 * ( acItem == I_POWER_WEIGHT ) ) );
+                acPkmn.m_boxdata.m_effortValues[ 1 ] += ( multiplier * ( p.m_EVYield[ 1 ] / 2 + 4 * ( acItem == I_POWER_BRACER ) ) );
+                acPkmn.m_boxdata.m_effortValues[ 2 ] += ( multiplier * ( p.m_EVYield[ 2 ] / 2 + 4 * ( acItem == I_POWER_BELT ) ) );
+                acPkmn.m_boxdata.m_effortValues[ 3 ] += ( multiplier * ( p.m_EVYield[ 3 ] / 2 + 4 * ( acItem == I_POWER_ANKLET ) ) );
+                acPkmn.m_boxdata.m_effortValues[ 4 ] += ( multiplier * ( p.m_EVYield[ 4 ] / 2 + 4 * ( acItem == I_POWER_LENS ) ) );
+                acPkmn.m_boxdata.m_effortValues[ 5 ] += ( multiplier * ( p.m_EVYield[ 5 ] / 2 + 4 * ( acItem == I_POWER_BAND ) ) );
 
                 //Check for level-advancing
 

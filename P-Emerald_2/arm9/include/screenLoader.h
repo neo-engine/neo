@@ -114,8 +114,7 @@ extern bool showmappointer;
 // 14 additional spaces used
 #define BORDER_ID 31
 // 9 additional spaces used
-#define SQCH_ID 240
-// 42 used
+#define SQCH_ID 80
 
 #define MAXBG 10
 struct backgroundSet {

@@ -125,22 +125,22 @@ namespace map2d {
         fread( &tsidx2, sizeof( u8 ), 1, mapF );
         readNop( mapF, 3 );
 
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.ts", tsidx1 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.ts", tsidx1 );
         readTileSet( fopen( buffer, "rb" ), m_tileset );
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.bvd", tsidx1 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.bvd", tsidx1 );
         readBlockSet( fopen( buffer, "rb" ), m_blockSets );
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.p2l", tsidx1 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.p2l", tsidx1 );
         readPal( fopen( buffer, "rb" ), m_pals );
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.anm", tsidx1 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx1 );
         readAnimations( fopen( buffer, "rb" ), m_animations );
 
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.ts", tsidx2 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.ts", tsidx2 );
         readTileSet( fopen( buffer, "rb" ), m_tileset, 512 );
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.bvd", tsidx2 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.bvd", tsidx2 );
         readBlockSet( fopen( buffer, "rb" ), m_blockSets, 512 );
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.p2l", tsidx2 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.p2l", tsidx2 );
         readPal( fopen( buffer, "rb" ), m_pals + 6 );
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.anm", tsidx2 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx2 );
         readAnimations( fopen( buffer, "rb" ), m_animations );
 
 

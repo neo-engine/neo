@@ -111,6 +111,9 @@
     <ClInclude Include="arm9\include\libnds_internal.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\include\defines.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\as_lib7.c">

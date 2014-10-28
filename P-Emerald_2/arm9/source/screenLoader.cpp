@@ -40,7 +40,11 @@
 #include <unistd.h>
 #include <math.h>
 
+#include "defines.h"
+
+#ifdef USE_AS_LIB
 #include "as_lib9.h"
+#endif
 
 #include "messageBox.h"
 #include "screenLoader.h"
@@ -50,7 +54,7 @@
 #include "bag.h"
 #include "item.h"
 #include "battle.h"
-#include "buffer.h"
+//#include "buffer.h"
 #include "fs.h"
 
 //Sprites
@@ -224,18 +228,24 @@ void printMapLocation( const MapRegionPos& p_m ) {
 }
 u8 frame = 0;
 
+#ifdef USE_AS_LIB
 bool used = false;
 bool usin = false;
+#endif
 
 void updateTime( s8 p_mapMode ) {
+#ifdef USE_AS_LIB
     used = true;
-    static bool mm = false;
+#endif
+    bool mm = false;
     if( -1 != p_mapMode )
         mm = p_mapMode;
 
+#ifdef USE_AS_LIB
     if( !usin )
         return;
     //AS_SoundVBL();
+#endif
 
     cust_font2.setColor( 0, 0 );
     cust_font2.setColor( 0, 1 );
@@ -272,13 +282,14 @@ void updateTime( s8 p_mapMode ) {
         cust_font2.setColor( 249, 1 );
         cust_font2.setColor( 249, 2 );
 
+        char buffer[ 50 ];
         sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
         cust_font2.printString( buffer, 18 * 8, 192 - 16, true );
 
         achours = timeStruct->tm_hour;
         acminutes = timeStruct->tm_min;
         acseconds = timeStruct->tm_sec;
-       
+
         cust_font2.setColor( 0, 1 );
         cust_font2.setColor( 252, 2 );
         sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
@@ -291,7 +302,7 @@ void updateTime( s8 p_mapMode ) {
     acyear = timeStruct->tm_year + 1900;
 }
 
-
+#ifdef USE_AS_LIB
 // regenerate buffers for mp3 stream, must be called each VBlank (only needed if mp3 is used)
 void AS_SoundVBL( ) {
     usin = true;
@@ -305,6 +316,7 @@ void AS_SoundVBL( ) {
     }
     scanKeys( );
 }
+#endif
 
 u8 DayTimes[ 4 ][ 5 ] = {
         { 7, 10, 15, 17, 23 },
@@ -330,7 +342,6 @@ u16 PALs[ 6 ][ 256 ];
 
 u16 cachedPKMN[ 6 ] = { 0 };
 
-int ac = 0; //Whats this??
 u8 positions[ 6 ][ 2 ] = {
         { 14, 2 }, { 16, 3 }, { 14, 9 },
         { 16, 10 }, { 14, 17 }, { 16, 18 }
@@ -487,9 +498,10 @@ void screenLoader::draw( s8 p_mode ) {
         }
         updateOAMSub( Oam );
     } else if( p_mode == 1 ) {
+        showmappointer = true;
         FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen2" );
         drawBorder( );
-        updateTime( true );
+        updateTime( s8( 1 ) );
         consoleSelect( &Bottom );
         consoleSetWindow( &Bottom, 4, 1, 12, 1 );
         printf( " Hoenn" );
@@ -500,9 +512,10 @@ void screenLoader::draw( s8 p_mode ) {
             Oam->oamBuffer[ 90 + i ].isHidden = true;
         updateOAMSub( Oam );
     } else if( p_mode == 2 ) {
+        showmappointer = true;
         FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen3" );
         drawBorder( );
-        updateTime( true );
+        updateTime( s8( 1 ) );
         consoleSelect( &Bottom );
         consoleSetWindow( &Bottom, 4, 1, 12, 1 );
         printf( " Kanto" );
@@ -512,9 +525,10 @@ void screenLoader::draw( s8 p_mode ) {
             Oam->oamBuffer[ 90 + i ].isHidden = true;
         updateOAMSub( Oam );
     } else if( p_mode == 3 ) {
+        showmappointer = true;
         FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen2_BG3_KJ" );
         drawBorder( );
-        updateTime( true );
+        updateTime( s8( 1 ) );
         consoleSelect( &Bottom );
         consoleSetWindow( &Bottom, 4, 1, 12, 1 );
         printf( " Johto" );
@@ -524,19 +538,16 @@ void screenLoader::draw( s8 p_mode ) {
             Oam->oamBuffer[ 90 + i ].isHidden = true;
         updateOAMSub( Oam );
     } else {
-
         drawSub( );
-        updateTime( true );
+        //updateTime( s8( 1 ) );
         setSpriteVisibility( back, true );
         setMainSpriteVisibility( false );
         for( u8 i = 0; i < 3; ++i )
             Oam->oamBuffer[ 90 + i ].isHidden = true;
         updateOAMSub( Oam );
-        /*initOAMTableSub(Oam);
-        initMainSprites(Oam,spriteInfo);*/
     }
     updateOAMSub( Oam );
-    updateTime( true );
+    //updateTime( s8( 1 ) );
 }
 void screenLoader::init( ) {
     //initVideoSub();

@@ -567,6 +567,8 @@ namespace FS {
             return false;
         }
 
+        dmaFillWords( 0, p_layer, p_tileCnt );
+
         fread( TEMP, sizeof( u32 ), 12288, fd );
         fread( TEMP_PAL, sizeof( u16 ), 256, fd );
 
@@ -586,6 +588,8 @@ namespace FS {
             fclose( fd );
             return false;
         }
+
+        dmaFillWords( 0, p_layer, p_tileCnt );
 
         fread( TEMP, sizeof( u32 ), 12288, fd );
         fread( TEMP_PAL, sizeof( u16 ), 256, fd );

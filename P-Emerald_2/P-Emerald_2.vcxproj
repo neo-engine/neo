@@ -16,6 +16,7 @@
     <ClInclude Include="arm9\include\ability.h" />
     <ClInclude Include="arm9\include\as_lib9.h" />
     <ClInclude Include="arm9\include\buffer.h" />
+    <ClInclude Include="arm9\include\defines.h" />
     <ClInclude Include="arm9\include\fs.h" />
     <ClInclude Include="arm9\include\libnds_internal.h" />
     <ClInclude Include="arm9\include\move.h" />

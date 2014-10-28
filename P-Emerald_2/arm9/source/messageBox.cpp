@@ -117,7 +117,7 @@ messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
     FS::drawItemIcon( Oam, spriteInfo, p_item.m_itemName, 4, 4, a, b, c );
     updateOAMSub( Oam );
 
-    updateTime( true );
+    updateTime( s8(1) );
 
     cust_font.setColor( 253, 3 );
     cust_font.setColor( 254, 4 );
@@ -137,7 +137,7 @@ messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
     touchPosition touch;
     while( 1 ) {
         swiWaitForVBlank( );
-        updateTime( true );
+        updateTime( s8(1) );
         scanKeys( );
         if( keysUp( ) & KEY_A )
             break;
@@ -171,7 +171,7 @@ messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {
 
     init( );
 
-    if( p_time ) updateTime( true );
+    if( p_time ) updateTime( s8(1) );
 
     cust_font.printStringD( p_text, 8, 8, true );
     Oam->oamBuffer[ 8 ].isHidden = false;
@@ -180,7 +180,7 @@ messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {
     while( 1 ) {
         swiWaitForVBlank( );
         if( p_time )
-            updateTime( true );
+            updateTime( s8(1) );
         scanKeys( );
         if( keysUp( ) & KEY_A )
             break;
@@ -677,7 +677,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             swiWaitForVBlank( );
             updateOAMSub( Oam );
             if( p_time )
-                updateTime( true );
+                updateTime( s8(1) );
             touchPosition t;
             touchRead( &t );
 
@@ -719,7 +719,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             swiWaitForVBlank( );
             updateOAMSub( Oam );
             if( p_time )
-                updateTime( true );
+                updateTime( s8(1) );
             touchPosition t;
             touchRead( &t );
 
@@ -780,7 +780,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             swiWaitForVBlank( );
             updateOAMSub( Oam );
             if( p_time )
-                updateTime( true );
+                updateTime( s8(1) );
             touchPosition t;
             touchRead( &t );
 
@@ -854,7 +854,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             swiWaitForVBlank( );
             updateOAMSub( Oam );
             if( p_time )
-                updateTime( true );
+                updateTime( s8(1) );
             touchPosition t;
             touchRead( &t );
 
@@ -990,7 +990,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             swiWaitForVBlank( );
             updateOAMSub( Oam );
             if( p_time )
-                updateTime( true );
+                updateTime( s8(1) );
             touchPosition t;
             touchRead( &t );
 

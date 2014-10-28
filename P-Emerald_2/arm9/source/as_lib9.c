@@ -18,6 +18,9 @@
 #include <malloc.h>
 #include <string.h>
 
+#include "defines.h"
+
+#ifdef USE_AS_LIB
 #include "as_lib9.h"
 
 
@@ -398,3 +401,4 @@ extern "C" {
 }
 #endif
 
+#endif

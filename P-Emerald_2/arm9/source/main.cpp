@@ -45,10 +45,14 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "defines.h"
+
+#ifdef USE_AS_LIB
 #include "as_lib9.h" 
+#endif
 
 #include "map2d.h"
-#include "buffer.h"
+//#include "buffer.h"
 #include "hmMoves.h"
 
 #include <string>
@@ -119,9 +123,9 @@ FONT::font cust_font2( FONT::font2::fontData, FONT::font2::fontWidths, FONT::fon
 
 std::unique_ptr<map2d::Map> acMap;
 
-int hours, seconds, minutes, day, month, year;
-int achours, acseconds, acminutes, acday, acmonth, acyear;
-u32 ticks;
+int hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
+int achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
+u32 ticks = 0;
 
 saveGame SAV;
 const std::string sav_nam = "nitro:/SAV";
@@ -146,6 +150,8 @@ enum ChoiceResult {
     CANCEL
 };
 
+#ifdef USE_AS_LIB
+
 bool playMp3( const char* p_path, const char* p_name ) {
     char buffer[ 120 ];
     sprintf( buffer, "%s%s", p_path, p_name );
@@ -160,6 +166,8 @@ bool playMp3( const char* p_path, const char* p_name ) {
 }
 #define PLAYMp(path) if(gMod != EMULATOR && !playMp3("./PERM2/SOUND/",(path)))\
     playMp3("nitro:/SOUND/",(path));
+
+#endif // USE_AS_LIB
 
 
 void fillWeiter( ) {
@@ -322,14 +330,18 @@ ChoiceResult opScreen( ) {
             return results[ i ];
             }
 
+#ifdef USE_AS_LIB
         if( AS_GetMP3Status( ) != MP3ST_PLAYING )
             return CANCEL;
+#endif
     }
 }
 
 
 void initNewGame( ) {
+#ifdef USE_AS_LIB
     AS_MP3Stop( );
+#endif
 
     SAV = saveGame( );
     SAV.m_activatedPNav = false;
@@ -365,7 +377,9 @@ void initNewGame( ) {
     BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
     BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
 
+#ifdef USE_AS_LIB
     PLAYMp( "1001.mp3" );
+#endif
 
     cust_font.printStringD( "Haaaaalt!", 24, 84, true );
     while( 1 ) {
@@ -382,7 +396,6 @@ void initNewGame( ) {
         if( keysCurrent( ) & KEY_A ) break;
     }
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
-    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
 
     free_spaces.clear( );
     for( u16 i = 0; i < MAXPKMN; i++ ) {
@@ -405,8 +418,6 @@ void initNewGame( ) {
         if( keysUp( ) & KEY_A ) break;
     }
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
-    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
-    //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
     cust_font.printStringD( "Da er gerade leider nicht in Hoenn\nist, werde ich euch heute euren\nPokéNav und euren PokéDex\nüberreichen.", 8, 68, true );
 
     while( 1 ) {
@@ -415,8 +426,6 @@ void initNewGame( ) {
         if( keysUp( ) & KEY_A ) break;
     }
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
-    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
-    //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
 
     cust_font.printStringD( "So hier ist erstmal der PokéNav!", 8, 84, true );
 
@@ -426,8 +435,6 @@ void initNewGame( ) {
         if( keysUp( ) & KEY_A ) break;
     }
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
-    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
-    //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
     cust_font.printStringD( "Ich gehe dann jetzt mal\ndie Dexe holen.\nIhr könnt solange eure\nPokéNav einrichten.", 24, 68, true );
     while( 1 ) {
         scanKeys( );
@@ -435,7 +442,6 @@ void initNewGame( ) {
         if( keysUp( ) & KEY_A ) break;
     }
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
-    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
 
     consoleSelect( &Bottom );
     std::wstring S_;
@@ -445,16 +451,24 @@ void initNewGame( ) {
     setMainSpriteVisibility( true );
     Oam->oamBuffer[ 1 ].isHidden = true;
     updateOAMSub( Oam );
+
+#ifdef USE_AS_LIB
     AS_MP3Stop( );
+#endif
     swiWaitForIRQ( );
     swiWaitForVBlank( );
 
-    //PLAYMp( "KeyItemGet.mp3" );
+#ifdef USE_AS_LIB
+    PLAYMp( "KeyItemGet.mp3" );
     AS_SetMP3Loop( false );
-    messageBox M( "Du erhälst einen PokéNav." );
+#endif
+    messageBox M( "Du erhälst einen PokéNav.", false );
+
+#ifdef USE_AS_LIB
     while( AS_GetMP3Status( ) == MP3ST_PLAYING ) {
         swiWaitForVBlank( );
     }
+#endif
     M.clear( );
 
     M.put( "Beginne automatische\nInitialisierung.", false );
@@ -462,10 +476,12 @@ void initNewGame( ) {
         swiWaitForVBlank( );
 
 
+#ifdef USE_AS_LIB
     AS_MP3Stop( );
 
     PLAYMp( "1000.mp3" );
     AS_SetMP3Loop( true );
+#endif
     M.put( "Setze Heimatregion: Hoenn.", false );
     for( u8 i = 0; i < 120; ++i )
         swiWaitForVBlank( );
@@ -709,9 +725,13 @@ bool heroIsBig = false;
 
 void startScreen( ) {
 
-    irqInit( );
+    //irqInit( );
     irqEnable( IRQ_VBLANK );
+#ifdef USE_AS_LIB
     irqSet( IRQ_VBLANK, AS_SoundVBL );    // needed for mp3 streaming
+#else
+    irqSet( IRQ_VBLANK, [ ]( ) { scanKeys( ); } );
+#endif
 
     vramSetup( );
 
@@ -757,19 +777,22 @@ void startScreen( ) {
         SAV.m_hasPKMN = false;
         SAV.m_savTyp = 0;
     }
+
+#ifdef USE_AS_LIB
     // init the ASlib
     AS_Init( AS_MODE_MP3 | AS_MODE_16CH );
 
     // set default sound settings
     AS_SetDefaultSettings( AS_PCM_16BIT, 22050, AS_NO_DELAY );
+#endif
 START:
     //Intro
 
-
-    if( !playMp3( "./PERM2/SOUND/", "Intro.mp3" ) )
-        playMp3( "nitro:/SOUND/", "Intro.mp3" );
+#ifdef USE_AS_LIB
+    PLAYMp( "Intro.mp3" );
     AS_SetMP3Loop( false );
     AS_SetMP3Volume( 127 );
+#endif
 
     //StartScreen
 
@@ -816,8 +839,10 @@ START:
             D0000 = 0;
         } else if( ( D0000 % 120 ) == 60 )
             consoleClear( );
+#ifdef USE_AS_LIB
         if( AS_GetMP3Status( ) != MP3ST_PLAYING )
             goto START;
+#endif
     }
 
     while( tp.px || tp.py ) {
@@ -849,7 +874,9 @@ START:
     POKEMON::LastPID = rand( );
 
     //StartMenu
+#ifdef USE_AS_LIB
     AS_SetMP3Volume( 31 );
+#endif
 
     switch( opScreen( ) ) {
         case TRANSFER_GAME:
@@ -1053,14 +1080,17 @@ CONT:
 
 s8 mode = -1;
 void showNewMap( u16 p_mapIdx ) {
+
+#ifdef USE_AS_LIB
     AS_MP3Stop( );
+#endif
+
     for( u8 i = 0; i < 3; ++i ) {
         for( u8 j = 0; j < 75; ++j ) {
             MapRegionPos m = MapLocations[ i ][ j ];
             if( m.m_ind != p_mapIdx )
                 continue;
             acMapRegion = Region( i + 1 );
-            showmappointer = true;
             scrn.draw( mode = 1 + i );
             printMapLocation( m );
             Oam->oamBuffer[ SQCH_ID ].x = Oam->oamBuffer[ SQCH_ID + 1 ].x = ( m.m_lx + m.m_rx ) / 2 - 8;
@@ -1070,10 +1100,12 @@ void showNewMap( u16 p_mapIdx ) {
 
             SAV.m_acMapIdx = p_mapIdx;
 
+#ifdef USE_AS_LIB
             char buffer[ 120 ];
             sprintf( buffer, "%d.mp3", SAV.m_acMapIdx );
-            PLAYMp( buffer );
-            swiWaitForIRQ( );
+            PLAYMp( buffer )
+#endif
+                swiWaitForIRQ( );
             swiWaitForVBlank( );
             return;
         }
@@ -1796,9 +1828,11 @@ int main( int p_argc, char** p_argv ) {
 
     startScreen( );
 
+#ifdef USE_AS_LIB
     AS_SetMP3Volume( 127 );
 
     AS_MP3Stop( );
+#endif
 
     heroIsBig = SAV.m_acMoveMode != WALK;
 
@@ -1826,14 +1860,16 @@ int main( int p_argc, char** p_argv ) {
 
 
     char buffer[ 120 ] = { 0 };
+#ifdef USE_AS_LIB
     sprintf( buffer, "%d.mp3", SAV.m_acMapIdx );
     PLAYMp( buffer );
     AS_SetMP3Loop( true );
+#endif
     swiWaitForIRQ( );
     swiWaitForVBlank( );
 
     while( 42 ) {
-        updateTime( true );
+        updateTime( s8( 1 ) );
         swiWaitForVBlank( );
         swiWaitForVBlank( );
         swiWaitForVBlank( );
@@ -1848,8 +1884,6 @@ int main( int p_argc, char** p_argv ) {
             consoleSetWindow( &Bottom, 4, 0, 20, 3 );
             consoleClear( );
             showmappointer = false;
-            Oam->oamBuffer[ SQCH_ID ].isHidden = true;
-            Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
             setMainSpriteVisibility( false );
             Oam->oamBuffer[ SAVE_ID ].isHidden = false;
             Oam->oamBuffer[ PKMN_ID ].isHidden = !( SAV.m_hasPKMN && SAV.m_PkmnTeam.size( ) );
@@ -1882,29 +1916,31 @@ int main( int p_argc, char** p_argv ) {
         }
 
         if( pressed & KEY_A ) {
-            for( auto a : SAV.m_PkmnTeam )
-                if( !a.m_boxdata.m_individualValues.m_isEgg )
-                    for( int i = 0; i < 4; ++i )
+            for( auto a : SAV.m_PkmnTeam ) {
+                if( !a.m_boxdata.m_individualValues.m_isEgg ) {
+                    for( u8 i = 0; i < 4; ++i ) {
                         if( AttackList[ a.m_boxdata.m_moves[ i ] ]->m_isFieldAttack && AttackList[ a.m_boxdata.m_moves[ i ] ]->possible( ) ) {
-                consoleSelect( &Bottom );
-                consoleSetWindow( &Bottom, 4, 0, 20, 3 );
-                consoleClear( );
-                showmappointer = false;
-                Oam->oamBuffer[ SQCH_ID ].isHidden = true;
-                Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
-                updateOAMSub( Oam );
-                scrn.draw( mode = -1 );
-                char buffer[ 50 ];
-                sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ i ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-                yesNoBox yn;
-                if( yn.getResult( buffer ) ) {
-                    sprintf( buffer, "%ls setzt %s\nein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-                    messageBox( buffer, true, true );
-                    shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
-                    AttackList[ a.m_boxdata.m_moves[ i ] ]->use( );
-                }
-                goto OUT;
+                            consoleSelect( &Bottom );
+                            consoleSetWindow( &Bottom, 4, 0, 20, 3 );
+                            consoleClear( );
+                            Oam->oamBuffer[ SQCH_ID ].isHidden = true;
+                            Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
+                            updateOAMSub( Oam );
+                            scrn.draw( mode = -1 );
+                            char buffer[ 50 ];
+                            sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ i ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
+                            yesNoBox yn;
+                            if( yn.getResult( buffer ) ) {
+                                sprintf( buffer, "%ls setzt %s\nein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
+                                messageBox( buffer, true, true );
+                                shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
+                                AttackList[ a.m_boxdata.m_moves[ i ] ]->use( );
+                            }
+                            goto OUT;
                         }
+                    }
+                }
+            }
 OUT:
             scrn.draw( mode );
         }
@@ -1971,16 +2007,11 @@ OUT:
                 continue;
         }
         //StartBag
-        //Centers o t circles.
-        //pokemon -> ID -> DEX -> Bag -> Opt -> Nav
-        // X|Y
-        //int mainSpritesPositions[6][2] 
-        //= {{130,60},{160,80},{160,115},{130,135},{100,115},{100,80}};
         if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 6 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 7 ] - touch.py ) ) <= 16 && mode == -1 ) {
 
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -1998,7 +2029,7 @@ OUT:
                  && mode == -1 ) ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2019,7 +2050,7 @@ OUT:
         else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 4 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 5 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2035,7 +2066,7 @@ OUT:
         else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 8 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 9 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2046,7 +2077,7 @@ OUT:
         else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 3 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2144,7 +2175,7 @@ OUT:
         else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 10 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 11 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2158,7 +2189,7 @@ OUT:
         else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 0 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 && mode == 0 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2167,14 +2198,13 @@ OUT:
             if( acMapRegion == NONE )
                 acMapRegion = acRegion;
             mode = acMapRegion;
-            showmappointer = true;
             scrn.draw( mode );
         }
         //Nav->StartScrn
         else if( touch.px > 224 && touch.py > 164 && mode == 0 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2187,7 +2217,7 @@ OUT:
         else if( touch.px > 224 && touch.py > 164 && mode > 0 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2197,11 +2227,8 @@ OUT:
             consoleSetWindow( &Bottom, 4, 0, 20, 3 );
             consoleClear( );
             showmappointer = false;
-            Oam->oamBuffer[ SQCH_ID ].isHidden = true;
-            Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
+            scrn.draw( mode = 0 );
             updateOAMSub( Oam );
-            mode = 0;
-            scrn.draw( mode );
         }
         //SwitchMap
         else if( ( held & KEY_SELECT ) && mode > 0 ) {
@@ -2210,7 +2237,7 @@ OUT:
                     break;
                 scanKeys( );
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
             }
             mode = ( ( mode + 1 ) % 3 ) + 1;
             consoleSetWindow( &Bottom, 5, 0, 20, 1 );
@@ -2220,15 +2247,16 @@ OUT:
         }
         //MapCourser
         else if( touch.px > 39 && touch.px < SCREEN_WIDTH - 39 && touch.py > 31 && touch.py < SCREEN_HEIGHT - 31 && mode > 0 ) {
+            showmappointer = true;
             Oam->oamBuffer[ SQCH_ID ].x = Oam->oamBuffer[ SQCH_ID + 1 ].x = touch.px - 8;
             Oam->oamBuffer[ SQCH_ID ].y = Oam->oamBuffer[ SQCH_ID + 1 ].y = touch.py - 8;
             printMapLocation( touch );
             updateOAMSub( Oam );
-            updateTime( true );
+            updateTime( s8( 1 ) );
         } else if( touch.px != 0 && touch.py != 0 && sqrt( sq( touch.px - 8 ) + sq( touch.py - 12 ) ) <= 17 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
