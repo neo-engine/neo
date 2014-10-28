@@ -19,12 +19,13 @@ Features
       * _Wild Pokémon encounter_
       * Animated map tiles
       * Player sprite, animated moving and surfing
-    * Playing .mp3 as BGM, user customization of BGM via music stored on the micro SD card
+    * Playing .mp3 as BGM, user customization of BGM via music stored on the micro SD card (at least, it works _sometimes_...)
     * RTC, _including overword changes based on time_
     * Saving the progress to the micro SD
     * Communicating with “the originals”
       * Playing with a save from a GBA version (saving is still not implemented yet, though)
       * _Link trading with Gen IV and Gen V games_
+    * An almost up-to-date UI
 * Easy-to-understand and ready-to-(re)use code
     * Strict and intuitive naming conventions
     * _Good_ documentation
