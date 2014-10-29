@@ -37,8 +37,11 @@
 #include "fontData.h"
 #include "print.h"
 #include "messageBox.h"
+#include "screenLoader.h"
 
 namespace FONT {
+    u8 ASpriteOamIndex = 0;
+
     void putrec( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
         for( u16 x = p_x1; x <= p_x2; ++x ) for( u16 y = p_y1; y < p_y2; ++y )
             if( p_bottom )
@@ -104,7 +107,7 @@ namespace FONT {
         p_font.printChar( 172, p_x, p_y, true );
     }
     void hideContinue( u8 p_x, u8 p_y ) {
-        putrec( p_x, p_y, p_x + 10, p_y + 10, true, false, (u8)250 );
+        putrec( p_x, p_y, p_x + 5, p_y + 5, true, false, (u8)250 );
     }
 
     void font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
@@ -121,6 +124,14 @@ namespace FONT {
             if( p_string[ current_char ] == L'`' ) {
                 u8 c = 0;
                 bool on = false;
+                if( p_bottom ) {
+                    Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
+                    updateOAMSub( Oam );
+                } else {
+                    OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
+                    updateOAM( OamTop );
+                }
+
                 while( 1 ) {
                     scanKeys( );
                     swiWaitForVBlank( );
@@ -135,9 +146,26 @@ namespace FONT {
                     if( keysUp( ) & KEY_A )
                         break;
                     auto t = touchReadXY( );
-                    if( t.px == 0 && t.py == 0 )
+                    if( t.px > 224 && t.py > 164 ) {
+                        while( 1 ) {
+                            swiWaitForVBlank( );
+                            scanKeys( );
+                            updateTime( true );
+                            auto touch = touchReadXY( );
+                            if( touch.px == 0 && touch.py == 0 )
+                                break;
+                        }
                         break;
+                    }
                 }
+                if( p_bottom ) {
+                    Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
+                    updateOAMSub( Oam );
+                } else {
+                    OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
+                    updateOAM( OamTop );
+                }
+                current_char++;
                 continue;
             }
             printChar( p_string[ current_char ], putX, putY, p_bottom );

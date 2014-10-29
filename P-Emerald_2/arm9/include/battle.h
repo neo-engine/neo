@@ -150,7 +150,7 @@ namespace BATTLE {
         void    declareBattleMoveChoose( );
         void    chooseAttack( );
         void    chooseItem( );
-        u8      choosePKMN( );
+        u8      choosePKMN( bool p_firstIsChosen );
         void    useNav( );
 
         void    showAttack( u8 p_moveNo );

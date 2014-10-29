@@ -86,6 +86,8 @@ namespace FONT {
         void( *_shiftchar )( u16& val );
         color _color[ 5 ];
     };
+
+    extern u8 ASpriteOamIndex;
 }
 
 void topScreenDarken( );

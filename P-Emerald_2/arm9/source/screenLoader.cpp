@@ -54,7 +54,6 @@
 #include "bag.h"
 #include "item.h"
 #include "battle.h"
-//#include "buffer.h"
 #include "fs.h"
 
 //Sprites
