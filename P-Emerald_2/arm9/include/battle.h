@@ -129,21 +129,6 @@ namespace BATTLE {
         battle* _battle;
         s8      _oldPKMNStats[ 6 ][ 2 ][ 10 ];
 
-        u16     _usedPals;
-
-        s8      getNextFreePal( ) {
-            for( u8 i = 0; i < 16; ++i )if( !( _usedPals & ( 1 << i ) ) ) {
-                _usedPals |= ( 1 << i );
-                return i;
-            }
-            return -1;
-        }
-        void    freePal( u16 p_palNo ) {
-            _usedPals &= ~( 1 << p_palNo );
-        }
-
-
-
     public:
         static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, bool big = false ); //HP in %
         static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR, u8 outerR ); //HP in %
@@ -379,6 +364,7 @@ namespace BATTLE {
 #define ACPKMNSTATCHG( p_pokemonPos, p_opponent ) _acPkmnStatChanges[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
 
 #define ACPOS2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._acPkmnPosition[ p_pokemonPos ][ p_opponent ]
+#define ACPKMNSTS2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._acPkmnStatus[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
 #define ACPKMN2( p_battle, p_pokemonPos, p_opponent ) ( ( ( p_opponent ) == OPPONENT ) ? ( ( *( p_battle )._opponent->m_pkmnTeam )[ ACPOS2( ( p_battle ), ( p_pokemonPos ), OPPONENT ) ] ) :\
                      ( ( *( p_battle )._player->m_pkmnTeam )[ ACPOS2( ( p_battle ), ( p_pokemonPos ), PLAYER ) ] ) )
 #define ACPKMNUNDO2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._undoScript[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
@@ -394,6 +380,9 @@ namespace BATTLE {
                                             const battleScript::command::targetSpecifier& p_targetSpecifier );
         friend int getTargetSpecifierValue( const battle& p_target,
                                             const battleScript::command::targetSpecifier& p_targetSpecifier );
+
+        friend  u16 initStsBalls( bool p_bottom, battle* p_battle, u16& p_tilecnt );
+        friend void loadSpritesSub( battle* p_battle );
 
         enum weather {
             NO_WEATHER = 0,
@@ -437,8 +426,8 @@ namespace BATTLE {
 
         void        initBattle( );
 
-        void        refillBattleSpots( bool p_choice );
-        u8          getNextPKMN( bool p_opponent );
+        void        refillBattleSpots( bool p_choice, bool p_send = true );
+        u8          getNextPKMN( bool p_opponent, u8 p_startIdx = 0 );
         void        orderPKMN( bool p_includeMovePriority = false ); //orders PKMN according to their speed, their move's priority, ... and stores result in _moveOrder
         void        switchPKMN( bool p_opponent, u8 p_toSwitch, u8 p_newPokemonPos );
 

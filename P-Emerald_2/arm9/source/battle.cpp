@@ -36,6 +36,7 @@
 #include <algorithm>
 #include <functional>
 #include <tuple>
+#include <initializer_list>
 
 #include "battle.h"
 #include "pokemon.h"
@@ -47,6 +48,7 @@
 #include "bag.h"
 #include "buffer.h"
 #include "fs.h"
+#include "sprite.h"
 
 #include "Message.h"
 #include "Border_1.h"
@@ -71,8 +73,13 @@
 #include "Choice_3.h"
 
 #include "BattleBall1.h" //Normal
-#include "BattleBall2.h" //Fainted
-#include "BattleBall3.h" //Statused
+#include "BattleBall2.h" //Statused
+#include "BattleBall3.h" //Fainted
+#include "BattleBall4.h" //NA
+
+//Test Trainer mugs:
+#include "mug_001_1.h"
+#include "mug_001_2.h"
 
 #include "PokeBall1.h"
 #include "PokeBall2.h"
@@ -236,6 +243,12 @@ namespace BATTLE {
         }
     }
 
+#define PB_PAL( i ) ( ( ( i ) == 0 ) ? BattleBall1Pal : ( ( ( i ) == 1 ) ? BattleBall2Pal : ( ( ( i ) == 2 ) ? BattleBall3Pal : BattleBall4Pal ) ) )
+#define PB_TILES( i ) ( ( ( i ) == 0 ) ? BattleBall1Tiles : ( ( ( i ) == 1 ) ? BattleBall2Tiles : ( ( ( i ) == 2 ) ? BattleBall3Tiles : BattleBall4Tiles ) ) )
+#define PB_TILES_LEN( i ) ( ( ( i ) == 0 ) ? BattleBall1TilesLen : ( ( ( i ) == 1 ) ? BattleBall2TilesLen : ( ( ( i ) == 2 ) ? BattleBall3TilesLen : BattleBall4TilesLen ) ) )
+
+    // TOP SCREEN DEFINES
+
     //Some defines of indices in the OAM for the used sprites
 #define HP_START                 1
 #define HP_IDX( p_pokemonPos, p_opponent ) ( HP_START + ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
@@ -249,7 +262,7 @@ namespace BATTLE {
 #define PB_ANIM             127
 #define SHINY_ANIM          127
 
-    //Some analogous defines for thei pal indices
+    //Some analogous defines for their pal indices
 #define PKMN_PAL_START
 #define OPP_PKMN_1_PAL        0-1
 #define OPP_PKMN_2_PAL        1-1
@@ -274,8 +287,27 @@ namespace BATTLE {
 
 #define GENDER(a) (a.m_boxdata.m_isFemale? 147 : (a.m_boxdata.m_isGenderless ? ' ' : 141))
 
-    void initStsBalls( ) {
+    // BOTTOM SCREEN DEFINES
+#define PB_PAL_SUB(i) (i)
+#define FIGHT_START 0
 
+#define SUB_PKMN_ICON_PAL 5
+
+    u16 initStsBalls( bool p_bottom, battle* p_battle, u16& p_tilecnt ) {
+        //Own PKMNs PBs
+        for( u8 i = 0; i < 6; ++i ) {
+            auto acStat = ACPKMNSTS2( *p_battle, i, PLAYER );
+            p_tilecnt = loadSprite( Oam, spriteInfo, i, PB_PAL_SUB( acStat ), p_tilecnt, 16 * i,
+                                    192 - 12, 16, 16, PB_PAL( acStat ), PB_TILES( acStat ), PB_TILES_LEN( acStat ),
+                                    false, false, false, OBJPRIORITY_0, p_bottom );
+        }
+        //Opps PKMNs PBs
+        for( u8 i = 0; i < 6; ++i ) {
+            auto acStat = ACPKMNSTS2( *p_battle, i, OPPONENT );
+            p_tilecnt = loadSprite( Oam, spriteInfo, 6 + i, PB_PAL_SUB( acStat ), p_tilecnt, 240 - ( 16 * i ),
+                                    -4, 16, 16, PB_PAL( acStat ), PB_TILES( acStat ), PB_TILES_LEN( acStat ),
+                                    false, false, false, OBJPRIORITY_0, p_bottom );
+        }
     }
     void setStsBallVisibility( bool p_opponent, u8 p_pokemonPos, bool p_visibility ) {
 
@@ -285,23 +317,100 @@ namespace BATTLE {
     }
 
     void loadSpritesTop( ) {
+        //Draw Trainer mug over the map
 
     }
 
-    void loadSpritesSub( ) {
+    void loadSpritesSub( battle* p_battle ) {
+        initOAMTableSub( Oam );
+        drawSub( );
 
+        u16 tilecnt = 0;
+        tilecnt = initStsBalls( true, p_battle, tilecnt );
+
+        cust_font.setColor( 0, 0 );
+        cust_font.setColor( 251, 1 );
+        cust_font.setColor( 252, 2 );
+        cust_font2.setColor( 0, 0 );
+        cust_font2.setColor( 253, 1 );
+        cust_font2.setColor( 254, 2 );
+
+        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
+        BG_PALETTE_SUB[ 251 ] = RGB15( 30, 30, 30 );
+        BG_PALETTE_SUB[ 252 ] = RGB15( 15, 15, 15 );
+        BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
+        BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
+        sprintf( buffer, "Eine Herausforderung von\n%s %s!",
+                 trainerclassnames[ p_battle->_opponent->m_trainerClass ],
+                 p_battle->_opponent->m_battleTrainerName );
+        cust_font.printString( buffer, 16, 80, true );
+        updateOAMSub( Oam );
+    }
+
+    void loadBattleUITop( ) {
+
+    }
+    void loadBattleUISub( u16 p_pkmnId, bool p_isWildBattle, bool p_showNav ) {
+        u16 tilecnt = 0;
+        //Load UI Sprites
+        //FIGHT -- 1
+        tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START, 0, tilecnt, 64,
+                              72, 64, 64, BattleSub1Pal, BattleSub1Tiles, BattleSub1TilesLen,
+                              false, false, false, OBJPRIORITY_1, true );
+        tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START + 1, 0, tilecnt, 128,
+                              72, 64, 64, BattleSub1Pal, BattleSub1Tiles, BattleSub1TilesLen,
+                              false, true, false, OBJPRIORITY_1, true );
+        //FIGHT-TEXT
+        tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START + 2, 1, tilecnt, 96,
+                              100, 64, 32, BattleSub2Pal, BattleSub2Tiles, BattleSub2TilesLen,
+                              false, false, false, OBJPRIORITY_0, true );
+        //RUN / POKENAV
+        if( p_isWildBattle ) { //Show Run
+            tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START + 3, 2, tilecnt, 91,
+                                  150, 64, 32, BattleSub3Pal, BattleSub3Tiles, BattleSub3TilesLen,
+                                  false, false, false, OBJPRIORITY_3, true );
+        } else if( p_showNav ) { //Show Nav
+            tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START + 3, 2, tilecnt, 91,
+                                  150, 64, 32, BattleSub6Pal, BattleSub6Tiles, BattleSub6TilesLen,
+                                  false, false, false, OBJPRIORITY_3, true );
+        }
+        //BAG
+        tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START + 4, 3, tilecnt, 0,
+                              157, 64, 32, BattleSub4Pal, BattleSub4Tiles, BattleSub4TilesLen,
+                              false, false, false, OBJPRIORITY_3, true );
+        //POKEMON
+        tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START + 5, 4, tilecnt, 185,
+                              142, 64, 32, BattleSub5Pal, BattleSub5Tiles, BattleSub5TilesLen,
+                              false, false, false, OBJPRIORITY_3, true );
+        //Load an icon of the PKMN, too
+
+
+        //That's it
+        updateOAMSub( Oam );
     }
 
     /**
      *  @brief Loads all the required graphics and sprites
      */
     void battleUI::init( ) {
-        //Use a 2D Map as top background for trainer intro
-
+        //Copy the current PKMNStatus
+        for( u8 i = 0; i < 6; ++i )
+            for( u8 p = 0; p < 2; ++p )
+                for( u8 s = 0; s < MAX_STATS; ++s )
+                    _oldPKMNStats[ ACPOS2( *_battle, i, p ) ][ p ][ s ] = ACPKMNSTS2( *_battle, i, p );
     }
 
     void battleUI::trainerIntro( ) {
+        //Use a 2D Map as top background for trainer intro
+        loadSpritesSub( _battle );
+        loadSpritesTop( ); // This should consume some time
 
+        while( 1 );
+
+        loadBattleUISub( 0, true, false );
+        loadBattleUITop( );
+
+        while( 1 );
     }
 
     void battleUI::declareBattleMove( u8 p_pokemonPos ) {
@@ -479,6 +588,17 @@ namespace BATTLE {
         return L"";
     }
 
+    battle::battle( battleTrainer* p_player, battleTrainer* p_opponent, int p_maxRounds, int p_AILevel, battleMode p_battleMode ) {
+        _maxRounds = p_maxRounds;
+        _AILevel = p_AILevel;
+        _player = p_player;
+        _opponent = p_opponent;
+        m_battleMode = p_battleMode;
+
+        m_distributeEXP = true;
+    }
+
+
     /**
      *  @brief Write the message p_message to the battle log
      *  @param p_message: The message to be written
@@ -547,7 +667,9 @@ namespace BATTLE {
         for( u8 i = 0; i < 6; ++i ) {
             ACPOS( i, PLAYER ) = ACPOS( i, OPPONENT ) = i;
             if( _player->m_pkmnTeam->size( ) > i ) {
-                if( ACPKMN( i, PLAYER ).m_stats.m_acHP == 0 || ACPKMN( i, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                if( ACPKMN( i, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                    ACPKMNSTS( i, PLAYER ) = NA;
+                else if( ACPKMN( i, PLAYER ).m_stats.m_acHP == 0 )
                     ACPKMNSTS( i, PLAYER ) = KO;
                 else if( ACPKMN( i, PLAYER ).m_statusint )
                     ACPKMNSTS( i, PLAYER ) = STS;
@@ -556,7 +678,9 @@ namespace BATTLE {
             } else
                 ACPKMNSTS( i, PLAYER ) = NA;
             if( _opponent->m_pkmnTeam->size( ) > i ) {
-                if( ACPKMN( i, OPPONENT ).m_stats.m_acHP == 0 || ACPKMN( i, OPPONENT ).m_boxdata.m_individualValues.m_isEgg )
+                if( ACPKMN( i, OPPONENT ).m_boxdata.m_individualValues.m_isEgg )
+                    ACPKMNSTS( i, OPPONENT ) = NA;
+                else if( ACPKMN( i, OPPONENT ).m_stats.m_acHP == 0 )
                     ACPKMNSTS( i, OPPONENT ) = KO;
                 else if( ACPKMN( i, OPPONENT ).m_statusint )
                     ACPKMNSTS( i, OPPONENT ) = STS;
@@ -565,10 +689,12 @@ namespace BATTLE {
                 ACPKMNSTS( i, OPPONENT ) = NA;
         }
 
-        for( u8 p = 0; p < 2; ++p ) {
+        for( auto p : { PLAYER, OPPONENT } ) {
             _battleSpotOccupied[ 0 ][ p ] = false;
             _battleSpotOccupied[ 1 ][ p ] = !( m_battleMode == DOUBLE );
         }
+
+        refillBattleSpots( false, false );
 
         _battleUI.trainerIntro( );
 
@@ -585,18 +711,19 @@ namespace BATTLE {
      *  @brief send in PKMN for fainted ones, if possible
      *  @param p_choice: Specifies whether the player can choose the PKMN which is/are being sent
      */
-    void battle::refillBattleSpots( bool p_choice ) {
-        acStatus oldSts[ 2 ] = { };
+    void battle::refillBattleSpots( bool p_choice, bool p_send ) {
+        acStatus oldSts[ 2 ] = { SELECTED, SELECTED };
 
-        for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
+        for( u8 i = 0; i < 2; ++i )for( auto j : { PLAYER, OPPONENT } ) {
             if( !_battleSpotOccupied[ i ][ j ] ) {
-                u8 nextSpot;
+                u8 nextSpot = i;
                 if( !p_choice || j )
-                    nextSpot = getNextPKMN( j );
+                    nextSpot = getNextPKMN( j, i );
                 else
                     nextSpot = _battleUI.choosePKMN( );
 
-                std::swap( ACPOS( i, j ), ACPOS( nextSpot, j ) );
+                if( nextSpot != 7 && nextSpot != i )
+                    std::swap( ACPOS( i, j ), ACPOS( nextSpot, j ) );
 
                 if( !i ) {
                     oldSts[ j ] = ACPKMNSTS( 0, j );
@@ -605,17 +732,34 @@ namespace BATTLE {
             }
         }
 
+        //Sort the remaining PKMN according to their status -> No STS, STS, KO, NA
+        std::vector<std::pair<u8, u8> > tmp;
+        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+            tmp.push_back( std::pair<u8, u8>( ACPKMNSTS( i, PLAYER ), i ) );
+        std::sort( tmp.begin( ), tmp.end( ) );
+        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+            ACPOS( i, PLAYER ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
+
+        //Sort the remaining PKMN according to their status -> No STS, STS, KO, NA (For the opponent)
+        tmp.clear( );
+        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+            tmp.push_back( std::pair<u8, u8>( ACPKMNSTS( i, OPPONENT ), i ) );
+        std::sort( tmp.begin( ), tmp.end( ) );
+        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+            ACPOS( i, OPPONENT ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
+
         orderPKMN( );
 
         for( u8 p = 0; p < 4; ++p ) {
-            for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
+            for( u8 i = 0; i < 2; ++i )for( auto j : { PLAYER, OPPONENT } ) {
                 if( _moveOrder[ i ][ j ] == p ) {
                     if( !_battleSpotOccupied[ i ][ j ] ) {
-                        if( !i )
+                        if( !i && oldSts[ j ] != SELECTED )
                             ACPKMNSTS( 0, j ) = oldSts[ j ];
-
-                        _battleUI.sendPKMN( j, i );
-                        _battleSpotOccupied[ i ][ j ] = true;
+                        if( p_send ) {
+                            _battleUI.sendPKMN( j, i );
+                            _battleSpotOccupied[ i ][ j ] = true;
+                        }
                     }
                     goto NEXT;
                 }
@@ -630,10 +774,10 @@ NEXT:
      *  @param p_opponent: true iff the next opponent's PKMN is requested.
      *  @returns Minimum i for which ACPKMNSTS(i,p_opponent) != KO and != SELECTED, 7 iff all PKMN fainted
      */
-    u8 battle::getNextPKMN( bool p_opponent ) {
+    u8 battle::getNextPKMN( bool p_opponent, u8 p_startIdx ) {
         u8 max = ( p_opponent ? _opponent->m_pkmnTeam->size( ) : _player->m_pkmnTeam->size( ) );
 
-        for( u8 i = 0; i < max; ++i )
+        for( u8 i = p_startIdx; i < max; ++i )
             if( ACPKMNSTS( i, p_opponent ) != KO
                 && ACPKMNSTS( i, p_opponent ) != SELECTED )
                 return i;
@@ -651,7 +795,7 @@ NEXT:
             = _moveOrder[ 1 ][ 1 ] = 42;
 
         std::vector< std::tuple<s8, u16, u8> > inits;
-        for( u8 i = 0; i < ( ( m_battleMode == DOUBLE ) ? 2 : 1 ); ++i ) {
+        for( u8 i = 0; i <= ( ( m_battleMode == DOUBLE ) ? 2 : 1 ); ++i ) {
             for( u8 j = 0; j < 2; ++j ) {
                 u16 acSpd = ACPKMN( i, j ).m_stats.m_Spd;
                 s8 movePr = ( ( _battleMoves[ i ][ j ].m_type == battleMove::ATTACK || _battleMoves[ i ][ j ].m_type == battleMove::MEGA_ATTACK ) ?
@@ -1640,69 +1784,59 @@ NEXT:
 
     //OLD STUFF -> deprcated
 
-    void init( ) {
-        for( int i = 5; i <= 8; ++i ) {
-            Oam->oamBuffer[ i ].isHidden = true;
-            swiWaitForVBlank( );
-        }
-        for( int i = 0; i < 4; ++i ) {
-            Oam->oamBuffer[ 9 + 2 * i ].isHidden = true;
-            swiWaitForVBlank( );
-        }
+    //void init( ) {
+    //    for( int i = 5; i <= 8; ++i ) {
+    //        Oam->oamBuffer[ i ].isHidden = true;
+    //        swiWaitForVBlank( );
+    //    }
+    //    for( int i = 0; i < 4; ++i ) {
+    //        Oam->oamBuffer[ 9 + 2 * i ].isHidden = true;
+    //        swiWaitForVBlank( );
+    //    }
 
-        Oam->oamBuffer[ 20 ].isHidden = true;
-        for( int i = 0; i < 20; ++i )
-            Oam->oamBuffer[ 36 + i ].isHidden = true;
-        //oamIndexS = 36;
-        //nextAvailableTileIdxS = p_oam->oamBuffer[36].gfxIndex;
-        //palcntS = p_oam->oamBuffer[36].palette;
+    //    Oam->oamBuffer[ 20 ].isHidden = true;
+    //    for( int i = 0; i < 20; ++i )
+    //        Oam->oamBuffer[ 36 + i ].isHidden = true;
+    //    //oamIndexS = 36;
+    //    //nextAvailableTileIdxS = p_oam->oamBuffer[36].gfxIndex;
+    //    //palcntS = p_oam->oamBuffer[36].palette;
 
-        cust_font.setColor( 0, 0 );
-        cust_font.setColor( 251, 1 );
-        cust_font.setColor( 252, 2 );
-        cust_font2.setColor( 0, 0 );
-        cust_font2.setColor( 253, 1 );
-        cust_font2.setColor( 254, 2 );
+    //    cust_font.setColor( 0, 0 );
+    //    cust_font.setColor( 251, 1 );
+    //    cust_font.setColor( 252, 2 );
+    //    cust_font2.setColor( 0, 0 );
+    //    cust_font2.setColor( 253, 1 );
+    //    cust_font2.setColor( 254, 2 );
 
-        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
-        BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE[ 251 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE[ 252 ] = RGB15( 3, 3, 3 );
-        BG_PALETTE[ 253 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE[ 254 ] = RGB15( 31, 31, 31 );
-        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
+    //    BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
+    //    BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
+    //    BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
+    //    BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
+    //    BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
+    //    BG_PALETTE[ 250 ] = RGB15( 31, 31, 31 );
+    //    BG_PALETTE[ 251 ] = RGB15( 15, 15, 15 );
+    //    BG_PALETTE[ 252 ] = RGB15( 3, 3, 3 );
+    //    BG_PALETTE[ 253 ] = RGB15( 15, 15, 15 );
+    //    BG_PALETTE[ 254 ] = RGB15( 31, 31, 31 );
+    //    FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
 
-        updateOAMSub( Oam );
-    }
-    void clear( ) {
-        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
-    }
-    void dinit( ) {
+    //    updateOAMSub( Oam );
+    //}
+    //void clear( ) {
+    //    FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
+    //}
+    //void dinit( ) {
 
-        drawSub( );
+    //    drawSub( );
 
-        for( int i = 5; i < 8; ++i )
-            Oam->oamBuffer[ 31 + 2 * i ].isHidden = false;
-        for( int i = 0; i < 4; ++i ) {
-            Oam->oamBuffer[ 9 + 2 * i ].isHidden = false;
-            swiWaitForVBlank( );
-        }
-        updateOAMSub( Oam );
-    }
-
-    battle::battle( battleTrainer* p_player, battleTrainer* p_opponent, int p_maxRounds, int p_AILevel, battleMode p_battleMode ) {
-        _maxRounds = p_maxRounds;
-        _AILevel = p_AILevel;
-        _player = p_player;
-        _opponent = p_opponent;
-        m_battleMode = p_battleMode;
-
-        m_distributeEXP = true;
-    }
+    //    for( int i = 5; i < 8; ++i )
+    //        Oam->oamBuffer[ 31 + 2 * i ].isHidden = false;
+    //    for( int i = 0; i < 4; ++i ) {
+    //        Oam->oamBuffer[ 9 + 2 * i ].isHidden = false;
+    //        swiWaitForVBlank( );
+    //    }
+    //    updateOAMSub( Oam );
+    //}
 
 
 
@@ -1747,226 +1881,8 @@ NEXT:
     //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall3Pal, &SPRITE_PALETTE[ ( palcnt++ ) * COLORS_PER_PALETTE ], 32 );
     //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall3Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], BattleBall3TilesLen );
     //        nextAvailableTileIdx += BattleBall3TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo4Info = &p_spriteInfo[ ++oamIndex ];
-    //        SpriteEntry * Bo4 = &p_oam->oamBuffer[ oamIndex ];
-    //        Bo4Info->m_oamId = oamIndex;
-    //        Bo4Info->m_width = 64;
-    //        Bo4Info->m_height = 64;
-    //        Bo4Info->m_angle = 0;
-    //        Bo4Info->m_entry = Bo4;
-    //        Bo4->y = 0;
-    //        Bo4->isRotateScale = false;
-    //        Bo4->blendMode = OBJMODE_NORMAL;
-    //        Bo4->isMosaic = false;
-    //        Bo4->colorMode = OBJCOLOR_16;
-    //        Bo4->shape = OBJSHAPE_SQUARE;
-    //        Bo4->isHidden = false;
-    //        Bo4->x = 0;
-    //        Bo4->size = OBJSIZE_64;
-    //        Bo4->gfxIndex = nextAvailableTileIdx;
-    //        Bo4->priority = OBJPRIORITY_2;
-    //        Bo4->palette = palcnt;
-    //        Bo4->vFlip = true;
-    //        Bo4->hFlip = true;
-    //
-    //        Bo4 = &p_oam->oamBuffer[ ++oamIndex ];
-    //        Bo4->y = 128;
-    //        Bo4->isRotateScale = false;
-    //        Bo4->blendMode = OBJMODE_NORMAL;
-    //        Bo4->isMosaic = false;
-    //        Bo4->colorMode = OBJCOLOR_16;
-    //        Bo4->shape = OBJSHAPE_SQUARE;
-    //        Bo4->isHidden = false;
-    //        Bo4->x = 192;
-    //        Bo4->size = OBJSIZE_64;
-    //        Bo4->gfxIndex = nextAvailableTileIdx;
-    //        Bo4->priority = OBJPRIORITY_2;
-    //        Bo4->palette = palcnt;
-    //        Bo4->vFlip = false;
-    //        Bo4->hFlip = false;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Border_4Pal, &SPRITE_PALETTE[ palcnt * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Border_4Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], Border_4TilesLen );
-    //        nextAvailableTileIdx += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo3Info = &p_spriteInfo[ ++oamIndex ];
-    //        SpriteEntry * Bo3 = &p_oam->oamBuffer[ oamIndex ];
-    //        Bo3Info->m_oamId = oamIndex;
-    //        Bo3Info->m_width = 64;
-    //        Bo3Info->m_height = 64;
-    //        Bo3Info->m_angle = 0;
-    //        Bo3Info->m_entry = Bo3;
-    //        Bo3->y = 0;
-    //        Bo3->isRotateScale = false;
-    //        Bo3->blendMode = OBJMODE_NORMAL;
-    //        Bo3->isMosaic = false;
-    //        Bo3->colorMode = OBJCOLOR_16;
-    //        Bo3->shape = OBJSHAPE_SQUARE;
-    //        Bo3->isHidden = false;
-    //        Bo3->x = 64;
-    //        Bo3->size = OBJSIZE_64;
-    //        Bo3->gfxIndex = nextAvailableTileIdx;
-    //        Bo3->priority = OBJPRIORITY_2;
-    //        Bo3->palette = palcnt;
-    //        Bo3->vFlip = true;
-    //        Bo3->hFlip = true;
-    //
-    //        Bo3 = &p_oam->oamBuffer[ ++oamIndex ];
-    //        Bo3->y = 128;
-    //        Bo3->isRotateScale = false;
-    //        Bo3->blendMode = OBJMODE_NORMAL;
-    //        Bo3->isMosaic = false;
-    //        Bo3->colorMode = OBJCOLOR_16;
-    //        Bo3->shape = OBJSHAPE_SQUARE;
-    //        Bo3->isHidden = false;
-    //        Bo3->x = 128;
-    //        Bo3->size = OBJSIZE_64;
-    //        Bo3->gfxIndex = nextAvailableTileIdx;
-    //        Bo3->priority = OBJPRIORITY_2;
-    //        Bo3->palette = palcnt;
-    //        Bo3->vFlip = false;
-    //        Bo3->hFlip = false;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-    //                          Border_3Tiles,
-    //                          &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ],
-    //                          Border_3TilesLen );
-    //
-    //        nextAvailableTileIdx += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo2Info = &p_spriteInfo[ ++oamIndex ];
-    //        SpriteEntry * Bo2 = &p_oam->oamBuffer[ oamIndex ];
-    //        Bo2Info->m_oamId = oamIndex;
-    //        Bo2Info->m_width = 64;
-    //        Bo2Info->m_height = 64;
-    //        Bo2Info->m_angle = 0;
-    //        Bo2Info->m_entry = Bo2;
-    //        Bo2->y = 0;
-    //        Bo2->isRotateScale = false;
-    //        Bo2->blendMode = OBJMODE_NORMAL;
-    //        Bo2->isMosaic = false;
-    //        Bo2->colorMode = OBJCOLOR_16;
-    //        Bo2->shape = OBJSHAPE_SQUARE;
-    //        Bo2->isHidden = false;
-    //        Bo2->x = 128;
-    //        Bo2->size = OBJSIZE_64;
-    //        Bo2->gfxIndex = nextAvailableTileIdx;
-    //        Bo2->priority = OBJPRIORITY_2;
-    //        Bo2->palette = palcnt;
-    //        Bo2->vFlip = true;
-    //        Bo2->hFlip = true;
-    //
-    //        Bo2 = &p_oam->oamBuffer[ ++oamIndex ];
-    //        Bo2->y = 128;
-    //        Bo2->isRotateScale = false;
-    //        Bo2->blendMode = OBJMODE_NORMAL;
-    //        Bo2->isMosaic = false;
-    //        Bo2->colorMode = OBJCOLOR_16;
-    //        Bo2->shape = OBJSHAPE_SQUARE;
-    //        Bo2->isHidden = false;
-    //        Bo2->x = 64;
-    //        Bo2->size = OBJSIZE_64;
-    //        Bo2->gfxIndex = nextAvailableTileIdx;
-    //        Bo2->priority = OBJPRIORITY_2;
-    //        Bo2->palette = palcnt;
-    //        Bo2->vFlip = false;
-    //        Bo2->hFlip = false;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-    //                          Border_2Tiles,
-    //                          &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ],
-    //                          Border_2TilesLen );
-    //        nextAvailableTileIdx += Border_2TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo1Info = &p_spriteInfo[ ++oamIndex ];
-    //        SpriteEntry * Bo1 = &p_oam->oamBuffer[ oamIndex ];
-    //        Bo1Info->m_oamId = oamIndex;
-    //        Bo1Info->m_width = 64;
-    //        Bo1Info->m_height = 64;
-    //        Bo1Info->m_angle = 0;
-    //        Bo1Info->m_entry = Bo1;
-    //        Bo1->y = 0;
-    //        Bo1->isRotateScale = false;
-    //        Bo1->blendMode = OBJMODE_NORMAL;
-    //        Bo1->isMosaic = false;
-    //        Bo1->colorMode = OBJCOLOR_16;
-    //        Bo1->shape = OBJSHAPE_SQUARE;
-    //        Bo1->isHidden = false;
-    //        Bo1->x = 192;
-    //        Bo1->size = OBJSIZE_64;
-    //        Bo1->gfxIndex = nextAvailableTileIdx;
-    //        Bo1->priority = OBJPRIORITY_2;
-    //        Bo1->palette = palcnt;
-    //        Bo1->vFlip = true;
-    //        Bo1->hFlip = true;
-    //
-    //        Bo1 = &p_oam->oamBuffer[ ++oamIndex ];
-    //        Bo1->y = 128;
-    //        Bo1->isRotateScale = false;
-    //        Bo1->blendMode = OBJMODE_NORMAL;
-    //        Bo1->isMosaic = false;
-    //        Bo1->colorMode = OBJCOLOR_16;
-    //        Bo1->shape = OBJSHAPE_SQUARE;
-    //        Bo1->isHidden = false;
-    //        Bo1->x = 0;
-    //        Bo1->size = OBJSIZE_64;
-    //        Bo1->gfxIndex = nextAvailableTileIdx;
-    //        Bo1->priority = OBJPRIORITY_2;
-    //        Bo1->palette = palcnt;
-    //        Bo1->vFlip = false;
-    //        Bo1->hFlip = false;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-    //                          Border_1Tiles,
-    //                          &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ],
-    //                          Border_1TilesLen );
-    //        nextAvailableTileIdx += Border_1TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo5Info = &p_spriteInfo[ ++oamIndex ];
-    //        SpriteEntry * Bo5 = &p_oam->oamBuffer[ oamIndex ];
-    //        Bo5Info->m_oamId = oamIndex;
-    //        Bo5Info->m_width = 64;
-    //        Bo5Info->m_height = 64;
-    //        Bo5Info->m_angle = 0;
-    //        Bo5Info->m_entry = Bo5;
-    //        Bo5->y = 64;
-    //        Bo5->isRotateScale = false;
-    //        Bo5->blendMode = OBJMODE_NORMAL;
-    //        Bo5->isMosaic = false;
-    //        Bo5->colorMode = OBJCOLOR_16;
-    //        Bo5->shape = OBJSHAPE_SQUARE;
-    //        Bo5->isHidden = false;
-    //        Bo5->x = 0;
-    //        Bo5->size = OBJSIZE_64;
-    //        Bo5->gfxIndex = nextAvailableTileIdx;
-    //        Bo5->priority = OBJPRIORITY_2;
-    //        Bo5->palette = palcnt;
-    //        Bo5->vFlip = true;
-    //        Bo5->hFlip = true;
-    //
-    //        Bo5 = &p_oam->oamBuffer[ ++oamIndex ];
-    //        Bo5->y = 64;
-    //        Bo5->isRotateScale = false;
-    //        Bo5->blendMode = OBJMODE_NORMAL;
-    //        Bo5->isMosaic = false;
-    //        Bo5->colorMode = OBJCOLOR_16;
-    //        Bo5->shape = OBJSHAPE_SQUARE;
-    //        Bo5->isHidden = false;
-    //        Bo5->x = 192;
-    //        Bo5->size = OBJSIZE_64;
-    //        Bo5->gfxIndex = nextAvailableTileIdx;
-    //        Bo5->priority = OBJPRIORITY_2;
-    //        Bo5->palette = palcnt;
-    //        Bo5->vFlip = false;
-    //        Bo5->hFlip = false;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Border_5Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], Border_5TilesLen );
-    //        nextAvailableTileIdx += Border_5TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        ++palcnt;
-    //    }
-    //
+    //}
+
     //    void drawTopBack( );
     //
     //    void battle::initBattleScreen( ) {
@@ -2076,7 +1992,7 @@ NEXT:
     //        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
     //        consoleClear( );
     //    }
-    //
+
     //    void initBattleScreenSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo ) {
     //        oamIndex = palcnt = nextAvailableTileIdx = 0;
     //
@@ -2178,111 +2094,9 @@ NEXT:
     //
     //
     //    }
-    //
+
     //    void initBattleSubScreenSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo, bool p_isWild, bool p_hasPokeNav ) {
     //        oamIndexS = palcntS = nextAvailableTileIdxS = 0;
-    //
-    //
-    //        SpriteInfo * type1Info = &p_spriteInfo[ oamIndexS ];
-    //        SpriteEntry * type1 = &p_oam->oamBuffer[ oamIndexS ];
-    //        type1Info->m_oamId = oamIndexS;
-    //        type1Info->m_width = 64;
-    //        type1Info->m_height = 64;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 72;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = true;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_SQUARE;
-    //        type1->x = 64;
-    //        type1->size = OBJSIZE_64;
-    //        type1->gfxIndex = nextAvailableTileIdxS;
-    //        type1->priority = OBJPRIORITY_2;
-    //        type1->palette = palcntS;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub1Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], BattleSub1TilesLen );
-    //        nextAvailableTileIdxS += BattleSub1TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        type1Info = &p_spriteInfo[ ++oamIndexS ];
-    //        type1 = &p_oam->oamBuffer[ oamIndexS ];
-    //        type1Info->m_oamId = oamIndexS;
-    //        type1Info->m_width = 64;
-    //        type1Info->m_height = 64;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 72;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = true;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_SQUARE;
-    //        type1->x = 128;
-    //        type1->size = OBJSIZE_64;
-    //        type1->gfxIndex = nextAvailableTileIdxS;
-    //        type1->priority = OBJPRIORITY_2;
-    //        type1->palette = palcntS;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub2Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], BattleSub2TilesLen );
-    //        nextAvailableTileIdxS += BattleSub2TilesLen / BYTES_PER_16_COLOR_TILE;
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub1Pal, &SPRITE_PALETTE_SUB[ ( palcntS++ ) * COLORS_PER_PALETTE ], 32 );
-    //
-    //        type1Info = &p_spriteInfo[ ++oamIndexS ];
-    //        type1 = &p_oam->oamBuffer[ oamIndexS ];
-    //        type1Info->m_oamId = oamIndexS;
-    //        type1Info->m_width = 64;
-    //        type1Info->m_height = 32;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 152;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = true;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_WIDE;
-    //        type1->x = 96;
-    //        type1->size = OBJSIZE_64;
-    //        type1->gfxIndex = nextAvailableTileIdxS;
-    //        type1->priority = OBJPRIORITY_2;
-    //        type1->palette = palcntS;
-    //
-    //        if( p_isWild ) {
-    //            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub3Pal, &SPRITE_PALETTE_SUB[ ( palcntS++ ) * COLORS_PER_PALETTE ], 32 );
-    //            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub3Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], BattleSub3TilesLen );
-    //            nextAvailableTileIdxS += BattleSub3TilesLen / BYTES_PER_16_COLOR_TILE;
-    //        } else if( p_hasPokeNav ) {
-    //            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub6Pal, &SPRITE_PALETTE_SUB[ ( palcntS++ ) * COLORS_PER_PALETTE ], 32 );
-    //            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub6Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], BattleSub6TilesLen );
-    //            nextAvailableTileIdxS += BattleSub6TilesLen / BYTES_PER_16_COLOR_TILE;
-    //        }
-    //
-    //        type1Info = &p_spriteInfo[ ++oamIndexS ];
-    //        type1 = &p_oam->oamBuffer[ oamIndexS ];
-    //        type1Info->m_oamId = oamIndexS;
-    //        type1Info->m_width = 64;
-    //        type1Info->m_height = 32;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 144;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = true;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_WIDE;
-    //        type1->x = 16;
-    //        type1->size = OBJSIZE_64;
-    //        type1->gfxIndex = nextAvailableTileIdxS;
-    //        type1->priority = OBJPRIORITY_1;
-    //        type1->palette = palcntS;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub4Pal, &SPRITE_PALETTE_SUB[ ( palcntS++ ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub4Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], BattleSub4TilesLen );
-    //        nextAvailableTileIdxS += BattleSub4TilesLen / BYTES_PER_16_COLOR_TILE;
     //
     //        type1Info = &p_spriteInfo[ ++oamIndexS ];
     //        type1 = &p_oam->oamBuffer[ oamIndexS ];
