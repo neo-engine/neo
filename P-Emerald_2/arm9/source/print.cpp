@@ -104,10 +104,11 @@ namespace FONT {
     }
 
     void drawContinue( font p_font, u8 p_x, u8 p_y ) {
-        p_font.printChar( 172, p_x, p_y, true );
+        p_font.printChar( /*'@'*/ u16(172), p_x, p_y, true );
     }
     void hideContinue( u8 p_x, u8 p_y ) {
-        putrec( p_x, p_y, p_x + 5, p_y + 5, true, false, (u8)250 );
+        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
+        putrec( p_x, p_y, p_x + 5, p_y + 9, true, false, (u8)250 );
     }
 
     void font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
@@ -138,9 +139,10 @@ namespace FONT {
                     if( ++c == 45 ) {
                         c = 0;
                         if( on )
-                            hideContinue( 246, 54 );
+                            hideContinue( 243, 51 );
                         else
-                            drawContinue( *this, 246, 54 );
+                            drawContinue( *this, 243, 51 );
+                        on = !on;
                     }
                     updateTime( 0 );
                     if( keysUp( ) & KEY_A )

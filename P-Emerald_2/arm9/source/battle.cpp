@@ -82,6 +82,13 @@
 //Test Trainer mugs:
 #include "mug_001_1.h"
 #include "mug_001_2.h"
+#include "TestBattleBack.h"
+#include "Border.h"
+
+#include "BattlePkmnChoice1.h"
+#include "BattlePkmnChoice2.h"
+#include "BattlePkmnChoice3.h"
+#include "BattlePkmnChoice4.h"
 
 #include "PokeBall1.h"
 #include "PokeBall2.h"
@@ -104,8 +111,6 @@
 #include "Shiny1.h"
 #include "Shiny2.h"
 
-#include "TestBattleBack.h"
-#include "Border.h"
 
 namespace BATTLE {
     const char* trainerclassnames[ ] = { "Pokémon-Trainer" };
@@ -291,12 +296,16 @@ namespace BATTLE {
 
     // BOTTOM SCREEN DEFINES
 #define PB_PAL_SUB(i) (i)
-#define FIGHT_START 0
+#define SUB_FIGHT_START 0
 
 #define SUB_PKMN_ICON_PAL 5
 
+#define SUB_CHOICE_START 10
+
 #define SUB_A_OAM 30
 #define SUB_Back_OAM 31
+    u16 SUB_TILESTART = 0;
+    u8 SUB_PALSTART = 0;
 
     u16 initStsBalls( bool p_bottom, battle* p_battle, u16& p_tilecnt ) {
         //Own PKMNs PBs
@@ -315,13 +324,14 @@ namespace BATTLE {
                                     -4, 16, 16, PB_PAL( acStat ), PB_TILES( acStat ), PB_TILES_LEN( acStat ),
                                     false, false, false, OBJPRIORITY_0, p_bottom );
         }
+        return p_tilecnt;
     }
-    void setStsBallVisibility( bool p_opponent, u8 p_pokemonPos, bool p_visibility, bool p_bottom ) {
+    void setStsBallVisibility( bool p_opponent, u8 p_pokemonPos, bool p_isHidden, bool p_bottom ) {
         if( p_bottom ) {
-            Oam[ 6 * p_opponent + p_pokemonPos ].oamBuffer->isHidden = p_visibility;
+            Oam[ 6 * p_opponent + p_pokemonPos ].oamBuffer->isHidden = p_isHidden;
             updateOAMSub( Oam );
         } else {
-            OamTop[ STSBALL_IDX( p_pokemonPos, p_opponent ) ].oamBuffer->isHidden = p_visibility;
+            OamTop[ STSBALL_IDX( p_pokemonPos, p_opponent ) ].oamBuffer->isHidden = p_isHidden;
             updateOAM( OamTop );
         }
     }
@@ -410,56 +420,57 @@ namespace BATTLE {
         u16 tilecnt = 0;
         //Load UI Sprites
         //FIGHT -- 1
-        tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START, 0, tilecnt, 64,
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START, 0, tilecnt, 64,
                               72, 64, 64, BattleSub1Pal, BattleSub1Tiles, BattleSub1TilesLen,
                               false, false, false, OBJPRIORITY_2, true );
-        tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START + 1, 0, tilecnt, 128,
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START + 1, 0, tilecnt, 128,
                               72, 64, 64, BattleSub1Pal, BattleSub1Tiles, BattleSub1TilesLen,
                               false, true, false, OBJPRIORITY_2, true );
         //FIGHT-TEXT
-        tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START + 2, 1, tilecnt, 96,
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START + 2, 1, tilecnt, 96,
                               100, 64, 32, BattleSub2Pal, BattleSub2Tiles, BattleSub2TilesLen,
                               false, false, false, OBJPRIORITY_0, true );
         //RUN / POKENAV
         if( p_isWildBattle ) { //Show Run
-            tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START + 3, 2, tilecnt, 91,
+            tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START + 3, 2, tilecnt, 91,
                                   150, 64, 32, BattleSub3Pal, BattleSub3Tiles, BattleSub3TilesLen,
                                   false, false, false, OBJPRIORITY_3, true );
         } else if( p_showNav ) { //Show Nav
-            tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START + 3, 2, tilecnt, 91,
+            tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START + 3, 2, tilecnt, 91,
                                   150, 64, 32, BattleSub6Pal, BattleSub6Tiles, BattleSub6TilesLen,
                                   false, false, false, OBJPRIORITY_3, true );
         }
         //BAG
-        tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START + 4, 3, tilecnt, 0,
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START + 4, 3, tilecnt, 0,
                               157, 64, 32, BattleSub4Pal, BattleSub4Tiles, BattleSub4TilesLen,
                               false, false, false, OBJPRIORITY_3, true );
         //POKEMON
-        tilecnt = loadSprite( Oam, spriteInfo, FIGHT_START + 5, 4, tilecnt, 185,
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START + 5, 4, tilecnt, 185,
                               142, 64, 32, BattleSub5Pal, BattleSub5Tiles, BattleSub5TilesLen,
                               false, false, false, OBJPRIORITY_3, true );
         //Load an icon of the PKMN, too
-        u8 oamIndex = FIGHT_START + 5;
+        u8 oamIndex = SUB_FIGHT_START + 5;
         u8 palIndex = 5;
 
         FS::drawPKMNIcon( Oam, spriteInfo, p_pkmnId, 112, 68, oamIndex, palIndex, tilecnt, true );
 
         //PreLoad A and Back buttons
 
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_A_OAM, 14, tilecnt,
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_A_OAM, palIndex, tilecnt,
                               SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                               ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
         FONT::ASpriteOamIndex = SUB_A_OAM;
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 15, tilecnt,
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, ++palIndex, tilecnt,
                               SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
                               BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, true );
 
-        //That's it
+        SUB_TILESTART = tilecnt;
+        SUB_PALSTART = palIndex;
         updateOAMSub( Oam );
     }
-    void hideBattleUISub( ) {
-        for( u8 i = 0; i < FIGHT_START + 6; ++i )
-            Oam->oamBuffer[ i ].isHidden = true;
+    void setBattleUISubVisibility( bool p_isHidden = false ) {
+        for( u8 i = 0; i <= SUB_FIGHT_START + 6; ++i )
+            Oam->oamBuffer[ i ].isHidden = p_isHidden;
         updateOAMSub( Oam );
     }
 
@@ -482,44 +493,310 @@ namespace BATTLE {
         loadBattleUITop( _battle );
         initOAMTableSub( Oam );
         drawSub( );
-        hideBattleUISub( );
+        setBattleUISubVisibility( );
         initLogScreen( );
     }
 
-    void battleUI::declareBattleMove( u8 p_pokemonPos ) {
+    void setDeclareBattleMoveSpriteVisibility( bool p_showBack, bool p_isHidden = true ) {
+        if( p_showBack )
+            Oam->oamBuffer[ SUB_Back_OAM ].isHidden = p_isHidden;
+        setBattleUISubVisibility( p_isHidden );
+    }
+
+    bool battleUI::declareBattleMove( u8 p_pokemonPos, bool p_showBack ) {
+        wchar_t wbuffer[ 100 ];
         swprintf( wbuffer, 50, L"Was soll %ls tun?", ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
         writeLogText( wbuffer );
 
-        loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId, true, false );
-
-        while( 1 ) {
-
+        loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+                         _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV.m_activatedPNav );
+        if( p_showBack ) {
+            Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
+            updateOAMSub( Oam );
         }
 
-        hideBattleUISub( );
+        touchPosition t;
+        auto& result = _battle->_battleMoves[ p_pokemonPos ][ PLAYER ];
+        while( 1 ) {
+            updateTime( false );
+            scanKeys( );
+            t = touchReadXY( );
+
+            //Accept touches that are almost on the sprite
+            if( p_showBack && t.px > 224 && t.py > 164 ) {
+                waitForTouchUp( );
+                setDeclareBattleMoveSpriteVisibility( p_showBack );
+                clearLogScreen( );
+                return false;
+
+            } else if( t.px > 74 && t.px < 181 && t.py > 81 && t.py < 125 ) {//Attacks
+                waitForTouchUp( );
+                setDeclareBattleMoveSpriteVisibility( p_showBack );
+                clearLogScreen( );
+                result.m_type = battle::battleMove::ATTACK;
+                result.m_value = chooseAttack( );
+                if( result.m_value ) {
+                    result.m_target = chooseAttackTarget( result.m_value );
+                    if( result.m_target )
+                        return true;
+                }
+                setDeclareBattleMoveSpriteVisibility( p_showBack, false );
+                writeLogText( wbuffer );
+            } else if( t.px < 58 && t.py > 162 && t.py <= 192 ) {//Bag
+                waitForTouchUp( );
+                setDeclareBattleMoveSpriteVisibility( p_showBack );
+                clearLogScreen( );
+                result.m_type = battle::battleMove::USE_ITEM;
+                result.m_value = chooseItem( );
+                if( result.m_value )
+                    return true;
+                setDeclareBattleMoveSpriteVisibility( p_showBack, false );
+                writeLogText( wbuffer );
+            } else if( !_battle->m_isWildBattle && SAV.m_activatedPNav
+                       && t.px > 95 && t.px < 152 && t.py > 152 && t.py < 178 ) {//Nav
+                waitForTouchUp( );
+                setDeclareBattleMoveSpriteVisibility( p_showBack );
+                clearLogScreen( );
+                result.m_type = battle::battleMove::USE_NAV;
+                useNav( );
+                if( result.m_value )
+                    return true;
+                setDeclareBattleMoveSpriteVisibility( p_showBack, false );
+                writeLogText( wbuffer );
+
+            } else if( _battle->m_isWildBattle && t.px > 97 && t.px < 153 && t.py > 162 && t.py < 180 ) {//Run
+                waitForTouchUp( );
+                setDeclareBattleMoveSpriteVisibility( p_showBack );
+                clearLogScreen( );
+                result.m_type = battle::battleMove::RUN;
+                if( _battle->run( ) ) {
+                    _battle->log( L"Du entkommst...[A]" );
+                    return true;
+                } else
+                    _battle->log( L"Flucht gescheitert![A]" );
+                if( result.m_value )
+                    return true;
+                setDeclareBattleMoveSpriteVisibility( p_showBack, false );
+                writeLogText( wbuffer );
+
+            } else if( t.px > 195 && t.px < 238 && t.py > 148 && t.py < 176 ) {//Pokémon
+                waitForTouchUp( );
+                setDeclareBattleMoveSpriteVisibility( p_showBack );
+                clearLogScreen( );
+                result.m_type = battle::battleMove::SWITCH;
+                result.m_value = choosePKMN( p_pokemonPos );
+                if( result.m_value )
+                    return true;
+                loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV.m_activatedPNav );
+                setDeclareBattleMoveSpriteVisibility( p_showBack, false );
+                writeLogText( wbuffer );
+            }
+        }
     }
 
-    void battleUI::declareBattleMoveChoose( ) {
+    u16 battleUI::chooseAttack( ) {
+        u8 result = 0;
+
+        writeLogText( L"Welche Attacke?" );
+
+        touchPosition t;
+        while( 42 ) {
+            updateTime( false );
+            scanKeys( );
+            t = touchReadXY( );
+
+            //Accept touches that are almost on the sprite
+            if( t.px > 224 && t.py > 164 ) { //Back
+                waitForTouchUp( );
+                result = 0;
+                break;
+            }
+        }
+
+        clearLogScreen( );
+        return result;
+    }
+
+    u8 battleUI::chooseAttackTarget( u16 p_move ) {
+        u8 result = 0;
+
+        writeLogText( L"Welches PKMN angreifen?" );
+
+        touchPosition t;
+        while( 42 ) {
+            updateTime( false );
+            scanKeys( );
+            t = touchReadXY( );
+
+            //Accept touches that are almost on the sprite
+            if( t.px > 224 && t.py > 164 ) { //Back
+                waitForTouchUp( );
+                result = 0;
+                break;
+            }
+        }
+
+        clearLogScreen( );
+        return result;
+    }
+
+    u16 battleUI::chooseItem( ) {
+        u8 result = 0;
+
+
+        touchPosition t;
+        while( 42 ) {
+            updateTime( false );
+            scanKeys( );
+            t = touchReadXY( );
+
+            //Accept touches that are almost on the sprite
+            if( t.px > 224 && t.py > 164 ) { //Back
+                waitForTouchUp( );
+                result = 0;
+                break;
+            }
+        }
+
+        clearLogScreen( );
+        return result;
+    }
+
+    void drawPKMNChoiceScreen( battle* p_battle, bool p_firstIsChosen ) {
+        Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
+
+        u16 tilecnt = 0;
+        u8  palIndex = 3;
+        u8 oamIndex = SUB_Back_OAM;
+
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 0, tilecnt,
+                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                              BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+        consoleSelect( &Bottom );
+
+        for( u8 i = 0; i < 6; ++i ) {
+            u8 x = 8 + ( i % 2 ) * 120 - ( i / 2 ) * 4,
+                y = 32 + ( i / 2 ) * 48;
+
+            if( !i || ( p_firstIsChosen && ( i == 1 ) ) ) {
+                tilecnt = loadSprite( Oam, spriteInfo, SUB_CHOICE_START + 2 * i, 1, tilecnt,
+                                      x, y, 64, 64, BattlePkmnChoice1Pal, BattlePkmnChoice1Tiles,
+                                      BattlePkmnChoice1TilesLen, false, false, false, OBJPRIORITY_2, true );
+                tilecnt = loadSprite( Oam, spriteInfo, SUB_CHOICE_START + 2 * i + 1, 1, tilecnt,
+                                      x + 64, y, 64, 64, BattlePkmnChoice2Pal, BattlePkmnChoice2Tiles,
+                                      BattlePkmnChoice2TilesLen, false, false, false, OBJPRIORITY_2, true );
+            } else {
+                tilecnt = loadSprite( Oam, spriteInfo, SUB_CHOICE_START + 2 * i, 2, tilecnt,
+                                      x, y, 64, 64, BattlePkmnChoice3Pal, BattlePkmnChoice3Tiles,
+                                      BattlePkmnChoice1TilesLen, false, false, false, OBJPRIORITY_2, true );
+                tilecnt = loadSprite( Oam, spriteInfo, SUB_CHOICE_START + 2 * i + 1, 2, tilecnt,
+                                      x + 64, y, 64, 64, BattlePkmnChoice4Pal, BattlePkmnChoice4Tiles,
+                                      BattlePkmnChoice4TilesLen, false, false, false, OBJPRIORITY_2, true );
+            }
+
+            if( i >= p_battle->_player->m_pkmnTeam->size( ) )
+                continue;
+
+            auto& acPkmn = ACPKMN2( *p_battle, i, PLAYER );
+
+            consoleSetWindow( &Bottom, ( x + 6 ) / 8, ( y + 6 ) / 8, 20, 8 );
+            if( !acPkmn.m_boxdata.m_individualValues.m_isEgg ) {
+                printf( "       Lv.%3d", acPkmn.m_Level );
+                printf( "\n%14ls\n", acPkmn.m_boxdata.m_name );
+                printf( "%14s\n\n",
+                        ITEMS::ItemList[ acPkmn.m_boxdata.m_holdItem ].getDisplayName( ).c_str( ) );
+                printf( "   %3i/%3i",
+                        acPkmn.m_stats.m_acHP,
+                        acPkmn.m_stats.m_maxHP );
+                FS::drawPKMNIcon( Oam,
+                                  spriteInfo,
+                                  acPkmn.m_boxdata.m_speciesId,
+                                  x + 4,
+                                  y - 12,
+                                  oamIndex,
+                                  palIndex,
+                                  tilecnt,
+                                  true );
+            } else {
+                printf( "\n            Ei" );
+                FS::drawEggIcon( Oam,
+                                 spriteInfo,
+                                 x + 4,
+                                 y - 12,
+                                 oamIndex,
+                                 palIndex,
+                                 tilecnt,
+                                 true );
+            }
+        }
+
+        updateOAMSub( Oam );
+    }
+
+    void undrawPKMNChoiceScreen( ) {
+        for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
+            Oam->oamBuffer[ i ].isHidden = true;
+        updateOAMSub( Oam );
+    }
+
+    /**
+     *  @returns 0 if the Pokemon shall be sent, 1 if further information was requested, 2 if the move should be displayed
+     */
+    u8 showConfirmation( u8 p_pokemonNo ) {
 
     }
 
-    void battleUI::chooseAttack( ) {
-
-    }
-
-    void battleUI::chooseItem( ) {
+    /**
+    *  @returns 0: rreturn to prvious screen, 1 view next pokémon, 2 view previous pokémon
+    */
+    u8 showDetailedInformation( POKEMON::pokemon& p_pokemon, u8 p_page ) {
 
     }
 
     u8 battleUI::choosePKMN( bool p_firstIsChosen ) {
+        u8 result = 0;
+        drawPKMNChoiceScreen( _battle, p_firstIsChosen );
+        drawSub( );
+        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
+        BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
+        BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
+        BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
+        BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
+        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)28, true, false, (u8)250 );
 
+        writeLogText( L"Welches PKMN?" );
+
+        touchPosition t;
+        while( 42 ) {
+            updateTime( false );
+            scanKeys( );
+            t = touchReadXY( );
+
+            //Accept touches that are almost on the sprite
+            if( t.px > 224 && t.py > 164 ) { //Back
+                waitForTouchUp( );
+                result = 0;
+                break;
+            }
+            for( u8 i = 0; i < _battle->_player->m_pkmnTeam->size( ); ++i ) {
+
+            }
+        }
+
+CLEAR:
+        undrawPKMNChoiceScreen( );
+        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+        consoleClear( );
+        clearLogScreen( );
+        return result;
     }
 
     void battleUI::useNav( ) {
-
+        _battle->log( L"Use Nav[A]" );
     }
 
-    void battleUI::showAttack( u8 p_moveNo ) {
+    void battleUI::showAttack( u16 p_moveNo ) {
 
     }
 
@@ -717,14 +994,31 @@ namespace BATTLE {
         while( 1 || _round++ < _maxRounds ) {
             registerParticipatedPKMN( );
 
-            if( canMove( PLAYER, 0 ) )
-                _battleUI.declareBattleMove( 0 );
-            else
+            bool p1CanMove = canMove( PLAYER, 0 );
+CHOOSE1:
+            if( p1CanMove ) {
+                _battleUI.declareBattleMove( 0, false );
+                if( _endBattle ) {
+                    endBattle( battleEnd = RUN );
+                    return ( battleEnd );
+                }
+            } else
                 log( L"[OWN1] kann nicht angreifen...[A]" );
-            if( m_battleMode == DOUBLE && canMove( PLAYER, 1 ) )
-                _battleUI.declareBattleMove( 1 );
-            else if( m_battleMode == DOUBLE )
-                log( L"[OWN2] kann nicht angreifen...[A]" );
+
+            //If 1st action is RUN, the player has no choice for a second move
+            if( _battleMoves[ 0 ][ PLAYER ].m_type != battleMove::RUN ) {
+                if( m_battleMode == DOUBLE && canMove( PLAYER, 1 ) ) {
+                    if( !_battleUI.declareBattleMove( 1, p1CanMove ) )
+                        goto CHOOSE1;
+
+                    if( _endBattle ) {
+                        endBattle( battleEnd = RUN );
+                        return ( battleEnd );
+                    }
+                } else if( m_battleMode == DOUBLE )
+                    log( L"[OWN2] kann nicht angreifen...[A]" );
+            } else
+                _battleMoves[ 1 ][ PLAYER ].m_type = battleMove::RUN;
 
             getAIMoves( );
 
@@ -1541,12 +1835,26 @@ NEXT:
 
                 u8 multiplier = ( 1 << ( hasPKRS + ( acItem == I_MACHO_BRACE ) ) );
 
-                i->m_boxdata.m_effortValues[ 0 ] += ( multiplier * ( p.m_EVYield[ 0 ] / 2 + 4 * ( acItem == I_POWER_WEIGHT ) ) );
-                i->m_boxdata.m_effortValues[ 1 ] += ( multiplier * ( p.m_EVYield[ 1 ] / 2 + 4 * ( acItem == I_POWER_BRACER ) ) );
-                i->m_boxdata.m_effortValues[ 2 ] += ( multiplier * ( p.m_EVYield[ 2 ] / 2 + 4 * ( acItem == I_POWER_BELT ) ) );
-                i->m_boxdata.m_effortValues[ 3 ] += ( multiplier * ( p.m_EVYield[ 3 ] / 2 + 4 * ( acItem == I_POWER_ANKLET ) ) );
-                i->m_boxdata.m_effortValues[ 4 ] += ( multiplier * ( p.m_EVYield[ 4 ] / 2 + 4 * ( acItem == I_POWER_LENS ) ) );
-                i->m_boxdata.m_effortValues[ 5 ] += ( multiplier * ( p.m_EVYield[ 5 ] / 2 + 4 * ( acItem == I_POWER_BAND ) ) );
+                //Check whether the PKMN can still obtain EV
+
+                u16 evsum = 0;
+                for( u8 j = 0; j < 6; ++j )
+                    evsum += i->m_boxdata.m_effortValues[ j ];
+                if( evsum >= 510 )
+                    continue;
+
+                if( i->m_boxdata.m_effortValues[ 0 ] <= u8( 252 ) )
+                    i->m_boxdata.m_effortValues[ 0 ] += ( multiplier * ( p.m_EVYield[ 0 ] / 2 + 4 * ( acItem == I_POWER_WEIGHT ) ) );
+                if( i->m_boxdata.m_effortValues[ 1 ] <= u8( 252 ) )
+                    i->m_boxdata.m_effortValues[ 1 ] += ( multiplier * ( p.m_EVYield[ 1 ] / 2 + 4 * ( acItem == I_POWER_BRACER ) ) );
+                if( i->m_boxdata.m_effortValues[ 2 ] <= u8( 252 ) )
+                    i->m_boxdata.m_effortValues[ 2 ] += ( multiplier * ( p.m_EVYield[ 2 ] / 2 + 4 * ( acItem == I_POWER_BELT ) ) );
+                if( i->m_boxdata.m_effortValues[ 3 ] <= u8( 252 ) )
+                    i->m_boxdata.m_effortValues[ 3 ] += ( multiplier * ( p.m_EVYield[ 3 ] / 2 + 4 * ( acItem == I_POWER_ANKLET ) ) );
+                if( i->m_boxdata.m_effortValues[ 4 ] <= u8( 252 ) )
+                    i->m_boxdata.m_effortValues[ 4 ] += ( multiplier * ( p.m_EVYield[ 4 ] / 2 + 4 * ( acItem == I_POWER_LENS ) ) );
+                if( i->m_boxdata.m_effortValues[ 5 ] <= u8( 252 ) )
+                    i->m_boxdata.m_effortValues[ 5 ] += ( multiplier * ( p.m_EVYield[ 5 ] / 2 + 4 * ( acItem == I_POWER_BAND ) ) );
             }
         }
 
@@ -1580,12 +1888,26 @@ NEXT:
 
                 u8 multiplier = ( 1 << ( hasPKRS + ( acItem == I_MACHO_BRACE ) ) );
 
-                acPkmn.m_boxdata.m_effortValues[ 0 ] += ( multiplier * ( p.m_EVYield[ 0 ] / 2 + 4 * ( acItem == I_POWER_WEIGHT ) ) );
-                acPkmn.m_boxdata.m_effortValues[ 1 ] += ( multiplier * ( p.m_EVYield[ 1 ] / 2 + 4 * ( acItem == I_POWER_BRACER ) ) );
-                acPkmn.m_boxdata.m_effortValues[ 2 ] += ( multiplier * ( p.m_EVYield[ 2 ] / 2 + 4 * ( acItem == I_POWER_BELT ) ) );
-                acPkmn.m_boxdata.m_effortValues[ 3 ] += ( multiplier * ( p.m_EVYield[ 3 ] / 2 + 4 * ( acItem == I_POWER_ANKLET ) ) );
-                acPkmn.m_boxdata.m_effortValues[ 4 ] += ( multiplier * ( p.m_EVYield[ 4 ] / 2 + 4 * ( acItem == I_POWER_LENS ) ) );
-                acPkmn.m_boxdata.m_effortValues[ 5 ] += ( multiplier * ( p.m_EVYield[ 5 ] / 2 + 4 * ( acItem == I_POWER_BAND ) ) );
+                //Check whether the PKMN can still obtain EV
+
+                u16 evsum = 0;
+                for( u8 j = 0; j < 6; ++j )
+                    evsum += acPkmn.m_boxdata.m_effortValues[ j ];
+                if( evsum >= 510 )
+                    continue;
+
+                if( acPkmn.m_boxdata.m_effortValues[ 0 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 0 ] += ( multiplier * ( p.m_EVYield[ 0 ] / 2 + 4 * ( acItem == I_POWER_WEIGHT ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 1 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 1 ] += ( multiplier * ( p.m_EVYield[ 1 ] / 2 + 4 * ( acItem == I_POWER_BRACER ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 2 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 2 ] += ( multiplier * ( p.m_EVYield[ 2 ] / 2 + 4 * ( acItem == I_POWER_BELT ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 3 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 3 ] += ( multiplier * ( p.m_EVYield[ 3 ] / 2 + 4 * ( acItem == I_POWER_ANKLET ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 4 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 4 ] += ( multiplier * ( p.m_EVYield[ 4 ] / 2 + 4 * ( acItem == I_POWER_LENS ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 5 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 5 ] += ( multiplier * ( p.m_EVYield[ 5 ] / 2 + 4 * ( acItem == I_POWER_BAND ) ) );
 
                 //Check for level-advancing
 
@@ -1744,6 +2066,10 @@ NEXT:
                 log( wbuffer );
                 break;
             }
+            case BATTLE::battle::RUN:
+            {
+                break;
+            }
             default:
                 log( L"Der Kampf endet.[A]" );
                 break;
@@ -1798,6 +2124,12 @@ NEXT:
                 m_weather = NO_WEATHER;
             }
         }
+    }
+
+    bool battle::run( ) {
+        //Check whether run is succesful -- TODO
+        _endBattle = true;
+        return true;
     }
 
     //////////////////////////////////////////////////////////////////////////

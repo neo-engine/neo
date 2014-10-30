@@ -145,15 +145,15 @@ namespace BATTLE {
         void    init( );
         void    trainerIntro( );
 
-        void    declareBattleMove( u8 p_pokemonPos );
+        bool    declareBattleMove( u8 p_pokemonPos, bool p_showBack );
 
-        void    declareBattleMoveChoose( );
-        void    chooseAttack( );
-        void    chooseItem( );
+        u16     chooseAttack( );
+        u8      chooseAttackTarget( u16 p_moveNo );
+        u16     chooseItem( );
         u8      choosePKMN( bool p_firstIsChosen );
         void    useNav( );
 
-        void    showAttack( u8 p_moveNo );
+        void    showAttack( u16 p_moveNo );
         void    updateHP( bool p_opponent, u8 p_pokemonPos );
         void    applyEXPChanges( );
         void    updateStats( bool p_opponent, u8 p_pokemonPos );
@@ -244,6 +244,8 @@ namespace BATTLE {
         bool        _restoreItem;
         bool        _allowMegaEvolution;
         u8          _weatherLength;
+
+        bool        _endBattle = false;
 
         battleScript _weatherEffects[ 9 ] = {
             battleScript( ),
@@ -383,6 +385,7 @@ namespace BATTLE {
 
         friend  u16 initStsBalls( bool p_bottom, battle* p_battle, u16& p_tilecnt );
         friend void loadSpritesSub( battle* p_battle );
+        friend void drawPKMNChoiceScreen( battle* p_battle, bool p_firstIsChosen );
 
         enum weather {
             NO_WEATHER = 0,
@@ -405,7 +408,8 @@ namespace BATTLE {
             ROUND_LIMIT = 0,
             OPPONENT_WON = -1,
             PLAYER_WON = 1,
-            NONE = 2
+            NONE = 2,
+            RUN = 3
         };
 
         bool        m_distributeEXP;
@@ -439,7 +443,7 @@ namespace BATTLE {
 
         void        getAIMoves( );
         bool        canMove( bool p_opponent, u8 p_pokemonPos );
-        void        run( );
+        bool        run( );
 
         void        registerParticipatedPKMN( );
         void        distributeEXP( bool p_opponent, u8 p_pokemonPos );
