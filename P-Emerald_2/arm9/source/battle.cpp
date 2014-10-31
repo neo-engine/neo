@@ -73,6 +73,8 @@
 #include "Choice_1.h"
 #include "Choice_2.h"
 #include "Choice_3.h"
+#include "Choice_4.h"
+#include "Choice_5.h"
 
 #include "BattleBall1.h" //Normal
 #include "BattleBall2.h" //Statused
@@ -84,6 +86,10 @@
 #include "mug_001_2.h"
 #include "TestBattleBack.h"
 #include "Border.h"
+
+
+#include "memo.h"
+#include "atks.h"
 
 #include "BattlePkmnChoice1.h"
 #include "BattlePkmnChoice2.h"
@@ -141,55 +147,58 @@ namespace BATTLE {
     // BEGIN BATTLE_UI
     //////////////////////////////////////////////////////////////////////////
 
+#define BG_PAL( p_sub ) ( ( p_sub ) ? BG_PALETTE_SUB : BG_PALETTE )
+#define BG_BMP( p_sub ) ( ( p_sub ) ? BG_BMP_RAM_SUB( 1 ) : BG_BMP_RAM( 1 ) )
+
     void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big ) {
         if( p_big )
             displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 20, 24 );
         else
             displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 8, 12 );
     }
-    void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR ) {
+    void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR, bool p_sub ) {
         p_HP = std::max( std::min( (u16)101, p_HP ), u16( 0 ) );
         u16 factor = std::max( 1, p_outerR / 15 );
         if( p_HP > 100 ) {
-            BG_PALETTE[ p_freecolor1 ] = GREEN;
+            BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
             for( u16 i = 0; i < factor * 100; ++i )
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
                 u8 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
+                ( (color *)( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
                 //printf("%i %i; ",nx,ny);
                 }
         } else {
-            BG_PALETTE[ p_freecolor2 ] = NORMAL_;
+            BG_PAL( p_sub )[ p_freecolor2 ] = NORMAL_;
             for( u16 i = factor * 100 - factor*p_HPstart; i < factor*p_HP; ++i ) {
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
                     u8 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                    ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
+                    ( (color *)( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
                     if( i == factor * 50 )
-                        BG_PALETTE[ p_freecolor1 ] = YELLOW;
+                        BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
                     if( i == factor * 80 )
-                        BG_PALETTE[ p_freecolor1 ] = RED;
+                        BG_PAL( p_sub )[ p_freecolor1 ] = RED;
                 }
                 if( p_delay )
                     swiWaitForVBlank( );
             }
         }
     }
-    void battleUI::displayEP( u16 p_EPstart, u16 p_EP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR ) {
+    void battleUI::displayEP( u16 p_EPstart, u16 p_EP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR, bool p_sub ) {
         u16 factor = std::max( 1, p_outerR / 15 );
         if( p_EPstart >= 100 || p_EP > 100 ) {
-            BG_PALETTE[ p_freecolor1 ] = NORMAL_;
+            BG_PAL( p_sub )[ p_freecolor1 ] = NORMAL_;
             for( u16 i = 0; i < factor * 100; ++i )
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
                 u16 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
+                ( (color *)BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
                 //printf("%i %i; ",nx,ny);
                 }
         } else {
-            BG_PALETTE[ p_freecolor2 ] = ICE;
+            BG_PAL( p_sub )[ p_freecolor2 ] = ICE;
             for( u16 i = p_EPstart*factor; i <= p_EP*factor; ++i ) {
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
                     u16 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                    ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
+                    ( (color *)BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
                 }
                 if( p_delay )
                     swiWaitForVBlank( );
@@ -584,7 +593,7 @@ namespace BATTLE {
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::SWITCH;
-                result.m_value = choosePKMN( p_pokemonPos );
+                result.m_value = choosePKMN( p_pokemonPos + ( _battle->m_battleMode == battle::DOUBLE ) );
                 if( result.m_value )
                     return true;
                 loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
@@ -663,6 +672,7 @@ namespace BATTLE {
         return result;
     }
 
+    u8 firstMoveSwitchTarget = 0;
     void drawPKMNChoiceScreen( battle* p_battle, bool p_firstIsChosen ) {
         Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
 
@@ -675,11 +685,14 @@ namespace BATTLE {
                               BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
         consoleSelect( &Bottom );
 
+        if( p_battle->m_battleMode == battle::DOUBLE && p_battle->_battleMoves[ 0 ][ PLAYER ].m_type == battle::battleMove::SWITCH )
+            firstMoveSwitchTarget = p_battle->_battleMoves[ 0 ][ PLAYER ].m_value;
+
         for( u8 i = 0; i < 6; ++i ) {
             u8 x = 8 + ( i % 2 ) * 120 - ( i / 2 ) * 4,
                 y = 32 + ( i / 2 ) * 48;
 
-            if( !i || ( p_firstIsChosen && ( i == 1 ) ) ) {
+            if( !i || ( p_firstIsChosen && ( i == 1 ) ) || i == firstMoveSwitchTarget ) {
                 tilecnt = loadSprite( Oam, spriteInfo, SUB_CHOICE_START + 2 * i, 1, tilecnt,
                                       x, y, 64, 64, BattlePkmnChoice1Pal, BattlePkmnChoice1Tiles,
                                       BattlePkmnChoice1TilesLen, false, false, false, OBJPRIORITY_2, true );
@@ -741,20 +754,219 @@ namespace BATTLE {
     }
 
     /**
-     *  @returns 0 if the Pokemon shall be sent, 1 if further information was requested, 2 if the move should be displayed
+     *  @returns 0 if the Pokemon shall be sent, 1 if further information was requested, 2 if the moves should be displayed, 3 if the previous screen shall be shown
      */
-    u8 showConfirmation( u8 p_pokemonNo ) {
+    u8 showConfirmation( POKEMON::pokemon& p_pokemon, bool p_alreadySent, bool p_alreadyChosen ) {
+        drawSub( );
+        Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
+        u16 tilecnt = 0;
+        u8  palIndex = 4;
+        u8 oamIndex = SUB_Back_OAM + 1;
 
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 0, tilecnt,
+                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                              BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+
+        consoleSelect( &Bottom );
+
+        u8 x = 104, y = 48;
+
+        if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+            if( !FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+                32, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) )
+                FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+                32, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
+            consoleSetWindow( &Bottom, 13, 7, 20, 8 );
+            if( !p_alreadySent && !p_alreadyChosen )
+                printf( "   AUSSENDEN" );
+            else if( !p_alreadyChosen )
+                printf( "Bereits im Kampf" );
+            else
+                printf( "Schon ausgew\x84""hlt" );
+            printf( "\n----------------\n%11ls %c\n%11s\n\nLv.%3i %3i/%3iKP",
+                    p_pokemon.m_boxdata.m_name,
+                    GENDER( p_pokemon ),
+                    ITEMS::ItemList[ p_pokemon.m_boxdata.m_holdItem ].getDisplayName( ).c_str( ),
+                    p_pokemon.m_Level,
+                    p_pokemon.m_stats.m_acHP,
+                    p_pokemon.m_stats.m_maxHP );
+        } else {
+            consoleSetWindow( &Bottom, 8, 11, 16, 10 );
+            printf( "  Ein Ei kann\n nicht k\x84""mpfen!" );
+            x = 64;
+            y = 64;
+        }
+        //Switch
+        tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 2, tilecnt,
+                              x, y, 64, 64, Choice_4Pal, Choice_4Tiles,
+                              Choice_4TilesLen, false, false, false, OBJPRIORITY_2, true );
+        tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 2, tilecnt,
+                              x + 64, y, 64, 64, Choice_4Pal, Choice_5Tiles,
+                              Choice_5TilesLen, false, false, false, OBJPRIORITY_2, true );
+
+        if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+            //Status
+            tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 2, tilecnt,
+                                  28, 128, 64, 32, Choice_1Pal, Choice_1Tiles,
+                                  Choice_1TilesLen, false, false, false, OBJPRIORITY_2, true );
+            tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 2, tilecnt,
+                                  60, 128, 64, 32, Choice_3Pal, Choice_3Tiles,
+                                  Choice_3TilesLen, false, false, false, OBJPRIORITY_2, true );
+            tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 3, tilecnt,
+                                  20, 128, 32, 32, memoPal, memoTiles,
+                                  memoTilesLen, false, false, false, OBJPRIORITY_1, true );
+            consoleSetWindow( &Bottom, 7, 17, 20, 8 );
+            printf( "BERICHT" );
+
+            //Moves
+            tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 2, tilecnt,
+                                  132, 128, 64, 32, Choice_1Pal, Choice_1Tiles,
+                                  Choice_1TilesLen, false, false, false, OBJPRIORITY_2, true );
+            tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 2, tilecnt,
+                                  164, 128, 64, 32, Choice_3Pal, Choice_3Tiles,
+                                  Choice_3TilesLen, false, false, false, OBJPRIORITY_2, true );
+            tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 4, tilecnt,
+                                  200, 128, 32, 32, atksPal, atksTiles,
+                                  atksTilesLen, false, false, false, OBJPRIORITY_1, true );
+            consoleSetWindow( &Bottom, 17, 17, 20, 8 );
+            printf( "ATTACKEN" );
+        }
+        updateOAMSub( Oam );
+
+        touchPosition t;
+        while( 42 ) {
+            updateTime( false );
+            scanKeys( );
+            t = touchReadXY( );
+
+            //Accept touches that are almost on the sprite
+            if( t.px > 224 && t.py > 164 ) { //Back
+                battleUI::waitForTouchUp( );
+                return 3;
+            }
+            if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+                if( !p_alreadySent && !p_alreadyChosen && t.px > x && t.px < x + 128 && t.py > y && t.py < y + 64 ) { //Send
+                    battleUI::waitForTouchUp( );
+                    return 0;
+                }
+                if( t.px > 20 && t.px < 124 && t.py > 128 && t.py < 160 ) { //Info
+                    battleUI::waitForTouchUp( );
+                    return 1;
+                }
+                if( t.px > 132 && t.px < 232 && t.py > 128 && t.py < 160 ) { //Moves
+                    battleUI::waitForTouchUp( );
+                    return 2;
+                }
+            }
+        }
     }
 
     /**
-    *  @returns 0: rreturn to prvious screen, 1 view next pokémon, 2 view previous pokémon
+    *  @param p_page: 0 show moves, 1 show status
+    *  @returns 0: return to prvious screen, 1 view next pokémon, 2 view previous pokémon
     */
     u8 showDetailedInformation( POKEMON::pokemon& p_pokemon, u8 p_page ) {
+        drawSub( );
+        Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
+        u16 tilecnt = 0;
+        u8  palIndex = 3;
+        u8 oamIndex = SUB_Back_OAM;
 
+        POKEMON::PKMNDATA::pokemonData data;
+        POKEMON::PKMNDATA::getAll( p_pokemon.m_boxdata.m_speciesId, data );
+
+
+
+        u16 exptype = data.m_expType;
+
+        if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+            if( !FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+                160, 8, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) )
+                FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+                160, 8, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
+            consoleSetWindow( &Bottom, 22, 0, 12, 2 );
+            printf( "EP(%3i%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
+                    * 100 / ( POKEMON::EXP[ p_pokemon.m_Level ][ exptype ] - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
+                    p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
+            BATTLE::battleUI::displayHP( 100, 101, 190, 40, 246, 247, false, 50, 56, true );
+            BATTLE::battleUI::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 190, 40, 246, 247, false, 50, 56, true );
+
+            BATTLE::battleUI::displayEP( 100, 101, 190, 40, 248, 249, false, 59, 62, true );
+            BATTLE::battleUI::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
+                                         * 100 / ( POKEMON::EXP[ p_pokemon.m_Level ][ exptype ] - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
+                                         190, 40, 248, 249, false, 59, 62, true );
+
+
+            BG_PALETTE_SUB[ 254 ] = RGB15( 31, 0, 0 );
+            BG_PALETTE_SUB[ 255 ] = RGB15( 0, 0, 31 );
+            BG_PALETTE_SUB[ 253 ] = RGB15( 31, 31, 31 );
+            cust_font.setColor( 253, 1 );
+
+            consoleSetWindow( &Bottom, 20, 1, 13, 2 );
+
+            cust_font.printString( &( p_pokemon.m_boxdata.m_name[ 0 ] ), 150, 2, true );
+            s8 G = p_pokemon.m_boxdata.gender( );
+
+            cust_font.printChar( '/', 234, 2, true );
+            if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 ) {
+                if( G == 1 ) {
+                    cust_font.setColor( 255, 1 );
+                    cust_font.printChar( 136, 246, 8, true );
+                } else {
+                    cust_font.setColor( 254, 1 );
+                    cust_font.printChar( 137, 246, 8, true );
+                }
+            }
+            cust_font.setColor( 253, 1 );
+
+            cust_font.printString( POKEMON::PKMNDATA::getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 160, 16, true );
+
+            if( p_pokemon.m_boxdata.getItem( ) ) {
+                cust_font.printString( "Item", 2, 176, true );
+                cust_font.setColor( 252, 1 );
+                cust_font.setColor( 0, 2 );
+                //char buffer[ 200 ];
+                sprintf( buffer, "%s: %s", ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
+                         ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].getShortDescription( true ).c_str( ) );
+                cust_font.printString( buffer, 50, 159, true );
+                FS::drawItemIcon( OamTop, spriteInfoTop, ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].m_itemName, 2, 152, oamIndex, palIndex, tilecnt, true );
+                updateOAM( OamTop );
+            } else {
+                cust_font.setColor( 252, 1 );
+                cust_font.setColor( 0, 2 );
+                cust_font.printString( ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].getDisplayName( ).c_str( ), 56, 168, true );
+            }
+            cust_font.setColor( 251, 1 );
+            cust_font.setColor( 252, 2 );
+        } else {
+            BG_PALETTE_SUB[ 253 ] = RGB15( 31, 31, 31 );
+            cust_font.setColor( 253, 1 );
+
+            cust_font.printString( "Ei", 150, 2, true );
+            cust_font.printChar( '/', 234, 2, true );
+            cust_font.printString( "Ei", 160, 18, true );
+            cust_font.setColor( 251, 1 );
+        }
+
+        touchPosition t;
+        while( 42 ) {
+            updateTime( false );
+            scanKeys( );
+            t = touchReadXY( );
+
+            //Accept touches that are almost on the sprite
+            if( t.px > 224 && t.py > 164 ) { //Back
+                battleUI::waitForTouchUp( );
+                return 0;
+            }
+        }
     }
 
     u8 battleUI::choosePKMN( bool p_firstIsChosen ) {
+START:
+        undrawPKMNChoiceScreen( );
+        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+        consoleClear( );
         u8 result = 0;
         drawPKMNChoiceScreen( _battle, p_firstIsChosen );
         drawSub( );
@@ -779,12 +991,47 @@ namespace BATTLE {
                 result = 0;
                 break;
             }
-            for( u8 i = 0; i < _battle->_player->m_pkmnTeam->size( ); ++i ) {
+            auto teamSz = _battle->_player->m_pkmnTeam->size( );
+            for( u8 i = 0; i < teamSz; ++i ) {
+                u8 x = Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].x;
+                u8 y = Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].y;
 
+                if( t.px > x && t.px < x + 96 && t.py > y && t.py < y + 42 ) {
+                    waitForTouchUp( );
+                    result = i;
+                    u8 tmp = 1;
+                    auto& acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                    undrawPKMNChoiceScreen( );
+                    consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+                    consoleClear( );
+                    while( tmp = showConfirmation( acPkmn, !result || ( result == p_firstIsChosen ), result == firstMoveSwitchTarget ) ) {
+                        if( tmp == 3 )
+                            break;
+                        while( tmp = showDetailedInformation( acPkmn, tmp - 1 ) ) {
+                            if( tmp == 1 )
+                                result = ( result + 1 ) % teamSz;
+                            if( tmp == 2 )
+                                result = ( result + teamSz - 1 ) % teamSz;
+                        }
+                        acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                        undrawPKMNChoiceScreen( );
+                        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+                        consoleClear( );
+                    }
+                    if( !tmp )
+                        goto CLEAR;
+                    goto START;
+                }
             }
         }
 
 CLEAR:
+        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
+        BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
+        BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
+        BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
+        BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
+
         undrawPKMNChoiceScreen( );
         consoleSetWindow( &Bottom, 0, 0, 32, 24 );
         consoleClear( );

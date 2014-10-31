@@ -131,16 +131,16 @@ namespace BATTLE {
 
     public:
         static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, bool big = false ); //HP in %
-        static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR, u8 outerR ); //HP in %
-        static void displayEP( u16 EPstart, u16 EP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR = 14, u8 outerR = 15 );
+        static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR, u8 outerR, bool p_sub = false ); //HP in %
+        static void displayEP( u16 EPstart, u16 EP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR = 14, u8 outerR = 15, bool p_sub = false );
 
-        void    initLogScreen( );
-        void    clearLogScreen( );
-        void    setLogTextColor( u16 p_color );
-        void    setLogText2Color( u16 p_color );
-        void    writeLogText( const std::wstring& p_message );
-        void    waitForTouchUp( );
-        void    waitForKeyUp( int p_key );
+        static void initLogScreen( );
+        static void clearLogScreen( );
+        static void setLogTextColor( u16 p_color );
+        static void setLogText2Color( u16 p_color );
+        static void writeLogText( const std::wstring& p_message );
+        static void waitForTouchUp( );
+        static void waitForKeyUp( int p_key );
 
         void    init( );
         void    trainerIntro( );
