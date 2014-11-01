@@ -546,10 +546,15 @@ namespace BATTLE {
 SHOW_ATTACK:
                 result.m_value = chooseAttack( p_pokemonPos );
                 if( result.m_value ) {
-                    result.m_target = chooseAttackTarget( p_pokemonPos, result.m_value );
-                    if( result.m_target )
+                    if( _battle->m_battleMode == battle::DOUBLE ) {
+                        result.m_target = chooseAttackTarget( p_pokemonPos, result.m_value );
+                        if( result.m_target )
+                            return true;
+                        goto SHOW_ATTACK;
+                    } else {
+                        result.m_target = 0;
                         return true;
-                    goto SHOW_ATTACK;
+                    }
                 }
                 loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                                  _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV.m_activatedPNav );
@@ -677,12 +682,12 @@ NEXT:
                 if( t.px >= x && t.py >= y && t.px <= x + w && t.py <= y + h ) {
                     auto acMove = AttackList[ acPkmn.m_boxdata.m_moves[ i ] ];
 
-                    FONT::putrec( x, y, x + w, y + h,
+                    FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
                                   true, false, BG_PALETTE_SUB[ 240 + i ] );
-                    FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
+                    FONT::putrec( x + 8, y + 6, x + w - 2, y + h,
                                   true, false, WHITE_IDX );
 
-                    cust_font.printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
+                    cust_font.printString( acMove->m_moveName.c_str( ), x + 9, y + 9, true );
 
                     while( 1 ) {
                         swiWaitForVBlank( );
@@ -728,8 +733,121 @@ END:
 
         writeLogText( L"Welches PKMN angreifen?" );
 
+        Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
+
+        u16 tilecnt = 0;
+        u8  palIndex = 3;
+        u8 oamIndex = SUB_Back_OAM;
+
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 0, tilecnt,
+                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                              BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+        consoleSelect( &Bottom );
+
+        bool selected[ 4 ] = { false };
+        bool neverTarget[ 4 ] = { false };
+        bool selectionExists = true;
+
+        auto acMove = AttackList[ p_move ];
+
+        switch( acMove->m_moveAffectsWhom ) {
+            case move::BOTH_FOES:
+            case move::OPPONENTS_FIELD:
+                neverTarget[ 2 ] = neverTarget[ 3 ] = true;
+                selected[ 0 ] = selected[ 1 ] = true;
+                break;
+            case move::BOTH_FOES_AND_PARTNER:
+                neverTarget[ p_pokemonPos + 2 ] = true;
+                selected[ 0 ] = selected[ 1 ]
+                    = selected[ 3 - p_pokemonPos ] = true;
+                break;
+            case move::OWN_FIELD:
+                neverTarget[ 0 ] = neverTarget[ 1 ] = true;
+                selected[ 1 ] = selected[ 0 ] = true;
+                break;
+            case move::SELECTED:
+                neverTarget[ 2 + p_pokemonPos ] = true;
+                selectionExists = false;
+                break;
+            case move::USER:
+                selected[ 2 + p_pokemonPos ] = true;
+                neverTarget[ 0 ] = neverTarget[ 1 ]
+                    = neverTarget[ 3 - p_pokemonPos ] = true;
+                break;
+            default:
+            case move::RANDOM:
+                selected[ 2 ] = selected[ 3 ] = true;
+                selected[ 0 ] = selected[ 1 ] = true;
+                break;
+        }
+
+        if( selected[ 2 ] && selected[ 3 ] )
+            FONT::putrec( 112 + 1, 130 + 1, 112 + 16 + 2, 146 + 1, true, false, BLACK_IDX );
+        if( selected[ 0 ] && selected[ 1 ] )
+            FONT::putrec( 120 + 1, 82 + 1, 120 + 16 + 2, 98 + 1, true, false, BLACK_IDX );
+
+        if( selected[ 1 ] && selected[ 2 ] )
+            FONT::putrec( 56 + 1, 106 + 1, 56 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
+        if( selected[ 3 ] && selected[ 0 ] )
+            FONT::putrec( 176 + 1, 106 + 1, 176 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
+
+        _battle->_battleMoves[ p_pokemonPos ][ PLAYER ].m_target = 1 | 2 | 4 | 8;
+        _battle->calcDamage( p_pokemonPos, 16 );
+        u16 avrgDamage[ 2 ][ 2 ];
+        for( u8 i = 0; i < 4; ++i )
+            avrgDamage[ i % 2 ][ i / 2 ] = _battle->_acDamage[ i % 2 ][ 1 / 2 ];
+        _battle->calcDamage( p_pokemonPos, 17 );
+        for( u8 i = 0; i < 4; ++i )
+            avrgDamage[ i % 2 ][ i / 2 ] = ( avrgDamage[ i % 2 ][ i / 2 ] + _battle->_acDamage[ i % 2 ][ 1 / 2 ] ) / 2;
+
+        for( u8 i = 0; i < 4; ++i ) {
+            u8 aI = i % 2;
+            if( 1 - ( i / 2 ) )
+                aI = ( 1 - aI );
+
+            auto acPkmn = ACPKMN2( *_battle, aI, 1 - ( i / 2 ) );
+
+            u8 w = 104, h = 32;
+            u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
+
+            FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
+                          true, false, BLACK_IDX );
+            FONT::putrec( x, y, x + w, y + h,
+                          true, false, selected[ i ] ? RED_IDX : GRAY_IDX );
+            FONT::putrec( x + 7, y + 5, x + w - 4, y + h - 1,
+                          true, false, BLACK_IDX );
+            FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
+                          true, false, WHITE_IDX );
+
+            if( neverTarget[ i ] )
+                continue;
+
+            if( acPkmn.m_stats.m_acHP ) {
+                cust_font.printString( acPkmn.m_boxdata.m_name, x + 7, y + 7, true );
+                FS::drawPKMNIcon( Oam, spriteInfo, acPkmn.m_boxdata.m_speciesId,
+                                  x - 10, y - 23, oamIndex, palIndex, tilecnt );
+                consoleSelect( &Bottom );
+                consoleSetWindow( &Bottom, x / 8, 12 + ( i / 2 ) * 6, 20, 2 );
+                if( acMove->m_moveHitType != move::STAT )
+                    printf( "%4hu Schaden", avrgDamage[ aI ][ 1 - ( i / 2 ) ] );
+            }
+        }
+
+        if( selected[ 2 ] && selected[ 3 ] )
+            FONT::putrec( 112, 130, 112 + 16, 146, true, false, RED_IDX );
+        if( selected[ 0 ] && selected[ 1 ] )
+            FONT::putrec( 120, 82, 120 + 16, 98, true, false, RED_IDX );
+
+        if( selected[ 1 ] && selected[ 2 ] )
+            FONT::putrec( 56, 106, 56 + 16, 122, true, false, RED_IDX );
+        if( selected[ 3 ] && selected[ 0 ] )
+            FONT::putrec( 176, 106, 176 + 16, 122, true, false, RED_IDX );
+
+        updateOAMSub( Oam );
+
         touchPosition t;
         while( 42 ) {
+NEXT:
             updateTime( false );
             scanKeys( );
             t = touchReadXY( );
@@ -740,9 +858,100 @@ END:
                 result = 0;
                 break;
             }
-        }
 
+            for( u8 i = 0; i < 4; ++i ) {
+                u8 aI = i % 2;
+                if( 1 - ( i / 2 ) )
+                    aI = ( 1 - aI );
+
+                auto acPkmn = ACPKMN2( *_battle, aI, 1 - ( i / 2 ) );
+                if( neverTarget[ i ] || !acPkmn.m_stats.m_acHP )
+                    continue;
+                if( !selected[ i ] && selectionExists )
+                    continue;
+
+                u8 w = 104, h = 32;
+                u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
+                if( t.px >= x && t.py >= y && t.px <= x + w && t.py <= y + h ) {
+
+                    for( u8 j = 0; j < 4; ++j ) {
+                        if( !selected[ j ] && j != i )
+                            continue;
+
+                        u8 aJ = j % 2;
+                        if( 1 - ( j / 2 ) )
+                            aJ = ( 1 - aJ );
+
+                        auto acPkmnJ = ACPKMN2( *_battle, aJ, 1 - ( i / 2 ) );
+
+                        u8 nx = 16 - 8 * ( j / 2 ) + ( w + 16 ) * ( j % 2 ), ny = 74 + ( h + 16 ) * ( j / 2 );
+                        FONT::putrec( nx + 1, ny + 1, nx + w + 2, ny + h + 1,
+                                      true, false, RED_IDX );
+                        FONT::putrec( nx + 8, ny + 6, nx + w - 2, ny + h,
+                                      true, false, WHITE_IDX );
+                        if( neverTarget[ j ] || !acPkmnJ.m_stats.m_acHP )
+                            continue;
+                        cust_font.printString( acPkmnJ.m_boxdata.m_name, nx + 9, ny + 9, true );
+                    }
+
+                    while( 1 ) {
+                        swiWaitForVBlank( );
+                        updateTime( false );
+                        scanKeys( );
+                        auto t = touchReadXY( );
+                        if( t.px == 0 && t.py == 0 )
+                            break;
+                        if( !( t.px >= x && t.py >= y && t.px <= x + w && t.py <= y + h ) ) {
+                            for( u8 j = 0; j < 4; ++j ) {
+                                if( !selected[ j ] && j != i )
+                                    continue;
+
+                                u8 aJ = j % 2;
+                                if( 1 - ( j / 2 ) )
+                                    aJ = ( 1 - aJ );
+
+                                auto acPkmnJ = ACPKMN2( *_battle, aJ, 1 - ( i / 2 ) );
+
+                                u8 nx = 16 - 8 * ( j / 2 ) + ( w + 16 ) * ( j % 2 ), ny = 74 + ( h + 16 ) * ( j / 2 );
+
+                                FONT::putrec( nx + 1, ny + 1, nx + w + 2, ny + h + 1,
+                                              true, false, BLACK_IDX );
+                                FONT::putrec( nx, ny, nx + w, ny + h,
+                                              true, false, selected[ i ] ? RED_IDX : GRAY_IDX );
+                                FONT::putrec( nx + 7, ny + 5, nx + w - 4, ny + h - 1,
+                                              true, false, BLACK_IDX );
+                                FONT::putrec( nx + 6, ny + 4, nx + w - 6, ny + h - 2,
+                                              true, false, WHITE_IDX );
+                                if( neverTarget[ j ] || !acPkmnJ.m_stats.m_acHP )
+                                    continue;
+                                cust_font.printString( acPkmnJ.m_boxdata.m_name, nx + 7, ny + 7, true );
+                            }
+                            goto NEXT;
+                        }
+                    }
+
+                    selected[ i ] = true;
+
+                    if( acMove->m_moveAffectsWhom == move::RANDOM
+                        || ( acMove->m_moveAffectsWhom & move::OWN_FIELD )
+                        || ( acMove->m_moveAffectsWhom & move::OPPONENTS_FIELD )
+                        || ( acMove->m_moveAffectsWhom == move::DEPENDS_ON_ATTACK ) )
+                        result = 0;
+                    result = selected[ 2 ] | ( selected[ 3 ] << 1 ) | ( selected[ 1 ] << 2 ) | ( selected[ 0 ] << 3 );
+                    goto END;
+                }
+            }
+        }
+END:
+        drawSub( );
+        initColors( );
         clearLogScreen( );
+        for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
+            Oam->oamBuffer[ i ].isHidden = true;
+        updateOAMSub( Oam );
+        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+        consoleClear( );
+
         return result;
     }
 
