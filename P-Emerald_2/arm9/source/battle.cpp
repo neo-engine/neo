@@ -959,6 +959,11 @@ END:
     u16 battleUI::chooseItem( u8 p_pokemonPos ) {
         u8 result = 0;
 
+        // Make this a debug battle end
+
+        _battle->_round = 0;
+        _battle->_maxRounds = -1;
+
 
         touchPosition t;
         while( 42 ) {
@@ -1633,7 +1638,16 @@ ST:
     }
 
     void battleUI::dinit( ) {
-
+        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+        consoleSelect( &Bottom );
+        consoleClear( );
+        drawSub( );
+        initOAMTableSub( Oam );
+        initMainSprites( Oam, spriteInfo );
+        setMainSpriteVisibility( false );
+        Oam->oamBuffer[ 8 ].isHidden = true;
+        Oam->oamBuffer[ 0 ].isHidden = true;
+        Oam->oamBuffer[ 1 ].isHidden = false;
     }
 
 #undef OWN_HP_1
@@ -2890,7 +2904,7 @@ NEXT:
     }
 
     /**
-     *  @brief Swithes the PKMN
+     *  @brief Switches the PKMN
      *  @param p_opponent: true iff the next opponent's PKMN is requested.
      *  @param p_pokemonPos: Position of the target PKMN (0 or 1)
      *  @param p_newPokemonPos: The new PKMNs current Pos
