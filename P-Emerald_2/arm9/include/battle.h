@@ -153,7 +153,7 @@ namespace BATTLE {
         u8      choosePKMN( bool p_firstIsChosen );
         void    useNav( );
 
-        void    showAttack( u16 p_moveNo );
+        void    showAttack( u8 p_moveNo );
         void    updateHP( bool p_opponent, u8 p_pokemonPos );
         void    applyEXPChanges( );
         void    updateStats( bool p_opponent, u8 p_pokemonPos );

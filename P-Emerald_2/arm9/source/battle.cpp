@@ -59,6 +59,7 @@
 #include "Back.h"
 #include "A.h"
 #include "map2d.h"
+#include "messageBox.h"
 
 #include "Battle1.h"
 #include "Battle2.h"
@@ -1552,8 +1553,13 @@ CLEAR:
         _battle->log( L"Use Nav[A]" );
     }
 
-    void battleUI::showAttack( u16 p_moveNo ) {
+    void battleUI::showAttack( u8 p_moveNo ) {
+        // Attack animation here
 
+        auto acMove = _battle->_battleMoves[ 0 ][ 0 ];
+        for( u8 i = 0; i < 4; ++i )
+            if( _battle->_moveOrder[ i / 2 ][ i % 2 ] == p_moveNo )
+                acMove = _battle->_battleMoves[ i / 2 ][ i % 2 ];
     }
 
     void battleUI::updateHP( bool p_opponent, u8 p_pokemonPos ) {
@@ -1581,7 +1587,49 @@ CLEAR:
     }
 
     void battleUI::learnMove( u8 p_pokemonPos, u16 p_move ) {
+        auto& acPkmn = ACPKMN2( *_battle, p_pokemonPos, PLAYER );
+        if( acPkmn.m_boxdata.m_moves[ 3 ] ) {
+            std::swprintf( wbuffer, 50, L"%ls kann nun\n%s erlernen![A][CLEAR]Aber %ls kennt\nbereits 4 Attacken.[A]",
+                           acPkmn.m_boxdata.m_name,
+                           AttackList[ p_move ]->m_moveName.c_str( ),
+                           acPkmn.m_boxdata.m_name );
+            _battle->log( wbuffer );
+            yesNoBox yn;
+ST:
+            if( yn.getResult( "Soll eine Attacke\nvergessen werden?" ) ) {
+                auto res = chooseAttack( p_pokemonPos );
+                if( !res ) {
+                    std::sprintf( buffer, "Aufgeben %s zu erlernen?", AttackList[ p_move ]->m_moveName.c_str( ) );
+                    if( !yn.getResult( buffer ) )
+                        goto ST;
+                } else {
+                    std::swprintf( wbuffer, 100, L"%ls vergisst %s[A]\nund erlernt %s![A]",
+                                   acPkmn.m_boxdata.m_name,
+                                   AttackList[ res ]->m_moveName.c_str( ),
+                                   AttackList[ p_move ]->m_moveName.c_str( ) );
+                    _battle->log( wbuffer );
 
+                    for( u8 i = 0; i < 4; ++i )
+                        if( acPkmn.m_boxdata.m_moves[ i ] == res )
+                            acPkmn.m_boxdata.m_moves[ i ] = p_move;
+                }
+            } else {
+                std::sprintf( buffer, "Aufgeben %s zu erlernen?", AttackList[ p_move ]->m_moveName.c_str( ) );
+                if( !yn.getResult( buffer ) )
+                    goto ST;
+            }
+        } else {
+            for( u8 i = 0; i < 4; ++i ) {
+                if( !acPkmn.m_boxdata.m_moves[ i ] ) {
+                    acPkmn.m_boxdata.m_moves[ i ] = p_move;
+                    std::swprintf( wbuffer, 50, L"%ls erlernt %s![A]",
+                                   acPkmn.m_boxdata.m_name,
+                                   AttackList[ p_move ]->m_moveName.c_str( ) );
+                    _battle->log( wbuffer );
+                    break;
+                }
+            }
+        }
     }
 
     void battleUI::dinit( ) {
