@@ -90,6 +90,8 @@
 
 #include "memo.h"
 #include "atks.h"
+#include "Up.h"
+#include "Down.h"
 
 #include "BattlePkmnChoice1.h"
 #include "BattlePkmnChoice2.h"
@@ -150,6 +152,12 @@ namespace BATTLE {
 #define BG_PAL( p_sub ) ( ( p_sub ) ? BG_PALETTE_SUB : BG_PALETTE )
 #define BG_BMP( p_sub ) ( ( p_sub ) ? BG_BMP_RAM_SUB( 1 ) : BG_BMP_RAM( 1 ) )
 
+#define WHITE_IDX (u8(250))
+#define GRAY_IDX (u8(251))
+#define BLACK_IDX (u8(252))
+#define RED_IDX (u8(253))
+#define BLUE_IDX (u8(254))
+
     void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big ) {
         if( p_big )
             displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 20, 24 );
@@ -205,35 +213,35 @@ namespace BATTLE {
             }
         }
     }
+    void initColors( ) {
 
-    void battleUI::initLogScreen( ) {
         cust_font.setColor( 0, 0 );
-        cust_font.setColor( 251, 1 );
-        cust_font.setColor( 252, 2 );
+        cust_font.setColor( GRAY_IDX, 1 );
+        cust_font.setColor( BLACK_IDX, 2 );
         cust_font2.setColor( 0, 0 );
-        cust_font2.setColor( 253, 1 );
-        cust_font2.setColor( 254, 2 );
+        cust_font2.setColor( GRAY_IDX, 1 );
+        cust_font2.setColor( BLACK_IDX, 2 );
 
-        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
-        BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE[ 251 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE[ 252 ] = RGB15( 3, 3, 3 );
-        BG_PALETTE[ 253 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE[ 254 ] = RGB15( 31, 31, 31 );
-        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
+        BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
+        BG_PALETTE_SUB[ GRAY_IDX ] = STEEL;
+        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
+        BG_PALETTE_SUB[ RED_IDX ] = RED;
+        BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;
+    }
+    void battleUI::initLogScreen( ) {
+        initColors( );
+        BG_PALETTE[ WHITE_IDX ] = WHITE;
+        BG_PALETTE[ GRAY_IDX ] = STEEL;
+        BG_PALETTE[ BLACK_IDX ] = BLACK;
+        BG_PALETTE[ RED_IDX ] = RED;
+        BG_PALETTE[ BLUE_IDX ] = BLUE;
+        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, WHITE_IDX );
     }
     void battleUI::clearLogScreen( ) {
-        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
+        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, WHITE_IDX );
     }
     void battleUI::setLogTextColor( u16 p_color ) {
-        BG_PALETTE_SUB[ 251 ] = BG_PALETTE[ 251 ] = p_color;
-    }
-    void battleUI::setLogText2Color( u16 p_color ) {
-        BG_PALETTE_SUB[ 253 ] = BG_PALETTE[ 253 ] = p_color;
+        BG_PALETTE_SUB[ GRAY_IDX ] = BG_PALETTE[ GRAY_IDX ] = p_color;
     }
     void battleUI::writeLogText( const std::wstring& p_message ) {
         cust_font.printMBString( p_message.c_str( ), 8, 8, true );
@@ -316,6 +324,8 @@ namespace BATTLE {
     u16 SUB_TILESTART = 0;
     u8 SUB_PALSTART = 0;
 
+
+
     u16 initStsBalls( bool p_bottom, battle* p_battle, u16& p_tilecnt ) {
         //Own PKMNs PBs
         for( u8 i = 0; i < 6; ++i ) {
@@ -393,19 +403,8 @@ namespace BATTLE {
 
         u16 tilecnt = 0;
         tilecnt = initStsBalls( true, p_battle, tilecnt );
+        initColors( );
 
-        cust_font.setColor( 0, 0 );
-        cust_font.setColor( 251, 1 );
-        cust_font.setColor( 252, 2 );
-        cust_font2.setColor( 0, 0 );
-        cust_font2.setColor( 253, 1 );
-        cust_font2.setColor( 254, 2 );
-
-        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE_SUB[ 251 ] = RGB15( 30, 30, 30 );
-        BG_PALETTE_SUB[ 252 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
         sprintf( buffer, "Eine Herausforderung von\n%s %s!",
                  trainerclassnames[ p_battle->_opponent->m_trainerClass ],
                  p_battle->_opponent->m_battleTrainerName );
@@ -609,6 +608,8 @@ namespace BATTLE {
         u8 result = 0;
 
         writeLogText( L"Welche Attacke?" );
+
+
 
         touchPosition t;
         while( 42 ) {
@@ -863,21 +864,39 @@ namespace BATTLE {
 
     /**
     *  @param p_page: 1 show moves, 0 show status
-    *  @returns 0: return to prvious screen, 1 view next pokémon, 2 view previous pokémon
+    *  @returns 0: return to prvious screen, 1 view next pokémon, 2 view previous pokémon, 3 switch screen
     */
     u8 showDetailedInformation( POKEMON::pokemon& p_pokemon, u8 p_page ) {
         drawSub( );
+        initColors( );
         undrawPKMNChoiceScreen( );
         consoleSetWindow( &Bottom, 0, 0, 32, 24 );
         consoleClear( );
         Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
         u16 tilecnt = 0;
-        u8  palIndex = 3;
+        u8  palIndex = 4;
         u8 oamIndex = SUB_Back_OAM;
 
         tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 0, tilecnt,
                               SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
                               BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+        // ^ Sprite
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM - 2, 1, tilecnt,
+                              SCREEN_WIDTH - 22, SCREEN_HEIGHT - 28 - 24, 32, 32, UpPal,
+                              UpTiles, UpTilesLen, false, false, false, OBJPRIORITY_1, true );
+        // v Sprite
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM - 3, 2, tilecnt,
+                              SCREEN_WIDTH - 28 - 24, SCREEN_HEIGHT - 22, 32, 32, DownPal,
+                              DownTiles, DownTilesLen, false, false, false, OBJPRIORITY_1, true );
+        if( !p_page ) {
+            tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM - 4, 3, tilecnt,
+                                  SCREEN_WIDTH - 20, SCREEN_HEIGHT - 28 - 48, 32, 32, atksPal,
+                                  atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_2, true );
+        } else {
+            tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM - 5, 3, tilecnt,
+                                  SCREEN_WIDTH - 20, SCREEN_HEIGHT - 28 - 48, 32, 32, memoPal,
+                                  memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_2, true );
+        }
 
         POKEMON::PKMNDATA::pokemonData data;
         POKEMON::PKMNDATA::getAll( p_pokemon.m_boxdata.m_speciesId, data );
@@ -902,12 +921,7 @@ namespace BATTLE {
             BATTLE::battleUI::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
                                          * 100 / ( POKEMON::EXP[ p_pokemon.m_Level ][ exptype ] - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
                                          46, 40, 247, 248, false, 59, 62, true );
-
-            BG_PALETTE_SUB[ 254 ] = RGB15( 31, 0, 0 );
-            BG_PALETTE_SUB[ 255 ] = RGB15( 0, 0, 31 );
-            BG_PALETTE_SUB[ 253 ] = RGB15( 31, 31, 31 );
-            BG_PALETTE_SUB[ 251 ] = RGB15( 31, 31, 31 );
-            cust_font.setColor( 253, 1 );
+            cust_font.setColor( WHITE_IDX, 1 );
 
             consoleSetWindow( &Bottom, 2, 1, 13, 2 );
 
@@ -917,14 +931,14 @@ namespace BATTLE {
 
             if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 ) {
                 if( G == 1 ) {
-                    cust_font.setColor( 255, 1 );
+                    cust_font.setColor( BLUE_IDX, 1 );
                     cust_font.printChar( 136, 100, 102, true );
                 } else {
-                    cust_font.setColor( 254, 1 );
+                    cust_font.setColor( RED_IDX, 1 );
                     cust_font.printChar( 137, 100, 102, true );
                 }
             }
-            cust_font.setColor( 253, 1 );
+            cust_font.setColor( WHITE_IDX, 1 );
 
             cust_font.printString( POKEMON::PKMNDATA::getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
 
@@ -933,101 +947,156 @@ namespace BATTLE {
                                        24, 124, true );
                 FS::drawItemIcon( Oam, spriteInfo, ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].m_itemName, 0, 116, oamIndex, palIndex, tilecnt, true );
             } else {
-                cust_font.setColor( 252, 1 );
-                cust_font.setColor( 0, 2 );
+                cust_font.setColor( BLACK_IDX, 1 );
+                cust_font.setColor( GRAY_IDX, 2 );
                 cust_font.printString( ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].getDisplayName( ).c_str( ), 24, 124, true );
             }
-            cust_font.setColor( 251, 1 );
-            cust_font.setColor( 252, 2 );
+            cust_font.setColor( GRAY_IDX, 1 );
+            cust_font.setColor( BLACK_IDX, 2 );
+
+            if( data.m_types[ 0 ] == data.m_types[ 1 ] )
+                drawTypeIcon( Oam, spriteInfo, oamIndex, palIndex, tilecnt, data.m_types[ 0 ], 224, 0, true );
+            else {
+                drawTypeIcon( Oam, spriteInfo, oamIndex, palIndex, tilecnt, data.m_types[ 0 ], 192, 0, true );
+                drawTypeIcon( Oam, spriteInfo, oamIndex, palIndex, tilecnt, data.m_types[ 1 ], 224, 0, true );
+            }
 
         } else {
-            BG_PALETTE_SUB[ 253 ] = RGB15( 31, 31, 31 );
-            cust_font.setColor( 253, 1 );
-
+            cust_font.setColor( WHITE_IDX, 1 );
             cust_font.printString( "Ei /", 16, 96, true );
             cust_font.printString( "Ei", 24, 110, true );
-            cust_font.setColor( 251, 1 );
+            cust_font.setColor( GRAY_IDX, 1 );
         }
-
 
         //Here starts the page specific stuff
 
-        if( p_page == 1 ) { //Moves
 
+        if( p_pokemon.m_boxdata.m_individualValues.m_isEgg )
+            p_page = 0;
+
+        if( p_page == 1 ) { //Moves
+            for( u8 i = 0; i < 4; ++i ) {
+                if( p_pokemon.m_boxdata.m_moves[ i ] ) {
+                    auto acMove = AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ];
+
+                    BG_PALETTE_SUB[ 240 + i ] = POKEMON::PKMNDATA::getColor( acMove->m_moveType );
+
+                    u8 w = 104, h = 32;
+                    u8 x = 144 - 8 * i, y = 18 + ( h + 8 ) * i;
+
+                    FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
+                                  true, false, BLACK_IDX );
+                    FONT::putrec( x, y, x + w, y + h,
+                                  true, false, BG_PALETTE_SUB[ 240 + i ] );
+                    FONT::putrec( x + 7, y + 5, x + w - 4, y + h - 1,
+                                  true, false, BLACK_IDX );
+                    FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
+                                  true, false, WHITE_IDX );
+
+                    cust_font.printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
+                    drawTypeIcon( Oam, spriteInfo, oamIndex, palIndex, tilecnt, acMove->m_moveType, x - 10, y - 7, true );
+                    consoleSelect( &Bottom );
+                    consoleSetWindow( &Bottom, x / 8, 5 + 5 * i, 20, 2 );
+                    printf( "%6hhu/%2hhu AP",
+                            p_pokemon.m_boxdata.m_acPP[ 0 ],
+                            AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_movePP * ( ( 5 + p_pokemon.m_boxdata.m_ppup.m_Up1 ) / 5 ) );
+                }
+            }
         } else { //Status
             if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+                cust_font.setColor( WHITE_IDX, 1 );
                 sprintf( buffer, "KP                     %3i", p_pokemon.m_stats.m_maxHP );
                 cust_font.printString( buffer, 130, 16, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 1.2 )
-                    cust_font.setColor( 254, 1 );
-                else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 0.8 )
-                    cust_font.setColor( 255, 1 );
-                else
-                    cust_font.setColor( 251, 1 );
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 1.2 ) {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( RED_IDX, 2 );
+                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 0.8 ) {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( BLUE_IDX, 2 );
+                } else {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( GRAY_IDX, 2 );
+                }
                 sprintf( buffer, "ANG                   %3i", p_pokemon.m_stats.m_Atk );
                 cust_font.printString( buffer, 126, 41, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 1.2 )
-                    cust_font.setColor( 254, 1 );
-                else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 0.8 )
-                    cust_font.setColor( 255, 1 );
-                else
-                    cust_font.setColor( 251, 1 );
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 1.2 ) {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( RED_IDX, 2 );
+                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 0.8 ) {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( BLUE_IDX, 2 );
+                } else {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( GRAY_IDX, 2 );
+                }
                 sprintf( buffer, "VER                   %3i", p_pokemon.m_stats.m_Def );
                 cust_font.printString( buffer, 124, 58, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 1.2 )
-                    cust_font.setColor( 254, 1 );
-                else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 0.8 )
-                    cust_font.setColor( 255, 1 );
-                else
-                    cust_font.setColor( 251, 1 );
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 1.2 ) {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( RED_IDX, 2 );
+                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 0.8 ) {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( BLUE_IDX, 2 );
+                } else {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( GRAY_IDX, 2 );
+                }
                 sprintf( buffer, "INI                   \xC3\xC3""%3i", p_pokemon.m_stats.m_Spd );
                 cust_font.printString( buffer, 122, 75, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 1.2 )
-                    cust_font.setColor( 254, 1 );
-                else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 0.8 )
-                    cust_font.setColor( 255, 1 );
-                else
-                    cust_font.setColor( 251, 1 );
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 1.2 ) {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( RED_IDX, 2 );
+                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 0.8 ) {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( BLUE_IDX, 2 );
+                } else {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( GRAY_IDX, 2 );
+                }
                 sprintf( buffer, "SAN                   %3i", p_pokemon.m_stats.m_SAtk );
                 cust_font.printString( buffer, 120, 92, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 1.2 )
-                    cust_font.setColor( 254, 1 );
-                else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 0.8 )
-                    cust_font.setColor( 255, 1 );
-                else
-                    cust_font.setColor( 251, 1 );
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 1.2 ) {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( RED_IDX, 2 );
+                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 0.8 ) {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( BLUE_IDX, 2 );
+                } else {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( GRAY_IDX, 2 );
+                }
                 sprintf( buffer, "SVE                   %3i", p_pokemon.m_stats.m_SDef );
                 cust_font.printString( buffer, 118, 109, true );
 
-                FONT::putrec( (u8)158, (u8)18, u8( 158 + 68 ), u8( 18 + 12 ), true, false, (u8)251 );
+                FONT::putrec( (u8)158, (u8)18, u8( 158 + 68 ), u8( 18 + 12 ), true, false, WHITE_IDX );
 
-                FONT::putrec( (u8)158, (u8)18, u8( 158 + ( 68.0*p_pokemon.m_boxdata.IVget( 0 ) / 31 ) ), u8( 18 + 6 ), true, false, u8( 7 * 16 - 1 ) );
-                FONT::putrec( (u8)158, u8( 18 + 6 ), u8( 158 + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ 0 ] / 255 ) ), u8( 18 + 12 ), true, false, u8( 7 * 16 - 1 ) );
+                FONT::putrec( (u8)158, (u8)18, u8( 158 + ( 68.0*p_pokemon.m_boxdata.IVget( 0 ) / 31 ) ), u8( 18 + 6 ), true, false, GRAY_IDX );
+                FONT::putrec( (u8)158, u8( 18 + 6 ), u8( 158 + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ 0 ] / 255 ) ), u8( 18 + 12 ), true, false, GRAY_IDX );
 
                 for( int i = 1; i < 6; ++i ) {
                     FONT::putrec( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
                                   u8( 156 - 2 * i + 68 ), u8( 26 + 12 + ( 17 * i ) ),
-                                  true, false, (u8)251 );
+                                  true, false, WHITE_IDX );
                     FONT::putrec( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
                                   u8( 156 - 2 * i + ( 68.0*p_pokemon.m_boxdata.IVget( i ) / 31 ) ),
                                   u8( 26 + 6 + ( 17 * i ) ),
-                                  true, false, u8( ( 7 + i ) * 16 - 1 ) );
+                                  true, false, GRAY_IDX );
                     FONT::putrec( u8( 156 - 2 * i ), u8( 26 + 6 + ( 17 * i ) ),
                                   u8( 156 - 2 * i + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ i ] / 255 ) ),
-                                  u8( 26 + 12 + ( 17 * i ) ), true, false, u8( ( 7 + i ) * 16 - 1 ) );
+                                  u8( 26 + 12 + ( 17 * i ) ), true, false, GRAY_IDX );
                 }
 
                 //Ability
                 auto acAbility = ability( p_pokemon.m_boxdata.m_ability );
 
-                BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-                FONT::putrec( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false, 250 );
-                cust_font.setColor( 253, 2 );
+                FONT::putrec( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false, WHITE_IDX );
+                cust_font.setColor( WHITE_IDX, 2 );
+                cust_font.setColor( BLACK_IDX, 1 );
                 u8 nlCnt = 0;
                 auto nStr = FS::breakString( acAbility.m_flavourText, cust_font, 250 );
                 for( auto c : nStr )
@@ -1035,10 +1104,11 @@ namespace BATTLE {
                         nlCnt++;
                 cust_font.printString( nStr.c_str( ), 0, 138, true, u8( 16 - 2 * nlCnt ) );
                 cust_font.printString( acAbility.m_abilityName.c_str( ), 5, 176, true );
-                cust_font.setColor( 254, 1 );
-                cust_font.setColor( 255, 2 );
-
+                cust_font.setColor( GRAY_IDX, 1 );
+                cust_font.setColor( BLACK_IDX, 2 );
             } else {
+                cust_font.setColor( WHITE_IDX, 1 );
+                cust_font.setColor( BLACK_IDX, 2 );
                 if( p_pokemon.m_boxdata.m_steps > 10 ) {
                     cust_font.printString( "Was da wohl", 16 * 8, 50, true );
                     cust_font.printString( "schlüpfen wird?", 16 * 8, 70, true );
@@ -1055,6 +1125,8 @@ namespace BATTLE {
                     cust_font.printString( "Bald ist es", 16 * 8, 100, true );
                     cust_font.printString( "wohl soweit.", 16 * 8, 120, true );
                 }
+                cust_font.setColor( GRAY_IDX, 1 );
+                cust_font.setColor( BLACK_IDX, 2 );
             }
         }
 
@@ -1063,11 +1135,33 @@ namespace BATTLE {
             updateTime( false );
             scanKeys( );
             t = touchReadXY( );
+            u32 p = keysHeld( );
 
             //Accept touches that are almost on the sprite
             if( t.px > 224 && t.py > 164 ) { //Back
                 battleUI::waitForTouchUp( );
                 return 0;
+            } else if( p & KEY_UP ) {
+                battleUI::waitForKeyUp( KEY_UP );
+                return 2;
+            } else if( p & KEY_DOWN ) {
+                battleUI::waitForKeyUp( KEY_DOWN );
+                return 1;
+            } else if( p & KEY_RIGHT ) {
+                battleUI::waitForKeyUp( KEY_RIGHT );
+                return 3;
+            } else if( p & KEY_LEFT ) {
+                battleUI::waitForKeyUp( KEY_LEFT );
+                return 3;
+            } else if( ( sqrt( sq( 16 + SCREEN_HEIGHT - 28 - 24 - t.py ) + sq( 16 + SCREEN_WIDTH - 22 - t.px ) ) <= 16 ) ) {
+                battleUI::waitForTouchUp( );
+                return 2;
+            } else if( ( sqrt( sq( 16 + SCREEN_WIDTH - 28 - 24 - t.px ) + sq( 16 + SCREEN_HEIGHT - 22 - t.py ) ) <= 16 ) ) {
+                battleUI::waitForTouchUp( );
+                return 1;
+            } else if( ( sqrt( sq( 16 + SCREEN_HEIGHT - 28 - 48 - t.py ) + sq( 16 + SCREEN_WIDTH - 20 - t.px ) ) <= 16 ) ) {
+                battleUI::waitForTouchUp( );
+                return 3;
             }
         }
     }
@@ -1080,12 +1174,8 @@ START:
         u8 result = 0;
         drawPKMNChoiceScreen( _battle, p_firstIsChosen );
         drawSub( );
-        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
-        BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)28, true, false, (u8)250 );
+        initColors( );
+        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)28, true, false, WHITE_IDX );
 
         writeLogText( L"Welches PKMN?" );
 
@@ -1110,18 +1200,29 @@ START:
                     waitForTouchUp( );
                     result = i;
                     u8 tmp = 1;
-                    auto& acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                    auto acPkmn = ACPKMN2( *_battle, result, PLAYER );
                     undrawPKMNChoiceScreen( );
                     consoleSetWindow( &Bottom, 0, 0, 32, 24 );
                     consoleClear( );
                     while( tmp = showConfirmation( acPkmn, !result || ( result == p_firstIsChosen ), result == firstMoveSwitchTarget ) ) {
                         if( tmp == 3 )
                             break;
+                        u8 oldtmp = tmp - 1;
                         while( tmp = showDetailedInformation( acPkmn, tmp - 1 ) ) {
-                            if( tmp == 1 )
-                                result = ( result + 1 ) % teamSz;
-                            if( tmp == 2 )
+                            if( tmp == 1 ) {
+                                result = ( result + 1 + oldtmp ) % teamSz;
+                                acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                                tmp = 1 + oldtmp;
+                            }
+                            if( tmp == 2 ) {
                                 result = ( result + teamSz - 1 ) % teamSz;
+                                acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                                tmp = 1 + oldtmp;
+                            }
+                            if( tmp == 3 ) {
+                                tmp = 1 + ( 1 - oldtmp );
+                                oldtmp = tmp - 1;
+                            }
                         }
                         acPkmn = ACPKMN2( *_battle, result, PLAYER );
                         undrawPKMNChoiceScreen( );
@@ -1136,16 +1237,11 @@ START:
         }
 
 CLEAR:
-        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
-        BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-
         undrawPKMNChoiceScreen( );
         consoleSetWindow( &Bottom, 0, 0, 32, 24 );
         consoleClear( );
         clearLogScreen( );
+        initColors( );
         return result;
     }
 

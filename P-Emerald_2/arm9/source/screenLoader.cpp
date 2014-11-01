@@ -786,24 +786,23 @@ void screenLoader::run_pkmn( ) {
             swiWaitForVBlank( );
             while( 1 ) {
                 initSub( -1 );
-                s8 p = SAV.m_PkmnTeam[ acIn ].draw( );
-                /*                if( p & KEY_X ) {
-                                    for( u8 i = 0; i < max; i++ ) {
-                                    consoleSetWindow( &Top, positions[ i ][ 0 ], positions[ i ][ 1 ], 2, 2 );
-                                    consoleClear( );
-                                    }
-                                    clearTop( );
-                                    initSub( -1 );
+                u32 p = SAV.m_PkmnTeam[ acIn ].draw( );
+                if( p & KEY_X ) {
+                    for( u8 i = 0; i < max; i++ ) {
+                        consoleSetWindow( &Top, positions[ i ][ 0 ], positions[ i ][ 1 ], 2, 2 );
+                        consoleClear( );
+                    }
+                    clearTop( );
+                    initSub( -1 );
 
-                                    initOAMTableSub( Oam );
-                                    initMainSprites( Oam, spriteInfo );
-                                    setSpriteVisibility( back, true );
-                                    setSpriteVisibility( save, false );
-                                    setMainSpriteVisibility( false );
-                                    Oam->oamBuffer[ 8 ].isHidden = true;
-                                    return;
-                                    } else*/
-                if( p & KEY_B ) {
+                    initOAMTableSub( Oam );
+                    initMainSprites( Oam, spriteInfo );
+                    setSpriteVisibility( back, true );
+                    setSpriteVisibility( save, false );
+                    setMainSpriteVisibility( false );
+                    Oam->oamBuffer[ 8 ].isHidden = true;
+                    return;
+                } else if( p & KEY_B ) {
                     initOAMTableSub( Oam );
                     initMainSprites( Oam, spriteInfo );
                     setSpriteVisibility( back, false );

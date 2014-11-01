@@ -472,7 +472,7 @@ u8: 8;
         void            evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
         bool            canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
 
-        s8              draw( );
+        u32             draw( );
         void            drawPage( u8 p_Page, PrintConsole* p_Top, PrintConsole* p_Bottom, bool p_newpok );
 
         bool      operator==( const pokemon& p_other ) const;

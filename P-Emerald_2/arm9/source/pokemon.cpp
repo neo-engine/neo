@@ -897,7 +897,7 @@ namespace POKEMON {
         }
     }
     extern bool drawInfoSub( u16* p_layer, u16 p_pkmnId );
-    s8 pokemon::draw( ) {
+    u32 pokemon::draw( ) {
 
         // Load bitmap to top background
         FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNInfoScreen" );
