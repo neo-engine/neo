@@ -512,6 +512,7 @@ namespace BATTLE {
         setBattleUISubVisibility( p_isHidden );
     }
 
+    u8 firstMoveSwitchTarget = 0;
     bool battleUI::declareBattleMove( u8 p_pokemonPos, bool p_showBack ) {
         wchar_t wbuffer[ 100 ];
         swprintf( wbuffer, 50, L"Was soll %ls tun?", ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
@@ -672,7 +673,6 @@ namespace BATTLE {
         return result;
     }
 
-    u8 firstMoveSwitchTarget = 0;
     void drawPKMNChoiceScreen( battle* p_battle, bool p_firstIsChosen ) {
         Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
 
@@ -862,90 +862,200 @@ namespace BATTLE {
     }
 
     /**
-    *  @param p_page: 0 show moves, 1 show status
+    *  @param p_page: 1 show moves, 0 show status
     *  @returns 0: return to prvious screen, 1 view next pokémon, 2 view previous pokémon
     */
     u8 showDetailedInformation( POKEMON::pokemon& p_pokemon, u8 p_page ) {
         drawSub( );
+        undrawPKMNChoiceScreen( );
+        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+        consoleClear( );
         Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
         u16 tilecnt = 0;
         u8  palIndex = 3;
         u8 oamIndex = SUB_Back_OAM;
 
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 0, tilecnt,
+                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                              BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+
         POKEMON::PKMNDATA::pokemonData data;
         POKEMON::PKMNDATA::getAll( p_pokemon.m_boxdata.m_speciesId, data );
 
-
+        updateOAMSub( Oam );
 
         u16 exptype = data.m_expType;
 
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
             if( !FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                160, 8, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) )
+                16, 8, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) )
                 FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                160, 8, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
-            consoleSetWindow( &Bottom, 22, 0, 12, 2 );
+                16, 8, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
+            consoleSetWindow( &Bottom, 4, 0, 12, 2 );
             printf( "EP(%3i%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
                     * 100 / ( POKEMON::EXP[ p_pokemon.m_Level ][ exptype ] - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
                     p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
-            BATTLE::battleUI::displayHP( 100, 101, 190, 40, 246, 247, false, 50, 56, true );
-            BATTLE::battleUI::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 190, 40, 246, 247, false, 50, 56, true );
+            BATTLE::battleUI::displayHP( 100, 101, 46, 40, 245, 246, false, 50, 56, true );
+            BATTLE::battleUI::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 40, 245, 246, false, 50, 56, true );
 
-            BATTLE::battleUI::displayEP( 100, 101, 190, 40, 248, 249, false, 59, 62, true );
+            BATTLE::battleUI::displayEP( 100, 101, 46, 40, 247, 248, false, 59, 62, true );
             BATTLE::battleUI::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
                                          * 100 / ( POKEMON::EXP[ p_pokemon.m_Level ][ exptype ] - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
-                                         190, 40, 248, 249, false, 59, 62, true );
-
+                                         46, 40, 247, 248, false, 59, 62, true );
 
             BG_PALETTE_SUB[ 254 ] = RGB15( 31, 0, 0 );
             BG_PALETTE_SUB[ 255 ] = RGB15( 0, 0, 31 );
             BG_PALETTE_SUB[ 253 ] = RGB15( 31, 31, 31 );
+            BG_PALETTE_SUB[ 251 ] = RGB15( 31, 31, 31 );
             cust_font.setColor( 253, 1 );
 
-            consoleSetWindow( &Bottom, 20, 1, 13, 2 );
+            consoleSetWindow( &Bottom, 2, 1, 13, 2 );
 
-            cust_font.printString( &( p_pokemon.m_boxdata.m_name[ 0 ] ), 150, 2, true );
+            std::swprintf( wbuffer, 20, L"%ls /", p_pokemon.m_boxdata.m_name );
+            cust_font.printString( wbuffer, 16, 96, true );
             s8 G = p_pokemon.m_boxdata.gender( );
 
-            cust_font.printChar( '/', 234, 2, true );
             if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 ) {
                 if( G == 1 ) {
                     cust_font.setColor( 255, 1 );
-                    cust_font.printChar( 136, 246, 8, true );
+                    cust_font.printChar( 136, 100, 102, true );
                 } else {
                     cust_font.setColor( 254, 1 );
-                    cust_font.printChar( 137, 246, 8, true );
+                    cust_font.printChar( 137, 100, 102, true );
                 }
             }
             cust_font.setColor( 253, 1 );
 
-            cust_font.printString( POKEMON::PKMNDATA::getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 160, 16, true );
+            cust_font.printString( POKEMON::PKMNDATA::getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
-                cust_font.printString( "Item", 2, 176, true );
-                cust_font.setColor( 252, 1 );
-                cust_font.setColor( 0, 2 );
-                //char buffer[ 200 ];
-                sprintf( buffer, "%s: %s", ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
-                         ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].getShortDescription( true ).c_str( ) );
-                cust_font.printString( buffer, 50, 159, true );
-                FS::drawItemIcon( OamTop, spriteInfoTop, ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].m_itemName, 2, 152, oamIndex, palIndex, tilecnt, true );
-                updateOAM( OamTop );
+                cust_font.printString( ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
+                                       24, 124, true );
+                FS::drawItemIcon( Oam, spriteInfo, ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].m_itemName, 0, 116, oamIndex, palIndex, tilecnt, true );
             } else {
                 cust_font.setColor( 252, 1 );
                 cust_font.setColor( 0, 2 );
-                cust_font.printString( ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].getDisplayName( ).c_str( ), 56, 168, true );
+                cust_font.printString( ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].getDisplayName( ).c_str( ), 24, 124, true );
             }
             cust_font.setColor( 251, 1 );
             cust_font.setColor( 252, 2 );
+
         } else {
             BG_PALETTE_SUB[ 253 ] = RGB15( 31, 31, 31 );
             cust_font.setColor( 253, 1 );
 
-            cust_font.printString( "Ei", 150, 2, true );
-            cust_font.printChar( '/', 234, 2, true );
-            cust_font.printString( "Ei", 160, 18, true );
+            cust_font.printString( "Ei /", 16, 96, true );
+            cust_font.printString( "Ei", 24, 110, true );
             cust_font.setColor( 251, 1 );
+        }
+
+
+        //Here starts the page specific stuff
+
+        if( p_page == 1 ) { //Moves
+
+        } else { //Status
+            if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+                sprintf( buffer, "KP                     %3i", p_pokemon.m_stats.m_maxHP );
+                cust_font.printString( buffer, 130, 16, true );
+
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 1.2 )
+                    cust_font.setColor( 254, 1 );
+                else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 0.8 )
+                    cust_font.setColor( 255, 1 );
+                else
+                    cust_font.setColor( 251, 1 );
+                sprintf( buffer, "ANG                   %3i", p_pokemon.m_stats.m_Atk );
+                cust_font.printString( buffer, 126, 41, true );
+
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 1.2 )
+                    cust_font.setColor( 254, 1 );
+                else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 0.8 )
+                    cust_font.setColor( 255, 1 );
+                else
+                    cust_font.setColor( 251, 1 );
+                sprintf( buffer, "VER                   %3i", p_pokemon.m_stats.m_Def );
+                cust_font.printString( buffer, 124, 58, true );
+
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 1.2 )
+                    cust_font.setColor( 254, 1 );
+                else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 0.8 )
+                    cust_font.setColor( 255, 1 );
+                else
+                    cust_font.setColor( 251, 1 );
+                sprintf( buffer, "INI                   \xC3\xC3""%3i", p_pokemon.m_stats.m_Spd );
+                cust_font.printString( buffer, 122, 75, true );
+
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 1.2 )
+                    cust_font.setColor( 254, 1 );
+                else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 0.8 )
+                    cust_font.setColor( 255, 1 );
+                else
+                    cust_font.setColor( 251, 1 );
+                sprintf( buffer, "SAN                   %3i", p_pokemon.m_stats.m_SAtk );
+                cust_font.printString( buffer, 120, 92, true );
+
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 1.2 )
+                    cust_font.setColor( 254, 1 );
+                else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 0.8 )
+                    cust_font.setColor( 255, 1 );
+                else
+                    cust_font.setColor( 251, 1 );
+                sprintf( buffer, "SVE                   %3i", p_pokemon.m_stats.m_SDef );
+                cust_font.printString( buffer, 118, 109, true );
+
+                FONT::putrec( (u8)158, (u8)18, u8( 158 + 68 ), u8( 18 + 12 ), true, false, (u8)251 );
+
+                FONT::putrec( (u8)158, (u8)18, u8( 158 + ( 68.0*p_pokemon.m_boxdata.IVget( 0 ) / 31 ) ), u8( 18 + 6 ), true, false, u8( 7 * 16 - 1 ) );
+                FONT::putrec( (u8)158, u8( 18 + 6 ), u8( 158 + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ 0 ] / 255 ) ), u8( 18 + 12 ), true, false, u8( 7 * 16 - 1 ) );
+
+                for( int i = 1; i < 6; ++i ) {
+                    FONT::putrec( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
+                                  u8( 156 - 2 * i + 68 ), u8( 26 + 12 + ( 17 * i ) ),
+                                  true, false, (u8)251 );
+                    FONT::putrec( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
+                                  u8( 156 - 2 * i + ( 68.0*p_pokemon.m_boxdata.IVget( i ) / 31 ) ),
+                                  u8( 26 + 6 + ( 17 * i ) ),
+                                  true, false, u8( ( 7 + i ) * 16 - 1 ) );
+                    FONT::putrec( u8( 156 - 2 * i ), u8( 26 + 6 + ( 17 * i ) ),
+                                  u8( 156 - 2 * i + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ i ] / 255 ) ),
+                                  u8( 26 + 12 + ( 17 * i ) ), true, false, u8( ( 7 + i ) * 16 - 1 ) );
+                }
+
+                //Ability
+                auto acAbility = ability( p_pokemon.m_boxdata.m_ability );
+
+                BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
+                FONT::putrec( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false, 250 );
+                cust_font.setColor( 253, 2 );
+                u8 nlCnt = 0;
+                auto nStr = FS::breakString( acAbility.m_flavourText, cust_font, 250 );
+                for( auto c : nStr )
+                    if( c == '\n' )
+                        nlCnt++;
+                cust_font.printString( nStr.c_str( ), 0, 138, true, u8( 16 - 2 * nlCnt ) );
+                cust_font.printString( acAbility.m_abilityName.c_str( ), 5, 176, true );
+                cust_font.setColor( 254, 1 );
+                cust_font.setColor( 255, 2 );
+
+            } else {
+                if( p_pokemon.m_boxdata.m_steps > 10 ) {
+                    cust_font.printString( "Was da wohl", 16 * 8, 50, true );
+                    cust_font.printString( "schlüpfen wird?", 16 * 8, 70, true );
+                    cust_font.printString( "Es dauert wohl", 16 * 8, 100, true );
+                    cust_font.printString( "noch lange.", 16 * 8, 120, true );
+                } else if( p_pokemon.m_boxdata.m_steps > 5 ) {
+                    cust_font.printString( "Hat es sich", 16 * 8, 50, true );
+                    cust_font.printString( "gerade bewegt?", 16 * 8, 70, true );
+                    cust_font.printString( "Da tut sich", 16 * 8, 100, true );
+                    cust_font.printString( "wohl bald was.", 16 * 8, 120, true );
+                } else {
+                    cust_font.printString( "Jetzt macht es", 16 * 8, 50, true );
+                    cust_font.printString( "schon Geräusche!", 16 * 8, 70, true );
+                    cust_font.printString( "Bald ist es", 16 * 8, 100, true );
+                    cust_font.printString( "wohl soweit.", 16 * 8, 120, true );
+                }
+            }
         }
 
         touchPosition t;
@@ -1238,11 +1348,18 @@ CLEAR:
 
         initBattle( );
 
-        while( 1 || _round++ < _maxRounds ) {
+        _round = 0;
+        _maxRounds = 500;
+        while( _round++ < _maxRounds ) {
             registerParticipatedPKMN( );
 
             bool p1CanMove = canMove( PLAYER, 0 );
 CHOOSE1:
+            firstMoveSwitchTarget = 0;
+
+            _battleMoves[ 0 ][ PLAYER ] = { ( battleMove::type )0, 0, 0 };
+            _battleMoves[ 1 ][ PLAYER ] = { ( battleMove::type )0, 0, 0 };
+
             if( p1CanMove ) {
                 _battleUI.declareBattleMove( 0, false );
                 if( _endBattle ) {

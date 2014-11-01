@@ -221,6 +221,12 @@ namespace BATTLE {
             type    m_type;
             u16     m_value;
             u8      m_target;  //Bitflag: 0 Own1, 1 Own2, 2 Opp1, 3 Opp2, 4 Own Field, 5 OppField, m_target == 0 -> default target
+
+            void clear( ) {
+                m_target = 0;
+                m_type = (type)0;
+                m_value = 0;
+            }
         };
 
         battleMove  _battleMoves[ 2 ][ 2 ];
