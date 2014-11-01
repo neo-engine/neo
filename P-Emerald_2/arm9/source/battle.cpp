@@ -543,12 +543,16 @@ namespace BATTLE {
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::ATTACK;
-                result.m_value = chooseAttack( );
+SHOW_ATTACK:
+                result.m_value = chooseAttack( p_pokemonPos );
                 if( result.m_value ) {
-                    result.m_target = chooseAttackTarget( result.m_value );
+                    result.m_target = chooseAttackTarget( p_pokemonPos, result.m_value );
                     if( result.m_target )
                         return true;
+                    goto SHOW_ATTACK;
                 }
+                loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV.m_activatedPNav );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( wbuffer );
             } else if( t.px < 58 && t.py > 162 && t.py <= 192 ) {//Bag
@@ -556,7 +560,7 @@ namespace BATTLE {
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::USE_ITEM;
-                result.m_value = chooseItem( );
+                result.m_value = chooseItem( p_pokemonPos );
                 if( result.m_value )
                     return true;
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
@@ -604,15 +608,57 @@ namespace BATTLE {
         }
     }
 
-    u16 battleUI::chooseAttack( ) {
+    u16 battleUI::chooseAttack( u8 p_pokemonPos ) {
         u8 result = 0;
 
         writeLogText( L"Welche Attacke?" );
 
+        Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
 
+        u16 tilecnt = 0;
+        u8  palIndex = 3;
+        u8 oamIndex = SUB_Back_OAM;
+
+        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 0, tilecnt,
+                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                              BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+        consoleSelect( &Bottom );
+
+        auto acPkmn = ACPKMN2( *_battle, p_pokemonPos, PLAYER );
+
+        for( u8 i = 0; i < 4; ++i ) {
+            if( acPkmn.m_boxdata.m_moves[ i ] ) {
+                auto acMove = AttackList[ acPkmn.m_boxdata.m_moves[ i ] ];
+
+                BG_PALETTE_SUB[ 240 + i ] = POKEMON::PKMNDATA::getColor( acMove->m_moveType );
+
+                u8 w = 104, h = 32;
+                u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
+
+                FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
+                              true, false, BLACK_IDX );
+                FONT::putrec( x, y, x + w, y + h,
+                              true, false, BG_PALETTE_SUB[ 240 + i ] );
+                FONT::putrec( x + 7, y + 5, x + w - 4, y + h - 1,
+                              true, false, BLACK_IDX );
+                FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
+                              true, false, WHITE_IDX );
+
+                cust_font.printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
+                drawTypeIcon( Oam, spriteInfo, oamIndex, palIndex, tilecnt, acMove->m_moveType, x - 7, y - 7, true );
+                consoleSelect( &Bottom );
+                consoleSetWindow( &Bottom, x / 8, 12 + ( i / 2 ) * 6, 20, 2 );
+                printf( "%6hhu/%2hhu AP",
+                        acPkmn.m_boxdata.m_acPP[ 0 ],
+                        AttackList[ acPkmn.m_boxdata.m_moves[ 0 ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.m_ppup.m_Up1 ) / 5 ) );
+            }
+        }
+
+        updateOAMSub( Oam );
 
         touchPosition t;
         while( 42 ) {
+NEXT:
             updateTime( false );
             scanKeys( );
             t = touchReadXY( );
@@ -623,13 +669,61 @@ namespace BATTLE {
                 result = 0;
                 break;
             }
-        }
+            for( u8 i = 0; i < 4; ++i ) {
+                if( !acPkmn.m_boxdata.m_moves[ i ] )
+                    break;
+                u8 w = 104, h = 32;
+                u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
+                if( t.px >= x && t.py >= y && t.px <= x + w && t.py <= y + h ) {
+                    auto acMove = AttackList[ acPkmn.m_boxdata.m_moves[ i ] ];
 
+                    FONT::putrec( x, y, x + w, y + h,
+                                  true, false, BG_PALETTE_SUB[ 240 + i ] );
+                    FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
+                                  true, false, WHITE_IDX );
+
+                    cust_font.printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
+
+                    while( 1 ) {
+                        swiWaitForVBlank( );
+                        updateTime( false );
+                        scanKeys( );
+                        auto t = touchReadXY( );
+                        if( t.px == 0 && t.py == 0 )
+                            break;
+                        if( !( t.px >= x && t.py >= y && t.px <= x + w && t.py <= y + h ) ) {
+                            FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
+                                          true, false, BLACK_IDX );
+                            FONT::putrec( x, y, x + w, y + h,
+                                          true, false, BG_PALETTE_SUB[ 240 + i ] );
+                            FONT::putrec( x + 7, y + 5, x + w - 4, y + h - 1,
+                                          true, false, BLACK_IDX );
+                            FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
+                                          true, false, WHITE_IDX );
+
+                            cust_font.printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
+                            goto NEXT;
+                        }
+                    }
+
+                    result = acPkmn.m_boxdata.m_moves[ i ];
+                    goto END;
+                }
+            }
+        }
+END:
+        drawSub( );
+        initColors( );
         clearLogScreen( );
+        for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
+            Oam->oamBuffer[ i ].isHidden = true;
+        updateOAMSub( Oam );
+        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+        consoleClear( );
         return result;
     }
 
-    u8 battleUI::chooseAttackTarget( u16 p_move ) {
+    u8 battleUI::chooseAttackTarget( u8 p_pokemonPos, u16 p_move ) {
         u8 result = 0;
 
         writeLogText( L"Welches PKMN angreifen?" );
@@ -652,7 +746,7 @@ namespace BATTLE {
         return result;
     }
 
-    u16 battleUI::chooseItem( ) {
+    u16 battleUI::chooseItem( u8 p_pokemonPos ) {
         u8 result = 0;
 
 
