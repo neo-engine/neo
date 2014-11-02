@@ -117,7 +117,7 @@ namespace FONT {
 
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == L'\n' ) {
-                putY += FONT_HEIGHT - 5;
+                putY += FONT_HEIGHT - 2;
                 putX = p_x;
                 current_char++;
                 continue;

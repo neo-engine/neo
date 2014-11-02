@@ -62,6 +62,8 @@ extern FONT::font cust_font2;
 
 
 namespace BATTLE {
+    extern u8 firstMoveSwitchTarget;
+
     typedef battleScript::command               cmd;
     typedef battleScript::command::condition    con;
     typedef battleScript::command::value        val;
