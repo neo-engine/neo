@@ -316,21 +316,21 @@ CHOOSE1:
             }
         }
 
-        ////Sort the remaining PKMN according to their status -> No STS, STS, KO, NA
-        //std::vector<std::pair<u8, u8> > tmp;
-        //for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
-        //    tmp.push_back( std::pair<u8, u8>( ACPKMNSTS( i, PLAYER ), i ) );
-        //std::sort( tmp.begin( ), tmp.end( ) );
-        //for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
-        //    ACPOS( i, PLAYER ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
+        //Sort the remaining PKMN according to their status -> No STS, STS, KO, NA
+        std::vector<std::pair<u8, u8> > tmp;
+        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+            tmp.push_back( std::pair<u8, u8>( ACPKMNSTS( i, PLAYER ), ACPOS( i, PLAYER ) ) );
+        std::sort( tmp.begin( ), tmp.end( ) );
+        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+            ACPOS( i, PLAYER ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
 
-        ////Sort the remaining PKMN according to their status -> No STS, STS, KO, NA (For the opponent)
-        //tmp.clear( );
-        //for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
-        //    tmp.push_back( std::pair<u8, u8>( ACPKMNSTS( i, OPPONENT ), i ) );
-        //std::sort( tmp.begin( ), tmp.end( ) );
-        //for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
-        //    ACPOS( i, OPPONENT ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
+        //Sort the remaining PKMN according to their status -> No STS, STS, KO, NA (For the opponent)
+        tmp.clear( );
+        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+            tmp.push_back( std::pair<u8, u8>( ACPKMNSTS( i, OPPONENT ), ACPOS( i, OPPONENT ) ) );
+        std::sort( tmp.begin( ), tmp.end( ) );
+        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+            ACPOS( i, OPPONENT ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
 
         orderPKMN( false );
 

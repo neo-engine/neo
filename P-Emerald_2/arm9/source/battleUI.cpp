@@ -1465,6 +1465,7 @@ END:
 
     u8 battleUI::choosePKMN( bool p_firstIsChosen ) {
 START:
+        consoleSelect( &Bottom );
         undrawPKMNChoiceScreen( );
         consoleSetWindow( &Bottom, 0, 0, 32, 24 );
         consoleClear( );
@@ -1892,18 +1893,22 @@ CLEAR:
         if( p_opponent ) {
             if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
                 oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-                FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/",
-                                    acPkmn.m_boxdata.m_speciesId, x, y,
-                                    oamIdx, palIdx, tileCnt, false,
-                                    acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false );
+                if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/",
+                    acPkmn.m_boxdata.m_speciesId, x, y,
+                    oamIdx, palIdx, tileCnt, false,
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    _battle->log( L"Sprite failed[A]" );
+                }
             }
         } else {
             if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x, y,
                 oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-                FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
-                                    acPkmn.m_boxdata.m_speciesId, x, y,
-                                    oamIdx, palIdx, tileCnt, false,
-                                    acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false );
+                if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
+                    acPkmn.m_boxdata.m_speciesId, x, y,
+                    oamIdx, palIdx, tileCnt, false,
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    _battle->log( L"Sprite failed[A]" );
+                }
             }
         }
         if( acPkmn.m_boxdata.isShiny( ) )

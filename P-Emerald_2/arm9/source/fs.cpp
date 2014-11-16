@@ -118,7 +118,7 @@ namespace FS {
 
     bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnId, const s16 p_posX,
                          const s16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx ) {
-        //char buffer[100];
+        char buffer[ 100 ];
         if( !p_female )
             sprintf( buffer, "%s%d/%d.raw", p_path, p_pkmnId, p_pkmnId );
         else
@@ -1329,8 +1329,8 @@ namespace POKEMON {
                 for( u16 i = 0; i < p_amount && I != reses.rend( ); ++i, ++I ) {
                     for( u16 z = 0; z < i; ++z )
                         if( *I == p_result[ z ] ) {
-                        --i;
-                        goto N;
+                            --i;
+                            goto N;
                         }
                     p_result[ i ] = *I;
 N:
