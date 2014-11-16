@@ -460,7 +460,7 @@ namespace BATTLE {
         void        doMoves( );
         void        doMove( bool p_opponent, u8 p_pokemonPos );
 
-        void        calcDamage( u8 p_moveNo, u8 p_randInt );
+        void        calcDamage( bool p_opponent, u8 p_pokemonPos, u8 p_randInt );
         void        doAttack( u8 p_moveNo );
 
         void        doWeather( );

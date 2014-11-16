@@ -518,6 +518,18 @@ namespace BATTLE {
                 clearLogScreen( );
                 result.m_type = battle::battleMove::ATTACK;
 SHOW_ATTACK:
+                //Check if the PKMN still has AP to use, if not, the move becomes struggle
+                u16 apCnt = 0;
+                for( u8 i = 0; i < 4; ++i )
+                    apCnt += ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_acPP[ i ];
+
+                if( !apCnt ) {
+                    result.m_value = M_STRUGGLE;
+                    result.m_target = 0;
+                    loadA( );
+                    return true;
+                }
+
                 result.m_value = chooseAttack( p_pokemonPos );
                 if( result.m_value ) {
                     if( _battle->m_battleMode == battle::DOUBLE ) {
@@ -664,7 +676,8 @@ NEXT:
                     break;
                 u8 w = 104, h = 32;
                 u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
-                if( t.px >= x && t.py >= y && t.px <= x + w && t.py <= y + h ) {
+                if( t.px >= x && t.py >= y && t.px <= x + w && t.py <= y + h
+                    && acPkmn.m_boxdata.m_acPP[ i ] ) {
                     auto acMove = AttackList[ acPkmn.m_boxdata.m_moves[ i ] ];
 
                     FONT::putrec( x, y, x + w, y + h,
@@ -779,11 +792,11 @@ END:
             FONT::putrec( 176 + 1, 106 + 1, 176 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
 
         _battle->_battleMoves[ p_pokemonPos ][ PLAYER ].m_target = 1 | 2 | 4 | 8;
-        _battle->calcDamage( p_pokemonPos, 16 );
+        _battle->calcDamage( PLAYER, p_pokemonPos, 16 );
         u16 avrgDamage[ 2 ][ 2 ];
         for( u8 i = 0; i < 4; ++i )
             avrgDamage[ i % 2 ][ i / 2 ] = _battle->_acDamage[ i % 2 ][ 1 / 2 ];
-        _battle->calcDamage( p_pokemonPos, 17 );
+        _battle->calcDamage( PLAYER, p_pokemonPos, 17 );
         for( u8 i = 0; i < 4; ++i )
             avrgDamage[ i % 2 ][ i / 2 ] = ( avrgDamage[ i % 2 ][ i / 2 ] + _battle->_acDamage[ i % 2 ][ 1 / 2 ] ) / 2;
 
@@ -1551,9 +1564,24 @@ CLEAR:
         // Attack animation here
 
         auto acMove = _battle->_battleMoves[ 0 ][ 0 ];
+        bool isOpp, isSnd;
         for( u8 i = 0; i < 4; ++i )
-            if( _battle->_moveOrder[ i / 2 ][ i % 2 ] == p_moveNo )
+            if( _battle->_moveOrder[ i / 2 ][ i % 2 ] == p_moveNo ) {
                 acMove = _battle->_battleMoves[ i / 2 ][ i % 2 ];
+                isOpp = i % 2;
+                isSnd = i / 2;
+            }
+
+        if( !acMove.m_type == battle::battleMove::ATTACK )
+            return;
+
+        //Reduce PP
+        for( u8 i = 0; i < 4; ++i )
+            if( ACPKMN2( *_battle, isSnd, isOpp ).m_boxdata.m_moves[ i ] == acMove.m_value ) {
+                if( ACPKMN2( *_battle, isSnd, isOpp ).m_boxdata.m_acPP[ i ] )
+                    ACPKMN2( *_battle, isSnd, isOpp ).m_boxdata.m_acPP[ i ]--;
+                break;
+            }
     }
 
     void battleUI::updateHP( bool p_opponent, u8 p_pokemonPos ) {
@@ -1590,7 +1618,7 @@ CLEAR:
         for( u8 i = 0; i < 4; ++i ) {
             bool opponent = i % 2;
             bool pokemonPos = i / 2;
-            
+
             if( !_battle->m_battleMode == battle::DOUBLE && pokemonPos )
                 continue;
 

@@ -230,6 +230,15 @@ CHOOSE1:
 
             getAIMoves( );
 
+            for( u8 i = 0; i < 4; ++i ) {
+                swprintf( wbuffer, 200, L"BM%hhu: Type %hhu\nValue: %hhu (%s)\nTarget: %hhu[A]", i,
+                          _battleMoves[ i / 2 ][ i % 2 ].m_type,
+                          _battleMoves[ i / 2 ][ i % 2 ].m_value,
+                          AttackList[ _battleMoves[ i / 2 ][ i % 2 ].m_value ]->m_moveName.c_str( ),
+                          _battleMoves[ i / 2 ][ i % 2 ].m_target );
+                log( wbuffer );
+            }
+
             doMoves( );
 
             if( endConditionHit( battleEnd ) ) {
@@ -595,7 +604,7 @@ NEXT:
                     }
                 }
 
-                calcDamage( _acMove, rand( ) % 16 );
+                calcDamage( p_opponent, p_pokemonPos, rand( ) % 16 );
 
                 doAbilities( ability::BEFORE_ATTACK );
                 doItems( ability::BEFORE_ATTACK );
@@ -627,177 +636,197 @@ NEXT:
 
     /**
     *  @brief Calculates the current move's dealt damage.
-    *  @param p_moveNo: The number of the attack that shall be done.
     *  @param p_randInt: A random integer between 0 and 15 used to adjust the dealt damage
     */
-    void battle::calcDamage( u8 p_moveNo, u8 p_randInt ) {
-        for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
-            if( _moveOrder[ i ][ j ] == p_moveNo ) {
-                auto& bm = _battleMoves[ i ][ j ];
+    void battle::calcDamage( bool p_opponent, u8 p_pokemonPos, u8 p_randInt ) {
+        //swprintf( wbuffer, 100, L"Calcin for PKMN\n%ls[A]", ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name );
+        //log( wbuffer );
 
-                //Calculate critical hit chance
-                int mod = 16;
-                switch( _criticalChance[ i ][ j ] ) {
-                    case 1:
-                        mod = 8;
-                        break;
-                    case 2:
-                        mod = 4;
-                        break;
-                    case 3:
-                        mod = 3;
-                        break;
-                    case 4:
-                        mod = 2;
-                        break;
-                    default:
-                        break;
+        auto bm = _battleMoves[ p_pokemonPos ][ p_opponent ];
+
+        //Calculate critical hit chance
+        int mod = 16;
+        switch( _criticalChance[ p_pokemonPos ][ p_opponent ] ) {
+            case 1:
+                mod = 8;
+                break;
+            case 2:
+                mod = 4;
+                break;
+            case 3:
+                mod = 3;
+                break;
+            case 4:
+                mod = 2;
+                break;
+            default:
+                break;
+        }
+
+        for( u8 k = 0; k < 4; ++k ) {
+            bool isOpp = k % 2,
+                isSnd = k / 2;
+            _acDamage[ isSnd ][ isOpp ] = 0;
+
+            //swprintf( wbuffer, 100, L"Calcin for target\n%ls[A]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+            //log( wbuffer );
+
+            if( !( bm.m_target & ( 1 << k ) ) ) {
+                //log( L"Not a Target[A]" );
+                continue;
+            }
+            auto move = AttackList[ bm.m_value ];
+
+            if( move->m_moveHitType == move::STAT ) {
+                //log( L"Move is a STS move[A]" );
+                continue;
+            }
+
+            POKEMON::PKMNDATA::pokemonData pd;
+            POKEMON::PKMNDATA::getAll( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_speciesId, pd );
+
+            //Calculate effectivity
+            _effectivity[ isSnd ][ isOpp ] = getEffectiveness( move->m_moveType, pd.m_types[ 0 ] );
+            if( pd.m_types[ 0 ] != pd.m_types[ 1 ] )
+                _effectivity[ isSnd ][ isOpp ] *= getEffectiveness( move->m_moveType, pd.m_types[ 1 ] );
+
+            //Calculate critical hit
+            if( p_randInt <= 15 )
+                _critical[ isSnd ][ isOpp ] = !( rand( ) % mod );
+            else {
+                _critical[ isSnd ][ isOpp ] = false;
+
+                if( p_randInt == 16 )
+                    p_randInt = 0;
+                else
+                    p_randInt = 15;
+            }
+            //STAB
+            float STAB = 1.0f;
+            if( POKEMON::PKMNDATA::getType( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_speciesId, 0 ) == move->m_moveType
+                || POKEMON::PKMNDATA::getType( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_speciesId, 1 ) == move->m_moveType )
+                STAB = 1.5f;
+            if( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability == A_ADAPTABILITY )
+                STAB = 2.0f;
+
+            //Weather
+            float weather = 1.0f;
+
+            bool weatherPossible = true;
+            for( u8 a = 0; a < 2; ++a ) for( u8 b = 0; b < 2; ++b )
+                weatherPossible &= ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability != A_AIR_LOCK
+                && ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability != A_CLOUD_NINE );
+
+            if( weatherPossible ) {
+                if( m_weather == SUN && move->m_moveType == WASSER )
+                    weather = 0.5f;
+                if( m_weather == HEAVY_SUNSHINE && move->m_moveType == WASSER )
+                    weather = 0.0f;
+
+                if( m_weather == SUN && move->m_moveType == FEUER )
+                    weather = 1.5f;
+                if( m_weather == HEAVY_SUNSHINE && move->m_moveType == FEUER )
+                    weather = 1.5f;
+
+                if( m_weather == RAIN && move->m_moveType == FEUER )
+                    weather = 0.5f;
+                if( m_weather == HEAVY_RAIN && move->m_moveType == FEUER )
+                    weather = 0.0f;
+
+                if( m_weather == RAIN && move->m_moveType == WASSER )
+                    weather = 1.5f;
+                if( m_weather == HEAVY_RAIN && move->m_moveType == WASSER )
+                    weather = 1.5f;
+            }
+
+            //Multi-Target modifier
+            float target = 1.0f;
+            if( move->m_moveAffectsWhom & ( 8 | 32 ) )
+                target = 0.75f;
+
+            //Burn
+            float burn = 1.0f;
+            if( ACPKMNAIL( p_pokemonPos, p_opponent ) == move::ailment::BURN
+                && move->m_moveHitType == move::PHYS
+                && ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability != A_GUTS ) {
+                burn = 0.5f;
+            }
+
+            //Base damage calculation
+            auto moveAtkHitType = move->m_moveHitType;
+            auto moveDefHitType = move->m_moveHitType;
+
+            if( bm.m_value == M_PSYSHOCK )
+                moveDefHitType = move::PHYS;
+            if( bm.m_value == M_PSYSTRIKE )
+                moveDefHitType = move::PHYS;
+            if( bm.m_value == M_SECRET_SWORD )
+                moveDefHitType = move::PHYS;
+
+            float atk = ( ( moveAtkHitType == move::PHYS ) ? ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_Atk : ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_SAtk );
+            if( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability != A_UNAWARE
+                && bm.m_value != M_FOULPLAY ) {
+                if( moveAtkHitType == move::PHYS ) {
+                    if( ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ ATK ] > 0 )
+                        atk = atk * ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ ATK ] / 2.0;
+                    if( ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ ATK ] < 0 )
+                        atk = atk  * 2.0 / ( -ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ ATK ] );
                 }
-
-                for( u8 k = 0; k < 4; ++k ) {
-                    bool isOpp = k % 2,
-                        isSnd = k / 2;
-
-                    if( !( bm.m_target & ( 1 << k ) ) )
-                        continue;
-
-                    auto move = AttackList[ ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] ];
-
-                    if( move->m_moveHitType == move::STAT ) {
-                        _acDamage[ isSnd ][ isOpp ] = 0;
-                        return;
-                    }
-
-                    POKEMON::PKMNDATA::pokemonData pd;
-                    POKEMON::PKMNDATA::getAll( ACPKMN( i, j ).m_boxdata.m_speciesId, pd );
-
-                    //Calculate effectivity
-                    _effectivity[ isSnd ][ isOpp ] = getEffectiveness( move->m_moveType, pd.m_types[ 0 ] );
-                    if( pd.m_types[ 0 ] != pd.m_types[ 1 ] )
-                        _effectivity[ isSnd ][ isOpp ] *= getEffectiveness( move->m_moveType, pd.m_types[ 1 ] );
-
-                    //Calculate critical hit
-                    if( p_randInt <= 15 )
-                        _critical[ isSnd ][ isOpp ] = !( rand( ) % mod );
-                    else {
-                        _critical[ isSnd ][ isOpp ] = false;
-
-                        if( p_randInt == 16 )
-                            p_randInt = 0;
-                        else
-                            p_randInt = 15;
-                    }
-                    //STAB
-                    float STAB = 1.5f;
-                    if( ACPKMN( i, j ).m_boxdata.m_ability == A_ADAPTABILITY )
-                        STAB = 2.0f;
-
-                    //Weather
-                    float weather = 1.0f;
-
-                    bool weatherPossible = true;
-                    for( u8 a = 0; a < 2; ++a ) for( u8 b = 0; b < 2; ++b )
-                        weatherPossible &= ( ACPKMN( i, j ).m_boxdata.m_ability != A_AIR_LOCK
-                        && ACPKMN( i, j ).m_boxdata.m_ability != A_CLOUD_NINE );
-
-                    if( weatherPossible ) {
-                        if( m_weather == SUN && move->m_moveType == WASSER )
-                            weather = 0.5f;
-                        if( m_weather == HEAVY_SUNSHINE && move->m_moveType == WASSER )
-                            weather = 0.0f;
-
-                        if( m_weather == SUN && move->m_moveType == FEUER )
-                            weather = 1.5f;
-                        if( m_weather == HEAVY_SUNSHINE && move->m_moveType == FEUER )
-                            weather = 1.5f;
-
-                        if( m_weather == RAIN && move->m_moveType == FEUER )
-                            weather = 0.5f;
-                        if( m_weather == HEAVY_RAIN && move->m_moveType == FEUER )
-                            weather = 0.0f;
-
-                        if( m_weather == RAIN && move->m_moveType == WASSER )
-                            weather = 1.5f;
-                        if( m_weather == HEAVY_RAIN && move->m_moveType == WASSER )
-                            weather = 1.5f;
-                    }
-
-                    //Multi-Target modifier
-                    int tcnt = 0;
-                    for( u8 o = 0; o < 4; ++o )
-                        if( ( bm.m_target & ( 1 << o ) ) )
-                            tcnt++;
-
-                    float target = 1.0f;
-                    if( tcnt > 1 )
-                        target = 0.75f;
-
-                    //Burn
-                    float burn = 1.0f;
-                    if( ACPKMNAIL( i, j ) == move::ailment::BURN
-                        && move->m_moveHitType == move::PHYS
-                        && ACPKMN( i, j ).m_boxdata.m_ability != A_GUTS ) {
-                        burn = 0.5f;
-                    }
-
-                    //Base damage calculation
-                    auto moveAtkHitType = move->m_moveHitType;
-                    auto moveDefHitType = move->m_moveHitType;
-
-                    if( ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] == M_PSYSHOCK )
-                        moveDefHitType = move::PHYS;
-                    if( ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] == M_PSYSTRIKE )
-                        moveDefHitType = move::PHYS;
-                    if( ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] == M_SECRET_SWORD )
-                        moveDefHitType = move::PHYS;
-
-                    float atk = ( ( moveAtkHitType == move::PHYS ) ? ACPKMN( i, j ).m_stats.m_Atk : ACPKMN( i, j ).m_stats.m_SAtk );
-                    if( ACPKMN( i, j ).m_boxdata.m_ability != A_UNAWARE
-                        && ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] != M_FOULPLAY ) {
-                        if( moveAtkHitType == move::PHYS ) {
-                            if( ACPKMNSTATCHG( i, j )[ ATK ] > 0 )
-                                atk = atk * ACPKMNSTATCHG( i, j )[ ATK ] / 2.0;
-                            if( ACPKMNSTATCHG( i, j )[ ATK ] < 0 )
-                                atk = atk  * 2.0 / ( -ACPKMNSTATCHG( i, j )[ ATK ] );
-                        }
-                        if( moveAtkHitType == move::SPEC ) {
-                            if( ACPKMNSTATCHG( i, j )[ SATK ] > 0 )
-                                atk = atk * ACPKMNSTATCHG( i, j )[ SATK ] / 2.0;
-                            if( ACPKMNSTATCHG( i, j )[ SATK ] < 0 )
-                                atk = atk  * 2.0 / ( -ACPKMNSTATCHG( i, j )[ SATK ] );
-                        }
-                    }
-                    if( ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] == M_FOULPLAY ) {
-                        atk = ACPKMN( isSnd, isOpp ).m_stats.m_Atk;
-
-                        if( ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] > 0 )
-                            atk = atk * ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] / 2.0;
-                        if( ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] < 0 )
-                            atk = atk  * 2.0 / ( -ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] );
-                    }
-
-                    float def = ( ( moveDefHitType == move::PHYS ) ? ACPKMN( isSnd, isOpp ).m_stats.m_Def : ACPKMN( isSnd, isOpp ).m_stats.m_SDef );
-                    if( ACPKMN( isSnd, isOpp ).m_boxdata.m_ability != A_UNAWARE
-                        && ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] != M_CHIP_AWAY ) {
-                        if( moveDefHitType == move::PHYS ) {
-                            if( ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] > 0 )
-                                atk = atk * ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] / 2.0;
-                            if( ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] < 0 )
-                                atk = atk  * 2.0 / ( -ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] );
-                        }
-                        if( moveDefHitType == move::SPEC ) {
-                            if( ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] > 0 )
-                                atk = atk * ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] / 2.0;
-                            if( ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] < 0 )
-                                atk = atk  * 2.0 / ( -ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] );
-                        }
-                    }
-
-                    _acDamage[ isSnd ][ isOpp ] = s16( ( ( 2 * ACPKMN( i, j ).m_Level + 10 ) / 250 ) * ( atk / def ) * move->m_moveBasePower + 2 );
-                    float modifier = _effectivity[ isSnd ][ isOpp ] * ( _critical[ isSnd ][ isOpp ] ? 2 : 1 ) * STAB * weather * target * burn;
-                    _acDamage[ isSnd ][ isOpp ] *= s16( modifier );
+                if( moveAtkHitType == move::SPEC ) {
+                    if( ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ SATK ] > 0 )
+                        atk = atk * ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ SATK ] / 2.0;
+                    if( ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ SATK ] < 0 )
+                        atk = atk  * 2.0 / ( -ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ SATK ] );
                 }
             }
+            if( bm.m_value == M_FOULPLAY ) {
+                atk = ACPKMN( isSnd, isOpp ).m_stats.m_Atk;
+
+                if( ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] > 0 )
+                    atk = atk * ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] / 2.0;
+                if( ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] < 0 )
+                    atk = atk  * 2.0 / ( -ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] );
+            }
+
+            float def = ( ( moveDefHitType == move::PHYS ) ? ACPKMN( isSnd, isOpp ).m_stats.m_Def : ACPKMN( isSnd, isOpp ).m_stats.m_SDef );
+            if( ACPKMN( isSnd, isOpp ).m_boxdata.m_ability != A_UNAWARE
+                && bm.m_value != M_CHIP_AWAY ) {
+                if( moveDefHitType == move::PHYS ) {
+                    if( ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] > 0 )
+                        atk = atk * ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] / 2.0;
+                    if( ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] < 0 )
+                        atk = atk  * 2.0 / ( -ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] );
+                }
+                if( moveDefHitType == move::SPEC ) {
+                    if( ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] > 0 )
+                        atk = atk * ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] / 2.0;
+                    if( ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] < 0 )
+                        atk = atk  * 2.0 / ( -ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] );
+                }
+            }
+
+            //swprintf( wbuffer, 100, L"Damage init %hd\n%.3f %.3f %hhd[A]", _acDamage[ isSnd ][ isOpp ],
+            //          ( ( 2.0f * ACPKMN( p_pokemonPos, p_opponent ).m_Level + 10.0f ) / 250.0f ),
+            //          ( atk * 1.0f / def ),
+            //          move->m_moveBasePower );
+            //log( wbuffer );
+
+            _acDamage[ isSnd ][ isOpp ] = s16( ( ( 2.0f * ACPKMN( p_pokemonPos, p_opponent ).m_Level + 10.0f ) / 250.0f ) * ( atk * 1.0f / def ) * move->m_moveBasePower + 2 );
+
+            //swprintf( wbuffer, 100, L"Damage bef mod %hd\n%.3f %.3f %.3f\n%.3f %.3f %.3f[A]", _acDamage[ isSnd ][ isOpp ],
+            //          _effectivity[ isSnd ][ isOpp ],
+            //          ( _critical[ isSnd ][ isOpp ] ? 2.0f : 1.0f ),
+            //          STAB,
+            //          weather,
+            //          target,
+            //          burn );
+            //log( wbuffer );
+
+            float modifier = _effectivity[ isSnd ][ isOpp ] * ( _critical[ isSnd ][ isOpp ] ? 2.0f : 1.0f ) * STAB * weather * target * burn;
+            _acDamage[ isSnd ][ isOpp ] = s16( _acDamage[ isSnd ][ isOpp ] * modifier );
+
+            //swprintf( wbuffer, 100, L"Damage aft mod %hd[A]", _acDamage[ isSnd ][ isOpp ] );
+            //log( wbuffer );
         }
     }
 
@@ -880,7 +909,7 @@ NEXT:
                     if( !messagePrinted ) {
                         std::swprintf( wbuffer, 100, L"%ls%s setzt\n%s ein.[A]",
                                        ( ACPKMN( i, j ).m_boxdata.m_name ),
-                                       ( j ? "(Gegner)" : "" ),
+                                       ( j ? " (Gegner)" : "" ),
                                        acMove->m_moveName.c_str( ) );
                         log( wbuffer );
                         messagePrinted = true;
@@ -890,7 +919,7 @@ NEXT:
                     if( acMove->m_moveAccuracy && rand( ) * 1.0 / RAND_MAX > acMove->m_moveAccuracy / 100.0 ) {
                         std::swprintf( wbuffer, 100, L"%ls%s wich aus.[A]",
                                        ( ACPKMN( isSnd, isOpp ).m_boxdata.m_name ),
-                                       ( j ? "(Gegner)" : "" ) );
+                                       ( j ? " (Gegner)" : "" ) );
                         log( wbuffer );
                         goto NEXT;
                     }
