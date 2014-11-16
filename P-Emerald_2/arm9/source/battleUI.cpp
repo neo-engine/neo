@@ -114,9 +114,9 @@ namespace BATTLE {
             BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
             for( u16 i = 0; i < factor * 100; ++i )
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                u8 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                ( (color *)( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
-                //printf("%i %i; ",nx,ny);
+                    u8 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
+                    ( (color *)( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
+                    //printf("%i %i; ",nx,ny);
                 }
         } else {
             BG_PAL( p_sub )[ p_freecolor2 ] = NORMAL_;
@@ -140,9 +140,9 @@ namespace BATTLE {
             BG_PAL( p_sub )[ p_freecolor1 ] = NORMAL_;
             for( u16 i = 0; i < factor * 100; ++i )
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                u16 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                ( (color *)BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
-                //printf("%i %i; ",nx,ny);
+                    u16 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
+                    ( (color *)BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
+                    //printf("%i %i; ",nx,ny);
                 }
         } else {
             BG_PAL( p_sub )[ p_freecolor2 ] = ICE;
@@ -628,7 +628,7 @@ SHOW_ATTACK:
                 FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
                               true, false, BLACK_IDX );
                 FONT::putrec( x, y, x + w, y + h,
-                              true, false, BG_PALETTE_SUB[ 240 + i ] );
+                              true, false, 240 + i );
                 FONT::putrec( x + 7, y + 5, x + w - 4, y + h - 1,
                               true, false, BLACK_IDX );
                 FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
@@ -667,8 +667,10 @@ NEXT:
                 if( t.px >= x && t.py >= y && t.px <= x + w && t.py <= y + h ) {
                     auto acMove = AttackList[ acPkmn.m_boxdata.m_moves[ i ] ];
 
+                    FONT::putrec( x, y, x + w, y + h,
+                                  true, false, 0 );
                     FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
-                                  true, false, BG_PALETTE_SUB[ 240 + i ] );
+                                  true, false, 240 + i );
                     FONT::putrec( x + 8, y + 6, x + w - 2, y + h,
                                   true, false, WHITE_IDX );
 
@@ -685,7 +687,7 @@ NEXT:
                             FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
                                           true, false, BLACK_IDX );
                             FONT::putrec( x, y, x + w, y + h,
-                                          true, false, BG_PALETTE_SUB[ 240 + i ] );
+                                          true, false, 240 + i );
                             FONT::putrec( x + 7, y + 5, x + w - 4, y + h - 1,
                                           true, false, BLACK_IDX );
                             FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
@@ -870,6 +872,8 @@ NEXT:
                         auto acPkmnJ = ACPKMN2( *_battle, aJ, 1 - ( i / 2 ) );
 
                         u8 nx = 16 - 8 * ( j / 2 ) + ( w + 16 ) * ( j % 2 ), ny = 74 + ( h + 16 ) * ( j / 2 );
+                        FONT::putrec( nx, ny, x + w, y + h,
+                                      true, false, 0 );
                         FONT::putrec( nx + 1, ny + 1, nx + w + 2, ny + h + 1,
                                       true, false, RED_IDX );
                         FONT::putrec( nx + 8, ny + 6, nx + w - 2, ny + h,
@@ -1280,7 +1284,7 @@ END:
                     FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
                                   true, false, BLACK_IDX );
                     FONT::putrec( x, y, x + w, y + h,
-                                  true, false, BG_PALETTE_SUB[ 240 + i ] );
+                                  true, false, 240 + i );
                     FONT::putrec( x + 7, y + 5, x + w - 4, y + h - 1,
                                   true, false, BLACK_IDX );
                     FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
@@ -1552,24 +1556,77 @@ CLEAR:
     }
 
     void battleUI::updateHP( bool p_opponent, u8 p_pokemonPos ) {
+        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+            return;
 
+        u8 hpx = OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
+            hpy = OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y;
+
+        displayHP( 100, 100 - ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP * 100 / ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_maxHP,
+                   hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, true );
+
+        consoleSelect( &Top );
+        if( p_opponent == p_pokemonPos ) {
+            consoleSetWindow( &Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
+            consoleClear( );
+            printf( "%10ls%c\n",
+                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
+                    GENDER( ACPKMN2( *_battle, p_pokemonPos, p_opponent ) ) );
+            printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_Level,
+                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
+        } else {
+            consoleSetWindow( &Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
+            consoleClear( );
+            printf( "%10ls%c\n",
+                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
+                    GENDER( ACPKMN2( *_battle, p_pokemonPos, p_opponent ) ) );
+            printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_Level,
+                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
+        }
     }
 
     void battleUI::applyEXPChanges( ) {
+        for( u8 i = 0; i < 4; ++i ) {
+            bool opponent = i % 2;
+            bool pokemonPos = i / 2;
+            
+            if( !_battle->m_battleMode == battle::DOUBLE && pokemonPos )
+                continue;
 
+            u8 hpx = OamTop->oamBuffer[ HP_IDX( opponent, pokemonPos ) ].x,
+                hpy = OamTop->oamBuffer[ HP_IDX( opponent, pokemonPos ) ].y;
+
+            POKEMON::PKMNDATA::pokemonData p;
+            auto acPkmn = ACPKMN2( *_battle, pokemonPos, opponent );
+            POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_speciesId, p );
+
+            displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
+                       ( POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ),
+                       hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
+        }
     }
 
     void battleUI::updateStats( bool p_opponent, u8 p_pokemonPos ) {
-
+        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+            return;
+        setStsBallSts( p_opponent, p_pokemonPos, ACPKMNSTS2( *_battle, p_pokemonPos, p_opponent ), false );
     }
 
     void battleUI::hidePKMN( bool p_opponent, u8 p_pokemonPos ) {
+        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+            return;
+
         //Hide PKMN sprite
         for( u8 i = PKMN_IDX( p_pokemonPos, p_opponent ); i < PKMN_IDX( p_pokemonPos, p_opponent ) + 4; ++i )
             OamTop->oamBuffer[ i ].isHidden = true;
 
         //Hide HP Bar
-        OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].isHidden = true;
+        //OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].isHidden = true;
+        displayHP( 100, 100, OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
+                   OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y,
+                   HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
+        displayEP( 100, 100, OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
+                   OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y, OWN1_EP_COL, OWN1_EP_COL + 1, false );
         setStsBallVisibility( p_opponent, p_pokemonPos, true, false );
         updateOAM( OamTop );
 
@@ -1773,6 +1830,8 @@ CLEAR:
     }
 
     void battleUI::sendPKMN( bool p_opponent, u8 p_pokemonPos ) {
+        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+            return;
         loadA( );
 
         s16 x = 0, y = 0;
@@ -1820,8 +1879,6 @@ CLEAR:
             std::swprintf( wbuffer, 50, L"Los [OWN%d]![A]", p_pokemonPos + 1 );
         _battle->log( wbuffer );
 
-        battleUI::waitForTouchUp( );
-
         setStsBallVisibility( p_opponent, p_pokemonPos, true, false );
         updateOAM( OamTop );
 
@@ -1859,29 +1916,46 @@ CLEAR:
         setStsBallVisibility( p_opponent, p_pokemonPos, false, false );
         updateOAM( OamTop );
 
+        POKEMON::PKMNDATA::pokemonData p;
+        POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_speciesId, p );
+
+        displayHP( 100, 101, hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
+        displayHP( 100, 100 - acPkmn.m_stats.m_acHP * 100 / acPkmn.m_stats.m_maxHP,
+                   hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
+
+        displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
+                   ( POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ),
+                   hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
+
         consoleSelect( &Top );
         if( p_opponent == p_pokemonPos ) {
             consoleSetWindow( &Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             printf( "%10ls%c\n",
-                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
-                    GENDER( ACPKMN2( *_battle, p_pokemonPos, p_opponent ) ) );
-            printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_Level,
-                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
+                    acPkmn.m_boxdata.m_name,
+                    GENDER( acPkmn ) );
+            printf( "Lv%3d%4dKP\n", acPkmn.m_Level,
+                    acPkmn.m_stats.m_acHP );
         } else {
             consoleSetWindow( &Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             printf( "%10ls%c\n",
-                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
-                    GENDER( ACPKMN2( *_battle, p_pokemonPos, p_opponent ) ) );
-            printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_Level,
-                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
+                    acPkmn.m_boxdata.m_name,
+                    GENDER( acPkmn ) );
+            printf( "Lv%3d%4dKP\n", acPkmn.m_Level,
+                    acPkmn.m_stats.m_acHP );
         }
     }
 
     void battleUI::evolvePKMN( bool p_opponent, u8 p_pokemonPos ) {
+        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+            return;
 
     }
 
     void battleUI::learnMove( u8 p_pokemonPos, u16 p_move ) {
+        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+            return;
+
+
         auto& acPkmn = ACPKMN2( *_battle, p_pokemonPos, PLAYER );
         if( acPkmn.m_boxdata.m_moves[ 3 ] ) {
             std::swprintf( wbuffer, 50, L"%ls kann nun\n%s erlernen![A][CLEAR]Aber %ls kennt\nbereits 4 Attacken.[A]",
