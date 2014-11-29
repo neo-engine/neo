@@ -233,7 +233,7 @@ namespace BATTLE {
 #define PKMN_PAL_START          0
 #define PKMN_PAL_IDX( p_pokemonPos, p_opponent ) ( PKMN_PAL_START + ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
 
-#define PB_PAL_TOP(i)         ((i) +4)
+#define PB_PAL_TOP(i)         ( (i) + 4 )
 #define HP_PAL                8
 
 #define PKMN_TILE_START       0
@@ -317,7 +317,7 @@ namespace BATTLE {
         } else {
             idx = STSBALL_IDX( p_pokemonPos, p_opponent );
             tileIdx = OamTop->oamBuffer[ idx ].gfxIndex;
-            loadSprite( Oam, spriteInfo, idx, PB_PAL_SUB( p_status ), tileIdx, !p_opponent ? ( 240 - ( 16 * ( 6 - p_pokemonPos ) ) ) : ( 16 * p_pokemonPos ),
+            loadSprite( Oam, spriteInfo, idx, PB_PAL_TOP( p_status ), tileIdx, !p_opponent ? ( 240 - ( 16 * ( 6 - p_pokemonPos ) ) ) : ( 16 * p_pokemonPos ),
                         p_opponent ? -4 : 180, 16, 16, PB_PAL( p_status ), PB_TILES( p_status ), PB_TILES_LEN( p_status ),
                         false, false, false, OBJPRIORITY_0, p_bottom );
             updateOAM( OamTop );
@@ -330,11 +330,11 @@ namespace BATTLE {
         bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
         bgSetPriority( bg3, 3 );
         bgSetPriority( bg2, 2 );
-        bgUpdate( );
-
         initOAMTable( OamTop );
         dmaFillWords( 0, bgGetGfxPtr( bg2 ), 256 * 192 );
         dmaFillWords( 0, bgGetGfxPtr( bg3 ), 256 * 192 );
+        bgUpdate( );
+
 
         dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
         dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
@@ -1560,26 +1560,19 @@ CLEAR:
         _battle->log( L"Use Nav[A]" );
     }
 
-    void battleUI::showAttack( u8 p_moveNo ) {
+    void battleUI::showAttack( bool p_opponent, u8 p_pokemonPos ) {
         // Attack animation here
 
-        auto acMove = _battle->_battleMoves[ 0 ][ 0 ];
-        bool isOpp, isSnd;
-        for( u8 i = 0; i < 4; ++i )
-            if( _battle->_moveOrder[ i / 2 ][ i % 2 ] == p_moveNo ) {
-                acMove = _battle->_battleMoves[ i / 2 ][ i % 2 ];
-                isOpp = i % 2;
-                isSnd = i / 2;
-            }
+        auto acMove = _battle->_battleMoves[ p_pokemonPos ][ p_opponent ];
 
-        if( !acMove.m_type == battle::battleMove::ATTACK )
+        if( acMove.m_type != battle::battleMove::ATTACK )
             return;
 
         //Reduce PP
         for( u8 i = 0; i < 4; ++i )
-            if( ACPKMN2( *_battle, isSnd, isOpp ).m_boxdata.m_moves[ i ] == acMove.m_value ) {
-                if( ACPKMN2( *_battle, isSnd, isOpp ).m_boxdata.m_acPP[ i ] )
-                    ACPKMN2( *_battle, isSnd, isOpp ).m_boxdata.m_acPP[ i ]--;
+            if( ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_moves[ i ] == acMove.m_value ) {
+                if( ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_acPP[ i ] )
+                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_acPP[ i ]--;
                 break;
             }
     }

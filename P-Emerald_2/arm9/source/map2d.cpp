@@ -193,8 +193,8 @@ namespace map2d {
             consoleSelect( &Bottom );
             for( u8 i = 0; i < 2; ++i )
                 for( u8 j = 0; j < 2; ++j ) {
-                if( fscanf( A, "%hu", &m_rand[ i ][ j ] ) == EOF )
-                    m_rand[ i ][ j ] = 0;
+                    if( fscanf( A, "%hu", &m_rand[ i ][ j ] ) == EOF )
+                        m_rand[ i ][ j ] = 0;
                 }
             fclose( A );
         }
@@ -507,5 +507,18 @@ namespace map2d {
         bgUpdate( );
         //consoleSelect( &Bottom );
         //swiWaitForVBlank();
+    }
+
+    Map::pos Map::getFlyPos( const char* p_path, const char* p_name ) {
+        sprintf( buffer, "%s%s.fp", p_path, p_name );
+        FILE* mapF = fopen( buffer, "rb" );
+        if( !mapF )
+            return{ -1, -1, -1 };
+
+        u16 x, y;
+        u8 z;
+        fscanf( mapF, "%hu %hu %hhu", &x, &y, &z );
+        fclose( mapF );
+        return{ x, y, z };
     }
 }

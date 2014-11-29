@@ -19,6 +19,7 @@
     <ClInclude Include="arm9\include\defines.h" />
     <ClInclude Include="arm9\include\fs.h" />
     <ClInclude Include="arm9\include\libnds_internal.h" />
+    <ClInclude Include="arm9\include\map2devents.h" />
     <ClInclude Include="arm9\include\move.h" />
     <ClInclude Include="arm9\include\bag.h" />
     <ClInclude Include="arm9\include\battle.h" />

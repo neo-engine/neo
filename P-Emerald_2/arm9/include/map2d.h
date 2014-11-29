@@ -101,7 +101,7 @@ namespace map2d {
         u8          m_acFrame;
         u8          m_maxFrame;
         u8          m_speed;
-        std::vector< Tile >
+        std::vector < Tile >
             m_animationTiles;
     };
 
@@ -110,14 +110,14 @@ namespace map2d {
         u32         m_sizex, m_sizey;
 
         Palette     m_pals[ 16 ];
-        std::vector< std::vector < MapBlockAtom > >
+        std::vector < std::vector < MapBlockAtom > >
             m_blocks;
         TileSet     m_tileset;
         BlockSet    m_blockSets;
-        std::vector< Anbindung >
+        std::vector < Anbindung >
             m_anbindungen;
         u16         m_rand[ 2 ][ 2 ];
-        std::vector< Animation >
+        std::vector < Animation >
             m_animations;
 
         //WildePKMN, Events...
@@ -127,6 +127,13 @@ namespace map2d {
 
         void            draw( s16 p_bx, s16 p_by, bool p_init = false );
         void            movePlayer( int p_direction );
+
+        struct pos {
+            u16 m_posX;
+            u16 m_posY;
+            u8 m_posZ;
+        };
+        static pos      getFlyPos( const char* p_path, const char* p_name );
     private:
         void            fill( u16* mapMemory[ 4 ], s16 p_xmin, s16 p_x, s16 p_xmax, s16 p_ymin, s16 p_y, s16 p_ymax, s16 p_c );
     };
