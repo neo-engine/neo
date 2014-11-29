@@ -105,9 +105,9 @@ namespace map2d {
     }
 
     Map::Map( const char* p_path, const char* p_name ) {
-        consoleSelect( &Bottom );
-        consoleSetWindow( &Bottom, 4, 4, 25, 20 );
-        consoleClear( );
+        //consoleSelect( &Bottom );
+        //consoleSetWindow( &Bottom, 4, 4, 25, 20 );
+        //consoleClear( );
 
         sprintf( buffer, "%s%s.m2p", p_path, p_name );
         FILE* mapF = fopen( buffer, "rb" );

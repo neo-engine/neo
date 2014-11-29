@@ -114,7 +114,8 @@ namespace BATTLE {
             BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
             for( u16 i = 0; i < factor * 100; ++i )
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u8 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
+                    u16 nx = p_x + 16 + j * ( sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) ),
+                        ny = p_y + 16 + j * ( cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) );
                     ( (color *)( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
                     //printf("%i %i; ",nx,ny);
                 }
@@ -122,7 +123,8 @@ namespace BATTLE {
             BG_PAL( p_sub )[ p_freecolor2 ] = NORMAL_;
             for( u16 i = factor * 100 - factor*p_HPstart; i < factor*p_HP; ++i ) {
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u8 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
+                    u16 nx = p_x + 16 + j * ( sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) ),
+                        ny = p_y + 16 + j * ( cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) );
                     ( (color *)( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
                     if( i == factor * 50 )
                         BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
@@ -140,7 +142,8 @@ namespace BATTLE {
             BG_PAL( p_sub )[ p_freecolor1 ] = NORMAL_;
             for( u16 i = 0; i < factor * 100; ++i )
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u16 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
+                    u16 nx = p_x + 16 + j * ( sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) ),
+                        ny = p_y + 16 + j * ( cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) );
                     ( (color *)BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
                     //printf("%i %i; ",nx,ny);
                 }
@@ -148,12 +151,13 @@ namespace BATTLE {
             BG_PAL( p_sub )[ p_freecolor2 ] = ICE;
             for( u16 i = p_EPstart*factor; i <= p_EP*factor; ++i ) {
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u16 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
+                    u16 nx = p_x + 16 + j * ( sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) ),
+                        ny = p_y + 16 + j * ( cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) );
                     ( (color *)BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
                 }
                 if( p_delay )
                     swiWaitForVBlank( );
-            }
+            } 
         }
     }
     void initColors( ) {
