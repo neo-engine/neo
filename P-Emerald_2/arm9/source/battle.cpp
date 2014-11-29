@@ -893,8 +893,8 @@ NEXT:
                     acMove->m_moveEffect.execute( *this, &ACPKMN( i, j ) );
 
                 for( u8 k = 0; k < 4; ++k ) {
-                    bool isOpp = k % 2,
-                        isSnd = k / 2;
+                    bool isOpp = k / 2,
+                        isSnd = k % 2;
 
                     if( !( bm.m_target & ( 1 << k ) ) )
                         continue;
@@ -926,9 +926,9 @@ NEXT:
 
                     if( doesChange ) {
 
-                        ACPKMN( isSnd, isOpp ).m_stats.m_acHP = std::max( u16( 0 ),
-                                                                          std::min( u16( ACPKMN( isSnd, isOpp ).m_stats.m_acHP - _acDamage[ isSnd ][ isOpp ] ),
-                                                                          ACPKMN( isSnd, isOpp ).m_stats.m_maxHP ) );
+                        ACPKMN( isSnd, isOpp ).m_stats.m_acHP = (u16)std::max( s16( 0 ),
+                                                                               std::min( s16( ACPKMN( isSnd, isOpp ).m_stats.m_acHP - _acDamage[ isSnd ][ isOpp ] ),
+                                                                               (s16)ACPKMN( isSnd, isOpp ).m_stats.m_maxHP ) );
 
 
                         for( u8 s = 0; s < MAX_STATS; s++ )
