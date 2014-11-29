@@ -155,7 +155,7 @@ namespace BATTLE {
         u8      choosePKMN( bool p_firstIsChosen );
         void    useNav( );
 
-        void    showAttack( u8 p_moveNo );
+        void    showAttack( bool p_opponent, u8 p_pokemonPos );
         void    updateHP( bool p_opponent, u8 p_pokemonPos );
         void    applyEXPChanges( );
         void    updateStats( bool p_opponent, u8 p_pokemonPos );
@@ -240,7 +240,6 @@ namespace BATTLE {
         std::map<POKEMON::pokemon*, std::set<POKEMON::pokemon*> > _participatedPKMN;
 
         //Current turn's current move's "consequences"
-        u8          _acMove;
         s16         _acDamage[ 2 ][ 2 ];
         u8          _critical[ 2 ][ 2 ];
         u8          _criticalChance[ 2 ][ 2 ];
@@ -458,10 +457,10 @@ namespace BATTLE {
         void        evolve( bool p_opponent, u8 p_pokemonPos );
         void        megaEvolve( bool p_opponent, u8 p_pokemonPos );
         void        doMoves( );
-        void        doMove( bool p_opponent, u8 p_pokemonPos );
+        void        doMove( u8 p_moveNo );
 
         void        calcDamage( bool p_opponent, u8 p_pokemonPos, u8 p_randInt );
-        void        doAttack( u8 p_moveNo );
+        void        doAttack( bool p_opponent, u8 p_pokemonPos );
 
         void        doWeather( );
 

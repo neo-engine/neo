@@ -52,6 +52,7 @@
 #endif
 
 #include "map2d.h"
+#include "map2devents.h"
 //#include "buffer.h"
 #include "hmMoves.h"
 
@@ -315,19 +316,19 @@ ChoiceResult opScreen( ) {
         }
         for( u16 i = 0; i < MaxVal; i++ )
             if( ( touch.py > ranges[ i ].first && touch.py < ranges[ i ].second ) ) {
-            while( 1 ) {
-                scanKeys( );
-                touch = touchReadXY( );
-                if( touch.px == 0 && touch.py == 0 )
-                    break;
-            }
-            killWeiter( );
-            FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD" );
-            FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "ClearD" );
-            for( u16 j = 1; j < 256; ++j )
-                BG_PALETTE_SUB[ j ] = RGB15( 31, 31, 31 );
+                while( 1 ) {
+                    scanKeys( );
+                    touch = touchReadXY( );
+                    if( touch.px == 0 && touch.py == 0 )
+                        break;
+                }
+                killWeiter( );
+                FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD" );
+                FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "ClearD" );
+                for( u16 j = 1; j < 256; ++j )
+                    BG_PALETTE_SUB[ j ] = RGB15( 31, 31, 31 );
 
-            return results[ i ];
+                return results[ i ];
             }
 
 #ifdef USE_AS_LIB
@@ -694,11 +695,7 @@ void vramSetup( ) {
 
 u8 lastdir;
 s8 dir[ 5 ][ 2 ] = { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } };
-enum MoveMode {
-    WALK,
-    SURF,
-    BIKE
-};
+
 int MOV = 20;
 
 bool cut::possible( ) {
@@ -717,7 +714,7 @@ bool whirlpool::possible( ) {
     return false;
 }
 bool surf::possible( ) {
-    return SAV.m_acMoveMode != SURF && acMap->m_blocks[ SAV.m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ SAV.m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].m_movedata == 4;
+    return SAV.m_acMoveMode != map2d::MoveMode::SURF && acMap->m_blocks[ SAV.m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ SAV.m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].m_movedata == 4;
 }
 
 bool heroIsBig = false;
@@ -1126,7 +1123,7 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
     heroIsBig = false;
 
     left = !left;
-    bool bike = (MoveMode)SAV.m_acMoveMode == BIKE, run = ( keysHeld( ) & KEY_B ) && !p_runDisable;
+    bool bike = ( map2d::MoveMode )SAV.m_acMoveMode == map2d::MoveMode::BIKE, run = ( keysHeld( ) & KEY_B ) && !p_runDisable;
     if( p_frame == 0 ) {
         switch( p_dir ) {
             case 0:
@@ -1444,7 +1441,7 @@ inline void movePlayer( u16 p_direction ) {
 bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
     bool WTW = ( gMod == DEVELOPER ) && ( keysHeld( ) & KEY_R );
 
-    MoveMode playermoveMode = (MoveMode)SAV.m_acMoveMode;
+    map2d::MoveMode playermoveMode = ( map2d::MoveMode )SAV.m_acMoveMode;
 
     p_x += 10;
     p_y += 10;
@@ -1465,7 +1462,7 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
 
     int verhalten = acBlock.m_bottombehave, hintergrund = acBlock.m_topbehave;
     int lstverhalten = lastBlock.m_bottombehave, lsthintergrund = lastBlock.m_topbehave;
-    if( verhalten == 0xa0 && playermoveMode != WALK ) //nur normales laufen möglich
+    if( verhalten == 0xa0 && playermoveMode != map2d::MoveMode::WALK ) //nur normales laufen möglich
         return false;
 
     if( verhalten == 0xc1 && p_y != SAV.m_acposy / 20 + 10 ) //Rechts-Links-Blockung
@@ -1478,11 +1475,11 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
     if( !WTW ) {
         if( acmovedata == 1 )
             return false;
-        if( ( acmovedata == 4 && playermoveMode != SURF ) )
+        if( ( acmovedata == 4 && playermoveMode != map2d::MoveMode::SURF ) )
             return false;
     }
-    if( acmovedata == 0xc && playermoveMode == SURF ) {
-        SAV.m_acMoveMode = WALK;
+    if( acmovedata == 0xc && playermoveMode == map2d::MoveMode::SURF ) {
+        SAV.m_acMoveMode = map2d::MoveMode::WALK;
 
     }
 
@@ -1775,7 +1772,7 @@ void flash::use( ) { }
 void whirlpool::use( ) { }
 void surf::use( ) {
     //heroIsBig = true;
-    SAV.m_acMoveMode = SURF;
+    SAV.m_acMoveMode = map2d::MoveMode::SURF;
     movePlayerOnMap( SAV.m_acposx / 20 + dir[ lastdir ][ 1 ], SAV.m_acposy / 20 + dir[ lastdir ][ 0 ], SAV.m_acposz, false );
     SAV.m_acposx += 20 * dir[ lastdir ][ 1 ];
     SAV.m_acposy += 20 * dir[ lastdir ][ 0 ];
@@ -1834,7 +1831,7 @@ int main( int p_argc, char** p_argv ) {
     AS_MP3Stop( );
 #endif
 
-    heroIsBig = SAV.m_acMoveMode != WALK;
+    heroIsBig = SAV.m_acMoveMode != map2d::MoveMode::WALK;
 
     FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "Clear" );
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "Clear" );
@@ -1973,7 +1970,7 @@ OUT:
                 stepincrease( );
                 lastdir = 2;
             }
-            if( SAV.m_acMoveMode != BIKE )
+            if( SAV.m_acMoveMode != map2d::MoveMode::BIKE )
                 continue;
         }
         if( held & KEY_LEFT ) {
@@ -1983,7 +1980,7 @@ OUT:
                 stepincrease( );
                 lastdir = 3;
             }
-            if( SAV.m_acMoveMode != BIKE )
+            if( SAV.m_acMoveMode != map2d::MoveMode::BIKE )
                 continue;
         }
         if( held & KEY_RIGHT ) {
@@ -1993,7 +1990,7 @@ OUT:
                 stepincrease( );
                 lastdir = 1;
             }
-            if( SAV.m_acMoveMode != BIKE )
+            if( SAV.m_acMoveMode != map2d::MoveMode::BIKE )
                 continue;
         }
         if( held & KEY_UP ) {
@@ -2003,7 +2000,7 @@ OUT:
                 stepincrease( );
                 lastdir = 4;
             }
-            if( SAV.m_acMoveMode != BIKE )
+            if( SAV.m_acMoveMode != map2d::MoveMode::BIKE )
                 continue;
         }
         //StartBag
