@@ -132,9 +132,12 @@ namespace map2d {
             u16 m_posX;
             u16 m_posY;
             u8 m_posZ;
+
+
         };
         static pos      getFlyPos( const char* p_path, const char* p_name );
     private:
         void            fill( u16* mapMemory[ 4 ], s16 p_xmin, s16 p_x, s16 p_xmax, s16 p_ymin, s16 p_y, s16 p_ymax, s16 p_c );
     };
+    bool operator<( Map::pos p_a, Map::pos p_b );
 }

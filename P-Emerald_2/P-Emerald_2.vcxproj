@@ -49,6 +49,7 @@
     <ClCompile Include="arm9\source\battleUI.cpp" />
     <ClCompile Include="arm9\source\buffer.cpp" />
     <ClCompile Include="arm9\source\fs.cpp" />
+    <ClCompile Include="arm9\source\map2devents.cpp" />
     <ClCompile Include="arm9\source\move.cpp" />
     <ClCompile Include="arm9\source\bag.cpp" />
     <ClCompile Include="arm9\source\battle.cpp" />

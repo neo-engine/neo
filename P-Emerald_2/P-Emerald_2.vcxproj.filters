@@ -200,6 +200,9 @@
     <ClCompile Include="arm9\source\battleUI.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
+    <ClCompile Include="arm9\source\map2devents.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile">
