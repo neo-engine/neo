@@ -60,6 +60,12 @@ extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 extern FONT::font cust_font;
 extern FONT::font cust_font2;
 
+#define COLOR_IDX (u8(253))
+#define WHITE_IDX (u8(250))
+#define GRAY_IDX (u8(251))
+#define BLACK_IDX (u8(252))
+#define RED_IDX (u8(253))
+#define BLUE_IDX (u8(254))
 
 namespace BATTLE {
     extern u8 firstMoveSwitchTarget;
@@ -158,7 +164,7 @@ namespace BATTLE {
         void    showAttack( bool p_opponent, u8 p_pokemonPos );
         void    updateHP( bool p_opponent, u8 p_pokemonPos );
         void    applyEXPChanges( );
-        void    updateStats( bool p_opponent, u8 p_pokemonPos );
+        void    updateStats( bool p_opponent, u8 p_pokemonPos, bool p_move = true );
 
         void    hidePKMN( bool p_opponent, u8 p_pokemonPos );
         void    sendPKMN( bool p_opponent, u8 p_pokemonPos );

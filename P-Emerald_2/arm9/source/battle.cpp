@@ -100,6 +100,10 @@ namespace BATTLE {
             b = 10 * C2I( p_cmd[ 11 ] ) + C2I( p_cmd[ 12 ] );
 
             p_battle._battleUI.setLogTextColor( RGB15( r, g, b ) );
+            if( r != 15 || g != 15 || b != 15 )
+                cust_font.setColor( COLOR_IDX, 1 );
+            else
+                cust_font.setColor( GRAY_IDX, 1 );
             return L"";
         }
 
@@ -174,12 +178,14 @@ namespace BATTLE {
                 if( accmd == L"CLEAR" ) {
                     _battleUI.writeLogText( msg );
                     _battleUI.clearLogScreen( );
+                    msg = L"";
                 }
             } else
                 msg += p_message[ i ];
         }
 
-        _battleUI.writeLogText( msg );
+        if( msg != L"" )
+            _battleUI.writeLogText( msg );
         _battleUI.clearLogScreen( );
     }
 
@@ -307,11 +313,25 @@ CHOOSE1:
 
         for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
             if( !_battleSpotOccupied[ i ][ j ] ) {
+                bool refillpossible = false;
+
+                for( u8 k = 1 + ( m_battleMode == DOUBLE );
+                     k < ( j ? _opponent->m_pkmnTeam->size( ) : _player->m_pkmnTeam->size( ) ); ++k )
+                     if( ACPKMNSTS( k, j ) != KO && ACPKMNSTS( k, j ) != SELECTED && ACPKMN( k, j ).m_stats.m_acHP ) {
+                         refillpossible = true;
+                         break;
+                     }
+
+                if( !refillpossible ) {
+                    _battleSpotOccupied[ i ][ j ] = true;
+                    continue;
+                }
+
                 u8 nextSpot = i;
                 if( !p_choice || j )
                     nextSpot = getNextPKMN( j, i );
                 else
-                    nextSpot = _battleUI.choosePKMN( i );
+                    nextSpot = _battleUI.choosePKMN( m_battleMode == DOUBLE );
 
                 if( nextSpot != 7 && nextSpot != i )
                     std::swap( ACPOS( i, j ), ACPOS( nextSpot, j ) );
@@ -336,6 +356,13 @@ CHOOSE1:
 
         orderPKMN( false );
 
+        if( p_send ) {
+            for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j )
+                if( !_battleSpotOccupied[ j ][ i ] )
+                    _battleUI.updateStats( i, j, false );
+            for( u8 i = 0; i < 2; ++i )for( u8 j = 2; j < 6; ++j )
+                    _battleUI.updateStats( i, j, false );
+        }
         for( u8 p = 0; p < 4; ++p ) {
             for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
                 if( _moveOrder[ i ][ j ] == p ) {
@@ -431,6 +458,9 @@ NEXT:
     *  @param p_situation: Current situation, on which an ability may be useable
     */
     void battle::doAbility( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation ) {
+        if( !ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
+            return;
+
         auto ab = ability( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability );
 
         if( ab.m_type & p_situation ) {
@@ -524,6 +554,9 @@ NEXT:
                     goto OUT;
 OUT:
         auto& acMove = _battleMoves[ pokemonPos ][ opponent ];
+
+        if( !ACPKMN( pokemonPos, opponent ).m_stats.m_acHP )
+            return;
 
         std::wstring acPkmnStr = L"";
         if( opponent )
@@ -845,6 +878,9 @@ NEXT:
     *  @param p_situation: Current situation, on which an item may be useable
     */
     void battle::doItem( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation ) {
+        if( !ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
+            return;
+
         auto im = ITEMS::ItemList[ ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability ];
 
         if( ( im.getEffectType( ) & ITEMS::item::itemEffectType::IN_BATTLE ) && ( im.m_inBattleEffect & p_situation ) ) {
@@ -925,19 +961,19 @@ NEXT:
                 _battleUI.showAttack( isOpp, isSnd );
                 _battleUI.updateHP( isOpp, isSnd );
                 if( _critical[ isSnd ][ isOpp ] )
-                    log( L"[COLR:15:15:00]Ein Volltreffer![A][COLR:15:15:15]" );
+                    log( L"[COLR:15:15:00]Ein Volltreffer![A][CLEAR][COLR:15:15:15]" );
                 if( _effectivity[ isSnd ][ isOpp ] != 1.0f ) {
                     float effectivity = _effectivity[ isSnd ][ isOpp ];
                     if( effectivity > 3.0f )
-                        std::swprintf( wbuffer, 100, L"[COLR:00:31:00]Das ist enorm effektiv\ngegen %ls![A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                        std::swprintf( wbuffer, 100, L"[COLR:00:31:00]Das ist enorm effektiv\ngegen %ls![A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
                     else if( effectivity > 1.0f )
-                        std::swprintf( wbuffer, 100, L"[COLR:00:15:00]Das ist sehr effektiv\ngegen %ls![A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                        std::swprintf( wbuffer, 100, L"[COLR:00:15:00]Das ist sehr effektiv\ngegen %ls![A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
                     else if( effectivity == 0.0f )
-                        std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Hat die Attacke\n%lsgetroffen?[A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                        std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Hat die Attacke\n%lsgetroffen?[A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
                     else if( effectivity < 0.3f )
-                        std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %ls...[A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                        std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %ls...[A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
                     else if( effectivity < 1.0f )
-                        std::swprintf( wbuffer, 100, L"[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %ls.[A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                        std::swprintf( wbuffer, 100, L"[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %ls.[A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
                     log( wbuffer );
                 }
 
@@ -947,10 +983,9 @@ NEXT:
                                    ( ACPKMN( isSnd, isOpp ).m_boxdata.m_name ),
                                    ( isOpp ? " (Gegner)" : "" ) );
                     log( wbuffer );
+                    ACPKMNSTS( isSnd, isOpp ) = KO;
                     _battleUI.hidePKMN( isOpp, isSnd );
                     _battleSpotOccupied[ isSnd ][ isOpp ] = false;
-
-                    ACPKMNSTS( isSnd, isOpp ) = KO;
 
                     if( m_distributeEXP )
                         distributeEXP( isSnd, isOpp );

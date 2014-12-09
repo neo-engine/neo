@@ -95,12 +95,6 @@ namespace BATTLE {
 #define BG_PAL( p_sub ) ( ( p_sub ) ? BG_PALETTE_SUB : BG_PALETTE )
 #define BG_BMP( p_sub ) ( ( p_sub ) ? BG_BMP_RAM_SUB( 1 ) : BG_BMP_RAM( 1 ) )
 
-#define WHITE_IDX (u8(250))
-#define GRAY_IDX (u8(251))
-#define BLACK_IDX (u8(252))
-#define RED_IDX (u8(253))
-#define BLUE_IDX (u8(254))
-
     void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big ) {
         if( p_big )
             displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 20, 24 );
@@ -157,7 +151,7 @@ namespace BATTLE {
                 }
                 if( p_delay )
                     swiWaitForVBlank( );
-            } 
+            }
         }
     }
     void initColors( ) {
@@ -188,7 +182,7 @@ namespace BATTLE {
         FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, WHITE_IDX );
     }
     void battleUI::setLogTextColor( u16 p_color ) {
-        BG_PALETTE_SUB[ GRAY_IDX ] = BG_PALETTE[ GRAY_IDX ] = p_color;
+        BG_PALETTE_SUB[ COLOR_IDX ] = BG_PALETTE[ COLOR_IDX ] = p_color;
     }
     void battleUI::writeLogText( const std::wstring& p_message ) {
         cust_font.printMBString( p_message.c_str( ), 8, 8, true );
@@ -321,7 +315,7 @@ namespace BATTLE {
         } else {
             idx = STSBALL_IDX( p_pokemonPos, p_opponent );
             tileIdx = OamTop->oamBuffer[ idx ].gfxIndex;
-            loadSprite( Oam, spriteInfo, idx, PB_PAL_TOP( p_status ), tileIdx, !p_opponent ? ( 240 - ( 16 * ( 6 - p_pokemonPos ) ) ) : ( 16 * p_pokemonPos ),
+            loadSprite( OamTop, spriteInfoTop, idx, PB_PAL_TOP( p_status ), tileIdx, !p_opponent ? ( 240 - ( 16 * p_pokemonPos ) ) : ( 16 * ( p_pokemonPos ) ),
                         p_opponent ? -4 : 180, 16, 16, PB_PAL( p_status ), PB_TILES( p_status ), PB_TILES_LEN( p_status ),
                         false, false, false, OBJPRIORITY_0, p_bottom );
             updateOAM( OamTop );
@@ -1084,6 +1078,7 @@ END:
 
         consoleSelect( &Bottom );
 
+        bool dead = !p_pokemon.m_stats.m_acHP;
         u8 x = 104, y = 48;
 
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
@@ -1091,11 +1086,14 @@ END:
                 32, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) )
                 FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
                 32, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
+
             consoleSetWindow( &Bottom, 13, 7, 20, 8 );
             if( !p_alreadySent && !p_alreadyChosen )
                 printf( "   AUSSENDEN" );
             else if( !p_alreadyChosen )
                 printf( "Bereits im Kampf" );
+            else if( dead )
+                printf( "Schon besiegt..." );
             else
                 printf( "Schon ausgew\x84""hlt" );
             printf( "\n----------------\n%11ls %c\n%11s\n\nLv.%3i %3i/%3iKP",
@@ -1160,7 +1158,7 @@ END:
                 return 3;
             }
             if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
-                if( !p_alreadySent && !p_alreadyChosen && t.px > x && t.px < x + 128 && t.py > y && t.py < y + 64 ) { //Send
+                if( !p_alreadySent && !p_alreadyChosen && !dead && t.px > x && t.px < x + 128 && t.py > y && t.py < y + 64 ) { //Send
                     battleUI::waitForTouchUp( );
                     return 0;
                 }
@@ -1624,6 +1622,10 @@ CLEAR:
 
             POKEMON::PKMNDATA::pokemonData p;
             auto acPkmn = ACPKMN2( *_battle, pokemonPos, opponent );
+
+            if( !acPkmn.m_stats.m_acHP )
+                continue;
+
             POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_speciesId, p );
 
             displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
@@ -1632,10 +1634,33 @@ CLEAR:
         }
     }
 
-    void battleUI::updateStats( bool p_opponent, u8 p_pokemonPos ) {
-        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
-            return;
+    void battleUI::updateStats( bool p_opponent, u8 p_pokemonPos, bool p_move ) {
+        //if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+        //    return;
         setStsBallSts( p_opponent, p_pokemonPos, ACPKMNSTS2( *_battle, p_pokemonPos, p_opponent ), false );
+        if( p_pokemonPos <= ( _battle->m_battleMode == battle::DOUBLE)  && p_move
+            && ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP ) {
+            u8 hpx = 0, hpy = 0;
+            if( p_opponent ) {
+                hpx = 88;
+                hpy = 40;
+
+                if( p_pokemonPos ) {
+                    hpx -= 88;
+                    hpy -= 32;
+                }
+            } else {
+                hpx = 220;
+                hpy = 152;
+
+                if( !p_pokemonPos ) {
+                    hpx -= 88;
+                    hpy -= 32;
+                }
+            }
+            setStsBallPosition( p_opponent, p_pokemonPos, hpx + 8, hpy + 8, false );
+        }
+        updateOAM( OamTop );
     }
 
     void battleUI::hidePKMN( bool p_opponent, u8 p_pokemonPos ) {
@@ -1653,7 +1678,8 @@ CLEAR:
                    HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
         displayEP( 100, 100, OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
                    OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-        setStsBallVisibility( p_opponent, p_pokemonPos, true, false );
+        //setStsBallVisibility( p_opponent, p_pokemonPos, true, false );
+        setStsBallSts( p_opponent, p_pokemonPos, ACPKMNSTS2( *_battle, p_pokemonPos, p_opponent ), false );
         updateOAM( OamTop );
 
         //Clear text
@@ -1911,7 +1937,7 @@ CLEAR:
         animatePokeBall( x + 40, y + 40, PB_ANIM, 15, TILESTART );
 
         //Load the PKMN sprite
-        u8 oamIdx = PKMN_IDX( p_pokemonPos, p_opponent );
+        u8 oamIdx = PKMN_IDX( p_pokemonPos, p_opponent ) - 1;
         u8 palIdx = PKMN_PAL_IDX( p_pokemonPos, p_opponent ) - 1;
         u16 tileCnt = PKMN_TILE_IDX( p_pokemonPos, p_opponent );
 
