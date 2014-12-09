@@ -158,7 +158,7 @@ namespace BATTLE {
         u16     chooseAttack( u8 p_pokemonPos );
         u8      chooseAttackTarget( u8 p_pokemonPos, u16 p_moveNo );
         u16     chooseItem( u8 p_pokemonPos );
-        u8      choosePKMN( bool p_firstIsChosen );
+        u8      choosePKMN( bool p_firstIsChosen, bool p_back = true );
         void    useNav( );
 
         void    showAttack( bool p_opponent, u8 p_pokemonPos );

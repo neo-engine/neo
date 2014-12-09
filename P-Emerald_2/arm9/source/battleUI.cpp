@@ -983,8 +983,6 @@ END:
     }
 
     void drawPKMNChoiceScreen( battle* p_battle, bool p_firstIsChosen ) {
-        Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
-
         u16 tilecnt = 0;
         u8  palIndex = 3;
         u8 oamIndex = SUB_Back_OAM;
@@ -1478,13 +1476,15 @@ END:
         }
     }
 
-    u8 battleUI::choosePKMN( bool p_firstIsChosen ) {
+    u8 battleUI::choosePKMN( bool p_firstIsChosen, bool p_back ) {
 START:
         consoleSelect( &Bottom );
         undrawPKMNChoiceScreen( );
         consoleSetWindow( &Bottom, 0, 0, 32, 24 );
         consoleClear( );
         u8 result = 0;
+        Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
+        updateOAMSub( Oam );
         drawPKMNChoiceScreen( _battle, p_firstIsChosen );
         drawSub( );
         initColors( );
@@ -1494,12 +1494,15 @@ START:
 
         touchPosition t;
         while( 42 ) {
+            Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
+            updateOAMSub( Oam );
+
             updateTime( false );
             scanKeys( );
             t = touchReadXY( );
 
             //Accept touches that are almost on the sprite
-            if( t.px > 224 && t.py > 164 ) { //Back
+            if(p_back && t.px > 224 && t.py > 164 ) { //Back
                 waitForTouchUp( );
                 result = 0;
                 break;

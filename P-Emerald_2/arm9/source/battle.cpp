@@ -212,19 +212,20 @@ CHOOSE1:
             _battleMoves[ 0 ][ OPPONENT ] = { ( battleMove::type )0, 0, 0 };
             _battleMoves[ 1 ][ OPPONENT ] = { ( battleMove::type )0, 0, 0 };
 
-            if( p1CanMove ) {
-                _battleUI.declareBattleMove( 0, false );
-                if( _endBattle ) {
-                    endBattle( battleEnd = RUN );
-                    return ( battleEnd );
-                }
-            } else
-                log( L"[OWN1] kann nicht angreifen...[A]" );
-
+            if( ACPKMNSTS( 0, PLAYER ) != KO ) {
+                if( p1CanMove ) {
+                    _battleUI.declareBattleMove( 0, false );
+                    if( _endBattle ) {
+                        endBattle( battleEnd = RUN );
+                        return ( battleEnd );
+                    }
+                } else
+                    log( L"[OWN1] kann nicht angreifen...[A]" );
+            }
             //If 1st action is RUN, the player has no choice for a second move
-            if( _battleMoves[ 0 ][ PLAYER ].m_type != battleMove::RUN ) {
+            if( _battleMoves[ 0 ][ PLAYER ].m_type != battleMove::RUN && ACPKMNSTS( 1, PLAYER ) != KO ) {
                 if( m_battleMode == DOUBLE && canMove( PLAYER, 1 ) ) {
-                    if( !_battleUI.declareBattleMove( 1, p1CanMove ) )
+                    if( !_battleUI.declareBattleMove( 1, p1CanMove && ACPKMNSTS( 0, PLAYER ) != KO ) )
                         goto CHOOSE1;
 
                     if( _endBattle ) {
@@ -317,7 +318,8 @@ CHOOSE1:
 
                 for( u8 k = 1 + ( m_battleMode == DOUBLE );
                      k < ( j ? _opponent->m_pkmnTeam->size( ) : _player->m_pkmnTeam->size( ) ); ++k )
-                     if( ACPKMNSTS( k, j ) != KO && ACPKMNSTS( k, j ) != SELECTED && ACPKMN( k, j ).m_stats.m_acHP ) {
+                     if( ACPKMNSTS( k, j ) != KO && ACPKMNSTS( k, j ) != SELECTED
+                         && ACPKMNSTS( k, j ) != NA && ACPKMN( k, j ).m_stats.m_acHP ) {
                          refillpossible = true;
                          break;
                      }
@@ -331,7 +333,7 @@ CHOOSE1:
                 if( !p_choice || j )
                     nextSpot = getNextPKMN( j, i );
                 else
-                    nextSpot = _battleUI.choosePKMN( m_battleMode == DOUBLE );
+                    nextSpot = _battleUI.choosePKMN( m_battleMode == DOUBLE, false );
 
                 if( nextSpot != 7 && nextSpot != i )
                     std::swap( ACPOS( i, j ), ACPOS( nextSpot, j ) );
@@ -361,7 +363,7 @@ CHOOSE1:
                 if( !_battleSpotOccupied[ j ][ i ] )
                     _battleUI.updateStats( i, j, false );
             for( u8 i = 0; i < 2; ++i )for( u8 j = 2; j < 6; ++j )
-                    _battleUI.updateStats( i, j, false );
+                _battleUI.updateStats( i, j, false );
         }
         for( u8 p = 0; p < 4; ++p ) {
             for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
