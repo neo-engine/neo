@@ -950,54 +950,56 @@ NEXT:
                 goto NEXT;
             }
 
-            if( doesChange ) {
+            if( ACPKMN( isSnd, isOpp ).m_stats.m_acHP ) {
+                if( doesChange ) {
 
-                ACPKMN( isSnd, isOpp ).m_stats.m_acHP = (u16)std::max( s16( 0 ),
-                                                                       std::min( s16( ACPKMN( isSnd, isOpp ).m_stats.m_acHP - _acDamage[ isSnd ][ isOpp ] ),
-                                                                       (s16)ACPKMN( isSnd, isOpp ).m_stats.m_maxHP ) );
+                    ACPKMN( isSnd, isOpp ).m_stats.m_acHP = (u16)std::max( s16( 0 ),
+                                                                           std::min( s16( ACPKMN( isSnd, isOpp ).m_stats.m_acHP - _acDamage[ isSnd ][ isOpp ] ),
+                                                                           (s16)ACPKMN( isSnd, isOpp ).m_stats.m_maxHP ) );
 
 
-                for( u8 s = 0; s < MAX_STATS; s++ )
-                    ACPKMNSTATCHG( isSnd, isOpp )[ s ] += _acStatChange[ isSnd ][ isOpp ][ s ];
+                    for( u8 s = 0; s < MAX_STATS; s++ )
+                        ACPKMNSTATCHG( isSnd, isOpp )[ s ] += _acStatChange[ isSnd ][ isOpp ][ s ];
 
-                _battleUI.showAttack( isOpp, isSnd );
-                _battleUI.updateHP( isOpp, isSnd );
-                if( _critical[ isSnd ][ isOpp ] )
-                    log( L"[COLR:15:15:00]Ein Volltreffer![A][CLEAR][COLR:15:15:15]" );
-                if( _effectivity[ isSnd ][ isOpp ] != 1.0f ) {
-                    float effectivity = _effectivity[ isSnd ][ isOpp ];
-                    if( effectivity > 3.0f )
-                        std::swprintf( wbuffer, 100, L"[COLR:00:31:00]Das ist enorm effektiv\ngegen %ls![A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
-                    else if( effectivity > 1.0f )
-                        std::swprintf( wbuffer, 100, L"[COLR:00:15:00]Das ist sehr effektiv\ngegen %ls![A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
-                    else if( effectivity == 0.0f )
-                        std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Hat die Attacke\n%lsgetroffen?[A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
-                    else if( effectivity < 0.3f )
-                        std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %ls...[A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
-                    else if( effectivity < 1.0f )
-                        std::swprintf( wbuffer, 100, L"[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %ls.[A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
-                    log( wbuffer );
-                }
+                    _battleUI.showAttack( isOpp, isSnd );
+                    _battleUI.updateHP( isOpp, isSnd );
+                    if( _critical[ isSnd ][ isOpp ] )
+                        log( L"[COLR:15:15:00]Ein Volltreffer![A][CLEAR][COLR:15:15:15]" );
+                    if( _effectivity[ isSnd ][ isOpp ] != 1.0f ) {
+                        float effectivity = _effectivity[ isSnd ][ isOpp ];
+                        if( effectivity > 3.0f )
+                            std::swprintf( wbuffer, 100, L"[COLR:00:31:00]Das ist enorm effektiv\ngegen %ls![A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                        else if( effectivity > 1.0f )
+                            std::swprintf( wbuffer, 100, L"[COLR:00:15:00]Das ist sehr effektiv\ngegen %ls![A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                        else if( effectivity == 0.0f )
+                            std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Hat die Attacke\n%lsgetroffen?[A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                        else if( effectivity < 0.3f )
+                            std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %ls...[A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                        else if( effectivity < 1.0f )
+                            std::swprintf( wbuffer, 100, L"[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %ls.[A][CLEAR][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                        log( wbuffer );
+                    }
 
-                //Check if PKMN fainted
-                if( !ACPKMN( isSnd, isOpp ).m_stats.m_acHP ) {
-                    std::swprintf( wbuffer, 100, L"%ls%s wurde besiegt.[A]",
+                    //Check if PKMN fainted
+                    if( !ACPKMN( isSnd, isOpp ).m_stats.m_acHP ) {
+                        std::swprintf( wbuffer, 100, L"%ls%s wurde besiegt.[A]",
+                                       ( ACPKMN( isSnd, isOpp ).m_boxdata.m_name ),
+                                       ( isOpp ? " (Gegner)" : "" ) );
+                        log( wbuffer );
+                        ACPKMNSTS( isSnd, isOpp ) = KO;
+                        _battleUI.hidePKMN( isOpp, isSnd );
+                        _battleSpotOccupied[ isSnd ][ isOpp ] = false;
+
+                        if( m_distributeEXP )
+                            distributeEXP( isSnd, isOpp );
+                    } else
+                        _battleUI.updateStats( isOpp, isSnd );
+                } else {
+                    std::swprintf( wbuffer, 100, L"%ls%s bleibt von\nder Attacke unbeeindruckt...[A]",
                                    ( ACPKMN( isSnd, isOpp ).m_boxdata.m_name ),
                                    ( isOpp ? " (Gegner)" : "" ) );
                     log( wbuffer );
-                    ACPKMNSTS( isSnd, isOpp ) = KO;
-                    _battleUI.hidePKMN( isOpp, isSnd );
-                    _battleSpotOccupied[ isSnd ][ isOpp ] = false;
-
-                    if( m_distributeEXP )
-                        distributeEXP( isSnd, isOpp );
-                } else
-                    _battleUI.updateStats( isOpp, isSnd );
-            } else {
-                std::swprintf( wbuffer, 100, L"%ls%s bleibt von\nder Attacke unbeeindruckt...[A]",
-                               ( ACPKMN( isSnd, isOpp ).m_boxdata.m_name ),
-                               ( isOpp ? " (Gegner)" : "" ) );
-                log( wbuffer );
+                }
             }
         }
         for( u8 k = 4; k < 6; ++k ) {
