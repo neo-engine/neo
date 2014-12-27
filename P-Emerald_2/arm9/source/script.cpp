@@ -258,8 +258,6 @@ namespace BATTLE {
                 switch( m_targetSpecifier ) {
                     case BATTLE::battleScript::command::PKMN_SPECIES:
                         if( m_action == SET ) {
-                            ACPKMNUNDO2( p_battle, p_targetPosition, p_targetIsOpp )._commands.push_back(
-                                command( { }, t, m_targetSpecifier, m_action, p_target.m_boxdata.m_speciesId ) );
                             p_target.m_boxdata.m_speciesId = m_value.get( p_battle, p_self );
                         }
                         break;
@@ -270,15 +268,11 @@ namespace BATTLE {
                         break;
                     case BATTLE::battleScript::command::PKMN_ABILITY:
                         if( m_action == SET ) {
-                            ACPKMNUNDO2( p_battle, p_targetPosition, p_targetIsOpp )._commands.push_back(
-                                command( { }, t, m_targetSpecifier, m_action, p_target.m_boxdata.m_holdItem ) );
                             p_target.m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
                         }
                         break;
                     case BATTLE::battleScript::command::PKMN_STATUS:
                         if( m_action == SET ) {
-                            ACPKMNUNDO2( p_battle, p_targetPosition, p_targetIsOpp )._commands.push_back(
-                                command( { }, t, m_targetSpecifier, m_action, p_target.m_boxdata.m_holdItem ) );
                             p_target.m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
                         }
                         break;

@@ -344,9 +344,9 @@ u8: 8;
                     case 0: return m_individualValues.m_hp;
                     case 1: return m_individualValues.m_attack;
                     case 2: return m_individualValues.m_defense;
-                    case 3: return m_individualValues.m_speed;
-                    case 4: return m_individualValues.m_sAttack;
-                    case 5: return m_individualValues.m_sDefense;
+                    case 5: return m_individualValues.m_speed;
+                    case 3: return m_individualValues.m_sAttack;
+                    case 4: return m_individualValues.m_sDefense;
                     default: return 0;
                 }
             }

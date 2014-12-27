@@ -262,6 +262,13 @@ CHOOSE1:
         _battleUI.init( );
 
         for( u8 i = 0; i < 6; ++i ) {
+            if( _player->m_pkmnTeam->size( ) > i ) {
+                _pkmns[ i ][ 0 ].m_pokemon = ( *_player->m_pkmnTeam )[ i ];
+            }
+            if( _opponent->m_pkmnTeam->size( ) > i ) {
+                _pkmns[ i ][ 1 ].m_pokemon = ( *_opponent->m_pkmnTeam )[ i ];
+            }
+
             ACPOS( i, PLAYER ) = ACPOS( i, OPPONENT ) = i;
             for( u8 o = 0; o < MAX_STATS; ++o )
                 ACPKMNSTATCHG( i, PLAYER )[ o ] = ACPKMNSTATCHG( i, OPPONENT )[ o ] = 0;

@@ -1318,10 +1318,10 @@ END:
                 sprintf( buffer, "KP                     %3i", p_pokemon.m_stats.m_maxHP );
                 cust_font.printString( buffer, 130, 16, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 1.2 ) {
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 1.1 ) {
                     cust_font.setColor( WHITE_IDX, 1 );
                     cust_font.setColor( RED_IDX, 2 );
-                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 0.8 ) {
+                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 0.9 ) {
                     cust_font.setColor( WHITE_IDX, 1 );
                     cust_font.setColor( BLUE_IDX, 2 );
                 } else {
@@ -1331,10 +1331,10 @@ END:
                 sprintf( buffer, "ANG                   %3i", p_pokemon.m_stats.m_Atk );
                 cust_font.printString( buffer, 126, 41, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 1.2 ) {
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 1.1 ) {
                     cust_font.setColor( WHITE_IDX, 1 );
                     cust_font.setColor( RED_IDX, 2 );
-                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 0.8 ) {
+                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 0.9 ) {
                     cust_font.setColor( WHITE_IDX, 1 );
                     cust_font.setColor( BLUE_IDX, 2 );
                 } else {
@@ -1344,23 +1344,10 @@ END:
                 sprintf( buffer, "VER                   %3i", p_pokemon.m_stats.m_Def );
                 cust_font.printString( buffer, 124, 58, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 1.2 ) {
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 1.1 ) {
                     cust_font.setColor( WHITE_IDX, 1 );
                     cust_font.setColor( RED_IDX, 2 );
-                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 0.8 ) {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( BLUE_IDX, 2 );
-                } else {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( GRAY_IDX, 2 );
-                }
-                sprintf( buffer, "INI                   \xC3\xC3""%3i", p_pokemon.m_stats.m_Spd );
-                cust_font.printString( buffer, 122, 75, true );
-
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 1.2 ) {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( RED_IDX, 2 );
-                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 0.8 ) {
+                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 0.9 ) {
                     cust_font.setColor( WHITE_IDX, 1 );
                     cust_font.setColor( BLUE_IDX, 2 );
                 } else {
@@ -1368,12 +1355,12 @@ END:
                     cust_font.setColor( GRAY_IDX, 2 );
                 }
                 sprintf( buffer, "SAN                   %3i", p_pokemon.m_stats.m_SAtk );
-                cust_font.printString( buffer, 120, 92, true );
+                cust_font.printString( buffer, 122, 75, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 1.2 ) {
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 1.1 ) {
                     cust_font.setColor( WHITE_IDX, 1 );
                     cust_font.setColor( RED_IDX, 2 );
-                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 0.8 ) {
+                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 0.9 ) {
                     cust_font.setColor( WHITE_IDX, 1 );
                     cust_font.setColor( BLUE_IDX, 2 );
                 } else {
@@ -1381,12 +1368,25 @@ END:
                     cust_font.setColor( GRAY_IDX, 2 );
                 }
                 sprintf( buffer, "SVE                   %3i", p_pokemon.m_stats.m_SDef );
+                cust_font.printString( buffer, 120, 92, true );
+
+                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 1.1 ) {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( RED_IDX, 2 );
+                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 0.9 ) {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( BLUE_IDX, 2 );
+                } else {
+                    cust_font.setColor( WHITE_IDX, 1 );
+                    cust_font.setColor( GRAY_IDX, 2 );
+                }
+                sprintf( buffer, "INI                   \xC3\xC3""%3i", p_pokemon.m_stats.m_Spd );
                 cust_font.printString( buffer, 118, 109, true );
 
                 FONT::putrec( (u8)158, (u8)18, u8( 158 + 68 ), u8( 18 + 12 ), true, false, WHITE_IDX );
 
                 FONT::putrec( (u8)158, (u8)18, u8( 158 + ( 68.0*p_pokemon.m_boxdata.IVget( 0 ) / 31 ) ), u8( 18 + 6 ), true, false, GRAY_IDX );
-                FONT::putrec( (u8)158, u8( 18 + 6 ), u8( 158 + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ 0 ] / 255 ) ), u8( 18 + 12 ), true, false, GRAY_IDX );
+                FONT::putrec( (u8)158, u8( 18 + 6 ), u8( 158 + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ 0 ] / 252 ) ), u8( 18 + 12 ), true, false, GRAY_IDX );
 
                 for( int i = 1; i < 6; ++i ) {
                     FONT::putrec( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
@@ -1397,7 +1397,7 @@ END:
                                   u8( 26 + 6 + ( 17 * i ) ),
                                   true, false, GRAY_IDX );
                     FONT::putrec( u8( 156 - 2 * i ), u8( 26 + 6 + ( 17 * i ) ),
-                                  u8( 156 - 2 * i + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ i ] / 255 ) ),
+                                  u8( 156 - 2 * i + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ i ] / 252 ) ),
                                   u8( 26 + 12 + ( 17 * i ) ), true, false, GRAY_IDX );
                 }
 

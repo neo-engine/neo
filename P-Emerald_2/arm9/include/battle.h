@@ -42,11 +42,8 @@
 #include "ability.h"
 #include "sprite.h"
 #include "print.h"
+#include "pokemon.h"
 
-
-namespace POKEMON {
-    class pokemon;
-}
 namespace ITEMS {
     class item;
 }
@@ -179,32 +176,6 @@ namespace BATTLE {
             :_battle( p_battle ) { }
     };
 
-    class battle {
-    private:
-        u16 _round,
-            _maxRounds,
-            _AILevel;
-        const battleTrainer
-            *_player,
-            *_opponent;
-
-        u8 _acPkmnPosition[ 6 ][ 2 ]; //me; opp; maps the Pkmn's positions in the teams to their real in-battle positions
-    public:
-        enum acStatus {
-            OK = 0,
-            STS = 1,
-            KO = 2,
-            NA = 3,
-            SELECTED = 4
-        };
-    private:
-        acStatus _acPkmnStatus[ 6 ][ 2 ];
-
-        move::ailment _acPkmnAilments[ 6 ][ 2 ];
-        u8 _acPkmnAilmentCounts[ 6 ][ 2 ];
-
-        bool _battleSpotOccupied[ 2 ][ 2 ];
-
 #define MAX_STATS 7
 #define ATK 0
 #define DEF 1
@@ -214,7 +185,26 @@ namespace BATTLE {
 #define ACCURACY 5
 #define ATTACK_BLOCKED 6
 
-        s8 _acPkmnStatChanges[ 6 ][ 2 ][ 10 ];
+    class battle {
+    public:
+        enum acStatus {
+            OK = 0,
+            STS = 1,
+            KO = 2,
+            NA = 3,
+            SELECTED = 4
+        };
+    private:
+        u16 _round,
+            _maxRounds,
+            _AILevel;
+        const battleTrainer
+            *_player,
+            *_opponent;
+
+        u8 _acPkmnPosition[ 6 ][ 2 ]; //me; opp; maps the Pkmn's positions in the teams to their real in-battle positions
+
+        bool _battleSpotOccupied[ 2 ][ 2 ];
 
         struct battleMove {
         public:
@@ -235,6 +225,15 @@ namespace BATTLE {
                 m_type = (type)0;
                 m_value = 0;
             }
+        };
+        struct battlePokemon {
+        public:
+            POKEMON::pokemon    m_pokemon;
+            s8                  m_acStatChanges[ 10 ];
+            Type                m_Types[ 3 ];
+            battle::acStatus    m_acStatus;
+            move::ailment       m_ailments;
+            u8                  m_ailmentCount;
         };
 
         battleMove  _battleMoves[ 2 ][ 2 ];
@@ -363,7 +362,7 @@ namespace BATTLE {
             L"Windstille...[A]"
         };
 
-
+        battlePokemon _pkmns[ 6 ][ 2 ];
 
         battleUI    _battleUI;
     public:
@@ -371,19 +370,16 @@ namespace BATTLE {
 #define PLAYER 0
 
 #define ACPOS( p_pokemonPos, p_opponent ) _acPkmnPosition[ p_pokemonPos ][ p_opponent ]
-#define ACPKMNSTS( p_pokemonPos, p_opponent ) _acPkmnStatus[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
-#define ACPKMNAIL( p_pokemonPos, p_opponent ) _acPkmnAilments[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
-#define ACPKMNAILCNT( p_pokemonPos, p_opponent ) _acPkmnAilmentCounts[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
-#define ACPKMN( p_pokemonPos, p_opponent ) ( ( ( p_opponent ) == OPPONENT) ? ( ( *_opponent->m_pkmnTeam )[ ACPOS( ( p_pokemonPos ), OPPONENT ) ] ) :\
-                     ( ( *_player->m_pkmnTeam )[ ACPOS( ( p_pokemonPos ), PLAYER ) ]))
-#define ACPKMNSTATCHG( p_pokemonPos, p_opponent ) _acPkmnStatChanges[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
+#define ACPKMNSTS( p_pokemonPos, p_opponent ) (_pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]).m_acStatus
+#define ACPKMNAIL( p_pokemonPos, p_opponent ) _pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_ailments
+#define ACPKMNAILCNT( p_pokemonPos, p_opponent ) _pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_ailmentCount
+#define ACPKMN( p_pokemonPos, p_opponent ) (_pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_pokemon)
+#define ACPKMNSTATCHG( p_pokemonPos, p_opponent ) _pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_acStatChanges
 
 #define ACPOS2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._acPkmnPosition[ p_pokemonPos ][ p_opponent ]
-#define ACPKMNSTS2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._acPkmnStatus[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
-#define ACPKMN2( p_battle, p_pokemonPos, p_opponent ) ( ( ( p_opponent ) == OPPONENT ) ? ( ( *( p_battle )._opponent->m_pkmnTeam )[ ACPOS2( ( p_battle ), ( p_pokemonPos ), OPPONENT ) ] ) :\
-                     ( ( *( p_battle )._player->m_pkmnTeam )[ ACPOS2( ( p_battle ), ( p_pokemonPos ), PLAYER ) ] ) )
-#define ACPKMNUNDO2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._undoScript[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
-#define ACPKMNSTATCHG2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._acPkmnStatChanges[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
+#define ACPKMNSTS2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._pkmns[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_acStatus
+#define ACPKMN2( p_battle, p_pokemonPos, p_opponent ) (( p_battle )._pkmns[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_pokemon)
+#define ACPKMNSTATCHG2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._pkmns[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_acStatChanges
 
         friend class battleScript;
         friend class battleUI;
