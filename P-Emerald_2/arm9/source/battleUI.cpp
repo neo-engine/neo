@@ -157,11 +157,11 @@ namespace BATTLE {
     void initColors( ) {
 
         cust_font.setColor( 0, 0 );
-        cust_font.setColor( GRAY_IDX, 1 );
-        cust_font.setColor( BLACK_IDX, 2 );
+        cust_font.setColor( BLACK_IDX, 1 );
+        cust_font.setColor( GRAY_IDX, 2 );
         cust_font2.setColor( 0, 0 );
         cust_font2.setColor( GRAY_IDX, 1 );
-        cust_font2.setColor( BLACK_IDX, 2 );
+        cust_font2.setColor( WHITE_IDX, 2 );
 
         BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
         BG_PALETTE_SUB[ GRAY_IDX ] = STEEL;
@@ -609,7 +609,7 @@ SHOW_ATTACK:
     }
 
     u16 battleUI::chooseAttack( u8 p_pokemonPos ) {
-        u8 result = 0;
+        u16 result = 0;
 
         writeLogText( L"Welche Attacke?" );
 
@@ -649,8 +649,8 @@ SHOW_ATTACK:
                 consoleSelect( &Bottom );
                 consoleSetWindow( &Bottom, x / 8, 12 + ( i / 2 ) * 6, 20, 2 );
                 printf( "%6hhu/%2hhu AP",
-                        acPkmn.m_boxdata.m_acPP[ 0 ],
-                        AttackList[ acPkmn.m_boxdata.m_moves[ 0 ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.m_ppup.m_Up1 ) / 5 ) );
+                        acPkmn.m_boxdata.m_acPP[ i ],
+                        AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.m_ppup.m_Up1 ) / 5 ) );
             }
         }
 
@@ -790,13 +790,6 @@ END:
             FONT::putrec( 176 + 1, 106 + 1, 176 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
 
         _battle->_battleMoves[ p_pokemonPos ][ PLAYER ].m_target = 1 | 2 | 4 | 8;
-        _battle->calcDamage( PLAYER, p_pokemonPos, 16 );
-        u16 avrgDamage[ 2 ][ 2 ];
-        for( u8 i = 0; i < 4; ++i )
-            avrgDamage[ i % 2 ][ i / 2 ] = _battle->_acDamage[ i % 2 ][ 1 / 2 ];
-        _battle->calcDamage( PLAYER, p_pokemonPos, 17 );
-        for( u8 i = 0; i < 4; ++i )
-            avrgDamage[ i % 2 ][ i / 2 ] = ( avrgDamage[ i % 2 ][ i / 2 ] + _battle->_acDamage[ i % 2 ][ 1 / 2 ] ) / 2;
 
         for( u8 i = 0; i < 4; ++i ) {
             u8 aI = i % 2;
@@ -824,10 +817,6 @@ END:
                 cust_font.printString( acPkmn.m_boxdata.m_name, x + 7, y + 7, true );
                 FS::drawPKMNIcon( Oam, spriteInfo, acPkmn.m_boxdata.m_speciesId,
                                   x - 10, y - 23, oamIndex, palIndex, tilecnt );
-                consoleSelect( &Bottom );
-                consoleSetWindow( &Bottom, x / 8, 12 + ( i / 2 ) * 6, 20, 2 );
-                if( acMove->m_moveHitType != move::STAT )
-                    printf( "%4hu Schaden", avrgDamage[ aI ][ 1 - ( i / 2 ) ] );
             }
         }
 
@@ -1572,14 +1561,6 @@ CLEAR:
 
         if( acMove.m_type != battle::battleMove::ATTACK )
             return;
-
-        //Reduce PP
-        for( u8 i = 0; i < 4; ++i )
-            if( ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_moves[ i ] == acMove.m_value ) {
-                if( ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_acPP[ i ] )
-                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_acPP[ i ]--;
-                break;
-            }
     }
 
     void battleUI::updateHP( bool p_opponent, u8 p_pokemonPos ) {
@@ -1664,6 +1645,14 @@ CLEAR:
             setStsBallPosition( p_opponent, p_pokemonPos, hpx + 8, hpy + 8, false );
         }
         updateOAM( OamTop );
+    }
+
+    void battleUI::updateStatus( bool p_opponent, u8 p_pokemonPos ) {
+
+    }
+
+    void battleUI::showStatus( bool p_opponent, u8 p_pokemonPos ) {
+
     }
 
     void battleUI::hidePKMN( bool p_opponent, u8 p_pokemonPos ) {
@@ -2060,12 +2049,27 @@ ST:
         }
     }
 
+    void battleUI::showEndScreen( ) {
+
+        initOAMTable( OamTop );
+        consoleSetWindow( &Top, 0, 0, 32, 24 );
+        consoleSelect( &Top );
+        consoleClear( );
+
+        dmaCopy( mug_001_1Bitmap, bgGetGfxPtr( bg2 ), 256 * 192 );
+        dmaCopy( mug_001_1Pal, BG_PALETTE, 64 );
+    }
+
     void battleUI::dinit( ) {
+        videoSetMode( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
+        dmaFillWords( 0, bgGetGfxPtr( bg2 ), 256 * 192 );
+        dmaFillWords( 0, bgGetGfxPtr( bg3 ), 256 * 192 );
         consoleSetWindow( &Bottom, 0, 0, 32, 24 );
         consoleSelect( &Bottom );
         consoleClear( );
         drawSub( );
         initOAMTableSub( Oam );
+        initOAMTable( OamTop );
         initMainSprites( Oam, spriteInfo );
         setMainSpriteVisibility( false );
         Oam->oamBuffer[ 8 ].isHidden = true;

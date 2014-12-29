@@ -42,7 +42,7 @@
 class move {
 public:
     enum ailment {
-        NONE,
+        NONE = 0,
         PARALYSIS,
         SLEEP,
         FREEZE,
@@ -81,7 +81,8 @@ public:
         SNATCH = 8,
         MIRROR_MOVE = 16,
         KINGS_ROCK = 32,
-        SOUNDPROOF = 64
+        SOUNDPROOF = 64,
+        WHILE_ASLEEP = 128
     };
 
     enum moveHitTypes {

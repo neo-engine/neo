@@ -42,7 +42,8 @@ public:
         AFTER_BATTLE = 4,
         GRASS = 8,
         BEFORE_ATTACK = 16,
-        AFTER_ATTACK = 32
+        AFTER_ATTACK = 32,
+        BETWEEN_TURNS = 64
     };
     std::string         m_abilityName;
     std::string         m_flavourText;
@@ -147,7 +148,7 @@ std::wstring getWAbilityName( int p_abilityId );
 #define A_DRY_SKIN 87
 #define A_DOWNLOAD 88
 #define A_IRON_FIST 89
-#define A_POISON 90
+#define A_POISON_HEAL 90
 #define A_ADAPTABILITY 91
 #define A_SKILL_LINK 92
 #define A_HYDRATION 93

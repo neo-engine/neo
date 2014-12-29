@@ -174,3 +174,6 @@ namespace ITEMS {
 #define I_POWER_LENS 47
 #define I_POWER_BAND 48
 #define I_POWER_ANKLET 49
+#define I_LAGGING_TAIL 50
+#define I_QUICK_CLAW 51
+#define I_FULL_INCENSE 52
