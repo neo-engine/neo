@@ -41,6 +41,8 @@
 
 #include "print.h"
 
+#include "defines.h"
+
 extern ConsoleFont cfont;
 extern FONT::font cust_font;
 extern FONT::font cust_font2;
@@ -60,18 +62,18 @@ void init( ) {
     updateOAMSub( Oam );
 
     cust_font.setColor( 0, 0 );
-    cust_font.setColor( 251, 1 );
-    cust_font.setColor( 252, 2 );
+    cust_font.setColor( BLACK_IDX, 1 );
+    cust_font.setColor( GRAY_IDX, 2 );
     cust_font2.setColor( 0, 0 );
-    cust_font2.setColor( 253, 1 );
-    cust_font2.setColor( 254, 2 );
+    cust_font2.setColor( GRAY_IDX, 1 );
+    cust_font2.setColor( WHITE_IDX, 2 );
 
-    BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-    BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
-    BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
-    BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
-    BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-    FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
+    BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
+    BG_PALETTE_SUB[ GRAY_IDX ] = STEEL;
+    BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
+    BG_PALETTE_SUB[ RED_IDX ] = RED;
+    BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;
+    FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, WHITE_IDX );
 
     updateOAMSub( Oam );
 }

@@ -43,6 +43,7 @@
 #include "sprite.h"
 #include "print.h"
 #include "pokemon.h"
+#include "defines.h"
 
 namespace ITEMS {
     class item;
@@ -56,13 +57,6 @@ extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 
 extern FONT::font cust_font;
 extern FONT::font cust_font2;
-
-#define COLOR_IDX (u8(253))
-#define WHITE_IDX (u8(250))
-#define GRAY_IDX (u8(251))
-#define BLACK_IDX (u8(252))
-#define RED_IDX (u8(253))
-#define BLUE_IDX (u8(254))
 
 namespace BATTLE {
     extern u8 firstMoveSwitchTarget;
@@ -162,7 +156,7 @@ namespace BATTLE {
         void    updateHP( bool p_opponent, u8 p_pokemonPos );
         void    showStatus( bool p_opponent, u8 p_pokemonPos );
         void    updateStatus( bool p_opponent, u8 p_pokemonPos );
-        void    applyEXPChanges( );
+        void    applyEXPChanges( bool p_opponent, u8 p_pokemonPos, u32 p_gainedExp );
         void    updateStats( bool p_opponent, u8 p_pokemonPos, bool p_move = true );
 
         void    hidePKMN( bool p_opponent, u8 p_pokemonPos );
@@ -265,7 +259,7 @@ namespace BATTLE {
         u16         _lstOppMove;
         u16         _lstMove;
 
-        std::map<POKEMON::pokemon*, std::set<POKEMON::pokemon*> > _participatedPKMN;
+        std::map<POKEMON::pokemon*, u8 > _participatedPKMN;
 
         //Current turn's current move's "consequences"
         s16         _acDamage[ 2 ][ 2 ];
@@ -458,6 +452,7 @@ namespace BATTLE {
                 int p_maxRounds,
                 int p_AILevel = 5,
                 battleMode p_battlemode = SINGLE );
+        ~battle( );
 
         void        log( const std::wstring& p_message );
 

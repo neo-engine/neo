@@ -91,10 +91,7 @@ namespace BATTLE {
     //////////////////////////////////////////////////////////////////////////
 
     extern char* trainerclassnames[ ];
-
-#define BG_PAL( p_sub ) ( ( p_sub ) ? BG_PALETTE_SUB : BG_PALETTE )
-#define BG_BMP( p_sub ) ( ( p_sub ) ? BG_BMP_RAM_SUB( 1 ) : BG_BMP_RAM( 1 ) )
-
+    
     void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big ) {
         if( p_big )
             displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 20, 24 );
@@ -1491,7 +1488,7 @@ START:
             t = touchReadXY( );
 
             //Accept touches that are almost on the sprite
-            if(p_back && t.px > 224 && t.py > 164 ) { //Back
+            if( p_back && t.px > 224 && t.py > 164 ) { //Back
                 waitForTouchUp( );
                 result = 0;
                 break;
@@ -1593,28 +1590,76 @@ CLEAR:
         }
     }
 
-    void battleUI::applyEXPChanges( ) {
-        for( u8 i = 0; i < 4; ++i ) {
-            bool opponent = i % 2;
-            bool pokemonPos = i / 2;
+    void battleUI::applyEXPChanges( bool p_opponent, u8 p_pokemonPos, u32 p_gainedExp ) {
 
-            if( !_battle->m_battleMode == battle::DOUBLE && pokemonPos )
-                continue;
+        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+            return;
 
-            u8 hpx = OamTop->oamBuffer[ HP_IDX( opponent, pokemonPos ) ].x,
-                hpy = OamTop->oamBuffer[ HP_IDX( opponent, pokemonPos ) ].y;
+        u8 hpx = OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
+            hpy = OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y;
 
-            POKEMON::PKMNDATA::pokemonData p;
-            auto acPkmn = ACPKMN2( *_battle, pokemonPos, opponent );
+        POKEMON::PKMNDATA::pokemonData p;
+        auto& acPkmn = ACPKMN2( *_battle, p_pokemonPos, p_opponent );
 
-            if( !acPkmn.m_stats.m_acHP )
-                continue;
+        if( !acPkmn.m_stats.m_acHP )
+            return;
 
-            POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_speciesId, p );
+        POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_speciesId, p );
 
-            displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
-                       ( POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ),
-                       hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
+        u16 expStart = ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] - p_gainedExp ) * 100 /
+            ( POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] );
+        u16 expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
+            ( POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) ) );
+
+        std::swprintf( wbuffer, 50, L"%ls gewinnt %d E.-Punkte.[A]", acPkmn.m_boxdata.m_name, p_gainedExp );
+        _battle->log( wbuffer );
+        displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
+
+
+        bool newLevel = POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+        u16 HPdif = acPkmn.m_stats.m_maxHP - acPkmn.m_stats.m_acHP;
+        
+        while( newLevel ) {
+            acPkmn.m_Level++;
+
+            if( acPkmn.m_boxdata.m_speciesId != 292 ) //Check for Ninjatom
+                acPkmn.m_stats.m_maxHP = ( ( acPkmn.m_boxdata.m_individualValues.m_hp + 2 * p.m_bases[ 0 ]
+                + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
+            else
+                acPkmn.m_stats.m_maxHP = 1;
+            POKEMON::pkmnNatures nature = acPkmn.m_boxdata.getNature( );
+
+            acPkmn.m_stats.m_Atk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
+                + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * POKEMON::NatMod[ nature ][ ATK ];
+            acPkmn.m_stats.m_Def = ( ( ( acPkmn.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ DEF + 1 ]
+                + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ DEF ];
+            acPkmn.m_stats.m_Spd = ( ( ( acPkmn.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ SPD + 1 ]
+                + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SPD ];
+            acPkmn.m_stats.m_SAtk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ SATK + 1 ]
+                + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SATK ];
+            acPkmn.m_stats.m_SDef = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ SDEF + 1 ]
+                + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SDEF ];
+
+            acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
+
+            std::swprintf( wbuffer, 50, L"%ls erreicht Level %d.[A]", acPkmn.m_boxdata.m_name, acPkmn.m_Level );
+            _battle->log( wbuffer );
+
+            updateHP( p_opponent, p_pokemonPos );
+
+            u8 oldSpec = acPkmn.m_boxdata.m_speciesId;
+            _battle->checkForAttackLearn( p_pokemonPos );
+            _battle->checkForEvolution( PLAYER, p_pokemonPos );
+            if( oldSpec != acPkmn.m_boxdata.m_speciesId )
+                _battle->checkForAttackLearn( p_pokemonPos );
+            newLevel = acPkmn.m_Level < 100 && POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+
+            expStart = 0;
+            expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
+                ( POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) ) );
+
+            displayEP( 101, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
+            displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
         }
     }
 
@@ -1622,7 +1667,7 @@ CLEAR:
         //if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
         //    return;
         setStsBallSts( p_opponent, p_pokemonPos, ACPKMNSTS2( *_battle, p_pokemonPos, p_opponent ), false );
-        if( p_pokemonPos <= ( _battle->m_battleMode == battle::DOUBLE)  && p_move
+        if( p_pokemonPos <= ( _battle->m_battleMode == battle::DOUBLE ) && p_move
             && ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP ) {
             u8 hpx = 0, hpy = 0;
             if( p_opponent ) {
@@ -1940,7 +1985,7 @@ CLEAR:
                     acPkmn.m_boxdata.m_speciesId, x, y,
                     oamIdx, palIdx, tileCnt, false,
                     acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( L"Sprite failed[A]" );
+                    _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
         } else {
@@ -1950,7 +1995,7 @@ CLEAR:
                     acPkmn.m_boxdata.m_speciesId, x, y,
                     oamIdx, palIdx, tileCnt, false,
                     acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( L"Sprite failed[A]" );
+                    _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
         }
@@ -1996,15 +2041,63 @@ CLEAR:
     void battleUI::evolvePKMN( bool p_opponent, u8 p_pokemonPos ) {
         if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
             return;
-
+        s16 x = 0, y = 0;
+        if( p_opponent ) {
+            x = 176;
+            y = 19;
+            if( p_pokemonPos ) {
+                x = 112;
+                y = 14;
+            }
+        } else {
+            x = 60;
+            y = 120;
+            if( !p_pokemonPos ) {
+                x = 0;
+                y = 115;
+            }
+        }
+        auto acPkmn = ACPKMN2( *_battle, p_pokemonPos, p_opponent );
+        u8 oamIdx = PKMN_IDX( p_pokemonPos, p_opponent ) - 1;
+        u8 palIdx = PKMN_PAL_IDX( p_pokemonPos, p_opponent ) - 1;
+        u16 tileCnt = PKMN_TILE_IDX( p_pokemonPos, p_opponent );
+        if( p_opponent ) {
+            if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+                if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/",
+                    acPkmn.m_boxdata.m_speciesId, x, y,
+                    oamIdx, palIdx, tileCnt, false,
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                }
+            }
+        } else {
+            if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x, y,
+                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+                if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
+                    acPkmn.m_boxdata.m_speciesId, x, y,
+                    oamIdx, palIdx, tileCnt, false,
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                }
+            }
+        }
+        updateHP( p_opponent, p_pokemonPos );
     }
-
+    
     void battleUI::learnMove( u8 p_pokemonPos, u16 p_move ) {
         if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
             return;
+        if( !p_move )
+            return;
 
-
+        //Check if the PKMN already knows this move
         auto& acPkmn = ACPKMN2( *_battle, p_pokemonPos, PLAYER );
+        
+        for( u8 i = 0; i < 4; ++i )
+            if( acPkmn.m_boxdata.m_moves[ i ] == p_move )
+                return;
+
         if( acPkmn.m_boxdata.m_moves[ 3 ] ) {
             std::swprintf( wbuffer, 50, L"%ls kann nun\n%s erlernen![A][CLEAR]Aber %ls kennt\nbereits 4 Attacken.[A]",
                            acPkmn.m_boxdata.m_name,
@@ -2061,6 +2154,7 @@ ST:
     }
 
     void battleUI::dinit( ) {
+        vramSetup( );
         videoSetMode( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
         dmaFillWords( 0, bgGetGfxPtr( bg2 ), 256 * 192 );
         dmaFillWords( 0, bgGetGfxPtr( bg3 ), 256 * 192 );

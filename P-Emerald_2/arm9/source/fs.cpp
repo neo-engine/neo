@@ -1313,6 +1313,9 @@ namespace POKEMON {
 
             u16 rescnt = 0;
 
+            for( u8 i = 0; i < p_amount; ++i )
+                p_result[ i ] = 0;
+
             if( p_fromLevel > p_toLevel ) {
                 std::vector<u16> reses;
                 for( u16 i = 0; i <= p_fromLevel; ++i ) {

@@ -48,6 +48,10 @@
 #include "atks.h"
 #include "Contest.h"
 
+#include "anti_pokerus_icon.h"
+#include "pokerus_icon.h"
+#include "rare_icon.h"
+
 
 #include "print.h"
 #include "fs.h"
@@ -79,6 +83,14 @@ namespace POKEMON {
         "ist sehr neugierig", "ist hinterhältig", "ist äußerst gerissen", "ist oft in Gedanken", "ist sehr pedantisch",
         "besitzt starken Willen", "ist irgendwie eitel", "ist sehr aufsässig", "hasst Niederlagen", "ist dickköpfig",
         "liebt es, zu rennen", "achtet auf Geräusche", "ist ungestüm und einfältig", "ist fast wie eine Clown", "flüchtet schnell"
+    };
+    std::string TasteList[ 6 ] = {
+        "scharf",
+        "saur",
+        "süß",
+        "trocken",
+        "bitter",
+        "all"
     };
 
     std::string Games[ 10 ] = { };
@@ -682,7 +694,7 @@ namespace POKEMON {
                     drawTypeIcon( Oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 0 ], 256 - 68, 24, true );
                     drawTypeIcon( Oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 1 ], 256 - 32, 24, true );
                 }
-                FS::drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ].m_itemName, 256 - 100, 0, o2s, p2s, t2s, true );
+                FS::drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ].m_itemName, 256 - 108, 0, o2s, p2s, t2s, true );
 
                 Oam->oamBuffer[ 15 ].isHidden = false;
                 Oam->oamBuffer[ 15 ].y = 0;
@@ -695,13 +707,22 @@ namespace POKEMON {
                 consoleSetWindow( p_bottom, 23, 1, 20, 5 );
 
                 if( m_boxdata.isShiny( ) ) {
-                    printf( "\x1b[34m""*%03i ", m_boxdata.m_speciesId );
-                } else
-                    printf( "\x1b[33m""#%03i ", m_boxdata.m_speciesId );
-
-                if( m_boxdata.m_pokerus ) {
-                    printf( "\x1b[39m""PKRS" );
+                    t2s = loadSprite( Oam, spriteInfo, ++o2s, ++p2s, t2s, 176, 8, 8, 8, rare_iconPal,
+                                      rare_iconTiles, rare_iconTilesLen, false, false, false, OBJPRIORITY_0, true );
+                    
                 }
+                else {
+                    Oam->oamBuffer[ ++o2s ].isHidden = true;
+                }
+                if( m_boxdata.m_pokerus ) {
+                    t2s = loadSprite( Oam, spriteInfo, ++o2s, ++p2s, t2s, 208, 4, 64, 32, pokerus_iconPal,
+                                      pokerus_iconTiles, pokerus_iconTilesLen, false, false, false, OBJPRIORITY_0, true );                    
+                } else {
+                    printf( "Nr. " );
+                    Oam->oamBuffer[ ++o2s ].isHidden = true;
+                }
+                printf( "%03i", m_boxdata.m_speciesId );
+                updateOAMSub( Oam );
 
                 Oam->oamBuffer[ 90 ].isHidden = false;
                 Oam->oamBuffer[ 90 ].y = -4;
@@ -728,6 +749,8 @@ namespace POKEMON {
                 Oam->oamBuffer[ 15 ].x = 256 - 32;
                 Oam->oamBuffer[ 16 ].isHidden = true;
 
+                Oam->oamBuffer[ o2s++ ].isHidden = true;
+                Oam->oamBuffer[ o2s++ ].isHidden = true;
                 Oam->oamBuffer[ o2s++ ].isHidden = true;
                 Oam->oamBuffer[ o2s++ ].isHidden = true;
                 Oam->oamBuffer[ o2s ].isHidden = true;
@@ -791,7 +814,7 @@ namespace POKEMON {
                     sprintf( buffer, "%s"".", PersonalityList[ m_boxdata.getPersonality( ) ].c_str( ) );
                     cust_font.printString( buffer, 35, 90, true );
 
-                    sprintf( buffer, "Mag %s""e Pokériegel.", m_boxdata.getTasteStr( ).c_str( ) );
+                    sprintf( buffer, "Mag %s""e Pokériegel.", TasteList[ m_boxdata.getTasteStr( ) ].c_str( ) );
                     cust_font.printString( buffer, 28, 104, true );
                 } else {
                     if( savMod == SavMod::_NDS )
@@ -818,7 +841,7 @@ namespace POKEMON {
                             sprintf( buffer, "%s"".", PersonalityList[ m_boxdata.getPersonality( ) ].c_str( ) );
                             cust_font.printString( buffer, 35, 114, true );
 
-                            sprintf( buffer, "Mag %s""e Pokériegel.", m_boxdata.getTasteStr( ).c_str( ) );
+                            sprintf( buffer, "Mag %s""e Pokériegel.", TasteList[ m_boxdata.getTasteStr( ) ].c_str( ) );
                             cust_font.printString( buffer, 28, 128, true );
                         } else {
                             sprintf( buffer, "Besitzt ein %s""es Wesen.", NatureList[ m_boxdata.getNature( ) ].c_str( ) );
@@ -840,7 +863,7 @@ namespace POKEMON {
                     sprintf( buffer, "%s"".", PersonalityList[ m_boxdata.getPersonality( ) ].c_str( ) );
                     cust_font.printString( buffer, 35, 90, true );
 
-                    sprintf( buffer, "Mag %s""e Pokériegel.", m_boxdata.getTasteStr( ).c_str( ) );
+                    sprintf( buffer, "Mag %s""e Pokériegel.", TasteList[ m_boxdata.getTasteStr( ) ].c_str( ) );
                     cust_font.printString( buffer, 28, 104, true );
                 } else {
                     if( savMod == SavMod::_NDS )
@@ -866,7 +889,7 @@ namespace POKEMON {
                             sprintf( buffer, "%s"".", PersonalityList[ m_boxdata.getPersonality( ) ].c_str( ) );
                             cust_font.printString( buffer, 35, 114, true );
 
-                            sprintf( buffer, "Mag %s""e Pokériegel.", m_boxdata.getTasteStr( ).c_str( ) );
+                            sprintf( buffer, "Mag %s""e Pokériegel.", TasteList[ m_boxdata.getTasteStr( ) ].c_str( ) );
                             cust_font.printString( buffer, 28, 128, true );
                         } else {
                             sprintf( buffer, "Besitzt ein %s""es Wesen.", NatureList[ m_boxdata.getNature( ) ].c_str( ) );
@@ -1181,6 +1204,7 @@ namespace POKEMON {
         if( into == 0 )
             return;
 
+        int HPdif = m_stats.m_maxHP - m_stats.m_acHP;
         m_boxdata.m_speciesId = into;
         PKMNDATA::getAll( m_boxdata.m_speciesId, data );
         if( m_boxdata.m_speciesId != 292 )
@@ -1191,7 +1215,6 @@ namespace POKEMON {
         if( !m_boxdata.m_individualValues.m_isNicked )
             wcscpy( m_boxdata.m_name, PKMNDATA::getWDisplayName( m_boxdata.m_speciesId ) );
 
-        int HPdif = m_stats.m_maxHP - m_stats.m_acHP;
         pkmnNatures nature = m_boxdata.getNature( );
         m_stats.m_Atk = ( ( ( m_boxdata.m_individualValues.m_attack + 2 * data.m_bases[ 1 ] + ( m_boxdata.m_effortValues[ 1 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];
         m_stats.m_Def = ( ( ( m_boxdata.m_individualValues.m_defense + 2 * data.m_bases[ 2 ] + ( m_boxdata.m_effortValues[ 2 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 1 ];

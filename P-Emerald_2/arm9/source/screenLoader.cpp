@@ -707,7 +707,7 @@ void loadPKMNSprites( ) {
 
 void screenLoader::run_pkmn( ) {
     vramSetup( );
-    videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
+    videoSetMode( MODE_5_2D/* | DISPLAY_BG2_ACTIVE*/ | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
     swiWaitForVBlank( );
     Top = *consoleInit( &Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
     consoleSetFont( &Top, &cfont );
