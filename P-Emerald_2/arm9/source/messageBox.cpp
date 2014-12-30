@@ -119,7 +119,7 @@ messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
     FS::drawItemIcon( Oam, spriteInfo, p_item.m_itemName, 4, 4, a, b, c );
     updateOAMSub( Oam );
 
-    updateTime( s8(1) );
+    updateTime( s8( 1 ) );
 
     cust_font.setColor( 253, 3 );
     cust_font.setColor( 254, 4 );
@@ -129,33 +129,18 @@ messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
 
     char buf[ 40 ];
     sprintf( buf, "%3d %s in der", p_count, p_item.getDisplayName( ).c_str( ) );
-    cust_font.printStringD( buf, 32, 8, true );
+    cust_font.printMBStringD( buf, 32, 8, true, true, 1 );
     cust_font.printChar( 489 - 21 + p_item.getItemType( ), 32, 24, true );
-    sprintf( buf, "%s-Tasche verstaut.", bagnames[ p_item.m_itemType ].c_str( ) );
-    cust_font.printStringD( buf, 46, 24, true );
+    sprintf( buf, "%s-Tasche verstaut.`", bagnames[ p_item.m_itemType ].c_str( ) );
+    FONT::ASpriteOamIndex = 8;
+    cust_font.printMBStringD( buf, 46, 24, true, true, 1 );
 
-    Oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( Oam );
-    touchPosition touch;
-    while( 1 ) {
-        swiWaitForVBlank( );
-        updateTime( s8(1) );
-        scanKeys( );
-        if( keysUp( ) & KEY_A )
-            break;
-        touchRead( &touch );
-
-        if( touch.px > 224 && touch.py > 164 ) {
-            waitForTouchUp( true );
-            break;
-        }
-    }
+    SAV.m_bag.addItem( p_item.m_itemType, p_item.getItemId( ), p_count );
 
     initMainSprites( Oam, spriteInfo );
     setMainSpriteVisibility( main_ );
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, false );
-    Oam->oamBuffer[ 8 ].isHidden = true;
     dinit( );
     updateOAMSub( Oam );
 }
@@ -173,27 +158,11 @@ messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {
 
     init( );
 
-    if( p_time ) updateTime( s8(1) );
+    if( p_time ) updateTime( s8( 1 ) );
 
-    cust_font.printStringD( p_text, 8, 8, true );
-    Oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( Oam );
-    touchPosition touch;
-    while( 1 ) {
-        swiWaitForVBlank( );
-        if( p_time )
-            updateTime( s8(1) );
-        scanKeys( );
-        if( keysUp( ) & KEY_A )
-            break;
-        touchRead( &touch );
-
-        if( touch.px > 224 && touch.py > 164 ) {
-
-            waitForTouchUp( p_time );
-            break;
-        }
-    }
+    FONT::ASpriteOamIndex = 8;
+    std::string text( p_text );
+    cust_font.printMBStringD( ( text + '`' ).c_str( ), 8, 8, true, p_time, 1 );
 
     setSpriteVisibility( back, back_ );
     setSpriteVisibility( save, save_ );
@@ -218,25 +187,9 @@ messageBox::messageBox( const wchar_t* p_text, bool p_time, bool p_remsprites ) 
 
     if( p_time ) updateTime( );
 
-    cust_font.printStringD( p_text, 8, 8, true );
-    Oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( Oam );
-    touchPosition touch;
-    while( 1 ) {
-        swiWaitForVBlank( );
-        if( p_time )
-            updateTime( );
-        scanKeys( );
-        if( keysUp( ) & KEY_A )
-            break;
-        touchRead( &touch );
-
-        if( touch.px > 224 && touch.py > 164 ) {
-
-            waitForTouchUp( p_time );
-            break;
-        }
-    }
+    FONT::ASpriteOamIndex = 8;
+    std::wstring text( p_text );
+    cust_font.printMBStringD( ( text + L'`' ).c_str( ), 8, 8, true, p_time );
 
     setSpriteVisibility( back, back_ );
     setSpriteVisibility( save, save_ );
@@ -274,31 +227,15 @@ messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, boo
     init( );
 
     if( p_time ) updateTime( );
-
-    cust_font.printString( p_name, 8, 8, true );
-    cust_font.printStringD( p_text, 72, 8, true );
-    if( p_a )
-        Oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( Oam );
-
+    if( p_name )
+        cust_font.printString( p_name, 8, 8, true );
     if( p_a ) {
-        touchPosition touch;
-        while( 1 ) {
-            swiWaitForVBlank( );
-            if( p_time )
-                updateTime( );
-            scanKeys( );
-            if( keysUp( ) & KEY_A )
-                break;
-            touchRead( &touch );
+        FONT::ASpriteOamIndex = 8;
+        std::string text( p_text );
+        cust_font.printMBStringD( ( text + '`' ).c_str( ), 64 * ( !!p_name ) + 8, 8, true, p_time );
+    } else
+        cust_font.printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
 
-            if( touch.px > 224 && touch.py > 164 ) {
-
-                waitForTouchUp( p_time );
-                break;
-            }
-        }
-    }
     if( !p_remsprites )
         return;
     if( p_sprt != no_sprite )
@@ -339,34 +276,16 @@ messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_tim
 
     init( );
 
-    if( p_name ) {
-        cust_font.printString( p_name, 8, 8, true );
-        cust_font.printStringD( p_text, 72, 8, true );
-    } else {
-        cust_font.printStringD( p_text, 8, 8, true );
-    }
-    if( p_a )
-        Oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( Oam );
-
+    if( p_time ) updateTime( );
+        if( p_name )
+            cust_font.printString( p_name, 8, 8, true );
     if( p_a ) {
-        touchPosition touch;
-        while( 1 ) {
-            swiWaitForVBlank( );
-            if( p_time )
-                updateTime( );
-            scanKeys( );
-            if( keysUp( ) & KEY_A )
-                break;
-            touchRead( &touch );
+        FONT::ASpriteOamIndex = 8;
+        std::wstring text( p_text );
+        cust_font.printMBStringD( ( text + L'`' ).c_str( ), 64 * ( !!p_name ) + 8, 8, true, p_time );
+    } else
+        cust_font.printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
 
-            if( touch.px > 224 && touch.py > 164 ) {
-
-                waitForTouchUp( p_time );
-                break;
-            }
-        }
-    }
     if( !p_remsprites )
         return;
     if( p_sprt != no_sprite )
@@ -387,30 +306,16 @@ messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_tim
 void messageBox::put( const char* p_text, bool p_a, bool p_time ) {
     init( );
 
-    if( m_isNamed ) {
-        cust_font.printString( m_isNamed, 8, 8, true );
-        cust_font.printStringD( p_text, 72, 8, true );
-    } else
-        cust_font.printStringD( p_text, 8, 8, true );
-
+    if( p_time ) updateTime( );
+        if( m_isNamed )
+            cust_font.printString( m_isNamed, 8, 8, true );
     if( p_a ) {
-        touchPosition touch;
-        while( 1 ) {
-            swiWaitForVBlank( );
-            if( p_time )
-                updateTime( );
-            scanKeys( );
-            if( keysUp( ) & KEY_A )
-                break;
-            touchRead( &touch );
+        FONT::ASpriteOamIndex = 8;
+        std::string text( p_text );
+        cust_font.printMBStringD( ( text + '`' ).c_str( ), ( 64 * !!m_isNamed ) + 8, 8, true, p_time );
+    } else
+        cust_font.printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
 
-            if( touch.px > 224 && touch.py > 164 ) {
-
-                waitForTouchUp( p_time );
-                break;
-            }
-        }
-    }
     swiWaitForVBlank( );
 }
 
@@ -679,7 +584,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             swiWaitForVBlank( );
             updateOAMSub( Oam );
             if( p_time )
-                updateTime( s8(1) );
+                updateTime( s8( 1 ) );
             touchPosition t;
             touchRead( &t );
 
@@ -721,7 +626,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             swiWaitForVBlank( );
             updateOAMSub( Oam );
             if( p_time )
-                updateTime( s8(1) );
+                updateTime( s8( 1 ) );
             touchPosition t;
             touchRead( &t );
 
@@ -782,7 +687,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             swiWaitForVBlank( );
             updateOAMSub( Oam );
             if( p_time )
-                updateTime( s8(1) );
+                updateTime( s8( 1 ) );
             touchPosition t;
             touchRead( &t );
 
@@ -856,7 +761,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             swiWaitForVBlank( );
             updateOAMSub( Oam );
             if( p_time )
-                updateTime( s8(1) );
+                updateTime( s8( 1 ) );
             touchPosition t;
             touchRead( &t );
 
@@ -992,7 +897,7 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
             swiWaitForVBlank( );
             updateOAMSub( Oam );
             if( p_time )
-                updateTime( s8(1) );
+                updateTime( s8( 1 ) );
             touchPosition t;
             touchRead( &t );
 

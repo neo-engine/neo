@@ -104,14 +104,83 @@ namespace FONT {
     }
 
     void drawContinue( font p_font, u8 p_x, u8 p_y ) {
-        p_font.printChar( /*'@'*/ u16(172), p_x, p_y, true );
+        p_font.printChar( /*'@'*/ u16( 172 ), p_x, p_y, true );
     }
     void hideContinue( u8 p_x, u8 p_y ) {
         BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
         putrec( p_x, p_y, p_x + 5, p_y + 9, true, false, (u8)250 );
     }
 
-    void font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, u8 p_updateTimePar ) {
+        u32 current_char = 0;
+        s16 putX = p_x, putY = p_y;
+
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' ) {
+                putY += FONT_HEIGHT - 2;
+                putX = p_x;
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == '`' ) {
+                u8 c = 0;
+                bool on = false;
+                if( p_bottom ) {
+                    Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
+                    updateOAMSub( Oam );
+                } else {
+                    OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
+                    updateOAM( OamTop );
+                }
+
+                while( 1 ) {
+                    scanKeys( );
+                    swiWaitForVBlank( );
+                    if( ++c == 45 ) {
+                        c = 0;
+                        if( on )
+                            hideContinue( 243, 51 );
+                        else
+                            drawContinue( *this, 243, 51 );
+                        on = !on;
+                    }
+                    if( p_updateTime )
+                        updateTime( p_updateTimePar );
+                    if( keysUp( ) & KEY_A )
+                        break;
+                    auto t = touchReadXY( );
+                    if( t.px > 224 && t.py > 164 ) {
+                        while( 1 ) {
+                            swiWaitForVBlank( );
+                            scanKeys( );
+                            updateTime( true );
+                            auto touch = touchReadXY( );
+                            if( touch.px == 0 && touch.py == 0 )
+                                break;
+                        }
+                        break;
+                    }
+                }
+                if( p_bottom ) {
+                    Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
+                    updateOAMSub( Oam );
+                } else {
+                    OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
+                    updateOAM( OamTop );
+                }
+                current_char++;
+                continue;
+            }
+            printChar( p_string[ current_char ], putX, putY, p_bottom );
+
+            u16 c = (u16)p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ];
+
+            current_char++;
+        }
+    }
+    void font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, u8 p_updateTimePar ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -144,7 +213,8 @@ namespace FONT {
                             drawContinue( *this, 243, 51 );
                         on = !on;
                     }
-                    updateTime( 0 );
+                    if( p_updateTime )
+                        updateTime( p_updateTimePar );
                     if( keysUp( ) & KEY_A )
                         break;
                     auto t = touchReadXY( );
@@ -176,6 +246,148 @@ namespace FONT {
             _shiftchar( c );
             putX += _widths[ c ];
 
+            current_char++;
+        }
+    }
+    void font::printMBStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, u8 p_updateTimePar ) {
+        u32 current_char = 0;
+        s16 putX = p_x, putY = p_y;
+
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' ) {
+                putY += FONT_HEIGHT - 2;
+                putX = p_x;
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == '`' ) {
+                u8 c = 0;
+                bool on = false;
+                if( p_bottom ) {
+                    Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
+                    updateOAMSub( Oam );
+                } else {
+                    OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
+                    updateOAM( OamTop );
+                }
+
+                while( 1 ) {
+                    scanKeys( );
+                    swiWaitForVBlank( );
+                    if( ++c == 45 ) {
+                        c = 0;
+                        if( on )
+                            hideContinue( 243, 51 );
+                        else
+                            drawContinue( *this, 243, 51 );
+                        on = !on;
+                    }
+                    if( p_updateTime )
+                        updateTime( p_updateTimePar );
+                    if( keysUp( ) & KEY_A )
+                        break;
+                    auto t = touchReadXY( );
+                    if( t.px > 224 && t.py > 164 ) {
+                        while( 1 ) {
+                            swiWaitForVBlank( );
+                            scanKeys( );
+                            updateTime( true );
+                            auto touch = touchReadXY( );
+                            if( touch.px == 0 && touch.py == 0 )
+                                break;
+                        }
+                        break;
+                    }
+                }
+                if( p_bottom ) {
+                    Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
+                    updateOAMSub( Oam );
+                } else {
+                    OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
+                    updateOAM( OamTop );
+                }
+                current_char++;
+                continue;
+            }
+            printChar( p_string[ current_char ], putX, putY, p_bottom );
+
+            u16 c = (u16)p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ];
+
+            for( u8 i = 0; i < 80 / TEXTSPEED; ++i )
+                swiWaitForVBlank( );
+            current_char++;
+        }
+    }
+    void font::printMBStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, u8 p_updateTimePar ) {
+        u32 current_char = 0;
+        s16 putX = p_x, putY = p_y;
+
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == L'\n' ) {
+                putY += FONT_HEIGHT - 2;
+                putX = p_x;
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == L'`' ) {
+                u8 c = 0;
+                bool on = false;
+                if( p_bottom ) {
+                    Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
+                    updateOAMSub( Oam );
+                } else {
+                    OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
+                    updateOAM( OamTop );
+                }
+
+                while( 1 ) {
+                    scanKeys( );
+                    swiWaitForVBlank( );
+                    if( ++c == 45 ) {
+                        c = 0;
+                        if( on )
+                            hideContinue( 243, 51 );
+                        else
+                            drawContinue( *this, 243, 51 );
+                        on = !on;
+                    }
+                    if( p_updateTime )
+                        updateTime( p_updateTimePar );
+                    if( keysUp( ) & KEY_A )
+                        break;
+                    auto t = touchReadXY( );
+                    if( t.px > 224 && t.py > 164 ) {
+                        while( 1 ) {
+                            swiWaitForVBlank( );
+                            scanKeys( );
+                            updateTime( true );
+                            auto touch = touchReadXY( );
+                            if( touch.px == 0 && touch.py == 0 )
+                                break;
+                        }
+                        break;
+                    }
+                }
+                if( p_bottom ) {
+                    Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
+                    updateOAMSub( Oam );
+                } else {
+                    OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
+                    updateOAM( OamTop );
+                }
+                current_char++;
+                continue;
+            }
+            printChar( p_string[ current_char ], putX, putY, p_bottom );
+
+            u16 c = (u16)p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ];
+
+            for( u8 i = 0; i < 80 / TEXTSPEED; ++i )
+                swiWaitForVBlank( );
             current_char++;
         }
     }
