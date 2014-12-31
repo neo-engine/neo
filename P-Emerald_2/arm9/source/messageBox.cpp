@@ -587,12 +587,19 @@ choiceBox::~choiceBox( ) {
     swiWaitForVBlank( );
 }
 
-int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
+int choiceBox::getResult( const char* p_text, bool p_time, bool p_backButton ) {
     consoleSelect( &Bottom );
     _text = p_text;
     draw( NEW_PAGE );
 
     int result = -1;
+
+    if( p_backButton ) {
+        ( Oam->oamBuffer[ BACK_ID ] ).isHidden = false;
+        ( Oam->oamBuffer[ BACK_ID ] ).x = fwdPos[ 0 ][ 0 ] - 12;
+        ( Oam->oamBuffer[ BACK_ID ] ).y = fwdPos[ 0 ][ 1 ] - 12;
+        updateOAMSub( Oam );
+    }
 
     if( _num < 1 )
         return -1;
@@ -600,8 +607,8 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
         _acPage = 0;
         if( _num > 3 && _big ) {
             ( Oam->oamBuffer[ 13 ] ).isHidden = false;
-            ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
-            ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
+            ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
+            ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
         }
         while( 42 ) {
             swiWaitForVBlank( );
@@ -621,16 +628,20 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
                     result = i + 3 * _acPage;
                     goto END;
                 }
+            if( p_backButton && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] - 12 ) + sq( t.py - fwdPos[ 0 ][ 1 ] - 12 ) ) < 17 ) { //Back pressed
+                result = -1;
+                goto END;
+            }
             if( _num > 3 && _big ) {
-                if( ( _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 )
-                    || ( _acPage && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
+                if( !p_backButton && ( _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 )
+                    || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
 
                     waitForTouchUp( p_time, true );
                     if( ( ++_acPage ) >= ( ( _num - 1 ) / 3 ) ) {
                         ( Oam->oamBuffer[ 13 ] ).isHidden = true;
                         ( Oam->oamBuffer[ 14 ] ).isHidden = false;
-                        ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 0 ][ 0 ] - 16;
-                        ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 0 ][ 1 ] - 16;
+                        ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ p_backButton ][ 0 ] - 16;
+                        ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ p_backButton ][ 1 ] - 16;
                         if( _acPage == ( ( _num - 1 ) / 3 ) )
                             draw( NEW_PAGE );
                         _acPage = ( ( _num - 1 ) / 3 );
@@ -644,15 +655,15 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
                         draw( NEW_PAGE );
                     }
                     updateOAMSub( Oam );
-                } else if( ( _acPage == ( _num - 1 ) / 3 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 )
-                           || ( _acPage && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
+                } else if( !p_backButton && ( _acPage == ( _num - 1 ) / 3 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 )
+                           || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
 
                     waitForTouchUp( p_time, true );
                     if( ( --_acPage ) <= 0 ) {
                         ( Oam->oamBuffer[ 14 ] ).isHidden = true;
                         ( Oam->oamBuffer[ 13 ] ).isHidden = false;
-                        ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
-                        ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
+                        ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
+                        ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
                         if( _acPage == 0 )
                             draw( NEW_PAGE );
                         _acPage = 0;
@@ -673,8 +684,8 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
         _acPage = 0;
         if( _num > 6 ) {
             ( Oam->oamBuffer[ 13 ] ).isHidden = false;
-            ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
-            ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
+            ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
+            ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
         }
         updateOAMSub( Oam );
         while( 42 ) {
@@ -700,15 +711,18 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
                 }
             }
 
-            if( ( _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 )
-                || ( _acPage && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
+            if( p_backButton && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] - 12 ) + sq( t.py - fwdPos[ 0 ][ 1 ] - 12 ) ) < 17 ) { //Back pressed
+                result = -1;
+                goto END;
+            } else if( !p_backButton && ( _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 )
+                       || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
 
                 waitForTouchUp( p_time, true );
                 if( ( ++_acPage ) >= ( _num / 6 ) ) {
                     ( Oam->oamBuffer[ 13 ] ).isHidden = true;
                     ( Oam->oamBuffer[ 14 ] ).isHidden = false;
-                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 0 ][ 0 ] - 16;
-                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 0 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ p_backButton ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ p_backButton ][ 1 ] - 16;
                     if( _acPage == ( _num / 6 ) )
                         draw( NEW_PAGE );
                     _acPage = ( _num / 6 );
@@ -721,14 +735,14 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
                     ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
                     draw( NEW_PAGE );
                 }
-            } else if( ( _acPage == _num / 6 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 )
-                       || ( _acPage && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
+            } else if( !p_backButton && ( _acPage == _num / 6 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 )
+                       || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
                 waitForTouchUp( p_time, true );
                 if( ( --_acPage ) <= 0 ) {
                     ( Oam->oamBuffer[ 14 ] ).isHidden = true;
                     ( Oam->oamBuffer[ 13 ] ).isHidden = false;
-                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
-                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
                     if( _acPage == 0 )
                         draw( NEW_PAGE );
                     _acPage = 0;
@@ -748,6 +762,7 @@ END:
     dinit( );
     ( Oam->oamBuffer[ 14 ] ).isHidden = true;
     ( Oam->oamBuffer[ 13 ] ).isHidden = true;
+    ( Oam->oamBuffer[ BACK_ID ] ).isHidden = true;
     updateOAMSub( Oam );
     return result;
 }

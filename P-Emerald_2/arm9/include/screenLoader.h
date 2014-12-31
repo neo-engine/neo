@@ -36,10 +36,8 @@
 
 #include "sprite.h"
 #include "pokemon.h"
+#include "defines.h"
 #include <string>
-
-#define sq(a) ((a)*(a))
-#define TIMER_SPEED (BUS_CLOCK/1024)
 
 extern int bg3sub;
 extern int bg3;
@@ -92,29 +90,6 @@ enum Region {
 extern std::map<u16, std::string> Locations;
 extern Region acMapRegion;
 extern bool showmappointer;
-
-
-
-#define BACK_ID  0
-#define SAVE_ID  1
-#define PKMN_ID  2
-#define ID_ID  3
-#define DEX_ID  4
-#define BAG_ID  5
-#define OPTS_ID  6
-#define NAV_ID  7
-#define A_ID  8
-//  9 - unused
-// 10 - unused
-// 11 - unused
-// 12 - unused
-#define FWD_ID  13
-#define BWD_ID  14
-#define CHOICE_ID  15
-// 14 additional spaces used
-#define BORDER_ID 31
-// 9 additional spaces used
-#define SQCH_ID 80
 
 #define MAXBG 10
 struct backgroundSet {

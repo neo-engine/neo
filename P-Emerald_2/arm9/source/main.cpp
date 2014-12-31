@@ -2082,8 +2082,8 @@ OUT:
                     break;
             }
             const char *someText[ 7 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item_Test", "Battle SPWN.", "Battle SPWN 2", "42", " ... " };
-            choiceBox test( 7, &someText[ 0 ], 0, true );
-            int res = test.getResult( "Tokens of god-being...", true );
+            choiceBox test( 5, &someText[ 0 ], 0, true );
+            int res = test.getResult( "Tokens of god-being...", true, true );
             switch( res ) {
                 case 0:
                 {

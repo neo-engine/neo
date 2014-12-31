@@ -73,7 +73,7 @@ public:
     ~choiceBox( );
 
     void draw( u8 p_pressedIdx );
-    int getResult( const char* p_text, bool p_time );
+    int getResult( const char* p_text = 0, bool p_time = true, bool p_backButton = false );
     void kill( );
 private:
     const char** _choices;
