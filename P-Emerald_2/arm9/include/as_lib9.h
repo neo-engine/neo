@@ -33,6 +33,11 @@
 #include <nds.h>
 #include <stdio.h>
 
+#include "defines.h"
+
+
+#ifdef USE_AS_LIB
+
 #ifndef AS_USE_EFS
 #include <stdio.h>
 #else
@@ -440,3 +445,4 @@ extern "C" {
 
 #endif
 
+#endif

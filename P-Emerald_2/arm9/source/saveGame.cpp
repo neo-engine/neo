@@ -101,6 +101,7 @@ saveGame::saveGame( void p_func( int ) ) {
     m_PkmnTeam = std::vector<POKEMON::pokemon>( a );
     for( u16 i = 0; i < a; ++i )
         fread( &m_PkmnTeam[ i ], sizeof( POKEMON::pokemon ), 1, fd );
+    m_hasPKMN = !!a;
 
     free_spaces.clear( );
     for( u16 i = 0; i < MAXSTOREDPKMN; i++ ) {
@@ -113,13 +114,15 @@ saveGame::saveGame( void p_func( int ) ) {
     }
     p_func( 40 );
 
-    for( u16 i = 0; i < 649; i++ ) {
-        fscanf( fd, " %i ", &booltemp );
-        m_inDex[ i ] = bool( booltemp );
-        p_func( 40 + ( 30 * ( i / 649 ) ) );
+    u32 inDextmp;
+    for( u8 i = 0; i < 23; i++ ) {
+        fscanf( fd, " %lu", &inDextmp );
+        for( u8 j = 0; j < 32; ++j )
+            m_inDex[ 32 * i + j ] = ( inDextmp & ( 1 << j ) );
+        p_func( 40 + ( 30 * ( i / 23 ) ) );
     }
 
-    fscanf( fd, " %i ", &booltemp );
+    fscanf( fd, " %i", &booltemp );
     m_hasGDex = bool( booltemp );
     fread( m_flags, 1, 1000, fd );
     p_func( 100 );
@@ -182,15 +185,18 @@ bool saveGame::save( void p_func( int ) ) {
     }
 
     p_func( 40 );
-    for( u16 i = 0; i < 649; i++ ) {
-        booltemp = ( m_inDex[ i ] ? 1 : 0 );
-        fprintf( fd, " %i", booltemp );
+    u32 inDextmp;
+    for( u8 i = 0; i < 23; i++ ) {
+        inDextmp = 0;
+        for( u8 j = 0; j < 32; ++j )
+            inDextmp |= ( m_inDex[ 32 * i + j ] << j );
+        fprintf( fd, " %lu", &inDextmp );
     }
     p_func( 50 );
 
 
     booltemp = m_hasGDex;
-    fprintf( fd, " %i ", booltemp );
+    fprintf( fd, " %i", booltemp );
 
     fwrite( m_flags, 1, 1000, fd );
     p_func( 100 );

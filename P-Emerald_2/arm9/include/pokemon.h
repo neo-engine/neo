@@ -74,6 +74,7 @@ extern move* AttackList[ 560 ];
 extern std::string NatureList[ 25 ];
 extern std::string TypeList[ 19 ];
 extern std::string PersonalityList[ 30 ];
+extern std::string TasteList[ 6 ];
 extern std::map<u16, std::string> Locations;
 
 enum Type;//defined in "berry.h"
@@ -344,9 +345,9 @@ u8: 8;
                     case 0: return m_individualValues.m_hp;
                     case 1: return m_individualValues.m_attack;
                     case 2: return m_individualValues.m_defense;
-                    case 3: return m_individualValues.m_speed;
-                    case 4: return m_individualValues.m_sAttack;
-                    case 5: return m_individualValues.m_sDefense;
+                    case 5: return m_individualValues.m_speed;
+                    case 3: return m_individualValues.m_sAttack;
+                    case 4: return m_individualValues.m_sDefense;
                     default: return 0;
                 }
             }
@@ -373,19 +374,19 @@ u8: 8;
 
                 return ( max * 5 ) + ( maxval % 5 );
             }
-            std::string             getTasteStr( ) {
-                if( NatMod[ getNature( ) ][ 0 ] == 1.2 )
-                    return "scharf";
-                if( NatMod[ getNature( ) ][ 1 ] == 1.2 )
-                    return "saur";
-                if( NatMod[ getNature( ) ][ 2 ] == 1.2 )
-                    return "süß";
-                if( NatMod[ getNature( ) ][ 3 ] == 1.2 )
-                    return "trocken";
-                if( NatMod[ getNature( ) ][ 4 ] == 1.2 )
-                    return "bitter";
+            int             getTasteStr( ) {
+                if( NatMod[ getNature( ) ][ 0 ] == 1.1 )
+                    return 0;
+                if( NatMod[ getNature( ) ][ 1 ] == 1.1 )
+                    return 1;
+                if( NatMod[ getNature( ) ][ 2 ] == 1.1 )
+                    return 2;
+                if( NatMod[ getNature( ) ][ 3 ] == 1.1 )
+                    return 3;
+                if( NatMod[ getNature( ) ][ 4 ] == 1.1 )
+                    return 4;
                 else
-                    return "all";
+                    return 5;
             }
             u16                     getItem( ) {
                 return m_holdItem;
@@ -472,7 +473,7 @@ u8: 8;
         void            evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
         bool            canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
 
-        s8              draw( );
+        u32             draw( );
         void            drawPage( u8 p_Page, PrintConsole* p_Top, PrintConsole* p_Bottom, bool p_newpok );
 
         bool      operator==( const pokemon& p_other ) const;

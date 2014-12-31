@@ -32,10 +32,10 @@
 
 #pragma once
 #include <nds.h>
+#include "defines.h"
 
 typedef u16 color;
 namespace FONT {
-#define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 #define NUMFONTS 2
     const u8 SCREEN_TOP = 1;
     const u8 SCREEN_BOTTOM = 0;
@@ -74,7 +74,10 @@ namespace FONT {
         u32 stringWidth( const char *p_string ) const;
 
         void printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16 );
-        void printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
+        void printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime = true, u8 p_updateTimePar = 0 );
+        void printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime = true, u8 p_updateTimePar = 0 );
+        void printMBStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime = true, u8 p_updateTimePar = 0 );
+        void printMBStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime = true, u8 p_updateTimePar = 0 );
         void printStringCenter( const wchar_t *p_string, bool p_bottom );
         void printStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
         void printStringCenterD( const wchar_t *p_string, bool p_bottom );
@@ -86,6 +89,8 @@ namespace FONT {
         void( *_shiftchar )( u16& val );
         color _color[ 5 ];
     };
+
+    extern u8 ASpriteOamIndex;
 }
 
 void topScreenDarken( );

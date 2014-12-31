@@ -105,9 +105,9 @@ namespace map2d {
     }
 
     Map::Map( const char* p_path, const char* p_name ) {
-        consoleSelect( &Bottom );
-        consoleSetWindow( &Bottom, 4, 4, 25, 20 );
-        consoleClear( );
+        //consoleSelect( &Bottom );
+        //consoleSetWindow( &Bottom, 4, 4, 25, 20 );
+        //consoleClear( );
 
         sprintf( buffer, "%s%s.m2p", p_path, p_name );
         FILE* mapF = fopen( buffer, "rb" );
@@ -125,22 +125,22 @@ namespace map2d {
         fread( &tsidx2, sizeof( u8 ), 1, mapF );
         readNop( mapF, 3 );
 
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.ts", tsidx1 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.ts", tsidx1 );
         readTileSet( fopen( buffer, "rb" ), m_tileset );
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.bvd", tsidx1 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.bvd", tsidx1 );
         readBlockSet( fopen( buffer, "rb" ), m_blockSets );
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.p2l", tsidx1 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.p2l", tsidx1 );
         readPal( fopen( buffer, "rb" ), m_pals );
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.anm", tsidx1 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx1 );
         readAnimations( fopen( buffer, "rb" ), m_animations );
 
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.ts", tsidx2 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.ts", tsidx2 );
         readTileSet( fopen( buffer, "rb" ), m_tileset, 512 );
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.bvd", tsidx2 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.bvd", tsidx2 );
         readBlockSet( fopen( buffer, "rb" ), m_blockSets, 512 );
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.p2l", tsidx2 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.p2l", tsidx2 );
         readPal( fopen( buffer, "rb" ), m_pals + 6 );
-        sprintf( buffer, "nitro://MAPS/TILESETS/%i.anm", tsidx2 );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx2 );
         readAnimations( fopen( buffer, "rb" ), m_animations );
 
 
@@ -193,8 +193,8 @@ namespace map2d {
             consoleSelect( &Bottom );
             for( u8 i = 0; i < 2; ++i )
                 for( u8 j = 0; j < 2; ++j ) {
-                if( fscanf( A, "%hu", &m_rand[ i ][ j ] ) == EOF )
-                    m_rand[ i ][ j ] = 0;
+                    if( fscanf( A, "%hu", &m_rand[ i ][ j ] ) == EOF )
+                        m_rand[ i ][ j ] = 0;
                 }
             fclose( A );
         }
@@ -507,5 +507,18 @@ namespace map2d {
         bgUpdate( );
         //consoleSelect( &Bottom );
         //swiWaitForVBlank();
+    }
+
+    Map::pos Map::getFlyPos( const char* p_path, const char* p_name ) {
+        sprintf( buffer, "%s%s.fp", p_path, p_name );
+        FILE* mapF = fopen( buffer, "rb" );
+        if( !mapF )
+            return{ -1, -1, -1 };
+
+        u16 x, y;
+        u8 z;
+        fscanf( mapF, "%hu %hu %hhu", &x, &y, &z );
+        fclose( mapF );
+        return{ x, y, z };
     }
 }

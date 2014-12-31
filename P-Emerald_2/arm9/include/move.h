@@ -7,7 +7,7 @@
     description : Header file. See corresponding source file for details.
 
     Copyright (C) 2012 - 2014
-        Philip Wellnitz (RedArceus)
+    Philip Wellnitz (RedArceus)
 
     This software is provided 'as-is', without any express or implied
     warranty.  In no event will the authors be held liable for any
@@ -19,16 +19,16 @@
 
 
     1.	The origin of this software must not be misrepresented; you
-        must not claim that you wrote the original software. If you use
-        this software in a product, an acknowledgment in the product
-        is required.
+    must not claim that you wrote the original software. If you use
+    this software in a product, an acknowledgment in the product
+    is required.
 
     2.	Altered source versions must be plainly marked as such, and
-        must not be misrepresented as being the original software.
+    must not be misrepresented as being the original software.
 
     3.	This notice may not be removed or altered from any source
-        distribution.
-*/
+    distribution.
+    */
 
 #pragma once
 
@@ -42,7 +42,7 @@
 class move {
 public:
     enum ailment {
-        NONE,
+        NONE = 0,
         PARALYSIS,
         SLEEP,
         FREEZE,
@@ -81,7 +81,8 @@ public:
         SNATCH = 8,
         MIRROR_MOVE = 16,
         KINGS_ROCK = 32,
-        SOUNDPROOF = 64
+        SOUNDPROOF = 64,
+        WHILE_ASLEEP = 128
     };
 
     enum moveHitTypes {
@@ -110,28 +111,28 @@ public:
     move( ) { }
 
     move( const std::string p_moveName,
-            char p_moveEffect,
-            char p_moveBasePower,
-            Type p_moveType,
-            char p_moveAccuracy,
-            char p_movePP,
-            char p_moveEffectAccuracy,
-            moveAffectsTypes p_moveAffectsWhom,
-            char p_movePriority,
-            moveFlags p_moveFlags,
-            moveHitTypes p_moveHitType )
-            : m_isFieldAttack( false ),
-            m_moveName( p_moveName ),
-            m_moveEffect( BATTLE::battleScript() ), // <-- TODO 
-            m_moveBasePower( p_moveBasePower ),
-            m_moveType( p_moveType ),
-            m_moveAccuracy( p_moveAccuracy ),
-            m_movePP( p_movePP ),
-            m_moveEffectAccuracy( p_moveEffectAccuracy ),
-            m_moveAffectsWhom( p_moveAffectsWhom ),
-            m_movePriority( p_movePriority ),
-            m_moveFlags( p_moveFlags ),
-            m_moveHitType( p_moveHitType ) { }
+          char p_moveEffect,
+          char p_moveBasePower,
+          Type p_moveType,
+          char p_moveAccuracy,
+          char p_movePP,
+          char p_moveEffectAccuracy,
+          moveAffectsTypes p_moveAffectsWhom,
+          char p_movePriority,
+          moveFlags p_moveFlags,
+          moveHitTypes p_moveHitType )
+          : m_isFieldAttack( false ),
+          m_moveName( p_moveName ),
+          m_moveEffect( BATTLE::battleScript( { BATTLE::battleScript::command( L"Attackeneffekt.[A]" ) } ) ), // <-- TODO 
+          m_moveBasePower( p_moveBasePower ),
+          m_moveType( p_moveType ),
+          m_moveAccuracy( p_moveAccuracy ),
+          m_movePP( p_movePP ),
+          m_moveEffectAccuracy( p_moveEffectAccuracy ),
+          m_moveAffectsWhom( p_moveAffectsWhom ),
+          m_movePriority( p_movePriority ),
+          m_moveFlags( p_moveFlags ),
+          m_moveHitType( p_moveHitType ) { }
 
     ~move( ) { }
 
@@ -151,3 +152,4 @@ public:
 #define M_PSYSHOCK 44
 #define M_PSYSTRIKE 45
 #define M_SECRET_SWORD 46
+#define M_STRUGGLE 47

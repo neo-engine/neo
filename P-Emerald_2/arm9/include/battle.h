@@ -42,11 +42,9 @@
 #include "ability.h"
 #include "sprite.h"
 #include "print.h"
+#include "pokemon.h"
+#include "defines.h"
 
-
-namespace POKEMON {
-    class pokemon;
-}
 namespace ITEMS {
     class item;
 }
@@ -60,8 +58,9 @@ extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 extern FONT::font cust_font;
 extern FONT::font cust_font2;
 
-
 namespace BATTLE {
+    extern u8 firstMoveSwitchTarget;
+
     typedef battleScript::command               cmd;
     typedef battleScript::command::condition    con;
     typedef battleScript::command::value        val;
@@ -129,55 +128,44 @@ namespace BATTLE {
         battle* _battle;
         s8      _oldPKMNStats[ 6 ][ 2 ][ 10 ];
 
-        u16     _usedPals;
-
-        s8      getNextFreePal( ) {
-            for( u8 i = 0; i < 16; ++i )if( !( _usedPals & ( 1 << i ) ) ) {
-                _usedPals |= ( 1 << i );
-                return i;
-            }
-            return -1;
-        }
-        void    freePal( u16 p_palNo ) {
-            _usedPals &= ~( 1 << p_palNo );
-        }
-
-
-
     public:
         static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, bool big = false ); //HP in %
-        static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR, u8 outerR ); //HP in %
-        static void displayEP( u16 EPstart, u16 EP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR = 14, u8 outerR = 15 );
+        static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR, u8 outerR, bool p_sub = false ); //HP in %
+        static void displayEP( u16 EPstart, u16 EP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR = 14, u8 outerR = 15, bool p_sub = false );
 
-        void    initLogScreen( );
-        void    clearLogScreen( );
-        void    setLogTextColor( u16 p_color );
-        void    setLogText2Color( u16 p_color );
-        void    writeLogText( const std::wstring& p_message );
-        void    waitForTouchUp( );
-        void    waitForKeyUp( int p_key );
+        static void initLogScreen( );
+        static void clearLogScreen( );
+        static void setLogTextColor( u16 p_color );
+        static void setLogText2Color( u16 p_color );
+        static void writeLogText( const std::wstring& p_message );
+        static void waitForTouchUp( );
+        static void waitForKeyUp( int p_key );
 
         void    init( );
         void    trainerIntro( );
 
-        void    declareBattleMove( u8 p_pokemonPos );
+        bool    declareBattleMove( u8 p_pokemonPos, bool p_showBack );
 
-        void    declareBattleMoveChoose( );
-        void    chooseAttack( );
-        void    chooseItem( );
-        u8      choosePKMN( );
+        u16     chooseAttack( u8 p_pokemonPos );
+        u8      chooseAttackTarget( u8 p_pokemonPos, u16 p_moveNo );
+        u16     chooseItem( u8 p_pokemonPos );
+        u8      choosePKMN( bool p_firstIsChosen, bool p_back = true );
         void    useNav( );
 
-        void    showAttack( u8 p_moveNo );
+        void    showAttack( bool p_opponent, u8 p_pokemonPos );
         void    updateHP( bool p_opponent, u8 p_pokemonPos );
-        void    applyEXPChanges( );
-        void    updateStats( bool p_opponent, u8 p_pokemonPos );
+        void    showStatus( bool p_opponent, u8 p_pokemonPos );
+        void    updateStatus( bool p_opponent, u8 p_pokemonPos );
+        void    applyEXPChanges( bool p_opponent, u8 p_pokemonPos, u32 p_gainedExp );
+        void    updateStats( bool p_opponent, u8 p_pokemonPos, bool p_move = true );
 
         void    hidePKMN( bool p_opponent, u8 p_pokemonPos );
         void    sendPKMN( bool p_opponent, u8 p_pokemonPos );
         void    evolvePKMN( bool p_opponent, u8 p_pokemonPos );
 
         void    learnMove( u8 p_pokemonPos, u16 p_move );
+
+        void    showEndScreen( );
 
         void    dinit( );
 
@@ -186,16 +174,17 @@ namespace BATTLE {
             :_battle( p_battle ) { }
     };
 
-    class battle {
-    private:
-        u16 _round,
-            _maxRounds,
-            _AILevel;
-        const battleTrainer
-            *_player,
-            *_opponent;
+#define MAX_STATS 8
+#define ATK 0
+#define DEF 1
+#define SPD 2
+#define SATK 3
+#define SDEF 4
+#define ACCURACY 5
+#define EVASION 6
+#define ATTACK_BLOCKED 7
 
-        u8 _acPkmnPosition[ 6 ][ 2 ]; //me; opp; maps the Pkmn's positions in the teams to their real in-battle positions
+    class battle {
     public:
         enum acStatus {
             OK = 0,
@@ -205,23 +194,32 @@ namespace BATTLE {
             SELECTED = 4
         };
     private:
-        acStatus _acPkmnStatus[ 6 ][ 2 ];
+        u16 _round,
+            _maxRounds,
+            _AILevel;
+        const battleTrainer
+            *_player,
+            *_opponent;
 
-        move::ailment _acPkmnAilments[ 6 ][ 2 ];
-        u8 _acPkmnAilmentCounts[ 6 ][ 2 ];
+        u8 _acPkmnPosition[ 6 ][ 2 ]; //me; opp; maps the Pkmn's positions in the teams to their real in-battle positions
 
         bool _battleSpotOccupied[ 2 ][ 2 ];
 
-#define MAX_STATS 7
-#define ATK 0
-#define DEF 1
-#define SPD 2
-#define SATK 3
-#define SDEF 4
-#define ACCURACY 5
-#define ATTACK_BLOCKED 6
+        enum battleStatus {
+            NO_BATTLE_STATUS = 0,
+            DIVE,
+            FLY,
+            DEFAULTED, //Pokemon used eg Hyperbeam last Turn
+            PROTECTED
+            //Todo ...
+        };
 
-        s8 _acPkmnStatChanges[ 6 ][ 2 ][ 10 ];
+        enum battleTerrain {
+            NO_BATTLE_TERRAIN = 0,
+            TRICK_ROOM = 1,
+            //Todo
+        };
+        battleTerrain   _battleTerrain;
 
         struct battleMove {
         public:
@@ -236,6 +234,23 @@ namespace BATTLE {
             type    m_type;
             u16     m_value;
             u8      m_target;  //Bitflag: 0 Own1, 1 Own2, 2 Opp1, 3 Opp2, 4 Own Field, 5 OppField, m_target == 0 -> default target
+
+            void clear( ) {
+                m_target = 0;
+                m_type = (type)0;
+                m_value = 0;
+            }
+        };
+        struct battlePokemon {
+        public:
+            POKEMON::pokemon*   m_pokemon;
+            s8                  m_acStatChanges[ 10 ];
+            Type                m_Types[ 3 ];
+            battle::acStatus    m_acStatus;
+            move::ailment       m_ailments;
+            u8                  m_ailmentCount;
+            battleStatus        m_battleStatus;
+            u8                  m_toxicCount;
         };
 
         battleMove  _battleMoves[ 2 ][ 2 ];
@@ -244,21 +259,24 @@ namespace BATTLE {
         u16         _lstOppMove;
         u16         _lstMove;
 
-        std::map<POKEMON::pokemon*, std::set<POKEMON::pokemon*> > _participatedPKMN;
+        std::map<POKEMON::pokemon*, u8 > _participatedPKMN;
 
         //Current turn's current move's "consequences"
-        u8          _acMove;
         s16         _acDamage[ 2 ][ 2 ];
         u8          _critical[ 2 ][ 2 ];
         u8          _criticalChance[ 2 ][ 2 ];
         float       _effectivity[ 2 ][ 2 ];
         s8          _acStatChange[ 2 ][ 2 ][ 10 ];
+        bool        _currentMoveIsOpp;
+        bool        _currentMoveIsSnd;
 
         battleScript _undoScript[ 6 ][ 2 ]; //script to undo changes done to the own pkmn
 
         bool        _restoreItem;
         bool        _allowMegaEvolution;
         u8          _weatherLength;
+
+        bool        _endBattle = false;
 
         battleScript _weatherEffects[ 9 ] = {
             battleScript( ),
@@ -363,7 +381,7 @@ namespace BATTLE {
             L"Windstille...[A]"
         };
 
-
+        battlePokemon _pkmns[ 6 ][ 2 ];
 
         battleUI    _battleUI;
     public:
@@ -371,18 +389,17 @@ namespace BATTLE {
 #define PLAYER 0
 
 #define ACPOS( p_pokemonPos, p_opponent ) _acPkmnPosition[ p_pokemonPos ][ p_opponent ]
-#define ACPKMNSTS( p_pokemonPos, p_opponent ) _acPkmnStatus[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
-#define ACPKMNAIL( p_pokemonPos, p_opponent ) _acPkmnAilments[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
-#define ACPKMNAILCNT( p_pokemonPos, p_opponent ) _acPkmnAilmentCounts[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
-#define ACPKMN( p_pokemonPos, p_opponent ) ( ( ( p_opponent ) == OPPONENT) ? ( ( *_opponent->m_pkmnTeam )[ ACPOS( ( p_pokemonPos ), OPPONENT ) ] ) :\
-                     ( ( *_player->m_pkmnTeam )[ ACPOS( ( p_pokemonPos ), PLAYER ) ]))
-#define ACPKMNSTATCHG( p_pokemonPos, p_opponent ) _acPkmnStatChanges[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
+#define ACPKMNSTS( p_pokemonPos, p_opponent ) (_pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]).m_acStatus
+#define ACPKMNAIL( p_pokemonPos, p_opponent ) _pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_ailments
+#define ACPKMNAILCNT( p_pokemonPos, p_opponent ) _pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_ailmentCount
+#define ACPKMN( p_pokemonPos, p_opponent ) (*(_pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_pokemon))
+#define ACPKMNSTATCHG( p_pokemonPos, p_opponent ) _pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_acStatChanges
+#define ACPKMNSTR( p_pokemonPos, p_opponent ) (_pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ])
 
 #define ACPOS2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._acPkmnPosition[ p_pokemonPos ][ p_opponent ]
-#define ACPKMN2( p_battle, p_pokemonPos, p_opponent ) ( ( ( p_opponent ) == OPPONENT ) ? ( ( *( p_battle )._opponent->m_pkmnTeam )[ ACPOS2( ( p_battle ), ( p_pokemonPos ), OPPONENT ) ] ) :\
-                     ( ( *( p_battle )._player->m_pkmnTeam )[ ACPOS2( ( p_battle ), ( p_pokemonPos ), PLAYER ) ] ) )
-#define ACPKMNUNDO2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._undoScript[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
-#define ACPKMNSTATCHG2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._acPkmnStatChanges[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]
+#define ACPKMNSTS2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._pkmns[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_acStatus
+#define ACPKMN2( p_battle, p_pokemonPos, p_opponent ) (*(( p_battle )._pkmns[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_pokemon))
+#define ACPKMNSTATCHG2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._pkmns[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_acStatChanges
 
         friend class battleScript;
         friend class battleUI;
@@ -394,6 +411,10 @@ namespace BATTLE {
                                             const battleScript::command::targetSpecifier& p_targetSpecifier );
         friend int getTargetSpecifierValue( const battle& p_target,
                                             const battleScript::command::targetSpecifier& p_targetSpecifier );
+
+        friend  u16 initStsBalls( bool p_bottom, battle* p_battle, u16& p_tilecnt );
+        friend void loadSpritesSub( battle* p_battle );
+        friend void drawPKMNChoiceScreen( battle* p_battle, bool p_firstIsChosen );
 
         enum weather {
             NO_WEATHER = 0,
@@ -416,7 +437,8 @@ namespace BATTLE {
             ROUND_LIMIT = 0,
             OPPONENT_WON = -1,
             PLAYER_WON = 1,
-            NONE = 2
+            NONE = 2,
+            RUN = 3
         };
 
         bool        m_distributeEXP;
@@ -430,6 +452,7 @@ namespace BATTLE {
                 int p_maxRounds,
                 int p_AILevel = 5,
                 battleMode p_battlemode = SINGLE );
+        ~battle( );
 
         void        log( const std::wstring& p_message );
 
@@ -437,8 +460,8 @@ namespace BATTLE {
 
         void        initBattle( );
 
-        void        refillBattleSpots( bool p_choice );
-        u8          getNextPKMN( bool p_opponent );
+        void        refillBattleSpots( bool p_choice, bool p_send = true );
+        u8          getNextPKMN( bool p_opponent, u8 p_startIdx = 0 );
         void        orderPKMN( bool p_includeMovePriority = false ); //orders PKMN according to their speed, their move's priority, ... and stores result in _moveOrder
         void        switchPKMN( bool p_opponent, u8 p_toSwitch, u8 p_newPokemonPos );
 
@@ -450,19 +473,21 @@ namespace BATTLE {
 
         void        getAIMoves( );
         bool        canMove( bool p_opponent, u8 p_pokemonPos );
-        void        run( );
+        bool        run( );
 
         void        registerParticipatedPKMN( );
         void        distributeEXP( bool p_opponent, u8 p_pokemonPos );
         void        evolve( bool p_opponent, u8 p_pokemonPos );
         void        megaEvolve( bool p_opponent, u8 p_pokemonPos );
         void        doMoves( );
-        void        doMove( bool p_opponent, u8 p_pokemonPos );
+        void        doMove( u8 p_moveNo );
 
-        void        calcDamage( u8 p_moveNo, u8 p_randInt );
-        void        doAttack( u8 p_moveNo );
+        s16         calcDamage( bool p_userIsOpp, u8 p_userPos, bool p_targetIsOpp, u8 p_targetPos );
+        void        doAttack( bool p_opponent, u8 p_pokemonPos );
 
         void        doWeather( );
+        void        handleSpecialConditions( bool p_opponent, u8 p_pokemonPos );
+        void        handleFaint( bool p_opponent, u8 p_pokemonPos, bool p_show = true );
 
         bool        endConditionHit( battleEndReason& p_battleEndReason );
         void        endBattle( battleEndReason p_battleEndReason );

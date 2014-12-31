@@ -45,10 +45,15 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "defines.h"
+
+#ifdef USE_AS_LIB
 #include "as_lib9.h" 
+#endif
 
 #include "map2d.h"
-#include "buffer.h"
+#include "map2devents.h"
+//#include "buffer.h"
 #include "hmMoves.h"
 
 #include <string>
@@ -119,9 +124,9 @@ FONT::font cust_font2( FONT::font2::fontData, FONT::font2::fontWidths, FONT::fon
 
 std::unique_ptr<map2d::Map> acMap;
 
-int hours, seconds, minutes, day, month, year;
-int achours, acseconds, acminutes, acday, acmonth, acyear;
-u32 ticks;
+int hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
+int achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
+u32 ticks = 0;
 
 saveGame SAV;
 const std::string sav_nam = "nitro:/SAV";
@@ -146,6 +151,8 @@ enum ChoiceResult {
     CANCEL
 };
 
+#ifdef USE_AS_LIB
+
 bool playMp3( const char* p_path, const char* p_name ) {
     char buffer[ 120 ];
     sprintf( buffer, "%s%s", p_path, p_name );
@@ -160,6 +167,8 @@ bool playMp3( const char* p_path, const char* p_name ) {
 }
 #define PLAYMp(path) if(gMod != EMULATOR && !playMp3("./PERM2/SOUND/",(path)))\
     playMp3("nitro:/SOUND/",(path));
+
+#endif // USE_AS_LIB
 
 
 void fillWeiter( ) {
@@ -307,29 +316,33 @@ ChoiceResult opScreen( ) {
         }
         for( u16 i = 0; i < MaxVal; i++ )
             if( ( touch.py > ranges[ i ].first && touch.py < ranges[ i ].second ) ) {
-            while( 1 ) {
-                scanKeys( );
-                touch = touchReadXY( );
-                if( touch.px == 0 && touch.py == 0 )
-                    break;
-            }
-            killWeiter( );
-            FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD" );
-            FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "ClearD" );
-            for( u16 j = 1; j < 256; ++j )
-                BG_PALETTE_SUB[ j ] = RGB15( 31, 31, 31 );
+                while( 1 ) {
+                    scanKeys( );
+                    touch = touchReadXY( );
+                    if( touch.px == 0 && touch.py == 0 )
+                        break;
+                }
+                killWeiter( );
+                FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD" );
+                FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "ClearD" );
+                for( u16 j = 1; j < 256; ++j )
+                    BG_PALETTE_SUB[ j ] = RGB15( 31, 31, 31 );
 
-            return results[ i ];
+                return results[ i ];
             }
 
+#ifdef USE_AS_LIB
         if( AS_GetMP3Status( ) != MP3ST_PLAYING )
             return CANCEL;
+#endif
     }
 }
 
 
 void initNewGame( ) {
+#ifdef USE_AS_LIB
     AS_MP3Stop( );
+#endif
 
     SAV = saveGame( );
     SAV.m_activatedPNav = false;
@@ -344,6 +357,8 @@ void initNewGame( ) {
     SAV.m_JOHTO_Badges = 0;
     SAV.m_badges = 0;
     SAV.m_dex = 0;
+
+    SAV.m_bgIdx = START_BG;
 
     SAV.m_PkmnTeam.clear( );
     consoleSelect( &Bottom );
@@ -365,7 +380,9 @@ void initNewGame( ) {
     BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
     BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
 
+#ifdef USE_AS_LIB
     PLAYMp( "1001.mp3" );
+#endif
 
     cust_font.printStringD( "Haaaaalt!", 24, 84, true );
     while( 1 ) {
@@ -382,7 +399,6 @@ void initNewGame( ) {
         if( keysCurrent( ) & KEY_A ) break;
     }
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
-    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
 
     free_spaces.clear( );
     for( u16 i = 0; i < MAXPKMN; i++ ) {
@@ -405,8 +421,6 @@ void initNewGame( ) {
         if( keysUp( ) & KEY_A ) break;
     }
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
-    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
-    //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
     cust_font.printStringD( "Da er gerade leider nicht in Hoenn\nist, werde ich euch heute euren\nPokéNav und euren PokéDex\nüberreichen.", 8, 68, true );
 
     while( 1 ) {
@@ -415,8 +429,6 @@ void initNewGame( ) {
         if( keysUp( ) & KEY_A ) break;
     }
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
-    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
-    //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
 
     cust_font.printStringD( "So hier ist erstmal der PokéNav!", 8, 84, true );
 
@@ -426,8 +438,6 @@ void initNewGame( ) {
         if( keysUp( ) & KEY_A ) break;
     }
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
-    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
-    //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","NewGame");
     cust_font.printStringD( "Ich gehe dann jetzt mal\ndie Dexe holen.\nIhr könnt solange eure\nPokéNav einrichten.", 24, 68, true );
     while( 1 ) {
         scanKeys( );
@@ -435,7 +445,6 @@ void initNewGame( ) {
         if( keysUp( ) & KEY_A ) break;
     }
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
-    //loadPicture(bgGetGfxPtr(bg3sub),"nitro:/PICS/","ClearD");
 
     consoleSelect( &Bottom );
     std::wstring S_;
@@ -445,15 +454,24 @@ void initNewGame( ) {
     setMainSpriteVisibility( true );
     Oam->oamBuffer[ 1 ].isHidden = true;
     updateOAMSub( Oam );
-    AS_MP3Stop( );
-    swiWaitForIRQ( );
 
+#ifdef USE_AS_LIB
+    AS_MP3Stop( );
+#endif
+    swiWaitForIRQ( );
+    swiWaitForVBlank( );
+
+#ifdef USE_AS_LIB
     PLAYMp( "KeyItemGet.mp3" );
     AS_SetMP3Loop( false );
-    messageBox M( "Du erhälst einen PokéNav." );
+#endif
+    messageBox M( "Du erhälst einen PokéNav.", false );
+
+#ifdef USE_AS_LIB
     while( AS_GetMP3Status( ) == MP3ST_PLAYING ) {
-        swiWaitForIRQ( );
+        swiWaitForVBlank( );
     }
+#endif
     M.clear( );
 
     M.put( "Beginne automatische\nInitialisierung.", false );
@@ -461,10 +479,12 @@ void initNewGame( ) {
         swiWaitForVBlank( );
 
 
+#ifdef USE_AS_LIB
     AS_MP3Stop( );
 
     PLAYMp( "1000.mp3" );
     AS_SetMP3Loop( true );
+#endif
     M.put( "Setze Heimatregion: Hoenn.", false );
     for( u8 i = 0; i < 120; ++i )
         swiWaitForVBlank( );
@@ -547,23 +567,23 @@ INDIVIDUALISIERUNG:
         M = messageBox( "Hi, ich bin Larissa,\n""aber Lari reicht auch.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Das da ist mein\nkleiner Bruder Moritz.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Wir kommen aus Azuria", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Das heißt eigentlich.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Als alle Kanto verlassen\nhaben, sind wir nach\nKlippdelta gezogen.", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
         consoleClear( );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Du kommst auch aus\nKlippdelta?!", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Oh...\n", "Lari", messageBox::sprite_trainer, 0 );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Na dann sehen wir uns ja\nwahrscheinlich noch öfter...", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
         consoleClear( );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
     } else {
         M = messageBox( "Mir wird sie den Dex\nzuerst geben!", "???", true, true, false, messageBox::sprite_pkmn, 0 );
         consoleClear( );
@@ -583,7 +603,7 @@ INDIVIDUALISIERUNG:
         M = messageBox( "Nenn' mich ruhig Basti.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Das da ist mein\nkleiner Bruder Moritz.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Wir kommen aus Azuria.", "Basti", true, true, true, messageBox::sprite_trainer, 0 );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Das heißt eigentlich.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
@@ -636,7 +656,7 @@ INDIVIDUALISIERUNG:
     setMainSpriteVisibility( false );
     Oam->oamBuffer[ 1 ].isHidden = false;
     updateOAMSub( Oam );
-    FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+    FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
 }
 
 void initVideo( ) {
@@ -677,11 +697,7 @@ void vramSetup( ) {
 
 u8 lastdir;
 s8 dir[ 5 ][ 2 ] = { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } };
-enum MoveMode {
-    WALK,
-    SURF,
-    BIKE
-};
+
 int MOV = 20;
 
 bool cut::possible( ) {
@@ -700,7 +716,8 @@ bool whirlpool::possible( ) {
     return false;
 }
 bool surf::possible( ) {
-    return SAV.m_acMoveMode != SURF && acMap->m_blocks[ SAV.m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ SAV.m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].m_movedata == 4;
+    return ( SAV.m_acMoveMode != map2d::MoveMode::SURF )
+        && acMap->m_blocks[ SAV.m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ SAV.m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].m_movedata == 4;
 }
 
 bool heroIsBig = false;
@@ -708,9 +725,13 @@ bool heroIsBig = false;
 
 void startScreen( ) {
 
-    irqInit( );
+    //irqInit( );
     irqEnable( IRQ_VBLANK );
+#ifdef USE_AS_LIB
     irqSet( IRQ_VBLANK, AS_SoundVBL );    // needed for mp3 streaming
+#else
+    irqSet( IRQ_VBLANK, [ ]( ) { scanKeys( ); } );
+#endif
 
     vramSetup( );
 
@@ -756,24 +777,27 @@ void startScreen( ) {
         SAV.m_hasPKMN = false;
         SAV.m_savTyp = 0;
     }
+
+#ifdef USE_AS_LIB
     // init the ASlib
     AS_Init( AS_MODE_MP3 | AS_MODE_16CH );
 
     // set default sound settings
     AS_SetDefaultSettings( AS_PCM_16BIT, 22050, AS_NO_DELAY );
+#endif
 START:
     //Intro
 
-
-    if( !playMp3( "./PERM2/SOUND/", "Intro.mp3" ) )
-        playMp3( "nitro:/SOUND/", "Intro.mp3" );
+#ifdef USE_AS_LIB
+    PLAYMp( "Intro.mp3" );
     AS_SetMP3Loop( false );
     AS_SetMP3Volume( 127 );
+#endif
 
     //StartScreen
 
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Title" );
-    if( BGs[ BG_ind ].m_allowsOverlay )
+    if( BGs[ SAV.m_bgIdx ].m_allowsOverlay )
         drawSub( );
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "Clear" );
 
@@ -815,8 +839,10 @@ START:
             D0000 = 0;
         } else if( ( D0000 % 120 ) == 60 )
             consoleClear( );
+#ifdef USE_AS_LIB
         if( AS_GetMP3Status( ) != MP3ST_PLAYING )
             goto START;
+#endif
     }
 
     while( tp.px || tp.py ) {
@@ -848,7 +874,9 @@ START:
     POKEMON::LastPID = rand( );
 
     //StartMenu
+#ifdef USE_AS_LIB
     AS_SetMP3Volume( 31 );
+#endif
 
     switch( opScreen( ) ) {
         case TRANSFER_GAME:
@@ -1021,6 +1049,7 @@ CONT:
             SAV.m_badges = 0;
             SAV.m_dex = 0;
             SAV.m_hasPKMN = false;
+            SAV.m_bgIdx = START_BG;
 
             SAV.m_PkmnTeam.clear( );
             free_spaces.clear( );
@@ -1052,14 +1081,17 @@ CONT:
 
 s8 mode = -1;
 void showNewMap( u16 p_mapIdx ) {
+
+#ifdef USE_AS_LIB
     AS_MP3Stop( );
+#endif
+
     for( u8 i = 0; i < 3; ++i ) {
         for( u8 j = 0; j < 75; ++j ) {
             MapRegionPos m = MapLocations[ i ][ j ];
             if( m.m_ind != p_mapIdx )
                 continue;
             acMapRegion = Region( i + 1 );
-            showmappointer = true;
             scrn.draw( mode = 1 + i );
             printMapLocation( m );
             Oam->oamBuffer[ SQCH_ID ].x = Oam->oamBuffer[ SQCH_ID + 1 ].x = ( m.m_lx + m.m_rx ) / 2 - 8;
@@ -1069,10 +1101,12 @@ void showNewMap( u16 p_mapIdx ) {
 
             SAV.m_acMapIdx = p_mapIdx;
 
+#ifdef USE_AS_LIB
             char buffer[ 120 ];
             sprintf( buffer, "%d.mp3", SAV.m_acMapIdx );
-            PLAYMp( buffer );
-            swiWaitForIRQ( );
+            PLAYMp( buffer )
+#endif
+                swiWaitForIRQ( );
             swiWaitForVBlank( );
             return;
         }
@@ -1093,7 +1127,7 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
     heroIsBig = false;
 
     left = !left;
-    bool bike = (MoveMode)SAV.m_acMoveMode == BIKE, run = ( keysHeld( ) & KEY_B ) && !p_runDisable;
+    bool bike = ( map2d::MoveMode )SAV.m_acMoveMode == map2d::MoveMode::BIKE, run = ( keysHeld( ) & KEY_B ) && !p_runDisable;
     if( p_frame == 0 ) {
         switch( p_dir ) {
             case 0:
@@ -1411,7 +1445,7 @@ inline void movePlayer( u16 p_direction ) {
 bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
     bool WTW = ( gMod == DEVELOPER ) && ( keysHeld( ) & KEY_R );
 
-    MoveMode playermoveMode = (MoveMode)SAV.m_acMoveMode;
+    map2d::MoveMode playermoveMode = ( map2d::MoveMode )SAV.m_acMoveMode;
 
     p_x += 10;
     p_y += 10;
@@ -1432,7 +1466,7 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
 
     int verhalten = acBlock.m_bottombehave, hintergrund = acBlock.m_topbehave;
     int lstverhalten = lastBlock.m_bottombehave, lsthintergrund = lastBlock.m_topbehave;
-    if( verhalten == 0xa0 && playermoveMode != WALK ) //nur normales laufen möglich
+    if( verhalten == 0xa0 && playermoveMode != map2d::MoveMode::WALK ) //nur normales laufen möglich
         return false;
 
     if( verhalten == 0xc1 && p_y != SAV.m_acposy / 20 + 10 ) //Rechts-Links-Blockung
@@ -1445,11 +1479,11 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
     if( !WTW ) {
         if( acmovedata == 1 )
             return false;
-        if( ( acmovedata == 4 && playermoveMode != SURF ) )
+        if( ( acmovedata == 4 && playermoveMode != map2d::MoveMode::SURF ) )
             return false;
     }
-    if( acmovedata == 0xc && playermoveMode == SURF ) {
-        SAV.m_acMoveMode = WALK;
+    if( acmovedata == 0xc && playermoveMode == map2d::MoveMode::SURF ) {
+        SAV.m_acMoveMode = map2d::MoveMode::WALK;
 
     }
 
@@ -1742,7 +1776,7 @@ void flash::use( ) { }
 void whirlpool::use( ) { }
 void surf::use( ) {
     //heroIsBig = true;
-    SAV.m_acMoveMode = SURF;
+    SAV.m_acMoveMode = map2d::MoveMode::SURF;
     movePlayerOnMap( SAV.m_acposx / 20 + dir[ lastdir ][ 1 ], SAV.m_acposy / 20 + dir[ lastdir ][ 0 ], SAV.m_acposz, false );
     SAV.m_acposx += 20 * dir[ lastdir ][ 1 ];
     SAV.m_acposy += 20 * dir[ lastdir ][ 0 ];
@@ -1795,11 +1829,13 @@ int main( int p_argc, char** p_argv ) {
 
     startScreen( );
 
+#ifdef USE_AS_LIB
     AS_SetMP3Volume( 127 );
 
     AS_MP3Stop( );
+#endif
 
-    heroIsBig = SAV.m_acMoveMode != WALK;
+    heroIsBig = SAV.m_acMoveMode != map2d::MoveMode::WALK;
 
     FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "Clear" );
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "Clear" );
@@ -1825,14 +1861,16 @@ int main( int p_argc, char** p_argv ) {
 
 
     char buffer[ 120 ] = { 0 };
+#ifdef USE_AS_LIB
     sprintf( buffer, "%d.mp3", SAV.m_acMapIdx );
     PLAYMp( buffer );
     AS_SetMP3Loop( true );
+#endif
     swiWaitForIRQ( );
     swiWaitForVBlank( );
 
     while( 42 ) {
-        updateTime( true );
+        updateTime( s8( 1 ) );
         swiWaitForVBlank( );
         swiWaitForVBlank( );
         swiWaitForVBlank( );
@@ -1847,8 +1885,6 @@ int main( int p_argc, char** p_argv ) {
             consoleSetWindow( &Bottom, 4, 0, 20, 3 );
             consoleClear( );
             showmappointer = false;
-            Oam->oamBuffer[ SQCH_ID ].isHidden = true;
-            Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
             setMainSpriteVisibility( false );
             Oam->oamBuffer[ SAVE_ID ].isHidden = false;
             Oam->oamBuffer[ PKMN_ID ].isHidden = !( SAV.m_hasPKMN && SAV.m_PkmnTeam.size( ) );
@@ -1881,29 +1917,31 @@ int main( int p_argc, char** p_argv ) {
         }
 
         if( pressed & KEY_A ) {
-            for( auto a : SAV.m_PkmnTeam )
-                if( !a.m_boxdata.m_individualValues.m_isEgg )
-                    for( int i = 0; i < 4; ++i )
+            for( auto a : SAV.m_PkmnTeam ) {
+                if( !a.m_boxdata.m_individualValues.m_isEgg ) {
+                    for( u8 i = 0; i < 4; ++i ) {
                         if( AttackList[ a.m_boxdata.m_moves[ i ] ]->m_isFieldAttack && AttackList[ a.m_boxdata.m_moves[ i ] ]->possible( ) ) {
-                consoleSelect( &Bottom );
-                consoleSetWindow( &Bottom, 4, 0, 20, 3 );
-                consoleClear( );
-                showmappointer = false;
-                Oam->oamBuffer[ SQCH_ID ].isHidden = true;
-                Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
-                updateOAMSub( Oam );
-                scrn.draw( mode = -1 );
-                char buffer[ 50 ];
-                sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ i ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-                yesNoBox yn;
-                if( yn.getResult( buffer ) ) {
-                    sprintf( buffer, "%ls setzt %s\nein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-                    messageBox( buffer, true, true );
-                    shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
-                    AttackList[ a.m_boxdata.m_moves[ i ] ]->use( );
-                }
-                goto OUT;
+                            consoleSelect( &Bottom );
+                            consoleSetWindow( &Bottom, 4, 0, 20, 3 );
+                            consoleClear( );
+                            Oam->oamBuffer[ SQCH_ID ].isHidden = true;
+                            Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
+                            updateOAMSub( Oam );
+                            scrn.draw( mode = -1 );
+                            char buffer[ 50 ];
+                            sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ i ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
+                            yesNoBox yn;
+                            if( yn.getResult( buffer ) ) {
+                                sprintf( buffer, "%ls setzt %s\nein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
+                                messageBox( buffer, true, true );
+                                shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
+                                AttackList[ a.m_boxdata.m_moves[ i ] ]->use( );
+                            }
+                            goto OUT;
                         }
+                    }
+                }
+            }
 OUT:
             scrn.draw( mode );
         }
@@ -1936,7 +1974,7 @@ OUT:
                 stepincrease( );
                 lastdir = 2;
             }
-            if( SAV.m_acMoveMode != BIKE )
+            if( SAV.m_acMoveMode != map2d::MoveMode::BIKE )
                 continue;
         }
         if( held & KEY_LEFT ) {
@@ -1946,7 +1984,7 @@ OUT:
                 stepincrease( );
                 lastdir = 3;
             }
-            if( SAV.m_acMoveMode != BIKE )
+            if( SAV.m_acMoveMode != map2d::MoveMode::BIKE )
                 continue;
         }
         if( held & KEY_RIGHT ) {
@@ -1956,7 +1994,7 @@ OUT:
                 stepincrease( );
                 lastdir = 1;
             }
-            if( SAV.m_acMoveMode != BIKE )
+            if( SAV.m_acMoveMode != map2d::MoveMode::BIKE )
                 continue;
         }
         if( held & KEY_UP ) {
@@ -1966,20 +2004,15 @@ OUT:
                 stepincrease( );
                 lastdir = 4;
             }
-            if( SAV.m_acMoveMode != BIKE )
+            if( SAV.m_acMoveMode != map2d::MoveMode::BIKE )
                 continue;
         }
         //StartBag
-        //Centers o t circles.
-        //pokemon -> ID -> DEX -> Bag -> Opt -> Nav
-        // X|Y
-        //int mainSpritesPositions[6][2] 
-        //= {{130,60},{160,80},{160,115},{130,135},{100,115},{100,80}};
-        if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 6 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 7 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 6 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 7 ] - touch.py ) ) <= 16 && mode == -1 ) {
 
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -1992,12 +2025,12 @@ OUT:
         //StartPkmn
         else if( SAV.m_PkmnTeam.size( )
                  && ( ( held & KEY_START )
-                 || ( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 0 ] - touch.px )
-                 + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 )
+                 || ( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 0 ] - touch.px )
+                 + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 )
                  && mode == -1 ) ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2015,10 +2048,10 @@ OUT:
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
         //StartDex
-        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 4 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 5 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 4 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 5 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2031,10 +2064,10 @@ OUT:
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
         //StartOptions
-        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 8 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 9 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 8 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 9 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2042,17 +2075,17 @@ OUT:
             }
         }
         //StartID
-        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 3 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 3 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
                     break;
             }
-            const char *someText[ 7 ] = { "\n     PKMN-Spawn", "\n    Item-Spawn", "\n 1-Item_Test", "\n  Battle SPWN.", "\n   Battle SPWN 2", "\n    42" };
-            choiceBox test( 5, &someText[ 0 ], 0, true );
+            const char *someText[ 7 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", " ... " };
+            choiceBox test( 6, &someText[ 0 ], 0, false );
             int res = test.getResult( "Tokens of god-being...", true );
             switch( res ) {
                 case 0:
@@ -2060,7 +2093,7 @@ OUT:
                     SAV.m_PkmnTeam.clear( );
                     for( int i = 0; i < 5; ++i ) {
                         POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
-                                            20, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName().c_str()*/, !SAV.m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                            20 + 10 * i, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName().c_str()*/, !SAV.m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         stored_pkmn[ *free_spaces.rbegin( ) ] = a.m_boxdata;
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         if( POKEMON::PKMNDATA::canLearn( HILFSCOUNTER, 57, 4 ) )
@@ -2100,13 +2133,13 @@ OUT:
 
                     for( u8 i = 0; i < 3; ++i ) {
                         POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
-                                            30, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                            30, SAV.m_Id + 1, SAV.m_Sid, L"Heiko"/*SAV.getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                         HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
                     }
 
-                    BATTLE::battleTrainer opp( "TEST-OPP", "DeR TeST iST DeR BeSTe MSG1", "DeR TeST VeRLieRT GeRaDe... MSG2", "DeR TeST GEWiNNT HaHa! MSG3", "DeR TeST VeRLieRT... MSG4", &( cpy ), 0 );
+                    BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...", "Yay gewonnen!", "Das war wohl eine Niederlage...", &( cpy ), 0 );
 
                     BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::DOUBLE );
                     test_battle.start( );
@@ -2120,19 +2153,30 @@ OUT:
 
                     for( u8 i = 0; i < 6; ++i ) {
                         POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
-                                            15, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                            15, SAV.m_Id + 1, SAV.m_Sid, L"Heiko"/*SAV.getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                         HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
                     }
 
-                    BATTLE::battleTrainer opp( "TEST-OPP", "DeR TeST iST DeR BeSTe MSG1", "DeR TeST VeRLieRT GeRaDe... MSG2", "DeR TeST GEWiNNT HaHa! MSG3", "DeR TeST VeRLieRT... MSG4", &( cpy ), 0 );
+                    BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...", "Yay gewonnen!", "Das war wohl eine Niederlage...", &( cpy ), 0 );
 
                     BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::SINGLE );
                     test_battle.start( );
                     initMapSprites( );
-                    movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
+                    movePlayerOnMap( SAV.m_acpo sx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
                     break;
+                }
+                case 5:{
+                    const char *bgNames[ MAXBG ];
+                    for( u8 o = 0; o < MAXBG; ++o )
+                        bgNames[ o ] = BGs[ o ].m_name.c_str( );
+                    setMainSpriteVisibility( false, true );
+                    scrn.draw( mode );
+                    choiceBox scrnChoice( MAXBG, bgNames, 0, true );
+                    drawSub( scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
+                    setMainSpriteVisibility( false, true );
+                    scrn.draw( mode );
                 }
             }
             setMainSpriteVisibility( false );
@@ -2140,10 +2184,10 @@ OUT:
 
         }
         //StartPok\x82""nav
-        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 10 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 11 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 10 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 11 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2154,10 +2198,10 @@ OUT:
             //movePlayerOnMap(SAV.m_acposx/20,SAV.m_acposy/20,SAV.m_acposz,false);
         }
         //StartMaps
-        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 0 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 && mode == 0 ) {
+        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 0 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 && mode == 0 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2166,14 +2210,13 @@ OUT:
             if( acMapRegion == NONE )
                 acMapRegion = acRegion;
             mode = acMapRegion;
-            showmappointer = true;
             scrn.draw( mode );
         }
         //Nav->StartScrn
         else if( touch.px > 224 && touch.py > 164 && mode == 0 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2186,7 +2229,7 @@ OUT:
         else if( touch.px > 224 && touch.py > 164 && mode > 0 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
@@ -2196,11 +2239,8 @@ OUT:
             consoleSetWindow( &Bottom, 4, 0, 20, 3 );
             consoleClear( );
             showmappointer = false;
-            Oam->oamBuffer[ SQCH_ID ].isHidden = true;
-            Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
+            scrn.draw( mode = 0 );
             updateOAMSub( Oam );
-            mode = 0;
-            scrn.draw( mode );
         }
         //SwitchMap
         else if( ( held & KEY_SELECT ) && mode > 0 ) {
@@ -2209,7 +2249,7 @@ OUT:
                     break;
                 scanKeys( );
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
             }
             mode = ( ( mode + 1 ) % 3 ) + 1;
             consoleSetWindow( &Bottom, 5, 0, 20, 1 );
@@ -2219,15 +2259,16 @@ OUT:
         }
         //MapCourser
         else if( touch.px > 39 && touch.px < SCREEN_WIDTH - 39 && touch.py > 31 && touch.py < SCREEN_HEIGHT - 31 && mode > 0 ) {
+            showmappointer = true;
             Oam->oamBuffer[ SQCH_ID ].x = Oam->oamBuffer[ SQCH_ID + 1 ].x = touch.px - 8;
             Oam->oamBuffer[ SQCH_ID ].y = Oam->oamBuffer[ SQCH_ID + 1 ].y = touch.py - 8;
             printMapLocation( touch );
             updateOAMSub( Oam );
-            updateTime( true );
+            updateTime( s8( 1 ) );
         } else if( touch.px != 0 && touch.py != 0 && sqrt( sq( touch.px - 8 ) + sq( touch.py - 12 ) ) <= 17 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
-                updateTime( true );
+                updateTime( s8( 1 ) );
                 scanKeys( );
                 touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )

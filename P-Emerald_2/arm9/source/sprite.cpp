@@ -110,6 +110,7 @@ void initOAMTableSub( OAMTable * p_oam ) {
         p_oam->matrixBuffer[ i ].vdx = 0;
         p_oam->matrixBuffer[ i ].vdy = 1 << 8;
     }
+
     updateOAMSub( p_oam );
 }
 void rotateSprite( SpriteRotation * p_spriteRotation, int p_angle ) {
@@ -218,10 +219,9 @@ u16 loadSprite( OAMTable   *p_oam,
     if( !p_subScreen ) {
         dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE[ p_palIdx * COLORS_PER_PALETTE ], 32 );
         dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER ], p_spriteDataLen );
-    }
-    else {
+    } else {
         dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE_SUB[ p_palIdx * COLORS_PER_PALETTE ], 32 );
         dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER_SUB ], p_spriteDataLen );
     }
-    return p_tileIdx + (p_spriteDataLen / BYTES_PER_16_COLOR_TILE);
+    return p_tileIdx + ( p_spriteDataLen / BYTES_PER_16_COLOR_TILE );
 }

@@ -111,6 +111,12 @@
     <ClInclude Include="arm9\include\libnds_internal.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\include\defines.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\map2devents.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\as_lib7.c">
@@ -190,6 +196,12 @@
     </ClCompile>
     <ClCompile Include="arm9\source\script.cpp">
       <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\battleUI.cpp">
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\map2devents.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

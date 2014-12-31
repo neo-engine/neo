@@ -36,67 +36,18 @@
 #include <algorithm>
 #include <functional>
 #include <tuple>
+#include <initializer_list>
 
 #include "battle.h"
 #include "pokemon.h"
 #include "move.h"
 #include "item.h"
 #include "screenLoader.h"
-#include "messageBox.h"
 #include "saveGame.h"
 #include "bag.h"
 #include "buffer.h"
 #include "fs.h"
-
-#include "Message.h"
-#include "Border_1.h"
-#include "Border_2.h"
-#include "Border_3.h"
-#include "Border_4.h"
-#include "Border_5.h"
-#include "Back.h"
-
-#include "Battle1.h"
-#include "Battle2.h"
-
-#include "BattleSub1.h"
-#include "BattleSub2.h"
-#include "BattleSub3.h"
-#include "BattleSub4.h"
-#include "BattleSub5.h"
-#include "BattleSub6.h"
-
-#include "Choice_1.h"
-#include "Choice_2.h"
-#include "Choice_3.h"
-
-#include "BattleBall1.h" //Normal
-#include "BattleBall2.h" //Fainted
-#include "BattleBall3.h" //Statused
-
-#include "PokeBall1.h"
-#include "PokeBall2.h"
-#include "PokeBall3.h"
-#include "PokeBall4.h"
-#include "PokeBall5.h"
-#include "PokeBall6.h"
-#include "PokeBall7.h"
-#include "PokeBall8.h"
-#include "PokeBall9.h"
-#include "PokeBall10.h"
-#include "PokeBall11.h"
-#include "PokeBall12.h"
-#include "PokeBall13.h"
-#include "PokeBall14.h"
-#include "PokeBall15.h"
-#include "PokeBall16.h"
-#include "PokeBall17.h"
-
-#include "Shiny1.h"
-#include "Shiny2.h"
-
-#include "TestBattleBack.h"
-#include "Border.h"
+#include "sprite.h"
 
 namespace BATTLE {
     const char* trainerclassnames[ ] = { "Pokémon-Trainer" };
@@ -124,279 +75,6 @@ namespace BATTLE {
     };
 
     //////////////////////////////////////////////////////////////////////////
-    // BEGIN BATTLE_UI
-    //////////////////////////////////////////////////////////////////////////
-
-    void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big ) {
-        if( p_big )
-            displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 20, 24 );
-        else
-            displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 8, 12 );
-    }
-    void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR ) {
-        p_HP = std::max( std::min( (u16)101, p_HP ), u16( 0 ) );
-        u16 factor = std::max( 1, p_outerR / 15 );
-        if( p_HP > 100 ) {
-            BG_PALETTE[ p_freecolor1 ] = GREEN;
-            for( u16 i = 0; i < factor * 100; ++i )
-                for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                u8 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
-                //printf("%i %i; ",nx,ny);
-                }
-        } else {
-            BG_PALETTE[ p_freecolor2 ] = NORMAL_;
-            for( u16 i = factor * 100 - factor*p_HPstart; i < factor*p_HP; ++i ) {
-                for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u8 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                    ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
-                    if( i == factor * 50 )
-                        BG_PALETTE[ p_freecolor1 ] = YELLOW;
-                    if( i == factor * 80 )
-                        BG_PALETTE[ p_freecolor1 ] = RED;
-                }
-                if( p_delay )
-                    swiWaitForVBlank( );
-            }
-        }
-    }
-    void battleUI::displayEP( u16 p_EPstart, u16 p_EP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR ) {
-        u16 factor = std::max( 1, p_outerR / 15 );
-        if( p_EPstart >= 100 || p_EP > 100 ) {
-            BG_PALETTE[ p_freecolor1 ] = NORMAL_;
-            for( u16 i = 0; i < factor * 100; ++i )
-                for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                u16 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
-                //printf("%i %i; ",nx,ny);
-                }
-        } else {
-            BG_PALETTE[ p_freecolor2 ] = ICE;
-            for( u16 i = p_EPstart*factor; i <= p_EP*factor; ++i ) {
-                for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u16 nx = p_x + 16 + j * sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 ), ny = p_y + 16 + j * cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 );
-                    ( (color *)BG_BMP_RAM( 1 ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
-                }
-                if( p_delay )
-                    swiWaitForVBlank( );
-            }
-        }
-    }
-
-    void battleUI::initLogScreen( ) {
-        cust_font.setColor( 0, 0 );
-        cust_font.setColor( 251, 1 );
-        cust_font.setColor( 252, 2 );
-        cust_font2.setColor( 0, 0 );
-        cust_font2.setColor( 253, 1 );
-        cust_font2.setColor( 254, 2 );
-
-        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
-        BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE[ 251 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE[ 252 ] = RGB15( 3, 3, 3 );
-        BG_PALETTE[ 253 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE[ 254 ] = RGB15( 31, 31, 31 );
-        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
-    }
-    void battleUI::clearLogScreen( ) {
-        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
-    }
-    void battleUI::setLogTextColor( u16 p_color ) {
-        BG_PALETTE_SUB[ 251 ] = BG_PALETTE[ 251 ] = p_color;
-    }
-    void battleUI::setLogText2Color( u16 p_color ) {
-        BG_PALETTE_SUB[ 253 ] = BG_PALETTE[ 253 ] = p_color;
-    }
-    void battleUI::writeLogText( const std::wstring& p_message ) {
-        cust_font.printMBString( p_message.c_str( ), 8, 8, true );
-    }
-
-    void battleUI::waitForTouchUp( ) {
-        while( 1 ) {
-            swiWaitForVBlank( );
-            updateTime( false );
-            scanKeys( );
-            auto t = touchReadXY( );
-            if( t.px == 0 && t.py == 0 )
-                break;
-        }
-    }
-    void battleUI::waitForKeyUp( int p_key ) {
-        while( 1 ) {
-            scanKeys( );
-            swiWaitForVBlank( );
-            updateTime( );
-            if( keysUp( ) & p_key )
-                break;
-        }
-    }
-
-    //Some defines of indices in the OAM for the used sprites
-#define HP_START                 1
-#define HP_IDX( p_pokemonPos, p_opponent ) ( HP_START + ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
-
-#define STSBALL_START            5
-#define STSBALL_IDX( p_pokemonPos, p_opponent ) ( STSBALL_START + ( ( p_opponent ) * 6 + ( p_pokemonPos ) ) )
-
-#define PKMN_START               17
-#define PKMN_IDX( p_pokemonPos, p_opponent ) ( PKMN_START + 4 * ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
-
-#define PB_ANIM             127
-#define SHINY_ANIM          127
-
-    //Some analogous defines for thei pal indices
-#define PKMN_PAL_START
-#define OPP_PKMN_1_PAL        0-1
-#define OPP_PKMN_2_PAL        1-1
-#define OWN_PKMN_1_PAL        2-1
-#define OWN_PKMN_2_PAL        3-1
-
-#define PB_PAL_START          4
-#define HP_PAL                7
-
-#define OPP_PKMN_1_TILE      44
-#define OPP_PKMN_2_TILE     188
-#define OWN_PKMN_1_TILE     332
-#define OWN_PKMN_2_TILE     476
-
-#define OWN1_EP_COL         160
-#define OWN2_EP_COL         OWN1_EP_COL
-
-#define OWN_HP_COL          150
-#define OPP_HP_COL          155
-
-#define HP_COL(a,b) (((a) == OPPONENT )? (OPP_HP_COL + (b)*2 ): (OWN_HP_COL + (b)*2 ))
-
-#define GENDER(a) (a.m_boxdata.m_isFemale? 147 : (a.m_boxdata.m_isGenderless ? ' ' : 141))
-
-    void initStsBalls( ) {
-
-    }
-    void setStsBallVisibility( bool p_opponent, u8 p_pokemonPos, bool p_visibility ) {
-
-    }
-    void setStsBallSts( bool p_opponent, u8 p_pokemonPos, battle::acStatus p_status ) {
-
-    }
-
-    /**
-     *  @brief Loads all the required graphics and sprites
-     */
-    void battleUI::init( ) {
-
-    }
-
-    void battleUI::trainerIntro( ) {
-
-    }
-
-    void battleUI::declareBattleMove( u8 p_pokemonPos ) {
-
-    }
-
-    void battleUI::declareBattleMoveChoose( ) {
-
-    }
-
-    void battleUI::chooseAttack( ) {
-
-    }
-
-    void battleUI::chooseItem( ) {
-
-    }
-
-    u8 battleUI::choosePKMN( ) {
-
-    }
-
-    void battleUI::useNav( ) {
-
-    }
-
-    void battleUI::showAttack( u8 p_moveNo ) {
-
-    }
-
-    void battleUI::updateHP( bool p_opponent, u8 p_pokemonPos ) {
-
-    }
-
-    void battleUI::applyEXPChanges( ) {
-
-    }
-
-    void battleUI::updateStats( bool p_opponent, u8 p_pokemonPos ) {
-
-    }
-
-    void battleUI::hidePKMN( bool p_opponent, u8 p_pokemonPos ) {
-
-    }
-
-    void battleUI::sendPKMN( bool p_opponent, u8 p_pokemonPos ) {
-
-    }
-
-    void battleUI::evolvePKMN( bool p_opponent, u8 p_pokemonPos ) {
-
-    }
-
-    void battleUI::learnMove( u8 p_pokemonPos, u16 p_move ) {
-
-    }
-
-    void battleUI::dinit( ) {
-
-    }
-
-#undef OWN_HP_1
-#undef OWN_HP_2              
-#undef OPP_HP_1              
-#undef OPP_HP_2              
-#undef OWN_PB_START          
-#undef OPP_PB_START         
-#undef OPP_PKMN_1_START     
-#undef OPP_PKMN_2_START    
-#undef OWN_PKMN_1_START     
-#undef OWN_PKMN_2_START     
-
-#undef PB_ANIM             
-#undef SHINY_ANIM          
-
-#undef OPP_PKMN_1_PAL        
-#undef OPP_PKMN_2_PAL       
-#undef OWN_PKMN_1_PAL       
-#undef OWN_PKMN_2_PAL        
-
-#undef PB_PAL_START          
-#undef HP_PAL                
-
-#undef OPP_PKMN_1_TILE      
-#undef OPP_PKMN_2_TILE     
-#undef OWN_PKMN_1_TILE     
-#undef OWN_PKMN_2_TILE     
-
-#undef OWN1_EP_COL         
-#undef OWN2_EP_COL         
-
-#undef OWN_HP_COL          
-#undef OPP_HP_COL          
-
-#undef HP_COL
-
-#undef GENDER
-
-    //////////////////////////////////////////////////////////////////////////
-    // END BATTLE_UI
-    //////////////////////////////////////////////////////////////////////////
-
-    //////////////////////////////////////////////////////////////////////////
     // BEGIN BATTLE
     //////////////////////////////////////////////////////////////////////////
 #define C2I(a) ((a) - L'0')
@@ -411,7 +89,7 @@ namespace BATTLE {
             return std::wstring( wbuffer );
         }
         if( p_cmd == L"TCLASS" ) {
-            std::swprintf( wbuffer, 50, L"%s", p_battle._opponent->m_trainerClass );
+            std::swprintf( wbuffer, 50, L"%s", trainerclassnames[ p_battle._opponent->m_trainerClass ] );
             return std::wstring( wbuffer );
         }
         if( p_cmd.substr( 0, 4 ) == L"COLR" ) {
@@ -422,10 +100,14 @@ namespace BATTLE {
             b = 10 * C2I( p_cmd[ 11 ] ) + C2I( p_cmd[ 12 ] );
 
             p_battle._battleUI.setLogTextColor( RGB15( r, g, b ) );
+            if( r != 15 || g != 15 || b != 15 )
+                cust_font.setColor( COLOR_IDX, 1 );
+            else
+                cust_font.setColor( GRAY_IDX, 1 );
             return L"";
         }
 
-        POKEMON::pokemon& target = ACPKMN2( p_battle, 0, PLAYER );
+        POKEMON::pokemon target = ACPKMN2( p_battle, 0, PLAYER );
         bool isPkmn = false;
         bool isOpp = false;
 
@@ -470,6 +152,17 @@ namespace BATTLE {
         return L"";
     }
 
+    battle::battle( battleTrainer* p_player, battleTrainer* p_opponent, int p_maxRounds, int p_AILevel, battleMode p_battleMode ) {
+        _maxRounds = p_maxRounds;
+        _AILevel = p_AILevel;
+        _player = p_player;
+        _opponent = p_opponent;
+        m_battleMode = p_battleMode;
+
+        m_distributeEXP = true;
+    }
+
+
     /**
      *  @brief Write the message p_message to the battle log
      *  @param p_message: The message to be written
@@ -485,12 +178,14 @@ namespace BATTLE {
                 if( accmd == L"CLEAR" ) {
                     _battleUI.writeLogText( msg );
                     _battleUI.clearLogScreen( );
+                    msg = L"";
                 }
             } else
                 msg += p_message[ i ];
         }
 
-        _battleUI.writeLogText( msg );
+        if( msg != L"" )
+            _battleUI.writeLogText( msg );
         _battleUI.clearLogScreen( );
     }
 
@@ -503,13 +198,44 @@ namespace BATTLE {
 
         initBattle( );
 
+        _round = 0;
+        _maxRounds = 500;
         while( _round++ < _maxRounds ) {
             registerParticipatedPKMN( );
 
-            if( canMove( PLAYER, 0 ) )
-                _battleUI.declareBattleMove( 0 );
-            if( m_battleMode == DOUBLE && canMove( PLAYER, 1 ) )
-                _battleUI.declareBattleMove( 1 );
+            bool p1CanMove = canMove( PLAYER, 0 );
+CHOOSE1:
+            firstMoveSwitchTarget = 0;
+
+            _battleMoves[ 0 ][ PLAYER ] = { ( battleMove::type )0, 0, 0 };
+            _battleMoves[ 1 ][ PLAYER ] = { ( battleMove::type )0, 0, 0 };
+            _battleMoves[ 0 ][ OPPONENT ] = { ( battleMove::type )0, 0, 0 };
+            _battleMoves[ 1 ][ OPPONENT ] = { ( battleMove::type )0, 0, 0 };
+
+            if( ACPKMNSTS( 0, PLAYER ) != KO ) {
+                if( p1CanMove ) {
+                    _battleUI.declareBattleMove( 0, false );
+                    if( _endBattle ) {
+                        endBattle( battleEnd = RUN );
+                        return ( battleEnd );
+                    }
+                } else
+                    log( L"[OWN1] kann nicht angreifen...[A]" );
+            }
+            //If 1st action is RUN, the player has no choice for a second move
+            if( _battleMoves[ 0 ][ PLAYER ].m_type != battleMove::RUN && ACPKMNSTS( 1, PLAYER ) != KO ) {
+                if( m_battleMode == DOUBLE && canMove( PLAYER, 1 ) ) {
+                    if( !_battleUI.declareBattleMove( 1, p1CanMove && ACPKMNSTS( 0, PLAYER ) != KO ) )
+                        goto CHOOSE1;
+
+                    if( _endBattle ) {
+                        endBattle( battleEnd = RUN );
+                        return ( battleEnd );
+                    }
+                } else if( m_battleMode == DOUBLE )
+                    log( L"[OWN2] kann nicht angreifen...[A]" );
+            } else
+                _battleMoves[ 1 ][ PLAYER ].m_type = battleMove::RUN;
 
             getAIMoves( );
 
@@ -520,8 +246,23 @@ namespace BATTLE {
                 break;
             }
             doWeather( );
+            for( int k = 0; k < 4; ++k ) {
+                if( m_battleMode != DOUBLE && ( k % 2 ) )
+                    continue;
+
+                handleFaint( k / 2, k % 2 );
+                doItem( k / 2, k % 2, ability::BETWEEN_TURNS );
+                doAbility( k / 2, k % 2, ability::BETWEEN_TURNS );
+                handleSpecialConditions( k / 2, k % 2 );
+                handleFaint( k / 2, k % 2 );
+            }
 
             refillBattleSpots( true );
+            for( int k = 0; k < 4; ++k ) {
+                if( m_battleMode != DOUBLE && ( k % 2 ) )
+                    continue;
+                handleFaint( k / 2, k % 2, false );
+            }
         }
 
         return battleEnd;
@@ -534,11 +275,30 @@ namespace BATTLE {
         //Some basic initialization stuff
         _battleUI = battleUI( this );
         _battleUI.init( );
-
+        POKEMON::PKMNDATA::pokemonData pdata;
         for( u8 i = 0; i < 6; ++i ) {
-            ACPOS( i, PLAYER ) = ACPOS( i, OPPONENT ) = i;
             if( _player->m_pkmnTeam->size( ) > i ) {
-                if( ACPKMN( i, PLAYER ).m_stats.m_acHP == 0 || ACPKMN( i, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                POKEMON::PKMNDATA::getAll( ( *_player->m_pkmnTeam )[ i ].m_boxdata.m_speciesId, pdata );
+                _pkmns[ i ][ 0 ].m_pokemon = &( ( *_player->m_pkmnTeam )[ i ] );
+                _pkmns[ i ][ 0 ].m_Types[ 0 ] = pdata.m_types[ 0 ];
+                _pkmns[ i ][ 0 ].m_Types[ 1 ] = pdata.m_types[ 1 ];
+                _pkmns[ i ][ 0 ].m_Types[ 2 ] = pdata.m_types[ 1 ];
+            }
+            if( _opponent->m_pkmnTeam->size( ) > i ) {
+                POKEMON::PKMNDATA::getAll( ( *_opponent->m_pkmnTeam )[ i ].m_boxdata.m_speciesId, pdata );
+                _pkmns[ i ][ 1 ].m_pokemon = &( ( *_opponent->m_pkmnTeam )[ i ] );
+                _pkmns[ i ][ 1 ].m_Types[ 0 ] = pdata.m_types[ 0 ];
+                _pkmns[ i ][ 1 ].m_Types[ 1 ] = pdata.m_types[ 1 ];
+                _pkmns[ i ][ 1 ].m_Types[ 2 ] = pdata.m_types[ 1 ];
+            }
+
+            ACPOS( i, PLAYER ) = ACPOS( i, OPPONENT ) = i;
+            for( u8 o = 0; o < MAX_STATS; ++o )
+                ACPKMNSTATCHG( i, PLAYER )[ o ] = ACPKMNSTATCHG( i, OPPONENT )[ o ] = 0;
+            if( _player->m_pkmnTeam->size( ) > i ) {
+                if( ACPKMN( i, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                    ACPKMNSTS( i, PLAYER ) = NA;
+                else if( ACPKMN( i, PLAYER ).m_stats.m_acHP == 0 )
                     ACPKMNSTS( i, PLAYER ) = KO;
                 else if( ACPKMN( i, PLAYER ).m_statusint )
                     ACPKMNSTS( i, PLAYER ) = STS;
@@ -547,7 +307,9 @@ namespace BATTLE {
             } else
                 ACPKMNSTS( i, PLAYER ) = NA;
             if( _opponent->m_pkmnTeam->size( ) > i ) {
-                if( ACPKMN( i, OPPONENT ).m_stats.m_acHP == 0 || ACPKMN( i, OPPONENT ).m_boxdata.m_individualValues.m_isEgg )
+                if( ACPKMN( i, OPPONENT ).m_boxdata.m_individualValues.m_isEgg )
+                    ACPKMNSTS( i, OPPONENT ) = NA;
+                else if( ACPKMN( i, OPPONENT ).m_stats.m_acHP == 0 )
                     ACPKMNSTS( i, OPPONENT ) = KO;
                 else if( ACPKMN( i, OPPONENT ).m_statusint )
                     ACPKMNSTS( i, OPPONENT ) = STS;
@@ -560,6 +322,8 @@ namespace BATTLE {
             _battleSpotOccupied[ 0 ][ p ] = false;
             _battleSpotOccupied[ 1 ][ p ] = !( m_battleMode == DOUBLE );
         }
+
+        refillBattleSpots( false, false );
 
         _battleUI.trainerIntro( );
 
@@ -576,37 +340,69 @@ namespace BATTLE {
      *  @brief send in PKMN for fainted ones, if possible
      *  @param p_choice: Specifies whether the player can choose the PKMN which is/are being sent
      */
-    void battle::refillBattleSpots( bool p_choice ) {
-        acStatus oldSts[ 2 ] = { };
+    void battle::refillBattleSpots( bool p_choice, bool p_send ) {
 
-        for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
+        for( u8 i = 0; i < 1 + ( m_battleMode == DOUBLE ); ++i )for( u8 j = 0; j < 2; ++j ) {
             if( !_battleSpotOccupied[ i ][ j ] ) {
-                u8 nextSpot;
-                if( !p_choice || j )
-                    nextSpot = getNextPKMN( j );
-                else
-                    nextSpot = _battleUI.choosePKMN( );
+                bool refillpossible = false;
 
-                std::swap( ACPOS( i, j ), ACPOS( nextSpot, j ) );
+                for( u8 k = 1 + ( m_battleMode == DOUBLE );
+                     k < ( j ? _opponent->m_pkmnTeam->size( ) : _player->m_pkmnTeam->size( ) ); ++k )
+                     if( ACPKMNSTS( k, j ) != KO && ACPKMNSTS( k, j ) != SELECTED
+                         && ACPKMNSTS( k, j ) != NA && ACPKMN( k, j ).m_stats.m_acHP ) {
+                         refillpossible = true;
+                         break;
+                     }
 
-                if( !i ) {
-                    oldSts[ j ] = ACPKMNSTS( 0, j );
-                    ACPKMNSTS( 0, j ) = SELECTED;
+                if( !refillpossible ) {
+                    _battleSpotOccupied[ i ][ j ] = true;
+                    continue;
                 }
+
+                u8 nextSpot = i;
+                if( !p_choice || j )
+                    nextSpot = getNextPKMN( j, i );
+                else
+                    nextSpot = _battleUI.choosePKMN( m_battleMode == DOUBLE, false );
+
+                if( nextSpot != 7 && nextSpot != i )
+                    std::swap( ACPOS( i, j ), ACPOS( nextSpot, j ) );
             }
         }
 
-        orderPKMN( );
+        //Sort the remaining PKMN according to their status -> No STS, STS, KO, NA
+        std::vector<std::pair<u8, u8> > tmp;
+        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+            tmp.push_back( std::pair<u8, u8>( ACPKMNSTS( i, PLAYER ), ACPOS( i, PLAYER ) ) );
+        std::sort( tmp.begin( ), tmp.end( ) );
+        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+            ACPOS( i, PLAYER ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
 
+        //Sort the remaining PKMN according to their status -> No STS, STS, KO, NA (For the opponent)
+        tmp.clear( );
+        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+            tmp.push_back( std::pair<u8, u8>( ACPKMNSTS( i, OPPONENT ), ACPOS( i, OPPONENT ) ) );
+        std::sort( tmp.begin( ), tmp.end( ) );
+        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+            ACPOS( i, OPPONENT ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
+
+        orderPKMN( false );
+
+        if( p_send ) {
+            for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 1 + ( m_battleMode == DOUBLE ); ++j )
+                if( !_battleSpotOccupied[ j ][ i ] )
+                    _battleUI.updateStats( i, j, false );
+            for( u8 i = 0; i < 2; ++i )for( u8 j = 1 + ( m_battleMode == DOUBLE ); j < 6; ++j )
+                _battleUI.updateStats( i, j, false );
+        }
         for( u8 p = 0; p < 4; ++p ) {
-            for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
+            for( u8 i = 0; i < 1 + ( m_battleMode == DOUBLE ); ++i )for( u8 j = 0; j < 2; ++j ) {
                 if( _moveOrder[ i ][ j ] == p ) {
                     if( !_battleSpotOccupied[ i ][ j ] ) {
-                        if( !i )
-                            ACPKMNSTS( 0, j ) = oldSts[ j ];
-
-                        _battleUI.sendPKMN( j, i );
-                        _battleSpotOccupied[ i ][ j ] = true;
+                        if( p_send ) {
+                            _battleUI.sendPKMN( j, i );
+                            _battleSpotOccupied[ i ][ j ] = true;
+                        }
                     }
                     goto NEXT;
                 }
@@ -621,10 +417,10 @@ NEXT:
      *  @param p_opponent: true iff the next opponent's PKMN is requested.
      *  @returns Minimum i for which ACPKMNSTS(i,p_opponent) != KO and != SELECTED, 7 iff all PKMN fainted
      */
-    u8 battle::getNextPKMN( bool p_opponent ) {
+    u8 battle::getNextPKMN( bool p_opponent, u8 p_startIdx ) {
         u8 max = ( p_opponent ? _opponent->m_pkmnTeam->size( ) : _player->m_pkmnTeam->size( ) );
 
-        for( u8 i = 0; i < max; ++i )
+        for( u8 i = p_startIdx; i < max; ++i )
             if( ACPKMNSTS( i, p_opponent ) != KO
                 && ACPKMNSTS( i, p_opponent ) != SELECTED )
                 return i;
@@ -636,32 +432,65 @@ NEXT:
      *  @param p_includeMovePriority: Determines whether the PKMN's move's priorities should matter.
      */
     void battle::orderPKMN( bool p_includeMovePriority ) {
-        _moveOrder[ 0 ][ 0 ]
-            = _moveOrder[ 0 ][ 1 ]
-            = _moveOrder[ 1 ][ 0 ]
-            = _moveOrder[ 1 ][ 1 ] = 42;
+        _moveOrder[ 0 ][ 0 ] = -1;
+        _moveOrder[ 0 ][ 1 ] = -1;
+        _moveOrder[ 1 ][ 0 ] = -1;
+        _moveOrder[ 1 ][ 1 ] = -1;
 
-        std::vector< std::tuple<s8, u16, u8> > inits;
+        //return;
+        bool hasTrickRoom = ( _battleTerrain & TRICK_ROOM );
+
+        std::vector< std::tuple<s16, s16, u16> > inits;
         for( u8 i = 0; i < ( ( m_battleMode == DOUBLE ) ? 2 : 1 ); ++i ) {
             for( u8 j = 0; j < 2; ++j ) {
-                u16 acSpd = ACPKMN( i, j ).m_stats.m_Spd;
+                s16 acSpd = ACPKMN( i, j ).m_stats.m_Spd;
                 s8 movePr = ( ( _battleMoves[ i ][ j ].m_type == battleMove::ATTACK || _battleMoves[ i ][ j ].m_type == battleMove::MEGA_ATTACK ) ?
-                              AttackList[ ACPKMN( i, j ).m_boxdata.m_moves[ 0 ] ]->m_movePriority : 0 );
-                inits.push_back( std::tuple<s8, u16, u8>( p_includeMovePriority * movePr, acSpd, 2u * i + ( 1u - j ) ) );
+                              AttackList[ _battleMoves[ i ][ j ].m_value ]->m_movePriority : 0 );
+                if( ACPKMN( i, j ).m_status.m_Paralyzed
+                    && ACPKMN( i, j ).m_boxdata.m_ability != A_QUICK_FEET )
+                    acSpd /= 4;
+                else if( ACPKMN( i, j ).m_statusint && ACPKMN( i, j ).m_boxdata.m_ability == A_QUICK_FEET )
+                    acSpd += acSpd / 2;
+
+                if( p_includeMovePriority ) {
+                    if( hasTrickRoom )
+                        acSpd *= -1;
+                    if( ACPKMN( i, j ).m_boxdata.m_holdItem == I_QUICK_CLAW
+                        && ( ( rand( ) % 100 ) < 20 ) ) {
+
+                        std::swprintf( wbuffer, 100, L"%ls%s agiert dank\neiner Flinkklaue zuerst![A]",
+                                       ( ACPKMN( i, j ).m_boxdata.m_name ),
+                                       ( j ? " (Gegner)" : "" ) );
+                        log( wbuffer );
+
+                        acSpd += 2000;
+                    } else if( ACPKMN( i, j ).m_boxdata.m_holdItem == I_LAGGING_TAIL )
+                        acSpd -= 2000;
+                    else if( ACPKMN( i, j ).m_boxdata.m_ability == A_STALL )
+                        acSpd -= 2000;
+
+                    if( ACPKMN( i, j ).m_boxdata.m_holdItem == I_FULL_INCENSE )
+                        movePr--;
+                }
+
+                if( _battleMoves[ i ][ j ].m_type == battleMove::SWITCH )
+                    movePr = 7;
+                if( _battleMoves[ i ][ j ].m_type == battleMove::USE_ITEM )
+                    movePr = 7;
+                inits.push_back( std::tuple<s16, s16, u8>( p_includeMovePriority * movePr, acSpd, 2 * i + j ) );
             }
         }
-        std::sort( inits.begin( ), inits.end( ), std::greater < std::tuple<s8, u16, u8> >( ) );
+        std::sort( inits.begin( ), inits.end( ), std::greater < std::tuple<s8, s16, u16> >( ) );
 
-        u8 c = 0;
-        for( const std::tuple<s8, u16, u8> i : inits ) {
-            s8 v;
-            u16 _1;
-            u8 _2;
-            std::tie( v, _1, _2 ) = i;
-            bool isOpp = v % 2,
+        for( u8 i = 0; i < inits.size( ); ++i ) {
+            s16 _0 = 0;
+            s16 _1 = 0;
+            u16 v = 0;
+            std::tie( _0, _1, v ) = inits[ i ];
+            u8 isOpp = v % 2,
                 isSnd = v / 2;
 
-            _moveOrder[ isSnd ][ isOpp ] = c++;
+            _moveOrder[ isSnd ][ isOpp ] = i;
         }
     }
 
@@ -670,8 +499,6 @@ NEXT:
      *  @param p_situation: Current situation, on which an ability may be useable
      */
     void battle::doAbilities( ability::abilityType p_situation ) {
-        orderPKMN( );
-
         for( u8 p = 0; p < 4; ++p ) {
             for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
                 if( _moveOrder[ i ][ j ] == p ) {
@@ -691,6 +518,9 @@ NEXT:
     *  @param p_situation: Current situation, on which an ability may be useable
     */
     void battle::doAbility( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation ) {
+        if( !ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
+            return;
+
         auto ab = ability( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability );
 
         if( ab.m_type & p_situation ) {
@@ -702,12 +532,12 @@ NEXT:
             log( wbuffer );
             ab.m_effect.execute( *this, &( ACPKMN( p_pokemonPos, p_opponent ) ) );
 
-            for( u8 k = 0; k < 4; ++k ) {
-                bool isOpp = k % 2,
-                    isSnd = k / 2;
-                _battleUI.updateHP( isOpp, isSnd );
-                _battleUI.updateStats( isOpp, isSnd );
-            }
+            //for( u8 k = 0; k < 4; ++k ) {
+            //    bool isOpp = k % 2,
+            //        isSnd = k / 2;
+            //    _battleUI.updateHP( isOpp, isSnd );
+            //    _battleUI.updateStats( isOpp, isSnd );
+            //}
         }
     }
 
@@ -719,7 +549,7 @@ NEXT:
     bool battle::canMove( bool p_opponent, u8 p_pokemonPos ) {
         if( m_battleMode != DOUBLE && p_pokemonPos )
             return false;
-        return ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ ATTACK_BLOCKED ];
+        return !ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ ATTACK_BLOCKED ];
     }
 
     /**
@@ -731,7 +561,7 @@ NEXT:
             case 0: // Trivial AI
             {
                 for( u8 i = 0; i < 2; ++i )if( canMove( OPPONENT, i ) )
-                    _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, 0, 0 };
+                    _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, ACPKMN( i, OPPONENT ).m_boxdata.m_moves[ 0 ], 0 };
                 break;
             }
         }
@@ -754,16 +584,8 @@ NEXT:
 
         orderPKMN( true );
 
-        for( u8 p = 0; p < 4; ++p ) {
-            for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
-                if( _moveOrder[ i ][ j ] == p ) {
-                    doMove( j, i );
-                    goto NEXT;
-                }
-            }
-NEXT:
-            ;
-        }
+        for( u8 p = 0; p < 4; ++p )
+            doMove( p );
     }
 
     /**
@@ -780,29 +602,37 @@ NEXT:
 
     /**
      *  @brief Does the specified PKMN's move.
-     *  @param p_opponent: true iff the next opponent's PKMN is requested.
-     *  @param p_pokemonPos: Position of the target PKMN (0 or 1)
      */
-    void battle::doMove( bool p_opponent, u8 p_pokemonPos ) {
-        _acMove = _moveOrder[ p_pokemonPos ][ p_opponent ];
+    void battle::doMove( u8 p_moveNo ) {
+
+        u8 opponent = -1;
+        u8 pokemonPos = -1;
+
+        for( opponent = 0; opponent < 2; ++opponent )
+            for( pokemonPos = 0; pokemonPos < 2; ++pokemonPos )
+                if( _moveOrder[ pokemonPos ][ opponent ] == p_moveNo )
+                    goto OUT;
+OUT:
+        auto& acMove = _battleMoves[ pokemonPos ][ opponent ];
+
+        if( !ACPKMN( pokemonPos, opponent ).m_stats.m_acHP )
+            return;
 
         std::wstring acPkmnStr = L"";
-        if( p_opponent )
-            acPkmnStr = L"OPP" + ( p_pokemonPos + 1 );
+        if( opponent )
+            acPkmnStr = L"OPP" + ( pokemonPos + 1 );
         else
-            acPkmnStr = L"OWN" + ( p_pokemonPos + 1 );
-        auto& acMove = _battleMoves[ p_pokemonPos ][ p_opponent ];
-        auto& acPkmn = ACPKMN( p_pokemonPos, p_opponent );
+            acPkmnStr = L"OWN" + ( pokemonPos + 1 );
 
         switch( acMove.m_type ) {
             case battleMove::ATTACK:
             {
-                auto& acAttack = AttackList[ acPkmn.m_boxdata.m_moves[ acMove.m_value ] ];
+                auto acAttack = AttackList[ acMove.m_value ];
                 if( acMove.m_target == 0 ) {
-                    if( !p_opponent )
+                    if( !opponent )
                         switch( acAttack->m_moveAffectsWhom ) {
                             case move::moveAffectsTypes::USER:
-                                acMove.m_target = 1 + p_pokemonPos;
+                                acMove.m_target = 1 + pokemonPos;
                                 break;
                             case move::moveAffectsTypes::OWN_FIELD:
                                 acMove.m_target = ( 1 << 4 );
@@ -814,14 +644,14 @@ NEXT:
                                 acMove.m_target = ( 1 << 2 ) | ( 1 << 3 );
                                 break;
                             case move::moveAffectsTypes::BOTH_FOES_AND_PARTNER:
-                                acMove.m_target = ( 1 << ( p_pokemonPos ) | ( 1 << 2 ) | ( 1 << 3 ) );
+                                acMove.m_target = ( 1 << ( pokemonPos ) | ( 1 << 2 ) | ( 1 << 3 ) );
                                 break;
                             case move::moveAffectsTypes::SELECTED:
                                 acMove.m_target = ( 1 << 2 );
                                 break;
                             case move::moveAffectsTypes::RANDOM:
                                 acMove.m_target = ( 1 << ( rand( ) % 4 ) );
-                                if( acMove.m_target == ( 1 << p_pokemonPos ) )
+                                if( acMove.m_target == ( 1 << pokemonPos ) )
                                     acMove.m_target <<= 1;
                                 break;
                             default:
@@ -829,7 +659,7 @@ NEXT:
                     } else
                         switch( acAttack->m_moveAffectsWhom ) {
                             case move::moveAffectsTypes::USER:
-                                acMove.m_target = ( ( 1 + p_pokemonPos ) << 2 );
+                                acMove.m_target = ( ( 1 + pokemonPos ) << 2 );
                                 break;
                             case move::moveAffectsTypes::OWN_FIELD:
                                 acMove.m_target = ( 1 << 5 );
@@ -841,41 +671,33 @@ NEXT:
                                 acMove.m_target = ( 1 << 0 ) | ( 1 << 1 );
                                 break;
                             case move::moveAffectsTypes::BOTH_FOES_AND_PARTNER:
-                                acMove.m_target = ( 1 << 0 ) | ( 1 << 1 ) | ( 1 << ( 2 + p_pokemonPos ) );
+                                acMove.m_target = ( 1 << 0 ) | ( 1 << 1 ) | ( 1 << ( 2 + pokemonPos ) );
                                 break;
                             case move::moveAffectsTypes::SELECTED:
                                 acMove.m_target = ( 1 << 0 );
                                 break;
                             case move::moveAffectsTypes::RANDOM:
                                 acMove.m_target = ( 1 << ( rand( ) % 4 ) );
-                                if( acMove.m_target == ( 1 << ( 2 + p_pokemonPos ) ) )
+                                if( acMove.m_target == ( 1 << ( 2 + pokemonPos ) ) )
                                     acMove.m_target >>= 1;
                                 break;
                             default:
                                 break;
                     }
                 }
-
-                calcDamage( _acMove, rand( ) % 16 );
-
-                doAbilities( ability::BEFORE_ATTACK );
-                doItems( ability::BEFORE_ATTACK );
-
-                doAttack( _acMove );
-
-                doAbilities( ability::AFTER_ATTACK );
-                doItems( ability::AFTER_ATTACK );
-
+                doAttack( opponent, pokemonPos );
                 break;
             }
             case battleMove::SWITCH:
-                battle::switchPKMN( p_opponent, p_pokemonPos, acMove.m_value );
+                battle::switchPKMN( opponent, pokemonPos, acMove.m_value );
                 break;
             case battleMove::USE_ITEM:
             {
-                if( p_opponent )
+                if( opponent ) {
                     std::swprintf( wbuffer, 100, L"[TRAINER] ([TCLASS]) setzt\n%s ein.[A]", ITEMS::ItemList[ acMove.m_value ].getDisplayName( true ).c_str( ) );
-                doItem( p_opponent, acMove.m_target, ability::abilityType( 0 ) );
+                    log( wbuffer );
+                }
+                doItem( opponent, acMove.m_target, ability::abilityType( 0 ) );
                 break;
             }
             case battleMove::USE_NAV:
@@ -886,180 +708,177 @@ NEXT:
         }
     }
 
-    /**
-    *  @brief Calculates the current move's dealt damage.
-    *  @param p_moveNo: The number of the attack that shall be done.
-    *  @param p_randInt: A random integer between 0 and 15 used to adjust the dealt damage
-    */
-    void battle::calcDamage( u8 p_moveNo, u8 p_randInt ) {
-        for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
-            if( _moveOrder[ i ][ j ] == p_moveNo ) {
-                auto& bm = _battleMoves[ i ][ j ];
+    s16 battle::calcDamage( bool p_userIsOpp, u8 p_userPos, bool p_targetIsOpp, u8 p_targetPos ) {
+        auto bm = _battleMoves[ p_userPos ][ p_userIsOpp ];
 
-                //Calculate critical hit chance
-                int mod = 16;
-                switch( _criticalChance[ i ][ j ] ) {
-                    case 1:
-                        mod = 8;
-                        break;
-                    case 2:
-                        mod = 4;
-                        break;
-                    case 3:
-                        mod = 3;
-                        break;
-                    case 4:
-                        mod = 2;
-                        break;
-                    default:
-                        break;
-                }
+        //Calculate critical hit chance
+        int mod = 16;
+        switch( _criticalChance[ p_userPos ][ p_userIsOpp ] ) {
+            case 1:
+                mod = 8;
+                break;
+            case 2:
+                mod = 4;
+                break;
+            case 3:
+                mod = 3;
+                break;
+            case 4:
+                mod = 2;
+                break;
+            default:
+                break;
+        }
 
-                for( u8 k = 0; k < 4; ++k ) {
-                    bool isOpp = k % 2,
-                        isSnd = k / 2;
+        _acDamage[ p_targetPos ][ p_targetIsOpp ] = 0;
 
-                    if( !( bm.m_target & ( 1 << k ) ) )
-                        continue;
+        auto move = AttackList[ bm.m_value ];
 
-                    auto move = AttackList[ ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] ];
+        if( move->m_moveHitType == move::STAT ) {
+            //log( L"Move is a STS move[A]" );
+            return ( _acDamage[ p_targetPos ][ p_targetIsOpp ] = 0 );
+        }
 
-                    if( move->m_moveHitType == move::STAT ) {
-                        _acDamage[ isSnd ][ isOpp ] = 0;
-                        return;
-                    }
+        //Calculate effectivity
+        _effectivity[ p_targetPos ][ p_targetIsOpp ] = getEffectiveness( move->m_moveType, ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 0 ] );
+        if( ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 0 ] != ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 1 ] )
+            _effectivity[ p_targetPos ][ p_targetIsOpp ] *= getEffectiveness( move->m_moveType, ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 1 ] );
+        if( ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 2 ] != ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 1 ] )
+            _effectivity[ p_targetPos ][ p_targetIsOpp ] *= getEffectiveness( move->m_moveType, ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 2 ] );
 
-                    POKEMON::PKMNDATA::pokemonData pd;
-                    POKEMON::PKMNDATA::getAll( ACPKMN( i, j ).m_boxdata.m_speciesId, pd );
+        //Calculate critical hit
+        _critical[ p_targetPos ][ p_targetIsOpp ] = !( rand( ) % mod );
+        //STAB
+        float STAB = 1.0f;
+        if( POKEMON::PKMNDATA::getType( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_speciesId, 0 ) == move->m_moveType
+            || POKEMON::PKMNDATA::getType( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_speciesId, 1 ) == move->m_moveType )
+            STAB = 1.5f;
+        if( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_ADAPTABILITY )
+            STAB = 2.0f;
 
-                    //Calculate effectivity
-                    _effectivity[ isSnd ][ isOpp ] = getEffectiveness( move->m_moveType, pd.m_types[ 0 ] );
-                    if( pd.m_types[ 0 ] != pd.m_types[ 1 ] )
-                        _effectivity[ isSnd ][ isOpp ] *= getEffectiveness( move->m_moveType, pd.m_types[ 1 ] );
+        //Weather
+        float weather = 1.0f;
 
-                    //Calculate critical hit
-                    if( p_randInt <= 15 )
-                        _critical[ isSnd ][ isOpp ] = !( rand( ) % mod );
-                    else {
-                        _critical[ isSnd ][ isOpp ] = false;
+        bool weatherPossible = true;
+        for( u8 a = 0; a < 1 + ( m_battleMode == DOUBLE ); ++a ) for( u8 b = 0; b < 2; ++b )
+            weatherPossible &= ( ACPKMN( a, b ).m_boxdata.m_ability != A_AIR_LOCK
+            && ACPKMN( a, b ).m_boxdata.m_ability != A_CLOUD_NINE );
 
-                        if( p_randInt == 16 )
-                            p_randInt = 0;
-                        else
-                            p_randInt = 15;
-                    }
-                    //STAB
-                    float STAB = 1.5f;
-                    if( ACPKMN( i, j ).m_boxdata.m_ability == A_ADAPTABILITY )
-                        STAB = 2.0f;
+        if( weatherPossible ) {
+            if( m_weather == SUN && move->m_moveType == WASSER )
+                weather = 0.5f;
+            if( m_weather == HEAVY_SUNSHINE && move->m_moveType == WASSER )
+                weather = 0.0f;
 
-                    //Weather
-                    float weather = 1.0f;
+            if( m_weather == SUN && move->m_moveType == FEUER )
+                weather = 1.5f;
+            if( m_weather == HEAVY_SUNSHINE && move->m_moveType == FEUER )
+                weather = 1.5f;
 
-                    bool weatherPossible = true;
-                    for( u8 a = 0; a < 2; ++a ) for( u8 b = 0; b < 2; ++b )
-                        weatherPossible &= ( ACPKMN( i, j ).m_boxdata.m_ability != A_AIR_LOCK
-                        && ACPKMN( i, j ).m_boxdata.m_ability != A_CLOUD_NINE );
+            if( m_weather == RAIN && move->m_moveType == FEUER )
+                weather = 0.5f;
+            if( m_weather == HEAVY_RAIN && move->m_moveType == FEUER )
+                weather = 0.0f;
 
-                    if( weatherPossible ) {
-                        if( m_weather == SUN && move->m_moveType == WASSER )
-                            weather = 0.5f;
-                        if( m_weather == HEAVY_SUNSHINE && move->m_moveType == WASSER )
-                            weather = 0.0f;
+            if( m_weather == RAIN && move->m_moveType == WASSER )
+                weather = 1.5f;
+            if( m_weather == HEAVY_RAIN && move->m_moveType == WASSER )
+                weather = 1.5f;
+        }
 
-                        if( m_weather == SUN && move->m_moveType == FEUER )
-                            weather = 1.5f;
-                        if( m_weather == HEAVY_SUNSHINE && move->m_moveType == FEUER )
-                            weather = 1.5f;
+        //Multi-Target modifier
+        float target = 1.0f;
+        if( move->m_moveAffectsWhom & ( 8 | 32 ) )
+            target = 0.75f;
 
-                        if( m_weather == RAIN && move->m_moveType == FEUER )
-                            weather = 0.5f;
-                        if( m_weather == HEAVY_RAIN && move->m_moveType == FEUER )
-                            weather = 0.0f;
+        //Base damage calculation
+        auto moveAtkHitType = move->m_moveHitType;
+        auto moveDefHitType = move->m_moveHitType;
 
-                        if( m_weather == RAIN && move->m_moveType == WASSER )
-                            weather = 1.5f;
-                        if( m_weather == HEAVY_RAIN && move->m_moveType == WASSER )
-                            weather = 1.5f;
-                    }
+        if( bm.m_value == M_PSYSHOCK )
+            moveDefHitType = move::PHYS;
+        if( bm.m_value == M_PSYSTRIKE )
+            moveDefHitType = move::PHYS;
+        if( bm.m_value == M_SECRET_SWORD )
+            moveDefHitType = move::PHYS;
 
-                    //Multi-Target modifier
-                    int tcnt = 0;
-                    for( u8 o = 0; o < 4; ++o )
-                        if( ( bm.m_target & ( 1 << o ) ) )
-                            tcnt++;
+        float atk = ( ( moveAtkHitType == move::PHYS ) ? ACPKMN( p_userPos, p_userIsOpp ).m_stats.m_Atk : ACPKMN( p_userPos, p_userIsOpp ).m_stats.m_SAtk );
+        float def = ( ( moveDefHitType == move::PHYS ) ? ACPKMN( p_targetPos, p_targetIsOpp ).m_stats.m_Def : ACPKMN( p_targetPos, p_targetIsOpp ).m_stats.m_SDef );
 
-                    float target = 1.0f;
-                    if( tcnt > 1 )
-                        target = 0.75f;
+        //Burn and other status stuff
+        if( ACPKMN( p_userPos, p_userIsOpp ).m_status.m_Burned &&
+            ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability != A_GUTS &&
+            moveAtkHitType == move::PHYS ) {
+            atk /= 2;
+        } else if( ACPKMN( p_userPos, p_userIsOpp ).m_statusint &&
+                   ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_GUTS &&
+                   moveAtkHitType == move::PHYS ) {
+            atk *= 1.5;
+        } else if( ACPKMN( p_userPos, p_userIsOpp ).m_status.m_Poisoned &&
+                   ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_TOXIC_BOOST &&
+                   moveAtkHitType == move::PHYS ) {
+            atk *= 1.5;
+        } else if( ACPKMN( p_userPos, p_userIsOpp ).m_status.m_Poisoned &&
+                   ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_FLARE_BOOST &&
+                   moveAtkHitType == move::SPEC ) {
+            atk *= 1.5;
+        }
 
-                    //Burn
-                    float burn = 1.0f;
-                    if( ACPKMNAIL( i, j ) == move::ailment::BURN
-                        && move->m_moveHitType == move::PHYS
-                        && ACPKMN( i, j ).m_boxdata.m_ability != A_GUTS ) {
-                        burn = 0.5f;
-                    }
+        if( ACPKMN( p_targetPos, p_targetIsOpp ).m_statusint &&
+            ACPKMN( p_targetPos, p_targetIsOpp ).m_boxdata.m_ability == A_MARVEL_SCALE &&
+            moveDefHitType == move::PHYS ) {
+            def *= 1.5;
+        }
 
-                    //Base damage calculation
-                    auto moveAtkHitType = move->m_moveHitType;
-                    auto moveDefHitType = move->m_moveHitType;
-
-                    if( ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] == M_PSYSHOCK )
-                        moveDefHitType = move::PHYS;
-                    if( ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] == M_PSYSTRIKE )
-                        moveDefHitType = move::PHYS;
-                    if( ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] == M_SECRET_SWORD )
-                        moveDefHitType = move::PHYS;
-
-                    float atk = ( ( moveAtkHitType == move::PHYS ) ? ACPKMN( i, j ).m_stats.m_Atk : ACPKMN( i, j ).m_stats.m_SAtk );
-                    if( ACPKMN( i, j ).m_boxdata.m_ability != A_UNAWARE
-                        && ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] != M_FOULPLAY ) {
-                        if( moveAtkHitType == move::PHYS ) {
-                            if( ACPKMNSTATCHG( i, j )[ ATK ] > 0 )
-                                atk = atk * ACPKMNSTATCHG( i, j )[ ATK ] / 2.0;
-                            if( ACPKMNSTATCHG( i, j )[ ATK ] < 0 )
-                                atk = atk  * 2.0 / ( -ACPKMNSTATCHG( i, j )[ ATK ] );
-                        }
-                        if( moveAtkHitType == move::SPEC ) {
-                            if( ACPKMNSTATCHG( i, j )[ SATK ] > 0 )
-                                atk = atk * ACPKMNSTATCHG( i, j )[ SATK ] / 2.0;
-                            if( ACPKMNSTATCHG( i, j )[ SATK ] < 0 )
-                                atk = atk  * 2.0 / ( -ACPKMNSTATCHG( i, j )[ SATK ] );
-                        }
-                    }
-                    if( ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] == M_FOULPLAY ) {
-                        atk = ACPKMN( isSnd, isOpp ).m_stats.m_Atk;
-
-                        if( ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] > 0 )
-                            atk = atk * ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] / 2.0;
-                        if( ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] < 0 )
-                            atk = atk  * 2.0 / ( -ACPKMNSTATCHG( isSnd, isOpp )[ ATK ] );
-                    }
-
-                    float def = ( ( moveDefHitType == move::PHYS ) ? ACPKMN( isSnd, isOpp ).m_stats.m_Def : ACPKMN( isSnd, isOpp ).m_stats.m_SDef );
-                    if( ACPKMN( isSnd, isOpp ).m_boxdata.m_ability != A_UNAWARE
-                        && ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] != M_CHIP_AWAY ) {
-                        if( moveDefHitType == move::PHYS ) {
-                            if( ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] > 0 )
-                                atk = atk * ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] / 2.0;
-                            if( ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] < 0 )
-                                atk = atk  * 2.0 / ( -ACPKMNSTATCHG( isSnd, isOpp )[ DEF ] );
-                        }
-                        if( moveDefHitType == move::SPEC ) {
-                            if( ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] > 0 )
-                                atk = atk * ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] / 2.0;
-                            if( ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] < 0 )
-                                atk = atk  * 2.0 / ( -ACPKMNSTATCHG( isSnd, isOpp )[ SDEF ] );
-                        }
-                    }
-
-                    _acDamage[ isSnd ][ isOpp ] = s16( ( ( 2 * ACPKMN( i, j ).m_Level + 10 ) / 250 ) * ( atk / def ) * move->m_moveBasePower + 2 );
-                    float modifier = _effectivity[ isSnd ][ isOpp ] * ( _critical[ isSnd ][ isOpp ] ? 2 : 1 ) * STAB * weather * target * burn;
-                    _acDamage[ isSnd ][ isOpp ] *= s16( modifier );
-                }
+        //Stat changes
+        if( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability != A_UNAWARE
+            && bm.m_value != M_FOULPLAY ) {
+            if( moveAtkHitType == move::PHYS ) {
+                if( ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ ATK ] > 0 )
+                    atk = atk * ( 2 + ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ ATK ] ) / 2.0;
+                if( ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ ATK ] < 0 )
+                    atk = atk  * 2.0 / ( 2 - ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ ATK ] );
+            }
+            if( moveAtkHitType == move::SPEC ) {
+                if( ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ SATK ] > 0 )
+                    atk = atk * ( 2 + ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ SATK ] ) / 2.0;
+                if( ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ SATK ] < 0 )
+                    atk = atk  * 2.0 / ( 2 - ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ SATK ] );
             }
         }
+        if( bm.m_value == M_FOULPLAY ) {
+            atk = ACPKMN( p_targetPos, p_targetIsOpp ).m_stats.m_Atk;
+
+            if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ ATK ] > 0 )
+                atk = atk * ( 2 + ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ ATK ] ) / 2.0;
+            if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ ATK ] < 0 )
+                atk = atk  * 2.0 / ( 2 - ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ ATK ] );
+        }
+
+        if( ACPKMN( p_targetPos, p_targetIsOpp ).m_boxdata.m_ability != A_UNAWARE
+            && bm.m_value != M_CHIP_AWAY ) {
+            if( moveDefHitType == move::PHYS ) {
+                if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ DEF ] > 0 )
+                    def = def * ( 2 + ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ DEF ] ) / 2.0;
+                if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ DEF ] < 0 )
+                    def = def  * 2.0 / ( 2 - ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ DEF ] );
+            }
+            if( moveDefHitType == move::SPEC ) {
+                if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ SDEF ] > 0 )
+                    def = def * ( 2 + ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ SDEF ] ) / 2.0;
+                if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ SDEF ] < 0 )
+                    def = def  * 2.0 / ( 2 - ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ SDEF ] );
+            }
+        }
+
+        _acDamage[ p_targetPos ][ p_targetIsOpp ] = s16( ( ( 2.0f * ACPKMN( p_userPos, p_userIsOpp ).m_Level + 10.0f ) / 250.0f )
+                                                         * ( atk / def ) * s16( move->m_moveBasePower ) + 2 );
+
+        float modifier = _effectivity[ p_targetPos ][ p_targetIsOpp ] * ( _critical[ p_targetPos ][ p_targetIsOpp ] ? 1.5f : 1.0f )
+            * STAB * weather * target * ( ( 100 - rand( ) % 15 ) / 100.0 );
+        _acDamage[ p_targetPos ][ p_targetIsOpp ] = s16( _acDamage[ p_targetPos ][ p_targetIsOpp ] * modifier );
+
+        return _acDamage[ p_targetPos ][ p_targetIsOpp ];
     }
 
     /**
@@ -1067,8 +886,6 @@ NEXT:
     *  @param p_situation: Current situation, on which an Item may be useable
     */
     void battle::doItems( ability::abilityType p_situation ) {
-        orderPKMN( );
-
         for( u8 p = 0; p < 4; ++p ) {
             for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
                 if( _moveOrder[ i ][ j ] == p ) {
@@ -1088,6 +905,9 @@ NEXT:
     *  @param p_situation: Current situation, on which an item may be useable
     */
     void battle::doItem( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation ) {
+        if( !ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
+            return;
+
         auto im = ITEMS::ItemList[ ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability ];
 
         if( ( im.getEffectType( ) & ITEMS::item::itemEffectType::IN_BATTLE ) && ( im.m_inBattleEffect & p_situation ) ) {
@@ -1111,132 +931,322 @@ NEXT:
      *  @brief does the p_moveNo positioned attack of this turn
      *  @param p_moveNo: The number of the attack that shall be done.
      */
-    void battle::doAttack( u8 p_moveNo ) {
-        bool messagePrinted = false;
-        for( u8 i = 0; i < 2; ++i )for( u8 j = 0; j < 2; ++j ) {
-            if( _moveOrder[ i ][ j ] == p_moveNo ) {
-                auto& bm = _battleMoves[ i ][ j ];
-                if( bm.m_type != battleMove::ATTACK )
-                    return;
-                auto acMove = AttackList[ ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ] ];
+    void battle::doAttack( bool p_opponent, u8 p_pokemonPos ) {
+        //Check if the user has already fainted
+        if( ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP == 0
+            || ACPKMNSTS( p_pokemonPos, p_opponent ) == KO )
+            return;
 
-                //"Preview" Attacks effect
-                if( rand( ) % 100 < acMove->m_moveEffectAccuracy )
-                    acMove->m_moveEffect.execute( *this, &ACPKMN( i, j ) );
+        auto& bm = _battleMoves[ p_pokemonPos ][ p_opponent ];
+        if( bm.m_type != battleMove::ATTACK )
+            return;
+        auto acMove = AttackList[ bm.m_value ];
 
-                for( u8 k = 0; k < 4; ++k ) {
-                    bool isOpp = k % 2,
-                        isSnd = k / 2;
-
-                    if( !( bm.m_target & ( 1 << k ) ) )
-                        continue;
-                    if( !_battleSpotOccupied[ isSnd ][ isOpp ] )
-                        continue;
-
-                    bool doesChange = !!_acDamage[ isSnd ][ isOpp ];
-
-                    for( u8 s = 0; s < MAX_STATS; s++ )
-                        doesChange |= !!_acStatChange[ isSnd ][ isOpp ][ s ];
-
-                    if( !messagePrinted ) {
-                        std::swprintf( wbuffer, 100, L"%ls%s setzt\n%s ein.[A]",
-                                       ( ACPKMN( i, j ).m_boxdata.m_name ),
-                                       ( j ? "\n(Gegner)" : "\n" ),
-                                       acMove->m_moveName.c_str( ) );
-                        log( wbuffer );
-                        messagePrinted = true;
-                    }
-
-                    //Check if the attack fails 
-                    if( acMove->m_moveAccuracy && rand( ) * 1.0 / RAND_MAX > acMove->m_moveAccuracy / 100.0 ) {
-                        std::swprintf( wbuffer, 100, L"%ls%s wich aus.[A]",
-                                       ( ACPKMN( isSnd, isOpp ).m_boxdata.m_name ),
-                                       ( j ? "\n(Gegner)" : "\n" ) );
-                        log( wbuffer );
-                        goto NEXT;
-                    }
-
-                    if( doesChange ) {
-
-                        ACPKMN( isSnd, isOpp ).m_stats.m_acHP = std::max( u16( 0 ),
-                                                                          std::min( u16( ACPKMN( isSnd, isOpp ).m_stats.m_acHP - _acDamage[ isSnd ][ isOpp ] ),
-                                                                          ACPKMN( isSnd, isOpp ).m_stats.m_maxHP ) );
-
-
-                        for( u8 s = 0; s < MAX_STATS; s++ )
-                            ACPKMNSTATCHG( isSnd, isOpp )[ s ] += _acStatChange[ isSnd ][ isOpp ][ s ];
-
-                        _battleUI.showAttack( p_moveNo );
-                        _battleUI.updateHP( isOpp, isSnd );
-                        if( _critical[ isSnd ][ isOpp ] )
-                            log( L"[COLR:15:15:00]Ein Volltreffer![A][COLR:15:15:15]" );
-                        if( _effectivity[ isSnd ][ isOpp ] != 1.0f ) {
-                            float effectivity = _effectivity[ isSnd ][ isOpp ];
-                            if( effectivity > 3.0f )
-                                std::swprintf( wbuffer, 100, L"[COLR:00:31:00]Das ist enorm effektiv\ngegen %ls![A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
-                            else if( effectivity > 1.0f )
-                                std::swprintf( wbuffer, 100, L"[COLR:00:15:00]Das ist sehr effektiv\ngegen %ls![A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
-                            else if( effectivity == 0.0f )
-                                std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Hat die Attacke\n%lsgetroffen?[A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
-                            else if( effectivity < 0.3f )
-                                std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %ls...[A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
-                            else if( effectivity < 1.0f )
-                                std::swprintf( wbuffer, 100, L"[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %ls.[A][COLR:15:15:15]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
-                            log( wbuffer );
-                        }
-
-                        //Check if PKMN fainted
-                        if( !ACPKMN( isSnd, isOpp ).m_stats.m_acHP ) {
-                            std::swprintf( wbuffer, 100, L"%ls%s wurde besiegt.[A]",
-                                           ( ACPKMN( isSnd, isOpp ).m_boxdata.m_name ),
-                                           ( j ? "\n(Gegner)" : "\n" ) );
-                            log( wbuffer );
-                            _battleUI.hidePKMN( isOpp, isSnd );
-                            _battleSpotOccupied[ isSnd ][ isOpp ] = false;
-
-                            ACPKMNSTS( isSnd, isOpp ) = KO;
-
-                            if( m_distributeEXP )
-                                distributeEXP( isSnd, isOpp );
-                        } else
-                            _battleUI.updateStats( isOpp, isSnd );
-                    } else {
-                        std::swprintf( wbuffer, 100, L"%ls%s bleibt von\nder Attacke unbeeindruckt...[A]",
-                                       ( ACPKMN( isSnd, isOpp ).m_boxdata.m_name ),
-                                       ( isOpp ? "\n(Gegner)" : "\n" ) );
-                        log( wbuffer );
-                    }
-                }
-                for( u8 k = 4; k < 6; ++k ) {
-                    if( !( bm.m_target & ( 1 << k ) ) )
-                        continue;
-                    if( !messagePrinted ) {
-                        std::swprintf( wbuffer, 100, L"%ls%s setzt\n%s ein.[A]",
-                                       ( ACPKMN( i, j ).m_boxdata.m_name ),
-                                       ( j ? "\n(Gegner)" : "\n" ),
-                                       acMove->m_moveName.c_str( ) );
-                        log( wbuffer );
-                        messagePrinted = true;
-                    }
-                    //acMove->m_moveEffect.execute( *this, &( ACPKMN( i, j ) ) );
-                }
-
-                if( !messagePrinted ) {
-                    std::swprintf( wbuffer, 100, L"%ls%s setzt\n%s ein.[A]\nDie Attacke ging\nins leere...",
-                                   ( ACPKMN( i, j ).m_boxdata.m_name ),
-                                   ( j ? "\n(Gegner)" : "\n" ),
-                                   acMove->m_moveName.c_str( ) );
-                    log( wbuffer );
-                    messagePrinted = true;
-                }
-NEXT:
-                _lstMove = ACPKMN( i, j ).m_boxdata.m_moves[ bm.m_value ];
-                if( j )
-                    _lstOppMove = _lstMove;
-                else
-                    _lstOwnMove = _lstMove;
+        //Check if the user is frozen/asleep/paralyzed
+        if( ACPKMN( p_pokemonPos, p_opponent ).m_status.m_Frozen ) {
+            if( ( rand( ) % 100 ) < 20 ) { //PKMN thaws
+                std::swprintf( wbuffer, 100, L"%ls%s ist aufgetaut![A]",
+                               ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                               ( p_opponent ? " (Gegner)" : "" ) );
+                log( wbuffer );
+                ACPKMN( p_pokemonPos, p_opponent ).m_status.m_Frozen = false;
+            } else {
+                std::swprintf( wbuffer, 100, L"%ls%s ist gefroren.[A]",
+                               ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                               ( p_opponent ? " (Gegner)" : "" ) );
+                log( wbuffer );
+                _battleUI.showStatus( p_opponent, p_pokemonPos );
                 return;
             }
+        }
+        if( ACPKMN( p_pokemonPos, p_opponent ).m_status.m_Paralyzed ) {
+            if( ( rand( ) % 100 ) < 25 ) {
+                std::swprintf( wbuffer, 100, L"%ls%s ist paralysiert.[A]",
+                               ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                               ( p_opponent ? " (Gegner)" : "" ) );
+                log( wbuffer );
+                _battleUI.showStatus( p_opponent, p_pokemonPos );
+                return;
+            }
+        }
+        if( ACPKMN( p_pokemonPos, p_opponent ).m_status.m_Asleep ) {
+            if( --ACPKMN( p_pokemonPos, p_opponent ).m_status.m_Asleep ) {
+                std::swprintf( wbuffer, 100, L"%ls%s bleibt schlafen.[A]",
+                               ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                               ( p_opponent ? " (Gegner)" : "" ) );
+                log( wbuffer );
+                //Check if the move can be used while the PKMN is asleep
+                if( !( acMove->m_moveFlags & move::WHILE_ASLEEP ) ) {
+                    _battleUI.showStatus( p_opponent, p_pokemonPos );
+                    return;
+                }
+            } else {
+                std::swprintf( wbuffer, 100, L"%ls%s ist aufgewacht![A]",
+                               ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                               ( p_opponent ? " (Gegner)" : "" ) );
+                log( wbuffer );
+            }
+        }
+        _battleUI.updateStatus( p_opponent, p_pokemonPos );
+
+
+        std::swprintf( wbuffer, 100, L"%ls%s setzt\n%s ein.[A]",
+                       ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                       ( p_opponent ? " (Gegner)" : "" ),
+                       acMove->m_moveName.c_str( ) );
+        log( wbuffer );
+
+        _lstMove = bm.m_value;
+        if( p_opponent )
+            _lstOppMove = _lstMove;
+        else
+            _lstOwnMove = _lstMove;
+        _currentMoveIsOpp = p_opponent;
+        _currentMoveIsSnd = p_pokemonPos;
+
+        bool moveHasTarget = false;
+        //Try to redirect the move if the original target has already fainted
+        if( m_battleMode == DOUBLE ) {
+            if( p_opponent ) {
+                if( ( bm.m_target & ( 1 << 0 ) )
+                    && ACPKMNSTS( 0, PLAYER ) == KO
+                    && ACPKMNSTS( 1, PLAYER ) != KO )
+                    bm.m_target |= ( 1 << 1 );
+                else if( ( bm.m_target & ( 1 << 1 ) )
+                         && ACPKMNSTS( 1, PLAYER ) == KO
+                         && ACPKMNSTS( 0, PLAYER ) != KO )
+                         bm.m_target |= ( 1 << 0 );
+            } else {
+                if( ( bm.m_target & ( 1 << 2 ) )
+                    && ACPKMNSTS( 0, OPPONENT ) == KO
+                    && ACPKMNSTS( 1, OPPONENT ) != KO )
+                    bm.m_target |= ( 1 << 3 );
+                else if( ( bm.m_target & ( 1 << 3 ) )
+                         && ACPKMNSTS( 1, OPPONENT ) == KO
+                         && ACPKMNSTS( 0, OPPONENT ) != KO )
+                         bm.m_target |= ( 1 << 2 );
+            }
+        }
+
+        u8 moveAccuracy = acMove->m_moveAccuracy;
+        if( ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ ACCURACY ] > 0 )
+            moveAccuracy *= ( 2 + ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ ACCURACY ] ) / 2.0;
+        else if( ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ ACCURACY ] < 0 )
+            moveAccuracy *= 2.0 / ( 2 - ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ ACCURACY ] );
+
+        //For every target, check if that target protects itself
+        for( u8 k = 0; k < 4; ++k ) {
+            bool isOpp = k / 2,
+                isSnd = k % 2;
+
+            if( !( bm.m_target & ( 1 << k ) ) )
+                continue;
+            if( !_battleSpotOccupied[ isSnd ][ isOpp ] )
+                continue;
+
+            if( m_battleMode != DOUBLE && isSnd )
+                continue;
+
+
+            if( ACPKMNSTATCHG( isSnd, isOpp )[ EVASION ] > 0 )
+                moveAccuracy *= 2.0 / ( 2 + ACPKMNSTATCHG( isSnd, isOpp )[ EVASION ] );
+            else if( ACPKMNSTATCHG( isSnd, isOpp )[ EVASION ] < 0 )
+                moveAccuracy *= ( 2 - ACPKMNSTATCHG( isSnd, isOpp )[ EVASION ] ) / 2.0;
+
+            //Check if the target is protected and if the move is affected by Protect
+            if( ACPKMNSTR( isSnd, isOpp ).m_battleStatus == battleStatus::PROTECTED
+                && ( acMove->m_moveFlags & move::PROTECT ) ) {
+                bm.m_target &= ~( 1 << k );
+                std::swprintf( wbuffer, 100, L"%ls%s bleibt unbeeindruckt.[A]",
+                               ( ACPKMN( isSnd, isOpp ).m_boxdata.m_name ),
+                               ( p_opponent ? " (Gegner)" : "" ) );
+                log( wbuffer );
+                moveHasTarget = true;
+            }
+            //Check if the move fails
+            else if( moveAccuracy && ( s8( rand( ) % 100 ) < s8( 100 - moveAccuracy ) )
+                     && ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability != A_NO_GUARD ) {
+                bm.m_target &= ~( 1 << k );
+                std::swprintf( wbuffer, 100, L"%ls%s wich aus.[A]",
+                               ( ACPKMN( isSnd, isOpp ).m_boxdata.m_name ),
+                               ( p_opponent ? " (Gegner)" : "" ) );
+                log( wbuffer );
+                moveHasTarget = true;
+            }
+            //If the target is already ko, then it shouldn't be a target at all...
+            else if( !ACPKMN( isSnd, isOpp ).m_stats.m_acHP ) {
+                bm.m_target &= ~( 1 << k );
+            }
+            //Activate Items/Abilities before attack
+            else {
+                doItem( isOpp, isSnd, ability::BEFORE_ATTACK );
+                doAbility( isOpp, isSnd, ability::BEFORE_ATTACK );
+            }
+        }
+
+        //Attack animation
+        _battleUI.showAttack( p_opponent, p_pokemonPos );
+
+        //Reduce PP
+        for( u8 i = 0; i < 4; ++i )
+            if( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_moves[ i ] == bm.m_value ) {
+                if( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_acPP[ i ] )
+                    ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_acPP[ i ]--;
+                break;
+            }
+
+        //Damage and stuff
+        for( u8 k = 0; k < 4; ++k ) {
+            bool isOpp = k / 2,
+                isSnd = k % 2;
+
+            if( !( bm.m_target & ( 1 << k ) ) ) {
+                continue;
+            }
+            if( !_battleSpotOccupied[ isSnd ][ isOpp ] )
+                continue;
+
+            if( m_battleMode != DOUBLE && isSnd )
+                continue;
+
+            if( !ACPKMN( isSnd, isOpp ).m_stats.m_acHP )
+                continue;
+
+            moveHasTarget = true;
+        }
+        for( u8 k = 0; k < 4; ++k ) {
+            bool isOpp = k / 2,
+                isSnd = k % 2;
+
+            if( !( bm.m_target & ( 1 << k ) ) ) {
+                continue;
+            }
+            if( !_battleSpotOccupied[ isSnd ][ isOpp ] )
+                continue;
+
+            if( m_battleMode != DOUBLE && isSnd )
+                continue;
+
+            if( !ACPKMN( isSnd, isOpp ).m_stats.m_acHP )
+                continue;
+
+            moveHasTarget = true;
+
+            //Calculate damage against the target
+            calcDamage( p_opponent, p_pokemonPos, isOpp, isSnd ); //If the damage is negative, then it heals the target
+
+            //Check for abilities/ items on the target
+            doItem( isOpp, isSnd, ability::ATTACK );
+            doAbility( isOpp, isSnd, ability::ATTACK );
+
+            ACPKMN( isSnd, isOpp ).m_stats.m_acHP = (u16)std::max( s16( 0 ),
+                                                                   std::min( s16( ACPKMN( isSnd, isOpp ).m_stats.m_acHP - _acDamage[ isSnd ][ isOpp ] ),
+                                                                   (s16)ACPKMN( isSnd, isOpp ).m_stats.m_maxHP ) );
+
+            _battleUI.updateHP( isOpp, isSnd );
+            if( acMove->m_moveHitType != move::STAT ) {
+                if( _critical[ isSnd ][ isOpp ] )
+                    log( L"[COLR:15:15:00]Ein Volltreffer![A][CLEAR][COLR:00:00:00]" );
+                if( _effectivity[ isSnd ][ isOpp ] != 1.0f ) {
+                    float effectivity = _effectivity[ isSnd ][ isOpp ];
+                    if( effectivity > 3.0f )
+                        std::swprintf( wbuffer, 100, L"[COLR:00:31:00]Das ist enorm effektiv\ngegen %ls![A][CLEAR][COLR:00:00:00]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                    else if( effectivity > 1.0f )
+                        std::swprintf( wbuffer, 100, L"[COLR:00:15:00]Das ist sehr effektiv\ngegen %ls![A][CLEAR][COLR:00:00:00]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                    else if( effectivity == 0.0f )
+                        std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Hat die Attacke\n%lsgetroffen?[A][CLEAR][COLR:00:00:00]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                    else if( effectivity < 0.3f )
+                        std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %ls...[A][CLEAR][COLR:00:00:00]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                    else if( effectivity < 1.0f )
+                        std::swprintf( wbuffer, 100, L"[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %ls.[A][CLEAR][COLR:00:00:00]", ACPKMN( isSnd, isOpp ).m_boxdata.m_name );
+                    log( wbuffer );
+                }
+            }
+            //Check if PKMN fainted
+            if( !ACPKMN( isSnd, isOpp ).m_stats.m_acHP && _battleSpotOccupied[ isSnd ][ isOpp ] ) {
+                handleFaint( isOpp, isSnd );
+            } else {
+                //Check if an attack effect triggers
+                if( ( rand( ) % 100 ) < acMove->m_moveEffectAccuracy ) {
+                    acMove->m_moveEffect.execute( *this, &ACPKMN( p_pokemonPos, p_opponent ) );
+
+                    for( u8 s = 0; s < MAX_STATS; s++ )
+                        ACPKMNSTATCHG( isSnd, isOpp )[ s ] += _acStatChange[ isSnd ][ isOpp ][ s ];
+                    _battleUI.updateStats( isOpp, isSnd );
+                }
+            }
+
+            //Check for items/abilities
+            doItem( isOpp, isSnd, ability::AFTER_ATTACK );
+            doAbility( isOpp, isSnd, ability::AFTER_ATTACK );
+            //Check if any PKMN on the field fainted
+
+            for( u8 j = 0; j < 4; ++j )
+                handleFaint( j / 2, j % 2 );
+        }
+        if( !moveHasTarget ) {
+            log( L"Es schlug fehl...[A]" );
+        }
+        return;
+    }
+    /**
+    *  @brief Handles special condition damage between turns
+    */
+    void battle::handleSpecialConditions( bool p_opponent, u8 p_pokemonPos ) {
+        if( ACPKMN( p_pokemonPos, p_opponent ).m_status.m_Burned ) {
+            std::swprintf( wbuffer, 100, L"Die Verbrennung schadet\n%ls%s.[A]",
+                           ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                           ( p_opponent ? " (Gegner)" : "" ) );
+            log( wbuffer );
+
+            ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP
+                = std::max( u16( 0 ), u16( ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP - 1.0 / ( 8 * ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_maxHP ) ) );
+
+            _battleUI.updateHP( p_opponent, p_pokemonPos );
+        }
+        if( ACPKMN( p_pokemonPos, p_opponent ).m_status.m_Poisoned
+            && ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability != A_POISON_HEAL ) {
+            std::swprintf( wbuffer, 100, L"Die Vergiftung schadet\n%ls%s.[A]",
+                           ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                           ( p_opponent ? " (Gegner)" : "" ) );
+            log( wbuffer );
+
+            ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP
+                = std::max( u16( 0 ), u16( ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP - 1.0 / ( 8 * ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_maxHP ) ) );
+
+            _battleUI.updateHP( p_opponent, p_pokemonPos );
+        }
+        if( ACPKMN( p_pokemonPos, p_opponent ).m_status.m_Toxic
+            && ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability != A_POISON_HEAL ) {
+            std::swprintf( wbuffer, 100, L"Die Vergiftung schadet\n%ls%s.[A]",
+                           ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                           ( p_opponent ? " (Gegner)" : "" ) );
+            log( wbuffer );
+
+            ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP
+                = std::max( u16( 0 ), u16( ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP
+                - ( ++ACPKMNSTR( p_pokemonPos, p_opponent ).m_toxicCount ) / ( 16.0 * ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_maxHP ) ) );
+
+            _battleUI.updateHP( p_opponent, p_pokemonPos );
+        }
+    }
+
+    void battle::handleFaint( bool p_opponent, u8 p_pokemonPos, bool p_show ) {
+        if( m_battleMode != DOUBLE && p_pokemonPos )
+            return;
+        if( !ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP && _battleSpotOccupied[ p_pokemonPos ][ p_opponent ] ) {
+            if( p_show ) {
+                std::swprintf( wbuffer, 100, L"%ls%s wurde besiegt.[A]",
+                               ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                               ( p_opponent ? " (Gegner)" : "" ) );
+                log( wbuffer );
+            }
+            ACPKMNSTS( p_pokemonPos, p_opponent ) = KO;
+            _battleUI.hidePKMN( p_opponent, p_pokemonPos );
+            _battleSpotOccupied[ p_pokemonPos ][ p_opponent ] = false;
+
+            if( m_distributeEXP )
+                distributeEXP( p_pokemonPos, p_opponent );
         }
     }
 
@@ -1246,32 +1256,32 @@ NEXT:
     void battle::registerParticipatedPKMN( ) {
         if( ACPKMNSTS( 0, PLAYER ) != KO && ACPKMNSTS( 0, OPPONENT ) != KO
             && ACPKMNSTS( 0, PLAYER ) != NA && ACPKMNSTS( 0, OPPONENT ) != NA )
-            _participatedPKMN[ &ACPKMN( 0, PLAYER ) ].insert( &ACPKMN( 0, OPPONENT ) );
+            _participatedPKMN[ &ACPKMN( 0, PLAYER ) ] |= ( 1 << ACPOS( 0, OPPONENT ) );
         if( ACPKMNSTS( 0, PLAYER ) != KO && ACPKMNSTS( 0, OPPONENT ) != KO
             && ACPKMNSTS( 0, PLAYER ) != NA && ACPKMNSTS( 0, OPPONENT ) != NA )
-            _participatedPKMN[ &ACPKMN( 0, OPPONENT ) ].insert( &ACPKMN( 0, PLAYER ) );
+            _participatedPKMN[ &ACPKMN( 0, OPPONENT ) ] |= ( 1 << ACPOS( 0, PLAYER ) );
 
         if( m_battleMode == DOUBLE ) {
             if( ACPKMNSTS( 0, PLAYER ) != KO && ACPKMNSTS( 1, OPPONENT ) != KO
                 && ACPKMNSTS( 0, PLAYER ) != NA && ACPKMNSTS( 1, OPPONENT ) != NA )
-                _participatedPKMN[ &ACPKMN( 0, PLAYER ) ].insert( &ACPKMN( 1, OPPONENT ) );
+                _participatedPKMN[ &ACPKMN( 0, PLAYER ) ] |= ( 1 << ACPOS( 1, OPPONENT ) );
             if( ACPKMNSTS( 1, PLAYER ) != KO && ACPKMNSTS( 0, OPPONENT ) != KO
                 && ACPKMNSTS( 1, PLAYER ) != NA && ACPKMNSTS( 0, OPPONENT ) != NA )
-                _participatedPKMN[ &ACPKMN( 0, OPPONENT ) ].insert( &ACPKMN( 1, PLAYER ) );
+                _participatedPKMN[ &ACPKMN( 0, OPPONENT ) ] |= ( 1 << ACPOS( 1, PLAYER ) );
 
             if( ACPKMNSTS( 1, PLAYER ) != KO && ACPKMNSTS( 0, OPPONENT ) != KO
                 && ACPKMNSTS( 1, PLAYER ) != NA && ACPKMNSTS( 0, OPPONENT ) != NA )
-                _participatedPKMN[ &ACPKMN( 1, PLAYER ) ].insert( &ACPKMN( 0, OPPONENT ) );
+                _participatedPKMN[ &ACPKMN( 1, PLAYER ) ] |= ( 1 << ACPOS( 0, OPPONENT ) );
             if( ACPKMNSTS( 0, PLAYER ) != KO && ACPKMNSTS( 1, OPPONENT ) != KO
                 && ACPKMNSTS( 0, PLAYER ) != NA && ACPKMNSTS( 1, OPPONENT ) != NA )
-                _participatedPKMN[ &ACPKMN( 1, OPPONENT ) ].insert( &ACPKMN( 0, PLAYER ) );
+                _participatedPKMN[ &ACPKMN( 1, OPPONENT ) ] |= ( 1 << ACPOS( 0, PLAYER ) );
 
             if( ACPKMNSTS( 1, PLAYER ) != KO && ACPKMNSTS( 1, OPPONENT ) != KO
                 && ACPKMNSTS( 1, PLAYER ) != NA && ACPKMNSTS( 1, OPPONENT ) != NA )
-                _participatedPKMN[ &ACPKMN( 1, PLAYER ) ].insert( &ACPKMN( 1, OPPONENT ) );
+                _participatedPKMN[ &ACPKMN( 1, PLAYER ) ] |= ( 1 << ACPOS( 1, OPPONENT ) );
             if( ACPKMNSTS( 1, PLAYER ) != KO && ACPKMNSTS( 1, OPPONENT ) != KO
                 && ACPKMNSTS( 1, PLAYER ) != NA && ACPKMNSTS( 1, OPPONENT ) != NA )
-                _participatedPKMN[ &ACPKMN( 1, OPPONENT ) ].insert( &ACPKMN( 1, PLAYER ) );
+                _participatedPKMN[ &ACPKMN( 1, OPPONENT ) ] |= ( 1 << ACPOS( 1, PLAYER ) );
         }
     }
 
@@ -1281,41 +1291,121 @@ NEXT:
     *  @param p_pokemonPos: Position of the fainted PKMN (0 or 1)
     */
     void battle::distributeEXP( bool p_opponent, u8 p_pokemonPos ) {
-        auto& receivingPKMN = _participatedPKMN[ &ACPKMN( p_pokemonPos, p_opponent ) ];
+        u8 receivingPKMN = _participatedPKMN[ &ACPKMN( p_pokemonPos, p_opponent ) ];
+        _participatedPKMN[ &ACPKMN( p_pokemonPos, p_opponent ) ] = 0;
 
         float wildModifer = m_isWildBattle ? 1 : 1.5;
         POKEMON::PKMNDATA::pokemonData p;
         POKEMON::PKMNDATA::getAll( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_speciesId, p );
         u16 b = p.m_EXPYield;
 
-        for( auto i : receivingPKMN ) {
-            if( i->m_stats.m_acHP ) {
-                if( i->m_Level == 100 )
+        for( u8 i = 0; i < 6; ++i ) {
+            u8 sz = !p_opponent ? _opponent->m_pkmnTeam->size( ) : _player->m_pkmnTeam->size( );
+
+            if( sz <= i )
+                break;
+
+            u8 acidx = -1;
+            for( int j = 0; j < sz; ++j )
+                if( ACPOS( j, !p_opponent ) == i ) {
+                    acidx = j;
+                    break;
+                }
+            if( acidx == -1 )
+                continue;
+
+            auto& acPkmn = ACPKMN( acidx, !p_opponent );
+
+            if( acPkmn.m_stats.m_acHP ) {
+                if( acPkmn.m_Level == 100 )
                     continue;
-                float e = ( i->m_boxdata.m_holdItem == I_LUCKY_EGG ) ? 1.5 : 1;
+                float e = ( acPkmn.m_boxdata.m_holdItem == I_LUCKY_EGG ) ? 1.5 : 1;
 
-                u8 L = i->m_Level;
+                u8 L = acPkmn.m_Level;
 
-                float t = ( i->m_boxdata.m_oTId == SAV.m_Id && i->m_boxdata.m_oTSid == SAV.m_Sid ? 1 : 1.5 );
+                float t = ( acPkmn.m_boxdata.m_oTId == SAV.m_Id && acPkmn.m_boxdata.m_oTSid == SAV.m_Sid ? 1 : 1.5 );
 
                 u32 exp = u32( ( wildModifer * t* b* e* L ) / 7 );
 
-                i->m_boxdata.m_experienceGained += exp;
+                acPkmn.m_boxdata.m_experienceGained += exp;
 
                 //Distribute EV
+                auto acItem = acPkmn.m_boxdata.m_holdItem;
+                auto hasPKRS = acPkmn.m_boxdata.m_pokerus;
+
+                u8 multiplier = ( 1 << ( hasPKRS + ( acItem == I_MACHO_BRACE ) ) );
+
+                //Check whether the PKMN can still obtain EV
+
+                u16 evsum = 0;
                 for( u8 j = 0; j < 6; ++j )
-                    i->m_boxdata.m_effortValues[ j ] += p.m_EVYield[ j ];
+                    evsum += acPkmn.m_boxdata.m_effortValues[ j ];
+                if( evsum >= 510 )
+                    continue;
+
+                if( acPkmn.m_boxdata.m_effortValues[ 0 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 0 ] += ( multiplier * ( p.m_EVYield[ 0 ] / 2 + 4 * ( acItem == I_POWER_WEIGHT ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 1 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 1 ] += ( multiplier * ( p.m_EVYield[ 1 ] / 2 + 4 * ( acItem == I_POWER_BRACER ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 2 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 2 ] += ( multiplier * ( p.m_EVYield[ 2 ] / 2 + 4 * ( acItem == I_POWER_BELT ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 3 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 3 ] += ( multiplier * ( p.m_EVYield[ 3 ] / 2 + 4 * ( acItem == I_POWER_ANKLET ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 4 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 4 ] += ( multiplier * ( p.m_EVYield[ 4 ] / 2 + 4 * ( acItem == I_POWER_LENS ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 5 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 5 ] += ( multiplier * ( p.m_EVYield[ 5 ] / 2 + 4 * ( acItem == I_POWER_BAND ) ) );
+
+                if( acidx < 1 + ( m_battleMode == DOUBLE ) )
+                    _battleUI.applyEXPChanges( !p_opponent, acidx, exp ); // Checks also for level-advancement of 1st (and in Doubles 2nd) PKMN
+                else { //Advance the level here (this is NOT redundant boilerplate!
+                    POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_speciesId, p );
+
+                    bool newLevel = POKEMON::EXP[ L ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+                    u16 HPdif = acPkmn.m_stats.m_maxHP - acPkmn.m_stats.m_acHP;
+
+                    while( newLevel ) {
+                        acPkmn.m_Level++;
+
+                        if( acPkmn.m_boxdata.m_speciesId != 292 ) //Check for Ninjatom
+                            acPkmn.m_stats.m_maxHP = ( ( acPkmn.m_boxdata.m_individualValues.m_hp + 2 * p.m_bases[ 0 ]
+                            + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
+                        else
+                            acPkmn.m_stats.m_maxHP = 1;
+                        POKEMON::pkmnNatures nature = acPkmn.m_boxdata.getNature( );
+
+                        acPkmn.m_stats.m_Atk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
+                            + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * POKEMON::NatMod[ nature ][ ATK ];
+                        acPkmn.m_stats.m_Def = ( ( ( acPkmn.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ DEF + 1 ]
+                            + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ DEF ];
+                        acPkmn.m_stats.m_Spd = ( ( ( acPkmn.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ SPD + 1 ]
+                            + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SPD ];
+                        acPkmn.m_stats.m_SAtk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ SATK + 1 ]
+                            + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SATK ];
+                        acPkmn.m_stats.m_SDef = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ SDEF + 1 ]
+                            + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SDEF ];
+
+                        acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
+
+                        std::swprintf( wbuffer, 50, L"%ls erreicht Level %d.[A]", acPkmn.m_boxdata.m_name, acPkmn.m_Level );
+                        log( wbuffer );
+
+                        checkForAttackLearn( i );
+                        newLevel = acPkmn.m_Level < 100 && POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+                    }
+                }
             }
         }
 
-        _battleUI.applyEXPChanges( ); // Checks also for level-advancement of 1st (and in Doubles 2nd) PKMN
 
-        if( SAV.m_EXPShareEnabled && !p_opponent ) {
+        if( SAV.m_EXPShareEnabled && p_opponent ) {
             log( L"Der EP-Teiler wirkt![A]" );
             for( u8 i = ( ( m_battleMode == DOUBLE ) ? 2 : 1 ); i < 6; ++i )if( ACPKMNSTS( i, PLAYER ) != KO &&
                                                                                 ACPKMNSTS( i, PLAYER ) != NA ) {
 
                 if( ACPKMN( i, PLAYER ).m_Level == 100 )
+                    continue;
+                if( receivingPKMN & ( 1 << ( ACPOS( i, PLAYER ) ) ) )
                     continue;
 
                 auto& acPkmn = ACPKMN( i, PLAYER );
@@ -1332,8 +1422,32 @@ NEXT:
                 acPkmn.m_boxdata.m_experienceGained += exp / 2;
 
                 //Distribute EV
+                //Check for EV-enhancing stuff
+                auto acItem = acPkmn.m_boxdata.m_holdItem;
+                auto hasPKRS = acPkmn.m_boxdata.m_pokerus;
+
+                u8 multiplier = ( 1 << ( hasPKRS + ( acItem == I_MACHO_BRACE ) ) );
+
+                //Check whether the PKMN can still obtain EV
+
+                u16 evsum = 0;
                 for( u8 j = 0; j < 6; ++j )
-                    acPkmn.m_boxdata.m_effortValues[ j ] += p.m_EVYield[ j ] / 2;
+                    evsum += acPkmn.m_boxdata.m_effortValues[ j ];
+                if( evsum >= 510 )
+                    continue;
+
+                if( acPkmn.m_boxdata.m_effortValues[ 0 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 0 ] += ( multiplier * ( p.m_EVYield[ 0 ] / 2 + 4 * ( acItem == I_POWER_WEIGHT ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 1 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 1 ] += ( multiplier * ( p.m_EVYield[ 1 ] / 2 + 4 * ( acItem == I_POWER_BRACER ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 2 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 2 ] += ( multiplier * ( p.m_EVYield[ 2 ] / 2 + 4 * ( acItem == I_POWER_BELT ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 3 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 3 ] += ( multiplier * ( p.m_EVYield[ 3 ] / 2 + 4 * ( acItem == I_POWER_ANKLET ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 4 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 4 ] += ( multiplier * ( p.m_EVYield[ 4 ] / 2 + 4 * ( acItem == I_POWER_LENS ) ) );
+                if( acPkmn.m_boxdata.m_effortValues[ 5 ] <= u8( 252 ) )
+                    acPkmn.m_boxdata.m_effortValues[ 5 ] += ( multiplier * ( p.m_EVYield[ 5 ] / 2 + 4 * ( acItem == I_POWER_BAND ) ) );
 
                 //Check for level-advancing
 
@@ -1368,11 +1482,7 @@ NEXT:
                     std::swprintf( wbuffer, 50, L"%ls erreicht Level %d.[A]", acPkmn.m_boxdata.m_name, acPkmn.m_Level );
                     log( wbuffer );
 
-                    u8 oldSpec = acPkmn.m_boxdata.m_speciesId;
                     checkForAttackLearn( i );
-                    checkForEvolution( PLAYER, i );
-                    if( oldSpec != acPkmn.m_boxdata.m_speciesId )
-                        checkForAttackLearn( i );
 
                     newLevel = acPkmn.m_Level < 100 && POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
                 }
@@ -1411,7 +1521,7 @@ NEXT:
         if( ACPKMN( p_pokemonPos, p_opponent ).canEvolve( ) ) {
             auto& acPkmn = ACPKMN( p_pokemonPos, p_opponent );
 
-            std::swprintf( wbuffer, 50, L"%ls entwickelt sich[A]", acPkmn.m_boxdata.m_name );
+            std::swprintf( wbuffer, 50, L"%ls entwickelt sich...[A]", acPkmn.m_boxdata.m_name );
             log( wbuffer );
 
             acPkmn.evolve( );
@@ -1439,7 +1549,9 @@ NEXT:
         u8 pkmnCnt = 0;
         for( u8 i = 0; i < 6; ++i ) {
             if( _player->m_pkmnTeam->size( ) > i ) {
-                if( ACPKMNSTS( i, PLAYER ) != KO )
+                if( ACPKMNSTS( i, PLAYER ) != KO
+                    && ACPKMNSTS( i, PLAYER ) != NA
+                    && ACPKMN( i, PLAYER ).m_stats.m_acHP )
                     pkmnCnt++;
             } else
                 break;
@@ -1453,7 +1565,9 @@ NEXT:
         pkmnCnt = 0;
         for( u8 i = 0; i < 6; ++i ) {
             if( _opponent->m_pkmnTeam->size( ) > i ) {
-                if( ACPKMNSTS( i, OPPONENT ) != KO )
+                if( ACPKMNSTS( i, OPPONENT ) != KO
+                    && ACPKMNSTS( i, OPPONENT ) != NA
+                    && ACPKMN( i, OPPONENT ).m_stats.m_acHP )
                     pkmnCnt++;
             } else
                 break;
@@ -1462,7 +1576,6 @@ NEXT:
             p_battleEndReason = battleEndReason::PLAYER_WON;
             return true;
         }
-
         return false;
     }
 
@@ -1473,23 +1586,37 @@ NEXT:
     void battle::endBattle( battleEndReason p_battleEndReason ) {
         switch( p_battleEndReason ) {
             case BATTLE::battle::ROUND_LIMIT:
-                log( L"Das Rundenlimit dieses\nKampfes wurde erreicht.[A][CLEAR]Der Kampf endet in einem\nUnentschieden![A]" );
+                log( L"Das Rundenlimit dieses\nKampfes wurde erreicht.[A]" );
+                _battleUI.showEndScreen( );
+                log( L"Der Kampf endet in einem\nUnentschieden![A]" );
                 break;
             case BATTLE::battle::OPPONENT_WON:
             {
-                std::swprintf( wbuffer, 100, L"[TRAINER] [TCLASS] gewinnt...[A][CLEAR]%s[A]",
+                std::swprintf( wbuffer, 100, L"[TRAINER] [TCLASS] gewinnt...[A]" );
+
+                _battleUI.showEndScreen( );
+
+                std::swprintf( wbuffer, 100, L"%s[A]",
                                _opponent->getWinMsg( ) );
                 log( wbuffer );
                 break;
             }
             case BATTLE::battle::PLAYER_WON:
             {
-                std::swprintf( wbuffer, 100, L"Du besiegst [TRAINER]\n[TCLASS]![A][CLEAR]%s[A]",
+                log( L"Du besiegst [TCLASS] [TRAINER]![A]" );
+
+                _battleUI.showEndScreen( );
+
+                std::swprintf( wbuffer, 100, L"%s[A]",
                                _opponent->getLooseMsg( ) );
                 log( wbuffer );
                 std::swprintf( wbuffer, 100, L"Du gewinnst %d$.[A]",
                                _opponent->getLooseMoney( ) );
                 log( wbuffer );
+                break;
+            }
+            case BATTLE::battle::RUN:
+            {
                 break;
             }
             default:
@@ -1501,34 +1628,21 @@ NEXT:
     }
 
     /**
-     *  @brief Swithes the PKMN
+     *  @brief Switches the PKMN
      *  @param p_opponent: true iff the next opponent's PKMN is requested.
      *  @param p_pokemonPos: Position of the target PKMN (0 or 1)
      *  @param p_newPokemonPos: The new PKMNs current Pos
      */
     void battle::switchPKMN( bool p_opponent, u8 p_pokemonPos, u8 p_newPokemonPos ) {
-
-        std::wstring acPkmnStr = L"";
         if( p_opponent )
-            acPkmnStr = L"OPP" + ( p_pokemonPos + 1 );
+            std::swprintf( wbuffer, 100, L"[OPP%d] wurde von [TRAINER]\n([TCLASS]) auf die Bank geschickt.[A]", p_pokemonPos + 1 );
         else
-            acPkmnStr = L"OWN" + ( p_pokemonPos + 1 );
-
-        if( p_opponent )
-            std::swprintf( wbuffer, 100, L"[%ls] wurde von [TRAINER]\n([TCLASS]) auf die Bank geschickt.[A]", acPkmnStr.c_str( ) );
-        else
-            std::swprintf( wbuffer, 100, L"Auf die Bank [%ls]![A]", acPkmnStr.c_str( ) );
+            std::swprintf( wbuffer, 100, L"Auf die Bank [OWN%d]![A]", p_pokemonPos + 1 );
         log( wbuffer );
 
         _battleUI.hidePKMN( p_opponent, p_pokemonPos );
 
         std::swap( ACPOS( p_pokemonPos, p_opponent ), ACPOS( p_newPokemonPos, p_opponent ) );
-
-        if( p_opponent )
-            std::swprintf( wbuffer, 100, L"[TRAINER] ([TCLASS]) schickt\n[%s] in den Kampf.[A]", acPkmnStr.c_str( ) );
-        else
-            std::swprintf( wbuffer, 100, L"Los [%ls]![A]", acPkmnStr.c_str( ) );
-        log( wbuffer );
 
         _battleUI.sendPKMN( p_opponent, p_pokemonPos );
     }
@@ -1548,3471 +1662,18 @@ NEXT:
         }
     }
 
+    bool battle::run( ) {
+        //Check whether run is succesful -- TODO
+        _endBattle = true;
+        return true;
+    }
+
+    battle::~battle( ) {
+        delete _player;
+        delete _opponent;
+    }
+
     //////////////////////////////////////////////////////////////////////////
     // END BATTLE
     //////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //OLD STUFF -> deprcated
-
-    void init( ) {
-        for( int i = 5; i <= 8; ++i ) {
-            Oam->oamBuffer[ i ].isHidden = true;
-            swiWaitForVBlank( );
-        }
-        for( int i = 0; i < 4; ++i ) {
-            Oam->oamBuffer[ 9 + 2 * i ].isHidden = true;
-            swiWaitForVBlank( );
-        }
-
-        Oam->oamBuffer[ 20 ].isHidden = true;
-        for( int i = 0; i < 20; ++i )
-            Oam->oamBuffer[ 36 + i ].isHidden = true;
-        //oamIndexS = 36;
-        //nextAvailableTileIdxS = p_oam->oamBuffer[36].gfxIndex;
-        //palcntS = p_oam->oamBuffer[36].palette;
-
-        cust_font.setColor( 0, 0 );
-        cust_font.setColor( 251, 1 );
-        cust_font.setColor( 252, 2 );
-        cust_font2.setColor( 0, 0 );
-        cust_font2.setColor( 253, 1 );
-        cust_font2.setColor( 254, 2 );
-
-        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
-        BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE[ 251 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE[ 252 ] = RGB15( 3, 3, 3 );
-        BG_PALETTE[ 253 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE[ 254 ] = RGB15( 31, 31, 31 );
-        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
-
-        updateOAMSub( Oam );
-    }
-    void clear( ) {
-        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
-    }
-    void dinit( ) {
-
-        drawSub( );
-
-        for( int i = 5; i < 8; ++i )
-            Oam->oamBuffer[ 31 + 2 * i ].isHidden = false;
-        for( int i = 0; i < 4; ++i ) {
-            Oam->oamBuffer[ 9 + 2 * i ].isHidden = false;
-            swiWaitForVBlank( );
-        }
-        updateOAMSub( Oam );
-    }
-
-    battle::battle( battleTrainer* p_player, battleTrainer* p_opponent, int p_maxRounds, int p_AILevel, battleMode p_battleMode ) {
-        _maxRounds = p_maxRounds;
-        _AILevel = p_AILevel;
-        _player = p_player;
-        _opponent = p_opponent;
-        m_battleMode = p_battleMode;
-
-        m_distributeEXP = true;
-    }
-
-
-
-    //
-    //    void initinitBattleScrnSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo, int p_ownPok, int p_oppPok ) {
-    //        oamIndex = palcnt = nextAvailableTileIdx = 0;
-    //
-    //        SpriteInfo * type1Info = &p_spriteInfo[ oamIndex ];
-    //        SpriteEntry * type1 = &p_oam->oamBuffer[ oamIndex ];
-    //        type1Info->m_oamId = oamIndex;
-    //        type1Info->m_width = 16;
-    //        type1Info->m_height = 16;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 0;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = false;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_SQUARE;
-    //        type1->x = 0;
-    //        type1->size = OBJSIZE_16;
-    //        type1->gfxIndex = nextAvailableTileIdx;
-    //        type1->priority = OBJPRIORITY_0;
-    //        type1->palette = palcnt;
-    //
-    //        for( int i = 0; i < 11; ++i ) {
-    //            p_spriteInfo[ ++oamIndex ] = *type1Info;
-    //            p_oam->oamBuffer[ oamIndex ] = *type1;
-    //            p_oam->oamBuffer[ oamIndex ].x = i < 5 ? 16 + i * 16 : 256 - ( i - 4 ) * 16;
-    //            p_oam->oamBuffer[ oamIndex ].isHidden = i < 5 ? p_oppPok < i : p_ownPok + 5 < i;
-    //            p_oam->oamBuffer[ oamIndex ].y = i >= 5 ? 192 - 16 : 0;
-    //        }
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall1Pal, &SPRITE_PALETTE[ ( palcnt++ ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall1Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], BattleBall1TilesLen );
-    //        nextAvailableTileIdx += BattleBall1TilesLen / BYTES_PER_16_COLOR_TILE;
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall2Pal, &SPRITE_PALETTE[ ( palcnt++ ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall2Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], BattleBall2TilesLen );
-    //        nextAvailableTileIdx += BattleBall2TilesLen / BYTES_PER_16_COLOR_TILE;
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall3Pal, &SPRITE_PALETTE[ ( palcnt++ ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall3Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], BattleBall3TilesLen );
-    //        nextAvailableTileIdx += BattleBall3TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo4Info = &p_spriteInfo[ ++oamIndex ];
-    //        SpriteEntry * Bo4 = &p_oam->oamBuffer[ oamIndex ];
-    //        Bo4Info->m_oamId = oamIndex;
-    //        Bo4Info->m_width = 64;
-    //        Bo4Info->m_height = 64;
-    //        Bo4Info->m_angle = 0;
-    //        Bo4Info->m_entry = Bo4;
-    //        Bo4->y = 0;
-    //        Bo4->isRotateScale = false;
-    //        Bo4->blendMode = OBJMODE_NORMAL;
-    //        Bo4->isMosaic = false;
-    //        Bo4->colorMode = OBJCOLOR_16;
-    //        Bo4->shape = OBJSHAPE_SQUARE;
-    //        Bo4->isHidden = false;
-    //        Bo4->x = 0;
-    //        Bo4->size = OBJSIZE_64;
-    //        Bo4->gfxIndex = nextAvailableTileIdx;
-    //        Bo4->priority = OBJPRIORITY_2;
-    //        Bo4->palette = palcnt;
-    //        Bo4->vFlip = true;
-    //        Bo4->hFlip = true;
-    //
-    //        Bo4 = &p_oam->oamBuffer[ ++oamIndex ];
-    //        Bo4->y = 128;
-    //        Bo4->isRotateScale = false;
-    //        Bo4->blendMode = OBJMODE_NORMAL;
-    //        Bo4->isMosaic = false;
-    //        Bo4->colorMode = OBJCOLOR_16;
-    //        Bo4->shape = OBJSHAPE_SQUARE;
-    //        Bo4->isHidden = false;
-    //        Bo4->x = 192;
-    //        Bo4->size = OBJSIZE_64;
-    //        Bo4->gfxIndex = nextAvailableTileIdx;
-    //        Bo4->priority = OBJPRIORITY_2;
-    //        Bo4->palette = palcnt;
-    //        Bo4->vFlip = false;
-    //        Bo4->hFlip = false;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Border_4Pal, &SPRITE_PALETTE[ palcnt * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Border_4Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], Border_4TilesLen );
-    //        nextAvailableTileIdx += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo3Info = &p_spriteInfo[ ++oamIndex ];
-    //        SpriteEntry * Bo3 = &p_oam->oamBuffer[ oamIndex ];
-    //        Bo3Info->m_oamId = oamIndex;
-    //        Bo3Info->m_width = 64;
-    //        Bo3Info->m_height = 64;
-    //        Bo3Info->m_angle = 0;
-    //        Bo3Info->m_entry = Bo3;
-    //        Bo3->y = 0;
-    //        Bo3->isRotateScale = false;
-    //        Bo3->blendMode = OBJMODE_NORMAL;
-    //        Bo3->isMosaic = false;
-    //        Bo3->colorMode = OBJCOLOR_16;
-    //        Bo3->shape = OBJSHAPE_SQUARE;
-    //        Bo3->isHidden = false;
-    //        Bo3->x = 64;
-    //        Bo3->size = OBJSIZE_64;
-    //        Bo3->gfxIndex = nextAvailableTileIdx;
-    //        Bo3->priority = OBJPRIORITY_2;
-    //        Bo3->palette = palcnt;
-    //        Bo3->vFlip = true;
-    //        Bo3->hFlip = true;
-    //
-    //        Bo3 = &p_oam->oamBuffer[ ++oamIndex ];
-    //        Bo3->y = 128;
-    //        Bo3->isRotateScale = false;
-    //        Bo3->blendMode = OBJMODE_NORMAL;
-    //        Bo3->isMosaic = false;
-    //        Bo3->colorMode = OBJCOLOR_16;
-    //        Bo3->shape = OBJSHAPE_SQUARE;
-    //        Bo3->isHidden = false;
-    //        Bo3->x = 128;
-    //        Bo3->size = OBJSIZE_64;
-    //        Bo3->gfxIndex = nextAvailableTileIdx;
-    //        Bo3->priority = OBJPRIORITY_2;
-    //        Bo3->palette = palcnt;
-    //        Bo3->vFlip = false;
-    //        Bo3->hFlip = false;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-    //                          Border_3Tiles,
-    //                          &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ],
-    //                          Border_3TilesLen );
-    //
-    //        nextAvailableTileIdx += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo2Info = &p_spriteInfo[ ++oamIndex ];
-    //        SpriteEntry * Bo2 = &p_oam->oamBuffer[ oamIndex ];
-    //        Bo2Info->m_oamId = oamIndex;
-    //        Bo2Info->m_width = 64;
-    //        Bo2Info->m_height = 64;
-    //        Bo2Info->m_angle = 0;
-    //        Bo2Info->m_entry = Bo2;
-    //        Bo2->y = 0;
-    //        Bo2->isRotateScale = false;
-    //        Bo2->blendMode = OBJMODE_NORMAL;
-    //        Bo2->isMosaic = false;
-    //        Bo2->colorMode = OBJCOLOR_16;
-    //        Bo2->shape = OBJSHAPE_SQUARE;
-    //        Bo2->isHidden = false;
-    //        Bo2->x = 128;
-    //        Bo2->size = OBJSIZE_64;
-    //        Bo2->gfxIndex = nextAvailableTileIdx;
-    //        Bo2->priority = OBJPRIORITY_2;
-    //        Bo2->palette = palcnt;
-    //        Bo2->vFlip = true;
-    //        Bo2->hFlip = true;
-    //
-    //        Bo2 = &p_oam->oamBuffer[ ++oamIndex ];
-    //        Bo2->y = 128;
-    //        Bo2->isRotateScale = false;
-    //        Bo2->blendMode = OBJMODE_NORMAL;
-    //        Bo2->isMosaic = false;
-    //        Bo2->colorMode = OBJCOLOR_16;
-    //        Bo2->shape = OBJSHAPE_SQUARE;
-    //        Bo2->isHidden = false;
-    //        Bo2->x = 64;
-    //        Bo2->size = OBJSIZE_64;
-    //        Bo2->gfxIndex = nextAvailableTileIdx;
-    //        Bo2->priority = OBJPRIORITY_2;
-    //        Bo2->palette = palcnt;
-    //        Bo2->vFlip = false;
-    //        Bo2->hFlip = false;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-    //                          Border_2Tiles,
-    //                          &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ],
-    //                          Border_2TilesLen );
-    //        nextAvailableTileIdx += Border_2TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo1Info = &p_spriteInfo[ ++oamIndex ];
-    //        SpriteEntry * Bo1 = &p_oam->oamBuffer[ oamIndex ];
-    //        Bo1Info->m_oamId = oamIndex;
-    //        Bo1Info->m_width = 64;
-    //        Bo1Info->m_height = 64;
-    //        Bo1Info->m_angle = 0;
-    //        Bo1Info->m_entry = Bo1;
-    //        Bo1->y = 0;
-    //        Bo1->isRotateScale = false;
-    //        Bo1->blendMode = OBJMODE_NORMAL;
-    //        Bo1->isMosaic = false;
-    //        Bo1->colorMode = OBJCOLOR_16;
-    //        Bo1->shape = OBJSHAPE_SQUARE;
-    //        Bo1->isHidden = false;
-    //        Bo1->x = 192;
-    //        Bo1->size = OBJSIZE_64;
-    //        Bo1->gfxIndex = nextAvailableTileIdx;
-    //        Bo1->priority = OBJPRIORITY_2;
-    //        Bo1->palette = palcnt;
-    //        Bo1->vFlip = true;
-    //        Bo1->hFlip = true;
-    //
-    //        Bo1 = &p_oam->oamBuffer[ ++oamIndex ];
-    //        Bo1->y = 128;
-    //        Bo1->isRotateScale = false;
-    //        Bo1->blendMode = OBJMODE_NORMAL;
-    //        Bo1->isMosaic = false;
-    //        Bo1->colorMode = OBJCOLOR_16;
-    //        Bo1->shape = OBJSHAPE_SQUARE;
-    //        Bo1->isHidden = false;
-    //        Bo1->x = 0;
-    //        Bo1->size = OBJSIZE_64;
-    //        Bo1->gfxIndex = nextAvailableTileIdx;
-    //        Bo1->priority = OBJPRIORITY_2;
-    //        Bo1->palette = palcnt;
-    //        Bo1->vFlip = false;
-    //        Bo1->hFlip = false;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-    //                          Border_1Tiles,
-    //                          &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ],
-    //                          Border_1TilesLen );
-    //        nextAvailableTileIdx += Border_1TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo5Info = &p_spriteInfo[ ++oamIndex ];
-    //        SpriteEntry * Bo5 = &p_oam->oamBuffer[ oamIndex ];
-    //        Bo5Info->m_oamId = oamIndex;
-    //        Bo5Info->m_width = 64;
-    //        Bo5Info->m_height = 64;
-    //        Bo5Info->m_angle = 0;
-    //        Bo5Info->m_entry = Bo5;
-    //        Bo5->y = 64;
-    //        Bo5->isRotateScale = false;
-    //        Bo5->blendMode = OBJMODE_NORMAL;
-    //        Bo5->isMosaic = false;
-    //        Bo5->colorMode = OBJCOLOR_16;
-    //        Bo5->shape = OBJSHAPE_SQUARE;
-    //        Bo5->isHidden = false;
-    //        Bo5->x = 0;
-    //        Bo5->size = OBJSIZE_64;
-    //        Bo5->gfxIndex = nextAvailableTileIdx;
-    //        Bo5->priority = OBJPRIORITY_2;
-    //        Bo5->palette = palcnt;
-    //        Bo5->vFlip = true;
-    //        Bo5->hFlip = true;
-    //
-    //        Bo5 = &p_oam->oamBuffer[ ++oamIndex ];
-    //        Bo5->y = 64;
-    //        Bo5->isRotateScale = false;
-    //        Bo5->blendMode = OBJMODE_NORMAL;
-    //        Bo5->isMosaic = false;
-    //        Bo5->colorMode = OBJCOLOR_16;
-    //        Bo5->shape = OBJSHAPE_SQUARE;
-    //        Bo5->isHidden = false;
-    //        Bo5->x = 192;
-    //        Bo5->size = OBJSIZE_64;
-    //        Bo5->gfxIndex = nextAvailableTileIdx;
-    //        Bo5->priority = OBJPRIORITY_2;
-    //        Bo5->palette = palcnt;
-    //        Bo5->vFlip = false;
-    //        Bo5->hFlip = false;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Border_5Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], Border_5TilesLen );
-    //        nextAvailableTileIdx += Border_5TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        ++palcnt;
-    //    }
-    //
-    //    void drawTopBack( );
-    //
-    //    void battle::initBattleScreen( ) {
-    //        sprintf( buffer, "%i.raw", _opponent->m_trainerClass );
-    //
-    //        FS::loadPicture( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "ClearD" );
-    //        dmaCopy( BorderBitmap, bgGetGfxPtr( bg2sub ), 256 * 192 );
-    //        dmaCopy( BorderPal, BG_PALETTE_SUB, 256 * 2 );
-    //        drawTopBack( );
-    //        initinitBattleScrnSprites( OamTop, spriteInfoTop, 6, 6 );
-    //
-    //        for( int i = 0; i < 6; ++i )
-    //            switch( ACPKMNSTS( i, OPPONENT ) ) {
-    //                case NA:
-    //                    OamTop->oamBuffer[ i ].isHidden = true;
-    //                    break;
-    //                case KO:
-    //                    OamTop->oamBuffer[ i ].gfxIndex += BattleBall2TilesLen / 32;
-    //                    OamTop->oamBuffer[ i ].palette++;
-    //                    break;
-    //                case STS:
-    //                    OamTop->oamBuffer[ i ].gfxIndex += BattleBall2TilesLen / 16;
-    //                    OamTop->oamBuffer[ i ].palette += 2;
-    //                    break;
-    //                default:
-    //                    break;
-    //        }
-    //        for( int i = 6; i < 12; ++i )
-    //            switch( _acPkmnStatus[ _acPkmnPosition[ i - 6 ][ PLAYER ] ][ PLAYER ] ) {
-    //                case NA:
-    //                    OamTop->oamBuffer[ i ].isHidden = true;
-    //                    break;
-    //                case KO:
-    //                    OamTop->oamBuffer[ i ].gfxIndex += BattleBall2TilesLen / 32;
-    //                    OamTop->oamBuffer[ i ].palette++;
-    //                    break;
-    //                case STS:
-    //                    OamTop->oamBuffer[ i ].gfxIndex += BattleBall2TilesLen / 16;
-    //                    OamTop->oamBuffer[ i ].palette += 2;
-    //                    break;
-    //                default:
-    //                    break;
-    //        }
-    //        updateOAM( OamTop );
-    //
-    //
-    //        consoleSetWindow( &Top, 0, 0, 32, 24 );
-    //        consoleSelect( &Top );
-    //        consoleClear( );
-    //        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-    //        consoleClear( );
-    //        consoleSetWindow( &Bottom, 2, 11, 32, 24 );
-    //        consoleSelect( &Bottom );
-    //
-    //        cust_font.setColor( 0, 0 );
-    //        cust_font.setColor( 251, 1 );
-    //        cust_font.setColor( 252, 2 );
-    //        cust_font2.setColor( 0, 0 );
-    //        cust_font2.setColor( 253, 1 );
-    //        cust_font2.setColor( 254, 2 );
-    //
-    //        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-    //        BG_PALETTE_SUB[ 251 ] = RGB15( 30, 30, 30 );
-    //        BG_PALETTE_SUB[ 252 ] = RGB15( 15, 15, 15 );
-    //        BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
-    //        BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-    //        sprintf( buffer, "Eine Herausforderung von\n %s %s!", trainerclassnames[ _opponent->m_trainerClass ], _opponent->m_battleTrainerName );
-    //        cust_font.printString( buffer, 16, 80, true );
-    //
-    //        FS::loadTrainerSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/TRAINER/", "n", 144, 16, oamIndex, palcnt, nextAvailableTileIdx, false );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 8; ++i )
-    //            swiWaitForVBlank( );
-    //        oamIndex -= 4;
-    //        --palcnt;
-    //        --palcnt;
-    //        nextAvailableTileIdx -= 144;
-    //        FS::loadTrainerSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/TRAINER/", "n2", 144, 16, oamIndex, palcnt, nextAvailableTileIdx, false );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 8; ++i )
-    //            swiWaitForVBlank( );
-    //        oamIndex -= 4;
-    //        --palcnt;
-    //        --palcnt;
-    //        nextAvailableTileIdx -= 144;
-    //        FS::loadTrainerSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/TRAINER/", "n3", 144, 16, oamIndex, palcnt, nextAvailableTileIdx, false );
-    //        updateOAM( OamTop );
-    //        oamIndex -= 4;
-    //        --palcnt;
-    //        --palcnt;
-    //        nextAvailableTileIdx -= 144;
-    //        for( int i = 0; i < 20; ++i )
-    //            swiWaitForVBlank( );
-    //
-    //        for( int l = 0; l < 25; ++l ) {
-    //            FS::loadTrainerSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/TRAINER/", "n3", 144 + 4 * l, 16, oamIndex, palcnt, nextAvailableTileIdx, false );
-    //            updateOAM( OamTop );
-    //            oamIndex -= 4;
-    //            --palcnt;
-    //            --palcnt;
-    //            nextAvailableTileIdx -= 144;
-    //            for( int i = 0; i < 3; ++i )
-    //                swiWaitForVBlank( );
-    //        }
-    //
-    //        FS::loadPicture( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "ClearD" );
-    //        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-    //        consoleClear( );
-    //    }
-    //
-    //    void initBattleScreenSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo ) {
-    //        oamIndex = palcnt = nextAvailableTileIdx = 0;
-    //
-    //        SpriteInfo * type1Info = &p_spriteInfo[ OWN_HP_2 ];
-    //        SpriteEntry * type1 = &p_oam->oamBuffer[ OWN_HP_2 ];
-    //        type1Info->m_oamId = OWN_HP_2;
-    //        type1Info->m_width = 32;
-    //        type1Info->m_height = 32;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 192 - 32 - 8;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = false;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_SQUARE;
-    //        type1->x = 256 - 36;
-    //        type1->size = OBJSIZE_32;
-    //        type1->gfxIndex = nextAvailableTileIdx;
-    //        type1->priority = OBJPRIORITY_2;
-    //        type1->palette = HP_PAL;
-    //
-    //        p_spriteInfo[ OWN_HP_1 ] = *type1Info;
-    //        p_oam->oamBuffer[ OWN_HP_1 ] = *type1;
-    //        p_oam->oamBuffer[ OWN_HP_1 ].x -= 88;
-    //        p_oam->oamBuffer[ OWN_HP_1 ].y -= 32;
-    //        p_oam->oamBuffer[ OWN_HP_1 ].priority = OBJPRIORITY_2;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Battle1Pal, &SPRITE_PALETTE[ (HP_PAL)* COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Battle1Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], Battle1TilesLen );
-    //        nextAvailableTileIdx += Battle1TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        type1Info = &p_spriteInfo[ OPP_HP_2 ];
-    //        type1 = &p_oam->oamBuffer[ OPP_HP_2 ];
-    //        type1Info->m_oamId = OPP_HP_2;
-    //        type1Info->m_width = 32;
-    //        type1Info->m_height = 32;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 8;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = false;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_SQUARE;
-    //        type1->x = 0;
-    //        type1->size = OBJSIZE_32;
-    //        type1->gfxIndex = nextAvailableTileIdx;
-    //        type1->priority = OBJPRIORITY_2;
-    //        type1->palette = HP_PAL + 1;
-    //
-    //        p_spriteInfo[ OPP_HP_1 ] = *type1Info;
-    //        p_oam->oamBuffer[ OPP_HP_1 ] = *type1;
-    //        p_oam->oamBuffer[ OPP_HP_1 ].x += 88;
-    //        p_oam->oamBuffer[ OPP_HP_1 ].y += 24;
-    //        p_oam->oamBuffer[ OPP_HP_1 ].priority = OBJPRIORITY_2;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Battle2Pal, &SPRITE_PALETTE[ ( HP_PAL + 1 ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Battle2Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], Battle2TilesLen );
-    //        nextAvailableTileIdx += Battle2TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //
-    //        type1Info = &p_spriteInfo[ OWN_PB_START ];
-    //        type1 = &p_oam->oamBuffer[ OWN_PB_START ];
-    //        type1Info->m_oamId = OWN_PB_START;
-    //        type1Info->m_width = 16;
-    //        type1Info->m_height = 16;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 0;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = true;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_SQUARE;
-    //        type1->x = 0;
-    //        type1->size = OBJSIZE_16;
-    //        type1->gfxIndex = nextAvailableTileIdx;
-    //        type1->priority = OBJPRIORITY_0;
-    //        type1->palette = PB_PAL_START;
-    //
-    //        for( int i = 1; i < 12; ++i ) {
-    //            p_spriteInfo[ OWN_PB_START + i ] = *type1Info;
-    //            p_oam->oamBuffer[ OWN_PB_START + i ] = *type1;
-    //        }
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall1Pal, &SPRITE_PALETTE[ (PB_PAL_START)* COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall1Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], BattleBall1TilesLen );
-    //        nextAvailableTileIdx += BattleBall1TilesLen / BYTES_PER_16_COLOR_TILE;
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall2Pal, &SPRITE_PALETTE[ ( PB_PAL_START + 1 ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall2Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], BattleBall2TilesLen );
-    //        nextAvailableTileIdx += BattleBall2TilesLen / BYTES_PER_16_COLOR_TILE;
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall3Pal, &SPRITE_PALETTE[ ( PB_PAL_START + 2 ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleBall3Tiles, &SPRITE_GFX[ nextAvailableTileIdx * OFFSET_MULTIPLIER ], BattleBall3TilesLen );
-    //        nextAvailableTileIdx += BattleBall3TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //
-    //    }
-    //
-    //    void initBattleSubScreenSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo, bool p_isWild, bool p_hasPokeNav ) {
-    //        oamIndexS = palcntS = nextAvailableTileIdxS = 0;
-    //
-    //
-    //        SpriteInfo * type1Info = &p_spriteInfo[ oamIndexS ];
-    //        SpriteEntry * type1 = &p_oam->oamBuffer[ oamIndexS ];
-    //        type1Info->m_oamId = oamIndexS;
-    //        type1Info->m_width = 64;
-    //        type1Info->m_height = 64;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 72;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = true;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_SQUARE;
-    //        type1->x = 64;
-    //        type1->size = OBJSIZE_64;
-    //        type1->gfxIndex = nextAvailableTileIdxS;
-    //        type1->priority = OBJPRIORITY_2;
-    //        type1->palette = palcntS;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub1Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], BattleSub1TilesLen );
-    //        nextAvailableTileIdxS += BattleSub1TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        type1Info = &p_spriteInfo[ ++oamIndexS ];
-    //        type1 = &p_oam->oamBuffer[ oamIndexS ];
-    //        type1Info->m_oamId = oamIndexS;
-    //        type1Info->m_width = 64;
-    //        type1Info->m_height = 64;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 72;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = true;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_SQUARE;
-    //        type1->x = 128;
-    //        type1->size = OBJSIZE_64;
-    //        type1->gfxIndex = nextAvailableTileIdxS;
-    //        type1->priority = OBJPRIORITY_2;
-    //        type1->palette = palcntS;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub2Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], BattleSub2TilesLen );
-    //        nextAvailableTileIdxS += BattleSub2TilesLen / BYTES_PER_16_COLOR_TILE;
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub1Pal, &SPRITE_PALETTE_SUB[ ( palcntS++ ) * COLORS_PER_PALETTE ], 32 );
-    //
-    //        type1Info = &p_spriteInfo[ ++oamIndexS ];
-    //        type1 = &p_oam->oamBuffer[ oamIndexS ];
-    //        type1Info->m_oamId = oamIndexS;
-    //        type1Info->m_width = 64;
-    //        type1Info->m_height = 32;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 152;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = true;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_WIDE;
-    //        type1->x = 96;
-    //        type1->size = OBJSIZE_64;
-    //        type1->gfxIndex = nextAvailableTileIdxS;
-    //        type1->priority = OBJPRIORITY_2;
-    //        type1->palette = palcntS;
-    //
-    //        if( p_isWild ) {
-    //            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub3Pal, &SPRITE_PALETTE_SUB[ ( palcntS++ ) * COLORS_PER_PALETTE ], 32 );
-    //            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub3Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], BattleSub3TilesLen );
-    //            nextAvailableTileIdxS += BattleSub3TilesLen / BYTES_PER_16_COLOR_TILE;
-    //        } else if( p_hasPokeNav ) {
-    //            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub6Pal, &SPRITE_PALETTE_SUB[ ( palcntS++ ) * COLORS_PER_PALETTE ], 32 );
-    //            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub6Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], BattleSub6TilesLen );
-    //            nextAvailableTileIdxS += BattleSub6TilesLen / BYTES_PER_16_COLOR_TILE;
-    //        }
-    //
-    //        type1Info = &p_spriteInfo[ ++oamIndexS ];
-    //        type1 = &p_oam->oamBuffer[ oamIndexS ];
-    //        type1Info->m_oamId = oamIndexS;
-    //        type1Info->m_width = 64;
-    //        type1Info->m_height = 32;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 144;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = true;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_WIDE;
-    //        type1->x = 16;
-    //        type1->size = OBJSIZE_64;
-    //        type1->gfxIndex = nextAvailableTileIdxS;
-    //        type1->priority = OBJPRIORITY_1;
-    //        type1->palette = palcntS;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub4Pal, &SPRITE_PALETTE_SUB[ ( palcntS++ ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub4Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], BattleSub4TilesLen );
-    //        nextAvailableTileIdxS += BattleSub4TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        type1Info = &p_spriteInfo[ ++oamIndexS ];
-    //        type1 = &p_oam->oamBuffer[ oamIndexS ];
-    //        type1Info->m_oamId = oamIndexS;
-    //        type1Info->m_width = 64;
-    //        type1Info->m_height = 32;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = 144;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = true;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_WIDE;
-    //        type1->x = 176;
-    //        type1->size = OBJSIZE_64;
-    //        type1->gfxIndex = nextAvailableTileIdxS;
-    //        type1->priority = OBJPRIORITY_1;
-    //        type1->palette = palcntS;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub5Pal, &SPRITE_PALETTE_SUB[ ( palcntS++ ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BattleSub5Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], BattleSub5TilesLen );
-    //        nextAvailableTileIdxS += BattleSub5TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        for( int i = 0; i < 4; ++i ) {
-    //            SpriteInfo * MInfo = &p_spriteInfo[ ++oamIndexS ];
-    //            SpriteEntry * M = &p_oam->oamBuffer[ oamIndexS ];
-    //            MInfo->m_oamId = oamIndexS;
-    //            MInfo->m_width = 64;
-    //            MInfo->m_height = 64;
-    //            MInfo->m_angle = 0;
-    //            MInfo->m_entry = M;
-    //            M->y = 0;
-    //            M->isRotateScale = false;
-    //            M->blendMode = OBJMODE_NORMAL;
-    //            M->isMosaic = false;
-    //            M->colorMode = OBJCOLOR_16;
-    //            M->shape = OBJSHAPE_SQUARE;
-    //            M->isHidden = true;
-    //            M->x = (i)* 64;
-    //            M->size = OBJSIZE_64;
-    //            M->gfxIndex = nextAvailableTileIdxS;
-    //            M->priority = OBJPRIORITY_2;
-    //            M->palette = palcntS;
-    //        }
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, MessagePal, &SPRITE_PALETTE_SUB[ ( palcntS++ ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, MessageTiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], MessageTilesLen );
-    //        nextAvailableTileIdxS += MessageTilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo4Info = &p_spriteInfo[ ++oamIndexS ];
-    //        SpriteEntry * Bo4 = &p_oam->oamBuffer[ oamIndexS ];
-    //        Bo4Info->m_oamId = oamIndexS;
-    //        Bo4Info->m_width = 64;
-    //        Bo4Info->m_height = 64;
-    //        Bo4Info->m_angle = 0;
-    //        Bo4Info->m_entry = Bo4;
-    //        Bo4->y = 0;
-    //        Bo4->isRotateScale = false;
-    //        Bo4->blendMode = OBJMODE_NORMAL;
-    //        Bo4->isMosaic = false;
-    //        Bo4->colorMode = OBJCOLOR_16;
-    //        Bo4->shape = OBJSHAPE_SQUARE;
-    //        Bo4->isHidden = true;
-    //        Bo4->x = 0;
-    //        Bo4->size = OBJSIZE_64;
-    //        Bo4->gfxIndex = nextAvailableTileIdxS;
-    //        Bo4->priority = OBJPRIORITY_2;
-    //        Bo4->palette = palcntS;
-    //        Bo4->vFlip = true;
-    //        Bo4->hFlip = true;
-    //
-    //        Bo4 = &p_oam->oamBuffer[ ++oamIndexS ];
-    //        Bo4->y = 128;
-    //        Bo4->isRotateScale = false;
-    //        Bo4->blendMode = OBJMODE_NORMAL;
-    //        Bo4->isMosaic = false;
-    //        Bo4->colorMode = OBJCOLOR_16;
-    //        Bo4->shape = OBJSHAPE_SQUARE;
-    //        Bo4->isHidden = true;
-    //        Bo4->x = 192;
-    //        Bo4->size = OBJSIZE_64;
-    //        Bo4->gfxIndex = nextAvailableTileIdxS;
-    //        Bo4->priority = OBJPRIORITY_2;
-    //        Bo4->palette = palcntS;
-    //        Bo4->vFlip = false;
-    //        Bo4->hFlip = false;
-    //
-    //        memset( &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], 0, Border_4TilesLen );
-    //        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Border_4Pal, &SPRITE_PALETTE_SUB[palcntS * COLORS_PER_PALETTE], 32);
-    //        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Border_4Tiles, &SPRITE_GFX_SUB[nextAvailableTileIdxS * OFFSET_MULTIPLIER], Border_4TilesLen);
-    //        nextAvailableTileIdxS += Border_4TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo3Info = &p_spriteInfo[ ++oamIndexS ];
-    //        SpriteEntry * Bo3 = &p_oam->oamBuffer[ oamIndexS ];
-    //        Bo3Info->m_oamId = oamIndexS;
-    //        Bo3Info->m_width = 64;
-    //        Bo3Info->m_height = 64;
-    //        Bo3Info->m_angle = 0;
-    //        Bo3Info->m_entry = Bo3;
-    //        Bo3->y = 0;
-    //        Bo3->isRotateScale = false;
-    //        Bo3->blendMode = OBJMODE_NORMAL;
-    //        Bo3->isMosaic = false;
-    //        Bo3->colorMode = OBJCOLOR_16;
-    //        Bo3->shape = OBJSHAPE_SQUARE;
-    //        Bo3->isHidden = true;
-    //        Bo3->x = 64;
-    //        Bo3->size = OBJSIZE_64;
-    //        Bo3->gfxIndex = nextAvailableTileIdxS;
-    //        Bo3->priority = OBJPRIORITY_2;
-    //        Bo3->palette = palcntS;
-    //        Bo3->vFlip = true;
-    //        Bo3->hFlip = true;
-    //
-    //        Bo3 = &p_oam->oamBuffer[ ++oamIndexS ];
-    //        Bo3->y = 128;
-    //        Bo3->isRotateScale = false;
-    //        Bo3->blendMode = OBJMODE_NORMAL;
-    //        Bo3->isMosaic = false;
-    //        Bo3->colorMode = OBJCOLOR_16;
-    //        Bo3->shape = OBJSHAPE_SQUARE;
-    //        Bo3->isHidden = true;
-    //        Bo3->x = 128;
-    //        Bo3->size = OBJSIZE_64;
-    //        Bo3->gfxIndex = nextAvailableTileIdxS;
-    //        Bo3->priority = OBJPRIORITY_2;
-    //        Bo3->palette = palcntS;
-    //        Bo3->vFlip = false;
-    //        Bo3->hFlip = false;
-    //
-    //        memset( &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], 0, Border_3TilesLen );
-    //        /*dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    //        Border_3Tiles,
-    //        &SPRITE_GFX_SUB[nextAvailableTileIdxS * OFFSET_MULTIPLIER],
-    //        Border_3TilesLen);*/
-    //
-    //        nextAvailableTileIdxS += Border_3TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo2Info = &p_spriteInfo[ ++oamIndexS ];
-    //        SpriteEntry * Bo2 = &p_oam->oamBuffer[ oamIndexS ];
-    //        Bo2Info->m_oamId = oamIndexS;
-    //        Bo2Info->m_width = 64;
-    //        Bo2Info->m_height = 64;
-    //        Bo2Info->m_angle = 0;
-    //        Bo2Info->m_entry = Bo2;
-    //        Bo2->y = 0;
-    //        Bo2->isRotateScale = false;
-    //        Bo2->blendMode = OBJMODE_NORMAL;
-    //        Bo2->isMosaic = false;
-    //        Bo2->colorMode = OBJCOLOR_16;
-    //        Bo2->shape = OBJSHAPE_SQUARE;
-    //        Bo2->isHidden = true;
-    //        Bo2->x = 128;
-    //        Bo2->size = OBJSIZE_64;
-    //        Bo2->gfxIndex = nextAvailableTileIdxS;
-    //        Bo2->priority = OBJPRIORITY_2;
-    //        Bo2->palette = palcntS;
-    //        Bo2->vFlip = true;
-    //        Bo2->hFlip = true;
-    //
-    //        Bo2 = &p_oam->oamBuffer[ ++oamIndexS ];
-    //        Bo2->y = 128;
-    //        Bo2->isRotateScale = false;
-    //        Bo2->blendMode = OBJMODE_NORMAL;
-    //        Bo2->isMosaic = false;
-    //        Bo2->colorMode = OBJCOLOR_16;
-    //        Bo2->shape = OBJSHAPE_SQUARE;
-    //        Bo2->isHidden = true;
-    //        Bo2->x = 64;
-    //        Bo2->size = OBJSIZE_64;
-    //        Bo2->gfxIndex = nextAvailableTileIdxS;
-    //        Bo2->priority = OBJPRIORITY_2;
-    //        Bo2->palette = palcntS;
-    //        Bo2->vFlip = false;
-    //        Bo2->hFlip = false;
-    //
-    //        memset( &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], 0, Border_2TilesLen );
-    //        /*dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    //        Border_2Tiles,
-    //        &SPRITE_GFX_SUB[nextAvailableTileIdxS * OFFSET_MULTIPLIER],
-    //        Border_2TilesLen);*/
-    //        nextAvailableTileIdxS += Border_2TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo1Info = &p_spriteInfo[ ++oamIndexS ];
-    //        SpriteEntry * Bo1 = &p_oam->oamBuffer[ oamIndexS ];
-    //        Bo1Info->m_oamId = oamIndexS;
-    //        Bo1Info->m_width = 64;
-    //        Bo1Info->m_height = 64;
-    //        Bo1Info->m_angle = 0;
-    //        Bo1Info->m_entry = Bo1;
-    //        Bo1->y = 0;
-    //        Bo1->isRotateScale = false;
-    //        Bo1->blendMode = OBJMODE_NORMAL;
-    //        Bo1->isMosaic = false;
-    //        Bo1->colorMode = OBJCOLOR_16;
-    //        Bo1->shape = OBJSHAPE_SQUARE;
-    //        Bo1->isHidden = true;
-    //        Bo1->x = 192;
-    //        Bo1->size = OBJSIZE_64;
-    //        Bo1->gfxIndex = nextAvailableTileIdxS;
-    //        Bo1->priority = OBJPRIORITY_2;
-    //        Bo1->palette = palcntS;
-    //        Bo1->vFlip = true;
-    //        Bo1->hFlip = true;
-    //
-    //        Bo1 = &p_oam->oamBuffer[ ++oamIndexS ];
-    //        Bo1->y = 128;
-    //        Bo1->isRotateScale = false;
-    //        Bo1->blendMode = OBJMODE_NORMAL;
-    //        Bo1->isMosaic = false;
-    //        Bo1->colorMode = OBJCOLOR_16;
-    //        Bo1->shape = OBJSHAPE_SQUARE;
-    //        Bo1->isHidden = true;
-    //        Bo1->x = 0;
-    //        Bo1->size = OBJSIZE_64;
-    //        Bo1->gfxIndex = nextAvailableTileIdxS;
-    //        Bo1->priority = OBJPRIORITY_2;
-    //        Bo1->palette = palcntS;
-    //        Bo1->vFlip = false;
-    //        Bo1->hFlip = false;
-    //
-    //        memset( &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], 0, Border_1TilesLen );
-    //        /*dmaCopyHalfWords(SPRITE_DMA_CHANNEL,
-    //        Border_1Tiles,
-    //        &SPRITE_GFX_SUB[nextAvailableTileIdxS * OFFSET_MULTIPLIER],
-    //        Border_1TilesLen);*/
-    //        nextAvailableTileIdxS += Border_1TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        SpriteInfo * Bo5Info = &p_spriteInfo[ ++oamIndexS ];
-    //        SpriteEntry * Bo5 = &p_oam->oamBuffer[ oamIndexS ];
-    //        Bo5Info->m_oamId = oamIndexS;
-    //        Bo5Info->m_width = 64;
-    //        Bo5Info->m_height = 64;
-    //        Bo5Info->m_angle = 0;
-    //        Bo5Info->m_entry = Bo5;
-    //        Bo5->y = 64;
-    //        Bo5->isRotateScale = false;
-    //        Bo5->blendMode = OBJMODE_NORMAL;
-    //        Bo5->isMosaic = false;
-    //        Bo5->colorMode = OBJCOLOR_16;
-    //        Bo5->shape = OBJSHAPE_SQUARE;
-    //        Bo5->isHidden = true;
-    //        Bo5->x = 0;
-    //        Bo5->size = OBJSIZE_64;
-    //        Bo5->gfxIndex = nextAvailableTileIdxS;
-    //        Bo5->priority = OBJPRIORITY_2;
-    //        Bo5->palette = palcntS;
-    //        Bo5->vFlip = true;
-    //        Bo5->hFlip = true;
-    //
-    //        Bo5 = &p_oam->oamBuffer[ ++oamIndexS ];
-    //        Bo5->y = 64;
-    //        Bo5->isRotateScale = false;
-    //        Bo5->blendMode = OBJMODE_NORMAL;
-    //        Bo5->isMosaic = false;
-    //        Bo5->colorMode = OBJCOLOR_16;
-    //        Bo5->shape = OBJSHAPE_SQUARE;
-    //        Bo5->isHidden = false;
-    //        Bo5->x = 192;
-    //        Bo5->size = OBJSIZE_64;
-    //        Bo5->gfxIndex = nextAvailableTileIdxS;
-    //        Bo5->priority = OBJPRIORITY_2;
-    //        Bo5->palette = palcntS;
-    //        Bo5->vFlip = false;
-    //        Bo5->hFlip = false;
-    //
-    //        memset( &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], 0, Border_5TilesLen );
-    //        //dmaCopyHalfWords(SPRITE_DMA_CHANNEL, Border_5Tiles, &SPRITE_GFX_SUB[nextAvailableTileIdxS * OFFSET_MULTIPLIER], Border_5TilesLen);
-    //        nextAvailableTileIdxS += Border_5TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        ++palcntS;
-    //
-    //        Bo5 = &p_oam->oamBuffer[ ++oamIndexS ];
-    //        Bo5->y = 192;
-    //        Bo5->isRotateScale = false;
-    //        Bo5->blendMode = OBJMODE_NORMAL;
-    //        Bo5->isMosaic = false;
-    //        Bo5->colorMode = OBJCOLOR_16;
-    //        Bo5->shape = OBJSHAPE_SQUARE;
-    //        Bo5->isHidden = true;
-    //        Bo5->x = 256;
-    //        Bo5->size = OBJSIZE_64;
-    //        Bo5->gfxIndex = nextAvailableTileIdxS;
-    //        Bo5->priority = OBJPRIORITY_2;
-    //        Bo5->palette = palcntS;
-    //        Bo5->vFlip = false;
-    //        Bo5->hFlip = false;
-    //        SpriteInfo * backInfo = &p_spriteInfo[ ++oamIndexS ];
-    //        SpriteEntry * back = &p_oam->oamBuffer[ oamIndexS ];
-    //        backInfo->m_oamId = oamIndexS;
-    //        backInfo->m_width = 32;
-    //        backInfo->m_height = 32;
-    //        backInfo->m_angle = 0;
-    //        backInfo->m_entry = back;
-    //        back->y = SCREEN_HEIGHT - 28;
-    //        back->isRotateScale = false;
-    //        back->blendMode = OBJMODE_NORMAL;
-    //        back->isMosaic = false;
-    //        back->isHidden = true;
-    //        back->colorMode = OBJCOLOR_16;
-    //        back->shape = OBJSHAPE_SQUARE;
-    //        back->x = SCREEN_WIDTH - 28;
-    //        back->size = OBJSIZE_32;
-    //        back->gfxIndex = nextAvailableTileIdxS;
-    //        back->priority = OBJPRIORITY_1;
-    //        back->palette = palcntS;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BackTiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], BackTilesLen );
-    //        nextAvailableTileIdxS += BackTilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BackPal, &SPRITE_PALETTE_SUB[ ( palcntS++ ) * COLORS_PER_PALETTE ], 32 );
-    //
-    //        ++oamIndexS;
-    //        int nextnext = nextAvailableTileIdxS + Choice_1TilesLen / BYTES_PER_16_COLOR_TILE;
-    //        for( int i = 0; i < 6; ++i ) {
-    //            SpriteInfo * C1Info = &p_spriteInfo[ 2 * i + oamIndexS ];
-    //            SpriteEntry * C1 = &p_oam->oamBuffer[ 2 * i + oamIndexS ];
-    //            C1Info->m_oamId = oamIndexS;
-    //            C1Info->m_width = 64;
-    //            C1Info->m_height = 32;
-    //            C1Info->m_angle = 0;
-    //            C1Info->m_entry = C1;
-    //            C1->y = 68 + ( i / 2 ) * 32;
-    //            C1->isRotateScale = false;
-    //            C1->blendMode = OBJMODE_NORMAL;
-    //            C1->isMosaic = false;
-    //            C1->colorMode = OBJCOLOR_16;
-    //            C1->shape = OBJSHAPE_WIDE;
-    //            C1->isHidden = true;
-    //            C1->x = ( ( i % 2 ) ? 32 : 128 );
-    //            C1->size = OBJSIZE_64;
-    //            C1->gfxIndex = nextAvailableTileIdxS;
-    //
-    //            C1->priority = OBJPRIORITY_2;
-    //            C1->palette = palcntS;
-    //
-    //            SpriteInfo * C3Info = &p_spriteInfo[ 2 * i + oamIndexS + 1 ];
-    //            SpriteEntry * C3 = &p_oam->oamBuffer[ 2 * i + oamIndexS + 1 ];
-    //            C3Info->m_oamId = oamIndexS;
-    //            C3Info->m_width = 64;
-    //            C3Info->m_height = 32;
-    //            C3Info->m_angle = 0;
-    //            C3Info->m_entry = C3;
-    //            C3->y = 68 + ( i / 2 ) * 32;
-    //            C3->isRotateScale = false;
-    //            C3->blendMode = OBJMODE_NORMAL;
-    //            C3->isMosaic = false;
-    //            C3->colorMode = OBJCOLOR_16;
-    //            C3->shape = OBJSHAPE_WIDE;
-    //            C3->isHidden = true;
-    //            C3->x = ( ( i % 2 ) ? 62 : 160 );
-    //            C3->size = OBJSIZE_64;
-    //            C3->gfxIndex = nextnext;
-    //            C3->priority = OBJPRIORITY_2;
-    //            C3->palette = palcntS;
-    //        }
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Choice_1Pal, &SPRITE_PALETTE_SUB[ palcntS * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Choice_1Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], Choice_1TilesLen );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Choice_3Tiles, &SPRITE_GFX_SUB[ nextnext * OFFSET_MULTIPLIER ], Choice_3TilesLen );
-    //        nextAvailableTileIdxS = nextnext + Choice_1TilesLen / BYTES_PER_16_COLOR_TILE;
-    //
-    //        for( int i = 0; i < 3; ++i ) {
-    //            SpriteInfo * C2Info = &p_spriteInfo[ i + oamIndexS + 12 ];
-    //            SpriteEntry * C2 = &p_oam->oamBuffer[ i + oamIndexS + 12 ];
-    //            C2Info->m_oamId = oamIndexS;
-    //            C2Info->m_width = 64;
-    //            C2Info->m_height = 32;
-    //            C2Info->m_angle = 0;
-    //            C2Info->m_entry = C2;
-    //            C2->y = 68 + (i)* 32;
-    //            C2->isRotateScale = false;
-    //            C2->blendMode = OBJMODE_NORMAL;
-    //            C2->isMosaic = false;
-    //            C2->colorMode = OBJCOLOR_16;
-    //            C2->shape = OBJSHAPE_WIDE;
-    //            C2->isHidden = true;
-    //            C2->x = 96;
-    //            C2->size = OBJSIZE_64;
-    //            C2->gfxIndex = nextAvailableTileIdxS;
-    //            C2->priority = OBJPRIORITY_2;
-    //            C2->palette = palcntS;
-    //        }
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Choice_2Tiles, &SPRITE_GFX_SUB[ nextAvailableTileIdxS * OFFSET_MULTIPLIER ], Choice_2TilesLen );
-    //        nextAvailableTileIdxS += Choice_2TilesLen / BYTES_PER_16_COLOR_TILE;
-    //        ++palcntS;
-    //        oamIndexS += 15;
-    //    }
-    //
-    //#define PB_ANIM_TILES 700
-    //    void animatePB( int p_x, int p_y ) {
-    //        p_x += 8; p_y += 8;
-    //        SpriteInfo * type1Info = &spriteInfoTop[ PB_ANIM ];
-    //        SpriteEntry * type1 = &OamTop->oamBuffer[ PB_ANIM ];
-    //        type1Info->m_oamId = PB_ANIM;
-    //        type1Info->m_width = 16;
-    //        type1Info->m_height = 16;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = p_y;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = false;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_SQUARE;
-    //        type1->x = p_x;
-    //        type1->size = OBJSIZE_16;
-    //        type1->gfxIndex = PB_ANIM_TILES;
-    //        type1->priority = OBJPRIORITY_0;
-    //        type1->palette = 15;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall1Pal, &SPRITE_PALETTE[ ( 15 ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall1Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], PokeBall1TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall2Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], PokeBall2TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall3Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], PokeBall3TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall4Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], PokeBall4TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall5Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], PokeBall5TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall6Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], PokeBall6TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall7Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], PokeBall7TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall8Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], PokeBall8TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall9Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], PokeBall9TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall10Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], PokeBall10TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall11Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], PokeBall11TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 3; ++i )
-    //            swiWaitForVBlank( );
-    //        type1->isHidden = true;
-    //
-    //        type1Info->m_oamId = PB_ANIM;
-    //        type1Info->m_width = 64;
-    //        type1Info->m_height = 64;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = p_y - 22;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = false;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_SQUARE;
-    //        type1->x = p_x - 22;
-    //        type1->size = OBJSIZE_64;
-    //        type1->gfxIndex = PB_ANIM_TILES;
-    //        type1->priority = OBJPRIORITY_0;
-    //        type1->palette = 15;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ ( 15 ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], Shiny1TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ ( 15 ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], Shiny2TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        type1->isHidden = true;
-    //        updateOAM( OamTop );
-    //    }
-    //
-    //    void animateShiny( int p_x, int p_y ) {
-    //        SpriteInfo * type1Info = &spriteInfoTop[ SHINY_ANIM ];
-    //        SpriteEntry * type1 = &OamTop->oamBuffer[ SHINY_ANIM ];
-    //        type1Info->m_oamId = SHINY_ANIM;
-    //        type1Info->m_width = 64;
-    //        type1Info->m_height = 64;
-    //        type1Info->m_angle = 0;
-    //        type1Info->m_entry = type1;
-    //        type1->y = p_y;
-    //        type1->isRotateScale = false;
-    //        type1->isHidden = false;
-    //        type1->blendMode = OBJMODE_NORMAL;
-    //        type1->isMosaic = false;
-    //        type1->colorMode = OBJCOLOR_16;
-    //        type1->shape = OBJSHAPE_SQUARE;
-    //        type1->x = p_x;
-    //        type1->size = OBJSIZE_64;
-    //        type1->gfxIndex = PB_ANIM_TILES;
-    //        type1->priority = OBJPRIORITY_0;
-    //        type1->palette = 15;
-    //
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ ( 15 ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], Shiny1TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ ( 15 ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], Shiny2TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ ( 15 ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], Shiny1TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ ( 15 ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], Shiny2TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ ( 15 ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], Shiny1TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ ( 15 ) * COLORS_PER_PALETTE ], 32 );
-    //        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ PB_ANIM_TILES * OFFSET_MULTIPLIER ], Shiny2TilesLen );
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 2; ++i )
-    //            swiWaitForVBlank( );
-    //        type1->isHidden = true;
-    //        updateOAM( OamTop );
-    //    }
-    ////
-    //    void battle::switchOppPkmn( int p_newPok, int p_toSwitch ) {
-    //        if( ACPKMN( p_newPok, OPPONENT ).m_stats.m_acHP == 0 )
-    //            return;
-    //
-    //        init( );
-    //
-    //        consoleSelect( &Bottom );
-    //        consoleClear( );
-    //        if( ACPKMN( p_toSwitch, OPPONENT ).m_stats.m_acHP ) {
-    //            clear( );
-    //            sprintf( buffer, "%ls wird von\n%s %s\nauf die Bank geschickt. ", ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_Name,
-    //                     trainerclassnames[ _opponent->m_trainerClass ], _opponent->m_battleTrainerName );
-    //            cust_font.printString( buffer, 8, 8, true );
-    //        }
-    //        for( int i = 1 + ( m_battleMode == DOUBLE && _opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ); i < 6; ++i )
-    //            if( i == p_newPok || i == p_toSwitch ) {
-    //            switch( ACPKMNSTS( i, OPPONENT ) ) {
-    //                case KO:
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].palette--;
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].gfxIndex -= BattleBall1TilesLen / 32;
-    //                    break;
-    //                case STS:
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].palette -= 2;
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].gfxIndex -= BattleBall1TilesLen / 16;
-    //                    break;
-    //                default:
-    //                    break;
-    //            }
-    //            }
-    //
-    //        std::swap( ACPOS( p_newPok, OPPONENT ), ACPOS( p_toSwitch, OPPONENT ) );
-    //
-    //        for( int i = 0; i < 150; ++i )
-    //            swiWaitForVBlank( );
-    //
-    //        clear( );
-    //        sprintf( buffer, "%s %s\nschickt %ls in den Kampf.",
-    //                 trainerclassnames[ _opponent->m_trainerClass ],
-    //                 _opponent->m_battleTrainerName,
-    //                 ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_Name );
-    //        cust_font.printString( buffer, 8, 8, true );
-    //
-    //        consoleSelect( &Top );
-    //
-    //        if( p_toSwitch == 0 ) {
-    //            oamIndex = OPP_PKMN_1_START;
-    //            palcnt = OPP_PKMN_1_PAL;
-    //            nextAvailableTileIdx = OPP_PKMN_1_TILE;
-    //
-    //            OamTop->oamBuffer[ OPP_PB_START ].isHidden = true;
-    //            for( int i = 1; i <= 4; ++i )
-    //                OamTop->oamBuffer[ OPP_PKMN_1_START + i ].isHidden = true;
-    //            updateOAM( OamTop );
-    //
-    //            animatePB( 206, 50 );
-    //
-    //            OamTop->oamBuffer[ OPP_PB_START ].isHidden = false;
-    //
-    //            if( !loadPKMNSprite( OamTop, spriteInfoTop,
-    //                "nitro:/PICS/SPRITES/PKMN/",
-    //                ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
-    //                176,
-    //                20,
-    //                oamIndex,
-    //                palcnt,
-    //                nextAvailableTileIdx,
-    //                false,
-    //                ACPKMN( 0, OPPONENT ).m_boxdata.isShiny( ),
-    //                ACPKMN( 0, OPPONENT ).m_boxdata.m_isFemale ) ) {
-    //                oamIndex = OPP_PKMN_1_START;
-    //                palcnt = OPP_PKMN_1_PAL;
-    //                nextAvailableTileIdx = OPP_PKMN_1_TILE;
-    //                loadPKMNSprite( OamTop,
-    //                                spriteInfoTop,
-    //                                "nitro:/PICS/SPRITES/PKMN/",
-    //                                ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
-    //                                176,
-    //                                20,
-    //                                oamIndex,
-    //                                palcnt,
-    //                                nextAvailableTileIdx,
-    //                                false,
-    //                                ACPKMN( 0, OPPONENT ).m_boxdata.isShiny( ),
-    //                                !ACPKMN( 0, OPPONENT ).m_boxdata.m_isFemale );
-    //            }
-    //            for( int i = 1; i <= 4; ++i )
-    //                OamTop->oamBuffer[ OPP_PKMN_1_START + i ].isHidden = false;
-    //            updateOAM( OamTop );
-    //
-    //            if( ACPKMN( 0, OPPONENT ).m_boxdata.isShiny( ) )
-    //                animateShiny( 176 + 16, 36 );
-    //
-    //            displayHP( 100, 101, 88, 32, HP_COL( 1, p_toSwitch ), HP_COL( 1, p_toSwitch ) + 1, false );
-    //            displayHP( 100, 100 - ACPKMN( 0, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 0, OPPONENT ).m_stats.m_maxHP,
-    //                       88, 32, HP_COL( 1, p_toSwitch ), HP_COL( 1, p_toSwitch ) + 1, false );
-    //            OamTop->oamBuffer[ OPP_PB_START ].x = 96;
-    //            OamTop->oamBuffer[ OPP_PB_START ].y = 41;
-    //            consoleSetWindow( &Top, 0, 5, 20, 2 );
-    //            consoleClear( );
-    //
-    //            printf( "%10ls%c\n",
-    //                    ACPKMN( 0, OPPONENT ).m_boxdata.m_Name,
-    //                    GENDER( ( *_player->m_pkmnTeam )[ ACPOS( 0, OPPONENT ) ] ) );
-    //
-    //            if( ACPKMN( 0, OPPONENT ).m_Level < 10 )
-    //                printf( " " );
-    //            if( ACPKMN( 0, OPPONENT ).m_Level < 100 )
-    //                printf( " " );
-    //            printf( "Lv%d%4dKP", ACPKMN( 0, OPPONENT ).m_Level,
-    //                    ACPKMN( 0, OPPONENT ).m_stats.m_acHP );
-    //        } else {
-    //            OamTop->oamBuffer[ OPP_PB_START + 1 ].isHidden = true;
-    //            updateOAM( OamTop );
-    //            consoleSelect( &Top );
-    //            oamIndex = OPP_PKMN_2_START;
-    //            palcnt = OPP_PKMN_2_PAL;
-    //            nextAvailableTileIdx = OPP_PKMN_2_TILE;
-    //
-    //            for( int i = 1; i <= 4; ++i )
-    //                OamTop->oamBuffer[ OPP_PKMN_2_START + i ].isHidden = true;
-    //            updateOAM( OamTop );
-    //
-    //            animatePB( 142, 34 );
-    //            OamTop->oamBuffer[ OPP_PB_START + 1 ].isHidden = false;
-    //
-    //            if( !loadPKMNSprite( OamTop,
-    //                spriteInfoTop,
-    //                "nitro:/PICS/SPRITES/PKMN/",
-    //                ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC,
-    //                112,
-    //                4,
-    //                oamIndex,
-    //                palcnt,
-    //                nextAvailableTileIdx,
-    //                false,
-    //                ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ),
-    //                ACPKMN( 1, OPPONENT ).m_boxdata.m_isFemale ) ) {
-    //                oamIndex = OPP_PKMN_2_START;
-    //                palcnt = OPP_PKMN_2_PAL;
-    //                nextAvailableTileIdx = OPP_PKMN_2_TILE;
-    //                loadPKMNSprite( OamTop,
-    //                                spriteInfoTop,
-    //                                "nitro:/PICS/SPRITES/PKMN/",
-    //                                ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC,
-    //                                112,
-    //                                4,
-    //                                oamIndex,
-    //                                palcnt,
-    //                                nextAvailableTileIdx,
-    //                                false,
-    //                                ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ),
-    //                                !ACPKMN( 1, OPPONENT ).m_boxdata.m_isFemale );
-    //            }
-    //
-    //            for( int i = 1; i <= 4; ++i )
-    //                OamTop->oamBuffer[ OPP_PKMN_2_START + i ].isHidden = false;
-    //            updateOAM( OamTop );
-    //
-    //            if( ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ) )
-    //                animateShiny( 112 + 16, 20 );
-    //
-    //            updateOAM( OamTop );
-    //
-    //            displayHP( 100, 101, 0, 8, HP_COL( 1, p_toSwitch ), HP_COL( 1, p_toSwitch ) + 1, false );
-    //            displayHP( 100, 100 - ACPKMN( 1, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 1, OPPONENT ).m_stats.m_maxHP, 0, 8, HP_COL( 1, p_toSwitch ), HP_COL( 1, p_toSwitch ) + 1, false );
-    //            OamTop->oamBuffer[ OPP_PB_START + 1 ].x = 8;
-    //            OamTop->oamBuffer[ OPP_PB_START + 1 ].y = 17;
-    //            consoleSetWindow( &Top, 4, 2, 20, 2 );
-    //            consoleClear( );
-    //            printf( "%ls%c\nLv%d%4dKP",
-    //                    ACPKMN( 1, OPPONENT ).m_boxdata.m_Name,
-    //                    GENDER( ACPKMN( 1, OPPONENT ) ),
-    //                    ACPKMN( 1, OPPONENT ).m_Level,
-    //                    ACPKMN( 1, OPPONENT ).m_stats.m_acHP );
-    //        }
-    //
-    //        consoleSelect( &Bottom );
-    //
-    //        for( int i = 1 + ( m_battleMode == DOUBLE && _opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ); i < 6; ++i )
-    //            if( i == p_newPok || i == p_toSwitch ) {
-    //            OamTop->oamBuffer[ OPP_PB_START + i ].x = -4 + 18 * i;
-    //            OamTop->oamBuffer[ OPP_PB_START + i ].y = -4;
-    //            OamTop->oamBuffer[ OPP_PB_START + i ].isHidden = false;
-    //            switch( ACPKMNSTS( i, OPPONENT ) ) {
-    //                case NA:
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].isHidden = true;
-    //                    break;
-    //                case KO:
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].palette++;
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].gfxIndex += BattleBall1TilesLen / 32;
-    //                    break;
-    //                case STS:
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].palette += 2;
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].gfxIndex += BattleBall1TilesLen / 16;
-    //                    break;
-    //                default:
-    //                    break;
-    //            }
-    //            }
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 200; ++i )
-    //            swiWaitForVBlank( );
-    //
-    //        if( abilities[ ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_ability ].m_type & ability::BEFORE_BATTLE ) {
-    //            clear( );
-    //            sprintf( buffer, "%s von\n %ls (Gegn.) wirkt!\n",
-    //                     abilities[ ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_ability ].m_abilityName.c_str( ),
-    //                     ACPKMN( p_toSwitch, OPPONENT ).m_boxdata.m_Name );
-    //            cust_font.printString( buffer, 8, 8, true );
-    //            //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
-    //            for( int i = 0; i < 100; ++i )
-    //                swiWaitForVBlank( );
-    //        }
-    //    }
-    //
-    //    void battle::switchOwnPkmn( int p_newPok, int p_toSwitch ) {
-    //        if( ACPKMN( p_newPok, PLAYER ).m_stats.m_acHP == 0 )
-    //            return;
-    //        init( );
-    //        for( int i = 1 + ( m_battleMode == DOUBLE && _player->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, PLAYER ) != KO ); i < 6; ++i ) {
-    //            if( i == p_newPok || i == p_toSwitch ) {
-    //                OamTop->oamBuffer[ OWN_PB_START + i ].x = 236 - 18 * i;
-    //                OamTop->oamBuffer[ OWN_PB_START + i ].y = 196 - 16;
-    //                OamTop->oamBuffer[ OWN_PB_START + i ].isHidden = false;
-    //                switch( ACPKMNSTS( i, PLAYER ) ) {
-    //                    case KO:
-    //                        OamTop->oamBuffer[ OWN_PB_START + i ].palette--;
-    //                        OamTop->oamBuffer[ OWN_PB_START + i ].gfxIndex -= BattleBall1TilesLen / 32;
-    //                        break;
-    //                    case STS:
-    //                        OamTop->oamBuffer[ OWN_PB_START + i ].palette -= 2;
-    //                        OamTop->oamBuffer[ OWN_PB_START + i ].gfxIndex -= BattleBall1TilesLen / 16;
-    //                        break;
-    //                    default:
-    //                        break;
-    //                }
-    //            }
-    //        }
-    //        updateOAM( OamTop );
-    //        consoleSelect( &Bottom );
-    //        consoleClear( );
-    //        if( ACPKMN( p_toSwitch, PLAYER ).m_stats.m_acHP ) {
-    //            clear( );
-    //            sprintf( buffer, "Auf die Bank,\n %ls!", ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_Name );
-    //            cust_font.printString( buffer, 8, 8, true );
-    //        }
-    //        std::swap( ACPOS( p_newPok, PLAYER ), ACPOS( p_toSwitch, PLAYER ) );
-    //
-    //        for( int i = 0; i < 100; ++i )
-    //            swiWaitForVBlank( );
-    //
-    //
-    //        consoleSelect( &Bottom );
-    //        clear( );
-    //        sprintf( buffer, "Los %ls!", ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_Name );
-    //        cust_font.printString( buffer, 8, 8, true );
-    //
-    //        consoleSelect( &Top );
-    //        if( p_toSwitch == 0 ) {
-    //            oamIndex = OWN_PKMN_1_START;
-    //            palcnt = OWN_PKMN_1_PAL;
-    //            nextAvailableTileIdx = OWN_PKMN_1_TILE;
-    //
-    //            OamTop->oamBuffer[ OWN_PB_START ].isHidden = true;
-    //            for( int i = 0; i < 4; ++i )
-    //                OamTop->oamBuffer[ OWN_PKMN_1_START + i + 1 ].isHidden = true;
-    //            updateOAM( OamTop );
-    //
-    //            animatePB( 80, 170 );
-    //
-    //
-    //            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
-    //                ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ), ACPKMN( 0, PLAYER ).m_boxdata.m_isFemale ) )
-    //                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
-    //                ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ), !ACPKMN( 0, PLAYER ).m_boxdata.m_isFemale );
-    //
-    //            OamTop->oamBuffer[ OWN_PB_START ].isHidden = false;
-    //
-    //            updateOAM( OamTop );
-    //
-    //            if( ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ) )
-    //                animateShiny( 6, 116 );
-    //
-    //            displayHP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, p_toSwitch ), HP_COL( 0, p_toSwitch ) + 1, false );
-    //            displayHP( 100, 100 - ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 0, PLAYER ).m_stats.m_maxHP,
-    //                       256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, p_toSwitch ), HP_COL( 0, p_toSwitch ) + 1, false );
-    //            displayEP( 100, 100, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-    //
-    //            POKEMON::PKMNDATA::getAll( ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, p );
-    //
-    //            displayEP( 0, ( ACPKMN( 0, PLAYER ).m_boxdata.m_exp - POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level - 1 ][ p.m_expType ] ) * 100 /
-    //                       ( POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level ][ p.m_expType ] - POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level - 1 ][ p.m_expType ] ),
-    //                       256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-    //            OamTop->oamBuffer[ OWN_PB_START ].x = 256 - 88 - 32 + 4;
-    //            OamTop->oamBuffer[ OWN_PB_START ].y = 192 - 31 - 32;
-    //            consoleSetWindow( &Top, 21, 16, 20, 4 );
-    //            consoleClear( );
-    //            printf( "%ls%c\nLv%d%4dKP",
-    //                    ACPKMN( 0, PLAYER ).m_boxdata.m_Name,
-    //                    GENDER( ACPKMN( 0, PLAYER ) ),
-    //                    ACPKMN( 0, PLAYER ).m_Level,
-    //                    ACPKMN( 0, PLAYER ).m_stats.m_acHP );
-    //
-    //            //OamTop->oamBuffer[OWN_PB_START + 1].isHidden = OamTop->oamBuffer[2].isHidden = false;
-    //            updateOAM( OamTop );
-    //        } else {
-    //            OamTop->oamBuffer[ OWN_PB_START + 1 ].isHidden = true;
-    //            updateOAM( OamTop );
-    //            consoleSelect( &Top );
-    //            oamIndex = OWN_PKMN_2_START;
-    //            palcnt = OWN_PKMN_2_PAL;
-    //            nextAvailableTileIdx = OWN_PKMN_2_TILE;
-    //
-    //            for( int i = 0; i < 4; ++i ) //hide pokemon sprite
-    //                OamTop->oamBuffer[ OWN_PKMN_2_START + i + 1 ].isHidden = true;
-    //            updateOAM( OamTop );
-    //
-    //            animatePB( 142, 34 );
-    //
-    //            OamTop->oamBuffer[ OWN_PB_START + 1 ].isHidden = false;
-    //
-    //            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, 50, 120, oamIndex, palcnt, nextAvailableTileIdx, false,
-    //                ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ), ACPKMN( 1, PLAYER ).m_boxdata.m_isFemale ) )
-    //                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, 50, 120, oamIndex, palcnt, nextAvailableTileIdx, false,
-    //                ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ), !ACPKMN( 1, PLAYER ).m_boxdata.m_isFemale );
-    //
-    //            if( ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ) )
-    //                animateShiny( 50 + 16, 136 );
-    //
-    //            updateOAM( OamTop );
-    //
-    //            displayHP( 100, 101, 256 - 36, 192 - 40, HP_COL( 0, p_toSwitch ), HP_COL( 0, p_toSwitch ) + 1, false );
-    //            displayHP( 100, 100 - ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 1, PLAYER ).m_stats.m_maxHP,
-    //                       256 - 36, 192 - 40, HP_COL( 0, p_toSwitch ), HP_COL( 0, p_toSwitch ) + 1, false );
-    //            displayEP( 100, 100, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
-    //
-    //            POKEMON::PKMNDATA::getAll( ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, p );
-    //
-    //            displayEP( 0,
-    //                       ( ACPKMN( 1, PLAYER ).m_boxdata.m_exp - POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level - 1 ][ p.m_expType ] ) * 100 /
-    //                       ( POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level ][ p.m_expType ] - POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level - 1 ][ p.m_expType ] ),
-    //                       256 - 36,
-    //                       192 - 40,
-    //                       OWN2_EP_COL,
-    //                       OWN2_EP_COL,
-    //                       false );
-    //
-    //            OamTop->oamBuffer[ OWN_PB_START + 1 ].x = 256 - 32 + 4;
-    //            OamTop->oamBuffer[ OWN_PB_START + 1 ].y = 192 - 31;
-    //            consoleSetWindow( &Top, 16, 20, 20, 5 );
-    //            consoleClear( );
-    //            printf( "%10ls%c\n",
-    //                    ACPKMN( 1, PLAYER ).m_boxdata.m_Name,
-    //                    GENDER( ACPKMN( 1, PLAYER ) ) );
-    //            if( ACPKMN( 1, PLAYER ).m_Level < 10 )
-    //                printf( " " );
-    //            if( ACPKMN( 1, PLAYER ).m_Level < 100 )
-    //                printf( " " );
-    //            printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
-    //                    ACPKMN( 1, PLAYER ).m_stats.m_acHP );
-    //
-    //            //OamTop->oamBuffer[5].isHidden = OamTop->oamBuffer[1].isHidden = false;
-    //            updateOAM( OamTop );
-    //        }
-    //
-    //        for( int i = 1 + ( m_battleMode == DOUBLE && _player->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, PLAYER ) != KO ); i < 6; ++i )
-    //            if( i == p_newPok || i == p_toSwitch ) {
-    //            OamTop->oamBuffer[ OWN_PB_START + i ].x = 236 - 18 * i;
-    //            OamTop->oamBuffer[ OWN_PB_START + i ].y = 196 - 16;
-    //            OamTop->oamBuffer[ OWN_PB_START + i ].isHidden = false;
-    //            switch( ACPKMNSTS( i, PLAYER ) ) {
-    //                case NA:
-    //                    OamTop->oamBuffer[ OWN_PB_START + i ].isHidden = true;
-    //                    break;
-    //                case KO:
-    //                    OamTop->oamBuffer[ OWN_PB_START + i ].palette++;
-    //                    OamTop->oamBuffer[ OWN_PB_START + i ].gfxIndex += BattleBall1TilesLen / 32;
-    //                    break;
-    //                case STS:
-    //                    OamTop->oamBuffer[ OWN_PB_START + i ].palette += 2;
-    //                    OamTop->oamBuffer[ OWN_PB_START + i ].gfxIndex += BattleBall1TilesLen / 16;
-    //                    break;
-    //                default:
-    //                    break;
-    //            }
-    //            }
-    //
-    //        for( int i = 0; i < 100; ++i )
-    //            swiWaitForVBlank( );
-    //        updateOAM( OamTop );
-    //
-    //        if( abilities[ ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_ability ].m_type & ability::BEFORE_BATTLE ) {
-    //            clear( );
-    //            sprintf( buffer, "%s von\n %ls wirkt!\n",
-    //                     abilities[ ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_ability ].m_abilityName.c_str( ),
-    //                     ACPKMN( p_toSwitch, PLAYER ).m_boxdata.m_Name );
-    //            cust_font.printString( buffer, 8, 8, true );
-    //            //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
-    //            for( int i = 0; i < 100; ++i )
-    //                swiWaitForVBlank( );
-    //        }
-    //    }
-    //
-    //    void setMainBattleVisibility( bool p_hidden ) {
-    //        for( int i = 0; i <= 4; ++i )
-    //            Oam->oamBuffer[ i ].isHidden = p_hidden;
-    //        Oam->oamBuffer[ 2 ].isHidden |= !p_hidden & !SAV.m_activatedPNav;
-    //        for( int i = 19; i <= 19; ++i )
-    //            Oam->oamBuffer[ i ].isHidden = p_hidden;
-    //        updateOAMSub( Oam );
-    //    }
-    //
-    //
-    //    void drawTopBack( ) {
-    //        dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
-    //        dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
-    //    }
-    //
-
-
-    //    void battle::initBattleScene( int p_battleBack, weather p_weather ) {
-    //        for( size_t i = 0; i < 6; ++i ) {
-    //            ACPOS( i, PLAYER ) = ACPOS( i, OPPONENT ) = i;
-    //            if( _player->m_pkmnTeam->size( ) > i ) {
-    //                if( ACPKMN( i, PLAYER ).m_stats.m_acHP == 0 || ACPKMN( i, PLAYER ).m_boxdata.m_IV.m_isEgg )
-    //                    ACPKMNSTS( i, PLAYER ) = KO;
-    //                else if( ACPKMN( i, PLAYER ).m_statusint )
-    //                    ACPKMNSTS( i, PLAYER ) = STS;
-    //                else
-    //                    ACPKMNSTS( i, PLAYER ) = OK;
-    //            } else
-    //                ACPKMNSTS( i, PLAYER ) = NA;
-    //            if( _opponent->m_pkmnTeam->size( ) > i ) {
-    //                if( ACPKMN( i, OPPONENT ).m_stats.m_acHP == 0 || ACPKMN( i, OPPONENT ).m_boxdata.m_IV.m_isEgg )
-    //                    ACPKMNSTS( i, OPPONENT ) = KO;
-    //                else if( ACPKMN( i, OPPONENT ).m_statusint )
-    //                    ACPKMNSTS( i, OPPONENT ) = STS;
-    //                else ACPKMNSTS( i, OPPONENT ) = OK;
-    //            } else
-    //                ACPKMNSTS( i, OPPONENT ) = NA;
-    //        }
-    //        if( ACPKMNSTS( 0, PLAYER ) == KO ) {
-    //            for( size_t i = 1 + ( m_battleMode == DOUBLE ); i < _player->m_pkmnTeam->size( ); ++i ) {
-    //                if( ACPKMNSTS( i, PLAYER ) != KO ) {
-    //                    std::swap( ACPOS( 0, PLAYER ), ACPOS( i, PLAYER ) );
-    //                    break;
-    //                }
-    //            }
-    //        }
-    //        if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, PLAYER ) == KO ) {
-    //            for( size_t i = 2; i < _player->m_pkmnTeam->size( ); ++i ) {
-    //                if( ACPKMNSTS( i, PLAYER ) != KO ) {
-    //                    std::swap( ACPOS( 1, PLAYER ), ACPOS( i, PLAYER ) );
-    //                    break;
-    //                }
-    //            }
-    //        }
-    //        if( ACPKMNSTS( 0, OPPONENT ) == KO ) {
-    //            for( size_t i = 1 + ( m_battleMode == DOUBLE ); i < _opponent->m_pkmnTeam->size( ); ++i ) {
-    //                if( ACPKMNSTS( i, OPPONENT ) != KO ) {
-    //                    std::swap( ACPOS( 0, OPPONENT ), ACPOS( i, OPPONENT ) );
-    //                    break;
-    //                }
-    //            }
-    //        }
-    //        if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, OPPONENT ) == KO ) {
-    //            for( size_t i = 2; i < _opponent->m_pkmnTeam->size( ); ++i ) {
-    //                if( ACPKMNSTS( i, OPPONENT ) != KO ) {
-    //                    std::swap( ACPOS( 1, OPPONENT ), ACPOS( i, OPPONENT ) );
-    //                    break;
-    //                }
-    //            }
-    //        }
-    //        vramSetup( );
-    //        videoSetMode( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-    //        drawTopBack( );
-    //        Top = *consoleInit( &Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
-    //        consoleSetFont( &Top, &cfont );
-    //
-    //        Bottom = *consoleInit( &Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
-    //        consoleSetFont( &Bottom, &cfont );
-    //
-    //        //touchPosition t;
-    //
-    //        initOAMTableSub( Oam );
-    //        initOAMTable( OamTop );
-    //        _round = _maxRounds;
-    //        initBattleScreen( );
-    //        drawTopBack( );
-    //
-    //        drawSub( );
-    //
-    //        drawTopBack( );
-    //
-    //        initOAMTableSub( Oam );
-    //        initOAMTable( OamTop );
-    //        initBattleScreenSprites( OamTop, spriteInfoTop );
-    //
-    //        initBattleSubScreenSprites( Oam, spriteInfo, false, SAV.m_activatedPNav );
-    //        for( int i = 5; i <= 19; ++i )
-    //            Oam->oamBuffer[ i ].isHidden = false;
-    //        updateOAMSub( Oam );
-    //
-    //        for( int i = 1; i <= 4; ++i )
-    //            OamTop->oamBuffer[ i ].isHidden = true;
-    //        updateOAM( OamTop );
-    //
-    //        init( );
-    //        //Opp's Side
-    //        consoleSelect( &Bottom );
-    //        consoleClear( );
-    //
-    //        if( ( m_battleMode == DOUBLE ) && _opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO )
-    //            sprintf( buffer, "%s %s\nschickt %ls ",
-    //            trainerclassnames[ _opponent->m_trainerClass ],
-    //            _opponent->m_battleTrainerName,
-    //            ACPKMN( 0, OPPONENT ).m_boxdata.m_Name );
-    //        else
-    //            sprintf( buffer, "%s %s\nschickt %ls in den Kampf.",
-    //            trainerclassnames[ _opponent->m_trainerClass ],
-    //            _opponent->m_battleTrainerName,
-    //            ACPKMN( 0, OPPONENT ).m_boxdata.m_Name );
-    //        cust_font.printString( buffer, 8, 8, true );
-    //        consoleSelect( &Top );
-    //
-    //        animatePB( 206, 50 );
-    //
-    //        OamTop->oamBuffer[ OPP_HP_1 ].isHidden = OamTop->oamBuffer[ OPP_PB_START ].isHidden = false;
-    //        oamIndex = OPP_PKMN_1_START;
-    //        palcnt = OPP_PKMN_1_PAL;
-    //        nextAvailableTileIdx = OPP_PKMN_1_TILE;
-    //
-    //        if( !loadPKMNSprite( OamTop,
-    //            spriteInfoTop,
-    //            "nitro:/PICS/SPRITES/PKMN/",
-    //            ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
-    //            176,
-    //            20,
-    //            oamIndex,
-    //            palcnt,
-    //            nextAvailableTileIdx,
-    //            false,
-    //            ACPKMN( 0, OPPONENT ).m_boxdata.isShiny( ),
-    //            ACPKMN( 0, OPPONENT ).m_boxdata.m_isFemale ) ) {
-    //
-    //            oamIndex = OPP_PKMN_1_START;
-    //            palcnt = OPP_PKMN_1_PAL;
-    //            nextAvailableTileIdx = OPP_PKMN_1_TILE;
-    //            loadPKMNSprite( OamTop,
-    //                            spriteInfoTop,
-    //                            "nitro:/PICS/SPRITES/PKMN/",
-    //                            ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC,
-    //                            176,
-    //                            20,
-    //                            oamIndex,
-    //                            palcnt,
-    //                            nextAvailableTileIdx,
-    //                            false,
-    //                            ACPKMN( 0, OPPONENT ).m_boxdata.isShiny( ),
-    //                            !ACPKMN( 0, OPPONENT ).m_boxdata.m_isFemale );
-    //        }
-    //        if( ACPKMN( 0, OPPONENT ).m_boxdata.isShiny( ) )
-    //            animateShiny( 176 + 16, 36 );
-    //
-    //        displayHP( 100, 101, 88, 32, HP_COL( 1, 0 ), HP_COL( 1, 0 ) + 1, false );
-    //        displayHP( 100, 100 - ACPKMN( 0, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 0, OPPONENT ).m_stats.m_maxHP, 88, 32, HP_COL( 1, 0 ), HP_COL( 1, 0 ) + 1, false );
-    //        OamTop->oamBuffer[ OPP_PB_START ].x = 96;
-    //        OamTop->oamBuffer[ OPP_PB_START ].y = 41;
-    //        consoleSetWindow( &Top, 0, 5, 20, 5 );
-    //
-    //        printf( "%10ls%c\n", ACPKMN( 0, OPPONENT ).m_boxdata.m_Name, GENDER( ( *_player->m_pkmnTeam )[ ACPOS( 0, OPPONENT ) ] ) );
-    //        if( ACPKMN( 0, OPPONENT ).m_Level < 10 )
-    //            printf( " " );
-    //        if( ACPKMN( 0, OPPONENT ).m_Level < 100 )
-    //            printf( " " );
-    //        printf( "Lv%d%4dKP", ACPKMN( 0, OPPONENT ).m_Level,
-    //                ACPKMN( 0, OPPONENT ).m_stats.m_acHP );
-    //
-    //        if( ( m_battleMode == DOUBLE ) && _opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ) {
-    //            OamTop->oamBuffer[ OPP_HP_2 ].isHidden = OamTop->oamBuffer[ OPP_PB_START + 1 ].isHidden = true;
-    //            updateOAM( OamTop );
-    //            for( int i = 0; i < 80; ++i )
-    //                swiWaitForVBlank( );
-    //            consoleSelect( &Bottom );
-    //            clear( );
-    //            sprintf( buffer, "und %ls in den Kampf.", ACPKMN( 1, OPPONENT ).m_boxdata.m_Name );
-    //            cust_font.printString( buffer, 8, 8, true );
-    //            consoleSelect( &Top );
-    //
-    //            animatePB( 142, 34 );
-    //            OamTop->oamBuffer[ OPP_HP_2 ].isHidden = OamTop->oamBuffer[ OPP_PB_START + 1 ].isHidden = false;
-    //            oamIndex = OPP_PKMN_2_START;
-    //            palcnt = OPP_PKMN_2_PAL;
-    //            nextAvailableTileIdx = OPP_PKMN_2_TILE;
-    //
-    //            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
-    //                ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ), ACPKMN( 1, OPPONENT ).m_boxdata.m_isFemale ) ) {
-    //                oamIndex = OPP_PKMN_2_START;
-    //                palcnt = OPP_PKMN_2_PAL;
-    //                nextAvailableTileIdx = OPP_PKMN_2_TILE;
-    //                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", ACPKMN( 1, OPPONENT ).m_boxdata.m_SPEC, 112, 4, oamIndex, palcnt, nextAvailableTileIdx, false,
-    //                                ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ), !ACPKMN( 1, OPPONENT ).m_boxdata.m_isFemale );
-    //            }
-    //            if( ACPKMN( 1, OPPONENT ).m_boxdata.isShiny( ) )
-    //                animateShiny( 112 + 16, 20 );
-    //
-    //
-    //            displayHP( 100, 101, 0, 8, HP_COL( 1, 1 ), HP_COL( 1, 1 ) + 1, false );
-    //            displayHP( 100, 100 - ACPKMN( 1, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 1, OPPONENT ).m_stats.m_maxHP, 0, 8, HP_COL( 1, 1 ), HP_COL( 1, 1 ) + 1, false );
-    //            OamTop->oamBuffer[ OPP_PB_START + 1 ].x = 8;
-    //            OamTop->oamBuffer[ OPP_PB_START + 1 ].y = 17;
-    //            consoleSetWindow( &Top, 4, 2, 20, 5 );
-    //            printf( "%ls%c\nLv%d%4dKP", ACPKMN( 1, OPPONENT ).m_boxdata.m_Name, GENDER( ( *_player->m_pkmnTeam )[ ACPOS( 1, OPPONENT ) ] ),
-    //                    ACPKMN( 1, OPPONENT ).m_Level, ACPKMN( 1, OPPONENT ).m_stats.m_acHP );
-    //        }
-    //
-    //        consoleSelect( &Bottom );
-    //        for( int i = 1 + ( m_battleMode == DOUBLE && _opponent->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, OPPONENT ) != KO ); i < 6; ++i ) {
-    //            OamTop->oamBuffer[ OPP_PB_START + i ].x = -4 + 18 * i;
-    //            OamTop->oamBuffer[ OPP_PB_START + i ].y = -4;
-    //            OamTop->oamBuffer[ OPP_PB_START + i ].isHidden = false;
-    //            switch( ACPKMNSTS( i, OPPONENT ) ) {
-    //                case NA:
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].isHidden = true;
-    //                    break;
-    //                case KO:
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].palette = PB_PAL_START + 1;
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].gfxIndex += BattleBall1TilesLen / 32;
-    //                    break;
-    //                case STS:
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].palette = PB_PAL_START + 2;
-    //                    OamTop->oamBuffer[ OPP_PB_START + i ].gfxIndex += BattleBall1TilesLen / 16;
-    //                    break;
-    //                default:
-    //                    break;
-    //            }
-    //        }
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 80; ++i )
-    //            swiWaitForVBlank( );
-    //
-    //        if( abilities[ ACPKMN( 0, OPPONENT ).m_boxdata.m_ability ].m_type & ability::BEFORE_BATTLE ) {
-    //            clear( );
-    //            sprintf( buffer, "%s von\n %ls (Gegn.) wirkt!\n",
-    //                     abilities[ ACPKMN( 0, OPPONENT ).m_boxdata.m_ability ].m_abilityName.c_str( ),
-    //                     ACPKMN( 0, OPPONENT ).m_boxdata.m_Name );
-    //            cust_font.printString( buffer, 8, 8, true );
-    //            //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
-    //            for( int i = 0; i < 100; ++i )
-    //                swiWaitForVBlank( );
-    //        }
-    //        if( ( m_battleMode == DOUBLE ) && abilities[ ACPKMN( 1, OPPONENT ).m_boxdata.m_ability ].m_type & ability::BEFORE_BATTLE ) {
-    //            clear( );
-    //            sprintf( buffer, "%s von\n %ls (Gegn.) wirkt!\n",
-    //                     abilities[ ACPKMN( 1, OPPONENT ).m_boxdata.m_ability ].m_abilityName.c_str( ),
-    //                     ACPKMN( 1, OPPONENT ).m_boxdata.m_Name );
-    //            cust_font.printString( buffer, 8, 8, true );
-    //            //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
-    //            for( int i = 0; i < 100; ++i )
-    //                swiWaitForVBlank( );
-    //        }
-    //
-    //
-    //        //Own Side
-    //        consoleSelect( &Bottom );
-    //        clear( );
-    //        sprintf( buffer, "Los %ls! ", ACPKMN( 0, PLAYER ).m_boxdata.m_Name );
-    //        cust_font.printString( buffer, 8, 8, true );
-    //        consoleSelect( &Top );
-    //
-    //        animatePB( 20, 150 );
-    //        oamIndex = OWN_PKMN_1_START;
-    //        palcnt = OWN_PKMN_1_PAL;
-    //        nextAvailableTileIdx = OWN_PKMN_1_TILE;
-    //        if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
-    //            ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ), ACPKMN( 0, PLAYER ).m_boxdata.m_isFemale ) ) {
-    //            oamIndex = OWN_PKMN_1_START;
-    //            palcnt = OWN_PKMN_1_PAL;
-    //            nextAvailableTileIdx = OWN_PKMN_1_TILE;
-    //            loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
-    //                            ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ), !ACPKMN( 0, PLAYER ).m_boxdata.m_isFemale );
-    //        }
-    //        if( ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ) )
-    //            animateShiny( 6, 116 );
-    //
-    //        displayHP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, false );
-    //        displayHP( 100, 100 - ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 0, PLAYER ).m_stats.m_maxHP,
-    //                   256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, false );
-    //        displayEP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-    //
-    //        POKEMON::PKMNDATA::getAll( ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, p );
-    //        displayEP( 0, ( ACPKMN( 0, PLAYER ).m_boxdata.m_exp - POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level - 1 ][ p.m_expType ] ) * 100 /
-    //                   ( POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level ][ p.m_expType ] - POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level - 1 ][ p.m_expType ] ),
-    //                   256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-    //        OamTop->oamBuffer[ OWN_PB_START ].x = 256 - 88 - 32 + 4;
-    //        OamTop->oamBuffer[ OWN_PB_START ].y = 192 - 31 - 32;
-    //        consoleSetWindow( &Top, 21, 16, 20, 5 );
-    //
-    //        printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).m_boxdata.m_Name, GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).m_Level,
-    //                ACPKMN( 0, PLAYER ).m_stats.m_acHP );
-    //
-    //
-    //        OamTop->oamBuffer[ OWN_PB_START ].isHidden = OamTop->oamBuffer[ OWN_HP_1 ].isHidden = false;
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 80; ++i )
-    //            swiWaitForVBlank( );
-    //
-    //        if( ( m_battleMode == DOUBLE ) && _player->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, PLAYER ) != KO ) {
-    //            consoleSelect( &Bottom );
-    //            clear( );
-    //            sprintf( buffer, "Auf in den Kampf %ls! ", ACPKMN( 1, PLAYER ).m_boxdata.m_Name );
-    //            cust_font.printString( buffer, 8, 8, true );
-    //            consoleSelect( &Top );
-    //
-    //            animatePB( 80, 170 );
-    //
-    //            oamIndex = OWN_PKMN_2_START;
-    //            palcnt = OWN_PKMN_2_PAL;
-    //            nextAvailableTileIdx = OWN_PKMN_2_TILE;
-    //
-    //            if( !loadPKMNSprite( OamTop,
-    //                spriteInfoTop,
-    //                "nitro:/PICS/SPRITES/PKMNBACK/",
-    //                ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC,
-    //                50,
-    //                120,
-    //                oamIndex,
-    //                palcnt,
-    //                nextAvailableTileIdx,
-    //                false,
-    //                ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ),
-    //                ACPKMN( 1, PLAYER ).m_boxdata.m_isFemale ) ) {
-    //
-    //                oamIndex = OWN_PKMN_2_START;
-    //                palcnt = OWN_PKMN_2_PAL;
-    //                nextAvailableTileIdx = OWN_PKMN_2_TILE;
-    //                loadPKMNSprite( OamTop,
-    //                                spriteInfoTop,
-    //                                "nitro:/PICS/SPRITES/PKMNBACK/",
-    //                                ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC,
-    //                                50,
-    //                                120,
-    //                                oamIndex,
-    //                                palcnt,
-    //                                nextAvailableTileIdx,
-    //                                false,
-    //                                ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ),
-    //                                !ACPKMN( 1, PLAYER ).m_boxdata.m_isFemale );
-    //            }
-    //            if( ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ) )
-    //                animateShiny( 50 + 16, 136 );
-    //
-    //            OamTop->oamBuffer[ OWN_PB_START + 1 ].isHidden = OamTop->oamBuffer[ OWN_HP_2 ].isHidden = false;
-    //            updateOAM( OamTop );
-    //
-    //            displayHP( 100, 101, 256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, false );
-    //            displayHP( 100, 100 - ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 1, PLAYER ).m_stats.m_maxHP,
-    //                       256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, false );
-    //            displayEP( 100, 100, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
-    //            POKEMON::PKMNDATA::getAll( ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, p );
-    //            displayEP( 0, ( ACPKMN( 1, PLAYER ).m_boxdata.m_exp - POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level - 1 ][ p.m_expType ] ) * 100 /
-    //                       ( POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level ][ p.m_expType ] - POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level - 1 ][ p.m_expType ] ),
-    //                       256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
-    //
-    //            OamTop->oamBuffer[ OWN_PB_START + 1 ].x = 256 - 32 + 4;
-    //            OamTop->oamBuffer[ OWN_PB_START + 1 ].y = 192 - 31;
-    //            consoleSetWindow( &Top, 16, 20, 20, 5 );
-    //
-    //            printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).m_boxdata.m_Name, GENDER( ACPKMN( 1, PLAYER ) ) );
-    //            if( ACPKMN( 1, PLAYER ).m_Level < 10 )
-    //                printf( " " );
-    //            if( ACPKMN( 1, PLAYER ).m_Level < 100 )
-    //                printf( " " );
-    //            printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
-    //                    ACPKMN( 1, PLAYER ).m_stats.m_acHP );
-    //
-    //        }
-    //
-    //        for( int i = 1 + ( m_battleMode == DOUBLE && _player->m_pkmnTeam->size( ) > 1 && ACPKMNSTS( 1, PLAYER ) != KO ); i < 6; ++i ) {
-    //            OamTop->oamBuffer[ OWN_PB_START + i ].x = 236 - 18 * i;
-    //            OamTop->oamBuffer[ OWN_PB_START + i ].y = 196 - 16;
-    //            OamTop->oamBuffer[ OWN_PB_START + i ].isHidden = false;
-    //            switch( ACPKMNSTS( i, PLAYER ) ) {
-    //                case NA:
-    //                    OamTop->oamBuffer[ OWN_PB_START + i ].isHidden = true;
-    //                    break;
-    //                case KO:
-    //                    OamTop->oamBuffer[ OWN_PB_START + i ].palette = PB_PAL_START + 1;
-    //                    OamTop->oamBuffer[ OWN_PB_START + i ].gfxIndex += BattleBall1TilesLen / 32;
-    //                    break;
-    //                case STS:
-    //                    OamTop->oamBuffer[ OWN_PB_START + i ].palette = PB_PAL_START + 2;
-    //                    OamTop->oamBuffer[ OWN_PB_START + i ].gfxIndex += BattleBall1TilesLen / 16;
-    //                    break;
-    //                default:
-    //                    break;
-    //            }
-    //        }
-    //        updateOAM( OamTop );
-    //        for( int i = 0; i < 80; ++i )
-    //            swiWaitForVBlank( );
-    //
-    //        consoleSelect( &Bottom );
-    //        if( abilities[ ACPKMN( 0, PLAYER ).m_boxdata.m_ability ].m_type & ability::BEFORE_BATTLE ) {
-    //            clear( );
-    //            sprintf( buffer, "%s von\n %ls wirkt!\n",
-    //                     abilities[ ACPKMN( 0, PLAYER ).m_boxdata.m_ability ].m_abilityName.c_str( ),
-    //                     ACPKMN( 0, PLAYER ).m_boxdata.m_Name );
-    //            cust_font.printString( buffer, 8, 8, true );
-    //            //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
-    //            for( int i = 0; i < 100; ++i )
-    //                swiWaitForVBlank( );
-    //        }
-    //        if( ( m_battleMode == DOUBLE ) && abilities[ ACPKMN( 1, PLAYER ).m_boxdata.m_ability ].m_type & ability::BEFORE_BATTLE ) {
-    //            clear( );
-    //            sprintf( buffer, "%s von\n %ls wirkt!\n",
-    //                     abilities[ ACPKMN( 1, PLAYER ).m_boxdata.m_ability ].m_abilityName.c_str( ),
-    //                     ACPKMN( 1, PLAYER ).m_boxdata.m_Name );
-    //            cust_font.printString( buffer, 8, 8, true );
-    //            //abilities[(*_opponent->m_pkmnTeam)[_acPkmnPosition[0][1]].m_boxdata.m_ability].run();
-    //            for( int i = 0; i < 100; ++i )
-    //                swiWaitForVBlank( );
-    //        }
-    //
-    //        //OamTop->oamBuffer[4].isHidden = OamTop->oamBuffer[12].isHidden = false;
-    //
-    //        updateOAM( OamTop );
-    //
-    //        for( int i = 0; i <= 4; ++i )
-    //            Oam->oamBuffer[ i ].isHidden = false;
-    //        Oam->oamBuffer[ 2 ].isHidden = !SAV.m_activatedPNav;
-    //        updateOAMSub( Oam );
-    //        consoleSelect( &Bottom );
-    //        consoleClear( );
-    //    }
-    //
-    //    float criticalChances[ 5 ] = { 0.0625, 0.125, 0.25, 0.3333, 0.5 };
-    //    bool criticalOccured = false;
-    //    float eff = 1;
-    //    bool missed = false;
-    //    int calcDamage( const move& p_move, const POKEMON::pokemon& p_attackingPkmn, const POKEMON::pokemon& p_defendingPkmn, int p_randomValue ) {
-    //        if( p_move.m_moveHitType == move::moveHitTypes::STAT )
-    //            return 0;
-    //        eff = 1;
-    //        missed = false;
-    //        if( p_move.m_moveAccuracy && rand( ) * 1.0 / RAND_MAX > p_move.m_moveAccuracy / 100.0 ) {
-    //            missed = true;
-    //            return 0;
-    //        }
-    //
-    //        if( p_defendingPkmn.m_stats.m_acHP == 0 ) {
-    //            missed = true;
-    //            return 0;
-    //        }
-    //
-    //        int atkval = ( p_move.m_moveHitType == move::moveHitTypes::SPEC ? p_attackingPkmn.m_stats.m_SAtk : p_attackingPkmn.m_stats.m_Atk );
-    //        int defval = ( p_move.m_moveHitType == move::moveHitTypes::SPEC ? p_defendingPkmn.m_stats.m_SDef : p_defendingPkmn.m_stats.m_Def );
-    //
-    //        int baseDmg = ( ( ( ( 2 * p_attackingPkmn.m_Level ) / 5 + 2 ) * p_move.m_moveBasePower * atkval ) / defval ) / 50 + 2;
-    //
-    //        POKEMON::PKMNDATA::pokemonData p1, p2;
-    //        POKEMON::PKMNDATA::getAll( p_attackingPkmn.m_boxdata.m_speciesId, p1 );
-    //        POKEMON::PKMNDATA::getAll( p_defendingPkmn.m_boxdata.m_speciesId, p2 );
-    //
-    //        int vs = 1;
-    //        criticalOccured = false;
-    //
-    //        if( p_randomValue <= 15 )
-    //            if( p_randomValue >= 0 && rand( ) * 1.0 / RAND_MAX <= criticalChances[ vs ] ) {
-    //            baseDmg <<= 1;
-    //            criticalOccured = true;
-    //            }
-    //
-    //        if( p_randomValue == -1 )
-    //            p_randomValue = 0;
-    //        if( p_randomValue == -2 )
-    //            p_randomValue = 15;
-    //
-    //        baseDmg = ( baseDmg * ( 100 - p_randomValue ) ) / 100;
-    //
-    //        if( p_move.m_moveType == p1.m_types[ 0 ] || p_move.m_moveType == p1.m_types[ 1 ] )
-    //            baseDmg = ( baseDmg * 3 ) / 2;
-    //
-    //        eff = getEffectiveness( p_move.m_moveType, p2.m_types[ 0 ] );
-    //        if( p2.m_types[ 1 ] != p2.m_types[ 0 ] )
-    //            eff *= getEffectiveness( p_move.m_moveType, p2.m_types[ 1 ] );
-    //        baseDmg = baseDmg * eff;
-    //
-    //        return std::max( 1, baseDmg );
-    //    }
-    //
-    //    std::pair<int, int> ownAtk[ 2 ]; //AtkIdx; Target 1->opp[0]/2->opp[1]/3->both_opp/4->self/8->partner
-    //    std::pair<int, int> oppAtk[ 2 ]; //AtkIdx; Target 1->own[0]/2->own[1]/3->both_opp/4->self/8->partner
-    //    int switchWith[ 2 ][ 2 ] = { { 0 } };
-
-    //    void battle::printAttackChoiceScreen( int p_pkmnSlot, int& p_oamIndex, int& p_paletteIndex, int& p_tileIndex ) {
-    //        for( int i = 21; i < 29; i += 2 ) {
-    //            if( !( ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ) )
-    //                continue;
-    //
-    //            ( Oam->oamBuffer[ i ] ).isHidden = false;
-    //            ( Oam->oamBuffer[ i + 1 ] ).isHidden = false;
-    //            ( Oam->oamBuffer[ i + 1 ] ).y += 14 + 16 * ( ( i - 21 ) / 4 );
-    //            ( Oam->oamBuffer[ i ] ).y += 14 + 16 * ( ( i - 21 ) / 4 );
-    //            if( ( i / 2 ) % 2 )
-    //                ( Oam->oamBuffer[ i ] ).x -= 16;
-    //            else
-    //                ( Oam->oamBuffer[ i + 1 ] ).x += 16;
-    //            updateOAMSub( Oam );
-    //
-    //            consoleSetWindow( &Bottom, ( Oam->oamBuffer[ i ] ).x / 8 - 3, ( Oam->oamBuffer[ i ] ).y / 8 + 1, 17, 5 );
-    //            consoleClear( );
-    //            drawTypeIcon( Oam, spriteInfo, p_oamIndex, p_paletteIndex, p_tileIndex,
-    //                          AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveType,
-    //                          ( Oam->oamBuffer[ i ] ).x + 4, ( Oam->oamBuffer[ i ] ).y - 10, true );
-    //            printf( "    %s\n    AP %2hhu""/""%2hhu ",
-    //                    &( AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveName[ 0 ] ),
-    //                    ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_AcPP[ ( i - 21 ) / 2 ],
-    //                    AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_movePP *
-    //                    ( ( 5 + ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.PPupget( ( i - 21 ) / 2 ) ) / 5 ) );
-    //            switch( AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveHitType ) {
-    //                case move::PHYS:
-    //                    printf( "PHS" );
-    //                    break;
-    //                case move::SPEC:
-    //                    printf( "SPC" );
-    //                    break;
-    //                case move::STAT:
-    //                    printf( "STS" );
-    //                    break;
-    //            }
-    //            printf( "\n    S " );
-    //            if( AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveBasePower )
-    //                printf( "%3i", AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveBasePower );
-    //            else
-    //                printf( "---" );
-    //            printf( " G " );
-    //            if( AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveAccuracy )
-    //                printf( "%3i", AttackList[ ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] ]->m_moveAccuracy );
-    //            else
-    //                printf( "---" );
-    //        }
-    //    }
-
-    //    void battle::printTargetChoiceScreen( int p_pkmnSlot, int p_move, int& p_oamIndex, int& p_paletteIndex, int& p_tileIndex ) {
-    //        for( int i = 0; i < 5; ++i )
-    //            Oam->oamBuffer[ p_oamIndex + i ].isHidden = true;
-    //        for( int i = 21; i < 29; i += 2 ) {
-    //            ( Oam->oamBuffer[ i ] ).isHidden = false;
-    //            ( Oam->oamBuffer[ i + 1 ] ).isHidden = false;
-    //        }
-    //        updateOAMSub( Oam );
-    //
-    //        int poss = AttackList[ p_move ]->m_moveAffectsWhom;
-    //        //Opp1, Opp2, ME, Partner, 
-    //        bool validTrg[ 4 ] = {
-    //            poss == 0 || poss == 8 || poss == 32 || poss == 64,
-    //            poss == 0 || poss == 8 || poss == 32 || poss == 64,
-    //            poss == 16 || poss == 2 || poss == 4,
-    //            poss == 0 || poss == 2 || poss == 32
-    //        };
-    //        if( !p_pkmnSlot )
-    //            std::swap( validTrg[ 2 ], validTrg[ 3 ] );
-    //        POKEMON::pokemon& p_attackingPkmn = ACPKMN( p_pkmnSlot, PLAYER );
-    //
-    //
-    //        for( int i = 21; i < 29; i += 2 ) {
-    //            int u = ( i - 21 ) / 2;
-    //            if( m_battleMode != DOUBLE && ( u == 2 || u == 1 ) ) {
-    //                ( Oam->oamBuffer[ i ] ).isHidden = true;
-    //                ( Oam->oamBuffer[ i + 1 ] ).isHidden = true;
-    //                consoleSetWindow( &Bottom, ( Oam->oamBuffer[ i ] ).x / 8 - 3, ( Oam->oamBuffer[ i ] ).y / 8 + 1, 20, 5 );
-    //                consoleClear( );
-    //                continue;
-    //            }
-    //
-    //            POKEMON::pokemon &acPK = ( u / 2 ? ACPKMN( 1 - u % 2, PLAYER ) : ACPKMN( u % 2, OPPONENT ) );
-    //
-    //            if( acPK.m_stats.m_acHP == 0 ) {
-    //                ( Oam->oamBuffer[ i ] ).isHidden = true;
-    //                ( Oam->oamBuffer[ i + 1 ] ).isHidden = true;
-    //                consoleSetWindow( &Bottom, ( Oam->oamBuffer[ i ] ).x / 8 - 3, ( Oam->oamBuffer[ i ] ).y / 8 + 1, 20, 5 );
-    //                consoleClear( );
-    //                continue;
-    //            }
-    //
-    //            ( Oam->oamBuffer[ i ] ).isHidden = false;
-    //            ( Oam->oamBuffer[ i + 1 ] ).isHidden = false;
-    //            updateOAMSub( Oam );
-    //
-    //            consoleSetWindow( &Bottom, ( Oam->oamBuffer[ i ] ).x / 8 - 3, ( Oam->oamBuffer[ i ] ).y / 8 + 1, 20, 5 );
-    //            consoleClear( );
-    //
-    //
-    //            drawPKMNIcon( Oam, spriteInfo, acPK.m_boxdata.m_speciesId, ( Oam->oamBuffer[ i ] ).x - 4, ( Oam->oamBuffer[ i ] ).y - 16, p_oamIndex, p_paletteIndex, p_tileIndex, true );
-    //
-    //            updateOAMSub( Oam );
-    //
-    //            printf( "      %ls", acPK.m_boxdata.m_name );
-    //            if( validTrg[ u ] ) {
-    //                if( AttackList[ p_move ]->m_moveHitType != move::moveHitTypes::STAT )
-    //                    printf( "\n      %3d-%2d KP\n        Schaden",
-    //                    std::max( 1, calcDamage( *AttackList[ p_move ], p_attackingPkmn, acPK, -2 ) ),
-    //                    std::max( 1, calcDamage( *AttackList[ p_move ], p_attackingPkmn, acPK, -1 ) ) );
-    //                else
-    //                    printf( "\n       Keinen\n        Schaden" );
-    //            }
-    //        }
-    //    }
-
-    //    void battle::printPKMNSwitchScreen( int& p_oamIndex, int& p_paletteIndex, int& p_tileIndex ) {
-    //        setMainBattleVisibility( true );
-    //        consoleClear( );
-    //        dinit( );
-    //        for( int i = 0; i <= 8; ++i )
-    //            ( Oam->oamBuffer[ i ] ).isHidden = true;
-    //        ( Oam->oamBuffer[ 20 ] ).isHidden = false;
-    //        updateOAMSub( Oam );
-    //
-    //        int num = (int)_player->m_pkmnTeam->size( );
-    //        consoleSelect( &Bottom );
-    //
-    //        for( int i = 23; i < 32; i += ( ( ( i - 21 ) / 2 ) % 2 ? -2 : +6 ) ) {
-    //            if( ( ( ( i - 21 ) / 2 ) ^ 1 ) >= num )
-    //                break;
-    //            ( Oam->oamBuffer[ i ] ).isHidden = false;
-    //            ( Oam->oamBuffer[ i + 1 ] ).isHidden = false;
-    //            ( Oam->oamBuffer[ i + 1 ] ).y -= 16 * ( 2 - ( ( i - 21 ) / 4 ) );
-    //            ( Oam->oamBuffer[ i ] ).y -= 16 * ( 2 - ( ( i - 21 ) / 4 ) );
-    //            updateOAMSub( Oam );
-    //            consoleSetWindow( &Bottom, ( ( Oam->oamBuffer[ i ] ).x + 6 ) / 8, ( ( Oam->oamBuffer[ i ] ).y + 6 ) / 8, 12, 3 );
-    //            if( !ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_boxdata.m_IV.m_isEgg ) {
-    //                printf( "   %3i/%3i\n ",
-    //                        ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_stats.m_acHP,
-    //                        ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_stats.m_maxHP );
-    //                wprintf( ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_boxdata.m_Name );
-    //                printf( "\n" );
-    //                printf( "%11s",
-    //                        ItemList[ ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_boxdata.m_Item ].getDisplayName( ).c_str( ) );
-    //                drawPKMNIcon( Oam,
-    //                              spriteInfo,
-    //                              ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_boxdata.m_SPEC,
-    //                              ( Oam->oamBuffer[ i ] ).x - 4,
-    //                              ( Oam->oamBuffer[ i ] ).y - 20,
-    //                              p_oamIndex,
-    //                              p_paletteIndex,
-    //                              p_tileIndex,
-    //                              true );
-    //            } else {
-    //                printf( "\n Ei" );
-    //                drawEggIcon( Oam,
-    //                             spriteInfo,
-    //                             ( Oam->oamBuffer[ i ] ).x - 4,
-    //                             ( Oam->oamBuffer[ i ] ).y - 20,
-    //                             p_oamIndex,
-    //                             p_paletteIndex,
-    //                             p_tileIndex,
-    //                             true );
-    //            }
-    //            updateOAMSub( Oam );
-    //        }
-    //    }
-
-    //    int battle::getSwitchPkmn( int& p_oamIndex, int& p_paletteIndex, int& p_tileIndex, bool p_retA ) {
-    //        int res = -1;
-    //        int num = (int)_player->m_pkmnTeam->size( );
-    //        touchPosition t;
-    //        ( Oam->oamBuffer[ 20 ] ).isHidden = !p_retA;
-    //        while( 42 ) {
-    //            swiWaitForVBlank( );
-    //            updateOAMSub( Oam );
-    //            updateTime( );
-    //            touchRead( &t );
-    //
-    //            if( p_retA && t.px > 224 && t.py > 164 ) {
-    //                waitForTouchUp( );
-    //
-    //                consoleSelect( &Bottom );
-    //                consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-    //                consoleClear( );
-    //                for( int i = 5; i <= 8; ++i )
-    //                    ( Oam->oamBuffer[ i ] ).isHidden = false;
-    //                for( int i = 20; i <= p_oamIndex; ++i )
-    //                    ( Oam->oamBuffer[ i ] ).isHidden = true;
-    //                updateOAMSub( Oam );
-    //
-    //                for( int i = 23; i < 32; i += ( ( ( i - 21 ) / 2 ) % 2 ? -2 : +6 ) ) {
-    //                    if( ( ( ( i - 21 ) / 2 ) ^ 1 ) >= num )
-    //                        break;
-    //                    ( Oam->oamBuffer[ i + 1 ] ).y += 16 * ( 2 - ( ( i - 21 ) / 4 ) );
-    //                    ( Oam->oamBuffer[ i ] ).y += 16 * ( 2 - ( ( i - 21 ) / 4 ) );
-    //                }
-    //                init( );
-    //                return -1;
-    //            }
-    //            for( int i = 23; i < 32; i += ( ( ( i - 21 ) / 2 ) % 2 ? -2 : +6 ) )
-    //                if( ( ( ( i - 21 ) / 2 ) ^ 1 ) >= num )
-    //                    break;
-    //                else if( t.px > Oam->oamBuffer[ i ].x && t.py > Oam->oamBuffer[ i ].y && t.px - 64 < Oam->oamBuffer[ i + 1 ].x && t.py - 32 < Oam->oamBuffer[ i ].y ) {
-    //                    if( ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_boxdata.m_IV.m_isEgg ||
-    //                        ACPKMN( ( ( i - 21 ) / 2 ) ^ 1, PLAYER ).m_stats.m_acHP == 0 ||
-    //                        ( ( ( i - 21 ) / 2 ) ^ 1 ) < ( 1 + ( m_battleMode == DOUBLE ) ) )
-    //                        continue;
-    //
-    //                    ( Oam->oamBuffer[ i ] ).isHidden = true;
-    //                    ( Oam->oamBuffer[ i + 1 ] ).isHidden = true;
-    //                    ( Oam->oamBuffer[ 3 + ( ( ( i - 21 ) / 2 ) ^ 1 ) ] ).isHidden = true;
-    //                    updateOAMSub( Oam );
-    //
-    //                    waitForTouchUp( );
-    //
-    //                    res = ( ( ( i - 21 ) / 2 ) ^ 1 );
-    //                    goto OUT2;
-    //                }
-    //        }
-    //OUT2:
-    //        consoleSelect( &Bottom );
-    //        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-    //        consoleClear( );
-    //        for( int i = 5; i <= 8; ++i )
-    //            ( Oam->oamBuffer[ i ] ).isHidden = false;
-    //        for( int i = 20; i <= p_oamIndex; ++i )
-    //            ( Oam->oamBuffer[ i ] ).isHidden = true;
-    //        for( int i = 23; i < 32; i += ( ( ( i - 21 ) / 2 ) % 2 ? -2 : +6 ) ) {
-    //            if( ( ( ( i - 21 ) / 2 ) ^ 1 ) >= num )
-    //                break;
-    //            ( Oam->oamBuffer[ i + 1 ] ).y += 16 * ( 2 - ( ( i - 21 ) / 4 ) );
-    //            ( Oam->oamBuffer[ i ] ).y += 16 * ( 2 - ( ( i - 21 ) / 4 ) );
-    //        }
-    //        updateOAMSub( Oam );
-    //        init( );
-    //
-    //        return res;
-    //    }
-
-    //#define BATTLE_END  -1
-    //#define RETRY       +1
-    //#define RETRY2       -2
-    //#define SUCCESS     +2
-    //    int battle::getChoice( int p_pkmnSlot ) {
-    //        touchPosition t;
-    //
-    //        ( Oam->oamBuffer[ 20 ] ).isHidden = !p_pkmnSlot;
-    //        updateOAMSub( Oam );
-    //
-    //        setMainBattleVisibility( false );
-    //        int oamIndex = oamIndexS, paletteIndex = palcntS, tileIndex = nextAvailableTileIdxS;
-    //        drawPKMNIcon( Oam, spriteInfo, ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_SPEC, 112, 64, oamIndex, paletteIndex, tileIndex, true );
-    //        clear( );
-    //        sprintf( buffer, "Was soll %ls tun?", ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Name );
-    //        cust_font.printString( buffer, 8, 8, true );
-    //        updateOAMSub( Oam );
-    //
-    //        int aprest = 0;
-    //
-    //        while( 42 ) {
-    //            updateTime( );
-    //            swiWaitForVBlank( );
-    //            touchRead( &t );
-    //            if( p_pkmnSlot && t.px > 224 && t.py > 164 ) {
-    //                waitForTouchUp( );
-    //
-    //                return RETRY2;
-    //            }
-    //            //BEGIN FIGHT
-    //            else if( t.px > 64 && t.px < 64 + 128 && t.py > 72 && t.py < 72 + 64 ) {
-    //                waitForTouchUp( );
-    //                setMainBattleVisibility( true );
-    //                Oam->oamBuffer[ oamIndexS + 1 ].isHidden = true;
-    //                consoleClear( );
-    //
-    //                aprest = 0;
-    //                for( int i = 0; i < 4; ++i )
-    //                    aprest += ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_AcPP[ i ];
-    //                if( aprest == 0 ) {
-    //                    clear( );
-    //                    printf( "%ls hat keine\n restlichen Attacken...", ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Name );
-    //                    cust_font.printString( buffer, 8, 8, true );
-    //                    ownAtk[ p_pkmnSlot ] = std::pair<int, int>( 165, 1 | 2 | 4 | 8 );
-    //                } else {
-    //                    ( Oam->oamBuffer[ 20 ] ).isHidden = false;
-    //
-    //                    oamIndex = oamIndexS; paletteIndex = palcntS; tileIndex = nextAvailableTileIdxS;
-    //                    printAttackChoiceScreen( p_pkmnSlot, oamIndex, paletteIndex, tileIndex );
-    //
-    //                    updateOAMSub( Oam );
-    //                    consoleSetWindow( &Bottom, 0, 0, 32, 5 );
-    //                    clear( );
-    //                    sprintf( buffer, "Welchen Angriff?" );
-    //                    cust_font.printString( buffer, 8, 8, true );
-    //
-    //                    while( 42 ) {
-    //                        updateTime( );
-    //                        swiWaitForVBlank( );
-    //                        touchRead( &t );
-    //                        if( t.px > 224 && t.py > 164 ) { //Back  
-    //                            waitForTouchUp( );
-    //
-    //                            consoleSelect( &Bottom );
-    //                            consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-    //                            consoleClear( );
-    //                            for( int i = 20; i <= oamIndex; ++i )
-    //                                ( Oam->oamBuffer[ i ] ).isHidden = true;
-    //                            setMainBattleVisibility( false );
-    //
-    //
-    //                            for( int i = 21; i < 29; i += 2 ) {
-    //                                ( Oam->oamBuffer[ i ] ).isHidden = true;
-    //                                ( Oam->oamBuffer[ i + 1 ] ).isHidden = true;
-    //                                ( Oam->oamBuffer[ i + 1 ] ).y -= 14 + 16 * ( ( i - 21 ) / 4 );
-    //                                ( Oam->oamBuffer[ i ] ).y -= 14 + 16 * ( ( i - 21 ) / 4 );
-    //
-    //                                if( ( i / 2 ) % 2 )
-    //                                    ( Oam->oamBuffer[ i ] ).x += 16;
-    //                                else
-    //                                    ( Oam->oamBuffer[ i + 1 ] ).x -= 16;
-    //                                updateOAMSub( Oam );
-    //                            }
-    //
-    //                            return RETRY;
-    //                        }
-    //
-    //                        for( int i = 21; i < 29; i += 2 )
-    //                            if( t.px>( Oam->oamBuffer[ i ].x ) && t.px < ( Oam->oamBuffer[ i + 1 ].x + 64 ) &&
-    //                                t.py>( Oam->oamBuffer[ i ] ).y && t.py < ( Oam->oamBuffer[ i ].y + 32 ) ) {
-    //                            if( !ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] )
-    //                                continue;
-    //                            if( !ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_AcPP[ ( i - 21 ) / 2 ] )
-    //                                continue;
-    //
-    //                            while( 1 ) {
-    //                                swiWaitForVBlank( );
-    //                                updateTime( false );
-    //                                scanKeys( );
-    //                                t = touchReadXY( );
-    //                                if( t.px == 0 && t.py == 0 )
-    //                                    break;
-    //                            }
-    //                            int trg = getTarget( p_pkmnSlot, ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ] );
-    //                            if( trg == 0 ) {
-    //                                oamIndex = oamIndexS; paletteIndex = palcntS; tileIndex = nextAvailableTileIdxS;
-    //                                for( int i = 21; i < 29; i += 2 ) {
-    //                                    ( Oam->oamBuffer[ i ] ).isHidden = true;
-    //                                    ( Oam->oamBuffer[ i + 1 ] ).isHidden = true;
-    //                                    ( Oam->oamBuffer[ i + 1 ] ).y -= 14 + 16 * ( ( i - 21 ) / 4 );
-    //                                    ( Oam->oamBuffer[ i ] ).y -= 14 + 16 * ( ( i - 21 ) / 4 );
-    //
-    //                                    if( ( i / 2 ) % 2 )
-    //                                        ( Oam->oamBuffer[ i ] ).x += 16;
-    //                                    else
-    //                                        ( Oam->oamBuffer[ i + 1 ] ).x -= 16;
-    //
-    //                                    updateOAMSub( Oam );
-    //                                }
-    //                                printAttackChoiceScreen( p_pkmnSlot, oamIndex, paletteIndex, tileIndex );
-    //
-    //                                updateOAMSub( Oam );
-    //                                consoleSetWindow( &Bottom, 0, 0, 32, 5 );
-    //                                clear( );
-    //                                sprintf( buffer, "Welchen Angriff?" );
-    //                                cust_font.printString( buffer, 8, 8, true );
-    //                                break;
-    //                            }
-    //
-    //                            ownAtk[ p_pkmnSlot ] = std::pair<int, int>( ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Attack[ ( i - 21 ) / 2 ], trg );
-    //                            ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_AcPP[ ( i - 21 ) / 2 ]--;
-    //                            goto ATTACKCHOSEN;
-    //                            }
-    //                    }
-    //ATTACKCHOSEN:
-    //                    for( int i = 21; i < 29; i += 2 ) {
-    //                        ( Oam->oamBuffer[ i ] ).isHidden = true;
-    //                        ( Oam->oamBuffer[ i + 1 ] ).isHidden = true;
-    //                        ( Oam->oamBuffer[ i + 1 ] ).y -= 14 + 16 * ( ( i - 21 ) / 4 );
-    //                        ( Oam->oamBuffer[ i ] ).y -= 14 + 16 * ( ( i - 21 ) / 4 );
-    //
-    //                        if( ( i / 2 ) % 2 )
-    //                            ( Oam->oamBuffer[ i ] ).x += 16;
-    //                        else
-    //                            ( Oam->oamBuffer[ i + 1 ] ).x -= 16;
-    //
-    //                        updateOAMSub( Oam );
-    //                    }
-    //                    for( int i = oamIndex; i >= oamIndex - 3; --i )
-    //                        ( Oam->oamBuffer[ i ] ).isHidden = true;
-    //                    updateOAMSub( Oam );
-    //                    consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-    //                    consoleClear( );
-    //                    consoleSetWindow( &Bottom, 0, 0, 32, 5 );
-    //                }
-    //                return SUCCESS;
-    //            }
-    //            //END FIGHT
-    //            //BEGIN BAG
-    //            else if( t.px > 16 && t.px < 16 + 64 && t.py > 144 && t.py < 144 + 32 ) {
-    //                waitForTouchUp( );
-    //                return BATTLE_END;
-    //            }
-    //            //END BAG
-    //            //BEGIN POKENAV
-    //            else if( SAV.m_activatedPNav && t.px > 96 && t.px < 96 + 64 && t.py > 152 && t.py < 152 + 32 ) {
-    //                waitForTouchUp( );
-    //                printf( "TEST3" );
-    //            }
-    //            //END POKENAV
-    //            //BEGIN pokemon
-    //            else if( t.px > 176 && t.px < 176 + 64 && t.py > 144 && t.py < 144 + 32 ) {
-    //                waitForTouchUp( );
-    //
-    //                oamIndex = oamIndexS; paletteIndex = palcntS; tileIndex = nextAvailableTileIdxS;
-    //                printPKMNSwitchScreen( oamIndex, paletteIndex, tileIndex );
-    //
-    //                int res = getSwitchPkmn( oamIndex, paletteIndex, tileIndex, true );
-    //
-    //                if( res == -1 )
-    //                    return RETRY;
-    //
-    //                switchWith[ p_pkmnSlot ][ PLAYER ] = res;
-    //
-    //                return SUCCESS;
-    //            }
-    //            //END pokemon
-    //        }
-    //    }
-
-    //#define OPP_1   1
-    //#define OPP_2   2
-    //#define ME      4
-    //#define PARTNER 8
-    //#define OWN_FIELD 16
-    //#define OPP_FIELD 32
-    //    int battle::getTarget( int p_pkmnSlot, int p_move ) {
-    //        int ret = 0;
-    //
-    //        touchPosition t;
-    //
-    //        ( Oam->oamBuffer[ 20 ] ).isHidden = false;
-    //        updateOAMSub( Oam );
-    //
-    //        clear( );
-    //        sprintf( buffer, "Wen soll %ls angreifen?", ACPKMN( p_pkmnSlot, PLAYER ).m_boxdata.m_Name );
-    //        cust_font.printString( buffer, 8, 8, true );
-    //
-    //        int oamIndex = oamIndexS, paletteIndex = palcntS, tileIndex = nextAvailableTileIdxS;
-    //        printTargetChoiceScreen( p_pkmnSlot, p_move, oamIndex, paletteIndex, tileIndex );
-    //
-    //        int poss = AttackList[ p_move ]->m_moveAffectsWhom;
-    //        //Opp1, Opp2, ME, Partner
-    //        bool validTrg[ 4 ] = {
-    //            poss == 0 || poss == 8 || poss == 32 || poss == 64,
-    //            poss == 0 || poss == 8 || poss == 32 || poss == 64,
-    //            poss == 16 || poss == 2 || poss == 4,
-    //            poss == 0 || poss == 2 || poss == 32
-    //        };
-    //        if( !p_pkmnSlot )
-    //            std::swap( validTrg[ 2 ], validTrg[ 3 ] );
-    //
-    //        int change = 0;
-    //
-    //        while( 42 ) {
-    //            if( ++change == 60 ) {
-    //                bool changeA[ 4 ] = { false };
-    //
-    //                if( poss & 2 )
-    //                    changeA[ 2 ] = changeA[ 3 ] = true;
-    //                if( ( poss & 8 ) || ( poss & 32 ) || ( poss & 64 ) )
-    //                    changeA[ 0 ] = changeA[ 1 ] = true;
-    //                if( poss & 32 )
-    //                    changeA[ 2 + ( p_pkmnSlot ) ] = true;
-    //
-    //                for( int i = 21; i < 29; i += 2 ) {
-    //                    if( m_battleMode == DOUBLE && changeA[ ( i - 21 ) / 2 ] ) {
-    //                        int u = ( i - 21 ) / 2;
-    //
-    //                        POKEMON::pokemon &acPK = ( ( u / 2 ) ? ACPKMN( 1 - u % 2, PLAYER ) : ACPKMN( u % 2, OPPONENT ) );
-    //
-    //                        if( acPK.m_stats.m_acHP == 0 )
-    //                            continue;
-    //
-    //                        Oam->oamBuffer[ i ].isHidden = !Oam->oamBuffer[ i ].isHidden;
-    //                        Oam->oamBuffer[ i + 1 ].isHidden = !Oam->oamBuffer[ i + 1 ].isHidden;
-    //                    }
-    //                }
-    //                updateOAMSub( Oam );
-    //                change = 0;
-    //            }
-    //            updateTime( );
-    //            swiWaitForVBlank( );
-    //            touchRead( &t );
-    //            if( t.px>224 && t.py > 164 ) { //Back  
-    //                waitForTouchUp( );
-    //                return 0;
-    //            }
-    //
-    //            for( int i = 21; i < 29; i += 2 ) {
-    //                if( t.px>( Oam->oamBuffer[ i ].x ) && t.px < ( Oam->oamBuffer[ i + 1 ].x + 64 ) &&
-    //                    t.py>( Oam->oamBuffer[ i ] ).y && t.py < ( Oam->oamBuffer[ i ].y + 32 ) ) {
-    //                    int u = ( i - 21 ) / 2;
-    //                    if( m_battleMode != DOUBLE && ( u == 2 || u == 1 ) )
-    //                        continue;
-    //                    if( !validTrg[ u ] )
-    //                        continue;
-    //
-    //                    POKEMON::pokemon &acPK = ( ( u / 2 ) ? ACPKMN( 1 - u % 2, PLAYER ) : ACPKMN( u % 2, OPPONENT ) );
-    //
-    //                    if( acPK.m_stats.m_acHP == 0 ) {
-    //                        ( Oam->oamBuffer[ i ] ).isHidden = true;
-    //                        ( Oam->oamBuffer[ i + 1 ] ).isHidden = true;
-    //                        consoleSetWindow( &Bottom, ( Oam->oamBuffer[ i ] ).x / 8 - 3, ( Oam->oamBuffer[ i ] ).y / 8 + 1, 20, 5 );
-    //                        consoleClear( );
-    //                        continue;
-    //                    }
-    //
-    //                    while( 1 ) {
-    //                        swiWaitForVBlank( );
-    //                        updateTime( false );
-    //                        scanKeys( );
-    //                        t = touchReadXY( );
-    //                        if( t.px == 0 && t.py == 0 )
-    //                            break;
-    //                    }
-    //                    ret = ( 1 << u );
-    //                    if( u == 2 && p_pkmnSlot == 0 )
-    //                        ret = PARTNER;
-    //                    if( poss & 2 )
-    //                        ret = OWN_FIELD;
-    //                    if( poss & 4 )
-    //                        ret = ( 2 << ( rand( ) % 3 ) );
-    //                    if( ( poss & 8 ) || ( poss & 32 ) )
-    //                        ret |= OPP_1 | OPP_2;
-    //                    if( poss & 32 )
-    //                        ret |= PARTNER;
-    //                    if( poss & 64 )
-    //                        ret = OPP_FIELD;
-    //
-    //                    return ret;
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    bool participated[ 6 ] = { false };
-    //#define LUCKY_EGG_EFFEKT     42
-    //    int calcEXP( const POKEMON::pokemon& p_move, int p_atkind, const POKEMON::pokemon& p_defendingPkmn, bool p_wild ) {
-    //        if( !SAV.m_EXPShareEnabled && !participated[ p_atkind ] )
-    //            return 0;
-    //
-    //        float a = p_wild ? 1 : 1.5;
-    //        POKEMON::PKMNDATA::getAll( p_defendingPkmn.m_boxdata.m_speciesId, p );
-    //        int b = p.m_EXPYield;
-    //
-    //        float e = ItemList[ p_move.m_boxdata.m_holdItem ].getEffectType( ) == LUCKY_EGG_EFFEKT ? 1.5 : 1;
-    //
-    //        int L = p_move.m_Level;
-    //
-    //        int s = 1;
-    //        if( SAV.m_EXPShareEnabled && !participated[ p_atkind ] )
-    //            s = 2;
-    //
-    //        float t = ( p_move.m_boxdata.m_oTId == SAV.m_Id && p_move.m_boxdata.m_oTSid == SAV.m_Sid ? 1 : 1.5 );
-    //
-    //        return int( ( a * t* b* e* L ) / ( 7 * s ) );
-    //    }
-
-    //    void printEFFLOG( const POKEMON::pokemon& P, int p_move ) {
-    //        if( AttackList[ p_move ]->m_moveHitType == move::moveHitTypes::STAT )
-    //            return;
-    //
-    //        if( missed ) {
-    //            clear( );
-    //            if( P.m_stats.m_acHP )
-    //                sprintf( buffer, "%ls wich der Attacke aus.", P.m_boxdata.m_name );
-    //            else
-    //                sprintf( buffer, "Die Attacke ging daneben..." );
-    //            cust_font.printString( buffer, 8, 8, true );
-    //            for( int i = 0; i < 75; ++i )
-    //                swiWaitForVBlank( );
-    //            return;
-    //        }
-    //        if( eff != 1 )
-    //            clear( );
-    //        if( eff > 3 )
-    //            sprintf( buffer, "Das ist enorm effektiv\ngegen %ls!", P.m_boxdata.m_name );
-    //        else if( eff > 1 )
-    //            sprintf( buffer, "Das ist sehr effektiv\ngegen %ls!", P.m_boxdata.m_name );
-    //        else if( eff == 0 )
-    //            sprintf( buffer, "Hat die Attacke\n%lsgetroffen?", P.m_boxdata.m_name );
-    //        else if( eff < 0.3 )
-    //            sprintf( buffer, "Das ist nur enorm wenig\neffektiv gegen %ls...", P.m_boxdata.m_name );
-    //        else if( eff < 1 )
-    //            sprintf( buffer, "Das ist nicht sehr effektiv\ngegen %ls.", P.m_boxdata.m_name );
-    //
-    //        if( eff != 1 ) {
-    //            cust_font.printString( buffer, 8, 8, true );
-    //            for( int i = 0; i < 75; ++i )
-    //                swiWaitForVBlank( );
-    //        }
-    //        if( criticalOccured ) {
-    //            clear( );
-    //            cust_font.printString( "Ein Volltreffer!", 8, 8, true );
-    //            for( int i = 0; i < 75; ++i )
-    //                swiWaitForVBlank( );
-    //        }
-    //    }
-
-    //    int battle::start( int p_battleBack, weather p_weather ) {
-    //        drawSub( );
-    //
-    //        for( int i = 0; i < 6; ++i )
-    //            participated[ i ] = false;
-    //
-    //        videoSetMode( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-    //        drawTopBack( );
-    //        initBattleScene( p_battleBack, p_weather );
-    //        //touchPosition t;
-    //
-    //        while( ( _round-- ) != 0 ) {
-    //            switchWith[ 0 ][ OPPONENT ] = switchWith[ 0 ][ PLAYER ] =
-    //                switchWith[ 1 ][ OPPONENT ] = switchWith[ 1 ][ PLAYER ] = 0;
-    //
-    //            //Switch Out KOed pokemon
-    //
-    //            //Own
-    //            if( ACPKMNSTS( 0, PLAYER ) == KO ) {
-    //                int pcnt = 0, at = 0;
-    //                for( int i = 1 + ( m_battleMode == DOUBLE ); i < 6; ++i )
-    //                    if( ACPKMNSTS( i, PLAYER ) != KO ) {
-    //                    //switchOwnPkmn(i,0);
-    //                    pcnt++;
-    //                    at = i;
-    //                    }
-    //                if( pcnt == 1 )
-    //                    switchOwnPkmn( at, 0 );
-    //                else if( pcnt > 1 ) {
-    //                    int oamIndex = oamIndexS,
-    //                        paletteIndex = palcntS,
-    //                        tileIndex = nextAvailableTileIdxS;
-    //                    printPKMNSwitchScreen( oamIndex, paletteIndex, tileIndex );
-    //
-    //                    int res = getSwitchPkmn( oamIndex, paletteIndex, tileIndex, false );
-    //                    switchOwnPkmn( res, 0 );
-    //                }
-    //            }
-    //            if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, PLAYER ) == KO ) {
-    //                int pcnt = 0, at = 0;
-    //                for( int i = 2; i < 6; ++i ) {
-    //                    if( ACPKMNSTS( i, PLAYER ) != KO ) {
-    //                        //switchOwnPkmn(i,0);
-    //                        pcnt++;
-    //                        at = i;
-    //                    }
-    //                }
-    //                if( pcnt == 1 )
-    //                    switchOwnPkmn( at, 1 );
-    //                else if( pcnt > 1 ) {
-    //                    int oamIndex = oamIndexS,
-    //                        paletteIndex = palcntS,
-    //                        tileIndex = nextAvailableTileIdxS;
-    //                    printPKMNSwitchScreen( oamIndex, paletteIndex, tileIndex );
-    //
-    //                    int res = getSwitchPkmn( oamIndex, paletteIndex, tileIndex, false );
-    //                    switchOwnPkmn( res, 1 );
-    //                }
-    //            }
-    //
-    //            if( ACPKMNSTS( 0, PLAYER ) == KO && ( m_battleMode != DOUBLE || ACPKMNSTS( 1, PLAYER ) == KO || ACPKMNSTS( 1, PLAYER ) == NA ) ) {
-    //                //Player lost
-    //                clear( );
-    //                cust_font.printString( _opponent->getWinMsg( ), 8, 8, true );
-    //                for( int i = 0; i < 75; ++i )
-    //                    swiWaitForVBlank( );
-    //
-    //                dinit( );
-    //                consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-    //                consoleSelect( &Bottom );
-    //                consoleClear( );
-    //                initOAMTableSub( Oam );
-    //                initMainSprites( Oam, spriteInfo );
-    //                setMainSpriteVisibility( false );
-    //                Oam->oamBuffer[ 8 ].isHidden = true;
-    //                Oam->oamBuffer[ 0 ].isHidden = true;
-    //                Oam->oamBuffer[ 1 ].isHidden = false;
-    //                return -1;
-    //            }
-    //
-    //            //Opp
-    //            if( ACPKMNSTS( 0, OPPONENT ) == KO )
-    //                for( size_t i = 1 + ( m_battleMode == DOUBLE ); i < _opponent->m_pkmnTeam->size( ); ++i )
-    //                    if( ACPKMNSTS( i, OPPONENT ) != KO ) {
-    //                switchOppPkmn( i, 0 );
-    //                for( int i = 0; i < 6; ++i )
-    //                    participated[ i ] = false;
-    //                break;
-    //                    }
-    //            if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, OPPONENT ) == KO )
-    //                for( size_t i = 2; i < _opponent->m_pkmnTeam->size( ); ++i )
-    //                    if( ACPKMNSTS( i, OPPONENT ) != KO ) {
-    //                switchOppPkmn( i, 1 );
-    //                for( int i = 0; i < 6; ++i )
-    //                    participated[ i ] = false;
-    //                break;
-    //                    }
-    //            if( ACPKMNSTS( 0, OPPONENT ) == KO && ( m_battleMode != DOUBLE || ACPKMNSTS( 1, OPPONENT ) == KO || ACPKMNSTS( 1, OPPONENT ) == NA ) ) {
-    //                //Opp lost
-    //                clear( );
-    //                cust_font.printString( _opponent->getLooseMsg( ), 8, 8, true );
-    //                for( int i = 0; i < 75; ++i )
-    //                    swiWaitForVBlank( );
-    //
-    //                SAV.m_money += _opponent->getLooseMoney( );
-    //                clear( );
-    //                sprintf( buffer, "Du gewinnst %dP!", _opponent->getLooseMoney( ) );
-    //                cust_font.printString( buffer, 8, 8, true );
-    //                for( int i = 0; i < 75; ++i )
-    //                    swiWaitForVBlank( );
-    //
-    //                dinit( );
-    //                consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-    //                consoleSelect( &Bottom );
-    //                consoleClear( );
-    //                initOAMTableSub( Oam );
-    //                initMainSprites( Oam, spriteInfo );
-    //                setMainSpriteVisibility( false );
-    //                Oam->oamBuffer[ 8 ].isHidden = true;
-    //                Oam->oamBuffer[ 0 ].isHidden = true;
-    //                Oam->oamBuffer[ 1 ].isHidden = false;
-    //                return 1;
-    //            }
-    //            //End of Switch Out
-    //
-    //            participated[ ACPOS( 0, PLAYER ) ] = true;
-    //            if( ( m_battleMode == DOUBLE ) )
-    //                participated[ ACPOS( 1, PLAYER ) ] = true;
-    //
-    //            consoleSelect( &Bottom );
-    //
-    //BEFORE_0:
-    //            if( ACPKMNSTS( 0, PLAYER ) != KO ) {
-    //                switch( getChoice( 0 ) ) {
-    //                    case SUCCESS:
-    //                        goto BEFORE_1;
-    //                    case RETRY:
-    //                        switchWith[ 0 ][ PLAYER ] = 0;
-    //                        goto BEFORE_0;
-    //                    case BATTLE_END:
-    //                        goto END;
-    //                }
-    //            }
-    //BEFORE_1:
-    //            if( ( m_battleMode == DOUBLE ) && ACPKMNSTS( 1, PLAYER ) != KO )
-    //                switch( getChoice( 1 ) ) {
-    //                    case RETRY:
-    //                        switchWith[ 1 ][ PLAYER ] = 0;
-    //                        goto BEFORE_1;
-    //                    case RETRY2:
-    //                        switchWith[ 0 ][ PLAYER ] = switchWith[ 1 ][ PLAYER ] = 0;
-    //                        goto BEFORE_0;
-    //                    case BATTLE_END:
-    //                        goto END;
-    //            }
-    //
-    //            ( Oam->oamBuffer[ 20 ] ).isHidden = true;
-    //            updateOAMSub( Oam );
-    //            //OPP'S ACTIONS
-    //            switchWith[ 0 ][ OPPONENT ] = switchWith[ 0 ][ PLAYER ];
-    //            switchWith[ 1 ][ OPPONENT ] = switchWith[ 1 ][ PLAYER ];
-    //            oppAtk[ 0 ] = std::pair<int, int>( ACPKMN( 0, OPPONENT ).m_boxdata.m_Attack[ 0 ], 1 );
-    //            oppAtk[ 1 ] = std::pair<int, int>( ACPKMN( 1, OPPONENT ).m_boxdata.m_Attack[ 0 ], 2 );
-    //
-    //
-    //            consoleClear( );
-    //
-    //            int inits[ 4 ] = { 0 }, ranking[ 4 ] = { 0 };
-    //
-    //            int maxst = ( m_battleMode == DOUBLE ) ? 4 : 2;
-    //
-    //            for( int i = 0; i < maxst; ++i )
-    //                if( i % 2 )
-    //                    inits[ i ] = ( *_opponent->m_pkmnTeam )[ _acPkmnPosition[ i / 2 ][ OPPONENT ] ].m_stats.m_Spd;
-    //                else
-    //                    inits[ i ] = ( *_player->m_pkmnTeam )[ _acPkmnPosition[ i / 2 ][ PLAYER ] ].m_stats.m_Spd;
-    //
-    //            bool ko[ 2 ][ 2 ] = { { false } };
-    //
-    //            for( int i = 0; i < maxst; ++i ) {
-    //                for( int j = 0, max = -1; j < maxst; ++j )
-    //                    if( inits[ j ] > max && ( !i || ( ranking[ i - 1 ] != j && inits[ ranking[ i - 1 ] ] >= inits[ j ] ) ) ) {
-    //                    max = inits[ j ];
-    //                    ranking[ i ] = j;
-    //                    }
-    //                for( int i = 0; i < maxst; ++i ) {
-    //                    int prio = 0;
-    //                    if( i % 2 )
-    //                        prio = AttackList[ oppAtk[ i / 2 ].first ]->m_movePriority;
-    //                    else
-    //                        prio = AttackList[ ownAtk[ i / 2 ].first ]->m_movePriority;
-    //                    ranking[ i ] -= 4 * prio;
-    //                }
-    //            }
-    //            for( int i = 0; i < maxst; ++i ) {
-    //                int acin = 0;
-    //                for( int j = 0, min = 100; j < maxst; ++j )
-    //                    if( ranking[ j ] < min ) {
-    //                    acin = j;
-    //                    min = ranking[ j ];
-    //                    }
-    //                ranking[ acin ] = 42442;
-    //
-    //                bool opp = acin % 2;
-    //
-    //                if( opp ) {
-    //                    if( ACPKMN( acin / 2, OPPONENT ).m_stats.m_acHP == 0 )
-    //                        continue;
-    //                } else
-    //                    if( ACPKMN( acin / 2, PLAYER ).m_stats.m_acHP == 0 )
-    //                        continue;
-    //
-    //                if( switchWith[ acin / 2 ][ opp ] ) {
-    //                    if( opp )
-    //                        switchOppPkmn( switchWith[ acin / 2 ][ opp ], acin / 2 );
-    //                    else
-    //                        switchOwnPkmn( switchWith[ acin / 2 ][ opp ], acin / 2 );
-    //                    continue;
-    //                }
-    //
-    //                ko[ 0 ][ PLAYER ] = ko[ 0 ][ OPPONENT ] = ko[ 1 ][ PLAYER ] = ko[ 1 ][ OPPONENT ] = false;
-    //                consoleSelect( &Top );
-    //
-    //                if( opp )
-    //                    sprintf( buffer,
-    //                    "%ls (Gegner)\nsetzt %s ein!",
-    //                    ACPKMN( acin / 2, OPPONENT ).m_boxdata.m_Name,
-    //                    AttackList[ oppAtk[ acin / 2 ].first ]->m_moveName.c_str( ) );
-    //                else
-    //                    sprintf( buffer,
-    //                    "%ls setzt\n%s ein!",
-    //                    ACPKMN( acin / 2, PLAYER ).m_boxdata.m_Name,
-    //                    AttackList[ ownAtk[ acin / 2 ].first ]->m_moveName.c_str( ) );
-    //                clear( );
-    //                cust_font.printString( buffer, 8, 8, true );
-    //                for( int i = 0; i < 70; ++i )
-    //                    swiWaitForVBlank( );
-    //                if( opp ) {
-    //                    int tg = oppAtk[ acin / 2 ].second;
-    //                    int dmg1 = 0, dmg2 = 0, dmg3 = 0;
-    //                    if( tg & 1 ) {
-    //                        missed = false;
-    //                        dmg1 = calcDamage( *AttackList[ oppAtk[ acin / 2 ].first ], ACPKMN( acin / 2, OPPONENT ), ACPKMN( 0, PLAYER ), rand( ) % 15 );
-    //
-    //                        if( !missed ) {
-    //                            int old = ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 0, PLAYER ).m_stats.m_maxHP;
-    //                            ACPKMN( 0, PLAYER ).m_stats.m_acHP = std::max( 0, ACPKMN( 0, PLAYER ).m_stats.m_acHP - dmg1 );
-    //
-    //                            ko[ 0 ][ PLAYER ] = ( ACPKMN( 0, PLAYER ).m_stats.m_acHP == 0 );
-    //                            if( ko[ 0 ][ PLAYER ] )
-    //                                ACPKMNSTS( 0, PLAYER ) = KO;
-    //
-    //                            displayHP( old, 100 - ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 0, PLAYER ).m_stats.m_maxHP,
-    //                                       256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, true );
-    //                            consoleSetWindow( &Top, 21, 16, 20, 4 );
-    //                            consoleClear( );
-    //                            printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).m_boxdata.m_Name,
-    //                                    GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).m_Level,
-    //                                    ACPKMN( 0, PLAYER ).m_stats.m_acHP );
-    //                        }
-    //                        printEFFLOG( ( ACPKMN( 0, PLAYER ) ), oppAtk[ acin / 2 ].first );
-    //                    }
-    //                    if( ( m_battleMode == DOUBLE ) && ( tg & 2 ) ) {
-    //                        missed = false;
-    //                        dmg2 = calcDamage( *AttackList[ oppAtk[ acin / 2 ].first ], ACPKMN( acin / 2, OPPONENT ), ACPKMN( 1, PLAYER ), rand( ) % 15 );
-    //
-    //                        if( !missed ) {
-    //                            int old = ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 1, PLAYER ).m_stats.m_maxHP;
-    //                            ACPKMN( 1, PLAYER ).m_stats.m_acHP = std::max( 0, ACPKMN( 1, PLAYER ).m_stats.m_acHP - dmg2 );
-    //
-    //                            ko[ 1 ][ PLAYER ] = ( ACPKMN( 1, PLAYER ).m_stats.m_acHP == 0 );
-    //                            if( ko[ 1 ][ PLAYER ] )
-    //                                ACPKMNSTS( 1, PLAYER ) = KO;
-    //                            consoleSetWindow( &Top, 16, 20, 20, 5 );
-    //                            consoleClear( );
-    //                            printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).m_boxdata.m_Name, GENDER( ACPKMN( 1, PLAYER ) ) );
-    //                            if( ACPKMN( 1, PLAYER ).m_Level < 10 )
-    //                                printf( " " );
-    //                            if( ACPKMN( 1, PLAYER ).m_Level < 100 )
-    //                                printf( " " );
-    //                            printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
-    //                                    ACPKMN( 1, PLAYER ).m_stats.m_acHP );
-    //
-    //                            displayHP( old, 100 - ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 1, PLAYER ).m_stats.m_maxHP,
-    //                                       256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, true );
-    //
-    //                        }
-    //                        printEFFLOG( ( ACPKMN( 1, PLAYER ) ), oppAtk[ acin / 2 ].first );
-    //                    }
-    //                    if( ( m_battleMode == DOUBLE ) && ( tg & 8 ) ) {
-    //                        missed = false;
-    //                        dmg3 = calcDamage( *AttackList[ oppAtk[ acin / 2 ].first ], ACPKMN( acin / 2, OPPONENT ),
-    //                                           ACPKMN( 1 - acin / 2, OPPONENT ), rand( ) % 15 );
-    //
-    //                        if( !missed ) {
-    //                            int old = 0;
-    //                            if( acin / 2 == 0 )
-    //                                old = ACPKMN( 0, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 0, OPPONENT ).m_stats.m_maxHP;
-    //                            else
-    //                                old = ACPKMN( 1, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 1, OPPONENT ).m_stats.m_maxHP;
-    //
-    //                            ACPKMN( 1 - acin / 2, OPPONENT ).m_stats.m_acHP = std::max( 0, ACPKMN( 1 - acin / 2, OPPONENT ).m_stats.m_acHP - dmg3 );
-    //                            if( !ACPKMN( 1 - acin / 2, OPPONENT ).m_stats.m_acHP ) {
-    //                                ko[ 1 - ( acin / 2 ) ][ OPPONENT ] = true;
-    //                                ACPKMNSTS( 1 - ( acin / 2 ), OPPONENT ) = KO;
-    //                            }
-    //                            if( acin / 2 == 0 ) {
-    //                                consoleSetWindow( &Top, 0, 5, 20, 2 );
-    //                                consoleClear( );
-    //                                printf( "%10ls%c\n", ACPKMN( 0, OPPONENT ).m_boxdata.m_Name, GENDER( ACPKMN( 0, OPPONENT ) ) );
-    //                                if( ACPKMN( 0, OPPONENT ).m_Level < 10 )
-    //                                    printf( " " );
-    //                                if( ACPKMN( 0, OPPONENT ).m_Level < 100 )
-    //                                    printf( " " );
-    //                                printf( "Lv%d%4dKP", ACPKMN( 0, OPPONENT ).m_Level,
-    //                                        ACPKMN( 0, OPPONENT ).m_stats.m_acHP );
-    //                                displayHP( old, 100 - ACPKMN( 0, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 0, OPPONENT ).m_stats.m_maxHP,
-    //                                           88, 32, HP_COL( 1, 0 ), HP_COL( 1, 0 ) + 1, true );
-    //                            } else {
-    //                                consoleSetWindow( &Top, 4, 2, 20, 2 );
-    //                                consoleClear( );
-    //                                printf( "%ls%c\nLv%d%4dKP", ACPKMN( 1, OPPONENT ).m_boxdata.m_Name, GENDER( ACPKMN( 1, OPPONENT ) ),
-    //                                        ACPKMN( 1, OPPONENT ).m_Level, ACPKMN( 1, OPPONENT ).m_stats.m_acHP );
-    //                                displayHP( old, 100 - ACPKMN( 1, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 1, OPPONENT ).m_stats.m_maxHP,
-    //                                           0, 8, HP_COL( 1, 1 ), HP_COL( 1, 1 ) + 1, true );
-    //                            }
-    //                        }
-    //                        printEFFLOG( ACPKMN( 1 - acin / 2, OPPONENT ), oppAtk[ acin / 2 ].first );
-    //                    }
-    //                } else {
-    //                    int tg = ownAtk[ acin / 2 ].second;
-    //                    int dmg1 = 0, dmg2 = 0, dmg3 = 0;
-    //                    if( tg & 1 ) {
-    //                        missed = false;
-    //                        dmg1 = calcDamage( *AttackList[ ownAtk[ acin / 2 ].first ], ACPKMN( acin / 2, PLAYER ), ACPKMN( 0, OPPONENT ), rand( ) % 15 );
-    //                        if( !missed ) {
-    //                            int old = ACPKMN( 0, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 0, OPPONENT ).m_stats.m_maxHP;
-    //                            ACPKMN( 0, OPPONENT ).m_stats.m_acHP = std::max( 0, ACPKMN( 0, OPPONENT ).m_stats.m_acHP - dmg1 );
-    //                            if( !ACPKMN( 0, OPPONENT ).m_stats.m_acHP ) {
-    //                                ko[ 0 ][ OPPONENT ] = true;
-    //                                ACPKMNSTS( 0, OPPONENT ) = KO;
-    //                            }
-    //                            consoleSetWindow( &Top, 0, 5, 20, 2 );
-    //                            consoleClear( );
-    //                            printf( "%10ls%c\n", ACPKMN( 0, OPPONENT ).m_boxdata.m_Name, GENDER( ACPKMN( 0, OPPONENT ) ) );
-    //
-    //                            if( ACPKMN( 0, OPPONENT ).m_Level < 10 )
-    //                                printf( " " );
-    //                            if( ACPKMN( 0, OPPONENT ).m_Level < 100 )
-    //                                printf( " " );
-    //
-    //                            printf( "Lv%d%4dKP",
-    //                                    ACPKMN( 0, OPPONENT ).m_Level,
-    //                                    ACPKMN( 0, OPPONENT ).m_stats.m_acHP );
-    //
-    //                            displayHP( old, 100 - ACPKMN( 0, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 0, OPPONENT ).m_stats.m_maxHP,
-    //                                       88, 32, HP_COL( 1, 0 ), HP_COL( 1, 0 ) + 1, true );
-    //                        }
-    //                        printEFFLOG( ACPKMN( 0, OPPONENT ), ownAtk[ acin / 2 ].first );
-    //                    }
-    //                    if( ( m_battleMode == DOUBLE ) && ( tg & 2 ) ) {
-    //                        missed = false;
-    //                        dmg2 = calcDamage( *AttackList[ ownAtk[ acin / 2 ].first ],
-    //                                           ACPKMN( acin / 2, PLAYER ),
-    //                                           ACPKMN( 1, OPPONENT ),
-    //                                           rand( ) % 15 );
-    //                        if( !missed ) {
-    //                            int old = ACPKMN( 1, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 1, OPPONENT ).m_stats.m_maxHP;
-    //
-    //                            ACPKMN( 1, OPPONENT ).m_stats.m_acHP = std::max( 0, ACPKMN( 1, OPPONENT ).m_stats.m_acHP - dmg2 );
-    //
-    //                            if( !ACPKMN( 1, OPPONENT ).m_stats.m_acHP ) {
-    //                                ko[ 1 ][ OPPONENT ] = true;
-    //                                ACPKMNSTS( 1, OPPONENT ) = KO;
-    //                            }
-    //
-    //                            consoleSetWindow( &Top, 4, 2, 20, 2 );
-    //                            consoleClear( );
-    //                            printf( "%ls%c\nLv%d%4dKP",
-    //                                    ACPKMN( 1, OPPONENT ).m_boxdata.m_Name,
-    //                                    GENDER( ACPKMN( 1, OPPONENT ) ),
-    //                                    ACPKMN( 1, OPPONENT ).m_Level,
-    //                                    ACPKMN( 1, OPPONENT ).m_stats.m_acHP );
-    //                            displayHP( old, 100 - ACPKMN( 1, OPPONENT ).m_stats.m_acHP * 100 / ACPKMN( 1, OPPONENT ).m_stats.m_maxHP,
-    //                                       0, 8, HP_COL( 1, 1 ), HP_COL( 1, 1 ) + 1, true );
-    //
-    //                        }
-    //                        printEFFLOG( ACPKMN( 1, OPPONENT ), ownAtk[ acin / 2 ].first );
-    //                    }
-    //                    if( ( m_battleMode == DOUBLE ) && ( tg & 8 ) ) {
-    //                        missed = false;
-    //                        dmg3 = calcDamage( *AttackList[ ownAtk[ acin / 2 ].first ],
-    //                                           ACPKMN( acin / 2, PLAYER ),
-    //                                           ACPKMN( 1 - acin / 2, PLAYER ),
-    //                                           rand( ) % 15 );
-    //                        if( !missed ) {
-    //                            int old = 0;
-    //                            if( acin / 2 == 1 )
-    //                                old = ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 0, PLAYER ).m_stats.m_maxHP;
-    //                            else
-    //                                old = ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 1, PLAYER ).m_stats.m_maxHP;
-    //
-    //                            ACPKMN( 1 - acin / 2, PLAYER ).m_stats.m_acHP = std::max( 0, ACPKMN( 1 - acin / 2, PLAYER ).m_stats.m_acHP - dmg3 );
-    //                            if( !ACPKMN( 1 - acin / 2, PLAYER ).m_stats.m_acHP ) {
-    //                                ko[ 1 - ( acin / 2 ) ][ PLAYER ] = true;
-    //                                ACPKMNSTS( 1 - ( acin / 2 ), PLAYER ) = KO;
-    //                            }
-    //                            if( acin / 2 == 1 ) {
-    //                                displayHP( old, 100 - ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100 /
-    //                                           ACPKMN( 0, PLAYER ).m_stats.m_maxHP, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, true );
-    //                                consoleSetWindow( &Top, 21, 16, 20, 4 );
-    //                                consoleClear( );
-    //                                printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).m_boxdata.m_Name,
-    //                                        GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).m_Level,
-    //                                        ACPKMN( 0, PLAYER ).m_stats.m_acHP );
-    //                            } else {
-    //                                displayHP( old, 100 - ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 / ACPKMN( 1, PLAYER ).m_stats.m_maxHP,
-    //                                           256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, true );
-    //                                consoleSetWindow( &Top, 16, 20, 20, 5 );
-    //                                consoleClear( );
-    //                                printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).m_boxdata.m_Name, GENDER( ACPKMN( 1, PLAYER ) ) );
-    //                                if( ACPKMN( 1, PLAYER ).m_Level < 10 )
-    //                                    printf( " " );
-    //                                if( ACPKMN( 1, PLAYER ).m_Level < 100 )
-    //                                    printf( " " );
-    //                                printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
-    //                                        ACPKMN( 1, PLAYER ).m_stats.m_acHP );
-    //
-    //                            }
-    //                        }
-    //                        printEFFLOG( ACPKMN( 1 - acin / 2, PLAYER ), ownAtk[ acin / 2 ].first );
-    //                    }
-    //                }
-    //
-    //
-    //                if( ko[ 0 ][ PLAYER ] ) {
-    //                    clear( );
-    //                    sprintf( buffer, "%ls wurde besiegt.", ACPKMN( 0, PLAYER ).m_boxdata.m_Name );
-    //                    cust_font.printString( buffer, 8, 8, true );
-    //
-    //                    consoleSetWindow( &Top, 21, 16, 20, 4 );
-    //                    consoleClear( );
-    //                    for( int i = 0; i < 4; ++i )
-    //                        OamTop->oamBuffer[ OWN_PKMN_1_START + i + 1 ].isHidden = true;
-    //                    updateOAM( OamTop );
-    //
-    //                    consoleSelect( &Bottom );
-    //
-    //                    for( int i = 0; i < 75; ++i )
-    //                        swiWaitForVBlank( );
-    //                }
-    //                if( ko[ 1 ][ PLAYER ] ) {
-    //                    clear( );
-    //                    sprintf( buffer, "%ls wurde besiegt.", ACPKMN( 1, PLAYER ).m_boxdata.m_Name );
-    //                    cust_font.printString( buffer, 8, 8, true );
-    //
-    //                    consoleSetWindow( &Top, 16, 20, 20, 5 );
-    //                    consoleClear( );
-    //                    for( int i = 0; i < 4; ++i )
-    //                        OamTop->oamBuffer[ OWN_PKMN_2_START + i + 1 ].isHidden = true;
-    //                    updateOAM( OamTop );
-    //
-    //                    consoleSelect( &Bottom );
-    //                    for( int i = 0; i < 75; ++i )
-    //                        swiWaitForVBlank( );
-    //                }
-    //
-    //                if( ko[ 0 ][ OPPONENT ] ) {
-    //                    clear( );
-    //                    sprintf( buffer, "%ls (Gegner)\nwurde besiegt.", ACPKMN( 0, OPPONENT ).m_boxdata.m_Name );
-    //                    cust_font.printString( buffer, 8, 8, true );
-    //                    consoleSetWindow( &Top, 0, 5, 20, 2 );
-    //                    consoleClear( );
-    //                    for( int i = 0; i < 4; ++i )
-    //                        OamTop->oamBuffer[ OPP_PKMN_1_START + i + 1 ].isHidden = true;
-    //                    updateOAM( OamTop );
-    //
-    //                    for( int i = 0; i < 75; ++i )
-    //                        swiWaitForVBlank( );
-    //
-    //                }
-    //                if( ko[ 1 ][ OPPONENT ] ) {
-    //                    clear( );
-    //                    sprintf( buffer, "%ls (Gegner)\nwurde besiegt.", ACPKMN( 1, OPPONENT ).m_boxdata.m_Name );
-    //                    cust_font.printString( buffer, 8, 8, true );
-    //
-    //                    consoleSetWindow( &Top, 4, 2, 20, 2 );
-    //                    consoleClear( );
-    //                    for( int i = 0; i < 4; ++i )
-    //                        OamTop->oamBuffer[ OPP_PKMN_2_START + i + 1 ].isHidden = true;
-    //                    updateOAM( OamTop );
-    //
-    //                    for( int i = 0; i < 75; ++i )
-    //                        swiWaitForVBlank( );
-    //                }
-    //
-    //
-    //                consoleSelect( &Bottom );
-    //
-    //                if( ko[ 0 ][ OPPONENT ] || ko[ 1 ][ OPPONENT ] ) {
-    //                    for( int i = 0; i < 6; ++i ) {
-    //                        if( m_distributeEXP && ACPKMNSTS( i, PLAYER ) != acStatus::NA && ACPKMNSTS( i, PLAYER ) != acStatus::KO ) {
-    //                            POKEMON::pokemon& acPK = ( *_player->m_pkmnTeam )[ ACPOS( i, PLAYER ) ];
-    //                            POKEMON::pokemon& acDF = ACPKMN( 0, OPPONENT );
-    //
-    //                            POKEMON::PKMNDATA::getAll( ACPKMN( 0, OPPONENT ).m_boxdata.m_SPEC, p );
-    //                            int exp = calcEXP( acPK, ACPOS( i, PLAYER ), acDF, false );
-    //                            if( exp && acPK.m_Level < 100 ) {
-    //                                int evsum = 0;
-    //
-    //                                for( int j = 0; j < 6; ++j ) {
-    //                                    evsum += p.m_EVYield[ j ];
-    //                                    acPK.m_boxdata.m_effortValues[ j ] += p.m_EVYield[ j ];
-    //                                }
-    //
-    //                                clear( );
-    //                                sprintf( buffer, "%ls erhält %d EV\nund %d E.-Punkte.", acPK.m_boxdata.m_name, evsum, exp );
-    //                                cust_font.printString( buffer, 8, 8, true );
-    //
-    //                                POKEMON::PKMNDATA::getAll( ( *_player->m_pkmnTeam )[ ACPOS( i, PLAYER ) ].m_boxdata.m_SPEC, p );
-    //                                int old = ( acPK.m_boxdata.m_experienceGained - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
-    //                                    ( POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] );
-    //
-    //                                acPK.m_boxdata.m_experienceGained += exp;
-    //
-    //                                int nw = std::min( 100u, ( acPK.m_boxdata.m_experienceGained - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
-    //                                                   ( POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) );
-    //
-    //
-    //                                if( i == 0 )
-    //                                    displayEP( old, nw, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, true );
-    //
-    //                                if( ( m_battleMode == DOUBLE ) && i == 1 )
-    //                                    displayEP( old, nw, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, true );
-    //                                for( int i = 0; i < 75; ++i )
-    //                                    swiWaitForVBlank( );
-    //                                bool newLevel = acPK.m_Level < 100 && POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] <= acPK.m_boxdata.m_experienceGained;
-    //                                bool nL = newLevel;
-    //
-    //                                u16 HPdif = acPK.m_stats.m_maxHP - acPK.m_stats.m_acHP;
-    //
-    //                                while( newLevel ) {
-    //                                    acPK.m_Level++;
-    //
-    //                                    if( acPK.m_boxdata.m_speciesId != 292 )
-    //                                        acPK.m_stats.m_maxHP = ( ( acPK.m_boxdata.m_individualValues.m_hp + 2 * p.m_bases[ 0 ] + ( acPK.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPK.m_Level / 100 ) + 10;
-    //                                    else
-    //                                        acPK.m_stats.m_maxHP = 1;
-    //                                    POKEMON::pkmnNatures nature = acPK.m_boxdata.getNature( );
-    //                                    acPK.m_stats.m_Atk = ( ( ( acPK.m_boxdata.m_individualValues.m_moves + 2 * p.m_bases[ 1 ] + ( acPK.m_boxdata.m_effortValues[ 1 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ PLAYER ];
-    //                                    acPK.m_stats.m_Def = ( ( ( acPK.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ 2 ] + ( acPK.m_boxdata.m_effortValues[ 2 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ OPPONENT ];
-    //                                    acPK.m_stats.m_Spd = ( ( ( acPK.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ 3 ] + ( acPK.m_boxdata.m_effortValues[ 3 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 2 ];
-    //                                    acPK.m_stats.m_SAtk = ( ( ( acPK.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ 4 ] + ( acPK.m_boxdata.m_effortValues[ 4 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 3 ];
-    //                                    acPK.m_stats.m_SDef = ( ( ( acPK.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ 5 ] + ( acPK.m_boxdata.m_effortValues[ 5 ] >> 2 ) )*acPK.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ 4 ];
-    //
-    //                                    acPK.m_stats.m_acHP = acPK.m_stats.m_maxHP - HPdif;
-    //
-    //                                    clear( );
-    //                                    sprintf( buffer, "%ls erreicht Level %d.", acPK.m_boxdata.m_name, acPK.m_Level );
-    //                                    cust_font.printString( buffer, 8, 8, true );
-    //                                    for( int i = 0; i < 75; ++i )
-    //                                        swiWaitForVBlank( );
-    //
-    //                                    nw = std::min( 100u, ( acPK.m_boxdata.m_experienceGained - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) * 100 /
-    //                                                   ( POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPK.m_Level - 1 ][ p.m_expType ] ) );
-    //
-    //                                    if( i == 0 ) {
-    //                                        displayEP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-    //                                        displayEP( 0, nw, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, true );
-    //                                        consoleSelect( &Top );
-    //                                        consoleSetWindow( &Top, 21, 16, 20, 4 );
-    //                                        consoleClear( );
-    //                                        printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).m_boxdata.m_Name,
-    //                                                GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).m_Level,
-    //                                                ACPKMN( 0, PLAYER ).m_stats.m_acHP );
-    //                                    }
-    //                                    if( ( m_battleMode == DOUBLE ) && i == 1 ) {
-    //                                        displayEP( 100, 101, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
-    //                                        displayEP( 0, nw, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, true );
-    //                                        consoleSelect( &Top );
-    //                                        consoleSetWindow( &Top, 16, 20, 20, 5 );
-    //                                        consoleClear( );
-    //                                        printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).m_boxdata.m_Name, GENDER( ACPKMN( 1, PLAYER ) ) );
-    //                                        if( ACPKMN( 1, PLAYER ).m_Level < 10 )
-    //                                            printf( " " );
-    //                                        if( ACPKMN( 1, PLAYER ).m_Level < 100 )
-    //                                            printf( " " );
-    //                                        printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
-    //                                                ACPKMN( 1, PLAYER ).m_stats.m_acHP );
-    //                                    }
-    //                                    newLevel = acPK.m_Level < 100 && (unsigned)POKEMON::EXP[ acPK.m_Level ][ p.m_expType ] <= acPK.m_boxdata.m_experienceGained;
-    //                                }
-    //
-    //                                if( nL && SAV.m_evolveInBattle ) {
-    //                                    consoleSelect( &Top );
-    //                                    if( acPK.canEvolve( ) ) {
-    //                                        clear( );
-    //                                        sprintf( buffer, "%ls entwickelt sich!", acPK.m_boxdata.m_name );
-    //                                        cust_font.printString( buffer, 8, 8, true );
-    //                                        for( int i = 0; i < 75; ++i )
-    //                                            swiWaitForVBlank( );
-    //
-    //                                        acPK.evolve( );
-    //
-    //                                        if( i == 0 ) {
-    //
-    //                                            oamIndex = OWN_PKMN_1_START;
-    //                                            palcnt = OWN_PKMN_1_PAL;
-    //                                            nextAvailableTileIdx = OWN_PKMN_1_TILE;
-    //
-    //                                            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
-    //                                                ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
-    //                                                ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ), ACPKMN( 0, PLAYER ).m_boxdata.m_isFemale ) )
-    //                                                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
-    //                                                ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, -10, 100, oamIndex, palcnt, nextAvailableTileIdx, false,
-    //                                                ACPKMN( 0, PLAYER ).m_boxdata.isShiny( ), !ACPKMN( 0, PLAYER ).m_boxdata.m_isFemale );
-    //
-    //                                            updateOAM( OamTop );
-    //
-    //
-    //                                            displayHP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, false );
-    //                                            displayHP( 100, 100 - ACPKMN( 0, PLAYER ).m_stats.m_acHP * 100
-    //                                                       / ACPKMN( 0, PLAYER ).m_stats.m_maxHP, 256 - 96 - 28, 192 - 32 - 8 - 32, HP_COL( 0, 0 ), HP_COL( 0, 0 ) + 1, false );
-    //                                            displayEP( 100, 101, 256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-    //
-    //                                            POKEMON::PKMNDATA::getAll( ACPKMN( 0, PLAYER ).m_boxdata.m_SPEC, p );
-    //
-    //                                            displayEP( 0, ( ACPKMN( 0, PLAYER ).m_boxdata.m_exp - POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level - 1 ][ p.m_expType ] ) * 100 /
-    //                                                       ( POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level ][ p.m_expType ] -
-    //                                                       POKEMON::EXP[ ACPKMN( 0, PLAYER ).m_Level - 1 ][ p.m_expType ] ),
-    //                                                       256 - 96 - 28, 192 - 32 - 8 - 32, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-    //                                            consoleSelect( &Top );
-    //                                            consoleSetWindow( &Top, 21, 16, 20, 4 );
-    //                                            consoleClear( );
-    //                                            printf( "%ls%c\nLv%d%4dKP", ACPKMN( 0, PLAYER ).m_boxdata.m_Name,
-    //                                                    GENDER( ACPKMN( 0, PLAYER ) ), ACPKMN( 0, PLAYER ).m_Level,
-    //                                                    ACPKMN( 0, PLAYER ).m_stats.m_acHP );
-    //
-    //                                        }
-    //                                        if( ( m_battleMode == DOUBLE ) && i == 1 ) {
-    //                                            oamIndex = OWN_PKMN_2_START;
-    //                                            palcnt = OWN_PKMN_2_PAL;
-    //                                            nextAvailableTileIdx = OWN_PKMN_2_TILE;
-    //
-    //                                            if( !loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
-    //                                                ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, 50, 120, oamIndex, palcnt, nextAvailableTileIdx, false,
-    //                                                ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ), ACPKMN( 1, PLAYER ).m_boxdata.m_isFemale ) )
-    //                                                loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
-    //                                                ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, 50, 120, oamIndex, palcnt, nextAvailableTileIdx, false,
-    //                                                ACPKMN( 1, PLAYER ).m_boxdata.isShiny( ), !ACPKMN( 1, PLAYER ).m_boxdata.m_isFemale );
-    //
-    //                                            updateOAM( OamTop );
-    //
-    //                                            displayHP( 100, 101, 256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, false );
-    //                                            displayHP( 100, 100 - ACPKMN( 1, PLAYER ).m_stats.m_acHP * 100 /
-    //                                                       ACPKMN( 1, PLAYER ).m_stats.m_maxHP, 256 - 36, 192 - 40, HP_COL( 0, 1 ), HP_COL( 0, 1 ) + 1, false );
-    //                                            displayEP( 100, 100, 256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
-    //
-    //                                            POKEMON::PKMNDATA::getAll( ACPKMN( 1, PLAYER ).m_boxdata.m_SPEC, p );
-    //
-    //                                            displayEP( 0, ( ACPKMN( 1, PLAYER ).m_boxdata.m_exp - POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level - 1 ][ p.m_expType ] ) * 100 /
-    //                                                       ( POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level ][ p.m_expType ] -
-    //                                                       POKEMON::EXP[ ACPKMN( 1, PLAYER ).m_Level - 1 ][ p.m_expType ] ),
-    //                                                       256 - 36, 192 - 40, OWN2_EP_COL, OWN2_EP_COL + 1, false );
-    //
-    //                                            consoleSelect( &Top );
-    //                                            consoleSetWindow( &Top, 16, 20, 20, 5 );
-    //                                            consoleClear( );
-    //                                            printf( "%10ls%c\n", ACPKMN( 1, PLAYER ).m_boxdata.m_Name, GENDER( ACPKMN( 1, PLAYER ) ) );
-    //                                            if( ACPKMN( 1, PLAYER ).m_Level < 10 )
-    //                                                printf( " " );
-    //                                            if( ACPKMN( 1, PLAYER ).m_Level < 100 )
-    //                                                printf( " " );
-    //                                            printf( "Lv%d%4dKP", ACPKMN( 1, PLAYER ).m_Level,
-    //                                                    ACPKMN( 1, PLAYER ).m_stats.m_acHP );
-    //
-    //                                        }
-    //
-    //                                        clear( );
-    //                                        sprintf( buffer, "Und wurde zu einem\n%ls.", acPK.m_boxdata.m_name );
-    //                                        cust_font.printString( buffer, 8, 8, true );
-    //
-    //                                        for( int i = 0; i < 75; ++i )
-    //                                            swiWaitForVBlank( );
-    //                                    }
-    //                                }
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //
-    //            }
-    //
-    //
-    //
-    //        }
-    //END:
-    //        dinit( );
-    //        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-    //        consoleSelect( &Bottom );
-    //        consoleClear( );
-    //        initOAMTableSub( Oam );
-    //        initMainSprites( Oam, spriteInfo );
-    //        setMainSpriteVisibility( false );
-    //        Oam->oamBuffer[ 8 ].isHidden = true;
-    //        Oam->oamBuffer[ 0 ].isHidden = true;
-    //        Oam->oamBuffer[ 1 ].isHidden = false;
-    //        return 0;
-    //    }
 }

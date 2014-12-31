@@ -68,6 +68,6 @@ float TypeEffectiveness[ 19 ][ 19 ] = {
         { 1, 2, 1, .5, 1, 1, 1, 1, .5, .75, 1, .5, 1, 1, 1, 1, 2, 2, 1 }  //Fairy
 };
 
-float getEffectiveness( const Type& p_t1, const Type& p_t2 ) { //t1 is moveing
+float getEffectiveness( const Type& p_t1, const Type& p_t2 ) { //t1 is moving
     return TypeEffectiveness[ (int)p_t1 ][ (int)p_t2 ];
 }

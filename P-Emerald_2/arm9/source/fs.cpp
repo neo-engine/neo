@@ -116,9 +116,9 @@ namespace FS {
         return true;
     }
 
-    bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnId, const u16 p_posX,
-                         const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx ) {
-        //char buffer[100];
+    bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnId, const s16 p_posX,
+                         const s16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx ) {
+        char buffer[ 100 ];
         if( !p_female )
             sprintf( buffer, "%s%d/%d.raw", p_path, p_pkmnId, p_pkmnId );
         else
@@ -567,6 +567,8 @@ namespace FS {
             return false;
         }
 
+        dmaFillWords( 0, p_layer, p_tileCnt );
+
         fread( TEMP, sizeof( u32 ), 12288, fd );
         fread( TEMP_PAL, sizeof( u16 ), 256, fd );
 
@@ -587,6 +589,8 @@ namespace FS {
             return false;
         }
 
+        dmaFillWords( 0, p_layer, p_tileCnt );
+
         fread( TEMP, sizeof( u32 ), 12288, fd );
         fread( TEMP_PAL, sizeof( u16 ), 256, fd );
 
@@ -599,13 +603,13 @@ namespace FS {
     }
 
     bool loadNavScreen( u16* p_layer, const char* p_name, u8 p_no ) {
-        if( p_no == BG_ind && NAV_DATA[ 0 ] ) {
+        if( p_no == SAV.m_bgIdx && NAV_DATA[ 0 ] ) {
             dmaCopy( NAV_DATA, p_layer, 256 * 192 );
             dmaCopy( NAV_DATA_PAL, BG_PALETTE_SUB, 256 * 2 );
             return true;
         }
 
-        //char buffer[100];
+        char buffer[100];
         sprintf( buffer, "nitro:/PICS/NAV/%s.raw", p_name );
         FILE* fd = fopen( buffer, "rb" );
 
@@ -1309,6 +1313,9 @@ namespace POKEMON {
 
             u16 rescnt = 0;
 
+            for( u8 i = 0; i < p_amount; ++i )
+                p_result[ i ] = 0;
+
             if( p_fromLevel > p_toLevel ) {
                 std::vector<u16> reses;
                 for( u16 i = 0; i <= p_fromLevel; ++i ) {
@@ -1325,8 +1332,8 @@ namespace POKEMON {
                 for( u16 i = 0; i < p_amount && I != reses.rend( ); ++i, ++I ) {
                     for( u16 z = 0; z < i; ++z )
                         if( *I == p_result[ z ] ) {
-                        --i;
-                        goto N;
+                            --i;
+                            goto N;
                         }
                     p_result[ i ] = *I;
 N:

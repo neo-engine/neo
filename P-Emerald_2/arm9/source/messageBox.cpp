@@ -41,6 +41,8 @@
 
 #include "print.h"
 
+#include "defines.h"
+
 extern ConsoleFont cfont;
 extern FONT::font cust_font;
 extern FONT::font cust_font2;
@@ -60,18 +62,18 @@ void init( ) {
     updateOAMSub( Oam );
 
     cust_font.setColor( 0, 0 );
-    cust_font.setColor( 251, 1 );
-    cust_font.setColor( 252, 2 );
+    cust_font.setColor( BLACK_IDX, 1 );
+    cust_font.setColor( GRAY_IDX, 2 );
     cust_font2.setColor( 0, 0 );
-    cust_font2.setColor( 253, 1 );
-    cust_font2.setColor( 254, 2 );
+    cust_font2.setColor( GRAY_IDX, 1 );
+    cust_font2.setColor( WHITE_IDX, 2 );
 
-    BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-    BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
-    BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
-    BG_PALETTE_SUB[ 253 ] = RGB15( 15, 15, 15 );
-    BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
-    FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
+    BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
+    BG_PALETTE_SUB[ GRAY_IDX ] = STEEL;
+    BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
+    BG_PALETTE_SUB[ RED_IDX ] = RED;
+    BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;
+    FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, WHITE_IDX );
 
     updateOAMSub( Oam );
 }
@@ -89,7 +91,7 @@ void messageBox::clearButName( ) {
     FONT::putrec( (u8)72, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
 }
 
-void waitForTouchUp( bool p_uTime, bool p_tpar = false ) {
+bool waitForTouchUp( bool p_uTime, bool p_tpar = false, u16 p_targetX1 = 0, u16 p_targetY1 = 0, u16 p_targetX2 = 300, u16 p_targetY2 = 300 ) {
     while( 1 ) {
         swiWaitForVBlank( );
         scanKeys( );
@@ -97,8 +99,11 @@ void waitForTouchUp( bool p_uTime, bool p_tpar = false ) {
             updateTime( p_tpar );
         auto touch = touchReadXY( );
         if( touch.px == 0 && touch.py == 0 )
-            break;
+            return true;
+        if( !( touch.px >= p_targetX1 && touch.py >= p_targetY1 && touch.px <= p_targetX2 && touch.py <= p_targetY2 ) )
+            return false;
     }
+    return false;
 }
 
 messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
@@ -117,7 +122,7 @@ messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
     FS::drawItemIcon( Oam, spriteInfo, p_item.m_itemName, 4, 4, a, b, c );
     updateOAMSub( Oam );
 
-    updateTime( true );
+    updateTime( s8( 1 ) );
 
     cust_font.setColor( 253, 3 );
     cust_font.setColor( 254, 4 );
@@ -127,33 +132,18 @@ messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
 
     char buf[ 40 ];
     sprintf( buf, "%3d %s in der", p_count, p_item.getDisplayName( ).c_str( ) );
-    cust_font.printStringD( buf, 32, 8, true );
+    cust_font.printMBStringD( buf, 32, 8, true, true, 1 );
     cust_font.printChar( 489 - 21 + p_item.getItemType( ), 32, 24, true );
-    sprintf( buf, "%s-Tasche verstaut.", bagnames[ p_item.m_itemType ].c_str( ) );
-    cust_font.printStringD( buf, 46, 24, true );
+    sprintf( buf, "%s-Tasche verstaut.`", bagnames[ p_item.m_itemType ].c_str( ) );
+    FONT::ASpriteOamIndex = 8;
+    cust_font.printMBStringD( buf, 46, 24, true, true, 1 );
 
-    Oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( Oam );
-    touchPosition touch;
-    while( 1 ) {
-        swiWaitForVBlank( );
-        updateTime( true );
-        scanKeys( );
-        if( keysUp( ) & KEY_A )
-            break;
-        touchRead( &touch );
-
-        if( touch.px > 224 && touch.py > 164 ) {
-            waitForTouchUp( true );
-            break;
-        }
-    }
+    SAV.m_bag.addItem( p_item.m_itemType, p_item.getItemId( ), p_count );
 
     initMainSprites( Oam, spriteInfo );
     setMainSpriteVisibility( main_ );
     setSpriteVisibility( back, true );
     setSpriteVisibility( save, false );
-    Oam->oamBuffer[ 8 ].isHidden = true;
     dinit( );
     updateOAMSub( Oam );
 }
@@ -171,27 +161,11 @@ messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {
 
     init( );
 
-    if( p_time ) updateTime( true );
+    if( p_time ) updateTime( s8( 1 ) );
 
-    cust_font.printStringD( p_text, 8, 8, true );
-    Oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( Oam );
-    touchPosition touch;
-    while( 1 ) {
-        swiWaitForVBlank( );
-        if( p_time )
-            updateTime( true );
-        scanKeys( );
-        if( keysUp( ) & KEY_A )
-            break;
-        touchRead( &touch );
-
-        if( touch.px > 224 && touch.py > 164 ) {
-
-            waitForTouchUp( p_time );
-            break;
-        }
-    }
+    FONT::ASpriteOamIndex = 8;
+    std::string text( p_text );
+    cust_font.printMBStringD( ( text + '`' ).c_str( ), 8, 8, true, p_time, 1 );
 
     setSpriteVisibility( back, back_ );
     setSpriteVisibility( save, save_ );
@@ -216,25 +190,9 @@ messageBox::messageBox( const wchar_t* p_text, bool p_time, bool p_remsprites ) 
 
     if( p_time ) updateTime( );
 
-    cust_font.printStringD( p_text, 8, 8, true );
-    Oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( Oam );
-    touchPosition touch;
-    while( 1 ) {
-        swiWaitForVBlank( );
-        if( p_time )
-            updateTime( );
-        scanKeys( );
-        if( keysUp( ) & KEY_A )
-            break;
-        touchRead( &touch );
-
-        if( touch.px > 224 && touch.py > 164 ) {
-
-            waitForTouchUp( p_time );
-            break;
-        }
-    }
+    FONT::ASpriteOamIndex = 8;
+    std::wstring text( p_text );
+    cust_font.printMBStringD( ( text + L'`' ).c_str( ), 8, 8, true, p_time );
 
     setSpriteVisibility( back, back_ );
     setSpriteVisibility( save, save_ );
@@ -272,31 +230,15 @@ messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, boo
     init( );
 
     if( p_time ) updateTime( );
-
-    cust_font.printString( p_name, 8, 8, true );
-    cust_font.printStringD( p_text, 72, 8, true );
-    if( p_a )
-        Oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( Oam );
-
+    if( p_name )
+        cust_font.printString( p_name, 8, 8, true );
     if( p_a ) {
-        touchPosition touch;
-        while( 1 ) {
-            swiWaitForVBlank( );
-            if( p_time )
-                updateTime( );
-            scanKeys( );
-            if( keysUp( ) & KEY_A )
-                break;
-            touchRead( &touch );
+        FONT::ASpriteOamIndex = 8;
+        std::string text( p_text );
+        cust_font.printMBStringD( ( text + '`' ).c_str( ), 64 * ( !!p_name ) + 8, 8, true, p_time );
+    } else
+        cust_font.printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
 
-            if( touch.px > 224 && touch.py > 164 ) {
-
-                waitForTouchUp( p_time );
-                break;
-            }
-        }
-    }
     if( !p_remsprites )
         return;
     if( p_sprt != no_sprite )
@@ -337,34 +279,16 @@ messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_tim
 
     init( );
 
-    if( p_name ) {
+    if( p_time ) updateTime( );
+    if( p_name )
         cust_font.printString( p_name, 8, 8, true );
-        cust_font.printStringD( p_text, 72, 8, true );
-    } else {
-        cust_font.printStringD( p_text, 8, 8, true );
-    }
-    if( p_a )
-        Oam->oamBuffer[ 8 ].isHidden = false;
-    updateOAMSub( Oam );
-
     if( p_a ) {
-        touchPosition touch;
-        while( 1 ) {
-            swiWaitForVBlank( );
-            if( p_time )
-                updateTime( );
-            scanKeys( );
-            if( keysUp( ) & KEY_A )
-                break;
-            touchRead( &touch );
+        FONT::ASpriteOamIndex = 8;
+        std::wstring text( p_text );
+        cust_font.printMBStringD( ( text + L'`' ).c_str( ), 64 * ( !!p_name ) + 8, 8, true, p_time );
+    } else
+        cust_font.printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
 
-            if( touch.px > 224 && touch.py > 164 ) {
-
-                waitForTouchUp( p_time );
-                break;
-            }
-        }
-    }
     if( !p_remsprites )
         return;
     if( p_sprt != no_sprite )
@@ -385,31 +309,50 @@ messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_tim
 void messageBox::put( const char* p_text, bool p_a, bool p_time ) {
     init( );
 
-    if( m_isNamed ) {
+    if( p_time ) updateTime( );
+    if( m_isNamed )
         cust_font.printString( m_isNamed, 8, 8, true );
-        cust_font.printStringD( p_text, 72, 8, true );
-    } else
-        cust_font.printStringD( p_text, 8, 8, true );
-
     if( p_a ) {
-        touchPosition touch;
-        while( 1 ) {
-            swiWaitForVBlank( );
-            if( p_time )
-                updateTime( );
-            scanKeys( );
-            if( keysUp( ) & KEY_A )
-                break;
-            touchRead( &touch );
+        FONT::ASpriteOamIndex = 8;
+        std::string text( p_text );
+        cust_font.printMBStringD( ( text + '`' ).c_str( ), ( 64 * !!m_isNamed ) + 8, 8, true, p_time );
+    } else
+        cust_font.printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
 
-            if( touch.px > 224 && touch.py > 164 ) {
-
-                waitForTouchUp( p_time );
-                break;
-            }
-        }
-    }
     swiWaitForVBlank( );
+}
+
+void drawChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_colorIdx, bool p_pressed ) {
+    if( !p_pressed ) {
+        FONT::putrec( p_x1 + 1, p_y1 + 1, p_x2, p_y2,
+                      true, false, BLACK_IDX );
+        FONT::putrec( p_x1, p_y1, p_x2 - 2, p_y2 - 1,
+                      true, false, p_colorIdx );
+        FONT::putrec( p_x1 + 1 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth, p_y2 - p_borderWidth + 4,
+                      true, false, BLACK_IDX );
+        FONT::putrec( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth - 2, p_y2 - p_borderWidth + 3,
+                      true, false, WHITE_IDX );
+    } else {
+        FONT::putrec( p_x1, p_y1, p_x2 - 1, p_y2 - 1,
+                      true, false, BLACK_IDX );
+        FONT::putrec( p_x1 + 2, p_y1 + 1, p_x2, p_y2,
+                      true, false, p_colorIdx );
+
+        FONT::putrec( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth - 1, p_y2 - p_borderWidth + 3,
+                      true, false, BLACK_IDX );
+
+        FONT::putrec( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth, p_y2 - p_borderWidth + 4,
+                      true, false, WHITE_IDX );
+    }
+}
+
+void yesNoBox::draw( u8 p_pressedIdx ) {
+    drawChoiceBox( 28, 102, 122, 134, 6, RED_IDX, p_pressedIdx == 0 );
+    cust_font.printString( "Ja", 65 + 2 * ( p_pressedIdx == 0 ),
+                           110 + ( p_pressedIdx == 0 ), true );
+    drawChoiceBox( 134, 102, 228, 134, 6, BLUE_IDX, p_pressedIdx == 1 );
+    cust_font.printString( "Nein", 165 + 2 * ( p_pressedIdx == 1 ),
+                           110 + ( p_pressedIdx == 1 ), true );
 }
 
 yesNoBox::yesNoBox( ) {
@@ -475,14 +418,9 @@ bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
         else
             cust_font.printStringD( p_text, 8, 8, true );
     }
-    for( u8 i = 19; i <= 22; ++i )
-        Oam->oamBuffer[ i ].isHidden = false;
+    draw( 2 );
     updateOAMSub( Oam );
-    consoleSetWindow( &Bottom, 5, 13, 10, 3 );
-    printf( "\n    Ja" );
-    consoleSetWindow( &Bottom, 17, 13, 10, 3 );
-    printf( "\n   Nein" );
-
+    bool result;
     while( 42 ) {
         swiWaitForVBlank( );
         updateOAMSub( Oam );
@@ -490,50 +428,37 @@ bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
             updateTime( );
         touchPosition t;
         touchRead( &t );
-        if( t.px > 31 && t.py > 99 && t.px < 129 && t.py < 133 ) {
-            Oam->oamBuffer[ 21 ].isHidden = true;
-            Oam->oamBuffer[ 22 ].isHidden = true;
-            updateOAMSub( Oam );
-
-            waitForTouchUp( p_time );
-            Oam->oamBuffer[ 19 ].isHidden = true;
-            Oam->oamBuffer[ 20 ].isHidden = true;
-            setSpriteVisibility( back, back_ );
-            setSpriteVisibility( save, save_ );
-            Oam->oamBuffer[ 8 ].isHidden = true;
-            for( u8 i = 9; i <= 12; ++i ) {
-                Oam->oamBuffer[ i ].isHidden = true;
+        if( t.px >= 28 && t.py >= 102 && t.px <= 122 && t.py <= 134 ) {
+            draw( 0 );
+            if( !waitForTouchUp( p_time, false, 28, 102, 122, 134 ) ) {
+                draw( 2 );
+                continue;
             }
-            updateOAMSub( Oam );
-            consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-            consoleClear( );
-            dinit( );
-            return true;//YES
-        } else if( t.px > 127 && t.py > 99 && t.px < 225 && t.py < 133 ) {
-            Oam->oamBuffer[ 19 ].isHidden = true;
-            Oam->oamBuffer[ 20 ].isHidden = true;
-            updateOAMSub( Oam );
-
-            waitForTouchUp( p_time );
-            Oam->oamBuffer[ 21 ].isHidden = true;
-            Oam->oamBuffer[ 22 ].isHidden = true;
-            setSpriteVisibility( back, back_ );
-            setSpriteVisibility( save, save_ );
-            Oam->oamBuffer[ 8 ].isHidden = true;
-            for( u8 i = 9; i <= 12; ++i ) {
-                Oam->oamBuffer[ i ].isHidden = true;
+            result = true;
+            break;
+        } else if( t.px >= 134 && t.py >= 102 && t.px <= 228 && t.py <= 134 ) {
+            draw( 1 );
+            if( !waitForTouchUp( p_time, false, 134, 102, 228, 134 ) ) {
+                draw( 2 );
+                continue;
             }
-            updateOAMSub( Oam );
-            consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-            consoleClear( );
-            dinit( );
-            return false;//No
+            result = false;
+            break;
         }
     }
+    setSpriteVisibility( back, back_ );
+    setSpriteVisibility( save, save_ );
+    Oam->oamBuffer[ 8 ].isHidden = true;
+    for( u8 i = 9; i <= 12; ++i ) {
+        Oam->oamBuffer[ i ].isHidden = true;
+    }
+    updateOAMSub( Oam );
+    consoleSetWindow( &Bottom, 1, 1, 30, 24 );
+    consoleClear( );
     dinit( );
-    return false;
+    return result;
 }
-bool yesNoBox::getResult( const wchar_t* p_text = 0, bool time ) {
+bool yesNoBox::getResult( const wchar_t* p_text = 0, bool p_time ) {
 
     updateOAMSub( Oam );
     consoleSelect( &Bottom );
@@ -543,70 +468,89 @@ bool yesNoBox::getResult( const wchar_t* p_text = 0, bool time ) {
         else
             cust_font.printStringD( p_text, 8, 8, true );
     }
-    for( u8 i = 19; i <= 22; ++i )
-        Oam->oamBuffer[ i ].isHidden = false;
+    draw( 2 );
     updateOAMSub( Oam );
-    consoleSetWindow( &Bottom, 5, 13, 10, 3 );
-    printf( "\n    Ja" );
-    consoleSetWindow( &Bottom, 17, 13, 10, 3 );
-    printf( "\n   Nein" );
-
+    bool result;
     while( 42 ) {
         swiWaitForVBlank( );
         updateOAMSub( Oam );
-        if( time )
+        if( p_time )
             updateTime( );
         touchPosition t;
         touchRead( &t );
-        if( t.px > 31 && t.py > 99 && t.px < 129 && t.py < 133 ) {
-            Oam->oamBuffer[ 21 ].isHidden = true;
-            Oam->oamBuffer[ 22 ].isHidden = true;
-            updateOAMSub( Oam );
-
-            waitForTouchUp( time );
-            Oam->oamBuffer[ 19 ].isHidden = true;
-            Oam->oamBuffer[ 20 ].isHidden = true;
-            setSpriteVisibility( back, back_ );
-            setSpriteVisibility( save, save_ );
-            Oam->oamBuffer[ 8 ].isHidden = true;
-            for( u8 i = 9; i <= 12; ++i ) {
-                Oam->oamBuffer[ i ].isHidden = true;
+        if( t.px >= 28 && t.py >= 102 && t.px <= 122 && t.py <= 134 ) {
+            draw( 0 );
+            if( !waitForTouchUp( p_time, false, 28, 102, 122, 134 ) ) {
+                draw( 2 );
+                continue;
             }
-            updateOAMSub( Oam );
-            consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-            consoleClear( );
-            dinit( );
-            return true;//YES
-        } else if( t.px > 127 && t.py > 99 && t.px < 225 && t.py < 133 ) {
-            Oam->oamBuffer[ 19 ].isHidden = true;
-            Oam->oamBuffer[ 20 ].isHidden = true;
-            updateOAMSub( Oam );
-
-
-            waitForTouchUp( time );
-            Oam->oamBuffer[ 21 ].isHidden = true;
-            Oam->oamBuffer[ 22 ].isHidden = true;
-            setSpriteVisibility( back, back_ );
-            setSpriteVisibility( save, save_ );
-            Oam->oamBuffer[ 8 ].isHidden = true;
-            for( u8 i = 9; i <= 12; ++i ) {
-                Oam->oamBuffer[ i ].isHidden = true;
+            result = true;
+            break;
+        } else if( t.px >= 134 && t.py >= 102 && t.px <= 228 && t.py <= 134 ) {
+            draw( 1 );
+            if( !waitForTouchUp( p_time, false, 134, 102, 228, 134 ) ) {
+                draw( 2 );
+                continue;
             }
-            updateOAMSub( Oam );
-            consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-            consoleClear( );
-            dinit( );
-            return false;//No
+            result = false;
+            break;
         }
     }
+    setSpriteVisibility( back, back_ );
+    setSpriteVisibility( save, save_ );
+    Oam->oamBuffer[ 8 ].isHidden = true;
+    for( u8 i = 9; i <= 12; ++i ) {
+        Oam->oamBuffer[ i ].isHidden = true;
+    }
+    updateOAMSub( Oam );
+    consoleSetWindow( &Bottom, 1, 1, 30, 24 );
+    consoleClear( );
     dinit( );
-    return false;
+    return result;
 }
 
+#define NEW_PAGE 9
+void choiceBox::draw( u8 p_pressedIdx ) {
+    if( p_pressedIdx == NEW_PAGE ) {
+        drawSub( );
+        init( );
+        if( _text ) {
+            if( _name ) {
+                cust_font.printString( _name, 8, 8, true );
+                cust_font.printString( _text, 72, 8, true );
+            } else
+                cust_font.printString( _text, 8, 8, true );
+        }
+    }
+    u8 startIdx = ( ( !_big ) * 3 + 3 ) * _acPage;
+    u8 endIdx = std::min( _num, u8( ( ( !_big ) * 3 + 3 ) * ( _acPage + 1 ) ) );
+
+    BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
+
+    if( _big ) {
+        for( u8 i = startIdx; i < endIdx; ++i ) {
+            u8 acPos = i - startIdx;
+            drawChoiceBox( 32, 68 + acPos * 35, 192 + 32, 68 + 32 + acPos * 35, 6, COLOR_IDX, acPos == p_pressedIdx );
+            cust_font.printString( _choices[ i ], 56 + 2 * ( p_pressedIdx == acPos ),
+                                   78 + acPos * 35 + ( p_pressedIdx == acPos ), true );
+            swiWaitForVBlank( );
+        }
+    } else {
+        for( u8 i = startIdx; i < endIdx; ++i ) {
+            u8 acPos = i - startIdx;
+            drawChoiceBox( ( ( acPos % 2 ) ? 129 : 19 ), 68 + ( acPos / 2 ) * 35,
+                           106 + ( ( acPos % 2 ) ? 129 : 19 ), 32 + 68 + ( acPos / 2 ) * 35, 6, COLOR_IDX, acPos == p_pressedIdx );
+            cust_font.printString( _choices[ i ], ( ( acPos % 2 ) ? 129 : 19 ) + 8 + 2 * ( p_pressedIdx == acPos ),
+                                   78 + ( acPos / 2 ) * 35 + ( p_pressedIdx == acPos ), true );
+            swiWaitForVBlank( );
+        }
+    }
+}
 choiceBox::choiceBox( int p_num, const char** p_choices, const char* p_name = 0, bool p_big = false ) {
     _num = p_num;
     _choices = p_choices;
     _big = p_big || ( p_num <= 3 );
+    _acPage = 0;
 
     back_ = Oam->oamBuffer[ 0 ].isHidden;
     save_ = Oam->oamBuffer[ 1 ].isHidden;
@@ -622,11 +566,7 @@ choiceBox::choiceBox( int p_num, const char** p_choices, const char* p_name = 0,
     }
     updateOAMSub( Oam );
 
-    if( p_name ) {
-        _name = true;
-        cust_font.printString( p_name, 8, 8, true );
-    } else
-        _name = false;
+    _name = p_name;
 
     swiWaitForVBlank( );
 }
@@ -636,13 +576,6 @@ bwdPos[ 2 ][ 2 ] = { { SCREEN_WIDTH - 12, SCREEN_HEIGHT - 12 }, { SCREEN_WIDTH -
 
 choiceBox::~choiceBox( ) {
     dinit( );
-    consoleSetWindow( &Bottom, 9, 1, 22, MAXLINES );
-    consoleSelect( &Bottom );
-    consoleClear( );
-    consoleSetWindow( &Bottom, 1, 1, 8, MAXLINES - 1 );
-    consoleClear( );
-    consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-    consoleClear( );
     setMainSpriteVisibility( main_ );
     Oam->oamBuffer[ 8 ].isHidden = true;
     for( u8 i = 9; i <= 29; ++i )
@@ -654,368 +587,145 @@ choiceBox::~choiceBox( ) {
     swiWaitForVBlank( );
 }
 
-int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
+int choiceBox::getResult( const char* p_text, bool p_time, bool p_backButton ) {
     consoleSelect( &Bottom );
-    if( p_text ) {
-        if( _name )
-            cust_font.printString( p_text, 72, 8, true );
-        else
-            cust_font.printString( p_text, 8, 8, true );
+    _text = p_text;
+    draw( NEW_PAGE );
+
+    int result = -1;
+
+    if( p_backButton ) {
+        ( Oam->oamBuffer[ BACK_ID ] ).isHidden = false;
+        ( Oam->oamBuffer[ BACK_ID ] ).x = fwdPos[ 0 ][ 0 ] - 12;
+        ( Oam->oamBuffer[ BACK_ID ] ).y = fwdPos[ 0 ][ 1 ] - 12;
+        updateOAMSub( Oam );
     }
+
     if( _num < 1 )
         return -1;
-    else if( _num == 1 ) {
-        ( Oam->oamBuffer[ 20 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 21 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 28 ] ).isHidden = false;
-        updateOAMSub( Oam );
-
-        consoleSetWindow( &Bottom, 5, 13, 22, 3 );
-        printf( _choices[ 0 ] );
-
-        while( 42 ) {
-            swiWaitForVBlank( );
-            updateOAMSub( Oam );
-            if( p_time )
-                updateTime( true );
-            touchPosition t;
-            touchRead( &t );
-
-            if( t.px > 31 && t.py > 99 && t.px < 225 && t.py < 133 ) {
-
-                Oam->oamBuffer[ 20 ].isHidden = true;
-                Oam->oamBuffer[ 21 ].isHidden = true;
-                Oam->oamBuffer[ 28 ].isHidden = true;
-                updateOAMSub( Oam );
-
-                waitForTouchUp( p_time, true );
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
-
-                return 0;
-            }
-        }
-    } else if( _num == 2 ) {
-        ( Oam->oamBuffer[ 20 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 21 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 29 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 24 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 25 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 28 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 20 ] ).y -= 16;
-        ( Oam->oamBuffer[ 21 ] ).y -= 16;
-        ( Oam->oamBuffer[ 28 ] ).y -= 16;
-        ( Oam->oamBuffer[ 24 ] ).y -= 16;
-        ( Oam->oamBuffer[ 25 ] ).y -= 16;
-        ( Oam->oamBuffer[ 29 ] ).y -= 16;
-        updateOAMSub( Oam );
-
-        consoleSetWindow( &Bottom, 5, 11, 22, 3 );
-        printf( _choices[ 0 ] );
-        consoleSetWindow( &Bottom, 5, 15, 22, 3 );
-        printf( _choices[ 1 ] );
-
-        while( 42 ) {
-            swiWaitForVBlank( );
-            updateOAMSub( Oam );
-            if( p_time )
-                updateTime( true );
-            touchPosition t;
-            touchRead( &t );
-
-            if( t.px > 31 && t.py > 83 && t.px < 225 && t.py < 117 ) {
-                ( Oam->oamBuffer[ 20 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 21 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 28 ] ).isHidden = true;
-                updateOAMSub( Oam );
-
-                waitForTouchUp( p_time, true );
-                ( Oam->oamBuffer[ 24 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 25 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 29 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 20 ] ).y += 16;
-                ( Oam->oamBuffer[ 21 ] ).y += 16;
-                ( Oam->oamBuffer[ 28 ] ).y += 16;
-                ( Oam->oamBuffer[ 24 ] ).y += 16;
-                ( Oam->oamBuffer[ 25 ] ).y += 16;
-                ( Oam->oamBuffer[ 29 ] ).y += 16;
-                updateOAMSub( Oam );
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
-
-                return 0;
-            } else if( t.px > 31 && t.py > 115 && t.px < 225 && t.py < 159 ) {
-                ( Oam->oamBuffer[ 24 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 25 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 29 ] ).isHidden = true;
-                updateOAMSub( Oam );
-
-                waitForTouchUp( p_time, true );
-                ( Oam->oamBuffer[ 20 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 21 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 28 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 20 ] ).y += 16;
-                ( Oam->oamBuffer[ 21 ] ).y += 16;
-                ( Oam->oamBuffer[ 28 ] ).y += 16;
-                ( Oam->oamBuffer[ 24 ] ).y += 16;
-                ( Oam->oamBuffer[ 25 ] ).y += 16;
-                ( Oam->oamBuffer[ 29 ] ).y += 16;
-                updateOAMSub( Oam );
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
-
-                return 1;
-            }
-        }
-    } else if( _num == 3 ) {
-        for( int i = 0; i < 3; ++i ) {
-            ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = false;
-            ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = false;
-            ( Oam->oamBuffer[ 27 + i ] ).isHidden = false;
-            updateOAMSub( Oam );
-            consoleSetWindow( &Bottom, 5, 9 + 4 * i, 22, 3 );
-            printf( _choices[ i ] );
+    else if( _num < 3 || ( _num > 3 && _big ) ) {
+        _acPage = 0;
+        if( _num > 3 && _big ) {
+            ( Oam->oamBuffer[ 13 ] ).isHidden = false;
+            ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
+            ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
         }
         while( 42 ) {
             swiWaitForVBlank( );
             updateOAMSub( Oam );
             if( p_time )
-                updateTime( true );
+                updateTime( s8( 1 ) );
             touchPosition t;
             touchRead( &t );
 
-            if( t.px > 31 && t.py > 67 && t.px < 225 && t.py < 101 ) {
-                Oam->oamBuffer[ 17 ].isHidden = true;
-                Oam->oamBuffer[ 16 ].isHidden = true;
-                Oam->oamBuffer[ 27 ].isHidden = true;
-                updateOAMSub( Oam );
-
-                waitForTouchUp( p_time, true );
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
-
-                Oam->oamBuffer[ 24 ].isHidden = true;
-                Oam->oamBuffer[ 25 ].isHidden = true;
-                Oam->oamBuffer[ 29 ].isHidden = true;
-                Oam->oamBuffer[ 21 ].isHidden = true;
-                Oam->oamBuffer[ 20 ].isHidden = true;
-                Oam->oamBuffer[ 28 ].isHidden = true;
-                return 0;
-            } else if( t.px > 31 && t.py > 99 && t.px < 225 && t.py < 133 ) {
-                Oam->oamBuffer[ 20 ].isHidden = true;
-                Oam->oamBuffer[ 21 ].isHidden = true;
-                Oam->oamBuffer[ 28 ].isHidden = true;
-                updateOAMSub( Oam );
-
-                waitForTouchUp( p_time, true );
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
-
-                Oam->oamBuffer[ 24 ].isHidden = true;
-                Oam->oamBuffer[ 25 ].isHidden = true;
-                Oam->oamBuffer[ 29 ].isHidden = true;
-                Oam->oamBuffer[ 17 ].isHidden = true;
-                Oam->oamBuffer[ 16 ].isHidden = true;
-                Oam->oamBuffer[ 27 ].isHidden = true;
-                return 1;
-            } else if( t.px > 31 && t.py > 131 && t.px < 225 && t.py < 165 ) {
-                Oam->oamBuffer[ 24 ].isHidden = true;
-                Oam->oamBuffer[ 25 ].isHidden = true;
-                Oam->oamBuffer[ 29 ].isHidden = true;
-                updateOAMSub( Oam );
-
-                waitForTouchUp( p_time, true );
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
-
-                Oam->oamBuffer[ 20 ].isHidden = true;
-                Oam->oamBuffer[ 21 ].isHidden = true;
-                Oam->oamBuffer[ 28 ].isHidden = true;
-                Oam->oamBuffer[ 17 ].isHidden = true;
-                Oam->oamBuffer[ 16 ].isHidden = true;
-                Oam->oamBuffer[ 27 ].isHidden = true;
-                return 2;
-            }
-        }
-    } else if( _num > 3 && _big ) {
-        int page = 0;
-        ( Oam->oamBuffer[ 13 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
-        ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
-        for( int i = 0; i < 3; ++i ) {
-            ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = false;
-            ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = false;
-            ( Oam->oamBuffer[ 27 + i ] ).isHidden = false;
-            updateOAMSub( Oam );
-            consoleSetWindow( &Bottom, 5, 9 + 4 * i, 22, 3 );
-            printf( _choices[ i ] );
-        }
-        while( 42 ) {
-            swiWaitForVBlank( );
-            updateOAMSub( Oam );
-            if( p_time )
-                updateTime( true );
-            touchPosition t;
-            touchRead( &t );
-
-            if( t.px > 31 && t.py > 67 && t.px < 225 && t.py < 101 ) {
-                Oam->oamBuffer[ 17 ].isHidden = true;
-                Oam->oamBuffer[ 16 ].isHidden = true;
-                Oam->oamBuffer[ 27 ].isHidden = true;
-                updateOAMSub( Oam );
-
-                waitForTouchUp( p_time, true );
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
-
-                Oam->oamBuffer[ 24 ].isHidden = true;
-                Oam->oamBuffer[ 25 ].isHidden = true;
-                Oam->oamBuffer[ 29 ].isHidden = true;
-                Oam->oamBuffer[ 21 ].isHidden = true;
-                Oam->oamBuffer[ 20 ].isHidden = true;
-                Oam->oamBuffer[ 28 ].isHidden = true;
-                return 0 + 3 * page;
-            } else if( _num >= 3 * page + 2 && t.px > 31 && t.py > 99 && t.px < 225 && t.py < 133 ) {
-                Oam->oamBuffer[ 20 ].isHidden = true;
-                Oam->oamBuffer[ 21 ].isHidden = true;
-                Oam->oamBuffer[ 28 ].isHidden = true;
-                updateOAMSub( Oam );
-
-                waitForTouchUp( p_time, true );
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
-
-                Oam->oamBuffer[ 24 ].isHidden = true;
-                Oam->oamBuffer[ 25 ].isHidden = true;
-                Oam->oamBuffer[ 29 ].isHidden = true;
-                Oam->oamBuffer[ 17 ].isHidden = true;
-                Oam->oamBuffer[ 16 ].isHidden = true;
-                Oam->oamBuffer[ 27 ].isHidden = true;
-                return 1 + 3 * page;
-            } else if( _num >= 3 * page + 3 && t.px > 31 && t.py > 131 && t.px < 225 && t.py < 165 ) {
-                Oam->oamBuffer[ 24 ].isHidden = true;
-                Oam->oamBuffer[ 25 ].isHidden = true;
-                Oam->oamBuffer[ 29 ].isHidden = true;
-                updateOAMSub( Oam );
-
-                waitForTouchUp( p_time, true );
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
-
-                Oam->oamBuffer[ 20 ].isHidden = true;
-                Oam->oamBuffer[ 21 ].isHidden = true;
-                Oam->oamBuffer[ 28 ].isHidden = true;
-                Oam->oamBuffer[ 17 ].isHidden = true;
-                Oam->oamBuffer[ 16 ].isHidden = true;
-                Oam->oamBuffer[ 27 ].isHidden = true;
-                return 2 + 3 * page;
-            } else if( ( page == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 ) || ( page && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
-
-                waitForTouchUp( p_time, true );
-                if( ( ++page ) >= ( ( _num - 1 ) / 3 ) ) {
-                    ( Oam->oamBuffer[ 13 ] ).isHidden = true;
-                    ( Oam->oamBuffer[ 14 ] ).isHidden = false;
-                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 0 ][ 0 ] - 16;
-                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 0 ][ 1 ] - 16;
-                    page = ( ( _num - 1 ) / 3 );
-                } else {
-                    ( Oam->oamBuffer[ 14 ] ).isHidden = false;
-                    ( Oam->oamBuffer[ 13 ] ).isHidden = false;
-                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 1 ][ 0 ] - 16;
-                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
-                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
-                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
-                }
-                for( int i = 0; i < 3; ++i ) {
-                    if( 3 * page + i >= _num ) {
-                        ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = true;
-                        ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = true;
-                        ( Oam->oamBuffer[ 27 + i ] ).isHidden = true;
-                        updateOAMSub( Oam );
-                        consoleSetWindow( &Bottom, 5, 9 + 4 * i, 22, 3 );
-                        consoleClear( );
-                    } else {
-                        consoleSetWindow( &Bottom, 5, 9 + 4 * i, 22, 3 );
-                        consoleClear( );
-                        printf( _choices[ 3 * page + i ] );
+            for( u8 i = 0; i < 3; ++i )
+                if( ( i + 3 * _acPage ) < _num && t.px >= 32 && t.py >= 68 + 35 * i && t.px <= 224 && t.py <= 100 + 35 * i ) {
+                    draw( i );
+                    if( !waitForTouchUp( p_time, true, 32, 68 + 35 * i, 224, 100 + 35 * i ) ) {
+                        draw( 8 );
+                        break;
                     }
+                    result = i + 3 * _acPage;
+                    goto END;
                 }
-                updateOAMSub( Oam );
-            } else if( ( page == ( _num - 1 ) / 3 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 ) || ( page && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
+            if( p_backButton && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] - 12 ) + sq( t.py - fwdPos[ 0 ][ 1 ] - 12 ) ) < 17 ) { //Back pressed
+                result = -1;
+                goto END;
+            }
+            if( _num > 3 && _big ) {
+                if( !p_backButton && ( _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 )
+                    || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
 
-                waitForTouchUp( p_time, true );
-                if( ( --page ) <= 0 ) {
-                    ( Oam->oamBuffer[ 14 ] ).isHidden = true;
-                    ( Oam->oamBuffer[ 13 ] ).isHidden = false;
-                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
-                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
-                    page = 0;
-                } else {
-                    ( Oam->oamBuffer[ 13 ] ).isHidden = false;
-                    ( Oam->oamBuffer[ 14 ] ).isHidden = false;
-                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 1 ][ 0 ] - 16;
-                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
-                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
-                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
-                }
-                for( int i = 0; i < 3; ++i ) {
-                    ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = false;
-                    ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = false;
-                    ( Oam->oamBuffer[ 27 + i ] ).isHidden = false;
+                    waitForTouchUp( p_time, true );
+                    if( ( ++_acPage ) >= ( ( _num - 1 ) / 3 ) ) {
+                        ( Oam->oamBuffer[ 13 ] ).isHidden = true;
+                        ( Oam->oamBuffer[ 14 ] ).isHidden = false;
+                        ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ p_backButton ][ 0 ] - 16;
+                        ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ p_backButton ][ 1 ] - 16;
+                        if( _acPage == ( ( _num - 1 ) / 3 ) )
+                            draw( NEW_PAGE );
+                        _acPage = ( ( _num - 1 ) / 3 );
+                    } else {
+                        ( Oam->oamBuffer[ 14 ] ).isHidden = false;
+                        ( Oam->oamBuffer[ 13 ] ).isHidden = false;
+                        ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 1 ][ 0 ] - 16;
+                        ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
+                        ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
+                        ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
+                        draw( NEW_PAGE );
+                    }
                     updateOAMSub( Oam );
-                    consoleSetWindow( &Bottom, 5, 9 + 4 * i, 22, 3 );
-                    consoleClear( );
-                    printf( _choices[ 3 * page + i ] );
+                } else if( !p_backButton && ( _acPage == ( _num - 1 ) / 3 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 )
+                           || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
+
+                    waitForTouchUp( p_time, true );
+                    if( ( --_acPage ) <= 0 ) {
+                        ( Oam->oamBuffer[ 14 ] ).isHidden = true;
+                        ( Oam->oamBuffer[ 13 ] ).isHidden = false;
+                        ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
+                        ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
+                        if( _acPage == 0 )
+                            draw( NEW_PAGE );
+                        _acPage = 0;
+                    } else {
+                        ( Oam->oamBuffer[ 13 ] ).isHidden = false;
+                        ( Oam->oamBuffer[ 14 ] ).isHidden = false;
+                        ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 1 ][ 0 ] - 16;
+                        ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
+                        ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
+                        ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
+                        draw( NEW_PAGE );
+                    }
+                    updateOAMSub( Oam );
                 }
-                updateOAMSub( Oam );
             }
         }
     } else {
-        u8 page = 0,
-            inds[ ] = { 17, 15, 21, 19, 25, 23 };
-        for( int i = 0; i < std::min( (u8)6, _num ); ++i ) {
-            ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = false;
-            ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = false;
-            updateOAMSub( Oam );
-            consoleSetWindow( &Bottom, 5 + ( ( i % 2 ) * 12 ), 9 + 4 * ( i / 2 ), 10, 3 );
-            printf( _choices[ i ] );
-        }
+        _acPage = 0;
         if( _num > 6 ) {
             ( Oam->oamBuffer[ 13 ] ).isHidden = false;
-            ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
-            ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
+            ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
+            ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
         }
         updateOAMSub( Oam );
         while( 42 ) {
             swiWaitForVBlank( );
             updateOAMSub( Oam );
             if( p_time )
-                updateTime( true );
+                updateTime( s8( 1 ) );
             touchPosition t;
             touchRead( &t );
 
-            for( u8 i = 0; i < std::min( 6, _num - 6 * page ); ++i ) {
-                if( t.px > 31 + ( ( i % 2 ) * 96 ) && t.py > 71 + 32 * ( i / 2 ) && t.px < 225 - ( ( ( i + 1 ) % 2 ) * 96 ) && t.py < 105 + 32 * ( i / 2 ) ) {
-                    ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = true;
-                    ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = true;
-                    updateOAMSub( Oam );
+            for( u8 i = 0; i < std::min( 6, _num - 6 * _acPage ); ++i ) {
+                if( t.px >= ( ( i % 2 ) ? 129 : 19 ) && t.py >= 68 + ( i / 2 ) * 35
+                    && t.px <= 106 + ( ( i % 2 ) ? 129 : 19 ) && t.py <= 32 + 68 + ( i / 2 ) * 35 ) {
+                    draw( i );
 
-                    waitForTouchUp( p_time, true );
-                    consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                    consoleClear( );
-                    return i + 6 * page;
+                    if( !waitForTouchUp( p_time, true, ( ( i % 2 ) ? 129 : 19 ),
+                        68 + ( i / 2 ) * 35, 106 + ( ( i % 2 ) ? 129 : 19 ), 32 + 68 + ( i / 2 ) * 35 ) ) {
+                        draw( 8 );
+                        break;
+                    }
+                    result = i + 6 * _acPage;
+                    goto END;
                 }
             }
 
-            if( ( page == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 ) || ( page && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
+            if( p_backButton && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] - 12 ) + sq( t.py - fwdPos[ 0 ][ 1 ] - 12 ) ) < 17 ) { //Back pressed
+                result = -1;
+                goto END;
+            } else if( !p_backButton && ( _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 )
+                       || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
 
                 waitForTouchUp( p_time, true );
-                if( ( ++page ) >= ( _num / 6 ) ) {
+                if( ( ++_acPage ) >= ( _num / 6 ) ) {
                     ( Oam->oamBuffer[ 13 ] ).isHidden = true;
                     ( Oam->oamBuffer[ 14 ] ).isHidden = false;
-                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ 0 ][ 0 ] - 16;
-                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 0 ][ 1 ] - 16;
-                    page = ( _num / 6 );
+                    ( Oam->oamBuffer[ 14 ] ).x = bwdPos[ p_backButton ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ p_backButton ][ 1 ] - 16;
+                    if( _acPage == ( _num / 6 ) )
+                        draw( NEW_PAGE );
+                    _acPage = ( _num / 6 );
                 } else {
                     ( Oam->oamBuffer[ 14 ] ).isHidden = false;
                     ( Oam->oamBuffer[ 13 ] ).isHidden = false;
@@ -1023,29 +733,19 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
                     ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
                     ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
                     ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
+                    draw( NEW_PAGE );
                 }
-                for( u8 i = 0; i < 6; ++i ) {
-                    consoleSetWindow( &Bottom, 5 + ( ( i % 2 ) * 12 ), 9 + 4 * ( i / 2 ), 10, 3 );
-                    consoleClear( );
-                    if( i < _num - 6 * page ) {
-                        ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = false;
-                        ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = false;
-                        printf( _choices[ i + 6 * page ] );
-                    } else {
-                        ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = true;
-                        ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = true;
-                    }
-                    updateOAMSub( Oam );
-                }
-            } else if( ( page == _num / 6 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 ) || ( page && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
-
+            } else if( !p_backButton && ( _acPage == _num / 6 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 )
+                       || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
                 waitForTouchUp( p_time, true );
-                if( ( --page ) <= 0 ) {
+                if( ( --_acPage ) <= 0 ) {
                     ( Oam->oamBuffer[ 14 ] ).isHidden = true;
                     ( Oam->oamBuffer[ 13 ] ).isHidden = false;
-                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 0 ][ 0 ] - 16;
-                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 0 ][ 1 ] - 16;
-                    page = 0;
+                    ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
+                    ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
+                    if( _acPage == 0 )
+                        draw( NEW_PAGE );
+                    _acPage = 0;
                 } else {
                     ( Oam->oamBuffer[ 13 ] ).isHidden = false;
                     ( Oam->oamBuffer[ 14 ] ).isHidden = false;
@@ -1053,22 +753,16 @@ int choiceBox::getResult( const char* p_text = 0, bool p_time = true ) {
                     ( Oam->oamBuffer[ 14 ] ).y = bwdPos[ 1 ][ 1 ] - 16;
                     ( Oam->oamBuffer[ 13 ] ).x = fwdPos[ 1 ][ 0 ] - 16;
                     ( Oam->oamBuffer[ 13 ] ).y = fwdPos[ 1 ][ 1 ] - 16;
-                }
-                for( u8 i = 0; i < 6; ++i ) {
-                    consoleSetWindow( &Bottom, 5 + ( ( i % 2 ) * 12 ), 9 + 4 * ( i / 2 ), 10, 3 );
-                    consoleClear( );
-                    if( i < _num - 6 * page ) {
-                        ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = false;
-                        ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = false;
-                        printf( _choices[ i + 6 * page ] );
-                    } else {
-                        ( Oam->oamBuffer[ inds[ i ] ] ).isHidden = true;
-                        ( Oam->oamBuffer[ inds[ i ] + 1 ] ).isHidden = true;
-                    }
-                    updateOAMSub( Oam );
+                    draw( NEW_PAGE );
                 }
             }
         }
     }
-    return -1;
+END:
+    dinit( );
+    ( Oam->oamBuffer[ 14 ] ).isHidden = true;
+    ( Oam->oamBuffer[ 13 ] ).isHidden = true;
+    ( Oam->oamBuffer[ BACK_ID ] ).isHidden = true;
+    updateOAMSub( Oam );
+    return result;
 }
