@@ -91,7 +91,7 @@ void messageBox::clearButName( ) {
     FONT::putrec( (u8)72, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
 }
 
-void waitForTouchUp( bool p_uTime, bool p_tpar = false ) {
+bool waitForTouchUp( bool p_uTime, bool p_tpar = false, u16 p_targetX1 = 0, u16 p_targetY1 = 0, u16 p_targetX2 = 300, u16 p_targetY2 = 300 ) {
     while( 1 ) {
         swiWaitForVBlank( );
         scanKeys( );
@@ -99,8 +99,11 @@ void waitForTouchUp( bool p_uTime, bool p_tpar = false ) {
             updateTime( p_tpar );
         auto touch = touchReadXY( );
         if( touch.px == 0 && touch.py == 0 )
-            break;
+            return true;
+        if( !( touch.px >= p_targetX1 && touch.py >= p_targetY1 && touch.px <= p_targetX2 && touch.py <= p_targetY2 ) )
+            return false;
     }
+    return false;
 }
 
 messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
@@ -277,8 +280,8 @@ messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_tim
     init( );
 
     if( p_time ) updateTime( );
-        if( p_name )
-            cust_font.printString( p_name, 8, 8, true );
+    if( p_name )
+        cust_font.printString( p_name, 8, 8, true );
     if( p_a ) {
         FONT::ASpriteOamIndex = 8;
         std::wstring text( p_text );
@@ -307,8 +310,8 @@ void messageBox::put( const char* p_text, bool p_a, bool p_time ) {
     init( );
 
     if( p_time ) updateTime( );
-        if( m_isNamed )
-            cust_font.printString( m_isNamed, 8, 8, true );
+    if( m_isNamed )
+        cust_font.printString( m_isNamed, 8, 8, true );
     if( p_a ) {
         FONT::ASpriteOamIndex = 8;
         std::string text( p_text );
@@ -317,6 +320,39 @@ void messageBox::put( const char* p_text, bool p_a, bool p_time ) {
         cust_font.printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
 
     swiWaitForVBlank( );
+}
+
+void drawChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_colorIdx, bool p_pressed ) {
+    if( !p_pressed ) {
+        FONT::putrec( p_x1 + 1, p_y1 + 1, p_x2, p_y2,
+                      true, false, BLACK_IDX );
+        FONT::putrec( p_x1, p_y1, p_x2 - 2, p_y2 - 1,
+                      true, false, p_colorIdx );
+        FONT::putrec( p_x1 + 1 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth, p_y2 - p_borderWidth + 4,
+                      true, false, BLACK_IDX );
+        FONT::putrec( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth - 2, p_y2 - p_borderWidth + 3,
+                      true, false, WHITE_IDX );
+    } else {
+        FONT::putrec( p_x1, p_y1, p_x2 - 1, p_y2 - 1,
+                      true, false, BLACK_IDX );
+        FONT::putrec( p_x1 + 2, p_y1 + 1, p_x2, p_y2,
+                      true, false, p_colorIdx );
+
+        FONT::putrec( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth - 1, p_y2 - p_borderWidth + 3,
+                      true, false, BLACK_IDX );
+
+        FONT::putrec( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth, p_y2 - p_borderWidth + 4,
+                      true, false, WHITE_IDX );
+    }
+}
+
+void yesNoBox::draw( int p_pressedIdx ) {
+    drawChoiceBox( 28, 102, 122, 134, 6, RED_IDX, p_pressedIdx == 0 );
+    cust_font.printString( "Ja", 65 + 2 * ( p_pressedIdx == 0 ),
+                           110 + ( p_pressedIdx == 0 ), true );
+    drawChoiceBox( 134, 102, 228, 134, 6, BLUE_IDX, p_pressedIdx == 1 );
+    cust_font.printString( "Nein", 165 + 2 * ( p_pressedIdx == 1 ),
+                           110 + ( p_pressedIdx == 1 ), true );
 }
 
 yesNoBox::yesNoBox( ) {
@@ -382,14 +418,9 @@ bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
         else
             cust_font.printStringD( p_text, 8, 8, true );
     }
-    for( u8 i = 19; i <= 22; ++i )
-        Oam->oamBuffer[ i ].isHidden = false;
+    draw( 2 );
     updateOAMSub( Oam );
-    consoleSetWindow( &Bottom, 5, 13, 10, 3 );
-    printf( "\n    Ja" );
-    consoleSetWindow( &Bottom, 17, 13, 10, 3 );
-    printf( "\n   Nein" );
-
+    bool result;
     while( 42 ) {
         swiWaitForVBlank( );
         updateOAMSub( Oam );
@@ -397,50 +428,37 @@ bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
             updateTime( );
         touchPosition t;
         touchRead( &t );
-        if( t.px > 31 && t.py > 99 && t.px < 129 && t.py < 133 ) {
-            Oam->oamBuffer[ 21 ].isHidden = true;
-            Oam->oamBuffer[ 22 ].isHidden = true;
-            updateOAMSub( Oam );
-
-            waitForTouchUp( p_time );
-            Oam->oamBuffer[ 19 ].isHidden = true;
-            Oam->oamBuffer[ 20 ].isHidden = true;
-            setSpriteVisibility( back, back_ );
-            setSpriteVisibility( save, save_ );
-            Oam->oamBuffer[ 8 ].isHidden = true;
-            for( u8 i = 9; i <= 12; ++i ) {
-                Oam->oamBuffer[ i ].isHidden = true;
+        if( t.px >= 28 && t.py >= 102 && t.px <= 122 && t.py <= 134 ) {
+            draw( 0 );
+            if( !waitForTouchUp( p_time, false, 28, 102, 122, 134 ) ) {
+                draw( 2 );
+                continue;
             }
-            updateOAMSub( Oam );
-            consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-            consoleClear( );
-            dinit( );
-            return true;//YES
-        } else if( t.px > 127 && t.py > 99 && t.px < 225 && t.py < 133 ) {
-            Oam->oamBuffer[ 19 ].isHidden = true;
-            Oam->oamBuffer[ 20 ].isHidden = true;
-            updateOAMSub( Oam );
-
-            waitForTouchUp( p_time );
-            Oam->oamBuffer[ 21 ].isHidden = true;
-            Oam->oamBuffer[ 22 ].isHidden = true;
-            setSpriteVisibility( back, back_ );
-            setSpriteVisibility( save, save_ );
-            Oam->oamBuffer[ 8 ].isHidden = true;
-            for( u8 i = 9; i <= 12; ++i ) {
-                Oam->oamBuffer[ i ].isHidden = true;
+            result = true;
+            break;
+        } else if( t.px >= 134 && t.py >= 102 && t.px <= 228 && t.py <= 134 ) {
+            draw( 1 );
+            if( !waitForTouchUp( p_time, false, 134, 102, 228, 134 ) ) {
+                draw( 2 );
+                continue;
             }
-            updateOAMSub( Oam );
-            consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-            consoleClear( );
-            dinit( );
-            return false;//No
+            result = false;
+            break;
         }
     }
+    setSpriteVisibility( back, back_ );
+    setSpriteVisibility( save, save_ );
+    Oam->oamBuffer[ 8 ].isHidden = true;
+    for( u8 i = 9; i <= 12; ++i ) {
+        Oam->oamBuffer[ i ].isHidden = true;
+    }
+    updateOAMSub( Oam );
+    consoleSetWindow( &Bottom, 1, 1, 30, 24 );
+    consoleClear( );
     dinit( );
-    return false;
+    return result;
 }
-bool yesNoBox::getResult( const wchar_t* p_text = 0, bool time ) {
+bool yesNoBox::getResult( const wchar_t* p_text = 0, bool p_time ) {
 
     updateOAMSub( Oam );
     consoleSelect( &Bottom );
@@ -450,64 +468,45 @@ bool yesNoBox::getResult( const wchar_t* p_text = 0, bool time ) {
         else
             cust_font.printStringD( p_text, 8, 8, true );
     }
-    for( u8 i = 19; i <= 22; ++i )
-        Oam->oamBuffer[ i ].isHidden = false;
+    draw( 2 );
     updateOAMSub( Oam );
-    consoleSetWindow( &Bottom, 5, 13, 10, 3 );
-    printf( "\n    Ja" );
-    consoleSetWindow( &Bottom, 17, 13, 10, 3 );
-    printf( "\n   Nein" );
-
+    bool result;
     while( 42 ) {
         swiWaitForVBlank( );
         updateOAMSub( Oam );
-        if( time )
+        if( p_time )
             updateTime( );
         touchPosition t;
         touchRead( &t );
-        if( t.px > 31 && t.py > 99 && t.px < 129 && t.py < 133 ) {
-            Oam->oamBuffer[ 21 ].isHidden = true;
-            Oam->oamBuffer[ 22 ].isHidden = true;
-            updateOAMSub( Oam );
-
-            waitForTouchUp( time );
-            Oam->oamBuffer[ 19 ].isHidden = true;
-            Oam->oamBuffer[ 20 ].isHidden = true;
-            setSpriteVisibility( back, back_ );
-            setSpriteVisibility( save, save_ );
-            Oam->oamBuffer[ 8 ].isHidden = true;
-            for( u8 i = 9; i <= 12; ++i ) {
-                Oam->oamBuffer[ i ].isHidden = true;
+        if( t.px >= 28 && t.py >= 102 && t.px <= 122 && t.py <= 134 ) {
+            draw( 0 );
+            if( !waitForTouchUp( p_time, false, 28, 102, 122, 134 ) ) {
+                draw( 2 );
+                continue;
             }
-            updateOAMSub( Oam );
-            consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-            consoleClear( );
-            dinit( );
-            return true;//YES
-        } else if( t.px > 127 && t.py > 99 && t.px < 225 && t.py < 133 ) {
-            Oam->oamBuffer[ 19 ].isHidden = true;
-            Oam->oamBuffer[ 20 ].isHidden = true;
-            updateOAMSub( Oam );
-
-
-            waitForTouchUp( time );
-            Oam->oamBuffer[ 21 ].isHidden = true;
-            Oam->oamBuffer[ 22 ].isHidden = true;
-            setSpriteVisibility( back, back_ );
-            setSpriteVisibility( save, save_ );
-            Oam->oamBuffer[ 8 ].isHidden = true;
-            for( u8 i = 9; i <= 12; ++i ) {
-                Oam->oamBuffer[ i ].isHidden = true;
+            result = true;
+            break;
+        } else if( t.px >= 134 && t.py >= 102 && t.px <= 228 && t.py <= 134 ) {
+            draw( 1 );
+            if( !waitForTouchUp( p_time, false, 134, 102, 228, 134 ) ) {
+                draw( 2 );
+                continue;
             }
-            updateOAMSub( Oam );
-            consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-            consoleClear( );
-            dinit( );
-            return false;//No
+            result = false;
+            break;
         }
     }
+    setSpriteVisibility( back, back_ );
+    setSpriteVisibility( save, save_ );
+    Oam->oamBuffer[ 8 ].isHidden = true;
+    for( u8 i = 9; i <= 12; ++i ) {
+        Oam->oamBuffer[ i ].isHidden = true;
+    }
+    updateOAMSub( Oam );
+    consoleSetWindow( &Bottom, 1, 1, 30, 24 );
+    consoleClear( );
     dinit( );
-    return false;
+    return result;
 }
 
 choiceBox::choiceBox( int p_num, const char** p_choices, const char* p_name = 0, bool p_big = false ) {

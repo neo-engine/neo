@@ -49,6 +49,8 @@ public:
     bool getResult( const char* p_text, bool p_time = true );
     bool getResult( const wchar_t* p_text, bool p_time = true );
 
+    void draw( int p_pressedIdx );
+
     ~yesNoBox( ) {
         consoleSetWindow( &Bottom, 9, 1, 22, MAXLINES );
         consoleSelect( &Bottom );

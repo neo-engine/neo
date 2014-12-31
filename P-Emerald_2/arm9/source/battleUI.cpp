@@ -91,7 +91,7 @@ namespace BATTLE {
     //////////////////////////////////////////////////////////////////////////
 
     extern char* trainerclassnames[ ];
-    
+
     void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big ) {
         if( p_big )
             displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 20, 24 );
@@ -1618,7 +1618,7 @@ CLEAR:
 
         bool newLevel = POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
         u16 HPdif = acPkmn.m_stats.m_maxHP - acPkmn.m_stats.m_acHP;
-        
+
         while( newLevel ) {
             acPkmn.m_Level++;
 
@@ -2084,7 +2084,7 @@ CLEAR:
         }
         updateHP( p_opponent, p_pokemonPos );
     }
-    
+
     void battleUI::learnMove( u8 p_pokemonPos, u16 p_move ) {
         if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
             return;
@@ -2093,7 +2093,7 @@ CLEAR:
 
         //Check if the PKMN already knows this move
         auto& acPkmn = ACPKMN2( *_battle, p_pokemonPos, PLAYER );
-        
+
         for( u8 i = 0; i < 4; ++i )
             if( acPkmn.m_boxdata.m_moves[ i ] == p_move )
                 return;
@@ -2107,12 +2107,24 @@ CLEAR:
             yesNoBox yn;
 ST:
             if( yn.getResult( "Soll eine Attacke\nvergessen werden?" ) ) {
+                initLogScreen( );
                 auto res = chooseAttack( p_pokemonPos );
+                for( u8 u = 0; u < 50; ++u )
+                    Oam->oamBuffer[ u ].isHidden = true;
+                updateOAMSub( Oam );
+
                 if( !res ) {
                     std::sprintf( buffer, "Aufgeben %s zu erlernen?", AttackList[ p_move ]->m_moveName.c_str( ) );
-                    if( !yn.getResult( buffer ) )
+                    if( !yn.getResult( buffer ) ) {
+                        for( u8 u = 0; u < 50; ++u )
+                            Oam->oamBuffer[ u ].isHidden = true;
+                        updateOAMSub( Oam );
+                        initLogScreen( );
                         goto ST;
+                    }
                 } else {
+                    initLogScreen( );
+                    loadA( );
                     std::swprintf( wbuffer, 100, L"%ls vergisst %s[A]\nund erlernt %s![A]",
                                    acPkmn.m_boxdata.m_name,
                                    AttackList[ res ]->m_moveName.c_str( ),
@@ -2120,18 +2132,32 @@ ST:
                     _battle->log( wbuffer );
 
                     for( u8 i = 0; i < 4; ++i )
-                        if( acPkmn.m_boxdata.m_moves[ i ] == res )
+                        if( acPkmn.m_boxdata.m_moves[ i ] == res ) {
                             acPkmn.m_boxdata.m_moves[ i ] = p_move;
+                            acPkmn.m_boxdata.m_acPP[ i ] = AttackList[ p_move ]->m_movePP;
+                        }
                 }
             } else {
+                initLogScreen( );
+                loadA( );
+                for( u8 u = 0; u < 50; ++u )
+                    Oam->oamBuffer[ u ].isHidden = true;
+                updateOAMSub( Oam );
+
                 std::sprintf( buffer, "Aufgeben %s zu erlernen?", AttackList[ p_move ]->m_moveName.c_str( ) );
-                if( !yn.getResult( buffer ) )
+                if( !yn.getResult( buffer ) ) {
+                    initLogScreen( );
+                    for( u8 u = 0; u < 50; ++u )
+                        Oam->oamBuffer[ u ].isHidden = true;
+                    updateOAMSub( Oam );
                     goto ST;
+                }
             }
         } else {
             for( u8 i = 0; i < 4; ++i ) {
                 if( !acPkmn.m_boxdata.m_moves[ i ] ) {
                     acPkmn.m_boxdata.m_moves[ i ] = p_move;
+                    acPkmn.m_boxdata.m_acPP[ i ] = AttackList[ p_move ]->m_movePP;
                     std::swprintf( wbuffer, 50, L"%ls erlernt %s![A]",
                                    acPkmn.m_boxdata.m_name,
                                    AttackList[ p_move ]->m_moveName.c_str( ) );
@@ -2140,6 +2166,9 @@ ST:
                 }
             }
         }
+
+        initLogScreen( );
+        loadA( );
     }
 
     void battleUI::showEndScreen( ) {
@@ -2169,6 +2198,7 @@ ST:
         Oam->oamBuffer[ 8 ].isHidden = true;
         Oam->oamBuffer[ 0 ].isHidden = true;
         Oam->oamBuffer[ 1 ].isHidden = false;
+        updateOAMSub( Oam );
     }
 
     //////////////////////////////////////////////////////////////////////////

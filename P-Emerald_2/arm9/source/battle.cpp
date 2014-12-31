@@ -1292,6 +1292,7 @@ NEXT:
     */
     void battle::distributeEXP( bool p_opponent, u8 p_pokemonPos ) {
         u8 receivingPKMN = _participatedPKMN[ &ACPKMN( p_pokemonPos, p_opponent ) ];
+        _participatedPKMN[ &ACPKMN( p_pokemonPos, p_opponent ) ] = 0;
 
         float wildModifer = m_isWildBattle ? 1 : 1.5;
         POKEMON::PKMNDATA::pokemonData p;
