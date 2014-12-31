@@ -32,10 +32,10 @@
 
 #pragma once
 #include <nds.h>
+#include "defines.h"
 
 typedef u16 color;
 namespace FONT {
-#define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 #define NUMFONTS 2
     const u8 SCREEN_TOP = 1;
     const u8 SCREEN_BOTTOM = 0;

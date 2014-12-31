@@ -714,7 +714,8 @@ bool whirlpool::possible( ) {
     return false;
 }
 bool surf::possible( ) {
-    return SAV.m_acMoveMode != map2d::MoveMode::SURF && acMap->m_blocks[ SAV.m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ SAV.m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].m_movedata == 4;
+    return ( SAV.m_acMoveMode != map2d::MoveMode::SURF )
+        && acMap->m_blocks[ SAV.m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ SAV.m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].m_movedata == 4;
 }
 
 bool heroIsBig = false;
@@ -2080,8 +2081,8 @@ OUT:
                 if( touch.px == 0 && touch.py == 0 )
                     break;
             }
-            const char *someText[ 7 ] = { "\n     PKMN-Spawn", "\n    Item-Spawn", "\n 1-Item_Test", "\n  Battle SPWN.", "\n   Battle SPWN 2", "\n    42" };
-            choiceBox test( 5, &someText[ 0 ], 0, true );
+            const char *someText[ 7 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item_Test", "Battle SPWN.", "Battle SPWN 2", "42", " ... " };
+            choiceBox test( 7, &someText[ 0 ], 0, true );
             int res = test.getResult( "Tokens of god-being...", true );
             switch( res ) {
                 case 0:

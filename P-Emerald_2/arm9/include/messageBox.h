@@ -49,7 +49,7 @@ public:
     bool getResult( const char* p_text, bool p_time = true );
     bool getResult( const wchar_t* p_text, bool p_time = true );
 
-    void draw( int p_pressedIdx );
+    void draw( u8 p_pressedIdx );
 
     ~yesNoBox( ) {
         consoleSetWindow( &Bottom, 9, 1, 22, MAXLINES );
@@ -72,13 +72,16 @@ public:
     choiceBox( int p_num, const char** p_choices, const char* p_name, bool p_big );
     ~choiceBox( );
 
+    void draw( u8 p_pressedIdx );
     int getResult( const char* p_text, bool p_time );
     void kill( );
 private:
     const char** _choices;
     bool _big;
     u8 _num;
-    bool _name;
+    const char* _name;
+    const char* _text;
+    u8 _acPage;
 };
 
 #endif
