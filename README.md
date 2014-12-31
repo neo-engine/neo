@@ -10,27 +10,27 @@ This game is intended to be played on real hardware, but [DeSmuME 0.9.10](http:/
 Features
 --------
 
-* A _fully_ working Pokémon engine, including
-    * Displaying _and storing_ Pokémon
-    * A fully working PokéDex, loading its data from the ROM's filesystem
-    * A _fully_ working battle engine, capable of simulaitng single and double battles
-    * Loading maps (for now only GBA-style maps are supported, 3D maps are planned)
-      * _Events_
-      * _Wild Pokémon encounter_
-      * Animated map tiles
-      * Player sprite, animated moving and surfing
-    * Playing .mp3 as BGM, user customization of BGM via music stored on the micro SD card (at least, it works _sometimes_...)
-    * RTC, _including overword changes based on time_
-    * Saving the progress to the micro SD
-    * Communicating with “the originals”
-      * Playing with a save from a GBA version (saving is still not implemented yet, though)
-      * _Link trading with Gen IV and Gen V games_
-    * An almost up-to-date UI
-* Easy-to-understand and ready-to-(re)use code
-    * Strict and intuitive naming conventions
-    * _Good_ documentation
+* [ ] A _fully_ working Pokémon engine, including
+    * [ ] Displaying Pokémon _and storing_ Pokémon
+    * [x] A fully working PokéDex, loading its data from the ROM's filesystem
+    * [ ] A _fully_ working battle engine, capable of simulaitng single and double battles
+    * [ ] Loading maps (for now only GBA-style maps are supported, 3D maps are planned)
+      * [ ] _Events_
+      * [ ] _Wild Pokémon encounter_
+      * [x] Animated map tiles
+      * [x] Player sprite, animated moving and surfing
+    * [x] ~~Playing .mp3 as BGM, user customization of BGM via music stored on the micro SD card (at least, it works _sometimes_...)~~ (currently excluded due to several related bugs)
+    * [ ] RTC, _including overword changes based on time_
+    * [x] Saving the progress to the micro SD
+    * [ ] Communicating with “the originals”
+      * [x] Playing with a save from a GBA version (saving is still not implemented yet, though)
+      * [ ] _Link trading with Gen IV and Gen V games_
+    * [x] An almost up-to-date UI
+* [ ] Easy-to-understand and ready-to-(re)use code
+    * [x] Strict and intuitive naming conventions
+    * [ ] _Good_ documentation
 
-Features that still have to be implemented yet are _italic_.
+Specific features that still have to be implemented yet are _italic_.
 
 Some screens
 ------------
@@ -47,5 +47,8 @@ Some screens
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_29_10070.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_01_10175.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_09_10201.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_51_11843.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_42_26995.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_13_11915.png)
 
 _More to come_, as this README.md is still under construction!
