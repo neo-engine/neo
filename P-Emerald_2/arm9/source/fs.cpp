@@ -603,13 +603,13 @@ namespace FS {
     }
 
     bool loadNavScreen( u16* p_layer, const char* p_name, u8 p_no ) {
-        if( p_no == BG_ind && NAV_DATA[ 0 ] ) {
+        if( p_no == SAV.m_bgIdx && NAV_DATA[ 0 ] ) {
             dmaCopy( NAV_DATA, p_layer, 256 * 192 );
             dmaCopy( NAV_DATA_PAL, BG_PALETTE_SUB, 256 * 2 );
             return true;
         }
 
-        //char buffer[100];
+        char buffer[100];
         sprintf( buffer, "nitro:/PICS/NAV/%s.raw", p_name );
         FILE* fd = fopen( buffer, "rb" );
 

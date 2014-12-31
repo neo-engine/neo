@@ -42,7 +42,6 @@ distribution.
 
 extern unsigned int NAV_DATA[ 12288 ];
 extern unsigned short NAV_DATA_PAL[ 256 ];
-extern u8 BG_ind;
 extern SavMod savMod;
 
 namespace FS {

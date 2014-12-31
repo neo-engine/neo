@@ -92,6 +92,7 @@ extern Region acMapRegion;
 extern bool showmappointer;
 
 #define MAXBG 10
+#define START_BG 9
 struct backgroundSet {
     std::string             m_name;
     const unsigned int      *m_mainMenu;
@@ -101,7 +102,6 @@ struct backgroundSet {
     u8                      *m_mainMenuSpritePoses;
 };
 extern backgroundSet BGs[ MAXBG ];
-extern u8 BG_ind;
 
 void vramSetup( );
 
@@ -110,6 +110,7 @@ void animateMap( u8 p_frame );
 
 void initVideoSub( );
 void drawSub( );
+void drawSub( u8 p_newIdx );
 
 void animateBack( );
 void setMainSpriteVisibility( bool p_hidden, bool p_save = false );

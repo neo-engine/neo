@@ -358,6 +358,8 @@ void initNewGame( ) {
     SAV.m_badges = 0;
     SAV.m_dex = 0;
 
+    SAV.m_bgIdx = START_BG;
+
     SAV.m_PkmnTeam.clear( );
     consoleSelect( &Bottom );
     consoleClear( );
@@ -565,23 +567,23 @@ INDIVIDUALISIERUNG:
         M = messageBox( "Hi, ich bin Larissa,\n""aber Lari reicht auch.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Das da ist mein\nkleiner Bruder Moritz.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Wir kommen aus Azuria", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Das heißt eigentlich.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Als alle Kanto verlassen\nhaben, sind wir nach\nKlippdelta gezogen.", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
         consoleClear( );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Du kommst auch aus\nKlippdelta?!", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Oh...\n", "Lari", messageBox::sprite_trainer, 0 );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Na dann sehen wir uns ja\nwahrscheinlich noch öfter...", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
         consoleClear( );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
     } else {
         M = messageBox( "Mir wird sie den Dex\nzuerst geben!", "???", true, true, false, messageBox::sprite_pkmn, 0 );
         consoleClear( );
@@ -601,7 +603,7 @@ INDIVIDUALISIERUNG:
         M = messageBox( "Nenn' mich ruhig Basti.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Das da ist mein\nkleiner Bruder Moritz.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Wir kommen aus Azuria.", "Basti", true, true, true, messageBox::sprite_trainer, 0 );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Das heißt eigentlich.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
@@ -654,7 +656,7 @@ INDIVIDUALISIERUNG:
     setMainSpriteVisibility( false );
     Oam->oamBuffer[ 1 ].isHidden = false;
     updateOAMSub( Oam );
-    FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ BG_ind ].m_name.c_str( ), BG_ind );
+    FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
 }
 
 void initVideo( ) {
@@ -795,7 +797,7 @@ START:
     //StartScreen
 
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Title" );
-    if( BGs[ BG_ind ].m_allowsOverlay )
+    if( BGs[ SAV.m_bgIdx ].m_allowsOverlay )
         drawSub( );
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "Clear" );
 
@@ -1047,6 +1049,7 @@ CONT:
             SAV.m_badges = 0;
             SAV.m_dex = 0;
             SAV.m_hasPKMN = false;
+            SAV.m_bgIdx = START_BG;
 
             SAV.m_PkmnTeam.clear( );
             free_spaces.clear( );
@@ -2005,7 +2008,7 @@ OUT:
                 continue;
         }
         //StartBag
-        if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 6 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 7 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 6 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 7 ] - touch.py ) ) <= 16 && mode == -1 ) {
 
             while( 1 ) {
                 swiWaitForVBlank( );
@@ -2022,8 +2025,8 @@ OUT:
         //StartPkmn
         else if( SAV.m_PkmnTeam.size( )
                  && ( ( held & KEY_START )
-                 || ( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 0 ] - touch.px )
-                 + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 )
+                 || ( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 0 ] - touch.px )
+                 + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 )
                  && mode == -1 ) ) {
             while( 1 ) {
                 swiWaitForVBlank( );
@@ -2045,7 +2048,7 @@ OUT:
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
         //StartDex
-        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 4 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 5 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 4 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 5 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
@@ -2061,7 +2064,7 @@ OUT:
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
         //StartOptions
-        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 8 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 9 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 8 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 9 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
@@ -2072,7 +2075,7 @@ OUT:
             }
         }
         //StartID
-        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 2 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 3 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 3 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
@@ -2081,9 +2084,9 @@ OUT:
                 if( touch.px == 0 && touch.py == 0 )
                     break;
             }
-            const char *someText[ 7 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item_Test", "Battle SPWN.", "Battle SPWN 2", "42", " ... " };
-            choiceBox test( 5, &someText[ 0 ], 0, true );
-            int res = test.getResult( "Tokens of god-being...", true, true );
+            const char *someText[ 7 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", " ... " };
+            choiceBox test( 6, &someText[ 0 ], 0, false );
+            int res = test.getResult( "Tokens of god-being...", true );
             switch( res ) {
                 case 0:
                 {
@@ -2164,13 +2167,24 @@ OUT:
                     movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
                     break;
                 }
+                case 5:{
+                    const char *bgNames[ MAXBG ];
+                    for( u8 o = 0; o < MAXBG; ++o )
+                        bgNames[ o ] = BGs[ o ].m_name.c_str( );
+                    setMainSpriteVisibility( false, true );
+                    scrn.draw( mode );
+                    choiceBox scrnChoice( MAXBG, bgNames, 0, true );
+                    drawSub( scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
+                    setMainSpriteVisibility( false, true );
+                    scrn.draw( mode );
+                }
             }
             setMainSpriteVisibility( false );
             scrn.draw( mode );
 
         }
         //StartPok\x82""nav
-        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 10 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 11 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 10 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 11 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
@@ -2184,7 +2198,7 @@ OUT:
             //movePlayerOnMap(SAV.m_acposx/20,SAV.m_acposy/20,SAV.m_acposz,false);
         }
         //StartMaps
-        else if( sqrt( sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 0 ] - touch.px ) + sq( BGs[ BG_ind ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 && mode == 0 ) {
+        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 0 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 && mode == 0 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
