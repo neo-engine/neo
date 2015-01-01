@@ -1907,223 +1907,31 @@ void getRanPerm( u8* p_array, u8* p_out ) {
     }
 }
 
-const std::string choi[ 6 ] = { "\nEinsetzen.", "\nEinem Pok\x82""mon geben.", "\nRegistrieren.", "\nWeitere Daten ansehen." };
-u8 getAnswer( ITEMS::item::itemType p_bagtype ) {
-    touchPosition t;
-    if( p_bagtype != ITEMS::item::BERRIES ) {
-        ( Oam->oamBuffer[ 20 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 21 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 29 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 24 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 25 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 28 ] ).isHidden = false;
-        ( Oam->oamBuffer[ 20 ] ).y -= 32;
-        ( Oam->oamBuffer[ 21 ] ).y -= 32;
-        ( Oam->oamBuffer[ 28 ] ).y -= 32;
-        ( Oam->oamBuffer[ 24 ] ).y -= 32;
-        ( Oam->oamBuffer[ 25 ] ).y -= 32;
-        ( Oam->oamBuffer[ 29 ] ).y -= 32;
-        updateOAMSub( Oam );
+const std::string choi[ 6 ] = { "Einsetzen.", "Einem Pokémon geben.", "Registrieren.", "Weitere Daten ansehen.", "Müll" };
+s8 getAnswer( ITEMS::item p_item ) {
+    const char* choiceNames[ 3 ] = { 0 };
+    u8 numChoices;
 
-        consoleSetWindow( &Bottom, 5, 9, 22, 3 );
-        printf( choi[ 0 ].c_str( ) );
+    auto bagType = p_item.getItemType( );
 
-        consoleSetWindow( &Bottom, 5, 13, 22, 3 );
-        if( p_bagtype != ITEMS::item::KEY_ITEM )
-            printf( choi[ 1 ].c_str( ) );
-        else
-            printf( choi[ 2 ].c_str( ) );
+    choiceNames[ 0 ] = choi[ 0 ].c_str( );
+    if( bagType == bag::bagtype::BATTLE_ITEM )
+        choiceNames[ 1 ] = choi[ 2 ].c_str( );
+    else if( bagType != bag::bagtype::TM_HM )
+        choiceNames[ 1 ] = choi[ 1 ].c_str( );
+    else
+        choiceNames[ 1 ] = choi[ 3 ].c_str( );
+    if( bagType == bag::bagtype::BERRIES )
+        choiceNames[ 2 ] = choi[ 3 ].c_str( );
+    numChoices = 2 + ( bagType == bag::bagtype::BERRIES );
 
-        while( 42 ) {
-            updateTime( );
-            swiWaitForVBlank( );
-            updateOAMSub( Oam );
-            scanKeys( );
-            touchRead( &t );
-            if( t.px > 224 && t.py > 164 ) {
-                while( 1 ) {
-                    scanKeys( );
-                    swiWaitForVBlank( );
-                    updateTime( );
-                    auto t = touchReadXY( );
-                    if( t.px == 0 && t.py == 0 )
-                        break;
-                }
-                consoleSelect( &Bottom );
-                consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-                consoleClear( );
-                return 4;
-            }
+    choiceBox choice( 2, choiceNames, 0, true );
 
-            if( t.px > 31 && t.py > 67 && t.px < 225 && t.py < 101 ) {
-                ( Oam->oamBuffer[ 20 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 21 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 28 ] ).isHidden = true;
-                updateOAMSub( Oam );
-                while( 1 ) {
-                    swiWaitForVBlank( );
-                    scanKeys( );
-                    updateTime( );
-                    auto t = touchReadXY( );
-                    if( t.px == 0 && t.py == 0 )
-                        break;
-                }
-                ( Oam->oamBuffer[ 24 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 25 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 29 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 20 ] ).y += 32;
-                ( Oam->oamBuffer[ 21 ] ).y += 32;
-                ( Oam->oamBuffer[ 28 ] ).y += 32;
-                ( Oam->oamBuffer[ 24 ] ).y += 32;
-                ( Oam->oamBuffer[ 25 ] ).y += 32;
-                ( Oam->oamBuffer[ 29 ] ).y += 32;
-                updateOAMSub( Oam );
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
+    std::sprintf( buffer, "%s%s", p_item.getDisplayName( true ).c_str( ), std::string( " ausgewählt." ).c_str( ) );
 
-                return 0;
-            } else if( t.px > 31 && t.py > 99 && t.px < 225 && t.py < 143 ) {
-                ( Oam->oamBuffer[ 24 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 25 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 29 ] ).isHidden = true;
-                updateOAMSub( Oam );
-                while( 1 ) {
-                    swiWaitForVBlank( );
-                    scanKeys( );
-                    updateTime( );
-                    auto t = touchReadXY( );
-                    if( t.px == 0 && t.py == 0 )
-                        break;
-                }
-                ( Oam->oamBuffer[ 20 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 21 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 28 ] ).isHidden = true;
-                ( Oam->oamBuffer[ 20 ] ).y += 32;
-                ( Oam->oamBuffer[ 21 ] ).y += 32;
-                ( Oam->oamBuffer[ 28 ] ).y += 32;
-                ( Oam->oamBuffer[ 24 ] ).y += 32;
-                ( Oam->oamBuffer[ 25 ] ).y += 32;
-                ( Oam->oamBuffer[ 29 ] ).y += 32;
-                updateOAMSub( Oam );
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
+    s8 result = s8( choice.getResult( buffer, true, true ) );
 
-                return 1;
-            }
-        }
-    } else {
-        for( u8 i = 0; i < 3; ++i ) {
-            ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = false;
-            ( Oam->oamBuffer[ 17 + 4 * i ] ).y -= 16;
-            ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = false;
-            ( Oam->oamBuffer[ 16 + 4 * i ] ).y -= 16;
-            ( Oam->oamBuffer[ 27 + i ] ).isHidden = false;
-            ( Oam->oamBuffer[ 27 + i ] ).y -= 16;
-            updateOAMSub( Oam );
-            consoleSetWindow( &Bottom, 5, 7 + 4 * i, 22, 3 );
-            if( i == 2 )
-                ++i;
-            printf( choi[ i ].c_str( ) );
-        }
-        while( 42 ) {
-            updateTime( );
-            swiWaitForVBlank( );
-            updateOAMSub( Oam );
-            scanKeys( );
-            touchRead( &t );
-            if( t.px>224 && t.py > 164 ) {
-                while( 1 ) {
-                    scanKeys( );
-                    swiWaitForVBlank( );
-                    updateTime( );
-                    auto t = touchReadXY( );
-                    if( t.px == 0 && t.py == 0 )
-                        break;
-                }
-                consoleSelect( &Bottom );
-                consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-                consoleClear( );
-                return 4;
-            }
-            if( t.px > 31 && t.py > 51 && t.px < 225 && t.py < 85 ) {
-                Oam->oamBuffer[ 17 ].isHidden = true;
-                Oam->oamBuffer[ 16 ].isHidden = true;
-                Oam->oamBuffer[ 27 ].isHidden = true;
-                updateOAMSub( Oam );
-                while( 1 ) {
-                    swiWaitForVBlank( );
-                    scanKeys( );
-                    updateTime( );
-                    auto t = touchReadXY( );
-                    if( t.px == 0 && t.py == 0 )
-                        break;
-                }
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
-                for( u8 i = 0; i < 3; ++i ) {
-                    ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = true;
-                    ( Oam->oamBuffer[ 17 + 4 * i ] ).y += 16;
-                    ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = true;
-                    ( Oam->oamBuffer[ 16 + 4 * i ] ).y += 16;
-                    ( Oam->oamBuffer[ 27 + i ] ).isHidden = true;
-                    ( Oam->oamBuffer[ 27 + i ] ).y += 16;
-                    updateOAMSub( Oam );
-                }
-                return 0;
-            } else if( t.px > 31 && t.py > 83 && t.px < 225 && t.py < 116 ) {
-                Oam->oamBuffer[ 20 ].isHidden = true;
-                Oam->oamBuffer[ 21 ].isHidden = true;
-                Oam->oamBuffer[ 28 ].isHidden = true;
-                updateOAMSub( Oam );
-                while( 1 ) {
-                    swiWaitForVBlank( );
-                    scanKeys( );
-                    updateTime( );
-                    auto t = touchReadXY( );
-                    if( t.px == 0 && t.py == 0 )
-                        break;
-                }
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
-                for( u8 i = 0; i < 3; ++i ) {
-                    ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = true;
-                    ( Oam->oamBuffer[ 17 + 4 * i ] ).y += 16;
-                    ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = true;
-                    ( Oam->oamBuffer[ 16 + 4 * i ] ).y += 16;
-                    ( Oam->oamBuffer[ 27 + i ] ).isHidden = true;
-                    ( Oam->oamBuffer[ 27 + i ] ).y += 16;
-                    updateOAMSub( Oam );
-                }
-                return 1;
-            } else if( t.px > 31 && t.py > 115 && t.px < 225 && t.py < 148 ) {
-                Oam->oamBuffer[ 24 ].isHidden = true;
-                Oam->oamBuffer[ 25 ].isHidden = true;
-                Oam->oamBuffer[ 29 ].isHidden = true;
-                updateOAMSub( Oam );
-                while( 1 ) {
-                    swiWaitForVBlank( );
-                    scanKeys( );
-                    updateTime( );
-                    auto t = touchReadXY( );
-                    if( t.px == 0 && t.py == 0 )
-                        break;
-                }
-                consoleSetWindow( &Bottom, 1, 1, 30, 24 );
-                consoleClear( );
-
-                for( u8 i = 0; i < 3; ++i ) {
-                    ( Oam->oamBuffer[ 17 + 4 * i ] ).isHidden = true;
-                    ( Oam->oamBuffer[ 17 + 4 * i ] ).y += 16;
-                    ( Oam->oamBuffer[ 16 + 4 * i ] ).isHidden = true;
-                    ( Oam->oamBuffer[ 16 + 4 * i ] ).y += 16;
-                    ( Oam->oamBuffer[ 27 + i ] ).isHidden = true;
-                    ( Oam->oamBuffer[ 27 + i ] ).y += 16;
-                    updateOAMSub( Oam );
-                }
-                return 2;
-            }
-        }
-    }
+    return result;
 }
 std::string bagnames[ 8 ] = { "Items", "Schl\x81""sselitems", "TM/VM", "Briefe", "Medizin", "Beeren", "Pok\x82""b\x84""lle", "Kampfitems" };
 void drawBagPage( u8 p_page, u8* p_position, u8 &p_oamIndex, u8& p_palCnt, u16& p_tileCnt, u8 &p_oamIndexTop, u8& p_palCntTop, u16& p_tileCntTop ) {
@@ -2361,7 +2169,7 @@ PREV:
                     updateOAMSub( Oam );
 
                     u16 acItem = SAV.m_bag.elementAt( ( bag::bagtype )p_page, acpage * 12 + io ).first;
-                    u8 ret = getAnswer( ITEMS::ItemList[ acItem ].getItemType( ) );
+                    u8 ret = getAnswer( ITEMS::ItemList[ acItem ] );
 
                     if( ret == 0 ) {
                         //TODO

@@ -2164,7 +2164,7 @@ OUT:
                     BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::SINGLE );
                     test_battle.start( );
                     initMapSprites( );
-                    movePlayerOnMap( SAV.m_acpo sx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
+                    movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
                     break;
                 }
                 case 5:{
