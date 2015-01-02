@@ -46,6 +46,7 @@
     <ClCompile Include="arm7\source\as_lib7.c" />
     <ClCompile Include="arm7\source\main.c" />
     <ClCompile Include="arm9\source\as_lib9.c" />
+    <ClCompile Include="arm9\source\bagUI.cpp" />
     <ClCompile Include="arm9\source\battleUI.cpp" />
     <ClCompile Include="arm9\source\buffer.cpp" />
     <ClCompile Include="arm9\source\fs.cpp" />

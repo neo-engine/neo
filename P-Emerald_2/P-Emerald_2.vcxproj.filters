@@ -201,7 +201,10 @@
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\map2devents.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\bagUI.cpp">
+      <Filter>Source Files\arm9</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

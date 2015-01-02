@@ -6,28 +6,23 @@
     author      : Philip Wellnitz (RedArceus)
     description : Functionality message boxes
 
-    Copyright (C) 2012 - 2014
+    Copyright (C) 2012 - 2015
     Philip Wellnitz (RedArceus)
 
-    This software is provided 'as-is', without any express or implied
-    warranty.  In no event will the authors be held liable for any
-    damages arising from the use of this software.
+    This file is part of Pokémon Emerald 2 Version.
 
-    Permission is granted to anyone to use this software for any
-    purpose, including commercial applications, and to alter it and
-    redistribute it freely, subject to the following restrictions:
+    Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
+    Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-    1.	The origin of this software must not be misrepresented; you
-    must not claim that you wrote the original software. If you use
-    this software in a product, an acknowledgment in the product
-    is required.
-
-    2.	Altered source versions must be plainly marked as such, and
-    must not be misrepresented as being the original software.
-
-    3.	This notice may not be removed or altered from any source
-    distribution.
+    You should have received a copy of the GNU General Public License
+    along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
     */
 
 #include "pokemon.h"
@@ -91,7 +86,7 @@ void messageBox::clearButName( ) {
     FONT::putrec( (u8)72, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
 }
 
-bool waitForTouchUp( bool p_uTime, bool p_tpar = false, u16 p_targetX1 = 0, u16 p_targetY1 = 0, u16 p_targetX2 = 300, u16 p_targetY2 = 300 ) {
+bool waitForTouchUp( bool p_uTime, bool p_tpar, u16 p_targetX1, u16 p_targetY1, u16 p_targetX2, u16 p_targetY2 ) {
     while( 1 ) {
         swiWaitForVBlank( );
         scanKeys( );

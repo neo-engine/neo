@@ -6,28 +6,23 @@
     author      : Philip Wellnitz (RedArceus)
     description : Main ARM9 entry point
 
-    Copyright (C) 2012 - 2014
+    Copyright (C) 2012 - 2015
     Philip Wellnitz (RedArceus)
 
-    This software is provided 'as-is', without any express or implied
-    warranty.  In no event will the authors be held liable for any
-    damages arising from the use of this software.
+    This file is part of Pokémon Emerald 2 Version.
 
-    Permission is granted to anyone to use this software for any
-    purpose, including commercial applications, and to alter it and
-    redistribute it freely, subject to the following restrictions:
+    Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
+    Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-    1.	The origin of this software must not be misrepresented; you
-    must not claim that you wrote the original software. If you use
-    this software in a product, an acknowledgment in the product
-    is required.
-
-    2.	Altered source versions must be plainly marked as such, and
-    must not be misrepresented as being the original software.
-
-    3.	This notice may not be removed or altered from any source
-    distribution.
+    You should have received a copy of the GNU General Public License
+    along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
     */
 
 #include <memory>
@@ -107,7 +102,7 @@ GameMod gMod = DEVELOPER;
 GameMod gMod = EMULATOR;
 #endif
 
-std::string CodeName = "Reborn Ho-Oh";
+std::string CodeName = "Fighting Torchic";
 SavMod savMod = _NDS;
 
 char acSlot2Game[ 5 ];
@@ -806,7 +801,7 @@ START:
 
     BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
 
-    printf( "@ Philip \"RedArceus\" Wellnitz\n                     2012 - 2014\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+    printf( "Entwickelt 2012-2015 von\n     Philip \"RedArceus\" Wellnitz\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
     if( gMod == DEVELOPER )
         printf( "             Developer's version\n" );
     else if( gMod == BETA )
@@ -2018,7 +2013,7 @@ OUT:
                 if( touch.px == 0 && touch.py == 0 )
                     break;
             }
-            SAV.m_bag.draw( );
+            SAV.m_bag.draw( 0, 0 );
             initMapSprites( );
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
@@ -2091,7 +2086,7 @@ OUT:
                 case 0:
                 {
                     SAV.m_PkmnTeam.clear( );
-                    for( int i = 0; i < 5; ++i ) {
+                    for( int i = 0; i < 6; ++i ) {
                         POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
                                             20 + 10 * i, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName().c_str()*/, !SAV.m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         stored_pkmn[ *free_spaces.rbegin( ) ] = a.m_boxdata;
@@ -2107,7 +2102,7 @@ OUT:
                         box_of_st_pkmn[ a.m_boxdata.m_speciesId - 1 ].push_back( *free_spaces.rbegin( ) );
                         //printf("%i",(*free_spaces.rbegin()));
                         free_spaces.pop_back( );
-                        HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
+                        //HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
                     }
                     for( u16 i = 0; i < 649; ++i )
                         SAV.m_inDex[ i ] = true;
