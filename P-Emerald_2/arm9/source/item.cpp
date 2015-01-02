@@ -249,8 +249,15 @@ namespace ITEMS {
         TM( "TM81" ), TM( "TM82" ), TM( "TM83" ), TM( "TM84" ),
         TM( "TM85" ), TM( "TM86" ), TM( "TM87" ), TM( "TM88" ),
         TM( "TM89" ), TM( "TM90" ), TM( "TM91" ), TM( "TM92" ),
-        TM( "VM01" ), TM( "VM02" ), TM( "VM03" ), TM( "VM04" ),
-        TM( "VM05" ), TM( "VM06" ), TM( "VM07" ), TM( "VM08" ),
+
+        TM( "VM01", M_CUT ),
+        TM( "VM02", M_ROCK_SMASH ),
+        TM( "VM03", M_FLY ),
+        TM( "VM04", M_FLASH ),
+        TM( "VM05", M_WHIRLPOOL ),
+        TM( "VM06", M_SURF ),
+        TM( "VM07", M_DIVE ),
+        TM( "VM08", M_DEFOG ),
 
         keyItem( "Forschersack" ), keyItem( "Beutesack" ),
         keyItem( "Regelbuch" ), keyItem( "Poke-Radar" ),
@@ -283,8 +290,10 @@ namespace ITEMS {
         keyItem( "Raetsel-Ei" ), keyItem( "Devon-Scope" ),
         keyItem( "Auroraticket" ), keyItem( "AlteKarte" ),
 
-        TM( "VM09" ), TM( "VM10" ),
-        TM( "VM11" ), TM( "VM12" ),
+        TM( "VM09", M_STRENGTH ),
+        TM( "VM10", M_ROCK_CLIMB ),
+        TM( "VM11", M_KASKADE ),
+        TM( "VM12", M_TELEPORT ),
 
         ball( "Turboball" ), ball( "Levelball" ),
         ball( "Koederball" ), ball( "Schwerball" ),
@@ -359,9 +368,9 @@ namespace ITEMS {
 
         keyItem( "Lichtstein" ),
         keyItem( "Dunkelstein" ),
-        TM( "TM93" ),
-        TM( "TM94" ),
-        TM( "TM95" ),
+        TM( "TM93", 0 ),
+        TM( "TM94", 0 ),
+        TM( "TM95", 0 ),
         keyItem( "Viso-Casterm" ),
         keyItem( "Nebelstein" ),
         keyItem( "Briefpost" ),

@@ -92,6 +92,9 @@ public:
     bool                m_EXPShareEnabled;
     bool                m_evolveInBattle;
     u8                  m_bgIdx;
+
+    u8                  m_bagPoses[ 5 ];
+
     //GameFlags
     bool                m_hasGDex;
 

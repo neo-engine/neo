@@ -31,6 +31,7 @@
 #include <map>
 
 #include "ability.h"
+#include "move.h"
 
 #include <nds/ndstypes.h>
 
@@ -108,7 +109,7 @@ namespace ITEMS {
     public:
         ball( const std::string& p_name )
             : item( p_name ) {
-            this->m_itemType = POKE_BALLS;
+            m_itemType = POKE_BALLS;
         }
     };
 
@@ -117,16 +118,18 @@ namespace ITEMS {
     public:
         medicine( const std::string& p_name )
             : item( p_name ) {
-            this->m_itemType = MEDICINE;
+            m_itemType = MEDICINE;
         }
     };
 
     class TM
         : public item {
     public:
-        TM( const std::string& p_name )
+        u16 m_moveIdx;
+        TM( const std::string& p_name, u16 p_moveIdx )
             : item( p_name ) {
-            this->m_itemType = TM_HM;
+            m_itemType = TM_HM;
+            m_moveIdx = p_moveIdx;
         }
     };
 
@@ -135,7 +138,7 @@ namespace ITEMS {
     public:
         battleItem( const std::string& p_name )
             : item( p_name ) {
-            this->m_itemType = BATTLE_ITEM;
+            m_itemType = BATTLE_ITEM;
         }
     };
 
@@ -144,7 +147,7 @@ namespace ITEMS {
     public:
         keyItem( const std::string& p_name )
             : item( p_name ) {
-            this->m_itemType = KEY_ITEM;
+            m_itemType = KEY_ITEM;
         }
     };
 
@@ -153,7 +156,7 @@ namespace ITEMS {
     public:
         mail( const std::string& p_name )
             : item( p_name ) {
-            this->m_itemType = MAILS;
+            m_itemType = MAILS;
         }
     };
 

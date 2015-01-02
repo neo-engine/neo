@@ -354,6 +354,8 @@ void initNewGame( ) {
     SAV.m_dex = 0;
 
     SAV.m_bgIdx = START_BG;
+    for( u8 i = 0; i < 5; ++i )
+        SAV.m_bagPoses[ i ] = i;
 
     SAV.m_PkmnTeam.clear( );
     consoleSelect( &Bottom );
@@ -801,7 +803,7 @@ START:
 
     BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
 
-    printf( "Entwickelt 2012-2015 von\n     Philip \"RedArceus\" Wellnitz\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+    printf( "@ Philip \"RedArceus\" Wellnitz\n                     2012 - 2015\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
     if( gMod == DEVELOPER )
         printf( "             Developer's version\n" );
     else if( gMod == BETA )
@@ -1044,6 +1046,8 @@ CONT:
             SAV.m_badges = 0;
             SAV.m_dex = 0;
             SAV.m_hasPKMN = false;
+            for( u8 i = 0; i < 5; ++i )
+                SAV.m_bagPoses[ i ] = i;
             SAV.m_bgIdx = START_BG;
 
             SAV.m_PkmnTeam.clear( );
@@ -1864,6 +1868,9 @@ int main( int p_argc, char** p_argv ) {
     swiWaitForIRQ( );
     swiWaitForVBlank( );
 
+    initMainSprites( Oam, spriteInfo );
+    setMainSpriteVisibility( false, true );
+    Oam->oamBuffer[ BACK_ID ].isHidden = true;
     while( 42 ) {
         updateTime( s8( 1 ) );
         swiWaitForVBlank( );
@@ -2086,9 +2093,10 @@ OUT:
                 case 0:
                 {
                     SAV.m_PkmnTeam.clear( );
-                    for( int i = 0; i < 6; ++i ) {
+                    for( int i = 0; i < 3; ++i ) {
                         POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
-                                            20 + 10 * i, SAV.m_Id, SAV.m_Sid, L"TEST"/*SAV.getName().c_str()*/, !SAV.m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                            50, SAV.m_Id, SAV.m_Sid, SAV.getName().c_str(),
+                                            !SAV.m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         stored_pkmn[ *free_spaces.rbegin( ) ] = a.m_boxdata;
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         if( POKEMON::PKMNDATA::canLearn( HILFSCOUNTER, 57, 4 ) )
@@ -2102,7 +2110,7 @@ OUT:
                         box_of_st_pkmn[ a.m_boxdata.m_speciesId - 1 ].push_back( *free_spaces.rbegin( ) );
                         //printf("%i",(*free_spaces.rbegin()));
                         free_spaces.pop_back( );
-                        //HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
+                        HILFSCOUNTER = 3 + ( ( HILFSCOUNTER ) % 649 );
                     }
                     for( u16 i = 0; i < 649; ++i )
                         SAV.m_inDex[ i ] = true;
