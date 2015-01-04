@@ -134,6 +134,11 @@ namespace FONT {
                 return;
             }
 
+            if( p_val == '\r' ) {
+                p_val = 489;
+                return;
+            }
+
             return;
         }
         //NUM_CHARS = 490

@@ -251,16 +251,16 @@ namespace ITEMS {
         new TM( "TM81", M_X_SCISSOR ), new TM( "TM82", M_DRAGON_TAIL ), new TM( "TM83", M_WORK_UP ), new TM( "TM84", M_POISON_JAB ),
         new TM( "TM85", M_DREAM_EATER ), new TM( "TM86", M_GRASS_KNOT ), new TM( "TM87", M_SWAGGER ), new TM( "TM88", M_SLEEP_TALK ),
         new TM( "TM89", M_PLUCK ), new TM( "TM90", M_SUBSTITUTE ), new TM( "TM91", M_FLASH_CANNON ), new TM( "TM92", M_TRICK_ROOM ),
-
-        new TM( "VM01", M_CUT ),
-        new TM( "VM02", M_ROCK_SMASH ),
-        new TM( "VM03", M_FLY ),
-        new TM( "VM04", M_FLASH ),
-        new TM( "VM05", M_WHIRLPOOL ),
-        new TM( "VM06", M_SURF ),
-        new TM( "VM07", M_DIVE ),
-        new TM( "VM08", M_DEFOG ),
-
+        
+        new TM( "TM93", M_WILD_CHARGE ),
+        new TM( "TM94", M_AVALANCHE ),
+        new TM( "TM95", M_SNARL ),
+        new TM( "TM96", M_NATURE_POWER ),
+        new TM( "TM97", M_FALSE_SWIPE ),
+        new TM( "TM98", M_HYPER_VOICE ),
+        new TM( "TM99", M_BRINE ),
+        new TM( "TM100", M_HEADBUTT ),
+                
         new keyItem( "Forschersack" ), new keyItem( "Beutesack" ),
         new keyItem( "Regelbuch" ), new keyItem( "Poke-Radar" ),
         new keyItem( "Punktekarte" ), new keyItem( "Tagebuch" ),
@@ -292,10 +292,10 @@ namespace ITEMS {
         new keyItem( "Raetsel-Ei" ), new keyItem( "Null" ),
         new keyItem( "Auroraticket" ), new keyItem( "AlteKarte" ),
 
-        new TM( "VM09", M_STRENGTH ),
-        new TM( "VM10", M_ROCK_CLIMB ),
-        new TM( "VM11", M_WATERFALL ),
-        new TM( "VM12", M_TELEPORT ),
+        new TM( "VM01", M_CUT ),
+        new TM( "VM02", M_ROCK_SMASH ),
+        new TM( "VM03", M_FLY ),
+        new TM( "VM04", M_FLASH ),
 
         new ball( "Turboball" ), new ball( "Levelball" ),
         new ball( "Koederball" ), new ball( "Schwerball" ),
@@ -371,9 +371,11 @@ namespace ITEMS {
 
         new keyItem( "Lichtstein" ),
         new keyItem( "Dunkelstein" ),
-        new TM( "TM93", M_WILD_CHARGE ),
-        new TM( "TM94", M_AVALANCHE ),
-        new TM( "TM95", M_SNARL ),
+
+        new TM( "VM05", M_WHIRLPOOL ),
+        new TM( "VM06", M_SURF ),
+        new TM( "VM07", M_DIVE ),
+
         new keyItem( "Viso-Casterm" ),
         new keyItem( "Nebelstein" ),
         new keyItem( "Briefpost" ),
@@ -449,11 +451,11 @@ namespace ITEMS {
 
         new keyItem( "Loturzelkanne" ),
 
-        new TM( "TM96", M_NATURE_POWER ),
-        new TM( "TM97", M_FALSE_SWIPE ),
-        new TM( "TM98", M_HYPER_VOICE ),
-        new TM( "TM99", M_BRINE ),
-        new TM( "TM100", M_HEADBUTT ),
+        new TM( "VM08", M_DEFOG ),
+        new TM( "VM09", M_STRENGTH ),
+        new TM( "VM10", M_ROCK_CLIMB ),
+        new TM( "VM11", M_WATERFALL ),
+        new TM( "VM12", M_TELEPORT ),
 
         new keyItem( "Kraftwerkspass" ),
         new keyItem( "MegaRing" ),

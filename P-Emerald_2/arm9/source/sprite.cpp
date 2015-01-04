@@ -30,6 +30,10 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "sprite.h"
 #include "berry.h"
 
+#include "damage_0.h"
+#include "damage_1.h"
+#include "damage_2.h"
+
 const unsigned int* TypeTiles[ 19 ] =
 {
     NormalTiles, KampfTiles, FlugTiles, GiftTiles, BodenTiles,
@@ -43,6 +47,15 @@ const unsigned short* TypePals[ 19 ] =
     GestPal, KaeferPal, GeistPal, StahlPal, UnbekPal,
     WasserPal, FeuerPal, PflPal, ElekPal, PsychoPal,
     EisPal, DraPal, UnlPal, FeePal
+};
+
+const unsigned int* HitTypeTiles[ 3 ] =
+{
+    damage_0Tiles, damage_1Tiles, damage_2Tiles
+};
+const unsigned short* HitTypePals[ 3 ] =
+{
+    damage_0Pal, damage_1Pal, damage_2Pal
 };
 
 void updateOAM( OAMTable * p_oam ) {

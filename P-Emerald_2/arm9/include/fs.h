@@ -46,7 +46,7 @@ namespace FS {
     std::string readString( FILE*, bool p_new = false );
     std::wstring readWString( FILE*, bool p_new = false );
 
-    std::string breakString( const std::string& p_string, u8 p_lineLength ); 
+    std::string breakString( const std::string& p_string, u8 p_lineLength );
     std::string breakString( const std::string& p_string, FONT::font p_font, u8 p_lineLength );
 
     bool loadNavScreen( u16* p_layer, const char* p_name, u8 p_no );
@@ -68,6 +68,8 @@ namespace FS {
                    u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen, bool p_showcnt );
     void drawItemIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY,
                        u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen = true );
+    void drawTMIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, Type p_type, bool p_hm, const u16 p_posX, const u16 p_posY,
+                     u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen = true );
     void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16& p_pkmnNo, const u16 p_posX, const u16 p_posY,
                        u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen = true );
     void drawEggIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16 p_posX, const u16 p_posY,

@@ -70,7 +70,7 @@ class rockSmash
     : public move {
 public:
     rockSmash( )
-        : move( std::string( "Zertr\x81""mmerer" ),
+        : move( std::string( "Zertrümmerer" ),
         C 1,
         C 60,
         KAMPF,

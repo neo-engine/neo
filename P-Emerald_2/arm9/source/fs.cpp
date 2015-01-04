@@ -28,6 +28,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 
 #include <string>
+#include <vector>
+#include <initializer_list>
 
 #include "fs.h"
 #include "buffer.h"
@@ -605,7 +607,7 @@ namespace FS {
             return true;
         }
 
-        char buffer[100];
+        char buffer[ 100 ];
         sprintf( buffer, "nitro:/PICS/NAV/%s.raw", p_name );
         FILE* fd = fopen( buffer, "rb" );
 
@@ -757,6 +759,59 @@ namespace FS {
             }
         } else {
             if( !FS::loadSprite( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemPal,
+                                  &SPRITE_PALETTE[ p_palCnt * 16 ],
+                                  32 );
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemTiles,
+                                  &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  NoItemTilesLen );
+            }
+        }
+        p_tileCnt += 512 / 32;
+        ++p_palCnt;
+    }
+
+    void drawTMIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, Type p_type, bool p_hm, const u16 p_posX, const u16 p_posY,
+                     u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen ) {
+        SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
+        SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
+        ItemInfo->m_oamId = p_oamIndex;
+        ItemInfo->m_width = ItemInfo->m_height = 32;
+        ItemInfo->m_angle = 0;
+        ItemInfo->m_entry = Item;
+        Item->isRotateScale = false;
+        Item->blendMode = OBJMODE_NORMAL;
+        Item->isMosaic = false;
+        Item->colorMode = OBJCOLOR_16;
+        Item->shape = OBJSHAPE_SQUARE;
+        Item->isHidden = false;
+        Item->size = OBJSIZE_32;
+        Item->gfxIndex = p_tileCnt;
+        Item->priority = p_subScreen ? OBJPRIORITY_1 : OBJPRIORITY_0;
+        Item->palette = p_palCnt;
+        Item->x = p_posX;
+        Item->y = p_posY;
+
+        std::string itemName = p_hm ? "VM" : "TM";
+        itemName += std::vector<std::string>( { "Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein", "Kaefer", "Geist",
+                                              "Stahl", "Unbekannt", "Wasser", "Feuer", "Pflanze", "Elektro", "Psycho", "Eis",
+                                              "Drache", "Unlicht", "Fee" } )[ p_type ];
+
+        if( p_subScreen ) {
+            if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", itemName.c_str( ), 128, 16 ) ) {
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemPal,
+                                  &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
+                                  32 );
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                                  NoItemTiles,
+                                  &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  NoItemTilesLen );
+            }
+        } else {
+            if( !FS::loadSprite( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", itemName.c_str( ), 128, 16 ) ) {
                 dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
                                   NoItemPal,
                                   &SPRITE_PALETTE[ p_palCnt * 16 ],

@@ -141,6 +141,9 @@ public:
     virtual const char* text( ) {
         return "N/A";
     }
+    virtual const char* description( ) {
+        return "N/A";
+    }
 };
 #define M_POUND 1
 #define M_KARATE_CHOP 2

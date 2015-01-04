@@ -251,13 +251,52 @@ void drawItemTop( ITEMS::item* p_item, u16 p_count ) {
 
     if( p_item->m_itemType != ITEMS::item::itemType::TM_HM ) {
         FS::drawItemIcon( OamTop, spriteInfoTop, p_item->m_itemName, 112, 46, oamIdxTop, palCntTop, tileCntTop, false );
+        OamTop->oamBuffer[ ++oamIdxTop ].isHidden = true;
+        OamTop->oamBuffer[ ++oamIdxTop ].isHidden = true;
         updateOAM( OamTop );
+
         display = p_item->getDisplayName( true );
         descr = p_item->getDescription( true );
     } else {
         auto mv = *( static_cast<ITEMS::TM*>( p_item ) );
+
+        FS::drawTMIcon( OamTop, spriteInfoTop, AttackList[ mv.m_moveIdx ]->m_moveType,
+                        AttackList[ mv.m_moveIdx ]->m_isFieldAttack, 112, 46, oamIdxTop, palCntTop, tileCntTop, false );
+        updateOAM( OamTop );
+
         display = p_item->getDisplayName( true ) + ": " + AttackList[ mv.m_moveIdx ]->m_moveName;
-        descr = FS::breakString( AttackList[ mv.m_moveIdx ]->text( ), cust_font, 196 );
+        descr = FS::breakString( AttackList[ mv.m_moveIdx ]->description( ), cust_font, 196 );
+
+
+        cust_font.printString( "Typ", 33, 145, false );
+        drawTypeIcon( OamTop, spriteInfoTop, oamIdxTop, palCntTop, tileCntTop, AttackList[ mv.m_moveIdx ]->m_moveType, 62, 144, false );
+
+        cust_font.printString( "Kateg.", 100, 145, false );
+        drawDamageCategoryIcon( OamTop, spriteInfoTop, oamIdxTop, palCntTop, tileCntTop, AttackList[ mv.m_moveIdx ]->m_moveHitType, 152, 144, false );
+
+        updateOAM( OamTop );
+
+        cust_font.printString( "AP", 190, 145, false );
+        std::sprintf( buffer, "%2d", AttackList[ mv.m_moveIdx ]->m_movePP );
+        cust_font.printString( buffer, 229 - cust_font.stringWidth( buffer ), 145, false );
+
+        cust_font.setColor( RED_IDX, 1 );
+        cust_font.printString( "Stärke", 33, 160, false );
+        if( AttackList[ mv.m_moveIdx ]->m_moveHitType != move::moveHitTypes::STAT
+            &&  AttackList[ mv.m_moveIdx ]->m_moveBasePower > 1)
+            std::sprintf( buffer, "%3d", AttackList[ mv.m_moveIdx ]->m_moveBasePower );
+        else
+            std::sprintf( buffer, "---" );
+        cust_font.printString( buffer, 108 - cust_font.stringWidth( buffer ), 160, false );
+
+        cust_font.setColor( BLUE_IDX, 1 );
+        cust_font.printString( "Genauigkeit", 124, 160, false );
+        if( AttackList[ mv.m_moveIdx ]->m_moveAccuracy )
+            std::sprintf( buffer, "%3d", AttackList[ mv.m_moveIdx ]->m_moveAccuracy );
+        else
+            std::sprintf( buffer, "---" );
+        cust_font.printString( buffer, 229 - cust_font.stringWidth( buffer ), 160, false );
+        cust_font.setColor( BLACK_IDX, 1 );
     }
 
     cust_font.printString( display.c_str( ),
@@ -390,7 +429,38 @@ void bag::draw( u8& p_startBag, u8& p_startItemIdx ) {
                 drawItemTop( ITEMS::ItemList[ SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
                              SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
             }
+        } else if( ( held & KEY_DOWN ) ) {
+            while( 1 ) {
+                if( keysUp( ) & KEY_DOWN )
+                    break;
+                scanKeys( );
+                swiWaitForVBlank( );
+                updateTime( );
+            }
+            if( !SAV->m_bag.m_bags[ p_startBag ].empty( ) ) {
+                drawActiveBagTop( p_startBag );
+                p_startItemIdx = ( p_startItemIdx + 1 ) % SAV->m_bag.m_bags[ p_startBag ].size( );
+
+                drawItemTop( ITEMS::ItemList[ SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
+                             SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
+            }
+        } else if( ( held & KEY_UP ) ) {
+            while( 1 ) {
+                if( keysUp( ) & KEY_UP )
+                    break;
+                scanKeys( );
+                swiWaitForVBlank( );
+                updateTime( );
+            }
+            if( !SAV->m_bag.m_bags[ p_startBag ].empty( ) ) {
+                drawActiveBagTop( p_startBag );
+                p_startItemIdx = ( p_startItemIdx + SAV->m_bag.m_bags[ p_startBag ].size( ) - 1 ) % SAV->m_bag.m_bags[ p_startBag ].size( );
+
+                drawItemTop( ITEMS::ItemList[ SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
+                             SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
+            }
         }
+
         for( u8 i = 0; i < 5; ++i ) {
 
         }

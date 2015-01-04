@@ -53,6 +53,8 @@
 
 extern const unsigned int* TypeTiles[ 19 ];
 extern const unsigned short* TypePals[ 19 ];
+extern const unsigned int* HitTypeTiles[ 3 ];
+extern const unsigned short* HitTypePals[ 3 ];
 
 static const u8 SPRITE_DMA_CHANNEL = 2;
 

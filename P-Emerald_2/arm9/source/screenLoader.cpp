@@ -1203,6 +1203,53 @@ void drawTypeIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u
     ++p_palCnt;
 }
 
+void drawDamageCategoryIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16 & p_tileCnt,
+                             move::moveHitTypes p_type, u16 p_posX, u16 p_posY, bool p_subScreen ) {
+    SpriteInfo * type1Info = &p_spriteInfo[ ++p_oamIndex ];
+    SpriteEntry * type1 = &p_oam->oamBuffer[ p_oamIndex ];
+    type1Info->m_oamId = p_oamIndex;
+    type1Info->m_width = 32;
+    type1Info->m_height = 16;
+    type1Info->m_angle = 0;
+    type1Info->m_entry = type1;
+    type1->y = p_posY;
+    type1->isRotateScale = false;
+    type1->isHidden = false;
+    type1->blendMode = OBJMODE_NORMAL;
+    type1->isMosaic = false;
+    type1->colorMode = OBJCOLOR_16;
+    type1->shape = OBJSHAPE_WIDE;
+    type1->x = p_posX;
+    type1->size = OBJSIZE_32;
+    type1->gfxIndex = p_tileCnt;
+    type1->priority = OBJPRIORITY_0;
+    type1->palette = p_palCnt;
+
+    if( p_subScreen ) {
+        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                          HitTypePals[ p_type ],
+                          &SPRITE_PALETTE_SUB[ p_palCnt * COLORS_PER_PALETTE ],
+                          32 );
+        /* Copy the sprite graphics to sprite graphics memory */
+        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                          HitTypeTiles[ p_type ],
+                          &SPRITE_GFX_SUB[ p_tileCnt * OFFSET_MULTIPLIER ],
+                          KampfTilesLen );
+    } else {
+        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                          HitTypePals[ p_type ],
+                          &SPRITE_PALETTE[ p_palCnt * COLORS_PER_PALETTE ],
+                          32 );
+        /* Copy the sprite graphics to sprite graphics memory */
+        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                          HitTypeTiles[ p_type ],
+                          &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ],
+                          KampfTilesLen );
+    }
+    p_tileCnt += KampfTilesLen / BYTES_PER_16_COLOR_TILE;
+    ++p_palCnt;
+}
+
 void formes( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16 & p_tileCnt, u16 p_pkmnId, bool p_female, POKEMON::pkmnGenderType p_pkmnGenderType ) {
     SpriteInfo * B2Info = &p_spriteInfo[ ++p_oamIndex ];
     SpriteEntry * B2 = &p_oam->oamBuffer[ p_oamIndex ];
