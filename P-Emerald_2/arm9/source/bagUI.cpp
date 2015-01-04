@@ -177,68 +177,88 @@ void drawActiveBagTop( u8 p_bagNo ) {
     }
     if( idx ) {
         consoleSelect( &Top );
-        consoleSetWindow( &Top, 0, 2, 32, 3 );
+        consoleSetWindow( &Top, 0, 22, 32, 3 );
         consoleClear( );
 
         consoleSelect( &Top );
-        consoleSetWindow( &Top, 11, 2, 12, 3 );
+        consoleSetWindow( &Top, 0, 22, 12, 3 );
         u16 acIn = 214 + 4 * idx;
         u16 s = SAV.m_bag.m_bags[ idx ].size( );
         //char buffer[ 50 ];
         printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
 
         if( s == 1 )
-            sprintf( buffer, "1 Item" );
+            sprintf( buffer, "  1 Item" );
         else
-            sprintf( buffer, "%i Items", s );
+            sprintf( buffer, "%3i Items", s );
 
-        cust_font.printString( buffer, 102, 17, false );
+        cust_font.printString( buffer, 16, 177, false );
     } else {
         consoleSelect( &Top );
-        consoleSetWindow( &Top, 11, 2, 12, 3 );
+        consoleSetWindow( &Top, 0, 22, 12, 3 );
         consoleClear( );
 
-        consoleSetWindow( &Top, 4, 2, 12, 3 );
+        consoleSetWindow( &Top, 0, 22, 12, 3 );
         u16 acIn = 214 + 4 * idx;
         u16 s = SAV.m_bag.m_bags[ idx ].size( );
         //char buffer[ 50 ];
         printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
         sprintf( buffer, "%3i,", s );
 
-        cust_font.printString( buffer, 46, 17, false );
+        cust_font.printString( buffer, 16, 177, false );
 
         idx = 3;
-        consoleSetWindow( &Top, 10, 2, 12, 3 );
+        consoleSetWindow( &Top, 6, 22, 12, 3 );
         acIn = 214 + 4 * idx;
         s = SAV.m_bag.m_bags[ idx ].size( );
         //char buffer[ 50 ];
         printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
-        sprintf( buffer, "%3i,", s );
+        sprintf( buffer, "%2i,", s );
 
-        cust_font.printString( buffer, 94, 17, false );
+        cust_font.printString( buffer, 64, 177, false );
 
 
         idx = 6;
-        consoleSetWindow( &Top, 15, 2, 12, 3 );
+        consoleSetWindow( &Top, 11, 22, 12, 3 );
         acIn = 214 + 4 * idx;
         s = SAV.m_bag.m_bags[ idx ].size( );
         //char buffer[ 50 ];
         printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
-        sprintf( buffer, "%3i,", s );
+        sprintf( buffer, "%2i,", s );
 
-        cust_font.printString( buffer, 134, 17, false );
+        cust_font.printString( buffer, 104, 177, false );
 
 
         idx = 7;
-        consoleSetWindow( &Top, 20, 2, 12, 3 );
+        consoleSetWindow( &Top, 16, 22, 12, 3 );
         acIn = 214 + 4 * idx;
         s = SAV.m_bag.m_bags[ idx ].size( );
         //char buffer[ 50 ];
         printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
-        sprintf( buffer, "%3i Items", s );
+        sprintf( buffer, "%2i Items", s );
 
-        cust_font.printString( buffer, 174, 17, false );
+        cust_font.printString( buffer, 144, 177, false );
     }
+}
+
+void drawItemTop( ITEMS::item* p_item, u16 p_count ) {
+    u8 oamIdxTop = 0,
+        palCntTop = 0;
+    u16 tileCntTop = 0;
+
+    std::string display;
+
+    if( p_item->m_itemType != ITEMS::item::itemType::TM_HM ) {
+        FS::drawItemIcon( OamTop, spriteInfoTop, p_item->m_itemName, 112, 46, oamIdxTop, palCntTop, tileCntTop, false );
+        updateOAM( OamTop );
+        display = p_item->getDisplayName( true );
+    } else {
+        auto mv = *( static_cast<ITEMS::TM*>( p_item ) );
+        display = p_item->getDisplayName( true ) + ": " + AttackList[ mv.m_moveIdx ]->m_moveName;
+    }
+
+    cust_font.printString( display.c_str( ),
+                           128 - cust_font.stringWidth( display.c_str( ) ) / 2, 26, false );
 }
 
 void drawPKMNs( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
@@ -271,7 +291,7 @@ void bagUIDinit( ) {
     drawSub( );
 }
 
-void bag::draw( u8 p_startBag, u8 p_startItemIdx ) {
+void bag::draw( u8& p_startBag, u8& p_startItemIdx ) {
     vramSetup( );
     videoSetMode( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
     videoSetModeSub( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
@@ -287,9 +307,15 @@ void bag::draw( u8 p_startBag, u8 p_startItemIdx ) {
 
     bagUIInit( );
 
-    u8 currentBag = p_startBag;
-    showActiveBag( currentBag );
-    drawActiveBagTop( currentBag );
+    showActiveBag( p_startBag );
+    drawActiveBagTop( p_startBag );
+
+    if( !SAV.m_bag.m_bags[ p_startBag ].empty( ) ) {
+        p_startItemIdx = std::min( p_startItemIdx, u8( SAV.m_bag.m_bags[ p_startBag ].size( ) - 1 ) );
+
+        drawItemTop( ITEMS::ItemList[ SAV.m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
+                     SAV.m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
+    }
 
     while( 42 ) {
         swiWaitForVBlank( );
@@ -313,18 +339,18 @@ void bag::draw( u8 p_startBag, u8 p_startItemIdx ) {
                 swiWaitForVBlank( );
                 updateTime( );
             }
-            showActiveBag( currentBag, false );
+            showActiveBag( p_startBag, false );
 
-            u8 currBgPos = SAV.m_bagPoses[ currentBag ];
+            u8 currBgPos = SAV.m_bagPoses[ p_startBag ];
             currBgPos = ( currBgPos + 4 ) % 5;
             for( u8 i = 0; i < 5; ++i )
                 if( SAV.m_bagPoses[ i ] == currBgPos ) {
-                    currentBag = i;
+                    p_startBag = i;
                     break;
                 }
 
-            showActiveBag( currentBag );
-            drawActiveBagTop( currentBag );
+            showActiveBag( p_startBag );
+            drawActiveBagTop( p_startBag );
         } else if( ( held & KEY_RIGHT ) ) {
             while( 1 ) {
                 if( keysUp( ) & KEY_RIGHT )
@@ -333,18 +359,18 @@ void bag::draw( u8 p_startBag, u8 p_startItemIdx ) {
                 swiWaitForVBlank( );
                 updateTime( );
             }
-            showActiveBag( currentBag, false );
+            showActiveBag( p_startBag, false );
 
-            u8 currBgPos = SAV.m_bagPoses[ currentBag ];
+            u8 currBgPos = SAV.m_bagPoses[ p_startBag ];
             currBgPos = ( currBgPos + 1 ) % 5;
             for( u8 i = 0; i < 5; ++i )
                 if( SAV.m_bagPoses[ i ] == currBgPos ) {
-                    currentBag = i;
+                    p_startBag = i;
                     break;
                 }
 
-            showActiveBag( currentBag );
-            drawActiveBagTop( currentBag );
+            showActiveBag( p_startBag );
+            drawActiveBagTop( p_startBag );
         }
         for( u8 i = 0; i < 5; ++i ) {
 

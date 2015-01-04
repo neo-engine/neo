@@ -602,7 +602,7 @@ void initTop( ) {
             sprintf( buffer, "%hi/%hi KP", SAV.m_PkmnTeam[ i ].m_stats.m_acHP, SAV.m_PkmnTeam[ i ].m_stats.m_maxHP );
             cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 28 - mval, false );
 
-            sprintf( buffer, "%s", ITEMS::ItemList[ SAV.m_PkmnTeam[ i ].m_boxdata.getItem( ) ].getDisplayName( ).c_str( ) );
+            sprintf( buffer, "%s", ITEMS::ItemList[ SAV.m_PkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ) );
             cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
         } else {
@@ -615,7 +615,7 @@ void initTop( ) {
             sprintf( buffer, "Ei" );
             cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
-            sprintf( buffer, "%s", ITEMS::ItemList[ SAV.m_PkmnTeam[ i ].m_boxdata.getItem( ) ].getDisplayName( ).c_str( ) );
+            sprintf( buffer, "%s", ITEMS::ItemList[ SAV.m_PkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ) );
             cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
             if( i % 2 == 0 ) {
@@ -890,7 +890,7 @@ void screenLoader::run_pkmn( ) {
                 swiWaitForVBlank( );
             }
             char buffer[ 50 ];
-            ITEMS::item acI = ITEMS::ItemList[ SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ];
+            ITEMS::item acI = *ITEMS::ItemList[ SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ];
             SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem = 0;
 
             initSub( -1 );
@@ -919,7 +919,7 @@ void screenLoader::run_pkmn( ) {
                     break;
                 swiWaitForVBlank( );
             }
-            ITEMS::item acI = ITEMS::ItemList[ SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ];
+            ITEMS::item acI = *ITEMS::ItemList[ SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ];
             SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem = 0;
 
             initSub( -1 );

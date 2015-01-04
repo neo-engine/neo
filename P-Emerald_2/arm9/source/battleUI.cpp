@@ -1036,7 +1036,7 @@ END:
                 printf( "       Lv.%3d", acPkmn.m_Level );
                 printf( "\n%14ls\n", acPkmn.m_boxdata.m_name );
                 printf( "%14s\n\n",
-                        ITEMS::ItemList[ acPkmn.m_boxdata.m_holdItem ].getDisplayName( ).c_str( ) );
+                        ITEMS::ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) );
                 printf( "   %3i/%3i",
                         acPkmn.m_stats.m_acHP,
                         acPkmn.m_stats.m_maxHP );
@@ -1108,7 +1108,7 @@ END:
             printf( "\n----------------\n%11ls %c\n%11s\n\nLv.%3i %3i/%3iKP",
                     p_pokemon.m_boxdata.m_name,
                     GENDER( p_pokemon ),
-                    ITEMS::ItemList[ p_pokemon.m_boxdata.m_holdItem ].getDisplayName( ).c_str( ),
+                    ITEMS::ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
                     p_pokemon.m_Level,
                     p_pokemon.m_stats.m_acHP,
                     p_pokemon.m_stats.m_maxHP );
@@ -1264,13 +1264,13 @@ END:
             cust_font.printString( POKEMON::PKMNDATA::getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
-                cust_font.printString( ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
+                cust_font.printString( ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
                                        24, 124, true );
-                FS::drawItemIcon( Oam, spriteInfo, ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].m_itemName, 0, 116, oamIndex, palIndex, tilecnt, true );
+                FS::drawItemIcon( Oam, spriteInfo, ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 0, 116, oamIndex, palIndex, tilecnt, true );
             } else {
                 cust_font.setColor( BLACK_IDX, 1 );
                 cust_font.setColor( GRAY_IDX, 2 );
-                cust_font.printString( ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ].getDisplayName( ).c_str( ), 24, 124, true );
+                cust_font.printString( ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 24, 124, true );
             }
             cust_font.setColor( GRAY_IDX, 1 );
             cust_font.setColor( BLACK_IDX, 2 );

@@ -354,6 +354,8 @@ void initNewGame( ) {
     SAV.m_dex = 0;
 
     SAV.m_bgIdx = START_BG;
+    SAV.m_lstBag = 0;
+    SAV.m_lstBagItem = 0;
     for( u8 i = 0; i < 5; ++i )
         SAV.m_bagPoses[ i ] = i;
 
@@ -1049,6 +1051,8 @@ CONT:
             for( u8 i = 0; i < 5; ++i )
                 SAV.m_bagPoses[ i ] = i;
             SAV.m_bgIdx = START_BG;
+            SAV.m_lstBag = 0;
+            SAV.m_lstBagItem = 0;
 
             SAV.m_PkmnTeam.clear( );
             free_spaces.clear( );
@@ -2020,7 +2024,7 @@ OUT:
                 if( touch.px == 0 && touch.py == 0 )
                     break;
             }
-            SAV.m_bag.draw( 0, 0 );
+            SAV.m_bag.draw( SAV.m_lstBag, SAV.m_lstBagItem );
             initMapSprites( );
             movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
         }
@@ -2095,7 +2099,7 @@ OUT:
                     SAV.m_PkmnTeam.clear( );
                     for( int i = 0; i < 3; ++i ) {
                         POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
-                                            50, SAV.m_Id, SAV.m_Sid, SAV.getName().c_str(),
+                                            50, SAV.m_Id, SAV.m_Sid, SAV.getName( ).c_str( ),
                                             !SAV.m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         stored_pkmn[ *free_spaces.rbegin( ) ] = a.m_boxdata;
                         //a.stats.acHP = i*a.stats.maxHP/5;
@@ -2122,9 +2126,9 @@ OUT:
                     break;
                 }
                 case 1:
-                    for( u16 j = 1; j < 700; ++j )
-                        if( ITEMS::ItemList[ j ].m_itemName != "Null" )
-                            SAV.m_bag.addItem( ITEMS::ItemList[ j ].m_itemType, j, 1 );
+                    for( u16 j = 1; j < 800; ++j )
+                        if( ITEMS::ItemList[ j ]->m_itemName != "Null" )
+                            SAV.m_bag.addItem( ITEMS::ItemList[ j ]->m_itemType, j, 1 );
                     break;
                 case 2:
                     setMainSpriteVisibility( false, true );

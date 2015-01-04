@@ -77,5 +77,5 @@ public:
     std::pair<u16, u16>
         elementAt( bagtype, u16 );
 
-    void            draw( u8 p_startBag, u8 p_startItemIdx );
+    void            draw( u8& p_startBag, u8& p_startItemIdx );
 };

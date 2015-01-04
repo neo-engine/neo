@@ -93,6 +93,8 @@ public:
     bool                m_evolveInBattle;
     u8                  m_bgIdx;
 
+    u8                  m_lstBag;
+    u8                  m_lstBagItem;
     u8                  m_bagPoses[ 5 ];
 
     //GameFlags

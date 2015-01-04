@@ -482,15 +482,15 @@ namespace POKEMON {
                 cust_font.setColor( 252, 1 );
                 cust_font.setColor( 0, 2 );
                 //char buffer[ 200 ];
-                sprintf( buffer, "%s: %s", ITEMS::ItemList[ m_boxdata.getItem( ) ].getDisplayName( true ).c_str( ),
-                         ITEMS::ItemList[ m_boxdata.getItem( ) ].getShortDescription( true ).c_str( ) );
+                sprintf( buffer, "%s: %s", ITEMS::ItemList[ m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
+                         ITEMS::ItemList[ m_boxdata.getItem( ) ]->getShortDescription( true ).c_str( ) );
                 cust_font.printString( buffer, 50, 159, false );
-                FS::drawItemIcon( OamTop, spriteInfoTop, ITEMS::ItemList[ m_boxdata.getItem( ) ].m_itemName, 2, 152, a2, b2, c2, false );
+                FS::drawItemIcon( OamTop, spriteInfoTop, ITEMS::ItemList[ m_boxdata.getItem( ) ]->m_itemName, 2, 152, a2, b2, c2, false );
                 updateOAM( OamTop );
             } else {
                 cust_font.setColor( 252, 1 );
                 cust_font.setColor( 0, 2 );
-                cust_font.printString( ITEMS::ItemList[ m_boxdata.getItem( ) ].getDisplayName( ).c_str( ), 56, 168, false );
+                cust_font.printString( ITEMS::ItemList[ m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 56, 168, false );
             }
             cust_font.setColor( 251, 1 );
             cust_font.setColor( 252, 2 );
@@ -689,7 +689,7 @@ namespace POKEMON {
                     drawTypeIcon( Oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 0 ], 256 - 68, 24, true );
                     drawTypeIcon( Oam, spriteInfo, o2s, p2s, t2s, data.m_types[ 1 ], 256 - 32, 24, true );
                 }
-                FS::drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ].m_itemName, 256 - 108, 0, o2s, p2s, t2s, true );
+                FS::drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ]->m_itemName, 256 - 108, 0, o2s, p2s, t2s, true );
 
                 Oam->oamBuffer[ 15 ].isHidden = false;
                 Oam->oamBuffer[ 15 ].y = 0;
@@ -749,7 +749,7 @@ namespace POKEMON {
                 Oam->oamBuffer[ o2s++ ].isHidden = true;
                 Oam->oamBuffer[ o2s++ ].isHidden = true;
                 Oam->oamBuffer[ o2s ].isHidden = true;
-                FS::drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ].m_itemName, 256 - 32, 0, o2s, p2s, t2s, true );
+                FS::drawItemIcon( Oam, spriteInfo, m_boxdata.m_ball == 0 ? "Pokeball" : ITEMS::ItemList[ m_boxdata.m_ball ]->m_itemName, 256 - 32, 0, o2s, p2s, t2s, true );
                 updateOAMSub( Oam );
             }
             Oam->oamBuffer[ 17 ].isHidden = true;

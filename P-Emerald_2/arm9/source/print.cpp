@@ -515,12 +515,14 @@ namespace FONT {
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' )
                 break;
-            width += _widths[ (u8)p_string[ current_char ] ] + 1;
+            u16 c = (u16)p_string[ current_char ];
+            _shiftchar( c );
+            width += _widths[ c ];
 
             current_char++;
         }
 
-        return width - 1;
+        return width;
     }
     u32 font::stringWidth( const wchar_t *p_string ) const {
         u32 current_char = 0;

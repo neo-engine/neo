@@ -81,7 +81,7 @@ namespace FONT {
             }
 
             if( p_val == '$' ) {
-                p_val = 98 + 7 + 16 - 3;
+                p_val = 98 + 7 + 16 - 4;
                 return;
             }
 
@@ -111,6 +111,10 @@ namespace FONT {
             }
             if( p_val == ')' ) {
                 p_val = 98 + 22 + 16 - 1;
+                return;
+            }
+            if( p_val == ':' ) {
+                p_val = 3 * 49 - 2;
                 return;
             }
             if( p_val == ':' ) {

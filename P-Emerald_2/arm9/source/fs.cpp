@@ -868,7 +868,7 @@ namespace FS {
             else
                 ret += ac;
         }
-        ret += '\0';
+        //ret += '\0';
         return ret;
     }
 
@@ -1449,7 +1449,7 @@ NEXT:
 namespace ITEMS {
     u16 item::getItemId( ) {
         for( int i = 0; i < 700; ++i )
-            if( ItemList[ i ].m_itemName == m_itemName )
+            if( ItemList[ i ]->m_itemName == m_itemName )
                 return i;
         return 0;
     }

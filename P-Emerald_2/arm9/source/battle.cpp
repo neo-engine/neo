@@ -137,7 +137,7 @@ namespace BATTLE {
                 return std::wstring( wbuffer );
             }
             if( specifier == L"ITEM" ) {
-                std::swprintf( wbuffer, 50, L"%s", ITEMS::ItemList[ target.m_boxdata.m_holdItem ].m_itemName.c_str( ) );
+                std::swprintf( wbuffer, 50, L"%s", ITEMS::ItemList[ target.m_boxdata.m_holdItem ]->m_itemName.c_str( ) );
                 return std::wstring( wbuffer );
             }
             if( specifier == L"LEVEL" )
@@ -689,7 +689,7 @@ OUT:
             case battleMove::USE_ITEM:
             {
                 if( opponent ) {
-                    std::swprintf( wbuffer, 100, L"[TRAINER] ([TCLASS]) setzt\n%s ein.[A]", ITEMS::ItemList[ acMove.m_value ].getDisplayName( true ).c_str( ) );
+                    std::swprintf( wbuffer, 100, L"[TRAINER] ([TCLASS]) setzt\n%s ein.[A]", ITEMS::ItemList[ acMove.m_value ]->getDisplayName( true ).c_str( ) );
                     log( wbuffer );
                 }
                 doItem( opponent, acMove.m_target, ability::abilityType( 0 ) );
@@ -827,7 +827,7 @@ OUT:
 
         //Stat changes
         if( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability != A_UNAWARE
-            && bm.m_value != M_FOULPLAY ) {
+            && bm.m_value != M_FOUL_PLAY ) {
             if( moveAtkHitType == move::PHYS ) {
                 if( ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ ATK ] > 0 )
                     atk = atk * ( 2 + ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ ATK ] ) / 2.0;
@@ -841,7 +841,7 @@ OUT:
                     atk = atk  * 2.0 / ( 2 - ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ SATK ] );
             }
         }
-        if( bm.m_value == M_FOULPLAY ) {
+        if( bm.m_value == M_FOUL_PLAY ) {
             atk = ACPKMN( p_targetPos, p_targetIsOpp ).m_stats.m_Atk;
 
             if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ ATK ] > 0 )
@@ -903,7 +903,7 @@ NEXT:
         if( !ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
             return;
 
-        auto im = ITEMS::ItemList[ ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability ];
+        auto im = *ITEMS::ItemList[ ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability ];
 
         if( ( im.getEffectType( ) & ITEMS::item::itemEffectType::IN_BATTLE ) && ( im.m_inBattleEffect & p_situation ) ) {
             std::swprintf( wbuffer, 50, L"%s von %ls%s wirkt.[A]",
