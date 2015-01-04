@@ -512,7 +512,7 @@ namespace BATTLE {
         writeLogText( wbuffer );
 
         loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                         _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV.m_activatedPNav );
+                         _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV->m_activatedPNav );
         if( p_showBack ) {
             Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
             updateOAMSub( Oam );
@@ -566,7 +566,7 @@ SHOW_ATTACK:
                     }
                 }
                 loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV.m_activatedPNav );
+                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV->m_activatedPNav );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( wbuffer );
             } else if( t.px < 58 && t.py > 162 && t.py <= 192 ) {//Bag
@@ -581,7 +581,7 @@ SHOW_ATTACK:
                 }
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( wbuffer );
-            } else if( !_battle->m_isWildBattle && SAV.m_activatedPNav
+            } else if( !_battle->m_isWildBattle && SAV->m_activatedPNav
                        && t.px > 95 && t.px < 152 && t.py > 152 && t.py < 178 ) {//Nav
                 waitForTouchUp( );
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
@@ -623,7 +623,7 @@ SHOW_ATTACK:
                     return true;
                 }
                 loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV.m_activatedPNav );
+                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV->m_activatedPNav );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( wbuffer );
             }

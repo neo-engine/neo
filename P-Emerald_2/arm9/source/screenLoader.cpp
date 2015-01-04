@@ -358,33 +358,33 @@ u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     //Main menu sprites
 
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, OPTS_ID, OPTS_ID, nextAvailableTileIdx,
-                                       BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( OPTS_ID - 2 ) ] - 16,
-                                       BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( OPTS_ID - 2 ) + 1 ] - 16,
+                                       BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( OPTS_ID - 2 ) ] - 16,
+                                       BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( OPTS_ID - 2 ) + 1 ] - 16,
                                        32, 32, OptionPal, OptionTiles, OptionTilesLen,
                                        false, false, true, OBJPRIORITY_0, true );
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, PKMN_ID, PKMN_ID, nextAvailableTileIdx,
-                                       BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( PKMN_ID - 2 ) ] - 16,
-                                       BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( PKMN_ID - 2 ) + 1 ] - 16,
+                                       BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( PKMN_ID - 2 ) ] - 16,
+                                       BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( PKMN_ID - 2 ) + 1 ] - 16,
                                        32, 32, PokemonSpPal, PokemonSpTiles, PokemonSpTilesLen,
                                        false, false, true, OBJPRIORITY_0, true );
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, NAV_ID, NAV_ID, nextAvailableTileIdx,
-                                       BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( NAV_ID - 2 ) ] - 16,
-                                       BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( NAV_ID - 2 ) + 1 ] - 16,
+                                       BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( NAV_ID - 2 ) ] - 16,
+                                       BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( NAV_ID - 2 ) + 1 ] - 16,
                                        32, 32, NavPal, NavTiles, NavTilesLen,
                                        false, false, true, OBJPRIORITY_0, true );
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, ID_ID, ID_ID, nextAvailableTileIdx,
-                                       BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( ID_ID - 2 ) ] - 16,
-                                       BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( ID_ID - 2 ) + 1 ] - 16,
+                                       BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( ID_ID - 2 ) ] - 16,
+                                       BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( ID_ID - 2 ) + 1 ] - 16,
                                        32, 32, IdPal, IdTiles, IdTilesLen,
                                        false, false, true, OBJPRIORITY_0, true );
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, DEX_ID, DEX_ID, nextAvailableTileIdx,
-                                       BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( DEX_ID - 2 ) ] - 16,
-                                       BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( DEX_ID - 2 ) + 1 ] - 16,
+                                       BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( DEX_ID - 2 ) ] - 16,
+                                       BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( DEX_ID - 2 ) + 1 ] - 16,
                                        32, 32, PokeDexPal, PokeDexTiles, PokeDexTilesLen,
                                        false, false, true, OBJPRIORITY_0, true );
     nextAvailableTileIdx = loadSprite( p_oam, p_spriteInfo, BAG_ID, BAG_ID, nextAvailableTileIdx,
-                                       BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( BAG_ID - 2 ) ] - 16,
-                                       BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( BAG_ID - 2 ) + 1 ] - 16,
+                                       BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( BAG_ID - 2 ) ] - 16,
+                                       BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( BAG_ID - 2 ) + 1 ] - 16,
                                        32, 32, SPBagPal, SPBagTiles, SPBagTilesLen,
                                        false, false, true, OBJPRIORITY_0, true );
 
@@ -444,7 +444,7 @@ u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
 }
 void setMainSpriteVisibility( bool p_hidden, bool p_save ) {
     for( u8 i = 2; i <= 7; ++i )
-        if( i == 2 && !SAV.m_hasPKMN )
+        if( i == 2 && !SAV->m_hasPKMN )
             setSpriteVisibility( &Oam->oamBuffer[ i ], true );
         else
             setSpriteVisibility( &Oam->oamBuffer[ i ], p_hidden );
@@ -462,31 +462,31 @@ void drawBorder( ) {
 void drawSub( ) {
     //memset( bgGetGfxPtr( bg2sub ), 0, 256 * 192 );
     //memset( bgGetGfxPtr( bg3sub ), 0, 256 * 192 );
-    if( !BGs[ SAV.m_bgIdx ].m_loadFromRom ) {
-        dmaCopy( BGs[ SAV.m_bgIdx ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 192 );
-        dmaCopy( BGs[ SAV.m_bgIdx ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
-    } else if( !FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx ) ) {
+    if( !BGs[ SAV->m_bgIdx ].m_loadFromRom ) {
+        dmaCopy( BGs[ SAV->m_bgIdx ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 192 );
+        dmaCopy( BGs[ SAV->m_bgIdx ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
+    } else if( !FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx ) ) {
         dmaCopy( BGs[ 0 ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 256 );
         dmaCopy( BGs[ 0 ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
-        SAV.m_bgIdx = 0;
+        SAV->m_bgIdx = 0;
     }
     drawBorder( );
 }
 
 void drawSub( u8 p_newIdx ) {
-    if( SAV.m_bgIdx == p_newIdx )
+    if( SAV->m_bgIdx == p_newIdx )
         return;
 
     if( !BGs[ p_newIdx ].m_loadFromRom ) {
         dmaCopy( BGs[ p_newIdx ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 192 );
         dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
-        SAV.m_bgIdx = p_newIdx;
+        SAV->m_bgIdx = p_newIdx;
     } else if( !FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ p_newIdx ].m_name.c_str( ), p_newIdx ) ) {
         dmaCopy( BGs[ 0 ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 256 );
         dmaCopy( BGs[ 0 ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
-        SAV.m_bgIdx = 0;
+        SAV->m_bgIdx = 0;
     } else
-        SAV.m_bgIdx = p_newIdx;
+        SAV->m_bgIdx = p_newIdx;
     drawBorder( );
 }
 
@@ -500,8 +500,8 @@ void screenLoader::draw( s8 p_mode ) {
 
         for( u8 i = 0; i < 3; ++i ) {
             Oam->oamBuffer[ 90 + i ].isHidden = false;
-            Oam->oamBuffer[ 90 + i ].x = BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 4 * i ] - 16;
-            Oam->oamBuffer[ 90 + i ].y = BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 4 * i + 1 ] - 16;
+            Oam->oamBuffer[ 90 + i ].x = BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 * i ] - 16;
+            Oam->oamBuffer[ 90 + i ].y = BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 * i + 1 ] - 16;
             Oam->oamBuffer[ 90 + i ].priority = OBJPRIORITY_1;
         }
         updateOAMSub( Oam );
@@ -578,31 +578,31 @@ void initTop( ) {
     BG_PALETTE[ 252 ] = RGB15( 15, 15, 15 );
     BG_PALETTE[ 251 ] = RGB15( 3, 3, 3 );
 
-    for( size_t i = 0; i < SAV.m_PkmnTeam.size( ); i++ ) {
-        if( !SAV.m_PkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
+    for( size_t i = 0; i < SAV->m_PkmnTeam.size( ); i++ ) {
+        if( !SAV->m_PkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
             if( i % 2 == 0 ) {
-                FS::drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId, u16( borders[ i ][ 0 ] * 8 - 28 ), u16( borders[ i ][ 1 ] * 8 ), a, b, c, false );
+                FS::drawPKMNIcon( OamTop, spriteInfoTop, SAV->m_PkmnTeam[ i ].m_boxdata.m_speciesId, u16( borders[ i ][ 0 ] * 8 - 28 ), u16( borders[ i ][ 1 ] * 8 ), a, b, c, false );
                 BATTLE::battleUI::displayHP( 100, 101, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
-                BATTLE::battleUI::displayHP( 100, 100 - SAV.m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV.m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
+                BATTLE::battleUI::displayHP( 100, 100 - SAV->m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV->m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
             } else {
-                FS::drawPKMNIcon( OamTop, spriteInfoTop, SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId, u16( borders[ i ][ 0 ] * 8 + 76 ), u16( borders[ i ][ 1 ] * 8 ), a, b, c, false );
+                FS::drawPKMNIcon( OamTop, spriteInfoTop, SAV->m_PkmnTeam[ i ].m_boxdata.m_speciesId, u16( borders[ i ][ 0 ] * 8 + 76 ), u16( borders[ i ][ 1 ] * 8 ), a, b, c, false );
                 BATTLE::battleUI::displayHP( 100, 101, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
-                BATTLE::battleUI::displayHP( 100, 100 - SAV.m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV.m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
+                BATTLE::battleUI::displayHP( 100, 100 - SAV->m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV->m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
             }
             updateOAM( OamTop );
             //char buffer[ 100 ];
 
             u8 mval = 1 + ( ( i / 2 == 1 ) ? 4 : 8 );
 
-            sprintf( buffer, "%ls", SAV.m_PkmnTeam[ i ].m_boxdata.m_name );
+            sprintf( buffer, "%ls", SAV->m_PkmnTeam[ i ].m_boxdata.m_name );
             cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 - mval, false );
-            sprintf( buffer, "%s", POKEMON::PKMNDATA::getDisplayName( SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId ) );
+            sprintf( buffer, "%s", POKEMON::PKMNDATA::getDisplayName( SAV->m_PkmnTeam[ i ].m_boxdata.m_speciesId ) );
             cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
-            sprintf( buffer, "%hi/%hi KP", SAV.m_PkmnTeam[ i ].m_stats.m_acHP, SAV.m_PkmnTeam[ i ].m_stats.m_maxHP );
+            sprintf( buffer, "%hi/%hi KP", SAV->m_PkmnTeam[ i ].m_stats.m_acHP, SAV->m_PkmnTeam[ i ].m_stats.m_maxHP );
             cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 28 - mval, false );
 
-            sprintf( buffer, "%s", ITEMS::ItemList[ SAV.m_PkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ) );
+            sprintf( buffer, "%s", ITEMS::ItemList[ SAV->m_PkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ) );
             cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
         } else {
@@ -615,7 +615,7 @@ void initTop( ) {
             sprintf( buffer, "Ei" );
             cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
-            sprintf( buffer, "%s", ITEMS::ItemList[ SAV.m_PkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ) );
+            sprintf( buffer, "%s", ITEMS::ItemList[ SAV->m_PkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ) );
             cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
             if( i % 2 == 0 ) {
@@ -630,7 +630,7 @@ void initTop( ) {
 }
 void clearTop( ) {
     consoleSelect( &Top );
-    for( size_t i = 0; i < SAV.m_PkmnTeam.size( ); i++ ) {
+    for( size_t i = 0; i < SAV->m_PkmnTeam.size( ); i++ ) {
         consoleSetWindow( &Top, borders[ i ][ 0 ], borders[ i ][ 1 ], 12, 6 );
         consoleClear( );
     }
@@ -648,14 +648,14 @@ void initSub( u16 pkmIdx ) {
         Oam->oamBuffer[ 16 + 2 * i ].isHidden = true;
     }
     updateOAMSub( Oam );
-    if( pkmIdx >= SAV.m_PkmnTeam.size( ) || SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_individualValues.m_isEgg ) {
+    if( pkmIdx >= SAV->m_PkmnTeam.size( ) || SAV->m_PkmnTeam[ pkmIdx ].m_boxdata.m_individualValues.m_isEgg ) {
         consoleSelect( &Top );
         return;
     }
     u8 u = 0;
     for( u8 i = 0; i < 4; ++i ) {
-        if( SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_moves[ i ] < MAXATTACK &&
-            AttackList[ SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_moves[ i ] ]->m_isFieldAttack ) {
+        if( SAV->m_PkmnTeam[ pkmIdx ].m_boxdata.m_moves[ i ] < MAXATTACK &&
+            AttackList[ SAV->m_PkmnTeam[ pkmIdx ].m_boxdata.m_moves[ i ] ]->m_isFieldAttack ) {
             Oam->oamBuffer[ 15 + 2 * ( u ) ].isHidden = false;
             Oam->oamBuffer[ 16 + 2 * ( u ) ].isHidden = false;
             Oam->oamBuffer[ 15 + 2 * ( u ) ].y = -7 + 24 * u;
@@ -666,11 +666,11 @@ void initSub( u16 pkmIdx ) {
             updateOAMSub( Oam );
 
             consoleSetWindow( &Bottom, 16, 3 * u + 1, 16, 16 );
-            printf( "    %s", AttackList[ SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
+            printf( "    %s", AttackList[ SAV->m_PkmnTeam[ pkmIdx ].m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
             ++u;
         }
     }
-    if( SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_holdItem ) {
+    if( SAV->m_PkmnTeam[ pkmIdx ].m_boxdata.m_holdItem ) {
         Oam->oamBuffer[ 15 + 2 * ( u ) ].isHidden = false;
         Oam->oamBuffer[ 16 + 2 * ( u ) ].isHidden = false;
         Oam->oamBuffer[ 15 + 2 * ( u ) ].y = -7 + 24 * u;
@@ -683,7 +683,7 @@ void initSub( u16 pkmIdx ) {
         consoleSetWindow( &Bottom, 16, 3 * u + 1, 16, 16 );
         printf( "    Item nehmen" );
     }
-    u16 s = u + SAV.m_PkmnTeam[ pkmIdx ].m_boxdata.m_holdItem;
+    u16 s = u + SAV->m_PkmnTeam[ pkmIdx ].m_boxdata.m_holdItem;
     Oam->oamBuffer[ 15 + 2 * ( s ) ].isHidden = false;
     Oam->oamBuffer[ 16 + 2 * ( s ) ].isHidden = false;
     Oam->oamBuffer[ 15 + 2 * ( s ) ].y = -7 + 24 * u;
@@ -727,7 +727,7 @@ void screenLoader::run_pkmn( ) {
     touchPosition touch;
     swiWaitForVBlank( );
     drawSub( );
-    u8 acIn = 0, max = SAV.m_PkmnTeam.size( );
+    u8 acIn = 0, max = SAV->m_PkmnTeam.size( );
     consoleSelect( &Top );
     consoleClear( );
 
@@ -795,7 +795,7 @@ void screenLoader::run_pkmn( ) {
             swiWaitForVBlank( );
             while( 1 ) {
                 initSub( -1 );
-                u32 p = SAV.m_PkmnTeam[ acIn ].draw( );
+                u32 p = SAV->m_PkmnTeam[ acIn ].draw( );
                 if( p & KEY_X ) {
                     for( u8 i = 0; i < max; i++ ) {
                         consoleSetWindow( &Top, positions[ i ][ 0 ], positions[ i ][ 1 ], 2, 2 );
@@ -881,7 +881,7 @@ void screenLoader::run_pkmn( ) {
             else
                 printf( "<" );
             initSub( acIn );
-        } else if( SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem && touch.px >= 152 && touch.py >= ( -7 + 24 * fieldCnt ) && touch.py < ( 17 + 24 * fieldCnt ) ) {
+        } else if( SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem && touch.px >= 152 && touch.py >= ( -7 + 24 * fieldCnt ) && touch.py < ( 17 + 24 * fieldCnt ) ) {
             while( 1 ) {
                 scanKeys( );
                 auto t = touchReadXY( );
@@ -890,8 +890,8 @@ void screenLoader::run_pkmn( ) {
                 swiWaitForVBlank( );
             }
             char buffer[ 50 ];
-            ITEMS::item acI = *ITEMS::ItemList[ SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ];
-            SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem = 0;
+            ITEMS::item acI = *ITEMS::ItemList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ];
+            SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem = 0;
 
             initSub( -1 );
             setSpriteVisibility( back, true );
@@ -899,9 +899,9 @@ void screenLoader::run_pkmn( ) {
             Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH - 28;
             Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT - 28;
             updateOAMSub( Oam );
-            sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( ).c_str( ), SAV.m_PkmnTeam[ acIn ].m_boxdata.m_name );
+            sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( ).c_str( ), SAV->m_PkmnTeam[ acIn ].m_boxdata.m_name );
             messageBox( buffer, true, true );
-            SAV.m_bag.addItem( acI.getItemType( ), acI.getItemId( ), 1 );
+            SAV->m_bag.addItem( acI.getItemType( ), acI.getItemId( ), 1 );
 
             Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
             Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
@@ -911,7 +911,7 @@ void screenLoader::run_pkmn( ) {
             Oam->oamBuffer[ 8 ].isHidden = false;
             updateOAMSub( Oam );
             initSub( acIn );
-        } else if( touch.px >= 152 && touch.py >= ( -7 + 24 * ( SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem + fieldCnt ) ) && touch.py < ( 17 + 24 * ( fieldCnt + SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ) ) ) {
+        } else if( touch.px >= 152 && touch.py >= ( -7 + 24 * ( SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem + fieldCnt ) ) && touch.py < ( 17 + 24 * ( fieldCnt + SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ) ) ) {
             while( 1 ) {
                 scanKeys( );
                 auto t = touchReadXY( );
@@ -919,8 +919,8 @@ void screenLoader::run_pkmn( ) {
                     break;
                 swiWaitForVBlank( );
             }
-            ITEMS::item acI = *ITEMS::ItemList[ SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ];
-            SAV.m_PkmnTeam[ acIn ].m_boxdata.m_holdItem = 0;
+            ITEMS::item acI = *ITEMS::ItemList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ];
+            SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem = 0;
 
             initSub( -1 );
             setSpriteVisibility( back, true );
@@ -929,7 +929,7 @@ void screenLoader::run_pkmn( ) {
             Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT - 28;
             updateOAMSub( Oam );
 
-            this->run_dex( SAV.m_PkmnTeam[ acIn ].m_boxdata.m_speciesId - 1 );
+            this->run_dex( SAV->m_PkmnTeam[ acIn ].m_boxdata.m_speciesId - 1 );
 
             setSpriteVisibility( back, false );
             setSpriteVisibility( save, true );
@@ -960,10 +960,10 @@ void screenLoader::run_pkmn( ) {
                 }
                 u8 u = 0, o;
                 for( o = 0; o < 4 && u <= i; ++o )
-                    if( AttackList[ SAV.m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->m_isFieldAttack )
+                    if( AttackList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->m_isFieldAttack )
                         u++;
                 o--;
-                if( AttackList[ SAV.m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->possible( ) ) {
+                if( AttackList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->possible( ) ) {
                     for( u8 i2 = 0; i2 < max; i2++ ) {
                         consoleSetWindow( &Top, positions[ i2 ][ 0 ], positions[ i2 ][ 1 ], 2, 2 );
                         consoleClear( );
@@ -980,16 +980,16 @@ void screenLoader::run_pkmn( ) {
 
                     this->draw( -1 );
                     initMapSprites( );
-                    movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
+                    movePlayerOnMap( SAV->m_acposx / 20, SAV->m_acposy / 20, SAV->m_acposz, true );
 
                     bgUpdate( );
                     swiWaitForVBlank( );
 
                     char buffer[ 50 ];
-                    sprintf( buffer, "%ls setzt %s\nein!", SAV.m_PkmnTeam[ acIn ].m_boxdata.m_name, AttackList[ SAV.m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
+                    sprintf( buffer, "%ls setzt %s\nein!", SAV->m_PkmnTeam[ acIn ].m_boxdata.m_name, AttackList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
                     messageBox( buffer, true, true );
-                    shoUseAttack( SAV.m_PkmnTeam[ acIn ].m_boxdata.m_speciesId, SAV.m_PkmnTeam[ acIn ].m_boxdata.m_isFemale, SAV.m_PkmnTeam[ acIn ].m_boxdata.isShiny( ) );
-                    AttackList[ SAV.m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->use( );
+                    shoUseAttack( SAV->m_PkmnTeam[ acIn ].m_boxdata.m_speciesId, SAV->m_PkmnTeam[ acIn ].m_boxdata.m_isFemale, SAV->m_PkmnTeam[ acIn ].m_boxdata.isShiny( ) );
+                    AttackList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->use( );
                     return;
                 } else {
                     initSub( -1 );
@@ -1393,7 +1393,7 @@ void drawTopDexPage( u8 p_page, u16 p_pkmnId, u8 p_pkmnFormeId = 0 ) {
         BG_PALETTE[ 251 ] = RGB15( 3, 3, 3 );
         BG_PALETTE[ 252 ] = RGB15( 31, 31, 31 );
 
-        if( SAV.m_inDex[ p_pkmnId - 1 ] ) {
+        if( SAV->m_inDex[ p_pkmnId - 1 ] ) {
             BG_PALETTE[ 0 ] = POKEMON::PKMNDATA::getColor( acpkmndata.m_types[ 0 ] );
 
             bool isFixed = ( acpkmndata.m_gender == POKEMON::GENDERLESS ) || ( acpkmndata.m_gender == POKEMON::MALE ) || ( acpkmndata.m_gender == POKEMON::FEMALE );
@@ -1426,7 +1426,7 @@ void drawTopDexPage( u8 p_page, u16 p_pkmnId, u8 p_pkmnFormeId = 0 ) {
     switch( p_page ) {
         case 0:{
             printf( "\x1b[37m" );
-            if( SAV.m_inDex[ p_pkmnId - 1 ] ) {
+            if( SAV->m_inDex[ p_pkmnId - 1 ] ) {
                 BG_PALETTE[ 42 ] = POKEMON::PKMNDATA::getColor( acpkmndata.m_types[ 1 ] );
                 for( u8 i = 0; i < 6; ++i ) {
                     FONT::putrec( u8( 19 + 40 * i ), u8( std::max( 56, 102 - acpkmndata.m_bases[ i ] / 3 ) ), u8( 37 + 40 * i ), (u8)102, false, true );
@@ -1451,7 +1451,7 @@ void drawTopDexPage( u8 p_page, u16 p_pkmnId, u8 p_pkmnFormeId = 0 ) {
             break;
         }
         case 2:{
-            if( SAV.m_inDex[ p_pkmnId - 1 ] ) {
+            if( SAV->m_inDex[ p_pkmnId - 1 ] ) {
                 formes( OamTop, spriteInfoTop, a, b, c, newformepkmn, p_pkmnFormeId % 2, acG );
             } else
                 formes( OamTop, spriteInfoTop, a, b, c, 0, 0, POKEMON::GENDERLESS );
@@ -1498,9 +1498,9 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
     consoleSetWindow( &Bottom, 0, 0, 32, 24 );
     consoleSelect( &Bottom );
     consoleClear( );
-    printf( "Gefangen: %3i", SAV.m_dex );
+    printf( "Gefangen: %3i", SAV->m_dex );
 
-    u16 acNum = p_pkmnId, maxn = SAV.m_hasGDex ? 649 : 493, t2 = tilecnt;
+    u16 acNum = p_pkmnId, maxn = SAV->m_hasGDex ? 649 : 493, t2 = tilecnt;
     u8 o2 = oamInd, p2 = palcnt, acPage = 0, acMap = acMapRegion;
 
     consoleSetWindow( &Top, 0, 0, 32, 24 );
@@ -1509,11 +1509,11 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
     for( u16 i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
         if( i == acNum ) {
             drawTopDexPage( acPage, i + 1, acForme );
-            FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true );
+            FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true );
             --j;
             continue;
         } else
-            FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+            FS::drawPKMNIcon( Oam, spriteInfo, SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
 
         spriteInfo[ 16 ].m_entry->isHidden = true;
         updateOAMSub( Oam );
@@ -1547,9 +1547,9 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                 for( u16 i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                         drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                        FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                        FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        FS::drawPKMNIcon( Oam, spriteInfo, SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( pressed & KEY_UP ) || ( ( held & ~up ) & KEY_UP ) ) {
                 scanKeys( );
@@ -1561,9 +1561,9 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                 for( u16 i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                         drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                        FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                        FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        FS::drawPKMNIcon( Oam, spriteInfo, SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( pressed & KEY_R ) || ( ( held & ~up ) & KEY_R ) ) {
                 scanKeys( );
@@ -1575,9 +1575,9 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                 for( u16 i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                         drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                        FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                        FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        FS::drawPKMNIcon( Oam, spriteInfo, SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( pressed & KEY_L ) || ( ( held & ~up ) & KEY_L ) ) {
                 scanKeys( );
@@ -1589,9 +1589,9 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                 for( u16 i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                     if( i == acNum ) {
                         drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                        FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                        FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                     } else
-                        FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                        FS::drawPKMNIcon( Oam, spriteInfo, SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( held & KEY_LEFT ) ) {
                 while( 1 ) {
@@ -1654,9 +1654,9 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                     for( u16 i = ( acNum + maxn - 3 ) % maxn, j = 0; j < 5; i = ( i + 1 ) % maxn, ++j )
                         if( i == acNum ) {
                             drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, i + 1, acForme ); --j;
-                            FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
+                            FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ 8 ] + 16, dexsppos[ 1 ][ 8 ] + 16, o2, p2, t2, true ); continue;
                         } else
-                            FS::drawPKMNIcon( Oam, spriteInfo, SAV.m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
+                            FS::drawPKMNIcon( Oam, spriteInfo, SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                 }
             for( u8 q = 5; q < 8; ++q )
                 if( sqrt( sq( dexsppos[ 0 ][ q ] - t.px + 16 ) + sq( dexsppos[ 1 ][ q ] - t.py + 16 ) ) <= 16 ) {

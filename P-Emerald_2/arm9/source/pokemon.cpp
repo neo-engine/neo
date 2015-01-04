@@ -665,7 +665,23 @@ namespace POKEMON {
             default:
                 return;
         }
+        if( !( m_boxdata.m_individualValues.m_isEgg ) ) {
+            Oam->oamBuffer[ 90 ].isHidden = false;
+            Oam->oamBuffer[ 90 ].y = -4;
+            Oam->oamBuffer[ 90 ].x = -8;
+            Oam->oamBuffer[ 90 ].priority = OBJPRIORITY_1;
+            Oam->oamBuffer[ 91 ].isHidden = false;
+            Oam->oamBuffer[ 91 ].y = 18;
+            Oam->oamBuffer[ 91 ].x = -8;
+            Oam->oamBuffer[ 91 ].priority = OBJPRIORITY_1;
+            Oam->oamBuffer[ 92 ].isHidden = false;
+            Oam->oamBuffer[ 92 ].y = -8;
+            Oam->oamBuffer[ 92 ].x = 14;
+            Oam->oamBuffer[ 92 ].priority = OBJPRIORITY_1;
 
+            Oam->oamBuffer[ 90 + page ].isHidden = true;
+            updateOAMSub( Oam );
+        }
         if( p_newpok ) {
             consoleSelect( p_bottom );
             printf( "\x1b[39m" );
@@ -704,36 +720,19 @@ namespace POKEMON {
                 if( m_boxdata.isShiny( ) ) {
                     t2s = loadSprite( Oam, spriteInfo, ++o2s, ++p2s, t2s, 176, 8, 8, 8, rare_iconPal,
                                       rare_iconTiles, rare_iconTilesLen, false, false, false, OBJPRIORITY_0, true );
-                    
-                }
-                else {
+
+                } else {
                     Oam->oamBuffer[ ++o2s ].isHidden = true;
                 }
                 if( m_boxdata.m_pokerus ) {
                     t2s = loadSprite( Oam, spriteInfo, ++o2s, ++p2s, t2s, 208, 4, 64, 32, pokerus_iconPal,
-                                      pokerus_iconTiles, pokerus_iconTilesLen, false, false, false, OBJPRIORITY_0, true );                    
+                                      pokerus_iconTiles, pokerus_iconTilesLen, false, false, false, OBJPRIORITY_0, true );
                 } else {
                     printf( "Nr. " );
                     Oam->oamBuffer[ ++o2s ].isHidden = true;
                 }
                 printf( "%03i", m_boxdata.m_speciesId );
                 updateOAMSub( Oam );
-
-                Oam->oamBuffer[ 90 ].isHidden = false;
-                Oam->oamBuffer[ 90 ].y = -4;
-                Oam->oamBuffer[ 90 ].x = -8;
-                Oam->oamBuffer[ 90 ].priority = OBJPRIORITY_1;
-                Oam->oamBuffer[ 91 ].isHidden = false;
-                Oam->oamBuffer[ 91 ].y = 18;
-                Oam->oamBuffer[ 91 ].x = -8;
-                Oam->oamBuffer[ 91 ].priority = OBJPRIORITY_1;
-                Oam->oamBuffer[ 92 ].isHidden = false;
-                Oam->oamBuffer[ 92 ].y = -8;
-                Oam->oamBuffer[ 92 ].x = 14;
-                Oam->oamBuffer[ 92 ].priority = OBJPRIORITY_1;
-
-                Oam->oamBuffer[ 90 + page ].isHidden = true;
-
             } else {
                 Oam->oamBuffer[ 90 ].isHidden = true;
                 Oam->oamBuffer[ 91 ].isHidden = true;
@@ -779,7 +778,7 @@ namespace POKEMON {
                 FONT::putrec( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false, 250 );
                 cust_font.setColor( 253, 2 );
                 u8 nlCnt = 0;
-                auto nStr = FS::breakString( acAbility.m_flavourText, cust_font, 250 );
+                auto nStr = FS::breakString( acAbility.m_flavourText, cust_font, 220 );
                 for( auto c : nStr )
                     if( c == '\n' )
                         nlCnt++;
@@ -792,7 +791,7 @@ namespace POKEMON {
             sprintf( buffer, "(%05i/%05i)", m_boxdata.m_oTId, m_boxdata.m_oTSid );
             cust_font.printString( buffer, 50, 30, true );
 
-            if( m_boxdata.m_oTId == SAV.m_Id && m_boxdata.m_oTSid == SAV.m_Sid ) //Trainer is OT
+            if( m_boxdata.m_oTId == SAV->m_Id && m_boxdata.m_oTSid == SAV->m_Sid ) //Trainer is OT
             {
                 if( m_boxdata.m_fateful )
                     cust_font.printString( "Schicksalhafte Begegnung.", 28, 120, true );
@@ -1109,7 +1108,7 @@ namespace POKEMON {
                 continue;
             if( data.m_evolutions[ i ].m_e.m_evolveGender && m_boxdata.gender( ) != data.m_evolutions[ i ].m_e.m_evolveGender )
                 continue;
-            if( data.m_evolutions[ i ].m_e.m_evolveLocation && SAV.m_acMapIdx != data.m_evolutions[ i ].m_e.m_evolveLocation )
+            if( data.m_evolutions[ i ].m_e.m_evolveLocation && SAV->m_acMapIdx != data.m_evolutions[ i ].m_e.m_evolveLocation )
                 continue;
             if( data.m_evolutions[ i ].m_e.m_evolveHeldItem && m_boxdata.m_holdItem != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
                 continue;
@@ -1132,7 +1131,7 @@ namespace POKEMON {
             if( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember ) {
                 bool b = false;
                 for( int j = 0; j < 6; ++j )
-                    b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId );
+                    b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == SAV->m_PkmnTeam[ i ].m_boxdata.m_speciesId );
                 if( !b )
                     continue;
             }
@@ -1164,7 +1163,7 @@ namespace POKEMON {
                 continue;
             if( data.m_evolutions[ i ].m_e.m_evolveGender && m_boxdata.gender( ) != data.m_evolutions[ i ].m_e.m_evolveGender )
                 continue;
-            if( data.m_evolutions[ i ].m_e.m_evolveLocation && SAV.m_acMapIdx != data.m_evolutions[ i ].m_e.m_evolveLocation )
+            if( data.m_evolutions[ i ].m_e.m_evolveLocation && SAV->m_acMapIdx != data.m_evolutions[ i ].m_e.m_evolveLocation )
                 continue;
             if( data.m_evolutions[ i ].m_e.m_evolveHeldItem && m_boxdata.m_holdItem != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
                 continue;
@@ -1187,7 +1186,7 @@ namespace POKEMON {
             if( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember ) {
                 bool b = false;
                 for( int j = 0; j < 6; ++j )
-                    b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == SAV.m_PkmnTeam[ i ].m_boxdata.m_speciesId );
+                    b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == SAV->m_PkmnTeam[ i ].m_boxdata.m_speciesId );
                 if( !b )
                     continue;
             }

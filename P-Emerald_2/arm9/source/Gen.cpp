@@ -36,7 +36,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses
 #include "pokemon.h"
 #include "saveGame.h"
 
-extern saveGame SAV;
+extern saveGame* SAV;
 
 namespace gen3 {
 #define MAX_TRAINER_NAME_LEN 7

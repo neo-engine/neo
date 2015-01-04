@@ -133,7 +133,7 @@ messageBox::messageBox( ITEMS::item p_item, const u16 p_count ) {
     FONT::ASpriteOamIndex = 8;
     cust_font.printMBStringD( buf, 46, 24, true, true, 1 );
 
-    SAV.m_bag.addItem( p_item.m_itemType, p_item.getItemId( ), p_count );
+    SAV->m_bag.addItem( p_item.m_itemType, p_item.getItemId( ), p_count );
 
     initMainSprites( Oam, spriteInfo );
     setMainSpriteVisibility( main_ );

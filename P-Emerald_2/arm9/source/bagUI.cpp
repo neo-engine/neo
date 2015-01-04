@@ -86,8 +86,8 @@ void loadBagSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
 
     u8 oamIdx = 3;
     u8 palIdx = 3;
-    for( u8 i = 0; i < SAV.m_PkmnTeam.size( ); ++i ) {
-        auto acPkmn = SAV.m_PkmnTeam[ i ];
+    for( u8 i = 0; i < SAV->m_PkmnTeam.size( ); ++i ) {
+        auto acPkmn = SAV->m_PkmnTeam[ i ];
 
         FS::drawPKMNIcon( Oam,
                           spriteInfo,
@@ -101,7 +101,7 @@ void loadBagSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
     }
     for( u8 i = 0; i < 5; ++i ) {
         tileCntSub = loadSprite( p_oam, p_spriteInfo, 10 + i, 10 + i, tileCntSub,
-                                 26 * SAV.m_bagPoses[ i ], 3, 32, 32, bagPals[ 2 * i ],
+                                 26 * SAV->m_bagPoses[ i ], 3, 32, 32, bagPals[ 2 * i ],
                                  bagTiles[ 2 * i ], BackTilesLen, false, false, false, OBJPRIORITY_0, true );
     }
 }
@@ -115,7 +115,7 @@ void loadBagSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
 void showActiveBag( u8 p_bagNo, bool p_active = true ) {
     u16 tileIdx = Oam->oamBuffer[ 10 + p_bagNo ].gfxIndex;
     loadSprite( Oam, spriteInfo, 10 + p_bagNo, 10 + p_bagNo, tileIdx,
-                26 * SAV.m_bagPoses[ p_bagNo ], 3, 32, 32, bagPals[ 2 * p_bagNo + p_active ],
+                26 * SAV->m_bagPoses[ p_bagNo ], 3, 32, 32, bagPals[ 2 * p_bagNo + p_active ],
                 bagTiles[ 2 * p_bagNo + p_active ], BackTilesLen, false, false, false, OBJPRIORITY_0, true );
 }
 
@@ -183,7 +183,7 @@ void drawActiveBagTop( u8 p_bagNo ) {
         consoleSelect( &Top );
         consoleSetWindow( &Top, 0, 22, 12, 3 );
         u16 acIn = 214 + 4 * idx;
-        u16 s = SAV.m_bag.m_bags[ idx ].size( );
+        u16 s = SAV->m_bag.m_bags[ idx ].size( );
         //char buffer[ 50 ];
         printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
 
@@ -200,7 +200,7 @@ void drawActiveBagTop( u8 p_bagNo ) {
 
         consoleSetWindow( &Top, 0, 22, 12, 3 );
         u16 acIn = 214 + 4 * idx;
-        u16 s = SAV.m_bag.m_bags[ idx ].size( );
+        u16 s = SAV->m_bag.m_bags[ idx ].size( );
         //char buffer[ 50 ];
         printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
         sprintf( buffer, "%3i,", s );
@@ -210,7 +210,7 @@ void drawActiveBagTop( u8 p_bagNo ) {
         idx = 3;
         consoleSetWindow( &Top, 6, 22, 12, 3 );
         acIn = 214 + 4 * idx;
-        s = SAV.m_bag.m_bags[ idx ].size( );
+        s = SAV->m_bag.m_bags[ idx ].size( );
         //char buffer[ 50 ];
         printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
         sprintf( buffer, "%2i,", s );
@@ -221,7 +221,7 @@ void drawActiveBagTop( u8 p_bagNo ) {
         idx = 6;
         consoleSetWindow( &Top, 11, 22, 12, 3 );
         acIn = 214 + 4 * idx;
-        s = SAV.m_bag.m_bags[ idx ].size( );
+        s = SAV->m_bag.m_bags[ idx ].size( );
         //char buffer[ 50 ];
         printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
         sprintf( buffer, "%2i,", s );
@@ -232,7 +232,7 @@ void drawActiveBagTop( u8 p_bagNo ) {
         idx = 7;
         consoleSetWindow( &Top, 16, 22, 12, 3 );
         acIn = 214 + 4 * idx;
-        s = SAV.m_bag.m_bags[ idx ].size( );
+        s = SAV->m_bag.m_bags[ idx ].size( );
         //char buffer[ 50 ];
         printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
         sprintf( buffer, "%2i Items", s );
@@ -247,18 +247,25 @@ void drawItemTop( ITEMS::item* p_item, u16 p_count ) {
     u16 tileCntTop = 0;
 
     std::string display;
+    std::string descr;
 
     if( p_item->m_itemType != ITEMS::item::itemType::TM_HM ) {
         FS::drawItemIcon( OamTop, spriteInfoTop, p_item->m_itemName, 112, 46, oamIdxTop, palCntTop, tileCntTop, false );
         updateOAM( OamTop );
         display = p_item->getDisplayName( true );
+        descr = p_item->getDescription( true );
     } else {
         auto mv = *( static_cast<ITEMS::TM*>( p_item ) );
         display = p_item->getDisplayName( true ) + ": " + AttackList[ mv.m_moveIdx ]->m_moveName;
+        descr = FS::breakString( AttackList[ mv.m_moveIdx ]->text( ), cust_font, 196 );
     }
 
     cust_font.printString( display.c_str( ),
                            128 - cust_font.stringWidth( display.c_str( ) ) / 2, 26, false );
+
+
+    cust_font.printString( descr.c_str( ), 33, 86, false, 15 );
+
 }
 
 void drawPKMNs( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
@@ -310,11 +317,11 @@ void bag::draw( u8& p_startBag, u8& p_startItemIdx ) {
     showActiveBag( p_startBag );
     drawActiveBagTop( p_startBag );
 
-    if( !SAV.m_bag.m_bags[ p_startBag ].empty( ) ) {
-        p_startItemIdx = std::min( p_startItemIdx, u8( SAV.m_bag.m_bags[ p_startBag ].size( ) - 1 ) );
+    if( !SAV->m_bag.m_bags[ p_startBag ].empty( ) ) {
+        p_startItemIdx = std::min( p_startItemIdx, u8( SAV->m_bag.m_bags[ p_startBag ].size( ) - 1 ) );
 
-        drawItemTop( ITEMS::ItemList[ SAV.m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
-                     SAV.m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
+        drawItemTop( ITEMS::ItemList[ SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
+                     SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
     }
 
     while( 42 ) {
@@ -341,16 +348,22 @@ void bag::draw( u8& p_startBag, u8& p_startItemIdx ) {
             }
             showActiveBag( p_startBag, false );
 
-            u8 currBgPos = SAV.m_bagPoses[ p_startBag ];
+            u8 currBgPos = SAV->m_bagPoses[ p_startBag ];
             currBgPos = ( currBgPos + 4 ) % 5;
             for( u8 i = 0; i < 5; ++i )
-                if( SAV.m_bagPoses[ i ] == currBgPos ) {
+                if( SAV->m_bagPoses[ i ] == currBgPos ) {
                     p_startBag = i;
                     break;
                 }
 
             showActiveBag( p_startBag );
             drawActiveBagTop( p_startBag );
+            if( !SAV->m_bag.m_bags[ p_startBag ].empty( ) ) {
+                p_startItemIdx = std::min( p_startItemIdx, u8( SAV->m_bag.m_bags[ p_startBag ].size( ) - 1 ) );
+
+                drawItemTop( ITEMS::ItemList[ SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
+                             SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
+            }
         } else if( ( held & KEY_RIGHT ) ) {
             while( 1 ) {
                 if( keysUp( ) & KEY_RIGHT )
@@ -361,16 +374,22 @@ void bag::draw( u8& p_startBag, u8& p_startItemIdx ) {
             }
             showActiveBag( p_startBag, false );
 
-            u8 currBgPos = SAV.m_bagPoses[ p_startBag ];
+            u8 currBgPos = SAV->m_bagPoses[ p_startBag ];
             currBgPos = ( currBgPos + 1 ) % 5;
             for( u8 i = 0; i < 5; ++i )
-                if( SAV.m_bagPoses[ i ] == currBgPos ) {
+                if( SAV->m_bagPoses[ i ] == currBgPos ) {
                     p_startBag = i;
                     break;
                 }
 
             showActiveBag( p_startBag );
             drawActiveBagTop( p_startBag );
+            if( !SAV->m_bag.m_bags[ p_startBag ].empty( ) ) {
+                p_startItemIdx = std::min( p_startItemIdx, u8( SAV->m_bag.m_bags[ p_startBag ].size( ) - 1 ) );
+
+                drawItemTop( ITEMS::ItemList[ SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
+                             SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
+            }
         }
         for( u8 i = 0; i < 5; ++i ) {
 

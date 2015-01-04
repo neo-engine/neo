@@ -39,7 +39,7 @@ extern int bg3;
 extern int bg2sub;
 extern int bg2;
 class saveGame;
-extern saveGame SAV;
+extern saveGame* SAV;
 
 extern PrintConsole Top, Bottom;
 extern ConsoleFont cfont;

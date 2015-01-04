@@ -123,7 +123,7 @@ int hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
 int achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
 u32 ticks = 0;
 
-saveGame SAV;
+saveGame* SAV;
 const std::string sav_nam = "nitro:/SAV";
 Region acRegion = HOENN;
 
@@ -174,28 +174,28 @@ void fillWeiter( ) {
     BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
     BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
     BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
-    if( SAV.m_isMale )
+    if( SAV->m_isMale )
         BG_PALETTE_SUB[ 252 ] = RGB15( 0, 0, 31 );
     else
         BG_PALETTE_SUB[ 252 ] = RGB15( 31, 0, 0 );
 
-    sprintf( buffer, "%ls", SAV.getName( ).c_str( ) );
+    sprintf( buffer, "%ls", SAV->getName( ).c_str( ) );
     cust_font.printString( buffer, 128, 5, true );
 
-    sprintf( buffer, "%s", FS::getLoc( SAV.m_acMapIdx ) );
+    sprintf( buffer, "%s", FS::getLoc( SAV->m_acMapIdx ) );
     cust_font.printString( "Ort:", 16, 23, true );
     cust_font.printString( buffer, 128, 23, true );
 
 
-    sprintf( buffer, "%d:%02d", SAV.m_pt.m_hours, SAV.m_pt.m_mins );
+    sprintf( buffer, "%d:%02d", SAV->m_pt.m_hours, SAV->m_pt.m_mins );
     cust_font.printString( "Spielzeit:", 16, 37, true );
     cust_font.printString( buffer, 128, 37, true );
 
-    sprintf( buffer, "%i", SAV.m_badges );
+    sprintf( buffer, "%i", SAV->m_badges );
     cust_font.printString( "Orden:", 16, 51, true );
     cust_font.printString( buffer, 128, 51, true );
 
-    sprintf( buffer, "%i", SAV.m_dex );
+    sprintf( buffer, "%i", SAV->m_dex );
     cust_font.printString( "PokéDex:", 16, 65, true );
     cust_font.printString( buffer, 128, 65, true );
 }
@@ -231,7 +231,7 @@ ChoiceResult opScreen( ) {
     printf("Slot 2: %s",acSlot2Game);
     }*/
 
-    switch( SAV.m_savTyp ) {
+    switch( SAV->m_savTyp ) {
         case 3:
         {
             FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "MainMenu0" );
@@ -290,15 +290,15 @@ ChoiceResult opScreen( ) {
         scanKeys( );
         u32 p = keysCurrent( );
         u32 k = keysHeld( ) | keysDown( );
-        if( ( SAV.m_savTyp == 1 ) && ( k & KEY_SELECT ) && ( k & KEY_RIGHT ) && ( k & KEY_L ) && ( k & KEY_R ) ) {
+        if( ( SAV->m_savTyp == 1 ) && ( k & KEY_SELECT ) && ( k & KEY_RIGHT ) && ( k & KEY_L ) && ( k & KEY_R ) ) {
             killWeiter( );
             consoleClear( );
-            ++SAV.m_savTyp;
+            ++SAV->m_savTyp;
             return opScreen( );
-        } else if( ( gMod == DEVELOPER ) && ( SAV.m_savTyp == 2 ) && ( k & KEY_START ) && ( k & KEY_LEFT ) && ( k & KEY_L ) && ( k & KEY_R ) ) {
+        } else if( ( gMod == DEVELOPER ) && ( SAV->m_savTyp == 2 ) && ( k & KEY_START ) && ( k & KEY_LEFT ) && ( k & KEY_L ) && ( k & KEY_R ) ) {
             killWeiter( );
             consoleClear( );
-            ++SAV.m_savTyp;
+            ++SAV->m_savTyp;
             return opScreen( );
         } else if( p & KEY_B ) {
             killWeiter( );
@@ -339,27 +339,27 @@ void initNewGame( ) {
     AS_MP3Stop( );
 #endif
 
-    SAV = saveGame( );
-    SAV.m_activatedPNav = false;
-    SAV.m_money = 3000;
-    SAV.m_Id = rand( ) % 65536;
-    SAV.m_Sid = rand( ) % 65536;
+    SAV = new saveGame( );
+    SAV->m_activatedPNav = false;
+    SAV->m_money = 3000;
+    SAV->m_Id = rand( ) % 65536;
+    SAV->m_Sid = rand( ) % 65536;
 
-    SAV.m_savTyp = 1;
-    SAV.m_playtime = 0;
-    SAV.m_HOENN_Badges = 0;
-    SAV.m_KANTO_Badges = 0;
-    SAV.m_JOHTO_Badges = 0;
-    SAV.m_badges = 0;
-    SAV.m_dex = 0;
+    SAV->m_savTyp = 1;
+    SAV->m_playtime = 0;
+    SAV->m_HOENN_Badges = 0;
+    SAV->m_KANTO_Badges = 0;
+    SAV->m_JOHTO_Badges = 0;
+    SAV->m_badges = 0;
+    SAV->m_dex = 0;
 
-    SAV.m_bgIdx = START_BG;
-    SAV.m_lstBag = 0;
-    SAV.m_lstBagItem = 0;
+    SAV->m_bgIdx = START_BG;
+    SAV->m_lstBag = 0;
+    SAV->m_lstBagItem = 0;
     for( u8 i = 0; i < 5; ++i )
-        SAV.m_bagPoses[ i ] = i;
+        SAV->m_bagPoses[ i ] = i;
 
-    SAV.m_PkmnTeam.clear( );
+    SAV->m_PkmnTeam.clear( );
     consoleSelect( &Bottom );
     consoleClear( );
     consoleSetWindow( &Bottom, 3, 10, 26, 5 );
@@ -401,7 +401,7 @@ void initNewGame( ) {
 
     free_spaces.clear( );
     for( u16 i = 0; i < MAXPKMN; i++ ) {
-        SAV.m_inDex[ i ] = false;
+        SAV->m_inDex[ i ] = false;
         box_of_st_pkmn[ i ].clear( );
         free_spaces.push_back( i );
     }
@@ -491,13 +491,13 @@ void initNewGame( ) {
     for( u8 i = 0; i < 120; ++i )
         swiWaitForVBlank( );
 
-    sprintf( buffer, "Setze ID: %05i", SAV.m_Id );
+    sprintf( buffer, "Setze ID: %05i", SAV->m_Id );
     M.put( buffer, false );
 
     for( u8 i = 0; i < 120; ++i )
         swiWaitForVBlank( );
 
-    sprintf( buffer, "Setze SID: %05i", SAV.m_Sid );
+    sprintf( buffer, "Setze SID: %05i", SAV->m_Sid );
     M.put( buffer, false );
 
     for( u8 i = 0; i < 120; ++i )
@@ -511,29 +511,29 @@ INDIVIDUALISIERUNG:
     M = messageBox( "Beginne Individualisierung." );
     yesNoBox yn = yesNoBox( M );
     consoleSetWindow( &Bottom, 1, 1, 22, MAXLINES );
-    SAV.m_isMale = !yn.getResult( "Bist du ein Mädchen?" );
-    if( SAV.m_isMale )
-        SAV.m_overWorldIdx = 0;
+    SAV->m_isMale = !yn.getResult( "Bist du ein Mädchen?" );
+    if( SAV->m_isMale )
+        SAV->m_overWorldIdx = 0;
     else
-        SAV.m_overWorldIdx = 10;
+        SAV->m_overWorldIdx = 10;
     consoleClear( );
     M.clear( );
     keyboard K = keyboard( );
     std::wstring Name = K.getText( 10, "Gib deinen Namen an!" );
     if( Name.empty( ) )
-        if( SAV.m_isMale )
-            SAV.setName( L"Basti" );
+        if( SAV->m_isMale )
+            SAV->setName( L"Basti" );
         else
-            SAV.setName( L"Lari" );
+            SAV->setName( L"Lari" );
     else
-        SAV.setName( Name );
+        SAV->setName( Name );
     yesNoBox YN = yesNoBox( );
     std::wstring S = L"Du bist also ";
-    if( SAV.m_isMale )
+    if( SAV->m_isMale )
         S += L"der\n";
     else
         S += L"die\n";
-    S += SAV.getName( ); S += L"?";
+    S += SAV->getName( ); S += L"?";
     if( !YN.getResult( &( S[ 0 ] ) ) )
         goto INDIVIDUALISIERUNG;
 
@@ -546,7 +546,7 @@ INDIVIDUALISIERUNG:
         swiWaitForVBlank( );
     dmaCopy( BrotherBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
     dmaCopy( BrotherPal, BG_PALETTE, 256 * 2 );
-    if( SAV.m_isMale ) {
+    if( SAV->m_isMale ) {
         M = messageBox( "Mir will sie den Dex\n""zuerst geben!", "???", true, true, true, messageBox::sprite_pkmn );
         consoleClear( );
         dmaCopy( FemaleBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
@@ -566,23 +566,23 @@ INDIVIDUALISIERUNG:
         M = messageBox( "Hi, ich bin Larissa,\n""aber Lari reicht auch.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Das da ist mein\nkleiner Bruder Moritz.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Wir kommen aus Azuria", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Das heißt eigentlich.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Als alle Kanto verlassen\nhaben, sind wir nach\nKlippdelta gezogen.", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
         consoleClear( );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Du kommst auch aus\nKlippdelta?!", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Oh...\n", "Lari", messageBox::sprite_trainer, 0 );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Na dann sehen wir uns ja\nwahrscheinlich noch öfter...", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
         consoleClear( );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx );
     } else {
         M = messageBox( "Mir wird sie den Dex\nzuerst geben!", "???", true, true, false, messageBox::sprite_pkmn, 0 );
         consoleClear( );
@@ -602,7 +602,7 @@ INDIVIDUALISIERUNG:
         M = messageBox( "Nenn' mich ruhig Basti.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Das da ist mein\nkleiner Bruder Moritz.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
         M = messageBox( "Wir kommen aus Azuria.", "Basti", true, true, true, messageBox::sprite_trainer, 0 );
-        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
+        FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
         M = messageBox( "Das heißt eigentlich.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
@@ -622,7 +622,7 @@ INDIVIDUALISIERUNG:
     messageBox( "So, hier habt ihr das\nPokéDex-Modul für den\nPokéNav.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
     messageBox( "Einmal für dich.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
     messageBox( "Einmal für Moritz.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
-    if( SAV.m_isMale )
+    if( SAV->m_isMale )
         messageBox( "Und einmal für Lari.", "Maike", true, true, true, messageBox::sprite_trainer, 0 );
     else
         messageBox( "Und einmal für Basti.", "Maike", true, true, true, messageBox::sprite_trainer, 0 );
@@ -636,26 +636,26 @@ INDIVIDUALISIERUNG:
     dmaCopy( BrotherBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
     dmaCopy( BrotherPal, BG_PALETTE, 256 * 2 );
     messageBox( "Und er zeigt einem,\nwie man den Beutel\nam Besten packt!", "Moritz", true, true, false, messageBox::sprite_trainer, 0 );
-    messageBox( "Moritz!", SAV.getName( ).c_str( ) );
+    messageBox( "Moritz!", SAV->getName( ).c_str( ) );
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
     messageBox( "...", "Maike", true, false, false, messageBox::sprite_trainer, 0 );
     messageBox( "Also, vergesst ihn ja nich'\nbei euch zu Hause, wenn\nihr auf Reisen geht!", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
     messageBox( "Also dann, bis bald!", "Maike", true, true, true, messageBox::sprite_trainer, 0 );
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Clear" );
 
-    S_ = SAV.getName( ); S_ += L",\n wir seh'n uns noch!";
+    S_ = SAV->getName( ); S_ += L",\n wir seh'n uns noch!";
     M = messageBox( &( S_[ 0 ] ), L"Moritz", true, true, true, messageBox::sprite_trainer, 0 );
     consoleSelect( &Top );
-    SAV.m_hasPKMN = false;
-    strcpy( SAV.m_acMapName, "0/98" );
-    SAV.m_acMapIdx = 1000;
-    SAV.m_acposx = 2 * 20;
-    SAV.m_acposy = 25 * 20;
-    SAV.m_acposz = 3;
+    SAV->m_hasPKMN = false;
+    strcpy( SAV->m_acMapName, "0/98" );
+    SAV->m_acMapIdx = 1000;
+    SAV->m_acposx = 2 * 20;
+    SAV->m_acposy = 25 * 20;
+    SAV->m_acposz = 3;
     setMainSpriteVisibility( false );
     Oam->oamBuffer[ 1 ].isHidden = false;
     updateOAMSub( Oam );
-    FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV.m_bgIdx ].m_name.c_str( ), SAV.m_bgIdx );
+    FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx );
 }
 
 void initVideo( ) {
@@ -715,8 +715,8 @@ bool whirlpool::possible( ) {
     return false;
 }
 bool surf::possible( ) {
-    return ( SAV.m_acMoveMode != map2d::MoveMode::SURF )
-        && acMap->m_blocks[ SAV.m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ SAV.m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].m_movedata == 4;
+    return ( SAV->m_acMoveMode != map2d::MoveMode::SURF )
+        && acMap->m_blocks[ SAV->m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ SAV->m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].m_movedata == 4;
 }
 
 bool heroIsBig = false;
@@ -770,11 +770,11 @@ void startScreen( ) {
 
     //ReadSavegame
     if( gMod != EMULATOR ) {
-        SAV = saveGame( whoCares );
-        SAV.m_hasPKMN &= SAV.m_good;
+        SAV = new saveGame( whoCares );
+        SAV->m_hasPKMN &= SAV->m_good;
     } else {
-        SAV.m_hasPKMN = false;
-        SAV.m_savTyp = 0;
+        SAV->m_hasPKMN = false;
+        SAV->m_savTyp = 0;
     }
 
 #ifdef USE_AS_LIB
@@ -796,7 +796,7 @@ START:
     //StartScreen
 
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Title" );
-    if( BGs[ SAV.m_bgIdx ].m_allowsOverlay )
+    if( BGs[ SAV->m_bgIdx ].m_allowsOverlay )
         drawSub( );
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "Clear" );
 
@@ -911,29 +911,29 @@ CONT:
                         messageBox( "Ein Fehler ist aufgetreten.\nKehre zum Hauptmenü zurück." );
                         goto START;
                     }
-                    SAV = saveGame( );
+                    SAV = new saveGame( );
                     wchar_t savname[ 8 ] = { 0 };
                     for( int i = 0; i < 7; ++i )
                         savname[ i ] = gen3::getNText( save3->unpackeddata[ i ] );
-                    SAV.setName( savname );
+                    SAV->setName( savname );
 
-                    SAV.m_isMale = !save3->unpackeddata[ 8 ];
+                    SAV->m_isMale = !save3->unpackeddata[ 8 ];
 
-                    SAV.m_Id = ( save3->unpackeddata[ 11 ] << 8 ) | save3->unpackeddata[ 10 ];
-                    SAV.m_Sid = ( save3->unpackeddata[ 13 ] << 8 ) | save3->unpackeddata[ 12 ];
+                    SAV->m_Id = ( save3->unpackeddata[ 11 ] << 8 ) | save3->unpackeddata[ 10 ];
+                    SAV->m_Sid = ( save3->unpackeddata[ 13 ] << 8 ) | save3->unpackeddata[ 12 ];
 
-                    SAV.m_pt.m_hours = ( save3->unpackeddata[ 15 ] << 8 ) | save3->unpackeddata[ 14 ];
-                    SAV.m_pt.m_mins = save3->unpackeddata[ 16 ];
-                    SAV.m_pt.m_secs = save3->unpackeddata[ 17 ];
+                    SAV->m_pt.m_hours = ( save3->unpackeddata[ 15 ] << 8 ) | save3->unpackeddata[ 14 ];
+                    SAV->m_pt.m_mins = save3->unpackeddata[ 16 ];
+                    SAV->m_pt.m_secs = save3->unpackeddata[ 17 ];
 
-                    SAV.m_gba.m_gameid = ( save3->unpackeddata[ 0xaf ] << 24 ) | ( save3->unpackeddata[ 0xae ] << 16 ) | ( save3->unpackeddata[ 0xad ] << 8 ) | save3->unpackeddata[ 0xac ];
+                    SAV->m_gba.m_gameid = ( save3->unpackeddata[ 0xaf ] << 24 ) | ( save3->unpackeddata[ 0xae ] << 16 ) | ( save3->unpackeddata[ 0xad ] << 8 ) | save3->unpackeddata[ 0xac ];
 
                     POKEMON::PKMNDATA::pokemonData p;
                     for( u8 i = 0; i < 6; ++i ) {
                         if( save3->pokemon[ i ]->personality ) {
-                            SAV.m_PkmnTeam.push_back( POKEMON::pokemon( ) );
+                            SAV->m_PkmnTeam.push_back( POKEMON::pokemon( ) );
 
-                            POKEMON::pokemon &acPkmn = SAV.m_PkmnTeam[ i ];
+                            POKEMON::pokemon &acPkmn = SAV->m_PkmnTeam[ i ];
                             gen3::belt_pokemon_t* &acBeltP = save3->pokemon[ i ];
 
 
@@ -1006,18 +1006,18 @@ CONT:
                                 acPkmn.m_boxdata.m_gotDate[ 1 ] =
                                 acPkmn.m_boxdata.m_gotDate[ 2 ] = 0;
 
-                            SAV.m_hasPKMN = true;
+                            SAV->m_hasPKMN = true;
                         }
                     }
                     savMod = _GBA;
                     //load player to default pos
-                    strcpy( SAV.m_acMapName, "0/98" );
-                    SAV.m_acMapIdx = 1000;
-                    SAV.m_acposx = 2 * 20;
-                    SAV.m_acposy = 25 * 20;
-                    SAV.m_acposz = 3;
+                    strcpy( SAV->m_acMapName, "0/98" );
+                    SAV->m_acMapIdx = 1000;
+                    SAV->m_acposx = 2 * 20;
+                    SAV->m_acposy = 25 * 20;
+                    SAV->m_acposz = 3;
 
-                    SAV.m_overWorldIdx = 20 * ( ( acgame + 1 ) / 2 ) + ( SAV.m_isMale ? 0 : 10 );
+                    SAV->m_overWorldIdx = 20 * ( ( acgame + 1 ) / 2 ) + ( SAV->m_isMale ? 0 : 10 );
 
                     Oam->oamBuffer[ SAVE_ID ].isHidden = false;
 
@@ -1028,36 +1028,36 @@ CONT:
         }
         case GEHEIMGESCHEHEN:
         case CANCEL:
-            //printf("%i",SAV.SavTyp);
+            //printf("%i",SAV->SavTyp);
             //while(1);
             if( gMod != EMULATOR )
                 goto START;
         case OPTIONS:
             scrn.init( );
-            SAV = saveGame( );
-            SAV.m_activatedPNav = false;
-            SAV.m_money = 3000;
-            SAV.m_Id = rand( ) % 65536;
-            SAV.m_Sid = rand( ) % 65536;
+            SAV = new saveGame( );
+            SAV->m_activatedPNav = false;
+            SAV->m_money = 3000;
+            SAV->m_Id = rand( ) % 65536;
+            SAV->m_Sid = rand( ) % 65536;
 
-            SAV.m_savTyp = 1;
-            SAV.m_playtime = 0;
-            SAV.m_HOENN_Badges = 0;
-            SAV.m_KANTO_Badges = 0;
-            SAV.m_JOHTO_Badges = 0;
-            SAV.m_badges = 0;
-            SAV.m_dex = 0;
-            SAV.m_hasPKMN = false;
+            SAV->m_savTyp = 1;
+            SAV->m_playtime = 0;
+            SAV->m_HOENN_Badges = 0;
+            SAV->m_KANTO_Badges = 0;
+            SAV->m_JOHTO_Badges = 0;
+            SAV->m_badges = 0;
+            SAV->m_dex = 0;
+            SAV->m_hasPKMN = false;
             for( u8 i = 0; i < 5; ++i )
-                SAV.m_bagPoses[ i ] = i;
-            SAV.m_bgIdx = START_BG;
-            SAV.m_lstBag = 0;
-            SAV.m_lstBagItem = 0;
+                SAV->m_bagPoses[ i ] = i;
+            SAV->m_bgIdx = START_BG;
+            SAV->m_lstBag = 0;
+            SAV->m_lstBagItem = 0;
 
-            SAV.m_PkmnTeam.clear( );
+            SAV->m_PkmnTeam.clear( );
             free_spaces.clear( );
             for( int i = 0; i < MAXPKMN; i++ ) {
-                SAV.m_inDex[ i ] = false;
+                SAV->m_inDex[ i ] = false;
                 box_of_st_pkmn[ i ].clear( );
                 free_spaces.push_back( i );
             }
@@ -1066,10 +1066,10 @@ CONT:
                 free_spaces.push_back( i );
             }
 
-            SAV.m_overWorldIdx = 0;
-            strcpy( SAV.m_acMapName, "0/98" );
-            SAV.m_acMapIdx = 1000;
-            SAV.m_acposx = 2 * 20, SAV.m_acposy = 25 * 20, SAV.m_acposz = 3;
+            SAV->m_overWorldIdx = 0;
+            strcpy( SAV->m_acMapName, "0/98" );
+            SAV->m_acMapIdx = 1000;
+            SAV->m_acposx = 2 * 20, SAV->m_acposy = 25 * 20, SAV->m_acposz = 3;
             break;
         case CONTINUE:
             scrn.init( );
@@ -1102,11 +1102,11 @@ void showNewMap( u16 p_mapIdx ) {
             Oam->oamBuffer[ SQCH_ID ].isHidden = Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = false;
             updateOAMSub( Oam );
 
-            SAV.m_acMapIdx = p_mapIdx;
+            SAV->m_acMapIdx = p_mapIdx;
 
 #ifdef USE_AS_LIB
             char buffer[ 120 ];
-            sprintf( buffer, "%d.mp3", SAV.m_acMapIdx );
+            sprintf( buffer, "%d.mp3", SAV->m_acMapIdx );
             PLAYMp( buffer )
 #endif
                 swiWaitForIRQ( );
@@ -1130,12 +1130,12 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
     heroIsBig = false;
 
     left = !left;
-    bool bike = ( map2d::MoveMode )SAV.m_acMoveMode == map2d::MoveMode::BIKE, run = ( keysHeld( ) & KEY_B ) && !p_runDisable;
+    bool bike = ( map2d::MoveMode )SAV->m_acMoveMode == map2d::MoveMode::BIKE, run = ( keysHeld( ) & KEY_B ) && !p_runDisable;
     if( p_frame == 0 ) {
         switch( p_dir ) {
             case 0:
                 OamTop->oamBuffer[ 0 ].hFlip = false;
-                loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 0, heroIsBig );
+                loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 0, heroIsBig );
                 updateOAM( OamTop );
                 swiWaitForVBlank( );
                 swiWaitForVBlank( );
@@ -1148,14 +1148,14 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 OamTop->oamBuffer[ 0 ].hFlip = true;
                 if( !run ) {
                     if( left )
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 7, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 7, heroIsBig );
                     else
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 8, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 8, heroIsBig );
                 } else {
                     if( left )
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 16, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 16, heroIsBig );
                     else
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 17, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 17, heroIsBig );
                 }
 
                 updateOAM( OamTop );
@@ -1183,14 +1183,14 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run ) {
                     if( left )
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 3, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 3, heroIsBig );
                     else
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 4, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 4, heroIsBig );
                 } else {
                     if( left )
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 12, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 12, heroIsBig );
                     else
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 13, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 13, heroIsBig );
                 }
                 updateOAM( OamTop );
                 swiWaitForVBlank( );
@@ -1216,14 +1216,14 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run ) {
                     if( left )
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 7, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 7, heroIsBig );
                     else
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 8, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 8, heroIsBig );
                 } else {
                     if( left )
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 16, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 16, heroIsBig );
                     else
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 17, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 17, heroIsBig );
                 }
                 updateOAM( OamTop );
                 swiWaitForVBlank( );
@@ -1249,14 +1249,14 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run ) {
                     if( left )
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 5, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 5, heroIsBig );
                     else
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 6, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 6, heroIsBig );
                 } else {
                     if( left )
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 14, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 14, heroIsBig );
                     else
-                        loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 15, heroIsBig );
+                        loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 15, heroIsBig );
                 }
                 updateOAM( OamTop );
                 swiWaitForVBlank( );
@@ -1283,7 +1283,7 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
         switch( p_dir ) {
             case 0:
                 OamTop->oamBuffer[ 0 ].hFlip = false;
-                loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 0, heroIsBig );
+                loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 0, heroIsBig );
                 updateOAM( OamTop );
                 return;
             case 1:
@@ -1301,9 +1301,9 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 if( !run )
                     swiWaitForVBlank( );
                 if( !run )
-                    loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 2, heroIsBig );
+                    loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 2, heroIsBig );
                 else
-                    loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 11, heroIsBig );
+                    loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 11, heroIsBig );
                 updateOAM( OamTop );
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 2, 0 );
@@ -1328,9 +1328,9 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                     swiWaitForVBlank( );
                 OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run )
-                    loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 0, heroIsBig );
+                    loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 0, heroIsBig );
                 else
-                    loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 9, heroIsBig );
+                    loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 9, heroIsBig );
                 updateOAM( OamTop );
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 0, 2 );
@@ -1353,9 +1353,9 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 OamTop->oamBuffer[ 0 ].hFlip = false;
                 updateOAM( OamTop );
                 if( !run )
-                    loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 2, heroIsBig );
+                    loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 2, heroIsBig );
                 else
-                    loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 11, heroIsBig );
+                    loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 11, heroIsBig );
                 updateOAM( OamTop );
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], -2, 0 );
@@ -1380,9 +1380,9 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                     swiWaitForVBlank( );
                 OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run )
-                    loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 1, heroIsBig );
+                    loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 1, heroIsBig );
                 else
-                    loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 10, heroIsBig );
+                    loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 10, heroIsBig );
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( map2d::bgs[ i ], 0, -2 );
                 updateOAM( OamTop );
@@ -1400,39 +1400,39 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
         switch( p_dir ) {
             case 0:
                 OamTop->oamBuffer[ 0 ].hFlip = false;
-                loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 0 );
+                loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 0 );
                 updateOAM( OamTop );
                 return;
             case 1:
                 OamTop->oamBuffer[ 0 ].hFlip = true;
                 if( !run )
-                    loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 2, heroIsBig );
+                    loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 2, heroIsBig );
                 //else
-                //    loadframe(&spriteInfoTop[0],SAV.owIdx,11,heroIsBig);
+                //    loadframe(&spriteInfoTop[0],SAV->owIdx,11,heroIsBig);
                 updateOAM( OamTop );
                 return;
             case 2:
                 OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run )
-                    loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 0, heroIsBig );
+                    loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 0, heroIsBig );
                 //else
-                //    loadframe(&spriteInfoTop[0],SAV.owIdx,9,heroIsBig);
+                //    loadframe(&spriteInfoTop[0],SAV->owIdx,9,heroIsBig);
                 updateOAM( OamTop );
                 return;
             case 3:
                 OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run )
-                    loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 2, heroIsBig );
+                    loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 2, heroIsBig );
                 //else
-                //    loadframe(&spriteInfoTop[0],SAV.owIdx,11,heroIsBig);
+                //    loadframe(&spriteInfoTop[0],SAV->owIdx,11,heroIsBig);
                 updateOAM( OamTop );
                 return;
             case 4:
                 OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run )
-                    loadframe( &spriteInfoTop[ 0 ], SAV.m_overWorldIdx, 1, heroIsBig );
+                    loadframe( &spriteInfoTop[ 0 ], SAV->m_overWorldIdx, 1, heroIsBig );
                 //else
-                //    loadframe(&spriteInfoTop[0],SAV.owIdx,10,heroIsBig);
+                //    loadframe(&spriteInfoTop[0],SAV->owIdx,10,heroIsBig);
                 updateOAM( OamTop );
                 return;
             default:
@@ -1448,7 +1448,7 @@ inline void movePlayer( u16 p_direction ) {
 bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
     bool WTW = ( gMod == DEVELOPER ) && ( keysHeld( ) & KEY_R );
 
-    map2d::MoveMode playermoveMode = ( map2d::MoveMode )SAV.m_acMoveMode;
+    map2d::MoveMode playermoveMode = ( map2d::MoveMode )SAV->m_acMoveMode;
 
     p_x += 10;
     p_y += 10;
@@ -1462,19 +1462,19 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
     if( p_y >= (int)acMap->m_sizex + 20 )
         return false;
 
-    int lastmovedata = acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_movedata;
+    int lastmovedata = acMap->m_blocks[ SAV->m_acposy / 20 + 10 ][ SAV->m_acposx / 20 + 10 ].m_movedata;
     int acmovedata = acMap->m_blocks[ p_y ][ p_x ].m_movedata;
     map2d::Block acBlock = acMap->m_blockSets.m_blocks[ acMap->m_blocks[ p_y ][ p_x ].m_blockidx ],
-        lastBlock = acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ];
+        lastBlock = acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV->m_acposy / 20 + 10 ][ SAV->m_acposx / 20 + 10 ].m_blockidx ];
 
     int verhalten = acBlock.m_bottombehave, hintergrund = acBlock.m_topbehave;
     int lstverhalten = lastBlock.m_bottombehave, lsthintergrund = lastBlock.m_topbehave;
     if( verhalten == 0xa0 && playermoveMode != map2d::MoveMode::WALK ) //nur normales laufen möglich
         return false;
 
-    if( verhalten == 0xc1 && p_y != SAV.m_acposy / 20 + 10 ) //Rechts-Links-Blockung
+    if( verhalten == 0xc1 && p_y != SAV->m_acposy / 20 + 10 ) //Rechts-Links-Blockung
         return false;
-    if( verhalten == 0xc0 && p_x != SAV.m_acposx / 20 + 10 ) //Oben-Unten-Blockung
+    if( verhalten == 0xc0 && p_x != SAV->m_acposx / 20 + 10 ) //Oben-Unten-Blockung
         return false;
     if( verhalten >= 0xd3 && verhalten <= 0xd7 ) //fester block
         return false;
@@ -1486,12 +1486,12 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
             return false;
     }
     if( acmovedata == 0xc && playermoveMode == map2d::MoveMode::SURF ) {
-        SAV.m_acMoveMode = map2d::MoveMode::WALK;
+        SAV->m_acMoveMode = map2d::MoveMode::WALK;
 
     }
 
     int movedir = 0;
-    int oldx = SAV.m_acposy / 20 + 10, oldy = SAV.m_acposx / 20 + 10;
+    int oldx = SAV->m_acposy / 20 + 10, oldy = SAV->m_acposx / 20 + 10;
     if( oldy < p_x )
         movedir = 1;
     else if( oldy > p_x )
@@ -1502,7 +1502,7 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
         movedir = 4;
 
     if( lastmovedata == 0 && acmovedata % 4 == 0 )
-        SAV.m_acposz = p_z = acmovedata / 4;
+        SAV->m_acposz = p_z = acmovedata / 4;
 
     OamTop->oamBuffer[ 0 ].priority = OBJPRIORITY_2;
     if( ( verhalten == 0x70 || lstverhalten == 0x70 ) && p_z >= 4 )
@@ -1526,13 +1526,13 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'W' && p_y >= a.m_move + 10 && p_y < a.m_move + a.m_mapsx + 10 ) {
                     showNewMap( a.m_mapidx );
-                    strcpy( SAV.m_acMapName, a.m_name );
-                    SAV.m_acMapIdx = a.m_mapidx;
+                    strcpy( SAV->m_acMapName, a.m_name );
+                    SAV->m_acMapIdx = a.m_mapidx;
                     acMap = std::unique_ptr<map2d::Map>( new map2d::Map( "nitro:/MAPS/", a.m_name ) );
                     p_y -= a.m_move;
                     p_x = a.m_mapsy + 10;
-                    SAV.m_acposx = 20 * ( p_x - 10 );
-                    SAV.m_acposy = 20 * ( p_y - 10 );
+                    SAV->m_acposx = 20 * ( p_x - 10 );
+                    SAV->m_acposy = 20 * ( p_y - 10 );
                     animateHero( movedir, 1 );
                     acMap->draw( p_x - 17, p_y - 18, true );
                     animateHero( movedir, 2 );
@@ -1547,13 +1547,13 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'N' && p_x >= a.m_move + 10 && p_x < a.m_move + a.m_mapsy + 10 ) {
                     showNewMap( a.m_mapidx );
-                    strcpy( SAV.m_acMapName, a.m_name );
-                    SAV.m_acMapIdx = a.m_mapidx;
+                    strcpy( SAV->m_acMapName, a.m_name );
+                    SAV->m_acMapIdx = a.m_mapidx;
                     acMap = std::unique_ptr<map2d::Map>( new map2d::Map( "nitro:/MAPS/", a.m_name ) );
                     p_x -= a.m_move;
                     p_y = a.m_mapsx + 10;
-                    SAV.m_acposx = 20 * ( p_x - 10 );
-                    SAV.m_acposy = 20 * ( p_y - 10 );
+                    SAV->m_acposx = 20 * ( p_x - 10 );
+                    SAV->m_acposy = 20 * ( p_y - 10 );
                     animateHero( movedir, 1 );
                     acMap->draw( p_x - 16, p_y - 19, true );
                     animateHero( movedir, 2 );
@@ -1568,13 +1568,13 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'E' && p_y >= a.m_move + 10 && p_y < a.m_move + a.m_mapsx + 10 ) {
                     showNewMap( a.m_mapidx );
-                    strcpy( SAV.m_acMapName, a.m_name );
-                    SAV.m_acMapIdx = a.m_mapidx;
+                    strcpy( SAV->m_acMapName, a.m_name );
+                    SAV->m_acMapIdx = a.m_mapidx;
                     acMap = std::unique_ptr<map2d::Map>( new map2d::Map( "nitro:/MAPS/", a.m_name ) );
                     p_y -= a.m_move;
                     p_x = 9;
-                    SAV.m_acposx = 20 * ( p_x - 10 );
-                    SAV.m_acposy = 20 * ( p_y - 10 );
+                    SAV->m_acposx = 20 * ( p_x - 10 );
+                    SAV->m_acposy = 20 * ( p_y - 10 );
                     animateHero( movedir, 1 );
                     acMap->draw( p_x - 15, p_y - 18, true );
                     animateHero( movedir, 2 );
@@ -1590,13 +1590,13 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'S'  && p_x >= a.m_move + 10 && p_x < a.m_move + a.m_mapsy + 10 ) {
                     showNewMap( a.m_mapidx );
-                    strcpy( SAV.m_acMapName, a.m_name );
-                    SAV.m_acMapIdx = a.m_mapidx;
+                    strcpy( SAV->m_acMapName, a.m_name );
+                    SAV->m_acMapIdx = a.m_mapidx;
                     acMap = std::unique_ptr<map2d::Map>( new map2d::Map( "nitro:/MAPS/", a.m_name ) );
                     p_x -= a.m_move;
                     p_y = 9;
-                    SAV.m_acposx = 20 * ( p_x - 10 );
-                    SAV.m_acposy = 20 * ( p_y - 10 );
+                    SAV->m_acposx = 20 * ( p_x - 10 );
+                    SAV->m_acposy = 20 * ( p_y - 10 );
                     animateHero( movedir, 1 );
                     acMap->draw( p_x - 16, p_y - 17, true );
                     animateHero( movedir, 2 );
@@ -1654,7 +1654,7 @@ void initMapSprites( ) {
     SQCHA->priority = OBJPRIORITY_2;
     SQCHA->palette = 0;
 
-    loadframe( SQCHAInfo, SAV.m_overWorldIdx, 0 );
+    loadframe( SQCHAInfo, SAV->m_overWorldIdx, 0 );
 
     SQCHAInfo = &spriteInfoTop[ 1 ];
     SQCHA = &OamTop->oamBuffer[ 1 ];
@@ -1751,14 +1751,14 @@ int stepcnt = 0;
 void stepincrease( ) {
     stepcnt = ( stepcnt + 1 ) % 256;
     if( stepcnt == 0 ) {
-        for( size_t s = 0; s < SAV.m_PkmnTeam.size( ); ++s ) {
-            POKEMON::pokemon& ac = SAV.m_PkmnTeam[ s ];
+        for( size_t s = 0; s < SAV->m_PkmnTeam.size( ); ++s ) {
+            POKEMON::pokemon& ac = SAV->m_PkmnTeam[ s ];
 
             if( ac.m_boxdata.m_individualValues.m_isEgg ) {
                 ac.m_boxdata.m_steps--;
                 if( ac.m_boxdata.m_steps == 0 ) {
                     ac.m_boxdata.m_individualValues.m_isEgg = false;
-                    ac.m_boxdata.m_hatchPlace = SAV.m_acMapIdx;
+                    ac.m_boxdata.m_hatchPlace = SAV->m_acMapIdx;
                     ac.m_boxdata.m_hatchDate[ 0 ] = acday;
                     ac.m_boxdata.m_hatchDate[ 1 ] = acmonth + 1;
                     ac.m_boxdata.m_hatchDate[ 2 ] = ( acyear + 1900 ) % 100;
@@ -1779,10 +1779,10 @@ void flash::use( ) { }
 void whirlpool::use( ) { }
 void surf::use( ) {
     //heroIsBig = true;
-    SAV.m_acMoveMode = map2d::MoveMode::SURF;
-    movePlayerOnMap( SAV.m_acposx / 20 + dir[ lastdir ][ 1 ], SAV.m_acposy / 20 + dir[ lastdir ][ 0 ], SAV.m_acposz, false );
-    SAV.m_acposx += 20 * dir[ lastdir ][ 1 ];
-    SAV.m_acposy += 20 * dir[ lastdir ][ 0 ];
+    SAV->m_acMoveMode = map2d::MoveMode::SURF;
+    movePlayerOnMap( SAV->m_acposx / 20 + dir[ lastdir ][ 1 ], SAV->m_acposy / 20 + dir[ lastdir ][ 0 ], SAV->m_acposz, false );
+    SAV->m_acposx += 20 * dir[ lastdir ][ 1 ];
+    SAV->m_acposy += 20 * dir[ lastdir ][ 0 ];
 }
 
 
@@ -1790,7 +1790,7 @@ void shoUseAttack( u16 p_pkmIdx, bool p_female, bool p_shiny ) {
     OamTop->oamBuffer[ 0 ].isHidden = true;
     OamTop->oamBuffer[ 1 ].isHidden = false;
     for( u8 i = 0; i < 5; ++i ) {
-        loadframe( &spriteInfoTop[ 1 ], SAV.m_overWorldIdx + 4, i, true );
+        loadframe( &spriteInfoTop[ 1 ], SAV->m_overWorldIdx + 4, i, true );
         updateOAM( OamTop );
         swiWaitForVBlank( );
         swiWaitForVBlank( );
@@ -1838,26 +1838,26 @@ int main( int p_argc, char** p_argv ) {
     AS_MP3Stop( );
 #endif
 
-    heroIsBig = SAV.m_acMoveMode != map2d::MoveMode::WALK;
+    heroIsBig = SAV->m_acMoveMode != map2d::MoveMode::WALK;
 
     FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "Clear" );
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "Clear" );
     scrn.draw( mode );
 
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Clear" );
-    acMap = std::unique_ptr<map2d::Map>( new map2d::Map( "nitro:/MAPS/", SAV.m_acMapName ) );
+    acMap = std::unique_ptr<map2d::Map>( new map2d::Map( "nitro:/MAPS/", SAV->m_acMapName ) );
 
-    movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
+    movePlayerOnMap( SAV->m_acposx / 20, SAV->m_acposy / 20, SAV->m_acposz, true );
     lastdir = 0;
 
     cust_font.setColor( RGB( 0, 31, 31 ), 0 );
 
     int HILFSCOUNTER = 252;
-    Oam->oamBuffer[ PKMN_ID ].isHidden = !( SAV.m_hasPKMN && SAV.m_PkmnTeam.size( ) );
+    Oam->oamBuffer[ PKMN_ID ].isHidden = !( SAV->m_hasPKMN && SAV->m_PkmnTeam.size( ) );
     updateOAMSub( Oam );
 
-    SAV.m_hasGDex = true;
-    SAV.m_evolveInBattle = true;
+    SAV->m_hasGDex = true;
+    SAV->m_evolveInBattle = true;
 
     initMapSprites( );
     updateOAM( OamTop );
@@ -1865,7 +1865,7 @@ int main( int p_argc, char** p_argv ) {
 
     char buffer[ 120 ] = { 0 };
 #ifdef USE_AS_LIB
-    sprintf( buffer, "%d.mp3", SAV.m_acMapIdx );
+    sprintf( buffer, "%d.mp3", SAV->m_acMapIdx );
     PLAYMp( buffer );
     AS_SetMP3Loop( true );
 #endif
@@ -1875,12 +1875,14 @@ int main( int p_argc, char** p_argv ) {
     initMainSprites( Oam, spriteInfo );
     setMainSpriteVisibility( false, true );
     Oam->oamBuffer[ BACK_ID ].isHidden = true;
+
+    consoleSelect( &Bottom );
+    consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+    consoleClear( );
+
     while( 42 ) {
         updateTime( s8( 1 ) );
         swiWaitForVBlank( );
-        swiWaitForVBlank( );
-        swiWaitForVBlank( );
-        swiWaitForIRQ( );
         updateOAMSub( Oam );
         touchRead( &touch );
         int pressed = keysUp( ), held = keysHeld( );
@@ -1893,7 +1895,7 @@ int main( int p_argc, char** p_argv ) {
             showmappointer = false;
             setMainSpriteVisibility( false );
             Oam->oamBuffer[ SAVE_ID ].isHidden = false;
-            Oam->oamBuffer[ PKMN_ID ].isHidden = !( SAV.m_hasPKMN && SAV.m_PkmnTeam.size( ) );
+            Oam->oamBuffer[ PKMN_ID ].isHidden = !( SAV->m_hasPKMN && SAV->m_PkmnTeam.size( ) );
             updateOAMSub( Oam );
             mode = -1;
             scrn.draw( mode );
@@ -1910,20 +1912,20 @@ int main( int p_argc, char** p_argv ) {
                           keysCurrent( ),
                           acMap->m_sizex,
                           acMap->m_sizey,
-                          SAV.m_acposx / 20,
-                          ( SAV.m_acposy ) / 20,
-                          SAV.m_acposz,
-                          SAV.m_acMapName,
-                          SAV.m_acMapIdx );
+                          SAV->m_acposx / 20,
+                          ( SAV->m_acposy ) / 20,
+                          SAV->m_acposz,
+                          SAV->m_acMapName,
+                          SAV->m_acMapIdx );
             messageBox m( buffer );
 
             /*
-                        printf( "topbehave %i;\n bottombehave %i", acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ].m_topbehave,
-                        acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV.m_acposy / 20 + 10 ][ SAV.m_acposx / 20 + 10 ].m_blockidx ].m_bottombehave );*/
+                        printf( "topbehave %i;\n bottombehave %i", acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV->m_acposy / 20 + 10 ][ SAV->m_acposx / 20 + 10 ].m_blockidx ].m_topbehave,
+                        acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV->m_acposy / 20 + 10 ][ SAV->m_acposx / 20 + 10 ].m_blockidx ].m_bottombehave );*/
         }
 
         if( pressed & KEY_A ) {
-            for( auto a : SAV.m_PkmnTeam ) {
+            for( auto a : SAV->m_PkmnTeam ) {
                 if( !a.m_boxdata.m_individualValues.m_isEgg ) {
                     for( u8 i = 0; i < 4; ++i ) {
                         if( AttackList[ a.m_boxdata.m_moves[ i ] ]->m_isFieldAttack && AttackList[ a.m_boxdata.m_moves[ i ] ]->possible( ) ) {
@@ -1975,46 +1977,46 @@ OUT:
 
         if( held & KEY_DOWN ) {
             scanKeys( );
-            if( movePlayerOnMap( SAV.m_acposx / 20, ( SAV.m_acposy + MOV ) / 20, SAV.m_acposz, false ) ) {
-                SAV.m_acposy += MOV;
+            if( movePlayerOnMap( SAV->m_acposx / 20, ( SAV->m_acposy + MOV ) / 20, SAV->m_acposz, false ) ) {
+                SAV->m_acposy += MOV;
                 stepincrease( );
                 lastdir = 2;
             }
-            if( SAV.m_acMoveMode != map2d::MoveMode::BIKE )
+            if( SAV->m_acMoveMode != map2d::MoveMode::BIKE )
                 continue;
         }
         if( held & KEY_LEFT ) {
             scanKeys( );
-            if( movePlayerOnMap( ( SAV.m_acposx - MOV ) / 20, SAV.m_acposy / 20, SAV.m_acposz, false ) ) {
-                SAV.m_acposx -= MOV;
+            if( movePlayerOnMap( ( SAV->m_acposx - MOV ) / 20, SAV->m_acposy / 20, SAV->m_acposz, false ) ) {
+                SAV->m_acposx -= MOV;
                 stepincrease( );
                 lastdir = 3;
             }
-            if( SAV.m_acMoveMode != map2d::MoveMode::BIKE )
+            if( SAV->m_acMoveMode != map2d::MoveMode::BIKE )
                 continue;
         }
         if( held & KEY_RIGHT ) {
             scanKeys( );
-            if( movePlayerOnMap( ( SAV.m_acposx + MOV ) / 20, SAV.m_acposy / 20, SAV.m_acposz, false ) ) {
-                SAV.m_acposx += MOV;
+            if( movePlayerOnMap( ( SAV->m_acposx + MOV ) / 20, SAV->m_acposy / 20, SAV->m_acposz, false ) ) {
+                SAV->m_acposx += MOV;
                 stepincrease( );
                 lastdir = 1;
             }
-            if( SAV.m_acMoveMode != map2d::MoveMode::BIKE )
+            if( SAV->m_acMoveMode != map2d::MoveMode::BIKE )
                 continue;
         }
         if( held & KEY_UP ) {
             scanKeys( );
-            if( movePlayerOnMap( SAV.m_acposx / 20, ( SAV.m_acposy - MOV ) / 20, SAV.m_acposz, false ) ) {
-                SAV.m_acposy -= MOV;
+            if( movePlayerOnMap( SAV->m_acposx / 20, ( SAV->m_acposy - MOV ) / 20, SAV->m_acposz, false ) ) {
+                SAV->m_acposy -= MOV;
                 stepincrease( );
                 lastdir = 4;
             }
-            if( SAV.m_acMoveMode != map2d::MoveMode::BIKE )
+            if( SAV->m_acMoveMode != map2d::MoveMode::BIKE )
                 continue;
         }
         //StartBag
-        if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 6 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 7 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        if( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 6 ] - touch.px ) + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 7 ] - touch.py ) ) <= 16 && mode == -1 ) {
 
             while( 1 ) {
                 swiWaitForVBlank( );
@@ -2024,15 +2026,15 @@ OUT:
                 if( touch.px == 0 && touch.py == 0 )
                     break;
             }
-            SAV.m_bag.draw( SAV.m_lstBag, SAV.m_lstBagItem );
+            SAV->m_bag.draw( SAV->m_lstBag, SAV->m_lstBagItem );
             initMapSprites( );
-            movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
+            movePlayerOnMap( SAV->m_acposx / 20, SAV->m_acposy / 20, SAV->m_acposz, true );
         }
         //StartPkmn
-        else if( SAV.m_PkmnTeam.size( )
+        else if( SAV->m_PkmnTeam.size( )
                  && ( ( held & KEY_START )
-                 || ( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 0 ] - touch.px )
-                 + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 )
+                 || ( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ] - touch.px )
+                 + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 )
                  && mode == -1 ) ) {
             while( 1 ) {
                 swiWaitForVBlank( );
@@ -2051,10 +2053,10 @@ OUT:
             scrn.draw( mode );
             showmappointer = omp;
             initMapSprites( );
-            movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
+            movePlayerOnMap( SAV->m_acposx / 20, SAV->m_acposy / 20, SAV->m_acposz, true );
         }
         //StartDex
-        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 4 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 5 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ] - touch.px ) + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 5 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
@@ -2067,10 +2069,10 @@ OUT:
             scrn.run_dex( );
             scrn.draw( mode );
             initMapSprites( );
-            movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
+            movePlayerOnMap( SAV->m_acposx / 20, SAV->m_acposy / 20, SAV->m_acposz, true );
         }
         //StartOptions
-        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 8 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 9 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 8 ] - touch.px ) + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 9 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
@@ -2081,7 +2083,7 @@ OUT:
             }
         }
         //StartID
-        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 2 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 3 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 ] - touch.px ) + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 3 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
@@ -2096,11 +2098,11 @@ OUT:
             switch( res ) {
                 case 0:
                 {
-                    SAV.m_PkmnTeam.clear( );
+                    SAV->m_PkmnTeam.clear( );
                     for( int i = 0; i < 3; ++i ) {
                         POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
-                                            50, SAV.m_Id, SAV.m_Sid, SAV.getName( ).c_str( ),
-                                            !SAV.m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                            50, SAV->m_Id, SAV->m_Sid, SAV->getName( ).c_str( ),
+                                            !SAV->m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         stored_pkmn[ *free_spaces.rbegin( ) ] = a.m_boxdata;
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         if( POKEMON::PKMNDATA::canLearn( HILFSCOUNTER, 57, 4 ) )
@@ -2108,17 +2110,17 @@ OUT:
                         if( POKEMON::PKMNDATA::canLearn( HILFSCOUNTER, 19, 4 ) )
                             a.m_boxdata.m_moves[ 1 ] = 19;
                         a.m_boxdata.m_experienceGained += 750;
-                        SAV.m_PkmnTeam.push_back( a );
+                        SAV->m_PkmnTeam.push_back( a );
 
-                        SAV.m_inDex[ a.m_boxdata.m_speciesId - 1 ] = true;
+                        SAV->m_inDex[ a.m_boxdata.m_speciesId - 1 ] = true;
                         box_of_st_pkmn[ a.m_boxdata.m_speciesId - 1 ].push_back( *free_spaces.rbegin( ) );
                         //printf("%i",(*free_spaces.rbegin()));
                         free_spaces.pop_back( );
                         HILFSCOUNTER = 3 + ( ( HILFSCOUNTER ) % 649 );
                     }
                     for( u16 i = 0; i < 649; ++i )
-                        SAV.m_inDex[ i ] = true;
-                    SAV.m_hasPKMN = true;
+                        SAV->m_inDex[ i ] = true;
+                    SAV->m_hasPKMN = true;
                     swiWaitForVBlank( );
 
 
@@ -2128,19 +2130,19 @@ OUT:
                 case 1:
                     for( u16 j = 1; j < 800; ++j )
                         if( ITEMS::ItemList[ j ]->m_itemName != "Null" )
-                            SAV.m_bag.addItem( ITEMS::ItemList[ j ]->m_itemType, j, 1 );
+                            SAV->m_bag.addItem( ITEMS::ItemList[ j ]->m_itemType, j, 1 );
                     break;
                 case 2:
                     setMainSpriteVisibility( false, true );
                     messageBox( ITEMS::berry( "Ginemabeere" ), 31 );
                     break;
                 case 3:{
-                    BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &SAV.m_PkmnTeam, 0 );
+                    BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &SAV->m_PkmnTeam, 0 );
                     std::vector<POKEMON::pokemon> cpy;
 
                     for( u8 i = 0; i < 3; ++i ) {
                         POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
-                                            30, SAV.m_Id + 1, SAV.m_Sid, L"Heiko"/*SAV.getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                            30, SAV->m_Id + 1, SAV->m_Sid, L"Heiko"/*SAV->getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                         HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
@@ -2151,16 +2153,16 @@ OUT:
                     BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::DOUBLE );
                     test_battle.start( );
                     initMapSprites( );
-                    movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
+                    movePlayerOnMap( SAV->m_acposx / 20, SAV->m_acposy / 20, SAV->m_acposz, true );
                     break;
                 }
                 case 4:{
-                    BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &SAV.m_PkmnTeam, 0 );
+                    BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &SAV->m_PkmnTeam, 0 );
                     std::vector<POKEMON::pokemon> cpy;
 
                     for( u8 i = 0; i < 6; ++i ) {
                         POKEMON::pokemon a( 0, HILFSCOUNTER, 0,
-                                            15, SAV.m_Id + 1, SAV.m_Sid, L"Heiko"/*SAV.getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                            15, SAV->m_Id + 1, SAV->m_Sid, L"Heiko"/*SAV->getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                         HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
@@ -2171,7 +2173,7 @@ OUT:
                     BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::SINGLE );
                     test_battle.start( );
                     initMapSprites( );
-                    movePlayerOnMap( SAV.m_acposx / 20, SAV.m_acposy / 20, SAV.m_acposz, true );
+                    movePlayerOnMap( SAV->m_acposx / 20, SAV->m_acposy / 20, SAV->m_acposz, true );
                     break;
                 }
                 case 5:{
@@ -2191,7 +2193,7 @@ OUT:
 
         }
         //StartPok\x82""nav
-        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 10 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 11 ] - touch.py ) ) <= 16 && mode == -1 ) {
+        else if( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 10 ] - touch.px ) + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 11 ] - touch.py ) ) <= 16 && mode == -1 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
@@ -2202,10 +2204,10 @@ OUT:
             }
             mode = 0;
             scrn.draw( mode );
-            //movePlayerOnMap(SAV.m_acposx/20,SAV.m_acposy/20,SAV.m_acposz,false);
+            //movePlayerOnMap(SAV->m_acposx/20,SAV->m_acposy/20,SAV->m_acposz,false);
         }
         //StartMaps
-        else if( sqrt( sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 0 ] - touch.px ) + sq( BGs[ SAV.m_bgIdx ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 && mode == 0 ) {
+        else if( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ] - touch.px ) + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 && mode == 0 ) {
             while( 1 ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
@@ -2295,7 +2297,7 @@ OUT:
             if( Save.getResult( "Möchtest du deinen\nFortschritt sichern?\n" ) ) {
                 if( gMod == EMULATOR )
                     messageBox Succ( "Speichern?\nIn einem Emulator?", "PokéNav" );
-                else if( SAV.save( progress ) )
+                else if( SAV->save( progress ) )
                     messageBox Succ( "Fortschritt\nerfolgreich gesichert!", "PokéNav" );
                 else
                     messageBox Succ( "Es trat ein Fehler auf\nSpiel nicht gesichert.", "PokéNav" );

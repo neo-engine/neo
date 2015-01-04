@@ -57,7 +57,7 @@ extern int bg3sub;
 extern int bg3;
 extern int bg2sub;
 extern int bg2;
-extern saveGame SAV;
+extern saveGame* SAV;
 
 extern PrintConsole Top, Bottom;
 extern FONT::font cust_font;

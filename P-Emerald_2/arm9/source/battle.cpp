@@ -1318,7 +1318,7 @@ NEXT:
 
                 u8 L = acPkmn.m_Level;
 
-                float t = ( acPkmn.m_boxdata.m_oTId == SAV.m_Id && acPkmn.m_boxdata.m_oTSid == SAV.m_Sid ? 1 : 1.5 );
+                float t = ( acPkmn.m_boxdata.m_oTId == SAV->m_Id && acPkmn.m_boxdata.m_oTSid == SAV->m_Sid ? 1 : 1.5 );
 
                 u32 exp = u32( ( wildModifer * t* b* e* L ) / 7 );
 
@@ -1393,7 +1393,7 @@ NEXT:
         }
 
 
-        if( SAV.m_EXPShareEnabled && p_opponent ) {
+        if( SAV->m_EXPShareEnabled && p_opponent ) {
             log( L"Der EP-Teiler wirkt![A]" );
             for( u8 i = ( ( m_battleMode == DOUBLE ) ? 2 : 1 ); i < 6; ++i )if( ACPKMNSTS( i, PLAYER ) != KO &&
                                                                                 ACPKMNSTS( i, PLAYER ) != NA ) {
@@ -1409,7 +1409,7 @@ NEXT:
 
                 u8 L = acPkmn.m_Level;
 
-                float t = ( acPkmn.m_boxdata.m_oTId == SAV.m_Id && acPkmn.m_boxdata.m_oTSid == SAV.m_Sid ? 1 : 1.5 );
+                float t = ( acPkmn.m_boxdata.m_oTId == SAV->m_Id && acPkmn.m_boxdata.m_oTSid == SAV->m_Sid ? 1 : 1.5 );
 
                 u32 exp = u32( ( wildModifer * t* b* e* L ) / 7 );
 
@@ -1510,7 +1510,7 @@ NEXT:
     *  @param p_pokemonPos: Position of the PKMN to be tested (0 or 1)
     */
     void battle::checkForEvolution( bool p_opponent, u8 p_pokemonPos ) {
-        if( !SAV.m_evolveInBattle )
+        if( !SAV->m_evolveInBattle )
             return;
 
         if( ACPKMN( p_pokemonPos, p_opponent ).canEvolve( ) ) {

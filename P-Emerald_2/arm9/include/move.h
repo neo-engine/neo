@@ -139,7 +139,7 @@ public:
     virtual void use( ) { }
 
     virtual const char* text( ) {
-        return 0;
+        return "N/A";
     }
 };
 #define M_POUND 1
