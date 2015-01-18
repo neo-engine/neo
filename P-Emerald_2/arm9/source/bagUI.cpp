@@ -257,6 +257,11 @@ void drawItemTop( ITEMS::item* p_item, u16 p_count ) {
 
         display = p_item->getDisplayName( true );
         descr = p_item->getDescription( true );
+
+        if( p_item->m_itemType != ITEMS::item::itemType::KEY_ITEM ) {
+            std::sprintf( buffer, "x %d", p_count );
+            cust_font.printString( buffer, 144, 53, false );
+        }
     } else {
         auto mv = *( static_cast<ITEMS::TM*>( p_item ) );
 

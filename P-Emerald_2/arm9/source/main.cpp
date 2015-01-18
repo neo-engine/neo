@@ -1517,6 +1517,7 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
         animateHero( movedir, 0 );
     else {
         animateHero( movedir, 2 );
+        swiWaitForVBlank( );
         bgUpdate( );
         return false;
     }
@@ -1612,7 +1613,9 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
         movePlayer( movedir );
 
     animateHero( movedir, 1 );
+    swiWaitForVBlank( );
     animateHero( movedir, 2 );
+    swiWaitForVBlank( );
     if( p_init )
         animateHero( lastdir, 2 );
 

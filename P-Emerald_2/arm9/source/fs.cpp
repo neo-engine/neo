@@ -795,7 +795,7 @@ namespace FS {
         Item->y = p_posY;
 
         std::string itemName = p_hm ? "VM" : "TM";
-        itemName += std::vector<std::string>( { "Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein", "Kaefer", "Geist",
+        itemName += std::vector<std::string>( { "Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein", "Pflanze", "Geist",
                                               "Stahl", "Unbekannt", "Wasser", "Feuer", "Pflanze", "Elektro", "Psycho", "Eis",
                                               "Drache", "Unlicht", "Fee" } )[ p_type ];
 
