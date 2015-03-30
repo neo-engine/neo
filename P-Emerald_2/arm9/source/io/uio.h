@@ -65,7 +65,7 @@ namespace IO {
 
     void initTextField( );
 
-    [deprecated( "Use printRectangle instead." )]
+    [[ deprecated( "Use printRectangle instead." ) ]]
     void putrec( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom = true, bool p_striped = false, u8 p_color = 42 );
     void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom = true, bool p_striped = false, u8 p_color = 42 );
 

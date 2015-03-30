@@ -1,7 +1,6 @@
 #include "choiceBox.h"
 #include "uio.h"
 #include "../defines.h"
-#include "../ds/pokemon.h"
 
 #include "Back.h"
 #include "Forward.h"

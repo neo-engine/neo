@@ -25,13 +25,11 @@
     along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
     */
 
-#include "../ds/pokemon.h"
 #include "messageBox.h"
 #include "sprite.h"
-//#include "screenLoader.h"
 #include "../ds/item.h"
 #include "../fs/fs.h"
-#include "../bag/bag.h"
+#include "../fs/saveGame.h"
 #include <cmath>
 #include <vector>
 
@@ -79,7 +77,7 @@ namespace IO {
         ASpriteOamIndex = A_ID;
         regularFont->printMBStringD( buf, 46, 24, true, true, 1 );
 
-        SAV->m_bag.addItem( p_item.m_itemType, p_item.getItemId( ), p_count );
+        FS::SAV->m_bag.addItem( p_item.m_itemType, p_item.getItemId( ), p_count );
     }
 
     messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {

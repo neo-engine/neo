@@ -58,6 +58,20 @@ namespace IO {
         damage_0Pal, damage_1Pal, damage_2Pal
     };
 
+    [[ deprecated( "Use the methods of IO instead." ) ]]
+    const u8 SPRITE_DMA_CHANNEL = 2;
+
+    [[ deprecated( "Use the methods of IO instead." ) ]]
+    const u16 BYTES_PER_16_COLOR_TILE = 32;
+    [[ deprecated( "Use the methods of IO instead." ) ]]
+    const u16 COLORS_PER_PALETTE = 16;
+    [[ deprecated( "Use the methods of IO instead." ) ]]
+    const u16 BOUNDARY_VALUE = 32;
+    [[ deprecated( "Use the methods of IO instead." ) ]]
+    const u16 OFFSET_MULTIPLIER = ( BOUNDARY_VALUE / sizeof( SPRITE_GFX[ 0 ] ) );
+    [[ deprecated( "Use the methods of IO instead." ) ]]
+    const u16 OFFSET_MULTIPLIER_SUB = ( BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] ) );
+
     void updateOAM( OAMTable * p_oam ) {
         DC_FlushAll( );
         dmaCopyHalfWords( SPRITE_DMA_CHANNEL,

@@ -25,14 +25,11 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
+
 #pragma once
 #include "nds.h"
 
-namespace POKEMON {
-    class pokemon;
-}
-
-class saveGame;
 
 namespace gen3 //using code from "pokehack" originally by "Grazfather"
 {
@@ -245,41 +242,41 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         } pokemon_misc_t;
     };
 
-    /* Order:
-    00. GAEM	 06. AGEM	 12. EGAM	 18. MGAE
-    01. GAME	 07. AGME	 13. EGMA	 19. MGEA
-    02. GEAM	 08. AEGM	 14. EAGM	 20. MAGE
-    03. GEMA	 09. AEMG	 15. EAMG	 21. MAEG
-    04. GMAE	 10. AMGE	 16. EMGA	 22. MEGA
-    05. GMEA	 11. AMEG	 17. EMAG	 23. MEAG
-    */
+    // Order:
+    //00. GAEM	 06. AGEM	 12. EGAM	 18. MGAE
+    //01. GAME	 07. AGME	 13. EGMA	 19. MGEA
+    //02. GEAM	 08. AEGM	 14. EAGM	 20. MAGE
+    //03. GEMA	 09. AEMG	 15. EAMG	 21. MAEG
+    //04. GMAE	 10. AMGE	 16. EMGA	 22. MEGA
+    //05. GMEA	 11. AMEG	 17. EMAG	 23. MEAG
+    
     // Where in data each struct is, based on AEGM order
-    static const int DataOrderTable[ 24 ][ 4 ] = { \
-        /*          A  E  G  M */ \
-        /* GAEM */ {1, 2, 0, 3}, \
-        /* GAME */ {1, 3, 0, 2}, \
-        /* GEAM */ {2, 1, 0, 3}, \
-        /* GEMA */ {3, 1, 0, 2}, \
-        /* GMAE */ {2, 3, 0, 1}, \
-        /* GMEA */ {3, 2, 0, 1}, \
-        /* AGEM */ {0, 2, 1, 3}, \
-        /* AGME */ {0, 3, 1, 2}, \
-        /* AEGM */ {0, 1, 2, 3}, \
-        /* AEMG */ {0, 1, 3, 2}, \
-        /* AMGE */ {0, 3, 2, 1}, \
-        /* AMEG */ {0, 2, 3, 1}, \
-        /* EGAM */ {2, 0, 1, 3}, \
-        /* EGMA */ {3, 0, 1, 2}, \
-        /* EAGM */ {1, 0, 2, 3}, \
-        /* EAMG */ {1, 0, 3, 2}, \
-        /* EMGA */ {3, 0, 2, 1}, \
-        /* EMAG */ {2, 0, 3, 1}, \
-        /* MGAE */ {2, 3, 1, 0}, \
-        /* MGEA */ {3, 2, 1, 0}, \
-        /* MAGE */ {1, 3, 2, 0}, \
-        /* MAEG */ {1, 2, 3, 0}, \
-        /* MEGA */ {3, 1, 2, 0}, \
-        /* MEAG */ {2, 1, 3, 0} };
+    static const int DataOrderTable[ 24 ][ 4 ] = { 
+    //    A  E  G  M  
+         {1, 2, 0, 3}, 
+         {1, 3, 0, 2}, 
+         {2, 1, 0, 3}, 
+         {3, 1, 0, 2}, 
+         {2, 3, 0, 1}, 
+         {3, 2, 0, 1}, 
+         {0, 2, 1, 3}, 
+         {0, 3, 1, 2}, 
+         {0, 1, 2, 3}, 
+         {0, 1, 3, 2}, 
+         {0, 3, 2, 1}, 
+         {0, 2, 3, 1}, 
+         {2, 0, 1, 3}, 
+         {3, 0, 1, 2}, 
+         {1, 0, 2, 3}, 
+         {1, 0, 3, 2}, 
+         {3, 0, 2, 1}, 
+         {2, 0, 3, 1}, 
+         {2, 3, 1, 0}, 
+         {3, 2, 1, 0}, 
+         {1, 3, 2, 0}, 
+         {1, 2, 3, 0}, 
+         {3, 1, 2, 0}, 
+         {2, 1, 3, 0} };
 
     static const int belt_offsets[ ] = { BELT_OFFSET_RSE, BELT_OFFSET_FRLG };
 
@@ -338,3 +335,4 @@ namespace gen4 {
         SOULSILVER = 4
     };
 }
+*/

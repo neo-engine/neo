@@ -29,111 +29,114 @@
 
 #include <string>
 #include <vector>
-#include "bag.h"
+#include "../bag/bag.h"
+#include "../ds/pokemon.h"
 
-namespace POKEMON {
-    class pokemon;
-}
-class BOX;
-enum SavMod {
-    _NDS,
-    _GBA
-};
-class saveGame {
-public:
-    typedef std::pair<int, int> pii;
-
-    //General Player Data
-    std::wstring        m_playername;
-    bool                m_isMale;
-    int                 m_Id;
-    int                 m_Sid;
-    union {
-        u32         m_playtime;
-        struct {
-            u16 m_hours;
-            u8  m_mins;
-            u8  m_secs;
-
-        }           m_pt;
+namespace FS {
+    enum SavMod {
+        _NDS,
+        _GBA
     };
-    int                 m_HOENN_Badges;
-    int                 m_KANTO_Badges;
-    int                 m_JOHTO_Badges;
-    short               m_badges;
-    int                 m_dex;
-    std::vector<bool>   m_inDex;
+    extern SavMod savMod;
 
-    int                 m_savTyp;
+    class saveGame {
+    public:
+        typedef std::pair<int, int> pii;
 
-    int                 m_money;
+        //General Player Data
+        std::wstring        m_playername;
+        bool                m_isMale;
+        int                 m_Id;
+        int                 m_Sid;
+        union {
+            u32         m_playtime;
+            struct {
+                u16 m_hours;
+                u8  m_mins;
+                u8  m_secs;
 
-    bool                m_hasPKMN;
-    bool                m_activatedPNav;
+            }           m_pt;
+        };
+        int                 m_HOENN_Badges;
+        int                 m_KANTO_Badges;
+        int                 m_JOHTO_Badges;
+        short               m_badges;
+        int                 m_dex;
+        std::vector<bool>   m_inDex;
 
-    //Bag
-    bag                 m_bag;
+        int                 m_savTyp;
 
-    //Team
-    std::vector < POKEMON::pokemon >
-        m_PkmnTeam;
+        int                 m_money;
 
-    u16                 m_overWorldIdx;
+        bool                m_hasPKMN;
+        bool                m_activatedPNav;
 
-    u16                 m_flags[ 500 ];
+        //Bag
+        BAG::bag                 m_bag;
 
-    int                 m_acposx,
-        m_acposy,
-        m_acposz;
-    int                 m_acMapIdx;
-    int                 m_acMoveMode;
-    char                m_acMapName[ 100 ];
+        //Team
+        std::vector < pokemon >
+            m_PkmnTeam;
 
-    bool                m_EXPShareEnabled;
-    bool                m_evolveInBattle;
-    u8                  m_bgIdx;
+        u16                 m_overWorldIdx;
 
-    u8                  m_lstBag;
-    u8                  m_lstBagItem;
-    u8                  m_bagPoses[ 5 ];
+        u16                 m_flags[ 500 ];
 
-    //GameFlags
-    bool                m_hasGDex;
+        int                 m_acposx,
+            m_acposy,
+            m_acposz;
+        int                 m_acMapIdx;
+        int                 m_acMoveMode;
+        char                m_acMapName[ 100 ];
 
-    bool                m_good; //FailBit
+        bool                m_EXPShareEnabled;
+        bool                m_evolveInBattle;
+        u8                  m_bgIdx;
 
-    struct {
-        u16 m_gameid;
-    }                   m_gba;
+        u8                  m_lstBag;
+        u8                  m_lstBagItem;
+        u8                  m_bagPoses[ 5 ];
 
-    saveGame( ) :
-        m_playername( ), m_isMale( true ), m_Id( 0 ), m_Sid( 0 ) {
-        m_inDex = std::vector<bool>( 650, false );
-        m_good = true;
-    }
-    saveGame( std::wstring p_playername )
-        : m_playername( p_playername ), m_isMale( true ), m_Id( 0 ), m_Sid( 0 ) {
-        m_inDex = std::vector<bool>( 650, false );
-        m_good = true;
-    }
-    saveGame( void p_func( int ) );
-    ~saveGame( ) { }
+        //GameFlags
+        bool                m_hasGDex;
 
-    bool                save( void p_func( int ) );
+        bool                m_good; //FailBit
 
-    std::wstring        getName( ) {
-        return m_playername;
-    }
-    void                setName( const std::wstring& p_playername ) {
-        m_playername = p_playername;
-    }
+        struct {
+            u16 m_gameid;
+        }                   m_gba;
 
-    bool                checkflag( int p_idx ) {
-        return m_flags[ p_idx >> 3 ] & ( 1 << ( p_idx % 8 ) );
-    }
-    void                setflag( int p_idx, bool p_value ) {
-        if( p_value != checkflag( p_idx ) )
-            m_flags[ p_idx >> 3 ] ^= ( 1 << ( p_idx % 8 ) );
-        return;
-    }
-};
+        saveGame( ) :
+            m_playername( ), m_isMale( true ), m_Id( 0 ), m_Sid( 0 ) {
+            m_inDex = std::vector<bool>( 650, false );
+            m_good = true;
+        }
+        saveGame( std::wstring p_playername )
+            : m_playername( p_playername ), m_isMale( true ), m_Id( 0 ), m_Sid( 0 ) {
+            m_inDex = std::vector<bool>( 650, false );
+            m_good = true;
+        }
+        saveGame( void p_func( int ) );
+        ~saveGame( ) { }
+
+        bool                save( void p_func( int ) );
+
+        std::wstring        getName( ) {
+            return m_playername;
+        }
+        void                setName( const std::wstring& p_playername ) {
+            m_playername = p_playername;
+        }
+
+        bool                checkflag( int p_idx ) {
+            return m_flags[ p_idx >> 3 ] & ( 1 << ( p_idx % 8 ) );
+        }
+        void                setflag( int p_idx, bool p_value ) {
+            if( p_value != checkflag( p_idx ) )
+                m_flags[ p_idx >> 3 ] ^= ( 1 << ( p_idx % 8 ) );
+            return;
+        }
+    };
+
+    extern saveGame* SAV;
+}

@@ -2,7 +2,7 @@
 
 #include "uio.h"
 #include "../defines.h"
-#include "../ds/pokemon.h"
+#include "../ds/type.h"
 
 namespace IO {
     font* regularFont = new font( REGULAR_FONT::fontData, REGULAR_FONT::fontWidths, REGULAR_FONT::shiftchar );
@@ -210,5 +210,71 @@ namespace IO {
             ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
         else if( ( p_color % ( 1 << 8 ) ) != 0 )
             ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
+    }
+
+    u16 getColor( Type p_type ) {
+        switch( p_type ) {
+            case NORMAL:
+                return NORMAL_;
+                break;
+            case KAMPF:
+                return RED;
+                break;
+            case FLUG:
+                return TURQOISE;
+                break;
+            case GIFT:
+                return POISON;
+                break;
+            case BODEN:
+                return GROUND;
+                break;
+            case GESTEIN:
+                return ROCK;
+                break;
+            case KAEFER:
+                return BUG;
+                break;
+            case GEIST:
+                return GHOST;
+                break;
+            case STAHL:
+                return STEEL;
+                break;
+            case UNBEKANNT:
+                return UNKNOWN;
+                break;
+            case WASSER:
+                return BLUE;
+                break;
+            case FEUER:
+                return ORANGE;
+                break;
+            case PFLANZE:
+                return GREEN;
+                break;
+            case ELEKTRO:
+                return YELLOW;
+                break;
+            case PSYCHO:
+                return PURPLE;
+                break;
+            case EIS:
+                return ICE;
+                break;
+            case DRACHE:
+                return DRAGON;
+                break;
+            case UNLICHT:
+                return BLACK;
+                break;
+            case FEE:
+                return FAIRY;
+                break;
+            default:
+                return DRAGON;
+                break;
+        }
+        return WHITE;
     }
 }

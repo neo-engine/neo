@@ -1,7 +1,6 @@
 #include "yesNoBox.h"
 #include "uio.h"
 #include "../defines.h"
-#include "../ds/pokemon.h"
 
 namespace IO {
 

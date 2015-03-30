@@ -105,30 +105,6 @@
     <ClInclude Include="arm9\include\script.h">
       <Filter>Header Files\arm9\battle</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\include\ability.h">
-      <Filter>Header Files\arm9\ds</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\berry.h">
-      <Filter>Header Files\arm9\ds</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\hmMoves.h">
-      <Filter>Header Files\arm9\ds</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\item.h">
-      <Filter>Header Files\arm9\ds</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\fs.h">
-      <Filter>Header Files\arm9\fs</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\pokemon.h">
-      <Filter>Header Files\arm9\ds</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\type.h">
-      <Filter>Header Files\arm9\ds</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\move.h">
-      <Filter>Header Files\arm9\ds</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\map2d.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
@@ -137,12 +113,6 @@
     </ClInclude>
     <ClInclude Include="arm9\include\mapconfig.h">
       <Filter>Header Files\arm9\map</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\saveGame.h">
-      <Filter>Header Files\arm9\fs</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\Gen.h">
-      <Filter>Header Files\arm9\fs</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\io\font.h">
       <Filter>Header Files\arm9\io</Filter>
@@ -168,14 +138,44 @@
     <ClInclude Include="arm9\source\io\uio.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\io\yesNoBox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\io\choiceBox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\source\bag\bag.h">
       <Filter>Header Files\arm9\bag</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\ds\ability.h">
+      <Filter>Header Files\arm9\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\ds\berry.h">
+      <Filter>Header Files\arm9\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\ds\hmMoves.h">
+      <Filter>Header Files\arm9\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\ds\item.h">
+      <Filter>Header Files\arm9\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\ds\move.h">
+      <Filter>Header Files\arm9\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\ds\pokemon.h">
+      <Filter>Header Files\arm9\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\ds\type.h">
+      <Filter>Header Files\arm9\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\fs\fs.h">
+      <Filter>Header Files\arm9\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\fs\Gen.h">
+      <Filter>Header Files\arm9\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\fs\saveGame.h">
+      <Filter>Header Files\arm9\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\io\choiceBox.h">
+      <Filter>Header Files\arm9\io</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\io\yesNoBox.h">
+      <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -218,9 +218,6 @@
     <ClCompile Include="arm9\source\Box.cpp">
       <Filter>Source Files\arm9\box</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\fs.cpp">
-      <Filter>Source Files\arm9\fs</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\item.cpp">
       <Filter>Source Files\arm9\ds</Filter>
     </ClCompile>
@@ -233,9 +230,6 @@
     <ClCompile Include="arm9\source\mapconfig.cpp">
       <Filter>Source Files\arm9\map</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\Gen.cpp">
-      <Filter>Source Files\arm9\fs</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\move.cpp">
       <Filter>Source Files\arm9\ds</Filter>
     </ClCompile>
@@ -244,9 +238,6 @@
     </ClCompile>
     <ClCompile Include="arm9\source\type.cpp">
       <Filter>Source Files\arm9\ds</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\saveGame.cpp">
-      <Filter>Source Files\arm9\fs</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\pokemon.cpp">
       <Filter>Source Files\arm9\ds</Filter>
@@ -274,6 +265,15 @@
     </ClCompile>
     <ClCompile Include="arm9\source\io\yesNoBox.cpp">
       <Filter>Source Files\arm9\io</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\fs\fs.cpp">
+      <Filter>Source Files\arm9\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\fs\Gen.cpp">
+      <Filter>Source Files\arm9\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\fs\saveGame.cpp">
+      <Filter>Source Files\arm9\fs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

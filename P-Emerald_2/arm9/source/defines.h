@@ -25,6 +25,7 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <nds.h>
 #include <nds/ndstypes.h>
 //#define USE_AS_LIB
 
@@ -38,6 +39,27 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #define BLUE_IDX (u8(254))
 
 #define CHOICE_COLOR RGB(16,25,19)
+
+#define GREEN RGB(0,24,0)
+#define RED RGB(24,0,0)
+#define BLUE RGB(0,0,24)
+#define WHITE RGB(31,31,31)
+#define NORMAL_ RGB(27,27,27)
+#define BLACK RGB(0,0,0)
+#define YELLOW RGB(24,24,0)
+#define PURPLE RGB(24,0,24)
+#define TURQOISE RGB(0,24,24)
+#define ICE RGB(15,31,31)
+#define FAIRY RGB(31,15,31)
+#define GROUND RGB(31,31,15)
+#define POISON RGB(31,0,15)
+#define ORANGE RGB(31,15,0)
+#define GHOST RGB(15,0,31)
+#define ROCK RGB(28,23,7)    
+#define BUG RGB(15,28,7)    
+#define STEEL RGB(24,24,24)
+#define DRAGON RGB(7,7,24)
+#define UNKNOWN RGB(0,42,42)
 
 #define BG_PAL( p_sub ) ( ( p_sub ) ? BG_PALETTE_SUB : BG_PALETTE )
 #define BG_BMP( p_sub ) ( ( p_sub ) ? BG_BMP_RAM_SUB( 1 ) : BG_BMP_RAM( 1 ) )

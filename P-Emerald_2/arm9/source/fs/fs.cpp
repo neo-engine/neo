@@ -32,12 +32,13 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <initializer_list>
 
 #include "fs.h"
-#include "buffer.h"
-#include "ability.h"
-#include "pokemon.h"
-#include "item.h"
-#include "berry.h"
-
+#include "../buffer.h"
+#include "../ds/ability.h"
+#include "../ds/move.h"
+#include "../ds/pokemon.h"
+#include "../ds/item.h"
+#include "../ds/berry.h"
+#include "../io/uio.h"
 
 #include "NoItem.h"
 
@@ -73,7 +74,7 @@ std::wstring getWAbilityName( int p_abilityId ) {
 }
 
 namespace FS {
-    bool loadSprite( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt ) {
+    bool loadSprite( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt ) {
         //char buffer[100];
         sprintf( buffer, "%s%s.raw", p_path, p_name );
         FILE* fd = fopen( buffer, "rb" );
@@ -85,12 +86,12 @@ namespace FS {
         fread( TEMP, sizeof( u32 ), p_tileCnt, fd );
         fread( TEMP_PAL, sizeof( u16 ), p_palCnt, fd );
 
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_spriteInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ], 4 * p_tileCnt );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ p_spriteInfo->m_entry->palette * COLORS_PER_PALETTE ], 2 * p_palCnt );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_spriteInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ], 4 * p_tileCnt );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ p_spriteInfo->m_entry->palette * IO::COLORS_PER_PALETTE ], 2 * p_palCnt );
         fclose( fd );
         return true;
     }
-    bool loadSpriteSub( SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt ) {
+    bool loadSpriteSub( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt ) {
         //char buffer[100];
         sprintf( buffer, "%s%s.raw", p_path, p_name );
         FILE* fd = fopen( buffer, "rb" );
@@ -102,19 +103,19 @@ namespace FS {
         fread( TEMP, sizeof( u32 ), p_tileCnt, fd );
         fread( TEMP_PAL, sizeof( u16 ), p_palCnt, fd );
 
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                           TEMP,
-                          &SPRITE_GFX_SUB[ p_spriteInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                          &SPRITE_GFX_SUB[ p_spriteInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ],
                           4 * p_tileCnt );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                           TEMP_PAL,
-                          &SPRITE_PALETTE_SUB[ p_spriteInfo->m_entry->palette * COLORS_PER_PALETTE ],
+                          &SPRITE_PALETTE_SUB[ p_spriteInfo->m_entry->palette * IO::COLORS_PER_PALETTE ],
                           2 * p_palCnt );
         fclose( fd );
         return true;
     }
 
-    bool loadPKMNSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnId, const s16 p_posX,
+    bool loadPKMNSprite( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnId, const s16 p_posX,
                          const s16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx ) {
         char buffer[ 100 ];
         if( !p_female )
@@ -149,12 +150,12 @@ namespace FS {
         }
         if( p_bottom ) {
             //swiCopy(TEMP_PAL,&SPRITE_PALETTE_SUB[(++p_palCnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[ ( ++p_palCnt ) * COLORS_PER_PALETTE ], 32 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[ ( ++p_palCnt ) * IO::COLORS_PER_PALETTE ], 32 );
         } else {
             //swiCopy(TEMP_PAL,&SPRITE_PALETTE[(++p_palCnt) * COLORS_PER_PALETTE], 32 | COPY_MODE_HWORD);
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ ( ++p_palCnt ) * COLORS_PER_PALETTE ], 32 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ ( ++p_palCnt ) * IO::COLORS_PER_PALETTE ], 32 );
         }
-        SpriteInfo * backInfo = &p_spriteInfo[ ++p_oamIndex ];
+        IO::SpriteInfo * backInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry * back = &p_oam->oamBuffer[ p_oamIndex ];
         backInfo->m_oamId = p_oamIndex;
         backInfo->m_width = 64;
@@ -176,10 +177,10 @@ namespace FS {
         back->palette = p_palCnt;
         if( p_bottom ) {
             //swiCopy(TEMP,&SPRITE_GFX_SUB[p_tileCnt * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[ p_tileCnt * OFFSET_MULTIPLIER ], 96 * 96 / 2 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[ p_tileCnt * IO::OFFSET_MULTIPLIER ], 96 * 96 / 2 );
         } else {
             //swiCopy(TEMP,&SPRITE_GFX[p_tileCnt * OFFSET_MULTIPLIER], 96*96/2 | COPY_MODE_HWORD);
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], 96 * 96 / 2 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], 96 * 96 / 2 );
         }
         p_tileCnt += 64;
 
@@ -251,12 +252,12 @@ namespace FS {
 
         ++p_palCnt;
         if( p_bottom )
-            updateOAMSub( p_oam );
+            IO::updateOAMSub( p_oam );
         else
-            updateOAM( p_oam );
+            IO::updateOAM( p_oam );
         return true;
     }
-    bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnId, const u16 p_posX,
+    bool loadPKMNSpriteTop( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnId, const u16 p_posX,
                             const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx ) {
 
         if( !p_female )
@@ -290,11 +291,11 @@ namespace FS {
             fclose( fd );
         }
         if( p_bottom )
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[ ( ++p_palCnt ) * COLORS_PER_PALETTE ], 32 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[ ( ++p_palCnt ) * IO::COLORS_PER_PALETTE ], 32 );
         else
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ ( ++p_palCnt ) * COLORS_PER_PALETTE ], 32 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ ( ++p_palCnt ) * IO::COLORS_PER_PALETTE ], 32 );
 
-        SpriteInfo * backInfo = &p_spriteInfo[ ++p_oamIndex ];
+        IO::SpriteInfo * backInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry * back = &p_oam->oamBuffer[ p_oamIndex ];
         backInfo->m_oamId = p_oamIndex;
         backInfo->m_width = 64;
@@ -315,9 +316,9 @@ namespace FS {
         back->priority = OBJPRIORITY_0;
         back->palette = p_palCnt;
         if( p_bottom )
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[ p_tileCnt * OFFSET_MULTIPLIER ], 96 * 96 / 2 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[ p_tileCnt * IO::OFFSET_MULTIPLIER ], 96 * 96 / 2 );
         else
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], 96 * 96 / 2 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], 96 * 96 / 2 );
         p_tileCnt += 64;
 
         backInfo = &p_spriteInfo[ ++p_oamIndex ];
@@ -344,13 +345,13 @@ namespace FS {
 
         ++p_palCnt;
         if( p_bottom )
-            updateOAMSub( p_oam );
+            IO::updateOAMSub( p_oam );
         else
-            updateOAM( p_oam );
+            IO::updateOAM( p_oam );
         return true;
     }
 
-    bool loadTrainerSprite( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_posX,
+    bool loadTrainerSprite( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_posX,
                             const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_bottom, bool p_flipx ) {
         //char buffer[100];
 
@@ -371,11 +372,11 @@ namespace FS {
         fclose( fd );
 
         if( p_bottom )
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[ ( ++p_palCnt ) * COLORS_PER_PALETTE ], 32 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[ ( ++p_palCnt ) * IO::COLORS_PER_PALETTE ], 32 );
         else
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ ( ++p_palCnt ) * COLORS_PER_PALETTE ], 32 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ ( ++p_palCnt ) * IO::COLORS_PER_PALETTE ], 32 );
 
-        SpriteInfo * backInfo = &p_spriteInfo[ ++p_oamIndex ];
+        IO::SpriteInfo * backInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry * back = &p_oam->oamBuffer[ p_oamIndex ];
         backInfo->m_oamId = p_oamIndex;
         backInfo->m_width = 64;
@@ -396,9 +397,9 @@ namespace FS {
         back->priority = OBJPRIORITY_0;
         back->palette = p_palCnt;
         if( p_bottom )
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[ p_tileCnt * OFFSET_MULTIPLIER ], 96 * 96 / 2 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[ p_tileCnt * IO::OFFSET_MULTIPLIER ], 96 * 96 / 2 );
         else
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], 96 * 96 / 2 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], 96 * 96 / 2 );
         p_tileCnt += 64;
 
         backInfo = &p_spriteInfo[ ++p_oamIndex ];
@@ -469,12 +470,12 @@ namespace FS {
 
         ++p_palCnt;
         if( p_bottom )
-            updateOAMSub( p_oam );
+            IO::updateOAMSub( p_oam );
         else
-            updateOAM( p_oam );
+            IO::updateOAM( p_oam );
         return true;
     }
-    bool loadPKMNSpriteTop( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_posX,
+    bool loadPKMNSpriteTop( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_posX,
                             const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_bottom, bool p_flipx ) {
 
         sprintf( buffer, "%sSprite_%s.raw", p_path, p_name );
@@ -494,11 +495,11 @@ namespace FS {
         fclose( fd );
 
         if( p_bottom )
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[ ( ++p_palCnt ) * COLORS_PER_PALETTE ], 32 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[ ( ++p_palCnt ) * IO::COLORS_PER_PALETTE ], 32 );
         else
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ ( ++p_palCnt ) * COLORS_PER_PALETTE ], 32 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ ( ++p_palCnt ) * IO::COLORS_PER_PALETTE ], 32 );
 
-        SpriteInfo * backInfo = &p_spriteInfo[ ++p_oamIndex ];
+        IO::SpriteInfo * backInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry * back = &p_oam->oamBuffer[ p_oamIndex ];
         backInfo->m_oamId = p_oamIndex;
         backInfo->m_width = 64;
@@ -519,9 +520,9 @@ namespace FS {
         back->priority = OBJPRIORITY_0;
         back->palette = p_palCnt;
         if( p_bottom )
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[ p_tileCnt * OFFSET_MULTIPLIER ], 96 * 96 / 2 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[ p_tileCnt * IO::OFFSET_MULTIPLIER ], 96 * 96 / 2 );
         else
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], 96 * 96 / 2 );
+            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], 96 * 96 / 2 );
         p_tileCnt += 64;
 
         backInfo = &p_spriteInfo[ ++p_oamIndex ];
@@ -548,9 +549,9 @@ namespace FS {
 
         ++p_palCnt;
         if( p_bottom )
-            updateOAMSub( p_oam );
+            IO::updateOAMSub( p_oam );
         else
-            updateOAM( p_oam );
+            IO::updateOAM( p_oam );
         return true;
     }
 
@@ -627,10 +628,10 @@ namespace FS {
     }
 
 
-    void drawPKMNIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16& p_pkmnId, const u16 p_posX, const u16 p_posY,
+    void drawPKMNIcon( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const u16& p_pkmnId, const u16 p_posX, const u16 p_posY,
                        u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen ) {
 
-        SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
+        IO::SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
         ItemInfo->m_oamId = p_oamIndex;
         ItemInfo->m_width = ItemInfo->m_height = 32;
@@ -653,33 +654,33 @@ namespace FS {
         sprintf( buffer, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
         if( p_subScreen ) {
             if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/PKMN/", buffer, 128, 16 ) ) {
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemPal,
                                   &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
                                   32 );
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemTiles,
-                                  &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ],
                                   NoItemTilesLen );
             }
         } else {
             if( !FS::loadSprite( ItemInfo, "nitro:/PICS/SPRITES/PKMN/", buffer, 128, 16 ) ) {
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemPal,
                                   &SPRITE_PALETTE[ p_palCnt * 16 ],
                                   32 );
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemTiles,
-                                  &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex *IO::OFFSET_MULTIPLIER ],
                                   NoItemTilesLen );
             }
         }
         p_tileCnt += 512 / 32;
         ++p_palCnt;
     }
-    void drawEggIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const u16 p_posX, const u16 p_posY,
+    void drawEggIcon( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const u16 p_posX, const u16 p_posY,
                       u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen ) {
-        SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
+        IO::SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
         ItemInfo->m_oamId = p_oamIndex;
         ItemInfo->m_width = ItemInfo->m_height = 32;
@@ -702,33 +703,33 @@ namespace FS {
         sprintf( buffer, "Icon_egg" );
         if( p_subScreen ) {
             if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/ICONS/", buffer, 128, 16 ) ) {
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemPal,
                                   &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
                                   32 );
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemTiles,
-                                  &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ],
                                   NoItemTilesLen );
             }
         } else {
             if( !FS::loadSprite( ItemInfo, "nitro:/PICS/ICONS/", buffer, 128, 16 ) ) {
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemPal,
                                   &SPRITE_PALETTE[ p_palCnt * 16 ],
                                   32 );
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemTiles,
-                                  &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ],
                                   NoItemTilesLen );
             }
         }
         p_tileCnt += 512 / 32;
         ++p_palCnt;
     }
-    void drawItemIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY,
+    void drawItemIcon( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY,
                        u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen ) {
-        SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
+        IO::SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
         ItemInfo->m_oamId = p_oamIndex;
         ItemInfo->m_width = ItemInfo->m_height = 32;
@@ -748,24 +749,24 @@ namespace FS {
         Item->y = p_posY;
         if( p_subScreen ) {
             if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemPal,
                                   &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
                                   32 );
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemTiles,
-                                  &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ],
                                   NoItemTilesLen );
             }
         } else {
             if( !FS::loadSprite( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemPal,
                                   &SPRITE_PALETTE[ p_palCnt * 16 ],
                                   32 );
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemTiles,
-                                  &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ],
                                   NoItemTilesLen );
             }
         }
@@ -773,9 +774,9 @@ namespace FS {
         ++p_palCnt;
     }
 
-    void drawTMIcon( OAMTable* p_oam, SpriteInfo* p_spriteInfo, Type p_type, bool p_hm, const u16 p_posX, const u16 p_posY,
+    void drawTMIcon( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, Type p_type, bool p_hm, const u16 p_posX, const u16 p_posY,
                      u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen ) {
-        SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
+        IO::SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
         ItemInfo->m_oamId = p_oamIndex;
         ItemInfo->m_width = ItemInfo->m_height = 32;
@@ -801,24 +802,24 @@ namespace FS {
 
         if( p_subScreen ) {
             if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", itemName.c_str( ), 128, 16 ) ) {
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemPal,
                                   &SPRITE_PALETTE_SUB[ p_palCnt * 16 ],
                                   32 );
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemTiles,
-                                  &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ],
                                   NoItemTilesLen );
             }
         } else {
             if( !FS::loadSprite( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", itemName.c_str( ), 128, 16 ) ) {
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemPal,
                                   &SPRITE_PALETTE[ p_palCnt * 16 ],
                                   32 );
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL,
                                   NoItemTiles,
-                                  &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ],
+                                  &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ],
                                   NoItemTilesLen );
             }
         }
@@ -826,10 +827,10 @@ namespace FS {
         ++p_palCnt;
     }
 
-    void drawItem( OAMTable* p_oam, SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY, const u16 p_itemCount,
+    void drawItem( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY, const u16 p_itemCount,
                    u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen, bool p_showItemCount ) {
 
-        SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
+        IO::SpriteInfo *ItemInfo = &p_spriteInfo[ ++p_oamIndex ];
         SpriteEntry *Item = &p_oam->oamBuffer[ p_oamIndex ];
         ItemInfo->m_oamId = p_oamIndex;
         ItemInfo->m_width = ItemInfo->m_height = 32;
@@ -853,25 +854,25 @@ namespace FS {
         Item->palette = p_palCnt;
         if( p_subScreen ) {
             if( !FS::loadSpriteSub( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, NoItemPal, &SPRITE_PALETTE_SUB[ p_palCnt * 16 ], 32 );
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, NoItemTiles, &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ], NoItemTilesLen );
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, NoItemPal, &SPRITE_PALETTE_SUB[ p_palCnt * 16 ], 32 );
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, NoItemTiles, &SPRITE_GFX_SUB[ ItemInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ], NoItemTilesLen );
             }
         } else {
             if( !FS::loadSprite( ItemInfo, "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), 128, 16 ) ) {
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, NoItemPal, &SPRITE_PALETTE[ p_palCnt * 16 ], 32 );
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, NoItemTiles, &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * OFFSET_MULTIPLIER ], NoItemTilesLen );
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, NoItemPal, &SPRITE_PALETTE[ p_palCnt * 16 ], 32 );
+                dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, NoItemTiles, &SPRITE_GFX[ ItemInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ], NoItemTilesLen );
             }
         }
         p_tileCnt += p_spriteInfo->m_height * p_spriteInfo->m_width / 32;
         ++p_palCnt;
         if( p_subScreen ) {
-            updateOAMSub( p_oam );
-            consoleSelect( &Bottom );
-            consoleSetWindow( &Bottom, ( p_posX + 10 ) / 8, ( p_posY + 32 ) / 8, 3, 1 );
+            IO::updateOAMSub( p_oam );
+            consoleSelect( &IO::Bottom );
+            consoleSetWindow( &IO::Bottom, ( p_posX + 10 ) / 8, ( p_posY + 32 ) / 8, 3, 1 );
         } else {
-            updateOAM( p_oam );
-            consoleSelect( &Top );
-            consoleSetWindow( &Top, ( p_posX + 10 ) / 8, ( p_posY + 32 ) / 8, 3, 1 );
+            IO::updateOAM( p_oam );
+            consoleSelect( &IO::Top );
+            consoleSetWindow( &IO::Top, ( p_posX + 10 ) / 8, ( p_posY + 32 ) / 8, 3, 1 );
         }
         if( !p_showItemCount )
             printf( "%3i", p_itemCount );
@@ -1003,7 +1004,7 @@ namespace FS {
         return result;
     }
 
-    std::string breakString( const std::string& p_string, FONT::font p_font, u8 p_lineLength ) {
+    std::string breakString( const std::string& p_string, IO::font p_font, u8 p_lineLength ) {
         std::string result = "";
 
         u8 acLineLength = 0;
@@ -1056,632 +1057,560 @@ namespace FS {
     }
 }
 
-namespace POKEMON {
-    namespace PKMNDATA {
-        Type getType( u16 p_pkmnId, u16 p_type ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
+Type getType( u16 p_pkmnId, u16 p_type ) {
+    char pt[ 100 ];
+    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
 
-            if( f == 0 ) {
-                fclose( f );
-                return UNBEKANNT;
-            }
-            char buf[ 12 ];
-            fscanf( f, "%s", buf );
-            fclose( f );
-            return (Type)( buf[ p_type ] - 42 );
-        }
-        u16 getBase( u16 p_pkmnId, u16 p_base ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return 0;
-            }
-            char buf[ 12 ];
-            fscanf( f, "%s", buf );
-            fclose( f );
-            return (short)buf[ 2 + p_base ];
-        }
-        u16 getCatchRate( u16 p_pkmnId ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return 0;
-            }
-            for( int i = 0; i < 8; ++i )
-                fgetc( f );
-            short buf; fscanf( f, "%hi", &buf );
-            fclose( f );
-            return buf;
-        }
-        const char* getDisplayName( u16 p_pkmnId ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return "???";
-            }
-            for( int i = 0; i < 8; ++i )
-                fgetc( f );
-            short buf; fscanf( f, "%hi", &buf );
-            fgetc( f );
-            std::string ret = FS::readString( f, true );
-            fclose( f );
-            return ret.c_str( );
-        }
-        const wchar_t* getWDisplayName( u16 p_pkmnId ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return L"???";
-            }
-            for( int i = 0; i < 8; ++i )
-                fgetc( f );
-            short buf; fscanf( f, "%hi", &buf );
-            fgetc( f );
-            std::wstring ret = FS::readWString( f );
-            fclose( f );
-            return ret.c_str( );
-        }
-        void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                wcscpy( p_name, L"???" );
-                return;
-            }
-            for( int i = 0; i < 8; ++i )
-                fgetc( f );
-            short buf; fscanf( f, "%hi", &buf );
-            fgetc( f );
-            std::wstring ret = FS::readWString( f );
-            fclose( f );
-            wcscpy( p_name, ret.c_str( ) );
-        }
-        void getHoldItems( u16 p_pkmnId, u16* p_items ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                p_items[ 0 ] = p_items[ 1 ] = p_items[ 2 ] = p_items[ 3 ] = 0;
-                return;
-            }
-            for( int i = 0; i < 8; ++i )
-                fgetc( f );
-            short buf; fscanf( f, "%hi", &buf );
-            fgetc( f );
-            FS::readString( f );
-            p_items[ 0 ] = p_items[ 1 ] = p_items[ 2 ] = p_items[ 3 ] = 0;
-            for( int i = 0; i < 4; ++i )
-                fscanf( f, "%hi", &p_items[ i ] );
-            fclose( f );
-            return;
-        }
-        pkmnGenderType getGenderType( u16 p_pkmnId ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return (pkmnGenderType)0;
-            }
-            for( int i = 0; i < 8; ++i )
-                fgetc( f );
-            short buf; fscanf( f, "%hi", &buf );
-            fgetc( f );
-            FS::readString( f );
-            for( int i = 0; i < 5; ++i )
-                fscanf( f, "%hi", &buf );
-            fclose( f );
-            return (pkmnGenderType)buf;
-        }
-        const char* getDexEntry( u16 p_pkmnId ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return "Keine Daten vorhanden.";
-            }
-            for( int i = 0; i < 2; ++i )
-                fgetc( f );
-            for( int i = 2; i < 8; ++i )
-                fgetc( f );
-            short s;
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            FS::readString( f );
-            for( int i = 0; i < 4; ++i )
-                fscanf( f, "%hi", &s );
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            for( int i = 0; i < 2; ++i )
-                fgetc( f );
-            fgetc( f );
-            fgetc( f );
-            for( int i = 0; i < 6; ++i )
-                fgetc( f );
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            std::string ret = FS::readString( f );
-            fclose( f );
-            return ret.c_str( );
-        }
-        u16 getForme( u16 p_pkmnId, u16 p_formeId, const char* p_retFormeName ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return p_pkmnId;
-            }
-            for( int i = 0; i < 2; ++i )
-                fgetc( f );
-            for( int i = 2; i < 8; ++i )
-                fgetc( f );
-            u16 s;
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            FS::readString( f );
-            for( int i = 0; i < 4; ++i )
-                fscanf( f, "%hi", &s );
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            for( int i = 0; i < 2; ++i )
-                fgetc( f );
-            fgetc( f );
-            fgetc( f );
-            for( int i = 0; i < 6; ++i )
-                fgetc( f );
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            FS::readString( f );
-            fscanf( f, "%hi", &s );
-            u16 d; std::string ret;
-            for( int i = 0; i <= std::min( s, p_formeId ); ++i ) {
-                fscanf( f, "%hi", &d ); ret = FS::readString( f );
-            }
-            //fscanf(f,"%hi",d); 
-            //ret = readString(f);
-            fclose( f );
-            p_retFormeName = ret.c_str( );
-            return d;
-        }
-        const char* getSpecies( u16 p_pkmnId ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return "UNBEKANNT";
-            }
-            for( int i = 0; i < 2; ++i )
-                fgetc( f );
-            for( int i = 2; i < 8; ++i )
-                fgetc( f );
-            short s;
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            FS::readString( f );
-            for( int i = 0; i < 4; ++i )
-                fscanf( f, "%hi", &s );
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            for( int i = 0; i < 2; ++i )
-                fgetc( f );
-            fgetc( f );
-            fgetc( f );
-            for( int i = 0; i < 6; ++i )
-                fgetc( f );
-            fscanf( f, "%hi", &s );
-            fgetc( f );
-            FS::readString( f );
-            fscanf( f, "%hi", &s );
-            short d; std::string ret2;
-            for( int i = 0; i < s; ++i ) {
-                fscanf( f, "%hi", &d ); FS::readString( f );
-            }
-            fscanf( f, " " );
-            ret2 = FS::readString( f, true );
-            fclose( f );
-            return ret2.c_str( );
-        }
-
-        void getAll( u16 p_pkmnId, pokemonData& p_out ) {
-            char pt[ 100 ];
-            sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-
-            if( f == 0 ) {
-                fclose( f );
-                return;
-            }
-            for( int i = 0; i < 2; ++i )
-                p_out.m_types[ i ] = (Type)( ( fgetc( f ) ) - 42 );
-            for( int i = 2; i < 8; ++i )
-                p_out.m_bases[ i - 2 ] = (short)fgetc( f );
-            fscanf( f, "%hi", &p_out.m_catchrate );
-            fgetc( f );
-            FS::readString( f );
-            for( int i = 0; i < 4; ++i )
-                fscanf( f, "%hi", &p_out.m_items[ i ] );
-            fscanf( f, "%hi", &p_out.m_gender );
-            fgetc( f );
-            for( int i = 0; i < 2; ++i )
-                p_out.m_eggT[ i ] = (pkmnEggType)( ( fgetc( f ) ) - 42 );
-            p_out.m_eggcyc = ( ( fgetc( f ) ) - 42 );
-            p_out.m_baseFriend = ( ( fgetc( f ) ) - 42 );
-            for( int i = 0; i < 6; ++i )
-                p_out.m_EVYield[ i ] = ( ( fgetc( f ) ) - 42 );
-            fscanf( f, "%hi", &p_out.m_EXPYield );
-            fgetc( f );
-            FS::readString( f );
-            fscanf( f, "%hi", &p_out.m_formecnt );
-            short d;
-            for( int i = 0; i < p_out.m_formecnt; ++i ) {
-                fscanf( f, "%hi", &d ); FS::readString( f );
-            }
-            fscanf( f, " " );
-            FS::readString( f, true );
-            fscanf( f, "%hi", &p_out.m_size );
-            fscanf( f, "%hi", &p_out.m_weight );
-            fscanf( f, "%hi", &p_out.m_expType );
-            for( int i = 0; i < 4; ++i )
-                fscanf( f, "%hu ", &p_out.m_abilities[ i ] );
-            for( int i = 0; i < 7; ++i )
-                for( int j = 0; j < 15; ++j )
-                    fscanf( f, "%hi ", &( p_out.m_evolutions[ i ].m_evolveData[ j ] ) );
-            fclose( f );
-            return;
-        }
-
-        void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount, u16* p_result ) {
-            sprintf( buffer, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( buffer, "r" );
-            if( !f )
-                return;
-
-            u16 rescnt = 0;
-
-            for( u8 i = 0; i < p_amount; ++i )
-                p_result[ i ] = 0;
-
-            if( p_fromLevel > p_toLevel ) {
-                std::vector<u16> reses;
-                for( u16 i = 0; i <= p_fromLevel; ++i ) {
-                    u16 z;
-                    fscanf( f, "%hd", &z );
-                    for( int j = 0; j < z; ++j ) {
-                        u16 g, h;
-                        fscanf( f, "%hd %hd", &g, &h );
-                        if( i >= p_toLevel && h == (u16)p_mode && g < MAXATTACK )
-                            reses.push_back( g );
-                    }
-                }
-                auto I = reses.rbegin( );
-                for( u16 i = 0; i < p_amount && I != reses.rend( ); ++i, ++I ) {
-                    for( u16 z = 0; z < i; ++z )
-                        if( *I == p_result[ z ] ) {
-                            --i;
-                            goto N;
-                        }
-                    p_result[ i ] = *I;
-N:
-                    ;
-                }
-                fclose( f );
-                return;
-            } else {
-                for( u16 i = 0; i <= p_toLevel; ++i ) {
-                    u16 z;
-                    fscanf( f, "%hd", &z );
-                    for( u16 j = 0; j < z; ++j ) {
-                        u16 g, h;
-                        fscanf( f, "%hd %hd", &g, &h );
-                        if( i >= p_fromLevel && h == p_mode && g < MAXATTACK ) {
-                            for( u16 z = 0; z < rescnt; ++z )
-                                if( g == p_result[ z ] )
-                                    goto NEXT;
-                            p_result[ rescnt ] = g;
-                            if( ++rescnt == p_amount )
-                                return;
-NEXT:
-                            ;
-                        }
-                    }
-                }
-            }
-            fclose( f );
-        }
-        bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
-            char pt[ 150 ];
-            sprintf( pt, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
-            FILE* f = fopen( pt, "r" );
-            if( !f )
-                return false;
-
-            for( int i = 0; i <= 100; ++i ) {
-                int z; fscanf( f, "%d", &z );
-                for( int j = 0; j < z; ++j ) {
-                    u16 g, h;
-                    fscanf( f, "%hd %hd", &g, &h );
-                    if( g == p_moveId && h == p_mode )
-                        return true;
-                }
-            }
-            return false;
-        }
-
-        u16 getColor( Type p_type ) {
-            switch( p_type ) {
-                case NORMAL:
-                    return NORMAL_;
-                    break;
-                case KAMPF:
-                    return RED;
-                    break;
-                case FLUG:
-                    return TURQOISE;
-                    break;
-                case GIFT:
-                    return POISON;
-                    break;
-                case BODEN:
-                    return GROUND;
-                    break;
-                case GESTEIN:
-                    return ROCK;
-                    break;
-                case KAEFER:
-                    return BUG;
-                    break;
-                case GEIST:
-                    return GHOST;
-                    break;
-                case STAHL:
-                    return STEEL;
-                    break;
-                case UNBEKANNT:
-                    return UNKNOWN;
-                    break;
-                case WASSER:
-                    return BLUE;
-                    break;
-                case FEUER:
-                    return ORANGE;
-                    break;
-                case PFLANZE:
-                    return GREEN;
-                    break;
-                case ELEKTRO:
-                    return YELLOW;
-                    break;
-                case PSYCHO:
-                    return PURPLE;
-                    break;
-                case EIS:
-                    return ICE;
-                    break;
-                case DRACHE:
-                    return DRAGON;
-                    break;
-                case UNLICHT:
-                    return BLACK;
-                    break;
-                case FEE:
-                    return FAIRY;
-                    break;
-                default:
-                    return DRAGON;
-                    break;
-            }
-            return WHITE;
-        }
+    if( f == 0 ) {
+        fclose( f );
+        return UNBEKANNT;
     }
+    char buf[ 12 ];
+    fscanf( f, "%s", buf );
+    fclose( f );
+    return (Type)( buf[ p_type ] - 42 );
 }
+u16 getBase( u16 p_pkmnId, u16 p_base ) {
+    char pt[ 100 ];
+    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
 
-namespace ITEMS {
-    u16 item::getItemId( ) {
-        for( int i = 0; i < 700; ++i )
-            if( ItemList[ i ]->m_itemName == m_itemName )
-                return i;
+    if( f == 0 ) {
+        fclose( f );
         return 0;
     }
+    char buf[ 12 ];
+    fscanf( f, "%s", buf );
+    fclose( f );
+    return (short)buf[ 2 + p_base ];
+}
+u16 getCatchRate( u16 p_pkmnId ) {
+    char pt[ 100 ];
+    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
 
-    bool item::load( ) {
-        //    std::stringstream FILENAME;
-        //    FILENAME << ITEM_PATH << Name << ".data";
-        //    FILE* f = fopen(FILENAME.str().c_str(),"r");
-        //    if(f == 0)
-        //        return false;
-        //    //itemtype = GOODS;
-        //    int ac;
-        //    fscanf(f,"%i",&ac);
-        //    effekt = item::EFFEKT(ac);
-        //    fscanf(f,"%i\n",&(price));
-        //    displayName = readString(f);
-        //    dscrpt = readString(f);
-        //    effekt_script = readString(f);
-        //    fclose(f);
-        return m_loaded = true;
-    }
-
-    bool berry::load( ) {
-        sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-        FILE* f = fopen( buffer, "r" );
-
-        if( f == 0 )
-            return m_loaded = false;
-        //itemtype = BERRIES;
-        int ac;
-        fscanf( f, "%i", &ac );
-        //effekt = item::EFFEKT(ac);
-        //fscanf(f,"%i\n",&(price));
-        fscanf( f, "%i", &ac );
-        /*displayName = */FS::readString( f, false );
-        /*dscrpt = "  "+ */FS::readString( f, false );
-        /*effekt_script = */FS::readString( f, false );
-
-        fscanf( f, "%hi", &( m_berrySize ) );
-
-        fscanf( f, "%i", &ac );
-        m_berryGuete = berry::berryGueteType( ac );
-
-        fscanf( f, "%i", &ac );
-        m_naturalGiftType = Type( ac );
-
-        fscanf( f, "%hhu", &( m_naturalGiftStrength ) );
-
-        for( int i = 0; i < 5; ++i )
-            fscanf( f, "%hhu", &( m_berryTaste[ i ] ) );
-
-        fscanf( f, "%hhu", &( m_hoursPerGrowthStage ) );
-
-        fscanf( f, "%hhu", &( m_minBerries ) );
-
-        fscanf( f, "%hhu\n", &( m_maxBerries ) );
-
+    if( f == 0 ) {
         fclose( f );
-        return m_loaded = true;
+        return 0;
     }
+    for( int i = 0; i < 8; ++i )
+        fgetc( f );
+    short buf; fscanf( f, "%hi", &buf );
+    fclose( f );
+    return buf;
+}
+const char* getDisplayName( u16 p_pkmnId ) {
+    char pt[ 100 ];
+    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
 
-    std::string item::getDescription( bool p_new ) {
-        sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-        FILE* f = fopen( buffer, "r" );
-        if( f == 0 )
-            return "Keine Daten.";
-        int ac;
-        fscanf( f, "%i", &ac );
-        fscanf( f, "%i\n", &ac );
-        std::string s = FS::readString( f, p_new );
-        s = FS::readString( f, p_new );
+    if( f == 0 ) {
         fclose( f );
-        return s;
+        return "???";
     }
+    for( int i = 0; i < 8; ++i )
+        fgetc( f );
+    short buf; fscanf( f, "%hi", &buf );
+    fgetc( f );
+    std::string ret = FS::readString( f, true );
+    fclose( f );
+    return ret.c_str( );
+}
+const wchar_t* getWDisplayName( u16 p_pkmnId ) {
+    char pt[ 100 ];
+    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
 
-    std::string item::getDisplayName( bool p_new ) {
-        sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-        FILE* f = fopen( buffer, "r" );
-        if( f == 0 )
-            return m_itemName;
-        int ac;
-        fscanf( f, "%i", &ac );
-        fscanf( f, "%i\n", &ac );
-        std::string s = FS::readString( f, p_new );
+    if( f == 0 ) {
         fclose( f );
-        return s;
+        return L"???";
     }
+    for( int i = 0; i < 8; ++i )
+        fgetc( f );
+    short buf; fscanf( f, "%hi", &buf );
+    fgetc( f );
+    std::wstring ret = FS::readWString( f );
+    fclose( f );
+    return ret.c_str( );
+}
+void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
+    char pt[ 100 ];
+    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
 
-    item::itemEffectType item::getEffectType( ) {
-        sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-        FILE* f = fopen( buffer, "r" );
-        if( f == 0 )
-            return ( item::itemEffectType::NONE );
-        int ac;
-        fscanf( f, "%i", &ac );
+    if( f == 0 ) {
         fclose( f );
-        return ( item::itemEffectType )ac;
+        wcscpy( p_name, L"???" );
+        return;
     }
+    for( int i = 0; i < 8; ++i )
+        fgetc( f );
+    short buf; fscanf( f, "%hi", &buf );
+    fgetc( f );
+    std::wstring ret = FS::readWString( f );
+    fclose( f );
+    wcscpy( p_name, ret.c_str( ) );
+}
+void getHoldItems( u16 p_pkmnId, u16* p_items ) {
+    char pt[ 100 ];
+    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
 
-    item::itemType item::getItemType( ) {
-        return m_itemType;
-    }
-
-    u32 item::getPrice( ) {
-        sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-        FILE* f = fopen( buffer, "r" );
-        if( f == 0 )
-            return 0;
-        int ac;
-        fscanf( f, "%i", &ac );
-        fscanf( f, "%i\n", &ac );
+    if( f == 0 ) {
         fclose( f );
-        return ac;
+        p_items[ 0 ] = p_items[ 1 ] = p_items[ 2 ] = p_items[ 3 ] = 0;
+        return;
     }
+    for( int i = 0; i < 8; ++i )
+        fgetc( f );
+    short buf; fscanf( f, "%hi", &buf );
+    fgetc( f );
+    FS::readString( f );
+    p_items[ 0 ] = p_items[ 1 ] = p_items[ 2 ] = p_items[ 3 ] = 0;
+    for( int i = 0; i < 4; ++i )
+        fscanf( f, "%hi", &p_items[ i ] );
+    fclose( f );
+    return;
+}
+pkmnGenderType getGenderType( u16 p_pkmnId ) {
+    char pt[ 100 ];
+    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
 
-    std::string berry::getDescription2( bool p_new ) {
-        sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-        FILE* f = fopen( buffer, "r" );
-        if( f == 0 )
-            return "Keine Daten.";
-        //itemtype = BERRIES;
-        int ac;
-        fscanf( f, "%i", &ac );
-        //effekt = item::EFFEKT(ac);
-        //fscanf(f,"%i\n",&(price));
-        fscanf( f, "%i", &ac );
-        /*displayName = */FS::readString( f, p_new );
-        /*dscrpt = "  "+ */FS::readString( f, p_new );
-        /*effekt_script = */FS::readString( f, p_new );
+    if( f == 0 ) {
+        fclose( f );
+        return (pkmnGenderType)0;
+    }
+    for( int i = 0; i < 8; ++i )
+        fgetc( f );
+    short buf; fscanf( f, "%hi", &buf );
+    fgetc( f );
+    FS::readString( f );
+    for( int i = 0; i < 5; ++i )
+        fscanf( f, "%hi", &buf );
+    fclose( f );
+    return (pkmnGenderType)buf;
+}
+const char* getDexEntry( u16 p_pkmnId ) {
+    char pt[ 100 ];
+    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
 
-        fscanf( f, "%hi", &( ac ) );
-        fscanf( f, "%i", &ac );
-        //Guete = berry::Guete_Type(ac);
-        fscanf( f, "%i", &ac );
-        //BeerenKr_Type = Type(ac);
+    if( f == 0 ) {
+        fclose( f );
+        return "Keine Daten vorhanden.";
+    }
+    for( int i = 0; i < 2; ++i )
+        fgetc( f );
+    for( int i = 2; i < 8; ++i )
+        fgetc( f );
+    short s;
+    fscanf( f, "%hi", &s );
+    fgetc( f );
+    FS::readString( f );
+    for( int i = 0; i < 4; ++i )
+        fscanf( f, "%hi", &s );
+    fscanf( f, "%hi", &s );
+    fgetc( f );
+    for( int i = 0; i < 2; ++i )
+        fgetc( f );
+    fgetc( f );
+    fgetc( f );
+    for( int i = 0; i < 6; ++i )
+        fgetc( f );
+    fscanf( f, "%hi", &s );
+    fgetc( f );
+    std::string ret = FS::readString( f );
+    fclose( f );
+    return ret.c_str( );
+}
+u16 getForme( u16 p_pkmnId, u16 p_formeId, const char* p_retFormeName ) {
+    char pt[ 100 ];
+    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
+
+    if( f == 0 ) {
+        fclose( f );
+        return p_pkmnId;
+    }
+    for( int i = 0; i < 2; ++i )
+        fgetc( f );
+    for( int i = 2; i < 8; ++i )
+        fgetc( f );
+    u16 s;
+    fscanf( f, "%hi", &s );
+    fgetc( f );
+    FS::readString( f );
+    for( int i = 0; i < 4; ++i )
+        fscanf( f, "%hi", &s );
+    fscanf( f, "%hi", &s );
+    fgetc( f );
+    for( int i = 0; i < 2; ++i )
+        fgetc( f );
+    fgetc( f );
+    fgetc( f );
+    for( int i = 0; i < 6; ++i )
+        fgetc( f );
+    fscanf( f, "%hi", &s );
+    fgetc( f );
+    FS::readString( f );
+    fscanf( f, "%hi", &s );
+    u16 d; std::string ret;
+    for( int i = 0; i <= std::min( s, p_formeId ); ++i ) {
+        fscanf( f, "%hi", &d ); ret = FS::readString( f );
+    }
+    //fscanf(f,"%hi",d); 
+    //ret = readString(f);
+    fclose( f );
+    p_retFormeName = ret.c_str( );
+    return d;
+}
+const char* getSpecies( u16 p_pkmnId ) {
+    char pt[ 100 ];
+    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
+
+    if( f == 0 ) {
+        fclose( f );
+        return "UNBEKANNT";
+    }
+    for( int i = 0; i < 2; ++i )
+        fgetc( f );
+    for( int i = 2; i < 8; ++i )
+        fgetc( f );
+    short s;
+    fscanf( f, "%hi", &s );
+    fgetc( f );
+    FS::readString( f );
+    for( int i = 0; i < 4; ++i )
+        fscanf( f, "%hi", &s );
+    fscanf( f, "%hi", &s );
+    fgetc( f );
+    for( int i = 0; i < 2; ++i )
+        fgetc( f );
+    fgetc( f );
+    fgetc( f );
+    for( int i = 0; i < 6; ++i )
+        fgetc( f );
+    fscanf( f, "%hi", &s );
+    fgetc( f );
+    FS::readString( f );
+    fscanf( f, "%hi", &s );
+    short d; std::string ret2;
+    for( int i = 0; i < s; ++i ) {
+        fscanf( f, "%hi", &d ); FS::readString( f );
+    }
+    fscanf( f, " " );
+    ret2 = FS::readString( f, true );
+    fclose( f );
+    return ret2.c_str( );
+}
+
+void getAll( u16 p_pkmnId, pokemonData& p_out ) {
+    char pt[ 100 ];
+    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
+
+    if( f == 0 ) {
+        fclose( f );
+        return;
+    }
+    for( int i = 0; i < 2; ++i )
+        p_out.m_types[ i ] = (Type)( ( fgetc( f ) ) - 42 );
+    for( int i = 2; i < 8; ++i )
+        p_out.m_bases[ i - 2 ] = (short)fgetc( f );
+    fscanf( f, "%hi", &p_out.m_catchrate );
+    fgetc( f );
+    FS::readString( f );
+    for( int i = 0; i < 4; ++i )
+        fscanf( f, "%hi", &p_out.m_items[ i ] );
+    fscanf( f, "%hi", &p_out.m_gender );
+    fgetc( f );
+    for( int i = 0; i < 2; ++i )
+        p_out.m_eggT[ i ] = (pkmnEggType)( ( fgetc( f ) ) - 42 );
+    p_out.m_eggcyc = ( ( fgetc( f ) ) - 42 );
+    p_out.m_baseFriend = ( ( fgetc( f ) ) - 42 );
+    for( int i = 0; i < 6; ++i )
+        p_out.m_EVYield[ i ] = ( ( fgetc( f ) ) - 42 );
+    fscanf( f, "%hi", &p_out.m_EXPYield );
+    fgetc( f );
+    FS::readString( f );
+    fscanf( f, "%hi", &p_out.m_formecnt );
+    short d;
+    for( int i = 0; i < p_out.m_formecnt; ++i ) {
+        fscanf( f, "%hi", &d ); FS::readString( f );
+    }
+    fscanf( f, " " );
+    FS::readString( f, true );
+    fscanf( f, "%hi", &p_out.m_size );
+    fscanf( f, "%hi", &p_out.m_weight );
+    fscanf( f, "%hi", &p_out.m_expType );
+    for( int i = 0; i < 4; ++i )
+        fscanf( f, "%hu ", &p_out.m_abilities[ i ] );
+    for( int i = 0; i < 7; ++i )
+        for( int j = 0; j < 15; ++j )
+            fscanf( f, "%hi ", &( p_out.m_evolutions[ i ].m_evolveData[ j ] ) );
+    fclose( f );
+    return;
+}
+
+void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount, u16* p_result ) {
+    sprintf( buffer, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( buffer, "r" );
+    if( !f )
+        return;
+
+    u16 rescnt = 0;
+
+    for( u8 i = 0; i < p_amount; ++i )
+        p_result[ i ] = 0;
+
+    if( p_fromLevel > p_toLevel ) {
+        std::vector<u16> reses;
+        for( u16 i = 0; i <= p_fromLevel; ++i ) {
+            u16 z;
+            fscanf( f, "%hd", &z );
+            for( int j = 0; j < z; ++j ) {
+                u16 g, h;
+                fscanf( f, "%hd %hd", &g, &h );
+                if( i >= p_toLevel && h == (u16)p_mode && g < MAXATTACK )
+                    reses.push_back( g );
+            }
+        }
+        auto I = reses.rbegin( );
+        for( u16 i = 0; i < p_amount && I != reses.rend( ); ++i, ++I ) {
+            for( u16 z = 0; z < i; ++z )
+                if( *I == p_result[ z ] ) {
+                    --i;
+                    goto N;
+                }
+            p_result[ i ] = *I;
+N:
+            ;
+        }
+        fclose( f );
+        return;
+    } else {
+        for( u16 i = 0; i <= p_toLevel; ++i ) {
+            u16 z;
+            fscanf( f, "%hd", &z );
+            for( u16 j = 0; j < z; ++j ) {
+                u16 g, h;
+                fscanf( f, "%hd %hd", &g, &h );
+                if( i >= p_fromLevel && h == p_mode && g < MAXATTACK ) {
+                    for( u16 z = 0; z < rescnt; ++z )
+                        if( g == p_result[ z ] )
+                            goto NEXT;
+                    p_result[ rescnt ] = g;
+                    if( ++rescnt == p_amount )
+                        return;
+NEXT:
+                    ;
+                }
+            }
+        }
+    }
+    fclose( f );
+}
+bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
+    char pt[ 150 ];
+    sprintf( pt, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
+    FILE* f = fopen( pt, "r" );
+    if( !f )
+        return false;
+
+    for( int i = 0; i <= 100; ++i ) {
+        int z; fscanf( f, "%d", &z );
+        for( int j = 0; j < z; ++j ) {
+            u16 g, h;
+            fscanf( f, "%hd %hd", &g, &h );
+            if( g == p_moveId && h == p_mode )
+                return true;
+        }
+    }
+    return false;
+}
+
+u16 item::getItemId( ) {
+    for( int i = 0; i < 700; ++i )
+        if( ItemList[ i ]->m_itemName == m_itemName )
+            return i;
+    return 0;
+}
+
+bool item::load( ) {
+    //    std::stringstream FILENAME;
+    //    FILENAME << ITEM_PATH << Name << ".data";
+    //    FILE* f = fopen(FILENAME.str().c_str(),"r");
+    //    if(f == 0)
+    //        return false;
+    //    //itemtype = GOODS;
+    //    int ac;
+    //    fscanf(f,"%i",&ac);
+    //    effekt = item::EFFEKT(ac);
+    //    fscanf(f,"%i\n",&(price));
+    //    displayName = readString(f);
+    //    dscrpt = readString(f);
+    //    effekt_script = readString(f);
+    //    fclose(f);
+    return m_loaded = true;
+}
+
+bool berry::load( ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+
+    if( f == 0 )
+        return m_loaded = false;
+    //itemtype = BERRIES;
+    int ac;
+    fscanf( f, "%i", &ac );
+    //effekt = item::EFFEKT(ac);
+    //fscanf(f,"%i\n",&(price));
+    fscanf( f, "%i", &ac );
+    /*displayName = */FS::readString( f, false );
+    /*dscrpt = "  "+ */FS::readString( f, false );
+    /*effekt_script = */FS::readString( f, false );
+
+    fscanf( f, "%hi", &( m_berrySize ) );
+
+    fscanf( f, "%i", &ac );
+    m_berryGuete = berry::berryGueteType( ac );
+
+    fscanf( f, "%i", &ac );
+    m_naturalGiftType = Type( ac );
+
+    fscanf( f, "%hhu", &( m_naturalGiftStrength ) );
+
+    for( int i = 0; i < 5; ++i )
+        fscanf( f, "%hhu", &( m_berryTaste[ i ] ) );
+
+    fscanf( f, "%hhu", &( m_hoursPerGrowthStage ) );
+
+    fscanf( f, "%hhu", &( m_minBerries ) );
+
+    fscanf( f, "%hhu\n", &( m_maxBerries ) );
+
+    fclose( f );
+    return m_loaded = true;
+}
+
+std::string item::getDescription( bool p_new ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
+        return "Keine Daten.";
+    int ac;
+    fscanf( f, "%i", &ac );
+    fscanf( f, "%i\n", &ac );
+    std::string s = FS::readString( f, p_new );
+    s = FS::readString( f, p_new );
+    fclose( f );
+    return s;
+}
+
+std::string item::getDisplayName( bool p_new ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
+        return m_itemName;
+    int ac;
+    fscanf( f, "%i", &ac );
+    fscanf( f, "%i\n", &ac );
+    std::string s = FS::readString( f, p_new );
+    fclose( f );
+    return s;
+}
+
+item::itemEffectType item::getEffectType( ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
+        return ( item::itemEffectType::NONE );
+    int ac;
+    fscanf( f, "%i", &ac );
+    fclose( f );
+    return ( item::itemEffectType )ac;
+}
+
+item::itemType item::getItemType( ) {
+    return m_itemType;
+}
+
+u32 item::getPrice( ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
+        return 0;
+    int ac;
+    fscanf( f, "%i", &ac );
+    fscanf( f, "%i\n", &ac );
+    fclose( f );
+    return ac;
+}
+
+std::string berry::getDescription2( bool p_new ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
+        return "Keine Daten.";
+    //itemtype = BERRIES;
+    int ac;
+    fscanf( f, "%i", &ac );
+    //effekt = item::EFFEKT(ac);
+    //fscanf(f,"%i\n",&(price));
+    fscanf( f, "%i", &ac );
+    /*displayName = */FS::readString( f, p_new );
+    /*dscrpt = "  "+ */FS::readString( f, p_new );
+    /*effekt_script = */FS::readString( f, p_new );
+
+    fscanf( f, "%hi", &( ac ) );
+    fscanf( f, "%i", &ac );
+    //Guete = berry::Guete_Type(ac);
+    fscanf( f, "%i", &ac );
+    //BeerenKr_Type = Type(ac);
+    fscanf( f, "%hhu", &( ac ) );
+    for( int i = 0; i < 5; ++i )
         fscanf( f, "%hhu", &( ac ) );
-        for( int i = 0; i < 5; ++i )
-            fscanf( f, "%hhu", &( ac ) );
-        fscanf( f, "%hhu", &( ac ) );
-        fscanf( f, "%hhu", &( ac ) );
-        fscanf( f, "%hhu\n", &( ac ) );
+    fscanf( f, "%hhu", &( ac ) );
+    fscanf( f, "%hhu", &( ac ) );
+    fscanf( f, "%hhu\n", &( ac ) );
 
-        std::string s = FS::readString( f, p_new );
-        fclose( f );
-        return s;
-    }
+    std::string s = FS::readString( f, p_new );
+    fclose( f );
+    return s;
+}
 
-    std::string item::getShortDescription( bool p_new ) {
-        sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-        FILE* f = fopen( buffer, "r" );
-        if( f == 0 )
-            return "Keine Daten.";
-        int ac;
-        fscanf( f, "%i", &ac );
-        //effekt = item::EFFEKT(ac);
-        //fscanf(f,"%i\n",&(price));
-        fscanf( f, "%i", &ac );
-        /*displayName = */FS::readString( f, p_new );
-        /*dscrpt = "  "+ */FS::readString( f, p_new );
-        /*effekt_script = */FS::readString( f, p_new );
+std::string item::getShortDescription( bool p_new ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
+        return "Keine Daten.";
+    int ac;
+    fscanf( f, "%i", &ac );
+    //effekt = item::EFFEKT(ac);
+    //fscanf(f,"%i\n",&(price));
+    fscanf( f, "%i", &ac );
+    /*displayName = */FS::readString( f, p_new );
+    /*dscrpt = "  "+ */FS::readString( f, p_new );
+    /*effekt_script = */FS::readString( f, p_new );
 
-        if( fscanf( f, "%hi", &( ac ) ) == EOF )
-            return "Keine Daten.";
-        fscanf( f, "%i", &ac );
-        //Guete = berry::Guete_Type(ac);
-        fscanf( f, "%i", &ac );
-        //BeerenKr_Type = Type(ac);
+    if( fscanf( f, "%hi", &( ac ) ) == EOF )
+        return "Keine Daten.";
+    fscanf( f, "%i", &ac );
+    //Guete = berry::Guete_Type(ac);
+    fscanf( f, "%i", &ac );
+    //BeerenKr_Type = Type(ac);
+    fscanf( f, "%hhu", &( ac ) );
+    for( int i = 0; i < 5; ++i )
         fscanf( f, "%hhu", &( ac ) );
-        for( int i = 0; i < 5; ++i )
-            fscanf( f, "%hhu", &( ac ) );
-        fscanf( f, "%hhu", &( ac ) );
-        fscanf( f, "%hhu", &( ac ) );
-        fscanf( f, "%hhu\n", &( ac ) );
+    fscanf( f, "%hhu", &( ac ) );
+    fscanf( f, "%hhu", &( ac ) );
+    fscanf( f, "%hhu\n", &( ac ) );
 
-        FS::readString( f, p_new );
-        std::string s = FS::readString( f, p_new );
-        fclose( f );
-        return s;
-    }
+    FS::readString( f, p_new );
+    std::string s = FS::readString( f, p_new );
+    fclose( f );
+    return s;
 }
