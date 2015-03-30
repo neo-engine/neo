@@ -34,16 +34,14 @@ namespace IO {
 #define MAXKEYBOARDS 3
     class keyboard {
     public:
-        keyboard( )
-            : _ind( 0 ) { }
+        keyboard( );
 
-        std::wstring getText( u16 p_length, const char* p_msg = 0, bool p_time = true );
+        std::wstring getText( u16 p_length, const char* p_msg = 0, bool p_time = true, bool p_timeParameter = false );
 
     private:
-        int _ind;
-        std::map<std::pair<int, int>, char> _chars;
+        u8 _ind;
+        std::map<std::pair<u8, std::pair<u16, u16>>, wchar_t> _chars;
 
-        void draw( );
-        void undraw( );
+        void draw( const char* p_msg, std::wstring& p_currSel, u16 p_length );
     };
 }

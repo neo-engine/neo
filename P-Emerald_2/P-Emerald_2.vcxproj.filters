@@ -269,11 +269,11 @@
     <ClCompile Include="arm9\source\io\uio.cpp">
       <Filter>Source Files\arm9\io</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\io\yesNoBox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\io\choiceBox.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\arm9\io</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\io\yesNoBox.cpp">
+      <Filter>Source Files\arm9\io</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
