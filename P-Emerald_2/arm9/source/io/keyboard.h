@@ -30,20 +30,20 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <string>
 #include <map>
 
-extern PrintConsole Bottom;
+namespace IO {
 #define MAXKEYBOARDS 3
-extern void updateTime( s8 );
-class keyboard {
-public:
-    keyboard( )
-        : _ind( 0 ) { }
+    class keyboard {
+    public:
+        keyboard( )
+            : _ind( 0 ) { }
 
-    std::wstring getText( u16 p_length, const char* p_msg = 0, bool p_time = true );
+        std::wstring getText( u16 p_length, const char* p_msg = 0, bool p_time = true );
 
-private:
-    int _ind;
-    std::map<std::pair<int, int>, char> _chars;
+    private:
+        int _ind;
+        std::map<std::pair<int, int>, char> _chars;
 
-    void draw( );
-    void undraw( );
-};
+        void draw( );
+        void undraw( );
+    };
+}

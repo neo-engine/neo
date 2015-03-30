@@ -4,7 +4,7 @@ Pokémon Emerald 2 Version
 
 file        : battleUI.cpp
 author      : Philip Wellnitz (RedArceus)
-description : 
+description :
 
 Copyright (C) 2012 - 2015
 Philip Wellnitz (RedArceus)
@@ -44,6 +44,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "buffer.h"
 #include "fs.h"
 #include "sprite.h"
+#include "userInput.h"
 
 #include "Back.h"
 #include "A.h"
@@ -208,26 +209,6 @@ namespace BATTLE {
     }
     void battleUI::writeLogText( const std::wstring& p_message ) {
         cust_font.printMBString( p_message.c_str( ), 8, 8, true );
-    }
-
-    void battleUI::waitForTouchUp( ) {
-        while( 1 ) {
-            swiWaitForVBlank( );
-            updateTime( false );
-            scanKeys( );
-            auto t = touchReadXY( );
-            if( t.px == 0 && t.py == 0 )
-                break;
-        }
-    }
-    void battleUI::waitForKeyUp( int p_key ) {
-        while( 1 ) {
-            scanKeys( );
-            swiWaitForVBlank( );
-            updateTime( );
-            if( keysUp( ) & p_key )
-                break;
-        }
     }
 
 #define PB_PAL( i ) ( ( ( i ) == 0 ) ? BattleBall1Pal : ( ( ( i ) == 1 ) ? BattleBall2Pal : ( ( ( i ) == 2 ) ? BattleBall3Pal : BattleBall4Pal ) ) )
@@ -527,13 +508,14 @@ namespace BATTLE {
 
             //Accept touches that are almost on the sprite
             if( p_showBack && t.px > 224 && t.py > 164 ) {
-                waitForTouchUp( );
-                setDeclareBattleMoveSpriteVisibility( p_showBack );
-                clearLogScreen( );
-                return false;
-
+                if( UI::waitForTouchUp( true, false, 224, 164 ) ) {
+                    setDeclareBattleMoveSpriteVisibility( p_showBack );
+                    clearLogScreen( );
+                    return false;
+                }
             } else if( t.px > 74 && t.px < 181 && t.py > 81 && t.py < 125 ) {//Attacks
-                waitForTouchUp( );
+                if( !UI::waitForTouchUp( true, false, 74, 181, 81, 125 ) )
+                    continue;
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::ATTACK;
@@ -570,7 +552,8 @@ SHOW_ATTACK:
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( wbuffer );
             } else if( t.px < 58 && t.py > 162 && t.py <= 192 ) {//Bag
-                waitForTouchUp( );
+                if( !UI::waitForTouchUp( true, false, 58, 162 ) )
+                    continue;
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::USE_ITEM;
@@ -583,7 +566,8 @@ SHOW_ATTACK:
                 writeLogText( wbuffer );
             } else if( !_battle->m_isWildBattle && SAV->m_activatedPNav
                        && t.px > 95 && t.px < 152 && t.py > 152 && t.py < 178 ) {//Nav
-                waitForTouchUp( );
+                if( !UI::waitForTouchUp( true, false, 95, 152, 152, 178 ) )
+                    continue;
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::USE_NAV;
@@ -596,7 +580,8 @@ SHOW_ATTACK:
                 writeLogText( wbuffer );
 
             } else if( _battle->m_isWildBattle && t.px > 97 && t.px < 153 && t.py > 162 && t.py < 180 ) {//Run
-                waitForTouchUp( );
+                if( !UI::waitForTouchUp( true, false, 97, 162, 153, 180 ) )
+                    continue;
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::RUN;
@@ -613,7 +598,8 @@ SHOW_ATTACK:
                 writeLogText( wbuffer );
 
             } else if( t.px > 195 && t.px < 238 && t.py > 148 && t.py < 176 ) {//Pokémon
-                waitForTouchUp( );
+                if( !UI::waitForTouchUp( true, false, 195, 148, 238, 176 ) )
+                    continue;
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::SWITCH;
@@ -687,9 +673,10 @@ NEXT:
 
             //Accept touches that are almost on the sprite
             if( t.px > 224 && t.py > 164 ) { //Back
-                waitForTouchUp( );
-                result = 0;
-                break;
+                if( UI::waitForTouchUp( true, false, 224, 164 ) ) {
+                    result = 0;
+                    break;
+                }
             }
             for( u8 i = 0; i < 4; ++i ) {
                 if( !acPkmn.m_boxdata.m_moves[ i ] )
@@ -862,8 +849,8 @@ NEXT:
             t = touchReadXY( );
 
             //Accept touches that are almost on the sprite
-            if( t.px > 224 && t.py > 164 ) { //Back
-                waitForTouchUp( );
+            if( t.px > 224 && t.py > 164
+                && UI::waitForTouchUp( true, false, 224, 164 ) ) { //Back
                 result = 0;
                 break;
             }
@@ -982,8 +969,8 @@ END:
             t = touchReadXY( );
 
             //Accept touches that are almost on the sprite
-            if( t.px > 224 && t.py > 164 ) { //Back
-                waitForTouchUp( );
+            if( t.px > 224 && t.py > 164
+                && UI::waitForTouchUp( true, false, 224, 164 ) ) { //Back
                 result = 0;
                 break;
             }
@@ -1162,21 +1149,22 @@ END:
             t = touchReadXY( );
 
             //Accept touches that are almost on the sprite
-            if( t.px > 224 && t.py > 164 ) { //Back
-                battleUI::waitForTouchUp( );
+            if( t.px > 224 && t.py > 164
+                && UI::waitForTouchUp( true, false, 224, 164 ) ) { //Back
                 return 3;
             }
             if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
-                if( !p_alreadySent && !p_alreadyChosen && !dead && t.px > x && t.px < x + 128 && t.py > y && t.py < y + 64 ) { //Send
-                    battleUI::waitForTouchUp( );
+                if( !p_alreadySent && !p_alreadyChosen && !dead
+                    && t.px > x && t.px < x + 128 && t.py > y && t.py < y + 64
+                    && UI::waitForTouchUp( true, false, x, y, x + 128, y + 64 ) ) { //Send
                     return 0;
                 }
-                if( t.px > 20 && t.px < 124 && t.py > 128 && t.py < 160 ) { //Info
-                    battleUI::waitForTouchUp( );
+                if( t.px > 20 && t.px < 124 && t.py > 128 && t.py < 160
+                    && UI::waitForTouchUp( true, false, 20, 128, 124, 160 ) ) { //Info
                     return 1;
                 }
-                if( t.px > 132 && t.px < 232 && t.py > 128 && t.py < 160 ) { //Moves
-                    battleUI::waitForTouchUp( );
+                if( t.px > 132 && t.px < 232 && t.py > 128 && t.py < 160
+                    && UI::waitForTouchUp( true, false, 132, 128, 232, 160 ) ) { //Moves
                     return 2;
                 }
             }
@@ -1459,29 +1447,29 @@ END:
             u32 p = keysHeld( );
 
             //Accept touches that are almost on the sprite
-            if( t.px > 224 && t.py > 164 ) { //Back
-                battleUI::waitForTouchUp( );
+            if( t.px > 224 && t.py > 164
+                && UI::waitForTouchUp( true, false, 224, 164 ) ) { //Back
                 return 0;
             } else if( p & KEY_UP ) {
-                battleUI::waitForKeyUp( KEY_UP );
+                UI::waitForKeysUp( true, false, KEY_UP );
                 return 2;
             } else if( p & KEY_DOWN ) {
-                battleUI::waitForKeyUp( KEY_DOWN );
+                UI::waitForKeysUp( true, false, KEY_DOWN );
                 return 1;
             } else if( p & KEY_RIGHT ) {
-                battleUI::waitForKeyUp( KEY_RIGHT );
+                UI::waitForKeysUp( true, false, KEY_RIGHT );
                 return 3;
             } else if( p & KEY_LEFT ) {
-                battleUI::waitForKeyUp( KEY_LEFT );
+                UI::waitForKeysUp( true, false, KEY_LEFT );
                 return 3;
             } else if( ( sqrt( sq( 16 + SCREEN_HEIGHT - 28 - 24 - t.py ) + sq( 16 + SCREEN_WIDTH - 22 - t.px ) ) <= 16 ) ) {
-                battleUI::waitForTouchUp( );
+                UI::waitForTouchUp( true, false );
                 return 2;
             } else if( ( sqrt( sq( 16 + SCREEN_WIDTH - 28 - 24 - t.px ) + sq( 16 + SCREEN_HEIGHT - 22 - t.py ) ) <= 16 ) ) {
-                battleUI::waitForTouchUp( );
+                UI::waitForTouchUp( true, false );
                 return 1;
             } else if( ( sqrt( sq( 16 + SCREEN_HEIGHT - 28 - 48 - t.py ) + sq( 16 + SCREEN_WIDTH - 20 - t.px ) ) <= 16 ) ) {
-                battleUI::waitForTouchUp( );
+                UI::waitForTouchUp( true, false );
                 return 3;
             }
         }
@@ -1513,8 +1501,8 @@ START:
             t = touchReadXY( );
 
             //Accept touches that are almost on the sprite
-            if( p_back && t.px > 224 && t.py > 164 ) { //Back
-                waitForTouchUp( );
+            if( p_back && t.px > 224 && t.py > 164
+                && UI::waitForTouchUp( true, false, 224, 164 ) ) { //Back
                 result = 0;
                 break;
             }
@@ -1523,8 +1511,8 @@ START:
                 u8 x = Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].x;
                 u8 y = Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].y;
 
-                if( t.px > x && t.px < x + 96 && t.py > y && t.py < y + 42 ) {
-                    waitForTouchUp( );
+                if( t.px > x && t.px < x + 96 && t.py > y && t.py < y + 42
+                    && UI::waitForTouchUp( true, false, x, y, x + 96, y + 42 ) ) {
                     result = i;
                     u8 tmp = 1;
                     auto acPkmn = ACPKMN2( *_battle, result, PLAYER );
@@ -2129,7 +2117,7 @@ CLEAR:
                            AttackList[ p_move ]->m_moveName.c_str( ),
                            acPkmn.m_boxdata.m_name );
             _battle->log( wbuffer );
-            yesNoBox yn;
+            UI::yesNoBox yn;
 ST:
             if( yn.getResult( "Soll eine Attacke\nvergessen werden?" ) ) {
                 initLogScreen( );

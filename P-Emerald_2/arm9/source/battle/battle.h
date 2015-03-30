@@ -133,8 +133,6 @@ namespace BATTLE {
         static void setLogTextColor( u16 p_color );
         static void setLogText2Color( u16 p_color );
         static void writeLogText( const std::wstring& p_message );
-        static void waitForTouchUp( );
-        static void waitForKeyUp( int p_key );
 
         void    init( );
         void    trainerIntro( );

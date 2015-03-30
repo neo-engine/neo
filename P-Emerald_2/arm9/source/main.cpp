@@ -46,10 +46,10 @@
 #include "as_lib9.h" 
 #endif
 
-#include "map2d.h"
-#include "map2devents.h"
+#include "map/map2d.h"
+#include "map/map2devents.h"
 //#include "buffer.h"
-#include "hmMoves.h"
+#include "ds/hmMoves.h"
 
 #include <string>
 #include <iostream>
@@ -57,23 +57,21 @@
 #include <vector>
 #include <time.h>
 
-#include "messageBox.h"
-#include "item.h"
-#include "berry.h"
-#include "font.h"
-#include "print.h"
-#include "fontData.h"
-#include "battle.h"
+#include "io/messageBox.h"
+#include "ds/item.h"
+#include "ds/berry.h"
+#include "io/font.h"
+#include "battle/battle.h"
 
 #include "screenLoader.h"
-#include "pokemon.h"
-#include "saveGame.h"
+#include "ds/pokemon.h"
+#include "fs/saveGame.h"
 //#include "Map.h"
-#include "keyboard.h"
-#include "sprite.h"
-#include "fs.h"
+#include "io/keyboard.h"
+#include "io/sprite.h"
+#include "fs/fs.h"
 
-#include "Gen.h"
+#include "fs/Gen.h"
 
 #include "Brother.h"
 #include "Male.h"
@@ -81,11 +79,6 @@
 
 #include "BigCirc1.h" 
 
-OAMTable *Oam = new OAMTable( );
-SpriteInfo spriteInfo[ SPRITE_COUNT ];
-
-OAMTable *OamTop = new OAMTable( );
-SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 
 #undef _EMULATOR
 
@@ -107,15 +100,8 @@ SavMod savMod = _NDS;
 
 char acSlot2Game[ 5 ];
 
-int bg3sub;
-int bg2sub;
-int bg3;
-int bg2;
 
-ConsoleFont cfont;
 Keyboard* kbd;
-FONT::font cust_font( FONT::font1::fontData, FONT::font1::fontWidths, FONT::font1::shiftchar );
-FONT::font cust_font2( FONT::font2::fontData, FONT::font2::fontWidths, FONT::font2::shiftchar );
 
 std::unique_ptr<map2d::Map> acMap;
 
@@ -464,7 +450,7 @@ void initNewGame( ) {
     PLAYMp( "KeyItemGet.mp3" );
     AS_SetMP3Loop( false );
 #endif
-    messageBox M( "Du erhälst einen PokéNav.", false );
+    UI::messageBox M( "Du erhälst einen PokéNav.", false );
 
 #ifdef USE_AS_LIB
     while( AS_GetMP3Status( ) == MP3ST_PLAYING ) {
@@ -504,12 +490,12 @@ void initNewGame( ) {
         swiWaitForVBlank( );
     consoleClear( );
     M.clear( );
-    M = messageBox( "Automatische Initialisierung\nabgeschlossen." );
+    M = UI::messageBox( "Automatische Initialisierung\nabgeschlossen." );
     consoleClear( );
     M.clear( );
 INDIVIDUALISIERUNG:
-    M = messageBox( "Beginne Individualisierung." );
-    yesNoBox yn = yesNoBox( M );
+    M = UI::messageBox( "Beginne Individualisierung." );
+    UI::yesNoBox yn = UI::yesNoBox( M );
     consoleSetWindow( &Bottom, 1, 1, 22, MAXLINES );
     SAV->m_isMale = !yn.getResult( "Bist du ein Mädchen?" );
     if( SAV->m_isMale )
@@ -518,7 +504,7 @@ INDIVIDUALISIERUNG:
         SAV->m_overWorldIdx = 10;
     consoleClear( );
     M.clear( );
-    keyboard K = keyboard( );
+    UI::keyboard K = UI::keyboard( );
     std::wstring Name = K.getText( 10, "Gib deinen Namen an!" );
     if( Name.empty( ) )
         if( SAV->m_isMale )
@@ -527,7 +513,7 @@ INDIVIDUALISIERUNG:
             SAV->setName( L"Lari" );
     else
         SAV->setName( Name );
-    yesNoBox YN = yesNoBox( );
+    UI::yesNoBox YN = UI::yesNoBox( );
     std::wstring S = L"Du bist also ";
     if( SAV->m_isMale )
         S += L"der\n";
@@ -539,7 +525,7 @@ INDIVIDUALISIERUNG:
 
     consoleClear( );
     M.clear( );
-    M = messageBox( "Individualisierung\nabgeschlossen!" );
+    M = UI::messageBox( "Individualisierung\nabgeschlossen!" );
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "ClearD" );
     drawSub( );
     for( u8 i = 0; i < 30; i++ )
@@ -547,104 +533,104 @@ INDIVIDUALISIERUNG:
     dmaCopy( BrotherBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
     dmaCopy( BrotherPal, BG_PALETTE, 256 * 2 );
     if( SAV->m_isMale ) {
-        M = messageBox( "Mir will sie den Dex\n""zuerst geben!", "???", true, true, true, messageBox::sprite_pkmn );
+        M = UI::messageBox( "Mir will sie den Dex\n""zuerst geben!", "???", true, true, true, UI::messageBox::sprite_pkmn );
         consoleClear( );
         dmaCopy( FemaleBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
         dmaCopy( FemalePal, BG_PALETTE, 256 * 2 );
-        M = messageBox( "Hey, jetzt spiel dich\nnicht so auf.\n", "???", true, true, false, messageBox::sprite_pkmn );
+        M = UI::messageBox( "Hey, jetzt spiel dich\nnicht so auf.\n", "???", true, true, false, UI::messageBox::sprite_pkmn );
         consoleClear( );
-        M = messageBox( "Ja, so ist er, mein\nBruder halt...\n"" Nich, Moritz?", "???", true, true, true, messageBox::sprite_pkmn );
+        M = UI::messageBox( "Ja, so ist er, mein\nBruder halt...\n"" Nich, Moritz?", "???", true, true, true, UI::messageBox::sprite_pkmn );
         consoleClear( );
         dmaCopy( BrotherBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
         dmaCopy( BrotherPal, BG_PALETTE, 256 * 2 );
-        M = messageBox( "Du bist doch\nnur neidisch!", "Moritz", true, true, true, messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Du bist doch\nnur neidisch!", "Moritz", true, true, true, UI::messageBox::sprite_trainer, 0 );
         consoleClear( );
         dmaCopy( FemaleBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
         dmaCopy( FemalePal, BG_PALETTE, 256 * 2 );
-        M = messageBox( "Tse...\n", "???", true, true, true, messageBox::sprite_pkmn );
+        M = UI::messageBox( "Tse...\n", "???", true, true, true, UI::messageBox::sprite_pkmn );
         consoleClear( );
-        M = messageBox( "Hi, ich bin Larissa,\n""aber Lari reicht auch.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
-        M = messageBox( "Das da ist mein\nkleiner Bruder Moritz.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
-        M = messageBox( "Wir kommen aus Azuria", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Hi, ich bin Larissa,\n""aber Lari reicht auch.", "Lari", true, true, false, UI::messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Das da ist mein\nkleiner Bruder Moritz.", "Lari", true, true, false, UI::messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Wir kommen aus Azuria", "Lari", true, true, true, UI::messageBox::sprite_trainer, 0 );
         FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
-        M = messageBox( "Das heißt eigentlich.", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
-        M = messageBox( "Als alle Kanto verlassen\nhaben, sind wir nach\nKlippdelta gezogen.", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Das heißt eigentlich.", "Lari", true, true, false, UI::messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Als alle Kanto verlassen\nhaben, sind wir nach\nKlippdelta gezogen.", "Lari", true, true, true, UI::messageBox::sprite_trainer, 0 );
         consoleClear( );
         FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
-        M = messageBox( "Du kommst auch aus\nKlippdelta?!", "Lari", true, true, false, messageBox::sprite_trainer, 0 );
-        M = messageBox( "Oh...\n", "Lari", messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Du kommst auch aus\nKlippdelta?!", "Lari", true, true, false, UI::messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Oh...\n", "Lari", UI::messageBox::sprite_trainer, 0 );
         FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
-        M = messageBox( "Na dann sehen wir uns ja\nwahrscheinlich noch öfter...", "Lari", true, true, true, messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Na dann sehen wir uns ja\nwahrscheinlich noch öfter...", "Lari", true, true, true, UI::messageBox::sprite_trainer, 0 );
         consoleClear( );
         FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx );
     } else {
-        M = messageBox( "Mir wird sie den Dex\nzuerst geben!", "???", true, true, false, messageBox::sprite_pkmn, 0 );
+        M = UI::messageBox( "Mir wird sie den Dex\nzuerst geben!", "???", true, true, false, UI::messageBox::sprite_pkmn, 0 );
         consoleClear( );
         dmaCopy( MaleBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
         dmaCopy( MalePal, BG_PALETTE, 256 * 2 );
-        M = messageBox( "Und weiter?", "???", true, true, false, messageBox::sprite_pkmn, 0 );
+        M = UI::messageBox( "Und weiter?", "???", true, true, false, UI::messageBox::sprite_pkmn, 0 );
         consoleClear( );
         dmaCopy( BrotherBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
         dmaCopy( BrotherPal, BG_PALETTE, 256 * 2 );
-        M = messageBox( "Bist doch nur neidisch!", "???", true, true, false, messageBox::sprite_pkmn, 0 );
+        M = UI::messageBox( "Bist doch nur neidisch!", "???", true, true, false, UI::messageBox::sprite_pkmn, 0 );
         consoleClear( );
         dmaCopy( MaleBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
         dmaCopy( MalePal, BG_PALETTE, 256 * 2 );
-        M = messageBox( "Wozu...\n", "???", true, true, false, messageBox::sprite_pkmn, 0 );
+        M = UI::messageBox( "Wozu...\n", "???", true, true, false, UI::messageBox::sprite_pkmn, 0 );
         consoleClear( );
-        M = messageBox( "Hi, ich bin Sebastian.", "???", true, true, false, messageBox::sprite_trainer, 0 );
-        M = messageBox( "Nenn' mich ruhig Basti.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
-        M = messageBox( "Das da ist mein\nkleiner Bruder Moritz.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
-        M = messageBox( "Wir kommen aus Azuria.", "Basti", true, true, true, messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Hi, ich bin Sebastian.", "???", true, true, false, UI::messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Nenn' mich ruhig Basti.", "Basti", true, true, false, UI::messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Das da ist mein\nkleiner Bruder Moritz.", "Basti", true, true, false, UI::messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Wir kommen aus Azuria.", "Basti", true, true, true, UI::messageBox::sprite_trainer, 0 );
         FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx );
         for( u8 k = 0; k < 30; k++ )
             swiWaitForVBlank( );
-        M = messageBox( "Das heißt eigentlich.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
-        M = messageBox( "Als alle Kanto verlassen\nhaben, sind wir\nnach Klippdelta.", "Basti", true, true, true, messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Das heißt eigentlich.", "Basti", true, true, false, UI::messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Als alle Kanto verlassen\nhaben, sind wir\nnach Klippdelta.", "Basti", true, true, true, UI::messageBox::sprite_trainer, 0 );
         consoleClear( );
-        M = messageBox( "Du lebst auch in\nKlippdelta, nich? ", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Du lebst auch in\nKlippdelta, nich? ", "Basti", true, true, false, UI::messageBox::sprite_trainer, 0 );
         consoleClear( );
-        M = messageBox( "Im hohen Gras dort sollen\nja Trasla auftauchen.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
-        M = messageBox( "Da muss ich mir dann\ngleich eins fangen!", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
-        M = messageBox( "Dann habe ich bald ein\nGuardevoir.", "Basti", true, true, false, messageBox::sprite_trainer, 0 );
-        M = messageBox( "Dann können wir ja mal\nkämpfen, du wohnst ja\nnur ein Haus weiter.", "Basti", true, true, true, messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Im hohen Gras dort sollen\nja Trasla auftauchen.", "Basti", true, true, false, UI::messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Da muss ich mir dann\ngleich eins fangen!", "Basti", true, true, false, UI::messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Dann habe ich bald ein\nGuardevoir.", "Basti", true, true, false, UI::messageBox::sprite_trainer, 0 );
+        M = UI::messageBox( "Dann können wir ja mal\nkämpfen, du wohnst ja\nnur ein Haus weiter.", "Basti", true, true, true, UI::messageBox::sprite_trainer, 0 );
         consoleClear( );
     }
     for( u8 k = 0; k < 45; k++ )
         swiWaitForVBlank( );
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
-    messageBox( "So, hier habt ihr das\nPokéDex-Modul für den\nPokéNav.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
-    messageBox( "Einmal für dich.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
-    messageBox( "Einmal für Moritz.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
+    UI::messageBox( "So, hier habt ihr das\nPokéDex-Modul für den\nPokéNav.", "Maike", true, true, false, UI::messageBox::sprite_trainer, 0 );
+    UI::messageBox( "Einmal für dich.", "Maike", true, true, false, UI::messageBox::sprite_trainer, 0 );
+    UI::messageBox( "Einmal für Moritz.", "Maike", true, true, false, UI::messageBox::sprite_trainer, 0 );
     if( SAV->m_isMale )
-        messageBox( "Und einmal für Lari.", "Maike", true, true, true, messageBox::sprite_trainer, 0 );
+        UI::messageBox( "Und einmal für Lari.", "Maike", true, true, true, UI::messageBox::sprite_trainer, 0 );
     else
-        messageBox( "Und einmal für Basti.", "Maike", true, true, true, messageBox::sprite_trainer, 0 );
+        UI::messageBox( "Und einmal für Basti.", "Maike", true, true, true, UI::messageBox::sprite_trainer, 0 );
 
-    M = messageBox( "Du erhälst das\nPokéDex-Modul für den PokéNav!" );
+    M = UI::messageBox( "Du erhälst das\nPokéDex-Modul für den PokéNav!" );
 
 
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
-    messageBox( "Der PokéNav kann euch\nalles über eure\nPokémon liefern.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
-    messageBox( "Man kann mit ihm andere\nTrainer anrufen und er\nhat 'ne Kartenfunktion.", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
+    UI::messageBox( "Der PokéNav kann euch\nalles über eure\nPokémon liefern.", "Maike", true, true, false, UI::messageBox::sprite_trainer, 0 );
+    UI::messageBox( "Man kann mit ihm andere\nTrainer anrufen und er\nhat 'ne Kartenfunktion.", "Maike", true, true, false, UI::messageBox::sprite_trainer, 0 );
     dmaCopy( BrotherBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
     dmaCopy( BrotherPal, BG_PALETTE, 256 * 2 );
-    messageBox( "Und er zeigt einem,\nwie man den Beutel\nam Besten packt!", "Moritz", true, true, false, messageBox::sprite_trainer, 0 );
-    messageBox( "Moritz!", SAV->getName( ).c_str( ) );
+    UI::messageBox( "Und er zeigt einem,\nwie man den Beutel\nam Besten packt!", "Moritz", true, true, false, UI::messageBox::sprite_trainer, 0 );
+    UI::messageBox( "Moritz!", SAV->getName( ).c_str( ) );
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
-    messageBox( "...", "Maike", true, false, false, messageBox::sprite_trainer, 0 );
-    messageBox( "Also, vergesst ihn ja nich'\nbei euch zu Hause, wenn\nihr auf Reisen geht!", "Maike", true, true, false, messageBox::sprite_trainer, 0 );
-    messageBox( "Also dann, bis bald!", "Maike", true, true, true, messageBox::sprite_trainer, 0 );
+    UI::messageBox( "...", "Maike", true, false, false, UI::messageBox::sprite_trainer, 0 );
+    UI::messageBox( "Also, vergesst ihn ja nich'\nbei euch zu Hause, wenn\nihr auf Reisen geht!", "Maike", true, true, false, UI::messageBox::sprite_trainer, 0 );
+    UI::messageBox( "Also dann, bis bald!", "Maike", true, true, true, UI::messageBox::sprite_trainer, 0 );
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Clear" );
 
     S_ = SAV->getName( ); S_ += L",\n wir seh'n uns noch!";
-    M = messageBox( &( S_[ 0 ] ), L"Moritz", true, true, true, messageBox::sprite_trainer, 0 );
+    M = UI::messageBox( &( S_[ 0 ] ), L"Moritz", true, true, true, UI::messageBox::sprite_trainer, 0 );
     consoleSelect( &Top );
     SAV->m_hasPKMN = false;
     strcpy( SAV->m_acMapName, "0/98" );
@@ -895,20 +881,20 @@ CONT:
                 goto START;
 
             scrn.init( );
-            yesNoBox yn = yesNoBox( messageBox( "", 0, false, false, false ) );
+            UI::yesNoBox yn = UI::yesNoBox( UI::messageBox( "", 0, false, false, false ) );
             if( yn.getResult( "Möchtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?", false ) ) {
-                messageBox( "Solltest du im Folgenden\nspeichern, so werden Daten\nauf das GBA-Modul geschrieben.", false, false );
-                messageBox( "Bitte entferne daher das\nGBA-Modul nicht, es könnte\nden Spielstand beschädigen.", false, false );
-                messageBox( "Auch das Speichern an sich\nkann den Spielstand\nbeschädigen.", false, false );
-                yn = yesNoBox( );
+                UI::messageBox( "Solltest du im Folgenden\nspeichern, so werden Daten\nauf das GBA-Modul geschrieben.", false, false );
+                UI::messageBox( "Bitte entferne daher das\nGBA-Modul nicht, es könnte\nden Spielstand beschädigen.", false, false );
+                UI::messageBox( "Auch das Speichern an sich\nkann den Spielstand\nbeschädigen.", false, false );
+                yn = UI::yesNoBox( );
                 if( yn.getResult( "Möchtest du fortfahren?", false ) ) {
-                    messageBox( "Lade Spielstand...", 0, false, false, false );
+                    UI::messageBox( "Lade Spielstand...", 0, false, false, false );
                     int loadgame = acgame > 2 ? 1 : 0;
 
                     gen3::SaveParser* save3 = gen3::SaveParser::Instance( );
 
                     if( save3->load( loadgame ) == -1 ) {
-                        messageBox( "Ein Fehler ist aufgetreten.\nKehre zum Hauptmenü zurück." );
+                        UI::messageBox( "Ein Fehler ist aufgetreten.\nKehre zum Hauptmenü zurück." );
                         goto START;
                     }
                     SAV = new saveGame( );
@@ -1021,7 +1007,7 @@ CONT:
 
                     Oam->oamBuffer[ SAVE_ID ].isHidden = false;
 
-                    messageBox( "Abgeschlossen." );
+                    UI::messageBox( "Abgeschlossen." );
                     break;
                 } else goto START;
             } else goto START;
@@ -1767,7 +1753,7 @@ void stepincrease( ) {
                     ac.m_boxdata.m_hatchDate[ 2 ] = ( acyear + 1900 ) % 100;
                     char buffer[ 50 ];
                     sprintf( buffer, "%ls schüpfte\naus dem Ei!", ac.m_boxdata.m_name );
-                    messageBox M( buffer );
+                    UI::messageBox M( buffer );
                 }
             } else
                 ac.m_boxdata.m_steps = std::min( 255, ac.m_boxdata.m_steps + 1 );
@@ -1920,7 +1906,7 @@ int main( int p_argc, char** p_argv ) {
                           SAV->m_acposz,
                           SAV->m_acMapName,
                           SAV->m_acMapIdx );
-            messageBox m( buffer );
+            UI::messageBox m( buffer );
 
             /*
                         printf( "topbehave %i;\n bottombehave %i", acMap->m_blockSets.m_blocks[ acMap->m_blocks[ SAV->m_acposy / 20 + 10 ][ SAV->m_acposx / 20 + 10 ].m_blockidx ].m_topbehave,
@@ -1941,10 +1927,10 @@ int main( int p_argc, char** p_argv ) {
                             scrn.draw( mode = -1 );
                             char buffer[ 50 ];
                             sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ i ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-                            yesNoBox yn;
+                            UI::yesNoBox yn;
                             if( yn.getResult( buffer ) ) {
                                 sprintf( buffer, "%ls setzt %s\nein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-                                messageBox( buffer, true, true );
+                                UI::messageBox( buffer, true, true );
                                 shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
                                 AttackList[ a.m_boxdata.m_moves[ i ] ]->use( );
                             }
@@ -2096,7 +2082,7 @@ OUT:
                     break;
             }
             const char *someText[ 7 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", " ... " };
-            choiceBox test( 6, &someText[ 0 ], 0, false );
+            UI::choiceBox test( 6, &someText[ 0 ], 0, false );
             int res = test.getResult( "Tokens of god-being...", true );
             switch( res ) {
                 case 0:
@@ -2137,7 +2123,7 @@ OUT:
                     break;
                 case 2:
                     setMainSpriteVisibility( false, true );
-                    messageBox( ITEMS::berry( "Ginemabeere" ), 31 );
+                    UI::messageBox( ITEMS::berry( "Ginemabeere" ), 31 );
                     break;
                 case 3:{
                     BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &SAV->m_PkmnTeam, 0 );
@@ -2185,7 +2171,7 @@ OUT:
                         bgNames[ o ] = BGs[ o ].m_name.c_str( );
                     setMainSpriteVisibility( false, true );
                     scrn.draw( mode );
-                    choiceBox scrnChoice( MAXBG, bgNames, 0, true );
+                    UI::choiceBox scrnChoice( MAXBG, bgNames, 0, true );
                     drawSub( scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
                     setMainSpriteVisibility( false, true );
                     scrn.draw( mode );
@@ -2296,14 +2282,14 @@ OUT:
             consoleSelect( &Bottom );
             consoleSetWindow( &Bottom, 0, 0, 32, 5 );
             consoleClear( );
-            yesNoBox Save( "PokéNav " );
+            UI::yesNoBox Save( "PokéNav " );
             if( Save.getResult( "Möchtest du deinen\nFortschritt sichern?\n" ) ) {
                 if( gMod == EMULATOR )
-                    messageBox Succ( "Speichern?\nIn einem Emulator?", "PokéNav" );
+                    UI::messageBox Succ( "Speichern?\nIn einem Emulator?", "PokéNav" );
                 else if( SAV->save( progress ) )
-                    messageBox Succ( "Fortschritt\nerfolgreich gesichert!", "PokéNav" );
+                    UI::messageBox Succ( "Fortschritt\nerfolgreich gesichert!", "PokéNav" );
                 else
-                    messageBox Succ( "Es trat ein Fehler auf\nSpiel nicht gesichert.", "PokéNav" );
+                    UI::messageBox Succ( "Es trat ein Fehler auf\nSpiel nicht gesichert.", "PokéNav" );
             }
             Oam->oamBuffer[ SQCH_ID ].isHidden = sqa;
             Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = sqb;

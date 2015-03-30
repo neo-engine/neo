@@ -93,7 +93,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "BG2.h"
 #include "BG3.h"
 
-PrintConsole Top, Bottom;
 
 unsigned int NAV_DATA[ 12288 ] = { 0 };
 unsigned short NAV_DATA_PAL[ 256 ] = { 0 };
@@ -900,7 +899,7 @@ void screenLoader::run_pkmn( ) {
             Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT - 28;
             updateOAMSub( Oam );
             sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( ).c_str( ), SAV->m_PkmnTeam[ acIn ].m_boxdata.m_name );
-            messageBox( buffer, true, true );
+            UI::messageBox( buffer, true, true );
             SAV->m_bag.addItem( acI.getItemType( ), acI.getItemId( ), 1 );
 
             Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
@@ -987,7 +986,7 @@ void screenLoader::run_pkmn( ) {
 
                     char buffer[ 50 ];
                     sprintf( buffer, "%ls setzt %s\nein!", SAV->m_PkmnTeam[ acIn ].m_boxdata.m_name, AttackList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
-                    messageBox( buffer, true, true );
+                    UI::messageBox( buffer, true, true );
                     shoUseAttack( SAV->m_PkmnTeam[ acIn ].m_boxdata.m_speciesId, SAV->m_PkmnTeam[ acIn ].m_boxdata.m_isFemale, SAV->m_PkmnTeam[ acIn ].m_boxdata.isShiny( ) );
                     AttackList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->use( );
                     return;
@@ -1002,7 +1001,7 @@ void screenLoader::run_pkmn( ) {
                     loadPKMNSprites( );
                     Oam->oamBuffer[ 8 ].isHidden = true;
                     //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
-                    messageBox( "Diese Attacke kann jetzt\nnicht eingesetzt werden.", "PokéNav" );
+                    UI::messageBox( "Diese Attacke kann jetzt\nnicht eingesetzt werden.", "PokéNav" );
 
                     setSpriteVisibility( back, false );
                     setSpriteVisibility( save, true );

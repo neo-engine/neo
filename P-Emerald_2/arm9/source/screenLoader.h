@@ -41,8 +41,6 @@ extern int bg2;
 class saveGame;
 extern saveGame* SAV;
 
-extern PrintConsole Top, Bottom;
-extern ConsoleFont cfont;
 extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;
 extern u32 ticks;
@@ -100,7 +98,6 @@ extern backgroundSet BGs[ MAXBG ];
 
 void vramSetup( );
 
-void updateTime( s8 p_mapMode = 0 );
 void animateMap( u8 p_frame );
 
 void initVideoSub( );
@@ -131,3 +128,6 @@ public:
     void run_pkmn( );
     void run_dex( u16 p_num = 0 );
 };
+
+//Some specific things
+u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo );

@@ -1,48 +1,11 @@
-/*
-Pokémon Emerald 2 Version
-------------------------------
-
-file        : print.cpp
-author      : Philip Wellnitz (RedArceus)
-description :
-
-Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
-
-This file is part of Pokémon Emerald 2 Version.
-
-Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-
 #include <nds.h>
-#include <string.h>
-#include "fontData.h"
-#include "print.h"
-#include "messageBox.h"
-#include "screenLoader.h"
+#include <nds/ndstypes.h>
 
-namespace FONT {
-    u8 ASpriteOamIndex = 0;
+#include "uio.h"
+#include "font.h"
+#include "../defines.h"
 
-    void putrec( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
-        for( u16 x = p_x1; x <= p_x2; ++x ) for( u16 y = p_y1; y < p_y2; ++y )
-            if( p_bottom )
-                ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * (u16)SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
-            else
-                ( (color *)BG_BMP_RAM( 1 ) )[ ( x + y * (u16)SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
-    }
+namespace IO {
     font::font( u8 *p_data, u8 *p_widths, void( *p_shiftchar )( u16& val ) ) {
         _data = p_data;
         _widths = p_widths;
@@ -50,10 +13,7 @@ namespace FONT {
             = _color[ 3 ] = _color[ 4 ] = RGB( 31, 31, 31 );
         _shiftchar = p_shiftchar;
     }
-
-    font::~font( ) { }
-
-
+    
     void font::printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom ) {
         _shiftchar( p_ch );
 
@@ -105,7 +65,7 @@ namespace FONT {
         putrec( p_x, p_y, p_x + 5, p_y + 9, true, false, (u8)250 );
     }
 
-    void font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, u8 p_updateTimePar ) {
+    void font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, s8 p_updateTimePar ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -143,15 +103,8 @@ namespace FONT {
                     if( keysUp( ) & KEY_A )
                         break;
                     auto t = touchReadXY( );
-                    if( t.px > 224 && t.py > 164 ) {
-                        while( 1 ) {
-                            swiWaitForVBlank( );
-                            scanKeys( );
-                            updateTime( true );
-                            auto touch = touchReadXY( );
-                            if( touch.px == 0 && touch.py == 0 )
-                                break;
-                        }
+                    if( t.px > 224 && t.py > 164
+                        && waitForTouchUp( p_updateTime, p_updateTimePar, 224, 164 ) ) {
                         break;
                     }
                 }
@@ -174,7 +127,7 @@ namespace FONT {
             current_char++;
         }
     }
-    void font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, u8 p_updateTimePar ) {
+    void font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, s8 p_updateTimePar ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -212,15 +165,8 @@ namespace FONT {
                     if( keysUp( ) & KEY_A )
                         break;
                     auto t = touchReadXY( );
-                    if( t.px > 224 && t.py > 164 ) {
-                        while( 1 ) {
-                            swiWaitForVBlank( );
-                            scanKeys( );
-                            updateTime( true );
-                            auto touch = touchReadXY( );
-                            if( touch.px == 0 && touch.py == 0 )
-                                break;
-                        }
+                    if( t.px > 224 && t.py > 164
+                        && waitForTouchUp( p_updateTime, p_updateTimePar, 224, 164 ) ) {
                         break;
                     }
                 }
@@ -243,7 +189,7 @@ namespace FONT {
             current_char++;
         }
     }
-    void font::printMBStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, u8 p_updateTimePar ) {
+    void font::printMBStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, s8 p_updateTimePar ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -281,15 +227,8 @@ namespace FONT {
                     if( keysUp( ) & KEY_A )
                         break;
                     auto t = touchReadXY( );
-                    if( t.px > 224 && t.py > 164 ) {
-                        while( 1 ) {
-                            swiWaitForVBlank( );
-                            scanKeys( );
-                            updateTime( true );
-                            auto touch = touchReadXY( );
-                            if( touch.px == 0 && touch.py == 0 )
-                                break;
-                        }
+                    if( t.px > 224 && t.py > 164
+                        && waitForTouchUp( p_updateTime, p_updateTimePar, 224, 164 ) ) {
                         break;
                     }
                 }
@@ -314,7 +253,7 @@ namespace FONT {
             current_char++;
         }
     }
-    void font::printMBStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, u8 p_updateTimePar ) {
+    void font::printMBStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, s8 p_updateTimePar ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -352,15 +291,8 @@ namespace FONT {
                     if( keysUp( ) & KEY_A )
                         break;
                     auto t = touchReadXY( );
-                    if( t.px > 224 && t.py > 164 ) {
-                        while( 1 ) {
-                            swiWaitForVBlank( );
-                            scanKeys( );
-                            updateTime( true );
-                            auto touch = touchReadXY( );
-                            if( touch.px == 0 && touch.py == 0 )
-                                break;
-                        }
+                    if( t.px > 224 && t.py > 164
+                        && waitForTouchUp( p_updateTime, p_updateTimePar, 224, 164 ) ) {
                         break;
                     }
                 }
@@ -538,45 +470,4 @@ namespace FONT {
 
         return width - 1;
     }
-}
-
-void topScreenDarken( ) {
-    u16 i;
-    color pixel;
-
-    for( i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++ ) {
-        pixel = ( (color *)BG_BMP_RAM( 1 ) )[ i ];
-        ( (color *)BG_BMP_RAM( 1 ) )[ i ] = ( ( pixel & 0x1F ) >> 1 ) |
-            ( ( ( ( pixel >> 5 ) & 0x1F ) >> 1 ) << 5 ) |
-            ( ( ( ( pixel >> 10 ) & 0x1F ) >> 1 ) << 10 ) |
-            ( 1 << 15 );
-    }
-}
-void topScreenPlot( u8 p_x, u8 p_y, color p_color ) {
-    if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
-        ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
-    else if( ( p_color >> 8 ) != 0 )
-        ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
-    else if( ( p_color % ( 1 << 8 ) ) != 0 )
-        ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
-}
-void btmScreenDarken( ) {
-    u16 i;
-    color pixel;
-
-    for( i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++ ) {
-        pixel = ( (color *)BG_BMP_RAM_SUB( 1 ) )[ i ];
-        ( (color *)BG_BMP_RAM_SUB( 1 ) )[ i ] = ( ( pixel & 0x1F ) >> 1 ) |
-            ( ( ( ( pixel >> 5 ) & 0x1F ) >> 1 ) << 5 ) |
-            ( ( ( ( pixel >> 10 ) & 0x1F ) >> 1 ) << 10 ) |
-            ( 1 << 15 );
-    }
-}
-void btmScreenPlot( u8 p_x, u8 p_y, color p_color ) {
-    if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
-        ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
-    else if( ( p_color >> 8 ) != 0 )
-        ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
-    else if( ( p_color % ( 1 << 8 ) ) != 0 )
-        ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
 }

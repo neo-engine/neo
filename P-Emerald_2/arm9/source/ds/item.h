@@ -37,131 +37,129 @@
 extern const char ITEM_PATH[ ];
 class ability;
 
-namespace ITEMS {
-
-    class item {
-    public:
-        enum itemEffectType {
-            NONE = 0,
-            IN_BATTLE = 1,
-            HOLD = 2,
-            OUT_OF_BATTLE = 4,
-            USE_ON_PKMN = 8
-        };
-        enum itemType {
-            GOODS,
-            KEY_ITEM,
-            TM_HM,
-            MAILS,
-            MEDICINE,
-            BERRIES,
-            POKE_BALLS,
-            BATTLE_ITEM
-        };
-
-        std::string     m_itemName;//, displayName, dscrpt;
-        //EFFEKT effekt;
-        itemType        m_itemType;
-        ability::abilityType
-            m_inBattleEffect;
-        BATTLE::battleScript
-            m_inBattleScript;
-
-        //std::string effekt_script;
-        //int price;
-
-        bool            m_loaded; //Specifies whether the item data has been loaded
-
-        //Functions
-        std::string     getDisplayName( bool p_new = false );
-
-        std::string     getDescription( bool p_new = false );
-
-        std::string     getShortDescription( bool p_new = false );
-
-        itemEffectType  getEffectType( );
-
-        itemType        getItemType( );
-
-        u32             getPrice( );
-
-        u16             getItemId( );
-
-        virtual bool    load( );
-
-        void            use( ... );
-
-        //Constructors
-
-        item( const std::string& p_itemName )
-            : m_itemName( p_itemName ) {/* load = false;*/
-        }
-
-        item( )
-            : m_itemName( "Null" ) { /*load = false;*/
-        }
-
+class item {
+public:
+    enum itemEffectType {
+        NONE = 0,
+        IN_BATTLE = 1,
+        HOLD = 2,
+        OUT_OF_BATTLE = 4,
+        USE_ON_PKMN = 8
+    };
+    enum itemType {
+        GOODS,
+        KEY_ITEM,
+        TM_HM,
+        MAILS,
+        MEDICINE,
+        BERRIES,
+        POKE_BALLS,
+        BATTLE_ITEM
     };
 
-    class ball
-        : public item {
-    public:
-        ball( const std::string& p_name )
-            : item( p_name ) {
-            m_itemType = POKE_BALLS;
-        }
-    };
+    std::string     m_itemName;//, displayName, dscrpt;
+    //EFFEKT effekt;
+    itemType        m_itemType;
+    ability::abilityType
+        m_inBattleEffect;
+    BATTLE::battleScript
+        m_inBattleScript;
 
-    class medicine
-        : public item {
-    public:
-        medicine( const std::string& p_name )
-            : item( p_name ) {
-            m_itemType = MEDICINE;
-        }
-    };
+    //std::string effekt_script;
+    //int price;
 
-    class TM
-        : public item {
-    public:
-        u16 m_moveIdx;
-        TM( const std::string& p_name, u16 p_moveIdx )
-            : item( p_name ) {
-            m_itemType = TM_HM;
-            m_moveIdx = p_moveIdx;
-        }
-    };
+    bool            m_loaded; //Specifies whether the item data has been loaded
 
-    class battleItem
-        : public item {
-    public:
-        battleItem( const std::string& p_name )
-            : item( p_name ) {
-            m_itemType = BATTLE_ITEM;
-        }
-    };
+    //Functions
+    std::string     getDisplayName( bool p_new = false );
 
-    class keyItem
-        : public item {
-    public:
-        keyItem( const std::string& p_name )
-            : item( p_name ) {
-            m_itemType = KEY_ITEM;
-        }
-    };
+    std::string     getDescription( bool p_new = false );
 
-    class mail
-        : public item {
-    public:
-        mail( const std::string& p_name )
-            : item( p_name ) {
-            m_itemType = MAILS;
-        }
-    };
+    std::string     getShortDescription( bool p_new = false );
+
+    itemEffectType  getEffectType( );
+
+    itemType        getItemType( );
+
+    u32             getPrice( );
+
+    u16             getItemId( );
+
+    virtual bool    load( );
+
+    void            use( ... );
+
+    //Constructors
+
+    item( const std::string& p_itemName )
+        : m_itemName( p_itemName ) {/* load = false;*/
+    }
+
+    item( )
+        : m_itemName( "Null" ) { /*load = false;*/
+    }
+
+};
+
+class ball
+    : public item {
+public:
+    ball( const std::string& p_name )
+        : item( p_name ) {
+        m_itemType = POKE_BALLS;
+    }
+};
+
+class medicine
+    : public item {
+public:
+    medicine( const std::string& p_name )
+        : item( p_name ) {
+        m_itemType = MEDICINE;
+    }
+};
+
+class TM
+    : public item {
+public:
+    u16 m_moveIdx;
+    TM( const std::string& p_name, u16 p_moveIdx )
+        : item( p_name ) {
+        m_itemType = TM_HM;
+        m_moveIdx = p_moveIdx;
+    }
+};
+
+class battleItem
+    : public item {
+public:
+    battleItem( const std::string& p_name )
+        : item( p_name ) {
+        m_itemType = BATTLE_ITEM;
+    }
+};
+
+class keyItem
+    : public item {
+public:
+    keyItem( const std::string& p_name )
+        : item( p_name ) {
+        m_itemType = KEY_ITEM;
+    }
+};
+
+class mail
+    : public item {
+public:
+    mail( const std::string& p_name )
+        : item( p_name ) {
+        m_itemType = MAILS;
+    }
+};
 
 
-    extern item* ItemList[ 800 ];
-}
+extern item* ItemList[ 800 ];
+
 
 #define I_NONE 0
 #define I_MASTER_BALL 1

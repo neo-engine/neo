@@ -37,7 +37,7 @@
 #include "sprite.h"
 #include "saveGame.h"
 #include "messageBox.h"
-#include "screenLoader.h"
+#include "userInput.h"
 
 #include "memo.h"
 #include "atks.h"
@@ -295,7 +295,7 @@ namespace POKEMON {
         }
         m_ability = p_hiddenAbility ? ( ( m_pid & 1 || ( data.m_abilities[ 3 ] == 0 ) ) ? data.m_abilities[ 2 ] : data.m_abilities[ 3 ] ) :
             ( ( m_pid & 1 || ( data.m_abilities[ 1 ] == 0 ) ) ? data.m_abilities[ 0 ] : data.m_abilities[ 1 ] );
-        m_markings = NONE;
+        m_markings = 0;
         m_origLang = 5;
         for( int i = 0; i < 6; ++i ) m_effortValues[ i ] = 0;
         for( int i = 0; i < 6; ++i ) m_contestStats[ i ] = 0;
