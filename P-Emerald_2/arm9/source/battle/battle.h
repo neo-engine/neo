@@ -32,26 +32,15 @@
 
 #include <nds.h>
 
-#include "move.h"
 #include "script.h"
-#include "ability.h"
-#include "sprite.h"
-#include "print.h"
-#include "pokemon.h"
-#include "defines.h"
-
-class item;
-
-extern OAMTable *Oam;
-extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
-
-extern OAMTable *OamTop;
-extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
-
-extern FONT::font cust_font;
-extern FONT::font cust_font2;
+#include "battleUI.h"
+#include "../defines.h"
+#include "../ds/move.h"
+#include "../ds/ability.h"
+#include "../ds/pokemon.h"
 
 namespace BATTLE {
+
     extern u8 firstMoveSwitchTarget;
 
     typedef battleScript::command               cmd;
@@ -85,8 +74,8 @@ namespace BATTLE {
                        const char* p_msg2,
                        const char* p_msg3,
                        const char* p_msg4,
-                       std::vector<POKEMON::pokemon>* p_pkmnTeam,
-                       std::vector<ITEMS::item>* p_items,
+                       std::vector<pokemon>* p_pkmnTeam,
+                       std::vector<item>* p_items,
                        trainerClass p_trainerClass = PKMN_TRAINER )
                        : m_battleTrainerName( p_battleTrainerName ),
                        m_trainerClass( p_trainerClass ),
@@ -117,50 +106,6 @@ namespace BATTLE {
         }
     };
 
-    class battleUI {
-        battle* _battle;
-        s8      _oldPKMNStats[ 6 ][ 2 ][ 10 ];
-
-    public:
-
-        static void initLogScreen( );
-        static void clearLogScreen( );
-        static void setLogTextColor( u16 p_color );
-        static void setLogText2Color( u16 p_color );
-        static void writeLogText( const std::wstring& p_message );
-
-        void    init( );
-        void    trainerIntro( );
-
-        bool    declareBattleMove( u8 p_pokemonPos, bool p_showBack );
-
-        u16     chooseAttack( u8 p_pokemonPos );
-        u8      chooseAttackTarget( u8 p_pokemonPos, u16 p_moveNo );
-        u16     chooseItem( u8 p_pokemonPos );
-        u8      choosePKMN( bool p_firstIsChosen, bool p_back = true );
-        void    useNav( );
-
-        void    showAttack( bool p_opponent, u8 p_pokemonPos );
-        void    updateHP( bool p_opponent, u8 p_pokemonPos );
-        void    showStatus( bool p_opponent, u8 p_pokemonPos );
-        void    updateStatus( bool p_opponent, u8 p_pokemonPos );
-        void    applyEXPChanges( bool p_opponent, u8 p_pokemonPos, u32 p_gainedExp );
-        void    updateStats( bool p_opponent, u8 p_pokemonPos, bool p_move = true );
-
-        void    hidePKMN( bool p_opponent, u8 p_pokemonPos );
-        void    sendPKMN( bool p_opponent, u8 p_pokemonPos );
-        void    evolvePKMN( bool p_opponent, u8 p_pokemonPos );
-
-        void    learnMove( u8 p_pokemonPos, u16 p_move );
-
-        void    showEndScreen( );
-
-        void    dinit( );
-
-        battleUI( ) { }
-        battleUI( battle* p_battle )
-            :_battle( p_battle ) { }
-    };
 
 #define MAX_STATS 8
 #define ATK 0
@@ -231,7 +176,7 @@ namespace BATTLE {
         };
         struct battlePokemon {
         public:
-            POKEMON::pokemon*   m_pokemon;
+            pokemon*            m_pokemon;
             s8                  m_acStatChanges[ 10 ];
             Type                m_Types[ 3 ];
             battle::acStatus    m_acStatus;
@@ -247,7 +192,7 @@ namespace BATTLE {
         u16         _lstOppMove;
         u16         _lstMove;
 
-        std::map<POKEMON::pokemon*, u8 > _participatedPKMN;
+        std::map<pokemon*, u8 > _participatedPKMN;
 
         //Current turn's current move's "consequences"
         s16         _acDamage[ 2 ][ 2 ];
@@ -393,7 +338,7 @@ namespace BATTLE {
         friend class battleUI;
         friend std::wstring parseLogCmd( battle& p_battle, const std::wstring& p_cmd );
         friend int getTargetSpecifierValue( const battle& p_battle,
-                                            const POKEMON::pokemon& p_target,
+                                            const pokemon& p_target,
                                             bool p_targetIsOpp,
                                             u8 p_targetPosition,
                                             const battleScript::command::targetSpecifier& p_targetSpecifier );

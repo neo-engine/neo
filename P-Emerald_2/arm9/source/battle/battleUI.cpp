@@ -34,22 +34,23 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <initializer_list>
 
 #include "battle.h"
-#include "pokemon.h"
-#include "move.h"
-#include "item.h"
-#include "screenLoader.h"
-#include "messageBox.h"
-#include "saveGame.h"
-#include "bag.h"
+#include "battleUI.h"
+#include "../defines.h"
+#include "../ds/pokemon.h"
+#include "../ds/move.h"
+#include "../ds/item.h"
+#include "../io/messageBox.h"
+#include "../io/yesNoBox.h"
+#include "../fs/saveGame.h"
+#include "../bag/bag.h"
 #include "../buffer.h"
-#include "fs.h"
-#include "../iosprite.h"
+#include "../fs/fs.h"
+#include "../io/sprite.h"
 #include "../io/uio.h"
 
 #include "Back.h"
 #include "A.h"
 #include "../map/map2d.h"
-#include "../io/messageBox.h"
 
 #include "Battle1.h"
 #include "Battle2.h"
@@ -120,12 +121,12 @@ namespace BATTLE {
 
     void initColors( ) {
 
-        cust_font.setColor( 0, 0 );
-        cust_font.setColor( BLACK_IDX, 1 );
-        cust_font.setColor( GRAY_IDX, 2 );
-        cust_font2.setColor( 0, 0 );
-        cust_font2.setColor( GRAY_IDX, 1 );
-        cust_font2.setColor( WHITE_IDX, 2 );
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::boldFont->setColor( 0, 0 );
+        IO::boldFont->setColor( GRAY_IDX, 1 );
+        IO::boldFont->setColor( WHITE_IDX, 2 );
 
         BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
         BG_PALETTE_SUB[ GRAY_IDX ] = STEEL;
@@ -140,16 +141,16 @@ namespace BATTLE {
         BG_PALETTE[ BLACK_IDX ] = BLACK;
         BG_PALETTE[ RED_IDX ] = RED;
         BG_PALETTE[ BLUE_IDX ] = BLUE;
-        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, WHITE_IDX );
+        IO::printRectangle( (u8)0, (u8)0, (u8)255, (u8)63, true, false, WHITE_IDX );
     }
     void battleUI::clearLogScreen( ) {
-        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)63, true, false, WHITE_IDX );
+        IO::printRectangle( (u8)0, (u8)0, (u8)255, (u8)63, true, false, WHITE_IDX );
     }
     void battleUI::setLogTextColor( u16 p_color ) {
         BG_PALETTE_SUB[ COLOR_IDX ] = BG_PALETTE[ COLOR_IDX ] = p_color;
     }
     void battleUI::writeLogText( const std::wstring& p_message ) {
-        cust_font.printMBString( p_message.c_str( ), 8, 8, true );
+        IO::regularFont->printMBString( p_message.c_str( ), 8, 8, true );
     }
 
 #define PB_PAL( i ) ( ( ( i ) == 0 ) ? BattleBall1Pal : ( ( ( i ) == 1 ) ? BattleBall2Pal : ( ( ( i ) == 2 ) ? BattleBall3Pal : BattleBall4Pal ) ) )
@@ -205,45 +206,43 @@ namespace BATTLE {
     u16 SUB_TILESTART = 0;
     u8 SUB_PALSTART = 0;
 
-
-
     u16 initStsBalls( bool p_bottom, battle* p_battle, u16& p_tilecnt ) {
         //Own PKMNs PBs
         for( u8 i = 0; i < 6; ++i ) {
             auto acStat = ACPKMNSTS2( *p_battle, i, PLAYER );
-            p_tilecnt = loadSprite( p_bottom ? Oam : OamTop, p_bottom ? spriteInfo : spriteInfoTop, p_bottom ? i : ( STSBALL_START + i ),
-                                    p_bottom ? PB_PAL_SUB( acStat ) : PB_PAL_TOP( acStat ), p_tilecnt, p_bottom ? ( 16 * i ) : 240 - ( 16 * i ),
-                                    180, 16, 16, PB_PAL( acStat ), PB_TILES( acStat ), PB_TILES_LEN( acStat ),
-                                    false, false, false, OBJPRIORITY_0, p_bottom );
+            p_tilecnt = IO::loadSprite( p_bottom ? i : ( STSBALL_START + i ),
+                                        p_bottom ? PB_PAL_SUB( acStat ) : PB_PAL_TOP( acStat ), p_tilecnt, p_bottom ? ( 16 * i ) : 240 - ( 16 * i ),
+                                        180, 16, 16, PB_PAL( acStat ), PB_TILES( acStat ), PB_TILES_LEN( acStat ),
+                                        false, false, false, OBJPRIORITY_0, p_bottom );
         }
         //Opps PKMNs PBs
         for( u8 i = 0; i < 6; ++i ) {
             auto acStat = ACPKMNSTS2( *p_battle, i, OPPONENT );
-            p_tilecnt = IO::loadSprite( p_bottom ? Oam : OamTop, p_bottom ? spriteInfo : spriteInfoTop, p_bottom ? ( 6 + i ) : ( STSBALL_START + 6 + i ),
-                                    p_bottom ? PB_PAL_SUB( acStat ) : PB_PAL_TOP( acStat ), p_tilecnt, !p_bottom ? ( 16 * i ) : 240 - ( 16 * i ),
-                                    -4, 16, 16, PB_PAL( acStat ), PB_TILES( acStat ), PB_TILES_LEN( acStat ),
-                                    false, false, false, OBJPRIORITY_0, p_bottom );
+            p_tilecnt = IO::loadSprite( p_bottom ? ( 6 + i ) : ( STSBALL_START + 6 + i ),
+                                        p_bottom ? PB_PAL_SUB( acStat ) : PB_PAL_TOP( acStat ), p_tilecnt, !p_bottom ? ( 16 * i ) : 240 - ( 16 * i ),
+                                        -4, 16, 16, PB_PAL( acStat ), PB_TILES( acStat ), PB_TILES_LEN( acStat ),
+                                        false, false, false, OBJPRIORITY_0, p_bottom );
         }
         return p_tilecnt;
     }
     void setStsBallVisibility( bool p_opponent, u8 p_pokemonPos, bool p_isHidden, bool p_bottom ) {
         if( p_bottom ) {
-            Oam->oamBuffer[ 6 * p_opponent + p_pokemonPos ].isHidden = p_isHidden;
-            updateOAM( true );
+            IO::Oam->oamBuffer[ 6 * p_opponent + p_pokemonPos ].isHidden = p_isHidden;
+            IO::updateOAM( true );
         } else {
-            OamTop->oamBuffer[ STSBALL_IDX( p_pokemonPos, p_opponent ) ].isHidden = p_isHidden;
-            updateOAM( OamTop );
+            IO::OamTop->oamBuffer[ STSBALL_IDX( p_pokemonPos, p_opponent ) ].isHidden = p_isHidden;
+            IO::updateOAM( false );
         }
     }
     void setStsBallPosition( bool p_opponent, u8 p_pokemonPos, u8 p_x, u8 p_y, bool p_bottom ) {
         if( p_bottom ) {
-            Oam->oamBuffer[ 6 * p_opponent + p_pokemonPos ].x = p_x;
-            Oam->oamBuffer[ 6 * p_opponent + p_pokemonPos ].y = p_y;
-            updateOAM( true );
+            IO::Oam->oamBuffer[ 6 * p_opponent + p_pokemonPos ].x = p_x;
+            IO::Oam->oamBuffer[ 6 * p_opponent + p_pokemonPos ].y = p_y;
+            IO::updateOAM( true );
         } else {
-            OamTop->oamBuffer[ STSBALL_IDX( p_pokemonPos, p_opponent ) ].x = p_x;
-            OamTop->oamBuffer[ STSBALL_IDX( p_pokemonPos, p_opponent ) ].y = p_y;
-            updateOAM( OamTop );
+            IO::OamTop->oamBuffer[ STSBALL_IDX( p_pokemonPos, p_opponent ) ].x = p_x;
+            IO::OamTop->oamBuffer[ STSBALL_IDX( p_pokemonPos, p_opponent ) ].y = p_y;
+            IO::updateOAM( false );
         }
     }
     void setStsBallSts( bool p_opponent, u8 p_pokemonPos, battle::acStatus p_status, bool p_bottom ) {
@@ -251,54 +250,54 @@ namespace BATTLE {
         u16 tileIdx = 0;
         if( p_bottom ) {
             idx = 6 * p_opponent + p_pokemonPos;
-            tileIdx = Oam->oamBuffer[ idx ].gfxIndex;
-            loadSprite( Oam, spriteInfo, idx, PB_PAL_SUB( p_status ), tileIdx, p_opponent ? ( 240 - ( 16 * p_pokemonPos ) ) : ( 16 * ( 6 - p_pokemonPos ) ),
-                        p_opponent ? -4 : 180, 16, 16, PB_PAL( p_status ), PB_TILES( p_status ), PB_TILES_LEN( p_status ),
-                        false, false, false, OBJPRIORITY_0, p_bottom );
-            updateOAM( true );
+            tileIdx = IO::Oam->oamBuffer[ idx ].gfxIndex;
+            IO::loadSprite( idx, PB_PAL_SUB( p_status ), tileIdx, p_opponent ? ( 240 - ( 16 * p_pokemonPos ) ) : ( 16 * ( 6 - p_pokemonPos ) ),
+                            p_opponent ? -4 : 180, 16, 16, PB_PAL( p_status ), PB_TILES( p_status ), PB_TILES_LEN( p_status ),
+                            false, false, false, OBJPRIORITY_0, p_bottom );
+            IO::updateOAM( p_bottom );
         } else {
             idx = STSBALL_IDX( p_pokemonPos, p_opponent );
-            tileIdx = OamTop->oamBuffer[ idx ].gfxIndex;
-            loadSprite( OamTop, spriteInfoTop, idx, PB_PAL_TOP( p_status ), tileIdx, !p_opponent ? ( 240 - ( 16 * p_pokemonPos ) ) : ( 16 * ( p_pokemonPos ) ),
-                        p_opponent ? -4 : 180, 16, 16, PB_PAL( p_status ), PB_TILES( p_status ), PB_TILES_LEN( p_status ),
-                        false, false, false, OBJPRIORITY_0, p_bottom );
-            updateOAM( OamTop );
+            tileIdx = IO::OamTop->oamBuffer[ idx ].gfxIndex;
+            IO::loadSprite( idx, PB_PAL_TOP( p_status ), tileIdx, !p_opponent ? ( 240 - ( 16 * p_pokemonPos ) ) : ( 16 * ( p_pokemonPos ) ),
+                            p_opponent ? -4 : 180, 16, 16, PB_PAL( p_status ), PB_TILES( p_status ), PB_TILES_LEN( p_status ),
+                            false, false, false, OBJPRIORITY_0, p_bottom );
+            IO::updateOAM( false );
         }
     }
 
     void loadSpritesTop( battle* p_battle ) {
         videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-        bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
-        bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
-        bgSetPriority( bg3, 3 );
-        bgSetPriority( bg2, 2 );
-        initOAMTable( OamTop );
-        dmaFillWords( 0, bgGetGfxPtr( bg2 ), 256 * 192 );
-        dmaFillWords( 0, bgGetGfxPtr( bg3 ), 256 * 192 );
+        IO::bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
+        IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
+        bgSetPriority( IO::bg3, 3 );
+        bgSetPriority( IO::bg2, 2 );
+        IO::initOAMTable( IO::OamTop );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
         bgUpdate( );
 
 
-        dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( bg3 ), 256 * 256 );
+        dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
         dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
-        dmaCopy( mug_001_1Bitmap, bgGetGfxPtr( bg2 ), 256 * 192 );
+        dmaCopy( mug_001_1Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         dmaCopy( mug_001_1Pal, BG_PALETTE, 64 );
         for( u8 i = 0; i < 40; ++i ) {
             swiWaitForVBlank( );
-            updateTime( );
+            IO::updateTime( );
         }
-        dmaCopy( mug_001_2Bitmap, bgGetGfxPtr( bg2 ), 256 * 192 );
+        dmaCopy( mug_001_2Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         dmaCopy( mug_001_2Pal, BG_PALETTE, 64 );
         for( u8 i = 0; i < 120; ++i ) {
             swiWaitForVBlank( );
-            updateTime( );
+            IO::updateTime( );
         }
 
-        dmaFillWords( 0, bgGetGfxPtr( bg2 ), 256 * 192 );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
     }
 
     void loadSpritesSub( battle* p_battle ) {
-        initOAMTable( true );
-        drawSub( );
+        IO::initOAMTable( true );
+        IO::drawSub( );
 
         u16 tilecnt = 0;
         tilecnt = initStsBalls( true, p_battle, tilecnt );
@@ -307,91 +306,91 @@ namespace BATTLE {
         sprintf( buffer, "Eine Herausforderung von\n%s %s!",
                  trainerclassnames[ p_battle->_opponent->m_trainerClass ],
                  p_battle->_opponent->m_battleTrainerName );
-        cust_font.printString( buffer, 16, 80, true );
-        updateOAM( true );
+        IO::regularFont->printString( buffer, 16, 80, true );
+        IO::updateOAM( true );
     }
 
     void loadBattleUITop( battle* p_battle ) {
-        initOAMTable( OamTop );
+        IO::initOAMTable( IO::OamTop );
 
-        Top = *consoleInit( &Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
-        consoleSetFont( &Top, &cfont );
+        IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
+        consoleSetFont( &IO::Top, IO::consoleFont );
 
         TILESTART = initStsBalls( false, p_battle, TILESTART = ( PKMN_TILE_START + 4 * 144 ) );
 
         for( u8 i = 0; i < 4; ++i ) {
-            TILESTART = loadSprite( OamTop, spriteInfoTop, HP_IDX( i % 2, ( i / 2 ) ), HP_PAL,
-                                    TILESTART, 0, 0, 32, 32, Battle1Pal,
-                                    Battle1Tiles, Battle1TilesLen, false,
-                                    false, true, OBJPRIORITY_2, false );
+            TILESTART = IO::loadSprite( HP_IDX( i % 2, ( i / 2 ) ), HP_PAL,
+                                        TILESTART, 0, 0, 32, 32, Battle1Pal,
+                                        Battle1Tiles, Battle1TilesLen, false,
+                                        false, true, OBJPRIORITY_2, false );
         }
 
-        updateOAM( OamTop );
+        IO::updateOAM( false );
     }
     void loadBattleUISub( u16 p_pkmnId, bool p_isWildBattle, bool p_showNav ) {
         u16 tilecnt = 0;
         //Load UI Sprites
         //FIGHT -- 1
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START, 0, tilecnt, 64,
-                              72, 64, 64, BattleSub1Pal, BattleSub1Tiles, BattleSub1TilesLen,
-                              false, false, false, OBJPRIORITY_2, true );
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START + 1, 0, tilecnt, 128,
-                              72, 64, 64, BattleSub1Pal, BattleSub1Tiles, BattleSub1TilesLen,
-                              false, true, false, OBJPRIORITY_2, true );
+        tilecnt = IO::loadSprite( SUB_FIGHT_START, 0, tilecnt, 64,
+                                  72, 64, 64, BattleSub1Pal, BattleSub1Tiles, BattleSub1TilesLen,
+                                  false, false, false, OBJPRIORITY_2, true );
+        tilecnt = IO::loadSprite( SUB_FIGHT_START + 1, 0, tilecnt, 128,
+                                  72, 64, 64, BattleSub1Pal, BattleSub1Tiles, BattleSub1TilesLen,
+                                  false, true, false, OBJPRIORITY_2, true );
         //FIGHT-TEXT
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START + 2, 1, tilecnt, 96,
-                              100, 64, 32, BattleSub2Pal, BattleSub2Tiles, BattleSub2TilesLen,
-                              false, false, false, OBJPRIORITY_0, true );
+        tilecnt = IO::loadSprite( SUB_FIGHT_START + 2, 1, tilecnt, 96,
+                                  100, 64, 32, BattleSub2Pal, BattleSub2Tiles, BattleSub2TilesLen,
+                                  false, false, false, OBJPRIORITY_0, true );
         //RUN / POKENAV
         if( p_isWildBattle ) { //Show Run
-            tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START + 3, 2, tilecnt, 91,
-                                  150, 64, 32, BattleSub3Pal, BattleSub3Tiles, BattleSub3TilesLen,
-                                  false, false, false, OBJPRIORITY_3, true );
+            tilecnt = IO::loadSprite( SUB_FIGHT_START + 3, 2, tilecnt, 91,
+                                      150, 64, 32, BattleSub3Pal, BattleSub3Tiles, BattleSub3TilesLen,
+                                      false, false, false, OBJPRIORITY_3, true );
         } else if( p_showNav ) { //Show Nav
-            tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START + 3, 2, tilecnt, 91,
-                                  150, 64, 32, BattleSub6Pal, BattleSub6Tiles, BattleSub6TilesLen,
-                                  false, false, false, OBJPRIORITY_3, true );
+            tilecnt = IO::loadSprite( SUB_FIGHT_START + 3, 2, tilecnt, 91,
+                                      150, 64, 32, BattleSub6Pal, BattleSub6Tiles, BattleSub6TilesLen,
+                                      false, false, false, OBJPRIORITY_3, true );
         }
         //BAG
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START + 4, 3, tilecnt, 0,
-                              157, 64, 32, BattleSub4Pal, BattleSub4Tiles, BattleSub4TilesLen,
-                              false, false, false, OBJPRIORITY_3, true );
+        tilecnt = IO::loadSprite( SUB_FIGHT_START + 4, 3, tilecnt, 0,
+                                  157, 64, 32, BattleSub4Pal, BattleSub4Tiles, BattleSub4TilesLen,
+                                  false, false, false, OBJPRIORITY_3, true );
         //POKEMON
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_FIGHT_START + 5, 4, tilecnt, 185,
-                              142, 64, 32, BattleSub5Pal, BattleSub5Tiles, BattleSub5TilesLen,
-                              false, false, false, OBJPRIORITY_3, true );
+        tilecnt = IO::loadSprite( SUB_FIGHT_START + 5, 4, tilecnt, 185,
+                                  142, 64, 32, BattleSub5Pal, BattleSub5Tiles, BattleSub5TilesLen,
+                                  false, false, false, OBJPRIORITY_3, true );
         //Load an icon of the PKMN, too
         u8 oamIndex = SUB_FIGHT_START + 5;
         u8 palIndex = 5;
 
-        FS::drawPKMNIcon( Oam, spriteInfo, p_pkmnId, 112, 68, oamIndex, palIndex, tilecnt, true );
+        IO::loadPKMNIcon( p_pkmnId, 112, 68, oamIndex, palIndex, tilecnt, true );
 
         //PreLoad A and Back buttons
 
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_A_OAM, 6, tilecnt,
-                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
-                              ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
-        FONT::ASpriteOamIndex = SUB_A_OAM;
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 7, tilecnt,
-                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                              BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, true );
+        tilecnt = IO::loadSprite( SUB_A_OAM, 6, tilecnt,
+                                  SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
+                                  ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
+        IO::ASpriteOamIndex = SUB_A_OAM;
+        tilecnt = IO::loadSprite( SUB_Back_OAM, 7, tilecnt,
+                                  SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                                  BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, true );
 
         SUB_TILESTART = tilecnt;
         SUB_PALSTART = 8;
-        updateOAM( true );
+        IO::updateOAM( true );
     }
     void setBattleUISubVisibility( bool p_isHidden = false ) {
         for( u8 i = 0; i <= SUB_FIGHT_START + 6; ++i )
-            Oam->oamBuffer[ i ].isHidden = p_isHidden;
-        updateOAM( true );
+            IO::Oam->oamBuffer[ i ].isHidden = p_isHidden;
+        IO::updateOAM( true );
     }
 
     void loadA( ) {
-        loadSprite( Oam, spriteInfo, SUB_A_OAM, 6, Oam->oamBuffer[ SUB_A_OAM ].gfxIndex,
-                    SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
-                    ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
-        FONT::ASpriteOamIndex = SUB_A_OAM;
-        updateOAM( true );
+        IO::loadSprite( SUB_A_OAM, 6, IO::Oam->oamBuffer[ SUB_A_OAM ].gfxIndex,
+                        SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
+                        ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
+        IO::ASpriteOamIndex = SUB_A_OAM;
+        IO::updateOAM( true );
     }
 
     /**
@@ -403,8 +402,8 @@ namespace BATTLE {
             for( u8 p = 0; p < 2; ++p )
                 for( u8 s = 0; s < MAX_STATS; ++s )
                     _oldPKMNStats[ ACPOS2( *_battle, i, p ) ][ p ][ s ] = ACPKMNSTS2( *_battle, i, p );
-        initOAMTable( true );
-        Oam->oamBuffer[ SUB_A_OAM ].gfxIndex = 0;
+        IO::initOAMTable( true );
+        IO::Oam->oamBuffer[ SUB_A_OAM ].gfxIndex = 0;
         loadA( );
     }
 
@@ -414,19 +413,20 @@ namespace BATTLE {
         loadSpritesTop( _battle ); // This should consume some time
 
         loadBattleUITop( _battle );
-        initOAMTable( true );
-        drawSub( );
+        IO::initOAMTable( true );
+        IO::drawSub( );
         setBattleUISubVisibility( );
         initLogScreen( );
     }
 
     void setDeclareBattleMoveSpriteVisibility( bool p_showBack, bool p_isHidden = true ) {
         if( p_showBack )
-            Oam->oamBuffer[ SUB_Back_OAM ].isHidden = p_isHidden;
+            IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = p_isHidden;
         setBattleUISubVisibility( p_isHidden );
     }
 
-
+#define p_time true
+#define p_timeParameter false
     u8 firstMoveSwitchTarget = 0;
     bool battleUI::declareBattleMove( u8 p_pokemonPos, bool p_showBack ) {
         wchar_t wbuffer[ 100 ];
@@ -434,29 +434,25 @@ namespace BATTLE {
         writeLogText( wbuffer );
 
         loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                         _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV->m_activatedPNav );
+                         _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
         if( p_showBack ) {
-            Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
-            updateOAM( true );
+            IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
+            IO::updateOAM( true );
         }
 
-        touchPosition t;
+        touchPosition touch;
         auto& result = _battle->_battleMoves[ p_pokemonPos ][ PLAYER ];
         loop( ) {
-            updateTime( false );
+            IO::updateTime( false );
             scanKeys( );
-            t = touchReadXY( );
+            touch = touchReadXY( );
 
             //Accept touches that are almost on the sprite
-            if( p_showBack && t.px > 224 && t.py > 164 ) {
-                if( UI::waitForTouchUp( true, false, 224, 164 ) ) {
-                    setDeclareBattleMoveSpriteVisibility( p_showBack );
-                    clearLogScreen( );
-                    return false;
-                }
-            } else if( t.px > 74 && t.px < 181 && t.py > 81 && t.py < 125 ) {//Attacks
-                if( !UI::waitForTouchUp( true, false, 74, 181, 81, 125 ) )
-                    continue;
+            if( p_showBack && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+                setDeclareBattleMoveSpriteVisibility( p_showBack );
+                clearLogScreen( );
+                return false;
+            } else if( GET_AND_WAIT_R( 74, 81, 181, 127 ) ) { //Attacks
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::ATTACK;
@@ -489,12 +485,12 @@ SHOW_ATTACK:
                     }
                 }
                 loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV->m_activatedPNav );
+                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( wbuffer );
-            } else if( t.px < 58 && t.py > 162 && t.py <= 192 ) {//Bag
-                if( !UI::waitForTouchUp( true, false, 58, 162 ) )
-                    continue;
+
+            } else if( GET_AND_WAIT_R( 0, 162, 58, 300 ) ) { //Bag
+
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::USE_ITEM;
@@ -505,10 +501,9 @@ SHOW_ATTACK:
                 }
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( wbuffer );
-            } else if( !_battle->m_isWildBattle && SAV->m_activatedPNav
-                       && t.px > 95 && t.px < 152 && t.py > 152 && t.py < 178 ) {//Nav
-                if( !UI::waitForTouchUp( true, false, 95, 152, 152, 178 ) )
-                    continue;
+
+            } else if( !_battle->m_isWildBattle && FS::SAV->m_activatedPNav && GET_AND_WAIT_R( 95, 152, 152, 178 ) ) {
+
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::USE_NAV;
@@ -520,9 +515,7 @@ SHOW_ATTACK:
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( wbuffer );
 
-            } else if( _battle->m_isWildBattle && t.px > 97 && t.px < 153 && t.py > 162 && t.py < 180 ) {//Run
-                if( !UI::waitForTouchUp( true, false, 97, 162, 153, 180 ) )
-                    continue;
+            } else if( _battle->m_isWildBattle && GET_AND_WAIT_R( 97, 162, 153, 180 ) ) { //Run
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::RUN;
@@ -538,9 +531,7 @@ SHOW_ATTACK:
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( wbuffer );
 
-            } else if( t.px > 195 && t.px < 238 && t.py > 148 && t.py < 176 ) {//Pokémon
-                if( !UI::waitForTouchUp( true, false, 195, 148, 238, 176 ) )
-                    continue;
+            } else if( GET_AND_WAIT_R( 195, 148, 238, 176 ) ) { // Switch Pkmn
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::SWITCH;
@@ -550,7 +541,7 @@ SHOW_ATTACK:
                     return true;
                 }
                 loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV->m_activatedPNav );
+                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( wbuffer );
             }
@@ -562,16 +553,16 @@ SHOW_ATTACK:
 
         writeLogText( L"Welche Attacke?" );
 
-        Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
+        IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
 
         u16 tilecnt = 0;
         u8  palIndex = 3;
         u8 oamIndex = SUB_Back_OAM;
 
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 0, tilecnt,
-                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                              BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
-        consoleSelect( &Bottom );
+        tilecnt = IO::loadSprite( SUB_Back_OAM, 0, tilecnt,
+                                  SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                                  BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+        consoleSelect( &IO::Bottom );
 
         auto acPkmn = ACPKMN2( *_battle, p_pokemonPos, PLAYER );
 
@@ -579,82 +570,80 @@ SHOW_ATTACK:
             if( acPkmn.m_boxdata.m_moves[ i ] ) {
                 auto acMove = AttackList[ acPkmn.m_boxdata.m_moves[ i ] ];
 
-                BG_PALETTE_SUB[ 240 + i ] = POKEMON::PKMNDATA::getColor( acMove->m_moveType );
+                BG_PALETTE_SUB[ 240 + i ] = getColor( acMove->m_moveType );
 
                 u8 w = 104, h = 32;
                 u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
 
-                FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
-                              true, false, BLACK_IDX );
-                FONT::putrec( x, y, x + w, y + h,
-                              true, false, 240 + i );
-                FONT::putrec( x + 7, y + 5, x + w - 4, y + h - 1,
-                              true, false, BLACK_IDX );
-                FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
-                              true, false, WHITE_IDX );
+                IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1,
+                                    true, false, BLACK_IDX );
+                IO::printRectangle( x, y, x + w, y + h,
+                                    true, false, 240 + i );
+                IO::printRectangle( x + 7, y + 5, x + w - 4, y + h - 1,
+                                    true, false, BLACK_IDX );
+                IO::printRectangle( x + 6, y + 4, x + w - 6, y + h - 2,
+                                    true, false, WHITE_IDX );
 
-                cust_font.printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
-                drawTypeIcon( Oam, spriteInfo, oamIndex, palIndex, tilecnt, acMove->m_moveType, x - 7, y - 7, true );
-                consoleSelect( &Bottom );
-                consoleSetWindow( &Bottom, x / 8, 12 + ( i / 2 ) * 6, 20, 2 );
+                IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
+                IO::loadTypeIcon( acMove->m_moveType, x - 7, y - 7, oamIndex, palIndex, tilecnt, true );
+                consoleSelect( &IO::Bottom );
+                consoleSetWindow( &IO::Bottom, x / 8, 12 + ( i / 2 ) * 6, 20, 2 );
                 printf( "%6hhu/%2hhu AP",
                         acPkmn.m_boxdata.m_acPP[ i ],
                         AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.m_ppup.m_Up1 ) / 5 ) );
             }
         }
 
-        updateOAM( true );
+        IO::updateOAM( true );
 
-        touchPosition t;
+        touchPosition touch;
         loop( ) {
 NEXT:
-            updateTime( false );
+            IO::updateTime( false );
             scanKeys( );
-            t = touchReadXY( );
+            touch = touchReadXY( );
 
             //Accept touches that are almost on the sprite
-            if( t.px > 224 && t.py > 164 ) { //Back
-                if( UI::waitForTouchUp( true, false, 224, 164 ) ) {
-                    result = 0;
-                    break;
-                }
+            if( GET_AND_WAIT_R( 224, 164, 300, 300 ) ) { //Back
+                result = 0;
+                break;
             }
             for( u8 i = 0; i < 4; ++i ) {
                 if( !acPkmn.m_boxdata.m_moves[ i ] )
                     break;
                 u8 w = 104, h = 32;
                 u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
-                if( t.px >= x && t.py >= y && t.px <= x + w && t.py <= y + h
+                if( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h
                     && acPkmn.m_boxdata.m_acPP[ i ] ) {
                     auto acMove = AttackList[ acPkmn.m_boxdata.m_moves[ i ] ];
 
-                    FONT::putrec( x, y, x + w, y + h,
-                                  true, false, 0 );
-                    FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
-                                  true, false, 240 + i );
-                    FONT::putrec( x + 8, y + 6, x + w - 2, y + h,
-                                  true, false, WHITE_IDX );
+                    IO::printRectangle( x, y, x + w, y + h,
+                                        true, false, 0 );
+                    IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1,
+                                        true, false, 240 + i );
+                    IO::printRectangle( x + 8, y + 6, x + w - 2, y + h,
+                                        true, false, WHITE_IDX );
 
-                    cust_font.printString( acMove->m_moveName.c_str( ), x + 9, y + 9, true );
+                    IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 9, y + 9, true );
 
                     loop( ) {
                         swiWaitForVBlank( );
-                        updateTime( false );
+                        IO::updateTime( false );
                         scanKeys( );
-                        auto t = touchReadXY( );
-                        if( t.px == 0 && t.py == 0 )
+                        auto touch = touchReadXY( );
+                        if( touch.px == 0 && touch.py == 0 )
                             break;
-                        if( !( t.px >= x && t.py >= y && t.px <= x + w && t.py <= y + h ) ) {
-                            FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
-                                          true, false, BLACK_IDX );
-                            FONT::putrec( x, y, x + w, y + h,
-                                          true, false, 240 + i );
-                            FONT::putrec( x + 7, y + 5, x + w - 4, y + h - 1,
-                                          true, false, BLACK_IDX );
-                            FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
-                                          true, false, WHITE_IDX );
+                        if( !( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h ) ) {
+                            IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1,
+                                                true, false, BLACK_IDX );
+                            IO::printRectangle( x, y, x + w, y + h,
+                                                true, false, 240 + i );
+                            IO::printRectangle( x + 7, y + 5, x + w - 4, y + h - 1,
+                                                true, false, BLACK_IDX );
+                            IO::printRectangle( x + 6, y + 4, x + w - 6, y + h - 2,
+                                                true, false, WHITE_IDX );
 
-                            cust_font.printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
+                            IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
                             goto NEXT;
                         }
                     }
@@ -665,13 +654,13 @@ NEXT:
             }
         }
 END:
-        drawSub( );
+        IO::drawSub( );
         initColors( );
         clearLogScreen( );
         for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
-            Oam->oamBuffer[ i ].isHidden = true;
-        updateOAM( true );
-        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+            IO::Oam->oamBuffer[ i ].isHidden = true;
+        IO::updateOAM( true );
+        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleClear( );
         return result;
     }
@@ -681,16 +670,16 @@ END:
 
         writeLogText( L"Welches PKMN angreifen?" );
 
-        Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
+        IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
 
         u16 tilecnt = 0;
         u8  palIndex = 3;
         u8 oamIndex = SUB_Back_OAM;
 
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 0, tilecnt,
-                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                              BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
-        consoleSelect( &Bottom );
+        tilecnt = IO::loadSprite( SUB_Back_OAM, 0, tilecnt,
+                                  SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                                  BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+        consoleSelect( &IO::Bottom );
 
         bool selected[ 4 ] = { false };
         bool neverTarget[ 4 ] = { false };
@@ -730,14 +719,14 @@ END:
         }
 
         if( selected[ 2 ] && selected[ 3 ] )
-            FONT::putrec( 112 + 1, 130 + 1, 112 + 16 + 2, 146 + 1, true, false, BLACK_IDX );
+            IO::printRectangle( 112 + 1, 130 + 1, 112 + 16 + 2, 146 + 1, true, false, BLACK_IDX );
         if( selected[ 0 ] && selected[ 1 ] )
-            FONT::putrec( 120 + 1, 82 + 1, 120 + 16 + 2, 98 + 1, true, false, BLACK_IDX );
+            IO::printRectangle( 120 + 1, 82 + 1, 120 + 16 + 2, 98 + 1, true, false, BLACK_IDX );
 
         if( selected[ 1 ] && selected[ 2 ] )
-            FONT::putrec( 56 + 1, 106 + 1, 56 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
+            IO::printRectangle( 56 + 1, 106 + 1, 56 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
         if( selected[ 3 ] && selected[ 0 ] )
-            FONT::putrec( 176 + 1, 106 + 1, 176 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
+            IO::printRectangle( 176 + 1, 106 + 1, 176 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
 
         _battle->_battleMoves[ p_pokemonPos ][ PLAYER ].m_target = 1 | 2 | 4 | 8;
 
@@ -751,47 +740,46 @@ END:
             u8 w = 104, h = 32;
             u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
 
-            FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
-                          true, false, BLACK_IDX );
-            FONT::putrec( x, y, x + w, y + h,
-                          true, false, selected[ i ] ? RED_IDX : GRAY_IDX );
-            FONT::putrec( x + 7, y + 5, x + w - 4, y + h - 1,
-                          true, false, BLACK_IDX );
-            FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
-                          true, false, WHITE_IDX );
+            IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1,
+                                true, false, BLACK_IDX );
+            IO::printRectangle( x, y, x + w, y + h,
+                                true, false, selected[ i ] ? RED_IDX : GRAY_IDX );
+            IO::printRectangle( x + 7, y + 5, x + w - 4, y + h - 1,
+                                true, false, BLACK_IDX );
+            IO::printRectangle( x + 6, y + 4, x + w - 6, y + h - 2,
+                                true, false, WHITE_IDX );
 
             if( neverTarget[ i ] )
                 continue;
 
             if( acPkmn.m_stats.m_acHP ) {
-                cust_font.printString( acPkmn.m_boxdata.m_name, x + 7, y + 7, true );
-                FS::drawPKMNIcon( Oam, spriteInfo, acPkmn.m_boxdata.m_speciesId,
+                IO::regularFont->printString( acPkmn.m_boxdata.m_name, x + 7, y + 7, true );
+                IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId,
                                   x - 10, y - 23, oamIndex, palIndex, tilecnt );
             }
         }
 
         if( selected[ 2 ] && selected[ 3 ] )
-            FONT::putrec( 112, 130, 112 + 16, 146, true, false, RED_IDX );
+            IO::printRectangle( 112, 130, 112 + 16, 146, true, false, RED_IDX );
         if( selected[ 0 ] && selected[ 1 ] )
-            FONT::putrec( 120, 82, 120 + 16, 98, true, false, RED_IDX );
+            IO::printRectangle( 120, 82, 120 + 16, 98, true, false, RED_IDX );
 
         if( selected[ 1 ] && selected[ 2 ] )
-            FONT::putrec( 56, 106, 56 + 16, 122, true, false, RED_IDX );
+            IO::printRectangle( 56, 106, 56 + 16, 122, true, false, RED_IDX );
         if( selected[ 3 ] && selected[ 0 ] )
-            FONT::putrec( 176, 106, 176 + 16, 122, true, false, RED_IDX );
+            IO::printRectangle( 176, 106, 176 + 16, 122, true, false, RED_IDX );
 
-        updateOAM( true );
+        IO::updateOAM( true );
 
-        touchPosition t;
+        touchPosition touch;
         loop( ) {
 NEXT:
-            updateTime( false );
+            IO::updateTime( false );
             scanKeys( );
-            t = touchReadXY( );
+            touch = touchReadXY( );
 
             //Accept touches that are almost on the sprite
-            if( t.px > 224 && t.py > 164
-                && UI::waitForTouchUp( true, false, 224, 164 ) ) { //Back
+            if( GET_AND_WAIT_R( 224, 164, 300, 300 ) ) { //Back
                 result = 0;
                 break;
             }
@@ -809,7 +797,7 @@ NEXT:
 
                 u8 w = 104, h = 32;
                 u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
-                if( t.px >= x && t.py >= y && t.px <= x + w && t.py <= y + h ) {
+                if( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h ) {
 
                     for( u8 j = 0; j < 4; ++j ) {
                         if( !selected[ j ] && j != i )
@@ -822,25 +810,25 @@ NEXT:
                         auto acPkmnJ = ACPKMN2( *_battle, aJ, 1 - ( i / 2 ) );
 
                         u8 nx = 16 - 8 * ( j / 2 ) + ( w + 16 ) * ( j % 2 ), ny = 74 + ( h + 16 ) * ( j / 2 );
-                        FONT::putrec( nx, ny, x + w, y + h,
-                                      true, false, 0 );
-                        FONT::putrec( nx + 1, ny + 1, nx + w + 2, ny + h + 1,
-                                      true, false, RED_IDX );
-                        FONT::putrec( nx + 8, ny + 6, nx + w - 2, ny + h,
-                                      true, false, WHITE_IDX );
+                        IO::printRectangle( nx, ny, x + w, y + h,
+                                            true, false, 0 );
+                        IO::printRectangle( nx + 1, ny + 1, nx + w + 2, ny + h + 1,
+                                            true, false, RED_IDX );
+                        IO::printRectangle( nx + 8, ny + 6, nx + w - 2, ny + h,
+                                            true, false, WHITE_IDX );
                         if( neverTarget[ j ] || !acPkmnJ.m_stats.m_acHP )
                             continue;
-                        cust_font.printString( acPkmnJ.m_boxdata.m_name, nx + 9, ny + 9, true );
+                        IO::regularFont->printString( acPkmnJ.m_boxdata.m_name, nx + 9, ny + 9, true );
                     }
 
                     loop( ) {
                         swiWaitForVBlank( );
-                        updateTime( false );
+                        IO::updateTime( false );
                         scanKeys( );
-                        auto t = touchReadXY( );
-                        if( t.px == 0 && t.py == 0 )
+                        auto touch = touchReadXY( );
+                        if( touch.px == 0 && touch.py == 0 )
                             break;
-                        if( !( t.px >= x && t.py >= y && t.px <= x + w && t.py <= y + h ) ) {
+                        if( !( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h ) ) {
                             for( u8 j = 0; j < 4; ++j ) {
                                 if( !selected[ j ] && j != i )
                                     continue;
@@ -853,17 +841,17 @@ NEXT:
 
                                 u8 nx = 16 - 8 * ( j / 2 ) + ( w + 16 ) * ( j % 2 ), ny = 74 + ( h + 16 ) * ( j / 2 );
 
-                                FONT::putrec( nx + 1, ny + 1, nx + w + 2, ny + h + 1,
-                                              true, false, BLACK_IDX );
-                                FONT::putrec( nx, ny, nx + w, ny + h,
-                                              true, false, selected[ i ] ? RED_IDX : GRAY_IDX );
-                                FONT::putrec( nx + 7, ny + 5, nx + w - 4, ny + h - 1,
-                                              true, false, BLACK_IDX );
-                                FONT::putrec( nx + 6, ny + 4, nx + w - 6, ny + h - 2,
-                                              true, false, WHITE_IDX );
+                                IO::printRectangle( nx + 1, ny + 1, nx + w + 2, ny + h + 1,
+                                                    true, false, BLACK_IDX );
+                                IO::printRectangle( nx, ny, nx + w, ny + h,
+                                                    true, false, selected[ i ] ? RED_IDX : GRAY_IDX );
+                                IO::printRectangle( nx + 7, ny + 5, nx + w - 4, ny + h - 1,
+                                                    true, false, BLACK_IDX );
+                                IO::printRectangle( nx + 6, ny + 4, nx + w - 6, ny + h - 2,
+                                                    true, false, WHITE_IDX );
                                 if( neverTarget[ j ] || !acPkmnJ.m_stats.m_acHP )
                                     continue;
-                                cust_font.printString( acPkmnJ.m_boxdata.m_name, nx + 7, ny + 7, true );
+                                IO::regularFont->printString( acPkmnJ.m_boxdata.m_name, nx + 7, ny + 7, true );
                             }
                             goto NEXT;
                         }
@@ -882,13 +870,13 @@ NEXT:
             }
         }
 END:
-        drawSub( );
+        IO::drawSub( );
         initColors( );
         clearLogScreen( );
         for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
-            Oam->oamBuffer[ i ].isHidden = true;
-        updateOAM( true );
-        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+            IO::Oam->oamBuffer[ i ].isHidden = true;
+        IO::updateOAM( true );
+        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleClear( );
 
         return result;
@@ -903,15 +891,14 @@ END:
         _battle->_maxRounds = -1;
 
 
-        touchPosition t;
+        touchPosition touch;
         loop( ) {
-            updateTime( false );
+            IO::updateTime( false );
             scanKeys( );
-            t = touchReadXY( );
+            touch = touchReadXY( );
 
             //Accept touches that are almost on the sprite
-            if( t.px > 224 && t.py > 164
-                && UI::waitForTouchUp( true, false, 224, 164 ) ) { //Back
+            if( GET_AND_WAIT_R( 224, 164, 300, 300 ) ) { //Back
                 result = 0;
                 break;
             }
@@ -926,10 +913,10 @@ END:
         u8  palIndex = 3;
         u8 oamIndex = SUB_Back_OAM;
 
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 0, tilecnt,
-                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                              BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
-        consoleSelect( &Bottom );
+        tilecnt = IO::loadSprite( SUB_Back_OAM, 0, tilecnt,
+                                  SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                                  BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+        consoleSelect( &IO::Bottom );
 
         if( p_battle->m_battleMode == battle::DOUBLE && p_battle->_battleMoves[ 0 ][ PLAYER ].m_type == battle::battleMove::SWITCH )
             firstMoveSwitchTarget = p_battle->_battleMoves[ 0 ][ PLAYER ].m_value;
@@ -939,19 +926,19 @@ END:
                 y = 32 + ( i / 2 ) * 48;
 
             if( !i || ( p_firstIsChosen && ( i == 1 ) ) || i == firstMoveSwitchTarget ) {
-                tilecnt = loadSprite( Oam, spriteInfo, SUB_CHOICE_START + 2 * i, 1, tilecnt,
-                                      x, y, 64, 64, BattlePkmnChoice1Pal, BattlePkmnChoice1Tiles,
-                                      BattlePkmnChoice1TilesLen, false, false, false, OBJPRIORITY_2, true );
-                tilecnt = loadSprite( Oam, spriteInfo, SUB_CHOICE_START + 2 * i + 1, 1, tilecnt,
-                                      x + 64, y, 64, 64, BattlePkmnChoice2Pal, BattlePkmnChoice2Tiles,
-                                      BattlePkmnChoice2TilesLen, false, false, false, OBJPRIORITY_2, true );
+                tilecnt = IO::loadSprite( SUB_CHOICE_START + 2 * i, 1, tilecnt,
+                                          x, y, 64, 64, BattlePkmnChoice1Pal, BattlePkmnChoice1Tiles,
+                                          BattlePkmnChoice1TilesLen, false, false, false, OBJPRIORITY_2, true );
+                tilecnt = IO::loadSprite( SUB_CHOICE_START + 2 * i + 1, 1, tilecnt,
+                                          x + 64, y, 64, 64, BattlePkmnChoice2Pal, BattlePkmnChoice2Tiles,
+                                          BattlePkmnChoice2TilesLen, false, false, false, OBJPRIORITY_2, true );
             } else {
-                tilecnt = loadSprite( Oam, spriteInfo, SUB_CHOICE_START + 2 * i, 2, tilecnt,
-                                      x, y, 64, 64, BattlePkmnChoice3Pal, BattlePkmnChoice3Tiles,
-                                      BattlePkmnChoice1TilesLen, false, false, false, OBJPRIORITY_2, true );
-                tilecnt = loadSprite( Oam, spriteInfo, SUB_CHOICE_START + 2 * i + 1, 2, tilecnt,
-                                      x + 64, y, 64, 64, BattlePkmnChoice4Pal, BattlePkmnChoice4Tiles,
-                                      BattlePkmnChoice4TilesLen, false, false, false, OBJPRIORITY_2, true );
+                tilecnt = IO::loadSprite( SUB_CHOICE_START + 2 * i, 2, tilecnt,
+                                          x, y, 64, 64, BattlePkmnChoice3Pal, BattlePkmnChoice3Tiles,
+                                          BattlePkmnChoice1TilesLen, false, false, false, OBJPRIORITY_2, true );
+                tilecnt = IO::loadSprite( SUB_CHOICE_START + 2 * i + 1, 2, tilecnt,
+                                          x + 64, y, 64, 64, BattlePkmnChoice4Pal, BattlePkmnChoice4Tiles,
+                                          BattlePkmnChoice4TilesLen, false, false, false, OBJPRIORITY_2, true );
             }
 
             if( i >= p_battle->_player->m_pkmnTeam->size( ) )
@@ -959,18 +946,16 @@ END:
 
             auto& acPkmn = ACPKMN2( *p_battle, i, PLAYER );
 
-            consoleSetWindow( &Bottom, ( x + 6 ) / 8, ( y + 6 ) / 8, 20, 8 );
+            consoleSetWindow( &IO::Bottom, ( x + 6 ) / 8, ( y + 6 ) / 8, 20, 8 );
             if( !acPkmn.m_boxdata.m_individualValues.m_isEgg ) {
                 printf( "       Lv.%3d", acPkmn.m_Level );
                 printf( "\n%14ls\n", acPkmn.m_boxdata.m_name );
                 printf( "%14s\n\n",
-                        ITEMS::ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) );
+                        ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) );
                 printf( "   %3i/%3i",
                         acPkmn.m_stats.m_acHP,
                         acPkmn.m_stats.m_maxHP );
-                FS::drawPKMNIcon( Oam,
-                                  spriteInfo,
-                                  acPkmn.m_boxdata.m_speciesId,
+                IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId,
                                   x + 4,
                                   y - 12,
                                   oamIndex,
@@ -979,9 +964,7 @@ END:
                                   true );
             } else {
                 printf( "\n            Ei" );
-                FS::drawEggIcon( Oam,
-                                 spriteInfo,
-                                 x + 4,
+                IO::loadEggIcon( x + 4,
                                  y - 12,
                                  oamIndex,
                                  palIndex,
@@ -990,41 +973,41 @@ END:
             }
         }
 
-        updateOAM( true );
+        IO::updateOAM( true );
     }
 
     void undrawPKMNChoiceScreen( ) {
         for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
-            Oam->oamBuffer[ i ].isHidden = true;
-        updateOAM( true );
+            IO::Oam->oamBuffer[ i ].isHidden = true;
+        IO::updateOAM( true );
     }
 
     /**
     *  @returns 0 if the Pokemon shall be sent, 1 if further information was requested, 2 if the moves should be displayed, 3 if the previous screen shall be shown
     */
-    u8 showConfirmation( POKEMON::pokemon& p_pokemon, bool p_alreadySent, bool p_alreadyChosen ) {
-        drawSub( );
-        Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
+    u8 showConfirmation( pokemon& p_pokemon, bool p_alreadySent, bool p_alreadyChosen ) {
+        IO::drawSub( );
+        IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
         u16 tilecnt = 0;
         u8  palIndex = 4;
         u8 oamIndex = SUB_Back_OAM + 1;
 
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 0, tilecnt,
-                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                              BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+        tilecnt = IO::loadSprite( SUB_Back_OAM, 0, tilecnt,
+                                  SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                                  BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
 
-        consoleSelect( &Bottom );
+        consoleSelect( &IO::Bottom );
 
         bool dead = !p_pokemon.m_stats.m_acHP;
         u8 x = 104, y = 48;
 
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
-            if( !FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
                 32, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) )
-                FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+                IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
                 32, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
 
-            consoleSetWindow( &Bottom, 13, 7, 20, 8 );
+            consoleSetWindow( &IO::Bottom, 13, 7, 20, 8 );
             if( !p_alreadySent && !p_alreadyChosen )
                 printf( "   AUSSENDEN" );
             else if( !p_alreadyChosen )
@@ -1036,78 +1019,70 @@ END:
             printf( "\n----------------\n%11ls %c\n%11s\n\nLv.%3i %3i/%3iKP",
                     p_pokemon.m_boxdata.m_name,
                     GENDER( p_pokemon ),
-                    ITEMS::ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
+                    ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
                     p_pokemon.m_Level,
                     p_pokemon.m_stats.m_acHP,
                     p_pokemon.m_stats.m_maxHP );
         } else {
-            consoleSetWindow( &Bottom, 8, 11, 16, 10 );
+            consoleSetWindow( &IO::Bottom, 8, 11, 16, 10 );
             printf( "  Ein Ei kann\n nicht k\x84""mpfen!" );
             x = 64;
             y = 64;
         }
         //Switch
-        tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 2, tilecnt,
-                              x, y, 64, 64, Choice_4Pal, Choice_4Tiles,
-                              Choice_4TilesLen, false, false, false, OBJPRIORITY_2, true );
-        tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 2, tilecnt,
-                              x + 64, y, 64, 64, Choice_4Pal, Choice_5Tiles,
-                              Choice_5TilesLen, false, false, false, OBJPRIORITY_2, true );
+        tilecnt = IO::loadSprite( ++oamIndex, 2, tilecnt,
+                                  x, y, 64, 64, Choice_4Pal, Choice_4Tiles,
+                                  Choice_4TilesLen, false, false, false, OBJPRIORITY_2, true );
+        tilecnt = IO::loadSprite( ++oamIndex, 2, tilecnt,
+                                  x + 64, y, 64, 64, Choice_4Pal, Choice_5Tiles,
+                                  Choice_5TilesLen, false, false, false, OBJPRIORITY_2, true );
 
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
             //Status
-            tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 2, tilecnt,
-                                  28, 128, 64, 32, Choice_1Pal, Choice_1Tiles,
-                                  Choice_1TilesLen, false, false, false, OBJPRIORITY_2, true );
-            tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 2, tilecnt,
-                                  60, 128, 64, 32, Choice_3Pal, Choice_3Tiles,
-                                  Choice_3TilesLen, false, false, false, OBJPRIORITY_2, true );
-            tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 3, tilecnt,
-                                  20, 128, 32, 32, memoPal, memoTiles,
-                                  memoTilesLen, false, false, false, OBJPRIORITY_1, true );
-            consoleSetWindow( &Bottom, 7, 17, 20, 8 );
+            tilecnt = IO::loadSprite( ++oamIndex, 2, tilecnt,
+                                      28, 128, 64, 32, Choice_1Pal, Choice_1Tiles,
+                                      Choice_1TilesLen, false, false, false, OBJPRIORITY_2, true );
+            tilecnt = IO::loadSprite( ++oamIndex, 2, tilecnt,
+                                      60, 128, 64, 32, Choice_3Pal, Choice_3Tiles,
+                                      Choice_3TilesLen, false, false, false, OBJPRIORITY_2, true );
+            tilecnt = IO::loadSprite( ++oamIndex, 3, tilecnt,
+                                      20, 128, 32, 32, memoPal, memoTiles,
+                                      memoTilesLen, false, false, false, OBJPRIORITY_1, true );
+            consoleSetWindow( &IO::Bottom, 7, 17, 20, 8 );
             printf( "BERICHT" );
 
             //Moves
-            tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 2, tilecnt,
-                                  132, 128, 64, 32, Choice_1Pal, Choice_1Tiles,
-                                  Choice_1TilesLen, false, false, false, OBJPRIORITY_2, true );
-            tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 2, tilecnt,
-                                  164, 128, 64, 32, Choice_3Pal, Choice_3Tiles,
-                                  Choice_3TilesLen, false, false, false, OBJPRIORITY_2, true );
-            tilecnt = loadSprite( Oam, spriteInfo, ++oamIndex, 4, tilecnt,
-                                  200, 128, 32, 32, atksPal, atksTiles,
-                                  atksTilesLen, false, false, false, OBJPRIORITY_1, true );
-            consoleSetWindow( &Bottom, 17, 17, 20, 8 );
+            tilecnt = IO::loadSprite( ++oamIndex, 2, tilecnt,
+                                      132, 128, 64, 32, Choice_1Pal, Choice_1Tiles,
+                                      Choice_1TilesLen, false, false, false, OBJPRIORITY_2, true );
+            tilecnt = IO::loadSprite( ++oamIndex, 2, tilecnt,
+                                      164, 128, 64, 32, Choice_3Pal, Choice_3Tiles,
+                                      Choice_3TilesLen, false, false, false, OBJPRIORITY_2, true );
+            tilecnt = IO::loadSprite( ++oamIndex, 4, tilecnt,
+                                      200, 128, 32, 32, atksPal, atksTiles,
+                                      atksTilesLen, false, false, false, OBJPRIORITY_1, true );
+            consoleSetWindow( &IO::Bottom, 17, 17, 20, 8 );
             printf( "ATTACKEN" );
         }
-        updateOAM( true );
+        IO::updateOAM( true );
 
-        touchPosition t;
+        touchPosition touch;
         loop( ) {
-            updateTime( false );
+            IO::updateTime( false );
             scanKeys( );
-            t = touchReadXY( );
+            touch = touchReadXY( );
 
             //Accept touches that are almost on the sprite
-            if( t.px > 224 && t.py > 164
-                && UI::waitForTouchUp( true, false, 224, 164 ) ) { //Back
+            if( GET_AND_WAIT_R( 224, 164, 300, 300 ) )  //Back
                 return 3;
-            }
             if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
                 if( !p_alreadySent && !p_alreadyChosen && !dead
-                    && t.px > x && t.px < x + 128 && t.py > y && t.py < y + 64
-                    && UI::waitForTouchUp( true, false, x, y, x + 128, y + 64 ) ) { //Send
+                    && GET_AND_WAIT_R( x, y, x + 128, y + 64 ) )  //Send
                     return 0;
-                }
-                if( t.px > 20 && t.px < 124 && t.py > 128 && t.py < 160
-                    && UI::waitForTouchUp( true, false, 20, 128, 124, 160 ) ) { //Info
+                if( GET_AND_WAIT_R( 20, 128, 124, 160 ) )  //Info
                     return 1;
-                }
-                if( t.px > 132 && t.px < 232 && t.py > 128 && t.py < 160
-                    && UI::waitForTouchUp( true, false, 132, 128, 232, 160 ) ) { //Moves
+                if( GET_AND_WAIT_R( 132, 128, 232, 160 ) )  //Moves
                     return 2;
-                }
             }
         }
     }
@@ -1116,106 +1091,111 @@ END:
     *  @param p_page: 1 show moves, 0 show status
     *  @returns 0: return to prvious screen, 1 view next pokémon, 2 view previous pokémon, 3 switch screen
     */
-    u8 showDetailedInformation( POKEMON::pokemon& p_pokemon, u8 p_page ) {
-        drawSub( );
+    u8 showDetailedInformation( pokemon& p_pokemon, u8 p_page ) {
+        IO::drawSub( );
         initColors( );
         undrawPKMNChoiceScreen( );
-        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleClear( );
-        Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
+        IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
         u16 tilecnt = 0;
         u8  palIndex = 4;
         u8 oamIndex = SUB_Back_OAM;
 
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM, 0, tilecnt,
-                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                              BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+        tilecnt = IO::loadSprite( SUB_Back_OAM, 0, tilecnt,
+                                  SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                                  BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
         // ^ Sprite
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM - 2, 1, tilecnt,
-                              SCREEN_WIDTH - 22, SCREEN_HEIGHT - 28 - 24, 32, 32, UpPal,
-                              UpTiles, UpTilesLen, false, false, false, OBJPRIORITY_1, true );
+        tilecnt = IO::loadSprite( SUB_Back_OAM - 2, 1, tilecnt,
+                                  SCREEN_WIDTH - 22, SCREEN_HEIGHT - 28 - 24, 32, 32, UpPal,
+                                  UpTiles, UpTilesLen, false, false, false, OBJPRIORITY_1, true );
         // v Sprite
-        tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM - 3, 2, tilecnt,
-                              SCREEN_WIDTH - 28 - 24, SCREEN_HEIGHT - 22, 32, 32, DownPal,
-                              DownTiles, DownTilesLen, false, false, false, OBJPRIORITY_1, true );
+        tilecnt = IO::loadSprite( SUB_Back_OAM - 3, 2, tilecnt,
+                                  SCREEN_WIDTH - 28 - 24, SCREEN_HEIGHT - 22, 32, 32, DownPal,
+                                  DownTiles, DownTilesLen, false, false, false, OBJPRIORITY_1, true );
         if( !p_page ) {
-            tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM - 4, 3, tilecnt,
-                                  SCREEN_WIDTH - 20, SCREEN_HEIGHT - 28 - 48, 32, 32, atksPal,
-                                  atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_2, true );
+            tilecnt = IO::loadSprite( SUB_Back_OAM - 4, 3, tilecnt,
+                                      SCREEN_WIDTH - 20, SCREEN_HEIGHT - 28 - 48, 32, 32, atksPal,
+                                      atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_2, true );
         } else {
-            tilecnt = loadSprite( Oam, spriteInfo, SUB_Back_OAM - 5, 3, tilecnt,
-                                  SCREEN_WIDTH - 20, SCREEN_HEIGHT - 28 - 48, 32, 32, memoPal,
-                                  memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_2, true );
+            tilecnt = IO::loadSprite( SUB_Back_OAM - 5, 3, tilecnt,
+                                      SCREEN_WIDTH - 20, SCREEN_HEIGHT - 28 - 48, 32, 32, memoPal,
+                                      memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_2, true );
         }
 
-        POKEMON::PKMNDATA::pokemonData data;
-        POKEMON::PKMNDATA::getAll( p_pokemon.m_boxdata.m_speciesId, data );
+        pokemonData data;
+        getAll( p_pokemon.m_boxdata.m_speciesId, data );
 
-        updateOAM( true );
+        IO::updateOAM( true );
 
         u16 exptype = data.m_expType;
 
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
-            if( !FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                16, 8, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) )
-                FS::loadPKMNSprite( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                16, 8, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
-            consoleSetWindow( &Bottom, 4, 0, 12, 2 );
-            printf( "EP(%3i%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
-                    * 100 / ( POKEMON::EXP[ p_pokemon.m_Level ][ exptype ] - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
+            if( !( tilecnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+                16, 8, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) ) {
+                tilecnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+                                              16, 8, oamIndex, palIndex, IO::Oam->oamBuffer[ oamIndex ].gfxIndex,
+                                              true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
+            }
+            oamIndex += 4;
+            palIndex++;
+
+            consoleSetWindow( &IO::Bottom, 4, 0, 12, 2 );
+            printf( "EP(%3i%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
+                    * 100 / ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
                     p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
-            BATTLE::battleUI::displayHP( 100, 101, 46, 40, 245, 246, false, 50, 56, true );
-            BATTLE::battleUI::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 40, 245, 246, false, 50, 56, true );
+            IO::displayHP( 100, 101, 46, 40, 245, 246, false, 50, 56, true );
+            IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 40, 245, 246, false, 50, 56, true );
 
-            BATTLE::battleUI::displayEP( 100, 101, 46, 40, 247, 248, false, 59, 62, true );
-            BATTLE::battleUI::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
-                                         * 100 / ( POKEMON::EXP[ p_pokemon.m_Level ][ exptype ] - POKEMON::EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
-                                         46, 40, 247, 248, false, 59, 62, true );
-            cust_font.setColor( WHITE_IDX, 1 );
+            IO::displayEP( 100, 101, 46, 40, 247, 248, false, 59, 62, true );
+            IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
+                           * 100 / ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
+                           46, 40, 247, 248, false, 59, 62, true );
+            IO::regularFont->setColor( WHITE_IDX, 1 );
 
-            consoleSetWindow( &Bottom, 2, 1, 13, 2 );
+            consoleSetWindow( &IO::Bottom, 2, 1, 13, 2 );
 
             std::swprintf( wbuffer, 20, L"%ls /", p_pokemon.m_boxdata.m_name );
-            cust_font.printString( wbuffer, 16, 96, true );
+            IO::regularFont->printString( wbuffer, 16, 96, true );
             s8 G = p_pokemon.m_boxdata.gender( );
 
             if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 ) {
                 if( G == 1 ) {
-                    cust_font.setColor( BLUE_IDX, 1 );
-                    cust_font.printChar( 136, 100, 102, true );
+                    IO::regularFont->setColor( BLUE_IDX, 1 );
+                    IO::regularFont->printChar( 136, 100, 102, true );
                 } else {
-                    cust_font.setColor( RED_IDX, 1 );
-                    cust_font.printChar( 137, 100, 102, true );
+                    IO::regularFont->setColor( RED_IDX, 1 );
+                    IO::regularFont->printChar( 137, 100, 102, true );
                 }
             }
-            cust_font.setColor( WHITE_IDX, 1 );
+            IO::regularFont->setColor( WHITE_IDX, 1 );
 
-            cust_font.printString( POKEMON::PKMNDATA::getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
+            IO::regularFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
-                cust_font.printString( ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
-                                       24, 124, true );
-                FS::drawItemIcon( Oam, spriteInfo, ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 0, 116, oamIndex, palIndex, tilecnt, true );
+                IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
+                                              24, 124, true );
+                tilecnt = IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 0, 116, oamIndex++, palIndex++, tilecnt, true );
             } else {
-                cust_font.setColor( BLACK_IDX, 1 );
-                cust_font.setColor( GRAY_IDX, 2 );
-                cust_font.printString( ITEMS::ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 24, 124, true );
+                IO::regularFont->setColor( BLACK_IDX, 1 );
+                IO::regularFont->setColor( GRAY_IDX, 2 );
+                IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 24, 124, true );
             }
-            cust_font.setColor( GRAY_IDX, 1 );
-            cust_font.setColor( BLACK_IDX, 2 );
+            IO::regularFont->setColor( GRAY_IDX, 1 );
+            IO::regularFont->setColor( BLACK_IDX, 2 );
 
             if( data.m_types[ 0 ] == data.m_types[ 1 ] )
-                drawTypeIcon( Oam, spriteInfo, oamIndex, palIndex, tilecnt, data.m_types[ 0 ], 224, 0, true );
+                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 224, 0, oamIndex++, palIndex++, tilecnt, true );
             else {
-                drawTypeIcon( Oam, spriteInfo, oamIndex, palIndex, tilecnt, data.m_types[ 0 ], 192, 0, true );
-                drawTypeIcon( Oam, spriteInfo, oamIndex, palIndex, tilecnt, data.m_types[ 1 ], 224, 0, true );
+                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 192, 0, oamIndex++, palIndex++, tilecnt, true );
+                tilecnt = IO::loadTypeIcon( data.m_types[ 1 ], 224, 0, oamIndex++, palIndex++, tilecnt, true );
             }
 
         } else {
-            cust_font.setColor( WHITE_IDX, 1 );
-            cust_font.printString( "Ei /", 16, 96, true );
-            cust_font.printString( "Ei", 24, 110, true );
-            cust_font.setColor( GRAY_IDX, 1 );
+            IO::regularFont->setColor( WHITE_IDX, 1 );
+            IO::regularFont->printString( "Ei /", 16, 96, true );
+            IO::regularFont->printString( "Ei", 24, 110, true );
+            IO::regularFont->setColor( GRAY_IDX, 1 );
         }
 
         //Here starts the page specific stuff
@@ -1229,24 +1209,24 @@ END:
                 if( p_pokemon.m_boxdata.m_moves[ i ] ) {
                     auto acMove = AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ];
 
-                    BG_PALETTE_SUB[ 240 + i ] = POKEMON::PKMNDATA::getColor( acMove->m_moveType );
+                    BG_PALETTE_SUB[ 240 + i ] = getColor( acMove->m_moveType );
 
                     u8 w = 104, h = 32;
                     u8 x = 144 - 8 * i, y = 18 + ( h + 8 ) * i;
 
-                    FONT::putrec( x + 1, y + 1, x + w + 2, y + h + 1,
-                                  true, false, BLACK_IDX );
-                    FONT::putrec( x, y, x + w, y + h,
-                                  true, false, 240 + i );
-                    FONT::putrec( x + 7, y + 5, x + w - 4, y + h - 1,
-                                  true, false, BLACK_IDX );
-                    FONT::putrec( x + 6, y + 4, x + w - 6, y + h - 2,
-                                  true, false, WHITE_IDX );
+                    IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1,
+                                        true, false, BLACK_IDX );
+                    IO::printRectangle( x, y, x + w, y + h,
+                                        true, false, 240 + i );
+                    IO::printRectangle( x + 7, y + 5, x + w - 4, y + h - 1,
+                                        true, false, BLACK_IDX );
+                    IO::printRectangle( x + 6, y + 4, x + w - 6, y + h - 2,
+                                        true, false, WHITE_IDX );
 
-                    cust_font.printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
-                    drawTypeIcon( Oam, spriteInfo, oamIndex, palIndex, tilecnt, acMove->m_moveType, x - 10, y - 7, true );
-                    consoleSelect( &Bottom );
-                    consoleSetWindow( &Bottom, x / 8, 5 + 5 * i, 20, 2 );
+                    IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
+                    tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 10, y - 7, oamIndex++, palIndex++, tilecnt, true );
+                    consoleSelect( &IO::Bottom );
+                    consoleSetWindow( &IO::Bottom, x / 8, 5 + 5 * i, 20, 2 );
                     printf( "%6hhu/%2hhu AP",
                             p_pokemon.m_boxdata.m_acPP[ 0 ],
                             AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_movePP * ( ( 5 + p_pokemon.m_boxdata.m_ppup.m_Up1 ) / 5 ) );
@@ -1254,211 +1234,200 @@ END:
             }
         } else { //Status
             if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
-                cust_font.setColor( WHITE_IDX, 1 );
+                IO::regularFont->setColor( WHITE_IDX, 1 );
                 sprintf( buffer, "KP                     %3i", p_pokemon.m_stats.m_maxHP );
-                cust_font.printString( buffer, 130, 16, true );
+                IO::regularFont->printString( buffer, 130, 16, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 1.1 ) {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( RED_IDX, 2 );
-                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 0.9 ) {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( BLUE_IDX, 2 );
+                if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 1.1 ) {
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( RED_IDX, 2 );
+                } else if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 0.9 ) {
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( BLUE_IDX, 2 );
                 } else {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( GRAY_IDX, 2 );
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( GRAY_IDX, 2 );
                 }
                 sprintf( buffer, "ANG                   %3i", p_pokemon.m_stats.m_Atk );
-                cust_font.printString( buffer, 126, 41, true );
+                IO::regularFont->printString( buffer, 126, 41, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 1.1 ) {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( RED_IDX, 2 );
-                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 0.9 ) {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( BLUE_IDX, 2 );
+                if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 1.1 ) {
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( RED_IDX, 2 );
+                } else if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 0.9 ) {
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( BLUE_IDX, 2 );
                 } else {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( GRAY_IDX, 2 );
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( GRAY_IDX, 2 );
                 }
                 sprintf( buffer, "VER                   %3i", p_pokemon.m_stats.m_Def );
-                cust_font.printString( buffer, 124, 58, true );
+                IO::regularFont->printString( buffer, 124, 58, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 1.1 ) {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( RED_IDX, 2 );
-                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 0.9 ) {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( BLUE_IDX, 2 );
+                if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 1.1 ) {
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( RED_IDX, 2 );
+                } else if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 0.9 ) {
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( BLUE_IDX, 2 );
                 } else {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( GRAY_IDX, 2 );
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( GRAY_IDX, 2 );
                 }
                 sprintf( buffer, "SAN                   %3i", p_pokemon.m_stats.m_SAtk );
-                cust_font.printString( buffer, 122, 75, true );
+                IO::regularFont->printString( buffer, 122, 75, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 1.1 ) {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( RED_IDX, 2 );
-                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 0.9 ) {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( BLUE_IDX, 2 );
+                if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 1.1 ) {
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( RED_IDX, 2 );
+                } else if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 0.9 ) {
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( BLUE_IDX, 2 );
                 } else {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( GRAY_IDX, 2 );
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( GRAY_IDX, 2 );
                 }
                 sprintf( buffer, "SVE                   %3i", p_pokemon.m_stats.m_SDef );
-                cust_font.printString( buffer, 120, 92, true );
+                IO::regularFont->printString( buffer, 120, 92, true );
 
-                if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 1.1 ) {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( RED_IDX, 2 );
-                } else if( POKEMON::NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 0.9 ) {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( BLUE_IDX, 2 );
+                if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 1.1 ) {
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( RED_IDX, 2 );
+                } else if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 0.9 ) {
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( BLUE_IDX, 2 );
                 } else {
-                    cust_font.setColor( WHITE_IDX, 1 );
-                    cust_font.setColor( GRAY_IDX, 2 );
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( GRAY_IDX, 2 );
                 }
                 sprintf( buffer, "INI                   \xC3\xC3""%3i", p_pokemon.m_stats.m_Spd );
-                cust_font.printString( buffer, 118, 109, true );
+                IO::regularFont->printString( buffer, 118, 109, true );
 
-                FONT::putrec( (u8)158, (u8)18, u8( 158 + 68 ), u8( 18 + 12 ), true, false, WHITE_IDX );
+                IO::printRectangle( (u8)158, (u8)18, u8( 158 + 68 ), u8( 18 + 12 ), true, false, WHITE_IDX );
 
-                FONT::putrec( (u8)158, (u8)18, u8( 158 + ( 68.0*p_pokemon.m_boxdata.IVget( 0 ) / 31 ) ), u8( 18 + 6 ), true, false, GRAY_IDX );
-                FONT::putrec( (u8)158, u8( 18 + 6 ), u8( 158 + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ 0 ] / 252 ) ), u8( 18 + 12 ), true, false, GRAY_IDX );
+                IO::printRectangle( (u8)158, (u8)18, u8( 158 + ( 68.0*p_pokemon.m_boxdata.IVget( 0 ) / 31 ) ), u8( 18 + 6 ), true, false, GRAY_IDX );
+                IO::printRectangle( (u8)158, u8( 18 + 6 ), u8( 158 + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ 0 ] / 252 ) ), u8( 18 + 12 ), true, false, GRAY_IDX );
 
                 for( int i = 1; i < 6; ++i ) {
-                    FONT::putrec( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
-                                  u8( 156 - 2 * i + 68 ), u8( 26 + 12 + ( 17 * i ) ),
-                                  true, false, WHITE_IDX );
-                    FONT::putrec( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
-                                  u8( 156 - 2 * i + ( 68.0*p_pokemon.m_boxdata.IVget( i ) / 31 ) ),
-                                  u8( 26 + 6 + ( 17 * i ) ),
-                                  true, false, GRAY_IDX );
-                    FONT::putrec( u8( 156 - 2 * i ), u8( 26 + 6 + ( 17 * i ) ),
-                                  u8( 156 - 2 * i + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ i ] / 252 ) ),
-                                  u8( 26 + 12 + ( 17 * i ) ), true, false, GRAY_IDX );
+                    IO::printRectangle( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
+                                        u8( 156 - 2 * i + 68 ), u8( 26 + 12 + ( 17 * i ) ),
+                                        true, false, WHITE_IDX );
+                    IO::printRectangle( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
+                                        u8( 156 - 2 * i + ( 68.0*p_pokemon.m_boxdata.IVget( i ) / 31 ) ),
+                                        u8( 26 + 6 + ( 17 * i ) ),
+                                        true, false, GRAY_IDX );
+                    IO::printRectangle( u8( 156 - 2 * i ), u8( 26 + 6 + ( 17 * i ) ),
+                                        u8( 156 - 2 * i + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ i ] / 252 ) ),
+                                        u8( 26 + 12 + ( 17 * i ) ), true, false, GRAY_IDX );
                 }
 
                 //Ability
                 auto acAbility = ability( p_pokemon.m_boxdata.m_ability );
 
-                FONT::putrec( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false, WHITE_IDX );
-                cust_font.setColor( WHITE_IDX, 2 );
-                cust_font.setColor( BLACK_IDX, 1 );
+                IO::printRectangle( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false, WHITE_IDX );
+                IO::regularFont->setColor( WHITE_IDX, 2 );
+                IO::regularFont->setColor( BLACK_IDX, 1 );
                 u8 nlCnt = 0;
-                auto nStr = FS::breakString( acAbility.m_flavourText, cust_font, 250 );
+                auto nStr = FS::breakString( acAbility.m_flavourText, IO::regularFont, 250 );
                 for( auto c : nStr )
                     if( c == '\n' )
                         nlCnt++;
-                cust_font.printString( nStr.c_str( ), 0, 138, true, u8( 16 - 2 * nlCnt ) );
-                cust_font.printString( acAbility.m_abilityName.c_str( ), 5, 176, true );
-                cust_font.setColor( GRAY_IDX, 1 );
-                cust_font.setColor( BLACK_IDX, 2 );
+                IO::regularFont->printString( nStr.c_str( ), 0, 138, true, u8( 16 - 2 * nlCnt ) );
+                IO::regularFont->printString( acAbility.m_abilityName.c_str( ), 5, 176, true );
+                IO::regularFont->setColor( GRAY_IDX, 1 );
+                IO::regularFont->setColor( BLACK_IDX, 2 );
             } else {
-                cust_font.setColor( WHITE_IDX, 1 );
-                cust_font.setColor( BLACK_IDX, 2 );
+                IO::regularFont->setColor( WHITE_IDX, 1 );
+                IO::regularFont->setColor( BLACK_IDX, 2 );
                 if( p_pokemon.m_boxdata.m_steps > 10 ) {
-                    cust_font.printString( "Was da wohl", 16 * 8, 50, true );
-                    cust_font.printString( "schlüpfen wird?", 16 * 8, 70, true );
-                    cust_font.printString( "Es dauert wohl", 16 * 8, 100, true );
-                    cust_font.printString( "noch lange.", 16 * 8, 120, true );
+                    IO::regularFont->printString( "Was da wohl", 16 * 8, 50, true );
+                    IO::regularFont->printString( "schlüpfen wird?", 16 * 8, 70, true );
+                    IO::regularFont->printString( "Es dauert wohl", 16 * 8, 100, true );
+                    IO::regularFont->printString( "noch lange.", 16 * 8, 120, true );
                 } else if( p_pokemon.m_boxdata.m_steps > 5 ) {
-                    cust_font.printString( "Hat es sich", 16 * 8, 50, true );
-                    cust_font.printString( "gerade bewegt?", 16 * 8, 70, true );
-                    cust_font.printString( "Da tut sich", 16 * 8, 100, true );
-                    cust_font.printString( "wohl bald was.", 16 * 8, 120, true );
+                    IO::regularFont->printString( "Hat es sich", 16 * 8, 50, true );
+                    IO::regularFont->printString( "gerade bewegt?", 16 * 8, 70, true );
+                    IO::regularFont->printString( "Da tut sich", 16 * 8, 100, true );
+                    IO::regularFont->printString( "wohl bald was.", 16 * 8, 120, true );
                 } else {
-                    cust_font.printString( "Jetzt macht es", 16 * 8, 50, true );
-                    cust_font.printString( "schon Geräusche!", 16 * 8, 70, true );
-                    cust_font.printString( "Bald ist es", 16 * 8, 100, true );
-                    cust_font.printString( "wohl soweit.", 16 * 8, 120, true );
+                    IO::regularFont->printString( "Jetzt macht es", 16 * 8, 50, true );
+                    IO::regularFont->printString( "schon Geräusche!", 16 * 8, 70, true );
+                    IO::regularFont->printString( "Bald ist es", 16 * 8, 100, true );
+                    IO::regularFont->printString( "wohl soweit.", 16 * 8, 120, true );
                 }
-                cust_font.setColor( GRAY_IDX, 1 );
-                cust_font.setColor( BLACK_IDX, 2 );
+                IO::regularFont->setColor( GRAY_IDX, 1 );
+                IO::regularFont->setColor( BLACK_IDX, 2 );
             }
         }
 
-        touchPosition t;
+        touchPosition touch;
         loop( ) {
-            updateTime( false );
+            IO::updateTime( false );
             scanKeys( );
-            t = touchReadXY( );
-            u32 p = keysHeld( );
+            touch = touchReadXY( );
+            u32 pressed = keysHeld( );
 
             //Accept touches that are almost on the sprite
-            if( t.px > 224 && t.py > 164
-                && UI::waitForTouchUp( true, false, 224, 164 ) ) { //Back
+            if( GET_AND_WAIT_R( 224, 164, 300, 300 ) )  //Back
                 return 0;
-            } else if( p & KEY_UP ) {
-                UI::waitForKeysUp( true, false, KEY_UP );
+            else if( GET_AND_WAIT( KEY_UP ) )
                 return 2;
-            } else if( p & KEY_DOWN ) {
-                UI::waitForKeysUp( true, false, KEY_DOWN );
+            else if( GET_AND_WAIT( KEY_DOWN ) )
                 return 1;
-            } else if( p & KEY_RIGHT ) {
-                UI::waitForKeysUp( true, false, KEY_RIGHT );
+            else if( GET_AND_WAIT( KEY_RIGHT ) )
                 return 3;
-            } else if( p & KEY_LEFT ) {
-                UI::waitForKeysUp( true, false, KEY_LEFT );
+            else if( GET_AND_WAIT( KEY_LEFT ) )
                 return 3;
-            } else if( ( sqrt( sq( 16 + SCREEN_HEIGHT - 28 - 24 - t.py ) + sq( 16 + SCREEN_WIDTH - 22 - t.px ) ) <= 16 ) ) {
-                UI::waitForTouchUp( true, false );
+            else if( GET_AND_WAIT_C( 16 + SCREEN_WIDTH - 22, 16 + SCREEN_HEIGHT - 28 - 24, 16 ) )
                 return 2;
-            } else if( ( sqrt( sq( 16 + SCREEN_WIDTH - 28 - 24 - t.px ) + sq( 16 + SCREEN_HEIGHT - 22 - t.py ) ) <= 16 ) ) {
-                UI::waitForTouchUp( true, false );
+            else if( GET_AND_WAIT_C( 16 + SCREEN_WIDTH - 28 - 24, 16 + SCREEN_HEIGHT - 22, 16 ) )
                 return 1;
-            } else if( ( sqrt( sq( 16 + SCREEN_HEIGHT - 28 - 48 - t.py ) + sq( 16 + SCREEN_WIDTH - 20 - t.px ) ) <= 16 ) ) {
-                UI::waitForTouchUp( true, false );
+            else if( GET_AND_WAIT_C( 16 + SCREEN_WIDTH - 20, 16 + SCREEN_HEIGHT - 28 - 48, 16 ) )
                 return 3;
-            }
         }
     }
 
     u8 battleUI::choosePKMN( bool p_firstIsChosen, bool p_back ) {
 START:
-        consoleSelect( &Bottom );
+        consoleSelect( &IO::Bottom );
         undrawPKMNChoiceScreen( );
-        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleClear( );
         u8 result = 0;
-        Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
-        updateOAM( true );
+        IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
+        IO::updateOAM( true );
         drawPKMNChoiceScreen( _battle, p_firstIsChosen );
-        drawSub( );
+        IO::drawSub( );
         initColors( );
-        FONT::putrec( (u8)0, (u8)0, (u8)255, (u8)28, true, false, WHITE_IDX );
+        IO::printRectangle( (u8)0, (u8)0, (u8)255, (u8)28, true, false, WHITE_IDX );
 
         writeLogText( L"Welches PKMN?" );
 
-        touchPosition t;
+        touchPosition touch;
         loop( ) {
-            Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
-            updateOAM( true );
+            IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
+            IO::updateOAM( true );
 
-            updateTime( false );
+            IO::updateTime( false );
             scanKeys( );
-            t = touchReadXY( );
+            touch = touchReadXY( );
 
             //Accept touches that are almost on the sprite
-            if( p_back && t.px > 224 && t.py > 164
-                && UI::waitForTouchUp( true, false, 224, 164 ) ) { //Back
+            if( p_back && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) { //Back
                 result = 0;
                 break;
             }
             auto teamSz = _battle->_player->m_pkmnTeam->size( );
             for( u8 i = 0; i < teamSz; ++i ) {
-                u8 x = Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].x;
-                u8 y = Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].y;
+                u8 x = IO::Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].x;
+                u8 y = IO::Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].y;
 
-                if( t.px > x && t.px < x + 96 && t.py > y && t.py < y + 42
-                    && UI::waitForTouchUp( true, false, x, y, x + 96, y + 42 ) ) {
+                if( GET_AND_WAIT_R( x, y, x + 96, y + 42 ) ) {
                     result = i;
                     u8 tmp = 1;
                     auto acPkmn = ACPKMN2( *_battle, result, PLAYER );
                     undrawPKMNChoiceScreen( );
-                    consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+                    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                     consoleClear( );
                     while( tmp = showConfirmation( acPkmn, !result || ( result == p_firstIsChosen ), result == firstMoveSwitchTarget ) ) {
                         if( tmp == 3 )
@@ -1482,7 +1451,7 @@ START:
                         }
                         acPkmn = ACPKMN2( *_battle, result, PLAYER );
                         undrawPKMNChoiceScreen( );
-                        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+                        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                         consoleClear( );
                     }
                     if( !tmp )
@@ -1494,7 +1463,7 @@ START:
 
 CLEAR:
         undrawPKMNChoiceScreen( );
-        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleClear( );
         clearLogScreen( );
         initColors( );
@@ -1518,15 +1487,15 @@ CLEAR:
         if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
             return;
 
-        u8 hpx = OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
-            hpy = OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y;
+        u8 hpx = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
+            hpy = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y;
 
-        displayHP( 100, 100 - ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP * 100 / ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_maxHP,
+        IO::displayHP( 100, 100 - ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP * 100 / ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_maxHP,
                    hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, true );
 
-        consoleSelect( &Top );
+        consoleSelect( &IO::Top );
         if( p_opponent == p_pokemonPos ) {
-            consoleSetWindow( &Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
+            consoleSetWindow( &IO::Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             consoleClear( );
             printf( "%10ls%c\n",
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
@@ -1534,7 +1503,7 @@ CLEAR:
             printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_Level,
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
         } else {
-            consoleSetWindow( &Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
+            consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             consoleClear( );
             printf( "%10ls%c\n",
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
@@ -1549,28 +1518,28 @@ CLEAR:
         if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
             return;
 
-        u8 hpx = OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
-            hpy = OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y;
+        u8 hpx = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
+            hpy = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y;
 
-        POKEMON::PKMNDATA::pokemonData p;
+        pokemonData p;
         auto& acPkmn = ACPKMN2( *_battle, p_pokemonPos, p_opponent );
 
         if( !acPkmn.m_stats.m_acHP )
             return;
 
-        POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_speciesId, p );
+        getAll( acPkmn.m_boxdata.m_speciesId, p );
 
-        u16 expStart = ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] - p_gainedExp ) * 100 /
-            ( POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] );
-        u16 expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
-            ( POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) ) );
+        u16 expStart = ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] - p_gainedExp ) * 100 /
+            ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] );
+        u16 expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
+            ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) ) );
 
         std::swprintf( wbuffer, 50, L"%ls gewinnt %d E.-Punkte.[A]", acPkmn.m_boxdata.m_name, p_gainedExp );
         _battle->log( wbuffer );
-        displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
+        IO::displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
 
 
-        bool newLevel = POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+        bool newLevel = EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
         u16 HPdif = acPkmn.m_stats.m_maxHP - acPkmn.m_stats.m_acHP;
 
         while( newLevel ) {
@@ -1581,18 +1550,18 @@ CLEAR:
                 + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
             else
                 acPkmn.m_stats.m_maxHP = 1;
-            POKEMON::pkmnNatures nature = acPkmn.m_boxdata.getNature( );
+            pkmnNatures nature = acPkmn.m_boxdata.getNature( );
 
             acPkmn.m_stats.m_Atk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
-                + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * POKEMON::NatMod[ nature ][ ATK ];
+                + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
             acPkmn.m_stats.m_Def = ( ( ( acPkmn.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ DEF + 1 ]
-                + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ DEF ];
+                + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
             acPkmn.m_stats.m_Spd = ( ( ( acPkmn.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ SPD + 1 ]
-                + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SPD ];
+                + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
             acPkmn.m_stats.m_SAtk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ SATK + 1 ]
-                + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SATK ];
+                + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
             acPkmn.m_stats.m_SDef = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ SDEF + 1 ]
-                + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SDEF ];
+                + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
 
             acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
 
@@ -1606,14 +1575,14 @@ CLEAR:
             _battle->checkForEvolution( PLAYER, p_pokemonPos );
             if( oldSpec != acPkmn.m_boxdata.m_speciesId )
                 _battle->checkForAttackLearn( p_pokemonPos );
-            newLevel = acPkmn.m_Level < 100 && POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+            newLevel = acPkmn.m_Level < 100 && EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
 
             expStart = 0;
-            expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
-                ( POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) ) );
+            expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
+                ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) ) );
 
-            displayEP( 101, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-            displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
+            IO::displayEP( 101, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
+            IO::displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
         }
     }
 
@@ -1643,7 +1612,7 @@ CLEAR:
             }
             setStsBallPosition( p_opponent, p_pokemonPos, hpx + 8, hpy + 8, false );
         }
-        updateOAM( OamTop );
+        IO::updateOAM( false );
     }
 
     void battleUI::updateStatus( bool p_opponent, u8 p_pokemonPos ) {
@@ -1660,18 +1629,18 @@ CLEAR:
 
         //Hide PKMN sprite
         for( u8 i = PKMN_IDX( p_pokemonPos, p_opponent ); i < PKMN_IDX( p_pokemonPos, p_opponent ) + 4; ++i )
-            OamTop->oamBuffer[ i ].isHidden = true;
+            IO::OamTop->oamBuffer[ i ].isHidden = true;
 
         //Hide HP Bar
         //OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].isHidden = true;
-        displayHP( 100, 100, OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
-                   OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y,
+        IO::displayHP( 100, 100, IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
+                       IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y,
                    HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
-        displayEP( 100, 100, OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
-                   OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y, OWN1_EP_COL, OWN1_EP_COL + 1, false );
+        IO::displayEP( 100, 100, IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
+                       IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y, OWN1_EP_COL, OWN1_EP_COL + 1, false );
         //setStsBallVisibility( p_opponent, p_pokemonPos, true, false );
         setStsBallSts( p_opponent, p_pokemonPos, ACPKMNSTS2( *_battle, p_pokemonPos, p_opponent ), false );
-        updateOAM( OamTop );
+        IO::updateOAM( false );
 
         //Clear text
         s16 x = 0, y = 0;
@@ -1706,20 +1675,20 @@ CLEAR:
                 y = 115;
             }
         }
-        consoleSelect( &Top );
+        consoleSelect( &IO::Top );
         if( p_opponent == p_pokemonPos ) {
-            consoleSetWindow( &Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
+            consoleSetWindow( &IO::Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             consoleClear( );
         } else {
-            consoleSetWindow( &Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
+            consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             consoleClear( );
         }
     }
 
     void animatePokeBall( u8 p_x, u8 p_y, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt ) {
 
-        SpriteInfo * type1Info = &spriteInfoTop[ p_oamIndex ];
-        SpriteEntry * type1 = &OamTop->oamBuffer[ p_oamIndex ];
+        IO::SpriteInfo * type1Info = &IO::spriteInfoTop[ p_oamIndex ];
+        SpriteEntry * type1 = &IO::OamTop->oamBuffer[ p_oamIndex ];
         type1Info->m_oamId = p_oamIndex;
         type1Info->m_width = 16;
         type1Info->m_height = 16;
@@ -1738,49 +1707,49 @@ CLEAR:
         type1->priority = OBJPRIORITY_0;
         type1->palette = p_palCnt;
 
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall1Pal, &SPRITE_PALETTE[ (p_palCnt)* COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall1Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], PokeBall1TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall1Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall1Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall1TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall2Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], PokeBall2TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall2Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall2TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall3Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], PokeBall3TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall3Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall3TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall4Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], PokeBall4TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall4Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall4TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall5Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], PokeBall5TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall5Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall5TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall6Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], PokeBall6TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall6Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall6TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall7Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], PokeBall7TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall7Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall7TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall8Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], PokeBall8TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall8Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall8TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall9Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], PokeBall9TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall9Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall9TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall10Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], PokeBall10TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall10Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall10TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, PokeBall11Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], PokeBall11TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall11Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall11TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 3; ++i )
             swiWaitForVBlank( );
         type1->isHidden = true;
@@ -1803,23 +1772,23 @@ CLEAR:
         type1->priority = OBJPRIORITY_0;
         type1->palette = p_palCnt;
 
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ (p_palCnt)* COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], Shiny1TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny1TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ (p_palCnt)* COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], Shiny2TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny2TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
         type1->isHidden = true;
-        updateOAM( OamTop );
+        IO::updateOAM( false );
     }
 
     void animateShiny( u8 p_x, u8 p_y, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt ) {
-        SpriteInfo * type1Info = &spriteInfoTop[ p_oamIndex ];
-        SpriteEntry * type1 = &OamTop->oamBuffer[ p_oamIndex ];
+        IO::SpriteInfo * type1Info = &IO::spriteInfoTop[ p_oamIndex ];
+        SpriteEntry * type1 = &IO::OamTop->oamBuffer[ p_oamIndex ];
         type1Info->m_oamId = p_oamIndex;
         type1Info->m_width = 64;
         type1Info->m_height = 64;
@@ -1838,38 +1807,38 @@ CLEAR:
         type1->priority = OBJPRIORITY_0;
         type1->palette = p_palCnt;
 
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ (p_palCnt)* COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], Shiny1TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny1TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ (p_palCnt)* COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], Shiny2TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny2TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ (p_palCnt)* COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], Shiny1TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny1TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ (p_palCnt)* COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], Shiny2TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny2TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ (p_palCnt)* COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], Shiny1TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny1TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ (p_palCnt)* COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ], Shiny2TilesLen );
-        updateOAM( OamTop );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
+        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny2TilesLen );
+        IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
         type1->isHidden = true;
-        updateOAM( OamTop );
+        IO::updateOAM( false );
     }
 
     void battleUI::sendPKMN( bool p_opponent, u8 p_pokemonPos ) {
@@ -1923,7 +1892,7 @@ CLEAR:
         _battle->log( wbuffer );
 
         setStsBallVisibility( p_opponent, p_pokemonPos, true, false );
-        updateOAM( OamTop );
+        IO::updateOAM( false );
 
         animatePokeBall( x + 40, y + 40, PB_ANIM, 15, TILESTART );
 
@@ -1933,57 +1902,61 @@ CLEAR:
         u16 tileCnt = PKMN_TILE_IDX( p_pokemonPos, p_opponent );
 
         if( p_opponent ) {
-            if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
-                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-                if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/",
+            if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) ) {
+                if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
                     acPkmn.m_boxdata.m_speciesId, x, y,
-                    oamIdx, palIdx, tileCnt, false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    oamIdx, palIdx, IO::OamTop->oamBuffer[ oamIdx ].gfxIndex, false,
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) ) {
                     _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
+            oamIdx += 4;
+            palIdx++;
         } else {
-            if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x, y,
-                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-                if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
+            if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x, y,
+                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) ) {
+                if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/",
                     acPkmn.m_boxdata.m_speciesId, x, y,
-                    oamIdx, palIdx, tileCnt, false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    oamIdx, palIdx, IO::OamTop->oamBuffer[ oamIdx ].gfxIndex, false,
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) ) {
                     _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
+            oamIdx += 4;
+            palIdx++;
         }
         if( acPkmn.m_boxdata.isShiny( ) )
             animateShiny( x + 16, y + 16, SHINY_ANIM, 15, TILESTART );
 
         setStsBallPosition( p_opponent, p_pokemonPos, hpx + 8, hpy + 8, false );
-        OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].isHidden = false;
-        OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x = hpx;
-        OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y = hpy;
+        IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].isHidden = false;
+        IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x = hpx;
+        IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y = hpy;
         setStsBallVisibility( p_opponent, p_pokemonPos, false, false );
-        updateOAM( OamTop );
+        IO::updateOAM( false );
 
-        POKEMON::PKMNDATA::pokemonData p;
-        POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_speciesId, p );
+        pokemonData p;
+        getAll( acPkmn.m_boxdata.m_speciesId, p );
 
-        displayHP( 100, 101, hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
-        displayHP( 100, 100 - acPkmn.m_stats.m_acHP * 100 / acPkmn.m_stats.m_maxHP,
+        IO::displayHP( 100, 101, hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
+        IO::displayHP( 100, 100 - acPkmn.m_stats.m_acHP * 100 / acPkmn.m_stats.m_maxHP,
                    hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
 
-        displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
-                   ( POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] - POKEMON::EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ),
+        IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
+                   ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ),
                    hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
 
-        consoleSelect( &Top );
+        consoleSelect( &IO::Top );
         if( p_opponent == p_pokemonPos ) {
-            consoleSetWindow( &Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
+            consoleSetWindow( &IO::Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             printf( "%10ls%c\n",
                     acPkmn.m_boxdata.m_name,
                     GENDER( acPkmn ) );
             printf( "Lv%3d%4dKP\n", acPkmn.m_Level,
                     acPkmn.m_stats.m_acHP );
         } else {
-            consoleSetWindow( &Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
+            consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             printf( "%10ls%c\n",
                     acPkmn.m_boxdata.m_name,
                     GENDER( acPkmn ) );
@@ -2016,25 +1989,29 @@ CLEAR:
         u8 palIdx = PKMN_PAL_IDX( p_pokemonPos, p_opponent ) - 1;
         u16 tileCnt = PKMN_TILE_IDX( p_pokemonPos, p_opponent );
         if( p_opponent ) {
-            if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
-                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-                if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/",
+            if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) ) {
+                if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
                     acPkmn.m_boxdata.m_speciesId, x, y,
-                    oamIdx, palIdx, tileCnt, false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    oamIdx, palIdx, IO::OamTop->oamBuffer[ oamIdx ].gfxIndex, false,
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) ) {
                     _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
+            oamIdx += 4;
+            palIdx++;
         } else {
-            if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x, y,
-                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-                if( !FS::loadPKMNSprite( OamTop, spriteInfoTop, "nitro:/PICS/SPRITES/PKMNBACK/",
+            if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x, y,
+                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) ) {
+                if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/",
                     acPkmn.m_boxdata.m_speciesId, x, y,
-                    oamIdx, palIdx, tileCnt, false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    oamIdx, palIdx, IO::OamTop->oamBuffer[ oamIdx ].gfxIndex, false,
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) ) {
                     _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
+            oamIdx += 4;
+            palIdx++;
         }
         updateHP( p_opponent, p_pokemonPos );
     }
@@ -2058,21 +2035,21 @@ CLEAR:
                            AttackList[ p_move ]->m_moveName.c_str( ),
                            acPkmn.m_boxdata.m_name );
             _battle->log( wbuffer );
-            UI::yesNoBox yn;
+            IO::yesNoBox yn;
 ST:
             if( yn.getResult( "Soll eine Attacke\nvergessen werden?" ) ) {
                 initLogScreen( );
                 auto res = chooseAttack( p_pokemonPos );
                 for( u8 u = 0; u < 50; ++u )
-                    Oam->oamBuffer[ u ].isHidden = true;
-                updateOAM( true );
+                    IO::Oam->oamBuffer[ u ].isHidden = true;
+                IO::updateOAM( true );
 
                 if( !res ) {
                     std::sprintf( buffer, "Aufgeben %s zu erlernen?", AttackList[ p_move ]->m_moveName.c_str( ) );
                     if( !yn.getResult( buffer ) ) {
                         for( u8 u = 0; u < 50; ++u )
-                            Oam->oamBuffer[ u ].isHidden = true;
-                        updateOAM( true );
+                            IO::Oam->oamBuffer[ u ].isHidden = true;
+                        IO::updateOAM( true );
                         initLogScreen( );
                         goto ST;
                     }
@@ -2095,15 +2072,15 @@ ST:
                 initLogScreen( );
                 loadA( );
                 for( u8 u = 0; u < 50; ++u )
-                    Oam->oamBuffer[ u ].isHidden = true;
-                updateOAM( true );
+                    IO::Oam->oamBuffer[ u ].isHidden = true;
+                IO::updateOAM( true );
 
                 std::sprintf( buffer, "Aufgeben %s zu erlernen?", AttackList[ p_move ]->m_moveName.c_str( ) );
                 if( !yn.getResult( buffer ) ) {
                     initLogScreen( );
                     for( u8 u = 0; u < 50; ++u )
-                        Oam->oamBuffer[ u ].isHidden = true;
-                    updateOAM( true );
+                        IO::Oam->oamBuffer[ u ].isHidden = true;
+                    IO::updateOAM( true );
                     goto ST;
                 }
             }
@@ -2127,32 +2104,13 @@ ST:
 
     void battleUI::showEndScreen( ) {
 
-        initOAMTable( OamTop );
-        consoleSetWindow( &Top, 0, 0, 32, 24 );
-        consoleSelect( &Top );
+        IO::initOAMTable( false );
+        consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+        consoleSelect( &IO::Top );
         consoleClear( );
 
-        dmaCopy( mug_001_1Bitmap, bgGetGfxPtr( bg2 ), 256 * 192 );
+        dmaCopy( mug_001_1Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         dmaCopy( mug_001_1Pal, BG_PALETTE, 64 );
-    }
-
-    void battleUI::dinit( ) {
-        vramSetup( );
-        videoSetMode( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-        dmaFillWords( 0, bgGetGfxPtr( bg2 ), 256 * 192 );
-        dmaFillWords( 0, bgGetGfxPtr( bg3 ), 256 * 192 );
-        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-        consoleSelect( &Bottom );
-        consoleClear( );
-        drawSub( );
-        initOAMTable( true );
-        initOAMTable( OamTop );
-        initMainSprites( Oam, spriteInfo );
-        setMainSpriteVisibility( false );
-        Oam->oamBuffer[ 8 ].isHidden = true;
-        Oam->oamBuffer[ 0 ].isHidden = true;
-        Oam->oamBuffer[ 1 ].isHidden = false;
-        updateOAM( true );
     }
 
     //////////////////////////////////////////////////////////////////////////

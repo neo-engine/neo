@@ -33,12 +33,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <nds/ndstypes.h>
 
 #include "buffer.h"
-//#include "pokemon.h"
-//#include "battle.h"
 
-namespace POKEMON {
-    class pokemon;
-}
+class pokemon;
 
 namespace BATTLE {
 
@@ -141,7 +137,7 @@ namespace BATTLE {
 
                 bool            check( battle& p_battle, void* p_self );
                 bool            evaluate( int p_other );
-                int             getTargetVal( const battle& p_battle, const POKEMON::pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition );
+                int             getTargetVal( const battle& p_battle, const pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition );
                 int             getTargetVal( const battle& p_target );
             };
 
@@ -176,7 +172,7 @@ namespace BATTLE {
                        m_additiveConstant( p_additiveConstant ) { }
 
                 int             get( battle& p_battle, void* p_self );
-                int             get( battle& p_battle, POKEMON::pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition );
+                int             get( battle& p_battle, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition );
                 int             get( battle& p_target );
             };
 
@@ -256,7 +252,7 @@ namespace BATTLE {
 
 
             void                    execute( battle& p_battle, void* p_self );
-            void                    evaluateOnTargetVal( battle& p_battle, void* p_self, POKEMON::pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition );
+            void                    evaluateOnTargetVal( battle& p_battle, void* p_self, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition );
             void                    evaluateOnTargetVal( battle& p_battle, void* p_self );
         };
 
@@ -272,7 +268,7 @@ namespace BATTLE {
         void                            execute( battle& p_battle, void* p_self );
 
         friend int                      getTargetSpecifierValue( const battle&                      p_battle,
-                                                                 const POKEMON::pokemon&                        p_target,
+                                                                 const pokemon&                        p_target,
                                                                  bool                                           p_targetIsOpp,
                                                                  u8                                             p_targetPosition,
                                                                  const battleScript::command::targetSpecifier&  p_targetSpecifier );

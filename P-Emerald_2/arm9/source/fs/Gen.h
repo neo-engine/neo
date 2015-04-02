@@ -312,8 +312,8 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
                        pokemon::pokemon_growth_t** p_pg, pokemon::pokemon_misc_t** p_pm, int p_num, int p_size );
     void print_pokemon( box_pokemon_t* p_pokemon );
 
-    POKEMON::pokemon getGen5Pkmn( const pokemon& p_gen3Pkmn );
-    pokemon getGen3Pkmn( const POKEMON::pokemon &p_gen5Pkmn );
+    pokemon getGen5Pkmn( const pokemon& p_gen3Pkmn );
+    pokemon getGen3Pkmn( const pokemon &p_gen5Pkmn );
 }
 namespace gen4 {
     bool isValidItem( int p_gen5Idx );
@@ -324,8 +324,8 @@ namespace gen4 {
 
     };
 
-    POKEMON::pokemon getGen5Pkmn( pokemon p_gen4Pkmn );
-    pokemon getGen4Pkmn( POKEMON::pokemon p_gen5Pkmn );
+    pokemon getGen5Pkmn( pokemon p_gen4Pkmn );
+    pokemon getGen4Pkmn( pokemon p_gen5Pkmn );
 
     enum GAME {
         DIAMANT = 0,

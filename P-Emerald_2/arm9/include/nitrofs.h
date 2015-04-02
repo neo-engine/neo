@@ -10,7 +10,7 @@ Kallisti (K) 2008-01-26 All rights reversed.
 * you then dont need the gba's LOADEROFFSET, so it was set to 0x000
 
 2008-05-21  v0.3 - newer and more improved
-* fixed some issues with ftell() (again was fseek's fault u_u;;)
+* fixed some issues with ftell() (again was fseek's fault u_u;)
 * fixed possible error in detecting sc.gba files when using dldi
 * readded support for .gba files in addition to .nds emu
 * added stat() support for completedness :)

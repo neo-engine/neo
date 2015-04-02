@@ -219,7 +219,7 @@ extern "C" {
 
     // sound channel info
     typedef struct {
-        SoundInfo snd;;
+        SoundInfo snd;
         u8  busy;
         u8  reserved;
         s8  volume;

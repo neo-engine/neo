@@ -34,15 +34,15 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <initializer_list>
 
 #include "battle.h"
-#include "pokemon.h"
-#include "move.h"
-#include "item.h"
-#include "screenLoader.h"
-#include "saveGame.h"
-#include "bag.h"
-#include "buffer.h"
-#include "fs.h"
-#include "sprite.h"
+#include "../ds/pokemon.h"
+#include "../ds/move.h"
+#include "../ds/item.h"
+#include "../fs/saveGame.h"
+#include "../bag/bag.h"
+#include "../buffer.h"
+#include "../fs/fs.h"
+#include "../io/sprite.h"
+#include "../io/uio.h"
 
 namespace BATTLE {
     const char* trainerclassnames[ ] = { "Pokémon-Trainer" };
@@ -96,13 +96,13 @@ namespace BATTLE {
 
             p_battle._battleUI.setLogTextColor( RGB15( r, g, b ) );
             if( r != 15 || g != 15 || b != 15 )
-                cust_font.setColor( COLOR_IDX, 1 );
+                IO::regularFont->setColor( COLOR_IDX, 1 );
             else
-                cust_font.setColor( GRAY_IDX, 1 );
+                IO::regularFont->setColor( GRAY_IDX, 1 );
             return L"";
         }
 
-        POKEMON::pokemon target = ACPKMN2( p_battle, 0, PLAYER );
+        pokemon target = ACPKMN2( p_battle, 0, PLAYER );
         bool isPkmn = false;
         bool isOpp = false;
 
@@ -137,7 +137,7 @@ namespace BATTLE {
                 return std::wstring( wbuffer );
             }
             if( specifier == L"ITEM" ) {
-                std::swprintf( wbuffer, 50, L"%s", ITEMS::ItemList[ target.m_boxdata.m_holdItem ]->m_itemName.c_str( ) );
+                std::swprintf( wbuffer, 50, L"%s", ItemList[ target.m_boxdata.m_holdItem ]->m_itemName.c_str( ) );
                 return std::wstring( wbuffer );
             }
             if( specifier == L"LEVEL" )
@@ -270,17 +270,17 @@ CHOOSE1:
         //Some basic initialization stuff
         _battleUI = battleUI( this );
         _battleUI.init( );
-        POKEMON::PKMNDATA::pokemonData pdata;
+        pokemonData pdata;
         for( u8 i = 0; i < 6; ++i ) {
             if( _player->m_pkmnTeam->size( ) > i ) {
-                POKEMON::PKMNDATA::getAll( ( *_player->m_pkmnTeam )[ i ].m_boxdata.m_speciesId, pdata );
+                getAll( ( *_player->m_pkmnTeam )[ i ].m_boxdata.m_speciesId, pdata );
                 _pkmns[ i ][ 0 ].m_pokemon = &( ( *_player->m_pkmnTeam )[ i ] );
                 _pkmns[ i ][ 0 ].m_Types[ 0 ] = pdata.m_types[ 0 ];
                 _pkmns[ i ][ 0 ].m_Types[ 1 ] = pdata.m_types[ 1 ];
                 _pkmns[ i ][ 0 ].m_Types[ 2 ] = pdata.m_types[ 1 ];
             }
             if( _opponent->m_pkmnTeam->size( ) > i ) {
-                POKEMON::PKMNDATA::getAll( ( *_opponent->m_pkmnTeam )[ i ].m_boxdata.m_speciesId, pdata );
+                getAll( ( *_opponent->m_pkmnTeam )[ i ].m_boxdata.m_speciesId, pdata );
                 _pkmns[ i ][ 1 ].m_pokemon = &( ( *_opponent->m_pkmnTeam )[ i ] );
                 _pkmns[ i ][ 1 ].m_Types[ 0 ] = pdata.m_types[ 0 ];
                 _pkmns[ i ][ 1 ].m_Types[ 1 ] = pdata.m_types[ 1 ];
@@ -689,7 +689,7 @@ OUT:
             case battleMove::USE_ITEM:
             {
                 if( opponent ) {
-                    std::swprintf( wbuffer, 100, L"[TRAINER] ([TCLASS]) setzt\n%s ein.[A]", ITEMS::ItemList[ acMove.m_value ]->getDisplayName( true ).c_str( ) );
+                    std::swprintf( wbuffer, 100, L"[TRAINER] ([TCLASS]) setzt\n%s ein.[A]", ItemList[ acMove.m_value ]->getDisplayName( true ).c_str( ) );
                     log( wbuffer );
                 }
                 doItem( opponent, acMove.m_target, ability::abilityType( 0 ) );
@@ -745,8 +745,8 @@ OUT:
         _critical[ p_targetPos ][ p_targetIsOpp ] = !( rand( ) % mod );
         //STAB
         float STAB = 1.0f;
-        if( POKEMON::PKMNDATA::getType( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_speciesId, 0 ) == move->m_moveType
-            || POKEMON::PKMNDATA::getType( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_speciesId, 1 ) == move->m_moveType )
+        if( getType( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_speciesId, 0 ) == move->m_moveType
+            || getType( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_speciesId, 1 ) == move->m_moveType )
             STAB = 1.5f;
         if( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_ADAPTABILITY )
             STAB = 2.0f;
@@ -903,9 +903,9 @@ NEXT:
         if( !ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
             return;
 
-        auto im = *ITEMS::ItemList[ ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability ];
+        auto im = *ItemList[ ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability ];
 
-        if( ( im.getEffectType( ) & ITEMS::item::itemEffectType::IN_BATTLE ) && ( im.m_inBattleEffect & p_situation ) ) {
+        if( ( im.getEffectType( ) & item::itemEffectType::IN_BATTLE ) && ( im.m_inBattleEffect & p_situation ) ) {
             std::swprintf( wbuffer, 50, L"%s von %ls%s wirkt.[A]",
                            im.getDisplayName( ).c_str( ),
                            ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
@@ -1290,8 +1290,8 @@ NEXT:
         _participatedPKMN[ &ACPKMN( p_pokemonPos, p_opponent ) ] = 0;
 
         float wildModifer = m_isWildBattle ? 1 : 1.5;
-        POKEMON::PKMNDATA::pokemonData p;
-        POKEMON::PKMNDATA::getAll( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_speciesId, p );
+        pokemonData p;
+        getAll( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_speciesId, p );
         u16 b = p.m_EXPYield;
 
         for( u8 i = 0; i < 6; ++i ) {
@@ -1318,7 +1318,7 @@ NEXT:
 
                 u8 L = acPkmn.m_Level;
 
-                float t = ( acPkmn.m_boxdata.m_oTId == SAV->m_Id && acPkmn.m_boxdata.m_oTSid == SAV->m_Sid ? 1 : 1.5 );
+                float t = ( acPkmn.m_boxdata.m_oTId == FS::SAV->m_Id && acPkmn.m_boxdata.m_oTSid == FS::SAV->m_Sid ? 1 : 1.5 );
 
                 u32 exp = u32( ( wildModifer * t* b* e* L ) / 7 );
 
@@ -1354,9 +1354,9 @@ NEXT:
                 if( acidx < 1 + ( m_battleMode == DOUBLE ) )
                     _battleUI.applyEXPChanges( !p_opponent, acidx, exp ); // Checks also for level-advancement of 1st (and in Doubles 2nd) PKMN
                 else { //Advance the level here (this is NOT redundant boilerplate!
-                    POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_speciesId, p );
+                    getAll( acPkmn.m_boxdata.m_speciesId, p );
 
-                    bool newLevel = POKEMON::EXP[ L ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+                    bool newLevel = EXP[ L ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
                     u16 HPdif = acPkmn.m_stats.m_maxHP - acPkmn.m_stats.m_acHP;
 
                     while( newLevel ) {
@@ -1367,18 +1367,18 @@ NEXT:
                             + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
                         else
                             acPkmn.m_stats.m_maxHP = 1;
-                        POKEMON::pkmnNatures nature = acPkmn.m_boxdata.getNature( );
+                        pkmnNatures nature = acPkmn.m_boxdata.getNature( );
 
                         acPkmn.m_stats.m_Atk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
-                            + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * POKEMON::NatMod[ nature ][ ATK ];
+                            + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
                         acPkmn.m_stats.m_Def = ( ( ( acPkmn.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ DEF + 1 ]
-                            + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ DEF ];
+                            + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
                         acPkmn.m_stats.m_Spd = ( ( ( acPkmn.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ SPD + 1 ]
-                            + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SPD ];
+                            + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
                         acPkmn.m_stats.m_SAtk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ SATK + 1 ]
-                            + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SATK ];
+                            + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
                         acPkmn.m_stats.m_SDef = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ SDEF + 1 ]
-                            + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SDEF ];
+                            + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
 
                         acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
 
@@ -1386,14 +1386,14 @@ NEXT:
                         log( wbuffer );
 
                         checkForAttackLearn( i );
-                        newLevel = acPkmn.m_Level < 100 && POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+                        newLevel = acPkmn.m_Level < 100 && EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
                     }
                 }
             }
         }
 
 
-        if( SAV->m_EXPShareEnabled && p_opponent ) {
+        if( FS::SAV->m_EXPShareEnabled && p_opponent ) {
             log( L"Der EP-Teiler wirkt![A]" );
             for( u8 i = ( ( m_battleMode == DOUBLE ) ? 2 : 1 ); i < 6; ++i )if( ACPKMNSTS( i, PLAYER ) != KO &&
                                                                                 ACPKMNSTS( i, PLAYER ) != NA ) {
@@ -1409,7 +1409,7 @@ NEXT:
 
                 u8 L = acPkmn.m_Level;
 
-                float t = ( acPkmn.m_boxdata.m_oTId == SAV->m_Id && acPkmn.m_boxdata.m_oTSid == SAV->m_Sid ? 1 : 1.5 );
+                float t = ( acPkmn.m_boxdata.m_oTId == FS::SAV->m_Id && acPkmn.m_boxdata.m_oTSid == FS::SAV->m_Sid ? 1 : 1.5 );
 
                 u32 exp = u32( ( wildModifer * t* b* e* L ) / 7 );
 
@@ -1446,9 +1446,9 @@ NEXT:
 
                 //Check for level-advancing
 
-                POKEMON::PKMNDATA::getAll( acPkmn.m_boxdata.m_speciesId, p );
+                getAll( acPkmn.m_boxdata.m_speciesId, p );
 
-                bool newLevel = POKEMON::EXP[ L ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+                bool newLevel = EXP[ L ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
                 u16 HPdif = acPkmn.m_stats.m_maxHP - acPkmn.m_stats.m_acHP;
 
                 while( newLevel ) {
@@ -1459,18 +1459,18 @@ NEXT:
                         + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
                     else
                         acPkmn.m_stats.m_maxHP = 1;
-                    POKEMON::pkmnNatures nature = acPkmn.m_boxdata.getNature( );
+                    pkmnNatures nature = acPkmn.m_boxdata.getNature( );
 
                     acPkmn.m_stats.m_Atk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
-                        + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * POKEMON::NatMod[ nature ][ ATK ];
+                        + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
                     acPkmn.m_stats.m_Def = ( ( ( acPkmn.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ DEF + 1 ]
-                        + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ DEF ];
+                        + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
                     acPkmn.m_stats.m_Spd = ( ( ( acPkmn.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ SPD + 1 ]
-                        + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SPD ];
+                        + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
                     acPkmn.m_stats.m_SAtk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ SATK + 1 ]
-                        + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SATK ];
+                        + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
                     acPkmn.m_stats.m_SDef = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ SDEF + 1 ]
-                        + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*POKEMON::NatMod[ nature ][ SDEF ];
+                        + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
 
                     acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
 
@@ -1479,7 +1479,7 @@ NEXT:
 
                     checkForAttackLearn( i );
 
-                    newLevel = acPkmn.m_Level < 100 && POKEMON::EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+                    newLevel = acPkmn.m_Level < 100 && EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
                 }
             }
         }
@@ -1494,7 +1494,7 @@ NEXT:
         u16 learnable[ MAX_ATTACKS_PER_LEVEL ];
         auto& acPkmn = ACPKMN( p_pokemonPos, PLAYER );
 
-        POKEMON::PKMNDATA::getLearnMoves( acPkmn.m_boxdata.m_speciesId, acPkmn.m_Level, acPkmn.m_Level, 1, MAX_ATTACKS_PER_LEVEL, learnable );
+        getLearnMoves( acPkmn.m_boxdata.m_speciesId, acPkmn.m_Level, acPkmn.m_Level, 1, MAX_ATTACKS_PER_LEVEL, learnable );
 
         for( u8 i = 0; i < MAX_ATTACKS_PER_LEVEL; ++i ) {
             if( !learnable[ i ] )
@@ -1510,7 +1510,7 @@ NEXT:
     *  @param p_pokemonPos: Position of the PKMN to be tested (0 or 1)
     */
     void battle::checkForEvolution( bool p_opponent, u8 p_pokemonPos ) {
-        if( !SAV->m_evolveInBattle )
+        if( !FS::SAV->m_evolveInBattle )
             return;
 
         if( ACPKMN( p_pokemonPos, p_opponent ).canEvolve( ) ) {
@@ -1618,8 +1618,6 @@ NEXT:
                 log( L"Der Kampf endet.[A]" );
                 break;
         }
-
-        _battleUI.dinit( );
     }
 
     /**

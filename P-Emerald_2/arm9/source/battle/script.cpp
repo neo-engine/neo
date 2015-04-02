@@ -51,31 +51,31 @@ namespace BATTLE {
     }
 
     u8 targetVal;
-    int getTargetSpecifierValue( const battle& p_battle, const POKEMON::pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition, const battleScript::command::targetSpecifier& p_targetSpecifier ) {
+    int getTargetSpecifierValue( const battle& p_battle, const pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition, const battleScript::command::targetSpecifier& p_targetSpecifier ) {
         switch( p_targetSpecifier ) {
             case BATTLE::battleScript::command::PKMN_TYPE1:
-                return int( POKEMON::PKMNDATA::getType( p_target.m_boxdata.m_speciesId, 0 ) );
+                return int( getType( p_target.m_boxdata.m_speciesId, 0 ) );
             case BATTLE::battleScript::command::PKMN_TYPE2:
-                return int( POKEMON::PKMNDATA::getType( p_target.m_boxdata.m_speciesId, 1 ) );
+                return int( getType( p_target.m_boxdata.m_speciesId, 1 ) );
             case BATTLE::battleScript::command::PKMN_TYPE1o2:
             {
-                int a = int( POKEMON::PKMNDATA::getType( p_target.m_boxdata.m_speciesId, 1 ) );
+                int a = int( getType( p_target.m_boxdata.m_speciesId, 1 ) );
                 if( targetVal == a )
                     return a;
                 else
-                    return int( POKEMON::PKMNDATA::getType( p_target.m_boxdata.m_speciesId, 0 ) );
+                    return int( getType( p_target.m_boxdata.m_speciesId, 0 ) );
                 break;
             }
             case BATTLE::battleScript::command::PKMN_SIZE:
             {
-                POKEMON::PKMNDATA::pokemonData pd;
-                POKEMON::PKMNDATA::getAll( p_target.m_boxdata.m_speciesId, pd );
+                pokemonData pd;
+                getAll( p_target.m_boxdata.m_speciesId, pd );
                 return int( pd.m_size );
             }
             case BATTLE::battleScript::command::PKMN_WEIGHT:
             {
-                POKEMON::PKMNDATA::pokemonData pd;
-                POKEMON::PKMNDATA::getAll( p_target.m_boxdata.m_speciesId, pd );
+                pokemonData pd;
+                getAll( p_target.m_boxdata.m_speciesId, pd );
                 return int( pd.m_weight );
             }
             case BATTLE::battleScript::command::PKMN_SPECIES:
@@ -159,7 +159,7 @@ namespace BATTLE {
         }
     }
 
-    int battleScript::command::condition::getTargetVal( const battle& p_battle, const POKEMON::pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition ) {
+    int battleScript::command::condition::getTargetVal( const battle& p_battle, const pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition ) {
         targetVal = m_value;
         return getTargetSpecifierValue( p_battle, p_target, p_targetIsOpp, p_targetPosition, m_targetSpecifier );
     }
@@ -183,7 +183,7 @@ namespace BATTLE {
             {
                 bool pkmnIsOpp = false;
                 bool pkmnIsSnd = ( p_battle.m_battleMode == battle::DOUBLE );
-                auto acPkmn = *( ( POKEMON::pokemon* )p_self );
+                auto acPkmn = *( ( pokemon* )p_self );
 
                 if( acPkmn == ACPKMN2( p_battle, OPPONENT, 0 ) ) {
                     pkmnIsOpp = true;
@@ -202,7 +202,7 @@ namespace BATTLE {
                     pkmnIsSnd &= true;
                 }
 
-                return evaluate( getTargetVal( p_battle, *( ( POKEMON::pokemon* )p_self ), pkmnIsOpp, pkmnIsSnd ) );
+                return evaluate( getTargetVal( p_battle, *( ( pokemon* )p_self ), pkmnIsOpp, pkmnIsSnd ) );
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
                 return evaluate( getTargetVal( *( (battle*)p_self ) ) );
@@ -230,7 +230,7 @@ namespace BATTLE {
             {
                 bool pkmnIsOpp = false;
                 bool pkmnIsSnd = ( p_battle.m_battleMode == battle::DOUBLE );
-                auto acPkmn = *( ( POKEMON::pokemon* )p_self );
+                auto acPkmn = *( ( pokemon* )p_self );
 
                 if( acPkmn == ACPKMN2( p_battle, OPPONENT, 0 ) ) {
                     pkmnIsOpp = true;
@@ -249,7 +249,7 @@ namespace BATTLE {
                     pkmnIsSnd &= true;
                 }
 
-                return get( p_battle, *( ( POKEMON::pokemon* )p_self ), pkmnIsOpp, pkmnIsSnd );
+                return get( p_battle, *( ( pokemon* )p_self ), pkmnIsOpp, pkmnIsSnd );
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
                 return get( *( (battle*)p_self ) );
@@ -260,14 +260,14 @@ namespace BATTLE {
                 return m_additiveConstant;
         }
     }
-    int battleScript::command::value::get( battle& p_battle, POKEMON::pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition ) {
+    int battleScript::command::value::get( battle& p_battle, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition ) {
         return m_additiveConstant + int( m_multiplier *getTargetSpecifierValue( p_battle, p_target, p_targetIsOpp, p_targetPosition, m_targetSpecifier ) );
     }
     int battleScript::command::value::get( battle& p_target ) {
         return m_additiveConstant + int( m_multiplier * getTargetSpecifierValue( p_target, m_targetSpecifier ) );
     }
 
-    void battleScript::command::evaluateOnTargetVal( battle& p_battle, void* p_self, POKEMON::pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition ) {
+    void battleScript::command::evaluateOnTargetVal( battle& p_battle, void* p_self, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition ) {
 
         target t;
         if( p_targetIsOpp && p_targetPosition )
@@ -400,7 +400,7 @@ namespace BATTLE {
             {
                 bool pkmnIsOpp = false;
                 bool pkmnIsSnd = ( p_battle.m_battleMode == battle::DOUBLE );
-                auto acPkmn = *( ( POKEMON::pokemon* )p_self );
+                auto acPkmn = *( ( pokemon* )p_self );
 
                 if( acPkmn == ACPKMN2( p_battle, OPPONENT, 0 ) ) {
                     pkmnIsOpp = true;

@@ -84,7 +84,7 @@ namespace IO {
                     updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-                    updateOAM( OamTop );
+                    IO::updateOAM( false );
                 }
 
                 loop( ) {
@@ -113,7 +113,7 @@ namespace IO {
                     updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-                    updateOAM( OamTop );
+                    IO::updateOAM( false );
                 }
                 current_char++;
                 continue;
@@ -146,7 +146,7 @@ namespace IO {
                     updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-                    updateOAM( OamTop );
+                    IO::updateOAM( false );
                 }
 
                 loop( ) {
@@ -175,7 +175,7 @@ namespace IO {
                     updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-                    updateOAM( OamTop );
+                    IO::updateOAM( false );
                 }
                 current_char++;
                 continue;
@@ -208,7 +208,7 @@ namespace IO {
                     updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-                    updateOAM( OamTop );
+                    IO::updateOAM( false );
                 }
 
                 loop( ) {
@@ -237,7 +237,7 @@ namespace IO {
                     updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-                    updateOAM( OamTop );
+                    IO::updateOAM( false );
                 }
                 current_char++;
                 continue;
@@ -272,7 +272,7 @@ namespace IO {
                     updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-                    updateOAM( OamTop );
+                    IO::updateOAM( false );
                 }
 
                 loop( ) {
@@ -301,7 +301,7 @@ namespace IO {
                     updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-                    updateOAM( OamTop );
+                    IO::updateOAM( false );
                 }
                 current_char++;
                 continue;
