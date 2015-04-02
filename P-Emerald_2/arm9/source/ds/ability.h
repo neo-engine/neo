@@ -28,7 +28,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #pragma once
 
 #include <string>
-#include "script.h"
+#include "../battle/script.h"
 
 class ability {
 public:

@@ -16,13 +16,13 @@
     <ClInclude Include="arm9\include\as_lib9.h" />
     <ClInclude Include="arm9\include\libnds_internal.h" />
     <ClInclude Include="arm9\include\map2devents.h" />
-    <ClInclude Include="arm9\include\battle.h" />
     <ClInclude Include="arm9\include\map2d.h" />
     <ClInclude Include="arm9\include\mapconfig.h" />
     <ClInclude Include="arm9\include\nitrofs.h" />
-    <ClInclude Include="arm9\include\script.h" />
     <ClInclude Include="arm9\include\unistd.h" />
     <ClInclude Include="arm9\source\bag\bag.h" />
+    <ClInclude Include="arm9\source\battle\battle.h" />
+    <ClInclude Include="arm9\source\battle\script.h" />
     <ClInclude Include="arm9\source\buffer.h" />
     <ClInclude Include="arm9\source\defines.h" />
     <ClInclude Include="arm9\source\ds\ability.h" />
@@ -43,14 +43,22 @@
     <ClInclude Include="arm9\source\io\sprite.h" />
     <ClInclude Include="arm9\source\io\yesNoBox.h" />
     <ClInclude Include="arm9\source\screenLoader.h" />
+    <ClInclude Include="arm9\source\sts\statusScreen.h" />
+    <ClInclude Include="arm9\source\sts\statusScreenUI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\as_lib7.c" />
     <ClCompile Include="arm7\source\main.c" />
     <ClCompile Include="arm9\source\as_lib9.c" />
     <ClCompile Include="arm9\source\bagUI.cpp" />
-    <ClCompile Include="arm9\source\battleUI.cpp" />
+    <ClCompile Include="arm9\source\battle\battle.cpp" />
+    <ClCompile Include="arm9\source\battle\battleUI.cpp" />
+    <ClCompile Include="arm9\source\battle\script.cpp" />
     <ClCompile Include="arm9\source\buffer.cpp" />
+    <ClCompile Include="arm9\source\ds\item.cpp" />
+    <ClCompile Include="arm9\source\ds\move.cpp" />
+    <ClCompile Include="arm9\source\ds\pokemon.cpp" />
+    <ClCompile Include="arm9\source\ds\type.cpp" />
     <ClCompile Include="arm9\source\fs\fs.cpp" />
     <ClCompile Include="arm9\source\fs\Gen.cpp" />
     <ClCompile Include="arm9\source\fs\saveGame.cpp" />
@@ -63,20 +71,16 @@
     <ClCompile Include="arm9\source\io\sprite.cpp" />
     <ClCompile Include="arm9\source\io\yesNoBox.cpp" />
     <ClCompile Include="arm9\source\map2devents.cpp" />
-    <ClCompile Include="arm9\source\move.cpp" />
     <ClCompile Include="arm9\source\bag.cpp" />
-    <ClCompile Include="arm9\source\battle.cpp" />
     <ClCompile Include="arm9\source\Box.cpp" />
     <ClCompile Include="arm9\source\hex2dec.c" />
-    <ClCompile Include="arm9\source\item.cpp" />
     <ClCompile Include="arm9\source\main.cpp" />
     <ClCompile Include="arm9\source\map2d.cpp" />
     <ClCompile Include="arm9\source\mapconfig.cpp" />
-    <ClCompile Include="arm9\source\pokemon.cpp" />
     <ClCompile Include="arm9\source\nitrofs.c" />
     <ClCompile Include="arm9\source\screenLoader.cpp" />
-    <ClCompile Include="arm9\source\script.cpp" />
-    <ClCompile Include="arm9\source\type.cpp" />
+    <ClCompile Include="arm9\source\sts\statusScreen.cpp" />
+    <ClCompile Include="arm9\source\sts\statusScreenUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />

@@ -26,12 +26,20 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 */
 
 #include <algorithm>
+#include <initializer_list>
 
 #include "sprite.h"
+#include "uio.h"
+#include "../fs/fs.h"
+#include "../ds/move.h"
 
 #include "damage_0.h"
 #include "damage_1.h"
 #include "damage_2.h"
+#include "NoItem.h"
+
+u32 TEMP[ 12288 ] = { 0 };
+u16 TEMP_PAL[ 256 ] = { 0 };
 
 namespace IO {
     const unsigned int* TypeTiles[ 19 ] =
@@ -58,6 +66,7 @@ namespace IO {
         damage_0Pal, damage_1Pal, damage_2Pal
     };
 
+
     [[ deprecated( "Use the methods of IO instead." ) ]]
     const u8 SPRITE_DMA_CHANNEL = 2;
 
@@ -72,69 +81,45 @@ namespace IO {
     [[ deprecated( "Use the methods of IO instead." ) ]]
     const u16 OFFSET_MULTIPLIER_SUB = ( BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] ) );
 
-    void updateOAM( OAMTable * p_oam ) {
+    void updateOAM( bool p_bottom ) {
+        OAMTable* oam = ( p_bottom ? Oam : OamTop );
         DC_FlushAll( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                          p_oam->oamBuffer,
-                          OAM,
-                          SPRITE_COUNT * sizeof( SpriteEntry ) );
+        if( p_bottom ) {
+            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                              oam->oamBuffer,
+                              OAM_SUB,
+                              SPRITE_COUNT * sizeof( SpriteEntry ) );
+        } else {
+            dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
+                              oam->oamBuffer,
+                              OAM,
+                              SPRITE_COUNT * sizeof( SpriteEntry ) );
+        }
     }
-    void updateOAMSub( OAMTable * p_oam ) {
-        DC_FlushAll( );
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                          p_oam->oamBuffer,
-                          OAM_SUB,
-                          SPRITE_COUNT * sizeof( SpriteEntry ) );
-    }
-
-    void initOAMTable( OAMTable * p_oam ) {
+    void initOAMTable( bool p_bottom ) {
+        OAMTable* oam = ( p_bottom ? Oam : OamTop );
         /*
         * For all 128 sprites on the DS, disable and clear any attributes they
         * might have. This prevents any garbage from being displayed and gives
         * us a clean slate to work with.
         */
         for( int i = 0; i < SPRITE_COUNT; i++ ) {
-            p_oam->oamBuffer[ i ].attribute[ 0 ] = ATTR0_DISABLED;
-            p_oam->oamBuffer[ i ].attribute[ 1 ] = 0;
-            p_oam->oamBuffer[ i ].attribute[ 2 ] = 0;
-            p_oam->oamBuffer[ i ].isHidden = true;
+            oam->oamBuffer[ i ].attribute[ 0 ] = ATTR0_DISABLED;
+            oam->oamBuffer[ i ].attribute[ 1 ] = 0;
+            oam->oamBuffer[ i ].attribute[ 2 ] = 0;
+            oam->oamBuffer[ i ].isHidden = true;
         }
         for( int i = 0; i < MATRIX_COUNT; i++ ) {
             /* If you look carefully, you'll see this is that affine trasformation
             * matrix again. We initialize it to the identity matrix, as we did
             * with backgrounds
             */
-            p_oam->matrixBuffer[ i ].hdx = 1 << 8;
-            p_oam->matrixBuffer[ i ].hdy = 0;
-            p_oam->matrixBuffer[ i ].vdx = 0;
-            p_oam->matrixBuffer[ i ].vdy = 1 << 8;
+            oam->matrixBuffer[ i ].hdx = 1 << 8;
+            oam->matrixBuffer[ i ].hdy = 0;
+            oam->matrixBuffer[ i ].vdx = 0;
+            oam->matrixBuffer[ i ].vdy = 1 << 8;
         }
-        updateOAM( p_oam );
-    }
-    void initOAMTableSub( OAMTable * p_oam ) {
-        /*
-        * For all 128 sprites on the DS, disable and clear any attributes they
-        * might have. This prevents any garbage from being displayed and gives
-        * us a clean slate to work with.
-        */
-        for( int i = 0; i < SPRITE_COUNT; i++ ) {
-            p_oam->oamBuffer[ i ].attribute[ 0 ] = ATTR0_DISABLED;
-            p_oam->oamBuffer[ i ].attribute[ 1 ] = 0;
-            p_oam->oamBuffer[ i ].attribute[ 2 ] = 0;
-            p_oam->oamBuffer[ i ].isHidden = true;
-        }
-        for( int i = 0; i < MATRIX_COUNT; i++ ) {
-            /* If you look carefully, you'll see this is that affine trasformation
-            * matrix again. We initialize it to the identity matrix, as we did
-            * with backgrounds
-            */
-            p_oam->matrixBuffer[ i ].hdx = 1 << 8;
-            p_oam->matrixBuffer[ i ].hdy = 0;
-            p_oam->matrixBuffer[ i ].vdx = 0;
-            p_oam->matrixBuffer[ i ].vdy = 1 << 8;
-        }
-
-        updateOAMSub( p_oam );
+        updateOAM( p_bottom );
     }
     void rotateSprite( SpriteRotation * p_spriteRotation, int p_angle ) {
         s16 s = sinLerp( p_angle ) >> 4;
@@ -191,9 +176,7 @@ namespace IO {
         p_spriteEntry->priority = p_priority;
     }
 
-    u16 loadSprite( OAMTable   *p_oam,
-                    SpriteInfo *p_spriteInfo,
-                    const u8    p_oamIdx,
+    u16 loadSprite( const u8    p_oamIdx,
                     const u8    p_palIdx,
                     const u16   p_tileIdx,
                     const u16   p_posX,
@@ -207,10 +190,12 @@ namespace IO {
                     bool        p_flipY,
                     bool        p_hidden,
                     ObjPriority p_priority,
-                    bool        p_subScreen ) {
+                    bool        p_bottom ) {
+        IO::SpriteInfo* sInfo = ( p_bottom ? spriteInfo : spriteInfoTop );
+        OAMTable* oam = ( p_bottom ? Oam : OamTop );
 
-        SpriteInfo * spriteInfo = &p_spriteInfo[ p_oamIdx ];
-        SpriteEntry * spriteEntry = &p_oam->oamBuffer[ p_oamIdx ];
+        SpriteInfo * spriteInfo = &sInfo[ p_oamIdx ];
+        SpriteEntry * spriteEntry = &oam->oamBuffer[ p_oamIdx ];
 
         spriteInfo->m_oamId = p_oamIdx;
         spriteInfo->m_width = p_width;
@@ -239,13 +224,114 @@ namespace IO {
                               ( ( maxSize == 32 ) ? OBJSIZE_32 :
                               ( ( maxSize == 16 ) ? OBJSIZE_16 : OBJSIZE_8 ) ) );
 
-        if( !p_subScreen ) {
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE[ p_palIdx * COLORS_PER_PALETTE ], 32 );
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER ], p_spriteDataLen );
+        if( !p_bottom ) {
+            if( p_spritePal )
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE[ p_palIdx * COLORS_PER_PALETTE ], 32 );
+            if( p_spriteData )
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER ], p_spriteDataLen );
         } else {
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE_SUB[ p_palIdx * COLORS_PER_PALETTE ], 32 );
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER_SUB ], p_spriteDataLen );
+            if( p_spritePal )
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE_SUB[ p_palIdx * COLORS_PER_PALETTE ], 32 );
+            if( p_spriteData )
+                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER_SUB ], p_spriteDataLen );
         }
         return p_tileIdx + ( p_spriteDataLen / BYTES_PER_16_COLOR_TILE );
     }
+
+    u16 loadPKMNSprite( const char* p_path, const u16& p_pkmnId, const s16 p_posX,
+                        const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx, bool p_topOnly ) {
+        char buffer[ 100 ];
+        if( !p_female )
+            sprintf( buffer, "%d/%d.raw", p_pkmnId, p_pkmnId );
+        else
+            sprintf( buffer, "%d/%df.raw", p_pkmnId, p_pkmnId );
+        if( !FS::readData( p_path, buffer, u16( 16 ), TEMP_PAL, u32( 96 * 96 ), TEMP ) )
+            return false;
+
+        if( p_shiny ) {
+            if( !p_female )
+                sprintf( buffer, "%s%d/%ds.raw", p_pkmnId, p_pkmnId );
+            else
+                sprintf( buffer, "%s%d/%dsf.raw", p_pkmnId, p_pkmnId );
+            FS::readData( p_path, buffer, u16( 16 ), TEMP_PAL );
+        }
+
+        p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY,
+                                64, 64, TEMP_PAL, TEMP, 96 * 96 / 2, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
+        p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? p_posX : 64 + p_posX, p_posY,
+                                32, 64, 0, 0, 0, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
+        if( !p_topOnly ) {
+            p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY + 64,
+                                    64, 32, 0, 0, 0, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
+            p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? p_posX : 64 + p_posX, p_posY + 64,
+                                    32, 32, 0, 0, 0, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
+        }
+        updateOAM( p_bottom );
+        return p_tileCnt;
+    }
+
+    u16 loadTrainerSprite( const char* p_path, const char* p_name, const s16 p_posX,
+                           const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_flipx, bool p_topOnly ) {
+        char buffer[ 100 ];
+        sprintf( buffer, "Sprite_%s.raw", p_name );
+        if( !FS::readData( p_path, buffer, u16( 16 ), TEMP_PAL, u32( 96 * 96 ), TEMP ) )
+            return false;
+
+        p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY,
+                                64, 64, TEMP_PAL, TEMP, 96 * 96 / 2, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
+        p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? p_posX : 64 + p_posX, p_posY,
+                                32, 64, 0, 0, 0, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
+        if( !p_topOnly ) {
+            p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY + 64,
+                                    64, 32, 0, 0, 0, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
+            p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? p_posX : 64 + p_posX, p_posY + 64,
+                                    32, 32, 0, 0, 0, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
+        }
+        updateOAM( p_bottom );
+        return p_tileCnt;
+    }
+
+    u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+        if( FS::readData( p_path, p_name, (u32)128, TEMP, (u16)16, TEMP_PAL ) ) {
+            return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP, 512,
+                               false, false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
+        } else {
+            return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal, NoItemTiles, NoItemTilesLen,
+                               false, false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
+        }
+    }
+
+    u16 loadPKMNIcon( const u16& p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+        char buffer[ 100 ];
+        sprintf( buffer, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
+        return loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+    }
+
+    u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+        return loadIcon( "nitro:/PICS/SPRITES/PKMN/", "Icon_egg", p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+    }
+
+    u16 loadItemIcon( const std::string& p_itemName, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+        return loadIcon( "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+    }
+
+    u16 loadTMIcon( Type p_type, bool p_hm, const u16 p_posX, const u16 p_posY,
+                    u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+        std::string itemname = ( p_hm ? "VM" : "TM" ) + ( std::vector<std::string>( { "Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein", "Pflanze", "Geist",
+            "Stahl", "Unbekannt", "Wasser", "Feuer", "Pflanze", "Elektro", "Psycho", "Eis",
+            "Drache", "Unlicht", "Fee" } )[ p_type ] );
+
+        return loadItemIcon( itemname, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+    }
+
+    u16 loadTypeIcon( Type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16, TypePals[ p_type ], TypeTiles[ p_type ], 256,
+                           false, false, false, OBJPRIORITY_0, p_bottom );
+    }
+    
+    u16 loadDamageCategoryIcon( move::moveHitTypes p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16, HitTypePals[ p_type ], HitTypeTiles[ p_type ], 256,
+                           false, false, false, OBJPRIORITY_0, p_bottom );
+    }
+
 }

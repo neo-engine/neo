@@ -70,27 +70,27 @@ namespace IO {
 
     std::wstring keyboard::getText( u16 p_length, const char* p_msg, bool p_time, bool p_timeParameter ) {
 
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         u16 nextAvailableTileIdx = 16;
 
-        nextAvailableTileIdx = loadSprite( Oam, spriteInfo, A_ID, 0, nextAvailableTileIdx,
+        nextAvailableTileIdx = loadSprite( A_ID, 0, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                                            ATiles, ATilesLen, false, false, false, OBJPRIORITY_0, true );
-        nextAvailableTileIdx = loadSprite( Oam, spriteInfo, FWD_ID, 1, nextAvailableTileIdx,
+        nextAvailableTileIdx = loadSprite( FWD_ID, 1, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 24, SCREEN_HEIGHT - 28 - 22, 32, 32, ForwardPal,
                                            ForwardTiles, ForwardTilesLen, false, false, false, OBJPRIORITY_1, true );
-        nextAvailableTileIdx = loadSprite( Oam, spriteInfo, BWD_ID, 2, nextAvailableTileIdx,
+        nextAvailableTileIdx = loadSprite( BWD_ID, 2, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 28 - 18, SCREEN_HEIGHT - 28, 32, 32, BackPal,
                                            BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_1, true );
 
-        updateOAMSub( Oam );
+        updateOAM( true );
 
         std::wstring out = L"";
         draw( p_msg, out, p_length );
 
         touchPosition t;
         u8 i = 0;
-        while( 1 ) {
+        loop( ) {
             scanKeys( );
             touchRead( &t );
             if( p_time )

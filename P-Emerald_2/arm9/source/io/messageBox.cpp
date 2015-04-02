@@ -52,14 +52,13 @@ namespace IO {
         m_isNamed = NULL;
 
         initTextField( );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         u16 c = 0;
-        c = loadSprite( Oam, spriteInfo, A_ID, 0, 0,
+        c = loadSprite( A_ID, 0, 0,
                         SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                         ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
-        u8 a = 0, b = 1;
-        FS::drawItemIcon( Oam, spriteInfo, p_item.m_itemName, 4, 4, a, b, c );
-        updateOAMSub( Oam );
+        loadItemIcon( p_item.m_itemName, 4, 4, 0, 1, c );
+        updateOAM( true );
 
         updateTime( s8( 1 ) );
 
@@ -83,12 +82,12 @@ namespace IO {
     messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {
         m_isNamed = NULL;
         initTextField( );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         u16 c = 0;
-        c = loadSprite( Oam, spriteInfo, A_ID, 0, 0,
+        c = loadSprite( A_ID, 0, 0,
                         SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                         ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
-        updateOAMSub( Oam );
+        updateOAM( true );
 
         if( p_time ) updateTime( s8( 1 ) );
 
@@ -101,12 +100,12 @@ namespace IO {
     messageBox::messageBox( const wchar_t* p_text, bool p_time, bool p_remsprites ) {
         m_isNamed = NULL;
         initTextField( );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         u16 c = 0;
-        c = loadSprite( Oam, spriteInfo, A_ID, 0, 0,
+        c = loadSprite( A_ID, 0, 0,
                         SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                         ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
-        updateOAMSub( Oam );
+        updateOAM( true );
 
         if( p_time ) updateTime( );
 
@@ -117,22 +116,21 @@ namespace IO {
         swiWaitForVBlank( );
     }
     messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, bool p_a, bool p_remsprites, sprite_type p_sprt, u16 p_sprind ) {
-        m_isNamed = p_name;      
-        initOAMTableSub( Oam );
+        m_isNamed = p_name;
+        initOAMTable( true );
         u16 c = 0;
-        c = loadSprite( Oam, spriteInfo, A_ID, 0, 0,
+        c = loadSprite( A_ID, 0, 0,
                         SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                         ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
-        updateOAMSub( Oam );
+        updateOAM( true );
         if( p_sprt != no_sprite ) {
-            u8 a = 0, b = 1;
             if( p_sprt == sprite_pkmn ) {
-                FS::loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, a, b, c, true );
+                c = loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, 0, 1, c, true, false, false, false, true );
             }
             if( p_sprt == sprite_trainer ) {
-                FS::loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
+                c = loadPKMNSprite( "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, 0, 1, c, true, false, true, false, true );
             }
-            updateOAMSub( Oam );
+            updateOAM( true );
         }
 
         initTextField( );
@@ -151,27 +149,26 @@ namespace IO {
             return;
         if( p_sprt != no_sprite ) {
             Oam->oamBuffer[ p_sprind ].isHidden = true;
-            updateOAMSub( Oam );
+            updateOAM( true );
         }
         swiWaitForVBlank( );
     }
     messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_time, bool p_a, bool p_remsprites, sprite_type p_sprt, u16 p_sprind ) {
         m_isNamed = NULL;
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         u16 c = 0;
-        c = loadSprite( Oam, spriteInfo, A_ID, 0, 0,
+        c = loadSprite( A_ID, 0, 0,
                         SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                         ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
-        updateOAMSub( Oam );
+        updateOAM( true );
         if( p_sprt != no_sprite ) {
-            u8 a = 0, b = 1;
             if( p_sprt == sprite_pkmn ) {
-                FS::loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, a, b, c, true );
+                c = loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, 0, 1, c, true, false, false, false, true );
             }
             if( p_sprt == sprite_trainer ) {
-                FS::loadPKMNSpriteTop( Oam, spriteInfo, "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, a, b, c, true );
+                c = loadPKMNSprite( "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, 0, 1, c, true, false, true, false, true );
             }
-            updateOAMSub( Oam );
+            updateOAM( true );
         }
 
         initTextField( );
@@ -190,18 +187,18 @@ namespace IO {
             return;
         if( p_sprt != no_sprite ) {
             Oam->oamBuffer[ p_sprind ].isHidden = true;
-            updateOAMSub( Oam );
+            updateOAM( true );
         }
         swiWaitForVBlank( );
     }
 
     void messageBox::put( const char* p_text, bool p_a, bool p_time ) {
         initTextField( );
-        initOAMTableSub( Oam );
-        loadSprite( Oam, spriteInfo, A_ID, 0, 0,
+        initOAMTable( true );
+        loadSprite( A_ID, 0, 0,
                     SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                     ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
-        updateOAMSub( Oam );
+        updateOAM( true );
 
         if( p_time ) updateTime( );
         if( m_isNamed )

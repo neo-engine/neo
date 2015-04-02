@@ -34,24 +34,6 @@
 #include "defines.h"
 #include <string>
 
-extern int bg3sub;
-extern int bg3;
-extern int bg2sub;
-extern int bg2;
-class saveGame;
-extern saveGame* SAV;
-
-extern int achours, acseconds, acminutes, acday, acmonth, acyear;
-extern int hours, seconds, minutes, day, month, year;
-extern u32 ticks;
-
-extern POKEMON::pokemon::boxPokemon stored_pkmn[ MAXSTOREDPKMN ];
-extern std::vector<int> box_of_st_pkmn[ MAXPKMN ];
-extern std::vector<int> free_spaces;
-
-extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
-extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
-extern OAMTable *Oam, *OamTop;
 
 extern int drawBox( u16 );
 
@@ -84,33 +66,12 @@ extern std::map<u16, std::string> Locations;
 extern Region acMapRegion;
 extern bool showmappointer;
 
-#define MAXBG 3
-#define START_BG 0
-struct backgroundSet {
-    std::string             m_name;
-    const unsigned int      *m_mainMenu;
-    const unsigned short    *m_mainMenuPal;
-    bool                    m_loadFromRom;
-    bool                    m_allowsOverlay;
-    u8                      *m_mainMenuSpritePoses;
-};
-extern backgroundSet BGs[ MAXBG ];
-
-void vramSetup( );
 
 void animateMap( u8 p_frame );
-
-void initVideoSub( );
-void drawSub( );
-void drawSub( u8 p_newIdx );
 
 void animateBack( );
 void setMainSpriteVisibility( bool p_hidden, bool p_save = false );
 
-void drawTypeIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt,
-                   u16 & p_nextAvailableTileIdx, Type p_type, u16 p_posX, u16 p_posY, bool p_bottom );
-void drawDamageCategoryIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16 & p_tileCnt,
-                             move::moveHitTypes p_type, u16 p_posX, u16 p_posY, bool p_subScreen );
 u8 getCurrentDaytime( );
 
 extern std::string bagnames[ 8 ];

@@ -435,7 +435,7 @@ int main( int argc, char ** argv ) {
     yoffset = ( ( PersonalData->calY1 + PersonalData->calY2 ) * yscale - ( ( PersonalData->calY1px + PersonalData->calY2px ) << 19 ) ) / 2;
 
     // main loop
-    while( 1 ) {
+    loop( ) {
         if( 0 == ( REG_KEYINPUT & ( KEY_SELECT | KEY_START | KEY_L | KEY_R ) ) ) {
             exitflag = 1;
         }

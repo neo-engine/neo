@@ -15,12 +15,12 @@ namespace IO {
 
     yesNoBox::yesNoBox( ) {
         initTextField( );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         _isNamed = false;
     }
     yesNoBox::yesNoBox( const char* p_name ) {
         initTextField( );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         regularFont->printString( p_name, 8, 8, true );
 
         swiWaitForVBlank( );
@@ -28,7 +28,7 @@ namespace IO {
     }
     yesNoBox::yesNoBox( messageBox p_box ) {
         initTextField( );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         _isNamed = p_box.m_isNamed;
     }
 
@@ -41,7 +41,7 @@ namespace IO {
         }
         draw( 2 );
         bool result;
-        while( 42 ) {
+        loop( ) {
             swiWaitForVBlank( );
             if( p_time )
                 updateTime( );
@@ -76,7 +76,7 @@ namespace IO {
         }
         draw( 2 );
         bool result;
-        while( 42 ) {
+        loop( ) {
             swiWaitForVBlank( );
             if( p_time )
                 updateTime( );

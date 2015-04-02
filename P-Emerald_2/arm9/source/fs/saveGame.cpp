@@ -99,7 +99,7 @@ namespace FS {
         //for( u16 i = 0; i < MAXSTOREDPKMN; i++ ) {
         //    //stored_pkmn[i] = pokemon(fd);
         //    fread( &stored_pkmn[ i ], sizeof( POKEMON::pokemon::boxPokemon ), 1, fd );
-        //    if( stored_pkmn[ i ].m_speciesId == 0 || stored_pkmn[ i ].m_speciesId > MAXPKMN )
+        //    if( stored_pkmn[ i ].m_speciesId == 0 || stored_pkmn[ i ].m_speciesId > MAX_PKMN )
         //        free_spaces.push_back( i );
         //    else
         //        box_of_st_pkmn[ stored_pkmn[ i ].m_speciesId ].push_back( i );

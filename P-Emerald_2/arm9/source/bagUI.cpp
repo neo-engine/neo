@@ -326,7 +326,7 @@ namespace BAG {
         initColors( );
 
         initOAMTable( OamTop );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
 
         loadBagSprites( Oam, spriteInfo );
         drawPKMNs( Oam, spriteInfo );
@@ -334,7 +334,7 @@ namespace BAG {
 
     void bagUIDinit( ) {
         initOAMTable( OamTop );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         initMainSprites( Oam, spriteInfo );
         setMainSpriteVisibility( false );
         Oam->oamBuffer[ 8 ].isHidden = true;
@@ -370,22 +370,22 @@ namespace BAG {
                          SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
         }
 
-        while( 42 ) {
+        loop( ) {
             swiWaitForVBlank( );
-            updateOAMSub( Oam );
+            updateOAM( true );
             touchRead( &t );
             scanKeys( );
             u32 pressed = keysDown( ), up = keysUp( ), held = keysHeld( );
             if( ( t.px > 228 && t.py > 168 ) ) { //Back
                 Oam->oamBuffer[ BACK_ID ].y -= 4;
-                updateOAMSub( Oam );
+                updateOAM( true );
                 if( !UI::waitForTouchUp( false, false, 228, 164 ) ) {
                     Oam->oamBuffer[ BACK_ID ].y += 4;
                     continue;
                 }
                 break;
             } else if( ( held & KEY_LEFT ) ) {
-                while( 1 ) {
+                loop( ) {
                     if( keysUp( ) & KEY_LEFT )
                         break;
                     scanKeys( );
@@ -411,7 +411,7 @@ namespace BAG {
                                  SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
                 }
             } else if( ( held & KEY_RIGHT ) ) {
-                while( 1 ) {
+                loop( ) {
                     if( keysUp( ) & KEY_RIGHT )
                         break;
                     scanKeys( );
@@ -437,7 +437,7 @@ namespace BAG {
                                  SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
                 }
             } else if( ( held & KEY_DOWN ) ) {
-                while( 1 ) {
+                loop( ) {
                     if( keysUp( ) & KEY_DOWN )
                         break;
                     scanKeys( );
@@ -452,7 +452,7 @@ namespace BAG {
                                  SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
                 }
             } else if( ( held & KEY_UP ) ) {
-                while( 1 ) {
+                loop( ) {
                     if( keysUp( ) & KEY_UP )
                         break;
                     scanKeys( );

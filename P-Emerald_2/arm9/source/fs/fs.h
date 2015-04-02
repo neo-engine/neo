@@ -44,38 +44,17 @@ namespace FS {
     std::string readString( FILE*, bool p_new = false );
     std::wstring readWString( FILE*, bool p_new = false );
 
+    template<typename T>
+    bool readData( const char* p_path, const char* p_name, const T p_dataCnt, T* p_data );
+    template<typename T1, typename T2>
+    bool readData( const char* p_path, const char* p_name, const T1 p_dataCnt1, T1* p_data1, const T2 p_dataCnt2, T2* p_data2 );
+
     std::string breakString( const std::string& p_string, u8 p_lineLength );
-    std::string breakString( const std::string& p_string, IO::font p_font, u8 p_lineLength );
+    std::string breakString( const std::string& p_string, IO::font* p_font, u8 p_lineLength );
 
-    bool loadNavScreen( u16* p_layer, const char* p_name, u8 p_no );
-    bool loadPicture( u16* p_layer, const char* p_Path, const char* p_name, u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256 );
-    bool loadPictureSub( u16* p_layer, const char* p_path, const char* p_name, u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256 );
-    bool loadSprite( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt );
-    bool loadSpriteSub( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt );
-    bool loadPKMNSprite( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnNo, const s16 p_posX,
-                         const s16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_nextAvailableTileIdx, bool p_bottom, bool p_shiny = false, bool p_female = false, bool p_flipX = false );
-    bool loadPKMNSpriteTop( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const char* p_path, const u16& p_pkmnNo, const u16 p_posX,
-                            const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_nextAvailableTileIdx, bool p_bottom, bool p_shiny = false, bool p_female = false, bool p_flipX = false );
-
-    bool loadTrainerSprite( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_posX,
-                            const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false );
-    bool loadTrainerSpriteTop( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u16 p_posX,
-                               const u16 p_posY, u8& p_oamIndex, u8& p_palCnt, u16& p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false );
-
-    void drawItem( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY, const u16 p_cnt,
-                   u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen, bool p_showcnt );
-    void drawItemIcon( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY,
-                       u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen = true );
-    void drawTMIcon( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, Type p_type, bool p_hm, const u16 p_posX, const u16 p_posY,
-                     u8& p_oamIndex, u8& p_palCnt, u16& p_tileCnt, bool p_subScreen = true );
-    void drawPKMNIcon( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const u16& p_pkmnNo, const u16 p_posX, const u16 p_posY,
-                       u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen = true );
-    void drawEggIcon( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const u16 p_posX, const u16 p_posY,
-                      u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen = true );
-    void drawTypeIcon( OAMTable *p_oam, IO::SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16 & p_nextAvailableTileIdx, Type p_type, u16 p_posX, u16 p_posY, bool p_bottom );
-
-    void drawItem( OAMTable* p_oam, IO::SpriteInfo* p_spriteInfo, const std::string& p_itemName, const u16 p_posX, const u16 p_posY, const u16 p_cnt,
-                   u8& p_oamIndex, u8& p_palcnt, u16& p_nextAvailableTileIdx, bool p_subScreen = true, bool p_showcnt = false );
+    bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no );
+    bool readPictureData( u16* p_layer, const char* p_Path, const char* p_name, u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256 );
+    bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt );
 
     const char* getLoc( u16 p_ind );
 }

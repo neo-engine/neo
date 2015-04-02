@@ -96,21 +96,12 @@ GameMod gMod = EMULATOR;
 #endif
 
 std::string CodeName = "Fighting Torchic";
-SavMod savMod = _NDS;
 
 char acSlot2Game[ 5 ];
 
 
-Keyboard* kbd;
-
 std::unique_ptr<map2d::Map> acMap;
 
-int hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
-int achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
-u32 ticks = 0;
-
-saveGame* SAV;
-const std::string sav_nam = "nitro:/SAV";
 Region acRegion = HOENN;
 
 screenLoader scrn( -2 );
@@ -265,7 +256,7 @@ ChoiceResult opScreen( ) {
     touchPosition touch;
     consoleSelect( &Bottom );
     consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-    while( 1 ) {
+    loop( ) {
         swiWaitForVBlank( );
 
         scanKeys( );
@@ -297,7 +288,7 @@ ChoiceResult opScreen( ) {
         }
         for( u16 i = 0; i < MaxVal; i++ )
             if( ( touch.py > ranges[ i ].first && touch.py < ranges[ i ].second ) ) {
-                while( 1 ) {
+                loop( ) {
                     scanKeys( );
                     touch = touchReadXY( );
                     if( touch.px == 0 && touch.py == 0 )
@@ -370,14 +361,14 @@ void initNewGame( ) {
 #endif
 
     cust_font.printStringD( "Haaaaalt!", 24, 84, true );
-    while( 1 ) {
+    loop( ) {
         swiWaitForVBlank( );
         scanKeys( );
         if( keysCurrent( ) & KEY_TOUCH ) break;
         if( keysCurrent( ) & KEY_A ) break;
     }
     cust_font.printStringD( "Hier lang!", 100, 84, true );
-    while( 1 ) {
+    loop( ) {
         swiWaitForVBlank( );
         scanKeys( );
         if( keysCurrent( ) & KEY_TOUCH ) break;
@@ -386,7 +377,7 @@ void initNewGame( ) {
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
 
     free_spaces.clear( );
-    for( u16 i = 0; i < MAXPKMN; i++ ) {
+    for( u16 i = 0; i < MAX_PKMN; i++ ) {
         SAV->m_inDex[ i ] = false;
         box_of_st_pkmn[ i ].clear( );
         free_spaces.push_back( i );
@@ -400,7 +391,7 @@ void initNewGame( ) {
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "NewGame" );
     cust_font.printStringD( "Hi, ich bin Maike, die\n""Tochter von Prof. Birk.", 24, 76, true );
 
-    while( 1 ) {
+    loop( ) {
         scanKeys( );
         if( keysUp( ) & KEY_TOUCH ) break;
         if( keysUp( ) & KEY_A ) break;
@@ -408,7 +399,7 @@ void initNewGame( ) {
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
     cust_font.printStringD( "Da er gerade leider nicht in Hoenn\nist, werde ich euch heute euren\nPokéNav und euren PokéDex\nüberreichen.", 8, 68, true );
 
-    while( 1 ) {
+    loop( ) {
         scanKeys( );
         if( keysUp( ) & KEY_TOUCH ) break;
         if( keysUp( ) & KEY_A ) break;
@@ -417,14 +408,14 @@ void initNewGame( ) {
 
     cust_font.printStringD( "So hier ist erstmal der PokéNav!", 8, 84, true );
 
-    while( 1 ) {
+    loop( ) {
         scanKeys( );
         if( keysUp( ) & KEY_TOUCH ) break;
         if( keysUp( ) & KEY_A ) break;
     }
     FS::loadPictureSub( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "ClearD", 16 );
     cust_font.printStringD( "Ich gehe dann jetzt mal\ndie Dexe holen.\nIhr könnt solange eure\nPokéNav einrichten.", 24, 68, true );
-    while( 1 ) {
+    loop( ) {
         scanKeys( );
         if( keysUp( ) & KEY_TOUCH ) break;
         if( keysUp( ) & KEY_A ) break;
@@ -438,7 +429,7 @@ void initNewGame( ) {
     scrn.init( );
     setMainSpriteVisibility( true );
     Oam->oamBuffer[ 1 ].isHidden = true;
-    updateOAMSub( Oam );
+    updateOAM( true );
 
 #ifdef USE_AS_LIB
     AS_MP3Stop( );
@@ -640,45 +631,10 @@ INDIVIDUALISIERUNG:
     SAV->m_acposz = 3;
     setMainSpriteVisibility( false );
     Oam->oamBuffer[ 1 ].isHidden = false;
-    updateOAMSub( Oam );
+    updateOAM( true );
     FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx );
 }
 
-void initVideo( ) {
-
-    vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
-    vramSetBankB( VRAM_B_MAIN_BG_0x06020000 );
-
-    vramSetBankE( VRAM_E_MAIN_SPRITE );
-
-    videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-
-    // set up our top bitmap background
-    bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
-    bgSetPriority( bg3, 3 );
-    bgUpdate( );
-}
-void initVideoSub( ) {
-
-    vramSetBankC( VRAM_C_SUB_BG_0x06200000 );
-    vramSetBankD( VRAM_D_SUB_SPRITE );
-
-
-    /*  Set the video mode on the main screen. */
-    videoSetModeSub( MODE_5_2D | // Set the graphics mode to Mode 5
-                     DISPLAY_BG2_ACTIVE | // Enable BG2 for display
-                     DISPLAY_BG3_ACTIVE | // Enable BG3 for display
-                     DISPLAY_SPR_ACTIVE | // Enable sprites for display
-                     DISPLAY_SPR_1D       // Enable 1D tiled sprites
-                     );
-}
-void vramSetup( ) {
-    initVideo( );
-    initVideoSub( );
-    VRAM_F_CR = VRAM_ENABLE | VRAM_F_BG_EXT_PALETTE | VRAM_OFFSET( 1 );
-    vramSetBankG( VRAM_G_LCD );
-    vramSetBankH( VRAM_H_LCD );
-}
 
 u8 lastdir;
 s8 dir[ 5 ][ 2 ] = { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } };
@@ -810,7 +766,7 @@ START:
     consoleSelect( &Top );
     int D0000 = 0;
     touchPosition tp;
-    while( 1 ) {
+    loop( ) {
         scanKeys( );
         tp = touchReadXY( );
         swiWaitForVBlank( );
@@ -1042,7 +998,7 @@ CONT:
 
             SAV->m_PkmnTeam.clear( );
             free_spaces.clear( );
-            for( int i = 0; i < MAXPKMN; i++ ) {
+            for( int i = 0; i < MAX_PKMN; i++ ) {
                 SAV->m_inDex[ i ] = false;
                 box_of_st_pkmn[ i ].clear( );
                 free_spaces.push_back( i );
@@ -1086,7 +1042,7 @@ void showNewMap( u16 p_mapIdx ) {
             Oam->oamBuffer[ SQCH_ID ].x = Oam->oamBuffer[ SQCH_ID + 1 ].x = ( m.m_lx + m.m_rx ) / 2 - 8;
             Oam->oamBuffer[ SQCH_ID ].y = Oam->oamBuffer[ SQCH_ID + 1 ].y = ( m.m_ly + m.m_ry ) / 2 - 8;
             Oam->oamBuffer[ SQCH_ID ].isHidden = Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = false;
-            updateOAMSub( Oam );
+            updateOAM( true );
 
             SAV->m_acMapIdx = p_mapIdx;
 
@@ -1843,7 +1799,7 @@ int main( int p_argc, char** p_argv ) {
 
     int HILFSCOUNTER = 252;
     Oam->oamBuffer[ PKMN_ID ].isHidden = !( SAV->m_hasPKMN && SAV->m_PkmnTeam.size( ) );
-    updateOAMSub( Oam );
+    updateOAM( true );
 
     SAV->m_hasGDex = true;
     SAV->m_evolveInBattle = true;
@@ -1869,10 +1825,10 @@ int main( int p_argc, char** p_argv ) {
     consoleSetWindow( &Bottom, 0, 0, 32, 24 );
     consoleClear( );
 
-    while( 42 ) {
+    loop( ) {
         updateTime( s8( 1 ) );
         swiWaitForVBlank( );
-        updateOAMSub( Oam );
+        updateOAM( true );
         touchRead( &touch );
         int pressed = keysUp( ), held = keysHeld( );
 
@@ -1885,7 +1841,7 @@ int main( int p_argc, char** p_argv ) {
             setMainSpriteVisibility( false );
             Oam->oamBuffer[ SAVE_ID ].isHidden = false;
             Oam->oamBuffer[ PKMN_ID ].isHidden = !( SAV->m_hasPKMN && SAV->m_PkmnTeam.size( ) );
-            updateOAMSub( Oam );
+            updateOAM( true );
             mode = -1;
             scrn.draw( mode );
         }
@@ -1923,7 +1879,7 @@ int main( int p_argc, char** p_argv ) {
                             consoleClear( );
                             Oam->oamBuffer[ SQCH_ID ].isHidden = true;
                             Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
-                            updateOAMSub( Oam );
+                            updateOAM( true );
                             scrn.draw( mode = -1 );
                             char buffer[ 50 ];
                             sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ i ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
@@ -2007,7 +1963,7 @@ OUT:
         //StartBag
         if( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 6 ] - touch.px ) + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 7 ] - touch.py ) ) <= 16 && mode == -1 ) {
 
-            while( 1 ) {
+            loop( ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
                 scanKeys( );
@@ -2025,7 +1981,7 @@ OUT:
                  || ( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ] - touch.px )
                  + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 )
                  && mode == -1 ) ) {
-            while( 1 ) {
+            loop( ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
                 scanKeys( );
@@ -2046,7 +2002,7 @@ OUT:
         }
         //StartDex
         else if( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ] - touch.px ) + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 5 ] - touch.py ) ) <= 16 && mode == -1 ) {
-            while( 1 ) {
+            loop( ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
                 scanKeys( );
@@ -2062,7 +2018,7 @@ OUT:
         }
         //StartOptions
         else if( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 8 ] - touch.px ) + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 9 ] - touch.py ) ) <= 16 && mode == -1 ) {
-            while( 1 ) {
+            loop( ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
                 scanKeys( );
@@ -2073,7 +2029,7 @@ OUT:
         }
         //StartID
         else if( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 ] - touch.px ) + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 3 ] - touch.py ) ) <= 16 && mode == -1 ) {
-            while( 1 ) {
+            loop( ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
                 scanKeys( );
@@ -2183,7 +2139,7 @@ OUT:
         }
         //StartPok\x82""nav
         else if( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 10 ] - touch.px ) + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 11 ] - touch.py ) ) <= 16 && mode == -1 ) {
-            while( 1 ) {
+            loop( ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
                 scanKeys( );
@@ -2197,7 +2153,7 @@ OUT:
         }
         //StartMaps
         else if( sqrt( sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ] - touch.px ) + sq( BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ] - touch.py ) ) <= 16 && mode == 0 ) {
-            while( 1 ) {
+            loop( ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
                 scanKeys( );
@@ -2212,7 +2168,7 @@ OUT:
         }
         //Nav->StartScrn
         else if( touch.px > 224 && touch.py > 164 && mode == 0 ) {
-            while( 1 ) {
+            loop( ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
                 scanKeys( );
@@ -2225,7 +2181,7 @@ OUT:
         }
         //Map->NavScrn
         else if( touch.px > 224 && touch.py > 164 && mode > 0 ) {
-            while( 1 ) {
+            loop( ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
                 scanKeys( );
@@ -2238,11 +2194,11 @@ OUT:
             consoleClear( );
             showmappointer = false;
             scrn.draw( mode = 0 );
-            updateOAMSub( Oam );
+            updateOAM( true );
         }
         //SwitchMap
         else if( ( held & KEY_SELECT ) && mode > 0 ) {
-            while( 1 ) {
+            loop( ) {
                 if( !( keysHeld( ) & KEY_SELECT ) )
                     break;
                 scanKeys( );
@@ -2261,10 +2217,10 @@ OUT:
             Oam->oamBuffer[ SQCH_ID ].x = Oam->oamBuffer[ SQCH_ID + 1 ].x = touch.px - 8;
             Oam->oamBuffer[ SQCH_ID ].y = Oam->oamBuffer[ SQCH_ID + 1 ].y = touch.py - 8;
             printMapLocation( touch );
-            updateOAMSub( Oam );
+            updateOAM( true );
             updateTime( s8( 1 ) );
         } else if( touch.px != 0 && touch.py != 0 && sqrt( sq( touch.px - 8 ) + sq( touch.py - 12 ) ) <= 17 ) {
-            while( 1 ) {
+            loop( ) {
                 swiWaitForVBlank( );
                 updateTime( s8( 1 ) );
                 scanKeys( );
@@ -2278,7 +2234,7 @@ OUT:
             Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
             bool mappy = showmappointer;
             showmappointer = false;
-            updateOAMSub( Oam );
+            updateOAM( true );
             consoleSelect( &Bottom );
             consoleSetWindow( &Bottom, 0, 0, 32, 5 );
             consoleClear( );
@@ -2294,7 +2250,7 @@ OUT:
             Oam->oamBuffer[ SQCH_ID ].isHidden = sqa;
             Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = sqb;
             showmappointer = mappy;
-            updateOAMSub( Oam );
+            updateOAM( true );
             scrn.draw( mode );
         }
         //End 

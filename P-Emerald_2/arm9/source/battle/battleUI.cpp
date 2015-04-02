@@ -41,15 +41,15 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "messageBox.h"
 #include "saveGame.h"
 #include "bag.h"
-#include "buffer.h"
+#include "../buffer.h"
 #include "fs.h"
-#include "sprite.h"
-#include "userInput.h"
+#include "../iosprite.h"
+#include "../io/uio.h"
 
 #include "Back.h"
 #include "A.h"
-#include "map2d.h"
-#include "messageBox.h"
+#include "../map/map2d.h"
+#include "../io/messageBox.h"
 
 #include "Battle1.h"
 #include "Battle2.h"
@@ -118,65 +118,6 @@ namespace BATTLE {
 
     extern char* trainerclassnames[ ];
 
-    void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big ) {
-        if( p_big )
-            displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 20, 24 );
-        else
-            displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 8, 12 );
-    }
-    void battleUI::displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR, bool p_sub ) {
-        p_HP = std::max( std::min( (u16)101, p_HP ), u16( 0 ) );
-        u16 factor = std::max( 1, p_outerR / 15 );
-        if( p_HP > 100 ) {
-            BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
-            for( u16 i = 0; i < factor * 100; ++i )
-                for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u16 nx = p_x + 16 + j * ( sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) ),
-                        ny = p_y + 16 + j * ( cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) );
-                    ( (color *)( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
-                    //printf("%i %i; ",nx,ny);
-                }
-        } else {
-            BG_PAL( p_sub )[ p_freecolor2 ] = NORMAL_;
-            for( u16 i = factor * 100 - factor*p_HPstart; i < factor*p_HP; ++i ) {
-                for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u16 nx = p_x + 16 + j * ( sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) ),
-                        ny = p_y + 16 + j * ( cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) );
-                    ( (color *)( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
-                    if( i == factor * 50 )
-                        BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
-                    if( i == factor * 80 )
-                        BG_PAL( p_sub )[ p_freecolor1 ] = RED;
-                }
-                if( p_delay )
-                    swiWaitForVBlank( );
-            }
-        }
-    }
-    void battleUI::displayEP( u16 p_EPstart, u16 p_EP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR, bool p_sub ) {
-        u16 factor = std::max( 1, p_outerR / 15 );
-        if( p_EPstart >= 100 || p_EP > 100 ) {
-            BG_PAL( p_sub )[ p_freecolor1 ] = NORMAL_;
-            for( u16 i = 0; i < factor * 100; ++i )
-                for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u16 nx = p_x + 16 + j * ( sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) ),
-                        ny = p_y + 16 + j * ( cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) );
-                    ( (color *)BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
-                    //printf("%i %i; ",nx,ny);
-                }
-        } else {
-            BG_PAL( p_sub )[ p_freecolor2 ] = ICE;
-            for( u16 i = p_EPstart*factor; i <= p_EP*factor; ++i ) {
-                for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u16 nx = p_x + 16 + j * ( sin( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) ),
-                        ny = p_y + 16 + j * ( cos( ( 50 - i / ( 1.0*factor ) )*acos( 0 ) / 30 + 0.001f ) );
-                    ( (color *)BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
-                }
-                if( p_delay )
-                    swiWaitForVBlank( );
-            }
-        }
-    }
     void initColors( ) {
 
         cust_font.setColor( 0, 0 );
@@ -278,7 +219,7 @@ namespace BATTLE {
         //Opps PKMNs PBs
         for( u8 i = 0; i < 6; ++i ) {
             auto acStat = ACPKMNSTS2( *p_battle, i, OPPONENT );
-            p_tilecnt = loadSprite( p_bottom ? Oam : OamTop, p_bottom ? spriteInfo : spriteInfoTop, p_bottom ? ( 6 + i ) : ( STSBALL_START + 6 + i ),
+            p_tilecnt = IO::loadSprite( p_bottom ? Oam : OamTop, p_bottom ? spriteInfo : spriteInfoTop, p_bottom ? ( 6 + i ) : ( STSBALL_START + 6 + i ),
                                     p_bottom ? PB_PAL_SUB( acStat ) : PB_PAL_TOP( acStat ), p_tilecnt, !p_bottom ? ( 16 * i ) : 240 - ( 16 * i ),
                                     -4, 16, 16, PB_PAL( acStat ), PB_TILES( acStat ), PB_TILES_LEN( acStat ),
                                     false, false, false, OBJPRIORITY_0, p_bottom );
@@ -288,7 +229,7 @@ namespace BATTLE {
     void setStsBallVisibility( bool p_opponent, u8 p_pokemonPos, bool p_isHidden, bool p_bottom ) {
         if( p_bottom ) {
             Oam->oamBuffer[ 6 * p_opponent + p_pokemonPos ].isHidden = p_isHidden;
-            updateOAMSub( Oam );
+            updateOAM( true );
         } else {
             OamTop->oamBuffer[ STSBALL_IDX( p_pokemonPos, p_opponent ) ].isHidden = p_isHidden;
             updateOAM( OamTop );
@@ -298,7 +239,7 @@ namespace BATTLE {
         if( p_bottom ) {
             Oam->oamBuffer[ 6 * p_opponent + p_pokemonPos ].x = p_x;
             Oam->oamBuffer[ 6 * p_opponent + p_pokemonPos ].y = p_y;
-            updateOAMSub( Oam );
+            updateOAM( true );
         } else {
             OamTop->oamBuffer[ STSBALL_IDX( p_pokemonPos, p_opponent ) ].x = p_x;
             OamTop->oamBuffer[ STSBALL_IDX( p_pokemonPos, p_opponent ) ].y = p_y;
@@ -314,7 +255,7 @@ namespace BATTLE {
             loadSprite( Oam, spriteInfo, idx, PB_PAL_SUB( p_status ), tileIdx, p_opponent ? ( 240 - ( 16 * p_pokemonPos ) ) : ( 16 * ( 6 - p_pokemonPos ) ),
                         p_opponent ? -4 : 180, 16, 16, PB_PAL( p_status ), PB_TILES( p_status ), PB_TILES_LEN( p_status ),
                         false, false, false, OBJPRIORITY_0, p_bottom );
-            updateOAMSub( Oam );
+            updateOAM( true );
         } else {
             idx = STSBALL_IDX( p_pokemonPos, p_opponent );
             tileIdx = OamTop->oamBuffer[ idx ].gfxIndex;
@@ -356,7 +297,7 @@ namespace BATTLE {
     }
 
     void loadSpritesSub( battle* p_battle ) {
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         drawSub( );
 
         u16 tilecnt = 0;
@@ -367,7 +308,7 @@ namespace BATTLE {
                  trainerclassnames[ p_battle->_opponent->m_trainerClass ],
                  p_battle->_opponent->m_battleTrainerName );
         cust_font.printString( buffer, 16, 80, true );
-        updateOAMSub( Oam );
+        updateOAM( true );
     }
 
     void loadBattleUITop( battle* p_battle ) {
@@ -437,12 +378,12 @@ namespace BATTLE {
 
         SUB_TILESTART = tilecnt;
         SUB_PALSTART = 8;
-        updateOAMSub( Oam );
+        updateOAM( true );
     }
     void setBattleUISubVisibility( bool p_isHidden = false ) {
         for( u8 i = 0; i <= SUB_FIGHT_START + 6; ++i )
             Oam->oamBuffer[ i ].isHidden = p_isHidden;
-        updateOAMSub( Oam );
+        updateOAM( true );
     }
 
     void loadA( ) {
@@ -450,7 +391,7 @@ namespace BATTLE {
                     SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                     ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
         FONT::ASpriteOamIndex = SUB_A_OAM;
-        updateOAMSub( Oam );
+        updateOAM( true );
     }
 
     /**
@@ -462,7 +403,7 @@ namespace BATTLE {
             for( u8 p = 0; p < 2; ++p )
                 for( u8 s = 0; s < MAX_STATS; ++s )
                     _oldPKMNStats[ ACPOS2( *_battle, i, p ) ][ p ][ s ] = ACPKMNSTS2( *_battle, i, p );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         Oam->oamBuffer[ SUB_A_OAM ].gfxIndex = 0;
         loadA( );
     }
@@ -473,7 +414,7 @@ namespace BATTLE {
         loadSpritesTop( _battle ); // This should consume some time
 
         loadBattleUITop( _battle );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         drawSub( );
         setBattleUISubVisibility( );
         initLogScreen( );
@@ -496,12 +437,12 @@ namespace BATTLE {
                          _battle->m_isWildBattle, !_battle->m_isWildBattle && SAV->m_activatedPNav );
         if( p_showBack ) {
             Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
-            updateOAMSub( Oam );
+            updateOAM( true );
         }
 
         touchPosition t;
         auto& result = _battle->_battleMoves[ p_pokemonPos ][ PLAYER ];
-        while( 1 ) {
+        loop( ) {
             updateTime( false );
             scanKeys( );
             t = touchReadXY( );
@@ -662,10 +603,10 @@ SHOW_ATTACK:
             }
         }
 
-        updateOAMSub( Oam );
+        updateOAM( true );
 
         touchPosition t;
-        while( 42 ) {
+        loop( ) {
 NEXT:
             updateTime( false );
             scanKeys( );
@@ -696,7 +637,7 @@ NEXT:
 
                     cust_font.printString( acMove->m_moveName.c_str( ), x + 9, y + 9, true );
 
-                    while( 1 ) {
+                    loop( ) {
                         swiWaitForVBlank( );
                         updateTime( false );
                         scanKeys( );
@@ -729,7 +670,7 @@ END:
         clearLogScreen( );
         for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
             Oam->oamBuffer[ i ].isHidden = true;
-        updateOAMSub( Oam );
+        updateOAM( true );
         consoleSetWindow( &Bottom, 0, 0, 32, 24 );
         consoleClear( );
         return result;
@@ -839,10 +780,10 @@ END:
         if( selected[ 3 ] && selected[ 0 ] )
             FONT::putrec( 176, 106, 176 + 16, 122, true, false, RED_IDX );
 
-        updateOAMSub( Oam );
+        updateOAM( true );
 
         touchPosition t;
-        while( 42 ) {
+        loop( ) {
 NEXT:
             updateTime( false );
             scanKeys( );
@@ -892,7 +833,7 @@ NEXT:
                         cust_font.printString( acPkmnJ.m_boxdata.m_name, nx + 9, ny + 9, true );
                     }
 
-                    while( 1 ) {
+                    loop( ) {
                         swiWaitForVBlank( );
                         updateTime( false );
                         scanKeys( );
@@ -946,7 +887,7 @@ END:
         clearLogScreen( );
         for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
             Oam->oamBuffer[ i ].isHidden = true;
-        updateOAMSub( Oam );
+        updateOAM( true );
         consoleSetWindow( &Bottom, 0, 0, 32, 24 );
         consoleClear( );
 
@@ -963,7 +904,7 @@ END:
 
 
         touchPosition t;
-        while( 42 ) {
+        loop( ) {
             updateTime( false );
             scanKeys( );
             t = touchReadXY( );
@@ -1049,13 +990,13 @@ END:
             }
         }
 
-        updateOAMSub( Oam );
+        updateOAM( true );
     }
 
     void undrawPKMNChoiceScreen( ) {
         for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
             Oam->oamBuffer[ i ].isHidden = true;
-        updateOAMSub( Oam );
+        updateOAM( true );
     }
 
     /**
@@ -1140,10 +1081,10 @@ END:
             consoleSetWindow( &Bottom, 17, 17, 20, 8 );
             printf( "ATTACKEN" );
         }
-        updateOAMSub( Oam );
+        updateOAM( true );
 
         touchPosition t;
-        while( 42 ) {
+        loop( ) {
             updateTime( false );
             scanKeys( );
             t = touchReadXY( );
@@ -1210,7 +1151,7 @@ END:
         POKEMON::PKMNDATA::pokemonData data;
         POKEMON::PKMNDATA::getAll( p_pokemon.m_boxdata.m_speciesId, data );
 
-        updateOAMSub( Oam );
+        updateOAM( true );
 
         u16 exptype = data.m_expType;
 
@@ -1440,7 +1381,7 @@ END:
         }
 
         touchPosition t;
-        while( 42 ) {
+        loop( ) {
             updateTime( false );
             scanKeys( );
             t = touchReadXY( );
@@ -1483,7 +1424,7 @@ START:
         consoleClear( );
         u8 result = 0;
         Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
-        updateOAMSub( Oam );
+        updateOAM( true );
         drawPKMNChoiceScreen( _battle, p_firstIsChosen );
         drawSub( );
         initColors( );
@@ -1492,9 +1433,9 @@ START:
         writeLogText( L"Welches PKMN?" );
 
         touchPosition t;
-        while( 42 ) {
+        loop( ) {
             Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
-            updateOAMSub( Oam );
+            updateOAM( true );
 
             updateTime( false );
             scanKeys( );
@@ -2124,14 +2065,14 @@ ST:
                 auto res = chooseAttack( p_pokemonPos );
                 for( u8 u = 0; u < 50; ++u )
                     Oam->oamBuffer[ u ].isHidden = true;
-                updateOAMSub( Oam );
+                updateOAM( true );
 
                 if( !res ) {
                     std::sprintf( buffer, "Aufgeben %s zu erlernen?", AttackList[ p_move ]->m_moveName.c_str( ) );
                     if( !yn.getResult( buffer ) ) {
                         for( u8 u = 0; u < 50; ++u )
                             Oam->oamBuffer[ u ].isHidden = true;
-                        updateOAMSub( Oam );
+                        updateOAM( true );
                         initLogScreen( );
                         goto ST;
                     }
@@ -2155,14 +2096,14 @@ ST:
                 loadA( );
                 for( u8 u = 0; u < 50; ++u )
                     Oam->oamBuffer[ u ].isHidden = true;
-                updateOAMSub( Oam );
+                updateOAM( true );
 
                 std::sprintf( buffer, "Aufgeben %s zu erlernen?", AttackList[ p_move ]->m_moveName.c_str( ) );
                 if( !yn.getResult( buffer ) ) {
                     initLogScreen( );
                     for( u8 u = 0; u < 50; ++u )
                         Oam->oamBuffer[ u ].isHidden = true;
-                    updateOAMSub( Oam );
+                    updateOAM( true );
                     goto ST;
                 }
             }
@@ -2204,14 +2145,14 @@ ST:
         consoleSelect( &Bottom );
         consoleClear( );
         drawSub( );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         initOAMTable( OamTop );
         initMainSprites( Oam, spriteInfo );
         setMainSpriteVisibility( false );
         Oam->oamBuffer[ 8 ].isHidden = true;
         Oam->oamBuffer[ 0 ].isHidden = true;
         Oam->oamBuffer[ 1 ].isHidden = false;
-        updateOAMSub( Oam );
+        updateOAM( true );
     }
 
     //////////////////////////////////////////////////////////////////////////

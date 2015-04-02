@@ -99,12 +99,6 @@
     <ClInclude Include="arm9\include\libnds_internal.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\include\battle.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\script.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\map2d.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
@@ -177,6 +171,18 @@
     <ClInclude Include="arm9\source\io\yesNoBox.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\source\sts\statusScreen.h">
+      <Filter>Header Files\arm9\sts</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\sts\statusScreenUI.h">
+      <Filter>Header Files\arm9\sts</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\battle\battle.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\battle\script.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\as_lib7.c">
@@ -209,17 +215,8 @@
     <ClCompile Include="arm9\source\bagUI.cpp">
       <Filter>Source Files\arm9\bag</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\battle.cpp">
-      <Filter>Source Files\arm9\battle</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\battleUI.cpp">
-      <Filter>Source Files\arm9\battle</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\Box.cpp">
       <Filter>Source Files\arm9\box</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\item.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\map2d.cpp">
       <Filter>Source Files\arm9\map</Filter>
@@ -229,18 +226,6 @@
     </ClCompile>
     <ClCompile Include="arm9\source\mapconfig.cpp">
       <Filter>Source Files\arm9\map</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\move.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\script.cpp">
-      <Filter>Source Files\arm9\battle</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\type.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\pokemon.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\io\keyboard.cpp">
       <Filter>Source Files\arm9\io</Filter>
@@ -274,6 +259,33 @@
     </ClCompile>
     <ClCompile Include="arm9\source\fs\saveGame.cpp">
       <Filter>Source Files\arm9\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\ds\item.cpp">
+      <Filter>Source Files\arm9\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\ds\move.cpp">
+      <Filter>Source Files\arm9\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\ds\pokemon.cpp">
+      <Filter>Source Files\arm9\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\ds\type.cpp">
+      <Filter>Source Files\arm9\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\sts\statusScreen.cpp">
+      <Filter>Source Files\arm9\sts</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\battle\battle.cpp">
+      <Filter>Source Files\arm9\battle</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\battle\battleUI.cpp">
+      <Filter>Source Files\arm9\battle</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\battle\script.cpp">
+      <Filter>Source Files\arm9\battle</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\sts\statusScreenUI.cpp">
+      <Filter>Source Files\arm9\sts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

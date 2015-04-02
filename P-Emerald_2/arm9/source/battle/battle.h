@@ -40,9 +40,7 @@
 #include "pokemon.h"
 #include "defines.h"
 
-namespace ITEMS {
-    class item;
-}
+class item;
 
 extern OAMTable *Oam;
 extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
@@ -61,7 +59,7 @@ namespace BATTLE {
     typedef battleScript::command::value        val;
 
 
-    u16 calcDamage( const move& atk, const POKEMON::pokemon& atg, const POKEMON::pokemon& def, u8 rndVal );
+    u16 calcDamage( const move& p_atk, const pokemon& p_atg, const pokemon& p_def, u8 p_rndVal );
 
     class battleTrainer {
     public:
@@ -71,10 +69,10 @@ namespace BATTLE {
 
         const char*         m_battleTrainerName;
         trainerClass        m_trainerClass;
-        std::vector < POKEMON::pokemon >
+        std::vector < pokemon >
             *m_pkmnTeam;
     private:
-        std::vector<ITEMS::item>   *_items;
+        std::vector<item>   *_items;
         int                 _moneyEarned;
         const char          *_msg1,
             *_msg2,
@@ -99,8 +97,8 @@ namespace BATTLE {
                        _msg3( p_msg3 ),
                        _msg4( p_msg4 ) { }
 
-        POKEMON::pokemon&      sendNewPKMN( bool p_choice = true );
-        ITEMS::item& useItem( bool choice = true );
+        pokemon&      sendNewPKMN( bool p_choice = true );
+        item& useItem( bool choice = true );
 
         const char*         getLooseMsg( ) const {
             return _msg4;
@@ -124,9 +122,6 @@ namespace BATTLE {
         s8      _oldPKMNStats[ 6 ][ 2 ][ 10 ];
 
     public:
-        static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, bool big = false ); //HP in %
-        static void displayHP( u16 HPstart, u16 HP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR, u8 outerR, bool p_sub = false ); //HP in %
-        static void displayEP( u16 EPstart, u16 EP, u8 x, u8 y, u8 freecolor1, u8 freecolor2, bool delay, u8 innerR = 14, u8 outerR = 15, bool p_sub = false );
 
         static void initLogScreen( );
         static void clearLogScreen( );

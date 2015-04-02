@@ -29,7 +29,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #pragma once
 
 #include "type.h"
-#include "script.h"
+#include "../battle/script.h"
 #include <string>
 #include <nds/ndstypes.h>
 
@@ -43,7 +43,7 @@ public:
         SLEEP,
         FREEZE,
         BURN,
-        POISON,
+        POISONED,
         CONFUSION,
         INFATUATION,
         TRAP,
@@ -145,6 +145,9 @@ public:
         return "N/A";
     }
 };
+
+extern move* AttackList[ MAXATTACK ];
+
 #define M_POUND 1
 #define M_KARATE_CHOP 2
 #define M_DOUBLE_SLAP 3

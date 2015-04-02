@@ -29,6 +29,21 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <nds/ndstypes.h>
 //#define USE_AS_LIB
 
+extern u32 TEMP[ 12288 ];
+extern u16 TEMP_PAL[ 256 ];
+
+#define loop() while( 1 )
+
+#define IN_RANGE( p_touch, p_input ) ( (p_touch).px >= (p_input).m_targetX1 && (p_touch).py >= (p_input).m_targetY1 \
+                                    && (p_touch).px <= (p_input).m_targetX2 && (p_touch).py <= (p_input).m_targetY2 )
+#define IN_RANGE_C( p_touch, p_input ) ( sqrt( sq( (p_touch).px - (p_input).m_targetX1 ) + sq( (p_touch).py - (p_input).m_targetY1 ) ) <= (p_input).m_targetR )
+
+#define GET_AND_WAIT( key ) ( ( pressed & key ) && IO::waitForInput( p_time, p_timeParameter, IO::inputTarget( key ) ) )
+#define GET_AND_WAIT_R( p_x1, p_y1, p_x2, p_y2 ) ( IN_RANGE( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) )\
+                                        && IO::waitForInput( p_time, p_timeParameter, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) )
+#define GET_AND_WAIT_C( p_x, p_y, p_r ) ( IN_RANGE_C( touch, IO::inputTarget( p_x, p_y, p_r ) )\
+                                    && IO::waitForInput( p_time, p_timeParameter, IO::inputTarget( p_x, p_y, p_r ) ) )
+
 #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 
 #define COLOR_IDX (u8(253))
@@ -89,3 +104,5 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #define BORDER_ID 31
 // 9 additional spaces used
 #define SQCH_ID 80
+
+s16 getCurrentDaytime( );

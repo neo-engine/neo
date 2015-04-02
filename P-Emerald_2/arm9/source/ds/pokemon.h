@@ -27,18 +27,15 @@
 
 #pragma once
 
-#include <nds.h>
 #include <string>
-
-#include "../io/font.h"
-#include "type.h"
 #include <map>
+#include <nds.h>
+#include "type.h"
 
 #undef RAND_MAX
 #define RAND_MAX 4294967295
 
-#define MAXPKMN 649
-#define MAXSTOREDPKMN 800
+#define MAX_PKMN 649
 
 extern std::string NatureList[ 25 ];
 extern std::string TypeList[ 19 ];
@@ -166,14 +163,10 @@ bool            canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode );
 
 
 extern double NatMod[ 25 ][ 5 ];
-extern u8 Pkmn_SafariCatchRate[ 669 ];
 
 extern u32 EXP[ 100 ][ 13 ];
 
-bool operator==( touchPosition R, touchPosition L );
-
 extern u32 LastPID;
-extern u16 page;
 
 const u16 OTLENGTH = 8;
 const u16 PKMN_NAMELENGTH = 11;
@@ -364,11 +357,7 @@ u8: 8;
                     u8              p_pokerus = 0 );
 
         ~boxPokemon( ) { }
-
-        int draw( ) {
-            return 0;
-        }
-
+        
     } m_boxdata;
 
     union {
@@ -388,7 +377,7 @@ u8: 8;
     u8 m_Level : 8;
 u8: 8;
     struct stats {
-        u16 m_acHP : 16;	//Aktuelle HP
+        u16 m_acHP : 16;	//current HP
         u16 m_maxHP : 16;
         u16 m_Atk : 16;
         u16 m_Def : 16;
@@ -414,13 +403,9 @@ u8: 8;
              u16            p_gotPlace = 0,
              u8             p_ball = 0,
              u8             p_pokerus = 0 );
-    ~pokemon( ) { }
 
     void            evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
     bool            canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
-
-    u32             draw( );
-    void            drawPage( u8 p_Page, PrintConsole* p_Top, PrintConsole* p_Bottom, bool p_newpok );
-
+    
     bool      operator==( const pokemon& p_other ) const;
 };

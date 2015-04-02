@@ -37,7 +37,7 @@ namespace IO {
             for( u8 i = startIdx; i < endIdx; ++i ) {
                 u8 acPos = i - startIdx;
                 printChoiceBox( ( ( acPos % 2 ) ? 129 : 19 ), 68 + ( acPos / 2 ) * 35,
-                               106 + ( ( acPos % 2 ) ? 129 : 19 ), 32 + 68 + ( acPos / 2 ) * 35, 6, COLOR_IDX, acPos == p_pressedIdx );
+                                106 + ( ( acPos % 2 ) ? 129 : 19 ), 32 + 68 + ( acPos / 2 ) * 35, 6, COLOR_IDX, acPos == p_pressedIdx );
                 regularFont->printString( _choices[ i ], ( ( acPos % 2 ) ? 129 : 19 ) + 8 + 2 * ( p_pressedIdx == acPos ),
                                           78 + ( acPos / 2 ) * 35 + ( p_pressedIdx == acPos ), true );
                 swiWaitForVBlank( );
@@ -52,19 +52,19 @@ namespace IO {
 
         initTextField( );
 
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         u16 nextAvailableTileIdx = 16;
 
-        nextAvailableTileIdx = loadSprite( Oam, spriteInfo, BACK_ID, 0, nextAvailableTileIdx,
+        nextAvailableTileIdx = loadSprite( BACK_ID, 0, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
                                            BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
-        nextAvailableTileIdx = loadSprite( Oam, spriteInfo, FWD_ID, 1, nextAvailableTileIdx,
+        nextAvailableTileIdx = loadSprite( FWD_ID, 1, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, ForwardPal,
                                            ForwardTiles, ForwardTilesLen, false, false, true, OBJPRIORITY_1, true );
-        nextAvailableTileIdx = loadSprite( Oam, spriteInfo, BWD_ID, 2, nextAvailableTileIdx,
+        nextAvailableTileIdx = loadSprite( BWD_ID, 2, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackwardPal,
                                            BackwardTiles, BackwardTilesLen, false, false, true, OBJPRIORITY_1, true );
-        updateOAMSub( Oam );
+        updateOAM( true );
 
         _name = p_name;
 
@@ -77,19 +77,19 @@ namespace IO {
     int choiceBox::getResult( const char* p_text, bool p_time, bool p_backButton ) {
         _text = p_text;
         draw( NEW_PAGE );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         u16 nextAvailableTileIdx = 16;
 
-        nextAvailableTileIdx = loadSprite( Oam, spriteInfo, BACK_ID, 0, nextAvailableTileIdx,
+        nextAvailableTileIdx = loadSprite( BACK_ID, 0, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
                                            BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
-        nextAvailableTileIdx = loadSprite( Oam, spriteInfo, FWD_ID, 1, nextAvailableTileIdx,
+        nextAvailableTileIdx = loadSprite( FWD_ID, 1, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, ForwardPal,
                                            ForwardTiles, ForwardTilesLen, false, false, true, OBJPRIORITY_1, true );
-        nextAvailableTileIdx = loadSprite( Oam, spriteInfo, BWD_ID, 2, nextAvailableTileIdx,
+        nextAvailableTileIdx = loadSprite( BWD_ID, 2, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackwardPal,
                                            BackwardTiles, BackwardTilesLen, false, false, true, OBJPRIORITY_1, true );
-        updateOAMSub( Oam );
+        updateOAM( true );
 
         int result = -1;
 
@@ -97,7 +97,7 @@ namespace IO {
             ( Oam->oamBuffer[ BACK_ID ] ).isHidden = false;
             ( Oam->oamBuffer[ BACK_ID ] ).x = fwdPos[ 0 ][ 0 ] - 12;
             ( Oam->oamBuffer[ BACK_ID ] ).y = fwdPos[ 0 ][ 1 ] - 12;
-            updateOAMSub( Oam );
+            updateOAM( true );
         }
 
         if( _num < 1 )
@@ -109,9 +109,9 @@ namespace IO {
                 ( Oam->oamBuffer[ FWD_ID ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
                 ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
             }
-            while( 42 ) {
+            loop( ) {
                 swiWaitForVBlank( );
-                updateOAMSub( Oam );
+                updateOAM( true );
                 if( p_time )
                     updateTime( s8( 1 ) );
                 touchPosition t;
@@ -153,7 +153,7 @@ namespace IO {
                             ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ 1 ][ 1 ] - 16;
                             draw( NEW_PAGE );
                         }
-                        updateOAMSub( Oam );
+                        updateOAM( true );
                     } else if( !p_backButton && ( _acPage && _acPage == ( _num - 1 ) / 3 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 )
                                || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
 
@@ -175,7 +175,7 @@ namespace IO {
                             ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ 1 ][ 1 ] - 16;
                             draw( NEW_PAGE );
                         }
-                        updateOAMSub( Oam );
+                        updateOAM( true );
                     }
                 }
             }
@@ -186,10 +186,10 @@ namespace IO {
                 ( Oam->oamBuffer[ FWD_ID ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
                 ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
             }
-            updateOAMSub( Oam );
-            while( 42 ) {
+            updateOAM( true );
+            loop( ) {
                 swiWaitForVBlank( );
-                updateOAMSub( Oam );
+                updateOAM( true );
                 if( p_time )
                     updateTime( s8( 1 ) );
                 touchPosition t;

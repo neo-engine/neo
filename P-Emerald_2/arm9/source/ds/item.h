@@ -35,7 +35,6 @@
 #include <nds/ndstypes.h>
 
 extern const char ITEM_PATH[ ];
-class ability;
 
 class item {
 public:

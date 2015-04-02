@@ -94,8 +94,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "BG3.h"
 
 
-unsigned int NAV_DATA[ 12288 ] = { 0 };
-unsigned short NAV_DATA_PAL[ 256 ] = { 0 };
 //Centers o t circles.
 //pokemon -> ID -> DEX -> Bag -> Opt -> Nav
 // X|Y
@@ -105,192 +103,104 @@ u8 mainSpritesPositions[ 12 ] = { 24, 64,
 238, 64,
 22, 96,
 234, 128 };
-backgroundSet BGs[ MAXBG ] = {/* { "Raging Gyarados", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-    { "Sleeping Eevee", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-    { "Mystic Guardevoir", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-    { "Waiting Suicune", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-    { "Awakening Xerneas", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-    { "Awakening Yveltal", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-    { "Fighting Groudon", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-    { "Fighting Kyogre", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },*/
-    { "Fighting Torchic", BG3Bitmap, BG3Pal, false, false, mainSpritesPositions },
-    { "Reborn Ho-Oh", BG2Bitmap, BG2Pal, false, false, mainSpritesPositions },
-    { "Working Klink", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions } };
 
 
-Region acMapRegion = NONE;
-std::pair<u8, u8> acMapPoint = std::pair<u8, u8>( 32, 24 );
-bool showfirst = true, showmappointer = false;
-
-const MapRegionPos MapLocations[ 3 ][ MAXMAPPOS ] = {
-    {
-        { 90, 66, 96, 73, 1010 },
-        { 115, 139, 121, 146, 308 },
-        { 57, 36, 66, 47, 239 },
-        { 46, 53, 51, 59, 298 },
-        { 37, 73, 47, 89, 245 },
-        { 39, 98, 45, 104, 294 },
-        { 45, 104, 53, 112, 242 },
-        { 47, 136, 54, 142, 291 },
-        { 50, 136, 59, 148, 237 },
-        { 64, 103, 72, 111, 236 },
-        { 64, 117, 72, 125, 235 },
-        { 64, 80, 72, 88, 240 },
-        { 65, 75, 71, 80, 295 },
-        { 69, 59, 78, 67, 238 },
-        { 77, 47, 85, 60, 292 },
-        { 79, 60, 84, 66, 312 },
-        { 89, 80, 105, 96, 244 },
-        { 89, 109, 98, 126, 243 },
-        { 114, 36, 123, 46, 246 },
-        { 140, 52, 149, 62, 202 },
-        { 142, 71, 147, 77, 300 },
-        { 121, 94, 130, 104, 1000 },
-        { 146, 109, 154, 118, 241 },
-        { 168, 112, 174, 116, 306 },
-        { 161, 112, 167, 116, 320 },
-        { 110, 112, 116, 116, 313 },
-        { 179, 122, 187, 131, 293 },
-        { 210, 95, 219, 111, 250 },
-        { 173, 88, 180, 97, 249 },
-        { 192, 74, 206, 82, 248 },
-        { 200, 60, 204, 66, 302 },
-        { 153, 59, 168, 67, 247 },
-        { 93, 111, 115, 117, 285 },
-        { 114, 111, 130, 117, 284 },
-        { 129, 111, 150, 117, 283 },
-        { 149, 111, 174, 117, 282 },
-        { 173, 111, 191, 117, 281 },
-        { 190, 111, 205, 117, 280 },
-        { 187, 104, 212, 112, 279 },
-        { 187, 80, 205, 105, 278 },
-        { 168, 80, 188, 101, 277 },
-        { 168, 60, 189, 81, 275 },
-        { 190, 60, 205, 76, 276 },
-        { 128, 60, 153, 66, 272 },
-        { 142, 65, 147, 83, 273 },
-        { 115, 82, 147, 88, 274 },
-        { 122, 87, 128, 95, 1001 },
-        { 103, 82, 115, 88, 269 },
-        { 109, 39, 114, 83, 270 },
-        { 122, 39, 128, 66, 271 },
-        { 90, 39, 96, 83, 262 },
-        { 76, 60, 91, 66, 263 },
-        { 62, 37, 96, 44, 264 },
-        { 39, 54, 45, 75, 266 },
-        { 46, 39, 51, 53, 265 },
-        { 46, 39, 60, 44, 265 },
-        { 45, 75, 66, 81, 267 },
-        { 39, 90, 45, 109, 254 },
-        { 39, 108, 45, 133, 255 },
-        { 39, 132, 57, 139, 256 },
-        { 57, 140, 70, 146, 258 },
-        { 69, 140, 91, 146, 259 },
-        { 90, 122, 96, 146, 260 },
-        { 90, 85, 96, 116, 261 },
-        { 69, 82, 94, 88, 268 },
-        { 50, 103, 66, 110, 252 },
-        { 64, 109, 70, 119, 251 },
-        { 65, 96, 91, 103, 253 }
-    }
-};
-void printMapLocation( const touchPosition& p_t ) {
-    consoleSetWindow( &Bottom, 5, 0, 20, 1 );
-    consoleSelect( &Bottom );
-    consoleClear( );
-    for( u16 i = 0; i < MAXMAPPOS; ++i ) {
-        if( p_t.px > MapLocations[ acMapRegion - 1 ][ i ].m_lx && p_t.px < MapLocations[ acMapRegion - 1 ][ i ].m_rx &&
-            p_t.py > MapLocations[ acMapRegion - 1 ][ i ].m_ly && p_t.py < MapLocations[ acMapRegion - 1 ][ i ].m_ry ) {
-            printf( FS::getLoc( MapLocations[ acMapRegion - 1 ][ i ].m_ind ) );
-            return;
+    Region acMapRegion = NONE;
+    const MapRegionPos MapLocations[ 3 ][ MAXMAPPOS ] = {
+        {
+            { 90, 66, 96, 73, 1010 },
+            { 115, 139, 121, 146, 308 },
+            { 57, 36, 66, 47, 239 },
+            { 46, 53, 51, 59, 298 },
+            { 37, 73, 47, 89, 245 },
+            { 39, 98, 45, 104, 294 },
+            { 45, 104, 53, 112, 242 },
+            { 47, 136, 54, 142, 291 },
+            { 50, 136, 59, 148, 237 },
+            { 64, 103, 72, 111, 236 },
+            { 64, 117, 72, 125, 235 },
+            { 64, 80, 72, 88, 240 },
+            { 65, 75, 71, 80, 295 },
+            { 69, 59, 78, 67, 238 },
+            { 77, 47, 85, 60, 292 },
+            { 79, 60, 84, 66, 312 },
+            { 89, 80, 105, 96, 244 },
+            { 89, 109, 98, 126, 243 },
+            { 114, 36, 123, 46, 246 },
+            { 140, 52, 149, 62, 202 },
+            { 142, 71, 147, 77, 300 },
+            { 121, 94, 130, 104, 1000 },
+            { 146, 109, 154, 118, 241 },
+            { 168, 112, 174, 116, 306 },
+            { 161, 112, 167, 116, 320 },
+            { 110, 112, 116, 116, 313 },
+            { 179, 122, 187, 131, 293 },
+            { 210, 95, 219, 111, 250 },
+            { 173, 88, 180, 97, 249 },
+            { 192, 74, 206, 82, 248 },
+            { 200, 60, 204, 66, 302 },
+            { 153, 59, 168, 67, 247 },
+            { 93, 111, 115, 117, 285 },
+            { 114, 111, 130, 117, 284 },
+            { 129, 111, 150, 117, 283 },
+            { 149, 111, 174, 117, 282 },
+            { 173, 111, 191, 117, 281 },
+            { 190, 111, 205, 117, 280 },
+            { 187, 104, 212, 112, 279 },
+            { 187, 80, 205, 105, 278 },
+            { 168, 80, 188, 101, 277 },
+            { 168, 60, 189, 81, 275 },
+            { 190, 60, 205, 76, 276 },
+            { 128, 60, 153, 66, 272 },
+            { 142, 65, 147, 83, 273 },
+            { 115, 82, 147, 88, 274 },
+            { 122, 87, 128, 95, 1001 },
+            { 103, 82, 115, 88, 269 },
+            { 109, 39, 114, 83, 270 },
+            { 122, 39, 128, 66, 271 },
+            { 90, 39, 96, 83, 262 },
+            { 76, 60, 91, 66, 263 },
+            { 62, 37, 96, 44, 264 },
+            { 39, 54, 45, 75, 266 },
+            { 46, 39, 51, 53, 265 },
+            { 46, 39, 60, 44, 265 },
+            { 45, 75, 66, 81, 267 },
+            { 39, 90, 45, 109, 254 },
+            { 39, 108, 45, 133, 255 },
+            { 39, 132, 57, 139, 256 },
+            { 57, 140, 70, 146, 258 },
+            { 69, 140, 91, 146, 259 },
+            { 90, 122, 96, 146, 260 },
+            { 90, 85, 96, 116, 261 },
+            { 69, 82, 94, 88, 268 },
+            { 50, 103, 66, 110, 252 },
+            { 64, 109, 70, 119, 251 },
+            { 65, 96, 91, 103, 253 }
         }
-    }
-}
-
-void printMapLocation( const MapRegionPos& p_m ) {
-    consoleSetWindow( &Bottom, 5, 0, 20, 1 );
-    consoleSelect( &Bottom );
-    consoleClear( );
-    printf( FS::getLoc( p_m.m_ind ) );
-    acMapPoint = std::pair<u8, u8>( ( p_m.m_lx + p_m.m_rx ) / 2, ( p_m.m_ly + p_m.m_ry ) / 2 );
-    updateTime( );
-    return;
-}
-u8 frame = 0;
-
-#ifdef USE_AS_LIB
-bool used = false;
-bool usin = false;
-#endif
-
-void updateTime( s8 p_mapMode ) {
-#ifdef USE_AS_LIB
-    used = true;
-#endif
-    bool mm = false;
-    if( -1 != p_mapMode )
-        mm = p_mapMode;
-
-#ifdef USE_AS_LIB
-    if( !usin )
-        return;
-    //AS_SoundVBL();
-#endif
-
-    cust_font2.setColor( 0, 0 );
-    cust_font2.setColor( 0, 1 );
-    cust_font2.setColor( 252, 2 );
-    BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
-    BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
-
-    frame = ( frame + 1 ) % 256;
-    if( mm )
-        animateMap( frame );
-
-    time_t unixTime = time( NULL );
-    struct tm* timeStruct = gmtime( (const time_t *)&unixTime );
-
-    if( acseconds != timeStruct->tm_sec ) {
-        if( showmappointer ) {
-            if( showfirst ) {
-                showfirst = false;
-                Oam->oamBuffer[ SQCH_ID ].isHidden = true;
-                Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = false;
-            } else {
-                showfirst = true;
-                Oam->oamBuffer[ SQCH_ID ].isHidden = false;
-                Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
+    };
+    void printMapLocation( const touchPosition& p_t ) {
+        consoleSetWindow( &Bottom, 5, 0, 20, 1 );
+        consoleSelect( &Bottom );
+        consoleClear( );
+        for( u16 i = 0; i < MAXMAPPOS; ++i ) {
+            if( p_t.px > MapLocations[ acMapRegion - 1 ][ i ].m_lx && p_t.px < MapLocations[ acMapRegion - 1 ][ i ].m_rx &&
+                p_t.py > MapLocations[ acMapRegion - 1 ][ i ].m_ly && p_t.py < MapLocations[ acMapRegion - 1 ][ i ].m_ry ) {
+                printf( FS::getLoc( MapLocations[ acMapRegion - 1 ][ i ].m_ind ) );
+                return;
             }
-            updateOAMSub( Oam );
-        } else {
-            Oam->oamBuffer[ SQCH_ID ].isHidden = true;
-            Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
-            updateOAMSub( Oam );
         }
-
-        BG_PALETTE_SUB[ 249 ] = RGB15( 31, 31, 31 );
-        cust_font2.setColor( 249, 1 );
-        cust_font2.setColor( 249, 2 );
-
-        char buffer[ 50 ];
-        sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-        cust_font2.printString( buffer, 18 * 8, 192 - 16, true );
-
-        achours = timeStruct->tm_hour;
-        acminutes = timeStruct->tm_min;
-        acseconds = timeStruct->tm_sec;
-
-        cust_font2.setColor( 0, 1 );
-        cust_font2.setColor( 252, 2 );
-        sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-        cust_font2.printString( buffer, 18 * 8, 192 - 16, true );
     }
-    achours = timeStruct->tm_hour;
-    acminutes = timeStruct->tm_min;
-    acday = timeStruct->tm_mday;
-    acmonth = timeStruct->tm_mon;
-    acyear = timeStruct->tm_year + 1900;
-}
+
+    void printMapLocation( const MapRegionPos& p_m ) {
+        consoleSetWindow( &Bottom, 5, 0, 20, 1 );
+        consoleSelect( &Bottom );
+        consoleClear( );
+        printf( FS::getLoc( p_m.m_ind ) );
+        acMapPoint = std::pair<u8, u8>( ( p_m.m_lx + p_m.m_rx ) / 2, ( p_m.m_ly + p_m.m_ry ) / 2 );
+        updateTime( );
+        return;
+    }
+
 
 #ifdef USE_AS_LIB
 // regenerate buffers for mp3 stream, must be called each VBlank (only needed if mp3 is used)
@@ -335,11 +245,6 @@ u16 cachedPKMN[ 6 ] = { 0 };
 u8 positions[ 6 ][ 2 ] = {
     { 14, 2 }, { 16, 3 }, { 14, 9 },
     { 16, 10 }, { 14, 17 }, { 16, 18 }
-};
-u8 borders[ 6 ][ 2 ] = {
-    { 4, 2 }, { 18, 3 },
-    { 4, 9 }, { 18, 10 },
-    { 4, 17 }, { 18, 18 }
 };
 
 u16 initMainSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
@@ -450,44 +355,9 @@ void setMainSpriteVisibility( bool p_hidden, bool p_save ) {
 
     if( p_save )
         setSpriteVisibility( &Oam->oamBuffer[ SAVE_ID ], p_hidden );
-    updateOAMSub( Oam );
+    updateOAM( true );
 }
 
-void drawBorder( ) {
-    dmaCopy( BorderBitmap, bgGetGfxPtr( bg2sub ), 256 * 192 );
-    dmaCopy( BorderPal, BG_PALETTE_SUB, 64 );
-}
-
-void drawSub( ) {
-    //memset( bgGetGfxPtr( bg2sub ), 0, 256 * 192 );
-    //memset( bgGetGfxPtr( bg3sub ), 0, 256 * 192 );
-    if( !BGs[ SAV->m_bgIdx ].m_loadFromRom ) {
-        dmaCopy( BGs[ SAV->m_bgIdx ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 192 );
-        dmaCopy( BGs[ SAV->m_bgIdx ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
-    } else if( !FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ SAV->m_bgIdx ].m_name.c_str( ), SAV->m_bgIdx ) ) {
-        dmaCopy( BGs[ 0 ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 256 );
-        dmaCopy( BGs[ 0 ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
-        SAV->m_bgIdx = 0;
-    }
-    drawBorder( );
-}
-
-void drawSub( u8 p_newIdx ) {
-    if( SAV->m_bgIdx == p_newIdx )
-        return;
-
-    if( !BGs[ p_newIdx ].m_loadFromRom ) {
-        dmaCopy( BGs[ p_newIdx ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 192 );
-        dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
-        SAV->m_bgIdx = p_newIdx;
-    } else if( !FS::loadNavScreen( bgGetGfxPtr( bg3sub ), BGs[ p_newIdx ].m_name.c_str( ), p_newIdx ) ) {
-        dmaCopy( BGs[ 0 ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 256 );
-        dmaCopy( BGs[ 0 ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
-        SAV->m_bgIdx = 0;
-    } else
-        SAV->m_bgIdx = p_newIdx;
-    drawBorder( );
-}
 
 void screenLoader::draw( s8 p_mode ) {
     _pos = p_mode;
@@ -503,7 +373,7 @@ void screenLoader::draw( s8 p_mode ) {
             Oam->oamBuffer[ 90 + i ].y = BGs[ SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 * i + 1 ] - 16;
             Oam->oamBuffer[ 90 + i ].priority = OBJPRIORITY_1;
         }
-        updateOAMSub( Oam );
+        updateOAM( true );
     } else if( p_mode == 1 ) {
         showmappointer = true;
         FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen2" );
@@ -517,7 +387,7 @@ void screenLoader::draw( s8 p_mode ) {
 
         for( u8 i = 0; i < 3; ++i )
             Oam->oamBuffer[ 90 + i ].isHidden = true;
-        updateOAMSub( Oam );
+        updateOAM( true );
     } else if( p_mode == 2 ) {
         showmappointer = true;
         FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen3" );
@@ -530,7 +400,7 @@ void screenLoader::draw( s8 p_mode ) {
         setMainSpriteVisibility( true );
         for( u8 i = 0; i < 3; ++i )
             Oam->oamBuffer[ 90 + i ].isHidden = true;
-        updateOAMSub( Oam );
+        updateOAM( true );
     } else if( p_mode == 3 ) {
         showmappointer = true;
         FS::loadPictureSub( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "BottomScreen2_BG3_KJ" );
@@ -543,7 +413,7 @@ void screenLoader::draw( s8 p_mode ) {
         setMainSpriteVisibility( true );
         for( u8 i = 0; i < 3; ++i )
             Oam->oamBuffer[ 90 + i ].isHidden = true;
-        updateOAMSub( Oam );
+        updateOAM( true );
     } else {
         drawSub( );
         //updateTime( s8( 1 ) );
@@ -551,483 +421,16 @@ void screenLoader::draw( s8 p_mode ) {
         setMainSpriteVisibility( false );
         for( u8 i = 0; i < 3; ++i )
             Oam->oamBuffer[ 90 + i ].isHidden = true;
-        updateOAMSub( Oam );
+        updateOAM( true );
     }
-    updateOAMSub( Oam );
+    updateOAM( true );
     //updateTime( s8( 1 ) );
 }
 void screenLoader::init( ) {
     //initVideoSub();
-    initOAMTableSub( Oam );
+    initOAMTable( true );
     initMainSprites( Oam, spriteInfo );
     this->draw( this->_pos );
-}
-
-void initTop( ) {
-    consoleSelect( &Top );
-    printf( "\x1b[39m" );
-    u8 a = 0, b = 0;
-    u16 c = 0;
-    initOAMTable( OamTop );
-    cust_font.setColor( 0, 0 );
-    cust_font.setColor( 251, 1 );
-    cust_font.setColor( 252, 2 );
-
-    BG_PALETTE[ 250 ] = RGB15( 31, 31, 31 );
-    BG_PALETTE[ 252 ] = RGB15( 15, 15, 15 );
-    BG_PALETTE[ 251 ] = RGB15( 3, 3, 3 );
-
-    for( size_t i = 0; i < SAV->m_PkmnTeam.size( ); i++ ) {
-        if( !SAV->m_PkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
-            if( i % 2 == 0 ) {
-                FS::drawPKMNIcon( OamTop, spriteInfoTop, SAV->m_PkmnTeam[ i ].m_boxdata.m_speciesId, u16( borders[ i ][ 0 ] * 8 - 28 ), u16( borders[ i ][ 1 ] * 8 ), a, b, c, false );
-                BATTLE::battleUI::displayHP( 100, 101, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
-                BATTLE::battleUI::displayHP( 100, 100 - SAV->m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV->m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
-            } else {
-                FS::drawPKMNIcon( OamTop, spriteInfoTop, SAV->m_PkmnTeam[ i ].m_boxdata.m_speciesId, u16( borders[ i ][ 0 ] * 8 + 76 ), u16( borders[ i ][ 1 ] * 8 ), a, b, c, false );
-                BATTLE::battleUI::displayHP( 100, 101, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
-                BATTLE::battleUI::displayHP( 100, 100 - SAV->m_PkmnTeam[ i ].m_stats.m_acHP * 100 / SAV->m_PkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
-            }
-            updateOAM( OamTop );
-            //char buffer[ 100 ];
-
-            u8 mval = 1 + ( ( i / 2 == 1 ) ? 4 : 8 );
-
-            sprintf( buffer, "%ls", SAV->m_PkmnTeam[ i ].m_boxdata.m_name );
-            cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 - mval, false );
-            sprintf( buffer, "%s", POKEMON::PKMNDATA::getDisplayName( SAV->m_PkmnTeam[ i ].m_boxdata.m_speciesId ) );
-            cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
-
-            sprintf( buffer, "%hi/%hi KP", SAV->m_PkmnTeam[ i ].m_stats.m_acHP, SAV->m_PkmnTeam[ i ].m_stats.m_maxHP );
-            cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 28 - mval, false );
-
-            sprintf( buffer, "%s", ITEMS::ItemList[ SAV->m_PkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ) );
-            cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
-
-        } else {
-            consoleSetWindow( &Top, borders[ i ][ 0 ], borders[ i ][ 1 ], 12, 6 );
-
-            char buffer[ 100 ];
-            int mval = 1 + ( ( i / 2 == 1 ) ? 4 : 8 );
-            sprintf( buffer, "Ei" );
-            cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 - mval, false );
-            sprintf( buffer, "Ei" );
-            cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
-
-            sprintf( buffer, "%s", ITEMS::ItemList[ SAV->m_PkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ) );
-            cust_font.printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
-
-            if( i % 2 == 0 ) {
-                FS::drawEggIcon( OamTop, spriteInfoTop, u16( borders[ i ][ 0 ] * 8 - 28 ), u16( borders[ i ][ 1 ] * 8 ), a, b, c, false );
-            } else {
-                FS::drawEggIcon( OamTop, spriteInfoTop, u16( borders[ i ][ 0 ] * 8 + 76 ), u16( borders[ i ][ 1 ] * 8 ), a, b, c, false );
-            }
-            updateOAM( OamTop );
-        }
-    }
-    updateOAM( OamTop );
-}
-void clearTop( ) {
-    consoleSelect( &Top );
-    for( size_t i = 0; i < SAV->m_PkmnTeam.size( ); i++ ) {
-        consoleSetWindow( &Top, borders[ i ][ 0 ], borders[ i ][ 1 ], 12, 6 );
-        consoleClear( );
-    }
-    initOAMTable( OamTop );
-}
-
-u8 fieldCnt = 0;
-
-void initSub( u16 pkmIdx ) {
-    consoleSelect( &Bottom );
-    consoleSetWindow( &Bottom, 16, 0, 16, 16 );
-    consoleClear( );
-    for( u8 i = 0; i < 6; ++i ) {
-        Oam->oamBuffer[ 15 + 2 * i ].isHidden = true;
-        Oam->oamBuffer[ 16 + 2 * i ].isHidden = true;
-    }
-    updateOAMSub( Oam );
-    if( pkmIdx >= SAV->m_PkmnTeam.size( ) || SAV->m_PkmnTeam[ pkmIdx ].m_boxdata.m_individualValues.m_isEgg ) {
-        consoleSelect( &Top );
-        return;
-    }
-    u8 u = 0;
-    for( u8 i = 0; i < 4; ++i ) {
-        if( SAV->m_PkmnTeam[ pkmIdx ].m_boxdata.m_moves[ i ] < MAXATTACK &&
-            AttackList[ SAV->m_PkmnTeam[ pkmIdx ].m_boxdata.m_moves[ i ] ]->m_isFieldAttack ) {
-            Oam->oamBuffer[ 15 + 2 * ( u ) ].isHidden = false;
-            Oam->oamBuffer[ 16 + 2 * ( u ) ].isHidden = false;
-            Oam->oamBuffer[ 15 + 2 * ( u ) ].y = -7 + 24 * u;
-            Oam->oamBuffer[ 16 + 2 * ( u ) ].y = -7 + 24 * u;
-
-            Oam->oamBuffer[ 15 + 2 * ( u ) ].x = 152;
-            Oam->oamBuffer[ 16 + 2 * ( u ) ].x = 192 + 24;
-            updateOAMSub( Oam );
-
-            consoleSetWindow( &Bottom, 16, 3 * u + 1, 16, 16 );
-            printf( "    %s", AttackList[ SAV->m_PkmnTeam[ pkmIdx ].m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-            ++u;
-        }
-    }
-    if( SAV->m_PkmnTeam[ pkmIdx ].m_boxdata.m_holdItem ) {
-        Oam->oamBuffer[ 15 + 2 * ( u ) ].isHidden = false;
-        Oam->oamBuffer[ 16 + 2 * ( u ) ].isHidden = false;
-        Oam->oamBuffer[ 15 + 2 * ( u ) ].y = -7 + 24 * u;
-        Oam->oamBuffer[ 16 + 2 * ( u ) ].y = -7 + 24 * u;
-
-        Oam->oamBuffer[ 15 + 2 * ( u ) ].x = 152;
-        Oam->oamBuffer[ 16 + 2 * ( u ) ].x = 192 + 24;
-        updateOAMSub( Oam );
-
-        consoleSetWindow( &Bottom, 16, 3 * u + 1, 16, 16 );
-        printf( "    Item nehmen" );
-    }
-    u16 s = u + SAV->m_PkmnTeam[ pkmIdx ].m_boxdata.m_holdItem;
-    Oam->oamBuffer[ 15 + 2 * ( s ) ].isHidden = false;
-    Oam->oamBuffer[ 16 + 2 * ( s ) ].isHidden = false;
-    Oam->oamBuffer[ 15 + 2 * ( s ) ].y = -7 + 24 * u;
-    Oam->oamBuffer[ 16 + 2 * ( s ) ].y = -7 + 24 * u;
-
-    Oam->oamBuffer[ 15 + 2 * ( s ) ].x = 152;
-    Oam->oamBuffer[ 16 + 2 * ( s ) ].x = 192 + 24;
-    updateOAMSub( Oam );
-
-    consoleSetWindow( &Bottom, 16, 3 * s + 1, 16, 16 );
-    printf( "    Dexeintrag" );
-    consoleSelect( &Top );
-
-    fieldCnt = u;
-}
-
-void loadPKMNSprites( ) {
-    int palcnt = A_ID + 1;
-    u16 nextAvailableTileIdx = 208;
-
-    // Choice Box Sprites
-
-    nextAvailableTileIdx = loadSprite( Oam, spriteInfo, FWD_ID, palcnt++, nextAvailableTileIdx,
-                                       SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, DownPal,
-                                       DownTiles, DownTilesLen, false, false, true, OBJPRIORITY_1, true );
-    nextAvailableTileIdx = loadSprite( Oam, spriteInfo, BWD_ID, palcnt++, nextAvailableTileIdx,
-                                       SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, UpPal,
-                                       UpTiles, UpTilesLen, false, false, true, OBJPRIORITY_1, true );
-}
-
-void screenLoader::run_pkmn( ) {
-    vramSetup( );
-    videoSetMode( MODE_5_2D/* | DISPLAY_BG2_ACTIVE*/ | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-    swiWaitForVBlank( );
-    Top = *consoleInit( &Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
-    consoleSetFont( &Top, &cfont );
-
-    Bottom = *consoleInit( &Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
-    consoleSetFont( &Bottom, &cfont );
-
-    touchPosition touch;
-    swiWaitForVBlank( );
-    drawSub( );
-    u8 acIn = 0, max = SAV->m_PkmnTeam.size( );
-    consoleSelect( &Top );
-    consoleClear( );
-
-    clearTop( );
-
-    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNScreen" );
-    bgUpdate( );
-    initTop( );
-    initSub( acIn );
-    loadPKMNSprites( );
-    consoleSetWindow( &Top, positions[ acIn ][ 0 ], positions[ acIn ][ 1 ], 2, 2 );
-    if( acIn & 1 )
-        printf( ">" );
-    else
-        printf( "<" );
-
-    SpriteEntry * back = &Oam->oamBuffer[ BACK_ID ];
-    SpriteEntry * save = &Oam->oamBuffer[ SAVE_ID ];
-    setSpriteVisibility( back, false );
-    setSpriteVisibility( save, true );
-    setMainSpriteVisibility( true );
-    Oam->oamBuffer[ 8 ].isHidden = false;
-    Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
-    Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
-    updateOAMSub( Oam );
-
-    while( 1 ) {
-        updateTime( );
-        consoleSelect( &Top );
-        updateOAMSub( Oam );
-
-        swiWaitForVBlank( );
-        scanKeys( );
-        u32 pressed = keysCurrent( );
-        u32 held = keysHeld( );
-        touchRead( &touch );
-
-        if( held & KEY_X || ( touch.px > 224 && touch.py > 164 ) ) {
-            while( 1 ) {
-                if( ( keysUp( ) & KEY_X ) )
-                    break;
-
-                auto t = touchReadXY( );
-                if( t.px == 0 && t.py == 0 )
-                    break;
-                swiWaitForVBlank( );
-                scanKeys( );
-            }
-            break;
-        } else if( ( pressed & KEY_A ) || ( sqrt( sq( touch.px - 128 ) + sq( touch.py - 96 ) ) <= 16 ) ) {
-            while( 2 ) {
-                if( keysUp( ) & KEY_A )
-                    break;
-
-                auto t = touchReadXY( );
-                if( t.px == 0 && t.py == 0 )
-                    break;
-                swiWaitForVBlank( );
-                scanKeys( );
-            }
-            consoleClear( );
-            clearTop( );
-            Oam->oamBuffer[ 8 ].isHidden = true;
-            updateOAMSub( Oam );
-            swiWaitForVBlank( );
-            while( 1 ) {
-                initSub( -1 );
-                u32 p = SAV->m_PkmnTeam[ acIn ].draw( );
-                if( p & KEY_X ) {
-                    for( u8 i = 0; i < max; i++ ) {
-                        consoleSetWindow( &Top, positions[ i ][ 0 ], positions[ i ][ 1 ], 2, 2 );
-                        consoleClear( );
-                    }
-                    clearTop( );
-                    initSub( -1 );
-
-                    initOAMTableSub( Oam );
-                    initMainSprites( Oam, spriteInfo );
-                    setSpriteVisibility( back, true );
-                    setSpriteVisibility( save, false );
-                    setMainSpriteVisibility( false );
-                    Oam->oamBuffer[ 8 ].isHidden = true;
-                    return;
-                } else if( p & KEY_B ) {
-                    initOAMTableSub( Oam );
-                    initMainSprites( Oam, spriteInfo );
-                    setSpriteVisibility( back, false );
-                    setSpriteVisibility( save, true );
-                    setMainSpriteVisibility( true );
-                    loadPKMNSprites( );
-                    Oam->oamBuffer[ 8 ].isHidden = false;
-                    Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
-                    Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
-
-                    FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNScreen" );
-                    drawSub( );
-
-                    acIn %= max;
-                    consoleSelect( &Top );
-                    consoleClear( );
-                    initTop( );
-                    consoleSetWindow( &Top, positions[ acIn ][ 0 ], positions[ acIn ][ 1 ], 2, 2 );
-                    if( acIn & 1 )
-                        printf( ">" );
-                    else
-                        printf( "<" );
-
-                    initSub( acIn );
-
-                    break;
-                } else if( p & KEY_UP ) {
-                    if( acIn == 0 )
-                        acIn = max - 1;
-                    else
-                        --acIn;
-                } else if( p & KEY_DOWN ) {
-                    if( ++acIn >= max )
-                        acIn = 0;
-                }
-
-            }
-        } else if( pressed & KEY_UP ) {
-            while( 1 ) {
-                scanKeys( );
-                if( keysUp( ) & KEY_UP )
-                    break;
-            }
-            if( acIn == 0 )
-                acIn = max - 1;
-            else
-                --acIn;
-            consoleClear( );
-            consoleSetWindow( &Top, positions[ acIn ][ 0 ], positions[ acIn ][ 1 ], 2, 2 );
-            if( acIn & 1 )
-                printf( ">" );
-            else
-                printf( "<" );
-            initSub( acIn );
-        } else if( pressed & KEY_DOWN ) {
-            while( 1 ) {
-                scanKeys( );
-                if( keysUp( ) & KEY_DOWN )
-                    break;
-            }
-            if( ++acIn >= max )
-                acIn = 0;
-            consoleClear( );
-            consoleSetWindow( &Top, positions[ acIn ][ 0 ], positions[ acIn ][ 1 ], 2, 2 );
-            if( acIn & 1 )
-                printf( ">" );
-            else
-                printf( "<" );
-            initSub( acIn );
-        } else if( SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem && touch.px >= 152 && touch.py >= ( -7 + 24 * fieldCnt ) && touch.py < ( 17 + 24 * fieldCnt ) ) {
-            while( 1 ) {
-                scanKeys( );
-                auto t = touchReadXY( );
-                if( t.px == 0 && t.py == 0 )
-                    break;
-                swiWaitForVBlank( );
-            }
-            char buffer[ 50 ];
-            ITEMS::item acI = *ITEMS::ItemList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ];
-            SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem = 0;
-
-            initSub( -1 );
-            setSpriteVisibility( back, true );
-            Oam->oamBuffer[ 8 ].isHidden = true;
-            Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH - 28;
-            Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT - 28;
-            updateOAMSub( Oam );
-            sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( ).c_str( ), SAV->m_PkmnTeam[ acIn ].m_boxdata.m_name );
-            UI::messageBox( buffer, true, true );
-            SAV->m_bag.addItem( acI.getItemType( ), acI.getItemId( ), 1 );
-
-            Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
-            Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
-            FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNScreen" );
-            initTop( );
-            setSpriteVisibility( back, false );
-            Oam->oamBuffer[ 8 ].isHidden = false;
-            updateOAMSub( Oam );
-            initSub( acIn );
-        } else if( touch.px >= 152 && touch.py >= ( -7 + 24 * ( SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem + fieldCnt ) ) && touch.py < ( 17 + 24 * ( fieldCnt + SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ) ) ) {
-            while( 1 ) {
-                scanKeys( );
-                auto t = touchReadXY( );
-                if( t.px == 0 && t.py == 0 )
-                    break;
-                swiWaitForVBlank( );
-            }
-            ITEMS::item acI = *ITEMS::ItemList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem ];
-            SAV->m_PkmnTeam[ acIn ].m_boxdata.m_holdItem = 0;
-
-            initSub( -1 );
-            setSpriteVisibility( back, true );
-            Oam->oamBuffer[ 8 ].isHidden = true;
-            Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH - 28;
-            Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT - 28;
-            updateOAMSub( Oam );
-
-            this->run_dex( SAV->m_PkmnTeam[ acIn ].m_boxdata.m_speciesId - 1 );
-
-            setSpriteVisibility( back, false );
-            setSpriteVisibility( save, true );
-            setMainSpriteVisibility( true );
-            Oam->oamBuffer[ 8 ].isHidden = false;
-            Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
-            Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
-            FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "PKMNScreen" );
-            initTop( );
-            setSpriteVisibility( back, false );
-            Oam->oamBuffer[ 8 ].isHidden = false;
-            updateOAMSub( Oam );
-            initSub( acIn );
-            consoleSetWindow( &Top, positions[ acIn ][ 0 ], positions[ acIn ][ 1 ], 2, 2 );
-            if( acIn & 1 )
-                printf( ">" );
-            else
-                printf( "<" );
-        }
-        for( u8 i = 0; i < fieldCnt; ++i )
-            if( touch.px >= 152 && touch.py >= ( -7 + 24 * i ) && touch.py < ( 17 + 24 * i ) ) {
-                while( 1 ) {
-                    scanKeys( );
-                    auto t = touchReadXY( );
-                    if( t.px == 0 && t.py == 0 )
-                        break;
-                    swiWaitForVBlank( );
-                }
-                u8 u = 0, o;
-                for( o = 0; o < 4 && u <= i; ++o )
-                    if( AttackList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->m_isFieldAttack )
-                        u++;
-                o--;
-                if( AttackList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->possible( ) ) {
-                    for( u8 i2 = 0; i2 < max; i2++ ) {
-                        consoleSetWindow( &Top, positions[ i2 ][ 0 ], positions[ i2 ][ 1 ], 2, 2 );
-                        consoleClear( );
-                    }
-                    clearTop( );
-                    initSub( -1 );
-
-                    initOAMTableSub( Oam );
-                    initMainSprites( Oam, spriteInfo );
-                    setSpriteVisibility( back, true );
-                    setSpriteVisibility( save, false );
-                    setMainSpriteVisibility( false );
-                    Oam->oamBuffer[ 8 ].isHidden = true;
-
-                    this->draw( -1 );
-                    initMapSprites( );
-                    movePlayerOnMap( SAV->m_acposx / 20, SAV->m_acposy / 20, SAV->m_acposz, true );
-
-                    bgUpdate( );
-                    swiWaitForVBlank( );
-
-                    char buffer[ 50 ];
-                    sprintf( buffer, "%ls setzt %s\nein!", SAV->m_PkmnTeam[ acIn ].m_boxdata.m_name, AttackList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
-                    UI::messageBox( buffer, true, true );
-                    shoUseAttack( SAV->m_PkmnTeam[ acIn ].m_boxdata.m_speciesId, SAV->m_PkmnTeam[ acIn ].m_boxdata.m_isFemale, SAV->m_PkmnTeam[ acIn ].m_boxdata.isShiny( ) );
-                    AttackList[ SAV->m_PkmnTeam[ acIn ].m_boxdata.m_moves[ o ] ]->use( );
-                    return;
-                } else {
-                    initSub( -1 );
-
-                    initOAMTableSub( Oam );
-                    initMainSprites( Oam, spriteInfo );
-                    setSpriteVisibility( back, true );
-                    setSpriteVisibility( save, false );
-                    setMainSpriteVisibility( true );
-                    loadPKMNSprites( );
-                    Oam->oamBuffer[ 8 ].isHidden = true;
-                    //loadPicture(bgGetGfxPtr(bg3),"nitro:/PICS/","PKMNScreen");
-                    UI::messageBox( "Diese Attacke kann jetzt\nnicht eingesetzt werden.", "PokéNav" );
-
-                    setSpriteVisibility( back, false );
-                    setSpriteVisibility( save, true );
-                    setMainSpriteVisibility( true );
-                    Oam->oamBuffer[ 8 ].isHidden = false;
-                    Oam->oamBuffer[ 8 ].x = SCREEN_WIDTH / 2 - 16;
-                    Oam->oamBuffer[ 8 ].y = SCREEN_HEIGHT / 2 - 16;
-                    updateOAMSub( Oam );
-                    initSub( acIn );
-                    //initTop();
-                }
-            }
-    }
-    for( u8 i = 0; i < max; i++ ) {
-        consoleSetWindow( &Top, positions[ i ][ 0 ], positions[ i ][ 1 ], 2, 2 );
-        consoleClear( );
-    }
-    clearTop( );
-    initSub( -1 );
-
-    initOAMTableSub( Oam );
-    initMainSprites( Oam, spriteInfo );
-    setSpriteVisibility( back, true );
-    setSpriteVisibility( save, false );
-    setMainSpriteVisibility( false );
-    Oam->oamBuffer[ 8 ].isHidden = true;
 }
 
 const u8 dexsppos[ 2 ][ 9 ] = { { 160, 128, 96, 19, 6, 120, 158, 196, 8 }, { -16, 0, 24, 138, 173, 108, 126, 144, 32 } };
@@ -1154,99 +557,6 @@ void initDexSprites( OAMTable* p_oam, SpriteInfo* p_spriteInfo, u8& p_oamIndex, 
     p_tileCnt += BigCirc1TilesLen / BYTES_PER_16_COLOR_TILE;
     ++p_palCnt;
     updateOAMSub( p_oam );
-}
-
-void drawTypeIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16 & p_tileCnt, Type p_type, u16 p_posX, u16 p_posY, bool p_subScreen ) {
-    SpriteInfo * type1Info = &p_spriteInfo[ ++p_oamIndex ];
-    SpriteEntry * type1 = &p_oam->oamBuffer[ p_oamIndex ];
-    type1Info->m_oamId = p_oamIndex;
-    type1Info->m_width = 32;
-    type1Info->m_height = 16;
-    type1Info->m_angle = 0;
-    type1Info->m_entry = type1;
-    type1->y = p_posY;
-    type1->isRotateScale = false;
-    type1->isHidden = false;
-    type1->blendMode = OBJMODE_NORMAL;
-    type1->isMosaic = false;
-    type1->colorMode = OBJCOLOR_16;
-    type1->shape = OBJSHAPE_WIDE;
-    type1->x = p_posX;
-    type1->size = OBJSIZE_32;
-    type1->gfxIndex = p_tileCnt;
-    type1->priority = OBJPRIORITY_0;
-    type1->palette = p_palCnt;
-
-    if( p_subScreen ) {
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                          TypePals[ p_type ],
-                          &SPRITE_PALETTE_SUB[ p_palCnt * COLORS_PER_PALETTE ],
-                          32 );
-        /* Copy the sprite graphics to sprite graphics memory */
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                          TypeTiles[ p_type ],
-                          &SPRITE_GFX_SUB[ p_tileCnt * OFFSET_MULTIPLIER ],
-                          KampfTilesLen );
-    } else {
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                          TypePals[ p_type ],
-                          &SPRITE_PALETTE[ p_palCnt * COLORS_PER_PALETTE ],
-                          32 );
-        /* Copy the sprite graphics to sprite graphics memory */
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                          TypeTiles[ p_type ],
-                          &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ],
-                          KampfTilesLen );
-    }
-    p_tileCnt += KampfTilesLen / BYTES_PER_16_COLOR_TILE;
-    ++p_palCnt;
-}
-
-void drawDamageCategoryIcon( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16 & p_tileCnt,
-                             move::moveHitTypes p_type, u16 p_posX, u16 p_posY, bool p_subScreen ) {
-    SpriteInfo * type1Info = &p_spriteInfo[ ++p_oamIndex ];
-    SpriteEntry * type1 = &p_oam->oamBuffer[ p_oamIndex ];
-    type1Info->m_oamId = p_oamIndex;
-    type1Info->m_width = 32;
-    type1Info->m_height = 16;
-    type1Info->m_angle = 0;
-    type1Info->m_entry = type1;
-    type1->y = p_posY;
-    type1->isRotateScale = false;
-    type1->isHidden = false;
-    type1->blendMode = OBJMODE_NORMAL;
-    type1->isMosaic = false;
-    type1->colorMode = OBJCOLOR_16;
-    type1->shape = OBJSHAPE_WIDE;
-    type1->x = p_posX;
-    type1->size = OBJSIZE_32;
-    type1->gfxIndex = p_tileCnt;
-    type1->priority = OBJPRIORITY_0;
-    type1->palette = p_palCnt;
-
-    if( p_subScreen ) {
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                          HitTypePals[ p_type ],
-                          &SPRITE_PALETTE_SUB[ p_palCnt * COLORS_PER_PALETTE ],
-                          32 );
-        /* Copy the sprite graphics to sprite graphics memory */
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                          HitTypeTiles[ p_type ],
-                          &SPRITE_GFX_SUB[ p_tileCnt * OFFSET_MULTIPLIER ],
-                          KampfTilesLen );
-    } else {
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                          HitTypePals[ p_type ],
-                          &SPRITE_PALETTE[ p_palCnt * COLORS_PER_PALETTE ],
-                          32 );
-        /* Copy the sprite graphics to sprite graphics memory */
-        dmaCopyHalfWords( SPRITE_DMA_CHANNEL,
-                          HitTypeTiles[ p_type ],
-                          &SPRITE_GFX[ p_tileCnt * OFFSET_MULTIPLIER ],
-                          KampfTilesLen );
-    }
-    p_tileCnt += KampfTilesLen / BYTES_PER_16_COLOR_TILE;
-    ++p_palCnt;
 }
 
 void formes( OAMTable *p_oam, SpriteInfo * p_spriteInfo, u8& p_oamIndex, u8& p_palCnt, u16 & p_tileCnt, u16 p_pkmnId, bool p_female, POKEMON::pkmnGenderType p_pkmnGenderType ) {
@@ -1534,7 +844,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
     FS::loadPicture( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "DexTop", 32 );
 
     drawSub( );
-    initOAMTableSub( Oam );
+    initOAMTable( true );
     initOAMTable( OamTop );
     u8 palcnt = 0;
     u16 tilecnt = 0;
@@ -1562,11 +872,11 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
             FS::drawPKMNIcon( Oam, spriteInfo, SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
 
         spriteInfo[ 16 ].m_entry->isHidden = true;
-        updateOAMSub( Oam );
-        while( 42 ) {
+        updateOAM( true );
+        loop( ) {
             updateTime( );
             swiWaitForVBlank( );
-            updateOAMSub( Oam );
+            updateOAM( true );
             touchRead( &t );
             scanKeys( );
             u32 pressed = keysDown( ), up = keysUp( ), held = keysHeld( );
@@ -1640,7 +950,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                         FS::drawPKMNIcon( Oam, spriteInfo, SAV->m_inDex[ i ] ? i + 1 : 0, dexsppos[ 0 ][ j ], dexsppos[ 1 ][ j ], o2, p2, t2, true );
                     continue;
             } else if( ( held & KEY_LEFT ) ) {
-                while( 1 ) {
+                loop( ) {
                     if( keysUp( ) & KEY_LEFT )
                         break;
                     scanKeys( );
@@ -1652,10 +962,10 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                 spriteInfo[ 16 + acPage ].m_entry->isHidden = false;
                 acPage = ( acPage + 2 ) % 3;
                 spriteInfo[ 16 + acPage ].m_entry->isHidden = true;
-                updateOAMSub( Oam );
+                updateOAM( true );
                 drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, acNum + 1, acForme );
             } else if( ( held & KEY_RIGHT ) ) {
-                while( 1 ) {
+                loop( ) {
                     if( keysUp( ) & KEY_RIGHT )
                         break;
                     scanKeys( );
@@ -1667,11 +977,11 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                 spriteInfo[ 16 + acPage ].m_entry->isHidden = false;
                 acPage = ( acPage + 1 ) % 3;
                 spriteInfo[ 16 + acPage ].m_entry->isHidden = true;
-                updateOAMSub( Oam );
+                updateOAM( true );
                 drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, acNum + 1, acForme );
             } else if( ( held & KEY_SELECT ) ) {
                 if( acPage > 1 ) {
-                    while( 1 ) {
+                    loop( ) {
                         if( !( keysHeld( ) & KEY_SELECT ) )
                             break;
                         scanKeys( );
@@ -1687,7 +997,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
             }
             for( u8 q = 0; q < 5; ++q )
                 if( sqrt( sq( dexsppos[ 0 ][ q ] - t.px + 16 ) + sq( dexsppos[ 1 ][ q ] - t.py + 16 ) ) <= 16 ) {
-                    while( 1 ) {
+                    loop( ) {
                         scanKeys( );
                         auto t = touchReadXY( );
                         if( t.px == 0 && t.py == 0 )
@@ -1706,7 +1016,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                 }
             for( u8 q = 5; q < 8; ++q )
                 if( sqrt( sq( dexsppos[ 0 ][ q ] - t.px + 16 ) + sq( dexsppos[ 1 ][ q ] - t.py + 16 ) ) <= 16 ) {
-                    while( 1 ) {
+                    loop( ) {
                         scanKeys( );
                         auto t = touchReadXY( );
                         if( t.px == 0 && t.py == 0 )
@@ -1719,7 +1029,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
                     spriteInfo[ 16 + acPage ].m_entry->isHidden = false;
                     acPage = ( q + 1 ) % 3;
                     spriteInfo[ 16 + acPage ].m_entry->isHidden = true;
-                    updateOAMSub( Oam );
+                    updateOAM( true );
                     drawTopDexPage( acPage == 1 ? 4 + acMap : acPage, acNum + 1, acForme );
                 }
         }
@@ -1730,7 +1040,7 @@ void screenLoader::run_dex( u16 p_pkmnId ) {
         consoleSelect( &Top );
         consoleClear( );
         initOAMTable( OamTop );
-        initOAMTableSub( Oam );
+        initOAMTable( true );
         initMainSprites( Oam, spriteInfo );
         setMainSpriteVisibility( false );
         Oam->oamBuffer[ 8 ].isHidden = true;

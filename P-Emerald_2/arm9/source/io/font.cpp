@@ -81,13 +81,13 @@ namespace IO {
                 bool on = false;
                 if( p_bottom ) {
                     Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-                    updateOAMSub( Oam );
+                    updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
                     updateOAM( OamTop );
                 }
 
-                while( 1 ) {
+                loop( ) {
                     scanKeys( );
                     swiWaitForVBlank( );
                     if( ++c == 45 ) {
@@ -110,7 +110,7 @@ namespace IO {
                 }
                 if( p_bottom ) {
                     Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-                    updateOAMSub( Oam );
+                    updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
                     updateOAM( OamTop );
@@ -143,13 +143,13 @@ namespace IO {
                 bool on = false;
                 if( p_bottom ) {
                     Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-                    updateOAMSub( Oam );
+                    updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
                     updateOAM( OamTop );
                 }
 
-                while( 1 ) {
+                loop( ) {
                     scanKeys( );
                     swiWaitForVBlank( );
                     if( ++c == 45 ) {
@@ -172,7 +172,7 @@ namespace IO {
                 }
                 if( p_bottom ) {
                     Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-                    updateOAMSub( Oam );
+                    updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
                     updateOAM( OamTop );
@@ -205,13 +205,13 @@ namespace IO {
                 bool on = false;
                 if( p_bottom ) {
                     Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-                    updateOAMSub( Oam );
+                    updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
                     updateOAM( OamTop );
                 }
 
-                while( 1 ) {
+                loop( ) {
                     scanKeys( );
                     swiWaitForVBlank( );
                     if( ++c == 45 ) {
@@ -234,7 +234,7 @@ namespace IO {
                 }
                 if( p_bottom ) {
                     Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-                    updateOAMSub( Oam );
+                    updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
                     updateOAM( OamTop );
@@ -269,13 +269,13 @@ namespace IO {
                 bool on = false;
                 if( p_bottom ) {
                     Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-                    updateOAMSub( Oam );
+                    updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
                     updateOAM( OamTop );
                 }
 
-                while( 1 ) {
+                loop( ) {
                     scanKeys( );
                     swiWaitForVBlank( );
                     if( ++c == 45 ) {
@@ -298,7 +298,7 @@ namespace IO {
                 }
                 if( p_bottom ) {
                     Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-                    updateOAMSub( Oam );
+                    updateOAM( true );
                 } else {
                     OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
                     updateOAM( OamTop );
