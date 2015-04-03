@@ -19,7 +19,7 @@ Features
       * [ ] _Wild Pokémon encounter_
       * [x] Animated map tiles
       * [x] Player sprite, animated moving and surfing
-    * [x] ~~Playing .mp3 as BGM, user customization of BGM via music stored on the micro SD card (at least, it works _sometimes_...)~~ (currently excluded due to several related bugs)
+    * [ ] _Playing .midi as BGM, user customization of BGM via music stored on the micro SD card_
     * [ ] RTC, _including overword changes based on time_
     * [x] Saving the progress to the micro SD
     * [ ] Communicating with “the originals”
@@ -29,6 +29,7 @@ Features
 * [ ] Easy-to-understand and ready-to-(re)use code
     * [x] Strict and intuitive naming conventions
     * [ ] _Good_ documentation
+    * [x] Modular code
 
 Specific features that still have to be implemented yet are _italic_.
 
