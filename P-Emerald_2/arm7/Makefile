@@ -15,8 +15,8 @@ include $(DEVKITARM)/ds_rules
 # all directories are relative to this makefile
 #---------------------------------------------------------------------------------
 BUILD		:=	build
-SOURCES		:=	source source/helix source/helix/real
-INCLUDES	:=	include build source/helix source
+SOURCES		:=	source
+INCLUDES	:=	include build source
 DATA		:=
  
 #---------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -std=c++11
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=ds_arm7.specs -g $(ARCH) -Wl,-Map,$(notdir $*).map
 
-LIBS	:=	-lnds7
+LIBS	:=	-ldswifi7 -lmm7 -lnds7
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

@@ -8,7 +8,7 @@ endif
 include $(DEVKITARM)/ds_rules
 
 ifeq ($(strip $(GAME_TITLE)),)
-GAME_TITLE	:=	Pok\emon
+GAME_TITLE	:=	Pokemon
 endif
 
 ifeq ($(strip $(GAME_SUBTITLE1)),)

@@ -27,10 +27,13 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include <nds.h>
 #include <nds/ndstypes.h>
+#include <cmath>
+#include <cstdio>
+
 //#define USE_AS_LIB
 
-extern u32 TEMP[ 12288 ];
-extern u16 TEMP_PAL[ 256 ];
+extern unsigned int TEMP[ 12288 ];
+extern unsigned short TEMP_PAL[ 256 ];
 
 #define loop() while( 1 )
 
@@ -105,4 +108,4 @@ extern u16 TEMP_PAL[ 256 ];
 // 9 additional spaces used
 #define SQCH_ID 80
 
-s16 getCurrentDaytime( );
+u8 getCurrentDaytime( );
