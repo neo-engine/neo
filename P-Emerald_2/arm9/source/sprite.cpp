@@ -246,53 +246,61 @@ namespace IO {
                         const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx, bool p_topOnly ) {
         char buffer[ 100 ];
         if( !p_female )
-            sprintf( buffer, "%d/%d.raw", p_pkmnId, p_pkmnId );
+            sprintf( buffer, "%d/%d", p_pkmnId, p_pkmnId );
         else
-            sprintf( buffer, "%d/%df.raw", p_pkmnId, p_pkmnId );
+            sprintf( buffer, "%d/%df", p_pkmnId, p_pkmnId );
+
+        memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
+        memset( TEMP, 0, sizeof( TEMP ) );
+
         if( !FS::readData( p_path, buffer, (unsigned short)( 16 ), TEMP_PAL, (unsigned int)( 96 * 96 ), TEMP ) )
             return false;
 
         if( p_shiny ) {
             if( !p_female )
-                sprintf( buffer, "%s%d/%ds.raw", p_pkmnId, p_pkmnId );
+                sprintf( buffer, "%d/%ds", p_pkmnId, p_pkmnId );
             else
-                sprintf( buffer, "%s%d/%dsf.raw", p_pkmnId, p_pkmnId );
+                sprintf( buffer, "%d/%dsf", p_pkmnId, p_pkmnId );
             FS::readData( p_path, buffer, (unsigned short)( 16 ), TEMP_PAL );
         }
 
-        p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY,
-                                64, 64, TEMP_PAL, TEMP, 96 * 96 / 2, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
-        p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? p_posX : 64 + p_posX, p_posY,
-                                32, 64, 0, 0, 0, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
+        loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY,
+                    64, 64, TEMP_PAL, TEMP, 96 * 96 / 2, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
+        loadSprite( p_oamIndex++, p_palCnt, p_tileCnt + 64, p_flipx ? p_posX : 64 + p_posX, p_posY,
+                    32, 64, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
         if( !p_topOnly ) {
-            p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY + 64,
-                                    64, 32, 0, 0, 0, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
-            p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? p_posX : 64 + p_posX, p_posY + 64,
-                                    32, 32, 0, 0, 0, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
+            loadSprite( p_oamIndex++, p_palCnt, p_tileCnt + 96, p_flipx ? 32 + p_posX : p_posX, p_posY + 64,
+                        64, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
+            loadSprite( p_oamIndex, p_palCnt, p_tileCnt + 128, p_flipx ? p_posX : 64 + p_posX, p_posY + 64,
+                        32, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
         }
         updateOAM( p_bottom );
-        return p_tileCnt;
+        return p_tileCnt + 144;
     }
 
     u16 loadTrainerSprite( const char* p_path, const char* p_name, const s16 p_posX,
                            const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_flipx, bool p_topOnly ) {
         char buffer[ 100 ];
-        sprintf( buffer, "Sprite_%s.raw", p_name );
+        sprintf( buffer, "Sprite_%s", p_name );
+
+        memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
+        memset( TEMP, 0, sizeof( TEMP ) );
+
         if( !FS::readData( p_path, buffer, (unsigned short)( 16 ), TEMP_PAL, (unsigned int)( 96 * 96 ), TEMP ) )
             return false;
 
-        p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY,
-                                64, 64, TEMP_PAL, TEMP, 96 * 96 / 2, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
-        p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? p_posX : 64 + p_posX, p_posY,
-                                32, 64, 0, 0, 0, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
+        loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY,
+                    64, 64, TEMP_PAL, TEMP, 96 * 96 / 2, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
+        loadSprite( p_oamIndex++, p_palCnt, p_tileCnt + 64, p_flipx ? p_posX : 64 + p_posX, p_posY,
+                    32, 64, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
         if( !p_topOnly ) {
-            p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY + 64,
-                                    64, 32, 0, 0, 0, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
-            p_tileCnt = loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? p_posX : 64 + p_posX, p_posY + 64,
-                                    32, 32, 0, 0, 0, p_flipx, false, false, OBJPRIORITY_0, p_bottom );
+            loadSprite( p_oamIndex++, p_palCnt, p_tileCnt + 96, p_flipx ? 32 + p_posX : p_posX, p_posY + 64,
+                        64, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
+            loadSprite( p_oamIndex++, p_palCnt, p_tileCnt + 128, p_flipx ? p_posX : 64 + p_posX, p_posY + 64,
+                        32, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
         }
         updateOAM( p_bottom );
-        return p_tileCnt;
+        return p_tileCnt + 144;
     }
 
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
@@ -312,7 +320,7 @@ namespace IO {
     }
 
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
-        return loadIcon( "nitro:/PICS/SPRITES/PKMN/", "Icon_egg", p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+        return loadIcon( "nitro:/PICS/ICONS/", "Icon_egg", p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
 
     u16 loadItemIcon( const std::string& p_itemName, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {

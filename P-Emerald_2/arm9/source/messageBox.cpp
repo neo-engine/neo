@@ -76,6 +76,8 @@ namespace IO {
         ASpriteOamIndex = A_ID;
         regularFont->printMBStringD( buf, 46, 24, true, true, 1 );
 
+        if( !FS::SAV->m_bag )
+            FS::SAV->m_bag = new BAG::bag( );
         FS::SAV->m_bag->insert( BAG::toBagType( p_item.m_itemType ), p_item.getItemId( ), p_count );
     }
 

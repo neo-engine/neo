@@ -84,6 +84,8 @@ int main( ) {
     //---------------------------------------------------------------------------------
     readUserSettings( );
 
+    rtcReset( );
+
     irqInit( );
     // Start the RTC tracking IRQ
     initClockIRQ( );

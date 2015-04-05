@@ -41,6 +41,9 @@ namespace FS {
     std::string readString( FILE*, bool p_new = false );
     std::wstring readWString( FILE*, bool p_new = false );
 
+    bool exists( const char* p_path, const char* p_name );
+    bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name = "" );
+
     // No, I'm absolutely not aware of templates.
     bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt, unsigned short* p_data );
     bool readData( const char* p_path, const char* p_name, const unsigned int p_dataCnt1, unsigned int* p_data1, const unsigned short p_dataCnt2, unsigned short* p_data2 );

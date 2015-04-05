@@ -72,6 +72,31 @@ std::wstring getWAbilityName( int p_abilityId ) {
 }
 
 namespace FS {
+    bool exists( const char* p_path, const char* p_name ) {
+        char buffer[ 100 ];
+        sprintf( buffer, "%s%s.raw", p_path, p_name );
+        FILE* fd = fopen( buffer, "rb" );
+
+        if( fd == 0 ) {
+            fclose( fd );
+            return false;
+        }
+        fclose( fd );
+        return true;
+    }
+    bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name ) {
+        char buffer[ 100 ];
+        sprintf( buffer, "%s%d/%d%s.raw", p_path, p_pkmnIdx, p_pkmnIdx, p_name );
+        FILE* fd = fopen( buffer, "rb" );
+
+        if( fd == 0 ) {
+            fclose( fd );
+            return false;
+        }
+        fclose( fd );
+        return true;
+    }
+
     bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt, unsigned short* p_data ) {
         char buffer[ 100 ];
         sprintf( buffer, "%s%s.raw", p_path, p_name );
@@ -152,7 +177,7 @@ namespace FS {
         }
 
         char buffer[ 100 ];
-        sprintf( buffer, "%s.raw", p_name );
+        sprintf( buffer, "%s", p_name );
 
         if( !readData( "nitro:/PICS/NAV/", buffer, (unsigned int)( 12288 ), IO::NAV_DATA, (unsigned short)( 256 ), IO::NAV_DATA_PAL ) )
             return false;
@@ -198,6 +223,8 @@ namespace FS {
                     ret += (char)136;
                 else if( ac == '#' )
                     ret += (char)137;
+                else if( ac == '\r' )
+                    ret += "";
                 else
                     ret += ac;
                 continue;
@@ -224,35 +251,37 @@ namespace FS {
         while( ( ac = fgetc( p_file ) ) != '*' ) {
             if( !p_new ) {
                 if( ac == 'ä' )
-                    ret += '\x84';
+                    ret += L'\x84';
                 else if( ac == 'Ä' )
-                    ret += '\x8E';
+                    ret += L'\x8E';
                 else if( ac == 'ü' )
-                    ret += '\x81';
+                    ret += L'\x81';
                 else if( ac == 'Ü' )
-                    ret += '\x9A';
+                    ret += L'\x9A';
                 else if( ac == 'ö' )
-                    ret += '\x94';
+                    ret += L'\x94';
                 else if( ac == 'Ö' )
-                    ret += '\x99';
+                    ret += L'\x99';
                 else if( ac == 'ß' )
-                    ret += '\x9D';
+                    ret += L'\x9D';
                 else if( ac == 'é' )
-                    ret += '\x82';
+                    ret += L'\x82';
                 else if( ac == '%' )
-                    ret += ' ';
+                    ret += L' ';
+                else if( ac == '\r' )
+                    ret += L"";
                 else
                     ret += ac;
                 continue;
             }
             if( ac == '|' )
-                ret += (char)136;
+                ret += (wchar_t)136;
             else if( ac == '#' )
-                ret += (char)137;
+                ret += (wchar_t)137;
             else
                 ret += ac;
         }
-        ret += L'\0';
+        //ret += L'\0';
         return ret;
     }
 
@@ -400,6 +429,8 @@ const char* getDisplayName( u16 p_pkmnId ) {
     fgetc( f );
     std::string ret = FS::readString( f, true );
     fclose( f );
+    ret += " ";
+    ret.pop_back( );
     return ret.c_str( );
 }
 const wchar_t* getWDisplayName( u16 p_pkmnId ) {
@@ -417,6 +448,8 @@ const wchar_t* getWDisplayName( u16 p_pkmnId ) {
     fgetc( f );
     std::wstring ret = FS::readWString( f );
     fclose( f );
+    ret += L" ";
+    ret.pop_back( );
     return ret.c_str( );
 }
 void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
@@ -584,7 +617,7 @@ std::vector<u16> getAllFormes( u16 p_pkmnId ) {
     fscanf( f, "%hi", &s );
     u16 d;
     std::vector<u16> res;
-    for( int i = 0; i <= s; ++i ) {
+    for( int i = 0; i < s; ++i ) {
         fscanf( f, "%hi", &d );
         res.push_back( d );
         FS::readString( f );
@@ -631,6 +664,8 @@ const char* getSpecies( u16 p_pkmnId ) {
     }
     fscanf( f, " " );
     ret2 = FS::readString( f, true );
+    ret2 += " ";
+    ret2.pop_back( );
     fclose( f );
     return ret2.c_str( );
 }

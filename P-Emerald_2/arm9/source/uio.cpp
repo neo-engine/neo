@@ -240,12 +240,12 @@ namespace IO {
     void waitForKeysUp( bool p_updateTime, s8 p_timeParameter, inputTarget p_inputTarget ) {
         if( p_inputTarget.m_inputType == inputTarget::inputType::BUTTON ) {
             loop( ) {
-                swiWaitForVBlank( );
                 scanKeys( );
+                keysCurrent( );
+                swiWaitForVBlank( );
                 if( p_updateTime )
                     updateTime( p_timeParameter );
-                auto touch = touchReadXY( );
-                if( ( keysUp( ) & p_inputTarget.m_keys ) == p_inputTarget.m_keys )
+                if( keysUp( ) & p_inputTarget.m_keys )
                     return;
             }
         }

@@ -11,12 +11,12 @@ namespace DEX {
 
     void dex::run( u16 p_pkmnIdx, bool p_time, s8 p_timeParameter ) {
         if( !_dexUI ) {
-            _dexUI = new dexUI( 0, p_pkmnIdx, _maxPkmn ); //Only the current Pkmn shall be shown
+            _dexUI = new dexUI( false, p_pkmnIdx, _maxPkmn ); //Only the current Pkmn shall be shown
         }
 
         _dexUI->init( );
         _dexUI->_currPkmn = p_pkmnIdx;
-        _dexUI->drawPage( true );
+        _dexUI->drawPage( true, true );
 
         touchPosition touch;
         loop( ) {
@@ -43,10 +43,10 @@ namespace DEX {
                 _dexUI->drawPage( true );
             } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
                 _dexUI->_currPage = ( _dexUI->_currPage + 1 ) % MAX_PAGES;
-                _dexUI->drawPage( false );
+                _dexUI->drawPage( false, true );
             } else if( GET_AND_WAIT( KEY_LEFT ) ) {
                 _dexUI->_currPage = ( _dexUI->_currPage + MAX_PAGES - 1 ) % MAX_PAGES;
-                _dexUI->drawPage( false );
+                _dexUI->drawPage( false, true );
             } else if( GET_AND_WAIT( KEY_SELECT ) ) {
                 _dexUI->_currForme++; //Just let it overflow
                 _dexUI->drawPage( false );
@@ -57,9 +57,10 @@ namespace DEX {
                     _dexUI->drawPage( true );
                 }
             for( u8 q = 5; q < 8; ++q )
-                if( GET_AND_WAIT_C( dexsppos[ 0 ][ q ] + 16, dexsppos[ 1 ][ q ] + 16, 16 ) ) {
+                if( GET_AND_WAIT_C( dexsppos[ 0 ][ q ] + 16, dexsppos[ 1 ][ q ] + 16, 16 )
+                    && _dexUI->_currPage != q + 1 ) {
                     _dexUI->_currPage = ( q + 1 ) % MAX_PAGES;
-                    _dexUI->drawPage( false );
+                    _dexUI->drawPage( false, true );
                 }
         }
     }

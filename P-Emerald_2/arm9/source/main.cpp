@@ -1310,7 +1310,8 @@ void animateMap( u8 p_frame ) {
 }
 
 void initMapSprites( ) {
-    IO::initOAMTable( IO::OamTop );
+    IO::initOAMTable( false );
+
     IO::SpriteInfo * SQCHAInfo = &IO::spriteInfoTop[ 0 ];
     SpriteEntry * SQCHA = &IO::OamTop->oamBuffer[ 0 ];
     SQCHAInfo->m_oamId = 0;
@@ -1422,6 +1423,7 @@ void initMapSprites( ) {
 
     dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, BigCirc1Pal, &SPRITE_PALETTE[ 16 ], 32 );
     dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, BigCirc1Tiles, &SPRITE_GFX[ 32 * 32 / sizeof( SPRITE_GFX[ 0 ] ) ], BigCirc1TilesLen );
+    IO::updateOAM( false );
 }
 
 int stepcnt = 0;
@@ -1520,7 +1522,7 @@ void initMainSprites( ) {
                               IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( PKMN_ID - 2 ) ] - 16,
                               IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( PKMN_ID - 2 ) + 1 ] - 16,
                               32, 32, PokemonSpPal, PokemonSpTiles, PokemonSpTilesLen,
-                              false, false, !!FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId, OBJPRIORITY_0, true );
+                              false, false, !FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId, OBJPRIORITY_0, true );
     tileCnt = IO::loadSprite( NAV_ID, NAV_ID, tileCnt,
                               IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( NAV_ID - 2 ) ] - 16,
                               IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( NAV_ID - 2 ) + 1 ] - 16,
@@ -1542,9 +1544,13 @@ void initMainSprites( ) {
                               32, 32, SPBagPal, SPBagTiles, SPBagTilesLen,
                               false, false, false, OBJPRIORITY_0, true );
 
+    IO::updateOAM( true );
 }
 
 
+
+DEX::dexUI dui( true, 1, FS::SAV->m_hasGDex ? 649 : 493 );
+DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
 
 int main( int p_argc, char** p_argv ) {
 
@@ -1578,8 +1584,6 @@ int main( int p_argc, char** p_argv ) {
     IO::regularFont->setColor( RGB( 0, 31, 31 ), 0 );
 
     int HILFSCOUNTER = 252;
-    IO::Oam->oamBuffer[ PKMN_ID ].isHidden = !FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId;
-    IO::updateOAM( true );
 
     FS::SAV->m_hasGDex = true;
     FS::SAV->m_evolveInBattle = true;
@@ -1587,13 +1591,16 @@ int main( int p_argc, char** p_argv ) {
     initMapSprites( );
     IO::updateOAM( false );
 
+    IO::drawSub( );
+    //Eliminate the time stamp when the rtc does not work
+    IO::updateTime( s8( 1 ) );
+    IO::drawSub( );
 
     char buffer[ 120 ] = { 0 };
     swiWaitForIRQ( );
     swiWaitForVBlank( );
 
     initMainSprites( );
-    IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
     IO::updateOAM( true );
 
     consoleSelect( &IO::Bottom );
@@ -1624,9 +1631,8 @@ int main( int p_argc, char** p_argv ) {
                           FS::SAV->m_acMapIdx );
             IO::messageBox m( buffer );
 
-            /*
-                        printf( "topbehave %i;\n bottombehave %i", acMap->m_blockSets.m_blocks[ acMap->m_blocks[ FS::SAV->m_acposy / 20 + 10 ][ FS::SAV->m_acposx / 20 + 10 ].m_blockidx ].m_topbehave,
-                        acMap->m_blockSets.m_blocks[ acMap->m_blocks[ FS::SAV->m_acposy / 20 + 10 ][ FS::SAV->m_acposx / 20 + 10 ].m_blockidx ].m_bottombehave );*/
+            initMainSprites( );
+            IO::drawSub( );
         }
 
         //        if( pressed & KEY_A ) {
@@ -1753,9 +1759,14 @@ int main( int p_argc, char** p_argv ) {
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ],        //StartDex
             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 5 ], 16 ) ) {
 
-            DEX::dexUI dui( FS::SAV->m_inDex, 1, FS::SAV->m_hasGDex ? 649 : 493 );
-            DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
-            dx.run( 1, true, 0 );
+            dx.run( dui.currPkmn( ), true, 0 );
+
+            consoleSelect( &IO::Top );
+            consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+            consoleClear( );
+            consoleSelect( &IO::Bottom );
+            consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+            consoleClear( );
 
             initMapSprites( );
             initMainSprites( );
@@ -1770,6 +1781,7 @@ int main( int p_argc, char** p_argv ) {
             const char *someText[ 7 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", " ... " };
             IO::choiceBox test( 6, &someText[ 0 ], 0, false );
             int res = test.getResult( "Tokens of god-being...", true );
+            IO::drawSub( );
             switch( res ) {
                 case 0:
                 {
@@ -1791,12 +1803,14 @@ int main( int p_argc, char** p_argv ) {
                         HILFSCOUNTER = 3 + ( ( HILFSCOUNTER ) % 649 );
                     }
                     for( u16 i = 0; i < 649 / 8; ++i )
-                        FS::SAV->m_inDex[ i ] = u8( ( 1 << 8 ) - 1 );
+                        FS::SAV->m_inDex[ i ] = 255;
 
                     swiWaitForVBlank( );
                     break;
                 }
                 case 1:
+                    if( !FS::SAV->m_bag )
+                        FS::SAV->m_bag = new BAG::bag( );
                     for( u16 j = 1; j < 800; ++j )
                         if( ItemList[ j ]->m_itemName != "Null" )
                             FS::SAV->m_bag->insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
@@ -1836,7 +1850,7 @@ int main( int p_argc, char** p_argv ) {
                             tmp.push_back( FS::SAV->m_pkmnTeam[ i ] );
                         else
                             break;
-                    BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &cpy, 0 );
+                    BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &tmp, 0 );
 
                     for( u8 i = 0; i < 6; ++i ) {
                         pokemon a( 0, HILFSCOUNTER, 0,
@@ -1876,6 +1890,7 @@ int main( int p_argc, char** p_argv ) {
         } else if( touch.px != 0 && touch.py != 0 && GET_AND_WAIT_C( 8, 12, 17 ) ) {
             IO::yesNoBox Save( "PokéNav " );
             if( Save.getResult( "Möchtest du deinen\nFortschritt sichern?\n" ) ) {
+                IO::drawSub( );
                 if( gMod == EMULATOR )
                     IO::messageBox Succ( "Speichern?\nIn einem Emulator?!", "PokéNav" );
                 else if( FS::writeSave( FS::SAV ) )

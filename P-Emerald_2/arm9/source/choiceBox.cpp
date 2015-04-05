@@ -59,7 +59,7 @@ namespace IO {
 
         nextAvailableTileIdx = loadSprite( BACK_ID, 0, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                                           BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+                                           BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, true );
         nextAvailableTileIdx = loadSprite( FWD_ID, 1, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, ForwardPal,
                                            ForwardTiles, ForwardTilesLen, false, false, true, OBJPRIORITY_1, true );
@@ -84,7 +84,7 @@ namespace IO {
 
         nextAvailableTileIdx = loadSprite( BACK_ID, 0, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                                           BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+                                           BackTiles, BackTilesLen, false, false, !p_backButton, OBJPRIORITY_0, true );
         nextAvailableTileIdx = loadSprite( FWD_ID, 1, nextAvailableTileIdx,
                                            SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, ForwardPal,
                                            ForwardTiles, ForwardTilesLen, false, false, true, OBJPRIORITY_1, true );

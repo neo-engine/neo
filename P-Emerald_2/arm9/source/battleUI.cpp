@@ -309,7 +309,7 @@ namespace BATTLE {
     }
 
     void loadBattleUITop( battle* p_battle ) {
-        IO::initOAMTable( IO::OamTop );
+        IO::initOAMTable( false );
 
         IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
         consoleSetFont( &IO::Top, IO::consoleFont );
@@ -358,10 +358,10 @@ namespace BATTLE {
                                   142, 64, 32, BattleSub5Pal, BattleSub5Tiles, BattleSub5TilesLen,
                                   false, false, false, OBJPRIORITY_3, true );
         //Load an icon of the PKMN, too
-        u8 oamIndex = SUB_FIGHT_START + 5;
+        u8 oamIndex = SUB_FIGHT_START + 6;
         u8 palIndex = 5;
 
-        IO::loadPKMNIcon( p_pkmnId, 112, 68, oamIndex, palIndex, tilecnt, true );
+        tilecnt = IO::loadPKMNIcon( p_pkmnId, 112, 68, oamIndex++, palIndex++, tilecnt, true );
 
         //PreLoad A and Back buttons
 
@@ -401,6 +401,7 @@ namespace BATTLE {
                 for( u8 s = 0; s < MAX_STATS; ++s )
                     _oldPKMNStats[ ACPOS2( *_battle, i, p ) ][ p ][ s ] = ACPKMNSTS2( *_battle, i, p );
         IO::initOAMTable( true );
+        IO::initOAMTable( false );
         IO::Oam->oamBuffer[ SUB_A_OAM ].gfxIndex = 0;
         loadA( );
     }
@@ -583,7 +584,7 @@ SHOW_ATTACK:
                                     true, false, WHITE_IDX );
 
                 IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
-                IO::loadTypeIcon( acMove->m_moveType, x - 7, y - 7, oamIndex, palIndex, tilecnt, true );
+                tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 7, y - 7, ++oamIndex, palIndex++, tilecnt, true );
                 consoleSelect( &IO::Bottom );
                 consoleSetWindow( &IO::Bottom, x / 8, 12 + ( i / 2 ) * 6, 20, 2 );
                 printf( "%6hhu/%2hhu AP",
@@ -752,8 +753,8 @@ END:
 
             if( acPkmn.m_stats.m_acHP ) {
                 IO::regularFont->printString( acPkmn.m_boxdata.m_name, x + 7, y + 7, true );
-                IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId,
-                                  x - 10, y - 23, oamIndex, palIndex, tilecnt );
+                tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId,
+                                            x - 10, y - 23, ++oamIndex, palIndex++, tilecnt );
             }
         }
 
@@ -953,21 +954,21 @@ END:
                 printf( "   %3i/%3i",
                         acPkmn.m_stats.m_acHP,
                         acPkmn.m_stats.m_maxHP );
-                IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId,
-                                  x + 4,
-                                  y - 12,
-                                  oamIndex,
-                                  palIndex,
-                                  tilecnt,
-                                  true );
+                tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId,
+                                            x + 4,
+                                            y - 12,
+                                            ++oamIndex,
+                                            palIndex++,
+                                            tilecnt,
+                                            true );
             } else {
                 printf( "\n            Ei" );
-                IO::loadEggIcon( x + 4,
-                                 y - 12,
-                                 oamIndex,
-                                 palIndex,
-                                 tilecnt,
-                                 true );
+                tilecnt = IO::loadEggIcon( x + 4,
+                                           y - 12,
+                                           ++oamIndex,
+                                           palIndex++,
+                                           tilecnt,
+                                           true );
             }
         }
 
@@ -998,12 +999,14 @@ END:
 
         bool dead = !p_pokemon.m_stats.m_acHP;
         u8 x = 104, y = 48;
-
+        u16 t2;
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
-            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                32, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) )
-                IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+            if( !( t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+                32, 32, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) )
+                t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
                 32, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
+            oamIndex += 3;
+            tilecnt = t2;
 
             consoleSetWindow( &IO::Bottom, 13, 7, 20, 8 );
             if( !p_alreadySent && !p_alreadyChosen )
@@ -1128,15 +1131,16 @@ END:
 
         u16 exptype = data.m_expType;
 
+        u16 t2;
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
-            if( !( tilecnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                16, 8, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) ) {
-                tilecnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+            if( !( t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+                16, 8, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) ) {
+                t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
                                               16, 8, oamIndex, palIndex, IO::Oam->oamBuffer[ oamIndex ].gfxIndex,
                                               true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
             }
             oamIndex += 4;
-            palIndex++;
+            tilecnt = t2;
 
             consoleSetWindow( &IO::Bottom, 4, 0, 12, 2 );
             printf( "EP(%3i%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
@@ -1173,7 +1177,7 @@ END:
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
                                               24, 124, true );
-                tilecnt = IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 0, 116, oamIndex++, palIndex++, tilecnt, true );
+                tilecnt = IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 0, 116, ++oamIndex, palIndex++, tilecnt, true );
             } else {
                 IO::regularFont->setColor( BLACK_IDX, 1 );
                 IO::regularFont->setColor( GRAY_IDX, 2 );
@@ -1182,11 +1186,12 @@ END:
             IO::regularFont->setColor( GRAY_IDX, 1 );
             IO::regularFont->setColor( BLACK_IDX, 2 );
 
-            if( data.m_types[ 0 ] == data.m_types[ 1 ] )
-                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 224, 0, oamIndex++, palIndex++, tilecnt, true );
-            else {
-                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 192, 0, oamIndex++, palIndex++, tilecnt, true );
-                tilecnt = IO::loadTypeIcon( data.m_types[ 1 ], 224, 0, oamIndex++, palIndex++, tilecnt, true );
+            if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
+                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 224, 0, ++oamIndex, palIndex++, tilecnt, true );
+                oamIndex++;
+            } else {
+                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 192, 0, ++oamIndex, palIndex++, tilecnt, true );
+                tilecnt = IO::loadTypeIcon( data.m_types[ 1 ], 224, 0, ++oamIndex, palIndex++, tilecnt, true );
             }
 
         } else {
@@ -1222,7 +1227,7 @@ END:
                                         true, false, WHITE_IDX );
 
                     IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
-                    tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 10, y - 7, oamIndex++, palIndex++, tilecnt, true );
+                    tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 10, y - 7, ++oamIndex, palIndex++, tilecnt, true );
                     consoleSelect( &IO::Bottom );
                     consoleSetWindow( &IO::Bottom, x / 8, 5 + 5 * i, 20, 2 );
                     printf( "%6hhu/%2hhu AP",
@@ -1895,34 +1900,28 @@ CLEAR:
         animatePokeBall( x + 40, y + 40, PB_ANIM, 15, TILESTART );
 
         //Load the PKMN sprite
-        u8 oamIdx = PKMN_IDX( p_pokemonPos, p_opponent ) - 1;
-        u8 palIdx = PKMN_PAL_IDX( p_pokemonPos, p_opponent ) - 1;
-        u16 tileCnt = PKMN_TILE_IDX( p_pokemonPos, p_opponent );
-
         if( p_opponent ) {
-            if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
-                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) ) {
-                if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
+            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+                PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
+                false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
                     acPkmn.m_boxdata.m_speciesId, x, y,
-                    oamIdx, palIdx, IO::OamTop->oamBuffer[ oamIdx ].gfxIndex, false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) ) {
+                    PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
                     _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
-            oamIdx += 4;
-            palIdx++;
         } else {
-            if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x, y,
-                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) ) {
-                if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/",
+            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x, y,
+                PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
+                false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/",
                     acPkmn.m_boxdata.m_speciesId, x, y,
-                    oamIdx, palIdx, IO::OamTop->oamBuffer[ oamIdx ].gfxIndex, false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) ) {
+                    PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
                     _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
-            oamIdx += 4;
-            palIdx++;
         }
         if( acPkmn.m_boxdata.isShiny( ) )
             animateShiny( x + 16, y + 16, SHINY_ANIM, 15, TILESTART );
@@ -1983,33 +1982,28 @@ CLEAR:
             }
         }
         auto acPkmn = ACPKMN2( *_battle, p_pokemonPos, p_opponent );
-        u8 oamIdx = PKMN_IDX( p_pokemonPos, p_opponent ) - 1;
-        u8 palIdx = PKMN_PAL_IDX( p_pokemonPos, p_opponent ) - 1;
-        u16 tileCnt = PKMN_TILE_IDX( p_pokemonPos, p_opponent );
         if( p_opponent ) {
-            if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
-                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) ) {
-                if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
+            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+                PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
+                false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
                     acPkmn.m_boxdata.m_speciesId, x, y,
-                    oamIdx, palIdx, IO::OamTop->oamBuffer[ oamIdx ].gfxIndex, false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) ) {
+                    PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
                     _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
-            oamIdx += 4;
-            palIdx++;
         } else {
-            if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x, y,
-                oamIdx, palIdx, tileCnt, false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) ) {
-                if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/",
+            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x, y,
+                PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
+                false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/",
                     acPkmn.m_boxdata.m_speciesId, x, y,
-                    oamIdx, palIdx, IO::OamTop->oamBuffer[ oamIdx ].gfxIndex, false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) ) {
+                    PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
                     _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
-            oamIdx += 4;
-            palIdx++;
         }
         updateHP( p_opponent, p_pokemonPos );
     }
