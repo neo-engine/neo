@@ -112,7 +112,7 @@ void debug( ) {
 }
 
 std::string CodeName = "Executing Exeggcute";
-std::string Version = "0.5.0";
+std::string Version = "v0.5";
 
 char acSlot2Game[ 5 ];
 
@@ -517,15 +517,15 @@ START:
     printf( "@ Philip \"RedArceus\" Wellnitz\n                     2012 - 2015\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
 
     if( gMod == DEVELOPER )
-        printf( "             Developer's version\n" );
+        printf( "                   %10sdev\n", Version.c_str( ) );
     else if( gMod == BETA )
-        printf( "                            Beta\n" );
+        printf( "                  %10sbeta\n", Version.c_str( ) );
     else if( gMod == ALPHA )
-        printf( "                           Alpha\n" );
+        printf( "                 %10salpha\n", Version.c_str( ) );
     else if( gMod == EMULATOR )
-        printf( "                        Emulator\n" );
+        printf( "                   %10semu\n", Version.c_str( ) );
     if( gMod != RELEASE ) {
-        std::string s = Version + " \"" + CodeName + "\"";
+        std::string s = "\"" + CodeName + "\"";
         s.insert( s.begin( ), 32 - s.length( ), ' ' );
         printf( s.c_str( ) );
     }
@@ -1464,36 +1464,34 @@ void surf::use( ) {
     FS::SAV->m_acposy += 20 * dir[ lastdir ][ 0 ];
 }
 
-
 void shoUseAttack( u16 p_pkmIdx, bool p_female, bool p_shiny ) {
-    //IO::OamTop->oamBuffer[ 0 ].isHidden = true;
-    //IO::OamTop->oamBuffer[ 1 ].isHidden = false;
-    //for( u8 i = 0; i < 5; ++i ) {
-    //    loadframe( &IO::spriteInfoTop[ 1 ], FS::SAV->m_overWorldIdx + 4, i, true );
-    //    IO::updateOAM( false );
-    //    swiWaitForVBlank( );
-    //    swiWaitForVBlank( );
-    //    swiWaitForVBlank( );
-    //}
-    //for( u8 i = 0; i < 4; ++i )
-    //    IO::OamTop->oamBuffer[ 2 + i ].isHidden = false;
-    //u8 a = 5, b = 2;
-    //u16 c = 96;
-    //if( !FS::loadPKMNSprite( IO::OamTop, IO::spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, p_female ) ) {
-    //    FS::loadPKMNSprite( IO::OamTop, IO::spriteInfoTop, "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, a, b, c, false, p_shiny, !p_female );
-    //}
-    //IO::updateOAM( false );
+    IO::OamTop->oamBuffer[ 0 ].isHidden = true;
+    IO::OamTop->oamBuffer[ 1 ].isHidden = false;
+    for( u8 i = 0; i < 5; ++i ) {
+        loadframe( &IO::spriteInfoTop[ 1 ], FS::SAV->m_overWorldIdx + 4, i, true );
+        IO::updateOAM( false );
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+    }
+    for( u8 i = 0; i < 4; ++i )
+        IO::OamTop->oamBuffer[ 2 + i ].isHidden = false;
+    if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 6, 2, 96, false, p_shiny, p_female ) ) {
+        IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 6, 2, 96, false, p_shiny, !p_female );
+    }
+    IO::updateOAM( false );
 
-    //for( u8 i = 0; i < 40; ++i )
-    //    swiWaitForVBlank( );
+    for( u8 i = 0; i < 40; ++i )
+        swiWaitForVBlank( );
 
-    ////animateHero(lastdir,2);
-    //IO::OamTop->oamBuffer[ 0 ].isHidden = false;
-    //IO::OamTop->oamBuffer[ 1 ].isHidden = true;
-    //for( u8 i = 0; i < 8; ++i )
-    //    IO::OamTop->oamBuffer[ 2 + i ].isHidden = true;
-    //IO::updateOAM( false );
+    //animateHero(lastdir,2);
+    IO::OamTop->oamBuffer[ 0 ].isHidden = false;
+    IO::OamTop->oamBuffer[ 1 ].isHidden = true;
+    for( u8 i = 0; i < 8; ++i )
+        IO::OamTop->oamBuffer[ 2 + i ].isHidden = true;
+    IO::updateOAM( false );
 }
+
 
 u8 positions[ 6 ][ 2 ] = {
     { 14, 2 }, { 16, 3 }, { 14, 9 },
@@ -1635,34 +1633,36 @@ int main( int p_argc, char** p_argv ) {
             IO::drawSub( );
         }
 
-        //        if( pressed & KEY_A ) {
-        //            for( auto a : FS::SAV->m_PkmnTeam ) {
-        //                if( !a.m_boxdata.m_individualValues.m_isEgg ) {
-        //                    for( u8 i = 0; i < 4; ++i ) {
-        //                        if( AttackList[ a.m_boxdata.m_moves[ i ] ]->m_isFieldAttack && AttackList[ a.m_boxdata.m_moves[ i ] ]->possible( ) ) {
-        //                            consoleSelect( &IO::Bottom );
-        //                            consoleSetWindow( &IO::Bottom, 4, 0, 20, 3 );
-        //                            consoleClear( );
-        //                            IO::Oam->oamBuffer[ SQCH_ID ].isHidden = true;
-        //                            IO::Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
-        //                            updateOAM( true );
-        //                            scrn.draw( mode = -1 );
-        //                            char buffer[ 50 ];
-        //                            sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ i ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-        //                            IO::yesNoBox yn;
-        //                            if( yn.getResult( buffer ) ) {
-        //                                sprintf( buffer, "%ls setzt %s\nein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-        //                                IO::messageBox( buffer, true, true );
-        //                                shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
-        //                                AttackList[ a.m_boxdata.m_moves[ i ] ]->use( );
-        //                            }
-        //                            goto OUT;
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //OUT:
-        //        }
+        if( pressed & KEY_A ) {
+            for( u8 i = 0; i < 6; ++i ) {
+                if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                    break;
+                auto a = FS::SAV->m_pkmnTeam[ i ];
+                if( !a.m_boxdata.m_individualValues.m_isEgg ) {
+                    for( u8 i = 0; i < 4; ++i ) {
+                        if( AttackList[ a.m_boxdata.m_moves[ i ] ]->m_isFieldAttack
+                            && AttackList[ a.m_boxdata.m_moves[ i ] ]->possible( ) ) {
+
+                            char buffer[ 50 ];
+                            sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ i ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
+                            IO::yesNoBox yn;
+                            if( yn.getResult( buffer ) ) {
+                                IO::drawSub( );
+                                sprintf( buffer, "%ls setzt %s\nein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
+                                IO::messageBox( buffer, true, true );
+                                shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
+                                AttackList[ a.m_boxdata.m_moves[ i ] ]->use( );
+                            }
+                            IO::drawSub( );
+                            initMainSprites( );
+                            goto OUT;
+                        }
+                    }
+                }
+            }
+OUT:
+            ;
+        }
         //Moving
         if( pressed & KEY_DOWN ) {
             animateHero( 2, 2, true );
@@ -1753,6 +1753,12 @@ int main( int p_argc, char** p_argv ) {
             for( u8 i = 0; i < tmp.size( ); ++i )
                 FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
 
+            consoleSelect( &IO::Top );
+            consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+            consoleClear( );
+            consoleSelect( &IO::Bottom );
+            consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+            consoleClear( );
             initMapSprites( );
             initMainSprites( );
             movePlayerOnMap( FS::SAV->m_acposx / 20, FS::SAV->m_acposy / 20, FS::SAV->m_acposz, true );

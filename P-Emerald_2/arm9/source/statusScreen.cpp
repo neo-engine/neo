@@ -39,12 +39,12 @@ namespace STS {
                 }
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
                 _pkmnIdx = ( _pkmnIdx + 1 ) % _pokemon->size( );
-                _stsUI->init( _pkmnIdx );
+                _stsUI->init( _pkmnIdx, false );
             } else if( GET_AND_WAIT( KEY_UP ) ) {
                 _pkmnIdx = ( _pkmnIdx + _pokemon->size( ) - 1 ) % _pokemon->size( );
-                _stsUI->init( _pkmnIdx );
-            } else if( ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_holdItem &&
-                       GET_AND_WAIT_R( 152, ( -7 + 24 * fieldCnt ), 300, ( 17 + 24 * fieldCnt ) ) ) {
+                _stsUI->init( _pkmnIdx, false );
+            } else if( _stsUI->_showTakeItem &&
+                       GET_AND_WAIT_R( 152, !!_stsUI->_showMoveCnt * ( -7 + 24 * _stsUI->_showMoveCnt ), 300, ( 17 + 24 * _stsUI->_showMoveCnt ) ) ) {
                 char buffer[ 50 ];
                 item acI = *ItemList[ ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_holdItem ];
                 ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_holdItem = 0;
@@ -52,27 +52,33 @@ namespace STS {
                 sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( ).c_str( ), ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_name );
                 IO::messageBox( buffer, p_time );
                 FS::SAV->m_bag->insert( BAG::toBagType( acI.getItemType( ) ), acI.getItemId( ), 1 );
-                _stsUI->init( _pkmnIdx );
-            } else if( GET_AND_WAIT_R( 152, ( -7 + 24 * ( !!( *_pokemon )[ _pkmnIdx ].m_boxdata.m_holdItem + fieldCnt ) ),
-                300, ( 17 + 24 * ( fieldCnt + !!( *_pokemon )[ _pkmnIdx ].m_boxdata.m_holdItem ) ) ) ) {
+                _stsUI->init( _pkmnIdx, false );
+            } else if( GET_AND_WAIT_R( 152, !!( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) * ( -7 + 24 * ( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) ),
+                300, ( 17 + 24 * ( _stsUI->_showMoveCnt + _stsUI->_showTakeItem ) ) ) ) {
 
-                DEX::dex( -1, 0 ).run( _pkmnIdx, p_time, p_timeParameter );
+                DEX::dex( -1, 0 ).run( ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_speciesId, p_time, p_timeParameter );
 
                 _stsUI->init( _pkmnIdx );
             }
-            for( u8 i = 0; i < fieldCnt; ++i )
-                if( GET_AND_WAIT_R( 152, ( -7 + 24 * i ), 256, ( 17 + 24 * i ) ) ) {
+            for( u8 i = 0; i < _stsUI->_showMoveCnt; ++i )
+                if( GET_AND_WAIT_R( 152, ( !!i * ( -7 + 24 * i ) ), 256, ( 17 + 24 * i ) ) ) {
                     u8 u = 0, o;
                     for( o = 0; o < 4 && u <= i; ++o )
                         if( AttackList[ ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_isFieldAttack )
                             u++;
                     o--;
+                    consoleSelect( &IO::Bottom );
+                    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+                    consoleClear( );
                     if( AttackList[ ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->possible( ) ) {
 
                         char buffer[ 50 ];
                         sprintf( buffer, "%ls setzt %s\nein!", ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_name,
                                  AttackList[ ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
                         IO::messageBox( buffer, p_time );
+                        IO::drawSub( );
+                        
+
 
                         //shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
                         //              (*_pokemon)[_pkmnIdx ].m_boxdata.m_isFemale, (*_pokemon)[_pkmnIdx ].m_boxdata.isShiny( ) );
@@ -81,8 +87,9 @@ namespace STS {
                         return;
                     } else {
                         IO::messageBox( "Diese Attacke kann jetzt\nnicht eingesetzt werden.", "PokéNav", p_time );
-                        _stsUI->init( _pkmnIdx );
+                        _stsUI->init( _pkmnIdx, false );
                     }
+                    break;
                 }
 
         }

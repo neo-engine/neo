@@ -29,16 +29,16 @@ namespace DEX {
             int pressed = keysCurrent( );
             if( GET_AND_WAIT_R( 224, 164, 300, 300 ) )
                 break;
-            else if( _maxPkmn != -1 && GET_AND_WAIT( KEY_DOWN ) ) {
+            else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_DOWN ) ) {
                 _dexUI->_currPkmn = ( _dexUI->_currPkmn + 1 ) % _maxPkmn;
                 _dexUI->drawPage( true );
-            } else if( _maxPkmn != -1 && GET_AND_WAIT( KEY_UP ) ) {
+            } else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_UP ) ) {
                 _dexUI->_currPkmn = ( _dexUI->_currPkmn + _maxPkmn - 1 ) % _maxPkmn;
                 _dexUI->drawPage( true );
-            } else if( _maxPkmn != -1 && GET_AND_WAIT( KEY_R ) ) {
+            } else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_R ) ) {
                 _dexUI->_currPkmn = ( _dexUI->_currPkmn + 15 ) % _maxPkmn;
                 _dexUI->drawPage( true );
-            } else if( _maxPkmn != -1 && GET_AND_WAIT( KEY_L ) ) {
+            } else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_L ) ) {
                 _dexUI->_currPkmn = ( _dexUI->_currPkmn + _maxPkmn - 15 ) % _maxPkmn;
                 _dexUI->drawPage( true );
             } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
@@ -52,13 +52,13 @@ namespace DEX {
                 _dexUI->drawPage( false );
             }
             for( u8 q = 0; q < 5; ++q )
-                if( _maxPkmn != -1 && GET_AND_WAIT_C( dexsppos[ 0 ][ q ] + 16, dexsppos[ 1 ][ q ] + 16, 16 ) ) {
+                if( _maxPkmn != u16( -1 ) && GET_AND_WAIT_C( dexsppos[ 0 ][ q ] + 16, dexsppos[ 1 ][ q ] + 16, 16 ) ) {
                     _dexUI->_currPkmn = ( _dexUI->_currPkmn + _maxPkmn - 3 + q + ( q > 2 ? 1 : 0 ) ) % _maxPkmn;
                     _dexUI->drawPage( true );
                 }
             for( u8 q = 5; q < 8; ++q )
                 if( GET_AND_WAIT_C( dexsppos[ 0 ][ q ] + 16, dexsppos[ 1 ][ q ] + 16, 16 )
-                    && _dexUI->_currPage != q + 1 ) {
+                    && _dexUI->_currPage != ( q + 1 ) % MAX_PAGES ) {
                     _dexUI->_currPage = ( q + 1 ) % MAX_PAGES;
                     _dexUI->drawPage( false, true );
                 }

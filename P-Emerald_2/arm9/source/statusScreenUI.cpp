@@ -39,7 +39,7 @@ namespace STS {
         { 14, 2 }, { 16, 3 }, { 14, 9 },
         { 16, 10 }, { 14, 17 }, { 16, 18 }
     };
-
+    
     regStsScreenUI::regStsScreenUI( std::vector<pokemon>* p_pokemon, u8 p_pageMax ) {
         _pokemon = p_pokemon;
         m_pagemax = p_pageMax;
@@ -52,7 +52,7 @@ namespace STS {
 #define ITEM_ICON_IDX  11
 #define TYPE_IDX 12
 #define ATK_DMGTYPE_IDX(a) (16 + (u8(a)))
-#define RIBBON_IDX 19
+#define RIBBON_IDX 20
 
 #define ICON_PAL(a) (a)
 #define PKMN_SPRITE_PAL 6
@@ -72,8 +72,6 @@ namespace STS {
     //#define FWD_ID 13
     //#define BWD_ID 14
 
-
-    u8 fieldCnt = 0;
     void regStsScreenUI::initSub( u16 p_pkmIdx ) {
         consoleSelect( &IO::Bottom );
         consoleSetWindow( &IO::Bottom, 16, 0, 16, 16 );
@@ -137,40 +135,43 @@ namespace STS {
             consoleSelect( &IO::Top );
             return;
         }
-        u8 u = 0;
+        _showMoveCnt = 0;
         for( u8 i = 0; i < 4; ++i ) {
             if( ( *_pokemon )[ p_pkmIdx ].m_boxdata.m_moves[ i ] < MAXATTACK &&
                 AttackList[ ( *_pokemon )[ p_pkmIdx ].m_boxdata.m_moves[ i ] ]->m_isFieldAttack ) {
-                IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( u ) ].isHidden = false;
-                IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( u ) ].isHidden = false;
-                IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( u ) ].y = -7 + 24 * u;
-                IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( u ) ].y = -7 + 24 * u;
+                IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( _showMoveCnt ) ].isHidden = false;
+                IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( _showMoveCnt ) ].isHidden = false;
+                IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( _showMoveCnt ) ].y = -7 + 24 * _showMoveCnt;
+                IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( _showMoveCnt ) ].y = -7 + 24 * _showMoveCnt;
 
-                IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( u ) ].x = 152;
-                IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( u ) ].x = 192 + 24;
+                IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( _showMoveCnt ) ].x = 152;
+                IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( _showMoveCnt ) ].x = 192 + 24;
 
-                consoleSetWindow( &IO::Bottom, 16, 3 * u + 1, 16, 16 );
+                consoleSetWindow( &IO::Bottom, 16, 3 * _showMoveCnt + 1, 16, 16 );
                 printf( "    %s", AttackList[ ( *_pokemon )[ p_pkmIdx ].m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-                ++u;
+                ++_showMoveCnt;
             }
         }
+        _showTakeItem = false;
         if( ( *_pokemon )[ p_pkmIdx ].m_boxdata.m_holdItem ) {
-            IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( u ) ].isHidden = false;
-            IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( u ) ].isHidden = false;
-            IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( u ) ].y = -7 + 24 * u;
-            IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( u ) ].y = -7 + 24 * u;
+            _showTakeItem = true;
 
-            IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( u ) ].x = 152;
-            IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( u ) ].x = 192 + 24;
+            IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( _showMoveCnt ) ].isHidden = false;
+            IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( _showMoveCnt ) ].isHidden = false;
+            IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( _showMoveCnt ) ].y = -7 + 24 * _showMoveCnt;
+            IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( _showMoveCnt ) ].y = -7 + 24 * _showMoveCnt;
 
-            consoleSetWindow( &IO::Bottom, 16, 3 * u + 1, 16, 16 );
+            IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( _showMoveCnt ) ].x = 152;
+            IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( _showMoveCnt ) ].x = 192 + 24;
+
+            consoleSetWindow( &IO::Bottom, 16, 3 * _showMoveCnt + 1, 16, 16 );
             printf( "    Item nehmen" );
         }
-        u16 s = u + ( *_pokemon )[ p_pkmIdx ].m_boxdata.m_holdItem;
+        u16 s = _showMoveCnt + _showTakeItem;
         IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( s ) ].isHidden = false;
         IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( s ) ].isHidden = false;
-        IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( s ) ].y = -7 + 24 * u;
-        IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( s ) ].y = -7 + 24 * u;
+        IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( s ) ].y = -7 + 24 * s;
+        IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( s ) ].y = -7 + 24 * s;
 
         IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( s ) ].x = 152;
         IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( s ) ].x = 192 + 24;
@@ -179,11 +180,10 @@ namespace STS {
         consoleSetWindow( &IO::Bottom, 16, 3 * s + 1, 16, 16 );
         printf( "    Dexeintrag" );
         consoleSelect( &IO::Top );
-
-        fieldCnt = u;
     }
 
     void regStsScreenUI::initTop( ) {
+        IO::initOAMTable( false );
         consoleSelect( &IO::Top );
         printf( "\x1b[39m" );
         u16 tileCnt = 0;
@@ -251,14 +251,9 @@ namespace STS {
         //Preload the page specific sprites
         auto currPkmn = ( *_pokemon )[ _current ];
 
-        if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", currPkmn.m_boxdata.m_speciesId, 16, 48,
+        if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", 0, 16, 48,
             PKMN_SPRITE_START, PKMN_SPRITE_PAL, tileCnt, false,
-            currPkmn.m_boxdata.isShiny( ), currPkmn.m_boxdata.m_isFemale, true ) ) ) {
-            tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", currPkmn.m_boxdata.m_speciesId, 16, 48,
-                                          PKMN_SPRITE_START, PKMN_SPRITE_PAL, IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, false,
-                                          currPkmn.m_boxdata.isShiny( ), !currPkmn.m_boxdata.m_isFemale, true );
-        }
-
+            currPkmn.m_boxdata.isShiny( ), false, true ) ) );
 
         tileCnt = IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, tileCnt,
                                   0, 0, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, false );
@@ -269,30 +264,31 @@ namespace STS {
             Type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
             tileCnt = IO::loadTypeIcon( t, 126, 43 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ), tileCnt, false );
         }
-        for( u8 i = 0; i < 4; ++i )
+        for( u8 i = 0; i < 4; ++i ) {
             tileCnt = IO::loadDamageCategoryIcon( ( move::moveHitTypes )( i % 3 ), 126, 43 + 32 * i,
-            ATK_DMGTYPE_IDX( i ), DMG_TYPE_PAL( i % 3 ), tileCnt, false );
+                                                  ATK_DMGTYPE_IDX( i ), DMG_TYPE_PAL( i % 3 ), tileCnt, false );
+        }
 
         for( u8 i = PKMN_SPRITE_START; i < RIBBON_IDX; ++i )
             IO::OamTop->oamBuffer[ i ].isHidden = true;
         IO::updateOAM( false );
     }
 
-    void regStsScreenUI::init( u8 p_current ) {
+    void regStsScreenUI::init( u8 p_current, bool p_initTop ) {
         _current = p_current;
-        u8 max = _pokemon->size( );
-
-        IO::vramSetup( );
-        videoSetMode( MODE_5_2D/* | DISPLAY_BG2_ACTIVE*/ | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-        swiWaitForVBlank( );
-        IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
-        consoleSetFont( &IO::Top, IO::consoleFont );
-
+        if( p_initTop ) {
+            IO::vramSetup( );
+            videoSetMode( MODE_5_2D/* | DISPLAY_BG2_ACTIVE*/ | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
+            swiWaitForVBlank( );
+            IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
+            consoleSetFont( &IO::Top, IO::consoleFont );
+            FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNScreen" );
+        }
         IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
         consoleSetFont( &IO::Bottom, IO::consoleFont );
 
-        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNScreen" );
         consoleSelect( &IO::Top );
+        consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
         consoleClear( );
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleSelect( &IO::Bottom );
@@ -300,9 +296,9 @@ namespace STS {
 
         bgUpdate( );
 
-
         IO::drawSub( );
-        initTop( );
+        if( p_initTop )
+            initTop( );
         initSub( _current );
 
         consoleSetWindow( &IO::Top, positions[ _current ][ 0 ], positions[ _current ][ 1 ], 2, 2 );
@@ -318,9 +314,16 @@ namespace STS {
     void regStsScreenUI::draw( u8 p_current, u8 p_page, bool p_newpok ) {
         for( u8 i = 0; i < 6; ++i )
             IO::OamTop->oamBuffer[ ICON_IDX( i ) ].isHidden = true;
+        for( u8 i = 0; i < 4; ++i )
+            IO::OamTop->oamBuffer[ TYPE_IDX + i ].isHidden = true;
+        IO::Oam->oamBuffer[ A_ID ].isHidden = true;
+        for( u8 u = 1; u < 6; ++u ) {
+            IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( u ) ].isHidden = true;
+            IO::Oam->oamBuffer[ CHOICE_ID + 1 + 2 * ( u ) ].isHidden = true;
+        }
 
         IO::setDefaultConsoleTextColors( BG_PALETTE, 6 );
-        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 32 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 128 );
 
         IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( 251, 1 );
@@ -340,11 +343,11 @@ namespace STS {
         consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
         consoleClear( );
         consoleSelect( &IO::Bottom );
-        consoleClear( );
+        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+        if( p_newpok )
+            consoleClear( );
 
         auto currPkmn = ( *_pokemon )[ p_current ];
-        u8 oamIdx = 0, palCnt = 0;
-        u16 tileCnt = 0;
 
         if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
             BG_PALETTE[ 254 ] = RGB15( 31, 0, 0 );
@@ -352,6 +355,7 @@ namespace STS {
             BG_PALETTE[ 253 ] = RGB15( 31, 31, 31 );
             IO::regularFont->setColor( 253, 1 );
 
+            consoleSelect( &IO::Top );
             consoleSetWindow( &IO::Top, 20, 1, 13, 2 );
 
             IO::regularFont->printString( currPkmn.m_boxdata.m_name, 150, 2, false );
@@ -393,14 +397,6 @@ namespace STS {
             IO::regularFont->setColor( 251, 1 );
             IO::regularFont->setColor( 252, 2 );
 
-            if( p_newpok )
-                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", currPkmn.m_boxdata.m_speciesId, 16, 48,
-                    PKMN_SPRITE_START, PKMN_SPRITE_PAL, IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, false,
-                    currPkmn.m_boxdata.isShiny( ), currPkmn.m_boxdata.m_isFemale, true ) ) {
-                    IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", currPkmn.m_boxdata.m_speciesId, 16, 48,
-                                        PKMN_SPRITE_START, PKMN_SPRITE_PAL, IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, false,
-                                        currPkmn.m_boxdata.isShiny( ), !currPkmn.m_boxdata.m_isFemale, true );
-                }
 
         } else {
             p_page = 0;
@@ -423,6 +419,7 @@ namespace STS {
 
                 IO::regularFont->printString( "Pokémon-Info", 36, 4, false );
                 if( !( currPkmn.m_boxdata.m_individualValues.m_isEgg ) ) {
+                    consoleSelect( &IO::Top );
                     consoleSetWindow( &IO::Top, 16, 4, 32, 24 );
                     printf( "     Lv.%3i", currPkmn.m_Level );
 
@@ -522,6 +519,7 @@ namespace STS {
                 IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, IO::OamTop->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
                                 0, 0, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, false );
 
+                consoleSelect( &IO::Top );
                 consoleSetWindow( &IO::Top, 16, 5, 32, 24 );
                 for( int i = 0; i < 4; i++ ) {
                     if( currPkmn.m_boxdata.m_moves[ i ] == 0 )
@@ -574,17 +572,17 @@ namespace STS {
                 return;
         }
 
-        if( currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
+        if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].isHidden = false;
-            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].y = -4;
-            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].x = -8;
+            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].y = u16( -4 );
+            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].x = u16( -8 );
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].priority = OBJPRIORITY_1;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].isHidden = false;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].y = 18;
-            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].x = -8;
+            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].x = u16( -8 );
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].priority = OBJPRIORITY_1;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].isHidden = false;
-            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].y = -8;
+            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].y = u16( -8 );
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].x = 14;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].priority = OBJPRIORITY_1;
 
@@ -604,6 +602,7 @@ namespace STS {
             IO::Oam->oamBuffer[ FWD_ID ].y = 196 - 28;
 
             if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
+
                 if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
                     IO::loadTypeIcon( data.m_types[ 0 ], 256 - 50, 24, SUB_TYPE_IDX( 0 ), SUB_TYPE_IDX( 0 ),
                                       IO::Oam->oamBuffer[ SUB_TYPE_IDX( 0 ) ].gfxIndex, true );
@@ -822,9 +821,18 @@ namespace STS {
             consoleSelect( &IO::Top );
             consoleSetWindow( &IO::Top, 4, 5, 12, 2 );
 
+            if( p_newpok )
+                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", currPkmn.m_boxdata.m_speciesId, 16, 48,
+                    PKMN_SPRITE_START, PKMN_SPRITE_PAL, IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, false,
+                    currPkmn.m_boxdata.isShiny( ), currPkmn.m_boxdata.m_isFemale, true ) ) {
+                    IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", currPkmn.m_boxdata.m_speciesId, 16, 48,
+                                        PKMN_SPRITE_START, PKMN_SPRITE_PAL, IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, false,
+                                        currPkmn.m_boxdata.isShiny( ), !currPkmn.m_boxdata.m_isFemale, true );
+                }
+
             u16 exptype = data.m_expType;
 
-            printf( "EP(%3i%%)\nKP(%3i%%)", ( currPkmn.m_boxdata.m_experienceGained - EXP[ currPkmn.m_Level - 1 ][ exptype ] ) * 100 /
+            printf( "EP(%3lu%%)\nKP(%3i%%)", ( currPkmn.m_boxdata.m_experienceGained - EXP[ currPkmn.m_Level - 1 ][ exptype ] ) * 100 /
                     ( EXP[ currPkmn.m_Level ][ exptype ] - EXP[ currPkmn.m_Level - 1 ][ exptype ] ),
                     currPkmn.m_stats.m_acHP * 100 / currPkmn.m_stats.m_maxHP );
             IO::displayHP( 100, 101, 46, 80, 97, 98, false, 50, 56 );

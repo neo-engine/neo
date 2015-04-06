@@ -1136,8 +1136,8 @@ END:
             if( !( t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
                 16, 8, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) ) {
                 t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                                              16, 8, oamIndex, palIndex, IO::Oam->oamBuffer[ oamIndex ].gfxIndex,
-                                              true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
+                                         16, 8, oamIndex, palIndex, IO::Oam->oamBuffer[ oamIndex ].gfxIndex,
+                                         true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
             }
             oamIndex += 4;
             tilecnt = t2;
@@ -1432,11 +1432,11 @@ START:
                     undrawPKMNChoiceScreen( );
                     consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                     consoleClear( );
-                    while( tmp = showConfirmation( acPkmn, !result || ( result == p_firstIsChosen ), result == firstMoveSwitchTarget ) ) {
+                    while( ( tmp = showConfirmation( acPkmn, !result || ( result == p_firstIsChosen ), result == firstMoveSwitchTarget ) ) ) {
                         if( tmp == 3 )
                             break;
                         u8 oldtmp = tmp - 1;
-                        while( tmp = showDetailedInformation( acPkmn, tmp - 1 ) ) {
+                        while( ( tmp = showDetailedInformation( acPkmn, tmp - 1 ) ) ) {
                             if( tmp == 1 ) {
                                 result = ( result + 1 + oldtmp ) % teamSz;
                                 acPkmn = ACPKMN2( *_battle, result, PLAYER );
@@ -1646,36 +1646,23 @@ CLEAR:
         IO::updateOAM( false );
 
         //Clear text
-        s16 x = 0, y = 0;
         u8 hpx = 0, hpy = 0;
 
         if( p_opponent ) {
             hpx = 88;
             hpy = 40;
 
-            x = 176;
-            y = 19;
-
             if( p_pokemonPos ) {
                 hpx -= 88;
                 hpy -= 32;
-
-                x = 112;
-                y = 14;
             }
         } else {
             hpx = 220;
             hpy = 152;
 
-            x = 60;
-            y = 120;
-
             if( !p_pokemonPos ) {
                 hpx -= 88;
                 hpy -= 32;
-
-                x = 0;
-                y = 115;
             }
         }
         consoleSelect( &IO::Top );

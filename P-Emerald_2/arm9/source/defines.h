@@ -110,3 +110,4 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define SQCH_ID 80
 
 u8 getCurrentDaytime( );
+void shoUseAttack( u16 p_pkmIdx, bool p_female, bool p_shiny );

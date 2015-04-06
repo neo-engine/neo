@@ -67,7 +67,7 @@ namespace DEX {
             tileCnt = IO::loadSprite( BAG_SPR_SUB( i ), 1, tileCnt, dexsppos[ 0 ][ i ], dexsppos[ 1 ][ i ], 32, 32, BagSprPal,
                                       BagSprTiles, BagSprTilesLen, false, false, !( _useInDex ), OBJPRIORITY_2, true );
             tileCnt = IO::loadPKMNIcon( 0, dexsppos[ 0 ][ i ], dexsppos[ 1 ][ i ], PKMN_ICON_SUB( i ), PKMN_ICON_SUB_PAL( i ), tileCnt, true );
-            IO::Oam->oamBuffer[ PKMN_ICON_SUB( i ) ].isHidden = !!( _useInDex );
+            IO::Oam->oamBuffer[ PKMN_ICON_SUB( i ) ].isHidden = !( _useInDex );
         }
 
         tileCnt = IO::loadSprite( BIG_CIRC_START, 2, tileCnt, 8, 32, 64, 64, BigCirc1Pal,
@@ -108,6 +108,8 @@ namespace DEX {
         }
 
         pokemonData data; getAll( _currPkmn, data );
+        if( data.m_types[ 0 ] == NORMAL )
+            IO::boldFont->setColor( BLACK_IDX, 2 );
         auto formes = getAllFormes( _currPkmn );
         //IO::boldFont->setColor( WHITE_IDX, 2 );
         //IO::boldFont->setColor( COLOR_IDX, 2 );
@@ -155,11 +157,17 @@ namespace DEX {
 
     u16 oldPkmn;
     u8 oldForme = -1;
+#define IN_DEX(pidx) ( FS::SAV->m_inDex[ (pidx) / 8 ] & ( 1 << ( (pidx) % 8 ) ) )
     void dexUI::undrawFormes( u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName ) {
         //Print over the text the same text, but with the color of the background
         pokemonData data2; getAll( _currPkmn, data2 );
-        BG_PALETTE[ 0 ] = IO::getColor( data2.m_types[ 0 ] );
-        BG_PALETTE[ COLOR_IDX ] = IO::getColor( data2.m_types[ 0 ] );
+        if( !( _useInDex ) || IN_DEX( _currPkmn ) ) {
+            BG_PALETTE[ 0 ] = IO::getColor( data2.m_types[ 0 ] );
+            BG_PALETTE[ COLOR_IDX ] = IO::getColor( data2.m_types[ 0 ] );
+        } else {
+            BG_PALETTE[ 0 ] = BLACK;
+            BG_PALETTE[ COLOR_IDX ] = BLACK;
+        }
         BG_PALETTE[ WHITE_IDX ] = WHITE;
         IO::boldFont->setColor( COLOR_IDX, 0 );
         IO::boldFont->setColor( COLOR_IDX, 1 );
@@ -181,7 +189,6 @@ namespace DEX {
 
     }
 
-#define IN_DEX(pidx) ( FS::SAV->m_inDex[ (pidx) / 8 ] & ( 1 << ( (pidx) % 8 ) ) )
     u16 newformepkmn = -1;
     std::string formeName;
     bool isFixed;

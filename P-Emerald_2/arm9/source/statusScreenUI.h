@@ -4,8 +4,6 @@
 #include <vector>
 
 namespace STS {
-    extern u8 fieldCnt;
-
     class statusScreenUI {
     protected:
         friend class statusScreen;
@@ -13,7 +11,10 @@ namespace STS {
 
         std::vector<pokemon>* _pokemon;
 
-        virtual void init( u8 p_current ) = 0;
+        bool _showTakeItem;
+        u8 _showMoveCnt;
+
+        virtual void init( u8 p_current, bool p_initTop = true ) = 0;
         virtual void draw( u8 p_current, u8 p_page, bool p_newpok ) = 0;
         virtual void draw( u8 p_current ) = 0;
     public:
@@ -27,7 +28,7 @@ namespace STS {
 
     public:
 
-        void init( u8 p_current ) override;
+        void init( u8 p_current, bool p_initTop = true ) override;
         void draw( u8 p_current, u8 p_page, bool p_newpok ) override;
         void draw( u8 p_current ) override;
 
