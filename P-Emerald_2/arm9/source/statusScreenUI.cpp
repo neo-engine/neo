@@ -39,7 +39,7 @@ namespace STS {
         { 14, 2 }, { 16, 3 }, { 14, 9 },
         { 16, 10 }, { 14, 17 }, { 16, 18 }
     };
-    
+
     regStsScreenUI::regStsScreenUI( std::vector<pokemon>* p_pokemon, u8 p_pageMax ) {
         _pokemon = p_pokemon;
         m_pagemax = p_pageMax;
@@ -224,7 +224,7 @@ namespace STS {
                 sprintf( buffer, "%hi/%hi KP", ( *_pokemon )[ i ].m_stats.m_acHP, ( *_pokemon )[ i ].m_stats.m_maxHP );
                 IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 28 - mval, false );
 
-                sprintf( buffer, "%s", ItemList[ ( *_pokemon )[ i ].m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ) );
+                sprintf( buffer, "%s", ItemList[ ( *_pokemon )[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
                 IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
             } else {
@@ -237,7 +237,7 @@ namespace STS {
                 sprintf( buffer, "Ei" );
                 IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
-                sprintf( buffer, "%s", ItemList[ ( *_pokemon )[ i ].m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ) );
+                sprintf( buffer, "%s", ItemList[ ( *_pokemon )[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
                 IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
                 if( i % 2 == 0 ) {
@@ -251,9 +251,9 @@ namespace STS {
         //Preload the page specific sprites
         auto currPkmn = ( *_pokemon )[ _current ];
 
-        if( !( tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", 0, 16, 48,
-            PKMN_SPRITE_START, PKMN_SPRITE_PAL, tileCnt, false,
-            currPkmn.m_boxdata.isShiny( ), false, true ) ) );
+        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", 0, 16, 48,
+                                      PKMN_SPRITE_START, PKMN_SPRITE_PAL, tileCnt, false,
+                                      currPkmn.m_boxdata.isShiny( ), false, true );
 
         tileCnt = IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, tileCnt,
                                   0, 0, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, false );
@@ -311,11 +311,191 @@ namespace STS {
     }
 
     pokemonData data;
+
+    void drawPkmnInformation( pokemon p_pokemon, u8& p_page, bool p_newpok ) {
+
+        if( !p_pokemon.m_boxdata.m_individualValues.m_isEgg ) {
+            BG_PALETTE[ RED_IDX ] = RED;
+            BG_PALETTE[ BLUE_IDX ] = BLUE;
+            BG_PALETTE[ WHITE_IDX ] = WHITE;
+            IO::regularFont->setColor( WHITE_IDX, 1 );
+
+            consoleSelect( &IO::Top );
+            consoleSetWindow( &IO::Top, 20, 1, 13, 2 );
+
+            IO::regularFont->printString( p_pokemon.m_boxdata.m_name, 150, 2, false );
+            s8 G = p_pokemon.m_boxdata.gender( );
+
+            IO::regularFont->printChar( '/', 234, 2, false );
+            if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 ) {
+                if( G == 1 ) {
+                    IO::regularFont->setColor( BLUE_IDX, 1 );
+                    IO::regularFont->printChar( 136, 246, 8, false );
+                } else {
+                    IO::regularFont->setColor( RED_IDX, 1 );
+                    IO::regularFont->printChar( 137, 246, 8, false );
+                }
+            }
+            IO::regularFont->setColor( WHITE_IDX, 1 );
+
+            getAll( p_pokemon.m_boxdata.m_speciesId, data );
+            IO::regularFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 160, 16, false );
+
+            if( p_pokemon.m_boxdata.getItem( ) ) {
+                IO::regularFont->printString( "Item", 2, 176, false );
+                IO::regularFont->setColor( BLACK_IDX, 1 );
+                IO::regularFont->setColor( 0, 2 );
+                char buffer[ 200 ];
+                sprintf( buffer, "%s: %s", ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
+                         ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getShortDescription( true ).c_str( ) );
+                IO::regularFont->printString( buffer, 50, 159, false );
+                if( p_newpok ) {
+                    IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 2, 152,
+                                      ITEM_ICON_IDX, ITEM_ICON_PAL, IO::OamTop->oamBuffer[ ITEM_ICON_IDX ].gfxIndex, false );
+                }
+            } else {
+                IO::regularFont->setColor( BLACK_IDX, 1 );
+                IO::regularFont->setColor( 0, 2 );
+                IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 56, 168, false );
+                IO::OamTop->oamBuffer[ ITEM_ICON_IDX ].isHidden = true;
+            }
+            IO::regularFont->setColor( BLACK_IDX, 1 );
+            IO::regularFont->setColor( GRAY_IDX, 2 );
+
+            consoleSelect( &IO::Top );
+            consoleSetWindow( &IO::Top, 4, 5, 12, 2 );
+
+            if( p_newpok )
+                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId, 16, 48,
+                    PKMN_SPRITE_START, PKMN_SPRITE_PAL, IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, false,
+                    p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale, true ) ) {
+                    IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId, 16, 48,
+                                        PKMN_SPRITE_START, PKMN_SPRITE_PAL, IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, false,
+                                        p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale, true );
+                }
+
+            u16 exptype = data.m_expType;
+
+            printf( "EP(%3lu%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ) * 100 /
+                    ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
+                    p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
+            IO::displayHP( 100, 101, 46, 80, 97, 98, false, 50, 56 );
+            IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 80, 97, 98, false, 50, 56 );
+
+            IO::displayEP( 100, 101, 46, 80, 99, 100, false, 59, 62 );
+            IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ) * 100 /
+                           ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62 );
+
+        } else {
+            p_page = 0;
+            BG_PALETTE[ WHITE_IDX ] = WHITE;
+            IO::regularFont->setColor( WHITE_IDX, 1 );
+
+            IO::regularFont->printString( "Ei", 150, 2, false );
+            IO::regularFont->printChar( '/', 234, 2, false );
+            IO::regularFont->printString( "Ei", 160, 18, false );
+            IO::regularFont->setColor( BLACK_IDX, 1 );
+
+            for( u8 i = 0; i < 4; ++i )
+                IO::OamTop->oamBuffer[ PKMN_SPRITE_START + i ].isHidden = true;
+        }
+    }
+
+    // Draw extra information about the specified move
+    bool regStsScreenUI::draw( u8 p_current, u8 p_moveIdx ) {
+        auto currPkmn = ( *_pokemon )[ p_current ];
+        if( !currPkmn.m_boxdata.m_moves[ p_moveIdx ] )
+            return false;
+        if( currPkmn.m_boxdata.m_individualValues.m_isEgg )
+            return false;
+
+        for( u8 i = 0; i < 4; ++i )
+            IO::OamTop->oamBuffer[ TYPE_IDX + i ].isHidden = true;
+        for( u8 i = 0; i < 4; ++i )
+            IO::OamTop->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
+
+        IO::setDefaultConsoleTextColors( BG_PALETTE, 6 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 128 );
+
+        BG_PALETTE[ WHITE_IDX ] = WHITE;
+        BG_PALETTE[ GRAY_IDX ] = RGB( 20, 20, 20 );
+        BG_PALETTE[ BLACK_IDX ] = BLACK;
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::boldFont->setColor( 0, 0 );
+        IO::boldFont->setColor( GRAY_IDX, 1 );
+        IO::boldFont->setColor( WHITE_IDX, 2 );
+
+        consoleSelect( &IO::Top );
+        consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+        consoleClear( );
+
+        u8 isNotEgg = 1;
+        drawPkmnInformation( currPkmn, isNotEgg, false );
+        if( !isNotEgg )
+            return false; //This should never occur
+
+        IO::regularFont->printString( "Attackeninfos", 36, 4, false );
+        IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, IO::OamTop->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
+                        0, 0, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, false );
+
+        move* currMove = AttackList[ currPkmn.m_boxdata.m_moves[ p_moveIdx ] ];
+
+        BG_PALETTE[ COLOR_IDX ] = GREEN;
+        if( currMove->m_moveType == data.m_types[ 0 ] || currMove->m_moveType == data.m_types[ 1 ] ) {
+            IO::regularFont->setColor( COLOR_IDX, 1 );
+            IO::regularFont->setColor( WHITE_IDX, 2 );
+        } else {
+            IO::regularFont->setColor( BLACK_IDX, 1 );
+            IO::regularFont->setColor( GRAY_IDX, 2 );
+        }
+        IO::regularFont->printString( currMove->m_moveName.c_str( ),
+                                      120, 36, false );
+        IO::regularFont->setColor( GRAY_IDX, 1 );
+        IO::regularFont->setColor( WHITE_IDX, 2 );
+
+        IO::loadTypeIcon( currMove->m_moveType, 222, 34, TYPE_IDX + p_moveIdx, TYPE_PAL( p_moveIdx ),
+                          IO::OamTop->oamBuffer[ TYPE_IDX + p_moveIdx ].gfxIndex, false );
+        IO::loadDamageCategoryIcon( currMove->m_moveHitType, 222, 50, ATK_DMGTYPE_IDX( currMove->m_moveHitType ), DMG_TYPE_PAL( currMove->m_moveHitType ),
+                                    IO::OamTop->oamBuffer[ ATK_DMGTYPE_IDX( currMove->m_moveHitType ) ].gfxIndex, false );
+        char buffer[ 20 ];
+
+        sprintf( buffer, "AP %2hhu""/""%2hhu ", currPkmn.m_boxdata.m_acPP[ p_moveIdx ],
+                 currMove->m_movePP * ( ( 5 + ( ( currPkmn.m_boxdata.m_pPUps >> ( 2 * p_moveIdx ) ) % 4 ) ) / 5 ) );
+        IO::regularFont->printString( buffer, 128, 51, false );
+
+        IO::regularFont->printString( "Stärke", 128, 64, false );
+        if( currMove->m_moveBasePower )
+            sprintf( buffer, "%3i", currMove->m_moveBasePower );
+        else
+            sprintf( buffer, "---" );
+        IO::regularFont->printString( buffer, 226, 64, false );
+
+        IO::regularFont->printString( "Genauigkeit", 128, 76, false );
+        if( currMove->m_moveAccuracy )
+            sprintf( buffer, "%3i", currMove->m_moveAccuracy );
+        else
+            sprintf( buffer, "---" );
+        IO::regularFont->printString( buffer, 226, 76, false );
+
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->printString( FS::breakString( currMove->description( ), IO::regularFont, 120 ).c_str( ),
+                                      128, 88, false, 11 );
+
+        IO::updateOAM( false );
+        return true;
+    }
+
+
     void regStsScreenUI::draw( u8 p_current, u8 p_page, bool p_newpok ) {
         for( u8 i = 0; i < 6; ++i )
             IO::OamTop->oamBuffer[ ICON_IDX( i ) ].isHidden = true;
         for( u8 i = 0; i < 4; ++i )
             IO::OamTop->oamBuffer[ TYPE_IDX + i ].isHidden = true;
+        for( u8 i = 0; i < 4; ++i )
+            IO::OamTop->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
         IO::Oam->oamBuffer[ A_ID ].isHidden = true;
         for( u8 u = 1; u < 6; ++u ) {
             IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( u ) ].isHidden = true;
@@ -326,18 +506,18 @@ namespace STS {
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 128 );
 
         IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( 251, 1 );
-        IO::regularFont->setColor( 252, 2 );
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::boldFont->setColor( 0, 0 );
-        IO::boldFont->setColor( 253, 1 );
-        IO::boldFont->setColor( 254, 2 );
+        IO::boldFont->setColor( GRAY_IDX, 1 );
+        IO::boldFont->setColor( WHITE_IDX, 2 );
 
-        BG_PALETTE[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE[ 251 ] = RGB15( 20, 20, 20 );
-        BG_PALETTE[ 252 ] = RGB15( 3, 3, 3 );
+        BG_PALETTE[ WHITE_IDX ] = WHITE;
+        BG_PALETTE[ GRAY_IDX ] = RGB( 20, 20, 20 );
+        BG_PALETTE[ BLACK_IDX ] = BLACK;
         if( p_newpok ) {
-            BG_PALETTE_SUB[ 253 ] = RGB15( 10, 10, 10 );
-            BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
+            BG_PALETTE_SUB[ GRAY_IDX ] = RGB( 10, 10, 10 );
+            BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
         }
         consoleSelect( &IO::Top );
         consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
@@ -349,68 +529,7 @@ namespace STS {
 
         auto currPkmn = ( *_pokemon )[ p_current ];
 
-        if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
-            BG_PALETTE[ 254 ] = RGB15( 31, 0, 0 );
-            BG_PALETTE[ 255 ] = RGB15( 0, 0, 31 );
-            BG_PALETTE[ 253 ] = RGB15( 31, 31, 31 );
-            IO::regularFont->setColor( 253, 1 );
-
-            consoleSelect( &IO::Top );
-            consoleSetWindow( &IO::Top, 20, 1, 13, 2 );
-
-            IO::regularFont->printString( currPkmn.m_boxdata.m_name, 150, 2, false );
-            s8 G = currPkmn.m_boxdata.gender( );
-
-            IO::regularFont->printChar( '/', 234, 2, false );
-            if( currPkmn.m_boxdata.m_speciesId != 29 && currPkmn.m_boxdata.m_speciesId != 32 ) {
-                if( G == 1 ) {
-                    IO::regularFont->setColor( 255, 1 );
-                    IO::regularFont->printChar( 136, 246, 8, false );
-                } else {
-                    IO::regularFont->setColor( 254, 1 );
-                    IO::regularFont->printChar( 137, 246, 8, false );
-                }
-            }
-            IO::regularFont->setColor( 253, 1 );
-
-            getAll( currPkmn.m_boxdata.m_speciesId, data );
-            IO::regularFont->printString( getDisplayName( currPkmn.m_boxdata.m_speciesId ), 160, 16, false );
-
-            if( currPkmn.m_boxdata.getItem( ) ) {
-                IO::regularFont->printString( "Item", 2, 176, false );
-                IO::regularFont->setColor( 252, 1 );
-                IO::regularFont->setColor( 0, 2 );
-                char buffer[ 200 ];
-                sprintf( buffer, "%s: %s", ItemList[ currPkmn.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
-                         ItemList[ currPkmn.m_boxdata.getItem( ) ]->getShortDescription( true ).c_str( ) );
-                IO::regularFont->printString( buffer, 50, 159, false );
-                if( p_newpok ) {
-                    IO::loadItemIcon( ItemList[ currPkmn.m_boxdata.getItem( ) ]->m_itemName, 2, 152,
-                                      ITEM_ICON_IDX, ITEM_ICON_PAL, IO::OamTop->oamBuffer[ ITEM_ICON_IDX ].gfxIndex, false );
-                }
-            } else {
-                IO::regularFont->setColor( 252, 1 );
-                IO::regularFont->setColor( 0, 2 );
-                IO::regularFont->printString( ItemList[ currPkmn.m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 56, 168, false );
-                IO::OamTop->oamBuffer[ ITEM_ICON_IDX ].isHidden = true;
-            }
-            IO::regularFont->setColor( 251, 1 );
-            IO::regularFont->setColor( 252, 2 );
-
-
-        } else {
-            p_page = 0;
-            BG_PALETTE[ 253 ] = RGB15( 31, 31, 31 );
-            IO::regularFont->setColor( 253, 1 );
-
-            IO::regularFont->printString( "Ei", 150, 2, false );
-            IO::regularFont->printChar( '/', 234, 2, false );
-            IO::regularFont->printString( "Ei", 160, 18, false );
-            IO::regularFont->setColor( 251, 1 );
-
-            for( u8 i = 0; i < 4; ++i )
-                IO::OamTop->oamBuffer[ PKMN_SPRITE_START + i ].isHidden = true;
-        }
+        drawPkmnInformation( currPkmn, p_page, p_newpok );
 
         switch( p_page ) {
             case 0:
@@ -423,55 +542,55 @@ namespace STS {
                     consoleSetWindow( &IO::Top, 16, 4, 32, 24 );
                     printf( "     Lv.%3i", currPkmn.m_Level );
 
-                    BG_PALETTE[ 254 ] = RGB15( 31, 0, 0 );
-                    BG_PALETTE[ 255 ] = RGB15( 0, 0, 31 );
+                    BG_PALETTE[ RED_IDX ] = RED;
+                    BG_PALETTE[ BLUE_IDX ] = BLUE;
 
                     char buffer[ 50 ];
                     sprintf( buffer, "KP                     %3i", currPkmn.m_stats.m_maxHP );
                     IO::regularFont->printString( buffer, 130, 44, false );
 
                     if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 0 ] == 1.1 )
-                        IO::regularFont->setColor( 254, 1 );
+                        IO::regularFont->setColor( RED_IDX, 1 );
                     else if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 0 ] == 0.9 )
-                        IO::regularFont->setColor( 255, 1 );
+                        IO::regularFont->setColor( BLUE_IDX, 1 );
                     else
-                        IO::regularFont->setColor( 251, 1 );
+                        IO::regularFont->setColor( BLACK_IDX, 1 );
                     sprintf( buffer, "ANG                   %3i", currPkmn.m_stats.m_Atk );
                     IO::regularFont->printString( buffer, 130, 69, false );
 
                     if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 1 ] == 1.1 )
-                        IO::regularFont->setColor( 254, 1 );
+                        IO::regularFont->setColor( RED_IDX, 1 );
                     else if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 1 ] == 0.9 )
-                        IO::regularFont->setColor( 255, 1 );
+                        IO::regularFont->setColor( BLUE_IDX, 1 );
                     else
-                        IO::regularFont->setColor( 251, 1 );
+                        IO::regularFont->setColor( BLACK_IDX, 1 );
                     sprintf( buffer, "VER                   %3i", currPkmn.m_stats.m_Def );
                     IO::regularFont->printString( buffer, 130, 86, false );
 
                     if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 3 ] == 1.1 )
-                        IO::regularFont->setColor( 254, 1 );
+                        IO::regularFont->setColor( RED_IDX, 1 );
                     else if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 3 ] == 0.9 )
-                        IO::regularFont->setColor( 255, 1 );
+                        IO::regularFont->setColor( BLUE_IDX, 1 );
                     else
-                        IO::regularFont->setColor( 251, 1 );
+                        IO::regularFont->setColor( BLACK_IDX, 1 );
                     sprintf( buffer, "SAN                   %3i", currPkmn.m_stats.m_SAtk );
                     IO::regularFont->printString( buffer, 130, 103, false );
 
                     if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 4 ] == 1.1 )
-                        IO::regularFont->setColor( 254, 1 );
+                        IO::regularFont->setColor( RED_IDX, 1 );
                     else if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 4 ] == 0.9 )
-                        IO::regularFont->setColor( 255, 1 );
+                        IO::regularFont->setColor( BLUE_IDX, 1 );
                     else
-                        IO::regularFont->setColor( 251, 1 );
+                        IO::regularFont->setColor( BLACK_IDX, 1 );
                     sprintf( buffer, "SVE                   %3i", currPkmn.m_stats.m_SDef );
                     IO::regularFont->printString( buffer, 130, 120, false );
 
                     if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 2 ] == 1.1 )
-                        IO::regularFont->setColor( 254, 1 );
+                        IO::regularFont->setColor( RED_IDX, 1 );
                     else if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 2 ] == 0.9 )
-                        IO::regularFont->setColor( 255, 1 );
+                        IO::regularFont->setColor( BLUE_IDX, 1 );
                     else
-                        IO::regularFont->setColor( 251, 1 );
+                        IO::regularFont->setColor( BLACK_IDX, 1 );
                     sprintf( buffer, "INI                   \xC3\xC3""%3i", currPkmn.m_stats.m_Spd );
                     IO::regularFont->printString( buffer, 130, 137, false );
 
@@ -522,43 +641,27 @@ namespace STS {
                 consoleSelect( &IO::Top );
                 consoleSetWindow( &IO::Top, 16, 5, 32, 24 );
                 for( int i = 0; i < 4; i++ ) {
-                    if( currPkmn.m_boxdata.m_moves[ i ] == 0 )
+                    if( !currPkmn.m_boxdata.m_moves[ i ] )
                         continue;
                     Type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
-                    IO::loadTypeIcon( t, 126, 43 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ),
+                    IO::loadTypeIcon( t, 126, 45 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ),
                                       IO::OamTop->oamBuffer[ TYPE_IDX + i ].gfxIndex, false );
 
-                    /* if(t == data.Types[0] || t == data.Types[1])
-                    printf("\x1b[32m");*/
-
-                    printf( "    %s\n    AP %2hhu""/""%2hhu ",
-                            ( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) ), currPkmn.m_boxdata.m_acPP[ i ],
-                            AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_movePP* ( ( 5 + ( ( currPkmn.m_boxdata.m_pPUps >> ( 2 * i ) ) % 4 ) ) / 5 ) );
-
-                    switch( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveHitType ) {
-                        case move::PHYS:
-                            printf( "PHS" );
-                            break;
-                        case move::SPEC:
-                            printf( "SPC" );
-                            break;
-                        case move::STAT:
-                            printf( "STS" );
-                            break;
+                    BG_PALETTE[ COLOR_IDX ] = GREEN;
+                    if( t == data.m_types[ 0 ] || t == data.m_types[ 1 ] ) {
+                        IO::regularFont->setColor( COLOR_IDX, 1 );
+                        IO::regularFont->setColor( WHITE_IDX, 2 );
+                    } else {
+                        IO::regularFont->setColor( BLACK_IDX, 1 );
+                        IO::regularFont->setColor( GRAY_IDX, 2 );
                     }
-                    printf( "\n    S " );
-                    if( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveBasePower )
-                        printf( "%3i", AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveBasePower );
-                    else
-                        printf( "---" );
-                    printf( " G " );
-                    if( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveAccuracy )
-                        printf( "%3i", AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveAccuracy );
-                    else
-                        printf( "---" );
 
+                    IO::regularFont->printString( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ),
+                                                  159, 39 + 32 * i, false );
+
+                    printf( "\n\n    AP %2hhu""/""%2hhu ", currPkmn.m_boxdata.m_acPP[ i ],
+                            AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + ( ( currPkmn.m_boxdata.m_pPUps >> ( 2 * i ) ) % 4 ) ) / 5 ) );
                     printf( "\n\n" );
-                    printf( "\x1b[39m" );
                 }
                 break;
             }
@@ -662,23 +765,23 @@ namespace STS {
             IO::drawSub( );
 
             IO::regularFont->setColor( 0, 0 );
-            IO::regularFont->setColor( 254, 1 );
-            IO::regularFont->setColor( 255, 2 );
-            BG_PALETTE_SUB[ 253 ] = currPkmn.m_boxdata.m_oTisFemale ? RGB15( 31, 15, 0 ) : RGB15( 0, 15, 31 );
-            BG_PALETTE_SUB[ 255 ] = RGB15( 0, 0, 0 );
-            BG_PALETTE_SUB[ 254 ] = RGB15( 31, 31, 31 );
+            IO::regularFont->setColor( WHITE_IDX, 1 );
+            IO::regularFont->setColor( BLACK_IDX, 2 );
+            BG_PALETTE_SUB[ COLOR_IDX ] = currPkmn.m_boxdata.m_oTisFemale ? RGB15( 31, 15, 0 ) : RGB15( 0, 15, 31 );
+            BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
+            BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
 
             IO::regularFont->printString( "OT:", 28, 22, true );
-            IO::regularFont->setColor( 253, 2 );
+            IO::regularFont->setColor( COLOR_IDX, 2 );
             IO::regularFont->printString( currPkmn.m_boxdata.m_oT, 56, 16, true );
-            IO::regularFont->setColor( 255, 2 );
+            IO::regularFont->setColor( BLACK_IDX, 2 );
 
             if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
                 auto acAbility = ability( currPkmn.m_boxdata.m_ability );
 
-                BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-                IO::printRectangle( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false, 250 );
-                IO::regularFont->setColor( 253, 2 );
+                BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
+                IO::printRectangle( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false, WHITE_IDX );
+                IO::regularFont->setColor( COLOR_IDX, 2 );
                 u8 nlCnt = 0;
                 auto nStr = FS::breakString( acAbility.m_flavourText, IO::regularFont, 220 );
                 for( auto c : nStr )
@@ -686,8 +789,8 @@ namespace STS {
                         nlCnt++;
                 IO::regularFont->printString( nStr.c_str( ), 0, 138, true, u8( 16 - 2 * nlCnt ) );
                 IO::regularFont->printString( acAbility.m_abilityName.c_str( ), 5, 176, true );
-                IO::regularFont->setColor( 254, 1 );
-                IO::regularFont->setColor( 255, 2 );
+                IO::regularFont->setColor( WHITE_IDX, 1 );
+                IO::regularFont->setColor( BLACK_IDX, 2 );
             }
 
             sprintf( buffer, "(%05i/%05i)", currPkmn.m_boxdata.m_oTId, currPkmn.m_boxdata.m_oTSid );
@@ -816,32 +919,6 @@ namespace STS {
                 if( currPkmn.m_boxdata.m_fateful )
                     IO::regularFont->printString( "Off. schicks. Begegnung.", 28, 120, true );
             }
-        }
-        if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
-            consoleSelect( &IO::Top );
-            consoleSetWindow( &IO::Top, 4, 5, 12, 2 );
-
-            if( p_newpok )
-                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", currPkmn.m_boxdata.m_speciesId, 16, 48,
-                    PKMN_SPRITE_START, PKMN_SPRITE_PAL, IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, false,
-                    currPkmn.m_boxdata.isShiny( ), currPkmn.m_boxdata.m_isFemale, true ) ) {
-                    IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", currPkmn.m_boxdata.m_speciesId, 16, 48,
-                                        PKMN_SPRITE_START, PKMN_SPRITE_PAL, IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, false,
-                                        currPkmn.m_boxdata.isShiny( ), !currPkmn.m_boxdata.m_isFemale, true );
-                }
-
-            u16 exptype = data.m_expType;
-
-            printf( "EP(%3lu%%)\nKP(%3i%%)", ( currPkmn.m_boxdata.m_experienceGained - EXP[ currPkmn.m_Level - 1 ][ exptype ] ) * 100 /
-                    ( EXP[ currPkmn.m_Level ][ exptype ] - EXP[ currPkmn.m_Level - 1 ][ exptype ] ),
-                    currPkmn.m_stats.m_acHP * 100 / currPkmn.m_stats.m_maxHP );
-            IO::displayHP( 100, 101, 46, 80, 97, 98, false, 50, 56 );
-            IO::displayHP( 100, 100 - currPkmn.m_stats.m_acHP * 100 / currPkmn.m_stats.m_maxHP, 46, 80, 97, 98, false, 50, 56 );
-
-            IO::displayEP( 100, 101, 46, 80, 99, 100, false, 59, 62 );
-            IO::displayEP( 0, ( currPkmn.m_boxdata.m_experienceGained - EXP[ currPkmn.m_Level - 1 ][ exptype ] ) * 100 /
-                           ( EXP[ currPkmn.m_Level ][ exptype ] - EXP[ currPkmn.m_Level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62 );
-
         }
 
         IO::updateOAM( true );

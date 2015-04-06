@@ -50,7 +50,7 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 #define COMPL(a) ( RGB( 31 - ( (a) >> 10 ) % 32,31 - ( (a) >> 5 ) % 32,31 - (a) % 32 ) )
 
-#define COLOR_IDX (u8(253))
+#define COLOR_IDX (u8(249))
 #define WHITE_IDX (u8(250))
 #define GRAY_IDX (u8(251))
 #define BLACK_IDX (u8(252))

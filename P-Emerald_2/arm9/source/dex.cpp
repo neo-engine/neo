@@ -27,7 +27,7 @@ namespace DEX {
             touchRead( &touch );
 
             int pressed = keysCurrent( );
-            if( GET_AND_WAIT_R( 224, 164, 300, 300 ) )
+            if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) )
                 break;
             else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_DOWN ) ) {
                 _dexUI->_currPkmn = ( _dexUI->_currPkmn + 1 ) % _maxPkmn;

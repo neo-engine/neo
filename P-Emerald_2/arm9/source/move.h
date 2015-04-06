@@ -142,7 +142,7 @@ public:
         return "N/A";
     }
     virtual const char* description( ) {
-        return "N/A";
+        return "Keine genaueren Informationen verfügbar.";
     }
 };
 

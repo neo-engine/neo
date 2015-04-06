@@ -1736,8 +1736,7 @@ OUT:
             //initMapSprites( );
             //movePlayerOnMap( FS::SAV->m_acposx / 20, FS::SAV->m_acposy / 20, FS::SAV->m_acposz, true );
         } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
-                   && ( GET_AND_WAIT( KEY_START )
-                   || GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ],
+                   && ( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ],
                    IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ], 16 ) ) ) {
 
             std::vector<pokemon> tmp;
@@ -1759,6 +1758,7 @@ OUT:
             consoleSelect( &IO::Bottom );
             consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
             consoleClear( );
+            IO::drawSub( );
             initMapSprites( );
             initMainSprites( );
             movePlayerOnMap( FS::SAV->m_acposx / 20, FS::SAV->m_acposy / 20, FS::SAV->m_acposz, true );

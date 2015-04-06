@@ -63,6 +63,9 @@ public:
     const char* text( ) override {
         return "Ein kleiner Baum.";
     }
+    const char* description( ) override {
+        return "Ein Basisangriff mit Schere oder Klaue. Damit können kleine Bäume gefällt werden.";
+    }
 };
 
 //HM02
@@ -90,6 +93,9 @@ public:
 
     const char* text( ) override {
         return "Ein kleiner Felsen";
+    }
+    const char* description( ) override {
+        return "Steinbrechende Attacke, die den Verteidigungs-Wert des Zieles senken kann.";
     }
 };
 
@@ -119,6 +125,9 @@ public:
     const char* text( ) override {
         return "Freier Himmel.";
     }
+    const char* description( ) override {
+        return "Steigt in Runde 1 empor und trifft das Ziel in Runde 2. Ermöglicht Flug in jede bekannte Stadt.";
+    }
 };
 
 //HM04
@@ -146,6 +155,9 @@ public:
 
     const char* text( ) override {
         return "Eine dunkle Höhle.";
+    }
+    const char* description( ) override {
+        return "Erzeugt helles Licht, das die Genauigkeit des Zieles senkt und Höhlen ausleuchten kann.";
     }
 };
 
@@ -175,6 +187,9 @@ public:
     const char* text( ) override {
         return "Ein Strudel.";
     }
+    const char* description( ) override {
+        return "Das Ziel wird für 4 bis 5 Runden in einer Wasserhose gefangen. Macht Strudel überwindbar.";
+    }
 };
 
 //HM06
@@ -203,22 +218,25 @@ public:
     const char* text( ) override {
         return "Das Wasser ist tiefblau.";
     }
+    const char* description( ) override {
+        return "Eine Welle bricht über alle Pokémon in der Nähe des Anwenders herein. Macht Surfen möglich.";
+    }
 };
 
 //HM07
-class dive 
+class dive
     : public move {
 public:
-    dive( ) 
-        : move( "Taucher", 
-        C 0, 
-        C 80, 
-        WASSER, 
+    dive( )
+        : move( "Taucher",
+        C 0,
+        C 80,
+        WASSER,
         C 100,
         C 10,
-        C 0, 
-        A 0, 
-        C 1, 
+        C 0,
+        A 0,
+        C 1,
         F 35,
         H 0 ) {
         this->m_isFieldAttack = true;
@@ -233,13 +251,17 @@ public:
     const char* text( ) override {
         return "Das Meer scheint hier\nbesonders tief.";
     }
+    const char* description( ) override {
+        return "Taucht in Runde 1 ab und greift in Runde 2 aus der Tiefe an. Ermöglicht Tauchgänge zum Meeresgrund.";
+    }
+
 };
 
 //HM08
-class defog 
+class defog
     : public move {
 public:
-    defog( ) 
+    defog( )
         : move( "Auflockern",
         C 0,
         C 0,
@@ -263,23 +285,26 @@ public:
     const char* text( ) override {
         return "Dichter Nebel.";
     }
+    const char* description( ) override {
+        return "Starker Wind hebt Attacken wie Reflektor und Lichtschild des Gegners auf. Senkt außerdem den Fluchtwert.";
+    }
 };
 
 //HM09
-class strength 
+class strength
     : public move {
 public:
-    strength( ) 
+    strength( )
         : move( "Stärke",
         C 0,
-        C 80, 
+        C 80,
         NORMAL,
-        C 100, 
+        C 100,
         C 15,
-        C 0, 
-        A 0, 
+        C 0,
+        A 0,
         C 1,
-        F 35, 
+        F 35,
         H 0 ) {
         this->m_isFieldAttack = true;
     }
@@ -293,20 +318,23 @@ public:
     const char* text( ) override {
         return "Ein großer Felsen.";
     }
+    const char* description( ) override {
+        return "Das Ziel wird extrem stark getroffen. Macht Verschieben von Felsen möglich.";
+    }
 };
 
 //HM10
 class rockClimb
     : public move {
 public:
-    rockClimb( ) 
+    rockClimb( )
         : move( "Kraxler",
-        C 0, 
+        C 0,
         C 90,
-        NORMAL, 
+        NORMAL,
         C 85,
-        C 20, 
-        C 0, 
+        C 20,
+        C 0,
         A 0,
         C 1,
         F 35,
@@ -323,22 +351,25 @@ public:
     const char* text( ) override {
         return "Eine steile Felswand.";
     }
+    const char* description( ) override {
+        return "Eine stürmische Attacke, die das Ziel eventuell verwirrt.";
+    }
 };
 
 //HM11
-class kaskade 
+class kaskade
     : public move {
 public:
-    kaskade( ) 
+    kaskade( )
         : move( "Kaskade",
-        C 0, 
+        C 0,
         C 80,
         WASSER,
         C 100,
         C 15,
-        C 0, 
+        C 0,
         A 0,
-        C 1, 
+        C 1,
         F 35,
         H 0 ) {
         this->m_isFieldAttack = true;
@@ -353,19 +384,22 @@ public:
     const char* text( ) override {
         return "Ein Wasselfall.";
     }
+    const char* description( ) override {
+        return "Eine mächtige Attacke, durch die das Ziel evtl. zurückschreckt. Wasserfälle können damit erklommen werden.";
+    }
 };
 
-class teleport 
+class teleport
     : public move {
 public:
-    teleport( ) 
-        : move( "Teleport", 
+    teleport( )
+        : move( "Teleport",
         C 0,
         C 0,
-        PSYCHO, 
-        C 100, 
+        PSYCHO,
+        C 100,
         C 20,
-        C 0, 
+        C 0,
         A 0,
         C 1,
         F 0,
@@ -381,6 +415,9 @@ public:
 
     const char* text( ) override {
         return "Zu gefährlich hier?";
+    }
+    const char* description( ) override {
+        return "Fliehe sofort vor wilden Pokémon. Warp zum letzten Pokémon-Center.";
     }
 };
 
@@ -411,12 +448,15 @@ public:
     const char* text( ) override {
         return "Da hat sich etwas bewegt!";
     }
+    const char* description( ) override {
+        return "Rammt das Ziel mit einer Kopfnuss. Ziel schreckt eventuell zurück.";
+    }
 };
 
-class lockduft 
+class lockduft
     : public move {
 public:
-    lockduft( ) 
+    lockduft( )
         : move( "Lockduft",
         C 0,
         C 0,
@@ -431,7 +471,7 @@ public:
         this->m_isFieldAttack = true;
     }
 
-    void use( ) { } 
+    void use( ) { }
 
     bool possible( ) {
         return false;
@@ -439,6 +479,9 @@ public:
 
     const char* text( ) override {
         return "Der Geruch wilder Pokémon\nliegt in der Luft.";
+    }
+    const char* description( ) override {
+        return "Lockt Gegner an und senkt deren Fluchtwert. Lockt im Gras auch wilde Pokémon an.";
     }
 };
 

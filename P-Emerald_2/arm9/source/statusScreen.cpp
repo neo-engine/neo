@@ -27,7 +27,7 @@ namespace STS {
                 IO::updateTime( p_timeParameter );
             int pressed = keysCurrent( );
 
-            if( GET_AND_WAIT( KEY_X ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+            if( GET_AND_WAIT( KEY_X ) || GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
                 break;
             } else if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT_C( 128, 96, 16 ) ) {
                 auto res = drawPage( p_time, p_timeParameter );
@@ -48,11 +48,14 @@ namespace STS {
                 char buffer[ 50 ];
                 item acI = *ItemList[ ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_holdItem ];
                 ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_holdItem = 0;
+                consoleSelect( &IO::Bottom );
+                consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+                consoleClear( );
 
-                sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( ).c_str( ), ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_name );
+                sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_name );
                 IO::messageBox( buffer, p_time );
                 FS::SAV->m_bag->insert( BAG::toBagType( acI.getItemType( ) ), acI.getItemId( ), 1 );
-                _stsUI->init( _pkmnIdx, false );
+                _stsUI->init( _pkmnIdx );
             } else if( GET_AND_WAIT_R( 152, !!( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) * ( -7 + 24 * ( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) ),
                 300, ( 17 + 24 * ( _stsUI->_showMoveCnt + _stsUI->_showTakeItem ) ) ) ) {
 
@@ -77,7 +80,7 @@ namespace STS {
                                  AttackList[ ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
                         IO::messageBox( buffer, p_time );
                         IO::drawSub( );
-                        
+
 
 
                         //shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
@@ -99,6 +102,10 @@ namespace STS {
         _stsUI->draw( _pkmnIdx, _page, true );
 
         touchPosition touch;
+
+        u8 acMode = 0; // 0: normal, 1: show attack details, 2: show ribbon details
+        u8 modeVal = 0;
+
         loop( ) {
             scanKeys( );
             touchRead( &touch );
@@ -107,31 +114,55 @@ namespace STS {
                 IO::updateTime( p_timeParameter );
             int pressed = keysCurrent( );
 
-            if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT( KEY_X ) || GET_AND_WAIT_C( 248, 184, 16 ) ) {
+            if( GET_AND_WAIT( KEY_X ) || ( !acMode && ( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_C( 248, 184, 16 ) ) ) ) {
                 return ( pressed & KEY_X ) | KEY_B;
-            } else if( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) {
+            } else if( !acMode && ( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) ) {
                 _pkmnIdx = ( _pkmnIdx + 1 ) % _pokemon->size( );
                 _stsUI->draw( _pkmnIdx, _page, true );
-            } else if( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) {
+            } else if( !acMode && ( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) ) {
                 _pkmnIdx = ( _pkmnIdx + _pokemon->size( ) - 1 ) % _pokemon->size( );
                 _stsUI->draw( _pkmnIdx, _page, true );
             } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                acMode = 0;
                 _page = ( _page + 1 ) % _stsUI->m_pagemax;
                 _stsUI->draw( _pkmnIdx, _page, false );
             } else if( GET_AND_WAIT( KEY_LEFT ) ) {
+                acMode = 0;
                 _page = ( _page + _stsUI->m_pagemax - 1 ) % _stsUI->m_pagemax;
                 _stsUI->draw( _pkmnIdx, _page, false );
             }
 
             else if( _page != 0 && GET_AND_WAIT_C( 12, 12, 16 ) ) {
                 _page = 0;
+                acMode = 0;
                 _stsUI->draw( _pkmnIdx, _page, false );
             } else if( _page != 1 && GET_AND_WAIT_C( 8, 34, 16 ) ) {
                 _page = 1;
+                acMode = 0;
                 _stsUI->draw( _pkmnIdx, _page, false );
             } else if( _page != 2 && GET_AND_WAIT_C( 34, 10, 16 ) ) {
                 _page = 2;
+                acMode = 0;
                 _stsUI->draw( _pkmnIdx, _page, false );
+            }
+
+            //Mode specific stuff
+
+            else if( acMode == 0 && _page == 1 && GET_AND_WAIT( KEY_A ) ) {
+                acMode = 1;
+                if( !_stsUI->draw( _pkmnIdx, modeVal ) ) {
+                    acMode = 0;
+                    modeVal = 0;
+                }
+            } else if( acMode == 1 && ( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_C( 248, 184, 16 ) ) ) {
+                acMode = 0;
+                _stsUI->draw( _pkmnIdx, _page = 1, false );
+            } else if( acMode == 1 && ( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) ) {
+                do modeVal = ( modeVal + 1 ) % 4;
+                while( !_stsUI->draw( _pkmnIdx, modeVal ) );
+            } else if( acMode == 1 && ( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) ) {
+                do modeVal = ( modeVal + 3 ) % 4;
+                while( !_stsUI->draw( _pkmnIdx, modeVal ) );
             }
         }
 

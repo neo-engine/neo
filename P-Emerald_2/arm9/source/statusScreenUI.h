@@ -15,6 +15,7 @@ namespace STS {
         u8 _showMoveCnt;
 
         virtual void init( u8 p_current, bool p_initTop = true ) = 0;
+        virtual bool draw( u8 p_current, u8 p_moveIdx ) = 0;
         virtual void draw( u8 p_current, u8 p_page, bool p_newpok ) = 0;
         virtual void draw( u8 p_current ) = 0;
     public:
@@ -29,6 +30,7 @@ namespace STS {
     public:
 
         void init( u8 p_current, bool p_initTop = true ) override;
+        bool draw( u8 p_current, u8 p_moveIdx ) override;
         void draw( u8 p_current, u8 p_page, bool p_newpok ) override;
         void draw( u8 p_current ) override;
 
