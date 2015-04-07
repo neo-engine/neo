@@ -195,7 +195,7 @@ namespace IO {
         boldFont->setColor( WHITE_IDX, 2 );
 
         BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-        BG_PALETTE_SUB[ GRAY_IDX ] = STEEL;
+        BG_PALETTE_SUB[ GRAY_IDX ] = GRAY;
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
         BG_PALETTE_SUB[ RED_IDX ] = RED;
         BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;

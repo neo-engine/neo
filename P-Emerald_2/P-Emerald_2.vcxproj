@@ -80,6 +80,7 @@
     <ClCompile Include="arm9\source\statusScreenUI.cpp" />
     <ClCompile Include="arm9\source\type.cpp" />
     <ClCompile Include="arm9\source\uio.cpp" />
+    <ClCompile Include="arm9\source\yesNoBox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />

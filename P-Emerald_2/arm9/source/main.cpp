@@ -100,18 +100,7 @@ GameMod gMod = DEVELOPER;
 GameMod gMod = EMULATOR;
 #endif
 
-void debug( ) {
-
-    //consoleDemoInit( );  //setup the sub screen for printing
-
-    printf( "\n\n\tHello DS dev'rs\n" );
-    printf( "\twww.drunkencoders.com\n" );
-    printf( "\twww.devkitpro.org" );
-
-    loop( );
-}
-
-std::string CodeName = "Executing Exeggcute";
+std::string CodeName = "Fighting Torchic";
 std::string Version = "v0.5";
 
 char acSlot2Game[ 5 ];
