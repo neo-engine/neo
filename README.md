@@ -10,28 +10,29 @@ This game is intended to be played on real hardware, but [DeSmuME 0.9.10](http:/
 Features
 --------
 
-* [ ] A _fully_ working Pokémon engine, including
-    * [ ] Displaying Pokémon _and storing_ Pokémon
-    * [x] A fully working PokéDex, loading its data from the ROM's filesystem
-    * [ ] A _fully_ working battle engine, capable of simulaitng single and double battles
-    * [ ] Loading maps (for now only GBA-style maps are supported, 3D maps are planned)
-      * [ ] _Events_
-      * [ ] _Wild Pokémon encounter_
+Features implemented in a non-master branch are in _italics_.
+
+* [ ] A fully working Pokémon engine, including
+    * [x] The ability to display a Pokémon's status, _including detailed information about the Pokémon's moves and ribbons_
+    * [ ] An in-game Pokémon storage system
+    * [x] A fully working PokéDex, loading its data from the ROM's filesystem _and displaying the various formes of the Pokémon_
+    * [ ] A fully working battle engine, capable of simulaitng single and double battles
+    * [x] The ability to load maps (for now only GBA-style maps are supported, 3D maps are planned) including
+      * [ ] Events
+      * [ ] Wild Pokémon encounter
       * [x] Animated map tiles
       * [x] Player sprite, animated moving and surfing
-    * [ ] _Playing .midi as BGM, user customization of BGM via music stored on the micro SD card_
-    * [ ] RTC, _including overword changes based on time_
-    * [x] Saving the progress to the micro SD
+    * [ ] Playing .midi as BGM, user customization of BGM via music stored on the micro SD card
+    * [ ] RTC, including overword changes based on time
+    * [ ] Saving the progress to the micro SD
     * [ ] Communicating with “the originals”
       * [x] Playing with a save from a GBA version (saving is still not implemented yet, though)
-      * [ ] _Link trading with Gen IV and Gen V games_
+      * [ ] Link trading with Gen IV and Gen V games
     * [x] An almost up-to-date UI
 * [ ] Easy-to-understand and ready-to-(re)use code
     * [x] Strict and intuitive naming conventions
-    * [ ] _Good_ documentation
-    * [x] Modular code
-
-Specific features that still have to be implemented yet are _italic_.
+    * [ ] Good documentation
+    * [x] _Modular code (strict seperation of each feature and between core and UI)_
 
 Some screens
 ------------
