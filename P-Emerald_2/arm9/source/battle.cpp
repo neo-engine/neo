@@ -1306,7 +1306,7 @@ NEXT:
                     acidx = j;
                     break;
                 }
-            if( acidx == -1 )
+            if( acidx == u8( -1 ) )
                 continue;
 
             auto& acPkmn = ACPKMN( acidx, !p_opponent );

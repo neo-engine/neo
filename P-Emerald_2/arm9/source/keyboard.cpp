@@ -69,7 +69,7 @@ namespace IO {
         }
     }
 
-    std::wstring keyboard::getText( u16 p_length, const char* p_msg, bool p_time, bool p_timeParameter ) {
+    std::wstring keyboard::getText( u16 p_length, const char* p_msg ) {
 
         initOAMTable( true );
         u16 nextAvailableTileIdx = 16;
@@ -94,8 +94,6 @@ namespace IO {
         loop( ) {
             scanKeys( );
             touchRead( &touch );
-            if( p_time )
-                updateTime( p_timeParameter );
 
             u16 keyPosX = ( touch.px - x ) / ( width + margin );
             u16 keyPosY = ( touch.py - y ) / ( height + margin );
@@ -106,7 +104,7 @@ namespace IO {
             if( i < p_length && _chars.count( { _ind, { nx, ny } } ) ) {
                 printChoiceBox( nx, ny, nx + width, ny + height, 2, COLOR_IDX, true );
                 printChar( regularFont, _chars[ { _ind, { nx, ny } } ], nx + 4, ny + 4, true );
-                bool res = waitForTouchUp( p_time, p_timeParameter, nx, ny, nx + width, ny + height );
+                bool res = waitForTouchUp( nx, ny, nx + width, ny + height );
 
                 printChoiceBox( nx, ny, nx + width, ny + height, 2, COLOR_IDX, false );
                 printChar( regularFont, _chars[ { _ind, { nx, ny } } ], nx + 2, ny + 2, true );
@@ -122,8 +120,6 @@ namespace IO {
             } else if( GET_AND_WAIT_C( 248, 162, 16 ) ) {
                 _ind = ( _ind + 1 ) % MAXKEYBOARDS;
                 draw( p_msg, out, p_length );
-                if( p_time )
-                    updateTime( p_timeParameter );
             } else if( GET_AND_WAIT_C( 248, 184, 16 ) ) {
                 return out;
             } else if( GET_AND_WAIT_C( 220, 184, 16 ) ) {

@@ -238,6 +238,12 @@ u8 DayTimes[ 4 ][ 5 ] = {
     { 7, 9, 13, 19, 23 }
 };
 
+int hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
+int achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
+u8 frame = 0;
+bool DRAW_TIME = false;
+bool ANIMATE_MAP = true;
+
 u8 getCurrentDaytime( ) {
     time_t unixTime = time( NULL );
     struct tm* timeStruct = gmtime( (const time_t *)&unixTime );
@@ -300,6 +306,8 @@ void killWeiter( ) {
 }
 
 ChoiceResult opScreen( ) {
+    return OPTIONS;
+
     consoleSelect( &IO::Top );
     consoleClear( );
 
@@ -451,10 +459,8 @@ bool heroIsBig = false;
 
 
 void startScreen( ) {
-
     //irqInit( );
     irqEnable( IRQ_VBLANK );
-    irqSet( IRQ_VBLANK, [ ]( ) { scanKeys( ); } );
 
     IO::vramSetup( );
 
@@ -564,18 +570,14 @@ START:
     time_t uTime = time( NULL );
     tm* tStruct = gmtime( (const time_t *)&uTime );
 
-    IO::hours = tStruct->tm_hour;
-    IO::month = tStruct->tm_min;
-    IO::seconds = tStruct->tm_sec;
-    IO::day = tStruct->tm_mday;
-    IO::month = tStruct->tm_mon + 1;
-    IO::year = tStruct->tm_year + 1900;
+    hours = tStruct->tm_hour;
+    month = tStruct->tm_min;
+    seconds = tStruct->tm_sec;
+    day = tStruct->tm_mday;
+    month = tStruct->tm_mon + 1;
+    year = tStruct->tm_year + 1900;
 
-    IO::ticks = 0;
-    timerStart( 0, ClockDivider_1024, 0, NULL );
-    IO::ticks += timerElapsed( 0 );
-
-    srand( IO::hours ^ ( 100 * IO::minutes ) ^ ( 10000 * IO::seconds ) ^ ( IO::day ^ ( 100 * IO::month ) ^ IO::year ) );
+    srand( hours ^ ( 100 * minutes ) ^ ( 10000 * seconds ) ^ ( day ^ ( 100 * month ) ^ year ) );
     LastPID = rand( );
 
     //StartMenu
@@ -737,6 +739,7 @@ START:
                 goto START;
         case OPTIONS:
             FS::SAV = new FS::saveGame( );
+            wcscpy( FS::SAV->m_playername, L"Test" );
             FS::SAV->m_activatedPNav = false;
             FS::SAV->m_money = 3000;
             FS::SAV->m_id = rand( ) % 65536;
@@ -754,6 +757,7 @@ START:
             memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
 
             FS::SAV->m_overWorldIdx = 0;
+            FS::SAV->m_isMale = true;
             strcpy( FS::SAV->m_acMapName, "0/98" );
             FS::SAV->m_acMapIdx = 1000;
             FS::SAV->m_acposx = 2 * 20, FS::SAV->m_acposy = 25 * 20, FS::SAV->m_acposz = 3;
@@ -774,14 +778,13 @@ void showNewMap( u16 p_mapIdx ) {
     //        if( m.m_ind != p_mapIdx )
     //            continue;
     //        acMapRegion = Region( i + 1 );
-    //        scrn.draw( mode = 1 + i );
     //        printMapLocation( m );
     //        IO::Oam->oamBuffer[ SQCH_ID ].x = IO::Oam->oamBuffer[ SQCH_ID + 1 ].x = ( m.m_lx + m.m_rx ) / 2 - 8;
     //        IO::Oam->oamBuffer[ SQCH_ID ].y = IO::Oam->oamBuffer[ SQCH_ID + 1 ].y = ( m.m_ly + m.m_ry ) / 2 - 8;
     //        IO::Oam->oamBuffer[ SQCH_ID ].isHidden = IO::Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = false;
     //        updateOAM( true );
 
-    //        FS::SAV->m_acMapIdx = p_mapIdx;
+    FS::SAV->m_acMapIdx = p_mapIdx;
 
     //        swiWaitForIRQ( );
     //        swiWaitForVBlank( );
@@ -838,8 +841,9 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 2, 0 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 2, 0 );
                 bgUpdate( );
@@ -847,8 +851,9 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 2, 0 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 return;
             case 2:
                 for( u8 i = 1; i < 4; ++i )
@@ -871,8 +876,9 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, 2 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, 2 );
                 bgUpdate( );
@@ -880,8 +886,9 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, 2 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 return;
             case 3:
                 for( u8 i = 1; i < 4; ++i )
@@ -904,8 +911,9 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], -2, 0 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], -2, 0 );
                 bgUpdate( );
@@ -913,8 +921,9 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], -2, 0 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 return;
             case 4:
                 for( u8 i = 1; i < 4; ++i )
@@ -933,21 +942,23 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                         loadframe( &IO::spriteInfoTop[ 0 ], FS::SAV->m_overWorldIdx, 15, heroIsBig );
                 }
                 IO::updateOAM( false );
-                swiWaitForVBlank( );
+                {swiWaitForVBlank( );  }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, -2 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, -2 );
                 bgUpdate( );
-                swiWaitForVBlank( );
+                {swiWaitForVBlank( );  }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, -2 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 return;
             default:
                 break;
@@ -961,19 +972,22 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 IO::updateOAM( false );
                 return;
             case 1:
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 2, 0 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 2, 0 );
                 IO::OamTop->oamBuffer[ 0 ].hFlip = true;
                 IO::updateOAM( false );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 if( !run )
                     loadframe( &IO::spriteInfoTop[ 0 ], FS::SAV->m_overWorldIdx, 2, heroIsBig );
                 else
@@ -982,24 +996,27 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 2, 0 );
                 bgUpdate( );
-                swiWaitForVBlank( );
+                {swiWaitForVBlank( );  }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 2, 0 );
                 bgUpdate( );
                 return;
             case 2:
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, 2 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, 2 );
                 IO::updateOAM( false );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 IO::OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run )
                     loadframe( &IO::spriteInfoTop[ 0 ], FS::SAV->m_overWorldIdx, 0, heroIsBig );
@@ -1009,19 +1026,21 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, 2 );
                 bgUpdate( );
-                swiWaitForVBlank( );
+                {swiWaitForVBlank( );  }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, 2 );
                 bgUpdate( );
                 return;
             case 3:
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], -2, 0 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], -2, 0 );
                 IO::OamTop->oamBuffer[ 0 ].hFlip = false;
@@ -1034,24 +1053,27 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], -2, 0 );
                 bgUpdate( );
-                swiWaitForVBlank( );
+                {swiWaitForVBlank( );  }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], -2, 0 );
                 bgUpdate( );
                 return;
             case 4:
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, -2 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, -2 );
                 bgUpdate( );
-                if( !run )
+                if( !run ) {
                     swiWaitForVBlank( );
+                }
                 IO::OamTop->oamBuffer[ 0 ].hFlip = false;
                 if( !run )
                     loadframe( &IO::spriteInfoTop[ 0 ], FS::SAV->m_overWorldIdx, 1, heroIsBig );
@@ -1061,7 +1083,7 @@ void animateHero( int p_dir, int p_frame, bool p_runDisable = false ) {
                     bgScroll( MAP::bgs[ i ], 0, -2 );
                 IO::updateOAM( false );
                 bgUpdate( );
-                swiWaitForVBlank( );
+                {swiWaitForVBlank( );  }
                 for( u8 i = 1; i < 4; ++i )
                     bgScroll( MAP::bgs[ i ], 0, -2 );
                 bgUpdate( );
@@ -1428,27 +1450,29 @@ void initMapSprites( ) {
 
 int stepcnt = 0;
 void stepincrease( ) {
-    //stepcnt = ( stepcnt + 1 ) % 256;
-    //if( stepcnt == 0 ) {
-    //    for( size_t s = 0; s < FS::SAV->m_PkmnTeam.size( ); ++s ) {
-    //        pokemon& ac = FS::SAV->m_PkmnTeam[ s ];
+    stepcnt = ( stepcnt + 1 ) % 256;
+    if( stepcnt == 0 ) {
+        for( size_t s = 0; s < 6; ++s ) {
+            pokemon& ac = FS::SAV->m_pkmnTeam[ s ];
+            if( !ac.m_boxdata.m_speciesId )
+                break;
 
-    //        if( ac.m_boxdata.m_individualValues.m_isEgg ) {
-    //            ac.m_boxdata.m_steps--;
-    //            if( ac.m_boxdata.m_steps == 0 ) {
-    //                ac.m_boxdata.m_individualValues.m_isEgg = false;
-    //                ac.m_boxdata.m_hatchPlace = FS::SAV->m_acMapIdx;
-    //                ac.m_boxdata.m_hatchDate[ 0 ] = acday;
-    //                ac.m_boxdata.m_hatchDate[ 1 ] = acmonth + 1;
-    //                ac.m_boxdata.m_hatchDate[ 2 ] = ( acyear + 1900 ) % 100;
-    //                char buffer[ 50 ];
-    //                sprintf( buffer, "%ls schüpfte\naus dem Ei!", ac.m_boxdata.m_name );
-    //                IO::messageBox M( buffer );
-    //            }
-    //        } else
-    //            ac.m_boxdata.m_steps = std::min( 255, ac.m_boxdata.m_steps + 1 );
-    //    }
-    //}
+            if( ac.m_boxdata.m_individualValues.m_isEgg ) {
+                ac.m_boxdata.m_steps--;
+                if( ac.m_boxdata.m_steps == 0 ) {
+                    ac.m_boxdata.m_individualValues.m_isEgg = false;
+                    ac.m_boxdata.m_hatchPlace = FS::SAV->m_acMapIdx;
+                    ac.m_boxdata.m_hatchDate[ 0 ] = acday;
+                    ac.m_boxdata.m_hatchDate[ 1 ] = acmonth + 1;
+                    ac.m_boxdata.m_hatchDate[ 2 ] = ( acyear + 1900 ) % 100;
+                    char buffer[ 50 ];
+                    sprintf( buffer, "%ls schüpfte\naus dem Ei!", ac.m_boxdata.m_name );
+                    IO::messageBox M( buffer );
+                }
+            } else
+                ac.m_boxdata.m_steps = std::min( 255, ac.m_boxdata.m_steps + 1 );
+        }
+    }
 }
 
 void cut::use( ) { }
@@ -1551,8 +1575,6 @@ DEX::dexUI dui( true, 1, FS::SAV->m_hasGDex ? 649 : 493 );
 DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
 
 int main( int p_argc, char** p_argv ) {
-
-
     //Init
     powerOn( POWER_ALL_2D );
 
@@ -1567,6 +1589,45 @@ int main( int p_argc, char** p_argv ) {
 
     startScreen( );
 
+    irqSet( IRQ_VBLANK, [ ]( ) {
+        scanKeys( );
+
+        if( ANIMATE_MAP ) {
+            animateMap( ++frame );
+        }
+
+        IO::boldFont->setColor( 0, 0 );
+        IO::boldFont->setColor( 0, 1 );
+        IO::boldFont->setColor( BLACK_IDX, 2 );
+        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
+        time_t unixTime = time( NULL );
+        struct tm* timeStruct = gmtime( (const time_t *)&unixTime );
+
+        if( acseconds != timeStruct->tm_sec || DRAW_TIME ) {
+            DRAW_TIME = false;
+            BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
+            IO::boldFont->setColor( WHITE_IDX, 1 );
+            IO::boldFont->setColor( WHITE_IDX, 2 );
+
+            char buffer[ 50 ];
+            sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
+            IO::boldFont->printString( buffer, 18 * 8, 192 - 16, true );
+
+            achours = timeStruct->tm_hour;
+            acminutes = timeStruct->tm_min;
+            acseconds = timeStruct->tm_sec;
+
+            IO::boldFont->setColor( 0, 1 );
+            IO::boldFont->setColor( BLACK_IDX, 2 );
+            sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
+            IO::boldFont->printString( buffer, 18 * 8, 192 - 16, true );
+        }
+        achours = timeStruct->tm_hour;
+        acminutes = timeStruct->tm_min;
+        acday = timeStruct->tm_mday;
+        acmonth = timeStruct->tm_mon;
+        acyear = timeStruct->tm_year + 1900;
+    } );
 
     heroIsBig = FS::SAV->m_acMoveMode != MAP::MoveMode::WALK;
 
@@ -1590,12 +1651,8 @@ int main( int p_argc, char** p_argv ) {
     IO::updateOAM( false );
 
     IO::drawSub( );
-    //Eliminate the time stamp when the rtc does not work
-    IO::updateTime( s8( 1 ) );
-    IO::drawSub( );
 
     char buffer[ 120 ] = { 0 };
-    swiWaitForIRQ( );
     swiWaitForVBlank( );
 
     initMainSprites( );
@@ -1606,7 +1663,7 @@ int main( int p_argc, char** p_argv ) {
     consoleClear( );
 
     loop( ) {
-        IO::updateTime( s8( 1 ) );
+
         swiWaitForVBlank( );
         touchRead( &touch );
         int pressed = keysUp( ), held = keysHeld( );
@@ -1649,7 +1706,7 @@ int main( int p_argc, char** p_argv ) {
                             if( yn.getResult( buffer ) ) {
                                 IO::drawSub( );
                                 sprintf( buffer, "%ls setzt %s\nein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-                                IO::messageBox( buffer, true, true );
+                                IO::messageBox( buffer, true );
                                 shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
                                 AttackList[ a.m_boxdata.m_moves[ i ] ]->use( );
                             }
@@ -1726,8 +1783,6 @@ OUT:
                 continue;
         }
         //StartBag
-#define p_time true
-#define p_timeParameter (s8(1))
         if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 6 ],
             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 7 ], 16 ) ) {
 
@@ -1747,7 +1802,9 @@ OUT:
                     break;
             STS::regStsScreenUI rsUI( &tmp );
             STS::regStsScreen sts( 0, &rsUI );
-            sts.run( true, s8( 1 ) );
+            ANIMATE_MAP = false;
+
+            sts.run( );
 
             for( u8 i = 0; i < tmp.size( ); ++i )
                 FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
@@ -1762,10 +1819,11 @@ OUT:
             initMapSprites( );
             initMainSprites( );
             movePlayerOnMap( FS::SAV->m_acposx / 20, FS::SAV->m_acposy / 20, FS::SAV->m_acposz, true );
+            ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ],        //StartDex
             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 5 ], 16 ) ) {
-
-            dx.run( dui.currPkmn( ), true, 0 );
+            ANIMATE_MAP = false;
+            dx.run( dui.currPkmn( ) );
 
             consoleSelect( &IO::Top );
             consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
@@ -1777,6 +1835,7 @@ OUT:
             initMapSprites( );
             initMainSprites( );
             movePlayerOnMap( FS::SAV->m_acposx / 20, FS::SAV->m_acposy / 20, FS::SAV->m_acposz, true );
+            ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 8 ],        //StartOptions
             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 9 ], 16 ) ) {
 
@@ -1853,6 +1912,7 @@ OUT:
                     BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...", "Yay gewonnen!", "Das war wohl eine Niederlage...", &( cpy ), 0 );
 
                     BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::DOUBLE );
+                    ANIMATE_MAP = false;
                     test_battle.start( );
                     for( u8 i = 0; i < tmp.size( ); ++i )
                         FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
@@ -1878,6 +1938,7 @@ OUT:
                     BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...", "Yay gewonnen!", "Das war wohl eine Niederlage...", &( cpy ), 0 );
 
                     BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::SINGLE );
+                    ANIMATE_MAP = false;
                     test_battle.start( );
                     for( u8 i = 0; i < tmp.size( ); ++i )
                         FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
@@ -1899,6 +1960,7 @@ OUT:
                 initMapSprites( );
                 movePlayerOnMap( FS::SAV->m_acposx / 20, FS::SAV->m_acposy / 20, FS::SAV->m_acposz, true );
             }
+            ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 10 ],  //Start Pokénav
             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 11 ], 16 ) ) {
 

@@ -13,7 +13,7 @@ namespace IO {
             = _color[ 3 ] = _color[ 4 ] = RGB( 31, 31, 31 );
         _shiftchar = p_shiftchar;
     }
-    
+
     void font::printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom ) {
         _shiftchar( p_ch );
 
@@ -65,7 +65,7 @@ namespace IO {
         printRectangle( p_x, p_y, p_x + 5, p_y + 9, true, false, (u8)250 );
     }
 
-    void font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, s8 p_updateTimePar ) {
+    void font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -98,13 +98,11 @@ namespace IO {
                             drawContinue( *this, 243, 51 );
                         on = !on;
                     }
-                    if( p_updateTime )
-                        updateTime( p_updateTimePar );
                     if( keysUp( ) & KEY_A )
                         break;
                     auto t = touchReadXY( );
                     if( t.px > 224 && t.py > 164
-                        && waitForTouchUp( p_updateTime, p_updateTimePar, 224, 164 ) ) {
+                        && waitForTouchUp( 224, 164 ) ) {
                         break;
                     }
                 }
@@ -127,7 +125,7 @@ namespace IO {
             current_char++;
         }
     }
-    void font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, s8 p_updateTimePar ) {
+    void font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -160,13 +158,11 @@ namespace IO {
                             drawContinue( *this, 243, 51 );
                         on = !on;
                     }
-                    if( p_updateTime )
-                        updateTime( p_updateTimePar );
                     if( keysUp( ) & KEY_A )
                         break;
                     auto t = touchReadXY( );
                     if( t.px > 224 && t.py > 164
-                        && waitForTouchUp( p_updateTime, p_updateTimePar, 224, 164 ) ) {
+                        && waitForTouchUp( 224, 164 ) ) {
                         break;
                     }
                 }
@@ -189,7 +185,7 @@ namespace IO {
             current_char++;
         }
     }
-    void font::printMBStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, s8 p_updateTimePar ) {
+    void font::printMBStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -222,13 +218,11 @@ namespace IO {
                             drawContinue( *this, 243, 51 );
                         on = !on;
                     }
-                    if( p_updateTime )
-                        updateTime( p_updateTimePar );
                     if( keysUp( ) & KEY_A )
                         break;
                     auto t = touchReadXY( );
                     if( t.px > 224 && t.py > 164
-                        && waitForTouchUp( p_updateTime, p_updateTimePar, 224, 164 ) ) {
+                        && waitForTouchUp( 224, 164 ) ) {
                         break;
                     }
                 }
@@ -253,7 +247,7 @@ namespace IO {
             current_char++;
         }
     }
-    void font::printMBStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, s8 p_updateTimePar ) {
+    void font::printMBStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -286,13 +280,11 @@ namespace IO {
                             drawContinue( *this, 243, 51 );
                         on = !on;
                     }
-                    if( p_updateTime )
-                        updateTime( p_updateTimePar );
                     if( keysUp( ) & KEY_A )
                         break;
                     auto t = touchReadXY( );
                     if( t.px > 224 && t.py > 164
-                        && waitForTouchUp( p_updateTime, p_updateTimePar, 224, 164 ) ) {
+                        && waitForTouchUp( 224, 164 ) ) {
                         break;
                     }
                 }

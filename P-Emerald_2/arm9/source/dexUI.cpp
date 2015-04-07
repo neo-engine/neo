@@ -158,7 +158,7 @@ namespace DEX {
     u16 oldPkmn;
     u8 oldForme = -1;
 #define IN_DEX(pidx) ( FS::SAV->m_inDex[ (pidx) / 8 ] & ( 1 << ( (pidx) % 8 ) ) )
-    void dexUI::undrawFormes( u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName ) {
+    void dexUI::undrawFormes( u16 p_formeIdx ) {
         //Print over the text the same text, but with the color of the background
         pokemonData data2; getAll( _currPkmn, data2 );
         if( !( _useInDex ) || IN_DEX( _currPkmn ) ) {
@@ -241,7 +241,7 @@ namespace DEX {
                 dmaCopy( DexTop2Bitmap, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
                 dmaCopy( DexTop2Pal, BG_PALETTE, 256 * 2 );
             } else
-                undrawFormes( newformepkmn, isFixed, formeName );
+                undrawFormes( newformepkmn );
         }
 
         consoleSelect( &IO::Top );

@@ -16,7 +16,7 @@ namespace STS {
         _stsUI = p_stsUI;
     }
 
-    void regStsScreen::run( bool p_time, s8 p_timeParameter ) {
+    void regStsScreen::run( ) {
         _stsUI->init( _pkmnIdx );
         touchPosition touch;
 
@@ -24,14 +24,12 @@ namespace STS {
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );
-            if( p_time )
-                IO::updateTime( p_timeParameter );
             int pressed = keysCurrent( );
 
             if( GET_AND_WAIT( KEY_X ) || GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
                 break;
             } else if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT_C( 128, 96, 16 ) ) {
-                auto res = drawPage( p_time, p_timeParameter );
+                auto res = drawPage( );
                 if( res & KEY_X )
                     break;
                 else if( res & KEY_B ) {
@@ -54,13 +52,13 @@ namespace STS {
                 consoleClear( );
 
                 sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_name );
-                IO::messageBox( buffer, p_time );
+                IO::messageBox a( buffer );
                 FS::SAV->m_bag->insert( BAG::toBagType( acI.getItemType( ) ), acI.getItemId( ), 1 );
                 _stsUI->init( _pkmnIdx );
             } else if( GET_AND_WAIT_R( 152, !!( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) * ( -7 + 24 * ( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) ),
                 300, ( 17 + 24 * ( _stsUI->_showMoveCnt + _stsUI->_showTakeItem ) ) ) ) {
 
-                DEX::dex( -1, 0 ).run( ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_speciesId, p_time, p_timeParameter );
+                DEX::dex( -1, 0 ).run( ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_speciesId );
 
                 _stsUI->init( _pkmnIdx );
             }
@@ -79,10 +77,8 @@ namespace STS {
                         char buffer[ 50 ];
                         sprintf( buffer, "%ls setzt %s\nein!", ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_name,
                                  AttackList[ ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
-                        IO::messageBox( buffer, p_time );
+                        IO::messageBox a( buffer );
                         IO::drawSub( );
-
-
 
                         //shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
                         //              (*_pokemon)[_pkmnIdx ].m_boxdata.m_isFemale, (*_pokemon)[_pkmnIdx ].m_boxdata.isShiny( ) );
@@ -90,7 +86,7 @@ namespace STS {
                         AttackList[ ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->use( );
                         return;
                     } else {
-                        IO::messageBox( "Diese Attacke kann jetzt\nnicht eingesetzt werden.", "PokéNav", p_time );
+                        IO::messageBox( "Diese Attacke kann jetzt\nnicht eingesetzt werden.", "PokéNav" );
                         _stsUI->init( _pkmnIdx, false );
                     }
                     break;
@@ -99,7 +95,7 @@ namespace STS {
         }
 
     }
-    s16 regStsScreen::drawPage( bool p_time, s8 p_timeParameter ) {
+    s16 regStsScreen::drawPage( ) {
         _stsUI->draw( _pkmnIdx, _page, true );
 
         touchPosition touch;
@@ -112,8 +108,6 @@ namespace STS {
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );
-            if( p_time )
-                IO::updateTime( p_timeParameter );
             int pressed = keysCurrent( );
 
             if( GET_AND_WAIT( KEY_X ) || ( !acMode && ( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_C( 248, 184, 16 ) ) ) ) {

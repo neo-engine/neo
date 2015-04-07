@@ -32,7 +32,7 @@ namespace IO {
         _isNamed = p_box.m_isNamed;
     }
 
-    bool yesNoBox::getResult( const char* p_text = 0, bool p_time ) {
+    bool yesNoBox::getResult( const char* p_text = 0 ) {
         if( p_text ) {
             if( _isNamed )
                 regularFont->printStringD( p_text, 72, 8, true );
@@ -43,13 +43,11 @@ namespace IO {
         bool result;
         loop( ) {
             swiWaitForVBlank( );
-            if( p_time )
-                updateTime( );
             touchPosition t;
             touchRead( &t );
             if( t.px >= 28 && t.py >= 102 && t.px <= 122 && t.py <= 134 ) {
                 draw( 0 );
-                if( !waitForTouchUp( p_time, false, 28, 102, 122, 134 ) ) {
+                if( !waitForTouchUp( 28, 102, 122, 134 ) ) {
                     draw( 2 );
                     continue;
                 }
@@ -57,7 +55,7 @@ namespace IO {
                 break;
             } else if( t.px >= 134 && t.py >= 102 && t.px <= 228 && t.py <= 134 ) {
                 draw( 1 );
-                if( !waitForTouchUp( p_time, false, 134, 102, 228, 134 ) ) {
+                if( !waitForTouchUp( 134, 102, 228, 134 ) ) {
                     draw( 2 );
                     continue;
                 }
@@ -67,7 +65,7 @@ namespace IO {
         }
         return result;
     }
-    bool yesNoBox::getResult( const wchar_t* p_text = 0, bool p_time ) {
+    bool yesNoBox::getResult( const wchar_t* p_text = 0 ) {
         if( p_text ) {
             if( _isNamed )
                 regularFont->printStringD( p_text, 72, 8, true );
@@ -78,13 +76,11 @@ namespace IO {
         bool result;
         loop( ) {
             swiWaitForVBlank( );
-            if( p_time )
-                updateTime( );
             touchPosition t;
             touchRead( &t );
             if( t.px >= 28 && t.py >= 102 && t.px <= 122 && t.py <= 134 ) {
                 draw( 0 );
-                if( !waitForTouchUp( p_time, false, 28, 102, 122, 134 ) ) {
+                if( !waitForTouchUp( 28, 102, 122, 134 ) ) {
                     draw( 2 );
                     continue;
                 }
@@ -92,7 +88,7 @@ namespace IO {
                 break;
             } else if( t.px >= 134 && t.py >= 102 && t.px <= 228 && t.py <= 134 ) {
                 draw( 1 );
-                if( !waitForTouchUp( p_time, false, 134, 102, 228, 134 ) ) {
+                if( !waitForTouchUp( 134, 102, 228, 134 ) ) {
                     draw( 2 );
                     continue;
                 }

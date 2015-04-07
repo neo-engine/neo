@@ -353,7 +353,7 @@ namespace FS {
     }
 
     const char* getLoc( u16 p_ind ) {
-        if( p_ind < 0 || p_ind > 5000 )
+        if( p_ind > 5000 )
             return "Entfernter Ort";
 
         sprintf( buffer, "nitro:/LOCATIONS/%i.data", p_ind );

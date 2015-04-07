@@ -32,6 +32,12 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 //#define USE_AS_LIB
 
+extern bool DRAW_TIME;
+extern bool ANIMATE_MAP;
+
+extern int achours, acseconds, acminutes, acday, acmonth, acyear;
+extern int hours, seconds, minutes, day, month, year;
+
 extern unsigned int TEMP[ 12288 ];
 extern unsigned short TEMP_PAL[ 256 ];
 
@@ -41,11 +47,11 @@ extern unsigned short TEMP_PAL[ 256 ];
                                     && (p_touch).px <= (p_input).m_targetX2 && (p_touch).py <= (p_input).m_targetY2 )
 #define IN_RANGE_C( p_touch, p_input ) ( sqrt( sq( (p_touch).px - (p_input).m_targetX1 ) + sq( (p_touch).py - (p_input).m_targetY1 ) ) <= (p_input).m_targetR )
 
-#define GET_AND_WAIT( key ) ( ( pressed & key ) && IO::waitForInput( p_time, p_timeParameter, IO::inputTarget( key ) ) )
+#define GET_AND_WAIT( key ) ( ( pressed & key ) && IO::waitForInput( IO::inputTarget( key ) ) )
 #define GET_AND_WAIT_R( p_x1, p_y1, p_x2, p_y2 ) ( IN_RANGE( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) )\
-                                        && IO::waitForInput( p_time, p_timeParameter, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) )
+                                        && IO::waitForInput( IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) )
 #define GET_AND_WAIT_C( p_x, p_y, p_r ) ( IN_RANGE_C( touch, IO::inputTarget( p_x, p_y, p_r ) )\
-                                    && IO::waitForInput( p_time, p_timeParameter, IO::inputTarget( p_x, p_y, p_r ) ) )
+                                    && IO::waitForInput( IO::inputTarget( p_x, p_y, p_r ) ) )
 
 #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 #define COMPL(a) ( RGB( 31 - ( (a) >> 10 ) % 32,31 - ( (a) >> 5 ) % 32,31 - (a) % 32 ) )

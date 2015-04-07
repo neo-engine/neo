@@ -36,7 +36,7 @@ namespace IO {
     public:
         keyboard( );
 
-        std::wstring getText( u16 p_length, const char* p_msg = 0, bool p_time = true, bool p_timeParameter = false );
+        std::wstring getText( u16 p_length, const char* p_msg = 0 );
 
     private:
         u8 _ind;

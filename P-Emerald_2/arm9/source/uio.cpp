@@ -36,10 +36,6 @@ namespace IO {
     int bg3;
     int bg2;
 
-    int hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
-    int achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
-    u32 ticks = 0;
-
     u8 mainSpritesPositions[ 12 ] = { 24, 64,
         236, 96,
         20, 128,
@@ -113,6 +109,8 @@ namespace IO {
     void drawBorder( ) {
         dmaCopy( BorderBitmap, bgGetGfxPtr( bg2sub ), 256 * 192 );
         dmaCopy( BorderPal, BG_PALETTE_SUB, 64 );
+
+        DRAW_TIME = true;
     }
 
     void drawSub( u8 p_newIdx ) {
@@ -134,82 +132,14 @@ namespace IO {
         drawBorder( );
     }
 
-    std::pair<u8, u8> acMapPoint = std::pair<u8, u8>( 32, 24 );
-    bool showfirst = true, showmappointer = false;
-
-    u8 frame = 0;
-
-    void updateTime( s8 p_mapMode ) {
-        bool mm = false;
-        if( -1 != p_mapMode )
-            mm = p_mapMode;
-
-
-        boldFont->setColor( 0, 0 );
-        boldFont->setColor( 0, 1 );
-        boldFont->setColor( 252, 2 );
-        BG_PALETTE_SUB[ 251 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE_SUB[ 252 ] = RGB15( 3, 3, 3 );
-
-        frame = ( frame + 1 ) % 256;
-        //if( mm )
-        //    animateMap( frame );
-
-        time_t unixTime = time( NULL );
-        struct tm* timeStruct = gmtime( (const time_t *)&unixTime );
-
-        if( acseconds != timeStruct->tm_sec ) {
-            if( showmappointer ) {
-                if( showfirst ) {
-                    showfirst = false;
-                    Oam->oamBuffer[ SQCH_ID ].isHidden = true;
-                    Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = false;
-                } else {
-                    showfirst = true;
-                    Oam->oamBuffer[ SQCH_ID ].isHidden = false;
-                    Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
-                }
-                updateOAM( true );
-            } else {
-                Oam->oamBuffer[ SQCH_ID ].isHidden = true;
-                Oam->oamBuffer[ SQCH_ID + 1 ].isHidden = true;
-                updateOAM( true );
-            }
-
-            BG_PALETTE_SUB[ 249 ] = RGB15( 31, 31, 31 );
-            boldFont->setColor( 249, 1 );
-            boldFont->setColor( 249, 2 );
-
-            char buffer[ 50 ];
-            sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-            boldFont->printString( buffer, 18 * 8, 192 - 16, true );
-
-            achours = timeStruct->tm_hour;
-            acminutes = timeStruct->tm_min;
-            acseconds = timeStruct->tm_sec;
-
-            boldFont->setColor( 0, 1 );
-            boldFont->setColor( 252, 2 );
-            sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-            boldFont->printString( buffer, 18 * 8, 192 - 16, true );
-        }
-        achours = timeStruct->tm_hour;
-        acminutes = timeStruct->tm_min;
-        acday = timeStruct->tm_mday;
-        acmonth = timeStruct->tm_mon;
-        acyear = timeStruct->tm_year + 1900;
+    bool waitForTouchUp( u16 p_targetX1, u16 p_targetY1, u16 p_targetX2, u16 p_targetY2 ) {
+        return waitForTouchUp( inputTarget( p_targetX1, p_targetY1, p_targetX2, p_targetY2 ) );
     }
-
-    bool waitForTouchUp( bool p_updateTime, s8 p_timeParameter, u16 p_targetX1, u16 p_targetY1, u16 p_targetX2, u16 p_targetY2 ) {
-        return waitForTouchUp( p_updateTime, p_timeParameter, inputTarget( p_targetX1, p_targetY1, p_targetX2, p_targetY2 ) );
-    }
-    bool waitForTouchUp( bool p_updateTime, s8 p_timeParameter, inputTarget p_inputTarget ) {
+    bool waitForTouchUp( inputTarget p_inputTarget ) {
         if( p_inputTarget.m_inputType == inputTarget::inputType::TOUCH ) {
             loop( ) {
                 swiWaitForVBlank( );
                 scanKeys( );
-                if( p_updateTime )
-                    updateTime( p_timeParameter );
                 auto touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
                     return true;
@@ -221,8 +151,6 @@ namespace IO {
             loop( ) {
                 swiWaitForVBlank( );
                 scanKeys( );
-                if( p_updateTime )
-                    updateTime( p_timeParameter );
                 auto touch = touchReadXY( );
                 if( touch.px == 0 && touch.py == 0 )
                     return true;
@@ -234,29 +162,27 @@ namespace IO {
     }
 
 
-    void waitForKeysUp( bool p_updateTime, s8 p_timeParameter, KEYPAD_BITS p_keys ) {
-        return waitForKeysUp( p_updateTime, p_timeParameter, inputTarget( p_keys ) );
+    void waitForKeysUp( KEYPAD_BITS p_keys ) {
+        return waitForKeysUp( inputTarget( p_keys ) );
     }
-    void waitForKeysUp( bool p_updateTime, s8 p_timeParameter, inputTarget p_inputTarget ) {
+    void waitForKeysUp( inputTarget p_inputTarget ) {
         if( p_inputTarget.m_inputType == inputTarget::inputType::BUTTON ) {
             loop( ) {
                 scanKeys( );
                 keysCurrent( );
                 swiWaitForVBlank( );
-                if( p_updateTime )
-                    updateTime( p_timeParameter );
                 if( keysUp( ) & p_inputTarget.m_keys )
                     return;
             }
         }
     }
 
-    bool waitForInput( bool p_updateTime, s8 p_timeParameter, inputTarget p_inputTarget ) {
+    bool waitForInput( inputTarget p_inputTarget ) {
         if( p_inputTarget.m_inputType == inputTarget::inputType::BUTTON ) {
-            waitForKeysUp( p_updateTime, p_timeParameter, p_inputTarget );
+            waitForKeysUp( p_inputTarget );
             return true;
         }
-        return waitForTouchUp( p_updateTime, p_timeParameter, p_inputTarget );
+        return waitForTouchUp( p_inputTarget );
     }
 
 
@@ -410,17 +336,17 @@ namespace IO {
     void printString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance ) {
         p_font->printString( p_string, p_x, p_y, p_bottom, p_yDistance );
     }
-    void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, s8 p_updateTimePar ) {
-        p_font->printMBString( p_string, p_x, p_y, p_bottom, p_updateTime, p_updateTimePar );
+    void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+        p_font->printMBString( p_string, p_x, p_y, p_bottom );
     }
-    void printMBString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, s8 p_updateTimePar ) {
-        p_font->printMBString( p_string, p_x, p_y, p_bottom, p_updateTime, p_updateTimePar );
+    void printMBString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+        p_font->printMBString( p_string, p_x, p_y, p_bottom );
     }
-    void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, s8 p_updateTimePar ) {
-        p_font->printMBStringD( p_string, p_x, p_y, p_bottom, p_updateTime, p_updateTimePar );
+    void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+        p_font->printMBStringD( p_string, p_x, p_y, p_bottom );
     }
-    void printMBStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime, s8 p_updateTimePar ) {
-        p_font->printMBStringD( p_string, p_x, p_y, p_bottom, p_updateTime, p_updateTimePar );
+    void printMBStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+        p_font->printMBStringD( p_string, p_x, p_y, p_bottom );
     }
     void printStringCenter( font* p_font, const wchar_t *p_string, bool p_bottom ) {
         p_font->printStringCenter( p_string, p_bottom );

@@ -279,16 +279,12 @@ namespace BATTLE {
         dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
         dmaCopy( mug_001_1Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         dmaCopy( mug_001_1Pal, BG_PALETTE, 64 );
-        for( u8 i = 0; i < 40; ++i ) {
+        for( u8 i = 0; i < 40; ++i )
             swiWaitForVBlank( );
-            IO::updateTime( );
-        }
         dmaCopy( mug_001_2Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         dmaCopy( mug_001_2Pal, BG_PALETTE, 64 );
-        for( u8 i = 0; i < 120; ++i ) {
+        for( u8 i = 0; i < 120; ++i )
             swiWaitForVBlank( );
-            IO::updateTime( );
-        }
 
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
     }
@@ -442,7 +438,7 @@ namespace BATTLE {
         touchPosition touch;
         auto& result = _battle->_battleMoves[ p_pokemonPos ][ PLAYER ];
         loop( ) {
-            IO::updateTime( false );
+
             scanKeys( );
             touch = touchReadXY( );
 
@@ -598,7 +594,7 @@ SHOW_ATTACK:
         touchPosition touch;
         loop( ) {
 NEXT:
-            IO::updateTime( false );
+
             scanKeys( );
             touch = touchReadXY( );
 
@@ -627,7 +623,7 @@ NEXT:
 
                     loop( ) {
                         swiWaitForVBlank( );
-                        IO::updateTime( false );
+
                         scanKeys( );
                         auto touch = touchReadXY( );
                         if( touch.px == 0 && touch.py == 0 )
@@ -773,7 +769,7 @@ END:
         touchPosition touch;
         loop( ) {
 NEXT:
-            IO::updateTime( false );
+
             scanKeys( );
             touch = touchReadXY( );
 
@@ -822,7 +818,7 @@ NEXT:
 
                     loop( ) {
                         swiWaitForVBlank( );
-                        IO::updateTime( false );
+
                         scanKeys( );
                         auto touch = touchReadXY( );
                         if( touch.px == 0 && touch.py == 0 )
@@ -892,7 +888,7 @@ END:
 
         touchPosition touch;
         loop( ) {
-            IO::updateTime( false );
+
             scanKeys( );
             touch = touchReadXY( );
 
@@ -1069,7 +1065,7 @@ END:
 
         touchPosition touch;
         loop( ) {
-            IO::updateTime( false );
+
             scanKeys( );
             touch = touchReadXY( );
 
@@ -1143,7 +1139,7 @@ END:
             tilecnt = t2;
 
             consoleSetWindow( &IO::Bottom, 4, 0, 12, 2 );
-            printf( "EP(%3i%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
+            printf( "EP(%3lu%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
                     * 100 / ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
                     p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::displayHP( 100, 101, 46, 40, 245, 246, false, 50, 56, true );
@@ -1365,7 +1361,7 @@ END:
 
         touchPosition touch;
         loop( ) {
-            IO::updateTime( false );
+
             scanKeys( );
             touch = touchReadXY( );
             u32 pressed = keysHeld( );
@@ -1411,7 +1407,7 @@ START:
             IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
             IO::updateOAM( true );
 
-            IO::updateTime( false );
+
             scanKeys( );
             touch = touchReadXY( );
 

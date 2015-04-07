@@ -59,8 +59,7 @@ namespace IO {
                         ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
         loadItemIcon( p_item.m_itemName, 4, 4, 0, 1, c );
         updateOAM( true );
-
-        updateTime( s8( 1 ) );
+        swiWaitForVBlank( );
 
         regularFont->setColor( 253, 3 );
         regularFont->setColor( 254, 4 );
@@ -70,54 +69,48 @@ namespace IO {
 
         char buf[ 40 ];
         sprintf( buf, "%3d %s in der", p_count, p_item.getDisplayName( ).c_str( ) );
-        regularFont->printMBStringD( buf, 32, 8, true, true, 1 );
+        regularFont->printMBStringD( buf, 32, 8, true );
         regularFont->printChar( 489 - 21 + p_item.getItemType( ), 32, 24, true );
         sprintf( buf, "%s-Tasche verstaut.`", BAG::bagnames[ p_item.m_itemType ].c_str( ) );
         ASpriteOamIndex = A_ID;
-        regularFont->printMBStringD( buf, 46, 24, true, true, 1 );
+        regularFont->printMBStringD( buf, 46, 24, true );
 
         if( !FS::SAV->m_bag )
             FS::SAV->m_bag = new BAG::bag( );
         FS::SAV->m_bag->insert( BAG::toBagType( p_item.m_itemType ), p_item.getItemId( ), p_count );
     }
 
-    messageBox::messageBox( const char* p_text, bool p_time, bool p_remsprites ) {
+    messageBox::messageBox( const char* p_text, bool p_remsprites ) {
         m_isNamed = NULL;
         initTextField( );
         initOAMTable( true );
-        u16 c = 0;
-        c = loadSprite( A_ID, 0, 0,
-                        SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
-                        ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
+        loadSprite( A_ID, 0, 0,
+                    SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
+                    ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
         updateOAM( true );
-
-        if( p_time ) updateTime( s8( 1 ) );
 
         ASpriteOamIndex = A_ID;
         std::string text( p_text );
-        regularFont->printMBStringD( ( text + '`' ).c_str( ), 8, 8, true, p_time, 1 );
+        regularFont->printMBStringD( ( text + '`' ).c_str( ), 8, 8, true );
 
         swiWaitForVBlank( );
     }
-    messageBox::messageBox( const wchar_t* p_text, bool p_time, bool p_remsprites ) {
+    messageBox::messageBox( const wchar_t* p_text, bool p_remsprites ) {
         m_isNamed = NULL;
         initTextField( );
         initOAMTable( true );
-        u16 c = 0;
-        c = loadSprite( A_ID, 0, 0,
-                        SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
-                        ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
+        loadSprite( A_ID, 0, 0,
+                    SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
+                    ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
         updateOAM( true );
-
-        if( p_time ) updateTime( );
 
         ASpriteOamIndex = A_ID;
         std::wstring text( p_text );
-        regularFont->printMBStringD( ( text + L'`' ).c_str( ), 8, 8, true, p_time );
+        regularFont->printMBStringD( ( text + L'`' ).c_str( ), 8, 8, true );
 
         swiWaitForVBlank( );
     }
-    messageBox::messageBox( const char* p_text, const char* p_name, bool p_time, bool p_a, bool p_remsprites, sprite_type p_sprt, u16 p_sprind ) {
+    messageBox::messageBox( const char* p_text, const char* p_name, bool p_a, bool p_remsprites, sprite_type p_sprt, u16 p_sprind ) {
         m_isNamed = p_name;
         initOAMTable( true );
         u16 c = 0;
@@ -137,13 +130,12 @@ namespace IO {
 
         initTextField( );
 
-        if( p_time ) updateTime( );
         if( p_name )
             regularFont->printString( p_name, 8, 8, true );
         if( p_a ) {
             ASpriteOamIndex = 8;
             std::string text( p_text );
-            regularFont->printMBStringD( ( text + '`' ).c_str( ), 64 * ( !!p_name ) + 8, 8, true, p_time );
+            regularFont->printMBStringD( ( text + '`' ).c_str( ), 64 * ( !!p_name ) + 8, 8, true );
         } else
             regularFont->printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
 
@@ -155,7 +147,7 @@ namespace IO {
         }
         swiWaitForVBlank( );
     }
-    messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_time, bool p_a, bool p_remsprites, sprite_type p_sprt, u16 p_sprind ) {
+    messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_a, bool p_remsprites, sprite_type p_sprt, u16 p_sprind ) {
         m_isNamed = NULL;
         initOAMTable( true );
         u16 c = 0;
@@ -175,13 +167,12 @@ namespace IO {
 
         initTextField( );
 
-        if( p_time ) updateTime( );
         if( p_name )
             regularFont->printString( p_name, 8, 8, true );
         if( p_a ) {
             ASpriteOamIndex = A_ID;
             std::wstring text( p_text );
-            regularFont->printMBStringD( ( text + L'`' ).c_str( ), 64 * ( !!p_name ) + 8, 8, true, p_time );
+            regularFont->printMBStringD( ( text + L'`' ).c_str( ), 64 * ( !!p_name ) + 8, 8, true );
         } else
             regularFont->printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
 
@@ -194,7 +185,7 @@ namespace IO {
         swiWaitForVBlank( );
     }
 
-    void messageBox::put( const char* p_text, bool p_a, bool p_time ) {
+    void messageBox::put( const char* p_text, bool p_a ) {
         initTextField( );
         initOAMTable( true );
         loadSprite( A_ID, 0, 0,
@@ -202,13 +193,12 @@ namespace IO {
                     ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
         updateOAM( true );
 
-        if( p_time ) updateTime( );
         if( m_isNamed )
             regularFont->printString( m_isNamed, 8, 8, true );
         if( p_a ) {
             ASpriteOamIndex = A_ID;
             std::string text( p_text );
-            regularFont->printMBStringD( ( text + '`' ).c_str( ), ( 64 * !!m_isNamed ) + 8, 8, true, p_time );
+            regularFont->printMBStringD( ( text + '`' ).c_str( ), ( 64 * !!m_isNamed ) + 8, 8, true );
         } else
             regularFont->printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
 

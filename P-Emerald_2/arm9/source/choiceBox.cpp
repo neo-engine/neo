@@ -76,7 +76,7 @@ namespace IO {
     int fwdPos[ 2 ][ 2 ] = { { SCREEN_WIDTH - 12, SCREEN_HEIGHT - 12 }, { SCREEN_WIDTH - 11, SCREEN_HEIGHT - 31 } },
         bwdPos[ 2 ][ 2 ] = { { SCREEN_WIDTH - 12, SCREEN_HEIGHT - 12 }, { SCREEN_WIDTH - 31, SCREEN_HEIGHT - 11 } };
 
-    int choiceBox::getResult( const char* p_text, bool p_time, bool p_backButton ) {
+    int choiceBox::getResult( const char* p_text, bool p_backButton ) {
         _text = p_text;
         draw( NEW_PAGE );
         initOAMTable( true );
@@ -114,15 +114,13 @@ namespace IO {
             loop( ) {
                 swiWaitForVBlank( );
                 updateOAM( true );
-                if( p_time )
-                    updateTime( s8( 1 ) );
                 touchPosition t;
                 touchRead( &t );
 
                 for( u8 i = 0; i < 3; ++i )
                     if( ( i + 3 * _acPage ) < _num && t.px >= 32 && t.py >= 68 + 35 * i && t.px <= 224 && t.py <= 100 + 35 * i ) {
                         draw( i );
-                        if( !waitForTouchUp( p_time, true, 32, 68 + 35 * i, 224, 100 + 35 * i ) ) {
+                        if( !waitForTouchUp( 32, 68 + 35 * i, 224, 100 + 35 * i ) ) {
                             draw( 8 );
                             break;
                         }
@@ -134,10 +132,10 @@ namespace IO {
                     goto END;
                 }
                 if( _num > 3 && _big ) {
-                    if( !p_backButton && ( ( _num - 1 ) / 3 && _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 )
+                    if( ( !p_backButton && ( ( _num - 1 ) / 3 && _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 ) )
                         || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
 
-                        waitForTouchUp( p_time, true );
+                        waitForTouchUp( );
                         if( ( ++_acPage ) >= ( ( _num - 1 ) / 3 ) ) {
                             ( Oam->oamBuffer[ FWD_ID ] ).isHidden = true;
                             ( Oam->oamBuffer[ FWD_ID ] ).isHidden = !_acPage;
@@ -156,10 +154,10 @@ namespace IO {
                             draw( NEW_PAGE );
                         }
                         updateOAM( true );
-                    } else if( !p_backButton && ( _acPage && _acPage == ( _num - 1 ) / 3 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 )
+                    } else if( ( !p_backButton && ( _acPage && _acPage == ( _num - 1 ) / 3 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 ) )
                                || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
 
-                        waitForTouchUp( p_time, true );
+                        waitForTouchUp( );
                         if( ( --_acPage ) <= 0 ) {
                             ( Oam->oamBuffer[ 14 ] ).isHidden = true;
                             ( Oam->oamBuffer[ FWD_ID ] ).isHidden = !( _acPage < ( ( _num - 1 ) / 3 ) );
@@ -192,8 +190,6 @@ namespace IO {
             loop( ) {
                 swiWaitForVBlank( );
                 updateOAM( true );
-                if( p_time )
-                    updateTime( s8( 1 ) );
                 touchPosition t;
                 touchRead( &t );
 
@@ -202,7 +198,7 @@ namespace IO {
                         && t.px <= 106 + ( ( i % 2 ) ? 129 : 19 ) && t.py <= 32 + 68 + ( i / 2 ) * 35 ) {
                         draw( i );
 
-                        if( !waitForTouchUp( p_time, true, ( ( i % 2 ) ? 129 : 19 ),
+                        if( !waitForTouchUp( ( ( i % 2 ) ? 129 : 19 ),
                             68 + ( i / 2 ) * 35, 106 + ( ( i % 2 ) ? 129 : 19 ), 32 + 68 + ( i / 2 ) * 35 ) ) {
                             draw( 8 );
                             break;
@@ -215,10 +211,10 @@ namespace IO {
                 if( p_backButton && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] - 12 ) + sq( t.py - fwdPos[ 0 ][ 1 ] - 12 ) ) < 17 ) { //Back pressed
                     result = -1;
                     goto END;
-                } else if( !p_backButton && ( ( _num - 1 ) / 6 && _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 )
+                } else if( ( !p_backButton && ( ( _num - 1 ) / 6 && _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 ) )
                            || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
 
-                    waitForTouchUp( p_time, true );
+                    waitForTouchUp( );
                     if( ( ++_acPage ) >= ( ( _num - 1 ) / 6 ) ) {
                         ( Oam->oamBuffer[ FWD_ID ] ).isHidden = true;
                         ( Oam->oamBuffer[ BWD_ID ] ).isHidden = !_acPage;
@@ -236,9 +232,9 @@ namespace IO {
                         ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ 1 ][ 1 ] - 16;
                         draw( NEW_PAGE );
                     }
-                } else if( !p_backButton && ( _acPage && _acPage == ( _num - 1 ) / 6 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 )
+                } else if( ( !p_backButton && ( _acPage && _acPage == ( _num - 1 ) / 6 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 ) )
                            || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
-                    waitForTouchUp( p_time, true );
+                    waitForTouchUp( );
                     if( ( --_acPage ) <= 0 ) {
                         ( Oam->oamBuffer[ BWD_ID ] ).isHidden = true;
                         ( Oam->oamBuffer[ FWD_ID ] ).isHidden = !( _acPage < ( ( _num - 1 ) / 6 ) );

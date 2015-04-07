@@ -32,10 +32,6 @@ namespace IO {
     extern int bg3sub;
     extern PrintConsole Bottom, Top;
 
-    extern int achours, acseconds, acminutes, acday, acmonth, acyear;
-    extern int hours, seconds, minutes, day, month, year;
-    extern u32 ticks;
-
     extern unsigned int NAV_DATA[ 12288 ];
     extern unsigned short NAV_DATA_PAL[ 256 ];
 
@@ -57,7 +53,6 @@ namespace IO {
 
     void setDefaultConsoleTextColors( u16* p_palette, u8 p_start = 1 );
 
-    void updateTime( s8 p_mapMode = 0 );
     void drawSub( u8 p_newIdx = u8( 255 ) );
 
     struct inputTarget {
@@ -82,13 +77,13 @@ namespace IO {
             : m_inputType( TOUCH_CIRCLE ), m_targetX1( p_targetX1 ), m_targetY1( p_targetY1 ), m_targetR( p_targetR ) { }
     };
 
-    bool waitForTouchUp( bool p_updateTime, s8 p_timeParameter = 0, u16 p_targetX1 = 0, u16 p_targetY1 = 0, u16 p_targetX2 = 300, u16 p_targetY2 = 300 );
-    bool waitForTouchUp( bool p_updateTime, s8 p_timeParameter, inputTarget p_inputTarget );
+    bool waitForTouchUp( u16 p_targetX1 = 0, u16 p_targetY1 = 0, u16 p_targetX2 = 300, u16 p_targetY2 = 300 );
+    bool waitForTouchUp( inputTarget p_inputTarget );
 
-    void waitForKeysUp( bool p_updateTime, s8 p_timeParameter, KEYPAD_BITS p_keys );
-    void waitForKeysUp( bool p_updateTime, s8 p_timeParameter, inputTarget p_inputTarget );
+    void waitForKeysUp( KEYPAD_BITS p_keys );
+    void waitForKeysUp( inputTarget p_inputTarget );
 
-    bool waitForInput( bool p_updateTime, s8 p_timeParameter, inputTarget p_inputTarget );
+    bool waitForInput( inputTarget p_inputTarget );
 
     void initTextField( );
 
@@ -110,10 +105,10 @@ namespace IO {
     void printNumber( font* p_font, s32 p_num, s16 p_x, s16 p_y, bool p_bottom );
 
     void printString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16 );
-    void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime = true, s8 p_updateTimePar = 0 );
-    void printMBString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime = true, s8 p_updateTimePar = 0 );
-    void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime = true, s8 p_updateTimePar = 0 );
-    void printMBStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, bool p_updateTime = true, s8 p_updateTimePar = 0 );
+    void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom);
+    void printMBString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom);
+    void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom);
+    void printMBStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom);
     void printStringCenter( font* p_font, const wchar_t *p_string, bool p_bottom );
     void printStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
     void printStringCenterD( font* p_font, const wchar_t *p_string, bool p_bottom );

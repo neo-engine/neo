@@ -10,7 +10,7 @@ namespace IO {
         choiceBox( int p_num, const char** p_choices, const char* p_name, bool p_big );
 
         void draw( u8 p_pressedIdx );
-        int getResult( const char* p_text = 0, bool p_time = true, bool p_backButton = false );
+        int getResult( const char* p_text = 0, bool p_backButton = false );
         void kill( );
     private:
         const char** _choices;
