@@ -489,6 +489,69 @@ namespace STS {
         return true;
     }
 
+    // Draw extra information about the specified ribbon
+    void regStsScreenUI::drawRibbon( u8 p_current, u8 p_ribbonIdx ) {
+        auto currPkmn = ( *_pokemon )[ p_current ];
+
+        for( u8 i = 0; i < 4; ++i )
+            IO::OamTop->oamBuffer[ TYPE_IDX + i ].isHidden = true;
+        for( u8 i = 0; i < 4; ++i )
+            IO::OamTop->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
+        for( u8 i = 0; i < 12; ++i )
+            IO::OamTop->oamBuffer[ RIBBON_IDX + i ].isHidden = true;
+
+        IO::setDefaultConsoleTextColors( BG_PALETTE, 6 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 128 );
+
+        BG_PALETTE[ WHITE_IDX ] = WHITE;
+        BG_PALETTE[ GRAY_IDX ] = RGB( 20, 20, 20 );
+        BG_PALETTE[ BLACK_IDX ] = BLACK;
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::boldFont->setColor( 0, 0 );
+        IO::boldFont->setColor( GRAY_IDX, 1 );
+        IO::boldFont->setColor( WHITE_IDX, 2 );
+
+        consoleSelect( &IO::Top );
+        consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+        consoleClear( );
+
+        u8 isNotEgg = 1;
+        drawPkmnInformation( currPkmn, isNotEgg, false );
+        if( !isNotEgg )
+            return; //This should never occur
+
+        IO::regularFont->printString( "Bandinfos", 36, 4, false );
+        IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, IO::OamTop->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
+                        0, 0, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, false );
+
+        ribbon currRb = RibbonList[ p_ribbonIdx ];
+
+        u16 tileCnt = IO::OamTop->oamBuffer[ TYPE_IDX ].gfxIndex;
+
+        if( !IO::loadRibbonIcon( p_ribbonIdx, 110, 32, RIBBON_IDX, TYPE_PAL( 0 ), tileCnt, false ) )
+            tileCnt = IO::loadEggIcon( 110, 32, RIBBON_IDX, TYPE_PAL( 0 ), tileCnt, false );
+
+        u8 nlCnt = 0;
+        auto nStr = FS::breakString( currRb.m_name == "" ? ( "----" ) : currRb.m_name, IO::regularFont, 110 );
+        for( auto c : nStr )
+            if( c == '\n' )
+                nlCnt++;
+
+        if( currRb.m_name == "" )
+            currRb.m_description = "----";
+
+        IO::regularFont->printString( nStr.c_str( ), 142, 43 - 7 * nlCnt, false, 14 );
+        IO::regularFont->printString( FS::breakString( ( currRb.m_description == "" ) ?
+            ( ( *_pokemon )[ p_current ].m_boxdata.m_fateful ? "Ein Band für Pokémon-Freunde." : "Ein Gedenk-Band. An einem mysteriösen Ort erhalten." )
+            : currRb.m_description, IO::regularFont, 120 ).c_str( ),
+            128, 70, false, 14 );
+
+        IO::updateOAM( false );
+        return;
+    }
+
 
     void regStsScreenUI::draw( u8 p_current, u8 p_page, bool p_newpok ) {
         for( u8 i = 0; i < 6; ++i )
@@ -683,9 +746,12 @@ namespace STS {
                     else
                         tileCnt = tmp;
                 }
-                if( rbs.empty( ) )
+                if( rbs.empty( ) ) {
                     IO::regularFont->printString( "Keine Bänder", 148, 87, false );
-
+                } else {
+                    sprintf( buffer, "(%u)", rbs.size( ) );
+                    IO::regularFont->printString( buffer, 88, 4, false );
+                }
                 break;
             }
             default:

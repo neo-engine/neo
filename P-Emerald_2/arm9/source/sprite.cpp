@@ -60,11 +60,41 @@ namespace IO {
     };
     const unsigned int* RibbonTiles[ MAX_RIBBONS ] =
     {
+        r0Tiles, r1Tiles, r2Tiles, r3Tiles, r4Tiles, r5Tiles, r6Tiles, r7Tiles,
+        r8Tiles, r9Tiles, r10Tiles, r11Tiles, r12Tiles, r13Tiles, r14Tiles, r15Tiles,
 
+        r16Tiles, r17Tiles, r18Tiles, r19Tiles, r20Tiles, r21Tiles, r22Tiles, r23Tiles,
+        r24Tiles, r25Tiles, r26Tiles, r27Tiles, r28Tiles, r29Tiles, r30Tiles, r31Tiles,
+
+        r32Tiles, r33Tiles, r34Tiles, r35Tiles, r36Tiles, r37Tiles, r38Tiles, r39Tiles,
+        r40Tiles, r41Tiles, r42Tiles, r43Tiles, r44Tiles, r45Tiles, r46Tiles, r47Tiles,
+
+        r48Tiles, r49Tiles, r50Tiles, r51Tiles, r52Tiles, r53Tiles, r54Tiles, r55Tiles,
+        r56Tiles, r57Tiles, r58Tiles, r59Tiles, r60Tiles, r61Tiles, r62Tiles, r63Tiles,
+
+        r64Tiles, r65Tiles, r66Tiles, r67Tiles, r68Tiles, r69Tiles, r70Tiles, r71Tiles,
+        r72Tiles, r73Tiles, r74Tiles, r75Tiles, r76Tiles, r77Tiles, r78Tiles, r79Tiles,
+
+        r80Tiles, r81Tiles, r82Tiles, r83Tiles, r84Tiles, r85Tiles
     };
     const unsigned short* RibbonPals[ MAX_RIBBONS ] =
     {
+        r0Pal, r1Pal, r2Pal, r3Pal, r4Pal, r5Pal, r6Pal, r7Pal,
+        r8Pal, r9Pal, r10Pal, r11Pal, r12Pal, r13Pal, r14Pal, r15Pal,
 
+        r16Pal, r17Pal, r18Pal, r19Pal, r20Pal, r21Pal, r22Pal, r23Pal,
+        r24Pal, r25Pal, r26Pal, r27Pal, r28Pal, r29Pal, r30Pal, r31Pal,
+
+        r32Pal, r33Pal, r34Pal, r35Pal, r36Pal, r37Pal, r38Pal, r39Pal,
+        r40Pal, r41Pal, r42Pal, r43Pal, r44Pal, r45Pal, r46Pal, r47Pal,
+
+        r48Pal, r49Pal, r50Pal, r51Pal, r52Pal, r53Pal, r54Pal, r55Pal,
+        r56Pal, r57Pal, r58Pal, r59Pal, r60Pal, r61Pal, r62Pal, r63Pal,
+
+        r64Pal, r65Pal, r66Pal, r67Pal, r68Pal, r69Pal, r70Pal, r71Pal,
+        r72Pal, r73Pal, r74Pal, r75Pal, r76Pal, r77Pal, r78Pal, r79Pal,
+
+        r80Pal, r81Pal, r82Pal, r83Pal, r84Pal, r85Pal
     };
 
     const unsigned int* HitTypeTiles[ 3 ] =

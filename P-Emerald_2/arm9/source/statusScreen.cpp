@@ -6,6 +6,7 @@
 #include "move.h"
 #include "saveGame.h"
 #include "dex.h"
+#include "ribbon.h"
 
 namespace STS {
     regStsScreen::regStsScreen( u8 p_pkmnIdx, statusScreenUI* p_stsUI ) {
@@ -105,6 +106,7 @@ namespace STS {
 
         u8 acMode = 0; // 0: normal, 1: show attack details, 2: show ribbon details
         u8 modeVal = 0;
+        auto rbs = ribbon::getRibbons( ( *_pokemon )[ _pkmnIdx ] );
 
         loop( ) {
             scanKeys( );
@@ -146,23 +148,39 @@ namespace STS {
                 _stsUI->draw( _pkmnIdx, _page, false );
             }
 
-            //Mode specific stuff
+            //Exit all specific modes through B/..
+            else if( acMode && ( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_C( 248, 184, 16 ) ) ) {
+                acMode = 0;
+                _stsUI->draw( _pkmnIdx, _page = 1, false );
+            }
 
+            //Mode specific stuff
+            //Attack info
             else if( acMode == 0 && _page == 1 && GET_AND_WAIT( KEY_A ) ) {
                 acMode = 1;
                 if( !_stsUI->draw( _pkmnIdx, modeVal ) ) {
                     acMode = 0;
                     modeVal = 0;
                 }
-            } else if( acMode == 1 && ( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_C( 248, 184, 16 ) ) ) {
-                acMode = 0;
-                _stsUI->draw( _pkmnIdx, _page = 1, false );
             } else if( acMode == 1 && ( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) ) {
                 do modeVal = ( modeVal + 1 ) % 4;
                 while( !_stsUI->draw( _pkmnIdx, modeVal ) );
             } else if( acMode == 1 && ( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) ) {
                 do modeVal = ( modeVal + 3 ) % 4;
                 while( !_stsUI->draw( _pkmnIdx, modeVal ) );
+            }
+
+            //Ribbon info
+            else if( acMode == 0 && _page == 2 && !rbs.empty( ) && GET_AND_WAIT( KEY_A ) ) {
+                acMode = 2;
+                modeVal = 0;
+                _stsUI->drawRibbon( _pkmnIdx, rbs[ modeVal ] );
+            } else if( acMode == 2 && ( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) ) {
+                modeVal = ( modeVal + 1 ) % rbs.size( );
+                _stsUI->drawRibbon( _pkmnIdx, rbs[ modeVal ] );
+            } else if( acMode == 2 && ( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) ) {
+                modeVal = ( modeVal + rbs.size( ) - 1 ) % rbs.size( );
+                _stsUI->drawRibbon( _pkmnIdx, rbs[ modeVal ] );
             }
         }
 
