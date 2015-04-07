@@ -2,6 +2,7 @@ Pokémon Emerald Version 2
 =========================
 
 There's still (very) much to do, but when it's complete, it's a recode of Pokémon for Nintendo DS.
+
 As the game itself is in German, I won't go into detail about the (planned) storyline (at least in the English description);
 so far the game is set in the Hoenn region 2 years after [Pokémon Ruby, Sapphire](https://en.wikipedia.org/wiki/Pok%C3%A9mon_Ruby_and_Sapphire) and [Emerald](https://en.wikipedia.org/wiki/Pok%C3%A9mon_Emerald).
 
@@ -12,7 +13,7 @@ Features
 
 Features implemented in a non-master branch are in _italics_.
 
-* [ ] A fully working Pokémon engine, including
+* [ ] A fully working Pokémon engine (at 60fps), including
     * [x] The ability to display a Pokémon's status, _including detailed information about the Pokémon's moves and ribbons_
     * [ ] An in-game Pokémon storage system
     * [x] A fully working PokéDex, loading its data from the ROM's filesystem _and displaying the various formes of the Pokémon_
