@@ -1804,6 +1804,16 @@ OUT:
                             a.m_boxdata.m_moves[ 1 ] = 19;
                         a.m_boxdata.m_experienceGained += 750;
 
+                        //Hand out some ribbons
+                        for( u8 i = 0; i < 4; ++i ) {
+                            a.m_boxdata.m_ribbons0[ i ] = 255;
+                            a.m_boxdata.m_ribbons1[ i ] = 255;
+                            a.m_boxdata.m_ribbons2[ i ] = 255;
+                        }
+                        a.m_boxdata.m_ribbons0[ 3 ] = 63;
+                        a.m_boxdata.m_ribbons1[ 2 ] = 15;
+                        a.m_boxdata.m_ribbons1[ 3 ] = 0;
+
                         FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId - 1 ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId - 1 ) % 8 ) );
 
                         HILFSCOUNTER = 3 + ( ( HILFSCOUNTER ) % 649 );

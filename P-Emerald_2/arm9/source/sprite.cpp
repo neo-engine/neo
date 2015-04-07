@@ -33,6 +33,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "uio.h"
 #include "fs.h"
 #include "move.h"
+#include "ribbon.h"
 
 #include "damage_0.h"
 #include "damage_1.h"
@@ -56,6 +57,14 @@ namespace IO {
         GestPal, KaeferPal, GeistPal, StahlPal, UnbekPal,
         WasserPal, FeuerPal, PflPal, ElekPal, PsychoPal,
         EisPal, DraPal, UnlPal, FeePal
+    };
+    const unsigned int* RibbonTiles[ MAX_RIBBONS ] =
+    {
+
+    };
+    const unsigned short* RibbonPals[ MAX_RIBBONS ] =
+    {
+
     };
 
     const unsigned int* HitTypeTiles[ 3 ] =
@@ -338,6 +347,13 @@ namespace IO {
 
     u16 loadTypeIcon( Type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16, TypePals[ p_type ], TypeTiles[ p_type ], 256,
+                           false, false, false, OBJPRIORITY_0, p_bottom );
+    }
+
+    u16 loadRibbonIcon( u8 p_ribbonIdx, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+        if( !RibbonPals[ p_ribbonIdx ] || !RibbonTiles[ p_ribbonIdx ] )
+            return 0;
+        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, RibbonPals[ p_ribbonIdx ], RibbonTiles[ p_ribbonIdx ], 512,
                            false, false, false, OBJPRIORITY_0, p_bottom );
     }
 

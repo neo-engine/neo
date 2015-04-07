@@ -7,6 +7,7 @@
 #include "sprite.h"
 #include "fs.h"
 #include "saveGame.h"
+#include "ribbon.h"
 
 #include <cstdio>
 
@@ -496,6 +497,8 @@ namespace STS {
             IO::OamTop->oamBuffer[ TYPE_IDX + i ].isHidden = true;
         for( u8 i = 0; i < 4; ++i )
             IO::OamTop->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
+        for( u8 i = 0; i < 12; ++i )
+            IO::OamTop->oamBuffer[ RIBBON_IDX + i ].isHidden = true;
         IO::Oam->oamBuffer[ A_ID ].isHidden = true;
         for( u8 u = 1; u < 6; ++u ) {
             IO::Oam->oamBuffer[ CHOICE_ID + 2 * ( u ) ].isHidden = true;
@@ -665,12 +668,26 @@ namespace STS {
                 }
                 break;
             }
-            case 2:
+            case 2: {
                 IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, IO::OamTop->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
                                 0, 0, 32, 32, ContestPal, ContestTiles, ContestTilesLen, false, false, false, OBJPRIORITY_0, false );
                 IO::regularFont->printString( "Bänder", 36, 4, false );
 
+                auto rbs = ribbon::getRibbons( currPkmn );
+                //Just draw the first 12 ribbons at max
+                u16 tileCnt = IO::OamTop->oamBuffer[ TYPE_IDX ].gfxIndex;
+                for( u8 i = 0; i < std::min( rbs.size( ), 12u ); ++i ) {
+                    u16 tmp = IO::loadRibbonIcon( rbs[ i ], 128 + 32 * ( i % 4 ), 40 + 40 * ( i / 4 ), RIBBON_IDX + i, TYPE_PAL( i ) % 16, tileCnt, false );
+                    if( !tmp ) //Draw an egg when something goes wrong
+                        tileCnt = IO::loadEggIcon( 128 + 32 * ( i % 4 ), 36 + 40 * ( i / 4 ), RIBBON_IDX + i, TYPE_PAL( i ) % 16, tileCnt, false );
+                    else
+                        tileCnt = tmp;
+                }
+                if( rbs.empty( ) )
+                    IO::regularFont->printString( "Keine Bänder", 148, 87, false );
+
                 break;
+            }
             default:
                 return;
         }

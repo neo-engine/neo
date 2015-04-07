@@ -27,6 +27,26 @@
 
 #pragma once
 
+#include "Normal.h"
+#include "Kampf.h"
+#include "Flug.h"
+#include "Gift.h"
+#include "Boden.h"
+#include "Gest.h"
+#include "Kaefer.h"
+#include "Geist.h"
+#include "Stahl.h"
+#include "Unbek.h"
+#include "Wasser.h"
+#include "Feuer.h"
+#include "Pfl.h"
+#include "Elek.h"
+#include "Psycho.h"
+#include "Eis.h"
+#include "Dra.h"
+#include "Unl.h"
+#include "Fee.h"
+
 enum Type{
     NORMAL=0,	KAMPF=1,	FLUG=2,     GIFT=3,	    BODEN=4,
     GESTEIN=5,	KAEFER=6,	GEIST=7,	STAHL=8,	UNBEKANNT=9,
