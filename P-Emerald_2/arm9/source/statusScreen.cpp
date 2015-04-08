@@ -20,6 +20,8 @@ namespace STS {
         _stsUI->init( _pkmnIdx );
         touchPosition touch;
 
+        u8 selectedIdx = 42;
+
         loop( ) {
             scanKeys( );
             touchRead( &touch );
@@ -42,6 +44,15 @@ namespace STS {
             } else if( GET_AND_WAIT( KEY_UP ) ) {
                 _pkmnIdx = ( _pkmnIdx + _pokemon->size( ) - 1 ) % _pokemon->size( );
                 _stsUI->init( _pkmnIdx, false );
+            } else if( GET_AND_WAIT( KEY_SELECT ) ) {
+                if( selectedIdx == 42 ) {
+                    selectedIdx = _pkmnIdx;
+                    continue;
+                } else if( selectedIdx != _pkmnIdx ) {
+                    std::swap( ( *_pokemon )[ selectedIdx ], ( *_pokemon )[ _pkmnIdx ] );
+                    _stsUI->init( _pkmnIdx );
+                }
+                selectedIdx = 42;
             } else if( _stsUI->_showTakeItem &&
                        GET_AND_WAIT_R( 152, !!_stsUI->_showMoveCnt * ( -7 + 24 * _stsUI->_showMoveCnt ), 300, ( 17 + 24 * _stsUI->_showMoveCnt ) ) ) {
                 char buffer[ 50 ];
