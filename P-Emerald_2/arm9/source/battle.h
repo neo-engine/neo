@@ -29,6 +29,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <string>
 
 #include <nds.h>
 
@@ -54,29 +55,28 @@ namespace BATTLE {
     class battleTrainer {
     public:
         enum trainerClass {
-            PKMN_TRAINER
+            PKMN_TRAINER = 0
         };
 
-        const char*         m_battleTrainerName;
+        std::string         m_battleTrainerName;
         trainerClass        m_trainerClass;
-        std::vector < pokemon >
-            *m_pkmnTeam;
+        std::vector < pokemon >& m_pkmnTeam;
     private:
-        std::vector<item>   *_items;
+        std::vector<item>&   _items;
         int                 _moneyEarned;
-        const char          *_msg1,
-            *_msg2,
-            *_msg3,
-            *_msg4;
+        std::string         _msg1;
+        std::string         _msg2;
+        std::string         _msg3;
+        std::string         _msg4;
 
     public:
-        battleTrainer( const char* p_battleTrainerName,
-                       const char* p_msg1,
-                       const char* p_msg2,
-                       const char* p_msg3,
-                       const char* p_msg4,
-                       std::vector<pokemon>* p_pkmnTeam,
-                       std::vector<item>* p_items,
+        battleTrainer( std::string p_battleTrainerName,
+                       std::string p_msg1,
+                       std::string p_msg2,
+                       std::string p_msg3,
+                       std::string p_msg4,
+                       std::vector<pokemon>& p_pkmnTeam,
+                       std::vector<item>& p_items,
                        trainerClass p_trainerClass = PKMN_TRAINER )
                        : m_battleTrainerName( p_battleTrainerName ),
                        m_trainerClass( p_trainerClass ),
@@ -91,19 +91,19 @@ namespace BATTLE {
         item& useItem( bool choice = true );
 
         const char*         getLooseMsg( ) const {
-            return _msg4;
+            return _msg4.c_str( );
         }
         int                 getLooseMoney( ) const {
             return _moneyEarned;
         }
         const char*         getWinMsg( ) const {
-            return _msg3;
+            return _msg3.c_str( );
         }
         const char*         getCriticalMsg( ) const {
-            return _msg2;
+            return _msg2.c_str( );
         }
         const char*         getInitMsg( ) const {
-            return _msg1;
+            return _msg1.c_str( );
         }
     };
 
@@ -131,9 +131,9 @@ namespace BATTLE {
         u16 _round,
             _maxRounds,
             _AILevel;
-        const battleTrainer
-            *_player,
-            *_opponent;
+        battleTrainer
+            &_player,
+            &_opponent;
 
         u8 _acPkmnPosition[ 6 ][ 2 ]; //me; opp; maps the Pkmn's positions in the teams to their real in-battle positions
 
@@ -193,7 +193,7 @@ namespace BATTLE {
         u16         _lstOppMove;
         u16         _lstMove;
 
-        std::map<pokemon*, u8 > _participatedPKMN;
+        u8          _participatedPKMN[ 6 ][ 2 ];
 
         //Current turn's current move's "consequences"
         s16         _acDamage[ 2 ][ 2 ];
@@ -212,7 +212,7 @@ namespace BATTLE {
 
         bool        _endBattle = false;
 
-        battleScript _weatherEffects[ 9 ] = {
+        const battleScript _weatherEffects[ 9 ] = {
             battleScript( ),
             //Rain
             battleScript( std::vector<cmd>( {
@@ -292,7 +292,7 @@ namespace BATTLE {
 
             //SUN
         };
-        std::wstring _weatherMessage[ 9 ] = {
+        const std::wstring _weatherMessage[ 9 ] = {
             L"",
             L"Es regnet.[A]",
             L"Es hagelt.[A]",
@@ -303,7 +303,7 @@ namespace BATTLE {
             L"Extremes Sonnenlicht.[A]",
             L"Starke Winde wehen.[A]"
         };
-        std::wstring _weatherEndMessage[ 9 ] = {
+        const std::wstring _weatherEndMessage[ 9 ] = {
             L"",
             L"Der Regen stoppte.[A]",
             L"Der Hagel stoppte.[A]",
@@ -317,7 +317,7 @@ namespace BATTLE {
 
         battlePokemon _pkmns[ 6 ][ 2 ];
 
-        battleUI    _battleUI;
+        battleUI*    _battleUI;
     public:
 #define OPPONENT 1
 #define PLAYER 0
@@ -337,7 +337,7 @@ namespace BATTLE {
 
         friend class battleScript;
         friend class battleUI;
-        friend std::wstring parseLogCmd( battle& p_battle, const std::wstring& p_cmd );
+        friend std::wstring parseLogCmd( battle* p_battle, const std::wstring& p_cmd );
         friend int getTargetSpecifierValue( const battle& p_battle,
                                             const pokemon& p_target,
                                             bool p_targetIsOpp,
@@ -381,8 +381,8 @@ namespace BATTLE {
         weather     m_weather;
         battleMode  m_battleMode;
 
-        battle( battleTrainer* p_player,
-                battleTrainer* p_opponent,
+        battle( battleTrainer& p_player,
+                battleTrainer& p_opponent,
                 int p_maxRounds,
                 int p_AILevel = 5,
                 battleMode p_battlemode = SINGLE );

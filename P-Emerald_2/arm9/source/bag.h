@@ -81,6 +81,11 @@ namespace BAG {
         std::size_t size( bagType );
 
         std::map<u16, u16> element( bagType );
+
+        std::vector<item>& getBattleItems( ) {
+            static std::vector<item> res;
+            return res;
+        }
     };
 
     bag::bagType toBagType( item::itemType p_itemType );

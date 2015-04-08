@@ -135,10 +135,10 @@ namespace BATTLE {
                            m_comp( p_comp ),
                            m_value( p_value ) { }
 
-                bool            check( battle& p_battle, void* p_self );
-                bool            evaluate( int p_other );
-                int             getTargetVal( const battle& p_battle, const pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition );
-                int             getTargetVal( const battle& p_target );
+                bool            check( battle& p_battle, void* p_self ) const;
+                bool            evaluate( int p_other ) const;
+                int             getTargetVal( const battle& p_battle, const pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition ) const;
+                int             getTargetVal( const battle& p_target ) const;
             };
 
             struct value {
@@ -171,9 +171,9 @@ namespace BATTLE {
                        m_multiplier( p_multiplier ),
                        m_additiveConstant( p_additiveConstant ) { }
 
-                int             get( battle& p_battle, void* p_self );
-                int             get( battle& p_battle, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition );
-                int             get( battle& p_target );
+                int             get( battle& p_battle, void* p_self )const;
+                int             get( battle& p_battle, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition )const;
+                int             get( battle& p_target )const;
             };
 
             std::vector<condition>  m_conditions;
@@ -251,9 +251,9 @@ namespace BATTLE {
                      m_log( p_log ) { }
 
 
-            void                    execute( battle& p_battle, void* p_self );
-            void                    evaluateOnTargetVal( battle& p_battle, void* p_self, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition );
-            void                    evaluateOnTargetVal( battle& p_battle, void* p_self );
+            void                    execute( battle& p_battle, void* p_self )const;
+            void                    evaluateOnTargetVal( battle& p_battle, void* p_self, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition )const;
+            void                    evaluateOnTargetVal( battle& p_battle, void* p_self )const;
         };
 
         std::vector<command>            _commands;
@@ -265,7 +265,7 @@ namespace BATTLE {
         battleScript( std::vector<command> p_commands )
             : _commands( p_commands ) { }
 
-        void                            execute( battle& p_battle, void* p_self );
+        void                            execute( battle& p_battle, void* p_self ) const;
 
         friend int                      getTargetSpecifierValue( const battle&                      p_battle,
                                                                  const pokemon&                        p_target,

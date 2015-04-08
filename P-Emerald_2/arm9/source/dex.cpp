@@ -45,7 +45,7 @@ namespace DEX {
             } else if( GET_AND_WAIT( KEY_LEFT ) ) {
                 _dexUI->_currPage = ( _dexUI->_currPage + MAX_PAGES - 1 ) % MAX_PAGES;
                 _dexUI->drawPage( false, true );
-            } else if( GET_AND_WAIT( KEY_SELECT ) ) {
+            } else if( GET_AND_WAIT( KEY_SELECT ) || GET_AND_WAIT( KEY_Y ) ) {
                 _dexUI->_currForme++; //Just let it overflow
                 _dexUI->drawPage( false );
             }

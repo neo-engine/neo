@@ -298,8 +298,8 @@ namespace BATTLE {
         initColors( );
 
         sprintf( buffer, "Eine Herausforderung von\n%s %s!",
-                 trainerclassnames[ p_battle->_opponent->m_trainerClass ],
-                 p_battle->_opponent->m_battleTrainerName );
+                 trainerclassnames[ p_battle->_opponent.m_trainerClass ],
+                 p_battle->_opponent.m_battleTrainerName.c_str( ) );
         IO::regularFont->printString( buffer, 16, 80, true );
         IO::updateOAM( true );
     }
@@ -403,7 +403,6 @@ namespace BATTLE {
     }
 
     void battleUI::trainerIntro( ) {
-        //Use a 2D Map as top background for trainer intro
         loadSpritesSub( _battle );
         loadSpritesTop( _battle ); // This should consume some time
 
@@ -581,6 +580,7 @@ SHOW_ATTACK:
 
                 IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
                 tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 7, y - 7, ++oamIndex, palIndex++, tilecnt, true );
+                tilecnt = IO::loadDamageCategoryIcon( acMove->m_moveHitType, x + 25, y - 7, ++oamIndex, palIndex++, tilecnt, true );
                 consoleSelect( &IO::Bottom );
                 consoleSetWindow( &IO::Bottom, x / 8, 12 + ( i / 2 ) * 6, 20, 2 );
                 printf( "%6hhu/%2hhu AP",
@@ -936,7 +936,7 @@ END:
                                           BattlePkmnChoice4TilesLen, false, false, false, OBJPRIORITY_2, true );
             }
 
-            if( i >= p_battle->_player->m_pkmnTeam->size( ) )
+            if( i >= p_battle->_player.m_pkmnTeam.size( ) )
                 continue;
 
             auto& acPkmn = ACPKMN2( *p_battle, i, PLAYER );
@@ -1173,7 +1173,7 @@ END:
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
                                               24, 124, true );
-                tilecnt = IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 0, 116, ++oamIndex, palIndex++, tilecnt, true );
+                tilecnt = IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 0, 116, ++oamIndex, ++palIndex, tilecnt, true );
             } else {
                 IO::regularFont->setColor( BLACK_IDX, 1 );
                 IO::regularFont->setColor( GRAY_IDX, 2 );
@@ -1183,11 +1183,12 @@ END:
             IO::regularFont->setColor( BLACK_IDX, 2 );
 
             if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
-                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 224, 0, ++oamIndex, palIndex++, tilecnt, true );
+                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 224, 0, ++oamIndex, ++palIndex, tilecnt, true );
                 oamIndex++;
+                ++palIndex;
             } else {
-                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 192, 0, ++oamIndex, palIndex++, tilecnt, true );
-                tilecnt = IO::loadTypeIcon( data.m_types[ 1 ], 224, 0, ++oamIndex, palIndex++, tilecnt, true );
+                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 192, 0, ++oamIndex, ++palIndex, tilecnt, true );
+                tilecnt = IO::loadTypeIcon( data.m_types[ 1 ], 224, 0, ++oamIndex, ++palIndex, tilecnt, true );
             }
 
         } else {
@@ -1223,7 +1224,8 @@ END:
                                         true, false, WHITE_IDX );
 
                     IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
-                    tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 10, y - 7, ++oamIndex, palIndex++, tilecnt, true );
+                    tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 10, y - 7, ++oamIndex, ++palIndex, tilecnt, true );
+                    tilecnt = IO::loadDamageCategoryIcon( acMove->m_moveHitType, x + 22, y - 7, ++oamIndex, ++palIndex, tilecnt, true );
                     consoleSelect( &IO::Bottom );
                     consoleSetWindow( &IO::Bottom, x / 8, 5 + 5 * i, 20, 2 );
                     printf( "%6hhu/%2hhu AP",
@@ -1359,6 +1361,7 @@ END:
             }
         }
 
+        IO::updateOAM( true );
         touchPosition touch;
         loop( ) {
 
@@ -1416,7 +1419,7 @@ START:
                 result = 0;
                 break;
             }
-            auto teamSz = _battle->_player->m_pkmnTeam->size( );
+            auto teamSz = _battle->_player.m_pkmnTeam.size( );
             for( u8 i = 0; i < teamSz; ++i ) {
                 u8 x = IO::Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].x;
                 u8 y = IO::Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].y;

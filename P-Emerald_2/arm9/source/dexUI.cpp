@@ -108,7 +108,9 @@ namespace DEX {
         }
 
         pokemonData data; getAll( _currPkmn, data );
-        if( data.m_types[ 0 ] == NORMAL )
+        if( data.m_types[ 0 ] == NORMAL
+            || data.m_types[ 0 ] == BODEN
+            || data.m_types[ 0 ] == EIS )
             IO::boldFont->setColor( BLACK_IDX, 2 );
         auto formes = getAllFormes( _currPkmn );
         //IO::boldFont->setColor( WHITE_IDX, 2 );
@@ -169,9 +171,6 @@ namespace DEX {
             BG_PALETTE[ COLOR_IDX ] = BLACK;
         }
         BG_PALETTE[ WHITE_IDX ] = WHITE;
-        IO::boldFont->setColor( COLOR_IDX, 0 );
-        IO::boldFont->setColor( COLOR_IDX, 1 );
-        IO::boldFont->setColor( COLOR_IDX, 2 );
         IO::regularFont->setColor( WHITE_IDX, 0 );
         IO::regularFont->setColor( WHITE_IDX, 1 );
         IO::regularFont->setColor( WHITE_IDX, 2 );
@@ -179,13 +178,16 @@ namespace DEX {
         sprintf( buffer, "%s - %s", buffer, getSpecies( oldPkmn ) );
         IO::regularFont->printString( std::string( 52, ' ' ).c_str( ), 36, 20, false );
 
+        IO::regularFont->setColor( COLOR_IDX, 0 );
+        IO::regularFont->setColor( COLOR_IDX, 1 );
+        IO::regularFont->setColor( COLOR_IDX, 2 );
         if( p_formeIdx == u16( -1 ) ) {
-            IO::boldFont->printString( std::string( 40, ' ' ).c_str( ), 90, 167, false );
+            IO::regularFont->printString( std::string( 40, ' ' ).c_str( ), 90, 167, false );
             return;
         }
-        IO::boldFont->printString( std::string( 40, ' ' ).c_str( ), 5, 167, false );
-        IO::boldFont->printString( std::string( 40, ' ' ).c_str( ), 110, 160, false );
-        IO::boldFont->printString( std::string( 40, ' ' ).c_str( ), 110, 176, false );
+        IO::regularFont->printString( std::string( 40, ' ' ).c_str( ), 5, 167, false );
+        IO::regularFont->printString( std::string( 40, ' ' ).c_str( ), 110, 160, false );
+        IO::regularFont->printString( std::string( 40, ' ' ).c_str( ), 110, 176, false );
 
     }
 

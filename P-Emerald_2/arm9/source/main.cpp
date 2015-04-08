@@ -231,7 +231,7 @@ int hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
 int achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
 u8 frame = 0;
 bool DRAW_TIME = false;
-bool ANIMATE_MAP = true;
+bool ANIMATE_MAP = false;
 
 u8 getCurrentDaytime( ) {
     time_t unixTime = time( NULL );
@@ -1211,6 +1211,7 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
         if( WTW || acmovedata == 4 || ( acmovedata % 4 == 0 && acmovedata / 4 == p_z ) || acmovedata == 0 || acmovedata == 60 ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'W' && p_y >= a.m_move + 10 && p_y < a.m_move + a.m_mapsx + 10 ) {
+                    ANIMATE_MAP = false;
                     showNewMap( a.m_mapidx );
                     strcpy( FS::SAV->m_acMapName, a.m_name );
                     FS::SAV->m_acMapIdx = a.m_mapidx;
@@ -1222,6 +1223,7 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
                     animateHero( movedir, 1 );
                     acMap->draw( p_x - 17, p_y - 18, true );
                     animateHero( movedir, 2 );
+                    ANIMATE_MAP = true;
                     return true;
                 }
             }
@@ -1232,6 +1234,7 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
         if( WTW || acmovedata == 4 || ( acmovedata % 4 == 0 && acmovedata / 4 == p_z ) || acmovedata == 0 || acmovedata == 60 ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'N' && p_x >= a.m_move + 10 && p_x < a.m_move + a.m_mapsy + 10 ) {
+                    ANIMATE_MAP = false;
                     showNewMap( a.m_mapidx );
                     strcpy( FS::SAV->m_acMapName, a.m_name );
                     FS::SAV->m_acMapIdx = a.m_mapidx;
@@ -1243,6 +1246,7 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
                     animateHero( movedir, 1 );
                     acMap->draw( p_x - 16, p_y - 19, true );
                     animateHero( movedir, 2 );
+                    ANIMATE_MAP = true;
                     return true;
                 }
             }
@@ -1253,6 +1257,7 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
         if( WTW || acmovedata == 4 || ( acmovedata % 4 == 0 && acmovedata / 4 == p_z ) || acmovedata == 0 || acmovedata == 60 ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'E' && p_y >= a.m_move + 10 && p_y < a.m_move + a.m_mapsx + 10 ) {
+                    ANIMATE_MAP = false;
                     showNewMap( a.m_mapidx );
                     strcpy( FS::SAV->m_acMapName, a.m_name );
                     FS::SAV->m_acMapIdx = a.m_mapidx;
@@ -1264,6 +1269,7 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
                     animateHero( movedir, 1 );
                     acMap->draw( p_x - 15, p_y - 18, true );
                     animateHero( movedir, 2 );
+                    ANIMATE_MAP = true;
                     return true;
                 }
             }
@@ -1275,6 +1281,7 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
         if( WTW || acmovedata == 4 || ( acmovedata % 4 == 0 && acmovedata / 4 == p_z ) || acmovedata == 0 || acmovedata == 60 ) {
             for( auto a : acMap->m_anbindungen ) {
                 if( a.m_direction == 'S'  && p_x >= a.m_move + 10 && p_x < a.m_move + a.m_mapsy + 10 ) {
+                    ANIMATE_MAP = false;
                     showNewMap( a.m_mapidx );
                     strcpy( FS::SAV->m_acMapName, a.m_name );
                     FS::SAV->m_acMapIdx = a.m_mapidx;
@@ -1286,6 +1293,7 @@ bool movePlayerOnMap( s16 p_x, s16 p_y, s16 p_z, bool p_init /*= true*/ ) {
                     animateHero( movedir, 1 );
                     acMap->draw( p_x - 16, p_y - 17, true );
                     animateHero( movedir, 2 );
+                    ANIMATE_MAP = true;
                     return true;
                 }
             }
@@ -1586,6 +1594,8 @@ int main( int p_argc, char** p_argv ) {
         }
 
         IO::boldFont->setColor( 0, 0 );
+        u8 oldC1 = IO::boldFont->getColor( 1 );
+        u8 oldC2 = IO::boldFont->getColor( 2 );
         IO::boldFont->setColor( 0, 1 );
         IO::boldFont->setColor( BLACK_IDX, 2 );
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
@@ -1616,6 +1626,9 @@ int main( int p_argc, char** p_argv ) {
         acday = timeStruct->tm_mday;
         acmonth = timeStruct->tm_mon;
         acyear = timeStruct->tm_year + 1900;
+
+        IO::boldFont->setColor( oldC1, 1 );
+        IO::boldFont->setColor( oldC2, 2 );
     } );
 
     heroIsBig = FS::SAV->m_acMoveMode != MAP::MoveMode::WALK;
@@ -1650,6 +1663,8 @@ int main( int p_argc, char** p_argv ) {
     consoleSelect( &IO::Bottom );
     consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
     consoleClear( );
+
+    ANIMATE_MAP = true;
 
     loop( ) {
 
@@ -1888,7 +1903,7 @@ OUT:
                             tmp.push_back( FS::SAV->m_pkmnTeam[ i ] );
                         else
                             break;
-                    BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &tmp, 0 );
+                    BATTLE::battleTrainer me( "TEST", "", "", "", "", tmp, FS::SAV->m_bag->getBattleItems( ) );
 
                     for( u8 i = 0; i < 3; ++i ) {
                         pokemon a( 0, HILFSCOUNTER, 0,
@@ -1897,10 +1912,11 @@ OUT:
                         cpy.push_back( a );
                         HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
                     }
+                    std::vector<item> itms;
+                    BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
+                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, itms );
 
-                    BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...", "Yay gewonnen!", "Das war wohl eine Niederlage...", &( cpy ), 0 );
-
-                    BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::DOUBLE );
+                    BATTLE::battle test_battle( me, opp, 100, 5, BATTLE::battle::DOUBLE );
                     ANIMATE_MAP = false;
                     test_battle.start( );
                     for( u8 i = 0; i < tmp.size( ); ++i )
@@ -1914,7 +1930,7 @@ OUT:
                             tmp.push_back( FS::SAV->m_pkmnTeam[ i ] );
                         else
                             break;
-                    BATTLE::battleTrainer me( "TEST", 0, 0, 0, 0, &tmp, 0 );
+                    BATTLE::battleTrainer me( "TEST", "", "", "", "", tmp, FS::SAV->m_bag->getBattleItems( ) );
 
                     for( u8 i = 0; i < 6; ++i ) {
                         pokemon a( 0, HILFSCOUNTER, 0,
@@ -1923,10 +1939,11 @@ OUT:
                         cpy.push_back( a );
                         HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
                     }
+                    std::vector<item> itms;
+                    BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
+                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, itms );
 
-                    BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...", "Yay gewonnen!", "Das war wohl eine Niederlage...", &( cpy ), 0 );
-
-                    BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::SINGLE );
+                    BATTLE::battle test_battle( me, opp, 100, 5, BATTLE::battle::SINGLE );
                     ANIMATE_MAP = false;
                     test_battle.start( );
                     for( u8 i = 0; i < tmp.size( ); ++i )
@@ -1944,12 +1961,12 @@ OUT:
             }
 
             IO::drawSub( );
+            swiWaitForVBlank( );
             initMainSprites( );
             if( res == 3 || res == 4 ) {
                 initMapSprites( );
-                movePlayerOnMap( FS::SAV->m_acposx / 20, FS::SAV->m_acposy / 20, FS::SAV->m_acposz, true );
+                ANIMATE_MAP = movePlayerOnMap( FS::SAV->m_acposx / 20, FS::SAV->m_acposy / 20, FS::SAV->m_acposz, true );
             }
-            ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 10 ],  //Start Pokénav
             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 11 ], 16 ) ) {
 
