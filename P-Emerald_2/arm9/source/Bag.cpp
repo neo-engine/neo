@@ -40,7 +40,8 @@ namespace BAG {
     }
 
     void bag::erase( bagType p_bagType, u16 p_itemId, u16 p_cnt ) {
-        _items[ u16( p_bagType ) ][ p_itemId ] = std::max( 0, _items[ size_t( p_bagType ) ][ p_itemId ] - p_cnt );
+        p_cnt = std::min( p_cnt, _items[ size_t( p_bagType ) ][ p_itemId ] );
+        _items[ u16( p_bagType ) ][ p_itemId ] = _items[ size_t( p_bagType ) ][ p_itemId ] - p_cnt;
     }
 
     u16 bag::count( bagType p_bagType, u16 p_itemId ) {

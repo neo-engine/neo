@@ -64,10 +64,6 @@ public:
 
     std::string     getDescription2( bool p_new = false );
 
-    short           getMass( );
-
-    short           getSize( );
-
     berryGueteType  getGuete( );
 
     std::pair < Type, u8 >

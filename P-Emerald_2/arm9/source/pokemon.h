@@ -147,7 +147,7 @@ struct pokemonData {
 
 Type            getType( u16 p_pkmnId, u16 p_type );
 u16             getBase( u16 p_pkmnId, u16 p_base );
-u16             getCatchRate( u16 p_pkmnId ); 
+u16             getCatchRate( u16 p_pkmnId );
 const char*     getDisplayName( u16 p_pkmnId );
 const wchar_t*  getWDisplayName( u16 p_pkmnId );
 void            getWDisplayName( u16 p_pkmnId, wchar_t* p_name );
@@ -179,7 +179,7 @@ public:
         u16      m_checksum : 16;
         //BLOCKA{
         u16      m_speciesId : 16;
-        u16      m_holdItem : 16;
+        u16      m_holdItem;
         u16      m_oTId : 16;
         u16      m_oTSid : 16;
         u32            m_experienceGained : 32;

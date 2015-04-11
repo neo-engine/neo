@@ -30,7 +30,7 @@ along with Pokémon Emerald 2 Version.  If not, new see <http://www.gnu.org/lice
 #include "move.h"
 
 
-item* ItemList[ 800 ] = {
+item* ItemList[ 772 ] = {
     new item( "Null" ),
     new ball( "Meisterball" ), new ball( "Hyperball" ),
     new ball( "Superball" ), new ball( "Pokeball" ),

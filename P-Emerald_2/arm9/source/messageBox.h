@@ -43,7 +43,7 @@ namespace IO {
             sprite_trainer = 2
         };
 
-        messageBox( item p_item, const u16 p_count );
+        messageBox( item* p_item, const u16 p_count );
 
         messageBox( const char* p_text, bool p_remsprites = true );
         messageBox( const wchar_t* p_text, bool p_remsprites = true );

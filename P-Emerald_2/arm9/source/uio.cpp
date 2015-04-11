@@ -292,14 +292,18 @@ namespace IO {
     }
 
     void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_colorIdx, bool p_pressed ) {
+        printChoiceBox( p_x1, p_y1, p_x2, p_y2, p_borderWidth, p_borderWidth, p_colorIdx, p_pressed );
+    }
+
+    void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2, u8 p_colorIdx, bool p_pressed ) {
         if( !p_pressed ) {
             printRectangle( p_x1 + 1, p_y1 + 1, p_x2, p_y2,
                             true, false, BLACK_IDX );
             printRectangle( p_x1, p_y1, p_x2 - 2, p_y2 - 1,
                             true, false, p_colorIdx );
-            printRectangle( p_x1 + 1 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth, p_y2 - p_borderWidth + 4,
+            printRectangle( p_x1 + 1 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4,
                             true, false, BLACK_IDX );
-            printRectangle( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth - 2, p_y2 - p_borderWidth + 3,
+            printRectangle( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth2 - 2, p_y2 - p_borderWidth + 3,
                             true, false, WHITE_IDX );
         } else {
             printRectangle( p_x1, p_y1, p_x2 - 1, p_y2 - 1,
@@ -307,10 +311,10 @@ namespace IO {
             printRectangle( p_x1 + 2, p_y1 + 1, p_x2, p_y2,
                             true, false, p_colorIdx );
 
-            printRectangle( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth - 1, p_y2 - p_borderWidth + 3,
+            printRectangle( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth2 - 1, p_y2 - p_borderWidth + 3,
                             true, false, BLACK_IDX );
 
-            printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth, p_y2 - p_borderWidth + 4,
+            printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4,
                             true, false, WHITE_IDX );
         }
     }

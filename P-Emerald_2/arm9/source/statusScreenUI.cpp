@@ -78,7 +78,7 @@ namespace STS {
         consoleSetWindow( &IO::Bottom, 16, 0, 16, 16 );
         consoleClear( );
         IO::initOAMTable( true );
-        u16 nextAvailableTileIdx = 16;
+        u16 nextAvailableTileIdx = 0;
 
         nextAvailableTileIdx = IO::loadSprite( BACK_ID, BACK_ID, nextAvailableTileIdx,
                                                SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,

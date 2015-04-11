@@ -874,16 +874,21 @@ std::string item::getDescription( bool p_new ) {
 }
 
 std::string item::getDisplayName( bool p_new ) {
+    if( _dislayNameStatus && p_new == ( _dislayNameStatus - 1 ) )
+        return _displayName;
+    _dislayNameStatus = 1 + p_new;
+
     sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
     FILE* f = fopen( buffer, "r" );
     if( f == 0 )
-        return m_itemName;
+        return _displayName = m_itemName;
     int ac;
     fscanf( f, "%i", &ac );
     fscanf( f, "%i\n", &ac );
-    std::string s = FS::readString( f, p_new );
+    _displayName = FS::readString( f, p_new );
     fclose( f );
-    return s;
+
+    return _displayName;
 }
 
 item::itemEffectType item::getEffectType( ) {

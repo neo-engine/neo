@@ -37,6 +37,9 @@
 extern const char ITEM_PATH[ ];
 
 class item {
+private:
+    std::string _displayName;
+    u8 _dislayNameStatus;
 public:
     enum itemEffectType {
         NONE = 0,
@@ -56,7 +59,8 @@ public:
         BATTLE_ITEM
     };
 
-    std::string     m_itemName;//, displayName, dscrpt;
+
+    std::string     m_itemName;
     //EFFEKT effekt;
     itemType        m_itemType;
     ability::abilityType
@@ -157,7 +161,7 @@ public:
 };
 
 
-extern item* ItemList[ 800 ];
+extern item* ItemList[ 772 ];
 
 
 #define I_NONE 0

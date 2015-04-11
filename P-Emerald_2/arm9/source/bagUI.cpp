@@ -1,478 +1,391 @@
-///*
-//Pokémon Emerald 2 Version
-//------------------------------
-//
-//file        : bagUI.cpp
-//author      : Philip Wellnitz (RedArceus)
-//description :
-//
-//Copyright (C) 2012 - 2015
-//Philip Wellnitz (RedArceus)
-//
-//This file is part of Pokémon Emerald 2 Version.
-//
-//Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
-//it under the terms of the GNU General Public License as published by
-//the Free Software Foundation, either version 3 of the License, or
-//(at your option) any later version.
-//
-//Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
-//but WITHOUT ANY WARRANTY; without even the implied warranty of
-//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//GNU General Public License for more details.
-//
-//You should have received a copy of the GNU General Public License
-//along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
-//*/
-//
-//
-//#include "screenLoader.h"
-//#include "bag.h"
-//#include "defines.h"
-//#include "item.h"
-//#include "fs.h"
-//#include "messageBox.h"
-//#include "saveGame.h"
-//#include "userInput.h"
-//
-//#include <vector>
-//
-////Sprites
-//#include "Back.h"
-//#include "BagBall1.h"
-//#include "BagBall2.h"
-//#include "BagHm1.h"
-//#include "BagHm2.h"
-//#include "BagKey1.h"
-//#include "BagKey2.h"
-//#include "BagMediine1.h"
-//#include "BagMediine2.h"
-//#include "BagBerry1.h"
-//#include "BagBerry2.h"
-//
-//#include "bag_bg_lower.h"
-//#include "bag_bg_upper.h"
-//
-//namespace BAG {
-//
-//    void drawBagTop( ) {
-//        dmaCopy( bag_bg_upperBitmap, bgGetGfxPtr( bg3 ), 256 * 192 );
-//        dmaCopy( bag_bg_upperPal, BG_PALETTE, 256 * 2 );
-//    }
-//
-//    void drawBagSub( ) {
-//        dmaCopy( bag_bg_lowerBitmap, bgGetGfxPtr( bg3sub ), 256 * 192 );
-//        dmaCopy( bag_bg_lowerPal, BG_PALETTE_SUB, 256 * 2 );
-//    }
-//
-//    const unsigned short * bagPals[ 10 ] = { BagBall1Pal, BagBall2Pal, BagMediine1Pal, BagMediine2Pal, BagHm1Pal, BagHm2Pal, BagBerry1Pal, BagBerry2Pal, BagKey1Pal, BagKey2Pal };
-//    const unsigned int * bagTiles[ 10 ] = { BagBall1Tiles, BagBall2Tiles, BagMediine1Tiles, BagMediine2Tiles, BagHm1Tiles, BagHm2Tiles, BagBerry1Tiles, BagBerry2Tiles, BagKey1Tiles, BagKey2Tiles };
-//
-//    u16 tileCntSub;
-//    void loadBagSprites( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
-//        tileCntSub = 16;
-//        tileCntSub = loadSprite( p_oam, p_spriteInfo, BACK_ID, BACK_ID, tileCntSub,
-//                                 SCREEN_WIDTH - 32, SCREEN_HEIGHT - 24, 32, 32, BackPal,
-//                                 BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
-//
-//        tileCntSub = loadSprite( p_oam, p_spriteInfo, 1, 1, tileCntSub,
-//                                 SCREEN_WIDTH - 64, SCREEN_HEIGHT - 24, 32, 32, BackPal,
-//                                 BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, true );
-//        tileCntSub = loadSprite( p_oam, p_spriteInfo, 2, 2, tileCntSub,
-//                                 SCREEN_WIDTH - 96, SCREEN_HEIGHT - 24, 32, 32, BackPal,
-//                                 BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, true );
-//        tileCntSub = loadSprite( p_oam, p_spriteInfo, 3, 3, tileCntSub,
-//                                 SCREEN_WIDTH - 128, SCREEN_HEIGHT - 24, 32, 32, BackPal,
-//                                 BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, true );
-//
-//        u8 oamIdx = 3;
-//        u8 palIdx = 3;
-//        for( u8 i = 0; i < SAV->m_PkmnTeam.size( ); ++i ) {
-//            auto acPkmn = SAV->m_PkmnTeam[ i ];
-//
-//            FS::drawPKMNIcon( Oam,
-//                              spriteInfo,
-//                              acPkmn.m_boxdata.m_speciesId,
-//                              8,
-//                              26 + i * 26,
-//                              oamIdx,
-//                              palIdx,
-//                              tileCntSub,
-//                              true );
-//        }
-//        for( u8 i = 0; i < 5; ++i ) {
-//            tileCntSub = loadSprite( p_oam, p_spriteInfo, 10 + i, 10 + i, tileCntSub,
-//                                     26 * SAV->m_bagPoses[ i ], 3, 32, 32, bagPals[ 2 * i ],
-//                                     bagTiles[ 2 * i ], BackTilesLen, false, false, false, OBJPRIORITY_0, true );
-//        }
-//    }
-//
-//#define GENERAL_ITEMS 0
-//#define MEDICINE 1
-//#define TMHM 2
-//#define BERRIES 3
-//#define KEY_ITEMS 4
-//
-//    void showActiveBag( u8 p_bagNo, bool p_active = true ) {
-//        u16 tileIdx = Oam->oamBuffer[ 10 + p_bagNo ].gfxIndex;
-//        loadSprite( Oam, spriteInfo, 10 + p_bagNo, 10 + p_bagNo, tileIdx,
-//                    26 * SAV->m_bagPoses[ p_bagNo ], 3, 32, 32, bagPals[ 2 * p_bagNo + p_active ],
-//                    bagTiles[ 2 * p_bagNo + p_active ], BackTilesLen, false, false, false, OBJPRIORITY_0, true );
-//    }
-//
-//    void initColors( ) {
-//
-//        IO::regularFont->setColor( 0, 0 );
-//        IO::regularFont->setColor( BLACK_IDX, 1 );
-//        IO::regularFont->setColor( GRAY_IDX, 2 );
-//        IO::boldFont->setColor( 0, 0 );
-//        IO::boldFont->setColor( GRAY_IDX, 1 );
-//        IO::boldFont->setColor( WHITE_IDX, 2 );
-//
-//        BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-//        BG_PALETTE_SUB[ GRAY_IDX ] = STEEL;
-//        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
-//        BG_PALETTE_SUB[ RED_IDX ] = RED;
-//        BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;
-//        BG_PALETTE[ WHITE_IDX ] = WHITE;
-//        BG_PALETTE[ GRAY_IDX ] = STEEL;
-//        BG_PALETTE[ BLACK_IDX ] = BLACK;
-//        BG_PALETTE[ RED_IDX ] = RED;
-//        BG_PALETTE[ BLUE_IDX ] = BLUE;
-//
-//    }
-//
-//    void drawActiveBagTop( u8 p_bagNo ) {
-//        drawBagTop( );
-//        initColors( );
-//
-//        u8 idx = 0;
-//        switch( p_bagNo ) {
-//            case GENERAL_ITEMS:{
-//                IO::regularFont->printString( bagnames[ 0 ].c_str( ), 106, 4, false );
-//                idx = 0;
-//                break;
-//            }
-//            case MEDICINE:{
-//                IO::regularFont->printString( bagnames[ 4 ].c_str( ), 104, 4, false );
-//                idx = 4;
-//                break;
-//            }
-//            case TMHM:{
-//                IO::regularFont->printString( bagnames[ 2 ].c_str( ), 106, 4, false );
-//                idx = 2;
-//                break;
-//            }
-//            case BERRIES:{
-//                IO::regularFont->printString( bagnames[ 5 ].c_str( ), 104, 4, false );
-//                idx = 5;
-//                break;
-//            }
-//            case KEY_ITEMS:{
-//                IO::regularFont->printString( bagnames[ 1 ].c_str( ), 90, 4, false );
-//                idx = 1;
-//                break;
-//            }
-//            default:
-//                return;
-//        }
-//        if( idx ) {
-//            consoleSelect( &Top );
-//            consoleSetWindow( &Top, 0, 22, 32, 3 );
-//            consoleClear( );
-//
-//            consoleSelect( &Top );
-//            consoleSetWindow( &Top, 0, 22, 12, 3 );
-//            u16 acIn = 214 + 4 * idx;
-//            u16 s = SAV->m_bag.m_bags[ idx ].size( );
-//            //char buffer[ 50 ];
-//            printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
-//
-//            if( s == 1 )
-//                sprintf( buffer, "  1 Item" );
-//            else
-//                sprintf( buffer, "%3i Items", s );
-//
-//            IO::regularFont->printString( buffer, 16, 177, false );
-//        } else {
-//            consoleSelect( &Top );
-//            consoleSetWindow( &Top, 0, 22, 12, 3 );
-//            consoleClear( );
-//
-//            consoleSetWindow( &Top, 0, 22, 12, 3 );
-//            u16 acIn = 214 + 4 * idx;
-//            u16 s = SAV->m_bag.m_bags[ idx ].size( );
-//            //char buffer[ 50 ];
-//            printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
-//            sprintf( buffer, "%3i,", s );
-//
-//            IO::regularFont->printString( buffer, 16, 177, false );
-//
-//            idx = 3;
-//            consoleSetWindow( &Top, 6, 22, 12, 3 );
-//            acIn = 214 + 4 * idx;
-//            s = SAV->m_bag.m_bags[ idx ].size( );
-//            //char buffer[ 50 ];
-//            printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
-//            sprintf( buffer, "%2i,", s );
-//
-//            IO::regularFont->printString( buffer, 64, 177, false );
-//
-//
-//            idx = 6;
-//            consoleSetWindow( &Top, 11, 22, 12, 3 );
-//            acIn = 214 + 4 * idx;
-//            s = SAV->m_bag.m_bags[ idx ].size( );
-//            //char buffer[ 50 ];
-//            printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
-//            sprintf( buffer, "%2i,", s );
-//
-//            IO::regularFont->printString( buffer, 104, 177, false );
-//
-//
-//            idx = 7;
-//            consoleSetWindow( &Top, 16, 22, 12, 3 );
-//            acIn = 214 + 4 * idx;
-//            s = SAV->m_bag.m_bags[ idx ].size( );
-//            //char buffer[ 50 ];
-//            printf( "%c%c\n%c%c ", ( acIn ), ( acIn + 1 ), ( acIn + 2 ), ( acIn + 3 ) );
-//            sprintf( buffer, "%2i Items", s );
-//
-//            IO::regularFont->printString( buffer, 144, 177, false );
-//        }
-//    }
-//
-//    void drawItemTop( item* p_item, u16 p_count ) {
-//        u8 oamIdxTop = 0,
-//            palCntTop = 0;
-//        u16 tileCntTop = 0;
-//
-//        std::string display;
-//        std::string descr;
-//
-//        if( p_item->m_itemType != item::itemType::TM_HM ) {
-//            FS::drawItemIcon( OamTop, spriteInfoTop, p_item->m_itemName, 112, 46, oamIdxTop, palCntTop, tileCntTop, false );
-//            OamTop->oamBuffer[ ++oamIdxTop ].isHidden = true;
-//            OamTop->oamBuffer[ ++oamIdxTop ].isHidden = true;
-//            IO::updateOAM( false );
-//
-//            display = p_item->getDisplayName( true );
-//            descr = p_item->getDescription( true );
-//
-//            if( p_item->m_itemType != item::itemType::KEY_ITEM ) {
-//                std::sprintf( buffer, "x %d", p_count );
-//                IO::regularFont->printString( buffer, 144, 53, false );
-//            }
-//        } else {
-//            auto mv = *( static_cast<TM*>( p_item ) );
-//
-//            FS::drawTMIcon( OamTop, spriteInfoTop, AttackList[ mv.m_moveIdx ]->m_moveType,
-//                            AttackList[ mv.m_moveIdx ]->m_isFieldAttack, 112, 46, oamIdxTop, palCntTop, tileCntTop, false );
-//            IO::updateOAM( false );
-//
-//            display = p_item->getDisplayName( true ) + ": " + AttackList[ mv.m_moveIdx ]->m_moveName;
-//            descr = FS::breakString( AttackList[ mv.m_moveIdx ]->description( ), cust_font, 196 );
-//
-//
-//            IO::regularFont->printString( "Typ", 33, 145, false );
-//            drawTypeIcon( OamTop, spriteInfoTop, oamIdxTop, palCntTop, tileCntTop, AttackList[ mv.m_moveIdx ]->m_moveType, 62, 144, false );
-//
-//            IO::regularFont->printString( "Kateg.", 100, 145, false );
-//            drawDamageCategoryIcon( OamTop, spriteInfoTop, oamIdxTop, palCntTop, tileCntTop, AttackList[ mv.m_moveIdx ]->m_moveHitType, 152, 144, false );
-//
-//            IO::updateOAM( false );
-//
-//            IO::regularFont->printString( "AP", 190, 145, false );
-//            std::sprintf( buffer, "%2d", AttackList[ mv.m_moveIdx ]->m_movePP );
-//            IO::regularFont->printString( buffer, 229 - IO::regularFont->stringWidth( buffer ), 145, false );
-//
-//            IO::regularFont->setColor( RED_IDX, 1 );
-//            IO::regularFont->printString( "Stärke", 33, 160, false );
-//            if( AttackList[ mv.m_moveIdx ]->m_moveHitType != move::moveHitTypes::STAT
-//                &&  AttackList[ mv.m_moveIdx ]->m_moveBasePower > 1 )
-//                std::sprintf( buffer, "%3d", AttackList[ mv.m_moveIdx ]->m_moveBasePower );
-//            else
-//                std::sprintf( buffer, "---" );
-//            IO::regularFont->printString( buffer, 108 - IO::regularFont->stringWidth( buffer ), 160, false );
-//
-//            IO::regularFont->setColor( BLUE_IDX, 1 );
-//            IO::regularFont->printString( "Genauigkeit", 124, 160, false );
-//            if( AttackList[ mv.m_moveIdx ]->m_moveAccuracy )
-//                std::sprintf( buffer, "%3d", AttackList[ mv.m_moveIdx ]->m_moveAccuracy );
-//            else
-//                std::sprintf( buffer, "---" );
-//            IO::regularFont->printString( buffer, 229 - IO::regularFont->stringWidth( buffer ), 160, false );
-//            IO::regularFont->setColor( BLACK_IDX, 1 );
-//        }
-//
-//        IO::regularFont->printString( display.c_str( ),
-//                               128 - IO::regularFont->stringWidth( display.c_str( ) ) / 2, 26, false );
-//
-//
-//        IO::regularFont->printString( descr.c_str( ), 33, 86, false, 15 );
-//
-//    }
-//
-//    void drawPKMNs( OAMTable * p_oam, SpriteInfo *p_spriteInfo ) {
-//
-//    }
-//
-//    void bagUIInit( ) {
-//
-//        drawBagTop( );
-//        drawBagSub( );
-//
-//        initColors( );
-//
-//        initOAMTable( OamTop );
-//        initOAMTable( true );
-//
-//        loadBagSprites( Oam, spriteInfo );
-//        drawPKMNs( Oam, spriteInfo );
-//    }
-//
-//    void bagUIDinit( ) {
-//        initOAMTable( OamTop );
-//        initOAMTable( true );
-//        initMainSprites( Oam, spriteInfo );
-//        setMainSpriteVisibility( false );
-//        Oam->oamBuffer[ 8 ].isHidden = true;
-//        Oam->oamBuffer[ 0 ].isHidden = true;
-//        Oam->oamBuffer[ 1 ].isHidden = false;
-//        videoSetModeSub( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-//        drawSub( );
-//    }
-//
-//    void bag::draw( u8& p_startBag, u8& p_startItemIdx ) {
-//        vramSetup( );
-//        videoSetMode( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-//        videoSetModeSub( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-//        memset( bgGetGfxPtr( bg2 ), 0, 256 * 192 );
-//        memset( bgGetGfxPtr( bg3 ), 0, 256 * 192 );
-//        Top = *consoleInit( &Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
-//        consoleSetFont( &Top, &cfont );
-//
-//        Bottom = *consoleInit( &Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
-//        consoleSetFont( &Bottom, &cfont );
-//
-//        touchPosition t;
-//
-//        bagUIInit( );
-//
-//        showActiveBag( p_startBag );
-//        drawActiveBagTop( p_startBag );
-//
-//        if( !SAV->m_bag.m_bags[ p_startBag ].empty( ) ) {
-//            p_startItemIdx = std::min( p_startItemIdx, u8( SAV->m_bag.m_bags[ p_startBag ].size( ) - 1 ) );
-//
-//            drawItemTop( ItemList[ SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
-//                         SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
-//        }
-//
-//        loop( ) {
-//            swiWaitForVBlank( );
-//            updateOAM( true );
-//            touchRead( &t );
-//            scanKeys( );
-//            u32 pressed = keysDown( ), up = keysUp( ), held = keysHeld( );
-//            if( ( t.px > 228 && t.py > 168 ) ) { //Back
-//                Oam->oamBuffer[ BACK_ID ].y -= 4;
-//                updateOAM( true );
-//                if( !UI::waitForTouchUp( false, false, 228, 164 ) ) {
-//                    Oam->oamBuffer[ BACK_ID ].y += 4;
-//                    continue;
-//                }
-//                break;
-//            } else if( ( held & KEY_LEFT ) ) {
-//                loop( ) {
-//                    if( keysUp( ) & KEY_LEFT )
-//                        break;
-//                    scanKeys( );
-//                    swiWaitForVBlank( );
-//                    updateTime( );
-//                }
-//                showActiveBag( p_startBag, false );
-//
-//                u8 currBgPos = SAV->m_bagPoses[ p_startBag ];
-//                currBgPos = ( currBgPos + 4 ) % 5;
-//                for( u8 i = 0; i < 5; ++i )
-//                    if( SAV->m_bagPoses[ i ] == currBgPos ) {
-//                        p_startBag = i;
-//                        break;
-//                    }
-//
-//                showActiveBag( p_startBag );
-//                drawActiveBagTop( p_startBag );
-//                if( !SAV->m_bag.m_bags[ p_startBag ].empty( ) ) {
-//                    p_startItemIdx = std::min( p_startItemIdx, u8( SAV->m_bag.m_bags[ p_startBag ].size( ) - 1 ) );
-//
-//                    drawItemTop( ItemList[ SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
-//                                 SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
-//                }
-//            } else if( ( held & KEY_RIGHT ) ) {
-//                loop( ) {
-//                    if( keysUp( ) & KEY_RIGHT )
-//                        break;
-//                    scanKeys( );
-//                    swiWaitForVBlank( );
-//                    updateTime( );
-//                }
-//                showActiveBag( p_startBag, false );
-//
-//                u8 currBgPos = SAV->m_bagPoses[ p_startBag ];
-//                currBgPos = ( currBgPos + 1 ) % 5;
-//                for( u8 i = 0; i < 5; ++i )
-//                    if( SAV->m_bagPoses[ i ] == currBgPos ) {
-//                        p_startBag = i;
-//                        break;
-//                    }
-//
-//                showActiveBag( p_startBag );
-//                drawActiveBagTop( p_startBag );
-//                if( !SAV->m_bag.m_bags[ p_startBag ].empty( ) ) {
-//                    p_startItemIdx = std::min( p_startItemIdx, u8( SAV->m_bag.m_bags[ p_startBag ].size( ) - 1 ) );
-//
-//                    drawItemTop( ItemList[ SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
-//                                 SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
-//                }
-//            } else if( ( held & KEY_DOWN ) ) {
-//                loop( ) {
-//                    if( keysUp( ) & KEY_DOWN )
-//                        break;
-//                    scanKeys( );
-//                    swiWaitForVBlank( );
-//                    updateTime( );
-//                }
-//                if( !SAV->m_bag.m_bags[ p_startBag ].empty( ) ) {
-//                    drawActiveBagTop( p_startBag );
-//                    p_startItemIdx = ( p_startItemIdx + 1 ) % SAV->m_bag.m_bags[ p_startBag ].size( );
-//
-//                    drawItemTop( ItemList[ SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
-//                                 SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
-//                }
-//            } else if( ( held & KEY_UP ) ) {
-//                loop( ) {
-//                    if( keysUp( ) & KEY_UP )
-//                        break;
-//                    scanKeys( );
-//                    swiWaitForVBlank( );
-//                    updateTime( );
-//                }
-//                if( !SAV->m_bag.m_bags[ p_startBag ].empty( ) ) {
-//                    drawActiveBagTop( p_startBag );
-//                    p_startItemIdx = ( p_startItemIdx + SAV->m_bag.m_bags[ p_startBag ].size( ) - 1 ) % SAV->m_bag.m_bags[ p_startBag ].size( );
-//
-//                    drawItemTop( ItemList[ SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].first ],
-//                                 SAV->m_bag.m_bags[ p_startBag ][ p_startItemIdx ].second );
-//                }
-//            }
-//
-//            for( u8 i = 0; i < 5; ++i )
-//                if( t.px ) {
-//
-//                }
-//        }
-//
-//        bagUIDinit( );
-//    }
-//}
+/*
+Pokémon Emerald 2 Version
+------------------------------
+
+file        : bagUI.cpp
+author      : Philip Wellnitz (RedArceus)
+description :
+
+Copyright (C) 2012 - 2015
+Philip Wellnitz (RedArceus)
+
+This file is part of Pokémon Emerald 2 Version.
+
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+#include "bag.h"
+#include "bagUI.h"
+#include "bagViewer.h"
+#include "defines.h"
+#include "item.h"
+#include "berry.h"
+#include "fs.h"
+#include "messageBox.h"
+#include "saveGame.h"
+#include "uio.h"
+
+#include <vector>
+
+//Sprites
+#include "Back.h"
+#include "BagBall1.h"
+#include "BagBall2.h"
+#include "BagHm1.h"
+#include "BagHm2.h"
+#include "BagKey1.h"
+#include "BagKey2.h"
+#include "BagMediine1.h"
+#include "BagMediine2.h"
+#include "BagBerry1.h"
+#include "BagBerry2.h"
+#include "Up.h"
+#include "Down.h"
+
+#include "bag_bg_lower.h"
+#include "bag_bg_upper.h"
+
+namespace BAG {
+    const unsigned short * bagPals[ 10 ] = { BagBall1Pal, BagBall2Pal, BagMediine1Pal, BagMediine2Pal, BagHm1Pal, BagHm2Pal, BagBerry1Pal, BagBerry2Pal, BagKey1Pal, BagKey2Pal };
+    const unsigned int * bagTiles[ 10 ] = { BagBall1Tiles, BagBall2Tiles, BagMediine1Tiles, BagMediine2Tiles, BagHm1Tiles, BagHm2Tiles, BagBerry1Tiles, BagBerry2Tiles, BagKey1Tiles, BagKey2Tiles };
+
+    //#define BACK_ID 0
+#define PKMN_SUB 1
+#define BAG_SUB 7
+#define SORT_SUB 12
+    //#define UP_SUB 13
+    //#define DOWN_SUB 14
+#define TRANSFER_SUB 15
+
+
+    void showActiveBag( u8 p_bagNo, bool p_active = true ) {
+        u16 tileIdx = IO::Oam->oamBuffer[ BAG_SUB + p_bagNo ].gfxIndex;
+        IO::loadSprite( BAG_SUB + p_bagNo, BAG_SUB + p_bagNo, tileIdx,
+                        26 * p_bagNo /*SAV->m_bagPoses[ p_bagNo ]*/, 3, 32, 32, bagPals[ 2 * p_bagNo + p_active ],
+                        bagTiles[ 2 * p_bagNo + p_active ], BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+    }
+
+    void initColors( ) {
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::boldFont->setColor( 0, 0 );
+        IO::boldFont->setColor( GRAY_IDX, 1 );
+        IO::boldFont->setColor( WHITE_IDX, 2 );
+
+        BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
+        BG_PALETTE_SUB[ GRAY_IDX ] = GRAY;
+        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
+        BG_PALETTE_SUB[ RED_IDX ] = RED;
+        BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;
+        BG_PALETTE[ WHITE_IDX ] = WHITE;
+        BG_PALETTE[ GRAY_IDX ] = GRAY;
+        BG_PALETTE[ BLACK_IDX ] = BLACK;
+        BG_PALETTE[ RED_IDX ] = RED;
+        BG_PALETTE[ BLUE_IDX ] = BLUE;
+    }
+
+    void bagUI::init( ) {
+        IO::vramSetup( );
+        videoSetMode( MODE_5_2D/* | DISPLAY_BG2_ACTIVE*/ | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
+        swiWaitForVBlank( );
+        IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
+        consoleSetFont( &IO::Top, IO::consoleFont );
+
+        dmaCopy( bag_bg_upperBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
+        dmaCopy( bag_bg_upperPal, BG_PALETTE, 256 * 2 );
+
+
+        IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
+        consoleSetFont( &IO::Bottom, IO::consoleFont );
+
+        FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "Clear", 512, 49152, true );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "Clear", 512, 49152, true );
+        dmaCopy( bag_bg_lowerBitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
+        dmaCopy( bag_bg_lowerPal, BG_PALETTE_SUB, 256 * 2 );
+
+        consoleSelect( &IO::Top );
+        consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+        consoleClear( );
+        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+        consoleSelect( &IO::Bottom );
+        consoleClear( );
+
+        bgUpdate( );
+        initColors( );
+
+        IO::initOAMTable( false );
+        //Don't init anything else for the top screen here
+
+        IO::initOAMTable( true );
+        u16 tileCnt = 0;
+
+        tileCnt = IO::loadSprite( BACK_ID, BACK_ID, tileCnt,
+                                  SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26, 32, 32, BackPal,
+                                  BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+        for( u8 i = 0; i < 6; ++i ) {
+            auto acPkmn = FS::SAV->m_pkmnTeam[ i ];
+            if( !acPkmn.m_boxdata.m_speciesId )
+                break;
+            if( acPkmn.m_boxdata.m_individualValues.m_isEgg )
+                tileCnt = IO::loadEggIcon( 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
+            else
+                tileCnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
+        }
+        for( u8 i = 0; i < 5; ++i ) {
+            tileCnt = IO::loadSprite( BAG_SUB + i, BAG_SUB + i, tileCnt,
+                                      26 * i/*FS::SAV->m_bagPoses[ i ]*/, 3, 32, 32, bagPals[ 2 * i ],
+                                      bagTiles[ 2 * i ], BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+        }
+
+        tileCnt = IO::loadSprite( FWD_ID, FWD_ID, tileCnt,
+                                  SCREEN_WIDTH - 60, SCREEN_HEIGHT - 26, 32, 32, DownPal,
+                                  DownTiles, DownTilesLen, false, false, false, OBJPRIORITY_1, true );
+        tileCnt = IO::loadSprite( BWD_ID, BWD_ID, tileCnt,
+                                  SCREEN_WIDTH - 92, SCREEN_HEIGHT - 26, 32, 32, UpPal,
+                                  UpTiles, UpTilesLen, false, false, false, OBJPRIORITY_1, true );
+        tileCnt = IO::loadSprite( TRANSFER_SUB, TRANSFER_SUB, tileCnt,
+                                  SCREEN_WIDTH - 92, SCREEN_HEIGHT - 26, 32, 32, UpPal,
+                                  UpTiles, UpTilesLen, false, false, true, OBJPRIORITY_1, true );
+
+        IO::updateOAM( true );
+    }
+
+    void drawItemTop( item* p_item, u16 p_count ) {
+        std::string display;
+        std::string descr;
+
+        if( p_item->m_itemType != item::itemType::TM_HM ) {
+            IO::loadItemIcon( p_item->m_itemName, 112, 46, 0, 0, 0, false );
+            IO::OamTop->oamBuffer[ 1 ].isHidden = true;
+            IO::OamTop->oamBuffer[ 2 ].isHidden = true;
+            IO::updateOAM( false );
+
+            display = p_item->getDisplayName( true );
+            descr = p_item->getDescription( true );
+
+            if( p_item->m_itemType != item::itemType::KEY_ITEM ) {
+                std::sprintf( buffer, "x %d", p_count );
+                IO::regularFont->printString( buffer, 144, 53, false );
+            }
+
+            if( p_item->m_itemType == item::itemType::BERRIES ) {
+                berry* curr = static_cast<berry*>( p_item );
+                curr->load( );
+
+                IO::regularFont->setColor( RED_IDX, 1 );
+                sprintf( buffer, "Güte: %s", ( curr->m_berryGuete == berry::berryGueteType::HARD ) ? "Hart" :
+                         ( ( curr->m_berryGuete == berry::berryGueteType::SOFT ) ? "Weich" :
+                         ( ( curr->m_berryGuete == berry::berryGueteType::SUPER_HARD ) ? "Steinhart" :
+                         ( ( curr->m_berryGuete == berry::berryGueteType::SUPER_SOFT ) ? "Normal" :
+                         ( ( curr->m_berryGuete == berry::berryGueteType::VERY_HARD ) ? "Sehr hart" :
+                         ( "Sehr weich" ) ) ) ) ) );
+                IO::regularFont->printString( buffer, 24, 145, false );
+                IO::regularFont->setColor( BLUE_IDX, 1 );
+                sprintf( buffer, "Größe:%4.1fcm", curr->m_berrySize / 10.0 );
+                IO::regularFont->printString( buffer, 140, 145, false );
+                IO::regularFont->setColor( BLACK_IDX, 1 );
+
+                std::string tastes[ 5 ] = { "Scharf", "Trocken", "Süß", "Bitter", "Sauer" };
+                u8 poses[ 5 ] = { 18, 66, 124, 150, 194 };
+                u8 mx = 0;
+                for( u8 i = 0; i < 5; ++i )
+                    mx = std::max( mx, curr->m_berryTaste[ i ] );
+                for( u8 i = 0; i < 5; ++i ) {
+                    if( curr->m_berryTaste[ i ] != mx ) {
+                        IO::regularFont->setColor( GRAY_IDX, 1 );
+                        IO::regularFont->setColor( WHITE_IDX, 2 );
+                    } else {
+                        IO::regularFont->setColor( GRAY_IDX, 2 );
+                        IO::regularFont->setColor( BLACK_IDX, 1 );
+                    }
+                    IO::regularFont->printString( tastes[ i ].c_str( ), poses[ i ], 160, false );
+                }
+                IO::regularFont->setColor( GRAY_IDX, 2 );
+                IO::regularFont->setColor( BLACK_IDX, 1 );
+            }
+        } else {
+            auto mv = *( static_cast<TM*>( p_item ) );
+
+            u16 tileCnt = IO::loadTMIcon( AttackList[ mv.m_moveIdx ]->m_moveType,
+                                          AttackList[ mv.m_moveIdx ]->m_isFieldAttack, 112, 46, 0, 0, 0, false );
+            IO::updateOAM( false );
+
+            display = p_item->getDisplayName( true ) + ": " + AttackList[ mv.m_moveIdx ]->m_moveName;
+            descr = FS::breakString( AttackList[ mv.m_moveIdx ]->description( ), IO::regularFont, 196 );
+
+
+            IO::regularFont->printString( "Typ", 33, 145, false );
+            tileCnt = IO::loadTypeIcon( AttackList[ mv.m_moveIdx ]->m_moveType, 62, 144, 1, 1, tileCnt, false );
+
+            IO::regularFont->printString( "Kateg.", 100, 145, false );
+            IO::loadDamageCategoryIcon( AttackList[ mv.m_moveIdx ]->m_moveHitType, 152, 144, 2, 2, tileCnt, false );
+
+            IO::updateOAM( false );
+
+            IO::regularFont->printString( "AP", 190, 145, false );
+            std::sprintf( buffer, "%2d", AttackList[ mv.m_moveIdx ]->m_movePP );
+            IO::regularFont->printString( buffer, 229 - IO::regularFont->stringWidth( buffer ), 145, false );
+
+            IO::regularFont->setColor( RED_IDX, 1 );
+            IO::regularFont->printString( "Stärke", 33, 160, false );
+            if( AttackList[ mv.m_moveIdx ]->m_moveHitType != move::moveHitTypes::STAT
+                &&  AttackList[ mv.m_moveIdx ]->m_moveBasePower > 1 )
+                std::sprintf( buffer, "%3d", AttackList[ mv.m_moveIdx ]->m_moveBasePower );
+            else
+                std::sprintf( buffer, "---" );
+            IO::regularFont->printString( buffer, 108 - IO::regularFont->stringWidth( buffer ), 160, false );
+
+            IO::regularFont->setColor( BLUE_IDX, 1 );
+            IO::regularFont->printString( "Genauigkeit", 124, 160, false );
+            if( AttackList[ mv.m_moveIdx ]->m_moveAccuracy )
+                std::sprintf( buffer, "%3d", AttackList[ mv.m_moveIdx ]->m_moveAccuracy );
+            else
+                std::sprintf( buffer, "---" );
+            IO::regularFont->printString( buffer, 229 - IO::regularFont->stringWidth( buffer ), 160, false );
+            IO::regularFont->setColor( BLACK_IDX, 1 );
+        }
+
+        IO::regularFont->printString( display.c_str( ),
+                                      128 - IO::regularFont->stringWidth( display.c_str( ) ) / 2, 26, false );
+
+
+        IO::regularFont->printString( descr.c_str( ), 33, 83, false, 11 );
+
+    }
+
+    void drawPkmn( item* p_item ) {
+        for( u8 i = 0; i < 6; ++i ) {
+            if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                break;
+            IO::printRectangle( 0, 33 + 26 * i, 128, 33 + 26 * i + 26, true, false, 0 );
+            IO::regularFont->setColor( WHITE_IDX, 1 );
+            IO::regularFont->setColor( GRAY_IDX, 2 );
+
+            if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg )
+                IO::regularFont->printString( "Ei", 45, 38 + 26 * i, true );
+            else {
+                if( p_item->m_itemType == item::itemType::TM_HM ) {
+                    if( canLearn( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId, static_cast<TM*>( p_item )->m_moveIdx, 4 ) ) {
+                        BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
+                        IO::regularFont->setColor( COLOR_IDX, 1 );
+                        IO::regularFont->setColor( BLACK_IDX, 2 );
+                        IO::regularFont->printString( "Erlernbar", 45, 38 + 26 * i, true );
+                    } else {
+                        IO::regularFont->setColor( RED_IDX, 1 );
+                        IO::regularFont->setColor( BLACK_IDX, 2 );
+                        IO::regularFont->printString( "Nicht\nerlernbar", 45, 33 + 26 * i, true, 11 );
+                    }
+                } else if( p_item->m_itemType == item::itemType::MEDICINE ) {
+                    sprintf( buffer, "Level %3d\n%3d/%3d KP", FS::SAV->m_pkmnTeam[ i ].m_Level, FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP, FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
+                    IO::regularFont->printString( buffer, 45, 33 + 26 * i, true,11 );
+                } else {
+                    IO::regularFont->printString( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name, 45, 33 + 26 * i, true );
+
+                    IO::regularFont->setColor( BLACK_IDX, 2 );
+                    IO::regularFont->setColor( GRAY_IDX, 1 );
+
+                    if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem ) {
+                        IO::regularFont->printString( ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
+                                                      45, 44 + 26 * i, true );
+                    } else
+                        IO::regularFont->printString( "Kein Item", 45, 44 + 26 * i, true );
+                }
+            }
+        }
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
+    }
+
+    void drawItemSub( item* p_item, u16 p_x, u16 p_y, bool p_selected, bool p_pressed, bool p_clearOnly = false ) {
+        IO::printRectangle( p_x, p_y, 255, p_y + 18, true, false, 0 );
+        if( p_clearOnly )
+            return;
+        if( p_item->getItemType( ) != item::itemType::GOODS
+            && toBagType( p_item->getItemType( ) ) == bag::bagType::ITEMS ) {
+            IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
+            IO::printChar( IO::boldFont, 490 - 22 + u16( p_item->getItemType( ) ), p_x + 102, p_y - 2, true );
+        } else
+            IO::printChoiceBox( p_x, p_y, p_x + 106, p_y + 16, 3, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
+        if( p_item->getItemType( ) != item::itemType::TM_HM )
+            IO::printString( IO::regularFont, p_item->getDisplayName( true ).c_str( ), p_x + 3, p_y + 1, true );
+        else
+            IO::printString( IO::regularFont, AttackList[ static_cast<TM*>( p_item )->m_moveIdx ]->m_moveName.c_str( ), p_x + 3, p_y + 1, true );
+    }
+
+    std::vector<IO::inputTarget> bagUI::drawBagPage( u8 p_page, u16 p_itemIdx ) {
+        std::vector<IO::inputTarget> res;
+
+        for( u8 i = 0; i < 5; ++i ) {
+            showActiveBag( i, i == p_page );
+            //if( i != p_page )
+            //    res.push_back( IO::inputTarget( 26 * i + 13, 3 + 13, 13 ) );
+        }
+        IO::updateOAM( true );
+
+        dmaCopy( bag_bg_upperBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
+        dmaCopy( bag_bg_upperPal, BG_PALETTE, 256 * 2 );
+        dmaCopy( bag_bg_lowerBitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
+        dmaCopy( bag_bg_lowerPal, BG_PALETTE_SUB, 256 * 2 );
+        initColors( );
+
+        switch( p_page ) {
+            case 0: case 2:{
+                IO::regularFont->printString( bagnames[ p_page ].c_str( ), 106, 4, false );
+                break;
+            }
+            case 1: case 3:{
+                IO::regularFont->printString( bagnames[ p_page ].c_str( ), 104, 4, false );
+                break;
+            }
+            case 4:{
+                IO::regularFont->printString( bagnames[ p_page ].c_str( ), 90, 4, false );
+                break;
+            }
+            default:
+                break;
+        }
+
+        drawPkmn( ItemList[ _bag[ p_page ][ p_itemIdx ].first ] );
+
+        if( !_bag[ p_page ].empty( ) ) {
+            drawItemTop( ItemList[ _bag[ p_page ][ p_itemIdx ].first ], _bag[ p_page ][ p_itemIdx ].second );
+            drawItemSub( ItemList[ _bag[ p_page ][ p_itemIdx ].first ], 132, 76, true, false );
+
+            u16 sz = _bag[ p_page ].size( );
+            u8 tp = ( sz - 1 ) / 2;
+
+            for( u8 i = 1; i < 5; ++i ) {
+                drawItemSub( ItemList[ _bag[ p_page ][ ( p_itemIdx + i ) % sz ].first ], 132, 76 + 18 * i, false, false, i > tp );
+                drawItemSub( ItemList[ _bag[ p_page ][ ( p_itemIdx + sz - i ) % sz ].first ], 132, 76 - 18 * i, false, false, i > ( tp + !( sz % 2 ) ) );
+            }
+
+        } else {
+            for( u8 i = 0; i < 5; ++i ) {
+                drawItemSub( 0, 132, 76 + 18 * i, false, false, true );
+                drawItemSub( 0, 132, 76 - 18 * i, false, false, true );
+            }
+            IO::regularFont->printString( "Keine Items", 140, 89, true );
+        }
+
+        return ( _ranges = res );
+    }
+    u8 bagUI::getSprite( u8 p_rangeIdx ) {
+
+    }
+    u32 bagUI::acceptDrop( u8 p_rangeIdx ) {
+
+    }
+}

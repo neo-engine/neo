@@ -48,17 +48,11 @@ namespace IO {
     }
 
 
-    messageBox::messageBox( item p_item, const u16 p_count ) {
+    messageBox::messageBox( item* p_item, const u16 p_count ) {
         m_isNamed = NULL;
 
         initTextField( );
         initOAMTable( true );
-        u16 c = 0;
-        c = loadSprite( A_ID, 0, 0,
-                        SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
-                        ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
-        loadItemIcon( p_item.m_itemName, 4, 4, 0, 1, c );
-        updateOAM( true );
         swiWaitForVBlank( );
 
         regularFont->setColor( 253, 3 );
@@ -68,16 +62,34 @@ namespace IO {
         BG_PALETTE_SUB[ 254 ] = RGB15( 0, 0, 15 );
 
         char buf[ 40 ];
-        sprintf( buf, "%3d %s in der", p_count, p_item.getDisplayName( ).c_str( ) );
+        if( BAG::toBagType( p_item->m_itemType ) != BAG::bag::bagType::TM_HM ) {
+            if( BAG::toBagType( p_item->m_itemType ) != BAG::bag::bagType::KEY_ITEMS )
+                sprintf( buf, "%3d %s in der", p_count, p_item->getDisplayName( true ).c_str( ) );
+            else
+                sprintf( buf, "%s in der", p_item->getDisplayName( true ).c_str( ) );
+            loadSprite( A_ID, 0, 0,
+                        SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
+                        ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
+            loadItemIcon( p_item->m_itemName, 4, 4, 0, 1, 0 );
+
+        } else {
+            auto mv = *( static_cast<TM*>( p_item ) );
+            sprintf( buf, "%s %s in der", p_item->getDisplayName( true ).c_str( ), AttackList[ mv.m_moveIdx ]->m_moveName.c_str( ) );
+            IO::loadTMIcon( AttackList[ mv.m_moveIdx ]->m_moveType, AttackList[ mv.m_moveIdx ]->m_isFieldAttack, 4, 4, 0, 1, 0 );
+        }
+        loadSprite( A_ID, 2, 64,
+                    SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
+                    ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
+        updateOAM( true );
         regularFont->printMBStringD( buf, 32, 8, true );
-        regularFont->printChar( 489 - 21 + p_item.getItemType( ), 32, 24, true );
-        sprintf( buf, "%s-Tasche verstaut.`", BAG::bagnames[ p_item.m_itemType ].c_str( ) );
+        regularFont->printChar( 489 - 21 + p_item->getItemType( ), 32, 24, true );
+        sprintf( buf, "%s-Tasche verstaut.`", BAG::bagnames[ BAG::toBagType( p_item->m_itemType ) ].c_str( ) );
         ASpriteOamIndex = A_ID;
         regularFont->printMBStringD( buf, 46, 24, true );
 
         if( !FS::SAV->m_bag )
             FS::SAV->m_bag = new BAG::bag( );
-        FS::SAV->m_bag->insert( BAG::toBagType( p_item.m_itemType ), p_item.getItemId( ), p_count );
+        FS::SAV->m_bag->insert( BAG::toBagType( p_item->m_itemType ), p_item->getItemId( ), p_count );
     }
 
     messageBox::messageBox( const char* p_text, bool p_remsprites ) {

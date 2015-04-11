@@ -189,6 +189,9 @@
     <ClInclude Include="arm9\source\ribbon.h">
       <Filter>Header Files\arm9\ds</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\source\bagViewer.h">
+      <Filter>Header Files\arm9\bag</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">
@@ -286,6 +289,12 @@
     </ClCompile>
     <ClCompile Include="arm9\source\yesNoBox.cpp">
       <Filter>Source Files\arm9\io</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\item.cpp">
+      <Filter>Source Files\arm9\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\bagViewer.cpp">
+      <Filter>Source Files\arm9\bag</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

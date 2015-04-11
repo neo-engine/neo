@@ -18,6 +18,7 @@
     <ClInclude Include="arm9\source\ability.h" />
     <ClInclude Include="arm9\source\bag.h" />
     <ClInclude Include="arm9\source\bagUI.h" />
+    <ClInclude Include="arm9\source\bagViewer.h" />
     <ClInclude Include="arm9\source\battle.h" />
     <ClInclude Include="arm9\source\battleUI.h" />
     <ClInclude Include="arm9\source\berry.h" />
@@ -54,6 +55,7 @@
     <ClCompile Include="arm9\include\nitrofs.c" />
     <ClCompile Include="arm9\source\Bag.cpp" />
     <ClCompile Include="arm9\source\bagUI.cpp" />
+    <ClCompile Include="arm9\source\bagViewer.cpp" />
     <ClCompile Include="arm9\source\battle.cpp" />
     <ClCompile Include="arm9\source\battleUI.cpp" />
     <ClCompile Include="arm9\source\buffer.cpp" />
@@ -64,6 +66,7 @@
     <ClCompile Include="arm9\source\fontData.cpp" />
     <ClCompile Include="arm9\source\fs.cpp" />
     <ClCompile Include="arm9\source\Gen.cpp" />
+    <ClCompile Include="arm9\source\item.cpp" />
     <ClCompile Include="arm9\source\keyboard.cpp" />
     <ClCompile Include="arm9\source\main.cpp" />
     <ClCompile Include="arm9\source\map2d.cpp" />

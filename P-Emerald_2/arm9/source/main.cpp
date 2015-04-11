@@ -62,6 +62,8 @@
 #include "battle.h"
 #include "statusScreen.h"
 #include "statusScreenUI.h"
+#include "bagUI.h"
+#include "bagViewer.h"
 
 #include "pokemon.h"
 #include "saveGame.h"
@@ -231,6 +233,7 @@ int hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
 int achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
 u8 frame = 0;
 bool DRAW_TIME = false;
+bool UPDATE_TIME = true;
 bool ANIMATE_MAP = false;
 
 u8 getCurrentDaytime( ) {
@@ -750,6 +753,7 @@ START:
             strcpy( FS::SAV->m_acMapName, "0/98" );
             FS::SAV->m_acMapIdx = 1000;
             FS::SAV->m_acposx = 2 * 20, FS::SAV->m_acposy = 25 * 20, FS::SAV->m_acposz = 3;
+            FS::SAV->m_bag = new BAG::bag( );
             break;
         case CONTINUE:
             break;
@@ -1592,6 +1596,8 @@ int main( int p_argc, char** p_argv ) {
         if( ANIMATE_MAP ) {
             animateMap( ++frame );
         }
+        if( !UPDATE_TIME )
+            return;
 
         IO::boldFont->setColor( 0, 0 );
         u8 oldC1 = IO::boldFont->getColor( 1 );
@@ -1789,11 +1795,25 @@ OUT:
         //StartBag
         if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 6 ],
             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 7 ], 16 ) ) {
+            BAG::bagUI bui;
+            BAG::bagViewer bv( FS::SAV->m_bag, &bui );
+            ANIMATE_MAP = false;
+            UPDATE_TIME = false;
 
+            bv.run( FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
 
-            //FS::SAV->m_bag.draw( FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
-            //initMapSprites( );
-            //movePlayerOnMap( FS::SAV->m_acposx / 20, FS::SAV->m_acposy / 20, FS::SAV->m_acposz, true );
+            consoleSelect( &IO::Top );
+            consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+            consoleClear( );
+            consoleSelect( &IO::Bottom );
+            consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+            consoleClear( );
+            IO::drawSub( );
+            UPDATE_TIME = true;
+            initMapSprites( );
+            initMainSprites( );
+            movePlayerOnMap( FS::SAV->m_acposx / 20, FS::SAV->m_acposy / 20, FS::SAV->m_acposz, true );
+            ANIMATE_MAP = true;
         } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
                    && ( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ],
                    IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ], 16 ) ) ) {
@@ -1849,7 +1869,7 @@ OUT:
 
             const char *someText[ 7 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", " ... " };
             IO::choiceBox test( 6, &someText[ 0 ], 0, false );
-            int res = test.getResult( "Tokens of god-being...", true );
+            int res = test.getResult( "Tokens of god-being..." );
             IO::drawSub( );
             switch( res ) {
                 case 0:
@@ -1889,13 +1909,17 @@ OUT:
                 case 1:
                     if( !FS::SAV->m_bag )
                         FS::SAV->m_bag = new BAG::bag( );
-                    for( u16 j = 1; j < 800; ++j )
+                    for( u16 j = 1; j < 772; ++j )
                         if( ItemList[ j ]->m_itemName != "Null" )
                             FS::SAV->m_bag->insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
                     break;
-                case 2:
-                    IO::messageBox( berry( "Ginemabeere" ), 31 );
+                case 2: {
+                    item* curr = ItemList[ rand( ) % 772 ];
+                    while( curr->m_itemName == "Null" )
+                        curr = ItemList[ rand( ) % 772 ];
+                    IO::messageBox( curr, 31 );
                     break;
+                }
                 case 3:{
                     std::vector<pokemon> tmp, cpy;
                     for( u8 i = 0; i < 6; ++i )
