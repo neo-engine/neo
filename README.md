@@ -42,7 +42,7 @@ Some screens
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_09_9809.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_44_9923.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_07_1429.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_46_10126.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_13_7968.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_01_27521.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_09_10201.png)
 
@@ -53,30 +53,33 @@ Some screens
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_02_11879.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_29_10070.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_51_11843.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_19_22859.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_28_18810.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_27_10767.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_38_10803.png)
 
 ##### The PokéDex
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_01_10175.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_39_27519.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_20_18761.png)
 
 ##### The Bag
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_01_30165.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_54_30142.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_08_30188.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_08_19333.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_38_8638.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_49_19467.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_54_6730.png)
 
 ##### Battles
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_23_27593.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_21_25627.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_32_25663.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_40_25689.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_52_25728.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_00_25754.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_06_25774.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_17_25810.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_34_25865.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_57_25940.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_42_26087.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_19_26208.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_18_26597.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_26_26623.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_01_27913.png)
 
