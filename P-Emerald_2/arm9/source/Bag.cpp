@@ -27,66 +27,61 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 
 #include "bag.h"
+#include "item.h"
 
 #include <algorithm>
-#include <nds/ndstypes.h>
+#include <nds.h>
 
-void bag::addItem( bagtype p_bagType, u16 p_itemId, u16 p_cnt ) {
-    for( auto I = m_bags[ p_bagType ].begin( );
-         I != m_bags[ p_bagType ].end( ); ++I ) {
-        if( I->first == p_itemId ) {
-            if( p_cnt + I->second <= MAXITEMCOUNT ) {
-                I->second += p_cnt;
-                return;
-            }
-            I->second = MAXITEMCOUNT;
-            p_cnt -= MAXITEMCOUNT - I->second;
-        }
+namespace BAG {
+    std::string bagnames[ 5 ] = { "Items", "Medizin", "TM/VM", "Beeren", "Basis-Items" };
+
+    void bag::insert( bagType p_bagType, u16 p_itemId, u16 p_cnt ) {
+        _items[ u16( p_bagType ) ][ p_itemId ] += p_cnt;
     }
-    m_bags[ p_bagType ].push_back( std::pair<u16, u16>( p_itemId, p_cnt ) );
-    std::sort( m_bags[ p_bagType ].begin( ), m_bags[ p_bagType ].end( ) );
-}
 
-void bag::removeItem( bagtype p_bagType, u16 p_itemId, u16 p_cnt ) {
-    for( auto I = m_bags[ p_bagType ].begin( );
-         I != m_bags[ p_bagType ].end( ); ++I ) {
-        if( I->first == p_itemId ) {
-            u16 num = I->second;
-            if( p_cnt && ( ( I->second - p_cnt ) > 0 ) ) {
-                I->second -= p_cnt;
-                std::sort( m_bags[ p_bagType ].begin( ), m_bags[ p_bagType ].end( ) );
-                return;
-            } else {
-                m_bags[ p_bagType ].erase( I );
-                p_cnt -= num;
+    void bag::erase( bagType p_bagType, u16 p_itemId, u16 p_cnt ) {
+        p_cnt = std::min( p_cnt, _items[ size_t( p_bagType ) ][ p_itemId ] );
+        _items[ u16( p_bagType ) ][ p_itemId ] = _items[ size_t( p_bagType ) ][ p_itemId ] - p_cnt;
+    }
+
+    u16 bag::count( bagType p_bagType, u16 p_itemId ) {
+        return _items[ u16( p_bagType ) ][ p_itemId ];
+    }
+
+    bool bag::empty( bagType p_bagType ) {
+        return _items[ u16( p_bagType ) ].empty( );
+    }
+
+    std::size_t bag::size( bagType p_bagType ) {
+        return _items[ u16( p_bagType ) ].size( );
+    }
+
+    std::map<u16, u16> bag::element( bagType p_bagType ) {
+        return _items[ u16( p_bagType ) ];
+    }
+
+    void bag::clear( bagType p_bagType ) {
+        _items[ u16( p_bagType ) ].clear( );
+    }
+
+    bag::bagType toBagType( item::itemType p_itemType ) {
+        switch( p_itemType ) {
+            case item::GOODS:
+            case item::MAILS:
+            case item::POKE_BALLS:
+            case item::BATTLE_ITEM:
+                return bag::bagType::ITEMS;
+            case item::KEY_ITEM:
+                return bag::bagType::KEY_ITEMS;
+            case item::TM_HM:
+                return bag::bagType::TM_HM;
+            case item::MEDICINE:
+                return bag::bagType::MEDICINE;
+            case item::BERRIES:
+                return bag::bagType::BERRIES;
+            default:
                 break;
-            }
         }
+        return bag::bagType::ITEMS;
     }
-    std::sort( m_bags[ p_bagType ].begin( ), m_bags[ p_bagType ].end( ) );
-}
-
-u16 bag::countItem( bagtype p_bagType, u16 p_itemId ) {
-    u16 cnt = 0;
-    for( auto I = m_bags[ p_bagType ].begin( );
-         I != m_bags[ p_bagType ].end( ); ++I )
-         if( I->first == p_itemId )
-             cnt += I->second;
-    return cnt;
-}
-
-bool bag::empty( bagtype p_bagType ) {
-    return m_bags[ p_bagType ].empty( );
-}
-
-std::size_t bag::size( bagtype p_bagType ) {
-    return m_bags[ p_bagType ].size( );
-}
-
-std::pair<u16, u16> bag::elementAt( bagtype p_bagType, u16 index ) {
-    return m_bags[ u16( p_bagType ) ][ index ];
-}
-
-void bag::clear( bagtype p_bagType ) {
-    m_bags[ p_bagType ].clear( );
 }

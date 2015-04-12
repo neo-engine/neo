@@ -33,7 +33,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "map2devents.h"
 
 
-namespace map2d {
+namespace MAP {
     bool operator<( Map::pos p_a, Map::pos p_b ) {
         if( p_a.m_posX < p_b.m_posX )
             return true;

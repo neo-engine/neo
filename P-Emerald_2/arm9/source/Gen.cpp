@@ -25,7 +25,7 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+/*
 #include "Gen.h"
 
 #include <cstdio>
@@ -33,10 +33,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses
 #include <cstdlib>
 #include <iostream>
 
-#include "pokemon.h"
+#include "../ds/pokemon.h"
 #include "saveGame.h"
-
-extern saveGame SAV;
 
 namespace gen3 {
 #define MAX_TRAINER_NAME_LEN 7
@@ -1145,7 +1143,7 @@ namespace gen3 {
      setpkmnickname(pkm,nickw,nicklength_);
      setpkmotname(pkm,otw,otlength_);
      calcchecksum(pkm);
-     }*/
+     }
 
     int getNLocation( int p_gen3Idx ) {
         if( p_gen3Idx < 88 )
@@ -1340,10 +1338,6 @@ namespace gen3 {
         return 0;
     }
 
-    /*
-    *	Encrypts/decrypts the 48 byte data buffer based on the xored pv and otid values
-    *  TODO: Make it encrypt its own data/not need arguments
-    */
     u16 SaveParser::encrypt( u8 *p_data, u32 p_pv, u32 p_otid ) {
         u32 xorkey = p_pv ^ p_otid;
         u16 checksum = 0;
@@ -1364,3 +1358,4 @@ namespace gen3 {
     }
 
 }
+*/

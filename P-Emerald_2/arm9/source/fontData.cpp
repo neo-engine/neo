@@ -1,36 +1,9 @@
-/*
-Pokémon Emerald 2 Version
-------------------------------
-
-file        : fontData.cpp
-author      : Philip Wellnitz (RedArceus)
-description :
-
-Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
-
-This file is part of Pokémon Emerald 2 Version.
-
-Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-
 #include <nds.h>
-#include "fontData.h"
 
-namespace FONT {
-    namespace font1 {
+#include "font.h"
+
+namespace IO {
+    namespace REGULAR_FONT {
 
         void shiftchar( u16& p_val ) {
             if( '0' <= p_val && p_val <= '9' ) {
@@ -81,7 +54,7 @@ namespace FONT {
             }
 
             if( p_val == '$' ) {
-                p_val = 98 + 7 + 16 - 3;
+                p_val = 98 + 7 + 16 - 4;
                 return;
             }
 
@@ -114,6 +87,10 @@ namespace FONT {
                 return;
             }
             if( p_val == ':' ) {
+                p_val = 3 * 49 - 2;
+                return;
+            }
+            if( p_val == ':' ) {
                 p_val = 3 * 49 - 1;
                 return;
             }
@@ -126,6 +103,11 @@ namespace FONT {
                 return;
             }
             if( p_val == ' ' ) {
+                p_val = 489;
+                return;
+            }
+
+            if( p_val == '\r' ) {
                 p_val = 489;
                 return;
             }
@@ -8482,7 +8464,7 @@ namespace FONT {
         };
 
     }
-    namespace font2 {
+    namespace BOLD_FONT {
         //NUM_CHARS = 490
         //FONT_WIDTH = 16
         //FONT_HEIGHT = 16
@@ -8567,12 +8549,28 @@ namespace FONT {
                 p_val = 3 * 49 - 1;
                 return;
             }
-            if( p_val == 45 ) {
-                p_val = 98 + 41;
-                return;
-            }
             if( p_val == ' ' ) {
                 p_val = 489;
+                return;
+            }
+            if( p_val == 136 ) {
+                p_val = 98 + 22 + 17;
+                return;
+            }
+            if( p_val == 137 ) {
+                p_val = 98 + 22 + 18;
+                return;
+            }
+            if( p_val == L'+' ) {
+                p_val = 98 + 22 + 19;
+                return;
+            }
+            if( p_val == L'-' ) {
+                p_val = 98 + 22 + 20;
+                return;
+            }
+            if( p_val == L'*' ) {
+                p_val = 98 + 22 + 21;
                 return;
             }
 
@@ -8580,8 +8578,17 @@ namespace FONT {
         }
         u8 fontWidths[ NUM_CHARS ] = {
 
-            8, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6, 8, 8, 4, 6, 8, 5, 8,
-            8, 8, 8, 8, 8, 8, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 6,
+            8, 7, 8, 8, 8, 8, 8, 8, 8, 8,
+
+            8, 8, 8, 8, 8, 8, 8, 8, 7, 8,
+            8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+            8, 8, 8, 8, 8, 8,
+
+            8, 8, 8, 8, 8, 6, 8, 8, 4, 6,
+            8, 5, 8, 8, 8, 8, 8, 8, 8, 7,
+            8, 8, 8, 8, 8, 8,
+            
+            8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 6,
             6, 6, 6, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 10, 8, 8, 10, 10, 7, 9, 5, 8, 6, 8, 6, 6, 8, 6, 8, 6, 6, 8, 8, 8, 8, 8, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 6,
             6, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 8, 8, 8, 8, 9, 8, 8, 8, 8, 8, 7, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             11, 12, 11, 12, 10, 12, 11, 12, 11, 12, 13, 13, 11, 13, 11, 13, 12, 13, 11, 13, 12, 13, 11, 12, 13, 13, 12, 13, 12, 13, 13, 13, 12, 13, 12, 12, 13, 12, 13, 11, 13, 12, 12, 12, 12, 12, 12, 13, 13,

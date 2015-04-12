@@ -29,8 +29,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "map2d.h"
 
-#include "screenLoader.h"
 #include "buffer.h"
+#include "uio.h"
 
 #include <fstream>
 #include <vector>
@@ -42,10 +42,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <unistd.h>
 #include <math.h>
 
-
-extern PrintConsole Top, Bottom;
-
-namespace map2d {
+namespace MAP {
 #define PLAYERSPRITE 0
 
     inline void readPal( FILE* p_file, Palette* p_palette ) {
@@ -186,7 +183,7 @@ namespace map2d {
                 }
                 fclose( mapF2 );
             }
-            consoleSelect( &Bottom );
+            consoleSelect( &IO::Bottom );
             for( u8 i = 0; i < 2; ++i )
                 for( u8 j = 0; j < 2; ++j ) {
                     if( fscanf( A, "%hu", &m_rand[ i ][ j ] ) == EOF )
