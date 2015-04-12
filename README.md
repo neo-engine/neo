@@ -78,6 +78,7 @@ Some screens
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_00_25754.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_06_25774.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_17_25810.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_18_26597.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_26_26623.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/P-Emerald_2_01_27913.png)
 
