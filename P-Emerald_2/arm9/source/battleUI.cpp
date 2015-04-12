@@ -1096,7 +1096,7 @@ END:
         consoleClear( );
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
         u16 tilecnt = 0;
-        u8  palIndex = 4;
+        u8  palIndex = 3;
         u8 oamIndex = SUB_Back_OAM;
 
         tilecnt = IO::loadSprite( SUB_Back_OAM, 0, tilecnt,
@@ -1175,6 +1175,8 @@ END:
                                               24, 124, true );
                 tilecnt = IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 0, 116, ++oamIndex, ++palIndex, tilecnt, true );
             } else {
+                ++oamIndex;
+                ++palIndex; 
                 IO::regularFont->setColor( BLACK_IDX, 1 );
                 IO::regularFont->setColor( GRAY_IDX, 2 );
                 IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 24, 124, true );
