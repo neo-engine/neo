@@ -73,7 +73,10 @@ namespace BAG {
                                 || currMv == acPkmn.m_boxdata.m_moves[ 2 ]
                                 || currMv == acPkmn.m_boxdata.m_moves[ 3 ] ) {
                                 sprintf( buffer, "%ls beherrscht\n%s bereits!", acPkmn.m_boxdata.m_name, AttackList[ currMv ]->m_moveName.c_str( ) );
-                                IO::messageBox a( buffer );
+                                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                                IO::messageBox a( buffer, false );
                             } else if( canLearn( acPkmn.m_boxdata.m_speciesId, currMv, 4 ) ) {
                                 bool freeSpot = false;
                                 for( u8 i = 0; i < 4; ++i )
@@ -81,13 +84,16 @@ namespace BAG {
                                         acPkmn.m_boxdata.m_moves[ i ] = currMv;
 
                                         sprintf( buffer, "%ls erlernt\n%s!", acPkmn.m_boxdata.m_name, AttackList[ currMv ]->m_moveName.c_str( ) );
-                                        IO::messageBox a( buffer );
+                                        IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                                        IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                                        IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                                        IO::messageBox a( buffer, false );
 
                                         freeSpot = true;
                                         break;
                                     }
                                 if( !freeSpot ) {
-                                    IO::yesNoBox yn;
+                                    IO::yesNoBox yn( false );
                                     sprintf( buffer, "%ls beherrscht\nbereits 4 Attacken.\nSoll eine verlernt werden?", acPkmn.m_boxdata.m_name );
                                     if( yn.getResult( buffer ) ) {
                                         u8 res = IO::choiceBox( acPkmn, currMv ).getResult( "Welche Attacke?", false );
@@ -97,14 +103,17 @@ namespace BAG {
                                 }
                             } else {
                                 sprintf( buffer, "%ls kann\n%s nicht erlernen!", acPkmn.m_boxdata.m_name, AttackList[ currMv ]->m_moveName.c_str( ) );
-                                IO::messageBox a( buffer );
+                                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                                IO::messageBox a( buffer, false );
                             }
                             _bagUI->init( );
                             _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                             break;
                         }
                         if( acPkmn.m_boxdata.m_holdItem ) {
-                            IO::yesNoBox yn;
+                            IO::yesNoBox yn( false );
                             sprintf( buffer, "%ls trägt bereits\ndas Item %s.\nSollen die Items getauscht werden?",
                                      acPkmn.m_boxdata.m_name, ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ) );
                             if( !yn.getResult( buffer ) ) {

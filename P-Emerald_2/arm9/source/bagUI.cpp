@@ -134,7 +134,7 @@ namespace BAG {
 
         tileCnt = IO::loadSprite( BACK_ID, BACK_ID, tileCnt,
                                   SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26, 32, 32, BackPal,
-                                  BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+                                  BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_3, true );
         for( u8 i = 0; i < 6; ++i ) {
             auto acPkmn = FS::SAV->m_pkmnTeam[ i ];
             if( !acPkmn.m_boxdata.m_speciesId )
@@ -143,6 +143,7 @@ namespace BAG {
                 tileCnt = IO::loadEggIcon( 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
             else
                 tileCnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
+            IO::Oam->oamBuffer[ PKMN_SUB + i ].priority = OBJPRIORITY_3;
         }
         for( u8 i = 0; i < 5; ++i ) {
             tileCnt = IO::loadSprite( BAG_SUB + i, BAG_SUB + i, tileCnt,
@@ -289,20 +290,20 @@ namespace BAG {
                         || currMv == FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_moves[ 3 ] ) {
                         IO::regularFont->setColor( BLUE_IDX, 1 );
                         IO::regularFont->setColor( BLACK_IDX, 2 );
-                        IO::regularFont->printString( "Bereits\nerlernt", 45, 33 + 26 * i, true, 11 );
+                        IO::regularFont->printString( "Bereits\nerlernt", 40, 33 + 26 * i, true, 11 );
                     } else if( canLearn( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId, currMv, 4 ) ) {
                         BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
                         IO::regularFont->setColor( COLOR_IDX, 1 );
                         IO::regularFont->setColor( BLACK_IDX, 2 );
-                        IO::regularFont->printString( "Erlernbar", 45, 38 + 26 * i, true );
+                        IO::regularFont->printString( "Erlernbar", 40, 38 + 26 * i, true );
                     } else {
                         IO::regularFont->setColor( RED_IDX, 1 );
                         IO::regularFont->setColor( BLACK_IDX, 2 );
-                        IO::regularFont->printString( "Nicht\nerlernbar", 45, 33 + 26 * i, true, 11 );
+                        IO::regularFont->printString( "Nicht\nerlernbar", 40, 33 + 26 * i, true, 11 );
                     }
                 } else if( p_item->m_itemType == item::itemType::MEDICINE ) {
                     sprintf( buffer, "Level %3d\n%3d/%3d KP", FS::SAV->m_pkmnTeam[ i ].m_Level, FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP, FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
-                    IO::regularFont->printString( buffer, 45, 33 + 26 * i, true, 11 );
+                    IO::regularFont->printString( buffer, 40, 33 + 26 * i, true, 11 );
                 } else {
                     IO::regularFont->printString( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name, 45, 33 + 26 * i, true );
 
@@ -311,9 +312,9 @@ namespace BAG {
 
                     if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem ) {
                         IO::regularFont->printString( ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
-                                                      45, 44 + 26 * i, true );
+                                                      40, 44 + 26 * i, true );
                     } else
-                        IO::regularFont->printString( "Kein Item", 45, 44 + 26 * i, true );
+                        IO::regularFont->printString( "Kein Item", 40, 44 + 26 * i, true );
                 }
             }
         }
