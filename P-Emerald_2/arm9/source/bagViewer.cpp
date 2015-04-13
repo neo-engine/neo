@@ -4,6 +4,7 @@
 #include "saveGame.h"
 #include "yesNoBox.h"
 #include "messageBox.h"
+#include "choiceBox.h"
 
 #include <nds.h>
 
@@ -61,13 +62,56 @@ namespace BAG {
                     case GIVE_ITEM:{
                         if( !acPkmn.m_boxdata.m_speciesId || acPkmn.m_boxdata.m_individualValues.m_isEgg )
                             break;
+                        if( ItemList[ targetItem ]->getItemType( ) == item::itemType::KEY_ITEM )
+                            break;
+                        if( ItemList[ targetItem ]->getItemType( ) == item::itemType::TM_HM ) {
+                            TM* currTm = static_cast<TM*>( ItemList[ targetItem ] );
+                            u16 currMv = currTm->m_moveIdx;
+
+                            if( currMv == acPkmn.m_boxdata.m_moves[ 0 ]
+                                || currMv == acPkmn.m_boxdata.m_moves[ 1 ]
+                                || currMv == acPkmn.m_boxdata.m_moves[ 2 ]
+                                || currMv == acPkmn.m_boxdata.m_moves[ 3 ] ) {
+                                sprintf( buffer, "%ls beherrscht\n%s bereits!", acPkmn.m_boxdata.m_name, AttackList[ currMv ]->m_moveName.c_str( ) );
+                                IO::messageBox a( buffer );
+                            } else if( canLearn( acPkmn.m_boxdata.m_speciesId, currMv, 4 ) ) {
+                                bool freeSpot = false;
+                                for( u8 i = 0; i < 4; ++i )
+                                    if( !acPkmn.m_boxdata.m_moves[ i ] ) {
+                                        acPkmn.m_boxdata.m_moves[ i ] = currMv;
+
+                                        sprintf( buffer, "%ls erlernt\n%s!", acPkmn.m_boxdata.m_name, AttackList[ currMv ]->m_moveName.c_str( ) );
+                                        IO::messageBox a( buffer );
+
+                                        freeSpot = true;
+                                        break;
+                                    }
+                                if( !freeSpot ) {
+                                    IO::yesNoBox yn;
+                                    sprintf( buffer, "%ls beherrscht\nbereits 4 Attacken.\nSoll eine verlernt werden?", acPkmn.m_boxdata.m_name );
+                                    if( yn.getResult( buffer ) ) {
+                                        u8 res = IO::choiceBox( acPkmn, currMv ).getResult( "Welche Attacke?", false );
+                                        if( res < 4 )
+                                            acPkmn.m_boxdata.m_moves[ res ] = currMv;
+                                    }
+                                }
+                            } else {
+                                sprintf( buffer, "%ls kann\n%s nicht erlernen!", acPkmn.m_boxdata.m_name, AttackList[ currMv ]->m_moveName.c_str( ) );
+                                IO::messageBox a( buffer );
+                            }
+                            _bagUI->init( );
+                            _ranges = _bagUI->drawBagPage( _currPage, _currItem );
+                            break;
+                        }
                         if( acPkmn.m_boxdata.m_holdItem ) {
                             IO::yesNoBox yn;
                             sprintf( buffer, "%ls trägt bereits\ndas Item %s.\nSollen die Items getauscht werden?",
                                      acPkmn.m_boxdata.m_name, ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ) );
-                            if( !yn.getResult( buffer ) )
+                            if( !yn.getResult( buffer ) ) {
+                                _bagUI->init( );
+                                _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                                 break;
-
+                            }
                             auto currBgType = toBagType( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getItemType( ) );
                             _origBag->insert( currBgType, acPkmn.m_boxdata.m_holdItem, 1 );
                             auto bgI = std::find_if( _bagUI->_bag[ (u8)currBgType ].begin( ), _bagUI->_bag[ (u8)currBgType ].end( ), [ acPkmn ]( std::pair<u16, u16> p_item ) {

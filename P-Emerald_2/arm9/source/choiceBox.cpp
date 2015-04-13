@@ -12,7 +12,8 @@ namespace IO {
 #define NEW_PAGE 9
     void choiceBox::draw( u8 p_pressedIdx ) {
         if( p_pressedIdx == NEW_PAGE ) {
-            drawSub( );
+            if( _drawSub )
+                drawSub( );
             initTextField( );
             if( _text ) {
                 if( _name ) {
@@ -51,24 +52,72 @@ namespace IO {
         _choices = p_choices;
         _big = p_big || ( p_num <= 3 );
         _acPage = 0;
+        _drawSub = true;
 
         initTextField( );
 
         initOAMTable( true );
-        u16 nextAvailableTileIdx = 16;
+        u16 tileCnt = 16;
 
-        nextAvailableTileIdx = loadSprite( BACK_ID, 0, nextAvailableTileIdx,
-                                           SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                                           BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, true );
-        nextAvailableTileIdx = loadSprite( FWD_ID, 1, nextAvailableTileIdx,
-                                           SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, ForwardPal,
-                                           ForwardTiles, ForwardTilesLen, false, false, true, OBJPRIORITY_1, true );
-        nextAvailableTileIdx = loadSprite( BWD_ID, 2, nextAvailableTileIdx,
-                                           SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackwardPal,
-                                           BackwardTiles, BackwardTilesLen, false, false, true, OBJPRIORITY_1, true );
+        tileCnt = loadSprite( BACK_ID, 0, tileCnt,
+                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                              BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, true );
+        tileCnt = loadSprite( FWD_ID, 1, tileCnt,
+                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, ForwardPal,
+                              ForwardTiles, ForwardTilesLen, false, false, true, OBJPRIORITY_1, true );
+        tileCnt = loadSprite( BWD_ID, 2, tileCnt,
+                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackwardPal,
+                              BackwardTiles, BackwardTilesLen, false, false, true, OBJPRIORITY_1, true );
         updateOAM( true );
 
         _name = p_name;
+
+        swiWaitForVBlank( );
+    }
+    choiceBox::choiceBox( pokemon p_pokemon, u16 p_move ) {
+        _num = 5;
+        static std::vector<const char*> names = { AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_moveName.c_str( ),
+            AttackList[ p_pokemon.m_boxdata.m_moves[ 1 ] ]->m_moveName.c_str( ),
+            AttackList[ p_pokemon.m_boxdata.m_moves[ 2 ] ]->m_moveName.c_str( ),
+            AttackList[ p_pokemon.m_boxdata.m_moves[ 3 ] ]->m_moveName.c_str( ),
+            AttackList[ p_move ]->m_moveName.c_str( ) };
+        _choices = &names[ 0 ];
+        _big = false;
+        _acPage = 0;
+        _name = 0;
+        _drawSub = false;
+
+        initTextField( );
+
+        initOAMTable( true );
+        u16 tileCnt = 0;
+
+        tileCnt = loadSprite( BACK_ID, 0, tileCnt,
+                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+                              BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, true );
+        tileCnt = loadSprite( FWD_ID, 1, tileCnt,
+                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, ForwardPal,
+                              ForwardTiles, ForwardTilesLen, false, false, true, OBJPRIORITY_1, true );
+        tileCnt = loadSprite( BWD_ID, 2, tileCnt,
+                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackwardPal,
+                              BackwardTiles, BackwardTilesLen, false, false, true, OBJPRIORITY_1, true );
+
+        //t.px >= ( ( i % 2 ) ? 129 : 19 ) && t.py >= 68 + ( i / 2 ) * 35
+        //&& t.px <= 106 + ( ( i % 2 ) ? 129 : 19 ) && t.py <= 32 + 68 + ( i / 2 ) * 35
+
+        for( u8 i = 0; i < 4; ++i ) {
+            tileCnt = loadTypeIcon( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveType,
+                                    ( ( i % 2 ) ? 122 : 12 ), 64 + ( i / 2 ) * 35, 3 + 2 * i, 3 + 2 * i, tileCnt, true );
+            tileCnt = loadDamageCategoryIcon( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveHitType,
+                                              ( ( i % 2 ) ? 154 : 44 ), 64 + ( i / 2 ) * 35, 4 + 2 * i, 4 + 2 * i, tileCnt, true );
+        }
+        tileCnt = loadTypeIcon( AttackList[ p_move ]->m_moveType,
+                                12, 134, 11, 11, tileCnt, true );
+        tileCnt = loadDamageCategoryIcon( AttackList[ p_move ]->m_moveHitType,
+                                          44, 134, 12, 12, tileCnt, true );
+
+        updateOAM( true );
+
 
         swiWaitForVBlank( );
     }
@@ -79,19 +128,19 @@ namespace IO {
     int choiceBox::getResult( const char* p_text, bool p_backButton ) {
         _text = p_text;
         draw( NEW_PAGE );
-        initOAMTable( true );
-        u16 nextAvailableTileIdx = 16;
+        //initOAMTable( true );
+        //u16 tileCnt = 16;
 
-        nextAvailableTileIdx = loadSprite( BACK_ID, 0, nextAvailableTileIdx,
-                                           SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                                           BackTiles, BackTilesLen, false, false, !p_backButton, OBJPRIORITY_0, true );
-        nextAvailableTileIdx = loadSprite( FWD_ID, 1, nextAvailableTileIdx,
-                                           SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, ForwardPal,
-                                           ForwardTiles, ForwardTilesLen, false, false, true, OBJPRIORITY_1, true );
-        nextAvailableTileIdx = loadSprite( BWD_ID, 2, nextAvailableTileIdx,
-                                           SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackwardPal,
-                                           BackwardTiles, BackwardTilesLen, false, false, true, OBJPRIORITY_1, true );
-        updateOAM( true );
+        //tileCnt = loadSprite( BACK_ID, 0, tileCnt,
+        //                      SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
+        //                      BackTiles, BackTilesLen, false, false, !p_backButton, OBJPRIORITY_0, true );
+        //tileCnt = loadSprite( FWD_ID, 1, tileCnt,
+        //                      SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, ForwardPal,
+        //                      ForwardTiles, ForwardTilesLen, false, false, true, OBJPRIORITY_1, true );
+        //tileCnt = loadSprite( BWD_ID, 2, tileCnt,
+        //                      SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackwardPal,
+        //                      BackwardTiles, BackwardTilesLen, false, false, true, OBJPRIORITY_1, true );
+        //updateOAM( true );
 
         int result = -1;
 

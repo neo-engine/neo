@@ -1878,11 +1878,10 @@ OUT:
                     for( int i = 0; i < 3; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
                         a = pokemon( 0, HILFSCOUNTER, 0,
-                                     50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
-                                     !FS::SAV->m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                     50, FS::SAV->m_id + i, FS::SAV->m_sid, FS::SAV->m_playername,
+                                     !FS::SAV->m_isMale, false, false, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         //a.stats.acHP = i*a.stats.maxHP/5;
-                        if( canLearn( HILFSCOUNTER, 57, 4 ) )
-                            a.m_boxdata.m_moves[ 2 ] = 57;
+                        a.m_boxdata.m_moves[ 3 ] = 0;
                         if( canLearn( HILFSCOUNTER, 19, 4 ) )
                             a.m_boxdata.m_moves[ 1 ] = 19;
                         a.m_boxdata.m_experienceGained += 750;
