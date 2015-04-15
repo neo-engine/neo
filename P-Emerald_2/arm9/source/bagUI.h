@@ -17,8 +17,11 @@ namespace BAG {
         std::vector<std::pair<IO::inputTarget, u16>> _ranges;
         std::vector<std::pair<u16, u16>> _bag[ BAG_CNT ];
 
+        u8 _currSelectedIdx;
+        u8 _currPage;
+        u16 _currItemIdx;
+
         u8 drawPkmn( item* p_item );
-    private:
         void init( );
 
         void updateAtHand( touchPosition p_touch, u8 p_oamIdx );

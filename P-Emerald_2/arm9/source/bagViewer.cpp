@@ -82,6 +82,7 @@ namespace BAG {
                                 for( u8 i = 0; i < 4; ++i )
                                     if( !acPkmn.m_boxdata.m_moves[ i ] ) {
                                         acPkmn.m_boxdata.m_moves[ i ] = currMv;
+                                        acPkmn.m_boxdata.m_acPP[ i ] = std::min( acPkmn.m_boxdata.m_acPP[ i ], AttackList[ currMv ]->m_movePP );
 
                                         sprintf( buffer, "%ls erlernt\n%s!", acPkmn.m_boxdata.m_name, AttackList[ currMv ]->m_moveName.c_str( ) );
                                         IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
@@ -97,8 +98,10 @@ namespace BAG {
                                     sprintf( buffer, "%ls beherrscht\nbereits 4 Attacken.\nSoll eine verlernt werden?", acPkmn.m_boxdata.m_name );
                                     if( yn.getResult( buffer ) ) {
                                         u8 res = IO::choiceBox( acPkmn, currMv ).getResult( "Welche Attacke?", false );
-                                        if( res < 4 )
+                                        if( res < 4 ) {
                                             acPkmn.m_boxdata.m_moves[ res ] = currMv;
+                                            acPkmn.m_boxdata.m_acPP[ res ] = std::min( acPkmn.m_boxdata.m_acPP[ res ], AttackList[ currMv ]->m_movePP );
+                                        }
                                     }
                                 }
                             } else {
@@ -112,6 +115,63 @@ namespace BAG {
                             _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                             break;
                         }
+
+                        if( ItemList[ targetItem ]->getEffectType( ) == item::itemEffectType::USE_ON_PKMN ) {
+                            IO::yesNoBox yn( false );
+                            sprintf( buffer, "Soll %ls das Item %s\nzum Tragen gegeben werden,\nanstatt es anzuwenden?",
+                                     acPkmn.m_boxdata.m_name, ItemList[ targetItem ]->getDisplayName( true ).c_str( ) );
+                            if( !yn.getResult( buffer ) ) {
+
+                                //Use the item on the PKMN
+                                //If it is an ordinary item, it could be only an evolutionary item
+                                if( ItemList[ targetItem ]->getItemType( ) == item::itemType::GOODS
+                                    && !acPkmn.canEvolve( targetItem, 3 ) ) {
+                                    _bagUI->init( );
+                                    _ranges = _bagUI->drawBagPage( _currPage, _currItem );
+                                    swiWaitForVBlank( );
+
+                                    IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                                    IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                                    IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                                    IO::messageBox( "Es würde keine\nWirkung haben...", false );
+                                    _bagUI->init( );
+                                    _ranges = _bagUI->drawBagPage( _currPage, _currItem );
+                                    break;
+                                } else if( ItemList[ targetItem ]->getItemType( ) == item::itemType::GOODS ) {
+                                    _bagUI->init( );
+                                    _ranges = _bagUI->drawBagPage( _currPage, _currItem );
+                                    swiWaitForVBlank( );
+
+                                    IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                                    IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                                    IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                                    sprintf( buffer, "%ls entwickelt sich...", acPkmn.m_boxdata.m_name );
+                                    IO::messageBox( buffer, false );
+                                    acPkmn.evolve( targetItem, 3 );
+
+                                    //Remove the used item
+                                    _origBag->erase( bag::bagType( _currPage ), targetItem, 1 );
+                                    auto bgI = std::find( _bagUI->_bag[ _currPage ].begin( ), _bagUI->_bag[ _currPage ].end( ), currItem );
+                                    if( !--bgI->second )
+                                        _bagUI->_bag[ _currPage ].erase( bgI );
+
+                                    _bagUI->init( );
+                                    _ranges = _bagUI->drawBagPage( _currPage, _currItem );
+                                    swiWaitForVBlank( );
+
+                                    sprintf( buffer, "...und wurde zu einem\n%s!", getDisplayName( acPkmn.m_boxdata.m_speciesId ) );
+                                    IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                                    IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                                    IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                                    IO::messageBox( buffer, false );
+                                    _bagUI->init( );
+                                    _ranges = _bagUI->drawBagPage( _currPage, _currItem );
+                                }
+
+                                break;
+                            }
+                        }
+
                         if( acPkmn.m_boxdata.m_holdItem ) {
                             IO::yesNoBox yn( false );
                             sprintf( buffer, "%ls trägt bereits\ndas Item %s.\nSollen die Items getauscht werden?",

@@ -1534,7 +1534,7 @@ NEXT:
             acPkmn.evolve( );
             _battleUI->evolvePKMN( p_opponent, p_pokemonPos );
 
-            std::swprintf( wbuffer, 50, L"und wurde zu einem %ls![A]", acPkmn.m_boxdata.m_name );
+            std::swprintf( wbuffer, 50, L"und wurde zu einem %ls![A]", getDisplayName( acPkmn.m_boxdata.m_speciesId ) );
             log( wbuffer );
         }
     }

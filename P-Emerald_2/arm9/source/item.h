@@ -46,7 +46,7 @@ public:
         IN_BATTLE = 1,
         HOLD = 2,
         OUT_OF_BATTLE = 4,
-        USE_ON_PKMN = 8
+        USE_ON_PKMN = 8   //Evolutionaries, 
     };
     enum itemType {
         GOODS,

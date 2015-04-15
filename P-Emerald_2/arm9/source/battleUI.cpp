@@ -2043,7 +2043,7 @@ ST:
                     for( u8 i = 0; i < 4; ++i )
                         if( acPkmn.m_boxdata.m_moves[ i ] == res ) {
                             acPkmn.m_boxdata.m_moves[ i ] = p_move;
-                            acPkmn.m_boxdata.m_acPP[ i ] = AttackList[ p_move ]->m_movePP;
+                            acPkmn.m_boxdata.m_acPP[ i ] = std::min( acPkmn.m_boxdata.m_acPP[ i ], AttackList[ p_move ]->m_movePP );
                         }
                 }
             } else {
@@ -2066,7 +2066,7 @@ ST:
             for( u8 i = 0; i < 4; ++i ) {
                 if( !acPkmn.m_boxdata.m_moves[ i ] ) {
                     acPkmn.m_boxdata.m_moves[ i ] = p_move;
-                    acPkmn.m_boxdata.m_acPP[ i ] = AttackList[ p_move ]->m_movePP;
+                    acPkmn.m_boxdata.m_acPP[ i ] = std::min( acPkmn.m_boxdata.m_acPP[ i ], AttackList[ p_move ]->m_movePP );
                     std::swprintf( wbuffer, 50, L"%ls erlernt %s![A]",
                                    acPkmn.m_boxdata.m_name,
                                    AttackList[ p_move ]->m_moveName.c_str( ) );
