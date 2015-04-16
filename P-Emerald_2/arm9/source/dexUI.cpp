@@ -3,7 +3,7 @@
 #include "uio.h"
 #include "sprite.h"
 #include "fs.h"
-#include "savegame.h"
+#include "saveGame.h"
 #include "pokemon.h"
 #include "defines.h"
 
