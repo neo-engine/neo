@@ -518,6 +518,11 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
     FILE* f = fopen( buffer, "r" );
     if( !f )
         return;
+    
+    u16 buffer[ 700 ];
+    fread( buffer, sizeof( u16 ), 699, f );
+    fclose( f );
+    u16 ptr = 0;
 
     u16 rescnt = 0;
 
@@ -527,11 +532,9 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
     if( p_fromLevel > p_toLevel ) {
         std::vector<u16> reses;
         for( u16 i = 0; i <= p_fromLevel; ++i ) {
-            u16 z;
-            fscanf( f, "%hd", &z );
+            u16 z = buffer[ ptr++ ];
             for( int j = 0; j < z; ++j ) {
-                u16 g, h;
-                fscanf( f, "%hd %hd", &g, &h );
+                u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
                 if( i >= p_toLevel && h == (u16)p_mode && g < MAXATTACK )
                     reses.push_back( g );
             }
@@ -547,15 +550,12 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
 N:
             ;
         }
-        fclose( f );
         return;
     } else {
         for( u16 i = 0; i <= p_toLevel; ++i ) {
-            u16 z;
-            fscanf( f, "%hd", &z );
+            u16 z = buffer[ ptr++ ];
             for( u16 j = 0; j < z; ++j ) {
-                u16 g, h;
-                fscanf( f, "%hd %hd", &g, &h );
+                u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
                 if( i >= p_fromLevel && h == p_mode && g < MAXATTACK ) {
                     for( u16 z = 0; z < rescnt; ++z )
                         if( g == p_result[ z ] )
@@ -569,7 +569,6 @@ NEXT:
             }
         }
     }
-    fclose( f );
 }
 bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
     char pt[ 150 ];
@@ -577,12 +576,16 @@ bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
     FILE* f = fopen( pt, "r" );
     if( !f )
         return false;
+    
+    u16 buffer[ 700 ];
+    fread( buffer, sizeof( u16 ), 699, f );
+    fclose( f );
+    u16 ptr = 0;
 
     for( int i = 0; i <= 100; ++i ) {
-        int z; fscanf( f, "%d", &z );
+        int z = buffer[ ptr++ ];
         for( int j = 0; j < z; ++j ) {
-            u16 g, h;
-            fscanf( f, "%hd %hd", &g, &h );
+            u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
             if( g == p_moveId && h == p_mode )
                 return true;
         }
