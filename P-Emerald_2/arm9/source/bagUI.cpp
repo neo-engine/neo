@@ -532,7 +532,7 @@ namespace BAG {
 
     u8 bagUI::acceptTouch( u8 p_rangeIdx ) {
         if( _ranges[ p_rangeIdx ].second & ( 1 << 15 ) ) {//It's a PKMN
-
+            return 0;
         } else { //It's an ordinary item
             if( !_ranges[ p_rangeIdx ].second )
                 return 0;
@@ -541,6 +541,9 @@ namespace BAG {
             _currSelectedIdx = 4 + ( _ranges[ p_rangeIdx ].first.m_targetY1 - 76 ) / 18;
             updateSelectedIdx( oldSelIdx );
         }
+
+        u16 sz = _bag[ _currPage ].size( );
+        item* currItem = ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ];
 
         return 0;
     }

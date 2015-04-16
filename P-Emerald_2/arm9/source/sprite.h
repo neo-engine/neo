@@ -29,7 +29,7 @@
 
 #include <nds.h>
 
-#include "Type.h"
+#include "type.h"
 #include "move.h"
 
 namespace IO {
