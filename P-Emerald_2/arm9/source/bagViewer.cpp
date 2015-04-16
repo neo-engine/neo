@@ -112,6 +112,7 @@ namespace BAG {
                                 IO::messageBox a( buffer, false );
                             }
                             _bagUI->init( );
+                            _bagUI->_currSelectedIdx = 0;
                             _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                             break;
                         }
@@ -139,6 +140,7 @@ namespace BAG {
                                     break;
                                 } else if( ItemList[ targetItem ]->getItemType( ) == item::itemType::GOODS ) {
                                     _bagUI->init( );
+                                    _bagUI->_currSelectedIdx = 0;
                                     _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                                     swiWaitForVBlank( );
 
@@ -178,6 +180,7 @@ namespace BAG {
                                      acPkmn.m_boxdata.m_name, ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ) );
                             if( !yn.getResult( buffer ) ) {
                                 _bagUI->init( );
+                                _bagUI->_currSelectedIdx = 0;
                                 _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                                 break;
                             }
@@ -201,6 +204,7 @@ namespace BAG {
                         //         acPkmn.m_boxdata.m_name, ItemList[ targetItem ]->getDisplayName( true ).c_str( ) );
                         //IO::messageBox m( buffer );
                         _bagUI->init( );
+                        _bagUI->_currSelectedIdx = 0;
                         _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                         break;
                     }
@@ -219,6 +223,8 @@ namespace BAG {
                                 _bagUI->_bag[ currBgType ].push_back( { acPkmn.m_boxdata.m_holdItem, 1 } );
 
                             acPkmn.m_boxdata.m_holdItem = 0;
+
+                            _bagUI->_currSelectedIdx = 0;
                             _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                         }
                         break;
@@ -246,19 +252,35 @@ namespace BAG {
             } else if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT( KEY_X ) || ( !_atHandOam &&  GET_AND_WAIT_C( SCREEN_WIDTH - 12, SCREEN_HEIGHT - 10, 16 ) ) ) {
                 break;
             } else if( GET_AND_WAIT( KEY_LEFT ) ) {
+                _bagUI->_currSelectedIdx = 0;
                 _currPage = ( _currPage + BAG_CNT - 1 ) % BAG_CNT;
                 _currItem %= _bagUI->_bag[ _currPage ].size( );
                 _ranges = _bagUI->drawBagPage( _currPage, _currItem );
             } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                _bagUI->_currSelectedIdx = 0;
                 _currPage = ( _currPage + 1 ) % BAG_CNT;
                 _currItem %= _bagUI->_bag[ _currPage ].size( );
                 _ranges = _bagUI->drawBagPage( _currPage, _currItem );
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
-                _currItem = ( _currItem + 1 ) % _bagUI->_bag[ _currPage ].size( );
-                _ranges = _bagUI->drawBagPage( _currPage, _currItem );
+                auto old = ( _bagUI->_currSelectedIdx %= _bagUI->_bag[ _currPage ].size( ) );
+                u8 mx = std::min( 9u, _bagUI->_bag[ _currPage ].size( ) );
+                if( ++_bagUI->_currSelectedIdx == mx ) {
+                    _bagUI->_currSelectedIdx = 0;
+                    _currItem = ( _currItem + mx ) % _bagUI->_bag[ _currPage ].size( );
+                    _ranges = _bagUI->drawBagPage( _currPage, _currItem );
+                } else if( !_bagUI->_bag[ _currPage ].empty( ) ) {
+                    _bagUI->updateSelectedIdx( old );
+                }
             } else if( GET_AND_WAIT( KEY_UP ) ) {
-                _currItem = ( _currItem + _bagUI->_bag[ _currPage ].size( ) - 1 ) % _bagUI->_bag[ _currPage ].size( );
-                _ranges = _bagUI->drawBagPage( _currPage, _currItem );
+                auto old = ( _bagUI->_currSelectedIdx %= _bagUI->_bag[ _currPage ].size( ) );
+                u8 mx = std::min( 9u, _bagUI->_bag[ _currPage ].size( ) );
+                if( _bagUI->_currSelectedIdx-- == 0 ) {
+                    _bagUI->_currSelectedIdx = mx - 1;
+                    _currItem = ( _currItem + _bagUI->_bag[ _currPage ].size( ) - mx ) % _bagUI->_bag[ _currPage ].size( );
+                    _ranges = _bagUI->drawBagPage( _currPage, _currItem );
+                } else if( !_bagUI->_bag[ _currPage ].empty( ) ) {
+                    _bagUI->updateSelectedIdx( old );
+                }
             } else if( !_atHandOam && GET_AND_WAIT_C( SCREEN_WIDTH - 44, SCREEN_HEIGHT - 10, 16 ) ) {
                 _currItem = ( _currItem + 8 ) % _bagUI->_bag[ _currPage ].size( );
                 _ranges = _bagUI->drawBagPage( _currPage, _currItem );
@@ -289,7 +311,18 @@ namespace BAG {
                                     start = curr = j;
                                 break;
                             }
-                            if( !( touch.px || touch.py ) || !IN_RANGE( touch, i ) )
+                            if( !touch.px && !touch.py ) {
+                                u8 res = _bagUI->acceptTouch( j );
+                                switch( res ) {
+                                    default:
+                                        break;
+                                }
+                                /*
+                                                                _bagUI->init( );
+                                                                _ranges = _bagUI->drawBagPage( _currPage, _currItem );*/
+                                break;
+                            }
+                            if( !IN_RANGE( touch, i ) )
                                 break;
                         }
                     } else {

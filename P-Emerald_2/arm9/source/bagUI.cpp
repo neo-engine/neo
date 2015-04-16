@@ -282,7 +282,7 @@ namespace BAG {
                 _ranges.push_back( { IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),
                                    ( 1 << 15 ) | ( i << 12 ) | FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem } );
 
-                if( p_item->m_itemType == item::itemType::TM_HM ) {
+                if( p_item && p_item->m_itemType == item::itemType::TM_HM ) {
                     u16 currMv = static_cast<TM*>( p_item )->m_moveIdx;
                     if( currMv == FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_moves[ 0 ]
                         || currMv == FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_moves[ 1 ]
@@ -301,22 +301,11 @@ namespace BAG {
                         IO::regularFont->setColor( BLACK_IDX, 2 );
                         IO::regularFont->printString( "Nicht\nerlernbar", 40, 33 + 26 * i, true, 11 );
                     }
-                } else if( p_item->m_itemType == item::itemType::MEDICINE ) {
+                } else if( p_item &&  p_item->m_itemType == item::itemType::MEDICINE ) {
                     sprintf( buffer, "Level %3d\n%3d/%3d KP", FS::SAV->m_pkmnTeam[ i ].m_Level, FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP, FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
                     IO::regularFont->printString( buffer, 40, 33 + 26 * i, true, 11 );
                 } else {
-                    if( p_item->getEffectType( ) != item::itemEffectType::USE_ON_PKMN ) {
-                        IO::regularFont->printString( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name, 45, 33 + 26 * i, true );
-
-                        IO::regularFont->setColor( BLACK_IDX, 2 );
-                        IO::regularFont->setColor( GRAY_IDX, 1 );
-
-                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem ) {
-                            IO::regularFont->printString( ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
-                                                          40, 44 + 26 * i, true );
-                        } else
-                            IO::regularFont->printString( "Kein Item", 40, 44 + 26 * i, true );
-                    } else {
+                    if( p_item && p_item->getEffectType( ) == item::itemEffectType::USE_ON_PKMN ) {
                         if( FS::SAV->m_pkmnTeam[ i ].canEvolve( p_item->getItemId( ), 3 ) ) {
                             BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
                             IO::regularFont->setColor( COLOR_IDX, 1 );
@@ -327,6 +316,17 @@ namespace BAG {
                             IO::regularFont->setColor( BLACK_IDX, 2 );
                             IO::regularFont->printString( "Nicht\nmöglich", 40, 33 + 26 * i, true, 11 );
                         }
+                    } else {
+                        IO::regularFont->printString( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name, 45, 33 + 26 * i, true );
+
+                        IO::regularFont->setColor( BLACK_IDX, 2 );
+                        IO::regularFont->setColor( GRAY_IDX, 1 );
+
+                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem ) {
+                            IO::regularFont->printString( ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
+                                                          40, 44 + 26 * i, true );
+                        } else
+                            IO::regularFont->printString( "Kein Item", 40, 44 + 26 * i, true );
                     }
                 }
             }
@@ -375,10 +375,29 @@ namespace BAG {
         }
     }
 
+    void bagUI::updateSelectedIdx( u8 p_oldIdx ) {
+        u16 sz = _bag[ _currPage ].size( );
+
+        drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( p_oldIdx - 4 ) + 4 * sz ) % sz ].first ],
+                     132, 76 + 18 * ( p_oldIdx - 4 ), false, false );
+
+        drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ],
+                     132, 76 + 18 * ( _currSelectedIdx - 4 ), true, false );
+
+
+        drawTop( _currPage );
+
+        drawItemTop( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ],
+                     _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].second );
+
+        u8 pkmnCnt = drawPkmn( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ] );
+        for( u8 i = 0; i < pkmnCnt; ++i )
+            _ranges.pop_back( );
+    }
+
     std::vector<IO::inputTarget> bagUI::drawBagPage( u8 p_page, u16 p_itemIdx ) {
         std::vector<IO::inputTarget> res;
         _ranges.clear( );
-        _currSelectedIdx = 4;
         _currPage = p_page;
         _currItemIdx = p_itemIdx;
 
@@ -395,34 +414,27 @@ namespace BAG {
         initColors( );
 
 
-        u8 pkmnCnt = drawPkmn( ItemList[ _bag[ p_page ][ p_itemIdx ].first ] );
-        for( u8 i = 0; i < pkmnCnt; ++i )
-            res.push_back( _ranges[ _ranges.size( ) - pkmnCnt + i ].first );
-
         if( !_bag[ p_page ].empty( ) ) {
-            drawItemTop( ItemList[ _bag[ p_page ][ p_itemIdx ].first ], _bag[ p_page ][ p_itemIdx ].second );
-            drawItemSub( ItemList[ _bag[ p_page ][ p_itemIdx ].first ], 132, 76, true, false );
-            res.push_back( IO::inputTarget( 132, 76, 256, 92 ) );
-            _ranges.push_back( { res.back( ), _bag[ p_page ][ p_itemIdx ].first } );
-
             u16 sz = _bag[ p_page ].size( );
-            u8 tp = ( sz - 1 ) / 2;
+            u8 pkmnCnt = drawPkmn( ItemList[ _bag[ p_page ][ ( p_itemIdx + 4 * sz + _currSelectedIdx - 4 ) % sz ].first ] );
+            for( u8 i = 0; i < pkmnCnt; ++i )
+                res.push_back( _ranges[ _ranges.size( ) - pkmnCnt + i ].first );
+            for( u8 i = 0; i < 9; ++i ) {
 
-            for( u8 i = 1; i < 5; ++i ) {
-                drawItemSub( ItemList[ _bag[ p_page ][ ( p_itemIdx + i ) % sz ].first ], 132, 76 + 18 * i, false, false, i > tp );
-                if( i <= tp ) {
-                    res.push_back( IO::inputTarget( 132, 76 + 18 * i, 256, 92 + 18 * i ) );
-                    _ranges.push_back( { res.back( ), _bag[ p_page ][ ( p_itemIdx + i ) % sz ].first } );
-                }
+                if( i == _currSelectedIdx )
+                    drawItemTop( ItemList[ _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].first ], _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].second );
+                drawItemSub( ItemList[ _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].first ], 132, 4 + i * 18, i == _currSelectedIdx, false, i >= sz );
 
-                drawItemSub( ItemList[ _bag[ p_page ][ ( p_itemIdx + sz - i ) % sz ].first ], 132, 76 - 18 * i, false, false, i > ( tp + !( sz % 2 ) ) );
-                if( i <= ( tp + !( sz % 2 ) ) ) {
-                    res.push_back( IO::inputTarget( 132, 76 - 18 * i, 256, 92 - 18 * i ) );
-                    _ranges.push_back( { res.back( ), _bag[ p_page ][ ( p_itemIdx + sz - i ) % sz ].first } );
+                if( i < sz ) {
+                    res.push_back( IO::inputTarget( 132, 4 + i * 18, 256, 20 + i * 18 ) );
+                    _ranges.push_back( { res.back( ), _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].first } );
                 }
             }
-
         } else {
+            u8 pkmnCnt = drawPkmn( 0 );
+            for( u8 i = 0; i < pkmnCnt; ++i )
+                res.push_back( _ranges[ _ranges.size( ) - pkmnCnt + i ].first );
+
             for( u8 i = 0; i < 5; ++i ) {
                 drawItemSub( 0, 132, 76 + 18 * i, false, false, true );
                 drawItemSub( 0, 132, 76 - 18 * i, false, false, true );
@@ -467,7 +479,7 @@ namespace BAG {
             }
             u16 sz = _bag[ _currPage ].size( );
 
-            drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + sz ) % sz ].first ],
+            drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ],
                          132, 76 + 18 * ( _currSelectedIdx - 4 ), false, false );
 
             drawItemSub( ItemList[ _ranges[ p_rangeIdx ].second ], _ranges[ p_rangeIdx ].first.m_targetX1,
@@ -475,13 +487,13 @@ namespace BAG {
 
             drawTop( _currPage );
 
-            drawItemTop( ItemList[ _ranges[ p_rangeIdx ].second ], _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + sz ) % sz ].second );
+            _currSelectedIdx = 4 + ( _ranges[ p_rangeIdx ].first.m_targetY1 - 76 ) / 18;
+            drawItemTop( ItemList[ _ranges[ p_rangeIdx ].second ], _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].second );
 
             u8 pkmnCnt = drawPkmn( ItemList[ _ranges[ p_rangeIdx ].second ] );
             for( u8 i = 0; i < pkmnCnt; ++i )
                 _ranges.pop_back( );
 
-            _currSelectedIdx = 4 + ( _ranges[ p_rangeIdx ].first.m_targetY1 - 76 ) / 18;
         }
         return TRANSFER_SUB;
     }
@@ -500,7 +512,7 @@ namespace BAG {
             res |= ( ( ( _ranges[ p_startIdx ].second >> 12 ) % 8 ) << 16 );
         } else { //It's an ordinary item
             u16 sz = _bag[ _currPage ].size( );
-            drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + sz ) % sz ].first ],
+            drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ],
                          132, 76 + 18 * ( _currSelectedIdx - 4 ), true, false );
 
             res |= _ranges[ p_startIdx ].second;
@@ -516,5 +528,20 @@ namespace BAG {
         }
 
         return res;
+    }
+
+    u8 bagUI::acceptTouch( u8 p_rangeIdx ) {
+        if( _ranges[ p_rangeIdx ].second & ( 1 << 15 ) ) {//It's a PKMN
+
+        } else { //It's an ordinary item
+            if( !_ranges[ p_rangeIdx ].second )
+                return 0;
+
+            auto oldSelIdx = _currSelectedIdx;
+            _currSelectedIdx = 4 + ( _ranges[ p_rangeIdx ].first.m_targetY1 - 76 ) / 18;
+            updateSelectedIdx( oldSelIdx );
+        }
+
+        return 0;
     }
 }
