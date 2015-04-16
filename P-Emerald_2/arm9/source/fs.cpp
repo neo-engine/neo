@@ -365,7 +365,12 @@ namespace FS {
 
             return "Entfernter Ort";
         }
-        std::string ret = readString( f );
+
+        char buffer[ 50 ] = { 0 };
+        fread( buffer, 1, 49, f );
+
+        std::string ret = std::string( buffer );
+        ret.pop_back( );
         fclose( f );
         return ret.c_str( );
     }
