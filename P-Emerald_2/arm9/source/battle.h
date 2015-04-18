@@ -42,6 +42,7 @@
 #include "item.h"
 
 namespace BATTLE {
+    extern const std::vector<std::wstring> trainerclassnames;
 
     extern u8 firstMoveSwitchTarget;
 

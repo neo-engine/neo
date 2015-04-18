@@ -302,7 +302,13 @@ namespace BAG {
                         IO::regularFont->printString( "Nicht\nerlernbar", 40, 33 + 26 * i, true, 11 );
                     }
                 } else if( p_item &&  p_item->m_itemType == item::itemType::MEDICINE ) {
-                    sprintf( buffer, "Level %3d\n%3d/%3d KP", FS::SAV->m_pkmnTeam[ i ].m_Level, FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP, FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
+                    if( FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP ) {
+                        sprintf( buffer, "Level %3d\n%3d/%3d KP", FS::SAV->m_pkmnTeam[ i ].m_Level,
+                                 FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP,
+                                 FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
+                    } else {
+                        sprintf( buffer, "Level %3d\n Besiegt", FS::SAV->m_pkmnTeam[ i ].m_Level );
+                    }
                     IO::regularFont->printString( buffer, 40, 33 + 26 * i, true, 11 );
                 } else {
                     if( p_item && p_item->getEffectType( ) == item::itemEffectType::USE_ON_PKMN ) {

@@ -65,7 +65,7 @@ extern unsigned short TEMP_PAL[ 256 ];
 
 #define CHOICE_COLOR RGB(16,25,19)
 
-#define GREEN RGB(0,24,0)
+#define GREEN RGB(0,20,0)
 #define RED RGB(24,0,0)
 #define BLUE RGB(0,0,24)
 #define WHITE RGB(31,31,31)

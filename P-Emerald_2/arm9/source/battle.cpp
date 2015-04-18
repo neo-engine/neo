@@ -45,7 +45,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "uio.h"
 
 namespace BATTLE {
-    const char* trainerclassnames[ ] = { "Pokémon-Trainer" };
+    const std::vector<std::wstring> trainerclassnames{ L"PKMN-Trainer" };
 
     const char* ailmentnames[ ] = {
         "none",
@@ -84,8 +84,7 @@ namespace BATTLE {
             return std::wstring( wbuffer );
         }
         if( p_cmd == L"TCLASS" ) {
-            std::swprintf( wbuffer, 50, L"%s", trainerclassnames[ p_battle->_opponent.m_trainerClass ] );
-            return std::wstring( wbuffer );
+            return trainerclassnames[ p_battle->_opponent.m_trainerClass ];
         }
         if( p_cmd.substr( 0, 4 ) == L"COLR" ) {
             u8 r, g, b;

@@ -834,7 +834,7 @@ bool berry::load( ) {
     fscanf( f, "%i", &ac );
     /*displayName = */FS::readString( f, false );
     /*dscrpt = "  "+ */FS::readString( f, false );
-    /*effekt_script = */FS::readString( f, false );
+    fscanf( f, "%lu", &m_itemEffect );
 
     fscanf( f, "%hi", &( m_berrySize ) );
 
@@ -869,6 +869,7 @@ std::string item::getDescription( bool p_new ) {
     fscanf( f, "%i\n", &ac );
     std::string s = FS::readString( f, p_new );
     s = FS::readString( f, p_new );
+    fscanf( f, "%lu", &m_itemEffect );
     fclose( f );
     return s;
 }
@@ -886,9 +887,26 @@ std::string item::getDisplayName( bool p_new ) {
     fscanf( f, "%i", &ac );
     fscanf( f, "%i\n", &ac );
     _displayName = FS::readString( f, p_new );
+    FS::readString( f );
+    fscanf( f, "%lu", &m_itemEffect );
     fclose( f );
 
     return _displayName;
+}
+
+u32 item::getEffect( ) {
+    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
+        return 0;
+    int ac;
+    fscanf( f, "%i", &ac );
+    fscanf( f, "%i\n", &ac );
+    FS::readString( f );
+    FS::readString( f );
+    fscanf( f, "%lu", &m_itemEffect );
+    fclose( f );
+    return m_itemEffect;
 }
 
 item::itemEffectType item::getEffectType( ) {

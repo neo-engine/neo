@@ -1875,12 +1875,12 @@ OUT:
                 case 0:
                 {
                     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
-                    for( int i = 0; i < 3; ++i ) {
+                    for( int i = 0; i < 6; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
                         a = pokemon( 0, 133, 0,
                                      50, FS::SAV->m_id + i, FS::SAV->m_sid, FS::SAV->m_playername,
                                      !FS::SAV->m_isMale, false, false, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
-                        //a.stats.acHP = i*a.stats.maxHP/5;
+                        a.m_stats.m_acHP *= i / 5.0;
                         a.m_boxdata.m_moves[ 3 ] = 0;
                         if( canLearn( 133, 19, 4 ) )
                             a.m_boxdata.m_moves[ 1 ] = 19;

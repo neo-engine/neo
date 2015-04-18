@@ -115,8 +115,6 @@ namespace BATTLE {
     // BEGIN BATTLE_UI
     //////////////////////////////////////////////////////////////////////////
 
-    extern char* trainerclassnames[ ];
-
     void initColors( ) {
 
         IO::regularFont->setColor( 0, 0 );
@@ -297,8 +295,8 @@ namespace BATTLE {
         tilecnt = initStsBalls( true, p_battle, tilecnt );
         initColors( );
 
-        sprintf( buffer, "Eine Herausforderung von\n%s %s!",
-                 trainerclassnames[ p_battle->_opponent.m_trainerClass ],
+        sprintf( buffer, "Eine Herausforderung von\n%ls %s!",
+                 trainerclassnames[ p_battle->_opponent.m_trainerClass ].c_str( ),
                  p_battle->_opponent.m_battleTrainerName.c_str( ) );
         IO::regularFont->printString( buffer, 16, 80, true );
         IO::updateOAM( true );
@@ -409,7 +407,6 @@ namespace BATTLE {
         loadBattleUITop( _battle );
         IO::initOAMTable( true );
         IO::drawSub( );
-        setBattleUISubVisibility( );
         initLogScreen( );
     }
 
@@ -585,7 +582,7 @@ SHOW_ATTACK:
                 consoleSetWindow( &IO::Bottom, x / 8, 12 + ( i / 2 ) * 6, 20, 2 );
                 printf( "%6hhu/%2hhu AP",
                         acPkmn.m_boxdata.m_acPP[ i ],
-                        AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.m_ppup.m_Up1 ) / 5 ) );
+                        s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
             }
         }
 

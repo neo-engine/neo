@@ -75,7 +75,7 @@ namespace IO {
         swiWaitForVBlank( );
     }
     choiceBox::choiceBox( pokemon p_pokemon, u16 p_move ) {
-        _num = 5;
+        _num = 4 + !!p_move;
         static std::vector<const char*> names = { AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_moveName.c_str( ),
             AttackList[ p_pokemon.m_boxdata.m_moves[ 1 ] ]->m_moveName.c_str( ),
             AttackList[ p_pokemon.m_boxdata.m_moves[ 2 ] ]->m_moveName.c_str( ),
@@ -106,15 +106,21 @@ namespace IO {
         //&& t.px <= 106 + ( ( i % 2 ) ? 129 : 19 ) && t.py <= 32 + 68 + ( i / 2 ) * 35
 
         for( u8 i = 0; i < 4; ++i ) {
+            if( !p_pokemon.m_boxdata.m_moves[ i ] ) {
+                _num -= 4 - i;
+                break;
+            }
             tileCnt = loadTypeIcon( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveType,
                                     ( ( i % 2 ) ? 122 : 12 ), 64 + ( i / 2 ) * 35, 3 + 2 * i, 3 + 2 * i, tileCnt, true );
             tileCnt = loadDamageCategoryIcon( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveHitType,
                                               ( ( i % 2 ) ? 154 : 44 ), 64 + ( i / 2 ) * 35, 4 + 2 * i, 4 + 2 * i, tileCnt, true );
         }
-        tileCnt = loadTypeIcon( AttackList[ p_move ]->m_moveType,
-                                12, 134, 11, 11, tileCnt, true );
-        tileCnt = loadDamageCategoryIcon( AttackList[ p_move ]->m_moveHitType,
-                                          44, 134, 12, 12, tileCnt, true );
+        if( p_move ) {
+            tileCnt = loadTypeIcon( AttackList[ p_move ]->m_moveType,
+                                    12, 134, 11, 11, tileCnt, true );
+            tileCnt = loadDamageCategoryIcon( AttackList[ p_move ]->m_moveHitType,
+                                              44, 134, 12, 12, tileCnt, true );
+        }
 
         updateOAM( true );
 

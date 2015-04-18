@@ -61,7 +61,8 @@ public:
 
 
     std::string     m_itemName;
-    //EFFEKT effekt;
+    u32             m_itemEffect;
+
     itemType        m_itemType;
     ability::abilityType
         m_inBattleEffect;
@@ -78,6 +79,8 @@ public:
 
     std::string     getDescription( bool p_new = false );
 
+    u32             getEffect( );
+
     std::string     getShortDescription( bool p_new = false );
 
     itemEffectType  getEffectType( );
@@ -90,7 +93,9 @@ public:
 
     virtual bool    load( );
 
-    void            use( ... );
+    bool            needsInformation( u8 p_num );
+
+    bool            use( pokemon& p_pokemon );
 
     //Constructors
 

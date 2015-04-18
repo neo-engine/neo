@@ -300,6 +300,15 @@ u8: 8;
                 default: return 0;
             }
         }
+        void inline               PPupset( u8 p_i, u8 p_val ) {
+            switch( p_i ) {
+                case 0: m_ppup.m_Up1 = p_val; break;
+                case 1: m_ppup.m_Up2 = p_val; break;
+                case 2: m_ppup.m_Up3 = p_val; break;
+                case 3: m_ppup.m_Up4 = p_val; break;
+                default: return;
+            }
+        }
         u8                      getPersonality( ) {
             u8 counter = 1, i = m_pid % 6;
 
