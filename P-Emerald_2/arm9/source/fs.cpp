@@ -190,45 +190,15 @@ namespace FS {
 
     std::string readString( FILE* p_file, bool p_new ) {
         std::string ret = "";
-        char ac;
+        int ac;
 
         while( ( ac = fgetc( p_file ) ) == '\n' || ac == '\r' );
 
-        if( ac == '*' ) {
-            ret += '\0';
+        if( ac == '*' || ac == EOF ) {
             return ret;
         } else ret += ac;
 
-        while( ( ac = fgetc( p_file ) ) != '*' ) {
-            if( !p_new ) {
-                if( ac == 'ä' )
-                    ret += '\x84';
-                else if( ac == 'Ä' )
-                    ret += '\x8E';
-                else if( ac == 'ü' )
-                    ret += '\x81';
-                else if( ac == 'Ü' )
-                    ret += '\x9A';
-                else if( ac == 'ö' )
-                    ret += '\x94';
-                else if( ac == 'Ö' )
-                    ret += '\x99';
-                else if( ac == 'ß' )
-                    ret += '\x9D';
-                else if( ac == 'é' )
-                    ret += '\x82';
-                else if( ac == '%' )
-                    ret += ' ';
-                else if( ac == '|' )
-                    ret += (char)136;
-                else if( ac == '#' )
-                    ret += (char)137;
-                else if( ac == '\r' )
-                    ret += "";
-                else
-                    ret += ac;
-                continue;
-            }
+        while( ( ac = fgetc( p_file ) ) != '*' && ac != EOF ) {
             if( ac == '|' )
                 ret += (char)136;
             else if( ac == '#' )
@@ -236,44 +206,20 @@ namespace FS {
             else
                 ret += ac;
         }
-        //ret += '\0';
-        return ret;
+        if( !p_new )
+            return convertToOld( ret );
+        else
+            return ret;
     }
 
     std::wstring readWString( FILE* p_file, bool p_new ) {
         std::wstring ret = L"";
-        char ac;
+        int ac;
         while( ( ac = fgetc( p_file ) ) == '\n' || ac == '\r' );
-        if( ac == '*' ) {
-            ret += L'\0';
+        if( ac == '*' || ac == EOF ) {
             return ret;
         } else ret += ac;
-        while( ( ac = fgetc( p_file ) ) != '*' ) {
-            if( !p_new ) {
-                if( ac == 'ä' )
-                    ret += L'\x84';
-                else if( ac == 'Ä' )
-                    ret += L'\x8E';
-                else if( ac == 'ü' )
-                    ret += L'\x81';
-                else if( ac == 'Ü' )
-                    ret += L'\x9A';
-                else if( ac == 'ö' )
-                    ret += L'\x94';
-                else if( ac == 'Ö' )
-                    ret += L'\x99';
-                else if( ac == 'ß' )
-                    ret += L'\x9D';
-                else if( ac == 'é' )
-                    ret += L'\x82';
-                else if( ac == '%' )
-                    ret += L' ';
-                else if( ac == '\r' )
-                    ret += L"";
-                else
-                    ret += ac;
-                continue;
-            }
+        while( ( ac = fgetc( p_file ) ) != '*' && ac != EOF ) {
             if( ac == '|' )
                 ret += (wchar_t)136;
             else if( ac == '#' )
@@ -281,8 +227,10 @@ namespace FS {
             else
                 ret += ac;
         }
-        //ret += L'\0';
-        return ret;
+        if( !p_new )
+            return convertToOld( ret );
+        else
+            return ret;
     }
 
     std::string breakString( const std::string& p_string, u8 p_lineLength ) {
@@ -350,6 +298,71 @@ namespace FS {
         else
             result += tmp;
         return result;
+    }
+
+    std::string convertToOld( const std::string& p_string ) {
+        std::string ret = "";
+        for( auto ac = p_string.begin( ); ac != p_string.end( ); ++ac ) {
+            if( *ac == 'ä' )
+                ret += '\x84';
+            else if( *ac == 'Ä' )
+                ret += '\x8E';
+            else if( *ac == 'ü' )
+                ret += '\x81';
+            else if( *ac == 'Ü' )
+                ret += '\x9A';
+            else if( *ac == 'ö' )
+                ret += '\x94';
+            else if( *ac == 'Ö' )
+                ret += '\x99';
+            else if( *ac == 'ß' )
+                ret += '\x9D';
+            else if( *ac == 'é' )
+                ret += '\x82';
+            else if( *ac == '%' )
+                ret += ' ';
+            else if( *ac == '|' )
+                ret += (char)136;
+            else if( *ac == '#' )
+                ret += (char)137;
+            else if( *ac == '\r' )
+                ret += "";
+            else
+                ret += *ac;
+        }
+        return ret;
+    }
+    std::wstring convertToOld( const std::wstring& p_string ) {
+        std::wstring ret = L"";
+        for( auto ac = p_string.begin( ); ac != p_string.end( ); ++ac ) {
+            if( *ac == 'ä' )
+                ret += L'\x84';
+            else if( *ac == 'Ä' )
+                ret += L'\x8E';
+            else if( *ac == 'ü' )
+                ret += L'\x81';
+            else if( *ac == 'Ü' )
+                ret += L'\x9A';
+            else if( *ac == 'ö' )
+                ret += L'\x94';
+            else if( *ac == 'Ö' )
+                ret += L'\x99';
+            else if( *ac == 'ß' )
+                ret += L'\x9D';
+            else if( *ac == 'é' )
+                ret += L'\x82';
+            else if( *ac == '%' )
+                ret += L' ';
+            else if( *ac == '|' )
+                ret += (char)136;
+            else if( *ac == '#' )
+                ret += (char)137;
+            else if( *ac == '\r' )
+                ret += L"";
+            else
+                ret += *ac;
+        }
+        return ret;
     }
 
     const char* getLoc( u16 p_ind ) {
@@ -803,182 +816,86 @@ u16 item::getItemId( ) {
 }
 
 bool item::load( ) {
-    //    std::stringstream FILENAME;
-    //    FILENAME << ITEM_PATH << Name << ".data";
-    //    FILE* f = fopen(FILENAME.str().c_str(),"r");
-    //    if(f == 0)
-    //        return false;
-    //    //itemtype = GOODS;
-    //    int ac;
-    //    fscanf(f,"%i",&ac);
-    //    effekt = item::EFFEKT(ac);
-    //    fscanf(f,"%i\n",&(price));
-    //    displayName = readString(f);
-    //    dscrpt = readString(f);
-    //    effekt_script = readString(f);
-    //    fclose(f);
+    if( m_loaded )
+        return true;
+    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
+    FILE* f = fopen( buffer, "r" );
+    if( f == 0 )
+        return false;
+
+    memset( &m_itemData, 0, sizeof( itemData ) );
+    fscanf( f, "%hhu %lu %lu\n", &m_itemData.m_itemEffectType,
+            &m_itemData.m_price, &m_itemData.m_itemEffect );
+    strcpy( m_itemData.m_itemDisplayName, FS::readString( f, true ).c_str( ) );
+    strcpy( m_itemData.m_itemDescription, FS::readString( f, true ).c_str( ) );
+    strcpy( m_itemData.m_itemShortDescr, FS::readString( f, true ).c_str( ) );
+    fclose( f );
     return m_loaded = true;
 }
 
 bool berry::load( ) {
+    if( m_loaded )
+        return true;
     sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
     FILE* f = fopen( buffer, "r" );
-
     if( f == 0 )
-        return m_loaded = false;
-    //itemtype = BERRIES;
-    int ac;
-    fscanf( f, "%i", &ac );
-    //effekt = item::EFFEKT(ac);
-    //fscanf(f,"%i\n",&(price));
-    fscanf( f, "%i", &ac );
-    /*displayName = */FS::readString( f, false );
-    /*dscrpt = "  "+ */FS::readString( f, false );
-    /*effekt_script = */FS::readString( f, false );
+        return false;
 
-    fscanf( f, "%hi", &( m_berrySize ) );
+    memset( &m_itemData, 0, sizeof( itemData ) );
+    fscanf( f, "%hhu %lu %lu\n", &m_itemData.m_itemEffectType,
+            &m_itemData.m_price, &m_itemData.m_itemEffect );
+    strcpy( m_itemData.m_itemDisplayName, FS::readString( f, true ).c_str( ) );
+    strcpy( m_itemData.m_itemDescription, FS::readString( f, true ).c_str( ) );
+    strcpy( m_itemData.m_itemShortDescr, FS::readString( f, true ).c_str( ) );
 
-    fscanf( f, "%i", &ac );
-    m_berryGuete = berry::berryGueteType( ac );
-
-    fscanf( f, "%i", &ac );
-    m_naturalGiftType = Type( ac );
-
-    fscanf( f, "%hhu", &( m_naturalGiftStrength ) );
-
-    for( int i = 0; i < 5; ++i )
-        fscanf( f, "%hhu", &( m_berryTaste[ i ] ) );
-
-    fscanf( f, "%hhu", &( m_hoursPerGrowthStage ) );
-
-    fscanf( f, "%hhu", &( m_minBerries ) );
-
-    fscanf( f, "%hhu\n", &( m_maxBerries ) );
-
+    memset( &m_berryData, 0, sizeof( berryData ) );
+    fscanf( f, "%hu %hhu %hhu %hhu", &m_berryData.m_berrySize,
+            &m_berryData.m_berryGuete, &m_berryData.m_naturalGiftType,
+            &m_berryData.m_naturalGiftStrength );
+    for( u8 i = 0; i < 5; ++i )
+        fscanf( f, "%hhu", &m_berryData.m_berryTaste[ i ] );
+    fscanf( f, "%hhu %hhu %hhu", &m_berryData.m_hoursPerGrowthStage,
+            &m_berryData.m_minBerries, &m_berryData.m_maxBerries );
     fclose( f );
     return m_loaded = true;
 }
 
-std::string item::getDescription( bool p_new ) {
-    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-    FILE* f = fopen( buffer, "r" );
-    if( f == 0 )
-        return "Keine Daten.";
-    int ac;
-    fscanf( f, "%i", &ac );
-    fscanf( f, "%i\n", &ac );
-    std::string s = FS::readString( f, p_new );
-    s = FS::readString( f, p_new );
-    fclose( f );
-    return s;
+std::string item::getDisplayName( bool p_new ) {
+    if( !m_loaded && !load( ) )
+        return m_itemName;
+    if( p_new )
+        return std::string( m_itemData.m_itemDisplayName );
+    else
+        return FS::convertToOld( std::string( m_itemData.m_itemDisplayName ) );
 }
 
-std::string item::getDisplayName( bool p_new ) {
-    if( _dislayNameStatus && p_new == ( _dislayNameStatus - 1 ) )
-        return _displayName;
-    _dislayNameStatus = 1 + p_new;
+std::string item::getDescription( ) {
+    if( !m_loaded && !load( ) )
+        return "Keine Daten.";
+    return std::string( m_itemData.m_itemDescription );
+}
 
-    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-    FILE* f = fopen( buffer, "r" );
-    if( f == 0 )
-        return _displayName = m_itemName;
-    int ac;
-    fscanf( f, "%i", &ac );
-    fscanf( f, "%i\n", &ac );
-    _displayName = FS::readString( f, p_new );
-    fclose( f );
+std::string item::getShortDescription( ) {
+    if( !m_loaded && !load( ) )
+        return "Keine Daten.";
+    return std::string( m_itemData.m_itemShortDescr );
+}
 
-    return _displayName;
+
+u32 item::getEffect( ) {
+    if( !m_loaded && !load( ) )
+        return 0;
+    return m_itemData.m_itemEffect;
 }
 
 item::itemEffectType item::getEffectType( ) {
-    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-    FILE* f = fopen( buffer, "r" );
-    if( f == 0 )
-        return ( item::itemEffectType::NONE );
-    int ac;
-    fscanf( f, "%i", &ac );
-    fclose( f );
-    return ( item::itemEffectType )ac;
-}
-
-item::itemType item::getItemType( ) {
-    return m_itemType;
+    if( !m_loaded && !load( ) )
+        return itemEffectType::NONE;
+    return m_itemData.m_itemEffectType;
 }
 
 u32 item::getPrice( ) {
-    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-    FILE* f = fopen( buffer, "r" );
-    if( f == 0 )
+    if( !m_loaded && !load( ) )
         return 0;
-    int ac;
-    fscanf( f, "%i", &ac );
-    fscanf( f, "%i\n", &ac );
-    fclose( f );
-    return ac;
-}
-
-std::string berry::getDescription2( bool p_new ) {
-    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-    FILE* f = fopen( buffer, "r" );
-    if( f == 0 )
-        return "Keine Daten.";
-    //itemtype = BERRIES;
-    int ac;
-    fscanf( f, "%i", &ac );
-    //effekt = item::EFFEKT(ac);
-    //fscanf(f,"%i\n",&(price));
-    fscanf( f, "%i", &ac );
-    /*displayName = */FS::readString( f, p_new );
-    /*dscrpt = "  "+ */FS::readString( f, p_new );
-    /*effekt_script = */FS::readString( f, p_new );
-
-    fscanf( f, "%hi", &( ac ) );
-    fscanf( f, "%i", &ac );
-    //Guete = berry::Guete_Type(ac);
-    fscanf( f, "%i", &ac );
-    //BeerenKr_Type = Type(ac);
-    fscanf( f, "%hhu", &( ac ) );
-    for( int i = 0; i < 5; ++i )
-        fscanf( f, "%hhu", &( ac ) );
-    fscanf( f, "%hhu", &( ac ) );
-    fscanf( f, "%hhu", &( ac ) );
-    fscanf( f, "%hhu\n", &( ac ) );
-
-    std::string s = FS::readString( f, p_new );
-    fclose( f );
-    return s;
-}
-
-std::string item::getShortDescription( bool p_new ) {
-    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-    FILE* f = fopen( buffer, "r" );
-    if( f == 0 )
-        return "Keine Daten.";
-    int ac;
-    fscanf( f, "%i", &ac );
-    //effekt = item::EFFEKT(ac);
-    //fscanf(f,"%i\n",&(price));
-    fscanf( f, "%i", &ac );
-    /*displayName = */FS::readString( f, p_new );
-    /*dscrpt = "  "+ */FS::readString( f, p_new );
-    /*effekt_script = */FS::readString( f, p_new );
-
-    if( fscanf( f, "%hi", &( ac ) ) == EOF )
-        return "Keine Daten.";
-    fscanf( f, "%i", &ac );
-    //Guete = berry::Guete_Type(ac);
-    fscanf( f, "%i", &ac );
-    //BeerenKr_Type = Type(ac);
-    fscanf( f, "%hhu", &( ac ) );
-    for( int i = 0; i < 5; ++i )
-        fscanf( f, "%hhu", &( ac ) );
-    fscanf( f, "%hhu", &( ac ) );
-    fscanf( f, "%hhu", &( ac ) );
-    fscanf( f, "%hhu\n", &( ac ) );
-
-    FS::readString( f, p_new );
-    std::string s = FS::readString( f, p_new );
-    fclose( f );
-    return s;
+    return m_itemData.m_price;
 }

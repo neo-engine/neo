@@ -52,32 +52,18 @@ public:
         SOUR
     };
 
-    //std::string dscrpt2;
-    short           m_berrySize;
-    berryGueteType  m_berryGuete;
-    Type            m_naturalGiftType;  //Type that Natural Gift becomes when holding this berry
-    u8   m_naturalGiftStrength;
-    u8   m_berryTaste[ 5 ];       //Spicy, Dry, Sweet, Bitter, Sour
-    u8   m_hoursPerGrowthStage,
-        m_minBerries,
-        m_maxBerries;
+    struct berryData {
+        u16             m_berrySize;
+        berryGueteType  m_berryGuete;
+        Type            m_naturalGiftType;  //Type that Natural Gift becomes when holding this berry
+        u8   m_naturalGiftStrength;
+        u8   m_berryTaste[ 5 ];       //Spicy, Dry, Sweet, Bitter, Sour
+        u8   m_hoursPerGrowthStage;
+        u8   m_minBerries;
+        u8   m_maxBerries;
+    } m_berryData;
 
-    std::string     getDescription2( bool p_new = false );
-
-    berryGueteType  getGuete( );
-
-    std::pair < Type, u8 >
-        getNaturalGiftStats( );
-
-    u8   getTaste( berryTaste p_taste );
-
-    u8   getHoursPerGrowthStage( );
-
-    u8   getMinBerries( );
-
-    u8   getMaxBerries( );
-
-    bool load( );
+    bool load( ) override;
 
     berry( const std::string& p_name )
         : item( p_name ) {

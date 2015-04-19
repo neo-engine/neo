@@ -52,6 +52,9 @@ namespace FS {
     std::string breakString( const std::string& p_string, u8 p_lineLength );
     std::string breakString( const std::string& p_string, IO::font* p_font, u8 p_lineLength );
 
+    std::string convertToOld( const std::string& p_string );
+    std::wstring convertToOld( const std::wstring& p_string );
+
     bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no );
     bool readPictureData( u16* p_layer, const char* p_Path, const char* p_name, u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256, bool p_bottom = false );
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt, bool p_bottom = false );

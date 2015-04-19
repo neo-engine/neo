@@ -28,7 +28,213 @@ along with Pokémon Emerald 2 Version.  If not, new see <http://www.gnu.org/lice
 #include "item.h"
 #include "berry.h"
 #include "move.h"
+#include "pokemon.h"
+#include "battle.h"
 
+#include <vector>
+
+#define APPLY_OP( op, tg, val, mx ) ( ( op == 1 ) ? tg += val : ( \
+                                  ( op == 2 ) ? tg -= val : ( \
+                                  ( op == 3 ) ? tg = val : ( \
+                                  ( op == 4 ) ? tg |= val : ( \
+                                  ( op == 5 ) ? tg &= val : ( \
+                                  ( op == 6 ) ? tg = mx : ( \
+                                  ( op == 7 ) ? tg = s16( ( mx + 0.5 ) / 2 ) : tg ) ) ) ) ) ) )
+
+void recalcStats( pokemon& p_pokemon, pokemonData& p_pData ) {
+    u16 HPdif = p_pokemon.m_stats.m_maxHP - p_pokemon.m_stats.m_acHP;
+    if( p_pokemon.m_boxdata.m_speciesId != 292 ) //Check for Ninjatom
+        p_pokemon.m_stats.m_maxHP = ( ( p_pokemon.m_boxdata.m_individualValues.m_hp + 2 * p_pData.m_bases[ 0 ]
+        + ( p_pokemon.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* p_pokemon.m_Level / 100 ) + 10;
+    else
+        p_pokemon.m_stats.m_maxHP = 1;
+    pkmnNatures nature = p_pokemon.m_boxdata.getNature( );
+
+    p_pokemon.m_stats.m_Atk = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_attack + 2 * p_pData.m_bases[ ATK + 1 ]
+        + ( p_pokemon.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
+    p_pokemon.m_stats.m_Def = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_defense + 2 * p_pData.m_bases[ DEF + 1 ]
+        + ( p_pokemon.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
+    p_pokemon.m_stats.m_Spd = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_speed + 2 * p_pData.m_bases[ SPD + 1 ]
+        + ( p_pokemon.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
+    p_pokemon.m_stats.m_SAtk = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_sAttack + 2 * p_pData.m_bases[ SATK + 1 ]
+        + ( p_pokemon.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
+    p_pokemon.m_stats.m_SDef = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_sDefense + 2 * p_pData.m_bases[ SDEF + 1 ]
+        + ( p_pokemon.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
+
+    p_pokemon.m_stats.m_acHP = std::max( 0, p_pokemon.m_stats.m_maxHP - HPdif );
+}
+
+bool item::needsInformation( u8 p_num ) {
+    if( !m_loaded && !load( ) )
+        return false;
+
+    u16 op = ( p_num ? m_itemData.m_itemEffect % ( 1 << 16 ) : m_itemData.m_itemEffect >> 16 );
+    u8 stat = ( op >> 8 ) % 32;
+
+    return ( stat == 2 || stat == 18 );
+}
+
+//Ya'know, this stuff here is serious voodoo,
+//e.g., Zinc's effect encodes to 755051786 = 0b001'01101'0000'0001''001'01010'0000'1010
+bool item::use( pokemon& p_pokemon ) {
+    if( p_pokemon.m_boxdata.m_individualValues.m_isEgg || !p_pokemon.m_boxdata.m_speciesId )
+        return false;
+    if( !m_loaded && !load( ) )
+        return false;
+
+    bool change = false;
+    pokemonData p; getAll( p_pokemon.m_boxdata.m_speciesId, p );
+
+    //Anything that modifies the PKMN's happiness shall be second
+    if( ( m_itemData.m_itemEffect >> 24 ) % 32 == 13 )
+        m_itemData.m_itemEffect = ( ( m_itemData.m_itemEffect % ( 1 << 16 ) ) << 16 ) | ( m_itemData.m_itemEffect >> 16 );
+
+
+    for( auto op : { m_itemData.m_itemEffect >> 16, m_itemData.m_itemEffect % ( 1 << 16 ) } ) {
+        u8 operation = op >> 13;
+        u8 stat = ( op >> 8 ) % 32;
+        u8 value = u8( op );
+
+
+        switch( stat ) {
+            case 1: {
+                if( !p_pokemon.m_stats.m_acHP )
+                    break;
+
+                s16 tmp = p_pokemon.m_stats.m_acHP;
+                APPLY_OP( operation, tmp, value, s16( p_pokemon.m_stats.m_maxHP ) );
+                tmp = std::min( tmp, s16( p_pokemon.m_stats.m_maxHP ) );
+                tmp = std::max( (s16)0, tmp );
+                if( tmp != p_pokemon.m_stats.m_acHP ) {
+                    p_pokemon.m_stats.m_acHP = tmp;
+                    change = true;
+                }
+                break;
+            }
+            case 2: case 3:
+            case 4: case 5: {
+                if( !p_pokemon.m_boxdata.m_moves[ stat - 2 ] )
+                    break;
+
+                s8 tmp = p_pokemon.m_boxdata.m_acPP[ stat - 2 ];
+                s8 mx = s8( AttackList[ p_pokemon.m_boxdata.m_moves[ stat - 2 ] ]->m_movePP
+                            * ( 5 + p_pokemon.m_boxdata.PPupget( stat - 2 ) ) / 5.0 );
+                APPLY_OP( operation, tmp, value, mx );
+                tmp = std::min( tmp, mx );
+                if( tmp != p_pokemon.m_boxdata.m_acPP[ stat - 2 ] ) {
+                    p_pokemon.m_boxdata.m_acPP[ stat - 2 ] = tmp;
+                    change = true;
+                }
+                break;
+            }
+            case 17: {
+                for( u8 i = 0; i < 4; ++i ) {
+                    if( !p_pokemon.m_boxdata.m_moves[ i ] )
+                        break;
+                    s8 tmp = p_pokemon.m_boxdata.m_acPP[ i ];
+                    s8 mx = s8( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_movePP
+                                * ( 5 + p_pokemon.m_boxdata.PPupget( i ) ) / 5.0 );
+                    APPLY_OP( operation, tmp, value, mx );
+                    tmp = std::min( tmp, mx );
+                    if( tmp != p_pokemon.m_boxdata.m_acPP[ i ] ) {
+                        p_pokemon.m_boxdata.m_acPP[ i ] = tmp;
+                        change = true;
+                    }
+                }
+                break;
+            }
+            case 18: case 19:
+            case 20: case 21: {
+                s8 tmp = p_pokemon.m_boxdata.PPupget( stat - 18 );
+
+                s8 df = s8( AttackList[ p_pokemon.m_boxdata.m_moves[ stat - 18 ] ]->m_movePP
+                            * ( 5 + p_pokemon.m_boxdata.PPupget( stat - 18 ) ) / 5.0 )
+                            - p_pokemon.m_boxdata.m_acPP[ stat - 18 ];
+
+                APPLY_OP( operation, tmp, value, (s8)3 );
+                tmp = std::min( tmp, (s8)3 );
+                if( tmp != p_pokemon.m_boxdata.PPupget( stat - 18 ) ) {
+                    p_pokemon.m_boxdata.PPupset( stat - 18, tmp );
+                    p_pokemon.m_boxdata.m_acPP[ stat - 18 ] = s8( AttackList[ p_pokemon.m_boxdata.m_moves[ stat - 18 ] ]->m_movePP
+                                                                  * ( 5 + p_pokemon.m_boxdata.PPupget( stat - 18 ) ) / 5.0 ) - df;
+                    change = true;
+                }
+                break;
+            }
+            case 6: case 7: case 8:
+            case 9: case 10: case 11: {
+                s16 tmp = p_pokemon.m_boxdata.m_effortValues[ stat - 6 ];
+                s16 sum = 0;
+                for( u8 i = 0; i < 6; ++i )
+                    sum += p_pokemon.m_boxdata.m_effortValues[ i ];
+                s16 mx = 510 - sum;
+                if( value > 1 ) {
+                    APPLY_OP( operation, tmp, value, std::min( s16( 100 ), mx ) );
+                    tmp = std::min( tmp, std::min( s16( 100 ), mx ) );
+                } else {
+                    APPLY_OP( operation, tmp, value, std::min( s16( 252 ), mx ) );
+                    tmp = std::min( tmp, std::min( s16( 252 ), mx ) );
+                }
+                tmp = std::max( (s16)0, tmp );
+                if( tmp != p_pokemon.m_boxdata.m_effortValues[ stat - 6 ] ) {
+                    p_pokemon.m_boxdata.m_effortValues[ stat - 6 ] = tmp;
+                    change = true;
+                    recalcStats( p_pokemon, p );
+                }
+                break;
+            }
+            case 12: {
+                s16 tmp = p_pokemon.m_Level;
+                APPLY_OP( operation, tmp, value, 100 );
+                tmp = std::min( tmp, s16( 100 ) );
+                tmp = std::max( (s16)0, tmp );
+                if( tmp != p_pokemon.m_Level ) {
+                    p_pokemon.m_Level = tmp;
+                    p_pokemon.m_boxdata.m_experienceGained = EXP[ p_pokemon.m_Level - 1 ][ p.m_expType ];
+
+                    recalcStats( p_pokemon, p );
+                    change = true;
+                }
+                break;
+            }
+            case 13: {
+                s16 tmp = p_pokemon.m_boxdata.m_steps;
+                APPLY_OP( operation, tmp, value, s16( 255 ) );
+                tmp = std::min( tmp, s16( 255 ) );
+                tmp = std::max( (s16)0, tmp );
+                if( change && tmp != p_pokemon.m_boxdata.m_steps ) {
+                    p_pokemon.m_boxdata.m_steps = tmp;
+                }
+                break;
+            }
+            case 14: {
+                u8 tmp = p_pokemon.m_statusint;
+                APPLY_OP( operation, tmp, value, s16( 0 ) );
+                if( tmp != p_pokemon.m_boxdata.m_steps ) {
+                    p_pokemon.m_boxdata.m_steps = tmp;
+                }
+                break;
+            }
+            case 15: {
+                if( p_pokemon.m_stats.m_acHP )
+                    break;
+
+                s16 tmp = p_pokemon.m_stats.m_acHP;
+                APPLY_OP( operation, tmp, value, s16( p_pokemon.m_stats.m_maxHP ) );
+                tmp = std::min( tmp, s16( p_pokemon.m_stats.m_maxHP ) );
+                tmp = std::max( (s16)1, tmp );
+
+                p_pokemon.m_stats.m_acHP = tmp;
+                change = true;
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    return change;
+}
 
 item* ItemList[ 772 ] = {
     new item( "Null" ),
@@ -53,7 +259,7 @@ item* ItemList[ 772 ] = {
     new medicine( "Vitalkraut" ), new medicine( "AEther" ),
     new medicine( "Top-AEther" ), new medicine( "Elixir" ),
     new medicine( "Top-Elixir" ), new medicine( "Lavakeks" ),
-    new medicine( "Beerensaft" ), new medicine( "Zauberasche" ),
+    new medicine( "Beerensaft" ), new item( "Zauberasche" ),
     new medicine( "KP-Plus" ), new medicine( "Protein" ),
     new medicine( "Eisen" ), new medicine( "Carbon" ),
     new medicine( "Kalzium" ), new medicine( "Sonderbonbon" ),

@@ -134,7 +134,7 @@ namespace BAG {
 
         tileCnt = IO::loadSprite( BACK_ID, BACK_ID, tileCnt,
                                   SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26, 32, 32, BackPal,
-                                  BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
+                                  BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_3, true );
         for( u8 i = 0; i < 6; ++i ) {
             auto acPkmn = FS::SAV->m_pkmnTeam[ i ];
             if( !acPkmn.m_boxdata.m_speciesId )
@@ -143,6 +143,7 @@ namespace BAG {
                 tileCnt = IO::loadEggIcon( 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
             else
                 tileCnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
+            IO::Oam->oamBuffer[ PKMN_SUB + i ].priority = OBJPRIORITY_3;
         }
         for( u8 i = 0; i < 5; ++i ) {
             tileCnt = IO::loadSprite( BAG_SUB + i, BAG_SUB + i, tileCnt,
@@ -176,7 +177,7 @@ namespace BAG {
             IO::OamTop->oamBuffer[ 2 ].isHidden = true;
 
             display = p_item->getDisplayName( true );
-            descr = p_item->getDescription( true );
+            descr = p_item->getDescription( );
 
             if( p_item->m_itemType != item::itemType::KEY_ITEM ) {
                 std::sprintf( buffer, "x %d", p_count );
@@ -188,15 +189,15 @@ namespace BAG {
                 curr->load( );
 
                 IO::regularFont->setColor( RED_IDX, 1 );
-                sprintf( buffer, "Güte: %s", ( curr->m_berryGuete == berry::berryGueteType::HARD ) ? "Hart" :
-                         ( ( curr->m_berryGuete == berry::berryGueteType::SOFT ) ? "Weich" :
-                         ( ( curr->m_berryGuete == berry::berryGueteType::SUPER_HARD ) ? "Steinhart" :
-                         ( ( curr->m_berryGuete == berry::berryGueteType::SUPER_SOFT ) ? "Normal" :
-                         ( ( curr->m_berryGuete == berry::berryGueteType::VERY_HARD ) ? "Sehr hart" :
+                sprintf( buffer, "Güte: %s", ( curr->m_berryData.m_berryGuete == berry::berryGueteType::HARD ) ? "Hart" :
+                         ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SOFT ) ? "Weich" :
+                         ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SUPER_HARD ) ? "Steinhart" :
+                         ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SUPER_SOFT ) ? "Normal" :
+                         ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::VERY_HARD ) ? "Sehr hart" :
                          ( "Sehr weich" ) ) ) ) ) );
                 IO::regularFont->printString( buffer, 24, 145, false );
                 IO::regularFont->setColor( BLUE_IDX, 1 );
-                sprintf( buffer, "Größe:%4.1fcm", curr->m_berrySize / 10.0 );
+                sprintf( buffer, "Größe:%4.1fcm", curr->m_berryData.m_berrySize / 10.0 );
                 IO::regularFont->printString( buffer, 140, 145, false );
                 IO::regularFont->setColor( BLACK_IDX, 1 );
 
@@ -204,9 +205,9 @@ namespace BAG {
                 u8 poses[ 5 ] = { 18, 66, 124, 150, 194 };
                 u8 mx = 0;
                 for( u8 i = 0; i < 5; ++i )
-                    mx = std::max( mx, curr->m_berryTaste[ i ] );
+                    mx = std::max( mx, curr->m_berryData.m_berryTaste[ i ] );
                 for( u8 i = 0; i < 5; ++i ) {
-                    if( curr->m_berryTaste[ i ] != mx ) {
+                    if( curr->m_berryData.m_berryTaste[ i ] != mx ) {
                         IO::regularFont->setColor( GRAY_IDX, 1 );
                         IO::regularFont->setColor( WHITE_IDX, 2 );
                     } else {
@@ -281,7 +282,7 @@ namespace BAG {
                 _ranges.push_back( { IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),
                                    ( 1 << 15 ) | ( i << 12 ) | FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem } );
 
-                if( p_item->m_itemType == item::itemType::TM_HM ) {
+                if( p_item && p_item->m_itemType == item::itemType::TM_HM ) {
                     u16 currMv = static_cast<TM*>( p_item )->m_moveIdx;
                     if( currMv == FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_moves[ 0 ]
                         || currMv == FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_moves[ 1 ]
@@ -289,31 +290,50 @@ namespace BAG {
                         || currMv == FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_moves[ 3 ] ) {
                         IO::regularFont->setColor( BLUE_IDX, 1 );
                         IO::regularFont->setColor( BLACK_IDX, 2 );
-                        IO::regularFont->printString( "Bereits\nerlernt", 45, 33 + 26 * i, true, 11 );
+                        IO::regularFont->printString( "Bereits\nerlernt", 40, 33 + 26 * i, true, 11 );
                     } else if( canLearn( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId, currMv, 4 ) ) {
                         BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
                         IO::regularFont->setColor( COLOR_IDX, 1 );
                         IO::regularFont->setColor( BLACK_IDX, 2 );
-                        IO::regularFont->printString( "Erlernbar", 45, 38 + 26 * i, true );
+                        IO::regularFont->printString( "Erlernbar", 40, 38 + 26 * i, true );
                     } else {
                         IO::regularFont->setColor( RED_IDX, 1 );
                         IO::regularFont->setColor( BLACK_IDX, 2 );
-                        IO::regularFont->printString( "Nicht\nerlernbar", 45, 33 + 26 * i, true, 11 );
+                        IO::regularFont->printString( "Nicht\nerlernbar", 40, 33 + 26 * i, true, 11 );
                     }
-                } else if( p_item->m_itemType == item::itemType::MEDICINE ) {
-                    sprintf( buffer, "Level %3d\n%3d/%3d KP", FS::SAV->m_pkmnTeam[ i ].m_Level, FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP, FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
-                    IO::regularFont->printString( buffer, 45, 33 + 26 * i, true, 11 );
+                } else if( p_item &&  p_item->m_itemType == item::itemType::MEDICINE ) {
+                    if( FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP ) {
+                        sprintf( buffer, "Level %3d\n%3d/%3d KP", FS::SAV->m_pkmnTeam[ i ].m_Level,
+                                 FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP,
+                                 FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
+                    } else {
+                        sprintf( buffer, "Level %3d\n Besiegt", FS::SAV->m_pkmnTeam[ i ].m_Level );
+                    }
+                    IO::regularFont->printString( buffer, 40, 33 + 26 * i, true, 11 );
                 } else {
-                    IO::regularFont->printString( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name, 45, 33 + 26 * i, true );
+                    if( p_item && p_item->getEffectType( ) == item::itemEffectType::USE_ON_PKMN ) {
+                        if( FS::SAV->m_pkmnTeam[ i ].canEvolve( p_item->getItemId( ), 3 ) ) {
+                            BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
+                            IO::regularFont->setColor( COLOR_IDX, 1 );
+                            IO::regularFont->setColor( BLACK_IDX, 2 );
+                            IO::regularFont->printString( "Möglich", 40, 38 + 26 * i, true );
+                        } else {
+                            IO::regularFont->setColor( RED_IDX, 1 );
+                            IO::regularFont->setColor( BLACK_IDX, 2 );
+                            IO::regularFont->printString( "Nicht\nmöglich", 40, 33 + 26 * i, true, 11 );
+                        }
+                    } else {
+                        IO::regularFont->printString( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name, 45, 33 + 26 * i, true );
 
-                    IO::regularFont->setColor( BLACK_IDX, 2 );
-                    IO::regularFont->setColor( GRAY_IDX, 1 );
+                        IO::regularFont->setColor( BLACK_IDX, 2 );
+                        IO::regularFont->setColor( GRAY_IDX, 1 );
 
-                    if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem ) {
-                        IO::regularFont->printString( ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
-                                                      45, 44 + 26 * i, true );
-                    } else
-                        IO::regularFont->printString( "Kein Item", 45, 44 + 26 * i, true );
+                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem ) {
+                            IO::regularFont->printString( ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
+                                                          40, 44 + 26 * i, true );
+                        } else
+                            IO::regularFont->printString( "Kein Item", 40, 44 + 26 * i, true );
+                    }
                 }
             }
         }
@@ -326,33 +346,21 @@ namespace BAG {
         IO::printRectangle( p_x, p_y, 255, p_y + 18, true, false, 0 );
         if( p_clearOnly )
             return;
-        if( p_item->getItemType( ) != item::itemType::GOODS
-            && toBagType( p_item->getItemType( ) ) == bag::bagType::ITEMS ) {
+        if( p_item->m_itemType != item::itemType::GOODS
+            && toBagType( p_item->m_itemType ) == bag::bagType::ITEMS ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
-            IO::printChar( IO::boldFont, 490 - 22 + u16( p_item->getItemType( ) ), p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
+            IO::printChar( IO::boldFont, 490 - 22 + u16( p_item->m_itemType ), p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
         } else
             IO::printChoiceBox( p_x, p_y, p_x + 106, p_y + 16, 3, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
-        if( p_item->getItemType( ) != item::itemType::TM_HM )
+        if( p_item->m_itemType != item::itemType::TM_HM )
             IO::printString( IO::regularFont, p_item->getDisplayName( true ).c_str( ), p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
         else
             IO::printString( IO::regularFont, AttackList[ static_cast<TM*>( p_item )->m_moveIdx ]->m_moveName.c_str( ), p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
     }
 
-    std::vector<IO::inputTarget> bagUI::drawBagPage( u8 p_page, u16 p_itemIdx ) {
-        std::vector<IO::inputTarget> res;
-        _ranges.clear( );
-
-        for( u8 i = 0; i < 5; ++i ) {
-            showActiveBag( i, i == p_page );
-            //if( i != p_page )
-            //    res.push_back( IO::inputTarget( 26 * i + 13, 3 + 13, 13 ) );
-        }
-        IO::updateOAM( true );
-
+    void drawTop( u8 p_page ) {
         dmaCopy( bag_bg_upperBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
         dmaCopy( bag_bg_upperPal, BG_PALETTE, 256 * 2 );
-        dmaCopy( bag_bg_lowerBitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
-        dmaCopy( bag_bg_lowerPal, BG_PALETTE_SUB, 256 * 2 );
         initColors( );
 
         switch( p_page ) {
@@ -371,35 +379,68 @@ namespace BAG {
             default:
                 break;
         }
+    }
 
-        u8 pkmnCnt = drawPkmn( ItemList[ _bag[ p_page ][ p_itemIdx ].first ] );
+    void bagUI::updateSelectedIdx( u8 p_oldIdx ) {
+        u16 sz = _bag[ _currPage ].size( );
+
+        drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( p_oldIdx - 4 ) + 4 * sz ) % sz ].first ],
+                     132, 76 + 18 * ( p_oldIdx - 4 ), false, false );
+
+        drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ],
+                     132, 76 + 18 * ( _currSelectedIdx - 4 ), true, false );
+
+
+        drawTop( _currPage );
+
+        drawItemTop( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ],
+                     _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].second );
+
+        u8 pkmnCnt = drawPkmn( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ] );
         for( u8 i = 0; i < pkmnCnt; ++i )
-            res.push_back( _ranges[ _ranges.size( ) - pkmnCnt + i ].first );
+            _ranges.pop_back( );
+    }
+
+    std::vector<IO::inputTarget> bagUI::drawBagPage( u8 p_page, u16 p_itemIdx ) {
+        std::vector<IO::inputTarget> res;
+        _ranges.clear( );
+        _currPage = p_page;
+        _currItemIdx = p_itemIdx;
+
+        for( u8 i = 0; i < 5; ++i ) {
+            showActiveBag( i, i == p_page );
+            //if( i != p_page )
+            //    res.push_back( IO::inputTarget( 26 * i + 13, 3 + 13, 13 ) );
+        }
+        IO::updateOAM( true );
+
+        dmaCopy( bag_bg_lowerBitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
+        dmaCopy( bag_bg_lowerPal, BG_PALETTE_SUB, 256 * 2 );
+        drawTop( p_page );
+        initColors( );
+
 
         if( !_bag[ p_page ].empty( ) ) {
-            drawItemTop( ItemList[ _bag[ p_page ][ p_itemIdx ].first ], _bag[ p_page ][ p_itemIdx ].second );
-            drawItemSub( ItemList[ _bag[ p_page ][ p_itemIdx ].first ], 132, 76, true, false );
-            res.push_back( IO::inputTarget( 132, 76, 256, 92 ) );
-            _ranges.push_back( { res.back( ), _bag[ p_page ][ p_itemIdx ].first } );
-
             u16 sz = _bag[ p_page ].size( );
-            u8 tp = ( sz - 1 ) / 2;
+            u8 pkmnCnt = drawPkmn( ItemList[ _bag[ p_page ][ ( p_itemIdx + 4 * sz + _currSelectedIdx - 4 ) % sz ].first ] );
+            for( u8 i = 0; i < pkmnCnt; ++i )
+                res.push_back( _ranges[ _ranges.size( ) - pkmnCnt + i ].first );
+            for( u8 i = 0; i < 9; ++i ) {
 
-            for( u8 i = 1; i < 5; ++i ) {
-                drawItemSub( ItemList[ _bag[ p_page ][ ( p_itemIdx + i ) % sz ].first ], 132, 76 + 18 * i, false, false, i > tp );
-                if( i <= tp ) {
-                    res.push_back( IO::inputTarget( 132, 76 + 18 * i, 256, 92 + 18 * i ) );
-                    _ranges.push_back( { res.back( ), _bag[ p_page ][ ( p_itemIdx + i ) % sz ].first } );
-                }
+                if( i == _currSelectedIdx )
+                    drawItemTop( ItemList[ _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].first ], _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].second );
+                drawItemSub( ItemList[ _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].first ], 132, 4 + i * 18, i == _currSelectedIdx, false, i >= sz );
 
-                drawItemSub( ItemList[ _bag[ p_page ][ ( p_itemIdx + sz - i ) % sz ].first ], 132, 76 - 18 * i, false, false, i > ( tp + !( sz % 2 ) ) );
-                if( i <= ( tp + !( sz % 2 ) ) ) {
-                    res.push_back( IO::inputTarget( 132, 76 - 18 * i, 256, 92 - 18 * i ) );
-                    _ranges.push_back( { res.back( ), _bag[ p_page ][ ( p_itemIdx + sz - i ) % sz ].first } );
+                if( i < sz ) {
+                    res.push_back( IO::inputTarget( 132, 4 + i * 18, 256, 20 + i * 18 ) );
+                    _ranges.push_back( { res.back( ), _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].first } );
                 }
             }
-
         } else {
+            u8 pkmnCnt = drawPkmn( 0 );
+            for( u8 i = 0; i < pkmnCnt; ++i )
+                res.push_back( _ranges[ _ranges.size( ) - pkmnCnt + i ].first );
+
             for( u8 i = 0; i < 5; ++i ) {
                 drawItemSub( 0, 132, 76 + 18 * i, false, false, true );
                 drawItemSub( 0, 132, 76 - 18 * i, false, false, true );
@@ -442,8 +483,23 @@ namespace BAG {
                                 AttackList[ static_cast<TM*>( ItemList[ _ranges[ p_rangeIdx ].second ] )->m_moveIdx ]->m_isFieldAttack,
                                 p_currPos.px, p_currPos.py, TRANSFER_SUB, TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
             }
+            u16 sz = _bag[ _currPage ].size( );
+
+            drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ],
+                         132, 76 + 18 * ( _currSelectedIdx - 4 ), false, false );
+
             drawItemSub( ItemList[ _ranges[ p_rangeIdx ].second ], _ranges[ p_rangeIdx ].first.m_targetX1,
-                         _ranges[ p_rangeIdx ].first.m_targetY1, _ranges[ p_rangeIdx ].first.m_targetY1 == 76, true );
+                         _ranges[ p_rangeIdx ].first.m_targetY1, true, true );
+
+            drawTop( _currPage );
+
+            _currSelectedIdx = 4 + ( _ranges[ p_rangeIdx ].first.m_targetY1 - 76 ) / 18;
+            drawItemTop( ItemList[ _ranges[ p_rangeIdx ].second ], _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].second );
+
+            u8 pkmnCnt = drawPkmn( ItemList[ _ranges[ p_rangeIdx ].second ] );
+            for( u8 i = 0; i < pkmnCnt; ++i )
+                _ranges.pop_back( );
+
         }
         return TRANSFER_SUB;
     }
@@ -461,8 +517,9 @@ namespace BAG {
             }
             res |= ( ( ( _ranges[ p_startIdx ].second >> 12 ) % 8 ) << 16 );
         } else { //It's an ordinary item
-            drawItemSub( ItemList[ _ranges[ p_startIdx ].second ], _ranges[ p_startIdx ].first.m_targetX1,
-                         _ranges[ p_startIdx ].first.m_targetY1, _ranges[ p_startIdx ].first.m_targetY1 == 76, false );
+            u16 sz = _bag[ _currPage ].size( );
+            drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ],
+                         132, 76 + 18 * ( _currSelectedIdx - 4 ), true, false );
 
             res |= _ranges[ p_startIdx ].second;
         }
@@ -477,5 +534,23 @@ namespace BAG {
         }
 
         return res;
+    }
+
+    u8 bagUI::acceptTouch( u8 p_rangeIdx ) {
+        if( _ranges[ p_rangeIdx ].second & ( 1 << 15 ) ) {//It's a PKMN
+            return 0;
+        } else { //It's an ordinary item
+            if( !_ranges[ p_rangeIdx ].second )
+                return 0;
+
+            auto oldSelIdx = _currSelectedIdx;
+            _currSelectedIdx = 4 + ( _ranges[ p_rangeIdx ].first.m_targetY1 - 76 ) / 18;
+            updateSelectedIdx( oldSelIdx );
+        }
+
+        u16 sz = _bag[ _currPage ].size( );
+        item* currItem = ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ];
+
+        return 0;
     }
 }

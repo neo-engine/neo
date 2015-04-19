@@ -13,22 +13,25 @@ namespace IO {
                                   110 + ( p_pressedIdx == 1 ), true );
     }
 
-    yesNoBox::yesNoBox( ) {
+    yesNoBox::yesNoBox( bool p_initSprites ) {
         initTextField( );
-        initOAMTable( true );
+        if( p_initSprites )
+            initOAMTable( true );
         _isNamed = false;
     }
-    yesNoBox::yesNoBox( const char* p_name ) {
+    yesNoBox::yesNoBox( const char* p_name, bool p_initSprites ) {
         initTextField( );
-        initOAMTable( true );
+        if( p_initSprites )
+            initOAMTable( true );
         regularFont->printString( p_name, 8, 8, true );
 
         swiWaitForVBlank( );
         _isNamed = true;
     }
-    yesNoBox::yesNoBox( messageBox p_box ) {
+    yesNoBox::yesNoBox( messageBox p_box, bool p_initSprites ) {
         initTextField( );
-        initOAMTable( true );
+        if( p_initSprites )
+            initOAMTable( true );
         _isNamed = p_box.m_isNamed;
     }
 
