@@ -7,9 +7,9 @@
 namespace IO {
     class yesNoBox {
     public:
-        yesNoBox( );
-        yesNoBox( const char* p_name );
-        yesNoBox( messageBox p_box );
+        yesNoBox( bool p_initSprites = true );
+        yesNoBox( const char* p_name, bool p_initSprites = true );
+        yesNoBox( messageBox p_box, bool p_initSprites = true );
 
         bool getResult( const char* p_text );
         bool getResult( const wchar_t* p_text );

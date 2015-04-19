@@ -37,16 +37,13 @@
 extern const char ITEM_PATH[ ];
 
 class item {
-private:
-    std::string _displayName;
-    u8 _dislayNameStatus;
 public:
     enum itemEffectType {
         NONE = 0,
-        IN_BATTLE = 1,
-        HOLD = 2,
-        OUT_OF_BATTLE = 4,
-        USE_ON_PKMN = 8
+        IN_BATTLE = 1, //Medicine/Berries
+        HOLD = 2, //Has a hold effect only
+        OUT_OF_BATTLE = 4, //Repel, etc
+        USE_ON_PKMN = 8   //Evolutionaries, 
     };
     enum itemType {
         GOODS,
@@ -59,43 +56,54 @@ public:
         BATTLE_ITEM
     };
 
+    struct itemData {
+        itemEffectType  m_itemEffectType;
+        u32             m_price;
+        u32             m_itemEffect;
+
+        char            m_itemDisplayName[ 15 ];
+        char            m_itemDescription[ 200 ];
+        char            m_itemShortDescr[ 100 ];
+    } m_itemData;
+    bool            m_loaded; //Specifies whether the item data has been loaded
+
+    itemType        m_itemType;
 
     std::string     m_itemName;
-    //EFFEKT effekt;
-    itemType        m_itemType;
+
     ability::abilityType
         m_inBattleEffect;
     BATTLE::battleScript
         m_inBattleScript;
 
-    //std::string effekt_script;
-    //int price;
-
-    bool            m_loaded; //Specifies whether the item data has been loaded
 
     //Functions
     std::string     getDisplayName( bool p_new = false );
 
-    std::string     getDescription( bool p_new = false );
+    std::string     getDescription( );
 
-    std::string     getShortDescription( bool p_new = false );
+    std::string     getShortDescription( );
+
+    u32             getEffect( );
+
 
     itemEffectType  getEffectType( );
-
-    itemType        getItemType( );
-
+    
     u32             getPrice( );
 
     u16             getItemId( );
 
     virtual bool    load( );
 
-    void            use( ... );
+    bool            needsInformation( u8 p_num );
+
+    bool            use( pokemon& p_pokemon );
 
     //Constructors
 
     item( const std::string& p_itemName )
-        : m_itemName( p_itemName ) {/* load = false;*/
+        : m_itemName( p_itemName ) { 
+        m_loaded = false;
     }
 
     item( )

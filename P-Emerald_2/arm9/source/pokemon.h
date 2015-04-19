@@ -306,6 +306,15 @@ u8: 8;
                 default: return 0;
             }
         }
+        void inline               PPupset( u8 p_i, u8 p_val ) {
+            switch( p_i ) {
+                case 0: m_ppup.m_Up1 = p_val; break;
+                case 1: m_ppup.m_Up2 = p_val; break;
+                case 2: m_ppup.m_Up3 = p_val; break;
+                case 3: m_ppup.m_Up4 = p_val; break;
+                default: return;
+            }
+        }
         u8                      getPersonality( ) {
             u8 counter = 1, i = m_pid % 6;
 
@@ -370,13 +379,13 @@ u8: 8;
     union {
         struct {
             u8   m_Asleep : 3;
-            bool            m_Poisoned : 1;
-            bool            m_Burned : 1;
-            bool            m_Frozen : 1;
-            bool            m_Paralyzed : 1;
-            bool            m_Toxic : 1;
+            u8   m_Poisoned : 1;
+            u8   m_Burned : 1;
+            u8   m_Frozen : 1;
+            u8   m_Paralyzed : 1;
+            u8   m_Toxic : 1;
         } m_status;
-        u32                 m_statusint;
+        u8                 m_statusint;
     };
 u8: 8;
 u8: 8;

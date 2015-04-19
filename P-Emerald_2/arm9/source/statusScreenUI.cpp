@@ -134,6 +134,7 @@ namespace STS {
 
         if( p_pkmIdx >= _pokemon->size( ) || ( *_pokemon )[ p_pkmIdx ].m_boxdata.m_individualValues.m_isEgg ) {
             consoleSelect( &IO::Top );
+            IO::updateOAM( true );
             return;
         }
         _showMoveCnt = 0;
@@ -189,12 +190,12 @@ namespace STS {
         printf( "\x1b[39m" );
         u16 tileCnt = 0;
         IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( 251, 1 );
-        IO::regularFont->setColor( 252, 2 );
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
 
-        BG_PALETTE[ 250 ] = RGB15( 31, 31, 31 );
-        BG_PALETTE[ 252 ] = RGB15( 15, 15, 15 );
-        BG_PALETTE[ 251 ] = RGB15( 3, 3, 3 );
+        BG_PALETTE[ WHITE_IDX ] = WHITE;
+        BG_PALETTE[ GRAY_IDX ] = GRAY;
+        BG_PALETTE[ BLACK_IDX ] = BLACK;
 
         for( size_t i = 0; i < _pokemon->size( ); i++ ) {
             if( !( *_pokemon )[ i ].m_boxdata.m_individualValues.m_isEgg ) {
@@ -222,8 +223,13 @@ namespace STS {
                 sprintf( buffer, "%s", getDisplayName( ( *_pokemon )[ i ].m_boxdata.m_speciesId ) );
                 IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
-                sprintf( buffer, "%hi/%hi KP", ( *_pokemon )[ i ].m_stats.m_acHP, ( *_pokemon )[ i ].m_stats.m_maxHP );
+                IO::regularFont->setColor( 142 + 2 * i, 2 );
+                if( ( *_pokemon )[ i ].m_stats.m_acHP )
+                    sprintf( buffer, "%hi/%hi KP", ( *_pokemon )[ i ].m_stats.m_acHP, ( *_pokemon )[ i ].m_stats.m_maxHP );
+                else
+                    sprintf( buffer, "Besiegt" );
                 IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 28 - mval, false );
+                IO::regularFont->setColor( GRAY_IDX, 2 );
 
                 sprintf( buffer, "%s", ItemList[ ( *_pokemon )[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
                 IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
@@ -252,9 +258,8 @@ namespace STS {
         //Preload the page specific sprites
         auto currPkmn = ( *_pokemon )[ _current ];
 
-        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", 0, 16, 48,
-                                      PKMN_SPRITE_START, PKMN_SPRITE_PAL, tileCnt, false,
-                                      currPkmn.m_boxdata.isShiny( ), false, true );
+        IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex = tileCnt;
+        tileCnt += 144;
 
         tileCnt = IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, tileCnt,
                                   0, 0, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, false );
@@ -348,7 +353,7 @@ namespace STS {
                 IO::regularFont->setColor( 0, 2 );
                 char buffer[ 200 ];
                 sprintf( buffer, "%s: %s", ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
-                         ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getShortDescription( true ).c_str( ) );
+                         ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getShortDescription( ).c_str( ) );
                 IO::regularFont->printString( buffer, 50, 159, false );
                 if( p_newpok ) {
                     IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 2, 152,
@@ -399,6 +404,7 @@ namespace STS {
 
             for( u8 i = 0; i < 4; ++i )
                 IO::OamTop->oamBuffer[ PKMN_SPRITE_START + i ].isHidden = true;
+            IO::OamTop->oamBuffer[ ITEM_ICON_IDX ].isHidden = true;
         }
     }
 
@@ -726,7 +732,7 @@ namespace STS {
                                                   159, 39 + 32 * i, false );
 
                     printf( "\n\n    AP %2hhu""/""%2hhu ", currPkmn.m_boxdata.m_acPP[ i ],
-                            AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + ( ( currPkmn.m_boxdata.m_pPUps >> ( 2 * i ) ) % 4 ) ) / 5 ) );
+                            s8( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + currPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
                     printf( "\n\n" );
                 }
                 break;
@@ -832,7 +838,7 @@ namespace STS {
 
                 IO::Oam->oamBuffer[ CHOICE_ID ].isHidden = false;
                 IO::Oam->oamBuffer[ CHOICE_ID ].y = 0;
-                IO::Oam->oamBuffer[ CHOICE_ID + 1 ].x = 256 - 32;
+                IO::Oam->oamBuffer[ CHOICE_ID ].x = 256 - 32;
                 IO::Oam->oamBuffer[ CHOICE_ID + 1 ].isHidden = true;
 
                 IO::Oam->oamBuffer[ SUB_TYPE_IDX( 0 ) ].isHidden = true;
@@ -944,13 +950,13 @@ namespace STS {
             } else {
                 if( !currPkmn.m_boxdata.m_gotDate[ 0 ] ) {
                     if( FS::savMod == FS::SavMod::_NDS ) {
-                        sprintf( buffer, "Off. gef. am %02i.%02i.%02i mit Lv. %i.",
+                        sprintf( buffer, "Off. gef. am %02i.%02i.%02i mit Lv. %i",
                                  currPkmn.m_boxdata.m_hatchDate[ 0 ],
                                  currPkmn.m_boxdata.m_hatchDate[ 1 ],
                                  currPkmn.m_boxdata.m_hatchDate[ 2 ],
                                  currPkmn.m_boxdata.m_gotLevel );
                     } else
-                        sprintf( buffer, "Offenbar gefangen mit Lv. %i.", currPkmn.m_boxdata.m_gotLevel );
+                        sprintf( buffer, "Offenbar gefangen mit Lv. %i", currPkmn.m_boxdata.m_gotLevel );
                     IO::regularFont->printString( buffer, 28, 44, true );
                     sprintf( buffer, "in/bei %s.", FS::getLoc( currPkmn.m_boxdata.m_gotPlace ) );
                     IO::regularFont->printString( buffer, 35, 58, true );

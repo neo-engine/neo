@@ -1877,13 +1877,12 @@ OUT:
                     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
                     for( int i = 0; i < 3; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                        a = pokemon( 0, HILFSCOUNTER, 0,
-                                     50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
-                                     !FS::SAV->m_isMale, false, rand( ) % 2, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
-                        //a.stats.acHP = i*a.stats.maxHP/5;
-                        if( canLearn( HILFSCOUNTER, 57, 4 ) )
-                            a.m_boxdata.m_moves[ 2 ] = 57;
-                        if( canLearn( HILFSCOUNTER, 19, 4 ) )
+                        a = pokemon( 0, 133, 0,
+                                     50, FS::SAV->m_id + i, FS::SAV->m_sid, FS::SAV->m_playername,
+                                     !FS::SAV->m_isMale, false, false, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                        a.m_stats.m_acHP *= i / 5.0;
+                        a.m_boxdata.m_moves[ 3 ] = 0;
+                        if( canLearn( 133, 19, 4 ) )
                             a.m_boxdata.m_moves[ 1 ] = 19;
                         a.m_boxdata.m_experienceGained += 750;
 
@@ -1895,7 +1894,7 @@ OUT:
                         }
                         a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
                         a.m_boxdata.m_ribbons1[ 3 ] = 0;
-                        a.m_boxdata.m_holdItem = I_GINEMA_BERRY + i;
+                        a.m_boxdata.m_holdItem = I_CELL_BATTERY + i;
 
                         FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId - 1 ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId - 1 ) % 8 ) );
 
@@ -1910,14 +1909,14 @@ OUT:
                 case 1:
                     if( !FS::SAV->m_bag )
                         FS::SAV->m_bag = new BAG::bag( );
-                    for( u16 j = 1; j < 772; ++j )
+                    for( u16 j = 1; j < 637; ++j )
                         if( ItemList[ j ]->m_itemName != "Null" )
                             FS::SAV->m_bag->insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
                     break;
                 case 2: {
-                    item* curr = ItemList[ rand( ) % 772 ];
+                    item* curr = ItemList[ rand( ) % 638 ];
                     while( curr->m_itemName == "Null" )
-                        curr = ItemList[ rand( ) % 772 ];
+                        curr = ItemList[ rand( ) % 638 ];
                     IO::messageBox( curr, 31 );
                     break;
                 }

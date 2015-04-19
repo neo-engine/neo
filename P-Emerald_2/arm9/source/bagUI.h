@@ -17,14 +17,19 @@ namespace BAG {
         std::vector<std::pair<IO::inputTarget, u16>> _ranges;
         std::vector<std::pair<u16, u16>> _bag[ BAG_CNT ];
 
+        u8 _currSelectedIdx = 0;
+        u8 _currPage;
+        u16 _currItemIdx;
+
         u8 drawPkmn( item* p_item );
-    private:
         void init( );
 
         void updateAtHand( touchPosition p_touch, u8 p_oamIdx );
 
+        void updateSelectedIdx( u8 p_newIdx );
         std::vector<IO::inputTarget> drawBagPage( u8 p_page, u16 p_itemIdx );
         u8 getSprite( u8 p_rangeIdx, touchPosition p_currPos );
         u32 acceptDrop( u8 p_startIdx, u8 p_dropIdx, u8 p_oamIdx ); //First 10 bits: type, remaining: value
+        u8 acceptTouch( u8 p_rangeIdx );
     };
 }

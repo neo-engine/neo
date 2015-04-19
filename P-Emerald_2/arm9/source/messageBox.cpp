@@ -82,7 +82,7 @@ namespace IO {
                     ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
         updateOAM( true );
         regularFont->printMBStringD( buf, 32, 8, true );
-        regularFont->printChar( 489 - 21 + p_item->getItemType( ), 32, 24, true );
+        regularFont->printChar( 489 - 21 + p_item->m_itemType, 32, 24, true );
         sprintf( buf, "%s-Tasche verstaut.`", BAG::bagnames[ BAG::toBagType( p_item->m_itemType ) ].c_str( ) );
         ASpriteOamIndex = A_ID;
         regularFont->printMBStringD( buf, 46, 24, true );
@@ -95,7 +95,8 @@ namespace IO {
     messageBox::messageBox( const char* p_text, bool p_remsprites ) {
         m_isNamed = NULL;
         initTextField( );
-        initOAMTable( true );
+        if( p_remsprites )
+            initOAMTable( true );
         loadSprite( A_ID, 0, 0,
                     SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                     ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
@@ -110,7 +111,8 @@ namespace IO {
     messageBox::messageBox( const wchar_t* p_text, bool p_remsprites ) {
         m_isNamed = NULL;
         initTextField( );
-        initOAMTable( true );
+        if( p_remsprites )
+            initOAMTable( true );
         loadSprite( A_ID, 0, 0,
                     SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                     ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
@@ -124,7 +126,8 @@ namespace IO {
     }
     messageBox::messageBox( const char* p_text, const char* p_name, bool p_a, bool p_remsprites, sprite_type p_sprt, u16 p_sprind ) {
         m_isNamed = p_name;
-        initOAMTable( true );
+        if( p_remsprites )
+            initOAMTable( true );
         u16 c = 0;
         c = loadSprite( A_ID, 0, 0,
                         SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
@@ -161,7 +164,8 @@ namespace IO {
     }
     messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_a, bool p_remsprites, sprite_type p_sprt, u16 p_sprind ) {
         m_isNamed = NULL;
-        initOAMTable( true );
+        if( p_remsprites )
+            initOAMTable( true );
         u16 c = 0;
         c = loadSprite( A_ID, 0, 0,
                         SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
