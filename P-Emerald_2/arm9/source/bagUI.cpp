@@ -177,7 +177,7 @@ namespace BAG {
             IO::OamTop->oamBuffer[ 2 ].isHidden = true;
 
             display = p_item->getDisplayName( true );
-            descr = p_item->getDescription( true );
+            descr = p_item->getDescription( );
 
             if( p_item->m_itemType != item::itemType::KEY_ITEM ) {
                 std::sprintf( buffer, "x %d", p_count );
@@ -189,15 +189,15 @@ namespace BAG {
                 curr->load( );
 
                 IO::regularFont->setColor( RED_IDX, 1 );
-                sprintf( buffer, "Güte: %s", ( curr->m_berryGuete == berry::berryGueteType::HARD ) ? "Hart" :
-                         ( ( curr->m_berryGuete == berry::berryGueteType::SOFT ) ? "Weich" :
-                         ( ( curr->m_berryGuete == berry::berryGueteType::SUPER_HARD ) ? "Steinhart" :
-                         ( ( curr->m_berryGuete == berry::berryGueteType::SUPER_SOFT ) ? "Normal" :
-                         ( ( curr->m_berryGuete == berry::berryGueteType::VERY_HARD ) ? "Sehr hart" :
+                sprintf( buffer, "Güte: %s", ( curr->m_berryData.m_berryGuete == berry::berryGueteType::HARD ) ? "Hart" :
+                         ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SOFT ) ? "Weich" :
+                         ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SUPER_HARD ) ? "Steinhart" :
+                         ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SUPER_SOFT ) ? "Normal" :
+                         ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::VERY_HARD ) ? "Sehr hart" :
                          ( "Sehr weich" ) ) ) ) ) );
                 IO::regularFont->printString( buffer, 24, 145, false );
                 IO::regularFont->setColor( BLUE_IDX, 1 );
-                sprintf( buffer, "Größe:%4.1fcm", curr->m_berrySize / 10.0 );
+                sprintf( buffer, "Größe:%4.1fcm", curr->m_berryData.m_berrySize / 10.0 );
                 IO::regularFont->printString( buffer, 140, 145, false );
                 IO::regularFont->setColor( BLACK_IDX, 1 );
 
@@ -205,9 +205,9 @@ namespace BAG {
                 u8 poses[ 5 ] = { 18, 66, 124, 150, 194 };
                 u8 mx = 0;
                 for( u8 i = 0; i < 5; ++i )
-                    mx = std::max( mx, curr->m_berryTaste[ i ] );
+                    mx = std::max( mx, curr->m_berryData.m_berryTaste[ i ] );
                 for( u8 i = 0; i < 5; ++i ) {
-                    if( curr->m_berryTaste[ i ] != mx ) {
+                    if( curr->m_berryData.m_berryTaste[ i ] != mx ) {
                         IO::regularFont->setColor( GRAY_IDX, 1 );
                         IO::regularFont->setColor( WHITE_IDX, 2 );
                     } else {
@@ -346,13 +346,13 @@ namespace BAG {
         IO::printRectangle( p_x, p_y, 255, p_y + 18, true, false, 0 );
         if( p_clearOnly )
             return;
-        if( p_item->getItemType( ) != item::itemType::GOODS
-            && toBagType( p_item->getItemType( ) ) == bag::bagType::ITEMS ) {
+        if( p_item->m_itemType != item::itemType::GOODS
+            && toBagType( p_item->m_itemType ) == bag::bagType::ITEMS ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
-            IO::printChar( IO::boldFont, 490 - 22 + u16( p_item->getItemType( ) ), p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
+            IO::printChar( IO::boldFont, 490 - 22 + u16( p_item->m_itemType ), p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
         } else
             IO::printChoiceBox( p_x, p_y, p_x + 106, p_y + 16, 3, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
-        if( p_item->getItemType( ) != item::itemType::TM_HM )
+        if( p_item->m_itemType != item::itemType::TM_HM )
             IO::printString( IO::regularFont, p_item->getDisplayName( true ).c_str( ), p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
         else
             IO::printString( IO::regularFont, AttackList[ static_cast<TM*>( p_item )->m_moveIdx ]->m_moveName.c_str( ), p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );

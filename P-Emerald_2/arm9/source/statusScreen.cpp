@@ -64,7 +64,7 @@ namespace STS {
 
                 sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_name );
                 IO::messageBox a( buffer );
-                FS::SAV->m_bag->insert( BAG::toBagType( acI.getItemType( ) ), acI.getItemId( ), 1 );
+                FS::SAV->m_bag->insert( BAG::toBagType( acI.m_itemType ), acI.getItemId( ), 1 );
                 _stsUI->init( _pkmnIdx );
             } else if( GET_AND_WAIT_R( 152, !!( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) * ( -7 + 24 * ( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) ),
                 300, ( 17 + 24 * ( _stsUI->_showMoveCnt + _stsUI->_showTakeItem ) ) ) ) {

@@ -1875,7 +1875,7 @@ OUT:
                 case 0:
                 {
                     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
-                    for( int i = 0; i < 6; ++i ) {
+                    for( int i = 0; i < 3; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
                         a = pokemon( 0, 133, 0,
                                      50, FS::SAV->m_id + i, FS::SAV->m_sid, FS::SAV->m_playername,
@@ -1894,7 +1894,7 @@ OUT:
                         }
                         a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
                         a.m_boxdata.m_ribbons1[ 3 ] = 0;
-                        a.m_boxdata.m_holdItem = I_GINEMA_BERRY + i;
+                        a.m_boxdata.m_holdItem = I_CELL_BATTERY + i;
 
                         FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId - 1 ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId - 1 ) % 8 ) );
 

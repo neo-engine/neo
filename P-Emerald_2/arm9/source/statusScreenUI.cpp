@@ -353,7 +353,7 @@ namespace STS {
                 IO::regularFont->setColor( 0, 2 );
                 char buffer[ 200 ];
                 sprintf( buffer, "%s: %s", ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
-                         ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getShortDescription( true ).c_str( ) );
+                         ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getShortDescription( ).c_str( ) );
                 IO::regularFont->printString( buffer, 50, 159, false );
                 if( p_newpok ) {
                     IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 2, 152,
@@ -950,13 +950,13 @@ namespace STS {
             } else {
                 if( !currPkmn.m_boxdata.m_gotDate[ 0 ] ) {
                     if( FS::savMod == FS::SavMod::_NDS ) {
-                        sprintf( buffer, "Off. gef. am %02i.%02i.%02i mit Lv. %i.",
+                        sprintf( buffer, "Off. gef. am %02i.%02i.%02i mit Lv. %i",
                                  currPkmn.m_boxdata.m_hatchDate[ 0 ],
                                  currPkmn.m_boxdata.m_hatchDate[ 1 ],
                                  currPkmn.m_boxdata.m_hatchDate[ 2 ],
                                  currPkmn.m_boxdata.m_gotLevel );
                     } else
-                        sprintf( buffer, "Offenbar gefangen mit Lv. %i.", currPkmn.m_boxdata.m_gotLevel );
+                        sprintf( buffer, "Offenbar gefangen mit Lv. %i", currPkmn.m_boxdata.m_gotLevel );
                     IO::regularFont->printString( buffer, 28, 44, true );
                     sprintf( buffer, "in/bei %s.", FS::getLoc( currPkmn.m_boxdata.m_gotPlace ) );
                     IO::regularFont->printString( buffer, 35, 58, true );

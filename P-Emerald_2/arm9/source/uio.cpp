@@ -27,7 +27,7 @@ namespace IO {
     OAMTable *OamTop = new OAMTable( );
     SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 
-    u8 TEXTSPEED = 35;
+    u8 TEXTSPEED = 50;
 
     PrintConsole Top, Bottom;
 

@@ -62,9 +62,9 @@ namespace BAG {
                     case GIVE_ITEM:{
                         if( !acPkmn.m_boxdata.m_speciesId || acPkmn.m_boxdata.m_individualValues.m_isEgg )
                             break;
-                        if( ItemList[ targetItem ]->getItemType( ) == item::itemType::KEY_ITEM )
+                        if( ItemList[ targetItem ]->m_itemType == item::itemType::KEY_ITEM )
                             break;
-                        if( ItemList[ targetItem ]->getItemType( ) == item::itemType::TM_HM ) {
+                        if( ItemList[ targetItem ]->m_itemType == item::itemType::TM_HM ) {
                             TM* currTm = static_cast<TM*>( ItemList[ targetItem ] );
                             u16 currMv = currTm->m_moveIdx;
 
@@ -117,14 +117,14 @@ namespace BAG {
                             break;
                         }
 
-                        if( ItemList[ targetItem ]->getItemType( ) == item::itemType::MEDICINE ) {
+                        if( ItemList[ targetItem ]->m_itemType == item::itemType::MEDICINE ) {
                             for( u8 i = 0; i < 2; ++i )
                                 if( ItemList[ targetItem ]->needsInformation( i ) ) {
                                     u8 res = 1 + IO::choiceBox( acPkmn, 0 ).getResult( "Welche Attacke?", false );
                                     _bagUI->init( );
                                     _ranges = _bagUI->drawBagPage( _currPage, _currItem );
 
-                                    u32& newEffect = ItemList[ targetItem ]->m_itemEffect;
+                                    u32& newEffect = ItemList[ targetItem ]->m_itemData.m_itemEffect;
                                     newEffect &= ~( 1 << ( 9 + 16 * !i ) );
                                     newEffect |= ( res << ( 9 + 16 * !i ) );
                                 }
@@ -186,7 +186,7 @@ namespace BAG {
 
                                 //Use the item on the PKMN
                                 //If it is an ordinary item, it could be only an evolutionary item
-                                if( ItemList[ targetItem ]->getItemType( ) == item::itemType::GOODS
+                                if( ItemList[ targetItem ]->m_itemType == item::itemType::GOODS
                                     && !acPkmn.canEvolve( targetItem, 3 ) ) {
                                     _bagUI->init( );
                                     _ranges = _bagUI->drawBagPage( _currPage, _currItem );
@@ -199,7 +199,7 @@ namespace BAG {
                                     _bagUI->init( );
                                     _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                                     break;
-                                } else if( ItemList[ targetItem ]->getItemType( ) == item::itemType::GOODS ) {
+                                } else if( ItemList[ targetItem ]->m_itemType == item::itemType::GOODS ) {
                                     _bagUI->init( );
                                     _bagUI->_currSelectedIdx = 0;
                                     _ranges = _bagUI->drawBagPage( _currPage, _currItem );
@@ -245,7 +245,7 @@ namespace BAG {
                                 _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                                 break;
                             }
-                            auto currBgType = toBagType( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getItemType( ) );
+                            auto currBgType = toBagType( ItemList[ acPkmn.m_boxdata.m_holdItem ]->m_itemType );
                             _origBag->insert( currBgType, acPkmn.m_boxdata.m_holdItem, 1 );
                             auto bgI = std::find_if( _bagUI->_bag[ (u8)currBgType ].begin( ), _bagUI->_bag[ (u8)currBgType ].end( ), [ acPkmn ]( std::pair<u16, u16> p_item ) {
                                 return p_item.first == acPkmn.m_boxdata.m_holdItem;
@@ -273,7 +273,7 @@ namespace BAG {
                         if( !acPkmn.m_boxdata.m_speciesId || acPkmn.m_boxdata.m_individualValues.m_isEgg )
                             break;
                         if( acPkmn.m_boxdata.m_holdItem ) {
-                            auto currBgType = toBagType( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getItemType( ) );
+                            auto currBgType = toBagType( ItemList[ acPkmn.m_boxdata.m_holdItem ]->m_itemType );
                             _origBag->insert( currBgType, acPkmn.m_boxdata.m_holdItem, 1 );
                             auto bgI = std::find_if( _bagUI->_bag[ (u8)currBgType ].begin( ), _bagUI->_bag[ (u8)currBgType ].end( ), [ acPkmn ]( std::pair<u16, u16> p_item ) {
                                 return ( p_item.first == acPkmn.m_boxdata.m_holdItem );

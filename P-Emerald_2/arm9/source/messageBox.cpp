@@ -82,7 +82,7 @@ namespace IO {
                     ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
         updateOAM( true );
         regularFont->printMBStringD( buf, 32, 8, true );
-        regularFont->printChar( 489 - 21 + p_item->getItemType( ), 32, 24, true );
+        regularFont->printChar( 489 - 21 + p_item->m_itemType, 32, 24, true );
         sprintf( buf, "%s-Tasche verstaut.`", BAG::bagnames[ BAG::toBagType( p_item->m_itemType ) ].c_str( ) );
         ASpriteOamIndex = A_ID;
         regularFont->printMBStringD( buf, 46, 24, true );

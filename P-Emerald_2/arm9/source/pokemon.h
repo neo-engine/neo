@@ -373,13 +373,13 @@ u8: 8;
     union {
         struct {
             u8   m_Asleep : 3;
-            bool            m_Poisoned : 1;
-            bool            m_Burned : 1;
-            bool            m_Frozen : 1;
-            bool            m_Paralyzed : 1;
-            bool            m_Toxic : 1;
+            u8   m_Poisoned : 1;
+            u8   m_Burned : 1;
+            u8   m_Frozen : 1;
+            u8   m_Paralyzed : 1;
+            u8   m_Toxic : 1;
         } m_status;
-        u32                 m_statusint;
+        u8                 m_statusint;
     };
 u8: 8;
 u8: 8;

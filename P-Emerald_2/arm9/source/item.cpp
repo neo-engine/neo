@@ -37,9 +37,9 @@ along with Pokémon Emerald 2 Version.  If not, new see <http://www.gnu.org/lice
                                   ( op == 2 ) ? tg -= val : ( \
                                   ( op == 3 ) ? tg = val : ( \
                                   ( op == 4 ) ? tg |= val : ( \
-                                  ( op == 5 ) ? tg ^= val : ( \
+                                  ( op == 5 ) ? tg &= val : ( \
                                   ( op == 6 ) ? tg = mx : ( \
-                                  ( op == 7 ) ? tg = 0 : tg ) ) ) ) ) ) )
+                                  ( op == 7 ) ? tg = s16( ( mx + 0.5 ) / 2 ) : tg ) ) ) ) ) ) )
 
 void recalcStats( pokemon& p_pokemon, pokemonData& p_pData ) {
     u16 HPdif = p_pokemon.m_stats.m_maxHP - p_pokemon.m_stats.m_acHP;
@@ -65,7 +65,10 @@ void recalcStats( pokemon& p_pokemon, pokemonData& p_pData ) {
 }
 
 bool item::needsInformation( u8 p_num ) {
-    u16 op = ( p_num ? m_itemEffect % ( 1 << 16 ) : m_itemEffect >> 16 );
+    if( !m_loaded && !load( ) )
+        return false;
+
+    u16 op = ( p_num ? m_itemData.m_itemEffect % ( 1 << 16 ) : m_itemData.m_itemEffect >> 16 );
     u8 stat = ( op >> 8 ) % 32;
 
     return ( stat == 2 || stat == 18 );
@@ -76,16 +79,18 @@ bool item::needsInformation( u8 p_num ) {
 bool item::use( pokemon& p_pokemon ) {
     if( p_pokemon.m_boxdata.m_individualValues.m_isEgg || !p_pokemon.m_boxdata.m_speciesId )
         return false;
+    if( !m_loaded && !load( ) )
+        return false;
 
     bool change = false;
     pokemonData p; getAll( p_pokemon.m_boxdata.m_speciesId, p );
 
     //Anything that modifies the PKMN's happiness shall be second
-    if( ( m_itemEffect >> 24 ) % 32 == 13 )
-        m_itemEffect = ( ( m_itemEffect % ( 1 << 16 ) ) << 16 ) | ( m_itemEffect >> 16 );
-    
+    if( ( m_itemData.m_itemEffect >> 24 ) % 32 == 13 )
+        m_itemData.m_itemEffect = ( ( m_itemData.m_itemEffect % ( 1 << 16 ) ) << 16 ) | ( m_itemData.m_itemEffect >> 16 );
 
-    for( auto op : { m_itemEffect >> 16, m_itemEffect % ( 1 << 16 ) } ) {
+
+    for( auto op : { m_itemData.m_itemEffect >> 16, m_itemData.m_itemEffect % ( 1 << 16 ) } ) {
         u8 operation = op >> 13;
         u8 stat = ( op >> 8 ) % 32;
         u8 value = u8( op );
@@ -202,6 +207,27 @@ bool item::use( pokemon& p_pokemon ) {
                 }
                 break;
             }
+            case 14: {
+                u8 tmp = p_pokemon.m_statusint;
+                APPLY_OP( operation, tmp, value, s16( 0 ) );
+                if( tmp != p_pokemon.m_boxdata.m_steps ) {
+                    p_pokemon.m_boxdata.m_steps = tmp;
+                }
+                break;
+            }
+            case 15: {
+                if( p_pokemon.m_stats.m_acHP )
+                    break;
+
+                s16 tmp = p_pokemon.m_stats.m_acHP;
+                APPLY_OP( operation, tmp, value, s16( p_pokemon.m_stats.m_maxHP ) );
+                tmp = std::min( tmp, s16( p_pokemon.m_stats.m_maxHP ) );
+                tmp = std::max( (s16)1, tmp );
+
+                p_pokemon.m_stats.m_acHP = tmp;
+                change = true;
+                break;
+            }
             default:
                 break;
         }
@@ -233,7 +259,7 @@ item* ItemList[ 772 ] = {
     new medicine( "Vitalkraut" ), new medicine( "AEther" ),
     new medicine( "Top-AEther" ), new medicine( "Elixir" ),
     new medicine( "Top-Elixir" ), new medicine( "Lavakeks" ),
-    new medicine( "Beerensaft" ), new medicine( "Zauberasche" ),
+    new medicine( "Beerensaft" ), new item( "Zauberasche" ),
     new medicine( "KP-Plus" ), new medicine( "Protein" ),
     new medicine( "Eisen" ), new medicine( "Carbon" ),
     new medicine( "Kalzium" ), new medicine( "Sonderbonbon" ),
