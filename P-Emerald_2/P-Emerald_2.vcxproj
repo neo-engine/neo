@@ -22,6 +22,9 @@
     <ClInclude Include="arm9\source\battle.h" />
     <ClInclude Include="arm9\source\battleUI.h" />
     <ClInclude Include="arm9\source\berry.h" />
+    <ClInclude Include="arm9\source\box.h" />
+    <ClInclude Include="arm9\source\boxUI.h" />
+    <ClInclude Include="arm9\source\boxViewer.h" />
     <ClInclude Include="arm9\source\buffer.h" />
     <ClInclude Include="arm9\source\choiceBox.h" />
     <ClInclude Include="arm9\source\defines.h" />
@@ -58,6 +61,8 @@
     <ClCompile Include="arm9\source\bagViewer.cpp" />
     <ClCompile Include="arm9\source\battle.cpp" />
     <ClCompile Include="arm9\source\battleUI.cpp" />
+    <ClCompile Include="arm9\source\boxUI.cpp" />
+    <ClCompile Include="arm9\source\boxViewer.cpp" />
     <ClCompile Include="arm9\source\buffer.cpp" />
     <ClCompile Include="arm9\source\choiceBox.cpp" />
     <ClCompile Include="arm9\source\dex.cpp" />

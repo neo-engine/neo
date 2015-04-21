@@ -348,6 +348,8 @@ u8: 8;
             return 30 + ( ( ( ( IVget( 0 ) >> 1 ) & 1 ) + 2 * ( ( IVget( 1 ) >> 1 ) & 1 ) + 4 * ( ( IVget( 2 ) >> 1 ) & 1 ) + 8 * ( ( IVget( 3 ) >> 1 ) & 1 ) + 16 * ( ( IVget( 4 ) >> 1 ) & 1 ) + 32 * ( ( IVget( 5 ) >> 1 ) & 1 ) * 40 ) / 63 );
         }
 
+        bool      operator==( const boxPokemon& p_other ) const;
+
         boxPokemon( ) { }
         boxPokemon( u16*            p_moves,
                     u16             p_pkmnId,
@@ -365,9 +367,6 @@ u8: 8;
                     u16             p_gotPlace = 0,
                     u8              p_ball = 0,
                     u8              p_pokerus = 0 );
-
-        ~boxPokemon( ) { }
-
     } m_boxdata;
 
     union {

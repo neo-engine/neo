@@ -394,6 +394,8 @@ u32 LastPID = 42;
 bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
     if( m_boxdata.m_individualValues.m_isEgg )
         return false;
+    if( m_boxdata.m_holdItem == I_EVERSTONE )
+        return false;
 
     getAll( m_boxdata.m_speciesId, data );
 
@@ -446,6 +448,8 @@ bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
 
 void pokemon::evolve( u16 p_item, u16 p_method ) {
     if( m_boxdata.m_individualValues.m_isEgg )
+        return;
+    if( m_boxdata.m_holdItem == I_EVERSTONE )
         return;
 
     getAll( m_boxdata.m_speciesId, data );
@@ -523,18 +527,21 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
 
 //TODO: enhance equality test
 bool pokemon::operator==( const pokemon& p_other ) const {
-    if( m_boxdata.m_pid != p_other.m_boxdata.m_pid
-        || m_boxdata.m_b1 != p_other.m_boxdata.m_b1
-        || m_boxdata.m_checksum != p_other.m_boxdata.m_checksum
-        || m_boxdata.m_speciesId != p_other.m_boxdata.m_speciesId
-        || m_boxdata.m_holdItem != p_other.m_boxdata.m_holdItem
-        || m_boxdata.m_oTId != p_other.m_boxdata.m_oTId
-        || m_boxdata.m_oTSid != p_other.m_boxdata.m_oTSid
-        || m_boxdata.m_experienceGained != p_other.m_boxdata.m_experienceGained
-        || m_boxdata.m_steps != p_other.m_boxdata.m_steps
-        || m_boxdata.m_ability != p_other.m_boxdata.m_ability
-        || m_boxdata.m_markings != p_other.m_boxdata.m_markings
-        || m_boxdata.m_origLang != p_other.m_boxdata.m_origLang )
+    return m_boxdata == p_other.m_boxdata;
+}
+bool pokemon::boxPokemon::operator==( const pokemon::boxPokemon& p_other ) const {
+    if( m_pid != p_other.m_pid
+        || m_b1 != p_other.m_b1
+        || m_checksum != p_other.m_checksum
+        || m_speciesId != p_other.m_speciesId
+        || m_holdItem != p_other.m_holdItem
+        || m_oTId != p_other.m_oTId
+        || m_oTSid != p_other.m_oTSid
+        || m_experienceGained != p_other.m_experienceGained
+        || m_steps != p_other.m_steps
+        || m_ability != p_other.m_ability
+        || m_markings != p_other.m_markings
+        || m_origLang != p_other.m_origLang )
         return false;
     return true;
 }

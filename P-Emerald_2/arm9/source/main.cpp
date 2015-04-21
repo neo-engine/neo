@@ -64,6 +64,8 @@
 #include "statusScreenUI.h"
 #include "bagUI.h"
 #include "bagViewer.h"
+#include "boxUI.h"
+#include "boxViewer.h"
 
 #include "pokemon.h"
 #include "saveGame.h"
@@ -1867,8 +1869,8 @@ OUT:
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 ],        //StartID
             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 3 ], 16 ) ) {
 
-            const char *someText[ 7 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", " ... " };
-            IO::choiceBox test( 6, &someText[ 0 ], 0, false );
+            const char *someText[ 8 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", "View Boxes A", "View Boxes B" };
+            IO::choiceBox test( 8, &someText[ 0 ], 0, false );
             int res = test.getResult( "Tokens of god-being..." );
             IO::drawSub( );
             switch( res ) {
@@ -1981,13 +1983,31 @@ OUT:
 
                     IO::choiceBox scrnChoice( MAXBG, bgNames, 0, true );
                     IO::drawSub( scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
+                    break;
+                }
+                case 6: case 7:{
+                    if( !FS::SAV->m_storedPokemon )
+                        FS::SAV->m_storedPokemon = new BOX::box( );
+
+                    BOX::boxUI bxUI;
+                    BOX::boxViewer bxv( FS::SAV->m_storedPokemon, &bxUI, 0 );
+                    ANIMATE_MAP = false;
+
+                    bxv.run( res % 2 );
+
+                    consoleSelect( &IO::Top );
+                    consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+                    consoleClear( );
+                    consoleSelect( &IO::Bottom );
+                    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+                    consoleClear( );
+                    break;
                 }
             }
-
             IO::drawSub( );
             swiWaitForVBlank( );
             initMainSprites( );
-            if( res == 3 || res == 4 ) {
+            if( res == 3 || res == 4 || res == 6 || res == 7 ) {
                 initMapSprites( );
                 ANIMATE_MAP = movePlayerOnMap( FS::SAV->m_acposx / 20, FS::SAV->m_acposy / 20, FS::SAV->m_acposz, true );
             }
