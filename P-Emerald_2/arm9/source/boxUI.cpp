@@ -44,16 +44,23 @@ namespace BOX {
         BG_PALETTE[ BLACK_IDX ] = BLACK;
 
         BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
+        BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
         BG_PALETTE_SUB[ GRAY_IDX ] = GRAY;
+        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
+        BG_PALETTE_SUB[ RED_IDX ] = RED;
     }
 
     void boxUI::draw( u16 p_pokemon, u8 p_pos, box* p_box ) {
+        pokemonData p; getAll( p_pokemon, p );
+        
         //SubScreen stuff
         IO::printChoiceBox( 48, 23, 204, 48, 6, COLOR_IDX, false );
+        
 
+        u16 cnt = 0;
         for( u8 i = 0; i < 4; ++i )
             for( u8 j = 0; j < 7; ++j )
                 IO::printChoiceBox( 16 + 32 * j, 57 + 28 * i,
-                44 + 32 * j, 78 + 28 * i, 3, GRAY_IDX, false );
+                44 + 32 * j, 78 + 28 * i, 3, ( cnt++ == p_pos ) ? RED_IDX : GRAY_IDX, false );
     }
 }
