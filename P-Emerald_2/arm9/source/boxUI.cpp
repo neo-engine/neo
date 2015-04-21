@@ -52,10 +52,10 @@ namespace BOX {
 
     void boxUI::draw( u16 p_pokemon, u8 p_pos, box* p_box ) {
         pokemonData p; getAll( p_pokemon, p );
-        
+
         //SubScreen stuff
         IO::printChoiceBox( 48, 23, 204, 48, 6, COLOR_IDX, false );
-        
+        IO::printString( IO::regularFont, "TEST", 126 - IO::regularFont->stringWidth( "TEST" ) / 2, 28, true );
 
         u16 cnt = 0;
         for( u8 i = 0; i < 4; ++i )
