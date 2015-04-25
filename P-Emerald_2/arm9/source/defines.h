@@ -56,6 +56,8 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 #define COMPL(a) ( RGB( 31 - ( (a) >> 10 ) % 32,31 - ( (a) >> 5 ) % 32,31 - (a) % 32 ) )
 
+#define RED2_IDX (u8(247))
+#define BLUE2_IDX (u8(248))
 #define COLOR_IDX (u8(249))
 #define WHITE_IDX (u8(250))
 #define GRAY_IDX (u8(251))
@@ -66,8 +68,10 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define CHOICE_COLOR RGB(16,25,19)
 
 #define GREEN RGB(0,20,0)
-#define RED RGB(24,0,0)
-#define BLUE RGB(0,0,24)
+#define RED RGB(28,0,0)
+#define RED2 RGB(10,0,0)
+#define BLUE RGB(0,10,31)
+#define BLUE2 RGB(0,0,15)
 #define WHITE RGB(31,31,31)
 #define GRAY RGB(15,15,15)
 #define NORMAL_ RGB(27,27,27)

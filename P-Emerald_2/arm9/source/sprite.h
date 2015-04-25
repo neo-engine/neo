@@ -93,6 +93,9 @@ namespace IO {
     u16 loadSprite( const u8 p_oamIdx, const u8 p_palIdx, const u16 p_tileIdx, const u16 p_posX, const u16 p_posY,
                     const u8 p_width, const u8 p_height, const unsigned short* p_spritePal, const unsigned int* p_spriteData,
                     const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom );
+    u16 loadSprite( const u8 p_oamIdx, const u8 p_palIdx, const u8 p_palPos, const u16 p_tileIdx, const u16 p_posX, const u16 p_posY,
+                    const u8 p_width, const u8 p_height, const unsigned short* p_spritePal, const unsigned int* p_spriteData,
+                    const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom );
 
     u16 loadPKMNSprite( const char* p_path, const u16& p_pkmnNo, const s16 p_posX, const s16 p_posY,
                         u8 p_oamIndex, u8 p_palCnt, u16 p_nextAvailableTileIdx, bool p_bottom, bool p_shiny = false,
@@ -103,6 +106,8 @@ namespace IO {
 
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
                   u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
+    u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
+                  u8 p_oamIndex, u8 p_palCnt, u8 p_palPos, u16 p_tileCnt, bool p_bottom );
 
     u16 loadItemIcon( const std::string& p_itemName, const u16 p_posX, const u16 p_posY,
                       u8 p_oamIndex, u8 p_palcnt, u16 p_nextAvailableTileIdx, bool p_bottom = true );
@@ -112,6 +117,8 @@ namespace IO {
 
     u16 loadPKMNIcon( const u16& p_pkmnNo, const u16 p_posX, const u16 p_posY,
                       u8 p_oamIndex, u8 p_palcnt, u16 p_nextAvailableTileIdx, bool p_bottom = true );
+    u16 loadPKMNIcon( const u16& p_pkmnNo, const u16 p_posX, const u16 p_posY,
+                      u8 p_oamIndex, u8 p_palcnt, u8 p_palPos, u16 p_nextAvailableTileIdx, bool p_bottom = true );
 
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY,
                      u8 p_oamIndex, u8 p_palcnt, u16 p_nextAvailableTileIdx, bool p_bottom = true );

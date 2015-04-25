@@ -1876,10 +1876,16 @@ OUT:
             switch( res ) {
                 case 0:
                 {
+                    if( !FS::SAV->m_storedPokemon )
+                        FS::SAV->m_storedPokemon = new BOX::box( );
+
+                    for( u8 i = 0; i < 6; ++i )
+                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                            FS::SAV->m_storedPokemon->insert( FS::SAV->m_pkmnTeam[ i ].m_boxdata );
                     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
                     for( int i = 0; i < 3; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                        a = pokemon( 0, 133, 0,
+                        a = pokemon( 0, ( 132 + i * ( rand( ) % MAX_PKMN ) ) % MAX_PKMN + 1, 0,
                                      50, FS::SAV->m_id + i, FS::SAV->m_sid, FS::SAV->m_playername,
                                      !FS::SAV->m_isMale, false, false, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         a.m_stats.m_acHP *= i / 5.0;
