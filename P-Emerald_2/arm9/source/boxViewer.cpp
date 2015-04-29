@@ -2,65 +2,74 @@
 #include "boxUI.h"
 #include "defines.h"
 #include "uio.h"
+#include "statusScreen.h"
+#include "statusScreenUI.h"
 
 namespace BOX {
     u16 boxViewer::nextNonEmptyBox( u16 p_start ) {
-        for( u16 i = p_start + 1; i < MAX_PKMN + 1; ++i )
+        for( u16 i = p_start + 1; i <= MAX_PKMN + 1; ++i )
             if( !_box->empty( i ) )
                 return i;
         return p_start;
     }
     u16 boxViewer::previousNonEmptyBox( u16 p_start ) {
-        for( u16 i = p_start; i > 0; --i )
-            if( !i )
+        for( u16 i = p_start - 1; i > 0; --i )
+            if( !p_start )
                 return p_start;
             else if( !_box->empty( i ) )
                 return i;
         return p_start;
     }
 
-    void boxViewer::generatePage( u16 p_pokemon, u16 p_pos ) {
-        u16 fst = p_pokemon;
-        u16 fpos = p_pos;
+    void boxViewer::generateNextPage( ) {
 
-        for( u8 i = 0; i < 30; ++i )
+        _currPage[ 0 ] = _currPage[ 28 ];
+
+        u16 pokemon = _currPage[ 0 ].first;
+        u16 pos = _currPage[ 0 ].second;
+
+        for( u8 i = 1; i < 30; ++i )
             _currPage[ i ] = { 0, 0 };
 
-        if( p_pos < _box->count( p_pokemon ) )
-            _currPage[ 1 ] = { p_pokemon, p_pos };
-        else {
-            u16 n = nextNonEmptyBox( p_pokemon );
-            if( n == p_pokemon )
-                return;
+        for( u8 i = 1; i < 30; ++i ) {
+            if( ++pos < _box->count( pokemon ) )
+                _currPage[ i ] = { pokemon, pos };
             else {
-                _currPage[ 1 ] = { n, 0 };
-                p_pos = 0;
-                fst = p_pokemon = n;
+                u16 n = nextNonEmptyBox( pokemon );
+                if( n == pokemon ) {
+                    return;
+                } else {
+                    _currPage[ i ] = { n, 0 };
+                    pos = 0;
+                    pokemon = n;
+                }
             }
         }
+    }
+    void boxViewer::generatePreviousPage( ) {
 
-        if( p_pos )
-            _currPage[ 0 ] = { p_pokemon, p_pos - 1 };
-        else {
-            u16 n = previousNonEmptyBox( p_pokemon );
-            if( n != p_pokemon )
-                _currPage[ 0 ] = { n, _box->count( n ) - 1 };
-        }
+        if( !( _currPage[ 0 ].first || _currPage[ 0 ].second ) ) //It's already the first page
+            return;
 
-        for( u8 i = 2; i < 30; ++i ) {
-            if( ++p_pos < _box->count( p_pokemon ) )
-                _currPage[ i ] = { p_pokemon, p_pos };
+        _currPage[ 29 ] = _currPage[ 1 ];
+        u16 pokemon = _currPage[ 1 ].first;
+        u16 pos = _currPage[ 1 ].second;
+
+        for( u8 i = 0; i < 29; ++i )
+            _currPage[ i ] = { 0, 0 };
+
+        for( u8 i = 28; i >= 0; --i ) {
+            if( pos-- )
+                _currPage[ i ] = { pokemon, pos };
             else {
-                u16 n = nextNonEmptyBox( p_pokemon );
-                if( n == p_pokemon || n == fst ) {
-                    _currPage[ 29 ] = { p_pokemon, p_pos };
+                u16 n = previousNonEmptyBox( pokemon );
+                if( n == pokemon ) {
                     _currPage[ 0 ] = { 0, 0 };
 
                     return;
                 } else {
-                    _currPage[ i ] = { n, 0 };
-                    p_pos = 0;
-                    p_pokemon = n;
+                    _currPage[ i ] = { n, pos = _box->count( n ) - 1 };
+                    pokemon = n;
                 }
             }
         }
@@ -68,7 +77,10 @@ namespace BOX {
 
     void boxViewer::run( bool p_allowTakePkmn ) {
         _boxUI->init( );
-        _ranges = _boxUI->draw( _currPage, _currPos = 0, _box );
+        _ranges = _boxUI->draw( _currPage, _currPos = 0, _box, '*', true, p_allowTakePkmn );
+
+        u8 mx = p_allowTakePkmn ? 21 : 28;
+
         touchPosition touch;
         loop( ) {
             swiWaitForVBlank( );
@@ -76,27 +88,30 @@ namespace BOX {
             touchRead( &touch );
             int pressed = keysCurrent( );
             u8 oldPos = _currPos;
+            bool newPok;
 
             if( GET_AND_WAIT( KEY_B )
                 || GET_AND_WAIT( KEY_X )
                 || GET_AND_WAIT_C( SCREEN_WIDTH - 12, SCREEN_HEIGHT - 10, 16 ) ) {
                 break;
             } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
-                if( ( ( ++_currPos ) %= 28 ) < oldPos )
-                    generatePage( _currPage[ 29 ].first, _currPage[ 29 ].second );
-                _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos );
+                if( newPok = ( ( ( ++_currPos ) %= mx ) < oldPos ) )
+                    generateNextPage( );
+                _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_LEFT ) ) {
-                if( ( ( _currPos += 27 ) %= 28 ) > oldPos )
-                    generatePage( _currPage[ 0 ].first, _currPage[ 0 ].second );
-                _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos );
+                if( newPok = ( ( ( _currPos += ( mx - 1 ) ) %= mx ) > oldPos ) )
+                    generatePreviousPage( );
+                _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_UP ) ) {
-                if( ( ( _currPos += 21 ) %= 28 ) > oldPos )
-                    generatePage( _currPage[ 0 ].first, _currPage[ 0 ].second );
-                _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos );
+                if( newPok = ( ( ( _currPos += ( mx - 7 ) ) %= mx ) > oldPos ) )
+                    generatePreviousPage( );
+                _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
-                if( ( ( _currPos += 7 ) %= 28 ) < oldPos )
-                    generatePage( _currPage[ 29 ].first, _currPage[ 29 ].second );
-                _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos );
+                if( newPok = ( ( ( _currPos += 7 ) %= mx ) < oldPos ) )
+                    generateNextPage( );
+                _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
+            } else if( GET_AND_WAIT( KEY_A ) ) {
+
             }
         }
     }

@@ -441,6 +441,9 @@ namespace IO {
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         return loadIcon( "nitro:/PICS/ICONS/", "Icon_egg", p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
+    u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom ) {
+        return loadIcon( "nitro:/PICS/ICONS/", "Icon_egg", p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos, p_tileCnt, p_bottom );
+    }
 
     u16 loadItemIcon( const std::string& p_itemName, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         return loadIcon( "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
