@@ -65,16 +65,24 @@ namespace BOX {
 
     std::vector<IO::inputTarget> boxUI::draw( std::pair<u16, u16> p_pokemon[ 30 ], u8 p_pos, box* p_box, u8 p_oldpos, bool p_newPok, bool p_showTeam ) {
         std::vector<IO::inputTarget> res;
-        for( u8 i = 0; i < 28 - 7 * p_showTeam; ++i )
-            res.push_back( IO::inputTarget( POS_X( i ), POS_Y( i ), POS_X( i ) + 28, POS_Y( i ) + 21 ) );
+        _ranges.clear( );
 
-        pokemonData p; getAll( p_pokemon[ p_pos + 1 ].first, p );
+        u16 pidx = p_pokemon[ p_pos + 1 ].first;
+        if( p_showTeam && p_pos >= 21 ) {
+            pidx = FS::SAV->m_pkmnTeam[ p_pos - 21 ].m_boxdata.m_speciesId;
+            if( FS::SAV->m_pkmnTeam[ p_pos - 21 ].m_boxdata.m_individualValues.m_isEgg )
+                pidx = MAX_PKMN + 1;
+        }
+
+        pokemonData p;
+        if( pidx != MAX_PKMN + 1 )
+            getAll( pidx, p );
 
         //SubScreen stuff
         IO::printChoiceBox( 48, 23, 204, 48, 6, COLOR_IDX, false );
-        if( p_pokemon[ p_pos + 1 ].first ) {
+        if( pidx ) {
             char buffer[ 50 ];
-            if( p_pokemon[ p_pos + 1 ].first != MAX_PKMN + 1 )
+            if( pidx != MAX_PKMN + 1 )
                 sprintf( buffer, "%s", p.m_displayName );
             else
                 sprintf( buffer, "Ei" );
@@ -90,8 +98,8 @@ namespace BOX {
                                     POS_X( cnt ) + 28, POS_Y( cnt ) + 21, 3, ( cnt == p_pos ) ? RED_IDX : GRAY_IDX, false );
             }
         } else {
-            u8 c1 = ( p_showTeam && ( p_oldpos > 21 ) ) ? 16 : 0;
-            u8 c2 = ( p_showTeam && ( p_pos > 21 ) ) ? 16 : 0;
+            u8 c1 = ( p_showTeam && ( p_oldpos >= 21 ) ) ? 16 : 0;
+            u8 c2 = ( p_showTeam && ( p_pos >= 21 ) ) ? 16 : 0;
 
             IO::printChoiceBox( c1 + POS_X( p_oldpos ), c1 / 2 + POS_Y( p_oldpos ),
                                 c1 + POS_X( p_oldpos ) + 28, c1 / 2 + POS_Y( p_oldpos ) + 21, 3, GRAY_IDX, false );
@@ -107,6 +115,9 @@ namespace BOX {
 
         if( p_newPok ) {
             for( u8 i = 1; i < 29 - 7 * p_showTeam; ++i ) {
+                res.push_back( IO::inputTarget( POS_X( i - 1 ), POS_Y( i - 1 ), POS_X( i - 1 ) + 28, POS_Y( i - 1 ) + 21 ) );
+                _ranges.push_back( { oam, res.back( ) } );
+
                 if( !p_pokemon[ i ].first ) {
                     IO::Oam->oamBuffer[ oam++ ].isHidden = true;
                     continue;
@@ -131,6 +142,10 @@ namespace BOX {
                 IO::printRectangle( 0, 140, 255, 192, true, false, WHITE_IDX );
                 IO::printString( IO::regularFont, "Pokémon-Team", 2, 176, true );
                 for( u8 i = 0; i < 6; ++i ) {
+                    res.push_back( IO::inputTarget( 16 + POS_X( 21 + i ), 8 + POS_Y( 21 + i ),
+                        16 + POS_X( 21 + i ) + 28, 8 + POS_Y( 21 + i ) + 21 ) );
+                    _ranges.push_back( { oam, res.back( ) } );
+
                     IO::printChoiceBox( 16 + POS_X( 21 + i ), 8 + POS_Y( 21 + i ),
                                         16 + POS_X( 21 + i ) + 28, 8 + POS_Y( 21 + i ) + 21, 3,
                                         ( 21 + i == p_pos ) ? RED_IDX : GRAY_IDX, false );
@@ -141,11 +156,128 @@ namespace BOX {
                         } else
                             tileCnt = IO::loadEggIcon( 16 + POS_X( 21 + i ) - 3, 8 + POS_Y( 21 + i ) - 10, oam++, pal / 16, pal % 16, tileCnt );
                         ++pal;
+                    } else {
+                        IO::Oam->oamBuffer[ oam++ ].isHidden = true;
                     }
                 }
+            }
+        } else {
+            for( u8 i = 1; i < 29 - 7 * p_showTeam; ++i ) {
+                res.push_back( IO::inputTarget( POS_X( i - 1 ), POS_Y( i - 1 ), POS_X( i - 1 ) + 28, POS_Y( i - 1 ) + 21 ) );
+                _ranges.push_back( { oam++, res.back( ) } );
+            }
+
+            if( p_showTeam ) for( u8 i = 0; i < 6; ++i ) {
+                res.push_back( IO::inputTarget( 16 + POS_X( 21 + i ), 8 + POS_Y( 21 + i ),
+                    16 + POS_X( 21 + i ) + 28, 8 + POS_Y( 21 + i ) + 21 ) );
+                _ranges.push_back( { oam++, res.back( ) } );
             }
         }
         IO::updateOAM( true );
         return res;
     }
+
+    void boxUI::updateAtHand( touchPosition p_touch, u8 p_oamIdx ) {
+        IO::Oam->oamBuffer[ p_oamIdx ].x = p_touch.px - 16;
+        IO::Oam->oamBuffer[ p_oamIdx ].y = p_touch.py - 16;
+        IO::updateOAM( true );
+    }
+
+    u8 boxUI::getSprite( u8 p_oldIdx, u8 p_rangeIdx ) {
+        IO::Oam->oamBuffer[ _ranges[ p_rangeIdx ].first ].priority = OBJPRIORITY_0;
+
+        if( p_oldIdx < 21 ) {
+            IO::printChoiceBox( POS_X( p_oldIdx ), POS_Y( p_oldIdx ),
+                                POS_X( p_oldIdx ) + 28, POS_Y( p_oldIdx ) + 21,
+                                3, GRAY_IDX, false );
+        } else {
+            IO::printChoiceBox( 16 + POS_X( p_oldIdx ), 8 + POS_Y( p_oldIdx ),
+                                16 + POS_X( p_oldIdx ) + 28, 8 + POS_Y( p_oldIdx ) + 21,
+                                3, GRAY_IDX, false );
+        }
+        if( p_rangeIdx < 21 ) {
+            IO::printChoiceBox( POS_X( p_rangeIdx ), POS_Y( p_rangeIdx ),
+                                POS_X( p_rangeIdx ) + 28, POS_Y( p_rangeIdx ) + 21,
+                                3, RED_IDX, true );
+        } else {
+            IO::printChoiceBox( 16 + POS_X( p_rangeIdx ), 8 + POS_Y( p_rangeIdx ),
+                                16 + POS_X( p_rangeIdx ) + 28, 8 + POS_Y( p_rangeIdx ) + 21,
+                                3, RED_IDX, true );
+
+            IO::printRectangle( 16 + POS_X( p_rangeIdx ), 8 + POS_Y( p_rangeIdx ),
+                                16 + POS_X( p_rangeIdx ) + 28, 9 + POS_Y( p_rangeIdx ),
+                                true, false, WHITE_IDX );
+            IO::printRectangle( 14 + POS_X( p_rangeIdx ), 8 + POS_Y( p_rangeIdx ),
+                                16 + POS_X( p_rangeIdx ), 8 + POS_Y( p_rangeIdx ) + 21,
+                                true, false, WHITE_IDX );
+        }
+
+        return _ranges[ p_rangeIdx ].first;
+    }
+
+    u8 boxUI::acceptTouch( u8 p_oldIdx, u8 p_rangeIdx, bool p_allowTakePkmn ) {
+        if( p_oldIdx < 21 || !p_allowTakePkmn ) {
+            IO::printChoiceBox( POS_X( p_oldIdx ), POS_Y( p_oldIdx ),
+                                POS_X( p_oldIdx ) + 28, POS_Y( p_oldIdx ) + 21,
+                                3, GRAY_IDX, false );
+        } else {
+            IO::printChoiceBox( 16 + POS_X( p_oldIdx ), 8 + POS_Y( p_oldIdx ),
+                                16 + POS_X( p_oldIdx ) + 28, 8 + POS_Y( p_oldIdx ) + 21,
+                                3, GRAY_IDX, false );
+        }
+
+        if( p_rangeIdx < 21 || !p_allowTakePkmn ) {
+            IO::printChoiceBox( POS_X( p_rangeIdx ), POS_Y( p_rangeIdx ),
+                                POS_X( p_rangeIdx ) + 28, POS_Y( p_rangeIdx ) + 21,
+                                3, RED_IDX, false );
+        } else {
+            IO::printChoiceBox( 16 + POS_X( p_rangeIdx ), 8 + POS_Y( p_rangeIdx ),
+                                16 + POS_X( p_rangeIdx ) + 28, 8 + POS_Y( p_rangeIdx ) + 21,
+                                3, RED_IDX, false );
+        }
+        return 0;
+    }
+
+    u32 boxUI::acceptDrop( u8 p_startIdx, u8 p_dropIdx, u8 p_oamIdx ) {
+
+        IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].x = POS_X( p_startIdx ) - 3;
+        IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].y = POS_Y( p_startIdx ) - 10;
+        IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].priority = OBJPRIORITY_0;
+        IO::updateOAM( true );
+
+        if( p_startIdx < 21 ) {
+            IO::printChoiceBox( POS_X( p_startIdx ), POS_Y( p_startIdx ),
+                                POS_X( p_startIdx ) + 28, POS_Y( p_startIdx ) + 21,
+                                3, RED_IDX, false );
+        } else {
+            IO::printChoiceBox( 16 + POS_X( p_startIdx ), 8 + POS_Y( p_startIdx ),
+                                16 + POS_X( p_startIdx ) + 28, 8 + POS_Y( p_startIdx ) + 21,
+                                3, RED_IDX, false );
+        }
+
+        if( u8( -1 ) == p_dropIdx )
+            return 0;
+
+        if( p_startIdx >= 21 || p_dropIdx >= 21 ) {
+            if( p_startIdx >= 21 ) {
+                IO::Oam->oamBuffer[ _ranges[ p_dropIdx ].first ].x = 16 + POS_X( p_startIdx ) - 3;
+                IO::Oam->oamBuffer[ _ranges[ p_dropIdx ].first ].y = 8 + POS_Y( p_startIdx ) - 10;
+            } else {
+                IO::Oam->oamBuffer[ _ranges[ p_dropIdx ].first ].x = POS_X( p_startIdx ) - 3;
+                IO::Oam->oamBuffer[ _ranges[ p_dropIdx ].first ].y = POS_Y( p_startIdx ) - 10;
+            }
+            if( p_dropIdx >= 21 ) {
+                IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].x = 16 + POS_X( p_dropIdx ) - 3;
+                IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].y = 8 + POS_Y( p_dropIdx ) - 10;
+            } else {
+                IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].x = POS_X( p_dropIdx ) - 3;
+                IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].y = POS_Y( p_dropIdx ) - 10;
+            }
+
+            std::swap( IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ], IO::Oam->oamBuffer[ _ranges[ p_dropIdx ].first ] );
+            IO::updateOAM( true );
+        }
+        return 0;
+    }
+
 }
