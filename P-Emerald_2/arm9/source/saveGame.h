@@ -3,11 +3,11 @@
     ------------------------------
 
     file        : saveGame.h
-    author      : Philip Wellnitz (RedArceus)
+    author      : Philip Wellnitz 
     description : Header file. See corresponding source file for details.
 
     Copyright (C) 2012 - 2015
-    Philip Wellnitz (RedArceus)
+    Philip Wellnitz 
 
     This file is part of Pokémon Emerald 2 Version.
 
@@ -32,6 +32,7 @@
 #include <vector>
 #include "bag.h"
 #include "pokemon.h"
+#include "mapObject.h"
 
 namespace FS {
     enum SavMod {
@@ -70,13 +71,8 @@ namespace FS {
         pokemon     m_pkmnTeam[ 6 ];
 
         //Map stuff
-        u16         m_overWorldIdx;
-        u16         m_acposx;
-        u16         m_acposy;
-        u16         m_acposz;
-        u16         m_acMapIdx;
-        u16         m_acMoveMode;
-        char        m_acMapName[ 100 ];
+        MAP::mapObject m_player;
+        u8          m_currentMap;
 
         u8          m_EXPShareEnabled : 1;
         u8          m_evolveInBattle : 1;

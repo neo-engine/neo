@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : fs.cpp
-author      : Philip Wellnitz (RedArceus)
+author      : Philip Wellnitz
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -25,8 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
 #include <string>
 #include <vector>
 #include <cstdio>
@@ -41,7 +39,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "berry.h"
 #include "uio.h"
 #include "defines.h"
-
+#include "mapSlice.h"
 
 const char ITEM_PATH[ ] = "nitro:/ITEMS/";
 const char PKMNDATA_PATH[ ] = "nitro:/PKMNDATA/";
@@ -97,15 +95,19 @@ namespace FS {
         return true;
     }
 
-    bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt, unsigned short* p_data ) {
+    FILE* open( const char* p_path, const char* p_name, const char* p_ext, const char* p_mode ) {
         char buffer[ 100 ];
-        sprintf( buffer, "%s%s.raw", p_path, p_name );
-        FILE* fd = fopen( buffer, "rb" );
+        sprintf( buffer, "%s%s%s", p_path, p_name, p_ext );
+        return fopen( buffer, p_mode );
+    }
+    void close( FILE* p_file ) {
+        fclose( p_file );
+    }
 
-        if( fd == 0 ) {
-            fclose( fd );
+    bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt, unsigned short* p_data ) {
+        FILE* fd = open( p_path, p_name );
+        if( !fd )
             return false;
-        }
         fread( p_data, sizeof( unsigned short ), p_dataCnt, fd );
         fclose( fd );
         return true;
@@ -113,14 +115,9 @@ namespace FS {
 
     bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt1,
                    unsigned short* p_data1, unsigned int p_dataCnt2, unsigned int* p_data2 ) {
-        char buffer[ 100 ];
-        sprintf( buffer, "%s%s.raw", p_path, p_name );
-        FILE* fd = fopen( buffer, "rb" );
-
-        if( fd == 0 ) {
-            fclose( fd );
+        FILE* fd = open( p_path, p_name );
+        if( !fd )
             return false;
-        }
         fread( p_data1, sizeof( unsigned short ), p_dataCnt1, fd );
         fread( p_data2, sizeof( unsigned int ), p_dataCnt2, fd );
         fclose( fd );
@@ -128,14 +125,9 @@ namespace FS {
     }
     bool readData( const char* p_path, const char* p_name, const unsigned int p_dataCnt1,
                    unsigned int* p_data1, unsigned short p_dataCnt2, unsigned short* p_data2 ) {
-        char buffer[ 100 ];
-        sprintf( buffer, "%s%s.raw", p_path, p_name );
-        FILE* fd = fopen( buffer, "rb" );
-
-        if( fd == 0 ) {
-            fclose( fd );
+        FILE* fd = open( p_path, p_name );
+        if( !fd )
             return false;
-        }
         fread( p_data1, sizeof( unsigned int ), p_dataCnt1, fd );
         fread( p_data2, sizeof( unsigned short ), p_dataCnt2, fd );
         fclose( fd );
@@ -187,6 +179,62 @@ namespace FS {
 
         return true;
     }
+
+    bool readNop( FILE* p_file, u32 p_cnt ) {
+        if( p_file == 0 )
+            return false;
+        fread( 0, sizeof( u8 )*p_cnt, 1, p_file );
+        return true;
+    }
+
+    bool readPal( FILE* p_file, MAP::Palette* p_palette ) {
+        if( p_file == 0 )
+            return false;
+        for( u8 i = 0; i < 6; ++i )
+            fread( p_palette[ i ].m_pal, sizeof( u16 ) * 16, 1, p_file );
+        return true;
+    }
+
+    bool readTileSet( FILE* p_file, MAP::TileSet& p_tileSet, u16 p_startIdx, u16 p_size ) {
+        if( p_file == 0 )
+            return false;
+        fread( &p_tileSet.m_blocks[ p_startIdx ], sizeof( MAP::Tile )*p_size, 1, p_file );
+        return true;
+    }
+
+    bool readBlockSet( FILE* p_file, MAP::BlockSet& p_tileSet, u16 p_startIdx, u16 p_size ) {
+        if( p_file == 0 )
+            return false;
+        readNop( p_file, 4 );
+        for( u16 i = 0; i < p_size; ++i ) {
+            fread( p_tileSet.m_blocks[ p_startIdx + i ].m_bottom, 4 * sizeof( MAP::BlockAtom ), 1, p_file );
+            fread( p_tileSet.m_blocks[ p_startIdx + i ].m_top, 4 * sizeof( MAP::BlockAtom ), 1, p_file );
+        }
+        for( u16 i = 0; i < p_size; ++i ) {
+            fread( &p_tileSet.m_blocks[ p_startIdx + i ].m_bottombehave, sizeof( u8 ), 1, p_file );
+            fread( &p_tileSet.m_blocks[ p_startIdx + i ].m_topbehave, sizeof( u8 ), 1, p_file );
+        }
+        return true;
+    }
+
+    //inline void readAnimations( FILE* p_file, std::vector<MAP::Animation>& p_animations ) {
+    //    if( p_file == 0 )
+    //        return;
+    //    u8 N;
+    //    fread( &N, sizeof( u8 ), 1, p_file );
+    //    for( int i = 0; i < N; ++i ) {
+    //        MAP::Animation a;
+    //        fread( &a.m_tileIdx, sizeof( u16 ), 1, p_file );
+    //        fread( &a.m_speed, sizeof( u8 ), 1, p_file );
+    //        fread( &a.m_maxFrame, sizeof( u8 ), 1, p_file );
+    //        a.m_acFrame = 0;
+    //        a.m_animationTiles.assign( a.m_maxFrame, Tile( ) );
+    //        for( int i = 0; i < a.m_maxFrame; ++i )
+    //            fread( &a.m_animationTiles[ i ], sizeof( Tile ), 1, p_file );
+    //        p_animations.push_back( a );
+    //    }
+    //    fclose( p_file );
+    //}
 
     std::string readString( FILE* p_file, bool p_new ) {
         std::string ret = "";
@@ -384,62 +432,47 @@ namespace FS {
     }
 }
 
-Type getType( u16 p_pkmnId, u16 p_type ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
+std::string toString( u16 p_num ) {
+    char buffer[ 32 ];
+    sprintf( buffer, "%hu", p_num );
+    return std::string( buffer );
+}
 
-    if( f == 0 ) {
-        fclose( f );
+Type getType( u16 p_pkmnId, u16 p_type ) {
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
+    if( f == 0 )
         return UNBEKANNT;
-    }
+
     char buf[ 12 ];
     fscanf( f, "%s", buf );
     fclose( f );
     return (Type)( buf[ p_type ] - 42 );
 }
 u16 getBase( u16 p_pkmnId, u16 p_base ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
-
-    if( f == 0 ) {
-        fclose( f );
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
+    if( f == 0 )
         return 0;
-    }
+
     char buf[ 12 ];
     fscanf( f, "%s", buf );
     fclose( f );
     return (short)buf[ 2 + p_base ];
 }
 u16 getCatchRate( u16 p_pkmnId ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
-
-    if( f == 0 ) {
-        fclose( f );
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
+    if( f == 0 )
         return 0;
-    }
-    for( int i = 0; i < 8; ++i )
-        fgetc( f );
+
+    FS::readNop( f, 8 );
     short buf; fscanf( f, "%hi", &buf );
     fclose( f );
     return buf;
 }
 const char* getDisplayName( u16 p_pkmnId ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
-
-    if( f == 0 ) {
-        fclose( f );
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
+    if( f == 0 )
         return "???";
-    }
-    for( int i = 0; i < 8; ++i )
-        fgetc( f );
-    short buf; fscanf( f, "%hi", &buf );
-    fgetc( f );
+    FS::readNop( f, 11 );
     std::string ret = FS::readString( f, true );
     fclose( f );
     ret += " ";
@@ -447,18 +480,10 @@ const char* getDisplayName( u16 p_pkmnId ) {
     return ret.c_str( );
 }
 const wchar_t* getWDisplayName( u16 p_pkmnId ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
-
-    if( f == 0 ) {
-        fclose( f );
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
+    if( f == 0 )
         return L"???";
-    }
-    for( int i = 0; i < 8; ++i )
-        fgetc( f );
-    short buf; fscanf( f, "%hi", &buf );
-    fgetc( f );
+    FS::readNop( f, 11 );
     std::wstring ret = FS::readWString( f );
     fclose( f );
     ret += L" ";
@@ -466,232 +491,125 @@ const wchar_t* getWDisplayName( u16 p_pkmnId ) {
     return ret.c_str( );
 }
 void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
-
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
     if( f == 0 ) {
-        fclose( f );
         wcscpy( p_name, L"???" );
         return;
     }
-    for( int i = 0; i < 8; ++i )
-        fgetc( f );
-    short buf; fscanf( f, "%hi", &buf );
-    fgetc( f );
+    FS::readNop( f, 11 );
     std::wstring ret = FS::readWString( f );
     fclose( f );
     wcscpy( p_name, ret.c_str( ) );
 }
 void getHoldItems( u16 p_pkmnId, u16* p_items ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
-
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
     if( f == 0 ) {
-        fclose( f );
         p_items[ 0 ] = p_items[ 1 ] = p_items[ 2 ] = p_items[ 3 ] = 0;
         return;
     }
-    for( int i = 0; i < 8; ++i )
-        fgetc( f );
-    short buf; fscanf( f, "%hi", &buf );
-    fgetc( f );
+    FS::readNop( f, 11 );
     FS::readString( f );
     p_items[ 0 ] = p_items[ 1 ] = p_items[ 2 ] = p_items[ 3 ] = 0;
-    for( int i = 0; i < 4; ++i )
+    for( u8 i = 0; i < 4; ++i )
         fscanf( f, "%hi", &p_items[ i ] );
     fclose( f );
     return;
 }
 pkmnGenderType getGenderType( u16 p_pkmnId ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
-
-    if( f == 0 ) {
-        fclose( f );
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
+    if( f == 0 )
         return (pkmnGenderType)0;
-    }
-    for( int i = 0; i < 8; ++i )
-        fgetc( f );
-    short buf; fscanf( f, "%hi", &buf );
-    fgetc( f );
+    FS::readNop( f, 11 );
     FS::readString( f );
-    for( int i = 0; i < 5; ++i )
-        fscanf( f, "%hi", &buf );
+    FS::readNop( f, 8 );
+    u16 buf;
+    fscanf( f, "%hi", &buf );
     fclose( f );
     return (pkmnGenderType)buf;
 }
 const char* getDexEntry( u16 p_pkmnId ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
+    if( f == 0 )
+        return NO_DATA;
 
-    if( f == 0 ) {
-        fclose( f );
-        return "Keine Daten vorhanden.";
-    }
-    for( int i = 0; i < 2; ++i )
-        fgetc( f );
-    for( int i = 2; i < 8; ++i )
-        fgetc( f );
-    short s;
-    fscanf( f, "%hi", &s );
-    fgetc( f );
+    FS::readNop( f, 11 );
     FS::readString( f );
-    for( int i = 0; i < 4; ++i )
-        fscanf( f, "%hi", &s );
-    fscanf( f, "%hi", &s );
-    fgetc( f );
-    for( int i = 0; i < 2; ++i )
-        fgetc( f );
-    fgetc( f );
-    fgetc( f );
-    for( int i = 0; i < 6; ++i )
-        fgetc( f );
-    fscanf( f, "%hi", &s );
-    fgetc( f );
+    FS::readNop( f, 24 );
     std::string ret = FS::readString( f );
     fclose( f );
     return ret.c_str( );
 }
 u16 getForme( u16 p_pkmnId, u16 p_formeId, std::string& p_retFormeName ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
-
-    if( f == 0 ) {
-        fclose( f );
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
+    if( f == 0 )
         return p_pkmnId;
-    }
-    for( int i = 0; i < 2; ++i )
-        fgetc( f );
-    for( int i = 2; i < 8; ++i )
-        fgetc( f );
-    u16 s;
-    fscanf( f, "%hi", &s );
-    fgetc( f );
+
+    FS::readNop( f, 11 );
     FS::readString( f );
-    for( int i = 0; i < 4; ++i )
-        fscanf( f, "%hi", &s );
-    fscanf( f, "%hi", &s );
-    fgetc( f );
-    for( int i = 0; i < 2; ++i )
-        fgetc( f );
-    fgetc( f );
-    fgetc( f );
-    for( int i = 0; i < 6; ++i )
-        fgetc( f );
-    fscanf( f, "%hi", &s );
-    fgetc( f );
+    FS::readNop( f, 24 );
     FS::readString( f );
+
+    u16 d, s;
     fscanf( f, "%hi", &s );
-    u16 d;
     for( int i = 0; i <= std::min( s, p_formeId ); ++i ) {
         fscanf( f, "%hi", &d );
         p_retFormeName = FS::readString( f );
     }
-    //fscanf(f,"%hi",d); 
-    //ret = readString(f);
     fclose( f );
     return d;
 }
 std::vector<u16> getAllFormes( u16 p_pkmnId ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
-
-    if( f == 0 ) {
-        fclose( f );
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
+    if( f == 0 )
         return{ };
-    }
-    for( int i = 0; i < 2; ++i )
-        fgetc( f );
-    for( int i = 2; i < 8; ++i )
-        fgetc( f );
-    u16 s;
-    fscanf( f, "%hi", &s );
-    fgetc( f );
+
+    FS::readNop( f, 11 );
     FS::readString( f );
-    for( int i = 0; i < 4; ++i )
-        fscanf( f, "%hi", &s );
-    fscanf( f, "%hi", &s );
-    fgetc( f );
-    for( int i = 0; i < 2; ++i )
-        fgetc( f );
-    fgetc( f );
-    fgetc( f );
-    for( int i = 0; i < 6; ++i )
-        fgetc( f );
-    fscanf( f, "%hi", &s );
-    fgetc( f );
+    FS::readNop( f, 24 );
     FS::readString( f );
+
+    u16 d, s;
     fscanf( f, "%hi", &s );
-    u16 d;
     std::vector<u16> res;
     for( int i = 0; i < s; ++i ) {
         fscanf( f, "%hi", &d );
         res.push_back( d );
         FS::readString( f );
     }
-    //fscanf(f,"%hi",d); 
-    //ret = readString(f);
     fclose( f );
     return res;
 }
 const char* getSpecies( u16 p_pkmnId ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
+    if( f == 0 )
+        return NO_DATA;
 
-    if( f == 0 ) {
-        fclose( f );
-        return "UNBEKANNT";
-    }
-    for( int i = 0; i < 2; ++i )
-        fgetc( f );
-    for( int i = 2; i < 8; ++i )
-        fgetc( f );
-    short s;
-    fscanf( f, "%hi", &s );
-    fgetc( f );
+    FS::readNop( f, 11 );
     FS::readString( f );
-    for( int i = 0; i < 4; ++i )
-        fscanf( f, "%hi", &s );
-    fscanf( f, "%hi", &s );
-    fgetc( f );
-    for( int i = 0; i < 2; ++i )
-        fgetc( f );
-    fgetc( f );
-    fgetc( f );
-    for( int i = 0; i < 6; ++i )
-        fgetc( f );
-    fscanf( f, "%hi", &s );
-    fgetc( f );
+    FS::readNop( f, 24 );
     FS::readString( f );
+    FS::readNop( f, 2 );
+
+    u16 s;
     fscanf( f, "%hi", &s );
-    short d; std::string ret2;
     for( int i = 0; i < s; ++i ) {
-        fscanf( f, "%hi", &d ); FS::readString( f );
+        FS::readNop( f, 2 );
+        FS::readString( f );
     }
-    fscanf( f, " " );
-    ret2 = FS::readString( f, true );
-    ret2 += " ";
-    ret2.pop_back( );
+    std::string ret;
+    FS::readNop( f, 1 );
+    ret = FS::readString( f, true );
+    ret += " ";
+    ret.pop_back( );
     fclose( f );
-    return ret2.c_str( );
+    return ret.c_str( );
 }
 
 void getAll( u16 p_pkmnId, pokemonData& p_out ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
-
-    if( f == 0 ) {
-        fclose( f );
+    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
+    if( f == 0 )
         return;
-    }
+
     for( int i = 0; i < 2; ++i )
         p_out.m_types[ i ] = (Type)( ( fgetc( f ) ) - 42 );
     for( int i = 2; i < 8; ++i )
@@ -715,7 +633,8 @@ void getAll( u16 p_pkmnId, pokemonData& p_out ) {
     fscanf( f, "%hi", &p_out.m_formecnt );
     short d;
     for( int i = 0; i < p_out.m_formecnt; ++i ) {
-        fscanf( f, "%hi", &d ); FS::readString( f );
+        fscanf( f, "%hi", &d );
+        FS::readString( f );
     }
     fscanf( f, " " );
     FS::readString( f, true );
@@ -732,13 +651,11 @@ void getAll( u16 p_pkmnId, pokemonData& p_out ) {
 }
 
 void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount, u16* p_result ) {
-    sprintf( buffer, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( buffer, "r" );
+    FILE* f = FS::open( PKMNDATA_PATH, ( "/LEARNSETS/" + toString( p_pkmnId ) ).c_str( ), ".learnset.data" );
     if( !f )
         return;
 
     u16 rescnt = 0;
-
     for( u8 i = 0; i < p_amount; ++i )
         p_result[ i ] = 0;
 
@@ -790,9 +707,7 @@ NEXT:
     fclose( f );
 }
 bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
-    char pt[ 150 ];
-    sprintf( pt, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
+    FILE* f = FS::open( PKMNDATA_PATH, ( "/LEARNSETS/" + toString( p_pkmnId ) ).c_str( ), ".learnset.data" );
     if( !f )
         return false;
 
@@ -818,9 +733,8 @@ u16 item::getItemId( ) {
 bool item::load( ) {
     if( m_loaded )
         return true;
-    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-    FILE* f = fopen( buffer, "r" );
-    if( f == 0 )
+    FILE* f = FS::open( ITEM_PATH, m_itemName.c_str( ), ".data" );
+    if( !f )
         return false;
 
     memset( &m_itemData, 0, sizeof( itemData ) );
@@ -836,9 +750,8 @@ bool item::load( ) {
 bool berry::load( ) {
     if( m_loaded )
         return true;
-    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-    FILE* f = fopen( buffer, "r" );
-    if( f == 0 )
+    FILE* f = FS::open( ITEM_PATH, m_itemName.c_str( ), ".data" );
+    if( !f )
         return false;
 
     memset( &m_itemData, 0, sizeof( itemData ) );
@@ -871,13 +784,13 @@ std::string item::getDisplayName( bool p_new ) {
 
 std::string item::getDescription( ) {
     if( !m_loaded && !load( ) )
-        return "Keine Daten.";
+        return NO_DATA;
     return std::string( m_itemData.m_itemDescription );
 }
 
 std::string item::getShortDescription( ) {
     if( !m_loaded && !load( ) )
-        return "Keine Daten.";
+        return NO_DATA;
     return std::string( m_itemData.m_itemShortDescr );
 }
 

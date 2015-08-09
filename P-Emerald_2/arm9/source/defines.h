@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : defines.h
-author      : Philip Wellnitz (RedArceus)
+author      : Philip Wellnitz 
 description : Header file. See corresponding source file for details.
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz 
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -24,13 +24,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
+#pragma once
 
 #include <nds.h>
 #include <nds/ndstypes.h>
 #include <cmath>
 #include <cstdio>
+#include <string>
 
 //#define USE_AS_LIB
+#undef _EMULATOR
+#define VERSION "0.5"
+#define VERSION_NAME "Fighting Torchic"
+
+enum GameMod : u8 {
+    DEVELOPER,
+    ALPHA,
+    BETA,
+    RELEASE,
+    EMULATOR
+};
+extern GameMod gMod;
+
+std::string toString( u16 p_num ); //I REALLY LIKE WORKAROUNDING g++'S BUGS
 
 extern bool DRAW_TIME;
 extern bool ANIMATE_MAP;
@@ -40,6 +56,8 @@ extern int hours, seconds, minutes, day, month, year;
 
 extern unsigned int TEMP[ 12288 ];
 extern unsigned short TEMP_PAL[ 256 ];
+
+#define NO_DATA "Keine Daten."
 
 #define loop() while( 1 )
 

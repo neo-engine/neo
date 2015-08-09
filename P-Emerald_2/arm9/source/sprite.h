@@ -3,11 +3,11 @@
  ------------------------------
 
  file : sprite.h
- author : Philip Wellnitz (RedArceus)
+ author : Philip Wellnitz 
  description : Header file. See corresponding source file for details.
 
  Copyright (C) 2012 - 2015
- Philip Wellnitz (RedArceus)
+ Philip Wellnitz 
 
  This file is part of Pokémon Emerald 2 Version.
 

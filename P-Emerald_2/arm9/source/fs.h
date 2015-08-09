@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : fs.h
-author      : Philip Wellnitz (RedArceus)
+author      : Philip Wellnitz 
 description : Header file. See corresponding source file for details.
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz 
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -43,11 +43,18 @@ namespace FS {
 
     bool exists( const char* p_path, const char* p_name );
     bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name = "" );
+    FILE* open( const char* p_path, const char* p_name, const char* p_ext = ".raw", const char* p_mode = "r" );
+    void close( FILE* p_file );
 
     // No, I'm absolutely not aware of templates.
     bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt, unsigned short* p_data );
     bool readData( const char* p_path, const char* p_name, const unsigned int p_dataCnt1, unsigned int* p_data1, const unsigned short p_dataCnt2, unsigned short* p_data2 );
     bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt1, unsigned short* p_data1, const unsigned int p_dataCnt2, unsigned int* p_data2 );
+
+    bool readNop( FILE* p_file, u32 p_cnt );
+    bool readPal( FILE* p_file, MAP::Palette* p_palette );
+    bool readTileSet( FILE* p_file, MAP::TileSet& p_tileSet, u16 p_startIdx = 0, u16 p_size = 512 );
+    bool readBlockSet( FILE* p_file, MAP::BlockSet& p_tileSet, u16 p_startIdx = 0, u16 p_size = 512 );
 
     std::string breakString( const std::string& p_string, u8 p_lineLength );
     std::string breakString( const std::string& p_string, IO::font* p_font, u8 p_lineLength );

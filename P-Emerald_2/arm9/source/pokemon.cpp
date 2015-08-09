@@ -3,11 +3,11 @@
     ------------------------------
 
     file        : pokemon.cpp
-    author      : Philip Wellnitz (RedArceus)
+    author      : Philip Wellnitz
     description : The main Pokémon engine
 
     Copyright (C) 2012 - 2015
-    Philip Wellnitz (RedArceus)
+    Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
 
@@ -31,6 +31,7 @@
 
 #include "defines.h"
 #include "saveGame.h"
+#include "mapDrawer.h"
 
 #include <nds.h>
 #include <vector>
@@ -410,7 +411,7 @@ bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
             continue;
         if( data.m_evolutions[ i ].m_e.m_evolveGender && m_boxdata.gender( ) != data.m_evolutions[ i ].m_e.m_evolveGender )
             continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveLocation && FS::SAV->m_acMapIdx != data.m_evolutions[ i ].m_e.m_evolveLocation )
+        if( data.m_evolutions[ i ].m_e.m_evolveLocation && MAP::curMap->getCurrentLocationId( ) != data.m_evolutions[ i ].m_e.m_evolveLocation )
             continue;
         if( data.m_evolutions[ i ].m_e.m_evolveHeldItem && m_boxdata.m_holdItem != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
             continue;
@@ -465,7 +466,7 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
             continue;
         if( data.m_evolutions[ i ].m_e.m_evolveGender && m_boxdata.gender( ) != data.m_evolutions[ i ].m_e.m_evolveGender )
             continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveLocation && FS::SAV->m_acMapIdx != data.m_evolutions[ i ].m_e.m_evolveLocation )
+        if( data.m_evolutions[ i ].m_e.m_evolveLocation && MAP::curMap->getCurrentLocationId( ) != data.m_evolutions[ i ].m_e.m_evolveLocation )
             continue;
         if( data.m_evolutions[ i ].m_e.m_evolveHeldItem && m_boxdata.m_holdItem != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
             continue;

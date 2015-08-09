@@ -30,12 +30,13 @@
     <ClInclude Include="arm9\source\font.h" />
     <ClInclude Include="arm9\source\fs.h" />
     <ClInclude Include="arm9\source\Gen.h" />
+    <ClInclude Include="arm9\source\mapObject.h" />
+    <ClInclude Include="arm9\source\mapDrawer.h" />
     <ClInclude Include="arm9\source\hmMoves.h" />
     <ClInclude Include="arm9\source\item.h" />
     <ClInclude Include="arm9\source\keyboard.h" />
     <ClInclude Include="arm9\source\map2d.h" />
-    <ClInclude Include="arm9\source\map2devents.h" />
-    <ClInclude Include="arm9\source\mapconfig.h" />
+    <ClInclude Include="arm9\source\mapSlice.h" />
     <ClInclude Include="arm9\source\messageBox.h" />
     <ClInclude Include="arm9\source\move.h" />
     <ClInclude Include="arm9\source\pokemon.h" />
@@ -43,6 +44,7 @@
     <ClInclude Include="arm9\source\saveGame.h" />
     <ClInclude Include="arm9\source\script.h" />
     <ClInclude Include="arm9\source\sprite.h" />
+    <ClInclude Include="arm9\source\startScreen.h" />
     <ClInclude Include="arm9\source\statusScreen.h" />
     <ClInclude Include="arm9\source\statusScreenUI.h" />
     <ClInclude Include="arm9\source\type.h" />
@@ -70,8 +72,7 @@
     <ClCompile Include="arm9\source\keyboard.cpp" />
     <ClCompile Include="arm9\source\main.cpp" />
     <ClCompile Include="arm9\source\map2d.cpp" />
-    <ClCompile Include="arm9\source\map2devents.cpp" />
-    <ClCompile Include="arm9\source\mapconfig.cpp" />
+    <ClCompile Include="arm9\source\mapSlice.cpp" />
     <ClCompile Include="arm9\source\messageBox.cpp" />
     <ClCompile Include="arm9\source\move.cpp" />
     <ClCompile Include="arm9\source\pokemon.cpp" />
@@ -79,6 +80,7 @@
     <ClCompile Include="arm9\source\saveGame.cpp" />
     <ClCompile Include="arm9\source\script.cpp" />
     <ClCompile Include="arm9\source\sprite.cpp" />
+    <ClCompile Include="arm9\source\startScreen.cpp" />
     <ClCompile Include="arm9\source\statusScreen.cpp" />
     <ClCompile Include="arm9\source\statusScreenUI.cpp" />
     <ClCompile Include="arm9\source\type.cpp" />

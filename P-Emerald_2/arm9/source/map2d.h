@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : map2d.h
-author      : Philip Wellnitz (RedArceus)
+author      : Philip Wellnitz
 description : Header file. See corresponding source file for details.
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -29,48 +29,12 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses
 #include <nds.h>
 #include <nds/ndstypes.h>
 #include <vector>
+#include "mapSlice.h"
 
 #include <stdio.h>
 
 namespace MAP {
     extern int bgs[ 4 ];
-
-
-    typedef struct {
-        u16 m_pal[ 16 ];
-    } Palette;
-    typedef struct {
-        u8 m_tile[ 32 ];
-    } Tile;
-    typedef u8 PalNo;
-    //typedef struct{
-    //    u16 tileidx      : 10;
-    //    u8 vflip         :  1;
-    //    u8 hflip         :  1;
-    //    PalNo palno      :  4;
-    //}BlockAtom;
-    typedef u16 BlockAtom;
-
-    class Block {
-    public:
-        BlockAtom   m_top[ 2 ][ 2 ];
-        u8          m_topbehave;
-
-        BlockAtom   m_bottom[ 2 ][ 2 ];
-        u8          m_bottombehave;
-    };
-
-    typedef struct {
-        Tile        m_blocks[ 1024 ];
-    } TileSet;
-    typedef struct {
-        Block       m_blocks[ 1024 ];
-    } BlockSet;
-
-    typedef struct {
-        u16         m_blockidx : 10;
-        u8          m_movedata : 6;
-    } MapBlockAtom;
 
     class Anbindung {
     public:
