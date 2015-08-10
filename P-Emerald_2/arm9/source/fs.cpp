@@ -100,6 +100,11 @@ namespace FS {
         sprintf( buffer, "%s%s%s", p_path, p_name, p_ext );
         return fopen( buffer, p_mode );
     }
+    FILE* open( const char* p_path, u16 p_value, const char* p_ext, const char* p_mode ) {
+        char buffer[ 100 ];
+        sprintf( buffer, "%s%d%s", p_path, p_value, p_ext );
+        return fopen( buffer, p_mode );
+    }
     void close( FILE* p_file ) {
         fclose( p_file );
     }
@@ -415,18 +420,20 @@ namespace FS {
 
     const char* getLoc( u16 p_ind ) {
         if( p_ind > 5000 )
-            return "Entfernter Ort";
+            return FARAWAY_PLACE;
+        FILE* f = FS::open( "nitro:/LOCATIONS/", p_ind, ".data" );
 
-        sprintf( buffer, "nitro:/LOCATIONS/%i.data", p_ind );
-        FILE* f = fopen( buffer, "r" );
         if( f == 0 ) {
-            FS::close( f );
             if( savMod == SavMod::_NDS && p_ind > 322 && p_ind < 1000 )
                 return getLoc( 3002 );
 
-            return "Entfernter Ort";
+            return FARAWAY_PLACE;
         }
-        std::string ret = readString( f );
+        char buffer[ 50 ] = { 0 };
+        fread( buffer, 1, 49, f );
+
+        std::string ret = std::string( buffer );
+        ret.pop_back( );
         FS::close( f );
         return ret.c_str( );
     }
@@ -438,222 +445,147 @@ std::string toString( u16 p_num ) {
     return std::string( buffer );
 }
 
+[[ deprecated ]]
 Type getType( u16 p_pkmnId, u16 p_type ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 )
+    pokemonData tmp;
+    if( getAll( p_pkmnId, tmp ) ) {
+        return tmp.m_types[ p_type ];
+    } else {
         return UNBEKANNT;
-
-    char buf[ 12 ];
-    fscanf( f, "%s", buf );
-    FS::close( f );
-    return (Type)( buf[ p_type ] - 42 );
+    }
 }
+[[ deprecated ]]
 u16 getBase( u16 p_pkmnId, u16 p_base ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 )
+    pokemonData tmp;
+    if( getAll( p_pkmnId, tmp ) ) {
+        return tmp.m_bases[ p_base ];
+    } else {
         return 0;
-
-    char buf[ 12 ];
-    fscanf( f, "%s", buf );
-    FS::close( f );
-    return (short)buf[ 2 + p_base ];
+    }
 }
+[[ deprecated ]]
 u16 getCatchRate( u16 p_pkmnId ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 )
+    pokemonData tmp;
+    if( getAll( p_pkmnId, tmp ) ) {
+        return tmp.m_catchrate;
+    } else {
         return 0;
-
-    FS::readNop( f, 9 );
-    short buf; fscanf( f, "%hi", &buf );
-    FS::close( f );
-    return buf;
+    }
 }
+[[ deprecated ]]
 const char* getDisplayName( u16 p_pkmnId ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 )
+    static pokemonData tmp;
+    if( getAll( p_pkmnId, tmp ) ) {
+        return reinterpret_cast<const char*>( tmp.m_displayName );
+    } else {
         return "???";
-    FS::readNop( f, 12 );
-    std::string ret = FS::readString( f, true );
-    FS::close( f );
-    ret += " ";
-    ret.pop_back( );
-    return ret.c_str( );
+    }
 }
 const wchar_t* getWDisplayName( u16 p_pkmnId ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 )
+    static pokemonData tmp;
+    if( !getAll( p_pkmnId, tmp ) ) {
         return L"???";
-    FS::readNop( f, 12 );
-    std::wstring ret = FS::readWString( f );
-    FS::close( f );
-    ret += L" ";
-    ret.pop_back( );
-    return ret.c_str( );
+    }
+
+    std::wstring res = L"";
+    for( u8 i = 0; tmp.m_displayName[ i ]; ++i )
+        res += tmp.m_displayName[ i ];
+    return res.c_str( );
 }
 void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 ) {
+    pokemonData tmp;
+    if( !getAll( p_pkmnId, tmp ) ) {
         wcscpy( p_name, L"???" );
         return;
     }
-    FS::readNop( f, 12 );
-    std::wstring ret = FS::readWString( f );
-    FS::close( f );
-    wcscpy( p_name, ret.c_str( ) );
+
+    std::wstring res = L"";
+    for( u8 i = 0; tmp.m_displayName[ i ]; ++i )
+        res += tmp.m_displayName[ i ];
+    wcscpy( p_name, res.c_str( ) );
 }
+
+[[ deprecated ]]
 void getHoldItems( u16 p_pkmnId, u16* p_items ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 ) {
-        p_items[ 0 ] = p_items[ 1 ] = p_items[ 2 ] = p_items[ 3 ] = 0;
-        return;
+    pokemonData tmp;
+    memset( p_items, 0, 4 * sizeof( u16 ) );
+    if( getAll( p_pkmnId, tmp ) ) {
+        memcpy( p_items, tmp.m_items, 4 * sizeof( u16 ) );
     }
-    FS::readNop( f, 12 );
-    FS::readString( f );
-    p_items[ 0 ] = p_items[ 1 ] = p_items[ 2 ] = p_items[ 3 ] = 0;
-    for( u8 i = 0; i < 4; ++i )
-        fscanf( f, "%hi", &p_items[ i ] );
-    FS::close( f );
-    return;
 }
+
+[[ deprecated ]]
 pkmnGenderType getGenderType( u16 p_pkmnId ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 )
-        return (pkmnGenderType)0;
-    FS::readNop( f, 12 );
-    FS::readString( f );
-    FS::readNop( f, 8 );
-    u16 buf;
-    fscanf( f, "%hi", &buf );
-    FS::close( f );
-    return (pkmnGenderType)buf;
+    pokemonData tmp;
+    if( getAll( p_pkmnId, tmp ) ) {
+        return tmp.m_gender;
+    } else {
+        return pkmnGenderType( 0 );
+    }
 }
+
+[[ deprecated ]]
 const char* getDexEntry( u16 p_pkmnId ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 )
+    static pokemonData tmp;
+    if( getAll( p_pkmnId, tmp ) ) {
+        return reinterpret_cast<const char*>( tmp.m_dexEntry );
+    } else {
         return NO_DATA;
-
-    FS::readNop( f, 12 );
-    FS::readString( f );
-    FS::readNop( f, 24 );
-    std::string ret = FS::readString( f );
-    FS::close( f );
-    return ret.c_str( );
+    }
 }
+
+[[ deprecated ]]
 u16 getForme( u16 p_pkmnId, u16 p_formeId, std::string& p_retFormeName ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 )
+    pokemonData tmp;
+    if( !getAll( p_pkmnId, tmp ) ) {
         return p_pkmnId;
-
-    FS::readNop( f, 12 );
-    FS::readString( f );
-    FS::readNop( f, 24 );
-    FS::readString( f );
-
-    u16 d, s;
-    fscanf( f, "%hi", &s );
-    for( int i = 0; i <= std::min( s, p_formeId ); ++i ) {
-        fscanf( f, "%hi", &d );
-        p_retFormeName = FS::readString( f );
     }
-    FS::close( f );
-    return d;
+    p_retFormeName = std::string( reinterpret_cast<const char*>( tmp.m_formeName[ p_formeId ] ) );
+    return tmp.m_formeIdx[ p_formeId ];
 }
+
+[[ deprecated ]]
 std::vector<u16> getAllFormes( u16 p_pkmnId ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 )
+    pokemonData tmp;
+    if( !getAll( p_pkmnId, tmp ) ) {
         return{ };
-
-    FS::readNop( f, 12 );
-    FS::readString( f );
-    FS::readNop( f, 24 );
-    FS::readString( f );
-
-    u16 d, s;
-    fscanf( f, "%hi", &s );
-    std::vector<u16> res;
-    for( int i = 0; i < s; ++i ) {
-        fscanf( f, "%hi", &d );
-        res.push_back( d );
-        FS::readString( f );
     }
-    FS::close( f );
+
+    std::vector<u16> res;
+    for( u8 i = 0; i < tmp.m_formecnt; ++i )
+        res.push_back( tmp.m_formeIdx[ i ] );
     return res;
 }
+
+[[ deprecated ]]
 const char* getSpecies( u16 p_pkmnId ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 )
-        return NO_DATA;
-
-    FS::readNop( f, 12 );
-    FS::readString( f );
-    FS::readNop( f, 24 );
-    FS::readString( f );
-    FS::readNop( f, 2 );
-
-    u16 s;
-    fscanf( f, "%hi", &s );
-    for( int i = 0; i < s; ++i ) {
-        FS::readNop( f, 2 );
-        FS::readString( f );
+    static pokemonData tmp;
+    if( getAll( p_pkmnId, tmp ) ) {
+        return reinterpret_cast<const char*>( tmp.m_species );
+    } else {
+        return UNKNOWN_SPECIES;
     }
-    std::string ret;
-    FS::readNop( f, 1 );
-    ret = FS::readString( f, true );
-    ret += " ";
-    ret.pop_back( );
-    FS::close( f );
-    return ret.c_str( );
 }
 
-void getAll( u16 p_pkmnId, pokemonData& p_out ) {
-    FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
-    if( f == 0 )
-        return;
+bool getAll( u16 p_pkmnId, pokemonData& p_out ) {
+    FILE* f = FS::open( PKMNDATA_PATH,  p_pkmnId , ".data" );
+    if( f == 0 ) 
+        return false;
 
-    for( int i = 0; i < 2; ++i )
-        p_out.m_types[ i ] = (Type)( ( fgetc( f ) ) - 42 );
-    for( int i = 2; i < 8; ++i )
-        p_out.m_bases[ i - 2 ] = (short)fgetc( f );
-    fscanf( f, " %hi", &p_out.m_catchrate );
-    fgetc( f );
-    FS::readString( f );
-    for( int i = 0; i < 4; ++i )
-        fscanf( f, "%hi", &p_out.m_items[ i ] );
-    fscanf( f, "%hi", &p_out.m_gender );
-    fgetc( f );
-    for( int i = 0; i < 2; ++i )
-        p_out.m_eggT[ i ] = (pkmnEggType)( ( fgetc( f ) ) - 42 );
-    p_out.m_eggcyc = ( ( fgetc( f ) ) - 42 );
-    p_out.m_baseFriend = ( ( fgetc( f ) ) - 42 );
-    for( int i = 0; i < 6; ++i )
-        p_out.m_EVYield[ i ] = ( ( fgetc( f ) ) - 42 );
-    fscanf( f, "%hi", &p_out.m_EXPYield );
-    fgetc( f );
-    FS::readString( f );
-    fscanf( f, "%hi", &p_out.m_formecnt );
-    short d;
-    for( int i = 0; i < p_out.m_formecnt; ++i ) {
-        fscanf( f, "%hi", &d );
-        FS::readString( f );
-    }
-    fscanf( f, " " );
-    FS::readString( f, true );
-    fscanf( f, "%hi", &p_out.m_size );
-    fscanf( f, "%hi", &p_out.m_weight );
-    fscanf( f, "%hi", &p_out.m_expType );
-    for( int i = 0; i < 4; ++i )
-        fscanf( f, "%hu ", &p_out.m_abilities[ i ] );
-    for( int i = 0; i < 7; ++i )
-        for( int j = 0; j < 15; ++j )
-            fscanf( f, "%hi ", &( p_out.m_evolutions[ i ].m_evolveData[ j ] ) );
+    fread( &p_out, sizeof( pokemonData ), 1, f );
     FS::close( f );
-    return;
+    return true;
 }
 
 void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount, u16* p_result ) {
-    FILE* f = FS::open( PKMNDATA_PATH, ( "/LEARNSETS/" + toString( p_pkmnId ) ).c_str( ), ".learnset.data" );
+    FILE* f = FS::open( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId, ".learnset.data" );
     if( !f )
         return;
+
+    u16 buffer[ 700 ];
+    fread( buffer, sizeof( u16 ), 699, f );
+    FS::close( f );
+    u16 ptr = 0;
 
     u16 rescnt = 0;
     for( u8 i = 0; i < p_amount; ++i )
@@ -662,11 +594,9 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
     if( p_fromLevel > p_toLevel ) {
         std::vector<u16> reses;
         for( u16 i = 0; i <= p_fromLevel; ++i ) {
-            u16 z;
-            fscanf( f, "%hd", &z );
+            u16 z = buffer[ ptr++ ];
             for( int j = 0; j < z; ++j ) {
-                u16 g, h;
-                fscanf( f, "%hd %hd", &g, &h );
+                u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
                 if( i >= p_toLevel && h == (u16)p_mode && g < MAXATTACK )
                     reses.push_back( g );
             }
@@ -686,11 +616,9 @@ N:
         return;
     } else {
         for( u16 i = 0; i <= p_toLevel; ++i ) {
-            u16 z;
-            fscanf( f, "%hd", &z );
+            u16 z = buffer[ ptr++ ];
             for( u16 j = 0; j < z; ++j ) {
-                u16 g, h;
-                fscanf( f, "%hd %hd", &g, &h );
+                u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
                 if( i >= p_fromLevel && h == p_mode && g < MAXATTACK ) {
                     for( u16 z = 0; z < rescnt; ++z )
                         if( g == p_result[ z ] )
@@ -707,15 +635,19 @@ NEXT:
     FS::close( f );
 }
 bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
-    FILE* f = FS::open( PKMNDATA_PATH, ( "/LEARNSETS/" + toString( p_pkmnId ) ).c_str( ), ".learnset.data" );
+    FILE* f = FS::open( (std::string(PKMNDATA_PATH) + "/LEARNSETS/").c_str(), p_pkmnId, ".learnset.data" );
     if( !f )
         return false;
 
+    u16 buffer[ 700 ];
+    fread( buffer, sizeof( u16 ), 699, f );
+    FS::close( f );
+    u16 ptr = 0;
+
     for( int i = 0; i <= 100; ++i ) {
-        int z; fscanf( f, "%d", &z );
+        int z = buffer[ ptr++ ];
         for( int j = 0; j < z; ++j ) {
-            u16 g, h;
-            fscanf( f, "%hd %hd", &g, &h );
+            u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
             if( g == p_moveId && h == p_mode )
                 return true;
         }

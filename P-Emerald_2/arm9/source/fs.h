@@ -44,6 +44,7 @@ namespace FS {
     bool exists( const char* p_path, const char* p_name );
     bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name = "" );
     FILE* open( const char* p_path, const char* p_name, const char* p_ext = ".raw", const char* p_mode = "r" );
+    FILE* open( const char* p_path, u16 p_value, const char* p_ext = ".raw", const char* p_mode = "r" );
     void close( FILE* p_file );
 
     // No, I'm absolutely not aware of templates.

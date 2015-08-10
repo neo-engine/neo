@@ -59,6 +59,8 @@ extern unsigned int TEMP[ 12288 ];
 extern unsigned short TEMP_PAL[ 256 ];
 
 #define NO_DATA "Keine Daten."
+#define FARAWAY_PLACE "Entfernter Ort"
+#define UNKNOWN_SPECIES "Unbekannt"
 
 #define loop() while( 1 )
 
