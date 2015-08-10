@@ -29,16 +29,27 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "mapSlice.h"
 #include "fs.h"
 #include "defines.h"
+#ifdef DEBUG
+#include "uio.h"
+#include "messageBox.h"
+#endif
 
 namespace MAP {
-    mapSlice::mapSlice( u8 p_map, u16 p_x, u16 p_y ) {
+    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y ) {
         FILE* mapF = FS::open( MAP_PATH,
                                ( toString( p_map )
                                + "/" + toString( p_x )
                                + "_" + toString( p_y ) ).c_str( ),
                                ".mgp" );
-        if( !mapF )
-            return;
+        if( !mapF ) {
+#ifdef DEBUG
+            sprintf( buffer, "Map %d/%d,%d does not exist.\n", p_map, p_x, p_y );
+            IO::messageBox m( buffer );
+            IO::drawSub( );
+#endif
+            return 0;
+        }
+        std::unique_ptr<mapSlice> res = std::unique_ptr<mapSlice>( new mapSlice );
 
         FS::readNop( mapF, 8 );
         u8 tsidx1, tsidx2;
@@ -51,15 +62,15 @@ namespace MAP {
         auto ts1st = toString( tsidx1 ).c_str( );
 
         FILE* tmp = FS::open( TILESET_PATH, ts1st, ".ts" );
-        FS::readTileSet( tmp, m_tileSet );
+        FS::readTileSet( tmp, res->m_tileSet );
         FS::close( tmp );
 
         tmp = FS::open( TILESET_PATH, ts1st, ".bvd" );
-        FS::readBlockSet( tmp, m_blockSet );
+        FS::readBlockSet( tmp, res->m_blockSet );
         FS::close( tmp );
 
         tmp = FS::open( TILESET_PATH, ts1st, ".p2l" );
-        FS::readPal( tmp, m_pals );
+        FS::readPal( tmp, res->m_pals );
         FS::close( tmp );
 
         //sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx1 );
@@ -69,15 +80,15 @@ namespace MAP {
         auto ts2st = toString( tsidx2 ).c_str( );
 
         tmp = FS::open( TILESET_PATH, ts2st, ".ts" );
-        FS::readTileSet( tmp, m_tileSet, 512 );
+        FS::readTileSet( tmp, res->m_tileSet, 512 );
         FS::close( tmp );
 
         tmp = FS::open( TILESET_PATH, ts2st, ".bvd" );
-        FS::readBlockSet( tmp, m_blockSet, 512 );
+        FS::readBlockSet( tmp, res->m_blockSet, 512 );
         FS::close( tmp );
 
         tmp = FS::open( TILESET_PATH, ts2st, ".p2l" );
-        FS::readPal( tmp, m_pals + 6 );
+        FS::readPal( tmp, res->m_pals + 6 );
         FS::close( tmp );
 
         //sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx2 );
@@ -85,10 +96,11 @@ namespace MAP {
 
 
         FS::readNop( mapF, 4 );
-        m_blocks.assign( SIZE, std::vector<MapBlockAtom>( SIZE ) );
+        res->m_blocks.assign( SIZE, std::vector<MapBlockAtom>( SIZE ) );
         for( u32 x = 0; x < SIZE; ++x )
-            fread( &m_blocks[ x ][ 0 ], sizeof( MapBlockAtom )*SIZE, 1, mapF );
+            fread( &res->m_blocks[ x ][ 0 ], sizeof( MapBlockAtom )*SIZE, 1, mapF );
         FS::close( mapF );
+        return res;
     }
 
     bool mapSlice::canMove( position p_start, direction p_direction, moveMode p_moveMode ) {

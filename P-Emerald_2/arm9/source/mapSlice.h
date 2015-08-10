@@ -28,6 +28,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #pragma once
 #include <nds/ndstypes.h>
 #include <vector>
+#include <memory>
 
 namespace MAP {
     const char* const MAP_PATH = "nitro:/MAPS/";
@@ -102,9 +103,7 @@ namespace MAP {
         u16         m_x, m_y;
         u16         m_location;
 
-        mapSlice( ) { }
-        mapSlice( u8 p_map, u16 p_x, u16 p_y );
-        
         bool canMove( position p_start, direction p_direction, moveMode p_moveMode = WALK );
     };
+    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y );
 }

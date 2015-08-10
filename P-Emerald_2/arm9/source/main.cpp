@@ -260,6 +260,15 @@ void initTimeAndRnd( ) {
     LastPID = rand( );
 }
 
+void defaultScrns( ) {
+    consoleSelect( &IO::Top );
+    consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+    consoleClear( );
+    consoleSelect( &IO::Bottom );
+    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+    consoleClear( );
+}
+
 int main( int, char** p_argv ) {
     //Init
     powerOn( POWER_ALL_2D );
@@ -335,9 +344,9 @@ int main( int, char** p_argv ) {
     initMainSprites( );
     IO::drawSub( );
 
-  //  curMap = new MAP::mapDrawer( FS::SAV->m_currentMap, FS::SAV->m_player );
-  //  curMap->draw( );
-   // ANIMATE_MAP = true;
+    curMap = new MAP::mapDrawer( FS::SAV->m_currentMap, FS::SAV->m_player );
+    curMap->draw( );
+    ANIMATE_MAP = true;
 
     touchPosition touch;
     loop( ) {
@@ -345,20 +354,18 @@ int main( int, char** p_argv ) {
         touchRead( &touch );
         int pressed = keysUp( ), held = keysHeld( );
 
+#ifdef DEBUG
         if( held & KEY_L && gMod == DEVELOPER ) {
-            u32 KEYS_CUR = ( ( ( ( ~REG_KEYINPUT ) & 0x3ff ) | ( ( ( ~__transferRegion( )->buttons ) & 3 ) << 10 ) | ( ( ( ~__transferRegion( )->buttons ) << 6 ) & ( KEY_TOUCH | KEY_LID ) ) ) ^ KEY_LID );
-
-            std::sprintf( buffer, "Keys: %lu, H: %lu, D: %lu, U: %lu, C: %lu",
-                          KEYS_CUR,
-                          keysHeld( ),
-                          keysDown( ),
-                          keysUp( ),
-                          keysCurrent( ) );
+            std::sprintf( buffer, "Currently at (%hu,%hu,%hu).",                          
+                          FS::SAV->m_player.m_pos.m_posX, 
+                          FS::SAV->m_player.m_pos.m_posY, 
+                          FS::SAV->m_player.m_pos.m_posZ );
             IO::messageBox m( buffer );
 
             initMainSprites( );
             IO::drawSub( );
         }
+#endif
 
         if( pressed & KEY_A ) {
             for( u8 i = 0; i < 6; ++i ) {
@@ -428,13 +435,8 @@ OUT:
             UPDATE_TIME = false;
 
             bv.run( FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
-
-            consoleSelect( &IO::Top );
-            consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
-            consoleClear( );
-            consoleSelect( &IO::Bottom );
-            consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-            consoleClear( );
+            
+            defaultScrns( );
             IO::drawSub( );
             UPDATE_TIME = true;
             initMainSprites( );
@@ -459,12 +461,7 @@ OUT:
             for( u8 i = 0; i < tmp.size( ); ++i )
                 FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
 
-            consoleSelect( &IO::Top );
-            consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
-            consoleClear( );
-            consoleSelect( &IO::Bottom );
-            consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-            consoleClear( );
+            defaultScrns( );
             IO::drawSub( );
             initMainSprites( );
             curMap->draw( );
@@ -474,13 +471,7 @@ OUT:
             ANIMATE_MAP = false;
             dx.run( dui.currPkmn( ) );
 
-            consoleSelect( &IO::Top );
-            consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
-            consoleClear( );
-            consoleSelect( &IO::Bottom );
-            consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-            consoleClear( );
-
+            defaultScrns( );
             initMainSprites( );
             curMap->draw( );
             ANIMATE_MAP = true;

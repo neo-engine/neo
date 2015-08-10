@@ -27,6 +27,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #pragma once
 #include <map>
+#include <memory>
 
 #include "mapSlice.h"
 #include "mapObject.h"
@@ -34,7 +35,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 namespace MAP {
     class mapDrawer {
     private:
-        mapSlice    _slices[ 2 ][ 2 ];  //[x][y]
+        std::unique_ptr<mapSlice> _slices[ 2 ][ 2 ] = { { 0 } };  //[x][y]
         u8          _curX, _curY;       //Current main slice from the _slices array
         std::map<std::pair<u16,u16>, std::vector<mapObject>>
             _mapObjs;
@@ -50,6 +51,8 @@ namespace MAP {
         void handleWarp( );
         void handleWildPkmn( );
         void handleTrainer( );
+
+        MapBlockAtom at( u16 p_x, u16 p_y ) const;
     public:
         mapDrawer( u8 p_currentMap, mapObject& p_player );
 
@@ -62,7 +65,7 @@ namespace MAP {
         void stopPlayer( mapSlice::direction p_direction );
         void changeMoveMode( mapSlice::moveMode p_newMode );
 
-        u16  getCurrentLocationId( );
+        u16  getCurrentLocationId( ) const;
     };
 
     extern mapDrawer* curMap;

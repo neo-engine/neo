@@ -36,6 +36,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #undef _EMULATOR
 #define VERSION "0.5"
 #define VERSION_NAME "Fighting Torchic"
+#define DEBUG
 
 enum GameMod : u8 {
     DEVELOPER,
