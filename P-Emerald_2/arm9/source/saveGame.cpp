@@ -45,9 +45,6 @@ namespace FS {
     saveGame* SAV;
 
 #define PKMN_DATALENGTH 128
-
-    extern "C"{ extern long hexdec( unsigned const char *p_hex ); }
-
     BAG::bag* readBag( FILE* p_file ) {
         BAG::bag* result = new BAG::bag( );
 

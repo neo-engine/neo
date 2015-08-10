@@ -102,27 +102,24 @@ namespace MAP {
             return true;
 
         //Gather data about the source block
-        u8 lstMoveData, lstBehave, lstBckgnd;
+        u8 lstMoveData, lstBehave;
         if( nx / SIZE != p_start.m_posX / SIZE
             || ny / SIZE != p_start.m_posY / SIZE ) {
             lstMoveData = 0;
             lstBehave = 0;
-            lstBckgnd = 0;
         } else {
             lstMoveData = m_blocks[ p_start.m_posX % SIZE ][ p_start.m_posY % SIZE ].m_movedata;
 
             auto lstBlock = m_blockSet.m_blocks[ m_blocks[ p_start.m_posX % SIZE ][ p_start.m_posY % SIZE ].m_blockidx ];
             lstBehave = lstBlock.m_bottombehave;
-            lstBckgnd = lstBlock.m_topbehave;
         }
 
         //Gather data about the destination block
-        u8 curMoveData, curBehave, curBckgnd;
+        u8 curMoveData, curBehave;
         curMoveData = m_blocks[ nx % SIZE ][ ny % SIZE ].m_movedata;
 
         auto curBlock = m_blockSet.m_blocks[ m_blocks[ nx % SIZE ][ ny % SIZE ].m_blockidx ];
         curBehave = curBlock.m_bottombehave;
-        curBckgnd = curBlock.m_topbehave;
 
         //Check for special block attributes
         switch( lstBehave ) {

@@ -13,7 +13,7 @@ namespace DEX {
         u32 runPKMNPage( );
     public:
         dex( u16 p_maxPkmn, dexUI* p_dexUI )
-            : _maxPkmn( p_maxPkmn ), _dexUI( p_dexUI ) { }
+            : _dexUI( p_dexUI ), _maxPkmn( p_maxPkmn ) { }
         ~dex( ) {
             delete _dexUI;
         }

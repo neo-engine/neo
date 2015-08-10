@@ -13,7 +13,7 @@
 namespace BAG {
 #define TRESHOLD 10
     bagViewer::bagViewer( bag* p_bag, bagUI* p_bagUI )
-        :_bagUI( p_bagUI ), _origBag( p_bag ) {
+        : _origBag( p_bag ), _bagUI( p_bagUI ) {
         _currPage = 0;
         _currItem = 0;
         _currCmp = std::less<std::pair<u16, u16>>( );

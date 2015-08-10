@@ -81,9 +81,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="arm9\include\nitrofs.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\unistd.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
@@ -206,12 +203,6 @@
     <ClCompile Include="arm9\source\buffer.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\include\hex2dec.c">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\include\nitrofs.c">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\Bag.cpp">
       <Filter>Source Files\arm9\bag</Filter>
     </ClCompile>
@@ -303,7 +294,7 @@
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\mapDrawer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\arm9\map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

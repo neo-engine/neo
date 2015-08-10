@@ -35,12 +35,25 @@ namespace MAP {
         return s8( ( p_pos % SIZE >= SIZE / 2 ) ? 1 : -1 );
     }
 
-    void mapDrawer::draw( u16 p_globX, u16 p_globY, bool p_init ) { }
+    void mapDrawer::draw( u16 p_globX, u16 p_globY, bool p_init ) {
+        (void)p_globX;
+        (void)p_globY;
+        (void)p_init;
+    }
 
-    void mapDrawer::moveCamera( mapSlice::direction p_direction ) { }
+    void mapDrawer::moveCamera( mapSlice::direction p_direction ) { 
+        (void)p_direction;
+    }
 
-    void mapDrawer::loatSlice( u8 p_x, u8 p_y, u16 p_sliceX, u16 p_sliceY ) { }
-    void mapDrawer::loadSlice( mapSlice::direction p_direction ) { }
+    void mapDrawer::loatSlice( u8 p_x, u8 p_y, u16 p_sliceX, u16 p_sliceY ) {
+        (void)p_sliceX;
+        (void)p_sliceY;
+        (void)p_x;
+        (void)p_y;
+    }
+    void mapDrawer::loadSlice( mapSlice::direction p_direction ) {
+        (void)p_direction;
+    }
 
     void mapDrawer::handleWarp( ) { }
     void mapDrawer::handleWildPkmn( ) { }
@@ -63,11 +76,20 @@ namespace MAP {
     bool mapDrawer::canMove( mapSlice::position p_start,
                              mapSlice::direction p_direction,
                              mapSlice::moveMode p_moveMode ) {
+        (void)p_start;
+        (void)p_direction;
+        (void)p_moveMode;
         return false;
     }
-    void mapDrawer::movePlayer( mapSlice::direction p_direction ) { }
-    void mapDrawer::stopPlayer( mapSlice::direction p_direction ) { }
-    void mapDrawer::changeMoveMode( mapSlice::moveMode p_newMode ) { }
+    void mapDrawer::movePlayer( mapSlice::direction p_direction ) {
+        (void)p_direction;
+    }
+    void mapDrawer::stopPlayer( mapSlice::direction p_direction ) {
+        (void)p_direction;
+    }
+    void mapDrawer::changeMoveMode( mapSlice::moveMode p_newMode ) { 
+        m_player.m_movement = p_newMode;
+    }
 
     u16  mapDrawer::getCurrentLocationId( ) {
         return _slices[ _curX ][ _curY ].m_location;

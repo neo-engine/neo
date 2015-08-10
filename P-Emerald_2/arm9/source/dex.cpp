@@ -7,7 +7,7 @@
 
 namespace DEX {
 #define MAX_PAGES 3
-    const u8 dexsppos[ 2 ][ 9 ] = { { 160, 128, 96, 19, 6, 120, 158, 196, 8 }, { -16, 0, 24, 138, 173, 108, 126, 144, 32 } };
+    const u8 dexsppos[ 2 ][ 9 ] = { { 160, 128, 96, 19, 6, 120, 158, 196, 8 }, { u8(-16), 0, 24, 138, 173, 108, 126, 144, 32 } };
 
     void dex::run( u16 p_pkmnIdx ) {
         if( !_dexUI ) {

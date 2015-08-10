@@ -128,7 +128,9 @@ public:
           m_moveAffectsWhom( p_moveAffectsWhom ),
           m_movePriority( p_movePriority ),
           m_moveFlags( p_moveFlags ),
-          m_moveHitType( p_moveHitType ) { }
+          m_moveHitType( p_moveHitType ) {
+        (void)p_moveEffect;
+    }
 
     ~move( ) { }
 

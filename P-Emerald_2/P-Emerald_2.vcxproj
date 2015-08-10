@@ -13,7 +13,6 @@
   <ItemGroup>
     <ClInclude Include="arm7\include\ipc.h" />
     <ClInclude Include="arm9\include\libnds_internal.h" />
-    <ClInclude Include="arm9\include\nitrofs.h" />
     <ClInclude Include="arm9\include\unistd.h" />
     <ClInclude Include="arm9\source\ability.h" />
     <ClInclude Include="arm9\source\bag.h" />
@@ -53,8 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c" />
-    <ClCompile Include="arm9\include\hex2dec.c" />
-    <ClCompile Include="arm9\include\nitrofs.c" />
     <ClCompile Include="arm9\source\Bag.cpp" />
     <ClCompile Include="arm9\source\bagUI.cpp" />
     <ClCompile Include="arm9\source\bagViewer.cpp" />

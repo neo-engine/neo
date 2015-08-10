@@ -766,15 +766,15 @@ namespace STS {
 
         if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].isHidden = false;
-            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].y = u16( -4 );
-            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].x = u16( -8 );
+            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].y = static_cast<u16>( 256-4 );
+            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].x = static_cast<u16>( 512-8 );
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].priority = OBJPRIORITY_1;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].isHidden = false;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].y = 18;
-            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].x = u16( -8 );
+            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].x = static_cast<u16>( 512-8 );
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].priority = OBJPRIORITY_1;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].isHidden = false;
-            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].y = u16( -8 );
+            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].y = static_cast<u16>( 256-8 );
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].x = 14;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].priority = OBJPRIORITY_1;
 

@@ -29,7 +29,7 @@
 
 #include <nds.h>
 #include <fat.h>
-#include "nitrofs.h"
+#include <filesystem.h>
 
 #include "libnds_internal.h"
 
@@ -260,12 +260,12 @@ void initTimeAndRnd( ) {
     LastPID = rand( );
 }
 
-int main( int p_argc, char** p_argv ) {
+int main( int, char** p_argv ) {
     //Init
     powerOn( POWER_ALL_2D );
 
     fatInitDefault( );
-    nitroFSInit( p_argv[ 0 ] );
+    nitroFSInit( p_argv );
 
 
     irqEnable( IRQ_VBLANK );

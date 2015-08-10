@@ -814,7 +814,7 @@ namespace gen3 {
         return '\0';
     }
 
-    /* void convertgen3pkmtogen5(void * gbapkm, void * pkm)
+     void convertgen3pkmtogen5(void * gbapkm, void * pkm)
      {
      std::ostringstream o;
      o

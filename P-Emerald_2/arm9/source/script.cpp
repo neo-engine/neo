@@ -269,15 +269,15 @@ namespace BATTLE {
 
     void battleScript::command::evaluateOnTargetVal( battle& p_battle, void* p_self, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition ) const {
 
-        target t;
-        if( p_targetIsOpp && p_targetPosition )
-            t = OPPONENT2;
-        if( p_targetIsOpp && !p_targetPosition )
-            t = OPPONENT1;
-        if( !p_targetIsOpp && p_targetPosition )
-            t = OWN2;
-        if( !p_targetIsOpp && !p_targetPosition )
-            t = OWN1;
+        //target t;
+        //if( p_targetIsOpp && p_targetPosition )
+        //    t = OPPONENT2;
+        //if( p_targetIsOpp && !p_targetPosition )
+        //    t = OPPONENT1;
+        //if( !p_targetIsOpp && p_targetPosition )
+        //    t = OWN2;
+        //if( !p_targetIsOpp && !p_targetPosition )
+        //    t = OWN1;
 
         switch( m_action ) {
             case BATTLE::battleScript::command::ADD:

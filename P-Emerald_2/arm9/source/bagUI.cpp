@@ -548,8 +548,8 @@ namespace BAG {
             updateSelectedIdx( oldSelIdx );
         }
 
-        u16 sz = _bag[ _currPage ].size( );
-        item* currItem = ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ];
+        //u16 sz = _bag[ _currPage ].size( );
+        //item* currItem = ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ];
 
         return 0;
     }

@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : battle.cpp
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -591,7 +591,8 @@ NEXT:
     void battle::megaEvolve( bool p_opponent, u8 p_pokemonPos ) {
         if( !_allowMegaEvolution )
             return;
-
+        (void)p_opponent;
+        (void)p_pokemonPos;
         //TODO
     }
 

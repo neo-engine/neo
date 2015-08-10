@@ -181,13 +181,13 @@ bool transferGame( ) {
     IO::drawSub( );
     IO::yesNoBox yn = IO::yesNoBox( );
     if( yn.getResult( "Möchtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?" ) ) {
-        IO::messageBox( "Solltest du im Folgenden\nspeichern, so werden Daten\nauf das GBA-Modul geschrieben.", false, false );
-        IO::messageBox( "Bitte entferne daher das\nGBA-Modul nicht, es könnte\nden Spielstand beschädigen.", false, false );
-        IO::messageBox( "Auch das Speichern an sich\nkann den Spielstand\nbeschädigen.", false, false );
+        IO::messageBox( "Solltest du im Folgenden\nspeichern, so werden Daten\nauf das GBA-Modul geschrieben." );
+        IO::messageBox( "Bitte entferne daher das\nGBA-Modul nicht, es könnte\nden Spielstand beschädigen." );
+        IO::messageBox( "Auch das Speichern an sich\nkann den Spielstand\nbeschädigen." );
         yn = IO::yesNoBox( );
         if( yn.getResult( "Möchtest du fortfahren?" ) ) {
             IO::messageBox( "Lade Spielstand..." );
-            int loadgame = acgame > 2 ? 1 : 0;
+            //int loadgame = acgame > 2 ? 1 : 0;
 
             // gen3::SaveParser* save3 = gen3::SaveParser::Instance( );
 

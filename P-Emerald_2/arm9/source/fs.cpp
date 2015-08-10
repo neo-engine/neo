@@ -46,15 +46,16 @@ const char PKMNDATA_PATH[ ] = "nitro:/PKMNDATA/";
 const char ABILITYDATA_PATH[ ] = "nitro:/PKMNDATA/ABILITIES/";
 
 ability::ability( int p_abilityId ) {
-    sprintf( buffer, "nitro:/PKMNDATA/ABILITIES/%i.data", p_abilityId );
-    FILE* f = fopen( buffer, "r" );
+    FILE* f = FS::open( "nitro:/PKMNDATA/ABILITIES/", p_abilityId, ".data" );
 
     if( !f )
         return;
 
     m_abilityName = FS::readString( f, true );
     m_flavourText = FS::readString( f, true );
-    fscanf( f, "%u", &( m_type ) );
+    u32 tmp;
+    fscanf( f, "%lu", &tmp );
+    m_type = static_cast<ability::abilityType>( tmp );
     FS::close( f );
 }
 
@@ -143,13 +144,8 @@ namespace FS {
         if( !readData( p_path, p_name, (unsigned int)p_tileCnt, TEMP, (unsigned short)p_palCnt, TEMP_PAL ) )
             return false;
 
-        if( p_bottom ) {
-            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[ p_spriteInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ], 4 * p_tileCnt );
-            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[ p_spriteInfo->m_entry->palette * IO::COLORS_PER_PALETTE ], 2 * p_palCnt );
-        } else {
-            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_spriteInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ], 4 * p_tileCnt );
-            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ p_spriteInfo->m_entry->palette * IO::COLORS_PER_PALETTE ], 2 * p_palCnt );
-        }
+        IO::copySpriteData( TEMP, p_spriteInfo->m_entry->gfxIndex, 4 * p_tileCnt, p_bottom );
+        IO::copySpritePal( TEMP_PAL, p_spriteInfo->m_entry->palette, 2 * p_palCnt, p_bottom );
         return true;
     }
 
@@ -568,8 +564,8 @@ const char* getSpecies( u16 p_pkmnId ) {
 }
 
 bool getAll( u16 p_pkmnId, pokemonData& p_out ) {
-    FILE* f = FS::open( PKMNDATA_PATH,  p_pkmnId , ".data" );
-    if( f == 0 ) 
+    FILE* f = FS::open( PKMNDATA_PATH, p_pkmnId, ".data" );
+    if( f == 0 )
         return false;
 
     fread( &p_out, sizeof( pokemonData ), 1, f );
@@ -635,7 +631,7 @@ NEXT:
     FS::close( f );
 }
 bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
-    FILE* f = FS::open( (std::string(PKMNDATA_PATH) + "/LEARNSETS/").c_str(), p_pkmnId, ".learnset.data" );
+    FILE* f = FS::open( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId, ".learnset.data" );
     if( !f )
         return false;
 
@@ -670,8 +666,10 @@ bool item::load( ) {
         return false;
 
     memset( &m_itemData, 0, sizeof( itemData ) );
-    fscanf( f, "%hhu %lu %lu\n", &m_itemData.m_itemEffectType,
+    u8 tmp;
+    fscanf( f, "%hhu %lu %lu\n", &tmp,
             &m_itemData.m_price, &m_itemData.m_itemEffect );
+    m_itemData.m_itemEffectType = static_cast<item::itemEffectType>( tmp );
     strcpy( m_itemData.m_itemDisplayName, FS::readString( f, true ).c_str( ) );
     strcpy( m_itemData.m_itemDescription, FS::readString( f, true ).c_str( ) );
     strcpy( m_itemData.m_itemShortDescr, FS::readString( f, true ).c_str( ) );
@@ -687,16 +685,20 @@ bool berry::load( ) {
         return false;
 
     memset( &m_itemData, 0, sizeof( itemData ) );
-    fscanf( f, "%hhu %lu %lu\n", &m_itemData.m_itemEffectType,
+    u8 tmp;
+    fscanf( f, "%hhu %lu %lu\n", &tmp,
             &m_itemData.m_price, &m_itemData.m_itemEffect );
+    m_itemData.m_itemEffectType = static_cast<item::itemEffectType>( tmp );
     strcpy( m_itemData.m_itemDisplayName, FS::readString( f, true ).c_str( ) );
     strcpy( m_itemData.m_itemDescription, FS::readString( f, true ).c_str( ) );
     strcpy( m_itemData.m_itemShortDescr, FS::readString( f, true ).c_str( ) );
 
     memset( &m_berryData, 0, sizeof( berryData ) );
-    fscanf( f, "%hu %hhu %hhu %hhu", &m_berryData.m_berrySize,
-            &m_berryData.m_berryGuete, &m_berryData.m_naturalGiftType,
-            &m_berryData.m_naturalGiftStrength );
+    fscanf( f, "%hu %hhu", &m_berryData.m_berrySize, &tmp );
+    m_berryData.m_berryGuete = static_cast<berry::berryGueteType>( tmp );
+    fscanf( f, "%hhu %hhu", &tmp, &m_berryData.m_naturalGiftStrength );
+    m_berryData.m_naturalGiftType = static_cast<Type>( tmp );
+
     for( u8 i = 0; i < 5; ++i )
         fscanf( f, "%hhu", &m_berryData.m_berryTaste[ i ] );
     fscanf( f, "%hhu %hhu %hhu", &m_berryData.m_hoursPerGrowthStage,

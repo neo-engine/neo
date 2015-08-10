@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : sprite.cpp
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description : Some sprite code.
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -107,18 +107,11 @@ namespace IO {
     };
 
 
-    [[ deprecated( "Use the methods of IO instead." ) ]]
     const u8 SPRITE_DMA_CHANNEL = 2;
-
-    [[ deprecated( "Use the methods of IO instead." ) ]]
     const u16 BYTES_PER_16_COLOR_TILE = 32;
-    [[ deprecated( "Use the methods of IO instead." ) ]]
     const u16 COLORS_PER_PALETTE = 16;
-    [[ deprecated( "Use the methods of IO instead." ) ]]
     const u16 BOUNDARY_VALUE = 32;
-    [[ deprecated( "Use the methods of IO instead." ) ]]
     const u16 OFFSET_MULTIPLIER = ( BOUNDARY_VALUE / sizeof( SPRITE_GFX[ 0 ] ) );
-    [[ deprecated( "Use the methods of IO instead." ) ]]
     const u16 OFFSET_MULTIPLIER_SUB = ( BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] ) );
 
     void updateOAM( bool p_bottom ) {
@@ -219,6 +212,22 @@ namespace IO {
         p_spriteEntry->priority = p_priority;
     }
 
+    void copySpritePal( const unsigned short *p_spritePal, const u8 p_palIdx, bool p_bottom ) {
+        copySpritePal( p_spritePal, p_palIdx, 32, p_bottom );
+    }
+    void copySpritePal( const unsigned short *p_spritePal, const u8 p_palIdx, const u16 p_palLen, bool p_bottom ) {
+        if( !p_bottom && p_spritePal )
+            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE[ p_palIdx * COLORS_PER_PALETTE ], p_palLen );
+        else if( p_spritePal )
+            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE_SUB[ p_palIdx * COLORS_PER_PALETTE ], p_palLen );
+    }
+    void copySpriteData( const unsigned int *p_spriteData, const u16 p_tileIdx, const u32 p_spriteDataLen, bool p_bottom ) {
+        if( !p_bottom&& p_spriteData )
+            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER ], p_spriteDataLen );
+        else if( p_spriteData )
+            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER_SUB ], p_spriteDataLen );
+    }
+
     u16 loadSprite( const u8    p_oamIdx,
                     const u8    p_palIdx,
                     const u16   p_tileIdx,
@@ -267,17 +276,8 @@ namespace IO {
                               ( ( maxSize == 32 ) ? OBJSIZE_32 :
                               ( ( maxSize == 16 ) ? OBJSIZE_16 : OBJSIZE_8 ) ) );
 
-        if( !p_bottom ) {
-            if( p_spritePal )
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE[ p_palIdx * COLORS_PER_PALETTE ], 32 );
-            if( p_spriteData )
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER ], p_spriteDataLen );
-        } else {
-            if( p_spritePal )
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal, &SPRITE_PALETTE_SUB[ p_palIdx * COLORS_PER_PALETTE ], 32 );
-            if( p_spriteData )
-                dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER_SUB ], p_spriteDataLen );
-        }
+        copySpriteData( p_spriteData, p_tileIdx, p_spriteDataLen, p_bottom );
+        copySpritePal( p_spritePal, p_palIdx, p_bottom );
         return p_tileIdx + ( p_spriteDataLen / BYTES_PER_16_COLOR_TILE );
     }
 

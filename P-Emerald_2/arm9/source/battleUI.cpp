@@ -262,6 +262,8 @@ namespace BATTLE {
     }
 
     void loadSpritesTop( battle* p_battle ) {
+        (void)p_battle;
+
         videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
         IO::bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
         IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
@@ -875,6 +877,8 @@ END:
     }
 
     u16 battleUI::chooseItem( u8 p_pokemonPos ) {
+        //TODO
+        (void)p_pokemonPos;
         u8 result = 0;
 
         // Make this a debug battle end
@@ -1617,11 +1621,13 @@ CLEAR:
     }
 
     void battleUI::updateStatus( bool p_opponent, u8 p_pokemonPos ) {
-
+        (void)p_opponent;
+        (void)p_pokemonPos;
     }
 
     void battleUI::showStatus( bool p_opponent, u8 p_pokemonPos ) {
-
+        (void)p_opponent;
+        (void)p_pokemonPos;
     }
 
     void battleUI::hidePKMN( bool p_opponent, u8 p_pokemonPos ) {
@@ -1695,48 +1701,48 @@ CLEAR:
         type1->priority = OBJPRIORITY_0;
         type1->palette = p_palCnt;
 
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall1Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall1Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall1TilesLen );
+        IO::copySpritePal( PokeBall1Pal, p_palCnt, false );
+        IO::copySpriteData( PokeBall1Tiles, p_tileCnt, PokeBall1TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall2Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall2TilesLen );
+        IO::copySpriteData( PokeBall2Tiles, p_tileCnt, PokeBall2TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall3Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall3TilesLen );
+        IO::copySpriteData( PokeBall3Tiles, p_tileCnt, PokeBall3TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall4Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall4TilesLen );
+        IO::copySpriteData( PokeBall4Tiles, p_tileCnt, PokeBall4TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall5Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall5TilesLen );
+        IO::copySpriteData( PokeBall5Tiles, p_tileCnt, PokeBall5TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall6Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall6TilesLen );
+        IO::copySpriteData( PokeBall6Tiles, p_tileCnt, PokeBall6TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall7Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall7TilesLen );
+        IO::copySpriteData( PokeBall7Tiles, p_tileCnt, PokeBall7TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall8Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall8TilesLen );
+        IO::copySpriteData( PokeBall8Tiles, p_tileCnt, PokeBall8TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall9Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall9TilesLen );
+        IO::copySpriteData( PokeBall9Tiles, p_tileCnt, PokeBall9TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall10Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall10TilesLen );
+        IO::copySpriteData( PokeBall10Tiles, p_tileCnt, PokeBall10TilesLen, false );;
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, PokeBall11Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], PokeBall11TilesLen );
+        IO::copySpriteData( PokeBall11Tiles, p_tileCnt, PokeBall11TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 3; ++i )
             swiWaitForVBlank( );
@@ -1760,13 +1766,13 @@ CLEAR:
         type1->priority = OBJPRIORITY_0;
         type1->palette = p_palCnt;
 
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny1TilesLen );
+        IO::copySpritePal( Shiny1Pal, p_palCnt, false );
+        IO::copySpriteData( Shiny1Tiles, p_tileCnt, Shiny1TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny2TilesLen );
+        IO::copySpritePal( Shiny2Pal, p_palCnt, false );
+        IO::copySpriteData( Shiny2Tiles, p_tileCnt, Shiny2TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
@@ -1795,33 +1801,33 @@ CLEAR:
         type1->priority = OBJPRIORITY_0;
         type1->palette = p_palCnt;
 
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny1TilesLen );
+        IO::copySpritePal( Shiny1Pal, p_palCnt, false );
+        IO::copySpriteData( Shiny1Tiles, p_tileCnt, Shiny1TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny2TilesLen );
+        IO::copySpritePal( Shiny2Pal, p_palCnt, false );
+        IO::copySpriteData( Shiny2Tiles, p_tileCnt, Shiny2TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny1TilesLen );
+        IO::copySpritePal( Shiny1Pal, p_palCnt, false );
+        IO::copySpriteData( Shiny1Tiles, p_tileCnt, Shiny1TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny2TilesLen );
+        IO::copySpritePal( Shiny2Pal, p_palCnt, false );
+        IO::copySpriteData( Shiny2Tiles, p_tileCnt, Shiny2TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny1Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny1TilesLen );
+        IO::copySpritePal( Shiny1Pal, p_palCnt, false );
+        IO::copySpriteData( Shiny1Tiles, p_tileCnt, Shiny1TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Pal, &SPRITE_PALETTE[ (p_palCnt)* IO::COLORS_PER_PALETTE ], 32 );
-        dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, Shiny2Tiles, &SPRITE_GFX[ p_tileCnt * IO::OFFSET_MULTIPLIER ], Shiny2TilesLen );
+        IO::copySpritePal( Shiny2Pal, p_palCnt, false );
+        IO::copySpriteData( Shiny2Tiles, p_tileCnt, Shiny2TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 2; ++i )
             swiWaitForVBlank( );

@@ -37,15 +37,7 @@ namespace IO {
     extern const unsigned short* TypePals[ 19 ];
     extern const unsigned int* HitTypeTiles[ 3 ];
     extern const unsigned short* HitTypePals[ 3 ];
-
-    extern const u8 SPRITE_DMA_CHANNEL;
-
-    extern const u16 BYTES_PER_16_COLOR_TILE;
-    extern const u16 COLORS_PER_PALETTE;
-    extern const u16 BOUNDARY_VALUE;
-    extern const u16 OFFSET_MULTIPLIER;
-    extern const u16 OFFSET_MULTIPLIER_SUB;
-
+    
     struct SpriteInfo {
         u8 m_oamId;
         u8 m_width;
@@ -89,6 +81,10 @@ namespace IO {
 
     inline void setSpritePosition( SpriteEntry* p_spriteEntry, u16 p_x = 0, u16 p_y = 0 );
     inline void setSpritePriority( SpriteEntry* p_spriteEntry, ObjPriority p_priority );
+
+    void copySpritePal( const unsigned short *p_spritePal, const u8 p_palIdx, bool p_bottom );
+    void copySpritePal( const unsigned short *p_spritePal, const u8 p_palIdx, const u16 p_palLen, bool p_bottom );
+    void copySpriteData( const unsigned int *p_spriteData, const u16 p_tileIdx, const u32 p_spriteDataLen, bool p_bottom );
 
     u16 loadSprite( const u8 p_oamIdx, const u8 p_palIdx, const u16 p_tileIdx, const u16 p_posX, const u16 p_posY,
                     const u8 p_width, const u8 p_height, const unsigned short* p_spritePal, const unsigned int* p_spriteData,
