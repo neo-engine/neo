@@ -30,7 +30,7 @@ class startScreen {
 private:
 
     enum ChoiceResult {
-        CONTINUE,
+        CONTINUE = 1,
         NEW_GAME,
         OPTIONS,
         GEHEIMGESCHEHEN,

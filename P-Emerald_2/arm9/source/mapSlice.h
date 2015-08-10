@@ -102,6 +102,7 @@ namespace MAP {
         u16         m_x, m_y;
         u16         m_location;
 
+        mapSlice( ) { }
         mapSlice( u8 p_map, u16 p_x, u16 p_y );
         
         bool canMove( position p_start, direction p_direction, moveMode p_moveMode = WALK );

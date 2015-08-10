@@ -332,11 +332,12 @@ int main( int p_argc, char** p_argv ) {
         IO::boldFont->setColor( oldC1, 1 );
         IO::boldFont->setColor( oldC2, 2 );
     } );
-    curMap = new MAP::mapDrawer( FS::SAV->m_currentMap, FS::SAV->m_player );
-    curMap->draw( );
-    ANIMATE_MAP = true;
     initMainSprites( );
     IO::drawSub( );
+
+  //  curMap = new MAP::mapDrawer( FS::SAV->m_currentMap, FS::SAV->m_player );
+  //  curMap->draw( );
+   // ANIMATE_MAP = true;
 
     touchPosition touch;
     loop( ) {
@@ -376,7 +377,7 @@ int main( int p_argc, char** p_argv ) {
                                 IO::drawSub( );
                                 sprintf( buffer, "%ls setzt %s\nein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
                                 IO::messageBox( buffer, true );
-                                shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
+                                //shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
                                 AttackList[ a.m_boxdata.m_moves[ i ] ]->use( );
                             }
                             IO::drawSub( );

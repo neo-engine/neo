@@ -84,7 +84,7 @@ void drawSplash( ) {
 
     BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
 
-    printf( "@ Philip Wellnitz   2012 - 2015\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+    printf( "@ Philip Wellnitz 2012 - 2015\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
 
     if( gMod == DEVELOPER )
         printf( "                   %10sdev\n", VERSION );
@@ -213,85 +213,85 @@ bool transferGame( ) {
 
             // FS::SAV->m_gba.m_gameid = ( save3->unpackeddata[ 0xaf ] << 24 ) | ( save3->unpackeddata[ 0xae ] << 16 ) | ( save3->unpackeddata[ 0xad ] << 8 ) | save3->unpackeddata[ 0xac ];
 
-        /*    pokemonData p;
-            for( u8 i = 0; i < 6; ++i ) {
+            /*    pokemonData p;
+                for( u8 i = 0; i < 6; ++i ) {
                 if( save3->pokemon[ i ]->personality ) {
 
-                    pokemon &acPkmn = FS::SAV->m_pkmnTeam[ i ];
-                      gen3::belt_pokemon_t* &acBeltP = save3->pokemon[ i ];
+                pokemon &acPkmn = FS::SAV->m_pkmnTeam[ i ];
+                gen3::belt_pokemon_t* &acBeltP = save3->pokemon[ i ];
 
 
-                    acPkmn.m_boxdata.m_pid = acBeltP->personality;
-                    acPkmn.m_boxdata.m_oTSid = acBeltP->otid >> 16;
-                    acPkmn.m_boxdata.m_oTId = acBeltP->otid % ( 1 << 16 );
-                    for( int i = 0; i < 10; ++i )
-                        acPkmn.m_boxdata.m_name[ i ] = gen3::getNText( acBeltP->name[ i ] );
-                    acPkmn.m_boxdata.m_name[ 10 ] = 0;
-                    acPkmn.m_boxdata.m_hometown = acBeltP->language;
-                    for( int i = 0; i < 7; ++i )
-                        acPkmn.m_boxdata.m_oT[ i ] = gen3::getNText( acBeltP->otname[ i ] );
-                    acPkmn.m_boxdata.m_oT[ 7 ] = 0;
-                    acPkmn.m_boxdata.m_markings = acBeltP->markint;
+                acPkmn.m_boxdata.m_pid = acBeltP->personality;
+                acPkmn.m_boxdata.m_oTSid = acBeltP->otid >> 16;
+                acPkmn.m_boxdata.m_oTId = acBeltP->otid % ( 1 << 16 );
+                for( int i = 0; i < 10; ++i )
+                acPkmn.m_boxdata.m_name[ i ] = gen3::getNText( acBeltP->name[ i ] );
+                acPkmn.m_boxdata.m_name[ 10 ] = 0;
+                acPkmn.m_boxdata.m_hometown = acBeltP->language;
+                for( int i = 0; i < 7; ++i )
+                acPkmn.m_boxdata.m_oT[ i ] = gen3::getNText( acBeltP->otname[ i ] );
+                acPkmn.m_boxdata.m_oT[ 7 ] = 0;
+                acPkmn.m_boxdata.m_markings = acBeltP->markint;
 
-                    acPkmn.m_statusint = acBeltP->status;
-                    acPkmn.m_Level = acBeltP->level;
-                    acPkmn.m_boxdata.m_pokerus = acBeltP->pokerus;
+                acPkmn.m_statusint = acBeltP->status;
+                acPkmn.m_Level = acBeltP->level;
+                acPkmn.m_boxdata.m_pokerus = acBeltP->pokerus;
 
-                    acPkmn.m_stats.m_acHP = acBeltP->currentHP;
-                    acPkmn.m_stats.m_maxHP = acBeltP->maxHP;
-                    acPkmn.m_stats.m_Atk = acBeltP->move;
-                    acPkmn.m_stats.m_Def = acBeltP->defense;
-                    acPkmn.m_stats.m_SAtk = acBeltP->spatk;
-                    acPkmn.m_stats.m_SDef = acBeltP->spdef;
-                    acPkmn.m_stats.m_Spd = acBeltP->speed;
+                acPkmn.m_stats.m_acHP = acBeltP->currentHP;
+                acPkmn.m_stats.m_maxHP = acBeltP->maxHP;
+                acPkmn.m_stats.m_Atk = acBeltP->move;
+                acPkmn.m_stats.m_Def = acBeltP->defense;
+                acPkmn.m_stats.m_SAtk = acBeltP->spatk;
+                acPkmn.m_stats.m_SDef = acBeltP->spdef;
+                acPkmn.m_stats.m_Spd = acBeltP->speed;
 
-                    gen3::pokemon::pokemon_growth_t* &acBG = save3->pokemon_growth[ i ];
-                    acPkmn.m_boxdata.m_speciesId = gen3::getNPKMNIdx( acBG->species );
-                    acPkmn.m_boxdata.m_holdItem = gen3::getNItemIdx( acBG->held );
-                    acPkmn.m_boxdata.m_experienceGained = acBG->xp;
-                    acPkmn.m_boxdata.m_steps = acBG->happiness;
-                    acPkmn.m_boxdata.m_pPUps = acBG->ppbonuses;
+                gen3::pokemon::pokemon_growth_t* &acBG = save3->pokemon_growth[ i ];
+                acPkmn.m_boxdata.m_speciesId = gen3::getNPKMNIdx( acBG->species );
+                acPkmn.m_boxdata.m_holdItem = gen3::getNItemIdx( acBG->held );
+                acPkmn.m_boxdata.m_experienceGained = acBG->xp;
+                acPkmn.m_boxdata.m_steps = acBG->happiness;
+                acPkmn.m_boxdata.m_pPUps = acBG->ppbonuses;
 
-                    gen3::pokemon::pokemon_moves_t* &acBA = save3->pokemon_moves[ i ];
-                    for( int i = 0; i < 4; ++i ) {
-                        acPkmn.m_boxdata.m_moves[ i ] = acBA->atk[ i ];
-                        acPkmn.m_boxdata.m_acPP[ i ] = acBA->pp[ i ];
-                    }
+                gen3::pokemon::pokemon_moves_t* &acBA = save3->pokemon_moves[ i ];
+                for( int i = 0; i < 4; ++i ) {
+                acPkmn.m_boxdata.m_moves[ i ] = acBA->atk[ i ];
+                acPkmn.m_boxdata.m_acPP[ i ] = acBA->pp[ i ];
+                }
 
-                    gen3::pokemon::pokemon_effort_t* &acBE = save3->pokemon_effort[ i ];
-                    for( int i = 0; i < 6; ++i ) {
-                        acPkmn.m_boxdata.m_effortValues[ i ] = acBE->EV[ i ];
-                        acPkmn.m_boxdata.m_contestStats[ i ] = acBE->ConStat[ i ];
-                    }
+                gen3::pokemon::pokemon_effort_t* &acBE = save3->pokemon_effort[ i ];
+                for( int i = 0; i < 6; ++i ) {
+                acPkmn.m_boxdata.m_effortValues[ i ] = acBE->EV[ i ];
+                acPkmn.m_boxdata.m_contestStats[ i ] = acBE->ConStat[ i ];
+                }
 
-                    gen3::pokemon::pokemon_misc_t* &acBM = save3->pokemon_misc[ i ];
-                    acPkmn.m_boxdata.m_iVint = acBM->IVint;
+                gen3::pokemon::pokemon_misc_t* &acBM = save3->pokemon_misc[ i ];
+                acPkmn.m_boxdata.m_iVint = acBM->IVint;
 
-                    getAll( acPkmn.m_boxdata.m_speciesId, p );
-                    acPkmn.m_boxdata.m_ability = p.m_abilities[ acPkmn.m_boxdata.m_individualValues.m_isEgg ];
-                    acPkmn.m_boxdata.m_individualValues.m_isEgg = acPkmn.m_boxdata.m_individualValues.m_isNicked;
-                    acPkmn.m_boxdata.m_gotPlace = gen3::getNLocation( acBM->locationcaught );
+                getAll( acPkmn.m_boxdata.m_speciesId, p );
+                acPkmn.m_boxdata.m_ability = p.m_abilities[ acPkmn.m_boxdata.m_individualValues.m_isEgg ];
+                acPkmn.m_boxdata.m_individualValues.m_isEgg = acPkmn.m_boxdata.m_individualValues.m_isNicked;
+                acPkmn.m_boxdata.m_gotPlace = gen3::getNLocation( acBM->locationcaught );
 
-                    acPkmn.m_boxdata.m_gotLevel = acBM->levelcaught;
+                acPkmn.m_boxdata.m_gotLevel = acBM->levelcaught;
 
-                    if( acPkmn.m_boxdata.m_individualValues.m_isEgg || acPkmn.m_boxdata.m_gotLevel ) {
-                        acPkmn.m_boxdata.m_hatchPlace = 999;
-                        acPkmn.m_boxdata.m_gotLevel = 5;
-                        acPkmn.m_boxdata.m_hatchDate[ 0 ] =
-                            acPkmn.m_boxdata.m_hatchDate[ 1 ] =
-                            acPkmn.m_boxdata.m_hatchDate[ 2 ] = 0;
-                        acPkmn.m_boxdata.m_gotDate[ 0 ] =
-                            acPkmn.m_boxdata.m_gotDate[ 1 ] =
-                            acPkmn.m_boxdata.m_gotDate[ 2 ] = 1;
-                    }
-                    acPkmn.m_boxdata.m_oTisFemale = acBM->tgender;
-                    acPkmn.m_boxdata.m_ball = acBM->pokeball;
-                    acPkmn.m_boxdata.m_gotDate[ 0 ] =
-                        acPkmn.m_boxdata.m_gotDate[ 1 ] =
-                        acPkmn.m_boxdata.m_gotDate[ 2 ] = 0;
+                if( acPkmn.m_boxdata.m_individualValues.m_isEgg || acPkmn.m_boxdata.m_gotLevel ) {
+                acPkmn.m_boxdata.m_hatchPlace = 999;
+                acPkmn.m_boxdata.m_gotLevel = 5;
+                acPkmn.m_boxdata.m_hatchDate[ 0 ] =
+                acPkmn.m_boxdata.m_hatchDate[ 1 ] =
+                acPkmn.m_boxdata.m_hatchDate[ 2 ] = 0;
+                acPkmn.m_boxdata.m_gotDate[ 0 ] =
+                acPkmn.m_boxdata.m_gotDate[ 1 ] =
+                acPkmn.m_boxdata.m_gotDate[ 2 ] = 1;
+                }
+                acPkmn.m_boxdata.m_oTisFemale = acBM->tgender;
+                acPkmn.m_boxdata.m_ball = acBM->pokeball;
+                acPkmn.m_boxdata.m_gotDate[ 0 ] =
+                acPkmn.m_boxdata.m_gotDate[ 1 ] =
+                acPkmn.m_boxdata.m_gotDate[ 2 ] = 0;
 
                 }
-            }*/
+                }*/
             //savMod = _GBA;
 
             //  FS::SAV->m_overWorldIdx = 20 * ( ( acgame + 1 ) / 2 ) + ( FS::SAV->m_isMale ? 0 : 10 );
@@ -317,7 +317,7 @@ startScreen::ChoiceResult startScreen::runChoice( ) {
     };
     u16 MaxVal;
     std::pair<u8, u8> ranges[ 5 ] = {
-        std::pair<u8, u8>( 0, 84 ),
+        std::pair<u8, u8>( 1, 84 ),
         std::pair<u8, u8>( 87, 108 ),
         std::pair<u8, u8>( 113, 134 ),
         std::pair<u8, u8>( 139, 160 ),
@@ -375,7 +375,7 @@ startScreen::ChoiceResult startScreen::runChoice( ) {
         swiWaitForVBlank( );
         scanKeys( );
         touch = touchReadXY( );
-        u32 p = keysCurrent( );
+        u32 p = keysUp( );
         u32 k = keysHeld( ) | keysDown( );
         if( ( FS::SAV->m_savTyp == 1 ) && ( k & KEY_SELECT ) && ( k & KEY_RIGHT ) && ( k & KEY_L ) && ( k & KEY_R ) ) {
             killResume( );
@@ -397,7 +397,7 @@ startScreen::ChoiceResult startScreen::runChoice( ) {
             return CANCEL;
         }
         for( u16 i = 0; i < MaxVal; i++ )
-            if( GET_AND_WAIT_R( 0, ranges[ i ].first, 256, ranges[ i ].second ) ) {
+            if( GET_AND_WAIT_R( u8( 1 ), ranges[ i ].first, u8( 255 ), ranges[ i ].second ) ) {
                 killResume( );
                 FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "ClearD", 512, 49152, true );
                 FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "ClearD", 512, 49152, true );

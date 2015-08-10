@@ -47,6 +47,7 @@ enum GameMod : u8 {
 extern GameMod gMod;
 
 std::string toString( u16 p_num ); //I REALLY LIKE WORKAROUNDING g++'S BUGS
+u8 getCurrentDaytime( );
 
 extern bool DRAW_TIME;
 extern bool ANIMATE_MAP;
@@ -133,6 +134,3 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define BORDER_ID 31
 // 9 additional spaces used
 #define SQCH_ID 80
-
-u8 getCurrentDaytime( );
-void shoUseAttack( u16 p_pkmIdx, bool p_female, bool p_shiny );

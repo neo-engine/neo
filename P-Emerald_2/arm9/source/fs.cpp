@@ -55,7 +55,7 @@ ability::ability( int p_abilityId ) {
     m_abilityName = FS::readString( f, true );
     m_flavourText = FS::readString( f, true );
     fscanf( f, "%u", &( m_type ) );
-    fclose( f );
+    FS::close( f );
 }
 
 std::wstring getWAbilityName( int p_abilityId ) {
@@ -65,7 +65,7 @@ std::wstring getWAbilityName( int p_abilityId ) {
     if( !f )
         return L"---";
     auto ret = FS::readWString( f, false );
-    fclose( f );
+    FS::close( f );
     return ret;
 }
 
@@ -183,7 +183,7 @@ namespace FS {
     bool readNop( FILE* p_file, u32 p_cnt ) {
         if( p_file == 0 )
             return false;
-        fread( 0, sizeof( u8 )*p_cnt, 1, p_file );
+        fread( 0, 1, p_cnt, p_file );
         return true;
     }
 
@@ -420,14 +420,14 @@ namespace FS {
         sprintf( buffer, "nitro:/LOCATIONS/%i.data", p_ind );
         FILE* f = fopen( buffer, "r" );
         if( f == 0 ) {
-            fclose( f );
+            FS::close( f );
             if( savMod == SavMod::_NDS && p_ind > 322 && p_ind < 1000 )
                 return getLoc( 3002 );
 
             return "Entfernter Ort";
         }
         std::string ret = readString( f );
-        fclose( f );
+        FS::close( f );
         return ret.c_str( );
     }
 }
@@ -445,7 +445,7 @@ Type getType( u16 p_pkmnId, u16 p_type ) {
 
     char buf[ 12 ];
     fscanf( f, "%s", buf );
-    fclose( f );
+    FS::close( f );
     return (Type)( buf[ p_type ] - 42 );
 }
 u16 getBase( u16 p_pkmnId, u16 p_base ) {
@@ -455,7 +455,7 @@ u16 getBase( u16 p_pkmnId, u16 p_base ) {
 
     char buf[ 12 ];
     fscanf( f, "%s", buf );
-    fclose( f );
+    FS::close( f );
     return (short)buf[ 2 + p_base ];
 }
 u16 getCatchRate( u16 p_pkmnId ) {
@@ -463,18 +463,18 @@ u16 getCatchRate( u16 p_pkmnId ) {
     if( f == 0 )
         return 0;
 
-    FS::readNop( f, 8 );
+    FS::readNop( f, 9 );
     short buf; fscanf( f, "%hi", &buf );
-    fclose( f );
+    FS::close( f );
     return buf;
 }
 const char* getDisplayName( u16 p_pkmnId ) {
     FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
     if( f == 0 )
         return "???";
-    FS::readNop( f, 11 );
+    FS::readNop( f, 12 );
     std::string ret = FS::readString( f, true );
-    fclose( f );
+    FS::close( f );
     ret += " ";
     ret.pop_back( );
     return ret.c_str( );
@@ -483,9 +483,9 @@ const wchar_t* getWDisplayName( u16 p_pkmnId ) {
     FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
     if( f == 0 )
         return L"???";
-    FS::readNop( f, 11 );
+    FS::readNop( f, 12 );
     std::wstring ret = FS::readWString( f );
-    fclose( f );
+    FS::close( f );
     ret += L" ";
     ret.pop_back( );
     return ret.c_str( );
@@ -496,9 +496,9 @@ void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
         wcscpy( p_name, L"???" );
         return;
     }
-    FS::readNop( f, 11 );
+    FS::readNop( f, 12 );
     std::wstring ret = FS::readWString( f );
-    fclose( f );
+    FS::close( f );
     wcscpy( p_name, ret.c_str( ) );
 }
 void getHoldItems( u16 p_pkmnId, u16* p_items ) {
@@ -507,24 +507,24 @@ void getHoldItems( u16 p_pkmnId, u16* p_items ) {
         p_items[ 0 ] = p_items[ 1 ] = p_items[ 2 ] = p_items[ 3 ] = 0;
         return;
     }
-    FS::readNop( f, 11 );
+    FS::readNop( f, 12 );
     FS::readString( f );
     p_items[ 0 ] = p_items[ 1 ] = p_items[ 2 ] = p_items[ 3 ] = 0;
     for( u8 i = 0; i < 4; ++i )
         fscanf( f, "%hi", &p_items[ i ] );
-    fclose( f );
+    FS::close( f );
     return;
 }
 pkmnGenderType getGenderType( u16 p_pkmnId ) {
     FILE* f = FS::open( PKMNDATA_PATH, toString( p_pkmnId ).c_str( ), ".data" );
     if( f == 0 )
         return (pkmnGenderType)0;
-    FS::readNop( f, 11 );
+    FS::readNop( f, 12 );
     FS::readString( f );
     FS::readNop( f, 8 );
     u16 buf;
     fscanf( f, "%hi", &buf );
-    fclose( f );
+    FS::close( f );
     return (pkmnGenderType)buf;
 }
 const char* getDexEntry( u16 p_pkmnId ) {
@@ -532,11 +532,11 @@ const char* getDexEntry( u16 p_pkmnId ) {
     if( f == 0 )
         return NO_DATA;
 
-    FS::readNop( f, 11 );
+    FS::readNop( f, 12 );
     FS::readString( f );
     FS::readNop( f, 24 );
     std::string ret = FS::readString( f );
-    fclose( f );
+    FS::close( f );
     return ret.c_str( );
 }
 u16 getForme( u16 p_pkmnId, u16 p_formeId, std::string& p_retFormeName ) {
@@ -544,7 +544,7 @@ u16 getForme( u16 p_pkmnId, u16 p_formeId, std::string& p_retFormeName ) {
     if( f == 0 )
         return p_pkmnId;
 
-    FS::readNop( f, 11 );
+    FS::readNop( f, 12 );
     FS::readString( f );
     FS::readNop( f, 24 );
     FS::readString( f );
@@ -555,7 +555,7 @@ u16 getForme( u16 p_pkmnId, u16 p_formeId, std::string& p_retFormeName ) {
         fscanf( f, "%hi", &d );
         p_retFormeName = FS::readString( f );
     }
-    fclose( f );
+    FS::close( f );
     return d;
 }
 std::vector<u16> getAllFormes( u16 p_pkmnId ) {
@@ -563,7 +563,7 @@ std::vector<u16> getAllFormes( u16 p_pkmnId ) {
     if( f == 0 )
         return{ };
 
-    FS::readNop( f, 11 );
+    FS::readNop( f, 12 );
     FS::readString( f );
     FS::readNop( f, 24 );
     FS::readString( f );
@@ -576,7 +576,7 @@ std::vector<u16> getAllFormes( u16 p_pkmnId ) {
         res.push_back( d );
         FS::readString( f );
     }
-    fclose( f );
+    FS::close( f );
     return res;
 }
 const char* getSpecies( u16 p_pkmnId ) {
@@ -584,7 +584,7 @@ const char* getSpecies( u16 p_pkmnId ) {
     if( f == 0 )
         return NO_DATA;
 
-    FS::readNop( f, 11 );
+    FS::readNop( f, 12 );
     FS::readString( f );
     FS::readNop( f, 24 );
     FS::readString( f );
@@ -601,7 +601,7 @@ const char* getSpecies( u16 p_pkmnId ) {
     ret = FS::readString( f, true );
     ret += " ";
     ret.pop_back( );
-    fclose( f );
+    FS::close( f );
     return ret.c_str( );
 }
 
@@ -614,7 +614,7 @@ void getAll( u16 p_pkmnId, pokemonData& p_out ) {
         p_out.m_types[ i ] = (Type)( ( fgetc( f ) ) - 42 );
     for( int i = 2; i < 8; ++i )
         p_out.m_bases[ i - 2 ] = (short)fgetc( f );
-    fscanf( f, "%hi", &p_out.m_catchrate );
+    fscanf( f, " %hi", &p_out.m_catchrate );
     fgetc( f );
     FS::readString( f );
     for( int i = 0; i < 4; ++i )
@@ -646,7 +646,7 @@ void getAll( u16 p_pkmnId, pokemonData& p_out ) {
     for( int i = 0; i < 7; ++i )
         for( int j = 0; j < 15; ++j )
             fscanf( f, "%hi ", &( p_out.m_evolutions[ i ].m_evolveData[ j ] ) );
-    fclose( f );
+    FS::close( f );
     return;
 }
 
@@ -682,7 +682,7 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
 N:
             ;
         }
-        fclose( f );
+        FS::close( f );
         return;
     } else {
         for( u16 i = 0; i <= p_toLevel; ++i ) {
@@ -704,7 +704,7 @@ NEXT:
             }
         }
     }
-    fclose( f );
+    FS::close( f );
 }
 bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
     FILE* f = FS::open( PKMNDATA_PATH, ( "/LEARNSETS/" + toString( p_pkmnId ) ).c_str( ), ".learnset.data" );
@@ -743,7 +743,7 @@ bool item::load( ) {
     strcpy( m_itemData.m_itemDisplayName, FS::readString( f, true ).c_str( ) );
     strcpy( m_itemData.m_itemDescription, FS::readString( f, true ).c_str( ) );
     strcpy( m_itemData.m_itemShortDescr, FS::readString( f, true ).c_str( ) );
-    fclose( f );
+    FS::close( f );
     return m_loaded = true;
 }
 
@@ -769,7 +769,7 @@ bool berry::load( ) {
         fscanf( f, "%hhu", &m_berryData.m_berryTaste[ i ] );
     fscanf( f, "%hhu %hhu %hhu", &m_berryData.m_hoursPerGrowthStage,
             &m_berryData.m_minBerries, &m_berryData.m_maxBerries );
-    fclose( f );
+    FS::close( f );
     return m_loaded = true;
 }
 
