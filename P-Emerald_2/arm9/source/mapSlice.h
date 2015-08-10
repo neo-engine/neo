@@ -33,7 +33,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 namespace MAP {
     const char* const MAP_PATH = "nitro:/MAPS/";
     const char* const TILESET_PATH = "nitro:/MAPS/TILESETS/";
-    const u8 SIZE = 32;
+    const u16 SIZE = 32;
     const s8 dir[ 4 ][ 2 ] = { { 0, -1 }, { 1, 0 }, { 0, 1 }, { 0, -1 } };
 
     typedef struct {
@@ -93,12 +93,11 @@ namespace MAP {
             NOTHING = 4,
 
         };
-        
+
         Palette     m_pals[ 16 ];
         TileSet     m_tileSet;
         BlockSet    m_blockSet;
-        std::vector<std::vector<MapBlockAtom>>
-            m_blocks;
+        MapBlockAtom m_blocks[ 32 ][ 32 ]; // [ y ][ x ]
         u8          m_map;
         u16         m_x, m_y;
         u16         m_location;

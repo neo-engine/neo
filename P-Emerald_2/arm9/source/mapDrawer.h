@@ -39,13 +39,13 @@ namespace MAP {
         u8          _curX, _curY;       //Current main slice from the _slices array
         std::map<std::pair<u16,u16>, std::vector<mapObject>>
             _mapObjs;
-        mapObject& m_player;
+        mapObject& _player;
         
         void draw( u16 p_globX, u16 p_globY, bool p_init );
         
         void moveCamera( mapSlice::direction p_direction );
 
-        void loatSlice( u8 p_x, u8 p_y, u16 p_sliceX, u16 p_sliceY );
+        void loadNewRow( mapSlice::direction p_direction, bool p_updatePlayer );
         void loadSlice( mapSlice::direction p_direction ); //dir: dir that needs to be extended
 
         void handleWarp( );

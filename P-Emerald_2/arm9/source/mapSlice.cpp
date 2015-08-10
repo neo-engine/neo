@@ -40,7 +40,7 @@ namespace MAP {
                                ( toString( p_map )
                                + "/" + toString( p_x )
                                + "_" + toString( p_y ) ).c_str( ),
-                               ".mgp" );
+                               ".map" );
         if( !mapF ) {
 #ifdef DEBUG
             sprintf( buffer, "Map %d/%d,%d does not exist.\n", p_map, p_x, p_y );
@@ -59,35 +59,42 @@ namespace MAP {
         FS::readNop( mapF, 3 );
 
         //Read the first tileset
-        auto ts1st = toString( tsidx1 ).c_str( );
-
-        FILE* tmp = FS::open( TILESET_PATH, ts1st, ".ts" );
-        FS::readTileSet( tmp, res->m_tileSet );
+        FILE* tmp = FS::open( TILESET_PATH, tsidx1, ".ts" );
+        if( !FS::readTileSet( tmp, res->m_tileSet ) ) {
+#ifdef DEBUG
+            IO::messageBox m( "ts1 failed" );
+#endif
+        }
         FS::close( tmp );
 
-        tmp = FS::open( TILESET_PATH, ts1st, ".bvd" );
-        FS::readBlockSet( tmp, res->m_blockSet );
+        tmp = FS::open( TILESET_PATH, tsidx1, ".bvd" );
+        if( !FS::readBlockSet( tmp, res->m_blockSet ) ) {
+#ifdef DEBUG
+            IO::messageBox m( "bs1 failed" );
+#endif
+        }
         FS::close( tmp );
 
-        tmp = FS::open( TILESET_PATH, ts1st, ".p2l" );
-        FS::readPal( tmp, res->m_pals );
+        tmp = FS::open( TILESET_PATH, tsidx1, ".p2l" );
+        if( !FS::readPal( tmp, res->m_pals ) ) {
+#ifdef DEBUG
+            IO::messageBox m( "pal1 failed" );
+#endif
+        }
         FS::close( tmp );
 
         //sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx1 );
         //FS::readAnimations( fopen( buffer, "rb" ), m_animations );
 
-
-        auto ts2st = toString( tsidx2 ).c_str( );
-
-        tmp = FS::open( TILESET_PATH, ts2st, ".ts" );
+        tmp = FS::open( TILESET_PATH, tsidx2, ".ts" );
         FS::readTileSet( tmp, res->m_tileSet, 512 );
         FS::close( tmp );
 
-        tmp = FS::open( TILESET_PATH, ts2st, ".bvd" );
+        tmp = FS::open( TILESET_PATH, tsidx2, ".bvd" );
         FS::readBlockSet( tmp, res->m_blockSet, 512 );
         FS::close( tmp );
 
-        tmp = FS::open( TILESET_PATH, ts2st, ".p2l" );
+        tmp = FS::open( TILESET_PATH, tsidx2, ".p2l" );
         FS::readPal( tmp, res->m_pals + 6 );
         FS::close( tmp );
 
@@ -96,9 +103,7 @@ namespace MAP {
 
 
         FS::readNop( mapF, 4 );
-        res->m_blocks.assign( SIZE, std::vector<MapBlockAtom>( SIZE ) );
-        for( u32 x = 0; x < SIZE; ++x )
-            fread( &res->m_blocks[ x ][ 0 ], sizeof( MapBlockAtom )*SIZE, 1, mapF );
+        fread( res->m_blocks, sizeof( MapBlockAtom ), SIZE * SIZE, mapF );
         FS::close( mapF );
         return res;
     }
@@ -184,7 +189,7 @@ namespace MAP {
                 return p_direction == direction::UP;
             case 0x3b:
                 return p_direction == direction::DOWN;
-                
+
             case 0xa0:
                 if( !( p_moveMode & WALK ) )
                     return false;
@@ -213,7 +218,7 @@ namespace MAP {
         else if( curMoveData == 4 )
             return true;
         if( curMoveData == 0x0c && lstMoveData == 4 )
-            return true; 
+            return true;
         if( !curMoveData )
             return true;
         return curMoveData % 4 == 0 && curMoveData / 4 == p_start.m_posZ;
