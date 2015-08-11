@@ -32,6 +32,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #ifdef DEBUG
 #include "messageBox.h"
+#include <cassert>
 #endif
 
 namespace MAP {
@@ -49,8 +50,6 @@ namespace MAP {
             y = ( p_y / SIZE != CUR_SLICE->m_y );
         return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blocks[ p_y % SIZE ][ p_x % SIZE ];
     }
-
-    int bgs[ 4 ];
 
     u16 lastrow, //Row to be filled when extending the map to the top
         lastcol; //Column to be filled when extending the map to the left
@@ -89,9 +88,8 @@ namespace MAP {
             vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
 
             for( u8 i = 1; i < 4; ++i ) {
-                bgs[ i ] = bgInit( i, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
-                bgSetPriority( bgs[ i ], i );
-                bgSetScroll( MAP::bgs[ i ], 120, 40 );
+                bgInit( i, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
+                bgSetScroll( i, 120, 40 );
             }
             u8* tileMemory = (u8*)BG_TILE_RAM( 1 );
 
@@ -121,6 +119,9 @@ namespace MAP {
     void mapDrawer::loadNewRow( mapSlice::direction p_direction, bool p_updatePlayer ) {
         cx += dir[ p_direction ][ 0 ];
         cy += dir[ p_direction ][ 1 ];
+#ifdef DEBUG
+        assert( cx != _player.m_pos.m_posX || cy != _player.m_pos.m_posY );
+#endif
         if( p_updatePlayer ) {
             _player.m_pos.m_posX = cx;
             _player.m_pos.m_posY = cy;
@@ -130,7 +131,7 @@ namespace MAP {
         if( ( dir[ p_direction ][ 0 ] && ( cx - dir[ p_direction ][ 0 ] + 32 ) % 32 == 16 )
             || ( dir[ p_direction ][ 1 ] && ( cy - dir[ p_direction ][ 1 ] + 32 ) % 32 == 16 ) ) {
             loadSlice( p_direction );
-#ifdef _DEBUG
+#ifdef ___DEBUG
             IO::messageBox m( "Load Slice" );
             IO::drawSub( );
 #endif
@@ -140,7 +141,7 @@ namespace MAP {
             || ( dir[ p_direction ][ 1 ] && ( cy - dir[ p_direction ][ 1 ] + 32 ) % 32 == 0 ) ) {
             _curX = ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1;
             _curY = ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1;
-#ifdef _DEBUG
+#ifdef ___DEBUG
             sprintf( buffer, "Switch Slice to (%d, %d)", _curX, _curY );
             IO::messageBox m( buffer );
             IO::drawSub( );
@@ -187,12 +188,12 @@ namespace MAP {
     void mapDrawer::moveCamera( mapSlice::direction p_direction, bool p_updatePlayer, bool p_autoLoadRows ) {
 
         for( u8 i = 1; i < 4; ++i )
-            bgScroll( MAP::bgs[ i ], dir[ p_direction ][ 0 ], dir[ p_direction ][ 1 ] );
+            bgScroll( i, dir[ p_direction ][ 0 ], dir[ p_direction ][ 1 ] );
         bgUpdate( );
 
         if( p_autoLoadRows
-            && ( ( dir[ p_direction ][ 0 ] && ( bgScrollTable[ 1 ]->x - dir[ p_direction ][ 0 ] + 16 ) % 16 == 0 )
-            || ( dir[ p_direction ][ 1 ] && ( bgScrollTable[ 1 ]->y - dir[ p_direction ][ 1 ] + 16 ) % 16 == 0 ) ) )
+            && ( ( dir[ p_direction ][ 0 ] && ( ( bgState[ 1 ].scrollX >> 8 ) - dir[ p_direction ][ 0 ] + 16 ) % 16 == 0 )
+            || ( dir[ p_direction ][ 1 ] && ( ( bgState[ 1 ].scrollY >> 8 ) - dir[ p_direction ][ 1 ] + 16 ) % 16 == 0 ) ) )
             loadNewRow( p_direction, p_updatePlayer );
     }
 

@@ -78,7 +78,7 @@ namespace MAP {
             u16 m_posY; //Global
             u8 m_posZ;
         };
-        enum direction {
+        enum direction : u8 {
             UP,
             RIGHT,
             DOWN,
