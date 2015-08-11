@@ -103,8 +103,12 @@ namespace MAP {
 
 
         FS::readNop( mapF, 4 );
+        FS::readNop( mapF, 8 ); //Border blocks will be ignored
         fread( res->m_blocks, sizeof( MapBlockAtom ), SIZE * SIZE, mapF );
         FS::close( mapF );
+
+        res->m_x = p_x;
+        res->m_y = p_y;
         return res;
     }
 

@@ -52,7 +52,7 @@ namespace MAP {
 
     u16 lastrow, //Row to be filled when extending the map to the top
         lastcol; //Column to be filled when extending the map to the left
-    u16 cx, cy;
+    u16 cx, cy;  //Cameras's pos
     u16* mapMemory[ 4 ];
 
     inline void loadBlock( Block p_curBlock, u32 p_memPos ) {
@@ -107,30 +107,53 @@ namespace MAP {
         cx = p_globX;
         cy = p_globY;
 
-        u32 c = 0;
-        for( u8 i = 0; i < 2; ++i, p_globX += 16 ) {
-            s16 mny = p_globY - 8, mxy = p_globY + 7;
-            s16 mnx = p_globX - 15, mxx = p_globX;
+        s16 mny = p_globY - 8;
+        s16 mnx = p_globX - 15;
 
-            for( s16 y = mny; y <= mxy; y++, c += 32 )
-                for( s16 x = mnx; x <= mxx; x++, c += 2 )
-                    loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( x, y ).m_blockidx ], c );
-        }
+        for( s16 y = mny; y < mny + NUM_ROWS; y++ )
+            for( s16 x = mnx; x < mnx + NUM_COLS; x++ ) {
+                loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( x, y ).m_blockidx ], x - mnx, y - mny );
+            }
+
         bgUpdate( );
     }
 
     void mapDrawer::loadNewRow( mapSlice::direction p_direction, bool p_updatePlayer ) {
+
+
         cx += dir[ p_direction ][ 0 ];
         cy += dir[ p_direction ][ 1 ];
         if( p_updatePlayer ) {
             _player.m_pos.m_posX = cx;
             _player.m_pos.m_posY = cy;
         }
+
+        //Check if a new slice should be loaded
+        if( ( dir[ p_direction ][ 0 ] && ( cx - dir[ p_direction ][ 0 ] + 32 ) % 32 == 16 )
+            || ( dir[ p_direction ][ 1 ] && ( cy - dir[ p_direction ][ 1 ] + 32 ) % 32 == 16 ) ) {
+            loadSlice( p_direction );
+#ifdef DEBUG
+            IO::messageBox m( "Load Slice" );
+            IO::drawSub( );
+#endif
+        }
+        //Check if a new slice got stepped onto
+        if( ( dir[ p_direction ][ 0 ] && ( cx - dir[ p_direction ][ 0 ] + 32 ) % 32 == 0 )
+            || ( dir[ p_direction ][ 1 ] && ( cy - dir[ p_direction ][ 1 ] + 32 ) % 32 == 0 ) ) {
+            _curX = ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1;
+            _curY = ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1;
+#ifdef DEBUG
+            sprintf( buffer, "Switch Slice to (%d, %d)", _curX, _curY );
+            IO::messageBox m( buffer );
+            IO::drawSub( );
+#endif
+        }
+
         switch( p_direction ) {
             case MAP::mapSlice::UP: {
                 u16 ty = cy - 8;
                 s16 mnx = cx - 15;
-                for( u16 x = 0, xp = mnx; x < NUM_COLS; ++x, ++xp )
+                for( u16 x = ( lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS; x = ( x + 1 ) % NUM_COLS, ++xp )
                     loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( xp, ty ).m_blockidx ], x, lastrow );
                 lastrow = ( lastrow + NUM_ROWS - 1 ) % NUM_ROWS;
                 break;
@@ -138,7 +161,7 @@ namespace MAP {
             case MAP::mapSlice::LEFT: {
                 u16 tx = cx - 15;
                 s16 mny = cy - 8;
-                for( u16 y = 0, yp = mny; y < NUM_ROWS; ++y, ++yp )
+                for( u16 y = ( lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS; y = ( y + 1 ) % NUM_ROWS, ++yp )
                     loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( tx, yp ).m_blockidx ], lastcol, y );
                 lastcol = ( lastcol + NUM_COLS - 1 ) % NUM_COLS;
                 break;
@@ -147,7 +170,7 @@ namespace MAP {
                 lastrow = ( lastrow + 1 ) % NUM_ROWS;
                 u16 ty = cy + 7;
                 s16 mnx = cx - 15;
-                for( u16 x = 0, xp = mnx; x < NUM_COLS; ++x, ++xp )
+                for( u16 x = ( lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS; x = ( x + 1 ) % NUM_COLS, ++xp )
                     loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( xp, ty ).m_blockidx ], x, lastrow );
                 break;
             }
@@ -155,7 +178,7 @@ namespace MAP {
                 lastcol = ( lastcol + 1 ) % NUM_COLS;
                 u16 tx = cx + 16;
                 s16 mny = cy - 8;
-                for( u16 y = 0, yp = mny; y < NUM_ROWS; ++y, ++yp )
+                for( u16 y = ( lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS; y = ( y + 1 ) % NUM_ROWS, ++yp )
                     loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( tx, yp ).m_blockidx ], lastcol, y );
                 break;
             }
@@ -164,15 +187,15 @@ namespace MAP {
     }
 
     void mapDrawer::moveCamera( mapSlice::direction p_direction, bool p_updatePlayer, bool p_autoLoadRows ) {
+
         for( u8 i = 1; i < 4; ++i )
             bgScroll( MAP::bgs[ i ], dir[ p_direction ][ 0 ], dir[ p_direction ][ 1 ] );
         bgUpdate( );
 
-        if( p_autoLoadRows && ( bgScrollTable[ 1 ]->x + dir[ p_direction ][ 0 ] ) % 16 == 1 )
+        if( p_autoLoadRows
+            && ( ( dir[ p_direction ][ 0 ] && ( bgScrollTable[ 1 ]->x - dir[ p_direction ][ 0 ] + 16 ) % 16 == 0 )
+            || ( dir[ p_direction ][ 1 ] && ( bgScrollTable[ 1 ]->y - dir[ p_direction ][ 1 ] + 16 ) % 16 == 0 ) ) )
             loadNewRow( p_direction, p_updatePlayer );
-        if( p_autoLoadRows && ( bgScrollTable[ 1 ]->y + dir[ p_direction ][ 1 ] ) % 16 == 1 )
-            loadNewRow( p_direction, p_updatePlayer );
-
     }
 
     void mapDrawer::loadSlice( mapSlice::direction p_direction ) {
