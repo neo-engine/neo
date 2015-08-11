@@ -37,6 +37,7 @@ namespace MAP {
     private:
         std::unique_ptr<mapSlice> _slices[ 2 ][ 2 ] = { { 0 } };  //[x][y]
         u8          _curX, _curY;       //Current main slice from the _slices array
+        u8          _curMap;
         std::map<std::pair<u16,u16>, std::vector<mapObject>>
             _mapObjs;
         mapObject& _player;

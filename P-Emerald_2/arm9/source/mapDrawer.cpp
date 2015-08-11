@@ -38,13 +38,15 @@ namespace MAP {
 #define NUM_ROWS 16
 #define NUM_COLS 32
     mapDrawer* curMap;
+#define CUR_SLICE _slices[ _curX ][ _curY ]
     constexpr s8 currentHalf( u16 p_pos ) {
         return s8( ( p_pos % SIZE >= SIZE / 2 ) ? 1 : -1 );
     }
 
+
     MapBlockAtom mapDrawer::at( u16 p_x, u16 p_y ) const {
-        bool x = ( p_x / SIZE != _slices[ _curX ][ _curY ]->m_x ),
-            y = ( p_y / SIZE != _slices[ _curX ][ _curY ]->m_y );
+        bool x = ( p_x / SIZE != CUR_SLICE->m_x ),
+            y = ( p_y / SIZE != CUR_SLICE->m_y );
         return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blocks[ p_y % SIZE ][ p_x % SIZE ];
     }
 
@@ -94,9 +96,9 @@ namespace MAP {
             u8* tileMemory = (u8*)BG_TILE_RAM( 1 );
 
             for( u16 i = 0; i < 1024; ++i )
-                swiCopy( _slices[ _curX ][ _curY ]->m_tileSet.m_blocks[ i ].m_tile, tileMemory + i * 32, 16 );
+                swiCopy( CUR_SLICE->m_tileSet.m_blocks[ i ].m_tile, tileMemory + i * 32, 16 );
 
-            dmaCopy( _slices[ _curX ][ _curY ]->m_pals, BG_PALETTE, 512 );
+            dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
             for( u8 i = 1; i < 4; ++i )
                 mapMemory[ i ] = (u16*)BG_MAP_RAM( 2 * i - 1 );
         }
@@ -111,16 +113,12 @@ namespace MAP {
         s16 mnx = p_globX - 15;
 
         for( s16 y = mny; y < mny + NUM_ROWS; y++ )
-            for( s16 x = mnx; x < mnx + NUM_COLS; x++ ) {
-                loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( x, y ).m_blockidx ], x - mnx, y - mny );
-            }
-
+            for( s16 x = mnx; x < mnx + NUM_COLS; x++ )
+                loadBlock( CUR_SLICE->m_blockSet.m_blocks[ at( x, y ).m_blockidx ], x - mnx, y - mny );
         bgUpdate( );
     }
 
     void mapDrawer::loadNewRow( mapSlice::direction p_direction, bool p_updatePlayer ) {
-
-
         cx += dir[ p_direction ][ 0 ];
         cy += dir[ p_direction ][ 1 ];
         if( p_updatePlayer ) {
@@ -132,7 +130,7 @@ namespace MAP {
         if( ( dir[ p_direction ][ 0 ] && ( cx - dir[ p_direction ][ 0 ] + 32 ) % 32 == 16 )
             || ( dir[ p_direction ][ 1 ] && ( cy - dir[ p_direction ][ 1 ] + 32 ) % 32 == 16 ) ) {
             loadSlice( p_direction );
-#ifdef DEBUG
+#ifdef _DEBUG
             IO::messageBox m( "Load Slice" );
             IO::drawSub( );
 #endif
@@ -142,7 +140,7 @@ namespace MAP {
             || ( dir[ p_direction ][ 1 ] && ( cy - dir[ p_direction ][ 1 ] + 32 ) % 32 == 0 ) ) {
             _curX = ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1;
             _curY = ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1;
-#ifdef DEBUG
+#ifdef _DEBUG
             sprintf( buffer, "Switch Slice to (%d, %d)", _curX, _curY );
             IO::messageBox m( buffer );
             IO::drawSub( );
@@ -154,7 +152,7 @@ namespace MAP {
                 u16 ty = cy - 8;
                 s16 mnx = cx - 15;
                 for( u16 x = ( lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS; x = ( x + 1 ) % NUM_COLS, ++xp )
-                    loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( xp, ty ).m_blockidx ], x, lastrow );
+                    loadBlock( CUR_SLICE->m_blockSet.m_blocks[ at( xp, ty ).m_blockidx ], x, lastrow );
                 lastrow = ( lastrow + NUM_ROWS - 1 ) % NUM_ROWS;
                 break;
             }
@@ -162,7 +160,7 @@ namespace MAP {
                 u16 tx = cx - 15;
                 s16 mny = cy - 8;
                 for( u16 y = ( lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS; y = ( y + 1 ) % NUM_ROWS, ++yp )
-                    loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( tx, yp ).m_blockidx ], lastcol, y );
+                    loadBlock( CUR_SLICE->m_blockSet.m_blocks[ at( tx, yp ).m_blockidx ], lastcol, y );
                 lastcol = ( lastcol + NUM_COLS - 1 ) % NUM_COLS;
                 break;
             }
@@ -171,7 +169,7 @@ namespace MAP {
                 u16 ty = cy + 7;
                 s16 mnx = cx - 15;
                 for( u16 x = ( lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS; x = ( x + 1 ) % NUM_COLS, ++xp )
-                    loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( xp, ty ).m_blockidx ], x, lastrow );
+                    loadBlock( CUR_SLICE->m_blockSet.m_blocks[ at( xp, ty ).m_blockidx ], x, lastrow );
                 break;
             }
             case MAP::mapSlice::RIGHT: {
@@ -179,7 +177,7 @@ namespace MAP {
                 u16 tx = cx + 16;
                 s16 mny = cy - 8;
                 for( u16 y = ( lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS; y = ( y + 1 ) % NUM_ROWS, ++yp )
-                    loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( tx, yp ).m_blockidx ], lastcol, y );
+                    loadBlock( CUR_SLICE->m_blockSet.m_blocks[ at( tx, yp ).m_blockidx ], lastcol, y );
                 break;
             }
         }
@@ -199,7 +197,12 @@ namespace MAP {
     }
 
     void mapDrawer::loadSlice( mapSlice::direction p_direction ) {
-        (void)p_direction;
+        _slices[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ][ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ]
+            = constructSlice( _curMap, CUR_SLICE->m_x + dir[ p_direction ][ 0 ], CUR_SLICE->m_y + dir[ p_direction ][ 1 ] );
+
+        auto& neigh = _slices[ ( _curX + !dir[ p_direction ][ 0 ] ) & 1 ][ ( _curY + !dir[ p_direction ][ 1 ] ) & 1 ];
+        _slices[ _curX ^ 1 ][ _curY ^ 1 ]
+            = constructSlice( _curMap, neigh->m_x + dir[ p_direction ][ 0 ], neigh->m_y + dir[ p_direction ][ 1 ] );
     }
 
     void mapDrawer::handleWarp( ) { }
@@ -209,12 +212,13 @@ namespace MAP {
     mapDrawer::mapDrawer( u8 p_currentMap, mapObject& p_player )
         :_player( p_player ) {
         _curX = _curY = 0;
+        _curMap = p_currentMap;
 
         u16 mx = p_player.m_pos.m_posX, my = p_player.m_pos.m_posY;
         _slices[ _curX ][ _curY ] = constructSlice( p_currentMap, mx / SIZE, my / SIZE );
-        _slices[ 1 - _curX ][ _curY ] = constructSlice( p_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE );
-        _slices[ _curX ][ 1 - _curY ] = constructSlice( p_currentMap, mx / SIZE, my / SIZE + currentHalf( my ) );
-        _slices[ 1 - _curX ][ 1 - _curY ] = constructSlice( p_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ) );
+        _slices[ _curX ^ 1 ][ _curY ] = constructSlice( p_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE );
+        _slices[ _curX ][ _curY ^ 1 ] = constructSlice( p_currentMap, mx / SIZE, my / SIZE + currentHalf( my ) );
+        _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( p_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ) );
     }
 
     void mapDrawer::draw( ) {
@@ -240,6 +244,6 @@ namespace MAP {
     }
 
     u16  mapDrawer::getCurrentLocationId( ) const {
-        return _slices[ _curX ][ _curY ]->m_location;
+        return CUR_SLICE->m_location;
     }
 }
