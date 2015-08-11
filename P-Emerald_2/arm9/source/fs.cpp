@@ -191,29 +191,28 @@ namespace FS {
     bool readPal( FILE* p_file, MAP::Palette* p_palette ) {
         if( p_file == 0 )
             return false;
-        for( u8 i = 0; i < 6; ++i )
-            fread( p_palette[ i ].m_pal, sizeof( u16 ) * 16, 1, p_file );
+        fread( p_palette, sizeof( u16 ) * 16, 6, p_file );
         return true;
     }
 
-    bool readTileSet( FILE* p_file, MAP::TileSet& p_tileSet, u16 p_startIdx, u16 p_size ) {
+    bool readTiles( FILE* p_file, MAP::Tile* p_tileSet, u16 p_startIdx, u16 p_size ) {
         if( p_file == 0 )
             return false;
-        fread( &p_tileSet.m_blocks[ p_startIdx ], sizeof( MAP::Tile )*p_size, 1, p_file );
+        fread( p_tileSet + p_startIdx, sizeof( MAP::Tile )*p_size, 1, p_file );
         return true;
     }
 
-    bool readBlockSet( FILE* p_file, MAP::BlockSet& p_tileSet, u16 p_startIdx, u16 p_size ) {
+    bool readBlocks( FILE* p_file, MAP::Block* p_tileSet, u16 p_startIdx, u16 p_size ) {
         if( p_file == 0 )
             return false;
         readNop( p_file, 4 );
         for( u16 i = 0; i < p_size; ++i ) {
-            fread( p_tileSet.m_blocks[ p_startIdx + i ].m_bottom, 4 * sizeof( MAP::BlockAtom ), 1, p_file );
-            fread( p_tileSet.m_blocks[ p_startIdx + i ].m_top, 4 * sizeof( MAP::BlockAtom ), 1, p_file );
+            fread( &( p_tileSet + p_startIdx + i )->m_bottom, 4 * sizeof( MAP::BlockAtom ), 1, p_file );
+            fread( &( p_tileSet + p_startIdx + i )->m_top, 4 * sizeof( MAP::BlockAtom ), 1, p_file );
         }
         for( u16 i = 0; i < p_size; ++i ) {
-            fread( &p_tileSet.m_blocks[ p_startIdx + i ].m_bottombehave, sizeof( u8 ), 1, p_file );
-            fread( &p_tileSet.m_blocks[ p_startIdx + i ].m_topbehave, sizeof( u8 ), 1, p_file );
+            fread( &( p_tileSet + p_startIdx + i )->m_bottombehave, sizeof( u8 ), 1, p_file );
+            fread( &( p_tileSet + p_startIdx + i )->m_topbehave, sizeof( u8 ), 1, p_file );
         }
         return true;
     }
