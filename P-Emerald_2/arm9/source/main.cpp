@@ -110,6 +110,7 @@ u8 frame = 0;
 bool DRAW_TIME = false;
 bool UPDATE_TIME = true;
 bool ANIMATE_MAP = false;
+bool INIT_MAIN_SPRITES = false;
 
 u8 getCurrentDaytime( ) {
     time_t unixTime = time( NULL );
@@ -301,6 +302,10 @@ int main( int, char** p_argv ) {
         if( ANIMATE_MAP ) {
             //animateMap( ++frame );
         }
+        if( INIT_MAIN_SPRITES ) {
+            INIT_MAIN_SPRITES = false;
+            initMainSprites( );
+        }
         if( !UPDATE_TIME )
             return;
 
@@ -362,8 +367,7 @@ int main( int, char** p_argv ) {
                           FS::SAV->m_player.m_pos.m_posZ );
             IO::messageBox m( buffer );
 
-            initMainSprites( );
-            IO::drawSub( );
+            IO::drawSub( true );
         }
 #endif
 
@@ -387,8 +391,7 @@ int main( int, char** p_argv ) {
                                 //shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
                                 AttackList[ a.m_boxdata.m_moves[ i ] ]->use( );
                             }
-                            IO::drawSub( );
-                            initMainSprites( );
+                            IO::drawSub( true );
                             goto OUT;
                         }
                     }
@@ -437,9 +440,8 @@ OUT:
             bv.run( FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
             
             defaultScrns( );
-            IO::drawSub( );
+            IO::drawSub( true );
             UPDATE_TIME = true;
-            initMainSprites( );
             curMap->draw( );
             ANIMATE_MAP = true;
         } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
@@ -462,8 +464,7 @@ OUT:
                 FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
 
             defaultScrns( );
-            IO::drawSub( );
-            initMainSprites( );
+            IO::drawSub( true );
             curMap->draw( );
             ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ],        //StartDex
@@ -599,9 +600,8 @@ OUT:
                 }
             }
 
-            IO::drawSub( );
+            IO::drawSub( true );
             swiWaitForVBlank( );
-            initMainSprites( );
             if( res == 3 || res == 4 ) {
                 curMap->draw( );
             }
@@ -619,8 +619,7 @@ OUT:
                 else
                     IO::messageBox Succ( "Es trat ein Fehler auf\nSpiel nicht gesichert.", "PokéNav" );
             }
-            initMainSprites( );
-            IO::drawSub( );
+            IO::drawSub( true );
         }
         //End 
 

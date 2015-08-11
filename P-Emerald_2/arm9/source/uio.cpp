@@ -113,7 +113,7 @@ namespace IO {
         DRAW_TIME = true;
     }
 
-    void drawSub( u8 p_newIdx ) {
+    void drawSub( bool p_initMainSrites, u8 p_newIdx ) {
         if( FS::SAV->m_bgIdx == p_newIdx )
             return;
         else if( p_newIdx == u8( 255 ) )
@@ -130,6 +130,8 @@ namespace IO {
         } else
             FS::SAV->m_bgIdx = p_newIdx;
         drawBorder( );
+        if( p_initMainSrites )
+            INIT_MAIN_SPRITES = true;
     }
 
     bool waitForTouchUp( u16 p_targetX1, u16 p_targetY1, u16 p_targetX2, u16 p_targetY2 ) {

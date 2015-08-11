@@ -46,11 +46,16 @@ namespace MAP {
                                + "/" + toString( p_y )
                                + "_" + toString( p_x ) ).c_str( ),
                                ".map" );
+        if( !mapF ) mapF = FS::open( MAP_PATH,
+                                     ( toString( p_map )
+                                     + "/BORDER/" + toString( p_y )
+                                     + "_" + toString( p_x ) ).c_str( ),
+                                     ".map" );
         if( !mapF ) {
 #ifdef DEBUG
-            sprintf( buffer, "Map %d/%d,%d does not exist.\n", p_map, p_x, p_y );
+            sprintf( buffer, "Map %d/%d,%d does not exist.\n", p_map, p_y, p_x );
             IO::messageBox m( buffer );
-            IO::drawSub( );
+            IO::drawSub( true );
 #endif
             return 0;
         }

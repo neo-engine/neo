@@ -29,15 +29,16 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "uio.h"
 #include "sprite.h"
 #include "defines.h"
+#include "messageBox.h"
 
 #ifdef DEBUG
-#include "messageBox.h"
 #include <cassert>
 #endif
 
 namespace MAP {
 #define NUM_ROWS 16
 #define NUM_COLS 32
+#define MAP_BORDER 0x3f
     mapDrawer* curMap;
 #define CUR_SLICE _slices[ _curX ][ _curY ]
     constexpr s8 currentHalf( u16 p_pos ) {
@@ -95,7 +96,6 @@ namespace MAP {
 
             for( u16 i = 0; i < 1024; ++i )
                 swiCopy( CUR_SLICE->m_tileSet.m_blocks[ i ].m_tile, tileMemory + i * 32, 16 );
-
             dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
             for( u8 i = 1; i < 4; ++i )
                 mapMemory[ i ] = (u16*)BG_MAP_RAM( 2 * i - 1 );
@@ -141,6 +141,12 @@ namespace MAP {
             || ( dir[ p_direction ][ 1 ] && ( cy - dir[ p_direction ][ 1 ] + 32 ) % 32 == 0 ) ) {
             _curX = ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1;
             _curY = ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1;
+            //Update tileset, block and palette data
+            u8* tileMemory = (u8*)BG_TILE_RAM( 1 );
+            for( u16 i = 0; i < 1024; ++i )
+                swiCopy( CUR_SLICE->m_tileSet.m_blocks[ i ].m_tile, tileMemory + i * 32, 16 );
+            dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
+
 #ifdef ___DEBUG
             sprintf( buffer, "Switch Slice to (%d, %d)", _curX, _curY );
             IO::messageBox m( buffer );
@@ -235,6 +241,13 @@ namespace MAP {
         return true;
     }
     void mapDrawer::movePlayer( mapSlice::direction p_direction ) {
+        if( at( _player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+            _player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == MAP_BORDER ) {
+            stopPlayer( mapSlice::direction( ( u8( p_direction ) + 2 ) % 4 ) );
+            IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
+            IO::drawSub( true );
+            return;
+        }
         moveCamera( p_direction, true );
     }
     void mapDrawer::stopPlayer( mapSlice::direction p_direction ) {

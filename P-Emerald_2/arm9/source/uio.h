@@ -53,7 +53,7 @@ namespace IO {
 
     void setDefaultConsoleTextColors( u16* p_palette, u8 p_start = 1 );
 
-    void drawSub( u8 p_newIdx = u8( 255 ) );
+    void drawSub( bool p_initMainSprites = false, u8 p_newIdx = u8( 255 ) );
 
     struct inputTarget {
         enum inputType {
@@ -87,8 +87,6 @@ namespace IO {
 
     void initTextField( );
 
-    [[ deprecated( "Use printRectangle instead." ) ]]
-    void putrec( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom = true, bool p_striped = false, u8 p_color = 42 );
     void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom = true, bool p_striped = false, u8 p_color = 42 );
 
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big = false ); //HP in %
