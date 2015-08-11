@@ -35,14 +35,16 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #endif
 
 namespace MAP {
+#define NUM_ROWS 16
+#define NUM_COLS 32
     mapDrawer* curMap;
     constexpr s8 currentHalf( u16 p_pos ) {
         return s8( ( p_pos % SIZE >= SIZE / 2 ) ? 1 : -1 );
     }
 
     MapBlockAtom mapDrawer::at( u16 p_x, u16 p_y ) const {
-        bool x = ( p_x / SIZE == _slices[ _curX ][ _curY ]->m_x ),
-            y = ( p_y / SIZE == _slices[ _curX ][ _curY ]->m_y );
+        bool x = ( p_x / SIZE != _slices[ _curX ][ _curY ]->m_x ),
+            y = ( p_y / SIZE != _slices[ _curX ][ _curY ]->m_y );
         return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blocks[ p_y % SIZE ][ p_x % SIZE ];
     }
 
@@ -52,9 +54,35 @@ namespace MAP {
         lastcol; //Column to be filled when extending the map to the left
     u16 cx, cy;
     u16* mapMemory[ 4 ];
+
+    inline void loadBlock( Block p_curBlock, u32 p_memPos ) {
+        u8 toplayer = 1, bottomlayer = 3;
+        bool elevateTopLayer = p_curBlock.m_topbehave == 0x10;
+
+        mapMemory[ toplayer ][ p_memPos ] = !elevateTopLayer * p_curBlock.m_top[ 0 ][ 0 ];
+        mapMemory[ toplayer ][ p_memPos + 1 ] = !elevateTopLayer * p_curBlock.m_top[ 0 ][ 1 ];
+        mapMemory[ toplayer ][ p_memPos + 32 ] = !elevateTopLayer * p_curBlock.m_top[ 1 ][ 0 ];
+        mapMemory[ toplayer ][ p_memPos + 33 ] = !elevateTopLayer * p_curBlock.m_top[ 1 ][ 1 ];
+
+        mapMemory[ toplayer + 1 ][ p_memPos ] = elevateTopLayer * p_curBlock.m_top[ 0 ][ 0 ];
+        mapMemory[ toplayer + 1 ][ p_memPos + 1 ] = elevateTopLayer *  p_curBlock.m_top[ 0 ][ 1 ];
+        mapMemory[ toplayer + 1 ][ p_memPos + 32 ] = elevateTopLayer *  p_curBlock.m_top[ 1 ][ 0 ];
+        mapMemory[ toplayer + 1 ][ p_memPos + 33 ] = elevateTopLayer * p_curBlock.m_top[ 1 ][ 1 ];
+
+        mapMemory[ bottomlayer ][ p_memPos ] = p_curBlock.m_bottom[ 0 ][ 0 ];
+        mapMemory[ bottomlayer ][ p_memPos + 1 ] = p_curBlock.m_bottom[ 0 ][ 1 ];
+        mapMemory[ bottomlayer ][ p_memPos + 32 ] = p_curBlock.m_bottom[ 1 ][ 0 ];
+        mapMemory[ bottomlayer ][ p_memPos + 33 ] = p_curBlock.m_bottom[ 1 ][ 1 ];
+    }
+    inline void loadBlock( Block p_curBlock, u8 p_scrnX, u8 p_scrnY ) {
+        u32 c = 64 * u32( p_scrnY ) + 2 * ( u32( p_scrnX ) % 16 );
+        c += ( u32( p_scrnX ) / 16 ) * 1024;
+        loadBlock( p_curBlock, c );
+    }
+
     void mapDrawer::draw( u16 p_globX, u16 p_globY, bool p_init ) {
         if( p_init ) {
-            videoSetMode( MODE_0_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG1_ACTIVE |
+            videoSetMode( MODE_0_2D/* | DISPLAY_BG0_ACTIVE*/ | DISPLAY_BG1_ACTIVE |
                           DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
             vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
 
@@ -63,11 +91,6 @@ namespace MAP {
                 bgSetPriority( bgs[ i ], i );
                 bgSetScroll( MAP::bgs[ i ], 120, 40 );
             }
-#undef DEBUG
-#ifdef DEBUG
-            IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 0, 5, true, true );
-#endif
-
             u8* tileMemory = (u8*)BG_TILE_RAM( 1 );
 
             for( u16 i = 0; i < 1024; ++i )
@@ -78,8 +101,8 @@ namespace MAP {
                 mapMemory[ i ] = (u16*)BG_MAP_RAM( 2 * i - 1 );
         }
 
-        lastrow = 15;
-        lastcol = 31;
+        lastrow = NUM_ROWS - 1;
+        lastcol = NUM_COLS - 1;
 
         cx = p_globX;
         cy = p_globY;
@@ -90,34 +113,8 @@ namespace MAP {
             s16 mnx = p_globX - 15, mxx = p_globX;
 
             for( s16 y = mny; y <= mxy; y++, c += 32 )
-                for( s16 x = mnx; x <= mxx; x++, c += 2 ) {
-                    u8 toplayer = 1, bottomlayer = 3;
-
-                    Block acBlock = _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( x, y ).m_blockidx ];
-#ifdef DEBUG
-                    consoleSelect( &IO::Top );
-                    consoleSetWindow( &IO::Top, 2 * ( x - mnx ) - 1, 2 * ( y - mny ) - 1, 2, 2 );
-                    printf( "%2i", x );
-                    if( x == mnx + 1 )
-                        printf( "%2i", y );
-#endif
-                    bool elevateTopLayer = acBlock.m_topbehave == 0x10;
-
-                    mapMemory[ toplayer ][ c ] = !elevateTopLayer * acBlock.m_top[ 0 ][ 0 ];
-                    mapMemory[ toplayer ][ c + 1 ] = !elevateTopLayer * acBlock.m_top[ 0 ][ 1 ];
-                    mapMemory[ toplayer ][ c + 32 ] = !elevateTopLayer * acBlock.m_top[ 1 ][ 0 ];
-                    mapMemory[ toplayer ][ c + 33 ] = !elevateTopLayer * acBlock.m_top[ 1 ][ 1 ];
-
-                    mapMemory[ toplayer + 1 ][ c ] = elevateTopLayer * acBlock.m_top[ 0 ][ 0 ];
-                    mapMemory[ toplayer + 1 ][ c + 1 ] = elevateTopLayer *  acBlock.m_top[ 0 ][ 1 ];
-                    mapMemory[ toplayer + 1 ][ c + 32 ] = elevateTopLayer *  acBlock.m_top[ 1 ][ 0 ];
-                    mapMemory[ toplayer + 1 ][ c + 33 ] = elevateTopLayer * acBlock.m_top[ 1 ][ 1 ];
-
-                    mapMemory[ bottomlayer ][ c ] = acBlock.m_bottom[ 0 ][ 0 ];
-                    mapMemory[ bottomlayer ][ c + 1 ] = acBlock.m_bottom[ 0 ][ 1 ];
-                    mapMemory[ bottomlayer ][ c + 32 ] = acBlock.m_bottom[ 1 ][ 0 ];
-                    mapMemory[ bottomlayer ][ c + 33 ] = acBlock.m_bottom[ 1 ][ 1 ];
-                }
+                for( s16 x = mnx; x <= mxx; x++, c += 2 )
+                    loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( x, y ).m_blockidx ], c );
         }
         bgUpdate( );
     }
@@ -131,34 +128,51 @@ namespace MAP {
         }
         switch( p_direction ) {
             case MAP::mapSlice::UP: {
-
-
-                lastrow = ( lastrow + SIZE - 1 ) % SIZE;
-                break;
-            }
-            case MAP::mapSlice::RIGHT: {
-
-
-                lastcol = ( lastcol + SIZE + 1 ) % SIZE;
-                break;
-            }
-            case MAP::mapSlice::DOWN: {
-                lastrow = ( lastrow + 1 ) % SIZE;
-
-
+                u16 ty = cy - 8;
+                s16 mnx = cx - 15;
+                for( u16 x = 0, xp = mnx; x < NUM_COLS; ++x, ++xp )
+                    loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( xp, ty ).m_blockidx ], x, lastrow );
+                lastrow = ( lastrow + NUM_ROWS - 1 ) % NUM_ROWS;
                 break;
             }
             case MAP::mapSlice::LEFT: {
-                lastcol = ( lastcol + 1 ) % SIZE;
-
-
+                u16 tx = cx - 15;
+                s16 mny = cy - 8;
+                for( u16 y = 0, yp = mny; y < NUM_ROWS; ++y, ++yp )
+                    loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( tx, yp ).m_blockidx ], lastcol, y );
+                lastcol = ( lastcol + NUM_COLS - 1 ) % NUM_COLS;
+                break;
+            }
+            case MAP::mapSlice::DOWN: {
+                lastrow = ( lastrow + 1 ) % NUM_ROWS;
+                u16 ty = cy + 7;
+                s16 mnx = cx - 15;
+                for( u16 x = 0, xp = mnx; x < NUM_COLS; ++x, ++xp )
+                    loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( xp, ty ).m_blockidx ], x, lastrow );
+                break;
+            }
+            case MAP::mapSlice::RIGHT: {
+                lastcol = ( lastcol + 1 ) % NUM_COLS;
+                u16 tx = cx + 16;
+                s16 mny = cy - 8;
+                for( u16 y = 0, yp = mny; y < NUM_ROWS; ++y, ++yp )
+                    loadBlock( _slices[ _curX ][ _curY ]->m_blockSet.m_blocks[ at( tx, yp ).m_blockidx ], lastcol, y );
                 break;
             }
         }
+        bgUpdate( );
     }
 
-    void mapDrawer::moveCamera( mapSlice::direction p_direction ) {
-        (void)p_direction;
+    void mapDrawer::moveCamera( mapSlice::direction p_direction, bool p_updatePlayer, bool p_autoLoadRows ) {
+        for( u8 i = 1; i < 4; ++i )
+            bgScroll( MAP::bgs[ i ], dir[ p_direction ][ 0 ], dir[ p_direction ][ 1 ] );
+        bgUpdate( );
+
+        if( p_autoLoadRows && ( bgScrollTable[ 1 ]->x + dir[ p_direction ][ 0 ] ) % 16 == 1 )
+            loadNewRow( p_direction, p_updatePlayer );
+        if( p_autoLoadRows && ( bgScrollTable[ 1 ]->y + dir[ p_direction ][ 1 ] ) % 16 == 1 )
+            loadNewRow( p_direction, p_updatePlayer );
+
     }
 
     void mapDrawer::loadSlice( mapSlice::direction p_direction ) {
@@ -190,10 +204,10 @@ namespace MAP {
         (void)p_start;
         (void)p_direction;
         (void)p_moveMode;
-        return false;
+        return true;
     }
     void mapDrawer::movePlayer( mapSlice::direction p_direction ) {
-        (void)p_direction;
+        moveCamera( p_direction, true );
     }
     void mapDrawer::stopPlayer( mapSlice::direction p_direction ) {
         (void)p_direction;

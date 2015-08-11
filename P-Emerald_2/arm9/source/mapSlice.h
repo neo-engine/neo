@@ -34,7 +34,7 @@ namespace MAP {
     const char* const MAP_PATH = "nitro:/MAPS/";
     const char* const TILESET_PATH = "nitro:/MAPS/TILESETS/";
     const u16 SIZE = 32;
-    const s8 dir[ 4 ][ 2 ] = { { 0, -1 }, { 1, 0 }, { 0, 1 }, { 0, -1 } };
+    const s16 dir[ 4 ][ 2 ] = { { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 } };
 
     typedef struct {
         u16 m_pal[ 16 ];

@@ -38,8 +38,8 @@ namespace MAP {
     std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y ) {
         FILE* mapF = FS::open( MAP_PATH,
                                ( toString( p_map )
-                               + "/" + toString( p_x )
-                               + "_" + toString( p_y ) ).c_str( ),
+                               + "/" + toString( p_y )
+                               + "_" + toString( p_x ) ).c_str( ),
                                ".map" );
         if( !mapF ) {
 #ifdef DEBUG
@@ -48,7 +48,7 @@ namespace MAP {
             IO::drawSub( );
 #endif
             return 0;
-        }
+        } 
         std::unique_ptr<mapSlice> res = std::unique_ptr<mapSlice>( new mapSlice );
 
         FS::readNop( mapF, 8 );

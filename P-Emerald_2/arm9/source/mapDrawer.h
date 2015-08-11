@@ -43,7 +43,7 @@ namespace MAP {
         
         void draw( u16 p_globX, u16 p_globY, bool p_init );
         
-        void moveCamera( mapSlice::direction p_direction );
+        void moveCamera( mapSlice::direction p_direction, bool p_updatePlayer, bool p_autoLoadRows = true );
 
         void loadNewRow( mapSlice::direction p_direction, bool p_updatePlayer );
         void loadSlice( mapSlice::direction p_direction ); //dir: dir that needs to be extended
