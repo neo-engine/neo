@@ -53,7 +53,8 @@ namespace MAP {
         void handleWildPkmn( );
         void handleTrainer( );
 
-        MapBlockAtom at( u16 p_x, u16 p_y ) const;
+        Block& at( u16 p_x, u16 p_y ) const;
+        MapBlockAtom& atom( u16 p_x, u16 p_y ) const;
     public:
         mapDrawer( u8 p_currentMap, mapObject& p_player );
 

@@ -52,12 +52,14 @@ namespace MAP {
                                      + "_" + toString( p_x ) ).c_str( ),
                                      ".map" );
         if( !mapF ) {
-#ifdef DEBUG
-            sprintf( buffer, "Map %d/%d,%d does not exist.\n", p_map, p_y, p_x );
+#ifdef ___DEBUG
+            sprintf( buffer, "Map %d/%d,%d does not exist.\nTrying to load empty.map.", p_map, p_y, p_x );
             IO::messageBox m( buffer );
             IO::drawSub( true );
 #endif
-            return 0;
+            mapF = FS::open( MAP_PATH, "empty", ".map" );
+            if( !mapF )
+                return 0;
         }
         std::unique_ptr<mapSlice> res = std::unique_ptr<mapSlice>( new mapSlice );
 
@@ -132,121 +134,5 @@ namespace MAP {
         //sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx2 );
         //readAnimations( fopen( buffer, "rb" ), m_animations );
         return res;
-    }
-
-    bool mapSlice::canMove( position p_start, direction p_direction, moveMode p_moveMode ) {
-        u16 nx = p_start.m_posX + dir[ p_direction ][ 0 ];
-        u16 ny = p_start.m_posY + dir[ p_direction ][ 1 ];
-
-        //Leaving a map shall always be possible
-        if( nx / SIZE != p_start.m_posX / SIZE && nx / SIZE != m_x )
-            return true;
-        if( ny / SIZE != p_start.m_posY / SIZE && ny / SIZE != m_y )
-            return true;
-
-        //Gather data about the source block
-        u8 lstMoveData, lstBehave;
-        if( nx / SIZE != p_start.m_posX / SIZE
-            || ny / SIZE != p_start.m_posY / SIZE ) {
-            lstMoveData = 0;
-            lstBehave = 0;
-        } else {
-            lstMoveData = m_blocks[ p_start.m_posX % SIZE ][ p_start.m_posY % SIZE ].m_movedata;
-
-            auto lstBlock = m_blockSet.m_blocks[ m_blocks[ p_start.m_posX % SIZE ][ p_start.m_posY % SIZE ].m_blockidx ];
-            lstBehave = lstBlock.m_bottombehave;
-        }
-
-        //Gather data about the destination block
-        u8 curMoveData, curBehave;
-        curMoveData = m_blocks[ nx % SIZE ][ ny % SIZE ].m_movedata;
-
-        auto curBlock = m_blockSet.m_blocks[ m_blocks[ nx % SIZE ][ ny % SIZE ].m_blockidx ];
-        curBehave = curBlock.m_bottombehave;
-
-        //Check for special block attributes
-        switch( lstBehave ) {
-            case 0x30:
-                if( p_direction == direction::RIGHT )
-                    return false;
-                break;
-            case 0x31:
-                if( p_direction == direction::LEFT )
-                    return false;
-                break;
-            case 0x32:
-                if( p_direction == direction::UP )
-                    return false;
-                break;
-            case 0x33:
-                if( p_direction == direction::DOWN )
-                    return false;
-                break;
-            case 0x36:
-                if( p_direction == direction::DOWN || p_direction == direction::LEFT )
-                    return false;
-                break;
-            case 0x37:
-                if( p_direction == direction::DOWN || p_direction == direction::RIGHT )
-                    return false;
-                break;
-            case 0xa0:
-                if( !( p_moveMode & WALK ) )
-                    return false;
-                break;
-            case 0xc0:
-                if( p_direction % 2 )
-                    return false;
-                break;
-            case 0xc1:
-                if( p_direction % 2 == 0 )
-                    return false;
-                break;
-            default:
-                break;
-        }
-        switch( curBehave ) {
-            //Jumpy stuff
-            case 0x38: case 0x35:
-                return p_direction == direction::RIGHT;
-            case 0x39: case 0x34:
-                return p_direction == direction::LEFT;
-            case 0x3a:
-                return p_direction == direction::UP;
-            case 0x3b:
-                return p_direction == direction::DOWN;
-
-            case 0xa0:
-                if( !( p_moveMode & WALK ) )
-                    return false;
-                break;
-            case 0xc0:
-                if( p_direction % 2 )
-                    return false;
-                break;
-            case 0xc1:
-                if( p_direction % 2 == 0 )
-                    return false;
-                break;
-            case 0xd3: case 0xd4:
-            case 0xd5: case 0xd6:
-            case 0xd7:
-                return false;
-            default:
-                break;
-        }
-
-        //Check for movedata stuff
-        if( curMoveData % 4 == 1 )
-            return false;
-        if( curMoveData == 4 && !( p_moveMode & SURF ) )
-            return false;
-        else if( curMoveData == 4 )
-            return true;
-        if( curMoveData == 0x0c && lstMoveData == 4 )
-            return true;
-        if( !curMoveData )
-            return true;
-        return curMoveData % 4 == 0 && curMoveData / 4 == p_start.m_posZ;
     }
 }

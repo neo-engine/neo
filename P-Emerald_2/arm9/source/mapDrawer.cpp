@@ -46,10 +46,15 @@ namespace MAP {
     }
 
 
-    MapBlockAtom mapDrawer::at( u16 p_x, u16 p_y ) const {
+    MapBlockAtom& mapDrawer::atom( u16 p_x, u16 p_y ) const {
         bool x = ( p_x / SIZE != CUR_SLICE->m_x ),
             y = ( p_y / SIZE != CUR_SLICE->m_y );
-        return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blocks[ p_y % SIZE ][ p_x % SIZE ];
+        return  _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blocks[ p_y % SIZE ][ p_x % SIZE ];
+    }
+    Block& mapDrawer::at( u16 p_x, u16 p_y ) const {
+        bool x = ( p_x / SIZE != CUR_SLICE->m_x ),
+            y = ( p_y / SIZE != CUR_SLICE->m_y );
+        return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks[ _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blocks[ p_y % SIZE ][ p_x % SIZE ].m_blockidx ];
     }
 
     u16 lastrow, //Row to be filled when extending the map to the top
@@ -112,7 +117,7 @@ namespace MAP {
 
         for( s16 y = mny; y < mny + NUM_ROWS; y++ )
             for( s16 x = mnx; x < mnx + NUM_COLS; x++ )
-                loadBlock( CUR_SLICE->m_blockSet.m_blocks[ at( x, y ).m_blockidx ], x - mnx, y - mny );
+                loadBlock( at( x, y ), x - mnx, y - mny );
         bgUpdate( );
     }
 
@@ -159,7 +164,7 @@ namespace MAP {
                 u16 ty = cy - 8;
                 s16 mnx = cx - 15;
                 for( u16 x = ( lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS; x = ( x + 1 ) % NUM_COLS, ++xp )
-                    loadBlock( CUR_SLICE->m_blockSet.m_blocks[ at( xp, ty ).m_blockidx ], x, lastrow );
+                    loadBlock( at( xp, ty ), x, lastrow );
                 lastrow = ( lastrow + NUM_ROWS - 1 ) % NUM_ROWS;
                 break;
             }
@@ -167,7 +172,7 @@ namespace MAP {
                 u16 tx = cx - 15;
                 s16 mny = cy - 8;
                 for( u16 y = ( lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS; y = ( y + 1 ) % NUM_ROWS, ++yp )
-                    loadBlock( CUR_SLICE->m_blockSet.m_blocks[ at( tx, yp ).m_blockidx ], lastcol, y );
+                    loadBlock( at( tx, yp ), lastcol, y );
                 lastcol = ( lastcol + NUM_COLS - 1 ) % NUM_COLS;
                 break;
             }
@@ -176,7 +181,7 @@ namespace MAP {
                 u16 ty = cy + 7;
                 s16 mnx = cx - 15;
                 for( u16 x = ( lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS; x = ( x + 1 ) % NUM_COLS, ++xp )
-                    loadBlock( CUR_SLICE->m_blockSet.m_blocks[ at( xp, ty ).m_blockidx ], x, lastrow );
+                    loadBlock( at( xp, ty ), x, lastrow );
                 break;
             }
             case MAP::mapSlice::RIGHT: {
@@ -184,7 +189,7 @@ namespace MAP {
                 u16 tx = cx + 16;
                 s16 mny = cy - 8;
                 for( u16 y = ( lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS; y = ( y + 1 ) % NUM_ROWS, ++yp )
-                    loadBlock( CUR_SLICE->m_blockSet.m_blocks[ at( tx, yp ).m_blockidx ], lastcol, y );
+                    loadBlock( at( tx, yp ), lastcol, y );
                 break;
             }
         }
@@ -235,13 +240,117 @@ namespace MAP {
     bool mapDrawer::canMove( mapSlice::position p_start,
                              mapSlice::direction p_direction,
                              mapSlice::moveMode p_moveMode ) {
-        (void)p_start;
-        (void)p_direction;
-        (void)p_moveMode;
-        return true;
+        u16 nx = p_start.m_posX + dir[ p_direction ][ 0 ];
+        u16 ny = p_start.m_posY + dir[ p_direction ][ 1 ];
+
+        //Gather data about the source block
+        u8 lstMoveData, lstBehave;
+        if( nx / SIZE != p_start.m_posX / SIZE
+            || ny / SIZE != p_start.m_posY / SIZE ) {
+            lstMoveData = 0;
+            lstBehave = 0;
+        } else {
+            lstMoveData = atom( p_start.m_posX, p_start.m_posY ).m_movedata;
+
+            auto lstBlock = at( p_start.m_posX, p_start.m_posY );
+            lstBehave = lstBlock.m_bottombehave;
+        }
+
+        //Gather data about the destination block
+        u8 curMoveData, curBehave;
+        curMoveData = atom( nx, ny ).m_movedata;
+
+        auto curBlock = at( nx, ny );
+        curBehave = curBlock.m_bottombehave;
+
+        //Check for special block attributes
+        switch( lstBehave ) {
+            case 0x30:
+                if( p_direction == mapSlice::direction::RIGHT )
+                    return false;
+                break;
+            case 0x31:
+                if( p_direction == mapSlice::direction::LEFT )
+                    return false;
+                break;
+            case 0x32:
+                if( p_direction == mapSlice::direction::UP )
+                    return false;
+                break;
+            case 0x33:
+                if( p_direction == mapSlice::direction::DOWN )
+                    return false;
+                break;
+            case 0x36:
+                if( p_direction == mapSlice::direction::DOWN || p_direction == mapSlice::direction::LEFT )
+                    return false;
+                break;
+            case 0x37:
+                if( p_direction == mapSlice::direction::DOWN || p_direction == mapSlice::direction::RIGHT )
+                    return false;
+                break;
+            case 0xa0:
+                if( !( p_moveMode & mapSlice::WALK ) )
+                    return false;
+                break;
+            case 0xc0:
+                if( p_direction % 2 )
+                    return false;
+                break;
+            case 0xc1:
+                if( p_direction % 2 == 0 )
+                    return false;
+                break;
+            default:
+                break;
+        }
+        switch( curBehave ) {
+            //Jumpy stuff
+            case 0x38: case 0x35:
+                return p_direction == mapSlice::direction::RIGHT;
+            case 0x39: case 0x34:
+                return p_direction == mapSlice::direction::LEFT;
+            case 0x3a:
+                return p_direction == mapSlice::direction::UP;
+            case 0x3b:
+                return p_direction == mapSlice::direction::DOWN;
+
+            case 0xa0:
+                if( !( p_moveMode & mapSlice::WALK ) )
+                    return false;
+                break;
+            case 0xc0:
+                if( p_direction % 2 )
+                    return false;
+                break;
+            case 0xc1:
+                if( p_direction % 2 == 0 )
+                    return false;
+                break;
+            case 0xd3: case 0xd4:
+            case 0xd5: case 0xd6:
+            case 0xd7:
+                return false;
+            default:
+                break;
+        }
+
+        //Check for movedata stuff
+        if( curMoveData % 4 == 1 )
+            return false;
+        if( curMoveData == 4 && !( p_moveMode & mapSlice::SURF ) )
+            return false;
+        else if( curMoveData == 4 )
+            return true;
+        if( curMoveData == 0x0c && lstMoveData == 4 )
+            return true;
+        if( !curMoveData || !lstMoveData )
+            return true;
+        return curMoveData % 4 == 0 && curMoveData / 4 == p_start.m_posZ;
+
     }
     void mapDrawer::movePlayer( mapSlice::direction p_direction ) {
-        if( at( _player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+        if( atom( _player.m_pos.m_posX + dir[ p_direction ][ 0 ],
             _player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == MAP_BORDER ) {
             stopPlayer( mapSlice::direction( ( u8( p_direction ) + 2 ) % 4 ) );
             IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
@@ -249,6 +358,9 @@ namespace MAP {
             return;
         }
         moveCamera( p_direction, true );
+
+        if( atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata > 4 )
+            _player.m_pos.m_posZ = atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata / 4;
     }
     void mapDrawer::stopPlayer( mapSlice::direction p_direction ) {
         (void)p_direction;

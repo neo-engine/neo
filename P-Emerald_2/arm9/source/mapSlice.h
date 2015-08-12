@@ -101,8 +101,6 @@ namespace MAP {
         u8          m_map;
         u16         m_x, m_y;
         u16         m_location;
-
-        bool canMove( position p_start, direction p_direction, moveMode p_moveMode = WALK );
     };
     std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y );
 }

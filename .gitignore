@@ -51,3 +51,4 @@ P-Emerald_2/arm9/build
 *.stackdump
 *.dsm
 *desmume*
+*.evt
