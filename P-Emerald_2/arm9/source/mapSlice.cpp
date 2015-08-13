@@ -4,7 +4,7 @@ Pokémon Emerald 2 Version
 
 file        : mapSlice.cpp
 author      : Philip Wellnitz
-description : Header file. See corresponding source file for details.
+description : Header file. Consult the corresponding source file for details.
 
 Copyright (C) 2012 - 2015
 Philip Wellnitz
@@ -52,14 +52,14 @@ namespace MAP {
                                      + "_" + toString( p_x ) ).c_str( ),
                                      ".map" );
         if( !mapF ) {
-#ifdef ___DEBUG
-            sprintf( buffer, "Map %d/%d,%d does not exist.\nTrying to load empty.map.", p_map, p_y, p_x );
+#ifdef DEBUG
+            sprintf( buffer, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
             IO::messageBox m( buffer );
             IO::drawSub( true );
 #endif
-            mapF = FS::open( MAP_PATH, "empty", ".map" );
-            if( !mapF )
-                return 0;
+            //mapF = FS::open( MAP_PATH, "empty", ".map" );
+            //if( !mapF )
+            return 0;
         }
         std::unique_ptr<mapSlice> res = std::unique_ptr<mapSlice>( new mapSlice );
 
@@ -74,8 +74,15 @@ namespace MAP {
         FS::readNop( mapF, 3 );
 
         FS::readNop( mapF, 4 );
-        FS::readNop( mapF, 8 ); //Border blocks will be ignored
-        fread( res->m_blocks, sizeof( MapBlockAtom ), SIZE * SIZE, mapF );
+
+        fread( res->m_blocks, sizeof( MapBlockAtom ), 4, mapF ); //Border blocks
+        //If the map is somehow messed up (border blocks aren't zeroed out),
+        // read less other stuff
+        bool mapMessed = res->m_blocks[ 0 ][ 0 ].m_blockidx;
+        if( mapMessed )
+            IO::messageBox m( "Map's messed" );
+
+        fread( res->m_blocks + 4 * mapMessed, sizeof( MapBlockAtom ), SIZE * SIZE - 4 * mapMessed, mapF );
         FS::close( mapF );
 
         //Read the first tileset

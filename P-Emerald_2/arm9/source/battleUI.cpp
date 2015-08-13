@@ -48,7 +48,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "Back.h"
 #include "A.h"
-#include "map2d.h"
 
 #include "Battle1.h"
 #include "Battle2.h"

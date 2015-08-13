@@ -4,7 +4,7 @@
 
     file        : berry.h
     author      : Philip Wellnitz 
-    description : Header file. See corresponding source file (item.cpp) for details.
+    description : Header file. Consult the corresponding source file (item.cpp) for details.
 
     Copyright (C) 2012 - 2015
     Philip Wellnitz 

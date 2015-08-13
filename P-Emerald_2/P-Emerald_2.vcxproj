@@ -34,8 +34,8 @@
     <ClInclude Include="arm9\source\hmMoves.h" />
     <ClInclude Include="arm9\source\item.h" />
     <ClInclude Include="arm9\source\keyboard.h" />
-    <ClInclude Include="arm9\source\map2d.h" />
     <ClInclude Include="arm9\source\mapSlice.h" />
+    <ClInclude Include="arm9\source\mapSprite.h" />
     <ClInclude Include="arm9\source\messageBox.h" />
     <ClInclude Include="arm9\source\move.h" />
     <ClInclude Include="arm9\source\pokemon.h" />

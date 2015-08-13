@@ -25,54 +25,45 @@
     along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
     */
 
-#include <memory>
 
 #include <nds.h>
 #include <fat.h>
 #include <filesystem.h>
 
-#include "libnds_internal.h"
-
 #include <cstdio>
-#include <stdlib.h>
-#include "defines.h"
-
-#include "map2d.h"
-#include "hmMoves.h"
-
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <vector>
+#include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include <string>
+#include <vector>
+#include <memory>
 
+#include "defines.h"
+#include "saveGame.h"
+#include "startScreen.h"
+
+#include "hmMoves.h"
+#include "item.h"
+#include "berry.h"
+#include "pokemon.h"
+
+#include "uio.h"
 #include "messageBox.h"
 #include "yesNoBox.h"
 #include "choiceBox.h"
-#include "item.h"
-#include "berry.h"
-#include "uio.h"
-#include "battle.h"
-#include "statusScreen.h"
-#include "statusScreenUI.h"
+#include "sprite.h"
+
 #include "bagUI.h"
 #include "bagViewer.h"
-
-#include "pokemon.h"
-#include "saveGame.h"
-#include "keyboard.h"
-#include "sprite.h"
-#include "fs.h"
+#include "statusScreen.h"
+#include "statusScreenUI.h"
 #include "dex.h"
 #include "dexUI.h"
-
-#include "startScreen.h"
-
 #include "mapDrawer.h"
 #include "mapSlice.h"
 #include "mapObject.h"
 
+#include "battle.h"
 #include "Gen.h"
 
 #include "BigCirc1.h" 
@@ -141,8 +132,8 @@ bool whirlpool::possible( ) {
 }
 bool surf::possible( ) {
     return false;
-   // return ( FS::SAV->m_acMoveMode != MAP::MoveMode::SURF )
-   //     && acMap->m_blocks[ FS::SAV->m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ FS::SAV->m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].m_movedata == 4;
+    // return ( FS::SAV->m_acMoveMode != MAP::MoveMode::SURF )
+    //     && acMap->m_blocks[ FS::SAV->m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ FS::SAV->m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].m_movedata == 4;
 }
 
 void cut::use( ) { }
@@ -211,26 +202,13 @@ void initMainSprites( ) {
 }
 void initGraphics( ) {
     IO::vramSetup( );
-
     videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
     videoSetModeSub( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
 
-    // set up our top bitmap background
     IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
-    //bgSet( IO::bg3, 0, 1<<8, 1<<8, 0, 0, 0, 0 );
-    bgSetPriority( IO::bg3, 3 );
-    bgUpdate( );
-
-    // set up our bottom bitmap background
     IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
-    // bgSet( IO::bg3sub, 0, 1<<8, 1<<8, 0, 0, 0, 0 );
-    bgSetPriority( IO::bg3sub, 3 );
-    bgUpdate( );
-    //// set up our bottom bitmap background
     IO::bg2sub = bgInitSub( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
-    //// bgSet( IO::bg2sub, 0, 1<<8, 1<<8, 0, 0, 0, 0 );
-    bgSetPriority( IO::bg2sub, 2 );
-    //bgUpdate();
+    bgUpdate( );
 
     IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
     IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
@@ -346,8 +324,7 @@ int main( int, char** p_argv ) {
         IO::boldFont->setColor( oldC1, 1 );
         IO::boldFont->setColor( oldC2, 2 );
     } );
-    initMainSprites( );
-    IO::drawSub( );
+    IO::drawSub( true );
 
     curMap = new MAP::mapDrawer( FS::SAV->m_currentMap, FS::SAV->m_player );
     curMap->draw( );
@@ -361,9 +338,9 @@ int main( int, char** p_argv ) {
 
 #ifdef DEBUG
         if( held & KEY_L && gMod == DEVELOPER ) {
-            std::sprintf( buffer, "Currently at (%hu,%hu,%hu).",                          
-                          FS::SAV->m_player.m_pos.m_posX, 
-                          FS::SAV->m_player.m_pos.m_posY, 
+            std::sprintf( buffer, "Currently at (%hu,%hu,%hu).",
+                          FS::SAV->m_player.m_pos.m_posX,
+                          FS::SAV->m_player.m_pos.m_posY,
                           FS::SAV->m_player.m_pos.m_posZ );
             IO::messageBox m( buffer );
 
@@ -410,7 +387,7 @@ OUT:
         if( pressed & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
             MAP::mapSlice::direction curDir = GET_DIR( pressed );
 
-            if( curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) )
+            if( curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) || ( ( held & KEY_R ) && gMod == DEVELOPER ) )
                 curMap->movePlayer( curDir );
             else {
                 //Play "Bump" sound
@@ -422,7 +399,7 @@ OUT:
             MAP::mapSlice::direction curDir = GET_DIR( held );
             scanKeys( );
 
-            if( curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) )
+            if( curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) || ( ( held & KEY_R ) && gMod == DEVELOPER ) )
                 curMap->movePlayer( curDir );
             else {
                 //Play "Bump" sound
@@ -438,7 +415,7 @@ OUT:
             UPDATE_TIME = false;
 
             bv.run( FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
-            
+
             defaultScrns( );
             IO::drawSub( true );
             UPDATE_TIME = true;

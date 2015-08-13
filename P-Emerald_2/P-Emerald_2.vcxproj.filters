@@ -165,9 +165,6 @@
     <ClInclude Include="arm9\source\yesNoBox.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\map2d.h">
-      <Filter>Header Files\arm9\map</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\source\statusScreen.h">
       <Filter>Header Files\arm9\sts</Filter>
     </ClInclude>
@@ -194,6 +191,9 @@
     </ClInclude>
     <ClInclude Include="arm9\source\startScreen.h">
       <Filter>Header Files\arm9</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\mapSprite.h">
+      <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

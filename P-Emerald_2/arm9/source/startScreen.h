@@ -4,7 +4,7 @@ Pokémon Emerald 2 Version
 
 file        : startScreen.h
 author      : Philip Wellnitz
-description : Header file. See corresponding source file for details.
+description : Header file. Consult the corresponding source file for details.
 
 Copyright (C) 2012 - 2015
 Philip Wellnitz
