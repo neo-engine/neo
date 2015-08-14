@@ -73,16 +73,14 @@ namespace MAP {
         fread( &tsidx2, sizeof( u8 ), 1, mapF );
         FS::readNop( mapF, 3 );
 
-        FS::readNop( mapF, 4 );
+        u8 b1, b2;
+        fread( &b1, sizeof( u8 ), 1, mapF );
+        fread( &b2, sizeof( u8 ), 1, mapF );
+        FS::readNop( mapF, 2 );
 
-        fread( res->m_blocks, sizeof( MapBlockAtom ), 4, mapF ); //Border blocks
-        //If the map is somehow messed up (border blocks aren't zeroed out),
-        // read less other stuff
-        bool mapMessed = res->m_blocks[ 0 ][ 0 ].m_blockidx;
-        if( mapMessed )
-            IO::messageBox m( "Map's messed" );
+        fread( res->m_blocks, sizeof( MapBlockAtom ), b1 * b2, mapF ); //Border blocks
 
-        fread( res->m_blocks + 4 * mapMessed, sizeof( MapBlockAtom ), SIZE * SIZE - 4 * mapMessed, mapF );
+        fread( res->m_blocks, sizeof( MapBlockAtom ), SIZE * SIZE, mapF );
         FS::close( mapF );
 
         //Read the first tileset

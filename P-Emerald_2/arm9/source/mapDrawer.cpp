@@ -87,6 +87,8 @@ namespace MAP {
         loadBlock( p_curBlock, c );
     }
 
+    // Drawing of Maps and stuff
+
     void mapDrawer::draw( u16 p_globX, u16 p_globY, bool p_init ) {
         if( p_init ) {
             videoSetMode( MODE_0_2D/* | DISPLAY_BG0_ACTIVE*/ | DISPLAY_BG1_ACTIVE |
@@ -125,6 +127,24 @@ namespace MAP {
                     loadBlock( at( mnx + x, mny + y ), x, y );
             }
         bgUpdate( );
+    }
+
+    void mapDrawer::draw( ) {
+        draw( _player.m_pos.m_posX, _player.m_pos.m_posY, true ); //Draw the map
+
+        IO::initOAMTable( false );
+        drawPlayer( ); //Draw the player
+        drawObjects( ); //Draw NPCs / stuff
+    }
+
+    void mapDrawer::drawPlayer( ) {
+        _sprites[ 0 ] = _player.show( 128 - 8, 96 - 24, 0, 0, 0 );
+        _spritePos[ _player.m_id ] = 0;
+        _entriesUsed |= ( 1 << 0 );
+    }
+
+    void mapDrawer::drawObjects( ) {
+
     }
 
     void mapDrawer::loadNewRow( mapSlice::direction p_direction, bool p_updatePlayer ) {
@@ -231,10 +251,7 @@ namespace MAP {
     void mapDrawer::handleTrainer( ) { }
 
     mapDrawer::mapDrawer( u8 p_currentMap, mapObject& p_player )
-        :_player( p_player ) {
-        _curX = _curY = 0;
-        _curMap = p_currentMap;
-
+        : _curX( 0 ), _curY( 0 ), _curMap( p_currentMap ), _player( p_player ), _entriesUsed( 0 ) {
         u16 mx = p_player.m_pos.m_posX, my = p_player.m_pos.m_posY;
         _slices[ _curX ][ _curY ] = constructSlice( p_currentMap, mx / SIZE, my / SIZE );
         _slices[ _curX ^ 1 ][ _curY ] = constructSlice( p_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE );
@@ -242,9 +259,7 @@ namespace MAP {
         _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( p_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ) );
     }
 
-    void mapDrawer::draw( ) {
-        draw( _player.m_pos.m_posX, _player.m_pos.m_posY, true );
-    }
+    // Movement stuff
 
     bool mapDrawer::canMove( mapSlice::position p_start,
                              mapSlice::direction p_direction,
@@ -355,6 +370,8 @@ namespace MAP {
             return true;
         if( !curMoveData || !lstMoveData )
             return true;
+        if( curMoveData == 0x3c )
+            return true;
         return curMoveData % 4 == 0 && curMoveData / 4 == p_start.m_posZ;
 
     }
@@ -368,10 +385,11 @@ namespace MAP {
         }
         for( u8 i = 0; i < 16; ++i ) {
             moveCamera( p_direction, true );
-            //bgUpdate( );
-            //swiWaitForVBlank( );
+            if( i % 2 )
+                swiWaitForVBlank( );
         }
-        if( atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata > 4 )
+        if( atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata > 4
+            && atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata != 0x3c )
             _player.m_pos.m_posZ = atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata / 4;
     }
     void mapDrawer::stopPlayer( mapSlice::direction p_direction ) {
@@ -382,6 +400,7 @@ namespace MAP {
     }
 
     u16  mapDrawer::getCurrentLocationId( ) const {
-        return CUR_SLICE->m_location;
+        //TODO
+        return 0;
     }
 }

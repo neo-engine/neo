@@ -31,6 +31,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "mapSlice.h"
 #include "mapObject.h"
+#include "mapSprite.h"
 
 namespace MAP {
     class mapDrawer {
@@ -41,8 +42,14 @@ namespace MAP {
         std::map<std::pair<u16,u16>, std::vector<mapObject>>
             _mapObjs;
         mapObject& _player;
+
+        mapSprite _sprites[ 16 ];
+        u16 _entriesUsed;
+        std::map<u16, u8> _spritePos; //mapObject.id -> index in _sprites
         
         void draw( u16 p_globX, u16 p_globY, bool p_init );
+        void drawPlayer( );
+        void drawObjects( );
         
         void moveCamera( mapSlice::direction p_direction, bool p_updatePlayer, bool p_autoLoadRows = true );
 

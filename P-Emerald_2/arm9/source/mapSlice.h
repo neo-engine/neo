@@ -100,7 +100,6 @@ namespace MAP {
         MapBlockAtom m_blocks[ 32 ][ 32 ]; // [ y ][ x ]
         u8          m_map;
         u16         m_x, m_y;
-        u16         m_location;
     };
     std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y );
 }

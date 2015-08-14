@@ -413,6 +413,7 @@ OUT:
             BAG::bagViewer bv( FS::SAV->m_bag, &bui );
             ANIMATE_MAP = false;
             UPDATE_TIME = false;
+            INIT_MAIN_SPRITES = false;
 
             bv.run( FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
 
