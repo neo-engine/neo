@@ -57,6 +57,8 @@ extern bool INIT_MAIN_SPRITES;
 extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;
 
+extern int pressed, held, last;
+
 extern unsigned int TEMP[ 12288 ];
 extern unsigned short TEMP_PAL[ 256 ];
 
@@ -75,6 +77,12 @@ extern unsigned short TEMP_PAL[ 256 ];
                                         && IO::waitForInput( IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) )
 #define GET_AND_WAIT_C( p_x, p_y, p_r ) ( IN_RANGE_C( touch, IO::inputTarget( p_x, p_y, p_r ) )\
                                     && IO::waitForInput( IO::inputTarget( p_x, p_y, p_r ) ) )
+
+#define GET_DIR(a) ( \
+            ( (a) & KEY_DOWN )  ?   MAP::mapSlice::direction::DOWN : (\
+            ( (a) & KEY_UP )    ?   MAP::mapSlice::direction::UP : (\
+            ( (a) & KEY_RIGHT ) ?   MAP::mapSlice::direction::RIGHT :\
+                                    MAP::mapSlice::direction::LEFT ) ) )
 
 #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 #define COMPL(a) ( RGB( 31 - ( (a) >> 10 ) % 32,31 - ( (a) >> 5 ) % 32,31 - (a) % 32 ) )

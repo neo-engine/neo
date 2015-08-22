@@ -97,6 +97,7 @@ u8 DayTimes[ 4 ][ 5 ] = {
 
 int hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
 int achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
+int pressed, held, last;
 u8 frame = 0;
 bool DRAW_TIME = false;
 bool UPDATE_TIME = true;
@@ -208,6 +209,10 @@ void initGraphics( ) {
     IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
     IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
     IO::bg2sub = bgInitSub( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
+    for( u8 i = 0; i < 4; ++i )
+        bgSetPriority( i, i );
+    for( u8 i = 0; i < 4; ++i )
+        bgSetPriority( 4 + i, i );
     bgUpdate( );
 
     IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
@@ -331,10 +336,14 @@ int main( int, char** p_argv ) {
     ANIMATE_MAP = true;
 
     touchPosition touch;
+    bool stopped = true;
+    u8 bmp = false;
     loop( ) {
         swiWaitForVBlank( );
         touchRead( &touch );
-        int pressed = keysUp( ), held = keysHeld( );
+        pressed = keysUp( );
+        last = held;
+        held = keysHeld( );
 
 #ifdef DEBUG
         if( held & KEY_L && gMod == DEVELOPER ) {
@@ -378,33 +387,31 @@ OUT:
             ;
         }
         //Movement
-#define GET_DIR(a) ( \
-            ( (a) & KEY_DOWN )  ?   MAP::mapSlice::direction::DOWN : (\
-            ( (a) & KEY_UP )    ?   MAP::mapSlice::direction::UP : (\
-            ( (a) & KEY_RIGHT ) ?   MAP::mapSlice::direction::RIGHT :\
-                                    MAP::mapSlice::direction::LEFT ) ) )
-
-        if( pressed & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
-            MAP::mapSlice::direction curDir = GET_DIR( pressed );
-
-            if( curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) || ( ( held & KEY_R ) && gMod == DEVELOPER ) )
-                curMap->movePlayer( curDir );
-            else {
-                //Play "Bump" sound
-            }
-            curMap->stopPlayer( curDir );
-            continue;
-        }
         if( held & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
             MAP::mapSlice::direction curDir = GET_DIR( held );
             scanKeys( );
 
-            if( curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) || ( ( held & KEY_R ) && gMod == DEVELOPER ) )
+            stopped = false;
+            if( curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) || ( ( held & KEY_R ) && gMod == DEVELOPER ) ) {
                 curMap->movePlayer( curDir );
-            else {
+            } else if( !bmp ) {
                 //Play "Bump" sound
+                curMap->stopPlayer( curDir );
+                swiWaitForVBlank( );
+                bmp = true;
+            } else if( bmp < 2 ) {
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+                curMap->stopPlayer( );
+                bmp = 2;
             }
             continue;
+        }
+        if( !stopped ) {
+            curMap->stopPlayer( );
+            stopped = true;
+            bmp = false;
         }
         //StartBag
         if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 6 ],

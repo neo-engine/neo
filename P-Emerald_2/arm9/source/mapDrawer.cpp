@@ -104,8 +104,10 @@ namespace MAP {
             for( u16 i = 0; i < 1024; ++i )
                 swiCopy( CUR_SLICE->m_tileSet.m_blocks[ i ].m_tile, tileMemory + i * 32, 16 );
             dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
-            for( u8 i = 1; i < 4; ++i )
+            for( u8 i = 1; i < 4; ++i ) {
                 mapMemory[ i ] = (u16*)BG_MAP_RAM( 2 * i - 1 );
+                bgSetPriority( i, i );
+            }
         }
 
         lastrow = NUM_ROWS - 1;
@@ -379,21 +381,51 @@ namespace MAP {
         if( atom( _player.m_pos.m_posX + dir[ p_direction ][ 0 ],
             _player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == MAP_BORDER ) {
             stopPlayer( mapSlice::direction( ( u8( p_direction ) + 2 ) % 4 ) );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            stopPlayer( );
             IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
             IO::drawSub( true );
             return;
         }
+        //Check if the player's direction changed
+        if( p_direction != _player.m_direction ) {
+            _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( p_direction ) );
+            _player.m_direction = p_direction;
+        }
         for( u8 i = 0; i < 16; ++i ) {
             moveCamera( p_direction, true );
-            if( i % 2 )
-                swiWaitForVBlank( );
+            if( i == 1 ) {
+                _sprites[ _spritePos[ _player.m_id ] ].move( p_direction, 0 );
+                //swiWaitForVBlank( );
+            }
+
+            //if( i == 5 || i == 11 )
+            //    _sprites[ _spritePos[ _player.m_id ] ].move( p_direction, 1 );
+            if( i == 15 ) {
+                _sprites[ _spritePos[ _player.m_id ] ].move( p_direction, 0 );
+                //swiWaitForVBlank( );
+            }
+            if( i == 8 )
+                _sprites[ _spritePos[ _player.m_id ] ].nextFrame( );
+            swiWaitForVBlank( );
         }
         if( atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata > 4
             && atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata != 0x3c )
             _player.m_pos.m_posZ = atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata / 4;
     }
+    void mapDrawer::stopPlayer( ) {
+        _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( _player.m_direction ) );
+    }
     void mapDrawer::stopPlayer( mapSlice::direction p_direction ) {
-        (void)p_direction;
+        //Check if the player's direction changed
+        if( p_direction != _player.m_direction ) {
+            _player.m_direction = p_direction;
+            _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( p_direction ) );
+        }
+        _sprites[ _spritePos[ _player.m_id ] ].nextFrame( );
     }
     void mapDrawer::changeMoveMode( mapSlice::moveMode p_newMode ) {
         _player.m_movement = p_newMode;

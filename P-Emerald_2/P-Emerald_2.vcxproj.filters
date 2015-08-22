@@ -300,7 +300,7 @@
       <Filter>Source Files\arm9\map</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\mapObject.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\arm9\map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

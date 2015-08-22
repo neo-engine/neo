@@ -71,6 +71,7 @@ namespace MAP {
                       mapSlice::direction p_direction,
                       mapSlice::moveMode p_moveMode = mapSlice::WALK );
         void movePlayer( mapSlice::direction p_direction );
+        void stopPlayer( );
         void stopPlayer( mapSlice::direction p_direction );
         void changeMoveMode( mapSlice::moveMode p_newMode );
 

@@ -42,7 +42,6 @@ namespace MAP {
     typedef struct {
         u8 m_tile[ 32 ];
     } Tile;
-    typedef u8 PalNo;
     //typedef struct{
     //    u16 tileidx      : 10;
     //    u8 vflip         :  1;

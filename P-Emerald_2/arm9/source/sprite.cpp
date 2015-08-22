@@ -342,6 +342,21 @@ namespace IO {
         return p_tileCnt + 144;
     }
 
+    u16 loadOWSprite( const char* p_path, const u16 p_picnum, const u8 p_frame,
+                      const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt ) {
+
+        u8 frame = p_frame;
+        if( frame % 20 >= 9 )
+            frame -= 3;
+
+        char buffer[ 100 ];
+        sprintf( buffer, "%hu/%hhu", p_picnum, frame );
+        if( !FS::readData( p_path, buffer, (unsigned int)64, TEMP, (unsigned short)16, TEMP_PAL ) )
+            return 0;
+        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 16, 32, TEMP_PAL, TEMP, 256,
+                           false, frame != p_frame, false, OBJPRIORITY_2, false );
+    }
+
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         if( FS::readData( p_path, p_name, (unsigned int)128, TEMP, (unsigned short)16, TEMP_PAL ) ) {
             return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP, 512,

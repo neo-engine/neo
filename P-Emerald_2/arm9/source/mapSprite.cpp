@@ -28,26 +28,58 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "mapSprite.h"
 #include "sprite.h"
 #include "uio.h"
+#include "fs.h"
+
+#include "messageBox.h"
 
 namespace MAP {
-    mapSprite::mapSprite( u16 p_imageId, u8 p_frameStart, u8 p_frame, u8 p_frameCount, bool p_isBig )
-        : _picNum( p_imageId ), _frameStart( p_frameStart ), _frame( p_frame ), _frameCount( p_frameCount ) {
+    const char* OW_PATH = "nitro:/PICS/SPRITES/OW/";
+    //void loadframe( IO::SpriteInfo* p_si, int p_idx, int p_frame, bool p_big = false ) {
+    //    char buffer[ 50 ];
+    //    sprintf( buffer, "%i/%i", p_idx, p_frame );
+    //    if( !p_big )
+    //        FS::readSpriteData( p_si, "nitro:/PICS/SPRITES/OW/", buffer, 64, 16 );
+    //    else
+    //        FS::readSpriteData( p_si, "nitro:/PICS/SPRITES/OW/", buffer, 128, 16 );
+    //}
 
+    mapSprite::mapSprite( u16 p_currX, u16 p_currY,
+                          u16 p_imageId,
+                          u8 p_startFrame,
+                          bool p_isBig,
+                          u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx )
+                          :_picNum( p_imageId ),
+                          _curFrame( p_startFrame ),
+                          _oamIndex( p_oamIdx ), _palette( p_palIdx ), _tileIdx( p_tileIdx ) {
+        if( !IO::loadOWSprite( OW_PATH, _picNum, _curFrame, p_currX, p_currY, p_oamIdx, p_palIdx, p_tileIdx ) ) {
+            IO::messageBox m( "Sprite failed" );
+            IO::drawSub( true );
+        }
+        IO::updateOAM( false );
     }
 
     void mapSprite::setVisibility( bool p_value ) {
         IO::OamTop->oamBuffer[ _oamIndex ].isHidden = !p_value;
-        IO::updateOAM( IO::OamTop );
+        IO::updateOAM( false );
     }
 
     void mapSprite::setFrame( u8 p_value ) {
-        _frame = p_value;
-
-        IO::updateOAM( IO::OamTop );
+        _curFrame = p_value;
+        IO::loadOWSprite( OW_PATH, _picNum, _curFrame, IO::OamTop->oamBuffer[ _oamIndex ].x,
+                          IO::OamTop->oamBuffer[ _oamIndex ].y, _oamIndex, _palette, _tileIdx );
+        IO::updateOAM( false );
     }
 
     void mapSprite::nextFrame( ) {
-        _frame = ( ( _frame + 1 - _frameStart ) % _frameCount ) + _frameStart;
-        setFrame( _frame );
+        _curFrame++;
+        if( _curFrame % 3 == 0 )
+            _curFrame -= 2;
+        setFrame( _curFrame );
+    }
+
+    void mapSprite::move( mapSlice::direction p_direction, s16 p_amount ) {
+        IO::OamTop->oamBuffer[ _oamIndex ].x += p_amount * dir[ p_direction ][ 0 ];
+        IO::OamTop->oamBuffer[ _oamIndex ].y += p_amount * dir[ p_direction ][ 1 ];
+        IO::updateOAM( false );
     }
 }

@@ -30,6 +30,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "mapSprite.h"
 
 namespace MAP {
+    u8 getFrame( mapSlice::direction p_direction );
+
     struct mapObject {
         enum type {
             PLYR,
@@ -41,6 +43,7 @@ namespace MAP {
         mapSlice::moveMode m_movement;
         u16 m_range;
         u16 m_id;
+        mapSlice::direction m_direction;
 
         void interact( );
         mapSprite show( u16 p_currX, u16 p_currY, u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx );

@@ -4,7 +4,7 @@ Pokémon Emerald 2 Version
 
 file        : mapObject.cpp
 author      : Philip Wellnitz
-description : 
+description :
 
 Copyright (C) 2012 - 2015
 Philip Wellnitz
@@ -29,11 +29,27 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "mapSprite.h"
 
 namespace MAP {
+    u8 getFrame( mapSlice::direction p_direction ) {        
+        switch( p_direction ) {
+            case MAP::mapSlice::UP:
+                return 3;
+            case MAP::mapSlice::RIGHT:
+                return 9;
+            case MAP::mapSlice::DOWN:
+                return 0;
+            case MAP::mapSlice::LEFT:
+                return 6;
+        }
+        return 0;
+    }
+
     void mapObject::interact( ) {
 
     }
 
     mapSprite mapObject::show( u16 p_currX, u16 p_currY, u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx ) {
-        return mapSprite( );
+        u8 frameStart = getFrame( m_direction );
+
+        return mapSprite( p_currX, p_currY, m_picNum, frameStart, false, p_oamIdx, p_palIdx, p_tileIdx );
     }
 }
