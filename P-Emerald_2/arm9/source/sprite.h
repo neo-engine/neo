@@ -3,11 +3,11 @@
  ------------------------------
 
  file : sprite.h
- author : Philip Wellnitz 
+ author : Philip Wellnitz
  description : Header file. Consult the corresponding source file for details.
 
  Copyright (C) 2012 - 2015
- Philip Wellnitz 
+ Philip Wellnitz
 
  This file is part of Pokémon Emerald 2 Version.
 
@@ -37,7 +37,7 @@ namespace IO {
     extern const unsigned short* TypePals[ 19 ];
     extern const unsigned int* HitTypeTiles[ 3 ];
     extern const unsigned short* HitTypePals[ 3 ];
-    
+
     struct SpriteInfo {
         u8 m_oamId;
         u8 m_width;
@@ -98,8 +98,8 @@ namespace IO {
                            u8 p_oamIndex, u8 p_palCnt, u16 p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false, bool p_topOnly = false );
 
     u16 loadOWSprite( const char* p_path, const u16 p_picnum, const s16 p_posX, const s16 p_posY,
-                      u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt );
-    void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt );
+                      u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_isBig = false );
+    void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt, bool p_isBig = false );
 
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
                   u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom );

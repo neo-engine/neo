@@ -393,7 +393,7 @@ OUT:
 
             stopped = false;
             if( curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) || ( ( held & KEY_R ) && gMod == DEVELOPER ) ) {
-                curMap->movePlayer( curDir );
+                curMap->movePlayer( curDir, ( held & KEY_B ) );
             } else if( !bmp ) {
                 //Play "Bump" sound
                 curMap->stopPlayer( curDir );

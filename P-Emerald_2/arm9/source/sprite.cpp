@@ -343,26 +343,26 @@ namespace IO {
     }
 
     u16 loadOWSprite( const char* p_path, const u16 p_picnum,
-                      const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt ) {
+                      const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_isBig ) {
 
         FILE* f = FS::open( p_path, p_picnum, ".rsd" );
         fread( TEMP_PAL, sizeof( unsigned short ), 16, f );
         u8 frameCount;
         fread( &frameCount, sizeof( u8 ), 1, f );
-        fread( TEMP, sizeof( unsigned int ), 64 * frameCount, f );
+        fread( TEMP, sizeof( unsigned int ), ( 64 + p_isBig * 64 ) * frameCount, f );
         FS::close( f );
 
-        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 16, 32, TEMP_PAL,
-                           TEMP, 256 * frameCount, false, false, false, OBJPRIORITY_2, false );
+        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, ( 16 + p_isBig * 16 ), 32, TEMP_PAL,
+                           TEMP, ( 256 + p_isBig * 256 ) * frameCount, false, false, false, OBJPRIORITY_2, false );
     }
-    void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt ) {
+    void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt, bool p_isBig ) {
         u8 frame = p_frame;
         if( frame % 20 >= 9 )
             frame -= 3;
         u8 memPos = frame / 20 * 9 + frame % 20;
 
         OamTop->oamBuffer[ p_oamIndex ].hFlip = ( frame != p_frame );
-        OamTop->oamBuffer[ p_oamIndex ].gfxIndex = p_tileCnt + memPos * 8;
+        OamTop->oamBuffer[ p_oamIndex ].gfxIndex = p_tileCnt + memPos * ( 8 + p_isBig * 8 );
     }
 
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {

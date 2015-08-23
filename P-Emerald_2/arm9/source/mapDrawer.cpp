@@ -259,6 +259,7 @@ namespace MAP {
         _slices[ _curX ^ 1 ][ _curY ] = constructSlice( p_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE );
         _slices[ _curX ][ _curY ^ 1 ] = constructSlice( p_currentMap, mx / SIZE, my / SIZE + currentHalf( my ) );
         _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( p_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ) );
+        _playerIsFast = false;
     }
 
     // Movement stuff
@@ -377,7 +378,7 @@ namespace MAP {
         return curMoveData % 4 == 0 && curMoveData / 4 == p_start.m_posZ;
 
     }
-    void mapDrawer::movePlayer( mapSlice::direction p_direction ) {
+    void mapDrawer::movePlayer( mapSlice::direction p_direction, bool p_fast ) {
         if( atom( _player.m_pos.m_posX + dir[ p_direction ][ 0 ],
             _player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == MAP_BORDER ) {
             stopPlayer( mapSlice::direction( ( u8( p_direction ) + 2 ) % 4 ) );
@@ -392,16 +393,21 @@ namespace MAP {
         }
         //Check if the player's direction changed
         if( p_direction != _player.m_direction ) {
-            _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( p_direction ) );
+            _sprites[ _spritePos[ _player.m_id ] ].setFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
             _player.m_direction = p_direction;
+        }
+        if( p_fast != _playerIsFast ) {
+            _playerIsFast = p_fast;
+            _sprites[ _spritePos[ _player.m_id ] ].setFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
         }
         for( u8 i = 0; i < 16; ++i ) {
             moveCamera( p_direction, true );
             if( i == 8 )
                 _sprites[ _spritePos[ _player.m_id ] ].nextFrame( );
-            swiWaitForVBlank( );
+            if( !p_fast || i % 3 )
+                swiWaitForVBlank( );
         }
-        _sprites[ _spritePos[ _player.m_id ] ].drawFrame( getFrame( p_direction ) );
+        _sprites[ _spritePos[ _player.m_id ] ].drawFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
         if( atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata > 4
             && atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata != 0x3c )
             _player.m_pos.m_posZ = atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata / 4;

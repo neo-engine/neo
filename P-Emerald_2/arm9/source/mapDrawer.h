@@ -42,6 +42,7 @@ namespace MAP {
         std::map<std::pair<u16,u16>, std::vector<mapObject>>
             _mapObjs;
         mapObject& _player;
+        bool _playerIsFast;
 
         mapSprite _sprites[ 16 ];
         u16 _entriesUsed;
@@ -70,7 +71,7 @@ namespace MAP {
         bool canMove( mapSlice::position p_start,
                       mapSlice::direction p_direction,
                       mapSlice::moveMode p_moveMode = mapSlice::WALK );
-        void movePlayer( mapSlice::direction p_direction );
+        void movePlayer( mapSlice::direction p_direction, bool p_fast = false );
         void stopPlayer( );
         void stopPlayer( mapSlice::direction p_direction );
         void changeMoveMode( mapSlice::moveMode p_newMode );

@@ -34,14 +34,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 namespace MAP {
     const char* OW_PATH = "nitro:/PICS/SPRITES/OW/";
-    //void loadframe( IO::SpriteInfo* p_si, int p_idx, int p_frame, bool p_big = false ) {
-    //    char buffer[ 50 ];
-    //    sprintf( buffer, "%i/%i", p_idx, p_frame );
-    //    if( !p_big )
-    //        FS::readSpriteData( p_si, "nitro:/PICS/SPRITES/OW/", buffer, 64, 16 );
-    //    else
-    //        FS::readSpriteData( p_si, "nitro:/PICS/SPRITES/OW/", buffer, 128, 16 );
-    //}
 
     mapSprite::mapSprite( u16 p_currX, u16 p_currY,
                           u16 p_imageId,
@@ -50,11 +42,11 @@ namespace MAP {
                           u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx )
                           : _oamIndex( p_oamIdx ), _palette( p_palIdx ), _tileIdx( p_tileIdx ),
                           _picNum( p_imageId ), _curFrame( p_startFrame ) {
-        if( !IO::loadOWSprite( OW_PATH, _picNum, p_currX, p_currY, _oamIndex, _palette, _tileIdx ) ) {
+        if( !IO::loadOWSprite( OW_PATH, _picNum, p_currX, p_currY, _oamIndex, _palette, _tileIdx, p_isBig ) ) {
             IO::messageBox m( "Sprite failed" );
             IO::drawSub( true );
         }
-        IO::setOWSpriteFrame( _curFrame, _oamIndex, _tileIdx );
+        IO::setOWSpriteFrame( _curFrame, _oamIndex, _tileIdx, p_isBig );
         IO::updateOAM( false );
     }
 
@@ -74,7 +66,7 @@ namespace MAP {
 
     void mapSprite::nextFrame( ) {
         _curFrame++;
-        if( _curFrame % 3 == 0 )
+        if( ( _curFrame % 20 ) % 3 == 0 )
             _curFrame -= 2;
         drawFrame( _curFrame );
     }
