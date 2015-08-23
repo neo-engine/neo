@@ -342,19 +342,27 @@ namespace IO {
         return p_tileCnt + 144;
     }
 
-    u16 loadOWSprite( const char* p_path, const u16 p_picnum, const u8 p_frame,
+    u16 loadOWSprite( const char* p_path, const u16 p_picnum,
                       const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt ) {
 
+        FILE* f = FS::open( p_path, p_picnum, ".rsd" );
+        fread( TEMP_PAL, sizeof( unsigned short ), 16, f );
+        u8 frameCount;
+        fread( &frameCount, sizeof( u8 ), 1, f );
+        fread( TEMP, sizeof( unsigned int ), 64 * frameCount, f );
+        FS::close( f );
+
+        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 16, 32, TEMP_PAL,
+                           TEMP, 256 * frameCount, false, false, false, OBJPRIORITY_2, false );
+    }
+    void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt ) {
         u8 frame = p_frame;
         if( frame % 20 >= 9 )
             frame -= 3;
+        u8 memPos = frame / 20 * 9 + frame % 20;
 
-        char buffer[ 100 ];
-        sprintf( buffer, "%hu/%hhu", p_picnum, frame );
-        if( !FS::readData( p_path, buffer, (unsigned int)64, TEMP, (unsigned short)16, TEMP_PAL ) )
-            return 0;
-        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 16, 32, TEMP_PAL, TEMP, 256,
-                           false, frame != p_frame, false, OBJPRIORITY_2, false );
+        OamTop->oamBuffer[ p_oamIndex ].hFlip = ( frame != p_frame );
+        OamTop->oamBuffer[ p_oamIndex ].gfxIndex = p_tileCnt + memPos * 8;
     }
 
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
@@ -383,9 +391,9 @@ namespace IO {
 
     u16 loadTMIcon( Type p_type, bool p_hm, const u16 p_posX, const u16 p_posY,
                     u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
-        std::string itemname = ( p_hm ? "VM" : "TM" ) + ( std::vector<std::string>( { "Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein", "Pflanze", "Geist",
-            "Stahl", "Unbekannt", "Wasser", "Feuer", "Pflanze", "Elektro", "Psycho", "Eis",
-            "Drache", "Unlicht", "Fee" } )[ p_type ] );
+        std::string itemname = ( p_hm ? "VM" : "TM" ) + ( std::vector<std::string>{ "Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein", "Pflanze", "Geist",
+                                                          "Stahl", "Unbekannt", "Wasser", "Feuer", "Pflanze", "Elektro", "Psycho", "Eis",
+                                                          "Drache", "Unlicht", "Fee" }[ p_type ] );
 
         return loadItemIcon( itemname, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }

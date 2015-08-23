@@ -50,6 +50,7 @@ namespace MAP {
                    u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx );
 
         void setVisibility( bool p_value );
+        void drawFrame( u8 p_value );
         void setFrame( u8 p_value );
         void nextFrame( );
         void move( mapSlice::direction p_direction, s16 p_amount );

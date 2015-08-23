@@ -397,27 +397,17 @@ namespace MAP {
         }
         for( u8 i = 0; i < 16; ++i ) {
             moveCamera( p_direction, true );
-            if( i == 1 ) {
-                _sprites[ _spritePos[ _player.m_id ] ].move( p_direction, 0 );
-                //swiWaitForVBlank( );
-            }
-
-            //if( i == 5 || i == 11 )
-            //    _sprites[ _spritePos[ _player.m_id ] ].move( p_direction, 1 );
-            if( i == 15 ) {
-                _sprites[ _spritePos[ _player.m_id ] ].move( p_direction, 0 );
-                //swiWaitForVBlank( );
-            }
             if( i == 8 )
                 _sprites[ _spritePos[ _player.m_id ] ].nextFrame( );
             swiWaitForVBlank( );
         }
+        _sprites[ _spritePos[ _player.m_id ] ].drawFrame( getFrame( p_direction ) );
         if( atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata > 4
             && atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata != 0x3c )
             _player.m_pos.m_posZ = atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata / 4;
     }
     void mapDrawer::stopPlayer( ) {
-        _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( _player.m_direction ) );
+        _sprites[ _spritePos[ _player.m_id ] ].drawFrame( getFrame( _player.m_direction ) );
     }
     void mapDrawer::stopPlayer( mapSlice::direction p_direction ) {
         //Check if the player's direction changed

@@ -155,7 +155,7 @@ void initNewGame( ) {
 
     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
 
-    FS::SAV->m_player = { MAP::mapObject::PLYR, { 107, 101, 4 }, 0, MAP::mapSlice::moveMode::WALK, 0, 0, MAP::mapSlice::direction::DOWN };
+    FS::SAV->m_player = { MAP::mapObject::PLYR, { 108, 100, 4 }, 10, MAP::mapSlice::moveMode::WALK, 0, 0, MAP::mapSlice::direction::DOWN };
     FS::SAV->m_isMale = true;
     FS::SAV->m_currentMap = 10;
     FS::SAV->m_bag = new BAG::bag( );

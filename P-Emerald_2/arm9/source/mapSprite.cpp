@@ -48,13 +48,13 @@ namespace MAP {
                           u8 p_startFrame,
                           bool p_isBig,
                           u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx )
-                          :_picNum( p_imageId ),
-                          _curFrame( p_startFrame ),
-                          _oamIndex( p_oamIdx ), _palette( p_palIdx ), _tileIdx( p_tileIdx ) {
-        if( !IO::loadOWSprite( OW_PATH, _picNum, _curFrame, p_currX, p_currY, p_oamIdx, p_palIdx, p_tileIdx ) ) {
+                          : _oamIndex( p_oamIdx ), _palette( p_palIdx ), _tileIdx( p_tileIdx ),
+                          _picNum( p_imageId ), _curFrame( p_startFrame ) {
+        if( !IO::loadOWSprite( OW_PATH, _picNum, p_currX, p_currY, _oamIndex, _palette, _tileIdx ) ) {
             IO::messageBox m( "Sprite failed" );
             IO::drawSub( true );
         }
+        IO::setOWSpriteFrame( _curFrame, _oamIndex, _tileIdx );
         IO::updateOAM( false );
     }
 
@@ -62,19 +62,21 @@ namespace MAP {
         IO::OamTop->oamBuffer[ _oamIndex ].isHidden = !p_value;
         IO::updateOAM( false );
     }
+    void mapSprite::drawFrame( u8 p_value ) {
+        IO::setOWSpriteFrame( p_value, _oamIndex, _tileIdx );
+        IO::updateOAM( false );
+    }
 
     void mapSprite::setFrame( u8 p_value ) {
         _curFrame = p_value;
-        IO::loadOWSprite( OW_PATH, _picNum, _curFrame, IO::OamTop->oamBuffer[ _oamIndex ].x,
-                          IO::OamTop->oamBuffer[ _oamIndex ].y, _oamIndex, _palette, _tileIdx );
-        IO::updateOAM( false );
+        drawFrame( _curFrame );
     }
 
     void mapSprite::nextFrame( ) {
         _curFrame++;
         if( _curFrame % 3 == 0 )
             _curFrame -= 2;
-        setFrame( _curFrame );
+        drawFrame( _curFrame );
     }
 
     void mapSprite::move( mapSlice::direction p_direction, s16 p_amount ) {
