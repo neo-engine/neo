@@ -439,20 +439,16 @@ namespace MAP {
             switch( newBehave ) {
                 //First check for jumps
                 case 0x38:
-                    jumpPlayer( mapSlice::direction::RIGHT );
-                    p_direction = mapSlice::direction::RIGHT;
+                    jumpPlayer( mapSlice::direction::RIGHT ); p_direction = mapSlice::direction::RIGHT;
                     break;
                 case 0x39:
-                    jumpPlayer( mapSlice::direction::LEFT );
-                    p_direction = mapSlice::direction::LEFT;
+                    jumpPlayer( mapSlice::direction::LEFT ); p_direction = mapSlice::direction::LEFT;
                     break;
                 case 0x3a:
-                    jumpPlayer( mapSlice::direction::UP );
-                    p_direction = mapSlice::direction::UP;
+                    jumpPlayer( mapSlice::direction::UP ); p_direction = mapSlice::direction::UP;
                     break;
                 case 0x3b:
-                    jumpPlayer( mapSlice::direction::DOWN );
-                    p_direction = mapSlice::direction::DOWN;
+                    jumpPlayer( mapSlice::direction::DOWN ); p_direction = mapSlice::direction::DOWN;
                     break;
                 default:
                     //If no jump has to be done, check for other stuff
@@ -465,55 +461,68 @@ namespace MAP {
 
                             //These change the direction of movement
                         case 0x40:
-                            walkPlayer( mapSlice::direction::RIGHT );
-                            p_direction = mapSlice::direction::RIGHT;
+                            if( !canMove( _player.m_pos, mapSlice::direction::RIGHT, _player.m_movement ) )
+                                goto NEXT_PASS;
+                            walkPlayer( mapSlice::direction::RIGHT ); p_direction = mapSlice::direction::RIGHT;
                             break;
                         case 0x41:
-                            walkPlayer( mapSlice::direction::LEFT );
-                            p_direction = mapSlice::direction::LEFT;
+                            if( !canMove( _player.m_pos, mapSlice::direction::LEFT, _player.m_movement ) )
+                                goto NEXT_PASS;
+                            walkPlayer( mapSlice::direction::LEFT ); p_direction = mapSlice::direction::LEFT;
                             break;
                         case 0x42:
-                            walkPlayer( mapSlice::direction::UP );
-                            p_direction = mapSlice::direction::UP;
+                            if( !canMove( _player.m_pos, mapSlice::direction::UP, _player.m_movement ) )
+                                goto NEXT_PASS;
+                            walkPlayer( mapSlice::direction::UP ); p_direction = mapSlice::direction::UP;
                             break;
                         case 0x43:
-                            walkPlayer( mapSlice::direction::DOWN );
-                            p_direction = mapSlice::direction::DOWN;
+                            if( !canMove( _player.m_pos, mapSlice::direction::DOWN, _player.m_movement ) )
+                                goto NEXT_PASS;
+                            walkPlayer( mapSlice::direction::DOWN ); p_direction = mapSlice::direction::DOWN;
                             break;
 
                         case 0x44:
-                            slidePlayer( mapSlice::direction::RIGHT );
-                            p_direction = mapSlice::direction::RIGHT;
+                            if( !canMove( _player.m_pos, mapSlice::direction::RIGHT, _player.m_movement ) )
+                                goto NEXT_PASS;
+                            slidePlayer( mapSlice::direction::RIGHT ); p_direction = mapSlice::direction::RIGHT;
                             break;
                         case 0x45:
-                            slidePlayer( mapSlice::direction::LEFT );
-                            p_direction = mapSlice::direction::LEFT;
+                            if( !canMove( _player.m_pos, mapSlice::direction::LEFT, _player.m_movement ) )
+                                goto NEXT_PASS;
+                            slidePlayer( mapSlice::direction::LEFT ); p_direction = mapSlice::direction::LEFT;
                             break;
                         case 0x46:
-                            slidePlayer( mapSlice::direction::UP );
-                            p_direction = mapSlice::direction::UP;
+                            if( !canMove( _player.m_pos, mapSlice::direction::UP, _player.m_movement ) )
+                                goto NEXT_PASS;
+                            slidePlayer( mapSlice::direction::UP ); p_direction = mapSlice::direction::UP;
                             break;
                         case 0x47:
-                            slidePlayer( mapSlice::direction::DOWN );
-                            p_direction = mapSlice::direction::DOWN;
+                            if( !canMove( _player.m_pos, mapSlice::direction::DOWN, _player.m_movement ) )
+                                goto NEXT_PASS;
+                            slidePlayer( mapSlice::direction::DOWN ); p_direction = mapSlice::direction::DOWN;
                             break;
 
                         case 0x50:
-                            walkPlayer( mapSlice::direction::RIGHT, true );
-                            p_direction = mapSlice::direction::RIGHT;
+                            if( !canMove( _player.m_pos, mapSlice::direction::RIGHT, _player.m_movement ) )
+                                goto NEXT_PASS;
+                            walkPlayer( mapSlice::direction::RIGHT, true ); p_direction = mapSlice::direction::RIGHT;
                             break;
                         case 0x51:
-                            walkPlayer( mapSlice::direction::LEFT, true );
-                            p_direction = mapSlice::direction::LEFT;
+                            if( !canMove( _player.m_pos, mapSlice::direction::LEFT, _player.m_movement ) )
+                                goto NEXT_PASS;
+                            walkPlayer( mapSlice::direction::LEFT, true ); p_direction = mapSlice::direction::LEFT;
                             break;
                         case 0x52:
-                            walkPlayer( mapSlice::direction::UP, true );
-                            p_direction = mapSlice::direction::UP;
+                            if( !canMove( _player.m_pos, mapSlice::direction::UP, _player.m_movement ) )
+                                goto NEXT_PASS;
+                            walkPlayer( mapSlice::direction::UP, true ); p_direction = mapSlice::direction::UP;
                             break;
                         case 0x53:
-                            walkPlayer( mapSlice::direction::DOWN, true );
-                            p_direction = mapSlice::direction::DOWN;
+                            if( !canMove( _player.m_pos, mapSlice::direction::DOWN, _player.m_movement ) )
+                                goto NEXT_PASS;
+                            walkPlayer( mapSlice::direction::DOWN, true ); p_direction = mapSlice::direction::DOWN;
                             break;
+NEXT_PASS:
                         default:
                             if( reinit ) {
                                 _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( p_direction ) );
@@ -526,54 +535,42 @@ namespace MAP {
 
                                     //These change the direction of movement
                                 case 0x40:
-                                    walkPlayer( p_direction, p_fast );
-                                    p_direction = mapSlice::direction::RIGHT;
+                                    walkPlayer( p_direction, p_fast ); p_direction = mapSlice::direction::RIGHT;
                                     break;
                                 case 0x41:
-                                    walkPlayer( p_direction, p_fast );
-                                    p_direction = mapSlice::direction::LEFT;
+                                    walkPlayer( p_direction, p_fast ); p_direction = mapSlice::direction::LEFT;
                                     break;
                                 case 0x42:
-                                    walkPlayer( p_direction, p_fast );
-                                    p_direction = mapSlice::direction::UP;
+                                    walkPlayer( p_direction, p_fast ); p_direction = mapSlice::direction::UP;
                                     break;
                                 case 0x43:
-                                    walkPlayer( p_direction, p_fast );
-                                    p_direction = mapSlice::direction::DOWN;
+                                    walkPlayer( p_direction, p_fast ); p_direction = mapSlice::direction::DOWN;
                                     break;
 
                                 case 0x44:
-                                    walkPlayer( p_direction, p_fast );
-                                    p_direction = mapSlice::direction::RIGHT;
+                                    walkPlayer( p_direction, p_fast ); p_direction = mapSlice::direction::RIGHT;
                                     break;
                                 case 0x45:
-                                    walkPlayer( p_direction, p_fast );
-                                    p_direction = mapSlice::direction::LEFT;
+                                    walkPlayer( p_direction, p_fast ); p_direction = mapSlice::direction::LEFT;
                                     break;
                                 case 0x46:
-                                    walkPlayer( p_direction, p_fast );
-                                    p_direction = mapSlice::direction::UP;
+                                    walkPlayer( p_direction, p_fast ); p_direction = mapSlice::direction::UP;
                                     break;
                                 case 0x47:
-                                    walkPlayer( p_direction, p_fast );
-                                    p_direction = mapSlice::direction::DOWN;
+                                    walkPlayer( p_direction, p_fast ); p_direction = mapSlice::direction::DOWN;
                                     break;
 
                                 case 0x50:
-                                    walkPlayer( p_direction, p_fast );
-                                    p_direction = mapSlice::direction::RIGHT;
+                                    walkPlayer( p_direction, p_fast ); p_direction = mapSlice::direction::RIGHT;
                                     break;
                                 case 0x51:
-                                    walkPlayer( p_direction, p_fast );
-                                    p_direction = mapSlice::direction::LEFT;
+                                    walkPlayer( p_direction, p_fast ); p_direction = mapSlice::direction::LEFT;
                                     break;
                                 case 0x52:
-                                    walkPlayer( p_direction, p_fast );
-                                    p_direction = mapSlice::direction::UP;
+                                    walkPlayer( p_direction, p_fast ); p_direction = mapSlice::direction::UP;
                                     break;
                                 case 0x53:
-                                    walkPlayer( p_direction, p_fast );
-                                    p_direction = mapSlice::direction::DOWN;
+                                    walkPlayer( p_direction, p_fast ); p_direction = mapSlice::direction::DOWN;
                                     break;
                                 default:
                                     moving = false;
