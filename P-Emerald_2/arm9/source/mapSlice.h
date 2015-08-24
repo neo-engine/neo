@@ -88,9 +88,10 @@ namespace MAP {
             WALK = 0,
             SURF = 1,
             BIKE = 2,
+            SIT = 4,
+            FISH = 5,
             //NPC modes
-            NOTHING = 4,
-
+            NOTHING = 0,
         };
 
         Palette     m_pals[ 16 ];

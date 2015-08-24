@@ -98,8 +98,8 @@ namespace IO {
                            u8 p_oamIndex, u8 p_palCnt, u16 p_nextAvailableTileIdx, bool p_bottom, bool p_flipX = false, bool p_topOnly = false );
 
     u16 loadOWSprite( const char* p_path, const u16 p_picnum, const s16 p_posX, const s16 p_posY,
-                      u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_isBig = false );
-    void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt, bool p_isBig = false );
+                      u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, u8 p_width = 16, u8 p_height = 32 );
+    void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt, u8 p_width = 16, u8 p_height = 32 );
 
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
                   u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom );

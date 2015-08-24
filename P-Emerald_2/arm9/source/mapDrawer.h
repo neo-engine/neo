@@ -57,6 +57,14 @@ namespace MAP {
         void loadNewRow( mapSlice::direction p_direction, bool p_updatePlayer );
         void loadSlice( mapSlice::direction p_direction ); //dir: dir that needs to be extended
 
+        void animateField( u16 p_globX, u16 p_globY );
+
+        void redirectPlayer( mapSlice::direction p_direction, bool p_fast );
+
+        void jumpPlayer( mapSlice::direction p_direction );
+        void slidePlayer( mapSlice::direction p_direction );
+        void walkPlayer( mapSlice::direction p_direction, bool p_fast = false );
+
         void handleWarp( );
         void handleWildPkmn( );
         void handleTrainer( );
@@ -72,6 +80,7 @@ namespace MAP {
                       mapSlice::direction p_direction,
                       mapSlice::moveMode p_moveMode = mapSlice::WALK );
         void movePlayer( mapSlice::direction p_direction, bool p_fast = false );
+
         void stopPlayer( );
         void stopPlayer( mapSlice::direction p_direction );
         void changeMoveMode( mapSlice::moveMode p_newMode );

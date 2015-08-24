@@ -149,6 +149,10 @@ namespace MAP {
 
     }
 
+    void mapDrawer::animateField( u16 p_globX, u16 p_globY ) {
+
+    }
+
     void mapDrawer::loadNewRow( mapSlice::direction p_direction, bool p_updatePlayer ) {
         cx += dir[ p_direction ][ 0 ];
         cy += dir[ p_direction ][ 1 ];
@@ -263,7 +267,6 @@ namespace MAP {
     }
 
     // Movement stuff
-
     bool mapDrawer::canMove( mapSlice::position p_start,
                              mapSlice::direction p_direction,
                              mapSlice::moveMode p_moveMode ) {
@@ -365,6 +368,10 @@ namespace MAP {
         //Check for movedata stuff
         if( curMoveData % 4 == 1 )
             return false;
+        if( lstMoveData == 0x0a ) //Stand up (only possible for the player)
+            return p_direction == _player.m_direction;
+        if( curMoveData == 0x0a ) //Sit down
+            return true;
         if( curMoveData == 4 && !( p_moveMode & mapSlice::SURF ) )
             return false;
         else if( curMoveData == 4 )
@@ -379,23 +386,242 @@ namespace MAP {
 
     }
     void mapDrawer::movePlayer( mapSlice::direction p_direction, bool p_fast ) {
-        if( atom( _player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-            _player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == MAP_BORDER ) {
-            stopPlayer( mapSlice::direction( ( u8( p_direction ) + 2 ) % 4 ) );
-            swiWaitForVBlank( );
-            swiWaitForVBlank( );
-            swiWaitForVBlank( );
-            swiWaitForVBlank( );
-            stopPlayer( );
-            IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
-            IO::drawSub( true );
-            return;
+        u8 newMoveData = atom( _player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                               _player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata;
+        u8 lstMoveData = atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata;
+
+        u8 newBehave = at( _player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                           _player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_bottombehave;
+        u8 lstBehave = at( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_bottombehave;
+
+        if( _player.m_movement != mapSlice::moveMode::WALK )
+            p_fast = false; //Running is only possible when the player is actually walking
+
+        bool reinit = false, moving = true;
+        while( moving ) {
+            if( newMoveData == MAP_BORDER ) {
+                stopPlayer( mapSlice::direction( ( u8( p_direction ) + 2 ) % 4 ) );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+                stopPlayer( );
+                IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
+                IO::drawSub( true );
+                return;
+            }
+            //Check for end of surf, stand up and sit down
+            if( lstMoveData == 0x0a ) { //Stand up (only possible for the player)
+                if( p_direction != _player.m_direction )
+                    return;
+                changeMoveMode( mapSlice::moveMode::WALK );
+                animateField( _player.m_pos.m_posX, _player.m_pos.m_posY );
+                return;
+            }
+            if( newMoveData == 0x0a ) { //Sit down
+                _player.m_direction = mapSlice::direction( ( u8( p_direction ) + 2 ) % 4 );
+                _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( _player.m_direction ) );
+                changeMoveMode( mapSlice::moveMode::SIT );
+                return;
+            }
+            if( newMoveData == 0x0c && lstMoveData == 4 ) { //End of surf
+                changeMoveMode( mapSlice::moveMode::WALK );
+                animateField( _player.m_pos.m_posX, _player.m_pos.m_posY );
+                return;
+            }
+
+            //Check for jumps/slides/...
+            if( !canMove( _player.m_pos, p_direction, _player.m_movement ) ) {
+                stopPlayer( p_direction );
+                return;
+            }
+
+            switch( newBehave ) {
+                //First check for jumps
+                case 0x38:
+                    jumpPlayer( mapSlice::direction::RIGHT );
+                    p_direction = mapSlice::direction::RIGHT;
+                    break;
+                case 0x39:
+                    jumpPlayer( mapSlice::direction::LEFT );
+                    p_direction = mapSlice::direction::LEFT;
+                    break;
+                case 0x3a:
+                    jumpPlayer( mapSlice::direction::UP );
+                    p_direction = mapSlice::direction::UP;
+                    break;
+                case 0x3b:
+                    jumpPlayer( mapSlice::direction::DOWN );
+                    p_direction = mapSlice::direction::DOWN;
+                    break;
+                default:
+                    //If no jump has to be done, check for other stuff
+                    switch( lstBehave ) {
+                        //case 0x0:
+                        //    break;
+                        case 0x20: case 0x48:
+                            slidePlayer( p_direction );
+                            break;
+
+                            //These change the direction of movement
+                        case 0x40:
+                            walkPlayer( mapSlice::direction::RIGHT );
+                            p_direction = mapSlice::direction::RIGHT;
+                            break;
+                        case 0x41:
+                            walkPlayer( mapSlice::direction::LEFT );
+                            p_direction = mapSlice::direction::LEFT;
+                            break;
+                        case 0x42:
+                            walkPlayer( mapSlice::direction::UP );
+                            p_direction = mapSlice::direction::UP;
+                            break;
+                        case 0x43:
+                            walkPlayer( mapSlice::direction::DOWN );
+                            p_direction = mapSlice::direction::DOWN;
+                            break;
+
+                        case 0x44:
+                            slidePlayer( mapSlice::direction::RIGHT );
+                            p_direction = mapSlice::direction::RIGHT;
+                            break;
+                        case 0x45:
+                            slidePlayer( mapSlice::direction::LEFT );
+                            p_direction = mapSlice::direction::LEFT;
+                            break;
+                        case 0x46:
+                            slidePlayer( mapSlice::direction::UP );
+                            p_direction = mapSlice::direction::UP;
+                            break;
+                        case 0x47:
+                            slidePlayer( mapSlice::direction::DOWN );
+                            p_direction = mapSlice::direction::DOWN;
+                            break;
+
+                        case 0x50:
+                            walkPlayer( mapSlice::direction::RIGHT, true );
+                            p_direction = mapSlice::direction::RIGHT;
+                            break;
+                        case 0x51:
+                            walkPlayer( mapSlice::direction::LEFT, true );
+                            p_direction = mapSlice::direction::LEFT;
+                            break;
+                        case 0x52:
+                            walkPlayer( mapSlice::direction::UP, true );
+                            p_direction = mapSlice::direction::UP;
+                            break;
+                        case 0x53:
+                            walkPlayer( mapSlice::direction::DOWN, true );
+                            p_direction = mapSlice::direction::DOWN;
+                            break;
+                        default:
+                            if( reinit ) {
+                                _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( p_direction ) );
+                                return;
+                            }
+                            switch( newBehave ) {
+                                case 0x20: case 0x48:
+                                    walkPlayer( p_direction, p_fast );
+                                    break;
+
+                                    //These change the direction of movement
+                                case 0x40:
+                                    walkPlayer( p_direction, p_fast );
+                                    p_direction = mapSlice::direction::RIGHT;
+                                    break;
+                                case 0x41:
+                                    walkPlayer( p_direction, p_fast );
+                                    p_direction = mapSlice::direction::LEFT;
+                                    break;
+                                case 0x42:
+                                    walkPlayer( p_direction, p_fast );
+                                    p_direction = mapSlice::direction::UP;
+                                    break;
+                                case 0x43:
+                                    walkPlayer( p_direction, p_fast );
+                                    p_direction = mapSlice::direction::DOWN;
+                                    break;
+
+                                case 0x44:
+                                    walkPlayer( p_direction, p_fast );
+                                    p_direction = mapSlice::direction::RIGHT;
+                                    break;
+                                case 0x45:
+                                    walkPlayer( p_direction, p_fast );
+                                    p_direction = mapSlice::direction::LEFT;
+                                    break;
+                                case 0x46:
+                                    walkPlayer( p_direction, p_fast );
+                                    p_direction = mapSlice::direction::UP;
+                                    break;
+                                case 0x47:
+                                    walkPlayer( p_direction, p_fast );
+                                    p_direction = mapSlice::direction::DOWN;
+                                    break;
+
+                                case 0x50:
+                                    walkPlayer( p_direction, p_fast );
+                                    p_direction = mapSlice::direction::RIGHT;
+                                    break;
+                                case 0x51:
+                                    walkPlayer( p_direction, p_fast );
+                                    p_direction = mapSlice::direction::LEFT;
+                                    break;
+                                case 0x52:
+                                    walkPlayer( p_direction, p_fast );
+                                    p_direction = mapSlice::direction::UP;
+                                    break;
+                                case 0x53:
+                                    walkPlayer( p_direction, p_fast );
+                                    p_direction = mapSlice::direction::DOWN;
+                                    break;
+                                default:
+                                    moving = false;
+                                    continue;
+                            }
+                    }
+
+            }
+            reinit = true;
+            newMoveData = atom( _player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                                _player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata;
+            lstMoveData = atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata;
+
+            newBehave = at( _player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                            _player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_bottombehave;
+            lstBehave = at( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_bottombehave;
         }
+        walkPlayer( p_direction, p_fast );
+        animateField( _player.m_pos.m_posX, _player.m_pos.m_posY );
+        if( atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata > 4
+            && atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata != 0x3c
+            && atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata != 0x0a )
+            _player.m_pos.m_posZ = atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata / 4;
+    }
+
+    void mapDrawer::redirectPlayer( mapSlice::direction p_direction, bool p_fast ) {
         //Check if the player's direction changed
         if( p_direction != _player.m_direction ) {
             _sprites[ _spritePos[ _player.m_id ] ].setFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
             _player.m_direction = p_direction;
         }
+    }
+    void mapDrawer::slidePlayer( mapSlice::direction p_direction ) {
+        redirectPlayer( p_direction, false );
+        if( _playerIsFast ) {
+            _playerIsFast = false;
+            _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( p_direction ) );
+            _sprites[ _spritePos[ _player.m_id ] ].nextFrame( );
+        }
+        for( u8 i = 0; i < 16; ++i ) {
+            moveCamera( p_direction, true );
+            if( i == 8 )
+                _sprites[ _spritePos[ _player.m_id ] ].currentFrame( );
+            swiWaitForVBlank( );
+        }
+    }
+    void mapDrawer::walkPlayer( mapSlice::direction p_direction, bool p_fast ) {
+        redirectPlayer( p_direction, p_fast );
         if( p_fast != _playerIsFast ) {
             _playerIsFast = p_fast;
             _sprites[ _spritePos[ _player.m_id ] ].setFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
@@ -408,19 +634,19 @@ namespace MAP {
                 swiWaitForVBlank( );
         }
         _sprites[ _spritePos[ _player.m_id ] ].drawFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
-        if( atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata > 4
-            && atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata != 0x3c )
-            _player.m_pos.m_posZ = atom( _player.m_pos.m_posX, _player.m_pos.m_posY ).m_movedata / 4;
     }
+    void mapDrawer::jumpPlayer( mapSlice::direction p_direction ) {
+        walkPlayer( p_direction );
+        walkPlayer( p_direction );
+    }
+
     void mapDrawer::stopPlayer( ) {
+        _playerIsFast = false;
         _sprites[ _spritePos[ _player.m_id ] ].drawFrame( getFrame( _player.m_direction ) );
     }
     void mapDrawer::stopPlayer( mapSlice::direction p_direction ) {
-        //Check if the player's direction changed
-        if( p_direction != _player.m_direction ) {
-            _player.m_direction = p_direction;
-            _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( p_direction ) );
-        }
+        redirectPlayer( p_direction, false );
+        _playerIsFast = false;
         _sprites[ _spritePos[ _player.m_id ] ].nextFrame( );
     }
     void mapDrawer::changeMoveMode( mapSlice::moveMode p_newMode ) {

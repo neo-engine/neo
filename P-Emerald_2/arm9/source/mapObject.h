@@ -44,6 +44,7 @@ namespace MAP {
         u16 m_range;
         u16 m_id;
         mapSlice::direction m_direction;
+        u8 m_width, m_height;
 
         void interact( );
         mapSprite show( u16 p_currX, u16 p_currY, u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx );
