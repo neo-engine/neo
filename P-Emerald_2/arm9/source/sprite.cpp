@@ -343,26 +343,31 @@ namespace IO {
     }
 
     u16 loadOWSprite( const char* p_path, const u16 p_picnum,
-                      const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, u8 p_width, u8 p_height ) {
+                      const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt ) {
 
         FILE* f = FS::open( p_path, p_picnum, ".rsd" );
         fread( TEMP_PAL, sizeof( unsigned short ), 16, f );
-        u8 frameCount;
+        u8 frameCount, width, height;
         fread( &frameCount, sizeof( u8 ), 1, f );
-        fread( TEMP, sizeof( unsigned int ), p_width * p_height * frameCount / 8, f );
+        fread( &width, sizeof( u8 ), 1, f );
+        fread( &height, sizeof( u8 ), 1, f );
+        fread( TEMP, sizeof( unsigned int ), width * height * frameCount / 8, f );
         FS::close( f );
 
-        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, p_width, p_height, TEMP_PAL,
-                           TEMP, 2 * p_width * p_height * frameCount, false, false, false, OBJPRIORITY_2, false );
+        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, width, height, TEMP_PAL,
+                           TEMP, 2 * width * height * frameCount, false, false, false, OBJPRIORITY_2, false );
     }
-    void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt, u8 p_width, u8 p_height ) {
+    void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt ) {
         u8 frame = p_frame;
         if( frame % 20 >= 9 && frame % 20 < 12 )
             frame -= 3;
         u8 memPos = frame / 20 * 9 + frame % 20;
 
+        u8 width = spriteInfoTop[ p_oamIndex ].m_width, 
+            height = spriteInfoTop[ p_oamIndex ].m_height;
+
         OamTop->oamBuffer[ p_oamIndex ].hFlip = ( frame != p_frame );
-        OamTop->oamBuffer[ p_oamIndex ].gfxIndex = p_tileCnt + memPos * p_width * p_height / 64;
+        OamTop->oamBuffer[ p_oamIndex ].gfxIndex = p_tileCnt + memPos * width * height / 64;
     }
 
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {

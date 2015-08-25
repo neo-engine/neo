@@ -30,6 +30,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "sprite.h"
 #include "defines.h"
 #include "messageBox.h"
+#include "saveGame.h"
 
 #ifdef DEBUG
 #include <cassert>
@@ -162,6 +163,8 @@ namespace MAP {
         if( p_updatePlayer ) {
             _player.m_pos.m_posX = cx;
             _player.m_pos.m_posY = cy;
+
+            FS::SAV->stepIncrease( );
         }
 
         //Check if a new slice should be loaded
@@ -633,8 +636,23 @@ NEXT_PASS:
         _sprites[ _spritePos[ _player.m_id ] ].drawFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
     }
     void mapDrawer::jumpPlayer( mapSlice::direction p_direction ) {
-        walkPlayer( p_direction );
-        walkPlayer( p_direction );
+        redirectPlayer( p_direction, false );
+        if( _playerIsFast ) {
+            _playerIsFast = false;
+            _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( p_direction ) );
+        }
+        for( u8 i = 0; i < 32; ++i ) {
+            moveCamera( p_direction, true );
+            if( i < 6 && i % 2 )
+                _sprites[ _spritePos[ _player.m_id ] ].move( mapSlice::direction::UP, 2 );
+            if( i % 8 == 0 )
+                _sprites[ _spritePos[ _player.m_id ] ].nextFrame( );
+            if( i > 28 && i % 2 )
+                _sprites[ _spritePos[ _player.m_id ] ].move( mapSlice::direction::DOWN, 3 );
+            if( i % 4 )
+                swiWaitForVBlank( );
+        }
+        _sprites[ _spritePos[ _player.m_id ] ].drawFrame( getFrame( p_direction ) );
     }
 
     void mapDrawer::stopPlayer( ) {

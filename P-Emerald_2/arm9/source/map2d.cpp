@@ -42,25 +42,6 @@
 //#include <unistd.h>
 //#include <math.h>
 //
-//namespace MAP {
-//#define PLAYERSPRITE 0
-//
-//
-//    int tcnt = 0;
-//
-//    Map::pos Map::getFlyPos( const char* p_path, const char* p_name ) {
-//        sprintf( buffer, "%s%s.fp", p_path, p_name );
-//        FILE* mapF = fopen( buffer, "rb" );
-//        if( !mapF )
-//            return{ -1, -1, -1 };
-//
-//        u16 x, y;
-//        u8 z;
-//        fscanf( mapF, "%hu %hu %hhu", &x, &y, &z );
-//        fclose( mapF );
-//        return{ x, y, z };
-//    }
-//}
 //
 //
 //void animateMap( u8 p_frame ) {
@@ -77,47 +58,6 @@
 //void initMapSprites( ) {
 //    IO::initOAMTable( false );
 //
-//    IO::SpriteInfo * SQCHAInfo = &IO::spriteInfoTop[ 0 ];
-//    SpriteEntry * SQCHA = &IO::OamTop->oamBuffer[ 0 ];
-//    SQCHAInfo->m_oamId = 0;
-//    SQCHAInfo->m_width = 16;
-//    SQCHAInfo->m_height = 32;
-//    SQCHAInfo->m_angle = 0;
-//    SQCHAInfo->m_entry = SQCHA;
-//    SQCHA->y = 72;
-//    SQCHA->isRotateScale = false;
-//    SQCHA->blendMode = OBJMODE_NORMAL;
-//    SQCHA->isMosaic = true;
-//    SQCHA->colorMode = OBJCOLOR_16;
-//    SQCHA->shape = OBJSHAPE_TALL;
-//    SQCHA->isHidden = false;
-//    SQCHA->x = 120;
-//    SQCHA->size = OBJSIZE_32;
-//    SQCHA->gfxIndex = 0;
-//    SQCHA->priority = OBJPRIORITY_2;
-//    SQCHA->palette = 0;
-//
-//    loadframe( SQCHAInfo, FS::SAV->m_overWorldIdx, 0 );
-//
-//    SQCHAInfo = &IO::spriteInfoTop[ 1 ];
-//    SQCHA = &IO::OamTop->oamBuffer[ 1 ];
-//    SQCHAInfo->m_oamId = 1;
-//    SQCHAInfo->m_width = 32;
-//    SQCHAInfo->m_height = 32;
-//    SQCHAInfo->m_angle = 0;
-//    SQCHAInfo->m_entry = SQCHA;
-//    SQCHA->y = 72;
-//    SQCHA->isRotateScale = false;
-//    SQCHA->blendMode = OBJMODE_NORMAL;
-//    SQCHA->isMosaic = true;
-//    SQCHA->colorMode = OBJCOLOR_16;
-//    SQCHA->shape = OBJSHAPE_SQUARE;
-//    SQCHA->isHidden = true;
-//    SQCHA->x = 112;
-//    SQCHA->size = OBJSIZE_32;
-//    SQCHA->gfxIndex = 16;
-//    SQCHA->priority = OBJPRIORITY_2;
-//    SQCHA->palette = 0;
 //
 //    IO::SpriteInfo * B2Info = &IO::spriteInfoTop[ 2 ];
 //    SpriteEntry * B2 = &IO::OamTop->oamBuffer[ 2 ];
@@ -190,34 +130,6 @@
 //    dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, BigCirc1Tiles, &SPRITE_GFX[ 32 * 32 / sizeof( SPRITE_GFX[ 0 ] ) ], BigCirc1TilesLen );
 //    IO::updateOAM( false );
 //}
-//
-//int stepcnt = 0;
-//void stepincrease( ) {
-//    stepcnt = ( stepcnt + 1 ) % 256;
-//    if( stepcnt == 0 ) {
-//        for( size_t s = 0; s < 6; ++s ) {
-//            pokemon& ac = FS::SAV->m_pkmnTeam[ s ];
-//            if( !ac.m_boxdata.m_speciesId )
-//                break;
-//
-//            if( ac.m_boxdata.m_individualValues.m_isEgg ) {
-//                ac.m_boxdata.m_steps--;
-//                if( ac.m_boxdata.m_steps == 0 ) {
-//                    ac.m_boxdata.m_individualValues.m_isEgg = false;
-//                    ac.m_boxdata.m_hatchPlace = curMap->getCurrentLocationId( );
-//                    ac.m_boxdata.m_hatchDate[ 0 ] = acday;
-//                    ac.m_boxdata.m_hatchDate[ 1 ] = acmonth + 1;
-//                    ac.m_boxdata.m_hatchDate[ 2 ] = ( acyear + 1900 ) % 100;
-//                    char buffer[ 50 ];
-//                    sprintf( buffer, "%ls schüpfte\naus dem Ei!", ac.m_boxdata.m_name );
-//                    IO::messageBox M( buffer );
-//                }
-//            } else
-//                ac.m_boxdata.m_steps = std::min( 255, ac.m_boxdata.m_steps + 1 );
-//        }
-//    }
-//}
-//
 //
 //void shoUseAttack( u16 p_pkmIdx, bool p_female, bool p_shiny ) {
 //    IO::OamTop->oamBuffer[ 0 ].isHidden = true;

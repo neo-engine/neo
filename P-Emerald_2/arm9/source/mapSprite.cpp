@@ -38,17 +38,14 @@ namespace MAP {
     mapSprite::mapSprite( u16 p_currX, u16 p_currY,
                           u16 p_imageId,
                           u8 p_startFrame,
-                          u8 p_width,
-                          u8 p_height,
                           u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx )
                           : _oamIndex( p_oamIdx ), _palette( p_palIdx ), _tileIdx( p_tileIdx ),
-                          _picNum( p_imageId ), _curFrame( p_startFrame ),
-                          _width( p_width ), _height( p_height ) {
-        if( !IO::loadOWSprite( OW_PATH, _picNum, p_currX, p_currY, _oamIndex, _palette, _tileIdx, _width, _height ) ) {
+                          _picNum( p_imageId ), _curFrame( p_startFrame ) {
+        if( !IO::loadOWSprite( OW_PATH, _picNum, p_currX, p_currY, _oamIndex, _palette, _tileIdx ) ) {
             IO::messageBox m( "Sprite failed" );
             IO::drawSub( true );
         }
-        IO::setOWSpriteFrame( _curFrame, _oamIndex, _tileIdx, _width, _height );
+        IO::setOWSpriteFrame( _curFrame, _oamIndex, _tileIdx );
         IO::updateOAM( false );
     }
 
@@ -57,7 +54,7 @@ namespace MAP {
         IO::updateOAM( false );
     }
     void mapSprite::drawFrame( u8 p_value ) {
-        IO::setOWSpriteFrame( p_value, _oamIndex, _tileIdx, _width, _height );
+        IO::setOWSpriteFrame( p_value, _oamIndex, _tileIdx );
         IO::updateOAM( false );
     }
 

@@ -40,15 +40,12 @@ namespace MAP {
 
         u16 _picNum;
         u8 _curFrame;
-        u8 _width, _height;
 
     public:
         mapSprite( ) { }
         mapSprite( u16 p_currX, u16 p_currY,
                    u16 p_imageId,
                    u8 p_startFrame,
-                   u8 p_width,
-                   u8 p_height,
                    u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx );
 
         void setVisibility( bool p_value );

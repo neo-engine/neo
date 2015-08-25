@@ -522,6 +522,14 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
     m_stats.m_acHP = m_stats.m_maxHP - HPdif;
 }
 
+void pokemon::hatch( ) {
+    m_boxdata.m_individualValues.m_isEgg = false;
+    m_boxdata.m_hatchPlace = MAP::curMap->getCurrentLocationId( );
+    m_boxdata.m_hatchDate[ 0 ] = acday;
+    m_boxdata.m_hatchDate[ 1 ] = acmonth + 1;
+    m_boxdata.m_hatchDate[ 2 ] = ( acyear + 1900 ) % 100;
+}
+
 //TODO: enhance equality test
 bool pokemon::operator==( const pokemon& p_other ) const {
     if( m_boxdata.m_pid != p_other.m_boxdata.m_pid

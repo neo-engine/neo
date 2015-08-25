@@ -50,6 +50,6 @@ namespace MAP {
     mapSprite mapObject::show( u16 p_currX, u16 p_currY, u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx ) {
         u8 frameStart = getFrame( m_direction );
 
-        return mapSprite( p_currX, p_currY, m_picNum, frameStart, m_width, m_height, p_oamIdx, p_palIdx, p_tileIdx );
+        return mapSprite( p_currX, p_currY, m_picNum, frameStart, p_oamIdx, p_palIdx, p_tileIdx );
     }
 }

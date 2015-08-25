@@ -91,6 +91,7 @@ namespace FS {
                 m_flags[ p_idx >> 3 ] ^= ( 1 << ( p_idx % 8 ) );
             return;
         }
+        void        stepIncrease( );
     };
 
     saveGame* readSave( );

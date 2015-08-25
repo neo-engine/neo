@@ -423,5 +423,7 @@ u8: 8;
     void            evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
     bool            canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
 
+    void            hatch( );
+
     bool      operator==( const pokemon& p_other ) const;
 };
