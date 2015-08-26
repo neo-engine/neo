@@ -143,8 +143,7 @@ void fly::use( ) { }
 void flash::use( ) { }
 void whirlpool::use( ) { }
 void surf::use( ) {
-    //heroIsBig = true;
-    FS::SAV->m_player.m_movement = MAP::mapSlice::moveMode::SURF;
+    MAP::curMap->changeMoveMode( MAP::SURF );
     //movePlayerOnMap( FS::SAV->m_acposx / 20 + dir[ lastdir ][ 1 ], FS::SAV->m_acposy / 20 + dir[ lastdir ][ 0 ], FS::SAV->m_acposz, false );
 }
 
@@ -388,7 +387,7 @@ OUT:
         }
         //Movement
         if( held & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
-            MAP::mapSlice::direction curDir = GET_DIR( held );
+            MAP::direction curDir = GET_DIR( held );
             scanKeys( );
 
             stopped = false;

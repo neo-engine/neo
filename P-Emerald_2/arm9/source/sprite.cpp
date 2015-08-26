@@ -359,14 +359,16 @@ namespace IO {
     }
     void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt ) {
         u8 frame = p_frame;
-        if( frame % 20 >= 9 && frame % 20 < 12 )
+        if( frame % 20 >= 9 )
             frame -= 3;
+        if( p_frame == 15 )
+            frame--;
         u8 memPos = frame / 20 * 9 + frame % 20;
 
-        u8 width = spriteInfoTop[ p_oamIndex ].m_width, 
+        u8 width = spriteInfoTop[ p_oamIndex ].m_width,
             height = spriteInfoTop[ p_oamIndex ].m_height;
 
-        OamTop->oamBuffer[ p_oamIndex ].hFlip = ( frame != p_frame );
+        OamTop->oamBuffer[ p_oamIndex ].hFlip = ( frame != p_frame ) && ( p_frame < 12 || p_frame == 15 );
         OamTop->oamBuffer[ p_oamIndex ].gfxIndex = p_tileCnt + memPos * width * height / 64;
     }
 

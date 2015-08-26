@@ -73,7 +73,7 @@ namespace MAP {
         drawFrame( _curFrame );
     }
 
-    void mapSprite::move( mapSlice::direction p_direction, s16 p_amount ) {
+    void mapSprite::move( direction p_direction, s16 p_amount ) {
         IO::OamTop->oamBuffer[ _oamIndex ].x += p_amount * dir[ p_direction ][ 0 ];
         IO::OamTop->oamBuffer[ _oamIndex ].y += p_amount * dir[ p_direction ][ 1 ];
         IO::updateOAM( false );

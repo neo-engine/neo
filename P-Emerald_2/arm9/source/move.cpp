@@ -492,7 +492,7 @@ move* AttackList[ MAXATTACK ] = {
     new move( "Holzhammer", C 0, C 120, PFLANZE, C 100, C 15, C 0, A 0, C 1, F 35, H 0 ),
     new move( "Wasserdüse", C 0, C 40, WASSER, C 100, C 20, C 0, A 0, C 1, F 35, H 0 ),
     new move( "Schlagbefehl", C 0, C 90, KAEFER, C 100, C 15, C 0, A 0, C 1, F 34, H 0 ),
-    new move( "Blockbefehl", C 0, C 0, KAEFER, C 0, C 10, C 0, A 0, C 1, F 8, H 1 ),
+    new move( "blockbefehl", C 0, C 0, KAEFER, C 0, C 10, C 0, A 0, C 1, F 8, H 1 ),
     new move( "Heilbefehl", C 0, C 0, KAEFER, C 0, C 10, C 0, A 0, C 1, F 8, H 1 ),
     new move( "Kopfstoß", C 0, C 150, GESTEIN, C 80, C 5, C 0, A 0, C 1, F 35, H 0 ),
     new move( "Doppelschlag", C 0, C 35, NORMAL, C 90, C 10, C 0, A 0, C 1, F 35, H 0 ),

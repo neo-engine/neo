@@ -26,11 +26,10 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 */
 
 #pragma once
-
-#include <nds/ndstypes.h>
-#include "mapSlice.h"
+#include "mapDefines.h"
 
 namespace MAP {
+
     class mapSprite {
     private:
 
@@ -53,6 +52,6 @@ namespace MAP {
         void setFrame( u8 p_value );
         void currentFrame( );
         void nextFrame( );
-        void move( mapSlice::direction p_direction, s16 p_amount );
+        void move( direction p_direction, s16 p_amount );
     };
 }

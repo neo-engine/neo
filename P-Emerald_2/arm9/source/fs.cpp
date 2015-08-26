@@ -188,27 +188,27 @@ namespace FS {
         return true;
     }
 
-    bool readPal( FILE* p_file, MAP::Palette* p_palette ) {
+    bool readPal( FILE* p_file, MAP::palette* p_palette ) {
         if( p_file == 0 )
             return false;
         fread( p_palette, sizeof( u16 ) * 16, 6, p_file );
         return true;
     }
 
-    bool readTiles( FILE* p_file, MAP::Tile* p_tileSet, u16 p_startIdx, u16 p_size ) {
+    bool readTiles( FILE* p_file, MAP::tile* p_tileSet, u16 p_startIdx, u16 p_size ) {
         if( p_file == 0 )
             return false;
-        fread( p_tileSet + p_startIdx, sizeof( MAP::Tile )*p_size, 1, p_file );
+        fread( p_tileSet + p_startIdx, sizeof( MAP::tile )*p_size, 1, p_file );
         return true;
     }
 
-    bool readBlocks( FILE* p_file, MAP::Block* p_tileSet, u16 p_startIdx, u16 p_size ) {
+    bool readblocks( FILE* p_file, MAP::block* p_tileSet, u16 p_startIdx, u16 p_size ) {
         if( p_file == 0 )
             return false;
         readNop( p_file, 4 );
         for( u16 i = 0; i < p_size; ++i ) {
-            fread( &( p_tileSet + p_startIdx + i )->m_bottom, 4 * sizeof( MAP::BlockAtom ), 1, p_file );
-            fread( &( p_tileSet + p_startIdx + i )->m_top, 4 * sizeof( MAP::BlockAtom ), 1, p_file );
+            fread( &( p_tileSet + p_startIdx + i )->m_bottom, 4 * sizeof( MAP::blockAtom ), 1, p_file );
+            fread( &( p_tileSet + p_startIdx + i )->m_top, 4 * sizeof( MAP::blockAtom ), 1, p_file );
         }
         for( u16 i = 0; i < p_size; ++i ) {
             fread( &( p_tileSet + p_startIdx + i )->m_bottombehave, sizeof( u8 ), 1, p_file );
@@ -228,9 +228,9 @@ namespace FS {
     //        fread( &a.m_speed, sizeof( u8 ), 1, p_file );
     //        fread( &a.m_maxFrame, sizeof( u8 ), 1, p_file );
     //        a.m_acFrame = 0;
-    //        a.m_animationTiles.assign( a.m_maxFrame, Tile( ) );
+    //        a.m_animationTiles.assign( a.m_maxFrame, tile( ) );
     //        for( int i = 0; i < a.m_maxFrame; ++i )
-    //            fread( &a.m_animationTiles[ i ], sizeof( Tile ), 1, p_file );
+    //            fread( &a.m_animationTiles[ i ], sizeof( tile ), 1, p_file );
     //        p_animations.push_back( a );
     //    }
     //    fclose( p_file );

@@ -195,6 +195,9 @@
     <ClInclude Include="arm9\source\mapSprite.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\source\mapDefines.h">
+      <Filter>Header Files\arm9\map</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">

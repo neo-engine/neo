@@ -79,10 +79,10 @@ extern unsigned short TEMP_PAL[ 256 ];
                                     && IO::waitForInput( IO::inputTarget( p_x, p_y, p_r ) ) )
 
 #define GET_DIR(a) ( \
-            ( (a) & KEY_DOWN )  ?   MAP::mapSlice::direction::DOWN : (\
-            ( (a) & KEY_UP )    ?   MAP::mapSlice::direction::UP : (\
-            ( (a) & KEY_RIGHT ) ?   MAP::mapSlice::direction::RIGHT :\
-                                    MAP::mapSlice::direction::LEFT ) ) )
+            ( (a) & KEY_DOWN )  ?   MAP::direction::DOWN : (\
+            ( (a) & KEY_UP )    ?   MAP::direction::UP : (\
+            ( (a) & KEY_RIGHT ) ?   MAP::direction::RIGHT :\
+                                    MAP::direction::LEFT ) ) )
 
 #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 #define COMPL(a) ( RGB( 31 - ( (a) >> 10 ) % 32,31 - ( (a) >> 5 ) % 32,31 - (a) % 32 ) )

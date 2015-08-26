@@ -29,6 +29,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <map>
 #include <memory>
 
+#include "mapDefines.h"
 #include "mapSlice.h"
 #include "mapObject.h"
 #include "mapSprite.h"
@@ -52,38 +53,40 @@ namespace MAP {
         void drawPlayer( );
         void drawObjects( );
         
-        void moveCamera( mapSlice::direction p_direction, bool p_updatePlayer, bool p_autoLoadRows = true );
+        void moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows = true );
 
-        void loadNewRow( mapSlice::direction p_direction, bool p_updatePlayer );
-        void loadSlice( mapSlice::direction p_direction ); //dir: dir that needs to be extended
+        void loadNewRow( direction p_direction, bool p_updatePlayer );
+        void loadSlice( direction p_direction ); //dir: dir that needs to be extended
 
         void animateField( u16 p_globX, u16 p_globY );
 
-        void redirectPlayer( mapSlice::direction p_direction, bool p_fast );
+        void redirectPlayer( direction p_direction, bool p_fast );
+        void standUpPlayer( direction p_direction );
+        void sitDownPlayer( direction p_direction, moveMode p_newMoveMode );
 
-        void jumpPlayer( mapSlice::direction p_direction );
-        void slidePlayer( mapSlice::direction p_direction );
-        void walkPlayer( mapSlice::direction p_direction, bool p_fast = false );
+        void jumpPlayer( direction p_direction );
+        void slidePlayer( direction p_direction );
+        void walkPlayer( direction p_direction, bool p_fast = false );
 
         void handleWarp( );
         void handleWildPkmn( );
         void handleTrainer( );
 
-        Block& at( u16 p_x, u16 p_y ) const;
-        MapBlockAtom& atom( u16 p_x, u16 p_y ) const;
+        block& at( u16 p_x, u16 p_y ) const;
+        mapBlockAtom& atom( u16 p_x, u16 p_y ) const;
     public:
         mapDrawer( u8 p_currentMap, mapObject& p_player );
 
         void draw( );
 
-        bool canMove( mapSlice::position p_start,
-                      mapSlice::direction p_direction,
-                      mapSlice::moveMode p_moveMode = mapSlice::WALK );
-        void movePlayer( mapSlice::direction p_direction, bool p_fast = false );
+        bool canMove( position p_start,
+                      direction p_direction,
+                      moveMode p_moveMode = WALK );
+        void movePlayer( direction p_direction, bool p_fast = false );
 
         void stopPlayer( );
-        void stopPlayer( mapSlice::direction p_direction );
-        void changeMoveMode( mapSlice::moveMode p_newMode );
+        void stopPlayer( direction p_direction );
+        void changeMoveMode( moveMode p_newMode );
 
         u16  getCurrentLocationId( ) const;
     };

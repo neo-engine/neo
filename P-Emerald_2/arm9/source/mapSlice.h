@@ -38,66 +38,45 @@ namespace MAP {
 
     typedef struct {
         u16 m_pal[ 16 ];
-    } Palette;
+    } palette;
     typedef struct {
         u8 m_tile[ 32 ];
-    } Tile;
+    } tile;
     //typedef struct{
     //    u16 tileidx      : 10;
     //    u8 vflip         :  1;
     //    u8 hflip         :  1;
     //    PalNo palno      :  4;
-    //}BlockAtom;
-    typedef u16 BlockAtom;
+    //}blockAtom;
+    typedef u16 blockAtom;
 
-    class Block {
+    class block {
     public:
-        BlockAtom   m_top[ 2 ][ 2 ];
+        blockAtom   m_top[ 2 ][ 2 ];
         u8          m_topbehave;
 
-        BlockAtom   m_bottom[ 2 ][ 2 ];
+        blockAtom   m_bottom[ 2 ][ 2 ];
         u8          m_bottombehave;
     };
 
     typedef struct {
-        Tile        m_blocks[ 1024 ];
-    } TileSet;
+        tile        m_blocks[ 1024 ];
+    } tileSet;
     typedef struct {
-        Block       m_blocks[ 1024 ];
-    } BlockSet;
+        block       m_blocks[ 1024 ];
+    } blockSet;
 
     typedef struct {
         u16         m_blockidx : 10;
         u8          m_movedata : 6;
-    } MapBlockAtom;
+    } mapBlockAtom;
 
     struct mapSlice {
-        struct position {
-            u16 m_posX; //Global
-            u16 m_posY; //Global
-            u8 m_posZ;
-        };
-        enum direction : u8 {
-            UP,
-            RIGHT,
-            DOWN,
-            LEFT
-        };
-        enum moveMode {
-            //Player modes
-            WALK = 0,
-            SURF = 1,
-            BIKE = 2,
-            SIT = 4,
-            FISH = 5,
-            //NPC modes
-            NOTHING = 0,
-        };
 
-        Palette     m_pals[ 16 ];
-        TileSet     m_tileSet;
-        BlockSet    m_blockSet;
-        MapBlockAtom m_blocks[ 32 ][ 32 ]; // [ y ][ x ]
+        palette     m_pals[ 16 ];
+        tileSet     m_tileSet;
+        blockSet    m_blockSet;
+        mapBlockAtom m_blocks[ 32 ][ 32 ]; // [ y ][ x ]
         u8          m_map;
         u16         m_x, m_y;
     };

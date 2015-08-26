@@ -36,9 +36,9 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #endif
 
 namespace MAP {
-    std::map<u8, Tile*> tiles;
-    std::map<u8, Block*> blocks;
-    std::map<u8, Palette*> palettes;
+    std::map<u8, tile*> tiles;
+    std::map<u8, block*> blocks;
+    std::map<u8, palette*> palettes;
 
     std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y ) {
         FILE* mapF = FS::open( MAP_PATH,
@@ -78,35 +78,35 @@ namespace MAP {
         fread( &b2, sizeof( u8 ), 1, mapF );
         FS::readNop( mapF, 2 );
 
-        fread( res->m_blocks, sizeof( MapBlockAtom ), b1 * b2, mapF ); //Border blocks
+        fread( res->m_blocks, sizeof( mapBlockAtom ), b1 * b2, mapF ); //Border blocks
 
-        fread( res->m_blocks, sizeof( MapBlockAtom ), SIZE * SIZE, mapF );
+        fread( res->m_blocks, sizeof( mapBlockAtom ), SIZE * SIZE, mapF );
         FS::close( mapF );
 
         //Read the first tileset
         if( !tiles.count( tsidx1 ) ) {
             mapF = FS::open( TILESET_PATH, tsidx1, ".ts" );
-            tiles[ tsidx1 ] = new Tile[ 512 ];
+            tiles[ tsidx1 ] = new tile[ 512 ];
             FS::readTiles( mapF, tiles[ tsidx1 ] );
             FS::close( mapF );
         }
-        memcpy( res->m_tileSet.m_blocks, tiles[ tsidx1 ], 512 * sizeof( Tile ) );
+        memcpy( res->m_tileSet.m_blocks, tiles[ tsidx1 ], 512 * sizeof( tile ) );
 
         if( !blocks.count( tsidx1 ) ) {
             mapF = FS::open( TILESET_PATH, tsidx1, ".bvd" );
-            blocks[ tsidx1 ] = new Block[ 512 ];
-            FS::readBlocks( mapF, blocks[ tsidx1 ] );
+            blocks[ tsidx1 ] = new block[ 512 ];
+            FS::readblocks( mapF, blocks[ tsidx1 ] );
             FS::close( mapF );
         }
-        memcpy( res->m_blockSet.m_blocks, blocks[ tsidx1 ], 512 * sizeof( Block ) );
+        memcpy( res->m_blockSet.m_blocks, blocks[ tsidx1 ], 512 * sizeof( block ) );
 
         if( !palettes.count( tsidx1 ) ) {
             mapF = FS::open( TILESET_PATH, tsidx1, ".p2l" );
-            palettes[ tsidx1 ] = new Palette[ 6 ];
+            palettes[ tsidx1 ] = new palette[ 6 ];
             FS::readPal( mapF, palettes[ tsidx1 ] );
             FS::close( mapF );
         }
-        memcpy( res->m_pals, palettes[ tsidx1 ], sizeof( Palette ) * 6 );
+        memcpy( res->m_pals, palettes[ tsidx1 ], sizeof( palette ) * 6 );
         //sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx1 );
         //FS::readAnimations( fopen( buffer, "rb" ), m_animations );
 
@@ -114,27 +114,27 @@ namespace MAP {
 
         if( !tiles.count( tsidx2 ) ) {
             mapF = FS::open( TILESET_PATH, tsidx2, ".ts" );
-            tiles[ tsidx2 ] = new Tile[ 512 ];
+            tiles[ tsidx2 ] = new tile[ 512 ];
             FS::readTiles( mapF, tiles[ tsidx2 ] );
             FS::close( mapF );
         }
-        memcpy( res->m_tileSet.m_blocks + 512, tiles[ tsidx2 ], 512 * sizeof( Tile ) );
+        memcpy( res->m_tileSet.m_blocks + 512, tiles[ tsidx2 ], 512 * sizeof( tile ) );
 
         if( !blocks.count( tsidx2 ) ) {
             mapF = FS::open( TILESET_PATH, tsidx2, ".bvd" );
-            blocks[ tsidx2 ] = new Block[ 512 ];
-            FS::readBlocks( mapF, blocks[ tsidx2 ] );
+            blocks[ tsidx2 ] = new block[ 512 ];
+            FS::readblocks( mapF, blocks[ tsidx2 ] );
             FS::close( mapF );
         }
-        memcpy( res->m_blockSet.m_blocks + 512, blocks[ tsidx2 ], 512 * sizeof( Block ) );
+        memcpy( res->m_blockSet.m_blocks + 512, blocks[ tsidx2 ], 512 * sizeof( block ) );
 
         if( !palettes.count( tsidx2 ) ) {
             mapF = FS::open( TILESET_PATH, tsidx2, ".p2l" );
-            palettes[ tsidx2 ] = new Palette[ 6 ];
+            palettes[ tsidx2 ] = new palette[ 6 ];
             FS::readPal( mapF, palettes[ tsidx2 ] );
             FS::close( mapF );
         }
-        memcpy( res->m_pals + 6, palettes[ tsidx2 ], sizeof( Palette ) * 6 );
+        memcpy( res->m_pals + 6, palettes[ tsidx2 ], sizeof( palette ) * 6 );
 
         //sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx2 );
         //readAnimations( fopen( buffer, "rb" ), m_animations );

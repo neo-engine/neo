@@ -29,6 +29,7 @@
     <ClInclude Include="arm9\source\font.h" />
     <ClInclude Include="arm9\source\fs.h" />
     <ClInclude Include="arm9\source\Gen.h" />
+    <ClInclude Include="arm9\source\mapDefines.h" />
     <ClInclude Include="arm9\source\mapObject.h" />
     <ClInclude Include="arm9\source\mapDrawer.h" />
     <ClInclude Include="arm9\source\hmMoves.h" />

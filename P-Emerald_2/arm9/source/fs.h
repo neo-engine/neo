@@ -34,6 +34,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "sprite.h"
 #include "font.h"
 #include "saveGame.h"
+#include "mapSlice.h"
 
 namespace FS {
 #define MAXITEMSPERPAGE 12
@@ -53,9 +54,9 @@ namespace FS {
     bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt1, unsigned short* p_data1, const unsigned int p_dataCnt2, unsigned int* p_data2 );
 
     bool readNop( FILE* p_file, u32 p_cnt );
-    bool readPal( FILE* p_file, MAP::Palette* p_palette );
-    bool readTiles( FILE* p_file, MAP::Tile* p_tiles, u16 p_startIdx = 0, u16 p_size = 512 );
-    bool readBlocks( FILE* p_file, MAP::Block* p_blocks, u16 p_startIdx = 0, u16 p_size = 512 );
+    bool readPal( FILE* p_file, MAP::palette* p_palette );
+    bool readTiles( FILE* p_file, MAP::tile* p_tiles, u16 p_startIdx = 0, u16 p_size = 512 );
+    bool readblocks( FILE* p_file, MAP::block* p_blocks, u16 p_startIdx = 0, u16 p_size = 512 );
 
     std::string breakString( const std::string& p_string, u8 p_lineLength );
     std::string breakString( const std::string& p_string, IO::font* p_font, u8 p_lineLength );

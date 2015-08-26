@@ -25,12 +25,12 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
-#include <nds/ndstypes.h>
-#include "mapSlice.h"
-#include "mapSprite.h"
+#include "mapDefines.h"
 
 namespace MAP {
-    u8 getFrame( mapSlice::direction p_direction );
+    class mapSprite;
+
+    u8 getFrame( direction p_direction );
 
     struct mapObject {
         enum type {
@@ -38,12 +38,12 @@ namespace MAP {
             SIGN,
             NPC
         } m_type;
-        mapSlice::position m_pos;
+        position m_pos;
         u16 m_picNum;
-        mapSlice::moveMode m_movement;
+        moveMode m_movement;
         u16 m_range;
         u16 m_id;
-        mapSlice::direction m_direction;
+        direction m_direction;
 
         void interact( );
         mapSprite show( u16 p_currX, u16 p_currY, u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx );
