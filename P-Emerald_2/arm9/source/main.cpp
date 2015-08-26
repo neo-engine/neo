@@ -386,6 +386,20 @@ OUT:
             ;
         }
         //Movement
+        if( held & KEY_Y ) {
+            IO::waitForKeysUp( KEY_Y );
+            if( FS::SAV->m_player.m_movement == MAP::WALK )
+                curMap->changeMoveMode( MAP::BIKE );
+            else if( FS::SAV->m_player.m_movement == MAP::BIKE )
+                curMap->changeMoveMode( MAP::WALK );
+            else {
+                IO::messageBox( "Das kann jetzt\nnicht eingesetzt werden.", "PokéNav" );
+                IO::drawSub( true );
+            }
+            swiWaitForVBlank( );
+            scanKeys( );
+            continue;
+        }
         if( held & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
             MAP::direction curDir = GET_DIR( held );
             scanKeys( );

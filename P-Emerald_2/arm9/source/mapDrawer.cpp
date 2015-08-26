@@ -62,6 +62,7 @@ namespace MAP {
         lastcol; //Column to be filled when extending the map to the left
     u16 cx, cy;  //Cameras's pos
     u16* mapMemory[ 4 ];
+    u8 fastBike = false;
 
     inline void loadblock( block p_curblock, u32 p_memPos ) {
         u8 toplayer = 1, bottomlayer = 3;
@@ -375,7 +376,7 @@ namespace MAP {
         if( lstMoveData == 0x0a ) //Stand up (only possible for the player)
             return p_direction == _player.m_direction;
         if( curMoveData == 0x0a ) //Sit down
-            return true;
+            return ( p_moveMode == WALK );
         if( curMoveData == 4 && !( p_moveMode & SURF ) )
             return false;
         else if( curMoveData == 4 )
@@ -412,6 +413,7 @@ namespace MAP {
                 stopPlayer( );
                 IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
                 IO::drawSub( true );
+                fastBike = false;
                 return;
             }
             //Check for end of surf, stand up and sit down
@@ -423,23 +425,28 @@ namespace MAP {
                 animateField( _player.m_pos.m_posX, _player.m_pos.m_posY );
                 return;
             } else if( lstMoveData == 0x0a ) {
+                fastBike = false;
                 return;
             }
             if( newMoveData == 0x0a ) { //Sit down
+                if( _player.m_movement != WALK ) return;
                 _player.m_direction = direction( ( u8( p_direction ) + 2 ) % 4 );
                 _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( _player.m_direction ) );
                 sitDownPlayer( _player.m_direction, SIT );
+                fastBike = false;
                 return;
             }
             if( newMoveData == 0x0c && lstMoveData == 4 ) { //End of surf
                 standUpPlayer( p_direction );
                 animateField( _player.m_pos.m_posX, _player.m_pos.m_posY );
+                fastBike = false;
                 return;
             }
 
             //Check for jumps/slides/...
             if( !canMove( _player.m_pos, p_direction, _player.m_movement ) ) {
                 stopPlayer( p_direction );
+                fastBike = false;
                 return;
             }
 
@@ -654,8 +661,8 @@ NEXT_PASS:
 
         for( u8 i = 0; i < 4; ++i ) {
             moveCamera( dir, true );
-            if( i % 2 );
-            swiWaitForVBlank( );
+            if( i % 2 )
+                swiWaitForVBlank( );
         }
         _sprites[ _spritePos[ _player.m_id ] ].move( UP, 2 );
         swiWaitForVBlank( );
@@ -688,6 +695,9 @@ NEXT_PASS:
         }
     }
     void mapDrawer::walkPlayer( direction p_direction, bool p_fast ) {
+        if( _player.m_movement != WALK )
+            p_fast = false;
+
         redirectPlayer( p_direction, p_fast );
         animateField( _player.m_pos.m_posX + dir[ p_direction ][ 0 ],
                       _player.m_pos.m_posY + dir[ p_direction ][ 1 ] );
@@ -699,10 +709,16 @@ NEXT_PASS:
             moveCamera( p_direction, true );
             if( i == 8 )
                 _sprites[ _spritePos[ _player.m_id ] ].nextFrame( );
-            if( !p_fast || i % 3 )
+            if( ( !p_fast || i % 3 ) && _player.m_movement != BIKE )
+                swiWaitForVBlank( );
+            if( i % ( fastBike / 3 + 2 ) == 0 && _player.m_movement == BIKE )
                 swiWaitForVBlank( );
         }
         _sprites[ _spritePos[ _player.m_id ] ].drawFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
+        if( _player.m_movement == BIKE )
+            fastBike = std::min( fastBike + 1, 12 );
+        else
+            fastBike = false;
     }
     void mapDrawer::jumpPlayer( direction p_direction ) {
         redirectPlayer( p_direction, false );
@@ -729,20 +745,32 @@ NEXT_PASS:
     }
 
     void mapDrawer::stopPlayer( ) {
+        while( fastBike > 1 ) {
+            fastBike = std::max( 0, fastBike - 3 );
+            if( canMove( _player.m_pos, _player.m_direction, BIKE ) )
+                movePlayer( _player.m_direction );
+            fastBike = std::max( 0, fastBike - 1 );
+        }
         _playerIsFast = false;
+        fastBike = false;
         _sprites[ _spritePos[ _player.m_id ] ].drawFrame( getFrame( _player.m_direction ) );
     }
     void mapDrawer::stopPlayer( direction p_direction ) {
-        if( _player.m_movement == SIT && p_direction % 2 == _player.m_direction % 2 )
+        if( _player.m_movement == SIT && ( ( p_direction % 2 == _player.m_direction % 2 )
+            || atom( _player.m_pos.m_posX + dir[ p_direction ][ 0 ], _player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata
+            != atom( _player.m_pos.m_posX + dir[ _player.m_direction ][ 0 ], _player.m_pos.m_posY + dir[ _player.m_direction ][ 1 ] ).m_movedata ) ) {
             return;
+        }
         redirectPlayer( p_direction, false );
         _playerIsFast = false;
+        fastBike = false;
         _sprites[ _spritePos[ _player.m_id ] ].nextFrame( );
     }
     void mapDrawer::changeMoveMode( moveMode p_newMode ) {
         _player.m_movement = p_newMode;
         u8 basePic = _player.m_picNum / 10 * 10;
         bool newIsBig = false;
+        fastBike = false;
         u8 ydif = 0;
         switch( p_newMode ) {
             case WALK:
