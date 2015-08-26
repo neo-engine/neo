@@ -62,9 +62,9 @@ namespace MAP {
         lastcol; //Column to be filled when extending the map to the left
     u16 cx, cy;  //Cameras's pos
     u16* mapMemory[ 4 ];
-    u8 fastBike = false;
+    s8 fastBike = false;
 
-    inline void loadblock( block p_curblock, u32 p_memPos ) {
+    inline void loadBlock( block p_curblock, u32 p_memPos ) {
         u8 toplayer = 1, bottomlayer = 3;
         bool elevateTopLayer = p_curblock.m_topbehave == 0x10;
 
@@ -83,10 +83,10 @@ namespace MAP {
         mapMemory[ bottomlayer ][ p_memPos + 32 ] = p_curblock.m_bottom[ 1 ][ 0 ];
         mapMemory[ bottomlayer ][ p_memPos + 33 ] = p_curblock.m_bottom[ 1 ][ 1 ];
     }
-    inline void loadblock( block p_curblock, u8 p_scrnX, u8 p_scrnY ) {
+    inline void loadBlock( block p_curblock, u8 p_scrnX, u8 p_scrnY ) {
         u32 c = 64 * u32( p_scrnY ) + 2 * ( u32( p_scrnX ) % 16 );
         c += ( u32( p_scrnX ) / 16 ) * 1024;
-        loadblock( p_curblock, c );
+        loadBlock( p_curblock, c );
     }
 
     // Drawing of Maps and stuff
@@ -125,10 +125,10 @@ namespace MAP {
             for( u16 x = 0; x < NUM_COLS; x++ ) {
 #ifdef ___DEBUG
                 if( ( mnx + x ) % SIZE == 0 || ( mny + y ) % SIZE == 0 )
-                    loadblock( CUR_SLICE->m_blockSet.m_blocks[ 0 ], x, y );
+                    loadBlock( CUR_SLICE->m_blockSet.m_blocks[ 0 ], x, y );
                 else
 #endif
-                    loadblock( at( mnx + x, mny + y ), x, y );
+                    loadBlock( at( mnx + x, mny + y ), x, y );
             }
         bgUpdate( );
     }
@@ -205,7 +205,7 @@ namespace MAP {
                 u16 ty = cy - 8;
                 u16 mnx = cx - 15;
                 for( u16 x = ( lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS; x = ( x + 1 ) % NUM_COLS, ++xp )
-                    loadblock( at( xp, ty ), x, lastrow );
+                    loadBlock( at( xp, ty ), x, lastrow );
                 lastrow = ( lastrow + NUM_ROWS - 1 ) % NUM_ROWS;
                 break;
             }
@@ -213,7 +213,7 @@ namespace MAP {
                 u16 tx = cx - 15;
                 u16 mny = cy - 8;
                 for( u16 y = ( lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS; y = ( y + 1 ) % NUM_ROWS, ++yp )
-                    loadblock( at( tx, yp ), lastcol, y );
+                    loadBlock( at( tx, yp ), lastcol, y );
                 lastcol = ( lastcol + NUM_COLS - 1 ) % NUM_COLS;
                 break;
             }
@@ -222,7 +222,7 @@ namespace MAP {
                 u16 ty = cy + 7;
                 u16 mnx = cx - 15;
                 for( u16 x = ( lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS; x = ( x + 1 ) % NUM_COLS, ++xp )
-                    loadblock( at( xp, ty ), x, lastrow );
+                    loadBlock( at( xp, ty ), x, lastrow );
                 break;
             }
             case RIGHT: {
@@ -230,7 +230,7 @@ namespace MAP {
                 u16 tx = cx + 16;
                 u16 mny = cy - 8;
                 for( u16 y = ( lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS; y = ( y + 1 ) % NUM_ROWS, ++yp )
-                    loadblock( at( tx, yp ), lastcol, y );
+                    loadBlock( at( tx, yp ), lastcol, y );
                 break;
             }
         }
@@ -405,6 +405,7 @@ namespace MAP {
         bool reinit = false, moving = true;
         while( moving ) {
             if( newMoveData == MAP_BORDER ) {
+                fastBike = false;
                 stopPlayer( direction( ( u8( p_direction ) + 2 ) % 4 ) );
                 swiWaitForVBlank( );
                 swiWaitForVBlank( );
@@ -413,7 +414,6 @@ namespace MAP {
                 stopPlayer( );
                 IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
                 IO::drawSub( true );
-                fastBike = false;
                 return;
             }
             //Check for end of surf, stand up and sit down
@@ -467,8 +467,6 @@ namespace MAP {
                 default:
                     //If no jump has to be done, check for other stuff
                     switch( lstBehave ) {
-                        //case 0x0:
-                        //    break;
                         case 0x20: case 0x48:
                             slidePlayer( p_direction );
                             break;
@@ -540,6 +538,7 @@ NEXT_PASS:
                         default:
                             if( reinit ) {
                                 _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( p_direction ) );
+                                fastBike = false;
                                 return;
                             }
                             switch( newBehave ) {
@@ -745,11 +744,11 @@ NEXT_PASS:
     }
 
     void mapDrawer::stopPlayer( ) {
-        while( fastBike > 1 ) {
-            fastBike = std::max( 0, fastBike - 3 );
+        while( fastBike ) {
+            fastBike = std::max( 0, (s8)fastBike - 3 );
             if( canMove( _player.m_pos, _player.m_direction, BIKE ) )
                 movePlayer( _player.m_direction );
-            fastBike = std::max( 0, fastBike - 1 );
+            fastBike = std::max( 0, (s8)fastBike - 1 );
         }
         _playerIsFast = false;
         fastBike = false;
@@ -761,9 +760,9 @@ NEXT_PASS:
             != atom( _player.m_pos.m_posX + dir[ _player.m_direction ][ 0 ], _player.m_pos.m_posY + dir[ _player.m_direction ][ 1 ] ).m_movedata ) ) {
             return;
         }
+        fastBike = false;
         redirectPlayer( p_direction, false );
         _playerIsFast = false;
-        fastBike = false;
         _sprites[ _spritePos[ _player.m_id ] ].nextFrame( );
     }
     void mapDrawer::changeMoveMode( moveMode p_newMode ) {

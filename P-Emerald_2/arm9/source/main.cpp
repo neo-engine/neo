@@ -405,8 +405,9 @@ OUT:
             scanKeys( );
 
             stopped = false;
-            if( curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) || ( ( held & KEY_R ) && gMod == DEVELOPER ) ) {
+            if( curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) ) {
                 curMap->movePlayer( curDir, ( held & KEY_B ) );
+                bmp = false;
             } else if( !bmp ) {
                 //Play "Bump" sound
                 curMap->stopPlayer( curDir );

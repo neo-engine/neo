@@ -56,6 +56,7 @@ namespace MAP {
             sprintf( buffer, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
             IO::messageBox m( buffer );
             IO::drawSub( true );
+            swiWaitForVBlank( );
 #endif
             //mapF = FS::open( MAP_PATH, "empty", ".map" );
             //if( !mapF )
