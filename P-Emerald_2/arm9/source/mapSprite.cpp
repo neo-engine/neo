@@ -57,6 +57,10 @@ namespace MAP {
         IO::setOWSpriteFrame( p_value, _oamIndex, _tileIdx );
         IO::updateOAM( false );
     }
+    void mapSprite::drawFrame( u8 p_value, bool p_hFlip ) {
+        IO::setOWSpriteFrame( p_value, p_hFlip, _oamIndex, _tileIdx );
+        IO::updateOAM( false );
+    }
 
     void mapSprite::setFrame( u8 p_value ) {
         _curFrame = p_value;

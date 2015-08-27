@@ -100,6 +100,7 @@ namespace IO {
     u16 loadOWSprite( const char* p_path, const u16 p_picnum, const s16 p_posX, const s16 p_posY,
                       u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt );
     void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt );
+    void setOWSpriteFrame( u8 p_memPos, bool p_hFlip, u8 p_oamIndex, u16 p_tileCnt );
 
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
                   u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom );

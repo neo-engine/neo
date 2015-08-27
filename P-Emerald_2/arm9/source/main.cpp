@@ -393,7 +393,20 @@ OUT:
             else if( FS::SAV->m_player.m_movement == MAP::BIKE )
                 curMap->changeMoveMode( MAP::WALK );
             else {
-                IO::messageBox( "Das kann jetzt\nnicht eingesetzt werden.", "PokéNav" );
+                IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                IO::drawSub( true );
+            }
+            swiWaitForVBlank( );
+            scanKeys( );
+            continue;
+        }
+        if( held & KEY_X ) {
+            IO::waitForKeysUp( KEY_X );
+            if( curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
+                curMap->fishPlayer( FS::SAV->m_player.m_direction );
+            }
+            else {
+                IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
                 IO::drawSub( true );
             }
             swiWaitForVBlank( );

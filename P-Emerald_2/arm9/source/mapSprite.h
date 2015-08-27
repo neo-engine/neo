@@ -49,6 +49,7 @@ namespace MAP {
 
         void setVisibility( bool p_value );
         void drawFrame( u8 p_value );
+        void drawFrame( u8 p_value, bool p_hFlip );
         void setFrame( u8 p_value );
         void currentFrame( );
         void nextFrame( );

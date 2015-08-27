@@ -777,7 +777,7 @@ NEXT_PASS:
                 break;
             case SURF:
                 _player.m_picNum = basePic + 3;
-                newIsBig = true;
+                newIsBig = basePic == 0 || basePic == 10;
                 ydif = 2;
                 break;
             case BIKE:
@@ -790,7 +790,7 @@ NEXT_PASS:
                 break;
             case SIT:
                 _player.m_picNum = basePic + 3;
-                newIsBig = true;
+                newIsBig = basePic == 0 || basePic == 10;
                 ydif = 2;
                 break;
             default:
@@ -798,6 +798,39 @@ NEXT_PASS:
         }
         _sprites[ _spritePos[ _player.m_id ] ] = _player.show( 128 - 8 - 8 * newIsBig, 96 - 24 - ydif, 0, 0, 0 );
         _sprites[ _spritePos[ _player.m_id ] ].setFrame( getFrame( _player.m_direction ) );
+    }
+
+    bool mapDrawer::canFish( position p_start,
+                             direction p_direction ) {
+        return atom( _player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                     _player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x04;
+    }
+    void mapDrawer::fishPlayer( direction p_direction ) {
+        u8 basePic = _player.m_picNum / 10 * 10;
+        _player.m_picNum = basePic + 6;
+        _sprites[ _spritePos[ _player.m_id ] ] = _player.show( 128 - 16 + 8 * dir[ p_direction ][ 0 ],
+                                                               96 - 24 + 8 * ( p_direction == DOWN ), 0, 0, 0 );
+
+        u8 frame = 0;
+        if( p_direction == UP )
+            frame = 4;
+        if( p_direction == DOWN )
+            frame = 8;
+
+        for( u8 i = 0; i < 4; ++i ) {
+            _sprites[ _spritePos[ _player.m_id ] ].drawFrame( frame + i, p_direction == RIGHT );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+        }
+        loop( ) {
+            scanKeys( );
+            int pressed = keysDown( );
+            if( GET_AND_WAIT( KEY_B ) ) {
+                changeMoveMode( WALK );
+                break;
+            }
+        }
     }
 
     u16  mapDrawer::getCurrentLocationId( ) const {

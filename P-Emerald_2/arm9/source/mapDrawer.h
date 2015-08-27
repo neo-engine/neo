@@ -88,6 +88,10 @@ namespace MAP {
         void stopPlayer( direction p_direction );
         void changeMoveMode( moveMode p_newMode );
 
+        bool canFish( position p_start,
+                      direction p_direction );
+        void fishPlayer( direction p_direction );
+
         u16  getCurrentLocationId( ) const;
     };
 

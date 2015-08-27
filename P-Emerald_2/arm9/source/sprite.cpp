@@ -361,15 +361,18 @@ namespace IO {
         u8 frame = p_frame;
         if( frame % 20 >= 9 )
             frame -= 3;
-        if( p_frame == 15 )
+        if( p_frame % 20 == 15 )
             frame--;
         u8 memPos = frame / 20 * 9 + frame % 20;
 
+        setOWSpriteFrame( memPos, ( frame != p_frame ) && ( p_frame % 20 < 12 || p_frame % 20 == 15 ), p_oamIndex, p_tileCnt );
+    }
+    void setOWSpriteFrame( u8 p_memPos, bool p_hFlip, u8 p_oamIndex, u16 p_tileCnt ) {
         u8 width = spriteInfoTop[ p_oamIndex ].m_width,
             height = spriteInfoTop[ p_oamIndex ].m_height;
 
-        OamTop->oamBuffer[ p_oamIndex ].hFlip = ( frame != p_frame ) && ( p_frame < 12 || p_frame == 15 );
-        OamTop->oamBuffer[ p_oamIndex ].gfxIndex = p_tileCnt + memPos * width * height / 64;
+        OamTop->oamBuffer[ p_oamIndex ].hFlip = p_hFlip;
+        OamTop->oamBuffer[ p_oamIndex ].gfxIndex = p_tileCnt + p_memPos * width * height / 64;
     }
 
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
