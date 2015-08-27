@@ -6,7 +6,7 @@ There's still (very) much to do, but when it's complete, it's a recode of Pokém
 As the game itself is in German, I won't go into detail about the (planned) storyline (at least in the English description);
 so far the game is set in the Hoenn region 2 years after [Pokémon Ruby, Sapphire](https://en.wikipedia.org/wiki/Pok%C3%A9mon_Ruby_and_Sapphire) and [Emerald](https://en.wikipedia.org/wiki/Pok%C3%A9mon_Emerald).
 
-This game is intended to be played on real hardware, but [DeSmuME 0.9.10](http://desmume.org/) seems to be capable of simulating most of real hardware's features, too.
+This game is intended to be played on real hardware, but [DeSmuME 0.9.11](http://desmume.org/) seems to be capable of simulating most of real hardware's features, too.
 
 Features
 --------
