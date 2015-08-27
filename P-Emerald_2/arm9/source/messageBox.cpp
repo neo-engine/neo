@@ -3,11 +3,11 @@
     ------------------------------
 
     file        : messageBox.cpp
-    author      : Philip Wellnitz 
+    author      : Philip Wellnitz
     description : Functionality message boxes
 
     Copyright (C) 2012 - 2015
-    Philip Wellnitz 
+    Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
 
@@ -40,11 +40,17 @@
 
 namespace IO {
 
+    s16 curx = 8, cury = 8;
+
     void messageBox::clear( ) {
         printRectangle( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
+        curx = 8;
+        cury = 8;
     }
     void messageBox::clearButName( ) {
         printRectangle( (u8)72, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
+        curx = 64 * ( !!m_isNamed ) + 8;
+        cury = 8;
     }
 
 
@@ -81,11 +87,13 @@ namespace IO {
                     SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                     ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
         updateOAM( true );
-        regularFont->printMBStringD( buf, 32, 8, true );
+        s16 x = 32, y = 8;
+        regularFont->printMBStringD( buf, x, y, true );
         regularFont->printChar( 489 - 21 + p_item->m_itemType, 32, 24, true );
         sprintf( buf, "%s-Tasche verstaut.`", BAG::bagnames[ BAG::toBagType( p_item->m_itemType ) ].c_str( ) );
         ASpriteOamIndex = A_ID;
-        regularFont->printMBStringD( buf, 46, 24, true );
+        x = 46; y = 24;
+        regularFont->printMBStringD( buf, x, y, true );
 
         if( !FS::SAV->m_bag )
             FS::SAV->m_bag = new BAG::bag( );
@@ -103,8 +111,10 @@ namespace IO {
         updateOAM( true );
 
         ASpriteOamIndex = A_ID;
+        curx = 8;
+        cury = 8;
         std::string text( p_text );
-        regularFont->printMBStringD( ( text + '`' ).c_str( ), 8, 8, true );
+        regularFont->printMBStringD( ( text + '`' ).c_str( ), curx, cury, true );
 
         swiWaitForVBlank( );
     }
@@ -119,8 +129,10 @@ namespace IO {
         updateOAM( true );
 
         ASpriteOamIndex = A_ID;
+        curx = 8;
+        cury = 8;
         std::wstring text( p_text );
-        regularFont->printMBStringD( ( text + L'`' ).c_str( ), 8, 8, true );
+        regularFont->printMBStringD( ( text + L'`' ).c_str( ), curx, cury, true );
 
         swiWaitForVBlank( );
     }
@@ -145,14 +157,16 @@ namespace IO {
 
         initTextField( );
 
+        curx = 64 * ( !!p_name ) + 8;
+        cury = 8;
         if( p_name )
             regularFont->printString( p_name, 8, 8, true );
         if( p_a ) {
-            ASpriteOamIndex = 8;
+            ASpriteOamIndex = A_ID;
             std::string text( p_text );
-            regularFont->printMBStringD( ( text + '`' ).c_str( ), 64 * ( !!p_name ) + 8, 8, true );
+            regularFont->printMBStringD( ( text + '`' ).c_str( ), curx, cury, true );
         } else
-            regularFont->printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
+            regularFont->printStringD( p_text, curx, cury, true );
 
         if( !p_remsprites )
             return;
@@ -183,14 +197,16 @@ namespace IO {
 
         initTextField( );
 
+        curx = 64 * ( !!p_name ) + 8;
+        cury = 8;
         if( p_name )
             regularFont->printString( p_name, 8, 8, true );
         if( p_a ) {
             ASpriteOamIndex = A_ID;
             std::wstring text( p_text );
-            regularFont->printMBStringD( ( text + L'`' ).c_str( ), 64 * ( !!p_name ) + 8, 8, true );
+            regularFont->printMBStringD( ( text + L'`' ).c_str( ), curx, cury, true );
         } else
-            regularFont->printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
+            regularFont->printStringD( p_text, curx, cury, true );
 
         if( !p_remsprites )
             return;
@@ -201,22 +217,27 @@ namespace IO {
         swiWaitForVBlank( );
     }
 
+    void messageBox::carriageReturn( ) {
+        curx = 64 * ( !!m_isNamed ) + 8;
+    }
+
     void messageBox::put( const char* p_text, bool p_a ) {
-        initTextField( );
         initOAMTable( true );
-        loadSprite( A_ID, 0, 0,
-                    SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
-                    ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
-        updateOAM( true );
+        if( p_a ) {
+            loadSprite( A_ID, 0, 0,
+                        SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
+                        ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
+            updateOAM( true );
+        }
 
         if( m_isNamed )
             regularFont->printString( m_isNamed, 8, 8, true );
         if( p_a ) {
             ASpriteOamIndex = A_ID;
             std::string text( p_text );
-            regularFont->printMBStringD( ( text + '`' ).c_str( ), ( 64 * !!m_isNamed ) + 8, 8, true );
+            regularFont->printMBStringD( ( text + '`' ).c_str( ), curx, cury, true );
         } else
-            regularFont->printStringD( p_text, ( 64 * !!m_isNamed ) + 8, 8, true );
+            regularFont->printStringD( p_text, curx, cury, true );
 
         swiWaitForVBlank( );
     }

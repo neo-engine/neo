@@ -53,6 +53,7 @@ u8 getCurrentDaytime( );
 extern bool DRAW_TIME;
 extern bool ANIMATE_MAP;
 extern bool INIT_MAIN_SPRITES;
+extern u8 FRAME_COUNT;
 
 extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;

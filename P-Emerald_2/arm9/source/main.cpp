@@ -103,6 +103,7 @@ bool DRAW_TIME = false;
 bool UPDATE_TIME = true;
 bool ANIMATE_MAP = false;
 bool INIT_MAIN_SPRITES = false;
+u8 FRAME_COUNT = 0;
 
 u8 getCurrentDaytime( ) {
     time_t unixTime = time( NULL );
@@ -280,6 +281,7 @@ int main( int, char** p_argv ) {
 
     irqSet( IRQ_VBLANK, [ ]( ) {
         scanKeys( );
+        FRAME_COUNT++;
 
         if( ANIMATE_MAP ) {
             //animateMap( ++frame );

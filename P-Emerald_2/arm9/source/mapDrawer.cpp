@@ -823,13 +823,49 @@ NEXT_PASS:
             swiWaitForVBlank( );
             swiWaitForVBlank( );
         }
-        loop( ) {
-            scanKeys( );
-            int pressed = keysDown( );
-            if( GET_AND_WAIT( KEY_B ) ) {
-                changeMoveMode( WALK );
+        u8 rounds = rand( ) % 5;
+        bool failed = false;
+        IO::messageBox fish( "", 0, false );
+        for( u8 i = 0; i < rounds + 1; ++i ) {
+            u8 cr = rand( ) % 7;
+            fish.clear( );
+            for( u8 j = 0; j < cr + 5; ++j ) {
+                fish.put( " .", false );
+                for( u8 k = 0; k < 30; ++k ) {
+                    scanKeys( );
+                    swiWaitForVBlank( );
+                    int pressed = keysDown( );
+                    if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_B ) ) {
+                        failed = true;
+                        goto OUT;
+                    }
+                }
+            }
+            FRAME_COUNT = 0;
+            fish.carriageReturn( );
+            fish.put( "\nDa ist etwas am Haken!" );
+            if( FRAME_COUNT > 60 ) {
+                failed = true;
                 break;
             }
+        }
+
+OUT:
+        fish.clear( );
+        if( !failed )
+            fish.put( "Du hast ein Pokémon geangelt!" );
+        else
+            fish.put( "Es ist entkommen..." );
+        IO::drawSub( true );
+        for( s8 i = 2; i >= 0; --i ) {
+            _sprites[ _spritePos[ _player.m_id ] ].drawFrame( frame + i, p_direction == RIGHT );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+        }
+        changeMoveMode( WALK );
+        if( !failed ) {
+            //Start wild PKMN battle here
         }
     }
 

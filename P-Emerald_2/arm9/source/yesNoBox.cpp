@@ -36,12 +36,10 @@ namespace IO {
     }
 
     bool yesNoBox::getResult( const char* p_text = 0 ) {
-        if( p_text ) {
-            if( _isNamed )
-                regularFont->printStringD( p_text, 72, 8, true );
-            else
-                regularFont->printStringD( p_text, 8, 8, true );
-        }
+        s16 x = 8 + 64 * !!_isNamed;
+        s16 y = 8;
+        if( p_text )
+            regularFont->printStringD( p_text, x, y, true );
         draw( 2 );
         bool result;
         loop( ) {
@@ -69,12 +67,11 @@ namespace IO {
         return result;
     }
     bool yesNoBox::getResult( const wchar_t* p_text = 0 ) {
-        if( p_text ) {
-            if( _isNamed )
-                regularFont->printStringD( p_text, 72, 8, true );
-            else
-                regularFont->printStringD( p_text, 8, 8, true );
-        }
+        s16 x = 8 + 64 * !!_isNamed;
+        s16 y = 8;
+        if( p_text )
+            regularFont->printStringD( p_text, x, y, true );
+
         draw( 2 );
         bool result;
         loop( ) {
