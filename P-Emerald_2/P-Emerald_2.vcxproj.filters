@@ -37,9 +37,6 @@
     <Filter Include="Header Files\arm9\dex">
       <UniqueIdentifier>{35669822-f1ec-4521-a8bf-30e30ea5f372}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\arm9\ds">
-      <UniqueIdentifier>{87796c2f-84ad-4bcc-b803-26ce3e1582b5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\arm9\fs">
       <UniqueIdentifier>{ce32e421-874e-4508-9b40-68bf8f4ed38a}</UniqueIdentifier>
     </Filter>
@@ -64,9 +61,6 @@
     <Filter Include="Source Files\arm9\dex">
       <UniqueIdentifier>{931087d5-781d-46c1-a737-58fd74712044}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\arm9\ds">
-      <UniqueIdentifier>{cc2ee30a-59bd-423e-b520-beebc83b7ea5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\arm9\fs">
       <UniqueIdentifier>{d14f2d8a-a5f5-4cec-a703-966dde312242}</UniqueIdentifier>
     </Filter>
@@ -78,6 +72,12 @@
     </Filter>
     <Filter Include="Source Files\arm9\sts">
       <UniqueIdentifier>{163da026-3d7f-4b79-adc1-a22342fb2b4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\arm9\data structures">
+      <UniqueIdentifier>{cc2ee30a-59bd-423e-b520-beebc83b7ea5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\arm9\data structures">
+      <UniqueIdentifier>{87796c2f-84ad-4bcc-b803-26ce3e1582b5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -118,22 +118,22 @@
       <Filter>Header Files\arm9\dex</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\ability.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\berry.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\item.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\move.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\pokemon.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\type.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\fs.h">
       <Filter>Header Files\arm9\fs</Filter>
@@ -172,10 +172,10 @@
       <Filter>Header Files\arm9\sts</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\hmMoves.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\ribbon.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\bagViewer.h">
       <Filter>Header Files\arm9\bag</Filter>
@@ -196,6 +196,9 @@
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\mapDefines.h">
+      <Filter>Header Files\arm9\map</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\mapWarps.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
   </ItemGroup>
@@ -228,13 +231,13 @@
       <Filter>Source Files\arm9\dex</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\move.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
+      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\pokemon.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
+      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\type.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
+      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\fs.cpp">
       <Filter>Source Files\arm9\fs</Filter>
@@ -279,13 +282,13 @@
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\ribbon.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
+      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\yesNoBox.cpp">
       <Filter>Source Files\arm9\io</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\item.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
+      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\bagViewer.cpp">
       <Filter>Source Files\arm9\bag</Filter>
@@ -306,6 +309,9 @@
       <Filter>Source Files\arm9\map</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\mapMoves.cpp">
+      <Filter>Source Files\arm9\map</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\mapWarps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

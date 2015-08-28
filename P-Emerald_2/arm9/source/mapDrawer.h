@@ -38,6 +38,45 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 namespace MAP {
     class mapDrawer {
     private:
+        enum wildPkmnType {
+            GRASS,
+            HIGH_GRASS,
+            WATER,
+            CAVE_WALK,
+            FISHING_ROD
+        };
+        enum mapWeather {
+            NOTHING, //Inside
+            SUNNY,
+            REGULAR,
+            RAINY,
+            SNOW,
+            THUNDERSTORM,
+            MIST,
+            BLIZZARD,
+            SANDSTORM,
+            MIST_2,
+            DENSE_MIST,
+            CLOUDY,
+            HEAVY_SUNLIGHT,
+            HEAVY_RAIN,
+            UNDERWATER
+        };
+        enum mapType {
+            OUTSIDE = 0,
+            CAVE = 1,
+            INSIDE = 2,
+            DARK = 4,
+            FLASHABLE = 8
+        };
+        enum warpType {
+            NORMAL,
+            LAST_VISITED
+        };
+
+        std::map<u8, mapType> _mapTypes = { { 10, OUTSIDE } };
+        mapWeather _weather;
+
         std::unique_ptr<mapSlice> _slices[ 2 ][ 2 ] = { { 0 } };  //[x][y]
         u8          _curX, _curY;       //Current main slice from the _slices array
         std::map<std::pair<u16, u16>, std::vector<mapObject>>
@@ -63,8 +102,8 @@ namespace MAP {
         void slidePlayer( direction p_direction );
         void walkPlayer( direction p_direction, bool p_fast = false );
 
-        void handleWarp( );
-        void handleWildPkmn( );
+        void handleWarp( warpType p_type );
+        void handleWildPkmn( wildPkmnType p_type );
         void handleTrainer( );
 
         block& at( u16 p_x, u16 p_y ) const;

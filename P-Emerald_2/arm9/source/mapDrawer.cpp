@@ -26,6 +26,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 */
 
 #include "mapDrawer.h"
+#include "mapWarps.h"
 #include "uio.h"
 #include "sprite.h"
 #include "defines.h"
@@ -48,6 +49,13 @@ namespace MAP {
         return s8( ( p_pos % SIZE >= SIZE / 2 ) ? 1 : -1 );
     }
 
+    bool operator==( position p_l, position p_r ) {
+        return p_l.m_posX == p_r.m_posX && p_l.m_posY == p_r.m_posY && p_l.m_posZ == p_r.m_posZ;
+    }
+    bool operator<( position p_l, position p_r ) {
+        return p_l.m_posX < p_r.m_posX || ( p_l.m_posX == p_r.m_posX && p_l.m_posY < p_r.m_posY )
+            || ( p_l.m_posX == p_r.m_posX && p_l.m_posY == p_r.m_posY && p_l.m_posZ < p_r.m_posZ );
+    }
 
     mapBlockAtom& mapDrawer::atom( u16 p_x, u16 p_y ) const {
         bool x = ( p_x / SIZE != CUR_SLICE->m_x ),
@@ -155,8 +163,19 @@ namespace MAP {
     }
 
     void mapDrawer::animateField( u16 p_globX, u16 p_globY ) {
-        (void)p_globX;
-        (void)p_globY;
+        u8 moveData = atom( p_globX, p_globY ).m_movedata;
+        u8 behave = at( p_globX, p_globY ).m_bottombehave;
+
+
+        //handle Pkmn stuff
+        if( moveData == 0x04 && behave != 0x13 )
+            handleWildPkmn( WATER );
+        else if( behave == 0x02 )
+            handleWildPkmn( GRASS );
+        else if( behave == 0x03 )
+            handleWildPkmn( HIGH_GRASS );
+        else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
+            handleWildPkmn( CAVE_WALK );
     }
 
     void mapDrawer::loadNewRow( direction p_direction, bool p_updatePlayer ) {
@@ -260,8 +279,30 @@ namespace MAP {
             = constructSlice( FS::SAV->m_currentMap, neigh->m_x + dir[ p_direction ][ 0 ], neigh->m_y + dir[ p_direction ][ 1 ] );
     }
 
-    void mapDrawer::handleWarp( ) { }
-    void mapDrawer::handleWildPkmn( ) { }
+    void mapDrawer::handleWarp( warpType p_type ) {
+        typedef std::pair<u8, position> warpPos;
+        static warpPos lastWarp = { 0, { 0, 0, 0 } };
+
+        warpPos current = warpPos{ FS::SAV->m_currentMap, FS::SAV->m_player.m_pos };
+        if( !warpList.count( current ) )
+            return;
+        warpPos target = p_type == LAST_VISITED ? lastWarp : warpList[ current ];
+        if( target == warpPos{ 0, { 0, 0, 0 } } )
+            return;
+        lastWarp = current;
+
+        switch( p_type ) {
+            case MAP::mapDrawer::NORMAL:
+                break;
+            case MAP::mapDrawer::LAST_VISITED:
+                break;
+            default:
+                break;
+        }
+    }
+    void mapDrawer::handleWildPkmn( wildPkmnType p_type ) {
+        (void)p_type;
+    }
     void mapDrawer::handleTrainer( ) { }
 
     mapDrawer::mapDrawer( )
@@ -662,7 +703,7 @@ NEXT_PASS:
     }
     void mapDrawer::sitDownPlayer( direction p_direction, moveMode p_newMoveMode ) {
         direction dir = ( ( p_newMoveMode == SIT ) ? direction( ( u8( p_direction ) + 2 ) % 4 ) : p_direction );
-        
+
         if( p_newMoveMode == SURF ) {
             //Load the Pkmn
             surfPlatform.m_id = 1;
@@ -876,9 +917,7 @@ NEXT_PASS:
 
 OUT:
         fish.clear( );
-        if( !failed )
-            fish.put( "Du hast ein Pokémon geangelt!" );
-        else
+        if( failed )
             fish.put( "Es ist entkommen..." );
         IO::drawSub( true );
         for( s8 i = 2; i >= 0; --i ) {
@@ -890,6 +929,7 @@ OUT:
         changeMoveMode( WALK );
         if( !failed ) {
             //Start wild PKMN battle here
+            handleWildPkmn( FISHING_ROD );
         }
     }
 
