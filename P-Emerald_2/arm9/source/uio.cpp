@@ -309,14 +309,14 @@ namespace IO {
                             true, false, WHITE_IDX );
         } else {
             printRectangle( p_x1, p_y1, p_x2 - 1, p_y2 - 1,
-                            true, false, BLACK_IDX );
+                            true, false, 0 );
             printRectangle( p_x1 + 2, p_y1 + 1, p_x2, p_y2,
                             true, false, p_colorIdx );
 
-            printRectangle( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth2 - 1, p_y2 - p_borderWidth + 3,
+            printRectangle( p_x1 + 3 + p_borderWidth, p_y1 + p_borderWidth, p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4,
                             true, false, BLACK_IDX );
 
-            printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4,
+            printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 3,
                             true, false, WHITE_IDX );
         }
     }

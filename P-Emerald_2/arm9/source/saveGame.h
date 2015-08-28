@@ -31,6 +31,7 @@
 #include <string>
 #include <vector>
 #include "bag.h"
+#include "box.h"
 #include "pokemon.h"
 #include "mapObject.h"
 
@@ -69,6 +70,9 @@ namespace FS {
         u8          m_lstBagItem;
 
         pokemon     m_pkmnTeam[ 6 ];
+
+        //Stored Pkmn
+        BOX::box*   m_storedPokemon; //And I really mean careful
 
         //Map stuff
         MAP::mapObject m_player;

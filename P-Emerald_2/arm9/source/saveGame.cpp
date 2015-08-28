@@ -29,11 +29,7 @@
 
 #include <string>
 #include <cstdio>
-#include <fat.h>
-#include <dirent.h>
 #include <nds.h>
-#include <fcntl.h>
-#include <unistd.h>
 
 #include "saveGame.h"
 //#include "Gen.h"
@@ -46,7 +42,7 @@ namespace FS {
 
 #define PKMN_DATALENGTH 128
     BAG::bag* readBag( FILE* p_file ) {
-        BAG::bag* result = new BAG::bag( );
+        static BAG::bag* result = new BAG::bag( );
 
         for( u8 i = 0; i < 5; ++i ) {
             size_t sz;
@@ -62,6 +58,19 @@ namespace FS {
         return result;
     }
 
+    BOX::box* readStoredPkmn( FILE* p_file ) {
+        static BOX::box* result = new BOX::box( );
+        pokemon::boxPokemon tmp;
+        for( u16 i = 0; i < MAX_PKMN + 1; ++i ) {
+            u16 cnt; fread( &cnt, sizeof( u16 ), 1, p_file );
+            for( u16 j = 0; j < cnt; ++j ) {
+                fread( &tmp, sizeof( pokemon::boxPokemon ), 1, p_file );
+                result->insert( tmp );
+            }
+        }
+        return result;
+    }
+
     saveGame* readSave( ) {
         FILE* f = fopen( sav_nam.c_str( ), "rb" );
 
@@ -70,9 +79,14 @@ namespace FS {
 
         saveGame* result = new saveGame( );
         fread( result, sizeof( saveGame ), 1, f );
+
         result->m_bag = readBag( f );
         if( !result->m_bag )
             result->m_bag = new BAG::bag( );
+
+        result->m_storedPokemon = readStoredPkmn( f );
+        if( !result->m_storedPokemon )
+            result->m_storedPokemon = new BOX::box( );
 
         fclose( f );
         return result;
@@ -94,12 +108,25 @@ namespace FS {
         return true;
     }
 
+    bool writeStoredPkmn( BOX::box* p_stPkmn, FILE* p_file ) {
+        if( !p_stPkmn )
+            return false;
+
+        for( u16 i = 0; i < MAX_PKMN + 1; ++i ) {
+            u16 cnt = p_stPkmn->count( i );
+            fwrite( &cnt, sizeof( u16 ), 1, p_file );
+            for( auto tmp : (*p_stPkmn)[ i ] )
+                fwrite( &tmp, sizeof( pokemon::boxPokemon ), 1, p_file );
+        }
+    }
+
     bool writeSave( saveGame* p_saveGame ) {
         FILE* f = fopen( sav_nam.c_str( ), "wb" );
         if( !f )
             return 0;
         fwrite( p_saveGame, sizeof( saveGame ), 1, f );
         writeBag( p_saveGame->m_bag, f );
+        writeStoredPkmn( p_saveGame->m_storedPokemon, f );
 
         fclose( f );
         return true;

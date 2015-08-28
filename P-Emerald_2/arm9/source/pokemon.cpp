@@ -205,8 +205,7 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
                                  u16            p_sid,
                                  const wchar_t* p_oT,
                                  bool           p_oTFemale,
-                                 bool           p_cloned,
-                                 bool           p_shiny,
+                                 u8             p_shiny,
                                  bool           p_hiddenAbility,
                                  bool           p_fatefulEncounter,
                                  bool           p_isEgg,
@@ -217,10 +216,10 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
 
     srand( LastPID );
     LastPID = m_pid = rand( );
-    if( p_shiny )
+    if( p_shiny == 2 )
         while( !isShiny( ) )
             LastPID = m_pid = rand( );
-    else
+    else if( p_shiny == 1 )
         while( isShiny( ) )
             LastPID = m_pid = rand( );
     m_checksum = 0;
@@ -246,23 +245,20 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
         m_experienceGained = EXP[ p_level - 1 ][ data.m_expType ];
     else
         m_experienceGained = 0;
-
-    time_t unixTime = time( NULL );
-    tm* timeStruct = gmtime( (const time_t *)&unixTime );
-
+    
     if( p_isEgg ) {
         m_steps = data.m_eggcyc;
-        m_gotDate[ 0 ] = timeStruct->tm_mday;
-        m_gotDate[ 1 ] = timeStruct->tm_mon + 1;
-        m_gotDate[ 2 ] = ( timeStruct->tm_year + 1900 ) % 100;
+        m_gotDate[ 0 ] = acday;
+        m_gotDate[ 1 ] = acmonth;
+        m_gotDate[ 2 ] = acyear % 100;
         m_gotPlace = p_gotPlace;
         m_hatchDate[ 0 ] = m_hatchDate[ 1 ] = m_hatchDate[ 2 ] = m_hatchPlace = 0;
     } else {
         m_steps = data.m_baseFriend;
         m_gotDate[ 0 ] = m_gotDate[ 1 ] = m_gotDate[ 2 ] = m_hatchPlace = 0;
-        m_hatchDate[ 0 ] = timeStruct->tm_mday;
-        m_hatchDate[ 1 ] = timeStruct->tm_mon + 1;
-        m_hatchDate[ 2 ] = ( timeStruct->tm_year + 1900 ) % 100;
+        m_hatchDate[ 0 ] = acday;
+        m_hatchDate[ 1 ] = acmonth;
+        m_hatchDate[ 2 ] = acyear % 100;
         m_gotPlace = p_gotPlace;
     }
     m_ability = p_hiddenAbility ? ( ( m_pid & 1 || ( data.m_abilities[ 3 ] == 0 ) ) ? data.m_abilities[ 2 ] : data.m_abilities[ 3 ] ) :
@@ -289,7 +285,7 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
     m_individualValues.m_sAttack = rand( ) % 32;
     m_individualValues.m_sDefense = rand( ) % 32;
     m_individualValues.m_speed = rand( ) % 32;
-    m_individualValues.m_isNicked = false;
+    m_individualValues.m_isNicked = !!p_name;
     m_individualValues.m_isEgg = p_isEgg;
     for( int i = 0; i < 4; ++i ) m_ribbons0[ i ] = 0;
     m_fateful = p_fatefulEncounter;
@@ -310,7 +306,6 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
         m_isGenderless = false;
 
     m_altForme = 0;
-    m_cloned = p_cloned;
     if( p_name ) {
         wcscpy( m_name, p_name );
         m_individualValues.m_isNicked = true;
@@ -337,8 +332,7 @@ pokemon::pokemon( u16*              p_moves,
                   u16               p_sid,
                   const wchar_t*    p_oT,
                   bool              p_oTFemale,
-                  bool              p_cloned,
-                  bool              p_shiny,
+                  u8                p_shiny,
                   bool              p_hiddenAbility,
                   bool              p_fatefulEncounter,
                   bool              p_isEgg,
@@ -353,14 +347,12 @@ pokemon::pokemon( u16*              p_moves,
                   p_sid,
                   p_oT,
                   p_oTFemale,
-                  p_cloned,
                   p_shiny,
                   p_hiddenAbility,
                   p_fatefulEncounter,
                   p_isEgg, p_gotPlace,
                   p_ball, p_pokerus ),
                   m_Level( p_level ) {
-    getAll( p_pkmnId, data );
     if( p_pkmnId != 292 )
         m_stats.m_acHP = m_stats.m_maxHP = ( ( m_boxdata.m_individualValues.m_hp + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )*p_level / 100 ) + 10;
     else
@@ -394,6 +386,8 @@ u32 LastPID = 42;
 
 bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
     if( m_boxdata.m_individualValues.m_isEgg )
+        return false;
+    if( m_boxdata.m_holdItem == I_EVERSTONE )
         return false;
 
     getAll( m_boxdata.m_speciesId, data );
@@ -447,6 +441,8 @@ bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
 
 void pokemon::evolve( u16 p_item, u16 p_method ) {
     if( m_boxdata.m_individualValues.m_isEgg )
+        return;
+    if( m_boxdata.m_holdItem == I_EVERSTONE )
         return;
 
     getAll( m_boxdata.m_speciesId, data );
@@ -532,18 +528,21 @@ void pokemon::hatch( ) {
 
 //TODO: enhance equality test
 bool pokemon::operator==( const pokemon& p_other ) const {
-    if( m_boxdata.m_pid != p_other.m_boxdata.m_pid
-        || m_boxdata.m_b1 != p_other.m_boxdata.m_b1
-        || m_boxdata.m_checksum != p_other.m_boxdata.m_checksum
-        || m_boxdata.m_speciesId != p_other.m_boxdata.m_speciesId
-        || m_boxdata.m_holdItem != p_other.m_boxdata.m_holdItem
-        || m_boxdata.m_oTId != p_other.m_boxdata.m_oTId
-        || m_boxdata.m_oTSid != p_other.m_boxdata.m_oTSid
-        || m_boxdata.m_experienceGained != p_other.m_boxdata.m_experienceGained
-        || m_boxdata.m_steps != p_other.m_boxdata.m_steps
-        || m_boxdata.m_ability != p_other.m_boxdata.m_ability
-        || m_boxdata.m_markings != p_other.m_boxdata.m_markings
-        || m_boxdata.m_origLang != p_other.m_boxdata.m_origLang )
+    return m_boxdata == p_other.m_boxdata;
+}
+bool pokemon::boxPokemon::operator==( const pokemon::boxPokemon& p_other ) const {
+    if( m_pid != p_other.m_pid
+        || m_b1 != p_other.m_b1
+        || m_checksum != p_other.m_checksum
+        || m_speciesId != p_other.m_speciesId
+        || m_holdItem != p_other.m_holdItem
+        || m_oTId != p_other.m_oTId
+        || m_oTSid != p_other.m_oTSid
+        || m_experienceGained != p_other.m_experienceGained
+        || m_steps != p_other.m_steps
+        || m_ability != p_other.m_ability
+        || m_markings != p_other.m_markings
+        || m_origLang != p_other.m_origLang )
         return false;
     return true;
 }

@@ -198,6 +198,15 @@
     <ClInclude Include="arm9\source\mapDefines.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\source\box.h">
+      <Filter>Header Files\arm9\box</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\boxUI.h">
+      <Filter>Header Files\arm9\box</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\boxViewer.h">
+      <Filter>Header Files\arm9\box</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">
@@ -307,6 +316,12 @@
     </ClCompile>
     <ClCompile Include="arm9\source\mapMoves.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\boxViewer.cpp">
+      <Filter>Source Files\arm9\box</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\boxUI.cpp">
+      <Filter>Source Files\arm9\box</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

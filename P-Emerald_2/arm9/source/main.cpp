@@ -55,8 +55,13 @@
 
 #include "bagUI.h"
 #include "bagViewer.h"
+
 #include "statusScreen.h"
 #include "statusScreenUI.h"
+
+#include "boxUI.h"
+#include "boxViewer.h"
+
 #include "dex.h"
 #include "dexUI.h"
 #include "mapDrawer.h"
@@ -86,7 +91,7 @@ GameMod gMod = GameMod::EMULATOR;
 
 DEX::dexUI dui( true, 1, FS::SAV->m_hasGDex ? 649 : 493 );
 DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
- 
+
 u8 DayTimes[ 4 ][ 5 ] = {
     { 7, 10, 15, 17, 23 },
     { 6, 9, 12, 18, 23 },
@@ -105,10 +110,7 @@ bool INIT_MAIN_SPRITES = false;
 u8 FRAME_COUNT = 0;
 
 u8 getCurrentDaytime( ) {
-    time_t unixTime = time( NULL );
-    struct tm* timeStruct = gmtime( (const time_t *)&unixTime );
-
-    u8 t = timeStruct->tm_hour, m = timeStruct->tm_mon;
+    u8 t = achours, m = acmonth;
 
     for( u8 i = 0; i < 5; ++i )
         if( DayTimes[ m / 4 ][ i ] >= t )
@@ -291,7 +293,7 @@ int main( int, char** p_argv ) {
         achours = timeStruct->tm_hour;
         acminutes = timeStruct->tm_min;
         acday = timeStruct->tm_mday;
-        acmonth = timeStruct->tm_mon;
+        acmonth = timeStruct->tm_mon + 1;
         acyear = timeStruct->tm_year + 1900;
 
         IO::boldFont->setColor( oldC1, 1 );
@@ -466,19 +468,25 @@ OUT:
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 ],        //StartID
             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 3 ], 16 ) ) {
 
-            const char *someText[ 7 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", " ... " };
-            IO::choiceBox test( 6, &someText[ 0 ], 0, false );
+            const char *someText[ 8 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", "View Boxes A", "View Boxes B" };
+            IO::choiceBox test( 8, &someText[ 0 ], 0, false );
             int res = test.getResult( "Tokens of god-being..." );
             IO::drawSub( );
             switch( res ) {
                 case 0:
                 {
+                    if( !FS::SAV->m_storedPokemon )
+                        FS::SAV->m_storedPokemon = new BOX::box( );
+
+                    for( u8 i = 0; i < 6; ++i )
+                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                            FS::SAV->m_storedPokemon->insert( FS::SAV->m_pkmnTeam[ i ].m_boxdata );
                     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
-                    for( int i = 0; i < 3; ++i ) {
+                    for( int i = 0; i < 6; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                        a = pokemon( 0, 133, 0,
+                        a = pokemon( 0, ( 132 + i * ( rand( ) % MAX_PKMN ) ) % MAX_PKMN + 1, 0,
                                      50, FS::SAV->m_id + i, FS::SAV->m_sid, FS::SAV->m_playername,
-                                     !FS::SAV->m_isMale, false, false, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                     !FS::SAV->m_isMale );
                         a.m_stats.m_acHP *= i / 5.0;
                         a.m_boxdata.m_moves[ 3 ] = 0;
                         if( canLearn( 133, 19, 4 ) )
@@ -531,7 +539,7 @@ OUT:
 
                     for( u8 i = 0; i < 3; ++i ) {
                         pokemon a( 0, HILFSCOUNTER, 0,
-                                   30, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko"/*FS::SAV->getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                   30, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko", false );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                         HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
@@ -558,7 +566,7 @@ OUT:
 
                     for( u8 i = 0; i < 6; ++i ) {
                         pokemon a( 0, HILFSCOUNTER, 0,
-                                   15, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko"/*FS::SAV->getName()*/, i % 2, true, rand( ) % 2, true, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
+                                   15, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko", false );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                         HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
@@ -581,12 +589,29 @@ OUT:
 
                     IO::choiceBox scrnChoice( MAXBG, bgNames, 0, true );
                     IO::drawSub( scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
+                    break;
+                }
+                case 6: case 7:{
+                    if( !FS::SAV->m_storedPokemon )
+                        FS::SAV->m_storedPokemon = new BOX::box( );
+                    BOX::boxUI bxUI;
+                    BOX::boxViewer bxv( FS::SAV->m_storedPokemon, &bxUI, 0 );
+                    ANIMATE_MAP = false;
+
+                    bxv.run( res % 2 );
+
+                    consoleSelect( &IO::Top );
+                    consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+                    consoleClear( );
+                    consoleSelect( &IO::Bottom );
+                    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+                    consoleClear( );
+                    break;
                 }
             }
-
             IO::drawSub( true );
             swiWaitForVBlank( );
-            if( res == 3 || res == 4 ) {
+            if( res == 3 || res == 4 || res == 6 || res == 7 ) {
                 MAP::curMap->draw( );
             }
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 10 ],  //Start Pokénav

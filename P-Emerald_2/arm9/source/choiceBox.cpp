@@ -275,8 +275,8 @@ namespace IO {
                         ( Oam->oamBuffer[ BWD_ID ] ).isHidden = !_acPage;
                         ( Oam->oamBuffer[ BWD_ID ] ).x = bwdPos[ p_backButton ][ 0 ] - 16;
                         ( Oam->oamBuffer[ BWD_ID ] ).y = bwdPos[ p_backButton ][ 1 ] - 16;
-                        /*if( _acPage == ( _num / 6 ) )
-                        draw( NEW_PAGE );*/
+                        if( _acPage == ( _num / 6 ) )
+                        draw( NEW_PAGE );
                         _acPage = ( _num / 6 );
                     } else {
                         ( Oam->oamBuffer[ BWD_ID ] ).isHidden = false;

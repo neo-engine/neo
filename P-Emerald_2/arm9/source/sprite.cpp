@@ -281,6 +281,83 @@ namespace IO {
         return p_tileIdx + ( p_spriteDataLen / BYTES_PER_16_COLOR_TILE );
     }
 
+    u16 loadSprite( const u8 p_oamIdx, const u8 p_palIdx, const u8 p_palpos, const u16 p_tileIdx, const u16 p_posX, const u16 p_posY, const u8 p_width,
+                    const u8 p_height, const unsigned short *p_spritePal, const unsigned int *p_spriteData, const u32 p_spriteDataLen, bool p_flipX, bool p_flipY,
+                    bool p_hidden, ObjPriority p_priority, bool p_bottom ) {
+        IO::SpriteInfo* sInfo = ( p_bottom ? spriteInfo : spriteInfoTop );
+        OAMTable* oam = ( p_bottom ? Oam : OamTop );
+
+        SpriteInfo * spriteInfo = &sInfo[ p_oamIdx ];
+        SpriteEntry * spriteEntry = &oam->oamBuffer[ p_oamIdx ];
+
+        spriteInfo->m_oamId = p_oamIdx;
+        spriteInfo->m_width = p_width;
+        spriteInfo->m_height = p_height;
+        spriteInfo->m_angle = 0;
+        spriteInfo->m_entry = spriteEntry;
+
+        spriteEntry->palette = p_palIdx;
+        spriteEntry->gfxIndex = p_tileIdx;
+        spriteEntry->x = p_posX;
+        spriteEntry->y = p_posY;
+        spriteEntry->vFlip = p_flipX;
+        spriteEntry->hFlip = p_flipY;
+        spriteEntry->isHidden = p_hidden;
+        spriteEntry->priority = p_priority;
+
+        spriteEntry->isRotateScale = false;
+        spriteEntry->isMosaic = false;
+        spriteEntry->blendMode = OBJMODE_NORMAL;
+        spriteEntry->colorMode = OBJCOLOR_256;
+
+        spriteEntry->shape = ( ( p_width == p_height ) ? OBJSHAPE_SQUARE : ( ( p_width > p_height ) ? OBJSHAPE_WIDE : OBJSHAPE_TALL ) );
+
+        u8 maxSize = std::max( p_width, p_height );
+        spriteEntry->size = ( ( maxSize == 64 ) ? OBJSIZE_64 :
+                              ( ( maxSize == 32 ) ? OBJSIZE_32 :
+                              ( ( maxSize == 16 ) ? OBJSIZE_16 : OBJSIZE_8 ) ) );
+
+
+        //Attention! The following code is not meant to be read.
+
+        const u8* nspD = reinterpret_cast<const u8*>( p_spriteData );
+
+        if( !p_bottom ) {
+            vramSetBankF( VRAM_F_LCD );
+            if( p_spritePal )
+                for( u8 i = 0; i < 16; ++i )
+                    VRAM_F_EXT_SPR_PALETTE[ p_palIdx ][ 16 * p_palpos + i ] = p_spritePal[ i ];
+            vramSetBankF( VRAM_F_SPRITE_EXT_PALETTE );
+            if( p_spriteData )
+                for( u32 i = 0; i < p_spriteDataLen; ++i ) {
+                    u8 ac = nspD[ i ];
+                    SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER + i ] = 0;
+                    if( ac >> 4 )
+                        SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac >> 4 ) ) << 8;
+                    if( ac % ( 1 << 4 ) )
+                        SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac % ( 1 << 4 ) ) );
+                }
+        } else {
+            vramSetBankI( VRAM_I_LCD );
+            if( p_spritePal )
+                for( u8 i = 0; i < 16; ++i )
+                    VRAM_I_EXT_SPR_PALETTE[ p_palIdx ][ 16 * p_palpos + i ] = p_spritePal[ i ];
+            vramSetBankI( VRAM_I_SUB_SPRITE_EXT_PALETTE );
+
+            if( p_spriteData )
+                for( u32 i = 0; i < p_spriteDataLen; ++i ) {
+                    u8 ac = nspD[ i ];
+                    SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER + i ] = 0;
+                    if( ac >> 4 )
+                        SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac >> 4 ) ) << 8;
+                    if( ac % ( 1 << 4 ) )
+                        SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac % ( 1 << 4 ) ) );
+                }
+        }
+
+        return p_tileIdx + 2 * ( p_spriteDataLen / BYTES_PER_16_COLOR_TILE );
+    }
+
     u16 loadPKMNSprite( const char* p_path, const u16& p_pkmnId, const s16 p_posX,
                         const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx, bool p_topOnly ) {
         char buffer[ 100 ];
@@ -384,6 +461,15 @@ namespace IO {
                                false, false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
         }
     }
+    u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom ) {
+        if( FS::readData( p_path, p_name, (unsigned int)128, TEMP, (unsigned short)16, TEMP_PAL ) ) {
+            return loadSprite( p_oamIndex, p_palCnt, p_palpos, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP, 512,
+                               false, false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
+        } else {
+            return loadSprite( p_oamIndex, p_palCnt, p_palpos, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal, NoItemTiles, NoItemTilesLen,
+                               false, false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
+        }
+    }
 
     u16 loadPKMNIcon( const u16& p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         char buffer[ 100 ];
@@ -391,8 +477,17 @@ namespace IO {
         return loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
 
+    u16 loadPKMNIcon( const u16& p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom ) {
+        char buffer[ 100 ];
+        sprintf( buffer, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
+        return loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos, p_tileCnt, p_bottom );
+    }
+
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         return loadIcon( "nitro:/PICS/ICONS/", "Icon_egg", p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+    }
+    u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom ) {
+        return loadIcon( "nitro:/PICS/ICONS/", "Icon_egg", p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos, p_tileCnt, p_bottom );
     }
 
     u16 loadItemIcon( const std::string& p_itemName, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
