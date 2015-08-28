@@ -355,7 +355,7 @@ namespace IO {
         FS::close( f );
 
         return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, width, height, TEMP_PAL,
-                           TEMP, 2 * width * height * frameCount, false, false, false, OBJPRIORITY_2, false );
+                           TEMP,width * height * frameCount / 2, false, false, false, OBJPRIORITY_2, false );
     }
     void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt ) {
         u8 frame = p_frame;

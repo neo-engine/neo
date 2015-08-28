@@ -27,6 +27,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #pragma once
 #include "mapDefines.h"
+#include "sprite.h"
 
 namespace MAP {
 
@@ -48,9 +49,12 @@ namespace MAP {
                    u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx );
 
         void setVisibility( bool p_value );
+        void setPriority( ObjPriority p_value );
+
         void drawFrame( u8 p_value );
         void drawFrame( u8 p_value, bool p_hFlip );
         void setFrame( u8 p_value );
+
         void currentFrame( );
         void nextFrame( );
         void move( direction p_direction, s16 p_amount );

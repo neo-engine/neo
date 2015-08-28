@@ -53,6 +53,10 @@ namespace MAP {
         IO::OamTop->oamBuffer[ _oamIndex ].isHidden = !p_value;
         IO::updateOAM( false );
     }
+    void mapSprite::setPriority( ObjPriority p_value ) {
+        IO::OamTop->oamBuffer[ _oamIndex ].priority = p_value;
+        IO::updateOAM( false );
+    }
     void mapSprite::drawFrame( u8 p_value ) {
         IO::setOWSpriteFrame( p_value, _oamIndex, _tileIdx );
         IO::updateOAM( false );

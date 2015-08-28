@@ -35,6 +35,7 @@ namespace MAP {
     struct mapObject {
         enum type {
             PLYR,
+            SURF_PLATFORM,
             SIGN,
             NPC
         } m_type;

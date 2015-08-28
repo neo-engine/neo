@@ -86,8 +86,7 @@ GameMod gMod = GameMod::EMULATOR;
 
 DEX::dexUI dui( true, 1, FS::SAV->m_hasGDex ? 649 : 493 );
 DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
-MAP::mapDrawer* curMap = 0;
-
+ 
 u8 DayTimes[ 4 ][ 5 ] = {
     { 7, 10, 15, 17, 23 },
     { 6, 9, 12, 18, 23 },
@@ -116,38 +115,6 @@ u8 getCurrentDaytime( ) {
             return i;
     return 254;
 }
-
-bool cut::possible( ) {
-    return false;
-}
-bool rockSmash::possible( ) {
-    return false;
-}
-bool fly::possible( ) {
-    return false;
-}
-bool flash::possible( ) {
-    return true;
-}
-bool whirlpool::possible( ) {
-    return false;
-}
-bool surf::possible( ) {
-    return false;
-    // return ( FS::SAV->m_acMoveMode != MAP::MoveMode::SURF )
-    //     && acMap->m_blocks[ FS::SAV->m_acposy / 20 + 10 + dir[ lastdir ][ 0 ] ][ FS::SAV->m_acposx / 20 + 10 + dir[ lastdir ][ 1 ] ].m_movedata == 4;
-}
-
-void cut::use( ) { }
-void rockSmash::use( ) { }
-void fly::use( ) { }
-void flash::use( ) { }
-void whirlpool::use( ) { }
-void surf::use( ) {
-    MAP::curMap->changeMoveMode( MAP::SURF );
-    //movePlayerOnMap( FS::SAV->m_acposx / 20 + dir[ lastdir ][ 1 ], FS::SAV->m_acposy / 20 + dir[ lastdir ][ 0 ], FS::SAV->m_acposz, false );
-}
-
 
 u8 positions[ 6 ][ 2 ] = {
     { 14, 2 }, { 16, 3 }, { 14, 9 },
@@ -332,8 +299,8 @@ int main( int, char** p_argv ) {
     } );
     IO::drawSub( true );
 
-    curMap = new MAP::mapDrawer( FS::SAV->m_currentMap, FS::SAV->m_player );
-    curMap->draw( );
+    MAP::curMap = new MAP::mapDrawer( );
+    MAP::curMap->draw( );
     ANIMATE_MAP = true;
 
     touchPosition touch;
@@ -348,52 +315,55 @@ int main( int, char** p_argv ) {
 
 #ifdef DEBUG
         if( held & KEY_L && gMod == DEVELOPER ) {
-            std::sprintf( buffer, "Currently at (%hu,%hu,%hu).",
+            std::sprintf( buffer, "Currently at (%hu,%hu,%hu).\n%d",
                           FS::SAV->m_player.m_pos.m_posX,
                           FS::SAV->m_player.m_pos.m_posY,
-                          FS::SAV->m_player.m_pos.m_posZ );
+                          FS::SAV->m_player.m_pos.m_posZ,
+                          FS::SAV->m_player.m_movement );
             IO::messageBox m( buffer );
 
             IO::drawSub( true );
         }
 #endif
 
-        if( pressed & KEY_A ) {
+        if( held & KEY_A ) {
             for( u8 i = 0; i < 6; ++i ) {
                 if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
                     break;
                 auto a = FS::SAV->m_pkmnTeam[ i ];
-                if( !a.m_boxdata.m_individualValues.m_isEgg ) {
-                    for( u8 i = 0; i < 4; ++i ) {
-                        if( AttackList[ a.m_boxdata.m_moves[ i ] ]->m_isFieldAttack
-                            && AttackList[ a.m_boxdata.m_moves[ i ] ]->possible( ) ) {
+                if( a.m_boxdata.m_individualValues.m_isEgg )
+                    continue;
+                for( u8 j = 0; j < 4; ++j ) {
+                    if( !AttackList[ a.m_boxdata.m_moves[ j ] ]->m_isFieldAttack
+                        || !AttackList[ a.m_boxdata.m_moves[ j ] ]->possible( ) )
+                        continue;
+                    sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ j ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                    IO::yesNoBox yn;
+                    if( yn.getResult( buffer ) ) {
+                        IO::drawSub( );
+                        sprintf( buffer, "%ls setzt %s ein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                        IO::messageBox( buffer, true );
+                        IO::drawSub( true );
+                        swiWaitForVBlank( );
+                        MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
 
-                            char buffer[ 50 ];
-                            sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ i ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-                            IO::yesNoBox yn;
-                            if( yn.getResult( buffer ) ) {
-                                IO::drawSub( );
-                                sprintf( buffer, "%ls setzt %s\nein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ) );
-                                IO::messageBox( buffer, true );
-                                //shoUseAttack( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
-                                AttackList[ a.m_boxdata.m_moves[ i ] ]->use( );
-                            }
-                            IO::drawSub( true );
-                            goto OUT;
-                        }
+                        AttackList[ a.m_boxdata.m_moves[ j ] ]->use( );
                     }
+                    IO::drawSub( true );
+                    goto OUT;
                 }
             }
 OUT:
-            ;
+            scanKeys( );
+            continue;
         }
         //Movement
         if( held & KEY_Y ) {
             IO::waitForKeysUp( KEY_Y );
             if( FS::SAV->m_player.m_movement == MAP::WALK )
-                curMap->changeMoveMode( MAP::BIKE );
+                MAP::curMap->changeMoveMode( MAP::BIKE );
             else if( FS::SAV->m_player.m_movement == MAP::BIKE )
-                curMap->changeMoveMode( MAP::WALK );
+                MAP::curMap->changeMoveMode( MAP::WALK );
             else {
                 IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
                 IO::drawSub( true );
@@ -404,10 +374,9 @@ OUT:
         }
         if( held & KEY_X ) {
             IO::waitForKeysUp( KEY_X );
-            if( curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
-                curMap->fishPlayer( FS::SAV->m_player.m_direction );
-            }
-            else {
+            if( MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
+                MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction );
+            } else {
                 IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
                 IO::drawSub( true );
             }
@@ -420,25 +389,25 @@ OUT:
             scanKeys( );
 
             stopped = false;
-            if( curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) ) {
-                curMap->movePlayer( curDir, ( held & KEY_B ) );
+            if( MAP::curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) ) {
+                MAP::curMap->movePlayer( curDir, ( held & KEY_B ) );
                 bmp = false;
             } else if( !bmp ) {
                 //Play "Bump" sound
-                curMap->stopPlayer( curDir );
+                MAP::curMap->stopPlayer( curDir );
                 swiWaitForVBlank( );
                 bmp = true;
             } else if( bmp < 2 ) {
                 swiWaitForVBlank( );
                 swiWaitForVBlank( );
                 swiWaitForVBlank( );
-                curMap->stopPlayer( );
+                MAP::curMap->stopPlayer( );
                 bmp = 2;
             }
             continue;
         }
         if( !stopped ) {
-            curMap->stopPlayer( );
+            MAP::curMap->stopPlayer( );
             stopped = true;
             bmp = false;
         }
@@ -456,7 +425,7 @@ OUT:
             defaultScrns( );
             IO::drawSub( true );
             UPDATE_TIME = true;
-            curMap->draw( );
+            MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
                    && ( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ],
@@ -479,7 +448,7 @@ OUT:
 
             defaultScrns( );
             IO::drawSub( true );
-            curMap->draw( );
+            MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ],        //StartDex
             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 5 ], 16 ) ) {
@@ -488,7 +457,7 @@ OUT:
 
             defaultScrns( );
             initMainSprites( );
-            curMap->draw( );
+            MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 8 ],        //StartOptions
             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 9 ], 16 ) ) {
@@ -532,6 +501,7 @@ OUT:
                     }
                     for( u16 i = 0; i < 649 / 8; ++i )
                         FS::SAV->m_inDex[ i ] = 255;
+                    FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_SURF;
 
                     swiWaitForVBlank( );
                     break;
@@ -617,7 +587,7 @@ OUT:
             IO::drawSub( true );
             swiWaitForVBlank( );
             if( res == 3 || res == 4 ) {
-                curMap->draw( );
+                MAP::curMap->draw( );
             }
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 10 ],  //Start Pokénav
             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 11 ], 16 ) ) {
@@ -639,6 +609,6 @@ OUT:
 
         scanKeys( );
     }
-    delete curMap;
+    delete MAP::curMap;
     return 0;
 }

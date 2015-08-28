@@ -71,6 +71,7 @@
     <ClCompile Include="arm9\source\main.cpp" />
     <ClCompile Include="arm9\source\map2d.cpp" />
     <ClCompile Include="arm9\source\mapDrawer.cpp" />
+    <ClCompile Include="arm9\source\mapMoves.cpp" />
     <ClCompile Include="arm9\source\mapObject.cpp" />
     <ClCompile Include="arm9\source\mapSlice.cpp" />
     <ClCompile Include="arm9\source\mapSprite.cpp" />

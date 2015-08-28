@@ -33,36 +33,31 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "mapSlice.h"
 #include "mapObject.h"
 #include "mapSprite.h"
+#include "hmMoves.h"
 
 namespace MAP {
     class mapDrawer {
     private:
         std::unique_ptr<mapSlice> _slices[ 2 ][ 2 ] = { { 0 } };  //[x][y]
         u8          _curX, _curY;       //Current main slice from the _slices array
-        u8          _curMap;
-        std::map<std::pair<u16,u16>, std::vector<mapObject>>
+        std::map<std::pair<u16, u16>, std::vector<mapObject>>
             _mapObjs;
-        mapObject& _player;
         bool _playerIsFast;
 
         mapSprite _sprites[ 16 ];
         u16 _entriesUsed;
         std::map<u16, u8> _spritePos; //mapObject.id -> index in _sprites
-        
+
         void draw( u16 p_globX, u16 p_globY, bool p_init );
         void drawPlayer( );
         void drawObjects( );
-        
+
         void moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows = true );
 
         void loadNewRow( direction p_direction, bool p_updatePlayer );
         void loadSlice( direction p_direction ); //dir: dir that needs to be extended
 
         void animateField( u16 p_globX, u16 p_globY );
-
-        void redirectPlayer( direction p_direction, bool p_fast );
-        void standUpPlayer( direction p_direction );
-        void sitDownPlayer( direction p_direction, moveMode p_newMoveMode );
 
         void jumpPlayer( direction p_direction );
         void slidePlayer( direction p_direction );
@@ -75,7 +70,10 @@ namespace MAP {
         block& at( u16 p_x, u16 p_y ) const;
         mapBlockAtom& atom( u16 p_x, u16 p_y ) const;
     public:
-        mapDrawer( u8 p_currentMap, mapObject& p_player );
+        friend bool surf::possible( );
+
+
+        mapDrawer( );
 
         void draw( );
 
@@ -88,12 +86,18 @@ namespace MAP {
         void stopPlayer( direction p_direction );
         void changeMoveMode( moveMode p_newMode );
 
+        void redirectPlayer( direction p_direction, bool p_fast );
+
+        void standUpPlayer( direction p_direction );
+        void sitDownPlayer( direction p_direction, moveMode p_newMoveMode );
+
         bool canFish( position p_start,
                       direction p_direction );
         void fishPlayer( direction p_direction );
 
+        void usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny );
+
         u16  getCurrentLocationId( ) const;
     };
-
     extern mapDrawer* curMap;
 }

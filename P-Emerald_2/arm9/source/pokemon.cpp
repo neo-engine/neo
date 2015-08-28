@@ -411,7 +411,7 @@ bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
             continue;
         if( data.m_evolutions[ i ].m_e.m_evolveGender && m_boxdata.gender( ) != data.m_evolutions[ i ].m_e.m_evolveGender )
             continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveLocation && MAP::curMap->getCurrentLocationId( ) != data.m_evolutions[ i ].m_e.m_evolveLocation )
+        if( data.m_evolutions[ i ].m_e.m_evolveLocation &&  MAP::curMap->getCurrentLocationId( ) != data.m_evolutions[ i ].m_e.m_evolveLocation )
             continue;
         if( data.m_evolutions[ i ].m_e.m_evolveHeldItem && m_boxdata.m_holdItem != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
             continue;
@@ -466,7 +466,7 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
             continue;
         if( data.m_evolutions[ i ].m_e.m_evolveGender && m_boxdata.gender( ) != data.m_evolutions[ i ].m_e.m_evolveGender )
             continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveLocation && MAP::curMap->getCurrentLocationId( ) != data.m_evolutions[ i ].m_e.m_evolveLocation )
+        if( data.m_evolutions[ i ].m_e.m_evolveLocation &&  MAP::curMap->getCurrentLocationId( ) != data.m_evolutions[ i ].m_e.m_evolveLocation )
             continue;
         if( data.m_evolutions[ i ].m_e.m_evolveHeldItem && m_boxdata.m_holdItem != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
             continue;
