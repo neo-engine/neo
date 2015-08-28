@@ -6,28 +6,28 @@ There's still (very) much to do, but when it's complete, it's a recode of Pokém
 As the game itself is in German, I won't go into detail about the (planned) storyline (at least in the English description);
 so far the game is set in the Hoenn region 2 years after [Pokémon Ruby, Sapphire](https://en.wikipedia.org/wiki/Pok%C3%A9mon_Ruby_and_Sapphire) and [Emerald](https://en.wikipedia.org/wiki/Pok%C3%A9mon_Emerald).
 
-This game is intended to be played on real hardware, but [DeSmuME 0.9.11](http://desmume.org/) seems to be capable of simulating most of real hardware's features, too.
+This game is intended to be played on real hardware, but [DeSmuME 0.9.11](http://desmume.org/) seems to be capable of emulating most of real hardware's features, too.
 
 Features
 --------
 
-Features implemented in a non-master branch are in _italics_.
+Features implemented in the _dev_ branch are in _italics_.
 
 * [ ] A fully working Pokémon engine (at 60fps), including
-    * [x] The ability to display a Pokémon's status, _including detailed information about the Pokémon's moves and ribbons_
-    * [ ] An in-game Pokémon storage system
-    * [x] A fully working PokéDex, loading its data from the ROM's filesystem _and displaying the various formes of the Pokémon_
-    * [ ] A fully working battle engine, capable of simulaitng single and double battles
+    * [x] The ability to display a Pokémon's status, including detailed information about the Pokémon's moves and ribbons
+    * [x] _An in-game Pokémon storage system_
+    * [x] A fully working PokéDex, loading its data from the ROM's filesystem and displaying the various formes of the Pokémon
+    * [x] A working battle engine, capable of simulaitng single and double battles
     * [x] The ability to load maps (for now only GBA-style maps are supported, 3D maps are planned) including
       * [ ] Events
       * [ ] Wild Pokémon encounter
       * [x] Animated map tiles
-      * [x] Player sprite, animated moving and surfing
+      * [x] Player sprite, animated moving, surfing_, cycling, and fishing_
     * [ ] Playing .midi as BGM, user customization of BGM via music stored on the micro SD card
     * [ ] RTC, including overword changes based on time
     * [ ] Saving the progress to the micro SD
     * [ ] Communicating with “the originals”
-      * [x] Playing with a save from a GBA version (saving is still not implemented yet, though)
+      * [ ] Playing with a save from a GBA version (saving is still not implemented yet, though)
       * [ ] Link trading with Gen IV and Gen V games
     * [x] An almost up-to-date UI
 * [ ] Easy-to-understand and ready-to-(re)use code
