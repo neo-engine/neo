@@ -49,14 +49,6 @@ namespace MAP {
         return s8( ( p_pos % SIZE >= SIZE / 2 ) ? 1 : -1 );
     }
 
-    bool operator==( position p_l, position p_r ) {
-        return p_l.m_posX == p_r.m_posX && p_l.m_posY == p_r.m_posY && p_l.m_posZ == p_r.m_posZ;
-    }
-    bool operator<( position p_l, position p_r ) {
-        return p_l.m_posX < p_r.m_posX || ( p_l.m_posX == p_r.m_posX && p_l.m_posY < p_r.m_posY )
-            || ( p_l.m_posX == p_r.m_posX && p_l.m_posY == p_r.m_posY && p_l.m_posZ < p_r.m_posZ );
-    }
-
     mapBlockAtom& mapDrawer::atom( u16 p_x, u16 p_y ) const {
         bool x = ( p_x / SIZE != CUR_SLICE->m_x ),
             y = ( p_y / SIZE != CUR_SLICE->m_y );
@@ -623,7 +615,7 @@ NEXT_PASS:
                                     walkPlayer( p_direction, p_fast );
                                     handleWarp( CAVE_ENTRY );
                                     break;
-                                case 0x61:
+                                case 0x61: case 0x68:
                                     walkPlayer( p_direction, p_fast );
                                     handleWarp( NO_SPECIAL );
                                     break;
@@ -639,7 +631,7 @@ NEXT_PASS:
                                     walkPlayer( p_direction, p_fast );
                                     handleWarp( EMERGE_WATER );
                                     break;
-                                case 0x70:
+                                case 0x70: case 0x29:
                                     walkPlayer( p_direction, p_fast );
                                     handleWarp( TELEPORT );
                                     break;
@@ -707,7 +699,9 @@ NEXT_PASS:
     }
 
     void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
-
+        FS::SAV->m_currentMap = p_target.first;
+        FS::SAV->m_player.m_pos = p_target.second;
+        draw( );
     }
 
     void mapDrawer::redirectPlayer( direction p_direction, bool p_fast ) {

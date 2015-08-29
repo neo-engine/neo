@@ -30,5 +30,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "mapDefines.h"
 
 namespace MAP {
+    bool operator==( position p_l, position p_r );
+    bool operator<( position p_l, position p_r );
+
     extern std::map<std::pair<u8, position>, std::pair<u8, position>> warpList;
 }
