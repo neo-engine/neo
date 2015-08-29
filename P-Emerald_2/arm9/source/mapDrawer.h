@@ -70,9 +70,14 @@ namespace MAP {
             FLASHABLE = 8
         };
         enum warpType {
-            NORMAL,
+            NO_SPECIAL,
+            CAVE_ENTRY,
+            DOOR,
+            TELEPORT,
+            EMERGE_WATER,
             LAST_VISITED
         };
+        typedef std::pair<u8, position> warpPos;
 
         std::map<u8, mapType> _mapTypes = { { 10, OUTSIDE } };
         mapWeather _weather;
@@ -120,6 +125,8 @@ namespace MAP {
                       direction p_direction,
                       moveMode p_moveMode = WALK );
         void movePlayer( direction p_direction, bool p_fast = false );
+
+        void warpPlayer( warpType p_type, warpPos p_target );
 
         void stopPlayer( );
         void stopPlayer( direction p_direction );

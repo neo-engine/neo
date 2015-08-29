@@ -280,7 +280,6 @@ namespace MAP {
     }
 
     void mapDrawer::handleWarp( warpType p_type ) {
-        typedef std::pair<u8, position> warpPos;
         static warpPos lastWarp = { 0, { 0, 0, 0 } };
 
         warpPos current = warpPos{ FS::SAV->m_currentMap, FS::SAV->m_player.m_pos };
@@ -291,14 +290,7 @@ namespace MAP {
             return;
         lastWarp = current;
 
-        switch( p_type ) {
-            case MAP::mapDrawer::NORMAL:
-                break;
-            case MAP::mapDrawer::LAST_VISITED:
-                break;
-            default:
-                break;
-        }
+        warpPlayer( p_type, target );
     }
     void mapDrawer::handleWildPkmn( wildPkmnType p_type ) {
         (void)p_type;
@@ -406,6 +398,7 @@ namespace MAP {
                 if( p_direction % 2 == 0 )
                     return false;
                 break;
+            case 0x13:
             case 0xd3: case 0xd4:
             case 0xd5: case 0xd6:
             case 0xd7:
@@ -508,13 +501,42 @@ namespace MAP {
                 case 0x3b:
                     jumpPlayer( DOWN ); p_direction = DOWN;
                     break;
+                    //Warpy stuff
+                case 0x62:
+                    if( p_direction == RIGHT ) {
+                        walkPlayer( p_direction, p_fast );
+                        handleWarp( NO_SPECIAL );
+                        break;
+                    }
+                    goto NO_BREAK;
+                case 0x63:
+                    if( p_direction == LEFT ) {
+                        walkPlayer( p_direction, p_fast );
+                        handleWarp( NO_SPECIAL );
+                        break;
+                    }
+                    goto NO_BREAK;
+                case 0x64:
+                    if( p_direction == UP ) {
+                        walkPlayer( p_direction, p_fast );
+                        handleWarp( NO_SPECIAL );
+                        break;
+                    }
+                    goto NO_BREAK;
+                case 0x65: case 0x6d:
+                    if( p_direction == DOWN ) {
+                        walkPlayer( p_direction, p_fast );
+                        handleWarp( NO_SPECIAL );
+                        break;
+                    }
+                    goto NO_BREAK;
+NO_BREAK:
                 default:
                     //If no jump has to be done, check for other stuff
                     switch( lstBehave ) {
                         case 0x20: case 0x48:
                             slidePlayer( p_direction );
                             break;
-
                             //These change the direction of movement
                         case 0x40:
                             if( !canMove( FS::SAV->m_player.m_pos, RIGHT, FS::SAV->m_player.m_movement ) )
@@ -558,6 +580,12 @@ namespace MAP {
                             slidePlayer( DOWN ); p_direction = DOWN;
                             break;
 
+                        case 0xd0:
+                            if( fastBike > 9 && p_direction != DOWN )
+                                goto NEXT_PASS;
+                            slidePlayer( DOWN ); p_direction = DOWN;
+                            break;
+
                         case 0x50:
                             if( !canMove( FS::SAV->m_player.m_pos, RIGHT, FS::SAV->m_player.m_movement ) )
                                 goto NEXT_PASS;
@@ -588,6 +616,32 @@ NEXT_PASS:
                             switch( newBehave ) {
                                 case 0x20: case 0x48:
                                     walkPlayer( p_direction, p_fast );
+                                    break;
+
+                                    //Check for warpy stuff
+                                case 0x60:
+                                    walkPlayer( p_direction, p_fast );
+                                    handleWarp( CAVE_ENTRY );
+                                    break;
+                                case 0x61:
+                                    walkPlayer( p_direction, p_fast );
+                                    handleWarp( NO_SPECIAL );
+                                    break;
+                                case 0x66: case 0x6e:
+                                    walkPlayer( p_direction, p_fast );
+                                    handleWarp( LAST_VISITED );
+                                    break;
+                                case 0x69:
+                                    walkPlayer( p_direction, p_fast );
+                                    handleWarp( DOOR );
+                                    break;
+                                case 0x6C:
+                                    walkPlayer( p_direction, p_fast );
+                                    handleWarp( EMERGE_WATER );
+                                    break;
+                                case 0x70:
+                                    walkPlayer( p_direction, p_fast );
+                                    handleWarp( TELEPORT );
                                     break;
 
                                     //These change the direction of movement
@@ -650,6 +704,10 @@ NEXT_PASS:
             && atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x3c
             && atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x0a )
             FS::SAV->m_player.m_pos.m_posZ = atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata / 4;
+    }
+
+    void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
+
     }
 
     void mapDrawer::redirectPlayer( direction p_direction, bool p_fast ) {
