@@ -315,20 +315,15 @@
       <Filter>Source Files\arm9\map</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\mapWarps.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\arm9\map</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\screenFade.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\arm9\io</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile">
       <Filter>Source Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\ChangeLog.txt">
-      <Filter>Source Files</Filter>
-    </Text>
   </ItemGroup>
 </Project>

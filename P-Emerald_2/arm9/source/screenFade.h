@@ -39,6 +39,11 @@ namespace IO {
         BATTLE_STRONG_OPPONENT
     };
 
+#define FADE_TOP() do {\
+                REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;\
+                REG_BLDY = 0x1F;\
+                         } while( 0 )
+    
     void fadeScreen( fadeType p_type );
     void clearScreen( bool p_bottom, bool p_both = false, bool p_dark = true );
     void clearScreenConsole( bool p_bottom, bool p_both = false );

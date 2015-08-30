@@ -291,8 +291,7 @@ int main( int, char** p_argv ) {
     } );
     IO::drawSub( true );
 
-    REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
-    REG_BLDY = 0x1F;
+    FADE_TOP( );
     MAP::curMap = new MAP::mapDrawer( );
     MAP::curMap->draw( );
     ANIMATE_MAP = true;
@@ -420,6 +419,7 @@ OUT:
             IO::clearScreenConsole( true, true );
             IO::drawSub( true );
             UPDATE_TIME = true;
+            FADE_TOP( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
@@ -443,6 +443,7 @@ OUT:
 
             IO::clearScreenConsole( true, true );
             IO::drawSub( true );
+            FADE_TOP( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ],        //StartDex
@@ -452,6 +453,7 @@ OUT:
 
             IO::clearScreenConsole( true, true );
             initMainSprites( );
+            FADE_TOP( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 8 ],        //StartOptions
@@ -580,6 +582,7 @@ OUT:
             IO::drawSub( true );
             swiWaitForVBlank( );
             if( res == 3 || res == 4 ) {
+                FADE_TOP( );
                 MAP::curMap->draw( );
             }
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 10 ],  //Start Pokénav

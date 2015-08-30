@@ -300,7 +300,7 @@ namespace MAP {
     void mapDrawer::handleTrainer( ) { }
 
     mapDrawer::mapDrawer( )
-        : _curX( 0 ), _curY( 0 ), _entriesUsed( 0 ), _playerIsFast( false ) { }
+        : _curX( 0 ), _curY( 0 ), _playerIsFast( false ), _entriesUsed( 0 ) { }
 
     // Movement stuff
     bool mapDrawer::canMove( position p_start,
