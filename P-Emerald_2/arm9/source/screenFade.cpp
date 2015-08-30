@@ -24,27 +24,52 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#include <nds/bios.h>
+#include <nds/arm9/sprite.h>
+#include <nds/arm9/background.h>
+
 #include "uio.h"
 #include "screenFade.h"
 #include "fs.h"
 #include "defines.h"
 
 namespace IO {
-    void fadeScreen( fadeType p_type, bool p_bottom ) {
+    void fadeScreen( fadeType p_type ) {
         switch( p_type ) {
+            case IO::UNFADE:
+                for( s8 i = 7; i >= 0; --i ) {
+                    swiWaitForVBlank( );
+                    swiWaitForVBlank( );
+                    REG_BLDY &= ~( 1 << i );
+                }
+                swiWaitForVBlank( );
+                break;
             case IO::CLEAR_DARK:
-                FS::readPictureData( bgGetGfxPtr( p_bottom * bg2sub ), "nitro:/PICS/", "ClearD", 512, 49152, p_bottom );
-                if( p_bottom )
-                    FS::readPictureData( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "ClearD", 512, 49152, p_bottom );
+            case IO::CAVE_ENTRY:
+                REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
+                REG_BLDY = 1;
+                for( u8 i = 1; i < 8; ++i ) {
+                    swiWaitForVBlank( );
+                    swiWaitForVBlank( );
+                    REG_BLDY |= ( 1 << i );
+                }
+                swiWaitForVBlank( );
+                if( p_type == CLEAR_DARK )
+                    break;
                 break;
             case IO::CLEAR_WHITE:
-                FS::readPictureData( bgGetGfxPtr( p_bottom * bg2sub ), "nitro:/PICS/", "Clear", 512, 49152, p_bottom );
-                if( p_bottom )
-                    FS::readPictureData( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "Clear", 512, 49152, p_bottom );
-                break;
-            case IO::CAVE_ENTRY:
-                break;
             case IO::CAVE_EXIT:
+                REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
+                REG_BLDY = 1;
+                for( u8 i = 1; i < 8; ++i ) {
+                    swiWaitForVBlank( );
+                    swiWaitForVBlank( );
+                    REG_BLDY |= ( 1 << i );
+                }
+                swiWaitForVBlank( );
+                if( p_type == CLEAR_WHITE )
+                    break;
                 break;
             case IO::BATTLE:
                 break;
@@ -55,20 +80,27 @@ namespace IO {
         }
     }
 
-    void clearScreens( ) {
-        FS::readPictureData( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", "Clear", 512, 49152, true );
-        FS::readPictureData( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", "Clear", 512, 49152, true );
-
-        FS::readPictureData( bgGetGfxPtr( bg3 ), "nitro:/PICS/", "Clear" );
-
+    void clearScreen( bool p_bottom, bool p_both, bool p_dark ) {
+        const char* file = p_dark ? "ClearD" : "Clear";
+        if( p_both || p_bottom ) {
+            FS::readPictureData( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", file, 512, 49152, true );
+            FS::readPictureData( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", file, 512, 49152, true );
+        }
+        if( p_both || !p_bottom ) {
+            FS::readPictureData( bgGetGfxPtr( bg3 ), "nitro:/PICS/", file );
+        }
         regularFont->setColor( RGB( 0, 31, 31 ), 0 );
     }
-    void clearScreenConsoles( ) {
-        consoleSelect( &Top );
-        consoleSetWindow( &Top, 0, 0, 32, 24 );
-        consoleClear( );
-        consoleSelect( &Bottom );
-        consoleSetWindow( &Bottom, 0, 0, 32, 24 );
-        consoleClear( );
+    void clearScreenConsole( bool p_bottom, bool p_both ) {
+        if( p_both || !p_bottom ) {
+            consoleSelect( &Top );
+            consoleSetWindow( &Top, 0, 0, 32, 24 );
+            consoleClear( );
+        }
+        if( p_both || p_bottom ) {
+            consoleSelect( &Bottom );
+            consoleSetWindow( &Bottom, 0, 0, 32, 24 );
+            consoleClear( );
+        }
     }
 }

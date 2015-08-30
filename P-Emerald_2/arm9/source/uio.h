@@ -112,8 +112,6 @@ namespace IO {
     void printStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
     void printStringCenterD( font* p_font, const wchar_t *p_string, bool p_bottom );
 
-    void topScreenDarken( );
-    void btmScreenDarken( );
     void topScreenPlot( u8 p_x, u8 p_y, color p_color );
     void btmScreenPlot( u8 p_x, u8 p_y, color p_color );
 

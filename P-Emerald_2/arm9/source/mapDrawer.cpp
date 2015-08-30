@@ -29,6 +29,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "mapWarps.h"
 #include "uio.h"
 #include "sprite.h"
+#include "screenFade.h"
 #include "defines.h"
 #include "messageBox.h"
 #include "saveGame.h"
@@ -100,6 +101,12 @@ namespace MAP {
                           DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
             vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
 
+            u16 mx = FS::SAV->m_player.m_pos.m_posX, my = FS::SAV->m_player.m_pos.m_posY;
+            _slices[ _curX ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE );
+            _slices[ _curX ^ 1 ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE );
+            _slices[ _curX ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE + currentHalf( my ) );
+            _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ) );
+
             for( u8 i = 1; i < 4; ++i ) {
                 bgInit( i, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
                 bgSetScroll( i, 120, 40 );
@@ -142,12 +149,15 @@ namespace MAP {
         IO::initOAMTable( false );
         drawPlayer( ); //Draw the player
         drawObjects( ); //Draw NPCs / stuff
+
+        IO::fadeScreen( IO::UNFADE );
     }
 
     void mapDrawer::drawPlayer( ) {
         _sprites[ 0 ] = FS::SAV->m_player.show( 128 - 8, 96 - 24, 0, 0, 0 );
         _spritePos[ FS::SAV->m_player.m_id ] = 0;
         _entriesUsed |= ( 1 << 0 );
+        changeMoveMode( FS::SAV->m_player.m_movement );
     }
 
     void mapDrawer::drawObjects( ) {
@@ -290,14 +300,7 @@ namespace MAP {
     void mapDrawer::handleTrainer( ) { }
 
     mapDrawer::mapDrawer( )
-        : _curX( 0 ), _curY( 0 ), _entriesUsed( 0 ) {
-        u16 mx = FS::SAV->m_player.m_pos.m_posX, my = FS::SAV->m_player.m_pos.m_posY;
-        _slices[ _curX ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE );
-        _slices[ _curX ^ 1 ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE );
-        _slices[ _curX ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE + currentHalf( my ) );
-        _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ) );
-        _playerIsFast = false;
-    }
+        : _curX( 0 ), _curY( 0 ), _entriesUsed( 0 ), _playerIsFast( false ) { }
 
     // Movement stuff
     bool mapDrawer::canMove( position p_start,
@@ -699,9 +702,39 @@ NEXT_PASS:
     }
 
     void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
+        bool entryCave = ( _mapTypes[ FS::SAV->m_currentMap ] != CAVE
+                           && _mapTypes[ p_target.first ] == CAVE );
+        bool exitCave = ( _mapTypes[ FS::SAV->m_currentMap ] == CAVE
+                           && _mapTypes[ p_target.first ] != CAVE );
+        switch( p_type ) {
+            case DOOR:
+                break;
+            case TELEPORT:
+                break;
+            case EMERGE_WATER:
+                break;
+            case CAVE_ENTRY:
+                if( entryCave ) {
+                    IO::fadeScreen( IO::CAVE_ENTRY );
+                    break;
+                }
+                if( exitCave ) {
+                    IO::fadeScreen( IO::CAVE_EXIT );
+                    break;
+                }
+            case LAST_VISITED:
+            case NO_SPECIAL:
+            default:
+                IO::fadeScreen( IO::CLEAR_DARK );
+                break;
+        }
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
         FS::SAV->m_currentMap = p_target.first;
         FS::SAV->m_player.m_pos = p_target.second;
         draw( );
+        if( exitCave )
+            movePlayer( DOWN );
     }
 
     void mapDrawer::redirectPlayer( direction p_direction, bool p_fast ) {

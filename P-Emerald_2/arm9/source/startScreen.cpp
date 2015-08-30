@@ -73,7 +73,7 @@ void drawSplash( ) {
     FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "Title" );
     if( IO::BGs[ FS::SAV->m_bgIdx ].m_allowsOverlay )
         IO::drawSub( );
-    IO::fadeScreen( IO::CLEAR_WHITE, true );
+    IO::clearScreen( true, false, false );
 
     consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
     consoleSelect( &IO::Bottom );
@@ -117,7 +117,7 @@ void drawSplash( ) {
         swiWaitForVBlank( );
     }
 
-    IO::clearScreenConsoles( );
+    IO::clearScreenConsole( true, true );
     consoleSelect( &IO::Top );
 }
 
@@ -140,7 +140,7 @@ void initNewGame( ) {
 
     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
 
-    FS::SAV->m_player = { MAP::mapObject::PLYR, { 118, 72, 3 }, 0, MAP::moveMode::WALK, 0, 0, MAP::direction::RIGHT };
+    FS::SAV->m_player = { MAP::mapObject::PLYR, { 104, 120, 5 }, 0, MAP::moveMode::WALK, 0, 0, MAP::direction::RIGHT };
     FS::SAV->m_isMale = true;
     FS::SAV->m_currentMap = 10;
     FS::SAV->m_bag = new BAG::bag( );
@@ -347,7 +347,7 @@ startScreen::ChoiceResult startScreen::runChoice( ) {
         }
         default:
         {
-            IO::clearScreenConsoles( );
+            IO::clearScreenConsole( true, true );
             return CANCEL;
         }
     }
@@ -363,24 +363,24 @@ startScreen::ChoiceResult startScreen::runChoice( ) {
         u32 p = keysUp( );
         u32 k = keysHeld( ) | keysDown( );
         if( ( FS::SAV->m_savTyp == 1 ) && ( k & KEY_SELECT ) && ( k & KEY_RIGHT ) && ( k & KEY_L ) && ( k & KEY_R ) ) {
-            IO::clearScreenConsoles( );
+            IO::clearScreenConsole( true, true );
             ++FS::SAV->m_savTyp;
             return REDRAW;
         } else if( ( gMod == DEVELOPER ) && ( FS::SAV->m_savTyp == 2 ) && ( k & KEY_START ) && ( k & KEY_LEFT ) && ( k & KEY_L ) && ( k & KEY_R ) ) {
-            IO::clearScreenConsoles( );
+            IO::clearScreenConsole( true, true );
             ++FS::SAV->m_savTyp;
             return REDRAW;
         } else if( p & KEY_B ) {
-            IO::clearScreenConsoles( );
-            IO::fadeScreen( IO::CLEAR_DARK, true );
+            IO::clearScreenConsole( true, true );
+            IO::clearScreen( true );
             for( u16 i = 1; i < 256; ++i )
                 BG_PALETTE_SUB[ i ] = RGB15( 31, 31, 31 );
             return CANCEL;
         }
         for( u16 i = 0; i < MaxVal; i++ )
             if( GET_AND_WAIT_R( u8( 1 ), ranges[ i ].first, u8( 255 ), ranges[ i ].second ) ) {
-                IO::clearScreenConsoles( );
-                IO::fadeScreen( IO::CLEAR_DARK, true );
+                IO::clearScreenConsole( true, true );
+                IO::clearScreen( true );
                 for( u16 j = 1; j < 256; ++j )
                     BG_PALETTE_SUB[ j ] = RGB15( 31, 31, 31 );
 
@@ -396,19 +396,20 @@ void startScreen::run( ) {
         while( ( res = runChoice( ) ) == REDRAW ) {
         }
         switch( res ) {
-            case startScreen::CONTINUE:
-                IO::clearScreens( );
                 return;
             case startScreen::NEW_GAME:
                 initNewGame( );
-                IO::clearScreens( );
+            case startScreen::CONTINUE:
+                IO::clearScreenConsole( true, true );
+                IO::clearScreen( false, false, false );
                 return;
             case startScreen::GEHEIMGESCHEHEN:
                 break;
             case startScreen::TRANSFER_GAME:
                 if( !transferGame( ) )
                     break;
-                IO::clearScreens( );
+                IO::clearScreenConsole( true, true );
+                IO::clearScreen( false, false, false );
                 return;
             case startScreen::CANCEL:
             default:

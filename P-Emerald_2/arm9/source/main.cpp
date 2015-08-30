@@ -87,7 +87,7 @@ GameMod gMod = GameMod::EMULATOR;
 
 DEX::dexUI dui( true, 1, FS::SAV->m_hasGDex ? 649 : 493 );
 DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
- 
+
 u8 DayTimes[ 4 ][ 5 ] = {
     { 7, 10, 15, 17, 23 },
     { 6, 9, 12, 18, 23 },
@@ -291,6 +291,8 @@ int main( int, char** p_argv ) {
     } );
     IO::drawSub( true );
 
+    REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
+    REG_BLDY = 0x1F;
     MAP::curMap = new MAP::mapDrawer( );
     MAP::curMap->draw( );
     ANIMATE_MAP = true;
@@ -415,7 +417,7 @@ OUT:
 
             bv.run( FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
 
-            IO::clearScreenConsoles( );
+            IO::clearScreenConsole( true, true );
             IO::drawSub( true );
             UPDATE_TIME = true;
             MAP::curMap->draw( );
@@ -439,7 +441,7 @@ OUT:
             for( u8 i = 0; i < tmp.size( ); ++i )
                 FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
 
-            IO::clearScreenConsoles( );
+            IO::clearScreenConsole( true, true );
             IO::drawSub( true );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
@@ -448,7 +450,7 @@ OUT:
             ANIMATE_MAP = false;
             dx.run( dui.currPkmn( ) );
 
-            IO::clearScreenConsoles( );
+            IO::clearScreenConsole( true, true );
             initMainSprites( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;

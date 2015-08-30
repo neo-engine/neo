@@ -28,6 +28,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 namespace IO {
     enum fadeType {
+        UNFADE,
+
         CLEAR_DARK,
         CLEAR_WHITE,
         CAVE_ENTRY,
@@ -37,7 +39,7 @@ namespace IO {
         BATTLE_STRONG_OPPONENT
     };
 
-    void fadeScreen( fadeType p_type, bool p_bottom );
-    void clearScreens( );
-    void clearScreenConsoles( );
+    void fadeScreen( fadeType p_type );
+    void clearScreen( bool p_bottom, bool p_both = false, bool p_dark = true );
+    void clearScreenConsole( bool p_bottom, bool p_both = false );
 }
