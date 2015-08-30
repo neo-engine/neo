@@ -43,6 +43,7 @@
     <ClInclude Include="arm9\source\pokemon.h" />
     <ClInclude Include="arm9\source\ribbon.h" />
     <ClInclude Include="arm9\source\saveGame.h" />
+    <ClInclude Include="arm9\source\screenFade.h" />
     <ClInclude Include="arm9\source\script.h" />
     <ClInclude Include="arm9\source\sprite.h" />
     <ClInclude Include="arm9\source\startScreen.h" />
@@ -82,6 +83,7 @@
     <ClCompile Include="arm9\source\pokemon.cpp" />
     <ClCompile Include="arm9\source\ribbon.cpp" />
     <ClCompile Include="arm9\source\saveGame.cpp" />
+    <ClCompile Include="arm9\source\screenFade.cpp" />
     <ClCompile Include="arm9\source\script.cpp" />
     <ClCompile Include="arm9\source\sprite.cpp" />
     <ClCompile Include="arm9\source\startScreen.cpp" />

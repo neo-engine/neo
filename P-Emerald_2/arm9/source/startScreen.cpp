@@ -28,6 +28,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "startScreen.h"
 #include "defines.h"
 #include "uio.h"
+#include "screenFade.h"
 #include "fs.h"
 #include "mapDrawer.h"
 #include "yesNoBox.h"
@@ -67,17 +68,12 @@ void fillResume( ) {
     IO::regularFont->printString( "PokéDex:", 16, 65, true );
     IO::regularFont->printString( buffer, 128, 65, true );
 }
-void killResume( ) {
-    consoleSetWindow( &IO::Bottom, 1, 1, 30, 22 );
-    consoleSelect( &IO::Bottom );
-    consoleClear( );
-}
 
 void drawSplash( ) {
     FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "Title" );
     if( IO::BGs[ FS::SAV->m_bgIdx ].m_allowsOverlay )
         IO::drawSub( );
-    FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "Clear", 512, 49152, true );
+    IO::fadeScreen( IO::CLEAR_WHITE, true );
 
     consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
     consoleSelect( &IO::Bottom );
@@ -121,19 +117,8 @@ void drawSplash( ) {
         swiWaitForVBlank( );
     }
 
-    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-    consoleSelect( &IO::Bottom );
-    consoleClear( );
+    IO::clearScreenConsoles( );
     consoleSelect( &IO::Top );
-}
-
-void clear( ) {
-    FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "Clear", 512, 49152, true );
-    FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "Clear", 512, 49152, true );
-
-    FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "Clear" );
-
-    IO::regularFont->setColor( RGB( 0, 31, 31 ), 0 );
 }
 
 void initNewGame( ) {
@@ -362,7 +347,7 @@ startScreen::ChoiceResult startScreen::runChoice( ) {
         }
         default:
         {
-            killResume( );
+            IO::clearScreenConsoles( );
             return CANCEL;
         }
     }
@@ -378,29 +363,24 @@ startScreen::ChoiceResult startScreen::runChoice( ) {
         u32 p = keysUp( );
         u32 k = keysHeld( ) | keysDown( );
         if( ( FS::SAV->m_savTyp == 1 ) && ( k & KEY_SELECT ) && ( k & KEY_RIGHT ) && ( k & KEY_L ) && ( k & KEY_R ) ) {
-            killResume( );
-            consoleClear( );
+            IO::clearScreenConsoles( );
             ++FS::SAV->m_savTyp;
             return REDRAW;
         } else if( ( gMod == DEVELOPER ) && ( FS::SAV->m_savTyp == 2 ) && ( k & KEY_START ) && ( k & KEY_LEFT ) && ( k & KEY_L ) && ( k & KEY_R ) ) {
-            killResume( );
-            consoleClear( );
+            IO::clearScreenConsoles( );
             ++FS::SAV->m_savTyp;
             return REDRAW;
         } else if( p & KEY_B ) {
-            killResume( );
-            consoleClear( );
-            FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "ClearD", 512, 49152, true );
-            FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "ClearD", 512, 49152, true );
+            IO::clearScreenConsoles( );
+            IO::fadeScreen( IO::CLEAR_DARK, true );
             for( u16 i = 1; i < 256; ++i )
                 BG_PALETTE_SUB[ i ] = RGB15( 31, 31, 31 );
             return CANCEL;
         }
         for( u16 i = 0; i < MaxVal; i++ )
             if( GET_AND_WAIT_R( u8( 1 ), ranges[ i ].first, u8( 255 ), ranges[ i ].second ) ) {
-                killResume( );
-                FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "ClearD", 512, 49152, true );
-                FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "ClearD", 512, 49152, true );
+                IO::clearScreenConsoles( );
+                IO::fadeScreen( IO::CLEAR_DARK, true );
                 for( u16 j = 1; j < 256; ++j )
                     BG_PALETTE_SUB[ j ] = RGB15( 31, 31, 31 );
 
@@ -417,18 +397,18 @@ void startScreen::run( ) {
         }
         switch( res ) {
             case startScreen::CONTINUE:
-                clear( );
+                IO::clearScreens( );
                 return;
             case startScreen::NEW_GAME:
                 initNewGame( );
-                clear( );
+                IO::clearScreens( );
                 return;
             case startScreen::GEHEIMGESCHEHEN:
                 break;
             case startScreen::TRANSFER_GAME:
                 if( !transferGame( ) )
                     break;
-                clear( );
+                IO::clearScreens( );
                 return;
             case startScreen::CANCEL:
             default:

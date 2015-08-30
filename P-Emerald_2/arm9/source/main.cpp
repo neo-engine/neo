@@ -52,6 +52,7 @@
 #include "yesNoBox.h"
 #include "choiceBox.h"
 #include "sprite.h"
+#include "screenFade.h"
 
 #include "bagUI.h"
 #include "bagViewer.h"
@@ -209,15 +210,6 @@ void initTimeAndRnd( ) {
 
     srand( hours ^ ( 100 * minutes ) ^ ( 10000 * seconds ) ^ ( day ^ ( 100 * month ) ^ year ) );
     LastPID = rand( );
-}
-
-void defaultScrns( ) {
-    consoleSelect( &IO::Top );
-    consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
-    consoleClear( );
-    consoleSelect( &IO::Bottom );
-    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-    consoleClear( );
 }
 
 int main( int, char** p_argv ) {
@@ -423,7 +415,7 @@ OUT:
 
             bv.run( FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
 
-            defaultScrns( );
+            IO::clearScreenConsoles( );
             IO::drawSub( true );
             UPDATE_TIME = true;
             MAP::curMap->draw( );
@@ -447,7 +439,7 @@ OUT:
             for( u8 i = 0; i < tmp.size( ); ++i )
                 FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
 
-            defaultScrns( );
+            IO::clearScreenConsoles( );
             IO::drawSub( true );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
@@ -456,7 +448,7 @@ OUT:
             ANIMATE_MAP = false;
             dx.run( dui.currPkmn( ) );
 
-            defaultScrns( );
+            IO::clearScreenConsoles( );
             initMainSprites( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;

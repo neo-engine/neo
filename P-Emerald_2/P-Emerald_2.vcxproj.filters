@@ -201,6 +201,9 @@
     <ClInclude Include="arm9\source\mapWarps.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\source\screenFade.h">
+      <Filter>Header Files\arm9\io</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">
@@ -312,6 +315,9 @@
       <Filter>Source Files\arm9\map</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\mapWarps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\screenFade.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
