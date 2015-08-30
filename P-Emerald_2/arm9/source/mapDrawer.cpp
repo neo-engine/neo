@@ -988,7 +988,9 @@ OUT:
     void mapDrawer::usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny ) {
         u8 basePic = FS::SAV->m_player.m_picNum / 10 * 10;
         FS::SAV->m_player.m_picNum = basePic + 5;
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ] = FS::SAV->m_player.show( 128 - 8 - 8 * ( basePic == 0 || basePic == 10 ), 96 - 24, 0, 0, 0 );
+        bool surfing = ( FS::SAV->m_player.m_movement == SURF );
+
+        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ] = FS::SAV->m_player.show( 128 - 8 - 8 * ( basePic == 0 || basePic == 10 ), 96 - 24 - 3 * surfing, 0, 0, 0 );
         for( u8 i = 0; i < 5; ++i ) {
             _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( i, false );
             for( u8 j = 0; j < 5; ++j )
@@ -1009,7 +1011,11 @@ OUT:
         for( u8 i = 120; i < 128; ++i )
             IO::OamTop->oamBuffer[ i ].isHidden = true;
         IO::updateOAM( false );
-        changeMoveMode( WALK );
+        changeMoveMode( surfing ? SURF : WALK );
+        if( surfing ) {
+            _sprites[ _spritePos[ surfPlatform.m_id ] ] = surfPlatform.show( 128 - 16, 96 - 20, 1, 1, 192 );
+            _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame( getFrame( FS::SAV->m_player.m_direction ) );
+        }
         swiWaitForVBlank( );
     }
 

@@ -341,11 +341,12 @@ int main( int, char** p_argv ) {
                     IO::yesNoBox yn;
                     if( yn.getResult( buffer ) ) {
                         IO::drawSub( );
+                        swiWaitForVBlank( );
                         sprintf( buffer, "%ls setzt %s ein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
-                        IO::messageBox( buffer, true );
+                        IO::messageBox( buffer, 0, false );
+                        MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
                         IO::drawSub( true );
                         swiWaitForVBlank( );
-                        MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
 
                         AttackList[ a.m_boxdata.m_moves[ j ] ]->use( );
                     }
@@ -476,13 +477,10 @@ OUT:
                     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
                     for( int i = 0; i < 3; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                        a = pokemon( 0, 133, 0,
+                        a = pokemon( 0, 133 + i, 0,
                                      50, FS::SAV->m_id + i, FS::SAV->m_sid, FS::SAV->m_playername,
                                      !FS::SAV->m_isMale, false, false, rand( ) % 2, rand( ) % 2, i == 3, HILFSCOUNTER, i + 1, i );
                         a.m_stats.m_acHP *= i / 5.0;
-                        a.m_boxdata.m_moves[ 3 ] = 0;
-                        if( canLearn( 133, 19, 4 ) )
-                            a.m_boxdata.m_moves[ 1 ] = 19;
                         a.m_boxdata.m_experienceGained += 750;
 
                         //Hand out some ribbons
@@ -501,7 +499,8 @@ OUT:
                     }
                     for( u16 i = 0; i < 649 / 8; ++i )
                         FS::SAV->m_inDex[ i ] = 255;
-                    FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                    FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                    FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
 
                     swiWaitForVBlank( );
                     break;

@@ -41,7 +41,7 @@ bool fly::possible( ) {
     return false;
 }
 bool flash::possible( ) {
-    return true;
+    return false;
 }
 bool whirlpool::possible( ) {
     return false;
@@ -50,6 +50,33 @@ bool surf::possible( ) {
     return ( FS::SAV->m_player.m_movement != MAP::SURF )
         && MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX + MAP::dir[ FS::SAV->m_player.m_direction ][ 0 ],
         FS::SAV->m_player.m_pos.m_posY + MAP::dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_movedata == 0x4;
+}
+bool dive::possible( ) {
+    return false;
+}
+bool defog::possible( ) {
+    return false;
+}
+bool strength::possible( ) {
+    return false;
+}
+bool rockClimb::possible( ) {
+    return false;
+}
+bool waterfall::possible( ) {
+    return ( FS::SAV->m_player.m_movement == MAP::SURF )
+        && MAP::curMap->at( FS::SAV->m_player.m_pos.m_posX + MAP::dir[ FS::SAV->m_player.m_direction ][ 0 ],
+        FS::SAV->m_player.m_pos.m_posY + MAP::dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_bottombehave == 0x13;
+}
+bool teleport::possible( ) {
+    return false;
+}
+bool headbutt::possible( ) {
+    return false;
+}
+bool sweetScent::possible( ) {
+    u8 curBehave = MAP::curMap->at( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_bottombehave;
+    return curBehave == 0x2 || curBehave == 0x3;
 }
 
 void cut::use( ) { }
@@ -60,3 +87,15 @@ void whirlpool::use( ) { }
 void surf::use( ) {
     MAP::curMap->sitDownPlayer( FS::SAV->m_player.m_direction, MAP::SURF );
 }
+void dive::use( ) { }
+void defog::use( ) { }
+void strength::use( ) { }
+void rockClimb::use( ) { }
+void waterfall::use( ) {
+    while( possible( ) )
+        MAP::curMap->walkPlayer( FS::SAV->m_player.m_direction );
+    MAP::curMap->walkPlayer( FS::SAV->m_player.m_direction );
+}
+void teleport::use( ) { }
+void headbutt::use( ) { }
+void sweetScent::use( ) { }

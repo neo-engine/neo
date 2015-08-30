@@ -55,7 +55,7 @@ namespace MAP {
             MIST,
             BLIZZARD,
             SANDSTORM,
-            MIST_2,
+            FOG,
             DENSE_MIST,
             CLOUDY,
             HEAVY_SUNLIGHT,
@@ -103,19 +103,13 @@ namespace MAP {
 
         void animateField( u16 p_globX, u16 p_globY );
 
-        void jumpPlayer( direction p_direction );
-        void slidePlayer( direction p_direction );
-        void walkPlayer( direction p_direction, bool p_fast = false );
-
         void handleWarp( warpType p_type );
         void handleWildPkmn( wildPkmnType p_type );
         void handleTrainer( );
 
+    public:
         block& at( u16 p_x, u16 p_y ) const;
         mapBlockAtom& atom( u16 p_x, u16 p_y ) const;
-    public:
-        friend bool surf::possible( );
-
 
         mapDrawer( );
 
@@ -125,6 +119,10 @@ namespace MAP {
                       direction p_direction,
                       moveMode p_moveMode = WALK );
         void movePlayer( direction p_direction, bool p_fast = false );
+
+        void jumpPlayer( direction p_direction );
+        void slidePlayer( direction p_direction );
+        void walkPlayer( direction p_direction, bool p_fast = false );
 
         void warpPlayer( warpType p_type, warpPos p_target );
 
