@@ -41,6 +41,7 @@ namespace IO {
                 for( s8 i = 7; i >= 0; --i ) {
                     swiWaitForVBlank( );
                     swiWaitForVBlank( );
+                    swiWaitForVBlank( );
                     REG_BLDY &= ~( 1 << i );
                 }
                 swiWaitForVBlank( );
@@ -50,6 +51,7 @@ namespace IO {
                 REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
                 REG_BLDY = 1;
                 for( u8 i = 1; i < 8; ++i ) {
+                    swiWaitForVBlank( );
                     swiWaitForVBlank( );
                     swiWaitForVBlank( );
                     REG_BLDY |= ( 1 << i );
@@ -63,6 +65,7 @@ namespace IO {
                 REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
                 REG_BLDY = 1;
                 for( u8 i = 1; i < 8; ++i ) {
+                    swiWaitForVBlank( );
                     swiWaitForVBlank( );
                     swiWaitForVBlank( );
                     REG_BLDY |= ( 1 << i );
