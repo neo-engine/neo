@@ -895,8 +895,15 @@ NEXT_PASS:
     void mapDrawer::walkPlayer( direction p_direction, bool p_fast ) {
         if( FS::SAV->m_player.m_movement != WALK )
             p_fast = false;
-
         redirectPlayer( p_direction, p_fast );
+
+        if( atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+            FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x3c
+            && FS::SAV->m_player.m_pos.m_posZ > 3
+            && FS::SAV->m_player.m_movement != SURF ) {
+            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( OBJPRIORITY_1 );
+        }
+
         animateField( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
                       FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] );
         if( p_fast != _playerIsFast ) {
@@ -914,9 +921,23 @@ NEXT_PASS:
         }
         _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
         if( FS::SAV->m_player.m_movement == BIKE )
-            fastBike = std::min( fastBike + 1, 12 );
+            fastBike = 12;// std::min( fastBike + 1, 12 );
         else
             fastBike = false;
+
+        if( atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+            FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x3c
+            && ( FS::SAV->m_player.m_pos.m_posZ <= 3 || FS::SAV->m_player.m_movement == SURF ) ) {
+            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( OBJPRIORITY_3 );
+            if( FS::SAV->m_player.m_movement == SURF )
+                _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_3 );
+        } else if( atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+            FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata != 0x3c
+            && atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x3c ) {
+            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( OBJPRIORITY_2 );
+            if( FS::SAV->m_player.m_movement == SURF )
+                _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_2 );
+        }
     }
     void mapDrawer::jumpPlayer( direction p_direction ) {
         redirectPlayer( p_direction, false );
@@ -1008,6 +1029,7 @@ NEXT_PASS:
     void mapDrawer::fishPlayer( direction p_direction ) {
         u8 basePic = FS::SAV->m_player.m_picNum / 10 * 10;
         FS::SAV->m_player.m_picNum = basePic + 6;
+        bool surfing = ( FS::SAV->m_player.m_movement == SURF );
         _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ] = FS::SAV->m_player.show( 128 - 16 + 8 * dir[ p_direction ][ 0 ],
                                                                                    96 - 24 + 8 * ( p_direction == DOWN ), 0, 0, 0 );
 
@@ -1061,7 +1083,7 @@ OUT:
             swiWaitForVBlank( );
             swiWaitForVBlank( );
         }
-        changeMoveMode( WALK );
+        changeMoveMode( surfing ? SURF : WALK );
         if( !failed ) {
             //Start wild PKMN battle here
             handleWildPkmn( FISHING_ROD );
