@@ -37,23 +37,24 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 namespace IO {
     void fadeScreen( fadeType p_type ) {
         switch( p_type ) {
-            case IO::UNFADE:
-                for( s8 i = 7; i >= 0; --i ) {
-                    swiWaitForVBlank( );
-                    swiWaitForVBlank( );
-                    swiWaitForVBlank( );
-                    REG_BLDY &= ~( 1 << i );
+            case IO::UNFADE: {
+                u16 val = 0x1F;
+                for( s8 i = 4; i >= 0; --i ) {
+                    for( u8 j = 0; j < 5; ++j )
+                        swiWaitForVBlank( );
+                    val &= ~( 1 << u8( i ) );
+                    REG_BLDY = val;
                 }
                 swiWaitForVBlank( );
                 break;
+            }
             case IO::CLEAR_DARK:
             case IO::CAVE_ENTRY:
                 REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
                 REG_BLDY = 1;
-                for( u8 i = 1; i < 8; ++i ) {
-                    swiWaitForVBlank( );
-                    swiWaitForVBlank( );
-                    swiWaitForVBlank( );
+                for( u8 i = 1; i < 5; ++i ) {
+                    for( u8 j = 0; j < 4; ++j )
+                        swiWaitForVBlank( );
                     REG_BLDY |= ( 1 << i );
                 }
                 swiWaitForVBlank( );
@@ -64,10 +65,9 @@ namespace IO {
             case IO::CAVE_EXIT:
                 REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
                 REG_BLDY = 1;
-                for( u8 i = 1; i < 8; ++i ) {
-                    swiWaitForVBlank( );
-                    swiWaitForVBlank( );
-                    swiWaitForVBlank( );
+                for( u8 i = 1; i < 5; ++i ) {
+                    for( u8 j = 0; j < 4; ++j )
+                        swiWaitForVBlank( );
                     REG_BLDY |= ( 1 << i );
                 }
                 swiWaitForVBlank( );

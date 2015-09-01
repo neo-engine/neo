@@ -37,8 +37,17 @@ namespace MAP {
             || ( p_l.m_posX == p_r.m_posX && p_l.m_posY == p_r.m_posY && p_l.m_posZ < p_r.m_posZ );
     }
 
+#define MAP_POS( p_mapX, p_mapY, p_x, p_y, p_z ) { ( p_mapY ) * 32 + ( p_x ), ( p_mapX ) * 32 + ( p_y ), ( p_z ) }
+#define POS( p_x, p_y, p_z ) { ( p_x ), ( p_y ), ( p_z ) }
+#define WARP( p_map1, p_pos1, p_map2, p_pos2 ) { { p_map1, p_pos1 }, { p_map2, p_pos2 } },\
+                    { { p_map2, p_pos2 }, { p_map1, p_pos1 } }
+
     std::map<std::pair<u8, position>, std::pair<u8, position>> warpList = {
-        { { 10, { 104, 119, 5 } }, { 10, { 83, 133, 3 } } },
-        { { 10, { 83, 133, 3 } }, { 10, { 104, 119, 5 } } }
+        WARP( 10, POS( 104, 119, 5 ), 1, MAP_POS( 1, 3, 0x1c, 0x1d, 4 ) ),
+        WARP( 10, POS( 83, 133, 3 ), 1, MAP_POS( 1, 3, 0x07, 0x32, 3 ) )
     };
+
+#undef MAP_POS
+#undef POS
+#undef WARP
 }

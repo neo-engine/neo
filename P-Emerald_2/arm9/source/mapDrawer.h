@@ -79,7 +79,11 @@ namespace MAP {
         };
         typedef std::pair<u8, position> warpPos;
 
-        std::map<u8, mapType> _mapTypes = { { 10, OUTSIDE } };
+        std::map<u8, mapType> _mapTypes = {
+            { 10, OUTSIDE },
+
+            { 1, CAVE } //Meteor Falls
+        };
         mapWeather _weather;
 
         std::unique_ptr<mapSlice> _slices[ 2 ][ 2 ] = { { 0 } };  //[x][y]

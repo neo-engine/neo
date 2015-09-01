@@ -419,7 +419,7 @@ OUT:
             IO::clearScreenConsole( true, true );
             IO::drawSub( true );
             UPDATE_TIME = true;
-            FADE_TOP( );
+            FADE_TOP_DARK( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
@@ -443,7 +443,7 @@ OUT:
 
             IO::clearScreenConsole( true, true );
             IO::drawSub( true );
-            FADE_TOP( );
+            FADE_TOP_DARK( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ],        //StartDex
@@ -453,7 +453,7 @@ OUT:
 
             IO::clearScreenConsole( true, true );
             initMainSprites( );
-            FADE_TOP( );
+            FADE_TOP_DARK( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 8 ],        //StartOptions
@@ -582,7 +582,7 @@ OUT:
             IO::drawSub( true );
             swiWaitForVBlank( );
             if( res == 3 || res == 4 ) {
-                FADE_TOP( );
+                FADE_TOP_DARK( );
                 MAP::curMap->draw( );
             }
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 10 ],  //Start Pokénav
