@@ -368,6 +368,22 @@ namespace MAP {
                 if( p_direction % 2 == 0 )
                     return false;
                 break;
+            case 0x62:
+                if( p_direction == RIGHT )
+                    return true;
+                break;
+            case 0x63:
+                if( p_direction == LEFT )
+                    return true;
+                break;
+            case 0x64:
+                if( p_direction == UP )
+                    return true;
+                break;
+            case 0x65: case 0x6d:
+                if( p_direction == DOWN )
+                    return true;
+                break;
             default:
                 break;
         }
@@ -498,6 +514,10 @@ namespace MAP {
                     jumpPlayer( DOWN ); p_direction = DOWN;
                     break;
                     //Warpy stuff
+                case 0x60:
+                    walkPlayer( p_direction, p_fast );
+                    handleWarp( NO_SPECIAL );
+                    break;
                 case 0x62:
                     if( p_direction == RIGHT ) {
                         walkPlayer( p_direction, p_fast );
@@ -549,6 +569,7 @@ NO_BREAK:
                                 goto NEXT_PASS;
                             walkPlayer( UP ); p_direction = UP;
                             break;
+                        case 0x60:
                         case 0x43:
                             if( !canMove( FS::SAV->m_player.m_pos, DOWN, FS::SAV->m_player.m_movement ) )
                                 goto NEXT_PASS;
@@ -602,6 +623,34 @@ NO_BREAK:
                                 goto NEXT_PASS;
                             walkPlayer( DOWN, true ); p_direction = DOWN;
                             break;
+                        case 0x62:
+                            if( p_direction == RIGHT ) {
+                                redirectPlayer( RIGHT, p_fast );
+                                handleWarp( NO_SPECIAL );
+                                break;
+                            }
+                            goto NEXT_PASS;
+                        case 0x63:
+                            if( p_direction == LEFT ) {
+                                redirectPlayer( LEFT, p_fast );
+                                handleWarp( NO_SPECIAL );
+                                break;
+                            }
+                            goto NEXT_PASS;
+                        case 0x64:
+                            if( p_direction == UP ) {
+                                redirectPlayer( UP, p_fast );
+                                handleWarp( NO_SPECIAL );
+                                break;
+                            }
+                            goto NEXT_PASS;
+                        case 0x65: case 0x6d:
+                            if( p_direction == DOWN ) {
+                                redirectPlayer( DOWN, p_fast );
+                                handleWarp( NO_SPECIAL );
+                                break;
+                            }
+                            goto NEXT_PASS;
 NEXT_PASS:
                         default:
                             if( reinit ) {
@@ -706,7 +755,7 @@ NEXT_PASS:
         bool entryCave = ( _mapTypes[ FS::SAV->m_currentMap ] != CAVE
                            && _mapTypes[ p_target.first ] == CAVE );
         bool exitCave = ( _mapTypes[ FS::SAV->m_currentMap ] == CAVE
-                           && _mapTypes[ p_target.first ] != CAVE );
+                          && _mapTypes[ p_target.first ] != CAVE );
         switch( p_type ) {
             case DOOR:
                 break;

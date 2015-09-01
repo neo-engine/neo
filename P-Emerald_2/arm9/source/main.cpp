@@ -308,11 +308,15 @@ int main( int, char** p_argv ) {
 
 #ifdef DEBUG
         if( held & KEY_L && gMod == DEVELOPER ) {
-            std::sprintf( buffer, "Currently at (%hu,%hu,%hu).\n%d",
+            std::sprintf( buffer, "Currently at %hu-(%hu,%hu,%hu).\nMap: %hu:%hu, (%02hX,%02hX)",
+                          FS::SAV->m_currentMap,
                           FS::SAV->m_player.m_pos.m_posX,
                           FS::SAV->m_player.m_pos.m_posY,
                           FS::SAV->m_player.m_pos.m_posZ,
-                          FS::SAV->m_player.m_movement );
+                          FS::SAV->m_player.m_pos.m_posY / 32,
+                          FS::SAV->m_player.m_pos.m_posX / 32,
+                          FS::SAV->m_player.m_pos.m_posX % 32,
+                          FS::SAV->m_player.m_pos.m_posY % 32 );
             IO::messageBox m( buffer );
 
             IO::drawSub( true );
