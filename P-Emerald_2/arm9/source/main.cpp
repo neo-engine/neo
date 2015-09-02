@@ -52,6 +52,7 @@
 #include "yesNoBox.h"
 #include "choiceBox.h"
 #include "sprite.h"
+#include "screenFade.h"
 
 #include "bagUI.h"
 #include "bagViewer.h"
@@ -213,15 +214,6 @@ void initTimeAndRnd( ) {
     LastPID = rand( );
 }
 
-void defaultScrns( ) {
-    consoleSelect( &IO::Top );
-    consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
-    consoleClear( );
-    consoleSelect( &IO::Bottom );
-    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-    consoleClear( );
-}
-
 int main( int, char** p_argv ) {
     //Init
     powerOn( POWER_ALL_2D );
@@ -301,6 +293,7 @@ int main( int, char** p_argv ) {
     } );
     IO::drawSub( true );
 
+    FADE_TOP( );
     MAP::curMap = new MAP::mapDrawer( );
     MAP::curMap->draw( );
     ANIMATE_MAP = true;
@@ -317,11 +310,15 @@ int main( int, char** p_argv ) {
 
 #ifdef DEBUG
         if( held & KEY_L && gMod == DEVELOPER ) {
-            std::sprintf( buffer, "Currently at (%hu,%hu,%hu).\n%d",
+            std::sprintf( buffer, "Currently at %hu-(%hu,%hu,%hu).\nMap: %hu:%hu, (%02hX,%02hX)",
+                          FS::SAV->m_currentMap,
                           FS::SAV->m_player.m_pos.m_posX,
                           FS::SAV->m_player.m_pos.m_posY,
                           FS::SAV->m_player.m_pos.m_posZ,
-                          FS::SAV->m_player.m_movement );
+                          FS::SAV->m_player.m_pos.m_posY / 32,
+                          FS::SAV->m_player.m_pos.m_posX / 32,
+                          FS::SAV->m_player.m_pos.m_posX % 32,
+                          FS::SAV->m_player.m_pos.m_posY % 32 );
             IO::messageBox m( buffer );
 
             IO::drawSub( true );
@@ -343,11 +340,12 @@ int main( int, char** p_argv ) {
                     IO::yesNoBox yn;
                     if( yn.getResult( buffer ) ) {
                         IO::drawSub( );
+                        swiWaitForVBlank( );
                         sprintf( buffer, "%ls setzt %s ein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
-                        IO::messageBox( buffer, true );
+                        IO::messageBox( buffer, 0, false );
+                        MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
                         IO::drawSub( true );
                         swiWaitForVBlank( );
-                        MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
 
                         AttackList[ a.m_boxdata.m_moves[ j ] ]->use( );
                     }
@@ -424,9 +422,10 @@ OUT:
 
             bv.run( FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
 
-            defaultScrns( );
+            IO::clearScreenConsole( true, true );
             IO::drawSub( true );
             UPDATE_TIME = true;
+            FADE_TOP_DARK( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
@@ -448,8 +447,9 @@ OUT:
             for( u8 i = 0; i < tmp.size( ); ++i )
                 FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
 
-            defaultScrns( );
+            IO::clearScreenConsole( true, true );
             IO::drawSub( true );
+            FADE_TOP_DARK( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ],        //StartDex
@@ -457,8 +457,9 @@ OUT:
             ANIMATE_MAP = false;
             dx.run( dui.currPkmn( ) );
 
-            defaultScrns( );
+            IO::clearScreenConsole( true, true );
             initMainSprites( );
+            FADE_TOP_DARK( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 8 ],        //StartOptions
@@ -484,13 +485,10 @@ OUT:
                     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
                     for( int i = 0; i < 6; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                        a = pokemon( 0, ( 132 + i * ( rand( ) % MAX_PKMN ) ) % MAX_PKMN + 1, 0,
+                        a = pokemon( 0, 133 + i, 0,
                                      50, FS::SAV->m_id + i, FS::SAV->m_sid, FS::SAV->m_playername,
                                      !FS::SAV->m_isMale );
                         a.m_stats.m_acHP *= i / 5.0;
-                        a.m_boxdata.m_moves[ 3 ] = 0;
-                        if( canLearn( 133, 19, 4 ) )
-                            a.m_boxdata.m_moves[ 1 ] = 19;
                         a.m_boxdata.m_experienceGained += 750;
 
                         //Hand out some ribbons
@@ -509,7 +507,9 @@ OUT:
                     }
                     for( u16 i = 0; i < 649 / 8; ++i )
                         FS::SAV->m_inDex[ i ] = 255;
-                    FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                    FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                    FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
+                    FS::SAV->m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
 
                     swiWaitForVBlank( );
                     break;
@@ -612,6 +612,7 @@ OUT:
             IO::drawSub( true );
             swiWaitForVBlank( );
             if( res == 3 || res == 4 || res == 6 || res == 7 ) {
+                FADE_TOP_DARK( );
                 MAP::curMap->draw( );
             }
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 10 ],  //Start Pokénav

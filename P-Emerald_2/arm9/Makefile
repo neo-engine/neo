@@ -16,12 +16,12 @@ LIBNDS	:=	$(DEVKITPRO)/libnds
 
 #---------------------------------------------------------------------------------
 %.nds: %.arm9
-	@ndstool -c $@ -9 $< -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES)
+	@ndstool -c $@ -9 $<
 	@echo built ... $(notdir $@)
 
 #---------------------------------------------------------------------------------
 %.nds: %.elf
-	@ndstool -c $@ -9 $< -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES)
+	@ndstool -c $@ -9 $<
 	@echo built ... $(notdir $@)
 
 #---------------------------------------------------------------------------------

@@ -26,8 +26,10 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 */
 
 #include "mapDrawer.h"
+#include "mapWarps.h"
 #include "uio.h"
 #include "sprite.h"
+#include "screenFade.h"
 #include "defines.h"
 #include "messageBox.h"
 #include "saveGame.h"
@@ -47,7 +49,6 @@ namespace MAP {
     constexpr s8 currentHalf( u16 p_pos ) {
         return s8( ( p_pos % SIZE >= SIZE / 2 ) ? 1 : -1 );
     }
-
 
     mapBlockAtom& mapDrawer::atom( u16 p_x, u16 p_y ) const {
         bool x = ( p_x / SIZE != CUR_SLICE->m_x ),
@@ -99,6 +100,13 @@ namespace MAP {
             videoSetMode( MODE_0_2D/* | DISPLAY_BG0_ACTIVE*/ | DISPLAY_BG1_ACTIVE |
                           DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
             vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
+            //FADE_TOP_DARK( );
+
+            u16 mx = FS::SAV->m_player.m_pos.m_posX, my = FS::SAV->m_player.m_pos.m_posY;
+            _slices[ _curX ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE );
+            _slices[ _curX ^ 1 ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE );
+            _slices[ _curX ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE + currentHalf( my ) );
+            _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ) );
 
             for( u8 i = 1; i < 4; ++i ) {
                 bgInit( i, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
@@ -142,12 +150,15 @@ namespace MAP {
         IO::initOAMTable( false );
         drawPlayer( ); //Draw the player
         drawObjects( ); //Draw NPCs / stuff
+
+        IO::fadeScreen( IO::UNFADE );
     }
 
     void mapDrawer::drawPlayer( ) {
         _sprites[ 0 ] = FS::SAV->m_player.show( 128 - 8, 96 - 24, 0, 0, 0 );
         _spritePos[ FS::SAV->m_player.m_id ] = 0;
         _entriesUsed |= ( 1 << 0 );
+        changeMoveMode( FS::SAV->m_player.m_movement );
     }
 
     void mapDrawer::drawObjects( ) {
@@ -155,8 +166,19 @@ namespace MAP {
     }
 
     void mapDrawer::animateField( u16 p_globX, u16 p_globY ) {
-        (void)p_globX;
-        (void)p_globY;
+        u8 moveData = atom( p_globX, p_globY ).m_movedata;
+        u8 behave = at( p_globX, p_globY ).m_bottombehave;
+
+
+        //handle Pkmn stuff
+        if( moveData == 0x04 && behave != 0x13 )
+            handleWildPkmn( WATER );
+        else if( behave == 0x02 )
+            handleWildPkmn( GRASS );
+        else if( behave == 0x03 )
+            handleWildPkmn( HIGH_GRASS );
+        else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
+            handleWildPkmn( CAVE_WALK );
     }
 
     void mapDrawer::loadNewRow( direction p_direction, bool p_updatePlayer ) {
@@ -260,19 +282,26 @@ namespace MAP {
             = constructSlice( FS::SAV->m_currentMap, neigh->m_x + dir[ p_direction ][ 0 ], neigh->m_y + dir[ p_direction ][ 1 ] );
     }
 
-    void mapDrawer::handleWarp( ) { }
-    void mapDrawer::handleWildPkmn( ) { }
+    void mapDrawer::handleWarp( warpType p_type ) {
+        static warpPos lastWarp = { 0, { 0, 0, 0 } };
+
+        warpPos current = warpPos{ FS::SAV->m_currentMap, FS::SAV->m_player.m_pos };
+        if( !warpList.count( current ) )
+            return;
+        warpPos target = p_type == LAST_VISITED ? lastWarp : warpList[ current ];
+        if( target == warpPos{ 0, { 0, 0, 0 } } )
+            return;
+        lastWarp = current;
+
+        warpPlayer( p_type, target );
+    }
+    void mapDrawer::handleWildPkmn( wildPkmnType p_type ) {
+        (void)p_type;
+    }
     void mapDrawer::handleTrainer( ) { }
 
     mapDrawer::mapDrawer( )
-        : _curX( 0 ), _curY( 0 ), _entriesUsed( 0 ) {
-        u16 mx = FS::SAV->m_player.m_pos.m_posX, my = FS::SAV->m_player.m_pos.m_posY;
-        _slices[ _curX ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE );
-        _slices[ _curX ^ 1 ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE );
-        _slices[ _curX ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE + currentHalf( my ) );
-        _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ) );
-        _playerIsFast = false;
-    }
+        : _curX( 0 ), _curY( 0 ), _playerIsFast( false ), _entriesUsed( 0 ) { }
 
     // Movement stuff
     bool mapDrawer::canMove( position p_start,
@@ -339,6 +368,22 @@ namespace MAP {
                 if( p_direction % 2 == 0 )
                     return false;
                 break;
+            case 0x62:
+                if( p_direction == RIGHT )
+                    return true;
+                break;
+            case 0x63:
+                if( p_direction == LEFT )
+                    return true;
+                break;
+            case 0x64:
+                if( p_direction == UP )
+                    return true;
+                break;
+            case 0x65: case 0x6d:
+                if( p_direction == DOWN )
+                    return true;
+                break;
             default:
                 break;
         }
@@ -365,6 +410,7 @@ namespace MAP {
                 if( p_direction % 2 == 0 )
                     return false;
                 break;
+            case 0x13:
             case 0xd3: case 0xd4:
             case 0xd5: case 0xd6:
             case 0xd7:
@@ -467,13 +513,46 @@ namespace MAP {
                 case 0x3b:
                     jumpPlayer( DOWN ); p_direction = DOWN;
                     break;
+                    //Warpy stuff
+                case 0x60:
+                    walkPlayer( p_direction, p_fast );
+                    handleWarp( NO_SPECIAL );
+                    break;
+                case 0x62:
+                    if( p_direction == RIGHT ) {
+                        walkPlayer( p_direction, p_fast );
+                        handleWarp( NO_SPECIAL );
+                        break;
+                    }
+                    goto NO_BREAK;
+                case 0x63:
+                    if( p_direction == LEFT ) {
+                        walkPlayer( p_direction, p_fast );
+                        handleWarp( NO_SPECIAL );
+                        break;
+                    }
+                    goto NO_BREAK;
+                case 0x64:
+                    if( p_direction == UP ) {
+                        walkPlayer( p_direction, p_fast );
+                        handleWarp( NO_SPECIAL );
+                        break;
+                    }
+                    goto NO_BREAK;
+                case 0x65: case 0x6d:
+                    if( p_direction == DOWN ) {
+                        walkPlayer( p_direction, p_fast );
+                        handleWarp( NO_SPECIAL );
+                        break;
+                    }
+                    goto NO_BREAK;
+NO_BREAK:
                 default:
                     //If no jump has to be done, check for other stuff
                     switch( lstBehave ) {
                         case 0x20: case 0x48:
                             slidePlayer( p_direction );
                             break;
-
                             //These change the direction of movement
                         case 0x40:
                             if( !canMove( FS::SAV->m_player.m_pos, RIGHT, FS::SAV->m_player.m_movement ) )
@@ -490,6 +569,7 @@ namespace MAP {
                                 goto NEXT_PASS;
                             walkPlayer( UP ); p_direction = UP;
                             break;
+                        case 0x60:
                         case 0x43:
                             if( !canMove( FS::SAV->m_player.m_pos, DOWN, FS::SAV->m_player.m_movement ) )
                                 goto NEXT_PASS;
@@ -517,6 +597,12 @@ namespace MAP {
                             slidePlayer( DOWN ); p_direction = DOWN;
                             break;
 
+                        case 0xd0:
+                            if( fastBike > 9 && p_direction != DOWN )
+                                goto NEXT_PASS;
+                            slidePlayer( DOWN ); p_direction = DOWN;
+                            break;
+
                         case 0x50:
                             if( !canMove( FS::SAV->m_player.m_pos, RIGHT, FS::SAV->m_player.m_movement ) )
                                 goto NEXT_PASS;
@@ -537,6 +623,34 @@ namespace MAP {
                                 goto NEXT_PASS;
                             walkPlayer( DOWN, true ); p_direction = DOWN;
                             break;
+                        case 0x62:
+                            if( p_direction == RIGHT ) {
+                                redirectPlayer( RIGHT, p_fast );
+                                handleWarp( NO_SPECIAL );
+                                break;
+                            }
+                            goto NEXT_PASS;
+                        case 0x63:
+                            if( p_direction == LEFT ) {
+                                redirectPlayer( LEFT, p_fast );
+                                handleWarp( NO_SPECIAL );
+                                break;
+                            }
+                            goto NEXT_PASS;
+                        case 0x64:
+                            if( p_direction == UP ) {
+                                redirectPlayer( UP, p_fast );
+                                handleWarp( NO_SPECIAL );
+                                break;
+                            }
+                            goto NEXT_PASS;
+                        case 0x65: case 0x6d:
+                            if( p_direction == DOWN ) {
+                                redirectPlayer( DOWN, p_fast );
+                                handleWarp( NO_SPECIAL );
+                                break;
+                            }
+                            goto NEXT_PASS;
 NEXT_PASS:
                         default:
                             if( reinit ) {
@@ -547,6 +661,32 @@ NEXT_PASS:
                             switch( newBehave ) {
                                 case 0x20: case 0x48:
                                     walkPlayer( p_direction, p_fast );
+                                    break;
+
+                                    //Check for warpy stuff
+                                case 0x60:
+                                    walkPlayer( p_direction, p_fast );
+                                    handleWarp( CAVE_ENTRY );
+                                    break;
+                                case 0x61: case 0x68:
+                                    walkPlayer( p_direction, p_fast );
+                                    handleWarp( NO_SPECIAL );
+                                    break;
+                                case 0x66: case 0x6e:
+                                    walkPlayer( p_direction, p_fast );
+                                    handleWarp( LAST_VISITED );
+                                    break;
+                                case 0x69:
+                                    walkPlayer( p_direction, p_fast );
+                                    handleWarp( DOOR );
+                                    break;
+                                case 0x6C:
+                                    walkPlayer( p_direction, p_fast );
+                                    handleWarp( EMERGE_WATER );
+                                    break;
+                                case 0x70: case 0x29:
+                                    walkPlayer( p_direction, p_fast );
+                                    handleWarp( TELEPORT );
                                     break;
 
                                     //These change the direction of movement
@@ -611,6 +751,42 @@ NEXT_PASS:
             FS::SAV->m_player.m_pos.m_posZ = atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata / 4;
     }
 
+    void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
+        bool entryCave = ( _mapTypes[ FS::SAV->m_currentMap ] != CAVE
+                           && _mapTypes[ p_target.first ] == CAVE );
+        bool exitCave = ( _mapTypes[ FS::SAV->m_currentMap ] == CAVE
+                          && _mapTypes[ p_target.first ] != CAVE );
+        switch( p_type ) {
+            case DOOR:
+                break;
+            case TELEPORT:
+                break;
+            case EMERGE_WATER:
+                break;
+            case CAVE_ENTRY:
+                if( entryCave ) {
+                    IO::fadeScreen( IO::CAVE_ENTRY );
+                    break;
+                }
+                if( exitCave ) {
+                    IO::fadeScreen( IO::CAVE_EXIT );
+                    break;
+                }
+            case LAST_VISITED:
+            case NO_SPECIAL:
+            default:
+                IO::fadeScreen( IO::CLEAR_DARK );
+                break;
+        }
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+        FS::SAV->m_currentMap = p_target.first;
+        FS::SAV->m_player.m_pos = p_target.second;
+        draw( );
+        if( exitCave )
+            movePlayer( DOWN );
+    }
+
     void mapDrawer::redirectPlayer( direction p_direction, bool p_fast ) {
         //Check if the player's direction changed
         if( p_direction != FS::SAV->m_player.m_direction ) {
@@ -662,7 +838,7 @@ NEXT_PASS:
     }
     void mapDrawer::sitDownPlayer( direction p_direction, moveMode p_newMoveMode ) {
         direction dir = ( ( p_newMoveMode == SIT ) ? direction( ( u8( p_direction ) + 2 ) % 4 ) : p_direction );
-        
+
         if( p_newMoveMode == SURF ) {
             //Load the Pkmn
             surfPlatform.m_id = 1;
@@ -719,8 +895,15 @@ NEXT_PASS:
     void mapDrawer::walkPlayer( direction p_direction, bool p_fast ) {
         if( FS::SAV->m_player.m_movement != WALK )
             p_fast = false;
-
         redirectPlayer( p_direction, p_fast );
+
+        if( atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+            FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x3c
+            && FS::SAV->m_player.m_pos.m_posZ > 3
+            && FS::SAV->m_player.m_movement != SURF ) {
+            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( OBJPRIORITY_1 );
+        }
+
         animateField( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
                       FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] );
         if( p_fast != _playerIsFast ) {
@@ -738,9 +921,23 @@ NEXT_PASS:
         }
         _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
         if( FS::SAV->m_player.m_movement == BIKE )
-            fastBike = std::min( fastBike + 1, 12 );
+            fastBike = 12;// std::min( fastBike + 1, 12 );
         else
             fastBike = false;
+
+        if( atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+            FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x3c
+            && ( FS::SAV->m_player.m_pos.m_posZ <= 3 || FS::SAV->m_player.m_movement == SURF ) ) {
+            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( OBJPRIORITY_3 );
+            if( FS::SAV->m_player.m_movement == SURF )
+                _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_3 );
+        } else if( atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+            FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata != 0x3c
+            && atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x3c ) {
+            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( OBJPRIORITY_2 );
+            if( FS::SAV->m_player.m_movement == SURF )
+                _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_2 );
+        }
     }
     void mapDrawer::jumpPlayer( direction p_direction ) {
         redirectPlayer( p_direction, false );
@@ -832,6 +1029,7 @@ NEXT_PASS:
     void mapDrawer::fishPlayer( direction p_direction ) {
         u8 basePic = FS::SAV->m_player.m_picNum / 10 * 10;
         FS::SAV->m_player.m_picNum = basePic + 6;
+        bool surfing = ( FS::SAV->m_player.m_movement == SURF );
         _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ] = FS::SAV->m_player.show( 128 - 16 + 8 * dir[ p_direction ][ 0 ],
                                                                                    96 - 24 + 8 * ( p_direction == DOWN ), 0, 0, 0 );
 
@@ -876,9 +1074,7 @@ NEXT_PASS:
 
 OUT:
         fish.clear( );
-        if( !failed )
-            fish.put( "Du hast ein Pokémon geangelt!" );
-        else
+        if( failed )
             fish.put( "Es ist entkommen..." );
         IO::drawSub( true );
         for( s8 i = 2; i >= 0; --i ) {
@@ -887,16 +1083,19 @@ OUT:
             swiWaitForVBlank( );
             swiWaitForVBlank( );
         }
-        changeMoveMode( WALK );
+        changeMoveMode( surfing ? SURF : WALK );
         if( !failed ) {
             //Start wild PKMN battle here
+            handleWildPkmn( FISHING_ROD );
         }
     }
 
     void mapDrawer::usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny ) {
         u8 basePic = FS::SAV->m_player.m_picNum / 10 * 10;
         FS::SAV->m_player.m_picNum = basePic + 5;
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ] = FS::SAV->m_player.show( 128 - 8 - 8 * ( basePic == 0 || basePic == 10 ), 96 - 24, 0, 0, 0 );
+        bool surfing = ( FS::SAV->m_player.m_movement == SURF );
+
+        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ] = FS::SAV->m_player.show( 128 - 8 - 8 * ( basePic == 0 || basePic == 10 ), 96 - 24 - 3 * surfing, 0, 0, 0 );
         for( u8 i = 0; i < 5; ++i ) {
             _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( i, false );
             for( u8 j = 0; j < 5; ++j )
@@ -917,7 +1116,11 @@ OUT:
         for( u8 i = 120; i < 128; ++i )
             IO::OamTop->oamBuffer[ i ].isHidden = true;
         IO::updateOAM( false );
-        changeMoveMode( WALK );
+        changeMoveMode( surfing ? SURF : WALK );
+        if( surfing ) {
+            _sprites[ _spritePos[ surfPlatform.m_id ] ] = surfPlatform.show( 128 - 16, 96 - 20, 1, 1, 192 );
+            _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame( getFrame( FS::SAV->m_player.m_direction ) );
+        }
         swiWaitForVBlank( );
     }
 

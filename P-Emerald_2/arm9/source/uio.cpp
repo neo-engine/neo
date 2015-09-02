@@ -364,18 +364,6 @@ namespace IO {
         p_font->printStringCenterD( p_string, p_bottom );
     }
 
-    void topScreenDarken( ) {
-        u16 i;
-        color pixel;
-
-        for( i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++ ) {
-            pixel = ( (color *)BG_BMP_RAM( 1 ) )[ i ];
-            ( (color *)BG_BMP_RAM( 1 ) )[ i ] = ( ( pixel & 0x1F ) >> 1 ) |
-                ( ( ( ( pixel >> 5 ) & 0x1F ) >> 1 ) << 5 ) |
-                ( ( ( ( pixel >> 10 ) & 0x1F ) >> 1 ) << 10 ) |
-                ( 1 << 15 );
-        }
-    }
     void topScreenPlot( u8 p_x, u8 p_y, color p_color ) {
         if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
             ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
@@ -383,18 +371,6 @@ namespace IO {
             ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
         else if( ( p_color % ( 1 << 8 ) ) != 0 )
             ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
-    }
-    void btmScreenDarken( ) {
-        u16 i;
-        color pixel;
-
-        for( i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++ ) {
-            pixel = ( (color *)BG_BMP_RAM_SUB( 1 ) )[ i ];
-            ( (color *)BG_BMP_RAM_SUB( 1 ) )[ i ] = ( ( pixel & 0x1F ) >> 1 ) |
-                ( ( ( ( pixel >> 5 ) & 0x1F ) >> 1 ) << 5 ) |
-                ( ( ( ( pixel >> 10 ) & 0x1F ) >> 1 ) << 10 ) |
-                ( 1 << 15 );
-        }
     }
     void btmScreenPlot( u8 p_x, u8 p_y, color p_color ) {
         if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )

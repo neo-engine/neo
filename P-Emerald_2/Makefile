@@ -7,17 +7,9 @@ endif
 
 include $(DEVKITARM)/ds_rules
 
-ifeq ($(strip $(GAME_TITLE)),)
-GAME_TITLE	:=	Pokemon
-endif
-
-ifeq ($(strip $(GAME_SUBTITLE1)),)
-GAME_SUBTITLE1	:= Smaragd Edition 2
-endif
-
-ifeq ($(strip $(GAME_ICON)),)
-GAME_ICON      :=      $(DEVKITPRO)/libnds/icon2.bmp
-endif
+GAME_TITLE	    :=	Pokemon
+GAME_SUBTITLE1	:=  Smaragd Edition 2
+GAME_ICON       :=  $(CURDIR)/icon.bmp
 
 export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
@@ -38,7 +30,7 @@ $(TARGET).ds.gba	: $(TARGET).nds
 
 #---------------------------------------------------------------------------------
 $(TARGET).nds	:	$(TARGET).arm7 $(TARGET).arm9
-	ndstool	-c $(TARGET).nds -7 $(TARGET).arm7 -9 $(TARGET).arm9 -d ./FSROOT 
+	ndstool	-c $(TARGET).nds -7 $(TARGET).arm7 -9 $(TARGET).arm9 -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES)
 
 #---------------------------------------------------------------------------------
 $(TARGET).arm7	: arm7/$(TARGET).elf

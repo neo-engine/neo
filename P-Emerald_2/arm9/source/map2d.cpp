@@ -27,23 +27,6 @@
 //
 //
 //
-//#include "map2d.h"
-//
-//#include "buffer.h"
-//#include "uio.h"
-//
-//#include <fstream>
-//#include <vector>
-//#include <fat.h>
-//#include <nds.h>
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <fcntl.h>
-//#include <unistd.h>
-//#include <math.h>
-//
-//
-//
 //void animateMap( u8 p_frame ) {
 //    u8* tileMemory = (u8*)BG_TILE_RAM( 1 );
 //    for( size_t i = 0; i < acMap->m_animations.size( ); ++i ) {
@@ -53,22 +36,4 @@
 //            swiCopy( &a.m_animationTiles[ a.m_acFrame ], tileMemory + a.m_tileIdx * 32, 16 );
 //        }
 //    }
-//}
-//
-//
-//void shoUseAttack( u16 p_pkmIdx, bool p_female, bool p_shiny ) {
-//    if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 6, 2, 96, false, p_shiny, p_female ) ) {
-//        IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 6, 2, 96, false, p_shiny, !p_female );
-//    }
-//    IO::updateOAM( false );
-//
-//    for( u8 i = 0; i < 40; ++i )
-//        swiWaitForVBlank( );
-//
-//    //animateHero(lastdir,2);
-//    IO::OamTop->oamBuffer[ 0 ].isHidden = false;
-//    IO::OamTop->oamBuffer[ 1 ].isHidden = true;
-//    for( u8 i = 0; i < 8; ++i )
-//        IO::OamTop->oamBuffer[ 2 + i ].isHidden = true;
-//    IO::updateOAM( false );
 //}

@@ -38,6 +38,54 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 namespace MAP {
     class mapDrawer {
     private:
+        enum wildPkmnType {
+            GRASS,
+            HIGH_GRASS,
+            WATER,
+            CAVE_WALK,
+            FISHING_ROD
+        };
+        enum mapWeather {
+            NOTHING, //Inside
+            SUNNY,
+            REGULAR,
+            RAINY,
+            SNOW,
+            THUNDERSTORM,
+            MIST,
+            BLIZZARD,
+            SANDSTORM,
+            FOG,
+            DENSE_MIST,
+            CLOUDY,
+            HEAVY_SUNLIGHT,
+            HEAVY_RAIN,
+            UNDERWATER
+        };
+        enum mapType {
+            OUTSIDE = 0,
+            CAVE = 1,
+            INSIDE = 2,
+            DARK = 4,
+            FLASHABLE = 8
+        };
+        enum warpType {
+            NO_SPECIAL,
+            CAVE_ENTRY,
+            DOOR,
+            TELEPORT,
+            EMERGE_WATER,
+            LAST_VISITED
+        };
+        typedef std::pair<u8, position> warpPos;
+
+        std::map<u8, mapType> _mapTypes = {
+            { 10, OUTSIDE },
+
+            { 1, CAVE } //Meteor Falls
+        };
+        mapWeather _weather;
+
         std::unique_ptr<mapSlice> _slices[ 2 ][ 2 ] = { { 0 } };  //[x][y]
         u8          _curX, _curY;       //Current main slice from the _slices array
         std::map<std::pair<u16, u16>, std::vector<mapObject>>
@@ -59,19 +107,13 @@ namespace MAP {
 
         void animateField( u16 p_globX, u16 p_globY );
 
-        void jumpPlayer( direction p_direction );
-        void slidePlayer( direction p_direction );
-        void walkPlayer( direction p_direction, bool p_fast = false );
-
-        void handleWarp( );
-        void handleWildPkmn( );
+        void handleWarp( warpType p_type );
+        void handleWildPkmn( wildPkmnType p_type );
         void handleTrainer( );
 
+    public:
         block& at( u16 p_x, u16 p_y ) const;
         mapBlockAtom& atom( u16 p_x, u16 p_y ) const;
-    public:
-        friend bool surf::possible( );
-
 
         mapDrawer( );
 
@@ -81,6 +123,12 @@ namespace MAP {
                       direction p_direction,
                       moveMode p_moveMode = WALK );
         void movePlayer( direction p_direction, bool p_fast = false );
+
+        void jumpPlayer( direction p_direction );
+        void slidePlayer( direction p_direction );
+        void walkPlayer( direction p_direction, bool p_fast = false );
+
+        void warpPlayer( warpType p_type, warpPos p_target );
 
         void stopPlayer( );
         void stopPlayer( direction p_direction );
