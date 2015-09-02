@@ -61,7 +61,8 @@ bool strength::possible( ) {
     return false;
 }
 bool rockClimb::possible( ) {
-    return false;
+    return MAP::curMap->at( FS::SAV->m_player.m_pos.m_posX + MAP::dir[ FS::SAV->m_player.m_direction ][ 0 ],
+                            FS::SAV->m_player.m_pos.m_posY + MAP::dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_bottombehave == 0x12;
 }
 bool waterfall::possible( ) {
     return ( FS::SAV->m_player.m_movement == MAP::SURF )
@@ -90,7 +91,16 @@ void surf::use( ) {
 void dive::use( ) { }
 void defog::use( ) { }
 void strength::use( ) { }
-void rockClimb::use( ) { }
+void rockClimb::use( ) {
+    MAP::curMap->sitDownPlayer( FS::SAV->m_player.m_direction, MAP::SURF );
+    while( possible( ) )
+        MAP::curMap->walkPlayer( FS::SAV->m_player.m_direction );
+    MAP::curMap->standUpPlayer( FS::SAV->m_player.m_direction );
+    if( MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata > 4
+        && MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x3c
+        && MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x0a )
+        FS::SAV->m_player.m_pos.m_posZ = MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata / 4;
+}
 void waterfall::use( ) {
     while( possible( ) )
         MAP::curMap->walkPlayer( FS::SAV->m_player.m_direction );

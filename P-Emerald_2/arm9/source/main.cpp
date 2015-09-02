@@ -501,6 +501,7 @@ OUT:
                         FS::SAV->m_inDex[ i ] = 255;
                     FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
                     FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
+                    FS::SAV->m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
 
                     swiWaitForVBlank( );
                     break;
