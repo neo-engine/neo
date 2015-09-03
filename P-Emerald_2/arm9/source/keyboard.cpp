@@ -139,7 +139,7 @@ namespace IO {
     void keyboard::draw( const char* p_msg, std::wstring& p_currSel, u16 p_length ) {
         BG_PALETTE_SUB[ COLOR_IDX ] = RGB( 30 * ( _ind == 0 ), 30 * ( _ind == 1 ), 30 * ( _ind == 2 ) );
 
-        drawSub( );
+        NAV->draw( );
         initTextField( );
         if( p_msg != 0 )
             regularFont->printString( p_msg, 8, 4, true );

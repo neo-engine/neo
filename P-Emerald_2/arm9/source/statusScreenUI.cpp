@@ -302,7 +302,7 @@ namespace STS {
 
         bgUpdate( );
 
-        IO::drawSub( );
+        IO::NAV->draw( );
         if( p_initTop )
             initTop( );
         initSub( _current );
@@ -863,7 +863,7 @@ namespace STS {
             printf( "\x1b[33m" );
 
             consoleSetWindow( &IO::Bottom, 3, 3, 27, 15 );
-            IO::drawSub( );
+            IO::NAV->draw( );
 
             IO::regularFont->setColor( 0, 0 );
             IO::regularFont->setColor( WHITE_IDX, 1 );

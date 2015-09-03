@@ -28,6 +28,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "startScreen.h"
 #include "defines.h"
 #include "uio.h"
+#include "nav.h"
 #include "screenFade.h"
 #include "fs.h"
 #include "mapDrawer.h"
@@ -72,7 +73,7 @@ void fillResume( ) {
 void drawSplash( ) {
     FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "Title" );
     if( IO::BGs[ FS::SAV->m_bgIdx ].m_allowsOverlay )
-        IO::drawSub( );
+        IO::NAV->draw( );
     IO::clearScreen( true, false, false );
 
     consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
@@ -163,7 +164,7 @@ bool transferGame( ) {
     if( acgame == -1 )
         return false;
 
-    IO::drawSub( );
+    IO::NAV->draw( );
     IO::yesNoBox yn = IO::yesNoBox( );
     if( yn.getResult( "Möchtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?" ) ) {
         IO::messageBox( "Solltest du im Folgenden\nspeichern, so werden Daten\nauf das GBA-Modul geschrieben." );

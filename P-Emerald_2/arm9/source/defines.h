@@ -51,8 +51,8 @@ std::string toString( u16 p_num ); //I REALLY LIKE WORKAROUNDING g++'S BUGS
 u8 getCurrentDaytime( );
 
 extern bool DRAW_TIME;
+extern bool UPDATE_TIME;
 extern bool ANIMATE_MAP;
-extern bool INIT_MAIN_SPRITES;
 extern u8 FRAME_COUNT;
 
 extern int achours, acseconds, acminutes, acday, acmonth, acyear;

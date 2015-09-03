@@ -290,7 +290,7 @@ namespace BATTLE {
 
     void loadSpritesSub( battle* p_battle ) {
         IO::initOAMTable( true );
-        IO::drawSub( );
+        IO::NAV->draw( );
 
         u16 tilecnt = 0;
         tilecnt = initStsBalls( true, p_battle, tilecnt );
@@ -407,7 +407,7 @@ namespace BATTLE {
 
         loadBattleUITop( _battle );
         IO::initOAMTable( true );
-        IO::drawSub( );
+        IO::NAV->draw( );
         initLogScreen( );
     }
 
@@ -647,7 +647,7 @@ NEXT:
             }
         }
 END:
-        IO::drawSub( );
+        IO::NAV->draw( );
         initColors( );
         clearLogScreen( );
         for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
@@ -863,7 +863,7 @@ NEXT:
             }
         }
 END:
-        IO::drawSub( );
+        IO::NAV->draw( );
         initColors( );
         clearLogScreen( );
         for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
@@ -981,7 +981,7 @@ END:
     *  @returns 0 if the Pokemon shall be sent, 1 if further information was requested, 2 if the moves should be displayed, 3 if the previous screen shall be shown
     */
     u8 showConfirmation( pokemon& p_pokemon, bool p_alreadySent, bool p_alreadyChosen ) {
-        IO::drawSub( );
+        IO::NAV->draw( );
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
         u16 tilecnt = 0;
         u8  palIndex = 4;
@@ -1089,7 +1089,7 @@ END:
     *  @returns 0: return to prvious screen, 1 view next pokémon, 2 view previous pokémon, 3 switch screen
     */
     u8 showDetailedInformation( pokemon& p_pokemon, u8 p_page ) {
-        IO::drawSub( );
+        IO::NAV->draw( );
         initColors( );
         undrawPKMNChoiceScreen( );
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
@@ -1401,7 +1401,7 @@ START:
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
         IO::updateOAM( true );
         drawPKMNChoiceScreen( _battle, p_firstIsChosen );
-        IO::drawSub( );
+        IO::NAV->draw( );
         initColors( );
         IO::printRectangle( (u8)0, (u8)0, (u8)255, (u8)28, true, false, WHITE_IDX );
 

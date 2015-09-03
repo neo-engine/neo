@@ -202,7 +202,7 @@ namespace MAP {
             loadSlice( p_direction );
 #ifdef __DEBUG
             IO::messageBox m( "Load Slice" );
-            IO::drawSub( );
+            IO::NAV->draw( );
 #endif
         }
         //Check if a new slice got stepped onto
@@ -221,7 +221,7 @@ namespace MAP {
 #ifdef __DEBUG
             sprintf( buffer, "Switch Slice to (%d, %d)", _curX, _curY );
             IO::messageBox m( buffer );
-            IO::drawSub( );
+            IO::NAV->draw( );
 #endif
         }
 
@@ -462,7 +462,7 @@ namespace MAP {
                 swiWaitForVBlank( );
                 stopPlayer( );
                 IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
-                IO::drawSub( true );
+                IO::NAV->draw( true );
                 return;
             }
             //Check for end of surf, stand up and sit down
@@ -780,9 +780,11 @@ NEXT_PASS:
         }
         swiWaitForVBlank( );
         swiWaitForVBlank( );
+
         FS::SAV->m_currentMap = p_target.first;
         FS::SAV->m_player.m_pos = p_target.second;
         draw( );
+        IO::NAV->showNewMap( FS::SAV->m_currentMap );
         if( exitCave )
             movePlayer( DOWN );
     }
@@ -1076,7 +1078,7 @@ OUT:
         fish.clear( );
         if( failed )
             fish.put( "Es ist entkommen..." );
-        IO::drawSub( true );
+        IO::NAV->draw( true );
         for( s8 i = 2; i >= 0; --i ) {
             _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( frame + i, p_direction == RIGHT );
             swiWaitForVBlank( );

@@ -54,44 +54,22 @@
 #include "sprite.h"
 #include "screenFade.h"
 
-#include "bagUI.h"
-#include "bagViewer.h"
-
-#include "statusScreen.h"
-#include "statusScreenUI.h"
-
-#include "boxUI.h"
-#include "boxViewer.h"
-
-#include "dex.h"
-#include "dexUI.h"
 #include "mapDrawer.h"
 #include "mapSlice.h"
 #include "mapObject.h"
 
-#include "battle.h"
+#include "nav.h"
+
 #include "Gen.h"
 
 #include "BigCirc1.h" 
 #include "consoleFont.h"
-
-#include "Back.h"
-#include "Save.h"
-#include "Option.h"
-#include "PokemonSp.h"
-#include "Id.h"
-#include "SPBag.h"
-#include "Nav.h"
-#include "PokeDex.h"
 
 #ifndef _EMULATOR
 GameMod gMod = GameMod::DEVELOPER;
 #else
 GameMod gMod = GameMod::EMULATOR;
 #endif
-
-DEX::dexUI dui( true, 1, FS::SAV->m_hasGDex ? 649 : 493 );
-DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
 
 u8 DayTimes[ 4 ][ 5 ] = {
     { 7, 10, 15, 17, 23 },
@@ -103,11 +81,9 @@ u8 DayTimes[ 4 ][ 5 ] = {
 int hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
 int achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
 int pressed, held, last;
-u8 frame = 0;
 bool DRAW_TIME = false;
 bool UPDATE_TIME = true;
 bool ANIMATE_MAP = false;
-bool INIT_MAIN_SPRITES = false;
 u8 FRAME_COUNT = 0;
 
 u8 getCurrentDaytime( ) {
@@ -119,58 +95,6 @@ u8 getCurrentDaytime( ) {
     return 254;
 }
 
-u8 positions[ 6 ][ 2 ] = {
-    { 14, 2 }, { 16, 3 }, { 14, 9 },
-    { 16, 10 }, { 14, 17 }, { 16, 18 }
-};
-
-void initMainSprites( ) {
-    IO::initOAMTable( true );
-    u16 tileCnt = 0;
-
-    tileCnt = IO::loadSprite( BACK_ID, BACK_ID, tileCnt,
-                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                              BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0, true );
-
-    tileCnt = IO::loadSprite( SAVE_ID, SAVE_ID, tileCnt,
-                              -20, -20, 64, 64, SavePal,
-                              SaveTiles, SaveTilesLen, false, false, false, OBJPRIORITY_0, true );
-
-    //Main menu sprites
-
-    tileCnt = IO::loadSprite( OPTS_ID, OPTS_ID, tileCnt,
-                              IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( OPTS_ID - 2 ) ] - 16,
-                              IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( OPTS_ID - 2 ) + 1 ] - 16,
-                              32, 32, OptionPal, OptionTiles, OptionTilesLen,
-                              false, false, false, OBJPRIORITY_0, true );
-    tileCnt = IO::loadSprite( PKMN_ID, PKMN_ID, tileCnt,
-                              IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( PKMN_ID - 2 ) ] - 16,
-                              IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( PKMN_ID - 2 ) + 1 ] - 16,
-                              32, 32, PokemonSpPal, PokemonSpTiles, PokemonSpTilesLen,
-                              false, false, !FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId, OBJPRIORITY_0, true );
-    tileCnt = IO::loadSprite( NAV_ID, NAV_ID, tileCnt,
-                              IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( NAV_ID - 2 ) ] - 16,
-                              IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( NAV_ID - 2 ) + 1 ] - 16,
-                              32, 32, NavPal, NavTiles, NavTilesLen,
-                              false, false, false, OBJPRIORITY_0, true );
-    tileCnt = IO::loadSprite( ID_ID, ID_ID, tileCnt,
-                              IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( ID_ID - 2 ) ] - 16,
-                              IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( ID_ID - 2 ) + 1 ] - 16,
-                              32, 32, IdPal, IdTiles, IdTilesLen,
-                              false, false, false, OBJPRIORITY_0, true );
-    tileCnt = IO::loadSprite( DEX_ID, DEX_ID, tileCnt,
-                              IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( DEX_ID - 2 ) ] - 16,
-                              IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( DEX_ID - 2 ) + 1 ] - 16,
-                              32, 32, PokeDexPal, PokeDexTiles, PokeDexTilesLen,
-                              false, false, false, OBJPRIORITY_0, true );
-    tileCnt = IO::loadSprite( BAG_ID, BAG_ID, tileCnt,
-                              IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( BAG_ID - 2 ) ] - 16,
-                              IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 * ( BAG_ID - 2 ) + 1 ] - 16,
-                              32, 32, SPBagPal, SPBagTiles, SPBagTilesLen,
-                              false, false, false, OBJPRIORITY_0, true );
-
-    IO::updateOAM( true );
-}
 void initGraphics( ) {
     IO::vramSetup( );
     videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
@@ -234,22 +158,15 @@ int main( int, char** p_argv ) {
     }
     startScreen( ).run( );
 
-    int HILFSCOUNTER = 252;
-
     FS::SAV->m_hasGDex = true;
     FS::SAV->m_evolveInBattle = true;
-
-
+    
     irqSet( IRQ_VBLANK, [ ]( ) {
         scanKeys( );
         FRAME_COUNT++;
 
         if( ANIMATE_MAP ) {
             //animateMap( ++frame );
-        }
-        if( INIT_MAIN_SPRITES ) {
-            INIT_MAIN_SPRITES = false;
-            initMainSprites( );
         }
         if( !UPDATE_TIME )
             return;
@@ -291,7 +208,7 @@ int main( int, char** p_argv ) {
         IO::boldFont->setColor( oldC1, 1 );
         IO::boldFont->setColor( oldC2, 2 );
     } );
-    IO::drawSub( true );
+    IO::NAV = new IO::nav( );
 
     FADE_TOP( );
     MAP::curMap = new MAP::mapDrawer( );
@@ -320,8 +237,7 @@ int main( int, char** p_argv ) {
                           FS::SAV->m_player.m_pos.m_posX % 32,
                           FS::SAV->m_player.m_pos.m_posY % 32 );
             IO::messageBox m( buffer );
-
-            IO::drawSub( true );
+            IO::NAV->draw( true );
         }
 #endif
 
@@ -339,17 +255,17 @@ int main( int, char** p_argv ) {
                     sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ j ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                     IO::yesNoBox yn;
                     if( yn.getResult( buffer ) ) {
-                        IO::drawSub( );
+                        IO::NAV->draw( );
                         swiWaitForVBlank( );
                         sprintf( buffer, "%ls setzt %s ein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                         IO::messageBox( buffer, 0, false );
                         MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
-                        IO::drawSub( true );
+                        IO::NAV->draw( true );
                         swiWaitForVBlank( );
 
                         AttackList[ a.m_boxdata.m_moves[ j ] ]->use( );
                     }
-                    IO::drawSub( true );
+                    IO::NAV->draw( true );
                     goto OUT;
                 }
             }
@@ -366,7 +282,7 @@ OUT:
                 MAP::curMap->changeMoveMode( MAP::WALK );
             else {
                 IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
-                IO::drawSub( true );
+                IO::NAV->draw( true );
             }
             swiWaitForVBlank( );
             scanKeys( );
@@ -378,7 +294,7 @@ OUT:
                 MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction );
             } else {
                 IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
-                IO::drawSub( true );
+                IO::NAV->draw( true );
             }
             swiWaitForVBlank( );
             scanKeys( );
@@ -411,230 +327,13 @@ OUT:
             stopped = true;
             bmp = false;
         }
-        //StartBag
-        if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 6 ],
-            IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 7 ], 16 ) ) {
-            BAG::bagUI bui;
-            BAG::bagViewer bv( FS::SAV->m_bag, &bui );
-            ANIMATE_MAP = false;
-            UPDATE_TIME = false;
-            INIT_MAIN_SPRITES = false;
 
-            bv.run( FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
-
-            IO::clearScreenConsole( true, true );
-            IO::drawSub( true );
-            UPDATE_TIME = true;
-            FADE_TOP_DARK( );
-            MAP::curMap->draw( );
-            ANIMATE_MAP = true;
-        } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
-                   && ( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ],
-                   IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ], 16 ) ) ) {
-
-            std::vector<pokemon> tmp;
-            for( u8 i = 0; i < 6; ++i )
-                if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                    tmp.push_back( FS::SAV->m_pkmnTeam[ i ] );
-                else
-                    break;
-            STS::regStsScreenUI rsUI( &tmp );
-            STS::regStsScreen sts( 0, &rsUI );
-            ANIMATE_MAP = false;
-
-            sts.run( );
-
-            for( u8 i = 0; i < tmp.size( ); ++i )
-                FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
-
-            IO::clearScreenConsole( true, true );
-            IO::drawSub( true );
-            FADE_TOP_DARK( );
-            MAP::curMap->draw( );
-            ANIMATE_MAP = true;
-        } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ],        //StartDex
-            IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 5 ], 16 ) ) {
-            ANIMATE_MAP = false;
-            dx.run( dui.currPkmn( ) );
-
-            IO::clearScreenConsole( true, true );
-            initMainSprites( );
-            FADE_TOP_DARK( );
-            MAP::curMap->draw( );
-            ANIMATE_MAP = true;
-        } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 8 ],        //StartOptions
-            IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 9 ], 16 ) ) {
-
-
-        } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 ],        //StartID
-            IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 3 ], 16 ) ) {
-
-            const char *someText[ 8 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", "View Boxes A", "View Boxes B" };
-            IO::choiceBox test( 8, &someText[ 0 ], 0, false );
-            int res = test.getResult( "Tokens of god-being..." );
-            IO::drawSub( );
-            switch( res ) {
-                case 0:
-                {
-                    if( !FS::SAV->m_storedPokemon )
-                        FS::SAV->m_storedPokemon = new BOX::box( );
-
-                    for( u8 i = 0; i < 6; ++i )
-                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                            FS::SAV->m_storedPokemon->insert( FS::SAV->m_pkmnTeam[ i ].m_boxdata );
-                    memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
-                    for( int i = 0; i < 6; ++i ) {
-                        pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                        a = pokemon( 0, 133 + i, 0,
-                                     50, FS::SAV->m_id + i, FS::SAV->m_sid, FS::SAV->m_playername,
-                                     !FS::SAV->m_isMale );
-                        a.m_stats.m_acHP *= i / 5.0;
-                        a.m_boxdata.m_experienceGained += 750;
-
-                        //Hand out some ribbons
-                        for( u8 i = 0; i < 4; ++i ) {
-                            a.m_boxdata.m_ribbons0[ i ] = rand( ) % 255;
-                            a.m_boxdata.m_ribbons1[ i ] = rand( ) % 255;
-                            a.m_boxdata.m_ribbons2[ i ] = rand( ) % 255;
-                        }
-                        a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
-                        a.m_boxdata.m_ribbons1[ 3 ] = 0;
-                        a.m_boxdata.m_holdItem = I_CELL_BATTERY + i;
-
-                        FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId - 1 ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId - 1 ) % 8 ) );
-
-                        HILFSCOUNTER = 3 + ( ( HILFSCOUNTER ) % 649 );
-                    }
-                    for( u16 i = 0; i < 649 / 8; ++i )
-                        FS::SAV->m_inDex[ i ] = 255;
-                    FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
-                    FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
-                    FS::SAV->m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
-
-                    swiWaitForVBlank( );
-                    break;
-                }
-                case 1:
-                    if( !FS::SAV->m_bag )
-                        FS::SAV->m_bag = new BAG::bag( );
-                    for( u16 j = 1; j < 637; ++j )
-                        if( ItemList[ j ]->m_itemName != "Null" )
-                            FS::SAV->m_bag->insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
-                    break;
-                case 2: {
-                    item* curr = ItemList[ rand( ) % 638 ];
-                    while( curr->m_itemName == "Null" )
-                        curr = ItemList[ rand( ) % 638 ];
-                    IO::messageBox( curr, 31 );
-                    break;
-                }
-                case 3:{
-                    std::vector<pokemon> tmp, cpy;
-                    for( u8 i = 0; i < 6; ++i )
-                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                            tmp.push_back( FS::SAV->m_pkmnTeam[ i ] );
-                        else
-                            break;
-                    BATTLE::battleTrainer me( "TEST", "", "", "", "", tmp, FS::SAV->m_bag->getBattleItems( ) );
-
-                    for( u8 i = 0; i < 3; ++i ) {
-                        pokemon a( 0, HILFSCOUNTER, 0,
-                                   30, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko", false );
-                        //a.stats.acHP = i*a.stats.maxHP/5;
-                        cpy.push_back( a );
-                        HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
-                    }
-                    std::vector<item> itms;
-                    BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
-                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, itms );
-
-                    BATTLE::battle test_battle( me, opp, 100, 5, BATTLE::battle::DOUBLE );
-                    ANIMATE_MAP = false;
-                    test_battle.start( );
-                    for( u8 i = 0; i < tmp.size( ); ++i )
-                        FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
-                    break;
-                }
-                case 4:{
-                    std::vector<pokemon> tmp, cpy;
-                    for( u8 i = 0; i < 6; ++i )
-                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                            tmp.push_back( FS::SAV->m_pkmnTeam[ i ] );
-                        else
-                            break;
-                    BATTLE::battleTrainer me( "TEST", "", "", "", "", tmp, FS::SAV->m_bag->getBattleItems( ) );
-
-                    for( u8 i = 0; i < 6; ++i ) {
-                        pokemon a( 0, HILFSCOUNTER, 0,
-                                   15, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko", false );
-                        //a.stats.acHP = i*a.stats.maxHP/5;
-                        cpy.push_back( a );
-                        HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
-                    }
-                    std::vector<item> itms;
-                    BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
-                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, itms );
-
-                    BATTLE::battle test_battle( me, opp, 100, 5, BATTLE::battle::SINGLE );
-                    ANIMATE_MAP = false;
-                    test_battle.start( );
-                    for( u8 i = 0; i < tmp.size( ); ++i )
-                        FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
-                    break;
-                }
-                case 5:{
-                    const char *bgNames[ MAXBG ];
-                    for( u8 o = 0; o < MAXBG; ++o )
-                        bgNames[ o ] = IO::BGs[ o ].m_name.c_str( );
-
-                    IO::choiceBox scrnChoice( MAXBG, bgNames, 0, true );
-                    IO::drawSub( scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
-                    break;
-                }
-                case 6: case 7:{
-                    if( !FS::SAV->m_storedPokemon )
-                        FS::SAV->m_storedPokemon = new BOX::box( );
-                    BOX::boxUI bxUI;
-                    BOX::boxViewer bxv( FS::SAV->m_storedPokemon, &bxUI, 0 );
-                    ANIMATE_MAP = false;
-
-                    bxv.run( res % 2 );
-
-                    consoleSelect( &IO::Top );
-                    consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
-                    consoleClear( );
-                    consoleSelect( &IO::Bottom );
-                    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-                    consoleClear( );
-                    break;
-                }
-            }
-            IO::drawSub( true );
-            swiWaitForVBlank( );
-            if( res == 3 || res == 4 || res == 6 || res == 7 ) {
-                FADE_TOP_DARK( );
-                MAP::curMap->draw( );
-            }
-        } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 10 ],  //Start Pokénav
-            IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 11 ], 16 ) ) {
-
-        } else if( touch.px != 0 && touch.py != 0 && GET_AND_WAIT_C( 8, 12, 17 ) ) {
-            IO::yesNoBox Save( "PokéNav " );
-            if( Save.getResult( "Möchtest du deinen\nFortschritt sichern?\n" ) ) {
-                IO::drawSub( );
-                if( gMod == EMULATOR )
-                    IO::messageBox Succ( "Speichern?\nIn einem Emulator?!", "PokéNav" );
-                else if( FS::writeSave( FS::SAV ) )
-                    IO::messageBox Succ( "Fortschritt\nerfolgreich gesichert!", "PokéNav" );
-                else
-                    IO::messageBox Succ( "Es trat ein Fehler auf\nSpiel nicht gesichert.", "PokéNav" );
-            }
-            IO::drawSub( true );
-        }
+        IO::NAV->handleInput( touch );
         //End 
 
         scanKeys( );
     }
     delete MAP::curMap;
+    delete IO::NAV;
     return 0;
 }

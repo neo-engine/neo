@@ -2,6 +2,7 @@
 #include "dex.h"
 #include "uio.h"
 #include "sprite.h"
+#include "nav.h"
 #include "fs.h"
 #include "saveGame.h"
 #include "pokemon.h"
@@ -206,7 +207,7 @@ namespace DEX {
 
         //Redraw the subscreen iff p_newPok
         if( p_newPok ) {
-            IO::drawSub( );
+            IO::NAV->draw( );
 
             IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", ( !( _useInDex ) || IN_DEX( _currPkmn ) ) ? _currPkmn : 0, dexsppos[ 0 ][ 8 ] + 16,
                                 dexsppos[ 1 ][ 8 ] + 16, PKMN_ICON_SUB( 5 ), PKMN_SPRITE_SUB_PAL,

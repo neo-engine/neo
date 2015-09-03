@@ -89,7 +89,7 @@ namespace STS {
                         sprintf( buffer, "%ls setzt %s\nein!", ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_name,
                                  AttackList[ ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
                         IO::messageBox a( buffer );
-                        IO::drawSub( );
+                        IO::NAV->draw( );
 
                         //shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
                         //              (*_pokemon)[_pkmnIdx ].m_boxdata.m_isFemale, (*_pokemon)[_pkmnIdx ].m_boxdata.isShiny( ) );

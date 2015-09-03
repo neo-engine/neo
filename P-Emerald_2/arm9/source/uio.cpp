@@ -8,12 +8,6 @@
 #include "saveGame.h"
 #include "fs.h"
 
-#include "Border.h"
-
-#include "BG1.h"
-#include "BG2.h"
-#include "BG3.h"
-
 namespace IO {
     font* regularFont = new font( REGULAR_FONT::fontData, REGULAR_FONT::fontWidths, REGULAR_FONT::shiftchar );
     font* boldFont = new font( BOLD_FONT::fontData, BOLD_FONT::fontWidths, BOLD_FONT::shiftchar );
@@ -35,29 +29,7 @@ namespace IO {
     int bg2sub;
     int bg3;
     int bg2;
-
-    u8 mainSpritesPositions[ 12 ] = { 24, 64,
-        236, 96,
-        20, 128,
-        238, 64,
-        22, 96,
-        234, 128 };
-    unsigned int NAV_DATA[ 12288 ] = { 0 };
-    unsigned short NAV_DATA_PAL[ 256 ] = { 0 };
-    backgroundSet BGs[ MAXBG ] = {/* { "Raging Gyarados", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Sleeping Eevee", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Mystic Guardevoir", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Waiting Suicune", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Awakening Xerneas", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Awakening Yveltal", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Fighting Groudon", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Fighting Kyogre", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },*/
-        { "Fighting Torchic", BG3Bitmap, BG3Pal, false, false, mainSpritesPositions },
-        { "Reborn Ho-Oh", BG2Bitmap, BG2Pal, false, false, mainSpritesPositions },
-        { "Working Klink", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions },
-        // { "Executing Exeggcute", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions }
-    };
-
+    
     void initVideo( ) {
 
         vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
@@ -106,34 +78,6 @@ namespace IO {
         p_palette[ ( p_start + 7 ) * 16 - 1 ] = RGB15( 24, 24, 24 ); //37 normal white
     }
 
-    void drawBorder( ) {
-        dmaCopy( BorderBitmap, bgGetGfxPtr( bg2sub ), 256 * 192 );
-        dmaCopy( BorderPal, BG_PALETTE_SUB, 64 );
-
-        DRAW_TIME = true;
-    }
-
-    void drawSub( bool p_initMainSrites, u8 p_newIdx ) {
-        if( FS::SAV->m_bgIdx == p_newIdx )
-            return;
-        else if( p_newIdx == u8( 255 ) )
-            p_newIdx = FS::SAV->m_bgIdx;
-
-        if( !BGs[ p_newIdx ].m_loadFromRom ) {
-            dmaCopy( BGs[ p_newIdx ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 192 );
-            dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
-            FS::SAV->m_bgIdx = p_newIdx;
-        } else if( !FS::readNavScreenData( bgGetGfxPtr( bg3sub ), BGs[ p_newIdx ].m_name.c_str( ), p_newIdx ) ) {
-            dmaCopy( BGs[ 0 ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 256 );
-            dmaCopy( BGs[ 0 ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
-            FS::SAV->m_bgIdx = 0;
-        } else
-            FS::SAV->m_bgIdx = p_newIdx;
-        drawBorder( );
-        if( p_initMainSrites )
-            INIT_MAIN_SPRITES = true;
-    }
-
     bool waitForTouchUp( u16 p_targetX1, u16 p_targetY1, u16 p_targetX2, u16 p_targetY2 ) {
         return waitForTouchUp( inputTarget( p_targetX1, p_targetY1, p_targetX2, p_targetY2 ) );
     }
@@ -163,7 +107,6 @@ namespace IO {
         return false;
     }
 
-
     void waitForKeysUp( KEYPAD_BITS p_keys ) {
         return waitForKeysUp( inputTarget( p_keys ) );
     }
@@ -186,8 +129,7 @@ namespace IO {
         }
         return waitForTouchUp( p_inputTarget );
     }
-
-
+    
     void initTextField( ) {
         regularFont->setColor( 0, 0 );
         regularFont->setColor( BLACK_IDX, 1 );

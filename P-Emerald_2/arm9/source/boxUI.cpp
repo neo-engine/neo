@@ -37,7 +37,7 @@ namespace BOX {
 
         bgUpdate( );
 
-        IO::drawSub( );
+        IO::NAV->draw( );
 
         IO::initOAMTable( true );
         u16 nextAvailableTileIdx = 0;
