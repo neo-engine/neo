@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : fs.h
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -43,6 +43,7 @@ namespace FS {
     std::wstring readWString( FILE*, bool p_new = false );
 
     bool exists( const char* p_path, const char* p_name );
+    bool exists( const char* p_path, u16 p_name, bool p_unused );
     bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name = "" );
     FILE* open( const char* p_path, const char* p_name, const char* p_ext = ".raw", const char* p_mode = "r" );
     FILE* open( const char* p_path, u16 p_value, const char* p_ext = ".raw", const char* p_mode = "r" );

@@ -37,6 +37,15 @@ namespace MAP {
             || ( p_l.m_posX == p_r.m_posX && p_l.m_posY == p_r.m_posY && p_l.m_posZ < p_r.m_posZ );
     }
 
+    std::map<u8, std::pair<std::string, u16>> mapInfo = {
+        { 10, { "Hoenn", 0 } },
+        { 1, { "Meteorfälle", 0 } },
+
+        { 110, { "Kanto", 0 } },
+
+        { 210, { "Johto", 0 } },
+    };
+
 #define MAP_POS( p_mapX, p_mapY, p_x, p_y, p_z ) { ( p_mapY ) * 32 + ( p_x ), ( p_mapX ) * 32 + ( p_y ), ( p_z ) }
 #define POS( p_x, p_y, p_z ) { ( p_x ), ( p_y ), ( p_z ) }
 #define WARP( p_map1, p_pos1, p_map2, p_pos2 ) { { p_map1, p_pos1 }, { p_map2, p_pos2 } },\

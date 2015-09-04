@@ -187,16 +187,21 @@ namespace IO {
     void nav::drawMapMug( ) {
         dmaCopy( _Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
         dmaCopy( _Pal, BG_PALETTE_SUB, 192 * 2 );
+
+        // sprintf( buffer, "%hu", _curMap );
+        // FS::readPictureData( bgGetGfxPtr( bg3sub ), "nitro:/PICS/MAPMUGS/", buffer, 512, 49152, true );
+
         BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
         BG_PALETTE_SUB[ GRAY_IDX ] = GRAY;
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
         regularFont->setColor( WHITE_IDX, 1 );
         regularFont->setColor( GRAY_IDX, 2 );
         regularFont->setColor( 0, 0 );
-        regularFont->printString( "Meteorfälle", 244 - regularFont->stringWidth( "Meteorfälle" ), 12, true );
+        regularFont->printString( MAP::mapInfo[ _curMap ].first.c_str( ),
+                                  244 - regularFont->stringWidth( MAP::mapInfo[ _curMap ].first.c_str( ) ), 12, true );
         regularFont->setColor( WHITE_IDX, 2 );
         regularFont->setColor( BLACK_IDX, 1 );
-        regularFont->printString( "Hoenn", 36, 0, true );
+        regularFont->printString( MAP::mapInfo[ _curMap / 100 * 100 + 10 ].first.c_str( ), 36, 0, true );
     }
 
     void nav::draw( bool p_initMainSrites, u8 p_newIdx ) {
@@ -229,12 +234,12 @@ namespace IO {
     void nav::showNewMap( u8 p_newMap ) {
         if( p_newMap == _curMap )
             return;
-        if( p_newMap == 10 ) {
-            _state = HOME;
+        if( p_newMap % 100 == 10 ) {
+            _state = MAP;
             _curMap = p_newMap;
             draw( true );
         } else
-            if( true || FS::exists( "FSROOT:/", " " ) ) {
+            if( true || FS::exists( "nitro:/PICS/MAPMUGS/", _curMap, false ) ) {
                 _power = true;
                 _state = MAP_MUG;
                 _curMap = p_newMap;
