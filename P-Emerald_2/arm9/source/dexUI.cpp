@@ -112,47 +112,47 @@ namespace DEX {
             || data.m_types[ 0 ] == BODEN
             || data.m_types[ 0 ] == EIS )
             IO::boldFont->setColor( BLACK_IDX, 2 );
-        auto formes = getAllFormes( _currPkmn );
+
         //IO::boldFont->setColor( WHITE_IDX, 2 );
         //IO::boldFont->setColor( COLOR_IDX, 2 );
 
         u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 10, 64,
                                           PKMN_SPRITE_START( 0 ), 0, 0, false, false, p_hasGenderDifference && ( _currForme % 2 ), true );
-        if( !formes.empty( ) )
+        if( data.m_formecnt )
             IO::boldFont->printString( p_formeName.c_str( ), 5, 167, false );
         else if( p_hasGenderDifference && ( _currForme % 2 ) )
             IO::boldFont->printString( "weiblich", 20, 167, false );
         else if( p_hasGenderDifference )
             IO::boldFont->printString( "männlich", 20, 167, false );
         else
-            IO::boldFont->printString( getDisplayName( _currPkmn ), 10, 167, false );
+            IO::boldFont->printString( getWDisplayName( _currPkmn ), 10, 167, false );
 
         tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 110, 64,
                                       PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true, p_hasGenderDifference && ( _currForme % 2 ) );
-        if( !formes.empty( ) )
+        if( data.m_formecnt )
             IO::boldFont->printString( p_formeName.c_str( ), 110, 160, false );
         else if( p_hasGenderDifference && ( _currForme % 2 ) )
             IO::boldFont->printString( "weiblich", 130, 160, false );
         else if( p_hasGenderDifference )
             IO::boldFont->printString( "männlich", 130, 160, false );
         else
-            IO::boldFont->printString( getDisplayName( _currPkmn ), 110, 160, false );
+            IO::boldFont->printString( getWDisplayName( _currPkmn ), 110, 160, false );
         IO::boldFont->printString( "(schillernd)", 110, 176, false );
 
         //Load Icons of the other formes ( max 4 )
-        if( formes.empty( ) ) {
+        if( !data.m_formecnt ) {
             for( u8 i = PKMN_SPRITE_START( 3 ); i <= PKMN_SPRITE_START( 4 ); ++i )
                 IO::OamTop->oamBuffer[ i ].isHidden = true;
             IO::updateOAM( false );
             return;
         }
-        u8 currpos = ( _currForme / ( 1 + p_hasGenderDifference ) ) % formes.size( );
+        u8 currpos = ( _currForme / ( 1 + p_hasGenderDifference ) ) % data.m_formecnt;
         tileCnt = IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 3 ) ].gfxIndex;
-        for( u8 i = 0; i < std::min( 4u, formes.size( ) - 1 ); ++i ) {
-            currpos = ( currpos + 1 ) % formes.size( );
-            tileCnt = IO::loadPKMNIcon( formes[ currpos ], 210, 150 - 35 * i, PKMN_SPRITE_START( 3 ) + i, 5 + i, tileCnt, false );
+        for( u8 i = 0; i < u16( std::min( 4, data.m_formecnt - 1 ) ); ++i ) {
+            currpos = ( currpos + 1 ) % data.m_formecnt;
+            tileCnt = IO::loadPKMNIcon( data.m_formeIdx[ currpos ], 210, 150 - 35 * i, PKMN_SPRITE_START( 3 ) + i, 5 + i, tileCnt, false );
         }
-        for( u8 i = std::min( 4u, formes.size( ) ); i < 4u; ++i )
+        for( u8 i = std::min( u16( 4 ), data.m_formecnt ); i < 4u; ++i )
             IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 3 ) + i ].isHidden = true;
         IO::updateOAM( false );
     }
@@ -174,8 +174,9 @@ namespace DEX {
         IO::regularFont->setColor( WHITE_IDX, 0 );
         IO::regularFont->setColor( WHITE_IDX, 1 );
         IO::regularFont->setColor( WHITE_IDX, 2 );
-        sprintf( buffer, "%s", getDisplayName( oldPkmn ) );
-        sprintf( buffer, "%s - %s", buffer, getSpecies( oldPkmn ) );
+        pokemonData data3; getAll( oldPkmn, data3 );
+        sprintf( buffer, "%s", data3.m_displayName );
+        sprintf( buffer, "%s - %s", buffer, data3.m_species );
         IO::regularFont->printString( std::string( 52, ' ' ).c_str( ), 36, 20, false );
 
         IO::regularFont->setColor( COLOR_IDX, 0 );
@@ -265,10 +266,21 @@ namespace DEX {
         if( _currPage != 1 ) {
             if( !( _useInDex ) || IN_DEX( _currPkmn ) ) {
                 BG_PALETTE[ 0 ] = IO::getColor( data.m_types[ 0 ] );
+                sprintf( buffer, "%s", data.m_displayName );
+                sprintf( buffer, "%s - %s", buffer, data.m_species );
+                IO::regularFont->printString( buffer, 36, 20, false );
+                if( !_currPage ) {
+                    consoleSetWindow( &IO::Top, 1, 16, 30, 24 );
+                    printf( "%s", data.m_dexEntry );
+                    consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+                }
 
                 _currForme %= data.m_formecnt ? ( ( isFixed ? 1 : 2 ) * data.m_formecnt ) : ( isFixed ? 1 : 2 );
 
-                newformepkmn = data.m_formecnt ? getForme( _currPkmn, _currForme / ( isFixed ? 1 : 2 ), formeName ) : _currPkmn;
+                newformepkmn = data.m_formecnt ? data.m_formeIdx[ _currForme / ( isFixed ? 1 : 2 ) ] : _currPkmn;
+                sprintf( buffer, "%s", data.m_formecnt ? data.m_formeName[ _currForme / ( isFixed ? 1 : 2 ) ] : data.m_displayName );
+                formeName = std::string( buffer );
+
                 if( data.m_formecnt )
                     getAll( newformepkmn, data );
 
@@ -284,13 +296,11 @@ namespace DEX {
                 } else
                     IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 2 ].isHidden = true;
                 printf( "\n    Du hast ?? dieser Pok\x82""mon.\n\n" );
-                sprintf( buffer, "%s", getDisplayName( _currPkmn ) );
-                sprintf( buffer, "%s - %s", buffer, getSpecies( _currPkmn ) );
-                IO::regularFont->printString( buffer, 36, 20, false );
                 printf( "\n\n %03i", _currPkmn );
             } else {
+                getAll( 0, data );
                 printf( "\n    Keine Daten vorhanden.\n\n" );
-                sprintf( buffer, "???????????? - %s", getSpecies( 0 ) );
+                sprintf( buffer, "???????????? - %s", data.m_species );
                 IO::regularFont->printString( buffer, 36, 20, false );
                 printf( "\n\n %03i", _currPkmn );
             }
@@ -310,8 +320,6 @@ namespace DEX {
                     IO::regularFont->printString( buffer, 10, 109, false );
                     sprintf( buffer, "GR.  %6.1fm", data.m_size / 10.0 );
                     IO::regularFont->printString( buffer, 100, 109, false );
-                    consoleSetWindow( &IO::Top, 1, 16, 30, 24 );
-                    printf( getDexEntry( _currPkmn ) );
                 } else {
                     printf( "\n\n  KP   ANG  DEF  SAN  SDF  INT\n\n\n\n\n\n\n\n\n" );
                     sprintf( buffer, "GW.  ???.?kg" );
@@ -319,7 +327,7 @@ namespace DEX {
                     sprintf( buffer, "GR.  ???.?m" );
                     IO::regularFont->printString( buffer, 100, 109, false );
                     consoleSetWindow( &IO::Top, 1, 16, 30, 24 );
-                    printf( getDexEntry( 0 ) );
+                    printf( "%s", data.m_dexEntry );
                 }
                 break;
             }

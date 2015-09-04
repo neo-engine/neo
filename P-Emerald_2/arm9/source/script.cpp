@@ -52,32 +52,25 @@ namespace BATTLE {
     u8 targetVal;
     int getTargetSpecifierValue( const battle& p_battle, const pokemon& p_target, bool p_targetIsOpp,
                                  u8 p_targetPosition, const battleScript::command::targetSpecifier& p_targetSpecifier ) {
+        pokemonData data; getAll( p_target.m_boxdata.m_speciesId, data );
         switch( p_targetSpecifier ) {
             case BATTLE::battleScript::command::PKMN_TYPE1:
-                return int( getType( p_target.m_boxdata.m_speciesId, 0 ) );
+                return int( data.m_types[ 0 ] );
             case BATTLE::battleScript::command::PKMN_TYPE2:
-                return int( getType( p_target.m_boxdata.m_speciesId, 1 ) );
+                return int( data.m_types[ 1 ] );
             case BATTLE::battleScript::command::PKMN_TYPE1o2:
             {
-                int a = int( getType( p_target.m_boxdata.m_speciesId, 1 ) );
+                int a = int( data.m_types[ 1 ] );
                 if( targetVal == a )
                     return a;
                 else
-                    return int( getType( p_target.m_boxdata.m_speciesId, 0 ) );
+                    return int( data.m_types[ 0 ] );
                 break;
             }
             case BATTLE::battleScript::command::PKMN_SIZE:
-            {
-                pokemonData pd;
-                getAll( p_target.m_boxdata.m_speciesId, pd );
-                return int( pd.m_size );
-            }
+                return int( data.m_size );
             case BATTLE::battleScript::command::PKMN_WEIGHT:
-            {
-                pokemonData pd;
-                getAll( p_target.m_boxdata.m_speciesId, pd );
-                return int( pd.m_weight );
-            }
+                return int( data.m_weight );
             case BATTLE::battleScript::command::PKMN_SPECIES:
                 return p_target.m_boxdata.m_speciesId;
             case BATTLE::battleScript::command::PKMN_ITEM:

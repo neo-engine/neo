@@ -27,20 +27,15 @@
 
 
 
-#include <string>
-#include <cstdio>
-#include <fat.h>
-#include <dirent.h>
 #include <nds.h>
-#include <fcntl.h>
-#include <unistd.h>
 
 #include "saveGame.h"
+#include "fs.h"
 //#include "Gen.h"
 
 namespace FS {
-    std::string sav_nam = "./p_smaragd_2.sav";
-    std::string sav_nam_2 = "./p_smaragd_2.gba.sav";
+    const char* sav_nam = "p_smaragd_2";
+    const char* sav_nam_2 = "p_smaragd_2.gba";
     SavMod savMod = _NDS;
     saveGame* SAV;
 
@@ -50,11 +45,11 @@ namespace FS {
 
         for( u8 i = 0; i < 5; ++i ) {
             size_t sz;
-            fread( &sz, sizeof( size_t ), 1, p_file );
+            read( p_file, &sz, sizeof( size_t ), 1 );
             for( size_t j = 0; j < sz; ++j ) {
                 std::pair<u16, u16> ac;
-                fread( &ac.first, sizeof( u16 ), 1, p_file );
-                fread( &ac.second, sizeof( u16 ), 1, p_file );
+                read( p_file, &ac.first, sizeof( u16 ), 1 );
+                read( p_file, &ac.second, sizeof( u16 ), 1 );
                 result->insert( BAG::bag::bagType( i ), ac.first, ac.second );
             }
         }
@@ -63,45 +58,44 @@ namespace FS {
     }
 
     saveGame* readSave( ) {
-        FILE* f = fopen( sav_nam.c_str( ), "rb" );
-
+        FILE* f = open( "./", sav_nam, ".sav" );
         if( !f )
             return 0;
 
         saveGame* result = new saveGame( );
-        fread( result, sizeof( saveGame ), 1, f );
+        read( f, result, sizeof( saveGame ), 1 );
         result->m_bag = readBag( f );
         if( !result->m_bag )
             result->m_bag = new BAG::bag( );
 
-        fclose( f );
+        close( f );
         return result;
     }
 
-    bool writeBag( BAG::bag* p_bag, FILE* p_file ) {
+    bool writeBag( FILE* p_file, BAG::bag* p_bag ) {
         if( !p_bag )
             return false;
 
         for( u8 i = 0; i < 5; ++i ) {
             auto bg = p_bag->element( BAG::bag::bagType( i ) );
             auto sz = bg.size( );
-            fwrite( &sz, sizeof( size_t ), 1, p_file );
+            write( p_file, &sz, sizeof( size_t ), 1 );
             for( auto j : bg ) {
-                fwrite( &j.first, sizeof( u16 ), 1, p_file );
-                fwrite( &j.second, sizeof( u16 ), 1, p_file );
+                write( p_file, &j.first, sizeof( u16 ), 1 );
+                write( p_file, &j.second, sizeof( u16 ), 1 );
             }
         }
         return true;
     }
 
     bool writeSave( saveGame* p_saveGame ) {
-        FILE* f = fopen( sav_nam.c_str( ), "wb" );
+        FILE* f = open( "./", sav_nam, ".sav", "w" );
         if( !f )
             return 0;
-        fwrite( p_saveGame, sizeof( saveGame ), 1, f );
-        writeBag( p_saveGame->m_bag, f );
+        write( f, p_saveGame, sizeof( saveGame ), 1 );
+        writeBag( f, p_saveGame->m_bag );
 
-        fclose( f );
+        close( f );
         return true;
     }
 

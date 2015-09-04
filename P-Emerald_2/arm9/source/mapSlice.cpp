@@ -69,19 +69,28 @@ namespace MAP {
         res->m_y = p_y;
 
         u8 tsidx1, tsidx2;
-        fread( &tsidx1, sizeof( u8 ), 1, mapF );
+        FS::read( mapF, &tsidx1, sizeof( u8 ), 1 );
         FS::readNop( mapF, 3 );
-        fread( &tsidx2, sizeof( u8 ), 1, mapF );
+        FS::read( mapF, &tsidx2, sizeof( u8 ), 1 );
         FS::readNop( mapF, 3 );
 
         u8 b1, b2;
-        fread( &b1, sizeof( u8 ), 1, mapF );
-        fread( &b2, sizeof( u8 ), 1, mapF );
+        FS::read( mapF, &b1, sizeof( u8 ), 1 );
+        FS::read( mapF, &b2, sizeof( u8 ), 1 );
         FS::readNop( mapF, 2 );
 
-        fread( res->m_blocks, sizeof( mapBlockAtom ), b1 * b2, mapF ); //Border blocks
+        FS::read( mapF, res->m_blocks, sizeof( mapBlockAtom ), b1 * b2 ); //Border blocks
 
-        fread( res->m_blocks, sizeof( mapBlockAtom ), SIZE * SIZE, mapF );
+        FS::read( mapF, res->m_blocks, sizeof( mapBlockAtom ), SIZE * SIZE );
+        FS::close( mapF );
+
+        //Read the wild Pkoemon data
+        mapF = FS::open( MAP_PATH,
+                         ( toString( p_map )
+                         + "/" + toString( p_y )
+                         + "_" + toString( p_x ) ).c_str( ),
+                         ".enc" );
+        FS::read( mapF, res->m_pokemon, sizeof( res->m_pokemon ), 1 );
         FS::close( mapF );
 
         //Read the first tileset

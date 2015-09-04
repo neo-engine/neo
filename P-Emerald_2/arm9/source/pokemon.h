@@ -142,27 +142,16 @@ struct pokemonData {
         }m_e;
         s16 m_evolveData[ 15 ];
     }               m_evolutions[ 7 ];
-    u8              m_displayName[ 15 ];
-    u8              m_species[ 50 ];
-    u8              m_dexEntry[ 200 ];
+    char            m_displayName[ 15 ];
+    char            m_species[ 50 ];
+    char            m_dexEntry[ 200 ];
 
     u16             m_formeIdx[ 30 ];
-    u8              m_formeName[ 30 ][ 15 ];
+    char            m_formeName[ 30 ][ 15 ];
 };
 
-
-Type            getType( u16 p_pkmnId, u16 p_type );
-u16             getBase( u16 p_pkmnId, u16 p_base );
-u16             getCatchRate( u16 p_pkmnId );
-const char*     getDisplayName( u16 p_pkmnId );
 const wchar_t*  getWDisplayName( u16 p_pkmnId );
 void            getWDisplayName( u16 p_pkmnId, wchar_t* p_name );
-void            getHoldItems( u16 p_pkmnId, u16* p_items );
-pkmnGenderType  getGenderType( u16 p_pkmnId );
-const char*     getSpecies( u16 p_pkmnId );
-const char*     getDexEntry( u16 p_pkmnId );
-u16             getForme( u16 p_pkmnId, u16 p_formeId, std::string& p_formeName );
-std::vector<u16> getAllFormes( u16 p_pkmnId );
 bool            getAll( u16 p_pkmnId, pokemonData& out );
 
 void            getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num, u16* p_res );

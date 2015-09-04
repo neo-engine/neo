@@ -220,7 +220,7 @@ namespace STS {
 
                 sprintf( buffer, "%ls", ( *_pokemon )[ i ].m_boxdata.m_name );
                 IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 - mval, false );
-                sprintf( buffer, "%s", getDisplayName( ( *_pokemon )[ i ].m_boxdata.m_speciesId ) );
+                sprintf( buffer, "%ls", getWDisplayName( ( *_pokemon )[ i ].m_boxdata.m_speciesId ) );
                 IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
                 IO::regularFont->setColor( 142 + 2 * i, 2 );
@@ -345,7 +345,7 @@ namespace STS {
             IO::regularFont->setColor( WHITE_IDX, 1 );
 
             getAll( p_pokemon.m_boxdata.m_speciesId, data );
-            IO::regularFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 160, 16, false );
+            IO::regularFont->printString( data.m_displayName, 160, 16, false );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::regularFont->printString( "Item", 2, 176, false );

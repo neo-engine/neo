@@ -1168,7 +1168,7 @@ END:
             }
             IO::regularFont->setColor( WHITE_IDX, 1 );
 
-            IO::regularFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
+            IO::regularFont->printString( getWDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),

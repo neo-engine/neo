@@ -746,8 +746,8 @@ OUT:
         _critical[ p_targetPos ][ p_targetIsOpp ] = !( rand( ) % mod );
         //STAB
         float STAB = 1.0f;
-        if( getType( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_speciesId, 0 ) == move->m_moveType
-            || getType( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_speciesId, 1 ) == move->m_moveType )
+        pokemonData pdata; getAll( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_speciesId, pdata );
+        if( pdata.m_types[ 0 ] == move->m_moveType || pdata.m_types[ 1 ] == move->m_moveType )
             STAB = 1.5f;
         if( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_ADAPTABILITY )
             STAB = 2.0f;
@@ -1534,7 +1534,7 @@ NEXT:
             acPkmn.evolve( );
             _battleUI->evolvePKMN( p_opponent, p_pokemonPos );
 
-            std::swprintf( wbuffer, 50, L"und wurde zu einem %ls![A]", getDisplayName( acPkmn.m_boxdata.m_speciesId ) );
+            std::swprintf( wbuffer, 50, L"und wurde zu einem %ls![A]", getWDisplayName( acPkmn.m_boxdata.m_speciesId ) );
             log( wbuffer );
         }
     }

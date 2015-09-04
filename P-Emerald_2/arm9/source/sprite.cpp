@@ -346,12 +346,12 @@ namespace IO {
                       const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt ) {
 
         FILE* f = FS::open( p_path, p_picnum, ".rsd" );
-        fread( TEMP_PAL, sizeof( unsigned short ), 16, f );
+        FS::read( f, TEMP_PAL, sizeof( unsigned short ), 16 );
         u8 frameCount, width, height;
-        fread( &frameCount, sizeof( u8 ), 1, f );
-        fread( &width, sizeof( u8 ), 1, f );
-        fread( &height, sizeof( u8 ), 1, f );
-        fread( TEMP, sizeof( unsigned int ), width * height * frameCount / 8, f );
+        FS::read( f, &frameCount, sizeof( u8 ), 1 );
+        FS::read( f, &width, sizeof( u8 ), 1 );
+        FS::read( f, &height, sizeof( u8 ), 1 );
+        FS::read( f, TEMP, sizeof( unsigned int ), width * height * frameCount / 8 );
         FS::close( f );
 
         return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, width, height, TEMP_PAL,

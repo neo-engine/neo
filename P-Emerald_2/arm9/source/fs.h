@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : fs.h
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -47,6 +47,8 @@ namespace FS {
     FILE* open( const char* p_path, const char* p_name, const char* p_ext = ".raw", const char* p_mode = "r" );
     FILE* open( const char* p_path, u16 p_value, const char* p_ext = ".raw", const char* p_mode = "r" );
     void close( FILE* p_file );
+    size_t read( FILE* p_stream, void* p_buffer, size_t p_size, size_t p_count );
+    size_t write( FILE* p_stream, const void* p_buffer, size_t p_size, size_t p_count );
 
     // No, I'm absolutely not aware of templates.
     bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt, unsigned short* p_data );
