@@ -109,6 +109,8 @@ namespace FS {
     void saveGame::stepIncrease( ) {
         static u8 stepCnt = 0;
         stepCnt++;
+        if( m_repelSteps )
+            m_repelSteps--;
         if( !stepCnt ) {
             bool hasHatchSpdUp = m_bag->count( BAG::toBagType( item::itemType::KEY_ITEM ), I_OVAL_CHARM );
             for( size_t s = 0; s < 6; ++s ) {
@@ -137,5 +139,20 @@ namespace FS {
                     ac.m_boxdata.m_steps = std::min( 255, ac.m_boxdata.m_steps + 1 + ( ac.m_boxdata.m_holdItem == I_CLEAR_BELL ) );
             }
         }
+    }
+
+    u8 saveGame::getEncounterLevel( u8 p_tier ) {
+        u8 mxlv = 0;
+        for( u8 i = 0; i < 6; ++i ) {
+            if( !m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                break;
+            mxlv = std::max( mxlv, m_pkmnTeam[ i ].m_Level );
+        }
+        if( !mxlv || m_repelSteps )
+            return 0;
+        mxlv = std::min( 93, mxlv + 6 );
+        mxlv = std::min( 5 * getBadgeCount( ) + 8, mxlv + 0 );
+
+        return mxlv + ( rand( ) % ( 2 * ( p_tier + 1 ) ) - p_tier - 1 );
     }
 }

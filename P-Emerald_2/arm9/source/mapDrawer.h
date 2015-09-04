@@ -42,7 +42,6 @@ namespace MAP {
             GRASS,
             HIGH_GRASS,
             WATER,
-            CAVE_WALK,
             FISHING_ROD
         };
         enum mapWeather {

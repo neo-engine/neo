@@ -3,11 +3,11 @@
     ------------------------------
 
     file        : saveGame.h
-    author      : Philip Wellnitz 
+    author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
     Copyright (C) 2012 - 2015
-    Philip Wellnitz 
+    Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
 
@@ -56,9 +56,9 @@ namespace FS {
 
             }       m_pt;
         };
-        u8          m_HOENN_Badges : 3;
-        u8          m_KANTO_Badges : 3;
-        u8          m_JOHTO_Badges : 3;
+        u8          m_HOENN_Badges;
+        u8          m_KANTO_Badges;
+        u8          m_JOHTO_Badges;
         u8          m_savTyp : 3;
         u8          m_inDex[ 1 + MAX_PKMN / 8 ];
         u32         m_money;
@@ -67,6 +67,8 @@ namespace FS {
         BAG::bag*   m_bag; //Be VERY CAREFUL when deleting savegames or when just using them!
         u8          m_lstBag;
         u8          m_lstBagItem;
+
+        u8          m_repelSteps;
 
         pokemon     m_pkmnTeam[ 6 ];
 
@@ -92,6 +94,16 @@ namespace FS {
             return;
         }
         void        stepIncrease( );
+        u8          getEncounterLevel( u8 p_tier );
+        u8          getBadgeCount( ) {
+            u8 cnt = 0;
+            for( u8 i = 0; i < 8; ++i ) {
+                cnt += !!( m_HOENN_Badges & ( 1 << i ) );
+                cnt += !!( m_KANTO_Badges & ( 1 << i ) );
+                cnt += !!( m_JOHTO_Badges & ( 1 << i ) );
+            }
+            return cnt;
+        }
     };
 
     saveGame* readSave( );

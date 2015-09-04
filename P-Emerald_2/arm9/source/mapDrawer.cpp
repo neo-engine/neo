@@ -178,7 +178,7 @@ namespace MAP {
         else if( behave == 0x03 )
             handleWildPkmn( HIGH_GRASS );
         else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
-            handleWildPkmn( CAVE_WALK );
+            handleWildPkmn( GRASS );
     }
 
     void mapDrawer::loadNewRow( direction p_direction, bool p_updatePlayer ) {
@@ -296,7 +296,38 @@ namespace MAP {
         warpPlayer( p_type, target );
     }
     void mapDrawer::handleWildPkmn( wildPkmnType p_type ) {
-        (void)p_type;
+
+        u8 rn = rand( );
+        if( p_type == FISHING_ROD )
+            rn /= 4;
+
+        u8 tier;
+        if( rn < 2 ) tier = 4;
+        else if( rn < 6 ) tier = 3;
+        else if( rn < 14 ) tier = 2;
+        else if( rn < 26 ) tier = 1;
+        else tier = 0;
+        u8 level = FS::SAV->getEncounterLevel( tier );
+
+        if( rn > 40 || !level ) {
+            if( p_type == FISHING_ROD ) {
+                IO::messageBox m( "Es war doch nur eine Dose..." );
+                IO::drawSub( true );
+            }
+            return;
+        }
+        if( p_type == FISHING_ROD ) {
+            IO::messageBox m( "Du hast ein Pokémon geangelt!" );
+            IO::drawSub( true );
+        }
+
+        u8 arridx = p_type * 15 + tier;
+        while( level > CUR_SLICE->m_pokemon[ arridx ].second && ( arridx + 1 ) % 3 )
+            ++arridx;
+
+        sprintf( buffer, "Tier %hhu\nLevel %hhu\nPokémon ", tier, level );
+        IO::messageBox m( buffer );
+        IO::drawSub( true );
     }
     void mapDrawer::handleTrainer( ) { }
 
@@ -451,7 +482,7 @@ namespace MAP {
         if( FS::SAV->m_player.m_movement != moveMode::WALK )
             p_fast = false; //Running is only possible when the player is actually walking
 
-        bool reinit = false, moving = true;
+        bool reinit = false, moving = true, hadjump = false;
         while( moving ) {
             if( newMoveData == MAP_BORDER ) {
                 fastBike = false;
@@ -502,26 +533,40 @@ namespace MAP {
             switch( newBehave ) {
                 //First check for jumps
                 case 0x38:
+                    if( hadjump )
+                        goto NO_BREAK;
+                    hadjump = true;
                     jumpPlayer( RIGHT ); p_direction = RIGHT;
                     break;
                 case 0x39:
+                    if( hadjump )
+                        goto NO_BREAK;
+                    hadjump = true;
                     jumpPlayer( LEFT ); p_direction = LEFT;
                     break;
                 case 0x3a:
+                    if( hadjump )
+                        goto NO_BREAK;
+                    hadjump = true;
                     jumpPlayer( UP ); p_direction = UP;
                     break;
                 case 0x3b:
+                    if( hadjump )
+                        goto NO_BREAK;
+                    hadjump = true;
                     jumpPlayer( DOWN ); p_direction = DOWN;
                     break;
                     //Warpy stuff
                 case 0x60:
                     walkPlayer( p_direction, p_fast );
                     handleWarp( NO_SPECIAL );
+                    hadjump = false;
                     break;
                 case 0x62:
                     if( p_direction == RIGHT ) {
                         walkPlayer( p_direction, p_fast );
                         handleWarp( NO_SPECIAL );
+                        hadjump = false;
                         break;
                     }
                     goto NO_BREAK;
@@ -529,6 +574,7 @@ namespace MAP {
                     if( p_direction == LEFT ) {
                         walkPlayer( p_direction, p_fast );
                         handleWarp( NO_SPECIAL );
+                        hadjump = false;
                         break;
                     }
                     goto NO_BREAK;
@@ -536,6 +582,7 @@ namespace MAP {
                     if( p_direction == UP ) {
                         walkPlayer( p_direction, p_fast );
                         handleWarp( NO_SPECIAL );
+                        hadjump = false;
                         break;
                     }
                     goto NO_BREAK;
@@ -543,12 +590,14 @@ namespace MAP {
                     if( p_direction == DOWN ) {
                         walkPlayer( p_direction, p_fast );
                         handleWarp( NO_SPECIAL );
+                        hadjump = false;
                         break;
                     }
                     goto NO_BREAK;
 NO_BREAK:
                 default:
                     //If no jump has to be done, check for other stuff
+                    hadjump = false;
                     switch( lstBehave ) {
                         case 0x20: case 0x48:
                             slidePlayer( p_direction );
@@ -1024,7 +1073,8 @@ NEXT_PASS:
     bool mapDrawer::canFish( position p_start,
                              direction p_direction ) {
         return atom( p_start.m_posX + dir[ p_direction ][ 0 ],
-                     p_start.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x04;
+                     p_start.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x04
+                     && atom( p_start.m_posX, p_start.m_posY ).m_movedata != 0x3c;
     }
     void mapDrawer::fishPlayer( direction p_direction ) {
         u8 basePic = FS::SAV->m_player.m_picNum / 10 * 10;
