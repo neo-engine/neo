@@ -755,10 +755,10 @@ SHOW_ATTACK:
                 clearLogScreen( );
                 result.m_type = battle::battleMove::RUN;
                 if( _battle->run( ) ) {
-                    _battle->log( L"Du entkommst...[A]" );
+                    _battle->log( L"Du bist entkommen.[A]" );
                     return true;
                 } else
-                    _battle->log( L"Flucht gescheitert![A]" );
+                    _battle->log( L"Flucht gescheitert...[A]" );
                 if( result.m_value ) {
                     loadA( );
                     return true;

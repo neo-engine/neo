@@ -209,6 +209,8 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
     getAll( p_pkmnId, data );
     srand( LastPID );
     LastPID = m_pid = rand( );
+    m_oTId = FS::SAV->m_id;
+    m_oTSid = FS::SAV->m_sid;
     if( p_shiny == 2 )
         while( !isShiny( ) )
             LastPID = m_pid = rand( );
@@ -232,8 +234,6 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
             m_holdItem = 0;
     }
 
-    m_oTId = FS::SAV->m_id;
-    m_oTSid = FS::SAV->m_sid;
 
     if( !p_isEgg )
         m_experienceGained = EXP[ p_level - 1 ][ data.m_expType ];
@@ -334,6 +334,8 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
     getAll( p_pkmnId, data );
 
     srand( LastPID );
+    m_oTId = p_id;
+    m_oTSid = p_sid;
     LastPID = m_pid = rand( );
     if( p_shiny )
         while( !isShiny( ) )
@@ -358,8 +360,6 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
             m_holdItem = 0;
     }
 
-    m_oTId = p_id;
-    m_oTSid = p_sid;
     if( !p_isEgg )
         m_experienceGained = EXP[ p_level - 1 ][ data.m_expType ];
     else

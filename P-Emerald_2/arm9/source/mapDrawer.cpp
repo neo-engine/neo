@@ -159,6 +159,13 @@ namespace MAP {
         _spritePos[ FS::SAV->m_player.m_id ] = 0;
         _entriesUsed |= ( 1 << 0 );
         changeMoveMode( FS::SAV->m_player.m_movement );
+        if( FS::SAV->m_player.m_movement == SURF ) {
+            surfPlatform.m_id = 1;
+            _spritePos[ surfPlatform.m_id ] = 1;
+            _sprites[ _spritePos[ surfPlatform.m_id ] ] = surfPlatform.show( 128 - 16, 96 - 20, 1, 1, 192 );
+            _entriesUsed |= ( 1 << 1 );
+            _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame( getFrame( FS::SAV->m_player.m_direction ) );
+        }
     }
 
     void mapDrawer::drawObjects( ) {
@@ -301,9 +308,9 @@ namespace MAP {
     }
     void mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType ) {
 
-        u8 rn = rand( );
+        u16 rn = rand( ) % 512;
         if( p_type == FISHING_ROD )
-            rn /= 4;
+            rn /= 8;
 
         u8 tier;
         if( rn < 2 ) tier = 4;
@@ -334,8 +341,9 @@ namespace MAP {
 
         pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level, 0, 2 );
         BATTLE::battle( FS::SAV->getBattleTrainer( ), &wildPkmn, BATTLE::battle::weather::NO_WEATHER, 0 ).start( );
-        IO::drawSub( true );
+        FADE_TOP_DARK( );
         draw( );
+        IO::drawSub( true );
     }
     void mapDrawer::handleTrainer( ) { }
 
@@ -1164,14 +1172,14 @@ OUT:
             for( u8 j = 0; j < 5; ++j )
                 swiWaitForVBlank( );
         }
-        u16 tile = IO::loadSprite( 120, 0, 0, 64, 32, 64, 64, BigCirc1Pal,
+        u16 tile = IO::loadSprite( 124, 0, 0, 64, 32, 64, 64, BigCirc1Pal,
                                    BigCirc1Tiles, BigCirc1TilesLen, false, false, false, OBJPRIORITY_1, false );
-        IO::loadSprite( 121, 0, 0, 128, 32, 64, 64, 0, 0, 0, false, true, false, OBJPRIORITY_1, false );
-        IO::loadSprite( 122, 0, 0, 64, 96, 64, 64, 0, 0, 0, true, false, false, OBJPRIORITY_1, false );
-        IO::loadSprite( 123, 0, 0, 128, 96, 64, 64, 0, 0, 0, true, true, false, OBJPRIORITY_1, false );
+        IO::loadSprite( 125, 0, 0, 128, 32, 64, 64, 0, 0, 0, false, true, false, OBJPRIORITY_1, false );
+        IO::loadSprite( 126, 0, 0, 64, 96, 64, 64, 0, 0, 0, true, false, false, OBJPRIORITY_1, false );
+        IO::loadSprite( 127, 0, 0, 128, 96, 64, 64, 0, 0, 0, true, true, false, OBJPRIORITY_1, false );
 
-        if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 124, 1, tile, false, p_shiny, p_female ) )
-            IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 124, 1, tile, false, p_shiny, !p_female );
+        if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 120, 1, tile, false, p_shiny, p_female ) )
+            IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 120, 1, tile, false, p_shiny, !p_female );
         IO::updateOAM( false );
         for( u8 i = 0; i < 75; ++i )
             swiWaitForVBlank( );
