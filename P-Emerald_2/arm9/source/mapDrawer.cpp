@@ -166,19 +166,8 @@ namespace MAP {
     }
 
     void mapDrawer::animateField( u16 p_globX, u16 p_globY ) {
-        u8 moveData = atom( p_globX, p_globY ).m_movedata;
-        u8 behave = at( p_globX, p_globY ).m_bottombehave;
-
-
-        //handle Pkmn stuff
-        if( moveData == 0x04 && behave != 0x13 )
-            handleWildPkmn( WATER );
-        else if( behave == 0x02 )
-            handleWildPkmn( GRASS );
-        else if( behave == 0x03 )
-            handleWildPkmn( HIGH_GRASS );
-        else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
-            handleWildPkmn( GRASS );
+        (void)p_globX;
+        (void)p_globY;
     }
 
     void mapDrawer::loadNewRow( direction p_direction, bool p_updatePlayer ) {
@@ -295,7 +284,22 @@ namespace MAP {
 
         warpPlayer( p_type, target );
     }
-    void mapDrawer::handleWildPkmn( wildPkmnType p_type ) {
+    void mapDrawer::handleWildPkmn( u16 p_globX, u16 p_globY ) {
+        u8 moveData = atom( p_globX, p_globY ).m_movedata;
+        u8 behave = at( p_globX, p_globY ).m_bottombehave;
+
+
+        //handle Pkmn stuff
+        if( moveData == 0x04 && behave != 0x13 )
+            handleWildPkmn( WATER );
+        else if( behave == 0x02 )
+            handleWildPkmn( GRASS );
+        else if( behave == 0x03 )
+            handleWildPkmn( HIGH_GRASS );
+        else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
+            handleWildPkmn( GRASS );
+    }
+    void mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType ) {
 
         u8 rn = rand( );
         if( p_type == FISHING_ROD )
@@ -319,13 +323,19 @@ namespace MAP {
         if( p_type == FISHING_ROD ) {
             IO::messageBox m( "Du hast ein Pokémon geangelt!" );
             IO::drawSub( true );
-        }
+        } else if( FS::SAV->m_repelSteps )
+            return;
+        u8 arridx = u8( p_type ) * 15 + tier * 3;
+        if( p_type == FISHING_ROD )
+            while( level > CUR_SLICE->m_pokemon[ arridx ].second && ( arridx + 1 ) % 3 )
+                ++arridx;
+        else
+            arridx += p_rodType;
 
-        u8 arridx = p_type * 15 + tier;
-        while( level > CUR_SLICE->m_pokemon[ arridx ].second && ( arridx + 1 ) % 3 )
-            ++arridx;
-
-        sprintf( buffer, "Tier %hhu\nLevel %hhu\nPokémon ", tier, level );
+        pokemon wildPkmn = pokemon( 0, CUR_SLICE->m_pokemon[ arridx ].first, 0, level, FS::SAV->m_id,
+                                    FS::SAV->m_sid, FS::SAV->m_playername, !FS::SAV->m_isMale, false,
+                                    false, false, false, false, getCurrentLocationId( ) );
+        sprintf( buffer, "Tier %hhu\n%ls, Level %hhu", tier, wildPkmn.m_boxdata.m_name, level );
         IO::messageBox m( buffer );
         IO::drawSub( true );
     }
@@ -503,6 +513,7 @@ namespace MAP {
 
                 standUpPlayer( p_direction );
                 animateField( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
+                handleWildPkmn( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
                 return;
             } else if( lstMoveData == 0x0a ) {
                 fastBike = false;
@@ -519,6 +530,7 @@ namespace MAP {
             if( newMoveData == 0x0c && lstMoveData == 4 ) { //End of surf
                 standUpPlayer( p_direction );
                 animateField( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
+                handleWildPkmn( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
                 fastBike = false;
                 return;
             }
@@ -940,6 +952,7 @@ NEXT_PASS:
                 _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].currentFrame( );
             swiWaitForVBlank( );
         }
+        handleWildPkmn( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
     }
     void mapDrawer::walkPlayer( direction p_direction, bool p_fast ) {
         if( FS::SAV->m_player.m_movement != WALK )
@@ -987,6 +1000,7 @@ NEXT_PASS:
             if( FS::SAV->m_player.m_movement == SURF )
                 _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_2 );
         }
+        handleWildPkmn( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
     }
     void mapDrawer::jumpPlayer( direction p_direction ) {
         redirectPlayer( p_direction, false );
@@ -1010,6 +1024,7 @@ NEXT_PASS:
             }
         }
         _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( getFrame( p_direction ) );
+        handleWildPkmn( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
     }
 
     void mapDrawer::stopPlayer( ) {
@@ -1076,7 +1091,7 @@ NEXT_PASS:
                      p_start.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x04
                      && atom( p_start.m_posX, p_start.m_posY ).m_movedata != 0x3c;
     }
-    void mapDrawer::fishPlayer( direction p_direction ) {
+    void mapDrawer::fishPlayer( direction p_direction, u8 p_rodType ) {
         u8 basePic = FS::SAV->m_player.m_picNum / 10 * 10;
         FS::SAV->m_player.m_picNum = basePic + 6;
         bool surfing = ( FS::SAV->m_player.m_movement == SURF );
@@ -1136,7 +1151,7 @@ OUT:
         changeMoveMode( surfing ? SURF : WALK );
         if( !failed ) {
             //Start wild PKMN battle here
-            handleWildPkmn( FISHING_ROD );
+            handleWildPkmn( FISHING_ROD, p_rodType );
         }
     }
 
