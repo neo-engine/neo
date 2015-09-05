@@ -326,15 +326,13 @@ namespace MAP {
         } else if( FS::SAV->m_repelSteps )
             return;
         u8 arridx = u8( p_type ) * 15 + tier * 3;
-        if( p_type == FISHING_ROD )
+        if( p_type != FISHING_ROD )
             while( level > CUR_SLICE->m_pokemon[ arridx ].second && ( arridx + 1 ) % 3 )
                 ++arridx;
         else
             arridx += p_rodType;
 
-        pokemon wildPkmn = pokemon( 0, CUR_SLICE->m_pokemon[ arridx ].first, 0, level, FS::SAV->m_id,
-                                    FS::SAV->m_sid, FS::SAV->m_playername, !FS::SAV->m_isMale, false,
-                                    false, false, false, false, getCurrentLocationId( ) );
+        pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
         sprintf( buffer, "Tier %hhu\n%ls, Level %hhu", tier, wildPkmn.m_boxdata.m_name, level );
         IO::messageBox m( buffer );
         IO::drawSub( true );

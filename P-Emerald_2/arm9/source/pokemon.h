@@ -3,11 +3,11 @@
     ------------------------------
 
     file        : pokemon.h
-    author      : Philip Wellnitz 
+    author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
     Copyright (C) 2012 - 2015
-    Philip Wellnitz 
+    Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
 
@@ -344,6 +344,14 @@ u8: 8;
         }
 
         boxPokemon( ) { }
+        boxPokemon( u16             p_pkmnId,
+                    u16             p_level,
+                    const wchar_t*  p_name = 0,
+                    u8              p_shiny = 0,
+                    bool            p_hiddenAbility = false,
+                    bool            p_isEgg = false,
+                    u8              p_pokerus = 0,
+                    bool            p_fatefulEncounter = false );
         boxPokemon( u16*            p_moves,
                     u16             p_pkmnId,
                     const wchar_t*  p_name,
@@ -392,6 +400,14 @@ u8: 8;
     }m_stats;
 
     pokemon( ) { }
+    pokemon( u16             p_pkmnId,
+             u16             p_level,
+             const wchar_t*  p_name = 0,
+             u8              p_shiny = 0,
+             bool            p_hiddenAbility = false,
+             bool            p_isEgg = false,
+             u8              p_pokerus = 0,
+             bool            p_fatefulEncounter = false );
     pokemon( u16*           p_moves,
              u16            p_species,
              const wchar_t* p_name,
