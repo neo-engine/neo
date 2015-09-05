@@ -144,9 +144,9 @@ namespace BATTLE {
                     return ( p_target._battleMoves[ 0 ][ OPPONENT ].m_type == battle::battleMove::ATTACK ) ? p_target._battleMoves[ 0 ][ OPPONENT ].m_value : -1;
                 return ( p_target._battleMoves[ 1 ][ OPPONENT ].m_type == battle::battleMove::ATTACK ) ? p_target._battleMoves[ 1 ][ OPPONENT ].m_value : -1;
             case BATTLE::battleScript::command::BATTLE_OWN_TEAMSIZE:
-                return int( p_target._player.m_pkmnTeam.size( ) );
+                return int( p_target._player->m_pkmnTeam.size( ) );
             case BATTLE::battleScript::command::BATTLE_OPP_TEAMSIZE:
-                return int( p_target._opponent.m_pkmnTeam.size( ) );
+                return int( p_target._opponent->m_pkmnTeam.size( ) );
             default:
                 return -1;
         }

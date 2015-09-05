@@ -332,10 +332,10 @@ namespace MAP {
         else
             arridx += p_rodType;
 
-        pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
-        sprintf( buffer, "Tier %hhu\n%ls, Level %hhu", tier, wildPkmn.m_boxdata.m_name, level );
-        IO::messageBox m( buffer );
+        pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level, 0, 2 );
+        BATTLE::battle( FS::SAV->getBattleTrainer( ), &wildPkmn, BATTLE::battle::weather::NO_WEATHER, 0 ).start( );
         IO::drawSub( true );
+        draw( );
     }
     void mapDrawer::handleTrainer( ) { }
 

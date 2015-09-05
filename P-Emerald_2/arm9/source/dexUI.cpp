@@ -159,7 +159,6 @@ namespace DEX {
 
     u16 oldPkmn;
     u8 oldForme = -1;
-#define IN_DEX(pidx) ( FS::SAV->m_inDex[ (pidx) / 8 ] & ( 1 << ( (pidx) % 8 ) ) )
     void dexUI::undrawFormes( u16 p_formeIdx ) {
         //Print over the text the same text, but with the color of the background
         pokemonData data2; getAll( _currPkmn, data2 );

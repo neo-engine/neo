@@ -38,6 +38,7 @@ namespace FS {
     const char* sav_nam = "p_smaragd_2";
     const char* sav_nam_2 = "p_smaragd_2.gba";
     SavMod savMod = _NDS;
+    std::vector<pokemon> tmp;
     saveGame* SAV;
 
 #define PKMN_DATALENGTH 128

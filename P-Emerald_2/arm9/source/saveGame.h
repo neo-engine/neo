@@ -33,6 +33,7 @@
 #include "bag.h"
 #include "pokemon.h"
 #include "mapObject.h"
+#include "battle.h"
 
 namespace FS {
     enum SavMod {
@@ -41,6 +42,7 @@ namespace FS {
     };
     extern SavMod savMod;
 
+    extern std::vector<pokemon> tmp;
     struct saveGame {
         //general stuff
         wchar_t     m_playername[ 12 ];
@@ -103,6 +105,23 @@ namespace FS {
                 cnt += !!( m_JOHTO_Badges & ( 1 << i ) );
             }
             return cnt;
+        }
+        BATTLE::battleTrainer* getBattleTrainer( ) {
+            tmp.clear( );
+            for( u8 i = 0; i < 6; ++i )
+                if( m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                    tmp.push_back( m_pkmnTeam[ i ] );
+                else
+                    break;
+            char buffer[ 30 ];
+            sprintf( buffer, "%ls", m_playername );
+
+            static BATTLE::battleTrainer res( std::string(buffer), "", "", "", "", tmp, m_bag->getBattleItems( ) );
+            return &res;
+        }
+        void updateTeam( ) {
+            for( u8 i = 0; i < tmp.size( ); ++i )
+                m_pkmnTeam[ i ] = tmp[ i ];
         }
     };
 

@@ -80,11 +80,11 @@ namespace BATTLE {
             return L"";
 
         if( p_cmd == L"TRAINER" ) {
-            std::swprintf( wbuffer, 50, L"%s", p_battle->_opponent.m_battleTrainerName.c_str( ) );
+            std::swprintf( wbuffer, 50, L"%s", p_battle->_opponent->m_battleTrainerName.c_str( ) );
             return std::wstring( wbuffer );
         }
         if( p_cmd == L"TCLASS" ) {
-            return trainerclassnames[ p_battle->_opponent.m_trainerClass ];
+            return trainerclassnames[ p_battle->_opponent->m_trainerClass ];
         }
         if( p_cmd.substr( 0, 4 ) == L"COLR" ) {
             u8 r, g, b;
@@ -146,12 +146,31 @@ namespace BATTLE {
         return L"";
     }
 
-    battle::battle( battleTrainer& p_player, battleTrainer& p_opponent, int p_maxRounds, int p_AILevel, battleMode p_battleMode )
+    battle::battle( battleTrainer* p_player, battleTrainer* p_opponent, int p_maxRounds, int p_AILevel, battleMode p_battleMode )
         : _player( p_player ), _opponent( p_opponent ) {
         _maxRounds = p_maxRounds;
         _AILevel = p_AILevel;
         m_battleMode = p_battleMode;
+        m_isWildBattle = false;
 
+        m_distributeEXP = true;
+    }
+    battle::battle( battleTrainer* p_player, pokemon* p_opponent, weather p_weather, u8 p_background )
+        : _player( p_player ), _opponent( 0 ) {
+        _maxRounds = 0;
+        _AILevel = 0;
+        m_weather = p_weather;
+        (void)p_background;
+
+        pokemonData pdata;
+        getAll( p_opponent->m_boxdata.m_speciesId, pdata );
+        _wildPokemon.m_pokemon = p_opponent;
+        _wildPokemon.m_Types[ 0 ] = pdata.m_types[ 0 ];
+        _wildPokemon.m_Types[ 1 ] = pdata.m_types[ 1 ];
+        _wildPokemon.m_Types[ 2 ] = pdata.m_types[ 1 ];
+
+        m_battleMode = SINGLE;
+        m_isWildBattle = true;
         m_distributeEXP = true;
     }
 
@@ -192,8 +211,7 @@ namespace BATTLE {
         initBattle( );
 
         _round = 0;
-        _maxRounds = 500;
-        while( _round++ < _maxRounds ) {
+        while( !_maxRounds || ++_round < _maxRounds ) {
             registerParticipatedPKMN( );
 
             bool p1CanMove = canMove( PLAYER, 0 );
@@ -270,25 +288,26 @@ CHOOSE1:
         _battleUI->init( );
         pokemonData pdata;
         for( u8 i = 0; i < 6; ++i ) {
-            if( _player.m_pkmnTeam.size( ) > i ) {
-                getAll( _player.m_pkmnTeam[ i ].m_boxdata.m_speciesId, pdata );
-                _pkmns[ i ][ 0 ].m_pokemon = &( _player.m_pkmnTeam[ i ] );
+            if( _player->m_pkmnTeam.size( ) > i ) {
+                getAll( _player->m_pkmnTeam[ i ].m_boxdata.m_speciesId, pdata );
+                _pkmns[ i ][ 0 ].m_pokemon = &( _player->m_pkmnTeam[ i ] );
                 _pkmns[ i ][ 0 ].m_Types[ 0 ] = pdata.m_types[ 0 ];
                 _pkmns[ i ][ 0 ].m_Types[ 1 ] = pdata.m_types[ 1 ];
                 _pkmns[ i ][ 0 ].m_Types[ 2 ] = pdata.m_types[ 1 ];
             }
-            if( _opponent.m_pkmnTeam.size( ) > i ) {
-                getAll( _opponent.m_pkmnTeam[ i ].m_boxdata.m_speciesId, pdata );
-                _pkmns[ i ][ 1 ].m_pokemon = &( _opponent.m_pkmnTeam[ i ] );
-                _pkmns[ i ][ 1 ].m_Types[ 0 ] = pdata.m_types[ 0 ];
-                _pkmns[ i ][ 1 ].m_Types[ 1 ] = pdata.m_types[ 1 ];
-                _pkmns[ i ][ 1 ].m_Types[ 2 ] = pdata.m_types[ 1 ];
-            }
+            if( !m_isWildBattle )
+                if( _opponent->m_pkmnTeam.size( ) > i ) {
+                    getAll( _opponent->m_pkmnTeam[ i ].m_boxdata.m_speciesId, pdata );
+                    _pkmns[ i ][ 1 ].m_pokemon = &( _opponent->m_pkmnTeam[ i ] );
+                    _pkmns[ i ][ 1 ].m_Types[ 0 ] = pdata.m_types[ 0 ];
+                    _pkmns[ i ][ 1 ].m_Types[ 1 ] = pdata.m_types[ 1 ];
+                    _pkmns[ i ][ 1 ].m_Types[ 2 ] = pdata.m_types[ 1 ];
+                }
 
             ACPOS( i, PLAYER ) = ACPOS( i, OPPONENT ) = i;
             for( u8 o = 0; o < MAX_STATS; ++o )
                 ACPKMNSTATCHG( i, PLAYER )[ o ] = ACPKMNSTATCHG( i, OPPONENT )[ o ] = 0;
-            if( _player.m_pkmnTeam.size( ) > i ) {
+            if( _player->m_pkmnTeam.size( ) > i ) {
                 if( ACPKMN( i, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
                     ACPKMNSTS( i, PLAYER ) = NA;
                 else if( ACPKMN( i, PLAYER ).m_stats.m_acHP == 0 )
@@ -299,16 +318,18 @@ CHOOSE1:
                     ACPKMNSTS( i, PLAYER ) = OK;
             } else
                 ACPKMNSTS( i, PLAYER ) = NA;
-            if( _opponent.m_pkmnTeam.size( ) > i ) {
-                if( ACPKMN( i, OPPONENT ).m_boxdata.m_individualValues.m_isEgg )
+            if( !m_isWildBattle ) {
+                if( _opponent->m_pkmnTeam.size( ) > i ) {
+                    if( ACPKMN( i, OPPONENT ).m_boxdata.m_individualValues.m_isEgg )
+                        ACPKMNSTS( i, OPPONENT ) = NA;
+                    else if( ACPKMN( i, OPPONENT ).m_stats.m_acHP == 0 )
+                        ACPKMNSTS( i, OPPONENT ) = KO;
+                    else if( ACPKMN( i, OPPONENT ).m_statusint )
+                        ACPKMNSTS( i, OPPONENT ) = STS;
+                    else ACPKMNSTS( i, OPPONENT ) = OK;
+                } else
                     ACPKMNSTS( i, OPPONENT ) = NA;
-                else if( ACPKMN( i, OPPONENT ).m_stats.m_acHP == 0 )
-                    ACPKMNSTS( i, OPPONENT ) = KO;
-                else if( ACPKMN( i, OPPONENT ).m_statusint )
-                    ACPKMNSTS( i, OPPONENT ) = STS;
-                else ACPKMNSTS( i, OPPONENT ) = OK;
-            } else
-                ACPKMNSTS( i, OPPONENT ) = NA;
+            }
         }
 
         for( u8 p = 0; p < 2; ++p ) {
@@ -318,7 +339,10 @@ CHOOSE1:
 
         refillBattleSpots( false, false );
 
-        _battleUI->trainerIntro( );
+        if( !m_isWildBattle )
+            _battleUI->trainerIntro( );
+        else
+            _battleUI->pokemonIntro( );
 
         refillBattleSpots( false );
 
@@ -334,13 +358,14 @@ CHOOSE1:
      *  @param p_choice: Specifies whether the player can choose the PKMN which is/are being sent
      */
     void battle::refillBattleSpots( bool p_choice, bool p_send ) {
-
         for( u8 i = 0; i < 1 + ( m_battleMode == DOUBLE ); ++i )for( u8 j = 0; j < 2; ++j ) {
+            if( j && m_isWildBattle )
+                continue;
             if( !_battleSpotOccupied[ i ][ j ] ) {
                 bool refillpossible = false;
 
                 for( u8 k = 1 + ( m_battleMode == DOUBLE );
-                     k < ( j ? _opponent.m_pkmnTeam.size( ) : _player.m_pkmnTeam.size( ) ); ++k )
+                     k < ( j ? _opponent->m_pkmnTeam.size( ) : _player->m_pkmnTeam.size( ) ); ++k )
                      if( ACPKMNSTS( k, j ) != KO && ACPKMNSTS( k, j ) != SELECTED
                          && ACPKMNSTS( k, j ) != NA && ACPKMN( k, j ).m_stats.m_acHP ) {
                          refillpossible = true;
@@ -371,14 +396,15 @@ CHOOSE1:
         for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
             ACPOS( i, PLAYER ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
 
-        //Sort the remaining PKMN according to their status -> No STS, STS, KO, NA (For the opponent)
-        tmp.clear( );
-        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
-            tmp.push_back( std::pair<u8, u8>( ACPKMNSTS( i, OPPONENT ), ACPOS( i, OPPONENT ) ) );
-        std::sort( tmp.begin( ), tmp.end( ) );
-        for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
-            ACPOS( i, OPPONENT ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
-
+        if( !m_isWildBattle ) {
+            //Sort the remaining PKMN according to their status -> No STS, STS, KO, NA (For the opponent)
+            tmp.clear( );
+            for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+                tmp.push_back( std::pair<u8, u8>( ACPKMNSTS( i, OPPONENT ), ACPOS( i, OPPONENT ) ) );
+            std::sort( tmp.begin( ), tmp.end( ) );
+            for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
+                ACPOS( i, OPPONENT ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
+        }
         orderPKMN( false );
 
         if( p_send ) {
@@ -411,7 +437,9 @@ NEXT:
      *  @returns Minimum i for which ACPKMNSTS(i,p_opponent) != KO and != SELECTED, 7 iff all PKMN fainted
      */
     u8 battle::getNextPKMN( bool p_opponent, u8 p_startIdx ) {
-        u8 max = ( p_opponent ? _opponent.m_pkmnTeam.size( ) : _player.m_pkmnTeam.size( ) );
+        if( p_opponent && m_isWildBattle )
+            return 7;
+        u8 max = ( p_opponent ? _opponent->m_pkmnTeam.size( ) : _player->m_pkmnTeam.size( ) );
 
         for( u8 i = p_startIdx; i < max; ++i )
             if( ACPKMNSTS( i, p_opponent ) != KO
@@ -1298,7 +1326,7 @@ NEXT:
         bool printPkmnMsg = false;
 
         for( u8 i = 0; i < 6; ++i ) {
-            u8 sz = ( !p_opponent ) ? _opponent.m_pkmnTeam.size( ) : _player.m_pkmnTeam.size( );
+            u8 sz = ( !p_opponent ) ? _opponent->m_pkmnTeam.size( ) : _player->m_pkmnTeam.size( );
 
             if( sz <= i )
                 break;
@@ -1555,7 +1583,7 @@ NEXT:
         //PLAYER
         u8 pkmnCnt = 0;
         for( u8 i = 0; i < 6; ++i ) {
-            if( _player.m_pkmnTeam.size( ) > i ) {
+            if( _player->m_pkmnTeam.size( ) > i ) {
                 if( ACPKMNSTS( i, PLAYER ) != KO
                     && ACPKMNSTS( i, PLAYER ) != NA
                     && ACPKMN( i, PLAYER ).m_stats.m_acHP )
@@ -1571,7 +1599,7 @@ NEXT:
         //OPPONENT
         pkmnCnt = 0;
         for( u8 i = 0; i < 6; ++i ) {
-            if( _opponent.m_pkmnTeam.size( ) > i ) {
+            if( _opponent->m_pkmnTeam.size( ) > i ) {
                 if( ACPKMNSTS( i, OPPONENT ) != KO
                     && ACPKMNSTS( i, OPPONENT ) != NA
                     && ACPKMN( i, OPPONENT ).m_stats.m_acHP )
@@ -1604,7 +1632,7 @@ NEXT:
                 _battleUI->showEndScreen( );
 
                 std::swprintf( wbuffer, 100, L"%s[A]",
-                               _opponent.getWinMsg( ) );
+                               _opponent->getWinMsg( ) );
                 log( wbuffer );
                 break;
             }
@@ -1615,10 +1643,10 @@ NEXT:
                 _battleUI->showEndScreen( );
 
                 std::swprintf( wbuffer, 100, L"%s[A]",
-                               _opponent.getLooseMsg( ) );
+                               _opponent->getLooseMsg( ) );
                 log( wbuffer );
                 std::swprintf( wbuffer, 100, L"Du gewinnst %d$.[A]",
-                               _opponent.getLooseMoney( ) );
+                               _opponent->getLooseMoney( ) );
                 log( wbuffer );
                 break;
             }

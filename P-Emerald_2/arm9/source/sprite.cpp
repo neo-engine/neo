@@ -304,14 +304,14 @@ namespace IO {
         }
 
         loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY,
-                    64, 64, TEMP_PAL, TEMP, 96 * 96 / 2, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
+                    64, 64, TEMP_PAL, TEMP, 96 * 96 / 2, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
         loadSprite( p_oamIndex++, p_palCnt, p_tileCnt + 64, p_flipx ? p_posX : 64 + p_posX, p_posY,
-                    32, 64, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
+                    32, 64, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
         if( !p_topOnly ) {
             loadSprite( p_oamIndex++, p_palCnt, p_tileCnt + 96, p_flipx ? 32 + p_posX : p_posX, p_posY + 64,
-                        64, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
+                        64, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
             loadSprite( p_oamIndex, p_palCnt, p_tileCnt + 128, p_flipx ? p_posX : 64 + p_posX, p_posY + 64,
-                        32, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
+                        32, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
         }
         updateOAM( p_bottom );
         return p_tileCnt + 144;

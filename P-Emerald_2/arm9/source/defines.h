@@ -85,6 +85,8 @@ extern unsigned short TEMP_PAL[ 256 ];
             ( (a) & KEY_RIGHT ) ?   MAP::direction::RIGHT :\
                                     MAP::direction::LEFT ) ) )
 
+#define IN_DEX(pidx) ( FS::SAV->m_inDex[ (pidx) / 8 ] & ( 1 << ( (pidx) % 8 ) ) )
+
 #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 #define COMPL(a) ( RGB( 31 - ( (a) >> 10 ) % 32,31 - ( (a) >> 5 ) % 32,31 - (a) % 32 ) )
 

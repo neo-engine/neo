@@ -133,8 +133,8 @@ namespace BATTLE {
             _maxRounds,
             _AILevel;
         battleTrainer
-            &_player,
-            &_opponent;
+            *_player,
+            *_opponent;
 
         u8 _acPkmnPosition[ 6 ][ 2 ]; //me; opp; maps the Pkmn's positions in the teams to their real in-battle positions
 
@@ -317,6 +317,7 @@ namespace BATTLE {
         };
 
         battlePokemon _pkmns[ 6 ][ 2 ];
+        battlePokemon _wildPokemon;
 
         battleUI*    _battleUI;
     public:
@@ -349,6 +350,8 @@ namespace BATTLE {
 
         friend  u16 initStsBalls( bool p_bottom, battle* p_battle, u16& p_tilecnt );
         friend void loadSpritesSub( battle* p_battle );
+        friend void loadSpritesTop( battle* p_battle );
+        friend void loadBattleUITop( battle* p_battle );
         friend void drawPKMNChoiceScreen( battle* p_battle, bool p_firstIsChosen );
 
         enum weather {
@@ -382,11 +385,15 @@ namespace BATTLE {
         weather     m_weather;
         battleMode  m_battleMode;
 
-        battle( battleTrainer& p_player,
-                battleTrainer& p_opponent,
+        battle( battleTrainer* p_player,
+                battleTrainer* p_opponent,
                 int p_maxRounds,
                 int p_AILevel = 5,
                 battleMode p_battlemode = SINGLE );
+        battle( battleTrainer* p_player,
+                pokemon* p_opponent,
+                weather p_weather,
+                u8 p_background );
         ~battle( );
 
         void        log( const std::wstring& p_message );
