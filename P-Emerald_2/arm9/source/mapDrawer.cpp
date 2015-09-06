@@ -370,11 +370,13 @@ namespace MAP {
         }
 
         u8 platform = 0;
-        if( p_type == GRASS || p_type == HIGH_GRASS ) {
+        if( p_type == GRASS || p_type == HIGH_GRASS || p_type == FISHING_ROD ) {
             if( _mapTypes[ FS::SAV->m_currentMap ] == OUTSIDE )
                 platform = 1;
             else if( _mapTypes[ FS::SAV->m_currentMap ] & DARK )
                 platform = 6;
+            else if( FS::SAV->m_player.m_movement == SURF )
+                platform = 0;
             else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
                 platform = 4;
         }
