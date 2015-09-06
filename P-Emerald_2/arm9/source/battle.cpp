@@ -162,11 +162,12 @@ namespace BATTLE {
         m_weather = NO_WEATHER;
         m_distributeEXP = true;
     }
-    battle::battle( battleTrainer* p_player, pokemon* p_opponent, weather p_weather, u8 p_background )
+    battle::battle( battleTrainer* p_player, pokemon* p_opponent, weather p_weather, u8 p_platform, u8 p_background )
         : _player( p_player ), _opponent( 0 ) {
         _maxRounds = 0;
         _AILevel = 0;
         m_weather = p_weather;
+        m_platformId = p_platform;
         m_backgroundId = p_background;
 
         pokemonData pdata;

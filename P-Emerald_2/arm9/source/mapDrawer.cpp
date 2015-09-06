@@ -340,7 +340,47 @@ namespace MAP {
             arridx += p_rodType;
 
         pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level, 0, 2 );
-        BATTLE::battle( FS::SAV->getBattleTrainer( ), &wildPkmn, BATTLE::battle::weather::NO_WEATHER, 0 ).start( );
+        BATTLE::battle::weather weat = BATTLE::battle::weather::NO_WEATHER;
+        switch( _weather ) {
+            case MAP::mapDrawer::SUNNY:
+                weat = BATTLE::battle::weather::SUN;
+                break;
+            case MAP::mapDrawer::RAINY:
+            case MAP::mapDrawer::THUNDERSTORM:
+                weat = BATTLE::battle::weather::RAIN;
+                break;
+            case MAP::mapDrawer::SNOW:
+            case MAP::mapDrawer::BLIZZARD:
+                weat = BATTLE::battle::weather::HAIL;
+                break;
+            case MAP::mapDrawer::SANDSTORM:
+                weat = BATTLE::battle::weather::SANDSTORM;
+                break;
+            case MAP::mapDrawer::FOG:
+                weat = BATTLE::battle::weather::FOG;
+                break;
+            case MAP::mapDrawer::HEAVY_SUNLIGHT:
+                weat = BATTLE::battle::weather::HEAVY_SUNSHINE;
+                break;
+            case MAP::mapDrawer::HEAVY_RAIN:
+                weat = BATTLE::battle::weather::HEAVY_RAIN;
+                break;
+            default:
+                break;
+        }
+
+        u8 platform = 0;
+        if( p_type == GRASS || p_type == HIGH_GRASS ) {
+            if( _mapTypes[ FS::SAV->m_currentMap ] == OUTSIDE )
+                platform = 1;
+            else if( _mapTypes[ FS::SAV->m_currentMap ] & DARK )
+                platform = 6;
+            else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
+                platform = 4;
+        }
+
+        u8 battleBack = 0;
+        BATTLE::battle( FS::SAV->getBattleTrainer( ), &wildPkmn, weat, platform, battleBack ).start( );
         FADE_TOP_DARK( );
         draw( );
         IO::drawSub( true );
@@ -819,10 +859,10 @@ NEXT_PASS:
     }
 
     void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
-        bool entryCave = ( _mapTypes[ FS::SAV->m_currentMap ] != CAVE
-                           && _mapTypes[ p_target.first ] == CAVE );
-        bool exitCave = ( _mapTypes[ FS::SAV->m_currentMap ] == CAVE
-                          && _mapTypes[ p_target.first ] != CAVE );
+        bool entryCave = ( !( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
+                           && ( _mapTypes[ p_target.first ] & CAVE ) );
+        bool exitCave = ( ( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
+                          && !( _mapTypes[ p_target.first ] & CAVE ) );
         switch( p_type ) {
             case DOOR:
                 break;

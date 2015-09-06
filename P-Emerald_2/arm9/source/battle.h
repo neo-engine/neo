@@ -382,6 +382,7 @@ namespace BATTLE {
         bool        m_distributeEXP;
         bool        m_isWildBattle;
 
+        u8          m_platformId;
         u8          m_backgroundId;
 
         weather     m_weather;
@@ -395,6 +396,7 @@ namespace BATTLE {
         battle( battleTrainer* p_player,
                 pokemon* p_opponent,
                 weather p_weather,
+                u8 p_platform,
                 u8 p_background );
         ~battle( );
 

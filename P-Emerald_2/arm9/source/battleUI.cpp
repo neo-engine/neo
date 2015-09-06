@@ -73,7 +73,9 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 //Test Trainer mugs:
 #include "mug_001_1.h"
 #include "mug_001_2.h"
+
 #include "TestBattleBack.h"
+
 #include "Border.h"
 
 
@@ -155,24 +157,27 @@ namespace BATTLE {
     // TOP SCREEN DEFINES
 
     //Some defines of indices in the OAM for the used sprites
-#define HP_START                 1
+#define HP_START              1
 #define HP_IDX( p_pokemonPos, p_opponent ) ( HP_START + ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
 
-#define STSBALL_START            5
+#define STSBALL_START         5
 #define STSBALL_IDX( p_pokemonPos, p_opponent ) ( STSBALL_START + ( ( p_opponent ) * 6 + ( p_pokemonPos ) ) )
 
-#define PKMN_START               17
+#define PKMN_START           17
 #define PKMN_IDX( p_pokemonPos, p_opponent ) ( PKMN_START + 4 * ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
+
+#define PLATFORM_START       30
 
 #define PB_ANIM             127
 #define SHINY_ANIM          127
 
     //Some analogous defines for their pal indices
-#define PKMN_PAL_START          0
+#define PKMN_PAL_START        0
 #define PKMN_PAL_IDX( p_pokemonPos, p_opponent ) ( PKMN_PAL_START + ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
 
 #define PB_PAL_TOP(i)         ( (i) + 4 )
 #define HP_PAL                8
+#define PLAT_PAL              9
 
 #define PKMN_TILE_START       0
 #define PKMN_TILE_IDX( p_pokemonPos, p_opponent ) ( PKMN_TILE_START + 144 * ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
@@ -198,6 +203,9 @@ namespace BATTLE {
 
 #define SUB_A_OAM 30
 #define SUB_Back_OAM 31
+
+
+
     u16 SUB_TILESTART = 0;
     u8 SUB_PALSTART = 0;
 
@@ -519,6 +527,14 @@ namespace BATTLE {
                                         Battle1Tiles, Battle1TilesLen, false,
                                         false, true, OBJPRIORITY_2, false );
         }
+        TILESTART = IO::loadSprite( PLATFORM_START, PLAT_PAL,
+                                    TILESTART, 128, 64, 64, 64, IO::PlatformPals[ p_battle->m_platformId ],
+                                    IO::PlatformTiles[ 2 * p_battle->m_platformId ], 2048, false,
+                                    false, false, OBJPRIORITY_2, false );
+        TILESTART = IO::loadSprite( PLATFORM_START + 1, PLAT_PAL,
+                                    TILESTART, 192, 64, 64, 64, IO::PlatformPals[ p_battle->m_platformId ],
+                                    IO::PlatformTiles[ 2 * p_battle->m_platformId + 1 ], 2048, false,
+                                    false, false, OBJPRIORITY_2, false );
 
         IO::updateOAM( false );
         if( p_battle->m_isWildBattle ) {
