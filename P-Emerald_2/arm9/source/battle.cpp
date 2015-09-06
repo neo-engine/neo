@@ -159,6 +159,7 @@ namespace BATTLE {
         m_battleMode = p_battleMode;
         m_isWildBattle = false;
 
+        m_weather = NO_WEATHER;
         m_distributeEXP = true;
     }
     battle::battle( battleTrainer* p_player, pokemon* p_opponent, weather p_weather, u8 p_background )
@@ -166,7 +167,7 @@ namespace BATTLE {
         _maxRounds = 0;
         _AILevel = 0;
         m_weather = p_weather;
-        (void)p_background;
+        m_backgroundId = p_background;
 
         pokemonData pdata;
         getAll( p_opponent->m_boxdata.m_speciesId, pdata );
@@ -340,7 +341,7 @@ CHOOSE1:
 
         for( u8 p = 0; p < 2; ++p ) {
             _battleSpotOccupied[ 0 ][ p ] = false;
-            _battleSpotOccupied[ 1 ][ p ] = !( m_battleMode == DOUBLE );
+            _battleSpotOccupied[ 1 ][ p ] = ( m_battleMode != DOUBLE );
         }
 
         refillBattleSpots( false, false );
@@ -368,6 +369,9 @@ CHOOSE1:
             if( j && m_isWildBattle )
                 continue;
             if( !_battleSpotOccupied[ i ][ j ] ) {
+                if( ACPKMNSTS( i, j ) != KO && ACPKMNSTS( i, j ) != NA && ACPKMN( i, j ).m_stats.m_acHP )
+                    continue;
+
                 bool refillpossible = false;
 
                 for( u8 k = 1 + ( m_battleMode == DOUBLE );
@@ -391,6 +395,7 @@ CHOOSE1:
 
                 if( nextSpot != 7 && nextSpot != i )
                     std::swap( ACPOS( i, j ), ACPOS( nextSpot, j ) );
+                _battleSpotOccupied[ i ][ j ] = ( nextSpot == 7 );
             }
         }
 
@@ -423,11 +428,9 @@ CHOOSE1:
         for( u8 p = 0; p < 4; ++p ) {
             for( u8 i = 0; i < 1 + ( m_battleMode == DOUBLE ); ++i )for( u8 j = 0; j < 2; ++j ) {
                 if( _moveOrder[ i ][ j ] == p ) {
-                    if( !_battleSpotOccupied[ i ][ j ] ) {
-                        if( p_send ) {
-                            _battleUI->sendPKMN( j, i );
-                            _battleSpotOccupied[ i ][ j ] = true;
-                        }
+                    if( !_battleSpotOccupied[ i ][ j ] && p_send ) {
+                        _battleUI->sendPKMN( j, i );
+                        _battleSpotOccupied[ i ][ j ] = true;
                     }
                     goto NEXT;
                 }

@@ -322,7 +322,7 @@ namespace MAP {
 
         if( rn > 40 || !level ) {
             if( p_type == FISHING_ROD ) {
-                IO::messageBox m( "Es war doch nur eine Dose..." );
+                IO::messageBox m( "Doch nur ein alter Pokéball..." );
                 IO::drawSub( true );
             }
             return;

@@ -435,6 +435,7 @@ namespace BATTLE {
         REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
         REG_BLDY = 0x1F;
         bgUpdate( );
+
         dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
         dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
 
@@ -1924,7 +1925,7 @@ CLEAR:
     }
 
     void battleUI::sendPKMN( bool p_opponent, u8 p_pokemonPos ) {
-        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+        if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
             return;
         if( _battle->m_isWildBattle && p_opponent )
             return;

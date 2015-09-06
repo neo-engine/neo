@@ -382,6 +382,8 @@ namespace BATTLE {
         bool        m_distributeEXP;
         bool        m_isWildBattle;
 
+        u8          m_backgroundId;
+
         weather     m_weather;
         battleMode  m_battleMode;
 

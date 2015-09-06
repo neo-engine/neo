@@ -477,9 +477,8 @@ OUT:
                     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
                     for( int i = 0; i < 3; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                        a = pokemon( 133 + i, 50, 0, 2 );
-                        a.m_stats.m_acHP *= i / 5.0;
-                        a.m_boxdata.m_experienceGained += 750;
+                        a = pokemon( 133 + i, 30, 0, 2 );
+                        a.m_stats.m_acHP *= !!i;
 
                         //Hand out some ribbons
                         for( u8 i = 0; i < 4; ++i ) {
@@ -491,7 +490,7 @@ OUT:
                         a.m_boxdata.m_ribbons1[ 3 ] = 0;
                         a.m_boxdata.m_holdItem = I_CELL_BATTERY + i;
 
-                        FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId - 1 ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId - 1 ) % 8 ) );
+                        FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
 
                         HILFSCOUNTER = 3 + ( ( HILFSCOUNTER ) % 649 );
                     }

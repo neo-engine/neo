@@ -71,13 +71,13 @@ namespace DEX {
         }
 
         tileCnt = IO::loadSprite( BIG_CIRC_START, 2, tileCnt, 8, 32, 64, 64, BigCirc1Pal,
-                                  BigCirc1Tiles, BigCirc1TilesLen, false, false, false, OBJPRIORITY_1, true );
+                                  BigCirc1Tiles, BigCirc1TilesLen, false, false, false, OBJPRIORITY_2, true );
         tileCnt = IO::loadSprite( BIG_CIRC_START + 1, 2, tileCnt, 72, 32, 64, 64, BigCirc1Pal,
-                                  BigCirc1Tiles, BigCirc1TilesLen, false, true, false, OBJPRIORITY_1, true );
+                                  BigCirc1Tiles, BigCirc1TilesLen, false, true, false, OBJPRIORITY_2, true );
         tileCnt = IO::loadSprite( BIG_CIRC_START + 2, 2, tileCnt, 8, 96, 64, 64, BigCirc1Pal,
-                                  BigCirc1Tiles, BigCirc1TilesLen, true, false, false, OBJPRIORITY_1, true );
+                                  BigCirc1Tiles, BigCirc1TilesLen, true, false, false, OBJPRIORITY_2, true );
         tileCnt = IO::loadSprite( BIG_CIRC_START + 3, 2, tileCnt, 72, 96, 64, 64, BigCirc1Pal,
-                                  BigCirc1Tiles, BigCirc1TilesLen, true, true, false, OBJPRIORITY_1, true );
+                                  BigCirc1Tiles, BigCirc1TilesLen, true, true, false, OBJPRIORITY_2, true );
 
         tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", _currPkmn, dexsppos[ 0 ][ 8 ] + 16,
                                       dexsppos[ 1 ][ 8 ] + 16, PKMN_ICON_SUB( 5 ), PKMN_SPRITE_SUB_PAL, tileCnt, true );
