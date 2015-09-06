@@ -3,11 +3,11 @@
     ------------------------------
 
     file        : battle.h
-    author      : Philip Wellnitz 
+    author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
     Copyright (C) 2012 - 2015
-    Philip Wellnitz 
+    Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
 
@@ -325,17 +325,20 @@ namespace BATTLE {
 #define PLAYER 0
 
 #define ACPOS( p_pokemonPos, p_opponent ) _acPkmnPosition[ p_pokemonPos ][ p_opponent ]
-#define ACPKMNSTS( p_pokemonPos, p_opponent ) (_pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]).m_acStatus
-#define ACPKMNAIL( p_pokemonPos, p_opponent ) _pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_ailments
-#define ACPKMNAILCNT( p_pokemonPos, p_opponent ) _pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_ailmentCount
-#define ACPKMN( p_pokemonPos, p_opponent ) (*(_pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_pokemon))
-#define ACPKMNSTATCHG( p_pokemonPos, p_opponent ) _pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_acStatChanges
-#define ACPKMNSTR( p_pokemonPos, p_opponent ) (_pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ])
+#define ACPKMNSTR( p_pokemonPos, p_opponent ) ( ( m_isWildBattle && (p_opponent) ) ? _wildPokemon : (_pkmns[ ACPOS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ]) )
+
+#define ACPKMNSTS( p_pokemonPos, p_opponent ) ACPKMNSTR( p_pokemonPos, p_opponent ).m_acStatus
+#define ACPKMNAIL( p_pokemonPos, p_opponent ) ACPKMNSTR( p_pokemonPos, p_opponent ).m_ailments
+#define ACPKMNAILCNT( p_pokemonPos, p_opponent ) ACPKMNSTR( p_pokemonPos, p_opponent ).m_ailmentCount
+#define ACPKMN( p_pokemonPos, p_opponent ) (*(ACPKMNSTR( p_pokemonPos, p_opponent ).m_pokemon))
+#define ACPKMNSTATCHG( p_pokemonPos, p_opponent ) ACPKMNSTR( p_pokemonPos, p_opponent ).m_acStatChanges
 
 #define ACPOS2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._acPkmnPosition[ p_pokemonPos ][ p_opponent ]
-#define ACPKMNSTS2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._pkmns[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_acStatus
-#define ACPKMN2( p_battle, p_pokemonPos, p_opponent ) (*(( p_battle )._pkmns[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_pokemon))
-#define ACPKMNSTATCHG2( p_battle, p_pokemonPos, p_opponent ) ( p_battle )._pkmns[ ACPOS2( ( p_battle ), ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ].m_acStatChanges
+#define ACPKMNSTR2( p_battle, p_pokemonPos, p_opponent ) ( ( ( p_battle ).m_isWildBattle && (p_opponent) ) ? ( p_battle )._wildPokemon : \
+                    ( ( p_battle )._pkmns[ ACPOS2( p_battle, p_pokemonPos, p_opponent ) ][ p_opponent ]) )
+#define ACPKMNSTS2( p_battle, p_pokemonPos, p_opponent ) ACPKMNSTR2( p_battle, p_pokemonPos, p_opponent ).m_acStatus
+#define ACPKMN2( p_battle, p_pokemonPos, p_opponent ) (*(ACPKMNSTR2( p_battle, p_pokemonPos, p_opponent ).m_pokemon) )
+#define ACPKMNSTATCHG2( p_battle, p_pokemonPos, p_opponent ) ACPKMNSTR2( p_battle, p_pokemonPos, p_opponent ).m_acStatChanges
 
         friend class battleScript;
         friend class battleUI;

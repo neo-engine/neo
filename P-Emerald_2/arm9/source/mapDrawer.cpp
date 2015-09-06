@@ -339,7 +339,10 @@ namespace MAP {
         else
             arridx += p_rodType;
 
-        pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level, 0, 2 );
+        if( !CUR_SLICE->m_pokemon[ arridx ].first )
+            return;
+
+        pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
         BATTLE::battle::weather weat = BATTLE::battle::weather::NO_WEATHER;
         switch( _weather ) {
             case MAP::mapDrawer::SUNNY:

@@ -390,7 +390,7 @@ CHOOSE1:
 
                 u8 nextSpot = i;
                 if( !p_choice || j )
-                    nextSpot = getNextPKMN( j, i );
+                    nextSpot = getNextPKMN( j, 1 + p_send * ( m_battleMode == DOUBLE ) );
                 else
                     nextSpot = _battleUI->choosePKMN( m_battleMode == DOUBLE, false );
 
@@ -591,8 +591,13 @@ NEXT:
             default:
             case 0: // Trivial AI
             {
-                for( u8 i = 0; i < 2; ++i )if( canMove( OPPONENT, i ) )
-                    _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, ACPKMN( i, OPPONENT ).m_boxdata.m_moves[ 0 ], 0 };
+                for( u8 i = 0; i < 2; ++i )
+                    if( canMove( OPPONENT, i ) ) {
+                        if( !m_isWildBattle )
+                            _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, ACPKMN( i, OPPONENT ).m_boxdata.m_moves[ 0 ], 0 };
+                        else
+                            _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, _wildPokemon.m_pokemon->m_boxdata.m_moves[ 0 ], 0 };
+                    }
                 break;
             }
         }
@@ -649,7 +654,8 @@ NEXT:
 OUT:
         auto& acMove = _battleMoves[ pokemonPos ][ opponent ];
 
-        if( !ACPKMN( pokemonPos, opponent ).m_stats.m_acHP )
+        if( ( !m_isWildBattle || !opponent )
+            && !ACPKMN( pokemonPos, opponent ).m_stats.m_acHP )
             return;
 
         std::wstring acPkmnStr = L"";
@@ -966,12 +972,15 @@ NEXT:
      *  @param p_moveNo: The number of the attack that shall be done.
      */
     void battle::doAttack( bool p_opponent, u8 p_pokemonPos ) {
-        auto acpkmn = ( m_isWildBattle && p_opponent ? _wildPokemon.m_pokemon : &ACPKMN( p_pokemonPos, p_opponent ) );
-        auto sts = ( m_isWildBattle && p_opponent ? _wildPokemon.m_acStatus : ACPKMNSTS( p_pokemonPos, p_opponent ) );
-        auto statchng = ( m_isWildBattle && p_opponent ? _wildPokemon.m_acStatChanges : ACPKMNSTATCHG( p_pokemonPos, p_opponent ) );
+        if( p_pokemonPos && m_battleMode != DOUBLE )
+            return;
+
+        auto acpkmn = &ACPKMN( p_pokemonPos, p_opponent );
+        auto sts = ACPKMNSTS( p_pokemonPos, p_opponent );
+        auto statchng = ACPKMNSTATCHG( p_pokemonPos, p_opponent );
 
         //Check if the user has already fainted
-        if( acpkmn->m_stats.m_acHP == 0 || sts == KO )
+        if( !acpkmn->m_stats.m_acHP || sts == KO )
             return;
 
         auto& bm = _battleMoves[ p_pokemonPos ][ p_opponent ];
@@ -1078,21 +1087,23 @@ NEXT:
 
             if( !( bm.m_target & ( 1 << k ) ) )
                 continue;
-            if( !_battleSpotOccupied[ isSnd ][ isOpp ] )
+            if( ( !m_isWildBattle || !isOpp ) && !_battleSpotOccupied[ isSnd ][ isOpp ] )
+                continue;
+            if( m_isWildBattle && isOpp && !_wildPokemon.m_pokemon->m_stats.m_acHP )
                 continue;
 
             if( m_battleMode != DOUBLE && isSnd )
                 continue;
 
 
-            auto oppstatchng = ( m_isWildBattle && isOpp ? _wildPokemon.m_acStatChanges : ACPKMNSTATCHG( isSnd, isOpp ) );
+            auto oppstatchng = ACPKMNSTATCHG( isSnd, isOpp );
             if( oppstatchng[ EVASION ] > 0 )
                 moveAccuracy *= 2.0 / ( 2 + oppstatchng[ EVASION ] );
             else if( oppstatchng[ EVASION ] < 0 )
                 moveAccuracy *= ( 2 - oppstatchng[ EVASION ] ) / 2.0;
 
             //Check if the target is protected and if the move is affected by Protect
-            auto str = ( m_isWildBattle && isOpp ? _wildPokemon : ACPKMNSTR( isSnd, isOpp ) );
+            auto str = ACPKMNSTR( isSnd, isOpp );
             if( str.m_battleStatus == battleStatus::PROTECTED
                 && ( acMove->m_moveFlags & move::PROTECT ) ) {
                 bm.m_target &= ~( 1 << k );
@@ -1138,14 +1149,13 @@ NEXT:
         for( u8 k = 0; k < 4; ++k ) {
             bool isOpp = k / 2,
                 isSnd = k % 2;
-            auto str = ( m_isWildBattle && isOpp ? _wildPokemon : ACPKMNSTR( isSnd, isOpp ) );
+            auto str = ACPKMNSTR( isSnd, isOpp );
 
             if( !( bm.m_target & ( 1 << k ) ) ) {
                 continue;
             }
-            if( !_battleSpotOccupied[ isSnd ][ isOpp ] )
+            if( ( !m_isWildBattle || !isOpp ) && !_battleSpotOccupied[ isSnd ][ isOpp ] )
                 continue;
-
             if( m_battleMode != DOUBLE && isSnd )
                 continue;
 
@@ -1211,11 +1221,12 @@ NEXT:
         }
         return;
     }
+   
     /**
     *  @brief Handles special condition damage between turns
     */
     void battle::handleSpecialConditions( bool p_opponent, u8 p_pokemonPos ) {
-        auto acpkmn = ( m_isWildBattle && p_opponent ? _wildPokemon.m_pokemon : &ACPKMN( p_pokemonPos, p_opponent ) );
+        auto acpkmn = &ACPKMN( p_pokemonPos, p_opponent );
 
         if( acpkmn->m_status.m_Burned ) {
             std::swprintf( wbuffer, 100, L"Die Verbrennung schadet\n%ls%s.[A]",
@@ -1245,7 +1256,7 @@ NEXT:
                            ( p_opponent ? " [OPPONENT]" : "" ) );
             log( wbuffer );
 
-            auto str = ( m_isWildBattle && p_opponent ? _wildPokemon : ACPKMNSTR( p_pokemonPos, p_opponent ) );
+            auto str = ACPKMNSTR( p_pokemonPos, p_opponent );
 
             acpkmn->m_stats.m_acHP
                 = std::max( u16( 0 ), u16( acpkmn->m_stats.m_acHP

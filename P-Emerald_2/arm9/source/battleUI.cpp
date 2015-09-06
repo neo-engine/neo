@@ -158,7 +158,7 @@ namespace BATTLE {
 
     //Some defines of indices in the OAM for the used sprites
 #define HP_START              1
-#define HP_IDX( p_pokemonPos, p_opponent ) ( HP_START + ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
+#define HP_IDX( p_opponent, p_pokemonPos) ( HP_START + ( ( p_opponent )+ ( p_pokemonPos ) * 2  ) )
 
 #define STSBALL_START         5
 #define STSBALL_IDX( p_pokemonPos, p_opponent ) ( STSBALL_START + ( ( p_opponent ) * 6 + ( p_pokemonPos ) ) )
@@ -557,9 +557,9 @@ namespace BATTLE {
             u8 hpx = 88, hpy = 40;
             auto& acPkmn = *p_battle->_wildPokemon.m_pokemon;
             setStsBallPosition( OPPONENT, 0, hpx + 8, hpy + 8, false );
-            IO::OamTop->oamBuffer[ HP_IDX( 0, OPPONENT ) ].isHidden = false;
-            IO::OamTop->oamBuffer[ HP_IDX( 0, OPPONENT ) ].x = hpx;
-            IO::OamTop->oamBuffer[ HP_IDX( 0, OPPONENT ) ].y = hpy;
+            IO::OamTop->oamBuffer[ HP_IDX( OPPONENT, 0 ) ].isHidden = false;
+            IO::OamTop->oamBuffer[ HP_IDX( OPPONENT, 0 ) ].x = hpx;
+            IO::OamTop->oamBuffer[ HP_IDX( OPPONENT, 0 ) ].y = hpy;
             setStsBallVisibility( OPPONENT, 0, false, false );
             IO::updateOAM( false );
 
@@ -1933,8 +1933,10 @@ CLEAR:
             return;
 
         //Hide PKMN sprite
-        for( u8 i = PKMN_IDX( p_pokemonPos, p_opponent ); i < PKMN_IDX( p_pokemonPos, p_opponent ) + 4; ++i )
+        for( u8 i = PKMN_IDX( p_pokemonPos, p_opponent ); i < PKMN_IDX( p_pokemonPos, p_opponent ) + 4; ++i ) {
+            IO::OamTop->oamBuffer[ i ].isRotateScale = false;
             IO::OamTop->oamBuffer[ i ].isHidden = true;
+        }
 
         //Hide HP Bar
         //OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].isHidden = true;
@@ -1943,30 +1945,16 @@ CLEAR:
                        HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
         IO::displayEP( 100, 100, IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
                        IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-        //setStsBallVisibility( p_opponent, p_pokemonPos, true, false );
-        setStsBallSts( p_opponent, p_pokemonPos, ACPKMNSTS2( *_battle, p_pokemonPos, p_opponent ), false );
+
+        if( !_battle->m_isWildBattle )
+            setStsBallSts( p_opponent, p_pokemonPos, ACPKMNSTS2( *_battle, p_pokemonPos, p_opponent ), false );
         IO::updateOAM( false );
 
         //Clear text
         u8 hpx = 0, hpy = 0;
+        s16 x, y;
+        getSpritePos( p_opponent, p_pokemonPos, _battle->m_battleMode == battle::DOUBLE, x, y, hpx, hpy );
 
-        if( p_opponent ) {
-            hpx = 88;
-            hpy = 40;
-
-            if( p_pokemonPos ) {
-                hpx -= 88;
-                hpy -= 32;
-            }
-        } else {
-            hpx = 220;
-            hpy = 152;
-
-            if( !p_pokemonPos ) {
-                hpx -= 88;
-                hpy -= 32;
-            }
-        }
         consoleSelect( &IO::Top );
         if( p_opponent == p_pokemonPos ) {
             consoleSetWindow( &IO::Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
