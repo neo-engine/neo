@@ -1536,7 +1536,7 @@ END:
             IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1,
                                 true, false, BLACK_IDX );
             IO::printRectangle( x, y, x + w, y + h,
-                                true, false, selected[ i ] ? RED_IDX : GRAY_IDX );
+                                true, false, ( selected[ i ] && !neverTarget[ i ] ) ? RED_IDX : GRAY_IDX );
             IO::printRectangle( x + 7, y + 5, x + w - 4, y + h - 1,
                                 true, false, BLACK_IDX );
             IO::printRectangle( x + 6, y + 4, x + w - 6, y + h - 2,
