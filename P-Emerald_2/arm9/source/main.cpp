@@ -72,7 +72,7 @@
 #include "battle.h"
 #include "Gen.h"
 
-#include "BigCirc1.h" 
+#include "BigCirc1.h"
 #include "consoleFont.h"
 
 #include "Back.h"
@@ -501,12 +501,10 @@ OUT:
                         a.m_boxdata.m_ribbons1[ 3 ] = 0;
                         a.m_boxdata.m_holdItem = I_CELL_BATTERY + i;
 
-                        FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId - 1 ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId - 1 ) % 8 ) );
+                        FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
 
                         HILFSCOUNTER = 3 + ( ( HILFSCOUNTER ) % 649 );
                     }
-                    for( u16 i = 0; i < 649 / 8; ++i )
-                        FS::SAV->m_inDex[ i ] = 255;
                     FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
                     FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
                     FS::SAV->m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
@@ -529,13 +527,7 @@ OUT:
                     break;
                 }
                 case 3:{
-                    std::vector<pokemon> tmp, cpy;
-                    for( u8 i = 0; i < 6; ++i )
-                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                            tmp.push_back( FS::SAV->m_pkmnTeam[ i ] );
-                        else
-                            break;
-                    BATTLE::battleTrainer me( "TEST", "", "", "", "", tmp, FS::SAV->m_bag->getBattleItems( ) );
+                    std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 3; ++i ) {
                         pokemon a( 0, HILFSCOUNTER, 0,
@@ -548,21 +540,14 @@ OUT:
                     BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
                                                "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, itms );
 
-                    BATTLE::battle test_battle( me, opp, 100, 5, BATTLE::battle::DOUBLE );
+                    BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100, 5, BATTLE::battle::DOUBLE );
                     ANIMATE_MAP = false;
                     test_battle.start( );
-                    for( u8 i = 0; i < tmp.size( ); ++i )
-                        FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
+                    FS::SAV->updateTeam( );
                     break;
                 }
                 case 4:{
-                    std::vector<pokemon> tmp, cpy;
-                    for( u8 i = 0; i < 6; ++i )
-                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                            tmp.push_back( FS::SAV->m_pkmnTeam[ i ] );
-                        else
-                            break;
-                    BATTLE::battleTrainer me( "TEST", "", "", "", "", tmp, FS::SAV->m_bag->getBattleItems( ) );
+                    std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 6; ++i ) {
                         pokemon a( 0, HILFSCOUNTER, 0,
@@ -575,11 +560,10 @@ OUT:
                     BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
                                                "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, itms );
 
-                    BATTLE::battle test_battle( me, opp, 100, 5, BATTLE::battle::SINGLE );
+                    BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100, 5, BATTLE::battle::SINGLE );
                     ANIMATE_MAP = false;
                     test_battle.start( );
-                    for( u8 i = 0; i < tmp.size( ); ++i )
-                        FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
+                    FS::SAV->updateTeam( );
                     break;
                 }
                 case 5:{
@@ -631,7 +615,7 @@ OUT:
             }
             IO::drawSub( true );
         }
-        //End 
+        //End
 
         scanKeys( );
     }

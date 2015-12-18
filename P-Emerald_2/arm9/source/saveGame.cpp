@@ -25,19 +25,18 @@
     along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
     */
 
-
-
-#include <string>
-#include <cstdio>
 #include <nds.h>
 
 #include "saveGame.h"
+#include "fs.h"
+#include "messageBox.h"
 //#include "Gen.h"
 
 namespace FS {
-    std::string sav_nam = "./p_smaragd_2.sav";
-    std::string sav_nam_2 = "./p_smaragd_2.gba.sav";
+    const char* sav_nam = "p_smaragd_2";
+    const char* sav_nam_2 = "p_smaragd_2.gba";
     SavMod savMod = _NDS;
+    std::vector<pokemon> tmp;
     saveGame* SAV;
 
 #define PKMN_DATALENGTH 128
@@ -46,11 +45,11 @@ namespace FS {
 
         for( u8 i = 0; i < 5; ++i ) {
             size_t sz;
-            fread( &sz, sizeof( size_t ), 1, p_file );
+            read( p_file, &sz, sizeof( size_t ), 1 );
             for( size_t j = 0; j < sz; ++j ) {
                 std::pair<u16, u16> ac;
-                fread( &ac.first, sizeof( u16 ), 1, p_file );
-                fread( &ac.second, sizeof( u16 ), 1, p_file );
+                read( p_file, &ac.first, sizeof( u16 ), 1 );
+                read( p_file, &ac.second, sizeof( u16 ), 1 );
                 result->insert( BAG::bag::bagType( i ), ac.first, ac.second );
             }
         }
@@ -72,14 +71,12 @@ namespace FS {
     }
 
     saveGame* readSave( ) {
-        FILE* f = fopen( sav_nam.c_str( ), "rb" );
-
+        FILE* f = open( "./", sav_nam, ".sav" );
         if( !f )
             return 0;
 
         saveGame* result = new saveGame( );
-        fread( result, sizeof( saveGame ), 1, f );
-
+        read( f, result, sizeof( saveGame ), 1 );
         result->m_bag = readBag( f );
         if( !result->m_bag )
             result->m_bag = new BAG::bag( );
@@ -88,21 +85,21 @@ namespace FS {
         if( !result->m_storedPokemon )
             result->m_storedPokemon = new BOX::box( );
 
-        fclose( f );
+        close( f );
         return result;
     }
 
-    bool writeBag( BAG::bag* p_bag, FILE* p_file ) {
+    bool writeBag( FILE* p_file, BAG::bag* p_bag ) {
         if( !p_bag )
             return false;
 
         for( u8 i = 0; i < 5; ++i ) {
             auto bg = p_bag->element( BAG::bag::bagType( i ) );
             auto sz = bg.size( );
-            fwrite( &sz, sizeof( size_t ), 1, p_file );
+            write( p_file, &sz, sizeof( size_t ), 1 );
             for( auto j : bg ) {
-                fwrite( &j.first, sizeof( u16 ), 1, p_file );
-                fwrite( &j.second, sizeof( u16 ), 1, p_file );
+                write( p_file, &j.first, sizeof( u16 ), 1 );
+                write( p_file, &j.second, sizeof( u16 ), 1 );
             }
         }
         return true;
@@ -121,14 +118,13 @@ namespace FS {
     }
 
     bool writeSave( saveGame* p_saveGame ) {
-        FILE* f = fopen( sav_nam.c_str( ), "wb" );
+        FILE* f = open( "./", sav_nam, ".sav", "w" );
         if( !f )
             return 0;
-        fwrite( p_saveGame, sizeof( saveGame ), 1, f );
-        writeBag( p_saveGame->m_bag, f );
+        write( f, p_saveGame, sizeof( saveGame ), 1 );
+        writeBag( f, p_saveGame->m_bag );
         writeStoredPkmn( p_saveGame->m_storedPokemon, f );
-
-        fclose( f );
+        close( f );
         return true;
     }
 
@@ -136,6 +132,11 @@ namespace FS {
     void saveGame::stepIncrease( ) {
         static u8 stepCnt = 0;
         stepCnt++;
+        if( m_repelSteps ) {
+            m_repelSteps--;
+            if( !m_repelSteps )
+                IO::messageBox m( "Der Schutz ist aufgebraucht." );
+        }
         if( !stepCnt ) {
             bool hasHatchSpdUp = m_bag->count( BAG::toBagType( item::itemType::KEY_ITEM ), I_OVAL_CHARM );
             for( size_t s = 0; s < 6; ++s ) {
@@ -164,5 +165,20 @@ namespace FS {
                     ac.m_boxdata.m_steps = std::min( 255, ac.m_boxdata.m_steps + 1 + ( ac.m_boxdata.m_holdItem == I_CLEAR_BELL ) );
             }
         }
+    }
+
+    u8 saveGame::getEncounterLevel( u8 p_tier ) {
+        u8 mxlv = 0;
+        for( u8 i = 0; i < 6; ++i ) {
+            if( !m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                break;
+            mxlv = std::max( mxlv, m_pkmnTeam[ i ].m_Level );
+        }
+        if( !mxlv || m_repelSteps )
+            return 0;
+        mxlv = std::min( 93, mxlv + 6 );
+        mxlv = std::min( 5 * getBadgeCount( ) + 8, mxlv + 0 );
+
+        return mxlv + ( rand( ) % ( 2 * ( p_tier + 1 ) ) - p_tier - 1 );
     }
 }

@@ -75,6 +75,14 @@ namespace IO {
                     break;
                 break;
             case IO::BATTLE:
+                REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3;
+                REG_BLDY = 1;
+                for( u8 i = 1; i < 5; ++i ) {
+                    for( u8 j = 0; j < 4; ++j )
+                        swiWaitForVBlank( );
+                    REG_BLDY |= ( 1 << i );
+                }
+                swiWaitForVBlank( );
                 break;
             case IO::BATTLE_STRONG_OPPONENT:
                 break;

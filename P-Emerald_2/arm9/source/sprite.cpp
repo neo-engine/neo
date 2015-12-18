@@ -40,6 +40,31 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "damage_2.h"
 #include "NoItem.h"
 
+#include "plat0a.h"
+#include "plat0b.h"
+#include "plat1a.h"
+#include "plat1b.h"
+#include "plat2a.h"
+#include "plat2b.h"
+#include "plat3a.h"
+#include "plat3b.h"
+#include "plat4a.h"
+#include "plat4b.h"
+#include "plat5a.h"
+#include "plat5b.h"
+#include "plat6a.h"
+#include "plat6b.h"
+#include "plat7a.h"
+#include "plat7b.h"
+#include "plat8a.h"
+#include "plat8b.h"
+#include "plat9a.h"
+#include "plat9b.h"
+#include "plat10a.h"
+#include "plat10b.h"
+#include "plat11a.h"
+#include "plat11b.h"
+
 unsigned int TEMP[ 12288 ] = { 0 };
 unsigned short TEMP_PAL[ 256 ] = { 0 };
 
@@ -95,6 +120,26 @@ namespace IO {
         r72Pal, r73Pal, r74Pal, r75Pal, r76Pal, r77Pal, r78Pal, r79Pal,
 
         r80Pal, r81Pal, r82Pal, r83Pal, r84Pal, r85Pal
+    };
+    const unsigned int* PlatformTiles[ 2 * MAX_PLATFORMS ] =
+    {
+        plat0aTiles, plat0bTiles,
+        plat1aTiles, plat1bTiles,
+        plat2aTiles, plat2bTiles,
+        plat3aTiles, plat3bTiles,
+        plat4aTiles, plat4bTiles,
+        plat5aTiles, plat5bTiles,
+        plat6aTiles, plat6bTiles,
+        plat7aTiles, plat7bTiles,
+        plat8aTiles, plat8bTiles,
+        plat9aTiles, plat9bTiles,
+        plat10aTiles, plat10bTiles,
+        plat11aTiles, plat11bTiles
+    };
+    const unsigned short* PlatformPals[ MAX_PLATFORMS ] =
+    {
+        plat0aPal, plat1aPal, plat2aPal, plat3aPal, plat4aPal, plat5aPal,
+        plat6aPal, plat7aPal, plat8aPal, plat9aPal, plat10aPal, plat11aPal
     };
 
     const unsigned int* HitTypeTiles[ 3 ] =
@@ -381,14 +426,14 @@ namespace IO {
         }
 
         loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY,
-                    64, 64, TEMP_PAL, TEMP, 96 * 96 / 2, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
+                    64, 64, TEMP_PAL, TEMP, 96 * 96 / 2, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
         loadSprite( p_oamIndex++, p_palCnt, p_tileCnt + 64, p_flipx ? p_posX : 64 + p_posX, p_posY,
-                    32, 64, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
+                    32, 64, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
         if( !p_topOnly ) {
             loadSprite( p_oamIndex++, p_palCnt, p_tileCnt + 96, p_flipx ? 32 + p_posX : p_posX, p_posY + 64,
-                        64, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
+                        64, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
             loadSprite( p_oamIndex, p_palCnt, p_tileCnt + 128, p_flipx ? p_posX : 64 + p_posX, p_posY + 64,
-                        32, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
+                        32, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
         }
         updateOAM( p_bottom );
         return p_tileCnt + 144;
@@ -423,16 +468,16 @@ namespace IO {
                       const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt ) {
 
         FILE* f = FS::open( p_path, p_picnum, ".rsd" );
-        fread( TEMP_PAL, sizeof( unsigned short ), 16, f );
+        FS::read( f, TEMP_PAL, sizeof( unsigned short ), 16 );
         u8 frameCount, width, height;
-        fread( &frameCount, sizeof( u8 ), 1, f );
-        fread( &width, sizeof( u8 ), 1, f );
-        fread( &height, sizeof( u8 ), 1, f );
-        fread( TEMP, sizeof( unsigned int ), width * height * frameCount / 8, f );
+        FS::read( f, &frameCount, sizeof( u8 ), 1 );
+        FS::read( f, &width, sizeof( u8 ), 1 );
+        FS::read( f, &height, sizeof( u8 ), 1 );
+        FS::read( f, TEMP, sizeof( unsigned int ), width * height * frameCount / 8 );
         FS::close( f );
 
         return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, width, height, TEMP_PAL,
-                           TEMP,width * height * frameCount / 2, false, false, false, OBJPRIORITY_2, false );
+                           TEMP, width * height * frameCount / 2, false, false, false, OBJPRIORITY_2, false );
     }
     void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt ) {
         u8 frame = p_frame;

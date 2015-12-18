@@ -3,11 +3,11 @@
     ------------------------------
 
     file        : pokemon.h
-    author      : Philip Wellnitz 
+    author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
     Copyright (C) 2012 - 2015
-    Philip Wellnitz 
+    Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
 
@@ -142,27 +142,16 @@ struct pokemonData {
         }m_e;
         s16 m_evolveData[ 15 ];
     }               m_evolutions[ 7 ];
-    u8              m_displayName[ 15 ];
-    u8              m_species[ 50 ];
-    u8              m_dexEntry[ 200 ];
+    char            m_displayName[ 15 ];
+    char            m_species[ 50 ];
+    char            m_dexEntry[ 200 ];
 
     u16             m_formeIdx[ 30 ];
-    u8              m_formeName[ 30 ][ 15 ];
+    char            m_formeName[ 30 ][ 15 ];
 };
 
-
-Type            getType( u16 p_pkmnId, u16 p_type );
-u16             getBase( u16 p_pkmnId, u16 p_base );
-u16             getCatchRate( u16 p_pkmnId );
-const char*     getDisplayName( u16 p_pkmnId );
 const wchar_t*  getWDisplayName( u16 p_pkmnId );
 void            getWDisplayName( u16 p_pkmnId, wchar_t* p_name );
-void            getHoldItems( u16 p_pkmnId, u16* p_items );
-pkmnGenderType  getGenderType( u16 p_pkmnId );
-const char*     getSpecies( u16 p_pkmnId );
-const char*     getDexEntry( u16 p_pkmnId );
-u16             getForme( u16 p_pkmnId, u16 p_formeId, std::string& p_formeName );
-std::vector<u16> getAllFormes( u16 p_pkmnId );
 bool            getAll( u16 p_pkmnId, pokemonData& out );
 
 void            getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num, u16* p_res );
@@ -189,7 +178,7 @@ public:
         u16      m_oTId : 16;
         u16      m_oTSid : 16;
         u32            m_experienceGained : 32;
-        u8           m_steps : 8; //StepstoHatch/256 // Happiness 
+        u8           m_steps : 8; //StepstoHatch/256 // Happiness
         u8           m_ability : 8;
         union {
             struct {
@@ -357,6 +346,14 @@ u8: 8;
         bool      operator==( const boxPokemon& p_other ) const;
 
         boxPokemon( ) { }
+        boxPokemon( u16             p_pkmnId,
+                    u16             p_level,
+                    const wchar_t*  p_name = 0,
+                    u8              p_shiny = 0,
+                    bool            p_hiddenAbility = false,
+                    bool            p_isEgg = false,
+                    u8              p_pokerus = 0,
+                    bool            p_fatefulEncounter = false );
         boxPokemon( u16*            p_moves,
                     u16             p_pkmnId,
                     const wchar_t*  p_name,
@@ -401,6 +398,14 @@ u8: 8;
     }m_stats;
 
     pokemon( ) { }
+    pokemon( u16             p_pkmnId,
+             u16             p_level,
+             const wchar_t*  p_name = 0,
+             u8              p_shiny = 0,
+             bool            p_hiddenAbility = false,
+             bool            p_isEgg = false,
+             u8              p_pokerus = 0,
+             bool            p_fatefulEncounter = false );
     pokemon( u16*           p_moves,
              u16            p_species,
              const wchar_t* p_name,
