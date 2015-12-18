@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : bagUI.cpp
-author      : Philip Wellnitz (RedArceus)
+author      : Philip Wellnitz 
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz 
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -548,8 +548,8 @@ namespace BAG {
             updateSelectedIdx( oldSelIdx );
         }
 
-        u16 sz = _bag[ _currPage ].size( );
-        item* currItem = ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ];
+        //u16 sz = _bag[ _currPage ].size( );
+        //item* currItem = ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ];
 
         return 0;
     }

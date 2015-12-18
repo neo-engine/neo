@@ -13,7 +13,6 @@
   <ItemGroup>
     <ClInclude Include="arm7\include\ipc.h" />
     <ClInclude Include="arm9\include\libnds_internal.h" />
-    <ClInclude Include="arm9\include\nitrofs.h" />
     <ClInclude Include="arm9\include\unistd.h" />
     <ClInclude Include="arm9\source\ability.h" />
     <ClInclude Include="arm9\source\bag.h" />
@@ -22,6 +21,9 @@
     <ClInclude Include="arm9\source\battle.h" />
     <ClInclude Include="arm9\source\battleUI.h" />
     <ClInclude Include="arm9\source\berry.h" />
+    <ClInclude Include="arm9\source\box.h" />
+    <ClInclude Include="arm9\source\boxUI.h" />
+    <ClInclude Include="arm9\source\boxViewer.h" />
     <ClInclude Include="arm9\source\buffer.h" />
     <ClInclude Include="arm9\source\choiceBox.h" />
     <ClInclude Include="arm9\source\defines.h" />
@@ -30,19 +32,24 @@
     <ClInclude Include="arm9\source\font.h" />
     <ClInclude Include="arm9\source\fs.h" />
     <ClInclude Include="arm9\source\Gen.h" />
+    <ClInclude Include="arm9\source\mapDefines.h" />
+    <ClInclude Include="arm9\source\mapObject.h" />
+    <ClInclude Include="arm9\source\mapDrawer.h" />
     <ClInclude Include="arm9\source\hmMoves.h" />
     <ClInclude Include="arm9\source\item.h" />
     <ClInclude Include="arm9\source\keyboard.h" />
-    <ClInclude Include="arm9\source\map2d.h" />
-    <ClInclude Include="arm9\source\map2devents.h" />
-    <ClInclude Include="arm9\source\mapconfig.h" />
+    <ClInclude Include="arm9\source\mapSlice.h" />
+    <ClInclude Include="arm9\source\mapSprite.h" />
+    <ClInclude Include="arm9\source\mapWarps.h" />
     <ClInclude Include="arm9\source\messageBox.h" />
     <ClInclude Include="arm9\source\move.h" />
     <ClInclude Include="arm9\source\pokemon.h" />
     <ClInclude Include="arm9\source\ribbon.h" />
     <ClInclude Include="arm9\source\saveGame.h" />
+    <ClInclude Include="arm9\source\screenFade.h" />
     <ClInclude Include="arm9\source\script.h" />
     <ClInclude Include="arm9\source\sprite.h" />
+    <ClInclude Include="arm9\source\startScreen.h" />
     <ClInclude Include="arm9\source\statusScreen.h" />
     <ClInclude Include="arm9\source\statusScreenUI.h" />
     <ClInclude Include="arm9\source\type.h" />
@@ -51,13 +58,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c" />
-    <ClCompile Include="arm9\include\hex2dec.c" />
-    <ClCompile Include="arm9\include\nitrofs.c" />
     <ClCompile Include="arm9\source\Bag.cpp" />
     <ClCompile Include="arm9\source\bagUI.cpp" />
     <ClCompile Include="arm9\source\bagViewer.cpp" />
     <ClCompile Include="arm9\source\battle.cpp" />
     <ClCompile Include="arm9\source\battleUI.cpp" />
+    <ClCompile Include="arm9\source\boxUI.cpp" />
+    <ClCompile Include="arm9\source\boxViewer.cpp" />
     <ClCompile Include="arm9\source\buffer.cpp" />
     <ClCompile Include="arm9\source\choiceBox.cpp" />
     <ClCompile Include="arm9\source\dex.cpp" />
@@ -70,15 +77,21 @@
     <ClCompile Include="arm9\source\keyboard.cpp" />
     <ClCompile Include="arm9\source\main.cpp" />
     <ClCompile Include="arm9\source\map2d.cpp" />
-    <ClCompile Include="arm9\source\map2devents.cpp" />
-    <ClCompile Include="arm9\source\mapconfig.cpp" />
+    <ClCompile Include="arm9\source\mapDrawer.cpp" />
+    <ClCompile Include="arm9\source\mapMoves.cpp" />
+    <ClCompile Include="arm9\source\mapObject.cpp" />
+    <ClCompile Include="arm9\source\mapSlice.cpp" />
+    <ClCompile Include="arm9\source\mapSprite.cpp" />
+    <ClCompile Include="arm9\source\mapWarps.cpp" />
     <ClCompile Include="arm9\source\messageBox.cpp" />
     <ClCompile Include="arm9\source\move.cpp" />
     <ClCompile Include="arm9\source\pokemon.cpp" />
     <ClCompile Include="arm9\source\ribbon.cpp" />
     <ClCompile Include="arm9\source\saveGame.cpp" />
+    <ClCompile Include="arm9\source\screenFade.cpp" />
     <ClCompile Include="arm9\source\script.cpp" />
     <ClCompile Include="arm9\source\sprite.cpp" />
+    <ClCompile Include="arm9\source\startScreen.cpp" />
     <ClCompile Include="arm9\source\statusScreen.cpp" />
     <ClCompile Include="arm9\source\statusScreenUI.cpp" />
     <ClCompile Include="arm9\source\type.cpp" />
@@ -87,9 +100,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\ChangeLog.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{516845C0-8C30-4C35-80DF-F3ED8E61213B}</ProjectGuid>

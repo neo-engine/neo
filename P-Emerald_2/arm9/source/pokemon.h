@@ -3,11 +3,11 @@
     ------------------------------
 
     file        : pokemon.h
-    author      : Philip Wellnitz (RedArceus)
-    description : Header file. See corresponding source file for details.
+    author      : Philip Wellnitz
+    description : Header file. Consult the corresponding source file for details.
 
     Copyright (C) 2012 - 2015
-    Philip Wellnitz (RedArceus)
+    Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
 
@@ -142,27 +142,16 @@ struct pokemonData {
         }m_e;
         s16 m_evolveData[ 15 ];
     }               m_evolutions[ 7 ];
-    u8              m_displayName[ 15 ];
-    u8              m_species[ 50 ];
-    u8              m_dexEntry[ 200 ];
+    char            m_displayName[ 15 ];
+    char            m_species[ 50 ];
+    char            m_dexEntry[ 200 ];
 
     u16             m_formeIdx[ 30 ];
-    u8              m_formeName[ 30 ][ 15 ];
+    char            m_formeName[ 30 ][ 15 ];
 };
 
-
-Type            getType( u16 p_pkmnId, u16 p_type );
-u16             getBase( u16 p_pkmnId, u16 p_base );
-u16             getCatchRate( u16 p_pkmnId );
-const char*     getDisplayName( u16 p_pkmnId );
 const wchar_t*  getWDisplayName( u16 p_pkmnId );
 void            getWDisplayName( u16 p_pkmnId, wchar_t* p_name );
-void            getHoldItems( u16 p_pkmnId, u16* p_items );
-pkmnGenderType  getGenderType( u16 p_pkmnId );
-const char*     getSpecies( u16 p_pkmnId );
-const char*     getDexEntry( u16 p_pkmnId );
-u16             getForme( u16 p_pkmnId, u16 p_formeId, std::string& p_formeName );
-std::vector<u16> getAllFormes( u16 p_pkmnId );
 bool            getAll( u16 p_pkmnId, pokemonData& out );
 
 void            getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num, u16* p_res );
@@ -189,7 +178,7 @@ public:
         u16      m_oTId : 16;
         u16      m_oTSid : 16;
         u32            m_experienceGained : 32;
-        u8           m_steps : 8; //StepstoHatch/256 // Happiness 
+        u8           m_steps : 8; //StepstoHatch/256 // Happiness
         u8           m_ability : 8;
         union {
             struct {
@@ -354,7 +343,17 @@ u8: 8;
             return 30 + ( ( ( ( IVget( 0 ) >> 1 ) & 1 ) + 2 * ( ( IVget( 1 ) >> 1 ) & 1 ) + 4 * ( ( IVget( 2 ) >> 1 ) & 1 ) + 8 * ( ( IVget( 3 ) >> 1 ) & 1 ) + 16 * ( ( IVget( 4 ) >> 1 ) & 1 ) + 32 * ( ( IVget( 5 ) >> 1 ) & 1 ) * 40 ) / 63 );
         }
 
+        bool      operator==( const boxPokemon& p_other ) const;
+
         boxPokemon( ) { }
+        boxPokemon( u16             p_pkmnId,
+                    u16             p_level,
+                    const wchar_t*  p_name = 0,
+                    u8              p_shiny = 0,
+                    bool            p_hiddenAbility = false,
+                    bool            p_isEgg = false,
+                    u8              p_pokerus = 0,
+                    bool            p_fatefulEncounter = false );
         boxPokemon( u16*            p_moves,
                     u16             p_pkmnId,
                     const wchar_t*  p_name,
@@ -363,17 +362,13 @@ u8: 8;
                     u16             p_sid,
                     const wchar_t*  p_ot,
                     bool            p_oTFemale,
-                    bool            p_cloned,
-                    bool            p_shiny,
+                    u8              p_shiny = 0,
                     bool            p_hiddenAbility = false,
                     bool            p_fatefulEncounter = false,
                     bool            p_isEgg = false,
                     u16             p_gotPlace = 0,
                     u8              p_ball = 0,
                     u8              p_pokerus = 0 );
-
-        ~boxPokemon( ) { }
-
     } m_boxdata;
 
     union {
@@ -403,6 +398,14 @@ u8: 8;
     }m_stats;
 
     pokemon( ) { }
+    pokemon( u16             p_pkmnId,
+             u16             p_level,
+             const wchar_t*  p_name = 0,
+             u8              p_shiny = 0,
+             bool            p_hiddenAbility = false,
+             bool            p_isEgg = false,
+             u8              p_pokerus = 0,
+             bool            p_fatefulEncounter = false );
     pokemon( u16*           p_moves,
              u16            p_species,
              const wchar_t* p_name,
@@ -411,8 +414,7 @@ u8: 8;
              u16            p_sid,
              const wchar_t* p_ot,
              bool           p_oTFemale,
-             bool           p_cloned,
-             bool           p_shiny,
+             u8             p_shiny = 0,
              bool           p_hiddenAbility = false,
              bool           p_fatefulEncounter = false,
              bool           p_isEgg = false,
@@ -422,6 +424,8 @@ u8: 8;
 
     void            evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
     bool            canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
+
+    void            hatch( );
 
     bool      operator==( const pokemon& p_other ) const;
 };

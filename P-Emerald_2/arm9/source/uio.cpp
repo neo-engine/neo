@@ -113,7 +113,7 @@ namespace IO {
         DRAW_TIME = true;
     }
 
-    void drawSub( u8 p_newIdx ) {
+    void drawSub( bool p_initMainSrites, u8 p_newIdx ) {
         if( FS::SAV->m_bgIdx == p_newIdx )
             return;
         else if( p_newIdx == u8( 255 ) )
@@ -130,6 +130,8 @@ namespace IO {
         } else
             FS::SAV->m_bgIdx = p_newIdx;
         drawBorder( );
+        if( p_initMainSrites )
+            INIT_MAIN_SPRITES = true;
     }
 
     bool waitForTouchUp( u16 p_targetX1, u16 p_targetY1, u16 p_targetX2, u16 p_targetY2 ) {
@@ -307,14 +309,14 @@ namespace IO {
                             true, false, WHITE_IDX );
         } else {
             printRectangle( p_x1, p_y1, p_x2 - 1, p_y2 - 1,
-                            true, false, BLACK_IDX );
+                            true, false, 0 );
             printRectangle( p_x1 + 2, p_y1 + 1, p_x2, p_y2,
                             true, false, p_colorIdx );
 
-            printRectangle( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth2 - 1, p_y2 - p_borderWidth + 3,
+            printRectangle( p_x1 + 3 + p_borderWidth, p_y1 + p_borderWidth, p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4,
                             true, false, BLACK_IDX );
 
-            printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4,
+            printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 3,
                             true, false, WHITE_IDX );
         }
     }
@@ -362,18 +364,6 @@ namespace IO {
         p_font->printStringCenterD( p_string, p_bottom );
     }
 
-    void topScreenDarken( ) {
-        u16 i;
-        color pixel;
-
-        for( i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++ ) {
-            pixel = ( (color *)BG_BMP_RAM( 1 ) )[ i ];
-            ( (color *)BG_BMP_RAM( 1 ) )[ i ] = ( ( pixel & 0x1F ) >> 1 ) |
-                ( ( ( ( pixel >> 5 ) & 0x1F ) >> 1 ) << 5 ) |
-                ( ( ( ( pixel >> 10 ) & 0x1F ) >> 1 ) << 10 ) |
-                ( 1 << 15 );
-        }
-    }
     void topScreenPlot( u8 p_x, u8 p_y, color p_color ) {
         if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
             ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
@@ -381,18 +371,6 @@ namespace IO {
             ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
         else if( ( p_color % ( 1 << 8 ) ) != 0 )
             ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
-    }
-    void btmScreenDarken( ) {
-        u16 i;
-        color pixel;
-
-        for( i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++ ) {
-            pixel = ( (color *)BG_BMP_RAM_SUB( 1 ) )[ i ];
-            ( (color *)BG_BMP_RAM_SUB( 1 ) )[ i ] = ( ( pixel & 0x1F ) >> 1 ) |
-                ( ( ( ( pixel >> 5 ) & 0x1F ) >> 1 ) << 5 ) |
-                ( ( ( ( pixel >> 10 ) & 0x1F ) >> 1 ) << 10 ) |
-                ( 1 << 15 );
-        }
     }
     void btmScreenPlot( u8 p_x, u8 p_y, color p_color ) {
         if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )

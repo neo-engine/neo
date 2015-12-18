@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : script.h
-author      : Philip Wellnitz (RedArceus)
-description : Header file. See corresponding source file for details.
+author      : Philip Wellnitz 
+description : Header file. Consult the corresponding source file for details.
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz 
 
 This file is part of Pokémon Emerald 2 Version.
 

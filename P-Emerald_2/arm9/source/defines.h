@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : defines.h
-author      : Philip Wellnitz (RedArceus)
-description : Header file. See corresponding source file for details.
+author      : Philip Wellnitz 
+description : Header file. Consult the corresponding source file for details.
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz 
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -24,22 +24,48 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
+#pragma once
 
 #include <nds.h>
 #include <nds/ndstypes.h>
 #include <cmath>
 #include <cstdio>
+#include <string>
 
 //#define USE_AS_LIB
+#undef _EMULATOR
+#define VERSION "0.5"
+#define VERSION_NAME "Fighting Torchic"
+#define DEBUG
+
+enum GameMod : u8 {
+    DEVELOPER,
+    ALPHA,
+    BETA,
+    RELEASE,
+    EMULATOR
+};
+extern GameMod gMod;
+
+std::string toString( u16 p_num ); //I REALLY LIKE WORKAROUNDING g++'S BUGS
+u8 getCurrentDaytime( );
 
 extern bool DRAW_TIME;
 extern bool ANIMATE_MAP;
+extern bool INIT_MAIN_SPRITES;
+extern u8 FRAME_COUNT;
 
 extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;
 
+extern int pressed, held, last;
+
 extern unsigned int TEMP[ 12288 ];
 extern unsigned short TEMP_PAL[ 256 ];
+
+#define NO_DATA "Keine Daten."
+#define FARAWAY_PLACE "Entfernter Ort"
+#define UNKNOWN_SPECIES "Unbekannt"
 
 #define loop() while( 1 )
 
@@ -53,9 +79,19 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define GET_AND_WAIT_C( p_x, p_y, p_r ) ( IN_RANGE_C( touch, IO::inputTarget( p_x, p_y, p_r ) )\
                                     && IO::waitForInput( IO::inputTarget( p_x, p_y, p_r ) ) )
 
+#define GET_DIR(a) ( \
+            ( (a) & KEY_DOWN )  ?   MAP::direction::DOWN : (\
+            ( (a) & KEY_UP )    ?   MAP::direction::UP : (\
+            ( (a) & KEY_RIGHT ) ?   MAP::direction::RIGHT :\
+                                    MAP::direction::LEFT ) ) )
+
+#define IN_DEX(pidx) ( FS::SAV->m_inDex[ (pidx) / 8 ] & ( 1 << ( (pidx) % 8 ) ) )
+
 #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 #define COMPL(a) ( RGB( 31 - ( (a) >> 10 ) % 32,31 - ( (a) >> 5 ) % 32,31 - (a) % 32 ) )
 
+#define RED2_IDX (u8(247))
+#define BLUE2_IDX (u8(248))
 #define COLOR_IDX (u8(249))
 #define WHITE_IDX (u8(250))
 #define GRAY_IDX (u8(251))
@@ -66,8 +102,10 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define CHOICE_COLOR RGB(16,25,19)
 
 #define GREEN RGB(0,20,0)
-#define RED RGB(24,0,0)
-#define BLUE RGB(0,0,24)
+#define RED RGB(28,0,0)
+#define RED2 RGB(10,0,0)
+#define BLUE RGB(0,10,31)
+#define BLUE2 RGB(0,0,15)
 #define WHITE RGB(31,31,31)
 #define GRAY RGB(15,15,15)
 #define NORMAL_ RGB(27,27,27)
@@ -115,6 +153,3 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define BORDER_ID 31
 // 9 additional spaces used
 #define SQCH_ID 80
-
-u8 getCurrentDaytime( );
-void shoUseAttack( u16 p_pkmIdx, bool p_female, bool p_shiny );

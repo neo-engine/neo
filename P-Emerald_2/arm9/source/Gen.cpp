@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : Gen.cpp
-author      : Philip Wellnitz (RedArceus)
+author      : Philip Wellnitz 
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz 
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -814,7 +814,7 @@ namespace gen3 {
         return '\0';
     }
 
-    /* void convertgen3pkmtogen5(void * gbapkm, void * pkm)
+     void convertgen3pkmtogen5(void * gbapkm, void * pkm)
      {
      std::ostringstream o;
      o

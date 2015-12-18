@@ -16,12 +16,12 @@ LIBNDS	:=	$(DEVKITPRO)/libnds
 
 #---------------------------------------------------------------------------------
 %.nds: %.arm9
-	@ndstool -c $@ -9 $< -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES)
+	@ndstool -c $@ -9 $<
 	@echo built ... $(notdir $@)
 
 #---------------------------------------------------------------------------------
 %.nds: %.elf
-	@ndstool -c $@ -9 $< -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES)
+	@ndstool -c $@ -9 $<
 	@echo built ... $(notdir $@)
 
 #---------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH)  -Wl,-Map,$(notdir $*.map)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:= -lfat -lnds9
+LIBS	:= -lfilesystem -lfat -lnds9
  
  
 #---------------------------------------------------------------------------------

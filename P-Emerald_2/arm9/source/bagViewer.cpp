@@ -13,7 +13,7 @@
 namespace BAG {
 #define TRESHOLD 10
     bagViewer::bagViewer( bag* p_bag, bagUI* p_bagUI )
-        :_bagUI( p_bagUI ), _origBag( p_bag ) {
+        : _origBag( p_bag ), _bagUI( p_bagUI ) {
         _currPage = 0;
         _currItem = 0;
         _currCmp = std::less<std::pair<u16, u16>>( );
@@ -158,7 +158,7 @@ namespace BAG {
                                     _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                                     swiWaitForVBlank( );
 
-                                    sprintf( buffer, "...und wurde zu einem\n%s!", getDisplayName( acPkmn.m_boxdata.m_speciesId ) );
+                                    sprintf( buffer, "...und wurde zu einem\n%ls!", getWDisplayName( acPkmn.m_boxdata.m_speciesId ) );
                                     IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                                     IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -222,7 +222,7 @@ namespace BAG {
                                     _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                                     swiWaitForVBlank( );
 
-                                    sprintf( buffer, "...und wurde zu einem\n%s!", getDisplayName( acPkmn.m_boxdata.m_speciesId ) );
+                                    sprintf( buffer, "...und wurde zu einem\n%ls!", getWDisplayName( acPkmn.m_boxdata.m_speciesId ) );
                                     IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                                     IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;

@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : fs.cpp
-author      : Philip Wellnitz (RedArceus)
+author      : Philip Wellnitz
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -25,8 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
 #include <string>
 #include <vector>
 #include <cstdio>
@@ -41,23 +39,24 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "berry.h"
 #include "uio.h"
 #include "defines.h"
-
+#include "mapSlice.h"
 
 const char ITEM_PATH[ ] = "nitro:/ITEMS/";
 const char PKMNDATA_PATH[ ] = "nitro:/PKMNDATA/";
 const char ABILITYDATA_PATH[ ] = "nitro:/PKMNDATA/ABILITIES/";
 
 ability::ability( int p_abilityId ) {
-    sprintf( buffer, "nitro:/PKMNDATA/ABILITIES/%i.data", p_abilityId );
-    FILE* f = fopen( buffer, "r" );
+    FILE* f = FS::open( "nitro:/PKMNDATA/ABILITIES/", p_abilityId, ".data" );
 
     if( !f )
         return;
 
     m_abilityName = FS::readString( f, true );
     m_flavourText = FS::readString( f, true );
-    fscanf( f, "%u", &( m_type ) );
-    fclose( f );
+    u32 tmp;
+    fscanf( f, "%lu", &tmp );
+    m_type = static_cast<ability::abilityType>( tmp );
+    FS::close( f );
 }
 
 std::wstring getWAbilityName( int p_abilityId ) {
@@ -67,7 +66,7 @@ std::wstring getWAbilityName( int p_abilityId ) {
     if( !f )
         return L"---";
     auto ret = FS::readWString( f, false );
-    fclose( f );
+    FS::close( f );
     return ret;
 }
 
@@ -97,48 +96,57 @@ namespace FS {
         return true;
     }
 
-    bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt, unsigned short* p_data ) {
+    FILE* open( const char* p_path, const char* p_name, const char* p_ext, const char* p_mode ) {
         char buffer[ 100 ];
-        sprintf( buffer, "%s%s.raw", p_path, p_name );
-        FILE* fd = fopen( buffer, "rb" );
+        sprintf( buffer, "%s%s%s", p_path, p_name, p_ext );
+        return fopen( buffer, p_mode );
+    }
+    FILE* open( const char* p_path, u16 p_value, const char* p_ext, const char* p_mode ) {
+        char buffer[ 100 ];
+        sprintf( buffer, "%s%d%s", p_path, p_value, p_ext );
+        return fopen( buffer, p_mode );
+    }
+    void close( FILE* p_file ) {
+        fclose( p_file );
+    }
+    size_t read( FILE* p_stream, void* p_buffer, size_t p_size, size_t p_count ) {
+        if( !p_stream )
+            return 0;
+        return fread( p_buffer, p_size, p_count, p_stream );
+    }
+    size_t write( FILE* p_stream, const void* p_buffer, size_t p_size, size_t p_count ) {
+        if( !p_stream )
+            return 0;
+        return fwrite( p_buffer, p_size, p_count, p_stream );
+    }
 
-        if( fd == 0 ) {
-            fclose( fd );
+    bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt, unsigned short* p_data ) {
+        FILE* fd = open( p_path, p_name );
+        if( !fd )
             return false;
-        }
-        fread( p_data, sizeof( unsigned short ), p_dataCnt, fd );
-        fclose( fd );
+        read( fd, p_data, sizeof( unsigned short ), p_dataCnt );
+        close( fd );
         return true;
     }
 
     bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt1,
                    unsigned short* p_data1, unsigned int p_dataCnt2, unsigned int* p_data2 ) {
-        char buffer[ 100 ];
-        sprintf( buffer, "%s%s.raw", p_path, p_name );
-        FILE* fd = fopen( buffer, "rb" );
-
-        if( fd == 0 ) {
-            fclose( fd );
+        FILE* fd = open( p_path, p_name );
+        if( !fd )
             return false;
-        }
-        fread( p_data1, sizeof( unsigned short ), p_dataCnt1, fd );
-        fread( p_data2, sizeof( unsigned int ), p_dataCnt2, fd );
-        fclose( fd );
+        read( fd, p_data1, sizeof( unsigned short ), p_dataCnt1 );
+        read( fd, p_data2, sizeof( unsigned int ), p_dataCnt2 );
+        close( fd );
         return true;
     }
     bool readData( const char* p_path, const char* p_name, const unsigned int p_dataCnt1,
                    unsigned int* p_data1, unsigned short p_dataCnt2, unsigned short* p_data2 ) {
-        char buffer[ 100 ];
-        sprintf( buffer, "%s%s.raw", p_path, p_name );
-        FILE* fd = fopen( buffer, "rb" );
-
-        if( fd == 0 ) {
-            fclose( fd );
+        FILE* fd = open( p_path, p_name );
+        if( !fd )
             return false;
-        }
-        fread( p_data1, sizeof( unsigned int ), p_dataCnt1, fd );
-        fread( p_data2, sizeof( unsigned short ), p_dataCnt2, fd );
-        fclose( fd );
+        read( fd, p_data1, sizeof( unsigned int ), p_dataCnt1 );
+        read( fd, p_data2, sizeof( unsigned short ), p_dataCnt2 );
+        close( fd );
         return true;
     }
 
@@ -146,13 +154,8 @@ namespace FS {
         if( !readData( p_path, p_name, (unsigned int)p_tileCnt, TEMP, (unsigned short)p_palCnt, TEMP_PAL ) )
             return false;
 
-        if( p_bottom ) {
-            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX_SUB[ p_spriteInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ], 4 * p_tileCnt );
-            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE_SUB[ p_spriteInfo->m_entry->palette * IO::COLORS_PER_PALETTE ], 2 * p_palCnt );
-        } else {
-            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP, &SPRITE_GFX[ p_spriteInfo->m_entry->gfxIndex * IO::OFFSET_MULTIPLIER ], 4 * p_tileCnt );
-            dmaCopyHalfWords( IO::SPRITE_DMA_CHANNEL, TEMP_PAL, &SPRITE_PALETTE[ p_spriteInfo->m_entry->palette * IO::COLORS_PER_PALETTE ], 2 * p_palCnt );
-        }
+        IO::copySpriteData( TEMP, p_spriteInfo->m_entry->gfxIndex, 4 * p_tileCnt, p_bottom );
+        IO::copySpritePal( TEMP_PAL, p_spriteInfo->m_entry->palette, 2 * p_palCnt, p_bottom );
         return true;
     }
 
@@ -187,6 +190,61 @@ namespace FS {
 
         return true;
     }
+
+    bool readNop( FILE* p_file, u32 p_cnt ) {
+        if( p_file == 0 )
+            return false;
+        read( p_file, 0, 1, p_cnt );
+        return true;
+    }
+
+    bool readPal( FILE* p_file, MAP::palette* p_palette ) {
+        if( p_file == 0 )
+            return false;
+        read( p_file, p_palette, sizeof( u16 ) * 16, 6 );
+        return true;
+    }
+
+    bool readTiles( FILE* p_file, MAP::tile* p_tileSet, u16 p_startIdx, u16 p_size ) {
+        if( p_file == 0 )
+            return false;
+        read( p_file, p_tileSet + p_startIdx, sizeof( MAP::tile )*p_size, 1 );
+        return true;
+    }
+
+    bool readblocks( FILE* p_file, MAP::block* p_tileSet, u16 p_startIdx, u16 p_size ) {
+        if( p_file == 0 )
+            return false;
+        readNop( p_file, 4 );
+        for( u16 i = 0; i < p_size; ++i ) {
+            read( p_file, &( p_tileSet + p_startIdx + i )->m_bottom, 4 * sizeof( MAP::blockAtom ), 1 );
+            read( p_file, &( p_tileSet + p_startIdx + i )->m_top, 4 * sizeof( MAP::blockAtom ), 1 );
+        }
+        for( u16 i = 0; i < p_size; ++i ) {
+            read( p_file, &( p_tileSet + p_startIdx + i )->m_bottombehave, sizeof( u8 ), 1 );
+            read( p_file, &( p_tileSet + p_startIdx + i )->m_topbehave, sizeof( u8 ), 1 );
+        }
+        return true;
+    }
+
+    //inline void readAnimations( FILE* p_file, std::vector<MAP::Animation>& p_animations ) {
+    //    if( p_file == 0 )
+    //        return;
+    //    u8 N;
+    //    fread( &N, sizeof( u8 ), 1, p_file );
+    //    for( int i = 0; i < N; ++i ) {
+    //        MAP::Animation a;
+    //        fread( &a.m_tileIdx, sizeof( u16 ), 1, p_file );
+    //        fread( &a.m_speed, sizeof( u8 ), 1, p_file );
+    //        fread( &a.m_maxFrame, sizeof( u8 ), 1, p_file );
+    //        a.m_acFrame = 0;
+    //        a.m_animationTiles.assign( a.m_maxFrame, tile( ) );
+    //        for( int i = 0; i < a.m_maxFrame; ++i )
+    //            fread( &a.m_animationTiles[ i ], sizeof( tile ), 1, p_file );
+    //        p_animations.push_back( a );
+    //    }
+    //    fclose( p_file );
+    //}
 
     std::string readString( FILE* p_file, bool p_new ) {
         std::string ret = "";
@@ -367,70 +425,37 @@ namespace FS {
 
     const char* getLoc( u16 p_ind ) {
         if( p_ind > 5000 )
-            return "Entfernter Ort";
+            return FARAWAY_PLACE;
+        FILE* f = FS::open( "nitro:/LOCATIONS/", p_ind, ".data" );
 
-        sprintf( buffer, "nitro:/LOCATIONS/%i.data", p_ind );
-        FILE* f = fopen( buffer, "r" );
         if( f == 0 ) {
-            fclose( f );
             if( savMod == SavMod::_NDS && p_ind > 322 && p_ind < 1000 )
                 return getLoc( 3002 );
 
-            return "Entfernter Ort";
+            return FARAWAY_PLACE;
         }
-
         char buffer[ 50 ] = { 0 };
-        fread( buffer, 1, 49, f );
+        FS::read( f, buffer, 1, 49 );
 
         std::string ret = std::string( buffer );
         ret.pop_back( );
-        fclose( f );
+        FS::close( f );
         return ret.c_str( );
     }
 }
 
-[[ deprecated ]]
-Type getType( u16 p_pkmnId, u16 p_type ) {
-    pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return tmp.m_types[ p_type ];
-    } else {
-        return UNBEKANNT;
-    }
+std::string toString( u16 p_num ) {
+    char buffer[ 32 ];
+    sprintf( buffer, "%hu", p_num );
+    return std::string( buffer );
 }
-[[ deprecated ]]
-u16 getBase( u16 p_pkmnId, u16 p_base ) {
-    pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return tmp.m_bases[ p_base ];
-    } else {
-        return 0;
-    }
-}
-[[ deprecated ]]
-u16 getCatchRate( u16 p_pkmnId ) {
-    pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return tmp.m_catchrate;
-    } else {
-        return 0;
-    }
-}
-[[ deprecated ]]
-const char* getDisplayName( u16 p_pkmnId ) {
-    static pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return reinterpret_cast<const char*>(tmp.m_displayName);
-    } else {
-        return "???";
-    }
-}
+
 const wchar_t* getWDisplayName( u16 p_pkmnId ) {
     static pokemonData tmp;
     if( !getAll( p_pkmnId, tmp ) ) {
         return L"???";
     }
-    
+
     std::wstring res = L"";
     for( u8 i = 0; tmp.m_displayName[ i ]; ++i )
         res += tmp.m_displayName[ i ];
@@ -442,103 +467,34 @@ void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
         wcscpy( p_name, L"???" );
         return;
     }
-    
+
     std::wstring res = L"";
     for( u8 i = 0; tmp.m_displayName[ i ]; ++i )
         res += tmp.m_displayName[ i ];
     wcscpy( p_name, res.c_str( ) );
 }
 
-[[ deprecated ]]
-void getHoldItems( u16 p_pkmnId, u16* p_items ) {
-    pokemonData tmp;
-    memset( p_items, 0, 4 * sizeof( u16 ) );
-    if( getAll( p_pkmnId, tmp ) ) {
-        memcpy( p_items, tmp.m_items, 4 * sizeof( u16 ) );    
-    } 
-}
-
-[[ deprecated ]]
-pkmnGenderType getGenderType( u16 p_pkmnId ) {
-    pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return tmp.m_gender;
-    } else {
-        return pkmnGenderType( 0 );
-    }
-}
-
-[[ deprecated ]]
-const char* getDexEntry( u16 p_pkmnId ) {
-    static pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return reinterpret_cast<const char*>( tmp.m_dexEntry );
-    } else {
-        return "Keine Daten vorhanden.";
-    }
-}
-
-[[ deprecated ]]
-u16 getForme( u16 p_pkmnId, u16 p_formeId, std::string& p_retFormeName ) {
-    pokemonData tmp;
-    if( !getAll( p_pkmnId, tmp ) ) {
-        return p_pkmnId;
-    }
-    p_retFormeName = std::string( reinterpret_cast<const char*>( tmp.m_formeName[ p_formeId ] ) );
-    return tmp.m_formeIdx[ p_formeId ];
-}
-
-[[ deprecated ]]
-std::vector<u16> getAllFormes( u16 p_pkmnId ) {   
-    pokemonData tmp;
-    if( !getAll( p_pkmnId, tmp ) ) {
-        return{ };
-    }
-    
-    std::vector<u16> res;
-    for( u8 i = 0; i < tmp.m_formecnt; ++i ) 
-        res.push_back( tmp.m_formeIdx[ i ] );
-    return res;
-}
-
-[[ deprecated ]]
-const char* getSpecies( u16 p_pkmnId ) {
-    static pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return reinterpret_cast<const char*>( tmp.m_species );
-    } else {
-        return "Unbekannt";
-    }
-}
-
 bool getAll( u16 p_pkmnId, pokemonData& p_out ) {
-    char pt[ 100 ];
-    sprintf( pt, "%s%d.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
-
-    if( f == 0 ) {
-        fclose( f );
+    FILE* f = FS::open( PKMNDATA_PATH, p_pkmnId, ".data" );
+    if( f == 0 )
         return false;
-    }
 
-    fread( &p_out, sizeof( pokemonData ), 1, f );
-    fclose( f );
+    FS::read( f, &p_out, sizeof( pokemonData ), 1 );
+    FS::close( f );
     return true;
 }
 
 void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount, u16* p_result ) {
-    sprintf( buffer, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( buffer, "r" );
+    FILE* f = FS::open( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId, ".learnset.data" );
     if( !f )
         return;
-    
+
     u16 buffer[ 700 ];
-    fread( buffer, sizeof( u16 ), 699, f );
-    fclose( f );
+    FS::read( f, buffer, sizeof( u16 ), 699 );
+    FS::close( f );
     u16 ptr = 0;
 
     u16 rescnt = 0;
-
     for( u8 i = 0; i < p_amount; ++i )
         p_result[ i ] = 0;
 
@@ -563,6 +519,7 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
 N:
             ;
         }
+        FS::close( f );
         return;
     } else {
         for( u16 i = 0; i <= p_toLevel; ++i ) {
@@ -582,17 +539,16 @@ NEXT:
             }
         }
     }
+    FS::close( f );
 }
 bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
-    char pt[ 150 ];
-    sprintf( pt, "%s/LEARNSETS/%d.learnset.data", PKMNDATA_PATH, p_pkmnId );
-    FILE* f = fopen( pt, "r" );
+    FILE* f = FS::open( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId, ".learnset.data" );
     if( !f )
         return false;
-    
+
     u16 buffer[ 700 ];
-    fread( buffer, sizeof( u16 ), 699, f );
-    fclose( f );
+    FS::read( f, buffer, sizeof( u16 ), 699 );
+    FS::close( f );
     u16 ptr = 0;
 
     for( int i = 0; i <= 100; ++i ) {
@@ -616,45 +572,49 @@ u16 item::getItemId( ) {
 bool item::load( ) {
     if( m_loaded )
         return true;
-    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-    FILE* f = fopen( buffer, "r" );
-    if( f == 0 )
+    FILE* f = FS::open( ITEM_PATH, m_itemName.c_str( ), ".data" );
+    if( !f )
         return false;
 
     memset( &m_itemData, 0, sizeof( itemData ) );
-    fscanf( f, "%hhu %lu %lu\n", &m_itemData.m_itemEffectType,
+    u8 tmp;
+    fscanf( f, "%hhu %lu %lu\n", &tmp,
             &m_itemData.m_price, &m_itemData.m_itemEffect );
+    m_itemData.m_itemEffectType = static_cast<item::itemEffectType>( tmp );
     strcpy( m_itemData.m_itemDisplayName, FS::readString( f, true ).c_str( ) );
     strcpy( m_itemData.m_itemDescription, FS::readString( f, true ).c_str( ) );
     strcpy( m_itemData.m_itemShortDescr, FS::readString( f, true ).c_str( ) );
-    fclose( f );
+    FS::close( f );
     return m_loaded = true;
 }
 
 bool berry::load( ) {
     if( m_loaded )
         return true;
-    sprintf( buffer, "%s%s.data", ITEM_PATH, m_itemName.c_str( ) );
-    FILE* f = fopen( buffer, "r" );
-    if( f == 0 )
+    FILE* f = FS::open( ITEM_PATH, m_itemName.c_str( ), ".data" );
+    if( !f )
         return false;
 
     memset( &m_itemData, 0, sizeof( itemData ) );
-    fscanf( f, "%hhu %lu %lu\n", &m_itemData.m_itemEffectType,
+    u8 tmp;
+    fscanf( f, "%hhu %lu %lu\n", &tmp,
             &m_itemData.m_price, &m_itemData.m_itemEffect );
+    m_itemData.m_itemEffectType = static_cast<item::itemEffectType>( tmp );
     strcpy( m_itemData.m_itemDisplayName, FS::readString( f, true ).c_str( ) );
     strcpy( m_itemData.m_itemDescription, FS::readString( f, true ).c_str( ) );
     strcpy( m_itemData.m_itemShortDescr, FS::readString( f, true ).c_str( ) );
 
     memset( &m_berryData, 0, sizeof( berryData ) );
-    fscanf( f, "%hu %hhu %hhu %hhu", &m_berryData.m_berrySize,
-            &m_berryData.m_berryGuete, &m_berryData.m_naturalGiftType,
-            &m_berryData.m_naturalGiftStrength );
+    fscanf( f, "%hu %hhu", &m_berryData.m_berrySize, &tmp );
+    m_berryData.m_berryGuete = static_cast<berry::berryGueteType>( tmp );
+    fscanf( f, "%hhu %hhu", &tmp, &m_berryData.m_naturalGiftStrength );
+    m_berryData.m_naturalGiftType = static_cast<Type>( tmp );
+
     for( u8 i = 0; i < 5; ++i )
         fscanf( f, "%hhu", &m_berryData.m_berryTaste[ i ] );
     fscanf( f, "%hhu %hhu %hhu", &m_berryData.m_hoursPerGrowthStage,
             &m_berryData.m_minBerries, &m_berryData.m_maxBerries );
-    fclose( f );
+    FS::close( f );
     return m_loaded = true;
 }
 
@@ -669,13 +629,13 @@ std::string item::getDisplayName( bool p_new ) {
 
 std::string item::getDescription( ) {
     if( !m_loaded && !load( ) )
-        return "Keine Daten.";
+        return NO_DATA;
     return std::string( m_itemData.m_itemDescription );
 }
 
 std::string item::getShortDescription( ) {
     if( !m_loaded && !load( ) )
-        return "Keine Daten.";
+        return NO_DATA;
     return std::string( m_itemData.m_itemShortDescr );
 }
 

@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : messageBox.h
-author      : Philip Wellnitz (RedArceus)
-description : Header file. See corresponding source file for details.
+author      : Philip Wellnitz 
+description : Header file. Consult the corresponding source file for details.
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz 
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -50,6 +50,7 @@ namespace IO {
         messageBox( const char* p_text, const char* p_name, bool p_a = true, bool p_remsprites = true, sprite_type p_sprt = no_sprite, u16 p_sprind = 0 );
         messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_a = true, bool p_remsprites = true, sprite_type p_sprt = no_sprite, u16 p_sprind = 0 );
         void put( const char* p_text, bool p_a = true );
+        void carriageReturn( );
         void clear( );
         void clearButName( );
 

@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : script.cpp
-author      : Philip Wellnitz (RedArceus)
+author      : Philip Wellnitz 
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz 
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -52,32 +52,25 @@ namespace BATTLE {
     u8 targetVal;
     int getTargetSpecifierValue( const battle& p_battle, const pokemon& p_target, bool p_targetIsOpp,
                                  u8 p_targetPosition, const battleScript::command::targetSpecifier& p_targetSpecifier ) {
+        pokemonData data; getAll( p_target.m_boxdata.m_speciesId, data );
         switch( p_targetSpecifier ) {
             case BATTLE::battleScript::command::PKMN_TYPE1:
-                return int( getType( p_target.m_boxdata.m_speciesId, 0 ) );
+                return int( data.m_types[ 0 ] );
             case BATTLE::battleScript::command::PKMN_TYPE2:
-                return int( getType( p_target.m_boxdata.m_speciesId, 1 ) );
+                return int( data.m_types[ 1 ] );
             case BATTLE::battleScript::command::PKMN_TYPE1o2:
             {
-                int a = int( getType( p_target.m_boxdata.m_speciesId, 1 ) );
+                int a = int( data.m_types[ 1 ] );
                 if( targetVal == a )
                     return a;
                 else
-                    return int( getType( p_target.m_boxdata.m_speciesId, 0 ) );
+                    return int( data.m_types[ 0 ] );
                 break;
             }
             case BATTLE::battleScript::command::PKMN_SIZE:
-            {
-                pokemonData pd;
-                getAll( p_target.m_boxdata.m_speciesId, pd );
-                return int( pd.m_size );
-            }
+                return int( data.m_size );
             case BATTLE::battleScript::command::PKMN_WEIGHT:
-            {
-                pokemonData pd;
-                getAll( p_target.m_boxdata.m_speciesId, pd );
-                return int( pd.m_weight );
-            }
+                return int( data.m_weight );
             case BATTLE::battleScript::command::PKMN_SPECIES:
                 return p_target.m_boxdata.m_speciesId;
             case BATTLE::battleScript::command::PKMN_ITEM:
@@ -151,9 +144,9 @@ namespace BATTLE {
                     return ( p_target._battleMoves[ 0 ][ OPPONENT ].m_type == battle::battleMove::ATTACK ) ? p_target._battleMoves[ 0 ][ OPPONENT ].m_value : -1;
                 return ( p_target._battleMoves[ 1 ][ OPPONENT ].m_type == battle::battleMove::ATTACK ) ? p_target._battleMoves[ 1 ][ OPPONENT ].m_value : -1;
             case BATTLE::battleScript::command::BATTLE_OWN_TEAMSIZE:
-                return int( p_target._player.m_pkmnTeam.size( ) );
+                return int( p_target._player->m_pkmnTeam.size( ) );
             case BATTLE::battleScript::command::BATTLE_OPP_TEAMSIZE:
-                return int( p_target._opponent.m_pkmnTeam.size( ) );
+                return int( p_target._opponent->m_pkmnTeam.size( ) );
             default:
                 return -1;
         }
@@ -269,15 +262,15 @@ namespace BATTLE {
 
     void battleScript::command::evaluateOnTargetVal( battle& p_battle, void* p_self, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition ) const {
 
-        target t;
-        if( p_targetIsOpp && p_targetPosition )
-            t = OPPONENT2;
-        if( p_targetIsOpp && !p_targetPosition )
-            t = OPPONENT1;
-        if( !p_targetIsOpp && p_targetPosition )
-            t = OWN2;
-        if( !p_targetIsOpp && !p_targetPosition )
-            t = OWN1;
+        //target t;
+        //if( p_targetIsOpp && p_targetPosition )
+        //    t = OPPONENT2;
+        //if( p_targetIsOpp && !p_targetPosition )
+        //    t = OPPONENT1;
+        //if( !p_targetIsOpp && p_targetPosition )
+        //    t = OWN2;
+        //if( !p_targetIsOpp && !p_targetPosition )
+        //    t = OWN1;
 
         switch( m_action ) {
             case BATTLE::battleScript::command::ADD:

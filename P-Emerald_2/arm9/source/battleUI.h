@@ -17,6 +17,7 @@ namespace BATTLE {
 
         void    init( );
         void    trainerIntro( );
+        void    pokemonIntro( );
 
         bool    declareBattleMove( u8 p_pokemonPos, bool p_showBack );
 

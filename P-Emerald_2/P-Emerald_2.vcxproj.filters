@@ -37,9 +37,6 @@
     <Filter Include="Header Files\arm9\dex">
       <UniqueIdentifier>{35669822-f1ec-4521-a8bf-30e30ea5f372}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\arm9\ds">
-      <UniqueIdentifier>{87796c2f-84ad-4bcc-b803-26ce3e1582b5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\arm9\fs">
       <UniqueIdentifier>{ce32e421-874e-4508-9b40-68bf8f4ed38a}</UniqueIdentifier>
     </Filter>
@@ -64,9 +61,6 @@
     <Filter Include="Source Files\arm9\dex">
       <UniqueIdentifier>{931087d5-781d-46c1-a737-58fd74712044}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\arm9\ds">
-      <UniqueIdentifier>{cc2ee30a-59bd-423e-b520-beebc83b7ea5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\arm9\fs">
       <UniqueIdentifier>{d14f2d8a-a5f5-4cec-a703-966dde312242}</UniqueIdentifier>
     </Filter>
@@ -79,11 +73,14 @@
     <Filter Include="Source Files\arm9\sts">
       <UniqueIdentifier>{163da026-3d7f-4b79-adc1-a22342fb2b4a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\arm9\data structures">
+      <UniqueIdentifier>{cc2ee30a-59bd-423e-b520-beebc83b7ea5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\arm9\data structures">
+      <UniqueIdentifier>{87796c2f-84ad-4bcc-b803-26ce3e1582b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="arm9\include\nitrofs.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\unistd.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
@@ -121,22 +118,22 @@
       <Filter>Header Files\arm9\dex</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\ability.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\berry.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\item.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\move.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\pokemon.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\type.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\fs.h">
       <Filter>Header Files\arm9\fs</Filter>
@@ -168,15 +165,6 @@
     <ClInclude Include="arm9\source\yesNoBox.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\map2d.h">
-      <Filter>Header Files\arm9\map</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\map2devents.h">
-      <Filter>Header Files\arm9\map</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\mapconfig.h">
-      <Filter>Header Files\arm9\map</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\source\statusScreen.h">
       <Filter>Header Files\arm9\sts</Filter>
     </ClInclude>
@@ -184,13 +172,48 @@
       <Filter>Header Files\arm9\sts</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\hmMoves.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\ribbon.h">
-      <Filter>Header Files\arm9\ds</Filter>
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\bagViewer.h">
       <Filter>Header Files\arm9\bag</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\mapSlice.h">
+      <Filter>Header Files\arm9\map</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\mapObject.h">
+      <Filter>Header Files\arm9\map</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\mapDrawer.h">
+      <Filter>Header Files\arm9\map</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\startScreen.h">
+      <Filter>Header Files\arm9</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\mapSprite.h">
+      <Filter>Header Files\arm9\map</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\mapDefines.h">
+      <Filter>Header Files\arm9\map</Filter>
+    </ClInclude>
+<<<<<<< HEAD
+    <ClInclude Include="arm9\source\box.h">
+      <Filter>Header Files\arm9\box</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\boxUI.h">
+      <Filter>Header Files\arm9\box</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\boxViewer.h">
+      <Filter>Header Files\arm9\box</Filter>
+=======
+    <ClInclude Include="arm9\source\mapWarps.h">
+      <Filter>Header Files\arm9\map</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\screenFade.h">
+      <Filter>Header Files\arm9\io</Filter>
+>>>>>>> mapupdate
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -198,12 +221,6 @@
       <Filter>Source Files\arm7</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\buffer.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\include\hex2dec.c">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\include\nitrofs.c">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\Bag.cpp">
@@ -228,13 +245,13 @@
       <Filter>Source Files\arm9\dex</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\move.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
+      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\pokemon.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
+      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\type.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
+      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\fs.cpp">
       <Filter>Source Files\arm9\fs</Filter>
@@ -269,12 +286,6 @@
     <ClCompile Include="arm9\source\map2d.cpp">
       <Filter>Source Files\arm9\map</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\map2devents.cpp">
-      <Filter>Source Files\arm9\map</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\mapconfig.cpp">
-      <Filter>Source Files\arm9\map</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\statusScreen.cpp">
       <Filter>Source Files\arm9\sts</Filter>
     </ClCompile>
@@ -285,26 +296,51 @@
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\ribbon.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
+      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\yesNoBox.cpp">
       <Filter>Source Files\arm9\io</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\item.cpp">
-      <Filter>Source Files\arm9\ds</Filter>
+      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\bagViewer.cpp">
       <Filter>Source Files\arm9\bag</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\mapSlice.cpp">
+      <Filter>Source Files\arm9\map</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\startScreen.cpp">
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\mapDrawer.cpp">
+      <Filter>Source Files\arm9\map</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\mapSprite.cpp">
+      <Filter>Source Files\arm9\map</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\mapObject.cpp">
+      <Filter>Source Files\arm9\map</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\mapMoves.cpp">
+      <Filter>Source Files\arm9\map</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\mapWarps.cpp">
+      <Filter>Source Files\arm9\map</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\screenFade.cpp">
+      <Filter>Source Files\arm9\io</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\boxViewer.cpp">
+      <Filter>Source Files\arm9\box</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\boxUI.cpp">
+      <Filter>Source Files\arm9\box</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile">
       <Filter>Source Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\ChangeLog.txt">
-      <Filter>Source Files</Filter>
-    </Text>
   </ItemGroup>
 </Project>

@@ -39,6 +39,14 @@ namespace STS {
         regStsScreenUI( std::vector<pokemon>* p_pokemon, u8 p_pageMax = 3 );
     };
 
+    class boxStsScreenUI : public regStsScreenUI {
+    public:
+        static void drawPkmnInformation( const pokemon& p_pokemon );
+        void init( u8 p_current, bool p_initTop = true ) override;
+        void draw( u8 p_current ) override;
+
+    };
+
     //class battleStsScreenUI : public statusScreenUI {
     //public:
     //    void init( u8 p_current ) override;

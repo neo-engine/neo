@@ -9,7 +9,6 @@ evilsbrother [PPorg] (Lucario)
 
 Special Thanks
 
-Peter Schraut (N3D)
 Michael Noland (libnds)
 Jason Rogers (libnds)
 Dave Murpy (libnds)

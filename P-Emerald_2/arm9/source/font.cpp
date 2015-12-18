@@ -185,7 +185,7 @@ namespace IO {
             current_char++;
         }
     }
-    void font::printMBStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printMBStringD( const char *p_string, s16& p_x, s16& p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -246,8 +246,10 @@ namespace IO {
                 swiWaitForVBlank( );
             current_char++;
         }
+        p_x = putX;
+        p_y = putY;
     }
-    void font::printMBStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printMBStringD( const wchar_t *p_string, s16& p_x, s16& p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -308,6 +310,8 @@ namespace IO {
                 swiWaitForVBlank( );
             current_char++;
         }
+        p_x = putX;
+        p_y = putY;
     }
     void font::printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance ) {
         u32 current_char = 0;
@@ -329,7 +333,7 @@ namespace IO {
             current_char++;
         }
     }
-    void font::printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printStringD( const char *p_string, s16& p_x, s16& p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -350,8 +354,10 @@ namespace IO {
                 swiWaitForVBlank( );
             current_char++;
         }
+        p_x = putX;
+        p_y = putY;
     }
-    void font::printStringD( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
+    void font::printStringD( const wchar_t *p_string, s16& p_x, s16& p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -372,6 +378,8 @@ namespace IO {
                 swiWaitForVBlank( );
             current_char++;
         }
+        p_x = putX;
+        p_y = putY;
     }
 
     void font::printStringCenter( const char *p_string, bool p_bottom ) {

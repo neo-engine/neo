@@ -42,7 +42,9 @@ Thumbs.db
 
 P-Emerald_2/build/
 P-Emerald_2/arm7/build/
-P-Emerald_2/arm9/build
+P-Emerald_2/arm9/build/
+
+P-Emerald_2/emulator/
 
 *.FNT
 *.arm7
@@ -50,4 +52,4 @@ P-Emerald_2/arm9/build
 *.elf
 *.stackdump
 *.dsm
-*desmume*
+*.evt

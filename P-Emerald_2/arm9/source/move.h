@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : pokemon.h
-author      : Philip Wellnitz (RedArceus)
+author      : Philip Wellnitz 
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz 
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -128,7 +128,9 @@ public:
           m_moveAffectsWhom( p_moveAffectsWhom ),
           m_movePriority( p_movePriority ),
           m_moveFlags( p_moveFlags ),
-          m_moveHitType( p_moveHitType ) { }
+          m_moveHitType( p_moveHitType ) {
+        (void)p_moveEffect;
+    }
 
     ~move( ) { }
 

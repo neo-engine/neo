@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : hmMoves.h
-author      : Philip Wellnitz (RedArceus)
-description : Header file. See corresponding source file for details.
+author      : Philip Wellnitz
+description : Header file. Consult the corresponding source file for details.
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz (RedArceus)
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -57,7 +57,6 @@ public:
     }
 
     void use( ) override;
-
     bool possible( ) override;
 
     const char* text( ) override {
@@ -88,7 +87,6 @@ public:
     }
 
     void use( ) override;
-
     bool possible( ) override;
 
     const char* text( ) override {
@@ -119,7 +117,6 @@ public:
     }
 
     void use( ) override;
-
     bool possible( ) override;
 
     const char* text( ) override {
@@ -150,7 +147,6 @@ public:
     }
 
     void use( ) override;
-
     bool possible( ) override;
 
     const char* text( ) override {
@@ -181,7 +177,6 @@ public:
     }
 
     void use( ) override;
-
     bool possible( ) override;
 
     const char* text( ) override {
@@ -212,7 +207,6 @@ public:
     }
 
     void use( ) override;
-
     bool possible( ) override;
 
     const char* text( ) override {
@@ -242,11 +236,8 @@ public:
         this->m_isFieldAttack = true;
     }
 
-    void use( ) { }
-
-    bool possible( ) {
-        return false;
-    }
+    void use( ) override;
+    bool possible( ) override;
 
     const char* text( ) override {
         return "Das Meer scheint hier\nbesonders tief.";
@@ -276,11 +267,8 @@ public:
         this->m_isFieldAttack = true;
     }
 
-    void use( ) { }
-
-    bool possible( ) {
-        return false;
-    }
+    void use( ) override;
+    bool possible( ) override;
 
     const char* text( ) override {
         return "Dichter Nebel.";
@@ -309,11 +297,8 @@ public:
         this->m_isFieldAttack = true;
     }
 
-    void use( ) { }
-
-    bool possible( ) {
-        return false;
-    }
+    void use( ) override;
+    bool possible( ) override;
 
     const char* text( ) override {
         return "Ein großer Felsen.";
@@ -342,11 +327,8 @@ public:
         this->m_isFieldAttack = true;
     }
 
-    void use( ) { }
-
-    bool possible( ) {
-        return false;
-    }
+    void use( ) override;
+    bool possible( ) override;
 
     const char* text( ) override {
         return "Eine steile Felswand.";
@@ -357,10 +339,10 @@ public:
 };
 
 //HM11
-class kaskade
+class waterfall
     : public move {
 public:
-    kaskade( )
+    waterfall( )
         : move( "Kaskade",
         C 0,
         C 80,
@@ -375,11 +357,8 @@ public:
         this->m_isFieldAttack = true;
     }
 
-    void use( ) { }
-
-    bool possible( ) {
-        return false;
-    }
+    void use( ) override;
+    bool possible( ) override;
 
     const char* text( ) override {
         return "Ein Wasselfall.";
@@ -407,11 +386,8 @@ public:
         this->m_isFieldAttack = true;
     }
 
-    void use( ) { }
-
-    bool possible( ) {
-        return false;
-    }
+    void use( ) override;
+    bool possible( ) override;
 
     const char* text( ) override {
         return "Zu gefährlich hier?";
@@ -439,11 +415,8 @@ public:
         this->m_isFieldAttack = true;
     }
 
-    void use( ) { }
-
-    bool possible( ) {
-        return false;
-    }
+    void use( ) override;
+    bool possible( ) override;
 
     const char* text( ) override {
         return "Da hat sich etwas bewegt!";
@@ -453,10 +426,10 @@ public:
     }
 };
 
-class lockduft
+class sweetScent
     : public move {
 public:
-    lockduft( )
+    sweetScent( )
         : move( "Lockduft",
         C 0,
         C 0,
@@ -471,11 +444,8 @@ public:
         this->m_isFieldAttack = true;
     }
 
-    void use( ) { }
-
-    bool possible( ) {
-        return false;
-    }
+    void use( ) override;
+    bool possible( ) override;
 
     const char* text( ) override {
         return "Der Geruch wilder Pokémon\nliegt in der Luft.";
