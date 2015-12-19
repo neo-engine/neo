@@ -1034,7 +1034,7 @@ NEXT_PASS:
         }
         _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
         if( FS::SAV->m_player.m_movement == BIKE )
-            fastBike = 12;// std::min( fastBike + 1, 12 );
+            fastBike = std::min( fastBike + 1, 12 );
         else
             fastBike = false;
 
