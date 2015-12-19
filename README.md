@@ -11,7 +11,7 @@ This game is intended to be played on real hardware, but [DeSmuME 0.9.11](http:/
 Features
 --------
 
-Features implemented in the _dev_ branch are in _italics_.
+_Partially_ implemented features are in _italics_.
 
 * [ ] A fully working Pokémon engine (at 60fps), including
     * [x] The ability to display a Pokémon's status, including detailed information about the Pokémon's moves and ribbons
@@ -20,9 +20,9 @@ Features implemented in the _dev_ branch are in _italics_.
     * [x] A working battle engine, capable of simulaitng single and double battles
     * [x] The ability to load maps (for now only GBA-style maps are supported, 3D maps are planned) including
       * [ ] Events
-      * [ ] Wild Pokémon encounter
-      * [x] Animated map tiles
-      * [x] Player sprite, animated moving, surfing_, cycling, and fishing_
+      * [x] Wild Pokémon encounter
+      * [ ] Animated map tiles
+      * [x] Player sprite, animated moving, surfing, cycling, and fishing
     * [ ] Playing .midi as BGM, user customization of BGM via music stored on the micro SD card
     * [ ] RTC, including overword changes based on time
     * [ ] Saving the progress to the micro SD
@@ -34,6 +34,17 @@ Features implemented in the _dev_ branch are in _italics_.
     * [x] Strict and intuitive naming conventions
     * [ ] Good documentation
     * [x] _Modular code (strict seperation of each feature and between core and UI)_
+
+Build requiremints
+------------------
+* devkitARM >= r45
+* libnds >= 1.5.12
+* nitrofs >= 0.9.12
+* libfat-nds >= 1.0.14
+* dswifi >= 0.3.17
+* maxmod >= 1.0.9
+
+* make
 
 Some screens
 ------------
