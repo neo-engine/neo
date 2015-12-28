@@ -198,7 +198,6 @@
     <ClInclude Include="arm9\source\mapDefines.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="arm9\source\box.h">
       <Filter>Header Files\arm9\box</Filter>
     </ClInclude>
@@ -207,13 +206,12 @@
     </ClInclude>
     <ClInclude Include="arm9\source\boxViewer.h">
       <Filter>Header Files\arm9\box</Filter>
-=======
+    </ClInclude>
     <ClInclude Include="arm9\source\mapWarps.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
     <ClInclude Include="arm9\source\screenFade.h">
       <Filter>Header Files\arm9\io</Filter>
->>>>>>> mapupdate
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
