@@ -572,7 +572,7 @@ OUT:
                         bgNames[ o ] = IO::BGs[ o ].m_name.c_str( );
 
                     IO::choiceBox scrnChoice( MAXBG, bgNames, 0, true );
-                    IO::drawSub( scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
+                    IO::drawSub( true, scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
                     break;
                 }
                 case 6: case 7:{
