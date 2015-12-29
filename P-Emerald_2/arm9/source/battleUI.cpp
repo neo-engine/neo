@@ -1800,7 +1800,7 @@ CLEAR:
     }
 
     void battleUI::updateHP( bool p_opponent, u8 p_pokemonPos ) {
-        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+        if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
             return;
 
         u8 hpx = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
@@ -1831,7 +1831,7 @@ CLEAR:
 
     void battleUI::applyEXPChanges( bool p_opponent, u8 p_pokemonPos, u32 p_gainedExp ) {
 
-        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+        if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
             return;
 
         u8 hpx = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
@@ -1903,7 +1903,7 @@ CLEAR:
     }
 
     void battleUI::updateStats( bool p_opponent, u8 p_pokemonPos, bool p_move ) {
-        //if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+        //if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
         //    return;
         if( _battle->m_isWildBattle && p_opponent )
             return;
@@ -1929,7 +1929,7 @@ CLEAR:
     }
 
     void battleUI::hidePKMN( bool p_opponent, u8 p_pokemonPos ) {
-        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+        if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
             return;
 
         //Hide PKMN sprite
@@ -2058,7 +2058,7 @@ CLEAR:
     }
 
     void battleUI::evolvePKMN( bool p_opponent, u8 p_pokemonPos ) {
-        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+        if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
             return;
         s16 x = 0, y = 0;
         u8 hpx, hpy;
@@ -2093,7 +2093,7 @@ CLEAR:
     }
 
     void battleUI::learnMove( u8 p_pokemonPos, u16 p_move ) {
-        if( !_battle->m_battleMode == battle::DOUBLE && p_pokemonPos )
+        if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
             return;
         if( !p_move )
             return;

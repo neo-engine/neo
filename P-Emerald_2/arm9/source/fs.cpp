@@ -455,11 +455,8 @@ const wchar_t* getWDisplayName( u16 p_pkmnId ) {
     if( !getAll( p_pkmnId, tmp ) ) {
         return L"???";
     }
-
-    std::wstring res = L"";
-    for( u8 i = 0; tmp.m_displayName[ i ]; ++i )
-        res += tmp.m_displayName[ i ];
-    return res.c_str( );
+    swprintf( wbuffer, 15, L"%s", tmp.m_displayName );
+    return wbuffer;
 }
 void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
     pokemonData tmp;
@@ -467,11 +464,7 @@ void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
         wcscpy( p_name, L"???" );
         return;
     }
-
-    std::wstring res = L"";
-    for( u8 i = 0; tmp.m_displayName[ i ]; ++i )
-        res += tmp.m_displayName[ i ];
-    wcscpy( p_name, res.c_str( ) );
+    swprintf( p_name, 15, L"%s", tmp.m_displayName );
 }
 
 bool getAll( u16 p_pkmnId, pokemonData& p_out ) {
