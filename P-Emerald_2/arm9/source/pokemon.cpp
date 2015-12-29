@@ -4,9 +4,10 @@ Pokémon Emerald 2 Version
 
 file        : pokemon.cpp
 author      : Philip Wellnitz
-description :
+description : The main Pokémon engine
 
 Copyright (C) 2012 - 2016
+>>>>>>> up pkmn
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -444,50 +445,52 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
     m_HGSSBall = 0;
 }
 
+pokemon::stats calcStats( const pokemon::boxPokemon& p_boxdata, u8 p_level ) {
+    pokemon::stats res;
+    u16 pkmnId = p_boxdata.m_speciesId;
+    if( pkmnId != 292 )
+        res.m_acHP = res.m_maxHP = ( ( p_boxdata.m_individualValues.m_hp + 2 * data.m_bases[ 0 ] + ( p_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )*p_level / 100 ) + 10;
+    else
+        res.m_acHP = res.m_maxHP = 1;
+    pkmnNatures nature = p_boxdata.getNature( );
+    res.m_Atk = ( ( ( p_boxdata.m_individualValues.m_attack + 2 * data.m_bases[ 1 ] + ( p_boxdata.m_effortValues[ 1 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];
+    res.m_Def = ( ( ( p_boxdata.m_individualValues.m_defense + 2 * data.m_bases[ 2 ] + ( p_boxdata.m_effortValues[ 2 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 1 ];
+    res.m_Spd = ( ( ( p_boxdata.m_individualValues.m_speed + 2 * data.m_bases[ 5 ] + ( p_boxdata.m_effortValues[ 5 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 2 ];
+    res.m_SAtk = ( ( ( p_boxdata.m_individualValues.m_sAttack + 2 * data.m_bases[ 3 ] + ( p_boxdata.m_effortValues[ 3 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 3 ];
+    res.m_SDef = ( ( ( p_boxdata.m_individualValues.m_sDefense + 2 * data.m_bases[ 4 ] + ( p_boxdata.m_effortValues[ 4 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 4 ];
+    return res;
+}
+u16 calcLevel( const pokemon::boxPokemon& p_boxdata ) {
+    return 50;
+}
 
+pokemon::pokemon( pokemon::boxPokemon p_boxPokemon )
+    : m_boxdata( p_boxPokemon ) {
+    m_Level = calcLevel( p_boxPokemon );
+    m_stats = calcStats( m_boxdata, m_Level );
+    m_status.m_Asleep = m_status.m_Burned = m_status.m_Frozen = m_status.m_Paralyzed = m_status.m_Poisoned = m_status.m_Toxic = false;
+}
 pokemon::pokemon( u16 p_pkmnId, u16 p_level, const wchar_t* p_name, u8 p_shiny,
                   bool p_hiddenAbility, bool p_isEgg, u8 p_pokerus, bool p_fatefulEncounter )
     : m_boxdata( p_pkmnId, p_level, p_name, p_shiny, p_hiddenAbility, p_isEgg, p_pokerus, p_fatefulEncounter ), m_Level( p_level ) {
-    if( p_pkmnId != 292 )
-        m_stats.m_acHP = m_stats.m_maxHP = ( ( m_boxdata.m_individualValues.m_hp + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )*p_level / 100 ) + 10;
-    else
-        m_stats.m_acHP = m_stats.m_maxHP = 1;
-
-    pkmnNatures nature = m_boxdata.getNature( );
-    m_stats.m_Atk = ( ( ( m_boxdata.m_individualValues.m_attack + 2 * data.m_bases[ 1 ] + ( m_boxdata.m_effortValues[ 1 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];
-    m_stats.m_Def = ( ( ( m_boxdata.m_individualValues.m_defense + 2 * data.m_bases[ 2 ] + ( m_boxdata.m_effortValues[ 2 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 1 ];
-    m_stats.m_Spd = ( ( ( m_boxdata.m_individualValues.m_speed + 2 * data.m_bases[ 5 ] + ( m_boxdata.m_effortValues[ 5 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 2 ];
-    m_stats.m_SAtk = ( ( ( m_boxdata.m_individualValues.m_sAttack + 2 * data.m_bases[ 3 ] + ( m_boxdata.m_effortValues[ 3 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 3 ];
-    m_stats.m_SDef = ( ( ( m_boxdata.m_individualValues.m_sDefense + 2 * data.m_bases[ 4 ] + ( m_boxdata.m_effortValues[ 4 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 4 ];
-
+    m_stats = calcStats( m_boxdata, p_level );
     m_status.m_Asleep = m_status.m_Burned = m_status.m_Frozen = m_status.m_Paralyzed = m_status.m_Poisoned = m_status.m_Toxic = false;
 }
 pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const wchar_t* p_name, u16 p_level, u16 p_id, u16 p_sid, const wchar_t* p_oT, bool p_oTFemale,
                   u8 p_shiny, bool p_hiddenAbility, bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace, u8 p_ball, u8 p_pokerus )
     : m_boxdata( p_moves, p_pkmnId, p_name, p_level, p_id, p_sid, p_oT, p_oTFemale, p_shiny,
                  p_hiddenAbility, p_fatefulEncounter, p_isEgg, p_gotPlace, p_ball, p_pokerus ), m_Level( p_level ) {
-    if( p_pkmnId != 292 )
-        m_stats.m_acHP = m_stats.m_maxHP = ( ( m_boxdata.m_individualValues.m_hp + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )*p_level / 100 ) + 10;
-    else
-        m_stats.m_acHP = m_stats.m_maxHP = 1;
-
-    pkmnNatures nature = m_boxdata.getNature( );
-    m_stats.m_Atk = ( ( ( m_boxdata.m_individualValues.m_attack + 2 * data.m_bases[ 1 ] + ( m_boxdata.m_effortValues[ 1 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];
-    m_stats.m_Def = ( ( ( m_boxdata.m_individualValues.m_defense + 2 * data.m_bases[ 2 ] + ( m_boxdata.m_effortValues[ 2 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 1 ];
-    m_stats.m_Spd = ( ( ( m_boxdata.m_individualValues.m_speed + 2 * data.m_bases[ 5 ] + ( m_boxdata.m_effortValues[ 5 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 2 ];
-    m_stats.m_SAtk = ( ( ( m_boxdata.m_individualValues.m_sAttack + 2 * data.m_bases[ 3 ] + ( m_boxdata.m_effortValues[ 3 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 3 ];
-    m_stats.m_SDef = ( ( ( m_boxdata.m_individualValues.m_sDefense + 2 * data.m_bases[ 4 ] + ( m_boxdata.m_effortValues[ 4 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 4 ];
-
+    m_stats = calcStats( m_boxdata, p_level );
     m_status.m_Asleep = m_status.m_Burned = m_status.m_Frozen = m_status.m_Paralyzed = m_status.m_Poisoned = m_status.m_Toxic = false;
 }
 
-bool pokemon::boxPokemon::isShiny( ) {
+bool pokemon::boxPokemon::isShiny( ) const {
     return ( ( ( ( m_oTId ^ m_oTSid ) >> 3 ) ^ ( ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) ) ) >> 3 ) == 0 );
 }
-bool pokemon::boxPokemon::isCloned( ) {
+bool pokemon::boxPokemon::isCloned( ) const {
     return ( ( m_pid >> 16 )&( m_pid % ( 1 << 16 ) ) ) < ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) );
 }
-s8 pokemon::boxPokemon::gender( ) {
+s8 pokemon::boxPokemon::gender( ) const {
     if( m_isGenderless )
         return 0;
     else if( m_isFemale )

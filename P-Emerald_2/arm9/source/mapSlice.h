@@ -29,6 +29,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <nds/ndstypes.h>
 #include <vector>
 #include <memory>
+#include <cstring>
 
 namespace MAP {
     const char* const MAP_PATH = "nitro:/MAPS/";
