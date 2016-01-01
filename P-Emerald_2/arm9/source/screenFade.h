@@ -6,7 +6,7 @@ file        : screenFade.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -47,7 +47,7 @@ namespace IO {
                 REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;\
                 REG_BLDY = 0x1F;\
                                  } while( 0 )
-    
+
     void fadeScreen( fadeType p_type );
     void clearScreen( bool p_bottom, bool p_both = false, bool p_dark = true );
     void clearScreenConsole( bool p_bottom, bool p_both = false );

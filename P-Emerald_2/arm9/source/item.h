@@ -3,11 +3,11 @@
     ------------------------------
 
     file        : item.h
-    author      : Philip Wellnitz 
+    author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2015
-    Philip Wellnitz 
+    Copyright (C) 2012 - 2016
+    Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
 
@@ -88,7 +88,7 @@ public:
 
 
     itemEffectType  getEffectType( );
-    
+
     u32             getPrice( );
 
     u16             getItemId( );
@@ -102,7 +102,7 @@ public:
     //Constructors
 
     item( const std::string& p_itemName )
-        : m_itemName( p_itemName ) { 
+        : m_itemName( p_itemName ) {
         m_loaded = false;
     }
 

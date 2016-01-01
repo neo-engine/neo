@@ -1,3 +1,30 @@
+/*
+Pokémon Emerald 2 Version
+------------------------------
+
+file        : uio.cpp
+author      : Philip Wellnitz
+description : User IO
+
+Copyright (C) 2012 - 2016
+Philip Wellnitz
+
+This file is part of Pokémon Emerald 2 Version.
+
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <nds.h>
 
 #include <ctime>
@@ -29,7 +56,7 @@ namespace IO {
     int bg2sub;
     int bg3;
     int bg2;
-    
+
     void initVideo( ) {
 
         vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
@@ -143,7 +170,7 @@ namespace IO {
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
         BG_PALETTE_SUB[ RED_IDX ] = RED;
         BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;
-        printRectangle( (u8)0, (u8)0, (u8)255, (u8)63, true, false, WHITE_IDX );
+        printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
     }
 
     void putrec( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
@@ -152,9 +179,9 @@ namespace IO {
     void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
         for( u16 x = p_x1; x <= p_x2; ++x ) for( u16 y = p_y1; y < p_y2; ++y )
             if( p_bottom )
-                ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( x + y * (u16)SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
+                ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( x + y * (u16) SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8) p_color ) << 8 ) | ( (u8) p_color ) : p_color;
             else
-                ( (color *)BG_BMP_RAM( 1 ) )[ ( x + y * (u16)SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8)p_color ) << 8 ) | ( (u8)p_color ) : p_color;
+                ( (color *) BG_BMP_RAM( 1 ) )[ ( x + y * (u16) SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8) p_color ) << 8 ) | ( (u8) p_color ) : p_color;
     }
 
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big ) {
@@ -164,7 +191,7 @@ namespace IO {
             displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 8, 12 );
     }
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR, bool p_sub ) {
-        p_HP = std::max( std::min( (u16)101, p_HP ), u16( 0 ) );
+        p_HP = std::max( std::min( (u16) 101, p_HP ), u16( 0 ) );
 
         if( p_HP > 100 ) {
             BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
@@ -176,7 +203,7 @@ namespace IO {
                     u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
                     if( nx == p_x + 16 + j )
                         --nx;
-                    ( (color *)( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
+                    ( (color *) ( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8) p_freecolor1 ) << 8 ) | (u8) p_freecolor1;
                     //printf( "%i %i; ", nx, ny );
                 }
             }
@@ -191,7 +218,7 @@ namespace IO {
                     if( nx == p_x + 16 + j )
                         --nx;
 
-                    ( (color *)( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
+                    ( (color *) ( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8) p_freecolor2 ) << 8 ) | (u8) p_freecolor2;
                     if( phi >= 150 )
                         BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
                     if( phi >= 225 )
@@ -213,7 +240,7 @@ namespace IO {
                     u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
                     if( nx == p_x + 16 + j )
                         --nx;
-                    ( (color *)BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor1 ) << 8 ) | (u8)p_freecolor1;
+                    ( (color *) BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8) p_freecolor1 ) << 8 ) | (u8) p_freecolor1;
                     //printf("%i %i; ",nx,ny);
                 }
             }
@@ -227,7 +254,7 @@ namespace IO {
                     u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
                     if( nx == p_x + 16 + j )
                         --nx;
-                    ( (color *)BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8)p_freecolor2 ) << 8 ) | (u8)p_freecolor2;
+                    ( (color *) BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8) p_freecolor2 ) << 8 ) | (u8) p_freecolor2;
                 }
                 if( p_delay )
                     swiWaitForVBlank( );
@@ -308,19 +335,19 @@ namespace IO {
 
     void topScreenPlot( u8 p_x, u8 p_y, color p_color ) {
         if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
-            ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
+            ( (color *) BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
         else if( ( p_color >> 8 ) != 0 )
-            ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
+            ( (color *) BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *) BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
         else if( ( p_color % ( 1 << 8 ) ) != 0 )
-            ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
+            ( (color *) BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *) BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
     }
     void btmScreenPlot( u8 p_x, u8 p_y, color p_color ) {
         if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
-            ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
+            ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
         else if( ( p_color >> 8 ) != 0 )
-            ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
+            ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] % ( 1 << 8 ) );
         else if( ( p_color % ( 1 << 8 ) ) != 0 )
-            ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *)BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
+            ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
     }
 
     u16 getColor( Type p_type ) {

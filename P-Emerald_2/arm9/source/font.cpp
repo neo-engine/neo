@@ -1,3 +1,30 @@
+/*
+Pokémon Emerald 2 Version
+------------------------------
+
+file        : font.cpp
+author      : Philip Wellnitz
+description :
+
+Copyright (C) 2012 - 2016
+Philip Wellnitz
+
+This file is part of Pokémon Emerald 2 Version.
+
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <nds.h>
 #include <nds/ndstypes.h>
 
@@ -25,11 +52,11 @@ namespace IO {
             for( putX = p_x, getX = 0; putX < p_x + _widths[ p_ch ]; putX += 2, getX += 2 ) {
                 if( putX >= 0 && putX < SCREEN_WIDTH && putY >= 0 && putY < SCREEN_HEIGHT ) {
                     if( !p_bottom ) {
-                        topScreenPlot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
-                                       (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                        topScreenPlot( putX, putY, ( (u8) ( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
+                                       (u8) ( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     } else {
-                        btmScreenPlot( putX, putY, ( (u8)( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
-                                       (u8)( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                        btmScreenPlot( putX, putY, ( (u8) ( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
+                                       (u8) ( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     }
                 }
             }
@@ -49,7 +76,7 @@ namespace IO {
             }
             printChar( p_string[ current_char ], putX, putY, p_bottom );
 
-            u16 c = (u16)p_string[ current_char ];
+            u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             putX += _widths[ c ];
 
@@ -62,7 +89,7 @@ namespace IO {
     }
     void hideContinue( u8 p_x, u8 p_y ) {
         BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
-        printRectangle( p_x, p_y, p_x + 5, p_y + 9, true, false, (u8)250 );
+        printRectangle( p_x, p_y, p_x + 5, p_y + 9, true, false, (u8) 250 );
     }
 
     void font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
@@ -118,7 +145,7 @@ namespace IO {
             }
             printChar( p_string[ current_char ], putX, putY, p_bottom );
 
-            u16 c = (u16)p_string[ current_char ];
+            u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             putX += _widths[ c ];
 
@@ -178,7 +205,7 @@ namespace IO {
             }
             printChar( p_string[ current_char ], putX, putY, p_bottom );
 
-            u16 c = (u16)p_string[ current_char ];
+            u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             putX += _widths[ c ];
 
@@ -238,7 +265,7 @@ namespace IO {
             }
             printChar( p_string[ current_char ], putX, putY, p_bottom );
 
-            u16 c = (u16)p_string[ current_char ];
+            u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             putX += _widths[ c ];
 
@@ -302,7 +329,7 @@ namespace IO {
             }
             printChar( p_string[ current_char ], putX, putY, p_bottom );
 
-            u16 c = (u16)p_string[ current_char ];
+            u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             putX += _widths[ c ];
 
@@ -326,7 +353,7 @@ namespace IO {
             }
             printChar( p_string[ current_char ], putX, putY, p_bottom );
 
-            u16 c = (u16)p_string[ current_char ];
+            u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             putX += _widths[ c ];
 
@@ -346,7 +373,7 @@ namespace IO {
             }
             printChar( p_string[ current_char ], putX, putY, p_bottom );
 
-            u16 c = (u16)p_string[ current_char ];
+            u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             putX += _widths[ c ];
 
@@ -370,7 +397,7 @@ namespace IO {
             }
             printChar( p_string[ current_char ], putX, putY, p_bottom );
 
-            u16 c = (u16)p_string[ current_char ];
+            u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             putX += _widths[ c ];
 
@@ -447,7 +474,7 @@ namespace IO {
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' )
                 break;
-            u16 c = (u16)p_string[ current_char ];
+            u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             width += _widths[ c ];
 
@@ -463,7 +490,7 @@ namespace IO {
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' )
                 break;
-            width += _widths[ (u8)p_string[ current_char ] ] + 1;
+            width += _widths[ (u8) p_string[ current_char ] ] + 1;
 
             current_char++;
         }

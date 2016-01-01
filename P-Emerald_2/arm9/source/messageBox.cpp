@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Functionality message boxes
 
-    Copyright (C) 2012 - 2015
+    Copyright (C) 2012 - 2016
     Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
@@ -43,12 +43,12 @@ namespace IO {
     s16 curx = 8, cury = 8;
 
     void messageBox::clear( ) {
-        printRectangle( (u8)0, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
+        printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, (u8) 250 );
         curx = 8;
         cury = 8;
     }
     void messageBox::clearButName( ) {
-        printRectangle( (u8)72, (u8)0, (u8)255, (u8)63, true, false, (u8)250 );
+        printRectangle( (u8) 72, (u8) 0, (u8) 255, (u8) 63, true, false, (u8) 250 );
         curx = 64 * ( !!m_isNamed ) + 8;
         cury = 8;
     }
@@ -147,10 +147,10 @@ namespace IO {
         updateOAM( true );
         if( p_sprt != no_sprite ) {
             if( p_sprt == sprite_pkmn ) {
-                c = loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, 0, 1, c, true, false, false, false, true );
+                c = loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16) -16, 0, 0, 1, c, true, false, false, false, true );
             }
             if( p_sprt == sprite_trainer ) {
-                c = loadPKMNSprite( "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, 0, 1, c, true, false, true, false, true );
+                c = loadPKMNSprite( "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16) -16, 0, 0, 1, c, true, false, true, false, true );
             }
             updateOAM( true );
         }
@@ -187,10 +187,10 @@ namespace IO {
         updateOAM( true );
         if( p_sprt != no_sprite ) {
             if( p_sprt == sprite_pkmn ) {
-                c = loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16)-16, 0, 0, 1, c, true, false, false, false, true );
+                c = loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16) -16, 0, 0, 1, c, true, false, false, false, true );
             }
             if( p_sprt == sprite_trainer ) {
-                c = loadPKMNSprite( "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16)-16, 0, 0, 1, c, true, false, true, false, true );
+                c = loadPKMNSprite( "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16) -16, 0, 0, 1, c, true, false, true, false, true );
             }
             updateOAM( true );
         }

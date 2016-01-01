@@ -3,11 +3,11 @@
     ------------------------------
 
     file        : bag.h
-    author      : Philip Wellnitz 
+    author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2015
-    Philip Wellnitz 
+    Copyright (C) 2012 - 2016
+    Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
 
@@ -36,7 +36,7 @@ namespace BAG {
 #define MAXITEMCOUNT 999
 
     extern std::string bagnames[ 5 ];
-    
+
     class bag {
     private:
         std::map<u16, u16> _items[ 5 ];

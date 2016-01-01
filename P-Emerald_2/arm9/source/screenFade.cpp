@@ -6,7 +6,7 @@ file        : screenFade.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -37,7 +37,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 namespace IO {
     void fadeScreen( fadeType p_type ) {
         switch( p_type ) {
-            case IO::UNFADE: {
+            case IO::UNFADE:
+            {
                 u16 val = 0x1F;
                 for( s8 i = 4; i >= 0; --i ) {
                     for( u8 j = 0; j < 5; ++j )
@@ -75,6 +76,14 @@ namespace IO {
                     break;
                 break;
             case IO::BATTLE:
+                REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3;
+                REG_BLDY = 1;
+                for( u8 i = 1; i < 5; ++i ) {
+                    for( u8 j = 0; j < 4; ++j )
+                        swiWaitForVBlank( );
+                    REG_BLDY |= ( 1 << i );
+                }
+                swiWaitForVBlank( );
                 break;
             case IO::BATTLE_STRONG_OPPONENT:
                 break;

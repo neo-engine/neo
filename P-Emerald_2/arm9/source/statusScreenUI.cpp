@@ -1,3 +1,30 @@
+/*
+Pokémon Emerald 2 Version
+------------------------------
+
+file        : statusScreenUI.cpp
+author      : Philip Wellnitz
+description :
+
+Copyright (C) 2012 - 2016
+Philip Wellnitz
+
+This file is part of Pokémon Emerald 2 Version.
+
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "statusScreenUI.h"
 #include "defines.h"
 #include "buffer.h"
@@ -128,7 +155,7 @@ namespace STS {
         }
         for( u8 i = 0; i < 3; ++i ) {
             nextAvailableTileIdx = IO::loadSprite( i + CHOICE_ID + 12, CHOICE_ID, nn2,
-                                                   96, 68 + (i)* 32, 64, 32, Choice_1Pal,
+                                                   96, 68 + (i) * 32, 64, 32, Choice_1Pal,
                                                    Choice_2Tiles, Choice_2TilesLen, false, false, true, OBJPRIORITY_2, true );
         }
 
@@ -220,7 +247,7 @@ namespace STS {
 
                 sprintf( buffer, "%ls", ( *_pokemon )[ i ].m_boxdata.m_name );
                 IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 - mval, false );
-                sprintf( buffer, "%s", getDisplayName( ( *_pokemon )[ i ].m_boxdata.m_speciesId ) );
+                sprintf( buffer, "%ls", getWDisplayName( ( *_pokemon )[ i ].m_boxdata.m_speciesId ) );
                 IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
                 IO::regularFont->setColor( 142 + 2 * i, 2 );
@@ -350,7 +377,7 @@ namespace STS {
             IO::regularFont->setColor( GRAY_IDX, 2 );
 
             getAll( p_pokemon.m_boxdata.m_speciesId, data );
-            IO::regularFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 160, 16, false );
+            IO::regularFont->printString( data.m_displayName, 160, 16, false );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::regularFont->printString( "Item", 2, 176, false );
@@ -378,8 +405,8 @@ namespace STS {
 
             if( p_newpok )
                 if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId, 16, 48,
-                    PKMN_SPRITE_START, PKMN_SPRITE_PAL, IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, false,
-                    p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale, true ) ) {
+                                         PKMN_SPRITE_START, PKMN_SPRITE_PAL, IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, false,
+                                         p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale, true ) ) {
                     IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId, 16, 48,
                                         PKMN_SPRITE_START, PKMN_SPRITE_PAL, IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, false,
                                         p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale, true );
@@ -555,9 +582,9 @@ namespace STS {
 
         IO::regularFont->printString( nStr.c_str( ), 142, 43 - 7 * nlCnt, false, 14 );
         IO::regularFont->printString( FS::breakString( ( currRb.m_description == "" ) ?
-            ( ( *_pokemon )[ p_current ].m_boxdata.m_fateful ? "Ein Band für Pokémon-Freunde." : "Ein Gedenk-Band. An einem mysteriösen Ort erhalten." )
-            : currRb.m_description, IO::regularFont, 120 ).c_str( ),
-            128, 70, false, 14 );
+                                                       ( ( *_pokemon )[ p_current ].m_boxdata.m_fateful ? "Ein Band für Pokémon-Freunde." : "Ein Gedenk-Band. An einem mysteriösen Ort erhalten." )
+                                                       : currRb.m_description, IO::regularFont, 120 ).c_str( ),
+                                      128, 70, false, 14 );
 
         IO::updateOAM( false );
         return;
@@ -583,7 +610,7 @@ namespace STS {
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 128 );
 
         IO::regularFont->setColor( 0, 0 );
-        {IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 ); }
+        { IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 ); }
         IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::boldFont->setColor( 0, 0 );
         IO::boldFont->setColor( GRAY_IDX, 1 );
@@ -678,22 +705,22 @@ namespace STS {
                     sprintf( buffer, "INI                   \xC3\xC3""%3i", currPkmn.m_stats.m_Spd );
                     IO::regularFont->printString( buffer, 130, 137, false );
 
-                    IO::printRectangle( (u8)158, (u8)46, u8( 158 + 68 ), u8( 46 + 12 ), false, false, (u8)251 );
+                    IO::printRectangle( (u8) 158, (u8) 46, u8( 158 + 68 ), u8( 46 + 12 ), false, false, (u8) 251 );
 
-                    IO::printRectangle( (u8)158, (u8)46,
+                    IO::printRectangle( (u8) 158, (u8) 46,
                                         u8( 158 + ( 68.0 * currPkmn.m_boxdata.IVget( 0 ) / 31 ) ),
                                         u8( 46 + 6 ), false, false, u8( 7 * 16 - 1 ) );
-                    IO::printRectangle( (u8)158, u8( 46 + 6 ),
+                    IO::printRectangle( (u8) 158, u8( 46 + 6 ),
                                         u8( 158 + ( 68.0*currPkmn.m_boxdata.m_effortValues[ 0 ] / 252 ) ),
                                         u8( 46 + 12 ), false, false, u8( 7 * 16 - 1 ) );
 
                     for( int i = 1; i < 6; ++i ) {
-                        IO::printRectangle( (u8)158, u8( 54 + ( 17 * i ) ),
-                                            u8( 158 + 68 ), u8( 54 + 12 + ( 17 * i ) ), false, false, (u8)251 );
-                        IO::printRectangle( (u8)158, u8( 54 + ( 17 * i ) ),
+                        IO::printRectangle( (u8) 158, u8( 54 + ( 17 * i ) ),
+                                            u8( 158 + 68 ), u8( 54 + 12 + ( 17 * i ) ), false, false, (u8) 251 );
+                        IO::printRectangle( (u8) 158, u8( 54 + ( 17 * i ) ),
                                             u8( 158 + ( 68.0*currPkmn.m_boxdata.IVget( i ) / 31 ) ),
                                             u8( 54 + 6 + ( 17 * i ) ), false, false, u8( ( 7 + i ) * 16 - 1 ) );
-                        IO::printRectangle( (u8)158, u8( 54 + 6 + ( 17 * i ) ),
+                        IO::printRectangle( (u8) 158, u8( 54 + 6 + ( 17 * i ) ),
                                             u8( 158 + ( 68.0*currPkmn.m_boxdata.m_effortValues[ i ] / 252 ) ),
                                             u8( 54 + 12 + ( 17 * i ) ), false, false, u8( ( 7 + i ) * 16 - 1 ) );
                     }
@@ -749,7 +776,8 @@ namespace STS {
                 }
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, IO::OamTop->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
                                 0, 0, 32, 32, ContestPal, ContestTiles, ContestTilesLen, false, false, false, OBJPRIORITY_0, false );
                 IO::regularFont->printString( "Bänder", 36, 4, false );
@@ -778,15 +806,15 @@ namespace STS {
 
         if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].isHidden = false;
-            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].y = static_cast<u16>( 256-4 );
-            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].x = static_cast<u16>( 512-8 );
+            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].y = static_cast<u16>( 256 - 4 );
+            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].x = static_cast<u16>( 512 - 8 );
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].priority = OBJPRIORITY_1;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].isHidden = false;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].y = 18;
-            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].x = static_cast<u16>( 512-8 );
+            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].x = static_cast<u16>( 512 - 8 );
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].priority = OBJPRIORITY_1;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].isHidden = false;
-            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].y = static_cast<u16>( 256-8 );
+            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].y = static_cast<u16>( 256 - 8 );
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].x = 14;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].priority = OBJPRIORITY_1;
 

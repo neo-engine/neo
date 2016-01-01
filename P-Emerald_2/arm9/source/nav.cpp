@@ -6,7 +6,7 @@ file        : nav.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -62,6 +62,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "Border.h"
 
+#include "BG0.h"
 #include "BG1.h"
 #include "BG2.h"
 #include "BG3.h"
@@ -102,10 +103,10 @@ namespace IO {
                                   { "Awakening Yveltal", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Fighting Groudon", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Fighting Kyogre", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },*/
+        { "Executing Exeggcute", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions },
         { "Fighting Torchic", BG3Bitmap, BG3Pal, false, false, mainSpritesPositions },
         { "Reborn Ho-Oh", BG2Bitmap, BG2Pal, false, false, mainSpritesPositions },
-        { "Working Klink", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions },
-        // { "Executing Exeggcute", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions }
+        { "Working Klink", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions }
     };
 
 #define POS( p_isHome ) ( (p_isHome) ? IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses : mainSpritesPositions2 )
@@ -258,7 +259,7 @@ namespace IO {
         } else {
             //StartBag
             if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 6 ],
-                POS( _state == HOME || !_power )[ 7 ], 16 ) ) {
+                                POS( _state == HOME || !_power )[ 7 ], 16 ) ) {
                 BAG::bagUI bui;
                 BAG::bagViewer bv( FS::SAV->m_bag, &bui );
                 ANIMATE_MAP = false;
@@ -274,7 +275,7 @@ namespace IO {
                 ANIMATE_MAP = true;
             } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
                        && ( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 0 ],
-                       POS( _state == HOME || !_power )[ 1 ], 16 ) ) ) {
+                                            POS( _state == HOME || !_power )[ 1 ], 16 ) ) ) {
 
                 std::vector<pokemon> tmp;
                 for( u8 i = 0; i < 6; ++i )
@@ -297,7 +298,7 @@ namespace IO {
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 4 ],         //StartDex
-                POS( _state == HOME || !_power )[ 5 ], 16 ) ) {
+                                       POS( _state == HOME || !_power )[ 5 ], 16 ) ) {
                 ANIMATE_MAP = false;
 
                 DEX::dexUI dui( true, 1, FS::SAV->m_hasGDex ? 649 : 493 );
@@ -310,11 +311,11 @@ namespace IO {
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 8 ],         //StartOptions
-                POS( _state == HOME || !_power )[ 9 ], 16 ) ) {
+                                       POS( _state == HOME || !_power )[ 9 ], 16 ) ) {
 
 
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 2 ],         //StartID
-                POS( _state == HOME || !_power )[ 3 ], 16 ) ) {
+                                       POS( _state == HOME || !_power )[ 3 ], 16 ) ) {
 
                 const char *someText[ 8 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", "View Boxes A", "View Boxes B" };
                 IO::choiceBox test( 8, &someText[ 0 ], 0, false );
@@ -368,14 +369,16 @@ namespace IO {
                             if( ItemList[ j ]->m_itemName != "Null" )
                                 FS::SAV->m_bag->insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
                         break;
-                    case 2: {
+                    case 2:
+                    {
                         item* curr = ItemList[ rand( ) % 638 ];
                         while( curr->m_itemName == "Null" )
                             curr = ItemList[ rand( ) % 638 ];
                         IO::messageBox( curr, 31 );
                         break;
                     }
-                    case 3:{
+                    case 3:
+                    {
                         std::vector<pokemon> tmp, cpy;
                         for( u8 i = 0; i < 6; ++i )
                             if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
@@ -395,14 +398,15 @@ namespace IO {
                         BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
                                                    "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, itms );
 
-                        BATTLE::battle test_battle( me, opp, 100, 5, BATTLE::battle::DOUBLE );
+                        BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::DOUBLE );
                         ANIMATE_MAP = false;
                         test_battle.start( );
                         for( u8 i = 0; i < tmp.size( ); ++i )
                             FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
                         break;
                     }
-                    case 4:{
+                    case 4:
+                    {
                         std::vector<pokemon> tmp, cpy;
                         for( u8 i = 0; i < 6; ++i )
                             if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
@@ -422,14 +426,15 @@ namespace IO {
                         BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
                                                    "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, itms );
 
-                        BATTLE::battle test_battle( me, opp, 100, 5, BATTLE::battle::SINGLE );
+                        BATTLE::battle test_battle( &me, &opp, 100, 5, BATTLE::battle::SINGLE );
                         ANIMATE_MAP = false;
                         test_battle.start( );
                         for( u8 i = 0; i < tmp.size( ); ++i )
                             FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
                         break;
                     }
-                    case 5:{
+                    case 5:
+                    {
                         const char *bgNames[ MAXBG ];
                         for( u8 o = 0; o < MAXBG; ++o )
                             bgNames[ o ] = IO::BGs[ o ].m_name.c_str( );
@@ -438,7 +443,8 @@ namespace IO {
                         IO::NAV->draw( scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
                         break;
                     }
-                    case 6: case 7:{
+                    case 6: case 7:
+                    {
                         if( !FS::SAV->m_storedPokemon )
                             FS::SAV->m_storedPokemon = new BOX::box( );
                         BOX::boxUI bxUI;
@@ -463,7 +469,7 @@ namespace IO {
                     MAP::curMap->draw( );
                 }
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 10 ],        //Save
-                POS( _state == HOME || !_power )[ 11 ], 16 ) ) {
+                                       POS( _state == HOME || !_power )[ 11 ], 16 ) ) {
                 IO::yesNoBox Save( "PokéNav " );
                 if( Save.getResult( "Möchtest du deinen\nFortschritt sichern?\n" ) ) {
                     IO::NAV->draw( );

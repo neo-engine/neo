@@ -1,3 +1,30 @@
+/*
+Pokémon Emerald 2 Version
+------------------------------
+
+file        : boxUI.cpp
+author      : Philip Wellnitz
+description : Storage sys UI
+
+Copyright (C) 2012 - 2016
+Philip Wellnitz
+
+This file is part of Pokémon Emerald 2 Version.
+
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <nds.h>
 
 #include "boxUI.h"
@@ -143,7 +170,7 @@ namespace BOX {
                 IO::printString( IO::regularFont, "Pokémon-Team", 2, 176, true );
                 for( u8 i = 0; i < 6; ++i ) {
                     res.push_back( IO::inputTarget( 16 + POS_X( 21 + i ), 8 + POS_Y( 21 + i ),
-                        16 + POS_X( 21 + i ) + 28, 8 + POS_Y( 21 + i ) + 21 ) );
+                                                    16 + POS_X( 21 + i ) + 28, 8 + POS_Y( 21 + i ) + 21 ) );
                     _ranges.push_back( { oam, res.back( ) } );
 
                     IO::printChoiceBox( 16 + POS_X( 21 + i ), 8 + POS_Y( 21 + i ),
@@ -169,7 +196,7 @@ namespace BOX {
 
             if( p_showTeam ) for( u8 i = 0; i < 6; ++i ) {
                 res.push_back( IO::inputTarget( 16 + POS_X( 21 + i ), 8 + POS_Y( 21 + i ),
-                    16 + POS_X( 21 + i ) + 28, 8 + POS_Y( 21 + i ) + 21 ) );
+                                                16 + POS_X( 21 + i ) + 28, 8 + POS_Y( 21 + i ) + 21 ) );
                 _ranges.push_back( { oam++, res.back( ) } );
             }
         }

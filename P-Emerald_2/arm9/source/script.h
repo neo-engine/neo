@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : script.h
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Copyright (C) 2012 - 2016
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -130,10 +130,10 @@ namespace BATTLE {
                            targetSpecifier p_targetSpecifier,
                            comp p_comp,
                            int p_value )
-                           : m_target( p_target ),
-                           m_targetSpecifier( p_targetSpecifier ),
-                           m_comp( p_comp ),
-                           m_value( p_value ) { }
+                    : m_target( p_target ),
+                    m_targetSpecifier( p_targetSpecifier ),
+                    m_comp( p_comp ),
+                    m_value( p_value ) { }
 
                 bool            check( battle& p_battle, void* p_self ) const;
                 bool            evaluate( int p_other ) const;
@@ -157,19 +157,19 @@ namespace BATTLE {
                 value( target          p_target,
                        targetSpecifier p_targetSpecifier,
                        float           p_multiplier )
-                       : m_target( p_target ),
-                       m_targetSpecifier( p_targetSpecifier ),
-                       m_multiplier( p_multiplier ),
-                       m_additiveConstant( 0 ) { }
+                    : m_target( p_target ),
+                    m_targetSpecifier( p_targetSpecifier ),
+                    m_multiplier( p_multiplier ),
+                    m_additiveConstant( 0 ) { }
 
                 value( target          p_target,
                        targetSpecifier p_targetSpecifier,
                        float           p_multiplier,
                        int             p_additiveConstant )
-                       : m_target( p_target ),
-                       m_targetSpecifier( p_targetSpecifier ),
-                       m_multiplier( p_multiplier ),
-                       m_additiveConstant( p_additiveConstant ) { }
+                    : m_target( p_target ),
+                    m_targetSpecifier( p_targetSpecifier ),
+                    m_multiplier( p_multiplier ),
+                    m_additiveConstant( p_additiveConstant ) { }
 
                 int             get( battle& p_battle, void* p_self )const;
                 int             get( battle& p_battle, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition )const;
@@ -204,12 +204,12 @@ namespace BATTLE {
                      targetSpecifier         p_targetSpecifier,
                      action                  p_action,
                      int                     p_value )
-                     : m_conditions( p_conditions ),
-                     m_target( p_target ),
-                     m_targetSpecifier( p_targetSpecifier ),
-                     m_action( p_action ),
-                     m_value( p_value ),
-                     m_log( L"" ) { }
+                : m_conditions( p_conditions ),
+                m_target( p_target ),
+                m_targetSpecifier( p_targetSpecifier ),
+                m_action( p_action ),
+                m_value( p_value ),
+                m_log( L"" ) { }
 
             command( std::vector<condition>  p_conditions,
                      target                  p_target,
@@ -217,24 +217,24 @@ namespace BATTLE {
                      action                  p_action,
                      int                     p_value,
                      std::wstring&           p_log )
-                     : m_conditions( p_conditions ),
-                     m_target( p_target ),
-                     m_targetSpecifier( p_targetSpecifier ),
-                     m_action( p_action ),
-                     m_value( p_value ),
-                     m_log( p_log ) { }
+                : m_conditions( p_conditions ),
+                m_target( p_target ),
+                m_targetSpecifier( p_targetSpecifier ),
+                m_action( p_action ),
+                m_value( p_value ),
+                m_log( p_log ) { }
             command( std::vector<condition>  p_conditions,
                      target                  p_target,
                      targetSpecifier         p_targetSpecifier,
                      action                  p_action,
                      int                     p_value,
                      const wchar_t*          p_log )
-                     : m_conditions( p_conditions ),
-                     m_target( p_target ),
-                     m_targetSpecifier( p_targetSpecifier ),
-                     m_action( p_action ),
-                     m_value( p_value ),
-                     m_log( p_log ) { }
+                : m_conditions( p_conditions ),
+                m_target( p_target ),
+                m_targetSpecifier( p_targetSpecifier ),
+                m_action( p_action ),
+                m_value( p_value ),
+                m_log( p_log ) { }
 
 
             command( std::vector<condition>  p_conditions,
@@ -243,12 +243,12 @@ namespace BATTLE {
                      action                  p_action,
                      value                   p_value,
                      const wchar_t*          p_log )
-                     : m_conditions( p_conditions ),
-                     m_target( p_target ),
-                     m_targetSpecifier( p_targetSpecifier ),
-                     m_action( p_action ),
-                     m_value( p_value ),
-                     m_log( p_log ) { }
+                : m_conditions( p_conditions ),
+                m_target( p_target ),
+                m_targetSpecifier( p_targetSpecifier ),
+                m_action( p_action ),
+                m_value( p_value ),
+                m_log( p_log ) { }
 
 
             void                    execute( battle& p_battle, void* p_self )const;

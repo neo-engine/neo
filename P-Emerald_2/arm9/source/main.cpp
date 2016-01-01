@@ -1,29 +1,29 @@
 /*
-    Pokémon Emerald 2 Version
-    ------------------------------
+Pokémon Emerald 2 Version
+------------------------------
 
-    file        : main.cpp
-    author      : Philip Wellnitz
-    description : Main ARM9 entry point
+file        : main.cpp
+author      : Philip Wellnitz
+description : Main ARM9 entry point
 
-    Copyright (C) 2012 - 2015
-    Philip Wellnitz
+Copyright (C) 2012 - 2016
+Philip Wellnitz
 
-    This file is part of Pokémon Emerald 2 Version.
+This file is part of Pokémon Emerald 2 Version.
 
-    Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
-    */
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 
 #include <nds.h>
@@ -62,7 +62,7 @@
 
 #include "Gen.h"
 
-#include "BigCirc1.h" 
+#include "BigCirc1.h"
 #include "consoleFont.h"
 
 #ifndef _EMULATOR
@@ -112,8 +112,8 @@ void initGraphics( ) {
     IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
     IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
 
-    IO::consoleFont->gfx = (u16*)consoleFontTiles;
-    IO::consoleFont->pal = (u16*)consoleFontPal;
+    IO::consoleFont->gfx = (u16*) consoleFontTiles;
+    IO::consoleFont->pal = (u16*) consoleFontPal;
     IO::consoleFont->numChars = 218;
     IO::consoleFont->numColors = 16;
     IO::consoleFont->bpp = 8;
@@ -125,7 +125,7 @@ void initGraphics( ) {
 }
 void initTimeAndRnd( ) {
     time_t uTime = time( NULL );
-    tm* tStruct = gmtime( (const time_t *)&uTime );
+    tm* tStruct = gmtime( (const time_t *) &uTime );
 
     hours = tStruct->tm_hour;
     month = tStruct->tm_min;
@@ -160,8 +160,8 @@ int main( int, char** p_argv ) {
 
     FS::SAV->m_hasGDex = true;
     FS::SAV->m_evolveInBattle = true;
-    
-    irqSet( IRQ_VBLANK, [ ]( ) {
+
+    irqSet( IRQ_VBLANK, [ ] ( ) {
         scanKeys( );
         FRAME_COUNT++;
 
@@ -178,7 +178,7 @@ int main( int, char** p_argv ) {
         IO::boldFont->setColor( BLACK_IDX, 2 );
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
         time_t unixTime = time( NULL );
-        struct tm* timeStruct = gmtime( (const time_t *)&unixTime );
+        struct tm* timeStruct = gmtime( (const time_t *) &unixTime );
 
         if( acseconds != timeStruct->tm_sec || DRAW_TIME ) {
             DRAW_TIME = false;
@@ -330,7 +330,6 @@ OUT:
 
         IO::NAV->handleInput( touch );
         //End 
-
         scanKeys( );
     }
     delete MAP::curMap;

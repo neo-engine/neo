@@ -1,3 +1,30 @@
+/*
+Pokémon Emerald 2 Version
+------------------------------
+
+file        : statusScreen.cpp
+author      : Philip Wellnitz
+description :
+
+Copyright (C) 2012 - 2016
+Philip Wellnitz
+
+This file is part of Pokémon Emerald 2 Version.
+
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "statusScreen.h"
 #include "uio.h"
 #include "messageBox.h"
@@ -67,7 +94,7 @@ namespace STS {
                 FS::SAV->m_bag->insert( BAG::toBagType( acI.m_itemType ), acI.getItemId( ), 1 );
                 _stsUI->init( _pkmnIdx );
             } else if( GET_AND_WAIT_R( 152, !!( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) * ( -7 + 24 * ( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) ),
-                300, ( 17 + 24 * ( _stsUI->_showMoveCnt + _stsUI->_showTakeItem ) ) ) ) {
+                                       300, ( 17 + 24 * ( _stsUI->_showMoveCnt + _stsUI->_showTakeItem ) ) ) ) {
 
                 DEX::dex( -1, 0 ).run( ( *_pokemon )[ _pkmnIdx ].m_boxdata.m_speciesId );
 

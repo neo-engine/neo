@@ -6,7 +6,7 @@ file        : mapObject.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -29,7 +29,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "mapSprite.h"
 
 namespace MAP {
-    u8 getFrame( direction p_direction ) {        
+    u8 getFrame( direction p_direction ) {
         switch( p_direction ) {
             case MAP::UP:
                 return 3;

@@ -6,7 +6,7 @@ file        : mapSprite.cpp
 author      : Philip Wellnitz
 description : Map Sprites.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -39,8 +39,8 @@ namespace MAP {
                           u16 p_imageId,
                           u8 p_startFrame,
                           u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx )
-                          : _oamIndex( p_oamIdx ), _palette( p_palIdx ), _tileIdx( p_tileIdx ),
-                          _picNum( p_imageId ), _curFrame( p_startFrame ) {
+        : _oamIndex( p_oamIdx ), _palette( p_palIdx ), _tileIdx( p_tileIdx ),
+        _picNum( p_imageId ), _curFrame( p_startFrame ) {
         if( !IO::loadOWSprite( OW_PATH, _picNum, p_currX, p_currY, _oamIndex, _palette, _tileIdx ) ) {
             IO::messageBox m( "Sprite failed" );
             IO::NAV->draw( true );

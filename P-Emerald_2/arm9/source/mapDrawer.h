@@ -6,7 +6,7 @@ file        : mapDrawer.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -42,7 +42,6 @@ namespace MAP {
             GRASS,
             HIGH_GRASS,
             WATER,
-            CAVE_WALK,
             FISHING_ROD
         };
         enum mapWeather {
@@ -108,7 +107,8 @@ namespace MAP {
         void animateField( u16 p_globX, u16 p_globY );
 
         void handleWarp( warpType p_type );
-        void handleWildPkmn( wildPkmnType p_type );
+        void handleWildPkmn( u16 p_globX, u16 p_globY );
+        void handleWildPkmn( wildPkmnType p_type, u8 p_rodType = 0 );
         void handleTrainer( );
 
     public:
@@ -141,7 +141,7 @@ namespace MAP {
 
         bool canFish( position p_start,
                       direction p_direction );
-        void fishPlayer( direction p_direction );
+        void fishPlayer( direction p_direction, u8 p_rodType = 0 );
 
         void usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny );
 

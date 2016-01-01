@@ -6,7 +6,7 @@
  author : Philip Wellnitz
  description : Header file. Consult the corresponding source file for details.
 
- Copyright (C) 2012 - 2015
+ Copyright (C) 2012 - 2016
  Philip Wellnitz
 
  This file is part of Pokémon Emerald 2 Version.
@@ -37,6 +37,9 @@ namespace IO {
     extern const unsigned short* TypePals[ 19 ];
     extern const unsigned int* HitTypeTiles[ 3 ];
     extern const unsigned short* HitTypePals[ 3 ];
+#define MAX_PLATFORMS 12
+    extern const unsigned int* PlatformTiles[ 2 * MAX_PLATFORMS ];
+    extern const unsigned short* PlatformPals[ MAX_PLATFORMS ];
 
     struct SpriteInfo {
         u8 m_oamId;

@@ -1,29 +1,29 @@
 /*
-    Pokémon Emerald 2 Version
-    ------------------------------
+Pokémon Emerald 2 Version
+------------------------------
 
-    file        : pokemon.cpp
-    author      : Philip Wellnitz
-    description : The main Pokémon engine
+file        : pokemon.cpp
+author      : Philip Wellnitz
+description :
 
-    Copyright (C) 2012 - 2015
-    Philip Wellnitz
+Copyright (C) 2012 - 2016
+Philip Wellnitz
 
-    This file is part of Pokémon Emerald 2 Version.
+This file is part of Pokémon Emerald 2 Version.
 
-    Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
-    */
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 
 #include "move.h"
@@ -197,6 +197,124 @@ u32 EXP[ 100 ][ 13 ] = {
     { 600000, 800000, 1000000, 1059860, 1250000, 1640000, 100, 0, 0, 0, 0, 0, 0 } };
 
 pokemonData data;
+
+pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
+                                 u16             p_level,
+                                 const wchar_t*  p_name,
+                                 u8              p_shiny,
+                                 bool            p_hiddenAbility,
+                                 bool            p_isEgg,
+                                 u8              p_pokerus,
+                                 bool            p_fatefulEncounter ) {
+    getAll( p_pkmnId, data );
+    srand( LastPID );
+    LastPID = m_pid = rand( );
+    m_oTId = FS::SAV->m_id;
+    m_oTSid = FS::SAV->m_sid;
+    if( p_shiny == 2 )
+        while( !isShiny( ) )
+            LastPID = m_pid = rand( );
+    else if( p_shiny == 1 )
+        while( isShiny( ) )
+            LastPID = m_pid = rand( );
+    m_checksum = 0;
+    m_speciesId = p_pkmnId;
+
+    if( data.m_items[ 3 ] )
+        m_holdItem = data.m_items[ 3 ];
+    else {
+        m_b1 = rand( ) % 100;
+        if( m_b1 < 5 && data.m_items[ 0 ] )
+            m_holdItem = data.m_items[ 0 ];
+        else if( m_b1 < 20 && data.m_items[ 1 ] )
+            m_holdItem = data.m_items[ 1 ];
+        else if( m_b1 < 80 && data.m_items[ 2 ] )
+            m_holdItem = data.m_items[ 2 ];
+        else
+            m_holdItem = 0;
+    }
+
+
+    if( !p_isEgg )
+        m_experienceGained = EXP[ p_level - 1 ][ data.m_expType ];
+    else
+        m_experienceGained = 0;
+
+    if( p_isEgg ) {
+        m_steps = data.m_eggcyc;
+        m_gotDate[ 0 ] = acday;
+        m_gotDate[ 1 ] = acmonth;
+        m_gotDate[ 2 ] = acyear % 100;
+        m_gotPlace = MAP::curMap->getCurrentLocationId( );
+        m_hatchDate[ 0 ] = m_hatchDate[ 1 ] = m_hatchDate[ 2 ] = m_hatchPlace = 0;
+    } else {
+        m_steps = data.m_baseFriend;
+        m_gotDate[ 0 ] = m_gotDate[ 1 ] = m_gotDate[ 2 ] = m_hatchPlace = 0;
+        m_hatchDate[ 0 ] = acday;
+        m_hatchDate[ 1 ] = acmonth;
+        m_hatchDate[ 2 ] = acyear % 100;
+        m_gotPlace = MAP::curMap->getCurrentLocationId( );
+    }
+
+    m_ability = p_hiddenAbility ? ( ( m_pid & 1 || ( data.m_abilities[ 3 ] == 0 ) ) ? data.m_abilities[ 2 ] : data.m_abilities[ 3 ] ) :
+        ( ( m_pid & 1 || ( data.m_abilities[ 1 ] == 0 ) ) ? data.m_abilities[ 0 ] : data.m_abilities[ 1 ] );
+    m_markings = 0;
+    m_origLang = 5;
+
+    memset( m_effortValues, 0, sizeof( m_effortValues ) );
+    memset( m_contestStats, 0, sizeof( m_contestStats ) );
+    memset( m_ribbons1, 0, sizeof( m_ribbons1 ) );
+    memset( m_ribbons1, 0, sizeof( m_ribbons1 ) );
+    memset( m_ribbons2, 0, sizeof( m_ribbons2 ) );
+    getLearnMoves( p_pkmnId, p_level, 0, 1, 4, m_moves );
+    for( u8 i = 0; i < 4; ++i ) m_acPP[ i ] = (u8) ( AttackList[ m_moves[ i ] ]->m_movePP );
+
+    m_ppup.m_Up1 = 0;
+    m_ppup.m_Up2 = 0;
+    m_ppup.m_Up3 = 0;
+    m_ppup.m_Up4 = 0;
+    m_individualValues.m_attack = rand( ) & 31;
+    m_individualValues.m_defense = rand( ) & 31;
+    m_individualValues.m_hp = rand( ) & 31;
+    m_individualValues.m_sAttack = rand( ) & 31;
+    m_individualValues.m_sDefense = rand( ) & 31;
+    m_individualValues.m_speed = rand( ) & 31;
+    m_individualValues.m_isEgg = p_isEgg;
+    m_fateful = p_fatefulEncounter;
+
+
+    pkmnGenderType A = data.m_gender;
+    if( A == MALE )
+        m_isFemale = m_isGenderless = false;
+    else if( A == FEMALE )
+        m_isFemale = true,
+        m_isGenderless = false;
+    else if( A == GENDERLESS )
+        m_isFemale = false,
+        m_isGenderless = true;
+    else if( ( m_pid % 256 ) >= A )
+        m_isFemale = m_isGenderless = false;
+    else m_isFemale = true,
+        m_isGenderless = false;
+
+    m_altForme = 0;
+    m_cloned = false;
+    if( p_name ) {
+        wcscpy( m_name, p_name );
+        m_individualValues.m_isNicked = true;
+    } else {
+        swprintf( m_name, 14, L"%s", data.m_displayName );
+        m_individualValues.m_isNicked = false;
+    }
+    m_hometown = 4;
+    wcscpy( m_oT, FS::SAV->m_playername );
+    m_pokerus = p_pokerus;
+    m_ball = 0;
+    m_gotLevel = p_level;
+    m_oTisFemale = !FS::SAV->m_isMale;
+    m_encounter = (encounter) 0;
+    m_HGSSBall = 0;
+}
 pokemon::boxPokemon::boxPokemon( u16*           p_moves,
                                  u16            p_pkmnId,
                                  const wchar_t* p_name,
@@ -215,6 +333,8 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
     getAll( p_pkmnId, data );
 
     srand( LastPID );
+    m_oTId = p_id;
+    m_oTSid = p_sid;
     LastPID = m_pid = rand( );
     if( p_shiny == 2 )
         while( !isShiny( ) )
@@ -239,13 +359,11 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
             m_holdItem = 0;
     }
 
-    m_oTId = p_id;
-    m_oTSid = p_sid;
     if( !p_isEgg )
         m_experienceGained = EXP[ p_level - 1 ][ data.m_expType ];
     else
         m_experienceGained = 0;
-    
+
     if( p_isEgg ) {
         m_steps = data.m_eggcyc;
         m_gotDate[ 0 ] = acday;
@@ -261,19 +379,23 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
         m_hatchDate[ 2 ] = acyear % 100;
         m_gotPlace = p_gotPlace;
     }
+
     m_ability = p_hiddenAbility ? ( ( m_pid & 1 || ( data.m_abilities[ 3 ] == 0 ) ) ? data.m_abilities[ 2 ] : data.m_abilities[ 3 ] ) :
         ( ( m_pid & 1 || ( data.m_abilities[ 1 ] == 0 ) ) ? data.m_abilities[ 0 ] : data.m_abilities[ 1 ] );
     m_markings = 0;
     m_origLang = 5;
-    for( int i = 0; i < 6; ++i ) m_effortValues[ i ] = 0;
-    for( int i = 0; i < 6; ++i ) m_contestStats[ i ] = 0;
-    for( int i = 0; i < 4; ++i ) m_ribbons1[ i ] = 0;
+
+    memset( m_effortValues, 0, sizeof( m_effortValues ) );
+    memset( m_contestStats, 0, sizeof( m_contestStats ) );
+    memset( m_ribbons0, 0, sizeof( m_ribbons0 ) );
+    memset( m_ribbons1, 0, sizeof( m_ribbons1 ) );
+    memset( m_ribbons2, 0, sizeof( m_ribbons2 ) );
 
     if( p_moves )
-        for( int i = 0; i < 4; ++i ) m_moves[ i ] = p_moves[ i ];
+        memcpy( m_moves, p_moves, sizeof( m_moves ) );
     else
         getLearnMoves( p_pkmnId, p_level, 0, 1, 4, m_moves );
-    for( int i = 0; i < 4; ++i ) m_acPP[ i ] = (u8)( AttackList[ m_moves[ i ] ]->m_movePP );
+    for( u8 i = 0; i < 4; ++i ) m_acPP[ i ] = (u8) ( AttackList[ m_moves[ i ] ]->m_movePP );
 
     m_ppup.m_Up1 = 0;
     m_ppup.m_Up2 = 0;
@@ -287,7 +409,6 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
     m_individualValues.m_speed = rand( ) % 32;
     m_individualValues.m_isNicked = !!p_name;
     m_individualValues.m_isEgg = p_isEgg;
-    for( int i = 0; i < 4; ++i ) m_ribbons0[ i ] = 0;
     m_fateful = p_fatefulEncounter;
 
 
@@ -310,49 +431,41 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
         wcscpy( m_name, p_name );
         m_individualValues.m_isNicked = true;
     } else {
-        getWDisplayName( p_pkmnId, m_name );
+        swprintf( m_name, 14, L"%s", data.m_displayName );
         m_individualValues.m_isNicked = false;
     }
     m_hometown = 4;
-    for( int i = 0; i < 4; ++i ) m_ribbons2[ i ] = 0;
     wcscpy( m_oT, p_oT );
     m_pokerus = p_pokerus;
     m_ball = p_ball;
     m_gotLevel = p_level;
     m_oTisFemale = p_oTFemale;
-    m_encounter = (encounter)0;
+    m_encounter = (encounter) 0;
     m_HGSSBall = 0;
-
 }
-pokemon::pokemon( u16*              p_moves,
-                  u16               p_pkmnId,
-                  const wchar_t*    p_name,
-                  u16               p_level,
-                  u16               p_id,
-                  u16               p_sid,
-                  const wchar_t*    p_oT,
-                  bool              p_oTFemale,
-                  u8                p_shiny,
-                  bool              p_hiddenAbility,
-                  bool              p_fatefulEncounter,
-                  bool              p_isEgg,
-                  u16               p_gotPlace,
-                  u8                p_ball,
-                  u8                p_pokerus )
-                  : m_boxdata( p_moves,
-                  p_pkmnId,
-                  p_name,
-                  p_level,
-                  p_id,
-                  p_sid,
-                  p_oT,
-                  p_oTFemale,
-                  p_shiny,
-                  p_hiddenAbility,
-                  p_fatefulEncounter,
-                  p_isEgg, p_gotPlace,
-                  p_ball, p_pokerus ),
-                  m_Level( p_level ) {
+
+
+pokemon::pokemon( u16 p_pkmnId, u16 p_level, const wchar_t* p_name, u8 p_shiny,
+                  bool p_hiddenAbility, bool p_isEgg, u8 p_pokerus, bool p_fatefulEncounter )
+    : m_boxdata( p_pkmnId, p_level, p_name, p_shiny, p_hiddenAbility, p_isEgg, p_pokerus, p_fatefulEncounter ), m_Level( p_level ) {
+    if( p_pkmnId != 292 )
+        m_stats.m_acHP = m_stats.m_maxHP = ( ( m_boxdata.m_individualValues.m_hp + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )*p_level / 100 ) + 10;
+    else
+        m_stats.m_acHP = m_stats.m_maxHP = 1;
+
+    pkmnNatures nature = m_boxdata.getNature( );
+    m_stats.m_Atk = ( ( ( m_boxdata.m_individualValues.m_attack + 2 * data.m_bases[ 1 ] + ( m_boxdata.m_effortValues[ 1 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];
+    m_stats.m_Def = ( ( ( m_boxdata.m_individualValues.m_defense + 2 * data.m_bases[ 2 ] + ( m_boxdata.m_effortValues[ 2 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 1 ];
+    m_stats.m_Spd = ( ( ( m_boxdata.m_individualValues.m_speed + 2 * data.m_bases[ 5 ] + ( m_boxdata.m_effortValues[ 5 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 2 ];
+    m_stats.m_SAtk = ( ( ( m_boxdata.m_individualValues.m_sAttack + 2 * data.m_bases[ 3 ] + ( m_boxdata.m_effortValues[ 3 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 3 ];
+    m_stats.m_SDef = ( ( ( m_boxdata.m_individualValues.m_sDefense + 2 * data.m_bases[ 4 ] + ( m_boxdata.m_effortValues[ 4 ] >> 2 ) )*p_level / 100.0 ) + 5 )*NatMod[ nature ][ 4 ];
+
+    m_status.m_Asleep = m_status.m_Burned = m_status.m_Frozen = m_status.m_Paralyzed = m_status.m_Poisoned = m_status.m_Toxic = false;
+}
+pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const wchar_t* p_name, u16 p_level, u16 p_id, u16 p_sid, const wchar_t* p_oT, bool p_oTFemale,
+                  u8 p_shiny, bool p_hiddenAbility, bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace, u8 p_ball, u8 p_pokerus )
+    : m_boxdata( p_moves, p_pkmnId, p_name, p_level, p_id, p_sid, p_oT, p_oTFemale, p_shiny,
+                 p_hiddenAbility, p_fatefulEncounter, p_isEgg, p_gotPlace, p_ball, p_pokerus ), m_Level( p_level ) {
     if( p_pkmnId != 292 )
         m_stats.m_acHP = m_stats.m_maxHP = ( ( m_boxdata.m_individualValues.m_hp + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )*p_level / 100 ) + 10;
     else
@@ -369,7 +482,7 @@ pokemon::pokemon( u16*              p_moves,
 }
 
 bool pokemon::boxPokemon::isShiny( ) {
-    return ( ( ( m_oTId ^ m_oTSid ) >> 3 ) ^ ( ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) ) ) >> 3 ) == 0;
+    return ( ( ( ( m_oTId ^ m_oTSid ) >> 3 ) ^ ( ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) ) ) >> 3 ) == 0 );
 }
 bool pokemon::boxPokemon::isCloned( ) {
     return ( ( m_pid >> 16 )&( m_pid % ( 1 << 16 ) ) ) < ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) );

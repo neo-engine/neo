@@ -1,3 +1,30 @@
+/*
+Pokémon Emerald 2 Version
+------------------------------
+
+file        : choiceBox.cpp
+author      : Philip Wellnitz
+description :
+
+Copyright (C) 2012 - 2016
+Philip Wellnitz
+
+This file is part of Pokémon Emerald 2 Version.
+
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "choiceBox.h"
 #include "uio.h"
 #include "defines.h"
@@ -193,11 +220,11 @@ namespace IO {
                         waitForTouchUp( );
                         if( ( ++_acPage ) >= ( ( _num - 1 ) / 3 ) ) {
                             ( Oam->oamBuffer[ FWD_ID ] ).isHidden = true;
-                            ( Oam->oamBuffer[ FWD_ID ] ).isHidden = !_acPage;
+                            ( Oam->oamBuffer[ BWD_ID ] ).isHidden = !_acPage;
                             ( Oam->oamBuffer[ BWD_ID ] ).x = bwdPos[ p_backButton ][ 0 ] - 16;
                             ( Oam->oamBuffer[ BWD_ID ] ).y = bwdPos[ p_backButton ][ 1 ] - 16;
-                            //if( _acPage == ( ( _num - 1 ) / 3 ) )
-                            //    draw( NEW_PAGE );
+                            if( _acPage == ( ( _num - 1 ) / 3 ) )
+                                draw( NEW_PAGE );
                             _acPage = ( ( _num - 1 ) / 3 );
                         } else {
                             ( Oam->oamBuffer[ BWD_ID ] ).isHidden = false;
@@ -254,7 +281,7 @@ namespace IO {
                         draw( i );
 
                         if( !waitForTouchUp( ( ( i % 2 ) ? 129 : 19 ),
-                            68 + ( i / 2 ) * 35, 106 + ( ( i % 2 ) ? 129 : 19 ), 32 + 68 + ( i / 2 ) * 35 ) ) {
+                                             68 + ( i / 2 ) * 35, 106 + ( ( i % 2 ) ? 129 : 19 ), 32 + 68 + ( i / 2 ) * 35 ) ) {
                             draw( 8 );
                             break;
                         }
@@ -276,7 +303,7 @@ namespace IO {
                         ( Oam->oamBuffer[ BWD_ID ] ).x = bwdPos[ p_backButton ][ 0 ] - 16;
                         ( Oam->oamBuffer[ BWD_ID ] ).y = bwdPos[ p_backButton ][ 1 ] - 16;
                         if( _acPage == ( _num / 6 ) )
-                        draw( NEW_PAGE );
+                            draw( NEW_PAGE );
                         _acPage = ( _num / 6 );
                     } else {
                         ( Oam->oamBuffer[ BWD_ID ] ).isHidden = false;

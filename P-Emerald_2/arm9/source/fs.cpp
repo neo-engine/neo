@@ -6,7 +6,7 @@ file        : fs.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -27,8 +27,9 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include <string>
 #include <vector>
-#include <cstdio>
 #include <initializer_list>
+#include <cstdio>
+#include <cstring>
 
 #include "fs.h"
 #include "buffer.h"
@@ -113,13 +114,23 @@ namespace FS {
     void close( FILE* p_file ) {
         fclose( p_file );
     }
+    size_t read( FILE* p_stream, void* p_buffer, size_t p_size, size_t p_count ) {
+        if( !p_stream )
+            return 0;
+        return fread( p_buffer, p_size, p_count, p_stream );
+    }
+    size_t write( FILE* p_stream, const void* p_buffer, size_t p_size, size_t p_count ) {
+        if( !p_stream )
+            return 0;
+        return fwrite( p_buffer, p_size, p_count, p_stream );
+    }
 
     bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt, unsigned short* p_data ) {
         FILE* fd = open( p_path, p_name );
         if( !fd )
             return false;
-        fread( p_data, sizeof( unsigned short ), p_dataCnt, fd );
-        fclose( fd );
+        read( fd, p_data, sizeof( unsigned short ), p_dataCnt );
+        close( fd );
         return true;
     }
 
@@ -128,9 +139,9 @@ namespace FS {
         FILE* fd = open( p_path, p_name );
         if( !fd )
             return false;
-        fread( p_data1, sizeof( unsigned short ), p_dataCnt1, fd );
-        fread( p_data2, sizeof( unsigned int ), p_dataCnt2, fd );
-        fclose( fd );
+        read( fd, p_data1, sizeof( unsigned short ), p_dataCnt1 );
+        read( fd, p_data2, sizeof( unsigned int ), p_dataCnt2 );
+        close( fd );
         return true;
     }
     bool readData( const char* p_path, const char* p_name, const unsigned int p_dataCnt1,
@@ -138,14 +149,14 @@ namespace FS {
         FILE* fd = open( p_path, p_name );
         if( !fd )
             return false;
-        fread( p_data1, sizeof( unsigned int ), p_dataCnt1, fd );
-        fread( p_data2, sizeof( unsigned short ), p_dataCnt2, fd );
-        fclose( fd );
+        read( fd, p_data1, sizeof( unsigned int ), p_dataCnt1 );
+        read( fd, p_data2, sizeof( unsigned short ), p_dataCnt2 );
+        close( fd );
         return true;
     }
 
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt, bool p_bottom ) {
-        if( !readData( p_path, p_name, (unsigned int)p_tileCnt, TEMP, (unsigned short)p_palCnt, TEMP_PAL ) )
+        if( !readData( p_path, p_name, (unsigned int) p_tileCnt, TEMP, (unsigned short) p_palCnt, TEMP_PAL ) )
             return false;
 
         IO::copySpriteData( TEMP, p_spriteInfo->m_entry->gfxIndex, 4 * p_tileCnt, p_bottom );
@@ -154,8 +165,7 @@ namespace FS {
     }
 
     bool readPictureData( u16* p_layer, const char* p_path, const char* p_name, u16 p_palSize, u32 p_tileCnt, bool p_bottom ) {
-
-        if( !readData( p_path, p_name, (unsigned int)( 12288 ), TEMP, (unsigned short)( 256 ), TEMP_PAL ) )
+        if( !readData( p_path, p_name, (unsigned int) ( 12288 ), TEMP, (unsigned short) ( 256 ), TEMP_PAL ) )
             return false;
 
         dmaCopy( TEMP, p_layer, p_tileCnt );
@@ -176,7 +186,7 @@ namespace FS {
         char buffer[ 100 ];
         sprintf( buffer, "%s", p_name );
 
-        if( !readData( "nitro:/PICS/NAV/", buffer, (unsigned int)( 12288 ), IO::NAV_DATA, (unsigned short)( 256 ), IO::NAV_DATA_PAL ) )
+        if( !readData( "nitro:/PICS/NAV/", buffer, (unsigned int) ( 12288 ), IO::NAV_DATA, (unsigned short) ( 256 ), IO::NAV_DATA_PAL ) )
             return false;
 
         dmaCopy( IO::NAV_DATA, p_layer, 256 * 192 );
@@ -188,21 +198,21 @@ namespace FS {
     bool readNop( FILE* p_file, u32 p_cnt ) {
         if( p_file == 0 )
             return false;
-        fread( 0, 1, p_cnt, p_file );
+        read( p_file, 0, 1, p_cnt );
         return true;
     }
 
     bool readPal( FILE* p_file, MAP::palette* p_palette ) {
         if( p_file == 0 )
             return false;
-        fread( p_palette, sizeof( u16 ) * 16, 6, p_file );
+        read( p_file, p_palette, sizeof( u16 ) * 16, 6 );
         return true;
     }
 
     bool readTiles( FILE* p_file, MAP::tile* p_tileSet, u16 p_startIdx, u16 p_size ) {
         if( p_file == 0 )
             return false;
-        fread( p_tileSet + p_startIdx, sizeof( MAP::tile )*p_size, 1, p_file );
+        read( p_file, p_tileSet + p_startIdx, sizeof( MAP::tile )*p_size, 1 );
         return true;
     }
 
@@ -211,12 +221,12 @@ namespace FS {
             return false;
         readNop( p_file, 4 );
         for( u16 i = 0; i < p_size; ++i ) {
-            fread( &( p_tileSet + p_startIdx + i )->m_bottom, 4 * sizeof( MAP::blockAtom ), 1, p_file );
-            fread( &( p_tileSet + p_startIdx + i )->m_top, 4 * sizeof( MAP::blockAtom ), 1, p_file );
+            read( p_file, &( p_tileSet + p_startIdx + i )->m_bottom, 4 * sizeof( MAP::blockAtom ), 1 );
+            read( p_file, &( p_tileSet + p_startIdx + i )->m_top, 4 * sizeof( MAP::blockAtom ), 1 );
         }
         for( u16 i = 0; i < p_size; ++i ) {
-            fread( &( p_tileSet + p_startIdx + i )->m_bottombehave, sizeof( u8 ), 1, p_file );
-            fread( &( p_tileSet + p_startIdx + i )->m_topbehave, sizeof( u8 ), 1, p_file );
+            read( p_file, &( p_tileSet + p_startIdx + i )->m_bottombehave, sizeof( u8 ), 1 );
+            read( p_file, &( p_tileSet + p_startIdx + i )->m_topbehave, sizeof( u8 ), 1 );
         }
         return true;
     }
@@ -252,9 +262,9 @@ namespace FS {
 
         while( ( ac = fgetc( p_file ) ) != '*' && ac != EOF ) {
             if( ac == '|' )
-                ret += (char)136;
+                ret += (char) 136;
             else if( ac == '#' )
-                ret += (char)137;
+                ret += (char) 137;
             else
                 ret += ac;
         }
@@ -273,9 +283,9 @@ namespace FS {
         } else ret += ac;
         while( ( ac = fgetc( p_file ) ) != '*' && ac != EOF ) {
             if( ac == '|' )
-                ret += (wchar_t)136;
+                ret += (wchar_t) 136;
             else if( ac == '#' )
-                ret += (wchar_t)137;
+                ret += (wchar_t) 137;
             else
                 ret += ac;
         }
@@ -374,9 +384,9 @@ namespace FS {
             else if( *ac == '%' )
                 ret += ' ';
             else if( *ac == '|' )
-                ret += (char)136;
+                ret += (char) 136;
             else if( *ac == '#' )
-                ret += (char)137;
+                ret += (char) 137;
             else if( *ac == '\r' )
                 ret += "";
             else
@@ -406,9 +416,9 @@ namespace FS {
             else if( *ac == '%' )
                 ret += L' ';
             else if( *ac == '|' )
-                ret += (char)136;
+                ret += (char) 136;
             else if( *ac == '#' )
-                ret += (char)137;
+                ret += (char) 137;
             else if( *ac == '\r' )
                 ret += L"";
             else
@@ -422,19 +432,17 @@ namespace FS {
             return FARAWAY_PLACE;
         FILE* f = FS::open( "nitro:/LOCATIONS/", p_ind, ".data" );
 
-        if( f == 0 ) {
+        if( !f ) {
             if( savMod == SavMod::_NDS && p_ind > 322 && p_ind < 1000 )
                 return getLoc( 3002 );
 
             return FARAWAY_PLACE;
         }
-        char buffer[ 50 ] = { 0 };
-        fread( buffer, 1, 49, f );
-
-        std::string ret = std::string( buffer );
-        ret.pop_back( );
+        static char buffer[ 60 ];
+        memset( buffer, 0, sizeof( buffer ) );
+        FS::read( f, buffer, sizeof( char ), 48 );
         FS::close( f );
-        return ret.c_str( );
+        return buffer;
     }
 }
 
@@ -444,52 +452,13 @@ std::string toString( u16 p_num ) {
     return std::string( buffer );
 }
 
-[[ deprecated ]]
-Type getType( u16 p_pkmnId, u16 p_type ) {
-    pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return tmp.m_types[ p_type ];
-    } else {
-        return UNBEKANNT;
-    }
-}
-[[ deprecated ]]
-u16 getBase( u16 p_pkmnId, u16 p_base ) {
-    pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return tmp.m_bases[ p_base ];
-    } else {
-        return 0;
-    }
-}
-[[ deprecated ]]
-u16 getCatchRate( u16 p_pkmnId ) {
-    pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return tmp.m_catchrate;
-    } else {
-        return 0;
-    }
-}
-[[ deprecated ]]
-const char* getDisplayName( u16 p_pkmnId ) {
-    static pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return reinterpret_cast<const char*>( tmp.m_displayName );
-    } else {
-        return "???";
-    }
-}
 const wchar_t* getWDisplayName( u16 p_pkmnId ) {
     static pokemonData tmp;
     if( !getAll( p_pkmnId, tmp ) ) {
         return L"???";
     }
-
-    std::wstring res = L"";
-    for( u8 i = 0; tmp.m_displayName[ i ]; ++i )
-        res += tmp.m_displayName[ i ];
-    return res.c_str( );
+    swprintf( wbuffer, 15, L"%s", tmp.m_displayName );
+    return wbuffer;
 }
 void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
     pokemonData tmp;
@@ -497,73 +466,7 @@ void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
         wcscpy( p_name, L"???" );
         return;
     }
-
-    std::wstring res = L"";
-    for( u8 i = 0; tmp.m_displayName[ i ]; ++i )
-        res += tmp.m_displayName[ i ];
-    wcscpy( p_name, res.c_str( ) );
-}
-
-[[ deprecated ]]
-void getHoldItems( u16 p_pkmnId, u16* p_items ) {
-    pokemonData tmp;
-    memset( p_items, 0, 4 * sizeof( u16 ) );
-    if( getAll( p_pkmnId, tmp ) ) {
-        memcpy( p_items, tmp.m_items, 4 * sizeof( u16 ) );
-    }
-}
-
-[[ deprecated ]]
-pkmnGenderType getGenderType( u16 p_pkmnId ) {
-    pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return tmp.m_gender;
-    } else {
-        return pkmnGenderType( 0 );
-    }
-}
-
-[[ deprecated ]]
-const char* getDexEntry( u16 p_pkmnId ) {
-    static pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return reinterpret_cast<const char*>( tmp.m_dexEntry );
-    } else {
-        return NO_DATA;
-    }
-}
-
-[[ deprecated ]]
-u16 getForme( u16 p_pkmnId, u16 p_formeId, std::string& p_retFormeName ) {
-    pokemonData tmp;
-    if( !getAll( p_pkmnId, tmp ) ) {
-        return p_pkmnId;
-    }
-    p_retFormeName = std::string( reinterpret_cast<const char*>( tmp.m_formeName[ p_formeId ] ) );
-    return tmp.m_formeIdx[ p_formeId ];
-}
-
-[[ deprecated ]]
-std::vector<u16> getAllFormes( u16 p_pkmnId ) {
-    pokemonData tmp;
-    if( !getAll( p_pkmnId, tmp ) ) {
-        return{ };
-    }
-
-    std::vector<u16> res;
-    for( u8 i = 0; i < tmp.m_formecnt; ++i )
-        res.push_back( tmp.m_formeIdx[ i ] );
-    return res;
-}
-
-[[ deprecated ]]
-const char* getSpecies( u16 p_pkmnId ) {
-    static pokemonData tmp;
-    if( getAll( p_pkmnId, tmp ) ) {
-        return reinterpret_cast<const char*>( tmp.m_species );
-    } else {
-        return UNKNOWN_SPECIES;
-    }
+    swprintf( p_name, 15, L"%s", tmp.m_displayName );
 }
 
 bool getAll( u16 p_pkmnId, pokemonData& p_out ) {
@@ -571,7 +474,7 @@ bool getAll( u16 p_pkmnId, pokemonData& p_out ) {
     if( f == 0 )
         return false;
 
-    fread( &p_out, sizeof( pokemonData ), 1, f );
+    FS::read( f, &p_out, sizeof( pokemonData ), 1 );
     FS::close( f );
     return true;
 }
@@ -582,7 +485,7 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
         return;
 
     u16 buffer[ 700 ];
-    fread( buffer, sizeof( u16 ), 699, f );
+    FS::read( f, buffer, sizeof( u16 ), 699 );
     FS::close( f );
     u16 ptr = 0;
 
@@ -596,7 +499,7 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
             u16 z = buffer[ ptr++ ];
             for( int j = 0; j < z; ++j ) {
                 u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-                if( i >= p_toLevel && h == (u16)p_mode && g < MAXATTACK )
+                if( i >= p_toLevel && h == (u16) p_mode && g < MAXATTACK )
                     reses.push_back( g );
             }
         }
@@ -639,7 +542,7 @@ bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
         return false;
 
     u16 buffer[ 700 ];
-    fread( buffer, sizeof( u16 ), 699, f );
+    FS::read( f, buffer, sizeof( u16 ), 699 );
     FS::close( f );
     u16 ptr = 0;
 

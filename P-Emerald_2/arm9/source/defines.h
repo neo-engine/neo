@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : defines.h
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Copyright (C) 2012 - 2016
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -34,8 +34,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 //#define USE_AS_LIB
 #undef _EMULATOR
-#define VERSION "0.5"
-#define VERSION_NAME "Fighting Torchic"
+#define VERSION "0.6"
+#define VERSION_NAME "Executing Exeggcute"
 #define DEBUG
 
 enum GameMod : u8 {
@@ -84,6 +84,8 @@ extern unsigned short TEMP_PAL[ 256 ];
             ( (a) & KEY_UP )    ?   MAP::direction::UP : (\
             ( (a) & KEY_RIGHT ) ?   MAP::direction::RIGHT :\
                                     MAP::direction::LEFT ) ) )
+
+#define IN_DEX(pidx) ( FS::SAV->m_inDex[ (pidx) / 8 ] & ( 1 << ( (pidx) % 8 ) ) )
 
 #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 #define COMPL(a) ( RGB( 31 - ( (a) >> 10 ) % 32,31 - ( (a) >> 5 ) % 32,31 - (a) % 32 ) )

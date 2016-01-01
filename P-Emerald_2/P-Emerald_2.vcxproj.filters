@@ -1,356 +1,356 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Header Files\arm7">
-      <UniqueIdentifier>{b993ab4b-e2b4-41cf-b080-78256e1f803b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\arm9">
-      <UniqueIdentifier>{cd7b15c1-903c-4c5d-ae67-2c1eab62e203}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\arm7">
-      <UniqueIdentifier>{c7deb384-0593-4b93-8ae5-276969bce207}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\arm9">
-      <UniqueIdentifier>{dd4570e5-bf87-4555-98dc-6b64bacab8e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\arm9\bag">
-      <UniqueIdentifier>{9b6d5fb8-2421-4b87-ba6c-aaa2daf40435}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\arm9\battle">
-      <UniqueIdentifier>{39d4fbda-d684-422f-bfa7-68c59b4edee7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\arm9\box">
-      <UniqueIdentifier>{38038f55-4118-4b8a-92d3-687a79e1063f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\arm9\dex">
-      <UniqueIdentifier>{35669822-f1ec-4521-a8bf-30e30ea5f372}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\arm9\fs">
-      <UniqueIdentifier>{ce32e421-874e-4508-9b40-68bf8f4ed38a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\arm9\io">
-      <UniqueIdentifier>{f5299c72-21f8-433d-89f5-531cf9d0e36b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\arm9\map">
-      <UniqueIdentifier>{edf41ce4-7d1c-4f31-bc99-7256154d6831}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\arm9\sts">
-      <UniqueIdentifier>{9ce47484-fb03-4ef5-bbce-0d7462926e35}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\arm9\bag">
-      <UniqueIdentifier>{398e7963-304b-4420-9b21-6163c53fdeca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\arm9\battle">
-      <UniqueIdentifier>{d8650326-7cea-41f5-aaf2-44212f179c0f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\arm9\box">
-      <UniqueIdentifier>{8a7b4f86-32f7-4a99-8ced-fb4256a1088d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\arm9\dex">
-      <UniqueIdentifier>{931087d5-781d-46c1-a737-58fd74712044}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\arm9\fs">
-      <UniqueIdentifier>{d14f2d8a-a5f5-4cec-a703-966dde312242}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\arm9\io">
-      <UniqueIdentifier>{6d30e346-9ecf-4144-8fee-bbc5b8644eb4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\arm9\map">
-      <UniqueIdentifier>{988879c6-c21a-4137-b73e-095edecbd303}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\arm9\sts">
-      <UniqueIdentifier>{163da026-3d7f-4b79-adc1-a22342fb2b4a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\arm9\data structures">
-      <UniqueIdentifier>{cc2ee30a-59bd-423e-b520-beebc83b7ea5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\arm9\data structures">
-      <UniqueIdentifier>{87796c2f-84ad-4bcc-b803-26ce3e1582b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\arm9\nav">
-      <UniqueIdentifier>{c28cb13f-7873-47f9-9e76-374f4a793e5d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\arm9\nav">
-      <UniqueIdentifier>{9c56e27e-cfea-46b1-b4a9-6c9e0c0f6950}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="arm9\include\unistd.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
-    <ClInclude Include="arm7\include\ipc.h">
-      <Filter>Header Files\arm7</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\libnds_internal.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\buffer.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\defines.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\bag.h">
-      <Filter>Header Files\arm9\bag</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\bagUI.h">
-      <Filter>Header Files\arm9\bag</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\battle.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\battleUI.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\script.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\dexUI.h">
-      <Filter>Header Files\arm9\dex</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\dex.h">
-      <Filter>Header Files\arm9\dex</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\ability.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\berry.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\item.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\move.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\pokemon.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\type.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\fs.h">
-      <Filter>Header Files\arm9\fs</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\Gen.h">
-      <Filter>Header Files\arm9\fs</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\saveGame.h">
-      <Filter>Header Files\arm9\fs</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\choiceBox.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\font.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\keyboard.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\messageBox.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\sprite.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\uio.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\yesNoBox.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\statusScreen.h">
-      <Filter>Header Files\arm9\sts</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\statusScreenUI.h">
-      <Filter>Header Files\arm9\sts</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\hmMoves.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\ribbon.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\bagViewer.h">
-      <Filter>Header Files\arm9\bag</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\mapSlice.h">
-      <Filter>Header Files\arm9\map</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\mapObject.h">
-      <Filter>Header Files\arm9\map</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\mapDrawer.h">
-      <Filter>Header Files\arm9\map</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\startScreen.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\mapSprite.h">
-      <Filter>Header Files\arm9\map</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\mapDefines.h">
-      <Filter>Header Files\arm9\map</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\box.h">
-      <Filter>Header Files\arm9\box</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\boxUI.h">
-      <Filter>Header Files\arm9\box</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\boxViewer.h">
-      <Filter>Header Files\arm9\box</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\mapWarps.h">
-      <Filter>Header Files\arm9\map</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\screenFade.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\nav.h">
-      <Filter>Header Files\arm9\nav</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="arm7\source\main.c">
-      <Filter>Source Files\arm7</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\buffer.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\Bag.cpp">
-      <Filter>Source Files\arm9\bag</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\bagUI.cpp">
-      <Filter>Source Files\arm9\bag</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\battle.cpp">
-      <Filter>Source Files\arm9\battle</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\battleUI.cpp">
-      <Filter>Source Files\arm9\battle</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\script.cpp">
-      <Filter>Source Files\arm9\battle</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\dex.cpp">
-      <Filter>Source Files\arm9\dex</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\dexUI.cpp">
-      <Filter>Source Files\arm9\dex</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\move.cpp">
-      <Filter>Source Files\arm9\data structures</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\pokemon.cpp">
-      <Filter>Source Files\arm9\data structures</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\type.cpp">
-      <Filter>Source Files\arm9\data structures</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\fs.cpp">
-      <Filter>Source Files\arm9\fs</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\Gen.cpp">
-      <Filter>Source Files\arm9\fs</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\saveGame.cpp">
-      <Filter>Source Files\arm9\fs</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\choiceBox.cpp">
-      <Filter>Source Files\arm9\io</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\font.cpp">
-      <Filter>Source Files\arm9\io</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\fontData.cpp">
-      <Filter>Source Files\arm9\io</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\keyboard.cpp">
-      <Filter>Source Files\arm9\io</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\messageBox.cpp">
-      <Filter>Source Files\arm9\io</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\sprite.cpp">
-      <Filter>Source Files\arm9\io</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\uio.cpp">
-      <Filter>Source Files\arm9\io</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\map2d.cpp">
-      <Filter>Source Files\arm9\map</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\statusScreen.cpp">
-      <Filter>Source Files\arm9\sts</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\statusScreenUI.cpp">
-      <Filter>Source Files\arm9\sts</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\main.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\ribbon.cpp">
-      <Filter>Source Files\arm9\data structures</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\yesNoBox.cpp">
-      <Filter>Source Files\arm9\io</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\item.cpp">
-      <Filter>Source Files\arm9\data structures</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\bagViewer.cpp">
-      <Filter>Source Files\arm9\bag</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\mapSlice.cpp">
-      <Filter>Source Files\arm9\map</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\startScreen.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\mapDrawer.cpp">
-      <Filter>Source Files\arm9\map</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\mapSprite.cpp">
-      <Filter>Source Files\arm9\map</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\mapObject.cpp">
-      <Filter>Source Files\arm9\map</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\mapMoves.cpp">
-      <Filter>Source Files\arm9\map</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\mapWarps.cpp">
-      <Filter>Source Files\arm9\map</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\screenFade.cpp">
-      <Filter>Source Files\arm9\io</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\boxViewer.cpp">
-      <Filter>Source Files\arm9\box</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\boxUI.cpp">
-      <Filter>Source Files\arm9\box</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\nav.cpp">
-      <Filter>Source Files\arm9\nav</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Makefile">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
+    <ItemGroup>
+        <Filter Include="Source Files">
+            <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+            <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+        </Filter>
+        <Filter Include="Header Files">
+            <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+            <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+        </Filter>
+        <Filter Include="Resource Files">
+            <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+            <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+        </Filter>
+        <Filter Include="Header Files\arm7">
+            <UniqueIdentifier>{b993ab4b-e2b4-41cf-b080-78256e1f803b}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Header Files\arm9">
+            <UniqueIdentifier>{cd7b15c1-903c-4c5d-ae67-2c1eab62e203}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Source Files\arm7">
+            <UniqueIdentifier>{c7deb384-0593-4b93-8ae5-276969bce207}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Source Files\arm9">
+            <UniqueIdentifier>{dd4570e5-bf87-4555-98dc-6b64bacab8e0}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Header Files\arm9\bag">
+            <UniqueIdentifier>{9b6d5fb8-2421-4b87-ba6c-aaa2daf40435}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Header Files\arm9\battle">
+            <UniqueIdentifier>{39d4fbda-d684-422f-bfa7-68c59b4edee7}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Header Files\arm9\box">
+            <UniqueIdentifier>{38038f55-4118-4b8a-92d3-687a79e1063f}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Header Files\arm9\dex">
+            <UniqueIdentifier>{35669822-f1ec-4521-a8bf-30e30ea5f372}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Header Files\arm9\fs">
+            <UniqueIdentifier>{ce32e421-874e-4508-9b40-68bf8f4ed38a}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Header Files\arm9\io">
+            <UniqueIdentifier>{f5299c72-21f8-433d-89f5-531cf9d0e36b}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Header Files\arm9\map">
+            <UniqueIdentifier>{edf41ce4-7d1c-4f31-bc99-7256154d6831}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Header Files\arm9\sts">
+            <UniqueIdentifier>{9ce47484-fb03-4ef5-bbce-0d7462926e35}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Source Files\arm9\bag">
+            <UniqueIdentifier>{398e7963-304b-4420-9b21-6163c53fdeca}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Source Files\arm9\battle">
+            <UniqueIdentifier>{d8650326-7cea-41f5-aaf2-44212f179c0f}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Source Files\arm9\box">
+            <UniqueIdentifier>{8a7b4f86-32f7-4a99-8ced-fb4256a1088d}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Source Files\arm9\dex">
+            <UniqueIdentifier>{931087d5-781d-46c1-a737-58fd74712044}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Source Files\arm9\io">
+            <UniqueIdentifier>{6d30e346-9ecf-4144-8fee-bbc5b8644eb4}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Source Files\arm9\map">
+            <UniqueIdentifier>{988879c6-c21a-4137-b73e-095edecbd303}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Source Files\arm9\sts">
+            <UniqueIdentifier>{163da026-3d7f-4b79-adc1-a22342fb2b4a}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Source Files\arm9\data structures">
+            <UniqueIdentifier>{cc2ee30a-59bd-423e-b520-beebc83b7ea5}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Header Files\arm9\data structures">
+            <UniqueIdentifier>{87796c2f-84ad-4bcc-b803-26ce3e1582b5}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Header Files\arm9\nav">
+            <UniqueIdentifier>{c28cb13f-7873-47f9-9e76-374f4a793e5d}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Source Files\arm9\nav">
+            <UniqueIdentifier>{9c56e27e-cfea-46b1-b4a9-6c9e0c0f6950}</UniqueIdentifier>
+        </Filter>
+        <Filter Include="Source Files\arm9\fs">
+            <UniqueIdentifier>{d14f2d8a-a5f5-4cec-a703-966dde312242}</UniqueIdentifier>
+        </Filter>
+    </ItemGroup>
+    <ItemGroup>
+        <ClInclude Include="arm9\include\unistd.h">
+            <Filter>Header Files\arm9</Filter>
+        </ClInclude>
+        <ClInclude Include="arm7\include\ipc.h">
+            <Filter>Header Files\arm7</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\include\libnds_internal.h">
+            <Filter>Header Files\arm9</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\buffer.h">
+            <Filter>Header Files\arm9</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\defines.h">
+            <Filter>Header Files\arm9</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\bag.h">
+            <Filter>Header Files\arm9\bag</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\bagUI.h">
+            <Filter>Header Files\arm9\bag</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\battle.h">
+            <Filter>Header Files\arm9\battle</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\battleUI.h">
+            <Filter>Header Files\arm9\battle</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\script.h">
+            <Filter>Header Files\arm9\battle</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\dexUI.h">
+            <Filter>Header Files\arm9\dex</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\dex.h">
+            <Filter>Header Files\arm9\dex</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\ability.h">
+            <Filter>Header Files\arm9\data structures</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\berry.h">
+            <Filter>Header Files\arm9\data structures</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\item.h">
+            <Filter>Header Files\arm9\data structures</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\move.h">
+            <Filter>Header Files\arm9\data structures</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\pokemon.h">
+            <Filter>Header Files\arm9\data structures</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\type.h">
+            <Filter>Header Files\arm9\data structures</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\fs.h">
+            <Filter>Header Files\arm9\fs</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\Gen.h">
+            <Filter>Header Files\arm9\fs</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\saveGame.h">
+            <Filter>Header Files\arm9\fs</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\choiceBox.h">
+            <Filter>Header Files\arm9\io</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\font.h">
+            <Filter>Header Files\arm9\io</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\keyboard.h">
+            <Filter>Header Files\arm9\io</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\messageBox.h">
+            <Filter>Header Files\arm9\io</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\sprite.h">
+            <Filter>Header Files\arm9\io</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\uio.h">
+            <Filter>Header Files\arm9\io</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\yesNoBox.h">
+            <Filter>Header Files\arm9\io</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\statusScreen.h">
+            <Filter>Header Files\arm9\sts</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\statusScreenUI.h">
+            <Filter>Header Files\arm9\sts</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\hmMoves.h">
+            <Filter>Header Files\arm9\data structures</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\ribbon.h">
+            <Filter>Header Files\arm9\data structures</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\bagViewer.h">
+            <Filter>Header Files\arm9\bag</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\mapSlice.h">
+            <Filter>Header Files\arm9\map</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\mapObject.h">
+            <Filter>Header Files\arm9\map</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\mapDrawer.h">
+            <Filter>Header Files\arm9\map</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\startScreen.h">
+            <Filter>Header Files\arm9</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\mapSprite.h">
+            <Filter>Header Files\arm9\map</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\mapDefines.h">
+            <Filter>Header Files\arm9\map</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\box.h">
+            <Filter>Header Files\arm9\box</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\boxUI.h">
+            <Filter>Header Files\arm9\box</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\boxViewer.h">
+            <Filter>Header Files\arm9\box</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\mapWarps.h">
+            <Filter>Header Files\arm9\map</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\screenFade.h">
+            <Filter>Header Files\arm9\io</Filter>
+        </ClInclude>
+        <ClInclude Include="arm9\source\nav.h">
+            <Filter>Header Files\arm9\nav</Filter>
+        </ClInclude>
+    </ItemGroup>
+    <ItemGroup>
+        <ClCompile Include="arm7\source\main.c">
+            <Filter>Source Files\arm7</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\buffer.cpp">
+            <Filter>Source Files\arm9</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\Bag.cpp">
+            <Filter>Source Files\arm9\bag</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\bagUI.cpp">
+            <Filter>Source Files\arm9\bag</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\battle.cpp">
+            <Filter>Source Files\arm9\battle</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\battleUI.cpp">
+            <Filter>Source Files\arm9\battle</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\script.cpp">
+            <Filter>Source Files\arm9\battle</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\dex.cpp">
+            <Filter>Source Files\arm9\dex</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\dexUI.cpp">
+            <Filter>Source Files\arm9\dex</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\move.cpp">
+            <Filter>Source Files\arm9\data structures</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\pokemon.cpp">
+            <Filter>Source Files\arm9\data structures</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\type.cpp">
+            <Filter>Source Files\arm9\data structures</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\fs.cpp">
+            <Filter>Source Files\arm9\fs</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\Gen.cpp">
+            <Filter>Source Files\arm9\fs</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\saveGame.cpp">
+            <Filter>Source Files\arm9\fs</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\choiceBox.cpp">
+            <Filter>Source Files\arm9\io</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\font.cpp">
+            <Filter>Source Files\arm9\io</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\fontData.cpp">
+            <Filter>Source Files\arm9\io</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\keyboard.cpp">
+            <Filter>Source Files\arm9\io</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\messageBox.cpp">
+            <Filter>Source Files\arm9\io</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\sprite.cpp">
+            <Filter>Source Files\arm9\io</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\uio.cpp">
+            <Filter>Source Files\arm9\io</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\map2d.cpp">
+            <Filter>Source Files\arm9\map</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\statusScreen.cpp">
+            <Filter>Source Files\arm9\sts</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\statusScreenUI.cpp">
+            <Filter>Source Files\arm9\sts</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\main.cpp">
+            <Filter>Source Files\arm9</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\ribbon.cpp">
+            <Filter>Source Files\arm9\data structures</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\yesNoBox.cpp">
+            <Filter>Source Files\arm9\io</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\item.cpp">
+            <Filter>Source Files\arm9\data structures</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\bagViewer.cpp">
+            <Filter>Source Files\arm9\bag</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\mapSlice.cpp">
+            <Filter>Source Files\arm9\map</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\startScreen.cpp">
+            <Filter>Source Files\arm9</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\mapDrawer.cpp">
+            <Filter>Source Files\arm9\map</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\mapSprite.cpp">
+            <Filter>Source Files\arm9\map</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\mapObject.cpp">
+            <Filter>Source Files\arm9\map</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\mapMoves.cpp">
+            <Filter>Source Files\arm9\map</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\mapWarps.cpp">
+            <Filter>Source Files\arm9\map</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\screenFade.cpp">
+            <Filter>Source Files\arm9\io</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\boxViewer.cpp">
+            <Filter>Source Files\arm9\box</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\boxUI.cpp">
+            <Filter>Source Files\arm9\box</Filter>
+        </ClCompile>
+        <ClCompile Include="arm9\source\nav.cpp">
+            <Filter>Source Files\arm9\nav</Filter>
+        </ClCompile>
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="Makefile">
+            <Filter>Source Files</Filter>
+        </None>
+    </ItemGroup>
 </Project>
