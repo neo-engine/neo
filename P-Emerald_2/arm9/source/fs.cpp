@@ -27,8 +27,9 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include <string>
 #include <vector>
-#include <cstdio>
 #include <initializer_list>
+#include <cstdio>
+#include <cstring>
 
 #include "fs.h"
 #include "buffer.h"
@@ -151,7 +152,7 @@ namespace FS {
     }
 
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt, bool p_bottom ) {
-        if( !readData( p_path, p_name, (unsigned int)p_tileCnt, TEMP, (unsigned short)p_palCnt, TEMP_PAL ) )
+        if( !readData( p_path, p_name, (unsigned int) p_tileCnt, TEMP, (unsigned short) p_palCnt, TEMP_PAL ) )
             return false;
 
         IO::copySpriteData( TEMP, p_spriteInfo->m_entry->gfxIndex, 4 * p_tileCnt, p_bottom );
@@ -160,8 +161,7 @@ namespace FS {
     }
 
     bool readPictureData( u16* p_layer, const char* p_path, const char* p_name, u16 p_palSize, u32 p_tileCnt, bool p_bottom ) {
-
-        if( !readData( p_path, p_name, (unsigned int)( 12288 ), TEMP, (unsigned short)( 256 ), TEMP_PAL ) )
+        if( !readData( p_path, p_name, (unsigned int) ( 12288 ), TEMP, (unsigned short) ( 256 ), TEMP_PAL ) )
             return false;
 
         dmaCopy( TEMP, p_layer, p_tileCnt );
@@ -182,7 +182,7 @@ namespace FS {
         char buffer[ 100 ];
         sprintf( buffer, "%s", p_name );
 
-        if( !readData( "nitro:/PICS/NAV/", buffer, (unsigned int)( 12288 ), IO::NAV_DATA, (unsigned short)( 256 ), IO::NAV_DATA_PAL ) )
+        if( !readData( "nitro:/PICS/NAV/", buffer, (unsigned int) ( 12288 ), IO::NAV_DATA, (unsigned short) ( 256 ), IO::NAV_DATA_PAL ) )
             return false;
 
         dmaCopy( IO::NAV_DATA, p_layer, 256 * 192 );
@@ -258,9 +258,9 @@ namespace FS {
 
         while( ( ac = fgetc( p_file ) ) != '*' && ac != EOF ) {
             if( ac == '|' )
-                ret += (char)136;
+                ret += (char) 136;
             else if( ac == '#' )
-                ret += (char)137;
+                ret += (char) 137;
             else
                 ret += ac;
         }
@@ -279,9 +279,9 @@ namespace FS {
         } else ret += ac;
         while( ( ac = fgetc( p_file ) ) != '*' && ac != EOF ) {
             if( ac == '|' )
-                ret += (wchar_t)136;
+                ret += (wchar_t) 136;
             else if( ac == '#' )
-                ret += (wchar_t)137;
+                ret += (wchar_t) 137;
             else
                 ret += ac;
         }
@@ -380,9 +380,9 @@ namespace FS {
             else if( *ac == '%' )
                 ret += ' ';
             else if( *ac == '|' )
-                ret += (char)136;
+                ret += (char) 136;
             else if( *ac == '#' )
-                ret += (char)137;
+                ret += (char) 137;
             else if( *ac == '\r' )
                 ret += "";
             else
@@ -412,9 +412,9 @@ namespace FS {
             else if( *ac == '%' )
                 ret += L' ';
             else if( *ac == '|' )
-                ret += (char)136;
+                ret += (char) 136;
             else if( *ac == '#' )
-                ret += (char)137;
+                ret += (char) 137;
             else if( *ac == '\r' )
                 ret += L"";
             else
@@ -428,19 +428,17 @@ namespace FS {
             return FARAWAY_PLACE;
         FILE* f = FS::open( "nitro:/LOCATIONS/", p_ind, ".data" );
 
-        if( f == 0 ) {
+        if( !f ) {
             if( savMod == SavMod::_NDS && p_ind > 322 && p_ind < 1000 )
                 return getLoc( 3002 );
 
             return FARAWAY_PLACE;
         }
-        char buffer[ 50 ] = { 0 };
-        FS::read( f, buffer, 1, 49 );
-
-        std::string ret = std::string( buffer );
-        ret.pop_back( );
+        static char buffer[ 60 ];
+        memset( buffer, 0, sizeof( buffer ) );
+        FS::read( f, buffer, sizeof( char ), 48 );
         FS::close( f );
-        return ret.c_str( );
+        return buffer;
     }
 }
 
@@ -497,7 +495,7 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
             u16 z = buffer[ ptr++ ];
             for( int j = 0; j < z; ++j ) {
                 u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-                if( i >= p_toLevel && h == (u16)p_mode && g < MAXATTACK )
+                if( i >= p_toLevel && h == (u16) p_mode && g < MAXATTACK )
                     reses.push_back( g );
             }
         }

@@ -376,12 +376,12 @@ CHOOSE1:
                 bool refillpossible = false;
 
                 for( u8 k = 1 + ( m_battleMode == DOUBLE );
-                     k < ( j ? _opponent->m_pkmnTeam.size( ) : _player->m_pkmnTeam.size( ) ); ++k )
-                     if( ACPKMNSTS( k, j ) != KO && ACPKMNSTS( k, j ) != SELECTED
-                         && ACPKMNSTS( k, j ) != NA && ACPKMN( k, j ).m_stats.m_acHP ) {
-                         refillpossible = true;
-                         break;
-                     }
+                k < ( j ? _opponent->m_pkmnTeam.size( ) : _player->m_pkmnTeam.size( ) ); ++k )
+                    if( ACPKMNSTS( k, j ) != KO && ACPKMNSTS( k, j ) != SELECTED
+                        && ACPKMNSTS( k, j ) != NA && ACPKMN( k, j ).m_stats.m_acHP ) {
+                        refillpossible = true;
+                        break;
+                    }
 
                 if( !refillpossible ) {
                     _battleSpotOccupied[ i ][ j ] = true;
@@ -634,8 +634,8 @@ NEXT:
     void battle::megaEvolve( bool p_opponent, u8 p_pokemonPos ) {
         if( !_allowMegaEvolution )
             return;
-        (void)p_opponent;
-        (void)p_pokemonPos;
+        (void) p_opponent;
+        (void) p_pokemonPos;
         //TODO
     }
 
@@ -696,34 +696,34 @@ OUT:
                                 break;
                             default:
                                 break;
-                    } else
-                        switch( acAttack->m_moveAffectsWhom ) {
-                            case move::moveAffectsTypes::USER:
-                                acMove.m_target = ( ( 1 + pokemonPos ) << 2 );
-                                break;
-                            case move::moveAffectsTypes::OWN_FIELD:
-                                acMove.m_target = ( 1 << 5 );
-                                break;
-                            case move::moveAffectsTypes::OPPONENTS_FIELD:
-                                acMove.m_target = ( 1 << 4 );
-                                break;
-                            case move::moveAffectsTypes::BOTH_FOES:
-                                acMove.m_target = ( 1 << 0 ) | ( 1 << 1 );
-                                break;
-                            case move::moveAffectsTypes::BOTH_FOES_AND_PARTNER:
-                                acMove.m_target = ( 1 << 0 ) | ( 1 << 1 ) | ( 1 << ( 3 - pokemonPos ) );
-                                break;
-                            case move::moveAffectsTypes::SELECTED:
-                                acMove.m_target = ( 1 << 0 );
-                                break;
-                            case move::moveAffectsTypes::RANDOM:
-                                acMove.m_target = ( 1 << ( rand( ) % 4 ) );
-                                if( acMove.m_target == ( 1 << ( 2 + pokemonPos ) ) )
-                                    acMove.m_target >>= 1;
-                                break;
-                            default:
-                                break;
-                    }
+                        } else
+                            switch( acAttack->m_moveAffectsWhom ) {
+                                case move::moveAffectsTypes::USER:
+                                    acMove.m_target = ( ( 1 + pokemonPos ) << 2 );
+                                    break;
+                                case move::moveAffectsTypes::OWN_FIELD:
+                                    acMove.m_target = ( 1 << 5 );
+                                    break;
+                                case move::moveAffectsTypes::OPPONENTS_FIELD:
+                                    acMove.m_target = ( 1 << 4 );
+                                    break;
+                                case move::moveAffectsTypes::BOTH_FOES:
+                                    acMove.m_target = ( 1 << 0 ) | ( 1 << 1 );
+                                    break;
+                                case move::moveAffectsTypes::BOTH_FOES_AND_PARTNER:
+                                    acMove.m_target = ( 1 << 0 ) | ( 1 << 1 ) | ( 1 << ( 3 - pokemonPos ) );
+                                    break;
+                                case move::moveAffectsTypes::SELECTED:
+                                    acMove.m_target = ( 1 << 0 );
+                                    break;
+                                case move::moveAffectsTypes::RANDOM:
+                                    acMove.m_target = ( 1 << ( rand( ) % 4 ) );
+                                    if( acMove.m_target == ( 1 << ( 2 + pokemonPos ) ) )
+                                        acMove.m_target >>= 1;
+                                    break;
+                                default:
+                                    break;
+                            }
                 }
                 doAttack( opponent, pokemonPos );
                 break;
@@ -802,7 +802,7 @@ OUT:
         bool weatherPossible = true;
         for( u8 a = 0; a < 1 + ( m_battleMode == DOUBLE ); ++a ) for( u8 b = 0; b < 2; ++b )
             weatherPossible &= ( ACPKMN( a, b ).m_boxdata.m_ability != A_AIR_LOCK
-            && ACPKMN( a, b ).m_boxdata.m_ability != A_CLOUD_NINE );
+                                 && ACPKMN( a, b ).m_boxdata.m_ability != A_CLOUD_NINE );
 
         if( weatherPossible ) {
             if( m_weather == SUN && move->m_moveType == WASSER )
@@ -1061,7 +1061,7 @@ NEXT:
                 else if( ( bm.m_target & ( 1 << 1 ) )
                          && ACPKMNSTS( 1, PLAYER ) == KO
                          && ACPKMNSTS( 0, PLAYER ) != KO )
-                         bm.m_target |= ( 1 << 0 );
+                    bm.m_target |= ( 1 << 0 );
             } else {
                 if( ( bm.m_target & ( 1 << 2 ) )
                     && ACPKMNSTS( 0, OPPONENT ) == KO
@@ -1070,7 +1070,7 @@ NEXT:
                 else if( ( bm.m_target & ( 1 << 3 ) )
                          && ACPKMNSTS( 1, OPPONENT ) == KO
                          && ACPKMNSTS( 0, OPPONENT ) != KO )
-                         bm.m_target |= ( 1 << 2 );
+                    bm.m_target |= ( 1 << 2 );
             }
         }
 
@@ -1171,9 +1171,9 @@ NEXT:
             doItem( isOpp, isSnd, ability::ATTACK );
             doAbility( isOpp, isSnd, ability::ATTACK );
 
-            str.m_pokemon->m_stats.m_acHP = (u16)std::max( s16( 0 ),
-                                                           std::min( s16( str.m_pokemon->m_stats.m_acHP - _acDamage[ isSnd ][ isOpp ] ),
-                                                           (s16)str.m_pokemon->m_stats.m_maxHP ) );
+            str.m_pokemon->m_stats.m_acHP = (u16) std::max( s16( 0 ),
+                                                            std::min( s16( str.m_pokemon->m_stats.m_acHP - _acDamage[ isSnd ][ isOpp ] ),
+                                                                      (s16) str.m_pokemon->m_stats.m_maxHP ) );
 
             _battleUI->updateHP( isOpp, isSnd );
             if( acMove->m_moveHitType != move::STAT ) {
@@ -1221,7 +1221,7 @@ NEXT:
         }
         return;
     }
-   
+
     /**
     *  @brief Handles special condition damage between turns
     */
@@ -1260,7 +1260,7 @@ NEXT:
 
             acpkmn->m_stats.m_acHP
                 = std::max( u16( 0 ), u16( acpkmn->m_stats.m_acHP
-                - ( ++str.m_toxicCount ) / ( 16.0 * acpkmn->m_stats.m_maxHP ) ) );
+                                           - ( ++str.m_toxicCount ) / ( 16.0 * acpkmn->m_stats.m_maxHP ) ) );
 
             _battleUI->updateHP( p_opponent, p_pokemonPos );
         }
@@ -1426,21 +1426,21 @@ NEXT:
 
                         if( acPkmn.m_boxdata.m_speciesId != 292 ) //Check for Ninjatom
                             acPkmn.m_stats.m_maxHP = ( ( acPkmn.m_boxdata.m_individualValues.m_hp + 2 * p.m_bases[ 0 ]
-                            + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
+                                                         + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
                         else
                             acPkmn.m_stats.m_maxHP = 1;
                         pkmnNatures nature = acPkmn.m_boxdata.getNature( );
 
                         acPkmn.m_stats.m_Atk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
-                            + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
+                                                     + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
                         acPkmn.m_stats.m_Def = ( ( ( acPkmn.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ DEF + 1 ]
-                            + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
+                                                     + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
                         acPkmn.m_stats.m_Spd = ( ( ( acPkmn.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ SPD + 1 ]
-                            + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
+                                                     + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
                         acPkmn.m_stats.m_SAtk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ SATK + 1 ]
-                            + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
+                                                      + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
                         acPkmn.m_stats.m_SDef = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ SDEF + 1 ]
-                            + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
+                                                      + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
 
                         acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
 
@@ -1521,21 +1521,21 @@ NEXT:
 
                     if( acPkmn.m_boxdata.m_speciesId != 292 ) //Check for Ninjatom
                         acPkmn.m_stats.m_maxHP = ( ( acPkmn.m_boxdata.m_individualValues.m_hp + 2 * p.m_bases[ 0 ]
-                        + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
+                                                     + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
                     else
                         acPkmn.m_stats.m_maxHP = 1;
                     pkmnNatures nature = acPkmn.m_boxdata.getNature( );
 
                     acPkmn.m_stats.m_Atk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
-                        + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
+                                                 + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
                     acPkmn.m_stats.m_Def = ( ( ( acPkmn.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ DEF + 1 ]
-                        + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
+                                                 + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
                     acPkmn.m_stats.m_Spd = ( ( ( acPkmn.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ SPD + 1 ]
-                        + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
+                                                 + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
                     acPkmn.m_stats.m_SAtk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ SATK + 1 ]
-                        + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
+                                                  + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
                     acPkmn.m_stats.m_SDef = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ SDEF + 1 ]
-                        + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
+                                                  + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
 
                     acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
 

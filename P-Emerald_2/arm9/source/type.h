@@ -3,11 +3,11 @@
     ------------------------------
 
     file        : type.h
-    author      : Philip Wellnitz 
+    author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
     Copyright (C) 2012 - 2015
-    Philip Wellnitz 
+    Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
 
@@ -47,11 +47,11 @@
 #include "Unl.h"
 #include "Fee.h"
 
-enum Type{
-    NORMAL=0,	KAMPF=1,	FLUG=2,     GIFT=3,	    BODEN=4,
-    GESTEIN=5,	KAEFER=6,	GEIST=7,	STAHL=8,	UNBEKANNT=9,
-    WASSER=10,	FEUER=11,	PFLANZE=12,	ELEKTRO=13,	PSYCHO=14,
-    EIS=15,     DRACHE=16,	UNLICHT=17, FEE = 18
+enum Type {
+    NORMAL = 0, KAMPF = 1, FLUG = 2, GIFT = 3, BODEN = 4,
+    GESTEIN = 5, KAEFER = 6, GEIST = 7, STAHL = 8, UNBEKANNT = 9,
+    WASSER = 10, FEUER = 11, PFLANZE = 12, ELEKTRO = 13, PSYCHO = 14,
+    EIS = 15, DRACHE = 16, UNLICHT = 17, FEE = 18
 };
 
 float getEffectiveness( const Type& p_t1, const Type& p_t2 );

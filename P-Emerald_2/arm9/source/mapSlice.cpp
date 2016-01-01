@@ -43,13 +43,13 @@ namespace MAP {
     std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y ) {
         FILE* mapF = FS::open( MAP_PATH,
                                ( toString( p_map )
-                               + "/" + toString( p_y )
-                               + "_" + toString( p_x ) ).c_str( ),
+                                 + "/" + toString( p_y )
+                                 + "_" + toString( p_x ) ).c_str( ),
                                ".map" );
         if( !mapF ) mapF = FS::open( MAP_PATH,
                                      ( toString( p_map )
-                                     + "/BORDER/" + toString( p_y )
-                                     + "_" + toString( p_x ) ).c_str( ),
+                                       + "/BORDER/" + toString( p_y )
+                                       + "_" + toString( p_x ) ).c_str( ),
                                      ".map" );
         if( !mapF ) {
 #ifdef DEBUG
@@ -87,10 +87,10 @@ namespace MAP {
         //Read the wild Pkoemon data
         mapF = FS::open( MAP_PATH,
                          ( toString( p_map )
-                         + "/" + toString( p_y )
-                         + "_" + toString( p_x ) ).c_str( ),
+                           + "/" + toString( p_y )
+                           + "_" + toString( p_x ) ).c_str( ),
                          ".enc" );
-        FS::read( mapF, res->m_pokemon, sizeof( std::pair<u16,u16> ), 3 * 5 * 4 );
+        FS::read( mapF, res->m_pokemon, sizeof( std::pair<u16, u16> ), 3 * 5 * 4 );
         FS::close( mapF );
 
         //Read the first tileset

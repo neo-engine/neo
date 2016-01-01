@@ -37,7 +37,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 namespace IO {
     void fadeScreen( fadeType p_type ) {
         switch( p_type ) {
-            case IO::UNFADE: {
+            case IO::UNFADE:
+            {
                 u16 val = 0x1F;
                 for( s8 i = 4; i >= 0; --i ) {
                     for( u8 j = 0; j < 5; ++j )

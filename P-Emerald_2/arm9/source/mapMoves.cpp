@@ -49,7 +49,7 @@ bool whirlpool::possible( ) {
 bool surf::possible( ) {
     return ( FS::SAV->m_player.m_movement != MAP::SURF )
         && MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX + MAP::dir[ FS::SAV->m_player.m_direction ][ 0 ],
-        FS::SAV->m_player.m_pos.m_posY + MAP::dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_movedata == 0x4;
+                              FS::SAV->m_player.m_pos.m_posY + MAP::dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_movedata == 0x4;
 }
 bool dive::possible( ) {
     return false;
@@ -67,7 +67,7 @@ bool rockClimb::possible( ) {
 bool waterfall::possible( ) {
     return ( FS::SAV->m_player.m_movement == MAP::SURF )
         && MAP::curMap->at( FS::SAV->m_player.m_pos.m_posX + MAP::dir[ FS::SAV->m_player.m_direction ][ 0 ],
-        FS::SAV->m_player.m_pos.m_posY + MAP::dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_bottombehave == 0x13;
+                            FS::SAV->m_player.m_pos.m_posY + MAP::dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_bottombehave == 0x13;
 }
 bool teleport::possible( ) {
     return false;

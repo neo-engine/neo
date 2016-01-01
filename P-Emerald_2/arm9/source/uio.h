@@ -1,3 +1,29 @@
+/*
+Pokémon Emerald 2 Version
+------------------------------
+
+file        : uio.h
+author      : Philip Wellnitz
+description : Consult corresponding source file.
+
+Copyright (C) 2012 - 2015
+Philip Wellnitz
+
+This file is part of Pokémon Emerald 2 Version.
+
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #pragma once
 #include <nds.h>
 #include <string>
@@ -104,10 +130,10 @@ namespace IO {
     void printNumber( font* p_font, s32 p_num, s16 p_x, s16 p_y, bool p_bottom );
 
     void printString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16 );
-    void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom);
-    void printMBString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom);
-    void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom);
-    void printMBStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom);
+    void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
+    void printMBString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
+    void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
+    void printMBStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
     void printStringCenter( font* p_font, const wchar_t *p_string, bool p_bottom );
     void printStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
     void printStringCenterD( font* p_font, const wchar_t *p_string, bool p_bottom );

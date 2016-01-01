@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : keyboard.cpp
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -55,16 +55,16 @@ namespace IO {
             u16 xpos = x + ( ( idx % charsPerRow ) * ( width + margin ) );
             u16 ypos = y + ( ( idx / charsPerRow ) * ( height * margin ) );
 
-            _chars[ { (u8)0, { xpos, ypos } } ] = c;
-            _chars[ { (u8)1, { xpos, ypos } } ] = L'a' + idx;
+            _chars[ { (u8) 0, { xpos, ypos } } ] = c;
+            _chars[ { (u8) 1, { xpos, ypos } } ] = L'a' + idx;
             if( idx < 10 )
-                _chars[ { (u8)2, { xpos, ypos } } ] = L'0' + idx;
+                _chars[ { (u8) 2, { xpos, ypos } } ] = L'0' + idx;
 
             if( idx < charsPerRow ) {
                 ypos += u16( 3 * ( height * margin ) );
 
-                _chars[ { (u8)0, { xpos, ypos } } ] = spchars[ 0 ][ idx ];
-                _chars[ { (u8)1, { xpos, ypos } } ] = spchars[ 1 ][ idx ];
+                _chars[ { (u8) 0, { xpos, ypos } } ] = spchars[ 0 ][ idx ];
+                _chars[ { (u8) 1, { xpos, ypos } } ] = spchars[ 1 ][ idx ];
             }
         }
     }

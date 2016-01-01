@@ -29,7 +29,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "mapSprite.h"
 
 namespace MAP {
-    u8 getFrame( direction p_direction ) {        
+    u8 getFrame( direction p_direction ) {
         switch( p_direction ) {
             case MAP::UP:
                 return 3;

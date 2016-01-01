@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : pokemon.h
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -117,19 +117,19 @@ public:
           char p_movePriority,
           moveFlags p_moveFlags,
           moveHitTypes p_moveHitType )
-          : m_isFieldAttack( false ),
-          m_moveName( p_moveName ),
-          m_moveEffect( BATTLE::battleScript( { BATTLE::battleScript::command( L"Attackeneffekt.[A]" ) } ) ), // <-- TODO 
-          m_moveBasePower( p_moveBasePower ),
-          m_moveType( p_moveType ),
-          m_moveAccuracy( p_moveAccuracy ),
-          m_movePP( p_movePP ),
-          m_moveEffectAccuracy( p_moveEffectAccuracy ),
-          m_moveAffectsWhom( p_moveAffectsWhom ),
-          m_movePriority( p_movePriority ),
-          m_moveFlags( p_moveFlags ),
-          m_moveHitType( p_moveHitType ) {
-        (void)p_moveEffect;
+        : m_isFieldAttack( false ),
+        m_moveName( p_moveName ),
+        m_moveEffect( BATTLE::battleScript( { BATTLE::battleScript::command( L"Attackeneffekt.[A]" ) } ) ), // <-- TODO 
+        m_moveBasePower( p_moveBasePower ),
+        m_moveType( p_moveType ),
+        m_moveAccuracy( p_moveAccuracy ),
+        m_movePP( p_movePP ),
+        m_moveEffectAccuracy( p_moveEffectAccuracy ),
+        m_moveAffectsWhom( p_moveAffectsWhom ),
+        m_movePriority( p_movePriority ),
+        m_moveFlags( p_moveFlags ),
+        m_moveHitType( p_moveHitType ) {
+        (void) p_moveEffect;
     }
 
     ~move( ) { }

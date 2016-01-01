@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : move.cpp
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -232,7 +232,7 @@ move* AttackList[ MAXATTACK ] = {
     new move( "Blitzkanone", C 0, C 120, ELEKTRO, C 50, C 5, C 0, A 0, C 1, F 34, H 1 ),
     new move( "Gesichte", C 0, C 0, NORMAL, C 100, C 5, C 0, A 0, C 1, F 6, H 2 ),
     new move( "Abgangsbund", C 0, C 0, GEIST, C 100, C 5, C 0, A 0, C 1, F 0, H 2 ),
-    new move( "Abgesang", C 0, C 0, NORMAL, C 100, C 5, C 0, A (2 | 64), C 1, F 64, H 2 ),
+    new move( "Abgesang", C 0, C 0, NORMAL, C 100, C 5, C 0, A( 2 | 64 ), C 1, F 64, H 2 ),
     new move( "Eissturm", C 0, C 55, EIS, C 95, C 15, C 0, A 0, C 1, F 2, H 1 ),
     new move( "Scanner", C 0, C 0, KAMPF, C 100, C 5, C 0, A 16, C 1, F 0, H 2 ),
     new move( "Knochenhatz", C 0, C 25, BODEN, C 80, C 10, C 0, A 0, C 1, F 34, H 0 ),

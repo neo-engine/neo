@@ -120,7 +120,7 @@ namespace FS {
             char buffer[ 30 ];
             sprintf( buffer, "%ls", m_playername );
 
-            static BATTLE::battleTrainer res( std::string(buffer), "", "", "", "", tmp, m_bag->getBattleItems( ) );
+            static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp, m_bag->getBattleItems( ) );
             return &res;
         }
         void updateTeam( ) {

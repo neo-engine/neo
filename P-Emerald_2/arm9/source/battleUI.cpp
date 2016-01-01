@@ -138,10 +138,10 @@ namespace BATTLE {
         BG_PALETTE[ BLACK_IDX ] = BLACK;
         BG_PALETTE[ RED_IDX ] = RED;
         BG_PALETTE[ BLUE_IDX ] = BLUE;
-        IO::printRectangle( (u8)0, (u8)0, (u8)255, (u8)63, true, false, WHITE_IDX );
+        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
     }
     void battleUI::clearLogScreen( ) {
-        IO::printRectangle( (u8)0, (u8)0, (u8)255, (u8)63, true, false, WHITE_IDX );
+        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
     }
     void battleUI::setLogTextColor( u16 p_color ) {
         BG_PALETTE_SUB[ COLOR_IDX ] = BG_PALETTE[ COLOR_IDX ] = p_color;
@@ -471,12 +471,12 @@ namespace BATTLE {
             u8  y = 19;
 
             if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
-                PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ),
-                false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+                                     PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ),
+                                     false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
                 if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
-                    acPkmn.m_boxdata.m_speciesId, x, y,
-                    PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                                         acPkmn.m_boxdata.m_speciesId, x, y,
+                                         PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
+                                         acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
                     p_battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
@@ -750,9 +750,9 @@ namespace BATTLE {
         u16 t2;
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
             if( !( t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                32, 32, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) )
+                                            32, 32, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) )
                 t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                32, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
+                                         32, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
             oamIndex += 3;
             tilecnt = t2;
 
@@ -882,7 +882,7 @@ namespace BATTLE {
         u16 t2;
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
             if( !( t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                16, 8, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) ) {
+                                            16, 8, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) ) {
                 t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
                                          16, 8, oamIndex, palIndex, IO::Oam->oamBuffer[ oamIndex ].gfxIndex,
                                          true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
@@ -1058,10 +1058,10 @@ namespace BATTLE {
                 sprintf( buffer, "INI                   \xC3\xC3""%3i", p_pokemon.m_stats.m_Spd );
                 IO::regularFont->printString( buffer, 118, 109, true );
 
-                IO::printRectangle( (u8)158, (u8)18, u8( 158 + 68 ), u8( 18 + 12 ), true, false, WHITE_IDX );
+                IO::printRectangle( (u8) 158, (u8) 18, u8( 158 + 68 ), u8( 18 + 12 ), true, false, WHITE_IDX );
 
-                IO::printRectangle( (u8)158, (u8)18, u8( 158 + ( 68.0*p_pokemon.m_boxdata.IVget( 0 ) / 31 ) ), u8( 18 + 6 ), true, false, GRAY_IDX );
-                IO::printRectangle( (u8)158, u8( 18 + 6 ), u8( 158 + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ 0 ] / 252 ) ), u8( 18 + 12 ), true, false, GRAY_IDX );
+                IO::printRectangle( (u8) 158, (u8) 18, u8( 158 + ( 68.0*p_pokemon.m_boxdata.IVget( 0 ) / 31 ) ), u8( 18 + 6 ), true, false, GRAY_IDX );
+                IO::printRectangle( (u8) 158, u8( 18 + 6 ), u8( 158 + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ 0 ] / 252 ) ), u8( 18 + 12 ), true, false, GRAY_IDX );
 
                 for( int i = 1; i < 6; ++i ) {
                     IO::printRectangle( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
@@ -1152,7 +1152,7 @@ namespace BATTLE {
                 p_x = 112; p_y = 14;
             }
             if( !p_double ) {
-                p_x += 32;
+                p_x -= 32;
                 p_y += 3;
             }
         } else {
@@ -1483,32 +1483,32 @@ END:
         switch( acMove->m_moveAffectsWhom ) {
             case move::BOTH_FOES:
             case move::OPPONENTS_FIELD:
-                neverTarget[ 2 ] = neverTarget[ 3 ] = true;
-                selected[ 0 ] = selected[ 1 ] = true;
-                break;
+            neverTarget[ 2 ] = neverTarget[ 3 ] = true;
+            selected[ 0 ] = selected[ 1 ] = true;
+            break;
             case move::BOTH_FOES_AND_PARTNER:
-                neverTarget[ p_pokemonPos + 2 ] = true;
-                selected[ 0 ] = selected[ 1 ]
-                    = selected[ 3 - p_pokemonPos ] = true;
-                break;
+            neverTarget[ p_pokemonPos + 2 ] = true;
+            selected[ 0 ] = selected[ 1 ]
+                = selected[ 3 - p_pokemonPos ] = true;
+            break;
             case move::OWN_FIELD:
-                neverTarget[ 0 ] = neverTarget[ 1 ] = true;
-                selected[ 1 ] = selected[ 0 ] = true;
-                break;
+            neverTarget[ 0 ] = neverTarget[ 1 ] = true;
+            selected[ 1 ] = selected[ 0 ] = true;
+            break;
             case move::SELECTED:
-                neverTarget[ 2 + p_pokemonPos ] = true;
-                selectionExists = false;
-                break;
+            neverTarget[ 2 + p_pokemonPos ] = true;
+            selectionExists = false;
+            break;
             case move::USER:
-                selected[ 2 + p_pokemonPos ] = true;
-                neverTarget[ 0 ] = neverTarget[ 1 ]
-                    = neverTarget[ 3 - p_pokemonPos ] = true;
-                break;
+            selected[ 2 + p_pokemonPos ] = true;
+            neverTarget[ 0 ] = neverTarget[ 1 ]
+                = neverTarget[ 3 - p_pokemonPos ] = true;
+            break;
             default:
             case move::RANDOM:
-                selected[ 2 ] = selected[ 3 ] = true;
-                selected[ 0 ] = selected[ 1 ] = true;
-                break;
+            selected[ 2 ] = selected[ 3 ] = true;
+            selected[ 0 ] = selected[ 1 ] = true;
+            break;
         }
 
         if( selected[ 2 ] && selected[ 3 ] )
@@ -1677,7 +1677,7 @@ END:
 
     u16 battleUI::chooseItem( u8 p_pokemonPos ) {
         //TODO
-        (void)p_pokemonPos;
+        (void) p_pokemonPos;
         u8 result = 0;
 
         // Make this a debug battle end
@@ -1715,7 +1715,7 @@ START:
         drawPKMNChoiceScreen( _battle, p_firstIsChosen );
         IO::drawSub( );
         initColors( );
-        IO::printRectangle( (u8)0, (u8)0, (u8)255, (u8)28, true, false, WHITE_IDX );
+        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
 
         writeLogText( L"Welches PKMN?" );
 
@@ -1848,7 +1848,7 @@ CLEAR:
         u16 expStart = ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] - p_gainedExp ) * 100 /
             ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] );
         u16 expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
-            ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) ) );
+                                                ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) ) );
 
         std::swprintf( wbuffer, 50, L"%ls gewinnt %d E.-Punkte.[A]", acPkmn.m_boxdata.m_name, p_gainedExp );
         _battle->log( wbuffer );
@@ -1863,21 +1863,21 @@ CLEAR:
 
             if( acPkmn.m_boxdata.m_speciesId != 292 ) //Check for Ninjatom
                 acPkmn.m_stats.m_maxHP = ( ( acPkmn.m_boxdata.m_individualValues.m_hp + 2 * p.m_bases[ 0 ]
-                + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
+                                             + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
             else
                 acPkmn.m_stats.m_maxHP = 1;
             pkmnNatures nature = acPkmn.m_boxdata.getNature( );
 
             acPkmn.m_stats.m_Atk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
-                + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
+                                         + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
             acPkmn.m_stats.m_Def = ( ( ( acPkmn.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ DEF + 1 ]
-                + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
+                                         + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
             acPkmn.m_stats.m_Spd = ( ( ( acPkmn.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ SPD + 1 ]
-                + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
+                                         + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
             acPkmn.m_stats.m_SAtk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ SATK + 1 ]
-                + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
+                                          + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
             acPkmn.m_stats.m_SDef = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ SDEF + 1 ]
-                + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
+                                          + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
 
             acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
 
@@ -1895,7 +1895,7 @@ CLEAR:
 
             expStart = 0;
             expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
-                ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) ) );
+                                                ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) ) );
 
             IO::displayEP( 101, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
             IO::displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
@@ -1919,13 +1919,13 @@ CLEAR:
     }
 
     void battleUI::updateStatus( bool p_opponent, u8 p_pokemonPos ) {
-        (void)p_opponent;
-        (void)p_pokemonPos;
+        (void) p_opponent;
+        (void) p_pokemonPos;
     }
 
     void battleUI::showStatus( bool p_opponent, u8 p_pokemonPos ) {
-        (void)p_opponent;
-        (void)p_pokemonPos;
+        (void) p_opponent;
+        (void) p_pokemonPos;
     }
 
     void battleUI::hidePKMN( bool p_opponent, u8 p_pokemonPos ) {
@@ -1983,7 +1983,7 @@ CLEAR:
 
         if( p_opponent )
             std::swprintf( wbuffer, 200, L"[TRAINER] ([TCLASS]) schickt\n%ls in den Kampf![A]",
-            ACPKMN2( *_battle, p_pokemonPos, OPPONENT ).m_boxdata.m_name );
+                           ACPKMN2( *_battle, p_pokemonPos, OPPONENT ).m_boxdata.m_name );
         else
             std::swprintf( wbuffer, 50, L"Los [OWN%d]![A]", p_pokemonPos + 1 );
         _battle->log( wbuffer );
@@ -1996,23 +1996,23 @@ CLEAR:
         //Load the PKMN sprite
         if( p_opponent ) {
             if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
-                PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
-                false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+                                     PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
+                                     false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
                 if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
-                    acPkmn.m_boxdata.m_speciesId, x, y,
-                    PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                                         acPkmn.m_boxdata.m_speciesId, x, y,
+                                         PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
+                                         acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
                     _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
         } else {
             if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
-                PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
-                false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+                                     PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
+                                     false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
                 if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/",
-                    acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
-                    PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                                         acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
+                                         PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
+                                         acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
                     _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
@@ -2067,23 +2067,23 @@ CLEAR:
         auto acPkmn = ACPKMN2( *_battle, p_pokemonPos, p_opponent );
         if( p_opponent ) {
             if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
-                PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
-                false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+                                     PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
+                                     false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
                 if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
-                    acPkmn.m_boxdata.m_speciesId, x, y,
-                    PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                                         acPkmn.m_boxdata.m_speciesId, x, y,
+                                         PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
+                                         acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
                     _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
         } else {
             if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
-                PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
-                false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+                                     PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
+                                     false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
                 if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/",
-                    acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
-                    PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                                         acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
+                                         PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
+                                         acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
                     _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
