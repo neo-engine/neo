@@ -220,11 +220,11 @@ namespace IO {
                         waitForTouchUp( );
                         if( ( ++_acPage ) >= ( ( _num - 1 ) / 3 ) ) {
                             ( Oam->oamBuffer[ FWD_ID ] ).isHidden = true;
-                            ( Oam->oamBuffer[ FWD_ID ] ).isHidden = !_acPage;
+                            ( Oam->oamBuffer[ BWD_ID ] ).isHidden = !_acPage;
                             ( Oam->oamBuffer[ BWD_ID ] ).x = bwdPos[ p_backButton ][ 0 ] - 16;
                             ( Oam->oamBuffer[ BWD_ID ] ).y = bwdPos[ p_backButton ][ 1 ] - 16;
-                            //if( _acPage == ( ( _num - 1 ) / 3 ) )
-                            //    draw( NEW_PAGE );
+                            if( _acPage == ( ( _num - 1 ) / 3 ) )
+                                draw( NEW_PAGE );
                             _acPage = ( ( _num - 1 ) / 3 );
                         } else {
                             ( Oam->oamBuffer[ BWD_ID ] ).isHidden = false;
