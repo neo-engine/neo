@@ -6,7 +6,7 @@ file        : uio.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -61,7 +61,7 @@ namespace IO {
     extern unsigned int NAV_DATA[ 12288 ];
     extern unsigned short NAV_DATA_PAL[ 256 ];
 
-#define MAXBG 3
+#define MAXBG 4
 #define START_BG 0
     struct backgroundSet {
         std::string             m_name;

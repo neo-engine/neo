@@ -6,7 +6,7 @@ file        : main.cpp
 author      : Philip Wellnitz
 description : Main ARM9 entry point
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.

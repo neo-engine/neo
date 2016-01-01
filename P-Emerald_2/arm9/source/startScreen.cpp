@@ -6,7 +6,7 @@ file        : startScreen.cpp
 author      : Philip Wellnitz
 description : Header file. See corresponding source file for details.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -80,7 +80,7 @@ void drawSplash( ) {
 
     BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
 
-    printf( "@ Philip Wellnitz 2012 - 2015\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+    printf( "@ Philip Wellnitz 2012 - 2016\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
 
     if( gMod == DEVELOPER )
         printf( "                   %10sdev\n", VERSION );

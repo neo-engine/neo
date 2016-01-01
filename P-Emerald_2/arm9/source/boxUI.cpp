@@ -6,7 +6,7 @@ file        : boxUI.cpp
 author      : Philip Wellnitz
 description : Storage sys UI
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.

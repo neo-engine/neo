@@ -6,7 +6,7 @@ file        : defines.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -34,8 +34,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 //#define USE_AS_LIB
 #undef _EMULATOR
-#define VERSION "0.5"
-#define VERSION_NAME "Fighting Torchic"
+#define VERSION "0.6"
+#define VERSION_NAME "Executing Exeggcute"
 #define DEBUG
 
 enum GameMod : u8 {

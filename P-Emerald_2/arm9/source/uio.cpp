@@ -6,7 +6,7 @@ file        : uio.cpp
 author      : Philip Wellnitz
 description : User IO
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -37,6 +37,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "Border.h"
 
+#include "BG0.h"
 #include "BG1.h"
 #include "BG2.h"
 #include "BG3.h"
@@ -79,10 +80,10 @@ namespace IO {
                                   { "Awakening Yveltal", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Fighting Groudon", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Fighting Kyogre", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },*/
+        { "Executing Exeggcute", BG0Bitmap, BG0Pal, false, true, mainSpritesPositions },
         { "Fighting Torchic", BG3Bitmap, BG3Pal, false, false, mainSpritesPositions },
         { "Reborn Ho-Oh", BG2Bitmap, BG2Pal, false, false, mainSpritesPositions },
-        { "Working Klink", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions },
-        // { "Executing Exeggcute", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions }
+        { "Working Klink", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions }
     };
 
     void initVideo( ) {
