@@ -1,29 +1,29 @@
 /*
-    Pokémon Emerald 2 Version
-    ------------------------------
+Pokémon Emerald 2 Version
+------------------------------
 
-    file        : main.cpp
-    author      : Philip Wellnitz
-    description : Main ARM9 entry point
+file        : main.cpp
+author      : Philip Wellnitz
+description : Main ARM9 entry point
 
-    Copyright (C) 2012 - 2015
-    Philip Wellnitz
+Copyright (C) 2012 - 2015
+Philip Wellnitz
 
-    This file is part of Pokémon Emerald 2 Version.
+This file is part of Pokémon Emerald 2 Version.
 
-    Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
-    */
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 
 #include <nds.h>
@@ -188,8 +188,8 @@ void initGraphics( ) {
     IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
     IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
 
-    IO::consoleFont->gfx = (u16*)consoleFontTiles;
-    IO::consoleFont->pal = (u16*)consoleFontPal;
+    IO::consoleFont->gfx = (u16*) consoleFontTiles;
+    IO::consoleFont->pal = (u16*) consoleFontPal;
     IO::consoleFont->numChars = 218;
     IO::consoleFont->numColors = 16;
     IO::consoleFont->bpp = 8;
@@ -201,7 +201,7 @@ void initGraphics( ) {
 }
 void initTimeAndRnd( ) {
     time_t uTime = time( NULL );
-    tm* tStruct = gmtime( (const time_t *)&uTime );
+    tm* tStruct = gmtime( (const time_t *) &uTime );
 
     hours = tStruct->tm_hour;
     month = tStruct->tm_min;
@@ -240,7 +240,7 @@ int main( int, char** p_argv ) {
     FS::SAV->m_evolveInBattle = true;
 
 
-    irqSet( IRQ_VBLANK, [ ]( ) {
+    irqSet( IRQ_VBLANK, [ ] ( ) {
         scanKeys( );
         FRAME_COUNT++;
 
@@ -261,7 +261,7 @@ int main( int, char** p_argv ) {
         IO::boldFont->setColor( BLACK_IDX, 2 );
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
         time_t unixTime = time( NULL );
-        struct tm* timeStruct = gmtime( (const time_t *)&unixTime );
+        struct tm* timeStruct = gmtime( (const time_t *) &unixTime );
 
         if( acseconds != timeStruct->tm_sec || DRAW_TIME ) {
             DRAW_TIME = false;
@@ -413,7 +413,7 @@ OUT:
         }
         //StartBag
         if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 6 ],
-            IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 7 ], 16 ) ) {
+                            IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 7 ], 16 ) ) {
             BAG::bagUI bui;
             BAG::bagViewer bv( FS::SAV->m_bag, &bui );
             ANIMATE_MAP = false;
@@ -430,7 +430,7 @@ OUT:
             ANIMATE_MAP = true;
         } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
                    && ( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ],
-                   IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ], 16 ) ) ) {
+                                        IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ], 16 ) ) ) {
 
             std::vector<pokemon> tmp;
             for( u8 i = 0; i < 6; ++i )
@@ -453,7 +453,7 @@ OUT:
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ],        //StartDex
-            IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 5 ], 16 ) ) {
+                                   IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 5 ], 16 ) ) {
             ANIMATE_MAP = false;
             dx.run( dui.currPkmn( ) );
 
@@ -463,11 +463,11 @@ OUT:
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 8 ],        //StartOptions
-            IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 9 ], 16 ) ) {
+                                   IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 9 ], 16 ) ) {
 
 
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 ],        //StartID
-            IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 3 ], 16 ) ) {
+                                   IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 3 ], 16 ) ) {
 
             const char *someText[ 8 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", "View Boxes A", "View Boxes B" };
             IO::choiceBox test( 8, &someText[ 0 ], 0, false );
@@ -486,7 +486,7 @@ OUT:
                     for( int i = 0; i < 6; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
                         a = pokemon( 0, 133 + i, 0,
-                                     50, FS::SAV->m_id + i, FS::SAV->m_sid, FS::SAV->m_playername,
+                                     50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
                                      !FS::SAV->m_isMale );
                         a.m_stats.m_acHP *= i / 5.0;
                         a.m_boxdata.m_experienceGained += 750;
@@ -519,14 +519,16 @@ OUT:
                         if( ItemList[ j ]->m_itemName != "Null" )
                             FS::SAV->m_bag->insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
                     break;
-                case 2: {
+                case 2:
+                {
                     item* curr = ItemList[ rand( ) % 638 ];
                     while( curr->m_itemName == "Null" )
                         curr = ItemList[ rand( ) % 638 ];
                     IO::messageBox( curr, 31 );
                     break;
                 }
-                case 3:{
+                case 3:
+                {
                     std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 3; ++i ) {
@@ -546,7 +548,8 @@ OUT:
                     FS::SAV->updateTeam( );
                     break;
                 }
-                case 4:{
+                case 4:
+                {
                     std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 6; ++i ) {
@@ -566,16 +569,18 @@ OUT:
                     FS::SAV->updateTeam( );
                     break;
                 }
-                case 5:{
+                case 5:
+                {
                     const char *bgNames[ MAXBG ];
                     for( u8 o = 0; o < MAXBG; ++o )
                         bgNames[ o ] = IO::BGs[ o ].m_name.c_str( );
 
                     IO::choiceBox scrnChoice( MAXBG, bgNames, 0, true );
-                    IO::drawSub( scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
+                    IO::drawSub( true, scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
                     break;
                 }
-                case 6: case 7:{
+                case 6: case 7:
+                {
                     if( !FS::SAV->m_storedPokemon )
                         FS::SAV->m_storedPokemon = new BOX::box( );
                     BOX::boxUI bxUI;
@@ -600,7 +605,7 @@ OUT:
                 MAP::curMap->draw( );
             }
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 10 ],  //Start Pokénav
-            IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 11 ], 16 ) ) {
+                                   IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 11 ], 16 ) ) {
 
         } else if( touch.px != 0 && touch.py != 0 && GET_AND_WAIT_C( 8, 12, 17 ) ) {
             IO::yesNoBox Save( "PokéNav " );

@@ -112,13 +112,13 @@ namespace MAP {
                 bgInit( i, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
                 bgSetScroll( i, 120, 40 );
             }
-            u8* tileMemory = (u8*)BG_TILE_RAM( 1 );
+            u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
 
             for( u16 i = 0; i < 1024; ++i )
                 swiCopy( CUR_SLICE->m_tileSet.m_blocks[ i ].m_tile, tileMemory + i * 32, 16 );
             dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
             for( u8 i = 1; i < 4; ++i ) {
-                mapMemory[ i ] = (u16*)BG_MAP_RAM( 2 * i - 1 );
+                mapMemory[ i ] = (u16*) BG_MAP_RAM( 2 * i - 1 );
                 bgSetPriority( i, i );
             }
         }
@@ -173,8 +173,8 @@ namespace MAP {
     }
 
     void mapDrawer::animateField( u16 p_globX, u16 p_globY ) {
-        (void)p_globX;
-        (void)p_globY;
+        (void) p_globX;
+        (void) p_globY;
     }
 
     void mapDrawer::loadNewRow( direction p_direction, bool p_updatePlayer ) {
@@ -209,7 +209,7 @@ namespace MAP {
             _curX = ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1;
             _curY = ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1;
             //Update tileset, block and palette data
-            u8* tileMemory = (u8*)BG_TILE_RAM( 1 );
+            u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
             for( u16 i = 0; i < 1024; ++i )
                 swiCopy( CUR_SLICE->m_tileSet.m_blocks[ i ].m_tile, tileMemory + i * 32, 16 );
             dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
@@ -222,7 +222,8 @@ namespace MAP {
         }
 
         switch( p_direction ) {
-            case UP: {
+            case UP:
+            {
                 u16 ty = cy - 8;
                 u16 mnx = cx - 15;
                 for( u16 x = ( lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS; x = ( x + 1 ) % NUM_COLS, ++xp )
@@ -230,7 +231,8 @@ namespace MAP {
                 lastrow = ( lastrow + NUM_ROWS - 1 ) % NUM_ROWS;
                 break;
             }
-            case LEFT: {
+            case LEFT:
+            {
                 u16 tx = cx - 15;
                 u16 mny = cy - 8;
                 for( u16 y = ( lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS; y = ( y + 1 ) % NUM_ROWS, ++yp )
@@ -238,7 +240,8 @@ namespace MAP {
                 lastcol = ( lastcol + NUM_COLS - 1 ) % NUM_COLS;
                 break;
             }
-            case DOWN: {
+            case DOWN:
+            {
                 lastrow = ( lastrow + 1 ) % NUM_ROWS;
                 u16 ty = cy + 7;
                 u16 mnx = cx - 15;
@@ -246,7 +249,8 @@ namespace MAP {
                     loadBlock( at( xp, ty ), x, lastrow );
                 break;
             }
-            case RIGHT: {
+            case RIGHT:
+            {
                 lastcol = ( lastcol + 1 ) % NUM_COLS;
                 u16 tx = cx + 16;
                 u16 mny = cy - 8;
@@ -265,7 +269,7 @@ namespace MAP {
 
         if( p_autoLoadRows
             && ( ( dir[ p_direction ][ 0 ] && ( ( bgState[ 1 ].scrollX >> 8 ) - dir[ p_direction ][ 0 ] + 16 ) % 16 == 0 )
-            || ( dir[ p_direction ][ 1 ] && ( ( bgState[ 1 ].scrollY >> 8 ) - dir[ p_direction ][ 1 ] + 16 ) % 16 == 0 ) ) )
+                 || ( dir[ p_direction ][ 1 ] && ( ( bgState[ 1 ].scrollY >> 8 ) - dir[ p_direction ][ 1 ] + 16 ) % 16 == 0 ) ) )
             loadNewRow( p_direction, p_updatePlayer );
     }
 
@@ -1011,7 +1015,7 @@ NEXT_PASS:
         redirectPlayer( p_direction, p_fast );
 
         if( atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-            FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x3c
+                  FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x3c
             && FS::SAV->m_player.m_pos.m_posZ > 3
             && FS::SAV->m_player.m_movement != SURF ) {
             _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( OBJPRIORITY_1 );
@@ -1039,14 +1043,14 @@ NEXT_PASS:
             fastBike = false;
 
         if( atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-            FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x3c
+                  FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x3c
             && ( FS::SAV->m_player.m_pos.m_posZ <= 3 || FS::SAV->m_player.m_movement == SURF ) ) {
             _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( OBJPRIORITY_3 );
             if( FS::SAV->m_player.m_movement == SURF )
                 _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_3 );
         } else if( atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-            FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata != 0x3c
-            && atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x3c ) {
+                         FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata != 0x3c
+                   && atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x3c ) {
             _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( OBJPRIORITY_2 );
             if( FS::SAV->m_player.m_movement == SURF )
                 _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_2 );
@@ -1080,10 +1084,10 @@ NEXT_PASS:
 
     void mapDrawer::stopPlayer( ) {
         while( fastBike ) {
-            fastBike = std::max( 0, (s8)fastBike - 3 );
+            fastBike = std::max( 0, (s8) fastBike - 3 );
             if( canMove( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction, BIKE ) )
                 movePlayer( FS::SAV->m_player.m_direction );
-            fastBike = std::max( 0, (s8)fastBike - 1 );
+            fastBike = std::max( 0, (s8) fastBike - 1 );
         }
         _playerIsFast = false;
         fastBike = false;
@@ -1091,8 +1095,8 @@ NEXT_PASS:
     }
     void mapDrawer::stopPlayer( direction p_direction ) {
         if( FS::SAV->m_player.m_movement == SIT && ( ( p_direction % 2 == FS::SAV->m_player.m_direction % 2 )
-            || atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ], FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata
-            != atom( FS::SAV->m_player.m_pos.m_posX + dir[ FS::SAV->m_player.m_direction ][ 0 ], FS::SAV->m_player.m_pos.m_posY + dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_movedata ) ) {
+                                                     || atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ], FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata
+                                                     != atom( FS::SAV->m_player.m_pos.m_posX + dir[ FS::SAV->m_player.m_direction ][ 0 ], FS::SAV->m_player.m_pos.m_posY + dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_movedata ) ) {
             return;
         }
         fastBike = false;
@@ -1140,7 +1144,7 @@ NEXT_PASS:
                              direction p_direction ) {
         return atom( p_start.m_posX + dir[ p_direction ][ 0 ],
                      p_start.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x04
-                     && atom( p_start.m_posX, p_start.m_posY ).m_movedata != 0x3c;
+            && atom( p_start.m_posX, p_start.m_posY ).m_movedata != 0x3c;
     }
     void mapDrawer::fishPlayer( direction p_direction, u8 p_rodType ) {
         u8 basePic = FS::SAV->m_player.m_picNum / 10 * 10;

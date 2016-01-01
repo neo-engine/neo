@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : script.cpp
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -176,7 +176,7 @@ namespace BATTLE {
             {
                 bool pkmnIsOpp = false;
                 bool pkmnIsSnd = ( p_battle.m_battleMode == battle::DOUBLE );
-                auto acPkmn = *( (pokemon*)p_self );
+                auto acPkmn = *( (pokemon*) p_self );
 
                 if( acPkmn == ACPKMN2( p_battle, OPPONENT, 0 ) ) {
                     pkmnIsOpp = true;
@@ -195,12 +195,12 @@ namespace BATTLE {
                     pkmnIsSnd &= true;
                 }
 
-                return evaluate( getTargetVal( p_battle, *( (pokemon*)p_self ), pkmnIsOpp, pkmnIsSnd ) );
+                return evaluate( getTargetVal( p_battle, *( (pokemon*) p_self ), pkmnIsOpp, pkmnIsSnd ) );
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
-                return evaluate( getTargetVal( *( (battle*)p_self ) ) );
+                return evaluate( getTargetVal( *( (battle*) p_self ) ) );
             case BATTLE::battleScript::command::SELF_DAMAGE:
-                return evaluate( *( (int*)p_self ) );
+                return evaluate( *( (int*) p_self ) );
             default:
                 break;
         }
@@ -223,7 +223,7 @@ namespace BATTLE {
             {
                 bool pkmnIsOpp = false;
                 bool pkmnIsSnd = ( p_battle.m_battleMode == battle::DOUBLE );
-                auto acPkmn = *( (pokemon*)p_self );
+                auto acPkmn = *( (pokemon*) p_self );
 
                 if( acPkmn == ACPKMN2( p_battle, OPPONENT, 0 ) ) {
                     pkmnIsOpp = true;
@@ -242,12 +242,12 @@ namespace BATTLE {
                     pkmnIsSnd &= true;
                 }
 
-                return get( p_battle, *( (pokemon*)p_self ), pkmnIsOpp, pkmnIsSnd );
+                return get( p_battle, *( (pokemon*) p_self ), pkmnIsOpp, pkmnIsSnd );
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
-                return get( *( (battle*)p_self ) );
+                return get( *( (battle*) p_self ) );
             case BATTLE::battleScript::command::SELF_DAMAGE:
-                return m_additiveConstant + m_multiplier * ( *( (int*)p_self ) ) / 100;
+                return m_additiveConstant + m_multiplier * ( *( (int*) p_self ) ) / 100;
             default:
             case BATTLE::battleScript::command::NO_TARGET:
                 return m_additiveConstant;
@@ -305,7 +305,7 @@ namespace BATTLE {
                         if( m_action == MULTIPLY )
                             p_target.m_stats.m_acHP = int( ( p_target.m_stats.m_acHP / 100.f ) *  m_value.get( p_battle, p_self ) );
 
-                        p_target.m_stats.m_acHP = std::max( (u16)0, std::min( p_target.m_stats.m_maxHP, p_target.m_stats.m_acHP ) );
+                        p_target.m_stats.m_acHP = std::max( (u16) 0, std::min( p_target.m_stats.m_maxHP, p_target.m_stats.m_acHP ) );
 
                         break;
                     case BATTLE::battleScript::command::PKMN_ATK:
@@ -393,7 +393,7 @@ namespace BATTLE {
             {
                 bool pkmnIsOpp = false;
                 bool pkmnIsSnd = ( p_battle.m_battleMode == battle::DOUBLE );
-                auto acPkmn = *( (pokemon*)p_self );
+                auto acPkmn = *( (pokemon*) p_self );
 
                 if( acPkmn == ACPKMN2( p_battle, OPPONENT, 0 ) ) {
                     pkmnIsOpp = true;
@@ -415,19 +415,19 @@ namespace BATTLE {
                 return evaluateOnTargetVal( p_battle, p_self, acPkmn, pkmnIsOpp, pkmnIsSnd );
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
-                return evaluateOnTargetVal( *( (battle*)p_self ), p_self );
+                return evaluateOnTargetVal( *( (battle*) p_self ), p_self );
 
             case BATTLE::battleScript::command::SELF_DAMAGE:
             {
                 switch( m_action ) {
                     case BATTLE::battleScript::command::SET:
-                        *( (int*)p_self ) = m_value.get( p_battle, p_self );
+                        *( (int*) p_self ) = m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::ADD:
-                        *( (int*)p_self ) += m_value.get( p_battle, p_self );
+                        *( (int*) p_self ) += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::MULTIPLY:
-                        *( (int*)p_self ) = int( *( (int*)p_self ) * m_value.get( p_battle, p_self ) / 100.f );
+                        *( (int*) p_self ) = int( *( (int*) p_self ) * m_value.get( p_battle, p_self ) / 100.f );
                         break;
                     default:
                         break;

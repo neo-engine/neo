@@ -150,7 +150,7 @@ bool transferGame( ) {
     char acSlot2Game[ 5 ];
 
     sysSetBusOwners( true, true );
-    memcpy( acSlot2Game, (char*)0x080000AC, 4 );
+    memcpy( acSlot2Game, (char*) 0x080000AC, 4 );
 
     char cmpgm[ 5 ][ 4 ] = { "BPE", "AXP", "AXV", "BPR", "BPG" };
     s8 acgame = -1;
@@ -277,9 +277,9 @@ bool transferGame( ) {
 
                 }
                 }*/
-            //savMod = _GBA;
+                //savMod = _GBA;
 
-            //  FS::SAV->m_overWorldIdx = 20 * ( ( acgame + 1 ) / 2 ) + ( FS::SAV->m_isMale ? 0 : 10 );
+                //  FS::SAV->m_overWorldIdx = 20 * ( ( acgame + 1 ) / 2 ) + ( FS::SAV->m_isMale ? 0 : 10 );
 
             IO::Oam->oamBuffer[ SAVE_ID ].isHidden = false;
 
@@ -396,7 +396,7 @@ void startScreen::run( ) {
         while( ( res = runChoice( ) ) == REDRAW ) {
         }
         switch( res ) {
-                return;
+            return;
             case startScreen::NEW_GAME:
                 initNewGame( );
             case startScreen::CONTINUE:

@@ -1,29 +1,29 @@
 /*
-    Pokémon Emerald 2 Version
-    ------------------------------
+Pokémon Emerald 2 Version
+------------------------------
 
-    file        : pokemon.cpp
-    author      : Philip Wellnitz
-    description : The main Pokémon engine
+file        : pokemon.cpp
+author      : Philip Wellnitz
+description :
 
-    Copyright (C) 2012 - 2015
-    Philip Wellnitz
+Copyright (C) 2012 - 2015
+Philip Wellnitz
 
-    This file is part of Pokémon Emerald 2 Version.
+This file is part of Pokémon Emerald 2 Version.
 
-    Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
-    */
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 
 #include "move.h"
@@ -267,7 +267,7 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
     memset( m_ribbons1, 0, sizeof( m_ribbons1 ) );
     memset( m_ribbons2, 0, sizeof( m_ribbons2 ) );
     getLearnMoves( p_pkmnId, p_level, 0, 1, 4, m_moves );
-    for( u8 i = 0; i < 4; ++i ) m_acPP[ i ] = (u8)( AttackList[ m_moves[ i ] ]->m_movePP );
+    for( u8 i = 0; i < 4; ++i ) m_acPP[ i ] = (u8) ( AttackList[ m_moves[ i ] ]->m_movePP );
 
     m_ppup.m_Up1 = 0;
     m_ppup.m_Up2 = 0;
@@ -312,7 +312,7 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
     m_ball = 0;
     m_gotLevel = p_level;
     m_oTisFemale = !FS::SAV->m_isMale;
-    m_encounter = (encounter)0;
+    m_encounter = (encounter) 0;
     m_HGSSBall = 0;
 }
 pokemon::boxPokemon::boxPokemon( u16*           p_moves,
@@ -395,7 +395,7 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
         memcpy( m_moves, p_moves, sizeof( m_moves ) );
     else
         getLearnMoves( p_pkmnId, p_level, 0, 1, 4, m_moves );
-    for( u8 i = 0; i < 4; ++i ) m_acPP[ i ] = (u8)( AttackList[ m_moves[ i ] ]->m_movePP );
+    for( u8 i = 0; i < 4; ++i ) m_acPP[ i ] = (u8) ( AttackList[ m_moves[ i ] ]->m_movePP );
 
     m_ppup.m_Up1 = 0;
     m_ppup.m_Up2 = 0;
@@ -440,14 +440,14 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
     m_ball = p_ball;
     m_gotLevel = p_level;
     m_oTisFemale = p_oTFemale;
-    m_encounter = (encounter)0;
+    m_encounter = (encounter) 0;
     m_HGSSBall = 0;
 }
 
 
 pokemon::pokemon( u16 p_pkmnId, u16 p_level, const wchar_t* p_name, u8 p_shiny,
                   bool p_hiddenAbility, bool p_isEgg, u8 p_pokerus, bool p_fatefulEncounter )
-                  : m_boxdata( p_pkmnId, p_level, p_name, p_shiny, p_hiddenAbility, p_isEgg, p_pokerus, p_fatefulEncounter ), m_Level( p_level ) {
+    : m_boxdata( p_pkmnId, p_level, p_name, p_shiny, p_hiddenAbility, p_isEgg, p_pokerus, p_fatefulEncounter ), m_Level( p_level ) {
     if( p_pkmnId != 292 )
         m_stats.m_acHP = m_stats.m_maxHP = ( ( m_boxdata.m_individualValues.m_hp + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )*p_level / 100 ) + 10;
     else
@@ -464,8 +464,8 @@ pokemon::pokemon( u16 p_pkmnId, u16 p_level, const wchar_t* p_name, u8 p_shiny,
 }
 pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const wchar_t* p_name, u16 p_level, u16 p_id, u16 p_sid, const wchar_t* p_oT, bool p_oTFemale,
                   u8 p_shiny, bool p_hiddenAbility, bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace, u8 p_ball, u8 p_pokerus )
-                  : m_boxdata( p_moves, p_pkmnId, p_name, p_level, p_id, p_sid, p_oT, p_oTFemale, p_shiny,
-                  p_hiddenAbility, p_fatefulEncounter, p_isEgg, p_gotPlace, p_ball, p_pokerus ), m_Level( p_level ) {
+    : m_boxdata( p_moves, p_pkmnId, p_name, p_level, p_id, p_sid, p_oT, p_oTFemale, p_shiny,
+                 p_hiddenAbility, p_fatefulEncounter, p_isEgg, p_gotPlace, p_ball, p_pokerus ), m_Level( p_level ) {
     if( p_pkmnId != 292 )
         m_stats.m_acHP = m_stats.m_maxHP = ( ( m_boxdata.m_individualValues.m_hp + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )*p_level / 100 ) + 10;
     else

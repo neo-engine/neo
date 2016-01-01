@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : bagUI.cpp
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -191,10 +191,10 @@ namespace BAG {
                 IO::regularFont->setColor( RED_IDX, 1 );
                 sprintf( buffer, "Güte: %s", ( curr->m_berryData.m_berryGuete == berry::berryGueteType::HARD ) ? "Hart" :
                          ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SOFT ) ? "Weich" :
-                         ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SUPER_HARD ) ? "Steinhart" :
-                         ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SUPER_SOFT ) ? "Normal" :
-                         ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::VERY_HARD ) ? "Sehr hart" :
-                         ( "Sehr weich" ) ) ) ) ) );
+                           ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SUPER_HARD ) ? "Steinhart" :
+                             ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SUPER_SOFT ) ? "Normal" :
+                               ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::VERY_HARD ) ? "Sehr hart" :
+                                 ( "Sehr weich" ) ) ) ) ) );
                 IO::regularFont->printString( buffer, 24, 145, false );
                 IO::regularFont->setColor( BLUE_IDX, 1 );
                 sprintf( buffer, "Größe:%4.1fcm", curr->m_berryData.m_berrySize / 10.0 );
@@ -364,15 +364,18 @@ namespace BAG {
         initColors( );
 
         switch( p_page ) {
-            case 0: case 2:{
+            case 0: case 2:
+            {
                 IO::regularFont->printString( bagnames[ p_page ].c_str( ), 106, 4, false );
                 break;
             }
-            case 1: case 3:{
+            case 1: case 3:
+            {
                 IO::regularFont->printString( bagnames[ p_page ].c_str( ), 104, 4, false );
                 break;
             }
-            case 4:{
+            case 4:
+            {
                 IO::regularFont->printString( bagnames[ p_page ].c_str( ), 90, 4, false );
                 break;
             }

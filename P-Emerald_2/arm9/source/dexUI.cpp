@@ -1,3 +1,30 @@
+/*
+Pokémon Emerald 2 Version
+------------------------------
+
+file        : dexUI.cpp
+author      : Philip Wellnitz
+description :
+
+Copyright (C) 2012 - 2015
+Philip Wellnitz
+
+This file is part of Pokémon Emerald 2 Version.
+
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "dexUI.h"
 #include "dex.h"
 #include "uio.h"
@@ -306,13 +333,14 @@ namespace DEX {
         }
 
         switch( _currPage ) {
-            case 0:{
+            case 0:
+            {
                 printf( "\x1b[37m" );
                 if( !( _useInDex ) || IN_DEX( _currPkmn ) ) {
                     BG_PALETTE[ COLOR_IDX ] = IO::getColor( data.m_types[ 1 ] );
                     for( u8 i = 0; i < 6; ++i ) {
                         IO::printRectangle( u8( 19 + 40 * i ), u8( std::max( 56, 102 - data.m_bases[ i ] / 3 ) ),
-                                            u8( 37 + 40 * i ), (u8)102, false, true );
+                                            u8( 37 + 40 * i ), (u8) 102, false, true );
                     }
                     printf( "\n\n  KP   ANG  DEF  SAN  SDF  INT\n\n\n\n\n\n\n\n\n" );
                     sprintf( buffer, "GW.  %5.1fkg", data.m_weight / 10.0 );
@@ -330,7 +358,8 @@ namespace DEX {
                 }
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 if( !( _useInDex ) || IN_DEX( _currPkmn ) ) {
                     isFixed = !isFixed;
                     oldForme = _currForme;

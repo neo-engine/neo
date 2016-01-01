@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : type.cpp
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -64,5 +64,5 @@ float TypeEffectiveness[ 19 ][ 19 ] = {
 };
 
 float getEffectiveness( const Type& p_t1, const Type& p_t2 ) { //t1 is moving
-    return TypeEffectiveness[ (int)p_t1 ][ (int)p_t2 ];
+    return TypeEffectiveness[ (int) p_t1 ][ (int) p_t2 ];
 }

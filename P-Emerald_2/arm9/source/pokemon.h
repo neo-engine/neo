@@ -266,7 +266,7 @@ u8: 8;
         //}
 
         pkmnNatures             getNature( ) {
-            return (pkmnNatures)( m_pid % 25 );
+            return (pkmnNatures) ( m_pid % 25 );
         }
         u16                     getAbility( ) {
             return m_ability;
@@ -337,7 +337,7 @@ u8: 8;
         }
         Type                    getHPType( ) {
             int a = ( ( IVget( 0 ) & 1 ) + 2 * ( IVget( 1 ) & 1 ) + 4 * ( IVget( 2 ) & 1 ) + 8 * ( IVget( 3 ) & 1 ) + 16 * ( IVget( 4 ) & 1 ) + 32 * ( IVget( 5 ) & 1 ) * 15 ) / 63;
-            return a < 9 ? (Type)a : Type( a + 1 );
+            return a < 9 ? (Type) a : Type( a + 1 );
         }
         u8                      getHPPower( ) {
             return 30 + ( ( ( ( IVget( 0 ) >> 1 ) & 1 ) + 2 * ( ( IVget( 1 ) >> 1 ) & 1 ) + 4 * ( ( IVget( 2 ) >> 1 ) & 1 ) + 8 * ( ( IVget( 3 ) >> 1 ) & 1 ) + 16 * ( ( IVget( 4 ) >> 1 ) & 1 ) + 32 * ( ( IVget( 5 ) >> 1 ) & 1 ) * 40 ) / 63 );

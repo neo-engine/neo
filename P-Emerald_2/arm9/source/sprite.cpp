@@ -319,7 +319,7 @@ namespace IO {
         u8 maxSize = std::max( p_width, p_height );
         spriteEntry->size = ( ( maxSize == 64 ) ? OBJSIZE_64 :
                               ( ( maxSize == 32 ) ? OBJSIZE_32 :
-                              ( ( maxSize == 16 ) ? OBJSIZE_16 : OBJSIZE_8 ) ) );
+                                ( ( maxSize == 16 ) ? OBJSIZE_16 : OBJSIZE_8 ) ) );
 
         copySpriteData( p_spriteData, p_tileIdx, p_spriteDataLen, p_bottom );
         copySpritePal( p_spritePal, p_palIdx, p_bottom );
@@ -360,7 +360,7 @@ namespace IO {
         u8 maxSize = std::max( p_width, p_height );
         spriteEntry->size = ( ( maxSize == 64 ) ? OBJSIZE_64 :
                               ( ( maxSize == 32 ) ? OBJSIZE_32 :
-                              ( ( maxSize == 16 ) ? OBJSIZE_16 : OBJSIZE_8 ) ) );
+                                ( ( maxSize == 16 ) ? OBJSIZE_16 : OBJSIZE_8 ) ) );
 
 
         //Attention! The following code is not meant to be read.
@@ -414,7 +414,7 @@ namespace IO {
         memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
         memset( TEMP, 0, sizeof( TEMP ) );
 
-        if( !FS::readData( p_path, buffer, (unsigned short)( 16 ), TEMP_PAL, (unsigned int)( 96 * 96 ), TEMP ) )
+        if( !FS::readData( p_path, buffer, (unsigned short) ( 16 ), TEMP_PAL, (unsigned int) ( 96 * 96 ), TEMP ) )
             return false;
 
         if( p_shiny ) {
@@ -422,7 +422,7 @@ namespace IO {
                 sprintf( buffer, "%d/%ds", p_pkmnId, p_pkmnId );
             else
                 sprintf( buffer, "%d/%dsf", p_pkmnId, p_pkmnId );
-            FS::readData( p_path, buffer, (unsigned short)( 16 ), TEMP_PAL );
+            FS::readData( p_path, buffer, (unsigned short) ( 16 ), TEMP_PAL );
         }
 
         loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY,
@@ -447,7 +447,7 @@ namespace IO {
         memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
         memset( TEMP, 0, sizeof( TEMP ) );
 
-        if( !FS::readData( p_path, buffer, (unsigned short)( 16 ), TEMP_PAL, (unsigned int)( 96 * 96 ), TEMP ) )
+        if( !FS::readData( p_path, buffer, (unsigned short) ( 16 ), TEMP_PAL, (unsigned int) ( 96 * 96 ), TEMP ) )
             return false;
 
         loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY,
@@ -498,7 +498,7 @@ namespace IO {
     }
 
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
-        if( FS::readData( p_path, p_name, (unsigned int)128, TEMP, (unsigned short)16, TEMP_PAL ) ) {
+        if( FS::readData( p_path, p_name, (unsigned int) 128, TEMP, (unsigned short) 16, TEMP_PAL ) ) {
             return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP, 512,
                                false, false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
         } else {
@@ -507,7 +507,7 @@ namespace IO {
         }
     }
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom ) {
-        if( FS::readData( p_path, p_name, (unsigned int)128, TEMP, (unsigned short)16, TEMP_PAL ) ) {
+        if( FS::readData( p_path, p_name, (unsigned int) 128, TEMP, (unsigned short) 16, TEMP_PAL ) ) {
             return loadSprite( p_oamIndex, p_palCnt, p_palpos, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP, 512,
                                false, false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
         } else {

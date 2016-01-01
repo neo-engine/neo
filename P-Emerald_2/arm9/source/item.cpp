@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        new : item.cpp
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description :
 
 Copyright (C) 2012 - 2015
-Philip Wellnitz 
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -45,21 +45,21 @@ void recalcStats( pokemon& p_pokemon, pokemonData& p_pData ) {
     u16 HPdif = p_pokemon.m_stats.m_maxHP - p_pokemon.m_stats.m_acHP;
     if( p_pokemon.m_boxdata.m_speciesId != 292 ) //Check for Ninjatom
         p_pokemon.m_stats.m_maxHP = ( ( p_pokemon.m_boxdata.m_individualValues.m_hp + 2 * p_pData.m_bases[ 0 ]
-        + ( p_pokemon.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* p_pokemon.m_Level / 100 ) + 10;
+                                        + ( p_pokemon.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* p_pokemon.m_Level / 100 ) + 10;
     else
         p_pokemon.m_stats.m_maxHP = 1;
     pkmnNatures nature = p_pokemon.m_boxdata.getNature( );
 
     p_pokemon.m_stats.m_Atk = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_attack + 2 * p_pData.m_bases[ ATK + 1 ]
-        + ( p_pokemon.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
+                                    + ( p_pokemon.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
     p_pokemon.m_stats.m_Def = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_defense + 2 * p_pData.m_bases[ DEF + 1 ]
-        + ( p_pokemon.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
+                                    + ( p_pokemon.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
     p_pokemon.m_stats.m_Spd = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_speed + 2 * p_pData.m_bases[ SPD + 1 ]
-        + ( p_pokemon.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
+                                    + ( p_pokemon.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
     p_pokemon.m_stats.m_SAtk = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_sAttack + 2 * p_pData.m_bases[ SATK + 1 ]
-        + ( p_pokemon.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
+                                     + ( p_pokemon.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
     p_pokemon.m_stats.m_SDef = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_sDefense + 2 * p_pData.m_bases[ SDEF + 1 ]
-        + ( p_pokemon.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
+                                     + ( p_pokemon.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
 
     p_pokemon.m_stats.m_acHP = std::max( 0, p_pokemon.m_stats.m_maxHP - HPdif );
 }
@@ -97,14 +97,15 @@ bool item::use( pokemon& p_pokemon ) {
 
 
         switch( stat ) {
-            case 1: {
+            case 1:
+            {
                 if( !p_pokemon.m_stats.m_acHP )
                     break;
 
                 s16 tmp = p_pokemon.m_stats.m_acHP;
                 APPLY_OP( operation, tmp, value, s16( p_pokemon.m_stats.m_maxHP ) );
                 tmp = std::min( tmp, s16( p_pokemon.m_stats.m_maxHP ) );
-                tmp = std::max( (s16)0, tmp );
+                tmp = std::max( (s16) 0, tmp );
                 if( tmp != p_pokemon.m_stats.m_acHP ) {
                     p_pokemon.m_stats.m_acHP = tmp;
                     change = true;
@@ -112,7 +113,8 @@ bool item::use( pokemon& p_pokemon ) {
                 break;
             }
             case 2: case 3:
-            case 4: case 5: {
+            case 4: case 5:
+            {
                 if( !p_pokemon.m_boxdata.m_moves[ stat - 2 ] )
                     break;
 
@@ -127,7 +129,8 @@ bool item::use( pokemon& p_pokemon ) {
                 }
                 break;
             }
-            case 17: {
+            case 17:
+            {
                 for( u8 i = 0; i < 4; ++i ) {
                     if( !p_pokemon.m_boxdata.m_moves[ i ] )
                         break;
@@ -144,15 +147,16 @@ bool item::use( pokemon& p_pokemon ) {
                 break;
             }
             case 18: case 19:
-            case 20: case 21: {
+            case 20: case 21:
+            {
                 s8 tmp = p_pokemon.m_boxdata.PPupget( stat - 18 );
 
                 s8 df = s8( AttackList[ p_pokemon.m_boxdata.m_moves[ stat - 18 ] ]->m_movePP
                             * ( 5 + p_pokemon.m_boxdata.PPupget( stat - 18 ) ) / 5.0 )
-                            - p_pokemon.m_boxdata.m_acPP[ stat - 18 ];
+                    - p_pokemon.m_boxdata.m_acPP[ stat - 18 ];
 
-                APPLY_OP( operation, tmp, value, (s8)3 );
-                tmp = std::min( tmp, (s8)3 );
+                APPLY_OP( operation, tmp, value, (s8) 3 );
+                tmp = std::min( tmp, (s8) 3 );
                 if( tmp != p_pokemon.m_boxdata.PPupget( stat - 18 ) ) {
                     p_pokemon.m_boxdata.PPupset( stat - 18, tmp );
                     p_pokemon.m_boxdata.m_acPP[ stat - 18 ] = s8( AttackList[ p_pokemon.m_boxdata.m_moves[ stat - 18 ] ]->m_movePP
@@ -162,7 +166,8 @@ bool item::use( pokemon& p_pokemon ) {
                 break;
             }
             case 6: case 7: case 8:
-            case 9: case 10: case 11: {
+            case 9: case 10: case 11:
+            {
                 s16 tmp = p_pokemon.m_boxdata.m_effortValues[ stat - 6 ];
                 s16 sum = 0;
                 for( u8 i = 0; i < 6; ++i )
@@ -175,7 +180,7 @@ bool item::use( pokemon& p_pokemon ) {
                     APPLY_OP( operation, tmp, value, std::min( s16( 252 ), mx ) );
                     tmp = std::min( tmp, std::min( s16( 252 ), mx ) );
                 }
-                tmp = std::max( (s16)0, tmp );
+                tmp = std::max( (s16) 0, tmp );
                 if( tmp != p_pokemon.m_boxdata.m_effortValues[ stat - 6 ] ) {
                     p_pokemon.m_boxdata.m_effortValues[ stat - 6 ] = tmp;
                     change = true;
@@ -183,11 +188,12 @@ bool item::use( pokemon& p_pokemon ) {
                 }
                 break;
             }
-            case 12: {
+            case 12:
+            {
                 s16 tmp = p_pokemon.m_Level;
                 APPLY_OP( operation, tmp, value, 100 );
                 tmp = std::min( tmp, s16( 100 ) );
-                tmp = std::max( (s16)0, tmp );
+                tmp = std::max( (s16) 0, tmp );
                 if( tmp != p_pokemon.m_Level ) {
                     p_pokemon.m_Level = tmp;
                     p_pokemon.m_boxdata.m_experienceGained = EXP[ p_pokemon.m_Level - 1 ][ p.m_expType ];
@@ -197,17 +203,19 @@ bool item::use( pokemon& p_pokemon ) {
                 }
                 break;
             }
-            case 13: {
+            case 13:
+            {
                 s16 tmp = p_pokemon.m_boxdata.m_steps;
                 APPLY_OP( operation, tmp, value, s16( 255 ) );
                 tmp = std::min( tmp, s16( 255 ) );
-                tmp = std::max( (s16)0, tmp );
+                tmp = std::max( (s16) 0, tmp );
                 if( change && tmp != p_pokemon.m_boxdata.m_steps ) {
                     p_pokemon.m_boxdata.m_steps = tmp;
                 }
                 break;
             }
-            case 14: {
+            case 14:
+            {
                 u8 tmp = p_pokemon.m_statusint;
                 APPLY_OP( operation, tmp, value, s16( 0 ) );
                 if( tmp != p_pokemon.m_boxdata.m_steps ) {
@@ -215,14 +223,15 @@ bool item::use( pokemon& p_pokemon ) {
                 }
                 break;
             }
-            case 15: {
+            case 15:
+            {
                 if( p_pokemon.m_stats.m_acHP )
                     break;
 
                 s16 tmp = p_pokemon.m_stats.m_acHP;
                 APPLY_OP( operation, tmp, value, s16( p_pokemon.m_stats.m_maxHP ) );
                 tmp = std::min( tmp, s16( p_pokemon.m_stats.m_maxHP ) );
-                tmp = std::max( (s16)1, tmp );
+                tmp = std::max( (s16) 1, tmp );
 
                 p_pokemon.m_stats.m_acHP = tmp;
                 change = true;

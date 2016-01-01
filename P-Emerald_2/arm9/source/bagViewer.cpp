@@ -1,3 +1,30 @@
+/*
+Pokémon Emerald 2 Version
+------------------------------
+
+file        : bagViewer.cpp
+author      : Philip Wellnitz
+description : 
+
+Copyright (C) 2012 - 2015
+Philip Wellnitz
+
+This file is part of Pokémon Emerald 2 Version.
+
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "bagViewer.h"
 #include "defines.h"
 #include "uio.h"
@@ -59,7 +86,8 @@ namespace BAG {
                 std::pair<u16, u16> currItem = { targetItem, _origBag->element( bag::bagType( _currPage ) )[ targetItem ] };
 
                 switch( res >> 24 ) {
-                    case GIVE_ITEM:{
+                    case GIVE_ITEM:
+                    {
                         if( !acPkmn.m_boxdata.m_speciesId || acPkmn.m_boxdata.m_individualValues.m_isEgg )
                             break;
                         if( ItemList[ targetItem ]->m_itemType == item::itemType::KEY_ITEM )
@@ -247,7 +275,7 @@ namespace BAG {
                             }
                             auto currBgType = toBagType( ItemList[ acPkmn.m_boxdata.m_holdItem ]->m_itemType );
                             _origBag->insert( currBgType, acPkmn.m_boxdata.m_holdItem, 1 );
-                            auto bgI = std::find_if( _bagUI->_bag[ (u8)currBgType ].begin( ), _bagUI->_bag[ (u8)currBgType ].end( ), [ acPkmn ]( std::pair<u16, u16> p_item ) {
+                            auto bgI = std::find_if( _bagUI->_bag[ (u8) currBgType ].begin( ), _bagUI->_bag[ (u8) currBgType ].end( ), [ acPkmn ] ( std::pair<u16, u16> p_item ) {
                                 return p_item.first == acPkmn.m_boxdata.m_holdItem;
                             } );
                             if( bgI != _bagUI->_bag[ currBgType ].end( ) )
@@ -269,13 +297,14 @@ namespace BAG {
                         _ranges = _bagUI->drawBagPage( _currPage, _currItem );
                         break;
                     }
-                    case TAKE_ITEM:{
+                    case TAKE_ITEM:
+                    {
                         if( !acPkmn.m_boxdata.m_speciesId || acPkmn.m_boxdata.m_individualValues.m_isEgg )
                             break;
                         if( acPkmn.m_boxdata.m_holdItem ) {
                             auto currBgType = toBagType( ItemList[ acPkmn.m_boxdata.m_holdItem ]->m_itemType );
                             _origBag->insert( currBgType, acPkmn.m_boxdata.m_holdItem, 1 );
-                            auto bgI = std::find_if( _bagUI->_bag[ (u8)currBgType ].begin( ), _bagUI->_bag[ (u8)currBgType ].end( ), [ acPkmn ]( std::pair<u16, u16> p_item ) {
+                            auto bgI = std::find_if( _bagUI->_bag[ (u8) currBgType ].begin( ), _bagUI->_bag[ (u8) currBgType ].end( ), [ acPkmn ] ( std::pair<u16, u16> p_item ) {
                                 return ( p_item.first == acPkmn.m_boxdata.m_holdItem );
                             } );
                             if( bgI != _bagUI->_bag[ currBgType ].end( ) )
@@ -290,7 +319,8 @@ namespace BAG {
                         }
                         break;
                     }
-                    case MOVE_ITEM:{
+                    case MOVE_ITEM:
+                    {
                         if( !acPkmn.m_boxdata.m_speciesId || acPkmn.m_boxdata.m_individualValues.m_isEgg )
                             break;
                         if( acPkmn.m_boxdata.m_holdItem && targetItem != targetPkmn ) {
@@ -315,14 +345,21 @@ namespace BAG {
             } else if( GET_AND_WAIT( KEY_LEFT ) ) {
                 _bagUI->_currSelectedIdx = 0;
                 _currPage = ( _currPage + BAG_CNT - 1 ) % BAG_CNT;
-                _currItem %= _bagUI->_bag[ _currPage ].size( );
+                if( _bagUI->_bag[ _currPage ].size( ) )
+                    _currItem %= _bagUI->_bag[ _currPage ].size( );
+                else
+                    _currItem = 0;
                 _ranges = _bagUI->drawBagPage( _currPage, _currItem );
             } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
                 _bagUI->_currSelectedIdx = 0;
                 _currPage = ( _currPage + 1 ) % BAG_CNT;
-                _currItem %= _bagUI->_bag[ _currPage ].size( );
+                if( _bagUI->_bag[ _currPage ].size( ) )
+                    _currItem %= _bagUI->_bag[ _currPage ].size( );
+                else
+                    _currItem = 0;
                 _ranges = _bagUI->drawBagPage( _currPage, _currItem );
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
+                if( !_bagUI->_bag[ _currPage ].size( ) ) continue;
                 auto old = ( _bagUI->_currSelectedIdx %= _bagUI->_bag[ _currPage ].size( ) );
                 u8 mx = std::min( 9u, _bagUI->_bag[ _currPage ].size( ) );
                 if( ++_bagUI->_currSelectedIdx == mx ) {
@@ -333,6 +370,7 @@ namespace BAG {
                     _bagUI->updateSelectedIdx( old );
                 }
             } else if( GET_AND_WAIT( KEY_UP ) ) {
+                if( !_bagUI->_bag[ _currPage ].size( ) ) continue;
                 auto old = ( _bagUI->_currSelectedIdx %= _bagUI->_bag[ _currPage ].size( ) );
                 u8 mx = std::min( 9u, _bagUI->_bag[ _currPage ].size( ) );
                 if( _bagUI->_currSelectedIdx-- == 0 ) {
@@ -343,9 +381,11 @@ namespace BAG {
                     _bagUI->updateSelectedIdx( old );
                 }
             } else if( !_atHandOam && GET_AND_WAIT_C( SCREEN_WIDTH - 44, SCREEN_HEIGHT - 10, 16 ) ) {
+                if( !_bagUI->_bag[ _currPage ].size( ) ) continue;
                 _currItem = ( _currItem + 8 ) % _bagUI->_bag[ _currPage ].size( );
                 _ranges = _bagUI->drawBagPage( _currPage, _currItem );
             } else if( !_atHandOam && GET_AND_WAIT_C( SCREEN_WIDTH - 76, SCREEN_HEIGHT - 10, 16 ) ) {
+                if( !_bagUI->_bag[ _currPage ].size( ) ) continue;
                 _currItem = ( _currItem + _bagUI->_bag[ _currPage ].size( ) - 8 ) % _bagUI->_bag[ _currPage ].size( );
                 _ranges = _bagUI->drawBagPage( _currPage, _currItem );
             }
