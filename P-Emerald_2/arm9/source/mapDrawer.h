@@ -95,6 +95,8 @@ namespace MAP {
         u16 _entriesUsed;
         std::map<u16, u8> _spritePos; //mapObject.id -> index in _sprites
 
+        s16 _noPkmnSteps;
+
         void draw( u16 p_globX, u16 p_globY, bool p_init );
         void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2 );
         void drawObjects( );
@@ -108,7 +110,7 @@ namespace MAP {
 
         void handleWarp( warpType p_type );
         void handleWildPkmn( u16 p_globX, u16 p_globY );
-        void handleWildPkmn( wildPkmnType p_type, u8 p_rodType = 0 );
+        bool handleWildPkmn( wildPkmnType p_type, u8 p_rodType = 0, bool p_forceEncounter = false );
         void handleTrainer( );
 
     public:
@@ -144,6 +146,11 @@ namespace MAP {
         void fishPlayer( direction p_direction, u8 p_rodType = 0 );
 
         void usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny );
+
+        void disablePkmn( s16 p_steps = -1 );
+        void enablePkmn( );
+
+        bool requestWildPkmn( );
 
         u16  getCurrentLocationId( ) const;
     };

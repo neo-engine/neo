@@ -283,6 +283,13 @@ namespace MAP {
             = constructSlice( FS::SAV->m_currentMap, neigh->m_x + dir[ p_direction ][ 0 ], neigh->m_y + dir[ p_direction ][ 1 ] );
     }
 
+    void mapDrawer::disablePkmn( s16 p_steps ) {
+        _noPkmnSteps = p_steps;
+    }
+    void mapDrawer::enablePkmn( ) {
+        _noPkmnSteps = 0;
+    }
+
     void mapDrawer::handleWarp( warpType p_type ) {
         static warpPos lastWarp = { 0, { 0, 0, 0 } };
 
@@ -300,7 +307,14 @@ namespace MAP {
         u8 moveData = atom( p_globX, p_globY ).m_movedata;
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
-
+        if( _noPkmnSteps > 0 )
+            if( !--_noPkmnSteps ) {
+                IO::messageBox( "Der Schutz lässt nach." );
+                _playerIsFast = false;
+                IO::drawSub( );
+            }
+        if( _noPkmnSteps )
+            return;
         //handle Pkmn stuff
         if( moveData == 0x04 && behave != 0x13 )
             handleWildPkmn( WATER );
@@ -311,9 +325,11 @@ namespace MAP {
         else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
             handleWildPkmn( GRASS );
     }
-    void mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType ) {
+    bool mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType, bool p_forceEncounter ) {
 
         u16 rn = rand( ) % 512;
+        while( p_forceEncounter && rn > 40 )
+            rn = rand( ) % 512;
         if( p_type == FISHING_ROD )
             rn /= 8;
 
@@ -328,15 +344,17 @@ namespace MAP {
         if( rn > 40 || !level ) {
             if( p_type == FISHING_ROD ) {
                 IO::messageBox m( "Doch nur ein alter Pokéball..." );
+                _playerIsFast = false;
                 IO::drawSub( true );
             }
-            return;
+            return false;
         }
         if( p_type == FISHING_ROD ) {
             IO::messageBox m( "Du hast ein Pokémon geangelt!" );
+            _playerIsFast = false;
             IO::drawSub( true );
-        } else if( FS::SAV->m_repelSteps )
-            return;
+        } else if( FS::SAV->m_repelSteps && !p_forceEncounter )
+            return false;
         u8 arridx = u8( p_type ) * 15 + tier * 3;
         if( p_type != FISHING_ROD )
             while( level > CUR_SLICE->m_pokemon[ arridx ].second && ( arridx + 1 ) % 3 )
@@ -345,7 +363,7 @@ namespace MAP {
             arridx += p_rodType;
 
         if( !CUR_SLICE->m_pokemon[ arridx ].first )
-            return;
+            return false;
 
         pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
         BATTLE::battle::weather weat = BATTLE::battle::weather::NO_WEATHER;
@@ -396,8 +414,24 @@ namespace MAP {
         FADE_TOP_DARK( );
         draw( playerPrio );
         IO::drawSub( true );
+
+        return true;
     }
     void mapDrawer::handleTrainer( ) { }
+
+    bool mapDrawer::requestWildPkmn( ) {
+        u8 moveData = atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata;
+        u8 behave = at( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_bottombehave;
+
+        if( moveData == 0x04 && behave != 0x13 )
+            return handleWildPkmn( WATER, 0, true );
+        else if( behave == 0x02 )
+            return handleWildPkmn( GRASS, 0, true );
+        else if( behave == 0x03 )
+            return handleWildPkmn( HIGH_GRASS, 0, true );
+        else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
+            return handleWildPkmn( GRASS, 0, true );
+    }
 
     mapDrawer::mapDrawer( )
         : _curX( 0 ), _curY( 0 ), _playerIsFast( false ), _entriesUsed( 0 ) { }
@@ -561,6 +595,7 @@ namespace MAP {
                 swiWaitForVBlank( );
                 stopPlayer( );
                 IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
+                _playerIsFast = false;
                 IO::drawSub( true );
                 return;
             }
