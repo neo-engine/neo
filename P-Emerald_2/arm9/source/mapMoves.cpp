@@ -114,7 +114,7 @@ void waterfall::use( ) {
 void teleport::use( ) { }
 void headbutt::use( ) { }
 void sweetScent::use( ) {
-    if( !sweetScent::possible( ) || !MAP::curMap->requestWildPkmn( ) ) {
+    if( !sweetScent::possible( ) || !MAP::curMap->requestWildPkmn( true ) ) {
         IO::messageBox( "Der Duft verstrich wirkungslos..." );
         IO::drawSub( );
     }

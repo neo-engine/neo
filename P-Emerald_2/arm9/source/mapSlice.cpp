@@ -101,7 +101,7 @@ namespace MAP {
                            + "/" + toString( p_y )
                            + "_" + toString( p_x ) ).c_str( ),
                          ".enc" );
-        FS::read( mapF, res->m_pokemon, sizeof( std::pair<u16, u16> ), 3 * 5 * 4 );
+        FS::read( mapF, res->m_pokemon, sizeof( std::pair<u16, u16> ), 3 * 5 * 5 );
         FS::close( mapF );
 
         //Read the first tileset

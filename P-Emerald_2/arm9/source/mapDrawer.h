@@ -39,10 +39,12 @@ namespace MAP {
     class mapDrawer {
     private:
         enum wildPkmnType {
-            GRASS,
-            HIGH_GRASS,
-            WATER,
-            FISHING_ROD
+            GRASS,      // 5 tiers
+            HIGH_GRASS, // 5 tiers
+            WATER,      // 5 tiers
+            FISHING_ROD,// 5 tiers
+            HEADBUTT,   // 3 tiers
+            ROCK_SMASH  // 2 tiers
         };
         enum mapWeather {
             NOTHING, //Inside
@@ -150,7 +152,7 @@ namespace MAP {
         void disablePkmn( s16 p_steps = -1 );
         void enablePkmn( );
 
-        bool requestWildPkmn( );
+        bool requestWildPkmn( bool p_forceHighGrass = false );
 
         u16  getCurrentLocationId( ) const;
     };
