@@ -58,7 +58,12 @@ namespace MAP {
     block& mapDrawer::at( u16 p_x, u16 p_y ) const {
         bool x = ( p_x / SIZE != CUR_SLICE->m_x ),
             y = ( p_y / SIZE != CUR_SLICE->m_y );
-        return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks[ _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blocks[ p_y % SIZE ][ p_x % SIZE ].m_blockidx ];
+        u16 blockidx = _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blocks[ p_y % SIZE ][ p_x % SIZE ].m_blockidx;
+
+        if( blockidx <= 512 )
+            return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks1[ blockidx ];
+        else
+            return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks2[ blockidx % 512 ];
     }
 
     u16 lastrow, //Row to be filled when extending the map to the top
@@ -114,8 +119,10 @@ namespace MAP {
             }
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
 
-            for( u16 i = 0; i < 1024; ++i )
-                swiCopy( CUR_SLICE->m_tileSet.m_blocks[ i ].m_tile, tileMemory + i * 32, 16 );
+            for( u16 i = 0; i < 512; ++i )
+                swiCopy( CUR_SLICE->m_tileSet.m_tiles1[ i ].m_tile, tileMemory + i * 32, 16 );
+            for( u16 i = 0; i < 512; ++i )
+                swiCopy( CUR_SLICE->m_tileSet.m_tiles2[ i ].m_tile, tileMemory + ( i + 512 ) * 32, 16 );
             dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
             for( u8 i = 1; i < 4; ++i ) {
                 mapMemory[ i ] = (u16*) BG_MAP_RAM( 2 * i - 1 );
@@ -210,9 +217,11 @@ namespace MAP {
             _curX = ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1;
             _curY = ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1;
             //Update tileset, block and palette data
-            u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
-            for( u16 i = 0; i < 1024; ++i )
-                swiCopy( CUR_SLICE->m_tileSet.m_blocks[ i ].m_tile, tileMemory + i * 32, 16 );
+            u8* tileMemory = (u8*)BG_TILE_RAM( 1 );
+            for( u16 i = 0; i < 512; ++i )
+                swiCopy( CUR_SLICE->m_tileSet.m_tiles1[ i ].m_tile, tileMemory + i * 32, 16 );
+            for( u16 i = 0; i < 512; ++i )
+                swiCopy( CUR_SLICE->m_tileSet.m_tiles2[ i ].m_tile, tileMemory + ( i + 512 ) * 32, 16 );
             dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
 
 #ifdef __DEBUG

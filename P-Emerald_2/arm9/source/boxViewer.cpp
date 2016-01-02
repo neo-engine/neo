@@ -29,12 +29,16 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "boxUI.h"
 #include "defines.h"
 #include "uio.h"
+#include "messageBox.h"
+
 #include "statusScreen.h"
 #include "statusScreenUI.h"
 #include "saveGame.h"
 
 namespace BOX {
 #define TRESHOLD 10
+#define MAX_PKMN_PRO_PAGE 21
+#define MAX_PKMN_PRO_PAGE_WITHOUT_TAKE 21
     u16 boxViewer::nextNonEmptyBox( u16 p_start ) {
         for( u16 i = p_start + 1; i <= MAX_PKMN + 1; ++i )
             if( !_box->empty( i ) )
@@ -87,7 +91,7 @@ namespace BOX {
         for( u8 i = 0; i < 29; ++i )
             _currPage[ i ] = { 0, 0 };
 
-        for( u8 i = 28; i >= 0; --i ) {
+        for( s8 i = 28; i >= 0; --i ) {
             if( pos-- )
                 _currPage[ i ] = { pokemon, pos };
             else {
@@ -109,10 +113,10 @@ namespace BOX {
         _atHandOam = 0;
         _ranges = _boxUI->draw( _currPage, _currPos = 0, _box, '*', true, p_allowTakePkmn );
 
-        u8 mx = p_allowTakePkmn ? 21 : 28;
+        u8 mx = p_allowTakePkmn ? MAX_PKMN_PRO_PAGE : MAX_PKMN_PRO_PAGE_WITHOUT_TAKE;
 
         touchPosition touch;
-        u8 curr = -1, start = -1;
+        u8 curr = -1, start = -1; //Indices the held sprite is covering
         loop( ) {
             swiWaitForVBlank( );
             scanKeys( );
@@ -126,51 +130,65 @@ namespace BOX {
             }
 
             if( _atHandOam && !( touch.px | touch.py ) ) { //Player drops the sprite at hand
-                u32 res = _boxUI->acceptDrop( start, curr, _atHandOam );
+                _boxUI->acceptDrop( start, curr, _atHandOam );
                 _atHandOam = 0;
-
-                if( start < 21 && curr < 21 )
-                    continue;
-
-                else if( start >= 21 && curr >= 21 ) {
-                    //Count the team pokemon
-                    u8 cnt = 0;
-                    for( u8 i = 0; i < 6; ++i )
-                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId
-                            && FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP )
-                            ++cnt;
-                    if( !FS::SAV->m_pkmnTeam[ start - 21 ].m_stats.m_acHP )
+                //Count the non-fainted team pkmn
+                u8 cnt = 0;
+                for( u8 i = 0; i < 6; ++i )
+                    if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId
+                        && FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP )
                         ++cnt;
 
-                    if( curr == u8( -1 ) && cnt > 1 ) { //Deposit the pokemon
-                        _box->insert( FS::SAV->m_pkmnTeam[ start - 21 ] );
-
-                        for( u8 i = start - 21; i < 5; ++i )
-                            std::swap( FS::SAV->m_pkmnTeam[ i ], FS::SAV->m_pkmnTeam[ i + 1 ] );
-                        memset( &FS::SAV->m_pkmnTeam[ 5 ], 0, sizeof( pokemon ) );
-
-                        for( u8 i = 0; i < 30; ++i )
-                            _currPage[ i ] = { 0, 0 };
-                        generateNextPage( );
-                        _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
-                    } else if( curr != u8( -1 ) && FS::SAV->m_pkmnTeam[ curr - 21 ].m_boxdata.m_speciesId &&
-                               FS::SAV->m_pkmnTeam[ start - 21 ].m_boxdata.m_speciesId ) {
+                if( start < 21 && curr < 21 ) //Boxes auto-sort; no PKMN-Shifting inside Boxes
+                    continue;
+                else if( start >= 21 && curr >= 21 ) { //Shift Team-Pkmn
+                    if( FS::SAV->m_pkmnTeam[ curr - 21 ].m_boxdata.m_speciesId &&
+                        FS::SAV->m_pkmnTeam[ start - 21 ].m_boxdata.m_speciesId ) {
                         std::swap( FS::SAV->m_pkmnTeam[ start - 21 ], FS::SAV->m_pkmnTeam[ curr - 21 ] );
-
                         _ranges = _boxUI->draw( _currPage, _currPos = curr, _box, start, true, true );
                     } else {
                         _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
                     }
-                } else if( start < 21 && curr >= 21 && _currPage[ start ].first ) {
-                    //if( FS::SAV->m_pkmnTeam[ curr - 21 ].m_boxdata.m_speciesId ) {
-                    //    _box->insert( FS::SAV->m_pkmnTeam[ curr - 21 ] );
-                    //}
+                } else if( start < 21 && curr >= 21 && _currPage[ start + 1 ].first ) { //withdraw pkmn
+                                                                                        //Extract pkmn from the box
+                    auto tmp = _box->operator[]( _currPage[ start + 1 ].first );
+                    auto it = tmp.begin( );
+                    for( u8 i = 0; i < _currPage[ start + 1 ].second; ++i, ++it );
+                    pokemon target = pokemon( *it );
+                    _box->erase( target );
 
-                    //FS::SAV->m_pkmnTeam[ curr - 21 ].m_boxdata =
+                    //Swap the extracted Pkmn with the team pkmn
+                    u8 rct = 0; //real count: including fainted ones
+                    for( u8 i = 0; i < 6; ++i )
+                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                            ++rct;
+                    rct = std::min( rct, u8( curr - 21 ) );
 
-                } else if( start >= 21 && curr < 21 ) {
+                    std::swap( target, FS::SAV->m_pkmnTeam[ rct ] );
 
+                    //Insert the team pkmn into the box
+                    _box->insert( target );
+
+                    //recalc and redraw everything
+                    for( u8 i = 0; i < 30; ++i )
+                        _currPage[ i ] = { 0, 0 };
+                    generateNextPage( );
+                    _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
+                } else if( start >= 21 && curr < 21 ) { //deposit pkmn
+                    if( cnt <= 1 ) {
+                        _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
+                        continue;
                     }
+                    _box->insert( FS::SAV->m_pkmnTeam[ start - 21 ] );
+                    for( u8 i = start - 21; i < 5; ++i )
+                        std::swap( FS::SAV->m_pkmnTeam[ i ], FS::SAV->m_pkmnTeam[ i + 1 ] );
+                    memset( &FS::SAV->m_pkmnTeam[ 5 ], 0, sizeof( pokemon ) );
+
+                    for( u8 i = 0; i < 30; ++i )
+                        _currPage[ i ] = { 0, 0 };
+                    generateNextPage( );
+                    _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
+                }
             }
 
             if( GET_AND_WAIT( KEY_B )
@@ -182,7 +200,7 @@ namespace BOX {
                     newPok = false;
                     _currPos = ( ( _currPos - 20 ) % 6 ) + 21;
                 } else {
-                    if( newPok = ( ( ( ++_currPos ) %= mx ) < oldPos ) )
+                    if( ( newPok = ( ( ( ++_currPos ) %= mx ) < oldPos ) ) )
                         generateNextPage( );
                 }
                 _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
@@ -191,16 +209,16 @@ namespace BOX {
                     newPok = false;
                     _currPos = ( ( _currPos - 16 ) % 6 ) + 21;
                 } else {
-                    if( newPok = ( ( ( _currPos += ( mx - 1 ) ) %= mx ) > oldPos ) )
+                    if( ( newPok = ( ( ( _currPos += ( mx - 1 ) ) %= mx ) > oldPos ) ) )
                         generatePreviousPage( );
                 }
                 _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_UP ) ) {
-                if( newPok = ( ( ( _currPos += ( mx - 7 ) ) %= mx ) > oldPos ) )
+                if( ( newPok = ( ( ( _currPos += ( mx - 7 ) ) %= mx ) > oldPos ) ) )
                     generatePreviousPage( );
                 _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
-                if( newPok = ( ( ( _currPos += 7 ) %= mx ) < oldPos ) )
+                if( ( newPok = ( ( ( _currPos += 7 ) %= mx ) < oldPos ) ) )
                     generateNextPage( );
                 _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_A ) ) {
@@ -226,7 +244,7 @@ namespace BOX {
                                 break;
                             }
                             if( !touch.px && !touch.py ) {
-                                u8 res = _boxUI->acceptTouch( _currPos, j, p_allowTakePkmn );
+                                _boxUI->acceptTouch( _currPos, j, p_allowTakePkmn );
                                 _ranges = _boxUI->draw( _currPage, j, _box, _currPos, false, p_allowTakePkmn );
                                 _currPos = j;
                                 break;

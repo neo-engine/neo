@@ -29,6 +29,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <nds/ndstypes.h>
 #include <vector>
 #include <memory>
+#include <cstring>
 
 namespace MAP {
     const char* const MAP_PATH = "nitro:/MAPS/";
@@ -60,10 +61,10 @@ namespace MAP {
     };
 
     typedef struct {
-        tile        m_blocks[ 1024 ];
+        tile        *m_tiles1, *m_tiles2;
     } tileSet;
     typedef struct {
-        block       m_blocks[ 1024 ];
+        block       *m_blocks1, *m_blocks2;
     } blockSet;
 
     typedef struct {
@@ -83,4 +84,42 @@ namespace MAP {
         std::pair<u16, u16> m_pokemon[ 3 * 5 * 4 ];
     };
     std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y );
+
+    struct sliceCache {
+#define MAX_CACHE_SIZE 4
+        s8 m_indices[ MAX_CACHE_SIZE ];
+        tile* m_tiles[ MAX_CACHE_SIZE ];
+        block* m_blocks[ MAX_CACHE_SIZE ];
+        palette* m_palettes[ MAX_CACHE_SIZE ];
+        u8 m_nextFree;
+
+        sliceCache( ) {
+            m_nextFree = 0;
+            memset( m_indices, -1, sizeof( m_indices ) );
+        }
+
+        u8 set( u8 p_index ) { //Gets the next free index
+            u8 res = m_nextFree;
+            m_indices[ m_nextFree ] = p_index;
+            m_nextFree = ( m_nextFree + 1 ) % MAX_CACHE_SIZE;
+            return res;
+        }
+        s8 get( u8 p_index ) { //Return the index or -1 if not found
+            for( u8 i = 0; i < MAX_CACHE_SIZE; ++i )
+                if( m_indices[ i ] == p_index )
+                    return i;
+            return -1;
+        }
+
+        void clear( ) {
+            m_nextFree = 0;
+            memset( m_indices, -1, sizeof( m_indices ) );
+            for( u8 i = 0; i < MAX_CACHE_SIZE; ++i ) {
+                delete m_tiles[ i ];
+                delete m_blocks[ i ];
+                delete m_palettes[ i ];
+            }
+        }
+    };
+    extern sliceCache cache;
 }
