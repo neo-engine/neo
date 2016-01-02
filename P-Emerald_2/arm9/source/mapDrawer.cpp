@@ -144,21 +144,22 @@ namespace MAP {
         bgUpdate( );
     }
 
-    void mapDrawer::draw( ) {
+    void mapDrawer::draw( ObjPriority p_playerPrio ) {
         draw( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY, true ); //Draw the map
 
         IO::initOAMTable( false );
-        drawPlayer( ); //Draw the player
+        drawPlayer( p_playerPrio ); //Draw the player
         drawObjects( ); //Draw NPCs / stuff
 
         IO::fadeScreen( IO::UNFADE );
     }
 
-    void mapDrawer::drawPlayer( ) {
+    void mapDrawer::drawPlayer( ObjPriority p_playerPrio ) {
         _sprites[ 0 ] = FS::SAV->m_player.show( 128 - 8, 96 - 24, 0, 0, 0 );
         _spritePos[ FS::SAV->m_player.m_id ] = 0;
         _entriesUsed |= ( 1 << 0 );
         changeMoveMode( FS::SAV->m_player.m_movement );
+        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( p_playerPrio );
         if( FS::SAV->m_player.m_movement == SURF ) {
             surfPlatform.m_id = 1;
             _spritePos[ surfPlatform.m_id ] = 1;
@@ -389,9 +390,11 @@ namespace MAP {
         }
 
         u8 battleBack = 0;
+        auto playerPrio = _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].getPriority( );
         BATTLE::battle( FS::SAV->getBattleTrainer( ), &wildPkmn, weat, platform, battleBack ).start( );
+        FS::SAV->updateTeam( );
         FADE_TOP_DARK( );
-        draw( );
+        draw( playerPrio );
         IO::drawSub( true );
     }
     void mapDrawer::handleTrainer( ) { }

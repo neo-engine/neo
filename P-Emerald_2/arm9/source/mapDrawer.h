@@ -96,7 +96,7 @@ namespace MAP {
         std::map<u16, u8> _spritePos; //mapObject.id -> index in _sprites
 
         void draw( u16 p_globX, u16 p_globY, bool p_init );
-        void drawPlayer( );
+        void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2 );
         void drawObjects( );
 
         void moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows = true );
@@ -117,7 +117,7 @@ namespace MAP {
 
         mapDrawer( );
 
-        void draw( );
+        void draw( ObjPriority p_playerPrio = OBJPRIORITY_2 );
 
         bool canMove( position p_start,
                       direction p_direction,

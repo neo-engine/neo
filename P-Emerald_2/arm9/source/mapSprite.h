@@ -48,6 +48,8 @@ namespace MAP {
                    u8 p_startFrame,
                    u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx );
 
+        ObjPriority getPriority( );
+
         void setVisibility( bool p_value );
         void setPriority( ObjPriority p_value );
 

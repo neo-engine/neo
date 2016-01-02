@@ -49,6 +49,10 @@ namespace MAP {
         IO::updateOAM( false );
     }
 
+    ObjPriority mapSprite::getPriority( ) {
+        return IO::OamTop->oamBuffer[ _oamIndex ].priority;
+    }
+
     void mapSprite::setVisibility( bool p_value ) {
         IO::OamTop->oamBuffer[ _oamIndex ].isHidden = !p_value;
         IO::updateOAM( false );
