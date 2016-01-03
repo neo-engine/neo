@@ -293,10 +293,10 @@ namespace MAP {
     }
 
     void mapDrawer::disablePkmn( s16 p_steps ) {
-        _noPkmnSteps = p_steps;
+        FS::SAV->m_repelSteps = p_steps;
     }
     void mapDrawer::enablePkmn( ) {
-        _noPkmnSteps = 0;
+        FS::SAV->m_repelSteps = 0;
     }
 
     void mapDrawer::handleWarp( warpType p_type ) {
@@ -316,13 +316,7 @@ namespace MAP {
         u8 moveData = atom( p_globX, p_globY ).m_movedata;
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
-        if( _noPkmnSteps > 0 )
-            if( !--_noPkmnSteps ) {
-                IO::messageBox( "Der Schutz lässt nach." );
-                _playerIsFast = false;
-                IO::drawSub( );
-            }
-        if( _noPkmnSteps )
+        if( FS::SAV->m_repelSteps )
             return;
         //handle Pkmn stuff
         if( moveData == 0x04 && behave != 0x13 )

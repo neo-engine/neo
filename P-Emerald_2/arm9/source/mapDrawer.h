@@ -96,9 +96,7 @@ namespace MAP {
         mapSprite _sprites[ 16 ];
         u16 _entriesUsed;
         std::map<u16, u8> _spritePos; //mapObject.id -> index in _sprites
-
-        s16 _noPkmnSteps;
-
+        
         void draw( u16 p_globX, u16 p_globY, bool p_init );
         void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2 );
         void drawObjects( );

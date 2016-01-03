@@ -71,7 +71,7 @@ namespace FS {
         u8          m_lstBag;
         u8          m_lstBagItem;
 
-        u8          m_repelSteps;
+        s16         m_repelSteps;
 
         pokemon     m_pkmnTeam[ 6 ];
 

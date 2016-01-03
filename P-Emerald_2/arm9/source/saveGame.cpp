@@ -29,6 +29,7 @@
 
 #include "saveGame.h"
 #include "fs.h"
+#include "uio.h"
 #include "messageBox.h"
 //#include "Gen.h"
 
@@ -132,10 +133,12 @@ namespace FS {
     void saveGame::stepIncrease( ) {
         static u8 stepCnt = 0;
         stepCnt++;
-        if( m_repelSteps ) {
+        if( m_repelSteps > 0 ) {
             m_repelSteps--;
-            if( !m_repelSteps )
-                IO::messageBox m( "Der Schutz ist aufgebraucht." );
+            if( !m_repelSteps ) {
+                IO::messageBox( "Der Schutz ist aufgebraucht." );
+                IO::drawSub( true );
+            }
         }
         if( !stepCnt ) {
             bool hasHatchSpdUp = m_bag->count( BAG::toBagType( item::itemType::KEY_ITEM ), I_OVAL_CHARM );
