@@ -138,8 +138,13 @@ namespace BOX {
                     if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId
                         && FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP )
                         ++cnt;
+/*
+                sprintf( buffer, "%d -> %d", start, curr );
+                IO::messageBox m( buffer );*/
 
-                if( start < 21 && curr < 21 ) //Boxes auto-sort; no PKMN-Shifting inside Boxes
+                if( start == 255 || curr == 255 ) //Something went wrong
+                    continue;
+                else if( start < 21 && curr < 21 ) //Boxes auto-sort; no PKMN-Shifting inside Boxes
                     continue;
                 else if( start >= 21 && curr >= 21 ) { //Shift Team-Pkmn
                     if( FS::SAV->m_pkmnTeam[ curr - 21 ].m_boxdata.m_speciesId &&

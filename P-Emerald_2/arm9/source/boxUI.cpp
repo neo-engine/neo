@@ -89,6 +89,8 @@ namespace BOX {
 
 #define POS_X( i ) ( 16 + 32 * ( (i) % 7 ) )
 #define POS_Y( i ) ( 57 + 28 * ( (i) / 7 ) )
+#define TEAM_POS_X( i ) ( 16 + POS_X( i ) )
+#define TEAM_POS_Y( i ) ( 8 + POS_Y( i ) )
 
     std::vector<IO::inputTarget> boxUI::draw( std::pair<u16, u16> p_pokemon[ 30 ], u8 p_pos, box* p_box, u8 p_oldpos, bool p_newPok, bool p_showTeam ) {
         std::vector<IO::inputTarget> res;
@@ -169,19 +171,19 @@ namespace BOX {
                 IO::printRectangle( 0, 140, 255, 192, true, false, WHITE_IDX );
                 IO::printString( IO::regularFont, "Pokémon-Team", 2, 176, true );
                 for( u8 i = 0; i < 6; ++i ) {
-                    res.push_back( IO::inputTarget( 16 + POS_X( 21 + i ), 8 + POS_Y( 21 + i ),
-                                                    16 + POS_X( 21 + i ) + 28, 8 + POS_Y( 21 + i ) + 21 ) );
+                    res.push_back( IO::inputTarget( TEAM_POS_X( 21 + i ), TEAM_POS_Y( 21 + i ),
+                                                    TEAM_POS_X( 21 + i ) + 28, TEAM_POS_Y( 21 + i ) + 21 ) );
                     _ranges.push_back( { oam, res.back( ) } );
 
-                    IO::printChoiceBox( 16 + POS_X( 21 + i ), 8 + POS_Y( 21 + i ),
-                                        16 + POS_X( 21 + i ) + 28, 8 + POS_Y( 21 + i ) + 21, 3,
+                    IO::printChoiceBox( TEAM_POS_X( 21 + i ), TEAM_POS_Y( 21 + i ),
+                                        TEAM_POS_X( 21 + i ) + 28, TEAM_POS_Y( 21 + i ) + 21, 3,
                                         ( 21 + i == p_pos ) ? RED_IDX : GRAY_IDX, false );
                     if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId ) {
                         if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
                             tileCnt = IO::loadPKMNIcon( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId,
-                                                        16 + POS_X( 21 + i ) - 3, 8 + POS_Y( 21 + i ) - 10, oam++, pal / 16, pal % 16, tileCnt );
+                                                        TEAM_POS_X( 21 + i ) - 3, TEAM_POS_Y( 21 + i ) - 10, oam++, pal / 16, pal % 16, tileCnt );
                         } else
-                            tileCnt = IO::loadEggIcon( 16 + POS_X( 21 + i ) - 3, 8 + POS_Y( 21 + i ) - 10, oam++, pal / 16, pal % 16, tileCnt );
+                            tileCnt = IO::loadEggIcon( TEAM_POS_X( 21 + i ) - 3, TEAM_POS_Y( 21 + i ) - 10, oam++, pal / 16, pal % 16, tileCnt );
                         ++pal;
                     } else {
                         IO::Oam->oamBuffer[ oam++ ].isHidden = true;
@@ -195,8 +197,8 @@ namespace BOX {
             }
 
             if( p_showTeam ) for( u8 i = 0; i < 6; ++i ) {
-                res.push_back( IO::inputTarget( 16 + POS_X( 21 + i ), 8 + POS_Y( 21 + i ),
-                                                16 + POS_X( 21 + i ) + 28, 8 + POS_Y( 21 + i ) + 21 ) );
+                res.push_back( IO::inputTarget( TEAM_POS_X( 21 + i ), TEAM_POS_Y( 21 + i ),
+                                                TEAM_POS_X( 21 + i ) + 28, TEAM_POS_Y( 21 + i ) + 21 ) );
                 _ranges.push_back( { oam++, res.back( ) } );
             }
         }
@@ -218,8 +220,8 @@ namespace BOX {
                                 POS_X( p_oldIdx ) + 28, POS_Y( p_oldIdx ) + 21,
                                 3, GRAY_IDX, false );
         } else {
-            IO::printChoiceBox( 16 + POS_X( p_oldIdx ), 8 + POS_Y( p_oldIdx ),
-                                16 + POS_X( p_oldIdx ) + 28, 8 + POS_Y( p_oldIdx ) + 21,
+            IO::printChoiceBox( TEAM_POS_X( p_oldIdx ), TEAM_POS_Y( p_oldIdx ),
+                                TEAM_POS_X( p_oldIdx ) + 28, TEAM_POS_Y( p_oldIdx ) + 21,
                                 3, GRAY_IDX, false );
         }
         if( p_rangeIdx < 21 ) {
@@ -227,15 +229,15 @@ namespace BOX {
                                 POS_X( p_rangeIdx ) + 28, POS_Y( p_rangeIdx ) + 21,
                                 3, RED_IDX, true );
         } else {
-            IO::printChoiceBox( 16 + POS_X( p_rangeIdx ), 8 + POS_Y( p_rangeIdx ),
-                                16 + POS_X( p_rangeIdx ) + 28, 8 + POS_Y( p_rangeIdx ) + 21,
+            IO::printChoiceBox( TEAM_POS_X( p_rangeIdx ), TEAM_POS_Y( p_rangeIdx ),
+                                TEAM_POS_X( p_rangeIdx ) + 28, TEAM_POS_Y( p_rangeIdx ) + 21,
                                 3, RED_IDX, true );
 
-            IO::printRectangle( 16 + POS_X( p_rangeIdx ), 8 + POS_Y( p_rangeIdx ),
-                                16 + POS_X( p_rangeIdx ) + 28, 9 + POS_Y( p_rangeIdx ),
+            IO::printRectangle( TEAM_POS_X( p_rangeIdx ), TEAM_POS_Y( p_rangeIdx ),
+                                TEAM_POS_X( p_rangeIdx ) + 28, 1 + TEAM_POS_Y( p_rangeIdx ),
                                 true, false, WHITE_IDX );
-            IO::printRectangle( 14 + POS_X( p_rangeIdx ), 8 + POS_Y( p_rangeIdx ),
-                                16 + POS_X( p_rangeIdx ), 8 + POS_Y( p_rangeIdx ) + 21,
+            IO::printRectangle( TEAM_POS_X( p_rangeIdx ) - 2, TEAM_POS_Y( p_rangeIdx ),
+                                TEAM_POS_X( p_rangeIdx ), TEAM_POS_Y( p_rangeIdx ) + 21,
                                 true, false, WHITE_IDX );
         }
 
@@ -248,8 +250,8 @@ namespace BOX {
                                 POS_X( p_oldIdx ) + 28, POS_Y( p_oldIdx ) + 21,
                                 3, GRAY_IDX, false );
         } else {
-            IO::printChoiceBox( 16 + POS_X( p_oldIdx ), 8 + POS_Y( p_oldIdx ),
-                                16 + POS_X( p_oldIdx ) + 28, 8 + POS_Y( p_oldIdx ) + 21,
+            IO::printChoiceBox( TEAM_POS_X( p_oldIdx ), TEAM_POS_Y( p_oldIdx ),
+                                TEAM_POS_X( p_oldIdx ) + 28, TEAM_POS_Y( p_oldIdx ) + 21,
                                 3, GRAY_IDX, false );
         }
 
@@ -258,44 +260,44 @@ namespace BOX {
                                 POS_X( p_rangeIdx ) + 28, POS_Y( p_rangeIdx ) + 21,
                                 3, RED_IDX, false );
         } else {
-            IO::printChoiceBox( 16 + POS_X( p_rangeIdx ), 8 + POS_Y( p_rangeIdx ),
-                                16 + POS_X( p_rangeIdx ) + 28, 8 + POS_Y( p_rangeIdx ) + 21,
+            IO::printChoiceBox( TEAM_POS_X( p_rangeIdx ), TEAM_POS_Y( p_rangeIdx ),
+                                TEAM_POS_X( p_rangeIdx ) + 28, TEAM_POS_Y( p_rangeIdx ) + 21,
                                 3, RED_IDX, false );
         }
         return 0;
     }
 
     u32 boxUI::acceptDrop( u8 p_startIdx, u8 p_dropIdx, u8 p_oamIdx ) {
-
-        IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].x = POS_X( p_startIdx ) - 3;
-        IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].y = POS_Y( p_startIdx ) - 10;
-        IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].priority = OBJPRIORITY_0;
-        IO::updateOAM( true );
-
         if( p_startIdx < 21 ) {
+            IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].x = POS_X( p_startIdx ) - 3;
+            IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].y = POS_Y( p_startIdx ) - 10;
             IO::printChoiceBox( POS_X( p_startIdx ), POS_Y( p_startIdx ),
                                 POS_X( p_startIdx ) + 28, POS_Y( p_startIdx ) + 21,
                                 3, RED_IDX, false );
         } else {
-            IO::printChoiceBox( 16 + POS_X( p_startIdx ), 8 + POS_Y( p_startIdx ),
-                                16 + POS_X( p_startIdx ) + 28, 8 + POS_Y( p_startIdx ) + 21,
+            IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].x = TEAM_POS_X( p_startIdx ) - 3;
+            IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].y = TEAM_POS_Y( p_startIdx ) - 10;
+            IO::printChoiceBox( TEAM_POS_X( p_startIdx ), TEAM_POS_Y( p_startIdx ),
+                                TEAM_POS_X( p_startIdx ) + 28, TEAM_POS_Y( p_startIdx ) + 21,
                                 3, RED_IDX, false );
         }
+        IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].priority = OBJPRIORITY_0;
+        IO::updateOAM( true );
 
         if( u8( -1 ) == p_dropIdx )
             return 0;
 
         if( p_startIdx >= 21 || p_dropIdx >= 21 ) {
             if( p_startIdx >= 21 ) {
-                IO::Oam->oamBuffer[ _ranges[ p_dropIdx ].first ].x = 16 + POS_X( p_startIdx ) - 3;
-                IO::Oam->oamBuffer[ _ranges[ p_dropIdx ].first ].y = 8 + POS_Y( p_startIdx ) - 10;
+                IO::Oam->oamBuffer[ _ranges[ p_dropIdx ].first ].x = TEAM_POS_X( p_startIdx ) - 3;
+                IO::Oam->oamBuffer[ _ranges[ p_dropIdx ].first ].y = TEAM_POS_Y( p_startIdx ) - 10;
             } else {
                 IO::Oam->oamBuffer[ _ranges[ p_dropIdx ].first ].x = POS_X( p_startIdx ) - 3;
                 IO::Oam->oamBuffer[ _ranges[ p_dropIdx ].first ].y = POS_Y( p_startIdx ) - 10;
             }
             if( p_dropIdx >= 21 ) {
-                IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].x = 16 + POS_X( p_dropIdx ) - 3;
-                IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].y = 8 + POS_Y( p_dropIdx ) - 10;
+                IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].x = TEAM_POS_X( p_dropIdx ) - 3;
+                IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].y = TEAM_POS_Y( p_dropIdx ) - 10;
             } else {
                 IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].x = POS_X( p_dropIdx ) - 3;
                 IO::Oam->oamBuffer[ _ranges[ p_startIdx ].first ].y = POS_Y( p_dropIdx ) - 10;

@@ -461,11 +461,15 @@ pokemon::stats calcStats( const pokemon::boxPokemon& p_boxdata, u8 p_level ) {
     return res;
 }
 u16 calcLevel( const pokemon::boxPokemon& p_boxdata ) {
-    return 50;
+    for( u16 i = 2; i < 101; ++i )
+        if( EXP[ i - 1 ][ data.m_expType ] > p_boxdata.m_experienceGained )
+            return ( i - 1 );
+    return 100;
 }
 
 pokemon::pokemon( pokemon::boxPokemon p_boxPokemon )
     : m_boxdata( p_boxPokemon ) {
+    getAll( p_boxPokemon.m_speciesId, data );
     m_Level = calcLevel( p_boxPokemon );
     m_stats = calcStats( m_boxdata, m_Level );
     m_status.m_Asleep = m_status.m_Burned = m_status.m_Frozen = m_status.m_Paralyzed = m_status.m_Poisoned = m_status.m_Toxic = false;
