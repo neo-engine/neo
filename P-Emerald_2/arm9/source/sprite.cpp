@@ -268,9 +268,9 @@ namespace IO {
     }
     void copySpriteData( const unsigned int *p_spriteData, const u16 p_tileIdx, const u32 p_spriteDataLen, bool p_bottom ) {
         if( !p_bottom&& p_spriteData )
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER ], p_spriteDataLen );
+            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX[ (u32) p_tileIdx * OFFSET_MULTIPLIER ], p_spriteDataLen );
         else if( p_spriteData )
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER_SUB ], p_spriteDataLen );
+            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX_SUB[ (u32) p_tileIdx * OFFSET_MULTIPLIER_SUB ], p_spriteDataLen );
     }
 
     u16 loadSprite( const u8    p_oamIdx,
@@ -376,11 +376,11 @@ namespace IO {
             if( p_spriteData )
                 for( u32 i = 0; i < p_spriteDataLen; ++i ) {
                     u8 ac = nspD[ i ];
-                    SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER + i ] = 0;
+                    SPRITE_GFX[ (u32) p_tileIdx * OFFSET_MULTIPLIER + i ] = 0;
                     if( ac >> 4 )
-                        SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac >> 4 ) ) << 8;
+                        SPRITE_GFX[ (u32) p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac >> 4 ) ) << 8;
                     if( ac % ( 1 << 4 ) )
-                        SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac % ( 1 << 4 ) ) );
+                        SPRITE_GFX[ (u32) p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac % ( 1 << 4 ) ) );
                 }
         } else {
             vramSetBankI( VRAM_I_LCD );
@@ -392,11 +392,11 @@ namespace IO {
             if( p_spriteData )
                 for( u32 i = 0; i < p_spriteDataLen; ++i ) {
                     u8 ac = nspD[ i ];
-                    SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER + i ] = 0;
+                    SPRITE_GFX_SUB[ (u32) p_tileIdx * OFFSET_MULTIPLIER + i ] = 0;
                     if( ac >> 4 )
-                        SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac >> 4 ) ) << 8;
+                        SPRITE_GFX_SUB[ (u32) p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac >> 4 ) ) << 8;
                     if( ac % ( 1 << 4 ) )
-                        SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac % ( 1 << 4 ) ) );
+                        SPRITE_GFX_SUB[ (u32) p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac % ( 1 << 4 ) ) );
                 }
         }
 

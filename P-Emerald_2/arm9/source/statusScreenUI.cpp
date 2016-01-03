@@ -311,11 +311,11 @@ namespace STS {
         _current = p_current;
         if( p_initTop ) {
             IO::vramSetup( );
-            videoSetMode( MODE_5_2D/* | DISPLAY_BG2_ACTIVE*/ | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
             swiWaitForVBlank( );
             IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
             consoleSetFont( &IO::Top, IO::consoleFont );
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNScreen" );
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         }
         IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
         consoleSetFont( &IO::Bottom, IO::consoleFont );
@@ -346,6 +346,7 @@ namespace STS {
     pokemonData data;
 
     void drawPkmnInformation( pokemon p_pokemon, u8& p_page, bool p_newpok ) {
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
 
         if( !p_pokemon.m_boxdata.m_individualValues.m_isEgg ) {
             BG_PALETTE[ RED_IDX ] = RED;

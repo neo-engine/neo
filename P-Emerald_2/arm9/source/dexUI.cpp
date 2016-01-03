@@ -60,7 +60,7 @@ namespace DEX {
 
     void dexUI::init( ) {
         IO::vramSetup( );
-        videoSetMode( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
 
         IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
         consoleSetFont( &IO::Top, IO::consoleFont );

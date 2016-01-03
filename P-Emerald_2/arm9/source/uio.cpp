@@ -94,17 +94,17 @@ namespace IO {
         vramSetBankE( VRAM_E_MAIN_SPRITE );
 
         videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-
         // set up our top bitmap background
-        bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
+        bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
+        bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
         bgSetPriority( bg3, 3 );
+        bgSetPriority( bg2, 2 );
         bgUpdate( );
     }
     void initVideoSub( ) {
 
         vramSetBankC( VRAM_C_SUB_BG_0x06200000 );
         vramSetBankD( VRAM_D_SUB_SPRITE );
-
 
         /*  Set the video mode on the main screen. */
         videoSetModeSub( MODE_5_2D | // Set the graphics mode to Mode 5
@@ -117,9 +117,16 @@ namespace IO {
     void vramSetup( ) {
         initVideo( );
         initVideoSub( );
-        VRAM_F_CR = VRAM_ENABLE | VRAM_F_BG_EXT_PALETTE | VRAM_OFFSET( 1 );
         vramSetBankG( VRAM_G_LCD );
         vramSetBankH( VRAM_H_LCD );
+    }
+
+    void swapScreens( ) {
+        if( SCREENS_SWAPPED )
+            lcdMainOnTop( );
+        else
+            lcdMainOnBottom( );
+        SCREENS_SWAPPED = !SCREENS_SWAPPED;
     }
 
     void setDefaultConsoleTextColors( u16* p_palette, u8 p_start ) {
@@ -135,8 +142,8 @@ namespace IO {
     }
 
     void drawBorder( ) {
-        dmaCopy( BorderBitmap, bgGetGfxPtr( bg2sub ), 256 * 192 );
-        dmaCopy( BorderPal, BG_PALETTE_SUB, 64 );
+        dmaCopy( BorderBitmap, SCREENS_SWAPPED ? bgGetGfxPtr( bg2 ) : bgGetGfxPtr( bg2sub ), 256 * 192 );
+        dmaCopy( BorderPal, SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB, 64 );
 
         DRAW_TIME = true;
     }
@@ -147,13 +154,16 @@ namespace IO {
         else if( p_newIdx == u8( 255 ) )
             p_newIdx = FS::SAV->m_bgIdx;
 
+        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
+        auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
+
         if( !BGs[ p_newIdx ].m_loadFromRom ) {
-            dmaCopy( BGs[ p_newIdx ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 192 );
-            dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
+            dmaCopy( BGs[ p_newIdx ].m_mainMenu, ptr, 256 * 192 );
+            dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, pal, 256 * 2 );
             FS::SAV->m_bgIdx = p_newIdx;
-        } else if( !FS::readNavScreenData( bgGetGfxPtr( bg3sub ), BGs[ p_newIdx ].m_name.c_str( ), p_newIdx ) ) {
-            dmaCopy( BGs[ 0 ].m_mainMenu, bgGetGfxPtr( bg3sub ), 256 * 256 );
-            dmaCopy( BGs[ 0 ].m_mainMenuPal, BG_PALETTE_SUB, 256 * 2 );
+        } else if( !FS::readNavScreenData( ptr, BGs[ p_newIdx ].m_name.c_str( ), p_newIdx ) ) {
+            dmaCopy( BGs[ 0 ].m_mainMenu, ptr, 256 * 256 );
+            dmaCopy( BGs[ 0 ].m_mainMenuPal, pal, 256 * 2 );
             FS::SAV->m_bgIdx = 0;
         } else
             FS::SAV->m_bgIdx = p_newIdx;
@@ -321,31 +331,31 @@ namespace IO {
         }
     }
 
-    void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_colorIdx, bool p_pressed ) {
-        printChoiceBox( p_x1, p_y1, p_x2, p_y2, p_borderWidth, p_borderWidth, p_colorIdx, p_pressed );
+    void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_colorIdx, bool p_pressed, bool p_bottom ) {
+        printChoiceBox( p_x1, p_y1, p_x2, p_y2, p_borderWidth, p_borderWidth, p_colorIdx, p_pressed, p_bottom );
     }
 
-    void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2, u8 p_colorIdx, bool p_pressed ) {
+    void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2, u8 p_colorIdx, bool p_pressed, bool p_bottom ) {
         if( !p_pressed ) {
             printRectangle( p_x1 + 1, p_y1 + 1, p_x2, p_y2,
-                            true, false, BLACK_IDX );
+                            p_bottom, false, BLACK_IDX );
             printRectangle( p_x1, p_y1, p_x2 - 2, p_y2 - 1,
-                            true, false, p_colorIdx );
+                            p_bottom, false, p_colorIdx );
             printRectangle( p_x1 + 1 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4,
-                            true, false, BLACK_IDX );
+                            p_bottom, false, BLACK_IDX );
             printRectangle( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth2 - 2, p_y2 - p_borderWidth + 3,
-                            true, false, WHITE_IDX );
+                            p_bottom, false, WHITE_IDX );
         } else {
             printRectangle( p_x1, p_y1, p_x2 - 1, p_y2 - 1,
-                            true, false, 0 );
+                            p_bottom, false, 0 );
             printRectangle( p_x1 + 2, p_y1 + 1, p_x2, p_y2,
-                            true, false, p_colorIdx );
+                            p_bottom, false, p_colorIdx );
 
             printRectangle( p_x1 + 3 + p_borderWidth, p_y1 + p_borderWidth, p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4,
-                            true, false, BLACK_IDX );
+                            p_bottom, false, BLACK_IDX );
 
             printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 3,
-                            true, false, WHITE_IDX );
+                            p_bottom, false, WHITE_IDX );
         }
     }
 

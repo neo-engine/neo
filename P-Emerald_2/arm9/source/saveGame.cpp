@@ -56,20 +56,7 @@ namespace FS {
 
         return result;
     }
-
-    BOX::box* readStoredPkmn( FILE* p_file ) {
-        static BOX::box* result = new BOX::box( );
-        pokemon::boxPokemon tmp;
-        for( u16 i = 0; i < MAX_PKMN + 1; ++i ) {
-            u16 cnt; fread( &cnt, sizeof( u16 ), 1, p_file );
-            for( u16 j = 0; j < cnt; ++j ) {
-                fread( &tmp, sizeof( pokemon::boxPokemon ), 1, p_file );
-                result->insert( tmp );
-            }
-        }
-        return result;
-    }
-
+    
     saveGame* readSave( ) {
         FILE* f = open( "./", sav_nam, ".sav" );
         if( !f )
@@ -80,11 +67,6 @@ namespace FS {
         result->m_bag = readBag( f );
         if( !result->m_bag )
             result->m_bag = new BAG::bag( );
-
-        result->m_storedPokemon = readStoredPkmn( f );
-        if( !result->m_storedPokemon )
-            result->m_storedPokemon = new BOX::box( );
-
         close( f );
         return result;
     }
@@ -105,29 +87,15 @@ namespace FS {
         return true;
     }
 
-    bool writeStoredPkmn( BOX::box* p_stPkmn, FILE* p_file ) {
-        if( !p_stPkmn )
-            return false;
-
-        for( u16 i = 0; i < MAX_PKMN + 1; ++i ) {
-            u16 cnt = p_stPkmn->count( i );
-            fwrite( &cnt, sizeof( u16 ), 1, p_file );
-            for( auto tmp : (*p_stPkmn)[ i ] )
-                fwrite( &tmp, sizeof( pokemon::boxPokemon ), 1, p_file );
-        }
-    }
-
     bool writeSave( saveGame* p_saveGame ) {
         FILE* f = open( "./", sav_nam, ".sav", "w" );
         if( !f )
             return 0;
         write( f, p_saveGame, sizeof( saveGame ), 1 );
         writeBag( f, p_saveGame->m_bag );
-        writeStoredPkmn( p_saveGame->m_storedPokemon, f );
         close( f );
         return true;
     }
-
 
     void saveGame::stepIncrease( ) {
         static u8 stepCnt = 0;
