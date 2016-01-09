@@ -147,6 +147,9 @@ namespace FS {
         s8 storePkmn( pokemon p_pokemon ) {
             return storePkmn( p_pokemon.m_boxdata );
         }
+        BOX::box* currentBox( ) {
+            return m_storedPokemon + m_curBox;
+        }
     };
 
     saveGame* readSave( );

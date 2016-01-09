@@ -39,8 +39,12 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "Backward.h"
 #include "Up.h"
 #include "Down.h"
+#include "box_arrow.h"
 
 namespace BOX {
+#define ARROW_ID 1
+#define HELD_PKMN 2
+#define PKMN_START 3
 
     constexpr u16 getBoxColor( u8 p_boxIdx ) {
         return RGB15( 4 * ( ( 41 - p_boxIdx ) % 7 + 1 ),
@@ -65,7 +69,10 @@ namespace BOX {
 
         nextAvailableTileIdx = IO::loadSprite( BACK_ID, BACK_ID, 0, nextAvailableTileIdx,
                                                SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                                               BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, false );
+                                               BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_1, false );
+        nextAvailableTileIdx = IO::loadSprite( ARROW_ID, 0, 1, nextAvailableTileIdx,
+                                               0, 0, 16, 16, box_arrowPal, box_arrowTiles, box_arrowTilesLen,
+                                               false, false, true, OBJPRIORITY_0, false );
 
         IO::updateOAM( false );
         IO::initOAMTable( true );
@@ -120,23 +127,24 @@ namespace BOX {
 
 #define POS_X( i ) ( 30 + 33 * ( (i) % 6 ) )
 #define POS_Y( i ) ( 45 + 25 * ( (i) / 6 ) )
-#define TEAM_POS_X( i ) ( 18 + 16 + 32 * ( (i) % 7 ) )
-#define TEAM_POS_Y( i ) ( 8 + 57 + 28 * ( (i) / 7 ) )
+#define TEAM_POS_X( i ) ( 18 + 16 + 32 * (i) )
+#define TEAM_POS_Y( i ) ( 8 + 57 + 28 * 3 )
 
-    std::vector<IO::inputTarget> boxUI::draw( box* p_box, bool p_showTeam ) {
+    std::vector<IO::inputTarget> boxUI::draw( bool p_showTeam ) {
         BG_PALETTE[ COLOR_IDX ] = getBoxColor( FS::SAV->m_curBox );
 
         std::vector<IO::inputTarget> res;
         _ranges.clear( );
+        box* box = FS::SAV->currentBox( );
 
         //SubScreen stuff
         IO::printChoiceBox( 48, 23, 162, 48, 6, COLOR_IDX, false, false ); //Box name
         IO::printChoiceBox( 165, 23, 204, 48, 6, GRAY_IDX, false, false ); //Change to box view
 
-        IO::printString( IO::regularFont, p_box->m_name, 105 - IO::regularFont->stringWidth( p_box->m_name ) / 2, 28, false );
+        IO::printString( IO::regularFont, box->m_name, 105 - IO::regularFont->stringWidth( box->m_name ) / 2, 28, false );
         IO::printString( IO::regularFont, "Alle", 170, 28, false );
 
-        u8 oam = 3;
+        u8 oam = PKMN_START;
         u8 pal = 4;
         u16 tileCnt = 96;
 
@@ -145,9 +153,9 @@ namespace BOX {
         for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
             res.push_back( IO::inputTarget( POS_X( i ), POS_Y( i ), POS_X( i ) + 28, POS_Y( i ) + 21 ) );
             _ranges.push_back( { oam, res.back( ) } );
-            if( p_box->m_pokemon[ i ].m_speciesId ) {
-                if( !p_box->m_pokemon[ i ].m_individualValues.m_isEgg ) {
-                    tileCnt = IO::loadPKMNIcon( p_box->m_pokemon[ i ].m_speciesId,
+            if( box->m_pokemon[ i ].m_speciesId ) {
+                if( !box->m_pokemon[ i ].m_individualValues.m_isEgg ) {
+                    tileCnt = IO::loadPKMNIcon( box->m_pokemon[ i ].m_speciesId,
                                                 POS_X( i ), POS_Y( i ), oam++, pal / 16, pal % 16, tileCnt, false );
                 } else
                     tileCnt = IO::loadEggIcon( POS_X( i ), POS_Y( i ), oam++, pal / 16, pal % 16, tileCnt, false );
@@ -160,12 +168,12 @@ namespace BOX {
         IO::printRectangle( 0, 140, 255, 192, false, false, WHITE_IDX );
         IO::printString( IO::regularFont, p_showTeam ? "Pokémon-Team" : "Zwischenablage", 2, 176, false );
         for( u8 i = 0; i < 6; ++i ) {
-            res.push_back( IO::inputTarget( TEAM_POS_X( 21 + i ), TEAM_POS_Y( 21 + i ),
-                                            TEAM_POS_X( 21 + i ) + 28, TEAM_POS_Y( 21 + i ) + 21 ) );
+            res.push_back( IO::inputTarget( TEAM_POS_X( i ), TEAM_POS_Y( i ),
+                                            TEAM_POS_X( i ) + 28, TEAM_POS_Y( i ) + 21 ) );
             _ranges.push_back( { oam, res.back( ) } );
 
-            IO::printChoiceBox( TEAM_POS_X( 21 + i ), TEAM_POS_Y( 21 + i ),
-                                TEAM_POS_X( 21 + i ) + 28, TEAM_POS_Y( 21 + i ) + 21, 3,
+            IO::printChoiceBox( TEAM_POS_X( i ), TEAM_POS_Y( i ),
+                                TEAM_POS_X( i ) + 28, TEAM_POS_Y( i ) + 21, 3,
                                 GRAY_IDX, false, false );
 
             u16 species = p_showTeam ? FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId
@@ -175,10 +183,10 @@ namespace BOX {
 
             if( species ) {
                 if( !isEgg )
-                    tileCnt = IO::loadPKMNIcon( species, TEAM_POS_X( 21 + i ) - 3, TEAM_POS_Y( 21 + i ) - 10,
+                    tileCnt = IO::loadPKMNIcon( species, TEAM_POS_X( i ) - 3, TEAM_POS_Y( i ) - 10,
                                                 oam++, pal / 16, pal % 16, tileCnt, false );
                 else
-                    tileCnt = IO::loadEggIcon( TEAM_POS_X( 21 + i ) - 3, TEAM_POS_Y( 21 + i ) - 10,
+                    tileCnt = IO::loadEggIcon( TEAM_POS_X( i ) - 3, TEAM_POS_Y( i ) - 10,
                                                oam++, pal / 16, pal % 16, tileCnt, false );
                 ++pal;
             } else {
@@ -196,53 +204,87 @@ namespace BOX {
         IO::OamTop->oamBuffer[ p_oamIdx ].y = p_touch.py - 16;
         IO::updateOAM( false );
     }
-
-    u8 boxUI::getSprite( u8 p_oldIdx, u8 p_rangeIdx ) {
-        IO::OamTop->oamBuffer[ _ranges[ p_rangeIdx ].first ].priority = OBJPRIORITY_0;
-        return _ranges[ p_rangeIdx ].first;
-    }
-
-    u8 boxUI::acceptTouch( u8 p_oldIdx, u8 p_rangeIdx, bool p_allowTakePkmn ) {
-        return 0;
-    }
-
-    u32 boxUI::acceptDrop( u8 p_startIdx, u8 p_dropIdx, u8 p_oamIdx ) {
-        if( p_startIdx < MAX_PKMN_PER_BOX ) {
-            IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].x = POS_X( p_startIdx ) - 3;
-            IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].y = POS_Y( p_startIdx ) - 10;
-        } else {
-            IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].x = TEAM_POS_X( p_startIdx ) - 3;
-            IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].y = TEAM_POS_Y( p_startIdx ) - 10;
+    /*
+        u8 boxUI::getSprite( u8 p_oldIdx, u8 p_rangeIdx ) {
+            IO::OamTop->oamBuffer[ _ranges[ p_rangeIdx ].first ].priority = OBJPRIORITY_0;
+            return _ranges[ p_rangeIdx ].first;
         }
-        IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].priority = OBJPRIORITY_0;
-        IO::updateOAM( false );
 
-        if( u8( -1 ) == p_dropIdx )
+        u8 boxUI::acceptTouch( u8 p_oldIdx, u8 p_rangeIdx, bool p_allowTakePkmn ) {
             return 0;
-
-        if( p_startIdx >= MAX_PKMN_PER_BOX || p_dropIdx >= MAX_PKMN_PER_BOX ) {
-            if( p_startIdx >= MAX_PKMN_PER_BOX ) {
-                IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ].x = TEAM_POS_X( p_startIdx ) - 3;
-                IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ].y = TEAM_POS_Y( p_startIdx ) - 10;
-            } else {
-                IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ].x = POS_X( p_startIdx ) - 3;
-                IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ].y = POS_Y( p_startIdx ) - 10;
-            }
-            if( p_dropIdx >= MAX_PKMN_PER_BOX ) {
-                IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].x = TEAM_POS_X( p_dropIdx ) - 3;
-                IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].y = TEAM_POS_Y( p_dropIdx ) - 10;
-            } else {
-                IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].x = POS_X( p_dropIdx ) - 3;
-                IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].y = POS_Y( p_dropIdx ) - 10;
-            }
-
-            std::swap( IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ], IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ] );
-            IO::updateOAM( false );
         }
-        return 0;
+
+        u32 boxUI::acceptDrop( u8 p_startIdx, u8 p_dropIdx, u8 p_oamIdx ) {
+            if( p_startIdx < MAX_PKMN_PER_BOX ) {
+                IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].x = POS_X( p_startIdx ) - 3;
+                IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].y = POS_Y( p_startIdx ) - 10;
+            } else {
+                IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].x = TEAM_POS_X( p_startIdx ) - 3;
+                IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].y = TEAM_POS_Y( p_startIdx ) - 10;
+            }
+            IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].priority = OBJPRIORITY_0;
+            IO::updateOAM( false );
+
+            if( u8( -1 ) == p_dropIdx )
+                return 0;
+
+            if( p_startIdx >= MAX_PKMN_PER_BOX || p_dropIdx >= MAX_PKMN_PER_BOX ) {
+                if( p_startIdx >= MAX_PKMN_PER_BOX ) {
+                    IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ].x = TEAM_POS_X( p_startIdx ) - 3;
+                    IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ].y = TEAM_POS_Y( p_startIdx ) - 10;
+                } else {
+                    IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ].x = POS_X( p_startIdx ) - 3;
+                    IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ].y = POS_Y( p_startIdx ) - 10;
+                }
+                if( p_dropIdx >= MAX_PKMN_PER_BOX ) {
+                    IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].x = TEAM_POS_X( p_dropIdx ) - 3;
+                    IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].y = TEAM_POS_Y( p_dropIdx ) - 10;
+                } else {
+                    IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].x = POS_X( p_dropIdx ) - 3;
+                    IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].y = POS_Y( p_dropIdx ) - 10;
+                }
+
+                std::swap( IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ], IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ] );
+                IO::updateOAM( false );
+            }
+            return 0;
+        }
+    */
+    void boxUI::select( u8 p_index ) {
+        if( p_index == (u8) -1 ) {
+            IO::OamTop->oamBuffer[ ARROW_ID ].isHidden = true;
+            IO::updateOAM( false );
+            drawAllBoxStatus( );
+            return;
+        }
+        u8 x, y;
+        if( p_index < MAX_PKMN_PER_BOX ) {
+            x = POS_X( p_index );
+            y = POS_Y( p_index );
+        } else {
+            x = TEAM_POS_X( p_index - MAX_PKMN_PER_BOX ) - 3;
+            y = TEAM_POS_Y( p_index - MAX_PKMN_PER_BOX ) - 10;
+        }
+        bool holding = !IO::OamTop->oamBuffer[ HELD_PKMN ].isHidden;
+        IO::OamTop->oamBuffer[ ARROW_ID ].x = x + 20 - 5 * holding;
+        IO::OamTop->oamBuffer[ ARROW_ID ].y = y + 4 - 5 * holding;
+        IO::OamTop->oamBuffer[ ARROW_ID ].isHidden = false;
+
+        IO::OamTop->oamBuffer[ p_index + PKMN_START ].x = x;
+        IO::OamTop->oamBuffer[ p_index + PKMN_START ].y = y;
+        //Held pkmn
+        IO::OamTop->oamBuffer[ HELD_PKMN ].x = x - 5;
+        IO::OamTop->oamBuffer[ HELD_PKMN ].y = y - 5;
+        IO::updateOAM( false );
     }
 
-    void boxUI::select( u8 p_index ) {
-
+    void boxUI::takePkmn( u8 p_index ) {
+        if( p_index != (u8) -1 )
+            std::swap( IO::OamTop->oamBuffer[ HELD_PKMN ], IO::OamTop->oamBuffer[ p_index + PKMN_START ] );
+        else {
+            memset( &IO::OamTop->oamBuffer[ HELD_PKMN ], 0, sizeof( SpriteEntry ) );
+            IO::OamTop->oamBuffer[ HELD_PKMN ].isHidden = true;
+        }
+        select( p_index );
     }
 }

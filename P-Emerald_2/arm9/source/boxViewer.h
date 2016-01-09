@@ -37,6 +37,15 @@ namespace BOX {
     private:
         std::vector<IO::inputTarget> _ranges;
         u8 _atHandOam;
+        u8 _selectedIdx;
+        std::pair<u8, u8> _heldPokmPos; //(box, pos in box); (_, 19..24) for team pkmn
+        pokemon _heldPkmn;
+        bool _showTeam;
+        boxUI _boxUI;
+
+        void select( u8 p_index );
+        void takePkmn( u8 p_index );
+        void dropPkmn( u8 p_index );
     public:
         void run( bool p_allowTakePkmn = false );
     };

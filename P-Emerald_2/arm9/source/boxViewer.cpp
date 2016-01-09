@@ -38,10 +38,11 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 namespace BOX {
 #define TRESHOLD 10
 
+#define HAS_SELECTION( no, yes ) do if( _selectedIdx == (u8) -1 ) { no; } else { yes; } while (false)
     void boxViewer::run( bool p_allowTakePkmn ) {
-        boxUI boxUI;
         _atHandOam = 0;
-        _ranges = boxUI.draw( FS::SAV->m_storedPokemon + FS::SAV->m_curBox, p_allowTakePkmn );
+        _selectedIdx = (u8) -1;
+        _ranges = _boxUI.draw( p_allowTakePkmn );
 
         touchPosition touch;
         u8 curr = -1, start = -1; //Indices the held sprite is covering
@@ -53,11 +54,11 @@ namespace BOX {
             bool newPok;
 
             if( _atHandOam ) {
-                boxUI.updateAtHand( touch, _atHandOam );
+                _boxUI.updateAtHand( touch, _atHandOam );
             }
 
             if( _atHandOam && !( touch.px | touch.py ) ) { //Player drops the sprite at hand
-                boxUI.acceptDrop( start, curr, _atHandOam );
+                //boxUI.acceptDrop( start, curr, _atHandOam );
                 _atHandOam = 0;
                 //Count the non-fainted team pkmn
                 u8 cnt = 0;
@@ -125,14 +126,32 @@ namespace BOX {
                 || GET_AND_WAIT( KEY_X )
                 || GET_AND_WAIT_C( SCREEN_WIDTH - 12, SCREEN_HEIGHT - 10, 16 ) ) {
                 break;
-            }
-            if( GET_AND_WAIT( KEY_LEFT ) ) {
+            } else if( GET_AND_WAIT( KEY_L ) ) {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
-                boxUI.draw( FS::SAV->m_storedPokemon + FS::SAV->m_curBox, p_allowTakePkmn );
-            }
-            if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                select( _selectedIdx = (u8) -1 );
+                _boxUI.draw( p_allowTakePkmn );
+            } else if( GET_AND_WAIT( KEY_R ) ) {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
-                boxUI.draw( FS::SAV->m_storedPokemon + FS::SAV->m_curBox, p_allowTakePkmn );
+                select( _selectedIdx = (u8) -1 );
+                _boxUI.draw( p_allowTakePkmn );
+            } else if( GET_AND_WAIT( KEY_DOWN ) ) {
+                HAS_SELECTION( _selectedIdx = 0,
+                               _selectedIdx = ( _selectedIdx + 6 ) % ( MAX_PKMN_PER_BOX + 6 ) );
+                select( _selectedIdx );
+            } else if( GET_AND_WAIT( KEY_UP ) ) {
+                HAS_SELECTION( _selectedIdx = 0,
+                               _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX ) % ( MAX_PKMN_PER_BOX + 6 ) );
+                select( _selectedIdx );
+            } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                HAS_SELECTION( _selectedIdx = 0,
+                               _selectedIdx = ( _selectedIdx + 1 ) % ( MAX_PKMN_PER_BOX + 6 ) );
+                select( _selectedIdx );
+            } else if( GET_AND_WAIT( KEY_LEFT ) ) {
+                HAS_SELECTION( _selectedIdx = 0,
+                               _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 5 ) % ( MAX_PKMN_PER_BOX + 6 ) );
+                select( _selectedIdx );
+            } else if( GET_AND_WAIT( KEY_A ) ) {
+                HAS_SELECTION( , takePkmn( _selectedIdx ) );
             }
 
             /*else if( GET_AND_WAIT( KEY_RIGHT ) ) {
@@ -201,5 +220,41 @@ namespace BOX {
             if( !rangeChanged )
                 curr = -1; */
         }
+    }
+    void boxViewer::select( u8 p_index ) {
+        if( p_index == (u8) -1 ) {
+            dropPkmn( p_index );
+            _boxUI.select( p_index );
+            return;
+        }
+
+        _boxUI.select( p_index );
+    }
+
+    void boxViewer::takePkmn( u8 p_index ) {
+        if( p_index > MAX_PKMN_PER_BOX + 6 )
+            return;
+        //New spot is empty -> drop every held pkmn
+        if( p_index < MAX_PKMN_PER_BOX
+            && !FS::SAV->currentBox( )->operator[]( p_index ).m_speciesId ) {
+            dropPkmn( p_index );
+            return;
+        }
+        if( p_index > MAX_PKMN_PER_BOX && _showTeam
+            && !FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ].m_boxdata.m_speciesId ) {
+            dropPkmn( p_index );
+            return;
+        }
+        if( p_index > MAX_PKMN_PER_BOX && !_showTeam
+            && !FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ].m_speciesId ) {
+            dropPkmn( p_index );
+            return;
+        }
+        //Current spot is non-empty
+
+        _boxUI.takePkmn( p_index );
+    }
+    void boxViewer::dropPkmn( u8 p_index ) {
+        _boxUI.takePkmn( p_index );
     }
 }
