@@ -114,6 +114,13 @@ namespace FS {
             }
             return cnt;
         }
+        u8 getTeamPkmnCount( ) {
+            u8 res = 0;
+            for( u8 i = 0; i < 6; ++i )
+                res += !!m_pkmnTeam[ i ].m_boxdata.m_speciesId;
+            return res;
+        }
+
         BATTLE::battleTrainer* getBattleTrainer( ) {
             tmp.clear( );
             for( u8 i = 0; i < 6; ++i )
@@ -133,7 +140,7 @@ namespace FS {
         }
 
         //Return the idx of the resulting Box
-        s8 storePkmn( pokemon::boxPokemon p_pokemon ) {
+        s8 storePkmn( const pokemon::boxPokemon& p_pokemon ) {
             s8 idx = m_storedPokemon[ m_curBox ].getFirstFreeSpot( );
             u8 i = 0;
             for( ; idx == -1 && i < MAX_BOXES; )
@@ -144,10 +151,10 @@ namespace FS {
             m_storedPokemon[ m_curBox ][ idx ] = p_pokemon;
             return m_curBox;
         }
-        s8 storePkmn( pokemon p_pokemon ) {
+        s8 storePkmn( const pokemon& p_pokemon ) {
             return storePkmn( p_pokemon.m_boxdata );
         }
-        BOX::box* currentBox( ) {
+        BOX::box* getCurrentBox( ) {
             return m_storedPokemon + m_curBox;
         }
     };

@@ -360,7 +360,7 @@ namespace BAG {
     }
 
     void drawTop( u8 p_page ) {
-        dmaCopy( bag_bg_upperBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
+        dmaCopy( bag_bg_upperBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         dmaCopy( bag_bg_upperPal, BG_PALETTE, 256 * 2 );
         initColors( );
 

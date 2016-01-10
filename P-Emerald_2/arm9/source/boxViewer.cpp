@@ -43,6 +43,8 @@ namespace BOX {
         _atHandOam = 0;
         _selectedIdx = (u8) -1;
         _ranges = _boxUI.draw( p_allowTakePkmn );
+        _topScreenDirty = false;
+        _showTeam = p_allowTakePkmn;
 
         touchPosition touch;
         u8 curr = -1, start = -1; //Indices the held sprite is covering
@@ -129,10 +131,12 @@ namespace BOX {
             } else if( GET_AND_WAIT( KEY_L ) ) {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
                 select( _selectedIdx = (u8) -1 );
+                _topScreenDirty = false;
                 _boxUI.draw( p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_R ) ) {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
                 select( _selectedIdx = (u8) -1 );
+                _topScreenDirty = false;
                 _boxUI.draw( p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
                 HAS_SELECTION( _selectedIdx = 0,
@@ -227,8 +231,24 @@ namespace BOX {
             _boxUI.select( p_index );
             return;
         }
+        pokemon selection;
+        if( p_index < MAX_PKMN_PER_BOX )
+            selection = ( *FS::SAV->getCurrentBox( ) )[ p_index ];
+        else if( _showTeam )
+            selection = FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ];
+        else
+            selection = FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
 
         _boxUI.select( p_index );
+        if( selection.m_boxdata.m_speciesId ) {
+            if( !_topScreenDirty )
+                _stsUI->init( );
+            _stsUI->draw( selection, 0, true );
+            _topScreenDirty = true;
+        } else if( _topScreenDirty ) {
+            _boxUI.drawAllBoxStatus( );
+            _topScreenDirty = false;
+        }
     }
 
     void boxViewer::takePkmn( u8 p_index ) {
@@ -236,7 +256,7 @@ namespace BOX {
             return;
         //New spot is empty -> drop every held pkmn
         if( p_index < MAX_PKMN_PER_BOX
-            && !FS::SAV->currentBox( )->operator[]( p_index ).m_speciesId ) {
+            && !FS::SAV->getCurrentBox( )->operator[]( p_index ).m_speciesId ) {
             dropPkmn( p_index );
             return;
         }

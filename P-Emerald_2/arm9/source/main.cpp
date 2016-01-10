@@ -430,20 +430,9 @@ OUT:
                    && ( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ],
                                         IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ], 16 ) ) ) {
 
-            std::vector<pokemon> tmp;
-            for( u8 i = 0; i < 6; ++i )
-                if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                    tmp.push_back( FS::SAV->m_pkmnTeam[ i ] );
-                else
-                    break;
-            STS::regStsScreenUI rsUI( &tmp );
-            STS::regStsScreen sts( 0, &rsUI );
             ANIMATE_MAP = false;
-
+            STS::statusScreen sts( 0 );
             sts.run( );
-
-            for( u8 i = 0; i < tmp.size( ); ++i )
-                FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
 
             IO::clearScreenConsole( true, true );
             IO::drawSub( true );
@@ -479,7 +468,7 @@ OUT:
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
                         a = pokemon( 0, 133 + i, 0,
                                      50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
-                                     !FS::SAV->m_isMale );
+                                     !FS::SAV->m_isMale, 2 );
                         a.m_stats.m_acHP *= i / 5.0;
                         a.m_boxdata.m_experienceGained += 750;
 
@@ -494,10 +483,22 @@ OUT:
                         a.m_boxdata.m_holdItem = I_DURIN_BERRY + i;
 
                         FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
-
-                        for( u8 j = 0; j < 6; ++j )
-                            FS::SAV->storePkmn( FS::SAV->m_pkmnTeam[ i ] );
                     }
+
+                    for( u16 j = 0; j < 649; ++j ) {
+                        auto a = pokemon( j + 1, 50, 0, 10 ).m_boxdata;
+                        s8 res = FS::SAV->storePkmn( a );
+                        if( a.isShiny( ) ) {
+                            IO::messageBox( "YAAAY" );
+                            s8 idx = FS::SAV->getCurrentBox( )->getFirstFreeSpot( );
+                            if( idx == -1 && !( *FS::SAV->getCurrentBox( ) )[ 17 ].isShiny( ) )
+                                IO::messageBox( "Lost :(" );
+                            else if( !( *FS::SAV->getCurrentBox( ) )[ idx - 1 ].isShiny( ) )
+                                IO::messageBox( "Lost :(" );
+                            break;
+                        }
+                    }
+
                     FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
                     FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
                     FS::SAV->m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;

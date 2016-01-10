@@ -31,6 +31,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "box.h"
 #include "boxUI.h"
+#include "statusScreenUI.h"
 
 namespace BOX {
     class boxViewer {
@@ -41,12 +42,20 @@ namespace BOX {
         std::pair<u8, u8> _heldPokmPos; //(box, pos in box); (_, 19..24) for team pkmn
         pokemon _heldPkmn;
         bool _showTeam;
+        bool _topScreenDirty;
         boxUI _boxUI;
+        STS::boxStsScreenUI* _stsUI;
 
         void select( u8 p_index );
         void takePkmn( u8 p_index );
         void dropPkmn( u8 p_index );
     public:
+        boxViewer( ) {
+            _stsUI = new STS::boxStsScreenUI;
+        }
+        ~boxViewer( ) {
+            delete _stsUI;
+        }
         void run( bool p_allowTakePkmn = false );
     };
 }

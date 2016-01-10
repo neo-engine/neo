@@ -94,14 +94,24 @@ namespace BOX {
     }
 
     void boxUI::drawAllBoxStatus( bool p_bottom ) {
-        FS::readPictureData( bgGetGfxPtr( p_bottom ? IO::bg3 : IO::bg3sub ),
-                             "nitro:/PICS/", "Clear", 24, 49152, !p_bottom );
+        dmaFillWords( 0, bgGetGfxPtr( !p_bottom ? IO::bg2sub : IO::bg2 ), 256 * 192 );
+        dmaFillWords( 0, bgGetGfxPtr( !p_bottom ? IO::bg3sub : IO::bg3 ), 256 * 192 );
+        IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
+        consoleSetFont( &IO::Bottom, IO::consoleFont );
+        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+        consoleSelect( &IO::Bottom );
+        consoleClear( );
+
+        auto pal = BG_PAL( !p_bottom );
+        pal[ 0 ] = WHITE;
+
+        IO::initOAMTable( !p_bottom );
         IO::printString( IO::regularFont, "Alle Boxen", 4, 3, !p_bottom );
         u8 w = 32, h = 24; //width and heigth
         u16 pkmncnt = 0;
         for( u8 i = 0; i < 7; ++i )
             for( u8 j = 0; j < 6; ++j ) {
-                BG_PALETTE_SUB[ 128 + j * 7 + i ] = getBoxColor( j * 7 + i );
+                pal[ 128 + j * 7 + i ] = getBoxColor( j * 7 + i );
                 u8 x = 2 + 36 * i;
                 u8 y = 22 + 28 * j;
                 bool prsd = j * 7 + i == FS::SAV->m_curBox;
@@ -135,7 +145,7 @@ namespace BOX {
 
         std::vector<IO::inputTarget> res;
         _ranges.clear( );
-        box* box = FS::SAV->currentBox( );
+        box* box = FS::SAV->getCurrentBox( );
 
         //SubScreen stuff
         IO::printChoiceBox( 48, 23, 162, 48, 6, COLOR_IDX, false, false ); //Box name

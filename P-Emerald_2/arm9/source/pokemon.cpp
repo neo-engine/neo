@@ -218,6 +218,10 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
     else if( p_shiny == 1 )
         while( isShiny( ) )
             LastPID = m_pid = rand( );
+    else if( p_shiny ) { //Try p_shiny - 2 additional times to generate a shiny PId
+        for( u8 i = 0; i < p_shiny - 2 && !isShiny( ); ++i )
+            LastPID = m_pid = rand( );
+    }
     m_checksum = 0;
     m_speciesId = p_pkmnId;
 
@@ -343,6 +347,10 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
     else if( p_shiny == 1 )
         while( isShiny( ) )
             LastPID = m_pid = rand( );
+    else if( p_shiny ) { //Try p_shiny - 2 additional times to generate a shiny PId
+        for( u8 i = 0; i < p_shiny - 2 && !isShiny( ); ++i )
+            LastPID = m_pid = rand( );
+    }
     m_checksum = 0;
     m_speciesId = p_pkmnId;
 
@@ -489,7 +497,7 @@ pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const wchar_t* p_name, u16 p_level
 }
 
 bool pokemon::boxPokemon::isShiny( ) const {
-    return ( ( ( ( m_oTId ^ m_oTSid ) >> 3 ) ^ ( ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) ) ) >> 3 ) == 0 );
+    return !( ( ( ( m_oTId ^ m_oTSid ) >> 3 ) ^ ( ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) ) ) >> 3 ) );
 }
 bool pokemon::boxPokemon::isCloned( ) const {
     return ( ( m_pid >> 16 )&( m_pid % ( 1 << 16 ) ) ) < ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) );
