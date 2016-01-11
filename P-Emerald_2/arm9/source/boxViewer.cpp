@@ -40,10 +40,11 @@ namespace BOX {
 
 #define HAS_SELECTION( no, yes ) do if( _selectedIdx == (u8) -1 ) { no; } else { yes; } while (false)
     void boxViewer::run( bool p_allowTakePkmn ) {
+#define CLEAN ( _topScreenDirty = false, _curPage = 0, _selectedIdx = (u8) -1 )
         _atHandOam = 0;
-        _selectedIdx = (u8) -1;
         _ranges = _boxUI.draw( p_allowTakePkmn );
-        _topScreenDirty = false;
+        CLEAN;
+
         _showTeam = p_allowTakePkmn;
 
         touchPosition touch;
@@ -130,13 +131,11 @@ namespace BOX {
                 break;
             } else if( GET_AND_WAIT( KEY_L ) ) {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
-                select( _selectedIdx = (u8) -1 );
-                _topScreenDirty = false;
+                CLEAN;
                 _boxUI.draw( p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_R ) ) {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
-                select( _selectedIdx = (u8) -1 );
-                _topScreenDirty = false;
+                CLEAN;
                 _boxUI.draw( p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
                 HAS_SELECTION( _selectedIdx = 0,
@@ -156,6 +155,9 @@ namespace BOX {
                 select( _selectedIdx );
             } else if( GET_AND_WAIT( KEY_A ) ) {
                 HAS_SELECTION( , takePkmn( _selectedIdx ) );
+            } else if( GET_AND_WAIT( KEY_SELECT ) ) {
+                _curPage = ( _curPage + 1 ) % 4;
+                select( _selectedIdx );
             }
 
             /*else if( GET_AND_WAIT( KEY_RIGHT ) ) {
@@ -243,7 +245,7 @@ namespace BOX {
         if( selection.m_boxdata.m_speciesId ) {
             if( !_topScreenDirty )
                 _stsUI->init( );
-            _stsUI->draw( selection, 0, true );
+            _stsUI->draw( selection, _curPage, true );
             _topScreenDirty = true;
         } else if( _topScreenDirty ) {
             _boxUI.drawAllBoxStatus( );

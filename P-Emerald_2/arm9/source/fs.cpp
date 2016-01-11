@@ -438,6 +438,7 @@ namespace FS {
         memset( buffer, 0, sizeof( buffer ) );
         FS::read( f, buffer, sizeof( char ), 48 );
         FS::close( f );
+        buffer[ strlen( buffer ) - 1 ] = 0;
         return buffer;
     }
 }

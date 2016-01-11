@@ -43,6 +43,7 @@ namespace BOX {
         pokemon _heldPkmn;
         bool _showTeam;
         bool _topScreenDirty;
+        u8 _curPage;
         boxUI _boxUI;
         STS::boxStsScreenUI* _stsUI;
 
