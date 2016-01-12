@@ -360,6 +360,9 @@ namespace STS {
         dmaFillWords( 0, bgGetGfxPtr( p_bottom ? IO::bg2sub : IO::bg2 ), 256 * 192 );
         auto Oam = p_bottom ? IO::Oam : IO::OamTop;
         auto pal = BG_PAL( p_bottom );
+        if( p_newpok )
+            IO::loadItemIcon( !p_pokemon.m_boxdata.m_ball ? "Pokeball" : ItemList[ p_pokemon.m_boxdata.m_ball ]->m_itemName,
+                              -6, 26, SHINY_IDX, SHINY_PAL, 1000, p_bottom );
 
         if( !p_pokemon.m_boxdata.m_individualValues.m_isEgg ) {
             pal[ RED_IDX ] = RED;
@@ -381,7 +384,7 @@ namespace STS {
                     IO::regularFont->setColor( BLUE_IDX, 1 );
                     IO::regularFont->setColor( BLUE2_IDX, 2 );
                     IO::regularFont->printChar( 136, 246, 8, p_bottom );
-                } else {
+                } else if( G == -1 ) {
                     IO::regularFont->setColor( RED_IDX, 1 );
                     IO::regularFont->setColor( RED2_IDX, 2 );
                     IO::regularFont->printChar( 137, 246, 8, p_bottom );
@@ -404,24 +407,24 @@ namespace STS {
                 if( p_newpok ) {
                     IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 2, 152,
                                       ITEM_ICON_IDX, ITEM_ICON_PAL, Oam->oamBuffer[ ITEM_ICON_IDX ].gfxIndex, p_bottom );
-
-                    if( p_pokemon.m_boxdata.isShiny( ) ) {
-                        IO::regularFont->setColor( RED_IDX, 1 );
-                        IO::regularFont->setColor( RED2_IDX, 2 );
-                        IO::regularFont->printString( "*", 1, 51, p_bottom );
-                        IO::regularFont->setColor( WHITE_IDX, 1 );
-                        IO::regularFont->setColor( GRAY_IDX, 2 );
-                    }
-
-                    IO::loadItemIcon( !p_pokemon.m_boxdata.m_ball ? "Pokeball" : ItemList[ p_pokemon.m_boxdata.m_ball ]->m_itemName,
-                                      -6, 26, SHINY_IDX, SHINY_PAL, 1000, p_bottom );
-
                 }
             } else {
                 IO::regularFont->setColor( BLACK_IDX, 1 );
                 IO::regularFont->setColor( 0, 2 );
                 IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 56, 168, p_bottom );
                 Oam->oamBuffer[ ITEM_ICON_IDX ].isHidden = true;
+            }
+            if( p_newpok ) {
+                if( p_pokemon.m_boxdata.isShiny( ) ) {
+                    IO::regularFont->setColor( RED_IDX, 1 );
+                    IO::regularFont->setColor( RED2_IDX, 2 );
+                    IO::regularFont->printString( "*", 1, 51, p_bottom );
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( GRAY_IDX, 2 );
+                }
+                if( p_pokemon.m_boxdata.isCloned( ) ) {
+                    IO::regularFont->printString( "*", 20, 32, p_bottom );
+                }
             }
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
@@ -440,7 +443,7 @@ namespace STS {
 
             u16 exptype = data.m_expType;
 
-            printf( "EP(%3lu%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ) * 100 /
+            printf( "EP %3lu%%\nKP %3i%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ) * 100 /
                     ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
                     p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::displayHP( 100, 101, 46, 80, 97, 98, false, 50, 56, p_bottom );
@@ -451,7 +454,7 @@ namespace STS {
                            ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62, p_bottom );
 
         } else {
-            p_page = 0;
+            p_page = -1;
             pal[ WHITE_IDX ] = WHITE;
             IO::regularFont->setColor( WHITE_IDX, 1 );
 
@@ -474,7 +477,7 @@ namespace STS {
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
                         0, 0, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
 
-        IO::regularFont->printString( "Pokémon-Info", 36, 4, p_bottom );
+        IO::regularFont->printString( "Statuswerte", 36, 4, p_bottom );
         if( !( currPkmn.m_boxdata.m_individualValues.m_isEgg ) ) {
 
             pal[ RED_IDX ] = RED;
@@ -593,7 +596,7 @@ namespace STS {
             if( !currPkmn.m_boxdata.m_moves[ i ] )
                 continue;
             Type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
-            IO::loadTypeIcon( t, 126, 45 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ),
+            IO::loadTypeIcon( t, 222, 42 + 30 * i, TYPE_IDX + i, TYPE_PAL( i ),
                               Oam->oamBuffer[ TYPE_IDX + i ].gfxIndex, p_bottom );
 
             pal[ COLOR_IDX ] = GREEN;
@@ -606,12 +609,16 @@ namespace STS {
             }
 
             IO::regularFont->printString( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ),
-                                          159, 39 + 32 * i, p_bottom );
+                                          128, 34 + 30 * i, p_bottom );
 
-            printf( "\n\n    AP %2hhu""/""%2hhu ", currPkmn.m_boxdata.m_acPP[ i ],
-                    s8( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + currPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
-            printf( "\n\n" );
+            IO::regularFont->setColor( GRAY_IDX, 1 );
+            IO::regularFont->setColor( WHITE_IDX, 2 );
+            sprintf( buffer, "AP %2hhu/%2hhu ", currPkmn.m_boxdata.m_acPP[ i ],
+                     s8( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + currPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+            IO::regularFont->printString( buffer, 135, 49 + 30 * i, p_bottom );
         }
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
     }
 
     void drawPkmnRibbons( const pokemon& p_pokemon, bool p_bottom ) {
@@ -696,7 +703,7 @@ namespace STS {
         IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 94, p_bottom, 14 );
         sprintf( buffer, "%s.",
                  FS::getLoc( currPkmn.m_boxdata.m_gotPlace ) );
-        IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 108, p_bottom, 14 );
+        IO::regularFont->printMaxString( buffer, std::max( (u32) 124, 250 - IO::regularFont->stringWidth( buffer ) ), 108, p_bottom, 254 );
 
         if( currPkmn.m_boxdata.m_gotDate[ 0 ] ) {
             sprintf( buffer, "Geschl. %02d.%02d.20%02d,",
@@ -711,6 +718,50 @@ namespace STS {
             IO::regularFont->printString( "Schicksalhafte Begeg.", 102, 143, true );
         else if( currPkmn.m_boxdata.m_fateful )
             IO::regularFont->printString( "Off. schicksal. Begeg.", 102, 143, true );
+    }
+
+    void drawPkmnNature( const pokemon& p_pokemon, bool p_bottom ) {
+        auto currPkmn = p_pokemon;
+        auto Oam = p_bottom ? IO::Oam : IO::OamTop;
+
+        IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
+                        0, 0, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
+        IO::regularFont->printString( "Pokémon-Info", 36, 4, p_bottom );
+
+        IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
+
+        sprintf( buffer, "Mag %s""e PokéRg.", TasteList[ currPkmn.m_boxdata.getTasteStr( ) ].c_str( ) );
+        IO::regularFont->printString( buffer, 106, 34, p_bottom );
+
+        sprintf( buffer, "Sehr %s; %s.", NatureList[ currPkmn.m_boxdata.getNature( ) ].c_str( ),
+                 PersonalityList[ currPkmn.m_boxdata.getPersonality( ) ].c_str( ) );
+        auto str = std::string( buffer );
+        auto nStr = FS::breakString( str, IO::regularFont, 122 );
+        IO::regularFont->printString( nStr.c_str( ), 122, 52, p_bottom, 14, -2 );
+
+        auto acAbility = ability( currPkmn.m_boxdata.m_ability );
+        u8 wd = IO::regularFont->stringWidth( acAbility.m_abilityName.c_str( ) );
+        if( 253 - wd > 140 )
+            IO::regularFont->printString( "Fäh.", 126, 98, p_bottom );
+        u8 nlCnt = 0;
+        nStr = FS::breakString( acAbility.m_flavourText, IO::regularFont, 125 );
+        for( auto c : nStr )
+            if( c == '\n' )
+                nlCnt++;
+        IO::regularFont->printString( nStr.c_str( ), 124,
+                                      112, p_bottom, u8( 16 - 2 * nlCnt ), 4 );
+
+        if( currPkmn.m_boxdata.m_oTisFemale ) {
+            IO::regularFont->setColor( RED_IDX, 1 );
+            IO::regularFont->setColor( RED2_IDX, 2 );
+        } else {
+            IO::regularFont->setColor( BLUE_IDX, 1 );
+            IO::regularFont->setColor( BLUE2_IDX, 2 );
+        }
+        IO::regularFont->printString( acAbility.m_abilityName.c_str( ),
+                                      253 - wd,
+                                      98, p_bottom );
+        IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
     }
 
     // Draw extra information about the specified move
@@ -904,7 +955,8 @@ namespace STS {
         auto currPkmn = p_pokemon;
 
         drawPkmnInformation( currPkmn, p_page, p_newpok, false );
-
+        if( p_page == (u8) -1 )
+            p_page = 0;
         switch( p_page ) {
             case 0:
                 drawPkmnStats( currPkmn, false );
@@ -1253,17 +1305,22 @@ namespace STS {
 
         IO::setDefaultConsoleTextColors( BG_PALETTE_SUB, 6 );
         drawPkmnInformation( p_pokemon, p_page, p_newpok, true );
+        if( p_page == (u8) -1 )
+            p_page = 2;
         switch( p_page ) {
             case 0:
                 drawPkmnGeneralData( p_pokemon, true );
                 break;
             case 1:
-                drawPkmnStats( p_pokemon, true );
+                drawPkmnNature( p_pokemon, true );
                 break;
             case 2:
-                drawPkmnMoves( p_pokemon, true );
+                drawPkmnStats( p_pokemon, true );
                 break;
             case 3:
+                drawPkmnMoves( p_pokemon, true );
+                break;
+            case 4:
                 drawPkmnRibbons( p_pokemon, true );
                 break;
             default:

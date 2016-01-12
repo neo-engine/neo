@@ -40,10 +40,12 @@ namespace BOX {
 
 #define HAS_SELECTION( no, yes ) do if( _selectedIdx == (u8) -1 ) { no; } else { yes; } while (false)
     void boxViewer::run( bool p_allowTakePkmn ) {
-#define CLEAN ( _topScreenDirty = false, _curPage = 0, _selectedIdx = (u8) -1 )
+#define CLEAN ( _topScreenDirty = false  )
         _atHandOam = 0;
         _ranges = _boxUI.draw( p_allowTakePkmn );
         CLEAN;
+        _curPage = 0;
+        _selectedIdx = (u8) -1;
 
         _showTeam = p_allowTakePkmn;
 
@@ -133,10 +135,12 @@ namespace BOX {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
                 CLEAN;
                 _boxUI.draw( p_allowTakePkmn );
+                select( _selectedIdx );
             } else if( GET_AND_WAIT( KEY_R ) ) {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
                 CLEAN;
                 _boxUI.draw( p_allowTakePkmn );
+                select( _selectedIdx );
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
                 HAS_SELECTION( _selectedIdx = 0,
                                _selectedIdx = ( _selectedIdx + 6 ) % ( MAX_PKMN_PER_BOX + 6 ) );
@@ -156,7 +160,7 @@ namespace BOX {
             } else if( GET_AND_WAIT( KEY_A ) ) {
                 HAS_SELECTION( , takePkmn( _selectedIdx ) );
             } else if( GET_AND_WAIT( KEY_SELECT ) ) {
-                _curPage = ( _curPage + 1 ) % 4;
+                _curPage = ( _curPage + 1 ) % 5;
                 select( _selectedIdx );
             }
 

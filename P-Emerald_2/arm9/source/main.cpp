@@ -468,7 +468,7 @@ OUT:
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
                         a = pokemon( 0, 143 + i, 0,
                                      50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
-                                     !FS::SAV->m_isMale, i );
+                                     !FS::SAV->m_isMale, i, false, i % 2, i == 5, i + rand() % 500, i, i );
                         a.m_stats.m_acHP *= i / 5.0;
                         a.m_boxdata.m_experienceGained += 750;
 
@@ -485,8 +485,8 @@ OUT:
                         FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
                     }
 
-                    /* for( u16 j = 0; j < 649; ++j ) {
-                        auto a = pokemon( j + 1, 50, 0, 10 ).m_boxdata;
+                    for( u16 j = 0; j < 649; ++j ) {
+                        auto a = pokemon( j + 1, 50, 0, -1 ).m_boxdata;
                         s8 res = FS::SAV->storePkmn( a );
                         if( a.isShiny( ) ) {
                             IO::messageBox( "YAAAY" );
@@ -497,7 +497,7 @@ OUT:
                                 IO::messageBox( "Lost :(" );
                             break;
                         }
-                    } */
+                    }
 
                     FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
                     FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;

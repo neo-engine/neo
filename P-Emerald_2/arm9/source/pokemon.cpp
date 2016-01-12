@@ -213,13 +213,13 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
     m_oTId = FS::SAV->m_id;
     m_oTSid = FS::SAV->m_sid;
     if( p_shiny == 2 )
-        while( !isShiny( ) )
+        while( !isShiny( ) || isCloned( ) )
             LastPID = m_pid = rand( );
     else if( p_shiny == 1 )
-        while( isShiny( ) )
+        while( isShiny( ) || isCloned( ) )
             LastPID = m_pid = rand( );
     else if( p_shiny ) { //Try p_shiny - 2 additional times to generate a shiny PId
-        for( u8 i = 0; i < p_shiny - 2 && !isShiny( ); ++i )
+        for( u8 i = 0; i < p_shiny - 2 && !isShiny( ) && isCloned( ); ++i )
             LastPID = m_pid = rand( );
     }
     m_checksum = 0;
@@ -500,7 +500,7 @@ bool pokemon::boxPokemon::isShiny( ) const {
     return !( ( ( ( m_oTId ^ m_oTSid ) >> 3 ) ^ ( ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) ) ) >> 3 ) );
 }
 bool pokemon::boxPokemon::isCloned( ) const {
-    return ( ( m_pid >> 16 )&( m_pid % ( 1 << 16 ) ) ) < ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) );
+    return ( ( m_pid >> 16 ) % ( 1 + ( m_pid % ( 1 << 16 ) ) ) ) == ( m_oTSid % ( m_oTId + 1 ) );
 }
 s8 pokemon::boxPokemon::gender( ) const {
     if( m_isGenderless )
