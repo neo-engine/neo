@@ -173,6 +173,7 @@ namespace BOX {
                 ++pal;
             } else {
                 IO::OamTop->oamBuffer[ oam++ ].isHidden = true;
+                tileCnt += 32;
             }
         }
 
@@ -202,6 +203,7 @@ namespace BOX {
                 ++pal;
             } else {
                 IO::OamTop->oamBuffer[ oam++ ].isHidden = true;
+                tileCnt += 32;
             }
         }
 
@@ -289,7 +291,7 @@ namespace BOX {
         IO::updateOAM( false );
     }
 
-    void boxUI::takePkmn( u8 p_index, u16 p_heldPkmnIdx ) {
+    void boxUI::takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg ) {
         if( p_index != (u8) -1 ) {
             box* box = FS::SAV->getCurrentBox( );
             auto spr = IO::OamTop->oamBuffer[ PKMN_START + p_index ];
@@ -301,28 +303,51 @@ namespace BOX {
                 bpm = FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ].m_boxdata;
             else
                 bpm = FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
-            
+
             if( bpm.m_speciesId ) {
                 u8 pal = p_index + 4;
                 if( !bpm.m_individualValues.m_isEgg ) {
                     IO::loadPKMNIcon( bpm.m_speciesId,
                                       POS_X( p_index ), POS_Y( p_index ),
-                                      PKMN_START + p_index, pal / 16, pal % 16, spr.gfxIndex, false );
+                                      PKMN_START + p_index, pal / 16, pal % 16, 96 + 32 * p_index, false );
                 } else
                     IO::loadEggIcon( POS_X( p_index ), POS_Y( p_index ), PKMN_START + p_index,
-                                     pal / 16, pal % 16, spr.gfxIndex, false );
+                                     pal / 16, pal % 16, 96 + 32 * p_index, false );
             } else {
                 IO::OamTop->oamBuffer[ PKMN_START + p_index ].isHidden = true;
             }
 
-            if( p_heldPkmnIdx )
-                IO::loadPKMNIcon( p_heldPkmnIdx, POS_X( p_index ), POS_Y( p_index ),
-                                  HELD_PKMN, 5, 0, 64, false );
-            else
+            if( p_heldPkmnIdx ) {
+                if( !p_isEgg )
+                    IO::loadPKMNIcon( p_heldPkmnIdx, POS_X( p_index ), POS_Y( p_index ),
+                                      HELD_PKMN, 6, 0, 64, false );
+                else
+                    IO::loadEggIcon( POS_X( p_index ), POS_Y( p_index ), HELD_PKMN,
+                                     6, 0, 64, false );
+            } else
                 IO::OamTop->oamBuffer[ HELD_PKMN ].isHidden = true;
         } else {
             IO::OamTop->oamBuffer[ HELD_PKMN ].isHidden = true;
         }
         select( p_index );
+    }
+
+    void boxUI::updateTeam( ) {
+        for( u8 i = 0; i < 6; ++i ) {
+            u16 species = FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId;
+            bool isEgg = FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg;
+            u8 pal = MAX_PKMN_PER_BOX + 4 + i;
+
+            if( species ) {
+                if( !isEgg )
+                    IO::loadPKMNIcon( species, TEAM_POS_X( i ) - 3, TEAM_POS_Y( i ) - 10,
+                                      PKMN_START + 18 + i, pal / 16, pal % 16, 672 + 32 * i, false );
+                else
+                    IO::loadEggIcon( TEAM_POS_X( i ) - 3, TEAM_POS_Y( i ) - 10,
+                                     PKMN_START + 18 + i, pal / 16, pal % 16, 672 + 32 * i, false );
+            } else
+                IO::OamTop->oamBuffer[ PKMN_START + 18 + i ].isHidden = true;
+        }
+        IO::updateOAM( false );
     }
 }

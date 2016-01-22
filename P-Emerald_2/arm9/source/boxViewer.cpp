@@ -264,12 +264,37 @@ namespace BOX {
         pokemon::boxPokemon hld = _heldPkmn.m_boxdata;
         if( p_index < MAX_PKMN_PER_BOX )
             std::swap( hld, FS::SAV->getCurrentBox( )->operator[]( p_index ) );
-        if( p_index > MAX_PKMN_PER_BOX && !_showTeam )
+        if( p_index >= MAX_PKMN_PER_BOX && !_showTeam )
             std::swap( hld, FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ] );
-        if( p_index > MAX_PKMN_PER_BOX && _showTeam )
+        if( p_index >= MAX_PKMN_PER_BOX && _showTeam ) {
             std::swap( _heldPkmn, FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
-        else
+            if( !updateTeam( ) ) {
+                std::swap( _heldPkmn, FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
+                return;
+            } else
+                _boxUI.updateTeam( );
+        } else
             _heldPkmn = pokemon( hld );
-        _boxUI.takePkmn( p_index, _heldPkmn.m_boxdata.m_speciesId );
+        _boxUI.takePkmn( p_index, _heldPkmn.m_boxdata.m_speciesId, _heldPkmn.m_boxdata.m_individualValues.m_isEgg );
+    }
+
+    //Remove gaps in party pkmn
+    bool boxViewer::updateTeam( ) {
+        u8 nxt = 1;
+        for( u8 i = 0; i < 6; ++i, ++nxt )
+            if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                for( ; nxt < 6; ++nxt )
+                    if( FS::SAV->m_pkmnTeam[ nxt ].m_boxdata.m_speciesId ) {
+                        std::swap( FS::SAV->m_pkmnTeam[ i ], FS::SAV->m_pkmnTeam[ nxt ] );
+                        break;
+                    }
+
+        //Check if the party is safe to walk with
+        for( u8 i = 0; i < 6; ++i )
+            if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId
+                && FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP
+                && !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg )
+                return true;
+        return false;
     }
 }

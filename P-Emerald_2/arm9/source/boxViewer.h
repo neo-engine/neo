@@ -49,6 +49,8 @@ namespace BOX {
 
         void select( u8 p_index );
         void takePkmn( u8 p_index );
+
+        bool updateTeam( );
     public:
         boxViewer( ) {
             _stsUI = new STS::boxStsScreenUI;

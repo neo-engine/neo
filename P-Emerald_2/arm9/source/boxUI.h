@@ -47,7 +47,8 @@ namespace BOX {
         //u8 acceptTouch( u8 p_oldIdx, u8 p_rangeIdx, bool p_allowTakePkmn );
         
         void select( u8 p_index );
-        void takePkmn( u8 p_index, u16 p_heldPkmnIdx );
+        void takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg );
+        void updateTeam( );
     private:
         bool _showTeam;
 

@@ -36,7 +36,7 @@ namespace STS {
         u8 _showMoveCnt;
         u8 m_pagemax;
         virtual bool drawMove( const pokemon& p_pokemon, u8 p_moveIdx, bool p_bottom = false );
-        virtual void drawRibbon( const pokemon& p_pokemon, u8 p_ribbonIdx, bool p_bottom = false );
+        virtual bool drawRibbon( const pokemon& p_pokemon, u8 p_ribbonIdx, bool p_bottom = false );
         virtual void draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) = 0;
 
         virtual ~statusScreenUI( ) { }
@@ -52,7 +52,7 @@ namespace STS {
         void draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) override;
         void draw( u8 p_current );
 
-        regStsScreenUI( u8 p_pageMax = 3 );
+        regStsScreenUI( u8 p_pageMax = 5 );
     };
 
     class boxStsScreenUI : public regStsScreenUI {

@@ -261,8 +261,8 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
         m_gotPlace = MAP::curMap->getCurrentLocationId( );
     }
 
-    m_ability = p_hiddenAbility ? ( ( m_pid & 1 || ( data.m_abilities[ 3 ] == 0 ) ) ? data.m_abilities[ 2 ] : data.m_abilities[ 3 ] ) :
-        ( ( m_pid & 1 || ( data.m_abilities[ 1 ] == 0 ) ) ? data.m_abilities[ 0 ] : data.m_abilities[ 1 ] );
+    m_ability = ( p_hiddenAbility && data.m_abilities[ 2 ] ) ? ( ( ( m_pid & 1 ) || !data.m_abilities[ 3 ] ) ? data.m_abilities[ 2 ] : data.m_abilities[ 3 ] ) :
+        ( ( ( m_pid & 1 ) || !data.m_abilities[ 1 ] ) ? data.m_abilities[ 0 ] : data.m_abilities[ 1 ] );
     m_markings = 0;
     m_origLang = 5;
 
@@ -389,8 +389,8 @@ pokemon::boxPokemon::boxPokemon( u16*           p_moves,
         m_gotPlace = p_gotPlace;
     }
 
-    m_ability = p_hiddenAbility ? ( ( m_pid & 1 || ( data.m_abilities[ 3 ] == 0 ) ) ? data.m_abilities[ 2 ] : data.m_abilities[ 3 ] ) :
-        ( ( m_pid & 1 || ( data.m_abilities[ 1 ] == 0 ) ) ? data.m_abilities[ 0 ] : data.m_abilities[ 1 ] );
+    m_ability = ( p_hiddenAbility && data.m_abilities[ 2 ] ) ? ( ( ( m_pid & 1 ) || !data.m_abilities[ 3 ] ) ? data.m_abilities[ 2 ] : data.m_abilities[ 3 ] ) :
+        ( ( ( m_pid & 1 ) || !data.m_abilities[ 1 ] ) ? data.m_abilities[ 0 ] : data.m_abilities[ 1 ] );
     m_markings = 0;
     m_origLang = 5;
 

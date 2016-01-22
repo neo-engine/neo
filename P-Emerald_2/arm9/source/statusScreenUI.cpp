@@ -715,9 +715,9 @@ namespace STS {
                      FS::getLoc( currPkmn.m_boxdata.m_hatchPlace ) );
             IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 143, p_bottom, 14 );
         } else if( plrOT && currPkmn.m_boxdata.m_fateful )
-            IO::regularFont->printString( "Schicksalhafte Begeg.", 102, 143, true );
+            IO::regularFont->printString( "Schicksalhafte Begeg.", 102, 143, p_bottom );
         else if( currPkmn.m_boxdata.m_fateful )
-            IO::regularFont->printString( "Off. schicksal. Begeg.", 102, 143, true );
+            IO::regularFont->printString( "Off. schicksal. Begeg.", 102, 143, p_bottom );
     }
 
     void drawPkmnNature( const pokemon& p_pokemon, bool p_bottom ) {
@@ -855,11 +855,13 @@ namespace STS {
     }
 
     // Draw extra information about the specified ribbon
-    void statusScreenUI::drawRibbon( const pokemon& p_pokemon, u8 p_ribbonIdx, bool p_bottom )
-    {
+    bool statusScreenUI::drawRibbon( const pokemon& p_pokemon, u8 p_ribbonIdx, bool p_bottom ) {
         auto currPkmn = p_pokemon;
         auto Oam = p_bottom ? IO::Oam : IO::OamTop;
         auto pal = BG_PAL( p_bottom );
+
+        if( currPkmn.m_boxdata.m_individualValues.m_isEgg )
+            return false;
 
         for( u8 i = 0; i < 4; ++i )
             Oam->oamBuffer[ TYPE_IDX + i ].isHidden = true;
@@ -887,8 +889,8 @@ namespace STS {
 
         u8 isNotEgg = 1;
         drawPkmnInformation( currPkmn, isNotEgg, false, p_bottom );
-        if( !isNotEgg )
-            return; //This should never occur
+        if( isNotEgg == (u8) -1 )
+            return false;
 
         IO::regularFont->printString( "Bandinfos", 36, 4, p_bottom );
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
@@ -916,7 +918,7 @@ namespace STS {
                                                        : currRb.m_description, IO::regularFont, 120 ).c_str( ),
                                       128, 70, p_bottom, 14 );
         IO::updateOAM( p_bottom );
-        return;
+        return true;
     }
     void regStsScreenUI::draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) {
         hideSprites( false );
@@ -956,21 +958,26 @@ namespace STS {
 
         drawPkmnInformation( currPkmn, p_page, p_newpok, false );
         if( p_page == (u8) -1 )
-            p_page = 0;
+            p_page = 2;
         switch( p_page ) {
             case 0:
-                drawPkmnStats( currPkmn, false );
+                drawPkmnGeneralData( currPkmn, false );
                 break;
             case 1:
-                drawPkmnMoves( currPkmn, false );
+                drawPkmnNature( currPkmn, false );
                 break;
             case 2:
+                drawPkmnStats( currPkmn, false );
+                break;
+            case 3:
+                drawPkmnMoves( currPkmn, false );
+                break;
+            case 4:
                 drawPkmnRibbons( currPkmn, false );
                 break;
             default:
                 return;
         }
-
         if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].isHidden = false;
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].y = static_cast<u16>( 256 - 4 );
@@ -988,9 +995,6 @@ namespace STS {
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( p_page ) ].isHidden = true;
         }
         if( p_newpok ) {
-            consoleSelect( &IO::Bottom );
-            printf( "\x1b[39m" );
-
             IO::Oam->oamBuffer[ BACK_ID ].x = 256 - 24;
             IO::Oam->oamBuffer[ BACK_ID ].y = 196 - 28;
             IO::Oam->oamBuffer[ FWD_ID ].isHidden = false;
@@ -1000,238 +1004,15 @@ namespace STS {
             IO::Oam->oamBuffer[ FWD_ID ].x = 256 - 28 - 18;
             IO::Oam->oamBuffer[ FWD_ID ].y = 196 - 28;
 
-            if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
-
-                if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
-                    IO::loadTypeIcon( data.m_types[ 0 ], 256 - 50, 24, SUB_TYPE_IDX( 0 ), SUB_TYPE_IDX( 0 ),
-                                      IO::Oam->oamBuffer[ SUB_TYPE_IDX( 0 ) ].gfxIndex, true );
-                    IO::Oam->oamBuffer[ SUB_TYPE_IDX( 1 ) ].isHidden = true;
-                } else {
-                    IO::loadTypeIcon( data.m_types[ 0 ], 256 - 68, 24, SUB_TYPE_IDX( 0 ), SUB_TYPE_IDX( 0 ),
-                                      IO::Oam->oamBuffer[ SUB_TYPE_IDX( 0 ) ].gfxIndex, true );
-                    IO::loadTypeIcon( data.m_types[ 1 ], 256 - 32, 24, SUB_TYPE_IDX( 1 ), SUB_TYPE_IDX( 1 ),
-                                      IO::Oam->oamBuffer[ SUB_TYPE_IDX( 1 ) ].gfxIndex, true );
-                }
-                IO::loadItemIcon( !currPkmn.m_boxdata.m_ball ? "Pokeball" : ItemList[ currPkmn.m_boxdata.m_ball ]->m_itemName,
-                                  256 - 108, 0, SUB_BALL_IDX, SUB_BALL_IDX, IO::Oam->oamBuffer[ SUB_BALL_IDX ].gfxIndex, true );
-
-                IO::Oam->oamBuffer[ CHOICE_ID ].isHidden = false;
-                IO::Oam->oamBuffer[ CHOICE_ID ].y = 0;
-                IO::Oam->oamBuffer[ CHOICE_ID ].x = 256 - 96;
-                IO::Oam->oamBuffer[ CHOICE_ID + 1 ].isHidden = false;
-                IO::Oam->oamBuffer[ CHOICE_ID + 1 ].y = 0;
-                IO::Oam->oamBuffer[ CHOICE_ID + 1 ].x = 256 - 32;
-
-                consoleSetWindow( &IO::Bottom, 23, 1, 20, 5 );
-
-                if( currPkmn.m_boxdata.isShiny( ) ) {
-                    IO::loadSprite( SUB_RARE_IDX, SUB_RARE_IDX, IO::Oam->oamBuffer[ SUB_RARE_IDX ].gfxIndex, 176, 8, 8, 8, rare_iconPal,
-                                    rare_iconTiles, rare_iconTilesLen, false, false, false, OBJPRIORITY_0, true );
-                } else
-                    IO::Oam->oamBuffer[ SUB_RARE_IDX ].isHidden = true;
-
-                if( currPkmn.m_boxdata.m_pokerus ) {
-                    IO::loadSprite( SUB_PKRS_IDX, SUB_PKRS_IDX, IO::Oam->oamBuffer[ SUB_PKRS_IDX ].gfxIndex, 208, 4, 64, 32, pokerus_iconPal,
-                                    pokerus_iconTiles, pokerus_iconTilesLen, false, false, false, OBJPRIORITY_0, true );
-                } else {
-                    printf( "Nr. " );
-                    IO::Oam->oamBuffer[ SUB_PKRS_IDX ].isHidden = true;
-                }
-                printf( "%03i", currPkmn.m_boxdata.m_speciesId );
-            } else {
+            if( currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
                 IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 0 ) ].isHidden = true;
                 IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 1 ) ].isHidden = true;
                 IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].isHidden = true;
-
-                IO::Oam->oamBuffer[ CHOICE_ID ].isHidden = false;
-                IO::Oam->oamBuffer[ CHOICE_ID ].y = 0;
-                IO::Oam->oamBuffer[ CHOICE_ID ].x = 256 - 32;
-                IO::Oam->oamBuffer[ CHOICE_ID + 1 ].isHidden = true;
-
-                IO::Oam->oamBuffer[ SUB_TYPE_IDX( 0 ) ].isHidden = true;
-                IO::Oam->oamBuffer[ SUB_TYPE_IDX( 1 ) ].isHidden = true;
-                IO::Oam->oamBuffer[ SUB_PKRS_IDX ].isHidden = true;
-                IO::Oam->oamBuffer[ SUB_RARE_IDX ].isHidden = true;
-                IO::loadItemIcon( !currPkmn.m_boxdata.m_ball ? "Pokeball" : ItemList[ currPkmn.m_boxdata.m_ball ]->m_itemName,
-                                  256 - 32, 0, SUB_BALL_IDX, SUB_BALL_IDX, IO::Oam->oamBuffer[ SUB_BALL_IDX ].gfxIndex, true );
             }
-            printf( "\x1b[33m" );
 
-            consoleSetWindow( &IO::Bottom, 3, 3, 27, 15 );
             IO::drawSub( );
-
-            IO::regularFont->setColor( 0, 0 );
-            IO::regularFont->setColor( WHITE_IDX, 1 );
-            IO::regularFont->setColor( BLACK_IDX, 2 );
-            BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
-            BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-            BG_PALETTE_SUB[ RED_IDX ] = RED;
-            BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;
-            BG_PALETTE_SUB[ RED2_IDX ] = RED2;
-            BG_PALETTE_SUB[ BLUE2_IDX ] = BLUE2;
-
-            IO::regularFont->printString( "OT:", 28, 22, true );
-            if( currPkmn.m_boxdata.m_oTisFemale ) {
-                IO::regularFont->setColor( RED_IDX, 1 );
-                IO::regularFont->setColor( RED2_IDX, 2 );
-            } else {
-                IO::regularFont->setColor( BLUE_IDX, 1 );
-                IO::regularFont->setColor( BLUE2_IDX, 2 );
-            }
-            IO::regularFont->printString( currPkmn.m_boxdata.m_oT, 56, 16, true );
-            IO::regularFont->setColor( WHITE_IDX, 1 );
-            IO::regularFont->setColor( BLACK_IDX, 2 );
-
-            if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
-                auto acAbility = ability( currPkmn.m_boxdata.m_ability );
-
-                BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-                IO::printRectangle( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false, WHITE_IDX );
-                if( currPkmn.m_boxdata.m_oTisFemale ) {
-                    IO::regularFont->setColor( RED_IDX, 1 );
-                    IO::regularFont->setColor( WHITE_IDX, 2 );
-                } else {
-                    IO::regularFont->setColor( BLUE_IDX, 1 );
-                    IO::regularFont->setColor( WHITE_IDX, 2 );
-                }
-                u8 nlCnt = 0;
-                auto nStr = FS::breakString( acAbility.m_flavourText, IO::regularFont, 220 );
-                for( auto c : nStr )
-                    if( c == '\n' )
-                        nlCnt++;
-                IO::regularFont->printString( nStr.c_str( ), 0, 138, true, u8( 16 - 2 * nlCnt ) );
-                IO::regularFont->printString( acAbility.m_abilityName.c_str( ), 5, 176, true );
-                IO::regularFont->setColor( WHITE_IDX, 1 );
-                IO::regularFont->setColor( BLACK_IDX, 2 );
-            }
-
-            sprintf( buffer, "(%05i/%05i)", currPkmn.m_boxdata.m_oTId, currPkmn.m_boxdata.m_oTSid );
-            IO::regularFont->printString( buffer, 50, 30, true );
-
-            if( currPkmn.m_boxdata.m_oTId == FS::SAV->m_id && currPkmn.m_boxdata.m_oTSid == FS::SAV->m_sid ) //Trainer is OT
-            {
-                if( currPkmn.m_boxdata.m_fateful )
-                    IO::regularFont->printString( "Schicksalhafte Begegnung.", 28, 120, true );
-                if( !( currPkmn.m_boxdata.m_gotDate[ 0 ] ) ) {
-                    if( FS::savMod == FS::SavMod::_NDS ) {
-                        sprintf( buffer, "Gefangen am %02i.%02i.%02i mit Lv. %i",
-                                 currPkmn.m_boxdata.m_hatchDate[ 0 ],
-                                 currPkmn.m_boxdata.m_hatchDate[ 1 ],
-                                 currPkmn.m_boxdata.m_hatchDate[ 2 ],
-                                 currPkmn.m_boxdata.m_gotLevel );
-                    } else
-                        sprintf( buffer, "Gefangen mit Lv. %i", currPkmn.m_boxdata.m_gotLevel );
-                    IO::regularFont->printString( buffer, 28, 44, true );
-                    sprintf( buffer, "in/bei %s.", FS::getLoc( currPkmn.m_boxdata.m_gotPlace ) );
-                    IO::regularFont->printString( buffer, 35, 58, true );
-                    sprintf( buffer, "Besitzt ein %s""es Wesen,", NatureList[ currPkmn.m_boxdata.getNature( ) ].c_str( ) );
-                    IO::regularFont->printString( buffer, 28, 76, true );
-                    sprintf( buffer, "%s"".", PersonalityList[ currPkmn.m_boxdata.getPersonality( ) ].c_str( ) );
-                    IO::regularFont->printString( buffer, 35, 90, true );
-
-                    sprintf( buffer, "Mag %s""e Pokériegel.", TasteList[ currPkmn.m_boxdata.getTasteStr( ) ].c_str( ) );
-                    IO::regularFont->printString( buffer, 28, 104, true );
-                } else {
-                    if( FS::savMod == FS::SavMod::_NDS ) {
-                        sprintf( buffer, "Als Ei erhalten am %02i.%02i.%02i",
-                                 currPkmn.m_boxdata.m_gotDate[ 0 ],
-                                 currPkmn.m_boxdata.m_gotDate[ 1 ],
-                                 currPkmn.m_boxdata.m_gotDate[ 2 ] );
-                    } else
-                        sprintf( buffer, "Als Ei erhalten." );
-                    IO::regularFont->printString( buffer, 28, 44, true );
-                    sprintf( buffer, "in/bei %s.", FS::getLoc( currPkmn.m_boxdata.m_gotPlace ) );
-                    IO::regularFont->printString( buffer, 35, 58, true );
-                    if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
-
-                        if( FS::savMod == FS::SavMod::_NDS ) {
-                            sprintf( buffer, "Geschlüpft am %02i.%02i.%02i",
-                                     currPkmn.m_boxdata.m_hatchDate[ 0 ],
-                                     currPkmn.m_boxdata.m_hatchDate[ 1 ],
-                                     currPkmn.m_boxdata.m_hatchDate[ 2 ] );
-                            IO::regularFont->printString( buffer, 28, 72, true );
-                            sprintf( buffer, "in/bei %s.", FS::getLoc( currPkmn.m_boxdata.m_hatchPlace ) );
-                            IO::regularFont->printString( buffer, 35, 86, true );
-                        } else {
-                            sprintf( buffer, "Geschlüpft in/bei %s.", FS::getLoc( currPkmn.m_boxdata.m_hatchPlace ) );
-                            IO::regularFont->printString( buffer, 28, 72, true );
-                        }
-                        if( !currPkmn.m_boxdata.m_fateful ) {
-                            sprintf( buffer, "Besitzt ein %s""es Wesen,", NatureList[ currPkmn.m_boxdata.getNature( ) ].c_str( ) );
-                            IO::regularFont->printString( buffer, 28, 100, true );
-                            sprintf( buffer, "%s"".", PersonalityList[ currPkmn.m_boxdata.getPersonality( ) ].c_str( ) );
-                            IO::regularFont->printString( buffer, 35, 114, true );
-
-                            sprintf( buffer, "Mag %s""e Pokériegel.", TasteList[ currPkmn.m_boxdata.getTasteStr( ) ].c_str( ) );
-                            IO::regularFont->printString( buffer, 28, 128, true );
-                        } else {
-                            sprintf( buffer, "Besitzt ein %s""es Wesen.", NatureList[ currPkmn.m_boxdata.getNature( ) ].c_str( ) );
-                            IO::regularFont->printString( buffer, 28, 100, true );
-                        }
-                    }
-                }
-            } else {
-                if( !currPkmn.m_boxdata.m_gotDate[ 0 ] ) {
-                    if( FS::savMod == FS::SavMod::_NDS ) {
-                        sprintf( buffer, "Off. gef. am %02i.%02i.%02i mit Lv. %i",
-                                 currPkmn.m_boxdata.m_hatchDate[ 0 ],
-                                 currPkmn.m_boxdata.m_hatchDate[ 1 ],
-                                 currPkmn.m_boxdata.m_hatchDate[ 2 ],
-                                 currPkmn.m_boxdata.m_gotLevel );
-                    } else
-                        sprintf( buffer, "Offenbar gefangen mit Lv. %i", currPkmn.m_boxdata.m_gotLevel );
-                    IO::regularFont->printString( buffer, 28, 44, true );
-                    sprintf( buffer, "in/bei %s.", FS::getLoc( currPkmn.m_boxdata.m_gotPlace ) );
-                    IO::regularFont->printString( buffer, 35, 58, true );
-                    sprintf( buffer, "Besitzt ein %s""es Wesen,", NatureList[ currPkmn.m_boxdata.getNature( ) ].c_str( ) );
-                    IO::regularFont->printString( buffer, 28, 76, true );
-                    sprintf( buffer, "%s"".", PersonalityList[ currPkmn.m_boxdata.getPersonality( ) ].c_str( ) );
-                    IO::regularFont->printString( buffer, 35, 90, true );
-
-                    sprintf( buffer, "Mag %s""e Pokériegel.", TasteList[ currPkmn.m_boxdata.getTasteStr( ) ].c_str( ) );
-                    IO::regularFont->printString( buffer, 28, 104, true );
-                } else {
-                    if( FS::savMod == FS::SavMod::_NDS ) {
-                        sprintf( buffer, "Off. Als Ei erh. am %02i.%02i.%02i",
-                                 currPkmn.m_boxdata.m_gotDate[ 0 ],
-                                 currPkmn.m_boxdata.m_gotDate[ 1 ],
-                                 currPkmn.m_boxdata.m_gotDate[ 2 ] );
-                    } else
-                        sprintf( buffer, "Offenbar als Ei erhalten." );
-                    IO::regularFont->printString( buffer, 28, 44, true );
-                    sprintf( buffer, "in/bei %s.", FS::getLoc( currPkmn.m_boxdata.m_gotPlace ) );
-                    IO::regularFont->printString( buffer, 35, 58, true );
-                    if( !currPkmn.m_boxdata.m_individualValues.m_isEgg ) {
-                        if( FS::savMod == FS::SavMod::_NDS ) {
-                            sprintf( buffer, "Geschlüpft am %02i.%02i.%02i",
-                                     currPkmn.m_boxdata.m_hatchDate[ 0 ],
-                                     currPkmn.m_boxdata.m_hatchDate[ 1 ],
-                                     currPkmn.m_boxdata.m_hatchDate[ 2 ] );
-                            IO::regularFont->printString( buffer, 28, 72, true );
-                            sprintf( buffer, "in/bei %s.", FS::getLoc( currPkmn.m_boxdata.m_hatchPlace ) );
-                            IO::regularFont->printString( buffer, 35, 86, true );
-                        } else {
-                            sprintf( buffer, "Geschlüpft in/bei %s.", FS::getLoc( currPkmn.m_boxdata.m_hatchPlace ) );
-                            IO::regularFont->printString( buffer, 28, 72, true );
-                        }
-                        if( !currPkmn.m_boxdata.m_fateful ) {
-                            sprintf( buffer, "Besitzt ein %s""es Wesen,", NatureList[ currPkmn.m_boxdata.getNature( ) ].c_str( ) );
-                            IO::regularFont->printString( buffer, 28, 100, true );
-                            sprintf( buffer, "%s"".", PersonalityList[ currPkmn.m_boxdata.getPersonality( ) ].c_str( ) );
-                            IO::regularFont->printString( buffer, 35, 114, true );
-
-                            sprintf( buffer, "Mag %s""e Pokériegel.", TasteList[ currPkmn.m_boxdata.getTasteStr( ) ].c_str( ) );
-                            IO::regularFont->printString( buffer, 28, 128, true );
-                        } else {
-                            sprintf( buffer, "Besitzt ein %s""es Wesen.", NatureList[ currPkmn.m_boxdata.getNature( ) ].c_str( ) );
-                            IO::regularFont->printString( buffer, 28, 100, true );
-                        }
-                    }
-                }
-                if( currPkmn.m_boxdata.m_fateful )
-                    IO::regularFont->printString( "Off. schicks. Begegnung.", 28, 120, true );
-            }
         }
+
 
         IO::updateOAM( true );
         IO::updateOAM( false );

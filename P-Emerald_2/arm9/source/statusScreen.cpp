@@ -39,7 +39,7 @@ namespace STS {
     statusScreen::statusScreen( u8 p_pkmnIdx ) {
         _page = 0;
         _pkmnIdx = p_pkmnIdx;
-        _stsUI = new regStsScreenUI( 3 );
+        _stsUI = new regStsScreenUI( );
     }
     statusScreen::~statusScreen( ) {
         delete _stsUI;
@@ -154,9 +154,11 @@ namespace STS {
                 return ( pressed & KEY_X ) | KEY_B;
             } else if( !acMode && ( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) ) {
                 _pkmnIdx = ( _pkmnIdx + 1 ) % FS::SAV->getTeamPkmnCount( );
+                rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
                 _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
             } else if( !acMode && ( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) ) {
-                _pkmnIdx = ( _pkmnIdx + FS::SAV->getTeamPkmnCount( ) - 1 ) % FS::SAV->getTeamPkmnCount( );
+                _pkmnIdx = ( _pkmnIdx + FS::SAV->getTeamPkmnCount( ) - 1 ) % FS::SAV->getTeamPkmnCount( ); 
+                rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
                 _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
             } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
                 acMode = 0;
@@ -185,11 +187,11 @@ namespace STS {
             //Exit all specific modes through B/..
             else if( acMode && ( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_C( 248, 184, 16 ) ) ) {
                 acMode = 0;
-                _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page = 1, false );
+                _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, false );
             }
             //Mode specific stuff
             //Attack info
-            else if( acMode == 0 && _page == 1 && GET_AND_WAIT( KEY_A ) ) {
+            else if( acMode == 0 && _page == 3 && GET_AND_WAIT( KEY_A ) ) {
                 acMode = 1;
                 if( !_stsUI->drawMove( FS::SAV->m_pkmnTeam[ _pkmnIdx ], modeVal ) ) {
                     acMode = 0;
@@ -204,10 +206,13 @@ namespace STS {
             }
 
             //Ribbon info
-            else if( acMode == 0 && _page == 2 && !rbs.empty( ) && GET_AND_WAIT( KEY_A ) ) {
+            else if( acMode == 0 && _page == 4 && !rbs.empty( ) && GET_AND_WAIT( KEY_A ) ) {
                 acMode = 2;
                 modeVal = 0;
-                _stsUI->drawRibbon( FS::SAV->m_pkmnTeam[ _pkmnIdx ], rbs[ modeVal ] );
+                if( !_stsUI->drawRibbon( FS::SAV->m_pkmnTeam[ _pkmnIdx ], rbs[ modeVal ] ) ) {
+                    acMode = 0;
+                    modeVal = 0;
+                }
             } else if( acMode == 2 && ( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) ) {
                 modeVal = ( modeVal + 1 ) % rbs.size( );
                 _stsUI->drawRibbon( FS::SAV->m_pkmnTeam[ _pkmnIdx ], rbs[ modeVal ] );
