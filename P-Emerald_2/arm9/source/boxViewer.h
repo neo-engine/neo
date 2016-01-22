@@ -49,7 +49,6 @@ namespace BOX {
 
         void select( u8 p_index );
         void takePkmn( u8 p_index );
-        void dropPkmn( u8 p_index );
     public:
         boxViewer( ) {
             _stsUI = new STS::boxStsScreenUI;

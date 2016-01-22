@@ -145,6 +145,7 @@ namespace BOX {
 
         std::vector<IO::inputTarget> res;
         _ranges.clear( );
+        _showTeam = p_showTeam;
         box* box = FS::SAV->getCurrentBox( );
 
         //SubScreen stuff
@@ -288,11 +289,38 @@ namespace BOX {
         IO::updateOAM( false );
     }
 
-    void boxUI::takePkmn( u8 p_index ) {
-        if( p_index != (u8) -1 )
-            std::swap( IO::OamTop->oamBuffer[ HELD_PKMN ], IO::OamTop->oamBuffer[ p_index + PKMN_START ] );
-        else {
-            memset( &IO::OamTop->oamBuffer[ HELD_PKMN ], 0, sizeof( SpriteEntry ) );
+    void boxUI::takePkmn( u8 p_index, u16 p_heldPkmnIdx ) {
+        if( p_index != (u8) -1 ) {
+            box* box = FS::SAV->getCurrentBox( );
+            auto spr = IO::OamTop->oamBuffer[ PKMN_START + p_index ];
+
+            pokemon::boxPokemon bpm;
+            if( p_index < MAX_PKMN_PER_BOX )
+                bpm = box->m_pokemon[ p_index ];
+            else if( _showTeam )
+                bpm = FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ].m_boxdata;
+            else
+                bpm = FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
+            
+            if( bpm.m_speciesId ) {
+                u8 pal = p_index + 4;
+                if( !bpm.m_individualValues.m_isEgg ) {
+                    IO::loadPKMNIcon( bpm.m_speciesId,
+                                      POS_X( p_index ), POS_Y( p_index ),
+                                      PKMN_START + p_index, pal / 16, pal % 16, spr.gfxIndex, false );
+                } else
+                    IO::loadEggIcon( POS_X( p_index ), POS_Y( p_index ), PKMN_START + p_index,
+                                     pal / 16, pal % 16, spr.gfxIndex, false );
+            } else {
+                IO::OamTop->oamBuffer[ PKMN_START + p_index ].isHidden = true;
+            }
+
+            if( p_heldPkmnIdx )
+                IO::loadPKMNIcon( p_heldPkmnIdx, POS_X( p_index ), POS_Y( p_index ),
+                                  HELD_PKMN, 5, 0, 64, false );
+            else
+                IO::OamTop->oamBuffer[ HELD_PKMN ].isHidden = true;
+        } else {
             IO::OamTop->oamBuffer[ HELD_PKMN ].isHidden = true;
         }
         select( p_index );

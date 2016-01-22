@@ -47,8 +47,10 @@ namespace BOX {
         //u8 acceptTouch( u8 p_oldIdx, u8 p_rangeIdx, bool p_allowTakePkmn );
         
         void select( u8 p_index );
-        void takePkmn( u8 p_index );
+        void takePkmn( u8 p_index, u16 p_heldPkmnIdx );
     private:
+        bool _showTeam;
+
         void drawAllBoxStatus( bool p_bottom = false );
     };
 }

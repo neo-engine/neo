@@ -46,6 +46,7 @@ namespace BOX {
         CLEAN;
         _curPage = 0;
         _selectedIdx = (u8) -1;
+        memset( &_heldPkmn, 0, sizeof( pokemon ) );
 
         _showTeam = p_allowTakePkmn;
 
@@ -233,7 +234,6 @@ namespace BOX {
     }
     void boxViewer::select( u8 p_index ) {
         if( p_index == (u8) -1 ) {
-            dropPkmn( p_index );
             _boxUI.select( p_index );
             return;
         }
@@ -260,27 +260,16 @@ namespace BOX {
     void boxViewer::takePkmn( u8 p_index ) {
         if( p_index > MAX_PKMN_PER_BOX + 6 )
             return;
-        //New spot is empty -> drop every held pkmn
-        if( p_index < MAX_PKMN_PER_BOX
-            && !FS::SAV->getCurrentBox( )->operator[]( p_index ).m_speciesId ) {
-            dropPkmn( p_index );
-            return;
-        }
-        if( p_index > MAX_PKMN_PER_BOX && _showTeam
-            && !FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ].m_boxdata.m_speciesId ) {
-            dropPkmn( p_index );
-            return;
-        }
-        if( p_index > MAX_PKMN_PER_BOX && !_showTeam
-            && !FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ].m_speciesId ) {
-            dropPkmn( p_index );
-            return;
-        }
-        //Current spot is non-empty
 
-        _boxUI.takePkmn( p_index );
-    }
-    void boxViewer::dropPkmn( u8 p_index ) {
-        _boxUI.takePkmn( p_index );
+        pokemon::boxPokemon hld = _heldPkmn.m_boxdata;
+        if( p_index < MAX_PKMN_PER_BOX )
+            std::swap( hld, FS::SAV->getCurrentBox( )->operator[]( p_index ) );
+        if( p_index > MAX_PKMN_PER_BOX && !_showTeam )
+            std::swap( hld, FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ] );
+        if( p_index > MAX_PKMN_PER_BOX && _showTeam )
+            std::swap( _heldPkmn, FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
+        else
+            _heldPkmn = pokemon( hld );
+        _boxUI.takePkmn( p_index, _heldPkmn.m_boxdata.m_speciesId );
     }
 }
