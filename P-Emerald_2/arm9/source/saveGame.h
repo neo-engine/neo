@@ -66,7 +66,6 @@ namespace FS {
         u8          m_inDex[ 1 + MAX_PKMN / 8 ];
         u32         m_money;
 
-
         pokemon     m_pkmnTeam[ 6 ];
 
         //Stored Pkmn
@@ -92,7 +91,7 @@ namespace FS {
         u8          m_lstBag;
         u8          m_lstBagItem;
 
-        u8          m_repelSteps;
+        s16         m_repelSteps;
         BAG::bag*   m_bag; //Be VERY CAREFUL when deleting savegames or when just using them!
 
         bool        checkflag( u8 p_idx ) {

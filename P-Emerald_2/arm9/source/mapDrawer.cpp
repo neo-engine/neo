@@ -217,7 +217,7 @@ namespace MAP {
             _curX = ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1;
             _curY = ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1;
             //Update tileset, block and palette data
-            u8* tileMemory = (u8*)BG_TILE_RAM( 1 );
+            u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
             for( u16 i = 0; i < 512; ++i )
                 swiCopy( CUR_SLICE->m_tileSet.m_tiles1[ i ].m_tile, tileMemory + i * 32, 16 );
             for( u16 i = 0; i < 512; ++i )
@@ -293,10 +293,10 @@ namespace MAP {
     }
 
     void mapDrawer::disablePkmn( s16 p_steps ) {
-        _noPkmnSteps = p_steps;
+        FS::SAV->m_repelSteps = p_steps;
     }
     void mapDrawer::enablePkmn( ) {
-        _noPkmnSteps = 0;
+        FS::SAV->m_repelSteps = 0;
     }
 
     void mapDrawer::handleWarp( warpType p_type ) {
@@ -316,13 +316,7 @@ namespace MAP {
         u8 moveData = atom( p_globX, p_globY ).m_movedata;
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
-        if( _noPkmnSteps > 0 )
-            if( !--_noPkmnSteps ) {
-                IO::messageBox( "Der Schutz lässt nach." );
-                _playerIsFast = false;
-                IO::drawSub( );
-            }
-        if( _noPkmnSteps )
+        if( FS::SAV->m_repelSteps )
             return;
         //handle Pkmn stuff
         if( moveData == 0x04 && behave != 0x13 )
@@ -337,10 +331,10 @@ namespace MAP {
     bool mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType, bool p_forceEncounter ) {
 
         u16 rn = rand( ) % 512;
-        while( p_forceEncounter && rn > 40 )
-            rn = rand( ) % 512;
         if( p_type == FISHING_ROD )
             rn /= 8;
+        if( p_forceEncounter )
+            rn %= 40;
 
         u8 tier;
         if( rn < 2 ) tier = 4;
@@ -428,15 +422,15 @@ namespace MAP {
     }
     void mapDrawer::handleTrainer( ) { }
 
-    bool mapDrawer::requestWildPkmn( ) {
+    bool mapDrawer::requestWildPkmn( bool p_forceHighGrass ) {
         u8 moveData = atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata;
         u8 behave = at( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_bottombehave;
 
         if( moveData == 0x04 && behave != 0x13 )
             return handleWildPkmn( WATER, 0, true );
-        else if( behave == 0x02 )
+        else if( behave == 0x02 && !p_forceHighGrass )
             return handleWildPkmn( GRASS, 0, true );
-        else if( behave == 0x03 )
+        else if( behave == 0x03 || p_forceHighGrass )
             return handleWildPkmn( HIGH_GRASS, 0, true );
         else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
             return handleWildPkmn( GRASS, 0, true );

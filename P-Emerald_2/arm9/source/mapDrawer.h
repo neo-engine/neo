@@ -39,10 +39,12 @@ namespace MAP {
     class mapDrawer {
     private:
         enum wildPkmnType {
-            GRASS,
-            HIGH_GRASS,
-            WATER,
-            FISHING_ROD
+            GRASS,      // 5 tiers
+            HIGH_GRASS, // 5 tiers
+            WATER,      // 5 tiers
+            FISHING_ROD,// 5 tiers
+            HEADBUTT,   // 3 tiers
+            ROCK_SMASH  // 2 tiers
         };
         enum mapWeather {
             NOTHING, //Inside
@@ -94,9 +96,7 @@ namespace MAP {
         mapSprite _sprites[ 16 ];
         u16 _entriesUsed;
         std::map<u16, u8> _spritePos; //mapObject.id -> index in _sprites
-
-        s16 _noPkmnSteps;
-
+        
         void draw( u16 p_globX, u16 p_globY, bool p_init );
         void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2 );
         void drawObjects( );
@@ -150,7 +150,7 @@ namespace MAP {
         void disablePkmn( s16 p_steps = -1 );
         void enablePkmn( );
 
-        bool requestWildPkmn( );
+        bool requestWildPkmn( bool p_forceHighGrass = false );
 
         u16  getCurrentLocationId( ) const;
     };

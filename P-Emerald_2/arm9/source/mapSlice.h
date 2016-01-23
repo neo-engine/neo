@@ -81,7 +81,7 @@ namespace MAP {
         u8          m_map;
         u16         m_x, m_y;
 
-        std::pair<u16, u16> m_pokemon[ 3 * 5 * 4 ];
+        std::pair<u16, u16> m_pokemon[ 3 * 5 * 5 ];
     };
     std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y );
 
