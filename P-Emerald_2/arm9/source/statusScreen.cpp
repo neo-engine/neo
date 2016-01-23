@@ -108,6 +108,82 @@ namespace STS {
                     mode = VIEW_DETAILS;
                 }
             }
+            for( s8 i = 0; i < s8( tg.size( ) ) - 2; ++i )
+                if( IN_RANGE( touch, tg[ i ] ) && IO::waitForInput( tg[ i ] ) ) {
+                    u8 u = 0, o;
+                    for( o = 0; o < 4 && u <= i; ++o )
+                        if( AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_isFieldAttack )
+                            u++;
+                    o--;
+                    consoleSelect( &IO::Bottom );
+                    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+                    consoleClear( );
+                    if( AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->possible( ) ) {
+
+                        char buffer[ 50 ];
+                        sprintf( buffer, "%ls setzt %s\nein!", FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
+                                 AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
+                        IO::messageBox a( buffer );
+                        IO::drawSub( );
+
+                        //shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
+                        //              (*_pokemon)[_pkmnIdx ].m_boxdata.m_isFemale, (*_pokemon)[_pkmnIdx ].m_boxdata.isShiny( ) );
+
+                        AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->use( );
+                        return;
+                    } else {
+                        IO::messageBox( "Diese Attacke kann jetzt\nnicht eingesetzt werden.", "PokéNav" );
+                        _stsUI->init( _pkmnIdx, false );
+                        tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
+
+                        if( mode != DEFAULT_MODE ) {
+                            mode = VIEW_DETAILS;
+                            rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
+                            _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
+                        }
+                    }
+                    break;
+                }
+
+            if( tg.size( ) >= 2 ) {
+                if( IN_RANGE( touch, tg[ tg.size( ) - 2 ] ) && IO::waitForInput( tg[ tg.size( ) - 2 ] ) ) {
+                    if( FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem ) { //take item
+                        char buffer[ 50 ];
+                        item acI = *ItemList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem ];
+                        FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem = 0;
+                        consoleSelect( &IO::Bottom );
+                        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+                        consoleClear( );
+
+                        sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
+                        IO::drawSub( );
+                        IO::messageBox a( buffer );
+                        FS::SAV->m_bag->insert( BAG::toBagType( acI.m_itemType ), acI.getItemId( ), 1 );
+                    } else { //give item
+
+                    }
+                    _stsUI->init( _pkmnIdx );
+                    tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
+
+                    if( mode != DEFAULT_MODE ) {
+                        mode = VIEW_DETAILS;
+                        rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
+                        _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
+                    }
+                }
+                if( IN_RANGE( touch, tg.back( ) ) && IO::waitForInput( tg.back( ) ) ) {
+                    DEX::dex( -1, 0 ).run( FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_speciesId );
+
+                    _stsUI->init( _pkmnIdx );
+                    tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
+
+                    if( mode != DEFAULT_MODE ) {
+                        mode = VIEW_DETAILS;
+                        rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
+                        _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
+                    }
+                }
+            }
 
             if( mode == DEFAULT_MODE ) {
                 if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
@@ -180,58 +256,6 @@ namespace STS {
                     }
                 }
             }
-
-            /*else if( _stsUI->_showTakeItem &&
-                       GET_AND_WAIT_R( 152, !!_stsUI->_showMoveCnt * ( -7 + 24 * _stsUI->_showMoveCnt ), 300, ( 17 + 24 * _stsUI->_showMoveCnt ) ) ) {
-                char buffer[ 50 ];
-                item acI = *ItemList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem ];
-                FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem = 0;
-                consoleSelect( &IO::Bottom );
-                consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-                consoleClear( );
-
-                sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
-                IO::messageBox a( buffer );
-                FS::SAV->m_bag->insert( BAG::toBagType( acI.m_itemType ), acI.getItemId( ), 1 );
-                _stsUI->draw( _pkmnIdx );
-            } else if( GET_AND_WAIT_R( 152, !!( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) * ( -7 + 24 * ( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) ),
-                                       300, ( 17 + 24 * ( _stsUI->_showMoveCnt + _stsUI->_showTakeItem ) ) ) ) {
-
-                DEX::dex( -1, 0 ).run( FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_speciesId );
-
-                _stsUI->init( _pkmnIdx );
-            }
-            for( u8 i = 0; i < _stsUI->_showMoveCnt; ++i )
-                if( GET_AND_WAIT_R( 152, ( !!i * ( -7 + 24 * i ) ), 256, ( 17 + 24 * i ) ) ) {
-                    u8 u = 0, o;
-                    for( o = 0; o < 4 && u <= i; ++o )
-                        if( AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_isFieldAttack )
-                            u++;
-                    o--;
-                    consoleSelect( &IO::Bottom );
-                    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-                    consoleClear( );
-                    if( AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->possible( ) ) {
-
-                        char buffer[ 50 ];
-                        sprintf( buffer, "%ls setzt %s\nein!", FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
-                                 AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
-                        IO::messageBox a( buffer );
-                        IO::drawSub( );
-
-                        //shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
-                        //              (*_pokemon)[_pkmnIdx ].m_boxdata.m_isFemale, (*_pokemon)[_pkmnIdx ].m_boxdata.isShiny( ) );
-
-                        AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->use( );
-                        return;
-                    } else {
-                        IO::messageBox( "Diese Attacke kann jetzt\nnicht eingesetzt werden.", "PokéNav" );
-                        _stsUI->init( _pkmnIdx, false );
-                    }
-                    break;
-                }
-*/
         }
-
     }
 }

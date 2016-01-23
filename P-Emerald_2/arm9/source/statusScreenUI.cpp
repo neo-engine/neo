@@ -147,6 +147,12 @@ namespace STS {
         BG_PALETTE[ BLACK_IDX ] = BLACK;
 
         for( size_t i = 0; i < FS::SAV->getTeamPkmnCount( ); i++ ) {
+            char buffer[ 100 ];
+            u8 mval = 1 + ( ( i / 2 == 1 ) ? 4 : 8 );
+            u8 x = borders[ i ][ 0 ] * 8;
+#define ADJUST_X( i, x, buffer ) ( ( ( i ) % 2 ) ? ( x ) - 4 : \
+                                   116 - IO::regularFont->stringWidth( buffer ) )
+
             if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
                 if( i % 2 == 0 ) {
                     tileCnt = IO::loadPKMNIcon( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId,
@@ -163,38 +169,31 @@ namespace STS {
                     IO::displayHP( 100, 100 - FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP * 100 / FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 + 63,
                                    borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
                 }
-                char buffer[ 100 ];
-
-                u8 mval = 1 + ( ( i / 2 == 1 ) ? 4 : 8 );
 
                 sprintf( buffer, "%ls", FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name );
-                IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 - mval, false );
+                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 - mval, false );
                 sprintf( buffer, "%ls", getWDisplayName( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId ) );
-                IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
+                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
                 IO::regularFont->setColor( 142 + 2 * i, 2 );
                 if( FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP )
                     sprintf( buffer, "%hi/%hi KP", FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP, FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
                 else
                     sprintf( buffer, "Besiegt" );
-                IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 28 - mval, false );
+                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 28 - mval, false );
                 IO::regularFont->setColor( GRAY_IDX, 2 );
 
                 sprintf( buffer, "%s", ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
-                IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
+                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
             } else {
-                consoleSetWindow( &IO::Top, borders[ i ][ 0 ], borders[ i ][ 1 ], 12, 6 );
-
-                char buffer[ 100 ];
-                int mval = 1 + ( ( i / 2 == 1 ) ? 4 : 8 );
                 sprintf( buffer, "Ei" );
-                IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 - mval, false );
+                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 - mval, false );
                 sprintf( buffer, "Ei" );
-                IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 14 - mval, false );
+                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
                 sprintf( buffer, "%s", ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
-                IO::regularFont->printString( buffer, borders[ i ][ 0 ] * 8, borders[ i ][ 1 ] * 8 + 42 - mval, false );
+                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 42 - mval, false );
 
                 if( i % 2 == 0 ) {
                     tileCnt = IO::loadEggIcon( u16( borders[ i ][ 0 ] * 8 - 28 ), u16( borders[ i ][ 1 ] * 8 ), ICON_IDX( i ), ICON_PAL( i ), tileCnt, false );

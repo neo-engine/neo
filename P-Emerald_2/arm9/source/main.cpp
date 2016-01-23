@@ -496,7 +496,7 @@ OUT:
                                 IO::messageBox( "Lost :(" );
                             else if( !( *FS::SAV->getCurrentBox( ) )[ idx - 1 ].isShiny( ) )
                                 IO::messageBox( "Lost :(" );
-                            //break;
+                            break;
                         }
                     }
 
