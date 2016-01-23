@@ -230,12 +230,17 @@ namespace STS {
 
     void regStsScreenUI::init( u8 p_current, bool p_initTop ) {
         _current = p_current;
+
         if( p_initTop ) {
             IO::vramSetup( );
             swiWaitForVBlank( );
+            IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
+            consoleSetFont( &IO::Top, IO::consoleFont );
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNScreen" );
             dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         }
+        IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
+        consoleSetFont( &IO::Bottom, IO::consoleFont );
         bgUpdate( );
 
         IO::drawSub( );
@@ -262,9 +267,13 @@ namespace STS {
         dmaFillWords( 0, bgGetGfxPtr( p_bottom ? IO::bg2sub : IO::bg2 ), 256 * 192 );
         auto Oam = p_bottom ? IO::Oam : IO::OamTop;
         auto pal = BG_PAL( p_bottom );
-        if( p_newpok )
+        if( p_newpok ) {
             IO::loadItemIcon( !p_pokemon.m_boxdata.m_ball ? "Pokeball" : ItemList[ p_pokemon.m_boxdata.m_ball ]->m_itemName,
                               -6, 26, SHINY_IDX, SHINY_PAL, 1000, p_bottom );
+        }
+        consoleSelect( p_bottom ? &IO::Bottom : &IO::Top );
+        consoleSetWindow( p_bottom ? &IO::Bottom : &IO::Top, 4, 5, 12, 2 );
+        consoleClear( );
 
         if( !p_pokemon.m_boxdata.m_individualValues.m_isEgg ) {
             pal[ RED_IDX ] = RED;
@@ -273,9 +282,6 @@ namespace STS {
             pal[ BLUE2_IDX ] = BLUE2;
             pal[ WHITE_IDX ] = WHITE;
             IO::regularFont->setColor( WHITE_IDX, 1 );
-
-            consoleSelect( p_bottom ? &IO::Bottom : &IO::Top );
-            consoleSetWindow( p_bottom ? &IO::Bottom : &IO::Top, 20, 1, 13, 2 );
 
             IO::regularFont->printString( p_pokemon.m_boxdata.m_name, 150, 2, p_bottom );
             s8 G = p_pokemon.m_boxdata.gender( );
@@ -329,8 +335,6 @@ namespace STS {
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
 
-            consoleSelect( p_bottom ? &IO::Bottom : &IO::Top );
-            consoleSetWindow( p_bottom ? &IO::Bottom : &IO::Top, 4, 5, 12, 2 );
 
             if( p_newpok )
                 if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId, 16, 48,
@@ -343,6 +347,7 @@ namespace STS {
 
             u16 exptype = data.m_expType;
 
+            printf( "\x1b[39m" );
             printf( "EP %3lu%%\nKP %3i%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ) * 100 /
                     ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
                     p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
