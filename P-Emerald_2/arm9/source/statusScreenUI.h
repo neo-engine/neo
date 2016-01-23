@@ -27,13 +27,12 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #pragma once
 
 #include "pokemon.h"
+#include "uio.h"
 #include <vector>
 
 namespace STS {
     class statusScreenUI {
     public:
-        bool _showTakeItem;
-        u8 _showMoveCnt;
         u8 m_pagemax;
         virtual bool drawMove( const pokemon& p_pokemon, u8 p_moveIdx, bool p_bottom = false );
         virtual bool drawRibbon( const pokemon& p_pokemon, u8 p_ribbonIdx, bool p_bottom = false );
@@ -45,12 +44,12 @@ namespace STS {
     class regStsScreenUI : public statusScreenUI {
         u8 _current;
         void initTop( );
-        void initSub( const pokemon& p_pokemon );
+        void initSub( );
 
     public:
         void init( u8 p_current, bool p_initTop = true );
         void draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) override;
-        void draw( u8 p_current );
+        std::vector<IO::inputTarget> draw( u8 p_current, bool p_updatePageIcons );
 
         regStsScreenUI( u8 p_pageMax = 5 );
     };

@@ -43,7 +43,6 @@ namespace STS {
         statusScreen( u8 p_pkmnIdx );
         ~statusScreen( );
 
-        s16 drawPage( );
         void run( );
     };
 }

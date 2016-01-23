@@ -464,11 +464,11 @@ OUT:
                 case 0:
                 {
                     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
-                    for( int i = 0; i < 6; ++i ) {
+                    for( int i = 0; i < 5; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
                         a = pokemon( 0, 143 + i, 0,
                                      50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
-                                     !FS::SAV->m_isMale, i, false, i % 2, i == 5, i + rand( ) % 500, i, i );
+                                     !FS::SAV->m_isMale, i, false, i % 2, i == 3, i + rand( ) % 500, i, i );
                         a.m_stats.m_acHP *= i / 5.0;
                         a.m_boxdata.m_experienceGained += 750;
 
@@ -486,7 +486,7 @@ OUT:
                     }
 
                     for( u16 j = 0; j < 649; ++j ) {
-                        auto a = pokemon( j + 1, 50, 0, -1 ).m_boxdata;
+                        auto a = pokemon( j + 1, 50, 0, j ).m_boxdata;
                         a.m_gotPlace = j;
                         s8 res = FS::SAV->storePkmn( a );
                         if( a.isShiny( ) ) {
@@ -496,7 +496,7 @@ OUT:
                                 IO::messageBox( "Lost :(" );
                             else if( !( *FS::SAV->getCurrentBox( ) )[ idx - 1 ].isShiny( ) )
                                 IO::messageBox( "Lost :(" );
-                            break;
+                            //break;
                         }
                     }
 

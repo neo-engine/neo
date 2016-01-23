@@ -47,42 +47,141 @@ namespace STS {
 
     void statusScreen::run( ) {
         _stsUI->init( _pkmnIdx );
+        auto tg = _stsUI->draw( _pkmnIdx, true );
+        auto rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
         touchPosition touch;
 
+#define DEFAULT_MODE 0
+#define VIEW_DETAILS 1
+#define MOVE_DETAILS 2
+#define RIBBON_DETAILS 3
+        u8 mode = DEFAULT_MODE;
+        u8 modeVal = 0;
         u8 selectedIdx = 42;
-
         loop( ) {
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );
             int pressed = keysCurrent( );
 
-            if( GET_AND_WAIT( KEY_X ) || GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+            if( GET_AND_WAIT( KEY_X ) )
                 break;
-            } else if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT_C( 128, 96, 16 ) ) {
-                auto res = drawPage( );
-                if( res & KEY_X )
+            else if( mode <= VIEW_DETAILS ) {
+                if( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) {
+                    _pkmnIdx = ( _pkmnIdx + 1 ) % FS::SAV->getTeamPkmnCount( );
+                    tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
+
+                    if( mode != DEFAULT_MODE ) {
+                        mode = VIEW_DETAILS;
+                        rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
+                        _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
+                    }
+                } else if( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) {
+                    _pkmnIdx = ( _pkmnIdx + FS::SAV->getTeamPkmnCount( ) - 1 ) % FS::SAV->getTeamPkmnCount( );
+                    tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
+
+                    if( mode != DEFAULT_MODE ) {
+                        mode = VIEW_DETAILS;
+                        rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
+                        _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
+                    }
+                }
+            }
+
+            for( u8 i = 0; i < FS::SAV->getTeamPkmnCount( ); ++i )
+                if( GET_AND_WAIT_C( 16 - 2 * i, 40 + 24 * i, 12 ) ) {
+                    _pkmnIdx = i;
+                    tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
+
+                    if( mode != DEFAULT_MODE ) {
+                        mode = VIEW_DETAILS;
+                        rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
+                        _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
+                    }
+                }
+            for( u8 i = 0; i < 5; ++i ) {
+                if( FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_individualValues.m_isEgg && i != 2 )
+                    continue;
+                if( GET_AND_WAIT_C( 62 + 32 * i, 14 - 2 * i, 14 ) ) {
+                    _page = i;
+                    _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, mode == DEFAULT_MODE );
+                    mode = VIEW_DETAILS;
+                }
+            }
+
+            if( mode == DEFAULT_MODE ) {
+                if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
                     break;
-                else if( res & KEY_B ) {
-                    _stsUI->init( _pkmnIdx );
-                    continue;
+                } else if( GET_AND_WAIT( KEY_A ) ) {
+                    _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
+                    mode = VIEW_DETAILS;
+                } else if( GET_AND_WAIT( KEY_SELECT ) ) {
+                    if( selectedIdx == 42 ) {
+                        selectedIdx = _pkmnIdx;
+                        continue;
+                    } else if( selectedIdx != _pkmnIdx ) {
+                        std::swap( FS::SAV->m_pkmnTeam[ selectedIdx ], FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
+                        _stsUI->init( _pkmnIdx );
+                        tg = _stsUI->draw( _pkmnIdx, true );
+                    }
+                    selectedIdx = 42;
                 }
-            } else if( GET_AND_WAIT( KEY_DOWN ) ) {
-                _pkmnIdx = ( _pkmnIdx + 1 ) % FS::SAV->getTeamPkmnCount( );
-                _stsUI->init( _pkmnIdx, false );
-            } else if( GET_AND_WAIT( KEY_UP ) ) {
-                _pkmnIdx = ( _pkmnIdx + FS::SAV->getTeamPkmnCount( ) - 1 ) % FS::SAV->getTeamPkmnCount( );
-                _stsUI->init( _pkmnIdx, false );
-            } else if( GET_AND_WAIT( KEY_SELECT ) ) {
-                if( selectedIdx == 42 ) {
-                    selectedIdx = _pkmnIdx;
-                    continue;
-                } else if( selectedIdx != _pkmnIdx ) {
-                    std::swap( FS::SAV->m_pkmnTeam[ selectedIdx ], FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
-                    _stsUI->init( _pkmnIdx );
+            } else {
+                if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                    mode = VIEW_DETAILS;
+                    _page = ( _page + 1 ) % _stsUI->m_pagemax;
+                    _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, false );
+                } else if( GET_AND_WAIT( KEY_LEFT ) ) {
+                    mode = VIEW_DETAILS;
+                    _page = ( _page + _stsUI->m_pagemax - 1 ) % _stsUI->m_pagemax;
+                    _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, false );
                 }
-                selectedIdx = 42;
-            } else if( _stsUI->_showTakeItem &&
+
+                if( mode == VIEW_DETAILS ) {
+                    if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+                        mode = DEFAULT_MODE;
+                        _stsUI->init( _pkmnIdx );
+                        tg = _stsUI->draw( _pkmnIdx, true );
+                    } else if( _page == 3 && GET_AND_WAIT( KEY_A ) ) {
+                        mode = MOVE_DETAILS;
+                        if( !_stsUI->drawMove( FS::SAV->m_pkmnTeam[ _pkmnIdx ], modeVal ) ) {
+                            mode = VIEW_DETAILS;
+                            modeVal = 0;
+                        }
+                    } else if( _page == 4 && !rbs.empty( ) && GET_AND_WAIT( KEY_A ) ) {
+                        mode = RIBBON_DETAILS;
+                        modeVal = 0;
+                        if( !_stsUI->drawRibbon( FS::SAV->m_pkmnTeam[ _pkmnIdx ], rbs[ modeVal ] ) ) {
+                            mode = VIEW_DETAILS;
+                            modeVal = 0;
+                        }
+                    }
+                } else if( mode == MOVE_DETAILS ) {
+                    if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+                        mode = VIEW_DETAILS;
+                        _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
+                    } else if( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) {
+                        do modeVal = ( modeVal + 1 ) % 4;
+                        while( !_stsUI->drawMove( FS::SAV->m_pkmnTeam[ _pkmnIdx ], modeVal ) );
+                    } else if( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) {
+                        do modeVal = ( modeVal + 3 ) % 4;
+                        while( !_stsUI->drawMove( FS::SAV->m_pkmnTeam[ _pkmnIdx ], modeVal ) );
+                    }
+                } else if( mode == RIBBON_DETAILS ) {
+                    if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+                        mode = VIEW_DETAILS;
+                        _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
+                    } else if( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) {
+                        modeVal = ( modeVal + 1 ) % rbs.size( );
+                        _stsUI->drawRibbon( FS::SAV->m_pkmnTeam[ _pkmnIdx ], rbs[ modeVal ] );
+                    } else if( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) {
+                        modeVal = ( modeVal + rbs.size( ) - 1 ) % rbs.size( );
+                        _stsUI->drawRibbon( FS::SAV->m_pkmnTeam[ _pkmnIdx ], rbs[ modeVal ] );
+                    }
+                }
+            }
+
+            /*else if( _stsUI->_showTakeItem &&
                        GET_AND_WAIT_R( 152, !!_stsUI->_showMoveCnt * ( -7 + 24 * _stsUI->_showMoveCnt ), 300, ( 17 + 24 * _stsUI->_showMoveCnt ) ) ) {
                 char buffer[ 50 ];
                 item acI = *ItemList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem ];
@@ -94,7 +193,7 @@ namespace STS {
                 sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
                 IO::messageBox a( buffer );
                 FS::SAV->m_bag->insert( BAG::toBagType( acI.m_itemType ), acI.getItemId( ), 1 );
-                _stsUI->init( _pkmnIdx );
+                _stsUI->draw( _pkmnIdx );
             } else if( GET_AND_WAIT_R( 152, !!( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) * ( -7 + 24 * ( _stsUI->_showTakeItem + _stsUI->_showMoveCnt ) ),
                                        300, ( 17 + 24 * ( _stsUI->_showMoveCnt + _stsUI->_showTakeItem ) ) ) ) {
 
@@ -131,95 +230,7 @@ namespace STS {
                     }
                     break;
                 }
-
-        }
-
-    }
-    s16 statusScreen::drawPage( ) {
-        _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
-
-        touchPosition touch;
-
-        u8 acMode = 0; // 0: normal, 1: show attack details, 2: show ribbon details
-        u8 modeVal = 0;
-        auto rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
-
-        loop( ) {
-            scanKeys( );
-            touchRead( &touch );
-            swiWaitForVBlank( );
-            int pressed = keysCurrent( );
-
-            if( GET_AND_WAIT( KEY_X ) || ( !acMode && ( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_C( 248, 184, 16 ) ) ) ) {
-                return ( pressed & KEY_X ) | KEY_B;
-            } else if( !acMode && ( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) ) {
-                _pkmnIdx = ( _pkmnIdx + 1 ) % FS::SAV->getTeamPkmnCount( );
-                rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
-                _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
-            } else if( !acMode && ( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) ) {
-                _pkmnIdx = ( _pkmnIdx + FS::SAV->getTeamPkmnCount( ) - 1 ) % FS::SAV->getTeamPkmnCount( ); 
-                rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
-                _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
-            } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
-                acMode = 0;
-                _page = ( _page + 1 ) % _stsUI->m_pagemax;
-                _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, false );
-            } else if( GET_AND_WAIT( KEY_LEFT ) ) {
-                acMode = 0;
-                _page = ( _page + _stsUI->m_pagemax - 1 ) % _stsUI->m_pagemax;
-                _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, false );
-            }
-
-            else if( _page != 0 && GET_AND_WAIT_C( 12, 12, 16 ) ) {
-                _page = 0;
-                acMode = 0;
-                _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, false );
-            } else if( _page != 1 && GET_AND_WAIT_C( 8, 34, 16 ) ) {
-                _page = 1;
-                acMode = 0;
-                _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, false );
-            } else if( _page != 2 && GET_AND_WAIT_C( 34, 10, 16 ) ) {
-                _page = 2;
-                acMode = 0;
-                _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, false );
-            }
-
-            //Exit all specific modes through B/..
-            else if( acMode && ( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_C( 248, 184, 16 ) ) ) {
-                acMode = 0;
-                _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, false );
-            }
-            //Mode specific stuff
-            //Attack info
-            else if( acMode == 0 && _page == 3 && GET_AND_WAIT( KEY_A ) ) {
-                acMode = 1;
-                if( !_stsUI->drawMove( FS::SAV->m_pkmnTeam[ _pkmnIdx ], modeVal ) ) {
-                    acMode = 0;
-                    modeVal = 0;
-                }
-            } else if( acMode == 1 && ( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) ) {
-                do modeVal = ( modeVal + 1 ) % 4;
-                while( !_stsUI->drawMove( FS::SAV->m_pkmnTeam[ _pkmnIdx ], modeVal ) );
-            } else if( acMode == 1 && ( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) ) {
-                do modeVal = ( modeVal + 3 ) % 4;
-                while( !_stsUI->drawMove( FS::SAV->m_pkmnTeam[ _pkmnIdx ], modeVal ) );
-            }
-
-            //Ribbon info
-            else if( acMode == 0 && _page == 4 && !rbs.empty( ) && GET_AND_WAIT( KEY_A ) ) {
-                acMode = 2;
-                modeVal = 0;
-                if( !_stsUI->drawRibbon( FS::SAV->m_pkmnTeam[ _pkmnIdx ], rbs[ modeVal ] ) ) {
-                    acMode = 0;
-                    modeVal = 0;
-                }
-            } else if( acMode == 2 && ( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) ) {
-                modeVal = ( modeVal + 1 ) % rbs.size( );
-                _stsUI->drawRibbon( FS::SAV->m_pkmnTeam[ _pkmnIdx ], rbs[ modeVal ] );
-            } else if( acMode == 2 && ( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) ) {
-                modeVal = ( modeVal + rbs.size( ) - 1 ) % rbs.size( );
-                _stsUI->drawRibbon( FS::SAV->m_pkmnTeam[ _pkmnIdx ], rbs[ modeVal ] );
-            }
+*/
         }
 
     }
