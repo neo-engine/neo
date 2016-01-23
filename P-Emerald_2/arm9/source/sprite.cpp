@@ -65,26 +65,24 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "plat11a.h"
 #include "plat11b.h"
 
+#include "messageBox.h"
 unsigned int TEMP[ 12288 ] = { 0 };
 unsigned short TEMP_PAL[ 256 ] = { 0 };
 
 namespace IO {
-    const unsigned int* TypeTiles[ 19 ] =
-    {
+    const unsigned int* TypeTiles[ 19 ] = {
         NormalTiles, KampfTiles, FlugTiles, GiftTiles, BodenTiles,
         GestTiles, KaeferTiles, GeistTiles, StahlTiles, UnbekTiles,
         WasserTiles, FeuerTiles, PflTiles, ElekTiles, PsychoTiles,
         EisTiles, DraTiles, UnlTiles, FeeTiles
     };
-    const unsigned short* TypePals[ 19 ] =
-    {
+    const unsigned short* TypePals[ 19 ] = {
         NormalPal, KampfPal, FlugPal, GiftPal, BodenPal,
         GestPal, KaeferPal, GeistPal, StahlPal, UnbekPal,
         WasserPal, FeuerPal, PflPal, ElekPal, PsychoPal,
         EisPal, DraPal, UnlPal, FeePal
     };
-    const unsigned int* RibbonTiles[ MAX_RIBBONS ] =
-    {
+    const unsigned int* RibbonTiles[ MAX_RIBBONS ] = {
         r0Tiles, r1Tiles, r2Tiles, r3Tiles, r4Tiles, r5Tiles, r6Tiles, r7Tiles,
         r8Tiles, r9Tiles, r10Tiles, r11Tiles, r12Tiles, r13Tiles, r14Tiles, r15Tiles,
 
@@ -102,8 +100,7 @@ namespace IO {
 
         r80Tiles, r81Tiles, r82Tiles, r83Tiles, r84Tiles, r85Tiles
     };
-    const unsigned short* RibbonPals[ MAX_RIBBONS ] =
-    {
+    const unsigned short* RibbonPals[ MAX_RIBBONS ] = {
         r0Pal, r1Pal, r2Pal, r3Pal, r4Pal, r5Pal, r6Pal, r7Pal,
         r8Pal, r9Pal, r10Pal, r11Pal, r12Pal, r13Pal, r14Pal, r15Pal,
 
@@ -121,8 +118,7 @@ namespace IO {
 
         r80Pal, r81Pal, r82Pal, r83Pal, r84Pal, r85Pal
     };
-    const unsigned int* PlatformTiles[ 2 * MAX_PLATFORMS ] =
-    {
+    const unsigned int* PlatformTiles[ 2 * MAX_PLATFORMS ] = {
         plat0aTiles, plat0bTiles,
         plat1aTiles, plat1bTiles,
         plat2aTiles, plat2bTiles,
@@ -136,18 +132,15 @@ namespace IO {
         plat10aTiles, plat10bTiles,
         plat11aTiles, plat11bTiles
     };
-    const unsigned short* PlatformPals[ MAX_PLATFORMS ] =
-    {
+    const unsigned short* PlatformPals[ MAX_PLATFORMS ] = {
         plat0aPal, plat1aPal, plat2aPal, plat3aPal, plat4aPal, plat5aPal,
         plat6aPal, plat7aPal, plat8aPal, plat9aPal, plat10aPal, plat11aPal
     };
 
-    const unsigned int* HitTypeTiles[ 3 ] =
-    {
+    const unsigned int* HitTypeTiles[ 3 ] = {
         damage_0Tiles, damage_1Tiles, damage_2Tiles
     };
-    const unsigned short* HitTypePals[ 3 ] =
-    {
+    const unsigned short* HitTypePals[ 3 ] = {
         damage_0Pal, damage_1Pal, damage_2Pal
     };
 
@@ -268,9 +261,9 @@ namespace IO {
     }
     void copySpriteData( const unsigned int *p_spriteData, const u16 p_tileIdx, const u32 p_spriteDataLen, bool p_bottom ) {
         if( !p_bottom&& p_spriteData )
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER ], p_spriteDataLen );
+            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX[ (u32) p_tileIdx * OFFSET_MULTIPLIER ], p_spriteDataLen );
         else if( p_spriteData )
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER_SUB ], p_spriteDataLen );
+            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, &SPRITE_GFX_SUB[ (u32) p_tileIdx * OFFSET_MULTIPLIER_SUB ], p_spriteDataLen );
     }
 
     u16 loadSprite( const u8    p_oamIdx,
@@ -376,11 +369,11 @@ namespace IO {
             if( p_spriteData )
                 for( u32 i = 0; i < p_spriteDataLen; ++i ) {
                     u8 ac = nspD[ i ];
-                    SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER + i ] = 0;
+                    SPRITE_GFX[ (u32) p_tileIdx * OFFSET_MULTIPLIER + i ] = 0;
                     if( ac >> 4 )
-                        SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac >> 4 ) ) << 8;
+                        SPRITE_GFX[ (u32) p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac >> 4 ) ) << 8;
                     if( ac % ( 1 << 4 ) )
-                        SPRITE_GFX[ p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac % ( 1 << 4 ) ) );
+                        SPRITE_GFX[ (u32) p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac % ( 1 << 4 ) ) );
                 }
         } else {
             vramSetBankI( VRAM_I_LCD );
@@ -392,11 +385,11 @@ namespace IO {
             if( p_spriteData )
                 for( u32 i = 0; i < p_spriteDataLen; ++i ) {
                     u8 ac = nspD[ i ];
-                    SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER + i ] = 0;
+                    SPRITE_GFX_SUB[ (u32) p_tileIdx * OFFSET_MULTIPLIER + i ] = 0;
                     if( ac >> 4 )
-                        SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac >> 4 ) ) << 8;
+                        SPRITE_GFX_SUB[ (u32) p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac >> 4 ) ) << 8;
                     if( ac % ( 1 << 4 ) )
-                        SPRITE_GFX_SUB[ p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac % ( 1 << 4 ) ) );
+                        SPRITE_GFX_SUB[ (u32) p_tileIdx * OFFSET_MULTIPLIER + i ] |= ( 16 * p_palpos + ( ac % ( 1 << 4 ) ) );
                 }
         }
 

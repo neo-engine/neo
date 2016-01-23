@@ -139,6 +139,10 @@ void initNewGame( ) {
     FS::SAV->m_lstBagItem = 0;
 
     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
+    memset( FS::SAV->m_storedPokemon, 0, sizeof( FS::SAV->m_storedPokemon ) );
+    for( u8 i = 0; i < MAX_BOXES; ++i )
+        sprintf( ( FS::SAV->m_storedPokemon + i )->m_name, "Box %d", i + 1 );
+    FS::SAV->m_curBox = 0;
 
     FS::SAV->m_player = { MAP::mapObject::PLYR, { 104, 120, 5 }, 0, MAP::moveMode::WALK, 0, 0, MAP::direction::RIGHT };
     FS::SAV->m_isMale = true;

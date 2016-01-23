@@ -61,14 +61,16 @@ namespace IO {
 
         // Methods
         void printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom );
-        void printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16 );
+        void printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16, s8 p_adjustX = 0 );
+        void printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX = 256, u16 p_breakChar = L'.' );
         void printStringCenter( const char *p_string, bool p_bottom );
         void printStringD( const char *p_string, s16& p_x, s16& p_y, bool p_bottom );
         void printStringCenterD( const char *p_string, bool p_bottom );
         void printNumber( s32 p_num, s16 p_x, s16 p_y, bool p_bottom );
         u32 stringWidth( const char *p_string ) const;
 
-        void printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16 );
+        void printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16, s8 p_adjustX = 0 );
+        void printMaxString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX = 256, u16 p_breakChar = L'.' );
         void printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
         void printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
         void printMBStringD( const char *p_string, s16& p_x, s16& p_y, bool p_bottom );

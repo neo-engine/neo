@@ -99,7 +99,6 @@ namespace BAG {
 
     void bagUI::init( ) {
         IO::vramSetup( );
-        videoSetMode( MODE_5_2D/* | DISPLAY_BG2_ACTIVE*/ | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
         swiWaitForVBlank( );
         IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
         consoleSetFont( &IO::Top, IO::consoleFont );
@@ -111,8 +110,10 @@ namespace BAG {
         IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
         consoleSetFont( &IO::Bottom, IO::consoleFont );
 
-        FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "Clear", 512, 49152, true );
-        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "Clear", 512, 49152, true );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
         dmaCopy( bag_bg_lowerBitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
         dmaCopy( bag_bg_lowerPal, BG_PALETTE_SUB, 256 * 2 );
 
@@ -359,7 +360,7 @@ namespace BAG {
     }
 
     void drawTop( u8 p_page ) {
-        dmaCopy( bag_bg_upperBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
+        dmaCopy( bag_bg_upperBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         dmaCopy( bag_bg_upperPal, BG_PALETTE, 256 * 2 );
         initColors( );
 

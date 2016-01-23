@@ -109,6 +109,7 @@ bool UPDATE_TIME = true;
 bool ANIMATE_MAP = false;
 bool INIT_MAIN_SPRITES = false;
 u8 FRAME_COUNT = 0;
+bool SCREENS_SWAPPED = false;
 
 u8 getCurrentDaytime( ) {
     u8 t = achours, m = acmonth;
@@ -173,10 +174,7 @@ void initMainSprites( ) {
 }
 void initGraphics( ) {
     IO::vramSetup( );
-    videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-    videoSetModeSub( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
 
-    IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
     IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
     IO::bg2sub = bgInitSub( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
     for( u8 i = 0; i < 4; ++i )
@@ -234,8 +232,6 @@ int main( int, char** p_argv ) {
     }
     startScreen( ).run( );
 
-    int HILFSCOUNTER = 252;
-
     FS::SAV->m_hasGDex = true;
     FS::SAV->m_evolveInBattle = true;
 
@@ -254,24 +250,26 @@ int main( int, char** p_argv ) {
         if( !UPDATE_TIME )
             return;
 
+        auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
+
         IO::boldFont->setColor( 0, 0 );
         u8 oldC1 = IO::boldFont->getColor( 1 );
         u8 oldC2 = IO::boldFont->getColor( 2 );
         IO::boldFont->setColor( 0, 1 );
         IO::boldFont->setColor( BLACK_IDX, 2 );
-        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
+        pal[ BLACK_IDX ] = BLACK;
         time_t unixTime = time( NULL );
         struct tm* timeStruct = gmtime( (const time_t *) &unixTime );
 
         if( acseconds != timeStruct->tm_sec || DRAW_TIME ) {
             DRAW_TIME = false;
-            BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
+            pal[ WHITE_IDX ] = WHITE;
             IO::boldFont->setColor( WHITE_IDX, 1 );
             IO::boldFont->setColor( WHITE_IDX, 2 );
 
             char buffer[ 50 ];
             sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-            IO::boldFont->printString( buffer, 18 * 8, 192 - 16, true );
+            IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
 
             achours = timeStruct->tm_hour;
             acminutes = timeStruct->tm_min;
@@ -280,7 +278,7 @@ int main( int, char** p_argv ) {
             IO::boldFont->setColor( 0, 1 );
             IO::boldFont->setColor( BLACK_IDX, 2 );
             sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-            IO::boldFont->printString( buffer, 18 * 8, 192 - 16, true );
+            IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
         }
         achours = timeStruct->tm_hour;
         acminutes = timeStruct->tm_min;
@@ -432,20 +430,9 @@ OUT:
                    && ( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ],
                                         IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ], 16 ) ) ) {
 
-            std::vector<pokemon> tmp;
-            for( u8 i = 0; i < 6; ++i )
-                if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                    tmp.push_back( FS::SAV->m_pkmnTeam[ i ] );
-                else
-                    break;
-            STS::regStsScreenUI rsUI( &tmp );
-            STS::regStsScreen sts( 0, &rsUI );
             ANIMATE_MAP = false;
-
+            STS::statusScreen sts( 0 );
             sts.run( );
-
-            for( u8 i = 0; i < tmp.size( ); ++i )
-                FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
 
             IO::clearScreenConsole( true, true );
             IO::drawSub( true );
@@ -476,18 +463,12 @@ OUT:
             switch( res ) {
                 case 0:
                 {
-                    if( !FS::SAV->m_storedPokemon )
-                        FS::SAV->m_storedPokemon = new BOX::box( );
-
-                    for( u8 i = 0; i < 6; ++i )
-                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                            FS::SAV->m_storedPokemon->insert( FS::SAV->m_pkmnTeam[ i ].m_boxdata );
                     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
-                    for( int i = 0; i < 6; ++i ) {
+                    for( int i = 0; i < 5; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                        a = pokemon( 0, 133 + i, 0,
+                        a = pokemon( 0, 143 + i, 0,
                                      50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
-                                     !FS::SAV->m_isMale );
+                                     !FS::SAV->m_isMale, i, false, i % 2, i == 3, i + rand( ) % 500, i, i );
                         a.m_stats.m_acHP *= i / 5.0;
                         a.m_boxdata.m_experienceGained += 750;
 
@@ -499,12 +480,26 @@ OUT:
                         }
                         a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
                         a.m_boxdata.m_ribbons1[ 3 ] = 0;
-                        a.m_boxdata.m_holdItem = I_CELL_BATTERY + i;
+                        a.m_boxdata.m_holdItem = I_DURIN_BERRY + i;
 
                         FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
-
-                        HILFSCOUNTER = 3 + ( ( HILFSCOUNTER ) % 649 );
                     }
+
+                    for( u16 j = 0; j < 649; ++j ) {
+                        auto a = pokemon( j + 1, 50, 0, j ).m_boxdata;
+                        a.m_gotPlace = j;
+                        s8 res = FS::SAV->storePkmn( a );
+                        if( a.isShiny( ) ) {
+                            IO::messageBox( "YAAAY" );
+                            s8 idx = FS::SAV->getCurrentBox( )->getFirstFreeSpot( );
+                            if( idx == -1 && !( *FS::SAV->getCurrentBox( ) )[ 17 ].isShiny( ) )
+                                IO::messageBox( "Lost :(" );
+                            else if( !( *FS::SAV->getCurrentBox( ) )[ idx - 1 ].isShiny( ) )
+                                IO::messageBox( "Lost :(" );
+                            break;
+                        }
+                    }
+
                     FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
                     FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
                     FS::SAV->m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
@@ -532,11 +527,10 @@ OUT:
                     std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 3; ++i ) {
-                        pokemon a( 0, HILFSCOUNTER, 0,
+                        pokemon a( 0, i + 456, 0,
                                    30, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko", false );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
-                        HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
                     }
                     std::vector<item> itms;
                     BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
@@ -553,11 +547,10 @@ OUT:
                     std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 6; ++i ) {
-                        pokemon a( 0, HILFSCOUNTER, 0,
+                        pokemon a( 0, 435, 0,
                                    15, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko", false );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
-                        HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
                     }
                     std::vector<item> itms;
                     BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
@@ -581,10 +574,7 @@ OUT:
                 }
                 case 6: case 7:
                 {
-                    if( !FS::SAV->m_storedPokemon )
-                        FS::SAV->m_storedPokemon = new BOX::box( );
-                    BOX::boxUI bxUI;
-                    BOX::boxViewer bxv( FS::SAV->m_storedPokemon, &bxUI, 0 );
+                    BOX::boxViewer bxv;
                     ANIMATE_MAP = false;
 
                     bxv.run( res % 2 );

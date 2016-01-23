@@ -29,160 +29,148 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "boxUI.h"
 #include "defines.h"
 #include "uio.h"
+#include "messageBox.h"
+
 #include "statusScreen.h"
 #include "statusScreenUI.h"
 #include "saveGame.h"
 
 namespace BOX {
 #define TRESHOLD 10
-    u16 boxViewer::nextNonEmptyBox( u16 p_start ) {
-        for( u16 i = p_start + 1; i <= MAX_PKMN + 1; ++i )
-            if( !_box->empty( i ) )
-                return i;
-        return p_start;
-    }
-    u16 boxViewer::previousNonEmptyBox( u16 p_start ) {
-        for( u16 i = p_start - 1; i > 0; --i )
-            if( !p_start )
-                return p_start;
-            else if( !_box->empty( i ) )
-                return i;
-        return p_start;
-    }
 
-    void boxViewer::generateNextPage( ) {
-
-        _currPage[ 0 ] = _currPage[ 28 ];
-
-        u16 pokemon = _currPage[ 0 ].first;
-        u16 pos = _currPage[ 0 ].second;
-
-        for( u8 i = 1; i < 30; ++i )
-            _currPage[ i ] = { 0, 0 };
-
-        for( u8 i = 1; i < 30; ++i ) {
-            if( ++pos < _box->count( pokemon ) )
-                _currPage[ i ] = { pokemon, pos };
-            else {
-                u16 n = nextNonEmptyBox( pokemon );
-                if( n == pokemon ) {
-                    return;
-                } else {
-                    _currPage[ i ] = { n, 0 };
-                    pos = 0;
-                    pokemon = n;
-                }
-            }
-        }
-    }
-    void boxViewer::generatePreviousPage( ) {
-
-        if( !( _currPage[ 0 ].first || _currPage[ 0 ].second ) ) //It's already the first page
-            return;
-
-        _currPage[ 29 ] = _currPage[ 1 ];
-        u16 pokemon = _currPage[ 1 ].first;
-        u16 pos = _currPage[ 1 ].second;
-
-        for( u8 i = 0; i < 29; ++i )
-            _currPage[ i ] = { 0, 0 };
-
-        for( u8 i = 28; i >= 0; --i ) {
-            if( pos-- )
-                _currPage[ i ] = { pokemon, pos };
-            else {
-                u16 n = previousNonEmptyBox( pokemon );
-                if( n == pokemon ) {
-                    _currPage[ 0 ] = { 0, 0 };
-
-                    return;
-                } else {
-                    _currPage[ i ] = { n, pos = _box->count( n ) - 1 };
-                    pokemon = n;
-                }
-            }
-        }
-    }
-
+#define HAS_SELECTION( no, yes ) do if( _selectedIdx == (u8) -1 ) { no; } else { yes; } while (false)
     void boxViewer::run( bool p_allowTakePkmn ) {
-        _boxUI->init( );
+#define CLEAN ( _topScreenDirty = false  )
         _atHandOam = 0;
-        _ranges = _boxUI->draw( _currPage, _currPos = 0, _box, '*', true, p_allowTakePkmn );
+        _ranges = _boxUI.draw( p_allowTakePkmn );
+        CLEAN;
+        _curPage = 0;
+        _selectedIdx = (u8) -1;
+        memset( &_heldPkmn, 0, sizeof( pokemon ) );
 
-        u8 mx = p_allowTakePkmn ? 21 : 28;
+        _showTeam = p_allowTakePkmn;
 
         touchPosition touch;
-        u8 curr = -1, start = -1;
+        u8 curr = -1, start = -1; //Indices the held sprite is covering
         loop( ) {
             swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
             int pressed = keysCurrent( );
-            u8 oldPos = _currPos;
             bool newPok;
 
             if( _atHandOam ) {
-                _boxUI->updateAtHand( touch, _atHandOam );
+                _boxUI.updateAtHand( touch, _atHandOam );
             }
 
             if( _atHandOam && !( touch.px | touch.py ) ) { //Player drops the sprite at hand
-                u32 res = _boxUI->acceptDrop( start, curr, _atHandOam );
+                //boxUI.acceptDrop( start, curr, _atHandOam );
                 _atHandOam = 0;
-
-                if( start < 21 && curr < 21 )
-                    continue;
-
-                else if( start >= 21 && curr >= 21 ) {
-                    //Count the team pokemon
-                    u8 cnt = 0;
-                    for( u8 i = 0; i < 6; ++i )
-                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId
-                            && FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP )
-                            ++cnt;
-                    if( !FS::SAV->m_pkmnTeam[ start - 21 ].m_stats.m_acHP )
+                //Count the non-fainted team pkmn
+                u8 cnt = 0;
+                for( u8 i = 0; i < 6; ++i )
+                    if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId
+                        && FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP )
                         ++cnt;
+                /*
+                                sprintf( buffer, "%d -> %d", start, curr );
+                                IO::messageBox m( buffer );*/
+                                /*
+                                if( start == 255 || curr == 255 ) //Something went wrong
+                                    continue;
+                                else if( start < 21 && curr < 21 ) //Boxes auto-sort; no PKMN-Shifting inside Boxes
+                                    continue;
+                                else if( start >= 21 && curr >= 21 ) { //Shift Team-Pkmn
+                                    if( FS::SAV->m_pkmnTeam[ curr - 21 ].m_boxdata.m_speciesId &&
+                                        FS::SAV->m_pkmnTeam[ start - 21 ].m_boxdata.m_speciesId ) {
+                                        std::swap( FS::SAV->m_pkmnTeam[ start - 21 ], FS::SAV->m_pkmnTeam[ curr - 21 ] );
+                                        _ranges = _boxUI->draw( _currPage, _currPos = curr, _box, start, true, true );
+                                    } else {
+                                        _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
+                                    }
+                                } else if( start < 21 && curr >= 21 && _currPage[ start + 1 ].first ) { //withdraw pkmn
+                                                                                                        //Extract pkmn from the box
+                                    auto tmp = _box->operator[]( _currPage[ start + 1 ].first );
+                                    auto it = tmp.begin( );
+                                    for( u8 i = 0; i < _currPage[ start + 1 ].second; ++i, ++it );
+                                    pokemon target = pokemon( *it );
+                                    _box->erase( target );
 
-                    if( curr == u8( -1 ) && cnt > 1 ) { //Deposit the pokemon
-                        _box->insert( FS::SAV->m_pkmnTeam[ start - 21 ] );
+                                    //Swap the extracted Pkmn with the team pkmn
+                                    u8 rct = 0; //real count: including fainted ones
+                                    for( u8 i = 0; i < 6; ++i )
+                                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                                            ++rct;
+                                    rct = std::min( rct, u8( curr - 21 ) );
 
-                        for( u8 i = start - 21; i < 5; ++i )
-                            std::swap( FS::SAV->m_pkmnTeam[ i ], FS::SAV->m_pkmnTeam[ i + 1 ] );
-                        memset( &FS::SAV->m_pkmnTeam[ 5 ], 0, sizeof( pokemon ) );
+                                    std::swap( target, FS::SAV->m_pkmnTeam[ rct ] );
 
-                        for( u8 i = 0; i < 30; ++i )
-                            _currPage[ i ] = { 0, 0 };
-                        generateNextPage( );
-                        _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
-                    } else if( curr != u8( -1 ) && FS::SAV->m_pkmnTeam[ curr - 21 ].m_boxdata.m_speciesId &&
-                               FS::SAV->m_pkmnTeam[ start - 21 ].m_boxdata.m_speciesId ) {
-                        std::swap( FS::SAV->m_pkmnTeam[ start - 21 ], FS::SAV->m_pkmnTeam[ curr - 21 ] );
+                                    //Insert the team pkmn into the box
+                                    _box->insert( target );
 
-                        _ranges = _boxUI->draw( _currPage, _currPos = curr, _box, start, true, true );
-                    } else {
-                        _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
-                    }
-                } else if( start < 21 && curr >= 21 && _currPage[ start ].first ) {
-                    //if( FS::SAV->m_pkmnTeam[ curr - 21 ].m_boxdata.m_speciesId ) {
-                    //    _box->insert( FS::SAV->m_pkmnTeam[ curr - 21 ] );
-                    //}
+                                    //recalc and redraw everything
+                                    generatePreviousPage( );
+                                    generateNextPage( );
+                                    _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
+                                } else if( start >= 21 && curr < 21 ) { //deposit pkmn
+                                    if( cnt <= 1 ) {
+                                        _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
+                                        continue;
+                                    }
+                                    _box->insert( FS::SAV->m_pkmnTeam[ start - 21 ] );
+                                    for( u8 i = start - 21; i < 5; ++i )
+                                        std::swap( FS::SAV->m_pkmnTeam[ i ], FS::SAV->m_pkmnTeam[ i + 1 ] );
+                                    memset( &FS::SAV->m_pkmnTeam[ 5 ], 0, sizeof( pokemon ) );
 
-                    //FS::SAV->m_pkmnTeam[ curr - 21 ].m_boxdata =
-
-                } else if( start >= 21 && curr < 21 ) {
-
-                    }
+                                    generatePreviousPage( );
+                                    generateNextPage( );
+                                    _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
+                                }*/
             }
 
             if( GET_AND_WAIT( KEY_B )
                 || GET_AND_WAIT( KEY_X )
                 || GET_AND_WAIT_C( SCREEN_WIDTH - 12, SCREEN_HEIGHT - 10, 16 ) ) {
                 break;
+            } else if( GET_AND_WAIT( KEY_L ) ) {
+                FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                CLEAN;
+                _boxUI.draw( p_allowTakePkmn );
+                select( _selectedIdx );
+            } else if( GET_AND_WAIT( KEY_R ) ) {
+                FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
+                CLEAN;
+                _boxUI.draw( p_allowTakePkmn );
+                select( _selectedIdx );
+            } else if( GET_AND_WAIT( KEY_DOWN ) ) {
+                HAS_SELECTION( _selectedIdx = 0,
+                               _selectedIdx = ( _selectedIdx + 6 ) % ( MAX_PKMN_PER_BOX + 6 ) );
+                select( _selectedIdx );
+            } else if( GET_AND_WAIT( KEY_UP ) ) {
+                HAS_SELECTION( _selectedIdx = 0,
+                               _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX ) % ( MAX_PKMN_PER_BOX + 6 ) );
+                select( _selectedIdx );
             } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                HAS_SELECTION( _selectedIdx = 0,
+                               _selectedIdx = ( _selectedIdx + 1 ) % ( MAX_PKMN_PER_BOX + 6 ) );
+                select( _selectedIdx );
+            } else if( GET_AND_WAIT( KEY_LEFT ) ) {
+                HAS_SELECTION( _selectedIdx = 0,
+                               _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 5 ) % ( MAX_PKMN_PER_BOX + 6 ) );
+                select( _selectedIdx );
+            } else if( GET_AND_WAIT( KEY_A ) ) {
+                HAS_SELECTION( , takePkmn( _selectedIdx ) );
+            } else if( GET_AND_WAIT( KEY_SELECT ) ) {
+                _curPage = ( _curPage + 1 ) % 5;
+                select( _selectedIdx );
+            }
+
+            /*else if( GET_AND_WAIT( KEY_RIGHT ) ) {
                 if( p_allowTakePkmn && _currPos >= 21 ) {
                     newPok = false;
                     _currPos = ( ( _currPos - 20 ) % 6 ) + 21;
                 } else {
-                    if( newPok = ( ( ( ++_currPos ) %= mx ) < oldPos ) )
+                    if( ( newPok = ( ( ( ++_currPos ) %= mx ) < oldPos ) ) )
                         generateNextPage( );
                 }
                 _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
@@ -191,16 +179,16 @@ namespace BOX {
                     newPok = false;
                     _currPos = ( ( _currPos - 16 ) % 6 ) + 21;
                 } else {
-                    if( newPok = ( ( ( _currPos += ( mx - 1 ) ) %= mx ) > oldPos ) )
+                    if( ( newPok = ( ( ( _currPos += ( mx - 1 ) ) %= mx ) > oldPos ) ) )
                         generatePreviousPage( );
                 }
                 _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_UP ) ) {
-                if( newPok = ( ( ( _currPos += ( mx - 7 ) ) %= mx ) > oldPos ) )
+                if( ( newPok = ( ( ( _currPos += ( mx - 7 ) ) %= mx ) > oldPos ) ) )
                     generatePreviousPage( );
                 _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
-                if( newPok = ( ( ( _currPos += 7 ) %= mx ) < oldPos ) )
+                if( ( newPok = ( ( ( _currPos += 7 ) %= mx ) < oldPos ) ) )
                     generateNextPage( );
                 _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
             } else if( GET_AND_WAIT( KEY_A ) ) {
@@ -226,7 +214,7 @@ namespace BOX {
                                 break;
                             }
                             if( !touch.px && !touch.py ) {
-                                u8 res = _boxUI->acceptTouch( _currPos, j, p_allowTakePkmn );
+                                _boxUI->acceptTouch( _currPos, j, p_allowTakePkmn );
                                 _ranges = _boxUI->draw( _currPage, j, _box, _currPos, false, p_allowTakePkmn );
                                 _currPos = j;
                                 break;
@@ -241,7 +229,72 @@ namespace BOX {
                 }
             }
             if( !rangeChanged )
-                curr = -1;
+                curr = -1; */
         }
+    }
+    void boxViewer::select( u8 p_index ) {
+        if( p_index == (u8) -1 ) {
+            _boxUI.select( p_index );
+            return;
+        }
+        pokemon selection;
+        if( p_index < MAX_PKMN_PER_BOX )
+            selection = ( *FS::SAV->getCurrentBox( ) )[ p_index ];
+        else if( _showTeam )
+            selection = FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ];
+        else
+            selection = FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
+
+        _boxUI.select( p_index );
+        if( selection.m_boxdata.m_speciesId ) {
+            if( !_topScreenDirty )
+                _stsUI->init( );
+            _stsUI->draw( selection, _curPage, true );
+            _topScreenDirty = true;
+        } else if( _topScreenDirty ) {
+            _boxUI.drawAllBoxStatus( );
+            _topScreenDirty = false;
+        }
+    }
+
+    void boxViewer::takePkmn( u8 p_index ) {
+        if( p_index > MAX_PKMN_PER_BOX + 6 )
+            return;
+
+        pokemon::boxPokemon hld = _heldPkmn.m_boxdata;
+        if( p_index < MAX_PKMN_PER_BOX )
+            std::swap( hld, FS::SAV->getCurrentBox( )->operator[]( p_index ) );
+        if( p_index >= MAX_PKMN_PER_BOX && !_showTeam )
+            std::swap( hld, FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ] );
+        if( p_index >= MAX_PKMN_PER_BOX && _showTeam ) {
+            std::swap( _heldPkmn, FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
+            if( !updateTeam( ) ) {
+                std::swap( _heldPkmn, FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
+                return;
+            } else
+                _boxUI.updateTeam( );
+        } else
+            _heldPkmn = pokemon( hld );
+        _boxUI.takePkmn( p_index, _heldPkmn.m_boxdata.m_speciesId, _heldPkmn.m_boxdata.m_individualValues.m_isEgg );
+    }
+
+    //Remove gaps in party pkmn
+    bool boxViewer::updateTeam( ) {
+        u8 nxt = 1;
+        for( u8 i = 0; i < 6; ++i, ++nxt )
+            if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                for( ; nxt < 6; ++nxt )
+                    if( FS::SAV->m_pkmnTeam[ nxt ].m_boxdata.m_speciesId ) {
+                        std::swap( FS::SAV->m_pkmnTeam[ i ], FS::SAV->m_pkmnTeam[ nxt ] );
+                        break;
+                    }
+
+        //Check if the party is safe to walk with
+        for( u8 i = 0; i < 6; ++i )
+            if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId
+                && FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP
+                && !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg )
+                return true;
+        return false;
     }
 }

@@ -27,50 +27,37 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #pragma once
 
 #include "pokemon.h"
+#include "uio.h"
 #include <vector>
 
 namespace STS {
     class statusScreenUI {
-    protected:
-        friend class statusScreen;
-        friend class regStsScreen;
-
-        std::vector<pokemon>* _pokemon;
-
-        bool _showTakeItem;
-        u8 _showMoveCnt;
-
-        virtual void init( u8 p_current, bool p_initTop = true ) = 0;
-        virtual bool draw( u8 p_current, u8 p_moveIdx );
-        virtual void drawRibbon( u8 p_current, u8 p_ribbonIdx );
-        virtual void draw( u8 p_current, u8 p_page, bool p_newpok ) = 0;
-        virtual void draw( u8 p_current ) = 0;
     public:
         u8 m_pagemax;
+        virtual bool drawMove( const pokemon& p_pokemon, u8 p_moveIdx, bool p_bottom = false );
+        virtual bool drawRibbon( const pokemon& p_pokemon, u8 p_ribbonIdx, bool p_bottom = false );
+        virtual void draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) = 0;
+
+        virtual ~statusScreenUI( ) { }
     };
 
     class regStsScreenUI : public statusScreenUI {
         u8 _current;
         void initTop( );
-        void initSub( u16 p_pkmIdx );
+        void initSub( );
 
     public:
+        void init( u8 p_current, bool p_initTop = true );
+        void draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) override;
+        std::vector<IO::inputTarget> draw( u8 p_current, bool p_updatePageIcons );
 
-        void init( u8 p_current, bool p_initTop = true ) override;
-        bool draw( u8 p_current, u8 p_moveIdx ) override;
-        void drawRibbon( u8 p_current, u8 p_ribbonIdx ) override;
-        void draw( u8 p_current, u8 p_page, bool p_newpok ) override;
-        void draw( u8 p_current ) override;
-
-        regStsScreenUI( std::vector<pokemon>* p_pokemon, u8 p_pageMax = 3 );
+        regStsScreenUI( u8 p_pageMax = 5 );
     };
 
     class boxStsScreenUI : public regStsScreenUI {
     public:
-        static void drawPkmnInformation( const pokemon& p_pokemon );
-        void init( u8 p_current, bool p_initTop = true ) override;
-        void draw( u8 p_current ) override;
-
+        void init( );
+        void draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) override;
     };
 
     //class battleStsScreenUI : public statusScreenUI {
