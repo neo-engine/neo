@@ -442,8 +442,8 @@ namespace BAG {
     }
 
     void bagUI::updateSprite( touchPosition p_touch ) {
-        IO::Oam->oamBuffer[ _curItemSpriteOam ].x = p_touch.px - 16;
-        IO::Oam->oamBuffer[ _curItemSpriteOam ].y = p_touch.py - 16;
+        IO::Oam->oamBuffer[ TRANSFER_SUB ].x = p_touch.px - 16;
+        IO::Oam->oamBuffer[ TRANSFER_SUB ].y = p_touch.py - 16;
         IO::updateOAM( true );
     }
 
@@ -469,10 +469,11 @@ namespace BAG {
         return true;
     }
 
-    void bagUI::dropSprite( bag::bagType p_page, u8 p_idx, u16 p_item ) {
+    void bagUI::dropSprite( bag::bagType p_page, u8 p_idx, std::pair<u16, u16> p_item ) {
         IO::Oam->oamBuffer[ TRANSFER_SUB ].isHidden = true;
         IO::updateOAM( true );
 
-        unselectItem( p_page, p_idx, p_item );
+        unselectItem( p_page, p_idx, p_item.first );
+        selectItem( p_idx, p_item );
     }
 }

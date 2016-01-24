@@ -47,8 +47,6 @@ namespace BAG {
             bool m_isHeld;
         };
     private:
-        u8 _curItemSpriteOam;
-
         std::vector<std::pair<IO::inputTarget, targetInfo>>
             drawPkmn( item* p_currentSelection );
     public:
@@ -61,6 +59,6 @@ namespace BAG {
 
         bool getSprite( u8 p_idx, std::pair<u16, u16> p_item );
         void updateSprite( touchPosition p_touch );
-        void dropSprite( bag::bagType p_page, u8 p_idx, u16 p_item );
+        void dropSprite( bag::bagType p_page, u8 p_idx, std::pair<u16, u16> p_item );
     };
 }

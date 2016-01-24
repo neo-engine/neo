@@ -278,6 +278,9 @@ namespace BAG {
         return true;
     }
 
+    void bagViewer::handleSelection( ) {
+
+    }
 
     void bagViewer::run( ) {
         _bagUI = new bagUI( );
@@ -295,44 +298,74 @@ namespace BAG {
             if( _hasSprite )
                 _bagUI->updateSprite( touch );
 
-            /*/
-            if( _atHandOam && !( touch.px | touch.py ) ) { //Player drops the sprite at hand
-                u32 res = _bagUI->acceptDrop( start, curr, _atHandOam );
-                _atHandOam = 0;
-                u8 targetPkmn = u8( res >> 16 );
-                pokemon& acPkmn = FS::SAV->m_pkmnTeam[ targetPkmn ];
+            if( _hasSprite && !( touch.px | touch.py ) ) { //Player drops the sprite at hand
+                if( !_ranges[ start ].second.m_isHeld )
+                    _bagUI->dropSprite( ( bag::bagType )FS::SAV->m_lstBag, start, CURRENT_ITEM );
+                else
+                    _bagUI->dropSprite( ( bag::bagType )FS::SAV->m_lstBag, MAX_ITEMS_PER_PAGE, { _ranges[ start ].second.m_item, 1 } );
+                _hasSprite = false;
 
-                u16 targetItem = res % ( 1 << 16 );
-                std::pair<u16, u16> currItem = { targetItem, _origBag->element( bag::bagType( _currPage ) )[ targetItem ] };
+                if( start == curr ) continue; //Nothing happened
 
-            } else */ if( !handleSomeInput( touch, pressed ) )
+                //Swap held items
+                if( _ranges[ start ].second.m_isHeld && _ranges[ curr ].second.m_isHeld ) {
+
+                } else if( !_ranges[ start ].second.m_isHeld && !_ranges[ curr ].second.m_isHeld ) { //Swap bag items
+
+                } else if( !_ranges[ start ].second.m_isHeld && _ranges[ curr ].second.m_isHeld ) { //Give/use item
+
+                } else if( _ranges[ start ].second.m_isHeld && !_ranges[ curr ].second.m_isHeld ) { //Take item
+
+                }
+
+            } else if( !handleSomeInput( touch, pressed ) )
                 break;
-            /*
+            else if( GET_AND_WAIT( KEY_A ) )
+                handleSelection( );
+
             bool rangeChanged = false;
             for( u8 j = 0; j < _ranges.size( ); ++j ) {
                 auto i = _ranges[ j ];
-                if( IN_RANGE( touch, i ) ) {
-                    if( !_atHandOam ) {
+                if( IN_RANGE( touch, i.first ) ) {
+                    if( !_hasSprite ) {
                         u8 c = 0;
                         loop( ) {
                             scanKeys( );
                             swiWaitForVBlank( );
                             touchRead( &touch );
-                            if( c++ == TRESHOLD ) {
-                                _atHandOam = _bagUI->getSprite( j, touch );
-                                if( _atHandOam )
-                                    start = curr = j;
-                                break;
-                            }
-                            if( !touch.px && !touch.py ) {
-                                u8 res = _bagUI->acceptTouch( j );
-                                switch( res ) {
-                                    default:
-                                        break;
+                            if( ( !touch.px && !touch.py ) || c++ == TRESHOLD ) {
+                                if( !touch.px && !touch.py && _currSelectedIdx == j ) {
+                                    handleSelection( );
+                                    break;
+                                }
+                                if( !i.second.m_isHeld || i.second.m_item ) {
+                                    if( FS::SAV->m_bag.size( ( bag::bagType )FS::SAV->m_lstBag ) )
+                                        _bagUI->unselectItem( ( bag::bagType )FS::SAV->m_lstBag, _currSelectedIdx, CURRENT_ITEM.first );
+                                    else //the current bag is empty
+                                        _bagUI->unselectItem( ( bag::bagType )FS::SAV->m_lstBag, MAX_ITEMS_PER_PAGE, 0 );
+                                }
+                                if( !i.second.m_isHeld ) {
+                                    _currSelectedIdx = j;
+                                    _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM );
+                                } else if( i.second.m_item ) {
+                                    u8 vl = j;
+                                    if( j < MAX_ITEMS_PER_PAGE )
+                                        vl += MAX_ITEMS_PER_PAGE - FS::SAV->m_bag.size( ( bag::bagType )FS::SAV->m_lstBag );
+                                    _bagUI->selectItem( vl, { i.second.m_item, 1 } );
+                                }
+                                if( c >= TRESHOLD ) {
+                                    if( !i.second.m_isHeld )
+                                        _hasSprite = _bagUI->getSprite( j, CURRENT_ITEM );
+                                    else
+                                        _hasSprite = _bagUI->getSprite( j, { i.second.m_item, 1 } );
+                                    if( _hasSprite ) {
+                                        _bagUI->updateSprite( touch );
+                                        start = curr = j;
+                                    }
                                 }
                                 break;
                             }
-                            if( !IN_RANGE( touch, i ) )
+                            if( !IN_RANGE( touch, i.first ) )
                                 break;
                         }
                     } else {
@@ -342,7 +375,7 @@ namespace BAG {
                 }
             }
             if( !rangeChanged )
-                curr = -1; */
+                curr = -1;
         }
     }
 
