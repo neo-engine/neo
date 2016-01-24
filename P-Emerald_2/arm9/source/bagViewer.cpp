@@ -349,6 +349,7 @@ namespace BAG {
     u16 bagViewer::getItem( context p_context ) {
         _bagUI = new bagUI( );
         initUI( );
+        _hasSprite = false;
 
         touchPosition touch;
         loop( ) {
@@ -378,8 +379,13 @@ namespace BAG {
                         swiWaitForVBlank( );
                         touchRead( &touch );
                         if( c++ == TRESHOLD ) { //Ask the player whether he is sure about the choice
-                            u16 targetItem = CURRENT_ITEM.first;
-                            if( confirmChoice( p_context, targetItem ) ) {
+                            while( touch.px || touch.py ) {
+                                scanKeys( );
+                                swiWaitForVBlank( );
+                                touchRead( &touch );
+                            }
+                            u16 targetItem = i.second.m_item;
+                            if( !i.second.m_isHeld && confirmChoice( p_context, targetItem ) ) {
                                 FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
                                 return targetItem;
                             } else {
@@ -388,7 +394,21 @@ namespace BAG {
                             }
                         }
                         if( !touch.px && !touch.py ) {
-                            _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM );
+                            if( !i.second.m_isHeld || i.second.m_item ) {
+                                if( FS::SAV->m_bag.size( ( bag::bagType )FS::SAV->m_lstBag ) )
+                                    _bagUI->unselectItem( ( bag::bagType )FS::SAV->m_lstBag, _currSelectedIdx, CURRENT_ITEM.first );
+                                else //the current bag is empty
+                                    _bagUI->unselectItem( ( bag::bagType )FS::SAV->m_lstBag, MAX_ITEMS_PER_PAGE, 0 );
+                            }
+                            if( !i.second.m_isHeld ) {
+                                _currSelectedIdx = j;
+                                _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM );
+                            } else if( i.second.m_item ) {
+                                u8 vl = j;
+                                if( j < MAX_ITEMS_PER_PAGE )
+                                    vl += MAX_ITEMS_PER_PAGE - FS::SAV->m_bag.size( ( bag::bagType )FS::SAV->m_lstBag );
+                                _bagUI->selectItem( vl, { i.second.m_item, 1 } );
+                            }
                             break;
                         }
                         if( !IN_RANGE( touch, i.first ) )

@@ -39,7 +39,7 @@ namespace BAG {
 #define MOVE_BAG  4
 
 #define BAG_CNT 5
-#define MAX_ITEMS_PER_PAGE 50
+#define MAX_ITEMS_PER_PAGE 9
     class bagUI {
     public:
         struct targetInfo {
