@@ -43,9 +43,12 @@ namespace BAG {
         _currCmp = std::less<std::pair<u16, u16>>( );
     }
 
+#define CURRENT_ITEM FS::SAV->m_bag( ( bag::bagType )FS::SAV->m_lstBag, (FS::SAV->m_lstBagItem + _currSelectedIdx) % FS::SAV->m_bag.size( ( bag::bagType )FS::SAV->m_lstBag ) )
     void bagViewer::initUI( ) {
         _bagUI->init( );
         _ranges = _bagUI->drawBagPage( ( bag::bagType )FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
+        if( FS::SAV->m_bag.size( ( bag::bagType )FS::SAV->m_lstBag ) )
+            _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM );
     }
 
     /*
@@ -173,18 +176,18 @@ namespace BAG {
     *  Returns true if the item needs to be removed from the bag, false otherwise
     */
     bool bagViewer::confirmChoice( context p_context, u16 p_targetItem ) {
-        bool possible = false;
+        bool possible = true;
 
         //Check if the item can be returned
         switch( p_context ) {
             case BAG::bagViewer::BATTLE:
-                possible |= ( ItemList[ p_targetItem ]->getEffectType( )
+                possible &= ( ItemList[ p_targetItem ]->getEffectType( )
                               & ( item::itemEffectType::IN_BATTLE | item::itemEffectType::USE_ON_PKMN ) );
                 break;
             case BAG::bagViewer::GIVE_TO_PKMN:
-                possible |= ( ItemList[ p_targetItem ]->m_itemType != item::itemType::KEY_ITEM );
-                possible |= ( ItemList[ p_targetItem ]->m_itemType != item::itemType::TM_HM );
-                possible |= ( ItemList[ p_targetItem ]->m_itemType != item::itemType::MAILS );
+                possible &= ( ItemList[ p_targetItem ]->m_itemType != item::itemType::KEY_ITEM );
+                possible &= ( ItemList[ p_targetItem ]->m_itemType != item::itemType::TM_HM );
+                possible &= ( ItemList[ p_targetItem ]->m_itemType != item::itemType::MAILS );
                 break;
             default:
                 break;
@@ -205,7 +208,6 @@ namespace BAG {
     }
 
     bool bagViewer::handleSomeInput( touchPosition p_touch, int p_pressed ) {
-#define CURRENT_ITEM FS::SAV->m_bag( ( bag::bagType )FS::SAV->m_lstBag, (FS::SAV->m_lstBagItem + _currSelectedIdx) % curBgsz )
         auto& touch = p_touch;
         auto& pressed = p_pressed;
 
@@ -274,7 +276,6 @@ namespace BAG {
                 break;
             }
         return true;
-#undef CURRENT_ITEM
     }
 
 
@@ -365,6 +366,7 @@ namespace BAG {
                     FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
                     return targetItem;
                 }
+                initUI( );
             }
 
             for( u8 j = 0; j < _ranges.size( ); ++j ) {
@@ -380,8 +382,10 @@ namespace BAG {
                             if( confirmChoice( p_context, targetItem ) ) {
                                 FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
                                 return targetItem;
-                            } else
+                            } else {
+                                initUI( );
                                 break;
+                            }
                         }
                         if( !touch.px && !touch.py ) {
                             _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM );

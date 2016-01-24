@@ -346,7 +346,7 @@ namespace BAG {
 
     void drawItemSub( item* p_item, u16 p_x, u16 p_y, bool p_selected, bool p_pressed, bool p_clearOnly = false ) {
         IO::printRectangle( p_x, p_y, 255, p_y + 18, true, false, 0 );
-        if( p_clearOnly )
+        if( p_clearOnly || !p_item )
             return;
         if( p_item->m_itemType != item::itemType::GOODS
             && toBagType( p_item->m_itemType ) == bag::bagType::ITEMS ) {
@@ -420,7 +420,6 @@ namespace BAG {
         if( !FS::SAV->m_bag.empty( p_page ) ) {
             u16 sz = FS::SAV->m_bag.size( p_page );
             for( u8 i = 0; i < 9; ++i ) {
-                //    drawItemTop( ItemList[ _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].first ], _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].second );
                 drawItemSub( ItemList[ FS::SAV->m_bag( p_page, ( p_firstDisplayedItem + i ) % sz ).first ],
                              132, 4 + i * 18, false, false, i >= sz );
 

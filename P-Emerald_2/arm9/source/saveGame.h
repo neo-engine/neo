@@ -89,7 +89,7 @@ namespace FS {
 
         //Bag stuff
         u8          m_lstBag;
-        u8          m_lstBagItem;
+        u16         m_lstBagItem;
 
         s16         m_repelSteps;
         BAG::bag    m_bag;

@@ -358,7 +358,7 @@ item* ItemList[ 772 ] = {
     new item( "Pudersand" ), new item( "Granitstein" ),
     new item( "Wundersaat" ), new item( "Schattenglas" ),
     new item( "Schwarzgurt" ), new item( "Magnet" ),
-    new item( "Zauberwasser" ), new item( "Hackmove" ),
+    new item( "Zauberwasser" ), new item( "Hackattack" ),
     new item( "Giftstich" ), new item( "EwigesEis" ),
     new item( "Bannsticker" ), new item( "Krummloeffel" ),
     new item( "Holzkohle" ), new item( "Drachenzahn" ),

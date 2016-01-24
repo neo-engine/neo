@@ -33,8 +33,7 @@
 #include "item.h"
 
 namespace BAG {
-#define MAX_ITEM_COUNT 999
-#define MAX_ITEMS_IN_BAG 800
+#define MAX_ITEMS_IN_BAG 900
 
     extern std::string bagnames[ 5 ];
 
@@ -42,10 +41,10 @@ namespace BAG {
     private:
         enum {
             ITEM_START = 0,
-            MEDICINE_START = 450,
-            TM_HM_START = 525,
-            BERRIES_START = 650,
-            KEY_ITEMS_START = 725
+            MEDICINE_START = 550,
+            TM_HM_START = 600,
+            BERRIES_START = 725,
+            KEY_ITEMS_START = 825
         };
         const u16 _startIdx[ 6 ] = { ITEM_START, MEDICINE_START, TM_HM_START,
             BERRIES_START, KEY_ITEMS_START, MAX_ITEMS_IN_BAG };
