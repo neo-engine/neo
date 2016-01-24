@@ -209,7 +209,6 @@ void initTimeAndRnd( ) {
     year = tStruct->tm_year + 1900;
 
     srand( hours ^ ( 100 * minutes ) ^ ( 10000 * seconds ) ^ ( day ^ ( 100 * month ) ^ year ) );
-    LastPID = rand( );
 }
 
 int main( int, char** p_argv ) {
@@ -412,13 +411,12 @@ OUT:
         //StartBag
         if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 6 ],
                             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 7 ], 16 ) ) {
-            BAG::bagUI bui;
-            BAG::bagViewer bv( FS::SAV->m_bag, &bui );
+            BAG::bagViewer bv;
             ANIMATE_MAP = false;
             UPDATE_TIME = false;
             INIT_MAIN_SPRITES = false;
 
-            bv.run( FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
+            bv.run( );
 
             IO::clearScreenConsole( true, true );
             IO::drawSub( true );
@@ -432,13 +430,16 @@ OUT:
 
             ANIMATE_MAP = false;
             STS::statusScreen sts( 0 );
-            sts.run( );
+            auto res = sts.run( );
 
             IO::clearScreenConsole( true, true );
             IO::drawSub( true );
             FADE_TOP_DARK( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
+
+            if( res )
+                res->use( );
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ],        //StartDex
                                    IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 5 ], 16 ) ) {
             ANIMATE_MAP = false;
@@ -488,7 +489,7 @@ OUT:
                     for( u16 j = 0; j < 649; ++j ) {
                         auto a = pokemon( j + 1, 50, 0, j ).m_boxdata;
                         a.m_gotPlace = j;
-                        s8 res = FS::SAV->storePkmn( a );
+                        FS::SAV->storePkmn( a );
                         if( a.isShiny( ) ) {
                             IO::messageBox( "YAAAY" );
                             s8 idx = FS::SAV->getCurrentBox( )->getFirstFreeSpot( );
@@ -509,11 +510,10 @@ OUT:
                     break;
                 }
                 case 1:
-                    if( !FS::SAV->m_bag )
-                        FS::SAV->m_bag = new BAG::bag( );
-                    for( u16 j = 1; j < 637; ++j )
+                    for( u16 j = 1; j < 637; ++j ) {
                         if( ItemList[ j ]->m_itemName != "Null" )
-                            FS::SAV->m_bag->insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
+                            FS::SAV->m_bag.insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
+                    }
                     break;
                 case 2:
                 {
@@ -533,9 +533,8 @@ OUT:
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                     }
-                    std::vector<item> itms;
                     BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
-                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, itms );
+                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, 0, 0 );
 
                     BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100, 5, BATTLE::battle::DOUBLE );
                     ANIMATE_MAP = false;
@@ -553,9 +552,8 @@ OUT:
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                     }
-                    std::vector<item> itms;
                     BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
-                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, itms );
+                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, 0, 0 );
 
                     BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100, 5, BATTLE::battle::SINGLE );
                     ANIMATE_MAP = false;

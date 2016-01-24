@@ -32,6 +32,7 @@ along with Pokémon Emerald 2 Version.  If not, new see <http://www.gnu.org/lice
 #include "battle.h"
 
 #include <vector>
+#include <algorithm>
 
 #define APPLY_OP( op, tg, val, mx ) ( ( op == 1 ) ? tg += val : ( \
                                   ( op == 2 ) ? tg -= val : ( \
@@ -40,29 +41,6 @@ along with Pokémon Emerald 2 Version.  If not, new see <http://www.gnu.org/lice
                                   ( op == 5 ) ? tg &= val : ( \
                                   ( op == 6 ) ? tg = mx : ( \
                                   ( op == 7 ) ? tg = s16( ( mx + 0.5 ) / 2 ) : tg ) ) ) ) ) ) )
-
-void recalcStats( pokemon& p_pokemon, pokemonData& p_pData ) {
-    u16 HPdif = p_pokemon.m_stats.m_maxHP - p_pokemon.m_stats.m_acHP;
-    if( p_pokemon.m_boxdata.m_speciesId != 292 ) //Check for Ninjatom
-        p_pokemon.m_stats.m_maxHP = ( ( p_pokemon.m_boxdata.m_individualValues.m_hp + 2 * p_pData.m_bases[ 0 ]
-                                        + ( p_pokemon.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* p_pokemon.m_Level / 100 ) + 10;
-    else
-        p_pokemon.m_stats.m_maxHP = 1;
-    pkmnNatures nature = p_pokemon.m_boxdata.getNature( );
-
-    p_pokemon.m_stats.m_Atk = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_attack + 2 * p_pData.m_bases[ ATK + 1 ]
-                                    + ( p_pokemon.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
-    p_pokemon.m_stats.m_Def = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_defense + 2 * p_pData.m_bases[ DEF + 1 ]
-                                    + ( p_pokemon.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
-    p_pokemon.m_stats.m_Spd = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_speed + 2 * p_pData.m_bases[ SPD + 1 ]
-                                    + ( p_pokemon.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
-    p_pokemon.m_stats.m_SAtk = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_sAttack + 2 * p_pData.m_bases[ SATK + 1 ]
-                                     + ( p_pokemon.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
-    p_pokemon.m_stats.m_SDef = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_sDefense + 2 * p_pData.m_bases[ SDEF + 1 ]
-                                     + ( p_pokemon.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
-
-    p_pokemon.m_stats.m_acHP = std::max( 0, p_pokemon.m_stats.m_maxHP - HPdif );
-}
 
 bool item::needsInformation( u8 p_num ) {
     if( !m_loaded && !load( ) )
@@ -88,13 +66,11 @@ bool item::use( pokemon& p_pokemon ) {
     //Anything that modifies the PKMN's happiness shall be second
     if( ( m_itemData.m_itemEffect >> 24 ) % 32 == 13 )
         m_itemData.m_itemEffect = ( ( m_itemData.m_itemEffect % ( 1 << 16 ) ) << 16 ) | ( m_itemData.m_itemEffect >> 16 );
-
-
+    
     for( auto op : { m_itemData.m_itemEffect >> 16, m_itemData.m_itemEffect % ( 1 << 16 ) } ) {
         u8 operation = op >> 13;
         u8 stat = ( op >> 8 ) % 32;
         u8 value = u8( op );
-
 
         switch( stat ) {
             case 1:
@@ -184,7 +160,7 @@ bool item::use( pokemon& p_pokemon ) {
                 if( tmp != p_pokemon.m_boxdata.m_effortValues[ stat - 6 ] ) {
                     p_pokemon.m_boxdata.m_effortValues[ stat - 6 ] = tmp;
                     change = true;
-                    recalcStats( p_pokemon, p );
+                    p_pokemon.m_stats = calcStats( p_pokemon.m_boxdata, p );
                 }
                 break;
             }
@@ -198,7 +174,7 @@ bool item::use( pokemon& p_pokemon ) {
                     p_pokemon.m_Level = tmp;
                     p_pokemon.m_boxdata.m_experienceGained = EXP[ p_pokemon.m_Level - 1 ][ p.m_expType ];
 
-                    recalcStats( p_pokemon, p );
+                    p_pokemon.m_stats = calcStats( p_pokemon.m_boxdata, p );
                     change = true;
                 }
                 break;

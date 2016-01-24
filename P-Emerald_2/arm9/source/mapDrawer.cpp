@@ -434,6 +434,7 @@ namespace MAP {
             return handleWildPkmn( HIGH_GRASS, 0, true );
         else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
             return handleWildPkmn( GRASS, 0, true );
+        return false;
     }
 
     mapDrawer::mapDrawer( )

@@ -43,6 +43,7 @@ namespace STS {
         statusScreen( u8 p_pkmnIdx );
         ~statusScreen( );
 
-        void run( );
+        //Returns 0 or a move pointer
+        move* run( );
     };
 }

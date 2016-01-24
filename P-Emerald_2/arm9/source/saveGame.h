@@ -92,7 +92,7 @@ namespace FS {
         u8          m_lstBagItem;
 
         s16         m_repelSteps;
-        BAG::bag*   m_bag; //Be VERY CAREFUL when deleting savegames or when just using them!
+        BAG::bag    m_bag;
 
         bool        checkflag( u8 p_idx ) {
             return m_flags[ p_idx >> 3 ] & ( 1 << ( p_idx % 8 ) );
@@ -130,7 +130,7 @@ namespace FS {
             char buffer[ 30 ];
             sprintf( buffer, "%ls", m_playername );
 
-            static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp, m_bag->getBattleItems( ) );
+            static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp );
             return &res;
         }
         void updateTeam( ) {

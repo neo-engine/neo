@@ -157,12 +157,9 @@ bool            getAll( u16 p_pkmnId, pokemonData& out );
 void            getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num, u16* p_res );
 bool            canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode );
 
-
 extern double NatMod[ 25 ][ 5 ];
 
-extern u32 EXP[ 100 ][ 13 ];
-
-extern u32 LastPID;
+extern u32 EXP[ 100 ][ 6 ];
 
 const u16 OTLENGTH = 8;
 const u16 PKMN_NAMELENGTH = 11;
@@ -275,7 +272,7 @@ u8: 8;
         bool                    isCloned( ) const;
         s8                      gender( ) const;
 
-        unsigned inline char    IVget( u8 p_i ) const {
+        inline unsigned char    IVget( u8 p_i ) const {
             switch( p_i ) {
                 case 0: return m_individualValues.m_hp;
                 case 1: return m_individualValues.m_attack;
@@ -295,7 +292,7 @@ u8: 8;
                 default: return 0;
             }
         }
-        void inline               PPupset( u8 p_i, u8 p_val ) {
+        void inline             PPupset( u8 p_i, u8 p_val ) {
             switch( p_i ) {
                 case 0: m_ppup.m_Up1 = p_val; break;
                 case 1: m_ppup.m_Up2 = p_val; break;
@@ -318,7 +315,7 @@ u8: 8;
 
             return ( max * 5 ) + ( maxval % 5 );
         }
-        int             getTasteStr( ) const {
+        int                     getTasteStr( ) const {
             if( NatMod[ getNature( ) ][ 0 ] == 1.1 )
                 return 0;
             if( NatMod[ getNature( ) ][ 1 ] == 1.1 )
@@ -342,6 +339,12 @@ u8: 8;
         u8                      getHPPower( ) const {
             return 30 + ( ( ( ( IVget( 0 ) >> 1 ) & 1 ) + 2 * ( ( IVget( 1 ) >> 1 ) & 1 ) + 4 * ( ( IVget( 2 ) >> 1 ) & 1 ) + 8 * ( ( IVget( 3 ) >> 1 ) & 1 ) + 16 * ( ( IVget( 4 ) >> 1 ) & 1 ) + 32 * ( ( IVget( 5 ) >> 1 ) & 1 ) * 40 ) / 63 );
         }
+        bool                    isEgg( ) const {
+            return m_individualValues.m_isEgg;
+        }
+
+        bool                    learnMove( u16 p_move );
+        void                    hatch( );
 
         bool      operator==( const boxPokemon& p_other ) const;
 
@@ -423,10 +426,63 @@ u8: 8;
              u8             p_ball = 0,
              u8             p_pokerus = 0 );
 
-    void            evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
-    bool            canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
 
-    void            hatch( );
+    pkmnNatures             getNature( ) const {
+        return m_boxdata.getNature( );
+    }
+    u16                     getAbility( ) const {
+        return m_boxdata.getAbility( );
+    }
+    bool                    isShiny( ) const {
+        return m_boxdata.isShiny( );
+    }
+    bool                    isCloned( ) const {
+        return m_boxdata.isCloned( );
+    }
+    s8                      gender( ) const {
+        return m_boxdata.gender( );
+    }
 
+    inline unsigned char    IVget( u8 p_i ) const {
+        return m_boxdata.IVget( p_i );
+    }
+    inline u8               PPupget( u8 p_i ) const {
+        return PPupget( p_i );
+    }
+    inline void             PPupset( u8 p_i, u8 p_val ) {
+        m_boxdata.PPupset( p_i, p_val );
+    }
+    u8                      getPersonality( ) const {
+        return m_boxdata.getPersonality( );
+    }
+    int                     getTasteStr( ) const {
+        return m_boxdata.getTasteStr( );
+    }
+    u16                     getItem( ) const {
+        return m_boxdata.getItem( );
+    }
+    Type                    getHPType( ) const {
+        return m_boxdata.getHPType( );
+    }
+    u8                      getHPPower( ) const {
+        return m_boxdata.getHPPower( );
+    }
+    bool                    isEgg( ) const {
+        return m_boxdata.isEgg( );
+    }
+
+    bool                    learnMove( u16 p_move ) {
+        return m_boxdata.learnMove( p_move );
+    }
+    void                    evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
+    bool                    canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
+
+    void                    hatch( ) {
+        m_boxdata.hatch( );
+    }
     bool      operator==( const pokemon& p_other ) const;
 };
+
+pokemon::stats  calcStats( const pokemon::boxPokemon& p_boxdata, const pokemonData& p_data );
+pokemon::stats  calcStats( const pokemon::boxPokemon& p_boxdata, u8 p_level, const pokemonData& p_data );
+u16             calcLevel( const pokemon::boxPokemon& p_boxdata, const pokemonData& p_data );

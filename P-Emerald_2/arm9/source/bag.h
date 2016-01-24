@@ -33,13 +33,24 @@
 #include "item.h"
 
 namespace BAG {
-#define MAXITEMCOUNT 999
+#define MAX_ITEM_COUNT 999
+#define MAX_ITEMS_IN_BAG 800
 
     extern std::string bagnames[ 5 ];
 
     class bag {
     private:
-        std::map<u16, u16> _items[ 5 ];
+        enum {
+            ITEM_START = 0,
+            MEDICINE_START = 450,
+            TM_HM_START = 525,
+            BERRIES_START = 650,
+            KEY_ITEMS_START = 725
+        };
+        const u16 _startIdx[ 6 ] = { ITEM_START, MEDICINE_START, TM_HM_START,
+            BERRIES_START, KEY_ITEMS_START, MAX_ITEMS_IN_BAG };
+        std::pair<u16, u16> _items[ MAX_ITEMS_IN_BAG ];
+        u16 _nextFree[ 5 ];
     public:
         enum bagType {
             ITEMS,
@@ -48,6 +59,10 @@ namespace BAG {
             BERRIES,
             KEY_ITEMS
         };
+        bag( ) {
+            for( u8 i = 0; i < 5; ++i )
+                _nextFree[ i ] = _startIdx[ i ];
+        }
 
         /*
          * Adds cnt items with no. item_id to the bag.
@@ -80,11 +95,35 @@ namespace BAG {
          */
         std::size_t size( bagType );
 
-        std::map<u16, u16> element( bagType );
+        /*
+        * Returns the pointer to the first element in the bag.
+        */
+        std::pair<u16, u16>* begin( bagType );
 
-        std::vector<item>& getBattleItems( ) {
-            static std::vector<item> res;
-            return res;
+        /*
+        * Returns the pointer to the first element in the bag.
+        */
+        const std::pair<u16, u16>* begin( bagType ) const;
+
+        /*
+        * Returns the pointer after the last element of the bag.
+        */
+        std::pair<u16, u16>* end( bagType );
+
+        /*
+        * Returns the pointer after the last element of the bag.
+        */
+        const std::pair<u16, u16>* end( bagType ) const;
+
+        std::pair<u16, u16>& operator()( bagType p_bagType, u16 p_idx ) {
+            return begin( p_bagType )[ p_idx ];
+        }
+        const std::pair<u16, u16>& operator()( bagType p_bagType, u16 p_idx ) const {
+            return begin( p_bagType )[ p_idx ];
+        }
+
+        std::pair<u16, u16>* getItems( ) {
+            return _items;
         }
     };
 

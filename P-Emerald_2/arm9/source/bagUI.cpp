@@ -38,6 +38,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "uio.h"
 
 #include <vector>
+#include <algorithm>
 
 //Sprites
 #include "Back.h"
@@ -267,8 +268,9 @@ namespace BAG {
         IO::updateOAM( false );
     }
 
-    u8 bagUI::drawPkmn( item* p_item ) {
-        u8 pkmnCnt = 0;
+    std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>>
+        bagUI::drawPkmn( item* p_item ) {
+        std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> res;
         for( u8 i = 0; i < 6; ++i ) {
             if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
                 break;
@@ -279,9 +281,8 @@ namespace BAG {
             if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg )
                 IO::regularFont->printString( "Ei", 45, 38 + 26 * i, true );
             else {
-                pkmnCnt++;
-                _ranges.push_back( { IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),
-                                   ( 1 << 15 ) | ( i << 12 ) | FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem } );
+                res.push_back( { IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ), {
+                    FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem, true } } );
 
                 if( p_item && p_item->m_itemType == item::itemType::TM_HM ) {
                     u16 currMv = static_cast<TM*>( p_item )->m_moveIdx;
@@ -340,7 +341,7 @@ namespace BAG {
         }
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
-        return pkmnCnt;
+        return res;
     }
 
     void drawItemSub( item* p_item, u16 p_x, u16 p_y, bool p_selected, bool p_pressed, bool p_clearOnly = false ) {
@@ -385,31 +386,22 @@ namespace BAG {
         }
     }
 
-    void bagUI::updateSelectedIdx( u8 p_oldIdx ) {
-        u16 sz = _bag[ _currPage ].size( );
-
-        drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( p_oldIdx - 4 ) + 4 * sz ) % sz ].first ],
-                     132, 76 + 18 * ( p_oldIdx - 4 ), false, false );
-
-        drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ],
-                     132, 76 + 18 * ( _currSelectedIdx - 4 ), true, false );
-
-
-        drawTop( _currPage );
-
-        drawItemTop( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ],
-                     _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].second );
-
-        u8 pkmnCnt = drawPkmn( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ] );
-        for( u8 i = 0; i < pkmnCnt; ++i )
-            _ranges.pop_back( );
+    void bagUI::selectItem( u8 p_idx, std::pair<u16, u16> p_item, bool p_pressed ) {
+        drawPkmn( ItemList[ p_item.first ] );
+        drawItemTop( ItemList[ p_item.first ], p_item.second );
+        if( p_idx < MAX_ITEMS_PER_PAGE )
+            drawItemSub( ItemList[ p_item.first ], 132, 4 + p_idx * 18, true, p_pressed, false );
+    }
+    void bagUI::unselectItem( bag::bagType p_page, u8 p_idx, u16 p_item ) {
+        drawPkmn( 0 );
+        drawTop( p_page );
+        if( p_idx < MAX_ITEMS_PER_PAGE )
+            drawItemSub( ItemList[ p_item ], 132, 4 + p_idx * 18, false, false, false );
     }
 
-    std::vector<IO::inputTarget> bagUI::drawBagPage( u8 p_page, u16 p_itemIdx ) {
-        std::vector<IO::inputTarget> res;
-        _ranges.clear( );
-        _currPage = p_page;
-        _currItemIdx = p_itemIdx;
+    std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>>
+        bagUI::drawBagPage( bag::bagType p_page, u16 p_firstDisplayedItem ) {
+        std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> res;
 
         for( u8 i = 0; i < 5; ++i ) {
             showActiveBag( i, i == p_page );
@@ -424,27 +416,19 @@ namespace BAG {
         initColors( );
 
 
-        if( !_bag[ p_page ].empty( ) ) {
-            u16 sz = _bag[ p_page ].size( );
-            u8 pkmnCnt = drawPkmn( ItemList[ _bag[ p_page ][ ( p_itemIdx + 4 * sz + _currSelectedIdx - 4 ) % sz ].first ] );
-            for( u8 i = 0; i < pkmnCnt; ++i )
-                res.push_back( _ranges[ _ranges.size( ) - pkmnCnt + i ].first );
+        auto pkmnTg = drawPkmn( 0 );
+        if( !FS::SAV->m_bag.empty( p_page ) ) {
+            u16 sz = FS::SAV->m_bag.size( p_page );
             for( u8 i = 0; i < 9; ++i ) {
+                //    drawItemTop( ItemList[ _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].first ], _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].second );
+                drawItemSub( ItemList[ FS::SAV->m_bag( p_page, ( p_firstDisplayedItem + i ) % sz ).first ],
+                             132, 4 + i * 18, false, false, i >= sz );
 
-                if( i == _currSelectedIdx )
-                    drawItemTop( ItemList[ _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].first ], _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].second );
-                drawItemSub( ItemList[ _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].first ], 132, 4 + i * 18, i == _currSelectedIdx, false, i >= sz );
-
-                if( i < sz ) {
-                    res.push_back( IO::inputTarget( 132, 4 + i * 18, 256, 20 + i * 18 ) );
-                    _ranges.push_back( { res.back( ), _bag[ p_page ][ ( p_itemIdx + 4 * sz + i - 4 ) % sz ].first } );
-                }
+                if( i < sz )
+                    res.push_back( { IO::inputTarget( 132, 4 + i * 18, 256, 20 + i * 18 ), {
+                        FS::SAV->m_bag( p_page, ( p_firstDisplayedItem + i ) % sz ).first, false } } );
             }
         } else {
-            u8 pkmnCnt = drawPkmn( 0 );
-            for( u8 i = 0; i < pkmnCnt; ++i )
-                res.push_back( _ranges[ _ranges.size( ) - pkmnCnt + i ].first );
-
             for( u8 i = 0; i < 5; ++i ) {
                 drawItemSub( 0, 132, 76 + 18 * i, false, false, true );
                 drawItemSub( 0, 132, 76 - 18 * i, false, false, true );
@@ -453,108 +437,43 @@ namespace BAG {
             IO::regularFont->printString( "Keine Items", 140, 89, true );
             IO::updateOAM( false );
         }
+        res.insert( res.end( ), pkmnTg.begin( ), pkmnTg.end( ) );
 
         return res;
     }
 
-    void bagUI::updateAtHand( touchPosition p_touch, u8 p_oamIdx ) {
-        IO::Oam->oamBuffer[ p_oamIdx ].x = p_touch.px - 16;
-        IO::Oam->oamBuffer[ p_oamIdx ].y = p_touch.py - 16;
+    void bagUI::updateSprite( touchPosition p_touch ) {
+        IO::Oam->oamBuffer[ _curItemSpriteOam ].x = p_touch.px - 16;
+        IO::Oam->oamBuffer[ _curItemSpriteOam ].y = p_touch.py - 16;
         IO::updateOAM( true );
     }
 
-    u8 bagUI::getSprite( u8 p_rangeIdx, touchPosition p_currPos ) {
-        if( _ranges[ p_rangeIdx ].second & ( 1 << 15 ) ) {//It's a PKMN
-            if( !( _ranges[ p_rangeIdx ].second % ( 1 << 12 ) ) )
-                return 0;
-            if( ItemList[ _ranges[ p_rangeIdx ].second % ( 1 << 12 ) ]->m_itemType != item::itemType::TM_HM ) {
-                IO::loadItemIcon( ItemList[ _ranges[ p_rangeIdx ].second % ( 1 << 12 ) ]->m_itemName, p_currPos.px, p_currPos.py,
-                                  TRANSFER_SUB, TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
-            } else {
-                IO::loadTMIcon( AttackList[ static_cast<TM*>( ItemList[ _ranges[ p_rangeIdx ].second % ( 1 << 12 ) ] )->m_moveIdx ]->m_moveType,
-                                AttackList[ static_cast<TM*>( ItemList[ _ranges[ p_rangeIdx ].second % ( 1 << 12 ) ] )->m_moveIdx ]->m_isFieldAttack,
-                                p_currPos.px, p_currPos.py, TRANSFER_SUB, TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
-            }
-        } else { //It's an ordinary item
-            if( !_ranges[ p_rangeIdx ].second )
-                return 0;
-            //So show it
-            if( ItemList[ _ranges[ p_rangeIdx ].second ]->m_itemType != item::itemType::TM_HM ) {
-                IO::loadItemIcon( ItemList[ _ranges[ p_rangeIdx ].second ]->m_itemName, p_currPos.px, p_currPos.py,
-                                  TRANSFER_SUB, TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
-            } else {
-                IO::loadTMIcon( AttackList[ static_cast<TM*>( ItemList[ _ranges[ p_rangeIdx ].second ] )->m_moveIdx ]->m_moveType,
-                                AttackList[ static_cast<TM*>( ItemList[ _ranges[ p_rangeIdx ].second ] )->m_moveIdx ]->m_isFieldAttack,
-                                p_currPos.px, p_currPos.py, TRANSFER_SUB, TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
-            }
-            u16 sz = _bag[ _currPage ].size( );
+    bool bagUI::getSprite( u8 p_idx, std::pair<u16, u16> p_item ) {
+        if( !p_item.first )
+            return false;
 
-            drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ],
-                         132, 76 + 18 * ( _currSelectedIdx - 4 ), false, false );
-
-            drawItemSub( ItemList[ _ranges[ p_rangeIdx ].second ], _ranges[ p_rangeIdx ].first.m_targetX1,
-                         _ranges[ p_rangeIdx ].first.m_targetY1, true, true );
-
-            drawTop( _currPage );
-
-            _currSelectedIdx = 4 + ( _ranges[ p_rangeIdx ].first.m_targetY1 - 76 ) / 18;
-            drawItemTop( ItemList[ _ranges[ p_rangeIdx ].second ], _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].second );
-
-            u8 pkmnCnt = drawPkmn( ItemList[ _ranges[ p_rangeIdx ].second ] );
-            for( u8 i = 0; i < pkmnCnt; ++i )
-                _ranges.pop_back( );
-
+        if( p_idx >= MAX_ITEMS_PER_PAGE ) {//It's a PKMN
+            if( !FS::SAV->m_pkmnTeam[ p_idx - 50 ].m_boxdata.m_holdItem ) //Something went wrong
+                return false;
         }
-        return TRANSFER_SUB;
+
+        if( ItemList[ p_item.first ]->m_itemType != item::itemType::TM_HM ) {
+            IO::loadItemIcon( ItemList[ p_item.first ]->m_itemName, 0, 0,
+                              TRANSFER_SUB, TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
+        } else {
+            IO::loadTMIcon( AttackList[ static_cast<TM*>( ItemList[ p_item.first ] )->m_moveIdx ]->m_moveType,
+                            AttackList[ static_cast<TM*>( ItemList[ p_item.first ] )->m_moveIdx ]->m_isFieldAttack,
+                            0, 0, TRANSFER_SUB, TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
+        }
+
+        selectItem( p_idx, p_item, true );
+        return true;
     }
-    u32 bagUI::acceptDrop( u8 p_startIdx, u8 p_dropIdx, u8 p_oamIdx ) {
-        IO::Oam->oamBuffer[ p_oamIdx ].isHidden = true;
+
+    void bagUI::dropSprite( bag::bagType p_page, u8 p_idx, u16 p_item ) {
+        IO::Oam->oamBuffer[ TRANSFER_SUB ].isHidden = true;
         IO::updateOAM( true );
 
-        u32 res = 0;
-
-        //Redraw the startIdx area
-        if( _ranges[ p_startIdx ].second & ( 1 << 15 ) ) {//It's a PKMN -> Nothing to do
-            res |= ( 2 << 24 );
-            if( !( _ranges[ p_dropIdx ].second & ( 1 << 15 ) ) ) {
-                res |= ( _ranges[ p_startIdx ].second % ( 1 << 12 ) );
-            }
-            res |= ( ( ( _ranges[ p_startIdx ].second >> 12 ) % 8 ) << 16 );
-        } else { //It's an ordinary item
-            u16 sz = _bag[ _currPage ].size( );
-            drawItemSub( ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ],
-                         132, 76 + 18 * ( _currSelectedIdx - 4 ), true, false );
-
-            res |= _ranges[ p_startIdx ].second;
-        }
-
-        if( _ranges[ p_dropIdx ].second & ( 1 << 15 ) ) {
-            res |= ( 1 << 24 );
-            if( _ranges[ p_startIdx ].second & ( 1 << 15 ) ) {
-                res |= ( ( _ranges[ p_dropIdx ].second >> 12 ) % 8 );
-            } else {
-                res |= ( ( ( _ranges[ p_dropIdx ].second >> 12 ) % 8 ) << 16 );
-            }
-        }
-
-        return res;
-    }
-
-    u8 bagUI::acceptTouch( u8 p_rangeIdx ) {
-        if( _ranges[ p_rangeIdx ].second & ( 1 << 15 ) ) {//It's a PKMN
-            return 0;
-        } else { //It's an ordinary item
-            if( !_ranges[ p_rangeIdx ].second )
-                return 0;
-
-            auto oldSelIdx = _currSelectedIdx;
-            _currSelectedIdx = 4 + ( _ranges[ p_rangeIdx ].first.m_targetY1 - 76 ) / 18;
-            updateSelectedIdx( oldSelIdx );
-        }
-
-        //u16 sz = _bag[ _currPage ].size( );
-        //item* currItem = ItemList[ _bag[ _currPage ][ ( _currItemIdx + ( _currSelectedIdx - 4 ) + 4 * sz ) % sz ].first ];
-
-        return 0;
+        unselectItem( p_page, p_idx, p_item );
     }
 }
