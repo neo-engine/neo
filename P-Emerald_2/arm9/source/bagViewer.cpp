@@ -167,6 +167,8 @@ namespace BAG {
     }
 
     void bagViewer::takeItemFromPkmn( pokemon& p_pokemon ) {
+        if( p_pokemon.isEgg( ) || !p_pokemon.getItem( ) )
+            return;
         auto currBgType = toBagType( ItemList[ p_pokemon.getItem( ) ]->m_itemType );
         FS::SAV->m_bag.insert( currBgType, p_pokemon.getItem( ), 1 );
         p_pokemon.m_boxdata.m_holdItem = 0;
@@ -307,17 +309,27 @@ namespace BAG {
 
                 if( start == curr ) continue; //Nothing happened
 
-                //Swap held items
-                if( _ranges[ start ].second.m_isHeld && _ranges[ curr ].second.m_isHeld ) {
+                u8 t = 0; for( ; !_ranges[ t ].second.m_isHeld; ++t ) { }
+                if( curr != (u8) -1 ) {
+                    if( _ranges[ start ].second.m_isHeld && _ranges[ curr ].second.m_isHeld ) { //Swap held items
+                        if( !FS::SAV->m_pkmnTeam[ start - t ].isEgg( )
+                            && !FS::SAV->m_pkmnTeam[ curr - t ].isEgg( ) )
+                            std::swap( FS::SAV->m_pkmnTeam[ start - t ].m_boxdata.m_holdItem,
+                                       FS::SAV->m_pkmnTeam[ curr - t ].m_boxdata.m_holdItem );
+                    } else if( !_ranges[ start ].second.m_isHeld && !_ranges[ curr ].second.m_isHeld ) { //Swap bag items
+                        FS::SAV->m_bag.swap( ( bag::bagType )FS::SAV->m_lstBag, FS::SAV->m_lstBagItem + start, FS::SAV->m_lstBagItem + curr );
+                        std::swap( _ranges[ start ].second.m_item, _ranges[ curr ].second.m_item );
+                        _currSelectedIdx = curr;
+                        _bagUI->unselectItem( ( bag::bagType )FS::SAV->m_lstBag, start, _ranges[ start ].second.m_item );
+                        _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM );
+                        continue;
+                    } else if( !_ranges[ start ].second.m_isHeld && _ranges[ curr ].second.m_isHeld ) { //Give/use item
 
-                } else if( !_ranges[ start ].second.m_isHeld && !_ranges[ curr ].second.m_isHeld ) { //Swap bag items
-
-                } else if( !_ranges[ start ].second.m_isHeld && _ranges[ curr ].second.m_isHeld ) { //Give/use item
-
-                } else if( _ranges[ start ].second.m_isHeld && !_ranges[ curr ].second.m_isHeld ) { //Take item
-
+                    }
+                } else if( _ranges[ start ].second.m_isHeld && ( curr == (u8) -1 || !_ranges[ curr ].second.m_isHeld ) ) { //Take item
+                    takeItemFromPkmn( FS::SAV->m_pkmnTeam[ start - t ] );
                 }
-
+                initUI( );
             } else if( !handleSomeInput( touch, pressed ) )
                 break;
             else if( GET_AND_WAIT( KEY_A ) )
@@ -356,8 +368,12 @@ namespace BAG {
                                 if( c >= TRESHOLD ) {
                                     if( !i.second.m_isHeld )
                                         _hasSprite = _bagUI->getSprite( j, CURRENT_ITEM );
-                                    else
-                                        _hasSprite = _bagUI->getSprite( j, { i.second.m_item, 1 } );
+                                    else {
+                                        u8 vl = j;
+                                        if( j < MAX_ITEMS_PER_PAGE )
+                                            vl += MAX_ITEMS_PER_PAGE - FS::SAV->m_bag.size( ( bag::bagType )FS::SAV->m_lstBag );
+                                        _hasSprite = _bagUI->getSprite( vl, { i.second.m_item, 1 } );
+                                    }
                                     if( _hasSprite ) {
                                         _bagUI->updateSprite( touch );
                                         start = curr = j;

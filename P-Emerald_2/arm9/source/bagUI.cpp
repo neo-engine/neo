@@ -278,12 +278,12 @@ namespace BAG {
             IO::regularFont->setColor( WHITE_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
 
-            if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg )
+            if( FS::SAV->m_pkmnTeam[ i ].isEgg( ) ) {
                 IO::regularFont->printString( "Ei", 45, 38 + 26 * i, true );
-            else {
+                res.push_back( { IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),{ 0, true } } );
+            } else {
                 res.push_back( { IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ), {
                     FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_holdItem, true } } );
-
                 if( p_item && p_item->m_itemType == item::itemType::TM_HM ) {
                     u16 currMv = static_cast<TM*>( p_item )->m_moveIdx;
                     if( currMv == FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_moves[ 0 ]
@@ -452,7 +452,7 @@ namespace BAG {
             return false;
 
         if( p_idx >= MAX_ITEMS_PER_PAGE ) {//It's a PKMN
-            if( !FS::SAV->m_pkmnTeam[ p_idx - 50 ].m_boxdata.m_holdItem ) //Something went wrong
+            if( !FS::SAV->m_pkmnTeam[ p_idx - MAX_ITEMS_PER_PAGE ].m_boxdata.m_holdItem ) //Something went wrong
                 return false;
         }
 

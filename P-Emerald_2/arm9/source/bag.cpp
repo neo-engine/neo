@@ -34,7 +34,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 namespace BAG {
     std::string bagnames[ 5 ] = { "Items", "Medizin", "TM/VM", "Beeren", "Basis-Items" };
-    
+
     void bag::insert( bagType p_bagType, u16 p_itemId, u16 p_cnt ) {
         for( u16 i = 0; i < _nextFree[ p_bagType ]; ++i )
             if( _items[ _startIdx[ p_bagType ] + i ].first == p_itemId ) {
@@ -76,19 +76,23 @@ namespace BAG {
     std::pair<u16, u16>* bag::begin( bagType p_bagType ) {
         return _items + _startIdx[ p_bagType ];
     }
-    const std::pair<u16, u16>* bag::begin( bagType p_bagType ) const {
+    const std::pair<u16, u16>* bag::cbegin( bagType p_bagType ) const {
         return _items + _startIdx[ p_bagType ];
     }
     std::pair<u16, u16>* bag::end( bagType p_bagType ) {
         return _items + _nextFree[ p_bagType ];
     }
-    const std::pair<u16, u16>* bag::end( bagType p_bagType ) const {
+    const std::pair<u16, u16>* bag::cend( bagType p_bagType ) const {
         return _items + _nextFree[ p_bagType ];
     }
 
     void bag::clear( bagType p_bagType ) {
         memset( _items + _startIdx[ p_bagType ], 0, _startIdx[ p_bagType + 1 ] - _startIdx[ p_bagType ] + 1 );
         _nextFree[ p_bagType ] = _startIdx[ p_bagType ];
+    }
+
+    void bag::swap( bagType p_bagType, u16 p_idx1, u16 p_idx2 ) {
+        std::swap( begin( p_bagType )[ p_idx1 ], begin( p_bagType )[ p_idx2 ] );
     }
 
     bag::bagType toBagType( item::itemType p_itemType ) {

@@ -85,9 +85,14 @@ namespace BAG {
         bool empty( bagType );
 
         /*
-         * Clears the specified bag.
-         */
+        * Clears the specified bag.
+        */
         void clear( bagType );
+
+        /*
+        * Swaps the items at the specified positions.
+        */
+        void swap( bagType, u16 p_idx1, u16 p_idx2 );
 
         /*
          * Returnes the number of items in the specified bag.
@@ -102,7 +107,7 @@ namespace BAG {
         /*
         * Returns the pointer to the first element in the bag.
         */
-        const std::pair<u16, u16>* begin( bagType ) const;
+        const std::pair<u16, u16>* cbegin( bagType ) const;
 
         /*
         * Returns the pointer after the last element of the bag.
@@ -112,13 +117,13 @@ namespace BAG {
         /*
         * Returns the pointer after the last element of the bag.
         */
-        const std::pair<u16, u16>* end( bagType ) const;
+        const std::pair<u16, u16>* cend( bagType ) const;
 
         std::pair<u16, u16>& operator()( bagType p_bagType, u16 p_idx ) {
             return begin( p_bagType )[ p_idx ];
         }
         const std::pair<u16, u16>& operator()( bagType p_bagType, u16 p_idx ) const {
-            return begin( p_bagType )[ p_idx ];
+            return cbegin( p_bagType )[ p_idx ];
         }
 
         std::pair<u16, u16>* getItems( ) {
