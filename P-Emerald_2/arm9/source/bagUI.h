@@ -50,6 +50,7 @@ namespace BAG {
         std::vector<std::pair<IO::inputTarget, targetInfo>>
             drawPkmn( item* p_currentSelection );
     public:
+        u16 drawPkmnIcons( );
         void init( );
 
         std::vector<std::pair<IO::inputTarget, targetInfo>>

@@ -34,6 +34,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "Backward.h"
 
 #include <cmath>
+#include <algorithm>
 
 namespace IO {
 #define NEW_PAGE 9
@@ -158,7 +159,8 @@ namespace IO {
     int fwdPos[ 2 ][ 2 ] = { { SCREEN_WIDTH - 12, SCREEN_HEIGHT - 12 }, { SCREEN_WIDTH - 11, SCREEN_HEIGHT - 31 } },
         bwdPos[ 2 ][ 2 ] = { { SCREEN_WIDTH - 12, SCREEN_HEIGHT - 12 }, { SCREEN_WIDTH - 31, SCREEN_HEIGHT - 11 } };
 
-    int choiceBox::getResult( const char* p_text, bool p_backButton ) {
+    int choiceBox::getResult( const char* p_text, bool p_backButton, bool p_drawSub ) {
+        _drawSub = p_drawSub;
         _text = p_text;
         draw( NEW_PAGE );
         //initOAMTable( true );
@@ -179,8 +181,8 @@ namespace IO {
 
         if( p_backButton ) {
             ( Oam->oamBuffer[ BACK_ID ] ).isHidden = false;
-            ( Oam->oamBuffer[ BACK_ID ] ).x = fwdPos[ 0 ][ 0 ] - 12;
-            ( Oam->oamBuffer[ BACK_ID ] ).y = fwdPos[ 0 ][ 1 ] - 12;
+            ( Oam->oamBuffer[ BACK_ID ] ).x = fwdPos[ 0 ][ 0 ] - 16;
+            ( Oam->oamBuffer[ BACK_ID ] ).y = fwdPos[ 0 ][ 1 ] - 14;
             updateOAM( true );
         }
 

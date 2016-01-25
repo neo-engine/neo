@@ -44,6 +44,9 @@ namespace BAG {
     }
 
 #define CURRENT_ITEM FS::SAV->m_bag( ( bag::bagType )FS::SAV->m_lstBag, (FS::SAV->m_lstBagItem + _currSelectedIdx) % FS::SAV->m_bag.size( ( bag::bagType )FS::SAV->m_lstBag ) )
+
+    const char* choices[ 5 ] = { "Geben", "Anwenden", "Registrieren", "Einsetzen", "Wegwerfen" };
+
     void bagViewer::initUI( ) {
         _bagUI->init( );
         _ranges = _bagUI->drawBagPage( ( bag::bagType )FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
@@ -280,8 +283,17 @@ namespace BAG {
         return true;
     }
 
-    void bagViewer::handleSelection( ) {
+    bool useable( u16 p_item ) {
+        return false;
+    }
 
+    u8 bagViewer::handleSelection( ) {
+        item* itm = ItemList[ CURRENT_ITEM.first ];
+        int res = -1;
+        if( itm->m_itemType == item::TM_HM )
+            return 0;
+
+        return 0;
     }
 
     void bagViewer::run( ) {
@@ -324,7 +336,33 @@ namespace BAG {
                         _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM );
                         continue;
                     } else if( !_ranges[ start ].second.m_isHeld && _ranges[ curr ].second.m_isHeld ) { //Give/use item
+                        pokemon& pkm = FS::SAV->m_pkmnTeam[ curr - t ];
+                        auto itm = ItemList[ _ranges[ start ].second.m_item ];
+                        bool result = false;
+                        if( itm->m_itemType == item::TM_HM )
+                            useItemOnPkmn( pkm, _ranges[ start ].second.m_item );
+                        else if( itm->getEffectType( ) == item::itemEffectType::USE_ON_PKMN
+                                 || itm->m_itemType == item::MEDICINE ) {
+                            IO::choiceBox cb( 2, choices, 0, true );
+                            sprintf( buffer, "Was tun mit %s?", itm->getDisplayName( true ).c_str( ) );
+                            _bagUI->drawPkmnIcons( );
+                            int res = cb.getResult( buffer, true, false );
+                            initUI( );
+                            switch( res ) {
+                                case 0:
+                                    result = giveItemToPkmn( pkm, _ranges[ start ].second.m_item );
+                                    break;
+                                case 1:
+                                    result = useItemOnPkmn( pkm, _ranges[ start ].second.m_item );
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } else
+                            result = giveItemToPkmn( pkm, _ranges[ start ].second.m_item );
 
+                        if( result )
+                            FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, _ranges[ start ].second.m_item, 1 );
                     }
                 } else if( _ranges[ start ].second.m_isHeld && ( curr == (u8) -1 || !_ranges[ curr ].second.m_isHeld ) ) { //Take item
                     takeItemFromPkmn( FS::SAV->m_pkmnTeam[ start - t ] );

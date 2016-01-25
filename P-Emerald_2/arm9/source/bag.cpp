@@ -36,9 +36,9 @@ namespace BAG {
     std::string bagnames[ 5 ] = { "Items", "Medizin", "TM/VM", "Beeren", "Basis-Items" };
 
     void bag::insert( bagType p_bagType, u16 p_itemId, u16 p_cnt ) {
-        for( u16 i = 0; i < _nextFree[ p_bagType ]; ++i )
-            if( _items[ _startIdx[ p_bagType ] + i ].first == p_itemId ) {
-                _items[ _startIdx[ p_bagType ] + i ].second += p_cnt;
+        for( u16 i = _startIdx[ p_bagType ]; i < _nextFree[ p_bagType ]; ++i )
+            if( _items[ i ].first == p_itemId ) {
+                _items[ i ].second += p_cnt;
                 return;
             }
         if( _nextFree[ p_bagType ] >= MAX_ITEMS_IN_BAG
@@ -48,20 +48,25 @@ namespace BAG {
     }
 
     void bag::erase( bagType p_bagType, u16 p_itemId, u16 p_cnt ) {
-        for( u16 i = 0; i < _nextFree[ p_bagType ]; ++i )
-            if( _items[ _startIdx[ p_bagType ] + i ].first == p_itemId ) {
-                if( p_cnt <= _items[ _startIdx[ p_bagType ] + i ].second )
-                    _items[ _startIdx[ p_bagType ] + i ].second -= p_cnt;
+        for( u16 i = _startIdx[ p_bagType ]; i < _nextFree[ p_bagType ]; ++i )
+            if( _items[ i ].first == p_itemId ) {
+                if( p_cnt <= _items[ i ].second )
+                    _items[ i ].second -= p_cnt;
                 else
-                    _items[ _startIdx[ p_bagType ] + i ].second = 0;
+                    _items[ i ].second = 0;
+                if( !_items[ i ].second ) {
+                    for( u16 j = i; j < _nextFree[ p_bagType ]; ++j )
+                        _items[ j ] = _items[ j + 1 ];
+                    --_nextFree[ p_bagType ];
+                }
                 return;
             }
     }
 
     u16 bag::count( bagType p_bagType, u16 p_itemId ) {
-        for( u16 i = 0; i < _nextFree[ p_bagType ]; ++i )
-            if( _items[ _startIdx[ p_bagType ] + i ].first == p_itemId )
-                return _items[ _startIdx[ p_bagType ] + i ].second;
+        for( u16 i = _startIdx[ p_bagType ]; i < _nextFree[ p_bagType ]; ++i )
+            if( _items[ i ].first == p_itemId )
+                return _items[ i ].second;
         return -1;
     }
 

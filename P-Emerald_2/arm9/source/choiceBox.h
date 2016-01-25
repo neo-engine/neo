@@ -39,7 +39,7 @@ namespace IO {
         choiceBox( pokemon p_pokemon, u16 p_moveToLearn );
 
         void draw( u8 p_pressedIdx );
-        int getResult( const char* p_text = 0, bool p_backButton = false );
+        int getResult( const char* p_text = 0, bool p_backButton = false, bool p_drawSub = true );
         void kill( );
     private:
         const char** _choices;

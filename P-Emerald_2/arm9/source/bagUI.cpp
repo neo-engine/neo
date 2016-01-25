@@ -137,16 +137,7 @@ namespace BAG {
         tileCnt = IO::loadSprite( BACK_ID, BACK_ID, tileCnt,
                                   SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26, 32, 32, BackPal,
                                   BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_3, true );
-        for( u8 i = 0; i < 6; ++i ) {
-            auto acPkmn = FS::SAV->m_pkmnTeam[ i ];
-            if( !acPkmn.m_boxdata.m_speciesId )
-                break;
-            if( acPkmn.m_boxdata.m_individualValues.m_isEgg )
-                tileCnt = IO::loadEggIcon( 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
-            else
-                tileCnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
-            IO::Oam->oamBuffer[ PKMN_SUB + i ].priority = OBJPRIORITY_3;
-        }
+        tileCnt = drawPkmnIcons( );
         for( u8 i = 0; i < 5; ++i ) {
             tileCnt = IO::loadSprite( BAG_SUB + i, BAG_SUB + i, tileCnt,
                                       26 * i/*FS::SAV->m_bagPoses[ i ]*/, 3, 32, 32, bagPals[ 2 * i ],
@@ -164,6 +155,21 @@ namespace BAG {
                                   UpTiles, UpTilesLen, false, false, true, OBJPRIORITY_3, true );
 
         IO::updateOAM( true );
+    }
+
+    u16 bagUI::drawPkmnIcons( ) {
+        u16 tileCnt = 32;
+        for( u8 i = 0; i < 6; ++i ) {
+            auto acPkmn = FS::SAV->m_pkmnTeam[ i ];
+            if( !acPkmn.m_boxdata.m_speciesId )
+                break;
+            if( acPkmn.m_boxdata.m_individualValues.m_isEgg )
+                tileCnt = IO::loadEggIcon( 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
+            else
+                tileCnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
+            IO::Oam->oamBuffer[ PKMN_SUB + i ].priority = OBJPRIORITY_3;
+        }
+        return tileCnt;
     }
 
     void drawItemTop( item* p_item, u16 p_count ) {
