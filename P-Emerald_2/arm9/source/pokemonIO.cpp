@@ -511,7 +511,7 @@ bool pokemon::boxPokemon::learnMove( u16 p_move ) {
             IO::yesNoBox yn( false );
             sprintf( buffer, "%ls beherrscht\nbereits 4 Attacken.\nSoll eine verlernt werden?", m_name );
             if( yn.getResult( buffer ) ) {
-                u8 res = IO::choiceBox( *this, p_move ).getResult( "Welche Attacke?", false );
+                u8 res = IO::choiceBox( *this, p_move ).getResult( "Welche Attacke?", false, false );
                 if( res < 4 ) {
                     m_moves[ res ] = p_move;
                     m_acPP[ res ] = std::min( m_acPP[ res ], AttackList[ p_move ]->m_movePP );

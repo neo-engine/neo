@@ -38,7 +38,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <algorithm>
 
 namespace BAG {
-#define TRESHOLD 10
+#define TRESHOLD 20
     bagViewer::bagViewer( ) {
         _currCmp = std::less<std::pair<u16, u16>>( );
     }
@@ -73,7 +73,9 @@ namespace BAG {
         if( ItemList[ p_item ]->m_itemType == item::itemType::MEDICINE ) {
             for( u8 i = 0; i < 2; ++i )
                 if( ItemList[ p_item ]->needsInformation( i ) ) {
-                    u8 res = 1 + IO::choiceBox( p_pokemon, 0 ).getResult( "Welche Attacke?", false );
+                    IO::choiceBox cb( p_pokemon, 0 );
+                    _bagUI->drawPkmnIcons( );
+                    u8 res = 1 + cb.getResult( "Welche Attacke?", false, false );
                     initUI( );
 
                     u32& newEffect = ItemList[ p_item ]->m_itemData.m_itemEffect;

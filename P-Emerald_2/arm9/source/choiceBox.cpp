@@ -102,9 +102,11 @@ namespace IO {
 
         swiWaitForVBlank( );
     }
+
+    std::vector<const char*> names;
     choiceBox::choiceBox( pokemon p_pokemon, u16 p_move ) {
         _num = 4 + !!p_move;
-        static std::vector<const char*> names = { AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_moveName.c_str( ),
+        names = { AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_moveName.c_str( ),
             AttackList[ p_pokemon.m_boxdata.m_moves[ 1 ] ]->m_moveName.c_str( ),
             AttackList[ p_pokemon.m_boxdata.m_moves[ 2 ] ]->m_moveName.c_str( ),
             AttackList[ p_pokemon.m_boxdata.m_moves[ 3 ] ]->m_moveName.c_str( ),
