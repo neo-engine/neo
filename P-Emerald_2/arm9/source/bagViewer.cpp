@@ -67,7 +67,7 @@ namespace BAG {
             u16 currMv = currTm->m_moveIdx;
 
             p_pokemon.learnMove( currMv );
-            return true;
+            return false;
         }
 
         if( ItemList[ p_item ]->m_itemType == item::itemType::MEDICINE ) {

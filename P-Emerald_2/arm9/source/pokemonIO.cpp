@@ -513,8 +513,17 @@ bool pokemon::boxPokemon::learnMove( u16 p_move ) {
             if( yn.getResult( buffer ) ) {
                 u8 res = IO::choiceBox( *this, p_move ).getResult( "Welche Attacke?", false, false );
                 if( res < 4 ) {
-                    m_moves[ res ] = p_move;
-                    m_acPP[ res ] = std::min( m_acPP[ res ], AttackList[ p_move ]->m_movePP );
+                    if( AttackList[ m_moves[ res ] ]->m_isFieldAttack ) {
+                        sprintf( buffer, "%ls kann\n%s nicht vergessen!", m_name, AttackList[ m_moves[ res ] ]->m_moveName.c_str( ) );
+                        IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                        IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                        IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                        IO::messageBox a( buffer, false );
+                        return false;
+                    } else {
+                        m_moves[ res ] = p_move;
+                        m_acPP[ res ] = std::min( m_acPP[ res ], AttackList[ p_move ]->m_movePP );
+                    }
                 }
             } else
                 return false;
