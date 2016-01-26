@@ -128,7 +128,7 @@ move* AttackList[ MAXATTACK ] = {
     new move( "Steinwurf", C 0, C 50, GESTEIN, C 90, C 15, C 0, A 0, C 1, F 34, H 0 ),
     new move( "Erdbeben", C 0, C 100, BODEN, C 100, C 10, C 0, A 0, C 1, F 34, H 0 ),
     new move( "Geofissur", C 10, C 0, BODEN, C 30, C 5, C 0, A 0, C 1, F 34, H 0 ),
-    new move( "Schaufler", C 0, C 80, BODEN, C 100, C 10, C 0, A 0, C 1, F 35, H 0 ),
+    new dig( ),
     new move( "Toxin", C 0, C 0, GIFT, C 85, C 10, C 0, A 0, C 1, F 6, H 2 ),
     new move( "Konfusion", C 0, C 50, PSYCHO, C 100, C 25, C 0, A 0, C 1, F 2, H 1 ),
     new move( "Psychokinese", C 0, C 90, PSYCHO, C 100, C 10, C 0, A 0, C 1, F 34, H 1 ),

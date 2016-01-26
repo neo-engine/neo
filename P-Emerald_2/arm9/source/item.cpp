@@ -34,6 +34,8 @@ along with Pokémon Emerald 2 Version.  If not, new see <http://www.gnu.org/lice
 #include "saveGame.h"
 #include "mapDefines.h"
 #include "mapDrawer.h"
+#include "uio.h"
+#include "messageBox.h"
 
 #include <vector>
 #include <algorithm>
@@ -229,6 +231,72 @@ bool item::use( pokemon& p_pokemon ) {
 bool item::use( bool p_dryRun ) {
     u16 itm = getItemId( );
     switch( itm ) {
+        case I_REPEL:
+            if( !p_dryRun ) {
+                FS::SAV->m_repelSteps = std::max( FS::SAV->m_repelSteps, (s16) 50 );
+                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                IO::messageBox( "Schutz eingesetzt.", false );
+            }
+            return true;
+        case I_SUPER_REPEL:
+            if( !p_dryRun ) {
+                FS::SAV->m_repelSteps = std::max( FS::SAV->m_repelSteps, (s16) 100 );
+                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                IO::messageBox( "Superschutz eingesetzt.", false );
+            }
+            return true;
+        case I_MAX_REPEL:
+            if( !p_dryRun ) {
+                FS::SAV->m_repelSteps = std::max( FS::SAV->m_repelSteps, (s16) 250 );
+                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                IO::messageBox( "Top-Schutz eingesetzt.", false );
+            }
+            return true;
+        case I_EXP_SHARE:
+            if( !p_dryRun ) {
+                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                if( FS::SAV->m_EXPShareEnabled )
+                    IO::messageBox( "EP-Teiler ausgeschaltet.", false );
+                else
+                    IO::messageBox( "EP-Teiler eingeschaltet.", false );
+                FS::SAV->m_EXPShareEnabled = !FS::SAV->m_EXPShareEnabled;
+            }
+            return true;
+        case I_COIN_CASE:
+            if( !p_dryRun ) {
+                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                sprintf( buffer, "Münzen: %lu.", FS::SAV->m_coins );
+                IO::messageBox( buffer, false );
+            }
+            return true;
+        case I_POINT_CARD:
+            if( !p_dryRun ) {
+                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                sprintf( buffer, "Kampfpunkte: %lu.", FS::SAV->m_battlePoints );
+                IO::messageBox( buffer, false );
+                FS::SAV->m_EXPShareEnabled = !FS::SAV->m_EXPShareEnabled;
+            }
+            return true;
+        case I_ESCAPE_ROPE:
+            if( !p_dryRun )
+                AttackList[ M_DIG ]->use( );
+            return false;
+        case I_HONEY:
+            if( !p_dryRun )
+                AttackList[ M_SWEET_SCENT ]->use( );
+            return false;
         case I_BIKE2:
         case I_BICYCLE:
         case I_MACH_BIKE:
@@ -273,6 +341,17 @@ bool item::use( bool p_dryRun ) {
 bool item::useable( ) {
     u16 itm = getItemId( );
     switch( itm ) {
+        case I_REPEL:
+        case I_SUPER_REPEL:
+        case I_MAX_REPEL:
+        case I_EXP_SHARE:
+        case I_COIN_CASE:
+        case I_POINT_CARD:
+            return true;
+        case I_ESCAPE_ROPE:
+            return AttackList[ M_DIG ]->possible( );
+        case I_HONEY:
+            return AttackList[ M_SWEET_SCENT ]->possible( );
         case I_BIKE2:
         case I_BICYCLE:
         case I_MACH_BIKE:

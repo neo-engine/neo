@@ -346,14 +346,21 @@ namespace BAG {
                     break;
                 }
 
+                FS::SAV->m_lstUsedItems[ FS::SAV->m_lstUsedItemsIdx ] = CURRENT_ITEM.first;
+                FS::SAV->m_lstUsedItemsIdx = ( FS::SAV->m_lstUsedItemsIdx + 1 ) % 5;
+
                 bool res = itm->use( true );
                 if( !res )
                     ret = 2 | ( CURRENT_ITEM.first << 2 );
-                else
-                    itm->use( false );
+                else {
+                    initUI( );
+                    itm->use( );
+                    FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
+                }
                 break;
             }
-            case 2: //Toss
+            case 2: //Toss everything
+                FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first );
                 break;
             default:
                 ret = 0;
@@ -439,8 +446,6 @@ namespace BAG {
                 break;
             else if( GET_AND_WAIT( KEY_A ) ) {
                 u16 res = handleSelection( );
-                if( res & 1 )
-                    FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
                 if( res & 2 )
                     return ( res >> 2 );
             }
@@ -458,8 +463,6 @@ namespace BAG {
                             if( ( !touch.px && !touch.py ) || c++ == TRESHOLD ) {
                                 if( !touch.px && !touch.py && _currSelectedIdx == j ) {
                                     u16 res = handleSelection( );
-                                    if( res & 1 )
-                                        FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
                                     if( res & 2 )
                                         return ( res >> 2 );
                                     break;
