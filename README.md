@@ -40,7 +40,7 @@ _Partially_ implemented features are in _italics_.
     * [ ] Good documentation
     * [x] _Modular code (strict seperation of each feature and between core and UI)_
 
-Build requiremints
+Build requirements
 ------------------
 * devkitARM >= r45
 * libnds >= 1.5.12
