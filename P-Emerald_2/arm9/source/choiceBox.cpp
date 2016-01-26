@@ -201,7 +201,10 @@ namespace IO {
                 swiWaitForVBlank( );
                 updateOAM( true );
                 touchPosition t;
+                auto& touch = t;
                 touchRead( &t );
+                scanKeys( );
+                int pressed = keysCurrent( );
 
                 for( u8 i = 0; i < 3; ++i )
                     if( ( i + 3 * _acPage ) < _num && t.px >= 32 && t.py >= 68 + 35 * i && t.px <= 224 && t.py <= 100 + 35 * i ) {
@@ -213,7 +216,7 @@ namespace IO {
                         result = i + 3 * _acPage;
                         goto END;
                     }
-                if( p_backButton && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] - 12 ) + sq( t.py - fwdPos[ 0 ][ 1 ] - 12 ) ) < 17 ) { //Back pressed
+                if( p_backButton && ( GET_AND_WAIT_C( fwdPos[ 0 ][ 0 ], fwdPos[ 0 ][ 1 ] + 2, 16 ) || GET_AND_WAIT( KEY_B ) ) ) { //Back pressed
                     result = -1;
                     goto END;
                 }
@@ -276,8 +279,11 @@ namespace IO {
             loop( ) {
                 swiWaitForVBlank( );
                 updateOAM( true );
-                touchPosition t;
-                touchRead( &t );
+                touchPosition touch;
+                auto& t = touch;
+                touchRead( &touch );
+                scanKeys( );
+                int pressed = keysCurrent( );
 
                 for( u8 i = 0; i < std::min( 6, _num - 6 * _acPage ); ++i ) {
                     if( t.px >= ( ( i % 2 ) ? 129 : 19 ) && t.py >= 68 + ( i / 2 ) * 35
@@ -294,7 +300,7 @@ namespace IO {
                     }
                 }
 
-                if( p_backButton && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] - 12 ) + sq( t.py - fwdPos[ 0 ][ 1 ] - 12 ) ) < 17 ) { //Back pressed
+                if( p_backButton && ( GET_AND_WAIT_C( fwdPos[ 0 ][ 0 ], fwdPos[ 0 ][ 1 ] + 2, 16 ) || GET_AND_WAIT( KEY_B ) ) ) { //Back pressed
                     result = -1;
                     goto END;
                 } else if( ( !p_backButton && ( ( _num - 1 ) / 6 && _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 ) )

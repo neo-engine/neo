@@ -31,6 +31,10 @@ along with Pokémon Emerald 2 Version.  If not, new see <http://www.gnu.org/lice
 #include "pokemon.h"
 #include "battle.h"
 
+#include "saveGame.h"
+#include "mapDefines.h"
+#include "mapDrawer.h"
+
 #include <vector>
 #include <algorithm>
 
@@ -66,7 +70,7 @@ bool item::use( pokemon& p_pokemon ) {
     //Anything that modifies the PKMN's happiness shall be second
     if( ( m_itemData.m_itemEffect >> 24 ) % 32 == 13 )
         m_itemData.m_itemEffect = ( ( m_itemData.m_itemEffect % ( 1 << 16 ) ) << 16 ) | ( m_itemData.m_itemEffect >> 16 );
-    
+
     for( auto op : { m_itemData.m_itemEffect >> 16, m_itemData.m_itemEffect % ( 1 << 16 ) } ) {
         u8 operation = op >> 13;
         u8 stat = ( op >> 8 ) % 32;
@@ -219,6 +223,69 @@ bool item::use( pokemon& p_pokemon ) {
     }
 
     return change;
+}
+
+//Returns false if the original UI has not to be redrawn/will be exited
+bool item::use( bool p_dryRun ) {
+    u16 itm = getItemId( );
+    switch( itm ) {
+        case I_BIKE2:
+        case I_BICYCLE:
+        case I_MACH_BIKE:
+        case I_ACRO_BIKE:
+            if( FS::SAV->m_player.m_movement == MAP::WALK ) {
+                if( !p_dryRun )
+                    MAP::curMap->changeMoveMode( MAP::BIKE );
+                return false;
+            } else if( FS::SAV->m_player.m_movement == MAP::BIKE ) {
+                if( !p_dryRun )
+                    MAP::curMap->changeMoveMode( MAP::WALK );
+                return false;
+            } else
+                return true;
+        case I_OLD_ROD:
+            if( MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
+                if( !p_dryRun )
+                    MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction, 0 );
+                return false;
+            } else
+                return true;
+        case I_GOOD_ROD:
+            if( MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
+                if( !p_dryRun )
+                    MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction, 1 );
+                return false;
+            } else
+                return true;
+        case I_SUPER_ROD:
+            if( MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
+                if( !p_dryRun )
+                    MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction, 2 );
+                return false;
+            } else
+                return true;
+        default:
+            break;
+    }
+    return false;
+}
+
+bool item::useable( ) {
+    u16 itm = getItemId( );
+    switch( itm ) {
+        case I_BIKE2:
+        case I_BICYCLE:
+        case I_MACH_BIKE:
+        case I_ACRO_BIKE:
+            return FS::SAV->m_player.m_movement == MAP::WALK || FS::SAV->m_player.m_movement == MAP::BIKE;
+        case I_OLD_ROD:
+        case I_GOOD_ROD:
+        case I_SUPER_ROD:
+            return MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction );
+        default:
+            break;
+    }
+    return false;
 }
 
 item* ItemList[ 772 ] = {
@@ -711,7 +778,7 @@ item* ItemList[ 772 ] = {
     new item( "Firnontornit" ),
     new item( "Diancienit" ),
 
-    new item( "Null" ),//Prison Bottle
+    new keyItem( "Banngefaess" ),//Prison Bottle
     new keyItem( "Null" ),
 
     new item( "Cameruptnit" ),

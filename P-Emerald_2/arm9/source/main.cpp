@@ -357,24 +357,15 @@ OUT:
         //Movement
         if( held & KEY_Y ) {
             IO::waitForKeysUp( KEY_Y );
-            if( FS::SAV->m_player.m_movement == MAP::WALK )
-                MAP::curMap->changeMoveMode( MAP::BIKE );
-            else if( FS::SAV->m_player.m_movement == MAP::BIKE )
-                MAP::curMap->changeMoveMode( MAP::WALK );
-            else {
-                IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
-                IO::drawSub( true );
-            }
-            swiWaitForVBlank( );
-            scanKeys( );
-            continue;
-        }
-        if( held & KEY_X ) {
-            IO::waitForKeysUp( KEY_X );
-            if( MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
-                MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction );
+            if( FS::SAV->m_registeredItem ) {
+                if( ItemList[ FS::SAV->m_registeredItem ]->useable( ) )
+                    ItemList[ FS::SAV->m_registeredItem ]->use( );
+                else {
+                    IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                    IO::drawSub( true );
+                }
             } else {
-                IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                IO::messageBox( "Du kannst ein Item\nauf Y registrieren.", "PokéNav" );
                 IO::drawSub( true );
             }
             swiWaitForVBlank( );
@@ -416,7 +407,7 @@ OUT:
             UPDATE_TIME = false;
             INIT_MAIN_SPRITES = false;
 
-            bv.run( );
+            u16 res = bv.run( );
 
             IO::clearScreenConsole( true, true );
             IO::drawSub( true );
@@ -424,6 +415,10 @@ OUT:
             FADE_TOP_DARK( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
+            if( res ) {
+                ItemList[ res ]->use( false );
+                IO::drawSub( true );
+            }
         } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
                    && ( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ],
                                         IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ], 16 ) ) ) {
@@ -486,7 +481,7 @@ OUT:
                         FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
                     }
 
-                    for( u16 j = 0; j < 150; ++j ) {
+                    for( u16 j = 251; j < 386; ++j ) {
                         auto a = pokemon( j + 1, 50, 0, j ).m_boxdata;
                         a.m_gotPlace = j;
                         FS::SAV->storePkmn( a );
@@ -510,7 +505,7 @@ OUT:
                     break;
                 }
                 case 1:
-                    for( u16 j = 1; j < 637; ++j ) {
+                    for( u16 j = 1; j < 772; ++j ) {
                         if( ItemList[ j ]->m_itemName != "Null" )
                             FS::SAV->m_bag.insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
                     }

@@ -58,14 +58,15 @@ namespace BAG {
         bool giveItemToPkmn( pokemon& p_pokemon, u16 p_item );
         void takeItemFromPkmn( pokemon& p_pokemon );
 
-        u8 handleSelection( );
+        u16 handleSelection( );
         bool handleSomeInput( touchPosition p_touch, int p_pressed );
     public:
         bagViewer( );
         ~bagViewer( ) {
             delete _bagUI;
         }
-        void run( );
+        //Returns an item which shall be used
+        u16 run( );
 
         u16 getItem( context p_context );
     };

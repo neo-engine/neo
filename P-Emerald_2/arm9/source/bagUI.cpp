@@ -358,6 +358,13 @@ namespace BAG {
             && toBagType( p_item->m_itemType ) == bag::bagType::ITEMS ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
             IO::printChar( IO::boldFont, 490 - 22 + u16( p_item->m_itemType ), p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
+        } else if( p_item->getItemId( ) == FS::SAV->m_registeredItem ) {
+            IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
+            IO::printChar( IO::boldFont, 'Y', p_x + 106 + 2 * p_pressed, p_y - 2 + p_pressed, true );
+        } else if( p_item->m_itemType == item::itemType::TM_HM
+                   && AttackList[ static_cast<TM*>( p_item )->m_moveIdx ]->m_isFieldAttack ) {
+            IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
+            IO::printChar( IO::boldFont, 490 - 22 + u16( p_item->m_itemType ), p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
         } else
             IO::printChoiceBox( p_x, p_y, p_x + 106, p_y + 16, 3, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
         if( p_item->m_itemType != item::itemType::TM_HM )

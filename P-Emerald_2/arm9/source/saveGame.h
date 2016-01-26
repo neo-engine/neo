@@ -65,6 +65,8 @@ namespace FS {
         u8          m_savTyp : 3;
         u8          m_inDex[ 1 + MAX_PKMN / 8 ];
         u32         m_money;
+        u32         m_coins;
+        u32         m_battlePoints;
 
         pokemon     m_pkmnTeam[ 6 ];
 
@@ -90,6 +92,10 @@ namespace FS {
         //Bag stuff
         u8          m_lstBag;
         u16         m_lstBagItem;
+
+        u16         m_lstUsedItems[ 5 ];
+        u8          m_lstUsedItemsIdx;
+        u16         m_registeredItem;
 
         s16         m_repelSteps;
         BAG::bag    m_bag;

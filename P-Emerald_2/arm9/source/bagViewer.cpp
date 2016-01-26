@@ -201,12 +201,18 @@ namespace BAG {
         }
 
         if( !possible ) {
-            IO::messageBox( "Dieses Item kann nicht\nausgewählt werden." );
+            IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+            IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+            IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+            IO::messageBox( "Dieses Item kann nicht\nausgewählt werden.", false );
             return false;
         }
         IO::yesNoBox yn( false );
         sprintf( buffer, "%s auswählen?",
                  ItemList[ p_targetItem ]->getDisplayName( true ).c_str( ) );
+        IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+        IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+        IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
         if( !yn.getResult( buffer ) ) {
             return false;
         }
@@ -286,19 +292,78 @@ namespace BAG {
     }
 
     bool useable( u16 p_item ) {
-        return false;
+        return ( p_item == I_REPEL )
+            || ( p_item == I_SUPER_REPEL )
+            || ( p_item == I_MAX_REPEL )
+            || ( p_item == I_ESCAPE_ROPE )
+            || ( p_item == I_HONEY )
+
+            || ( p_item == I_EXP_SHARE )
+            || ( p_item == I_POKE_RADAR )
+            || ( p_item == I_COIN_CASE )
+            || ( p_item == I_OLD_ROD )
+            || ( p_item == I_SUPER_ROD )
+            || ( p_item == I_GOOD_ROD )
+            || ( p_item == I_SQUIRT_BOTTLE )
+            || ( p_item == I_SPRAYDUCK )
+            || ( p_item == I_WAILMER_PAIL )
+            || ( p_item == I_BICYCLE )
+            || ( p_item == I_ACRO_BIKE )
+            || ( p_item == I_BIKE2 )
+            || ( p_item == I_MACH_BIKE );
     }
 
-    u8 bagViewer::handleSelection( ) {
+    //returns: 0 if nothing happend; 1 if the item got consumed and 2 if the bag is exited.
+    //If an item has yet to be used the 14 highest bits contain its id
+    u16 bagViewer::handleSelection( ) {
         item* itm = ItemList[ CURRENT_ITEM.first ];
-        int res = -1;
         if( itm->m_itemType == item::TM_HM )
             return 0;
 
-        return 0;
+        IO::choiceBox cb( 1 + useable( CURRENT_ITEM.first ), choices + 2
+                          + ( itm->m_itemType != item::KEY_ITEM ), 0, true );
+        _bagUI->drawPkmnIcons( );
+        sprintf( buffer, "Was tun mit %s?", itm->getDisplayName( true ).c_str( ) );
+        int res = cb.getResult( buffer, true, false );
+        if( res != -1 )
+            res += ( itm->m_itemType != item::KEY_ITEM );
+        u16 ret = ( itm->m_itemType != item::KEY_ITEM );
+        switch( res ) {
+            case 0: //Registry
+            {
+                FS::SAV->m_registeredItem = CURRENT_ITEM.first;
+                break;
+            }
+            case 1: //Use
+            {
+                if( !itm->useable( ) ) {
+                    initUI( );
+                    IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                    IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                    IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                    IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", false );
+                    ret = 0;
+                    break;
+                }
+
+                bool res = itm->use( true );
+                if( !res )
+                    ret = 2 | ( CURRENT_ITEM.first << 2 );
+                else
+                    itm->use( false );
+                break;
+            }
+            case 2: //Toss
+                break;
+            default:
+                ret = 0;
+                break;
+        }
+        initUI( );
+        return ret;
     }
 
-    void bagViewer::run( ) {
+    u16 bagViewer::run( ) {
         _bagUI = new bagUI( );
         initUI( );
         _hasSprite = false;
@@ -372,8 +437,13 @@ namespace BAG {
                 initUI( );
             } else if( !handleSomeInput( touch, pressed ) )
                 break;
-            else if( GET_AND_WAIT( KEY_A ) )
-                handleSelection( );
+            else if( GET_AND_WAIT( KEY_A ) ) {
+                u16 res = handleSelection( );
+                if( res & 1 )
+                    FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
+                if( res & 2 )
+                    return ( res >> 2 );
+            }
 
             bool rangeChanged = false;
             for( u8 j = 0; j < _ranges.size( ); ++j ) {
@@ -387,7 +457,11 @@ namespace BAG {
                             touchRead( &touch );
                             if( ( !touch.px && !touch.py ) || c++ == TRESHOLD ) {
                                 if( !touch.px && !touch.py && _currSelectedIdx == j ) {
-                                    handleSelection( );
+                                    u16 res = handleSelection( );
+                                    if( res & 1 )
+                                        FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
+                                    if( res & 2 )
+                                        return ( res >> 2 );
                                     break;
                                 }
                                 if( !i.second.m_isHeld || i.second.m_item ) {
@@ -433,6 +507,7 @@ namespace BAG {
             if( !rangeChanged )
                 curr = -1;
         }
+        return 0;
     }
 
     u16 bagViewer::getItem( context p_context ) {
