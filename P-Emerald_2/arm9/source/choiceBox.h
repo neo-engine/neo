@@ -6,7 +6,7 @@ file        : choiceBox.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -39,7 +39,7 @@ namespace IO {
         choiceBox( pokemon p_pokemon, u16 p_moveToLearn );
 
         void draw( u8 p_pressedIdx );
-        int getResult( const char* p_text = 0, bool p_backButton = false );
+        int getResult( const char* p_text = 0, bool p_backButton = false, bool p_drawSub = true );
         void kill( );
     private:
         const char** _choices;

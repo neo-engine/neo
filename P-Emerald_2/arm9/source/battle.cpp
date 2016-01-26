@@ -6,7 +6,7 @@ file        : battle.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -28,6 +28,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include <cwchar>
 #include <cstdio>
+#include <cstring>
 #include <algorithm>
 #include <functional>
 #include <tuple>
@@ -339,6 +340,7 @@ CHOOSE1:
                     ACPKMNSTS( i, OPPONENT ) = NA;
             }
         }
+        memset( _participatedPKMN, 0, sizeof( _participatedPKMN ) );
 
         for( u8 p = 0; p < 2; ++p ) {
             _battleSpotOccupied[ 0 ][ p ] = false;
@@ -1080,6 +1082,13 @@ NEXT:
         else if( statchng[ ACCURACY ] < 0 )
             moveAccuracy *= 2.0 / ( 2 - statchng[ ACCURACY ] );
 
+        //Reduce PP
+        for( u8 i = 0; i < 4; ++i )
+            if( acpkmn->m_boxdata.m_moves[ i ] == bm.m_value ) {
+                if( acpkmn->m_boxdata.m_acPP[ i ] )
+                    acpkmn->m_boxdata.m_acPP[ i ]--;
+                break;
+            }
         //For every target, check if that target protects itself
         for( u8 k = 0; k < 4; ++k ) {
             bool isOpp = k / 2,
@@ -1136,15 +1145,7 @@ NEXT:
 
         //Attack animation
         _battleUI->showAttack( p_opponent, p_pokemonPos );
-
-        //Reduce PP
-        for( u8 i = 0; i < 4; ++i )
-            if( acpkmn->m_boxdata.m_moves[ i ] == bm.m_value ) {
-                if( acpkmn->m_boxdata.m_acPP[ i ] )
-                    acpkmn->m_boxdata.m_acPP[ i ]--;
-                break;
-            }
-
+    
         //Damage and stuff
         for( u8 k = 0; k < 4; ++k ) {
             bool isOpp = k / 2,
@@ -1270,7 +1271,7 @@ NEXT:
         if( m_battleMode != DOUBLE && p_pokemonPos )
             return;
         if( m_isWildBattle && p_opponent ) {
-            if( !_wildPokemon.m_pokemon->m_stats.m_acHP ) {
+            if( !_wildPokemon.m_pokemon->m_stats.m_acHP && _wildPokemon.m_acStatus != KO ) {
                 if( p_show ) {
                     std::swprintf( wbuffer, 100, L"%ls [OPPONENT] wurde besiegt.[A]",
                                    _wildPokemon.m_pokemon->m_boxdata.m_name );

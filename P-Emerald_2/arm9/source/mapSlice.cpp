@@ -6,7 +6,7 @@ file        : mapSlice.cpp
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -36,9 +36,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #endif
 
 namespace MAP {
-    std::map<u8, tile*> tiles;
-    std::map<u8, block*> blocks;
-    std::map<u8, palette*> palettes;
+    sliceCache cache;
 
     std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y ) {
         FILE* mapF = FS::open( MAP_PATH,
@@ -63,6 +61,12 @@ namespace MAP {
             return 0;
         }
         std::unique_ptr<mapSlice> res = std::unique_ptr<mapSlice>( new mapSlice );
+#ifdef DEBUG
+        if( !res ) {
+            IO::messageBox( "Not enough memory :(" );
+            IO::drawSub( true );
+        }
+#endif
 
         FS::readNop( mapF, 8 );
         res->m_x = p_x;
@@ -84,67 +88,81 @@ namespace MAP {
         FS::read( mapF, res->m_blocks, sizeof( mapBlockAtom ), SIZE * SIZE );
         FS::close( mapF );
 
+#ifdef DEBUG__
+        sprintf( buffer, "ts1 %d ts2 %d", tsidx1, tsidx2 );
+        IO::messageBox a( buffer );
+        IO::drawSub( true );
+        swiWaitForVBlank( );
+#endif
+
         //Read the wild Pkoemon data
         mapF = FS::open( MAP_PATH,
                          ( toString( p_map )
                            + "/" + toString( p_y )
                            + "_" + toString( p_x ) ).c_str( ),
                          ".enc" );
-        FS::read( mapF, res->m_pokemon, sizeof( std::pair<u16, u16> ), 3 * 5 * 4 );
+        FS::read( mapF, res->m_pokemon, sizeof( std::pair<u16, u16> ), 3 * 5 * 5 );
         FS::close( mapF );
 
         //Read the first tileset
-        if( !tiles.count( tsidx1 ) ) {
+        s8 ind;
+        if( ( ind = cache.get( tsidx1 ) ) == -1 ) {
+            ind = cache.set( tsidx1 );
+            if( cache.m_tiles[ ind ] )
+                delete cache.m_tiles[ ind ];
             mapF = FS::open( TILESET_PATH, tsidx1, ".ts" );
-            tiles[ tsidx1 ] = new tile[ 512 ];
-            FS::readTiles( mapF, tiles[ tsidx1 ] );
+            cache.m_tiles[ ind ] = new tile[ 512 ];
+            FS::readTiles( mapF, cache.m_tiles[ ind ] );
             FS::close( mapF );
-        }
-        memcpy( res->m_tileSet.m_blocks, tiles[ tsidx1 ], 512 * sizeof( tile ) );
 
-        if( !blocks.count( tsidx1 ) ) {
+            if( cache.m_blocks[ ind ] )
+                delete cache.m_blocks[ ind ];
             mapF = FS::open( TILESET_PATH, tsidx1, ".bvd" );
-            blocks[ tsidx1 ] = new block[ 512 ];
-            FS::readblocks( mapF, blocks[ tsidx1 ] );
+            cache.m_blocks[ ind ] = new block[ 512 ];
+            FS::readblocks( mapF, cache.m_blocks[ ind ] );
             FS::close( mapF );
-        }
-        memcpy( res->m_blockSet.m_blocks, blocks[ tsidx1 ], 512 * sizeof( block ) );
 
-        if( !palettes.count( tsidx1 ) ) {
+            if( cache.m_palettes[ ind ] )
+                delete  cache.m_palettes[ ind ];
             mapF = FS::open( TILESET_PATH, tsidx1, ".p2l" );
-            palettes[ tsidx1 ] = new palette[ 6 ];
-            FS::readPal( mapF, palettes[ tsidx1 ] );
+            cache.m_palettes[ ind ] = new palette[ 6 ];
+            FS::readPal( mapF, cache.m_palettes[ ind ] );
             FS::close( mapF );
         }
-        memcpy( res->m_pals, palettes[ tsidx1 ], sizeof( palette ) * 6 );
+        res->m_tileSet.m_tiles1 = cache.m_tiles[ ind ];
+        res->m_blockSet.m_blocks1 = cache.m_blocks[ ind ];
+        memcpy( res->m_pals, cache.m_palettes[ ind ], sizeof( palette ) * 6 );
         //sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx1 );
         //FS::readAnimations( fopen( buffer, "rb" ), m_animations );
 
         //Read the second tileset
 
-        if( !tiles.count( tsidx2 ) ) {
+        if( ( ind = cache.get( tsidx2 ) ) == -1 ) {
+            ind = cache.set( tsidx2 );
+            if( cache.m_tiles[ ind ] )
+                delete cache.m_tiles[ ind ];
             mapF = FS::open( TILESET_PATH, tsidx2, ".ts" );
-            tiles[ tsidx2 ] = new tile[ 512 ];
-            FS::readTiles( mapF, tiles[ tsidx2 ] );
+            cache.m_tiles[ ind ] = new tile[ 512 ];
+            FS::readTiles( mapF, cache.m_tiles[ ind ] );
             FS::close( mapF );
-        }
-        memcpy( res->m_tileSet.m_blocks + 512, tiles[ tsidx2 ], 512 * sizeof( tile ) );
 
-        if( !blocks.count( tsidx2 ) ) {
+            if( cache.m_blocks[ ind ] )
+                delete cache.m_blocks[ ind ];
             mapF = FS::open( TILESET_PATH, tsidx2, ".bvd" );
-            blocks[ tsidx2 ] = new block[ 512 ];
-            FS::readblocks( mapF, blocks[ tsidx2 ] );
+            cache.m_blocks[ ind ] = new block[ 512 ];
+            FS::readblocks( mapF, cache.m_blocks[ ind ] );
             FS::close( mapF );
-        }
-        memcpy( res->m_blockSet.m_blocks + 512, blocks[ tsidx2 ], 512 * sizeof( block ) );
 
-        if( !palettes.count( tsidx2 ) ) {
+            if( cache.m_palettes[ ind ] )
+                delete  cache.m_palettes[ ind ];
             mapF = FS::open( TILESET_PATH, tsidx2, ".p2l" );
-            palettes[ tsidx2 ] = new palette[ 6 ];
-            FS::readPal( mapF, palettes[ tsidx2 ] );
+            cache.m_palettes[ ind ] = new palette[ 6 ];
+            FS::readPal( mapF, cache.m_palettes[ ind ] );
             FS::close( mapF );
         }
-        memcpy( res->m_pals + 6, palettes[ tsidx2 ], sizeof( palette ) * 6 );
+        res->m_tileSet.m_tiles2 = cache.m_tiles[ ind ];
+        res->m_blockSet.m_blocks2 = cache.m_blocks[ ind ];
+        memcpy( res->m_pals + 6, cache.m_palettes[ ind ], sizeof( palette ) * 6 );
 
         //sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx2 );
         //readAnimations( fopen( buffer, "rb" ), m_animations );

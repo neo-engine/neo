@@ -6,7 +6,7 @@ file        : bagViewer.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -37,21 +37,37 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 namespace BAG {
     class bagViewer {
+    public:
+        enum context {
+            BATTLE,         //Allow only items usable in-battle
+            GIVE_TO_PKMN    //Allow only items, medicine and berries
+        };
     private:
-        u8 _currPage;
-        u16 _currItem;
-
         std::function<bool( std::pair<u16, u16>, std::pair<u16, u16> )> _currCmp;
 
-        bag* _origBag;
-
-        std::vector<IO::inputTarget> _ranges;
-        u8 _atHandOam;
+        std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> _ranges;
 
         bagUI* _bagUI;
+        bool _hasSprite;
+        u8 _currSelectedIdx;
 
+        void initUI( );
+
+        bool confirmChoice( context p_context, u16 p_targetItem );
+        bool useItemOnPkmn( pokemon& p_pokemon, u16 p_item );
+        bool giveItemToPkmn( pokemon& p_pokemon, u16 p_item );
+        void takeItemFromPkmn( pokemon& p_pokemon );
+
+        u16 handleSelection( );
+        bool handleSomeInput( touchPosition p_touch, int p_pressed );
     public:
-        bagViewer( bag* p_bag, bagUI* p_bagUI );
-        void run( u8 p_startPage, u16 p_startIdx );
+        bagViewer( );
+        ~bagViewer( ) {
+            delete _bagUI;
+        }
+        //Returns an item which shall be used
+        u16 run( );
+
+        u16 getItem( context p_context );
     };
 }

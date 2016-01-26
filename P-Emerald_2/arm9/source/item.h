@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2015
+    Copyright (C) 2012 - 2016
     Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
@@ -98,6 +98,10 @@ public:
     bool            needsInformation( u8 p_num );
 
     bool            use( pokemon& p_pokemon );
+
+    bool            use( bool p_dryRun = false );
+
+    bool            useable( );
 
     //Constructors
 

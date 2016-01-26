@@ -6,7 +6,7 @@ file        : fontData.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -117,7 +117,7 @@ namespace IO {
                 p_val = 3 * 49 - 2;
                 return;
             }
-            if( p_val == ':' ) {
+            if( p_val == ';' ) {
                 p_val = 3 * 49 - 1;
                 return;
             }
@@ -131,6 +131,22 @@ namespace IO {
             }
             if( p_val == ' ' ) {
                 p_val = 489;
+                return;
+            }
+            if( p_val == '#' ) {
+                p_val = 98 + 43;
+                return;
+            }
+            if( p_val == '*' ) {
+                p_val = 98 + 42;
+                return;
+            }
+            if( p_val == '+' ) {
+                p_val = 98 + 41;
+                return;
+            }
+            if( p_val == '-' ) {
+                p_val = 98 + 42;
                 return;
             }
 

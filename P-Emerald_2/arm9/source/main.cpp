@@ -6,7 +6,7 @@ file        : main.cpp
 author      : Philip Wellnitz
 description : Main ARM9 entry point
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -109,6 +109,7 @@ bool UPDATE_TIME = true;
 bool ANIMATE_MAP = false;
 bool INIT_MAIN_SPRITES = false;
 u8 FRAME_COUNT = 0;
+bool SCREENS_SWAPPED = false;
 
 u8 getCurrentDaytime( ) {
     u8 t = achours, m = acmonth;
@@ -173,10 +174,7 @@ void initMainSprites( ) {
 }
 void initGraphics( ) {
     IO::vramSetup( );
-    videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
-    videoSetModeSub( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
 
-    IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
     IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
     IO::bg2sub = bgInitSub( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
     for( u8 i = 0; i < 4; ++i )
@@ -211,7 +209,6 @@ void initTimeAndRnd( ) {
     year = tStruct->tm_year + 1900;
 
     srand( hours ^ ( 100 * minutes ) ^ ( 10000 * seconds ) ^ ( day ^ ( 100 * month ) ^ year ) );
-    LastPID = rand( );
 }
 
 int main( int, char** p_argv ) {
@@ -234,8 +231,6 @@ int main( int, char** p_argv ) {
     }
     startScreen( ).run( );
 
-    int HILFSCOUNTER = 252;
-
     FS::SAV->m_hasGDex = true;
     FS::SAV->m_evolveInBattle = true;
 
@@ -254,24 +249,26 @@ int main( int, char** p_argv ) {
         if( !UPDATE_TIME )
             return;
 
+        auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
+
         IO::boldFont->setColor( 0, 0 );
         u8 oldC1 = IO::boldFont->getColor( 1 );
         u8 oldC2 = IO::boldFont->getColor( 2 );
         IO::boldFont->setColor( 0, 1 );
         IO::boldFont->setColor( BLACK_IDX, 2 );
-        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
+        pal[ BLACK_IDX ] = BLACK;
         time_t unixTime = time( NULL );
         struct tm* timeStruct = gmtime( (const time_t *) &unixTime );
 
         if( acseconds != timeStruct->tm_sec || DRAW_TIME ) {
             DRAW_TIME = false;
-            BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
+            pal[ WHITE_IDX ] = WHITE;
             IO::boldFont->setColor( WHITE_IDX, 1 );
             IO::boldFont->setColor( WHITE_IDX, 2 );
 
             char buffer[ 50 ];
             sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-            IO::boldFont->printString( buffer, 18 * 8, 192 - 16, true );
+            IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
 
             achours = timeStruct->tm_hour;
             acminutes = timeStruct->tm_min;
@@ -280,7 +277,7 @@ int main( int, char** p_argv ) {
             IO::boldFont->setColor( 0, 1 );
             IO::boldFont->setColor( BLACK_IDX, 2 );
             sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-            IO::boldFont->printString( buffer, 18 * 8, 192 - 16, true );
+            IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
         }
         achours = timeStruct->tm_hour;
         acminutes = timeStruct->tm_min;
@@ -360,24 +357,15 @@ OUT:
         //Movement
         if( held & KEY_Y ) {
             IO::waitForKeysUp( KEY_Y );
-            if( FS::SAV->m_player.m_movement == MAP::WALK )
-                MAP::curMap->changeMoveMode( MAP::BIKE );
-            else if( FS::SAV->m_player.m_movement == MAP::BIKE )
-                MAP::curMap->changeMoveMode( MAP::WALK );
-            else {
-                IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
-                IO::drawSub( true );
-            }
-            swiWaitForVBlank( );
-            scanKeys( );
-            continue;
-        }
-        if( held & KEY_X ) {
-            IO::waitForKeysUp( KEY_X );
-            if( MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
-                MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction );
+            if( FS::SAV->m_registeredItem ) {
+                if( ItemList[ FS::SAV->m_registeredItem ]->useable( ) )
+                    ItemList[ FS::SAV->m_registeredItem ]->use( );
+                else {
+                    IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                    IO::drawSub( true );
+                }
             } else {
-                IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                IO::messageBox( "Du kannst ein Item\nauf Y registrieren.", "PokéNav" );
                 IO::drawSub( true );
             }
             swiWaitForVBlank( );
@@ -414,13 +402,12 @@ OUT:
         //StartBag
         if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 6 ],
                             IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 7 ], 16 ) ) {
-            BAG::bagUI bui;
-            BAG::bagViewer bv( FS::SAV->m_bag, &bui );
+            BAG::bagViewer bv;
             ANIMATE_MAP = false;
             UPDATE_TIME = false;
             INIT_MAIN_SPRITES = false;
 
-            bv.run( FS::SAV->m_lstBag, FS::SAV->m_lstBagItem );
+            u16 res = bv.run( );
 
             IO::clearScreenConsole( true, true );
             IO::drawSub( true );
@@ -428,30 +415,26 @@ OUT:
             FADE_TOP_DARK( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
+            if( res ) {
+                ItemList[ res ]->use( false );
+                IO::drawSub( true );
+            }
         } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
                    && ( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 0 ],
                                         IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 1 ], 16 ) ) ) {
 
-            std::vector<pokemon> tmp;
-            for( u8 i = 0; i < 6; ++i )
-                if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                    tmp.push_back( FS::SAV->m_pkmnTeam[ i ] );
-                else
-                    break;
-            STS::regStsScreenUI rsUI( &tmp );
-            STS::regStsScreen sts( 0, &rsUI );
             ANIMATE_MAP = false;
-
-            sts.run( );
-
-            for( u8 i = 0; i < tmp.size( ); ++i )
-                FS::SAV->m_pkmnTeam[ i ] = tmp[ i ];
+            STS::statusScreen sts( 0 );
+            auto res = sts.run( );
 
             IO::clearScreenConsole( true, true );
             IO::drawSub( true );
             FADE_TOP_DARK( );
             MAP::curMap->draw( );
             ANIMATE_MAP = true;
+
+            if( res )
+                res->use( );
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ],        //StartDex
                                    IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 5 ], 16 ) ) {
             ANIMATE_MAP = false;
@@ -469,25 +452,19 @@ OUT:
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 ],        //StartID
                                    IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 3 ], 16 ) ) {
 
-            const char *someText[ 8 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", "View Boxes A", "View Boxes B" };
-            IO::choiceBox test( 8, &someText[ 0 ], 0, false );
+            const char *someText[ 9 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", "View Boxes A", "View Boxes B", "Max Repel" };
+            IO::choiceBox test( 9, &someText[ 0 ], 0, false );
             int res = test.getResult( "Tokens of god-being..." );
             IO::drawSub( );
             switch( res ) {
                 case 0:
                 {
-                    if( !FS::SAV->m_storedPokemon )
-                        FS::SAV->m_storedPokemon = new BOX::box( );
-
-                    for( u8 i = 0; i < 6; ++i )
-                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                            FS::SAV->m_storedPokemon->insert( FS::SAV->m_pkmnTeam[ i ].m_boxdata );
                     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
-                    for( int i = 0; i < 6; ++i ) {
+                    for( int i = 0; i < 5; ++i ) {
                         pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                        a = pokemon( 0, 133 + i, 0,
+                        a = pokemon( 0, 143 + i, 0,
                                      50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
-                                     !FS::SAV->m_isMale );
+                                     !FS::SAV->m_isMale, i, false, i % 2, i == 3, i + rand( ) % 500, i, i );
                         a.m_stats.m_acHP *= i / 5.0;
                         a.m_boxdata.m_experienceGained += 750;
 
@@ -499,25 +476,39 @@ OUT:
                         }
                         a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
                         a.m_boxdata.m_ribbons1[ 3 ] = 0;
-                        a.m_boxdata.m_holdItem = I_CELL_BATTERY + i;
+                        a.m_boxdata.m_holdItem = I_DURIN_BERRY + i;
 
                         FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
-
-                        HILFSCOUNTER = 3 + ( ( HILFSCOUNTER ) % 649 );
                     }
+
+                    for( u16 j = 251; j < 386; ++j ) {
+                        auto a = pokemon( j + 1, 50, 0, j ).m_boxdata;
+                        a.m_gotPlace = j;
+                        FS::SAV->storePkmn( a );
+                        /*if( a.isShiny( ) ) {
+                            IO::messageBox( "YAAAY" );
+                            s8 idx = FS::SAV->getCurrentBox( )->getFirstFreeSpot( );
+                            if( idx == -1 && !( *FS::SAV->getCurrentBox( ) )[ 17 ].isShiny( ) )
+                                IO::messageBox( "Lost :(" );
+                            else if( !( *FS::SAV->getCurrentBox( ) )[ idx - 1 ].isShiny( ) )
+                                IO::messageBox( "Lost :(" );
+                            break;
+                        }*/
+                    }
+
                     FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
                     FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
                     FS::SAV->m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
+                    FS::SAV->m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ] = M_SWEET_SCENT;
 
                     swiWaitForVBlank( );
                     break;
                 }
                 case 1:
-                    if( !FS::SAV->m_bag )
-                        FS::SAV->m_bag = new BAG::bag( );
-                    for( u16 j = 1; j < 637; ++j )
+                    for( u16 j = 1; j < 772; ++j ) {
                         if( ItemList[ j ]->m_itemName != "Null" )
-                            FS::SAV->m_bag->insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
+                            FS::SAV->m_bag.insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
+                    }
                     break;
                 case 2:
                 {
@@ -532,15 +523,13 @@ OUT:
                     std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 3; ++i ) {
-                        pokemon a( 0, HILFSCOUNTER, 0,
+                        pokemon a( 0, i + 456, 0,
                                    30, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko", false );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
-                        HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
                     }
-                    std::vector<item> itms;
                     BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
-                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, itms );
+                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, 0, 0 );
 
                     BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100, 5, BATTLE::battle::DOUBLE );
                     ANIMATE_MAP = false;
@@ -553,15 +542,13 @@ OUT:
                     std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 6; ++i ) {
-                        pokemon a( 0, HILFSCOUNTER, 0,
+                        pokemon a( 0, 435, 0,
                                    15, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko", false );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
-                        HILFSCOUNTER = 1 + ( ( HILFSCOUNTER ) % 649 );
                     }
-                    std::vector<item> itms;
                     BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
-                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, itms );
+                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, 0, 0 );
 
                     BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100, 5, BATTLE::battle::SINGLE );
                     ANIMATE_MAP = false;
@@ -581,10 +568,7 @@ OUT:
                 }
                 case 6: case 7:
                 {
-                    if( !FS::SAV->m_storedPokemon )
-                        FS::SAV->m_storedPokemon = new BOX::box( );
-                    BOX::boxUI bxUI;
-                    BOX::boxViewer bxv( FS::SAV->m_storedPokemon, &bxUI, 0 );
+                    BOX::boxViewer bxv;
                     ANIMATE_MAP = false;
 
                     bxv.run( res % 2 );
@@ -595,6 +579,11 @@ OUT:
                     consoleSelect( &IO::Bottom );
                     consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                     consoleClear( );
+                    break;
+                }
+                case 8:
+                {
+                    MAP::curMap->disablePkmn( 250 );
                     break;
                 }
             }

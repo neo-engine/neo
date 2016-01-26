@@ -6,7 +6,7 @@ file        : mapSprite.cpp
 author      : Philip Wellnitz
 description : Map Sprites.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -47,6 +47,10 @@ namespace MAP {
         }
         IO::setOWSpriteFrame( _curFrame, _oamIndex, _tileIdx );
         IO::updateOAM( false );
+    }
+
+    ObjPriority mapSprite::getPriority( ) {
+        return IO::OamTop->oamBuffer[ _oamIndex ].priority;
     }
 
     void mapSprite::setVisibility( bool p_value ) {

@@ -6,7 +6,7 @@ file        : box.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -28,58 +28,38 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #pragma once
 
 #include <nds.h>
-#include <list>
-#include <algorithm>
+#include <cstring>
 
 #include "pokemon.h"
 
 namespace BOX {
-    class box {
-    private:
-        std::list<pokemon::boxPokemon> _storedPkmn[ 1 + MAX_PKMN ]; //An extra box for eggs
-    public:
-        void insert( pokemon p_pokemon ) {
-            if( !p_pokemon.m_boxdata.m_individualValues.m_isEgg )
-                _storedPkmn[ p_pokemon.m_boxdata.m_speciesId - 1 ].push_back( p_pokemon.m_boxdata );
-            else
-                _storedPkmn[ MAX_PKMN ].push_back( p_pokemon.m_boxdata );
-        }
-        void insert( pokemon::boxPokemon p_pokemon ) {
-            if( !p_pokemon.m_individualValues.m_isEgg )
-                _storedPkmn[ p_pokemon.m_speciesId - 1 ].push_back( p_pokemon );
-            else
-                _storedPkmn[ MAX_PKMN ].push_back( p_pokemon );
-        }
-        void erase( pokemon p_pokemon ) {
-            if( !p_pokemon.m_boxdata.m_individualValues.m_isEgg )
-                _storedPkmn[ p_pokemon.m_boxdata.m_speciesId - 1 ].remove( p_pokemon.m_boxdata );
-            else
-                _storedPkmn[ MAX_PKMN ].remove( p_pokemon.m_boxdata );
-        }
-        void erase( pokemon::boxPokemon p_pokemon ) {
-            if( !p_pokemon.m_individualValues.m_isEgg )
-                _storedPkmn[ p_pokemon.m_speciesId - 1 ].remove( p_pokemon );
-            else
-                _storedPkmn[ MAX_PKMN ].remove( p_pokemon );
-        }
+    struct box {
+        char m_name[ 15 ];
+#define MAX_PKMN_PER_BOX 18
+        pokemon::boxPokemon m_pokemon[ MAX_PKMN_PER_BOX ];
+        u8 m_wallpaper;
 
-        u16 count( u16 p_pkmnSpecies ) {
-            if( !p_pkmnSpecies )
-                return 0;
-            return _storedPkmn[ p_pkmnSpecies - 1 ].size( );
+        s8 getFirstFreeSpot( ) const {
+            for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i )
+                if( !( m_pokemon + i )->m_speciesId )
+                    return i;
+            return -1;
         }
-
-        bool empty( u16 p_pkmnSpecies ) {
-            if( !p_pkmnSpecies )
-                return 0;
-            return _storedPkmn[ p_pkmnSpecies - 1 ].empty( );
+        u8 count( ) const {
+            u8 res = 0;
+            for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i )
+                if( ( m_pokemon + i )->m_speciesId )
+                    res++;
+            return res;
         }
-
-        std::list<pokemon::boxPokemon>& operator[]( u16 p_pkmnSpecies ) {
-            return _storedPkmn[ p_pkmnSpecies - 1 ];
+        void clear( u8 p_pos ) {
+            memset( m_pokemon + p_pos, 0, sizeof( pokemon::boxPokemon ) );
         }
-        std::list<pokemon::boxPokemon> operator[]( u16 p_pkmnSpecies ) const {
-            return _storedPkmn[ p_pkmnSpecies - 1 ];
+        pokemon::boxPokemon& operator[]( u8 p_pos ) {
+            return m_pokemon[ p_pos ];
+        }
+        const pokemon::boxPokemon& operator[]( u8 p_pos ) const {
+            return m_pokemon[ p_pos ];
         }
     };
 }

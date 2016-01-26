@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Functionality for parsing game save files
 
-    Copyright (C) 2012 - 2015
+    Copyright (C) 2012 - 2016
     Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
@@ -29,6 +29,7 @@
 
 #include "saveGame.h"
 #include "fs.h"
+#include "uio.h"
 #include "messageBox.h"
 //#include "Gen.h"
 
@@ -39,37 +40,7 @@ namespace FS {
     std::vector<pokemon> tmp;
     saveGame* SAV;
 
-#define PKMN_DATALENGTH 128
-    BAG::bag* readBag( FILE* p_file ) {
-        static BAG::bag* result = new BAG::bag( );
-
-        for( u8 i = 0; i < 5; ++i ) {
-            size_t sz;
-            read( p_file, &sz, sizeof( size_t ), 1 );
-            for( size_t j = 0; j < sz; ++j ) {
-                std::pair<u16, u16> ac;
-                read( p_file, &ac.first, sizeof( u16 ), 1 );
-                read( p_file, &ac.second, sizeof( u16 ), 1 );
-                result->insert( BAG::bag::bagType( i ), ac.first, ac.second );
-            }
-        }
-
-        return result;
-    }
-
-    BOX::box* readStoredPkmn( FILE* p_file ) {
-        static BOX::box* result = new BOX::box( );
-        pokemon::boxPokemon tmp;
-        for( u16 i = 0; i < MAX_PKMN + 1; ++i ) {
-            u16 cnt; fread( &cnt, sizeof( u16 ), 1, p_file );
-            for( u16 j = 0; j < cnt; ++j ) {
-                fread( &tmp, sizeof( pokemon::boxPokemon ), 1, p_file );
-                result->insert( tmp );
-            }
-        }
-        return result;
-    }
-
+#define PKMN_DATALENGTH 128    
     saveGame* readSave( ) {
         FILE* f = open( "./", sav_nam, ".sav" );
         if( !f )
@@ -77,68 +48,31 @@ namespace FS {
 
         saveGame* result = new saveGame( );
         read( f, result, sizeof( saveGame ), 1 );
-        result->m_bag = readBag( f );
-        if( !result->m_bag )
-            result->m_bag = new BAG::bag( );
-
-        result->m_storedPokemon = readStoredPkmn( f );
-        if( !result->m_storedPokemon )
-            result->m_storedPokemon = new BOX::box( );
-
         close( f );
         return result;
     }
-
-    bool writeBag( FILE* p_file, BAG::bag* p_bag ) {
-        if( !p_bag )
-            return false;
-
-        for( u8 i = 0; i < 5; ++i ) {
-            auto bg = p_bag->element( BAG::bag::bagType( i ) );
-            auto sz = bg.size( );
-            write( p_file, &sz, sizeof( size_t ), 1 );
-            for( auto j : bg ) {
-                write( p_file, &j.first, sizeof( u16 ), 1 );
-                write( p_file, &j.second, sizeof( u16 ), 1 );
-            }
-        }
-        return true;
-    }
-
-    bool writeStoredPkmn( BOX::box* p_stPkmn, FILE* p_file ) {
-        if( !p_stPkmn )
-            return false;
-
-        for( u16 i = 0; i < MAX_PKMN + 1; ++i ) {
-            u16 cnt = p_stPkmn->count( i );
-            fwrite( &cnt, sizeof( u16 ), 1, p_file );
-            for( auto tmp : (*p_stPkmn)[ i ] )
-                fwrite( &tmp, sizeof( pokemon::boxPokemon ), 1, p_file );
-        }
-    }
-
+    
     bool writeSave( saveGame* p_saveGame ) {
         FILE* f = open( "./", sav_nam, ".sav", "w" );
         if( !f )
             return 0;
         write( f, p_saveGame, sizeof( saveGame ), 1 );
-        writeBag( f, p_saveGame->m_bag );
-        writeStoredPkmn( p_saveGame->m_storedPokemon, f );
         close( f );
         return true;
     }
 
-
     void saveGame::stepIncrease( ) {
         static u8 stepCnt = 0;
         stepCnt++;
-        if( m_repelSteps ) {
+        if( m_repelSteps > 0 ) {
             m_repelSteps--;
-            if( !m_repelSteps )
-                IO::messageBox m( "Der Schutz ist aufgebraucht." );
+            if( !m_repelSteps ) {
+                IO::messageBox( "Der Schutz ist aufgebraucht." );
+                IO::drawSub( true );
+            }
         }
         if( !stepCnt ) {
-            bool hasHatchSpdUp = m_bag->count( BAG::toBagType( item::itemType::KEY_ITEM ), I_OVAL_CHARM );
+            bool hasHatchSpdUp = m_bag.count( BAG::toBagType( item::itemType::KEY_ITEM ), I_OVAL_CHARM );
             for( size_t s = 0; s < 6; ++s ) {
                 pokemon& ac = m_pkmnTeam[ s ];
                 if( !ac.m_boxdata.m_speciesId )

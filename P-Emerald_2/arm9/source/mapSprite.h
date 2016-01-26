@@ -6,7 +6,7 @@ file        : mapSprite.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -47,6 +47,8 @@ namespace MAP {
                    u16 p_imageId,
                    u8 p_startFrame,
                    u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx );
+
+        ObjPriority getPriority( );
 
         void setVisibility( bool p_value );
         void setPriority( ObjPriority p_value );

@@ -1,29 +1,29 @@
 ﻿/*
-    Pokémon Emerald 2 Version
-    ------------------------------
+Pokémon Emerald 2 Version
+------------------------------
 
-    file        : pokemon.h
-    author      : Philip Wellnitz
-    description : Header file. Consult the corresponding source file for details.
+file        : pokemon.h
+author      : Philip Wellnitz
+description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2015
-    Philip Wellnitz
+Copyright (C) 2012 - 2016
+Philip Wellnitz
 
-    This file is part of Pokémon Emerald 2 Version.
+This file is part of Pokémon Emerald 2 Version.
 
-    Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
-    */
+You should have received a copy of the GNU General Public License
+along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #pragma once
 
@@ -157,12 +157,9 @@ bool            getAll( u16 p_pkmnId, pokemonData& out );
 void            getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num, u16* p_res );
 bool            canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode );
 
-
 extern double NatMod[ 25 ][ 5 ];
 
-extern u32 EXP[ 100 ][ 13 ];
-
-extern u32 LastPID;
+extern u32 EXP[ 100 ][ 6 ];
 
 const u16 OTLENGTH = 8;
 const u16 PKMN_NAMELENGTH = 11;
@@ -233,9 +230,9 @@ public:
 u16: 15;
         u16                     m_hatchPlace : 16; //PT-like
         u16                     m_gotPlace : 16; //PT-like
-        //}
+                                                 //}
 
-        //BLOCKC{
+                                                 //BLOCKC{
         wchar_t                 m_name[ PKMN_NAMELENGTH ];
         u16                     m_hometown : 16;
         u8                      m_ribbons2[ 4 ];
@@ -265,17 +262,17 @@ u32: 32;
 u8: 8;
         //}
 
-        pkmnNatures             getNature( ) {
+        pkmnNatures             getNature( ) const {
             return (pkmnNatures) ( m_pid % 25 );
         }
-        u16                     getAbility( ) {
+        u16                     getAbility( ) const {
             return m_ability;
         }
-        bool                    isShiny( );
-        bool                    isCloned( );
-        s8                      gender( );
+        bool                    isShiny( ) const;
+        bool                    isCloned( ) const;
+        s8                      gender( ) const;
 
-        unsigned inline char    IVget( u8 p_i ) {
+        inline unsigned char    IVget( u8 p_i ) const {
             switch( p_i ) {
                 case 0: return m_individualValues.m_hp;
                 case 1: return m_individualValues.m_attack;
@@ -286,7 +283,7 @@ u8: 8;
                 default: return 0;
             }
         }
-        u8 inline               PPupget( u8 p_i ) {
+        u8 inline               PPupget( u8 p_i ) const {
             switch( p_i ) {
                 case 0: return m_ppup.m_Up1;
                 case 1: return m_ppup.m_Up2;
@@ -295,7 +292,7 @@ u8: 8;
                 default: return 0;
             }
         }
-        void inline               PPupset( u8 p_i, u8 p_val ) {
+        void inline             PPupset( u8 p_i, u8 p_val ) {
             switch( p_i ) {
                 case 0: m_ppup.m_Up1 = p_val; break;
                 case 1: m_ppup.m_Up2 = p_val; break;
@@ -304,7 +301,7 @@ u8: 8;
                 default: return;
             }
         }
-        u8                      getPersonality( ) {
+        u8                      getPersonality( ) const {
             u8 counter = 1, i = m_pid % 6;
 
             u8 max = i, maxval = IVget( i );
@@ -318,7 +315,7 @@ u8: 8;
 
             return ( max * 5 ) + ( maxval % 5 );
         }
-        int             getTasteStr( ) {
+        int                     getTasteStr( ) const {
             if( NatMod[ getNature( ) ][ 0 ] == 1.1 )
                 return 0;
             if( NatMod[ getNature( ) ][ 1 ] == 1.1 )
@@ -332,16 +329,22 @@ u8: 8;
             else
                 return 5;
         }
-        u16                     getItem( ) {
+        u16                     getItem( ) const {
             return m_holdItem;
         }
-        Type                    getHPType( ) {
+        Type                    getHPType( ) const {
             int a = ( ( IVget( 0 ) & 1 ) + 2 * ( IVget( 1 ) & 1 ) + 4 * ( IVget( 2 ) & 1 ) + 8 * ( IVget( 3 ) & 1 ) + 16 * ( IVget( 4 ) & 1 ) + 32 * ( IVget( 5 ) & 1 ) * 15 ) / 63;
             return a < 9 ? (Type) a : Type( a + 1 );
         }
-        u8                      getHPPower( ) {
+        u8                      getHPPower( ) const {
             return 30 + ( ( ( ( IVget( 0 ) >> 1 ) & 1 ) + 2 * ( ( IVget( 1 ) >> 1 ) & 1 ) + 4 * ( ( IVget( 2 ) >> 1 ) & 1 ) + 8 * ( ( IVget( 3 ) >> 1 ) & 1 ) + 16 * ( ( IVget( 4 ) >> 1 ) & 1 ) + 32 * ( ( IVget( 5 ) >> 1 ) & 1 ) * 40 ) / 63 );
         }
+        bool                    isEgg( ) const {
+            return m_individualValues.m_isEgg;
+        }
+
+        bool                    learnMove( u16 p_move );
+        void                    hatch( );
 
         bool      operator==( const boxPokemon& p_other ) const;
 
@@ -398,6 +401,7 @@ u8: 8;
     }m_stats;
 
     pokemon( ) { }
+    pokemon( pokemon::boxPokemon p_boxPokemon );
     pokemon( u16             p_pkmnId,
              u16             p_level,
              const wchar_t*  p_name = 0,
@@ -422,10 +426,63 @@ u8: 8;
              u8             p_ball = 0,
              u8             p_pokerus = 0 );
 
-    void            evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
-    bool            canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
 
-    void            hatch( );
+    pkmnNatures             getNature( ) const {
+        return m_boxdata.getNature( );
+    }
+    u16                     getAbility( ) const {
+        return m_boxdata.getAbility( );
+    }
+    bool                    isShiny( ) const {
+        return m_boxdata.isShiny( );
+    }
+    bool                    isCloned( ) const {
+        return m_boxdata.isCloned( );
+    }
+    s8                      gender( ) const {
+        return m_boxdata.gender( );
+    }
 
+    inline unsigned char    IVget( u8 p_i ) const {
+        return m_boxdata.IVget( p_i );
+    }
+    inline u8               PPupget( u8 p_i ) const {
+        return PPupget( p_i );
+    }
+    inline void             PPupset( u8 p_i, u8 p_val ) {
+        m_boxdata.PPupset( p_i, p_val );
+    }
+    u8                      getPersonality( ) const {
+        return m_boxdata.getPersonality( );
+    }
+    int                     getTasteStr( ) const {
+        return m_boxdata.getTasteStr( );
+    }
+    u16                     getItem( ) const {
+        return m_boxdata.getItem( );
+    }
+    Type                    getHPType( ) const {
+        return m_boxdata.getHPType( );
+    }
+    u8                      getHPPower( ) const {
+        return m_boxdata.getHPPower( );
+    }
+    bool                    isEgg( ) const {
+        return m_boxdata.isEgg( );
+    }
+
+    bool                    learnMove( u16 p_move ) {
+        return m_boxdata.learnMove( p_move );
+    }
+    void                    evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
+    bool                    canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
+
+    void                    hatch( ) {
+        m_boxdata.hatch( );
+    }
     bool      operator==( const pokemon& p_other ) const;
 };
+
+pokemon::stats  calcStats( const pokemon::boxPokemon& p_boxdata, const pokemonData& p_data );
+pokemon::stats  calcStats( const pokemon::boxPokemon& p_boxdata, u8 p_level, const pokemonData& p_data );
+u16             calcLevel( const pokemon::boxPokemon& p_boxdata, const pokemonData& p_data );

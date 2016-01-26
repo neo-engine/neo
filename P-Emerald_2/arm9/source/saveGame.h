@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2015
+    Copyright (C) 2012 - 2016
     Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
@@ -65,18 +65,16 @@ namespace FS {
         u8          m_savTyp : 3;
         u8          m_inDex[ 1 + MAX_PKMN / 8 ];
         u32         m_money;
-
-        //Bag stuff
-        BAG::bag*   m_bag; //Be VERY CAREFUL when deleting savegames or when just using them!
-        u8          m_lstBag;
-        u8          m_lstBagItem;
-
-        u8          m_repelSteps;
+        u32         m_coins;
+        u32         m_battlePoints;
 
         pokemon     m_pkmnTeam[ 6 ];
 
         //Stored Pkmn
-        BOX::box*   m_storedPokemon; //And I really mean careful
+#define MAX_BOXES 42
+        BOX::box    m_storedPokemon[ MAX_BOXES ];
+        pokemon::boxPokemon m_clipboard[ 6 ];
+        u8          m_curBox;
 
         //Map stuff
         MAP::mapObject m_player;
@@ -90,6 +88,17 @@ namespace FS {
 
         u8          m_hasGDex : 1;
         u8          m_activatedPNav;
+
+        //Bag stuff
+        u8          m_lstBag;
+        u16         m_lstBagItem;
+
+        u16         m_lstUsedItems[ 5 ];
+        u8          m_lstUsedItemsIdx;
+        u16         m_registeredItem;
+
+        s16         m_repelSteps;
+        BAG::bag    m_bag;
 
         bool        checkflag( u8 p_idx ) {
             return m_flags[ p_idx >> 3 ] & ( 1 << ( p_idx % 8 ) );
@@ -110,6 +119,13 @@ namespace FS {
             }
             return cnt;
         }
+        u8 getTeamPkmnCount( ) {
+            u8 res = 0;
+            for( u8 i = 0; i < 6; ++i )
+                res += !!m_pkmnTeam[ i ].m_boxdata.m_speciesId;
+            return res;
+        }
+
         BATTLE::battleTrainer* getBattleTrainer( ) {
             tmp.clear( );
             for( u8 i = 0; i < 6; ++i )
@@ -120,12 +136,31 @@ namespace FS {
             char buffer[ 30 ];
             sprintf( buffer, "%ls", m_playername );
 
-            static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp, m_bag->getBattleItems( ) );
+            static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp );
             return &res;
         }
         void updateTeam( ) {
             for( u8 i = 0; i < tmp.size( ); ++i )
                 m_pkmnTeam[ i ] = tmp[ i ];
+        }
+
+        //Return the idx of the resulting Box
+        s8 storePkmn( const pokemon::boxPokemon& p_pokemon ) {
+            s8 idx = m_storedPokemon[ m_curBox ].getFirstFreeSpot( );
+            u8 i = 0;
+            for( ; idx == -1 && i < MAX_BOXES; )
+                idx = m_storedPokemon[ ( ( ++i ) + m_curBox ) % MAX_BOXES ].getFirstFreeSpot( );
+            if( idx == -1 ) //Everything's full :/
+                return -1;
+            m_curBox = ( m_curBox + i ) % MAX_BOXES;
+            m_storedPokemon[ m_curBox ][ idx ] = p_pokemon;
+            return m_curBox;
+        }
+        s8 storePkmn( const pokemon& p_pokemon ) {
+            return storePkmn( p_pokemon.m_boxdata );
+        }
+        BOX::box* getCurrentBox( ) {
+            return m_storedPokemon + m_curBox;
         }
     };
 

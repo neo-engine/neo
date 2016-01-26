@@ -6,7 +6,7 @@ file        : font.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -63,14 +63,14 @@ namespace IO {
         }
     }
 
-    void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance ) {
+    void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance, s8 p_adjustX ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
-                putX = p_x;
+                putX = ( p_x -= p_adjustX );
                 current_char++;
                 continue;
             }
@@ -80,6 +80,61 @@ namespace IO {
             _shiftchar( c );
             putX += _widths[ c ];
 
+            current_char++;
+        }
+    }
+    void font::printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance, s8 p_adjustX ) {
+        u32 current_char = 0;
+        s16 putX = p_x, putY = p_y;
+
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == L'\n' ) {
+                putY += p_yDistance;
+                putX = ( p_x -= p_adjustX );
+                current_char++;
+                continue;
+            }
+            printChar( p_string[ current_char ], putX, putY, p_bottom );
+
+            u16 c = (u16) p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ];
+
+            current_char++;
+        }
+    }
+
+    void font::printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX, u16 p_breakChar ) {
+        u32 current_char = 0;
+        s16 putX = p_x, putY = p_y;
+
+        while( p_string[ current_char ] ) {
+            u16 c = (u16) p_string[ current_char ];
+            _shiftchar( c );
+            if( putX + _widths[ c ] > p_maxX ) {
+                printChar( p_breakChar, putX, putY, p_bottom );
+                break;
+            } else
+                printChar( p_string[ current_char ], putX, putY, p_bottom );
+
+            putX += _widths[ c ];
+            current_char++;
+        }
+    }
+    void font::printMaxString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX, u16 p_breakChar ) {
+        u32 current_char = 0;
+        s16 putX = p_x, putY = p_y;
+
+        while( p_string[ current_char ] ) {
+            u16 c = (u16) p_string[ current_char ];
+            _shiftchar( c );
+            if( putX + _widths[ c ] > p_maxX ) {
+                printChar( p_breakChar, putX, putY, p_bottom );
+                break;
+            } else
+                printChar( p_string[ current_char ], putX, putY, p_bottom );
+
+            putX += _widths[ c ];
             current_char++;
         }
     }
@@ -339,26 +394,6 @@ namespace IO {
         }
         p_x = putX;
         p_y = putY;
-    }
-    void font::printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance ) {
-        u32 current_char = 0;
-        s16 putX = p_x, putY = p_y;
-
-        while( p_string[ current_char ] ) {
-            if( p_string[ current_char ] == L'\n' ) {
-                putY += p_yDistance;
-                putX = p_x;
-                current_char++;
-                continue;
-            }
-            printChar( p_string[ current_char ], putX, putY, p_bottom );
-
-            u16 c = (u16) p_string[ current_char ];
-            _shiftchar( c );
-            putX += _widths[ c ];
-
-            current_char++;
-        }
     }
     void font::printStringD( const char *p_string, s16& p_x, s16& p_y, bool p_bottom ) {
         u32 current_char = 0;

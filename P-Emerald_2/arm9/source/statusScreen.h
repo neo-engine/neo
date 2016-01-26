@@ -6,7 +6,7 @@ file        : statusScreen.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -34,27 +34,16 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 namespace STS {
     class statusScreen {
-    protected:
+    private:
+        //Displays player's Pkmn team
         u8 _page;
         u8 _pkmnIdx;
-        std::vector<pokemon>* _pokemon;
-        statusScreenUI* _stsUI;
+        regStsScreenUI* _stsUI;
     public:
+        statusScreen( u8 p_pkmnIdx );
+        ~statusScreen( );
 
-        virtual s16 drawPage( ) = 0;
-        virtual void run( ) = 0;
+        //Returns 0 or a move pointer
+        move* run( );
     };
-
-    class regStsScreen : public statusScreen {
-    public:
-        regStsScreen( u8 p_pkmnIdx, statusScreenUI* p_stsUI );
-
-        void run( ) override;
-        s16 drawPage( ) override;
-    };
-
-    //class battleStsScreen : public statusScreen {
-    //    s16 run( bool _time, s8 p_timeParameter ) override;
-    //    s16 drawPage(  ) override;
-    //};
 }

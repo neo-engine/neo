@@ -6,7 +6,7 @@ file        : mapMoves.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -30,6 +30,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "mapSlice.h"
 #include "hmMoves.h"
 #include "saveGame.h"
+#include "uio.h"
+#include "messageBox.h"
 
 bool cut::possible( ) {
     return false;
@@ -49,7 +51,8 @@ bool whirlpool::possible( ) {
 bool surf::possible( ) {
     return ( FS::SAV->m_player.m_movement != MAP::SURF )
         && MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX + MAP::dir[ FS::SAV->m_player.m_direction ][ 0 ],
-                              FS::SAV->m_player.m_pos.m_posY + MAP::dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_movedata == 0x4;
+                              FS::SAV->m_player.m_pos.m_posY + MAP::dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_movedata == 0x4
+        && MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata == 0xc;
 }
 bool dive::possible( ) {
     return false;
@@ -79,6 +82,9 @@ bool sweetScent::possible( ) {
     u8 curBehave = MAP::curMap->at( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_bottombehave;
     return curBehave == 0x2 || curBehave == 0x3;
 }
+bool dig::possible( ) {
+    return false;
+}
 
 void cut::use( ) { }
 void rockSmash::use( ) { }
@@ -102,10 +108,18 @@ void rockClimb::use( ) {
         FS::SAV->m_player.m_pos.m_posZ = MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata / 4;
 }
 void waterfall::use( ) {
+    MAP::curMap->disablePkmn( );
     while( possible( ) )
         MAP::curMap->walkPlayer( FS::SAV->m_player.m_direction );
     MAP::curMap->walkPlayer( FS::SAV->m_player.m_direction );
+    MAP::curMap->enablePkmn( );
 }
 void teleport::use( ) { }
 void headbutt::use( ) { }
-void sweetScent::use( ) { }
+void sweetScent::use( ) {
+    if( !sweetScent::possible( ) || !MAP::curMap->requestWildPkmn( true ) ) {
+        IO::messageBox( "Der Duft verstrich wirkungslos..." );
+        IO::drawSub( );
+    }
+}
+void dig::use( ) { }

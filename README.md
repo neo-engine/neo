@@ -17,17 +17,22 @@ _Partially_ implemented features are in _italics_.
     * [x] The ability to display a Pokémon's status, including detailed information about the Pokémon's moves and ribbons
     * [x] _An in-game Pokémon storage system_
     * [x] A fully working PokéDex, loading its data from the ROM's filesystem and displaying the various formes of the Pokémon
-    * [x] A working battle engine, capable of simulaitng single and double battles
+    * [x] _A working battle engine_ inclunding
+        * [x] Single, double trainer battles
+        * [x] Wild Pokémon battles
+        * [x] Switch Pokémon, use moves, _use items_
+        * [ ] Move effects
+    * [x] A fully working bag
     * [x] The ability to load maps (for now only GBA-style maps are supported, 3D maps are planned) including
       * [ ] Events
       * [x] Wild Pokémon encounter
       * [ ] Animated map tiles
       * [x] Player sprite, animated moving, surfing, cycling, and fishing
     * [ ] Playing .midi as BGM, user customization of BGM via music stored on the micro SD card
-    * [ ] RTC, including overword changes based on time
-    * [ ] Saving the progress to the micro SD
+    * [ ] RTC, including overworld changes based on time
+    * [x] Saving the progress to the micro SD (untested, saves may break with a new version)
     * [ ] Communicating with “the originals”
-      * [ ] Playing with a save from a GBA version (saving is still not implemented yet, though)
+      * [ ] Playing with a save from a GBA version
       * [ ] Link trading with Gen IV and Gen V games
     * [x] An almost up-to-date UI
 * [ ] Easy-to-understand and ready-to-(re)use code

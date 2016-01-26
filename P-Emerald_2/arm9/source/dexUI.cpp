@@ -6,7 +6,7 @@ file        : dexUI.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -60,7 +60,7 @@ namespace DEX {
 
     void dexUI::init( ) {
         IO::vramSetup( );
-        videoSetMode( MODE_5_2D | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
 
         IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
         consoleSetFont( &IO::Top, IO::consoleFont );
@@ -68,6 +68,8 @@ namespace DEX {
         IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
         consoleSetFont( &IO::Bottom, IO::consoleFont );
 
+        consoleSelect( &IO::Top );
+        printf( "\x1b[39m" );
 
         //Initialize the top screen
         IO::initOAMTable( false );
@@ -275,7 +277,9 @@ namespace DEX {
 
         consoleSelect( &IO::Top );
         consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         consoleClear( );
+        printf( "\x1b[39m" );
 
         //Init some colors
         IO::regularFont->setColor( 0, 0 );

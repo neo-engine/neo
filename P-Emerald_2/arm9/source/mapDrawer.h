@@ -6,7 +6,7 @@ file        : mapDrawer.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -39,10 +39,12 @@ namespace MAP {
     class mapDrawer {
     private:
         enum wildPkmnType {
-            GRASS,
-            HIGH_GRASS,
-            WATER,
-            FISHING_ROD
+            GRASS,      // 5 tiers
+            HIGH_GRASS, // 5 tiers
+            WATER,      // 5 tiers
+            FISHING_ROD,// 5 tiers
+            HEADBUTT,   // 3 tiers
+            ROCK_SMASH  // 2 tiers
         };
         enum mapWeather {
             NOTHING, //Inside
@@ -94,9 +96,9 @@ namespace MAP {
         mapSprite _sprites[ 16 ];
         u16 _entriesUsed;
         std::map<u16, u8> _spritePos; //mapObject.id -> index in _sprites
-
+        
         void draw( u16 p_globX, u16 p_globY, bool p_init );
-        void drawPlayer( );
+        void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2 );
         void drawObjects( );
 
         void moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows = true );
@@ -108,7 +110,7 @@ namespace MAP {
 
         void handleWarp( warpType p_type );
         void handleWildPkmn( u16 p_globX, u16 p_globY );
-        void handleWildPkmn( wildPkmnType p_type, u8 p_rodType = 0 );
+        bool handleWildPkmn( wildPkmnType p_type, u8 p_rodType = 0, bool p_forceEncounter = false );
         void handleTrainer( );
 
     public:
@@ -117,7 +119,7 @@ namespace MAP {
 
         mapDrawer( );
 
-        void draw( );
+        void draw( ObjPriority p_playerPrio = OBJPRIORITY_2 );
 
         bool canMove( position p_start,
                       direction p_direction,
@@ -144,6 +146,11 @@ namespace MAP {
         void fishPlayer( direction p_direction, u8 p_rodType = 0 );
 
         void usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny );
+
+        void disablePkmn( s16 p_steps = -1 );
+        void enablePkmn( );
+
+        bool requestWildPkmn( bool p_forceHighGrass = false );
 
         u16  getCurrentLocationId( ) const;
     };

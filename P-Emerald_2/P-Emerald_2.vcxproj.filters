@@ -61,9 +61,6 @@
     <Filter Include="Source Files\arm9\dex">
       <UniqueIdentifier>{931087d5-781d-46c1-a737-58fd74712044}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\arm9\fs">
-      <UniqueIdentifier>{d14f2d8a-a5f5-4cec-a703-966dde312242}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\arm9\io">
       <UniqueIdentifier>{6d30e346-9ecf-4144-8fee-bbc5b8644eb4}</UniqueIdentifier>
     </Filter>
@@ -78,6 +75,9 @@
     </Filter>
     <Filter Include="Header Files\arm9\data structures">
       <UniqueIdentifier>{87796c2f-84ad-4bcc-b803-26ce3e1582b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\arm9\fs">
+      <UniqueIdentifier>{d14f2d8a-a5f5-4cec-a703-966dde312242}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -221,9 +221,6 @@
     <ClCompile Include="arm9\source\buffer.cpp">
       <Filter>Source Files\arm9</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\Bag.cpp">
-      <Filter>Source Files\arm9\bag</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\bagUI.cpp">
       <Filter>Source Files\arm9\bag</Filter>
     </ClCompile>
@@ -334,6 +331,12 @@
     </ClCompile>
     <ClCompile Include="arm9\source\boxUI.cpp">
       <Filter>Source Files\arm9\box</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\bag.cpp">
+      <Filter>Source Files\arm9\bag</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\pokemonIO.cpp">
+      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

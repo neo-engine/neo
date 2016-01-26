@@ -6,7 +6,7 @@ file        : startScreen.cpp
 author      : Philip Wellnitz
 description : Header file. See corresponding source file for details.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -80,7 +80,7 @@ void drawSplash( ) {
 
     BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
 
-    printf( "@ Philip Wellnitz 2012 - 2015\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+    printf( "@ Philip Wellnitz 2012 - 2016\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
 
     if( gMod == DEVELOPER )
         printf( "                   %10sdev\n", VERSION );
@@ -139,11 +139,14 @@ void initNewGame( ) {
     FS::SAV->m_lstBagItem = 0;
 
     memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
+    memset( FS::SAV->m_storedPokemon, 0, sizeof( FS::SAV->m_storedPokemon ) );
+    for( u8 i = 0; i < MAX_BOXES; ++i )
+        sprintf( ( FS::SAV->m_storedPokemon + i )->m_name, "Box %d", i + 1 );
+    FS::SAV->m_curBox = 0;
 
     FS::SAV->m_player = { MAP::mapObject::PLYR, { 104, 120, 5 }, 0, MAP::moveMode::WALK, 0, 0, MAP::direction::RIGHT };
     FS::SAV->m_isMale = true;
     FS::SAV->m_currentMap = 10;
-    FS::SAV->m_bag = new BAG::bag( );
 }
 
 bool transferGame( ) {

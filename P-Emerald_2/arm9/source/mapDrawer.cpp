@@ -6,7 +6,7 @@ file        : mapDrawer.cpp
 author      : Philip Wellnitz
 description : Map drawing engine
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -58,7 +58,12 @@ namespace MAP {
     block& mapDrawer::at( u16 p_x, u16 p_y ) const {
         bool x = ( p_x / SIZE != CUR_SLICE->m_x ),
             y = ( p_y / SIZE != CUR_SLICE->m_y );
-        return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks[ _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blocks[ p_y % SIZE ][ p_x % SIZE ].m_blockidx ];
+        u16 blockidx = _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blocks[ p_y % SIZE ][ p_x % SIZE ].m_blockidx;
+
+        if( blockidx <= 512 )
+            return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks1[ blockidx ];
+        else
+            return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks2[ blockidx % 512 ];
     }
 
     u16 lastrow, //Row to be filled when extending the map to the top
@@ -114,8 +119,10 @@ namespace MAP {
             }
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
 
-            for( u16 i = 0; i < 1024; ++i )
-                swiCopy( CUR_SLICE->m_tileSet.m_blocks[ i ].m_tile, tileMemory + i * 32, 16 );
+            for( u16 i = 0; i < 512; ++i )
+                swiCopy( CUR_SLICE->m_tileSet.m_tiles1[ i ].m_tile, tileMemory + i * 32, 16 );
+            for( u16 i = 0; i < 512; ++i )
+                swiCopy( CUR_SLICE->m_tileSet.m_tiles2[ i ].m_tile, tileMemory + ( i + 512 ) * 32, 16 );
             dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
             for( u8 i = 1; i < 4; ++i ) {
                 mapMemory[ i ] = (u16*) BG_MAP_RAM( 2 * i - 1 );
@@ -144,21 +151,22 @@ namespace MAP {
         bgUpdate( );
     }
 
-    void mapDrawer::draw( ) {
+    void mapDrawer::draw( ObjPriority p_playerPrio ) {
         draw( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY, true ); //Draw the map
 
         IO::initOAMTable( false );
-        drawPlayer( ); //Draw the player
+        drawPlayer( p_playerPrio ); //Draw the player
         drawObjects( ); //Draw NPCs / stuff
 
         IO::fadeScreen( IO::UNFADE );
     }
 
-    void mapDrawer::drawPlayer( ) {
+    void mapDrawer::drawPlayer( ObjPriority p_playerPrio ) {
         _sprites[ 0 ] = FS::SAV->m_player.show( 128 - 8, 96 - 24, 0, 0, 0 );
         _spritePos[ FS::SAV->m_player.m_id ] = 0;
         _entriesUsed |= ( 1 << 0 );
         changeMoveMode( FS::SAV->m_player.m_movement );
+        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( p_playerPrio );
         if( FS::SAV->m_player.m_movement == SURF ) {
             surfPlatform.m_id = 1;
             _spritePos[ surfPlatform.m_id ] = 1;
@@ -210,8 +218,10 @@ namespace MAP {
             _curY = ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1;
             //Update tileset, block and palette data
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
-            for( u16 i = 0; i < 1024; ++i )
-                swiCopy( CUR_SLICE->m_tileSet.m_blocks[ i ].m_tile, tileMemory + i * 32, 16 );
+            for( u16 i = 0; i < 512; ++i )
+                swiCopy( CUR_SLICE->m_tileSet.m_tiles1[ i ].m_tile, tileMemory + i * 32, 16 );
+            for( u16 i = 0; i < 512; ++i )
+                swiCopy( CUR_SLICE->m_tileSet.m_tiles2[ i ].m_tile, tileMemory + ( i + 512 ) * 32, 16 );
             dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
 
 #ifdef __DEBUG
@@ -282,6 +292,13 @@ namespace MAP {
             = constructSlice( FS::SAV->m_currentMap, neigh->m_x + dir[ p_direction ][ 0 ], neigh->m_y + dir[ p_direction ][ 1 ] );
     }
 
+    void mapDrawer::disablePkmn( s16 p_steps ) {
+        FS::SAV->m_repelSteps = p_steps;
+    }
+    void mapDrawer::enablePkmn( ) {
+        FS::SAV->m_repelSteps = 0;
+    }
+
     void mapDrawer::handleWarp( warpType p_type ) {
         static warpPos lastWarp = { 0, { 0, 0, 0 } };
 
@@ -299,7 +316,8 @@ namespace MAP {
         u8 moveData = atom( p_globX, p_globY ).m_movedata;
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
-
+        if( FS::SAV->m_repelSteps )
+            return;
         //handle Pkmn stuff
         if( moveData == 0x04 && behave != 0x13 )
             handleWildPkmn( WATER );
@@ -310,11 +328,13 @@ namespace MAP {
         else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
             handleWildPkmn( GRASS );
     }
-    void mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType ) {
+    bool mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType, bool p_forceEncounter ) {
 
         u16 rn = rand( ) % 512;
         if( p_type == FISHING_ROD )
             rn /= 8;
+        if( p_forceEncounter )
+            rn %= 40;
 
         u8 tier;
         if( rn < 2 ) tier = 4;
@@ -327,15 +347,17 @@ namespace MAP {
         if( rn > 40 || !level ) {
             if( p_type == FISHING_ROD ) {
                 IO::messageBox m( "Doch nur ein alter Pokéball..." );
+                _playerIsFast = false;
                 IO::drawSub( true );
             }
-            return;
+            return false;
         }
         if( p_type == FISHING_ROD ) {
             IO::messageBox m( "Du hast ein Pokémon geangelt!" );
+            _playerIsFast = false;
             IO::drawSub( true );
-        } else if( FS::SAV->m_repelSteps )
-            return;
+        } else if( FS::SAV->m_repelSteps && !p_forceEncounter )
+            return false;
         u8 arridx = u8( p_type ) * 15 + tier * 3;
         if( p_type != FISHING_ROD )
             while( level > CUR_SLICE->m_pokemon[ arridx ].second && ( arridx + 1 ) % 3 )
@@ -344,7 +366,7 @@ namespace MAP {
             arridx += p_rodType;
 
         if( !CUR_SLICE->m_pokemon[ arridx ].first )
-            return;
+            return false;
 
         pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
         BATTLE::battle::weather weat = BATTLE::battle::weather::NO_WEATHER;
@@ -389,12 +411,31 @@ namespace MAP {
         }
 
         u8 battleBack = 0;
+        auto playerPrio = _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].getPriority( );
         BATTLE::battle( FS::SAV->getBattleTrainer( ), &wildPkmn, weat, platform, battleBack ).start( );
+        FS::SAV->updateTeam( );
         FADE_TOP_DARK( );
-        draw( );
+        draw( playerPrio );
         IO::drawSub( true );
+
+        return true;
     }
     void mapDrawer::handleTrainer( ) { }
+
+    bool mapDrawer::requestWildPkmn( bool p_forceHighGrass ) {
+        u8 moveData = atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata;
+        u8 behave = at( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_bottombehave;
+
+        if( moveData == 0x04 && behave != 0x13 )
+            return handleWildPkmn( WATER, 0, true );
+        else if( behave == 0x02 && !p_forceHighGrass )
+            return handleWildPkmn( GRASS, 0, true );
+        else if( behave == 0x03 || p_forceHighGrass )
+            return handleWildPkmn( HIGH_GRASS, 0, true );
+        else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
+            return handleWildPkmn( GRASS, 0, true );
+        return false;
+    }
 
     mapDrawer::mapDrawer( )
         : _curX( 0 ), _curY( 0 ), _playerIsFast( false ), _entriesUsed( 0 ) { }
@@ -558,6 +599,7 @@ namespace MAP {
                 swiWaitForVBlank( );
                 stopPlayer( );
                 IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
+                _playerIsFast = false;
                 IO::drawSub( true );
                 return;
             }

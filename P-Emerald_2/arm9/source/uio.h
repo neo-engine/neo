@@ -6,7 +6,7 @@ file        : uio.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -61,7 +61,7 @@ namespace IO {
     extern unsigned int NAV_DATA[ 12288 ];
     extern unsigned short NAV_DATA_PAL[ 256 ];
 
-#define MAXBG 3
+#define MAXBG 4
 #define START_BG 0
     struct backgroundSet {
         std::string             m_name;
@@ -76,6 +76,8 @@ namespace IO {
     void initVideo( );
     void initVideoSub( );
     void vramSetup( );
+
+    void swapScreens( );
 
     void setDefaultConsoleTextColors( u16* p_palette, u8 p_start = 1 );
 
@@ -119,8 +121,8 @@ namespace IO {
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR, bool p_sub = false ); //HP in %
     void displayEP( u16 p_EPstart, u16 p_EP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR = 14, u8 p_outerR = 15, bool p_sub = false );
 
-    void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_colorIdx, bool p_pressed );
-    void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2, u8 p_colorIdx, bool p_pressed );
+    void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_colorIdx, bool p_pressed, bool p_bottom = true );
+    void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2, u8 p_colorIdx, bool p_pressed, bool p_bottom = true );
 
     void printChar( font* p_font, u16 p_ch, s16 p_x, s16 p_y, bool p_bottom );
     void printString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16 );

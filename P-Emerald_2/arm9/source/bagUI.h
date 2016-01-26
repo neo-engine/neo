@@ -6,7 +6,7 @@ file        : bagUI.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2015
+Copyright (C) 2012 - 2016
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -39,24 +39,27 @@ namespace BAG {
 #define MOVE_BAG  4
 
 #define BAG_CNT 5
+#define MAX_ITEMS_PER_PAGE 9
     class bagUI {
-        friend class bagViewer;
-        std::vector<std::pair<IO::inputTarget, u16>> _ranges;
-        std::vector<std::pair<u16, u16>> _bag[ BAG_CNT ];
-
-        u8 _currSelectedIdx = 0;
-        u8 _currPage;
-        u16 _currItemIdx;
-
-        u8 drawPkmn( item* p_item );
+    public:
+        struct targetInfo {
+            u16 m_item;
+            bool m_isHeld;
+        };
+    private:
+        std::vector<std::pair<IO::inputTarget, targetInfo>>
+            drawPkmn( item* p_currentSelection );
+    public:
+        u16 drawPkmnIcons( );
         void init( );
 
-        void updateAtHand( touchPosition p_touch, u8 p_oamIdx );
+        std::vector<std::pair<IO::inputTarget, targetInfo>>
+            drawBagPage( bag::bagType, u16 p_firstDisplayedItem );
+        void selectItem( u8 p_idx, std::pair<u16, u16> p_item, bool p_pressed = false );
+        void unselectItem( bag::bagType p_page, u8 p_idx, u16 p_item );
 
-        void updateSelectedIdx( u8 p_newIdx );
-        std::vector<IO::inputTarget> drawBagPage( u8 p_page, u16 p_itemIdx );
-        u8 getSprite( u8 p_rangeIdx, touchPosition p_currPos );
-        u32 acceptDrop( u8 p_startIdx, u8 p_dropIdx, u8 p_oamIdx ); //First 10 bits: type, remaining: value
-        u8 acceptTouch( u8 p_rangeIdx );
+        bool getSprite( u8 p_idx, std::pair<u16, u16> p_item );
+        void updateSprite( touchPosition p_touch );
+        void dropSprite( bag::bagType p_page, u8 p_idx, std::pair<u16, u16> p_item );
     };
 }
