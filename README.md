@@ -14,20 +14,20 @@ Features
 Features implemented in a non-master branch are in _italics_.
 
 * [ ] A fully working Pokémon engine (at 60fps), including
-    * [x] The ability to display a Pokémon's status, _including detailed information about the Pokémon's moves and ribbons_
-    * [ ] An in-game Pokémon storage system
-    * [x] A fully working PokéDex, loading its data from the ROM's filesystem _and displaying the various formes of the Pokémon_
+    * [x] The ability to display a Pokémon's status, including detailed information about the Pokémon's moves and ribbons
+    * [x] An in-game Pokémon storage system
+    * [x] A fully working PokéDex, loading its data from the ROM's filesystem and displaying the various formes of the Pokémon
     * [ ] A fully working battle engine, capable of simulaitng single and double battles
     * [x] The ability to load maps (for now only GBA-style maps are supported, 3D maps are planned) including
       * [ ] Events
-      * [ ] Wild Pokémon encounter
-      * [x] Animated map tiles
+      * [x] Wild Pokémon encounter
+      * [ ] Animated map tiles
       * [x] Player sprite, animated moving and surfing
     * [ ] Playing .midi as BGM, user customization of BGM via music stored on the micro SD card
     * [ ] RTC, including overword changes based on time
     * [ ] Saving the progress to the micro SD
     * [ ] Communicating with “the originals”
-      * [x] Playing with a save from a GBA version (saving is still not implemented yet, though)
+      * [ ] Playing with a save from a GBA version
       * [ ] Link trading with Gen IV and Gen V games
     * [x] An almost up-to-date UI
 * [ ] Easy-to-understand and ready-to-(re)use code
