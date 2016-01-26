@@ -82,6 +82,9 @@ bool sweetScent::possible( ) {
     u8 curBehave = MAP::curMap->at( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_bottombehave;
     return curBehave == 0x2 || curBehave == 0x3;
 }
+bool dig::possible( ) {
+    return false;
+}
 
 void cut::use( ) { }
 void rockSmash::use( ) { }
@@ -119,3 +122,4 @@ void sweetScent::use( ) {
         IO::drawSub( );
     }
 }
+void dig::use( ) { }

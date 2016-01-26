@@ -31,7 +31,14 @@ along with Pokémon Emerald 2 Version.  If not, new see <http://www.gnu.org/lice
 #include "pokemon.h"
 #include "battle.h"
 
+#include "saveGame.h"
+#include "mapDefines.h"
+#include "mapDrawer.h"
+#include "uio.h"
+#include "messageBox.h"
+
 #include <vector>
+#include <algorithm>
 
 #define APPLY_OP( op, tg, val, mx ) ( ( op == 1 ) ? tg += val : ( \
                                   ( op == 2 ) ? tg -= val : ( \
@@ -40,29 +47,6 @@ along with Pokémon Emerald 2 Version.  If not, new see <http://www.gnu.org/lice
                                   ( op == 5 ) ? tg &= val : ( \
                                   ( op == 6 ) ? tg = mx : ( \
                                   ( op == 7 ) ? tg = s16( ( mx + 0.5 ) / 2 ) : tg ) ) ) ) ) ) )
-
-void recalcStats( pokemon& p_pokemon, pokemonData& p_pData ) {
-    u16 HPdif = p_pokemon.m_stats.m_maxHP - p_pokemon.m_stats.m_acHP;
-    if( p_pokemon.m_boxdata.m_speciesId != 292 ) //Check for Ninjatom
-        p_pokemon.m_stats.m_maxHP = ( ( p_pokemon.m_boxdata.m_individualValues.m_hp + 2 * p_pData.m_bases[ 0 ]
-                                        + ( p_pokemon.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* p_pokemon.m_Level / 100 ) + 10;
-    else
-        p_pokemon.m_stats.m_maxHP = 1;
-    pkmnNatures nature = p_pokemon.m_boxdata.getNature( );
-
-    p_pokemon.m_stats.m_Atk = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_attack + 2 * p_pData.m_bases[ ATK + 1 ]
-                                    + ( p_pokemon.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
-    p_pokemon.m_stats.m_Def = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_defense + 2 * p_pData.m_bases[ DEF + 1 ]
-                                    + ( p_pokemon.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
-    p_pokemon.m_stats.m_Spd = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_speed + 2 * p_pData.m_bases[ SPD + 1 ]
-                                    + ( p_pokemon.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
-    p_pokemon.m_stats.m_SAtk = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_sAttack + 2 * p_pData.m_bases[ SATK + 1 ]
-                                     + ( p_pokemon.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
-    p_pokemon.m_stats.m_SDef = ( ( ( p_pokemon.m_boxdata.m_individualValues.m_sDefense + 2 * p_pData.m_bases[ SDEF + 1 ]
-                                     + ( p_pokemon.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*p_pokemon.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
-
-    p_pokemon.m_stats.m_acHP = std::max( 0, p_pokemon.m_stats.m_maxHP - HPdif );
-}
 
 bool item::needsInformation( u8 p_num ) {
     if( !m_loaded && !load( ) )
@@ -89,12 +73,10 @@ bool item::use( pokemon& p_pokemon ) {
     if( ( m_itemData.m_itemEffect >> 24 ) % 32 == 13 )
         m_itemData.m_itemEffect = ( ( m_itemData.m_itemEffect % ( 1 << 16 ) ) << 16 ) | ( m_itemData.m_itemEffect >> 16 );
 
-
     for( auto op : { m_itemData.m_itemEffect >> 16, m_itemData.m_itemEffect % ( 1 << 16 ) } ) {
         u8 operation = op >> 13;
         u8 stat = ( op >> 8 ) % 32;
         u8 value = u8( op );
-
 
         switch( stat ) {
             case 1:
@@ -184,7 +166,7 @@ bool item::use( pokemon& p_pokemon ) {
                 if( tmp != p_pokemon.m_boxdata.m_effortValues[ stat - 6 ] ) {
                     p_pokemon.m_boxdata.m_effortValues[ stat - 6 ] = tmp;
                     change = true;
-                    recalcStats( p_pokemon, p );
+                    p_pokemon.m_stats = calcStats( p_pokemon.m_boxdata, p );
                 }
                 break;
             }
@@ -198,7 +180,7 @@ bool item::use( pokemon& p_pokemon ) {
                     p_pokemon.m_Level = tmp;
                     p_pokemon.m_boxdata.m_experienceGained = EXP[ p_pokemon.m_Level - 1 ][ p.m_expType ];
 
-                    recalcStats( p_pokemon, p );
+                    p_pokemon.m_stats = calcStats( p_pokemon.m_boxdata, p );
                     change = true;
                 }
                 break;
@@ -243,6 +225,146 @@ bool item::use( pokemon& p_pokemon ) {
     }
 
     return change;
+}
+
+//Returns false if the original UI has not to be redrawn/will be exited
+bool item::use( bool p_dryRun ) {
+    u16 itm = getItemId( );
+    switch( itm ) {
+        case I_REPEL:
+            if( !p_dryRun ) {
+                FS::SAV->m_repelSteps = std::max( FS::SAV->m_repelSteps, (s16) 50 );
+                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                IO::messageBox( "Schutz eingesetzt.", false );
+            }
+            return true;
+        case I_SUPER_REPEL:
+            if( !p_dryRun ) {
+                FS::SAV->m_repelSteps = std::max( FS::SAV->m_repelSteps, (s16) 100 );
+                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                IO::messageBox( "Superschutz eingesetzt.", false );
+            }
+            return true;
+        case I_MAX_REPEL:
+            if( !p_dryRun ) {
+                FS::SAV->m_repelSteps = std::max( FS::SAV->m_repelSteps, (s16) 250 );
+                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                IO::messageBox( "Top-Schutz eingesetzt.", false );
+            }
+            return true;
+        case I_EXP_SHARE:
+            if( !p_dryRun ) {
+                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                if( FS::SAV->m_EXPShareEnabled )
+                    IO::messageBox( "EP-Teiler ausgeschaltet.", false );
+                else
+                    IO::messageBox( "EP-Teiler eingeschaltet.", false );
+                FS::SAV->m_EXPShareEnabled = !FS::SAV->m_EXPShareEnabled;
+            }
+            return true;
+        case I_COIN_CASE:
+            if( !p_dryRun ) {
+                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                sprintf( buffer, "Münzen: %lu.", FS::SAV->m_coins );
+                IO::messageBox( buffer, false );
+            }
+            return true;
+        case I_POINT_CARD:
+            if( !p_dryRun ) {
+                IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
+                sprintf( buffer, "Kampfpunkte: %lu.", FS::SAV->m_battlePoints );
+                IO::messageBox( buffer, false );
+                FS::SAV->m_EXPShareEnabled = !FS::SAV->m_EXPShareEnabled;
+            }
+            return true;
+        case I_ESCAPE_ROPE:
+            if( !p_dryRun )
+                AttackList[ M_DIG ]->use( );
+            return false;
+        case I_HONEY:
+            if( !p_dryRun )
+                AttackList[ M_SWEET_SCENT ]->use( );
+            return false;
+        case I_BIKE2:
+        case I_BICYCLE:
+        case I_MACH_BIKE:
+        case I_ACRO_BIKE:
+            if( FS::SAV->m_player.m_movement == MAP::WALK ) {
+                if( !p_dryRun )
+                    MAP::curMap->changeMoveMode( MAP::BIKE );
+                return false;
+            } else if( FS::SAV->m_player.m_movement == MAP::BIKE ) {
+                if( !p_dryRun )
+                    MAP::curMap->changeMoveMode( MAP::WALK );
+                return false;
+            } else
+                return true;
+        case I_OLD_ROD:
+            if( MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
+                if( !p_dryRun )
+                    MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction, 0 );
+                return false;
+            } else
+                return true;
+        case I_GOOD_ROD:
+            if( MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
+                if( !p_dryRun )
+                    MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction, 1 );
+                return false;
+            } else
+                return true;
+        case I_SUPER_ROD:
+            if( MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
+                if( !p_dryRun )
+                    MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction, 2 );
+                return false;
+            } else
+                return true;
+        default:
+            break;
+    }
+    return false;
+}
+
+bool item::useable( ) {
+    u16 itm = getItemId( );
+    switch( itm ) {
+        case I_REPEL:
+        case I_SUPER_REPEL:
+        case I_MAX_REPEL:
+        case I_EXP_SHARE:
+        case I_COIN_CASE:
+        case I_POINT_CARD:
+            return true;
+        case I_ESCAPE_ROPE:
+            return AttackList[ M_DIG ]->possible( );
+        case I_HONEY:
+            return AttackList[ M_SWEET_SCENT ]->possible( );
+        case I_BIKE2:
+        case I_BICYCLE:
+        case I_MACH_BIKE:
+        case I_ACRO_BIKE:
+            return FS::SAV->m_player.m_movement == MAP::WALK || FS::SAV->m_player.m_movement == MAP::BIKE;
+        case I_OLD_ROD:
+        case I_GOOD_ROD:
+        case I_SUPER_ROD:
+            return MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction );
+        default:
+            break;
+    }
+    return false;
 }
 
 item* ItemList[ 772 ] = {
@@ -382,7 +504,7 @@ item* ItemList[ 772 ] = {
     new item( "Pudersand" ), new item( "Granitstein" ),
     new item( "Wundersaat" ), new item( "Schattenglas" ),
     new item( "Schwarzgurt" ), new item( "Magnet" ),
-    new item( "Zauberwasser" ), new item( "Hackmove" ),
+    new item( "Zauberwasser" ), new item( "Hackattack" ),
     new item( "Giftstich" ), new item( "EwigesEis" ),
     new item( "Bannsticker" ), new item( "Krummloeffel" ),
     new item( "Holzkohle" ), new item( "Drachenzahn" ),
@@ -735,7 +857,7 @@ item* ItemList[ 772 ] = {
     new item( "Firnontornit" ),
     new item( "Diancienit" ),
 
-    new item( "Null" ),//Prison Bottle
+    new keyItem( "Banngefaess" ),//Prison Bottle
     new keyItem( "Null" ),
 
     new item( "Cameruptnit" ),

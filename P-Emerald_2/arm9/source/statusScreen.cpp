@@ -34,6 +34,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "saveGame.h"
 #include "dex.h"
 #include "ribbon.h"
+#include "bagViewer.h"
+#include "defines.h"
 
 namespace STS {
     statusScreen::statusScreen( u8 p_pkmnIdx ) {
@@ -45,7 +47,7 @@ namespace STS {
         delete _stsUI;
     }
 
-    void statusScreen::run( ) {
+    move* statusScreen::run( ) {
         _stsUI->init( _pkmnIdx );
         auto tg = _stsUI->draw( _pkmnIdx, true );
         auto rbs = ribbon::getRibbons( FS::SAV->m_pkmnTeam[ _pkmnIdx ] );
@@ -129,8 +131,7 @@ namespace STS {
                         //shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
                         //              (*_pokemon)[_pkmnIdx ].m_boxdata.m_isFemale, (*_pokemon)[_pkmnIdx ].m_boxdata.isShiny( ) );
 
-                        AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->use( );
-                        return;
+                        return AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ];
                     } else {
                         IO::messageBox( "Diese Attacke kann jetzt\nnicht eingesetzt werden.", "PokéNav" );
                         _stsUI->init( _pkmnIdx, false );
@@ -158,9 +159,20 @@ namespace STS {
                         sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
                         IO::drawSub( );
                         IO::messageBox a( buffer );
-                        FS::SAV->m_bag->insert( BAG::toBagType( acI.m_itemType ), acI.getItemId( ), 1 );
+                        FS::SAV->m_bag.insert( BAG::toBagType( acI.m_itemType ), acI.getItemId( ), 1 );
                     } else { //give item
-
+                        BAG::bagViewer bv;
+                        UPDATE_TIME = false;
+                        u16 itm = bv.getItem( BAG::bagViewer::GIVE_TO_PKMN );
+                        UPDATE_TIME = true;
+                        DRAW_TIME = true;
+                        if( itm ) {
+                            if( FS::SAV->m_pkmnTeam[ _pkmnIdx ].getItem( ) ) {
+                                auto curItm = ItemList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].getItem( ) ];
+                                FS::SAV->m_bag.insert( BAG::toBagType( curItm->m_itemType ), curItm->getItemId( ), 1 );
+                            }
+                            FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem = itm;
+                        }
                     }
                     _stsUI->init( _pkmnIdx );
                     tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
@@ -257,5 +269,6 @@ namespace STS {
                 }
             }
         }
+        return 0;
     }
 }

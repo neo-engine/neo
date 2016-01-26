@@ -58,7 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c" />
-    <ClCompile Include="arm9\source\Bag.cpp" />
+    <ClCompile Include="arm9\source\bag.cpp" />
     <ClCompile Include="arm9\source\bagUI.cpp" />
     <ClCompile Include="arm9\source\bagViewer.cpp" />
     <ClCompile Include="arm9\source\battle.cpp" />
@@ -86,6 +86,7 @@
     <ClCompile Include="arm9\source\messageBox.cpp" />
     <ClCompile Include="arm9\source\move.cpp" />
     <ClCompile Include="arm9\source\pokemon.cpp" />
+    <ClCompile Include="arm9\source\pokemonIO.cpp" />
     <ClCompile Include="arm9\source\ribbon.cpp" />
     <ClCompile Include="arm9\source\saveGame.cpp" />
     <ClCompile Include="arm9\source\screenFade.cpp" />

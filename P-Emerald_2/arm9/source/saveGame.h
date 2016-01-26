@@ -65,6 +65,8 @@ namespace FS {
         u8          m_savTyp : 3;
         u8          m_inDex[ 1 + MAX_PKMN / 8 ];
         u32         m_money;
+        u32         m_coins;
+        u32         m_battlePoints;
 
         pokemon     m_pkmnTeam[ 6 ];
 
@@ -89,10 +91,14 @@ namespace FS {
 
         //Bag stuff
         u8          m_lstBag;
-        u8          m_lstBagItem;
+        u16         m_lstBagItem;
+
+        u16         m_lstUsedItems[ 5 ];
+        u8          m_lstUsedItemsIdx;
+        u16         m_registeredItem;
 
         s16         m_repelSteps;
-        BAG::bag*   m_bag; //Be VERY CAREFUL when deleting savegames or when just using them!
+        BAG::bag    m_bag;
 
         bool        checkflag( u8 p_idx ) {
             return m_flags[ p_idx >> 3 ] & ( 1 << ( p_idx % 8 ) );
@@ -130,7 +136,7 @@ namespace FS {
             char buffer[ 30 ];
             sprintf( buffer, "%ls", m_playername );
 
-            static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp, m_bag->getBattleItems( ) );
+            static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp );
             return &res;
         }
         void updateTeam( ) {

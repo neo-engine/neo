@@ -99,6 +99,10 @@ public:
 
     bool            use( pokemon& p_pokemon );
 
+    bool            use( bool p_dryRun = false );
+
+    bool            useable( );
+
     //Constructors
 
     item( const std::string& p_itemName )

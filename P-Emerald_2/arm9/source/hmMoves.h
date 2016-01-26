@@ -455,6 +455,34 @@ public:
     }
 };
 
+class dig
+    : public move {
+public:
+    dig( )
+        : move( "Schaufler",
+                C 0,
+                C 80,
+                BODEN,
+                C 100,
+                C 10,
+                C 0,
+                A 0,
+                C 1,
+                F 35,
+                H 0 ) {
+        this->m_isFieldAttack = true;
+    }
+
+    void use( ) override;
+    bool possible( ) override;
+
+    const char* text( ) override {
+        return "Zu dunkel hier?";
+    }
+    const char* description( ) override {
+        return "Gräbt sich ein, um dann aus der Erde anzugreifen. Warp zum Höhleneingang.";
+    }
+};
 #undef C
 #undef A
 #undef F

@@ -34,6 +34,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "Backward.h"
 
 #include <cmath>
+#include <algorithm>
 
 namespace IO {
 #define NEW_PAGE 9
@@ -101,9 +102,11 @@ namespace IO {
 
         swiWaitForVBlank( );
     }
+
+    std::vector<const char*> names;
     choiceBox::choiceBox( pokemon p_pokemon, u16 p_move ) {
         _num = 4 + !!p_move;
-        static std::vector<const char*> names = { AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_moveName.c_str( ),
+        names = { AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_moveName.c_str( ),
             AttackList[ p_pokemon.m_boxdata.m_moves[ 1 ] ]->m_moveName.c_str( ),
             AttackList[ p_pokemon.m_boxdata.m_moves[ 2 ] ]->m_moveName.c_str( ),
             AttackList[ p_pokemon.m_boxdata.m_moves[ 3 ] ]->m_moveName.c_str( ),
@@ -158,7 +161,8 @@ namespace IO {
     int fwdPos[ 2 ][ 2 ] = { { SCREEN_WIDTH - 12, SCREEN_HEIGHT - 12 }, { SCREEN_WIDTH - 11, SCREEN_HEIGHT - 31 } },
         bwdPos[ 2 ][ 2 ] = { { SCREEN_WIDTH - 12, SCREEN_HEIGHT - 12 }, { SCREEN_WIDTH - 31, SCREEN_HEIGHT - 11 } };
 
-    int choiceBox::getResult( const char* p_text, bool p_backButton ) {
+    int choiceBox::getResult( const char* p_text, bool p_backButton, bool p_drawSub ) {
+        _drawSub = p_drawSub;
         _text = p_text;
         draw( NEW_PAGE );
         //initOAMTable( true );
@@ -179,8 +183,8 @@ namespace IO {
 
         if( p_backButton ) {
             ( Oam->oamBuffer[ BACK_ID ] ).isHidden = false;
-            ( Oam->oamBuffer[ BACK_ID ] ).x = fwdPos[ 0 ][ 0 ] - 12;
-            ( Oam->oamBuffer[ BACK_ID ] ).y = fwdPos[ 0 ][ 1 ] - 12;
+            ( Oam->oamBuffer[ BACK_ID ] ).x = fwdPos[ 0 ][ 0 ] - 16;
+            ( Oam->oamBuffer[ BACK_ID ] ).y = fwdPos[ 0 ][ 1 ] - 14;
             updateOAM( true );
         }
 
@@ -197,7 +201,10 @@ namespace IO {
                 swiWaitForVBlank( );
                 updateOAM( true );
                 touchPosition t;
+                auto& touch = t;
                 touchRead( &t );
+                scanKeys( );
+                int pressed = keysCurrent( );
 
                 for( u8 i = 0; i < 3; ++i )
                     if( ( i + 3 * _acPage ) < _num && t.px >= 32 && t.py >= 68 + 35 * i && t.px <= 224 && t.py <= 100 + 35 * i ) {
@@ -209,7 +216,7 @@ namespace IO {
                         result = i + 3 * _acPage;
                         goto END;
                     }
-                if( p_backButton && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] - 12 ) + sq( t.py - fwdPos[ 0 ][ 1 ] - 12 ) ) < 17 ) { //Back pressed
+                if( p_backButton && ( GET_AND_WAIT_C( fwdPos[ 0 ][ 0 ], fwdPos[ 0 ][ 1 ] + 2, 16 ) || GET_AND_WAIT( KEY_B ) ) ) { //Back pressed
                     result = -1;
                     goto END;
                 }
@@ -272,8 +279,11 @@ namespace IO {
             loop( ) {
                 swiWaitForVBlank( );
                 updateOAM( true );
-                touchPosition t;
-                touchRead( &t );
+                touchPosition touch;
+                auto& t = touch;
+                touchRead( &touch );
+                scanKeys( );
+                int pressed = keysCurrent( );
 
                 for( u8 i = 0; i < std::min( 6, _num - 6 * _acPage ); ++i ) {
                     if( t.px >= ( ( i % 2 ) ? 129 : 19 ) && t.py >= 68 + ( i / 2 ) * 35
@@ -290,7 +300,7 @@ namespace IO {
                     }
                 }
 
-                if( p_backButton && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] - 12 ) + sq( t.py - fwdPos[ 0 ][ 1 ] - 12 ) ) < 17 ) { //Back pressed
+                if( p_backButton && ( GET_AND_WAIT_C( fwdPos[ 0 ][ 0 ], fwdPos[ 0 ][ 1 ] + 2, 16 ) || GET_AND_WAIT( KEY_B ) ) ) { //Back pressed
                     result = -1;
                     goto END;
                 } else if( ( !p_backButton && ( ( _num - 1 ) / 6 && _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 ) )

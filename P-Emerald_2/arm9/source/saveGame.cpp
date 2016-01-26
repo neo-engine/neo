@@ -40,24 +40,7 @@ namespace FS {
     std::vector<pokemon> tmp;
     saveGame* SAV;
 
-#define PKMN_DATALENGTH 128
-    BAG::bag* readBag( FILE* p_file ) {
-        static BAG::bag* result = new BAG::bag( );
-
-        for( u8 i = 0; i < 5; ++i ) {
-            size_t sz;
-            read( p_file, &sz, sizeof( size_t ), 1 );
-            for( size_t j = 0; j < sz; ++j ) {
-                std::pair<u16, u16> ac;
-                read( p_file, &ac.first, sizeof( u16 ), 1 );
-                read( p_file, &ac.second, sizeof( u16 ), 1 );
-                result->insert( BAG::bag::bagType( i ), ac.first, ac.second );
-            }
-        }
-
-        return result;
-    }
-    
+#define PKMN_DATALENGTH 128    
     saveGame* readSave( ) {
         FILE* f = open( "./", sav_nam, ".sav" );
         if( !f )
@@ -65,35 +48,15 @@ namespace FS {
 
         saveGame* result = new saveGame( );
         read( f, result, sizeof( saveGame ), 1 );
-        result->m_bag = readBag( f );
-        if( !result->m_bag )
-            result->m_bag = new BAG::bag( );
         close( f );
         return result;
     }
-
-    bool writeBag( FILE* p_file, BAG::bag* p_bag ) {
-        if( !p_bag )
-            return false;
-
-        for( u8 i = 0; i < 5; ++i ) {
-            auto bg = p_bag->element( BAG::bag::bagType( i ) );
-            auto sz = bg.size( );
-            write( p_file, &sz, sizeof( size_t ), 1 );
-            for( auto j : bg ) {
-                write( p_file, &j.first, sizeof( u16 ), 1 );
-                write( p_file, &j.second, sizeof( u16 ), 1 );
-            }
-        }
-        return true;
-    }
-
+    
     bool writeSave( saveGame* p_saveGame ) {
         FILE* f = open( "./", sav_nam, ".sav", "w" );
         if( !f )
             return 0;
         write( f, p_saveGame, sizeof( saveGame ), 1 );
-        writeBag( f, p_saveGame->m_bag );
         close( f );
         return true;
     }
@@ -109,7 +72,7 @@ namespace FS {
             }
         }
         if( !stepCnt ) {
-            bool hasHatchSpdUp = m_bag->count( BAG::toBagType( item::itemType::KEY_ITEM ), I_OVAL_CHARM );
+            bool hasHatchSpdUp = m_bag.count( BAG::toBagType( item::itemType::KEY_ITEM ), I_OVAL_CHARM );
             for( size_t s = 0; s < 6; ++s ) {
                 pokemon& ac = m_pkmnTeam[ s ];
                 if( !ac.m_boxdata.m_speciesId )
