@@ -1338,8 +1338,11 @@ SHOW_ATTACK:
                         u8 res = choosePKMN( p_pokemonPos + ( _battle->m_battleMode == battle::DOUBLE ), true, true );
                         if( res )
                             result.m_target |= ( 1 << res );
-                        else
+                        else {
+                            loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+                                             _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
                             goto NEXT_TRY;
+                        }
                     } else if( ItemList[ result.m_value ]->m_itemType == item::POKE_BALLS )
                         result.m_target |= ( 1 << 2 );
 

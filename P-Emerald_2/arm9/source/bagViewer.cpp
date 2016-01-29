@@ -372,6 +372,7 @@ namespace BAG {
 
     u16 bagViewer::run( ) {
         _bagUI = new bagUI( );
+        _currSelectedIdx = 0;
         initUI( );
         _hasSprite = false;
 
@@ -515,6 +516,7 @@ namespace BAG {
 
     u16 bagViewer::getItem( context p_context ) {
         _bagUI = new bagUI( );
+        _currSelectedIdx = 0;
         initUI( );
         _hasSprite = false;
 
