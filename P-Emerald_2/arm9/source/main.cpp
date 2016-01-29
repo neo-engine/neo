@@ -452,8 +452,8 @@ OUT:
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 ],        //StartID
                                    IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 3 ], 16 ) ) {
 
-            const char *someText[ 9 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", "View Boxes A", "View Boxes B", "Max Repel" };
-            IO::choiceBox test( 9, &someText[ 0 ], 0, false );
+            const char *someText[ 9 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", "View Boxes A", "View Boxes B" };
+            IO::choiceBox test( 8, &someText[ 0 ], 0, false );
             int res = test.getResult( "Tokens of god-being..." );
             IO::drawSub( );
             switch( res ) {
@@ -579,11 +579,6 @@ OUT:
                     consoleSelect( &IO::Bottom );
                     consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                     consoleClear( );
-                    break;
-                }
-                case 8:
-                {
-                    MAP::curMap->disablePkmn( 250 );
                     break;
                 }
             }

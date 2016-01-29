@@ -63,9 +63,9 @@ namespace BATTLE {
         std::string         m_battleTrainerName;
         trainerClass        m_trainerClass;
         std::vector < pokemon >& m_pkmnTeam;
+        std::pair<u16, u16>*m_items;         //if this is 0 and _itemCount == MAX_ITEMS_IN_BAG, then FS::SAV->m_bag is used.
+        u16                 m_itemCount;
     private:
-        std::pair<u16, u16>*_items;         //if this is 0 and _itemCount == MAX_ITEMS_IN_BAG, then FS::SAV->m_bag is used.
-        u16                 _itemCount;
         int                 _moneyEarned;
         std::string         _msg1;
         std::string         _msg2;
@@ -85,15 +85,15 @@ namespace BATTLE {
             : m_battleTrainerName( p_battleTrainerName ),
             m_trainerClass( p_trainerClass ),
             m_pkmnTeam( p_pkmnTeam ),
-            _items( p_items ),
-            _itemCount( p_itemCnt ),
+            m_items( p_items ),
+            m_itemCount( p_itemCnt ),
             _msg1( p_msg1 ),
             _msg2( p_msg2 ),
             _msg3( p_msg3 ),
             _msg4( p_msg4 ) { }
 
         pokemon&      sendNewPKMN( bool p_choice = true );
-        item& useItem( bool choice = true );
+        //item& useItem( bool choice = true );
 
         const char*         getLooseMsg( ) const {
             return _msg4.c_str( );

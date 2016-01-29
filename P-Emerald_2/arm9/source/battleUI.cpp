@@ -45,6 +45,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "fs.h"
 #include "sprite.h"
 #include "uio.h"
+#include "bagViewer.h"
 
 #include "Back.h"
 #include "A.h"
@@ -164,7 +165,7 @@ namespace BATTLE {
 #define STSBALL_IDX( p_pokemonPos, p_opponent ) ( STSBALL_START + ( ( p_opponent ) * 6 + ( p_pokemonPos ) ) )
 
 #define PKMN_START           17
-#define PKMN_IDX( p_pokemonPos, p_opponent ) ( PKMN_START + 4 * ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
+#define PKMN_IDX( p_pokemonPos, p_opponent ) ( PKMN_START + 4 * ( ( p_opponent ) * 2 + 1 - ( p_pokemonPos ) ) )
 
 #define PLATFORM_START       34
 
@@ -495,6 +496,47 @@ namespace BATTLE {
         }
     }
 
+    void battleUI::redrawBattle( ) {
+        videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
+        IO::bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
+        IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
+        bgSetPriority( IO::bg3, 3 );
+        bgSetPriority( IO::bg2, 2 );
+        IO::initOAMTable( IO::OamTop );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
+        REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
+        REG_BLDY = 0x1F;
+        bgUpdate( );
+
+        dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+        dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
+
+        loadBattleUITop( _battle );
+        for( u8 i = 0; i < 4; ++i )
+            sendPKMN( i % 2, i / 2, true );
+        if( _battle->m_isWildBattle ) {
+            auto acPkmn = *_battle->_wildPokemon.m_pokemon;
+            u16 x = 144;
+            u8  y = 19;
+
+            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+                                     PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ),
+                                     false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
+                                         acPkmn.m_boxdata.m_speciesId, x, y,
+                                         PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
+                                         acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                }
+            }
+            IO::updateOAM( false );
+        }
+
+        REG_BLDY = 0;
+        swiWaitForVBlank( );
+    }
+
     void loadSpritesSub( battle* p_battle ) {
         IO::initOAMTable( true );
         IO::drawSub( );
@@ -523,24 +565,24 @@ namespace BATTLE {
             TILESTART = IO::loadSprite( HP_IDX( i % 2, ( i / 2 ) ), HP_PAL,
                                         TILESTART, 0, 0, 32, 32, Battle1Pal,
                                         Battle1Tiles, Battle1TilesLen, false,
-                                        false, true, OBJPRIORITY_2, false );
+                                        false, true, OBJPRIORITY_1, false );
         }
         TILESTART = IO::loadSprite( PLATFORM_START, PLAT_PAL,
                                     TILESTART, 128, 56, 64, 64, IO::PlatformPals[ p_battle->m_platformId ],
                                     IO::PlatformTiles[ 2 * p_battle->m_platformId ], 2048, false,
-                                    false, false, OBJPRIORITY_2, false );
+                                    false, false, OBJPRIORITY_3, false );
         TILESTART = IO::loadSprite( PLATFORM_START + 1, PLAT_PAL,
                                     TILESTART, 192, 56, 64, 64, IO::PlatformPals[ p_battle->m_platformId ],
                                     IO::PlatformTiles[ 2 * p_battle->m_platformId + 1 ], 2048, false,
-                                    false, false, OBJPRIORITY_2, false );
+                                    false, false, OBJPRIORITY_3, false );
         TILESTART = IO::loadSprite( PLATFORM_START + 2, PLAT_PAL,
                                     TILESTART, -52, 152 - 32, 64, 64, IO::PlatformPals[ p_battle->m_platformId ],
                                     IO::PlatformTiles[ 2 * p_battle->m_platformId ], 2048, false,
-                                    false, false, OBJPRIORITY_2, false );
+                                    false, false, OBJPRIORITY_3, false );
         TILESTART = IO::loadSprite( PLATFORM_START + 3, PLAT_PAL,
                                     TILESTART, 80 - 16, 152 - 32, 64, 64, IO::PlatformPals[ p_battle->m_platformId ],
                                     IO::PlatformTiles[ 2 * p_battle->m_platformId + 1 ], 2048, false,
-                                    false, false, OBJPRIORITY_2, false );
+                                    false, false, OBJPRIORITY_3, false );
         IO::OamTop->oamBuffer[ PLATFORM_START + 2 ].isRotateScale = true;
         IO::OamTop->oamBuffer[ PLATFORM_START + 2 ].isSizeDouble = true;
         IO::OamTop->oamBuffer[ PLATFORM_START + 2 ].rotationIndex = 0;
@@ -1174,6 +1216,7 @@ namespace BATTLE {
             IO::OamTop->oamBuffer[ PKMN_IDX( p_pokemonPos, p_opponent ) + k ].isRotateScale = true;
             IO::OamTop->oamBuffer[ PKMN_IDX( p_pokemonPos, p_opponent ) + k ].isSizeDouble = true;
             IO::OamTop->oamBuffer[ PKMN_IDX( p_pokemonPos, p_opponent ) + k ].rotationIndex = 1;
+            IO::OamTop->oamBuffer[ PKMN_IDX( p_pokemonPos, p_opponent ) + k ].priority = OBJPRIORITY_3;
         }
         IO::OamTop->oamBuffer[ PKMN_IDX( p_pokemonPos, p_opponent ) ].y -= 48;
         IO::OamTop->oamBuffer[ PKMN_IDX( p_pokemonPos, p_opponent ) ].x -= 48;
@@ -1289,10 +1332,14 @@ SHOW_ATTACK:
                 result.m_value = chooseItem( p_pokemonPos );
                 if( result.m_value ) {
                     loadA( );
+                    setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                     return true;
                 }
-                setDeclareBattleMoveSpriteVisibility( p_showBack, false );
+                swprintf( wbuffer, 50, L"Was soll %ls tun?", ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
                 writeLogText( wbuffer );
+                loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                setDeclareBattleMoveSpriteVisibility( p_showBack, false );
 
             } else if( !_battle->m_isWildBattle && FS::SAV->m_activatedPNav && GET_AND_WAIT_R( 95, 152, 152, 178 ) ) {
 
@@ -1483,32 +1530,32 @@ END:
         switch( acMove->m_moveAffectsWhom ) {
             case move::BOTH_FOES:
             case move::OPPONENTS_FIELD:
-            neverTarget[ 2 ] = neverTarget[ 3 ] = true;
-            selected[ 0 ] = selected[ 1 ] = true;
-            break;
+                neverTarget[ 2 ] = neverTarget[ 3 ] = true;
+                selected[ 0 ] = selected[ 1 ] = true;
+                break;
             case move::BOTH_FOES_AND_PARTNER:
-            neverTarget[ p_pokemonPos + 2 ] = true;
-            selected[ 0 ] = selected[ 1 ]
-                = selected[ 3 - p_pokemonPos ] = true;
-            break;
+                neverTarget[ p_pokemonPos + 2 ] = true;
+                selected[ 0 ] = selected[ 1 ]
+                    = selected[ 3 - p_pokemonPos ] = true;
+                break;
             case move::OWN_FIELD:
-            neverTarget[ 0 ] = neverTarget[ 1 ] = true;
-            selected[ 1 ] = selected[ 0 ] = true;
-            break;
+                neverTarget[ 0 ] = neverTarget[ 1 ] = true;
+                selected[ 1 ] = selected[ 0 ] = true;
+                break;
             case move::SELECTED:
-            neverTarget[ 2 + p_pokemonPos ] = true;
-            selectionExists = false;
-            break;
+                neverTarget[ 2 + p_pokemonPos ] = true;
+                selectionExists = false;
+                break;
             case move::USER:
-            selected[ 2 + p_pokemonPos ] = true;
-            neverTarget[ 0 ] = neverTarget[ 1 ]
-                = neverTarget[ 3 - p_pokemonPos ] = true;
-            break;
+                selected[ 2 + p_pokemonPos ] = true;
+                neverTarget[ 0 ] = neverTarget[ 1 ]
+                    = neverTarget[ 3 - p_pokemonPos ] = true;
+                break;
             default:
             case move::RANDOM:
-            selected[ 2 ] = selected[ 3 ] = true;
-            selected[ 0 ] = selected[ 1 ] = true;
-            break;
+                selected[ 2 ] = selected[ 3 ] = true;
+                selected[ 0 ] = selected[ 1 ] = true;
+                break;
         }
 
         if( selected[ 2 ] && selected[ 3 ] )
@@ -1676,31 +1723,20 @@ END:
     }
 
     u16 battleUI::chooseItem( u8 p_pokemonPos ) {
-        //TODO
-        (void) p_pokemonPos;
-        u8 result = 0;
-
-        // Make this a debug battle end
-
-        _battle->_round = 0;
-        _battle->_maxRounds = -1;
-
-
-        touchPosition touch;
-        loop( ) {
-
-            scanKeys( );
-            touch = touchReadXY( );
-
-            //Accept touches that are almost on the sprite
-            if( GET_AND_WAIT_R( 224, 164, 300, 300 ) ) { //Back
-                result = 0;
-                break;
-            }
+        if( !_battle->_player->m_items && _battle->_player->m_itemCount == MAX_ITEMS_IN_BAG ) {
+            BAG::bagViewer bv;
+            UPDATE_TIME = false;
+            u16 itm = bv.getItem( BAG::bagViewer::GIVE_TO_PKMN );
+            init( );
+            IO::initOAMTable( true );
+            IO::drawSub( );
+            UPDATE_TIME = true;
+            DRAW_TIME = true;
+            redrawBattle( );
+            initLogScreen( );
+            return itm;
         }
-
-        clearLogScreen( );
-        return result;
+        return 0;
     }
 
     u8 battleUI::choosePKMN( bool p_firstIsChosen, bool p_back ) {
@@ -1965,7 +2001,7 @@ CLEAR:
         }
     }
 
-    void battleUI::sendPKMN( bool p_opponent, u8 p_pokemonPos ) {
+    void battleUI::sendPKMN( bool p_opponent, u8 p_pokemonPos, bool p_silent ) {
         if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
             return;
         if( _battle->m_isWildBattle && p_opponent )
@@ -1980,19 +2016,19 @@ CLEAR:
         if( !acPkmn.m_stats.m_acHP )
             return;
         //Lets do some animation stuff here
+        if( !p_silent ) {
+            if( p_opponent )
+                std::swprintf( wbuffer, 200, L"[TRAINER] ([TCLASS]) schickt\n%ls in den Kampf![A]",
+                               ACPKMN2( *_battle, p_pokemonPos, OPPONENT ).m_boxdata.m_name );
+            else
+                std::swprintf( wbuffer, 50, L"Los [OWN%d]![A]", p_pokemonPos + 1 );
+            _battle->log( wbuffer );
 
-        if( p_opponent )
-            std::swprintf( wbuffer, 200, L"[TRAINER] ([TCLASS]) schickt\n%ls in den Kampf![A]",
-                           ACPKMN2( *_battle, p_pokemonPos, OPPONENT ).m_boxdata.m_name );
-        else
-            std::swprintf( wbuffer, 50, L"Los [OWN%d]![A]", p_pokemonPos + 1 );
-        _battle->log( wbuffer );
+            setStsBallVisibility( p_opponent, p_pokemonPos, true, false );
+            IO::updateOAM( false );
 
-        setStsBallVisibility( p_opponent, p_pokemonPos, true, false );
-        IO::updateOAM( false );
-
-        animatePokeBall( x + 40 + 24 * ( !p_opponent ), y + 40 + 24 * ( !p_opponent ), PB_ANIM, 15, TILESTART );
-
+            animatePokeBall( x + 40 + 24 * ( !p_opponent ), y + 40 + 24 * ( !p_opponent ), PB_ANIM, 15, TILESTART );
+        }
         //Load the PKMN sprite
         if( p_opponent ) {
             if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
@@ -2018,7 +2054,7 @@ CLEAR:
             }
             adjustSprite( p_opponent, p_pokemonPos );
         }
-        if( acPkmn.m_boxdata.isShiny( ) )
+        if( acPkmn.m_boxdata.isShiny( ) && !p_silent )
             animateShiny( x + 16 + 24 * ( !p_opponent ), y + 16 + 24 * ( !p_opponent ), SHINY_ANIM, 15, TILESTART );
 
         setStsBallPosition( p_opponent, p_pokemonPos, hpx + 8, hpy + 8, false );

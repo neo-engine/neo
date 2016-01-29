@@ -46,6 +46,8 @@ namespace BATTLE {
         void    trainerIntro( );
         void    pokemonIntro( );
 
+        void    redrawBattle( );
+
         bool    declareBattleMove( u8 p_pokemonPos, bool p_showBack );
 
         u16     chooseAttack( u8 p_pokemonPos );
@@ -62,7 +64,7 @@ namespace BATTLE {
         void    updateStats( bool p_opponent, u8 p_pokemonPos, bool p_move = true );
 
         void    hidePKMN( bool p_opponent, u8 p_pokemonPos );
-        void    sendPKMN( bool p_opponent, u8 p_pokemonPos );
+        void    sendPKMN( bool p_opponent, u8 p_pokemonPos, bool p_silent = false );
         void    evolvePKMN( bool p_opponent, u8 p_pokemonPos );
 
         void    learnMove( u8 p_pokemonPos, u16 p_move );
