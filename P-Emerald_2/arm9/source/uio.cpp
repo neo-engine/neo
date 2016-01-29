@@ -27,6 +27,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include <nds.h>
 
+#include <algorithm>
 #include <ctime>
 
 #include "uio.h"
@@ -278,23 +279,44 @@ namespace IO {
             }
         } else {
             BG_PAL( p_sub )[ p_freecolor2 ] = NORMAL_;
-            for( u16 phi = 3 * ( 100 - p_HPstart ); phi < 3 * p_HP; phi++ ) {
-                s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
-                s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
-                for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
-                    u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
-                    if( nx == p_x + 16 + j )
-                        --nx;
+            if( 100 - p_HPstart <= p_HP ) {
+                for( u16 phi = 3 * ( 100 - p_HPstart ); phi < 3 * p_HP; phi++ ) {
+                    s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
+                    s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
+                    for( u16 j = p_innerR; j <= p_outerR; ++j ) {
+                        u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
+                        u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
+                        if( nx == p_x + 16 + j )
+                            --nx;
 
-                    ( (color *) ( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8) p_freecolor2 ) << 8 ) | (u8) p_freecolor2;
-                    if( phi >= 150 )
-                        BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
-                    if( phi >= 225 )
-                        BG_PAL( p_sub )[ p_freecolor1 ] = RED;
+                        ( (color *) ( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8) p_freecolor2 ) << 8 ) | (u8) p_freecolor2;
+                        if( phi >= 150 )
+                            BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
+                        if( phi >= 225 )
+                            BG_PAL( p_sub )[ p_freecolor1 ] = RED;
+                    }
+                    if( p_delay )
+                        swiWaitForVBlank( );
                 }
-                if( p_delay )
-                    swiWaitForVBlank( );
+            } else {
+                for( u16 phi = 3 * ( 100 - p_HPstart ); phi > 3 * p_HP; phi-- ) {
+                    s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
+                    s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
+                    for( u16 j = p_innerR; j <= p_outerR; ++j ) {
+                        u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
+                        u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
+                        if( nx == p_x + 16 + j )
+                            --nx;
+
+                        ( (color *) ( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8) p_freecolor1 ) << 8 ) | (u8) p_freecolor1;
+                        if( phi < 225 )
+                            BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
+                        if( phi < 150 )
+                            BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
+                    }
+                    if( p_delay )
+                        swiWaitForVBlank( );
+                }
             }
         }
     }

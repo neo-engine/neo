@@ -40,12 +40,14 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "move.h"
 #include "item.h"
 #include "yesNoBox.h"
+#include "choiceBox.h"
 #include "saveGame.h"
 #include "buffer.h"
 #include "fs.h"
 #include "sprite.h"
 #include "uio.h"
 #include "bagViewer.h"
+
 
 #include "Back.h"
 #include "A.h"
@@ -1336,9 +1338,23 @@ SHOW_ATTACK:
                 if( result.m_value ) {
                     if( ItemList[ result.m_value ]->m_itemType == item::MEDICINE ) {
                         u8 res = choosePKMN( p_pokemonPos + ( _battle->m_battleMode == battle::DOUBLE ), true, true );
-                        if( res )
+                        if( res != (u8) -1 ) {
                             result.m_target |= ( 1 << res );
-                        else {
+                            result.m_newItemEffect = ItemList[ result.m_value ]->m_itemData.m_itemEffect;
+                            for( u8 i = 0; i < 2; ++i )
+                                if( ItemList[ result.m_value ]->needsInformation( i ) ) {
+                                    IO::choiceBox cb( ACPKMN2( *_battle, res, PLAYER ), 0 );
+                                    u8 res = 1 + cb.getResult( "Welche Attacke?", false, false );
+
+                                    result.m_newItemEffect &= ~( 1 << ( 9 + 16 * !i ) );
+                                    result.m_newItemEffect |= ( res << ( 9 + 16 * !i ) );
+                                }
+                            IO::initOAMTable( true );
+                            IO::drawSub( );
+                            loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+                                             _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                            setDeclareBattleMoveSpriteVisibility( p_showBack, true );
+                        } else {
                             loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                                              _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
                             goto NEXT_TRY;
@@ -1388,7 +1404,7 @@ NEXT_TRY:
                 clearLogScreen( );
                 result.m_type = battle::battleMove::SWITCH;
                 result.m_value = choosePKMN( p_pokemonPos + ( _battle->m_battleMode == battle::DOUBLE ) );
-                if( result.m_value ) {
+                if( result.m_value != (u8) -1 && result.m_value ) {
                     loadA( );
                     return true;
                 }
@@ -1779,11 +1795,13 @@ START:
 
             //Accept touches that are almost on the sprite
             if( p_back && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) { //Back
-                result = 0;
+                result = -1;
                 break;
             }
             auto teamSz = _battle->_player->m_pkmnTeam.size( );
             for( u8 i = 0; i < teamSz; ++i ) {
+                if( p_noRestrict && ACPKMN2( *_battle, i, PLAYER ).isEgg( ) )
+                    continue;
                 u8 x = IO::Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].x;
                 u8 y = IO::Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].y;
 
@@ -1850,14 +1868,18 @@ CLEAR:
             return;
     }
 
-    void battleUI::updateHP( bool p_opponent, u8 p_pokemonPos ) {
+    void battleUI::updateHP( bool p_opponent, u8 p_pokemonPos, u16 p_oldHP, u16 p_oldHPmax ) {
         if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
             return;
+        if( p_oldHPmax == u16( -1 ) )
+            p_oldHPmax = ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_maxHP;
 
         u8 hpx = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
             hpy = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y;
 
-        IO::displayHP( 100, 100 - ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP * 100 / ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_maxHP,
+        IO::displayHP( p_oldHP * 100 / p_oldHPmax,
+                       100 - ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP * 100
+                       / ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_maxHP,
                        hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, true );
 
         consoleSelect( &IO::Top );
@@ -1908,6 +1930,8 @@ CLEAR:
 
         bool newLevel = EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
         u16 HPdif = acPkmn.m_stats.m_maxHP - acPkmn.m_stats.m_acHP;
+        u16 oldHP = acPkmn.m_stats.m_acHP;
+        u16 oldHPmax = acPkmn.m_stats.m_maxHP;
 
         while( newLevel ) {
             acPkmn.m_Level++;
@@ -1935,7 +1959,9 @@ CLEAR:
             std::swprintf( wbuffer, 50, L"%ls erreicht Level %d.[A]", acPkmn.m_boxdata.m_name, acPkmn.m_Level );
             _battle->log( wbuffer );
 
-            updateHP( p_opponent, p_pokemonPos );
+            updateHP( p_opponent, p_pokemonPos, oldHP, oldHPmax );
+            oldHP = acPkmn.m_stats.m_acHP;
+            oldHPmax = acPkmn.m_stats.m_maxHP;
 
             u8 oldSpec = acPkmn.m_boxdata.m_speciesId;
             _battle->checkForAttackLearn( p_pokemonPos );
@@ -2140,7 +2166,7 @@ CLEAR:
             }
             adjustSprite( p_opponent, p_pokemonPos );
         }
-        updateHP( p_opponent, p_pokemonPos );
+        updateHP( p_opponent, p_pokemonPos, 1, 1 );
     }
 
     void battleUI::learnMove( u8 p_pokemonPos, u16 p_move ) {

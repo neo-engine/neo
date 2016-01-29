@@ -57,7 +57,7 @@ namespace BATTLE {
         void    useNav( );
 
         void    showAttack( bool p_opponent, u8 p_pokemonPos );
-        void    updateHP( bool p_opponent, u8 p_pokemonPos );
+        void    updateHP( bool p_opponent, u8 p_pokemonPos, u16 p_oldHP, u16 p_oldHPmax = -1 );
         void    showStatus( bool p_opponent, u8 p_pokemonPos );
         void    updateStatus( bool p_opponent, u8 p_pokemonPos );
         void    applyEXPChanges( bool p_opponent, u8 p_pokemonPos, u32 p_gainedExp );

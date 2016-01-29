@@ -227,10 +227,10 @@ namespace BATTLE {
 CHOOSE1:
             firstMoveSwitchTarget = 0;
 
-            _battleMoves[ 0 ][ PLAYER ] = { ( battleMove::type )0, 0, 0 };
-            _battleMoves[ 1 ][ PLAYER ] = { ( battleMove::type )0, 0, 0 };
-            _battleMoves[ 0 ][ OPPONENT ] = { ( battleMove::type )0, 0, 0 };
-            _battleMoves[ 1 ][ OPPONENT ] = { ( battleMove::type )0, 0, 0 };
+            _battleMoves[ 0 ][ PLAYER ] = { ( battleMove::type )0, 0, 0, 0 };
+            _battleMoves[ 1 ][ PLAYER ] = { ( battleMove::type )0, 0, 0, 0 };
+            _battleMoves[ 0 ][ OPPONENT ] = { ( battleMove::type )0, 0, 0, 0 };
+            _battleMoves[ 1 ][ OPPONENT ] = { ( battleMove::type )0, 0, 0, 0 };
 
             if( ACPKMNSTS( 0, PLAYER ) != KO ) {
                 if( p1CanMove ) {
@@ -596,9 +596,9 @@ NEXT:
                 for( u8 i = 0; i < 2; ++i )
                     if( canMove( OPPONENT, i ) ) {
                         if( !m_isWildBattle )
-                            _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, ACPKMN( i, OPPONENT ).m_boxdata.m_moves[ 0 ], 0 };
+                            _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, ACPKMN( i, OPPONENT ).m_boxdata.m_moves[ 0 ], 0, 0 };
                         else
-                            _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, _wildPokemon.m_pokemon->m_boxdata.m_moves[ 0 ], 0 };
+                            _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, _wildPokemon.m_pokemon->m_boxdata.m_moves[ 0 ], 0, 0 };
                     }
                 break;
             }
@@ -609,7 +609,17 @@ NEXT:
      *  @brief Does all of the turn's moves.
      */
     void battle::doMoves( ) {
-        //Mega evolve all PKMN first
+        //Use all Items first
+        for( u8 i = 0; i < 4; ++i ) {
+            bool isOpp = i % 2,
+                isSnd = i / 2;
+
+            if( _battleMoves[ isSnd ][ isOpp ].m_type == battleMove::USE_ITEM )
+                doItem( isOpp, isSnd, ability::GRASS );
+
+        }
+
+        //Mega evolve all PKMN second
         for( u8 i = 0; i < 4; ++i ) {
             bool isOpp = i % 2,
                 isSnd = i / 2;
@@ -733,18 +743,8 @@ OUT:
             case battleMove::SWITCH:
                 battle::switchPKMN( opponent, pokemonPos, acMove.m_value );
                 break;
-            case battleMove::USE_ITEM:
-            {
-                if( opponent ) {
-                    std::swprintf( wbuffer, 100, L"[TRAINER] ([TCLASS]) setzt\n%s ein.[A]", ItemList[ acMove.m_value ]->getDisplayName( true ).c_str( ) );
-                    log( wbuffer );
-                }
-                doItem( opponent, acMove.m_target, ability::abilityType( 0 ) );
-                break;
-            }
             case battleMove::USE_NAV:
-                //TODO
-                break;
+            case battleMove::USE_ITEM:
             default:
                 break;
         }
@@ -947,24 +947,106 @@ NEXT:
     *  @param p_situation: Current situation, on which an item may be useable
     */
     void battle::doItem( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation ) {
-        if( !ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
-            return;
+        if( p_situation != ability::GRASS ) {
+            if( !ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
+                return;
 
-        auto im = *ItemList[ ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability ];
+            auto im = *ItemList[ ACPKMN( p_pokemonPos, p_opponent ).getItem( ) ];
 
-        if( ( im.getEffectType( ) & item::itemEffectType::IN_BATTLE ) && ( im.m_inBattleEffect & p_situation ) ) {
-            std::swprintf( wbuffer, 50, L"%s von %ls%s wirkt.[A]",
-                           im.getDisplayName( ).c_str( ),
-                           ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
-                           ( p_opponent ? "\n[OPPONENT]" : "\n" ) );
+            if( ( im.getEffectType( ) & item::itemEffectType::IN_BATTLE ) && ( im.m_inBattleEffect & p_situation ) ) {
+                std::swprintf( wbuffer, 50, L"%s von %ls%s wirkt.[A]",
+                               im.getDisplayName( ).c_str( ),
+                               ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                               ( p_opponent ? "\n[OPPONENT]" : "\n" ) );
 
-            log( wbuffer );
-            im.m_inBattleScript.execute( *this, &( ACPKMN( p_pokemonPos, p_opponent ) ) );
-            for( u8 k = 0; k < 4; ++k ) {
-                bool isOpp = k % 2,
-                    isSnd = k / 2;
-                _battleUI->updateHP( isOpp, isSnd );
-                _battleUI->updateStats( isOpp, isSnd );
+                log( wbuffer );
+                u16 oldHP[ 4 ] = { 0 }; for( u8 k = 0; k < 4; ++k ) {
+                    bool isOpp = k % 2,
+                        isSnd = k / 2;
+                    oldHP[ k ] = ACPKMN( isSnd, isOpp ).m_stats.m_acHP;
+                }
+                im.m_inBattleScript.execute( *this, &( ACPKMN( p_pokemonPos, p_opponent ) ) );
+                for( u8 k = 0; k < 4; ++k ) {
+                    bool isOpp = k % 2,
+                        isSnd = k / 2;
+                    _battleUI->updateHP( isOpp, isSnd, oldHP[ k ] );
+                    _battleUI->updateStats( isOpp, isSnd );
+                }
+            }
+        } else {
+            auto im = ItemList[ _battleMoves[ p_pokemonPos ][ p_opponent ].m_value ];
+            if( p_opponent ) {
+                std::swprintf( wbuffer, 100, L"[TRAINER] ([TCLASS]) setzt\n%s ein.[A]",
+                               im->getDisplayName( true ).c_str( ) );
+                log( wbuffer );
+
+                u16 oldHP = ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP;
+                u16 oldHPmax = ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_maxHP;
+
+                if( im->m_itemType != item::MEDICINE || im->needsInformation( 0 )
+                    || im->needsInformation( 1 ) || !im->use( ACPKMN( p_pokemonPos, p_opponent ) ) )
+                    log( L"Es hat keine Wirkung..." );
+                else {
+                    if( ACPKMN( p_pokemonPos, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                        ACPKMNSTS( p_pokemonPos, PLAYER ) = NA;
+                    else if( ACPKMN( p_pokemonPos, PLAYER ).m_stats.m_acHP == 0 )
+                        ACPKMNSTS( p_pokemonPos, PLAYER ) = KO;
+                    else if( ACPKMN( p_pokemonPos, PLAYER ).m_statusint )
+                        ACPKMNSTS( p_pokemonPos, PLAYER ) = STS;
+                    else
+                        ACPKMNSTS( p_pokemonPos, PLAYER ) = OK;
+                }
+
+                for( u8 i = 0; i < _opponent->m_itemCount; ++i )
+                    if( _opponent->m_items[ i ].first == _battleMoves[ p_pokemonPos ][ p_opponent ].m_value )
+                        _opponent->m_items[ i ].second = (u16) std::max( 0, _opponent->m_items[ i ].second - 1 );
+                _battleUI->updateHP( p_opponent, p_pokemonPos, oldHP, oldHPmax );
+                _battleUI->updateStats( p_opponent, p_pokemonPos );
+            } else {
+                if( im->m_itemType != item::POKE_BALLS ) {
+                    std::swprintf( wbuffer, 100, L"%s eingesetzt.[A]",
+                                   im->getDisplayName( true ).c_str( ) );
+                    log( wbuffer );
+                }
+
+                if( !_player->m_items && _player->m_itemCount == MAX_ITEMS_IN_BAG )
+                    FS::SAV->m_bag.erase( BAG::toBagType( im->m_itemType ), _battleMoves[ p_pokemonPos ][ p_opponent ].m_value, 1 );
+                else
+                    for( u8 i = 0; i < _player->m_itemCount; ++i )
+                        if( _player->m_items[ i ].first == _battleMoves[ p_pokemonPos ][ p_opponent ].m_value )
+                            _player->m_items[ i ].second = (u16) std::max( 0, _player->m_items[ i ].second - 1 );
+
+                if( im->m_itemType == item::MEDICINE ) {
+                    u8 pos = 0;
+                    while( _battleMoves[ p_pokemonPos ][ p_opponent ].m_target ) {
+                        ++pos;
+                        _battleMoves[ p_pokemonPos ][ p_opponent ].m_target >>= 1;
+                    }
+                    --pos;
+                    if( _battleMoves[ p_pokemonPos ][ p_opponent ].m_newItemEffect )
+                        im->m_itemData.m_itemEffect = _battleMoves[ p_pokemonPos ][ p_opponent ].m_newItemEffect;
+
+                    u16 oldHP = ACPKMN( pos, p_opponent ).m_stats.m_acHP;
+                    u16 oldHPmax = ACPKMN( pos, p_opponent ).m_stats.m_maxHP;
+                    if( !im->use( ACPKMN( pos, p_opponent ) ) )
+                        log( L"Es hat keine Wirkung..." );
+                    else {
+                        if( ACPKMN( pos, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                            ACPKMNSTS( pos, PLAYER ) = NA;
+                        else if( ACPKMN( pos, PLAYER ).m_stats.m_acHP == 0 )
+                            ACPKMNSTS( pos, PLAYER ) = KO;
+                        else if( ACPKMN( pos, PLAYER ).m_statusint )
+                            ACPKMNSTS( pos, PLAYER ) = STS;
+                        else
+                            ACPKMNSTS( pos, PLAYER ) = OK;
+                    }
+
+                    if( pos <= 1 )
+                        _battleUI->updateHP( p_opponent, pos, oldHP, oldHPmax );
+                    _battleUI->updateStats( p_opponent, pos );
+                } else if( im->m_itemType == item::POKE_BALLS ) {
+
+                }
             }
         }
     }
@@ -1145,7 +1227,7 @@ NEXT:
 
         //Attack animation
         _battleUI->showAttack( p_opponent, p_pokemonPos );
-    
+
         //Damage and stuff
         for( u8 k = 0; k < 4; ++k ) {
             bool isOpp = k / 2,
@@ -1172,11 +1254,12 @@ NEXT:
             doItem( isOpp, isSnd, ability::ATTACK );
             doAbility( isOpp, isSnd, ability::ATTACK );
 
+            u16 oldHP = str.m_pokemon->m_stats.m_acHP;
             str.m_pokemon->m_stats.m_acHP = (u16) std::max( s16( 0 ),
                                                             std::min( s16( str.m_pokemon->m_stats.m_acHP - _acDamage[ isSnd ][ isOpp ] ),
                                                                       (s16) str.m_pokemon->m_stats.m_maxHP ) );
 
-            _battleUI->updateHP( isOpp, isSnd );
+            _battleUI->updateHP( isOpp, isSnd, oldHP );
             if( acMove->m_moveHitType != move::STAT ) {
                 if( _critical[ isSnd ][ isOpp ] )
                     log( L"[COLR:15:15:00]Ein Volltreffer![A][CLEAR][COLR:00:00:00]" );
@@ -1235,10 +1318,11 @@ NEXT:
                            ( p_opponent ? " [OPPONENT]" : "" ) );
             log( wbuffer );
 
+            u16 oldHP = acpkmn->m_stats.m_acHP;
             acpkmn->m_stats.m_acHP
                 = std::max( u16( 0 ), u16( acpkmn->m_stats.m_acHP - 1.0 / ( 8 * acpkmn->m_stats.m_maxHP ) ) );
 
-            _battleUI->updateHP( p_opponent, p_pokemonPos );
+            _battleUI->updateHP( p_opponent, p_pokemonPos, oldHP );
         }
         if( acpkmn->m_status.m_Poisoned && acpkmn->m_boxdata.m_ability != A_POISON_HEAL ) {
             std::swprintf( wbuffer, 100, L"Die Vergiftung schadet\n%ls%s.[A]",
@@ -1246,10 +1330,11 @@ NEXT:
                            ( p_opponent ? " [OPPONENT]" : "" ) );
             log( wbuffer );
 
+            u16 oldHP = acpkmn->m_stats.m_acHP;
             acpkmn->m_stats.m_acHP
                 = std::max( u16( 0 ), u16( acpkmn->m_stats.m_acHP - 1.0 / ( 8 * acpkmn->m_stats.m_maxHP ) ) );
 
-            _battleUI->updateHP( p_opponent, p_pokemonPos );
+            _battleUI->updateHP( p_opponent, p_pokemonPos, oldHP );
         }
         if( acpkmn->m_status.m_Toxic && acpkmn->m_boxdata.m_ability != A_POISON_HEAL ) {
             std::swprintf( wbuffer, 100, L"Die Vergiftung schadet\n%ls%s.[A]",
@@ -1259,11 +1344,12 @@ NEXT:
 
             auto str = ACPKMNSTR( p_pokemonPos, p_opponent );
 
+            u16 oldHP = acpkmn->m_stats.m_acHP;
             acpkmn->m_stats.m_acHP
                 = std::max( u16( 0 ), u16( acpkmn->m_stats.m_acHP
                                            - ( ++str.m_toxicCount ) / ( 16.0 * acpkmn->m_stats.m_maxHP ) ) );
 
-            _battleUI->updateHP( p_opponent, p_pokemonPos );
+            _battleUI->updateHP( p_opponent, p_pokemonPos, oldHP );
         }
     }
 
