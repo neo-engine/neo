@@ -1329,16 +1329,26 @@ SHOW_ATTACK:
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::USE_ITEM;
-                result.m_value = chooseItem( p_pokemonPos );
-                if( result.m_value ) {
-                    loadA( );
-                    setDeclareBattleMoveSpriteVisibility( p_showBack, false );
-                    return true;
-                }
-                swprintf( wbuffer, 50, L"Was soll %ls tun?", ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
-                writeLogText( wbuffer );
+                result.m_value = chooseItem( );
+                result.m_target = 0;
                 loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                                  _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                if( result.m_value ) {
+                    if( ItemList[ result.m_value ]->m_itemType == item::MEDICINE ) {
+                        u8 res = choosePKMN( p_pokemonPos + ( _battle->m_battleMode == battle::DOUBLE ), true, true );
+                        if( res )
+                            result.m_target |= ( 1 << res );
+                        else
+                            goto NEXT_TRY;
+                    } else if( ItemList[ result.m_value ]->m_itemType == item::POKE_BALLS )
+                        result.m_target |= ( 1 << 2 );
+
+                    loadA( );
+                    return true;
+                }
+NEXT_TRY:
+                swprintf( wbuffer, 50, L"Was soll %ls tun?", ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
+                writeLogText( wbuffer );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
 
             } else if( !_battle->m_isWildBattle && FS::SAV->m_activatedPNav && GET_AND_WAIT_R( 95, 152, 152, 178 ) ) {
@@ -1722,7 +1732,7 @@ END:
         return result;
     }
 
-    u16 battleUI::chooseItem( u8 p_pokemonPos ) {
+    u16 battleUI::chooseItem( ) {
         if( !_battle->_player->m_items && _battle->_player->m_itemCount == MAX_ITEMS_IN_BAG ) {
             BAG::bagViewer bv;
             UPDATE_TIME = false;
@@ -1739,7 +1749,7 @@ END:
         return 0;
     }
 
-    u8 battleUI::choosePKMN( bool p_firstIsChosen, bool p_back ) {
+    u8 battleUI::choosePKMN( bool p_firstIsChosen, bool p_back, bool p_noRestrict ) {
 START:
         consoleSelect( &IO::Bottom );
         undrawPKMNChoiceScreen( );
@@ -1777,36 +1787,38 @@ START:
                 if( GET_AND_WAIT_R( x, y, x + 96, y + 42 ) ) {
                     result = i;
                     u8 tmp = 1;
-                    auto acPkmn = ACPKMN2( *_battle, result, PLAYER );
-                    undrawPKMNChoiceScreen( );
-                    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-                    consoleClear( );
-                    while( ( tmp = showConfirmation( acPkmn, !result || ( result == p_firstIsChosen ), result == firstMoveSwitchTarget ) ) ) {
-                        if( tmp == 3 )
-                            break;
-                        u8 oldtmp = tmp - 1;
-                        while( ( tmp = showDetailedInformation( acPkmn, tmp - 1 ) ) ) {
-                            if( tmp == 1 ) {
-                                result = ( result + 1 + oldtmp ) % teamSz;
-                                acPkmn = ACPKMN2( *_battle, result, PLAYER );
-                                tmp = 1 + oldtmp;
-                            }
-                            if( tmp == 2 ) {
-                                result = ( result + teamSz - 1 ) % teamSz;
-                                acPkmn = ACPKMN2( *_battle, result, PLAYER );
-                                tmp = 1 + oldtmp;
-                            }
-                            if( tmp == 3 ) {
-                                tmp = 1 + ( 1 - oldtmp );
-                                oldtmp = tmp - 1;
-                            }
-                        }
-                        acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                    if( !p_noRestrict ) {
+                        auto acPkmn = ACPKMN2( *_battle, result, PLAYER );
                         undrawPKMNChoiceScreen( );
                         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                         consoleClear( );
+                        while( ( tmp = showConfirmation( acPkmn, !result || ( result == p_firstIsChosen ), result == firstMoveSwitchTarget ) ) ) {
+                            if( tmp == 3 )
+                                break;
+                            u8 oldtmp = tmp - 1;
+                            while( ( tmp = showDetailedInformation( acPkmn, tmp - 1 ) ) ) {
+                                if( tmp == 1 ) {
+                                    result = ( result + 1 + oldtmp ) % teamSz;
+                                    acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                                    tmp = 1 + oldtmp;
+                                }
+                                if( tmp == 2 ) {
+                                    result = ( result + teamSz - 1 ) % teamSz;
+                                    acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                                    tmp = 1 + oldtmp;
+                                }
+                                if( tmp == 3 ) {
+                                    tmp = 1 + ( 1 - oldtmp );
+                                    oldtmp = tmp - 1;
+                                }
+                            }
+                            acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                            undrawPKMNChoiceScreen( );
+                            consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+                            consoleClear( );
+                        }
                     }
-                    if( !tmp )
+                    if( !tmp || p_noRestrict )
                         goto CLEAR;
                     goto START;
                 }
