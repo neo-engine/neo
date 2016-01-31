@@ -55,7 +55,7 @@ public:
     struct berryData {
         u16             m_berrySize;
         berryGueteType  m_berryGuete;
-        Type            m_naturalGiftType;  //Type that Natural Gift becomes when holding this berry
+        type            m_naturalGiftType;  //Type that Natural Gift becomes when holding this berry
         u8   m_naturalGiftStrength;
         u8   m_berryTaste[ 5 ];       //Spicy, Dry, Sweet, Bitter, Sour
         u8   m_hoursPerGrowthStage;

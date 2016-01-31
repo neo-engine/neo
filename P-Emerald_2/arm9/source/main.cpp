@@ -110,6 +110,7 @@ bool ANIMATE_MAP = false;
 bool INIT_MAIN_SPRITES = false;
 u8 FRAME_COUNT = 0;
 bool SCREENS_SWAPPED = false;
+bool PLAYER_IS_FISHING = false;
 
 u8 getCurrentDaytime( ) {
     u8 t = achours, m = acmonth;
@@ -452,8 +453,9 @@ OUT:
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 2 ],        //StartID
                                    IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 3 ], 16 ) ) {
 
-            const char *someText[ 9 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle", "Chg NavScrn", "View Boxes A", "View Boxes B" };
-            IO::choiceBox test( 8, &someText[ 0 ], 0, false );
+            const char *someText[ 11 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle",
+                "Chg NavScrn", "View Boxes A", "View Boxes B", "Hoenn Badges", "Kanto Badges", "Johto Badges" };
+            IO::choiceBox test( 11, &someText[ 0 ], 0, false );
             int res = test.getResult( "Tokens of god-being..." );
             IO::drawSub( );
             switch( res ) {
@@ -542,7 +544,7 @@ OUT:
                     std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 6; ++i ) {
-                        pokemon a( 0, 435, 0,
+                        pokemon a( 0, 435 + i, 0,
                                    15, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko", false );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
@@ -581,6 +583,15 @@ OUT:
                     consoleClear( );
                     break;
                 }
+                case 8:
+                    FS::SAV->m_HOENN_Badges <<= 1;
+                    FS::SAV->m_HOENN_Badges |= 1;
+                case 9:
+                    FS::SAV->m_KANTO_Badges <<= 1;
+                    FS::SAV->m_KANTO_Badges |= 1;
+                case 10:
+                    FS::SAV->m_JOHTO_Badges <<= 1;
+                    FS::SAV->m_JOHTO_Badges |= 1;
             }
             IO::drawSub( true );
             swiWaitForVBlank( );

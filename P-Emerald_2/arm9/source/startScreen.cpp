@@ -222,7 +222,7 @@ bool transferGame( ) {
                 acPkmn.m_boxdata.m_markings = acBeltP->markint;
 
                 acPkmn.m_statusint = acBeltP->status;
-                acPkmn.m_Level = acBeltP->level;
+                acPkmn.m_level = acBeltP->level;
                 acPkmn.m_boxdata.m_pokerus = acBeltP->pokerus;
 
                 acPkmn.m_stats.m_acHP = acBeltP->currentHP;

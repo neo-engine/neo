@@ -172,13 +172,13 @@ bool item::use( pokemon& p_pokemon ) {
             }
             case 12:
             {
-                s16 tmp = p_pokemon.m_Level;
+                s16 tmp = p_pokemon.m_level;
                 APPLY_OP( operation, tmp, value, 100 );
                 tmp = std::min( tmp, s16( 100 ) );
                 tmp = std::max( (s16) 0, tmp );
-                if( tmp != p_pokemon.m_Level ) {
-                    p_pokemon.m_Level = tmp;
-                    p_pokemon.m_boxdata.m_experienceGained = EXP[ p_pokemon.m_Level - 1 ][ p.m_expType ];
+                if( tmp != p_pokemon.m_level ) {
+                    p_pokemon.m_level = tmp;
+                    p_pokemon.m_boxdata.m_experienceGained = EXP[ p_pokemon.m_level - 1 ][ p.m_expType ];
 
                     p_pokemon.m_stats = calcStats( p_pokemon.m_boxdata, p );
                     change = true;

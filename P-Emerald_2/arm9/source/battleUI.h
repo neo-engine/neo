@@ -63,6 +63,9 @@ namespace BATTLE {
         void    applyEXPChanges( bool p_opponent, u8 p_pokemonPos, u32 p_gainedExp );
         void    updateStats( bool p_opponent, u8 p_pokemonPos, bool p_move = true );
 
+        void    capture( u16 p_pokeBall, u8 p_ticks );
+        void    handleCapture( );
+
         void    hidePKMN( bool p_opponent, u8 p_pokemonPos );
         void    sendPKMN( bool p_opponent, u8 p_pokemonPos, bool p_silent = false );
         void    evolvePKMN( bool p_opponent, u8 p_pokemonPos );

@@ -106,7 +106,7 @@ namespace FS {
         for( u8 i = 0; i < 6; ++i ) {
             if( !m_pkmnTeam[ i ].m_boxdata.m_speciesId )
                 break;
-            mxlv = std::max( mxlv, m_pkmnTeam[ i ].m_Level );
+            mxlv = std::max( mxlv, m_pkmnTeam[ i ].m_level );
         }
         if( !mxlv || m_repelSteps )
             return 0;

@@ -47,6 +47,7 @@ namespace MAP {
         BIKE = 2,
         ACRO_BIKE = 3,
         SIT = 4,
+        DIVE = 5,
         //NPC modes
         NOTHING = 0,
     };

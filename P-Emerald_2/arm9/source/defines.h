@@ -56,6 +56,7 @@ extern bool ANIMATE_MAP;
 extern bool INIT_MAIN_SPRITES;
 extern u8 FRAME_COUNT;
 extern bool SCREENS_SWAPPED;
+extern bool PLAYER_IS_FISHING;
 
 extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;
@@ -110,22 +111,22 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define BLUE2 RGB(0,0,15)
 #define WHITE RGB(31,31,31)
 #define GRAY RGB(15,15,15)
-#define NORMAL_ RGB(27,27,27)
+#define NORMAL_COLOR RGB(27,27,27)
 #define BLACK RGB(0,0,0)
 #define YELLOW RGB(24,24,0)
 #define PURPLE RGB(24,0,24)
 #define TURQOISE RGB(0,24,24)
-#define ICE RGB(15,31,31)
-#define FAIRY RGB(31,15,31)
-#define GROUND RGB(31,31,15)
-#define POISON RGB(31,0,15)
+#define ICE_COLOR RGB(15,31,31)
+#define FAIRY_COLOR RGB(31,15,31)
+#define GROUND_COLOR RGB(31,31,15)
+#define POISON_COLOR RGB(31,0,15)
 #define ORANGE RGB(31,15,0)
-#define GHOST RGB(15,0,31)
-#define ROCK RGB(28,23,7)    
-#define BUG RGB(15,28,7)    
-#define STEEL RGB(24,24,24)
-#define DRAGON RGB(7,7,24)
-#define UNKNOWN RGB(0,42,42)
+#define GHOST_COLOR RGB(15,0,31)
+#define ROCK_COLOR RGB(28,23,7)    
+#define BUG_COLOR RGB(15,28,7)    
+#define STEEL_COLOR RGB(24,24,24)
+#define DRAGON_COLOR RGB(7,7,24)
+#define UNKNOWN_COLOR RGB(0,42,42)
 
 #define BG_PAL( p_sub ) ( ( p_sub ) ? BG_PALETTE_SUB : BG_PALETTE )
 #define BG_BMP( p_sub ) ( ( p_sub ) ? BG_BMP_RAM_SUB( 1 ) : BG_BMP_RAM( 1 ) )

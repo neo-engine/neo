@@ -92,7 +92,7 @@ public:
     std::string     m_moveName;
     BATTLE::battleScript    m_moveEffect;
     char            m_moveBasePower;
-    Type            m_moveType;
+    type            m_moveType;
     char            m_moveAccuracy;
     u8              m_movePP;
     char            m_moveEffectAccuracy;
@@ -109,7 +109,7 @@ public:
     move( const std::string p_moveName,
           char p_moveEffect,
           char p_moveBasePower,
-          Type p_moveType,
+          type p_moveType,
           char p_moveAccuracy,
           char p_movePP,
           char p_moveEffectAccuracy,

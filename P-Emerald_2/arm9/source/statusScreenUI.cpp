@@ -215,7 +215,7 @@ namespace STS {
                                     ITEM_ICON_IDX, ITEM_ICON_PAL, tileCnt, false );
 
         for( u8 i = 0; i < 4; ++i ) {
-            Type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
+            type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
             tileCnt = IO::loadTypeIcon( t, 126, 43 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ), tileCnt, false );
         }
         for( u8 i = 0; i < 4; ++i ) {
@@ -348,15 +348,15 @@ namespace STS {
             u16 exptype = data.m_expType;
 
             printf( "\x1b[39m" );
-            printf( "EP %3lu%%\nKP %3i%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ) * 100 /
-                    ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
+            printf( "EP %3lu%%\nKP %3i%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
+                    ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
                     p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::displayHP( 100, 101, 46, 80, 97, 98, false, 50, 56, p_bottom );
             IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 80, 97, 98, false, 50, 56, p_bottom );
 
             IO::displayEP( 100, 101, 46, 80, 99, 100, false, 59, 62, p_bottom );
-            IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ) * 100 /
-                           ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62, p_bottom );
+            IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
+                           ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62, p_bottom );
 
         } else {
             p_page = -1;
@@ -391,7 +391,7 @@ namespace STS {
             pal[ BLUE2_IDX ] = BLUE2;
 
             char buffer[ 50 ];
-            sprintf( buffer, "Status auf Lv.%3i:", currPkmn.m_Level );
+            sprintf( buffer, "Status auf Lv.%3i:", currPkmn.m_level );
             IO::regularFont->printString( buffer, 110, 34, p_bottom );
 
             sprintf( buffer, "KP                     %3i", currPkmn.m_stats.m_maxHP );
@@ -500,7 +500,7 @@ namespace STS {
         for( int i = 0; i < 4; i++ ) {
             if( !currPkmn.m_boxdata.m_moves[ i ] )
                 continue;
-            Type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
+            type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
             IO::loadTypeIcon( t, 222, 42 + 30 * i, TYPE_IDX + i, TYPE_PAL( i ),
                               Oam->oamBuffer[ TYPE_IDX + i ].gfxIndex, p_bottom );
 
@@ -972,7 +972,7 @@ namespace STS {
                                     ITEM_ICON_IDX, ITEM_ICON_PAL, tileCnt );
 
         for( u8 i = 0; i < 4; ++i ) {
-            Type t = AttackList[ 0 ]->m_moveType;
+            type t = AttackList[ 0 ]->m_moveType;
             tileCnt = IO::loadTypeIcon( t, 126, 43 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ), tileCnt, true );
         }
         for( u8 i = 0; i < 4; ++i ) {

@@ -278,7 +278,7 @@ namespace IO {
                 }
             }
         } else {
-            BG_PAL( p_sub )[ p_freecolor2 ] = NORMAL_;
+            BG_PAL( p_sub )[ p_freecolor2 ] = NORMAL_COLOR;
             if( 100 - p_HPstart <= p_HP ) {
                 for( u16 phi = 3 * ( 100 - p_HPstart ); phi < 3 * p_HP; phi++ ) {
                     s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
@@ -322,7 +322,7 @@ namespace IO {
     }
     void displayEP( u16 p_EPstart, u16 p_EP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR, bool p_sub ) {
         if( p_EPstart >= 100 || p_EP > 100 ) {
-            BG_PAL( p_sub )[ p_freecolor1 ] = NORMAL_;
+            BG_PAL( p_sub )[ p_freecolor1 ] = NORMAL_COLOR;
             for( u16 phi = 0; phi < 300; phi++ ) {
                 s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
                 s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
@@ -336,7 +336,7 @@ namespace IO {
                 }
             }
         } else {
-            BG_PAL( p_sub )[ p_freecolor2 ] = ICE;
+            BG_PAL( p_sub )[ p_freecolor2 ] = ICE_COLOR;
             for( u16 phi = 3 * p_EPstart; phi <= 3 * p_EP; ++phi ) {
                 s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
                 s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
@@ -441,67 +441,67 @@ namespace IO {
             ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
     }
 
-    u16 getColor( Type p_type ) {
+    u16 getColor( type p_type ) {
         switch( p_type ) {
             case NORMAL:
-                return NORMAL_;
+                return NORMAL_COLOR;
                 break;
-            case KAMPF:
+            case FIGHTING:
                 return RED;
                 break;
-            case FLUG:
+            case FLYING:
                 return TURQOISE;
                 break;
-            case GIFT:
-                return POISON;
+            case POISON:
+                return POISON_COLOR;
                 break;
-            case BODEN:
-                return GROUND;
+            case GROUND:
+                return GROUND_COLOR;
                 break;
-            case GESTEIN:
-                return ROCK;
+            case ROCK:
+                return ROCK_COLOR;
                 break;
-            case KAEFER:
-                return BUG;
+            case BUG:
+                return BUG_COLOR;
                 break;
-            case GEIST:
-                return GHOST;
+            case GHOST:
+                return GHOST_COLOR;
                 break;
-            case STAHL:
-                return STEEL;
+            case STEEL:
+                return STEEL_COLOR;
                 break;
-            case UNBEKANNT:
-                return UNKNOWN;
+            case UNKNOWN:
+                return UNKNOWN_COLOR;
                 break;
-            case WASSER:
+            case WATER:
                 return BLUE;
                 break;
-            case FEUER:
+            case FIRE:
                 return ORANGE;
                 break;
-            case PFLANZE:
+            case GRASS:
                 return GREEN;
                 break;
-            case ELEKTRO:
+            case LIGHTNING:
                 return YELLOW;
                 break;
-            case PSYCHO:
+            case PSYCHIC:
                 return PURPLE;
                 break;
-            case EIS:
-                return ICE;
+            case ICE:
+                return ICE_COLOR;
                 break;
-            case DRACHE:
-                return DRAGON;
+            case DRAGON:
+                return DRAGON_COLOR;
                 break;
-            case UNLICHT:
+            case DARKNESS:
                 return BLACK;
                 break;
-            case FEE:
-                return FAIRY;
+            case FAIRY:
+                return FAIRY_COLOR;
                 break;
             default:
-                return DRAGON;
+                return DRAGON_COLOR;
                 break;
         }
         return WHITE;

@@ -102,7 +102,7 @@ namespace BATTLE {
             case BATTLE::battleScript::command::PKMN_ATTACK_BLOCKED:
                 return ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ATTACK_BLOCKED ];
             case BATTLE::battleScript::command::PKMN_LEVEL:
-                return p_target.m_Level;
+                return p_target.m_level;
             default:
                 return -1;
         }

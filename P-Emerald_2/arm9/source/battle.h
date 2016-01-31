@@ -187,7 +187,7 @@ namespace BATTLE {
         public:
             pokemon*            m_pokemon;
             s8                  m_acStatChanges[ 10 ];
-            Type                m_Types[ 3 ];
+            type                m_Types[ 3 ];
             battle::acStatus    m_acStatus;
             move::ailment       m_ailments;
             u8                  m_ailmentCount;
@@ -444,6 +444,8 @@ namespace BATTLE {
         void        doWeather( );
         void        handleSpecialConditions( bool p_opponent, u8 p_pokemonPos );
         void        handleFaint( bool p_opponent, u8 p_pokemonPos, bool p_show = true );
+
+        bool        tryCapture( u16 p_pokeBall );
 
         bool        endConditionHit( battleEndReason& p_battleEndReason );
         void        endBattle( battleEndReason p_battleEndReason );

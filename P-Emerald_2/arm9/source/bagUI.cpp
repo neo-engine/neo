@@ -311,11 +311,11 @@ namespace BAG {
                     }
                 } else if( p_item &&  p_item->m_itemType == item::itemType::MEDICINE ) {
                     if( FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP ) {
-                        sprintf( buffer, "Level %3d\n%3d/%3d KP", FS::SAV->m_pkmnTeam[ i ].m_Level,
+                        sprintf( buffer, "Level %3d\n%3d/%3d KP", FS::SAV->m_pkmnTeam[ i ].m_level,
                                  FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP,
                                  FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
                     } else {
-                        sprintf( buffer, "Level %3d\n Besiegt", FS::SAV->m_pkmnTeam[ i ].m_Level );
+                        sprintf( buffer, "Level %3d\n Besiegt", FS::SAV->m_pkmnTeam[ i ].m_level );
                     }
                     IO::regularFont->printString( buffer, 40, 33 + 26 * i, true, 11 );
                 } else {

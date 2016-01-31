@@ -78,8 +78,8 @@ namespace DEX {
         tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", _currPkmn, 80, 64, PKMN_SPRITE_START( 1 ), 1, tileCnt, false );
 
         tileCnt = IO::loadPKMNIcon( _currPkmn, 0, 8, PKMN_SPRITE_START( 2 ), 2, 288, false );
-        tileCnt = IO::loadTypeIcon( Type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 1, 3, tileCnt, false );
-        tileCnt = IO::loadTypeIcon( Type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 2, 4, tileCnt, false );
+        tileCnt = IO::loadTypeIcon( type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 1, 3, tileCnt, false );
+        tileCnt = IO::loadTypeIcon( type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 2, 4, tileCnt, false );
         tileCnt = IO::loadPKMNIcon( _currPkmn, 0, 8, PKMN_SPRITE_START( 3 ), 5, tileCnt, false );
         for( u8 i = PKMN_SPRITE_START( 0 ); i <= PKMN_SPRITE_START( 3 ); ++i )
             IO::OamTop->oamBuffer[ i ].isHidden = true;
@@ -138,8 +138,8 @@ namespace DEX {
 
         pokemonData data; getAll( _currPkmn, data );
         if( data.m_types[ 0 ] == NORMAL
-            || data.m_types[ 0 ] == BODEN
-            || data.m_types[ 0 ] == EIS )
+            || data.m_types[ 0 ] == GROUND
+            || data.m_types[ 0 ] == ICE_COLOR )
             IO::boldFont->setColor( BLACK_IDX, 2 );
 
         //IO::boldFont->setColor( WHITE_IDX, 2 );

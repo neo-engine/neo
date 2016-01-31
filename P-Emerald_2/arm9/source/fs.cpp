@@ -600,7 +600,7 @@ bool berry::load( ) {
     fscanf( f, "%hu %hhu", &m_berryData.m_berrySize, &tmp );
     m_berryData.m_berryGuete = static_cast<berry::berryGueteType>( tmp );
     fscanf( f, "%hhu %hhu", &tmp, &m_berryData.m_naturalGiftStrength );
-    m_berryData.m_naturalGiftType = static_cast<Type>( tmp );
+    m_berryData.m_naturalGiftType = static_cast<type>( tmp );
 
     for( u8 i = 0; i < 5; ++i )
         fscanf( f, "%hhu", &m_berryData.m_berryTaste[ i ] );

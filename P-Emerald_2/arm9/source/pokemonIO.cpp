@@ -320,22 +320,22 @@ u16 calcLevel( const pokemon::boxPokemon& p_boxdata, const pokemonData& p_data )
 pokemon::pokemon( pokemon::boxPokemon p_boxPokemon )
     : m_boxdata( p_boxPokemon ) {
     getAll( p_boxPokemon.m_speciesId, data );
-    m_Level = calcLevel( p_boxPokemon, data );
-    m_stats = calcStats( m_boxdata, m_Level, data );
-    m_status.m_Asleep = m_status.m_Burned = m_status.m_Frozen = m_status.m_Paralyzed = m_status.m_Poisoned = m_status.m_Toxic = false;
+    m_level = calcLevel( p_boxPokemon, data );
+    m_stats = calcStats( m_boxdata, m_level, data );
+    m_status.m_isAsleep = m_status.m_isBurned = m_status.m_isFrozen = m_status.m_isParalyzed = m_status.m_isPoisoned = m_status.m_isBadlyPoisoned = false;
 }
 pokemon::pokemon( u16 p_pkmnId, u16 p_level, const wchar_t* p_name, u8 p_shiny,
                   bool p_hiddenAbility, bool p_isEgg, u8 p_pokerus, bool p_fatefulEncounter )
-    : m_boxdata( p_pkmnId, p_level, p_name, p_shiny, p_hiddenAbility, p_isEgg, p_pokerus, p_fatefulEncounter ), m_Level( p_level ) {
+    : m_boxdata( p_pkmnId, p_level, p_name, p_shiny, p_hiddenAbility, p_isEgg, p_pokerus, p_fatefulEncounter ), m_level( p_level ) {
     m_stats = calcStats( m_boxdata, p_level, data );
-    m_status.m_Asleep = m_status.m_Burned = m_status.m_Frozen = m_status.m_Paralyzed = m_status.m_Poisoned = m_status.m_Toxic = false;
+    m_status.m_isAsleep = m_status.m_isBurned = m_status.m_isFrozen = m_status.m_isParalyzed = m_status.m_isPoisoned = m_status.m_isBadlyPoisoned = false;
 }
 pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const wchar_t* p_name, u16 p_level, u16 p_id, u16 p_sid, const wchar_t* p_oT, bool p_oTFemale,
                   u8 p_shiny, bool p_hiddenAbility, bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace, u8 p_ball, u8 p_pokerus )
     : m_boxdata( p_moves, p_pkmnId, p_name, p_level, p_id, p_sid, p_oT, p_oTFemale, p_shiny,
-                 p_hiddenAbility, p_fatefulEncounter, p_isEgg, p_gotPlace, p_ball, p_pokerus ), m_Level( p_level ) {
+                 p_hiddenAbility, p_fatefulEncounter, p_isEgg, p_gotPlace, p_ball, p_pokerus ), m_level( p_level ) {
     m_stats = calcStats( m_boxdata, p_level, data );
-    m_status.m_Asleep = m_status.m_Burned = m_status.m_Frozen = m_status.m_Paralyzed = m_status.m_Poisoned = m_status.m_Toxic = false;
+    m_status.m_isAsleep = m_status.m_isBurned = m_status.m_isFrozen = m_status.m_isParalyzed = m_status.m_isPoisoned = m_status.m_isBadlyPoisoned = false;
 }
 
 bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
@@ -347,7 +347,7 @@ bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
     getAll( m_boxdata.m_speciesId, data );
 
     for( int i = 0; i < 7; ++i ) {
-        if( m_Level < data.m_evolutions[ i ].m_e.m_evolveLevel )
+        if( m_level < data.m_evolutions[ i ].m_e.m_evolveLevel )
             continue;
         if( m_boxdata.m_steps < data.m_evolutions[ i ].m_e.m_evolveFriendship )
             continue;
@@ -404,7 +404,7 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
     int into = 0;
 
     for( int i = 0; i < 7; ++i ) {
-        if( m_Level < data.m_evolutions[ i ].m_e.m_evolveLevel )
+        if( m_level < data.m_evolutions[ i ].m_e.m_evolveLevel )
             continue;
         if( m_boxdata.m_steps < data.m_evolutions[ i ].m_e.m_evolveFriendship )
             continue;
@@ -455,7 +455,7 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
     m_boxdata.m_speciesId = into;
     getAll( m_boxdata.m_speciesId, data );
     if( m_boxdata.m_speciesId != 292 )
-        m_stats.m_maxHP = ( ( m_boxdata.m_individualValues.m_hp + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )*m_Level / 100 ) + 10;
+        m_stats.m_maxHP = ( ( m_boxdata.m_individualValues.m_hp + 2 * data.m_bases[ 0 ] + ( m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )*m_level / 100 ) + 10;
     else
         m_stats.m_maxHP = 1;
 
@@ -463,11 +463,11 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
         wcscpy( m_boxdata.m_name, getWDisplayName( m_boxdata.m_speciesId ) );
 
     pkmnNatures nature = m_boxdata.getNature( );
-    m_stats.m_Atk = ( ( ( m_boxdata.m_individualValues.m_attack + 2 * data.m_bases[ 1 ] + ( m_boxdata.m_effortValues[ 1 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];
-    m_stats.m_Def = ( ( ( m_boxdata.m_individualValues.m_defense + 2 * data.m_bases[ 2 ] + ( m_boxdata.m_effortValues[ 2 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 1 ];
-    m_stats.m_Spd = ( ( ( m_boxdata.m_individualValues.m_speed + 2 * data.m_bases[ 3 ] + ( m_boxdata.m_effortValues[ 3 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 2 ];
-    m_stats.m_SAtk = ( ( ( m_boxdata.m_individualValues.m_sAttack + 2 * data.m_bases[ 4 ] + ( m_boxdata.m_effortValues[ 4 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 3 ];
-    m_stats.m_SDef = ( ( ( m_boxdata.m_individualValues.m_sDefense + 2 * data.m_bases[ 5 ] + ( m_boxdata.m_effortValues[ 5 ] >> 2 ) )*m_Level / 100.0 ) + 5 )*NatMod[ nature ][ 4 ];
+    m_stats.m_Atk = ( ( ( m_boxdata.m_individualValues.m_attack + 2 * data.m_bases[ 1 ] + ( m_boxdata.m_effortValues[ 1 ] >> 2 ) )*m_level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];
+    m_stats.m_Def = ( ( ( m_boxdata.m_individualValues.m_defense + 2 * data.m_bases[ 2 ] + ( m_boxdata.m_effortValues[ 2 ] >> 2 ) )*m_level / 100.0 ) + 5 )*NatMod[ nature ][ 1 ];
+    m_stats.m_Spd = ( ( ( m_boxdata.m_individualValues.m_speed + 2 * data.m_bases[ 3 ] + ( m_boxdata.m_effortValues[ 3 ] >> 2 ) )*m_level / 100.0 ) + 5 )*NatMod[ nature ][ 2 ];
+    m_stats.m_SAtk = ( ( ( m_boxdata.m_individualValues.m_sAttack + 2 * data.m_bases[ 4 ] + ( m_boxdata.m_effortValues[ 4 ] >> 2 ) )*m_level / 100.0 ) + 5 )*NatMod[ nature ][ 3 ];
+    m_stats.m_SDef = ( ( ( m_boxdata.m_individualValues.m_sDefense + 2 * data.m_bases[ 5 ] + ( m_boxdata.m_effortValues[ 5 ] >> 2 ) )*m_level / 100.0 ) + 5 )*NatMod[ nature ][ 4 ];
 
     m_stats.m_acHP = m_stats.m_maxHP - HPdif;
 }

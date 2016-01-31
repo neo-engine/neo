@@ -1189,6 +1189,8 @@ NEXT_PASS:
             && atom( p_start.m_posX, p_start.m_posY ).m_movedata != 0x3c;
     }
     void mapDrawer::fishPlayer( direction p_direction, u8 p_rodType ) {
+        PLAYER_IS_FISHING = true;
+
         u8 basePic = FS::SAV->m_player.m_picNum / 10 * 10;
         FS::SAV->m_player.m_picNum = basePic + 6;
         bool surfing = ( FS::SAV->m_player.m_movement == SURF );
@@ -1250,6 +1252,8 @@ OUT:
             //Start wild PKMN battle here
             handleWildPkmn( FISHING_ROD, p_rodType );
         }
+
+        PLAYER_IS_FISHING = false;
     }
 
     void mapDrawer::usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny ) {

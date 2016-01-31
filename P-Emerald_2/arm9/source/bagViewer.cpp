@@ -82,7 +82,7 @@ namespace BAG {
                     newEffect &= ~( 1 << ( 9 + 16 * !i ) );
                     newEffect |= ( res << ( 9 + 16 * !i ) );
                 }
-            u8 oldLv = p_pokemon.m_Level;
+            u8 oldLv = p_pokemon.m_level;
             if( ItemList[ p_item ]->use( p_pokemon ) ) {
 
                 sprintf( buffer, "%s auf %ls angewendet.", ItemList[ p_item ]->getDisplayName( true ).c_str( ),
@@ -95,7 +95,7 @@ namespace BAG {
                 FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, p_item, 1 );
 
                 //Check for evolution
-                if( p_pokemon.m_Level != oldLv && p_pokemon.canEvolve( ) ) {
+                if( p_pokemon.m_level != oldLv && p_pokemon.canEvolve( ) ) {
                     initUI( );
                     IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;

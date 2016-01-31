@@ -143,5 +143,5 @@ namespace IO {
     void topScreenPlot( u8 p_x, u8 p_y, color p_color );
     void btmScreenPlot( u8 p_x, u8 p_y, color p_color );
 
-    u16 getColor( Type p_type );
+    u16 getColor( type p_type );
 }

@@ -129,7 +129,7 @@ namespace BATTLE {
         IO::boldFont->setColor( WHITE_IDX, 2 );
 
         BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-        BG_PALETTE_SUB[ GRAY_IDX ] = STEEL;
+        BG_PALETTE_SUB[ GRAY_IDX ] = STEEL_COLOR;
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
         BG_PALETTE_SUB[ RED_IDX ] = RED;
         BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;
@@ -137,7 +137,7 @@ namespace BATTLE {
     void battleUI::initLogScreen( ) {
         initColors( );
         BG_PALETTE[ WHITE_IDX ] = WHITE;
-        BG_PALETTE[ GRAY_IDX ] = STEEL;
+        BG_PALETTE[ GRAY_IDX ] = STEEL_COLOR;
         BG_PALETTE[ BLACK_IDX ] = BLACK;
         BG_PALETTE[ RED_IDX ] = RED;
         BG_PALETTE[ BLUE_IDX ] = BLUE;
@@ -182,7 +182,8 @@ namespace BATTLE {
 #define HP_PAL                8
 #define PLAT_PAL              9
 
-#define PKMN_TILE_START       0
+#define PB_ANIM_TILES         0
+#define PKMN_TILE_START      64
 #define PKMN_TILE_IDX( p_pokemonPos, p_opponent ) ( PKMN_TILE_START + 144 * ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
     u16 TILESTART = ( PKMN_TILE_START + 4 * 144 );
 
@@ -614,8 +615,8 @@ namespace BATTLE {
             IO::displayHP( 100, 100 - acPkmn.m_stats.m_acHP * 100 / acPkmn.m_stats.m_maxHP,
                            hpx, hpy, HP_COL( 0, OPPONENT ), HP_COL( 0, OPPONENT ) + 1, false );
 
-            IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
-                           ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ),
+            IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
+                           ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
                            hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
 
             consoleSelect( &IO::Top );
@@ -623,7 +624,7 @@ namespace BATTLE {
             printf( "%10ls%c\n",
                     acPkmn.m_boxdata.m_name,
                     GENDER( acPkmn ) );
-            printf( "Lv%3d%4dKP\n", acPkmn.m_Level,
+            printf( "Lv%3d%4dKP\n", acPkmn.m_level,
                     acPkmn.m_stats.m_acHP );
         }
     }
@@ -739,7 +740,7 @@ namespace BATTLE {
 
             consoleSetWindow( &IO::Bottom, ( x + 6 ) / 8, ( y + 6 ) / 8, 20, 8 );
             if( !acPkmn.m_boxdata.m_individualValues.m_isEgg ) {
-                printf( "       Lv.%3d", acPkmn.m_Level );
+                printf( "       Lv.%3d", acPkmn.m_level );
                 printf( "\n%14ls\n", acPkmn.m_boxdata.m_name );
                 printf( "%14s\n\n",
                         ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) );
@@ -813,7 +814,7 @@ namespace BATTLE {
                     p_pokemon.m_boxdata.m_name,
                     GENDER( p_pokemon ),
                     ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
-                    p_pokemon.m_Level,
+                    p_pokemon.m_level,
                     p_pokemon.m_stats.m_acHP,
                     p_pokemon.m_stats.m_maxHP );
         } else {
@@ -935,15 +936,15 @@ namespace BATTLE {
             tilecnt = t2;
 
             consoleSetWindow( &IO::Bottom, 4, 0, 12, 2 );
-            printf( "EP(%3lu%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
-                    * 100 / ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
+            printf( "EP(%3lu%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] )
+                    * 100 / ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
                     p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::displayHP( 100, 101, 46, 40, 245, 246, false, 50, 56, true );
             IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 40, 245, 246, false, 50, 56, true );
 
             IO::displayEP( 100, 101, 46, 40, 247, 248, false, 59, 62, true );
-            IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] )
-                           * 100 / ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
+            IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] )
+                           * 100 / ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
                            46, 40, 247, 248, false, 59, 62, true );
             IO::regularFont->setColor( WHITE_IDX, 1 );
 
@@ -1349,11 +1350,6 @@ SHOW_ATTACK:
                                     result.m_newItemEffect &= ~( 1 << ( 9 + 16 * !i ) );
                                     result.m_newItemEffect |= ( res << ( 9 + 16 * !i ) );
                                 }
-                            IO::initOAMTable( true );
-                            IO::drawSub( );
-                            loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                             _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
-                            setDeclareBattleMoveSpriteVisibility( p_showBack, true );
                         } else {
                             loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                                              _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
@@ -1361,11 +1357,18 @@ SHOW_ATTACK:
                         }
                     } else if( ItemList[ result.m_value ]->m_itemType == item::POKE_BALLS )
                         result.m_target |= ( 1 << 2 );
+                    IO::initOAMTable( true );
+                    IO::drawSub( );
+                    loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+                                     _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
 
+                    setDeclareBattleMoveSpriteVisibility( p_showBack, true );
+                    initLogScreen( );
                     loadA( );
                     return true;
                 }
 NEXT_TRY:
+                initLogScreen( );
                 swprintf( wbuffer, 50, L"Was soll %ls tun?", ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
                 writeLogText( wbuffer );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
@@ -1889,7 +1892,7 @@ CLEAR:
             printf( "%10ls%c\n",
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
                     GENDER( ACPKMN2( *_battle, p_pokemonPos, p_opponent ) ) );
-            printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_Level,
+            printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_level,
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
         } else {
             consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
@@ -1897,7 +1900,7 @@ CLEAR:
             printf( "%10ls%c\n",
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
                     GENDER( ACPKMN2( *_battle, p_pokemonPos, p_opponent ) ) );
-            printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_Level,
+            printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_level,
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
         }
     }
@@ -1918,45 +1921,45 @@ CLEAR:
 
         getAll( acPkmn.m_boxdata.m_speciesId, p );
 
-        u16 expStart = ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] - p_gainedExp ) * 100 /
-            ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] );
-        u16 expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
-                                                ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) ) );
+        u16 expStart = ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] - p_gainedExp ) * 100 /
+            ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] );
+        u16 expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
+                                                ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
 
         std::swprintf( wbuffer, 50, L"%ls gewinnt %d E.-Punkte.[A]", acPkmn.m_boxdata.m_name, p_gainedExp );
         _battle->log( wbuffer );
         IO::displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
 
 
-        bool newLevel = EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+        bool newLevel = EXP[ acPkmn.m_level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
         u16 HPdif = acPkmn.m_stats.m_maxHP - acPkmn.m_stats.m_acHP;
         u16 oldHP = acPkmn.m_stats.m_acHP;
         u16 oldHPmax = acPkmn.m_stats.m_maxHP;
 
         while( newLevel ) {
-            acPkmn.m_Level++;
+            acPkmn.m_level++;
 
             if( acPkmn.m_boxdata.m_speciesId != 292 ) //Check for Ninjatom
                 acPkmn.m_stats.m_maxHP = ( ( acPkmn.m_boxdata.m_individualValues.m_hp + 2 * p.m_bases[ 0 ]
-                                             + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
+                                             + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_level / 100 ) + 10;
             else
                 acPkmn.m_stats.m_maxHP = 1;
             pkmnNatures nature = acPkmn.m_boxdata.getNature( );
 
             acPkmn.m_stats.m_Atk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
-                                         + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
+                                         + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
             acPkmn.m_stats.m_Def = ( ( ( acPkmn.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ DEF + 1 ]
-                                         + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
+                                         + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
             acPkmn.m_stats.m_Spd = ( ( ( acPkmn.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ SPD + 1 ]
-                                         + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
+                                         + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
             acPkmn.m_stats.m_SAtk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ SATK + 1 ]
-                                          + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
+                                          + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
             acPkmn.m_stats.m_SDef = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ SDEF + 1 ]
-                                          + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
+                                          + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
 
             acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
 
-            std::swprintf( wbuffer, 50, L"%ls erreicht Level %d.[A]", acPkmn.m_boxdata.m_name, acPkmn.m_Level );
+            std::swprintf( wbuffer, 50, L"%ls erreicht Level %d.[A]", acPkmn.m_boxdata.m_name, acPkmn.m_level );
             _battle->log( wbuffer );
 
             updateHP( p_opponent, p_pokemonPos, oldHP, oldHPmax );
@@ -1968,11 +1971,11 @@ CLEAR:
             _battle->checkForEvolution( PLAYER, p_pokemonPos );
             if( oldSpec != acPkmn.m_boxdata.m_speciesId )
                 _battle->checkForAttackLearn( p_pokemonPos );
-            newLevel = acPkmn.m_Level < 100 && EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+            newLevel = acPkmn.m_level < 100 && EXP[ acPkmn.m_level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
 
             expStart = 0;
-            expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
-                                                ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) ) );
+            expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
+                                                ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
 
             IO::displayEP( 101, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
             IO::displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
@@ -2112,8 +2115,8 @@ CLEAR:
         IO::displayHP( 100, 100 - acPkmn.m_stats.m_acHP * 100 / acPkmn.m_stats.m_maxHP,
                        hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
 
-        IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ) * 100 /
-                       ( EXP[ acPkmn.m_Level ][ p.m_expType ] - EXP[ acPkmn.m_Level - 1 ][ p.m_expType ] ),
+        IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
+                       ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
                        hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
 
         consoleSelect( &IO::Top );
@@ -2122,14 +2125,14 @@ CLEAR:
             printf( "%10ls%c\n",
                     acPkmn.m_boxdata.m_name,
                     GENDER( acPkmn ) );
-            printf( "Lv%3d%4dKP\n", acPkmn.m_Level,
+            printf( "Lv%3d%4dKP\n", acPkmn.m_level,
                     acPkmn.m_stats.m_acHP );
         } else {
             consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             printf( "%10ls%c\n",
                     acPkmn.m_boxdata.m_name,
                     GENDER( acPkmn ) );
-            printf( "Lv%3d%4dKP\n", acPkmn.m_Level,
+            printf( "Lv%3d%4dKP\n", acPkmn.m_level,
                     acPkmn.m_stats.m_acHP );
         }
     }
@@ -2264,6 +2267,201 @@ ST:
 
         dmaCopy( mug_001_1Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         dmaCopy( mug_001_1Pal, BG_PALETTE, 64 );
+    }
+
+    void battleUI::capture( u16 p_pokeBall, u8 p_ticks ) {
+        IO::loadSprite( PB_ANIM, 15, PB_ANIM_TILES, 72, 100, 16, 16,
+                        PokeBall1Pal, PokeBall1Tiles, PokeBall1TilesLen,
+                        false, false, false, OBJPRIORITY_0, false );
+        IO::copySpriteData( PokeBall1Tiles, PB_ANIM_TILES, PokeBall1TilesLen, false );
+        IO::updateOAM( false );
+
+        u8 y;
+        for( u8 x = 92; x <= 184; x += 2 ) {
+            y = u8( .01 * x * x - 3 * x + 236 );
+            IO::OamTop->oamBuffer[ PB_ANIM ].x = x;
+            IO::OamTop->oamBuffer[ PB_ANIM ].y = y;
+            u8 f = x - 92;
+            if( f % 36 == 0 )
+                IO::copySpriteData( PokeBall1Tiles, PB_ANIM_TILES, PokeBall1TilesLen, false );
+            if( f % 36 == 4 )
+                IO::copySpriteData( PokeBall2Tiles, PB_ANIM_TILES, PokeBall2TilesLen, false );
+            if( f % 36 == 8 )
+                IO::copySpriteData( PokeBall3Tiles, PB_ANIM_TILES, PokeBall3TilesLen, false );
+            if( f % 36 == 12 )
+                IO::copySpriteData( PokeBall4Tiles, PB_ANIM_TILES, PokeBall4TilesLen, false );
+            if( f % 36 == 16 )
+                IO::copySpriteData( PokeBall5Tiles, PB_ANIM_TILES, PokeBall5TilesLen, false );
+            if( f % 36 == 20 )
+                IO::copySpriteData( PokeBall6Tiles, PB_ANIM_TILES, PokeBall6TilesLen, false );
+            if( f % 36 == 24 )
+                IO::copySpriteData( PokeBall7Tiles, PB_ANIM_TILES, PokeBall7TilesLen, false );
+            if( f % 36 == 28 )
+                IO::copySpriteData( PokeBall8Tiles, PB_ANIM_TILES, PokeBall8TilesLen, false );
+            if( f % 36 == 32 )
+                IO::copySpriteData( PokeBall9Tiles, PB_ANIM_TILES, PokeBall9TilesLen, false );
+            IO::updateOAM( false );
+            swiWaitForVBlank( );
+            if( x % 4 == 2 )
+                swiWaitForVBlank( );
+        }
+        IO::copySpriteData( PokeBall1Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+
+        if( p_ticks == (u8) -1 ) {
+            IO::OamTop->oamBuffer[ PB_ANIM ].isHidden = true;
+            IO::updateOAM( false );
+            _battle->log( L"Der Ball wurde abgeblockt.\nSei kein Dieb![A]" );
+            return;
+        }
+        for( int i = 0; i < 4; ++i )
+            swiWaitForVBlank( );
+
+        IO::copySpriteData( PokeBall11Tiles, PB_ANIM_TILES, PokeBall11TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 8; ++i )
+            swiWaitForVBlank( );
+        IO::updateOAM( false );
+
+        for( u8 i = 0; i < 4; ++i )
+            IO::OamTop->oamBuffer[ PKMN_IDX( 0, OPPONENT ) + i ].isHidden = true;
+        IO::updateOAM( false );
+
+        for( int i = 0; i < 3; ++i )
+            swiWaitForVBlank( );
+
+        IO::copySpriteData( PokeBall1Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+
+        for( ; y <= 76; y += 2 ) {
+            IO::OamTop->oamBuffer[ PB_ANIM ].y = y;
+            IO::updateOAM( false );
+            swiWaitForVBlank( );
+        }
+        for( ; y >= 64; y-- ) {
+            IO::OamTop->oamBuffer[ PB_ANIM ].y = y;
+            IO::updateOAM( false );
+            swiWaitForVBlank( );
+        }
+        for( ; y <= 76; y++ ) {
+            IO::OamTop->oamBuffer[ PB_ANIM ].y = y;
+            IO::updateOAM( false );
+            swiWaitForVBlank( );
+        }
+        for( int i = 0; i < 15; ++i )
+            swiWaitForVBlank( );
+
+        if( !p_ticks ) goto BREAK;
+
+        for( int i = 0; i < 30; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall12Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall13Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall14Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall13Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall12Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall1Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 30; ++i )
+            swiWaitForVBlank( );
+
+        if( p_ticks == 1 ) goto BREAK;
+
+        for( int i = 0; i < 30; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall15Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall16Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall17Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall16Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall15Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall1Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 30; ++i )
+            swiWaitForVBlank( );
+
+        if( p_ticks == 2 ) goto BREAK;
+
+        for( int i = 0; i < 30; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall12Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall13Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall14Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall13Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall12Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 5; ++i )
+            swiWaitForVBlank( );
+        IO::copySpriteData( PokeBall1Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
+        IO::updateOAM( false );
+        for( int i = 0; i < 30; ++i )
+            swiWaitForVBlank( );
+
+        if( p_ticks == 3 ) goto BREAK;
+
+        for( int i = 0; i < 30; ++i )
+            swiWaitForVBlank( );
+
+        swprintf( wbuffer, 100, L"Toll!\n%ls wurde gefangen![A]", _battle->_wildPokemon.m_pokemon->m_boxdata.m_name );
+        _battle->log( wbuffer );
+        return;
+BREAK:
+        IO::copySpriteData( PokeBall11Tiles, PB_ANIM_TILES, PokeBall11TilesLen, false );
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 4; ++i )
+            IO::OamTop->oamBuffer[ PKMN_IDX( 0, OPPONENT ) + i ].isHidden = false;
+        IO::OamTop->oamBuffer[ PB_ANIM ].isHidden = true;
+        IO::updateOAM( false );
+        if( p_ticks == 0 ) _battle->log( L"Mist!\nEs hat sich befreit...[A]" );
+        else if( p_ticks == 1 ) _battle->log( L"Oh.\nFast war es gefangen...[A]" );
+        else if( p_ticks == 2 ) _battle->log( L"Mist!\nDas war knapp...[A]" );
+        else if( p_ticks == 3 ) _battle->log( L"Verflixt!\nEs war doch fast gefangen...[A]" );
+        return;
+    }
+
+    void battleUI::handleCapture( ) {
+
     }
 
     //////////////////////////////////////////////////////////////////////////
