@@ -43,6 +43,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "fs.h"
 #include "sprite.h"
 #include "uio.h"
+#include "dex.h"
 
 namespace BATTLE {
     const std::vector<std::wstring> trainerclassnames{ L"PKMN-Trainer" };
@@ -299,9 +300,9 @@ CHOOSE1:
     void battle::initBattle( ) {
         //Some basic initialization stuff
         if( !_battleUI )
-            battle::_battleUI = new battleUI( this );
+            _battleUI = new battleUI( this );
         else
-            battle::_battleUI->_battle = this;
+            _battleUI->_battle = this;
         _battleUI->init( );
         pokemonData pdata;
         for( u8 i = 0; i < 6; ++i ) {
@@ -1058,15 +1059,26 @@ NEXT:
                         _battleUI->capture( _battleMoves[ p_pokemonPos ][ p_opponent ].m_value, -1 );
                     } else if( tryCapture( _battleMoves[ p_pokemonPos ][ p_opponent ].m_value ) ) {
                         _wildPokemon.m_pokemon->m_boxdata.m_ball = _battleMoves[ p_pokemonPos ][ p_opponent ].m_value;
-                        FS::SAV->storePkmn( *_wildPokemon.m_pokemon );
-                        u16 spid = _wildPokemon.m_pokemon->m_boxdata.m_speciesId;
-                        FS::SAV->m_inDex[ spid / 8 ] |= ( 1 << ( spid % 8 ) );
                         _endBattle = true;
-                        _battleUI->handleCapture( );
+                        handleCapture( );
                     }
                 }
             }
         }
+    }
+
+    void battle::handleCapture( ) {
+        u16 spid = _wildPokemon.m_pokemon->m_boxdata.m_speciesId;
+        if( !( FS::SAV->m_inDex[ spid / 8 ] & ( 1 << ( spid % 8 ) ) ) ) {
+            FS::SAV->m_inDex[ spid / 8 ] |= ( 1 << ( spid % 8 ) );
+            swprintf( wbuffer, 100, L"Die Daten von %ls\nwurden im Dex gespeichert.[A]",
+                      _wildPokemon.m_pokemon->m_boxdata.m_name );
+            log( wbuffer );
+
+            DEX::dex( -1, 0 ).run( _wildPokemon.m_pokemon->m_boxdata.m_speciesId );
+        }
+        _battleUI->handleCapture( );
+        FS::SAV->storePkmn( *_wildPokemon.m_pokemon );
     }
 
     /**

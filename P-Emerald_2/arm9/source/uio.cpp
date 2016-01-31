@@ -177,11 +177,12 @@ namespace IO {
         return waitForTouchUp( inputTarget( p_targetX1, p_targetY1, p_targetX2, p_targetY2 ) );
     }
     bool waitForTouchUp( inputTarget p_inputTarget ) {
+        touchPosition touch;
         if( p_inputTarget.m_inputType == inputTarget::inputType::TOUCH ) {
             loop( ) {
                 swiWaitForVBlank( );
                 scanKeys( );
-                auto touch = touchReadXY( );
+                touchRead( &touch );
                 if( touch.px == 0 && touch.py == 0 )
                     return true;
                 if( !IN_RANGE( touch, p_inputTarget ) )
@@ -192,7 +193,7 @@ namespace IO {
             loop( ) {
                 swiWaitForVBlank( );
                 scanKeys( );
-                auto touch = touchReadXY( );
+                touchRead( &touch );
                 if( touch.px == 0 && touch.py == 0 )
                     return true;
                 if( !IN_RANGE_C( touch, p_inputTarget ) )

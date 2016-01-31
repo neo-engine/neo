@@ -36,139 +36,230 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "A.h"
 #include "Forward.h"
+#include "Backward.h"
 #include "Back.h"
 
 namespace IO {
-    const u16 height = 18, width = 12;
-    const u16 x = 16, y = 70;
-    const u16 margin = 2;
-    const u16 charsPerRow = 13;
+    const u8 height = 16, width = 16;
+    const u8 textHeight = 14, textWidth = 12;
+    const u8 sx = 16, sy = 68;
+    const u8 margin = 4;
+    const u8 charsPerRow = 11;
+    const u8 numRows = 5;
 
-    keyboard::keyboard( ) {
-        _ind = 0;
-        //Initialize the keyboard's characters
+    const char* pages[ ] = {
+        "ABCDEFG  .:"
+        "HIJKLMN  ,;"
+        "OPQRSTU  !?"
+        "VWXYZ   ÄÖÜ"
+        "1234567890 ",
 
-        std::string spchars[ ] = { "ÄÖÜ .!?()[]{}", "äöüßé §$%&/\\#" };
-        for( wchar_t c = L'A'; c <= L'Z'; ++c ) {
-            u16 idx = u16( c - L'A' );
+        "abcdefg  .:"
+        "hijklmn  ,;"
+        "opqrstu  !?"
+        "vwxyz ß äöü"
+        "1234567890 ",
 
-            u16 xpos = x + ( ( idx % charsPerRow ) * ( width + margin ) );
-            u16 ypos = y + ( ( idx / charsPerRow ) * ( height * margin ) );
+        "ÀÁÂÄÇÈÉÊË ¡"
+        "ÌÍÎÏÑÒÓÔÖ ¿"
+        "ÙÚÛÜŒ $… {}"
+        "+-*/~()#&×÷"
+        "1234567890 ",
 
-            _chars[ { (u8) 0, { xpos, ypos } } ] = c;
-            _chars[ { (u8) 1, { xpos, ypos } } ] = L'a' + idx;
-            if( idx < 10 )
-                _chars[ { (u8) 2, { xpos, ypos } } ] = L'0' + idx;
+        "àáâäåçèéêë "
+        "ìíîïñòóôö @"
+        "ùúûüßœ · {}"
+        "+-*/~()#&×÷"
+        "1234567890 ",
+    };
 
-            if( idx < charsPerRow ) {
-                ypos += u16( 3 * ( height * margin ) );
+    std::string guardEmptyString( const std::string& p_string ) {
+        for( auto i : p_string )
+            if( i != ' ' )
+                return p_string;
+        return "";
+    }
 
-                _chars[ { (u8) 0, { xpos, ypos } } ] = spchars[ 0 ][ idx ];
-                _chars[ { (u8) 1, { xpos, ypos } } ] = spchars[ 1 ][ idx ];
+    std::string keyboard::getText( u8 p_length ) {
+        _page = 0;
+        for( u8 i = 0; i < p_length; ++i )
+            clearChar( i );
+
+        std::string res = "";
+        char c;
+        u8 pos = 0;
+        loop( ) {
+            c = getNextChar( );
+            switch( c ) {
+                case '\n':
+                    return guardEmptyString( res );
+                case '\b':
+                    if( pos )
+                        clearChar( --pos );
+                    break;
+                case '\a':
+                    _page = ( _page + 1 ) % MAX_KEYBOARD_PAGES;
+                    drawPage( );
+                    break;
+                default:
+                    if( pos < p_length ) {
+                        res += c;
+                        drawChar( pos++, c );
+                    }
+                    break;
             }
         }
     }
 
-    std::wstring keyboard::getText( u16 p_length, const char* p_msg ) {
+    std::string keyboard::getText( u8 p_length, const char* p_msg ) {
+        drawPage( p_msg );
+        return getText( p_length );
+    }
+    std::string keyboard::getText( u8 p_length, const wchar_t* p_msg ) {
+        drawPage( p_msg );
+        return getText( p_length );
+    }
+    std::wstring keyboard::getWText( u8 p_length, const char* p_msg ) {
+        auto rs = getText( p_length, p_msg );
+        std::wstring res = L"";
+        for( auto i : rs ) res += i;
+        return res;
+    }
+    std::wstring keyboard::getWText( u8 p_length, const wchar_t* p_msg ) {
+        auto rs = getText( p_length, p_msg );
+        std::wstring res = L"";
+        for( auto i : rs ) res += i;
+        return res;
+    }
 
+    void init( ) {
         initOAMTable( true );
-        u16 nextAvailableTileIdx = 16;
+        u16 tileCnt = 0;
 
-        nextAvailableTileIdx = loadSprite( A_ID, 0, nextAvailableTileIdx,
-                                           SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
-                                           ATiles, ATilesLen, false, false, false, OBJPRIORITY_0, true );
-        nextAvailableTileIdx = loadSprite( FWD_ID, 1, nextAvailableTileIdx,
-                                           SCREEN_WIDTH - 24, SCREEN_HEIGHT - 28 - 22, 32, 32, ForwardPal,
-                                           ForwardTiles, ForwardTilesLen, false, false, false, OBJPRIORITY_1, true );
-        nextAvailableTileIdx = loadSprite( BWD_ID, 2, nextAvailableTileIdx,
-                                           SCREEN_WIDTH - 28 - 18, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                                           BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_1, true );
-
+        tileCnt = loadSprite( A_ID, 0, tileCnt,
+                              SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
+                              ATiles, ATilesLen, false, false, false, OBJPRIORITY_0, true );
+        tileCnt = loadSprite( FWD_ID, 1, tileCnt,
+                              SCREEN_WIDTH - 24, SCREEN_HEIGHT - 28 - 24, 32, 32, ForwardPal,
+                              ForwardTiles, ForwardTilesLen, false, false, false, OBJPRIORITY_1, true );
+        tileCnt = loadSprite( BWD_ID, 2, tileCnt,
+                              SCREEN_WIDTH - 28 - 24, SCREEN_HEIGHT - 24, 32, 32, BackwardPal,
+                              BackwardTiles, BackwardTilesLen, false, false, false, OBJPRIORITY_1, true );
         updateOAM( true );
+        drawSub( );
+        initTextField( );
 
-        std::wstring out = L"";
-        draw( p_msg, out, p_length );
+    }
 
+    void keyboard::drawPage( ) {
+        BG_PALETTE_SUB[ COLOR_IDX ] = RGB( 30 * ( _page == 0 ), 30 * ( _page == 1 ), 30 * ( _page == 2 ) );
+        for( u8 y = 0; y < numRows; ++y )
+            for( u8 x = 0; x < charsPerRow; ++x ) {
+                u8 px = sx + x * ( width + margin );
+                u8 py = sy + y * ( height + margin );
+
+                printChoiceBox( px, py, px + width, py + height,
+                                2, COLOR_IDX, false );
+                printChar( regularFont, pages[ _page ][ y * charsPerRow + x ],
+                           px + 2, py + 2, true );
+            }
+    }
+
+    void keyboard::drawPage( const char* p_msg ) {
+        init( );
+        if( p_msg != 0 )
+            regularFont->printString( p_msg, 8, 4, true );
+        drawPage( );
+    }
+    void keyboard::drawPage( const wchar_t* p_msg ) {
+        init( );
+        if( p_msg != 0 )
+            regularFont->printString( p_msg, 8, 4, true );
+        drawPage( );
+    }
+
+    void keyboard::drawChar( u8 p_pos, u16 p_char ) {
+        printChar( regularFont, p_char, 8 + p_pos * ( textWidth + margin ) + 2,
+                   -13 + ( textHeight + 2 * margin ) + textHeight, true );
+    }
+    void keyboard::clearChar( u8 p_pos ) {
+        printRectangle( 8 + p_pos * ( textWidth + margin ), 2 + textHeight + 2 * margin,
+                        8 + p_pos * ( textWidth + margin ) + textWidth, 4 + 2 * textHeight + 2 * margin,
+                        true, false, GRAY_IDX );
+        printChar( regularFont, '_', 8 + p_pos * ( textWidth + margin ) + 1,
+                   -10 + 2 * textHeight + 2 * margin, true );
+    }
+
+    u16 keyboard::getNextChar( ) {
         touchPosition touch;
-        u8 i = 0;
+        int pressed;
         loop( ) {
             scanKeys( );
             touchRead( &touch );
+            pressed = keysCurrent( );
 
-            u16 keyPosX = ( touch.px - x ) / ( width + margin );
-            u16 keyPosY = ( touch.py - y ) / ( height + margin );
-
-            u16 nx = x + keyPosX * ( width + margin ),
-                ny = y + keyPosY * ( width + margin );
-
-            if( i < p_length && _chars.count( { _ind, { nx, ny } } ) ) {
-                printChoiceBox( nx, ny, nx + width, ny + height, 2, COLOR_IDX, true );
-                printChar( regularFont, _chars[ { _ind, { nx, ny } } ], nx + 4, ny + 4, true );
-                bool res = waitForTouchUp( nx, ny, nx + width, ny + height );
-
-                printChoiceBox( nx, ny, nx + width, ny + height, 2, COLOR_IDX, false );
-                printChar( regularFont, _chars[ { _ind, { nx, ny } } ], nx + 2, ny + 2, true );
-
-                if( !res )
-                    continue;
-
-                ++i;
-                out += _chars[ { _ind, { nx, ny } } ];
-
-                printChar( regularFont, _chars[ { _ind, { nx, ny } } ], 8 + i * ( width + margin ) + 2, 4 + ( height + margin ) * !!p_msg + 2, true );
-                swiWaitForVBlank( );
-            } else if( GET_AND_WAIT_C( 248, 162, 16 ) ) {
-                _ind = ( _ind + 1 ) % MAXKEYBOARDS;
-                draw( p_msg, out, p_length );
-            } else if( GET_AND_WAIT_C( 248, 184, 16 ) ) {
-                return out;
-            } else if( GET_AND_WAIT_C( 220, 184, 16 ) ) {
-                out.pop_back( );
-                --i;
-                printRectangle( 8 + i * ( width + margin ), 4 + ( height + margin ) * !!p_msg,
-                                8 + i * ( width + margin ) + width, 4 + ( height + margin ) * !!p_msg + height,
-                                true, false, GRAY_IDX );
-                printChar( regularFont, '_', 8 + i * ( width + margin ) + 2, 4 + ( height + margin ) * !!p_msg + 2, true );
-            }
-            swiWaitForVBlank( );
+            if( GET_AND_WAIT( KEY_SELECT ) )
+                return '\a';
+            if( GET_AND_WAIT( KEY_B ) )
+                return '\b';
+            if( GET_AND_WAIT( KEY_START ) )
+                return '\n';
         }
-
-        return out;
+        return '\n';
     }
 
-    void keyboard::draw( const char* p_msg, std::wstring& p_currSel, u16 p_length ) {
-        BG_PALETTE_SUB[ COLOR_IDX ] = RGB( 30 * ( _ind == 0 ), 30 * ( _ind == 1 ), 30 * ( _ind == 2 ) );
 
-        drawSub( );
-        initTextField( );
-        if( p_msg != 0 )
-            regularFont->printString( p_msg, 8, 4, true );
-        for( u8 i = 0; i < p_length; ++i ) {
-            printRectangle( 8 + i * ( width + margin ), 4 + ( height + margin ) * !!p_msg,
-                            8 + i * ( width + margin ) + width, 4 + ( height + margin ) * !!p_msg + height,
-                            true, false, GRAY_IDX );
+    /* std::wstring keyboard::getText( u16 p_length, const char* p_msg ) {
 
-            u16 currChar = '_';
-            if( i < p_currSel.length( ) )
-                currChar = p_currSel[ i ];
 
-            printChar( regularFont, currChar, 8 + i * ( width + margin ) + 2, 4 + ( height + margin ) * !!p_msg + 2, true );
-        }
+         std::wstring out = L"";
+         draw( p_msg, out, p_length );
 
-        for( auto i : _chars ) {
-            if( i.first.first != _ind )
-                continue;
+         touchPosition touch;
+         u8 i = 0;
+         loop( ) {
+             scanKeys( );
+             touchRead( &touch );
 
-            printChoiceBox( i.first.second.first,
-                            i.first.second.second,
-                            i.first.second.first + width,
-                            i.first.second.second + height,
-                            2,
-                            COLOR_IDX,
-                            false );
-            printChar( regularFont, i.second,
-                       i.first.second.first + 2,
-                       i.first.second.second + 2, true );
-        }
-    }
+             u16 keyPosX = ( touch.px - x ) / ( width + margin );
+             u16 keyPosY = ( touch.py - y ) / ( height + margin );
+
+             u16 nx = x + keyPosX * ( width + margin ),
+                 ny = y + keyPosY * ( width + margin );
+
+             if( i < p_length && _chars.count( { _ind, { nx, ny } } ) ) {
+                 printChoiceBox( nx, ny, nx + width, ny + height, 2, COLOR_IDX, true );
+                 printChar( regularFont, _chars[ { _ind, { nx, ny } } ], nx + 4, ny + 4, true );
+                 bool res = waitForTouchUp( nx, ny, nx + width, ny + height );
+
+                 printChoiceBox( nx, ny, nx + width, ny + height, 2, COLOR_IDX, false );
+                 printChar( regularFont, _chars[ { _ind, { nx, ny } } ], nx + 2, ny + 2, true );
+
+                 if( !res )
+                     continue;
+
+                 ++i;
+                 out += _chars[ { _ind, { nx, ny } } ];
+
+                 printChar( regularFont, _chars[ { _ind, { nx, ny } } ], 8 + i * ( width + margin ) + 2, 4 + ( height + margin ) * !!p_msg + 2, true );
+                 swiWaitForVBlank( );
+             } else if( GET_AND_WAIT_C( 248, 162, 16 ) ) {
+                 _ind = ( _ind + 1 ) % MAXKEYBOARDS;
+                 draw( p_msg, out, p_length );
+             } else if( GET_AND_WAIT_C( 248, 184, 16 ) ) {
+                 return out;
+             } else if( GET_AND_WAIT_C( 220, 184, 16 ) ) {
+                 out.pop_back( );
+                 --i;
+                 printRectangle( 8 + i * ( width + margin ), 4 + ( height + margin ) * !!p_msg,
+                                 8 + i * ( width + margin ) + width, 4 + ( height + margin ) * !!p_msg + height,
+                                 true, false, GRAY_IDX );
+                 printChar( regularFont, '_', 8 + i * ( width + margin ) + 2, 4 + ( height + margin ) * !!p_msg + 2, true );
+             }
+             swiWaitForVBlank( );
+         }
+
+         return out;
+     }
+ */
 }

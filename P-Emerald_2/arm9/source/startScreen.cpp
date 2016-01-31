@@ -362,7 +362,7 @@ startScreen::ChoiceResult startScreen::runChoice( ) {
     loop( ) {
         swiWaitForVBlank( );
         scanKeys( );
-        touch = touchReadXY( );
+        touchRead(&touch);
         u32 p = keysUp( );
         u32 k = keysHeld( ) | keysDown( );
         if( ( FS::SAV->m_savTyp == 1 ) && ( k & KEY_SELECT ) && ( k & KEY_RIGHT ) && ( k & KEY_L ) && ( k & KEY_R ) ) {

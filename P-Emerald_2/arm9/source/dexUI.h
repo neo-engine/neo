@@ -35,7 +35,6 @@ namespace DEX {
         friend class dex;
     private:
         bool _useInDex;
-        u16 _currPkmn;
         u16 _maxPkmn;
         u8 _currPage;
         u8 _currForme;
@@ -45,10 +44,7 @@ namespace DEX {
         void drawFormes( u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName );
         void undrawFormes( u16 p_formeIdx );
     public:
-        dexUI( bool p_useInDex, u16 p_currPkmn, u16 p_maxPkmn )
-            : _useInDex( p_useInDex ), _currPkmn( p_currPkmn ), _maxPkmn( p_maxPkmn ), _currPage( 0 ) { }
-        u16 currPkmn( ) {
-            return _currPkmn;
-        }
+        dexUI( bool p_useInDex, u16 p_maxPkmn )
+            : _useInDex( p_useInDex ), _maxPkmn( p_maxPkmn ), _currPage( 0 ) { }
     };
 }

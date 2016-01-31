@@ -86,6 +86,7 @@ namespace FS {
 
         u16         m_flags[ 500 ];
 
+        u16         m_lstDex;
         u8          m_hasGDex : 1;
         u8          m_activatedPNav;
 

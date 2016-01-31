@@ -25,7 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include <cwchar>
 #include <cstdio>
 #include <algorithm>
@@ -47,8 +46,9 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "sprite.h"
 #include "uio.h"
 #include "bagViewer.h"
+#include "keyboard.h"
 
-
+//Sprites
 #include "Back.h"
 #include "A.h"
 
@@ -864,7 +864,7 @@ namespace BATTLE {
         loop( ) {
 
             scanKeys( );
-            touch = touchReadXY( );
+            touchRead( &touch );
 
             //Accept touches that are almost on the sprite
             if( GET_AND_WAIT_R( 224, 164, 300, 300 ) )  //Back
@@ -1165,7 +1165,7 @@ namespace BATTLE {
         loop( ) {
 
             scanKeys( );
-            touch = touchReadXY( );
+            touchRead( &touch );
             u32 pressed = keysHeld( );
 
             //Accept touches that are almost on the sprite
@@ -1283,7 +1283,7 @@ namespace BATTLE {
         loop( ) {
 
             scanKeys( );
-            touch = touchReadXY( );
+            touchRead( &touch );
 
             //Accept touches that are almost on the sprite
             if( p_showBack && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
@@ -1473,7 +1473,7 @@ NEXT_TRY:
 NEXT:
 
             scanKeys( );
-            touch = touchReadXY( );
+            touchRead( &touch );
 
             //Accept touches that are almost on the sprite
             if( GET_AND_WAIT_R( 224, 164, 300, 300 ) ) { //Back
@@ -1502,7 +1502,7 @@ NEXT:
                         swiWaitForVBlank( );
 
                         scanKeys( );
-                        auto touch = touchReadXY( );
+                        touchRead( &touch );
                         if( touch.px == 0 && touch.py == 0 )
                             break;
                         if( !( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h ) ) {
@@ -1648,7 +1648,7 @@ END:
 NEXT:
 
             scanKeys( );
-            touch = touchReadXY( );
+            touchRead( &touch );
 
             //Accept touches that are almost on the sprite
             if( GET_AND_WAIT_R( 224, 164, 300, 300 ) ) { //Back
@@ -1697,7 +1697,7 @@ NEXT:
                         swiWaitForVBlank( );
 
                         scanKeys( );
-                        auto touch = touchReadXY( );
+                        touchRead( &touch );
                         if( touch.px == 0 && touch.py == 0 )
                             break;
                         if( !( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h ) ) {
@@ -1759,7 +1759,6 @@ END:
             BAG::bagViewer bv;
             UPDATE_TIME = false;
             u16 itm = bv.getItem( BAG::bagViewer::GIVE_TO_PKMN );
-            init( );
             IO::initOAMTable( true );
             IO::drawSub( );
             UPDATE_TIME = true;
@@ -1794,7 +1793,7 @@ START:
 
 
             scanKeys( );
-            touch = touchReadXY( );
+            touchRead( &touch );
 
             //Accept touches that are almost on the sprite
             if( p_back && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) { //Back
@@ -2272,6 +2271,7 @@ ST:
     void battleUI::capture( u16 p_pokeBall, u8 p_ticks ) {
         (void) p_pokeBall;
 
+        IO::OamTop->oamBuffer[ 0 ].isHidden = true;
         IO::loadSprite( PB_ANIM, 15, PB_ANIM_TILES, 72, 100, 16, 16,
                         PokeBall1Pal, PokeBall1Tiles, PokeBall1TilesLen,
                         false, false, false, OBJPRIORITY_0, false );
@@ -2463,7 +2463,57 @@ BREAK:
     }
 
     void battleUI::handleCapture( ) {
+        IO::initOAMTable( true );
+        IO::initOAMTable( false );
+        IO::drawSub( );
+        UPDATE_TIME = true;
+        DRAW_TIME = true;
 
+        videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
+        IO::bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
+        IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
+        bgSetPriority( IO::bg3, 3 );
+        bgSetPriority( IO::bg2, 2 );
+        IO::initOAMTable( IO::OamTop );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
+        bgUpdate( );
+
+        dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+        dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
+
+        auto& acPkmn = *_battle->_wildPokemon.m_pokemon;
+        u16 x = 80;
+        u8  y = 48;
+
+        if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+                                 PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ),
+                                 false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
+            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
+                                     acPkmn.m_boxdata.m_speciesId, x, y,
+                                     PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
+                                     acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
+            }
+        }
+        IO::updateOAM( false );
+
+        IO::drawSub( true );
+        initLogScreen( );
+
+        IO::yesNoBox yn;
+        sprintf( buffer, "Möchtest du dem %ls\neinen Spitznamen geben?", acPkmn.m_boxdata.m_name );
+        if( yn.getResult( buffer ) ) {
+            IO::keyboard kbd;
+            auto nick = kbd.getWText( 10, "Wähle einen Spitznamen!" );
+            if( wcscmp( nick.c_str( ), acPkmn.m_boxdata.m_name )
+                && wcscmp( L"", acPkmn.m_boxdata.m_name ) ) {
+                wcscpy( acPkmn.m_boxdata.m_name, nick.c_str( ) );
+                acPkmn.m_boxdata.m_individualValues.m_isNicked = true;
+            }
+        }
+        IO::drawSub( true );
+        initLogScreen( );
     }
 
     //////////////////////////////////////////////////////////////////////////

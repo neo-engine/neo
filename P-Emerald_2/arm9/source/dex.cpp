@@ -29,6 +29,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "dex.h"
 #include "defines.h"
 #include "uio.h"
+#include "saveGame.h"
 
 #include <cmath>
 
@@ -38,11 +39,11 @@ namespace DEX {
 
     void dex::run( u16 p_pkmnIdx ) {
         if( !_dexUI ) {
-            _dexUI = new dexUI( false, p_pkmnIdx, _maxPkmn ); //Only the current Pkmn shall be shown
+            _dexUI = new dexUI( false, _maxPkmn ); //Only the current Pkmn shall be shown
         }
 
         _dexUI->init( );
-        _dexUI->_currPkmn = p_pkmnIdx;
+        FS::SAV->m_lstDex = p_pkmnIdx;
         _dexUI->drawPage( true, true );
 
         touchPosition touch;
@@ -55,16 +56,16 @@ namespace DEX {
             if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) )
                 break;
             else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_DOWN ) ) {
-                _dexUI->_currPkmn = ( _dexUI->_currPkmn + 1 ) % _maxPkmn;
+                FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + 1 ) % _maxPkmn;
                 _dexUI->drawPage( true );
             } else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_UP ) ) {
-                _dexUI->_currPkmn = ( _dexUI->_currPkmn + _maxPkmn - 1 ) % _maxPkmn;
+                FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + _maxPkmn - 1 ) % _maxPkmn;
                 _dexUI->drawPage( true );
             } else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_R ) ) {
-                _dexUI->_currPkmn = ( _dexUI->_currPkmn + 15 ) % _maxPkmn;
+                FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + 15 ) % _maxPkmn;
                 _dexUI->drawPage( true );
             } else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_L ) ) {
-                _dexUI->_currPkmn = ( _dexUI->_currPkmn + _maxPkmn - 15 ) % _maxPkmn;
+                FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + _maxPkmn - 15 ) % _maxPkmn;
                 _dexUI->drawPage( true );
             } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
                 _dexUI->_currPage = ( _dexUI->_currPage + 1 ) % MAX_PAGES;
@@ -78,7 +79,7 @@ namespace DEX {
             }
             for( u8 q = 0; q < 5; ++q )
                 if( _maxPkmn != u16( -1 ) && GET_AND_WAIT_C( dexsppos[ 0 ][ q ] + 16, dexsppos[ 1 ][ q ] + 16, 16 ) ) {
-                    _dexUI->_currPkmn = ( _dexUI->_currPkmn + _maxPkmn - 3 + q + ( q > 2 ? 1 : 0 ) ) % _maxPkmn;
+                    FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + _maxPkmn - 3 + q + ( q > 2 ? 1 : 0 ) ) % _maxPkmn;
                     _dexUI->drawPage( true );
                 }
             for( u8 q = 5; q < 8; ++q )

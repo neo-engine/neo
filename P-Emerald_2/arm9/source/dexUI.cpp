@@ -75,13 +75,13 @@ namespace DEX {
         //Initialize the top screen
         IO::initOAMTable( false );
 
-        u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", _currPkmn, 80, 64, PKMN_SPRITE_START( 0 ), 0, 0, false );
-        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", _currPkmn, 80, 64, PKMN_SPRITE_START( 1 ), 1, tileCnt, false );
+        u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", FS::SAV->m_lstDex, 80, 64, PKMN_SPRITE_START( 0 ), 0, 0, false );
+        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", FS::SAV->m_lstDex, 80, 64, PKMN_SPRITE_START( 1 ), 1, tileCnt, false );
 
-        tileCnt = IO::loadPKMNIcon( _currPkmn, 0, 8, PKMN_SPRITE_START( 2 ), 2, 288, false );
+        tileCnt = IO::loadPKMNIcon( FS::SAV->m_lstDex, 0, 8, PKMN_SPRITE_START( 2 ), 2, 288, false );
         tileCnt = IO::loadTypeIcon( type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 1, 3, tileCnt, false );
         tileCnt = IO::loadTypeIcon( type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 2, 4, tileCnt, false );
-        tileCnt = IO::loadPKMNIcon( _currPkmn, 0, 8, PKMN_SPRITE_START( 3 ), 5, tileCnt, false );
+        tileCnt = IO::loadPKMNIcon( FS::SAV->m_lstDex, 0, 8, PKMN_SPRITE_START( 3 ), 5, tileCnt, false );
         for( u8 i = PKMN_SPRITE_START( 0 ); i <= PKMN_SPRITE_START( 3 ); ++i )
             IO::OamTop->oamBuffer[ i ].isHidden = true;
 
@@ -109,7 +109,7 @@ namespace DEX {
         tileCnt = IO::loadSprite( BIG_CIRC_START + 3, 2, tileCnt, 72, 96, 64, 64, BigCirc1Pal,
                                   BigCirc1Tiles, BigCirc1TilesLen, true, true, false, OBJPRIORITY_2, true );
 
-        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", _currPkmn, dexsppos[ 0 ][ 8 ] + 16,
+        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", FS::SAV->m_lstDex, dexsppos[ 0 ][ 8 ] + 16,
                                       dexsppos[ 1 ][ 8 ] + 16, PKMN_ICON_SUB( 5 ), PKMN_SPRITE_SUB_PAL, tileCnt, true );
 
         tileCnt = IO::loadSprite( PAGE_ICON_START, PAGE_ICON_PAL_START, tileCnt, dexsppos[ 0 ][ 5 ], dexsppos[ 1 ][ 5 ], 32, 32, memoPal,
@@ -137,7 +137,7 @@ namespace DEX {
             return;
         }
 
-        pokemonData data; getAll( _currPkmn, data );
+        pokemonData data; getAll( FS::SAV->m_lstDex, data );
         if( data.m_types[ 0 ] == NORMAL
             || data.m_types[ 0 ] == GROUND
             || data.m_types[ 0 ] == ICE )
@@ -155,7 +155,7 @@ namespace DEX {
         else if( p_hasGenderDifference )
             IO::boldFont->printString( "männlich", 20, 167, false );
         else
-            IO::boldFont->printString( getWDisplayName( _currPkmn ), 10, 167, false );
+            IO::boldFont->printString( getWDisplayName( FS::SAV->m_lstDex ), 10, 167, false );
 
         tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 110, 64,
                                       PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true, p_hasGenderDifference && ( _currForme % 2 ) );
@@ -166,7 +166,7 @@ namespace DEX {
         else if( p_hasGenderDifference )
             IO::boldFont->printString( "männlich", 130, 160, false );
         else
-            IO::boldFont->printString( getWDisplayName( _currPkmn ), 110, 160, false );
+            IO::boldFont->printString( getWDisplayName( FS::SAV->m_lstDex ), 110, 160, false );
         IO::boldFont->printString( "(schillernd)", 110, 176, false );
 
         //Load Icons of the other formes ( max 4 )
@@ -191,8 +191,8 @@ namespace DEX {
     u8 oldForme = -1;
     void dexUI::undrawFormes( u16 p_formeIdx ) {
         //Print over the text the same text, but with the color of the background
-        pokemonData data2; getAll( _currPkmn, data2 );
-        if( !( _useInDex ) || IN_DEX( _currPkmn ) ) {
+        pokemonData data2; getAll( FS::SAV->m_lstDex, data2 );
+        if( !( _useInDex ) || IN_DEX( FS::SAV->m_lstDex ) ) {
             BG_PALETTE[ 0 ] = IO::getColor( data2.m_types[ 0 ] );
             BG_PALETTE[ COLOR_IDX ] = IO::getColor( data2.m_types[ 0 ] );
         } else {
@@ -225,10 +225,10 @@ namespace DEX {
     std::string formeName;
     bool isFixed;
     void dexUI::drawPage( bool p_newPok, bool p_newPage ) {
-        if( !_currPkmn )
-            _currPkmn = _maxPkmn;
-        pokemonData data; getAll( _currPkmn, data );
-        isFixed = !FS::exists( "nitro:/PICS/SPRITES/PKMN/", _currPkmn, "f" );
+        if( !FS::SAV->m_lstDex )
+            FS::SAV->m_lstDex = _maxPkmn;
+        pokemonData data; getAll( FS::SAV->m_lstDex, data );
+        isFixed = !FS::exists( "nitro:/PICS/SPRITES/PKMN/", FS::SAV->m_lstDex, "f" );
         if( _currPage != 1 )
             _currForme %= data.m_formecnt ? ( ( isFixed ? 1 : 2 ) * data.m_formecnt ) : ( isFixed ? 1 : 2 );
         if( !p_newPok && !p_newPage  && !data.m_formecnt && isFixed && _currPage != 1 )
@@ -238,13 +238,13 @@ namespace DEX {
         if( p_newPok ) {
             IO::drawSub( );
 
-            IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", ( !( _useInDex ) || IN_DEX( _currPkmn ) ) ? _currPkmn : 0, dexsppos[ 0 ][ 8 ] + 16,
+            IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", ( !( _useInDex ) || IN_DEX( FS::SAV->m_lstDex ) ) ? FS::SAV->m_lstDex : 0, dexsppos[ 0 ][ 8 ] + 16,
                                 dexsppos[ 1 ][ 8 ] + 16, PKMN_ICON_SUB( 5 ), PKMN_SPRITE_SUB_PAL,
                                 IO::Oam->oamBuffer[ PKMN_ICON_SUB( 5 ) ].gfxIndex, true );
             if( _useInDex ) {
-                u16 pidx = ( _currPkmn + _maxPkmn - 5 ) % _maxPkmn;
+                u16 pidx = ( FS::SAV->m_lstDex + _maxPkmn - 5 ) % _maxPkmn;
                 for( u8 i = 0; i < 5; ++i ) {
-                    if( ( ( ++pidx ) %= _maxPkmn ) == _currPkmn - 1 )
+                    if( ( ( ++pidx ) %= _maxPkmn ) == FS::SAV->m_lstDex - 1 )
                         pidx = ( pidx + 1 ) % _maxPkmn;
                     IO::loadPKMNIcon( IN_DEX( pidx + 1 ) ? ( pidx + 1 ) : 0, dexsppos[ 0 ][ i ],
                                       dexsppos[ 1 ][ i ], PKMN_ICON_SUB( i ), PKMN_ICON_SUB_PAL( i ),
@@ -290,12 +290,12 @@ namespace DEX {
         BG_PALETTE[ WHITE_IDX ] = WHITE;
         BG_PALETTE[ BLACK_IDX ] = BLACK;
 
-        newformepkmn = _currPkmn;
+        newformepkmn = FS::SAV->m_lstDex;
         for( u8 i = 0; i < PKMN_SPRITE_START( 5 ); ++i )
             IO::OamTop->oamBuffer[ i ].isHidden = true;
         char buffer[ 50 ];
         if( _currPage != 1 ) {
-            if( !( _useInDex ) || IN_DEX( _currPkmn ) ) {
+            if( !( _useInDex ) || IN_DEX( FS::SAV->m_lstDex ) ) {
                 BG_PALETTE[ 0 ] = IO::getColor( data.m_types[ 0 ] );
                 sprintf( buffer, "%s", data.m_displayName );
                 sprintf( buffer, "%s - %s", buffer, data.m_species );
@@ -308,7 +308,7 @@ namespace DEX {
 
                 _currForme %= data.m_formecnt ? ( ( isFixed ? 1 : 2 ) * data.m_formecnt ) : ( isFixed ? 1 : 2 );
 
-                newformepkmn = data.m_formecnt ? data.m_formeIdx[ _currForme / ( isFixed ? 1 : 2 ) ] : _currPkmn;
+                newformepkmn = data.m_formecnt ? data.m_formeIdx[ _currForme / ( isFixed ? 1 : 2 ) ] : FS::SAV->m_lstDex;
                 sprintf( buffer, "%s", data.m_formecnt ? data.m_formeName[ _currForme / ( isFixed ? 1 : 2 ) ] : data.m_displayName );
                 formeName = std::string( buffer );
 
@@ -316,7 +316,7 @@ namespace DEX {
                     getAll( newformepkmn, data );
 
                 //BG_PALETTE[ 1 ] = IO::getColor( data.m_types[ 0 ] );
-                IO::loadPKMNIcon( ( _currPkmn == 493 || _currPkmn == 649 ) ? _currPkmn : newformepkmn, 0, 8,
+                IO::loadPKMNIcon( ( FS::SAV->m_lstDex == 493 || FS::SAV->m_lstDex == 649 ) ? FS::SAV->m_lstDex : newformepkmn, 0, 8,
                                   PKMN_SPRITE_START( 2 ), 2, IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
 
                 IO::loadTypeIcon( data.m_types[ 0 ], 33, 35, PKMN_SPRITE_START( 2 ) + 1, 3,
@@ -327,13 +327,13 @@ namespace DEX {
                 } else
                     IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 2 ].isHidden = true;
                 printf( "\n    Du hast ?? dieser Pok\x82""mon.\n\n" );
-                printf( "\n\n %03i", _currPkmn );
+                printf( "\n\n %03i", FS::SAV->m_lstDex );
             } else {
                 getAll( 0, data );
                 printf( "\n    Keine Daten vorhanden.\n\n" );
                 sprintf( buffer, "???????????? - %s", data.m_species );
                 IO::regularFont->printString( buffer, 36, 20, false );
-                printf( "\n\n %03i", _currPkmn );
+                printf( "\n\n %03i", FS::SAV->m_lstDex );
             }
         }
 
@@ -341,7 +341,7 @@ namespace DEX {
             case 0:
             {
                 printf( "\x1b[37m" );
-                if( !( _useInDex ) || IN_DEX( _currPkmn ) ) {
+                if( !( _useInDex ) || IN_DEX( FS::SAV->m_lstDex ) ) {
                     BG_PALETTE[ COLOR_IDX ] = IO::getColor( data.m_types[ 1 ] );
                     for( u8 i = 0; i < 6; ++i ) {
                         IO::printRectangle( u8( 19 + 40 * i ), u8( std::max( 56, 102 - data.m_bases[ i ] / 3 ) ),
@@ -365,14 +365,14 @@ namespace DEX {
             }
             case 2:
             {
-                if( !( _useInDex ) || IN_DEX( _currPkmn ) ) {
+                if( !( _useInDex ) || IN_DEX( FS::SAV->m_lstDex ) ) {
                     isFixed = !isFixed;
                     oldForme = _currForme;
-                    oldPkmn = _currPkmn;
+                    oldPkmn = FS::SAV->m_lstDex;
                     drawFormes( newformepkmn, isFixed, formeName );
                 } else {
                     oldForme = _currForme;
-                    oldPkmn = _currPkmn;
+                    oldPkmn = FS::SAV->m_lstDex;
                     drawFormes( newformepkmn = -1, isFixed = 0, formeName );
                 }
             }

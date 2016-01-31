@@ -445,6 +445,7 @@ namespace BATTLE {
         void        handleFaint( bool p_opponent, u8 p_pokemonPos, bool p_show = true );
 
         bool        tryCapture( u16 p_pokeBall );
+        void        handleCapture( );
 
         bool        endConditionHit( battleEndReason& p_battleEndReason );
         void        endBattle( battleEndReason p_battleEndReason );

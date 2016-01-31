@@ -51,6 +51,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "messageBox.h"
 #include "yesNoBox.h"
 #include "choiceBox.h"
+#include "keyboard.h"
 #include "sprite.h"
 #include "screenFade.h"
 
@@ -90,7 +91,7 @@ GameMod gMod = GameMod::DEVELOPER;
 GameMod gMod = GameMod::EMULATOR;
 #endif
 
-DEX::dexUI dui( true, 1, FS::SAV->m_hasGDex ? 649 : 493 );
+DEX::dexUI dui( true, FS::SAV->m_hasGDex ? 649 : 493 );
 DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
 
 u8 DayTimes[ 4 ][ 5 ] = {
@@ -439,7 +440,7 @@ OUT:
         } else if( GET_AND_WAIT_C( IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 4 ],        //StartDex
                                    IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 5 ], 16 ) ) {
             ANIMATE_MAP = false;
-            dx.run( dui.currPkmn( ) );
+            dx.run( FS::SAV->m_lstDex );
 
             IO::clearScreenConsole( true, true );
             initMainSprites( );
@@ -454,7 +455,7 @@ OUT:
                                    IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses[ 3 ], 16 ) ) {
 
             const char *someText[ 11 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle",
-                "Chg NavScrn", "View Boxes A", "View Boxes B", "Hoenn Badges", "Kanto Badges", "Johto Badges" };
+                "Chg NavScrn", "View Boxes A", "View Boxes B", "Hoenn Badges", "Kanto Badges", "Keyboard" };
             IO::choiceBox test( 11, &someText[ 0 ], 0, false );
             int res = test.getResult( "Tokens of god-being..." );
             IO::drawSub( );
@@ -586,12 +587,19 @@ OUT:
                 case 8:
                     FS::SAV->m_HOENN_Badges <<= 1;
                     FS::SAV->m_HOENN_Badges |= 1;
+                    break;
                 case 9:
                     FS::SAV->m_KANTO_Badges <<= 1;
                     FS::SAV->m_KANTO_Badges |= 1;
+                    break;
                 case 10:
-                    FS::SAV->m_JOHTO_Badges <<= 1;
-                    FS::SAV->m_JOHTO_Badges |= 1;
+                {
+                    IO::keyboard kbd;
+                    auto res = kbd.getWText( 10, "Type some text!" );
+                    sprintf( buffer, "Got: “%ls”", res.c_str( ) );
+                    IO::messageBox( buffer, true );
+                    break;
+                }
             }
             IO::drawSub( true );
             swiWaitForVBlank( );
