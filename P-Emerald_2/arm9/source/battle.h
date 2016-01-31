@@ -1,5 +1,5 @@
-/*
-    Pokémon Emerald 2 Version
+ï»¿/*
+    PokÃ©mon Emerald 2 Version
     ------------------------------
 
     file        : battle.h
@@ -9,20 +9,20 @@
     Copyright (C) 2012 - 2016
     Philip Wellnitz
 
-    This file is part of Pokémon Emerald 2 Version.
+    This file is part of PokÃ©mon Emerald 2 Version.
 
-    Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+    PokÃ©mon Emerald 2 Version is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+    PokÃ©mon Emerald 2 Version is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+    along with PokÃ©mon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
     */
 
 #pragma once
@@ -326,7 +326,7 @@ namespace BATTLE {
         battlePokemon _pkmns[ 6 ][ 2 ];
         battlePokemon _wildPokemon;
 
-        battleUI*    _battleUI;
+        static battleUI*    _battleUI;
     public:
 #define OPPONENT 1
 #define PLAYER 0
@@ -408,7 +408,6 @@ namespace BATTLE {
                 weather p_weather,
                 u8 p_platform,
                 u8 p_background );
-        ~battle( );
 
         void        log( const std::wstring& p_message );
 

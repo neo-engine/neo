@@ -35,6 +35,7 @@ namespace BATTLE {
         s8      _oldPKMNStats[ 6 ][ 2 ][ 10 ];
 
     public:
+        friend class battle;
 
         static void initLogScreen( );
         static void clearLogScreen( );

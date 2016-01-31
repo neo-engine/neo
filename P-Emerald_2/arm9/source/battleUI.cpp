@@ -2270,6 +2270,8 @@ ST:
     }
 
     void battleUI::capture( u16 p_pokeBall, u8 p_ticks ) {
+        (void) p_pokeBall;
+
         IO::loadSprite( PB_ANIM, 15, PB_ANIM_TILES, 72, 100, 16, 16,
                         PokeBall1Pal, PokeBall1Tiles, PokeBall1TilesLen,
                         false, false, false, OBJPRIORITY_0, false );

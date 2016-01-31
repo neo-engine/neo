@@ -69,6 +69,8 @@ namespace BATTLE {
         "Ingrain"
     };
 
+    battleUI*    battle::_battleUI;
+
     //////////////////////////////////////////////////////////////////////////
     // BEGIN BATTLE
     //////////////////////////////////////////////////////////////////////////
@@ -259,7 +261,6 @@ CHOOSE1:
             getAIMoves( );
 
             doMoves( );
-
             if( endConditionHit( battleEnd ) ) {
                 endBattle( battleEnd );
                 break;
@@ -268,6 +269,7 @@ CHOOSE1:
                 endBattle( battleEnd = PLAYER_WON );
                 return battleEnd;
             }
+
             doWeather( );
             for( int k = 0; k < 4; ++k ) {
                 if( m_battleMode != DOUBLE && ( k % 2 ) )
@@ -296,7 +298,10 @@ CHOOSE1:
      */
     void battle::initBattle( ) {
         //Some basic initialization stuff
-        _battleUI = new battleUI( this );
+        if( !_battleUI )
+            battle::_battleUI = new battleUI( this );
+        else
+            battle::_battleUI->_battle = this;
         _battleUI->init( );
         pokemonData pdata;
         for( u8 i = 0; i < 6; ++i ) {
@@ -1924,11 +1929,7 @@ NEXT:
             succ++;
         }
         _battleUI->capture( p_pokeBall, succ );
-        return succ == 4;
-    }
-
-    battle::~battle( ) {
-        delete _battleUI;
+        return ( succ == 4 );
     }
 
     //////////////////////////////////////////////////////////////////////////

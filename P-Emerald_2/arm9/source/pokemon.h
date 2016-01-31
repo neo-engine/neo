@@ -246,7 +246,7 @@ u32: 32;
 u32: 32;
         u8                      m_pokerus : 8;//
         u8                      m_ball : 8;//
-        u16      m_gotLevel : 7;
+        u16                     m_gotLevel : 7;
         bool                    m_oTisFemale : 1;
         enum encounter : char {
             EGG = 0x0,

@@ -43,6 +43,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "DexTop2.h"
 #include <vector>
+#include <algorithm>
 #include <cstdio>
 
 namespace DEX {
@@ -139,7 +140,7 @@ namespace DEX {
         pokemonData data; getAll( _currPkmn, data );
         if( data.m_types[ 0 ] == NORMAL
             || data.m_types[ 0 ] == GROUND
-            || data.m_types[ 0 ] == ICE_COLOR )
+            || data.m_types[ 0 ] == ICE )
             IO::boldFont->setColor( BLACK_IDX, 2 );
 
         //IO::boldFont->setColor( WHITE_IDX, 2 );
