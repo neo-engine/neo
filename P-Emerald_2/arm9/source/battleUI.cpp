@@ -624,7 +624,7 @@ namespace BATTLE {
             printf( "%10s%c\n",
                     acPkmn.m_boxdata.m_name,
                     GENDER( acPkmn ) );
-            printf( "Lv%3d%4dKP\n", acPkmn.m_level,
+            printf( "Lv%3hhu%4huKP\n", acPkmn.m_level,
                     acPkmn.m_stats.m_acHP );
         }
     }
@@ -810,7 +810,7 @@ namespace BATTLE {
                 printf( "Schon besiegt..." );
             else
                 printf( "Schon ausgew\x84""hlt" );
-            printf( "\n----------------\n%11s %c\n%11s\n\nLv.%3hhu %3ihu/%3ihuKP",
+            printf( "\n----------------\n%11s %c\n%11s\n\nLv.%3hhu %3hu/%3huKP",
                     p_pokemon.m_boxdata.m_name,
                     GENDER( p_pokemon ),
                     ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
@@ -1891,7 +1891,7 @@ CLEAR:
             printf( "%10s%c\n",
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
                     GENDER( ACPKMN2( *_battle, p_pokemonPos, p_opponent ) ) );
-            printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_level,
+            printf( "Lv%3hhu%4huKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_level,
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
         } else {
             consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
@@ -1899,7 +1899,7 @@ CLEAR:
             printf( "%10s%c\n",
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
                     GENDER( ACPKMN2( *_battle, p_pokemonPos, p_opponent ) ) );
-            printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_level,
+            printf( "Lv%3hhu%4huKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_level,
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
         }
     }
@@ -2062,7 +2062,7 @@ CLEAR:
         if( !p_silent ) {
             if( p_opponent )
                 std::sprintf( buffer, "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]",
-                               ACPKMN2( *_battle, p_pokemonPos, OPPONENT ).m_boxdata.m_name );
+                              ACPKMN2( *_battle, p_pokemonPos, OPPONENT ).m_boxdata.m_name );
             else
                 std::sprintf( buffer, "Los [OWN%d]![A]", p_pokemonPos + 1 );
             _battle->log( buffer );
@@ -2124,14 +2124,14 @@ CLEAR:
             printf( "%10s%c\n",
                     acPkmn.m_boxdata.m_name,
                     GENDER( acPkmn ) );
-            printf( "Lv%3d%4dKP\n", acPkmn.m_level,
+            printf( "Lv%3hhu%4huKP\n", acPkmn.m_level,
                     acPkmn.m_stats.m_acHP );
         } else {
             consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             printf( "%10s%c\n",
                     acPkmn.m_boxdata.m_name,
                     GENDER( acPkmn ) );
-            printf( "Lv%3d%4dKP\n", acPkmn.m_level,
+            printf( "Lv%3hhu%4huKP\n", acPkmn.m_level,
                     acPkmn.m_stats.m_acHP );
         }
     }
@@ -2186,9 +2186,9 @@ CLEAR:
 
         if( acPkmn.m_boxdata.m_moves[ 3 ] ) {
             std::sprintf( buffer, "%s kann nun\n%s erlernen![A][CLEAR]Aber %s kennt\nbereits 4 Attacken.[A]",
-                           acPkmn.m_boxdata.m_name,
-                           AttackList[ p_move ]->m_moveName.c_str( ),
-                           acPkmn.m_boxdata.m_name );
+                          acPkmn.m_boxdata.m_name,
+                          AttackList[ p_move ]->m_moveName.c_str( ),
+                          acPkmn.m_boxdata.m_name );
             _battle->log( buffer );
             IO::yesNoBox yn;
 ST:
@@ -2212,9 +2212,9 @@ ST:
                     initLogScreen( );
                     loadA( );
                     std::sprintf( buffer, "%s vergisst %s[A]\nund erlernt %s![A]",
-                                   acPkmn.m_boxdata.m_name,
-                                   AttackList[ res ]->m_moveName.c_str( ),
-                                   AttackList[ p_move ]->m_moveName.c_str( ) );
+                                  acPkmn.m_boxdata.m_name,
+                                  AttackList[ res ]->m_moveName.c_str( ),
+                                  AttackList[ p_move ]->m_moveName.c_str( ) );
                     _battle->log( buffer );
 
                     for( u8 i = 0; i < 4; ++i )
@@ -2245,8 +2245,8 @@ ST:
                     acPkmn.m_boxdata.m_moves[ i ] = p_move;
                     acPkmn.m_boxdata.m_acPP[ i ] = std::min( acPkmn.m_boxdata.m_acPP[ i ], AttackList[ p_move ]->m_movePP );
                     std::sprintf( buffer, "%s erlernt %s![A]",
-                                   acPkmn.m_boxdata.m_name,
-                                   AttackList[ p_move ]->m_moveName.c_str( ) );
+                                  acPkmn.m_boxdata.m_name,
+                                  AttackList[ p_move ]->m_moveName.c_str( ) );
                     _battle->log( buffer );
                     break;
                 }
@@ -2512,7 +2512,7 @@ BREAK:
                 acPkmn.m_boxdata.m_individualValues.m_isNicked = true;
             }
         }
-        IO::drawSub( true );
+        IO::drawSub( );
         initLogScreen( );
     }
 

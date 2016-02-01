@@ -192,7 +192,6 @@ namespace STS {
             } else {
                 sprintf( buffer, "Ei" );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 - mval, false );
-                sprintf( buffer, "Ei" );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
                 sprintf( buffer, "%s", ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
