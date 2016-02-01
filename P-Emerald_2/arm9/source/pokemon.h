@@ -150,8 +150,8 @@ struct pokemonData {
     char            m_formeName[ 30 ][ 15 ];
 };
 
-const wchar_t*  getWDisplayName( u16 p_pkmnId );
-void            getWDisplayName( u16 p_pkmnId, wchar_t* p_name );
+const char*     getDisplayName( u16 p_pkmnId );
+void            getDisplayName( u16 p_pkmnId, char* p_name );
 bool            getAll( u16 p_pkmnId, pokemonData& out );
 
 void            getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num, u16* p_res );
@@ -233,14 +233,14 @@ u16: 15;
                                                  //}
 
                                                  //BLOCKC{
-        wchar_t                 m_name[ PKMN_NAMELENGTH ];
+        char                    m_name[ PKMN_NAMELENGTH ];
         u16                     m_hometown : 16;
         u8                      m_ribbons2[ 4 ];
 u32: 32;
         //}
 
         //BLOCKD{
-        wchar_t                 m_oT[ OTLENGTH ];
+        char                    m_oT[ OTLENGTH ];
         u8                      m_gotDate[ 3 ];//(EGG)
         u8                      m_hatchDate[ 3 ]; //gotDate for nonEgg
 u32: 32;
@@ -351,7 +351,7 @@ u8: 8;
         boxPokemon( ) { }
         boxPokemon( u16             p_pkmnId,
                     u16             p_level,
-                    const wchar_t*  p_name = 0,
+                    const char*     p_name = 0,
                     u8              p_shiny = 0,
                     bool            p_hiddenAbility = false,
                     bool            p_isEgg = false,
@@ -359,11 +359,11 @@ u8: 8;
                     bool            p_fatefulEncounter = false );
         boxPokemon( u16*            p_moves,
                     u16             p_pkmnId,
-                    const wchar_t*  p_name,
+                    const char*     p_name,
                     u16             p_level,
                     u16             p_id,
                     u16             p_sid,
-                    const wchar_t*  p_ot,
+                    const char*     p_ot,
                     bool            p_oTFemale,
                     u8              p_shiny = 0,
                     bool            p_hiddenAbility = false,
@@ -404,7 +404,7 @@ u8: 8;
     pokemon( pokemon::boxPokemon p_boxPokemon );
     pokemon( u16             p_pkmnId,
              u16             p_level,
-             const wchar_t*  p_name = 0,
+             const char*    p_name = 0,
              u8              p_shiny = 0,
              bool            p_hiddenAbility = false,
              bool            p_isEgg = false,
@@ -412,11 +412,11 @@ u8: 8;
              bool            p_fatefulEncounter = false );
     pokemon( u16*           p_moves,
              u16            p_species,
-             const wchar_t* p_name,
+             const char*    p_name,
              u16            p_level,
              u16            p_id,
              u16            p_sid,
-             const wchar_t* p_ot,
+             const char*    p_ot,
              bool           p_oTFemale,
              u8             p_shiny = 0,
              bool           p_hiddenAbility = false,

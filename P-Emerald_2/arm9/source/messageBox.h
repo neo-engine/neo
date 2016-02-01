@@ -46,9 +46,7 @@ namespace IO {
         messageBox( item* p_item, const u16 p_count );
 
         messageBox( const char* p_text, bool p_remsprites = true );
-        messageBox( const wchar_t* p_text, bool p_remsprites = true );
         messageBox( const char* p_text, const char* p_name, bool p_a = true, bool p_remsprites = true, sprite_type p_sprt = no_sprite, u16 p_sprind = 0 );
-        messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_a = true, bool p_remsprites = true, sprite_type p_sprt = no_sprite, u16 p_sprind = 0 );
         void put( const char* p_text, bool p_a = true );
         void carriageReturn( );
         void clear( );

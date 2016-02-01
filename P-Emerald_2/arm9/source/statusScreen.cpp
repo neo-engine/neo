@@ -123,7 +123,7 @@ namespace STS {
                     if( AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->possible( ) ) {
 
                         char buffer[ 50 ];
-                        sprintf( buffer, "%ls setzt %s\nein!", FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
+                        sprintf( buffer, "%s setzt %s\nein!", FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
                                  AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
                         IO::messageBox a( buffer );
                         IO::drawSub( );
@@ -156,7 +156,7 @@ namespace STS {
                         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                         consoleClear( );
 
-                        sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
+                        sprintf( buffer, "%s von %s\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
                         IO::drawSub( );
                         IO::messageBox a( buffer );
                         FS::SAV->m_bag.insert( BAG::toBagType( acI.m_itemType ), acI.getItemId( ), 1 );

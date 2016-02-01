@@ -131,14 +131,8 @@ namespace IO {
     void printStringCenterD( font* p_font, const char *p_string, bool p_bottom );
     void printNumber( font* p_font, s32 p_num, s16 p_x, s16 p_y, bool p_bottom );
 
-    void printString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16 );
     void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
-    void printMBString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
     void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
-    void printMBStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
-    void printStringCenter( font* p_font, const wchar_t *p_string, bool p_bottom );
-    void printStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
-    void printStringCenterD( font* p_font, const wchar_t *p_string, bool p_bottom );
 
     void topScreenPlot( u8 p_x, u8 p_y, color p_color );
     void btmScreenPlot( u8 p_x, u8 p_y, color p_color );

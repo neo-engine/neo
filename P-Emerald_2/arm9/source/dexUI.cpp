@@ -155,7 +155,7 @@ namespace DEX {
         else if( p_hasGenderDifference )
             IO::boldFont->printString( "männlich", 20, 167, false );
         else
-            IO::boldFont->printString( getWDisplayName( FS::SAV->m_lstDex ), 10, 167, false );
+            IO::boldFont->printString( getDisplayName( FS::SAV->m_lstDex ), 10, 167, false );
 
         tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 110, 64,
                                       PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true, p_hasGenderDifference && ( _currForme % 2 ) );
@@ -166,7 +166,7 @@ namespace DEX {
         else if( p_hasGenderDifference )
             IO::boldFont->printString( "männlich", 130, 160, false );
         else
-            IO::boldFont->printString( getWDisplayName( FS::SAV->m_lstDex ), 110, 160, false );
+            IO::boldFont->printString( getDisplayName( FS::SAV->m_lstDex ), 110, 160, false );
         IO::boldFont->printString( "(schillernd)", 110, 176, false );
 
         //Load Icons of the other formes ( max 4 )

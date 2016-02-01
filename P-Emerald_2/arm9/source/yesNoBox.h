@@ -38,7 +38,6 @@ namespace IO {
         yesNoBox( messageBox p_box, bool p_initSprites = true );
 
         bool getResult( const char* p_text );
-        bool getResult( const wchar_t* p_text );
 
         void draw( u8 p_pressedIdx );
 

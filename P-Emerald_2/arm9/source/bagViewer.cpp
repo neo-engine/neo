@@ -85,7 +85,7 @@ namespace BAG {
             u8 oldLv = p_pokemon.m_level;
             if( ItemList[ p_item ]->use( p_pokemon ) ) {
 
-                sprintf( buffer, "%s auf %ls angewendet.", ItemList[ p_item ]->getDisplayName( true ).c_str( ),
+                sprintf( buffer, "%s auf %s angewendet.", ItemList[ p_item ]->getDisplayName( true ).c_str( ),
                          p_pokemon.m_boxdata.m_name );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
@@ -100,14 +100,14 @@ namespace BAG {
                     IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                    sprintf( buffer, "%ls entwickelt sich...", p_pokemon.m_boxdata.m_name );
+                    sprintf( buffer, "%s entwickelt sich...", p_pokemon.m_boxdata.m_name );
                     IO::messageBox( buffer, false );
                     p_pokemon.evolve( );
 
                     initUI( );
                     swiWaitForVBlank( );
 
-                    sprintf( buffer, "...und wurde zu einem\n%ls!", getWDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
+                    sprintf( buffer, "...und wurde zu einem\n%s!", getDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
                     IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -136,14 +136,14 @@ namespace BAG {
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                sprintf( buffer, "%ls entwickelt sich...", p_pokemon.m_boxdata.m_name );
+                sprintf( buffer, "%s entwickelt sich...", p_pokemon.m_boxdata.m_name );
                 IO::messageBox( buffer, false );
                 p_pokemon.evolve( p_item, 3 );
 
                 initUI( );
                 swiWaitForVBlank( );
 
-                sprintf( buffer, "...und wurde zu einem\n%ls!", getWDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
+                sprintf( buffer, "...und wurde zu einem\n%s!", getDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -160,7 +160,7 @@ namespace BAG {
     bool bagViewer::giveItemToPkmn( pokemon& p_pokemon, u16 p_item ) {
         if( p_pokemon.getItem( ) ) {
             IO::yesNoBox yn( false );
-            sprintf( buffer, "%ls trägt bereits\ndas Item %s.\nSollen die Items getauscht werden?",
+            sprintf( buffer, "%s trägt bereits\ndas Item %s.\nSollen die Items getauscht werden?",
                      p_pokemon.m_boxdata.m_name, ItemList[ p_pokemon.getItem( ) ]->getDisplayName( true ).c_str( ) );
             if( !yn.getResult( buffer ) )
                 return false;

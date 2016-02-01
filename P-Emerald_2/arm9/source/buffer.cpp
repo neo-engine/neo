@@ -29,4 +29,3 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "buffer.h"
 
 char buffer[ 200 ];
-wchar_t wbuffer[ 200 ];

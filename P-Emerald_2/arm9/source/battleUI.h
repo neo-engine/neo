@@ -41,7 +41,7 @@ namespace BATTLE {
         static void clearLogScreen( );
         static void setLogTextColor( u16 p_color );
         static void setLogText2Color( u16 p_color );
-        static void writeLogText( const std::wstring& p_message );
+        static void writeLogText( const std::string& p_message );
 
         void    init( );
         void    trainerIntro( );

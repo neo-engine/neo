@@ -48,7 +48,7 @@ void fillResume( ) {
     else
         BG_PALETTE_SUB[ 252 ] = RGB15( 31, 0, 0 );
 
-    sprintf( buffer, "%ls", FS::SAV->m_playername );
+    sprintf( buffer, "%s", FS::SAV->m_playername );
     IO::regularFont->printString( buffer, 128, 5, true );
 
     sprintf( buffer, "%s", FS::getLoc( MAP::curMap->getCurrentLocationId( ) ) );
@@ -123,7 +123,7 @@ void drawSplash( ) {
 
 void initNewGame( ) {
     FS::SAV = new FS::saveGame( );
-    wcscpy( FS::SAV->m_playername, L"Test" );
+    strcpy( FS::SAV->m_playername, "Test" );
     FS::SAV->m_activatedPNav = false;
     FS::SAV->m_money = 3000;
     FS::SAV->m_id = rand( ) % 65536;
@@ -185,10 +185,10 @@ bool transferGame( ) {
             //   }
 
             FS::SAV = new FS::saveGame( );
-            wchar_t savname[ 8 ] = { 0 };
+            char savname[ 8 ] = { 0 };
             // for( int i = 0; i < 7; ++i )
             //     savname[ i ] = gen3::getNText( save3->unpackeddata[ i ] );
-            wcscpy( FS::SAV->m_playername, savname );
+            strcpy( FS::SAV->m_playername, savname );
 
             //  FS::SAV->m_isMale = !save3->unpackeddata[ 8 ];
 

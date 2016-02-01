@@ -43,7 +43,7 @@
 #include "bag.h"
 
 namespace BATTLE {
-    extern const std::vector<std::wstring> trainerclassnames;
+    extern const std::vector<std::string> trainerclassnames;
 
     extern u8 firstMoveSwitchTarget;
 
@@ -224,73 +224,73 @@ namespace BATTLE {
             battleScript( ),
             //Rain
             battleScript( std::vector<cmd>( {
-                cmd( L"Es regnet.[A]" ),
+                cmd( "Es regnet.[A]" ),
 
                 //Hydration
                 cmd( std::vector<con>( { con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ),
                 con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                 con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ), con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                 con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::EQUALS, A_HYDRATION ), con( cmd::OPPONENT2, cmd::PKMN_STATUS, cmd::NOT_EQUALS, 0 ) } ),
-                cmd::OWN1, cmd::PKMN_STATUS, cmd::SET, 0, L"[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR][OWN1] heilt sich.[A]" ),
+                cmd::OWN1, cmd::PKMN_STATUS, cmd::SET, 0, "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR][OWN1] heilt sich.[A]" ),
                 cmd( std::vector<con>( { con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ),
                 con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                 con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ), con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                 con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::EQUALS, A_HYDRATION ), con( cmd::OPPONENT2, cmd::PKMN_STATUS, cmd::NOT_EQUALS, 0 ) } ),
-                cmd::OWN2, cmd::PKMN_STATUS, cmd::SET, 0, L"[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR][OWN2] heilt sich.[A]" ),
+                cmd::OWN2, cmd::PKMN_STATUS, cmd::SET, 0, "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR][OWN2] heilt sich.[A]" ),
                 cmd( std::vector<con>( { con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ),
                 con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                 con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ), con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                 con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::EQUALS, A_HYDRATION ), con( cmd::OPPONENT2, cmd::PKMN_STATUS, cmd::NOT_EQUALS, 0 ) } ),
-                cmd::OPPONENT1, cmd::PKMN_STATUS, cmd::SET, 0, L"[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR][OPP1] heilt sich.[A]" ),
+                cmd::OPPONENT1, cmd::PKMN_STATUS, cmd::SET, 0, "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR][OPP1] heilt sich.[A]" ),
                 cmd( std::vector<con>( { con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ),
                 con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                 con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ), con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                 con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::EQUALS, A_HYDRATION ), con( cmd::OPPONENT2, cmd::PKMN_STATUS, cmd::NOT_EQUALS, 0 ) } ),
-                cmd::OPPONENT2, cmd::PKMN_STATUS, cmd::SET, 0, L"[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR][OPP2] heilt sich.[A]" ),
+                cmd::OPPONENT2, cmd::PKMN_STATUS, cmd::SET, 0, "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR][OPP2] heilt sich.[A]" ),
 
                                             //Dry Skin
                                             cmd( std::vector<con>( { con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ),
                                             con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ), con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::EQUALS, A_DRY_SKIN ), con( cmd::OWN1, cmd::PKMN_HP_PERCENT, cmd::NOT_EQUALS, 100 ) } ),
-                                            cmd::OWN1, cmd::PKMN_HP, cmd::ADD, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 8 ), L"[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]KP von [OWN1]\nregenerieren sich.[A]" ),
+                                            cmd::OWN1, cmd::PKMN_HP, cmd::ADD, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 8 ), "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]KP von [OWN1]\nregenerieren sich.[A]" ),
                                             cmd( std::vector<con>( { con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ),
                                             con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ), con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::EQUALS, A_DRY_SKIN ), con( cmd::OPPONENT2, cmd::PKMN_HP_PERCENT, cmd::NOT_EQUALS, 100 ) } ),
-                                            cmd::OWN2, cmd::PKMN_STATUS, cmd::SET, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 8 ), L"[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]KP von [OWN2]\nregenerieren sich.[A]" ),
+                                            cmd::OWN2, cmd::PKMN_STATUS, cmd::SET, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 8 ), "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]KP von [OWN2]\nregenerieren sich.[A]" ),
                                             cmd( std::vector<con>( { con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ),
                                             con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ), con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::EQUALS, A_DRY_SKIN ), con( cmd::OPPONENT2, cmd::PKMN_HP_PERCENT, cmd::NOT_EQUALS, 100 ) } ),
-                                            cmd::OPPONENT1, cmd::PKMN_STATUS, cmd::SET, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 8 ), L"[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]KP von [OPP1]\nregenerieren sich.[A]" ),
+                                            cmd::OPPONENT1, cmd::PKMN_STATUS, cmd::SET, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 8 ), "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]KP von [OPP1]\nregenerieren sich.[A]" ),
                                             cmd( std::vector<con>( { con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ),
                                             con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ), con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::EQUALS, A_DRY_SKIN ), con( cmd::OPPONENT2, cmd::PKMN_HP_PERCENT, cmd::NOT_EQUALS, 100 ) } ),
-                                            cmd::OPPONENT2, cmd::PKMN_STATUS, cmd::SET, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 8 ), L"[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]KP von [OPP2]\nregenerieren sich.[A]" ),
+                                            cmd::OPPONENT2, cmd::PKMN_STATUS, cmd::SET, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 8 ), "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]KP von [OPP2]\nregenerieren sich.[A]" ),
 
                                             //Rain Dish
                                             cmd( std::vector<con>( { con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ),
                                             con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ), con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::EQUALS, A_RAIN_DISH ), con( cmd::OWN1, cmd::PKMN_HP_PERCENT, cmd::NOT_EQUALS, 100 ) } ),
-                                            cmd::OWN1, cmd::PKMN_HP, cmd::ADD, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 16 ), L"[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]KP von [OWN1]\nregenerieren sich.[A]" ),
+                                            cmd::OWN1, cmd::PKMN_HP, cmd::ADD, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 16 ), "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]KP von [OWN1]\nregenerieren sich.[A]" ),
                                             cmd( std::vector<con>( { con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ),
                                             con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ), con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::EQUALS, A_RAIN_DISH ), con( cmd::OPPONENT2, cmd::PKMN_HP_PERCENT, cmd::NOT_EQUALS, 100 ) } ),
-                                            cmd::OWN2, cmd::PKMN_STATUS, cmd::SET, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 16 ), L"[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]KP von [OWN2]\nregenerieren sich.[A]" ),
+                                            cmd::OWN2, cmd::PKMN_STATUS, cmd::SET, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 16 ), "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]KP von [OWN2]\nregenerieren sich.[A]" ),
                                             cmd( std::vector<con>( { con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ),
                                             con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ), con( cmd::OPPONENT2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::EQUALS, A_RAIN_DISH ), con( cmd::OPPONENT2, cmd::PKMN_HP_PERCENT, cmd::NOT_EQUALS, 100 ) } ),
-                                            cmd::OPPONENT1, cmd::PKMN_STATUS, cmd::SET, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 16 ), L"[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]KP von [OPP1]\nregenerieren sich.[A]" ),
+                                            cmd::OPPONENT1, cmd::PKMN_STATUS, cmd::SET, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 16 ), "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]KP von [OPP1]\nregenerieren sich.[A]" ),
                                             cmd( std::vector<con>( { con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ),
                                             con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_AIR_LOCK ), con( cmd::OWN1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OPPONENT1, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ), con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::NOT_EQUALS, A_CLOUD_NINE ),
                                             con( cmd::OWN2, cmd::PKMN_ABILITY, cmd::EQUALS, A_RAIN_DISH ), con( cmd::OPPONENT2, cmd::PKMN_HP_PERCENT, cmd::NOT_EQUALS, 100 ) } ),
-                                            cmd::OPPONENT2, cmd::PKMN_STATUS, cmd::SET, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 16 ), L"[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]KP von [OPP2]\nregenerieren sich.[A]" ),
+                                            cmd::OPPONENT2, cmd::PKMN_STATUS, cmd::SET, val( cmd::OWN1, cmd::PKMN_MAX_HP, 1.0f / 16 ), "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]KP von [OPP2]\nregenerieren sich.[A]" ),
                                         } ) ),
             //Hail
 
@@ -300,27 +300,27 @@ namespace BATTLE {
 
             //SUN
         };
-        const std::wstring _weatherMessage[ 9 ] = {
-            L"",
-            L"Es regnet.[A]",
-            L"Es hagelt.[A]",
-            L"Es herrscht dichter Nebel...[A]",
-            L"Der Sandsturm wirkt.[A]",
-            L"Das Sonnenlicht ist stark.[A]",
-            L"Enormer Regen.[A]",
-            L"Extremes Sonnenlicht.[A]",
-            L"Starke Winde wehen.[A]"
+        const std::string _weatherMessage[ 9 ] = {
+            "",
+            "Es regnet.[A]",
+            "Es hagelt.[A]",
+            "Es herrscht dichter Nebel...[A]",
+            "Der Sandsturm wirkt.[A]",
+            "Das Sonnenlicht ist stark.[A]",
+            "Enormer Regen.[A]",
+            "Extremes Sonnenlicht.[A]",
+            "Starke Winde wehen.[A]"
         };
-        const std::wstring _weatherEndMessage[ 9 ] = {
-            L"",
-            L"Der Regen stoppte.[A]",
-            L"Der Hagel stoppte.[A]",
-            L"Der Nebel verzog sich.[A]",
-            L"Der Sandsturm verzog sich.[A]",
-            L"Das Sonnenlicht wurde wieder normal.[A]",
-            L"Der Regen stoppte.[A]",
-            L"Das Sonnenlicht wurde wieder normal.[A]",
-            L"Windstille...[A]"
+        const std::string _weatherEndMessage[ 9 ] = {
+            "",
+            "Es hat aufgehört zu regnen.[A]",
+            "Es hat aufgehört zu hageln.[A]",
+            "Der Nebel verzog sich.[A]",
+            "Der Sandsturm legt sich.[A]",
+            "Das Sonnenlicht wurde wieder normal.[A]",
+            "Es hat aufgehört zu regnen.[A]",
+            "Das Sonnenlicht wurde wieder normal.[A]",
+            "Windstille...[A]"
         };
 
         battlePokemon _pkmns[ 6 ][ 2 ];
@@ -349,7 +349,7 @@ namespace BATTLE {
 
         friend class battleScript;
         friend class battleUI;
-        friend std::wstring parseLogCmd( battle* p_battle, const std::wstring& p_cmd );
+        friend std::string parseLogCmd( battle* p_battle, const std::string& p_cmd );
         friend int getTargetSpecifierValue( const battle& p_battle,
                                             const pokemon& p_target,
                                             bool p_targetIsOpp,
@@ -409,7 +409,7 @@ namespace BATTLE {
                 u8 p_platform,
                 u8 p_background );
 
-        void        log( const std::wstring& p_message );
+        void        log( const std::string& p_message );
 
         s8          start( ); //Runs battle; returns -1 if opponent wins, 0 if tie, 1 otherwise
 

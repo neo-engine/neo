@@ -35,9 +35,6 @@ namespace IO {
     class keyboard {
     public:
         std::string getText( u8 p_length, const char* p_msg );
-        std::string getText( u8 p_length, const wchar_t* p_msg );
-        std::wstring getWText( u8 p_length, const char* p_msg );
-        std::wstring getWText( u8 p_length, const wchar_t* p_msg );
     private:
         u8 _page;
 
@@ -45,7 +42,6 @@ namespace IO {
 
         void drawPage( );
         void drawPage( const char* p_msg );
-        void drawPage( const wchar_t* p_msg );
 
         void drawChar( u8 p_pos, u16 p_char );
         void clearChar( u8 p_pos );

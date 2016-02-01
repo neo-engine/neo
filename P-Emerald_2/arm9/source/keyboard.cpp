@@ -94,8 +94,10 @@ namespace IO {
                 case '\n':
                     return guardEmptyString( res );
                 case '\b':
-                    if( pos )
+                    if( pos ) {
                         clearChar( --pos );
+                        res.pop_back( );
+                    }
                     break;
                 case '\a':
                     _page = ( _page + 1 ) % MAX_KEYBOARD_PAGES;
@@ -114,22 +116,6 @@ namespace IO {
     std::string keyboard::getText( u8 p_length, const char* p_msg ) {
         drawPage( p_msg );
         return getText( p_length );
-    }
-    std::string keyboard::getText( u8 p_length, const wchar_t* p_msg ) {
-        drawPage( p_msg );
-        return getText( p_length );
-    }
-    std::wstring keyboard::getWText( u8 p_length, const char* p_msg ) {
-        auto rs = getText( p_length, p_msg );
-        std::wstring res = L"";
-        for( auto i : rs ) res += i;
-        return res;
-    }
-    std::wstring keyboard::getWText( u8 p_length, const wchar_t* p_msg ) {
-        auto rs = getText( p_length, p_msg );
-        std::wstring res = L"";
-        for( auto i : rs ) res += i;
-        return res;
     }
 
     void init( ) {
@@ -171,23 +157,17 @@ namespace IO {
             regularFont->printString( p_msg, 8, 4, true );
         drawPage( );
     }
-    void keyboard::drawPage( const wchar_t* p_msg ) {
-        init( );
-        if( p_msg != 0 )
-            regularFont->printString( p_msg, 8, 4, true );
-        drawPage( );
-    }
 
     void keyboard::drawChar( u8 p_pos, u16 p_char ) {
         printChar( regularFont, p_char, 8 + p_pos * ( textWidth + margin ) + 2,
-                   -13 + ( textHeight + 2 * margin ) + textHeight, true );
+                   -12 + ( textHeight + 2 * margin ) + textHeight, true );
     }
     void keyboard::clearChar( u8 p_pos ) {
-        printRectangle( 8 + p_pos * ( textWidth + margin ), 2 + textHeight + 2 * margin,
-                        8 + p_pos * ( textWidth + margin ) + textWidth, 4 + 2 * textHeight + 2 * margin,
+        printRectangle( 8 + p_pos * ( textWidth + margin ), 1 + textHeight + 2 * margin,
+                        8 + p_pos * ( textWidth + margin ) + textWidth, 5 + 2 * textHeight + 2 * margin,
                         true, false, GRAY_IDX );
         printChar( regularFont, '_', 8 + p_pos * ( textWidth + margin ) + 1,
-                   -10 + 2 * textHeight + 2 * margin, true );
+                   -9 + 2 * textHeight + 2 * margin, true );
     }
 
     u16 keyboard::getNextChar( ) {
@@ -198,68 +178,38 @@ namespace IO {
             touchRead( &touch );
             pressed = keysCurrent( );
 
-            if( GET_AND_WAIT( KEY_SELECT ) )
-                return '\a';
-            if( GET_AND_WAIT( KEY_B ) )
-                return '\b';
-            if( GET_AND_WAIT( KEY_START ) )
+            if( GET_AND_WAIT( KEY_START ) || GET_AND_WAIT( KEY_A ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) )
                 return '\n';
+            if( GET_AND_WAIT( KEY_SELECT ) || GET_AND_WAIT_C( 248, 162, 16 ) )
+                return '\a';
+            if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_C( 220, 184, 16 ) )
+                return '\b';
+
+            for( u8 y = 0; y < numRows; ++y )
+                for( u8 x = 0; x < charsPerRow; ++x ) {
+                    u8 px = sx + x * ( width + margin );
+                    u8 py = sy + y * ( height + margin );
+                    if( touch.px >= px && touch.px <= px + width
+                        && touch.py >= py && touch.py <= py + height ) {
+
+                        printChoiceBox( px, py, px + width, py + height,
+                                        2, COLOR_IDX, true );
+                        printChar( regularFont, pages[ _page ][ y * charsPerRow + x ],
+                                   px + 4, py + 3, true );
+                        if( waitForTouchUp( px, py, px + width, py + width ) ) {
+                            printChoiceBox( px, py, px + width, py + height,
+                                            2, COLOR_IDX, false );
+                            printChar( regularFont, pages[ _page ][ y * charsPerRow + x ],
+                                       px + 2, py + 2, true );
+                            return pages[ _page ][ y * charsPerRow + x ];
+                        }
+                        printChoiceBox( px, py, px + width, py + height,
+                                        2, COLOR_IDX, false );
+                        printChar( regularFont, pages[ _page ][ y * charsPerRow + x ],
+                                   px + 2, py + 2, true );
+                    }
+                }
         }
         return '\n';
     }
-
-
-    /* std::wstring keyboard::getText( u16 p_length, const char* p_msg ) {
-
-
-         std::wstring out = L"";
-         draw( p_msg, out, p_length );
-
-         touchPosition touch;
-         u8 i = 0;
-         loop( ) {
-             scanKeys( );
-             touchRead( &touch );
-
-             u16 keyPosX = ( touch.px - x ) / ( width + margin );
-             u16 keyPosY = ( touch.py - y ) / ( height + margin );
-
-             u16 nx = x + keyPosX * ( width + margin ),
-                 ny = y + keyPosY * ( width + margin );
-
-             if( i < p_length && _chars.count( { _ind, { nx, ny } } ) ) {
-                 printChoiceBox( nx, ny, nx + width, ny + height, 2, COLOR_IDX, true );
-                 printChar( regularFont, _chars[ { _ind, { nx, ny } } ], nx + 4, ny + 4, true );
-                 bool res = waitForTouchUp( nx, ny, nx + width, ny + height );
-
-                 printChoiceBox( nx, ny, nx + width, ny + height, 2, COLOR_IDX, false );
-                 printChar( regularFont, _chars[ { _ind, { nx, ny } } ], nx + 2, ny + 2, true );
-
-                 if( !res )
-                     continue;
-
-                 ++i;
-                 out += _chars[ { _ind, { nx, ny } } ];
-
-                 printChar( regularFont, _chars[ { _ind, { nx, ny } } ], 8 + i * ( width + margin ) + 2, 4 + ( height + margin ) * !!p_msg + 2, true );
-                 swiWaitForVBlank( );
-             } else if( GET_AND_WAIT_C( 248, 162, 16 ) ) {
-                 _ind = ( _ind + 1 ) % MAXKEYBOARDS;
-                 draw( p_msg, out, p_length );
-             } else if( GET_AND_WAIT_C( 248, 184, 16 ) ) {
-                 return out;
-             } else if( GET_AND_WAIT_C( 220, 184, 16 ) ) {
-                 out.pop_back( );
-                 --i;
-                 printRectangle( 8 + i * ( width + margin ), 4 + ( height + margin ) * !!p_msg,
-                                 8 + i * ( width + margin ) + width, 4 + ( height + margin ) * !!p_msg + height,
-                                 true, false, GRAY_IDX );
-                 printChar( regularFont, '_', 8 + i * ( width + margin ) + 2, 4 + ( height + margin ) * !!p_msg + 2, true );
-             }
-             swiWaitForVBlank( );
-         }
-
-         return out;
-     }
- */
 }

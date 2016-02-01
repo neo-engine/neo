@@ -226,8 +226,7 @@ namespace IO {
         }
         return waitForTouchUp( p_inputTarget );
     }
-
-
+    
     void initTextField( ) {
         regularFont->setColor( 0, 0 );
         regularFont->setColor( BLACK_IDX, 1 );
@@ -244,6 +243,7 @@ namespace IO {
         printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
     }
 
+    [[ deprecated( "use printRectangle" ) ]]
     void putrec( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
         printRectangle( p_x1, p_y1, p_x2, p_y2, p_bottom, p_striped, p_color );
     }
@@ -398,31 +398,15 @@ namespace IO {
     void printStringCenterD( font* p_font, const char *p_string, bool p_bottom ) {
         p_font->printStringCenterD( p_string, p_bottom );
     }
-    void printNumber( font* p_font, s32 p_num, s16 p_x, s16 p_y, bool p_bottom );
+    void printNumber( font* p_font, s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
+        p_font->printNumber( p_num, p_x, p_y, p_bottom );
+    }
 
-    void printString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance ) {
-        p_font->printString( p_string, p_x, p_y, p_bottom, p_yDistance );
-    }
     void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printMBString( p_string, p_x, p_y, p_bottom );
-    }
-    void printMBString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         p_font->printMBString( p_string, p_x, p_y, p_bottom );
     }
     void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         p_font->printMBStringD( p_string, p_x, p_y, p_bottom );
-    }
-    void printMBStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printMBStringD( p_string, p_x, p_y, p_bottom );
-    }
-    void printStringCenter( font* p_font, const wchar_t *p_string, bool p_bottom ) {
-        p_font->printStringCenter( p_string, p_bottom );
-    }
-    void printStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printStringD( p_string, p_x, p_y, p_bottom );
-    }
-    void printStringCenterD( font* p_font, const wchar_t *p_string, bool p_bottom ) {
-        p_font->printStringCenterD( p_string, p_bottom );
     }
 
     void topScreenPlot( u8 p_x, u8 p_y, color p_color ) {

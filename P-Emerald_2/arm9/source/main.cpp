@@ -340,7 +340,7 @@ int main( int, char** p_argv ) {
                     if( yn.getResult( buffer ) ) {
                         IO::drawSub( );
                         swiWaitForVBlank( );
-                        sprintf( buffer, "%ls setzt %s ein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                        sprintf( buffer, "%s setzt %s ein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                         IO::messageBox( buffer, 0, false );
                         MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
                         IO::drawSub( true );
@@ -527,7 +527,7 @@ OUT:
 
                     for( u8 i = 0; i < 3; ++i ) {
                         pokemon a( 0, i + 456, 0,
-                                   30, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko", false );
+                                   30, FS::SAV->m_id + 1, FS::SAV->m_sid, "Heiko", false );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                     }
@@ -546,7 +546,7 @@ OUT:
 
                     for( u8 i = 0; i < 6; ++i ) {
                         pokemon a( 0, 435 + i, 0,
-                                   15, FS::SAV->m_id + 1, FS::SAV->m_sid, L"Heiko", false );
+                                   15, FS::SAV->m_id + 1, FS::SAV->m_sid, "Heiko", false );
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                     }
@@ -595,8 +595,8 @@ OUT:
                 case 10:
                 {
                     IO::keyboard kbd;
-                    auto res = kbd.getWText( 10, "Type some text!" );
-                    sprintf( buffer, "Got: “%ls”", res.c_str( ) );
+                    auto res = kbd.getText( 10, "Type some text!" );
+                    sprintf( buffer, "Got: “%s”", res.c_str( ) );
                     IO::messageBox( buffer, true );
                     break;
                 }

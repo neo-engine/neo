@@ -37,6 +37,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "ribbon.h"
 
 #include <cstdio>
+#include <algorithm>
 
 #include "memo.h"
 #include "atks.h"
@@ -170,10 +171,12 @@ namespace STS {
                                    borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
                 }
 
-                sprintf( buffer, "%ls", FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 - mval, false );
-                sprintf( buffer, "%ls", getWDisplayName( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId ) );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 14 - mval, false );
+                IO::regularFont->printString( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name,
+                                              ADJUST_X( i, x, FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name ),
+                                              borders[ i ][ 1 ] * 8 - mval, false );
+                IO::regularFont->printString( getDisplayName( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId ),
+                                              ADJUST_X( i, x, getDisplayName( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId ) ),
+                                              borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
                 IO::regularFont->setColor( 142 + 2 * i, 2 );
                 if( FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP )
@@ -582,7 +585,7 @@ namespace STS {
             IO::regularFont->setColor( BLUE2_IDX, 2 );
         }
         char buffer[ 50 ];
-        sprintf( buffer, "%ls/%05d", currPkmn.m_boxdata.m_oT, currPkmn.m_boxdata.m_oTId );
+        sprintf( buffer, "%s/%05d", currPkmn.m_boxdata.m_oT, currPkmn.m_boxdata.m_oTId );
         IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 34, p_bottom );
 
         if( !currPkmn.m_boxdata.isShiny( ) )

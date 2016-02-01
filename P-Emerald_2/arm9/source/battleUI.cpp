@@ -149,7 +149,7 @@ namespace BATTLE {
     void battleUI::setLogTextColor( u16 p_color ) {
         BG_PALETTE_SUB[ COLOR_IDX ] = BG_PALETTE[ COLOR_IDX ] = p_color;
     }
-    void battleUI::writeLogText( const std::wstring& p_message ) {
+    void battleUI::writeLogText( const std::string& p_message ) {
         IO::regularFont->printMBString( p_message.c_str( ), 8, 8, true );
     }
 
@@ -481,7 +481,7 @@ namespace BATTLE {
                                          acPkmn.m_boxdata.m_speciesId, x, y,
                                          PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    p_battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    p_battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
             IO::updateOAM( false );
@@ -530,7 +530,7 @@ namespace BATTLE {
                                          acPkmn.m_boxdata.m_speciesId, x, y,
                                          PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
             IO::updateOAM( false );
@@ -548,7 +548,7 @@ namespace BATTLE {
         tilecnt = initStsBalls( true, p_battle, tilecnt );
         initColors( );
 
-        sprintf( buffer, "Eine Herausforderung von\n%ls %s!",
+        sprintf( buffer, "Eine Herausforderung von\n%s %s!",
                  trainerclassnames[ p_battle->_opponent->m_trainerClass ].c_str( ),
                  p_battle->_opponent->m_battleTrainerName.c_str( ) );
         IO::regularFont->printString( buffer, 16, 80, true );
@@ -621,7 +621,7 @@ namespace BATTLE {
 
             consoleSelect( &IO::Top );
             consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
-            printf( "%10ls%c\n",
+            printf( "%10s%c\n",
                     acPkmn.m_boxdata.m_name,
                     GENDER( acPkmn ) );
             printf( "Lv%3d%4dKP\n", acPkmn.m_level,
@@ -741,7 +741,7 @@ namespace BATTLE {
             consoleSetWindow( &IO::Bottom, ( x + 6 ) / 8, ( y + 6 ) / 8, 20, 8 );
             if( !acPkmn.m_boxdata.m_individualValues.m_isEgg ) {
                 printf( "       Lv.%3d", acPkmn.m_level );
-                printf( "\n%14ls\n", acPkmn.m_boxdata.m_name );
+                printf( "\n%14s\n", acPkmn.m_boxdata.m_name );
                 printf( "%14s\n\n",
                         ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) );
                 printf( "   %3i/%3i",
@@ -810,7 +810,7 @@ namespace BATTLE {
                 printf( "Schon besiegt..." );
             else
                 printf( "Schon ausgew\x84""hlt" );
-            printf( "\n----------------\n%11ls %c\n%11s\n\nLv.%3i %3i/%3iKP",
+            printf( "\n----------------\n%11s %c\n%11s\n\nLv.%3hhu %3ihu/%3ihuKP",
                     p_pokemon.m_boxdata.m_name,
                     GENDER( p_pokemon ),
                     ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
@@ -950,8 +950,8 @@ namespace BATTLE {
 
             consoleSetWindow( &IO::Bottom, 2, 1, 13, 2 );
 
-            std::swprintf( wbuffer, 20, L"%ls /", p_pokemon.m_boxdata.m_name );
-            IO::regularFont->printString( wbuffer, 16, 96, true );
+            std::sprintf( buffer, "%s /", p_pokemon.m_boxdata.m_name );
+            IO::regularFont->printString( buffer, 16, 96, true );
             s8 G = p_pokemon.m_boxdata.gender( );
 
             if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 ) {
@@ -965,7 +965,7 @@ namespace BATTLE {
             }
             IO::regularFont->setColor( WHITE_IDX, 1 );
 
-            IO::regularFont->printString( getWDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
+            IO::regularFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
@@ -1262,14 +1262,14 @@ namespace BATTLE {
                         SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                         ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
         IO::ASpriteOamIndex = SUB_A_OAM;
-        _battle->log( std::wstring( L"Ein wildes " ) + _battle->_wildPokemon.m_pokemon->m_boxdata.m_name + L" erscheint![A]" );
+        _battle->log( std::string( "Ein wildes " ) + _battle->_wildPokemon.m_pokemon->m_boxdata.m_name + " erscheint![A]" );
     }
 
     u8 firstMoveSwitchTarget = 0;
     bool battleUI::declareBattleMove( u8 p_pokemonPos, bool p_showBack ) {
-        wchar_t wbuffer[ 100 ];
-        swprintf( wbuffer, 50, L"Was soll %ls tun?", ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
-        writeLogText( wbuffer );
+        char buffer[ 100 ];
+        std::sprintf( buffer, "Was soll %s tun?", ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
+        writeLogText( buffer );
 
         loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                          _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
@@ -1325,7 +1325,7 @@ SHOW_ATTACK:
                 loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                                  _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
-                writeLogText( wbuffer );
+                writeLogText( buffer );
 
             } else if( GET_AND_WAIT_R( 0, 162, 58, 300 ) ) { //Bag
 
@@ -1369,8 +1369,8 @@ SHOW_ATTACK:
                 }
 NEXT_TRY:
                 initLogScreen( );
-                swprintf( wbuffer, 50, L"Was soll %ls tun?", ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
-                writeLogText( wbuffer );
+                std::sprintf( buffer, "Was soll %s tun?", ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
+                writeLogText( buffer );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
 
             } else if( !_battle->m_isWildBattle && FS::SAV->m_activatedPNav && GET_AND_WAIT_R( 95, 152, 152, 178 ) ) {
@@ -1384,23 +1384,23 @@ NEXT_TRY:
                     return true;
                 }
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
-                writeLogText( wbuffer );
+                writeLogText( buffer );
 
             } else if( _battle->m_isWildBattle && GET_AND_WAIT_R( 97, 162, 153, 180 ) ) { //Run
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::RUN;
                 if( _battle->run( ) ) {
-                    _battle->log( L"Du bist entkommen.[A]" );
+                    _battle->log( "Du bist entkommen.[A]" );
                     return true;
                 } else
-                    _battle->log( L"Flucht gescheitert...[A]" );
+                    _battle->log( "Flucht gescheitert...[A]" );
                 if( result.m_value ) {
                     loadA( );
                     return true;
                 }
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
-                writeLogText( wbuffer );
+                writeLogText( buffer );
 
             } else if( GET_AND_WAIT_R( 195, 148, 238, 176 ) ) { // Switch Pkmn
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
@@ -1414,7 +1414,7 @@ NEXT_TRY:
                 loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                                  _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
-                writeLogText( wbuffer );
+                writeLogText( buffer );
             }
         }
     }
@@ -1422,7 +1422,7 @@ NEXT_TRY:
     u16 battleUI::chooseAttack( u8 p_pokemonPos ) {
         u16 result = 0;
 
-        writeLogText( L"Welche Attacke?" );
+        writeLogText( "Welche Attacke?" );
 
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
 
@@ -1540,7 +1540,7 @@ END:
     u8 battleUI::chooseAttackTarget( u8 p_pokemonPos, u16 p_move ) {
         u8 result = 0;
 
-        writeLogText( L"Welches PKMN angreifen?" );
+        writeLogText( "Welches PKMN angreifen?" );
 
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
 
@@ -1784,7 +1784,7 @@ START:
         initColors( );
         IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
 
-        writeLogText( L"Welches PKMN?" );
+        writeLogText( "Welches PKMN?" );
 
         touchPosition touch;
         loop( ) {
@@ -1858,7 +1858,7 @@ CLEAR:
     }
 
     void battleUI::useNav( ) {
-        _battle->log( L"Use Nav[A]" );
+        _battle->log( "Use Nav[A]" );
     }
 
     void battleUI::showAttack( bool p_opponent, u8 p_pokemonPos ) {
@@ -1888,7 +1888,7 @@ CLEAR:
         if( p_opponent == p_pokemonPos ) {
             consoleSetWindow( &IO::Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             consoleClear( );
-            printf( "%10ls%c\n",
+            printf( "%10s%c\n",
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
                     GENDER( ACPKMN2( *_battle, p_pokemonPos, p_opponent ) ) );
             printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_level,
@@ -1896,7 +1896,7 @@ CLEAR:
         } else {
             consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             consoleClear( );
-            printf( "%10ls%c\n",
+            printf( "%10s%c\n",
                     ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
                     GENDER( ACPKMN2( *_battle, p_pokemonPos, p_opponent ) ) );
             printf( "Lv%3d%4dKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_level,
@@ -1925,8 +1925,8 @@ CLEAR:
         u16 expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
                                                 ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
 
-        std::swprintf( wbuffer, 50, L"%ls gewinnt %d E.-Punkte.[A]", acPkmn.m_boxdata.m_name, p_gainedExp );
-        _battle->log( wbuffer );
+        std::sprintf( buffer, "%s gewinnt %lu E.-Punkte.[A]", acPkmn.m_boxdata.m_name, p_gainedExp );
+        _battle->log( buffer );
         IO::displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
 
 
@@ -1958,8 +1958,8 @@ CLEAR:
 
             acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
 
-            std::swprintf( wbuffer, 50, L"%ls erreicht Level %d.[A]", acPkmn.m_boxdata.m_name, acPkmn.m_level );
-            _battle->log( wbuffer );
+            std::sprintf( buffer, "%s erreicht Level %d.[A]", acPkmn.m_boxdata.m_name, acPkmn.m_level );
+            _battle->log( buffer );
 
             updateHP( p_opponent, p_pokemonPos, oldHP, oldHPmax );
             oldHP = acPkmn.m_stats.m_acHP;
@@ -2061,11 +2061,11 @@ CLEAR:
         //Lets do some animation stuff here
         if( !p_silent ) {
             if( p_opponent )
-                std::swprintf( wbuffer, 200, L"[TRAINER] ([TCLASS]) schickt\n%ls in den Kampf![A]",
+                std::sprintf( buffer, "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]",
                                ACPKMN2( *_battle, p_pokemonPos, OPPONENT ).m_boxdata.m_name );
             else
-                std::swprintf( wbuffer, 50, L"Los [OWN%d]![A]", p_pokemonPos + 1 );
-            _battle->log( wbuffer );
+                std::sprintf( buffer, "Los [OWN%d]![A]", p_pokemonPos + 1 );
+            _battle->log( buffer );
 
             setStsBallVisibility( p_opponent, p_pokemonPos, true, false );
             IO::updateOAM( false );
@@ -2081,7 +2081,7 @@ CLEAR:
                                          acPkmn.m_boxdata.m_speciesId, x, y,
                                          PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
         } else {
@@ -2092,7 +2092,7 @@ CLEAR:
                                          acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
                                          PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
             adjustSprite( p_opponent, p_pokemonPos );
@@ -2121,14 +2121,14 @@ CLEAR:
         consoleSelect( &IO::Top );
         if( p_opponent == p_pokemonPos ) {
             consoleSetWindow( &IO::Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
-            printf( "%10ls%c\n",
+            printf( "%10s%c\n",
                     acPkmn.m_boxdata.m_name,
                     GENDER( acPkmn ) );
             printf( "Lv%3d%4dKP\n", acPkmn.m_level,
                     acPkmn.m_stats.m_acHP );
         } else {
             consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
-            printf( "%10ls%c\n",
+            printf( "%10s%c\n",
                     acPkmn.m_boxdata.m_name,
                     GENDER( acPkmn ) );
             printf( "Lv%3d%4dKP\n", acPkmn.m_level,
@@ -2152,7 +2152,7 @@ CLEAR:
                                          acPkmn.m_boxdata.m_speciesId, x, y,
                                          PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
         } else {
@@ -2163,7 +2163,7 @@ CLEAR:
                                          acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
                                          PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
             adjustSprite( p_opponent, p_pokemonPos );
@@ -2185,11 +2185,11 @@ CLEAR:
                 return;
 
         if( acPkmn.m_boxdata.m_moves[ 3 ] ) {
-            std::swprintf( wbuffer, 50, L"%ls kann nun\n%s erlernen![A][CLEAR]Aber %ls kennt\nbereits 4 Attacken.[A]",
+            std::sprintf( buffer, "%s kann nun\n%s erlernen![A][CLEAR]Aber %s kennt\nbereits 4 Attacken.[A]",
                            acPkmn.m_boxdata.m_name,
                            AttackList[ p_move ]->m_moveName.c_str( ),
                            acPkmn.m_boxdata.m_name );
-            _battle->log( wbuffer );
+            _battle->log( buffer );
             IO::yesNoBox yn;
 ST:
             if( yn.getResult( "Soll eine Attacke\nvergessen werden?" ) ) {
@@ -2211,11 +2211,11 @@ ST:
                 } else {
                     initLogScreen( );
                     loadA( );
-                    std::swprintf( wbuffer, 100, L"%ls vergisst %s[A]\nund erlernt %s![A]",
+                    std::sprintf( buffer, "%s vergisst %s[A]\nund erlernt %s![A]",
                                    acPkmn.m_boxdata.m_name,
                                    AttackList[ res ]->m_moveName.c_str( ),
                                    AttackList[ p_move ]->m_moveName.c_str( ) );
-                    _battle->log( wbuffer );
+                    _battle->log( buffer );
 
                     for( u8 i = 0; i < 4; ++i )
                         if( acPkmn.m_boxdata.m_moves[ i ] == res ) {
@@ -2244,10 +2244,10 @@ ST:
                 if( !acPkmn.m_boxdata.m_moves[ i ] ) {
                     acPkmn.m_boxdata.m_moves[ i ] = p_move;
                     acPkmn.m_boxdata.m_acPP[ i ] = std::min( acPkmn.m_boxdata.m_acPP[ i ], AttackList[ p_move ]->m_movePP );
-                    std::swprintf( wbuffer, 50, L"%ls erlernt %s![A]",
+                    std::sprintf( buffer, "%s erlernt %s![A]",
                                    acPkmn.m_boxdata.m_name,
                                    AttackList[ p_move ]->m_moveName.c_str( ) );
-                    _battle->log( wbuffer );
+                    _battle->log( buffer );
                     break;
                 }
             }
@@ -2313,7 +2313,7 @@ ST:
         if( p_ticks == (u8) -1 ) {
             IO::OamTop->oamBuffer[ PB_ANIM ].isHidden = true;
             IO::updateOAM( false );
-            _battle->log( L"Der Ball wurde abgeblockt.\nSei kein Dieb![A]" );
+            _battle->log( "Der Ball wurde abgeblockt.\nSei kein Dieb![A]" );
             return;
         }
         for( int i = 0; i < 4; ++i )
@@ -2445,8 +2445,8 @@ ST:
         for( int i = 0; i < 30; ++i )
             swiWaitForVBlank( );
 
-        swprintf( wbuffer, 100, L"Toll!\n%ls wurde gefangen![A]", _battle->_wildPokemon.m_pokemon->m_boxdata.m_name );
-        _battle->log( wbuffer );
+        std::sprintf( buffer, "Toll!\n%s wurde gefangen![A]", _battle->_wildPokemon.m_pokemon->m_boxdata.m_name );
+        _battle->log( buffer );
         return;
 BREAK:
         IO::copySpriteData( PokeBall11Tiles, PB_ANIM_TILES, PokeBall11TilesLen, false );
@@ -2455,10 +2455,10 @@ BREAK:
             IO::OamTop->oamBuffer[ PKMN_IDX( 0, OPPONENT ) + i ].isHidden = false;
         IO::OamTop->oamBuffer[ PB_ANIM ].isHidden = true;
         IO::updateOAM( false );
-        if( p_ticks == 0 ) _battle->log( L"Mist!\nEs hat sich befreit...[A]" );
-        else if( p_ticks == 1 ) _battle->log( L"Oh.\nFast war es gefangen...[A]" );
-        else if( p_ticks == 2 ) _battle->log( L"Mist!\nDas war knapp...[A]" );
-        else if( p_ticks == 3 ) _battle->log( L"Verflixt!\nEs war doch fast gefangen...[A]" );
+        if( p_ticks == 0 ) _battle->log( "Mist!\nEs hat sich befreit...[A]" );
+        else if( p_ticks == 1 ) _battle->log( "Oh.\nFast hätte es geklappt...[A]" );
+        else if( p_ticks == 2 ) _battle->log( "Mist!\nDas war knapp...[A]" );
+        else if( p_ticks == 3 ) _battle->log( "Verflixt!\nEs war doch fast gefangen...[A]" );
         return;
     }
 
@@ -2493,7 +2493,7 @@ BREAK:
                                      acPkmn.m_boxdata.m_speciesId, x, y,
                                      PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
                                      acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                _battle->log( L"Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
             }
         }
         IO::updateOAM( false );
@@ -2502,13 +2502,13 @@ BREAK:
         initLogScreen( );
 
         IO::yesNoBox yn;
-        sprintf( buffer, "Möchtest du dem %ls\neinen Spitznamen geben?", acPkmn.m_boxdata.m_name );
+        sprintf( buffer, "Möchtest du dem %s\neinen Spitznamen geben?", acPkmn.m_boxdata.m_name );
         if( yn.getResult( buffer ) ) {
             IO::keyboard kbd;
-            auto nick = kbd.getWText( 10, "Wähle einen Spitznamen!" );
-            if( wcscmp( nick.c_str( ), acPkmn.m_boxdata.m_name )
-                && wcscmp( L"", acPkmn.m_boxdata.m_name ) ) {
-                wcscpy( acPkmn.m_boxdata.m_name, nick.c_str( ) );
+            auto nick = kbd.getText( 10, "Wähle einen Spitznamen!" );
+            if( strcmp( nick.c_str( ), acPkmn.m_boxdata.m_name )
+                && strcmp( "", nick.c_str( ) ) ) {
+                strcpy( acPkmn.m_boxdata.m_name, nick.c_str( ) );
                 acPkmn.m_boxdata.m_individualValues.m_isNicked = true;
             }
         }

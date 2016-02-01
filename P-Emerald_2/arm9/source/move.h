@@ -119,7 +119,7 @@ public:
           moveHitTypes p_moveHitType )
         : m_isFieldAttack( false ),
         m_moveName( p_moveName ),
-        m_moveEffect( BATTLE::battleScript( { BATTLE::battleScript::command( L"Attackeneffekt.[A]" ) } ) ), // <-- TODO 
+        m_moveEffect( BATTLE::battleScript( { BATTLE::battleScript::command( "Attackeneffekt.[A]" ) } ) ), // <-- TODO 
         m_moveBasePower( p_moveBasePower ),
         m_moveType( p_moveType ),
         m_moveAccuracy( p_moveAccuracy ),

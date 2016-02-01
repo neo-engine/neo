@@ -46,7 +46,7 @@ namespace FS {
     extern std::vector<pokemon> tmp;
     struct saveGame {
         //general stuff
-        wchar_t     m_playername[ 12 ];
+        char     m_playername[ 12 ];
         u8          m_isMale : 1;
         u16         m_id;
         u16         m_sid;
@@ -135,7 +135,7 @@ namespace FS {
                 else
                     break;
             char buffer[ 30 ];
-            sprintf( buffer, "%ls", m_playername );
+            sprintf( buffer, "%s", m_playername );
 
             static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp );
             return &res;

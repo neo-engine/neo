@@ -39,7 +39,6 @@
 #include "A.h"
 
 namespace IO {
-
     s16 curx = 8, cury = 8;
 
     void messageBox::clear( ) {
@@ -116,24 +115,6 @@ namespace IO {
 
         swiWaitForVBlank( );
     }
-    messageBox::messageBox( const wchar_t* p_text, bool p_remsprites ) {
-        m_isNamed = NULL;
-        initTextField( );
-        if( p_remsprites )
-            initOAMTable( true );
-        loadSprite( A_ID, 0, 0,
-                    SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
-                    ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
-        updateOAM( true );
-
-        ASpriteOamIndex = A_ID;
-        curx = 8;
-        cury = 8;
-        std::wstring text( p_text );
-        regularFont->printMBStringD( ( text + L'`' ).c_str( ), curx, cury, true );
-
-        swiWaitForVBlank( );
-    }
     messageBox::messageBox( const char* p_text, const char* p_name, bool p_a, bool p_remsprites, sprite_type p_sprt, u16 p_sprind ) {
         m_isNamed = p_name;
         if( p_remsprites )
@@ -174,46 +155,6 @@ namespace IO {
         }
         swiWaitForVBlank( );
     }
-    messageBox::messageBox( const wchar_t* p_text, const wchar_t* p_name, bool p_a, bool p_remsprites, sprite_type p_sprt, u16 p_sprind ) {
-        m_isNamed = NULL;
-        if( p_remsprites )
-            initOAMTable( true );
-        u16 c = 0;
-        c = loadSprite( A_ID, 0, 0,
-                        SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
-                        ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
-        updateOAM( true );
-        if( p_sprt != no_sprite ) {
-            if( p_sprt == sprite_pkmn ) {
-                c = loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_sprind, (u16) -16, 0, 0, 1, c, true, false, false, false, true );
-            }
-            if( p_sprt == sprite_trainer ) {
-                c = loadPKMNSprite( "nitro:/PICS/SPRITES/TRAINER/", p_sprind, (u16) -16, 0, 0, 1, c, true, false, true, false, true );
-            }
-            updateOAM( true );
-        }
-
-        initTextField( );
-
-        curx = 64 * ( !!p_name ) + 8;
-        cury = 8;
-        if( p_name )
-            regularFont->printString( p_name, 8, 8, true );
-        if( p_a ) {
-            ASpriteOamIndex = A_ID;
-            std::wstring text( p_text );
-            regularFont->printMBStringD( ( text + L'`' ).c_str( ), curx, cury, true );
-        } else
-            regularFont->printStringD( p_text, curx, cury, true );
-
-        if( !p_remsprites )
-            return;
-        if( p_sprt != no_sprite ) {
-            Oam->oamBuffer[ p_sprind ].isHidden = true;
-            updateOAM( true );
-        }
-        swiWaitForVBlank( );
-    }
 
     void messageBox::carriageReturn( ) {
         curx = 64 * ( !!m_isNamed ) + 8;
@@ -239,5 +180,4 @@ namespace IO {
 
         swiWaitForVBlank( );
     }
-
 }
