@@ -1799,13 +1799,15 @@ NEXT:
                 break;
             case BATTLE::battle::OPPONENT_WON:
             {
-                std::sprintf( buffer, "[TRAINER] [TCLASS] gewinnt...[A]" );
+                if( !m_isWildBattle ) {
+                    std::sprintf( buffer, "[TRAINER] [TCLASS] gewinnt...[A]" );
 
-                _battleUI->showEndScreen( );
+                    _battleUI->showEndScreen( );
 
-                std::sprintf( buffer, "%s[A]",
-                              _opponent->getWinMsg( ) );
-                log( buffer );
+                    std::sprintf( buffer, "%s[A]",
+                                  _opponent->getWinMsg( ) );
+                    log( buffer );
+                }
                 break;
             }
             case BATTLE::battle::PLAYER_WON:
@@ -1948,6 +1950,7 @@ NEXT:
                 break;
         }
 
+
         u8 status = 2;
         if( _wildPokemon.m_pokemon->m_status.m_isAsleep
             || _wildPokemon.m_pokemon->m_status.m_isFrozen )
@@ -1960,7 +1963,7 @@ NEXT:
 
         u32 catchRate = ( 3 * _wildPokemon.m_pokemon->m_stats.m_maxHP - 2 * _wildPokemon.m_pokemon->m_stats.m_acHP )
             * p.m_catchrate * ballCatchRate / 3 / _wildPokemon.m_pokemon->m_stats.m_maxHP * status;
-        u32 pr = ( 65535 << 4 ) / ( sqrt32( sqrt32( ( 255 << 14 ) / catchRate ) ) );
+        u32 pr = u32( ( 65535 << 4 ) / ( sqrt( sqrt( ( 255L << 18 ) / catchRate ) ) ) );
         u8 succ = 0;
         for( u8 i = 0; i < 4; ++i ) {
             u16 rn = rand( );

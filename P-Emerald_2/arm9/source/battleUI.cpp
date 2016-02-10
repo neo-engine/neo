@@ -2350,13 +2350,11 @@ ST:
             IO::updateOAM( false );
             swiWaitForVBlank( );
         }
-        for( int i = 0; i < 15; ++i )
+        for( int i = 0; i < 60; ++i )
             swiWaitForVBlank( );
 
         if( !p_ticks ) goto BREAK;
 
-        for( int i = 0; i < 30; ++i )
-            swiWaitForVBlank( );
         IO::copySpriteData( PokeBall12Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 5; ++i )
@@ -2379,13 +2377,11 @@ ST:
             swiWaitForVBlank( );
         IO::copySpriteData( PokeBall1Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
         IO::updateOAM( false );
-        for( int i = 0; i < 30; ++i )
+        for( int i = 0; i < 60; ++i )
             swiWaitForVBlank( );
 
         if( p_ticks == 1 ) goto BREAK;
 
-        for( int i = 0; i < 30; ++i )
-            swiWaitForVBlank( );
         IO::copySpriteData( PokeBall15Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 5; ++i )
@@ -2408,13 +2404,10 @@ ST:
             swiWaitForVBlank( );
         IO::copySpriteData( PokeBall1Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
         IO::updateOAM( false );
-        for( int i = 0; i < 30; ++i )
+        for( int i = 0; i < 60; ++i )
             swiWaitForVBlank( );
 
         if( p_ticks == 2 ) goto BREAK;
-
-        for( int i = 0; i < 30; ++i )
-            swiWaitForVBlank( );
         IO::copySpriteData( PokeBall12Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
         IO::updateOAM( false );
         for( int i = 0; i < 5; ++i )
@@ -2437,14 +2430,14 @@ ST:
             swiWaitForVBlank( );
         IO::copySpriteData( PokeBall1Tiles, PB_ANIM_TILES, PokeBall12TilesLen, false );
         IO::updateOAM( false );
-        for( int i = 0; i < 30; ++i )
+        for( int i = 0; i < 50; ++i )
             swiWaitForVBlank( );
 
         if( p_ticks == 3 ) goto BREAK;
 
-        for( int i = 0; i < 30; ++i )
+        for( int i = 0; i < 20; ++i )
             swiWaitForVBlank( );
-
+        
         std::sprintf( buffer, "Toll!\n%s wurde gefangen![A]", _battle->_wildPokemon.m_pokemon->m_boxdata.m_name );
         _battle->log( buffer );
         return;
