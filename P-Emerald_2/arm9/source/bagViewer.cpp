@@ -100,14 +100,14 @@ namespace BAG {
                     IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                    sprintf( buffer, "%s entwickelt sich...", p_pokemon.m_boxdata.m_name );
+                    sprintf( buffer, "%s entwickelt sich…", p_pokemon.m_boxdata.m_name );
                     IO::messageBox( buffer, false );
                     p_pokemon.evolve( );
 
                     initUI( );
                     swiWaitForVBlank( );
 
-                    sprintf( buffer, "...und wurde zu einem\n%s!", getDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
+                    sprintf( buffer, "…und wurde zu einem\n%s!", getDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
                     IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -118,7 +118,7 @@ namespace BAG {
             IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
             IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
             IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-            IO::messageBox( "Es würde keine Wirkung haben...", false );
+            IO::messageBox( "Es würde keine Wirkung haben…", false );
             return false;
         }
 
@@ -130,20 +130,20 @@ namespace BAG {
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                IO::messageBox( "Es würde keine\nWirkung haben...", false );
+                IO::messageBox( "Es würde keine\nWirkung haben…", false );
                 return false;
             } else if( ItemList[ p_item ]->m_itemType == item::itemType::GOODS ) {
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                sprintf( buffer, "%s entwickelt sich...", p_pokemon.m_boxdata.m_name );
+                sprintf( buffer, "%s entwickelt sich…", p_pokemon.m_boxdata.m_name );
                 IO::messageBox( buffer, false );
                 p_pokemon.evolve( p_item, 3 );
 
                 initUI( );
                 swiWaitForVBlank( );
 
-                sprintf( buffer, "...und wurde zu einem\n%s!", getDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
+                sprintf( buffer, "…und wurde zu einem\n%s!", getDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;

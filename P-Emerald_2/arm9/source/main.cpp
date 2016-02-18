@@ -457,7 +457,7 @@ OUT:
             const char *someText[ 11 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test", "Dbl Battle", "Sgl Battle",
                 "Chg NavScrn", "View Boxes A", "View Boxes B", "Hoenn Badges", "Kanto Badges", "Keyboard" };
             IO::choiceBox test( 11, &someText[ 0 ], 0, false );
-            int res = test.getResult( "Tokens of god-being..." );
+            int res = test.getResult( "Tokens of god-being…" );
             IO::drawSub( );
             switch( res ) {
                 case 0:
@@ -531,8 +531,8 @@ OUT:
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                     }
-                    BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
-                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, 0, 0 );
+                    BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm… Du bist gar nicht so schlecht…",
+                                               "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
 
                     BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
                                                 BATTLE::weather( rand( ) % 9 ), 0, 0, 5, BATTLE::battle::DOUBLE );
@@ -551,8 +551,8 @@ OUT:
                         //a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                     }
-                    BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
-                                               "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, 0, 0 );
+                    BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm… Du bist gar nicht so schlecht…",
+                                               "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
 
                     BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
                                                 BATTLE::HAIL/*weather( rand( ) % 9 )*/, 0, 0, 5, BATTLE::battle::SINGLE );

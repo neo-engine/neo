@@ -174,7 +174,7 @@ bool transferGame( ) {
         IO::messageBox( "Auch das Speichern an sich\nkann den Spielstand\nbeschädigen." );
         yn = IO::yesNoBox( );
         if( yn.getResult( "Möchtest du fortfahren?" ) ) {
-            IO::messageBox( "Lade Spielstand..." );
+            IO::messageBox( "Lade Spielstand…" );
             //int loadgame = acgame > 2 ? 1 : 0;
 
             // gen3::SaveParser* save3 = gen3::SaveParser::Instance( );

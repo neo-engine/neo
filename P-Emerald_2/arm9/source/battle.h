@@ -205,7 +205,7 @@ namespace BATTLE {
 
         void        refillBattleSpots( bool p_choice, bool p_send = true );
         u8          getNextPKMN( bool p_opponent, u8 p_startIdx = 0 );
-        void        orderPKMN( bool p_includeMovePriority = false ); //orders PKMN according to their speed, their move's priority, ... and stores result in _moveOrder
+        void        orderPKMN( bool p_includeMovePriority = false ); //orders PKMN according to their speed, their move's priority, … and stores result in _moveOrder
         void        switchPKMN( bool p_opponent, u8 p_toSwitch, u8 p_newPokemonPos );
 
         void        doItems( ability::abilityType p_situation );

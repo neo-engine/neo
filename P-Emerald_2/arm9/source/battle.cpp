@@ -372,7 +372,7 @@ CHOOSE1:
                         return ( battleEnd );
                     }
                 } else
-                    log( "[OWN1] kann nicht angreifen...[A]" );
+                    log( "[OWN1] kann nicht angreifen…[A]" );
             }
             //If 1st action is RUN, the player has no choice for a second move
             if( _battleMoves[ 0 ][ PLAYER ].m_type != battleMove::RUN && CUR_PKMN_STS( 1, PLAYER ) != KO ) {
@@ -385,7 +385,7 @@ CHOOSE1:
                         return ( battleEnd );
                     }
                 } else if( m_battleMode == DOUBLE )
-                    log( "[OWN2] kann nicht angreifen...[A]" );
+                    log( "[OWN2] kann nicht angreifen…[A]" );
             } else
                 _battleMoves[ 1 ][ PLAYER ].m_type = battleMove::RUN;
 
@@ -1125,7 +1125,7 @@ NEXT:
 
                 if( im->m_itemType != item::MEDICINE || im->needsInformation( 0 )
                     || im->needsInformation( 1 ) || !im->use( CUR_PKMN( p_pokemonPos, p_opponent ) ) )
-                    log( "Es hat keine Wirkung...[A]" );
+                    log( "Es hat keine Wirkung…[A]" );
                 else {
                     if( CUR_PKMN( p_pokemonPos, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
                         CUR_PKMN_STS( p_pokemonPos, PLAYER ) = NA;
@@ -1169,7 +1169,7 @@ NEXT:
                     u16 oldHP = CUR_PKMN( pos, p_opponent ).m_stats.m_acHP;
                     u16 oldHPmax = CUR_PKMN( pos, p_opponent ).m_stats.m_maxHP;
                     if( !im->use( CUR_PKMN( pos, p_opponent ) ) )
-                        log( "Es hat keine Wirkung...[A]" );
+                        log( "Es hat keine Wirkung…[A]" );
                     else {
                         if( CUR_PKMN( pos, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
                             CUR_PKMN_STS( pos, PLAYER ) = NA;
@@ -1402,7 +1402,7 @@ NEXT:
                 log( buffer );
                 moveHasTarget = true;
             }
-            //If the target is already ko, then it shouldn't be a target at all...
+            //If the target is already ko, then it shouldn't be a target at all…
             else if( !str.m_pokemon->m_stats.m_acHP ) {
                 bm.m_target &= ~( 1 << k );
             }
@@ -1460,7 +1460,7 @@ NEXT:
                     else if( effectivity == 0.0f )
                         std::sprintf( buffer, "[COLR:31:00:00]Hat die Attacke\n%s getroffen?[A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
                     else if( effectivity < 0.3f )
-                        std::sprintf( buffer, "[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %s...[A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
+                        std::sprintf( buffer, "[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %s…[A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
                     else if( effectivity < 1.0f )
                         std::sprintf( buffer, "[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %s.[A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
                     log( buffer );
@@ -1489,7 +1489,7 @@ NEXT:
                 handleFaint( j / 2, j % 2 );
         }
         if( !moveHasTarget ) {
-            log( "Es schlug fehl...[A]" );
+            log( "Es schlug fehl…[A]" );
         }
         return;
     }
@@ -1865,7 +1865,7 @@ NEXT:
         if( CUR_PKMN( p_pokemonPos, p_opponent ).canEvolve( ) ) {
             auto& acPkmn = CUR_PKMN( p_pokemonPos, p_opponent );
 
-            std::sprintf( buffer, "%s entwickelt sich...[A]", acPkmn.m_boxdata.m_name );
+            std::sprintf( buffer, "%s entwickelt sich…[A]", acPkmn.m_boxdata.m_name );
             log( buffer );
 
             acPkmn.evolve( );
@@ -1944,7 +1944,7 @@ NEXT:
             case BATTLE::battle::OPPONENT_WON:
             {
                 if( !m_isWildBattle ) {
-                    std::sprintf( buffer, "[TRAINER] [TCLASS] gewinnt...[A]" );
+                    std::sprintf( buffer, "[TRAINER] [TCLASS] gewinnt…[A]" );
 
                     _battleUI->showEndScreen( );
 

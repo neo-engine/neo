@@ -1396,7 +1396,7 @@ NEXT_TRY:
                     _battle->log( "Du bist entkommen.[A]" );
                     return true;
                 } else
-                    _battle->log( "Flucht gescheitert...[A]" );
+                    _battle->log( "Flucht gescheitert…[A]" );
                 if( result.m_value ) {
                     loadA( );
                     return true;
@@ -2450,10 +2450,10 @@ BREAK:
             IO::OamTop->oamBuffer[ PKMN_IDX( 0, OPPONENT ) + i ].isHidden = false;
         IO::OamTop->oamBuffer[ PB_ANIM ].isHidden = true;
         IO::updateOAM( false );
-        if( p_ticks == 0 ) _battle->log( "Mist!\nEs hat sich befreit...[A]" );
-        else if( p_ticks == 1 ) _battle->log( "Oh.\nFast hätte es geklappt...[A]" );
-        else if( p_ticks == 2 ) _battle->log( "Mist!\nDas war knapp...[A]" );
-        else if( p_ticks == 3 ) _battle->log( "Verflixt!\nEs war doch fast gefangen...[A]" );
+        if( p_ticks == 0 ) _battle->log( "Mist!\nEs hat sich befreit…[A]" );
+        else if( p_ticks == 1 ) _battle->log( "Oh.\nFast hätte es geklappt…[A]" );
+        else if( p_ticks == 2 ) _battle->log( "Mist!\nDas war knapp…[A]" );
+        else if( p_ticks == 3 ) _battle->log( "Verflixt!\nEs war doch fast gefangen…[A]" );
         return;
     }
 

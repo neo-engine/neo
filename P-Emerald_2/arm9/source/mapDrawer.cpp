@@ -350,7 +350,7 @@ namespace MAP {
 
         if( rn > 40 || !level ) {
             if( p_type == FISHING_ROD ) {
-                IO::messageBox m( "Doch nur ein alter Pokéball..." );
+                IO::messageBox m( "Doch nur ein alter Pokéball…" );
                 _playerIsFast = false;
                 IO::drawSub( true );
             }
@@ -636,7 +636,7 @@ namespace MAP {
                 return;
             }
 
-            //Check for jumps/slides/...
+            //Check for jumps/slides/…
             if( !canMove( FS::SAV->m_player.m_pos, p_direction, FS::SAV->m_player.m_movement ) ) {
                 stopPlayer( p_direction );
                 fastBike = false;
@@ -1243,7 +1243,7 @@ NEXT_PASS:
 OUT:
         fish.clear( );
         if( failed )
-            fish.put( "Es ist entkommen..." );
+            fish.put( "Es ist entkommen…" );
         IO::drawSub( true );
         for( s8 i = 2; i >= 0; --i ) {
             _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( frame + i, p_direction == RIGHT );
