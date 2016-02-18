@@ -921,7 +921,7 @@ namespace STS {
             return res;
 
         for( u8 i = 0; i < 4; ++i )
-            if( pkmn.m_boxdata.m_moves[ i ] < MAXATTACK &&
+            if( pkmn.m_boxdata.m_moves[ i ] < MAX_ATTACK &&
                 AttackList[ pkmn.m_boxdata.m_moves[ i ] ]->m_isFieldAttack )
                 names.push_back( AttackList[ pkmn.m_boxdata.m_moves[ i ] ]->m_moveName );
 

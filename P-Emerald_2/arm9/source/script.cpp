@@ -29,6 +29,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "script.h"
 #include "battle.h"
 
+#include <algorithm>
+
 namespace BATTLE {
     bool battleScript::command::condition::evaluate( int p_other ) const {
         switch( m_comp ) {
@@ -49,156 +51,45 @@ namespace BATTLE {
         }
     }
 
-    u8 targetVal;
-    int getTargetSpecifierValue( const battle& p_battle, const pokemon& p_target, bool p_targetIsOpp,
-                                 u8 p_targetPosition, const battleScript::command::targetSpecifier& p_targetSpecifier ) {
-        pokemonData data; getAll( p_target.m_boxdata.m_speciesId, data );
-        switch( p_targetSpecifier ) {
-            case BATTLE::battleScript::command::PKMN_TYPE1:
-                return int( data.m_types[ 0 ] );
-            case BATTLE::battleScript::command::PKMN_TYPE2:
-                return int( data.m_types[ 1 ] );
-            case BATTLE::battleScript::command::PKMN_TYPE1o2:
-            {
-                int a = int( data.m_types[ 1 ] );
-                if( targetVal == a )
-                    return a;
-                else
-                    return int( data.m_types[ 0 ] );
-                break;
-            }
-            case BATTLE::battleScript::command::PKMN_SIZE:
-                return int( data.m_size );
-            case BATTLE::battleScript::command::PKMN_WEIGHT:
-                return int( data.m_weight );
-            case BATTLE::battleScript::command::PKMN_SPECIES:
-                return p_target.m_boxdata.m_speciesId;
-            case BATTLE::battleScript::command::PKMN_ITEM:
-                return p_target.m_boxdata.m_holdItem;
-            case BATTLE::battleScript::command::PKMN_ABILITY:
-                return p_target.m_boxdata.m_ability;
-            case BATTLE::battleScript::command::PKMN_GENDER:
-                return ( p_target.m_boxdata.m_isFemale ? -1 : ( p_target.m_boxdata.m_isGenderless ? 0 : 1 ) );
-            case BATTLE::battleScript::command::PKMN_STATUS:
-                return p_target.m_statusint;
-            case BATTLE::battleScript::command::PKMN_HP:
-                return p_target.m_stats.m_acHP;
-            case BATTLE::battleScript::command::PKMN_MAX_HP:
-                return p_target.m_stats.m_maxHP;
-            case BATTLE::battleScript::command::PKMN_HP_PERCENT:
-                return p_target.m_stats.m_acHP * 100 / p_target.m_stats.m_maxHP;
-            case BATTLE::battleScript::command::PKMN_ATK:
-                return ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ATK ];
-            case BATTLE::battleScript::command::PKMN_DEF:
-                return ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ DEF ];
-            case BATTLE::battleScript::command::PKMN_SPD:
-                return ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ SPD ];
-            case BATTLE::battleScript::command::PKMN_SATK:
-                return ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ SATK ];
-            case BATTLE::battleScript::command::PKMN_SDEF:
-                return ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ SDEF ];
-            case BATTLE::battleScript::command::PKMN_ACCURACY:
-                return ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ACCURACY ];
-            case BATTLE::battleScript::command::PKMN_ATTACK_BLOCKED:
-                return ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ATTACK_BLOCKED ];
-            case BATTLE::battleScript::command::PKMN_LEVEL:
-                return p_target.m_level;
-            default:
-                return -1;
-        }
-    }
-    int getTargetSpecifierValue( const battle& p_target, const battleScript::command::targetSpecifier& p_targetSpecifier ) {
-        switch( p_targetSpecifier ) {
-            case BATTLE::battleScript::command::BATTLE_ROUND:
-                return p_target._round;
-            case BATTLE::battleScript::command::BATTLE_MODE:
-                return p_target.m_battleMode;
-            case BATTLE::battleScript::command::BATTLE_WEATHER:
-                return p_target.m_weather;
-            case BATTLE::battleScript::command::BATTLE_LAST_MOVE:
-                return p_target._lstMove;
-            case BATTLE::battleScript::command::BATTLE_LAST_OWN_MOVE:
-                return p_target._lstOwnMove;
-            case BATTLE::battleScript::command::BATTLE_LAST_OPP_MOVE:
-                return p_target._lstOppMove;
-            case BATTLE::battleScript::command::BATTLE_OWN_FST_MOVE:
-                if( p_target.m_battleMode == battle::SINGLE ||
-                    ( p_target._moveOrder[ 1 ][ PLAYER ] > p_target._moveOrder[ 0 ][ PLAYER ] ) )
-                    return ( p_target._battleMoves[ 0 ][ PLAYER ].m_type == battle::battleMove::ATTACK ) ? p_target._battleMoves[ 0 ][ PLAYER ].m_value : -1;
-                return ( p_target._battleMoves[ 1 ][ PLAYER ].m_type == battle::battleMove::ATTACK ) ? p_target._battleMoves[ 1 ][ PLAYER ].m_value : -1;
-            case BATTLE::battleScript::command::BATTLE_OWN_SND_MOVE:
-                if( p_target.m_battleMode == battle::SINGLE )
-                    return -1;
-                if( p_target._moveOrder[ 1 ][ PLAYER ] > p_target._moveOrder[ 0 ][ PLAYER ] )
-                    return ( p_target._battleMoves[ 0 ][ PLAYER ].m_type == battle::battleMove::ATTACK ) ? p_target._battleMoves[ 0 ][ PLAYER ].m_value : -1;
-                return ( p_target._battleMoves[ 1 ][ PLAYER ].m_type == battle::battleMove::ATTACK ) ? p_target._battleMoves[ 1 ][ PLAYER ].m_value : -1;
-            case BATTLE::battleScript::command::BATTLE_OPP_FST_MOVE:
-                if( p_target.m_battleMode == battle::SINGLE ||
-                    ( p_target._moveOrder[ 1 ][ OPPONENT ] > p_target._moveOrder[ 0 ][ OPPONENT ] ) )
-                    return ( p_target._battleMoves[ 0 ][ OPPONENT ].m_type == battle::battleMove::ATTACK ) ? p_target._battleMoves[ 0 ][ OPPONENT ].m_value : -1;
-                return ( p_target._battleMoves[ 1 ][ OPPONENT ].m_type == battle::battleMove::ATTACK ) ? p_target._battleMoves[ 1 ][ OPPONENT ].m_value : -1;
-            case BATTLE::battleScript::command::BATTLE_OPP_SND_MOVE:
-                if( p_target.m_battleMode == battle::SINGLE )
-                    return -1;
-                if( p_target._moveOrder[ 1 ][ OPPONENT ] < p_target._moveOrder[ 0 ][ OPPONENT ] )
-                    return ( p_target._battleMoves[ 0 ][ OPPONENT ].m_type == battle::battleMove::ATTACK ) ? p_target._battleMoves[ 0 ][ OPPONENT ].m_value : -1;
-                return ( p_target._battleMoves[ 1 ][ OPPONENT ].m_type == battle::battleMove::ATTACK ) ? p_target._battleMoves[ 1 ][ OPPONENT ].m_value : -1;
-            case BATTLE::battleScript::command::BATTLE_OWN_TEAMSIZE:
-                return int( p_target._player->m_pkmnTeam.size( ) );
-            case BATTLE::battleScript::command::BATTLE_OPP_TEAMSIZE:
-                return int( p_target._opponent->m_pkmnTeam.size( ) );
-            default:
-                return -1;
-        }
-    }
-
-    int battleScript::command::condition::getTargetVal( const battle& p_battle, const pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition )const {
-        targetVal = m_value;
-        return getTargetSpecifierValue( p_battle, p_target, p_targetIsOpp, p_targetPosition, m_targetSpecifier );
-    }
-    int battleScript::command::condition::getTargetVal( const battle& p_target ) const {
-        return getTargetSpecifierValue( p_target, m_targetSpecifier );
-    }
-
     bool battleScript::command::condition::check( battle& p_battle, void* p_self ) const {
         switch( m_target ) {
             case BATTLE::battleScript::command::OPPONENT1:
-                return evaluate( getTargetVal( p_battle, ACPKMN2( p_battle, OPPONENT, 0 ), OPPONENT, 0 ) );
+                return evaluate( p_battle.getTargetSpecifierValue( OPPONENT, 0, m_targetSpecifier, m_value ) );
             case BATTLE::battleScript::command::OPPONENT2:
-                return evaluate( getTargetVal( p_battle, ACPKMN2( p_battle, OPPONENT, 1 ), OPPONENT, 1 ) );
+                return evaluate( p_battle.getTargetSpecifierValue( OPPONENT, 1, m_targetSpecifier, m_value ) );
             case BATTLE::battleScript::command::OWN1:
-                return evaluate( getTargetVal( p_battle, ACPKMN2( p_battle, PLAYER, 0 ), PLAYER, 0 ) );
+                return evaluate( p_battle.getTargetSpecifierValue( PLAYER, 0, m_targetSpecifier, m_value ) );
             case BATTLE::battleScript::command::OWN2:
-                return evaluate( getTargetVal( p_battle, ACPKMN2( p_battle, PLAYER, 1 ), PLAYER, 1 ) );
+                return evaluate( p_battle.getTargetSpecifierValue( PLAYER, 1, m_targetSpecifier, m_value ) );
             case BATTLE::battleScript::command::BATTLE_:
-                return evaluate( getTargetVal( p_battle ) );
+                return evaluate( p_battle.getTargetSpecifierValue( m_targetSpecifier ) );
             case BATTLE::battleScript::command::SELF_PKMN:
             {
                 bool pkmnIsOpp = false;
                 bool pkmnIsSnd = ( p_battle.m_battleMode == battle::DOUBLE );
                 auto acPkmn = *( (pokemon*) p_self );
 
-                if( acPkmn == ACPKMN2( p_battle, OPPONENT, 0 ) ) {
+                if( acPkmn == CUR_PKMN_2( p_battle, OPPONENT, 0 ) ) {
                     pkmnIsOpp = true;
                     pkmnIsSnd = false;
                 }
-                if( acPkmn == ACPKMN2( p_battle, OPPONENT, 1 ) ) {
+                if( acPkmn == CUR_PKMN_2( p_battle, OPPONENT, 1 ) ) {
                     pkmnIsOpp = true;
                     pkmnIsSnd &= true;
                 }
-                if( acPkmn == ACPKMN2( p_battle, PLAYER, 0 ) ) {
+                if( acPkmn == CUR_PKMN_2( p_battle, PLAYER, 0 ) ) {
                     pkmnIsOpp = false;
                     pkmnIsSnd = false;
                 }
-                if( acPkmn == ACPKMN2( p_battle, PLAYER, 1 ) ) {
+                if( acPkmn == CUR_PKMN_2( p_battle, PLAYER, 1 ) ) {
                     pkmnIsOpp = false;
                     pkmnIsSnd &= true;
                 }
 
-                return evaluate( getTargetVal( p_battle, *( (pokemon*) p_self ), pkmnIsOpp, pkmnIsSnd ) );
+                return evaluate( p_battle.getTargetSpecifierValue( pkmnIsOpp, pkmnIsSnd, m_targetSpecifier, m_value ) );
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
-                return evaluate( getTargetVal( *( (battle*) p_self ) ) );
+                return evaluate( ( (battle*) p_self )->getTargetSpecifierValue( m_targetSpecifier ) );
             case BATTLE::battleScript::command::SELF_DAMAGE:
                 return evaluate( *( (int*) p_self ) );
             default:
@@ -210,13 +101,13 @@ namespace BATTLE {
     int battleScript::command::value::get( battle& p_battle, void* p_self ) const {
         switch( m_target ) {
             case BATTLE::battleScript::command::OPPONENT1:
-                return get( p_battle, ACPKMN2( p_battle, OPPONENT, 0 ), OPPONENT, 0 );
+                return get( p_battle, OPPONENT, 0 );
             case BATTLE::battleScript::command::OPPONENT2:
-                return get( p_battle, ACPKMN2( p_battle, OPPONENT, 1 ), OPPONENT, 1 );
+                return get( p_battle, OPPONENT, 1 );
             case BATTLE::battleScript::command::OWN1:
-                return get( p_battle, ACPKMN2( p_battle, PLAYER, 0 ), PLAYER, 0 );
+                return get( p_battle, PLAYER, 0 );
             case BATTLE::battleScript::command::OWN2:
-                return get( p_battle, ACPKMN2( p_battle, PLAYER, 1 ), PLAYER, 1 );
+                return get( p_battle, PLAYER, 1 );
             case BATTLE::battleScript::command::BATTLE_:
                 return get( p_battle );
             case BATTLE::battleScript::command::SELF_PKMN:
@@ -225,24 +116,24 @@ namespace BATTLE {
                 bool pkmnIsSnd = ( p_battle.m_battleMode == battle::DOUBLE );
                 auto acPkmn = *( (pokemon*) p_self );
 
-                if( acPkmn == ACPKMN2( p_battle, OPPONENT, 0 ) ) {
+                if( acPkmn == CUR_PKMN_2( p_battle, OPPONENT, 0 ) ) {
                     pkmnIsOpp = true;
                     pkmnIsSnd = false;
                 }
-                if( acPkmn == ACPKMN2( p_battle, OPPONENT, 1 ) ) {
+                if( acPkmn == CUR_PKMN_2( p_battle, OPPONENT, 1 ) ) {
                     pkmnIsOpp = true;
                     pkmnIsSnd &= true;
                 }
-                if( acPkmn == ACPKMN2( p_battle, PLAYER, 0 ) ) {
+                if( acPkmn == CUR_PKMN_2( p_battle, PLAYER, 0 ) ) {
                     pkmnIsOpp = false;
                     pkmnIsSnd = false;
                 }
-                if( acPkmn == ACPKMN2( p_battle, PLAYER, 1 ) ) {
+                if( acPkmn == CUR_PKMN_2( p_battle, PLAYER, 1 ) ) {
                     pkmnIsOpp = false;
                     pkmnIsSnd &= true;
                 }
 
-                return get( p_battle, *( (pokemon*) p_self ), pkmnIsOpp, pkmnIsSnd );
+                return get( p_battle, pkmnIsOpp, pkmnIsSnd );
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
                 return get( *( (battle*) p_self ) );
@@ -253,100 +144,89 @@ namespace BATTLE {
                 return m_additiveConstant;
         }
     }
-    int battleScript::command::value::get( battle& p_battle, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition ) const {
-        return m_additiveConstant + int( m_multiplier *getTargetSpecifierValue( p_battle, p_target, p_targetIsOpp, p_targetPosition, m_targetSpecifier ) );
+    int battleScript::command::value::get( battle& p_battle, bool p_targetIsOpp, u8 p_targetPosition ) const {
+        return m_additiveConstant + int( m_multiplier * p_battle.getTargetSpecifierValue( p_targetIsOpp, p_targetPosition, m_targetSpecifier ) );
     }
     int battleScript::command::value::get( battle& p_target ) const {
-        return m_additiveConstant + int( m_multiplier * getTargetSpecifierValue( p_target, m_targetSpecifier ) );
+        return m_additiveConstant + int( m_multiplier * p_target.getTargetSpecifierValue( m_targetSpecifier ) );
     }
 
-    void battleScript::command::evaluateOnTargetVal( battle& p_battle, void* p_self, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition ) const {
+    void battleScript::command::evaluateOnTargetVal( battle& p_battle, void* p_self, bool p_targetIsOpp, u8 p_targetPosition ) const {
+        if( p_battle.m_battleMode != battle::DOUBLE && p_targetPosition )
+            return;
 
-        //target t;
-        //if( p_targetIsOpp && p_targetPosition )
-        //    t = OPPONENT2;
-        //if( p_targetIsOpp && !p_targetPosition )
-        //    t = OPPONENT1;
-        //if( !p_targetIsOpp && p_targetPosition )
-        //    t = OWN2;
-        //if( !p_targetIsOpp && !p_targetPosition )
-        //    t = OWN1;
-
+        auto target = CUR_PKMN_STR_2( p_battle, p_targetPosition, p_targetIsOpp );
         switch( m_action ) {
             case BATTLE::battleScript::command::ADD:
             case BATTLE::battleScript::command::MULTIPLY:
             case BATTLE::battleScript::command::SET:
                 switch( m_targetSpecifier ) {
                     case BATTLE::battleScript::command::PKMN_SPECIES:
-                        if( m_action == SET ) {
-                            p_target.m_boxdata.m_speciesId = m_value.get( p_battle, p_self );
-                        }
+                        if( m_action == SET )
+                            target.m_pokemon->m_boxdata.m_speciesId = m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_ITEM:
-                        if( m_action == SET ) {
-                            p_target.m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
-                        }
+                        if( m_action == SET )
+                            target.m_pokemon->m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_ABILITY:
-                        if( m_action == SET ) {
-                            p_target.m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
-                        }
+                        if( m_action == SET )
+                            target.m_pokemon->m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_STATUS:
-                        if( m_action == SET ) {
-                            p_target.m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
-                        }
+                        if( m_action == SET )
+                            target.m_pokemon->m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_HP:
                         if( m_action == SET )
-                            p_target.m_stats.m_acHP = m_value.get( p_battle, p_self );
+                            target.m_pokemon->m_stats.m_acHP = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            p_target.m_stats.m_acHP += m_value.get( p_battle, p_self );
+                            target.m_pokemon->m_stats.m_acHP += m_value.get( p_battle, p_self );
                         if( m_action == MULTIPLY )
-                            p_target.m_stats.m_acHP = int( ( p_target.m_stats.m_acHP / 100.f ) *  m_value.get( p_battle, p_self ) );
+                            target.m_pokemon->m_stats.m_acHP = int( ( target.m_pokemon->m_stats.m_acHP / 100.f ) *  m_value.get( p_battle, p_self ) );
 
-                        p_target.m_stats.m_acHP = std::max( (u16) 0, std::min( p_target.m_stats.m_maxHP, p_target.m_stats.m_acHP ) );
+                        target.m_pokemon->m_stats.m_acHP = std::max( (u16) 0, std::min( target.m_pokemon->m_stats.m_maxHP, target.m_pokemon->m_stats.m_acHP ) );
 
                         break;
                     case BATTLE::battleScript::command::PKMN_ATK:
                         if( m_action == SET )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ATK ] = m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ ATK ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ATK ] += m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ ATK ] += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_DEF:
                         if( m_action == SET )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ DEF ] = m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ DEF ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ DEF ] += m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ DEF ] += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_SPD:
                         if( m_action == SET )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ SPD ] = m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ SPD ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ SPD ] += m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ SPD ] += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_SATK:
                         if( m_action == SET )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ SATK ] = m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ SATK ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ SATK ] += m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ SATK ] += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_SDEF:
                         if( m_action == SET )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ SDEF ] = m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ SDEF ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ SDEF ] += m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ SDEF ] += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_ACCURACY:
                         if( m_action == SET )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ACCURACY ] = m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ ACCURACY ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ACCURACY ] += m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ ACCURACY ] += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_ATTACK_BLOCKED:
                         if( m_action == SET )
-                            ACPKMNSTATCHG2( p_battle, p_targetPosition, p_targetIsOpp )[ ATTACK_BLOCKED ] = !!m_value.get( p_battle, p_self );
+                            target.m_acStatChanges[ ATTACK_BLOCKED ] = !!m_value.get( p_battle, p_self );
                         break;
                     default:
                         break;
@@ -362,12 +242,10 @@ namespace BATTLE {
     void battleScript::command::evaluateOnTargetVal( battle& p_battle, void* p_self ) const {
         switch( m_action ) {
             case BATTLE::battleScript::command::SET:
-                if( m_targetSpecifier == BATTLE_WEATHER ) {
-                    p_battle.m_weather = battle::weather( m_value.get( p_battle, p_self ) );
-                }
-                if( m_targetSpecifier == BATTLE_WEATHER_LENGTH ) {
-                    p_battle._weatherLength = battle::weather( m_value.get( p_battle, p_self ) );
-                }
+                if( m_targetSpecifier == BATTLE_WEATHER )
+                    p_battle.m_weather = weather( m_value.get( p_battle, p_self ) );
+                if( m_targetSpecifier == BATTLE_WEATHER_LENGTH )
+                    p_battle._weatherLength = weather( m_value.get( p_battle, p_self ) );
                 break;
             case BATTLE::battleScript::command::END:
                 p_battle.endBattle( battle::NONE );
@@ -380,39 +258,48 @@ namespace BATTLE {
     void battleScript::command::execute( battle& p_battle, void* p_self ) const {
         switch( m_target ) {
             case BATTLE::battleScript::command::OPPONENT1:
-                return evaluateOnTargetVal( p_battle, p_self, ACPKMN2( p_battle, OPPONENT, 0 ), OPPONENT, 0 );
+                p_battle.storePkmnSts( OPPONENT, 0 );
+                evaluateOnTargetVal( p_battle, p_self, OPPONENT, 0 );
+                return p_battle.updatePkmnSts( OPPONENT, 0 );
             case BATTLE::battleScript::command::OPPONENT2:
-                return evaluateOnTargetVal( p_battle, p_self, ACPKMN2( p_battle, OPPONENT, 1 ), OPPONENT, 1 );
+                p_battle.storePkmnSts( OPPONENT, 1 );
+                evaluateOnTargetVal( p_battle, p_self, OPPONENT, 1 );
+                return p_battle.updatePkmnSts( OPPONENT, 1 );
             case BATTLE::battleScript::command::OWN1:
-                return evaluateOnTargetVal( p_battle, p_self, ACPKMN2( p_battle, PLAYER, 0 ), PLAYER, 0 );
+                p_battle.storePkmnSts( PLAYER, 0 );
+                evaluateOnTargetVal( p_battle, p_self, PLAYER, 0 );
+                return p_battle.updatePkmnSts( PLAYER, 0 );
             case BATTLE::battleScript::command::OWN2:
-                return evaluateOnTargetVal( p_battle, p_self, ACPKMN2( p_battle, PLAYER, 1 ), PLAYER, 1 );
+                p_battle.storePkmnSts( PLAYER, 1 );
+                evaluateOnTargetVal( p_battle, p_self, PLAYER, 1 );
+                return p_battle.updatePkmnSts( PLAYER, 1 );
             case BATTLE::battleScript::command::BATTLE_:
                 return evaluateOnTargetVal( p_battle, p_self );
             case BATTLE::battleScript::command::SELF_PKMN:
             {
                 bool pkmnIsOpp = false;
-                bool pkmnIsSnd = ( p_battle.m_battleMode == battle::DOUBLE );
+                bool pkmnIsSnd = false;
                 auto acPkmn = *( (pokemon*) p_self );
 
-                if( acPkmn == ACPKMN2( p_battle, OPPONENT, 0 ) ) {
+                if( acPkmn == CUR_PKMN_2( p_battle, OPPONENT, 0 ) ) {
                     pkmnIsOpp = true;
                     pkmnIsSnd = false;
                 }
-                if( acPkmn == ACPKMN2( p_battle, OPPONENT, 1 ) ) {
+                if( acPkmn == CUR_PKMN_2( p_battle, OPPONENT, 1 ) ) {
                     pkmnIsOpp = true;
-                    pkmnIsSnd &= true;
+                    pkmnIsSnd = true;
                 }
-                if( acPkmn == ACPKMN2( p_battle, PLAYER, 0 ) ) {
+                if( acPkmn == CUR_PKMN_2( p_battle, PLAYER, 0 ) ) {
                     pkmnIsOpp = false;
                     pkmnIsSnd = false;
                 }
-                if( acPkmn == ACPKMN2( p_battle, PLAYER, 1 ) ) {
+                if( acPkmn == CUR_PKMN_2( p_battle, PLAYER, 1 ) ) {
                     pkmnIsOpp = false;
-                    pkmnIsSnd &= true;
+                    pkmnIsSnd = true;
                 }
-
-                return evaluateOnTargetVal( p_battle, p_self, acPkmn, pkmnIsOpp, pkmnIsSnd );
+                p_battle.storePkmnSts( pkmnIsOpp, pkmnIsSnd );
+                evaluateOnTargetVal( p_battle, p_self, pkmnIsOpp, pkmnIsSnd );
+                return p_battle.updatePkmnSts( pkmnIsOpp, pkmnIsSnd );
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
                 return evaluateOnTargetVal( *( (battle*) p_self ), p_self );

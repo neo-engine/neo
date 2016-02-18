@@ -26,13 +26,18 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 */
 
 #pragma once
-#include "battle.h"
 
 namespace BATTLE {
+    class battle;
 
     class battleUI {
         battle* _battle;
         s8      _oldPKMNStats[ 6 ][ 2 ][ 10 ];
+        u16     initStsBalls( bool p_bottom, u16& p_tilecnt );
+        void    loadSpritesTop( );
+        void    loadSpritesSub( );
+        void    loadBattleUITop( );
+        void    drawPKMNChoiceScreen( bool p_firstIsChosen );
 
     public:
         friend class battle;

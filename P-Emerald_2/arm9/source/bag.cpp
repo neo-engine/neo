@@ -28,6 +28,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "bag.h"
 #include "item.h"
+#include "script.h"
+#include "pokemon.h"
 
 #include <algorithm>
 #include <nds.h>

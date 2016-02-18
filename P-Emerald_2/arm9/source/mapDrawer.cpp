@@ -25,6 +25,8 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "mapDrawer.h"
 #include "mapWarps.h"
 #include "uio.h"
@@ -33,6 +35,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "defines.h"
 #include "messageBox.h"
 #include "saveGame.h"
+#include "battleWeather.h"
+#include "battle.h"
 
 #include "BigCirc1.h"
 
@@ -369,30 +373,30 @@ namespace MAP {
             return false;
 
         pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
-        BATTLE::battle::weather weat = BATTLE::battle::weather::NO_WEATHER;
+        BATTLE::weather weat = BATTLE::weather::NO_WEATHER;
         switch( _weather ) {
-            case MAP::mapDrawer::SUNNY:
-                weat = BATTLE::battle::weather::SUN;
+            case mapDrawer::SUNNY:
+                weat = BATTLE::weather::SUN;
                 break;
-            case MAP::mapDrawer::RAINY:
-            case MAP::mapDrawer::THUNDERSTORM:
-                weat = BATTLE::battle::weather::RAIN;
+            case mapDrawer::RAINY:
+            case mapDrawer::THUNDERSTORM:
+                weat = BATTLE::weather::RAIN;
                 break;
-            case MAP::mapDrawer::SNOW:
-            case MAP::mapDrawer::BLIZZARD:
-                weat = BATTLE::battle::weather::HAIL;
+            case mapDrawer::SNOW:
+            case mapDrawer::BLIZZARD:
+                weat = BATTLE::weather::HAIL;
                 break;
-            case MAP::mapDrawer::SANDSTORM:
-                weat = BATTLE::battle::weather::SANDSTORM;
+            case mapDrawer::SANDSTORM:
+                weat = BATTLE::weather::SANDSTORM;
                 break;
-            case MAP::mapDrawer::FOG:
-                weat = BATTLE::battle::weather::FOG;
+            case mapDrawer::FOG:
+                weat = BATTLE::weather::FOG;
                 break;
-            case MAP::mapDrawer::HEAVY_SUNLIGHT:
-                weat = BATTLE::battle::weather::HEAVY_SUNSHINE;
+            case mapDrawer::HEAVY_SUNLIGHT:
+                weat = BATTLE::weather::HEAVY_SUNSHINE;
                 break;
-            case MAP::mapDrawer::HEAVY_RAIN:
-                weat = BATTLE::battle::weather::HEAVY_RAIN;
+            case mapDrawer::HEAVY_RAIN:
+                weat = BATTLE::weather::HEAVY_RAIN;
                 break;
             default:
                 break;

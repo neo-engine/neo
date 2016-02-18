@@ -55,3 +55,25 @@ enum type {
 };
 
 float getEffectiveness( const type& p_t1, const type& p_t2 );
+
+enum ailment {
+    NONE = 0,
+    PARALYSIS,
+    SLEEP,
+    FREEZE,
+    BURN,
+    POISONED,
+    CONFUSION,
+    INFATUATION,
+    TRAP,
+    NIGHTMARE,
+    TORMENT,
+    DISABLE,
+    YAWN,
+    HEAL_BLOCK,
+    NO_TYPE_IMMUNITY,
+    LEECH_SEED,
+    EMBARGO,
+    PERISH_SONG,
+    INGRAIN
+};

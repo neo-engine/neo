@@ -442,7 +442,7 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
             u16 z = buffer[ ptr++ ];
             for( int j = 0; j < z; ++j ) {
                 u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-                if( i >= p_toLevel && h == (u16) p_mode && g < MAXATTACK )
+                if( i >= p_toLevel && h == (u16) p_mode && g < MAX_ATTACK )
                     reses.push_back( g );
             }
         }
@@ -464,7 +464,7 @@ N:
             u16 z = buffer[ ptr++ ];
             for( u16 j = 0; j < z; ++j ) {
                 u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-                if( i >= p_fromLevel && h == p_mode && g < MAXATTACK ) {
+                if( i >= p_fromLevel && h == p_mode && g < MAX_ATTACK ) {
                     for( u16 z = 0; z < rescnt; ++z )
                         if( g == p_result[ z ] )
                             goto NEXT;

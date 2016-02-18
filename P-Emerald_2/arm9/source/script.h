@@ -33,12 +33,14 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <nds/ndstypes.h>
 
 #include "buffer.h"
+#include "type.h"
 
 class pokemon;
+class move;
 
 namespace BATTLE {
-
     class battle;
+    struct battlePokemon;
 
     class battleScript {
     public:
@@ -58,7 +60,8 @@ namespace BATTLE {
                 NONE,
                 PKMN_TYPE1,
                 PKMN_TYPE2,
-                PKMN_TYPE1o2,
+                PKMN_TYPE3,
+                PKMN_TYPE,
 
                 PKMN_SIZE,
 
@@ -137,8 +140,6 @@ namespace BATTLE {
 
                 bool            check( battle& p_battle, void* p_self ) const;
                 bool            evaluate( int p_other ) const;
-                int             getTargetVal( const battle& p_battle, const pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition ) const;
-                int             getTargetVal( const battle& p_target ) const;
             };
 
             struct value {
@@ -172,7 +173,7 @@ namespace BATTLE {
                     m_additiveConstant( p_additiveConstant ) { }
 
                 int             get( battle& p_battle, void* p_self )const;
-                int             get( battle& p_battle, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition )const;
+                int             get( battle& p_battle, bool p_targetIsOpp, u8 p_targetPosition )const;
                 int             get( battle& p_target )const;
             };
 
@@ -252,7 +253,7 @@ namespace BATTLE {
 
 
             void                    execute( battle& p_battle, void* p_self )const;
-            void                    evaluateOnTargetVal( battle& p_battle, void* p_self, pokemon& p_target, bool p_targetIsOpp, u8 p_targetPosition )const;
+            void                    evaluateOnTargetVal( battle& p_battle, void* p_self, bool p_targetIsOpp, u8 p_targetPosition )const;
             void                    evaluateOnTargetVal( battle& p_battle, void* p_self )const;
         };
 
@@ -260,19 +261,21 @@ namespace BATTLE {
     public:
         battleScript( ) { }
 
-        battleScript( std::string p_path );
-
         battleScript( std::vector<command> p_commands )
             : _commands( p_commands ) { }
 
         void                            execute( battle& p_battle, void* p_self ) const;
-
-        friend int                      getTargetSpecifierValue( const battle&                      p_battle,
-                                                                 const pokemon&                        p_target,
-                                                                 bool                                           p_targetIsOpp,
-                                                                 u8                                             p_targetPosition,
-                                                                 const battleScript::command::targetSpecifier&  p_targetSpecifier );
-        friend int                      getTargetSpecifierValue( const battle&                                  p_target,
-                                                                 const battleScript::command::targetSpecifier&  p_targetSpecifier );
     };
+
+    extern battleScript weatherEffects[ 9 ];
+    typedef battleScript::command               cmd;
+    typedef battleScript::command::condition    con;
+    typedef battleScript::command::value        val;
+
+#define NEQ( pkmn, var, val ) ( con( cmd::pkmn, cmd::var, cmd::NOT_EQUALS, val ) )
+#define EQ( pkmn, var, val ) ( con( cmd::pkmn, cmd::var, cmd::EQUALS, val ) )
+#define GT( pkmn, var, val ) ( con( cmd::pkmn, cmd::var, cmd::GREATER, val ) )
+#define LS( pkmn, var, val ) ( con( cmd::pkmn, cmd::var, cmd::LESS, val ) )
+#define GEQ( pkmn, var, val ) ( con( cmd::pkmn, cmd::var, cmd::GEQ, val ) )
+#define LEQ( pkmn, var, val ) ( con( cmd::pkmn, cmd::var, cmd::LEQ, val ) )
 }

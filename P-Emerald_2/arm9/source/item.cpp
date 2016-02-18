@@ -25,20 +25,22 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, new see <http://www.gnu.org/licenses/>.
 */
 
+#include <vector>
+#include <algorithm>
+
 #include "item.h"
 #include "berry.h"
 #include "move.h"
 #include "pokemon.h"
-#include "battle.h"
+#include "script.h"
 
+#include "buffer.h"
 #include "saveGame.h"
 #include "mapDefines.h"
 #include "mapDrawer.h"
 #include "uio.h"
 #include "messageBox.h"
 
-#include <vector>
-#include <algorithm>
 
 #define APPLY_OP( op, tg, val, mx ) ( ( op == 1 ) ? tg += val : ( \
                                   ( op == 2 ) ? tg -= val : ( \

@@ -35,7 +35,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #define F (move::moveFlags)
 #define H (move::moveHitTypes)
 
-move* AttackList[ MAXATTACK ] = {
+move* AttackList[ MAX_ATTACK ] = {
     //move(_Name,     _Effect,_Base_Power,_type,    _Accuracy, _PP,_E.Accuracy,_Aff._whom,_Priority,Flags,_HitType)
     new move( "----", C 0, C 0, UNKNOWN, C 100, C 0, C 0, A 0, C 0, F 0, H 0 ),
     new move( "Pfund", C 0, C 40, NORMAL, C 100, C 35, C 0, A 0, C 1, F 35, H 0 ),

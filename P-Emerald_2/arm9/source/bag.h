@@ -31,10 +31,9 @@
 #include <string>
 #include <map>
 #include "item.h"
+#include "defines.h"
 
 namespace BAG {
-#define MAX_ITEMS_IN_BAG 900
-
     extern std::string bagnames[ 5 ];
 
     class bag {

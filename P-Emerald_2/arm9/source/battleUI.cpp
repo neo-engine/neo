@@ -34,6 +34,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "battle.h"
 #include "battleUI.h"
+#include "battleTrainer.h"
 #include "defines.h"
 #include "pokemon.h"
 #include "move.h"
@@ -53,7 +54,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "A.h"
 
 #include "Battle1.h"
-#include "Battle2.h"
 
 #include "BattleSub1.h"
 #include "BattleSub2.h"
@@ -211,10 +211,10 @@ namespace BATTLE {
     u16 SUB_TILESTART = 0;
     u8 SUB_PALSTART = 0;
 
-    u16 initStsBalls( bool p_bottom, battle* p_battle, u16& p_tilecnt ) {
+    u16 battleUI::initStsBalls( bool p_bottom, u16& p_tilecnt ) {
         //Own PKMNs PBs
         for( u8 i = 0; i < 6; ++i ) {
-            auto acStat = ACPKMNSTS2( *p_battle, i, PLAYER );
+            auto acStat = CUR_PKMN_STS_2( *_battle, i, PLAYER );
             p_tilecnt = IO::loadSprite( p_bottom ? i : ( STSBALL_START + i ),
                                         p_bottom ? PB_PAL_SUB( acStat ) : PB_PAL_TOP( acStat ), p_tilecnt, p_bottom ? ( 16 * i ) : 240 - ( 16 * i ),
                                         180, 16, 16, PB_PAL( acStat ), PB_TILES( acStat ), PB_TILES_LEN( acStat ),
@@ -222,13 +222,13 @@ namespace BATTLE {
         }
         //Opps PKMNs PBs
         for( u8 i = 0; i < 6; ++i ) {
-            auto acStat = ACPKMNSTS2( *p_battle, i, OPPONENT );
-            if( p_battle->m_isWildBattle )
-                acStat = IN_DEX( p_battle->_wildPokemon.m_pokemon->m_boxdata.m_speciesId ) ? battle::acStatus::OK : battle::acStatus::NA;
+            auto acStat = CUR_PKMN_STS_2( *_battle, i, OPPONENT );
+            if( _battle->m_isWildBattle )
+                acStat = IN_DEX( _battle->_wildPokemon.m_pokemon->m_boxdata.m_speciesId ) ? acStatus::OK : acStatus::NA;
             p_tilecnt = IO::loadSprite( p_bottom ? ( 6 + i ) : ( STSBALL_START + 6 + i ),
                                         p_bottom ? PB_PAL_SUB( acStat ) : PB_PAL_TOP( acStat ), p_tilecnt, !p_bottom ? ( 16 * i ) : 240 - ( 16 * i ),
                                         -4, 16, 16, PB_PAL( acStat ), PB_TILES( acStat ), PB_TILES_LEN( acStat ),
-                                        false, false, p_battle->m_isWildBattle, OBJPRIORITY_0, p_bottom );
+                                        false, false, _battle->m_isWildBattle, OBJPRIORITY_0, p_bottom );
         }
         return p_tilecnt;
     }
@@ -252,7 +252,7 @@ namespace BATTLE {
             IO::updateOAM( false );
         }
     }
-    void setStsBallSts( bool p_opponent, u8 p_pokemonPos, battle::acStatus p_status, bool p_bottom ) {
+    void setStsBallSts( bool p_opponent, u8 p_pokemonPos, acStatus p_status, bool p_bottom ) {
         u8 idx = 0;
         u16 tileIdx = 0;
         if( p_bottom ) {
@@ -433,7 +433,7 @@ namespace BATTLE {
         IO::updateOAM( false );
     }
 
-    void loadSpritesTop( battle* p_battle ) {
+    void battleUI::loadSpritesTop( ) {
         videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
         IO::bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
         IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
@@ -458,7 +458,7 @@ namespace BATTLE {
         }
         swiWaitForVBlank( );
 
-        if( !p_battle->m_isWildBattle ) {
+        if( !_battle->m_isWildBattle ) {
             dmaCopy( mug_001_1Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
             dmaCopy( mug_001_1Pal, BG_PALETTE, 64 );
             for( u8 i = 0; i < 40; ++i )
@@ -470,7 +470,7 @@ namespace BATTLE {
 
             dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         } else {
-            auto acPkmn = *p_battle->_wildPokemon.m_pokemon;
+            auto acPkmn = *_battle->_wildPokemon.m_pokemon;
             u16 x = 128;
             u8  y = 19;
 
@@ -481,7 +481,7 @@ namespace BATTLE {
                                          acPkmn.m_boxdata.m_speciesId, x, y,
                                          PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    p_battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
             IO::updateOAM( false );
@@ -515,7 +515,7 @@ namespace BATTLE {
         dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
         dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
 
-        loadBattleUITop( _battle );
+        loadBattleUITop( );
         for( u8 i = 0; i < 4; ++i )
             sendPKMN( i % 2, i / 2, true );
         if( _battle->m_isWildBattle ) {
@@ -540,29 +540,29 @@ namespace BATTLE {
         swiWaitForVBlank( );
     }
 
-    void loadSpritesSub( battle* p_battle ) {
+    void battleUI::loadSpritesSub( ) {
         IO::initOAMTable( true );
         IO::drawSub( );
 
         u16 tilecnt = 0;
-        tilecnt = initStsBalls( true, p_battle, tilecnt );
+        tilecnt = initStsBalls( true, tilecnt );
         initColors( );
 
         sprintf( buffer, "Eine Herausforderung von\n%s %s!",
-                 trainerclassnames[ p_battle->_opponent->m_trainerClass ].c_str( ),
-                 p_battle->_opponent->m_battleTrainerName.c_str( ) );
+                 trainerClassNames[ _battle->_opponent->m_trainerClass ].c_str( ),
+                 _battle->_opponent->m_battleTrainerName.c_str( ) );
         IO::regularFont->printString( buffer, 16, 80, true );
         IO::updateOAM( true );
     }
 
-    void loadBattleUITop( battle* p_battle ) {
-        if( !p_battle->m_isWildBattle )
+    void battleUI::loadBattleUITop( ) {
+        if( !_battle->m_isWildBattle )
             IO::initOAMTable( false );
 
         IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
         consoleSetFont( &IO::Top, IO::consoleFont );
 
-        TILESTART = initStsBalls( false, p_battle, TILESTART = ( PKMN_TILE_START + 4 * 144 ) );
+        TILESTART = initStsBalls( false, TILESTART = ( PKMN_TILE_START + 4 * 144 ) );
 
         for( u8 i = 0; i < 4; ++i ) {
             TILESTART = IO::loadSprite( HP_IDX( i % 2, ( i / 2 ) ), HP_PAL,
@@ -571,20 +571,20 @@ namespace BATTLE {
                                         false, true, OBJPRIORITY_1, false );
         }
         TILESTART = IO::loadSprite( PLATFORM_START, PLAT_PAL,
-                                    TILESTART, 128, 56, 64, 64, IO::PlatformPals[ p_battle->m_platformId ],
-                                    IO::PlatformTiles[ 2 * p_battle->m_platformId ], 2048, false,
+                                    TILESTART, 128, 56, 64, 64, IO::PlatformPals[ _battle->m_platformId ],
+                                    IO::PlatformTiles[ 2 * _battle->m_platformId ], 2048, false,
                                     false, false, OBJPRIORITY_3, false );
         TILESTART = IO::loadSprite( PLATFORM_START + 1, PLAT_PAL,
-                                    TILESTART, 192, 56, 64, 64, IO::PlatformPals[ p_battle->m_platformId ],
-                                    IO::PlatformTiles[ 2 * p_battle->m_platformId + 1 ], 2048, false,
+                                    TILESTART, 192, 56, 64, 64, IO::PlatformPals[ _battle->m_platformId ],
+                                    IO::PlatformTiles[ 2 * _battle->m_platformId + 1 ], 2048, false,
                                     false, false, OBJPRIORITY_3, false );
         TILESTART = IO::loadSprite( PLATFORM_START + 2, PLAT_PAL,
-                                    TILESTART, -52, 152 - 32, 64, 64, IO::PlatformPals[ p_battle->m_platformId ],
-                                    IO::PlatformTiles[ 2 * p_battle->m_platformId ], 2048, false,
+                                    TILESTART, -52, 152 - 32, 64, 64, IO::PlatformPals[ _battle->m_platformId ],
+                                    IO::PlatformTiles[ 2 * _battle->m_platformId ], 2048, false,
                                     false, false, OBJPRIORITY_3, false );
         TILESTART = IO::loadSprite( PLATFORM_START + 3, PLAT_PAL,
-                                    TILESTART, 80 - 16, 152 - 32, 64, 64, IO::PlatformPals[ p_battle->m_platformId ],
-                                    IO::PlatformTiles[ 2 * p_battle->m_platformId + 1 ], 2048, false,
+                                    TILESTART, 80 - 16, 152 - 32, 64, 64, IO::PlatformPals[ _battle->m_platformId ],
+                                    IO::PlatformTiles[ 2 * _battle->m_platformId + 1 ], 2048, false,
                                     false, false, OBJPRIORITY_3, false );
         IO::OamTop->oamBuffer[ PLATFORM_START + 2 ].isRotateScale = true;
         IO::OamTop->oamBuffer[ PLATFORM_START + 2 ].isSizeDouble = true;
@@ -598,9 +598,9 @@ namespace BATTLE {
         IO::OamTop->matrixBuffer[ 1 ].vdy = 154;
 
         IO::updateOAM( false );
-        if( p_battle->m_isWildBattle ) {
+        if( _battle->m_isWildBattle ) {
             u8 hpx = 88, hpy = 40;
-            auto& acPkmn = *p_battle->_wildPokemon.m_pokemon;
+            auto& acPkmn = *_battle->_wildPokemon.m_pokemon;
             setStsBallPosition( OPPONENT, 0, hpx + 8, hpy + 8, false );
             IO::OamTop->oamBuffer[ HP_IDX( OPPONENT, 0 ) ].isHidden = false;
             IO::OamTop->oamBuffer[ HP_IDX( OPPONENT, 0 ) ].x = hpx;
@@ -628,6 +628,7 @@ namespace BATTLE {
                     acPkmn.m_stats.m_acHP );
         }
     }
+    
     void loadBattleUISub( u16 p_pkmnId, bool p_isWildBattle, bool p_showNav ) {
         u16 tilecnt = 0;
         //Load UI Sprites
@@ -680,6 +681,7 @@ namespace BATTLE {
         SUB_PALSTART = 8;
         IO::updateOAM( true );
     }
+    
     void setBattleUISubVisibility( bool p_isHidden = false ) {
         for( u8 i = 0; i <= SUB_FIGHT_START + 6; ++i )
             IO::Oam->oamBuffer[ i ].isHidden = p_isHidden;
@@ -700,7 +702,7 @@ namespace BATTLE {
         setBattleUISubVisibility( p_isHidden );
     }
 
-    void drawPKMNChoiceScreen( battle* p_battle, bool p_firstIsChosen ) {
+    void battleUI::drawPKMNChoiceScreen( bool p_firstIsChosen ) {
         u16 tilecnt = 0;
         u8  palIndex = 3;
         u8 oamIndex = SUB_Back_OAM;
@@ -710,8 +712,8 @@ namespace BATTLE {
                                   BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
         consoleSelect( &IO::Bottom );
 
-        if( p_battle->m_battleMode == battle::DOUBLE && p_battle->_battleMoves[ 0 ][ PLAYER ].m_type == battle::battleMove::SWITCH )
-            firstMoveSwitchTarget = p_battle->_battleMoves[ 0 ][ PLAYER ].m_value;
+        if( _battle->m_battleMode == battle::DOUBLE && _battle->_battleMoves[ 0 ][ PLAYER ].m_type == battle::battleMove::SWITCH )
+            firstMoveSwitchTarget = _battle->_battleMoves[ 0 ][ PLAYER ].m_value;
 
         for( u8 i = 0; i < 6; ++i ) {
             u8 x = 8 + ( i % 2 ) * 120 - ( i / 2 ) * 4,
@@ -733,10 +735,10 @@ namespace BATTLE {
                                           BattlePkmnChoice4TilesLen, false, false, false, OBJPRIORITY_2, true );
             }
 
-            if( i >= p_battle->_player->m_pkmnTeam.size( ) )
+            if( i >= _battle->_player->m_pkmnTeam.size( ) )
                 continue;
 
-            auto& acPkmn = ACPKMN2( *p_battle, i, PLAYER );
+            auto& acPkmn = CUR_PKMN_2( *_battle, i, PLAYER );
 
             consoleSetWindow( &IO::Bottom, ( x + 6 ) / 8, ( y + 6 ) / 8, 20, 8 );
             if( !acPkmn.m_boxdata.m_individualValues.m_isEgg ) {
@@ -1235,7 +1237,7 @@ namespace BATTLE {
         for( u8 i = 0; i < 6; ++i )
             for( u8 p = 0; p < 2; ++p )
                 for( u8 s = 0; s < MAX_STATS; ++s )
-                    _oldPKMNStats[ ACPOS2( *_battle, i, p ) ][ p ][ s ] = ACPKMNSTS2( *_battle, i, p );
+                    _oldPKMNStats[ CUR_POS_2( *_battle, i, p ) ][ p ][ s ] = CUR_PKMN_STS_2( *_battle, i, p );
         IO::initOAMTable( true );
         IO::initOAMTable( false );
         IO::Oam->oamBuffer[ SUB_A_OAM ].gfxIndex = 0;
@@ -1243,18 +1245,18 @@ namespace BATTLE {
     }
 
     void battleUI::trainerIntro( ) {
-        loadSpritesSub( _battle );
-        loadSpritesTop( _battle ); // This should consume some time
+        loadSpritesSub( );
+        loadSpritesTop( ); // This should consume some time
 
-        loadBattleUITop( _battle );
+        loadBattleUITop( );
         IO::initOAMTable( true );
         IO::drawSub( );
         initLogScreen( );
     }
     void battleUI::pokemonIntro( ) {
-        loadSpritesTop( _battle ); // This should consume some time
+        loadSpritesTop( ); // This should consume some time
 
-        loadBattleUITop( _battle );
+        loadBattleUITop( );
         IO::initOAMTable( true );
         IO::drawSub( );
         initLogScreen( );
@@ -1268,10 +1270,10 @@ namespace BATTLE {
     u8 firstMoveSwitchTarget = 0;
     bool battleUI::declareBattleMove( u8 p_pokemonPos, bool p_showBack ) {
         char buffer[ 100 ];
-        std::sprintf( buffer, "Was soll %s tun?", ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
+        std::sprintf( buffer, "Was soll %s tun?", CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
         writeLogText( buffer );
 
-        loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+        loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                          _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
         if( p_showBack ) {
             IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
@@ -1298,7 +1300,7 @@ SHOW_ATTACK:
                 //Check if the PKMN still has AP to use, if not, the move becomes struggle
                 u16 apCnt = 0;
                 for( u8 i = 0; i < 4; ++i )
-                    apCnt += ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_acPP[ i ];
+                    apCnt += CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_acPP[ i ];
 
                 if( !apCnt ) {
                     result.m_value = M_STRUGGLE;
@@ -1322,7 +1324,7 @@ SHOW_ATTACK:
                         return true;
                     }
                 }
-                loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+                loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                                  _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( buffer );
@@ -1334,7 +1336,7 @@ SHOW_ATTACK:
                 result.m_type = battle::battleMove::USE_ITEM;
                 result.m_value = chooseItem( );
                 result.m_target = 0;
-                loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+                loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                                  _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
                 if( result.m_value ) {
                     if( ItemList[ result.m_value ]->m_itemType == item::MEDICINE ) {
@@ -1344,14 +1346,14 @@ SHOW_ATTACK:
                             result.m_newItemEffect = ItemList[ result.m_value ]->m_itemData.m_itemEffect;
                             for( u8 i = 0; i < 2; ++i )
                                 if( ItemList[ result.m_value ]->needsInformation( i ) ) {
-                                    IO::choiceBox cb( ACPKMN2( *_battle, res, PLAYER ), 0 );
+                                    IO::choiceBox cb( CUR_PKMN_2( *_battle, res, PLAYER ), 0 );
                                     u8 res = 1 + cb.getResult( "Welche Attacke?", false, false );
 
                                     result.m_newItemEffect &= ~( 1 << ( 9 + 16 * !i ) );
                                     result.m_newItemEffect |= ( res << ( 9 + 16 * !i ) );
                                 }
                         } else {
-                            loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+                            loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                                              _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
                             goto NEXT_TRY;
                         }
@@ -1359,7 +1361,7 @@ SHOW_ATTACK:
                         result.m_target |= ( 1 << 2 );
                     IO::initOAMTable( true );
                     IO::drawSub( );
-                    loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+                    loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                                      _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
 
                     setDeclareBattleMoveSpriteVisibility( p_showBack, true );
@@ -1369,7 +1371,7 @@ SHOW_ATTACK:
                 }
 NEXT_TRY:
                 initLogScreen( );
-                std::sprintf( buffer, "Was soll %s tun?", ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
+                std::sprintf( buffer, "Was soll %s tun?", CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
                 writeLogText( buffer );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
 
@@ -1411,7 +1413,7 @@ NEXT_TRY:
                     loadA( );
                     return true;
                 }
-                loadBattleUISub( ACPKMN2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
+                loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                                  _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( buffer );
@@ -1435,7 +1437,7 @@ NEXT_TRY:
                                   BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
         consoleSelect( &IO::Bottom );
 
-        auto acPkmn = ACPKMN2( *_battle, p_pokemonPos, PLAYER );
+        auto acPkmn = CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER );
 
         for( u8 i = 0; i < 4; ++i ) {
             if( acPkmn.m_boxdata.m_moves[ i ] ) {
@@ -1607,7 +1609,7 @@ END:
             if( 1 - ( i / 2 ) )
                 aI = ( 1 - aI );
 
-            auto acPkmn = ACPKMN2( *_battle, aI, 1 - ( i / 2 ) );
+            auto acPkmn = CUR_PKMN_2( *_battle, aI, 1 - ( i / 2 ) );
 
             u8 w = 104, h = 32;
             u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
@@ -1661,7 +1663,7 @@ NEXT:
                 if( 1 - ( i / 2 ) )
                     aI = ( 1 - aI );
 
-                auto acPkmn = ACPKMN2( *_battle, aI, 1 - ( i / 2 ) );
+                auto acPkmn = CUR_PKMN_2( *_battle, aI, 1 - ( i / 2 ) );
                 if( neverTarget[ i ] || !acPkmn.m_stats.m_acHP )
                     continue;
                 if( !selected[ i ] && selectionExists )
@@ -1679,7 +1681,7 @@ NEXT:
                         if( 1 - ( j / 2 ) )
                             aJ = ( 1 - aJ );
 
-                        auto acPkmnJ = ACPKMN2( *_battle, aJ, 1 - ( i / 2 ) );
+                        auto acPkmnJ = CUR_PKMN_2( *_battle, aJ, 1 - ( i / 2 ) );
 
                         u8 nx = 16 - 8 * ( j / 2 ) + ( w + 16 ) * ( j % 2 ), ny = 74 + ( h + 16 ) * ( j / 2 );
                         IO::printRectangle( nx, ny, x + w, y + h,
@@ -1709,7 +1711,7 @@ NEXT:
                                 if( 1 - ( j / 2 ) )
                                     aJ = ( 1 - aJ );
 
-                                auto acPkmnJ = ACPKMN2( *_battle, aJ, 1 - ( i / 2 ) );
+                                auto acPkmnJ = CUR_PKMN_2( *_battle, aJ, 1 - ( i / 2 ) );
 
                                 u8 nx = 16 - 8 * ( j / 2 ) + ( w + 16 ) * ( j % 2 ), ny = 74 + ( h + 16 ) * ( j / 2 );
 
@@ -1779,7 +1781,7 @@ START:
         u8 result = 0;
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
         IO::updateOAM( true );
-        drawPKMNChoiceScreen( _battle, p_firstIsChosen );
+        drawPKMNChoiceScreen( p_firstIsChosen );
         IO::drawSub( );
         initColors( );
         IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
@@ -1802,7 +1804,7 @@ START:
             }
             auto teamSz = _battle->_player->m_pkmnTeam.size( );
             for( u8 i = 0; i < teamSz; ++i ) {
-                if( p_noRestrict && ACPKMN2( *_battle, i, PLAYER ).isEgg( ) )
+                if( p_noRestrict && CUR_PKMN_2( *_battle, i, PLAYER ).isEgg( ) )
                     continue;
                 u8 x = IO::Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].x;
                 u8 y = IO::Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].y;
@@ -1811,7 +1813,7 @@ START:
                     result = i;
                     u8 tmp = 1;
                     if( !p_noRestrict ) {
-                        auto acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                        auto acPkmn = CUR_PKMN_2( *_battle, result, PLAYER );
                         undrawPKMNChoiceScreen( );
                         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                         consoleClear( );
@@ -1822,12 +1824,12 @@ START:
                             while( ( tmp = showDetailedInformation( acPkmn, tmp - 1 ) ) ) {
                                 if( tmp == 1 ) {
                                     result = ( result + 1 + oldtmp ) % teamSz;
-                                    acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                                    acPkmn = CUR_PKMN_2( *_battle, result, PLAYER );
                                     tmp = 1 + oldtmp;
                                 }
                                 if( tmp == 2 ) {
                                     result = ( result + teamSz - 1 ) % teamSz;
-                                    acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                                    acPkmn = CUR_PKMN_2( *_battle, result, PLAYER );
                                     tmp = 1 + oldtmp;
                                 }
                                 if( tmp == 3 ) {
@@ -1835,7 +1837,7 @@ START:
                                     oldtmp = tmp - 1;
                                 }
                             }
-                            acPkmn = ACPKMN2( *_battle, result, PLAYER );
+                            acPkmn = CUR_PKMN_2( *_battle, result, PLAYER );
                             undrawPKMNChoiceScreen( );
                             consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                             consoleClear( );
@@ -1874,14 +1876,14 @@ CLEAR:
         if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
             return;
         if( p_oldHPmax == u16( -1 ) )
-            p_oldHPmax = ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_maxHP;
+            p_oldHPmax = CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_maxHP;
 
         u8 hpx = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
             hpy = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y;
 
         IO::displayHP( p_oldHP * 100 / p_oldHPmax,
-                       100 - ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP * 100
-                       / ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_maxHP,
+                       100 - CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP * 100
+                       / CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_maxHP,
                        hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, true );
 
         consoleSelect( &IO::Top );
@@ -1889,18 +1891,18 @@ CLEAR:
             consoleSetWindow( &IO::Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             consoleClear( );
             printf( "%10s%c\n",
-                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
-                    GENDER( ACPKMN2( *_battle, p_pokemonPos, p_opponent ) ) );
-            printf( "Lv%3hhu%4huKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_level,
-                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
+                    CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
+                    GENDER( CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ) ) );
+            printf( "Lv%3hhu%4huKP\n", CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_level,
+                    CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
         } else {
             consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
             consoleClear( );
             printf( "%10s%c\n",
-                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
-                    GENDER( ACPKMN2( *_battle, p_pokemonPos, p_opponent ) ) );
-            printf( "Lv%3hhu%4huKP\n", ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_level,
-                    ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
+                    CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
+                    GENDER( CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ) ) );
+            printf( "Lv%3hhu%4huKP\n", CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_level,
+                    CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
         }
     }
 
@@ -1913,7 +1915,7 @@ CLEAR:
             hpy = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y;
 
         pokemonData p;
-        auto& acPkmn = ACPKMN2( *_battle, p_pokemonPos, p_opponent );
+        auto& acPkmn = CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent );
 
         if( !acPkmn.m_stats.m_acHP )
             return;
@@ -1986,9 +1988,9 @@ CLEAR:
         //    return;
         if( _battle->m_isWildBattle && p_opponent )
             return;
-        setStsBallSts( p_opponent, p_pokemonPos, ACPKMNSTS2( *_battle, p_pokemonPos, p_opponent ), false );
+        setStsBallSts( p_opponent, p_pokemonPos, CUR_PKMN_STS_2( *_battle, p_pokemonPos, p_opponent ), false );
         if( p_pokemonPos <= ( _battle->m_battleMode == battle::DOUBLE ) && p_move
-            && ACPKMN2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP ) {
+            && CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP ) {
             u8 hpx = 0, hpy = 0;
             s16 x, y;
             getSpritePos( p_opponent, p_pokemonPos, _battle->m_battleMode == battle::DOUBLE, x, y, hpx, hpy );
@@ -2026,7 +2028,7 @@ CLEAR:
                        IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y, OWN1_EP_COL, OWN1_EP_COL + 1, false );
 
         if( !_battle->m_isWildBattle )
-            setStsBallSts( p_opponent, p_pokemonPos, ACPKMNSTS2( *_battle, p_pokemonPos, p_opponent ), false );
+            setStsBallSts( p_opponent, p_pokemonPos, CUR_PKMN_STS_2( *_battle, p_pokemonPos, p_opponent ), false );
         IO::updateOAM( false );
 
         //Clear text
@@ -2055,14 +2057,14 @@ CLEAR:
         u8 hpx = 0, hpy = 0;
         getSpritePos( p_opponent, p_pokemonPos, _battle->m_battleMode == battle::DOUBLE, x, y, hpx, hpy );
 
-        auto acPkmn = ACPKMN2( *_battle, p_pokemonPos, p_opponent );
+        auto acPkmn = CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent );
         if( !acPkmn.m_stats.m_acHP )
             return;
         //Lets do some animation stuff here
         if( !p_silent ) {
             if( p_opponent )
                 std::sprintf( buffer, "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]",
-                              ACPKMN2( *_battle, p_pokemonPos, OPPONENT ).m_boxdata.m_name );
+                              CUR_PKMN_2( *_battle, p_pokemonPos, OPPONENT ).m_boxdata.m_name );
             else
                 std::sprintf( buffer, "Los [OWN%d]![A]", p_pokemonPos + 1 );
             _battle->log( buffer );
@@ -2143,7 +2145,7 @@ CLEAR:
         u8 hpx, hpy;
         getSpritePos( p_opponent, p_pokemonPos, _battle->m_battleMode == battle::DOUBLE, x, y, hpx, hpy );
 
-        auto acPkmn = ACPKMN2( *_battle, p_pokemonPos, p_opponent );
+        auto acPkmn = CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent );
         if( p_opponent ) {
             if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
                                      PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
@@ -2178,7 +2180,7 @@ CLEAR:
             return;
 
         //Check if the PKMN already knows this move
-        auto& acPkmn = ACPKMN2( *_battle, p_pokemonPos, PLAYER );
+        auto& acPkmn = CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER );
 
         for( u8 i = 0; i < 4; ++i )
             if( acPkmn.m_boxdata.m_moves[ i ] == p_move )
@@ -2437,7 +2439,7 @@ ST:
 
         for( int i = 0; i < 20; ++i )
             swiWaitForVBlank( );
-        
+
         std::sprintf( buffer, "Toll!\n%s wurde gefangen![A]", _battle->_wildPokemon.m_pokemon->m_boxdata.m_name );
         _battle->log( buffer );
         return;

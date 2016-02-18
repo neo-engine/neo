@@ -38,6 +38,9 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #define VERSION_NAME "Executing Exeggcute"
 #define DEBUG
 
+#define MAX_ITEMS_IN_BAG 900
+#define MAX_ATTACK 560
+
 enum GameMod : u8 {
     DEVELOPER,
     ALPHA,

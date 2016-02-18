@@ -51,5 +51,4 @@ namespace MAP {
         //NPC modes
         NOTHING = 0,
     };
-
 }

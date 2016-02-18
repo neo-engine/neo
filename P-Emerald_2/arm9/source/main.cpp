@@ -71,7 +71,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "mapObject.h"
 
 #include "battle.h"
-#include "Gen.h"
+#include "battleTrainer.h"
 
 #include "BigCirc1.h"
 #include "consoleFont.h"
@@ -534,7 +534,8 @@ OUT:
                     BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
                                                "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, 0, 0 );
 
-                    BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100, 5, BATTLE::battle::DOUBLE );
+                    BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
+                                                BATTLE::weather( rand( ) % 9 ), 0, 0, 5, BATTLE::battle::DOUBLE );
                     ANIMATE_MAP = false;
                     test_battle.start( );
                     FS::SAV->updateTeam( );
@@ -553,7 +554,8 @@ OUT:
                     BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm... Du bist gar nicht so schlecht...",
                                                "Yay gewonnen!", "Das war wohl eine Niederlage...", cpy, 0, 0 );
 
-                    BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100, 5, BATTLE::battle::SINGLE );
+                    BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
+                                                BATTLE::HAIL/*weather( rand( ) % 9 )*/, 0, 0, 5, BATTLE::battle::SINGLE );
                     ANIMATE_MAP = false;
                     test_battle.start( );
                     FS::SAV->updateTeam( );
