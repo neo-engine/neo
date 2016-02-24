@@ -216,7 +216,8 @@ namespace IO {
                     }
                     if( keysUp( ) & KEY_A )
                         break;
-                    auto t = touchReadXY( );
+                    touchPosition t;
+                    touchRead( &t );
                     if( t.px > 224 && t.py > 164
                         && waitForTouchUp( 224, 164 ) ) {
                         break;
@@ -276,7 +277,8 @@ namespace IO {
                     }
                     if( keysUp( ) & KEY_A )
                         break;
-                    auto t = touchReadXY( );
+                    touchPosition t;
+                    touchRead( &t );
                     if( t.px > 224 && t.py > 164
                         && waitForTouchUp( 224, 164 ) ) {
                         break;

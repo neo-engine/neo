@@ -90,7 +90,7 @@ namespace BATTLE {
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
                 return evaluate( ( (battle*) p_self )->getTargetSpecifierValue( m_targetSpecifier ) );
-            case BATTLE::battleScript::command::SELF_DAMAGE:
+            case BATTLE::battleScript::command::MOVE:
                 return evaluate( *( (int*) p_self ) );
             default:
                 break;
@@ -137,7 +137,7 @@ namespace BATTLE {
             }
             case BATTLE::battleScript::command::SELF_BATTLE:
                 return get( *( (battle*) p_self ) );
-            case BATTLE::battleScript::command::SELF_DAMAGE:
+            case BATTLE::battleScript::command::MOVE:
                 return m_additiveConstant + m_multiplier * ( *( (int*) p_self ) ) / 100;
             default:
             case BATTLE::battleScript::command::NO_TARGET:
@@ -304,7 +304,7 @@ namespace BATTLE {
             case BATTLE::battleScript::command::SELF_BATTLE:
                 return evaluateOnTargetVal( *( (battle*) p_self ), p_self );
 
-            case BATTLE::battleScript::command::SELF_DAMAGE:
+            case BATTLE::battleScript::command::MOVE:
             {
                 switch( m_action ) {
                     case BATTLE::battleScript::command::SET:
@@ -326,10 +326,14 @@ namespace BATTLE {
     }
 
     void battleScript::execute( battle& p_battle, void* p_self ) const {
+        bool lastCondition = false;
         for( auto cmd : _commands ) {
-            for( auto cond : cmd.m_conditions )
-                if( !cond.check( p_battle, p_self ) )
+            for( auto cond : cmd.m_conditions ) {
+                if( cond.m_asLastCondition && !lastCondition )
                     goto NEXT;
+                if( !cond.m_asLastCondition && !( lastCondition = cond.check( p_battle, p_self ) ) )
+                    goto NEXT;
+            }
             if( cmd.m_log.length( ) )
                 p_battle.log( cmd.m_log );
             cmd.execute( p_battle, p_self );

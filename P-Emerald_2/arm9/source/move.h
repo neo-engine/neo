@@ -28,6 +28,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #pragma once
 
+#include <cstring>
 #include <string>
 #include <nds/ndstypes.h>
 #include "type.h"
@@ -36,7 +37,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 class move {
 public:
-    enum moveAffectsTypes : u8{
+    enum moveAffectsTypes : u8 {
         SELECTED = 0,
         DEPENDS_ON_ATTACK = 1,
         OWN_FIELD = 2,
@@ -79,12 +80,14 @@ public:
     moveFlags       m_moveFlags;
     moveHitTypes    m_moveHitType;
 
+    char            m_description[ 300 ] = { 0 };
+
     //Constructrs
 
     move( ) { }
 
     move( const std::string p_moveName,
-          char p_moveEffect,
+          BATTLE::battleScript p_moveEffect,
           char p_moveBasePower,
           type p_moveType,
           char p_moveAccuracy,
@@ -93,10 +96,11 @@ public:
           moveAffectsTypes p_moveAffectsWhom,
           char p_movePriority,
           moveFlags p_moveFlags,
-          moveHitTypes p_moveHitType )
+          moveHitTypes p_moveHitType,
+          const char* p_description = "Keine genaueren Informationen verfügbar." )
         : m_isFieldAttack( false ),
         m_moveName( p_moveName ),
-        m_moveEffect( BATTLE::battleScript( { BATTLE::cmd( "Attackeneffekt.[A]" ) } ) ), // <-- TODO 
+        m_moveEffect( p_moveEffect ),
         m_moveBasePower( p_moveBasePower ),
         m_moveType( p_moveType ),
         m_moveAccuracy( p_moveAccuracy ),
@@ -106,7 +110,7 @@ public:
         m_movePriority( p_movePriority ),
         m_moveFlags( p_moveFlags ),
         m_moveHitType( p_moveHitType ) {
-        (void) p_moveEffect;
+        strcpy( m_description, p_description );
     }
 
     ~move( ) { }
@@ -121,7 +125,7 @@ public:
         return "N/A";
     }
     virtual const char* description( ) {
-        return "Keine genaueren Informationen verfügbar.";
+        return m_description;
     }
 };
 

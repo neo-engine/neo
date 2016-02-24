@@ -98,7 +98,7 @@ void drawSplash( ) {
     touchPosition tp;
     loop( ) {
         scanKeys( );
-        tp = touchReadXY( );
+        touchRead( &tp );
         swiWaitForVBlank( );
 
         int pressed = keysCurrent( );
@@ -113,7 +113,7 @@ void drawSplash( ) {
     }
     while( tp.px || tp.py ) {
         scanKeys( );
-        tp = touchReadXY( );
+        touchRead( &tp );
         swiWaitForVBlank( );
     }
 

@@ -43,7 +43,7 @@ class cut
 public:
     cut( )
         : move( std::string( "Zerschneider" ),
-                C 0,
+        { },
                 C 60,
                 NORMAL,
                 C 100,
@@ -73,7 +73,7 @@ class rockSmash
 public:
     rockSmash( )
         : move( std::string( "Zertrümmerer" ),
-                C 1,
+        { },
                 C 60,
                 FIGHTING,
                 C 100,
@@ -103,7 +103,7 @@ class fly
 public:
     fly( )
         : move( std::string( "Fliegen" ),
-                C 2,
+        { },
                 C 90,
                 FLYING,
                 C 100,
@@ -133,7 +133,7 @@ class flash
 public:
     flash( ) :
         move( std::string( "Blitz" ),
-              C 3,
+        { },
               C 0,
               LIGHTNING,
               C 80,
@@ -163,7 +163,7 @@ class whirlpool
 public:
     whirlpool( )
         : move( std::string( "Whirlpool" ),
-                C 4,
+        { },
                 C 35,
                 WATER,
                 C 85,
@@ -193,7 +193,7 @@ class surf
 public:
     surf( )
         : move( std::string( "Surfer" ),
-                C 0,
+        { },
                 C 95,
                 WATER,
                 C 95,
@@ -223,7 +223,7 @@ class dive
 public:
     dive( )
         : move( "Taucher",
-                C 0,
+        { },
                 C 80,
                 WATER,
                 C 100,
@@ -254,7 +254,7 @@ class defog
 public:
     defog( )
         : move( "Auflockern",
-                C 0,
+        { },
                 C 0,
                 FLYING,
                 C 0,
@@ -284,7 +284,7 @@ class strength
 public:
     strength( )
         : move( "Stärke",
-                C 0,
+        { },
                 C 80,
                 NORMAL,
                 C 100,
@@ -314,7 +314,7 @@ class rockClimb
 public:
     rockClimb( )
         : move( "Kraxler",
-                C 0,
+        { },
                 C 90,
                 NORMAL,
                 C 85,
@@ -344,7 +344,7 @@ class waterfall
 public:
     waterfall( )
         : move( "Kaskade",
-                C 0,
+        { },
                 C 80,
                 WATER,
                 C 100,
@@ -373,7 +373,7 @@ class teleport
 public:
     teleport( )
         : move( "Teleport",
-                C 0,
+        { },
                 C 0,
                 PSYCHIC,
                 C 100,
@@ -402,7 +402,7 @@ class headbutt
 public:
     headbutt( ) :
         move( "Kopfnuss",
-              C 0,
+        { },
               C 70,
               NORMAL,
               C 100,
@@ -431,7 +431,7 @@ class sweetScent
 public:
     sweetScent( )
         : move( "Lockduft",
-                C 0,
+        { },
                 C 0,
                 NORMAL,
                 C 100,
@@ -460,7 +460,7 @@ class dig
 public:
     dig( )
         : move( "Schaufler",
-                C 0,
+        { },
                 C 80,
                 GROUND,
                 C 100,

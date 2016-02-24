@@ -52,9 +52,15 @@ namespace BATTLE {
                 OWN1,
                 OWN2,
                 BATTLE_,
-                SELF_PKMN,
+                SELF_PKMN, //move user
                 SELF_BATTLE,
-                SELF_DAMAGE
+                MOVE,
+
+                MOVE_TARGET,
+
+                PLAYER,
+
+                RANDOM
             };
             enum targetSpecifier {
                 NONE,
@@ -75,7 +81,8 @@ namespace BATTLE {
 
                 PKMN_GENDER, //-1: Female, 0: Neutral, 1: Male
 
-                PKMN_STATUS,
+                PKMN_AILMENT,   //Burn, ...
+                PKMN_STATUS,    //is Flying, etc
 
                 PKMN_HP,
                 PKMN_HP_PERCENT,
@@ -87,6 +94,7 @@ namespace BATTLE {
                 PKMN_SDEF,
                 PKMN_ACCURACY,
                 PKMN_ATTACK_BLOCKED,
+                PKMN_KO, //Ko moves
 
                 PKMN_LEVEL,
 
@@ -102,7 +110,22 @@ namespace BATTLE {
                 BATTLE_OPP_FST_MOVE,
                 BATTLE_OPP_SND_MOVE,
                 BATTLE_OWN_TEAMSIZE,
-                BATTLE_OPP_TEAMSIZE
+                BATTLE_OPP_TEAMSIZE,
+
+                BATTLE_MOVE_TARGET,
+
+                MOVE_DAMAGE,
+                MOVE_REPEAT,
+                MOVE_CRITICAL_RATIO,
+                MOVE_MAX_ROUNDS,
+                MOVE_ROUND,
+
+                PLAYER_MONEY,
+
+                RAND_MAX_0,
+                RAND_MAX_10 = RAND_MAX_0 + 10,
+                RAND_MAX_50 = RAND_MAX_0 + 50,
+                RAND_MAX_100 = RAND_MAX_0 + 100
             };
 
             enum action {
@@ -110,7 +133,8 @@ namespace BATTLE {
                 ADD,
                 MULTIPLY, //Multiply target by value and divide it by 100
                 SWITCH,
-                END
+                END,
+                DEFER,    //Don't use a move
             };
             enum comp {
                 EQUALS,
@@ -121,22 +145,36 @@ namespace BATTLE {
                 LEQ
             };
 
+            enum ctr {
+                IF,
+                IFN,
+                ELSE,
+                WHILE
+            };
+
             struct condition {
             public:
+                ctr             m_control;
                 target          m_target;
                 targetSpecifier m_targetSpecifier;
                 comp            m_comp;
                 int             m_value;
+                bool            m_asLastCondition;
 
-                condition( ) { }
+                condition( ctr p_control = IF )
+                    : m_control( p_control ),
+                    m_asLastCondition( true ) {
+                }
                 condition( target p_target,
                            targetSpecifier p_targetSpecifier,
                            comp p_comp,
                            int p_value )
-                    : m_target( p_target ),
+                    : m_control( IF ),
+                    m_target( p_target ),
                     m_targetSpecifier( p_targetSpecifier ),
                     m_comp( p_comp ),
-                    m_value( p_value ) { }
+                    m_value( p_value ),
+                    m_asLastCondition( false ) { }
 
                 bool            check( battle& p_battle, void* p_self ) const;
                 bool            evaluate( int p_other ) const;
@@ -200,6 +238,24 @@ namespace BATTLE {
                 m_value( 0 ),
                 m_log( p_log ) { }
 
+            command( target                 p_target,
+                     targetSpecifier        p_targetSpecifier,
+                     value                  p_value )
+                : m_target( p_target ),
+                m_targetSpecifier( p_targetSpecifier ),
+                m_action( SET ),
+                m_value( p_value ) {
+            }
+            command( target                 p_target,
+                     targetSpecifier        p_targetSpecifier,
+                     action                 p_action,
+                     value                  p_value )
+                : m_target( p_target ),
+                m_targetSpecifier( p_targetSpecifier ),
+                m_action( p_action ),
+                m_value( p_value ) {
+            }
+
             command( std::vector<condition>  p_conditions,
                      target                  p_target,
                      targetSpecifier         p_targetSpecifier,
@@ -217,7 +273,7 @@ namespace BATTLE {
                      targetSpecifier         p_targetSpecifier,
                      action                  p_action,
                      int                     p_value,
-                     std::string&           p_log )
+                     std::string&            p_log )
                 : m_conditions( p_conditions ),
                 m_target( p_target ),
                 m_targetSpecifier( p_targetSpecifier ),
@@ -243,7 +299,7 @@ namespace BATTLE {
                      targetSpecifier         p_targetSpecifier,
                      action                  p_action,
                      value                   p_value,
-                     const char*          p_log )
+                     const char*             p_log = "" )
                 : m_conditions( p_conditions ),
                 m_target( p_target ),
                 m_targetSpecifier( p_targetSpecifier ),
