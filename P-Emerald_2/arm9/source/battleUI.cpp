@@ -147,7 +147,7 @@ namespace BATTLE {
         IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
     }
     void battleUI::setLogTextColor( u16 p_color ) {
-        BG_PALETTE_SUB[ COLOR_IDX ] = BG_PALETTE[ COLOR_IDX ] = p_color;
+        BG_PALETTE_SUB[ COLOR_IDX ] = p_color;
     }
     void battleUI::writeLogText( const std::string& p_message ) {
         IO::regularFont->printMBString( p_message.c_str( ), 8, 8, true );
@@ -210,6 +210,69 @@ namespace BATTLE {
 
     u16 SUB_TILESTART = 0;
     u8 SUB_PALSTART = 0;
+
+    void drawGender( u8 p_x, u8 p_y, s8 p_gender, bool p_bottom = false ) {
+        auto pal = BG_PAL( p_bottom );
+        pal[ RED_IDX ] = RED;
+        pal[ BLUE_IDX ] = BLUE;
+        pal[ RED2_IDX ] = RED2;
+        pal[ BLUE2_IDX ] = BLUE2;
+        pal[ WHITE_IDX ] = WHITE;
+        if( p_gender == 1 ) {
+            IO::regularFont->setColor( BLUE_IDX, 1 );
+            IO::regularFont->setColor( BLUE2_IDX, 2 );
+            IO::regularFont->printChar( 136, p_x, p_y, p_bottom );
+        } else if( p_gender == -1 ) {
+            IO::regularFont->setColor( RED_IDX, 1 );
+            IO::regularFont->setColor( RED2_IDX, 2 );
+            IO::regularFont->printChar( 137, p_x, p_y, p_bottom );
+        }
+    }
+    void undrawPkmnInfo1( u8 p_hpx, u8 p_hpy ) {
+        IO::printRectangle( p_hpx - 88, p_hpy + 4, p_hpx, p_hpy + 30, false, false, 0 );
+    }
+    void undrawPkmnInfo2( u8 p_hpx, u8 p_hpy ) {
+        IO::printRectangle( p_hpx + 32, p_hpy + 4, p_hpx + 120, p_hpy + 30, false, false, 0 );
+    }
+    void drawPkmnInfo1( u8 p_hpx, u8 p_hpy, pokemon p_pokemon, u8 p_hpCol ) {
+        undrawPkmnInfo1( p_hpx, p_hpy );
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::printString( IO::regularFont, p_pokemon.m_boxdata.m_name, p_hpx - IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) - 12, p_hpy + 2, false );
+        if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 )
+            drawGender( p_hpx - 10, p_hpy + 2, p_pokemon.gender( ) );
+        IO::regularFont->setColor( WHITE_IDX, 2 );
+        IO::regularFont->setColor( GRAY_IDX, 1 );
+        char bf2[ 20 ] = { 0 };
+        sprintf( buffer, "Lv%hhu", p_pokemon.m_level );
+        sprintf( bf2, " %huKP", p_pokemon.m_stats.m_acHP );
+        IO::printString( IO::regularFont, buffer, p_hpx - IO::regularFont->stringWidth( buffer )
+                         - IO::regularFont->stringWidth( bf2 ) - 2, p_hpy + 15, false );
+        IO::regularFont->setColor( WHITE_IDX, 1 );
+        IO::regularFont->setColor( p_hpCol, 2 );
+        IO::printString( IO::regularFont, bf2, p_hpx - IO::regularFont->stringWidth( bf2 ) - 2, p_hpy + 15, false );
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
+    }
+    void drawPkmnInfo2( u8 p_hpx, u8 p_hpy, pokemon p_pokemon, u8 p_hpCol ) {
+        undrawPkmnInfo2( p_hpx, p_hpy );
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::printString( IO::regularFont, p_pokemon.m_boxdata.m_name, p_hpx + 34, p_hpy + 2, false );
+        if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 )
+            drawGender( p_hpx + IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) + 34, p_hpy + 2, p_pokemon.gender( ) );
+        IO::regularFont->setColor( WHITE_IDX, 2 );
+        IO::regularFont->setColor( GRAY_IDX, 1 );
+        char bf2[ 20 ] = { 0 };
+        sprintf( buffer, "Lv%hhu", p_pokemon.m_level );
+        sprintf( bf2, " %huKP", p_pokemon.m_stats.m_acHP );
+        IO::printString( IO::regularFont, buffer, p_hpx + 34, p_hpy + 15, false );
+        IO::regularFont->setColor( WHITE_IDX, 1 );
+        IO::regularFont->setColor( p_hpCol, 2 );
+        IO::printString( IO::regularFont, bf2, p_hpx + IO::regularFont->stringWidth( buffer ) + 34, p_hpy + 15, false );
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
+    }
 
     u16 battleUI::initStsBalls( bool p_bottom, u16& p_tilecnt ) {
         //Own PKMNs PBs
@@ -611,24 +674,18 @@ namespace BATTLE {
             pokemonData p;
             getAll( acPkmn.m_boxdata.m_speciesId, p );
 
-            IO::displayHP( 100, 101, hpx, hpy, HP_COL( 0, OPPONENT ), HP_COL( 0, OPPONENT ) + 1, false );
+            drawPkmnInfo1( hpx, hpy, acPkmn, HP_COL( OPPONENT, 0 ) );
+
+            IO::displayHP( 100, 101, hpx, hpy, HP_COL( OPPONENT, 0 ), HP_COL( OPPONENT, 0 ) + 1, false );
             IO::displayHP( 100, 100 - acPkmn.m_stats.m_acHP * 100 / acPkmn.m_stats.m_maxHP,
-                           hpx, hpy, HP_COL( 0, OPPONENT ), HP_COL( 0, OPPONENT ) + 1, false );
+                           hpx, hpy, HP_COL( OPPONENT, 0 ), HP_COL( OPPONENT, 0 ) + 1, false );
 
             IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
                            ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
                            hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-
-            consoleSelect( &IO::Top );
-            consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
-            printf( "%10s%c\n",
-                    acPkmn.m_boxdata.m_name,
-                    GENDER( acPkmn ) );
-            printf( "Lv%3hhu%4huKP\n", acPkmn.m_level,
-                    acPkmn.m_stats.m_acHP );
         }
     }
-    
+
     void loadBattleUISub( u16 p_pkmnId, bool p_isWildBattle, bool p_showNav ) {
         u16 tilecnt = 0;
         //Load UI Sprites
@@ -681,7 +738,7 @@ namespace BATTLE {
         SUB_PALSTART = 8;
         IO::updateOAM( true );
     }
-    
+
     void setBattleUISubVisibility( bool p_isHidden = false ) {
         for( u8 i = 0; i <= SUB_FIGHT_START + 6; ++i )
             IO::Oam->oamBuffer[ i ].isHidden = p_isHidden;
@@ -1887,23 +1944,11 @@ CLEAR:
                        hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, true );
 
         consoleSelect( &IO::Top );
-        if( p_opponent == p_pokemonPos ) {
-            consoleSetWindow( &IO::Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
-            consoleClear( );
-            printf( "%10s%c\n",
-                    CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
-                    GENDER( CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ) ) );
-            printf( "Lv%3hhu%4huKP\n", CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_level,
-                    CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
-        } else {
-            consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
-            consoleClear( );
-            printf( "%10s%c\n",
-                    CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_boxdata.m_name,
-                    GENDER( CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ) ) );
-            printf( "Lv%3hhu%4huKP\n", CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_level,
-                    CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent ).m_stats.m_acHP );
-        }
+        auto acPkmn = CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent );
+        if( p_opponent == p_pokemonPos )
+            drawPkmnInfo2( hpx, hpy, acPkmn, HP_COL( p_opponent, p_pokemonPos ) );
+        else
+            drawPkmnInfo1( hpx, hpy, acPkmn, HP_COL( p_opponent, p_pokemonPos ) );
     }
 
     void battleUI::applyEXPChanges( bool p_opponent, u8 p_pokemonPos, u32 p_gainedExp ) {
@@ -2037,13 +2082,10 @@ CLEAR:
         getSpritePos( p_opponent, p_pokemonPos, _battle->m_battleMode == battle::DOUBLE, x, y, hpx, hpy );
 
         consoleSelect( &IO::Top );
-        if( p_opponent == p_pokemonPos ) {
-            consoleSetWindow( &IO::Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
-            consoleClear( );
-        } else {
-            consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
-            consoleClear( );
-        }
+        if( p_opponent == p_pokemonPos )
+            undrawPkmnInfo2( hpx, hpy );
+        else
+            undrawPkmnInfo1( hpx, hpy );
     }
 
     void battleUI::sendPKMN( bool p_opponent, u8 p_pokemonPos, bool p_silent ) {
@@ -2112,6 +2154,12 @@ CLEAR:
         pokemonData p;
         getAll( acPkmn.m_boxdata.m_speciesId, p );
 
+        consoleSelect( &IO::Top );
+        if( p_opponent == p_pokemonPos )
+            drawPkmnInfo2( hpx, hpy, acPkmn, HP_COL( p_opponent, p_pokemonPos ) );
+        else
+            drawPkmnInfo1( hpx, hpy, acPkmn, HP_COL( p_opponent, p_pokemonPos ) );
+
         IO::displayHP( 100, 101, hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
         IO::displayHP( 100, 100 - acPkmn.m_stats.m_acHP * 100 / acPkmn.m_stats.m_maxHP,
                        hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
@@ -2120,22 +2168,6 @@ CLEAR:
                        ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
                        hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
 
-        consoleSelect( &IO::Top );
-        if( p_opponent == p_pokemonPos ) {
-            consoleSetWindow( &IO::Top, ( hpx + 40 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
-            printf( "%10s%c\n",
-                    acPkmn.m_boxdata.m_name,
-                    GENDER( acPkmn ) );
-            printf( "Lv%3hhu%4huKP\n", acPkmn.m_level,
-                    acPkmn.m_stats.m_acHP );
-        } else {
-            consoleSetWindow( &IO::Top, ( hpx - 88 ) / 8, ( hpy + 8 ) / 8, 20, 3 );
-            printf( "%10s%c\n",
-                    acPkmn.m_boxdata.m_name,
-                    GENDER( acPkmn ) );
-            printf( "Lv%3hhu%4huKP\n", acPkmn.m_level,
-                    acPkmn.m_stats.m_acHP );
-        }
     }
 
     void battleUI::evolvePKMN( bool p_opponent, u8 p_pokemonPos ) {
