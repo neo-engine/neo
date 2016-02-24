@@ -1548,11 +1548,11 @@ NEXT:
                     && acPkmn.m_boxdata.m_acPP[ i ] ) {
                     auto acMove = AttackList[ acPkmn.m_boxdata.m_moves[ i ] ];
 
-                    IO::printRectangle( x, y, x + w, y + h,
+                    IO::printRectangle( x, y, x + w, y + h + 1,
                                         true, false, 0 );
-                    IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1,
+                    IO::printRectangle( x + 3, y + 2, x + w + 2, y + h + 1,
                                         true, false, 240 + i );
-                    IO::printRectangle( x + 8, y + 6, x + w - 2, y + h,
+                    IO::printRectangle( x + 8, y + 6, x + w - 3, y + h,
                                         true, false, WHITE_IDX );
 
                     IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 9, y + 9, true );
@@ -1596,6 +1596,56 @@ END:
         return result;
     }
 
+
+    void battleUI::drawAttackTargetChoice( bool selected[ 4 ], bool neverTarget[ 4 ], u8 p_pokemonPos, u16 p_move ) {
+        if( selected[ 2 ] && selected[ 3 ] )
+            IO::printRectangle( 112 + 1, 130 + 1, 112 + 16 + 2, 146 + 1, true, false, BLACK_IDX );
+        if( selected[ 0 ] && selected[ 1 ] )
+            IO::printRectangle( 120 + 1, 82 + 1, 120 + 16 + 2, 98 + 1, true, false, BLACK_IDX );
+
+        if( selected[ 1 ] && selected[ 2 ] )
+            IO::printRectangle( 56 + 1, 106 + 1, 56 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
+        if( selected[ 3 ] && selected[ 0 ] )
+            IO::printRectangle( 176 + 1, 106 + 1, 176 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
+
+        _battle->_battleMoves[ p_pokemonPos ][ PLAYER ].m_target = 1 | 2 | 4 | 8;
+
+        for( u8 i = 0; i < 4; ++i ) {
+            u8 aI = i % 2;
+            if( 1 - ( i / 2 ) )
+                aI = ( 1 - aI );
+
+            auto acPkmn = CUR_PKMN_2( *_battle, aI, 1 - ( i / 2 ) );
+
+            u8 w = 104, h = 32;
+            u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
+
+            IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1,
+                                true, false, BLACK_IDX );
+            IO::printRectangle( x, y, x + w, y + h,
+                                true, false, ( selected[ i ] && !neverTarget[ i ] ) ? RED_IDX : GRAY_IDX );
+            IO::printRectangle( x + 7, y + 5, x + w - 4, y + h - 1,
+                                true, false, BLACK_IDX );
+            IO::printRectangle( x + 6, y + 4, x + w - 6, y + h - 2,
+                                true, false, WHITE_IDX );
+
+            if( neverTarget[ i ] )
+                continue;
+
+            if( acPkmn.m_stats.m_acHP ) 
+                IO::regularFont->printString( acPkmn.m_boxdata.m_name, x + 7, y + 7, true );
+        }
+
+        if( selected[ 2 ] && selected[ 3 ] )
+            IO::printRectangle( 112, 130, 112 + 16, 146, true, false, RED_IDX );
+        if( selected[ 0 ] && selected[ 1 ] )
+            IO::printRectangle( 120, 82, 120 + 16, 98, true, false, RED_IDX );
+
+        if( selected[ 1 ] && selected[ 2 ] )
+            IO::printRectangle( 56, 106, 56 + 16, 122, true, false, RED_IDX );
+        if( selected[ 3 ] && selected[ 0 ] )
+            IO::printRectangle( 176, 106, 176 + 16, 122, true, false, RED_IDX );
+    }
     u8 battleUI::chooseAttackTarget( u8 p_pokemonPos, u16 p_move ) {
         u8 result = 0;
 
@@ -1649,63 +1699,28 @@ END:
                 break;
         }
 
-        if( selected[ 2 ] && selected[ 3 ] )
-            IO::printRectangle( 112 + 1, 130 + 1, 112 + 16 + 2, 146 + 1, true, false, BLACK_IDX );
-        if( selected[ 0 ] && selected[ 1 ] )
-            IO::printRectangle( 120 + 1, 82 + 1, 120 + 16 + 2, 98 + 1, true, false, BLACK_IDX );
-
-        if( selected[ 1 ] && selected[ 2 ] )
-            IO::printRectangle( 56 + 1, 106 + 1, 56 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
-        if( selected[ 3 ] && selected[ 0 ] )
-            IO::printRectangle( 176 + 1, 106 + 1, 176 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
-
-        _battle->_battleMoves[ p_pokemonPos ][ PLAYER ].m_target = 1 | 2 | 4 | 8;
-
+        drawAttackTargetChoice( selected, neverTarget, p_pokemonPos, p_move );
         for( u8 i = 0; i < 4; ++i ) {
             u8 aI = i % 2;
             if( 1 - ( i / 2 ) )
                 aI = ( 1 - aI );
 
             auto acPkmn = CUR_PKMN_2( *_battle, aI, 1 - ( i / 2 ) );
+            if( neverTarget[ i ] )
+                continue;
 
             u8 w = 104, h = 32;
             u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
 
-            IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1,
-                                true, false, BLACK_IDX );
-            IO::printRectangle( x, y, x + w, y + h,
-                                true, false, ( selected[ i ] && !neverTarget[ i ] ) ? RED_IDX : GRAY_IDX );
-            IO::printRectangle( x + 7, y + 5, x + w - 4, y + h - 1,
-                                true, false, BLACK_IDX );
-            IO::printRectangle( x + 6, y + 4, x + w - 6, y + h - 2,
-                                true, false, WHITE_IDX );
-
-            if( neverTarget[ i ] )
-                continue;
-
-            if( acPkmn.m_stats.m_acHP ) {
-                IO::regularFont->printString( acPkmn.m_boxdata.m_name, x + 7, y + 7, true );
+            if( acPkmn.m_stats.m_acHP ) 
                 tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId,
                                             x - 10, y - 23, ++oamIndex, palIndex++, tilecnt );
-            }
         }
-
-        if( selected[ 2 ] && selected[ 3 ] )
-            IO::printRectangle( 112, 130, 112 + 16, 146, true, false, RED_IDX );
-        if( selected[ 0 ] && selected[ 1 ] )
-            IO::printRectangle( 120, 82, 120 + 16, 98, true, false, RED_IDX );
-
-        if( selected[ 1 ] && selected[ 2 ] )
-            IO::printRectangle( 56, 106, 56 + 16, 122, true, false, RED_IDX );
-        if( selected[ 3 ] && selected[ 0 ] )
-            IO::printRectangle( 176, 106, 176 + 16, 122, true, false, RED_IDX );
-
         IO::updateOAM( true );
 
         touchPosition touch;
         loop( ) {
 NEXT:
-
             scanKeys( );
             touchRead( &touch );
 
@@ -1730,6 +1745,16 @@ NEXT:
                 u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
                 if( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h ) {
 
+                    if( selected[ 2 ] && selected[ 3 ] )
+                        IO::printRectangle( 112, 130, 112 + 16, 146, true, false, 0 );
+                    if( selected[ 0 ] && selected[ 1 ] )
+                        IO::printRectangle( 120, 82, 120 + 16, 98, true, false, 0 );
+
+                    if( selected[ 1 ] && selected[ 2 ] )
+                        IO::printRectangle( 56, 106, 56 + 16, 122, true, false, 0 );
+                    if( selected[ 3 ] && selected[ 0 ] )
+                        IO::printRectangle( 176, 106, 176 + 16, 122, true, false, 0 );
+
                     for( u8 j = 0; j < 4; ++j ) {
                         if( !selected[ j ] && j != i )
                             continue;
@@ -1738,19 +1763,28 @@ NEXT:
                         if( 1 - ( j / 2 ) )
                             aJ = ( 1 - aJ );
 
-                        auto acPkmnJ = CUR_PKMN_2( *_battle, aJ, 1 - ( i / 2 ) );
+                        auto acPkmnJ = CUR_PKMN_2( *_battle, aJ, 1 - ( j / 2 ) );
 
                         u8 nx = 16 - 8 * ( j / 2 ) + ( w + 16 ) * ( j % 2 ), ny = 74 + ( h + 16 ) * ( j / 2 );
-                        IO::printRectangle( nx, ny, x + w, y + h,
+                        IO::printRectangle( nx, ny, nx + w, ny + h + 1,
                                             true, false, 0 );
-                        IO::printRectangle( nx + 1, ny + 1, nx + w + 2, ny + h + 1,
+                        IO::printRectangle( nx + 3, ny + 2, nx + w + 2, ny + h + 1,
                                             true, false, RED_IDX );
-                        IO::printRectangle( nx + 8, ny + 6, nx + w - 2, ny + h,
+                        IO::printRectangle( nx + 8, ny + 6, nx + w - 3, ny + h,
                                             true, false, WHITE_IDX );
                         if( neverTarget[ j ] || !acPkmnJ.m_stats.m_acHP )
                             continue;
                         IO::regularFont->printString( acPkmnJ.m_boxdata.m_name, nx + 9, ny + 9, true );
                     }
+                    if( selected[ 2 ] && selected[ 3 ] )
+                        IO::printRectangle( 112 + 1, 130 + 2, 112 + 16 + 2, 146 + 1, true, false, RED_IDX );
+                    if( selected[ 0 ] && selected[ 1 ] )
+                        IO::printRectangle( 120 + 1, 82 + 2, 120 + 16 + 2, 98 + 1, true, false, RED_IDX );
+
+                    if( selected[ 1 ] && selected[ 2 ] )
+                        IO::printRectangle( 56 + 2, 106 + 1, 56 + 16 + 2, 122 + 2, true, false, RED_IDX );
+                    if( selected[ 3 ] && selected[ 0 ] )
+                        IO::printRectangle( 176 + 2, 106 + 1, 176 + 16 + 2, 122 + 2, true, false, RED_IDX );
 
                     loop( ) {
                         swiWaitForVBlank( );
@@ -1760,30 +1794,7 @@ NEXT:
                         if( touch.px == 0 && touch.py == 0 )
                             break;
                         if( !( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h ) ) {
-                            for( u8 j = 0; j < 4; ++j ) {
-                                if( !selected[ j ] && j != i )
-                                    continue;
-
-                                u8 aJ = j % 2;
-                                if( 1 - ( j / 2 ) )
-                                    aJ = ( 1 - aJ );
-
-                                auto acPkmnJ = CUR_PKMN_2( *_battle, aJ, 1 - ( i / 2 ) );
-
-                                u8 nx = 16 - 8 * ( j / 2 ) + ( w + 16 ) * ( j % 2 ), ny = 74 + ( h + 16 ) * ( j / 2 );
-
-                                IO::printRectangle( nx + 1, ny + 1, nx + w + 2, ny + h + 1,
-                                                    true, false, BLACK_IDX );
-                                IO::printRectangle( nx, ny, nx + w, ny + h,
-                                                    true, false, selected[ i ] ? RED_IDX : GRAY_IDX );
-                                IO::printRectangle( nx + 7, ny + 5, nx + w - 4, ny + h - 1,
-                                                    true, false, BLACK_IDX );
-                                IO::printRectangle( nx + 6, ny + 4, nx + w - 6, ny + h - 2,
-                                                    true, false, WHITE_IDX );
-                                if( neverTarget[ j ] || !acPkmnJ.m_stats.m_acHP )
-                                    continue;
-                                IO::regularFont->printString( acPkmnJ.m_boxdata.m_name, nx + 7, ny + 7, true );
-                            }
+                            drawAttackTargetChoice( selected, neverTarget, p_pokemonPos, p_move );
                             goto NEXT;
                         }
                     }

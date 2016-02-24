@@ -38,6 +38,7 @@ namespace BATTLE {
         void    loadSpritesSub( );
         void    loadBattleUITop( );
         void    drawPKMNChoiceScreen( bool p_firstIsChosen );
+        void    drawAttackTargetChoice( bool p_selected[ 4 ], bool p_neverTarget[ 4 ], u8 p_pokemonPos, u16 p_move );
 
     public:
         friend class battle;
