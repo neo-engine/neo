@@ -767,7 +767,10 @@ namespace BATTLE {
         u8 dy = p_pressed;
 
         if( !acPkmn.m_boxdata.m_individualValues.m_isEgg ) {
-            IO::regularFont->printString( acPkmn.m_boxdata.m_name, dx + x + 112 - IO::regularFont->stringWidth( acPkmn.m_boxdata.m_name ), dy + y + 2, true );
+            u8 gn = !acPkmn.gender( ) ? 8 : 0;
+            IO::regularFont->printString( acPkmn.m_boxdata.m_name, gn + dx + x + 104 - IO::regularFont->stringWidth( acPkmn.m_boxdata.m_name ), dy + y + 2, true );
+            if( !gn )
+                drawGender( dx + x + 104, dy + y + 2, acPkmn.gender( ), true );
             IO::regularFont->setColor( GRAY_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
             IO::regularFont->printString( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
@@ -839,9 +842,9 @@ namespace BATTLE {
             auto& acPkmnStr = CUR_PKMN_STR_2( *_battle, i, PLAYER );
             auto& acPkmn = *acPkmnStr.m_pokemon;
             if( !acPkmn.m_boxdata.m_individualValues.m_isEgg )
-                tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, x + 4, y - 12, ++oamIndex, palIndex++, tilecnt, true );
+                tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, x - 4, y - 12, ++oamIndex, palIndex++, tilecnt, true );
             else
-                tilecnt = IO::loadEggIcon( x + 4, y - 12, ++oamIndex, palIndex++, tilecnt, true );
+                tilecnt = IO::loadEggIcon( x - 4, y - 12, ++oamIndex, palIndex++, tilecnt, true );
         }
 
         IO::updateOAM( true );
@@ -936,7 +939,8 @@ namespace BATTLE {
             IO::regularFont->setColor( GRAY_IDX, 2 );
         } else {
             consoleSetWindow( &IO::Bottom, 8, 11, 16, 10 );
-            printf( "  Ein Ei kann\n nicht k\x84""mpfen!" );
+            IO::regularFont->printString( "Ein Ei kann", x + 64 - IO::regularFont->stringWidth( "Ein Ei kann" ) / 2, 80, true );
+            IO::regularFont->printString( "nicht kämpfen!", x + 64 - IO::regularFont->stringWidth( "nicht kämpfen!" ) / 2, 94, true );
         }
 
         IO::updateOAM( true );
