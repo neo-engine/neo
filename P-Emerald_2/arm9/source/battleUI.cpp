@@ -759,6 +759,70 @@ namespace BATTLE {
         setBattleUISubVisibility( p_isHidden );
     }
 
+    void battleUI::drawPkmnChoicePkmn( u8 p_index, bool p_firstIsChosen, bool p_pressed ) {
+        u8 x = 8 + ( p_index % 2 ) * 120 - ( p_index / 2 ) * 4,
+            y = 32 + ( p_index / 2 ) * 48;
+
+        if( !p_index || ( p_firstIsChosen && ( p_index == 1 ) ) || p_index == firstMoveSwitchTarget )
+            IO::printChoiceBox( x + 8, y, x + 120, y + 44, 5, RED_IDX, p_pressed );
+        else
+            IO::printChoiceBox( x + 8, y, x + 120, y + 44, 5, GRAY_IDX, p_pressed );
+
+        if( p_index >= _battle->_player->m_pkmnTeam.size( ) )
+            return;
+
+        auto& acPkmnStr = CUR_PKMN_STR_2( *_battle, p_index, PLAYER );
+        auto& acPkmn = *acPkmnStr.m_pokemon;
+
+        u8 dx = p_pressed * 2;
+        u8 dy = p_pressed;
+
+        if( !acPkmn.m_boxdata.m_individualValues.m_isEgg ) {
+            IO::regularFont->printString( acPkmn.m_boxdata.m_name, dx + x + 112 - IO::regularFont->stringWidth( acPkmn.m_boxdata.m_name ), dy + y + 2, true );
+            IO::regularFont->setColor( GRAY_IDX, 1 );
+            IO::regularFont->setColor( WHITE_IDX, 2 );
+            IO::regularFont->printString( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
+                                          dx + x + 113 - IO::regularFont->stringWidth( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) ),
+                                          dy + y + 15, true );
+            sprintf( buffer, "Lv%d", acPkmn.m_level );
+            IO::regularFont->printString( buffer, dx + x + 12, dy + y + 27, true );
+            if( acPkmn.m_stats.m_acHP ) {
+                switch( acPkmnStr.m_ailments ) {
+                    case FREEZE:
+                        sprintf( buffer, "Eingfr" );
+                        break;
+                    case PARALYSIS:
+                        sprintf( buffer, "Prlyse" );
+                        break;
+                    case BURN:
+                        sprintf( buffer, "Verbrng" );
+                        break;
+                    case SLEEP:
+                        sprintf( buffer, "Schlaf" );
+                        break;
+                    case POISONED:
+                        sprintf( buffer, "Gift" );
+                    default:
+                        if( 5 * acPkmn.m_stats.m_acHP <= acPkmn.m_stats.m_maxHP )
+                            IO::regularFont->setColor( RED_IDX, 1 );
+                        else if( 2 * acPkmn.m_stats.m_acHP <= acPkmn.m_stats.m_maxHP )
+                            IO::regularFont->setColor( 241, 1 );
+                        else
+                            IO::regularFont->setColor( 240, 1 );
+                        sprintf( buffer, "%d/%d", acPkmn.m_stats.m_acHP, acPkmn.m_stats.m_maxHP );
+                }
+            } else {
+                IO::regularFont->setColor( RED_IDX, 1 );
+                sprintf( buffer, "Besiegt" );
+            }
+            IO::regularFont->printString( buffer, dx + x + 113 - IO::regularFont->stringWidth( buffer ), dy + y + 27, true );
+
+            IO::regularFont->setColor( BLACK_IDX, 1 );
+            IO::regularFont->setColor( GRAY_IDX, 2 );
+        } else
+            IO::regularFont->printString( "Ei", dx + x + 112 - IO::regularFont->stringWidth( "Ei" ), dy + y + 2, true );
+    }
+
     void battleUI::drawPKMNChoiceScreen( bool p_firstIsChosen ) {
         u16 tilecnt = 0;
         u8  palIndex = 3;
@@ -772,62 +836,30 @@ namespace BATTLE {
         if( _battle->m_battleMode == battle::DOUBLE && _battle->_battleMoves[ 0 ][ PLAYER ].m_type == battle::battleMove::SWITCH )
             firstMoveSwitchTarget = _battle->_battleMoves[ 0 ][ PLAYER ].m_value;
 
+        BG_PAL( true )[ 240 ] = GREEN;
+        BG_PAL( true )[ 241 ] = YELLOW;
         for( u8 i = 0; i < 6; ++i ) {
             u8 x = 8 + ( i % 2 ) * 120 - ( i / 2 ) * 4,
                 y = 32 + ( i / 2 ) * 48;
 
-            if( !i || ( p_firstIsChosen && ( i == 1 ) ) || i == firstMoveSwitchTarget ) {
-                tilecnt = IO::loadSprite( SUB_CHOICE_START + 2 * i, 1, tilecnt,
-                                          x, y, 64, 64, BattlePkmnChoice1Pal, BattlePkmnChoice1Tiles,
-                                          BattlePkmnChoice1TilesLen, false, false, false, OBJPRIORITY_2, true );
-                tilecnt = IO::loadSprite( SUB_CHOICE_START + 2 * i + 1, 1, tilecnt,
-                                          x + 64, y, 64, 64, BattlePkmnChoice2Pal, BattlePkmnChoice2Tiles,
-                                          BattlePkmnChoice2TilesLen, false, false, false, OBJPRIORITY_2, true );
-            } else {
-                tilecnt = IO::loadSprite( SUB_CHOICE_START + 2 * i, 2, tilecnt,
-                                          x, y, 64, 64, BattlePkmnChoice3Pal, BattlePkmnChoice3Tiles,
-                                          BattlePkmnChoice1TilesLen, false, false, false, OBJPRIORITY_2, true );
-                tilecnt = IO::loadSprite( SUB_CHOICE_START + 2 * i + 1, 2, tilecnt,
-                                          x + 64, y, 64, 64, BattlePkmnChoice4Pal, BattlePkmnChoice4Tiles,
-                                          BattlePkmnChoice4TilesLen, false, false, false, OBJPRIORITY_2, true );
-            }
+            drawPkmnChoicePkmn( i, p_firstIsChosen, false );
 
             if( i >= _battle->_player->m_pkmnTeam.size( ) )
                 continue;
 
-            auto& acPkmn = CUR_PKMN_2( *_battle, i, PLAYER );
-
-            consoleSetWindow( &IO::Bottom, ( x + 6 ) / 8, ( y + 6 ) / 8, 20, 8 );
-            if( !acPkmn.m_boxdata.m_individualValues.m_isEgg ) {
-                printf( "       Lv.%3d", acPkmn.m_level );
-                printf( "\n%14s\n", acPkmn.m_boxdata.m_name );
-                printf( "%14s\n\n",
-                        ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) );
-                printf( "   %3i/%3i",
-                        acPkmn.m_stats.m_acHP,
-                        acPkmn.m_stats.m_maxHP );
-                tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId,
-                                            x + 4,
-                                            y - 12,
-                                            ++oamIndex,
-                                            palIndex++,
-                                            tilecnt,
-                                            true );
-            } else {
-                printf( "\n            Ei" );
-                tilecnt = IO::loadEggIcon( x + 4,
-                                           y - 12,
-                                           ++oamIndex,
-                                           palIndex++,
-                                           tilecnt,
-                                           true );
-            }
+            auto& acPkmnStr = CUR_PKMN_STR_2( *_battle, i, PLAYER );
+            auto& acPkmn = *acPkmnStr.m_pokemon;
+            if( !acPkmn.m_boxdata.m_individualValues.m_isEgg )
+                tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, x + 4, y - 12, ++oamIndex, palIndex++, tilecnt, true );
+            else
+                tilecnt = IO::loadEggIcon( x + 4, y - 12, ++oamIndex, palIndex++, tilecnt, true );
         }
 
         IO::updateOAM( true );
     }
 
     void undrawPKMNChoiceScreen( ) {
+        IO::drawSub( );
         for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
             IO::Oam->oamBuffer[ i ].isHidden = true;
         IO::updateOAM( true );
@@ -1506,14 +1538,6 @@ NEXT_TRY:
                 u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
 
                 IO::printChoiceBox( x, y, x + w + 2, y + h + 1, 6, 240 + i, false );
-               // IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1,
-               //                     true, false, BLACK_IDX );
-               // IO::printRectangle( x, y, x + w, y + h,
-               //                     true, false, 240 + i );
-               // IO::printRectangle( x + 7, y + 5, x + w - 4, y + h - 1,
-               //                     true, false, BLACK_IDX );
-               // IO::printRectangle( x + 6, y + 4, x + w - 6, y + h - 2,
-               //                     true, false, WHITE_IDX );
 
                 IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
                 tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 7, y - 7, ++oamIndex, palIndex++, tilecnt, true );
@@ -1550,12 +1574,6 @@ NEXT:
                     auto acMove = AttackList[ acPkmn.m_boxdata.m_moves[ i ] ];
 
                     IO::printChoiceBox( x, y, x + w + 2, y + h + 1, 6, 240 + i, true );
-                    //IO::printRectangle( x, y, x + w, y + h + 1,
-                    //                    true, false, 0 );
-                    //IO::printRectangle( x + 3, y + 2, x + w + 2, y + h + 1,
-                    //                    true, false, 240 + i );
-                    //IO::printRectangle( x + 8, y + 6, x + w - 3, y + h,
-                    //                    true, false, WHITE_IDX );
 
                     IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 9, y + 8, true );
 
@@ -1568,14 +1586,6 @@ NEXT:
                             break;
                         if( !( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h ) ) {
                             IO::printChoiceBox( x, y, x + w + 2, y + h + 1, 6, 240 + i, false );
-                           // IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1,
-                           //                     true, false, BLACK_IDX );
-                           // IO::printRectangle( x, y, x + w, y + h,
-                           //                     true, false, 240 + i );
-                           // IO::printRectangle( x + 7, y + 5, x + w - 4, y + h - 1,
-                           //                     true, false, BLACK_IDX );
-                           // IO::printRectangle( x + 6, y + 4, x + w - 6, y + h - 2,
-                           //                     true, false, WHITE_IDX );
 
                             IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
                             goto NEXT;
@@ -1840,15 +1850,16 @@ START:
         u8 result = 0;
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
         IO::updateOAM( true );
-        drawPKMNChoiceScreen( p_firstIsChosen );
         IO::drawSub( );
         initColors( );
         IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
 
         writeLogText( "Welches PKMN?" );
 
+        drawPKMNChoiceScreen( p_firstIsChosen );
         touchPosition touch;
         loop( ) {
+NEXT:
             IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
             IO::updateOAM( true );
 
@@ -1865,10 +1876,23 @@ START:
             for( u8 i = 0; i < teamSz; ++i ) {
                 if( p_noRestrict && CUR_PKMN_2( *_battle, i, PLAYER ).isEgg( ) )
                     continue;
-                u8 x = IO::Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].x;
-                u8 y = IO::Oam->oamBuffer[ SUB_CHOICE_START + 2 * i ].y;
+                u8 x = 8 + ( i % 2 ) * 120 - ( i / 2 ) * 4,
+                    y = 32 + ( i / 2 ) * 48;
 
-                if( GET_AND_WAIT_R( x, y, x + 96, y + 42 ) ) {
+                if( touch.px >= x + 8 && touch.py >= y && touch.px <= x + 120 && touch.py <= y + 44 ) {
+                    drawPkmnChoicePkmn( i, p_firstIsChosen, true );
+                    loop( ) {
+                        swiWaitForVBlank( );
+
+                        scanKeys( );
+                        touchRead( &touch );
+                        if( touch.px == 0 && touch.py == 0 )
+                            break;
+                        if( !( touch.px >= x + 8 && touch.py >= y && touch.px <= x + 120 && touch.py <= y + 44 ) ) {
+                            drawPkmnChoicePkmn( i, p_firstIsChosen, false );
+                            goto NEXT;
+                        }
+                    }
                     result = i;
                     u8 tmp = 1;
                     if( !p_noRestrict ) {
@@ -1901,10 +1925,10 @@ START:
                             consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                             consoleClear( );
                         }
+                        if( !tmp || p_noRestrict )
+                            goto CLEAR;
+                        goto START;
                     }
-                    if( !tmp || p_noRestrict )
-                        goto CLEAR;
-                    goto START;
                 }
             }
         }
