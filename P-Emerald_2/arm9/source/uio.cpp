@@ -243,10 +243,6 @@ namespace IO {
         printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
     }
 
-    [[ deprecated( "use printRectangle" ) ]]
-    void putrec( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
-        printRectangle( p_x1, p_y1, p_x2, p_y2, p_bottom, p_striped, p_color );
-    }
     void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
         for( u16 x = p_x1; x <= p_x2; ++x ) for( u16 y = p_y1; y < p_y2; ++y )
             if( p_bottom )
