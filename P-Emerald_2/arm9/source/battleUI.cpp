@@ -62,12 +62,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "BattleSub5.h"
 #include "BattleSub6.h"
 
-#include "Choice_1.h"
-#include "Choice_2.h"
-#include "Choice_3.h"
-#include "Choice_4.h"
-#include "Choice_5.h"
-
 #include "BattleBall1.h" //Normal
 #include "BattleBall2.h" //Statused
 #include "BattleBall3.h" //Fainted
@@ -86,11 +80,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "atks.h"
 #include "Up.h"
 #include "Down.h"
-
-#include "BattlePkmnChoice1.h"
-#include "BattlePkmnChoice2.h"
-#include "BattlePkmnChoice3.h"
-#include "BattlePkmnChoice4.h"
 
 #include "PokeBall1.h"
 #include "PokeBall2.h"
@@ -884,73 +873,73 @@ namespace BATTLE {
         bool dead = !p_pokemon.m_stats.m_acHP;
         u8 x = 104, y = 48;
         u16 t2;
+        //Switch
+        BG_PALETTE_SUB[ GRAY_IDX ] = NORMAL_COLOR;
+
+        if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+            //Status
+            tilecnt = IO::loadSprite( ++oamIndex, 3, tilecnt,
+                                      20, 128, 32, 32, memoPal, memoTiles,
+                                      memoTilesLen, false, false, false, OBJPRIORITY_1, true );
+            IO::printChoiceBox( 36, 132, 124, 156, 6, GRAY_IDX, false );
+            IO::regularFont->printString( "Bericht", 56, 137, true );
+            //consoleSetWindow( &IO::Bottom, 7, 17, 20, 8 );
+            //printf( "BERICHT" );
+
+            //Moves
+            tilecnt = IO::loadSprite( ++oamIndex, 4, tilecnt,
+                                      200, 128, 32, 32, atksPal, atksTiles,
+                                      atksTilesLen, false, false, false, OBJPRIORITY_1, true );
+            IO::printChoiceBox( 132, 132, 216, 156, 6, GRAY_IDX, false );
+            IO::regularFont->printString( "Attacken", 138, 137, true );
+            //consoleSetWindow( &IO::Bottom, 17, 17, 20, 8 );
+            //printf( "ATTACKEN" );
+        } else {
+            x = 64;
+            y = 64;
+        }
+        IO::printChoiceBox( x - 8, y, x + 136, y + 64, 6, GRAY_IDX, false );
+
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
             if( !( t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                                            32, 32, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) )
+                                            16, 32, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) )
                 t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                                         32, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
+                                         16, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
             oamIndex += 3;
             tilecnt = t2;
 
             consoleSetWindow( &IO::Bottom, 13, 7, 20, 8 );
             if( !p_alreadySent && !p_alreadyChosen && !dead )
-                printf( "   AUSSENDEN" );
+                IO::regularFont->printString( "Aussenden", x + 64 - IO::regularFont->stringWidth( "Aussenden" ) / 2, 52, true );
             else if( !p_alreadyChosen  && !dead )
-                printf( "Bereits im Kampf" );
+                IO::regularFont->printString( "Bereits im Kampf", x + 64 - IO::regularFont->stringWidth( "Bereits im Kampf" ) / 2, 52, true );
             else if( dead )
-                printf( "Schon besiegt..." );
+                IO::regularFont->printString( "Schon besiegt…", x + 64 - IO::regularFont->stringWidth( "Schon besiegt…" ) / 2, 52, true );
             else
-                printf( "Schon ausgew\x84""hlt" );
-            printf( "\n----------------\n%11s %c\n%11s\n\nLv.%3hhu %3hu/%3huKP",
-                    p_pokemon.m_boxdata.m_name,
-                    GENDER( p_pokemon ),
-                    ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
-                    p_pokemon.m_level,
-                    p_pokemon.m_stats.m_acHP,
-                    p_pokemon.m_stats.m_maxHP );
+                IO::regularFont->printString( "Schon ausgewählt", x + 64 - IO::regularFont->stringWidth( "Schon ausgewählt" ) / 2, 52, true );
+
+            IO::regularFont->printString( p_pokemon.m_boxdata.m_name, x + 58 - IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2, 66, true );
+            drawGender( x + 62 + IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2, 66, p_pokemon.gender( ), true );
+
+            IO::regularFont->setColor( GRAY_IDX, 1 );
+            IO::regularFont->setColor( WHITE_IDX, 2 );
+
+            IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
+                                          x + 64 - IO::regularFont->stringWidth( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) ) / 2, 80, true );
+
+            sprintf( buffer, "Lv%d", p_pokemon.m_level );
+            IO::regularFont->printString( buffer, x, 94, true );
+            sprintf( buffer, "%d/%dKP", p_pokemon.m_stats.m_acHP, p_pokemon.m_stats.m_maxHP );
+            IO::regularFont->printString( buffer, x + 128 - IO::regularFont->stringWidth( buffer ), 94, true );
+
+            IO::regularFont->setColor( BLACK_IDX, 1 );
+            IO::regularFont->setColor( GRAY_IDX, 2 );
         } else {
             consoleSetWindow( &IO::Bottom, 8, 11, 16, 10 );
             printf( "  Ein Ei kann\n nicht k\x84""mpfen!" );
-            x = 64;
-            y = 64;
         }
-        //Switch
-        tilecnt = IO::loadSprite( ++oamIndex, 2, tilecnt,
-                                  x, y, 64, 64, Choice_4Pal, Choice_4Tiles,
-                                  Choice_4TilesLen, false, false, false, OBJPRIORITY_2, true );
-        tilecnt = IO::loadSprite( ++oamIndex, 2, tilecnt,
-                                  x + 64, y, 64, 64, Choice_4Pal, Choice_5Tiles,
-                                  Choice_5TilesLen, false, false, false, OBJPRIORITY_2, true );
 
-        if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
-            //Status
-            tilecnt = IO::loadSprite( ++oamIndex, 2, tilecnt,
-                                      28, 128, 64, 32, Choice_1Pal, Choice_1Tiles,
-                                      Choice_1TilesLen, false, false, false, OBJPRIORITY_2, true );
-            tilecnt = IO::loadSprite( ++oamIndex, 2, tilecnt,
-                                      60, 128, 64, 32, Choice_3Pal, Choice_3Tiles,
-                                      Choice_3TilesLen, false, false, false, OBJPRIORITY_2, true );
-            tilecnt = IO::loadSprite( ++oamIndex, 3, tilecnt,
-                                      20, 128, 32, 32, memoPal, memoTiles,
-                                      memoTilesLen, false, false, false, OBJPRIORITY_1, true );
-            consoleSetWindow( &IO::Bottom, 7, 17, 20, 8 );
-            printf( "BERICHT" );
-
-            //Moves
-            tilecnt = IO::loadSprite( ++oamIndex, 2, tilecnt,
-                                      132, 128, 64, 32, Choice_1Pal, Choice_1Tiles,
-                                      Choice_1TilesLen, false, false, false, OBJPRIORITY_2, true );
-            tilecnt = IO::loadSprite( ++oamIndex, 2, tilecnt,
-                                      164, 128, 64, 32, Choice_3Pal, Choice_3Tiles,
-                                      Choice_3TilesLen, false, false, false, OBJPRIORITY_2, true );
-            tilecnt = IO::loadSprite( ++oamIndex, 4, tilecnt,
-                                      200, 128, 32, 32, atksPal, atksTiles,
-                                      atksTilesLen, false, false, false, OBJPRIORITY_1, true );
-            consoleSetWindow( &IO::Bottom, 17, 17, 20, 8 );
-            printf( "ATTACKEN" );
-        }
         IO::updateOAM( true );
-
         touchPosition touch;
         loop( ) {
 
@@ -1900,7 +1889,7 @@ NEXT:
                         undrawPKMNChoiceScreen( );
                         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                         consoleClear( );
-                        while( ( tmp = showConfirmation( acPkmn, !result || ( result == p_firstIsChosen ), result == firstMoveSwitchTarget ) ) ) {
+                        while( ( tmp = showConfirmation( acPkmn, result <= p_firstIsChosen, result == firstMoveSwitchTarget && result > 1 ) ) ) {
                             if( tmp == 3 )
                                 break;
                             u8 oldtmp = tmp - 1;
