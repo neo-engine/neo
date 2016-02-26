@@ -1776,7 +1776,7 @@ END:
         if( !_battle->_player->m_items && _battle->_player->m_itemCount == MAX_ITEMS_IN_BAG ) {
             BAG::bagViewer bv;
             UPDATE_TIME = false;
-            u16 itm = bv.getItem( BAG::bagViewer::GIVE_TO_PKMN );
+            u16 itm = bv.getItem( BAG::bagViewer::BATTLE );
             IO::initOAMTable( true );
             IO::drawSub( );
             UPDATE_TIME = true;

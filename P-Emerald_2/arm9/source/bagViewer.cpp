@@ -188,8 +188,9 @@ namespace BAG {
         //Check if the item can be returned
         switch( p_context ) {
             case BAG::bagViewer::BATTLE:
-                possible &= ( ItemList[ p_targetItem ]->getEffectType( )
-                              & ( item::itemEffectType::IN_BATTLE | item::itemEffectType::USE_ON_PKMN ) );
+                possible &= ItemList[ p_targetItem ]->m_itemType == item::itemType::POKE_BALLS
+                    || ItemList[ p_targetItem ]->m_itemType == item::itemType::MEDICINE
+                    || ItemList[ p_targetItem ]->m_itemType == item::itemType::BATTLE_ITEM;
                 break;
             case BAG::bagViewer::GIVE_TO_PKMN:
                 possible &= ( ItemList[ p_targetItem ]->m_itemType != item::itemType::KEY_ITEM );
@@ -533,7 +534,8 @@ namespace BAG {
                     continue;
                 u16 targetItem = CURRENT_ITEM.first;
                 if( targetItem && confirmChoice( p_context, targetItem ) ) {
-                    FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
+                    if( p_context != context::BATTLE )
+                        FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
                     return targetItem;
                 }
                 initUI( );
@@ -555,7 +557,8 @@ namespace BAG {
                             }
                             u16 targetItem = i.second.m_item;
                             if( !i.second.m_isHeld && confirmChoice( p_context, targetItem ) ) {
-                                FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
+                                if( p_context != context::BATTLE )
+                                    FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
                                 return targetItem;
                             } else {
                                 initUI( );
