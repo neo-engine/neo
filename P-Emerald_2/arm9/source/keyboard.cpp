@@ -138,6 +138,7 @@ namespace IO {
     }
 
     void keyboard::drawPage( ) {
+        if( _page > 4 ) _page = 0;
         BG_PALETTE_SUB[ COLOR_IDX ] = RGB( 30 * ( _page == 0 ), 30 * ( _page == 1 ), 30 * ( _page == 2 ) );
         for( u8 y = 0; y < numRows; ++y )
             for( u8 x = 0; x < charsPerRow; ++x ) {

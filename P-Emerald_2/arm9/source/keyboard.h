@@ -35,8 +35,10 @@ namespace IO {
     class keyboard {
     public:
         std::string getText( u8 p_length, const char* p_msg );
+
+        keyboard( ) :_page( 0 ) { }
     private:
-        u8 _page;
+        u8 _page = 0;
 
         std::string getText( u8 p_length );
 
