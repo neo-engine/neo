@@ -183,9 +183,9 @@ namespace IO {
                 swiWaitForVBlank( );
                 scanKeys( );
                 touchRead( &touch );
-                if( touch.px == 0 && touch.py == 0 )
+                if( TOUCH_UP )
                     return true;
-                if( !IN_RANGE( touch, p_inputTarget ) )
+                if( !IN_RANGE_I( touch, p_inputTarget ) )
                     return false;
             }
         }
@@ -194,9 +194,9 @@ namespace IO {
                 swiWaitForVBlank( );
                 scanKeys( );
                 touchRead( &touch );
-                if( touch.px == 0 && touch.py == 0 )
+                if( TOUCH_UP )
                     return true;
-                if( !IN_RANGE_C( touch, p_inputTarget ) )
+                if( !IN_RANGE_I_C( touch, p_inputTarget ) )
                     return false;
             }
         }
@@ -226,7 +226,7 @@ namespace IO {
         }
         return waitForTouchUp( p_inputTarget );
     }
-    
+
     void initTextField( ) {
         regularFont->setColor( 0, 0 );
         regularFont->setColor( BLACK_IDX, 1 );
@@ -243,8 +243,11 @@ namespace IO {
         printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
     }
 
+    /*
+    * @brief Prints a rectangle to the screen, all coordinates inclusive
+    */
     void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
-        for( u16 x = p_x1; x <= p_x2; ++x ) for( u16 y = p_y1; y < p_y2; ++y )
+        for( u16 y = p_y1; y <= p_y2; ++y ) for( u16 x = p_x1; x <= p_x2; ++x )
             if( p_bottom )
                 ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( x + y * (u16) SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8) p_color ) << 8 ) | ( (u8) p_color ) : p_color;
             else
@@ -356,21 +359,32 @@ namespace IO {
 
     void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2, u8 p_colorIdx, bool p_pressed, bool p_bottom ) {
         if( !p_pressed ) {
-            printRectangle( p_x1 + 1, p_y1 + 1, p_x2, p_y2,
+            printRectangle( p_x2 - 2, p_y1 + 1, p_x2, p_y2, p_bottom, false, BLACK_IDX );
+            printRectangle( p_x1 + 1, p_y2 - 1, p_x2, p_y2, p_bottom, false, BLACK_IDX );
+
+            printRectangle( p_x1, p_y1, p_x1 + p_borderWidth, p_y2 - 1, p_bottom, false, p_colorIdx );
+            printRectangle( p_x2 - p_borderWidth2 - 2, p_y1, p_x2 - 2, p_y2 - 1, p_bottom, false, p_colorIdx );
+            printRectangle( p_x1, p_y1, p_x2 - 2, p_y1 + p_borderWidth - 2, p_bottom, false, p_colorIdx );
+            printRectangle( p_x1, p_y2 - p_borderWidth + 3, p_x2 - 2, p_y2 - 1, p_bottom, false, p_colorIdx );
+
+            printRectangle( p_x2 - p_borderWidth2 - 1, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4,
                             p_bottom, false, BLACK_IDX );
-            printRectangle( p_x1, p_y1, p_x2 - 2, p_y2 - 1,
-                            p_bottom, false, p_colorIdx );
-            printRectangle( p_x1 + 1 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4,
+            printRectangle( p_x1 + 1 + p_borderWidth, p_y2 - p_borderWidth + 2, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4,
                             p_bottom, false, BLACK_IDX );
             printRectangle( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth2 - 2, p_y2 - p_borderWidth + 3,
                             p_bottom, false, WHITE_IDX );
         } else {
-            printRectangle( p_x1, p_y1, p_x2 - 1, p_y2 - 1,
-                            p_bottom, false, 0 );
-            printRectangle( p_x1 + 2, p_y1 + 1, p_x2, p_y2,
-                            p_bottom, false, p_colorIdx );
+            printRectangle( p_x1, p_y1, p_x1 + 2, p_y2 - 1, p_bottom, false, 0 );
+            printRectangle( p_x1, p_y1, p_x2 - 1, p_y1 + 1, p_bottom, false, 0 );
 
-            printRectangle( p_x1 + 3 + p_borderWidth, p_y1 + p_borderWidth, p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4,
+            printRectangle( p_x1 + 2, p_y1 + 1, p_x1 + 2 + p_borderWidth, p_y2, p_bottom, false, p_colorIdx );
+            printRectangle( p_x2 - p_borderWidth2, p_y1 + 1, p_x2, p_y2, p_bottom, false, p_colorIdx );
+            printRectangle( p_x1 + 2, p_y1 + 1, p_x2, p_y1 + p_borderWidth - 1, p_bottom, false, p_colorIdx );
+            printRectangle( p_x1 + 2, p_y2 - p_borderWidth + 3, p_x2, p_y2, p_bottom, false, p_colorIdx );
+
+            printRectangle( p_x2 - p_borderWidth2 + 1, p_y1 + p_borderWidth, p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4,
+                            p_bottom, false, BLACK_IDX );
+            printRectangle( p_x1 + 3 + p_borderWidth, p_y2 - p_borderWidth + 4, p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4,
                             p_bottom, false, BLACK_IDX );
 
             printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 3,

@@ -75,14 +75,20 @@ extern unsigned short TEMP_PAL[ 256 ];
 
 #define loop() while( 1 )
 
-#define IN_RANGE( p_touch, p_input ) ( (p_touch).px >= (p_input).m_targetX1 && (p_touch).py >= (p_input).m_targetY1 \
+#define IN_RANGE_I( p_touch, p_input ) ( (p_touch).px >= (p_input).m_targetX1 && (p_touch).py >= (p_input).m_targetY1 \
                                     && (p_touch).px <= (p_input).m_targetX2 && (p_touch).py <= (p_input).m_targetY2 )
-#define IN_RANGE_C( p_touch, p_input ) ( sqrt( sq( (p_touch).px - (p_input).m_targetX1 ) + sq( (p_touch).py - (p_input).m_targetY1 ) ) <= (p_input).m_targetR )
+#define IN_RANGE_I_C( p_touch, p_input ) ( sqrt( sq( (p_touch).px - (p_input).m_targetX1 ) + sq( (p_touch).py - (p_input).m_targetY1 ) ) <= (p_input).m_targetR )
+
+
+#define IN_RANGE_R(p_x1, p_y1, p_x2, p_y2 ) IN_RANGE_I( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) )
+#define IN_RANGE_C( p_x, p_y, p_r ) IN_RANGE_I_C( touch, IO::inputTarget( p_x, p_y, p_r ) )
+
+#define TOUCH_UP ( !touch.px && !touch.py ) 
 
 #define GET_AND_WAIT( key ) ( ( pressed & key ) && IO::waitForInput( IO::inputTarget( key ) ) )
-#define GET_AND_WAIT_R( p_x1, p_y1, p_x2, p_y2 ) ( IN_RANGE( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) )\
+#define GET_AND_WAIT_R( p_x1, p_y1, p_x2, p_y2 ) ( IN_RANGE_I( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) )\
                                         && IO::waitForInput( IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) )
-#define GET_AND_WAIT_C( p_x, p_y, p_r ) ( IN_RANGE_C( touch, IO::inputTarget( p_x, p_y, p_r ) )\
+#define GET_AND_WAIT_C( p_x, p_y, p_r ) ( IN_RANGE_I_C( touch, IO::inputTarget( p_x, p_y, p_r ) )\
                                     && IO::waitForInput( IO::inputTarget( p_x, p_y, p_r ) ) )
 
 #define GET_DIR(a) ( \

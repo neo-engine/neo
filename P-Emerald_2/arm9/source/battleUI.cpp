@@ -857,6 +857,44 @@ namespace BATTLE {
         IO::updateOAM( true );
     }
 
+    void drawPkmnConfirmation( pokemon p_pokemon, bool p_alreadySent, bool p_alreadyChosen, u8 p_x, u8 p_y, bool p_pressed ) {
+        IO::printChoiceBox( p_x - 8, p_y, p_x + 136, p_y + 64, 6, GRAY_IDX, p_pressed );
+        bool dead = !p_pokemon.m_stats.m_acHP;
+        u8 dx = p_pressed * 2, dy = p_pressed;
+
+        if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+            if( !p_alreadySent && !p_alreadyChosen && !dead )
+                IO::regularFont->printString( "Aussenden", p_x + dx + 64 - IO::regularFont->stringWidth( "Aussenden" ) / 2, dy + 52, true );
+            else if( !p_alreadyChosen  && !dead )
+                IO::regularFont->printString( "Bereits im Kampf", p_x + dx + 64 - IO::regularFont->stringWidth( "Bereits im Kampf" ) / 2, dy + 52, true );
+            else if( dead )
+                IO::regularFont->printString( "Schon besiegt…", p_x + dx + 64 - IO::regularFont->stringWidth( "Schon besiegt…" ) / 2, dy + 52, true );
+            else
+                IO::regularFont->printString( "Schon ausgewählt", p_x + dx + 64 - IO::regularFont->stringWidth( "Schon ausgewählt" ) / 2, dy + 52, true );
+
+            IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_x + dx + 58 - IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2, dy + 66, true );
+            drawGender( p_x + dx + 62 + IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2, dy + 66, p_pokemon.gender( ), true );
+
+            IO::regularFont->setColor( GRAY_IDX, 1 );
+            IO::regularFont->setColor( WHITE_IDX, 2 );
+
+            IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
+                                          p_x + dx + 64 - IO::regularFont->stringWidth( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) ) / 2, dy + 80, true );
+
+            sprintf( buffer, "Lv%d", p_pokemon.m_level );
+            IO::regularFont->printString( buffer, dx + p_x, dy + 94, true );
+            sprintf( buffer, "%d/%dKP", p_pokemon.m_stats.m_acHP, p_pokemon.m_stats.m_maxHP );
+            IO::regularFont->printString( buffer, dx + p_x + 128 - IO::regularFont->stringWidth( buffer ), dy + 94, true );
+
+            IO::regularFont->setColor( BLACK_IDX, 1 );
+            IO::regularFont->setColor( GRAY_IDX, 2 );
+        } else {
+            consoleSetWindow( &IO::Bottom, 8, 11, 16, 10 );
+            IO::regularFont->printString( "Ein Ei kann", p_x + dx + 64 - IO::regularFont->stringWidth( "Ein Ei kann" ) / 2, dy + 80, true );
+            IO::regularFont->printString( "nicht kämpfen!", p_x + dx + 64 - IO::regularFont->stringWidth( "nicht kämpfen!" ) / 2, dy + 94, true );
+        }
+    }
+
     /**
     *  @returns 0 if the Pokemon shall be sent, 1 if further information was requested, 2 if the moves should be displayed, 3 if the previous screen shall be shown
     */
@@ -899,8 +937,6 @@ namespace BATTLE {
             x = 64;
             y = 64;
         }
-        IO::printChoiceBox( x - 8, y, x + 136, y + 64, 6, GRAY_IDX, false );
-
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
             if( !( t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
                                             16, 32, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) )
@@ -908,43 +944,14 @@ namespace BATTLE {
                                          16, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
             oamIndex += 3;
             tilecnt = t2;
-
-            consoleSetWindow( &IO::Bottom, 13, 7, 20, 8 );
-            if( !p_alreadySent && !p_alreadyChosen && !dead )
-                IO::regularFont->printString( "Aussenden", x + 64 - IO::regularFont->stringWidth( "Aussenden" ) / 2, 52, true );
-            else if( !p_alreadyChosen  && !dead )
-                IO::regularFont->printString( "Bereits im Kampf", x + 64 - IO::regularFont->stringWidth( "Bereits im Kampf" ) / 2, 52, true );
-            else if( dead )
-                IO::regularFont->printString( "Schon besiegt…", x + 64 - IO::regularFont->stringWidth( "Schon besiegt…" ) / 2, 52, true );
-            else
-                IO::regularFont->printString( "Schon ausgewählt", x + 64 - IO::regularFont->stringWidth( "Schon ausgewählt" ) / 2, 52, true );
-
-            IO::regularFont->printString( p_pokemon.m_boxdata.m_name, x + 58 - IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2, 66, true );
-            drawGender( x + 62 + IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2, 66, p_pokemon.gender( ), true );
-
-            IO::regularFont->setColor( GRAY_IDX, 1 );
-            IO::regularFont->setColor( WHITE_IDX, 2 );
-
-            IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
-                                          x + 64 - IO::regularFont->stringWidth( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) ) / 2, 80, true );
-
-            sprintf( buffer, "Lv%d", p_pokemon.m_level );
-            IO::regularFont->printString( buffer, x, 94, true );
-            sprintf( buffer, "%d/%dKP", p_pokemon.m_stats.m_acHP, p_pokemon.m_stats.m_maxHP );
-            IO::regularFont->printString( buffer, x + 128 - IO::regularFont->stringWidth( buffer ), 94, true );
-
-            IO::regularFont->setColor( BLACK_IDX, 1 );
-            IO::regularFont->setColor( GRAY_IDX, 2 );
-        } else {
-            consoleSetWindow( &IO::Bottom, 8, 11, 16, 10 );
-            IO::regularFont->printString( "Ein Ei kann", x + 64 - IO::regularFont->stringWidth( "Ein Ei kann" ) / 2, 80, true );
-            IO::regularFont->printString( "nicht kämpfen!", x + 64 - IO::regularFont->stringWidth( "nicht kämpfen!" ) / 2, 94, true );
         }
+
+        drawPkmnConfirmation( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, false );
 
         IO::updateOAM( true );
         touchPosition touch;
         loop( ) {
-
+            swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
 
@@ -953,12 +960,64 @@ namespace BATTLE {
                 return 3;
             if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
                 if( !p_alreadySent && !p_alreadyChosen && !dead
-                    && GET_AND_WAIT_R( x, y, x + 128, y + 64 ) )  //Send
-                    return 0;
-                if( GET_AND_WAIT_R( 20, 128, 124, 160 ) )  //Info
-                    return 1;
-                if( GET_AND_WAIT_R( 132, 128, 232, 160 ) )  //Moves
-                    return 2;
+                    && IN_RANGE_R( x, y, x + 128, y + 64 ) ) { //Send
+                    drawPkmnConfirmation( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, true );
+                    loop( ) {
+                        swiWaitForVBlank( );
+                        scanKeys( );
+                        touchRead( &touch );
+                        if( TOUCH_UP )
+                            return 0;
+                        if( !IN_RANGE_R( x, y, x + 128, y + 64 ) ) {
+                            drawPkmnConfirmation( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, false );
+                            break;
+                        }
+                    }
+                }
+                if( IN_RANGE_R( 20, 132, 124, 156 ) ) { //Info
+                    IO::printChoiceBox( 36, 132, 124, 156, 6, GRAY_IDX, true );
+                    IO::regularFont->printString( "Bericht", 58, 138, true );
+                    IO::Oam->oamBuffer[ SUB_Back_OAM + 2 ].x += 2;
+                    IO::Oam->oamBuffer[ SUB_Back_OAM + 2 ].y += 1;
+                    IO::updateOAM( true );
+                    loop( ) {
+                        swiWaitForVBlank( );
+                        scanKeys( );
+                        touchRead( &touch );
+                        if( TOUCH_UP )
+                            return 1;
+                        if( !IN_RANGE_R( 20, 132, 124, 156 ) ) {
+                            IO::printChoiceBox( 36, 132, 124, 156, 6, GRAY_IDX, false );
+                            IO::regularFont->printString( "Bericht", 56, 137, true );
+                            IO::Oam->oamBuffer[ SUB_Back_OAM + 2 ].x -= 2;
+                            IO::Oam->oamBuffer[ SUB_Back_OAM + 2 ].y -= 1;
+                            IO::updateOAM( true );
+                            break;
+                        }
+                    }
+                }
+                if( IN_RANGE_R( 132, 132, 232, 156 ) ) { //Moves
+                    IO::printChoiceBox( 132, 132, 216, 156, 6, GRAY_IDX, true );
+                    IO::regularFont->printString( "Attacken", 140, 138, true );
+                    IO::Oam->oamBuffer[ SUB_Back_OAM + 3 ].x += 2;
+                    IO::Oam->oamBuffer[ SUB_Back_OAM + 3 ].y += 1;
+                    IO::updateOAM( true );
+                    loop( ) {
+                        swiWaitForVBlank( );
+                        scanKeys( );
+                        touchRead( &touch );
+                        if( TOUCH_UP )
+                            return 2;
+                        if( !IN_RANGE_R( 132, 132, 232, 156 ) ) {
+                            IO::printChoiceBox( 132, 132, 216, 156, 6, GRAY_IDX, false );
+                            IO::regularFont->printString( "Attacken", 138, 137, true );
+                            IO::Oam->oamBuffer[ SUB_Back_OAM + 3 ].x -= 2;
+                            IO::Oam->oamBuffer[ SUB_Back_OAM + 3 ].y -= 1;
+                            IO::updateOAM( true );
+                            break;
+                        }
+                    }
+                }
             }
         }
     }
@@ -1516,8 +1575,7 @@ NEXT:
                     break;
                 u8 w = 104, h = 32;
                 u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
-                if( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h
-                    && acPkmn.m_boxdata.m_acPP[ i ] ) {
+                if( IN_RANGE_R( x, y, x + w, y + h ) && acPkmn.m_boxdata.m_acPP[ i ] ) {
                     auto acMove = AttackList[ acPkmn.m_boxdata.m_moves[ i ] ];
 
                     IO::printChoiceBox( x, y, x + w + 2, y + h + 1, 6, 240 + i, true );
@@ -1529,9 +1587,9 @@ NEXT:
 
                         scanKeys( );
                         touchRead( &touch );
-                        if( touch.px == 0 && touch.py == 0 )
+                        if( TOUCH_UP )
                             break;
-                        if( !( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h ) ) {
+                        if( !IN_RANGE_R( x, y, x + w, y + h ) ) {
                             IO::printChoiceBox( x, y, x + w + 2, y + h + 1, 6, 240 + i, false );
 
                             IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
@@ -1739,7 +1797,7 @@ NEXT:
 
                         scanKeys( );
                         touchRead( &touch );
-                        if( touch.px == 0 && touch.py == 0 )
+                        if( TOUCH_UP )
                             break;
                         if( !( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h ) ) {
                             drawAttackTargetChoice( selected, neverTarget, p_pokemonPos );
@@ -1833,7 +1891,7 @@ NEXT:
 
                         scanKeys( );
                         touchRead( &touch );
-                        if( touch.px == 0 && touch.py == 0 )
+                        if( TOUCH_UP )
                             break;
                         if( !( touch.px >= x + 8 && touch.py >= y && touch.px <= x + 120 && touch.py <= y + 44 ) ) {
                             drawPkmnChoicePkmn( i, p_firstIsChosen, false );

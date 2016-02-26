@@ -455,7 +455,7 @@ namespace BAG {
             bool rangeChanged = false;
             for( u8 j = 0; j < _ranges.size( ); ++j ) {
                 auto i = _ranges[ j ];
-                if( IN_RANGE( touch, i.first ) ) {
+                if( IN_RANGE_I( touch, i.first ) ) {
                     if( !_hasSprite ) {
                         u8 c = 0;
                         loop( ) {
@@ -500,7 +500,7 @@ namespace BAG {
                                 }
                                 break;
                             }
-                            if( !IN_RANGE( touch, i.first ) )
+                            if( !IN_RANGE_I( touch, i.first ) )
                                 break;
                         }
                     } else {
@@ -543,7 +543,7 @@ namespace BAG {
 
             for( u8 j = 0; j < _ranges.size( ); ++j ) {
                 auto i = _ranges[ j ];
-                if( IN_RANGE( touch, i.first ) ) {
+                if( IN_RANGE_I( touch, i.first ) ) {
                     u8 c = 0;
                     loop( ) {
                         scanKeys( );
@@ -583,7 +583,7 @@ namespace BAG {
                             }
                             break;
                         }
-                        if( !IN_RANGE( touch, i.first ) )
+                        if( !IN_RANGE_I( touch, i.first ) )
                             break;
                     }
                 }
