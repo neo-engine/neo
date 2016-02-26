@@ -8513,109 +8513,128 @@ namespace IO {
         //FONT_HEIGHT = 16
 
         void shiftchar( u16& p_val ) {
-            if( '0' <= p_val && p_val <= '9' ) {
-                p_val = ( p_val - '0' );
-                return;
-            }
-            if( 'A' <= p_val && p_val <= 'Z' ) {
-                p_val = ( p_val - 'A' ) + 10;
-                return;
-            }
-            if( 'a' <= p_val && p_val <= 'z' ) {
-                p_val = ( p_val - 'a' ) + 10 + 26;
-                return;
-            }
+            if( '0' <= p_val && p_val <= '9' ) { p_val = ( p_val - '0' ); return; }
+            if( 'A' <= p_val && p_val <= 'Z' ) { p_val = ( p_val - 'A' ) + 10; return; }
+            if( 'a' <= p_val && p_val <= 'z' ) { p_val = ( p_val - 'a' ) + 36; return; }
 
-            if( p_val == 'ä' ) {
-                p_val = 49 + 41;
-                return;
-            }
-            if( p_val == 'ö' ) {
-                p_val = 49 + 565;
-                return;
-            }
-            if( p_val == 'ü' || p_val == 254 ) {
-                p_val = 49 + 61;
-                return;
-            }
-            if( p_val == 'Ä' ) {
-                p_val = 65;
-                return;
-            }
-            if( p_val == 'Ö' ) {
-                p_val = 79;
-                return;
-            }
-            if( p_val == 'Ü' ) {
-                p_val = 84;
-                return;
-            }
-            if( p_val == 'ß' || p_val == 255 ) {
-                p_val = 85;
-                return;
-            }
+            if( p_val == 'À' ) { p_val = 62; return; }
+            if( p_val == 'Á' ) { p_val = 63; return; }
+            if( p_val == 'Â' ) { p_val = 64; return; }
+            if( p_val == 'Ä' ) { p_val = 65; return; }
+            if( p_val == 'Ç' ) { p_val = 66; return; }
+            if( p_val == 'È' ) { p_val = 67; return; }
+            if( p_val == 'É' ) { p_val = 68; return; }
+            if( p_val == 'Ê' ) { p_val = 69; return; }
+            if( p_val == 'Ë' ) { p_val = 70; return; }
+            if( p_val == 'Ì' ) { p_val = 71; return; }
+            if( p_val == 'Í' ) { p_val = 72; return; }
+            if( p_val == 'Î' ) { p_val = 73; return; }
+            if( p_val == 'Ï' ) { p_val = 74; return; }
+            if( p_val == 'Ñ' ) { p_val = 75; return; }
+            if( p_val == 'Ò' ) { p_val = 76; return; }
+            if( p_val == 'Ó' ) { p_val = 77; return; }
+            if( p_val == 'Ô' ) { p_val = 78; return; }
+            if( p_val == 'Ö' ) { p_val = 79; return; }
+            if( p_val == '×' ) { p_val = 80; return; }
+            if( p_val == 'Ù' ) { p_val = 81; return; }
+            if( p_val == 'Ú' ) { p_val = 82; return; }
+            if( p_val == 'Û' ) { p_val = 83; return; }
+            if( p_val == 'Ü' ) { p_val = 84; return; }
 
-            if( p_val == 'é' ) {
-                p_val = 49 + 45;
-                return;
-            }
+            if( p_val == 'ß' ) { p_val = 85; return; }
+            if( p_val == 'à' ) { p_val = 86; return; }
+            if( p_val == 'á' ) { p_val = 87; return; }
+            if( p_val == 'â' ) { p_val = 88; return; }
+            //´´a
+            if( p_val == 'ä' ) { p_val = 90; return; }
+            if( p_val == 'å' ) { p_val = 91; return; }
+            if( p_val == 'ç' ) { p_val = 92; return; }
+            if( p_val == 'è' ) { p_val = 93; return; }
+            if( p_val == 'é' ) { p_val = 94; return; }
+            if( p_val == 'ê' ) { p_val = 95; return; }
+            if( p_val == 'ë' ) { p_val = 96; return; }
+            if( p_val == 'ì' ) { p_val = 97; return; }
+            if( p_val == 'í' ) { p_val = 98; return; }
+            if( p_val == 'î' ) { p_val = 99; return; }
+            if( p_val == 'ï' ) { p_val = 100; return; }
+            if( p_val == 'ñ' ) { p_val = 101; return; }
+            if( p_val == 'ò' ) { p_val = 102; return; }
+            if( p_val == 'ó' ) { p_val = 103; return; }
+            if( p_val == 'ô' ) { p_val = 104; return; }
+            if( p_val == 'ö' ) { p_val = 105; return; }
+            if( p_val == '÷' ) { p_val = 106; return; }
+            if( p_val == 'ù' ) { p_val = 107; return; }
+            if( p_val == 'ú' ) { p_val = 108; return; }
+            if( p_val == 'û' ) { p_val = 109; return; }
+            if( p_val == 'ü' ) { p_val = 110; return; }
+            if( p_val == 'Œ' ) { p_val = 111; return; }
+            if( p_val == 'œ' ) { p_val = 112; return; }
 
-            if( p_val == '!' ) {
-                p_val = 98 + 7 + 16;
-                return;
-            }
-            if( p_val == '?' ) {
-                p_val = 98 + 8 + 16;
-                return;
-            }
-            if( p_val == ',' ) {
-                p_val = 98 + 9 + 16;
-                return;
-            }
-            if( p_val == '.' ) {
-                p_val = 98 + 10 + 16;
-                return;
-            }
-            if( p_val == '/' ) {
-                p_val = 98 + 13 + 16;
-                return;
-            }
-            if( p_val == '(' ) {
-                p_val = 98 + 21 + 16;
-                return;
-            }
-            if( p_val == ')' ) {
-                p_val = 98 + 22 + 16;
-                return;
-            }
-            if( p_val == ':' ) {
-                p_val = 3 * 49 - 1;
-                return;
-            }
-            if( p_val == ' ' ) {
-                p_val = 489;
-                return;
-            }
-            if( p_val == 136 ) {
-                p_val = 98 + 22 + 17;
-                return;
-            }
-            if( p_val == 137 ) {
-                p_val = 98 + 22 + 18;
-                return;
-            }
-            if( p_val == L'+' ) {
-                p_val = 98 + 22 + 19;
-                return;
-            }
-            if( p_val == L'-' ) {
-                p_val = 98 + 22 + 20;
-                return;
-            }
-            if( p_val == L'*' ) {
-                p_val = 98 + 22 + 21;
-                return;
-            }
+
+            if( p_val == '$' ) { p_val = 118; return; }
+            if( p_val == '¡' ) { p_val = 119; return; }
+            if( p_val == '¿' ) { p_val = 120; return; }
+            if( p_val == '!' ) { p_val = 121; return; }
+            if( p_val == '?' ) { p_val = 122; return; }
+            if( p_val == ',' ) { p_val = 123; return; }
+            if( p_val == '.' ) { p_val = 124; return; }
+            if( p_val == '…' ) { p_val = 125; return; }
+            if( p_val == '·' ) { p_val = 126; return; }
+            if( p_val == '/' ) { p_val = 127; return; }
+            if( p_val == '‘' ) { p_val = 128; return; }
+            if( p_val == '’' ) { p_val = 129; return; }
+            if( p_val == '\'' ) { p_val = 129; return; }
+            if( p_val == '“' ) { p_val = 130; return; }
+            if( p_val == '”' ) { p_val = 131; return; }
+            if( p_val == '\"' ) { p_val = 131; return; }
+            if( p_val == '„' ) { p_val = 132; return; }
+            if( p_val == '«' ) { p_val = 133; return; }
+            if( p_val == '»' ) { p_val = 134; return; }
+            if( p_val == '(' ) { p_val = 135; return; }
+            if( p_val == ')' ) { p_val = 136; return; }
+
+            if( p_val == '{' ) { p_val = 137; return; } //male
+            if( p_val == '}' ) { p_val = 138; return; } //female
+
+            if( p_val == '+' ) { p_val = 139; return; }
+            if( p_val == '-' ) { p_val = 140; return; }
+            if( p_val == '*' ) { p_val = 141; return; }
+            if( p_val == '#' ) { p_val = 142; return; }
+            if( p_val == '=' ) { p_val = 133; return; }
+            if( p_val == '&' ) { p_val = 144; return; }
+            if( p_val == '~' ) { p_val = 145; return; }
+            if( p_val == ':' ) { p_val = 146; return; }
+            if( p_val == ';' ) { p_val = 147; return; }
+            //pik
+            //krz
+            //hrt
+            //karo
+            //star
+            //crcld pnt
+            //circle
+            //sqare
+            //triangle
+            //raute
+            if( p_val == '@' ) { p_val = 158; return; }
+            //music
+            if( p_val == '%' ) { p_val = 160; return; }
+            //sun
+            //wind
+            //rain
+            //snow
+            //:)
+            //^^
+            //><
+            //|(
+            //-^
+            //-v
+            //sleep
+            //^e
+            //continue (messageBox)
+            if( p_val == '_' ) { p_val = 174; return; }
+
+            if( p_val == ' ' ) { p_val = 489; return; }
+            if( p_val == '\r' ) { p_val = 489; return; }
 
             return;
         }

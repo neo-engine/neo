@@ -1149,9 +1149,9 @@ NEXT:
                     log( buffer );
                 }
 
-                if( !_player->m_items && _player->m_itemCount == MAX_ITEMS_IN_BAG )
+                if( !_player->m_items && _player->m_itemCount == MAX_ITEMS_IN_BAG ) {
                     FS::SAV->m_bag.erase( BAG::toBagType( im->m_itemType ), _battleMoves[ p_pokemonPos ][ p_opponent ].m_value, 1 );
-                else
+                } else
                     for( u8 i = 0; i < _player->m_itemCount; ++i )
                         if( _player->m_items[ i ].first == _battleMoves[ p_pokemonPos ][ p_opponent ].m_value )
                             _player->m_items[ i ].second = (u16) std::max( 0, _player->m_items[ i ].second - 1 );

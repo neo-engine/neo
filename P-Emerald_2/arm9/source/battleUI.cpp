@@ -210,11 +210,11 @@ namespace BATTLE {
         if( p_gender == 1 ) {
             IO::regularFont->setColor( BLUE_IDX, 1 );
             IO::regularFont->setColor( BLUE2_IDX, 2 );
-            IO::regularFont->printChar( 136, p_x, p_y, p_bottom );
+            IO::regularFont->printChar( '{', p_x, p_y, p_bottom );
         } else if( p_gender == -1 ) {
             IO::regularFont->setColor( RED_IDX, 1 );
             IO::regularFont->setColor( RED2_IDX, 2 );
-            IO::regularFont->printChar( 137, p_x, p_y, p_bottom );
+            IO::regularFont->printChar( '}', p_x, p_y, p_bottom );
         }
     }
     void undrawPkmnInfo1( u8 p_hpx, u8 p_hpy ) {
@@ -863,6 +863,8 @@ namespace BATTLE {
     u8 showConfirmation( pokemon& p_pokemon, bool p_alreadySent, bool p_alreadyChosen ) {
         IO::drawSub( );
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
         u16 tilecnt = 0;
         u8  palIndex = 4;
         u8 oamIndex = SUB_Back_OAM + 1;
@@ -886,8 +888,6 @@ namespace BATTLE {
                                       memoTilesLen, false, false, false, OBJPRIORITY_1, true );
             IO::printChoiceBox( 36, 132, 124, 156, 6, GRAY_IDX, false );
             IO::regularFont->printString( "Bericht", 56, 137, true );
-            //consoleSetWindow( &IO::Bottom, 7, 17, 20, 8 );
-            //printf( "BERICHT" );
 
             //Moves
             tilecnt = IO::loadSprite( ++oamIndex, 4, tilecnt,
@@ -895,8 +895,6 @@ namespace BATTLE {
                                       atksTilesLen, false, false, false, OBJPRIORITY_1, true );
             IO::printChoiceBox( 132, 132, 216, 156, 6, GRAY_IDX, false );
             IO::regularFont->printString( "Attacken", 138, 137, true );
-            //consoleSetWindow( &IO::Bottom, 17, 17, 20, 8 );
-            //printf( "ATTACKEN" );
         } else {
             x = 64;
             y = 64;
@@ -971,10 +969,10 @@ namespace BATTLE {
     */
     u8 showDetailedInformation( pokemon& p_pokemon, u8 p_page ) {
         IO::drawSub( );
-        initColors( );
         undrawPKMNChoiceScreen( );
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleClear( );
+        initColors( );
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
         u16 tilecnt = 0;
         u8  palIndex = 3;
@@ -1013,7 +1011,7 @@ namespace BATTLE {
             if( !( t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
                                             16, 8, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) ) {
                 t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
-                                         16, 8, oamIndex, palIndex, IO::Oam->oamBuffer[ oamIndex ].gfxIndex,
+                                         16, 8, oamIndex, palIndex, tilecnt,
                                          true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
             }
             oamIndex += 4;
@@ -1023,47 +1021,48 @@ namespace BATTLE {
             printf( "EP(%3lu%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] )
                     * 100 / ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
                     p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
-            IO::displayHP( 100, 101, 46, 40, 245, 246, false, 50, 56, true );
-            IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 40, 245, 246, false, 50, 56, true );
+            IO::displayHP( 100, 101, 46, 40, 236, 237, false, 50, 56, true );
+            IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 40, 236, 237, false, 50, 56, true );
 
-            IO::displayEP( 100, 101, 46, 40, 247, 248, false, 59, 62, true );
+            IO::displayEP( 100, 101, 46, 40, 238, 239, false, 59, 62, true );
             IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] )
                            * 100 / ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
-                           46, 40, 247, 248, false, 59, 62, true );
-            IO::regularFont->setColor( WHITE_IDX, 1 );
+                           46, 40, 238, 239, false, 59, 62, true );
+            IO::boldFont->setColor( GRAY_IDX, 1 );
+            IO::boldFont->setColor( BLACK_IDX, 2 );
 
             consoleSetWindow( &IO::Bottom, 2, 1, 13, 2 );
 
             std::sprintf( buffer, "%s /", p_pokemon.m_boxdata.m_name );
-            IO::regularFont->printString( buffer, 16, 96, true );
+            IO::boldFont->printString( buffer, 16, 96, true );
             s8 G = p_pokemon.m_boxdata.gender( );
 
             if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 ) {
                 if( G == 1 ) {
-                    IO::regularFont->setColor( BLUE_IDX, 1 );
-                    IO::regularFont->printChar( 136, 100, 102, true );
+                    IO::boldFont->setColor( BLUE_IDX, 2 );
+                    IO::boldFont->printChar( '{', 100, 102, true );
                 } else {
-                    IO::regularFont->setColor( RED_IDX, 1 );
-                    IO::regularFont->printChar( 137, 100, 102, true );
+                    IO::boldFont->setColor( RED_IDX, 2 );
+                    IO::boldFont->printChar( '}', 100, 102, true );
                 }
             }
-            IO::regularFont->setColor( WHITE_IDX, 1 );
+            IO::boldFont->setColor( GRAY_IDX, 1 );
+            IO::boldFont->setColor( BLACK_IDX, 2 );
 
-            IO::regularFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
+
+            IO::boldFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
-                IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
-                                              24, 124, true );
+                IO::boldFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
+                                           24, 122, true );
                 tilecnt = IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 0, 116, ++oamIndex, ++palIndex, tilecnt, true );
             } else {
                 ++oamIndex;
                 ++palIndex;
-                IO::regularFont->setColor( BLACK_IDX, 1 );
-                IO::regularFont->setColor( GRAY_IDX, 2 );
-                IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 24, 124, true );
+                IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 24, 122, true );
             }
-            IO::regularFont->setColor( GRAY_IDX, 1 );
-            IO::regularFont->setColor( BLACK_IDX, 2 );
+            IO::boldFont->setColor( GRAY_IDX, 1 );
+            IO::boldFont->setColor( BLACK_IDX, 2 );
 
             if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
                 tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 224, 0, ++oamIndex, ++palIndex, tilecnt, true );
@@ -1075,15 +1074,11 @@ namespace BATTLE {
             }
 
         } else {
-            IO::regularFont->setColor( WHITE_IDX, 1 );
-            IO::regularFont->printString( "Ei /", 16, 96, true );
-            IO::regularFont->printString( "Ei", 24, 110, true );
-            IO::regularFont->setColor( GRAY_IDX, 1 );
+            IO::boldFont->printString( "Ei /", 16, 96, true );
+            IO::boldFont->printString( "Ei", 24, 110, true );
         }
 
         //Here starts the page specific stuff
-
-
         if( p_pokemon.m_boxdata.m_individualValues.m_isEgg )
             p_page = 0;
 
@@ -1111,81 +1106,40 @@ namespace BATTLE {
                     tilecnt = IO::loadDamageCategoryIcon( acMove->m_moveHitType, x + 22, y - 7, ++oamIndex, ++palIndex, tilecnt, true );
                     consoleSelect( &IO::Bottom );
                     consoleSetWindow( &IO::Bottom, x / 8, 5 + 5 * i, 20, 2 );
-                    printf( "%6hhu/%2hhu AP",
-                            p_pokemon.m_boxdata.m_acPP[ 0 ],
+                    printf( "%6hhu/%2hhu AP", p_pokemon.m_boxdata.m_acPP[ 0 ],
                             AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_movePP * ( ( 5 + p_pokemon.m_boxdata.m_ppup.m_Up1 ) / 5 ) );
                 }
             }
         } else { //Status
             if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
-                IO::regularFont->setColor( WHITE_IDX, 1 );
+                IO::boldFont->setColor( GRAY_IDX, 1 );
+                IO::boldFont->setColor( BLACK_IDX, 2 );
                 sprintf( buffer, "KP                     %3i", p_pokemon.m_stats.m_maxHP );
-                IO::regularFont->printString( buffer, 130, 16, true );
+                IO::boldFont->printString( buffer, 130, 16, true );
 
-                if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 1.1 ) {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( RED_IDX, 2 );
-                } else if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] == 0.9 ) {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( BLUE_IDX, 2 );
-                } else {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( GRAY_IDX, 2 );
-                }
+#define ADJUST_COLOR( p_val )   if( p_val == 1.1 ) IO::boldFont->setColor( RED_IDX, 2 ); \
+                                else if( p_val == 0.9 ) IO::boldFont->setColor( BLUE_IDX, 2 ); \
+                                else IO::boldFont->setColor( BLACK_IDX, 2 );                 
+
+                ADJUST_COLOR( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] );
                 sprintf( buffer, "ANG                   %3i", p_pokemon.m_stats.m_Atk );
-                IO::regularFont->printString( buffer, 126, 41, true );
+                IO::boldFont->printString( buffer, 126, 41, true );
 
-                if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 1.1 ) {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( RED_IDX, 2 );
-                } else if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] == 0.9 ) {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( BLUE_IDX, 2 );
-                } else {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( GRAY_IDX, 2 );
-                }
+                ADJUST_COLOR( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] );
                 sprintf( buffer, "VER                   %3i", p_pokemon.m_stats.m_Def );
-                IO::regularFont->printString( buffer, 124, 58, true );
+                IO::boldFont->printString( buffer, 124, 58, true );
 
-                if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 1.1 ) {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( RED_IDX, 2 );
-                } else if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] == 0.9 ) {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( BLUE_IDX, 2 );
-                } else {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( GRAY_IDX, 2 );
-                }
+                ADJUST_COLOR( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] );
                 sprintf( buffer, "SAN                   %3i", p_pokemon.m_stats.m_SAtk );
-                IO::regularFont->printString( buffer, 122, 75, true );
+                IO::boldFont->printString( buffer, 122, 75, true );
 
-                if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 1.1 ) {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( RED_IDX, 2 );
-                } else if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] == 0.9 ) {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( BLUE_IDX, 2 );
-                } else {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( GRAY_IDX, 2 );
-                }
+                ADJUST_COLOR( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] );
                 sprintf( buffer, "SVE                   %3i", p_pokemon.m_stats.m_SDef );
-                IO::regularFont->printString( buffer, 120, 92, true );
+                IO::boldFont->printString( buffer, 120, 92, true );
 
-                if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 1.1 ) {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( RED_IDX, 2 );
-                } else if( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] == 0.9 ) {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( BLUE_IDX, 2 );
-                } else {
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( GRAY_IDX, 2 );
-                }
+                ADJUST_COLOR( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] );
                 sprintf( buffer, "INI                   \xC3\xC3""%3i", p_pokemon.m_stats.m_Spd );
-                IO::regularFont->printString( buffer, 118, 109, true );
+                IO::boldFont->printString( buffer, 118, 109, true );
 
                 IO::printRectangle( (u8) 158, (u8) 18, u8( 158 + 68 ), u8( 18 + 12 ), true, false, WHITE_IDX );
 
@@ -1221,26 +1175,26 @@ namespace BATTLE {
                 IO::regularFont->setColor( GRAY_IDX, 1 );
                 IO::regularFont->setColor( BLACK_IDX, 2 );
             } else {
-                IO::regularFont->setColor( WHITE_IDX, 1 );
-                IO::regularFont->setColor( BLACK_IDX, 2 );
+                IO::boldFont->setColor( WHITE_IDX, 1 );
+                IO::boldFont->setColor( BLACK_IDX, 2 );
                 if( p_pokemon.m_boxdata.m_steps > 10 ) {
-                    IO::regularFont->printString( "Was da wohl", 16 * 8, 50, true );
-                    IO::regularFont->printString( "schlüpfen wird?", 16 * 8, 70, true );
-                    IO::regularFont->printString( "Es dauert wohl", 16 * 8, 100, true );
-                    IO::regularFont->printString( "noch lange.", 16 * 8, 120, true );
+                    IO::boldFont->printString( "Was da wohl", 16 * 8, 50, true );
+                    IO::boldFont->printString( "schlüpfen wird?", 16 * 8, 70, true );
+                    IO::boldFont->printString( "Es dauert wohl", 16 * 8, 100, true );
+                    IO::boldFont->printString( "noch lange.", 16 * 8, 120, true );
                 } else if( p_pokemon.m_boxdata.m_steps > 5 ) {
-                    IO::regularFont->printString( "Hat es sich", 16 * 8, 50, true );
-                    IO::regularFont->printString( "gerade bewegt?", 16 * 8, 70, true );
-                    IO::regularFont->printString( "Da tut sich", 16 * 8, 100, true );
-                    IO::regularFont->printString( "wohl bald was.", 16 * 8, 120, true );
+                    IO::boldFont->printString( "Hat es sich", 16 * 8, 50, true );
+                    IO::boldFont->printString( "gerade bewegt?", 16 * 8, 70, true );
+                    IO::boldFont->printString( "Da tut sich", 16 * 8, 100, true );
+                    IO::boldFont->printString( "wohl bald was.", 16 * 8, 120, true );
                 } else {
-                    IO::regularFont->printString( "Jetzt macht es", 16 * 8, 50, true );
-                    IO::regularFont->printString( "schon Geräusche!", 16 * 8, 70, true );
-                    IO::regularFont->printString( "Bald ist es", 16 * 8, 100, true );
-                    IO::regularFont->printString( "wohl soweit.", 16 * 8, 120, true );
+                    IO::boldFont->printString( "Jetzt macht es", 16 * 8, 50, true );
+                    IO::boldFont->printString( "schon Geräusche!", 16 * 8, 70, true );
+                    IO::boldFont->printString( "Bald ist es", 16 * 8, 100, true );
+                    IO::boldFont->printString( "wohl soweit.", 16 * 8, 120, true );
                 }
-                IO::regularFont->setColor( GRAY_IDX, 1 );
-                IO::regularFont->setColor( BLACK_IDX, 2 );
+                IO::boldFont->setColor( GRAY_IDX, 1 );
+                IO::boldFont->setColor( BLACK_IDX, 2 );
             }
         }
 
