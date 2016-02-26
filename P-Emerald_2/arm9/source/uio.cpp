@@ -254,6 +254,20 @@ namespace IO {
                 ( (color *) BG_BMP_RAM( 1 ) )[ ( x + y * (u16) SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8) p_color ) << 8 ) | ( (u8) p_color ) : p_color;
     }
 
+    /*
+     * @brief A sine approximation via a third-order cosine approx.
+     * @param p_x   angle (with 2^15 units/circle)
+     * @return     Sine value (Q12)
+     */
+    s32 isin( s32 p_x ) {
+        static const u16 qN = 13, qA = 12, qP = 15, qR = 2 * qN - qP, qS = qN + qP + 1 - qA;
+        p_x <<= ( 30 - qN );                 // shift to full s32 range (Q13->Q30)
+        if( ( p_x ^ ( p_x << 1 ) ) < 0 )     // test for quadrant 1 or 2
+            p_x = ( 1 << 31 ) - p_x;
+        p_x >>= ( 30 - qN );
+        return p_x * ( ( 3 << qP ) - ( p_x * p_x >> qR ) ) >> qS;
+    }
+
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big ) {
         if( p_big )
             displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 20, 24 );
@@ -266,8 +280,8 @@ namespace IO {
         if( p_HP > 100 ) {
             BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
             for( u16 phi = 0; phi < 300; phi++ ) {
-                s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
-                s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
+                s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
+                s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
                     u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
                     u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
@@ -281,8 +295,8 @@ namespace IO {
             BG_PAL( p_sub )[ p_freecolor2 ] = NORMAL_COLOR;
             if( 100 - p_HPstart <= p_HP ) {
                 for( u16 phi = 3 * ( 100 - p_HPstart ); phi < 3 * p_HP; phi++ ) {
-                    s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
-                    s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
+                    s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
+                    s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
                     for( u16 j = p_innerR; j <= p_outerR; ++j ) {
                         u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
                         u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
@@ -300,8 +314,8 @@ namespace IO {
                 }
             } else {
                 for( u16 phi = 3 * ( 100 - p_HPstart ); phi > 3 * p_HP; phi-- ) {
-                    s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
-                    s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
+                    s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
+                    s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
                     for( u16 j = p_innerR; j <= p_outerR; ++j ) {
                         u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
                         u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
@@ -324,8 +338,8 @@ namespace IO {
         if( p_EPstart >= 100 || p_EP > 100 ) {
             BG_PAL( p_sub )[ p_freecolor1 ] = NORMAL_COLOR;
             for( u16 phi = 0; phi < 300; phi++ ) {
-                s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
-                s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
+                s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
+                s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
                     u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
                     u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
@@ -338,8 +352,8 @@ namespace IO {
         } else {
             BG_PAL( p_sub )[ p_freecolor2 ] = ICE_COLOR;
             for( u16 phi = 3 * p_EPstart; phi <= 3 * p_EP; ++phi ) {
-                s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
-                s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
+                s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
+                s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
                     u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
                     u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
