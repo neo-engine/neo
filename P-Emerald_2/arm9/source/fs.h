@@ -6,6 +6,7 @@ file        : fs.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
+
 Copyright (C) 2012 - 2016
 Philip Wellnitz
 
@@ -42,6 +43,7 @@ namespace FS {
     std::string readString( FILE*, bool p_new = false );
 
     bool exists( const char* p_path, const char* p_name );
+    bool exists( const char* p_path, u16 p_name, bool p_unused );
     bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name = "" );
     FILE* open( const char* p_path, const char* p_name, const char* p_ext = ".raw", const char* p_mode = "r" );
     FILE* open( const char* p_path, u16 p_value, const char* p_ext = ".raw", const char* p_mode = "r" );

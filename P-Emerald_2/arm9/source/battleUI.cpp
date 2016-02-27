@@ -594,7 +594,7 @@ namespace BATTLE {
 
     void battleUI::loadSpritesSub( ) {
         IO::initOAMTable( true );
-        IO::drawSub( );
+        IO::NAV->draw( );
 
         u16 tilecnt = 0;
         tilecnt = initStsBalls( true, tilecnt );
@@ -851,7 +851,7 @@ namespace BATTLE {
     }
 
     void undrawPKMNChoiceScreen( ) {
-        IO::drawSub( );
+        IO::NAV->draw( );
         for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
             IO::Oam->oamBuffer[ i ].isHidden = true;
         IO::updateOAM( true );
@@ -899,7 +899,7 @@ namespace BATTLE {
     *  @returns 0 if the Pokemon shall be sent, 1 if further information was requested, 2 if the moves should be displayed, 3 if the previous screen shall be shown
     */
     u8 showConfirmation( pokemon& p_pokemon, bool p_alreadySent, bool p_alreadyChosen ) {
-        IO::drawSub( );
+        IO::NAV->draw( );
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
@@ -1027,7 +1027,7 @@ namespace BATTLE {
     *  @returns 0: return to prvious screen, 1 view next pokémon, 2 view previous pokémon, 3 switch screen
     */
     u8 showDetailedInformation( pokemon& p_pokemon, u8 p_page ) {
-        IO::drawSub( );
+        IO::NAV->draw( );
         undrawPKMNChoiceScreen( );
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleClear( );
@@ -1178,7 +1178,7 @@ namespace BATTLE {
 
 #define ADJUST_COLOR( p_val )   if( p_val == 1.1 ) IO::boldFont->setColor( RED_IDX, 2 ); \
                                 else if( p_val == 0.9 ) IO::boldFont->setColor( BLUE_IDX, 2 ); \
-                                else IO::boldFont->setColor( BLACK_IDX, 2 );                 
+                                else IO::boldFont->setColor( BLACK_IDX, 2 );
 
                 ADJUST_COLOR( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] );
                 sprintf( buffer, "ANG                   %3i", p_pokemon.m_stats.m_Atk );
@@ -1345,7 +1345,7 @@ namespace BATTLE {
 
         loadBattleUITop( );
         IO::initOAMTable( true );
-        IO::drawSub( );
+        IO::NAV->draw( );
         initLogScreen( );
     }
     void battleUI::pokemonIntro( ) {
@@ -1353,7 +1353,7 @@ namespace BATTLE {
 
         loadBattleUITop( );
         IO::initOAMTable( true );
-        IO::drawSub( );
+        IO::NAV->draw( );
         initLogScreen( );
         IO::loadSprite( SUB_A_OAM, 6, 0,
                         SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
@@ -1455,7 +1455,7 @@ SHOW_ATTACK:
                     } else if( ItemList[ result.m_value ]->m_itemType == item::POKE_BALLS )
                         result.m_target |= ( 1 << 2 );
                     IO::initOAMTable( true );
-                    IO::drawSub( );
+                    IO::NAV->draw( );
                     loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
                                      _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
 
@@ -1561,7 +1561,6 @@ NEXT_TRY:
         touchPosition touch;
         loop( ) {
 NEXT:
-
             scanKeys( );
             touchRead( &touch );
 
@@ -1603,7 +1602,7 @@ NEXT:
             }
         }
 END:
-        IO::drawSub( );
+        IO::NAV->draw( );
         initColors( );
         clearLogScreen( );
         for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
@@ -1818,7 +1817,7 @@ NEXT:
             }
         }
 END:
-        IO::drawSub( );
+        IO::NAV->draw( );
         initColors( );
         clearLogScreen( );
         for( u8 i = 0; i <= 3 * SUB_Back_OAM; ++i )
@@ -1836,7 +1835,7 @@ END:
             UPDATE_TIME = false;
             u16 itm = bv.getItem( BAG::bagViewer::BATTLE );
             IO::initOAMTable( true );
-            IO::drawSub( );
+            IO::NAV->draw( );
             UPDATE_TIME = true;
             DRAW_TIME = true;
             redrawBattle( );
@@ -1855,7 +1854,7 @@ START:
         u8 result = 0;
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
         IO::updateOAM( true );
-        IO::drawSub( );
+        IO::NAV->draw( );
         initColors( );
         IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
 
@@ -2523,7 +2522,7 @@ BREAK:
     void battleUI::handleCapture( ) {
         IO::initOAMTable( true );
         IO::initOAMTable( false );
-        IO::drawSub( );
+        IO::NAV->draw( );
         UPDATE_TIME = true;
         DRAW_TIME = true;
 
@@ -2556,7 +2555,7 @@ BREAK:
         }
         IO::updateOAM( false );
 
-        IO::drawSub( true );
+        IO::NAV->draw( true );
         initLogScreen( );
 
         IO::yesNoBox yn;
@@ -2570,7 +2569,7 @@ BREAK:
                 acPkmn.m_boxdata.m_individualValues.m_isNicked = true;
             }
         }
-        IO::drawSub( );
+        IO::NAV->draw( );
         initLogScreen( );
     }
 

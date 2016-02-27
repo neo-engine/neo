@@ -210,7 +210,7 @@ namespace MAP {
             loadSlice( p_direction );
 #ifdef __DEBUG
             IO::messageBox m( "Load Slice" );
-            IO::drawSub( );
+            IO::NAV->draw( );
 #endif
         }
         //Check if a new slice got stepped onto
@@ -231,7 +231,7 @@ namespace MAP {
 #ifdef __DEBUG
             sprintf( buffer, "Switch Slice to (%d, %d)", _curX, _curY );
             IO::messageBox m( buffer );
-            IO::drawSub( );
+            IO::NAV->draw( );
 #endif
         }
 
@@ -352,14 +352,14 @@ namespace MAP {
             if( p_type == FISHING_ROD ) {
                 IO::messageBox m( "Doch nur ein alter Pokéball…" );
                 _playerIsFast = false;
-                IO::drawSub( true );
+                IO::NAV->draw( true );
             }
             return false;
         }
         if( p_type == FISHING_ROD ) {
             IO::messageBox m( "Du hast ein Pokémon geangelt!" );
             _playerIsFast = false;
-            IO::drawSub( true );
+            IO::NAV->draw( true );
         } else if( FS::SAV->m_repelSteps && !p_forceEncounter )
             return false;
         u8 arridx = u8( p_type ) * 15 + tier * 3;
@@ -420,7 +420,7 @@ namespace MAP {
         FS::SAV->updateTeam( );
         FADE_TOP_DARK( );
         draw( playerPrio );
-        IO::drawSub( true );
+        IO::NAV->draw( true );
 
         return true;
     }
@@ -604,7 +604,7 @@ namespace MAP {
                 stopPlayer( );
                 IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
                 _playerIsFast = false;
-                IO::drawSub( true );
+                IO::NAV->draw( true );
                 return;
             }
             //Check for end of surf, stand up and sit down
@@ -942,9 +942,11 @@ NEXT_PASS:
         }
         swiWaitForVBlank( );
         swiWaitForVBlank( );
+
         FS::SAV->m_currentMap = p_target.first;
         FS::SAV->m_player.m_pos = p_target.second;
         draw( );
+        IO::NAV->showNewMap( FS::SAV->m_currentMap );
         if( exitCave )
             movePlayer( DOWN );
     }
@@ -1244,7 +1246,7 @@ OUT:
         fish.clear( );
         if( failed )
             fish.put( "Es ist entkommen…" );
-        IO::drawSub( true );
+        IO::NAV->draw( true );
         for( s8 i = 2; i >= 0; --i ) {
             _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( frame + i, p_direction == RIGHT );
             swiWaitForVBlank( );

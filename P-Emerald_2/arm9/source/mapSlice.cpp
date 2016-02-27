@@ -53,7 +53,7 @@ namespace MAP {
 #ifdef DEBUG
             sprintf( buffer, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
             IO::messageBox m( buffer );
-            IO::drawSub( true );
+            IO::NAV->draw( true );
             swiWaitForVBlank( );
 #endif
             //mapF = FS::open( MAP_PATH, "empty", ".map" );
@@ -64,7 +64,7 @@ namespace MAP {
 #ifdef DEBUG
         if( !res ) {
             IO::messageBox( "Not enough memory :(" );
-            IO::drawSub( true );
+            IO::NAV->draw( true );
         }
 #endif
 
@@ -91,7 +91,7 @@ namespace MAP {
 #ifdef DEBUG__
         sprintf( buffer, "ts1 %d ts2 %d", tsidx1, tsidx2 );
         IO::messageBox a( buffer );
-        IO::drawSub( true );
+        IO::NAV->draw( true );
         swiWaitForVBlank( );
 #endif
 

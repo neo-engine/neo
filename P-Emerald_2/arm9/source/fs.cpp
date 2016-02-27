@@ -73,14 +73,18 @@ std::string getAbilityName( int p_abilityId ) {
 
 namespace FS {
     bool exists( const char* p_path, const char* p_name ) {
-        char buffer[ 100 ];
-        sprintf( buffer, "%s%s.raw", p_path, p_name );
-        FILE* fd = fopen( buffer, "rb" );
-
-        if( fd == 0 ) {
-            fclose( fd );
+        FILE* fd = open( p_path, p_name );
+        if( !fd )
             return false;
-        }
+        fclose( fd );
+        return true;
+    }
+    bool exists( const char* p_path, u16 p_name, bool p_unused ) {
+        (void)p_unused;
+
+        FILE* fd = open( p_path, p_name );
+        if( !fd )
+            return false;
         fclose( fd );
         return true;
     }

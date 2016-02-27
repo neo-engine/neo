@@ -41,7 +41,7 @@ namespace IO {
     void choiceBox::draw( u8 p_pressedIdx ) {
         if( p_pressedIdx == NEW_PAGE ) {
             if( _drawSub )
-                drawSub( );
+                NAV->draw( );
             initTextField( );
             if( _text ) {
                 if( _name ) {

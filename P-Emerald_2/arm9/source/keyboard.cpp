@@ -33,6 +33,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "keyboard.h"
 #include "uio.h"
 #include "defines.h"
+#include "nav.h"
 
 #include "A.h"
 #include "Forward.h"
@@ -132,7 +133,7 @@ namespace IO {
                               SCREEN_WIDTH - 28 - 24, SCREEN_HEIGHT - 24, 32, 32, BackwardPal,
                               BackwardTiles, BackwardTilesLen, false, false, false, OBJPRIORITY_1, true );
         updateOAM( true );
-        drawSub( );
+        NAV->draw( );
         initTextField( );
 
     }

@@ -56,7 +56,6 @@ u8 getCurrentDaytime( );
 extern bool DRAW_TIME;
 extern bool UPDATE_TIME;
 extern bool ANIMATE_MAP;
-extern bool INIT_MAIN_SPRITES;
 extern u8 FRAME_COUNT;
 extern bool SCREENS_SWAPPED;
 extern bool PLAYER_IS_FISHING;
@@ -83,7 +82,7 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define IN_RANGE_R(p_x1, p_y1, p_x2, p_y2 ) IN_RANGE_I( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) )
 #define IN_RANGE_C( p_x, p_y, p_r ) IN_RANGE_I_C( touch, IO::inputTarget( p_x, p_y, p_r ) )
 
-#define TOUCH_UP ( !touch.px && !touch.py ) 
+#define TOUCH_UP ( !touch.px && !touch.py )
 
 #define GET_AND_WAIT( key ) ( ( pressed & key ) && IO::waitForInput( IO::inputTarget( key ) ) )
 #define GET_AND_WAIT_R( p_x1, p_y1, p_x2, p_y2 ) ( IN_RANGE_I( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) )\
@@ -131,8 +130,8 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define POISON_COLOR RGB(31,0,15)
 #define ORANGE RGB(31,15,0)
 #define GHOST_COLOR RGB(15,0,31)
-#define ROCK_COLOR RGB(28,23,7)    
-#define BUG_COLOR RGB(15,28,7)    
+#define ROCK_COLOR RGB(28,23,7)
+#define BUG_COLOR RGB(15,28,7)
 #define STEEL_COLOR RGB(24,24,24)
 #define DRAGON_COLOR RGB(7,7,24)
 #define UNKNOWN_COLOR RGB(0,42,42)

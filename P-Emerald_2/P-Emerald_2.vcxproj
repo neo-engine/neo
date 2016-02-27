@@ -46,6 +46,7 @@
     <ClInclude Include="arm9\source\mapWarps.h" />
     <ClInclude Include="arm9\source\messageBox.h" />
     <ClInclude Include="arm9\source\move.h" />
+    <ClInclude Include="arm9\source\nav.h" />
     <ClInclude Include="arm9\source\pokemon.h" />
     <ClInclude Include="arm9\source\ribbon.h" />
     <ClInclude Include="arm9\source\saveGame.h" />
@@ -89,6 +90,7 @@
     <ClCompile Include="arm9\source\mapWarps.cpp" />
     <ClCompile Include="arm9\source\messageBox.cpp" />
     <ClCompile Include="arm9\source\move.cpp" />
+    <ClCompile Include="arm9\source\nav.cpp" />
     <ClCompile Include="arm9\source\pokemon.cpp" />
     <ClCompile Include="arm9\source\pokemonIO.cpp" />
     <ClCompile Include="arm9\source\ribbon.cpp" />

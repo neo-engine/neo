@@ -43,7 +43,7 @@ namespace MAP {
         _picNum( p_imageId ), _curFrame( p_startFrame ) {
         if( !IO::loadOWSprite( OW_PATH, _picNum, p_currX, p_currY, _oamIndex, _palette, _tileIdx ) ) {
             IO::messageBox m( "Sprite failed" );
-            IO::drawSub( true );
+            IO::NAV->draw( true );
         }
         IO::setOWSpriteFrame( _curFrame, _oamIndex, _tileIdx );
         IO::updateOAM( false );

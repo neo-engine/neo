@@ -245,7 +245,7 @@ namespace STS {
         consoleSetFont( &IO::Bottom, IO::consoleFont );
         bgUpdate( );
 
-        IO::drawSub( );
+        IO::NAV->draw( );
         if( p_initTop )
             initTop( );
         initSub( );
@@ -890,7 +890,7 @@ namespace STS {
         std::vector<std::string> names;
 
         auto pkmn = FS::SAV->m_pkmnTeam[ p_current ];
-        IO::drawSub( );
+        IO::NAV->draw( );
         BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
         BG_PALETTE_SUB[ GRAY_IDX ] = GRAY;
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;

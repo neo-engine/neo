@@ -61,7 +61,7 @@ namespace BOX {
 
         bgUpdate( );
         swiWaitForVBlank( );
-        IO::drawSub( );
+        IO::NAV->draw( );
         drawAllBoxStatus( );
 
         IO::initOAMTable( false );

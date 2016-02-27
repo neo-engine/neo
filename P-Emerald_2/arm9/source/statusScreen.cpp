@@ -126,7 +126,7 @@ namespace STS {
                         sprintf( buffer, "%s setzt %s\nein!", FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
                                  AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
                         IO::messageBox a( buffer );
-                        IO::drawSub( );
+                        IO::NAV->draw( );
 
                         //shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
                         //              (*_pokemon)[_pkmnIdx ].m_boxdata.m_isFemale, (*_pokemon)[_pkmnIdx ].m_boxdata.isShiny( ) );
@@ -157,7 +157,7 @@ namespace STS {
                         consoleClear( );
 
                         sprintf( buffer, "%s von %s\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
-                        IO::drawSub( );
+                        IO::NAV->draw( );
                         IO::messageBox a( buffer );
                         FS::SAV->m_bag.insert( BAG::toBagType( acI.m_itemType ), acI.getItemId( ), 1 );
                     } else { //give item

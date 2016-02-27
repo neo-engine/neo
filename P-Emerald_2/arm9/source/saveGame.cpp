@@ -42,7 +42,7 @@ namespace FS {
     std::vector<pokemon> tmp;
     saveGame* SAV;
 
-#define PKMN_DATALENGTH 128    
+#define PKMN_DATALENGTH 128
     saveGame* readSave( ) {
         FILE* f = open( "./", sav_nam, ".sav" );
         if( !f )
@@ -53,7 +53,7 @@ namespace FS {
         close( f );
         return result;
     }
-    
+
     bool writeSave( saveGame* p_saveGame ) {
         FILE* f = open( "./", sav_nam, ".sav", "w" );
         if( !f )
@@ -70,7 +70,7 @@ namespace FS {
             m_repelSteps--;
             if( !m_repelSteps ) {
                 IO::messageBox( "Der Schutz ist aufgebraucht." );
-                IO::drawSub( true );
+                IO::NAV->draw( true );
             }
         }
         if( !stepCnt ) {
