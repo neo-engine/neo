@@ -31,17 +31,23 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <map>
 
 namespace IO {
-#define MAXKEYBOARDS 3
+#define MAX_KEYBOARD_PAGES 4
     class keyboard {
     public:
-        keyboard( );
+        std::string getText( u8 p_length, const char* p_msg );
 
-        std::wstring getText( u16 p_length, const char* p_msg = 0 );
-
+        keyboard( ) :_page( 0 ) { }
     private:
-        u8 _ind;
-        std::map<std::pair<u8, std::pair<u16, u16>>, wchar_t> _chars;
+        u8 _page = 0;
 
-        void draw( const char* p_msg, std::wstring& p_currSel, u16 p_length );
+        std::string getText( u8 p_length );
+
+        void drawPage( );
+        void drawPage( const char* p_msg );
+
+        void drawChar( u8 p_pos, u16 p_char );
+        void clearChar( u8 p_pos );
+
+        u16 getNextChar( );
     };
 }

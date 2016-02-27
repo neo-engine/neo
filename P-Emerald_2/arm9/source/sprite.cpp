@@ -532,7 +532,7 @@ namespace IO {
         return loadIcon( "nitro:/PICS/SPRITES/ITEMS/", p_itemName.c_str( ), p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
 
-    u16 loadTMIcon( Type p_type, bool p_hm, const u16 p_posX, const u16 p_posY,
+    u16 loadTMIcon( type p_type, bool p_hm, const u16 p_posX, const u16 p_posY,
                     u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         std::string itemname = ( p_hm ? "VM" : "TM" ) + ( std::vector<std::string>{ "Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein", "Pflanze", "Geist",
                                                           "Stahl", "Unbekannt", "Wasser", "Feuer", "Pflanze", "Elektro", "Psycho", "Eis",
@@ -541,7 +541,7 @@ namespace IO {
         return loadItemIcon( itemname, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
 
-    u16 loadTypeIcon( Type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16, TypePals[ p_type ], TypeTiles[ p_type ], 256,
                            false, false, false, OBJPRIORITY_0, p_bottom );
     }

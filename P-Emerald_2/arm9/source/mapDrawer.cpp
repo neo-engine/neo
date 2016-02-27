@@ -25,6 +25,8 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "mapDrawer.h"
 #include "mapWarps.h"
 #include "uio.h"
@@ -33,6 +35,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "defines.h"
 #include "messageBox.h"
 #include "saveGame.h"
+#include "battleWeather.h"
+#include "battle.h"
 
 #include "BigCirc1.h"
 
@@ -206,7 +210,7 @@ namespace MAP {
             loadSlice( p_direction );
 #ifdef __DEBUG
             IO::messageBox m( "Load Slice" );
-            IO::drawSub( );
+            IO::NAV->draw( );
 #endif
         }
         //Check if a new slice got stepped onto
@@ -227,7 +231,7 @@ namespace MAP {
 #ifdef __DEBUG
             sprintf( buffer, "Switch Slice to (%d, %d)", _curX, _curY );
             IO::messageBox m( buffer );
-            IO::drawSub( );
+            IO::NAV->draw( );
 #endif
         }
 
@@ -346,16 +350,16 @@ namespace MAP {
 
         if( rn > 40 || !level ) {
             if( p_type == FISHING_ROD ) {
-                IO::messageBox m( "Doch nur ein alter Pokéball..." );
+                IO::messageBox m( "Doch nur ein alter Pokéball…" );
                 _playerIsFast = false;
-                IO::drawSub( true );
+                IO::NAV->draw( true );
             }
             return false;
         }
         if( p_type == FISHING_ROD ) {
             IO::messageBox m( "Du hast ein Pokémon geangelt!" );
             _playerIsFast = false;
-            IO::drawSub( true );
+            IO::NAV->draw( true );
         } else if( FS::SAV->m_repelSteps && !p_forceEncounter )
             return false;
         u8 arridx = u8( p_type ) * 15 + tier * 3;
@@ -369,30 +373,30 @@ namespace MAP {
             return false;
 
         pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
-        BATTLE::battle::weather weat = BATTLE::battle::weather::NO_WEATHER;
+        BATTLE::weather weat = BATTLE::weather::NO_WEATHER;
         switch( _weather ) {
-            case MAP::mapDrawer::SUNNY:
-                weat = BATTLE::battle::weather::SUN;
+            case mapDrawer::SUNNY:
+                weat = BATTLE::weather::SUN;
                 break;
-            case MAP::mapDrawer::RAINY:
-            case MAP::mapDrawer::THUNDERSTORM:
-                weat = BATTLE::battle::weather::RAIN;
+            case mapDrawer::RAINY:
+            case mapDrawer::THUNDERSTORM:
+                weat = BATTLE::weather::RAIN;
                 break;
-            case MAP::mapDrawer::SNOW:
-            case MAP::mapDrawer::BLIZZARD:
-                weat = BATTLE::battle::weather::HAIL;
+            case mapDrawer::SNOW:
+            case mapDrawer::BLIZZARD:
+                weat = BATTLE::weather::HAIL;
                 break;
-            case MAP::mapDrawer::SANDSTORM:
-                weat = BATTLE::battle::weather::SANDSTORM;
+            case mapDrawer::SANDSTORM:
+                weat = BATTLE::weather::SANDSTORM;
                 break;
-            case MAP::mapDrawer::FOG:
-                weat = BATTLE::battle::weather::FOG;
+            case mapDrawer::FOG:
+                weat = BATTLE::weather::FOG;
                 break;
-            case MAP::mapDrawer::HEAVY_SUNLIGHT:
-                weat = BATTLE::battle::weather::HEAVY_SUNSHINE;
+            case mapDrawer::HEAVY_SUNLIGHT:
+                weat = BATTLE::weather::HEAVY_SUNSHINE;
                 break;
-            case MAP::mapDrawer::HEAVY_RAIN:
-                weat = BATTLE::battle::weather::HEAVY_RAIN;
+            case mapDrawer::HEAVY_RAIN:
+                weat = BATTLE::weather::HEAVY_RAIN;
                 break;
             default:
                 break;
@@ -416,7 +420,7 @@ namespace MAP {
         FS::SAV->updateTeam( );
         FADE_TOP_DARK( );
         draw( playerPrio );
-        IO::drawSub( true );
+        IO::NAV->draw( true );
 
         return true;
     }
@@ -600,7 +604,7 @@ namespace MAP {
                 stopPlayer( );
                 IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
                 _playerIsFast = false;
-                IO::drawSub( true );
+                IO::NAV->draw( true );
                 return;
             }
             //Check for end of surf, stand up and sit down
@@ -632,7 +636,7 @@ namespace MAP {
                 return;
             }
 
-            //Check for jumps/slides/...
+            //Check for jumps/slides/…
             if( !canMove( FS::SAV->m_player.m_pos, p_direction, FS::SAV->m_player.m_movement ) ) {
                 stopPlayer( p_direction );
                 fastBike = false;
@@ -938,9 +942,11 @@ NEXT_PASS:
         }
         swiWaitForVBlank( );
         swiWaitForVBlank( );
+
         FS::SAV->m_currentMap = p_target.first;
         FS::SAV->m_player.m_pos = p_target.second;
         draw( );
+        IO::NAV->showNewMap( FS::SAV->m_currentMap );
         if( exitCave )
             movePlayer( DOWN );
     }
@@ -1189,6 +1195,8 @@ NEXT_PASS:
             && atom( p_start.m_posX, p_start.m_posY ).m_movedata != 0x3c;
     }
     void mapDrawer::fishPlayer( direction p_direction, u8 p_rodType ) {
+        PLAYER_IS_FISHING = true;
+
         u8 basePic = FS::SAV->m_player.m_picNum / 10 * 10;
         FS::SAV->m_player.m_picNum = basePic + 6;
         bool surfing = ( FS::SAV->m_player.m_movement == SURF );
@@ -1237,8 +1245,8 @@ NEXT_PASS:
 OUT:
         fish.clear( );
         if( failed )
-            fish.put( "Es ist entkommen..." );
-        IO::drawSub( true );
+            fish.put( "Es ist entkommen…" );
+        IO::NAV->draw( true );
         for( s8 i = 2; i >= 0; --i ) {
             _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( frame + i, p_direction == RIGHT );
             swiWaitForVBlank( );
@@ -1250,6 +1258,8 @@ OUT:
             //Start wild PKMN battle here
             handleWildPkmn( FISHING_ROD, p_rodType );
         }
+
+        PLAYER_IS_FISHING = false;
     }
 
     void mapDrawer::usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny ) {

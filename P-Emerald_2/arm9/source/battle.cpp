@@ -25,7 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include <cwchar>
 #include <cstdio>
 #include <cstring>
@@ -34,19 +33,46 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <tuple>
 #include <initializer_list>
 
+#include "defines.h"
+
 #include "battle.h"
+#include "battleTrainer.h"
+
 #include "pokemon.h"
 #include "move.h"
 #include "item.h"
+
 #include "saveGame.h"
-#include "bag.h"
-#include "buffer.h"
 #include "fs.h"
 #include "sprite.h"
 #include "uio.h"
 
+#include "bag.h"
+#include "buffer.h"
+#include "dex.h"
+
 namespace BATTLE {
-    const std::vector<std::wstring> trainerclassnames{ L"PKMN-Trainer" };
+    std::string trainerClassNames[ 120 ] = { "Pokémon-Trainer", "Altes Paar", "Angler",
+        "Aqua-Vorstand", "Aromalady", "Ass-Trainer", "Backpacker", "Camper", "Champ",
+        "Drachenprofi", "Experte", "Forscher", "Forscherin", "Gentleman", "Geschwister",
+        "Gitarrist", "Göre", "Hexe", "Hitzkopf", "Interviewer", "Junges Glück", "Käfermaniac",
+        "Käfersammler", "Kämpferin", "Künstler", "Lady", "Magma-Vorstand", "Matrose", "Ninjajunge",
+        "Picknickerin", "Planscher", "Pokéfan", "Pokémaniac", "Pokémon Ranger", "Pokémon-Sammler",
+        "Pokémon-Trainer", "Pokémon-Züchter", "Psycho", "Ruinenmaniac", "Schirmdame", "Schnösel",
+        "Schönheit", "Schulkind", "Schwarzgurt", "Schwimmer", "Schwimmerin", "Senior & Junior",
+        "Serviererin", "Team Aqua Boss", "Team Aqua Rüpel", "Team Magma Boss", "Team Magma Rüpel",
+        "Teenager", "Top Vier", "Triathlet", "Veteran", "Vogelfänger", "Vorschüler", "Vorschülerin",
+        "Wanderer", "Zwillinge", "Ass-Duo", "Baron", "Baronin", "Butler", "Erbfolgerin", "Expertin",
+        "Fahrer", "Fräulein Reihumkampf", "Gastronom", "Garçon", "Gärtner", "Geheimbasen-Meister",
+        "Geheimbasis", "Graf", "Gräfin", "Grips & Muckis", "Großherzogin", "Halbstarke", "Herzog",
+        "Herzogin", "Himmelstrainer", "Hochzeitsreisende", "Illumina-Gangster", "Inhaber", "Kampf-Châtelaine",
+        "Kimono-Trägerin", "Koch", "Künstlerfamilie", "Künstlerin", "Marquis", "Marquise", "Planscherin",
+        "Pokéfan-Pärchen", "Pokémon-Professor", "Pokémon-Züchterin", "Punker", "Punkerin", "Punker-Pärchen",
+        "Raubein", "Rollerskater", "Rollerskaterin", "Schräge Schwestern", "Schüler", "Schülerin", "Taucher",
+        "Taucherin", "Team Flare Rüpel", "Team Flare Vorstand", "Tourist", "Touristin", "Trainerhoffnung",
+        "Träumerin", "Verdächtige Frau", "Verdächtiges Kind", "Verdächtiges Mädchen",
+        "Vicomte", "Vicomtesse", "Wissenshüterin", "Xeneraner"
+    };
 
     const char* ailmentnames[ ] = {
         "none",
@@ -70,98 +96,204 @@ namespace BATTLE {
         "Ingrain"
     };
 
+    battleUI*    battle::_battleUI;
+
     //////////////////////////////////////////////////////////////////////////
     // BEGIN BATTLE
     //////////////////////////////////////////////////////////////////////////
-#define C2I(a) ((a) - L'0')
-    std::wstring parseLogCmd( battle* p_battle, const std::wstring& p_cmd ) {
-        if( p_cmd == L"A" )
-            return L"`";
-        if( p_cmd == L"CLEAR" )
-            return L"";
 
-        if( p_cmd == L"TRAINER" ) {
-            std::swprintf( wbuffer, 50, L"%s", p_battle->_opponent->m_battleTrainerName.c_str( ) );
-            return std::wstring( wbuffer );
+    int battle::getTargetSpecifierValue( bool p_targetIsOpp, u8 p_targetPosition,
+                                         const battleScript::command::targetSpecifier& p_targetSpecifier, u8 p_targetVal ) {
+        battlePokemon target = CUR_PKMN_STR( p_targetPosition, p_targetIsOpp );
+        pokemonData data; getAll( target.m_pokemon->m_boxdata.m_speciesId, data );
+        switch( p_targetSpecifier ) {
+            case BATTLE::battleScript::command::PKMN_TYPE1:
+                return int( target.m_types[ 0 ] );
+            case BATTLE::battleScript::command::PKMN_TYPE2:
+                return int( target.m_types[ 1 ] );
+            case BATTLE::battleScript::command::PKMN_TYPE3:
+                return int( target.m_types[ 2 ] );
+            case BATTLE::battleScript::command::PKMN_TYPE:
+            {
+                for( u8 i = 0; i < 3; ++i )
+                    if( p_targetVal == target.m_types[ i ] )
+                        return target.m_types[ i ];
+                return int( target.m_types[ 0 ] );
+            }
+            case BATTLE::battleScript::command::PKMN_SIZE:
+                return int( data.m_size );
+            case BATTLE::battleScript::command::PKMN_WEIGHT:
+                return int( data.m_weight );
+            case BATTLE::battleScript::command::PKMN_SPECIES:
+                return target.m_pokemon->m_boxdata.m_speciesId;
+            case BATTLE::battleScript::command::PKMN_ITEM:
+                return target.m_pokemon->m_boxdata.m_holdItem;
+            case BATTLE::battleScript::command::PKMN_ABILITY:
+                return target.m_pokemon->m_boxdata.m_ability;
+            case BATTLE::battleScript::command::PKMN_GENDER:
+                return ( target.m_pokemon->m_boxdata.m_isFemale ? -1 :
+                         ( target.m_pokemon->m_boxdata.m_isGenderless ? 0 : 1 ) );
+            case BATTLE::battleScript::command::PKMN_STATUS:
+                return target.m_pokemon->m_statusint;
+            case BATTLE::battleScript::command::PKMN_HP:
+                return target.m_pokemon->m_stats.m_acHP;
+            case BATTLE::battleScript::command::PKMN_MAX_HP:
+                return target.m_pokemon->m_stats.m_maxHP;
+            case BATTLE::battleScript::command::PKMN_HP_PERCENT:
+                return target.m_pokemon->m_stats.m_acHP * 100 / target.m_pokemon->m_stats.m_maxHP;
+            case BATTLE::battleScript::command::PKMN_ATK:
+                return target.m_acStatChanges[ ATK ];
+            case BATTLE::battleScript::command::PKMN_DEF:
+                return target.m_acStatChanges[ DEF ];
+            case BATTLE::battleScript::command::PKMN_SPD:
+                return target.m_acStatChanges[ SPD ];
+            case BATTLE::battleScript::command::PKMN_SATK:
+                return target.m_acStatChanges[ SATK ];
+            case BATTLE::battleScript::command::PKMN_SDEF:
+                return target.m_acStatChanges[ SDEF ];
+            case BATTLE::battleScript::command::PKMN_ACCURACY:
+                return target.m_acStatChanges[ ACCURACY ];
+            case BATTLE::battleScript::command::PKMN_ATTACK_BLOCKED:
+                return target.m_acStatChanges[ ATTACK_BLOCKED ];
+            case BATTLE::battleScript::command::PKMN_LEVEL:
+                return target.m_pokemon->m_level;
+            default:
+                return -1;
         }
-        if( p_cmd == L"TCLASS" ) {
-            return trainerclassnames[ p_battle->_opponent->m_trainerClass ];
+    }
+    int battle::getTargetSpecifierValue( const battleScript::command::targetSpecifier& p_targetSpecifier ) {
+        switch( p_targetSpecifier ) {
+            case BATTLE::battleScript::command::BATTLE_ROUND:
+                return _round;
+            case BATTLE::battleScript::command::BATTLE_MODE:
+                return m_battleMode;
+            case BATTLE::battleScript::command::BATTLE_WEATHER:
+                return m_weather;
+            case BATTLE::battleScript::command::BATTLE_LAST_MOVE:
+                return _lstMove;
+            case BATTLE::battleScript::command::BATTLE_LAST_OWN_MOVE:
+                return _lstOwnMove;
+            case BATTLE::battleScript::command::BATTLE_LAST_OPP_MOVE:
+                return _lstOppMove;
+            case BATTLE::battleScript::command::BATTLE_OWN_FST_MOVE:
+                if( m_battleMode == battle::SINGLE ||
+                    ( _moveOrder[ 1 ][ PLAYER ] > _moveOrder[ 0 ][ PLAYER ] ) )
+                    return ( _battleMoves[ 0 ][ PLAYER ].m_type == battle::battleMove::ATTACK ) ? _battleMoves[ 0 ][ PLAYER ].m_value : -1;
+                return ( _battleMoves[ 1 ][ PLAYER ].m_type == battle::battleMove::ATTACK ) ? _battleMoves[ 1 ][ PLAYER ].m_value : -1;
+            case BATTLE::battleScript::command::BATTLE_OWN_SND_MOVE:
+                if( m_battleMode == battle::SINGLE )
+                    return -1;
+                if( _moveOrder[ 1 ][ PLAYER ] > _moveOrder[ 0 ][ PLAYER ] )
+                    return ( _battleMoves[ 0 ][ PLAYER ].m_type == battle::battleMove::ATTACK ) ? _battleMoves[ 0 ][ PLAYER ].m_value : -1;
+                return ( _battleMoves[ 1 ][ PLAYER ].m_type == battle::battleMove::ATTACK ) ? _battleMoves[ 1 ][ PLAYER ].m_value : -1;
+            case BATTLE::battleScript::command::BATTLE_OPP_FST_MOVE:
+                if( m_battleMode == battle::SINGLE ||
+                    ( _moveOrder[ 1 ][ OPPONENT ] > _moveOrder[ 0 ][ OPPONENT ] ) )
+                    return ( _battleMoves[ 0 ][ OPPONENT ].m_type == battle::battleMove::ATTACK ) ? _battleMoves[ 0 ][ OPPONENT ].m_value : -1;
+                return ( _battleMoves[ 1 ][ OPPONENT ].m_type == battle::battleMove::ATTACK ) ? _battleMoves[ 1 ][ OPPONENT ].m_value : -1;
+            case BATTLE::battleScript::command::BATTLE_OPP_SND_MOVE:
+                if( m_battleMode == battle::SINGLE )
+                    return -1;
+                if( _moveOrder[ 1 ][ OPPONENT ] < _moveOrder[ 0 ][ OPPONENT ] )
+                    return ( _battleMoves[ 0 ][ OPPONENT ].m_type == battle::battleMove::ATTACK ) ? _battleMoves[ 0 ][ OPPONENT ].m_value : -1;
+                return ( _battleMoves[ 1 ][ OPPONENT ].m_type == battle::battleMove::ATTACK ) ? _battleMoves[ 1 ][ OPPONENT ].m_value : -1;
+            case BATTLE::battleScript::command::BATTLE_OWN_TEAMSIZE:
+                return int( _player->m_pkmnTeam.size( ) );
+            case BATTLE::battleScript::command::BATTLE_OPP_TEAMSIZE:
+                return int( _opponent->m_pkmnTeam.size( ) );
+            default:
+                return -1;
         }
-        if( p_cmd == L"OPPONENT" ) {
-            if( p_battle->m_isWildBattle )
-                return L"(Wild)";
+    }
+
+#define C2I(a) ((a) - '0')
+    std::string battle::parseLogCmd( const std::string& p_cmd ) {
+        if( p_cmd == "A" )
+            return "`";
+        if( p_cmd == "CLEAR" )
+            return "";
+
+        if( p_cmd == "TRAINER" ) {
+            return _opponent->m_battleTrainerName;
+        }
+        if( p_cmd == "TCLASS" ) {
+            return trainerClassNames[ _opponent->m_trainerClass ];
+        }
+        if( p_cmd == "OPPONENT" ) {
+            if( m_isWildBattle )
+                return "(Wild)";
             else
-                return L"(Gegner)";
+                return "(Gegner)";
         }
-        if( p_cmd.substr( 0, 4 ) == L"COLR" ) {
+        if( p_cmd.substr( 0, 4 ) == "COLR" ) {
             u8 r, g, b;
 
             r = 10 * C2I( p_cmd[ 5 ] ) + C2I( p_cmd[ 6 ] );
             g = 10 * C2I( p_cmd[ 8 ] ) + C2I( p_cmd[ 9 ] );
             b = 10 * C2I( p_cmd[ 11 ] ) + C2I( p_cmd[ 12 ] );
 
-            p_battle->_battleUI->setLogTextColor( RGB15( r, g, b ) );
+            _battleUI->setLogTextColor( RGB15( r, g, b ) );
             if( r != 15 || g != 15 || b != 15 )
                 IO::regularFont->setColor( COLOR_IDX, 1 );
             else
                 IO::regularFont->setColor( GRAY_IDX, 1 );
-            return L"";
+            return "";
         }
 
-        pokemon target = ACPKMN2( *p_battle, 0, PLAYER );
+        pokemon target = CUR_PKMN( 0, PLAYER );
         bool isPkmn = false;
         bool isOpp = false;
 
-        if( p_cmd.substr( 0, 4 ) == L"OWN1" ) {
-            target = ACPKMN2( *p_battle, 0, PLAYER );
+        if( p_cmd.substr( 0, 4 ) == "OWN1" ) {
+            target = CUR_PKMN( 0, PLAYER );
             isPkmn = true;
         }
-        if( p_cmd.substr( 0, 4 ) == L"OWN2" ) {
-            target = ACPKMN2( *p_battle, 1, PLAYER );
+        if( p_cmd.substr( 0, 4 ) == "OWN2" ) {
+            target = CUR_PKMN( 1, PLAYER );
             isPkmn = true;
         }
-        if( p_cmd.substr( 0, 4 ) == L"OPP1" ) {
-            target = ACPKMN2( *p_battle, 0, OPPONENT );
+        if( p_cmd.substr( 0, 4 ) == "OPP1" ) {
+            target = CUR_PKMN( 0, OPPONENT );
             isOpp = true;
             isPkmn = true;
         }
-        if( p_cmd.substr( 0, 4 ) == L"OPP2" ) {
-            target = ACPKMN2( *p_battle, 1, OPPONENT );
+        if( p_cmd.substr( 0, 4 ) == "OPP2" ) {
+            target = CUR_PKMN( 1, OPPONENT );
             isOpp = true;
             isPkmn = true;
         }
 
         if( isPkmn && p_cmd.length( ) == 4 )
-            return target.m_boxdata.m_name + std::wstring( isOpp ? L" [OPPONENT]" : L"" );
+            return target.m_boxdata.m_name + std::string( isOpp ? " " + parseLogCmd( "OPPONENT" ) : "" );
 
         if( isPkmn ) {
             auto specifier = p_cmd.substr( 5 );
-            if( specifier == L"ABILITY" )
-                return getWAbilityName( target.m_boxdata.m_ability );
-            if( specifier.substr( 0, 4 ) == L"MOVE" ) {
-                std::swprintf( wbuffer, 50, L"%s", AttackList[ target.m_boxdata.m_moves[ C2I( specifier[ 4 ] ) - 1 ] ]->m_moveName.c_str( ) );
-                return std::wstring( wbuffer );
-            }
-            if( specifier == L"ITEM" ) {
-                std::swprintf( wbuffer, 50, L"%s", ItemList[ target.m_boxdata.m_holdItem ]->m_itemName.c_str( ) );
-                return std::wstring( wbuffer );
-            }
-            if( specifier == L"LEVEL" )
-                return ( L"" + target.m_Level );
+            if( specifier == "ABILITY" )
+                return getAbilityName( target.m_boxdata.m_ability );
+            if( specifier.substr( 0, 4 ) == "MOVE" )
+                return AttackList[ target.m_boxdata.m_moves[ C2I( specifier[ 4 ] ) - 1 ] ]->m_moveName;
+            if( specifier == "ITEM" )
+                return ItemList[ target.m_boxdata.m_holdItem ]->m_itemName;
+            if( specifier == "LEVEL" )
+                return ( "" + target.m_level );
         }
 
-        return L"";
+        return "";
     }
 
-    battle::battle( battleTrainer* p_player, battleTrainer* p_opponent, int p_maxRounds, int p_AILevel, battleMode p_battleMode )
+    battle::battle( battleTrainer* p_player, battleTrainer* p_opponent, int p_maxRounds, weather p_weather,
+                    u8 p_platform, u8 p_background, int p_AILevel, battleMode p_battleMode )
         : _player( p_player ), _opponent( p_opponent ) {
         _maxRounds = p_maxRounds;
         _AILevel = p_AILevel;
         m_battleMode = p_battleMode;
         m_isWildBattle = false;
 
-        m_weather = NO_WEATHER;
         m_distributeEXP = true;
+
+        m_weather = p_weather;
+        m_platformId = p_platform;
+        m_backgroundId = p_background;
     }
     battle::battle( battleTrainer* p_player, pokemon* p_opponent, weather p_weather, u8 p_platform, u8 p_background )
         : _player( p_player ), _opponent( 0 ) {
@@ -174,9 +306,9 @@ namespace BATTLE {
         pokemonData pdata;
         getAll( p_opponent->m_boxdata.m_speciesId, pdata );
         _wildPokemon.m_pokemon = p_opponent;
-        _wildPokemon.m_Types[ 0 ] = pdata.m_types[ 0 ];
-        _wildPokemon.m_Types[ 1 ] = pdata.m_types[ 1 ];
-        _wildPokemon.m_Types[ 2 ] = pdata.m_types[ 1 ];
+        _wildPokemon.m_types[ 0 ] = pdata.m_types[ 0 ];
+        _wildPokemon.m_types[ 1 ] = pdata.m_types[ 1 ];
+        _wildPokemon.m_types[ 2 ] = pdata.m_types[ 1 ];
 
         m_battleMode = SINGLE;
         m_isWildBattle = true;
@@ -188,24 +320,24 @@ namespace BATTLE {
      *  @brief Write the message p_message to the battle log
      *  @param p_message: The message to be written
      */
-    void battle::log( const std::wstring& p_message ) {
-        std::wstring msg = L"";
+    void battle::log( const std::string& p_message ) {
+        std::string msg = "";
         for( size_t i = 0; i < p_message.length( ); i++ ) {
             if( p_message[ i ] == L'[' ) {
-                std::wstring accmd = L"";
+                std::string accmd = "";
                 while( p_message[ ++i ] != L']' )
                     accmd += p_message[ i ];
-                msg += parseLogCmd( this, accmd );
-                if( accmd == L"CLEAR" ) {
+                msg += parseLogCmd( accmd );
+                if( accmd == "CLEAR" ) {
                     _battleUI->writeLogText( msg );
                     _battleUI->clearLogScreen( );
-                    msg = L"";
+                    msg = "";
                 }
             } else
                 msg += p_message[ i ];
         }
 
-        if( msg != L"" )
+        if( msg != "" )
             _battleUI->writeLogText( msg );
         _battleUI->clearLogScreen( );
     }
@@ -227,12 +359,12 @@ namespace BATTLE {
 CHOOSE1:
             firstMoveSwitchTarget = 0;
 
-            _battleMoves[ 0 ][ PLAYER ] = { ( battleMove::type )0, 0, 0 };
-            _battleMoves[ 1 ][ PLAYER ] = { ( battleMove::type )0, 0, 0 };
-            _battleMoves[ 0 ][ OPPONENT ] = { ( battleMove::type )0, 0, 0 };
-            _battleMoves[ 1 ][ OPPONENT ] = { ( battleMove::type )0, 0, 0 };
+            _battleMoves[ 0 ][ PLAYER ] = { ( battleMove::type )0, 0, 0, 0 };
+            _battleMoves[ 1 ][ PLAYER ] = { ( battleMove::type )0, 0, 0, 0 };
+            _battleMoves[ 0 ][ OPPONENT ] = { ( battleMove::type )0, 0, 0, 0 };
+            _battleMoves[ 1 ][ OPPONENT ] = { ( battleMove::type )0, 0, 0, 0 };
 
-            if( ACPKMNSTS( 0, PLAYER ) != KO ) {
+            if( CUR_PKMN_STS( 0, PLAYER ) != KO ) {
                 if( p1CanMove ) {
                     _battleUI->declareBattleMove( 0, false );
                     if( _endBattle ) {
@@ -240,12 +372,12 @@ CHOOSE1:
                         return ( battleEnd );
                     }
                 } else
-                    log( L"[OWN1] kann nicht angreifen...[A]" );
+                    log( "[OWN1] kann nicht angreifen…[A]" );
             }
             //If 1st action is RUN, the player has no choice for a second move
-            if( _battleMoves[ 0 ][ PLAYER ].m_type != battleMove::RUN && ACPKMNSTS( 1, PLAYER ) != KO ) {
+            if( _battleMoves[ 0 ][ PLAYER ].m_type != battleMove::RUN && CUR_PKMN_STS( 1, PLAYER ) != KO ) {
                 if( m_battleMode == DOUBLE && canMove( PLAYER, 1 ) ) {
-                    if( !_battleUI->declareBattleMove( 1, p1CanMove && ACPKMNSTS( 0, PLAYER ) != KO ) )
+                    if( !_battleUI->declareBattleMove( 1, p1CanMove && CUR_PKMN_STS( 0, PLAYER ) != KO ) )
                         goto CHOOSE1;
 
                     if( _endBattle ) {
@@ -253,18 +385,22 @@ CHOOSE1:
                         return ( battleEnd );
                     }
                 } else if( m_battleMode == DOUBLE )
-                    log( L"[OWN2] kann nicht angreifen...[A]" );
+                    log( "[OWN2] kann nicht angreifen…[A]" );
             } else
                 _battleMoves[ 1 ][ PLAYER ].m_type = battleMove::RUN;
 
             getAIMoves( );
 
             doMoves( );
-
             if( endConditionHit( battleEnd ) ) {
                 endBattle( battleEnd );
                 break;
             }
+            if( _endBattle ) {
+                endBattle( battleEnd = PLAYER_WON );
+                return battleEnd;
+            }
+
             doWeather( );
             for( int k = 0; k < 4; ++k ) {
                 if( m_battleMode != DOUBLE && ( k % 2 ) )
@@ -293,51 +429,54 @@ CHOOSE1:
      */
     void battle::initBattle( ) {
         //Some basic initialization stuff
-        _battleUI = new battleUI( this );
+        if( !_battleUI )
+            _battleUI = new battleUI( this );
+        else
+            _battleUI->_battle = this;
         _battleUI->init( );
         pokemonData pdata;
         for( u8 i = 0; i < 6; ++i ) {
             if( _player->m_pkmnTeam.size( ) > i ) {
                 getAll( _player->m_pkmnTeam[ i ].m_boxdata.m_speciesId, pdata );
                 _pkmns[ i ][ 0 ].m_pokemon = &( _player->m_pkmnTeam[ i ] );
-                _pkmns[ i ][ 0 ].m_Types[ 0 ] = pdata.m_types[ 0 ];
-                _pkmns[ i ][ 0 ].m_Types[ 1 ] = pdata.m_types[ 1 ];
-                _pkmns[ i ][ 0 ].m_Types[ 2 ] = pdata.m_types[ 1 ];
+                _pkmns[ i ][ 0 ].m_types[ 0 ] = pdata.m_types[ 0 ];
+                _pkmns[ i ][ 0 ].m_types[ 1 ] = pdata.m_types[ 1 ];
+                _pkmns[ i ][ 0 ].m_types[ 2 ] = pdata.m_types[ 1 ];
             }
             if( !m_isWildBattle )
                 if( _opponent->m_pkmnTeam.size( ) > i ) {
                     getAll( _opponent->m_pkmnTeam[ i ].m_boxdata.m_speciesId, pdata );
                     _pkmns[ i ][ 1 ].m_pokemon = &( _opponent->m_pkmnTeam[ i ] );
-                    _pkmns[ i ][ 1 ].m_Types[ 0 ] = pdata.m_types[ 0 ];
-                    _pkmns[ i ][ 1 ].m_Types[ 1 ] = pdata.m_types[ 1 ];
-                    _pkmns[ i ][ 1 ].m_Types[ 2 ] = pdata.m_types[ 1 ];
+                    _pkmns[ i ][ 1 ].m_types[ 0 ] = pdata.m_types[ 0 ];
+                    _pkmns[ i ][ 1 ].m_types[ 1 ] = pdata.m_types[ 1 ];
+                    _pkmns[ i ][ 1 ].m_types[ 2 ] = pdata.m_types[ 1 ];
                 }
 
-            ACPOS( i, PLAYER ) = ACPOS( i, OPPONENT ) = i;
+            CUR_POS( i, PLAYER ) = CUR_POS( i, OPPONENT ) = i;
             for( u8 o = 0; o < MAX_STATS; ++o )
-                ACPKMNSTATCHG( i, PLAYER )[ o ] = ACPKMNSTATCHG( i, OPPONENT )[ o ] = 0;
+                CUR_PKMN_STATCHG( i, PLAYER )[ o ] = CUR_PKMN_STATCHG( i, OPPONENT )[ o ] = 0;
             if( _player->m_pkmnTeam.size( ) > i ) {
-                if( ACPKMN( i, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
-                    ACPKMNSTS( i, PLAYER ) = NA;
-                else if( ACPKMN( i, PLAYER ).m_stats.m_acHP == 0 )
-                    ACPKMNSTS( i, PLAYER ) = KO;
-                else if( ACPKMN( i, PLAYER ).m_statusint )
-                    ACPKMNSTS( i, PLAYER ) = STS;
+                if( CUR_PKMN( i, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                    CUR_PKMN_STS( i, PLAYER ) = NA;
+                else if( CUR_PKMN( i, PLAYER ).m_stats.m_acHP == 0 )
+                    CUR_PKMN_STS( i, PLAYER ) = KO;
+                else if( CUR_PKMN( i, PLAYER ).m_statusint )
+                    CUR_PKMN_STS( i, PLAYER ) = STS;
                 else
-                    ACPKMNSTS( i, PLAYER ) = OK;
+                    CUR_PKMN_STS( i, PLAYER ) = OK;
             } else
-                ACPKMNSTS( i, PLAYER ) = NA;
+                CUR_PKMN_STS( i, PLAYER ) = NA;
             if( !m_isWildBattle ) {
                 if( _opponent->m_pkmnTeam.size( ) > i ) {
-                    if( ACPKMN( i, OPPONENT ).m_boxdata.m_individualValues.m_isEgg )
-                        ACPKMNSTS( i, OPPONENT ) = NA;
-                    else if( ACPKMN( i, OPPONENT ).m_stats.m_acHP == 0 )
-                        ACPKMNSTS( i, OPPONENT ) = KO;
-                    else if( ACPKMN( i, OPPONENT ).m_statusint )
-                        ACPKMNSTS( i, OPPONENT ) = STS;
-                    else ACPKMNSTS( i, OPPONENT ) = OK;
+                    if( CUR_PKMN( i, OPPONENT ).m_boxdata.m_individualValues.m_isEgg )
+                        CUR_PKMN_STS( i, OPPONENT ) = NA;
+                    else if( CUR_PKMN( i, OPPONENT ).m_stats.m_acHP == 0 )
+                        CUR_PKMN_STS( i, OPPONENT ) = KO;
+                    else if( CUR_PKMN( i, OPPONENT ).m_statusint )
+                        CUR_PKMN_STS( i, OPPONENT ) = STS;
+                    else CUR_PKMN_STS( i, OPPONENT ) = OK;
                 } else
-                    ACPKMNSTS( i, OPPONENT ) = NA;
+                    CUR_PKMN_STS( i, OPPONENT ) = NA;
             }
         }
         memset( _participatedPKMN, 0, sizeof( _participatedPKMN ) );
@@ -357,7 +496,7 @@ CHOOSE1:
         refillBattleSpots( false );
 
         if( m_weather != NO_WEATHER ) {
-            log( _weatherMessage[ m_weather ] );
+            log( weatherMessage[ m_weather ] );
         }
 
         doAbilities( ability::BEFORE_BATTLE );
@@ -372,15 +511,15 @@ CHOOSE1:
             if( j && m_isWildBattle )
                 continue;
             if( !_battleSpotOccupied[ i ][ j ] ) {
-                if( ACPKMNSTS( i, j ) != KO && ACPKMNSTS( i, j ) != NA && ACPKMN( i, j ).m_stats.m_acHP )
+                if( CUR_PKMN_STS( i, j ) != KO && CUR_PKMN_STS( i, j ) != NA && CUR_PKMN( i, j ).m_stats.m_acHP )
                     continue;
 
                 bool refillpossible = false;
 
                 for( u8 k = 1 + ( m_battleMode == DOUBLE );
                 k < ( j ? _opponent->m_pkmnTeam.size( ) : _player->m_pkmnTeam.size( ) ); ++k )
-                    if( ACPKMNSTS( k, j ) != KO && ACPKMNSTS( k, j ) != SELECTED
-                        && ACPKMNSTS( k, j ) != NA && ACPKMN( k, j ).m_stats.m_acHP ) {
+                    if( CUR_PKMN_STS( k, j ) != KO && CUR_PKMN_STS( k, j ) != SELECTED
+                        && CUR_PKMN_STS( k, j ) != NA && CUR_PKMN( k, j ).m_stats.m_acHP ) {
                         refillpossible = true;
                         break;
                     }
@@ -397,7 +536,7 @@ CHOOSE1:
                     nextSpot = _battleUI->choosePKMN( m_battleMode == DOUBLE, false );
 
                 if( nextSpot != 7 && nextSpot != i )
-                    std::swap( ACPOS( i, j ), ACPOS( nextSpot, j ) );
+                    std::swap( CUR_POS( i, j ), CUR_POS( nextSpot, j ) );
                 _battleSpotOccupied[ i ][ j ] = ( nextSpot == 7 );
             }
         }
@@ -405,19 +544,19 @@ CHOOSE1:
         //Sort the remaining PKMN according to their status -> No STS, STS, KO, NA
         std::vector<std::pair<u8, u8> > tmp;
         for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
-            tmp.push_back( std::pair<u8, u8>( ACPKMNSTS( i, PLAYER ), ACPOS( i, PLAYER ) ) );
+            tmp.push_back( std::pair<u8, u8>( CUR_PKMN_STS( i, PLAYER ), CUR_POS( i, PLAYER ) ) );
         std::sort( tmp.begin( ), tmp.end( ) );
         for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
-            ACPOS( i, PLAYER ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
+            CUR_POS( i, PLAYER ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
 
         if( !m_isWildBattle ) {
             //Sort the remaining PKMN according to their status -> No STS, STS, KO, NA (For the opponent)
             tmp.clear( );
             for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
-                tmp.push_back( std::pair<u8, u8>( ACPKMNSTS( i, OPPONENT ), ACPOS( i, OPPONENT ) ) );
+                tmp.push_back( std::pair<u8, u8>( CUR_PKMN_STS( i, OPPONENT ), CUR_POS( i, OPPONENT ) ) );
             std::sort( tmp.begin( ), tmp.end( ) );
             for( u8 i = ( m_battleMode == DOUBLE ? 2 : 1 ); i < 6; ++i )
-                ACPOS( i, OPPONENT ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
+                CUR_POS( i, OPPONENT ) = tmp[ i - ( m_battleMode == DOUBLE ? 2 : 1 ) ].second;
         }
         orderPKMN( false );
 
@@ -446,7 +585,7 @@ NEXT:
     /**
      *  @brief Gets the index of the next PKMN that is not koed.
      *  @param p_opponent: true iff the next opponent's PKMN is requested.
-     *  @returns Minimum i for which ACPKMNSTS(i,p_opponent) != KO and != SELECTED, 7 iff all PKMN fainted
+     *  @returns Minimum i for which CUR_PKMN_STS(i,p_opponent) != KO and != SELECTED, 7 iff all PKMN fainted
      */
     u8 battle::getNextPKMN( bool p_opponent, u8 p_startIdx ) {
         if( p_opponent && m_isWildBattle )
@@ -454,8 +593,8 @@ NEXT:
         u8 max = ( p_opponent ? _opponent->m_pkmnTeam.size( ) : _player->m_pkmnTeam.size( ) );
 
         for( u8 i = p_startIdx; i < max; ++i )
-            if( ACPKMNSTS( i, p_opponent ) != KO
-                && ACPKMNSTS( i, p_opponent ) != SELECTED )
+            if( CUR_PKMN_STS( i, p_opponent ) != KO
+                && CUR_PKMN_STS( i, p_opponent ) != SELECTED )
                 return i;
         return 7;
     }
@@ -476,33 +615,33 @@ NEXT:
         std::vector< std::tuple<s16, s16, u16> > inits;
         for( u8 i = 0; i < ( ( m_battleMode == DOUBLE ) ? 2 : 1 ); ++i ) {
             for( u8 j = 0; j < 2; ++j ) {
-                s16 acSpd = ACPKMN( i, j ).m_stats.m_Spd;
+                s16 acSpd = CUR_PKMN( i, j ).m_stats.m_Spd;
                 s8 movePr = ( ( _battleMoves[ i ][ j ].m_type == battleMove::ATTACK || _battleMoves[ i ][ j ].m_type == battleMove::MEGA_ATTACK ) ?
                               AttackList[ _battleMoves[ i ][ j ].m_value ]->m_movePriority : 0 );
-                if( ACPKMN( i, j ).m_status.m_Paralyzed
-                    && ACPKMN( i, j ).m_boxdata.m_ability != A_QUICK_FEET )
+                if( CUR_PKMN( i, j ).m_status.m_isParalyzed
+                    && CUR_PKMN( i, j ).m_boxdata.m_ability != A_QUICK_FEET )
                     acSpd /= 4;
-                else if( ACPKMN( i, j ).m_statusint && ACPKMN( i, j ).m_boxdata.m_ability == A_QUICK_FEET )
+                else if( CUR_PKMN( i, j ).m_statusint && CUR_PKMN( i, j ).m_boxdata.m_ability == A_QUICK_FEET )
                     acSpd += acSpd / 2;
 
                 if( p_includeMovePriority ) {
                     if( hasTrickRoom )
                         acSpd *= -1;
-                    if( ACPKMN( i, j ).m_boxdata.m_holdItem == I_QUICK_CLAW
+                    if( CUR_PKMN( i, j ).m_boxdata.m_holdItem == I_QUICK_CLAW
                         && ( ( rand( ) % 100 ) < 20 ) ) {
 
-                        std::swprintf( wbuffer, 100, L"%ls%s agiert dank\neiner Flinkklaue zuerst![A]",
-                                       ( ACPKMN( i, j ).m_boxdata.m_name ),
-                                       ( j ? " [OPPONENT]" : "" ) );
-                        log( wbuffer );
+                        std::sprintf( buffer, "%s%s agiert dank\neiner Flinkklaue zuerst![A]",
+                                      ( CUR_PKMN( i, j ).m_boxdata.m_name ),
+                                      ( j ? " [OPPONENT]" : "" ) );
+                        log( buffer );
 
                         acSpd += 2000;
-                    } else if( ACPKMN( i, j ).m_boxdata.m_holdItem == I_LAGGING_TAIL )
+                    } else if( CUR_PKMN( i, j ).m_boxdata.m_holdItem == I_LAGGING_TAIL )
                         acSpd -= 2000;
-                    else if( ACPKMN( i, j ).m_boxdata.m_ability == A_STALL )
+                    else if( CUR_PKMN( i, j ).m_boxdata.m_ability == A_STALL )
                         acSpd -= 2000;
 
-                    if( ACPKMN( i, j ).m_boxdata.m_holdItem == I_FULL_INCENSE )
+                    if( CUR_PKMN( i, j ).m_boxdata.m_holdItem == I_FULL_INCENSE )
                         movePr--;
                 }
 
@@ -551,19 +690,19 @@ NEXT:
     *  @param p_situation: Current situation, on which an ability may be useable
     */
     void battle::doAbility( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation ) {
-        if( !ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
+        if( !CUR_PKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
             return;
 
-        auto ab = ability( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability );
+        auto ab = ability( CUR_PKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability );
 
         if( ab.m_type & p_situation ) {
-            std::swprintf( wbuffer, 50, L"%s von %ls%s wirkt.[A]",
-                           ab.m_abilityName.c_str( ),
-                           ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
-                           ( p_opponent ? "\n[OPPONENT]" : "\n" ) );
+            std::sprintf( buffer, "%s von %s%s wirkt.[A]",
+                          ab.m_abilityName.c_str( ),
+                          ( CUR_PKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                          ( p_opponent ? "\n[OPPONENT]" : "\n" ) );
 
-            log( wbuffer );
-            ab.m_effect.execute( *this, &( ACPKMN( p_pokemonPos, p_opponent ) ) );
+            log( buffer );
+            ab.m_effect.execute( *this, &( CUR_PKMN( p_pokemonPos, p_opponent ) ) );
 
             //for( u8 k = 0; k < 4; ++k ) {
             //    bool isOpp = k % 2,
@@ -582,7 +721,7 @@ NEXT:
     bool battle::canMove( bool p_opponent, u8 p_pokemonPos ) {
         if( m_battleMode != DOUBLE && p_pokemonPos )
             return false;
-        return !ACPKMNSTATCHG( p_pokemonPos, p_opponent )[ ATTACK_BLOCKED ];
+        return !CUR_PKMN_STATCHG( p_pokemonPos, p_opponent )[ ATTACK_BLOCKED ];
     }
 
     /**
@@ -596,9 +735,9 @@ NEXT:
                 for( u8 i = 0; i < 2; ++i )
                     if( canMove( OPPONENT, i ) ) {
                         if( !m_isWildBattle )
-                            _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, ACPKMN( i, OPPONENT ).m_boxdata.m_moves[ 0 ], 0 };
+                            _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, CUR_PKMN( i, OPPONENT ).m_boxdata.m_moves[ 0 ], 0, 0 };
                         else
-                            _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, _wildPokemon.m_pokemon->m_boxdata.m_moves[ 0 ], 0 };
+                            _battleMoves[ i ][ OPPONENT ] = { battleMove::type::ATTACK, _wildPokemon.m_pokemon->m_boxdata.m_moves[ 0 ], 0, 0 };
                     }
                 break;
             }
@@ -609,7 +748,18 @@ NEXT:
      *  @brief Does all of the turn's moves.
      */
     void battle::doMoves( ) {
-        //Mega evolve all PKMN first
+        //Use all Items first
+        for( u8 i = 0; i < 4; ++i ) {
+            bool isOpp = i % 2,
+                isSnd = i / 2;
+
+            if( _battleMoves[ isSnd ][ isOpp ].m_type == battleMove::USE_ITEM )
+                doItem( isOpp, isSnd, ability::GRASS );
+            if( _endBattle )
+                return;
+        }
+
+        //Mega evolve all PKMN second
         for( u8 i = 0; i < 4; ++i ) {
             bool isOpp = i % 2,
                 isSnd = i / 2;
@@ -657,14 +807,14 @@ OUT:
         auto& acMove = _battleMoves[ pokemonPos ][ opponent ];
 
         if( ( !m_isWildBattle || !opponent )
-            && !ACPKMN( pokemonPos, opponent ).m_stats.m_acHP )
+            && !CUR_PKMN( pokemonPos, opponent ).m_stats.m_acHP )
             return;
 
-        std::wstring acPkmnStr = L"";
+        std::string acPkmnStr = "";
         if( opponent )
-            acPkmnStr = L"OPP" + ( pokemonPos + 1 );
+            acPkmnStr = "OPP" + ( pokemonPos + 1 );
         else
-            acPkmnStr = L"OWN" + ( pokemonPos + 1 );
+            acPkmnStr = "OWN" + ( pokemonPos + 1 );
 
         switch( acMove.m_type ) {
             case battleMove::ATTACK:
@@ -733,18 +883,8 @@ OUT:
             case battleMove::SWITCH:
                 battle::switchPKMN( opponent, pokemonPos, acMove.m_value );
                 break;
-            case battleMove::USE_ITEM:
-            {
-                if( opponent ) {
-                    std::swprintf( wbuffer, 100, L"[TRAINER] ([TCLASS]) setzt\n%s ein.[A]", ItemList[ acMove.m_value ]->getDisplayName( true ).c_str( ) );
-                    log( wbuffer );
-                }
-                doItem( opponent, acMove.m_target, ability::abilityType( 0 ) );
-                break;
-            }
             case battleMove::USE_NAV:
-                //TODO
-                break;
+            case battleMove::USE_ITEM:
             default:
                 break;
         }
@@ -777,25 +917,25 @@ OUT:
         auto move = AttackList[ bm.m_value ];
 
         if( move->m_moveHitType == move::STAT ) {
-            //log( L"Move is a STS move[A]" );
+            //log( "Move is a STS move[A]" );
             return ( _acDamage[ p_targetPos ][ p_targetIsOpp ] = 0 );
         }
 
         //Calculate effectivity
-        _effectivity[ p_targetPos ][ p_targetIsOpp ] = getEffectiveness( move->m_moveType, ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 0 ] );
-        if( ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 0 ] != ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 1 ] )
-            _effectivity[ p_targetPos ][ p_targetIsOpp ] *= getEffectiveness( move->m_moveType, ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 1 ] );
-        if( ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 2 ] != ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 1 ] )
-            _effectivity[ p_targetPos ][ p_targetIsOpp ] *= getEffectiveness( move->m_moveType, ACPKMNSTR( p_targetPos, p_targetIsOpp ).m_Types[ 2 ] );
+        _effectivity[ p_targetPos ][ p_targetIsOpp ] = getEffectiveness( move->m_moveType, CUR_PKMN_STR( p_targetPos, p_targetIsOpp ).m_types[ 0 ] );
+        if( CUR_PKMN_STR( p_targetPos, p_targetIsOpp ).m_types[ 0 ] != CUR_PKMN_STR( p_targetPos, p_targetIsOpp ).m_types[ 1 ] )
+            _effectivity[ p_targetPos ][ p_targetIsOpp ] *= getEffectiveness( move->m_moveType, CUR_PKMN_STR( p_targetPos, p_targetIsOpp ).m_types[ 1 ] );
+        if( CUR_PKMN_STR( p_targetPos, p_targetIsOpp ).m_types[ 2 ] != CUR_PKMN_STR( p_targetPos, p_targetIsOpp ).m_types[ 1 ] )
+            _effectivity[ p_targetPos ][ p_targetIsOpp ] *= getEffectiveness( move->m_moveType, CUR_PKMN_STR( p_targetPos, p_targetIsOpp ).m_types[ 2 ] );
 
         //Calculate critical hit
         _critical[ p_targetPos ][ p_targetIsOpp ] = !( rand( ) % mod );
         //STAB
         float STAB = 1.0f;
-        pokemonData pdata; getAll( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_speciesId, pdata );
+        pokemonData pdata; getAll( CUR_PKMN( p_userPos, p_userIsOpp ).m_boxdata.m_speciesId, pdata );
         if( pdata.m_types[ 0 ] == move->m_moveType || pdata.m_types[ 1 ] == move->m_moveType )
             STAB = 1.5f;
-        if( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_ADAPTABILITY )
+        if( CUR_PKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_ADAPTABILITY )
             STAB = 2.0f;
 
         //Weather
@@ -803,28 +943,28 @@ OUT:
 
         bool weatherPossible = true;
         for( u8 a = 0; a < 1 + ( m_battleMode == DOUBLE ); ++a ) for( u8 b = 0; b < 2; ++b )
-            weatherPossible &= ( ACPKMN( a, b ).m_boxdata.m_ability != A_AIR_LOCK
-                                 && ACPKMN( a, b ).m_boxdata.m_ability != A_CLOUD_NINE );
+            weatherPossible &= ( CUR_PKMN( a, b ).m_boxdata.m_ability != A_AIR_LOCK
+                                 && CUR_PKMN( a, b ).m_boxdata.m_ability != A_CLOUD_NINE );
 
         if( weatherPossible ) {
-            if( m_weather == SUN && move->m_moveType == WASSER )
+            if( m_weather == SUN && move->m_moveType == WATER )
                 weather = 0.5f;
-            if( m_weather == HEAVY_SUNSHINE && move->m_moveType == WASSER )
+            if( m_weather == HEAVY_SUNSHINE && move->m_moveType == WATER )
                 weather = 0.0f;
 
-            if( m_weather == SUN && move->m_moveType == FEUER )
+            if( m_weather == SUN && move->m_moveType == FIRE )
                 weather = 1.5f;
-            if( m_weather == HEAVY_SUNSHINE && move->m_moveType == FEUER )
+            if( m_weather == HEAVY_SUNSHINE && move->m_moveType == FIRE )
                 weather = 1.5f;
 
-            if( m_weather == RAIN && move->m_moveType == FEUER )
+            if( m_weather == RAIN && move->m_moveType == FIRE )
                 weather = 0.5f;
-            if( m_weather == HEAVY_RAIN && move->m_moveType == FEUER )
+            if( m_weather == HEAVY_RAIN && move->m_moveType == FIRE )
                 weather = 0.0f;
 
-            if( m_weather == RAIN && move->m_moveType == WASSER )
+            if( m_weather == RAIN && move->m_moveType == WATER )
                 weather = 1.5f;
-            if( m_weather == HEAVY_RAIN && move->m_moveType == WASSER )
+            if( m_weather == HEAVY_RAIN && move->m_moveType == WATER )
                 weather = 1.5f;
         }
 
@@ -844,76 +984,76 @@ OUT:
         if( bm.m_value == M_SECRET_SWORD )
             moveDefHitType = move::PHYS;
 
-        float atk = ( ( moveAtkHitType == move::PHYS ) ? ACPKMN( p_userPos, p_userIsOpp ).m_stats.m_Atk : ACPKMN( p_userPos, p_userIsOpp ).m_stats.m_SAtk );
-        float def = ( ( moveDefHitType == move::PHYS ) ? ACPKMN( p_targetPos, p_targetIsOpp ).m_stats.m_Def : ACPKMN( p_targetPos, p_targetIsOpp ).m_stats.m_SDef );
+        float atk = ( ( moveAtkHitType == move::PHYS ) ? CUR_PKMN( p_userPos, p_userIsOpp ).m_stats.m_Atk : CUR_PKMN( p_userPos, p_userIsOpp ).m_stats.m_SAtk );
+        float def = ( ( moveDefHitType == move::PHYS ) ? CUR_PKMN( p_targetPos, p_targetIsOpp ).m_stats.m_Def : CUR_PKMN( p_targetPos, p_targetIsOpp ).m_stats.m_SDef );
 
         //Burn and other status stuff
-        if( ACPKMN( p_userPos, p_userIsOpp ).m_status.m_Burned &&
-            ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability != A_GUTS &&
+        if( CUR_PKMN( p_userPos, p_userIsOpp ).m_status.m_isBurned &&
+            CUR_PKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability != A_GUTS &&
             moveAtkHitType == move::PHYS ) {
             atk /= 2;
-        } else if( ACPKMN( p_userPos, p_userIsOpp ).m_statusint &&
-                   ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_GUTS &&
+        } else if( CUR_PKMN( p_userPos, p_userIsOpp ).m_statusint &&
+                   CUR_PKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_GUTS &&
                    moveAtkHitType == move::PHYS ) {
             atk *= 1.5;
-        } else if( ACPKMN( p_userPos, p_userIsOpp ).m_status.m_Poisoned &&
-                   ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_TOXIC_BOOST &&
+        } else if( CUR_PKMN( p_userPos, p_userIsOpp ).m_status.m_isPoisoned &&
+                   CUR_PKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_TOXIC_BOOST &&
                    moveAtkHitType == move::PHYS ) {
             atk *= 1.5;
-        } else if( ACPKMN( p_userPos, p_userIsOpp ).m_status.m_Poisoned &&
-                   ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_FLARE_BOOST &&
+        } else if( CUR_PKMN( p_userPos, p_userIsOpp ).m_status.m_isPoisoned &&
+                   CUR_PKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability == A_FLARE_BOOST &&
                    moveAtkHitType == move::SPEC ) {
             atk *= 1.5;
         }
 
-        if( ACPKMN( p_targetPos, p_targetIsOpp ).m_statusint &&
-            ACPKMN( p_targetPos, p_targetIsOpp ).m_boxdata.m_ability == A_MARVEL_SCALE &&
+        if( CUR_PKMN( p_targetPos, p_targetIsOpp ).m_statusint &&
+            CUR_PKMN( p_targetPos, p_targetIsOpp ).m_boxdata.m_ability == A_MARVEL_SCALE &&
             moveDefHitType == move::PHYS ) {
             def *= 1.5;
         }
 
         //Stat changes
-        if( ACPKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability != A_UNAWARE
+        if( CUR_PKMN( p_userPos, p_userIsOpp ).m_boxdata.m_ability != A_UNAWARE
             && bm.m_value != M_FOUL_PLAY ) {
             if( moveAtkHitType == move::PHYS ) {
-                if( ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ ATK ] > 0 )
-                    atk = atk * ( 2 + ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ ATK ] ) / 2.0;
-                if( ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ ATK ] < 0 )
-                    atk = atk  * 2.0 / ( 2 - ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ ATK ] );
+                if( CUR_PKMN_STATCHG( p_userPos, p_userIsOpp )[ ATK ] > 0 )
+                    atk = atk * ( 2 + CUR_PKMN_STATCHG( p_userPos, p_userIsOpp )[ ATK ] ) / 2.0;
+                if( CUR_PKMN_STATCHG( p_userPos, p_userIsOpp )[ ATK ] < 0 )
+                    atk = atk  * 2.0 / ( 2 - CUR_PKMN_STATCHG( p_userPos, p_userIsOpp )[ ATK ] );
             }
             if( moveAtkHitType == move::SPEC ) {
-                if( ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ SATK ] > 0 )
-                    atk = atk * ( 2 + ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ SATK ] ) / 2.0;
-                if( ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ SATK ] < 0 )
-                    atk = atk  * 2.0 / ( 2 - ACPKMNSTATCHG( p_userPos, p_userIsOpp )[ SATK ] );
+                if( CUR_PKMN_STATCHG( p_userPos, p_userIsOpp )[ SATK ] > 0 )
+                    atk = atk * ( 2 + CUR_PKMN_STATCHG( p_userPos, p_userIsOpp )[ SATK ] ) / 2.0;
+                if( CUR_PKMN_STATCHG( p_userPos, p_userIsOpp )[ SATK ] < 0 )
+                    atk = atk  * 2.0 / ( 2 - CUR_PKMN_STATCHG( p_userPos, p_userIsOpp )[ SATK ] );
             }
         }
         if( bm.m_value == M_FOUL_PLAY ) {
-            atk = ACPKMN( p_targetPos, p_targetIsOpp ).m_stats.m_Atk;
+            atk = CUR_PKMN( p_targetPos, p_targetIsOpp ).m_stats.m_Atk;
 
-            if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ ATK ] > 0 )
-                atk = atk * ( 2 + ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ ATK ] ) / 2.0;
-            if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ ATK ] < 0 )
-                atk = atk  * 2.0 / ( 2 - ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ ATK ] );
+            if( CUR_PKMN_STATCHG( p_targetPos, p_targetIsOpp )[ ATK ] > 0 )
+                atk = atk * ( 2 + CUR_PKMN_STATCHG( p_targetPos, p_targetIsOpp )[ ATK ] ) / 2.0;
+            if( CUR_PKMN_STATCHG( p_targetPos, p_targetIsOpp )[ ATK ] < 0 )
+                atk = atk  * 2.0 / ( 2 - CUR_PKMN_STATCHG( p_targetPos, p_targetIsOpp )[ ATK ] );
         }
 
-        if( ACPKMN( p_targetPos, p_targetIsOpp ).m_boxdata.m_ability != A_UNAWARE
+        if( CUR_PKMN( p_targetPos, p_targetIsOpp ).m_boxdata.m_ability != A_UNAWARE
             && bm.m_value != M_CHIP_AWAY ) {
             if( moveDefHitType == move::PHYS ) {
-                if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ DEF ] > 0 )
-                    def = def * ( 2 + ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ DEF ] ) / 2.0;
-                if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ DEF ] < 0 )
-                    def = def  * 2.0 / ( 2 - ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ DEF ] );
+                if( CUR_PKMN_STATCHG( p_targetPos, p_targetIsOpp )[ DEF ] > 0 )
+                    def = def * ( 2 + CUR_PKMN_STATCHG( p_targetPos, p_targetIsOpp )[ DEF ] ) / 2.0;
+                if( CUR_PKMN_STATCHG( p_targetPos, p_targetIsOpp )[ DEF ] < 0 )
+                    def = def  * 2.0 / ( 2 - CUR_PKMN_STATCHG( p_targetPos, p_targetIsOpp )[ DEF ] );
             }
             if( moveDefHitType == move::SPEC ) {
-                if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ SDEF ] > 0 )
-                    def = def * ( 2 + ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ SDEF ] ) / 2.0;
-                if( ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ SDEF ] < 0 )
-                    def = def  * 2.0 / ( 2 - ACPKMNSTATCHG( p_targetPos, p_targetIsOpp )[ SDEF ] );
+                if( CUR_PKMN_STATCHG( p_targetPos, p_targetIsOpp )[ SDEF ] > 0 )
+                    def = def * ( 2 + CUR_PKMN_STATCHG( p_targetPos, p_targetIsOpp )[ SDEF ] ) / 2.0;
+                if( CUR_PKMN_STATCHG( p_targetPos, p_targetIsOpp )[ SDEF ] < 0 )
+                    def = def  * 2.0 / ( 2 - CUR_PKMN_STATCHG( p_targetPos, p_targetIsOpp )[ SDEF ] );
             }
         }
 
-        _acDamage[ p_targetPos ][ p_targetIsOpp ] = s16( ( ( 2.0f * ACPKMN( p_userPos, p_userIsOpp ).m_Level + 10.0f ) / 250.0f )
+        _acDamage[ p_targetPos ][ p_targetIsOpp ] = s16( ( ( 2.0f * CUR_PKMN( p_userPos, p_userIsOpp ).m_level + 10.0f ) / 250.0f )
                                                          * ( atk / def ) * s16( move->m_moveBasePower ) + 2 );
 
         float modifier = _effectivity[ p_targetPos ][ p_targetIsOpp ] * ( _critical[ p_targetPos ][ p_targetIsOpp ] ? 1.5f : 1.0f )
@@ -947,24 +1087,154 @@ NEXT:
     *  @param p_situation: Current situation, on which an item may be useable
     */
     void battle::doItem( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation ) {
-        if( !ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
-            return;
+        if( p_situation != ability::GRASS ) {
+            if( !CUR_PKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
+                return;
 
-        auto im = *ItemList[ ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability ];
+            auto im = *ItemList[ CUR_PKMN( p_pokemonPos, p_opponent ).getItem( ) ];
 
-        if( ( im.getEffectType( ) & item::itemEffectType::IN_BATTLE ) && ( im.m_inBattleEffect & p_situation ) ) {
-            std::swprintf( wbuffer, 50, L"%s von %ls%s wirkt.[A]",
-                           im.getDisplayName( ).c_str( ),
-                           ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
-                           ( p_opponent ? "\n[OPPONENT]" : "\n" ) );
+            if( ( im.getEffectType( ) & item::itemEffectType::IN_BATTLE ) && ( im.m_inBattleEffect & p_situation ) ) {
+                std::sprintf( buffer, "%s von %s%s wirkt.[A]",
+                              im.getDisplayName( ).c_str( ),
+                              ( CUR_PKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                              ( p_opponent ? "\n[OPPONENT]" : "\n" ) );
 
-            log( wbuffer );
-            im.m_inBattleScript.execute( *this, &( ACPKMN( p_pokemonPos, p_opponent ) ) );
-            for( u8 k = 0; k < 4; ++k ) {
-                bool isOpp = k % 2,
-                    isSnd = k / 2;
-                _battleUI->updateHP( isOpp, isSnd );
-                _battleUI->updateStats( isOpp, isSnd );
+                log( buffer );
+                u16 oldHP[ 4 ] = { 0 }; for( u8 k = 0; k < 4; ++k ) {
+                    bool isOpp = k % 2,
+                        isSnd = k / 2;
+                    oldHP[ k ] = CUR_PKMN( isSnd, isOpp ).m_stats.m_acHP;
+                }
+                im.m_inBattleScript.execute( *this, &( CUR_PKMN( p_pokemonPos, p_opponent ) ) );
+                for( u8 k = 0; k < 4; ++k ) {
+                    bool isOpp = k % 2,
+                        isSnd = k / 2;
+                    _battleUI->updateHP( isOpp, isSnd, oldHP[ k ] );
+                    _battleUI->updateStats( isOpp, isSnd );
+                }
+            }
+        } else {
+            auto im = ItemList[ _battleMoves[ p_pokemonPos ][ p_opponent ].m_value ];
+            if( p_opponent ) {
+                std::sprintf( buffer, "[TRAINER] ([TCLASS]) setzt\n%s ein.[A]",
+                              im->getDisplayName( true ).c_str( ) );
+                log( buffer );
+
+                u16 oldHP = CUR_PKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP;
+                u16 oldHPmax = CUR_PKMN( p_pokemonPos, p_opponent ).m_stats.m_maxHP;
+
+                if( im->m_itemType != item::MEDICINE || im->needsInformation( 0 )
+                    || im->needsInformation( 1 ) || !im->use( CUR_PKMN( p_pokemonPos, p_opponent ) ) )
+                    log( "Es hat keine Wirkung…[A]" );
+                else {
+                    if( CUR_PKMN( p_pokemonPos, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                        CUR_PKMN_STS( p_pokemonPos, PLAYER ) = NA;
+                    else if( CUR_PKMN( p_pokemonPos, PLAYER ).m_stats.m_acHP == 0 )
+                        CUR_PKMN_STS( p_pokemonPos, PLAYER ) = KO;
+                    else if( CUR_PKMN( p_pokemonPos, PLAYER ).m_statusint )
+                        CUR_PKMN_STS( p_pokemonPos, PLAYER ) = STS;
+                    else
+                        CUR_PKMN_STS( p_pokemonPos, PLAYER ) = OK;
+                }
+
+                for( u8 i = 0; i < _opponent->m_itemCount; ++i )
+                    if( _opponent->m_items[ i ].first == _battleMoves[ p_pokemonPos ][ p_opponent ].m_value )
+                        _opponent->m_items[ i ].second = (u16) std::max( 0, _opponent->m_items[ i ].second - 1 );
+                _battleUI->updateHP( p_opponent, p_pokemonPos, oldHP, oldHPmax );
+                _battleUI->updateStats( p_opponent, p_pokemonPos );
+            } else {
+                if( im->m_itemType != item::POKE_BALLS ) {
+                    std::sprintf( buffer, "%s eingesetzt.[A]",
+                                  im->getDisplayName( true ).c_str( ) );
+                    log( buffer );
+                }
+
+                if( !_player->m_items && _player->m_itemCount == MAX_ITEMS_IN_BAG ) {
+                    FS::SAV->m_bag.erase( BAG::toBagType( im->m_itemType ), _battleMoves[ p_pokemonPos ][ p_opponent ].m_value, 1 );
+                } else
+                    for( u8 i = 0; i < _player->m_itemCount; ++i )
+                        if( _player->m_items[ i ].first == _battleMoves[ p_pokemonPos ][ p_opponent ].m_value )
+                            _player->m_items[ i ].second = (u16) std::max( 0, _player->m_items[ i ].second - 1 );
+
+                if( im->m_itemType == item::MEDICINE ) {
+                    u8 pos = 0;
+                    while( _battleMoves[ p_pokemonPos ][ p_opponent ].m_target ) {
+                        ++pos;
+                        _battleMoves[ p_pokemonPos ][ p_opponent ].m_target >>= 1;
+                    }
+                    --pos;
+                    if( _battleMoves[ p_pokemonPos ][ p_opponent ].m_newItemEffect )
+                        im->m_itemData.m_itemEffect = _battleMoves[ p_pokemonPos ][ p_opponent ].m_newItemEffect;
+
+                    u16 oldHP = CUR_PKMN( pos, p_opponent ).m_stats.m_acHP;
+                    u16 oldHPmax = CUR_PKMN( pos, p_opponent ).m_stats.m_maxHP;
+                    if( !im->use( CUR_PKMN( pos, p_opponent ) ) )
+                        log( "Es hat keine Wirkung…[A]" );
+                    else {
+                        if( CUR_PKMN( pos, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                            CUR_PKMN_STS( pos, PLAYER ) = NA;
+                        else if( CUR_PKMN( pos, PLAYER ).m_stats.m_acHP == 0 )
+                            CUR_PKMN_STS( pos, PLAYER ) = KO;
+                        else if( CUR_PKMN( pos, PLAYER ).m_statusint )
+                            CUR_PKMN_STS( pos, PLAYER ) = STS;
+                        else
+                            CUR_PKMN_STS( pos, PLAYER ) = OK;
+                    }
+
+                    if( pos <= 1 )
+                        _battleUI->updateHP( p_opponent, pos, oldHP, oldHPmax );
+                    _battleUI->updateStats( p_opponent, pos );
+                } else if( im->m_itemType == item::POKE_BALLS ) {
+                    if( !m_isWildBattle ) {
+                        _battleUI->capture( _battleMoves[ p_pokemonPos ][ p_opponent ].m_value, -1 );
+                    } else if( tryCapture( _battleMoves[ p_pokemonPos ][ p_opponent ].m_value ) ) {
+                        _wildPokemon.m_pokemon->m_boxdata.m_ball = _battleMoves[ p_pokemonPos ][ p_opponent ].m_value;
+                        _endBattle = true;
+                        handleCapture( );
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @brief Handles the capture of the wild Pokémon
+     */
+    void battle::handleCapture( ) {
+        u16 spid = _wildPokemon.m_pokemon->m_boxdata.m_speciesId;
+        if( !( FS::SAV->m_inDex[ spid / 8 ] & ( 1 << ( spid % 8 ) ) ) ) {
+            FS::SAV->m_inDex[ spid / 8 ] |= ( 1 << ( spid % 8 ) );
+            sprintf( buffer, "Die Daten von %s\nwurden im PokéDex gespeichert.[A]",
+                     _wildPokemon.m_pokemon->m_boxdata.m_name );
+            log( buffer );
+
+            DEX::dex( -1, 0 ).run( _wildPokemon.m_pokemon->m_boxdata.m_speciesId );
+        }
+        _battleUI->handleCapture( );
+
+        //Check whether the pkmn fits in the team
+        if( _player->m_pkmnTeam.size( ) < 6 )
+            _player->m_pkmnTeam.push_back( *_wildPokemon.m_pokemon );
+        else {
+            u8 oldbx = FS::SAV->m_curBox;
+            u8 nb = FS::SAV->storePkmn( *_wildPokemon.m_pokemon );
+            if( nb != u8( -1 ) ) {
+                sprintf( buffer, "%s wurde an das\nPokémon-Lagerungssystem\ngeschickt.[A]",
+                         _wildPokemon.m_pokemon->m_boxdata.m_name );
+                log( buffer );
+
+                if( oldbx != nb ) {
+                    sprintf( buffer, "Box %hhu ist voll.", oldbx );
+                    log( buffer );
+                }
+                sprintf( buffer, "%s wurde in\nBox %hhu abgelegt.[A]",
+                         _wildPokemon.m_pokemon->m_boxdata.m_name, nb );
+                log( buffer );
+            } else {
+                log( "Du hast keinen Platz\nfür weitere Pokémon.[A]" );
+                sprintf( buffer, "%s wurde wieder\nfreigelassen.[A]",
+                         _wildPokemon.m_pokemon->m_boxdata.m_name );
+                log( buffer );
             }
         }
     }
@@ -977,9 +1247,9 @@ NEXT:
         if( p_pokemonPos && m_battleMode != DOUBLE )
             return;
 
-        auto acpkmn = &ACPKMN( p_pokemonPos, p_opponent );
-        auto sts = ACPKMNSTS( p_pokemonPos, p_opponent );
-        auto statchng = ACPKMNSTATCHG( p_pokemonPos, p_opponent );
+        auto acpkmn = &CUR_PKMN( p_pokemonPos, p_opponent );
+        auto sts = CUR_PKMN_STS( p_pokemonPos, p_opponent );
+        auto statchng = CUR_PKMN_STATCHG( p_pokemonPos, p_opponent );
 
         //Check if the user has already fainted
         if( !acpkmn->m_stats.m_acHP || sts == KO )
@@ -991,58 +1261,58 @@ NEXT:
         auto acMove = AttackList[ bm.m_value ];
 
         //Check if the user is frozen/asleep/paralyzed
-        if( acpkmn->m_status.m_Frozen ) {
+        if( acpkmn->m_status.m_isFrozen ) {
             if( ( rand( ) % 100 ) < 20 ) { //PKMN thaws
-                std::swprintf( wbuffer, 100, L"%ls%s ist aufgetaut![A]",
-                               ( acpkmn->m_boxdata.m_name ),
-                               ( p_opponent ? " [OPPONENT]" : "" ) );
-                log( wbuffer );
-                acpkmn->m_status.m_Frozen = false;
+                std::sprintf( buffer, "%s%s ist aufgetaut![A]",
+                              ( acpkmn->m_boxdata.m_name ),
+                              ( p_opponent ? " [OPPONENT]" : "" ) );
+                log( buffer );
+                acpkmn->m_status.m_isFrozen = false;
             } else {
-                std::swprintf( wbuffer, 100, L"%ls%s ist gefroren.[A]",
-                               ( acpkmn->m_boxdata.m_name ),
-                               ( p_opponent ? " [OPPONENT]" : "" ) );
-                log( wbuffer );
+                std::sprintf( buffer, "%s%s ist gefroren.[A]",
+                              ( acpkmn->m_boxdata.m_name ),
+                              ( p_opponent ? " [OPPONENT]" : "" ) );
+                log( buffer );
                 _battleUI->showStatus( p_opponent, p_pokemonPos );
                 return;
             }
         }
-        if( acpkmn->m_status.m_Paralyzed ) {
+        if( acpkmn->m_status.m_isParalyzed ) {
             if( ( rand( ) % 100 ) < 25 ) {
-                std::swprintf( wbuffer, 100, L"%ls%s ist paralysiert.[A]",
-                               ( acpkmn->m_boxdata.m_name ),
-                               ( p_opponent ? " [OPPONENT]" : "" ) );
-                log( wbuffer );
+                std::sprintf( buffer, "%s%s ist paralysiert.[A]",
+                              ( acpkmn->m_boxdata.m_name ),
+                              ( p_opponent ? " [OPPONENT]" : "" ) );
+                log( buffer );
                 _battleUI->showStatus( p_opponent, p_pokemonPos );
                 return;
             }
         }
-        if( acpkmn->m_status.m_Asleep ) {
-            if( --acpkmn->m_status.m_Asleep ) {
-                std::swprintf( wbuffer, 100, L"%ls%s bleibt schlafen.[A]",
-                               ( acpkmn->m_boxdata.m_name ),
-                               ( p_opponent ? " [OPPONENT]" : "" ) );
-                log( wbuffer );
+        if( acpkmn->m_status.m_isAsleep ) {
+            if( --acpkmn->m_status.m_isAsleep ) {
+                std::sprintf( buffer, "%s%s bleibt schlafen.[A]",
+                              ( acpkmn->m_boxdata.m_name ),
+                              ( p_opponent ? " [OPPONENT]" : "" ) );
+                log( buffer );
                 //Check if the move can be used while the PKMN is asleep
                 if( !( acMove->m_moveFlags & move::WHILE_ASLEEP ) ) {
                     _battleUI->showStatus( p_opponent, p_pokemonPos );
                     return;
                 }
             } else {
-                std::swprintf( wbuffer, 100, L"%ls%s ist aufgewacht![A]",
-                               ( acpkmn->m_boxdata.m_name ),
-                               ( p_opponent ? " [OPPONENT]" : "" ) );
-                log( wbuffer );
+                std::sprintf( buffer, "%s%s ist aufgewacht![A]",
+                              ( acpkmn->m_boxdata.m_name ),
+                              ( p_opponent ? " [OPPONENT]" : "" ) );
+                log( buffer );
             }
         }
         _battleUI->updateStatus( p_opponent, p_pokemonPos );
 
 
-        std::swprintf( wbuffer, 100, L"%ls%s setzt\n%s ein.[A]",
-                       ( acpkmn->m_boxdata.m_name ),
-                       ( p_opponent ? " [OPPONENT]" : "" ),
-                       acMove->m_moveName.c_str( ) );
-        log( wbuffer );
+        std::sprintf( buffer, "%s%s setzt\n%s ein.[A]",
+                      ( acpkmn->m_boxdata.m_name ),
+                      ( p_opponent ? " [OPPONENT]" : "" ),
+                      acMove->m_moveName.c_str( ) );
+        log( buffer );
 
         _lstMove = bm.m_value;
         if( p_opponent )
@@ -1057,21 +1327,21 @@ NEXT:
         if( m_battleMode == DOUBLE ) {
             if( p_opponent ) {
                 if( ( bm.m_target & ( 1 << 0 ) )
-                    && ACPKMNSTS( 0, PLAYER ) == KO
-                    && ACPKMNSTS( 1, PLAYER ) != KO )
+                    && CUR_PKMN_STS( 0, PLAYER ) == KO
+                    && CUR_PKMN_STS( 1, PLAYER ) != KO )
                     bm.m_target |= ( 1 << 1 );
                 else if( ( bm.m_target & ( 1 << 1 ) )
-                         && ACPKMNSTS( 1, PLAYER ) == KO
-                         && ACPKMNSTS( 0, PLAYER ) != KO )
+                         && CUR_PKMN_STS( 1, PLAYER ) == KO
+                         && CUR_PKMN_STS( 0, PLAYER ) != KO )
                     bm.m_target |= ( 1 << 0 );
             } else {
                 if( ( bm.m_target & ( 1 << 2 ) )
-                    && ACPKMNSTS( 0, OPPONENT ) == KO
-                    && ACPKMNSTS( 1, OPPONENT ) != KO )
+                    && CUR_PKMN_STS( 0, OPPONENT ) == KO
+                    && CUR_PKMN_STS( 1, OPPONENT ) != KO )
                     bm.m_target |= ( 1 << 3 );
                 else if( ( bm.m_target & ( 1 << 3 ) )
-                         && ACPKMNSTS( 1, OPPONENT ) == KO
-                         && ACPKMNSTS( 0, OPPONENT ) != KO )
+                         && CUR_PKMN_STS( 1, OPPONENT ) == KO
+                         && CUR_PKMN_STS( 0, OPPONENT ) != KO )
                     bm.m_target |= ( 1 << 2 );
             }
         }
@@ -1105,34 +1375,34 @@ NEXT:
                 continue;
 
 
-            auto oppstatchng = ACPKMNSTATCHG( isSnd, isOpp );
+            auto oppstatchng = CUR_PKMN_STATCHG( isSnd, isOpp );
             if( oppstatchng[ EVASION ] > 0 )
                 moveAccuracy *= 2.0 / ( 2 + oppstatchng[ EVASION ] );
             else if( oppstatchng[ EVASION ] < 0 )
                 moveAccuracy *= ( 2 - oppstatchng[ EVASION ] ) / 2.0;
 
             //Check if the target is protected and if the move is affected by Protect
-            auto str = ACPKMNSTR( isSnd, isOpp );
+            auto str = CUR_PKMN_STR( isSnd, isOpp );
             if( str.m_battleStatus == battleStatus::PROTECTED
                 && ( acMove->m_moveFlags & move::PROTECT ) ) {
                 bm.m_target &= ~( 1 << k );
-                std::swprintf( wbuffer, 100, L"%ls%s bleibt unbeeindruckt.[A]",
-                               ( str.m_pokemon->m_boxdata.m_name ),
-                               ( p_opponent ? " [OPPONENT]" : "" ) );
-                log( wbuffer );
+                std::sprintf( buffer, "%s%s bleibt unbeeindruckt.[A]",
+                              ( str.m_pokemon->m_boxdata.m_name ),
+                              ( p_opponent ? " [OPPONENT]" : "" ) );
+                log( buffer );
                 moveHasTarget = true;
             }
             //Check if the move fails
             else if( moveAccuracy && ( s8( rand( ) % 100 ) < s8( 100 - moveAccuracy ) )
                      && acpkmn->m_boxdata.m_ability != A_NO_GUARD ) {
                 bm.m_target &= ~( 1 << k );
-                std::swprintf( wbuffer, 100, L"%ls%s wich aus.[A]",
-                               ( str.m_pokemon->m_boxdata.m_name ),
-                               ( p_opponent ? " [OPPONENT]" : "" ) );
-                log( wbuffer );
+                std::sprintf( buffer, "%s%s wich aus.[A]",
+                              ( str.m_pokemon->m_boxdata.m_name ),
+                              ( p_opponent ? " [OPPONENT]" : "" ) );
+                log( buffer );
                 moveHasTarget = true;
             }
-            //If the target is already ko, then it shouldn't be a target at all...
+            //If the target is already ko, then it shouldn't be a target at all…
             else if( !str.m_pokemon->m_stats.m_acHP ) {
                 bm.m_target &= ~( 1 << k );
             }
@@ -1145,12 +1415,12 @@ NEXT:
 
         //Attack animation
         _battleUI->showAttack( p_opponent, p_pokemonPos );
-    
+
         //Damage and stuff
         for( u8 k = 0; k < 4; ++k ) {
             bool isOpp = k / 2,
                 isSnd = k % 2;
-            auto str = ACPKMNSTR( isSnd, isOpp );
+            auto str = CUR_PKMN_STR( isSnd, isOpp );
 
             if( !( bm.m_target & ( 1 << k ) ) ) {
                 continue;
@@ -1172,27 +1442,28 @@ NEXT:
             doItem( isOpp, isSnd, ability::ATTACK );
             doAbility( isOpp, isSnd, ability::ATTACK );
 
+            u16 oldHP = str.m_pokemon->m_stats.m_acHP;
             str.m_pokemon->m_stats.m_acHP = (u16) std::max( s16( 0 ),
                                                             std::min( s16( str.m_pokemon->m_stats.m_acHP - _acDamage[ isSnd ][ isOpp ] ),
                                                                       (s16) str.m_pokemon->m_stats.m_maxHP ) );
 
-            _battleUI->updateHP( isOpp, isSnd );
+            _battleUI->updateHP( isOpp, isSnd, oldHP );
             if( acMove->m_moveHitType != move::STAT ) {
                 if( _critical[ isSnd ][ isOpp ] )
-                    log( L"[COLR:15:15:00]Ein Volltreffer![A][CLEAR][COLR:00:00:00]" );
+                    log( "[COLR:15:15:00]Ein Volltreffer![A][CLEAR][COLR:00:00:00]" );
                 if( _effectivity[ isSnd ][ isOpp ] != 1.0f ) {
                     float effectivity = _effectivity[ isSnd ][ isOpp ];
                     if( effectivity > 3.0f )
-                        std::swprintf( wbuffer, 100, L"[COLR:00:31:00]Das ist enorm effektiv\ngegen %ls![A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
+                        std::sprintf( buffer, "[COLR:00:31:00]Das ist enorm effektiv\ngegen %s![A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
                     else if( effectivity > 1.0f )
-                        std::swprintf( wbuffer, 100, L"[COLR:00:15:00]Das ist sehr effektiv\ngegen %ls![A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
+                        std::sprintf( buffer, "[COLR:00:15:00]Das ist sehr effektiv\ngegen %s![A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
                     else if( effectivity == 0.0f )
-                        std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Hat die Attacke\n%ls getroffen?[A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
+                        std::sprintf( buffer, "[COLR:31:00:00]Hat die Attacke\n%s getroffen?[A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
                     else if( effectivity < 0.3f )
-                        std::swprintf( wbuffer, 100, L"[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %ls...[A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
+                        std::sprintf( buffer, "[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %s…[A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
                     else if( effectivity < 1.0f )
-                        std::swprintf( wbuffer, 100, L"[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %ls.[A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
-                    log( wbuffer );
+                        std::sprintf( buffer, "[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %s.[A][CLEAR][COLR:00:00:00]", str.m_pokemon->m_boxdata.m_name );
+                    log( buffer );
                 }
             }
             //Check if PKMN fainted
@@ -1218,52 +1489,64 @@ NEXT:
                 handleFaint( j / 2, j % 2 );
         }
         if( !moveHasTarget ) {
-            log( L"Es schlug fehl...[A]" );
+            log( "Es schlug fehl…[A]" );
         }
         return;
+    }
+
+    void battle::storePkmnSts( bool p_opponent, u8 p_pokemonPos ) {
+        _storedHP[ p_opponent ][ p_pokemonPos ] = CUR_PKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP;
+    }
+
+    void battle::updatePkmnSts( bool p_opponent, u8 p_pokemonPos ) {
+        if( _storedHP[ p_opponent ][ p_pokemonPos ] != CUR_PKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP )
+            _battleUI->updateHP( p_opponent, p_pokemonPos, _storedHP[ p_opponent ][ p_pokemonPos ] );
     }
 
     /**
     *  @brief Handles special condition damage between turns
     */
     void battle::handleSpecialConditions( bool p_opponent, u8 p_pokemonPos ) {
-        auto acpkmn = &ACPKMN( p_pokemonPos, p_opponent );
+        auto acpkmn = &CUR_PKMN( p_pokemonPos, p_opponent );
 
-        if( acpkmn->m_status.m_Burned ) {
-            std::swprintf( wbuffer, 100, L"Die Verbrennung schadet\n%ls%s.[A]",
-                           ( acpkmn->m_boxdata.m_name ),
-                           ( p_opponent ? " [OPPONENT]" : "" ) );
-            log( wbuffer );
+        if( acpkmn->m_status.m_isBurned ) {
+            std::sprintf( buffer, "Die Verbrennung schadet\n%s%s.[A]",
+                          ( acpkmn->m_boxdata.m_name ),
+                          ( p_opponent ? " [OPPONENT]" : "" ) );
+            log( buffer );
 
+            u16 oldHP = acpkmn->m_stats.m_acHP;
             acpkmn->m_stats.m_acHP
                 = std::max( u16( 0 ), u16( acpkmn->m_stats.m_acHP - 1.0 / ( 8 * acpkmn->m_stats.m_maxHP ) ) );
 
-            _battleUI->updateHP( p_opponent, p_pokemonPos );
+            _battleUI->updateHP( p_opponent, p_pokemonPos, oldHP );
         }
-        if( acpkmn->m_status.m_Poisoned && acpkmn->m_boxdata.m_ability != A_POISON_HEAL ) {
-            std::swprintf( wbuffer, 100, L"Die Vergiftung schadet\n%ls%s.[A]",
-                           ( acpkmn->m_boxdata.m_name ),
-                           ( p_opponent ? " [OPPONENT]" : "" ) );
-            log( wbuffer );
+        if( acpkmn->m_status.m_isPoisoned && acpkmn->m_boxdata.m_ability != A_POISON_HEAL ) {
+            std::sprintf( buffer, "Die Vergiftung schadet\n%s%s.[A]",
+                          ( acpkmn->m_boxdata.m_name ),
+                          ( p_opponent ? " [OPPONENT]" : "" ) );
+            log( buffer );
 
+            u16 oldHP = acpkmn->m_stats.m_acHP;
             acpkmn->m_stats.m_acHP
                 = std::max( u16( 0 ), u16( acpkmn->m_stats.m_acHP - 1.0 / ( 8 * acpkmn->m_stats.m_maxHP ) ) );
 
-            _battleUI->updateHP( p_opponent, p_pokemonPos );
+            _battleUI->updateHP( p_opponent, p_pokemonPos, oldHP );
         }
-        if( acpkmn->m_status.m_Toxic && acpkmn->m_boxdata.m_ability != A_POISON_HEAL ) {
-            std::swprintf( wbuffer, 100, L"Die Vergiftung schadet\n%ls%s.[A]",
-                           ( acpkmn->m_boxdata.m_name ),
-                           ( p_opponent ? " [OPPONENT]" : "" ) );
-            log( wbuffer );
+        if( acpkmn->m_status.m_isBadlyPoisoned && acpkmn->m_boxdata.m_ability != A_POISON_HEAL ) {
+            std::sprintf( buffer, "Die Vergiftung schadet\n%s%s.[A]",
+                          ( acpkmn->m_boxdata.m_name ),
+                          ( p_opponent ? " [OPPONENT]" : "" ) );
+            log( buffer );
 
-            auto str = ACPKMNSTR( p_pokemonPos, p_opponent );
+            auto str = CUR_PKMN_STR( p_pokemonPos, p_opponent );
 
+            u16 oldHP = acpkmn->m_stats.m_acHP;
             acpkmn->m_stats.m_acHP
                 = std::max( u16( 0 ), u16( acpkmn->m_stats.m_acHP
                                            - ( ++str.m_toxicCount ) / ( 16.0 * acpkmn->m_stats.m_maxHP ) ) );
 
-            _battleUI->updateHP( p_opponent, p_pokemonPos );
+            _battleUI->updateHP( p_opponent, p_pokemonPos, oldHP );
         }
     }
 
@@ -1273,9 +1556,9 @@ NEXT:
         if( m_isWildBattle && p_opponent ) {
             if( !_wildPokemon.m_pokemon->m_stats.m_acHP && _wildPokemon.m_acStatus != KO ) {
                 if( p_show ) {
-                    std::swprintf( wbuffer, 100, L"%ls [OPPONENT] wurde besiegt.[A]",
-                                   _wildPokemon.m_pokemon->m_boxdata.m_name );
-                    log( wbuffer );
+                    std::sprintf( buffer, "%s [OPPONENT] wurde besiegt.[A]",
+                                  _wildPokemon.m_pokemon->m_boxdata.m_name );
+                    log( buffer );
                 }
                 _wildPokemon.m_acStatus = KO;
                 _battleUI->hidePKMN( p_opponent, p_pokemonPos );
@@ -1284,14 +1567,14 @@ NEXT:
             }
             return;
         }
-        if( !ACPKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP && _battleSpotOccupied[ p_pokemonPos ][ p_opponent ] ) {
+        if( !CUR_PKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP && _battleSpotOccupied[ p_pokemonPos ][ p_opponent ] ) {
             if( p_show ) {
-                std::swprintf( wbuffer, 100, L"%ls%s wurde besiegt.[A]",
-                               ( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
-                               ( p_opponent ? " [OPPONENT]" : "" ) );
-                log( wbuffer );
+                std::sprintf( buffer, "%s%s wurde besiegt.[A]",
+                              ( CUR_PKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
+                              ( p_opponent ? " [OPPONENT]" : "" ) );
+                log( buffer );
             }
-            ACPKMNSTS( p_pokemonPos, p_opponent ) = KO;
+            CUR_PKMN_STS( p_pokemonPos, p_opponent ) = KO;
             _battleUI->hidePKMN( p_opponent, p_pokemonPos );
             _battleSpotOccupied[ p_pokemonPos ][ p_opponent ] = false;
 
@@ -1304,34 +1587,34 @@ NEXT:
      *  @brief Registers the current participating PKMN
      */
     void battle::registerParticipatedPKMN( ) {
-        if( ACPKMNSTS( 0, PLAYER ) != KO && ACPKMNSTS( 0, OPPONENT ) != KO
-            && ACPKMNSTS( 0, PLAYER ) != NA && ACPKMNSTS( 0, OPPONENT ) != NA )
-            _participatedPKMN[ ACPOS( 0, PLAYER ) ][ PLAYER ] |= ( 1 << ACPOS( 0, OPPONENT ) );
-        if( ACPKMNSTS( 0, PLAYER ) != KO && ACPKMNSTS( 0, OPPONENT ) != KO
-            && ACPKMNSTS( 0, PLAYER ) != NA && ACPKMNSTS( 0, OPPONENT ) != NA )
-            _participatedPKMN[ ACPOS( 0, OPPONENT ) ][ OPPONENT ] |= ( 1 << ACPOS( 0, PLAYER ) );
+        if( CUR_PKMN_STS( 0, PLAYER ) != KO && CUR_PKMN_STS( 0, OPPONENT ) != KO
+            && CUR_PKMN_STS( 0, PLAYER ) != NA && CUR_PKMN_STS( 0, OPPONENT ) != NA )
+            _participatedPKMN[ CUR_POS( 0, PLAYER ) ][ PLAYER ] |= ( 1 << CUR_POS( 0, OPPONENT ) );
+        if( CUR_PKMN_STS( 0, PLAYER ) != KO && CUR_PKMN_STS( 0, OPPONENT ) != KO
+            && CUR_PKMN_STS( 0, PLAYER ) != NA && CUR_PKMN_STS( 0, OPPONENT ) != NA )
+            _participatedPKMN[ CUR_POS( 0, OPPONENT ) ][ OPPONENT ] |= ( 1 << CUR_POS( 0, PLAYER ) );
 
         if( m_battleMode == DOUBLE ) {
-            if( ACPKMNSTS( 0, PLAYER ) != KO && ACPKMNSTS( 1, OPPONENT ) != KO
-                && ACPKMNSTS( 0, PLAYER ) != NA && ACPKMNSTS( 1, OPPONENT ) != NA )
-                _participatedPKMN[ ACPOS( 0, PLAYER ) ][ PLAYER ] |= ( 1 << ACPOS( 1, OPPONENT ) );
-            if( ACPKMNSTS( 1, PLAYER ) != KO && ACPKMNSTS( 0, OPPONENT ) != KO
-                && ACPKMNSTS( 1, PLAYER ) != NA && ACPKMNSTS( 0, OPPONENT ) != NA )
-                _participatedPKMN[ ACPOS( 0, OPPONENT ) ][ OPPONENT ] |= ( 1 << ACPOS( 1, PLAYER ) );
+            if( CUR_PKMN_STS( 0, PLAYER ) != KO && CUR_PKMN_STS( 1, OPPONENT ) != KO
+                && CUR_PKMN_STS( 0, PLAYER ) != NA && CUR_PKMN_STS( 1, OPPONENT ) != NA )
+                _participatedPKMN[ CUR_POS( 0, PLAYER ) ][ PLAYER ] |= ( 1 << CUR_POS( 1, OPPONENT ) );
+            if( CUR_PKMN_STS( 1, PLAYER ) != KO && CUR_PKMN_STS( 0, OPPONENT ) != KO
+                && CUR_PKMN_STS( 1, PLAYER ) != NA && CUR_PKMN_STS( 0, OPPONENT ) != NA )
+                _participatedPKMN[ CUR_POS( 0, OPPONENT ) ][ OPPONENT ] |= ( 1 << CUR_POS( 1, PLAYER ) );
 
-            if( ACPKMNSTS( 1, PLAYER ) != KO && ACPKMNSTS( 0, OPPONENT ) != KO
-                && ACPKMNSTS( 1, PLAYER ) != NA && ACPKMNSTS( 0, OPPONENT ) != NA )
-                _participatedPKMN[ ACPOS( 1, PLAYER ) ][ PLAYER ] |= ( 1 << ACPOS( 0, OPPONENT ) );
-            if( ACPKMNSTS( 0, PLAYER ) != KO && ACPKMNSTS( 1, OPPONENT ) != KO
-                && ACPKMNSTS( 0, PLAYER ) != NA && ACPKMNSTS( 1, OPPONENT ) != NA )
-                _participatedPKMN[ ACPOS( 1, OPPONENT ) ][ OPPONENT ] |= ( 1 << ACPOS( 0, PLAYER ) );
+            if( CUR_PKMN_STS( 1, PLAYER ) != KO && CUR_PKMN_STS( 0, OPPONENT ) != KO
+                && CUR_PKMN_STS( 1, PLAYER ) != NA && CUR_PKMN_STS( 0, OPPONENT ) != NA )
+                _participatedPKMN[ CUR_POS( 1, PLAYER ) ][ PLAYER ] |= ( 1 << CUR_POS( 0, OPPONENT ) );
+            if( CUR_PKMN_STS( 0, PLAYER ) != KO && CUR_PKMN_STS( 1, OPPONENT ) != KO
+                && CUR_PKMN_STS( 0, PLAYER ) != NA && CUR_PKMN_STS( 1, OPPONENT ) != NA )
+                _participatedPKMN[ CUR_POS( 1, OPPONENT ) ][ OPPONENT ] |= ( 1 << CUR_POS( 0, PLAYER ) );
 
-            if( ACPKMNSTS( 1, PLAYER ) != KO && ACPKMNSTS( 1, OPPONENT ) != KO
-                && ACPKMNSTS( 1, PLAYER ) != NA && ACPKMNSTS( 1, OPPONENT ) != NA )
-                _participatedPKMN[ ACPOS( 1, PLAYER ) ][ PLAYER ] |= ( 1 << ACPOS( 1, OPPONENT ) );
-            if( ACPKMNSTS( 1, PLAYER ) != KO && ACPKMNSTS( 1, OPPONENT ) != KO
-                && ACPKMNSTS( 1, PLAYER ) != NA && ACPKMNSTS( 1, OPPONENT ) != NA )
-                _participatedPKMN[ ACPOS( 1, OPPONENT ) ][ OPPONENT ] |= ( 1 << ACPOS( 1, PLAYER ) );
+            if( CUR_PKMN_STS( 1, PLAYER ) != KO && CUR_PKMN_STS( 1, OPPONENT ) != KO
+                && CUR_PKMN_STS( 1, PLAYER ) != NA && CUR_PKMN_STS( 1, OPPONENT ) != NA )
+                _participatedPKMN[ CUR_POS( 1, PLAYER ) ][ PLAYER ] |= ( 1 << CUR_POS( 1, OPPONENT ) );
+            if( CUR_PKMN_STS( 1, PLAYER ) != KO && CUR_PKMN_STS( 1, OPPONENT ) != KO
+                && CUR_PKMN_STS( 1, PLAYER ) != NA && CUR_PKMN_STS( 1, OPPONENT ) != NA )
+                _participatedPKMN[ CUR_POS( 1, OPPONENT ) ][ OPPONENT ] |= ( 1 << CUR_POS( 1, PLAYER ) );
         }
     }
 
@@ -1341,12 +1624,12 @@ NEXT:
     *  @param p_pokemonPos: Position of the fainted PKMN (0 or 1)
     */
     void battle::distributeEXP( bool p_opponent, u8 p_pokemonPos ) {
-        u8 receivingPKMN = _participatedPKMN[ ACPOS( p_pokemonPos, p_opponent ) ][ p_opponent ];
-        _participatedPKMN[ ACPOS( p_pokemonPos, p_opponent ) ][ p_opponent ] = 0;
+        u8 receivingPKMN = _participatedPKMN[ CUR_POS( p_pokemonPos, p_opponent ) ][ p_opponent ];
+        _participatedPKMN[ CUR_POS( p_pokemonPos, p_opponent ) ][ p_opponent ] = 0;
 
         float wildModifer = m_isWildBattle ? 1 : 1.5;
         pokemonData p;
-        getAll( ACPKMN( p_pokemonPos, p_opponent ).m_boxdata.m_speciesId, p );
+        getAll( CUR_PKMN( p_pokemonPos, p_opponent ).m_boxdata.m_speciesId, p );
         u16 b = p.m_EXPYield;
 
         bool printPkmnMsg = false;
@@ -1356,26 +1639,26 @@ NEXT:
 
             if( sz <= i )
                 break;
-            if( !( receivingPKMN & ( 1 << ( ACPOS( i, PLAYER ) ) ) ) )
+            if( !( receivingPKMN & ( 1 << ( CUR_POS( i, PLAYER ) ) ) ) )
                 continue;
 
             u8 acidx = 42;
             for( int j = 0; j < sz; ++j )
-                if( ACPOS( j, !p_opponent ) == i ) {
+                if( CUR_POS( j, !p_opponent ) == i ) {
                     acidx = j;
                     break;
                 }
             if( acidx == 42 )
                 continue;
 
-            auto& acPkmn = ACPKMN( acidx, !p_opponent );
+            auto& acPkmn = CUR_PKMN( acidx, !p_opponent );
 
             if( acPkmn.m_stats.m_acHP ) {
-                if( acPkmn.m_Level == 100 )
+                if( acPkmn.m_level == 100 )
                     continue;
                 float e = ( acPkmn.m_boxdata.m_holdItem == I_LUCKY_EGG ) ? 1.5 : 1;
 
-                u8 L = acPkmn.m_Level;
+                u8 L = acPkmn.m_level;
 
                 float t = ( acPkmn.m_boxdata.m_oTId == FS::SAV->m_id && acPkmn.m_boxdata.m_oTSid == FS::SAV->m_sid ? 1 : 1.5 );
 
@@ -1423,57 +1706,57 @@ NEXT:
                     u16 HPdif = acPkmn.m_stats.m_maxHP - acPkmn.m_stats.m_acHP;
 
                     while( newLevel ) {
-                        acPkmn.m_Level++;
+                        acPkmn.m_level++;
 
                         if( acPkmn.m_boxdata.m_speciesId != 292 ) //Check for Ninjatom
                             acPkmn.m_stats.m_maxHP = ( ( acPkmn.m_boxdata.m_individualValues.m_hp + 2 * p.m_bases[ 0 ]
-                                                         + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
+                                                         + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_level / 100 ) + 10;
                         else
                             acPkmn.m_stats.m_maxHP = 1;
                         pkmnNatures nature = acPkmn.m_boxdata.getNature( );
 
                         acPkmn.m_stats.m_Atk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
-                                                     + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
+                                                     + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
                         acPkmn.m_stats.m_Def = ( ( ( acPkmn.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ DEF + 1 ]
-                                                     + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
+                                                     + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
                         acPkmn.m_stats.m_Spd = ( ( ( acPkmn.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ SPD + 1 ]
-                                                     + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
+                                                     + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
                         acPkmn.m_stats.m_SAtk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ SATK + 1 ]
-                                                      + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
+                                                      + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
                         acPkmn.m_stats.m_SDef = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ SDEF + 1 ]
-                                                      + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
+                                                      + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
 
                         acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
 
-                        std::swprintf( wbuffer, 50, L"%ls%s erreicht\nLevel %d.[A]", acPkmn.m_boxdata.m_name,
-                                       ( ( !p_opponent ) ? " [OPPONENT]" : "" ), acPkmn.m_Level );
-                        log( wbuffer );
+                        std::sprintf( buffer, "%s%s erreicht\nLevel %d.[A]", acPkmn.m_boxdata.m_name,
+                                      ( ( !p_opponent ) ? " [OPPONENT]" : "" ), acPkmn.m_level );
+                        log( buffer );
 
                         checkForAttackLearn( i );
-                        newLevel = acPkmn.m_Level < 100 && EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+                        newLevel = acPkmn.m_level < 100 && EXP[ acPkmn.m_level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
                     }
                 }
             }
         }
 
         if( printPkmnMsg )
-            log( L"Weiter PKMN im Team\n erhalten E.-Punkte.[A]" );
+            log( "Weiter Pokémon im Team\n erhalten E.-Punkte.[A]" );
 
         if( FS::SAV->m_EXPShareEnabled && p_opponent ) {
-            log( L"Der EP-Teiler wirkt![A]" );
-            for( u8 i = ( ( m_battleMode == DOUBLE ) ? 2 : 1 ); i < 6; ++i )if( ACPKMNSTS( i, PLAYER ) != KO &&
-                                                                                ACPKMNSTS( i, PLAYER ) != NA ) {
+            log( "Der EP-Teiler wirkt![A]" );
+            for( u8 i = ( ( m_battleMode == DOUBLE ) ? 2 : 1 ); i < 6; ++i )if( CUR_PKMN_STS( i, PLAYER ) != KO &&
+                                                                                CUR_PKMN_STS( i, PLAYER ) != NA ) {
 
-                if( ACPKMN( i, PLAYER ).m_Level == 100 )
+                if( CUR_PKMN( i, PLAYER ).m_level == 100 )
                     continue;
-                if( receivingPKMN & ( 1 << ( ACPOS( i, PLAYER ) ) ) )
+                if( receivingPKMN & ( 1 << ( CUR_POS( i, PLAYER ) ) ) )
                     continue;
 
-                auto& acPkmn = ACPKMN( i, PLAYER );
+                auto& acPkmn = CUR_PKMN( i, PLAYER );
 
                 float e = ( acPkmn.m_boxdata.m_holdItem == I_LUCKY_EGG ) ? 1.5 : 1;
 
-                u8 L = acPkmn.m_Level;
+                u8 L = acPkmn.m_level;
 
                 float t = ( acPkmn.m_boxdata.m_oTId == FS::SAV->m_id && acPkmn.m_boxdata.m_oTSid == FS::SAV->m_sid ? 1 : 1.5 );
 
@@ -1518,34 +1801,34 @@ NEXT:
                 u16 HPdif = acPkmn.m_stats.m_maxHP - acPkmn.m_stats.m_acHP;
 
                 while( newLevel ) {
-                    acPkmn.m_Level++;
+                    acPkmn.m_level++;
 
                     if( acPkmn.m_boxdata.m_speciesId != 292 ) //Check for Ninjatom
                         acPkmn.m_stats.m_maxHP = ( ( acPkmn.m_boxdata.m_individualValues.m_hp + 2 * p.m_bases[ 0 ]
-                                                     + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_Level / 100 ) + 10;
+                                                     + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )* acPkmn.m_level / 100 ) + 10;
                     else
                         acPkmn.m_stats.m_maxHP = 1;
                     pkmnNatures nature = acPkmn.m_boxdata.getNature( );
 
                     acPkmn.m_stats.m_Atk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
-                                                 + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
+                                                 + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 ) * NatMod[ nature ][ ATK ];
                     acPkmn.m_stats.m_Def = ( ( ( acPkmn.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ DEF + 1 ]
-                                                 + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
+                                                 + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 )*NatMod[ nature ][ DEF ];
                     acPkmn.m_stats.m_Spd = ( ( ( acPkmn.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ SPD + 1 ]
-                                                 + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
+                                                 + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 )*NatMod[ nature ][ SPD ];
                     acPkmn.m_stats.m_SAtk = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ SATK + 1 ]
-                                                  + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
+                                                  + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 )*NatMod[ nature ][ SATK ];
                     acPkmn.m_stats.m_SDef = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ SDEF + 1 ]
-                                                  + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_Level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
+                                                  + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )*acPkmn.m_level / 100.0 ) + 5 )*NatMod[ nature ][ SDEF ];
 
                     acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
 
-                    std::swprintf( wbuffer, 50, L"%ls erreicht Level %d.[A]", acPkmn.m_boxdata.m_name, acPkmn.m_Level );
-                    log( wbuffer );
+                    std::sprintf( buffer, "%s erreicht Level %d.[A]", acPkmn.m_boxdata.m_name, acPkmn.m_level );
+                    log( buffer );
 
                     checkForAttackLearn( i );
 
-                    newLevel = acPkmn.m_Level < 100 && EXP[ acPkmn.m_Level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+                    newLevel = acPkmn.m_level < 100 && EXP[ acPkmn.m_level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
                 }
             }
         }
@@ -1558,9 +1841,9 @@ NEXT:
     void battle::checkForAttackLearn( u8 p_pokemonPos ) {
         const int MAX_ATTACKS_PER_LEVEL = 10;
         u16 learnable[ MAX_ATTACKS_PER_LEVEL ];
-        auto& acPkmn = ACPKMN( p_pokemonPos, PLAYER );
+        auto& acPkmn = CUR_PKMN( p_pokemonPos, PLAYER );
 
-        getLearnMoves( acPkmn.m_boxdata.m_speciesId, acPkmn.m_Level, acPkmn.m_Level, 1, MAX_ATTACKS_PER_LEVEL, learnable );
+        getLearnMoves( acPkmn.m_boxdata.m_speciesId, acPkmn.m_level, acPkmn.m_level, 1, MAX_ATTACKS_PER_LEVEL, learnable );
 
         for( u8 i = 0; i < MAX_ATTACKS_PER_LEVEL; ++i ) {
             if( !learnable[ i ] )
@@ -1579,17 +1862,17 @@ NEXT:
         if( !FS::SAV->m_evolveInBattle )
             return;
 
-        if( ACPKMN( p_pokemonPos, p_opponent ).canEvolve( ) ) {
-            auto& acPkmn = ACPKMN( p_pokemonPos, p_opponent );
+        if( CUR_PKMN( p_pokemonPos, p_opponent ).canEvolve( ) ) {
+            auto& acPkmn = CUR_PKMN( p_pokemonPos, p_opponent );
 
-            std::swprintf( wbuffer, 50, L"%ls entwickelt sich...[A]", acPkmn.m_boxdata.m_name );
-            log( wbuffer );
+            std::sprintf( buffer, "%s entwickelt sich…[A]", acPkmn.m_boxdata.m_name );
+            log( buffer );
 
             acPkmn.evolve( );
             _battleUI->evolvePKMN( p_opponent, p_pokemonPos );
 
-            std::swprintf( wbuffer, 50, L"und wurde zu einem %ls![A]", getWDisplayName( acPkmn.m_boxdata.m_speciesId ) );
-            log( wbuffer );
+            std::sprintf( buffer, "und wurde zu einem %s![A]", getDisplayName( acPkmn.m_boxdata.m_speciesId ) );
+            log( buffer );
         }
     }
 
@@ -1610,9 +1893,9 @@ NEXT:
         u8 pkmnCnt = 0;
         for( u8 i = 0; i < 6; ++i ) {
             if( _player->m_pkmnTeam.size( ) > i ) {
-                if( ACPKMNSTS( i, PLAYER ) != KO
-                    && ACPKMNSTS( i, PLAYER ) != NA
-                    && ACPKMN( i, PLAYER ).m_stats.m_acHP )
+                if( CUR_PKMN_STS( i, PLAYER ) != KO
+                    && CUR_PKMN_STS( i, PLAYER ) != NA
+                    && CUR_PKMN( i, PLAYER ).m_stats.m_acHP )
                     pkmnCnt++;
             } else
                 break;
@@ -1633,9 +1916,9 @@ NEXT:
         pkmnCnt = 0;
         for( u8 i = 0; i < 6; ++i ) {
             if( _opponent->m_pkmnTeam.size( ) > i ) {
-                if( ACPKMNSTS( i, OPPONENT ) != KO
-                    && ACPKMNSTS( i, OPPONENT ) != NA
-                    && ACPKMN( i, OPPONENT ).m_stats.m_acHP )
+                if( CUR_PKMN_STS( i, OPPONENT ) != KO
+                    && CUR_PKMN_STS( i, OPPONENT ) != NA
+                    && CUR_PKMN( i, OPPONENT ).m_stats.m_acHP )
                     pkmnCnt++;
             } else
                 break;
@@ -1654,34 +1937,36 @@ NEXT:
     void battle::endBattle( battleEndReason p_battleEndReason ) {
         switch( p_battleEndReason ) {
             case BATTLE::battle::ROUND_LIMIT:
-                log( L"Das Rundenlimit dieses\nKampfes wurde erreicht.[A]" );
+                log( "Das Rundenlimit dieses\nKampfes wurde erreicht.[A]" );
                 _battleUI->showEndScreen( );
-                log( L"Der Kampf endet in einem\nUnentschieden![A]" );
+                log( "Der Kampf endet in einem\nUnentschieden![A]" );
                 break;
             case BATTLE::battle::OPPONENT_WON:
             {
-                std::swprintf( wbuffer, 100, L"[TRAINER] [TCLASS] gewinnt...[A]" );
+                if( !m_isWildBattle ) {
+                    std::sprintf( buffer, "[TRAINER] [TCLASS] gewinnt…[A]" );
 
-                _battleUI->showEndScreen( );
+                    _battleUI->showEndScreen( );
 
-                std::swprintf( wbuffer, 100, L"%s[A]",
-                               _opponent->getWinMsg( ) );
-                log( wbuffer );
+                    std::sprintf( buffer, "%s[A]",
+                                  _opponent->getWinMsg( ) );
+                    log( buffer );
+                }
                 break;
             }
             case BATTLE::battle::PLAYER_WON:
             {
                 if( !m_isWildBattle ) {
-                    log( L"Du besiegst [TCLASS] [TRAINER]![A]" );
+                    log( "Du besiegst [TCLASS] [TRAINER]![A]" );
 
                     _battleUI->showEndScreen( );
 
-                    std::swprintf( wbuffer, 100, L"%s[A]",
-                                   _opponent->getLooseMsg( ) );
-                    log( wbuffer );
-                    std::swprintf( wbuffer, 100, L"Du gewinnst %d$.[A]",
-                                   _opponent->getLooseMoney( ) );
-                    log( wbuffer );
+                    std::sprintf( buffer, "%s[A]",
+                                  _opponent->getLooseMsg( ) );
+                    log( buffer );
+                    std::sprintf( buffer, "Du gewinnst %d$.[A]",
+                                  _opponent->getLooseMoney( ) );
+                    log( buffer );
                 }
                 break;
             }
@@ -1690,7 +1975,7 @@ NEXT:
                 break;
             }
             default:
-                log( L"Der Kampf endet.[A]" );
+                log( "Der Kampf endet.[A]" );
                 break;
         }
     }
@@ -1703,14 +1988,14 @@ NEXT:
      */
     void battle::switchPKMN( bool p_opponent, u8 p_pokemonPos, u8 p_newPokemonPos ) {
         if( p_opponent )
-            std::swprintf( wbuffer, 100, L"[OPP%d] wurde von [TRAINER]\n([TCLASS]) auf die Bank geschickt.[A]", p_pokemonPos + 1 );
+            std::sprintf( buffer, "[OPP%d] wurde von [TRAINER]\n([TCLASS]) auf die Bank geschickt.[A]", p_pokemonPos + 1 );
         else
-            std::swprintf( wbuffer, 100, L"Auf die Bank [OWN%d]![A]", p_pokemonPos + 1 );
-        log( wbuffer );
+            std::sprintf( buffer, "Auf die Bank [OWN%d]![A]", p_pokemonPos + 1 );
+        log( buffer );
 
         _battleUI->hidePKMN( p_opponent, p_pokemonPos );
 
-        std::swap( ACPOS( p_pokemonPos, p_opponent ), ACPOS( p_newPokemonPos, p_opponent ) );
+        std::swap( CUR_POS( p_pokemonPos, p_opponent ), CUR_POS( p_newPokemonPos, p_opponent ) );
 
         _battleUI->sendPKMN( p_opponent, p_pokemonPos );
     }
@@ -1721,23 +2006,117 @@ NEXT:
     void battle::doWeather( ) {
         if( m_weather != NO_WEATHER ) {
             if( --_weatherLength ) {
-                log( _weatherMessage[ m_weather ] );
-                _weatherEffects[ m_weather ].execute( *this, this );
+                log( weatherMessage[ m_weather ] );
+                weatherEffects[ m_weather ].execute( *this, this );
             } else {
-                log( _weatherEndMessage[ m_weather ] );
+                log( weatherEndMessage[ m_weather ] );
                 m_weather = NO_WEATHER;
             }
         }
     }
 
+    /**
+    *  @brief Checks whether the player can run from the wild Pokémon.
+    */
     bool battle::run( ) {
         //Check whether run is succesful -- TODO
         _endBattle = true;
         return true;
     }
 
-    battle::~battle( ) {
-        delete _battleUI;
+    /**
+    * @brief Tries to capture with the specified poké ball
+    * @param p_pokeball: item idx of the thrown poke ball
+    * @returns true iff the capture was successful
+    */
+    bool battle::tryCapture( u16 p_pokeBall )
+    {
+        u16 ballCatchRate = 2;
+        u16 specId = _wildPokemon.m_pokemon->m_boxdata.m_speciesId;
+        pokemonData p; getAll( specId, p );
+        switch( p_pokeBall ) {
+            case I_SAFARI_BALL: case I_SPORT_BALL:
+            case I_GREAT_BALL:  ballCatchRate = 3; break;
+            case I_ULTRA_BALL:  ballCatchRate = 4; break;
+            case I_MASTER_BALL: ballCatchRate = 512; break;
+
+            case I_LEVEL_BALL:
+                if( CUR_PKMN( 0, PLAYER ).m_level > _wildPokemon.m_pokemon->m_level ) ballCatchRate = 4;
+                if( CUR_PKMN( 0, PLAYER ).m_level / 2 > _wildPokemon.m_pokemon->m_level ) ballCatchRate = 8;
+                if( CUR_PKMN( 0, PLAYER ).m_level / 4 > _wildPokemon.m_pokemon->m_level ) ballCatchRate = 16;
+                break;
+            case I_LURE_BALL:
+                if( PLAYER_IS_FISHING ) ballCatchRate = 6;
+                break;
+            case I_MOON_BALL:
+                if( _wildPokemon.m_pokemon->canEvolve( I_MOON_STONE ) ) ballCatchRate = 16;
+                break;
+            case I_LOVE_BALL:
+                if( _wildPokemon.m_pokemon->m_boxdata.m_isFemale != CUR_PKMN( 0, PLAYER ).m_boxdata.m_isFemale )
+                    ballCatchRate = 16;
+                break;
+            case I_HEAVY_BALL:
+                ballCatchRate = std::min( 128, p.m_weight >> 2 );
+                break;
+            case I_FAST_BALL:
+                if( p.m_bases[ 5 ] >= 100 ) ballCatchRate = 16;
+                break;
+
+            case I_REPEAT_BALL:
+                if( FS::SAV->m_inDex[ specId / 8 ] & ( 1 << ( specId % 8 ) ) )
+                    ballCatchRate = 6;
+                break;
+            case I_TIMER_BALL:
+                ballCatchRate = std::min( _round + 10 / 5, 8 );
+                break;
+            case I_NEST_BALL:
+                ballCatchRate = std::max( ( 40 - _wildPokemon.m_pokemon->m_level ) / 5, 2 );
+                break;
+            case I_NET_BALL:
+                if( p.m_types[ 0 ] == type::BUG || p.m_types[ 1 ] == type::BUG
+                    || p.m_types[ 0 ] == type::WATER || p.m_types[ 1 ] == type::WATER )
+                    ballCatchRate = 6;
+                break;
+            case I_DIVE_BALL:
+                if( FS::SAV->m_player.m_movement == MAP::moveMode::DIVE )
+                    ballCatchRate = 7;
+                break;
+
+            case I_QUICK_BALL:
+                if( _round < 2 ) ballCatchRate = 10;
+                break;
+            case I_DUSK_BALL:
+                if( AttackList[ M_DIG ]->possible( ) || getCurrentDaytime( ) == 4 )
+                    ballCatchRate = 7;
+                break;
+
+            default:
+                break;
+        }
+
+
+        u8 status = 2;
+        if( _wildPokemon.m_pokemon->m_status.m_isAsleep
+            || _wildPokemon.m_pokemon->m_status.m_isFrozen )
+            status = 4;
+        if( _wildPokemon.m_pokemon->m_status.m_isParalyzed
+            || _wildPokemon.m_pokemon->m_status.m_isPoisoned
+            || _wildPokemon.m_pokemon->m_status.m_isBadlyPoisoned
+            || _wildPokemon.m_pokemon->m_status.m_isBurned )
+            status = 3;
+
+        u32 catchRate = ( 3 * _wildPokemon.m_pokemon->m_stats.m_maxHP - 2 * _wildPokemon.m_pokemon->m_stats.m_acHP )
+            * p.m_catchrate * ballCatchRate / 3 / _wildPokemon.m_pokemon->m_stats.m_maxHP * status;
+        u32 pr = u32( ( 65535 << 4 ) / ( sqrt( sqrt( ( 255L << 18 ) / catchRate ) ) ) );
+        u8 succ = 0;
+        for( u8 i = 0; i < 4; ++i ) {
+            u16 rn = rand( );
+            if( rn > pr )
+                break;
+            succ++;
+        }
+        _battleUI->capture( p_pokeBall, succ );
+        return ( succ == 4 );
     }
 
     //////////////////////////////////////////////////////////////////////////

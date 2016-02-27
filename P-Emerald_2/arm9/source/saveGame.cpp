@@ -31,6 +31,8 @@
 #include "fs.h"
 #include "uio.h"
 #include "messageBox.h"
+#include "pokemon.h"
+#include "battleTrainer.h"
 //#include "Gen.h"
 
 namespace FS {
@@ -40,7 +42,7 @@ namespace FS {
     std::vector<pokemon> tmp;
     saveGame* SAV;
 
-#define PKMN_DATALENGTH 128    
+#define PKMN_DATALENGTH 128
     saveGame* readSave( ) {
         FILE* f = open( "./", sav_nam, ".sav" );
         if( !f )
@@ -51,7 +53,7 @@ namespace FS {
         close( f );
         return result;
     }
-    
+
     bool writeSave( saveGame* p_saveGame ) {
         FILE* f = open( "./", sav_nam, ".sav", "w" );
         if( !f )
@@ -68,7 +70,7 @@ namespace FS {
             m_repelSteps--;
             if( !m_repelSteps ) {
                 IO::messageBox( "Der Schutz ist aufgebraucht." );
-                IO::drawSub( true );
+                IO::NAV->draw( true );
             }
         }
         if( !stepCnt ) {
@@ -106,7 +108,7 @@ namespace FS {
         for( u8 i = 0; i < 6; ++i ) {
             if( !m_pkmnTeam[ i ].m_boxdata.m_speciesId )
                 break;
-            mxlv = std::max( mxlv, m_pkmnTeam[ i ].m_Level );
+            mxlv = std::max( mxlv, m_pkmnTeam[ i ].m_level );
         }
         if( !mxlv || m_repelSteps )
             return 0;
@@ -114,5 +116,67 @@ namespace FS {
         mxlv = std::min( 5 * getBadgeCount( ) + 8, mxlv + 0 );
 
         return mxlv + ( rand( ) % ( 2 * ( p_tier + 1 ) ) - p_tier - 1 );
+    }
+
+
+    bool        saveGame::checkflag( u8 p_idx ) {
+        return m_flags[ p_idx >> 3 ] & ( 1 << ( p_idx % 8 ) );
+    }
+    void        saveGame::setflag( u8 p_idx, bool p_value ) {
+        if( p_value != checkflag( p_idx ) )
+            m_flags[ p_idx >> 3 ] ^= ( 1 << ( p_idx % 8 ) );
+        return;
+    }
+    u8          saveGame::getBadgeCount( ) {
+        u8 cnt = 0;
+        for( u8 i = 0; i < 8; ++i ) {
+            cnt += !!( m_HOENN_Badges & ( 1 << i ) );
+            cnt += !!( m_KANTO_Badges & ( 1 << i ) );
+            cnt += !!( m_JOHTO_Badges & ( 1 << i ) );
+        }
+        return cnt;
+    }
+    u8 saveGame::getTeamPkmnCount( ) {
+        u8 res = 0;
+        for( u8 i = 0; i < 6; ++i )
+            res += !!m_pkmnTeam[ i ].m_boxdata.m_speciesId;
+        return res;
+    }
+
+    BATTLE::battleTrainer* saveGame::getBattleTrainer( ) {
+        tmp.clear( );
+        for( u8 i = 0; i < 6; ++i )
+            if( m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                tmp.push_back( m_pkmnTeam[ i ] );
+            else
+                break;
+        char buffer[ 30 ];
+        sprintf( buffer, "%s", m_playername );
+
+        static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp );
+        return &res;
+    }
+    void saveGame::updateTeam( ) {
+        for( u8 i = 0; i < tmp.size( ); ++i )
+            m_pkmnTeam[ i ] = tmp[ i ];
+    }
+
+    //Return the idx of the resulting Box
+    s8 saveGame::storePkmn( const pokemon::boxPokemon& p_pokemon ) {
+        s8 idx = m_storedPokemon[ m_curBox ].getFirstFreeSpot( );
+        u8 i = 0;
+        for( ; idx == -1 && i < MAX_BOXES; )
+            idx = m_storedPokemon[ ( ( ++i ) + m_curBox ) % MAX_BOXES ].getFirstFreeSpot( );
+        if( idx == -1 ) //Everything's full :/
+            return -1;
+        m_curBox = ( m_curBox + i ) % MAX_BOXES;
+        m_storedPokemon[ m_curBox ][ idx ] = p_pokemon;
+        return m_curBox;
+    }
+    s8 saveGame::storePkmn( const pokemon& p_pokemon ) {
+        return storePkmn( p_pokemon.m_boxdata );
+    }
+    BOX::box* saveGame::getCurrentBox( ) {
+        return m_storedPokemon + m_curBox;
     }
 }

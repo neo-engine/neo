@@ -82,10 +82,10 @@ namespace BAG {
                     newEffect &= ~( 1 << ( 9 + 16 * !i ) );
                     newEffect |= ( res << ( 9 + 16 * !i ) );
                 }
-            u8 oldLv = p_pokemon.m_Level;
+            u8 oldLv = p_pokemon.m_level;
             if( ItemList[ p_item ]->use( p_pokemon ) ) {
 
-                sprintf( buffer, "%s auf %ls angewendet.", ItemList[ p_item ]->getDisplayName( true ).c_str( ),
+                sprintf( buffer, "%s auf %s angewendet.", ItemList[ p_item ]->getDisplayName( true ).c_str( ),
                          p_pokemon.m_boxdata.m_name );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
@@ -95,19 +95,19 @@ namespace BAG {
                 FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, p_item, 1 );
 
                 //Check for evolution
-                if( p_pokemon.m_Level != oldLv && p_pokemon.canEvolve( ) ) {
+                if( p_pokemon.m_level != oldLv && p_pokemon.canEvolve( ) ) {
                     initUI( );
                     IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                    sprintf( buffer, "%ls entwickelt sich...", p_pokemon.m_boxdata.m_name );
+                    sprintf( buffer, "%s entwickelt sich…", p_pokemon.m_boxdata.m_name );
                     IO::messageBox( buffer, false );
                     p_pokemon.evolve( );
 
                     initUI( );
                     swiWaitForVBlank( );
 
-                    sprintf( buffer, "...und wurde zu einem\n%ls!", getWDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
+                    sprintf( buffer, "…und wurde zu einem\n%s!", getDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
                     IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -118,7 +118,7 @@ namespace BAG {
             IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
             IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
             IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-            IO::messageBox( "Es würde keine Wirkung haben...", false );
+            IO::messageBox( "Es würde keine Wirkung haben…", false );
             return false;
         }
 
@@ -130,20 +130,20 @@ namespace BAG {
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                IO::messageBox( "Es würde keine\nWirkung haben...", false );
+                IO::messageBox( "Es würde keine\nWirkung haben…", false );
                 return false;
             } else if( ItemList[ p_item ]->m_itemType == item::itemType::GOODS ) {
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                sprintf( buffer, "%ls entwickelt sich...", p_pokemon.m_boxdata.m_name );
+                sprintf( buffer, "%s entwickelt sich…", p_pokemon.m_boxdata.m_name );
                 IO::messageBox( buffer, false );
                 p_pokemon.evolve( p_item, 3 );
 
                 initUI( );
                 swiWaitForVBlank( );
 
-                sprintf( buffer, "...und wurde zu einem\n%ls!", getWDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
+                sprintf( buffer, "…und wurde zu einem\n%s!", getDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -160,7 +160,7 @@ namespace BAG {
     bool bagViewer::giveItemToPkmn( pokemon& p_pokemon, u16 p_item ) {
         if( p_pokemon.getItem( ) ) {
             IO::yesNoBox yn( false );
-            sprintf( buffer, "%ls trägt bereits\ndas Item %s.\nSollen die Items getauscht werden?",
+            sprintf( buffer, "%s trägt bereits\ndas Item %s.\nSollen die Items getauscht werden?",
                      p_pokemon.m_boxdata.m_name, ItemList[ p_pokemon.getItem( ) ]->getDisplayName( true ).c_str( ) );
             if( !yn.getResult( buffer ) )
                 return false;
@@ -188,8 +188,9 @@ namespace BAG {
         //Check if the item can be returned
         switch( p_context ) {
             case BAG::bagViewer::BATTLE:
-                possible &= ( ItemList[ p_targetItem ]->getEffectType( )
-                              & ( item::itemEffectType::IN_BATTLE | item::itemEffectType::USE_ON_PKMN ) );
+                possible &= ItemList[ p_targetItem ]->m_itemType == item::itemType::POKE_BALLS
+                    || ItemList[ p_targetItem ]->m_itemType == item::itemType::MEDICINE
+                    || ItemList[ p_targetItem ]->m_itemType == item::itemType::BATTLE_ITEM;
                 break;
             case BAG::bagViewer::GIVE_TO_PKMN:
                 possible &= ( ItemList[ p_targetItem ]->m_itemType != item::itemType::KEY_ITEM );
@@ -372,6 +373,7 @@ namespace BAG {
 
     u16 bagViewer::run( ) {
         _bagUI = new bagUI( );
+        _currSelectedIdx = 0;
         initUI( );
         _hasSprite = false;
 
@@ -453,7 +455,7 @@ namespace BAG {
             bool rangeChanged = false;
             for( u8 j = 0; j < _ranges.size( ); ++j ) {
                 auto i = _ranges[ j ];
-                if( IN_RANGE( touch, i.first ) ) {
+                if( IN_RANGE_I( touch, i.first ) ) {
                     if( !_hasSprite ) {
                         u8 c = 0;
                         loop( ) {
@@ -498,7 +500,7 @@ namespace BAG {
                                 }
                                 break;
                             }
-                            if( !IN_RANGE( touch, i.first ) )
+                            if( !IN_RANGE_I( touch, i.first ) )
                                 break;
                         }
                     } else {
@@ -515,6 +517,7 @@ namespace BAG {
 
     u16 bagViewer::getItem( context p_context ) {
         _bagUI = new bagUI( );
+        _currSelectedIdx = 0;
         initUI( );
         _hasSprite = false;
 
@@ -531,7 +534,8 @@ namespace BAG {
                     continue;
                 u16 targetItem = CURRENT_ITEM.first;
                 if( targetItem && confirmChoice( p_context, targetItem ) ) {
-                    FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
+                    if( p_context != context::BATTLE )
+                        FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
                     return targetItem;
                 }
                 initUI( );
@@ -539,7 +543,7 @@ namespace BAG {
 
             for( u8 j = 0; j < _ranges.size( ); ++j ) {
                 auto i = _ranges[ j ];
-                if( IN_RANGE( touch, i.first ) ) {
+                if( IN_RANGE_I( touch, i.first ) ) {
                     u8 c = 0;
                     loop( ) {
                         scanKeys( );
@@ -553,7 +557,8 @@ namespace BAG {
                             }
                             u16 targetItem = i.second.m_item;
                             if( !i.second.m_isHeld && confirmChoice( p_context, targetItem ) ) {
-                                FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
+                                if( p_context != context::BATTLE )
+                                    FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
                                 return targetItem;
                             } else {
                                 initUI( );
@@ -578,7 +583,7 @@ namespace BAG {
                             }
                             break;
                         }
-                        if( !IN_RANGE( touch, i.first ) )
+                        if( !IN_RANGE_I( touch, i.first ) )
                             break;
                     }
                 }

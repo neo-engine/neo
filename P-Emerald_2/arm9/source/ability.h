@@ -52,7 +52,7 @@ public:
 
     ability( int p_abilityId );
 };
-std::wstring getWAbilityName( int p_abilityId );
+std::string getAbilityName( int p_abilityId );
 
 #define A_CACOPHONY 0
 #define A_STENCH 1

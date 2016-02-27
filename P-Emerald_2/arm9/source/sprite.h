@@ -116,7 +116,7 @@ namespace IO {
     u16 loadItemIcon( const std::string& p_itemName, const u16 p_posX, const u16 p_posY,
                       u8 p_oamIndex, u8 p_palcnt, u16 p_tileCnt, bool p_bottom = true );
 
-    u16 loadTMIcon( Type p_type, bool p_hm, const u16 p_posX, const u16 p_posY,
+    u16 loadTMIcon( type p_type, bool p_hm, const u16 p_posX, const u16 p_posY,
                     u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom = true );
 
     u16 loadPKMNIcon( const u16& p_pkmnNo, const u16 p_posX, const u16 p_posY,
@@ -129,7 +129,7 @@ namespace IO {
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY,
                      u8 p_oamIndex, u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom = true );
 
-    u16 loadTypeIcon( Type p_type, const u16 p_posX, const u16 p_posY,
+    u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY,
                       u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
 
     u16 loadDamageCategoryIcon( move::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,

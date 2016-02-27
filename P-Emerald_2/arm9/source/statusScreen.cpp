@@ -111,7 +111,7 @@ namespace STS {
                 }
             }
             for( s8 i = 0; i < s8( tg.size( ) ) - 2; ++i )
-                if( IN_RANGE( touch, tg[ i ] ) && IO::waitForInput( tg[ i ] ) ) {
+                if( IN_RANGE_I( touch, tg[ i ] ) && IO::waitForInput( tg[ i ] ) ) {
                     u8 u = 0, o;
                     for( o = 0; o < 4 && u <= i; ++o )
                         if( AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_isFieldAttack )
@@ -123,10 +123,10 @@ namespace STS {
                     if( AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->possible( ) ) {
 
                         char buffer[ 50 ];
-                        sprintf( buffer, "%ls setzt %s\nein!", FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
+                        sprintf( buffer, "%s setzt %s\nein!", FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
                                  AttackList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
                         IO::messageBox a( buffer );
-                        IO::drawSub( );
+                        IO::NAV->draw( );
 
                         //shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
                         //              (*_pokemon)[_pkmnIdx ].m_boxdata.m_isFemale, (*_pokemon)[_pkmnIdx ].m_boxdata.isShiny( ) );
@@ -147,7 +147,7 @@ namespace STS {
                 }
 
             if( tg.size( ) >= 2 ) {
-                if( IN_RANGE( touch, tg[ tg.size( ) - 2 ] ) && IO::waitForInput( tg[ tg.size( ) - 2 ] ) ) {
+                if( IN_RANGE_I( touch, tg[ tg.size( ) - 2 ] ) && IO::waitForInput( tg[ tg.size( ) - 2 ] ) ) {
                     if( FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem ) { //take item
                         char buffer[ 50 ];
                         item acI = *ItemList[ FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem ];
@@ -156,8 +156,8 @@ namespace STS {
                         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                         consoleClear( );
 
-                        sprintf( buffer, "%s von %ls\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
-                        IO::drawSub( );
+                        sprintf( buffer, "%s von %s\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
+                        IO::NAV->draw( );
                         IO::messageBox a( buffer );
                         FS::SAV->m_bag.insert( BAG::toBagType( acI.m_itemType ), acI.getItemId( ), 1 );
                     } else { //give item
@@ -183,7 +183,7 @@ namespace STS {
                         _stsUI->draw( FS::SAV->m_pkmnTeam[ _pkmnIdx ], _page, true );
                     }
                 }
-                if( IN_RANGE( touch, tg.back( ) ) && IO::waitForInput( tg.back( ) ) ) {
+                if( IN_RANGE_I( touch, tg.back( ) ) && IO::waitForInput( tg.back( ) ) ) {
                     DEX::dex( -1, 0 ).run( FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_speciesId );
 
                     _stsUI->init( _pkmnIdx );

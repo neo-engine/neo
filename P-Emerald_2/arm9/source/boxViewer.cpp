@@ -198,7 +198,7 @@ namespace BOX {
             bool rangeChanged = false;
             for( u8 j = 0; j < _ranges.size( ); ++j ) {
                 auto i = _ranges[ j ];
-                if( IN_RANGE( touch, i ) ) {
+                if( IN_RANGE_I( touch, i ) ) {
                     if( !_atHandOam ) {
                         u8 c = 0;
                         loop( ) {
@@ -219,7 +219,7 @@ namespace BOX {
                                 _currPos = j;
                                 break;
                             }
-                            if( !IN_RANGE( touch, i ) )
+                            if( !IN_RANGE_I( touch, i ) )
                                 break;
                         }
                     } else {

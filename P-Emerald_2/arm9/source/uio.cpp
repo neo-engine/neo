@@ -27,6 +27,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include <nds.h>
 
+#include <algorithm>
 #include <ctime>
 
 #include "uio.h"
@@ -34,13 +35,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "type.h"
 #include "saveGame.h"
 #include "fs.h"
-
-#include "Border.h"
-
-#include "BG0.h"
-#include "BG1.h"
-#include "BG2.h"
-#include "BG3.h"
 
 namespace IO {
     font* regularFont = new font( REGULAR_FONT::fontData, REGULAR_FONT::fontWidths, REGULAR_FONT::shiftchar );
@@ -63,28 +57,6 @@ namespace IO {
     int bg2sub;
     int bg3;
     int bg2;
-
-    u8 mainSpritesPositions[ 12 ] = { 24, 64,
-        236, 96,
-        20, 128,
-        238, 64,
-        22, 96,
-        234, 128 };
-    unsigned int NAV_DATA[ 12288 ] = { 0 };
-    unsigned short NAV_DATA_PAL[ 256 ] = { 0 };
-    backgroundSet BGs[ MAXBG ] = {/* { "Raging Gyarados", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Sleeping Eevee", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Mystic Guardevoir", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Waiting Suicune", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Awakening Xerneas", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Awakening Yveltal", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Fighting Groudon", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Fighting Kyogre", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },*/
-        { "Executing Exeggcute", BG0Bitmap, BG0Pal, false, true, mainSpritesPositions },
-        { "Fighting Torchic", BG3Bitmap, BG3Pal, false, false, mainSpritesPositions },
-        { "Reborn Ho-Oh", BG2Bitmap, BG2Pal, false, false, mainSpritesPositions },
-        { "Working Klink", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions }
-    };
 
     void initVideo( ) {
 
@@ -141,49 +113,19 @@ namespace IO {
         p_palette[ ( p_start + 7 ) * 16 - 1 ] = RGB15( 24, 24, 24 ); //37 normal white
     }
 
-    void drawBorder( ) {
-        dmaCopy( BorderBitmap, SCREENS_SWAPPED ? bgGetGfxPtr( bg2 ) : bgGetGfxPtr( bg2sub ), 256 * 192 );
-        dmaCopy( BorderPal, SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB, 64 );
-
-        DRAW_TIME = true;
-    }
-
-    void drawSub( bool p_initMainSrites, u8 p_newIdx ) {
-        if( FS::SAV->m_bgIdx == p_newIdx )
-            return;
-        else if( p_newIdx == u8( 255 ) )
-            p_newIdx = FS::SAV->m_bgIdx;
-
-        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
-        auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
-
-        if( !BGs[ p_newIdx ].m_loadFromRom ) {
-            dmaCopy( BGs[ p_newIdx ].m_mainMenu, ptr, 256 * 192 );
-            dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, pal, 256 * 2 );
-            FS::SAV->m_bgIdx = p_newIdx;
-        } else if( !FS::readNavScreenData( ptr, BGs[ p_newIdx ].m_name.c_str( ), p_newIdx ) ) {
-            dmaCopy( BGs[ 0 ].m_mainMenu, ptr, 256 * 256 );
-            dmaCopy( BGs[ 0 ].m_mainMenuPal, pal, 256 * 2 );
-            FS::SAV->m_bgIdx = 0;
-        } else
-            FS::SAV->m_bgIdx = p_newIdx;
-        drawBorder( );
-        if( p_initMainSrites )
-            INIT_MAIN_SPRITES = true;
-    }
-
     bool waitForTouchUp( u16 p_targetX1, u16 p_targetY1, u16 p_targetX2, u16 p_targetY2 ) {
         return waitForTouchUp( inputTarget( p_targetX1, p_targetY1, p_targetX2, p_targetY2 ) );
     }
     bool waitForTouchUp( inputTarget p_inputTarget ) {
+        touchPosition touch;
         if( p_inputTarget.m_inputType == inputTarget::inputType::TOUCH ) {
             loop( ) {
                 swiWaitForVBlank( );
                 scanKeys( );
-                auto touch = touchReadXY( );
-                if( touch.px == 0 && touch.py == 0 )
+                touchRead( &touch );
+                if( TOUCH_UP )
                     return true;
-                if( !IN_RANGE( touch, p_inputTarget ) )
+                if( !IN_RANGE_I( touch, p_inputTarget ) )
                     return false;
             }
         }
@@ -191,16 +133,15 @@ namespace IO {
             loop( ) {
                 swiWaitForVBlank( );
                 scanKeys( );
-                auto touch = touchReadXY( );
-                if( touch.px == 0 && touch.py == 0 )
+                touchRead( &touch );
+                if( TOUCH_UP )
                     return true;
-                if( !IN_RANGE_C( touch, p_inputTarget ) )
+                if( !IN_RANGE_I_C( touch, p_inputTarget ) )
                     return false;
             }
         }
         return false;
     }
-
 
     void waitForKeysUp( KEYPAD_BITS p_keys ) {
         return waitForKeysUp( inputTarget( p_keys ) );
@@ -225,7 +166,6 @@ namespace IO {
         return waitForTouchUp( p_inputTarget );
     }
 
-
     void initTextField( ) {
         regularFont->setColor( 0, 0 );
         regularFont->setColor( BLACK_IDX, 1 );
@@ -242,15 +182,29 @@ namespace IO {
         printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
     }
 
-    void putrec( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
-        printRectangle( p_x1, p_y1, p_x2, p_y2, p_bottom, p_striped, p_color );
-    }
+    /*
+    * @brief Prints a rectangle to the screen, all coordinates inclusive
+    */
     void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped, u8 p_color ) {
-        for( u16 x = p_x1; x <= p_x2; ++x ) for( u16 y = p_y1; y < p_y2; ++y )
+        for( u16 y = p_y1; y <= p_y2; ++y ) for( u16 x = p_x1; x <= p_x2; ++x )
             if( p_bottom )
                 ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( x + y * (u16) SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8) p_color ) << 8 ) | ( (u8) p_color ) : p_color;
             else
                 ( (color *) BG_BMP_RAM( 1 ) )[ ( x + y * (u16) SCREEN_WIDTH ) / 2 ] = !p_striped ? ( ( (u8) p_color ) << 8 ) | ( (u8) p_color ) : p_color;
+    }
+
+    /*
+     * @brief A sine approximation via a third-order cosine approx.
+     * @param p_x   angle (with 2^15 units/circle)
+     * @return     Sine value (Q12)
+     */
+    s32 isin( s32 p_x ) {
+        static const u16 qN = 13, qA = 12, qP = 15, qR = 2 * qN - qP, qS = qN + qP + 1 - qA;
+        p_x <<= ( 30 - qN );                 // shift to full s32 range (Q13->Q30)
+        if( ( p_x ^ ( p_x << 1 ) ) < 0 )     // test for quadrant 1 or 2
+            p_x = ( 1 << 31 ) - p_x;
+        p_x >>= ( 30 - qN );
+        return p_x * ( ( 3 << qP ) - ( p_x * p_x >> qR ) ) >> qS;
     }
 
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, bool p_big ) {
@@ -265,8 +219,8 @@ namespace IO {
         if( p_HP > 100 ) {
             BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
             for( u16 phi = 0; phi < 300; phi++ ) {
-                s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
-                s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
+                s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
+                s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
                     u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
                     u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
@@ -277,33 +231,54 @@ namespace IO {
                 }
             }
         } else {
-            BG_PAL( p_sub )[ p_freecolor2 ] = NORMAL_;
-            for( u16 phi = 3 * ( 100 - p_HPstart ); phi < 3 * p_HP; phi++ ) {
-                s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
-                s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
-                for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
-                    u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
-                    if( nx == p_x + 16 + j )
-                        --nx;
+            BG_PAL( p_sub )[ p_freecolor2 ] = NORMAL_COLOR;
+            if( 100 - p_HPstart <= p_HP ) {
+                for( u16 phi = 3 * ( 100 - p_HPstart ); phi < 3 * p_HP; phi++ ) {
+                    s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
+                    s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
+                    for( u16 j = p_innerR; j <= p_outerR; ++j ) {
+                        u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
+                        u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
+                        if( nx == p_x + 16 + j )
+                            --nx;
 
-                    ( (color *) ( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8) p_freecolor2 ) << 8 ) | (u8) p_freecolor2;
-                    if( phi >= 150 )
-                        BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
-                    if( phi >= 225 )
-                        BG_PAL( p_sub )[ p_freecolor1 ] = RED;
+                        ( (color *) ( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8) p_freecolor2 ) << 8 ) | (u8) p_freecolor2;
+                        if( phi >= 150 )
+                            BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
+                        if( phi >= 225 )
+                            BG_PAL( p_sub )[ p_freecolor1 ] = RED;
+                    }
+                    if( p_delay )
+                        swiWaitForVBlank( );
                 }
-                if( p_delay )
-                    swiWaitForVBlank( );
+            } else {
+                for( u16 phi = 3 * ( 100 - p_HPstart ); phi > 3 * p_HP; phi-- ) {
+                    s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
+                    s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
+                    for( u16 j = p_innerR; j <= p_outerR; ++j ) {
+                        u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
+                        u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
+                        if( nx == p_x + 16 + j )
+                            --nx;
+
+                        ( (color *) ( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ] = ( ( (u8) p_freecolor1 ) << 8 ) | (u8) p_freecolor1;
+                        if( phi < 225 )
+                            BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
+                        if( phi < 150 )
+                            BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
+                    }
+                    if( p_delay )
+                        swiWaitForVBlank( );
+                }
             }
         }
     }
     void displayEP( u16 p_EPstart, u16 p_EP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2, bool p_delay, u8 p_innerR, u8 p_outerR, bool p_sub ) {
         if( p_EPstart >= 100 || p_EP > 100 ) {
-            BG_PAL( p_sub )[ p_freecolor1 ] = NORMAL_;
+            BG_PAL( p_sub )[ p_freecolor1 ] = NORMAL_COLOR;
             for( u16 phi = 0; phi < 300; phi++ ) {
-                s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
-                s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
+                s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
+                s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
                     u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
                     u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
@@ -314,10 +289,10 @@ namespace IO {
                 }
             }
         } else {
-            BG_PAL( p_sub )[ p_freecolor2 ] = ICE;
+            BG_PAL( p_sub )[ p_freecolor2 ] = ICE_COLOR;
             for( u16 phi = 3 * p_EPstart; phi <= 3 * p_EP; ++phi ) {
-                s16 x = cosLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
-                s16 y = sinLerp( degreesToAngle( ( 120 + phi ) % 360 ) );
+                s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
+                s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
                     u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
                     u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
@@ -337,21 +312,32 @@ namespace IO {
 
     void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2, u8 p_colorIdx, bool p_pressed, bool p_bottom ) {
         if( !p_pressed ) {
-            printRectangle( p_x1 + 1, p_y1 + 1, p_x2, p_y2,
+            printRectangle( p_x2 - 2, p_y1 + 1, p_x2, p_y2, p_bottom, false, BLACK_IDX );
+            printRectangle( p_x1 + 1, p_y2 - 1, p_x2, p_y2, p_bottom, false, BLACK_IDX );
+
+            printRectangle( p_x1, p_y1, p_x1 + p_borderWidth, p_y2 - 1, p_bottom, false, p_colorIdx );
+            printRectangle( p_x2 - p_borderWidth2 - 2, p_y1, p_x2 - 2, p_y2 - 1, p_bottom, false, p_colorIdx );
+            printRectangle( p_x1, p_y1, p_x2 - 2, p_y1 + p_borderWidth - 2, p_bottom, false, p_colorIdx );
+            printRectangle( p_x1, p_y2 - p_borderWidth + 3, p_x2 - 2, p_y2 - 1, p_bottom, false, p_colorIdx );
+
+            printRectangle( p_x2 - p_borderWidth2 - 1, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4,
                             p_bottom, false, BLACK_IDX );
-            printRectangle( p_x1, p_y1, p_x2 - 2, p_y2 - 1,
-                            p_bottom, false, p_colorIdx );
-            printRectangle( p_x1 + 1 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4,
+            printRectangle( p_x1 + 1 + p_borderWidth, p_y2 - p_borderWidth + 2, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4,
                             p_bottom, false, BLACK_IDX );
             printRectangle( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2, p_x2 - p_borderWidth2 - 2, p_y2 - p_borderWidth + 3,
                             p_bottom, false, WHITE_IDX );
         } else {
-            printRectangle( p_x1, p_y1, p_x2 - 1, p_y2 - 1,
-                            p_bottom, false, 0 );
-            printRectangle( p_x1 + 2, p_y1 + 1, p_x2, p_y2,
-                            p_bottom, false, p_colorIdx );
+            printRectangle( p_x1, p_y1, p_x1 + 2, p_y2 - 1, p_bottom, false, 0 );
+            printRectangle( p_x1, p_y1, p_x2 - 1, p_y1 + 1, p_bottom, false, 0 );
 
-            printRectangle( p_x1 + 3 + p_borderWidth, p_y1 + p_borderWidth, p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4,
+            printRectangle( p_x1 + 2, p_y1 + 1, p_x1 + 2 + p_borderWidth, p_y2, p_bottom, false, p_colorIdx );
+            printRectangle( p_x2 - p_borderWidth2, p_y1 + 1, p_x2, p_y2, p_bottom, false, p_colorIdx );
+            printRectangle( p_x1 + 2, p_y1 + 1, p_x2, p_y1 + p_borderWidth - 1, p_bottom, false, p_colorIdx );
+            printRectangle( p_x1 + 2, p_y2 - p_borderWidth + 3, p_x2, p_y2, p_bottom, false, p_colorIdx );
+
+            printRectangle( p_x2 - p_borderWidth2 + 1, p_y1 + p_borderWidth, p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4,
+                            p_bottom, false, BLACK_IDX );
+            printRectangle( p_x1 + 3 + p_borderWidth, p_y2 - p_borderWidth + 4, p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4,
                             p_bottom, false, BLACK_IDX );
 
             printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 3,
@@ -375,31 +361,15 @@ namespace IO {
     void printStringCenterD( font* p_font, const char *p_string, bool p_bottom ) {
         p_font->printStringCenterD( p_string, p_bottom );
     }
-    void printNumber( font* p_font, s32 p_num, s16 p_x, s16 p_y, bool p_bottom );
+    void printNumber( font* p_font, s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
+        p_font->printNumber( p_num, p_x, p_y, p_bottom );
+    }
 
-    void printString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance ) {
-        p_font->printString( p_string, p_x, p_y, p_bottom, p_yDistance );
-    }
     void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printMBString( p_string, p_x, p_y, p_bottom );
-    }
-    void printMBString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         p_font->printMBString( p_string, p_x, p_y, p_bottom );
     }
     void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
         p_font->printMBStringD( p_string, p_x, p_y, p_bottom );
-    }
-    void printMBStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printMBStringD( p_string, p_x, p_y, p_bottom );
-    }
-    void printStringCenter( font* p_font, const wchar_t *p_string, bool p_bottom ) {
-        p_font->printStringCenter( p_string, p_bottom );
-    }
-    void printStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printStringD( p_string, p_x, p_y, p_bottom );
-    }
-    void printStringCenterD( font* p_font, const wchar_t *p_string, bool p_bottom ) {
-        p_font->printStringCenterD( p_string, p_bottom );
     }
 
     void topScreenPlot( u8 p_x, u8 p_y, color p_color ) {
@@ -419,67 +389,67 @@ namespace IO {
             ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color | ( ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
     }
 
-    u16 getColor( Type p_type ) {
+    u16 getColor( type p_type ) {
         switch( p_type ) {
             case NORMAL:
-                return NORMAL_;
+                return NORMAL_COLOR;
                 break;
-            case KAMPF:
+            case FIGHTING:
                 return RED;
                 break;
-            case FLUG:
+            case FLYING:
                 return TURQOISE;
                 break;
-            case GIFT:
-                return POISON;
+            case POISON:
+                return POISON_COLOR;
                 break;
-            case BODEN:
-                return GROUND;
+            case GROUND:
+                return GROUND_COLOR;
                 break;
-            case GESTEIN:
-                return ROCK;
+            case ROCK:
+                return ROCK_COLOR;
                 break;
-            case KAEFER:
-                return BUG;
+            case BUG:
+                return BUG_COLOR;
                 break;
-            case GEIST:
-                return GHOST;
+            case GHOST:
+                return GHOST_COLOR;
                 break;
-            case STAHL:
-                return STEEL;
+            case STEEL:
+                return STEEL_COLOR;
                 break;
-            case UNBEKANNT:
-                return UNKNOWN;
+            case UNKNOWN:
+                return UNKNOWN_COLOR;
                 break;
-            case WASSER:
+            case WATER:
                 return BLUE;
                 break;
-            case FEUER:
+            case FIRE:
                 return ORANGE;
                 break;
-            case PFLANZE:
+            case GRASS:
                 return GREEN;
                 break;
-            case ELEKTRO:
+            case LIGHTNING:
                 return YELLOW;
                 break;
-            case PSYCHO:
+            case PSYCHIC:
                 return PURPLE;
                 break;
-            case EIS:
-                return ICE;
+            case ICE:
+                return ICE_COLOR;
                 break;
-            case DRACHE:
-                return DRAGON;
+            case DRAGON:
+                return DRAGON_COLOR;
                 break;
-            case UNLICHT:
+            case DARKNESS:
                 return BLACK;
                 break;
-            case FEE:
-                return FAIRY;
+            case FAIRY:
+                return FAIRY_COLOR;
                 break;
             default:
-                return DRAGON;
+                return DRAGON_COLOR;
                 break;
         }
         return WHITE;

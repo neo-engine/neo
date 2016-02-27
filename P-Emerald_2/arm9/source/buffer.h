@@ -28,4 +28,3 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #pragma once
 
 extern char buffer[ 200 ];
-extern wchar_t wbuffer[ 200 ];

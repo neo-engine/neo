@@ -28,6 +28,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "startScreen.h"
 #include "defines.h"
 #include "uio.h"
+#include "nav.h"
 #include "screenFade.h"
 #include "fs.h"
 #include "mapDrawer.h"
@@ -48,7 +49,7 @@ void fillResume( ) {
     else
         BG_PALETTE_SUB[ 252 ] = RGB15( 31, 0, 0 );
 
-    sprintf( buffer, "%ls", FS::SAV->m_playername );
+    sprintf( buffer, "%s", FS::SAV->m_playername );
     IO::regularFont->printString( buffer, 128, 5, true );
 
     sprintf( buffer, "%s", FS::getLoc( MAP::curMap->getCurrentLocationId( ) ) );
@@ -72,7 +73,7 @@ void fillResume( ) {
 void drawSplash( ) {
     FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "Title" );
     if( IO::BGs[ FS::SAV->m_bgIdx ].m_allowsOverlay )
-        IO::drawSub( );
+        IO::NAV->draw( );
     IO::clearScreen( true, false, false );
 
     consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
@@ -98,7 +99,7 @@ void drawSplash( ) {
     touchPosition tp;
     loop( ) {
         scanKeys( );
-        tp = touchReadXY( );
+        touchRead( &tp );
         swiWaitForVBlank( );
 
         int pressed = keysCurrent( );
@@ -113,7 +114,7 @@ void drawSplash( ) {
     }
     while( tp.px || tp.py ) {
         scanKeys( );
-        tp = touchReadXY( );
+        touchRead( &tp );
         swiWaitForVBlank( );
     }
 
@@ -123,7 +124,7 @@ void drawSplash( ) {
 
 void initNewGame( ) {
     FS::SAV = new FS::saveGame( );
-    wcscpy( FS::SAV->m_playername, L"Test" );
+    strcpy( FS::SAV->m_playername, "Test" );
     FS::SAV->m_activatedPNav = false;
     FS::SAV->m_money = 3000;
     FS::SAV->m_id = rand( ) % 65536;
@@ -166,7 +167,7 @@ bool transferGame( ) {
     if( acgame == -1 )
         return false;
 
-    IO::drawSub( );
+    IO::NAV->draw( );
     IO::yesNoBox yn = IO::yesNoBox( );
     if( yn.getResult( "Möchtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?" ) ) {
         IO::messageBox( "Solltest du im Folgenden\nspeichern, so werden Daten\nauf das GBA-Modul geschrieben." );
@@ -174,7 +175,7 @@ bool transferGame( ) {
         IO::messageBox( "Auch das Speichern an sich\nkann den Spielstand\nbeschädigen." );
         yn = IO::yesNoBox( );
         if( yn.getResult( "Möchtest du fortfahren?" ) ) {
-            IO::messageBox( "Lade Spielstand..." );
+            IO::messageBox( "Lade Spielstand…" );
             //int loadgame = acgame > 2 ? 1 : 0;
 
             // gen3::SaveParser* save3 = gen3::SaveParser::Instance( );
@@ -185,10 +186,10 @@ bool transferGame( ) {
             //   }
 
             FS::SAV = new FS::saveGame( );
-            wchar_t savname[ 8 ] = { 0 };
+            char savname[ 8 ] = { 0 };
             // for( int i = 0; i < 7; ++i )
             //     savname[ i ] = gen3::getNText( save3->unpackeddata[ i ] );
-            wcscpy( FS::SAV->m_playername, savname );
+            strcpy( FS::SAV->m_playername, savname );
 
             //  FS::SAV->m_isMale = !save3->unpackeddata[ 8 ];
 
@@ -222,7 +223,7 @@ bool transferGame( ) {
                 acPkmn.m_boxdata.m_markings = acBeltP->markint;
 
                 acPkmn.m_statusint = acBeltP->status;
-                acPkmn.m_Level = acBeltP->level;
+                acPkmn.m_level = acBeltP->level;
                 acPkmn.m_boxdata.m_pokerus = acBeltP->pokerus;
 
                 acPkmn.m_stats.m_acHP = acBeltP->currentHP;
@@ -362,7 +363,7 @@ startScreen::ChoiceResult startScreen::runChoice( ) {
     loop( ) {
         swiWaitForVBlank( );
         scanKeys( );
-        touch = touchReadXY( );
+        touchRead(&touch);
         u32 p = keysUp( );
         u32 k = keysHeld( ) | keysDown( );
         if( ( FS::SAV->m_savTyp == 1 ) && ( k & KEY_SELECT ) && ( k & KEY_RIGHT ) && ( k & KEY_L ) && ( k & KEY_R ) ) {

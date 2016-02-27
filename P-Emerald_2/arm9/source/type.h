@@ -47,11 +47,33 @@
 #include "Unl.h"
 #include "Fee.h"
 
-enum Type {
-    NORMAL = 0, KAMPF = 1, FLUG = 2, GIFT = 3, BODEN = 4,
-    GESTEIN = 5, KAEFER = 6, GEIST = 7, STAHL = 8, UNBEKANNT = 9,
-    WASSER = 10, FEUER = 11, PFLANZE = 12, ELEKTRO = 13, PSYCHO = 14,
-    EIS = 15, DRACHE = 16, UNLICHT = 17, FEE = 18
+enum type {
+    NORMAL = 0, FIGHTING = 1, FLYING = 2, POISON = 3, GROUND = 4,
+    ROCK = 5, BUG = 6, GHOST = 7, STEEL = 8, UNKNOWN = 9,
+    WATER = 10, FIRE = 11, GRASS = 12, LIGHTNING = 13, PSYCHIC = 14,
+    ICE = 15, DRAGON = 16, DARKNESS = 17, FAIRY = 18
 };
 
-float getEffectiveness( const Type& p_t1, const Type& p_t2 );
+float getEffectiveness( const type& p_t1, const type& p_t2 );
+
+enum ailment {
+    NONE = 0,
+    PARALYSIS,
+    SLEEP,
+    FREEZE,
+    BURN,
+    POISONED,
+    CONFUSION,
+    INFATUATION,
+    TRAP,
+    NIGHTMARE,
+    TORMENT,
+    DISABLE,
+    YAWN,
+    HEAL_BLOCK,
+    NO_TYPE_IMMUNITY,
+    LEECH_SEED,
+    EMBARGO,
+    PERISH_SONG,
+    INGRAIN
+};

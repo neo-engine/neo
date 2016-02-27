@@ -37,6 +37,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "ribbon.h"
 
 #include <cstdio>
+#include <algorithm>
 
 #include "memo.h"
 #include "atks.h"
@@ -170,10 +171,12 @@ namespace STS {
                                    borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
                 }
 
-                sprintf( buffer, "%ls", FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 - mval, false );
-                sprintf( buffer, "%ls", getWDisplayName( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId ) );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 14 - mval, false );
+                IO::regularFont->printString( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name,
+                                              ADJUST_X( i, x, FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name ),
+                                              borders[ i ][ 1 ] * 8 - mval, false );
+                IO::regularFont->printString( getDisplayName( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId ),
+                                              ADJUST_X( i, x, getDisplayName( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId ) ),
+                                              borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
                 IO::regularFont->setColor( 142 + 2 * i, 2 );
                 if( FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP )
@@ -189,7 +192,6 @@ namespace STS {
             } else {
                 sprintf( buffer, "Ei" );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 - mval, false );
-                sprintf( buffer, "Ei" );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 14 - mval, false );
 
                 sprintf( buffer, "%s", ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
@@ -215,7 +217,7 @@ namespace STS {
                                     ITEM_ICON_IDX, ITEM_ICON_PAL, tileCnt, false );
 
         for( u8 i = 0; i < 4; ++i ) {
-            Type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
+            type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
             tileCnt = IO::loadTypeIcon( t, 126, 43 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ), tileCnt, false );
         }
         for( u8 i = 0; i < 4; ++i ) {
@@ -243,7 +245,7 @@ namespace STS {
         consoleSetFont( &IO::Bottom, IO::consoleFont );
         bgUpdate( );
 
-        IO::drawSub( );
+        IO::NAV->draw( );
         if( p_initTop )
             initTop( );
         initSub( );
@@ -348,15 +350,15 @@ namespace STS {
             u16 exptype = data.m_expType;
 
             printf( "\x1b[39m" );
-            printf( "EP %3lu%%\nKP %3i%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ) * 100 /
-                    ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ),
+            printf( "EP %3lu%%\nKP %3i%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
+                    ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
                     p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::displayHP( 100, 101, 46, 80, 97, 98, false, 50, 56, p_bottom );
             IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 80, 97, 98, false, 50, 56, p_bottom );
 
             IO::displayEP( 100, 101, 46, 80, 99, 100, false, 59, 62, p_bottom );
-            IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ) * 100 /
-                           ( EXP[ p_pokemon.m_Level ][ exptype ] - EXP[ p_pokemon.m_Level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62, p_bottom );
+            IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
+                           ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62, p_bottom );
 
         } else {
             p_page = -1;
@@ -391,7 +393,7 @@ namespace STS {
             pal[ BLUE2_IDX ] = BLUE2;
 
             char buffer[ 50 ];
-            sprintf( buffer, "Status auf Lv.%3i:", currPkmn.m_Level );
+            sprintf( buffer, "Status auf Lv.%3i:", currPkmn.m_level );
             IO::regularFont->printString( buffer, 110, 34, p_bottom );
 
             sprintf( buffer, "KP                     %3i", currPkmn.m_stats.m_maxHP );
@@ -500,7 +502,7 @@ namespace STS {
         for( int i = 0; i < 4; i++ ) {
             if( !currPkmn.m_boxdata.m_moves[ i ] )
                 continue;
-            Type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
+            type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
             IO::loadTypeIcon( t, 222, 42 + 30 * i, TYPE_IDX + i, TYPE_PAL( i ),
                               Oam->oamBuffer[ TYPE_IDX + i ].gfxIndex, p_bottom );
 
@@ -582,7 +584,7 @@ namespace STS {
             IO::regularFont->setColor( BLUE2_IDX, 2 );
         }
         char buffer[ 50 ];
-        sprintf( buffer, "%ls/%05d", currPkmn.m_boxdata.m_oT, currPkmn.m_boxdata.m_oTId );
+        sprintf( buffer, "%s/%05d", currPkmn.m_boxdata.m_oT, currPkmn.m_boxdata.m_oTId );
         IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 34, p_bottom );
 
         if( !currPkmn.m_boxdata.isShiny( ) )
@@ -888,7 +890,7 @@ namespace STS {
         std::vector<std::string> names;
 
         auto pkmn = FS::SAV->m_pkmnTeam[ p_current ];
-        IO::drawSub( );
+        IO::NAV->draw( );
         BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
         BG_PALETTE_SUB[ GRAY_IDX ] = GRAY;
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
@@ -919,7 +921,7 @@ namespace STS {
             return res;
 
         for( u8 i = 0; i < 4; ++i )
-            if( pkmn.m_boxdata.m_moves[ i ] < MAXATTACK &&
+            if( pkmn.m_boxdata.m_moves[ i ] < MAX_ATTACK &&
                 AttackList[ pkmn.m_boxdata.m_moves[ i ] ]->m_isFieldAttack )
                 names.push_back( AttackList[ pkmn.m_boxdata.m_moves[ i ] ]->m_moveName );
 
@@ -972,7 +974,7 @@ namespace STS {
                                     ITEM_ICON_IDX, ITEM_ICON_PAL, tileCnt );
 
         for( u8 i = 0; i < 4; ++i ) {
-            Type t = AttackList[ 0 ]->m_moveType;
+            type t = AttackList[ 0 ]->m_moveType;
             tileCnt = IO::loadTypeIcon( t, 126, 43 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ), tileCnt, true );
         }
         for( u8 i = 0; i < 4; ++i ) {

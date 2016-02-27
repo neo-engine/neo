@@ -106,7 +106,7 @@ enum pkmnNatures {
 };
 
 struct pokemonData {
-    Type            m_types[ 2 ];
+    type            m_types[ 2 ];
     u16             m_bases[ 6 ];
     u16             m_catchrate;
     u16             m_items[ 4 ];
@@ -150,8 +150,8 @@ struct pokemonData {
     char            m_formeName[ 30 ][ 15 ];
 };
 
-const wchar_t*  getWDisplayName( u16 p_pkmnId );
-void            getWDisplayName( u16 p_pkmnId, wchar_t* p_name );
+const char*     getDisplayName( u16 p_pkmnId );
+void            getDisplayName( u16 p_pkmnId, char* p_name );
 bool            getAll( u16 p_pkmnId, pokemonData& out );
 
 void            getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num, u16* p_res );
@@ -233,20 +233,20 @@ u16: 15;
                                                  //}
 
                                                  //BLOCKC{
-        wchar_t                 m_name[ PKMN_NAMELENGTH ];
+        char                    m_name[ PKMN_NAMELENGTH ];
         u16                     m_hometown : 16;
         u8                      m_ribbons2[ 4 ];
 u32: 32;
         //}
 
         //BLOCKD{
-        wchar_t                 m_oT[ OTLENGTH ];
+        char                    m_oT[ OTLENGTH ];
         u8                      m_gotDate[ 3 ];//(EGG)
         u8                      m_hatchDate[ 3 ]; //gotDate for nonEgg
 u32: 32;
         u8                      m_pokerus : 8;//
         u8                      m_ball : 8;//
-        u16      m_gotLevel : 7;
+        u16                     m_gotLevel : 7;
         bool                    m_oTisFemale : 1;
         enum encounter : char {
             EGG = 0x0,
@@ -332,9 +332,9 @@ u8: 8;
         u16                     getItem( ) const {
             return m_holdItem;
         }
-        Type                    getHPType( ) const {
+        type                    getHPType( ) const {
             int a = ( ( IVget( 0 ) & 1 ) + 2 * ( IVget( 1 ) & 1 ) + 4 * ( IVget( 2 ) & 1 ) + 8 * ( IVget( 3 ) & 1 ) + 16 * ( IVget( 4 ) & 1 ) + 32 * ( IVget( 5 ) & 1 ) * 15 ) / 63;
-            return a < 9 ? (Type) a : Type( a + 1 );
+            return a < 9 ? (type) a : type( a + 1 );
         }
         u8                      getHPPower( ) const {
             return 30 + ( ( ( ( IVget( 0 ) >> 1 ) & 1 ) + 2 * ( ( IVget( 1 ) >> 1 ) & 1 ) + 4 * ( ( IVget( 2 ) >> 1 ) & 1 ) + 8 * ( ( IVget( 3 ) >> 1 ) & 1 ) + 16 * ( ( IVget( 4 ) >> 1 ) & 1 ) + 32 * ( ( IVget( 5 ) >> 1 ) & 1 ) * 40 ) / 63 );
@@ -351,7 +351,7 @@ u8: 8;
         boxPokemon( ) { }
         boxPokemon( u16             p_pkmnId,
                     u16             p_level,
-                    const wchar_t*  p_name = 0,
+                    const char*     p_name = 0,
                     u8              p_shiny = 0,
                     bool            p_hiddenAbility = false,
                     bool            p_isEgg = false,
@@ -359,11 +359,11 @@ u8: 8;
                     bool            p_fatefulEncounter = false );
         boxPokemon( u16*            p_moves,
                     u16             p_pkmnId,
-                    const wchar_t*  p_name,
+                    const char*     p_name,
                     u16             p_level,
                     u16             p_id,
                     u16             p_sid,
-                    const wchar_t*  p_ot,
+                    const char*     p_ot,
                     bool            p_oTFemale,
                     u8              p_shiny = 0,
                     bool            p_hiddenAbility = false,
@@ -376,19 +376,19 @@ u8: 8;
 
     union {
         struct {
-            u8   m_Asleep : 3;
-            u8   m_Poisoned : 1;
-            u8   m_Burned : 1;
-            u8   m_Frozen : 1;
-            u8   m_Paralyzed : 1;
-            u8   m_Toxic : 1;
+            u8   m_isAsleep : 3;
+            u8   m_isPoisoned : 1;
+            u8   m_isBurned : 1;
+            u8   m_isFrozen : 1;
+            u8   m_isParalyzed : 1;
+            u8   m_isBadlyPoisoned : 1;
         } m_status;
         u8                 m_statusint;
     };
 u8: 8;
 u8: 8;
 u8: 8;
-    u8 m_Level : 8;
+    u8 m_level : 8;
 u8: 8;
     struct stats {
         u16 m_acHP : 16;	//current HP
@@ -404,7 +404,7 @@ u8: 8;
     pokemon( pokemon::boxPokemon p_boxPokemon );
     pokemon( u16             p_pkmnId,
              u16             p_level,
-             const wchar_t*  p_name = 0,
+             const char*    p_name = 0,
              u8              p_shiny = 0,
              bool            p_hiddenAbility = false,
              bool            p_isEgg = false,
@@ -412,11 +412,11 @@ u8: 8;
              bool            p_fatefulEncounter = false );
     pokemon( u16*           p_moves,
              u16            p_species,
-             const wchar_t* p_name,
+             const char*    p_name,
              u16            p_level,
              u16            p_id,
              u16            p_sid,
-             const wchar_t* p_ot,
+             const char*    p_ot,
              bool           p_oTFemale,
              u8             p_shiny = 0,
              bool           p_hiddenAbility = false,
@@ -461,7 +461,7 @@ u8: 8;
     u16                     getItem( ) const {
         return m_boxdata.getItem( );
     }
-    Type                    getHPType( ) const {
+    type                    getHPType( ) const {
         return m_boxdata.getHPType( );
     }
     u8                      getHPPower( ) const {

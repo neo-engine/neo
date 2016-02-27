@@ -6,6 +6,7 @@ file        : fs.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
+
 Copyright (C) 2012 - 2016
 Philip Wellnitz
 
@@ -40,9 +41,9 @@ namespace FS {
 #define MAXITEMSPERPAGE 12
 
     std::string readString( FILE*, bool p_new = false );
-    std::wstring readWString( FILE*, bool p_new = false );
 
     bool exists( const char* p_path, const char* p_name );
+    bool exists( const char* p_path, u16 p_name, bool p_unused );
     bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name = "" );
     FILE* open( const char* p_path, const char* p_name, const char* p_ext = ".raw", const char* p_mode = "r" );
     FILE* open( const char* p_path, u16 p_value, const char* p_ext = ".raw", const char* p_mode = "r" );
@@ -64,7 +65,6 @@ namespace FS {
     std::string breakString( const std::string& p_string, IO::font* p_font, u8 p_lineLength );
 
     std::string convertToOld( const std::string& p_string );
-    std::wstring convertToOld( const std::wstring& p_string );
 
     bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no );
     bool readPictureData( u16* p_layer, const char* p_Path, const char* p_name, u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256, bool p_bottom = false );

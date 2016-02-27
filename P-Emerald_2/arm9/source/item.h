@@ -29,12 +29,12 @@
 
 #include <string>
 #include <map>
-
-#include "ability.h"
-
 #include <nds/ndstypes.h>
 
+#include "ability.h"
+#include "script.h"
 extern const char ITEM_PATH[ ];
+
 
 class item {
 public:

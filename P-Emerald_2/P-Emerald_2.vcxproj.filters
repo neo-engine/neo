@@ -213,6 +213,15 @@
     <ClInclude Include="arm9\source\screenFade.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\source\battleTrainer.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\battlePokemon.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\battleWeather.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">
@@ -337,6 +346,9 @@
     </ClCompile>
     <ClCompile Include="arm9\source\pokemonIO.cpp">
       <Filter>Source Files\arm9\data structures</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\battleScripts.cpp">
+      <Filter>Source Files\arm9\battle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

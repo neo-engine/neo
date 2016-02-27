@@ -93,37 +93,4 @@ namespace IO {
         }
         return result;
     }
-    bool yesNoBox::getResult( const wchar_t* p_text = 0 ) {
-        s16 x = 8 + 64 * !!_isNamed;
-        s16 y = 8;
-        if( p_text )
-            regularFont->printStringD( p_text, x, y, true );
-
-        draw( 2 );
-        bool result;
-        loop( ) {
-            swiWaitForVBlank( );
-            touchPosition t;
-            touchRead( &t );
-            if( t.px >= 28 && t.py >= 102 && t.px <= 122 && t.py <= 134 ) {
-                draw( 0 );
-                if( !waitForTouchUp( 28, 102, 122, 134 ) ) {
-                    draw( 2 );
-                    continue;
-                }
-                result = true;
-                break;
-            } else if( t.px >= 134 && t.py >= 102 && t.px <= 228 && t.py <= 134 ) {
-                draw( 1 );
-                if( !waitForTouchUp( 134, 102, 228, 134 ) ) {
-                    draw( 2 );
-                    continue;
-                }
-                result = false;
-                break;
-            }
-        }
-        return result;
-    }
-
 }

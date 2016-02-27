@@ -83,26 +83,6 @@ namespace IO {
             current_char++;
         }
     }
-    void font::printString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance, s8 p_adjustX ) {
-        u32 current_char = 0;
-        s16 putX = p_x, putY = p_y;
-
-        while( p_string[ current_char ] ) {
-            if( p_string[ current_char ] == L'\n' ) {
-                putY += p_yDistance;
-                putX = ( p_x -= p_adjustX );
-                current_char++;
-                continue;
-            }
-            printChar( p_string[ current_char ], putX, putY, p_bottom );
-
-            u16 c = (u16) p_string[ current_char ];
-            _shiftchar( c );
-            putX += _widths[ c ];
-
-            current_char++;
-        }
-    }
 
     void font::printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX, u16 p_breakChar ) {
         u32 current_char = 0;
@@ -121,22 +101,76 @@ namespace IO {
             current_char++;
         }
     }
-    void font::printMaxString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX, u16 p_breakChar ) {
+
+    void font::printStringCenter( const char *p_string, bool p_bottom ) {
+        s16 x = SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2;
+        s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
+
+        printString( p_string, x, y, p_bottom );
+    }
+
+    void font::printStringD( const char *p_string, s16& p_x, s16& p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
         while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' ) {
+                putY += 16;
+                putX = p_x;
+                current_char++;
+                continue;
+            }
+            printChar( p_string[ current_char ], putX, putY, p_bottom );
+
             u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
-            if( putX + _widths[ c ] > p_maxX ) {
-                printChar( p_breakChar, putX, putY, p_bottom );
-                break;
-            } else
-                printChar( p_string[ current_char ], putX, putY, p_bottom );
-
             putX += _widths[ c ];
+
+            for( u8 i = 0; i < 80 / TEXTSPEED; ++i )
+                swiWaitForVBlank( );
             current_char++;
         }
+        p_x = putX;
+        p_y = putY;
+    }
+
+    void font::printStringCenterD( const char *p_string, bool p_bottom ) {
+        s16 x = ( SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2 );
+        s16 y = ( SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2 );
+
+        printStringD( p_string, x, y, p_bottom );
+    }
+
+    void font::printNumber( s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
+        char numstring[ 10 ] = "";
+        u32 number = p_num, quotient = 1, remainder = 0;
+        char remainder_str[ 3 ] = "";
+        u32 current_char = 0, current_char2 = 0;
+        static char string[ 100 ];
+
+        if( number == 0 ) {
+            strcpy( string, "0" );
+        } else {
+            while( quotient != 0 ) {
+                remainder = number % 10;
+                quotient = number / 10;
+                remainder_str[ 0 ] = remainder + 48;
+                remainder_str[ 1 ] = '\0';
+                strcat( numstring, remainder_str );
+                number = quotient;
+            }
+
+            current_char = strlen( numstring ) - 1;
+            while( current_char != 0 ) {
+                string[ current_char2 ] = numstring[ current_char ];
+                current_char--;
+                current_char2++;
+            }
+            string[ current_char2 ] = numstring[ current_char ];
+            string[ current_char2 + 1 ] = '\0';
+        }
+
+        printString( string, p_x, p_y, p_bottom );
     }
 
     void drawContinue( font p_font, u8 p_x, u8 p_y ) {
@@ -182,67 +216,8 @@ namespace IO {
                     }
                     if( keysUp( ) & KEY_A )
                         break;
-                    auto t = touchReadXY( );
-                    if( t.px > 224 && t.py > 164
-                        && waitForTouchUp( 224, 164 ) ) {
-                        break;
-                    }
-                }
-                if( p_bottom ) {
-                    Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-                    updateOAM( true );
-                } else {
-                    OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-                    IO::updateOAM( false );
-                }
-                current_char++;
-                continue;
-            }
-            printChar( p_string[ current_char ], putX, putY, p_bottom );
-
-            u16 c = (u16) p_string[ current_char ];
-            _shiftchar( c );
-            putX += _widths[ c ];
-
-            current_char++;
-        }
-    }
-    void font::printMBString( const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        u32 current_char = 0;
-        s16 putX = p_x, putY = p_y;
-
-        while( p_string[ current_char ] ) {
-            if( p_string[ current_char ] == L'\n' ) {
-                putY += FONT_HEIGHT - 2;
-                putX = p_x;
-                current_char++;
-                continue;
-            }
-            if( p_string[ current_char ] == L'`' ) {
-                u8 c = 0;
-                bool on = false;
-                if( p_bottom ) {
-                    Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-                    updateOAM( true );
-                } else {
-                    OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-                    IO::updateOAM( false );
-                }
-
-                loop( ) {
-                    scanKeys( );
-                    swiWaitForVBlank( );
-                    if( ++c == 45 ) {
-                        c = 0;
-                        if( on )
-                            hideContinue( 243, 51 );
-                        else
-                            drawContinue( *this, 243, 51 );
-                        on = !on;
-                    }
-                    if( keysUp( ) & KEY_A )
-                        break;
-                    auto t = touchReadXY( );
+                    touchPosition t;
+                    touchRead( &t );
                     if( t.px > 224 && t.py > 164
                         && waitForTouchUp( 224, 164 ) ) {
                         break;
@@ -302,7 +277,8 @@ namespace IO {
                     }
                     if( keysUp( ) & KEY_A )
                         break;
-                    auto t = touchReadXY( );
+                    touchPosition t;
+                    touchRead( &t );
                     if( t.px > 224 && t.py > 164
                         && waitForTouchUp( 224, 164 ) ) {
                         break;
@@ -330,175 +306,6 @@ namespace IO {
         }
         p_x = putX;
         p_y = putY;
-    }
-    void font::printMBStringD( const wchar_t *p_string, s16& p_x, s16& p_y, bool p_bottom ) {
-        u32 current_char = 0;
-        s16 putX = p_x, putY = p_y;
-
-        while( p_string[ current_char ] ) {
-            if( p_string[ current_char ] == L'\n' ) {
-                putY += FONT_HEIGHT - 2;
-                putX = p_x;
-                current_char++;
-                continue;
-            }
-            if( p_string[ current_char ] == L'`' ) {
-                u8 c = 0;
-                bool on = false;
-                if( p_bottom ) {
-                    Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-                    updateOAM( true );
-                } else {
-                    OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-                    IO::updateOAM( false );
-                }
-
-                loop( ) {
-                    scanKeys( );
-                    swiWaitForVBlank( );
-                    if( ++c == 45 ) {
-                        c = 0;
-                        if( on )
-                            hideContinue( 243, 51 );
-                        else
-                            drawContinue( *this, 243, 51 );
-                        on = !on;
-                    }
-                    if( keysUp( ) & KEY_A )
-                        break;
-                    auto t = touchReadXY( );
-                    if( t.px > 224 && t.py > 164
-                        && waitForTouchUp( 224, 164 ) ) {
-                        break;
-                    }
-                }
-                if( p_bottom ) {
-                    Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-                    updateOAM( true );
-                } else {
-                    OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-                    IO::updateOAM( false );
-                }
-                current_char++;
-                continue;
-            }
-            printChar( p_string[ current_char ], putX, putY, p_bottom );
-
-            u16 c = (u16) p_string[ current_char ];
-            _shiftchar( c );
-            putX += _widths[ c ];
-
-            for( u8 i = 0; i < 80 / TEXTSPEED; ++i )
-                swiWaitForVBlank( );
-            current_char++;
-        }
-        p_x = putX;
-        p_y = putY;
-    }
-    void font::printStringD( const char *p_string, s16& p_x, s16& p_y, bool p_bottom ) {
-        u32 current_char = 0;
-        s16 putX = p_x, putY = p_y;
-
-        while( p_string[ current_char ] ) {
-            if( p_string[ current_char ] == '\n' ) {
-                putY += 16;
-                putX = p_x;
-                current_char++;
-                continue;
-            }
-            printChar( p_string[ current_char ], putX, putY, p_bottom );
-
-            u16 c = (u16) p_string[ current_char ];
-            _shiftchar( c );
-            putX += _widths[ c ];
-
-            for( u8 i = 0; i < 80 / TEXTSPEED; ++i )
-                swiWaitForVBlank( );
-            current_char++;
-        }
-        p_x = putX;
-        p_y = putY;
-    }
-    void font::printStringD( const wchar_t *p_string, s16& p_x, s16& p_y, bool p_bottom ) {
-        u32 current_char = 0;
-        s16 putX = p_x, putY = p_y;
-
-        while( p_string[ current_char ] ) {
-            if( p_string[ current_char ] == L'\n' ) {
-                putY += FONT_HEIGHT;
-                putX = p_x;
-                current_char++;
-                continue;
-            }
-            printChar( p_string[ current_char ], putX, putY, p_bottom );
-
-            u16 c = (u16) p_string[ current_char ];
-            _shiftchar( c );
-            putX += _widths[ c ];
-
-            for( u8 i = 0; i < 80 / TEXTSPEED; ++i )
-                swiWaitForVBlank( );
-            current_char++;
-        }
-        p_x = putX;
-        p_y = putY;
-    }
-
-    void font::printStringCenter( const char *p_string, bool p_bottom ) {
-        s16 x = SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2;
-        s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
-
-        printString( p_string, x, y, p_bottom );
-    }
-    void font::printStringCenterD( const char *p_string, bool p_bottom ) {
-        s16 x = ( SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2 );
-        s16 y = ( SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2 );
-
-        printStringD( p_string, x, y, p_bottom );
-    }
-    void font::printStringCenter( const wchar_t *p_string, bool p_bottom ) {
-        s16 x = SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2;
-        s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
-
-        printString( p_string, x, y, p_bottom );
-    }
-    void font::printStringCenterD( const wchar_t *p_string, bool p_bottom ) {
-        s16 x = ( SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2 );
-        s16 y = ( SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2 );
-
-        printStringD( p_string, x, y, p_bottom );
-    }
-
-    void font::printNumber( s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
-        char numstring[ 10 ] = "";
-        u32 number = p_num, quotient = 1, remainder = 0;
-        char remainder_str[ 3 ] = "";
-        u32 current_char = 0, current_char2 = 0;
-        static char string[ 100 ];
-
-        if( number == 0 ) {
-            strcpy( string, "0" );
-        } else {
-            while( quotient != 0 ) {
-                remainder = number % 10;
-                quotient = number / 10;
-                remainder_str[ 0 ] = remainder + 48;
-                remainder_str[ 1 ] = '\0';
-                strcat( numstring, remainder_str );
-                number = quotient;
-            }
-
-            current_char = strlen( numstring ) - 1;
-            while( current_char != 0 ) {
-                string[ current_char2 ] = numstring[ current_char ];
-                current_char--;
-                current_char2++;
-            }
-            string[ current_char2 ] = numstring[ current_char ];
-            string[ current_char2 + 1 ] = '\0';
-        }
-
-        printString( string, p_x, p_y, p_bottom );
     }
 
 
@@ -517,19 +324,5 @@ namespace IO {
         }
 
         return width;
-    }
-    u32 font::stringWidth( const wchar_t *p_string ) const {
-        u32 current_char = 0;
-        u32 width = 0;
-
-        while( p_string[ current_char ] ) {
-            if( p_string[ current_char ] == '\n' )
-                break;
-            width += _widths[ (u8) p_string[ current_char ] ] + 1;
-
-            current_char++;
-        }
-
-        return width - 1;
     }
 }

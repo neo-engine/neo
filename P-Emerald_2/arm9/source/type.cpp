@@ -37,7 +37,7 @@ std::string TypeList[ 19 ] =
     "\x8f\x90\x91\x92", "\xa2\xa3\xa4\xa5", "\xbe\xbf\xc0\xc1", "[FEE]"
 };
 
-std::string toString( Type p_type ) {
+std::string toString( type p_type ) {
     return TypeList[ p_type ];
 }
 
@@ -63,6 +63,6 @@ float TypeEffectiveness[ 19 ][ 19 ] = {
         { 1, 2, 1, .5, 1, 1, 1, 1, .5, .75, 1, .5, 1, 1, 1, 1, 2, 2, 1 }  //Fairy
 };
 
-float getEffectiveness( const Type& p_t1, const Type& p_t2 ) { //t1 is moving
+float getEffectiveness( const type& p_t1, const type& p_t2 ) { //t1 is moving
     return TypeEffectiveness[ (int) p_t1 ][ (int) p_t2 ];
 }

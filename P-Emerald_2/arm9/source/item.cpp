@@ -25,20 +25,22 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, new see <http://www.gnu.org/licenses/>.
 */
 
+#include <vector>
+#include <algorithm>
+
 #include "item.h"
 #include "berry.h"
 #include "move.h"
 #include "pokemon.h"
-#include "battle.h"
+#include "script.h"
 
+#include "buffer.h"
 #include "saveGame.h"
 #include "mapDefines.h"
 #include "mapDrawer.h"
 #include "uio.h"
 #include "messageBox.h"
 
-#include <vector>
-#include <algorithm>
 
 #define APPLY_OP( op, tg, val, mx ) ( ( op == 1 ) ? tg += val : ( \
                                   ( op == 2 ) ? tg -= val : ( \
@@ -172,13 +174,13 @@ bool item::use( pokemon& p_pokemon ) {
             }
             case 12:
             {
-                s16 tmp = p_pokemon.m_Level;
+                s16 tmp = p_pokemon.m_level;
                 APPLY_OP( operation, tmp, value, 100 );
                 tmp = std::min( tmp, s16( 100 ) );
                 tmp = std::max( (s16) 0, tmp );
-                if( tmp != p_pokemon.m_Level ) {
-                    p_pokemon.m_Level = tmp;
-                    p_pokemon.m_boxdata.m_experienceGained = EXP[ p_pokemon.m_Level - 1 ][ p.m_expType ];
+                if( tmp != p_pokemon.m_level ) {
+                    p_pokemon.m_level = tmp;
+                    p_pokemon.m_boxdata.m_experienceGained = EXP[ p_pokemon.m_level - 1 ][ p.m_expType ];
 
                     p_pokemon.m_stats = calcStats( p_pokemon.m_boxdata, p );
                     change = true;

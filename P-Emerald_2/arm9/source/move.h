@@ -28,38 +28,16 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #pragma once
 
-#include "type.h"
-#include "script.h"
+#include <cstring>
 #include <string>
 #include <nds/ndstypes.h>
-
-#define MAXATTACK 560
+#include "type.h"
+#include "defines.h"
+#include "script.h"
 
 class move {
 public:
-    enum ailment {
-        NONE = 0,
-        PARALYSIS,
-        SLEEP,
-        FREEZE,
-        BURN,
-        POISONED,
-        CONFUSION,
-        INFATUATION,
-        TRAP,
-        NIGHTMARE,
-        TORMENT,
-        DISABLE,
-        YAWN,
-        HEAL_BLOCK,
-        NO_TYPE_IMMUNITY,
-        LEECH_SEED,
-        EMBARGO,
-        PERISH_SONG,
-        INGRAIN
-    };
-
-    enum moveAffectsTypes {
+    enum moveAffectsTypes : u8 {
         SELECTED = 0,
         DEPENDS_ON_ATTACK = 1,
         OWN_FIELD = 2,
@@ -70,7 +48,7 @@ public:
         OPPONENTS_FIELD = 64
     };
 
-    enum moveFlags {
+    enum moveFlags : u8 {
         MAKES_CONTACT = 1,
         PROTECT = 2,
         MAGIC_COAT = 4,
@@ -81,7 +59,7 @@ public:
         WHILE_ASLEEP = 128
     };
 
-    enum moveHitTypes {
+    enum moveHitTypes : u8 {
         PHYS = 0,
         SPEC = 1,
         STAT = 2
@@ -92,7 +70,7 @@ public:
     std::string     m_moveName;
     BATTLE::battleScript    m_moveEffect;
     char            m_moveBasePower;
-    Type            m_moveType;
+    type            m_moveType;
     char            m_moveAccuracy;
     u8              m_movePP;
     char            m_moveEffectAccuracy;
@@ -102,24 +80,27 @@ public:
     moveFlags       m_moveFlags;
     moveHitTypes    m_moveHitType;
 
+    char            m_description[ 300 ] = { 0 };
+
     //Constructrs
 
     move( ) { }
 
     move( const std::string p_moveName,
-          char p_moveEffect,
+          BATTLE::battleScript p_moveEffect,
           char p_moveBasePower,
-          Type p_moveType,
+          type p_moveType,
           char p_moveAccuracy,
           char p_movePP,
           char p_moveEffectAccuracy,
           moveAffectsTypes p_moveAffectsWhom,
           char p_movePriority,
           moveFlags p_moveFlags,
-          moveHitTypes p_moveHitType )
+          moveHitTypes p_moveHitType,
+          const char* p_description = "Keine genaueren Informationen verfügbar." )
         : m_isFieldAttack( false ),
         m_moveName( p_moveName ),
-        m_moveEffect( BATTLE::battleScript( { BATTLE::battleScript::command( L"Attackeneffekt.[A]" ) } ) ), // <-- TODO 
+        m_moveEffect( p_moveEffect ),
         m_moveBasePower( p_moveBasePower ),
         m_moveType( p_moveType ),
         m_moveAccuracy( p_moveAccuracy ),
@@ -129,7 +110,7 @@ public:
         m_movePriority( p_movePriority ),
         m_moveFlags( p_moveFlags ),
         m_moveHitType( p_moveHitType ) {
-        (void) p_moveEffect;
+        strcpy( m_description, p_description );
     }
 
     ~move( ) { }
@@ -144,11 +125,11 @@ public:
         return "N/A";
     }
     virtual const char* description( ) {
-        return "Keine genaueren Informationen verfügbar.";
+        return m_description;
     }
 };
 
-extern move* AttackList[ MAXATTACK ];
+extern move* AttackList[ MAX_ATTACK ];
 
 #define M_POUND 1
 #define M_KARATE_CHOP 2

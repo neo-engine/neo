@@ -19,7 +19,10 @@
     <ClInclude Include="arm9\source\bagUI.h" />
     <ClInclude Include="arm9\source\bagViewer.h" />
     <ClInclude Include="arm9\source\battle.h" />
+    <ClInclude Include="arm9\source\battlePokemon.h" />
+    <ClInclude Include="arm9\source\battleTrainer.h" />
     <ClInclude Include="arm9\source\battleUI.h" />
+    <ClInclude Include="arm9\source\battleWeather.h" />
     <ClInclude Include="arm9\source\berry.h" />
     <ClInclude Include="arm9\source\box.h" />
     <ClInclude Include="arm9\source\boxUI.h" />
@@ -43,6 +46,7 @@
     <ClInclude Include="arm9\source\mapWarps.h" />
     <ClInclude Include="arm9\source\messageBox.h" />
     <ClInclude Include="arm9\source\move.h" />
+    <ClInclude Include="arm9\source\nav.h" />
     <ClInclude Include="arm9\source\pokemon.h" />
     <ClInclude Include="arm9\source\ribbon.h" />
     <ClInclude Include="arm9\source\saveGame.h" />
@@ -62,6 +66,7 @@
     <ClCompile Include="arm9\source\bagUI.cpp" />
     <ClCompile Include="arm9\source\bagViewer.cpp" />
     <ClCompile Include="arm9\source\battle.cpp" />
+    <ClCompile Include="arm9\source\battleScripts.cpp" />
     <ClCompile Include="arm9\source\battleUI.cpp" />
     <ClCompile Include="arm9\source\boxUI.cpp" />
     <ClCompile Include="arm9\source\boxViewer.cpp" />
@@ -85,6 +90,7 @@
     <ClCompile Include="arm9\source\mapWarps.cpp" />
     <ClCompile Include="arm9\source\messageBox.cpp" />
     <ClCompile Include="arm9\source\move.cpp" />
+    <ClCompile Include="arm9\source\nav.cpp" />
     <ClCompile Include="arm9\source\pokemon.cpp" />
     <ClCompile Include="arm9\source\pokemonIO.cpp" />
     <ClCompile Include="arm9\source\ribbon.cpp" />

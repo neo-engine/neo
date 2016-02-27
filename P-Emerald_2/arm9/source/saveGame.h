@@ -32,9 +32,13 @@
 #include <vector>
 #include "bag.h"
 #include "box.h"
-#include "pokemon.h"
 #include "mapObject.h"
-#include "battle.h"
+
+struct pokemon;
+
+namespace BATTLE {
+    class battleTrainer;
+}
 
 namespace FS {
     enum SavMod {
@@ -46,7 +50,7 @@ namespace FS {
     extern std::vector<pokemon> tmp;
     struct saveGame {
         //general stuff
-        wchar_t     m_playername[ 12 ];
+        char     m_playername[ 12 ];
         u8          m_isMale : 1;
         u16         m_id;
         u16         m_sid;
@@ -86,6 +90,7 @@ namespace FS {
 
         u16         m_flags[ 500 ];
 
+        u16         m_lstDex;
         u8          m_hasGDex : 1;
         u8          m_activatedPNav;
 
@@ -100,68 +105,20 @@ namespace FS {
         s16         m_repelSteps;
         BAG::bag    m_bag;
 
-        bool        checkflag( u8 p_idx ) {
-            return m_flags[ p_idx >> 3 ] & ( 1 << ( p_idx % 8 ) );
-        }
-        void        setflag( u8 p_idx, bool p_value ) {
-            if( p_value != checkflag( p_idx ) )
-                m_flags[ p_idx >> 3 ] ^= ( 1 << ( p_idx % 8 ) );
-            return;
-        }
+        bool        checkflag( u8 p_idx );
+        void        setflag( u8 p_idx, bool p_value );
         void        stepIncrease( );
         u8          getEncounterLevel( u8 p_tier );
-        u8          getBadgeCount( ) {
-            u8 cnt = 0;
-            for( u8 i = 0; i < 8; ++i ) {
-                cnt += !!( m_HOENN_Badges & ( 1 << i ) );
-                cnt += !!( m_KANTO_Badges & ( 1 << i ) );
-                cnt += !!( m_JOHTO_Badges & ( 1 << i ) );
-            }
-            return cnt;
-        }
-        u8 getTeamPkmnCount( ) {
-            u8 res = 0;
-            for( u8 i = 0; i < 6; ++i )
-                res += !!m_pkmnTeam[ i ].m_boxdata.m_speciesId;
-            return res;
-        }
+        u8          getBadgeCount( );
+        u8          getTeamPkmnCount( );
 
-        BATTLE::battleTrainer* getBattleTrainer( ) {
-            tmp.clear( );
-            for( u8 i = 0; i < 6; ++i )
-                if( m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                    tmp.push_back( m_pkmnTeam[ i ] );
-                else
-                    break;
-            char buffer[ 30 ];
-            sprintf( buffer, "%ls", m_playername );
-
-            static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp );
-            return &res;
-        }
-        void updateTeam( ) {
-            for( u8 i = 0; i < tmp.size( ); ++i )
-                m_pkmnTeam[ i ] = tmp[ i ];
-        }
+        BATTLE::battleTrainer* getBattleTrainer( );
+        void updateTeam( );
 
         //Return the idx of the resulting Box
-        s8 storePkmn( const pokemon::boxPokemon& p_pokemon ) {
-            s8 idx = m_storedPokemon[ m_curBox ].getFirstFreeSpot( );
-            u8 i = 0;
-            for( ; idx == -1 && i < MAX_BOXES; )
-                idx = m_storedPokemon[ ( ( ++i ) + m_curBox ) % MAX_BOXES ].getFirstFreeSpot( );
-            if( idx == -1 ) //Everything's full :/
-                return -1;
-            m_curBox = ( m_curBox + i ) % MAX_BOXES;
-            m_storedPokemon[ m_curBox ][ idx ] = p_pokemon;
-            return m_curBox;
-        }
-        s8 storePkmn( const pokemon& p_pokemon ) {
-            return storePkmn( p_pokemon.m_boxdata );
-        }
-        BOX::box* getCurrentBox( ) {
-            return m_storedPokemon + m_curBox;
-        }
+        s8 storePkmn( const pokemon::boxPokemon& p_pokemon );
+        s8 storePkmn( const pokemon& p_pokemon );
+        BOX::box* getCurrentBox( );
     };
 
     saveGame* readSave( );

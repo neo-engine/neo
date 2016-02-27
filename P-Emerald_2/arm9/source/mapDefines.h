@@ -27,6 +27,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #pragma once
 #include <nds/ndstypes.h>
+#include <map>
+#include <string>
 
 namespace MAP {
     struct position {
@@ -47,8 +49,9 @@ namespace MAP {
         BIKE = 2,
         ACRO_BIKE = 3,
         SIT = 4,
+        DIVE = 5,
         //NPC modes
         NOTHING = 0,
     };
-
+    extern std::map<u8, std::pair<std::string, u16>> mapInfo; //mapId -> (mapName, locadionId)
 }

@@ -60,27 +60,31 @@ ability::ability( int p_abilityId ) {
     FS::close( f );
 }
 
-std::wstring getWAbilityName( int p_abilityId ) {
+std::string getAbilityName( int p_abilityId ) {
     sprintf( buffer, "nitro:/LOCATIONS/%i.data", p_abilityId );
     FILE* f = fopen( buffer, "r" );
 
     if( !f )
-        return L"---";
-    auto ret = FS::readWString( f, false );
+        return "---";
+    auto ret = FS::readString( f, false );
     FS::close( f );
     return ret;
 }
 
 namespace FS {
     bool exists( const char* p_path, const char* p_name ) {
-        char buffer[ 100 ];
-        sprintf( buffer, "%s%s.raw", p_path, p_name );
-        FILE* fd = fopen( buffer, "rb" );
-
-        if( fd == 0 ) {
-            fclose( fd );
+        FILE* fd = open( p_path, p_name );
+        if( !fd )
             return false;
-        }
+        fclose( fd );
+        return true;
+    }
+    bool exists( const char* p_path, u16 p_name, bool p_unused ) {
+        (void)p_unused;
+
+        FILE* fd = open( p_path, p_name );
+        if( !fd )
+            return false;
         fclose( fd );
         return true;
     }
@@ -270,27 +274,6 @@ namespace FS {
             return ret;
     }
 
-    std::wstring readWString( FILE* p_file, bool p_new ) {
-        std::wstring ret = L"";
-        int ac;
-        while( ( ac = fgetc( p_file ) ) == '\n' || ac == '\r' );
-        if( ac == '*' || ac == EOF ) {
-            return ret;
-        } else ret += ac;
-        while( ( ac = fgetc( p_file ) ) != '*' && ac != EOF ) {
-            if( ac == '|' )
-                ret += (wchar_t) 136;
-            else if( ac == '#' )
-                ret += (wchar_t) 137;
-            else
-                ret += ac;
-        }
-        if( !p_new )
-            return convertToOld( ret );
-        else
-            return ret;
-    }
-
     std::string breakString( const std::string& p_string, u8 p_lineLength ) {
         std::string result = "";
 
@@ -390,38 +373,6 @@ namespace FS {
         }
         return ret;
     }
-    std::wstring convertToOld( const std::wstring& p_string ) {
-        std::wstring ret = L"";
-        for( auto ac = p_string.begin( ); ac != p_string.end( ); ++ac ) {
-            if( *ac == 'ä' )
-                ret += L'\x84';
-            else if( *ac == 'Ä' )
-                ret += L'\x8E';
-            else if( *ac == 'ü' )
-                ret += L'\x81';
-            else if( *ac == 'Ü' )
-                ret += L'\x9A';
-            else if( *ac == 'ö' )
-                ret += L'\x94';
-            else if( *ac == 'Ö' )
-                ret += L'\x99';
-            else if( *ac == 'ß' )
-                ret += L'\x9D';
-            else if( *ac == 'é' )
-                ret += L'\x82';
-            else if( *ac == '%' )
-                ret += L' ';
-            else if( *ac == '|' )
-                ret += (char) 136;
-            else if( *ac == '#' )
-                ret += (char) 137;
-            else if( *ac == '\r' )
-                ret += L"";
-            else
-                ret += *ac;
-        }
-        return ret;
-    }
 
     const char* getLoc( u16 p_ind ) {
         if( p_ind > 5000 )
@@ -449,21 +400,20 @@ std::string toString( u16 p_num ) {
     return std::string( buffer );
 }
 
-const wchar_t* getWDisplayName( u16 p_pkmnId ) {
+const char* getDisplayName( u16 p_pkmnId ) {
     static pokemonData tmp;
     if( !getAll( p_pkmnId, tmp ) ) {
-        return L"???";
+        return "???";
     }
-    swprintf( wbuffer, 15, L"%s", tmp.m_displayName );
-    return wbuffer;
+    return tmp.m_displayName;
 }
-void getWDisplayName( u16 p_pkmnId, wchar_t* p_name ) {
+void getDisplayName( u16 p_pkmnId, char* p_name ) {
     pokemonData tmp;
     if( !getAll( p_pkmnId, tmp ) ) {
-        wcscpy( p_name, L"???" );
+        strcpy( p_name, "???" );
         return;
     }
-    swprintf( p_name, 15, L"%s", tmp.m_displayName );
+    strcpy( p_name, tmp.m_displayName );
 }
 
 bool getAll( u16 p_pkmnId, pokemonData& p_out ) {
@@ -496,7 +446,7 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
             u16 z = buffer[ ptr++ ];
             for( int j = 0; j < z; ++j ) {
                 u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-                if( i >= p_toLevel && h == (u16) p_mode && g < MAXATTACK )
+                if( i >= p_toLevel && h == (u16) p_mode && g < MAX_ATTACK )
                     reses.push_back( g );
             }
         }
@@ -518,7 +468,7 @@ N:
             u16 z = buffer[ ptr++ ];
             for( u16 j = 0; j < z; ++j ) {
                 u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-                if( i >= p_fromLevel && h == p_mode && g < MAXATTACK ) {
+                if( i >= p_fromLevel && h == p_mode && g < MAX_ATTACK ) {
                     for( u16 z = 0; z < rescnt; ++z )
                         if( g == p_result[ z ] )
                             goto NEXT;
@@ -600,7 +550,7 @@ bool berry::load( ) {
     fscanf( f, "%hu %hhu", &m_berryData.m_berrySize, &tmp );
     m_berryData.m_berryGuete = static_cast<berry::berryGueteType>( tmp );
     fscanf( f, "%hhu %hhu", &tmp, &m_berryData.m_naturalGiftStrength );
-    m_berryData.m_naturalGiftType = static_cast<Type>( tmp );
+    m_berryData.m_naturalGiftType = static_cast<type>( tmp );
 
     for( u8 i = 0; i < 5; ++i )
         fscanf( f, "%hhu", &m_berryData.m_berryTaste[ i ] );

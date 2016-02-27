@@ -30,6 +30,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "font.h"
 #include "sprite.h"
+#include "nav.h"
 
 namespace IO {
 
@@ -58,21 +59,6 @@ namespace IO {
     extern int bg3sub;
     extern PrintConsole Bottom, Top;
 
-    extern unsigned int NAV_DATA[ 12288 ];
-    extern unsigned short NAV_DATA_PAL[ 256 ];
-
-#define MAXBG 4
-#define START_BG 0
-    struct backgroundSet {
-        std::string             m_name;
-        const unsigned int      *m_mainMenu;
-        const unsigned short    *m_mainMenuPal;
-        bool                    m_loadFromRom;
-        bool                    m_allowsOverlay;
-        u8                      *m_mainMenuSpritePoses;
-    };
-    extern backgroundSet BGs[ MAXBG ];
-
     void initVideo( );
     void initVideoSub( );
     void vramSetup( );
@@ -80,9 +66,7 @@ namespace IO {
     void swapScreens( );
 
     void setDefaultConsoleTextColors( u16* p_palette, u8 p_start = 1 );
-
-    void drawSub( bool p_initMainSprites = false, u8 p_newIdx = u8( 255 ) );
-
+    
     struct inputTarget {
         enum inputType {
             BUTTON,
@@ -131,17 +115,11 @@ namespace IO {
     void printStringCenterD( font* p_font, const char *p_string, bool p_bottom );
     void printNumber( font* p_font, s32 p_num, s16 p_x, s16 p_y, bool p_bottom );
 
-    void printString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16 );
     void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
-    void printMBString( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
     void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
-    void printMBStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
-    void printStringCenter( font* p_font, const wchar_t *p_string, bool p_bottom );
-    void printStringD( font* p_font, const wchar_t *p_string, s16 p_x, s16 p_y, bool p_bottom );
-    void printStringCenterD( font* p_font, const wchar_t *p_string, bool p_bottom );
 
     void topScreenPlot( u8 p_x, u8 p_y, color p_color );
     void btmScreenPlot( u8 p_x, u8 p_y, color p_color );
 
-    u16 getColor( Type p_type );
+    u16 getColor( type p_type );
 }

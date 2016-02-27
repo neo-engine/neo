@@ -1134,10 +1134,10 @@ namespace gen3 {
      }
      wstring nick = wstring(nickname.begin(),nickname.end());
      wstring otn = wstring(otname.begin(),otname.end());
-     wchar_t * nickw = const_cast<wchar_t*>(nick.c_str());
-     wchar_t * otw = const_cast<wchar_t*>(otn.c_str());
-     setpkmnickname(pkm,L"",NICKLENGTH);
-     setpkmotname(pkm,L"",OTLENGTH);
+     char * nickw = const_cast<char*>(nick.c_str());
+     char * otw = const_cast<char*>(otn.c_str());
+     setpkmnickname(pkm,"",NICKLENGTH);
+     setpkmotname(pkm,"",OTLENGTH);
      std::size_t nicklength_ = nickname.find('\0');
      std::size_t otlength_ = otname.find('\0');
      setpkmnickname(pkm,nickw,nicklength_);
