@@ -1835,6 +1835,7 @@ END:
             UPDATE_TIME = false;
             u16 itm = bv.getItem( BAG::bagViewer::BATTLE );
             IO::initOAMTable( true );
+            IO::initOAMTable( false );
             IO::NAV->draw( );
             UPDATE_TIME = true;
             DRAW_TIME = true;

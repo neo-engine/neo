@@ -125,8 +125,11 @@ namespace IO {
 	DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
 
     void drawBorder( ) {
-        dmaCopy( BorderBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
-        dmaCopy( BorderPal + 192, BG_PALETTE_SUB + 192, 64 );
+		auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg2 ) : bgGetGfxPtr( bg2sub );
+        auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
+
+        dmaCopy( BorderBitmap, ptr, 256 * 192 );
+        dmaCopy( BorderPal + 192, pal + 192, 64 );
 
         DRAW_TIME = true;
     }
@@ -191,8 +194,11 @@ namespace IO {
     }
 
     void nav::drawMapMug( ) {
-        dmaCopy( _Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
-        dmaCopy( _Pal, BG_PALETTE_SUB, 192 * 2 );
+		auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
+        auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
+
+        dmaCopy( _Bitmap, ptr, 256 * 192 );
+        dmaCopy( _Pal, pal, 192 * 2 );
 
         // sprintf( buffer, "%hu", _curMap );
         // FS::readPictureData( bgGetGfxPtr( bg3sub ), "nitro:/PICS/MAPMUGS/", buffer, 512, 49152, true );
@@ -204,10 +210,10 @@ namespace IO {
         regularFont->setColor( GRAY_IDX, 2 );
         regularFont->setColor( 0, 0 );
         regularFont->printString( MAP::mapInfo[ _curMap ].first.c_str( ),
-                                  244 - regularFont->stringWidth( MAP::mapInfo[ _curMap ].first.c_str( ) ), 12, true );
+                                  244 - regularFont->stringWidth( MAP::mapInfo[ _curMap ].first.c_str( ) ), 12, !SCREENS_SWAPPED );
         regularFont->setColor( WHITE_IDX, 2 );
         regularFont->setColor( BLACK_IDX, 1 );
-        regularFont->printString( MAP::mapInfo[ _curMap / 100 * 100 + 10 ].first.c_str( ), 36, 0, true );
+        regularFont->printString( MAP::mapInfo[ _curMap / 100 * 100 + 10 ].first.c_str( ), 36, 0, !SCREENS_SWAPPED );
     }
 
     void nav::draw( bool p_initMainSrites, u8 p_newIdx ) {
@@ -216,14 +222,17 @@ namespace IO {
         else if( p_newIdx == u8( 255 ) )
             p_newIdx = FS::SAV->m_bgIdx;
 
+		auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
+        auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
+
         if( !_power || _state != MAP_MUG ) {
             if( !BGs[ p_newIdx ].m_loadFromRom ) {
-                dmaCopy( BGs[ p_newIdx ].m_mainMenu, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
-                dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, BG_PALETTE_SUB, 192 * 2 );
+                dmaCopy( BGs[ p_newIdx ].m_mainMenu, ptr, 256 * 192 );
+                dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, pal, 192 * 2 );
                 FS::SAV->m_bgIdx = p_newIdx;
-            } else if( !FS::readNavScreenData( bgGetGfxPtr( IO::bg3sub ), BGs[ p_newIdx ].m_name.c_str( ), p_newIdx ) ) {
-                dmaCopy( BGs[ 0 ].m_mainMenu, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
-                dmaCopy( BGs[ 0 ].m_mainMenuPal, BG_PALETTE_SUB, 192 * 2 );
+            } else if( !FS::readNavScreenData( ptr, BGs[ p_newIdx ].m_name.c_str( ), p_newIdx ) ) {
+                dmaCopy( BGs[ 0 ].m_mainMenu, ptr, 256 * 192 );
+                dmaCopy( BGs[ 0 ].m_mainMenuPal, pal, 192 * 2 );
                 FS::SAV->m_bgIdx = 0;
             } else
                 FS::SAV->m_bgIdx = p_newIdx;
@@ -266,12 +275,12 @@ namespace IO {
 				BAG::bagViewer bv;
 				ANIMATE_MAP = false;
 				UPDATE_TIME = false;
-				//INIT_MAIN_SPRITES = false;
 
 				u16 res = bv.run( );
 
 				IO::clearScreenConsole( true, true );
-				draw( true );
+				_state = HOME;
+                draw( true );
 				UPDATE_TIME = true;
 				FADE_TOP_DARK( );
 				MAP::curMap->draw( );
@@ -284,6 +293,8 @@ namespace IO {
                        && ( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 0 ],
                                             POS( _state == HOME || !_power )[ 1 ], 16 ) ) ) {
 				ANIMATE_MAP = false;
+				_state = HOME;
+				draw( true );
 				STS::statusScreen sts( 0 );
 				auto res = sts.run( );
 
@@ -298,6 +309,8 @@ namespace IO {
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 4 ],         //StartDex
                                        POS( _state == HOME || !_power )[ 5 ], 16 ) ) {
                 ANIMATE_MAP = false;
+				_state = HOME;
+				draw( true );
 				dx.run( FS::SAV->m_lstDex );
 
                 IO::clearScreenConsole( true, true );
@@ -312,6 +325,8 @@ namespace IO {
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 2 ],         //StartID
                                        POS( _state == HOME || !_power )[ 3 ], 16 ) ) {
 
+				_state = HOME;
+				draw( true );
 
 				const char *someText[ 11 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test",
 												"Dbl Battle", "Sgl Battle", "Chg NavScrn",
