@@ -212,6 +212,14 @@ namespace BOX {
                 _curPage = ( _curPage + 1 ) % 5;
                 select( _selectedIdx );
             }
+            for( u8 i = 0; i < 5; ++i ) {
+                if( IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].isHidden )
+                    continue;
+                if( GET_AND_WAIT_C( 62 + 32 * i, 4, 14 ) ) {
+                    _curPage = i;
+                    select( _selectedIdx );
+                }
+            }
 
             /*else if( GET_AND_WAIT( KEY_RIGHT ) ) {
                 if( p_allowTakePkmn && _currPos >= 21 ) {

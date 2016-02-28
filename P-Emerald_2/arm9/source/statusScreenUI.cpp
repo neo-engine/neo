@@ -1000,6 +1000,10 @@ namespace STS {
             default:
                 break;
         }
+        for( u8 i = 0; i < 5; ++i )
+            IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].isHidden = p_pokemon.m_boxdata.m_individualValues.m_isEgg;
+        IO::OamTop->oamBuffer[ PAGE_ICON_START + p_page ].isHidden = !p_pokemon.m_boxdata.m_individualValues.m_isEgg;
+        IO::updateOAM( false );
         IO::updateOAM( true );
     }
 }

@@ -85,20 +85,23 @@ namespace BOX {
         tileCnt += 64;
         tileCnt = IO::loadSprite( PAGE_ICON_START + ( 0 ), 0, PAGE_ICON_START + ( 0 ), tileCnt,
                                   0, 0, 32, 32, memoPal,
-                                  memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, false );
+                                  memoTiles, memoTilesLen, false, false, true, OBJPRIORITY_0, false );
         tileCnt = IO::loadSprite( PAGE_ICON_START + ( 1 ), 0, PAGE_ICON_START + ( 1 ), tileCnt,
                                   20, 0, 32, 32, memoPal,
-                                  memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, false );
+                                  memoTiles, memoTilesLen, false, false, true, OBJPRIORITY_0, false );
         tileCnt = IO::loadSprite( PAGE_ICON_START + ( 2 ), 0, PAGE_ICON_START + ( 2 ), tileCnt,
                                   40, 0, 32, 32, memoPal,
-                                  memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, false );
+                                  memoTiles, memoTilesLen, false, false, true, OBJPRIORITY_0, false );
         tileCnt = IO::loadSprite( PAGE_ICON_START + ( 3 ), 0, PAGE_ICON_START + ( 3 ), tileCnt,
                                   50, 0, 32, 32, atksPal,
-                                  atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, false );
+                                  atksTiles, atksTilesLen, false, false, true, OBJPRIORITY_0, false );
         tileCnt = IO::loadSprite( PAGE_ICON_START + ( 4 ), 0, PAGE_ICON_START + ( 4 ), tileCnt,
                                   60, 0, 32, 32, ContestPal,
-                                  ContestTiles, ContestTilesLen, false, false, false, OBJPRIORITY_0, false );
-
+                                  ContestTiles, ContestTilesLen, false, false, true, OBJPRIORITY_0, false );
+        for( u8 i = 0; i < 5; ++i ) {
+            IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].x = 48 + 32 * i;
+            IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].y = -10 + 0 * i;
+        }
         IO::updateOAM( false );
         IO::initOAMTable( true );
 
@@ -121,7 +124,6 @@ namespace BOX {
     void boxUI::drawAllBoxStatus( bool p_bottom ) {
         dmaFillWords( 0, bgGetGfxPtr( !p_bottom ? IO::bg2sub : IO::bg2 ), 256 * 192 );
         dmaFillWords( 0, bgGetGfxPtr( !p_bottom ? IO::bg3sub : IO::bg3 ), 256 * 192 );
-        IO::clearScreenConsole( true, true );
 
         auto pal = BG_PAL( !p_bottom );
         pal[ 0 ] = WHITE;
@@ -153,7 +155,12 @@ namespace BOX {
             IO::regularFont->setColor( RED_IDX, 1 );
         else
             IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::printString( IO::regularFont, buffer, 252 - IO::regularFont->stringWidth( buffer ), 3, !p_bottom );
+        IO::printString( IO::regularFont, buffer, 252 - IO::regularFont->stringWidth( buffer ), 3, !p_bottom );      
+        
+        for( u8 i = 0; i < 5; ++i ) {
+            IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].isHidden = true;
+        }
+        IO::updateOAM( false );
     }
 
 #define POS_X( i ) ( 30 + 33 * ( (i) % 6 ) )
