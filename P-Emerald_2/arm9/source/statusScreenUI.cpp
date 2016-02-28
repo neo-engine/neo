@@ -995,6 +995,9 @@ namespace STS {
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleSelect( &IO::Bottom );
         consoleClear( );
+        consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+        consoleSelect( &IO::Top );
+        consoleClear( );
 
         IO::setDefaultConsoleTextColors( BG_PALETTE_SUB, 6 );
         drawPkmnInformation( p_pokemon, p_page, p_newpok, true );

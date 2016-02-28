@@ -108,7 +108,9 @@ namespace IO {
             if( p_val == '\"' ) { p_val = 130; return; }
             if( p_val == '„' ) { p_val = 131; return; }
             if( p_val == '«' ) { p_val = 132; return; }
+            if( p_val == '<' ) { p_val = 132; return; }
             if( p_val == '»' ) { p_val = 133; return; }
+            if( p_val == '>' ) { p_val = 133; return; }
             if( p_val == '(' ) { p_val = 134; return; }
             if( p_val == ')' ) { p_val = 135; return; }
 

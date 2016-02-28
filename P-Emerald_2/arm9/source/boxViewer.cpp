@@ -137,26 +137,74 @@ namespace BOX {
                 CLEAN;
                 _boxUI.draw( p_allowTakePkmn );
                 select( _selectedIdx );
+            } else if( IN_RANGE_R( 24, 23, 48, 48 ) ) {
+                _boxUI.buttonChange( boxUI::BUTTON_LEFT, true );
+                loop( ) {
+                    swiWaitForVBlank( );
+
+                    scanKeys( );
+                    touchRead( &touch );
+                    if( TOUCH_UP ) {
+                        FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                        CLEAN;
+                        _boxUI.draw( p_allowTakePkmn );
+                        select( _selectedIdx );
+                        break;
+                    }
+                    if( !IN_RANGE_R( 24, 23, 48, 48 ) ) {
+                        _boxUI.buttonChange( boxUI::BUTTON_LEFT, false );
+                        break;
+                    }
+                }
             } else if( GET_AND_WAIT( KEY_R ) ) {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
                 CLEAN;
                 _boxUI.draw( p_allowTakePkmn );
                 select( _selectedIdx );
+            } else if( IN_RANGE_R( 208, 23, 232, 48 ) ) {
+                _boxUI.buttonChange( boxUI::BUTTON_RIGHT, true );
+                loop( ) {
+                    swiWaitForVBlank( );
+
+                    scanKeys( );
+                    touchRead( &touch );
+                    if( TOUCH_UP ) {
+                        FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
+                        CLEAN;
+                        _boxUI.draw( p_allowTakePkmn );
+                        select( _selectedIdx );
+                        break;
+                    }
+                    if( !IN_RANGE_R( 208, 23, 232, 48 ) ) {
+                        _boxUI.buttonChange( boxUI::BUTTON_RIGHT, false );
+                        break;
+                    }
+                }
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
-                HAS_SELECTION( _selectedIdx = 0,
-                               _selectedIdx = ( _selectedIdx + 6 ) % ( MAX_PKMN_PER_BOX + 6 ) );
+                if( _selectedIdx >= MAX_PKMN_PER_BOX && _selectedIdx < MAX_PKMN_PER_BOX + 6 )
+                    _selectedIdx = MAX_PKMN_PER_BOX + 6;
+                else if( _selectedIdx >= MAX_PKMN_PER_BOX + 6 )
+                    _selectedIdx = 0;
+                else
+                    HAS_SELECTION( _selectedIdx = 0,
+                                   _selectedIdx = ( _selectedIdx + 6 ) % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
             } else if( GET_AND_WAIT( KEY_UP ) ) {
-                HAS_SELECTION( _selectedIdx = 0,
-                               _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX ) % ( MAX_PKMN_PER_BOX + 6 ) );
+                if( _selectedIdx < 6 )
+                    _selectedIdx = MAX_PKMN_PER_BOX + 6;
+                else if( _selectedIdx >= MAX_PKMN_PER_BOX + 6 )
+                    _selectedIdx = MAX_PKMN_PER_BOX;
+                else
+                    HAS_SELECTION( _selectedIdx = 0,
+                                   _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 2 ) % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
             } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
                 HAS_SELECTION( _selectedIdx = 0,
-                               _selectedIdx = ( _selectedIdx + 1 ) % ( MAX_PKMN_PER_BOX + 6 ) );
+                               _selectedIdx = ( _selectedIdx + 1 ) % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
             } else if( GET_AND_WAIT( KEY_LEFT ) ) {
                 HAS_SELECTION( _selectedIdx = 0,
-                               _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 5 ) % ( MAX_PKMN_PER_BOX + 6 ) );
+                               _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 7 ) % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
             } else if( GET_AND_WAIT( KEY_A ) ) {
                 HAS_SELECTION( , takePkmn( _selectedIdx ) );
@@ -240,12 +288,15 @@ namespace BOX {
         pokemon selection;
         if( p_index < MAX_PKMN_PER_BOX )
             selection = ( *FS::SAV->getCurrentBox( ) )[ p_index ];
-        else if( _showTeam )
-            selection = FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ];
-        else
-            selection = FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
-
+        else if( p_index < MAX_PKMN_PER_BOX + 6 ) {
+            if( _showTeam )
+                selection = FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ];
+            else
+                selection = FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
+        }
         _boxUI.select( p_index );
+        if( p_index >= MAX_PKMN_PER_BOX + 6 )
+            return;
         if( selection.m_boxdata.m_speciesId ) {
             if( !_topScreenDirty )
                 _stsUI->init( );
@@ -258,8 +309,19 @@ namespace BOX {
     }
 
     void boxViewer::takePkmn( u8 p_index ) {
-        if( p_index > MAX_PKMN_PER_BOX + 6 )
+        if( p_index >= MAX_PKMN_PER_BOX + 6 ) {
+            if( p_index >= MAX_PKMN_PER_BOX + 8 )
+                return;
+            if( p_index == MAX_PKMN_PER_BOX + 6 ) // <
+                FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+            else if( p_index == MAX_PKMN_PER_BOX + 7 ) // >
+                FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
+
+            CLEAN;
+            _boxUI.draw( _showTeam );
+            select( _selectedIdx );
             return;
+        }
 
         pokemon::boxPokemon hld = _heldPkmn.m_boxdata;
         if( p_index < MAX_PKMN_PER_BOX )

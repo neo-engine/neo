@@ -34,6 +34,14 @@ namespace BOX {
     class boxUI {
         friend class boxViewer;
 
+        enum button {
+            BUTTON_LEFT,
+            BUTTON_RIGHT,
+            BUTTON_BOX_NAME
+        };
+
+        void buttonChange( button p_button, bool p_pressed );
+
         std::vector<std::pair<u8, IO::inputTarget>> _ranges;
 
         boxUI( );
