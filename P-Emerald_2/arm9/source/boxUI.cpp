@@ -32,6 +32,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "defines.h"
 #include "fs.h"
 #include "pokemon.h"
+#include "screenFade.h"
 
 #include "Back.h"
 #include "A.h"
@@ -50,7 +51,6 @@ namespace BOX {
 #define HELD_PKMN 2
 #define FWD_ICON 3
 #define BWD_ICON 4
-#define PAGE_ICON_START 5
 #define PKMN_START 10
 #define PKMN_PALETTE_START 15 
 #define PKMN_TILES_START 96 + 182
@@ -121,11 +121,7 @@ namespace BOX {
     void boxUI::drawAllBoxStatus( bool p_bottom ) {
         dmaFillWords( 0, bgGetGfxPtr( !p_bottom ? IO::bg2sub : IO::bg2 ), 256 * 192 );
         dmaFillWords( 0, bgGetGfxPtr( !p_bottom ? IO::bg3sub : IO::bg3 ), 256 * 192 );
-        IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
-        consoleSetFont( &IO::Bottom, IO::consoleFont );
-        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-        consoleSelect( &IO::Bottom );
-        consoleClear( );
+        IO::clearScreenConsole( true, true );
 
         auto pal = BG_PAL( !p_bottom );
         pal[ 0 ] = WHITE;
