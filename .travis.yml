@@ -10,3 +10,7 @@ before_install:
     - echo "export DEVKITARM=/opt/devkitpro/devkitARM" >> ~/.bashrc
     - echo "export PATH=$PATH:/opt/devkitpro/devkitARM/bin" >> ~/.bashrc
     - source ~/.bashrc
+
+script:
+    - cd P-Emerald_2
+    - make
