@@ -26,6 +26,7 @@
     */
 
 #include <nds.h>
+#include <algorithm>
 
 #include "saveGame.h"
 #include "fs.h"
@@ -33,7 +34,7 @@
 #include "messageBox.h"
 #include "pokemon.h"
 #include "battleTrainer.h"
-//#include "Gen.h"
+    //#include "Gen.h"
 
 namespace FS {
     const char* sav_nam = "p_smaragd_2";
@@ -43,7 +44,7 @@ namespace FS {
     saveGame* SAV;
 
 #define PKMN_DATALENGTH 128
-    saveGame* readSave( ) {
+    saveGame*   readSave( ) {
         FILE* f = open( "./", sav_nam, ".sav" );
         if( !f )
             return 0;
@@ -54,7 +55,7 @@ namespace FS {
         return result;
     }
 
-    bool writeSave( saveGame* p_saveGame ) {
+    bool        writeSave( saveGame* p_saveGame ) {
         FILE* f = open( "./", sav_nam, ".sav", "w" );
         if( !f )
             return 0;
@@ -63,7 +64,7 @@ namespace FS {
         return true;
     }
 
-    void saveGame::stepIncrease( ) {
+    void        saveGame::stepIncrease( ) {
         static u8 stepCnt = 0;
         stepCnt++;
         if( m_repelSteps > 0 ) {
@@ -103,7 +104,7 @@ namespace FS {
         }
     }
 
-    u8 saveGame::getEncounterLevel( u8 p_tier ) {
+    u8          saveGame::getEncounterLevel( u8 p_tier ) {
         u8 mxlv = 0;
         for( u8 i = 0; i < 6; ++i ) {
             if( !m_pkmnTeam[ i ].m_boxdata.m_speciesId )
@@ -136,7 +137,7 @@ namespace FS {
         }
         return cnt;
     }
-    u8 saveGame::getTeamPkmnCount( ) {
+    u8          saveGame::getTeamPkmnCount( ) {
         u8 res = 0;
         for( u8 i = 0; i < 6; ++i )
             res += !!m_pkmnTeam[ i ].m_boxdata.m_speciesId;
@@ -156,13 +157,13 @@ namespace FS {
         static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp );
         return &res;
     }
-    void saveGame::updateTeam( ) {
+    void        saveGame::updateTeam( ) {
         for( u8 i = 0; i < tmp.size( ); ++i )
             m_pkmnTeam[ i ] = tmp[ i ];
     }
 
     //Return the idx of the resulting Box
-    s8 saveGame::storePkmn( const pokemon::boxPokemon& p_pokemon ) {
+    s8          saveGame::storePkmn( const pokemon::boxPokemon& p_pokemon ) {
         s8 idx = m_storedPokemon[ m_curBox ].getFirstFreeSpot( );
         u8 i = 0;
         for( ; idx == -1 && i < MAX_BOXES; )
@@ -173,10 +174,23 @@ namespace FS {
         m_storedPokemon[ m_curBox ][ idx ] = p_pokemon;
         return m_curBox;
     }
-    s8 saveGame::storePkmn( const pokemon& p_pokemon ) {
+    s8          saveGame::storePkmn( const pokemon& p_pokemon ) {
         return storePkmn( p_pokemon.m_boxdata );
     }
-    BOX::box* saveGame::getCurrentBox( ) {
+    BOX::box*   saveGame::getCurrentBox( ) {
         return m_storedPokemon + m_curBox;
+    }
+
+    u16 FS::saveGame::countPkmn( u16 p_pkmnIdx ) {
+        u16 res = 0;
+        for( u8 i = 0; i < MAX_BOXES; i++ )
+            res += m_storedPokemon[ i ].count( p_pkmnIdx );
+        for( u8 i = 0; i < 6; ++i ) {
+            if( m_pkmnTeam[ i ].m_boxdata.m_speciesId == p_pkmnIdx )
+                ++res;
+            if( m_clipboard[ i ].m_speciesId == p_pkmnIdx )
+                ++res;
+        }
+        return res;
     }
 }

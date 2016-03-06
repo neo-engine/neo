@@ -327,7 +327,7 @@ namespace DEX {
                                       IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 2 ].gfxIndex, false );
                 } else
                     IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 2 ].isHidden = true;
-                printf( "\n    Du hast ?? dieser Pok\x82""mon.\n\n" );
+                printf( "\n    Du hast %2hu dieser Pok\x82""mon.\n\n", FS::SAV->countPkmn( FS::SAV->m_lstDex ) );
                 printf( "\n\n %03i", FS::SAV->m_lstDex );
             } else {
                 getAll( 0, data );

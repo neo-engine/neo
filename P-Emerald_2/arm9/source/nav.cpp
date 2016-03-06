@@ -121,11 +121,11 @@ namespace IO {
         { nav::HOME, nav::HOME }
     };
 
-	DEX::dexUI dui( true, FS::SAV->m_hasGDex ? 649 : 493 );
-	DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
+    DEX::dexUI dui( true, FS::SAV->m_hasGDex ? 649 : 493 );
+    DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
 
     void drawBorder( ) {
-		auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg2 ) : bgGetGfxPtr( bg2sub );
+        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg2 ) : bgGetGfxPtr( bg2sub );
         auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
 
         dmaCopy( BorderBitmap, ptr, 256 * 192 );
@@ -194,7 +194,7 @@ namespace IO {
     }
 
     void nav::drawMapMug( ) {
-		auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
+        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
         auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
 
         dmaCopy( _Bitmap, ptr, 256 * 192 );
@@ -222,7 +222,7 @@ namespace IO {
         else if( p_newIdx == u8( 255 ) )
             p_newIdx = FS::SAV->m_bgIdx;
 
-		auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
+        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
         auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
 
         if( !_power || _state != MAP_MUG ) {
@@ -272,46 +272,46 @@ namespace IO {
             //StartBag
             if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 6 ],
                                 POS( _state == HOME || !_power )[ 7 ], 16 ) ) {
-				BAG::bagViewer bv;
-				ANIMATE_MAP = false;
-				UPDATE_TIME = false;
+                BAG::bagViewer bv;
+                ANIMATE_MAP = false;
+                UPDATE_TIME = false;
 
-				u16 res = bv.run( );
+                u16 res = bv.run( );
 
-				IO::clearScreenConsole( true, true );
-				_state = HOME;
+                IO::clearScreenConsole( true, true );
+                _state = HOME;
                 draw( true );
-				UPDATE_TIME = true;
-				FADE_TOP_DARK( );
-				MAP::curMap->draw( );
-				ANIMATE_MAP = true;
-				if( res ) {
-					ItemList[ res ]->use( false );
-					draw( true );
-				}
+                UPDATE_TIME = true;
+                FADE_TOP_DARK( );
+                MAP::curMap->draw( );
+                ANIMATE_MAP = true;
+                if( res ) {
+                    ItemList[ res ]->use( false );
+                    draw( true );
+                }
             } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
                        && ( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 0 ],
                                             POS( _state == HOME || !_power )[ 1 ], 16 ) ) ) {
-				ANIMATE_MAP = false;
-				_state = HOME;
-				draw( true );
-				STS::statusScreen sts( 0 );
-				auto res = sts.run( );
+                ANIMATE_MAP = false;
+                _state = HOME;
+                draw( true );
+                STS::statusScreen sts( 0 );
+                auto res = sts.run( );
 
-				IO::clearScreenConsole( true, true );
-				draw( true );
-				FADE_TOP_DARK( );
-				MAP::curMap->draw( );
-				ANIMATE_MAP = true;
+                IO::clearScreenConsole( true, true );
+                draw( true );
+                FADE_TOP_DARK( );
+                MAP::curMap->draw( );
+                ANIMATE_MAP = true;
 
-				if( res )
-					res->use( );
+                if( res )
+                    res->use( );
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 4 ],         //StartDex
                                        POS( _state == HOME || !_power )[ 5 ], 16 ) ) {
                 ANIMATE_MAP = false;
-				_state = HOME;
-				draw( true );
-				dx.run( FS::SAV->m_lstDex );
+                _state = HOME;
+                draw( true );
+                dx.run( FS::SAV->m_lstDex );
 
                 IO::clearScreenConsole( true, true );
                 draw( true );
@@ -325,64 +325,64 @@ namespace IO {
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 2 ],         //StartID
                                        POS( _state == HOME || !_power )[ 3 ], 16 ) ) {
 
-				_state = HOME;
-				draw( true );
+                _state = HOME;
+                draw( true );
 
-				const char *someText[ 11 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test",
-												"Dbl Battle", "Sgl Battle", "Chg NavScrn",
-												"View Boxes A", "View Boxes B", "Hoenn Badges",
-												"Kanto Badges", "Keyboard" };
-				IO::choiceBox test( 11, &someText[ 0 ], 0, false );
+                const char *someText[ 11 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test",
+                                                "Dbl Battle", "Sgl Battle", "Chg NavScrn",
+                                                "View Boxes A", "View Boxes B", "Hoenn Badges",
+                                                "Kanto Badges", "Keyboard" };
+                IO::choiceBox test( 11, &someText[ 0 ], 0, false );
                 int res = test.getResult( "Tokens of god-being..." );
                 draw( );
                 switch( res ) {
                     case 0:
-                        {
-                            memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
-                            for( int i = 0; i < 5; ++i ) {
-                                pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                                a = pokemon( 0, 143 + i, 0,
-                                     50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
-                                     !FS::SAV->m_isMale, i, false, i % 2, i == 3, i + rand( ) % 500, i, i );
-                                a.m_stats.m_acHP *= i / 5.0;
-                                a.m_boxdata.m_experienceGained += 750;
+                    {
+                        memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
+                        for( int i = 0; i < 5; ++i ) {
+                            pokemon& a = FS::SAV->m_pkmnTeam[ i ];
+                            a = pokemon( 0, 143 + i, 0,
+                                         50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
+                                         !FS::SAV->m_isMale, i, false, i % 2, i == 3, i + rand( ) % 500, i, i );
+                            a.m_stats.m_acHP *= i / 5.0;
+                            a.m_boxdata.m_experienceGained += 750;
 
-                                //Hand out some ribbons
-                                for( u8 i = 0; i < 4; ++i ) {
-                                    a.m_boxdata.m_ribbons0[ i ] = rand( ) % 255;
-                                    a.m_boxdata.m_ribbons1[ i ] = rand( ) % 255;
-                                    a.m_boxdata.m_ribbons2[ i ] = rand( ) % 255;
-                                }
-                                a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
-                                a.m_boxdata.m_ribbons1[ 3 ] = 0;
-                                a.m_boxdata.m_holdItem = I_DURIN_BERRY + i;
-
-                                FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
+                            //Hand out some ribbons
+                            for( u8 i = 0; i < 4; ++i ) {
+                                a.m_boxdata.m_ribbons0[ i ] = rand( ) % 255;
+                                a.m_boxdata.m_ribbons1[ i ] = rand( ) % 255;
+                                a.m_boxdata.m_ribbons2[ i ] = rand( ) % 255;
                             }
+                            a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
+                            a.m_boxdata.m_ribbons1[ 3 ] = 0;
+                            a.m_boxdata.m_holdItem = I_DURIN_BERRY + i;
 
-                            for( u16 j = 251; j < 386; ++j ) {
-                                auto a = pokemon( j + 1, 50, 0, j ).m_boxdata;
-                                a.m_gotPlace = j;
-                                FS::SAV->storePkmn( a );
-                                /*if( a.isShiny( ) ) {
-                                  IO::messageBox( "YAAAY" );
-                                  s8 idx = FS::SAV->getCurrentBox( )->getFirstFreeSpot( );
-                                  if( idx == -1 && !( *FS::SAV->getCurrentBox( ) )[ 17 ].isShiny( ) )
-                                  IO::messageBox( "Lost :(" );
-                                  else if( !( *FS::SAV->getCurrentBox( ) )[ idx - 1 ].isShiny( ) )
-                                  IO::messageBox( "Lost :(" );
-                                  break;
-                                  }*/
-                            }
-
-                            FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
-                            FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
-                            FS::SAV->m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
-                            FS::SAV->m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ] = M_SWEET_SCENT;
-
-                            swiWaitForVBlank( );
-                            break;
+                            FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
                         }
+
+                        for( u16 j = 251; j < 386; ++j ) {
+                            auto a = pokemon( j + 1, 50, 0, j ).m_boxdata;
+                            a.m_gotPlace = j;
+                            FS::SAV->storePkmn( a );
+                            /*if( a.isShiny( ) ) {
+                              IO::messageBox( "YAAAY" );
+                              s8 idx = FS::SAV->getCurrentBox( )->getFirstFreeSpot( );
+                              if( idx == -1 && !( *FS::SAV->getCurrentBox( ) )[ 17 ].isShiny( ) )
+                              IO::messageBox( "Lost :(" );
+                              else if( !( *FS::SAV->getCurrentBox( ) )[ idx - 1 ].isShiny( ) )
+                              IO::messageBox( "Lost :(" );
+                              break;
+                              }*/
+                        }
+
+                        FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                        FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
+                        FS::SAV->m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
+                        FS::SAV->m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ] = M_SWEET_SCENT;
+
+                        swiWaitForVBlank( );
+                        break;
+                    }
                     case 1:
                         for( u16 j = 1; j < 772; ++j ) {
                             if( ItemList[ j ]->m_itemName != "Null" )
@@ -390,78 +390,78 @@ namespace IO {
                         }
                         break;
                     case 2:
-                        {
-                            item* curr = ItemList[ rand( ) % 638 ];
-                            while( curr->m_itemName == "Null" )
-                                curr = ItemList[ rand( ) % 638 ];
-                            IO::messageBox( curr, 31 );
-                            break;
-                        }
+                    {
+                        item* curr = ItemList[ rand( ) % 638 ];
+                        while( curr->m_itemName == "Null" )
+                            curr = ItemList[ rand( ) % 638 ];
+                        IO::messageBox( curr, 31 );
+                        break;
+                    }
                     case 3:
-                        {
-                            std::vector<pokemon> cpy;
+                    {
+                        std::vector<pokemon> cpy;
 
-                            for( u8 i = 0; i < 3; ++i ) {
-                                pokemon a( 0, i + 456, 0,
-                                        30, FS::SAV->m_id + 1, FS::SAV->m_sid, "Heiko", false );
-                                //a.stats.acHP = i*a.stats.maxHP/5;
-                                cpy.push_back( a );
-                            }
-                            BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm… Du bist gar nicht so schlecht…",
-                                    "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
-
-                            BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
-                                    BATTLE::weather( rand( ) % 9 ), 0, 0, 5, BATTLE::battle::DOUBLE );
-                            ANIMATE_MAP = false;
-                            test_battle.start( );
-                            FS::SAV->updateTeam( );
-                            break;
+                        for( u8 i = 0; i < 3; ++i ) {
+                            pokemon a( 0, i + 456, 0,
+                                       30, FS::SAV->m_id + 1, FS::SAV->m_sid, "Heiko", false );
+                            //a.stats.acHP = i*a.stats.maxHP/5;
+                            cpy.push_back( a );
                         }
+                        BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm… Du bist gar nicht so schlecht…",
+                                                   "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
+
+                        BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
+                                                    BATTLE::weather( rand( ) % 9 ), 0, 0, 5, BATTLE::battle::DOUBLE );
+                        ANIMATE_MAP = false;
+                        test_battle.start( );
+                        FS::SAV->updateTeam( );
+                        break;
+                    }
                     case 4:
-                        {
-                            std::vector<pokemon> cpy;
+                    {
+                        std::vector<pokemon> cpy;
 
-                            for( u8 i = 0; i < 6; ++i ) {
-                                pokemon a( 0, 435 + i, 0,
-                                        15, FS::SAV->m_id + 1, FS::SAV->m_sid, "Heiko", false );
-                                //a.stats.acHP = i*a.stats.maxHP/5;
-                                cpy.push_back( a );
-                            }
-                            BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm… Du bist gar nicht so schlecht…",
-                                    "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
-
-                            BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
-                                    BATTLE::HAIL/*weather( rand( ) % 9 )*/, 0, 0, 5, BATTLE::battle::SINGLE );
-                            ANIMATE_MAP = false;
-                            test_battle.start( );
-                            FS::SAV->updateTeam( );
-                            break;
+                        for( u8 i = 0; i < 6; ++i ) {
+                            pokemon a( 0, 435 + i, 0,
+                                       15, FS::SAV->m_id + 1, FS::SAV->m_sid, "Heiko", false );
+                            //a.stats.acHP = i*a.stats.maxHP/5;
+                            cpy.push_back( a );
                         }
+                        BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm… Du bist gar nicht so schlecht…",
+                                                   "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
+
+                        BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
+                                                    BATTLE::HAIL/*weather( rand( ) % 9 )*/, 0, 0, 5, BATTLE::battle::SINGLE );
+                        ANIMATE_MAP = false;
+                        test_battle.start( );
+                        FS::SAV->updateTeam( );
+                        break;
+                    }
                     case 5:
-                        {
-                            const char *bgNames[ MAXBG ];
-                            for( u8 o = 0; o < MAXBG; ++o )
-                                bgNames[ o ] = IO::BGs[ o ].m_name.c_str( );
+                    {
+                        const char *bgNames[ MAXBG ];
+                        for( u8 o = 0; o < MAXBG; ++o )
+                            bgNames[ o ] = IO::BGs[ o ].m_name.c_str( );
 
-                            IO::choiceBox scrnChoice( MAXBG, bgNames, 0, true );
-                            draw( true, scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
-                            break;
-                        }
+                        IO::choiceBox scrnChoice( MAXBG, bgNames, 0, true );
+                        draw( true, scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
+                        break;
+                    }
                     case 6: case 7:
-                        {
-                            BOX::boxViewer bxv;
-                            ANIMATE_MAP = false;
+                    {
+                        BOX::boxViewer bxv;
+                        ANIMATE_MAP = false;
 
-                            bxv.run( res % 2 );
+                        bxv.run( res % 2 );
 
-                            consoleSelect( &IO::Top );
-                            consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
-                            consoleClear( );
-                            consoleSelect( &IO::Bottom );
-                            consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-                            consoleClear( );
-                            break;
-                        }
+                        consoleSelect( &IO::Top );
+                        consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+                        consoleClear( );
+                        consoleSelect( &IO::Bottom );
+                        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
+                        consoleClear( );
+                        break;
+                    }
                     case 8:
                         FS::SAV->m_HOENN_Badges <<= 1;
                         FS::SAV->m_HOENN_Badges |= 1;
@@ -471,13 +471,13 @@ namespace IO {
                         FS::SAV->m_KANTO_Badges |= 1;
                         break;
                     case 10:
-                        {
-                            IO::keyboard kbd;
-                            auto res = kbd.getText( 10, "Type some text!" );
-                            sprintf( buffer, "Got: “%s”", res.c_str( ) );
-                            IO::messageBox( buffer, true );
-                            break;
-                        }
+                    {
+                        IO::keyboard kbd;
+                        auto res = kbd.getText( 10, "Type some text!" );
+                        sprintf( buffer, "Got: “%s”", res.c_str( ) );
+                        IO::messageBox( buffer, true );
+                        break;
+                    }
                 }
                 draw( true );
                 swiWaitForVBlank( );

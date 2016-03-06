@@ -35,6 +35,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "fs.h"
 #include "saveGame.h"
 #include "ribbon.h"
+#include "boxUI.h"
 
 #include <cstdio>
 #include <algorithm>
@@ -236,13 +237,9 @@ namespace STS {
         if( p_initTop ) {
             IO::vramSetup( );
             swiWaitForVBlank( );
-            IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
-            consoleSetFont( &IO::Top, IO::consoleFont );
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNScreen" );
             dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         }
-        IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
-        consoleSetFont( &IO::Bottom, IO::consoleFont );
         bgUpdate( );
 
         IO::NAV->draw( );
@@ -273,9 +270,6 @@ namespace STS {
             IO::loadItemIcon( !p_pokemon.m_boxdata.m_ball ? "Pokeball" : ItemList[ p_pokemon.m_boxdata.m_ball ]->m_itemName,
                               -6, 26, SHINY_IDX, SHINY_PAL, 1000, p_bottom );
         }
-        consoleSelect( p_bottom ? &IO::Bottom : &IO::Top );
-        consoleSetWindow( p_bottom ? &IO::Bottom : &IO::Top, 4, 5, 12, 2 );
-        consoleClear( );
 
         if( !p_pokemon.m_boxdata.m_individualValues.m_isEgg ) {
             pal[ RED_IDX ] = RED;
@@ -349,10 +343,6 @@ namespace STS {
 
             u16 exptype = data.m_expType;
 
-            printf( "\x1b[39m" );
-            printf( "EP %3lu%%\nKP %3i%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
-                    ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
-                    p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::displayHP( 100, 101, 46, 80, 97, 98, false, 50, 56, p_bottom );
             IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 80, 97, 98, false, 50, 56, p_bottom );
 
@@ -360,6 +350,15 @@ namespace STS {
             IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
                            ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62, p_bottom );
 
+            IO::regularFont->setColor( 0, 2 );
+            IO::regularFont->setColor( 99, 1 );
+            sprintf( buffer, "EP %lu%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
+                     ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) );
+            IO::regularFont->printString( buffer, 62 - IO::regularFont->stringWidth( buffer ) / 2, 32, p_bottom );
+            sprintf( buffer, "KP %i%%", p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
+            IO::regularFont->printString( buffer, 62 - IO::regularFont->stringWidth( buffer ) / 2, 42, p_bottom );
+            IO::regularFont->setColor( GRAY_IDX, 2 );
+            IO::regularFont->setColor( BLACK_IDX, 1 );
         } else {
             p_page = -1;
             pal[ WHITE_IDX ] = WHITE;
@@ -497,8 +496,6 @@ namespace STS {
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
                         0, 0, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
 
-        consoleSelect( p_bottom ? &IO::Bottom : &IO::Top );
-        consoleSetWindow( p_bottom ? &IO::Bottom : &IO::Top, 16, 5, 32, 24 );
         for( int i = 0; i < 4; i++ ) {
             if( !currPkmn.m_boxdata.m_moves[ i ] )
                 continue;
@@ -700,10 +697,6 @@ namespace STS {
         IO::boldFont->setColor( GRAY_IDX, 1 );
         IO::boldFont->setColor( WHITE_IDX, 2 );
 
-        consoleSelect( p_bottom ? &IO::Bottom : &IO::Top );
-        consoleSetWindow( p_bottom ? &IO::Bottom : &IO::Top, 0, 0, 32, 24 );
-        consoleClear( );
-
         u8 isNotEgg = 1;
         drawPkmnInformation( currPkmn, isNotEgg, false, p_bottom );
         if( !isNotEgg )
@@ -789,10 +782,6 @@ namespace STS {
         IO::boldFont->setColor( 0, 0 );
         IO::boldFont->setColor( GRAY_IDX, 1 );
         IO::boldFont->setColor( WHITE_IDX, 2 );
-
-        consoleSelect( p_bottom ? &IO::Bottom : &IO::Top );
-        consoleSetWindow( p_bottom ? &IO::Bottom : &IO::Top, 0, 0, 32, 24 );
-        consoleClear( );
 
         u8 isNotEgg = 1;
         drawPkmnInformation( currPkmn, isNotEgg, false, p_bottom );
@@ -947,11 +936,6 @@ namespace STS {
 
     void boxStsScreenUI::init( ) {
         //Remember: the storage sys swaps the screens.
-        IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
-        consoleSetFont( &IO::Bottom, IO::consoleFont );
-        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-        consoleSelect( &IO::Bottom );
-        consoleClear( );
 
         IO::regularFont->setColor( 0, 0 );
         { IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 ); }
@@ -990,11 +974,8 @@ namespace STS {
 
     void boxStsScreenUI::draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) {
         //Remember: the storage sys swaps the screens.
-        //Only drew on the sub screen
+        //Only draw on the sub screen
         hideSprites( true );
-        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-        consoleSelect( &IO::Bottom );
-        consoleClear( );
 
         IO::setDefaultConsoleTextColors( BG_PALETTE_SUB, 6 );
         drawPkmnInformation( p_pokemon, p_page, p_newpok, true );
@@ -1019,6 +1000,10 @@ namespace STS {
             default:
                 break;
         }
+        for( u8 i = 0; i < 5; ++i )
+            IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].isHidden = p_pokemon.m_boxdata.m_individualValues.m_isEgg;
+        IO::OamTop->oamBuffer[ PAGE_ICON_START + p_page ].isHidden = !p_pokemon.m_boxdata.m_individualValues.m_isEgg;
+        IO::updateOAM( false );
         IO::updateOAM( true );
     }
 }

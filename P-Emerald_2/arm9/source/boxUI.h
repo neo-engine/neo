@@ -31,21 +31,25 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <vector>
 
 namespace BOX {
+#define PAGE_ICON_START 5
     class boxUI {
         friend class boxViewer;
+
+        enum button {
+            BUTTON_LEFT,
+            BUTTON_RIGHT,
+            BUTTON_BOX_NAME
+        };
+
+        void buttonChange( button p_button, bool p_pressed );
 
         std::vector<std::pair<u8, IO::inputTarget>> _ranges;
 
         boxUI( );
         ~boxUI( );
 
-        void updateAtHand( touchPosition p_touch, u8 p_oamIdx );
-
         std::vector<IO::inputTarget> draw( bool p_showTeam = false );
-        //u8 getSprite( u8 p_oldIdx, u8 p_rangeIdx );
-        //u32 acceptDrop( u8 p_startIdx, u8 p_dropIdx, u8 p_oamIdx ); //First 10 bits: type, remaining: value
-        //u8 acceptTouch( u8 p_oldIdx, u8 p_rangeIdx, bool p_allowTakePkmn );
-        
+
         void select( u8 p_index );
         void takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg );
         void updateTeam( );
