@@ -113,16 +113,19 @@ namespace FS {
         u8          getTeamPkmnCount( );
 
         BATTLE::battleTrainer* getBattleTrainer( );
-        void updateTeam( );
+        void        updateTeam( );
 
         //Return the idx of the resulting Box
-        s8 storePkmn( const pokemon::boxPokemon& p_pokemon );
-        s8 storePkmn( const pokemon& p_pokemon );
-        BOX::box* getCurrentBox( );
+        s8          storePkmn( const pokemon::boxPokemon& p_pokemon );
+        s8          storePkmn( const pokemon& p_pokemon );
+
+        u16         countPkmn( u16 p_pkmnIdx );
+
+        BOX::box*   getCurrentBox( );
     };
 
-    saveGame* readSave( );
-    bool writeSave( saveGame* p_saveGame );
+    saveGame*       readSave( );
+    bool            writeSave( saveGame* p_saveGame );
 
     extern saveGame* SAV;
 }

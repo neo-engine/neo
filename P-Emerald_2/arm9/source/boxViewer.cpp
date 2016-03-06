@@ -63,7 +63,7 @@ namespace BOX {
                 _boxUI.updateAtHand( touch, _atHandOam );
             }
 
-            if( _atHandOam && !( touch.px | touch.py ) ) { //Player drops the sprite at hand
+            if( _atHandOam && TOUCH_UP ) { //Player drops the sprite at hand
                 //boxUI.acceptDrop( start, curr, _atHandOam );
                 _atHandOam = 0;
                 //Count the non-fainted team pkmn
@@ -135,7 +135,7 @@ namespace BOX {
             } else if( GET_AND_WAIT( KEY_L ) ) {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
                 CLEAN;
-                _boxUI.draw( p_allowTakePkmn );
+                _ranges = _boxUI.draw( p_allowTakePkmn );
                 select( _selectedIdx );
             } else if( IN_RANGE_R( 24, 23, 48, 48 ) ) {
                 _boxUI.buttonChange( boxUI::BUTTON_LEFT, true );
@@ -147,7 +147,7 @@ namespace BOX {
                     if( TOUCH_UP ) {
                         FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
                         CLEAN;
-                        _boxUI.draw( p_allowTakePkmn );
+                        _ranges = _boxUI.draw( p_allowTakePkmn );
                         select( _selectedIdx );
                         break;
                     }
@@ -159,7 +159,7 @@ namespace BOX {
             } else if( GET_AND_WAIT( KEY_R ) ) {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
                 CLEAN;
-                _boxUI.draw( p_allowTakePkmn );
+                _ranges = _boxUI.draw( p_allowTakePkmn );
                 select( _selectedIdx );
             } else if( IN_RANGE_R( 208, 23, 232, 48 ) ) {
                 _boxUI.buttonChange( boxUI::BUTTON_RIGHT, true );
@@ -171,7 +171,7 @@ namespace BOX {
                     if( TOUCH_UP ) {
                         FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
                         CLEAN;
-                        _boxUI.draw( p_allowTakePkmn );
+                        _ranges = _boxUI.draw( p_allowTakePkmn );
                         select( _selectedIdx );
                         break;
                     }
@@ -221,36 +221,6 @@ namespace BOX {
                 }
             }
 
-            /*else if( GET_AND_WAIT( KEY_RIGHT ) ) {
-                if( p_allowTakePkmn && _currPos >= 21 ) {
-                    newPok = false;
-                    _currPos = ( ( _currPos - 20 ) % 6 ) + 21;
-                } else {
-                    if( ( newPok = ( ( ( ++_currPos ) %= mx ) < oldPos ) ) )
-                        generateNextPage( );
-                }
-                _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
-            } else if( GET_AND_WAIT( KEY_LEFT ) ) {
-                if( p_allowTakePkmn && _currPos >= 21 ) {
-                    newPok = false;
-                    _currPos = ( ( _currPos - 16 ) % 6 ) + 21;
-                } else {
-                    if( ( newPok = ( ( ( _currPos += ( mx - 1 ) ) %= mx ) > oldPos ) ) )
-                        generatePreviousPage( );
-                }
-                _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
-            } else if( GET_AND_WAIT( KEY_UP ) ) {
-                if( ( newPok = ( ( ( _currPos += ( mx - 7 ) ) %= mx ) > oldPos ) ) )
-                    generatePreviousPage( );
-                _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
-            } else if( GET_AND_WAIT( KEY_DOWN ) ) {
-                if( ( newPok = ( ( ( _currPos += 7 ) %= mx ) < oldPos ) ) )
-                    generateNextPage( );
-                _ranges = _boxUI->draw( _currPage, _currPos, _box, oldPos, newPok, p_allowTakePkmn );
-            } else if( GET_AND_WAIT( KEY_A ) ) {
-
-            }
-
             bool rangeChanged = false;
             for( u8 j = 0; j < _ranges.size( ); ++j ) {
                 auto i = _ranges[ j ];
@@ -261,18 +231,19 @@ namespace BOX {
                             scanKeys( );
                             swiWaitForVBlank( );
                             touchRead( &touch );
-                            if( c++ == TRESHOLD && p_allowTakePkmn ) {
-                                _atHandOam = _boxUI->getSprite( _currPos, j );
-                                _ranges = _boxUI->draw( _currPage, j, _box, _currPos, false, p_allowTakePkmn );
-                                _currPos = j;
-                                if( _atHandOam )
-                                    start = curr = j;
-                                break;
-                            }
-                            if( !touch.px && !touch.py ) {
-                                _boxUI->acceptTouch( _currPos, j, p_allowTakePkmn );
-                                _ranges = _boxUI->draw( _currPage, j, _box, _currPos, false, p_allowTakePkmn );
-                                _currPos = j;
+                            /* if( c++ == TRESHOLD ) {
+                                 // _atHandOam = _boxUI->getSprite( _currPos, j );
+                                 // _ranges = _boxUI->draw( _currPage, j, _box, _currPos, false, p_allowTakePkmn );
+                                 _currPos = j;
+                                 if( _atHandOam )
+                                     start = curr = j;
+                                 break;
+                             } */
+                            if( TOUCH_UP ) {
+                                // _boxUI->acceptTouch( _currPos, j, p_allowTakePkmn );
+                                // _ranges = _boxUI->draw( _currPage, j, _box, _currPos, false, p_allowTakePkmn );
+                                _selectedIdx = j;
+                                select( _selectedIdx );
                                 break;
                             }
                             if( !IN_RANGE_I( touch, i ) )
@@ -285,7 +256,7 @@ namespace BOX {
                 }
             }
             if( !rangeChanged )
-                curr = -1; */
+                curr = -1;
         }
     }
     void boxViewer::select( u8 p_index ) {
@@ -326,7 +297,7 @@ namespace BOX {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
 
             CLEAN;
-            _boxUI.draw( _showTeam );
+            _ranges = _boxUI.draw( _showTeam );
             select( _selectedIdx );
             return;
         }

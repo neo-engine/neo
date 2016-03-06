@@ -52,6 +52,13 @@ namespace BOX {
                     res++;
             return res;
         }
+        u8 count( u16 p_pkmnIdx ) const {
+            u8 res = 0;
+            for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i )
+                if( ( m_pokemon + i )->m_speciesId == p_pkmnIdx )
+                    res++;
+            return res;
+        }
         void clear( u8 p_pos ) {
             memset( m_pokemon + p_pos, 0, sizeof( pokemon::boxPokemon ) );
         }

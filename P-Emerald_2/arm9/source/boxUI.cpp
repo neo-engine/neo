@@ -100,7 +100,7 @@ namespace BOX {
                                   ContestTiles, ContestTilesLen, false, false, true, OBJPRIORITY_0, false );
         for( u8 i = 0; i < 5; ++i ) {
             IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].x = 48 + 32 * i;
-            IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].y = -10 + 0 * i;
+            IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].y = 256 - 10;
         }
         IO::updateOAM( false );
         IO::initOAMTable( true );
@@ -155,8 +155,8 @@ namespace BOX {
             IO::regularFont->setColor( RED_IDX, 1 );
         else
             IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::printString( IO::regularFont, buffer, 252 - IO::regularFont->stringWidth( buffer ), 3, !p_bottom );      
-        
+        IO::printString( IO::regularFont, buffer, 252 - IO::regularFont->stringWidth( buffer ), 3, !p_bottom );
+
         for( u8 i = 0; i < 5; ++i ) {
             IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].isHidden = true;
         }
@@ -216,7 +216,7 @@ namespace BOX {
         IO::printChoiceBox( 24, 51, 232, 136, 6, COLOR_IDX, false, false );
 
         for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
-            res.push_back( IO::inputTarget( POS_X( i ), POS_Y( i ), POS_X( i ) + 28, POS_Y( i ) + 21 ) );
+            res.push_back( IO::inputTarget( POS_X( i ) + 5, POS_Y( i ) + 10, POS_X( i ) + 33, POS_Y( i ) + 31 ) );
             _ranges.push_back( { oam, res.back( ) } );
             if( box->m_pokemon[ i ].m_speciesId ) {
                 if( !box->m_pokemon[ i ].m_individualValues.m_isEgg ) {
@@ -234,8 +234,8 @@ namespace BOX {
         IO::printRectangle( 0, 140, 255, 192, false, false, WHITE_IDX );
         IO::printString( IO::regularFont, p_showTeam ? "Pokémon-Team" : "Zwischenablage", 2, 176, false );
         for( u8 i = 0; i < 6; ++i ) {
-            res.push_back( IO::inputTarget( TEAM_POS_X( i ), TEAM_POS_Y( i ),
-                                            TEAM_POS_X( i ) + 28, TEAM_POS_Y( i ) + 21 ) );
+            res.push_back( IO::inputTarget( TEAM_POS_X( i ) + 5, TEAM_POS_Y( i ) + 10,
+                                            TEAM_POS_X( i ) + 33, TEAM_POS_Y( i ) + 31 ) );
             _ranges.push_back( { oam, res.back( ) } );
 
             IO::printChoiceBox( TEAM_POS_X( i ), TEAM_POS_Y( i ),
@@ -277,9 +277,6 @@ namespace BOX {
             return _ranges[ p_rangeIdx ].first;
         }
 
-        u8 boxUI::acceptTouch( u8 p_oldIdx, u8 p_rangeIdx, bool p_allowTakePkmn ) {
-            return 0;
-        }
 
         u32 boxUI::acceptDrop( u8 p_startIdx, u8 p_dropIdx, u8 p_oamIdx ) {
             if( p_startIdx < MAX_PKMN_PER_BOX ) {
@@ -356,7 +353,6 @@ namespace BOX {
     void boxUI::takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg ) {
         if( p_index != (u8) -1 ) {
             box* box = FS::SAV->getCurrentBox( );
-            auto spr = IO::OamTop->oamBuffer[ PKMN_START + p_index ];
 
             pokemon::boxPokemon bpm;
             if( p_index < MAX_PKMN_PER_BOX )
