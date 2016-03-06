@@ -15,3 +15,6 @@ before_install:
 script:
     - cd P-Emerald_2
     - make
+
+notifications:
+      email: false
