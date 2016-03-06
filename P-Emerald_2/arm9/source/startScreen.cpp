@@ -72,8 +72,8 @@ void fillResume( ) {
 
 void drawSplash( ) {
     FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "Title" );
-    if( IO::BGs[ FS::SAV->m_bgIdx ].m_allowsOverlay )
-        IO::NAV->draw( );
+//    if( IO::BGs[ FS::SAV->m_bgIdx ].m_allowsOverlay )
+//        IO::NAV->draw( );
     IO::clearScreen( true, false, false );
 
     consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
