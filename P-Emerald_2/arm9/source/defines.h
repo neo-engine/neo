@@ -34,7 +34,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 //#define USE_AS_LIB
 #undef _EMULATOR
-#define VERSION "0.6"
+#define VERSION "0.6.1"
 #define VERSION_NAME "Executing Exeggcute"
 #define DEBUG
 
