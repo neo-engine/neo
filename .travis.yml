@@ -2,8 +2,8 @@ sudo: required
 dist: trusty
 language: cpp
 before_install:
-    - sudo apt-get -qq update
-    - sudo apt-get install git curl
+    - sudo apt-get update -qq
+    - sudo apt-get install -qq git curl
     - curl -L http://sourceforge.net/projects/devkitpro/files/Automated%20Installer/devkitARMupdate.pl/download -o devkitARMupdate.pl
     - chmod +x ./devkitARMupdate.pl
     - sudo ./devkitARMupdate.pl /opt/devkitpro
