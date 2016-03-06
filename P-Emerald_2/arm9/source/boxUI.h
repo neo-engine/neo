@@ -48,12 +48,7 @@ namespace BOX {
         boxUI( );
         ~boxUI( );
 
-        void updateAtHand( touchPosition p_touch, u8 p_oamIdx );
-
         std::vector<IO::inputTarget> draw( bool p_showTeam = false );
-        //u8 getSprite( u8 p_oldIdx, u8 p_rangeIdx );
-        //u32 acceptDrop( u8 p_startIdx, u8 p_dropIdx, u8 p_oamIdx ); //First 10 bits: type, remaining: value
-        //u8 acceptTouch( u8 p_oldIdx, u8 p_rangeIdx, bool p_allowTakePkmn );
 
         void select( u8 p_index );
         void takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg );

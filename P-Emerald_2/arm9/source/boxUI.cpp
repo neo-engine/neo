@@ -266,54 +266,6 @@ namespace BOX {
         return res;
     }
 
-    void boxUI::updateAtHand( touchPosition p_touch, u8 p_oamIdx ) {
-        IO::OamTop->oamBuffer[ p_oamIdx ].x = p_touch.px - 16;
-        IO::OamTop->oamBuffer[ p_oamIdx ].y = p_touch.py - 16;
-        IO::updateOAM( false );
-    }
-    /*
-        u8 boxUI::getSprite( u8 p_oldIdx, u8 p_rangeIdx ) {
-            IO::OamTop->oamBuffer[ _ranges[ p_rangeIdx ].first ].priority = OBJPRIORITY_0;
-            return _ranges[ p_rangeIdx ].first;
-        }
-
-
-        u32 boxUI::acceptDrop( u8 p_startIdx, u8 p_dropIdx, u8 p_oamIdx ) {
-            if( p_startIdx < MAX_PKMN_PER_BOX ) {
-                IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].x = POS_X( p_startIdx ) - 3;
-                IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].y = POS_Y( p_startIdx ) - 10;
-            } else {
-                IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].x = TEAM_POS_X( p_startIdx ) - 3;
-                IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].y = TEAM_POS_Y( p_startIdx ) - 10;
-            }
-            IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].priority = OBJPRIORITY_0;
-            IO::updateOAM( false );
-
-            if( u8( -1 ) == p_dropIdx )
-                return 0;
-
-            if( p_startIdx >= MAX_PKMN_PER_BOX || p_dropIdx >= MAX_PKMN_PER_BOX ) {
-                if( p_startIdx >= MAX_PKMN_PER_BOX ) {
-                    IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ].x = TEAM_POS_X( p_startIdx ) - 3;
-                    IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ].y = TEAM_POS_Y( p_startIdx ) - 10;
-                } else {
-                    IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ].x = POS_X( p_startIdx ) - 3;
-                    IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ].y = POS_Y( p_startIdx ) - 10;
-                }
-                if( p_dropIdx >= MAX_PKMN_PER_BOX ) {
-                    IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].x = TEAM_POS_X( p_dropIdx ) - 3;
-                    IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].y = TEAM_POS_Y( p_dropIdx ) - 10;
-                } else {
-                    IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].x = POS_X( p_dropIdx ) - 3;
-                    IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ].y = POS_Y( p_dropIdx ) - 10;
-                }
-
-                std::swap( IO::OamTop->oamBuffer[ _ranges[ p_startIdx ].first ], IO::OamTop->oamBuffer[ _ranges[ p_dropIdx ].first ] );
-                IO::updateOAM( false );
-            }
-            return 0;
-        }
-    */
     void boxUI::select( u8 p_index ) {
         if( p_index == (u8) -1 ) {
             IO::OamTop->oamBuffer[ ARROW_ID ].isHidden = true;

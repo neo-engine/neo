@@ -37,7 +37,6 @@ namespace BOX {
     class boxViewer {
     private:
         std::vector<IO::inputTarget> _ranges;
-        u8 _atHandOam;
         u8 _selectedIdx;
         std::pair<u8, u8> _heldPokmPos; //(box, pos in box); (_, 19..24) for team pkmn
         pokemon _heldPkmn;

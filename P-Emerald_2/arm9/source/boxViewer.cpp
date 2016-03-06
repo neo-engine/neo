@@ -41,7 +41,6 @@ namespace BOX {
 #define HAS_SELECTION( no, yes ) do if( _selectedIdx == (u8) -1 ) { no; } else { yes; } while (false)
     void boxViewer::run( bool p_allowTakePkmn ) {
 #define CLEAN ( _topScreenDirty = false  )
-        _atHandOam = 0;
         _ranges = _boxUI.draw( p_allowTakePkmn );
         CLEAN;
         _curPage = 0;
@@ -51,82 +50,11 @@ namespace BOX {
         _showTeam = p_allowTakePkmn;
 
         touchPosition touch;
-        u8 curr = -1, start = -1; //Indices the held sprite is covering
         loop( ) {
             swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
             int pressed = keysCurrent( );
-            bool newPok;
-
-            if( _atHandOam ) {
-                _boxUI.updateAtHand( touch, _atHandOam );
-            }
-
-            if( _atHandOam && TOUCH_UP ) { //Player drops the sprite at hand
-                //boxUI.acceptDrop( start, curr, _atHandOam );
-                _atHandOam = 0;
-                //Count the non-fainted team pkmn
-                u8 cnt = 0;
-                for( u8 i = 0; i < 6; ++i )
-                    if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId
-                        && FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP )
-                        ++cnt;
-                /*
-                                sprintf( buffer, "%d -> %d", start, curr );
-                                IO::messageBox m( buffer );*/
-                                /*
-                                if( start == 255 || curr == 255 ) //Something went wrong
-                                    continue;
-                                else if( start < 21 && curr < 21 ) //Boxes auto-sort; no PKMN-Shifting inside Boxes
-                                    continue;
-                                else if( start >= 21 && curr >= 21 ) { //Shift Team-Pkmn
-                                    if( FS::SAV->m_pkmnTeam[ curr - 21 ].m_boxdata.m_speciesId &&
-                                        FS::SAV->m_pkmnTeam[ start - 21 ].m_boxdata.m_speciesId ) {
-                                        std::swap( FS::SAV->m_pkmnTeam[ start - 21 ], FS::SAV->m_pkmnTeam[ curr - 21 ] );
-                                        _ranges = _boxUI->draw( _currPage, _currPos = curr, _box, start, true, true );
-                                    } else {
-                                        _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
-                                    }
-                                } else if( start < 21 && curr >= 21 && _currPage[ start + 1 ].first ) { //withdraw pkmn
-                                                                                                        //Extract pkmn from the box
-                                    auto tmp = _box->operator[]( _currPage[ start + 1 ].first );
-                                    auto it = tmp.begin( );
-                                    for( u8 i = 0; i < _currPage[ start + 1 ].second; ++i, ++it );
-                                    pokemon target = pokemon( *it );
-                                    _box->erase( target );
-
-                                    //Swap the extracted Pkmn with the team pkmn
-                                    u8 rct = 0; //real count: including fainted ones
-                                    for( u8 i = 0; i < 6; ++i )
-                                        if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                                            ++rct;
-                                    rct = std::min( rct, u8( curr - 21 ) );
-
-                                    std::swap( target, FS::SAV->m_pkmnTeam[ rct ] );
-
-                                    //Insert the team pkmn into the box
-                                    _box->insert( target );
-
-                                    //recalc and redraw everything
-                                    generatePreviousPage( );
-                                    generateNextPage( );
-                                    _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
-                                } else if( start >= 21 && curr < 21 ) { //deposit pkmn
-                                    if( cnt <= 1 ) {
-                                        _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
-                                        continue;
-                                    }
-                                    _box->insert( FS::SAV->m_pkmnTeam[ start - 21 ] );
-                                    for( u8 i = start - 21; i < 5; ++i )
-                                        std::swap( FS::SAV->m_pkmnTeam[ i ], FS::SAV->m_pkmnTeam[ i + 1 ] );
-                                    memset( &FS::SAV->m_pkmnTeam[ 5 ], 0, sizeof( pokemon ) );
-
-                                    generatePreviousPage( );
-                                    generateNextPage( );
-                                    _ranges = _boxUI->draw( _currPage, _currPos = start, _box, start, true, true );
-                                }*/
-            }
 
             if( GET_AND_WAIT( KEY_B )
                 || GET_AND_WAIT( KEY_X )
@@ -221,42 +149,30 @@ namespace BOX {
                 }
             }
 
-            bool rangeChanged = false;
             for( u8 j = 0; j < _ranges.size( ); ++j ) {
                 auto i = _ranges[ j ];
                 if( IN_RANGE_I( touch, i ) ) {
-                    if( !_atHandOam ) {
-                        u8 c = 0;
-                        loop( ) {
-                            scanKeys( );
-                            swiWaitForVBlank( );
-                            touchRead( &touch );
-                            /* if( c++ == TRESHOLD ) {
-                                 // _atHandOam = _boxUI->getSprite( _currPos, j );
-                                 // _ranges = _boxUI->draw( _currPage, j, _box, _currPos, false, p_allowTakePkmn );
-                                 _currPos = j;
-                                 if( _atHandOam )
-                                     start = curr = j;
-                                 break;
-                             } */
-                            if( TOUCH_UP ) {
-                                // _boxUI->acceptTouch( _currPos, j, p_allowTakePkmn );
-                                // _ranges = _boxUI->draw( _currPage, j, _box, _currPos, false, p_allowTakePkmn );
-                                _selectedIdx = j;
-                                select( _selectedIdx );
-                                break;
-                            }
-                            if( !IN_RANGE_I( touch, i ) )
-                                break;
+                    u8 c = 0;
+                    loop( ) {
+                        scanKeys( );
+                        swiWaitForVBlank( );
+                        touchRead( &touch );
+                        if( c++ == TRESHOLD ) {
+                            _selectedIdx = j;
+                            takePkmn( _selectedIdx );
+                            IO::waitForTouchUp( i );
+                            break;
                         }
-                    } else {
-                        curr = j;
-                        rangeChanged = true;
+                        if( TOUCH_UP ) {
+                            _selectedIdx = j;
+                            select( _selectedIdx );
+                            break;
+                        }
+                        if( !IN_RANGE_I( touch, i ) )
+                            break;
                     }
                 }
             }
-            if( !rangeChanged )
-                curr = -1;
         }
     }
     void boxViewer::select( u8 p_index ) {
