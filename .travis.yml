@@ -1,0 +1,12 @@
+language:
+    cpp
+before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get install git curl
+    - curl -L http://sourceforge.net/projects/devkitpro/files/Automated%20Installer/devkitARMupdate.pl/download -o devkitARMupdate.pl
+    - chmod +x ./devkitARMupdate.pl
+    - sudo ./devkitARMupdate.pl /opt/devkitpro
+    - echo "export DEVKITPRO=/opt/devkitpro" >> ~/.bashrc
+    - echo "export DEVKITARM=/opt/devkitpro/devkitARM" >> ~/.bashrc
+    - echo "export PATH=$PATH:/opt/devkitpro/devkitARM/bin" >> ~/.bashrc
+    - source ~/.bashrc
