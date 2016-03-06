@@ -1,7 +1,6 @@
 Pokémon Emerald Version 2
 =========================
-
-![](https://travis-ci.org/PH111P/perm2.svg?branch=master)
+[![Travis](https://travis-ci.org/PH111P/perm2.svg?branch=master)](https://travis-ci.org/PH111P/perm2)
 
 There's still (very) much to do, but when it's complete, it's a recode of Pokémon for Nintendo DS.
 
