@@ -165,9 +165,9 @@ int main( int, char** p_argv ) {
         scanKeys( );
         FRAME_COUNT++;
 
-        if( ANIMATE_MAP ) {
-            //animateMap( ++frame );
-        }
+        if( ANIMATE_MAP )
+            MAP::curMap->animateMap( FRAME_COUNT );
+
         if( !UPDATE_TIME )
             return;
 

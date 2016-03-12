@@ -416,10 +416,13 @@ namespace MAP {
 
         u8 battleBack = 0;
         auto playerPrio = _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].getPriority( );
+        ANIMATE_MAP = false;
+        swiWaitForVBlank( );
         BATTLE::battle( FS::SAV->getBattleTrainer( ), &wildPkmn, weat, platform, battleBack ).start( );
         FS::SAV->updateTeam( );
         FADE_TOP_DARK( );
         draw( playerPrio );
+        ANIMATE_MAP = true;
         IO::NAV->draw( true );
 
         return true;
@@ -439,6 +442,24 @@ namespace MAP {
         else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
             return handleWildPkmn( GRASS, 0, true );
         return false;
+    }
+
+    void mapDrawer::animateMap( u8 p_frame ) {
+        u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
+        for( size_t i = 0; i < CUR_SLICE->m_tileSet.m_animationCount1; ++i ) {
+            auto& a = CUR_SLICE->m_tileSet.m_animations1[ i ];
+            if( p_frame % a.m_speed == 0 || a.m_speed == 1 ) {
+                a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
+                swiCopy( &a.m_tiles[ a.m_acFrame ], tileMemory + a.m_tileIdx * 32, 16 );
+            }
+        }
+        for( size_t i = 0; i < CUR_SLICE->m_tileSet.m_animationCount2; ++i ) {
+            auto& a = CUR_SLICE->m_tileSet.m_animations2[ i ];
+            if( p_frame % a.m_speed == 0 || a.m_speed == 1 ) {
+                a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
+                swiCopy( &a.m_tiles[ a.m_acFrame ], tileMemory + a.m_tileIdx * 32, 16 );
+            }
+        }
     }
 
     mapDrawer::mapDrawer( )

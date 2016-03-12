@@ -121,6 +121,8 @@ namespace MAP {
 
         void draw( ObjPriority p_playerPrio = OBJPRIORITY_2 );
 
+        void animateMap( u8 p_frame );
+
         bool canMove( position p_start,
                       direction p_direction,
                       moveMode p_moveMode = WALK );

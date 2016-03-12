@@ -483,6 +483,7 @@ namespace IO {
                 swiWaitForVBlank( );
                 if( res == 3 || res == 4 || res == 6 || res == 7 ) {
                     FADE_TOP_DARK( );
+                    ANIMATE_MAP = true;
                     MAP::curMap->draw( );
                 }
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 10 ],        //Save

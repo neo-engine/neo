@@ -119,7 +119,7 @@ namespace MAP {
                 delete cache.m_blocks[ ind ];
             mapF = FS::open( TILESET_PATH, tsidx1, ".bvd" );
             cache.m_blocks[ ind ] = new block[ 512 ];
-            FS::readblocks( mapF, cache.m_blocks[ ind ] );
+            FS::readBlocks( mapF, cache.m_blocks[ ind ] );
             FS::close( mapF );
 
             if( cache.m_palettes[ ind ] )
@@ -132,8 +132,8 @@ namespace MAP {
         res->m_tileSet.m_tiles1 = cache.m_tiles[ ind ];
         res->m_blockSet.m_blocks1 = cache.m_blocks[ ind ];
         memcpy( res->m_pals, cache.m_palettes[ ind ], sizeof( palette ) * 6 );
-        //sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx1 );
-        //FS::readAnimations( fopen( buffer, "rb" ), m_animations );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx1 );
+        res->m_tileSet.m_animationCount1 = FS::readAnimations( fopen( buffer, "r" ), res->m_tileSet.m_animations1 );
 
         //Read the second tileset
 
@@ -150,7 +150,7 @@ namespace MAP {
                 delete cache.m_blocks[ ind ];
             mapF = FS::open( TILESET_PATH, tsidx2, ".bvd" );
             cache.m_blocks[ ind ] = new block[ 512 ];
-            FS::readblocks( mapF, cache.m_blocks[ ind ] );
+            FS::readBlocks( mapF, cache.m_blocks[ ind ] );
             FS::close( mapF );
 
             if( cache.m_palettes[ ind ] )
@@ -164,8 +164,8 @@ namespace MAP {
         res->m_blockSet.m_blocks2 = cache.m_blocks[ ind ];
         memcpy( res->m_pals + 6, cache.m_palettes[ ind ], sizeof( palette ) * 6 );
 
-        //sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx2 );
-        //readAnimations( fopen( buffer, "rb" ), m_animations );
+        sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx2 );
+        res->m_tileSet.m_animationCount2 = FS::readAnimations( fopen( buffer, "r" ), res->m_tileSet.m_animations2 );
         return res;
     }
 }

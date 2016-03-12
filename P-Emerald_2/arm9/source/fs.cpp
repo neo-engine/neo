@@ -216,7 +216,7 @@ namespace FS {
         return true;
     }
 
-    bool readblocks( FILE* p_file, MAP::block* p_tileSet, u16 p_startIdx, u16 p_size ) {
+    bool readBlocks( FILE* p_file, MAP::block* p_tileSet, u16 p_startIdx, u16 p_size ) {
         if( p_file == 0 )
             return false;
         readNop( p_file, 4 );
@@ -231,24 +231,26 @@ namespace FS {
         return true;
     }
 
-    //inline void readAnimations( FILE* p_file, std::vector<MAP::Animation>& p_animations ) {
-    //    if( p_file == 0 )
-    //        return;
-    //    u8 N;
-    //    fread( &N, sizeof( u8 ), 1, p_file );
-    //    for( int i = 0; i < N; ++i ) {
-    //        MAP::Animation a;
-    //        fread( &a.m_tileIdx, sizeof( u16 ), 1, p_file );
-    //        fread( &a.m_speed, sizeof( u8 ), 1, p_file );
-    //        fread( &a.m_maxFrame, sizeof( u8 ), 1, p_file );
-    //        a.m_acFrame = 0;
-    //        a.m_animationTiles.assign( a.m_maxFrame, tile( ) );
-    //        for( int i = 0; i < a.m_maxFrame; ++i )
-    //            fread( &a.m_animationTiles[ i ], sizeof( tile ), 1, p_file );
-    //        p_animations.push_back( a );
-    //    }
-    //    fclose( p_file );
-    //}
+    u8 readAnimations( FILE* p_file, MAP::tileSet::animation* p_animations ) {
+        if( !p_file )
+            return 0;
+        u8 N;
+        fread( &N, sizeof( u8 ), 1, p_file );
+
+        if( !p_animations )
+            p_animations = new MAP::tileSet::animation[ N ];
+
+        for( int i = 0; i < N; ++i ) {
+            auto& a = p_animations[ i ];
+            fread( &a.m_tileIdx, sizeof( u16 ), 1, p_file );
+            fread( &a.m_speed, sizeof( u8 ), 1, p_file );
+            fread( &a.m_maxFrame, sizeof( u8 ), 1, p_file );
+            a.m_acFrame = 0;
+            fread( a.m_tiles, sizeof( MAP::tile ), a.m_maxFrame, p_file );
+        }
+        fclose( p_file );
+        return N;
+    }
 
     std::string readString( FILE* p_file, bool p_new ) {
         std::string ret = "";

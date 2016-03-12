@@ -59,7 +59,8 @@ namespace FS {
     bool readNop( FILE* p_file, u32 p_cnt );
     bool readPal( FILE* p_file, MAP::palette* p_palette );
     bool readTiles( FILE* p_file, MAP::tile* p_tiles, u16 p_startIdx = 0, u16 p_size = 512 );
-    bool readblocks( FILE* p_file, MAP::block* p_blocks, u16 p_startIdx = 0, u16 p_size = 512 );
+    bool readBlocks( FILE* p_file, MAP::block* p_blocks, u16 p_startIdx = 0, u16 p_size = 512 );
+    u8   readAnimations( FILE* p_file, MAP::tileSet::animation* p_animations );
 
     std::string breakString( const std::string& p_string, u8 p_lineLength );
     std::string breakString( const std::string& p_string, IO::font* p_font, u8 p_lineLength );

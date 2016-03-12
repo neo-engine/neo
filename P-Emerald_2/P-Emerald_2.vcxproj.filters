@@ -296,9 +296,6 @@
     <ClCompile Include="arm9\source\uio.cpp">
       <Filter>Source Files\arm9\io</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\map2d.cpp">
-      <Filter>Source Files\arm9\map</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\statusScreen.cpp">
       <Filter>Source Files\arm9\sts</Filter>
     </ClCompile>

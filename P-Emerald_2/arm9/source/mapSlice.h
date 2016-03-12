@@ -60,20 +60,28 @@ namespace MAP {
         u8          m_bottombehave;
     };
 
-    typedef struct {
+    struct tileSet {
+        struct animation {
+            u16     m_tileIdx;
+            u8      m_acFrame;
+            u8      m_maxFrame;
+            u8      m_speed;
+            tile    m_tiles[ 16 ];
+        };
+        u8          m_animationCount1, m_animationCount2;
+        animation   *m_animations1, *m_animations2;
         tile        *m_tiles1, *m_tiles2;
-    } tileSet;
-    typedef struct {
+    };
+    struct blockSet {
         block       *m_blocks1, *m_blocks2;
-    } blockSet;
+    };
 
-    typedef struct {
+    struct mapBlockAtom {
         u16         m_blockidx : 10;
         u8          m_movedata : 6;
-    } mapBlockAtom;
+    };
 
     struct mapSlice {
-
         palette     m_pals[ 16 ];
         tileSet     m_tileSet;
         blockSet    m_blockSet;
