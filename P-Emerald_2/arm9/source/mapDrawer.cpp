@@ -445,19 +445,25 @@ namespace MAP {
     }
 
     void mapDrawer::animateMap( u8 p_frame ) {
+        if( !CUR_SLICE )
+            return;
         u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
-        for( size_t i = 0; i < CUR_SLICE->m_tileSet.m_animationCount1; ++i ) {
+       // if( !CUR_SLICE->m_tileSet.m_animations1 )
+       //     return;
+        for( u8 i = 0; i < CUR_SLICE->m_tileSet.m_animationCount1; ++i ) {
             auto& a = CUR_SLICE->m_tileSet.m_animations1[ i ];
-            if( p_frame % a.m_speed == 0 || a.m_speed == 1 ) {
+            if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
                 a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
                 swiCopy( &a.m_tiles[ a.m_acFrame ], tileMemory + a.m_tileIdx * 32, 16 );
             }
         }
-        for( size_t i = 0; i < CUR_SLICE->m_tileSet.m_animationCount2; ++i ) {
+        if( !CUR_SLICE->m_tileSet.m_animations2 )
+            return;
+        for( u8 i = 0; i < CUR_SLICE->m_tileSet.m_animationCount2; ++i ) {
             auto& a = CUR_SLICE->m_tileSet.m_animations2[ i ];
-            if( p_frame % a.m_speed == 0 || a.m_speed == 1 ) {
+            if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
                 a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
-                swiCopy( &a.m_tiles[ a.m_acFrame ], tileMemory + a.m_tileIdx * 32, 16 );
+                swiCopy( &a.m_tiles[ a.m_acFrame ], tileMemory + ( a.m_tileIdx + 512 ) * 32, 16 );
             }
         }
     }

@@ -165,7 +165,7 @@ int main( int, char** p_argv ) {
         scanKeys( );
         FRAME_COUNT++;
 
-        if( ANIMATE_MAP )
+        if( ANIMATE_MAP && MAP::curMap )
             MAP::curMap->animateMap( FRAME_COUNT );
 
         if( !UPDATE_TIME )
@@ -229,7 +229,9 @@ int main( int, char** p_argv ) {
 
 #ifdef DEBUG
         if( held & KEY_L && gMod == DEVELOPER ) {
-            std::sprintf( buffer, "Currently at %hu-(%hu,%hu,%hu).\nMap: %hu:%hu, (%02hX,%02hX)",
+            time_t unixTime = time( NULL );
+            struct tm* timeStruct = gmtime( (const time_t *) &unixTime );
+            std::sprintf( buffer, "Currently at %hu-(%hu,%hu,%hu).\nMap: %hu:%hu, (%02hX,%02hX)\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
                           FS::SAV->m_currentMap,
                           FS::SAV->m_player.m_pos.m_posX,
                           FS::SAV->m_player.m_pos.m_posY,
@@ -237,7 +239,9 @@ int main( int, char** p_argv ) {
                           FS::SAV->m_player.m_pos.m_posY / 32,
                           FS::SAV->m_player.m_pos.m_posX / 32,
                           FS::SAV->m_player.m_pos.m_posX % 32,
-                          FS::SAV->m_player.m_pos.m_posY % 32 );
+                          FS::SAV->m_player.m_pos.m_posY % 32,
+                          FRAME_COUNT,
+                          achours, acminutes, acseconds, timeStruct->tm_sec );
             IO::messageBox m( buffer );
             IO::NAV->draw( true );
         }

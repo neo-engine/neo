@@ -99,11 +99,15 @@ namespace MAP {
         tile* m_tiles[ MAX_CACHE_SIZE ];
         block* m_blocks[ MAX_CACHE_SIZE ];
         palette* m_palettes[ MAX_CACHE_SIZE ];
+
+        u8 m_animationCounts[ MAX_CACHE_SIZE ];
+        tileSet::animation* m_animations[ MAX_CACHE_SIZE ];
         u8 m_nextFree;
 
         sliceCache( ) {
             m_nextFree = 0;
             memset( m_indices, -1, sizeof( m_indices ) );
+            memset( m_animationCounts, 0, sizeof( m_animationCounts ) );
         }
 
         u8 set( u8 p_index ) { //Gets the next free index
@@ -122,10 +126,12 @@ namespace MAP {
         void clear( ) {
             m_nextFree = 0;
             memset( m_indices, -1, sizeof( m_indices ) );
+            memset( m_animationCounts, 0, sizeof( m_animationCounts ) );
             for( u8 i = 0; i < MAX_CACHE_SIZE; ++i ) {
                 delete m_tiles[ i ];
                 delete m_blocks[ i ];
                 delete m_palettes[ i ];
+                delete m_animations[ i ];
             }
         }
     };
