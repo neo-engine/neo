@@ -102,15 +102,14 @@ namespace IO {
     }
 
     void setDefaultConsoleTextColors( u16* p_palette, u8 p_start ) {
-        p_palette[ p_start * 16 - 1 ] = RGB15( 0, 0, 0 ); //30 normal black
-        p_palette[ ( p_start + 1 ) * 16 - 1 ] = RGB15( 15, 0, 0 ); //31 normal red
-        p_palette[ ( p_start + 2 ) * 16 - 1 ] = RGB15( 0, 15, 0 ); //32 normal green
-        p_palette[ ( p_start + 3 ) * 16 - 1 ] = RGB15( 15, 15, 0 ); //33 normal yellow
+        p_palette[ ( p_start + 0 ) ] = RGB15( 15, 0, 0 ); //31 normal red
+        p_palette[ ( p_start + 1 ) ] = RGB15( 0, 15, 0 ); //32 normal green
+        p_palette[ ( p_start + 2 ) ] = RGB15( 15, 15, 0 ); //33 normal yellow
 
-        p_palette[ ( p_start + 4 ) * 16 - 1 ] = RGB15( 0, 0, 15 ); //34 normal blue
-        p_palette[ ( p_start + 5 ) * 16 - 1 ] = RGB15( 15, 0, 15 ); //35 normal magenta
-        p_palette[ ( p_start + 6 ) * 16 - 1 ] = RGB15( 0, 15, 15 ); //36 normal cyan
-        p_palette[ ( p_start + 7 ) * 16 - 1 ] = RGB15( 24, 24, 24 ); //37 normal white
+        p_palette[ ( p_start + 3 ) ] = RGB15( 0, 0, 15 ); //34 normal blue
+        p_palette[ ( p_start + 4 ) ] = RGB15( 15, 0, 15 ); //35 normal magenta
+        p_palette[ ( p_start + 5 ) ] = RGB15( 0, 15, 15 ); //36 normal cyan
+        p_palette[ ( p_start + 6 ) ] = RGB15( 24, 24, 24 ); //37 normal white
     }
 
     bool waitForTouchUp( u16 p_targetX1, u16 p_targetY1, u16 p_targetX2, u16 p_targetY2 ) {

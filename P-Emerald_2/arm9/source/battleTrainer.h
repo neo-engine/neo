@@ -39,7 +39,8 @@ namespace BATTLE {
     class battleTrainer {
     public:
         enum trainerClass {
-            PKMN_TRAINER = 0
+            PKMN_TRAINER = 0, //Wally
+           
         };
 
         std::string         m_battleTrainerName;

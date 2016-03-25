@@ -64,11 +64,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "Border.h"
 
-#include "BG0.h"
-#include "BG1.h"
-#include "BG2.h"
-#include "BG3.h"
-
 #include "Back.h"
 #include "poweroff.h"
 #include "poweron.h"
@@ -78,8 +73,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "SPBag.h"
 #include "Save.h"
 #include "PokeDex.h"
-
-#include "1.h"
 
 namespace IO {
     nav* NAV = 0;
@@ -97,18 +90,18 @@ namespace IO {
         250, 128 };
     unsigned int NAV_DATA[ 12288 ] = { 0 };
     unsigned short NAV_DATA_PAL[ 256 ] = { 0 };
-    nav::backgroundSet BGs[ MAXBG ] = {/* { "Raging Gyarados", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+    nav::backgroundSet BGs[ MAXBG ] = { { "Executing Exeggcute", NAV_DATA, NAV_DATA_PAL, true, true, mainSpritesPositions },
+                                  { "Raging Gyarados", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Sleeping Eevee", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Mystic Guardevoir", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Waiting Suicune", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Awakening Xerneas", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Awakening Yveltal", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Fighting Groudon", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Fighting Kyogre", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },*/
-        { "Executing Exeggcute", BG0Bitmap, BG0Pal, false, true, mainSpritesPositions },
-        { "Fighting Torchic", BG3Bitmap, BG3Pal, false, false, mainSpritesPositions },
-        { "Reborn Ho-Oh", BG2Bitmap, BG2Pal, false, false, mainSpritesPositions },
-        { "Working Klink", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions }
+                                  { "Fighting Kyogre", NAV_DATA,NAV_DATA_PAL, true, false, mainSpritesPositions },
+                                  { "Fighting Torchic", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+                                  { "Reborn Ho-Oh", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+                                  { "Working Klink", NAV_DATA, NAV_DATA_PAL, true, true, mainSpritesPositions }
     };
 
 #define POS( p_isHome ) ( (p_isHome) ? IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses : mainSpritesPositions2 )
@@ -195,13 +188,10 @@ namespace IO {
 
     void nav::drawMapMug( ) {
         auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
-        auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
 
-        dmaCopy( _Bitmap, ptr, 256 * 192 );
-        dmaCopy( _Pal, pal, 192 * 2 );
-
-        // sprintf( buffer, "%hu", _curMap );
-        // FS::readPictureData( bgGetGfxPtr( bg3sub ), "nitro:/PICS/MAPMUGS/", buffer, 512, 49152, true );
+        sprintf( buffer, "%hu", _curMap );
+        FS::readPictureData( ptr, "nitro:/PICS/MAP_MUG/", buffer, 512, 49152, !SCREENS_SWAPPED );
+        drawBorder( );
 
         BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
         BG_PALETTE_SUB[ GRAY_IDX ] = GRAY;
@@ -254,7 +244,7 @@ namespace IO {
             _curMap = p_newMap;
             draw( true );
         } else
-            if( true || FS::exists( "nitro:/PICS/MAPMUGS/", _curMap, false ) ) {
+            if( true || FS::exists( "nitro:/PICS/MAP_MUG/", _curMap, false ) ) {
                 _power = true;
                 _state = MAP_MUG;
                 _curMap = p_newMap;

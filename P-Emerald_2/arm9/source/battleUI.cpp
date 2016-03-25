@@ -67,15 +67,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "BattleBall3.h" //Fainted
 #include "BattleBall4.h" //NA
 
-//Test Trainer mugs:
-#include "mug_001_1.h"
-#include "mug_001_2.h"
-
-#include "TestBattleBack.h"
-
-#include "Border.h"
-
-
 #include "memo.h"
 #include "atks.h"
 #include "Up.h"
@@ -176,11 +167,11 @@ namespace BATTLE {
 #define PKMN_TILE_IDX( p_pokemonPos, p_opponent ) ( PKMN_TILE_START + 144 * ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
     u16 TILESTART = ( PKMN_TILE_START + 4 * 144 );
 
-#define OWN1_EP_COL         160
+#define OWN1_EP_COL         200
 #define OWN2_EP_COL         OWN1_EP_COL
 
-#define OWN_HP_COL          150
-#define OPP_HP_COL          155
+#define OWN_HP_COL          210
+#define OPP_HP_COL          215
 
 #define HP_COL(a,b) (((a) == OPPONENT )? (OPP_HP_COL + (b)*2 ): (OWN_HP_COL + (b)*2 ))
 
@@ -498,8 +489,8 @@ namespace BATTLE {
         REG_BLDY = 0x1F;
         bgUpdate( );
 
-        dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
-        dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
+        sprintf( buffer, "%d", _battle->m_backgroundId );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/", buffer, 512, 49152 );
 
         u16 val = 0x1F;
         for( s8 i = 4; i >= 0; --i ) {
@@ -511,12 +502,12 @@ namespace BATTLE {
         swiWaitForVBlank( );
 
         if( !_battle->m_isWildBattle ) {
-            dmaCopy( mug_001_1Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-            dmaCopy( mug_001_1Pal, BG_PALETTE, 64 );
+            sprintf( buffer, "%03d_1", _battle->_opponent->m_trainerClass );
+            FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 64, 49152 );
             for( u8 i = 0; i < 40; ++i )
                 swiWaitForVBlank( );
-            dmaCopy( mug_001_2Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-            dmaCopy( mug_001_2Pal, BG_PALETTE, 64 );
+            sprintf( buffer, "%03d_2", _battle->_opponent->m_trainerClass );
+            FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 64, 49152 );
             for( u8 i = 0; i < 120; ++i )
                 swiWaitForVBlank( );
 
@@ -563,9 +554,9 @@ namespace BATTLE {
         REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
         REG_BLDY = 0x1F;
         bgUpdate( );
-
-        dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
-        dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
+        
+        sprintf( buffer, "%d", _battle->m_backgroundId );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/", buffer, 512, 49152 );
 
         loadBattleUITop( );
         for( u8 i = 0; i < 4; ++i )
@@ -611,8 +602,6 @@ namespace BATTLE {
         if( !_battle->m_isWildBattle )
             IO::initOAMTable( false );
 
-        IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
-        consoleSetFont( &IO::Top, IO::consoleFont );
 
         TILESTART = initStsBalls( false, TILESTART = ( PKMN_TILE_START + 4 * 144 ) );
 
@@ -1081,7 +1070,7 @@ namespace BATTLE {
                     * 100 / ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
                     p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::displayHP( 100, 101, 46, 40, 236, 237, false, 50, 56, true );
-            IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 40, 236, 237, false, 50, 56, true );
+            IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 40, false, 50, 56, true );
 
             IO::displayEP( 100, 101, 46, 40, 238, 239, false, 59, 62, true );
             IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] )
@@ -2329,8 +2318,8 @@ ST:
         consoleSelect( &IO::Top );
         consoleClear( );
 
-        dmaCopy( mug_001_1Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-        dmaCopy( mug_001_1Pal, BG_PALETTE, 64 );
+        sprintf( buffer, "%03d_1", _battle->_opponent->m_trainerClass );
+        FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 64, 49152 );
     }
 
     void battleUI::capture( u16 p_pokeBall, u8 p_ticks ) {
@@ -2537,8 +2526,8 @@ BREAK:
         dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
         bgUpdate( );
 
-        dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
-        dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
+        sprintf( buffer, "%d", _battle->m_backgroundId );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/", buffer, 512, 49152 );
 
         auto& acPkmn = *_battle->_wildPokemon.m_pokemon;
         u16 x = 80;

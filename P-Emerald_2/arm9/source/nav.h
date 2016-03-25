@@ -31,7 +31,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <string>
 
 namespace IO {
-#define MAXBG 4
+#define MAXBG 12
 #define START_BG 0
     extern unsigned int NAV_DATA[ 12288 ];
     extern unsigned short NAV_DATA_PAL[ 256 ];

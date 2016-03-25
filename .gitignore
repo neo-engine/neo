@@ -53,3 +53,6 @@ P-Emerald_2/emulator/
 *.stackdump
 *.dsm
 *.evt
+*.opendb
+
+*phpSacredArch*

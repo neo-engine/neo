@@ -55,9 +55,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "Up.h"
 #include "Down.h"
 
-#include "bag_bg_lower.h"
-#include "bag_bg_upper.h"
-
 namespace BAG {
     const unsigned short * bagPals[ 10 ] = { BagBall1Pal, BagBall2Pal, BagMediine1Pal, BagMediine2Pal, BagHm1Pal, BagHm2Pal, BagBerry1Pal, BagBerry2Pal, BagKey1Pal, BagKey2Pal };
     const unsigned int * bagTiles[ 10 ] = { BagBall1Tiles, BagBall2Tiles, BagMediine1Tiles, BagMediine2Tiles, BagHm1Tiles, BagHm2Tiles, BagBerry1Tiles, BagBerry2Tiles, BagKey1Tiles, BagKey2Tiles };
@@ -104,8 +101,7 @@ namespace BAG {
         IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
         consoleSetFont( &IO::Top, IO::consoleFont );
 
-        dmaCopy( bag_bg_upperBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
-        dmaCopy( bag_bg_upperPal, BG_PALETTE, 256 * 2 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BagUpper" );
 
 
         IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
@@ -115,8 +111,8 @@ namespace BAG {
         dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
-        dmaCopy( bag_bg_lowerBitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
-        dmaCopy( bag_bg_lowerPal, BG_PALETTE_SUB, 256 * 2 );
+
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "BagLower", 512, 49152, true );
 
         consoleSelect( &IO::Top );
         consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
@@ -374,8 +370,7 @@ namespace BAG {
     }
 
     void drawTop( u8 p_page ) {
-        dmaCopy( bag_bg_upperBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-        dmaCopy( bag_bg_upperPal, BG_PALETTE, 256 * 2 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BagUpper" );
         initColors( );
 
         switch( p_page ) {
@@ -423,8 +418,7 @@ namespace BAG {
         }
         IO::updateOAM( true );
 
-        dmaCopy( bag_bg_lowerBitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
-        dmaCopy( bag_bg_lowerPal, BG_PALETTE_SUB, 256 * 2 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "BagLower", 512, 49152, true );
         drawTop( p_page );
         initColors( );
 

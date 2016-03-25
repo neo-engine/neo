@@ -90,6 +90,7 @@ namespace STS {
     //#define FWD_ID 13
     //#define BWD_ID 14
 
+#define HP_COL 238
     void regStsScreenUI::initSub( ) {
         IO::initOAMTable( true );
         u16 nextAvailableTileIdx = 0;
@@ -150,59 +151,48 @@ namespace STS {
 
         for( size_t i = 0; i < FS::SAV->getTeamPkmnCount( ); i++ ) {
             char buffer[ 100 ];
-            u8 mval = 1 + ( ( i / 2 == 1 ) ? 4 : 8 );
-            u8 x = borders[ i ][ 0 ] * 8;
-#define ADJUST_X( i, x, buffer ) ( ( ( i ) % 2 ) ? ( x ) - 4 : \
-                                   116 - IO::regularFont->stringWidth( buffer ) )
+            u16 sx, sy;
+            u16 x = 133;
+            if( i % 2 == 0 ) {
+                sx = 20;
+                sy = 24 + 60 * ( i / 2 );
+            } else {
+                sx = 220;
+                sy = 36 + 60 * ( i / 2 );
+            }
+#define ADJUST_X( i, x, buffer ) ( ( ( i ) % 2 ) ? ( x ) : \
+                                   123 - IO::regularFont->stringWidth( buffer ) )
 
             if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
-                if( i % 2 == 0 ) {
-                    tileCnt = IO::loadPKMNIcon( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId,
-                                                u16( borders[ i ][ 0 ] * 8 - 28 ), u16( borders[ i ][ 1 ] * 8 ),
-                                                ICON_IDX( i ), ICON_PAL( i ), tileCnt, false );
-                    IO::displayHP( 100, 101, borders[ i ][ 0 ] * 8 - 13, borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
-                    IO::displayHP( 100, 100 - FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP * 100 / FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 - 13,
-                                   borders[ i ][ 1 ] * 8 + 8 - ( i != 2 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
-                } else {
-                    tileCnt = IO::loadPKMNIcon( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId,
-                                                u16( borders[ i ][ 0 ] * 8 + 76 ), u16( borders[ i ][ 1 ] * 8 ),
-                                                ICON_IDX( i ), ICON_PAL( i ), tileCnt, false );
-                    IO::displayHP( 100, 101, borders[ i ][ 0 ] * 8 + 63, borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
-                    IO::displayHP( 100, 100 - FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP * 100 / FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP, borders[ i ][ 0 ] * 8 + 63,
-                                   borders[ i ][ 1 ] * 8 + 8 - ( i != 3 ? 4 : 0 ), 142 + 2 * i, 143 + 2 * i, false, true );
-                }
+                tileCnt = IO::loadPKMNIcon( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId, sx - 10, sy - 10,
+                                            ICON_IDX( i ), ICON_PAL( i ), tileCnt, false );
+                IO::displayHP( 100, 101, sx - 8, sy - 8, HP_COL + 2 * i, HP_COL + 1 + 2 * i, false, 23, 26 );
+                IO::displayHP( 100, 100 - FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP * 100 / FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP,
+                               sx - 8, sy - 8, HP_COL + 2 * i, HP_COL + 1 + 2 * i, false, 23, 26 );
+
 
                 IO::regularFont->printString( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name,
-                                              ADJUST_X( i, x, FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name ),
-                                              borders[ i ][ 1 ] * 8 - mval, false );
-                IO::regularFont->printString( getDisplayName( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId ),
-                                              ADJUST_X( i, x, getDisplayName( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId ) ),
-                                              borders[ i ][ 1 ] * 8 + 14 - mval, false );
+                                              ADJUST_X( i, x, FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name ), sy - 14, false );
 
-                IO::regularFont->setColor( 142 + 2 * i, 2 );
+                IO::regularFont->setColor( HP_COL + 2 * i, 2 );
                 if( FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP )
-                    sprintf( buffer, "%hi/%hi KP", FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP, FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
+                    sprintf( buffer, "%hi/%hiKP", FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP, FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
                 else
                     sprintf( buffer, "Besiegt" );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 28 - mval, false );
+                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy, false );
                 IO::regularFont->setColor( GRAY_IDX, 2 );
 
                 sprintf( buffer, "%s", ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 42 - mval, false );
+                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy + 14, false );
 
             } else {
                 sprintf( buffer, "Ei" );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 - mval, false );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 14 - mval, false );
+                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy - 7, false );
 
                 sprintf( buffer, "%s", ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), borders[ i ][ 1 ] * 8 + 42 - mval, false );
+                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy + 7, false );
 
-                if( i % 2 == 0 ) {
-                    tileCnt = IO::loadEggIcon( u16( borders[ i ][ 0 ] * 8 - 28 ), u16( borders[ i ][ 1 ] * 8 ), ICON_IDX( i ), ICON_PAL( i ), tileCnt, false );
-                } else {
-                    tileCnt = IO::loadEggIcon( u16( borders[ i ][ 0 ] * 8 + 76 ), u16( borders[ i ][ 1 ] * 8 ), ICON_IDX( i ), ICON_PAL( i ), tileCnt, false );
-                }
+                tileCnt = IO::loadEggIcon( sx - 10, sy - 10, ICON_IDX( i ), ICON_PAL( i ), tileCnt, false );
             }
         }
 
@@ -213,7 +203,7 @@ namespace STS {
         tileCnt += 144;
 
         tileCnt = IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, tileCnt,
-                                  0, 0, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, false );
+                                  0, -5, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, false );
         tileCnt = IO::loadItemIcon( ItemList[ currPkmn.m_boxdata.getItem( ) ]->m_itemName, 2, 152,
                                     ITEM_ICON_IDX, ITEM_ICON_PAL, tileCnt, false );
 
@@ -268,7 +258,7 @@ namespace STS {
         auto pal = BG_PAL( p_bottom );
         if( p_newpok ) {
             IO::loadItemIcon( !p_pokemon.m_boxdata.m_ball ? "Pokeball" : ItemList[ p_pokemon.m_boxdata.m_ball ]->m_itemName,
-                              -6, 26, SHINY_IDX, SHINY_PAL, 1000, p_bottom );
+                              -6, 22, SHINY_IDX, SHINY_PAL, 1000, p_bottom );
         }
 
         if( !p_pokemon.m_boxdata.m_individualValues.m_isEgg ) {
@@ -277,28 +267,28 @@ namespace STS {
             pal[ RED2_IDX ] = RED2;
             pal[ BLUE2_IDX ] = BLUE2;
             pal[ WHITE_IDX ] = WHITE;
-            IO::regularFont->setColor( WHITE_IDX, 1 );
+            IO::regularFont->setColor( BLACK_IDX, 1 );
 
-            IO::regularFont->printString( p_pokemon.m_boxdata.m_name, 150, 2, p_bottom );
+            IO::regularFont->printString( p_pokemon.m_boxdata.m_name, 150, 0, p_bottom );
             s8 G = p_pokemon.m_boxdata.gender( );
 
-            IO::regularFont->printChar( '/', 234, 2, p_bottom );
+            IO::regularFont->printChar( '/', 234, 0, p_bottom );
             if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 ) {
                 if( G == 1 ) {
                     IO::regularFont->setColor( BLUE_IDX, 1 );
                     IO::regularFont->setColor( BLUE2_IDX, 2 );
-                    IO::regularFont->printChar( 136, 246, 8, p_bottom );
+                    IO::regularFont->printChar( 136, 246, 7, p_bottom );
                 } else if( G == -1 ) {
                     IO::regularFont->setColor( RED_IDX, 1 );
                     IO::regularFont->setColor( RED2_IDX, 2 );
-                    IO::regularFont->printChar( 137, 246, 8, p_bottom );
+                    IO::regularFont->printChar( 137, 246, 7, p_bottom );
                 }
             }
-            IO::regularFont->setColor( WHITE_IDX, 1 );
+            IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
 
             getAll( p_pokemon.m_boxdata.m_speciesId, data );
-            IO::regularFont->printString( data.m_displayName, 160, 16, p_bottom );
+            IO::regularFont->printString( data.m_displayName, 160, 13, p_bottom );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::regularFont->printString( "Item", 2, 176, p_bottom );
@@ -307,7 +297,7 @@ namespace STS {
                 char buffer[ 200 ];
                 sprintf( buffer, "%s: %s", ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
                          ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getShortDescription( ).c_str( ) );
-                IO::regularFont->printString( buffer, 50, 159, p_bottom );
+                IO::regularFont->printString( buffer, 40, 159, p_bottom );
                 if( p_newpok ) {
                     IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 2, 152,
                                       ITEM_ICON_IDX, ITEM_ICON_PAL, Oam->oamBuffer[ ITEM_ICON_IDX ].gfxIndex, p_bottom );
@@ -320,54 +310,53 @@ namespace STS {
             }
             if( p_pokemon.m_boxdata.isShiny( ) ) {
                 IO::regularFont->setColor( RED_IDX, 1 );
-                IO::regularFont->setColor( RED2_IDX, 2 );
-                IO::regularFont->printString( "*", 1, 51, p_bottom );
+                IO::regularFont->setColor( WHITE_IDX, 2 );
+                IO::regularFont->printString( "*", 1, 47, p_bottom );
                 IO::regularFont->setColor( WHITE_IDX, 1 );
                 IO::regularFont->setColor( GRAY_IDX, 2 );
             }
             if( p_pokemon.m_boxdata.isCloned( ) ) {
-                IO::regularFont->printString( "*", 20, 32, p_bottom );
+                IO::regularFont->printString( "*", 20, 28, p_bottom );
             }
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
 
 
             if( p_newpok )
-                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId, 16, 48,
+                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId, 16, 44,
                                          PKMN_SPRITE_START, PKMN_SPRITE_PAL, Oam->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, p_bottom,
                                          p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale, true ) ) {
-                    IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId, 16, 48,
+                    IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId, 16, 44,
                                         PKMN_SPRITE_START, PKMN_SPRITE_PAL, Oam->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, p_bottom,
                                         p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale, true );
                 }
 
             u16 exptype = data.m_expType;
 
-            IO::displayHP( 100, 101, 46, 80, 97, 98, false, 50, 56, p_bottom );
-            IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 80, 97, 98, false, 50, 56, p_bottom );
+            IO::displayHP( 100, 101, 46, 76, HP_COL, HP_COL + 1, false, 50, 56, p_bottom );
+            IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 76, HP_COL, HP_COL + 1, false, 50, 56, p_bottom );
 
-            IO::displayEP( 100, 101, 46, 80, 99, 100, false, 59, 62, p_bottom );
+            IO::displayEP( 100, 101, 46, 76, HP_COL + 2, HP_COL + 3, false, 59, 62, p_bottom );
             IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
-                           ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ), 46, 80, 99, 100, false, 59, 62, p_bottom );
+                           ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ), 46, 76, HP_COL + 2, HP_COL + 3, false, 59, 62, p_bottom );
 
             IO::regularFont->setColor( 0, 2 );
-            IO::regularFont->setColor( 99, 1 );
+            IO::regularFont->setColor( HP_COL + 2, 1 );
             sprintf( buffer, "EP %lu%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
                      ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) );
-            IO::regularFont->printString( buffer, 62 - IO::regularFont->stringWidth( buffer ) / 2, 32, p_bottom );
+            IO::regularFont->printString( buffer, 62 - IO::regularFont->stringWidth( buffer ) / 2, 28, p_bottom );
             sprintf( buffer, "KP %i%%", p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
-            IO::regularFont->printString( buffer, 62 - IO::regularFont->stringWidth( buffer ) / 2, 42, p_bottom );
+            IO::regularFont->printString( buffer, 62 - IO::regularFont->stringWidth( buffer ) / 2, 38, p_bottom );
             IO::regularFont->setColor( GRAY_IDX, 2 );
             IO::regularFont->setColor( BLACK_IDX, 1 );
         } else {
             p_page = -1;
             pal[ WHITE_IDX ] = WHITE;
-            IO::regularFont->setColor( WHITE_IDX, 1 );
-
-            IO::regularFont->printString( "Ei", 150, 2, p_bottom );
-            IO::regularFont->printChar( '/', 234, 2, p_bottom );
-            IO::regularFont->printString( "Ei", 160, 18, p_bottom );
             IO::regularFont->setColor( BLACK_IDX, 1 );
+
+            IO::regularFont->printString( "Ei", 150, 0, p_bottom );
+            IO::regularFont->printChar( '/', 234, 0, p_bottom );
+            IO::regularFont->printString( "Ei", 160, 13, p_bottom );
 
             for( u8 i = 0; i < 4; ++i )
                 Oam->oamBuffer[ PKMN_SPRITE_START + i ].isHidden = true;
@@ -381,9 +370,9 @@ namespace STS {
         auto pal = BG_PAL( p_bottom );
 
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
-                        0, 0, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
+                        0, -5, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
 
-        IO::regularFont->printString( "Statuswerte", 36, 4, p_bottom );
+        IO::regularFont->printString( "Statuswerte", 32, 0, p_bottom );
         if( !( currPkmn.m_boxdata.m_individualValues.m_isEgg ) ) {
 
             pal[ RED_IDX ] = RED;
@@ -393,10 +382,10 @@ namespace STS {
 
             char buffer[ 50 ];
             sprintf( buffer, "Status auf Lv.%3i:", currPkmn.m_level );
-            IO::regularFont->printString( buffer, 110, 34, p_bottom );
+            IO::regularFont->printString( buffer, 110, 30, p_bottom );
 
             sprintf( buffer, "KP                     %3i", currPkmn.m_stats.m_maxHP );
-            IO::regularFont->printString( buffer, 130, 50, p_bottom );
+            IO::regularFont->printString( buffer, 130, 46, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 0 ] == 1.1 ) {
                 IO::regularFont->setColor( RED_IDX, 1 ); IO::regularFont->setColor( RED2_IDX, 2 );
@@ -406,7 +395,7 @@ namespace STS {
                 IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
             }
             sprintf( buffer, "ANG                   %3i", currPkmn.m_stats.m_Atk );
-            IO::regularFont->printString( buffer, 130, 69, p_bottom );
+            IO::regularFont->printString( buffer, 130, 65, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 1 ] == 1.1 ) {
                 IO::regularFont->setColor( RED_IDX, 1 ); IO::regularFont->setColor( RED2_IDX, 2 );
@@ -416,7 +405,7 @@ namespace STS {
                 IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
             }
             sprintf( buffer, "VER                   %3i", currPkmn.m_stats.m_Def );
-            IO::regularFont->printString( buffer, 130, 86, p_bottom );
+            IO::regularFont->printString( buffer, 130, 82, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 3 ] == 1.1 ) {
                 IO::regularFont->setColor( RED_IDX, 1 ); IO::regularFont->setColor( RED2_IDX, 2 );
@@ -426,7 +415,7 @@ namespace STS {
                 IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
             }
             sprintf( buffer, "SAN                   %3i", currPkmn.m_stats.m_SAtk );
-            IO::regularFont->printString( buffer, 130, 103, p_bottom );
+            IO::regularFont->printString( buffer, 130, 99, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 4 ] == 1.1 ) {
                 IO::regularFont->setColor( RED_IDX, 1 ); IO::regularFont->setColor( RED2_IDX, 2 );
@@ -436,7 +425,7 @@ namespace STS {
                 IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
             }
             sprintf( buffer, "SVE                   %3i", currPkmn.m_stats.m_SDef );
-            IO::regularFont->printString( buffer, 130, 120, p_bottom );
+            IO::regularFont->printString( buffer, 130, 116, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 2 ] == 1.1 ) {
                 IO::regularFont->setColor( RED_IDX, 1 ); IO::regularFont->setColor( RED2_IDX, 2 );
@@ -446,43 +435,43 @@ namespace STS {
                 IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
             }
             sprintf( buffer, "INI                   \xC3\xC3""%3i", currPkmn.m_stats.m_Spd );
-            IO::regularFont->printString( buffer, 130, 137, p_bottom );
+            IO::regularFont->printString( buffer, 130, 133, p_bottom );
 
-            IO::printRectangle( (u8) 158, (u8) 52, u8( 158 + 68 ), u8( 52 + 12 ), p_bottom, false, (u8) 251 );
+            IO::printRectangle( (u8) 158, (u8) 48, u8( 158 + 68 ), u8( 48 + 12 ), p_bottom, false, (u8) 251 );
 
-            IO::printRectangle( (u8) 158, (u8) 52,
+            IO::printRectangle( (u8) 158, (u8) 48,
                                 u8( 158 + ( 68.0 * currPkmn.m_boxdata.IVget( 0 ) / 31 ) ),
-                                u8( 52 + 6 ), p_bottom, false, u8( 7 * 16 - 1 ) );
-            IO::printRectangle( (u8) 158, u8( 52 + 6 ),
+                                u8( 48 + 6 ), p_bottom, false, 230 );
+            IO::printRectangle( (u8) 158, u8( 48 + 6 ),
                                 u8( 158 + ( 68.0*currPkmn.m_boxdata.m_effortValues[ 0 ] / 252 ) ),
-                                u8( 52 + 12 ), p_bottom, false, u8( 7 * 16 - 1 ) );
+                                u8( 48 + 12 ), p_bottom, false, 230 );
 
             for( int i = 1; i < 6; ++i ) {
-                IO::printRectangle( (u8) 158, u8( 54 + ( 17 * i ) ),
-                                    u8( 158 + 68 ), u8( 54 + 12 + ( 17 * i ) ), p_bottom, false, (u8) 251 );
-                IO::printRectangle( (u8) 158, u8( 54 + ( 17 * i ) ),
+                IO::printRectangle( (u8) 158, u8( 50 + ( 17 * i ) ),
+                                    u8( 158 + 68 ), u8( 50 + 12 + ( 17 * i ) ), p_bottom, false, (u8) 251 );
+                IO::printRectangle( (u8) 158, u8( 50 + ( 17 * i ) ),
                                     u8( 158 + ( 68.0*currPkmn.m_boxdata.IVget( i ) / 31 ) ),
-                                    u8( 54 + 6 + ( 17 * i ) ), p_bottom, false, u8( ( 7 + i ) * 16 - 1 ) );
-                IO::printRectangle( (u8) 158, u8( 54 + 6 + ( 17 * i ) ),
+                                    u8( 50 + 6 + ( 17 * i ) ), p_bottom, false, 230 + i );
+                IO::printRectangle( (u8) 158, u8( 50 + 6 + ( 17 * i ) ),
                                     u8( 158 + ( 68.0*currPkmn.m_boxdata.m_effortValues[ i ] / 252 ) ),
-                                    u8( 54 + 12 + ( 17 * i ) ), p_bottom, false, u8( ( 7 + i ) * 16 - 1 ) );
+                                    u8( 50 + 12 + ( 17 * i ) ), p_bottom, false, 230 + i );
             }
         } else {
             if( currPkmn.m_boxdata.m_steps > 10 ) {
-                IO::regularFont->printString( "Was da wohl", 16 * 8, 50, p_bottom );
-                IO::regularFont->printString( "schlüpfen wird?", 16 * 8, 70, p_bottom );
-                IO::regularFont->printString( "Es dauert wohl", 16 * 8, 100, p_bottom );
-                IO::regularFont->printString( "noch lange.", 16 * 8, 120, p_bottom );
+                IO::regularFont->printString( "Was da wohl", 16 * 8, 46, p_bottom );
+                IO::regularFont->printString( "schlüpfen wird?", 16 * 8, 66, p_bottom );
+                IO::regularFont->printString( "Es dauert wohl", 16 * 8, 96, p_bottom );
+                IO::regularFont->printString( "noch lange.", 16 * 8, 116, p_bottom );
             } else if( currPkmn.m_boxdata.m_steps > 5 ) {
-                IO::regularFont->printString( "Hat es sich", 16 * 8, 50, p_bottom );
-                IO::regularFont->printString( "gerade bewegt?", 16 * 8, 70, p_bottom );
-                IO::regularFont->printString( "Da tut sich", 16 * 8, 100, p_bottom );
-                IO::regularFont->printString( "wohl bald was.", 16 * 8, 120, p_bottom );
+                IO::regularFont->printString( "Hat es sich", 16 * 8, 46, p_bottom );
+                IO::regularFont->printString( "gerade bewegt?", 16 * 8, 66, p_bottom );
+                IO::regularFont->printString( "Da tut sich", 16 * 8, 96, p_bottom );
+                IO::regularFont->printString( "wohl bald was.", 16 * 8, 116, p_bottom );
             } else {
-                IO::regularFont->printString( "Jetzt macht es", 16 * 8, 50, p_bottom );
-                IO::regularFont->printString( "schon Geräusche!", 16 * 8, 70, p_bottom );
-                IO::regularFont->printString( "Bald ist es", 16 * 8, 100, p_bottom );
-                IO::regularFont->printString( "wohl soweit.", 16 * 8, 120, p_bottom );
+                IO::regularFont->printString( "Jetzt macht es", 16 * 8, 46, p_bottom );
+                IO::regularFont->printString( "schon Geräusche!", 16 * 8, 66, p_bottom );
+                IO::regularFont->printString( "Bald ist es", 16 * 8, 96, p_bottom );
+                IO::regularFont->printString( "wohl soweit.", 16 * 8, 116, p_bottom );
             }
         }
     }
@@ -492,15 +481,15 @@ namespace STS {
         auto Oam = p_bottom ? IO::Oam : IO::OamTop;
         auto pal = BG_PAL( p_bottom );
 
-        IO::regularFont->printString( "Attacken", 36, 4, p_bottom );
+        IO::regularFont->printString( "Attacken", 32, 0, p_bottom );
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
-                        0, 0, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
+                        0, -5, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
 
         for( int i = 0; i < 4; i++ ) {
             if( !currPkmn.m_boxdata.m_moves[ i ] )
                 continue;
             type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
-            IO::loadTypeIcon( t, 222, 42 + 30 * i, TYPE_IDX + i, TYPE_PAL( i ),
+            IO::loadTypeIcon( t, 222, 38 + 30 * i, TYPE_IDX + i, TYPE_PAL( i ),
                               Oam->oamBuffer[ TYPE_IDX + i ].gfxIndex, p_bottom );
 
             pal[ COLOR_IDX ] = GREEN;
@@ -513,13 +502,13 @@ namespace STS {
             }
 
             IO::regularFont->printString( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ),
-                                          128, 34 + 30 * i, p_bottom );
+                                          128, 30 + 30 * i, p_bottom );
 
             IO::regularFont->setColor( GRAY_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
             sprintf( buffer, "AP %2hhu/%2hhu ", currPkmn.m_boxdata.m_acPP[ i ],
                      s8( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + currPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
-            IO::regularFont->printString( buffer, 135, 49 + 30 * i, p_bottom );
+            IO::regularFont->printString( buffer, 135, 45 + 30 * i, p_bottom );
         }
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
@@ -530,24 +519,24 @@ namespace STS {
         auto Oam = p_bottom ? IO::Oam : IO::OamTop;
 
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
-                        0, 0, 32, 32, ContestPal, ContestTiles, ContestTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
-        IO::regularFont->printString( "Bänder", 36, 4, p_bottom );
+                        0, -5, 32, 32, ContestPal, ContestTiles, ContestTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
+        IO::regularFont->printString( "Bänder", 32, 0, p_bottom );
 
         auto rbs = ribbon::getRibbons( currPkmn );
         //Just draw the first 12 ribbons at max
         u16 tileCnt = Oam->oamBuffer[ TYPE_IDX ].gfxIndex;
         for( u8 i = 0; i < std::min( rbs.size( ), 12u ); ++i ) {
-            u16 tmp = IO::loadRibbonIcon( rbs[ i ], 128 + 32 * ( i % 4 ), 40 + 40 * ( i / 4 ), RIBBON_IDX + i, TYPE_PAL( i ) % 16, tileCnt, p_bottom );
+            u16 tmp = IO::loadRibbonIcon( rbs[ i ], 128 + 32 * ( i % 4 ), 36 + 40 * ( i / 4 ), RIBBON_IDX + i, TYPE_PAL( i ) % 16, tileCnt, p_bottom );
             if( !tmp ) //Draw an egg when something goes wrong
-                tileCnt = IO::loadEggIcon( 128 + 32 * ( i % 4 ), 36 + 40 * ( i / 4 ), RIBBON_IDX + i, TYPE_PAL( i ) % 16, tileCnt, p_bottom );
+                tileCnt = IO::loadEggIcon( 128 + 32 * ( i % 4 ), 32 + 40 * ( i / 4 ), RIBBON_IDX + i, TYPE_PAL( i ) % 16, tileCnt, p_bottom );
             else
                 tileCnt = tmp;
         }
         if( rbs.empty( ) ) {
-            IO::regularFont->printString( "Keine Bänder", 148, 87, p_bottom );
+            IO::regularFont->printString( "Keine Bänder", 148, 83, p_bottom );
         } else {
             sprintf( buffer, "(%u)", rbs.size( ) );
-            IO::regularFont->printString( buffer, 88, 4, p_bottom );
+            IO::regularFont->printString( buffer, 88, 0, p_bottom );
         }
     }
 
@@ -556,23 +545,23 @@ namespace STS {
         auto Oam = p_bottom ? IO::Oam : IO::OamTop;
 
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
-                        0, 0, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
-        IO::regularFont->printString( "Trainer-Memo", 36, 4, p_bottom );
+                        0, -5, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
+        IO::regularFont->printString( "Trainer-Memo", 32, 0, p_bottom );
 
         if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
-            IO::loadTypeIcon( data.m_types[ 0 ], 250 - 32, 54, TYPE_IDX, TYPE_PAL( 0 ),
+            IO::loadTypeIcon( data.m_types[ 0 ], 250 - 32, 50, TYPE_IDX, TYPE_PAL( 0 ),
                               Oam->oamBuffer[ TYPE_IDX ].gfxIndex, p_bottom );
             Oam->oamBuffer[ TYPE_IDX + 1 ].isHidden = true;
         } else {
-            IO::loadTypeIcon( data.m_types[ 0 ], 250 - 64, 54, TYPE_IDX, TYPE_PAL( 0 ),
+            IO::loadTypeIcon( data.m_types[ 0 ], 250 - 64, 50, TYPE_IDX, TYPE_PAL( 0 ),
                               Oam->oamBuffer[ TYPE_IDX ].gfxIndex, p_bottom );
-            IO::loadTypeIcon( data.m_types[ 1 ], 250 - 32, 54, TYPE_IDX + 1, TYPE_PAL( 1 ),
+            IO::loadTypeIcon( data.m_types[ 1 ], 250 - 32, 50, TYPE_IDX + 1, TYPE_PAL( 1 ),
                               Oam->oamBuffer[ TYPE_IDX + 1 ].gfxIndex, p_bottom );
         }
 
         IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
 
-        IO::regularFont->printString( "OT", 110, 34, p_bottom );
+        IO::regularFont->printString( "OT", 110, 30, p_bottom );
         if( currPkmn.m_boxdata.m_oTisFemale ) {
             IO::regularFont->setColor( RED_IDX, 1 );
             IO::regularFont->setColor( RED2_IDX, 2 );
@@ -582,14 +571,14 @@ namespace STS {
         }
         char buffer[ 50 ];
         sprintf( buffer, "%s/%05d", currPkmn.m_boxdata.m_oT, currPkmn.m_boxdata.m_oTId );
-        IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 34, p_bottom );
+        IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 30, p_bottom );
 
         if( !currPkmn.m_boxdata.isShiny( ) )
             IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
         sprintf( buffer, "%03d", currPkmn.m_boxdata.m_speciesId );
-        IO::regularFont->printString( buffer, 180 - IO::regularFont->stringWidth( buffer ), 55, p_bottom );
+        IO::regularFont->printString( buffer, 180 - IO::regularFont->stringWidth( buffer ), 51, p_bottom );
         IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
-        IO::regularFont->printString( "Nr.", 124, 55, p_bottom );
+        IO::regularFont->printString( "Nr.", 124, 51, p_bottom );
 
         bool plrOT = currPkmn.m_boxdata.m_oTId == FS::SAV->m_id && currPkmn.m_boxdata.m_oTSid == FS::SAV->m_sid;
         if( !currPkmn.m_boxdata.m_gotDate[ 0 ] )
@@ -599,29 +588,29 @@ namespace STS {
         else
             sprintf( buffer, "%s",
                      plrOT ? "Ei erhalten" : "Ei offenbar erh." );
-        IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 80, p_bottom, 14 );
+        IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 76, p_bottom, 14 );
         sprintf( buffer, "am %02d.%02d.20%02d,",
                  currPkmn.m_boxdata.m_gotDate[ 0 ] ? currPkmn.m_boxdata.m_gotDate[ 0 ] : currPkmn.m_boxdata.m_hatchDate[ 0 ],
                  currPkmn.m_boxdata.m_gotDate[ 1 ] ? currPkmn.m_boxdata.m_gotDate[ 1 ] : currPkmn.m_boxdata.m_hatchDate[ 1 ],
                  currPkmn.m_boxdata.m_gotDate[ 2 ] ? currPkmn.m_boxdata.m_gotDate[ 2 ] : currPkmn.m_boxdata.m_hatchDate[ 2 ] );
-        IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 94, p_bottom, 14 );
+        IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 90, p_bottom, 14 );
         sprintf( buffer, "%s.",
                  FS::getLoc( currPkmn.m_boxdata.m_gotPlace ) );
-        IO::regularFont->printMaxString( buffer, std::max( (u32) 124, 250 - IO::regularFont->stringWidth( buffer ) ), 108, p_bottom, 254 );
+        IO::regularFont->printMaxString( buffer, std::max( (u32) 124, 250 - IO::regularFont->stringWidth( buffer ) ), 104, p_bottom, 254 );
 
         if( currPkmn.m_boxdata.m_gotDate[ 0 ] ) {
             sprintf( buffer, "Geschl. %02d.%02d.20%02d,",
                      currPkmn.m_boxdata.m_hatchDate[ 0 ],
                      currPkmn.m_boxdata.m_hatchDate[ 1 ],
                      currPkmn.m_boxdata.m_hatchDate[ 2 ] );
-            IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 129, p_bottom, 14 );
+            IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 125, p_bottom, 14 );
             sprintf( buffer, "%s.",
                      FS::getLoc( currPkmn.m_boxdata.m_hatchPlace ) );
-            IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 143, p_bottom, 14 );
+            IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 139, p_bottom, 14 );
         } else if( plrOT && currPkmn.m_boxdata.m_fateful )
-            IO::regularFont->printString( "Schicksalhafte Begeg.", 102, 143, p_bottom );
+            IO::regularFont->printString( "Schicksalhafte Begeg.", 102, 139, p_bottom );
         else if( currPkmn.m_boxdata.m_fateful )
-            IO::regularFont->printString( "Off. schicksal. Begeg.", 102, 143, p_bottom );
+            IO::regularFont->printString( "Off. schicksal. Begeg.", 102, 139, p_bottom );
     }
 
     void drawPkmnNature( const pokemon& p_pokemon, bool p_bottom ) {
@@ -629,31 +618,31 @@ namespace STS {
         auto Oam = p_bottom ? IO::Oam : IO::OamTop;
 
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
-                        0, 0, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
-        IO::regularFont->printString( "Pokémon-Info", 36, 4, p_bottom );
+                        0, -5, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
+        IO::regularFont->printString( "Pokémon-Info", 32, 0, p_bottom );
 
         IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
 
         sprintf( buffer, "Mag %s""e PokéRg.", TasteList[ currPkmn.m_boxdata.getTasteStr( ) ].c_str( ) );
-        IO::regularFont->printString( buffer, 106, 34, p_bottom );
+        IO::regularFont->printString( buffer, 106, 30, p_bottom );
 
         sprintf( buffer, "Sehr %s; %s.", NatureList[ currPkmn.m_boxdata.getNature( ) ].c_str( ),
                  PersonalityList[ currPkmn.m_boxdata.getPersonality( ) ].c_str( ) );
         auto str = std::string( buffer );
         auto nStr = FS::breakString( str, IO::regularFont, 122 );
-        IO::regularFont->printString( nStr.c_str( ), 122, 52, p_bottom, 14, -2 );
+        IO::regularFont->printString( nStr.c_str( ), 122, 48, p_bottom, 14, -2 );
 
         auto acAbility = ability( currPkmn.m_boxdata.m_ability );
         u8 wd = IO::regularFont->stringWidth( acAbility.m_abilityName.c_str( ) );
         if( 253 - wd > 140 )
-            IO::regularFont->printString( "Fäh.", 126, 98, p_bottom );
+            IO::regularFont->printString( "Fäh.", 126, 94, p_bottom );
         u8 nlCnt = 0;
         nStr = FS::breakString( acAbility.m_flavourText, IO::regularFont, 125 );
         for( auto c : nStr )
             if( c == '\n' )
                 nlCnt++;
         IO::regularFont->printString( nStr.c_str( ), 124,
-                                      112, p_bottom, u8( 16 - 2 * nlCnt ), 4 );
+                                      108, p_bottom, u8( 16 - 2 * nlCnt ), 4 );
 
         if( currPkmn.m_boxdata.m_oTisFemale ) {
             IO::regularFont->setColor( RED_IDX, 1 );
@@ -664,7 +653,7 @@ namespace STS {
         }
         IO::regularFont->printString( acAbility.m_abilityName.c_str( ),
                                       253 - wd,
-                                      98, p_bottom );
+                                      94, p_bottom );
         IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
     }
 
@@ -684,9 +673,6 @@ namespace STS {
         for( u8 i = 0; i < 4; ++i )
             Oam->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
 
-        IO::setDefaultConsoleTextColors( pal, 6 );
-        FS::readPictureData( bgGetGfxPtr( p_bottom ? IO::bg3sub : IO::bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 128 );
-
         pal[ WHITE_IDX ] = WHITE;
         pal[ GRAY_IDX ] = RGB( 20, 20, 20 );
         pal[ BLACK_IDX ] = BLACK;
@@ -702,9 +688,9 @@ namespace STS {
         if( !isNotEgg )
             return false; //This should never occur
 
-        IO::regularFont->printString( "Attackeninfos", 36, 4, p_bottom );
+        IO::regularFont->printString( "Attackeninfos", 32, 0, p_bottom );
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
-                        0, 0, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
+                        0, -5, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
 
         move* currMove = AttackList[ currPkmn.m_boxdata.m_moves[ p_moveIdx ] ];
 
@@ -716,39 +702,38 @@ namespace STS {
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
         }
-        IO::regularFont->printString( currMove->m_moveName.c_str( ),
-                                      120, 36, p_bottom );
+        IO::regularFont->printString( currMove->m_moveName.c_str( ), 120, 32, p_bottom );
         IO::regularFont->setColor( GRAY_IDX, 1 );
         IO::regularFont->setColor( WHITE_IDX, 2 );
 
-        IO::loadTypeIcon( currMove->m_moveType, 222, 34, TYPE_IDX + p_moveIdx, TYPE_PAL( p_moveIdx ),
+        IO::loadTypeIcon( currMove->m_moveType, 222, 30, TYPE_IDX + p_moveIdx, TYPE_PAL( p_moveIdx ),
                           Oam->oamBuffer[ TYPE_IDX + p_moveIdx ].gfxIndex, p_bottom );
-        IO::loadDamageCategoryIcon( currMove->m_moveHitType, 222, 50, ATK_DMGTYPE_IDX( currMove->m_moveHitType ), DMG_TYPE_PAL( currMove->m_moveHitType ),
+        IO::loadDamageCategoryIcon( currMove->m_moveHitType, 222, 46, ATK_DMGTYPE_IDX( currMove->m_moveHitType ), DMG_TYPE_PAL( currMove->m_moveHitType ),
                                     Oam->oamBuffer[ ATK_DMGTYPE_IDX( currMove->m_moveHitType ) ].gfxIndex, p_bottom );
         char buffer[ 20 ];
 
         sprintf( buffer, "AP %2hhu""/""%2hhu ", currPkmn.m_boxdata.m_acPP[ p_moveIdx ],
                  currMove->m_movePP * ( ( 5 + ( ( currPkmn.m_boxdata.m_pPUps >> ( 2 * p_moveIdx ) ) % 4 ) ) / 5 ) );
-        IO::regularFont->printString( buffer, 128, 51, p_bottom );
+        IO::regularFont->printString( buffer, 128, 47, p_bottom );
 
-        IO::regularFont->printString( "Stärke", 128, 64, p_bottom );
+        IO::regularFont->printString( "Stärke", 128, 60, p_bottom );
         if( currMove->m_moveBasePower )
             sprintf( buffer, "%3i", currMove->m_moveBasePower );
         else
             sprintf( buffer, "---" );
-        IO::regularFont->printString( buffer, 226, 64, p_bottom );
+        IO::regularFont->printString( buffer, 226, 60, p_bottom );
 
-        IO::regularFont->printString( "Genauigkeit", 128, 76, p_bottom );
+        IO::regularFont->printString( "Genauigkeit", 128, 72, p_bottom );
         if( currMove->m_moveAccuracy )
             sprintf( buffer, "%3i", currMove->m_moveAccuracy );
         else
             sprintf( buffer, "---" );
-        IO::regularFont->printString( buffer, 226, 76, p_bottom );
+        IO::regularFont->printString( buffer, 226, 72, p_bottom );
 
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::regularFont->printString( FS::breakString( currMove->description( ), IO::regularFont, 120 ).c_str( ),
-                                      128, 88, p_bottom, 11 );
+                                      128, 84, p_bottom, 11 );
 
         IO::updateOAM( p_bottom );
         return true;
@@ -770,9 +755,6 @@ namespace STS {
         for( u8 i = 0; i < 12; ++i )
             Oam->oamBuffer[ RIBBON_IDX + i ].isHidden = true;
 
-        IO::setDefaultConsoleTextColors( pal, 6 );
-        FS::readPictureData( bgGetGfxPtr( p_bottom ? IO::bg3sub : IO::bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 128 );
-
         pal[ WHITE_IDX ] = WHITE;
         pal[ GRAY_IDX ] = RGB( 20, 20, 20 );
         pal[ BLACK_IDX ] = BLACK;
@@ -788,16 +770,16 @@ namespace STS {
         if( isNotEgg == (u8) -1 )
             return false;
 
-        IO::regularFont->printString( "Bandinfos", 36, 4, p_bottom );
+        IO::regularFont->printString( "Bandinfos", 32, 4, p_bottom );
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
-                        0, 0, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
+                        0, -5, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
 
         ribbon currRb = RibbonList[ p_ribbonIdx ];
 
         u16 tileCnt = Oam->oamBuffer[ TYPE_IDX ].gfxIndex;
 
-        if( !IO::loadRibbonIcon( p_ribbonIdx, 110, 32, RIBBON_IDX, TYPE_PAL( 0 ), tileCnt, p_bottom ) )
-            tileCnt = IO::loadEggIcon( 110, 32, RIBBON_IDX, TYPE_PAL( 0 ), tileCnt, p_bottom );
+        if( !IO::loadRibbonIcon( p_ribbonIdx, 110, 28, RIBBON_IDX, TYPE_PAL( 0 ), tileCnt, p_bottom ) )
+            tileCnt = IO::loadEggIcon( 110, 28, RIBBON_IDX, TYPE_PAL( 0 ), tileCnt, p_bottom );
 
         u8 nlCnt = 0;
         auto nStr = FS::breakString( currRb.m_name == "" ? ( "----" ) : currRb.m_name, IO::regularFont, 110 );
@@ -808,19 +790,19 @@ namespace STS {
         if( currRb.m_name == "" )
             currRb.m_description = "----";
 
-        IO::regularFont->printString( nStr.c_str( ), 142, 43 - 7 * nlCnt, p_bottom, 14 );
+        IO::regularFont->printString( nStr.c_str( ), 142, 39 - 7 * nlCnt, p_bottom, 14 );
         IO::regularFont->printString( FS::breakString( ( currRb.m_description == "" ) ?
                                                        ( currPkmn.m_boxdata.m_fateful ? "Ein Band für Pokémon-Freunde." : "Ein Gedenk-Band. An einem mysteriösen Ort erhalten." )
                                                        : currRb.m_description, IO::regularFont, 120 ).c_str( ),
-                                      128, 70, p_bottom, 14 );
+                                      128, 66, p_bottom, 14 );
         IO::updateOAM( p_bottom );
         return true;
     }
     void regStsScreenUI::draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) {
         hideSprites( false );
 
-        IO::setDefaultConsoleTextColors( BG_PALETTE, 6 );
-        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 128 );
+        IO::setDefaultConsoleTextColors( BG_PALETTE, 230 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 420 );
         IO::updateOAM( false );
 
         IO::regularFont->setColor( 0, 0 );
@@ -968,8 +950,8 @@ namespace STS {
 
         for( u8 i = PKMN_SPRITE_START; i < RIBBON_IDX; ++i )
             IO::Oam->oamBuffer[ i ].isHidden = true;
-        IO::setDefaultConsoleTextColors( BG_PALETTE_SUB, 6 );
-        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "PKMNInfoScreen", 128, 49162, true );
+        IO::setDefaultConsoleTextColors( BG_PALETTE_SUB, 230 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "PKMNInfoScreen", 420, 49162, true );
     }
 
     void boxStsScreenUI::draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) {

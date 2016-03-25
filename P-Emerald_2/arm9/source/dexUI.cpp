@@ -42,7 +42,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "PKMN.h"
 #include "time_icon.h"
 
-#include "DexTop2.h"
 #include <vector>
 #include <algorithm>
 #include <cstdio>
@@ -264,16 +263,15 @@ namespace DEX {
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "DexTop" );
         else if( _currPage == 1 ) {
             if( _currForme % 3 == 0 )
-                FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BottomScreen2" );
+                FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "HoennMap" );
             else if( _currForme % 3 == 1 )
-                FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BottomScreen3" );
+                FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "KantoMap" );
             else
-                FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BottomScreen2_BG3_KJ" );
+                FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "JohtoMap" );
         } else {
-            if( p_newPage ) {
-                dmaCopy( DexTop2Bitmap, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
-                dmaCopy( DexTop2Pal, BG_PALETTE, 256 * 2 );
-            } else
+            if( p_newPage )
+                FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "DexTop2" );
+            else
                 undrawFormes( newformepkmn );
         }
 
