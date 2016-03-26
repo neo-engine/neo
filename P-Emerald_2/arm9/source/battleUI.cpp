@@ -554,7 +554,7 @@ namespace BATTLE {
         REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
         REG_BLDY = 0x1F;
         bgUpdate( );
-        
+
         sprintf( buffer, "%d", _battle->m_backgroundId );
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/", buffer, 512, 49152 );
 
@@ -1070,7 +1070,7 @@ namespace BATTLE {
                     * 100 / ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
                     p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::displayHP( 100, 101, 46, 40, 236, 237, false, 50, 56, true );
-            IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 40, false, 50, 56, true );
+            IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 40, 236, 237, false, 50, 56, true );
 
             IO::displayEP( 100, 101, 46, 40, 238, 239, false, 59, 62, true );
             IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] )
@@ -1122,6 +1122,10 @@ namespace BATTLE {
             }
 
         } else {
+            tilecnt = IO::loadEggSprite( 26, 24, ++oamIndex, ++palIndex, tilecnt, true );
+            IO::boldFont->setColor( GRAY_IDX, 1 );
+            IO::boldFont->setColor( BLACK_IDX, 2 );
+
             IO::boldFont->printString( "Ei /", 16, 96, true );
             IO::boldFont->printString( "Ei", 24, 110, true );
         }

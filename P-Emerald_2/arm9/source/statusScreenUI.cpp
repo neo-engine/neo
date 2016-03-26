@@ -358,7 +358,8 @@ namespace STS {
             IO::regularFont->printChar( '/', 234, 0, p_bottom );
             IO::regularFont->printString( "Ei", 160, 13, p_bottom );
 
-            for( u8 i = 0; i < 4; ++i )
+            IO::loadEggSprite( 29, 60, PKMN_SPRITE_START, PKMN_SPRITE_PAL, Oam->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, p_bottom );
+            for( u8 i = 1; i < 4; ++i )
                 Oam->oamBuffer[ PKMN_SPRITE_START + i ].isHidden = true;
             Oam->oamBuffer[ ITEM_ICON_IDX ].isHidden = true;
         }
@@ -437,6 +438,7 @@ namespace STS {
             sprintf( buffer, "INI                   \xC3\xC3""%3i", currPkmn.m_stats.m_Spd );
             IO::regularFont->printString( buffer, 130, 133, p_bottom );
 
+            IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
             IO::printRectangle( (u8) 158, (u8) 48, u8( 158 + 68 ), u8( 48 + 12 ), p_bottom, false, (u8) 251 );
 
             IO::printRectangle( (u8) 158, (u8) 48,

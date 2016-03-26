@@ -100,6 +100,8 @@ namespace IO {
                         u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny = false,
                         bool p_female = false, bool p_flipX = false, bool p_topOnly = false );
 
+    u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom = false);
+
     u16 loadTrainerSprite( const char* p_path, const char* p_name, const u16 p_posX, const u16 p_posY,
                            u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_flipX = false, bool p_topOnly = false );
 

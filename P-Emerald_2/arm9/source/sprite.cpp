@@ -35,6 +35,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "move.h"
 #include "ribbon.h"
 
+#include "Egg.h"
+
 #include "damage_0.h"
 #include "damage_1.h"
 #include "damage_2.h"
@@ -430,6 +432,10 @@ namespace IO {
         }
         updateOAM( p_bottom );
         return p_tileCnt + 144;
+    }
+    u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 64, 64,
+                           EggPal, EggTiles, EggTilesLen, false, false, false, OBJPRIORITY_1, p_bottom );
     }
 
     u16 loadTrainerSprite( const char* p_path, const char* p_name, const s16 p_posX,
