@@ -191,18 +191,18 @@ namespace FS {
     bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no ) {
         if( p_no == SAV->m_bgIdx && IO::NAV_DATA[ 0 ] ) {
             dmaCopy( IO::NAV_DATA, p_layer, 256 * 192 );
-            dmaCopy( IO::NAV_DATA_PAL, BG_PALETTE_SUB, 256 * 2 );
+            dmaCopy( IO::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
             return true;
         }
 
         char buffer[ 100 ];
         sprintf( buffer, "%s", p_name );
 
-        if( !readData( "nitro:/PICS/NAV/", buffer, (unsigned int) ( 12288 ), IO::NAV_DATA, (unsigned short) ( 256 ), IO::NAV_DATA_PAL ) )
+        if( !readData( "nitro:/PICS/NAV/", buffer, (unsigned int) 12288, IO::NAV_DATA, (unsigned short) 192, IO::NAV_DATA_PAL ) )
             return false;
 
         dmaCopy( IO::NAV_DATA, p_layer, 256 * 192 );
-        dmaCopy( IO::NAV_DATA_PAL, BG_PALETTE_SUB, 192 * 2 );
+        dmaCopy( IO::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
 
         return true;
     }
