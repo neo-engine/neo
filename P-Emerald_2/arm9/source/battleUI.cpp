@@ -503,11 +503,11 @@ namespace BATTLE {
 
         if( !_battle->m_isWildBattle ) {
             sprintf( buffer, "%03d_1", _battle->_opponent->m_trainerClass );
-            FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 64, 49152 );
+            FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 128, 49152 );
             for( u8 i = 0; i < 40; ++i )
                 swiWaitForVBlank( );
             sprintf( buffer, "%03d_2", _battle->_opponent->m_trainerClass );
-            FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 64, 49152 );
+            FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 128, 49152 );
             for( u8 i = 0; i < 120; ++i )
                 swiWaitForVBlank( );
 
@@ -2319,7 +2319,7 @@ ST:
         consoleClear( );
 
         sprintf( buffer, "%03d_1", _battle->_opponent->m_trainerClass );
-        FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 64, 49152 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 128, 49152 );
     }
 
     void battleUI::capture( u16 p_pokeBall, u8 p_ticks ) {

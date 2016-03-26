@@ -52,7 +52,7 @@ void fillResume( ) {
     sprintf( buffer, "%s", FS::SAV->m_playername );
     IO::regularFont->printString( buffer, 128, 5, true );
 
-    sprintf( buffer, "%s", FS::getLoc( MAP::curMap->getCurrentLocationId( ) ) );
+    sprintf( buffer, "%s", FS::getLocation( MAP::curMap->getCurrentLocationId( ) ) );
     IO::regularFont->printString( "Ort:", 16, 23, true );
     IO::regularFont->printString( buffer, 128, 23, true );
 

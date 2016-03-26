@@ -98,28 +98,12 @@ namespace BAG {
     void bagUI::init( ) {
         IO::vramSetup( );
         swiWaitForVBlank( );
-        IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
-        consoleSetFont( &IO::Top, IO::consoleFont );
-
-        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BagUpper" );
-
-
-        IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
-        consoleSetFont( &IO::Bottom, IO::consoleFont );
-
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
-
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BagUpper" );
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "BagLower", 512, 49152, true );
-
-        consoleSelect( &IO::Top );
-        consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
-        consoleClear( );
-        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-        consoleSelect( &IO::Bottom );
-        consoleClear( );
 
         bgUpdate( );
         initColors( );
@@ -169,6 +153,7 @@ namespace BAG {
     }
 
     void drawItemTop( item* p_item, u16 p_count ) {
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         std::string display;
         std::string descr;
         IO::OamTop->oamBuffer[ 0 ].isHidden = true;

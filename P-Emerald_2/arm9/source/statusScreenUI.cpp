@@ -595,7 +595,7 @@ namespace STS {
                  currPkmn.m_boxdata.m_gotDate[ 2 ] ? currPkmn.m_boxdata.m_gotDate[ 2 ] : currPkmn.m_boxdata.m_hatchDate[ 2 ] );
         IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 90, p_bottom, 14 );
         sprintf( buffer, "%s.",
-                 FS::getLoc( currPkmn.m_boxdata.m_gotPlace ) );
+                 FS::getLocation( currPkmn.m_boxdata.m_gotPlace ) );
         IO::regularFont->printMaxString( buffer, std::max( (u32) 124, 250 - IO::regularFont->stringWidth( buffer ) ), 104, p_bottom, 254 );
 
         if( currPkmn.m_boxdata.m_gotDate[ 0 ] ) {
@@ -605,7 +605,7 @@ namespace STS {
                      currPkmn.m_boxdata.m_hatchDate[ 2 ] );
             IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 125, p_bottom, 14 );
             sprintf( buffer, "%s.",
-                     FS::getLoc( currPkmn.m_boxdata.m_hatchPlace ) );
+                     FS::getLocation( currPkmn.m_boxdata.m_hatchPlace ) );
             IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 139, p_bottom, 14 );
         } else if( plrOT && currPkmn.m_boxdata.m_fateful )
             IO::regularFont->printString( "Schicksalhafte Begeg.", 102, 139, p_bottom );

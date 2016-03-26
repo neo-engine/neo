@@ -30,6 +30,38 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <map>
 #include <string>
 
+#define MAP_HOENN 10
+#define MAP_METEOR_FALLS 11
+#define MAP_DESERT_RUINS 12
+#define MAP_ISLAND_CAVE 13
+#define MAP_ANCIENT_TOMB 14
+
+#define MAP_KANTO 110
+#define MAP_TOHJO_FALLS 111
+#define MAP_KANTO_VICTORY_ROAD 112
+#define MAP_VIRIDIAN_FOREST 113
+#define MAP_SEAFOAM_ISLANDS 114
+#define MAP_MT_MOON 115
+#define MAP_DIGLETTS_CAVE 116
+#define MAP_ROCK_TUNNEL 117
+#define MAP_CERULEAN_CAVE 118
+
+#define MAP_JOHTO 210
+#define MAP_DARK_CAVE 211
+#define MAP_SPROUT_TOWER 212
+#define MAP_RUINS_OF_ALPH 213
+#define MAP_UNION_CAVE 214
+#define MAP_SLOWPOKE_WELL 215
+#define MAP_ILEX_FOREST 216
+#define MAP_NATIONAL_PARK 217
+#define MAP_BURNED_TOWER 218
+#define MAP_BELL_TOWER 219
+#define MAP_WHIRL_ISLANDS 220
+#define MAP_MT_MORTAR 221
+#define MAP_ICE_PATH 222
+#define MAP_DRAGONS_DEN 223
+
+
 namespace MAP {
     struct position {
         u16 m_posX; //Global
@@ -51,7 +83,52 @@ namespace MAP {
         SIT = 4,
         DIVE = 5,
         //NPC modes
-        NOTHING = 0,
+        NO_MOVEMENT = 0,
     };
-    extern std::map<u8, std::pair<std::string, u16>> mapInfo; //mapId -> (mapName, locadionId)
+    enum wildPkmnType {
+        GRASS,      // 5 tiers
+        HIGH_GRASS, // 5 tiers
+        WATER,      // 5 tiers
+        FISHING_ROD,// 5 tiers
+        HEADBUTT,   // 3 tiers
+        ROCK_SMASH  // 2 tiers
+    };
+    enum mapWeather {
+        NOTHING, //Inside
+        SUNNY,
+        REGULAR,
+        RAINY,
+        SNOW,
+        THUNDERSTORM,
+        MIST,
+        BLIZZARD,
+        SANDSTORM,
+        FOG,
+        DENSE_MIST,
+        CLOUDY, //Dark Forest clouds
+        HEAVY_SUNLIGHT,
+        HEAVY_RAIN,
+        UNDERWATER
+    };
+    enum mapType {
+        OUTSIDE = 0,
+        CAVE = 1,
+        INSIDE = 2,
+        DARK = 4,
+        FLASHABLE = 8
+    };
+    enum warpType {
+        NO_SPECIAL,
+        CAVE_ENTRY,
+        DOOR,
+        TELEPORT,
+        EMERGE_WATER,
+        LAST_VISITED
+    };
+
+
+    typedef std::pair<u8, position> warpPos;
+
+    extern std::map<u8, std::pair<u16, u16>> mapInfo; //mapId -> (locadionId, battleBG)
+    extern std::map<u8, std::pair<mapType, mapWeather>> mapTypes;
 }

@@ -42,7 +42,6 @@ extern std::string NatureList[ 25 ];
 extern std::string TypeList[ 19 ];
 extern std::string PersonalityList[ 30 ];
 extern std::string TasteList[ 6 ];
-extern std::map<u16, std::string> Locations;
 
 enum pkmnLevelUpType {
     MEDIUM_FAST = 0,

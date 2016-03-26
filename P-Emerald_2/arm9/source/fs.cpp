@@ -80,7 +80,7 @@ namespace FS {
         return true;
     }
     bool exists( const char* p_path, u16 p_name, bool p_unused ) {
-        (void)p_unused;
+        (void) p_unused;
 
         FILE* fd = open( p_path, p_name );
         if( !fd )
@@ -386,14 +386,14 @@ namespace FS {
         return ret;
     }
 
-    const char* getLoc( u16 p_ind ) {
+    const char* getLocation( u16 p_ind ) {
         if( p_ind > 5000 )
             return FARAWAY_PLACE;
         FILE* f = FS::open( "nitro:/LOCATIONS/", p_ind, ".data" );
 
         if( !f ) {
             if( savMod == SavMod::_NDS && p_ind > 322 && p_ind < 1000 )
-                return getLoc( 3002 );
+                return getLocation( 3002 );
 
             return FARAWAY_PLACE;
         }

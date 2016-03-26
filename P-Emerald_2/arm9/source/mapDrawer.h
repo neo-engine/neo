@@ -38,53 +38,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 namespace MAP {
     class mapDrawer {
     private:
-        enum wildPkmnType {
-            GRASS,      // 5 tiers
-            HIGH_GRASS, // 5 tiers
-            WATER,      // 5 tiers
-            FISHING_ROD,// 5 tiers
-            HEADBUTT,   // 3 tiers
-            ROCK_SMASH  // 2 tiers
-        };
-        enum mapWeather {
-            NOTHING, //Inside
-            SUNNY,
-            REGULAR,
-            RAINY,
-            SNOW,
-            THUNDERSTORM,
-            MIST,
-            BLIZZARD,
-            SANDSTORM,
-            FOG,
-            DENSE_MIST,
-            CLOUDY,
-            HEAVY_SUNLIGHT,
-            HEAVY_RAIN,
-            UNDERWATER
-        };
-        enum mapType {
-            OUTSIDE = 0,
-            CAVE = 1,
-            INSIDE = 2,
-            DARK = 4,
-            FLASHABLE = 8
-        };
-        enum warpType {
-            NO_SPECIAL,
-            CAVE_ENTRY,
-            DOOR,
-            TELEPORT,
-            EMERGE_WATER,
-            LAST_VISITED
-        };
-        typedef std::pair<u8, position> warpPos;
-
-        std::map<u8, mapType> _mapTypes = {
-            { 10, OUTSIDE },
-
-            { 1, CAVE } //Meteor Falls
-        };
         mapWeather _weather;
 
         std::unique_ptr<mapSlice> _slices[ 2 ][ 2 ] = { { 0 } };  //[x][y]
@@ -96,7 +49,7 @@ namespace MAP {
         mapSprite _sprites[ 16 ];
         u16 _entriesUsed;
         std::map<u16, u8> _spritePos; //mapObject.id -> index in _sprites
-        
+
         void draw( u16 p_globX, u16 p_globY, bool p_init );
         void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2 );
         void drawObjects( );

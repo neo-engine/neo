@@ -189,7 +189,7 @@ namespace IO {
     void nav::drawMapMug( ) {
         auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
 
-        sprintf( buffer, "%hu", _curMap );
+        sprintf( buffer, "%hu_%hhu", _curMap, getCurrentDaytime( ) % 4 );
         FS::readPictureData( ptr, "nitro:/PICS/MAP_MUG/", buffer, 512, 49152, !SCREENS_SWAPPED );
         drawBorder( );
 
@@ -199,11 +199,11 @@ namespace IO {
         regularFont->setColor( WHITE_IDX, 1 );
         regularFont->setColor( GRAY_IDX, 2 );
         regularFont->setColor( 0, 0 );
-        regularFont->printString( MAP::mapInfo[ _curMap ].first.c_str( ),
-                                  244 - regularFont->stringWidth( MAP::mapInfo[ _curMap ].first.c_str( ) ), 12, !SCREENS_SWAPPED );
+        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap ].first ),
+                                  244 - regularFont->stringWidth( FS::getLocation( MAP::mapInfo[ _curMap ].first ) ), 12, !SCREENS_SWAPPED );
         regularFont->setColor( WHITE_IDX, 2 );
         regularFont->setColor( BLACK_IDX, 1 );
-        regularFont->printString( MAP::mapInfo[ _curMap / 100 * 100 + 10 ].first.c_str( ), 36, 0, !SCREENS_SWAPPED );
+        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap / 100 * 100 + 10 ].first ), 36, 0, !SCREENS_SWAPPED );
     }
 
     void nav::draw( bool p_initMainSrites, u8 p_newIdx ) {
@@ -401,7 +401,7 @@ namespace IO {
                                                    "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
 
                         BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
-                                                    BATTLE::weather( rand( ) % 9 ), 0, 0, 5, BATTLE::battle::DOUBLE );
+                                                    BATTLE::weather( rand( ) % 9 ), 10, 0, 5, BATTLE::battle::DOUBLE );
                         ANIMATE_MAP = false;
                         test_battle.start( );
                         FS::SAV->updateTeam( );
@@ -421,7 +421,7 @@ namespace IO {
                                                    "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
 
                         BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
-                                                    BATTLE::HAIL/*weather( rand( ) % 9 )*/, 0, 0, 5, BATTLE::battle::SINGLE );
+                                                    BATTLE::HAIL/*weather( rand( ) % 9 )*/, 10, 0, 5, BATTLE::battle::SINGLE );
                         ANIMATE_MAP = false;
                         test_battle.start( );
                         FS::SAV->updateTeam( );

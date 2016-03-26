@@ -71,5 +71,5 @@ namespace FS {
     bool readPictureData( u16* p_layer, const char* p_Path, const char* p_name, u16 p_paletteSize, u16 p_palStart, u32 p_tileCnt, bool p_bottom );
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt, bool p_bottom = false );
 
-    const char* getLoc( u16 p_ind );
+    const char* getLocation( u16 p_ind );
 }
