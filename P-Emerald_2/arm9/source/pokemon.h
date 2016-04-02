@@ -147,6 +147,9 @@ struct pokemonData {
 
     u16             m_formeIdx[ 30 ];
     char            m_formeName[ 30 ][ 15 ];
+
+    u16             m_preEvolution;
+    u8              m_stage; //0: Basic, 1: Stage 1, 2: Stage 2, 3 Restored (m_preEvolution: itemIdx)
 };
 
 const char*     getDisplayName( u16 p_pkmnId );
