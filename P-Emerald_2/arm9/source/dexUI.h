@@ -42,7 +42,7 @@ namespace DEX {
         void init( );
         void drawPage( bool p_newPok, bool p_newPage = false );
         void drawFormes( u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName );
-        void undrawFormes( u16 p_formeIdx );
+        //void undrawFormes( u16 p_formeIdx );
     public:
         dexUI( bool p_useInDex, u16 p_maxPkmn )
             : _useInDex( p_useInDex ), _maxPkmn( p_maxPkmn ), _currPage( 0 ) { }
