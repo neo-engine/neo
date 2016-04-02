@@ -445,7 +445,7 @@ namespace STS {
                                 u8( 158 + ( 68.0 * currPkmn.m_boxdata.IVget( 0 ) / 31 ) ),
                                 u8( 48 + 6 ), p_bottom, false, 230 );
             IO::printRectangle( (u8) 158, u8( 48 + 6 ),
-                                u8( 158 + ( 68.0*currPkmn.m_boxdata.m_effortValues[ 0 ] / 252 ) ),
+                                u8( 158 + ( 68.0 * currPkmn.m_boxdata.m_effortValues[ 0 ] / 252 ) ),
                                 u8( 48 + 12 ), p_bottom, false, 230 );
 
             for( int i = 1; i < 6; ++i ) {
