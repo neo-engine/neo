@@ -60,8 +60,8 @@ namespace IO {
             for( u8 i = startIdx; i < endIdx; ++i ) {
                 u8 acPos = i - startIdx;
                 printChoiceBox( 32, 68 + acPos * 35, 192 + 32, 68 + 32 + acPos * 35, 6, COLOR_IDX, acPos == p_pressedIdx );
-                regularFont->printString( _choices[ i ], 40 + 2 * ( p_pressedIdx == acPos ),
-                                          78 + acPos * 35 + ( p_pressedIdx == acPos ), true );
+                regularFont->printString( _choices[ i ], 32 + 2 * ( p_pressedIdx == acPos ) + 184 / 2,
+                                          78 + acPos * 35 + ( p_pressedIdx == acPos ), true, IO::font::CENTER );
                 swiWaitForVBlank( );
             }
         } else {
@@ -69,8 +69,8 @@ namespace IO {
                 u8 acPos = i - startIdx;
                 printChoiceBox( ( ( acPos % 2 ) ? 129 : 19 ), 68 + ( acPos / 2 ) * 35,
                                 106 + ( ( acPos % 2 ) ? 129 : 19 ), 32 + 68 + ( acPos / 2 ) * 35, 6, COLOR_IDX, acPos == p_pressedIdx );
-                regularFont->printString( _choices[ i ], ( ( acPos % 2 ) ? 129 : 19 ) + 8 + 2 * ( p_pressedIdx == acPos ),
-                                          78 + ( acPos / 2 ) * 35 + ( p_pressedIdx == acPos ), true );
+                regularFont->printString( _choices[ i ], ( ( acPos % 2 ) ? 129 : 19 ) + 2 * ( p_pressedIdx == acPos ) + 102 / 2,
+                                          78 + ( acPos / 2 ) * 35 + ( p_pressedIdx == acPos ), true, IO::font::CENTER );
                 swiWaitForVBlank( );
             }
         }
@@ -132,9 +132,6 @@ namespace IO {
                               SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackwardPal,
                               BackwardTiles, BackwardTilesLen, false, false, true, OBJPRIORITY_1, true );
 
-        //t.px >= ( ( i % 2 ) ? 129 : 19 ) && t.py >= 68 + ( i / 2 ) * 35
-        //&& t.px <= 106 + ( ( i % 2 ) ? 129 : 19 ) && t.py <= 32 + 68 + ( i / 2 ) * 35
-
         for( u8 i = 0; i < 4; ++i ) {
             if( !p_pokemon.m_boxdata.m_moves[ i ] ) {
                 _num -= 4 - i;
@@ -153,8 +150,6 @@ namespace IO {
         }
 
         updateOAM( true );
-
-
         swiWaitForVBlank( );
     }
 
@@ -165,22 +160,8 @@ namespace IO {
         _drawSub = p_drawSub;
         _text = p_text;
         draw( NEW_PAGE );
-        //initOAMTable( true );
-        //u16 tileCnt = 16;
-
-        //tileCnt = loadSprite( BACK_ID, 0, tileCnt,
-        //                      SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-        //                      BackTiles, BackTilesLen, false, false, !p_backButton, OBJPRIORITY_0, true );
-        //tileCnt = loadSprite( FWD_ID, 1, tileCnt,
-        //                      SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, ForwardPal,
-        //                      ForwardTiles, ForwardTilesLen, false, false, true, OBJPRIORITY_1, true );
-        //tileCnt = loadSprite( BWD_ID, 2, tileCnt,
-        //                      SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackwardPal,
-        //                      BackwardTiles, BackwardTilesLen, false, false, true, OBJPRIORITY_1, true );
-        //updateOAM( true );
 
         int result = -1;
-
         if( p_backButton ) {
             ( Oam->oamBuffer[ BACK_ID ] ).isHidden = false;
             ( Oam->oamBuffer[ BACK_ID ] ).x = fwdPos[ 0 ][ 0 ] - 16;

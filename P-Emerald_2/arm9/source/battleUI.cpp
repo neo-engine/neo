@@ -218,7 +218,7 @@ namespace BATTLE {
         undrawPkmnInfo1( p_hpx, p_hpy );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
-        IO::printString( IO::regularFont, p_pokemon.m_boxdata.m_name, p_hpx - IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) - 12, p_hpy + 2, false );
+        IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_hpx - 12, p_hpy + 2, false, IO::font::RIGHT );
         if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 )
             drawGender( p_hpx - 10, p_hpy + 2, p_pokemon.gender( ) );
         IO::regularFont->setColor( WHITE_IDX, 2 );
@@ -226,11 +226,10 @@ namespace BATTLE {
         char bf2[ 20 ] = { 0 };
         sprintf( buffer, "Lv%hhu", p_pokemon.m_level );
         sprintf( bf2, " %huKP", p_pokemon.m_stats.m_acHP );
-        IO::printString( IO::regularFont, buffer, p_hpx - IO::regularFont->stringWidth( buffer )
-                         - IO::regularFont->stringWidth( bf2 ) - 2, p_hpy + 15, false );
+        IO::regularFont->printString( buffer, p_hpx - IO::regularFont->stringWidth( bf2 ) - 2, p_hpy + 15, false, IO::font::RIGHT );
         IO::regularFont->setColor( WHITE_IDX, 1 );
         IO::regularFont->setColor( p_hpCol, 2 );
-        IO::printString( IO::regularFont, bf2, p_hpx - IO::regularFont->stringWidth( bf2 ) - 2, p_hpy + 15, false );
+        IO::regularFont->printString( bf2, p_hpx - 2, p_hpy + 15, false, IO::font::RIGHT );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
     }
@@ -238,7 +237,7 @@ namespace BATTLE {
         undrawPkmnInfo2( p_hpx, p_hpy );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
-        IO::printString( IO::regularFont, p_pokemon.m_boxdata.m_name, p_hpx + 34, p_hpy + 2, false );
+        IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_hpx + 34, p_hpy + 2, false );
         if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 )
             drawGender( p_hpx + IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) + 34, p_hpy + 2, p_pokemon.gender( ) );
         IO::regularFont->setColor( WHITE_IDX, 2 );
@@ -246,10 +245,10 @@ namespace BATTLE {
         char bf2[ 20 ] = { 0 };
         sprintf( buffer, "Lv%hhu", p_pokemon.m_level );
         sprintf( bf2, " %huKP", p_pokemon.m_stats.m_acHP );
-        IO::printString( IO::regularFont, buffer, p_hpx + 34, p_hpy + 15, false );
+        IO::regularFont->printString( buffer, p_hpx + 34, p_hpy + 15, false );
         IO::regularFont->setColor( WHITE_IDX, 1 );
         IO::regularFont->setColor( p_hpCol, 2 );
-        IO::printString( IO::regularFont, bf2, p_hpx + IO::regularFont->stringWidth( buffer ) + 34, p_hpy + 15, false );
+        IO::regularFont->printString( bf2, p_hpx + IO::regularFont->stringWidth( buffer ) + 34, p_hpy + 15, false );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
     }
@@ -757,14 +756,13 @@ namespace BATTLE {
 
         if( !acPkmn.m_boxdata.m_individualValues.m_isEgg ) {
             u8 gn = !acPkmn.gender( ) ? 8 : 0;
-            IO::regularFont->printString( acPkmn.m_boxdata.m_name, gn + dx + x + 104 - IO::regularFont->stringWidth( acPkmn.m_boxdata.m_name ), dy + y + 2, true );
+            IO::regularFont->printString( acPkmn.m_boxdata.m_name, gn + dx + x + 104, dy + y + 2, true, IO::font::RIGHT );
             if( !gn )
                 drawGender( dx + x + 104, dy + y + 2, acPkmn.gender( ), true );
             IO::regularFont->setColor( GRAY_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
             IO::regularFont->printString( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
-                                          dx + x + 113 - IO::regularFont->stringWidth( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) ),
-                                          dy + y + 15, true );
+                                          dx + x + 113, dy + y + 15, true, IO::font::RIGHT );
             sprintf( buffer, "Lv%d", acPkmn.m_level );
             IO::regularFont->printString( buffer, dx + x + 12, dy + y + 27, true );
             if( acPkmn.m_stats.m_acHP ) {
@@ -796,12 +794,12 @@ namespace BATTLE {
                 IO::regularFont->setColor( RED_IDX, 1 );
                 sprintf( buffer, "Besiegt" );
             }
-            IO::regularFont->printString( buffer, dx + x + 113 - IO::regularFont->stringWidth( buffer ), dy + y + 27, true );
+            IO::regularFont->printString( buffer, dx + x + 113, dy + y + 27, true, IO::font::RIGHT );
 
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
         } else
-            IO::regularFont->printString( "Ei", dx + x + 112 - IO::regularFont->stringWidth( "Ei" ), dy + y + 2, true );
+            IO::regularFont->printString( "Ei", dx + x + 112, dy + y + 2, true, IO::font::RIGHT );
     }
 
     void battleUI::drawPKMNChoiceScreen( bool p_firstIsChosen ) {
@@ -853,34 +851,34 @@ namespace BATTLE {
 
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
             if( !p_alreadySent && !p_alreadyChosen && !dead )
-                IO::regularFont->printString( "Aussenden", p_x + dx + 64 - IO::regularFont->stringWidth( "Aussenden" ) / 2, dy + 52, true );
+                IO::regularFont->printString( "Aussenden", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
             else if( !p_alreadyChosen  && !dead )
-                IO::regularFont->printString( "Bereits im Kampf", p_x + dx + 64 - IO::regularFont->stringWidth( "Bereits im Kampf" ) / 2, dy + 52, true );
+                IO::regularFont->printString( "Bereits im Kampf", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
             else if( dead )
-                IO::regularFont->printString( "Schon besiegt…", p_x + dx + 64 - IO::regularFont->stringWidth( "Schon besiegt…" ) / 2, dy + 52, true );
+                IO::regularFont->printString( "Schon besiegt…", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
             else
-                IO::regularFont->printString( "Schon ausgewählt", p_x + dx + 64 - IO::regularFont->stringWidth( "Schon ausgewählt" ) / 2, dy + 52, true );
+                IO::regularFont->printString( "Schon ausgewählt", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
 
-            IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_x + dx + 58 - IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2, dy + 66, true );
+            IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_x + dx + 58, dy + 66, true, IO::font::CENTER );
             drawGender( p_x + dx + 62 + IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2, dy + 66, p_pokemon.gender( ), true );
 
             IO::regularFont->setColor( GRAY_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
 
             IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
-                                          p_x + dx + 64 - IO::regularFont->stringWidth( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) ) / 2, dy + 80, true );
+                                          p_x + dx + 64, dy + 80, true, IO::font::CENTER );
 
             sprintf( buffer, "Lv%d", p_pokemon.m_level );
             IO::regularFont->printString( buffer, dx + p_x, dy + 94, true );
             sprintf( buffer, "%d/%dKP", p_pokemon.m_stats.m_acHP, p_pokemon.m_stats.m_maxHP );
-            IO::regularFont->printString( buffer, dx + p_x + 128 - IO::regularFont->stringWidth( buffer ), dy + 94, true );
+            IO::regularFont->printString( buffer, dx + p_x + 128, dy + 94, true, IO::font::RIGHT );
 
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
         } else {
             consoleSetWindow( &IO::Bottom, 8, 11, 16, 10 );
-            IO::regularFont->printString( "Ein Ei kann", p_x + dx + 64 - IO::regularFont->stringWidth( "Ein Ei kann" ) / 2, dy + 80, true );
-            IO::regularFont->printString( "nicht kämpfen!", p_x + dx + 64 - IO::regularFont->stringWidth( "nicht kämpfen!" ) / 2, dy + 94, true );
+            IO::regularFont->printString( "Ein Ei kann", p_x + dx + 64, dy + 80, true, IO::font::CENTER );
+            IO::regularFont->printString( "nicht kämpfen!", p_x + dx + 64, dy + 94, true, IO::font::CENTER );
         }
     }
 
@@ -1222,7 +1220,7 @@ namespace BATTLE {
                 for( auto c : nStr )
                     if( c == '\n' )
                         nlCnt++;
-                IO::regularFont->printString( nStr.c_str( ), 0, 138, true, u8( 16 - 2 * nlCnt ) );
+                IO::regularFont->printString( nStr.c_str( ), 0, 138, true, IO::font::LEFT, u8( 16 - 2 * nlCnt ) );
                 IO::regularFont->printString( acAbility.m_abilityName.c_str( ), 5, 176, true );
                 IO::regularFont->setColor( GRAY_IDX, 1 );
                 IO::regularFont->setColor( BLACK_IDX, 2 );

@@ -129,7 +129,7 @@ namespace BOX {
         pal[ 0 ] = WHITE;
 
         IO::initOAMTable( !p_bottom );
-        IO::printString( IO::regularFont, "Alle Boxen", 4, 3, !p_bottom );
+        IO::regularFont->printString( "Alle Boxen", 4, 3, !p_bottom );
         u8 w = 32, h = 24; //width and heigth
         u16 pkmncnt = 0;
         for( u8 i = 0; i < 7; ++i )
@@ -147,7 +147,7 @@ namespace BOX {
                 else
                     IO::regularFont->setColor( BLACK_IDX, 1 );
                 sprintf( buffer, "%2d", cnt );
-                IO::printString( IO::regularFont, buffer,
+                IO::regularFont->printString( buffer,
                                  x + 7, y + 5, !p_bottom );
             }
         sprintf( buffer, "%4d Pokémon", pkmncnt );
@@ -155,7 +155,7 @@ namespace BOX {
             IO::regularFont->setColor( RED_IDX, 1 );
         else
             IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::printString( IO::regularFont, buffer, 252 - IO::regularFont->stringWidth( buffer ), 3, !p_bottom );
+        IO::regularFont->printString( buffer, 252, 3, !p_bottom, IO::font::RIGHT );
 
         for( u8 i = 0; i < 5; ++i ) {
             IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].isHidden = true;
@@ -174,17 +174,17 @@ namespace BOX {
         switch( p_button ) {
             case BOX::boxUI::BUTTON_LEFT:
                 IO::printChoiceBox( 24, 23, 48, 48, 6, GRAY_IDX, p_pressed, false ); // <
-                IO::printString( IO::regularFont, "<", dx + 31, dy + 28, false );
+                IO::regularFont->printString( "<", dx + 31, dy + 28, false );
                 break;
             case BOX::boxUI::BUTTON_RIGHT:
                 IO::printChoiceBox( 208, 23, 232, 48, 6, GRAY_IDX, p_pressed, false ); // >
-                IO::printString( IO::regularFont, ">", dx + 216, dy + 28, false );
+                IO::regularFont->printString( ">", dx + 216, dy + 28, false );
                 break;
             case BOX::boxUI::BUTTON_BOX_NAME:
             {
                 box* box = FS::SAV->getCurrentBox( );
                 IO::printChoiceBox( 50, 23, 206, 48, 6, COLOR_IDX, p_pressed, false ); //Box name
-                IO::printString( IO::regularFont, box->m_name, dx + 127 - IO::regularFont->stringWidth( box->m_name ) / 2, dy + 28, false );
+                IO::regularFont->printString( box->m_name, dx + 127, dy + 28, false, IO::font::CENTER );
                 break;
             }
             default:
@@ -205,9 +205,9 @@ namespace BOX {
         IO::printChoiceBox( 24, 23, 48, 48, 6, GRAY_IDX, false, false ); // <
         IO::printChoiceBox( 208, 23, 232, 48, 6, GRAY_IDX, false, false ); // >
 
-        IO::printString( IO::regularFont, box->m_name, 127 - IO::regularFont->stringWidth( box->m_name ) / 2, 28, false );
-        IO::printString( IO::regularFont, "<", 31, 28, false );
-        IO::printString( IO::regularFont, ">", 216, 28, false );
+        IO::regularFont->printString( box->m_name, 127, 28, false, IO::font::CENTER );
+        IO::regularFont->printString( "<", 31, 28, false );
+        IO::regularFont->printString( ">", 216, 28, false );
 
         u8 oam = PKMN_START;
         u8 pal = PKMN_PALETTE_START;
@@ -232,7 +232,7 @@ namespace BOX {
         }
 
         IO::printRectangle( 0, 140, 255, 192, false, false, WHITE_IDX );
-        IO::printString( IO::regularFont, p_showTeam ? "Pokémon-Team" : "Zwischenablage", 2, 176, false );
+        IO::regularFont->printString( p_showTeam ? "Pokémon-Team" : "Zwischenablage", 2, 176, false );
         for( u8 i = 0; i < 6; ++i ) {
             res.push_back( IO::inputTarget( TEAM_POS_X( i ) + 5, TEAM_POS_Y( i ) + 10,
                                             TEAM_POS_X( i ) + 33, TEAM_POS_Y( i ) + 31 ) );

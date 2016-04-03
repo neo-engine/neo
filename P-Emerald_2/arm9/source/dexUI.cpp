@@ -388,9 +388,9 @@ namespace DEX {
 
                     IO::OamTop->oamBuffer[ i + STAR_START ].isHidden = ( bs < 60 + 20 * ( i % 5 ) );
                 }
-                IO::regularFont->printString( "KP", 80 - IO::regularFont->stringWidth( "KP" ), 49, false );
-                IO::regularFont->printString( "Angriff", 80 - IO::regularFont->stringWidth( "Angriff" ), 74, false );
-                IO::regularFont->printString( "Sp.-Angr", 80 - IO::regularFont->stringWidth( "Sp.-Angr" ), 99, false );
+                IO::regularFont->printString( "KP", 80, 49, false, IO::font::RIGHT );
+                IO::regularFont->printString( "Angriff", 80, 74, false, IO::font::RIGHT );
+                IO::regularFont->printString( "Sp.-Angr", 80, 99, false, IO::font::RIGHT );
 
                 IO::regularFont->printString( "Initiative", 176, 49, false );
                 IO::regularFont->printString( "Vert", 176, 74, false );
@@ -398,7 +398,7 @@ namespace DEX {
 
                 IO::regularFont->setColor( BLACK_IDX, 1 );
                 IO::regularFont->setColor( WHITE_IDX, 2 );
-                IO::regularFont->printString( FS::breakString( data.m_dexEntry, IO::regularFont, 224 ).c_str( ), 16, 134, false, 12 );
+                IO::regularFont->printString( FS::breakString( data.m_dexEntry, IO::regularFont, 224 ).c_str( ), 16, 134, false, IO::font::LEFT, 12 );
 
                 consoleSetWindow( &IO::Top, 3, 22, 32, 23 );
                 if( strlen( data.m_species ) >= 13 )

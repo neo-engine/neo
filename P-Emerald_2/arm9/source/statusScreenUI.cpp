@@ -344,9 +344,9 @@ namespace STS {
             IO::regularFont->setColor( HP_COL + 2, 1 );
             sprintf( buffer, "EP %lu%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
                      ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) );
-            IO::regularFont->printString( buffer, 62 - IO::regularFont->stringWidth( buffer ) / 2, 28, p_bottom );
+            IO::regularFont->printString( buffer, 62, 28, p_bottom, IO::font::CENTER );
             sprintf( buffer, "KP %i%%", p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
-            IO::regularFont->printString( buffer, 62 - IO::regularFont->stringWidth( buffer ) / 2, 38, p_bottom );
+            IO::regularFont->printString( buffer, 62, 38, p_bottom, IO::font::CENTER );
             IO::regularFont->setColor( GRAY_IDX, 2 );
             IO::regularFont->setColor( BLACK_IDX, 1 );
         } else {
@@ -573,12 +573,12 @@ namespace STS {
         }
         char buffer[ 50 ];
         sprintf( buffer, "%s/%05d", currPkmn.m_boxdata.m_oT, currPkmn.m_boxdata.m_oTId );
-        IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 30, p_bottom );
+        IO::regularFont->printString( buffer, 250, 30, p_bottom, IO::font::RIGHT );
 
         if( !currPkmn.m_boxdata.isShiny( ) )
             IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
         sprintf( buffer, "%03d", currPkmn.m_boxdata.m_speciesId );
-        IO::regularFont->printString( buffer, 180 - IO::regularFont->stringWidth( buffer ), 51, p_bottom );
+        IO::regularFont->printString( buffer, 180, 51, p_bottom, IO::font::RIGHT );
         IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::regularFont->printString( "Nr.", 124, 51, p_bottom );
 
@@ -590,12 +590,12 @@ namespace STS {
         else
             sprintf( buffer, "%s",
                      plrOT ? "Ei erhalten" : "Ei offenbar erh." );
-        IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 76, p_bottom, 14 );
+        IO::regularFont->printString( buffer, 250, 76, p_bottom, IO::font::RIGHT, 14 );
         sprintf( buffer, "am %02d.%02d.20%02d,",
                  currPkmn.m_boxdata.m_gotDate[ 0 ] ? currPkmn.m_boxdata.m_gotDate[ 0 ] : currPkmn.m_boxdata.m_hatchDate[ 0 ],
                  currPkmn.m_boxdata.m_gotDate[ 1 ] ? currPkmn.m_boxdata.m_gotDate[ 1 ] : currPkmn.m_boxdata.m_hatchDate[ 1 ],
                  currPkmn.m_boxdata.m_gotDate[ 2 ] ? currPkmn.m_boxdata.m_gotDate[ 2 ] : currPkmn.m_boxdata.m_hatchDate[ 2 ] );
-        IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 90, p_bottom, 14 );
+        IO::regularFont->printString( buffer, 250, 90, p_bottom, IO::font::RIGHT, 14 );
         sprintf( buffer, "%s.",
                  FS::getLocation( currPkmn.m_boxdata.m_gotPlace ) );
         IO::regularFont->printMaxString( buffer, std::max( (u32) 124, 250 - IO::regularFont->stringWidth( buffer ) ), 104, p_bottom, 254 );
@@ -605,10 +605,10 @@ namespace STS {
                      currPkmn.m_boxdata.m_hatchDate[ 0 ],
                      currPkmn.m_boxdata.m_hatchDate[ 1 ],
                      currPkmn.m_boxdata.m_hatchDate[ 2 ] );
-            IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 125, p_bottom, 14 );
+            IO::regularFont->printString( buffer, 250, 125, p_bottom, IO::font::RIGHT, 14 );
             sprintf( buffer, "%s.",
                      FS::getLocation( currPkmn.m_boxdata.m_hatchPlace ) );
-            IO::regularFont->printString( buffer, 250 - IO::regularFont->stringWidth( buffer ), 139, p_bottom, 14 );
+            IO::regularFont->printString( buffer, 250, 139, p_bottom, IO::font::RIGHT, 14 );
         } else if( plrOT && currPkmn.m_boxdata.m_fateful )
             IO::regularFont->printString( "Schicksalhafte Begeg.", 102, 139, p_bottom );
         else if( currPkmn.m_boxdata.m_fateful )
@@ -632,7 +632,7 @@ namespace STS {
                  PersonalityList[ currPkmn.m_boxdata.getPersonality( ) ].c_str( ) );
         auto str = std::string( buffer );
         auto nStr = FS::breakString( str, IO::regularFont, 122 );
-        IO::regularFont->printString( nStr.c_str( ), 122, 48, p_bottom, 14, -2 );
+        IO::regularFont->printString( nStr.c_str( ), 122, 48, p_bottom, IO::font::LEFT, 14, -2 );
 
         auto acAbility = ability( currPkmn.m_boxdata.m_ability );
         u8 wd = IO::regularFont->stringWidth( acAbility.m_abilityName.c_str( ) );
@@ -643,8 +643,7 @@ namespace STS {
         for( auto c : nStr )
             if( c == '\n' )
                 nlCnt++;
-        IO::regularFont->printString( nStr.c_str( ), 124,
-                                      108, p_bottom, u8( 16 - 2 * nlCnt ), 4 );
+        IO::regularFont->printString( nStr.c_str( ), 124, 108, p_bottom, IO::font::LEFT, u8( 16 - 2 * nlCnt ), 4 );
 
         if( currPkmn.m_boxdata.m_oTisFemale ) {
             IO::regularFont->setColor( RED_IDX, 1 );
@@ -735,7 +734,7 @@ namespace STS {
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::regularFont->printString( FS::breakString( currMove->description( ), IO::regularFont, 120 ).c_str( ),
-                                      128, 84, p_bottom, 11 );
+                                      128, 84, p_bottom, IO::font::LEFT, 11 );
 
         IO::updateOAM( p_bottom );
         return true;
@@ -792,11 +791,11 @@ namespace STS {
         if( currRb.m_name == "" )
             currRb.m_description = "----";
 
-        IO::regularFont->printString( nStr.c_str( ), 142, 39 - 7 * nlCnt, p_bottom, 14 );
+        IO::regularFont->printString( nStr.c_str( ), 142, 39 - 7 * nlCnt, p_bottom, IO::font::LEFT, 14 );
         IO::regularFont->printString( FS::breakString( ( currRb.m_description == "" ) ?
                                                        ( currPkmn.m_boxdata.m_fateful ? "Ein Band für Pokémon-Freunde." : "Ein Gedenk-Band. An einem mysteriösen Ort erhalten." )
                                                        : currRb.m_description, IO::regularFont, 120 ).c_str( ),
-                                      128, 66, p_bottom, 14 );
+                                      128, 66, p_bottom, IO::font::LEFT, 14 );
         IO::updateOAM( p_bottom );
         return true;
     }
@@ -910,9 +909,8 @@ namespace STS {
                                  132 + 100 * ( sz % 2 ), 80 + 41 * ( sz / 2 ) );
             IO::printChoiceBox( cur.m_targetX1, cur.m_targetY1, cur.m_targetX2, cur.m_targetY2,
                                 6, COLOR_IDX, false );
-            IO::regularFont->printString( names[ i ].c_str( ), ( cur.m_targetX2 + cur.m_targetX1 - 2
-                                                                 - IO::regularFont->stringWidth( names[ i ].c_str( ) ) ) / 2,
-                                          cur.m_targetY1 + 8, true );
+            IO::regularFont->printString( names[ i ].c_str( ), ( cur.m_targetX2 + cur.m_targetX1 - 2 ) / 2,
+                                          cur.m_targetY1 + 8, true, IO::font::CENTER );
             res.push_back( cur );
         }
         return res;

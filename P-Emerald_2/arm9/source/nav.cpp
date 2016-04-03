@@ -199,8 +199,7 @@ namespace IO {
         regularFont->setColor( WHITE_IDX, 1 );
         regularFont->setColor( GRAY_IDX, 2 );
         regularFont->setColor( 0, 0 );
-        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap ].first ),
-                                  244 - regularFont->stringWidth( FS::getLocation( MAP::mapInfo[ _curMap ].first ) ), 12, !SCREENS_SWAPPED );
+        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap ].first ), 244, 12, !SCREENS_SWAPPED, IO::font::RIGHT );
         regularFont->setColor( WHITE_IDX, 2 );
         regularFont->setColor( BLACK_IDX, 1 );
         regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap / 100 * 100 + 10 ].first ), 36, 0, !SCREENS_SWAPPED );

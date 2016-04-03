@@ -226,7 +226,7 @@ namespace BAG {
 
             IO::regularFont->printString( "AP", 190, 145, false );
             std::sprintf( buffer, "%2d", AttackList[ mv.m_moveIdx ]->m_movePP );
-            IO::regularFont->printString( buffer, 229 - IO::regularFont->stringWidth( buffer ), 145, false );
+            IO::regularFont->printString( buffer, 229, 145, false, IO::font::RIGHT );
 
             IO::regularFont->setColor( RED_IDX, 1 );
             IO::regularFont->printString( "Stärke", 33, 160, false );
@@ -235,7 +235,7 @@ namespace BAG {
                 std::sprintf( buffer, "%3d", AttackList[ mv.m_moveIdx ]->m_moveBasePower );
             else
                 std::sprintf( buffer, "---" );
-            IO::regularFont->printString( buffer, 108 - IO::regularFont->stringWidth( buffer ), 160, false );
+            IO::regularFont->printString( buffer, 108, 160, false, IO::font::RIGHT );
 
             IO::regularFont->setColor( BLUE_IDX, 1 );
             IO::regularFont->printString( "Genauigkeit", 124, 160, false );
@@ -243,15 +243,14 @@ namespace BAG {
                 std::sprintf( buffer, "%3d", AttackList[ mv.m_moveIdx ]->m_moveAccuracy );
             else
                 std::sprintf( buffer, "---" );
-            IO::regularFont->printString( buffer, 229 - IO::regularFont->stringWidth( buffer ), 160, false );
+            IO::regularFont->printString( buffer, 229, 160, false, IO::font::RIGHT );
             IO::regularFont->setColor( BLACK_IDX, 1 );
         }
 
-        IO::regularFont->printString( display.c_str( ),
-                                      128 - IO::regularFont->stringWidth( display.c_str( ) ) / 2, 26, false );
+        IO::regularFont->printString( display.c_str( ), 128, 26, false, IO::font::CENTER );
 
 
-        IO::regularFont->printString( descr.c_str( ), 33, 83, false, 11 );
+        IO::regularFont->printString( descr.c_str( ), 33, 83, false, IO::font::LEFT, 11 );
         IO::updateOAM( false );
     }
 
@@ -279,7 +278,7 @@ namespace BAG {
                         || currMv == FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_moves[ 3 ] ) {
                         IO::regularFont->setColor( BLUE_IDX, 1 );
                         IO::regularFont->setColor( BLACK_IDX, 2 );
-                        IO::regularFont->printString( "Bereits\nerlernt", 40, 33 + 26 * i, true, 11 );
+                        IO::regularFont->printString( "Bereits\nerlernt", 40, 33 + 26 * i, true, IO::font::LEFT, 11 );
                     } else if( canLearn( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId, currMv, 4 ) ) {
                         BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
                         IO::regularFont->setColor( COLOR_IDX, 1 );
@@ -288,7 +287,7 @@ namespace BAG {
                     } else {
                         IO::regularFont->setColor( RED_IDX, 1 );
                         IO::regularFont->setColor( BLACK_IDX, 2 );
-                        IO::regularFont->printString( "Nicht\nerlernbar", 40, 33 + 26 * i, true, 11 );
+                        IO::regularFont->printString( "Nicht\nerlernbar", 40, 33 + 26 * i, true, IO::font::LEFT, 11 );
                     }
                 } else if( p_item &&  p_item->m_itemType == item::itemType::MEDICINE ) {
                     if( FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP ) {
@@ -298,7 +297,7 @@ namespace BAG {
                     } else {
                         sprintf( buffer, "Level %3d\n Besiegt", FS::SAV->m_pkmnTeam[ i ].m_level );
                     }
-                    IO::regularFont->printString( buffer, 40, 33 + 26 * i, true, 11 );
+                    IO::regularFont->printString( buffer, 40, 33 + 26 * i, true, IO::font::LEFT, 11 );
                 } else {
                     if( p_item && p_item->getEffectType( ) == item::itemEffectType::USE_ON_PKMN ) {
                         if( FS::SAV->m_pkmnTeam[ i ].canEvolve( p_item->getItemId( ), 3 ) ) {
@@ -309,7 +308,7 @@ namespace BAG {
                         } else {
                             IO::regularFont->setColor( RED_IDX, 1 );
                             IO::regularFont->setColor( BLACK_IDX, 2 );
-                            IO::regularFont->printString( "Nicht\nmöglich", 40, 33 + 26 * i, true, 11 );
+                            IO::regularFont->printString( "Nicht\nmöglich", 40, 33 + 26 * i, true, IO::font::LEFT, 11 );
                         }
                     } else {
                         IO::regularFont->printString( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name, 45, 33 + 26 * i, true );
@@ -338,20 +337,20 @@ namespace BAG {
         if( p_item->m_itemType != item::itemType::GOODS
             && toBagType( p_item->m_itemType ) == bag::bagType::ITEMS ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
-            IO::printChar( IO::boldFont, 490 - 22 + u16( p_item->m_itemType ), p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
+            IO::boldFont->printChar( 490 - 22 + u16( p_item->m_itemType ), p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
         } else if( p_item->getItemId( ) == FS::SAV->m_registeredItem ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
-            IO::printChar( IO::boldFont, 'Y', p_x + 106 + 2 * p_pressed, p_y - 2 + p_pressed, true );
+            IO::boldFont->printChar( 'Y', p_x + 106 + 2 * p_pressed, p_y - 2 + p_pressed, true );
         } else if( p_item->m_itemType == item::itemType::TM_HM
                    && AttackList[ static_cast<TM*>( p_item )->m_moveIdx ]->m_isFieldAttack ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
-            IO::printChar( IO::boldFont, 490 - 22 + u16( p_item->m_itemType ), p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
+            IO::boldFont->printChar( 490 - 22 + u16( p_item->m_itemType ), p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
         } else
             IO::printChoiceBox( p_x, p_y, p_x + 106, p_y + 16, 3, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
         if( p_item->m_itemType != item::itemType::TM_HM )
-            IO::printString( IO::regularFont, p_item->getDisplayName( true ).c_str( ), p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
+            IO::regularFont->printString( p_item->getDisplayName( true ).c_str( ), p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
         else
-            IO::printString( IO::regularFont, AttackList[ static_cast<TM*>( p_item )->m_moveIdx ]->m_moveName.c_str( ), p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
+            IO::regularFont->printString( AttackList[ static_cast<TM*>( p_item )->m_moveIdx ]->m_moveName.c_str( ), p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
     }
 
     void drawTop( u8 p_page ) {

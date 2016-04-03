@@ -343,34 +343,7 @@ namespace IO {
                             p_bottom, false, WHITE_IDX );
         }
     }
-
-
-    void printChar( font* p_font, u16 p_ch, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printChar( p_ch, p_x, p_y, p_bottom );
-    }
-    void printString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance ) {
-        p_font->printString( p_string, p_x, p_y, p_bottom, p_yDistance );
-    }
-    void printStringCenter( font* p_font, const char *p_string, bool p_bottom ) {
-        p_font->printStringCenter( p_string, p_bottom );
-    }
-    void printStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printStringD( p_string, p_x, p_y, p_bottom );
-    }
-    void printStringCenterD( font* p_font, const char *p_string, bool p_bottom ) {
-        p_font->printStringCenterD( p_string, p_bottom );
-    }
-    void printNumber( font* p_font, s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printNumber( p_num, p_x, p_y, p_bottom );
-    }
-
-    void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printMBString( p_string, p_x, p_y, p_bottom );
-    }
-    void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printMBStringD( p_string, p_x, p_y, p_bottom );
-    }
-
+    
     void topScreenPlot( u8 p_x, u8 p_y, color p_color ) {
         if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
             ( (color *) BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
