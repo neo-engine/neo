@@ -43,6 +43,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "time_icon.h"
 #include "star.h"
 
+#include "DexTop.h"
 #include "DexTop0.h"
 #include "DexTop1.h"
 #include "DexTop2.h"
@@ -140,33 +141,30 @@ namespace DEX {
     }
 
     void dexUI::drawFormes( u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName ) {
-        IO::boldFont->setColor( WHITE_IDX, 2 );
-        IO::boldFont->setColor( 0, 1 );
-
         pokemonData data; getAll( FS::SAV->m_lstDex, data );
 
         u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 10, 64,
                                           PKMN_SPRITE_START( 0 ), 0, 0, false, false, p_hasGenderDifference && ( _currForme % 2 ), true );
         if( data.m_formecnt )
-            IO::boldFont->printString( p_formeName.c_str( ), 5, 157, false );
+            IO::boldFont->printString( p_formeName.c_str( ), 58, 157, false, IO::font::CENTER );
         else if( p_hasGenderDifference && ( _currForme % 2 ) )
-            IO::boldFont->printString( "weiblich", 20, 157, false );
+            IO::boldFont->printString( "weiblich", 58, 157, false, IO::font::CENTER );
         else if( p_hasGenderDifference )
-            IO::boldFont->printString( "männlich", 20, 157, false );
+            IO::boldFont->printString( "männlich", 58, 157, false, IO::font::CENTER );
         else
-            IO::boldFont->printString( getDisplayName( FS::SAV->m_lstDex ), 10, 157, false );
+            IO::boldFont->printString( getDisplayName( FS::SAV->m_lstDex ), 58, 157, false, IO::font::CENTER );
 
         tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 110, 64,
                                       PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true, p_hasGenderDifference && ( _currForme % 2 ) );
         if( data.m_formecnt )
-            IO::boldFont->printString( p_formeName.c_str( ), 110, 150, false );
+            IO::boldFont->printString( p_formeName.c_str( ), 158, 150, false, IO::font::CENTER );
         else if( p_hasGenderDifference && ( _currForme % 2 ) )
-            IO::boldFont->printString( "weiblich", 130, 150, false );
+            IO::boldFont->printString( "weiblich", 158, 150, false, IO::font::CENTER );
         else if( p_hasGenderDifference )
-            IO::boldFont->printString( "männlich", 130, 150, false );
+            IO::boldFont->printString( "männlich", 158, 150, false, IO::font::CENTER );
         else
-            IO::boldFont->printString( getDisplayName( FS::SAV->m_lstDex ), 110, 150, false );
-        IO::boldFont->printString( "(schillernd)", 110, 166, false );
+            IO::boldFont->printString( getDisplayName( FS::SAV->m_lstDex ), 158, 150, false, IO::font::CENTER );
+        IO::boldFont->printString( "(schillernd)", 158, 166, false, IO::font::CENTER );
 
         //Load Icons of the other formes ( max 4 )
         if( !data.m_formecnt ) {
@@ -189,15 +187,28 @@ namespace DEX {
     void dexUI::drawPage( bool p_newPok, bool p_newPage ) {
         if( !FS::SAV->m_lstDex )
             FS::SAV->m_lstDex = _maxPkmn;
+
+        if( _useInDex && !IN_DEX( FS::SAV->m_lstDex ) ) {
+            IO::NAV->draw( );
+            dmaCopy( DexTopBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
+            dmaCopy( DexTopPal, BG_PALETTE, 480 );
+            IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", 0, 80, 35, PKMN_SPRITE_START( 0 ), 0, 0, false );
+
+            IO::boldFont->setColor( BLACK_IDX, 2 );
+            IO::boldFont->setColor( WHITE_IDX, 1 );
+            BG_PALETTE[ WHITE_IDX ] = WHITE;
+            BG_PALETTE[ BLACK_IDX ] = BLACK;
+            IO::boldFont->printString( "Keine Daten.", 128, 150, false, IO::font::CENTER );
+            return;
+        }
+
         pokemonData data; getAll( FS::SAV->m_lstDex, data );
+
         bool isFixed = !FS::exists( "nitro:/PICS/SPRITES/PKMN/", FS::SAV->m_lstDex, "f" );
 
         if( _currPage <= 1 )
             _currForme %= data.m_formecnt ? ( ( 2 - isFixed ) * data.m_formecnt ) : ( 2 - isFixed );
-
-        //if( !p_newPok && !p_newPage  && !data.m_formecnt && isFixed && _currPage != 1 )
-        //    return; //Nothing changed, so just do nothing.
-
+        
         //Redraw the subscreen iff p_newPok
         if( p_newPok ) {
             IO::NAV->draw( );
