@@ -1208,7 +1208,7 @@ NEXT:
                      _wildPokemon.m_pokemon->m_boxdata.m_name );
             log( buffer );
 
-            DEX::dex( -1, 0 ).run( _wildPokemon.m_pokemon->m_boxdata.m_speciesId );
+            DEX::dex( DEX::dex::SHOW_SINGLE, -1 ).run( _wildPokemon.m_pokemon->m_boxdata.m_speciesId );
         }
         _battleUI->handleCapture( );
 

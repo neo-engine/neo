@@ -45,6 +45,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "memo.h"
 #include "atks.h"
 #include "Contest.h"
+#include "PKMN.h"
+#include "time_icon.h"
 
 namespace BOX {
 #define ARROW_ID 1
@@ -84,14 +86,14 @@ namespace BOX {
                                   false, false, true, OBJPRIORITY_0, false );
         tileCnt += 64;
         tileCnt = IO::loadSprite( PAGE_ICON_START + ( 0 ), 0, PAGE_ICON_START + ( 0 ), tileCnt,
-                                  0, 0, 32, 32, memoPal,
-                                  memoTiles, memoTilesLen, false, false, true, OBJPRIORITY_0, false );
+                                  20, 0, 32, 32, time_iconPal,
+                                  time_iconTiles, time_iconTilesLen, false, false, true, OBJPRIORITY_0, false );
         tileCnt = IO::loadSprite( PAGE_ICON_START + ( 1 ), 0, PAGE_ICON_START + ( 1 ), tileCnt,
-                                  20, 0, 32, 32, memoPal,
-                                  memoTiles, memoTilesLen, false, false, true, OBJPRIORITY_0, false );
-        tileCnt = IO::loadSprite( PAGE_ICON_START + ( 2 ), 0, PAGE_ICON_START + ( 2 ), tileCnt,
                                   40, 0, 32, 32, memoPal,
                                   memoTiles, memoTilesLen, false, false, true, OBJPRIORITY_0, false );
+        tileCnt = IO::loadSprite( PAGE_ICON_START + ( 2 ), 0, PAGE_ICON_START + ( 2 ), tileCnt,
+                                  0, 0, 32, 32, PKMNPal,
+                                  PKMNTiles, PKMNTilesLen, false, false, true, OBJPRIORITY_0, false );
         tileCnt = IO::loadSprite( PAGE_ICON_START + ( 3 ), 0, PAGE_ICON_START + ( 3 ), tileCnt,
                                   50, 0, 32, 32, atksPal,
                                   atksTiles, atksTilesLen, false, false, true, OBJPRIORITY_0, false );

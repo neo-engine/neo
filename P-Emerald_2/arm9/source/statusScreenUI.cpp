@@ -43,6 +43,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "memo.h"
 #include "atks.h"
 #include "Contest.h"
+#include "PKMN.h"
+#include "time_icon.h"
 
 #include "anti_pokerus_icon.h"
 #include "pokerus_icon.h"
@@ -99,11 +101,11 @@ namespace STS {
                                                SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
                                                BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
         nextAvailableTileIdx = IO::loadSprite( SUB_PAGE_ICON_IDX( 0 ), SUB_PAGE_ICON_IDX( 0 ), nextAvailableTileIdx,
-                                               0, 0, 32, 32, memoPal,
-                                               memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, true );
+                                               0, 0, 32, 32, time_iconPal,
+                                               time_iconTiles, time_iconTilesLen, false, false, false, OBJPRIORITY_0, true );
         nextAvailableTileIdx = IO::loadSprite( SUB_PAGE_ICON_IDX( 1 ), SUB_PAGE_ICON_IDX( 1 ), nextAvailableTileIdx,
-                                               0, 0, 32, 32, memoPal,
-                                               memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, true );
+                                               0, 0, 32, 32, PKMNPal,
+                                               PKMNTiles, PKMNTilesLen, false, false, false, OBJPRIORITY_0, true );
         nextAvailableTileIdx = IO::loadSprite( SUB_PAGE_ICON_IDX( 2 ), SUB_PAGE_ICON_IDX( 2 ), nextAvailableTileIdx,
                                                0, 0, 32, 32, memoPal,
                                                memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, true );
@@ -626,24 +628,24 @@ namespace STS {
         IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
 
         sprintf( buffer, "Mag %s""e PokéRg.", TasteList[ currPkmn.m_boxdata.getTasteStr( ) ].c_str( ) );
-        IO::regularFont->printString( buffer, 106, 30, p_bottom );
+        IO::regularFont->printString( buffer, 250, 30, p_bottom, IO::font::RIGHT );
 
         sprintf( buffer, "Sehr %s; %s.", NatureList[ currPkmn.m_boxdata.getNature( ) ].c_str( ),
                  PersonalityList[ currPkmn.m_boxdata.getPersonality( ) ].c_str( ) );
         auto str = std::string( buffer );
         auto nStr = FS::breakString( str, IO::regularFont, 122 );
-        IO::regularFont->printString( nStr.c_str( ), 122, 48, p_bottom, IO::font::LEFT, 14, -2 );
+        IO::regularFont->printString( nStr.c_str( ), 245, 48, p_bottom, IO::font::RIGHT, 14 );
 
         auto acAbility = ability( currPkmn.m_boxdata.m_ability );
         u8 wd = IO::regularFont->stringWidth( acAbility.m_abilityName.c_str( ) );
-        if( 253 - wd > 140 )
-            IO::regularFont->printString( "Fäh.", 126, 94, p_bottom );
+        if( 250 - wd > 140 )
+            IO::regularFont->printString( "Fäh. ", 250 - wd, 94, p_bottom, IO::font::RIGHT );
         u8 nlCnt = 0;
-        nStr = FS::breakString( acAbility.m_flavourText, IO::regularFont, 125 );
+        nStr = FS::breakString( acAbility.m_flavourText, IO::regularFont, 130 );
         for( auto c : nStr )
             if( c == '\n' )
                 nlCnt++;
-        IO::regularFont->printString( nStr.c_str( ), 124, 108, p_bottom, IO::font::LEFT, u8( 16 - 2 * nlCnt ), 4 );
+        IO::regularFont->printString( nStr.c_str( ), 250, 108, p_bottom, IO::font::RIGHT, u8( 16 - 2 * nlCnt ) );
 
         if( currPkmn.m_boxdata.m_oTisFemale ) {
             IO::regularFont->setColor( RED_IDX, 1 );
@@ -653,7 +655,7 @@ namespace STS {
             IO::regularFont->setColor( BLUE2_IDX, 2 );
         }
         IO::regularFont->printString( acAbility.m_abilityName.c_str( ),
-                                      253 - wd,
+                                      250 - wd,
                                       94, p_bottom );
         IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
     }

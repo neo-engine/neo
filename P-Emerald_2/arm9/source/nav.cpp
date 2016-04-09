@@ -114,9 +114,6 @@ namespace IO {
         { nav::HOME, nav::HOME }
     };
 
-    DEX::dexUI dui( true, FS::SAV->m_hasGDex ? 649 : 493 );
-    DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
-
     void drawBorder( ) {
         auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg2 ) : bgGetGfxPtr( bg2sub );
         auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
@@ -300,7 +297,8 @@ namespace IO {
                 ANIMATE_MAP = false;
                 _state = HOME;
                 draw( true );
-                dx.run( FS::SAV->m_lstDex );
+
+                DEX::dex( DEX::dex::SHOW_CAUGHT, FS::SAV->m_hasGDex ? 649 : 493 ).run( FS::SAV->m_lstDex );
 
                 IO::clearScreenConsole( true, true );
                 draw( true );

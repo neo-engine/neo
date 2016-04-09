@@ -28,23 +28,24 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #pragma once
 
 #include <nds.h>
-#include "pokemon.h"
+#include <string>
 
 namespace DEX {
     class dexUI {
-        friend class dex;
     private:
         bool _useInDex;
         u16 _maxPkmn;
-        u8 _currPage;
         u8 _currForme;
 
-        void init( );
-        void drawPage( bool p_newPok, bool p_newPage = false );
         void drawFormes( u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName );
-        //void undrawFormes( u16 p_formeIdx );
     public:
-        dexUI( bool p_useInDex, u16 p_maxPkmn )
-            : _useInDex( p_useInDex ), _maxPkmn( p_maxPkmn ), _currPage( 0 ) { }
+        dexUI( bool p_useInDex, u16 p_maxPkmn );
+
+        void drawPage( u16 p_pkmnIdx, u8 p_page );
+        s8 drawSub( u8 p_mode, u16 p_pkmnIdcs[ 32 ], u16 p_idxStart, u8 p_selectedIdx ); // +1 -> rotateForward, -1 -> rotateBackward
+
+        void changeMode( u8 p_newMode );
+
+        void select( u8 p_idx );
     };
 }

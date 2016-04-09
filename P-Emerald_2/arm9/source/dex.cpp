@@ -35,16 +35,94 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 namespace DEX {
 #define MAX_PAGES 3
-    const u8 dexsppos[ 2 ][ 9 ] = { { 160, 128, 96, 19, 6, 120, 158, 196, 8 }, { u8( -16 ), 0, 24, 138, 173, 108, 126, 144, 32 } };
 
-    void dex::run( u16 p_pkmnIdx ) {
-        if( !_dexUI ) {
-            _dexUI = new dexUI( false, _maxPkmn ); //Only the current Pkmn shall be shown
+#define MAX_PKMN_ALL 32
+#define MAX_PKMN_CAUGHT 5
+#define MAX_PKMN_PER_PAGE( p_mode ) ( (p_mode == SHOW_CAUGHT) ? MAX_PKMN_CAUGHT : MAX_PKMN_ALL )
+
+    u16 nextEntry( u16 p_startIdx ) {
+        if( p_startIdx > MAX_PKMN )
+            return MAX_PKMN + 1;
+        for( u16 i = p_startIdx + 1; i <= MAX_PKMN; ++i )
+            if( IN_DEX( i ) )
+                return i;
+        return MAX_PKMN + 1;
+    }
+
+    u16 previousEntry( u16 p_startIdx ) {
+        if( p_startIdx > MAX_PKMN )
+            p_startIdx = MAX_PKMN + 1;
+        for( u16 i = p_startIdx - 1; p_startIdx > 0 && p_startIdx <= MAX_PKMN; --i )
+            if( IN_DEX( i ) )
+                return i;
+        return 0;
+    }
+
+    dex::dex( mode p_mode, u16 p_maxPkmn )
+        : _maxPkmn( p_maxPkmn ), _page( 0 ), _mode( p_mode ) {
+        _dexUI = new dexUI( p_mode != SHOW_SINGLE, p_maxPkmn );
+    }
+
+    void dex::changeMode( mode p_newMode, u16 p_startPkmn ) {
+        if( p_newMode == SHOW_CAUGHT && !IN_DEX( p_startPkmn ) )
+            p_startPkmn = nextEntry( p_startPkmn );
+        if( p_newMode == SHOW_ALL )
+            p_startPkmn -= 12;
+
+        memset( _curPkmn, 0, sizeof( _curPkmn ) );
+        _curPkmnStart = 0;
+
+        for( u8 i = 0; i < MAX_PKMN_PER_PAGE( p_newMode ); ++i ) {
+            _curPkmn[ i ] = p_startPkmn;
+            if( p_newMode == SHOW_CAUGHT )
+                p_startPkmn = nextEntry( p_startPkmn );
+            else
+                ++p_startPkmn;
         }
 
-        _dexUI->init( );
+        _dexUI->changeMode( p_newMode );
+    }
+
+    void dex::select( u8 p_idx ) {
+        _selectedIdx = p_idx;
+
+        _dexUI->drawPage( _curPkmn[ p_idx ], _page );
+        s8 rs = _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
+        if( rs == 1 ) rotateForward( );
+        else if( rs == -1 ) rotateBackward( );
+    }
+
+    void dex::rotateForward( ) {
+        if( _mode == SHOW_ALL ) {
+            u16 end = _curPkmn[ ( _curPkmnStart + MAX_PKMN_ALL - 1 ) % MAX_PKMN_ALL ];
+            for( u8 i = 0; i < 8; ++i )
+                _curPkmn[ ( _curPkmnStart + i ) % MAX_PKMN_ALL ] = ++end;
+            _curPkmnStart = ( _curPkmnStart + 8 ) % MAX_PKMN_ALL;
+        } else if( _mode == SHOW_CAUGHT ) {
+            _curPkmn[ _curPkmnStart ] =
+                nextEntry( _curPkmn[ ( _curPkmnStart + MAX_PKMN_CAUGHT - 1 ) % MAX_PKMN_CAUGHT ] );
+            _curPkmnStart = ( _curPkmnStart + 1 ) % MAX_PKMN_CAUGHT;
+        }
+    }
+
+    void dex::rotateBackward( ) {
+        if( _mode == SHOW_ALL ) {
+            u16 start = _curPkmn[ _curPkmnStart ];
+            for( u8 i = 0; i < 8; ++i )
+                _curPkmn[ ( _curPkmnStart - i + MAX_PKMN_ALL ) % MAX_PKMN_ALL ] = --start;
+            _curPkmnStart = ( _curPkmnStart + MAX_PKMN_ALL - 8 ) % MAX_PKMN_ALL;
+        } else if( _mode == SHOW_CAUGHT ) {
+            _curPkmn[ ( _curPkmnStart + MAX_PKMN_CAUGHT - 1 ) % MAX_PKMN_CAUGHT ] =
+                previousEntry( _curPkmn[ _curPkmnStart ] );
+            _curPkmnStart = ( _curPkmnStart + MAX_PKMN_CAUGHT - 1 ) % MAX_PKMN_CAUGHT;
+        }
+    }
+
+    void dex::run( u16 p_pkmnIdx ) {
         FS::SAV->m_lstDex = p_pkmnIdx;
-        _dexUI->drawPage( true, true );
+
+        changeMode( _mode, p_pkmnIdx );
+        select( 12 * ( _mode == SHOW_ALL ) );
 
         touchPosition touch;
         loop( ) {
@@ -55,39 +133,40 @@ namespace DEX {
             int pressed = keysCurrent( );
             if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) )
                 break;
+            /*
             else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_DOWN ) ) {
                 FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + 1 ) % _maxPkmn;
-                _dexUI->drawPage( true );
+                _dexUI->drawPage( );
             } else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_UP ) ) {
                 FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + _maxPkmn - 1 ) % _maxPkmn;
-                _dexUI->drawPage( true );
+                _dexUI->drawPage( );
             } else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_R ) ) {
                 FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + 15 ) % _maxPkmn;
-                _dexUI->drawPage( true );
+                _dexUI->drawPage( );
             } else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_L ) ) {
                 FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + _maxPkmn - 15 ) % _maxPkmn;
-                _dexUI->drawPage( true );
+                _dexUI->drawPage( );
             } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
                 _dexUI->_currPage = ( _dexUI->_currPage + 1 ) % MAX_PAGES;
-                _dexUI->drawPage( false, true );
+                _dexUI->drawPage( );
             } else if( GET_AND_WAIT( KEY_LEFT ) ) {
                 _dexUI->_currPage = ( _dexUI->_currPage + MAX_PAGES - 1 ) % MAX_PAGES;
-                _dexUI->drawPage( false, true );
+                _dexUI->drawPage( );
             } else if( GET_AND_WAIT( KEY_SELECT ) || GET_AND_WAIT( KEY_Y ) ) {
                 _dexUI->_currForme++; //Just let it overflow
-                _dexUI->drawPage( false );
+                _dexUI->drawPage( );
             }
             for( u8 q = 0; q < 5; ++q )
                 if( _maxPkmn != u16( -1 ) && GET_AND_WAIT_C( dexsppos[ 0 ][ q ] + 16, dexsppos[ 1 ][ q ] + 16, 16 ) ) {
                     FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + _maxPkmn - 3 + q + ( q > 2 ? 1 : 0 ) ) % _maxPkmn;
-                    _dexUI->drawPage( true );
+                    _dexUI->drawPage( );
                 }
             for( u8 q = 5; q < 8; ++q )
                 if( GET_AND_WAIT_C( dexsppos[ 0 ][ q ] + 16, dexsppos[ 1 ][ q ] + 16, 16 )
                     && _dexUI->_currPage != ( q + 1 ) % MAX_PAGES ) {
                     _dexUI->_currPage = ( q + 1 ) % MAX_PAGES;
-                    _dexUI->drawPage( false, true );
-                }
+                    _dexUI->drawPage( );
+                } */
         }
     }
 }

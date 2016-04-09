@@ -31,16 +31,36 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "dexUI.h"
 
 namespace DEX {
-    extern const u8 dexsppos[ 2 ][ 9 ];
+    u16 nextEntry( u16 p_current );
+    u16 previousEntry( u16 p_current );
+
     class dex {
+    public:
+        enum mode {
+            SHOW_CAUGHT = 0,
+            SHOW_ALL = 1,
+            SHOW_SINGLE = 2
+        };
     private:
         dexUI* _dexUI;
         u16 _maxPkmn; //set this to -1 to show only a single dex entry
 
-        u32 runPKMNPage( );
+        u8 _page;
+        u16 _curPkmn[ 32 ];
+        u8 _curPkmnStart;
+
+        u8 _selectedIdx;
+
+        mode _mode;
+
+        void changeMode( mode p_newMode, u16 p_startIdx );
+        void select( u8 p_idx );
+
+        void rotateForward( );
+        void rotateBackward( );
     public:
-        dex( u16 p_maxPkmn, dexUI* p_dexUI )
-            : _dexUI( p_dexUI ), _maxPkmn( p_maxPkmn ) { }
+
+        dex( mode p_mode, u16 p_maxPkmn );
         ~dex( ) {
             delete _dexUI;
         }
