@@ -42,10 +42,8 @@ namespace DEX {
         dexUI( bool p_useInDex, u16 p_maxPkmn );
 
         void drawPage( u16 p_pkmnIdx, u8 p_page );
-        s8 drawSub( u8 p_mode, u16 p_pkmnIdcs[ 32 ], u16 p_idxStart, u8 p_selectedIdx ); // +1 -> rotateForward, -1 -> rotateBackward
-
-        void changeMode( u8 p_newMode );
-
-        void select( u8 p_idx );
+        void drawSub( u8 p_mode, u16 p_pkmnIdcs[ 32 ], u16 p_idxStart, u8 p_selectedIdx );
+        
+        s8 select( u8 p_idx ); // +1 -> rotateForward, -1 -> rotateBackward
     };
 }

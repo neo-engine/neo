@@ -65,16 +65,30 @@ namespace DEX {
 #define STAR_START PKMN_SPRITE_START( 8 )
 
 #define PAGE_ICON_START 1 // + 3
-#define BG_SPR_START 4 // + 2 * 8
-#define FRAME_START 20 // + 32
+#define FRAME_START_2 10 // + 5
+#define PKMN_ICON_START 32 // + 32
+#define FRAME_START 64 // + 32
+#define BG_SPR_START 96 // + 2 * 8
 
 #define PKMN_ICON_SUB( a ) ( 13 + ( a ) )
 #define PKMN_ICON_SUB_PAL( a ) ( 3 + ( a ) )
 
 
+    void setAllVis( bool p_vis ) {
+        for( u8 i = PKMN_ICON_START; i <= BG_SPR_START + 16; ++i )
+            IO::Oam->oamBuffer[ FRAME_START_2 + i ].isHidden = p_vis;
+        IO::updateOAM( true );
+    }
+    void setCghtVis( bool p_vis ) {
+        for( u8 i = 0; i < 5; ++i )
+            IO::Oam->oamBuffer[ FRAME_START_2 + i ].isHidden = p_vis;
+        IO::updateOAM( true );
+    }
+
     dexUI::dexUI( bool p_useInDex, u16 p_maxPkmn )
         : _useInDex( p_useInDex ), _maxPkmn( p_maxPkmn ) {
         IO::vramSetup( );
+        videoSetModeSub( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D | DISPLAY_SPR_EXT_PALETTE );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
 
         IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
@@ -109,12 +123,53 @@ namespace DEX {
 
         //Init sub
         IO::NAV->draw( );
+        IO::initOAMTable( true );
 
         tileCnt = 0;
-        tileCnt = IO::loadSprite( BACK_ID, BACK_ID, 0, tileCnt,
+        tileCnt = IO::loadSprite( BACK_ID, 0, BACK_ID, tileCnt,
                                   SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
-                                  BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_1, false );
+                                  BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_1, true );
 
+        tileCnt = IO::loadSprite( PAGE_ICON_START + 0, 0, PAGE_ICON_START + 0, tileCnt,
+                                  80, -10, 32, 32, memoPal,
+                                  memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadSprite( PAGE_ICON_START + 1, 0, PAGE_ICON_START + 1, tileCnt,
+                                  112, -10, 32, 32, PKMNPal,
+                                  PKMNTiles, PKMNTilesLen, false, false, false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadSprite( PAGE_ICON_START + 2, 0, PAGE_ICON_START + 2, tileCnt,
+                                  144, -10, 32, 32, time_iconPal,
+                                  time_iconTiles, time_iconTilesLen, false, false, false, OBJPRIORITY_0, true );
+
+        u16 tc2;
+        u8 k = 0;
+        for( u8 i : { 4, 0, 5, 1, 6, 2, 7, 3 } ) {
+            u16 x = 88 * ( i % 4 ) - ( i > 3 ) * 44, y = 28 + ( i > 3 ) * 72;
+            tc2 = IO::loadSprite( BG_SPR_START + 2 * k, 0, PAGE_ICON_START + 3, tileCnt,
+                                  x, y, 64, 64, DexSub2Pal,
+                                  DexSub2Tiles, DexSub2TilesLen, false, false, true, OBJPRIORITY_3, true );
+            IO::loadSprite( BG_SPR_START + 2 * k + 1, 0, PAGE_ICON_START + 3, tileCnt,
+                            20 + x, y, 64, 64, DexSub2Pal,
+                            DexSub2Tiles, DexSub2TilesLen, false, true, true, OBJPRIORITY_3, true );
+            u16 tc3; u8 l = 0;
+            auto jj = { 2, 0, 1, 3 };
+            if( i > 3 )
+                jj = { 0, 2, 3, 1 };
+            for( u8 j : jj ) {
+                tc3 = IO::loadSprite( FRAME_START + 4 * k + l, 0, PAGE_ICON_START + 4, tc2,
+                                      x + 6 + 40 * ( j % 2 ), y + 2 + 32 * ( j / 2 ), 32, 32, DexSubPal,
+                                      DexSubTiles, DexSubTilesLen, false, false, true, OBJPRIORITY_3, true );
+                ++l;
+            }
+            tc2 = tc3;
+            ++k;
+        }
+        tileCnt = tc2;
+
+        for( u8 i = 0; i < 5; ++i )
+            tileCnt = IO::loadSprite( FRAME_START_2 + i, 0, PAGE_ICON_START + 4, tc2,
+                                      32, 24 + 32 * i, 32, 32, DexSubPal,
+                                      DexSubTiles, DexSubTilesLen, false, false, true, OBJPRIORITY_3, true );
+        IO::updateOAM( true );
     }
 
     void dexUI::drawFormes( u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName ) {
@@ -417,15 +472,18 @@ namespace DEX {
         return;
     }
 
-    s8 dexUI::drawSub( u8 p_mode, u16 p_pkmnIdcs[ 32 ], u16 p_idxStart, u8 p_selectedIdx ) {
-
+    void dexUI::drawSub( u8 p_mode, u16 p_pkmnIdcs[ 32 ], u16 p_idxStart, u8 p_selectedIdx ) {
+        switch( ( dex::mode )p_mode ) {
+            case dex::SHOW_CAUGHT:
+                break;
+            case dex::SHOW_ALL:
+                break;
+            case dex::SHOW_SINGLE:
+                break;
+        }
     }
 
-    void dexUI::changeMode( u8 p_newMode ) {
-
-    }
-
-    void dexUI::select( u8 p_idx ) {
+    s8 dexUI::select( u8 p_idx ) {
 
     }
 }

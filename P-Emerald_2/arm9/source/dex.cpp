@@ -80,16 +80,21 @@ namespace DEX {
                 ++p_startPkmn;
         }
 
-        _dexUI->changeMode( p_newMode );
+        _mode = p_newMode;
+        _dexUI->drawPage( _curPkmn[ ( _curPkmnStart + _selectedIdx ) % MAX_PKMN_PER_PAGE( p_newMode ) ], _page );
+        _dexUI->drawSub( p_newMode, _curPkmn, _curPkmnStart, _selectedIdx );
     }
 
     void dex::select( u8 p_idx ) {
         _selectedIdx = p_idx;
 
         _dexUI->drawPage( _curPkmn[ p_idx ], _page );
-        s8 rs = _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
+        s8 rs = _dexUI->select( p_idx );
         if( rs == 1 ) rotateForward( );
         else if( rs == -1 ) rotateBackward( );
+
+        if( rs )
+            _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
     }
 
     void dex::rotateForward( ) {
