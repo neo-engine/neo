@@ -46,6 +46,7 @@ namespace DEX {
         u16 _maxPkmn; //set this to -1 to show only a single dex entry
 
         u8 _page;
+        u8 _forme;
         u16 _curPkmn[ 32 ];
         u8 _curPkmnStart;
 

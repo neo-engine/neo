@@ -66,23 +66,25 @@ namespace DEX {
 
 #define PAGE_ICON_START 1 // + 3
 #define FRAME_START_2 10 // + 5
+#define PKMN_ICON_START_2 15 // + 5
 #define PKMN_ICON_START 32 // + 32
 #define FRAME_START 64 // + 32
 #define BG_SPR_START 96 // + 2 * 8
-
-#define PKMN_ICON_SUB( a ) ( 13 + ( a ) )
-#define PKMN_ICON_SUB_PAL( a ) ( 3 + ( a ) )
 
 
     void setAllVis( bool p_vis ) {
         for( u8 i = PKMN_ICON_START; i <= BG_SPR_START + 16; ++i )
             IO::Oam->oamBuffer[ FRAME_START_2 + i ].isHidden = p_vis;
-        IO::updateOAM( true );
     }
     void setCghtVis( bool p_vis ) {
         for( u8 i = 0; i < 5; ++i )
             IO::Oam->oamBuffer[ FRAME_START_2 + i ].isHidden = p_vis;
-        IO::updateOAM( true );
+    }
+    void loadPkmnIconToSlot( u16 p_pkmnIdx, u8 p_slot, bool p_showAll ) {
+        if( !p_showAll ) {
+            IO::loadPKMNIcon( p_pkmnIdx, 64, 18 + 32 * p_slot, PKMN_ICON_START_2 + p_slot, 1, p_slot,
+                              IO::Oam->oamBuffer[ PKMN_ICON_START_2 + p_slot ].gfxIndex );
+        }
     }
 
     dexUI::dexUI( bool p_useInDex, u16 p_maxPkmn )
@@ -163,39 +165,41 @@ namespace DEX {
             tc2 = tc3;
             ++k;
         }
-        tileCnt = tc2;
-
-        for( u8 i = 0; i < 5; ++i )
-            tileCnt = IO::loadSprite( FRAME_START_2 + i, 0, PAGE_ICON_START + 4, tc2,
-                                      32, 24 + 32 * i, 32, 32, DexSubPal,
-                                      DexSubTiles, DexSubTilesLen, false, false, true, OBJPRIORITY_3, true );
+        for( u8 i = 0; i < 5; ++i ) {
+            IO::loadSprite( FRAME_START_2 + i, 0, PAGE_ICON_START + 4, tileCnt,
+                            64, 24 + 32 * i, 32, 32, DexSubPal,
+                            DexSubTiles, DexSubTilesLen, false, false, true, OBJPRIORITY_2, true );
+            tc2 = IO::loadSprite( PKMN_ICON_START_2 + i, 1, i, tc2,
+                                  64, 24 + 32 * i, 32, 32, DexSubPal,
+                                  DexSubTiles, DexSubTilesLen, false, false, true, OBJPRIORITY_1, true );
+        }
         IO::updateOAM( true );
     }
 
-    void dexUI::drawFormes( u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName ) {
-        pokemonData data; getAll( FS::SAV->m_lstDex, data );
+    void dexUI::drawFormes( u16 p_pkmnId, u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName, u8 p_forme ) {
+        pokemonData data; getAll( p_pkmnId, data );
 
         u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 10, 64,
-                                          PKMN_SPRITE_START( 0 ), 0, 0, false, false, p_hasGenderDifference && ( _currForme % 2 ), true );
+                                          PKMN_SPRITE_START( 0 ), 0, 0, false, false, p_hasGenderDifference && ( p_forme % 2 ), true );
         if( data.m_formecnt )
             IO::boldFont->printString( p_formeName.c_str( ), 58, 157, false, IO::font::CENTER );
-        else if( p_hasGenderDifference && ( _currForme % 2 ) )
+        else if( p_hasGenderDifference && ( p_forme % 2 ) )
             IO::boldFont->printString( "weiblich", 58, 157, false, IO::font::CENTER );
         else if( p_hasGenderDifference )
             IO::boldFont->printString( "männlich", 58, 157, false, IO::font::CENTER );
         else
-            IO::boldFont->printString( getDisplayName( FS::SAV->m_lstDex ), 58, 157, false, IO::font::CENTER );
+            IO::boldFont->printString( getDisplayName( p_pkmnId ), 58, 157, false, IO::font::CENTER );
 
         tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 110, 64,
-                                      PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true, p_hasGenderDifference && ( _currForme % 2 ) );
+                                      PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true, p_hasGenderDifference && ( p_forme % 2 ) );
         if( data.m_formecnt )
             IO::boldFont->printString( p_formeName.c_str( ), 158, 150, false, IO::font::CENTER );
-        else if( p_hasGenderDifference && ( _currForme % 2 ) )
+        else if( p_hasGenderDifference && ( p_forme % 2 ) )
             IO::boldFont->printString( "weiblich", 158, 150, false, IO::font::CENTER );
         else if( p_hasGenderDifference )
             IO::boldFont->printString( "männlich", 158, 150, false, IO::font::CENTER );
         else
-            IO::boldFont->printString( getDisplayName( FS::SAV->m_lstDex ), 158, 150, false, IO::font::CENTER );
+            IO::boldFont->printString( getDisplayName( p_pkmnId ), 158, 150, false, IO::font::CENTER );
         IO::boldFont->printString( "(schillernd)", 158, 166, false, IO::font::CENTER );
 
         //Load Icons of the other formes ( max 4 )
@@ -205,7 +209,7 @@ namespace DEX {
             IO::updateOAM( false );
             return;
         }
-        u8 currpos = ( _currForme / ( 1 + p_hasGenderDifference ) ) % data.m_formecnt;
+        u8 currpos = ( p_forme / ( 1 + p_hasGenderDifference ) ) % data.m_formecnt;
         tileCnt = IO::OamTop->oamBuffer[ STAR_START ].gfxIndex + 64;
         for( u8 i = 0; i < u16( std::min( 4, data.m_formecnt - 1 ) ); ++i ) {
             currpos = ( currpos + 1 ) % data.m_formecnt;
@@ -216,9 +220,12 @@ namespace DEX {
         IO::updateOAM( false );
     }
 
-    void dexUI::drawPage( u16 p_pkmnIdx, u8 p_page ) {
+    void dexUI::drawPage( u16 p_pkmnIdx, u8 p_page, u8 p_forme ) {
         if( !p_pkmnIdx )
             p_pkmnIdx = _maxPkmn;
+
+        for( u8 i = 0; i < 3; ++i )
+            IO::Oam->oamBuffer[ PAGE_ICON_START + i ].isHidden = false;
 
         if( _useInDex && !IN_DEX( p_pkmnIdx ) ) {
             IO::NAV->draw( );
@@ -231,18 +238,21 @@ namespace DEX {
             BG_PALETTE[ WHITE_IDX ] = WHITE;
             BG_PALETTE[ BLACK_IDX ] = BLACK;
             IO::boldFont->printString( "Keine Daten.", 128, 150, false, IO::font::CENTER );
+            IO::updateOAM( true );
             return;
         }
+        IO::Oam->oamBuffer[ PAGE_ICON_START + p_page ].isHidden = true;
+        IO::updateOAM( true );
 
         pokemonData data; getAll( p_pkmnIdx, data );
 
         bool isFixed = !FS::exists( "nitro:/PICS/SPRITES/PKMN/", p_pkmnIdx, "f" );
 
         if( p_page <= 1 )
-            _currForme %= data.m_formecnt ? ( ( 2 - isFixed ) * data.m_formecnt ) : ( 2 - isFixed );
+            p_forme %= data.m_formecnt ? ( ( 2 - isFixed ) * data.m_formecnt ) : ( 2 - isFixed );
 
-        u16 currFormeIdx = data.m_formecnt ? data.m_formeIdx[ _currForme / ( 2 - isFixed ) ] : p_pkmnIdx;
-        sprintf( buffer, "%s", data.m_formecnt ? data.m_formeName[ _currForme / ( 2 - isFixed ) ] : data.m_displayName );
+        u16 currFormeIdx = data.m_formecnt ? data.m_formeIdx[ p_forme / ( 2 - isFixed ) ] : p_pkmnIdx;
+        sprintf( buffer, "%s", data.m_formecnt ? data.m_formeName[ p_forme / ( 2 - isFixed ) ] : data.m_displayName );
         std::string formeName = std::string( buffer );
 
         if( currFormeIdx != p_pkmnIdx )
@@ -434,14 +444,14 @@ namespace DEX {
                 IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 2 ].isHidden = true;
 
                 isFixed = !isFixed;
-                drawFormes( currFormeIdx, isFixed, formeName );
+                drawFormes( p_pkmnIdx, currFormeIdx, isFixed, formeName, p_forme );
                 break;
             }
             case 2:
             {
-                if( _currForme % 3 == 0 )
+                if( p_forme % 3 == 0 )
                     FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/", "HoennMap" );
-                else if( _currForme % 3 == 1 )
+                else if( p_forme % 3 == 1 )
                     FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/", "KantoMap" );
                 else
                     FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/", "JohtoMap" );
@@ -473,14 +483,42 @@ namespace DEX {
     }
 
     void dexUI::drawSub( u8 p_mode, u16 p_pkmnIdcs[ 32 ], u16 p_idxStart, u8 p_selectedIdx ) {
+        setAllVis( true );
+        setCghtVis( true );
+        IO::NAV->draw( );
         switch( ( dex::mode )p_mode ) {
+            case dex::SHOW_SINGLE:
             case dex::SHOW_CAUGHT:
+                setCghtVis( false );
+                for( u8 i = 0; i < 5; ++i ) {
+                    u16 id = p_pkmnIdcs[ ( p_idxStart + i ) % 5 ] % ( MAX_PKMN + 1 );
+
+                    if( !id ) {
+                        IO::Oam->oamBuffer[ FRAME_START_2 + i ].isHidden = true;
+                        if( !i )
+                            IO::boldFont->printString( "Keine Daten.", 128, 89, true, IO::font::CENTER );
+                        continue;
+                    }
+
+                    bool inDex = IN_DEX( id );
+                    loadPkmnIconToSlot( inDex * id, i, false );
+                    sprintf( buffer, "%03d", id );
+                    IO::boldFont->printString( buffer, 32, 28 + 32 * i, true );
+                    IO::boldFont->printString( getDisplayName( id ), 100, 28 + 32 * i, true );
+
+                    if( i == p_selectedIdx ) {
+                        pokemonData p; getAll( id, p );
+                        BG_PALETTE_SUB[ COLOR_IDX ] = IO::getColor( p.m_types[ 0 ] );
+                    }
+                    IO::printRectangle( 64 + 3, 24 + 32 * i + 2, 64 + 28, 24 + 32 * i + 26,
+                                        true, false, i == p_selectedIdx ? COLOR_IDX : WHITE_IDX );
+                }
                 break;
             case dex::SHOW_ALL:
-                break;
-            case dex::SHOW_SINGLE:
+                setAllVis( false );
                 break;
         }
+        IO::updateOAM( true );
     }
 
     s8 dexUI::select( u8 p_idx ) {

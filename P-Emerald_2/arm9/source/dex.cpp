@@ -38,7 +38,10 @@ namespace DEX {
 
 #define MAX_PKMN_ALL 32
 #define MAX_PKMN_CAUGHT 5
-#define MAX_PKMN_PER_PAGE( p_mode ) ( (p_mode == SHOW_CAUGHT) ? MAX_PKMN_CAUGHT : MAX_PKMN_ALL )
+#define MAX_PKMN_PER_PAGE( p_mode ) ( (p_mode == dex::SHOW_CAUGHT) ? MAX_PKMN_CAUGHT : MAX_PKMN_ALL )
+
+#define CURR_PKMN _curPkmn[ ( _curPkmnStart + _selectedIdx ) % MAX_PKMN_PER_PAGE( _mode ) ]
+#define DRAW_TOP( ) _dexUI->drawPage( CURR_PKMN, _page, _forme )
 
     u16 nextEntry( u16 p_startIdx ) {
         if( p_startIdx > MAX_PKMN )
@@ -52,14 +55,15 @@ namespace DEX {
     u16 previousEntry( u16 p_startIdx ) {
         if( p_startIdx > MAX_PKMN )
             p_startIdx = MAX_PKMN + 1;
-        for( u16 i = p_startIdx - 1; p_startIdx > 0 && p_startIdx <= MAX_PKMN; --i )
+        if( !p_startIdx ) return 0;
+        for( u16 i = p_startIdx - 1; i && i <= MAX_PKMN; --i )
             if( IN_DEX( i ) )
                 return i;
         return 0;
     }
 
     dex::dex( mode p_mode, u16 p_maxPkmn )
-        : _maxPkmn( p_maxPkmn ), _page( 0 ), _mode( p_mode ) {
+        : _maxPkmn( p_maxPkmn ), _page( 0 ), _forme( 0 ), _mode( p_mode ) {
         _dexUI = new dexUI( p_mode != SHOW_SINGLE, p_maxPkmn );
     }
 
@@ -73,7 +77,9 @@ namespace DEX {
         _curPkmnStart = 0;
 
         for( u8 i = 0; i < MAX_PKMN_PER_PAGE( p_newMode ); ++i ) {
-            _curPkmn[ i ] = p_startPkmn;
+            if( p_newMode == SHOW_SINGLE && i )
+                break;
+            _curPkmn[ i ] = p_startPkmn;                
             if( p_newMode == SHOW_CAUGHT )
                 p_startPkmn = nextEntry( p_startPkmn );
             else
@@ -81,14 +87,14 @@ namespace DEX {
         }
 
         _mode = p_newMode;
-        _dexUI->drawPage( _curPkmn[ ( _curPkmnStart + _selectedIdx ) % MAX_PKMN_PER_PAGE( p_newMode ) ], _page );
+        DRAW_TOP( );
         _dexUI->drawSub( p_newMode, _curPkmn, _curPkmnStart, _selectedIdx );
     }
 
     void dex::select( u8 p_idx ) {
         _selectedIdx = p_idx;
 
-        _dexUI->drawPage( _curPkmn[ p_idx ], _page );
+        _dexUI->drawPage( _curPkmn[ p_idx ], _page, _forme );
         s8 rs = _dexUI->select( p_idx );
         if( rs == 1 ) rotateForward( );
         else if( rs == -1 ) rotateBackward( );
@@ -124,6 +130,7 @@ namespace DEX {
     }
 
     void dex::run( u16 p_pkmnIdx ) {
+
         FS::SAV->m_lstDex = p_pkmnIdx;
 
         changeMode( _mode, p_pkmnIdx );
@@ -138,6 +145,45 @@ namespace DEX {
             int pressed = keysCurrent( );
             if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) )
                 break;
+            else if( GET_AND_WAIT( KEY_SELECT ) || GET_AND_WAIT( KEY_Y ) ) {
+                if( _page ) {
+                    _forme++;
+                    DRAW_TOP( );
+                }
+            }
+
+            if( _mode != SHOW_ALL) {
+                if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                    _page = ( _page + 1 ) % MAX_PAGES;
+                    DRAW_TOP( );
+                } else if( GET_AND_WAIT( KEY_LEFT ) ) {
+                    _page = ( _page + MAX_PAGES - 1 ) % MAX_PAGES;
+                    DRAW_TOP( );
+                }
+            }
+            if( _mode == SHOW_CAUGHT ) {
+                if( GET_AND_WAIT( KEY_DOWN ) ) {
+                    if( nextEntry( CURR_PKMN ) < MAX_PKMN + 1 ) {
+                        if( _selectedIdx == 4 )
+                            rotateForward( );
+                        else
+                            _selectedIdx++;
+                        FS::SAV->m_lstDex = CURR_PKMN;
+                        DRAW_TOP( );
+                        _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
+                    }
+                } else if( GET_AND_WAIT( KEY_UP ) ) {
+                    if( previousEntry( CURR_PKMN ) ) {
+                        if( _selectedIdx == 0 )
+                            rotateBackward( );
+                        else
+                            _selectedIdx--;
+                        FS::SAV->m_lstDex = CURR_PKMN;
+                        DRAW_TOP( ); 
+                        _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
+                    }
+                }
+            }
             /*
             else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_DOWN ) ) {
                 FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + 1 ) % _maxPkmn;
@@ -156,9 +202,6 @@ namespace DEX {
                 _dexUI->drawPage( );
             } else if( GET_AND_WAIT( KEY_LEFT ) ) {
                 _dexUI->_currPage = ( _dexUI->_currPage + MAX_PAGES - 1 ) % MAX_PAGES;
-                _dexUI->drawPage( );
-            } else if( GET_AND_WAIT( KEY_SELECT ) || GET_AND_WAIT( KEY_Y ) ) {
-                _dexUI->_currForme++; //Just let it overflow
                 _dexUI->drawPage( );
             }
             for( u8 q = 0; q < 5; ++q )

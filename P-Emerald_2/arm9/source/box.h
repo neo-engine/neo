@@ -55,7 +55,8 @@ namespace BOX {
         u8 count( u16 p_pkmnIdx ) const {
             u8 res = 0;
             for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i )
-                if( ( m_pokemon + i )->m_speciesId == p_pkmnIdx )
+                if( !( m_pokemon + i )->isEgg( )
+                    && ( m_pokemon + i )->m_speciesId == p_pkmnIdx )
                     res++;
             return res;
         }

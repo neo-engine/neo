@@ -35,13 +35,12 @@ namespace DEX {
     private:
         bool _useInDex;
         u16 _maxPkmn;
-        u8 _currForme;
 
-        void drawFormes( u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName );
+        void drawFormes( u16 p_pkmnId, u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName, u8 p_forme );
     public:
         dexUI( bool p_useInDex, u16 p_maxPkmn );
 
-        void drawPage( u16 p_pkmnIdx, u8 p_page );
+        void drawPage( u16 p_pkmnIdx, u8 p_page, u8 p_forme );
         void drawSub( u8 p_mode, u16 p_pkmnIdcs[ 32 ], u16 p_idxStart, u8 p_selectedIdx );
         
         s8 select( u8 p_idx ); // +1 -> rotateForward, -1 -> rotateBackward

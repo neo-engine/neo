@@ -186,9 +186,11 @@ namespace FS {
         for( u8 i = 0; i < MAX_BOXES; i++ )
             res += m_storedPokemon[ i ].count( p_pkmnIdx );
         for( u8 i = 0; i < 6; ++i ) {
-            if( m_pkmnTeam[ i ].m_boxdata.m_speciesId == p_pkmnIdx )
+            if( !m_pkmnTeam[ i ].isEgg( )
+                && m_pkmnTeam[ i ].m_boxdata.m_speciesId == p_pkmnIdx )
                 ++res;
-            if( m_clipboard[ i ].m_speciesId == p_pkmnIdx )
+            if( !m_clipboard[ i ].isEgg( )
+                && m_clipboard[ i ].m_speciesId == p_pkmnIdx )
                 ++res;
         }
         return res;
