@@ -68,10 +68,17 @@ namespace DEX {
     }
 
     void dex::changeMode( mode p_newMode, u16 p_startPkmn ) {
-        if( p_newMode == SHOW_CAUGHT && !IN_DEX( p_startPkmn ) )
+        IO::NAV->draw( );
+        if( p_newMode == SHOW_CAUGHT && !IN_DEX( p_startPkmn ) ) {
             p_startPkmn = nextEntry( p_startPkmn );
-        if( p_newMode == SHOW_ALL )
-            p_startPkmn -= 12;
+            if( p_startPkmn > MAX_PKMN )
+                p_startPkmn = previousEntry( p_startPkmn );
+        }
+        if( p_newMode == SHOW_ALL ) {
+            _selectedIdx = 12 + ( ( p_startPkmn + 7 ) % 8 );
+            p_startPkmn = ( ( p_startPkmn - 1 ) / 8 * 8 ) - 11;
+        } else
+            _selectedIdx = 0;
 
         memset( _curPkmn, 0, sizeof( _curPkmn ) );
         _curPkmnStart = 0;
@@ -79,7 +86,7 @@ namespace DEX {
         for( u8 i = 0; i < MAX_PKMN_PER_PAGE( p_newMode ); ++i ) {
             if( p_newMode == SHOW_SINGLE && i )
                 break;
-            _curPkmn[ i ] = p_startPkmn;                
+            _curPkmn[ i ] = p_startPkmn;
             if( p_newMode == SHOW_CAUGHT )
                 p_startPkmn = nextEntry( p_startPkmn );
             else
@@ -92,15 +99,24 @@ namespace DEX {
     }
 
     void dex::select( u8 p_idx ) {
+        if( _curPkmn[ ( _curPkmnStart + p_idx ) % MAX_PKMN_PER_PAGE( _mode ) ] > MAX_PKMN
+            || !_curPkmn[ ( _curPkmnStart + p_idx ) % MAX_PKMN_PER_PAGE( _mode ) ] )
+            return;
+
+        u8 oldIdx = _selectedIdx;
+        while( p_idx >= 20 ) {
+            rotateForward( );
+            p_idx = ( p_idx + MAX_PKMN_ALL - 8 ) % MAX_PKMN_ALL;
+        }
+        while( p_idx < 12 ) {
+            rotateBackward( );
+            p_idx = ( p_idx + 8 ) % MAX_PKMN_ALL;
+        }
         _selectedIdx = p_idx;
+        FS::SAV->m_lstDex = CURR_PKMN;
 
-        _dexUI->drawPage( _curPkmn[ p_idx ], _page, _forme );
-        s8 rs = _dexUI->select( p_idx );
-        if( rs == 1 ) rotateForward( );
-        else if( rs == -1 ) rotateBackward( );
-
-        if( rs )
-            _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
+        DRAW_TOP( );
+        _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx, oldIdx );
     }
 
     void dex::rotateForward( ) {
@@ -119,7 +135,7 @@ namespace DEX {
     void dex::rotateBackward( ) {
         if( _mode == SHOW_ALL ) {
             u16 start = _curPkmn[ _curPkmnStart ];
-            for( u8 i = 0; i < 8; ++i )
+            for( u8 i = 1; i <= 8; ++i )
                 _curPkmn[ ( _curPkmnStart - i + MAX_PKMN_ALL ) % MAX_PKMN_ALL ] = --start;
             _curPkmnStart = ( _curPkmnStart + MAX_PKMN_ALL - 8 ) % MAX_PKMN_ALL;
         } else if( _mode == SHOW_CAUGHT ) {
@@ -134,7 +150,6 @@ namespace DEX {
         FS::SAV->m_lstDex = p_pkmnIdx;
 
         changeMode( _mode, p_pkmnIdx );
-        select( 12 * ( _mode == SHOW_ALL ) );
 
         touchPosition touch;
         loop( ) {
@@ -151,16 +166,30 @@ namespace DEX {
                     DRAW_TOP( );
                 }
             }
-
-            if( _mode != SHOW_ALL) {
-                if( GET_AND_WAIT( KEY_RIGHT ) ) {
-                    _page = ( _page + 1 ) % MAX_PAGES;
-                    DRAW_TOP( );
-                } else if( GET_AND_WAIT( KEY_LEFT ) ) {
-                    _page = ( _page + MAX_PAGES - 1 ) % MAX_PAGES;
-                    DRAW_TOP( );
+            if( CURR_PKMN && IN_DEX( CURR_PKMN ) )
+                for( u8 i = 0; i < 3; ++i ) {
+                    if( IO::Oam->oamBuffer[ 1 + i ].isHidden )
+                        continue;
+                    if( GET_AND_WAIT_C( 94 + 32 * i, 4, 14 ) ) {
+                        _page = i;
+                        DRAW_TOP( );
+                        break;
+                    }
                 }
+
+            if( GET_AND_WAIT( KEY_R ) ) {
+                _page = ( _page + 1 ) % MAX_PAGES;
+                DRAW_TOP( );
+            } else if( GET_AND_WAIT( KEY_L ) ) {
+                _page = ( _page + MAX_PAGES - 1 ) % MAX_PAGES;
+                DRAW_TOP( );
             }
+
+            if( _mode != SHOW_SINGLE )
+                if( GET_AND_WAIT( KEY_START )
+                    || GET_AND_WAIT_R( 1, 1, 30 * ( 1 + ( _mode == SHOW_CAUGHT ) ), 16 ) )
+                    changeMode( mode( !_mode ), CURR_PKMN );
+
             if( _mode == SHOW_CAUGHT ) {
                 if( GET_AND_WAIT( KEY_DOWN ) ) {
                     if( nextEntry( CURR_PKMN ) < MAX_PKMN + 1 ) {
@@ -179,10 +208,21 @@ namespace DEX {
                         else
                             _selectedIdx--;
                         FS::SAV->m_lstDex = CURR_PKMN;
-                        DRAW_TOP( ); 
+                        DRAW_TOP( );
                         _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
                     }
                 }
+            } else if( _mode == SHOW_ALL ) {
+                if( GET_AND_WAIT( KEY_DOWN ) ) {
+                    select( _selectedIdx + 1 );
+                } else if( GET_AND_WAIT( KEY_UP ) ) {
+                    select( _selectedIdx - 1 );
+                }
+                //else if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                //    select( ( _selectedIdx + MAX_PKMN_ALL - 1 ) % MAX_PKMN_ALL );
+                //} else if( GET_AND_WAIT( KEY_LEFT ) ) {
+                //    select( ( _selectedIdx + MAX_PKMN_ALL - 1 ) % MAX_PKMN_ALL );
+                //}
             }
             /*
             else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_DOWN ) ) {

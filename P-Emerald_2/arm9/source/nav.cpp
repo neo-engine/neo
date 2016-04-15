@@ -328,7 +328,7 @@ namespace IO {
                         memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
                         for( int i = 0; i < 5; ++i ) {
                             pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                            a = pokemon( 0, rand( ) % MAX_PKMN + 1, 0,
+                            a = pokemon( 0, rand() % MAX_PKMN + 1, 0,
                                          50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
                                          !FS::SAV->m_isMale, i, false, i % 2, i == 3, i + rand( ) % 500, i, i );
                             a.m_stats.m_acHP *= i / 5.0;
@@ -342,7 +342,7 @@ namespace IO {
                             }
                             a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
                             a.m_boxdata.m_ribbons1[ 3 ] = 0;
-                            a.m_boxdata.m_holdItem = I_DURIN_BERRY + i;
+                            a.m_boxdata.m_holdItem = 1 + rand( ) % 400;
 
                             FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
                         }

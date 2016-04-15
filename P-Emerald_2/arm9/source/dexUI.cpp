@@ -74,17 +74,32 @@ namespace DEX {
 
     void setAllVis( bool p_vis ) {
         for( u8 i = PKMN_ICON_START; i <= BG_SPR_START + 16; ++i )
-            IO::Oam->oamBuffer[ FRAME_START_2 + i ].isHidden = p_vis;
+            IO::Oam->oamBuffer[ i ].isHidden = p_vis;
     }
     void setCghtVis( bool p_vis ) {
-        for( u8 i = 0; i < 5; ++i )
+        for( u8 i = 0; i < 5; ++i ) {
             IO::Oam->oamBuffer[ FRAME_START_2 + i ].isHidden = p_vis;
+            IO::Oam->oamBuffer[ PKMN_ICON_START_2 + i ].isHidden = p_vis;
+        }
     }
     void loadPkmnIconToSlot( u16 p_pkmnIdx, u8 p_slot, bool p_showAll ) {
         if( !p_showAll ) {
             IO::loadPKMNIcon( p_pkmnIdx, 64, 18 + 32 * p_slot, PKMN_ICON_START_2 + p_slot, 1, p_slot,
                               IO::Oam->oamBuffer[ PKMN_ICON_START_2 + p_slot ].gfxIndex );
+        } else {
+            u16 shf = 2 + 4 * !!( IO::Oam->oamBuffer[ BG_SPR_START + 2 * 3 ].x == 44 );
+            if( p_slot >= shf && p_slot < 30 ) {
+                IO::loadPKMNIcon( p_pkmnIdx, IO::Oam->oamBuffer[ FRAME_START + p_slot ].x,
+                                  IO::Oam->oamBuffer[ FRAME_START + p_slot ].y - 6, PKMN_ICON_START + p_slot,
+                                  1 + p_slot / 16, p_slot % 16, IO::Oam->oamBuffer[ PKMN_ICON_START_2 ].gfxIndex + 31 * ( p_slot - shf ), true );
+                IO::Oam->oamBuffer[ PKMN_ICON_START + p_slot ].priority = OBJPRIORITY_3;
+            }
         }
+    }
+
+    void moveAll( s8 p_x ) {
+        for( u8 i = PKMN_ICON_START; i <= BG_SPR_START + 16; ++i )
+            IO::Oam->oamBuffer[ i ].x += p_x;
     }
 
     dexUI::dexUI( bool p_useInDex, u16 p_maxPkmn )
@@ -142,7 +157,7 @@ namespace DEX {
                                   144, -10, 32, 32, time_iconPal,
                                   time_iconTiles, time_iconTilesLen, false, false, false, OBJPRIORITY_0, true );
 
-        u16 tc2;
+        u16 tc2, tc3;
         u8 k = 0;
         for( u8 i : { 4, 0, 5, 1, 6, 2, 7, 3 } ) {
             u16 x = 88 * ( i % 4 ) - ( i > 3 ) * 44, y = 28 + ( i > 3 ) * 72;
@@ -152,7 +167,7 @@ namespace DEX {
             IO::loadSprite( BG_SPR_START + 2 * k + 1, 0, PAGE_ICON_START + 3, tileCnt,
                             20 + x, y, 64, 64, DexSub2Pal,
                             DexSub2Tiles, DexSub2TilesLen, false, true, true, OBJPRIORITY_3, true );
-            u16 tc3; u8 l = 0;
+            u8 l = 0;
             auto jj = { 2, 0, 1, 3 };
             if( i > 3 )
                 jj = { 0, 2, 3, 1 };
@@ -162,14 +177,13 @@ namespace DEX {
                                       DexSubTiles, DexSubTilesLen, false, false, true, OBJPRIORITY_3, true );
                 ++l;
             }
-            tc2 = tc3;
             ++k;
         }
         for( u8 i = 0; i < 5; ++i ) {
-            IO::loadSprite( FRAME_START_2 + i, 0, PAGE_ICON_START + 4, tileCnt,
+            IO::loadSprite( FRAME_START_2 + i, 0, PAGE_ICON_START + 4, tc2,
                             64, 24 + 32 * i, 32, 32, DexSubPal,
                             DexSubTiles, DexSubTilesLen, false, false, true, OBJPRIORITY_2, true );
-            tc2 = IO::loadSprite( PKMN_ICON_START_2 + i, 1, i, tc2,
+            tc3 = IO::loadSprite( PKMN_ICON_START_2 + i, 1, i, tc3,
                                   64, 24 + 32 * i, 32, 32, DexSubPal,
                                   DexSubTiles, DexSubTilesLen, false, false, true, OBJPRIORITY_1, true );
         }
@@ -225,23 +239,35 @@ namespace DEX {
             p_pkmnIdx = _maxPkmn;
 
         for( u8 i = 0; i < 3; ++i )
-            IO::Oam->oamBuffer[ PAGE_ICON_START + i ].isHidden = false;
+            IO::Oam->oamBuffer[ PAGE_ICON_START + i ].isHidden = true;
+
+        consoleSelect( &IO::Top );
+        consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
+        consoleClear( );
+        printf( "\x1b[39m" );
+
+        //Init some colors
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( WHITE_IDX, 2 );
+        IO::boldFont->setColor( BLACK_IDX, 2 );
+        IO::boldFont->setColor( WHITE_IDX, 1 );
 
         if( _useInDex && !IN_DEX( p_pkmnIdx ) ) {
-            IO::NAV->draw( );
+            for( u8 i = 0; i < 128; ++i )
+                IO::OamTop->oamBuffer[ i ].isHidden = true;
             dmaCopy( DexTopBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-            dmaCopy( DexTopPal, BG_PALETTE, 480 );
+            dmaCopy( DexTopPal, BG_PALETTE, 512 );
             IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", 0, 80, 35, PKMN_SPRITE_START( 0 ), 0, 0, false );
 
-            IO::boldFont->setColor( BLACK_IDX, 2 );
-            IO::boldFont->setColor( WHITE_IDX, 1 );
             BG_PALETTE[ WHITE_IDX ] = WHITE;
             BG_PALETTE[ BLACK_IDX ] = BLACK;
             IO::boldFont->printString( "Keine Daten.", 128, 150, false, IO::font::CENTER );
             IO::updateOAM( true );
             return;
         }
-        IO::Oam->oamBuffer[ PAGE_ICON_START + p_page ].isHidden = true;
+        for( u8 i = 0; i < 3; ++i )
+            IO::Oam->oamBuffer[ PAGE_ICON_START + i ].isHidden = i == p_page;
         IO::updateOAM( true );
 
         pokemonData data; getAll( p_pkmnIdx, data );
@@ -257,18 +283,6 @@ namespace DEX {
 
         if( currFormeIdx != p_pkmnIdx )
             getAll( currFormeIdx, data );
-
-
-        consoleSelect( &IO::Top );
-        consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
-        consoleClear( );
-        printf( "\x1b[39m" );
-        //Init some colors
-        IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( WHITE_IDX, 2 );
-        IO::boldFont->setColor( BLACK_IDX, 2 );
-        IO::boldFont->setColor( WHITE_IDX, 1 );
 
         for( u8 i = 0; i < PKMN_SPRITE_START( 5 ); ++i )
             IO::OamTop->oamBuffer[ i ].isHidden = true;
@@ -314,6 +328,7 @@ namespace DEX {
                     printf( "aus %s", getDisplayName( data.m_preEvolution ) );
                     break;
                 case 3:
+                default:
                     if( p_page == 0 ) {
                         dmaCopy( DexTop3Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
                         dmaCopy( DexTop3Pal + 64, BG_PALETTE + 64, 256 );
@@ -325,8 +340,6 @@ namespace DEX {
                                       IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                     consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
                     printf( "aus %s", ItemList[ data.m_preEvolution ]->m_itemName.c_str( ) );
-                    break;
-                default:
                     break;
             }
             switch( data.m_types[ 0 ] ) {
@@ -482,19 +495,24 @@ namespace DEX {
         return;
     }
 
-    void dexUI::drawSub( u8 p_mode, u16 p_pkmnIdcs[ 32 ], u16 p_idxStart, u8 p_selectedIdx ) {
+    void dexUI::drawSub( u8 p_mode, u16 p_pkmnIdcs[ 32 ], u16 p_idxStart, u8 p_selectedIdx, u8 p_oldIdx ) {
         setAllVis( true );
         setCghtVis( true );
-        IO::NAV->draw( );
         switch( ( dex::mode )p_mode ) {
             case dex::SHOW_SINGLE:
             case dex::SHOW_CAUGHT:
+                IO::NAV->draw( );
+                IO::regularFont->setColor( 0, 0 );
+                IO::regularFont->setColor( BLACK_IDX, 1 );
+                IO::regularFont->setColor( 0, 2 );
                 setCghtVis( false );
+                IO::regularFont->printString( "Einträge", 2, 0, true );
                 for( u8 i = 0; i < 5; ++i ) {
                     u16 id = p_pkmnIdcs[ ( p_idxStart + i ) % 5 ] % ( MAX_PKMN + 1 );
 
                     if( !id ) {
                         IO::Oam->oamBuffer[ FRAME_START_2 + i ].isHidden = true;
+                        IO::Oam->oamBuffer[ PKMN_ICON_START_2 + i ].isHidden = true;
                         if( !i )
                             IO::boldFont->printString( "Keine Daten.", 128, 89, true, IO::font::CENTER );
                         continue;
@@ -516,12 +534,50 @@ namespace DEX {
                 break;
             case dex::SHOW_ALL:
                 setAllVis( false );
+
+                IO::regularFont->printString( "Alle", 2, 0, true );
+                if( p_oldIdx )
+                    IO::printRectangle( IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].x + 3,
+                                        IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].y + 2,
+                                        IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].x + 29,
+                                        IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].y + 25,
+                                        true, false, 0 );
+
+                if( 12 <= p_selectedIdx && p_selectedIdx < 16 ) {
+                    if( IO::Oam->oamBuffer[ BG_SPR_START + 2 * 3 ].x == 88 - 44 )
+                        moveAll( +44 );
+                } else if( 16 <= p_selectedIdx && p_selectedIdx < 20 ) {
+                    if( IO::Oam->oamBuffer[ BG_SPR_START + 2 * 3 ].x == 88 )
+                        moveAll( -44 );
+                }
+
+                for( u8 i = 0; i < 32; ++i ) {
+                    u16 id = p_pkmnIdcs[ ( p_idxStart + i ) % 32 ];
+                    if( id > MAX_PKMN ) id = 0;
+                    if( !id ) {
+                        IO::Oam->oamBuffer[ FRAME_START + i ].isHidden = true;
+                        IO::Oam->oamBuffer[ PKMN_ICON_START + i ].isHidden = true;
+                        if( !( i % 4 ) ) {
+                            IO::Oam->oamBuffer[ BG_SPR_START + 2 * ( i / 4 ) ].isHidden = true;
+                            IO::Oam->oamBuffer[ BG_SPR_START + 2 * ( i / 4 ) + 1 ].isHidden = true;
+                        }
+                        continue;
+                    }
+                    bool inDex = IN_DEX( id );
+                    loadPkmnIconToSlot( inDex * id, i, true );
+                    if( i == p_selectedIdx ) {
+                        pokemonData p; getAll( id * inDex, p );
+                        IO::Oam->oamBuffer[ PKMN_ICON_START + i ].priority = OBJPRIORITY_1;
+                        BG_PALETTE_SUB[ COLOR_IDX ] = IO::getColor( p.m_types[ 0 ] );
+                        IO::printRectangle( IO::Oam->oamBuffer[ FRAME_START + i ].x + 3,
+                                            IO::Oam->oamBuffer[ FRAME_START + i ].y + 2,
+                                            IO::Oam->oamBuffer[ FRAME_START + i ].x + 29,
+                                            IO::Oam->oamBuffer[ FRAME_START + i ].y + 25,
+                                            true, false, COLOR_IDX );
+                    }
+                }
                 break;
         }
         IO::updateOAM( true );
-    }
-
-    s8 dexUI::select( u8 p_idx ) {
-
     }
 }

@@ -781,8 +781,8 @@ namespace STS {
 
         u16 tileCnt = Oam->oamBuffer[ TYPE_IDX ].gfxIndex;
 
-        if( !IO::loadRibbonIcon( p_ribbonIdx, 110, 28, RIBBON_IDX, TYPE_PAL( 0 ), tileCnt, p_bottom ) )
-            tileCnt = IO::loadEggIcon( 110, 28, RIBBON_IDX, TYPE_PAL( 0 ), tileCnt, p_bottom );
+        if( !IO::loadRibbonIcon( p_ribbonIdx, 226, 28, RIBBON_IDX, TYPE_PAL( 0 ), tileCnt, p_bottom ) )
+            tileCnt = IO::loadEggIcon( 226, 28, RIBBON_IDX, TYPE_PAL( 0 ), tileCnt, p_bottom );
 
         u8 nlCnt = 0;
         auto nStr = FS::breakString( currRb.m_name == "" ? ( "----" ) : currRb.m_name, IO::regularFont, 110 );
@@ -793,11 +793,11 @@ namespace STS {
         if( currRb.m_name == "" )
             currRb.m_description = "----";
 
-        IO::regularFont->printString( nStr.c_str( ), 142, 39 - 7 * nlCnt, p_bottom, IO::font::LEFT, 14 );
+        IO::regularFont->printString( nStr.c_str( ), 226, 39 - 7 * nlCnt, p_bottom, IO::font::RIGHT, 14 );
         IO::regularFont->printString( FS::breakString( ( currRb.m_description == "" ) ?
                                                        ( currPkmn.m_boxdata.m_fateful ? "Ein Band für Pokémon-Freunde." : "Ein Gedenk-Band. An einem mysteriösen Ort erhalten." )
                                                        : currRb.m_description, IO::regularFont, 120 ).c_str( ),
-                                      128, 66, p_bottom, IO::font::LEFT, 14 );
+                                      250, 66, p_bottom, IO::font::RIGHT, 14 );
         IO::updateOAM( p_bottom );
         return true;
     }
