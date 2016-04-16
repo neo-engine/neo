@@ -1224,11 +1224,11 @@ NEXT:
                 log( buffer );
 
                 if( oldbx != nb ) {
-                    sprintf( buffer, "Box %hhu ist voll.", oldbx );
+                    sprintf( buffer, "Box „%s“ ist voll.[A]", FS::SAV->m_storedPokemon[ oldbx ].m_name );
                     log( buffer );
                 }
-                sprintf( buffer, "%s wurde in\nBox %hhu abgelegt.[A]",
-                         _wildPokemon.m_pokemon->m_boxdata.m_name, nb );
+                sprintf( buffer, "%s wurde in\nBox „%s“ abgelegt.[A]",
+                         _wildPokemon.m_pokemon->m_boxdata.m_name, FS::SAV->m_storedPokemon[ nb ].m_name );
                 log( buffer );
             } else {
                 log( "Du hast keinen Platz\nfür weitere Pokémon.[A]" );

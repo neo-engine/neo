@@ -150,7 +150,7 @@ namespace BOX {
                     IO::regularFont->setColor( BLACK_IDX, 1 );
                 sprintf( buffer, "%2d", cnt );
                 IO::regularFont->printString( buffer,
-                                 x + 7, y + 5, !p_bottom );
+                                              x + 7, y + 5, !p_bottom );
             }
         sprintf( buffer, "%4d Pokémon", pkmncnt );
         if( pkmncnt == 756 )
@@ -236,8 +236,8 @@ namespace BOX {
         IO::printRectangle( 0, 140, 255, 192, false, false, WHITE_IDX );
         IO::regularFont->printString( p_showTeam ? "Pokémon-Team" : "Zwischenablage", 2, 176, false );
         for( u8 i = 0; i < 6; ++i ) {
-            res.push_back( IO::inputTarget( TEAM_POS_X( i ) + 5, TEAM_POS_Y( i ) + 10,
-                                            TEAM_POS_X( i ) + 33, TEAM_POS_Y( i ) + 31 ) );
+            res.push_back( IO::inputTarget( TEAM_POS_X( i ), TEAM_POS_Y( i ),
+                                            TEAM_POS_X( i ) + 28, TEAM_POS_Y( i ) + 21 ) );
             _ranges.push_back( { oam, res.back( ) } );
 
             IO::printChoiceBox( TEAM_POS_X( i ), TEAM_POS_Y( i ),

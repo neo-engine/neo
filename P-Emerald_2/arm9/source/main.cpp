@@ -192,6 +192,7 @@ int main( int, char** p_argv ) {
             sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
             IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
 
+
             achours = timeStruct->tm_hour;
             acminutes = timeStruct->tm_min;
             acseconds = timeStruct->tm_sec;

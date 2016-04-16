@@ -146,7 +146,6 @@ namespace DEX {
     }
 
     void dex::run( u16 p_pkmnIdx ) {
-
         FS::SAV->m_lstDex = p_pkmnIdx;
 
         changeMode( _mode, p_pkmnIdx );
