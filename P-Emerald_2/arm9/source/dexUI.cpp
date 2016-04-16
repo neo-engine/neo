@@ -64,14 +64,6 @@ namespace DEX {
 #define PKMN_SPRITE_START( a ) ( 4 * ( a ) )
 #define STAR_START PKMN_SPRITE_START( 8 )
 
-#define PAGE_ICON_START 1 // + 3
-#define FRAME_START_2 10 // + 5
-#define PKMN_ICON_START_2 15 // + 5
-#define PKMN_ICON_START 32 // + 32
-#define FRAME_START 64 // + 32
-#define BG_SPR_START 96 // + 2 * 8
-
-
     void setAllVis( bool p_vis ) {
         for( u8 i = PKMN_ICON_START; i <= BG_SPR_START + 16; ++i )
             IO::Oam->oamBuffer[ i ].isHidden = p_vis;
@@ -147,13 +139,13 @@ namespace DEX {
                                   SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, BackPal,
                                   BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_1, true );
 
-        tileCnt = IO::loadSprite( PAGE_ICON_START + 0, 0, PAGE_ICON_START + 0, tileCnt,
+        tileCnt = IO::loadSprite( PAGE_START + 0, 0, PAGE_START + 0, tileCnt,
                                   80, -10, 32, 32, memoPal,
                                   memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( PAGE_ICON_START + 1, 0, PAGE_ICON_START + 1, tileCnt,
+        tileCnt = IO::loadSprite( PAGE_START + 1, 0, PAGE_START + 1, tileCnt,
                                   112, -10, 32, 32, PKMNPal,
                                   PKMNTiles, PKMNTilesLen, false, false, false, OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( PAGE_ICON_START + 2, 0, PAGE_ICON_START + 2, tileCnt,
+        tileCnt = IO::loadSprite( PAGE_START + 2, 0, PAGE_START + 2, tileCnt,
                                   144, -10, 32, 32, time_iconPal,
                                   time_iconTiles, time_iconTilesLen, false, false, false, OBJPRIORITY_0, true );
 
@@ -161,10 +153,10 @@ namespace DEX {
         u8 k = 0;
         for( u8 i : { 4, 0, 5, 1, 6, 2, 7, 3 } ) {
             u16 x = 88 * ( i % 4 ) - ( i > 3 ) * 44, y = 28 + ( i > 3 ) * 72;
-            tc2 = IO::loadSprite( BG_SPR_START + 2 * k, 0, PAGE_ICON_START + 3, tileCnt,
+            tc2 = IO::loadSprite( BG_SPR_START + 2 * k, 0, PAGE_START + 3, tileCnt,
                                   x, y, 64, 64, DexSub2Pal,
                                   DexSub2Tiles, DexSub2TilesLen, false, false, true, OBJPRIORITY_3, true );
-            IO::loadSprite( BG_SPR_START + 2 * k + 1, 0, PAGE_ICON_START + 3, tileCnt,
+            IO::loadSprite( BG_SPR_START + 2 * k + 1, 0, PAGE_START + 3, tileCnt,
                             20 + x, y, 64, 64, DexSub2Pal,
                             DexSub2Tiles, DexSub2TilesLen, false, true, true, OBJPRIORITY_3, true );
             u8 l = 0;
@@ -172,7 +164,7 @@ namespace DEX {
             if( i > 3 )
                 jj = { 0, 2, 3, 1 };
             for( u8 j : jj ) {
-                tc3 = IO::loadSprite( FRAME_START + 4 * k + l, 0, PAGE_ICON_START + 4, tc2,
+                tc3 = IO::loadSprite( FRAME_START + 4 * k + l, 0, PAGE_START + 4, tc2,
                                       x + 6 + 40 * ( j % 2 ), y + 2 + 32 * ( j / 2 ), 32, 32, DexSubPal,
                                       DexSubTiles, DexSubTilesLen, false, false, true, OBJPRIORITY_3, true );
                 ++l;
@@ -180,7 +172,7 @@ namespace DEX {
             ++k;
         }
         for( u8 i = 0; i < 5; ++i ) {
-            IO::loadSprite( FRAME_START_2 + i, 0, PAGE_ICON_START + 4, tc2,
+            IO::loadSprite( FRAME_START_2 + i, 0, PAGE_START + 4, tc2,
                             64, 24 + 32 * i, 32, 32, DexSubPal,
                             DexSubTiles, DexSubTilesLen, false, false, true, OBJPRIORITY_2, true );
             tc3 = IO::loadSprite( PKMN_ICON_START_2 + i, 1, i, tc3,
@@ -239,7 +231,7 @@ namespace DEX {
             p_pkmnIdx = _maxPkmn;
 
         for( u8 i = 0; i < 3; ++i )
-            IO::Oam->oamBuffer[ PAGE_ICON_START + i ].isHidden = true;
+            IO::Oam->oamBuffer[ PAGE_START + i ].isHidden = true;
 
         consoleSelect( &IO::Top );
         consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
@@ -267,7 +259,7 @@ namespace DEX {
             return;
         }
         for( u8 i = 0; i < 3; ++i )
-            IO::Oam->oamBuffer[ PAGE_ICON_START + i ].isHidden = i == p_page;
+            IO::Oam->oamBuffer[ PAGE_START + i ].isHidden = i == p_page;
         IO::updateOAM( true );
 
         pokemonData data; getAll( p_pkmnIdx, data );

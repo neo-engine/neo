@@ -31,6 +31,12 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <string>
 
 namespace DEX {
+#define PAGE_START 1 // + 3
+#define FRAME_START_2 10 // + 5
+#define PKMN_ICON_START_2 15 // + 5
+#define PKMN_ICON_START 32 // + 32
+#define FRAME_START 64 // + 32
+#define BG_SPR_START 96 // + 2 * 8
     class dexUI {
     private:
         bool _useInDex;

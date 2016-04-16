@@ -212,49 +212,31 @@ namespace DEX {
                         _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
                     }
                 }
+                for( u8 i = FRAME_START_2; i < FRAME_START_2 + MAX_PKMN_CAUGHT; ++i )
+                    if( !IO::Oam->oamBuffer[ i ].isHidden
+                        && GET_AND_WAIT_R( IO::Oam->oamBuffer[ i ].x, IO::Oam->oamBuffer[ i ].y,
+                                           IO::Oam->oamBuffer[ i ].x + 32, IO::Oam->oamBuffer[ i ].y + 28 ) ) {
+                        _selectedIdx = i - FRAME_START_2;
+                        FS::SAV->m_lstDex = CURR_PKMN;
+                        DRAW_TOP( );
+                        _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
+                    }
             } else if( _mode == SHOW_ALL ) {
-                if( GET_AND_WAIT( KEY_DOWN ) ) {
+                if( GET_AND_WAIT( KEY_DOWN ) )
                     select( _selectedIdx + 1 );
-                } else if( GET_AND_WAIT( KEY_UP ) ) {
+                else if( GET_AND_WAIT( KEY_UP ) )
                     select( _selectedIdx - 1 );
-                }
-                //else if( GET_AND_WAIT( KEY_RIGHT ) ) {
-                //    select( ( _selectedIdx + MAX_PKMN_ALL - 1 ) % MAX_PKMN_ALL );
-                //} else if( GET_AND_WAIT( KEY_LEFT ) ) {
-                //    select( ( _selectedIdx + MAX_PKMN_ALL - 1 ) % MAX_PKMN_ALL );
-                //}
+                else if( GET_AND_WAIT( KEY_RIGHT ) )
+                    select( ( _selectedIdx + 2 * ( 4 - ( ( _selectedIdx + 2 ) % 4 ) ) - 1 ) % MAX_PKMN_ALL );
+                else if( GET_AND_WAIT( KEY_LEFT ) )
+                    select( ( _selectedIdx + MAX_PKMN_ALL - 2 * ( ( _selectedIdx + 2 ) % 4 ) - 1 ) % MAX_PKMN_ALL );
+
+                for( u8 i = FRAME_START; i < FRAME_START + MAX_PKMN_ALL; ++i )
+                    if( !IO::Oam->oamBuffer[ i ].isHidden
+                        && GET_AND_WAIT_R( IO::Oam->oamBuffer[ i ].x, IO::Oam->oamBuffer[ i ].y,
+                                           IO::Oam->oamBuffer[ i ].x + 32, IO::Oam->oamBuffer[ i ].y + 28 ) )
+                        select( i - FRAME_START );
             }
-            /*
-            else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_DOWN ) ) {
-                FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + 1 ) % _maxPkmn;
-                _dexUI->drawPage( );
-            } else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_UP ) ) {
-                FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + _maxPkmn - 1 ) % _maxPkmn;
-                _dexUI->drawPage( );
-            } else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_R ) ) {
-                FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + 15 ) % _maxPkmn;
-                _dexUI->drawPage( );
-            } else if( _maxPkmn != u16( -1 ) && GET_AND_WAIT( KEY_L ) ) {
-                FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + _maxPkmn - 15 ) % _maxPkmn;
-                _dexUI->drawPage( );
-            } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
-                _dexUI->_currPage = ( _dexUI->_currPage + 1 ) % MAX_PAGES;
-                _dexUI->drawPage( );
-            } else if( GET_AND_WAIT( KEY_LEFT ) ) {
-                _dexUI->_currPage = ( _dexUI->_currPage + MAX_PAGES - 1 ) % MAX_PAGES;
-                _dexUI->drawPage( );
-            }
-            for( u8 q = 0; q < 5; ++q )
-                if( _maxPkmn != u16( -1 ) && GET_AND_WAIT_C( dexsppos[ 0 ][ q ] + 16, dexsppos[ 1 ][ q ] + 16, 16 ) ) {
-                    FS::SAV->m_lstDex = ( FS::SAV->m_lstDex + _maxPkmn - 3 + q + ( q > 2 ? 1 : 0 ) ) % _maxPkmn;
-                    _dexUI->drawPage( );
-                }
-            for( u8 q = 5; q < 8; ++q )
-                if( GET_AND_WAIT_C( dexsppos[ 0 ][ q ] + 16, dexsppos[ 1 ][ q ] + 16, 16 )
-                    && _dexUI->_currPage != ( q + 1 ) % MAX_PAGES ) {
-                    _dexUI->_currPage = ( q + 1 ) % MAX_PAGES;
-                    _dexUI->drawPage( );
-                } */
         }
     }
 }
