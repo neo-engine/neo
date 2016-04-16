@@ -73,6 +73,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "SPBag.h"
 #include "Save.h"
 #include "PokeDex.h"
+#include "BagSpr.h"
 
 namespace IO {
     nav* NAV = 0;
@@ -124,6 +125,26 @@ namespace IO {
         DRAW_TIME = true;
     }
 
+    void updateItems( ) {
+        bool b = false;
+        for( u8 i = 0; i < 3; ++i ) {
+            u16 curitm = FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 4 - i ) % 5 ];
+            if( curitm )
+                IO::loadItemIcon( ItemList[ curitm ]->m_itemName,
+                                  80 + 32 * i, -4, ITM( i ), ITM( i ),
+                                  IO::Oam->oamBuffer[ ITM_BACK + 2 ].gfxIndex + 32 * ( i + 1 ) );
+            if( !b && FS::SAV->m_registeredItem && ( !curitm || i == 2 ) ) {
+                IO::loadItemIcon( ItemList[ FS::SAV->m_registeredItem ]->m_itemName,
+                                  80 + 32 * i, -4, ITM( 2 ), ITM( 2 ),
+                                  IO::Oam->oamBuffer[ ITM_BACK + 2 ].gfxIndex + 32 * ( i + 1 ) );
+                b = true;
+            }
+            if( curitm && curitm == FS::SAV->m_registeredItem )
+                b = true;
+        }
+        IO::updateOAM( true );
+    }
+
     void initMainSprites( bool p_power = false, bool p_showBack = false ) {
         IO::initOAMTable( true );
         u16 tileCnt = 0;
@@ -173,6 +194,16 @@ namespace IO {
                                   32, 32, SPBagPal, SPBagTiles, SPBagTilesLen,
                                   false, false, false, OBJPRIORITY_0, true );
 
+        IO::loadSprite( ITM_BACK, ITM_BACK, tileCnt,
+                        80, -4, 32, 32, BagSprPal,
+                        BagSprTiles, BagSprTilesLen, false, false, false, OBJPRIORITY_2, true );
+        IO::loadSprite( ITM_BACK + 1, ITM_BACK, tileCnt,
+                        112, -4, 32, 32, BagSprPal,
+                        BagSprTiles, BagSprTilesLen, false, false, false, OBJPRIORITY_2, true );
+        tileCnt = IO::loadSprite( ITM_BACK + 2, ITM_BACK, tileCnt,
+                                  144, -4, 32, 32, BagSprPal,
+                                  BagSprTiles, BagSprTilesLen, false, false, false, OBJPRIORITY_2, true );
+        updateItems( );
         IO::updateOAM( true );
     }
 
@@ -196,10 +227,10 @@ namespace IO {
         regularFont->setColor( WHITE_IDX, 1 );
         regularFont->setColor( GRAY_IDX, 2 );
         regularFont->setColor( 0, 0 );
-        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap ].first ), 244, 12, !SCREENS_SWAPPED, IO::font::RIGHT );
+        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap / 100 * 100 + 10 ].first ), 246, 8, !SCREENS_SWAPPED, IO::font::RIGHT );
+        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap ].first ), 10, 166, !SCREENS_SWAPPED );
         regularFont->setColor( WHITE_IDX, 2 );
         regularFont->setColor( BLACK_IDX, 1 );
-        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap / 100 * 100 + 10 ].first ), 36, 0, !SCREENS_SWAPPED );
     }
 
     void nav::draw( bool p_initMainSrites, u8 p_newIdx ) {
@@ -251,6 +282,64 @@ namespace IO {
     void nav::handleInput( touchPosition p_touch ) {
         touchPosition& touch = p_touch;
 
+        if( held & KEY_Y ) {
+            IO::waitForKeysUp( KEY_Y );
+            if( FS::SAV->m_registeredItem ) {
+                if( ItemList[ FS::SAV->m_registeredItem ]->useable( ) ) {
+                    ItemList[ FS::SAV->m_registeredItem ]->use( );
+                    updateItems( );
+                } else {
+                    IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                    IO::NAV->draw( true );
+                }
+            } else {
+                IO::messageBox( "Du kannst ein Item\nauf Y registrieren.", "PokéNav" );
+                IO::NAV->draw( true );
+            }
+            swiWaitForVBlank( );
+            scanKeys( );
+            return;
+        }
+
+        bool itmsn = false;
+        for( u8 i = 0; i < 3; ++i ) {
+            if( GET_AND_WAIT_C( 96 + 32 * i, 12, 14 ) ) {
+                u16 curitm = FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 4 - i ) % 5 ];
+                if( !itmsn && FS::SAV->m_registeredItem && ( !curitm || i == 2 || curitm == FS::SAV->m_registeredItem ) ) {
+                    curitm = FS::SAV->m_registeredItem;
+                    itmsn = true;
+                }
+                if( curitm ) {
+                    if( u16( -1 ) == FS::SAV->m_bag.count( BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm ) ) {
+                        IO::yesNoBox yn( "PokéNav" );
+                        sprintf( buffer, "Kein Exemplar des Items\n%s vorhanden.\nIcon entfernen?", ItemList[ curitm ]->getDisplayName( true ).c_str( ) );
+                        if( yn.getResult( buffer ) ) {
+                            for( u8 j = i; j < 4; ++j ) {
+                                FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 4 - j ) % 5 ] =
+                                    FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 3 - j ) % 5 ];
+                            }
+                            FS::SAV->m_lstUsedItems[ FS::SAV->m_lstUsedItemsIdx ] = 0;
+                        }
+                        IO::NAV->draw( true );
+                    } else if( ItemList[ curitm ]->useable( ) ) {
+                        if( ItemList[ curitm ]->use( true ) )
+                            IO::messageBox( "", 0, false );
+                        ItemList[ curitm ]->use( );
+                        if( ItemList[ curitm ]->m_itemType != item::KEY_ITEM )
+                            FS::SAV->m_bag.erase( BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm, 1 );
+                        IO::NAV->draw( true );
+                    } else {
+                        IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                        IO::NAV->draw( true );
+                    }
+                } else {
+                    IO::messageBox( "Hier erscheinen zuletzt\neingesetzte Items.", "PokéNav" );
+                    IO::NAV->draw( true );
+                }
+                return;
+            }
+        }
+
         if( _state != HOME && _power && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
             _state = backTransition[ _state ];
             draw( true );
@@ -271,8 +360,10 @@ namespace IO {
                 FADE_TOP_DARK( );
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
+                updateItems( );
                 if( res ) {
                     ItemList[ res ]->use( false );
+                    updateItems( );
                     draw( true );
                 }
             } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
@@ -328,7 +419,7 @@ namespace IO {
                         memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
                         for( int i = 0; i < 5; ++i ) {
                             pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                            a = pokemon( 0, rand() % MAX_PKMN + 1, 0,
+                            a = pokemon( 0, rand( ) % MAX_PKMN + 1, 0,
                                          50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
                                          !FS::SAV->m_isMale, i, false, i % 2, i == 3, i + rand( ) % 500, i, i );
                             a.m_stats.m_acHP *= i / 5.0;

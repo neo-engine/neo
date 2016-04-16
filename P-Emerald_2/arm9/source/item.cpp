@@ -232,6 +232,18 @@ bool item::use( pokemon& p_pokemon ) {
 //Returns false if the original UI has not to be redrawn/will be exited
 bool item::use( bool p_dryRun ) {
     u16 itm = getItemId( );
+    if( !p_dryRun ) {
+        bool ex = false;
+        for( u8 i = 0; i < 5; ++i )
+            if( FS::SAV->m_lstUsedItems[ i ] == itm ) {
+                ex = true;
+                break;
+            }
+        if( !ex ) {
+            FS::SAV->m_lstUsedItems[ FS::SAV->m_lstUsedItemsIdx ] = itm;
+            FS::SAV->m_lstUsedItemsIdx = ( FS::SAV->m_lstUsedItemsIdx + 1 ) % 5;
+        }
+    }
     switch( itm ) {
         case I_REPEL:
             if( !p_dryRun ) {

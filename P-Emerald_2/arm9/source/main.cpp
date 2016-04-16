@@ -277,23 +277,6 @@ OUT:
             continue;
         }
         //Movement
-        if( held & KEY_Y ) {
-            IO::waitForKeysUp( KEY_Y );
-            if( FS::SAV->m_registeredItem ) {
-                if( ItemList[ FS::SAV->m_registeredItem ]->useable( ) )
-                    ItemList[ FS::SAV->m_registeredItem ]->use( );
-                else {
-                    IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
-                    IO::NAV->draw( true );
-                }
-            } else {
-                IO::messageBox( "Du kannst ein Item\nauf Y registrieren.", "PokéNav" );
-                IO::NAV->draw( true );
-            }
-            swiWaitForVBlank( );
-            scanKeys( );
-            continue;
-        }
         if( held & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
             MAP::direction curDir = GET_DIR( held );
             scanKeys( );
