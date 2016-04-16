@@ -38,7 +38,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 namespace MAP {
     sliceCache cache;
 
-    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y ) {
+    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y, bool p_init ) {
         FILE* mapF = FS::open( MAP_PATH,
                                ( toString( p_map )
                                  + "/" + toString( p_y )
@@ -106,7 +106,7 @@ namespace MAP {
 
         //Read the first tileset
         s8 ind;
-        if( ( ind = cache.get( tsidx1 ) ) == -1 ) {
+        if( ( ind = cache.get( tsidx1 ) ) == -1 || p_init ) {
             ind = cache.set( tsidx1 );
             if( cache.m_tiles[ ind ] )
                 delete cache.m_tiles[ ind ];
@@ -137,7 +137,7 @@ namespace MAP {
 
         //Read the second tileset
 
-        if( ( ind = cache.get( tsidx2 ) ) == -1 ) {
+        if( ( ind = cache.get( tsidx2 ) ) == -1 || p_init ) {
             ind = cache.set( tsidx2 );
             if( cache.m_tiles[ ind ] )
                 delete cache.m_tiles[ ind ];

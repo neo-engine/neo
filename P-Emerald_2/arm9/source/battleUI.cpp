@@ -1531,7 +1531,7 @@ NEXT_TRY:
 
                 BG_PALETTE_SUB[ 240 + i ] = IO::getColor( acMove->m_moveType );
 
-                u8 w = 104, h = 32;
+                u8 w = 104, h = 34;
                 u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
 
                 IO::printChoiceBox( x, y, x + w + 2, y + h + 1, 6, 240 + i, false );
@@ -1539,11 +1539,13 @@ NEXT_TRY:
                 IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
                 tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 7, y - 7, ++oamIndex, palIndex++, tilecnt, true );
                 tilecnt = IO::loadDamageCategoryIcon( acMove->m_moveHitType, x + 25, y - 7, ++oamIndex, palIndex++, tilecnt, true );
-                consoleSelect( &IO::Bottom );
-                consoleSetWindow( &IO::Bottom, x / 8, 12 + ( i / 2 ) * 6, 20, 2 );
-                printf( "%6hhu/%2hhu AP",
-                        acPkmn.m_boxdata.m_acPP[ i ],
-                        s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                
+                sprintf( buffer, "%6hhu/%2hhu AP",
+                         acPkmn.m_boxdata.m_acPP[ i ],
+                         s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                IO::regularFont->setColor( 0, 2 );
+                IO::regularFont->printString( buffer, x + w - 4, y + h - 14, true, IO::font::RIGHT );
+                IO::regularFont->setColor( GRAY_IDX, 2 );
             }
         }
 
@@ -1563,7 +1565,7 @@ NEXT:
             for( u8 i = 0; i < 4; ++i ) {
                 if( !acPkmn.m_boxdata.m_moves[ i ] )
                     break;
-                u8 w = 104, h = 32;
+                u8 w = 104, h = 34;
                 u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
                 if( IN_RANGE_R( x, y, x + w, y + h ) && acPkmn.m_boxdata.m_acPP[ i ] ) {
                     auto acMove = AttackList[ acPkmn.m_boxdata.m_moves[ i ] ];
@@ -1571,6 +1573,13 @@ NEXT:
                     IO::printChoiceBox( x, y, x + w + 2, y + h + 1, 6, 240 + i, true );
 
                     IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 9, y + 8, true );
+
+                    sprintf( buffer, "%6hhu/%2hhu AP",
+                             acPkmn.m_boxdata.m_acPP[ i ],
+                             s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                    IO::regularFont->setColor( 0, 2 );
+                    IO::regularFont->printString( buffer, x + w - 2, y + h - 13, true, IO::font::RIGHT );
+                    IO::regularFont->setColor( GRAY_IDX, 2 );
 
                     loop( ) {
                         swiWaitForVBlank( );
@@ -1583,6 +1592,10 @@ NEXT:
                             IO::printChoiceBox( x, y, x + w + 2, y + h + 1, 6, 240 + i, false );
 
                             IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
+
+                            IO::regularFont->setColor( 0, 2 );
+                            IO::regularFont->printString( buffer, x + w - 4, y + h - 14, true, IO::font::RIGHT );
+                            IO::regularFont->setColor( GRAY_IDX, 2 );
                             goto NEXT;
                         }
                     }
@@ -2074,6 +2087,14 @@ CLEAR:
     void battleUI::showStatus( bool p_opponent, u8 p_pokemonPos ) {
         (void) p_opponent;
         (void) p_pokemonPos;
+    }
+
+    bool battleUI::isVisiblePKMN( bool p_opponent, u8 p_pokemonPos ) {
+        if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
+            return false;
+        if( p_opponent )
+            return !IO::OamTop->oamBuffer[ PKMN_IDX( p_pokemonPos, p_opponent ) ].isHidden;
+        return IO::OamTop->oamBuffer[ PKMN_IDX( p_pokemonPos, p_opponent ) ].isRotateScale;
     }
 
     void battleUI::hidePKMN( bool p_opponent, u8 p_pokemonPos ) {

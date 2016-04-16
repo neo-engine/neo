@@ -521,7 +521,8 @@ CHOOSE1:
                 for( u8 k = 1 + ( m_battleMode == DOUBLE );
                 k < ( j ? _opponent->m_pkmnTeam.size( ) : _player->m_pkmnTeam.size( ) ); ++k )
                     if( CUR_PKMN_STS( k, j ) != KO && CUR_PKMN_STS( k, j ) != SELECTED
-                        && CUR_PKMN_STS( k, j ) != NA && CUR_PKMN( k, j ).m_stats.m_acHP ) {
+                        && CUR_PKMN_STS( k, j ) != NA && CUR_PKMN( k, j ).m_stats.m_acHP
+                        && !CUR_PKMN( k, j ).isEgg( ) ) {
                         refillpossible = true;
                         break;
                     }
@@ -596,7 +597,9 @@ NEXT:
 
         for( u8 i = p_startIdx; i < max; ++i )
             if( CUR_PKMN_STS( i, p_opponent ) != KO
-                && CUR_PKMN_STS( i, p_opponent ) != SELECTED )
+                && CUR_PKMN_STS( i, p_opponent ) != SELECTED
+                && !CUR_PKMN( i, p_opponent ).isEgg( )
+                && CUR_PKMN( i, p_opponent ).m_stats.m_acHP )
                 return i;
         return 7;
     }
@@ -1569,7 +1572,8 @@ NEXT:
             }
             return;
         }
-        if( !CUR_PKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP && _battleSpotOccupied[ p_pokemonPos ][ p_opponent ] ) {
+        if( !CUR_PKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP && _battleSpotOccupied[ p_pokemonPos ][ p_opponent ]
+            && _battleUI->isVisiblePKMN( p_opponent, p_pokemonPos ) ) {
             if( p_show ) {
                 std::sprintf( buffer, "%s%s wurde besiegt.[A]",
                               ( CUR_PKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),

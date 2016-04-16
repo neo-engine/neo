@@ -83,7 +83,7 @@ namespace MAP {
 
         std::pair<u16, u16> m_pokemon[ 3 * 5 * 5 ];
     };
-    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y );
+    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y, bool p_init = false );
 
     struct sliceCache {
 #define MAX_CACHE_SIZE 4
