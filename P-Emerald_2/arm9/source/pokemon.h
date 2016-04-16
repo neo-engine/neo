@@ -243,9 +243,9 @@ u32: 32;
 
         //BLOCKD{
         char                    m_oT[ OTLENGTH ];
+u32: 32;
         u8                      m_gotDate[ 3 ];//(EGG)
         u8                      m_hatchDate[ 3 ]; //gotDate for nonEgg
-u32: 32;
         u8                      m_pokerus : 8;//
         u8                      m_ball : 8;//
         u16                     m_gotLevel : 7;

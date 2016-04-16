@@ -65,9 +65,13 @@ CFLAGS	:=	-g -Wall -Wextra\
 
 CFLAGS	+=	$(INCLUDE) -DARM9 -DNDSFILENAME=\"$(TARGET).nds\"
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++14 -Os
+#            -fsanitize=undefined -fsanitize=float-cast-overflow -fsanitize=null\
+#            -fsanitize=return -fsanitize=vptr
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH)  -Wl,-Map,$(notdir $*.map)
+#            -fsanitize=undefined -fsanitize=float-cast-overflow -fsanitize=null\
+#            -fsanitize=return -fsanitize=vptr
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project

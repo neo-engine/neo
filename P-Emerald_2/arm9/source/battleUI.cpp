@@ -611,18 +611,18 @@ namespace BATTLE {
                                         false, true, OBJPRIORITY_1, false );
         }
         TILESTART = IO::loadSprite( PLATFORM_START, PLAT_PAL,
-                                    TILESTART, 128, 56, 64, 64, IO::PlatformPals[ _battle->m_platformId ],
-                                    IO::PlatformTiles[ 2 * _battle->m_platformId ], 2048, false,
+                                    TILESTART, 128, 56, 64, 64, IO::PlatformPals[ _battle->m_platform2Id ],
+                                    IO::PlatformTiles[ 2 * _battle->m_platform2Id ], 2048, false,
                                     false, false, OBJPRIORITY_3, false );
         TILESTART = IO::loadSprite( PLATFORM_START + 1, PLAT_PAL,
-                                    TILESTART, 192, 56, 64, 64, IO::PlatformPals[ _battle->m_platformId ],
-                                    IO::PlatformTiles[ 2 * _battle->m_platformId + 1 ], 2048, false,
+                                    TILESTART, 192, 56, 64, 64, IO::PlatformPals[ _battle->m_platform2Id ],
+                                    IO::PlatformTiles[ 2 * _battle->m_platform2Id + 1 ], 2048, false,
                                     false, false, OBJPRIORITY_3, false );
-        TILESTART = IO::loadSprite( PLATFORM_START + 2, PLAT_PAL,
+        TILESTART = IO::loadSprite( PLATFORM_START + 2, PLAT_PAL + 1,
                                     TILESTART, -52, 152 - 32, 64, 64, IO::PlatformPals[ _battle->m_platformId ],
                                     IO::PlatformTiles[ 2 * _battle->m_platformId ], 2048, false,
                                     false, false, OBJPRIORITY_3, false );
-        TILESTART = IO::loadSprite( PLATFORM_START + 3, PLAT_PAL,
+        TILESTART = IO::loadSprite( PLATFORM_START + 3, PLAT_PAL + 1,
                                     TILESTART, 80 - 16, 152 - 32, 64, 64, IO::PlatformPals[ _battle->m_platformId ],
                                     IO::PlatformTiles[ 2 * _battle->m_platformId + 1 ], 2048, false,
                                     false, false, OBJPRIORITY_3, false );
@@ -761,7 +761,7 @@ namespace BATTLE {
                 drawGender( dx + x + 104, dy + y + 2, acPkmn.gender( ), true );
             IO::regularFont->setColor( GRAY_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
-            IO::regularFont->printString( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
+            IO::regularFont->printString( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
                                           dx + x + 113, dy + y + 15, true, IO::font::RIGHT );
             sprintf( buffer, "Lv%d", acPkmn.m_level );
             IO::regularFont->printString( buffer, dx + x + 12, dy + y + 27, true );
@@ -865,7 +865,7 @@ namespace BATTLE {
             IO::regularFont->setColor( GRAY_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
 
-            IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
+            IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
                                           p_x + dx + 64, dy + 80, true, IO::font::CENTER );
 
             sprintf( buffer, "Lv%d", p_pokemon.m_level );
@@ -1105,7 +1105,7 @@ namespace BATTLE {
             } else {
                 ++oamIndex;
                 ++palIndex;
-                IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 24, 122, true );
+                IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ), 24, 122, true );
             }
             IO::boldFont->setColor( GRAY_IDX, 1 );
             IO::boldFont->setColor( BLACK_IDX, 2 );
@@ -1921,10 +1921,10 @@ NEXT:
                             consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                             consoleClear( );
                         }
-                        if( !tmp || p_noRestrict )
-                            goto CLEAR;
-                        goto START;
                     }
+                    if( !tmp || p_noRestrict )
+                        goto CLEAR;
+                    goto START;
                 }
             }
         }

@@ -151,10 +151,8 @@ namespace FS {
                 tmp.push_back( m_pkmnTeam[ i ] );
             else
                 break;
-        char buffer[ 30 ];
-        sprintf( buffer, "%s", m_playername );
 
-        static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp );
+        static BATTLE::battleTrainer res( std::string( m_playername ), "", "", "", "", tmp );
         return &res;
     }
     void        saveGame::updateTeam( ) {

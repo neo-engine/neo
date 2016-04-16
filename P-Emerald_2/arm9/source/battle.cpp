@@ -282,7 +282,7 @@ namespace BATTLE {
     }
 
     battle::battle( battleTrainer* p_player, battleTrainer* p_opponent, int p_maxRounds, weather p_weather,
-                    u8 p_platform, u8 p_background, int p_AILevel, battleMode p_battleMode )
+                    u8 p_platform, u8 p_background, int p_AILevel, battleMode p_battleMode, u8 p_platform2 )
         : _player( p_player ), _opponent( p_opponent ) {
         _maxRounds = p_maxRounds;
         _AILevel = p_AILevel;
@@ -293,19 +293,21 @@ namespace BATTLE {
 
         m_weather = p_weather;
         m_platformId = p_platform;
+        m_platform2Id = p_platform2 == u8( -1 ) ? p_platform : p_platform2;
         m_backgroundId = p_background;
     }
-    battle::battle( battleTrainer* p_player, pokemon* p_opponent, weather p_weather, u8 p_platform, u8 p_background )
+    battle::battle( battleTrainer* p_player, pokemon p_opponent, weather p_weather, u8 p_platform, u8 p_platform2, u8 p_background )
         : _player( p_player ), _opponent( 0 ) {
         _maxRounds = 0;
         _AILevel = 0;
         m_weather = p_weather;
         m_platformId = p_platform;
+        m_platform2Id = p_platform2;
         m_backgroundId = p_background;
 
         pokemonData pdata;
-        getAll( p_opponent->m_boxdata.m_speciesId, pdata );
-        _wildPokemon.m_pokemon = p_opponent;
+        getAll( p_opponent.m_boxdata.m_speciesId, pdata );
+        _wildPokemon.m_pokemon = new pokemon( p_opponent );
         _wildPokemon.m_types[ 0 ] = pdata.m_types[ 0 ];
         _wildPokemon.m_types[ 1 ] = pdata.m_types[ 1 ];
         _wildPokemon.m_types[ 2 ] = pdata.m_types[ 1 ];

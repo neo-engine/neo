@@ -149,7 +149,7 @@ namespace DEX {
                                   144, -10, 32, 32, time_iconPal,
                                   time_iconTiles, time_iconTilesLen, false, false, false, OBJPRIORITY_0, true );
 
-        u16 tc2, tc3;
+        u16 tc2, tc3 = 0;
         u8 k = 0;
         for( u8 i : { 4, 0, 5, 1, 6, 2, 7, 3 } ) {
             u16 x = 88 * ( i % 4 ) - ( i > 3 ) * 44, y = 28 + ( i > 3 ) * 72;
