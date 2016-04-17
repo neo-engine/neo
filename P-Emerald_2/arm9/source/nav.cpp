@@ -129,18 +129,14 @@ namespace IO {
         bool b = false;
         for( u8 i = 0; i < 3; ++i ) {
             u16 curitm = FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 4 - i ) % 5 ];
+            if( !b && FS::SAV->m_registeredItem && ( !curitm || i == 2 || curitm == FS::SAV->m_registeredItem ) ) {
+                curitm = FS::SAV->m_registeredItem;
+                b = true;
+            }
             if( curitm )
                 IO::loadItemIcon( ItemList[ curitm ]->m_itemName,
                                   80 + 32 * i, -4, ITM( i ), ITM( i ),
                                   IO::Oam->oamBuffer[ ITM_BACK + 2 ].gfxIndex + 32 * ( i + 1 ) );
-            if( !b && FS::SAV->m_registeredItem && ( !curitm || i == 2 ) ) {
-                IO::loadItemIcon( ItemList[ FS::SAV->m_registeredItem ]->m_itemName,
-                                  80 + 32 * i, -4, ITM( 2 ), ITM( 2 ),
-                                  IO::Oam->oamBuffer[ ITM_BACK + 2 ].gfxIndex + 32 * ( i + 1 ) );
-                b = true;
-            }
-            if( curitm && curitm == FS::SAV->m_registeredItem )
-                b = true;
         }
         IO::updateOAM( true );
     }
@@ -303,12 +299,12 @@ namespace IO {
 
         bool itmsn = false;
         for( u8 i = 0; i < 3; ++i ) {
+            u16 curitm = FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 4 - i ) % 5 ];
+            if( !itmsn && FS::SAV->m_registeredItem && ( !curitm || i == 2 || curitm == FS::SAV->m_registeredItem ) ) {
+                curitm = FS::SAV->m_registeredItem;
+                itmsn = true;
+            }
             if( GET_AND_WAIT_C( 96 + 32 * i, 12, 14 ) ) {
-                u16 curitm = FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 4 - i ) % 5 ];
-                if( !itmsn && FS::SAV->m_registeredItem && ( !curitm || i == 2 || curitm == FS::SAV->m_registeredItem ) ) {
-                    curitm = FS::SAV->m_registeredItem;
-                    itmsn = true;
-                }
                 if( curitm ) {
                     if( u16( -1 ) == FS::SAV->m_bag.count( BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm ) ) {
                         IO::yesNoBox yn( "PokéNav" );
