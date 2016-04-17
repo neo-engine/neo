@@ -434,8 +434,8 @@ namespace IO {
                             FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
                         }
 
-                        for( u16 j = 251; j < 386; ++j ) {
-                            auto a = pokemon( j + 1, 50, 0, j ).m_boxdata;
+                        for( u16 j : { 493, 649, 648, 647, 487, 492, 641, 642, 646, 645, 643, 644 } ) {
+                            auto a = pokemon( j, 50, 0, j ).m_boxdata;
                             a.m_gotPlace = j;
                             FS::SAV->storePkmn( a );
                             /*if( a.isShiny( ) ) {

@@ -381,7 +381,7 @@ bool item::useable( ) {
     return false;
 }
 
-item* ItemList[ 772 ] = {
+item* ItemList[ MAX_ITEMS ] = {
     new item( "Null" ),
     new ball( "Meisterball" ), new ball( "Hyperball" ),
     new ball( "Superball" ), new ball( "Pokeball" ),

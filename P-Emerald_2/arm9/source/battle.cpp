@@ -657,7 +657,7 @@ NEXT:
                 inits.push_back( std::tuple<s16, s16, u8>( p_includeMovePriority * movePr, acSpd, 2 * i + j ) );
             }
         }
-        std::sort( inits.begin( ), inits.end( ), std::greater < std::tuple<s8, s16, u16> >( ) );
+        std::sort( inits.rbegin( ), inits.rend( ) );
 
         for( u8 i = 0; i < inits.size( ); ++i ) {
             s16 _0 = 0;

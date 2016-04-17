@@ -517,7 +517,7 @@ bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
 }
 
 u16 item::getItemId( ) {
-    for( int i = 0; i < 700; ++i )
+    for( u16 i = 0; i < MAX_ITEMS; ++i )
         if( ItemList[ i ]->m_itemName == m_itemName )
             return i;
     return 0;

@@ -429,10 +429,13 @@ namespace MAP {
         }
 
         auto playerPrio = _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].getPriority( );
+        IO::NAV->togglePower( );
+        IO::NAV->draw( );
         BATTLE::battle( FS::SAV->getBattleTrainer( ), wildPkmn, weat, platform, plat2, battleBack ).start( );
         FS::SAV->updateTeam( );
         FADE_TOP_DARK( );
         draw( playerPrio );
+        IO::NAV->togglePower( );
         IO::NAV->draw( true );
 
         return true;

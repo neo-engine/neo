@@ -172,8 +172,8 @@ public:
     }
 };
 
-
-extern item* ItemList[ 772 ];
+#define MAX_ITEMS 772
+extern item* ItemList[ MAX_ITEMS ];
 
 
 #define I_NONE 0

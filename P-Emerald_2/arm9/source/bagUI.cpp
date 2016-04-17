@@ -344,6 +344,11 @@ namespace BAG {
         } else if( p_item->m_itemType == item::itemType::TM_HM
                    && AttackList[ static_cast<TM*>( p_item )->m_moveIdx ]->m_isFieldAttack ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
+            IO::boldFont->setColor( BLUE_IDX, 2 );
+            IO::boldFont->printChar( 490 - 22 + u16( p_item->m_itemType ), p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
+            IO::boldFont->setColor( WHITE_IDX, 2 );
+        } else if( p_item->m_itemType == item::itemType::TM_HM ) {
+            IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16, p_selected ? RED_IDX : GRAY_IDX, p_pressed );
             IO::boldFont->printChar( 490 - 22 + u16( p_item->m_itemType ), p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
         } else
             IO::printChoiceBox( p_x, p_y, p_x + 106, p_y + 16, 3, p_selected ? RED_IDX : GRAY_IDX, p_pressed );

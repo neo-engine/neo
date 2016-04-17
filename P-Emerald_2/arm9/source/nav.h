@@ -64,6 +64,12 @@ namespace IO {
         void draw( bool p_initMainSprites = false, u8 p_newIdx = (u8)255 );
         void showNewMap( u8 p_map );
         void handleInput( touchPosition p_touch );
+        void home( ) {
+            _state = HOME;
+        }
+        void togglePower( ) {
+            _power = !_power;
+        }
     };
     extern nav::backgroundSet BGs[ MAXBG ];
     extern nav* NAV;
