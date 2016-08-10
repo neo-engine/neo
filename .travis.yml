@@ -18,6 +18,10 @@ before_install:
 
 script:
     - cd P-Emerald_2
+    - cd FSROOT
+    - git submodule init
+    - git submodule update
+    - cd ..
     - make
 
 notifications:
