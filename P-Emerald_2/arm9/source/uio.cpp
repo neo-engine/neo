@@ -102,15 +102,14 @@ namespace IO {
     }
 
     void setDefaultConsoleTextColors( u16* p_palette, u8 p_start ) {
-        p_palette[ p_start * 16 - 1 ] = RGB15( 0, 0, 0 ); //30 normal black
-        p_palette[ ( p_start + 1 ) * 16 - 1 ] = RGB15( 15, 0, 0 ); //31 normal red
-        p_palette[ ( p_start + 2 ) * 16 - 1 ] = RGB15( 0, 15, 0 ); //32 normal green
-        p_palette[ ( p_start + 3 ) * 16 - 1 ] = RGB15( 15, 15, 0 ); //33 normal yellow
+        p_palette[ ( p_start + 0 ) ] = RGB15( 15, 0, 0 ); //31 normal red
+        p_palette[ ( p_start + 1 ) ] = RGB15( 0, 15, 0 ); //32 normal green
+        p_palette[ ( p_start + 2 ) ] = RGB15( 15, 15, 0 ); //33 normal yellow
 
-        p_palette[ ( p_start + 4 ) * 16 - 1 ] = RGB15( 0, 0, 15 ); //34 normal blue
-        p_palette[ ( p_start + 5 ) * 16 - 1 ] = RGB15( 15, 0, 15 ); //35 normal magenta
-        p_palette[ ( p_start + 6 ) * 16 - 1 ] = RGB15( 0, 15, 15 ); //36 normal cyan
-        p_palette[ ( p_start + 7 ) * 16 - 1 ] = RGB15( 24, 24, 24 ); //37 normal white
+        p_palette[ ( p_start + 3 ) ] = RGB15( 0, 0, 15 ); //34 normal blue
+        p_palette[ ( p_start + 4 ) ] = RGB15( 15, 0, 15 ); //35 normal magenta
+        p_palette[ ( p_start + 5 ) ] = RGB15( 0, 15, 15 ); //36 normal cyan
+        p_palette[ ( p_start + 6 ) ] = RGB15( 24, 24, 24 ); //37 normal white
     }
 
     bool waitForTouchUp( u16 p_targetX1, u16 p_targetY1, u16 p_targetX2, u16 p_targetY2 ) {
@@ -343,33 +342,6 @@ namespace IO {
             printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1, p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 3,
                             p_bottom, false, WHITE_IDX );
         }
-    }
-
-
-    void printChar( font* p_font, u16 p_ch, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printChar( p_ch, p_x, p_y, p_bottom );
-    }
-    void printString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance ) {
-        p_font->printString( p_string, p_x, p_y, p_bottom, p_yDistance );
-    }
-    void printStringCenter( font* p_font, const char *p_string, bool p_bottom ) {
-        p_font->printStringCenter( p_string, p_bottom );
-    }
-    void printStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printStringD( p_string, p_x, p_y, p_bottom );
-    }
-    void printStringCenterD( font* p_font, const char *p_string, bool p_bottom ) {
-        p_font->printStringCenterD( p_string, p_bottom );
-    }
-    void printNumber( font* p_font, s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printNumber( p_num, p_x, p_y, p_bottom );
-    }
-
-    void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printMBString( p_string, p_x, p_y, p_bottom );
-    }
-    void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom ) {
-        p_font->printMBStringD( p_string, p_x, p_y, p_bottom );
     }
 
     void topScreenPlot( u8 p_x, u8 p_y, color p_color ) {

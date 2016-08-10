@@ -42,6 +42,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "defines.h"
 #include "mapSlice.h"
 
+#include "messageBox.h"
+
 const char ITEM_PATH[ ] = "nitro:/ITEMS/";
 const char PKMNDATA_PATH[ ] = "nitro:/PKMNDATA/";
 const char ABILITYDATA_PATH[ ] = "nitro:/PKMNDATA/ABILITIES/";
@@ -80,7 +82,7 @@ namespace FS {
         return true;
     }
     bool exists( const char* p_path, u16 p_name, bool p_unused ) {
-        (void)p_unused;
+        (void) p_unused;
 
         FILE* fd = open( p_path, p_name );
         if( !fd )
@@ -176,21 +178,33 @@ namespace FS {
         return true;
     }
 
+    bool readPictureData( u16* p_layer, const char* p_path, const char* p_name, u16 p_palSize, u16 p_palStart, u32 p_tileCnt, bool p_bottom ) {
+        if( !readData( p_path, p_name, (unsigned int) ( 12288 ), TEMP, (unsigned short) ( 256 ), TEMP_PAL ) )
+            return false;
+
+        dmaCopy( TEMP, p_layer, p_tileCnt );
+        if( p_bottom )
+            dmaCopy( TEMP_PAL + p_palStart, BG_PALETTE_SUB + p_palStart, p_palSize );
+        else
+            dmaCopy( TEMP_PAL + p_palStart, BG_PALETTE + p_palStart, p_palSize );
+        return true;
+    }
+
     bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no ) {
         if( p_no == SAV->m_bgIdx && IO::NAV_DATA[ 0 ] ) {
             dmaCopy( IO::NAV_DATA, p_layer, 256 * 192 );
-            dmaCopy( IO::NAV_DATA_PAL, BG_PALETTE_SUB, 256 * 2 );
+            dmaCopy( IO::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
             return true;
         }
 
         char buffer[ 100 ];
         sprintf( buffer, "%s", p_name );
 
-        if( !readData( "nitro:/PICS/NAV/", buffer, (unsigned int) ( 12288 ), IO::NAV_DATA, (unsigned short) ( 256 ), IO::NAV_DATA_PAL ) )
+        if( !readData( "nitro:/PICS/NAV/", buffer, (unsigned int) 12288, IO::NAV_DATA, (unsigned short) 192, IO::NAV_DATA_PAL ) )
             return false;
 
         dmaCopy( IO::NAV_DATA, p_layer, 256 * 192 );
-        dmaCopy( IO::NAV_DATA_PAL, BG_PALETTE_SUB, 256 * 2 );
+        dmaCopy( IO::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
 
         return true;
     }
@@ -216,7 +230,7 @@ namespace FS {
         return true;
     }
 
-    bool readblocks( FILE* p_file, MAP::block* p_tileSet, u16 p_startIdx, u16 p_size ) {
+    bool readBlocks( FILE* p_file, MAP::block* p_tileSet, u16 p_startIdx, u16 p_size ) {
         if( p_file == 0 )
             return false;
         readNop( p_file, 4 );
@@ -231,24 +245,29 @@ namespace FS {
         return true;
     }
 
-    //inline void readAnimations( FILE* p_file, std::vector<MAP::Animation>& p_animations ) {
-    //    if( p_file == 0 )
-    //        return;
-    //    u8 N;
-    //    fread( &N, sizeof( u8 ), 1, p_file );
-    //    for( int i = 0; i < N; ++i ) {
-    //        MAP::Animation a;
-    //        fread( &a.m_tileIdx, sizeof( u16 ), 1, p_file );
-    //        fread( &a.m_speed, sizeof( u8 ), 1, p_file );
-    //        fread( &a.m_maxFrame, sizeof( u8 ), 1, p_file );
-    //        a.m_acFrame = 0;
-    //        a.m_animationTiles.assign( a.m_maxFrame, tile( ) );
-    //        for( int i = 0; i < a.m_maxFrame; ++i )
-    //            fread( &a.m_animationTiles[ i ], sizeof( tile ), 1, p_file );
-    //        p_animations.push_back( a );
-    //    }
-    //    fclose( p_file );
-    //}
+    u8 readAnimations( FILE* p_file, MAP::tileSet::animation*& p_animations ) {
+        if( !p_file )
+            return 0;
+        u8 N;
+        fread( &N, sizeof( u8 ), 1, p_file );
+
+        if( !p_animations && N )
+            p_animations = new MAP::tileSet::animation[ N ];
+
+        if( !p_animations )
+            return 0;
+
+        for( int i = 0; i < N; ++i ) {
+            auto& a = p_animations[ i ];
+            fread( &a.m_tileIdx, sizeof( u16 ), 1, p_file );
+            fread( &a.m_speed, sizeof( u8 ), 1, p_file );
+            fread( &a.m_maxFrame, sizeof( u8 ), 1, p_file );
+            a.m_acFrame = 0;
+            fread( a.m_tiles, sizeof( MAP::tile ), a.m_maxFrame, p_file );
+        }
+        fclose( p_file );
+        return N;
+    }
 
     std::string readString( FILE* p_file, bool p_new ) {
         std::string ret = "";
@@ -374,14 +393,14 @@ namespace FS {
         return ret;
     }
 
-    const char* getLoc( u16 p_ind ) {
+    const char* getLocation( u16 p_ind ) {
         if( p_ind > 5000 )
             return FARAWAY_PLACE;
         FILE* f = FS::open( "nitro:/LOCATIONS/", p_ind, ".data" );
 
         if( !f ) {
             if( savMod == SavMod::_NDS && p_ind > 322 && p_ind < 1000 )
-                return getLoc( 3002 );
+                return getLocation( 3002 );
 
             return FARAWAY_PLACE;
         }
@@ -505,7 +524,7 @@ bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
 }
 
 u16 item::getItemId( ) {
-    for( int i = 0; i < 700; ++i )
+    for( u16 i = 0; i < MAX_ITEMS; ++i )
         if( ItemList[ i ]->m_itemName == m_itemName )
             return i;
     return 0;

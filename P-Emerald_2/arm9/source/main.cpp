@@ -165,9 +165,9 @@ int main( int, char** p_argv ) {
         scanKeys( );
         FRAME_COUNT++;
 
-        if( ANIMATE_MAP ) {
-            //animateMap( ++frame );
-        }
+        if( ANIMATE_MAP && MAP::curMap )
+            MAP::curMap->animateMap( FRAME_COUNT );
+
         if( !UPDATE_TIME )
             return;
 
@@ -191,6 +191,7 @@ int main( int, char** p_argv ) {
             char buffer[ 50 ];
             sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
             IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
+
 
             achours = timeStruct->tm_hour;
             acminutes = timeStruct->tm_min;
@@ -229,7 +230,9 @@ int main( int, char** p_argv ) {
 
 #ifdef DEBUG
         if( held & KEY_L && gMod == DEVELOPER ) {
-            std::sprintf( buffer, "Currently at %hu-(%hu,%hu,%hu).\nMap: %hu:%hu, (%02hX,%02hX)",
+            time_t unixTime = time( NULL );
+            struct tm* timeStruct = gmtime( (const time_t *) &unixTime );
+            std::sprintf( buffer, "Currently at %hu-(%hu,%hu,%hu).\nMap: %hu:%hu, (%02hX,%02hX)\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
                           FS::SAV->m_currentMap,
                           FS::SAV->m_player.m_pos.m_posX,
                           FS::SAV->m_player.m_pos.m_posY,
@@ -237,7 +240,9 @@ int main( int, char** p_argv ) {
                           FS::SAV->m_player.m_pos.m_posY / 32,
                           FS::SAV->m_player.m_pos.m_posX / 32,
                           FS::SAV->m_player.m_pos.m_posX % 32,
-                          FS::SAV->m_player.m_pos.m_posY % 32 );
+                          FS::SAV->m_player.m_pos.m_posY % 32,
+                          FRAME_COUNT,
+                          achours, acminutes, acseconds, timeStruct->tm_sec );
             IO::messageBox m( buffer );
             IO::NAV->draw( true );
         }
@@ -276,23 +281,6 @@ OUT:
             continue;
         }
         //Movement
-        if( held & KEY_Y ) {
-            IO::waitForKeysUp( KEY_Y );
-            if( FS::SAV->m_registeredItem ) {
-                if( ItemList[ FS::SAV->m_registeredItem ]->useable( ) )
-                    ItemList[ FS::SAV->m_registeredItem ]->use( );
-                else {
-                    IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
-                    IO::NAV->draw( true );
-                }
-            } else {
-                IO::messageBox( "Du kannst ein Item\nauf Y registrieren.", "PokéNav" );
-                IO::NAV->draw( true );
-            }
-            swiWaitForVBlank( );
-            scanKeys( );
-            continue;
-        }
         if( held & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
             MAP::direction curDir = GET_DIR( held );
             scanKeys( );

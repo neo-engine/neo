@@ -28,7 +28,7 @@ LIBNDS	:=	$(DEVKITPRO)/libnds
 %.arm9: %.elf
 	@$(OBJCOPY) -O binary $< $@
 	@echo built ... $(notdir $@)
- 
+
 #---------------------------------------------------------------------------------
 %.arm7: %.elf
 	@$(OBJCOPY) -O binary $< $@
@@ -64,34 +64,38 @@ CFLAGS	:=	-g -Wall -Wextra\
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM9 -DNDSFILENAME=\"$(TARGET).nds\"
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++14 -Os
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++14 -Ofast
+#            -fsanitize=undefined -fsanitize=float-cast-overflow -fsanitize=null\
+#            -fsanitize=return -fsanitize=vptr
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH)  -Wl,-Map,$(notdir $*.map)
+#            -fsanitize=undefined -fsanitize=float-cast-overflow -fsanitize=null\
+#            -fsanitize=return -fsanitize=vptr
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
 LIBS	:= -lfilesystem -lfat -lnds9
- 
- 
+
+
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
 LIBDIRS	:=	$(LIBNDS)
- 
+
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
 # rules for different file extensions
 #---------------------------------------------------------------------------------
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
- 
+
 export ARM9BIN	:=	$(TOPDIR)/$(TARGET).arm9
 export ARM9ELF	:=	$(CURDIR)/$(TARGET).arm9.elf
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
- 
+
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(DATA),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir))
@@ -121,34 +125,34 @@ endif
 export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 					$(PNGFILES:.png=.o) \
 					$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
- 
+
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 					-I$(CURDIR)/$(BUILD)
- 
+
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
-  
+
 .PHONY: $(BUILD)
- 
+
 #---------------------------------------------------------------------------------
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@make -C $(BUILD) -f $(CURDIR)/Makefile
- 
+
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).nds $(TARGET).ds.gba 
- 
+	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).nds $(TARGET).ds.gba
+
 rebuild: clean $(BUILD)
 
 
 #---------------------------------------------------------------------------------
 else
- 
+
 DEPENDS	:=	$(OFILES:.o=.d)
- 
+
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
@@ -179,7 +183,7 @@ $(ARM9ELF)	:	$(OFILES)
 	grit $< -fts -o$*
 
 -include $(DEPENDS)
- 
+
 #---------------------------------------------------------------------------------------
 endif
 #---------------------------------------------------------------------------------------

@@ -79,6 +79,12 @@
     <Filter Include="Source Files\arm9\fs">
       <UniqueIdentifier>{d14f2d8a-a5f5-4cec-a703-966dde312242}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\arm9\nav">
+      <UniqueIdentifier>{d8e11ffa-e4f3-4cb9-b24f-bb908b0aa4dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\arm9\nav">
+      <UniqueIdentifier>{17593f18-579d-426a-b6cf-65f112bde7eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arm9\include\unistd.h">
@@ -222,6 +228,9 @@
     <ClInclude Include="arm9\source\battleWeather.h">
       <Filter>Header Files\arm9\battle</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\source\nav.h">
+      <Filter>Header Files\arm9\nav</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">
@@ -287,9 +296,6 @@
     <ClCompile Include="arm9\source\uio.cpp">
       <Filter>Source Files\arm9\io</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\map2d.cpp">
-      <Filter>Source Files\arm9\map</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\statusScreen.cpp">
       <Filter>Source Files\arm9\sts</Filter>
     </ClCompile>
@@ -349,6 +355,9 @@
     </ClCompile>
     <ClCompile Include="arm9\source\battleScripts.cpp">
       <Filter>Source Files\arm9\battle</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\nav.cpp">
+      <Filter>Source Files\arm9\nav</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

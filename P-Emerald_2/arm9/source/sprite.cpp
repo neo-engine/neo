@@ -35,6 +35,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "move.h"
 #include "ribbon.h"
 
+#include "Egg.h"
+
 #include "damage_0.h"
 #include "damage_1.h"
 #include "damage_2.h"
@@ -396,7 +398,7 @@ namespace IO {
         return p_tileIdx + 2 * ( p_spriteDataLen / BYTES_PER_16_COLOR_TILE );
     }
 
-    u16 loadPKMNSprite( const char* p_path, const u16& p_pkmnId, const s16 p_posX,
+    u16 loadPKMNSprite( const char* p_path, const u16 p_pkmnId, const s16 p_posX,
                         const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx, bool p_topOnly ) {
         char buffer[ 100 ];
         if( !p_female )
@@ -430,6 +432,10 @@ namespace IO {
         }
         updateOAM( p_bottom );
         return p_tileCnt + 144;
+    }
+    u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 64, 64,
+                           EggPal, EggTiles, EggTilesLen, false, false, false, OBJPRIORITY_1, p_bottom );
     }
 
     u16 loadTrainerSprite( const char* p_path, const char* p_name, const s16 p_posX,
@@ -509,13 +515,13 @@ namespace IO {
         }
     }
 
-    u16 loadPKMNIcon( const u16& p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadPKMNIcon( const u16 p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         char buffer[ 100 ];
         sprintf( buffer, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
         return loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
 
-    u16 loadPKMNIcon( const u16& p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadPKMNIcon( const u16 p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom ) {
         char buffer[ 100 ];
         sprintf( buffer, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
         return loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos, p_tileCnt, p_bottom );

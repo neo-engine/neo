@@ -60,20 +60,28 @@ namespace MAP {
         u8          m_bottombehave;
     };
 
-    typedef struct {
+    struct tileSet {
+        struct animation {
+            u16     m_tileIdx;
+            u8      m_acFrame;
+            u8      m_maxFrame;
+            u8      m_speed;
+            tile    m_tiles[ 16 ];
+        };
+        u8          m_animationCount1, m_animationCount2;
+        animation   *m_animations1, *m_animations2;
         tile        *m_tiles1, *m_tiles2;
-    } tileSet;
-    typedef struct {
+    };
+    struct blockSet {
         block       *m_blocks1, *m_blocks2;
-    } blockSet;
+    };
 
-    typedef struct {
+    struct mapBlockAtom {
         u16         m_blockidx : 10;
         u8          m_movedata : 6;
-    } mapBlockAtom;
+    };
 
     struct mapSlice {
-
         palette     m_pals[ 16 ];
         tileSet     m_tileSet;
         blockSet    m_blockSet;
@@ -83,7 +91,7 @@ namespace MAP {
 
         std::pair<u16, u16> m_pokemon[ 3 * 5 * 5 ];
     };
-    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y );
+    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y, bool p_init = false );
 
     struct sliceCache {
 #define MAX_CACHE_SIZE 4
@@ -91,11 +99,15 @@ namespace MAP {
         tile* m_tiles[ MAX_CACHE_SIZE ];
         block* m_blocks[ MAX_CACHE_SIZE ];
         palette* m_palettes[ MAX_CACHE_SIZE ];
+
+        u8 m_animationCounts[ MAX_CACHE_SIZE ];
+        tileSet::animation* m_animations[ MAX_CACHE_SIZE ];
         u8 m_nextFree;
 
         sliceCache( ) {
             m_nextFree = 0;
             memset( m_indices, -1, sizeof( m_indices ) );
+            memset( m_animationCounts, 0, sizeof( m_animationCounts ) );
         }
 
         u8 set( u8 p_index ) { //Gets the next free index
@@ -114,10 +126,12 @@ namespace MAP {
         void clear( ) {
             m_nextFree = 0;
             memset( m_indices, -1, sizeof( m_indices ) );
+            memset( m_animationCounts, 0, sizeof( m_animationCounts ) );
             for( u8 i = 0; i < MAX_CACHE_SIZE; ++i ) {
                 delete m_tiles[ i ];
                 delete m_blocks[ i ];
                 delete m_palettes[ i ];
+                delete m_animations[ i ];
             }
         }
     };

@@ -52,7 +52,7 @@ void fillResume( ) {
     sprintf( buffer, "%s", FS::SAV->m_playername );
     IO::regularFont->printString( buffer, 128, 5, true );
 
-    sprintf( buffer, "%s", FS::getLoc( MAP::curMap->getCurrentLocationId( ) ) );
+    sprintf( buffer, "%s", FS::getLocation( MAP::curMap->getCurrentLocationId( ) ) );
     IO::regularFont->printString( "Ort:", 16, 23, true );
     IO::regularFont->printString( buffer, 128, 23, true );
 
@@ -72,8 +72,8 @@ void fillResume( ) {
 
 void drawSplash( ) {
     FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "Title" );
-    if( IO::BGs[ FS::SAV->m_bgIdx ].m_allowsOverlay )
-        IO::NAV->draw( );
+//    if( IO::BGs[ FS::SAV->m_bgIdx ].m_allowsOverlay )
+//        IO::NAV->draw( );
     IO::clearScreen( true, false, false );
 
     consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );

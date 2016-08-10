@@ -30,13 +30,14 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "defines.h"
 #include "uio.h"
 #include "messageBox.h"
+#include "keyboard.h"
 
 #include "statusScreen.h"
 #include "statusScreenUI.h"
 #include "saveGame.h"
 
 namespace BOX {
-#define TRESHOLD 10
+#define TRESHOLD 20
 
 #define HAS_SELECTION( no, yes ) do if( _selectedIdx == (u8) -1 ) { no; } else { yes; } while (false)
     void boxViewer::run( bool p_allowTakePkmn ) {
@@ -59,7 +60,8 @@ namespace BOX {
             if( GET_AND_WAIT( KEY_B )
                 || GET_AND_WAIT( KEY_X )
                 || GET_AND_WAIT_C( SCREEN_WIDTH - 12, SCREEN_HEIGHT - 10, 16 ) ) {
-                break;
+                if( !_heldPkmn.m_boxdata.m_speciesId )
+                    break;
             } else if( GET_AND_WAIT( KEY_L ) ) {
                 FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
                 CLEAN;
@@ -105,6 +107,35 @@ namespace BOX {
                     }
                     if( !IN_RANGE_R( 208, 23, 232, 48 ) ) {
                         _boxUI.buttonChange( boxUI::BUTTON_RIGHT, false );
+                        break;
+                    }
+                }
+            } else if( IN_RANGE_R( 49, 23, 207, 48 ) ) {
+                _boxUI.buttonChange( boxUI::BUTTON_BOX_NAME, true );
+                loop( ) {
+                    swiWaitForVBlank( );
+                    scanKeys( );
+                    touchRead( &touch );
+                    if( TOUCH_UP ) {
+                        _boxUI.buttonChange( boxUI::BUTTON_BOX_NAME, false );
+                        IO::swapScreens( );
+                        IO::OamTop->oamBuffer[ 0 ].isHidden = true;
+                        IO::updateOAM( false );
+                        IO::printRectangle( 144, 192 - 14, 255, 192, false, false, WHITE_IDX );
+
+                        IO::keyboard kb;
+                        sprintf( buffer, "Name für Box „%s“", FS::SAV->getCurrentBox( )->m_name );
+                        strcpy( FS::SAV->getCurrentBox( )->m_name, kb.getText( 14, buffer ).c_str( ) );
+                        IO::swapScreens( );
+                        IO::OamTop->oamBuffer[ 0 ].isHidden = false;
+                        IO::updateOAM( false );
+
+                        _ranges = _boxUI.draw( p_allowTakePkmn );
+                        select( _selectedIdx );
+                        break;
+                    }
+                    if( !IN_RANGE_R( 49, 23, 207, 48 ) ) {
+                        _boxUI.buttonChange( boxUI::BUTTON_BOX_NAME, false );
                         break;
                     }
                 }

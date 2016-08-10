@@ -7,7 +7,7 @@ endif
 
 include $(DEVKITARM)/ds_rules
 
-GAME_TITLE	    :=	Pokemon
+GAME_TITLE	    :=	Pok_mon
 GAME_SUBTITLE1	:=  Smaragd Edition 2
 GAME_ICON       :=  $(CURDIR)/icon.bmp
 
@@ -30,7 +30,7 @@ $(TARGET).ds.gba	: $(TARGET).nds
 
 #---------------------------------------------------------------------------------
 $(TARGET).nds	:	$(TARGET).arm7 $(TARGET).arm9
-	ndstool	-c $(TARGET).nds -7 $(TARGET).arm7 -9 $(TARGET).arm9 -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES)
+	ndstool	-c $(TARGET).nds -7 $(TARGET).arm7 -9 $(TARGET).arm9 -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES) -g PE2P PW "POKEMON E2"
 
 #---------------------------------------------------------------------------------
 $(TARGET).arm7	: arm7/$(TARGET).elf
@@ -39,7 +39,7 @@ $(TARGET).arm9	: arm9/$(TARGET).elf
 #---------------------------------------------------------------------------------
 arm7/$(TARGET).elf:
 	$(MAKE) -C arm7
-	
+
 #---------------------------------------------------------------------------------
 arm9/$(TARGET).elf:
 	$(MAKE) -C arm9

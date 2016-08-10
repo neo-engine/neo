@@ -33,12 +33,14 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #ifdef DEBUG
 #include "uio.h"
 #include "messageBox.h"
+
+#define assert( a ) if( !(a) ) IO::messageBox( "assert failed o.O" )
 #endif
 
 namespace MAP {
     sliceCache cache;
 
-    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y ) {
+    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y, bool p_init ) {
         FILE* mapF = FS::open( MAP_PATH,
                                ( toString( p_map )
                                  + "/" + toString( p_y )
@@ -106,7 +108,7 @@ namespace MAP {
 
         //Read the first tileset
         s8 ind;
-        if( ( ind = cache.get( tsidx1 ) ) == -1 ) {
+        if( ( ind = cache.get( tsidx1 ) ) == -1 || p_init ) {
             ind = cache.set( tsidx1 );
             if( cache.m_tiles[ ind ] )
                 delete cache.m_tiles[ ind ];
@@ -119,25 +121,33 @@ namespace MAP {
                 delete cache.m_blocks[ ind ];
             mapF = FS::open( TILESET_PATH, tsidx1, ".bvd" );
             cache.m_blocks[ ind ] = new block[ 512 ];
-            FS::readblocks( mapF, cache.m_blocks[ ind ] );
+            FS::readBlocks( mapF, cache.m_blocks[ ind ] );
             FS::close( mapF );
 
             if( cache.m_palettes[ ind ] )
-                delete  cache.m_palettes[ ind ];
+                delete cache.m_palettes[ ind ];
             mapF = FS::open( TILESET_PATH, tsidx1, ".p2l" );
             cache.m_palettes[ ind ] = new palette[ 6 ];
             FS::readPal( mapF, cache.m_palettes[ ind ] );
             FS::close( mapF );
+
+            if( cache.m_animations[ ind ] )
+                delete cache.m_animations[ ind ];
+            mapF = FS::open( TILESET_PATH, tsidx1, ".anm" );
+            cache.m_animationCounts[ ind ] = FS::readAnimations( mapF, cache.m_animations[ ind ] );
+#ifdef DEBUG
+            assert( !cache.m_animationCounts[ ind ] || cache.m_animations[ ind ] );
+#endif
         }
         res->m_tileSet.m_tiles1 = cache.m_tiles[ ind ];
         res->m_blockSet.m_blocks1 = cache.m_blocks[ ind ];
         memcpy( res->m_pals, cache.m_palettes[ ind ], sizeof( palette ) * 6 );
-        //sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx1 );
-        //FS::readAnimations( fopen( buffer, "rb" ), m_animations );
 
+        res->m_tileSet.m_animations1 = cache.m_animations[ ind ];
+        res->m_tileSet.m_animationCount1 = cache.m_animationCounts[ ind ];
         //Read the second tileset
 
-        if( ( ind = cache.get( tsidx2 ) ) == -1 ) {
+        if( ( ind = cache.get( tsidx2 ) ) == -1 || p_init ) {
             ind = cache.set( tsidx2 );
             if( cache.m_tiles[ ind ] )
                 delete cache.m_tiles[ ind ];
@@ -150,22 +160,30 @@ namespace MAP {
                 delete cache.m_blocks[ ind ];
             mapF = FS::open( TILESET_PATH, tsidx2, ".bvd" );
             cache.m_blocks[ ind ] = new block[ 512 ];
-            FS::readblocks( mapF, cache.m_blocks[ ind ] );
+            FS::readBlocks( mapF, cache.m_blocks[ ind ] );
             FS::close( mapF );
 
             if( cache.m_palettes[ ind ] )
-                delete  cache.m_palettes[ ind ];
+                delete cache.m_palettes[ ind ];
             mapF = FS::open( TILESET_PATH, tsidx2, ".p2l" );
             cache.m_palettes[ ind ] = new palette[ 6 ];
             FS::readPal( mapF, cache.m_palettes[ ind ] );
             FS::close( mapF );
+
+            if( cache.m_animations[ ind ] )
+                delete cache.m_animations[ ind ];
+            mapF = FS::open( TILESET_PATH, tsidx2, ".anm" );
+            cache.m_animationCounts[ ind ] = FS::readAnimations( mapF, cache.m_animations[ ind ] );
+#ifdef DEBUG
+            assert( !cache.m_animationCounts[ ind ] || cache.m_animations[ ind ] );
+#endif
         }
         res->m_tileSet.m_tiles2 = cache.m_tiles[ ind ];
         res->m_blockSet.m_blocks2 = cache.m_blocks[ ind ];
         memcpy( res->m_pals + 6, cache.m_palettes[ ind ], sizeof( palette ) * 6 );
 
-        //sprintf( buffer, "nitro:/MAPS/TILESETS/%i.anm", tsidx2 );
-        //readAnimations( fopen( buffer, "rb" ), m_animations );
+        res->m_tileSet.m_animations2 = cache.m_animations[ ind ];
+        res->m_tileSet.m_animationCount2 = cache.m_animationCounts[ ind ];
         return res;
     }
 }

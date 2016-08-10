@@ -73,6 +73,8 @@ namespace BATTLE {
         void    capture( u16 p_pokeBall, u8 p_ticks );
         void    handleCapture( );
 
+        bool    isVisiblePKMN( bool p_opponent, u8 p_pokemonPos );
+
         void    hidePKMN( bool p_opponent, u8 p_pokemonPos );
         void    sendPKMN( bool p_opponent, u8 p_pokemonPos, bool p_silent = false );
         void    evolvePKMN( bool p_opponent, u8 p_pokemonPos );

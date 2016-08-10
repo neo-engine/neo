@@ -151,10 +151,8 @@ namespace FS {
                 tmp.push_back( m_pkmnTeam[ i ] );
             else
                 break;
-        char buffer[ 30 ];
-        sprintf( buffer, "%s", m_playername );
 
-        static BATTLE::battleTrainer res( std::string( buffer ), "", "", "", "", tmp );
+        static BATTLE::battleTrainer res( std::string( m_playername ), "", "", "", "", tmp );
         return &res;
     }
     void        saveGame::updateTeam( ) {
@@ -186,9 +184,11 @@ namespace FS {
         for( u8 i = 0; i < MAX_BOXES; i++ )
             res += m_storedPokemon[ i ].count( p_pkmnIdx );
         for( u8 i = 0; i < 6; ++i ) {
-            if( m_pkmnTeam[ i ].m_boxdata.m_speciesId == p_pkmnIdx )
+            if( !m_pkmnTeam[ i ].isEgg( )
+                && m_pkmnTeam[ i ].m_boxdata.m_speciesId == p_pkmnIdx )
                 ++res;
-            if( m_clipboard[ i ].m_speciesId == p_pkmnIdx )
+            if( !m_clipboard[ i ].isEgg( )
+                && m_clipboard[ i ].m_speciesId == p_pkmnIdx )
                 ++res;
         }
         return res;

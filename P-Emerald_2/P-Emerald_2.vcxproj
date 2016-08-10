@@ -81,7 +81,6 @@
     <ClCompile Include="arm9\source\item.cpp" />
     <ClCompile Include="arm9\source\keyboard.cpp" />
     <ClCompile Include="arm9\source\main.cpp" />
-    <ClCompile Include="arm9\source\map2d.cpp" />
     <ClCompile Include="arm9\source\mapDrawer.cpp" />
     <ClCompile Include="arm9\source\mapMoves.cpp" />
     <ClCompile Include="arm9\source\mapObject.cpp" />

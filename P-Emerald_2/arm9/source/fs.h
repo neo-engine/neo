@@ -59,7 +59,8 @@ namespace FS {
     bool readNop( FILE* p_file, u32 p_cnt );
     bool readPal( FILE* p_file, MAP::palette* p_palette );
     bool readTiles( FILE* p_file, MAP::tile* p_tiles, u16 p_startIdx = 0, u16 p_size = 512 );
-    bool readblocks( FILE* p_file, MAP::block* p_blocks, u16 p_startIdx = 0, u16 p_size = 512 );
+    bool readBlocks( FILE* p_file, MAP::block* p_blocks, u16 p_startIdx = 0, u16 p_size = 512 );
+    u8   readAnimations( FILE* p_file, MAP::tileSet::animation*& p_animations );
 
     std::string breakString( const std::string& p_string, u8 p_lineLength );
     std::string breakString( const std::string& p_string, IO::font* p_font, u8 p_lineLength );
@@ -68,7 +69,8 @@ namespace FS {
 
     bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no );
     bool readPictureData( u16* p_layer, const char* p_Path, const char* p_name, u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256, bool p_bottom = false );
+    bool readPictureData( u16* p_layer, const char* p_Path, const char* p_name, u16 p_paletteSize, u16 p_palStart, u32 p_tileCnt, bool p_bottom );
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt, bool p_bottom = false );
 
-    const char* getLoc( u16 p_ind );
+    const char* getLocation( u16 p_ind );
 }

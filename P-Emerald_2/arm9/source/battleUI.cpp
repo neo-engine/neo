@@ -67,15 +67,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "BattleBall3.h" //Fainted
 #include "BattleBall4.h" //NA
 
-//Test Trainer mugs:
-#include "mug_001_1.h"
-#include "mug_001_2.h"
-
-#include "TestBattleBack.h"
-
-#include "Border.h"
-
-
 #include "memo.h"
 #include "atks.h"
 #include "Up.h"
@@ -176,11 +167,11 @@ namespace BATTLE {
 #define PKMN_TILE_IDX( p_pokemonPos, p_opponent ) ( PKMN_TILE_START + 144 * ( ( p_opponent ) * 2 + ( p_pokemonPos ) ) )
     u16 TILESTART = ( PKMN_TILE_START + 4 * 144 );
 
-#define OWN1_EP_COL         160
+#define OWN1_EP_COL         200
 #define OWN2_EP_COL         OWN1_EP_COL
 
-#define OWN_HP_COL          150
-#define OPP_HP_COL          155
+#define OWN_HP_COL          210
+#define OPP_HP_COL          215
 
 #define HP_COL(a,b) (((a) == OPPONENT )? (OPP_HP_COL + (b)*2 ): (OWN_HP_COL + (b)*2 ))
 
@@ -227,7 +218,7 @@ namespace BATTLE {
         undrawPkmnInfo1( p_hpx, p_hpy );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
-        IO::printString( IO::regularFont, p_pokemon.m_boxdata.m_name, p_hpx - IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) - 12, p_hpy + 2, false );
+        IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_hpx - 12, p_hpy + 2, false, IO::font::RIGHT );
         if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 )
             drawGender( p_hpx - 10, p_hpy + 2, p_pokemon.gender( ) );
         IO::regularFont->setColor( WHITE_IDX, 2 );
@@ -235,11 +226,10 @@ namespace BATTLE {
         char bf2[ 20 ] = { 0 };
         sprintf( buffer, "Lv%hhu", p_pokemon.m_level );
         sprintf( bf2, " %huKP", p_pokemon.m_stats.m_acHP );
-        IO::printString( IO::regularFont, buffer, p_hpx - IO::regularFont->stringWidth( buffer )
-                         - IO::regularFont->stringWidth( bf2 ) - 2, p_hpy + 15, false );
+        IO::regularFont->printString( buffer, p_hpx - IO::regularFont->stringWidth( bf2 ) - 2, p_hpy + 15, false, IO::font::RIGHT );
         IO::regularFont->setColor( WHITE_IDX, 1 );
         IO::regularFont->setColor( p_hpCol, 2 );
-        IO::printString( IO::regularFont, bf2, p_hpx - IO::regularFont->stringWidth( bf2 ) - 2, p_hpy + 15, false );
+        IO::regularFont->printString( bf2, p_hpx - 2, p_hpy + 15, false, IO::font::RIGHT );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
     }
@@ -247,7 +237,7 @@ namespace BATTLE {
         undrawPkmnInfo2( p_hpx, p_hpy );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
-        IO::printString( IO::regularFont, p_pokemon.m_boxdata.m_name, p_hpx + 34, p_hpy + 2, false );
+        IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_hpx + 34, p_hpy + 2, false );
         if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 )
             drawGender( p_hpx + IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) + 34, p_hpy + 2, p_pokemon.gender( ) );
         IO::regularFont->setColor( WHITE_IDX, 2 );
@@ -255,10 +245,10 @@ namespace BATTLE {
         char bf2[ 20 ] = { 0 };
         sprintf( buffer, "Lv%hhu", p_pokemon.m_level );
         sprintf( bf2, " %huKP", p_pokemon.m_stats.m_acHP );
-        IO::printString( IO::regularFont, buffer, p_hpx + 34, p_hpy + 15, false );
+        IO::regularFont->printString( buffer, p_hpx + 34, p_hpy + 15, false );
         IO::regularFont->setColor( WHITE_IDX, 1 );
         IO::regularFont->setColor( p_hpCol, 2 );
-        IO::printString( IO::regularFont, bf2, p_hpx + IO::regularFont->stringWidth( buffer ) + 34, p_hpy + 15, false );
+        IO::regularFont->printString( bf2, p_hpx + IO::regularFont->stringWidth( buffer ) + 34, p_hpy + 15, false );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
     }
@@ -498,8 +488,8 @@ namespace BATTLE {
         REG_BLDY = 0x1F;
         bgUpdate( );
 
-        dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
-        dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
+        sprintf( buffer, "%d", _battle->m_backgroundId );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/", buffer, 512, 49152 );
 
         u16 val = 0x1F;
         for( s8 i = 4; i >= 0; --i ) {
@@ -511,12 +501,12 @@ namespace BATTLE {
         swiWaitForVBlank( );
 
         if( !_battle->m_isWildBattle ) {
-            dmaCopy( mug_001_1Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-            dmaCopy( mug_001_1Pal, BG_PALETTE, 64 );
+            sprintf( buffer, "%03d_1", _battle->_opponent->m_trainerClass );
+            FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 128, 49152 );
             for( u8 i = 0; i < 40; ++i )
                 swiWaitForVBlank( );
-            dmaCopy( mug_001_2Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-            dmaCopy( mug_001_2Pal, BG_PALETTE, 64 );
+            sprintf( buffer, "%03d_2", _battle->_opponent->m_trainerClass );
+            FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 128, 49152 );
             for( u8 i = 0; i < 120; ++i )
                 swiWaitForVBlank( );
 
@@ -564,8 +554,8 @@ namespace BATTLE {
         REG_BLDY = 0x1F;
         bgUpdate( );
 
-        dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
-        dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
+        sprintf( buffer, "%d", _battle->m_backgroundId );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/", buffer, 512, 49152 );
 
         loadBattleUITop( );
         for( u8 i = 0; i < 4; ++i )
@@ -611,8 +601,6 @@ namespace BATTLE {
         if( !_battle->m_isWildBattle )
             IO::initOAMTable( false );
 
-        IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
-        consoleSetFont( &IO::Top, IO::consoleFont );
 
         TILESTART = initStsBalls( false, TILESTART = ( PKMN_TILE_START + 4 * 144 ) );
 
@@ -623,18 +611,18 @@ namespace BATTLE {
                                         false, true, OBJPRIORITY_1, false );
         }
         TILESTART = IO::loadSprite( PLATFORM_START, PLAT_PAL,
-                                    TILESTART, 128, 56, 64, 64, IO::PlatformPals[ _battle->m_platformId ],
-                                    IO::PlatformTiles[ 2 * _battle->m_platformId ], 2048, false,
+                                    TILESTART, 128, 56, 64, 64, IO::PlatformPals[ _battle->m_platform2Id ],
+                                    IO::PlatformTiles[ 2 * _battle->m_platform2Id ], 2048, false,
                                     false, false, OBJPRIORITY_3, false );
         TILESTART = IO::loadSprite( PLATFORM_START + 1, PLAT_PAL,
-                                    TILESTART, 192, 56, 64, 64, IO::PlatformPals[ _battle->m_platformId ],
-                                    IO::PlatformTiles[ 2 * _battle->m_platformId + 1 ], 2048, false,
+                                    TILESTART, 192, 56, 64, 64, IO::PlatformPals[ _battle->m_platform2Id ],
+                                    IO::PlatformTiles[ 2 * _battle->m_platform2Id + 1 ], 2048, false,
                                     false, false, OBJPRIORITY_3, false );
-        TILESTART = IO::loadSprite( PLATFORM_START + 2, PLAT_PAL,
+        TILESTART = IO::loadSprite( PLATFORM_START + 2, PLAT_PAL + 1,
                                     TILESTART, -52, 152 - 32, 64, 64, IO::PlatformPals[ _battle->m_platformId ],
                                     IO::PlatformTiles[ 2 * _battle->m_platformId ], 2048, false,
                                     false, false, OBJPRIORITY_3, false );
-        TILESTART = IO::loadSprite( PLATFORM_START + 3, PLAT_PAL,
+        TILESTART = IO::loadSprite( PLATFORM_START + 3, PLAT_PAL + 1,
                                     TILESTART, 80 - 16, 152 - 32, 64, 64, IO::PlatformPals[ _battle->m_platformId ],
                                     IO::PlatformTiles[ 2 * _battle->m_platformId + 1 ], 2048, false,
                                     false, false, OBJPRIORITY_3, false );
@@ -768,14 +756,13 @@ namespace BATTLE {
 
         if( !acPkmn.m_boxdata.m_individualValues.m_isEgg ) {
             u8 gn = !acPkmn.gender( ) ? 8 : 0;
-            IO::regularFont->printString( acPkmn.m_boxdata.m_name, gn + dx + x + 104 - IO::regularFont->stringWidth( acPkmn.m_boxdata.m_name ), dy + y + 2, true );
+            IO::regularFont->printString( acPkmn.m_boxdata.m_name, gn + dx + x + 104, dy + y + 2, true, IO::font::RIGHT );
             if( !gn )
                 drawGender( dx + x + 104, dy + y + 2, acPkmn.gender( ), true );
             IO::regularFont->setColor( GRAY_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
-            IO::regularFont->printString( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
-                                          dx + x + 113 - IO::regularFont->stringWidth( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) ),
-                                          dy + y + 15, true );
+            IO::regularFont->printString( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
+                                          dx + x + 113, dy + y + 15, true, IO::font::RIGHT );
             sprintf( buffer, "Lv%d", acPkmn.m_level );
             IO::regularFont->printString( buffer, dx + x + 12, dy + y + 27, true );
             if( acPkmn.m_stats.m_acHP ) {
@@ -807,12 +794,12 @@ namespace BATTLE {
                 IO::regularFont->setColor( RED_IDX, 1 );
                 sprintf( buffer, "Besiegt" );
             }
-            IO::regularFont->printString( buffer, dx + x + 113 - IO::regularFont->stringWidth( buffer ), dy + y + 27, true );
+            IO::regularFont->printString( buffer, dx + x + 113, dy + y + 27, true, IO::font::RIGHT );
 
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
         } else
-            IO::regularFont->printString( "Ei", dx + x + 112 - IO::regularFont->stringWidth( "Ei" ), dy + y + 2, true );
+            IO::regularFont->printString( "Ei", dx + x + 112, dy + y + 2, true, IO::font::RIGHT );
     }
 
     void battleUI::drawPKMNChoiceScreen( bool p_firstIsChosen ) {
@@ -864,34 +851,34 @@ namespace BATTLE {
 
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
             if( !p_alreadySent && !p_alreadyChosen && !dead )
-                IO::regularFont->printString( "Aussenden", p_x + dx + 64 - IO::regularFont->stringWidth( "Aussenden" ) / 2, dy + 52, true );
+                IO::regularFont->printString( "Aussenden", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
             else if( !p_alreadyChosen  && !dead )
-                IO::regularFont->printString( "Bereits im Kampf", p_x + dx + 64 - IO::regularFont->stringWidth( "Bereits im Kampf" ) / 2, dy + 52, true );
+                IO::regularFont->printString( "Bereits im Kampf", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
             else if( dead )
-                IO::regularFont->printString( "Schon besiegt…", p_x + dx + 64 - IO::regularFont->stringWidth( "Schon besiegt…" ) / 2, dy + 52, true );
+                IO::regularFont->printString( "Schon besiegt…", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
             else
-                IO::regularFont->printString( "Schon ausgewählt", p_x + dx + 64 - IO::regularFont->stringWidth( "Schon ausgewählt" ) / 2, dy + 52, true );
+                IO::regularFont->printString( "Schon ausgewählt", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
 
-            IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_x + dx + 58 - IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2, dy + 66, true );
+            IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_x + dx + 58, dy + 66, true, IO::font::CENTER );
             drawGender( p_x + dx + 62 + IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2, dy + 66, p_pokemon.gender( ), true );
 
             IO::regularFont->setColor( GRAY_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
 
-            IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ),
-                                          p_x + dx + 64 - IO::regularFont->stringWidth( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( ).c_str( ) ) / 2, dy + 80, true );
+            IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
+                                          p_x + dx + 64, dy + 80, true, IO::font::CENTER );
 
             sprintf( buffer, "Lv%d", p_pokemon.m_level );
             IO::regularFont->printString( buffer, dx + p_x, dy + 94, true );
             sprintf( buffer, "%d/%dKP", p_pokemon.m_stats.m_acHP, p_pokemon.m_stats.m_maxHP );
-            IO::regularFont->printString( buffer, dx + p_x + 128 - IO::regularFont->stringWidth( buffer ), dy + 94, true );
+            IO::regularFont->printString( buffer, dx + p_x + 128, dy + 94, true, IO::font::RIGHT );
 
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
         } else {
             consoleSetWindow( &IO::Bottom, 8, 11, 16, 10 );
-            IO::regularFont->printString( "Ein Ei kann", p_x + dx + 64 - IO::regularFont->stringWidth( "Ein Ei kann" ) / 2, dy + 80, true );
-            IO::regularFont->printString( "nicht kämpfen!", p_x + dx + 64 - IO::regularFont->stringWidth( "nicht kämpfen!" ) / 2, dy + 94, true );
+            IO::regularFont->printString( "Ein Ei kann", p_x + dx + 64, dy + 80, true, IO::font::CENTER );
+            IO::regularFont->printString( "nicht kämpfen!", p_x + dx + 64, dy + 94, true, IO::font::CENTER );
         }
     }
 
@@ -1118,7 +1105,7 @@ namespace BATTLE {
             } else {
                 ++oamIndex;
                 ++palIndex;
-                IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 24, 122, true );
+                IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ), 24, 122, true );
             }
             IO::boldFont->setColor( GRAY_IDX, 1 );
             IO::boldFont->setColor( BLACK_IDX, 2 );
@@ -1133,6 +1120,10 @@ namespace BATTLE {
             }
 
         } else {
+            tilecnt = IO::loadEggSprite( 26, 24, ++oamIndex, ++palIndex, tilecnt, true );
+            IO::boldFont->setColor( GRAY_IDX, 1 );
+            IO::boldFont->setColor( BLACK_IDX, 2 );
+
             IO::boldFont->printString( "Ei /", 16, 96, true );
             IO::boldFont->printString( "Ei", 24, 110, true );
         }
@@ -1229,7 +1220,7 @@ namespace BATTLE {
                 for( auto c : nStr )
                     if( c == '\n' )
                         nlCnt++;
-                IO::regularFont->printString( nStr.c_str( ), 0, 138, true, u8( 16 - 2 * nlCnt ) );
+                IO::regularFont->printString( nStr.c_str( ), 0, 138, true, IO::font::LEFT, u8( 16 - 2 * nlCnt ) );
                 IO::regularFont->printString( acAbility.m_abilityName.c_str( ), 5, 176, true );
                 IO::regularFont->setColor( GRAY_IDX, 1 );
                 IO::regularFont->setColor( BLACK_IDX, 2 );
@@ -1540,7 +1531,7 @@ NEXT_TRY:
 
                 BG_PALETTE_SUB[ 240 + i ] = IO::getColor( acMove->m_moveType );
 
-                u8 w = 104, h = 32;
+                u8 w = 104, h = 34;
                 u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
 
                 IO::printChoiceBox( x, y, x + w + 2, y + h + 1, 6, 240 + i, false );
@@ -1548,11 +1539,13 @@ NEXT_TRY:
                 IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
                 tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 7, y - 7, ++oamIndex, palIndex++, tilecnt, true );
                 tilecnt = IO::loadDamageCategoryIcon( acMove->m_moveHitType, x + 25, y - 7, ++oamIndex, palIndex++, tilecnt, true );
-                consoleSelect( &IO::Bottom );
-                consoleSetWindow( &IO::Bottom, x / 8, 12 + ( i / 2 ) * 6, 20, 2 );
-                printf( "%6hhu/%2hhu AP",
-                        acPkmn.m_boxdata.m_acPP[ i ],
-                        s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+
+                sprintf( buffer, "%6hhu/%2hhu AP",
+                         acPkmn.m_boxdata.m_acPP[ i ],
+                         s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                IO::regularFont->setColor( 0, 2 );
+                IO::regularFont->printString( buffer, x + w - 4, y + h - 14, true, IO::font::RIGHT );
+                IO::regularFont->setColor( GRAY_IDX, 2 );
             }
         }
 
@@ -1572,7 +1565,7 @@ NEXT:
             for( u8 i = 0; i < 4; ++i ) {
                 if( !acPkmn.m_boxdata.m_moves[ i ] )
                     break;
-                u8 w = 104, h = 32;
+                u8 w = 104, h = 34;
                 u8 x = 16 - 8 * ( i / 2 ) + ( w + 16 ) * ( i % 2 ), y = 74 + ( h + 16 ) * ( i / 2 );
                 if( IN_RANGE_R( x, y, x + w, y + h ) && acPkmn.m_boxdata.m_acPP[ i ] ) {
                     auto acMove = AttackList[ acPkmn.m_boxdata.m_moves[ i ] ];
@@ -1580,6 +1573,13 @@ NEXT:
                     IO::printChoiceBox( x, y, x + w + 2, y + h + 1, 6, 240 + i, true );
 
                     IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 9, y + 8, true );
+
+                    sprintf( buffer, "%6hhu/%2hhu AP",
+                             acPkmn.m_boxdata.m_acPP[ i ],
+                             s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                    IO::regularFont->setColor( 0, 2 );
+                    IO::regularFont->printString( buffer, x + w - 2, y + h - 13, true, IO::font::RIGHT );
+                    IO::regularFont->setColor( GRAY_IDX, 2 );
 
                     loop( ) {
                         swiWaitForVBlank( );
@@ -1592,6 +1592,10 @@ NEXT:
                             IO::printChoiceBox( x, y, x + w + 2, y + h + 1, 6, 240 + i, false );
 
                             IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
+
+                            IO::regularFont->setColor( 0, 2 );
+                            IO::regularFont->printString( buffer, x + w - 4, y + h - 14, true, IO::font::RIGHT );
+                            IO::regularFont->setColor( GRAY_IDX, 2 );
                             goto NEXT;
                         }
                     }
@@ -1930,10 +1934,10 @@ NEXT:
                             consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                             consoleClear( );
                         }
-                        if( !tmp || p_noRestrict )
-                            goto CLEAR;
-                        goto START;
                     }
+                    if( !tmp || p_noRestrict )
+                        goto CLEAR;
+                    goto START;
                 }
             }
         }
@@ -2083,6 +2087,14 @@ CLEAR:
     void battleUI::showStatus( bool p_opponent, u8 p_pokemonPos ) {
         (void) p_opponent;
         (void) p_pokemonPos;
+    }
+
+    bool battleUI::isVisiblePKMN( bool p_opponent, u8 p_pokemonPos ) {
+        if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
+            return false;
+        if( p_opponent )
+            return !IO::OamTop->oamBuffer[ PKMN_IDX( p_pokemonPos, p_opponent ) ].isHidden;
+        return IO::OamTop->oamBuffer[ PKMN_IDX( p_pokemonPos, p_opponent ) ].isRotateScale;
     }
 
     void battleUI::hidePKMN( bool p_opponent, u8 p_pokemonPos ) {
@@ -2329,8 +2341,8 @@ ST:
         consoleSelect( &IO::Top );
         consoleClear( );
 
-        dmaCopy( mug_001_1Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-        dmaCopy( mug_001_1Pal, BG_PALETTE, 64 );
+        sprintf( buffer, "%03d_1", _battle->_opponent->m_trainerClass );
+        FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 128, 49152 );
     }
 
     void battleUI::capture( u16 p_pokeBall, u8 p_ticks ) {
@@ -2537,8 +2549,8 @@ BREAK:
         dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
         bgUpdate( );
 
-        dmaCopy( TestBattleBackBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
-        dmaCopy( TestBattleBackPal, BG_PALETTE, 128 * 2 );
+        sprintf( buffer, "%d", _battle->m_backgroundId );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/", buffer, 512, 49152 );
 
         auto& acPkmn = *_battle->_wildPokemon.m_pokemon;
         u16 x = 80;
