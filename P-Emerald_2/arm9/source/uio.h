@@ -66,7 +66,7 @@ namespace IO {
     void swapScreens( );
 
     void setDefaultConsoleTextColors( u16* p_palette, u8 p_start = 1 );
-    
+
     struct inputTarget {
         enum inputType {
             BUTTON,
@@ -107,7 +107,7 @@ namespace IO {
 
     void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_colorIdx, bool p_pressed, bool p_bottom = true );
     void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2, u8 p_colorIdx, bool p_pressed, bool p_bottom = true );
-    
+
     void topScreenPlot( u8 p_x, u8 p_y, color p_color );
     void btmScreenPlot( u8 p_x, u8 p_y, color p_color );
 

@@ -74,7 +74,7 @@ namespace BATTLE {
             _msg2( p_msg2 ),
             _msg3( p_msg3 ),
             _msg4( p_msg4 ) { }
-        
+
         const char*         getLooseMsg( ) const {
             return _msg4.c_str( );
         }

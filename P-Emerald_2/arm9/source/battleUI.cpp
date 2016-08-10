@@ -1539,7 +1539,7 @@ NEXT_TRY:
                 IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
                 tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 7, y - 7, ++oamIndex, palIndex++, tilecnt, true );
                 tilecnt = IO::loadDamageCategoryIcon( acMove->m_moveHitType, x + 25, y - 7, ++oamIndex, palIndex++, tilecnt, true );
-                
+
                 sprintf( buffer, "%6hhu/%2hhu AP",
                          acPkmn.m_boxdata.m_acPP[ i ],
                          s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );

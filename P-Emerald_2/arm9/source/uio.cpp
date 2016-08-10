@@ -343,7 +343,7 @@ namespace IO {
                             p_bottom, false, WHITE_IDX );
         }
     }
-    
+
     void topScreenPlot( u8 p_x, u8 p_y, color p_color ) {
         if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
             ( (color *) BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;

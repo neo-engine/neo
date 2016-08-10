@@ -160,7 +160,7 @@ namespace BATTLE {
 
         friend class battleScript;
         friend class battleUI;
-        
+
         enum battleMode {
             SINGLE = 0,
             DOUBLE = 1

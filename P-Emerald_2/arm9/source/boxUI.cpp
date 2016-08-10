@@ -54,7 +54,7 @@ namespace BOX {
 #define FWD_ICON 3
 #define BWD_ICON 4
 #define PKMN_START 10
-#define PKMN_PALETTE_START 15 
+#define PKMN_PALETTE_START 15
 #define PKMN_TILES_START 96 + 182
 
     constexpr u16 getBoxColor( u8 p_boxIdx ) {

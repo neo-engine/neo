@@ -3,11 +3,11 @@ Pokémon Emerald 2 Version
 ------------------------------
 
 file        : Gen.h
-author      : Philip Wellnitz 
+author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
 Copyright (C) 2012 - 2016
-Philip Wellnitz 
+Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
 
@@ -249,33 +249,33 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
     //03. GEMA	 09. AEMG	 15. EAMG	 21. MAEG
     //04. GMAE	 10. AMGE	 16. EMGA	 22. MEGA
     //05. GMEA	 11. AMEG	 17. EMAG	 23. MEAG
-    
+
     // Where in data each struct is, based on AEGM order
-    static const int DataOrderTable[ 24 ][ 4 ] = { 
-    //    A  E  G  M  
-         {1, 2, 0, 3}, 
-         {1, 3, 0, 2}, 
-         {2, 1, 0, 3}, 
-         {3, 1, 0, 2}, 
-         {2, 3, 0, 1}, 
-         {3, 2, 0, 1}, 
-         {0, 2, 1, 3}, 
-         {0, 3, 1, 2}, 
-         {0, 1, 2, 3}, 
-         {0, 1, 3, 2}, 
-         {0, 3, 2, 1}, 
-         {0, 2, 3, 1}, 
-         {2, 0, 1, 3}, 
-         {3, 0, 1, 2}, 
-         {1, 0, 2, 3}, 
-         {1, 0, 3, 2}, 
-         {3, 0, 2, 1}, 
-         {2, 0, 3, 1}, 
-         {2, 3, 1, 0}, 
-         {3, 2, 1, 0}, 
-         {1, 3, 2, 0}, 
-         {1, 2, 3, 0}, 
-         {3, 1, 2, 0}, 
+    static const int DataOrderTable[ 24 ][ 4 ] = {
+    //    A  E  G  M
+         {1, 2, 0, 3},
+         {1, 3, 0, 2},
+         {2, 1, 0, 3},
+         {3, 1, 0, 2},
+         {2, 3, 0, 1},
+         {3, 2, 0, 1},
+         {0, 2, 1, 3},
+         {0, 3, 1, 2},
+         {0, 1, 2, 3},
+         {0, 1, 3, 2},
+         {0, 3, 2, 1},
+         {0, 2, 3, 1},
+         {2, 0, 1, 3},
+         {3, 0, 1, 2},
+         {1, 0, 2, 3},
+         {1, 0, 3, 2},
+         {3, 0, 2, 1},
+         {2, 0, 3, 1},
+         {2, 3, 1, 0},
+         {3, 2, 1, 0},
+         {1, 3, 2, 0},
+         {1, 2, 3, 0},
+         {3, 1, 2, 0},
          {2, 1, 3, 0} };
 
     static const int belt_offsets[ ] = { BELT_OFFSET_RSE, BELT_OFFSET_FRLG };
