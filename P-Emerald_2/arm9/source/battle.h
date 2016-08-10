@@ -160,7 +160,7 @@ namespace BATTLE {
 
         friend class battleScript;
         friend class battleUI;
-        
+
         enum battleMode {
             SINGLE = 0,
             DOUBLE = 1
@@ -178,6 +178,7 @@ namespace BATTLE {
         bool        m_isWildBattle;
 
         u8          m_platformId;
+        u8          m_platform2Id; //Opponents platform
         u8          m_backgroundId;
 
         weather     m_weather;
@@ -190,11 +191,13 @@ namespace BATTLE {
                 u8 p_platform,
                 u8 p_background,
                 int p_AILevel = 5,
-                battleMode p_battlemode = SINGLE );
+                battleMode p_battlemode = SINGLE,
+                u8 p_platform2 = -1 );
         battle( battleTrainer* p_player,
-                pokemon* p_opponent,
+                pokemon p_opponent,
                 weather p_weather,
                 u8 p_platform,
+                u8 p_platform2,
                 u8 p_background );
 
         void        log( const std::string& p_message );

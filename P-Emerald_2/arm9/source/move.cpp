@@ -311,7 +311,7 @@ move* AttackList[ MAX_ATTACK ] = {
     new move( "Knirscher", battleScript( ), C 80, DARKNESS, C 100, C 15, C 0, A 0, C 1, F 35, H 0 ),
     new move( "Spiegelcape", battleScript( ), C 1, PSYCHIC, C 100, C 20, C 0, A 0, C 1, F 32, H 0 ),
     new move( "Psycho-Plus", battleScript( ), C 0, NORMAL, C 100, C 10, C 0, A 0, C 1, F 8, H 1 ),
-    new move( "Turbotempo", battleScript( ), C 80, NORMAL, C 100, C 5, C 0, A 0, C 1, F 35, H 0 ),
+    new move( "Turbotempo", battleScript( ), C 80, NORMAL, C 100, C 5, C 0, A 0, C 3, F 35, H 0 ),
     new move( "Antik-Kraft", battleScript( ), C 60, ROCK, C 100, C 5, C 0, A 0, C 1, F 34, H 1 ),
     new move( "Spukball", battleScript( ), C 80, GHOST, C 100, C 15, C 0, A 0, C 1, F 2, H 1 ),
     new move( "Seher", battleScript( ), C 80, PSYCHIC, C 90, C 15, C 0, A 0, C 1, F 0, H 1 ),

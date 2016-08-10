@@ -64,11 +64,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "Border.h"
 
-#include "BG0.h"
-#include "BG1.h"
-#include "BG2.h"
-#include "BG3.h"
-
 #include "Back.h"
 #include "poweroff.h"
 #include "poweron.h"
@@ -78,8 +73,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "SPBag.h"
 #include "Save.h"
 #include "PokeDex.h"
-
-#include "1.h"
+#include "BagSpr.h"
 
 namespace IO {
     nav* NAV = 0;
@@ -97,18 +91,18 @@ namespace IO {
         250, 128 };
     unsigned int NAV_DATA[ 12288 ] = { 0 };
     unsigned short NAV_DATA_PAL[ 256 ] = { 0 };
-    nav::backgroundSet BGs[ MAXBG ] = {/* { "Raging Gyarados", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+    nav::backgroundSet BGs[ MAXBG ] = { { "Executing Exeggcute", NAV_DATA, NAV_DATA_PAL, true, true, mainSpritesPositions },
+                                  { "Raging Gyarados", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Sleeping Eevee", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Mystic Guardevoir", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Waiting Suicune", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Awakening Xerneas", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Awakening Yveltal", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Fighting Groudon", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Fighting Kyogre", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },*/
-        { "Executing Exeggcute", BG0Bitmap, BG0Pal, false, true, mainSpritesPositions },
-        { "Fighting Torchic", BG3Bitmap, BG3Pal, false, false, mainSpritesPositions },
-        { "Reborn Ho-Oh", BG2Bitmap, BG2Pal, false, false, mainSpritesPositions },
-        { "Working Klink", BG1Bitmap, BG1Pal, false, true, mainSpritesPositions }
+                                  { "Fighting Kyogre", NAV_DATA,NAV_DATA_PAL, true, false, mainSpritesPositions },
+                                  { "Fighting Torchic", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+                                  { "Reborn Ho-Oh", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+                                  { "Working Klink", NAV_DATA, NAV_DATA_PAL, true, true, mainSpritesPositions }
     };
 
 #define POS( p_isHome ) ( (p_isHome) ? IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses : mainSpritesPositions2 )
@@ -121,9 +115,6 @@ namespace IO {
         { nav::HOME, nav::HOME }
     };
 
-    DEX::dexUI dui( true, FS::SAV->m_hasGDex ? 649 : 493 );
-    DEX::dex dx( FS::SAV->m_hasGDex ? 649 : 493, &dui );
-
     void drawBorder( ) {
         auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg2 ) : bgGetGfxPtr( bg2sub );
         auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
@@ -132,6 +123,22 @@ namespace IO {
         dmaCopy( BorderPal + 192, pal + 192, 64 );
 
         DRAW_TIME = true;
+    }
+
+    void updateItems( ) {
+        bool b = false;
+        for( u8 i = 0; i < 3; ++i ) {
+            u16 curitm = FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 4 - i ) % 5 ];
+            if( !b && FS::SAV->m_registeredItem && ( !curitm || i == 2 || curitm == FS::SAV->m_registeredItem ) ) {
+                curitm = FS::SAV->m_registeredItem;
+                b = true;
+            }
+            if( curitm )
+                IO::loadItemIcon( ItemList[ curitm ]->m_itemName,
+                                  80 + 32 * i, -4, ITM( i ), ITM( i ),
+                                  IO::Oam->oamBuffer[ ITM_BACK + 2 ].gfxIndex + 32 * ( i + 1 ) );
+        }
+        IO::updateOAM( true );
     }
 
     void initMainSprites( bool p_power = false, bool p_showBack = false ) {
@@ -183,6 +190,16 @@ namespace IO {
                                   32, 32, SPBagPal, SPBagTiles, SPBagTilesLen,
                                   false, false, false, OBJPRIORITY_0, true );
 
+        IO::loadSprite( ITM_BACK, ITM_BACK, tileCnt,
+                        80, -4, 32, 32, BagSprPal,
+                        BagSprTiles, BagSprTilesLen, false, false, false, OBJPRIORITY_2, true );
+        IO::loadSprite( ITM_BACK + 1, ITM_BACK, tileCnt,
+                        112, -4, 32, 32, BagSprPal,
+                        BagSprTiles, BagSprTilesLen, false, false, false, OBJPRIORITY_2, true );
+        tileCnt = IO::loadSprite( ITM_BACK + 2, ITM_BACK, tileCnt,
+                                  144, -4, 32, 32, BagSprPal,
+                                  BagSprTiles, BagSprTilesLen, false, false, false, OBJPRIORITY_2, true );
+        updateItems( );
         IO::updateOAM( true );
     }
 
@@ -195,13 +212,10 @@ namespace IO {
 
     void nav::drawMapMug( ) {
         auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
-        auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
 
-        dmaCopy( _Bitmap, ptr, 256 * 192 );
-        dmaCopy( _Pal, pal, 192 * 2 );
-
-        // sprintf( buffer, "%hu", _curMap );
-        // FS::readPictureData( bgGetGfxPtr( bg3sub ), "nitro:/PICS/MAPMUGS/", buffer, 512, 49152, true );
+        sprintf( buffer, "%hu_%hhu", _curMap, getCurrentDaytime( ) % 4 );
+        FS::readPictureData( ptr, "nitro:/PICS/MAP_MUG/", buffer, 512, 49152, !SCREENS_SWAPPED );
+        drawBorder( );
 
         BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
         BG_PALETTE_SUB[ GRAY_IDX ] = GRAY;
@@ -209,11 +223,10 @@ namespace IO {
         regularFont->setColor( WHITE_IDX, 1 );
         regularFont->setColor( GRAY_IDX, 2 );
         regularFont->setColor( 0, 0 );
-        regularFont->printString( MAP::mapInfo[ _curMap ].first.c_str( ),
-                                  244 - regularFont->stringWidth( MAP::mapInfo[ _curMap ].first.c_str( ) ), 12, !SCREENS_SWAPPED );
+        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap / 100 * 100 + 10 ].first ), 246, 8, !SCREENS_SWAPPED, IO::font::RIGHT );
+        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap ].first ), 10, 166, !SCREENS_SWAPPED );
         regularFont->setColor( WHITE_IDX, 2 );
         regularFont->setColor( BLACK_IDX, 1 );
-        regularFont->printString( MAP::mapInfo[ _curMap / 100 * 100 + 10 ].first.c_str( ), 36, 0, !SCREENS_SWAPPED );
     }
 
     void nav::draw( bool p_initMainSrites, u8 p_newIdx ) {
@@ -254,7 +267,7 @@ namespace IO {
             _curMap = p_newMap;
             draw( true );
         } else
-            if( true || FS::exists( "nitro:/PICS/MAPMUGS/", _curMap, false ) ) {
+            if( true || FS::exists( "nitro:/PICS/MAP_MUG/", _curMap, false ) ) {
                 _power = true;
                 _state = MAP_MUG;
                 _curMap = p_newMap;
@@ -264,6 +277,64 @@ namespace IO {
 
     void nav::handleInput( touchPosition p_touch ) {
         touchPosition& touch = p_touch;
+
+        if( held & KEY_Y ) {
+            IO::waitForKeysUp( KEY_Y );
+            if( FS::SAV->m_registeredItem ) {
+                if( ItemList[ FS::SAV->m_registeredItem ]->useable( ) ) {
+                    ItemList[ FS::SAV->m_registeredItem ]->use( );
+                    updateItems( );
+                } else {
+                    IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                    IO::NAV->draw( true );
+                }
+            } else {
+                IO::messageBox( "Du kannst ein Item\nauf Y registrieren.", "PokéNav" );
+                IO::NAV->draw( true );
+            }
+            swiWaitForVBlank( );
+            scanKeys( );
+            return;
+        }
+
+        bool itmsn = false;
+        for( u8 i = 0; i < 3; ++i ) {
+            u16 curitm = FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 4 - i ) % 5 ];
+            if( !itmsn && FS::SAV->m_registeredItem && ( !curitm || i == 2 || curitm == FS::SAV->m_registeredItem ) ) {
+                curitm = FS::SAV->m_registeredItem;
+                itmsn = true;
+            }
+            if( GET_AND_WAIT_C( 96 + 32 * i, 12, 14 ) ) {
+                if( curitm ) {
+                    if( u16( -1 ) == FS::SAV->m_bag.count( BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm ) ) {
+                        IO::yesNoBox yn( "PokéNav" );
+                        sprintf( buffer, "Kein Exemplar des Items\n%s vorhanden.\nIcon entfernen?", ItemList[ curitm ]->getDisplayName( true ).c_str( ) );
+                        if( yn.getResult( buffer ) ) {
+                            for( u8 j = i; j < 4; ++j ) {
+                                FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 4 - j ) % 5 ] =
+                                    FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 3 - j ) % 5 ];
+                            }
+                            FS::SAV->m_lstUsedItems[ FS::SAV->m_lstUsedItemsIdx ] = 0;
+                        }
+                        IO::NAV->draw( true );
+                    } else if( ItemList[ curitm ]->useable( ) ) {
+                        if( ItemList[ curitm ]->use( true ) )
+                            IO::messageBox( "", 0, false );
+                        ItemList[ curitm ]->use( );
+                        if( ItemList[ curitm ]->m_itemType != item::KEY_ITEM )
+                            FS::SAV->m_bag.erase( BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm, 1 );
+                        IO::NAV->draw( true );
+                    } else {
+                        IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                        IO::NAV->draw( true );
+                    }
+                } else {
+                    IO::messageBox( "Hier erscheinen zuletzt\neingesetzte Items.", "PokéNav" );
+                    IO::NAV->draw( true );
+                }
+                return;
+            }
+        }
 
         if( _state != HOME && _power && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
             _state = backTransition[ _state ];
@@ -285,8 +356,10 @@ namespace IO {
                 FADE_TOP_DARK( );
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
+                updateItems( );
                 if( res ) {
                     ItemList[ res ]->use( false );
+                    updateItems( );
                     draw( true );
                 }
             } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
@@ -311,7 +384,8 @@ namespace IO {
                 ANIMATE_MAP = false;
                 _state = HOME;
                 draw( true );
-                dx.run( FS::SAV->m_lstDex );
+
+                DEX::dex( DEX::dex::SHOW_CAUGHT, FS::SAV->m_hasGDex ? 649 : 493 ).run( FS::SAV->m_lstDex );
 
                 IO::clearScreenConsole( true, true );
                 draw( true );
@@ -341,7 +415,7 @@ namespace IO {
                         memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
                         for( int i = 0; i < 5; ++i ) {
                             pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                            a = pokemon( 0, 143 + i, 0,
+                            a = pokemon( 0, rand( ) % MAX_PKMN + 1, 0,
                                          50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
                                          !FS::SAV->m_isMale, i, false, i % 2, i == 3, i + rand( ) % 500, i, i );
                             a.m_stats.m_acHP *= i / 5.0;
@@ -355,13 +429,13 @@ namespace IO {
                             }
                             a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
                             a.m_boxdata.m_ribbons1[ 3 ] = 0;
-                            a.m_boxdata.m_holdItem = I_DURIN_BERRY + i;
+                            a.m_boxdata.m_holdItem = 1 + rand( ) % 400;
 
                             FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
                         }
 
-                        for( u16 j = 251; j < 386; ++j ) {
-                            auto a = pokemon( j + 1, 50, 0, j ).m_boxdata;
+                        for( u16 j : { 493, 649, 648, 647, 487, 492, 641, 642, 646, 645, 643, 644 } ) {
+                            auto a = pokemon( j, 50, 0, j ).m_boxdata;
                             a.m_gotPlace = j;
                             FS::SAV->storePkmn( a );
                             /*if( a.isShiny( ) ) {
@@ -411,7 +485,7 @@ namespace IO {
                                                    "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
 
                         BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
-                                                    BATTLE::weather( rand( ) % 9 ), 0, 0, 5, BATTLE::battle::DOUBLE );
+                                                    BATTLE::weather( rand( ) % 9 ), 10, 0, 5, BATTLE::battle::DOUBLE );
                         ANIMATE_MAP = false;
                         test_battle.start( );
                         FS::SAV->updateTeam( );
@@ -431,7 +505,7 @@ namespace IO {
                                                    "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
 
                         BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
-                                                    BATTLE::HAIL/*weather( rand( ) % 9 )*/, 0, 0, 5, BATTLE::battle::SINGLE );
+                                                    BATTLE::HAIL/*weather( rand( ) % 9 )*/, 10, 0, 5, BATTLE::battle::SINGLE );
                         ANIMATE_MAP = false;
                         test_battle.start( );
                         FS::SAV->updateTeam( );

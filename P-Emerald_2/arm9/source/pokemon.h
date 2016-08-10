@@ -42,7 +42,6 @@ extern std::string NatureList[ 25 ];
 extern std::string TypeList[ 19 ];
 extern std::string PersonalityList[ 30 ];
 extern std::string TasteList[ 6 ];
-extern std::map<u16, std::string> Locations;
 
 enum pkmnLevelUpType {
     MEDIUM_FAST = 0,
@@ -148,6 +147,9 @@ struct pokemonData {
 
     u16             m_formeIdx[ 30 ];
     char            m_formeName[ 30 ][ 15 ];
+
+    u16             m_preEvolution;
+    u8              m_stage; //0: Basic, 1: Stage 1, 2: Stage 2, 3 Restored (m_preEvolution: itemIdx)
 };
 
 const char*     getDisplayName( u16 p_pkmnId );
@@ -241,9 +243,9 @@ u32: 32;
 
         //BLOCKD{
         char                    m_oT[ OTLENGTH ];
+u32: 32;
         u8                      m_gotDate[ 3 ];//(EGG)
         u8                      m_hatchDate[ 3 ]; //gotDate for nonEgg
-u32: 32;
         u8                      m_pokerus : 8;//
         u8                      m_ball : 8;//
         u16                     m_gotLevel : 7;

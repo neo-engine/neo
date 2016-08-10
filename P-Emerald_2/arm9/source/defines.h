@@ -153,14 +153,9 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define OPTS_ID  6
 #define NAV_ID  7
 #define A_ID  8
-//  9 - unused
-// 10 - unused
-// 11 - unused
-// 12 - unused
+#define ITM( a ) ( 9 + ( a ) )
 #define FWD_ID  13
 #define BWD_ID  14
-#define CHOICE_ID  15
-// 14 additional spaces used
-#define BORDER_ID 31
-// 9 additional spaces used
+#define ITM_BACK 15
+
 #define SQCH_ID 80

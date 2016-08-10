@@ -282,7 +282,7 @@ namespace BATTLE {
     }
 
     battle::battle( battleTrainer* p_player, battleTrainer* p_opponent, int p_maxRounds, weather p_weather,
-                    u8 p_platform, u8 p_background, int p_AILevel, battleMode p_battleMode )
+                    u8 p_platform, u8 p_background, int p_AILevel, battleMode p_battleMode, u8 p_platform2 )
         : _player( p_player ), _opponent( p_opponent ) {
         _maxRounds = p_maxRounds;
         _AILevel = p_AILevel;
@@ -293,19 +293,21 @@ namespace BATTLE {
 
         m_weather = p_weather;
         m_platformId = p_platform;
+        m_platform2Id = p_platform2 == u8( -1 ) ? p_platform : p_platform2;
         m_backgroundId = p_background;
     }
-    battle::battle( battleTrainer* p_player, pokemon* p_opponent, weather p_weather, u8 p_platform, u8 p_background )
+    battle::battle( battleTrainer* p_player, pokemon p_opponent, weather p_weather, u8 p_platform, u8 p_platform2, u8 p_background )
         : _player( p_player ), _opponent( 0 ) {
         _maxRounds = 0;
         _AILevel = 0;
         m_weather = p_weather;
         m_platformId = p_platform;
+        m_platform2Id = p_platform2;
         m_backgroundId = p_background;
 
         pokemonData pdata;
-        getAll( p_opponent->m_boxdata.m_speciesId, pdata );
-        _wildPokemon.m_pokemon = p_opponent;
+        getAll( p_opponent.m_boxdata.m_speciesId, pdata );
+        _wildPokemon.m_pokemon = new pokemon( p_opponent );
         _wildPokemon.m_types[ 0 ] = pdata.m_types[ 0 ];
         _wildPokemon.m_types[ 1 ] = pdata.m_types[ 1 ];
         _wildPokemon.m_types[ 2 ] = pdata.m_types[ 1 ];
@@ -519,7 +521,8 @@ CHOOSE1:
                 for( u8 k = 1 + ( m_battleMode == DOUBLE );
                 k < ( j ? _opponent->m_pkmnTeam.size( ) : _player->m_pkmnTeam.size( ) ); ++k )
                     if( CUR_PKMN_STS( k, j ) != KO && CUR_PKMN_STS( k, j ) != SELECTED
-                        && CUR_PKMN_STS( k, j ) != NA && CUR_PKMN( k, j ).m_stats.m_acHP ) {
+                        && CUR_PKMN_STS( k, j ) != NA && CUR_PKMN( k, j ).m_stats.m_acHP
+                        && !CUR_PKMN( k, j ).isEgg( ) ) {
                         refillpossible = true;
                         break;
                     }
@@ -594,7 +597,9 @@ NEXT:
 
         for( u8 i = p_startIdx; i < max; ++i )
             if( CUR_PKMN_STS( i, p_opponent ) != KO
-                && CUR_PKMN_STS( i, p_opponent ) != SELECTED )
+                && CUR_PKMN_STS( i, p_opponent ) != SELECTED
+                && !CUR_PKMN( i, p_opponent ).isEgg( )
+                && CUR_PKMN( i, p_opponent ).m_stats.m_acHP )
                 return i;
         return 7;
     }
@@ -652,7 +657,7 @@ NEXT:
                 inits.push_back( std::tuple<s16, s16, u8>( p_includeMovePriority * movePr, acSpd, 2 * i + j ) );
             }
         }
-        std::sort( inits.begin( ), inits.end( ), std::greater < std::tuple<s8, s16, u16> >( ) );
+        std::sort( inits.rbegin( ), inits.rend( ) );
 
         for( u8 i = 0; i < inits.size( ); ++i ) {
             s16 _0 = 0;
@@ -1208,7 +1213,7 @@ NEXT:
                      _wildPokemon.m_pokemon->m_boxdata.m_name );
             log( buffer );
 
-            DEX::dex( -1, 0 ).run( _wildPokemon.m_pokemon->m_boxdata.m_speciesId );
+            DEX::dex( DEX::dex::SHOW_SINGLE, -1 ).run( _wildPokemon.m_pokemon->m_boxdata.m_speciesId );
         }
         _battleUI->handleCapture( );
 
@@ -1224,11 +1229,11 @@ NEXT:
                 log( buffer );
 
                 if( oldbx != nb ) {
-                    sprintf( buffer, "Box %hhu ist voll.", oldbx );
+                    sprintf( buffer, "Box „%s“ ist voll.[A]", FS::SAV->m_storedPokemon[ oldbx ].m_name );
                     log( buffer );
                 }
-                sprintf( buffer, "%s wurde in\nBox %hhu abgelegt.[A]",
-                         _wildPokemon.m_pokemon->m_boxdata.m_name, nb );
+                sprintf( buffer, "%s wurde in\nBox „%s“ abgelegt.[A]",
+                         _wildPokemon.m_pokemon->m_boxdata.m_name, FS::SAV->m_storedPokemon[ nb ].m_name );
                 log( buffer );
             } else {
                 log( "Du hast keinen Platz\nfür weitere Pokémon.[A]" );
@@ -1567,7 +1572,8 @@ NEXT:
             }
             return;
         }
-        if( !CUR_PKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP && _battleSpotOccupied[ p_pokemonPos ][ p_opponent ] ) {
+        if( !CUR_PKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP && _battleSpotOccupied[ p_pokemonPos ][ p_opponent ]
+            && _battleUI->isVisiblePKMN( p_opponent, p_pokemonPos ) ) {
             if( p_show ) {
                 std::sprintf( buffer, "%s%s wurde besiegt.[A]",
                               ( CUR_PKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),

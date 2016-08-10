@@ -66,7 +66,7 @@ namespace IO {
     void swapScreens( );
 
     void setDefaultConsoleTextColors( u16* p_palette, u8 p_start = 1 );
-    
+
     struct inputTarget {
         enum inputType {
             BUTTON,
@@ -107,16 +107,6 @@ namespace IO {
 
     void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_colorIdx, bool p_pressed, bool p_bottom = true );
     void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2, u8 p_colorIdx, bool p_pressed, bool p_bottom = true );
-
-    void printChar( font* p_font, u16 p_ch, s16 p_x, s16 p_y, bool p_bottom );
-    void printString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance = 16 );
-    void printStringCenter( font* p_font, const char *p_string, bool p_bottom );
-    void printStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
-    void printStringCenterD( font* p_font, const char *p_string, bool p_bottom );
-    void printNumber( font* p_font, s32 p_num, s16 p_x, s16 p_y, bool p_bottom );
-
-    void printMBString( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
-    void printMBStringD( font* p_font, const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
 
     void topScreenPlot( u8 p_x, u8 p_y, color p_color );
     void btmScreenPlot( u8 p_x, u8 p_y, color p_color );

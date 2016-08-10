@@ -184,7 +184,7 @@ namespace STS {
                     }
                 }
                 if( IN_RANGE_I( touch, tg.back( ) ) && IO::waitForInput( tg.back( ) ) ) {
-                    DEX::dex( -1, 0 ).run( FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_speciesId );
+                    DEX::dex( DEX::dex::SHOW_SINGLE, -1 ).run( FS::SAV->m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_speciesId );
 
                     _stsUI->init( _pkmnIdx );
                     tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );

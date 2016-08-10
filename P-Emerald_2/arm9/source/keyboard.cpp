@@ -148,7 +148,7 @@ namespace IO {
 
                 printChoiceBox( px, py, px + width, py + height,
                                 2, COLOR_IDX, false );
-                printChar( regularFont, pages[ _page ][ y * charsPerRow + x ],
+                IO::regularFont->printChar( pages[ _page ][ y * charsPerRow + x ],
                            px + 2, py + 2, true );
             }
     }
@@ -161,14 +161,14 @@ namespace IO {
     }
 
     void keyboard::drawChar( u8 p_pos, u16 p_char ) {
-        printChar( regularFont, p_char, 8 + p_pos * ( textWidth + margin ) + 2,
+        IO::regularFont->printChar( p_char, 8 + p_pos * ( textWidth + margin ) + 2,
                    -12 + ( textHeight + 2 * margin ) + textHeight, true );
     }
     void keyboard::clearChar( u8 p_pos ) {
         printRectangle( 8 + p_pos * ( textWidth + margin ), 1 + textHeight + 2 * margin,
                         8 + p_pos * ( textWidth + margin ) + textWidth, 5 + 2 * textHeight + 2 * margin,
                         true, false, GRAY_IDX );
-        printChar( regularFont, '_', 8 + p_pos * ( textWidth + margin ) + 1,
+        IO::regularFont->printChar( '_', 8 + p_pos * ( textWidth + margin ) + 1,
                    -9 + 2 * textHeight + 2 * margin, true );
     }
 
@@ -196,18 +196,18 @@ namespace IO {
 
                         printChoiceBox( px, py, px + width, py + height,
                                         2, COLOR_IDX, true );
-                        printChar( regularFont, pages[ _page ][ y * charsPerRow + x ],
+                        IO::regularFont->printChar( pages[ _page ][ y * charsPerRow + x ],
                                    px + 4, py + 3, true );
                         if( waitForTouchUp( px, py, px + width, py + width ) ) {
                             printChoiceBox( px, py, px + width, py + height,
                                             2, COLOR_IDX, false );
-                            printChar( regularFont, pages[ _page ][ y * charsPerRow + x ],
+                            IO::regularFont->printChar( pages[ _page ][ y * charsPerRow + x ],
                                        px + 2, py + 2, true );
                             return pages[ _page ][ y * charsPerRow + x ];
                         }
                         printChoiceBox( px, py, px + width, py + height,
                                         2, COLOR_IDX, false );
-                        printChar( regularFont, pages[ _page ][ y * charsPerRow + x ],
+                        IO::regularFont->printChar( pages[ _page ][ y * charsPerRow + x ],
                                    px + 2, py + 2, true );
                     }
                 }

@@ -75,7 +75,7 @@ namespace MAP {
     u16 cx, cy;  //Cameras's pos
     u16* mapMemory[ 4 ];
     s8 fastBike = false;
-    mapObject surfPlatform = { MAP::mapObject::SURF_PLATFORM, { 0, 0, 0 }, 240, MAP::moveMode::NOTHING, 0, 1, MAP::direction::UP };
+    mapObject surfPlatform = { MAP::mapObject::SURF_PLATFORM, { 0, 0, 0 }, 240, MAP::moveMode::NO_MOVEMENT, 0, 1, MAP::direction::UP };
 
     inline void loadBlock( block p_curblock, u32 p_memPos ) {
         u8 toplayer = 1, bottomlayer = 3;
@@ -112,10 +112,10 @@ namespace MAP {
             //FADE_TOP_DARK( );
 
             u16 mx = FS::SAV->m_player.m_pos.m_posX, my = FS::SAV->m_player.m_pos.m_posY;
-            _slices[ _curX ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE );
-            _slices[ _curX ^ 1 ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE );
-            _slices[ _curX ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE + currentHalf( my ) );
-            _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ) );
+            _slices[ _curX ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE, p_init );
+            _slices[ _curX ^ 1 ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE, p_init );
+            _slices[ _curX ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE + currentHalf( my ), p_init );
+            _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ), p_init );
 
             for( u8 i = 1; i < 4; ++i ) {
                 bgInit( i, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
@@ -329,7 +329,7 @@ namespace MAP {
             handleWildPkmn( GRASS );
         else if( behave == 0x03 )
             handleWildPkmn( HIGH_GRASS );
-        else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
+        else if( mapTypes[ FS::SAV->m_currentMap ].first & CAVE )
             handleWildPkmn( GRASS );
     }
     bool mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType, bool p_forceEncounter ) {
@@ -375,54 +375,70 @@ namespace MAP {
         pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
         BATTLE::weather weat = BATTLE::weather::NO_WEATHER;
         switch( _weather ) {
-            case mapDrawer::SUNNY:
+            case SUNNY:
                 weat = BATTLE::weather::SUN;
                 break;
-            case mapDrawer::RAINY:
-            case mapDrawer::THUNDERSTORM:
+            case RAINY:
+            case THUNDERSTORM:
                 weat = BATTLE::weather::RAIN;
                 break;
-            case mapDrawer::SNOW:
-            case mapDrawer::BLIZZARD:
+            case SNOW:
+            case BLIZZARD:
                 weat = BATTLE::weather::HAIL;
                 break;
-            case mapDrawer::SANDSTORM:
+            case SANDSTORM:
                 weat = BATTLE::weather::SANDSTORM;
                 break;
-            case mapDrawer::FOG:
+            case FOG:
                 weat = BATTLE::weather::FOG;
                 break;
-            case mapDrawer::HEAVY_SUNLIGHT:
+            case HEAVY_SUNLIGHT:
                 weat = BATTLE::weather::HEAVY_SUNSHINE;
                 break;
-            case mapDrawer::HEAVY_RAIN:
+            case HEAVY_RAIN:
                 weat = BATTLE::weather::HEAVY_RAIN;
                 break;
             default:
                 break;
         }
 
-        u8 platform = 0;
+        u8 platform = 0, plat2 = 0;
+        u8 battleBack = mapInfo[ FS::SAV->m_currentMap ].second;
         if( p_type == GRASS || p_type == HIGH_GRASS || p_type == FISHING_ROD ) {
-            if( _mapTypes[ FS::SAV->m_currentMap ] == OUTSIDE )
-                platform = 1;
-            else if( _mapTypes[ FS::SAV->m_currentMap ] & DARK )
-                platform = 6;
-            else if( FS::SAV->m_player.m_movement == SURF )
-                platform = 0;
-            else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
-                platform = 4;
+            if( mapTypes[ FS::SAV->m_currentMap ].first == OUTSIDE && FS::SAV->m_player.m_movement != SURF ) {
+                plat2 = platform = 1;
+            } else if( FS::SAV->m_player.m_movement == SURF ) {
+                plat2 = platform = 0;
+            } else if( mapTypes[ FS::SAV->m_currentMap ].first & DARK ) {
+                plat2 = platform = 6;
+            } else if( mapTypes[ FS::SAV->m_currentMap ].first & CAVE ) {
+                plat2 = platform = 4;
+            }
+
+            if( p_type == FISHING_ROD )
+                plat2 = 0;
         }
 
-        u8 battleBack = 0;
+        if( !battleBack ) {
+            if( p_type == GRASS ) battleBack = 1;
+            if( p_type == HIGH_GRASS ) battleBack = 3;
+            if( FS::SAV->m_player.m_movement == SURF )
+                battleBack = 4;
+            else if( mapTypes[ FS::SAV->m_currentMap ].first & CAVE )
+                battleBack = 19;
+        }
+
         auto playerPrio = _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].getPriority( );
         ANIMATE_MAP = false;
         swiWaitForVBlank( );
-        BATTLE::battle( FS::SAV->getBattleTrainer( ), &wildPkmn, weat, platform, battleBack ).start( );
+        IO::NAV->togglePower( );
+        IO::NAV->draw( );
+        BATTLE::battle( FS::SAV->getBattleTrainer( ), wildPkmn, weat, platform, plat2, battleBack ).start( );
         FS::SAV->updateTeam( );
         FADE_TOP_DARK( );
         draw( playerPrio );
         ANIMATE_MAP = true;
+        IO::NAV->togglePower( );
         IO::NAV->draw( true );
 
         return true;
@@ -439,7 +455,7 @@ namespace MAP {
             return handleWildPkmn( GRASS, 0, true );
         else if( behave == 0x03 || p_forceHighGrass )
             return handleWildPkmn( HIGH_GRASS, 0, true );
-        else if( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
+        else if( mapTypes[ FS::SAV->m_currentMap ].first & CAVE )
             return handleWildPkmn( GRASS, 0, true );
         return false;
     }
@@ -941,10 +957,10 @@ NEXT_PASS:
     }
 
     void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
-        bool entryCave = ( !( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
-                           && ( _mapTypes[ p_target.first ] & CAVE ) );
-        bool exitCave = ( ( _mapTypes[ FS::SAV->m_currentMap ] & CAVE )
-                          && !( _mapTypes[ p_target.first ] & CAVE ) );
+        bool entryCave = ( !( mapTypes[ FS::SAV->m_currentMap ].first & CAVE )
+                           && ( mapTypes[ p_target.first ].first & CAVE ) );
+        bool exitCave = ( ( mapTypes[ FS::SAV->m_currentMap ].first & CAVE )
+                          && !( mapTypes[ p_target.first ].first & CAVE ) );
         switch( p_type ) {
             case DOOR:
                 break;
@@ -1324,7 +1340,14 @@ OUT:
     }
 
     u16  mapDrawer::getCurrentLocationId( ) const {
-        //TODO
-        return 0;
+        u16 res = MAP::mapInfo[ FS::SAV->m_currentMap ].first;
+        if( res == 2003 ) { //Kanto
+
+        } else if( res == 2004 ) { //Johto
+
+        } else if( res == 2005 ) { //Hoenn
+
+        }
+        return res;
     }
 }

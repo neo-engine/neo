@@ -332,7 +332,10 @@ namespace BAG {
         switch( res ) {
             case 0: //Registry
             {
-                FS::SAV->m_registeredItem = CURRENT_ITEM.first;
+                if( FS::SAV->m_registeredItem != CURRENT_ITEM.first )
+                    FS::SAV->m_registeredItem = CURRENT_ITEM.first;
+                else
+                    FS::SAV->m_registeredItem = 0;
                 break;
             }
             case 1: //Use
@@ -356,7 +359,8 @@ namespace BAG {
                 else {
                     initUI( );
                     itm->use( );
-                    FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
+                    if( itm->m_itemType != item::KEY_ITEM )
+                        FS::SAV->m_bag.erase( ( bag::bagType )FS::SAV->m_lstBag, CURRENT_ITEM.first, 1 );
                 }
                 break;
             }

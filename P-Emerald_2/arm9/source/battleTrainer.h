@@ -39,12 +39,13 @@ namespace BATTLE {
     class battleTrainer {
     public:
         enum trainerClass {
-            PKMN_TRAINER = 0
+            PKMN_TRAINER = 0, //Wally
+
         };
 
         std::string         m_battleTrainerName;
         trainerClass        m_trainerClass;
-        std::vector < pokemon >& m_pkmnTeam;
+        std::vector<pokemon>& m_pkmnTeam;
         std::pair<u16, u16>*m_items;         //if this is 0 and _itemCount == MAX_ITEMS_IN_BAG, then FS::SAV->m_bag is used.
         u16                 m_itemCount;
     private:
@@ -73,9 +74,6 @@ namespace BATTLE {
             _msg2( p_msg2 ),
             _msg3( p_msg3 ),
             _msg4( p_msg4 ) { }
-
-        pokemon&      sendNewPKMN( bool p_choice = true );
-        //item& useItem( bool choice = true );
 
         const char*         getLooseMsg( ) const {
             return _msg4.c_str( );

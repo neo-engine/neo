@@ -31,7 +31,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <string>
 
 namespace IO {
-#define MAXBG 4
+#define MAXBG 12
 #define START_BG 0
     extern unsigned int NAV_DATA[ 12288 ];
     extern unsigned short NAV_DATA_PAL[ 256 ];
@@ -64,6 +64,12 @@ namespace IO {
         void draw( bool p_initMainSprites = false, u8 p_newIdx = (u8)255 );
         void showNewMap( u8 p_map );
         void handleInput( touchPosition p_touch );
+        void home( ) {
+            _state = HOME;
+        }
+        void togglePower( ) {
+            _power = !_power;
+        }
     };
     extern nav::backgroundSet BGs[ MAXBG ];
     extern nav* NAV;

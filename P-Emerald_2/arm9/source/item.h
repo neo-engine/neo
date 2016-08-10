@@ -43,7 +43,7 @@ public:
         IN_BATTLE = 1, //Medicine/Berries
         HOLD = 2, //Has a hold effect only
         OUT_OF_BATTLE = 4, //Repel, etc
-        USE_ON_PKMN = 8   //Evolutionaries, 
+        USE_ON_PKMN = 8   //Evolutionaries,
     };
     enum itemType {
         GOODS,
@@ -172,8 +172,8 @@ public:
     }
 };
 
-
-extern item* ItemList[ 772 ];
+#define MAX_ITEMS 772
+extern item* ItemList[ MAX_ITEMS ];
 
 
 #define I_NONE 0

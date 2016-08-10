@@ -63,14 +63,23 @@ namespace IO {
         }
     }
 
-    void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_yDistance, s8 p_adjustX ) {
+    void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, alignment p_alignment, u8 p_yDistance, s8 p_adjustX ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
+        if( p_alignment == RIGHT )
+            putX = p_x - stringWidth( p_string );
+        if( p_alignment == CENTER )
+            putX = p_x - stringWidth( p_string ) / 2;
 
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
                 putX = ( p_x -= p_adjustX );
+                if( p_alignment == RIGHT )
+                    putX = p_x - stringWidth( p_string + current_char + 1 );
+                if( p_alignment == CENTER )
+                    putX = p_x - stringWidth( p_string + current_char + 1 ) / 2;
+
                 current_char++;
                 continue;
             }
@@ -102,13 +111,6 @@ namespace IO {
         }
     }
 
-    void font::printStringCenter( const char *p_string, bool p_bottom ) {
-        s16 x = SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2;
-        s16 y = SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2;
-
-        printString( p_string, x, y, p_bottom );
-    }
-
     void font::printStringD( const char *p_string, s16& p_x, s16& p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
@@ -132,45 +134,6 @@ namespace IO {
         }
         p_x = putX;
         p_y = putY;
-    }
-
-    void font::printStringCenterD( const char *p_string, bool p_bottom ) {
-        s16 x = ( SCREEN_WIDTH / 2 - stringWidth( p_string ) / 2 );
-        s16 y = ( SCREEN_HEIGHT / 2 - FONT_HEIGHT / 2 );
-
-        printStringD( p_string, x, y, p_bottom );
-    }
-
-    void font::printNumber( s32 p_num, s16 p_x, s16 p_y, bool p_bottom ) {
-        char numstring[ 10 ] = "";
-        u32 number = p_num, quotient = 1, remainder = 0;
-        char remainder_str[ 3 ] = "";
-        u32 current_char = 0, current_char2 = 0;
-        static char string[ 100 ];
-
-        if( number == 0 ) {
-            strcpy( string, "0" );
-        } else {
-            while( quotient != 0 ) {
-                remainder = number % 10;
-                quotient = number / 10;
-                remainder_str[ 0 ] = remainder + 48;
-                remainder_str[ 1 ] = '\0';
-                strcat( numstring, remainder_str );
-                number = quotient;
-            }
-
-            current_char = strlen( numstring ) - 1;
-            while( current_char != 0 ) {
-                string[ current_char2 ] = numstring[ current_char ];
-                current_char--;
-                current_char2++;
-            }
-            string[ current_char2 ] = numstring[ current_char ];
-            string[ current_char2 + 1 ] = '\0';
-        }
-
-        printString( string, p_x, p_y, p_bottom );
     }
 
     void drawContinue( font p_font, u8 p_x, u8 p_y ) {
@@ -307,7 +270,6 @@ namespace IO {
         p_x = putX;
         p_y = putY;
     }
-
 
     u32 font::stringWidth( const char *p_string ) const {
         u32 current_char = 0;
