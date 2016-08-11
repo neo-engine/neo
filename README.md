@@ -28,7 +28,7 @@ _Partially_ implemented features are in _italics_.
     * [x] The ability to load maps (for now only GBA-style maps are supported, 3D maps are planned) including
       * [ ] Events
       * [x] Wild Pokémon encounter
-      * [ ] Animated map tiles
+      * [x] Animated map tiles (at least some are animated)
       * [x] Player sprite, animated moving, surfing, cycling, and fishing
       * [x] Warps
     * [ ] Playing .midi as BGM, user customization of BGM via music stored on the micro SD card
