@@ -46,12 +46,14 @@ _Partially_ implemented features are in _italics_.
 
 Build requirements
 ------------------
-* devkitARM >= r45
-* libnds >= 1.5.12
-* nitrofs >= 0.9.12
-* libfat-nds >= 1.0.14
-* dswifi >= 0.3.17
-* maxmod >= 1.0.9
+* devkitARM ≥ r45
+* libnds ≥ 1.5.12
+* nitrofs ≥ 0.9.12
+* libfat-nds ≥ 1.0.14
+* dswifi ≥ 0.3.17
+* maxmod ≥ 1.0.9
+
+* gcc/g++ ≥ 4.9
 
 * make
 
