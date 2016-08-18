@@ -53,6 +53,8 @@ Build requirements
 * dswifi >= 0.3.17
 * maxmod >= 1.0.9
 
+* gcc/g++ >= 4.9
+
 * make
 
 Some screens
