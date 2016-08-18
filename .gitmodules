@@ -1,3 +1,6 @@
 [submodule "P-Emerald_2/FSROOT"]
 	path = P-Emerald_2/FSROOT
 	url = https://github.com/ph111p/perm2-fsroot
+[submodule "P-Emerald_2/tools/ndstool"]
+	path = P-Emerald_2/tools/ndstool
+	url = https://github.com/PH111P/ndstool
