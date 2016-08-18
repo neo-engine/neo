@@ -18,11 +18,9 @@ before_install:
 
 script:
     - cd P-Emerald_2
-    - cd FSROOT
-    - git submodule init
-    - git submodule update
-    - cd ..
+    - cp P-Emerald_2.nds repo.nds
     - make
+    - diff P-Emerald_2.nds repo.nds
 
 notifications:
       email: false
