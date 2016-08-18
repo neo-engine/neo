@@ -3,4 +3,4 @@
 	url = https://github.com/ph111p/perm2-fsroot
 [submodule "P-Emerald_2/tools/ndstool"]
 	path = P-Emerald_2/tools/ndstool
-	url = git@github.com:PH111P/ndstool.git
+	url = https://github.com/PH111P/ndstool
