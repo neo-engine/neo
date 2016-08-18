@@ -13,7 +13,7 @@ GAME_ICON       :=  $(CURDIR)/icon.bmp
 
 export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
-
+export NDSTOOL		:=  $(CURDIR)/tools/ndstool/ndstool
 
 .PHONY: $(TARGET).arm7 $(TARGET).arm9
 
@@ -30,7 +30,7 @@ $(TARGET).ds.gba	: $(TARGET).nds
 
 #---------------------------------------------------------------------------------
 $(TARGET).nds	:	$(TARGET).arm7 $(TARGET).arm9
-	ndstool	-c $(TARGET).nds -7 $(TARGET).arm7 -9 $(TARGET).arm9 -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES) -g PE2P PW "POKEMON E2"
+	$(NDSTOOL) -c $(TARGET).nds -7 $(TARGET).arm7 -9 $(TARGET).arm9 -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES) -g PE2P PW "POKEMON E2"
 
 #---------------------------------------------------------------------------------
 $(TARGET).arm7	: arm7/$(TARGET).elf
@@ -42,12 +42,14 @@ arm7/$(TARGET).elf:
 
 #---------------------------------------------------------------------------------
 arm9/$(TARGET).elf:
+	$(MAKE) -C tools/ndstool
 	$(MAKE) -C arm9
 
 #---------------------------------------------------------------------------------
 clean:
 	$(MAKE) -C arm9 clean
 	$(MAKE) -C arm7 clean
+	$(MAKE) -C tools/ndstool clean
 	rm -f $(TARGET).ds.gba $(TARGET).nds $(TARGET).arm7 $(TARGET).arm9
 
 rebuild: clean $(BUILD)
