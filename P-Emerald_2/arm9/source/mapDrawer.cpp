@@ -464,8 +464,8 @@ namespace MAP {
         if( !CUR_SLICE )
             return;
         u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
-       // if( !CUR_SLICE->m_tileSet.m_animations1 )
-       //     return;
+        if( !CUR_SLICE->m_tileSet.m_animations1 )
+            return;
         for( u8 i = 0; i < CUR_SLICE->m_tileSet.m_animationCount1; ++i ) {
             auto& a = CUR_SLICE->m_tileSet.m_animations1[ i ];
             if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
