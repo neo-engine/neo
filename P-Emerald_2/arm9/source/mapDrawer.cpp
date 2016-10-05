@@ -63,11 +63,7 @@ namespace MAP {
         bool x = ( p_x / SIZE != CUR_SLICE->m_x ),
             y = ( p_y / SIZE != CUR_SLICE->m_y );
         u16 blockidx = _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blocks[ p_y % SIZE ][ p_x % SIZE ].m_blockidx;
-
-        if( blockidx <= 512 )
-            return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks1[ blockidx ];
-        else
-            return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks2[ blockidx % 512 ];
+        return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks[ blockidx ];
     }
 
     u16 lastrow, //Row to be filled when extending the map to the top
@@ -112,10 +108,10 @@ namespace MAP {
             //FADE_TOP_DARK( );
 
             u16 mx = FS::SAV->m_player.m_pos.m_posX, my = FS::SAV->m_player.m_pos.m_posY;
-            _slices[ _curX ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE, p_init );
-            _slices[ _curX ^ 1 ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE, p_init );
-            _slices[ _curX ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE + currentHalf( my ), p_init );
-            _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ), p_init );
+            _slices[ _curX ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE );
+            _slices[ _curX ^ 1 ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE );
+            _slices[ _curX ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE + currentHalf( my ) );
+            _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ) );
 
             for( u8 i = 1; i < 4; ++i ) {
                 bgInit( i, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
@@ -123,10 +119,9 @@ namespace MAP {
             }
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
 
-            for( u16 i = 0; i < 512; ++i )
-                swiCopy( CUR_SLICE->m_tileSet.m_tiles1[ i ].m_tile, tileMemory + i * 32, 16 );
-            for( u16 i = 0; i < 512; ++i )
-                swiCopy( CUR_SLICE->m_tileSet.m_tiles2[ i ].m_tile, tileMemory + ( i + 512 ) * 32, 16 );
+            //for( u16 i = 0; i < MAX_TILES_PER_TILE_SET * 2; ++i )
+            //    swiCopy( CUR_SLICE->m_tileSet.m_tiles[ i ].m_tile, tileMemory + i * 32, 16 );
+            dmaCopy( CUR_SLICE->m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
             dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
             for( u8 i = 1; i < 4; ++i ) {
                 mapMemory[ i ] = (u16*) BG_MAP_RAM( 2 * i - 1 );
@@ -222,10 +217,10 @@ namespace MAP {
             _curY = ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1;
             //Update tileset, block and palette data
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
-            for( u16 i = 0; i < 512; ++i )
-                swiCopy( CUR_SLICE->m_tileSet.m_tiles1[ i ].m_tile, tileMemory + i * 32, 16 );
-            for( u16 i = 0; i < 512; ++i )
-                swiCopy( CUR_SLICE->m_tileSet.m_tiles2[ i ].m_tile, tileMemory + ( i + 512 ) * 32, 16 );
+
+            //for( u16 i = 0; i < MAX_TILES_PER_TILE_SET * 2; ++i )
+            //    swiCopy( CUR_SLICE->m_tileSet.m_tiles[ i ].m_tile, tileMemory + i * 32, 16 );
+            dmaCopy( CUR_SLICE->m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
             dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
 
 #ifdef __DEBUG
@@ -464,22 +459,22 @@ namespace MAP {
         if( !CUR_SLICE )
             return;
         u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
-        if( !CUR_SLICE->m_tileSet.m_animations1 )
+        if( !CUR_SLICE->m_tileSet.m_animationCount1 )
             return;
         for( u8 i = 0; i < CUR_SLICE->m_tileSet.m_animationCount1; ++i ) {
-            auto& a = CUR_SLICE->m_tileSet.m_animations1[ i ];
+            auto& a = CUR_SLICE->m_tileSet.m_animations[ i ];
             if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
                 a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
                 swiCopy( &a.m_tiles[ a.m_acFrame ], tileMemory + a.m_tileIdx * 32, 16 );
             }
         }
-        if( !CUR_SLICE->m_tileSet.m_animations2 )
+        if( !CUR_SLICE->m_tileSet.m_animationCount2 )
             return;
         for( u8 i = 0; i < CUR_SLICE->m_tileSet.m_animationCount2; ++i ) {
-            auto& a = CUR_SLICE->m_tileSet.m_animations2[ i ];
+            auto& a = CUR_SLICE->m_tileSet.m_animations[ i + MAX_ANIM_PER_TILE_SET ];
             if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
                 a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
-                swiCopy( &a.m_tiles[ a.m_acFrame ], tileMemory + ( a.m_tileIdx + 512 ) * 32, 16 );
+                swiCopy( &a.m_tiles[ a.m_acFrame ], tileMemory + ( a.m_tileIdx + MAX_TILES_PER_TILE_SET ) * 32, 16 );
             }
         }
     }

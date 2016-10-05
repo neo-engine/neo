@@ -30,6 +30,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <initializer_list>
 #include <cstdio>
 #include <cstring>
+#include <algorithm>
 
 #include "fs.h"
 #include "buffer.h"
@@ -245,17 +246,16 @@ namespace FS {
         return true;
     }
 
-    u8 readAnimations( FILE* p_file, MAP::tileSet::animation*& p_animations ) {
+    u8 readAnimations( FILE* p_file, MAP::tileSet::animation* p_animations ) {
         if( !p_file )
             return 0;
         u8 N;
         fread( &N, sizeof( u8 ), 1, p_file );
 
-        if( !p_animations && N )
-            p_animations = new MAP::tileSet::animation[ N ];
-
         if( !p_animations )
             return 0;
+
+        N = std::min( N, MAP::MAX_ANIM_PER_TILE_SET );
 
         for( int i = 0; i < N; ++i ) {
             auto& a = p_animations[ i ];
