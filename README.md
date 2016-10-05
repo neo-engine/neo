@@ -4,9 +4,6 @@ Pokémon Emerald Version 2
 
 There's still (very) much to do, but when it's complete, it's a recode of Pokémon for Nintendo DS.
 
-As the game itself is in German, I won't go into detail about the (planned) storyline (at least in the English description);
-so far the game is set in the Hoenn region 2 years after [Pokémon Ruby, Sapphire](https://en.wikipedia.org/wiki/Pok%C3%A9mon_Ruby_and_Sapphire) and [Emerald](https://en.wikipedia.org/wiki/Pok%C3%A9mon_Emerald).
-
 This game is intended to be played on real hardware, but [DeSmuME 0.9.11](http://desmume.org/) seems to be capable of emulating most of real hardware's features, too.
 
 Features
@@ -31,14 +28,20 @@ _Partially_ implemented features are in _italics_.
       * [x] Animated map tiles (at least some are animated)
       * [x] Player sprite, animated moving, surfing, cycling, and fishing
       * [x] Warps
-    * [ ] Playing .midi as BGM, user customization of BGM via music stored on the micro SD card
-    * [x] Real time clock (doesn't work fully on DeSmuME)
+    * [ ] Support for .midi as BGM, user customization of BGM via music stored on the micro SD card
+    * [x] A real time clock (doesn't work fully on DeSmuME)
       * [ ] Overworld changes based on time
-    * [x] Saving the progress to the micro SD (untested, saves may break with a new version)
-    * [ ] Communicating with “the originals”
-      * [ ] Playing with a save from a GBA version
+    * [x] Support for saving the progress to the micro SD (untested, saves may break with a new version)
+    * [ ] Support for communication with “the originals”
+      * [ ] Playing / importing with a save from a GBA version
       * [ ] Link trading with Gen IV and Gen V games
     * [x] A clean UI
+    * [ ] Dynamic difficulty 
+      * [ ] Adjust the encounter rate at will
+      * [ ] Adjust opposing Pokémon's level (between battles)
+    * [ ] Support for multiple save files and “New Game+”
+      * [ ] Shared PokéDex and stored Pokémon
+    * [ ] Support for multiple languages
 * [ ] _Easy-to-understand and ready-to-(re)use code_
     * [x] Strict and intuitive naming conventions
     * [ ] _Good documentation_
