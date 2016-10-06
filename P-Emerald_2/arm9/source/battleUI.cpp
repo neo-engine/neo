@@ -658,7 +658,7 @@ namespace BATTLE {
                            hpx, hpy, HP_COL( OPPONENT, 0 ), HP_COL( OPPONENT, 0 ) + 1, false );
 
             IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
-                           ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
+                ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
                            hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
         }
     }
@@ -852,7 +852,7 @@ namespace BATTLE {
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
             if( !p_alreadySent && !p_alreadyChosen && !dead )
                 IO::regularFont->printString( "Aussenden", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
-            else if( !p_alreadyChosen  && !dead )
+            else if( !p_alreadyChosen && !dead )
                 IO::regularFont->printString( "Bereits im Kampf", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
             else if( dead )
                 IO::regularFont->printString( "Schon besiegt…", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
@@ -1360,7 +1360,7 @@ namespace BATTLE {
         writeLogText( buffer );
 
         loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                         _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                         _battle->m_isWildBattle, !_battle->m_isWildBattle && SAVE::SAV->getActiveFile( ).m_activatedPNav );
         if( p_showBack ) {
             IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
             IO::updateOAM( true );
@@ -1411,7 +1411,7 @@ SHOW_ATTACK:
                     }
                 }
                 loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && SAVE::SAV->getActiveFile( ).m_activatedPNav );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( buffer );
 
@@ -1423,7 +1423,7 @@ SHOW_ATTACK:
                 result.m_value = chooseItem( );
                 result.m_target = 0;
                 loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && SAVE::SAV->getActiveFile( ).m_activatedPNav );
                 if( result.m_value ) {
                     if( ItemList[ result.m_value ]->m_itemType == item::MEDICINE ) {
                         u8 res = choosePKMN( p_pokemonPos + ( _battle->m_battleMode == battle::DOUBLE ), true, true );
@@ -1440,7 +1440,7 @@ SHOW_ATTACK:
                                 }
                         } else {
                             loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                             _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                                             _battle->m_isWildBattle, !_battle->m_isWildBattle && SAVE::SAV->getActiveFile( ).m_activatedPNav );
                             goto NEXT_TRY;
                         }
                     } else if( ItemList[ result.m_value ]->m_itemType == item::POKE_BALLS )
@@ -1448,7 +1448,7 @@ SHOW_ATTACK:
                     IO::initOAMTable( true );
                     IO::NAV->draw( );
                     loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                     _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                                     _battle->m_isWildBattle, !_battle->m_isWildBattle && SAVE::SAV->getActiveFile( ).m_activatedPNav );
 
                     setDeclareBattleMoveSpriteVisibility( p_showBack, true );
                     initLogScreen( );
@@ -1461,7 +1461,7 @@ NEXT_TRY:
                 writeLogText( buffer );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
 
-            } else if( !_battle->m_isWildBattle && FS::SAV->m_activatedPNav && GET_AND_WAIT_R( 95, 152, 152, 178 ) ) {
+            } else if( !_battle->m_isWildBattle && SAVE::SAV->getActiveFile( ).m_activatedPNav && GET_AND_WAIT_R( 95, 152, 152, 178 ) ) {
 
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
@@ -1500,7 +1500,7 @@ NEXT_TRY:
                     return true;
                 }
                 loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && SAVE::SAV->getActiveFile( ).m_activatedPNav );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( buffer );
             }
@@ -2005,7 +2005,7 @@ CLEAR:
         u16 expStart = ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] - p_gainedExp ) * 100 /
             ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] );
         u16 expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
-                                                ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
+            ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
 
         std::sprintf( buffer, "%s gewinnt %lu E.-Punkte.[A]", acPkmn.m_boxdata.m_name, p_gainedExp );
         _battle->log( buffer );
@@ -2056,7 +2056,7 @@ CLEAR:
 
             expStart = 0;
             expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
-                                                ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
+                ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
 
             IO::displayEP( 101, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
             IO::displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
@@ -2208,7 +2208,7 @@ CLEAR:
                        hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
 
         IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
-                       ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
+            ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
                        hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
 
     }

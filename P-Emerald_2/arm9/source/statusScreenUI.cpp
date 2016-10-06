@@ -121,7 +121,7 @@ namespace STS {
         }
 
         for( u8 i = 0; i < 6; ++i ) {
-            auto pkmn = FS::SAV->m_pkmnTeam[ i ].m_boxdata;
+            auto pkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata;
             if( pkmn.m_individualValues.m_isEgg )
                 nextAvailableTileIdx = IO::loadEggIcon( 4 - 2 * i, 28 + 24 * i,
                                                         SUB_BALL_IDX( i ), SUB_BALL_IDX( i ), nextAvailableTileIdx );
@@ -151,7 +151,7 @@ namespace STS {
         BG_PALETTE[ GRAY_IDX ] = GRAY;
         BG_PALETTE[ BLACK_IDX ] = BLACK;
 
-        for( size_t i = 0; i < FS::SAV->getTeamPkmnCount( ); i++ ) {
+        for( size_t i = 0; i < SAVE::SAV->getActiveFile( ).getTeamPkmnCount( ); i++ ) {
             char buffer[ 100 ];
             u16 sx, sy;
             u16 x = 133;
@@ -165,33 +165,33 @@ namespace STS {
 #define ADJUST_X( i, x, buffer ) ( ( ( i ) % 2 ) ? ( x ) : \
                                    123 - IO::regularFont->stringWidth( buffer ) )
 
-            if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
-                tileCnt = IO::loadPKMNIcon( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId, sx - 10, sy - 10,
+            if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
+                tileCnt = IO::loadPKMNIcon( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId, sx - 10, sy - 10,
                                             ICON_IDX( i ), ICON_PAL( i ), tileCnt, false );
                 IO::displayHP( 100, 101, sx - 8, sy - 8, HP_COL + 2 * i, HP_COL + 1 + 2 * i, false, 23, 26 );
-                IO::displayHP( 100, 100 - FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP * 100 / FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP,
+                IO::displayHP( 100, 100 - SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP * 100 / SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP,
                                sx - 8, sy - 8, HP_COL + 2 * i, HP_COL + 1 + 2 * i, false, 23, 26 );
 
 
-                IO::regularFont->printString( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name,
-                                              ADJUST_X( i, x, FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name ), sy - 14, false );
+                IO::regularFont->printString( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_name,
+                                              ADJUST_X( i, x, SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_name ), sy - 14, false );
 
                 IO::regularFont->setColor( HP_COL + 2 * i, 2 );
-                if( FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP )
-                    sprintf( buffer, "%hi/%hiKP", FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP, FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
+                if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP )
+                    sprintf( buffer, "%hi/%hiKP", SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP, SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP );
                 else
                     sprintf( buffer, "Besiegt" );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy, false );
                 IO::regularFont->setColor( GRAY_IDX, 2 );
 
-                sprintf( buffer, "%s", ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
+                sprintf( buffer, "%s", ItemList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy + 14, false );
 
             } else {
                 sprintf( buffer, "Ei" );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy - 7, false );
 
-                sprintf( buffer, "%s", ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
+                sprintf( buffer, "%s", ItemList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy + 7, false );
 
                 tileCnt = IO::loadEggIcon( sx - 10, sy - 10, ICON_IDX( i ), ICON_PAL( i ), tileCnt, false );
@@ -199,7 +199,7 @@ namespace STS {
         }
 
         //Preload the page specific sprites
-        auto currPkmn = FS::SAV->m_pkmnTeam[ _current ];
+        auto currPkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _current ];
 
         IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex = tileCnt;
         tileCnt += 144;
@@ -584,7 +584,7 @@ namespace STS {
         IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::regularFont->printString( "Nr.", 124, 51, p_bottom );
 
-        bool plrOT = currPkmn.m_boxdata.m_oTId == FS::SAV->m_id && currPkmn.m_boxdata.m_oTSid == FS::SAV->m_sid;
+        bool plrOT = currPkmn.m_boxdata.m_oTId == SAVE::SAV->getActiveFile( ).m_id && currPkmn.m_boxdata.m_oTSid == SAVE::SAV->getActiveFile( ).m_sid;
         if( !currPkmn.m_boxdata.m_gotDate[ 0 ] )
             sprintf( buffer, "%s%d",
                      plrOT ? "Gef. auf Lv. " : "Off gef auf Lv.",
@@ -863,7 +863,7 @@ namespace STS {
         std::vector<IO::inputTarget> res;
         std::vector<std::string> names;
 
-        auto pkmn = FS::SAV->m_pkmnTeam[ p_current ];
+        auto pkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_current ];
         IO::NAV->draw( );
         BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
         BG_PALETTE_SUB[ GRAY_IDX ] = GRAY;
@@ -876,14 +876,14 @@ namespace STS {
         }
 
         for( u8 i = 0; i < 6; ++i ) {
-            auto pkmn = FS::SAV->m_pkmnTeam[ i ].m_boxdata;
+            auto pkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata;
             if( pkmn.m_individualValues.m_isEgg )
                 IO::loadEggIcon( 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ), SUB_BALL_IDX( i ),
                                  IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex );
             else if( i == p_current )
                 IO::loadPKMNIcon( pkmn.m_speciesId, 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ),
                                   SUB_BALL_IDX( i ), IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex );
-            else if( i < FS::SAV->getTeamPkmnCount( ) )
+            else if( i < SAVE::SAV->getActiveFile( ).getTeamPkmnCount( ) )
                 IO::loadItemIcon( !pkmn.m_ball ? "Pokeball" : ItemList[ pkmn.m_ball ]->m_itemName, 4 - 2 * i,
                                   28 + 24 * i, SUB_BALL_IDX( i ), SUB_BALL_IDX( i ), IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex, true );
             else

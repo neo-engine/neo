@@ -49,10 +49,10 @@ bool whirlpool::possible( ) {
     return false;
 }
 bool surf::possible( ) {
-    return ( FS::SAV->m_player.m_movement != MAP::SURF )
-        && MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX + MAP::dir[ FS::SAV->m_player.m_direction ][ 0 ],
-                              FS::SAV->m_player.m_pos.m_posY + MAP::dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_movedata == 0x4
-        && MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata == 0xc;
+    return ( SAVE::SAV->getActiveFile( ).m_player.m_movement != MAP::SURF )
+        && MAP::curMap->atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + MAP::dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 0 ],
+                              SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + MAP::dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 1 ] ).m_movedata == 0x4
+        && MAP::curMap->atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata == 0xc;
 }
 bool dive::possible( ) {
     return false;
@@ -64,13 +64,13 @@ bool strength::possible( ) {
     return false;
 }
 bool rockClimb::possible( ) {
-    return MAP::curMap->at( FS::SAV->m_player.m_pos.m_posX + MAP::dir[ FS::SAV->m_player.m_direction ][ 0 ],
-                            FS::SAV->m_player.m_pos.m_posY + MAP::dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_bottombehave == 0x12;
+    return MAP::curMap->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + MAP::dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 0 ],
+                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + MAP::dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 1 ] ).m_bottombehave == 0x12;
 }
 bool waterfall::possible( ) {
-    return ( FS::SAV->m_player.m_movement == MAP::SURF )
-        && MAP::curMap->at( FS::SAV->m_player.m_pos.m_posX + MAP::dir[ FS::SAV->m_player.m_direction ][ 0 ],
-                            FS::SAV->m_player.m_pos.m_posY + MAP::dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_bottombehave == 0x13;
+    return ( SAVE::SAV->getActiveFile( ).m_player.m_movement == MAP::SURF )
+        && MAP::curMap->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + MAP::dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 0 ],
+                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + MAP::dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 1 ] ).m_bottombehave == 0x13;
 }
 bool teleport::possible( ) {
     return false;
@@ -79,7 +79,7 @@ bool headbutt::possible( ) {
     return false;
 }
 bool sweetScent::possible( ) {
-    u8 curBehave = MAP::curMap->at( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_bottombehave;
+    u8 curBehave = MAP::curMap->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_bottombehave;
     return curBehave == 0x2 || curBehave == 0x3;
 }
 bool dig::possible( ) {
@@ -92,26 +92,27 @@ void fly::use( ) { }
 void flash::use( ) { }
 void whirlpool::use( ) { }
 void surf::use( ) {
-    MAP::curMap->sitDownPlayer( FS::SAV->m_player.m_direction, MAP::SURF );
+    MAP::curMap->sitDownPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction, MAP::SURF );
 }
 void dive::use( ) { }
 void defog::use( ) { }
 void strength::use( ) { }
 void rockClimb::use( ) {
-    MAP::curMap->sitDownPlayer( FS::SAV->m_player.m_direction, MAP::SURF );
+    MAP::curMap->sitDownPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction, MAP::SURF );
     while( possible( ) )
-        MAP::curMap->walkPlayer( FS::SAV->m_player.m_direction );
-    MAP::curMap->standUpPlayer( FS::SAV->m_player.m_direction );
-    if( MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata > 4
-        && MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x3c
-        && MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x0a )
-        FS::SAV->m_player.m_pos.m_posZ = MAP::curMap->atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata / 4;
+        MAP::curMap->walkPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction );
+    MAP::curMap->standUpPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction );
+    if( MAP::curMap->atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata > 4
+        && MAP::curMap->atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata != 0x3c
+        && MAP::curMap->atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata != 0x0a )
+        SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ = MAP::curMap->atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, 
+                                                                               SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata / 4;
 }
 void waterfall::use( ) {
     MAP::curMap->disablePkmn( );
     while( possible( ) )
-        MAP::curMap->walkPlayer( FS::SAV->m_player.m_direction );
-    MAP::curMap->walkPlayer( FS::SAV->m_player.m_direction );
+        MAP::curMap->walkPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction );
+    MAP::curMap->walkPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction );
     MAP::curMap->enablePkmn( );
 }
 void teleport::use( ) { }

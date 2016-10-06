@@ -112,13 +112,13 @@ namespace DEX {
         //Initialize the top screen
         IO::initOAMTable( false );
 
-        u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", FS::SAV->m_lstDex, 80, 64, PKMN_SPRITE_START( 0 ), 0, 0, false );
-        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", FS::SAV->m_lstDex, 80, 64, PKMN_SPRITE_START( 1 ), 1, tileCnt, false );
+        u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", SAVE::SAV->getActiveFile( ).m_lstDex, 80, 64, PKMN_SPRITE_START( 0 ), 0, 0, false );
+        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", SAVE::SAV->getActiveFile( ).m_lstDex, 80, 64, PKMN_SPRITE_START( 1 ), 1, tileCnt, false );
 
-        tileCnt = IO::loadPKMNIcon( FS::SAV->m_lstDex, 0, 8, PKMN_SPRITE_START( 2 ), 2, 288, false );
+        tileCnt = IO::loadPKMNIcon( SAVE::SAV->getActiveFile( ).m_lstDex, 0, 8, PKMN_SPRITE_START( 2 ), 2, 288, false );
         tileCnt = IO::loadTypeIcon( type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 1, 3, tileCnt, false );
         tileCnt = IO::loadTypeIcon( type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 2, 4, tileCnt, false );
-        tileCnt = IO::loadPKMNIcon( FS::SAV->m_lstDex, 0, 8, PKMN_SPRITE_START( 3 ), 5, tileCnt, false );
+        tileCnt = IO::loadPKMNIcon( SAVE::SAV->getActiveFile( ).m_lstDex, 0, 8, PKMN_SPRITE_START( 3 ), 5, tileCnt, false );
         for( u8 i = 0; i < 30; ++i ) {
             u8 x = 67 - 13 * ( i % 10 );
             if( i % 10 >= 5 )
@@ -403,7 +403,7 @@ namespace DEX {
             consoleSetWindow( &IO::Top, 28, 1, 32, 2 );
             printf( "%03d", p_pkmnIdx );
             consoleSetWindow( &IO::Top, 28, 2, 32, 3 );
-            printf( "%3d", FS::SAV->countPkmn( p_pkmnIdx ) );
+            printf( "%3d", SAVE::SAV->countPkmn( p_pkmnIdx ) );
         }
 
         switch( p_page ) {

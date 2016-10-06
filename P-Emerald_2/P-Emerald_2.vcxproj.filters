@@ -85,6 +85,12 @@
     <Filter Include="Source Files\arm9\nav">
       <UniqueIdentifier>{17593f18-579d-426a-b6cf-65f112bde7eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\arm9\saves">
+      <UniqueIdentifier>{901b10e2-bfa3-4624-820a-1516ccd55160}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\arm9\saves">
+      <UniqueIdentifier>{999db076-590a-4ef4-ab89-c1cd94b25e0e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arm9\include\unistd.h">
@@ -147,9 +153,6 @@
     <ClInclude Include="arm9\source\Gen.h">
       <Filter>Header Files\arm9\fs</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\saveGame.h">
-      <Filter>Header Files\arm9\fs</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\source\choiceBox.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
@@ -195,9 +198,6 @@
     <ClInclude Include="arm9\source\mapDrawer.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\startScreen.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\source\mapSprite.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
@@ -230,6 +230,15 @@
     </ClInclude>
     <ClInclude Include="arm9\source\nav.h">
       <Filter>Header Files\arm9\nav</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\saveGame.h">
+      <Filter>Header Files\arm9\saves</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\saveOptions.h">
+      <Filter>Header Files\arm9\saves</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\source\startScreen.h">
+      <Filter>Header Files\arm9\saves</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -270,9 +279,6 @@
       <Filter>Source Files\arm9\fs</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\Gen.cpp">
-      <Filter>Source Files\arm9\fs</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\saveGame.cpp">
       <Filter>Source Files\arm9\fs</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\choiceBox.cpp">
@@ -320,9 +326,6 @@
     <ClCompile Include="arm9\source\mapSlice.cpp">
       <Filter>Source Files\arm9\map</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\startScreen.cpp">
-      <Filter>Source Files\arm9</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\mapDrawer.cpp">
       <Filter>Source Files\arm9\map</Filter>
     </ClCompile>
@@ -358,6 +361,15 @@
     </ClCompile>
     <ClCompile Include="arm9\source\nav.cpp">
       <Filter>Source Files\arm9\nav</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\saveGame.cpp">
+      <Filter>Source Files\arm9\saves</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\strings.cpp">
+      <Filter>Source Files\arm9</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\startScreen.cpp">
+      <Filter>Source Files\arm9\saves</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

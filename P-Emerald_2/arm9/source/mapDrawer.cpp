@@ -107,11 +107,11 @@ namespace MAP {
             vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
             //FADE_TOP_DARK( );
 
-            u16 mx = FS::SAV->m_player.m_pos.m_posX, my = FS::SAV->m_player.m_pos.m_posY;
-            _slices[ _curX ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE );
-            _slices[ _curX ^ 1 ][ _curY ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE );
-            _slices[ _curX ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE, my / SIZE + currentHalf( my ) );
-            _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( FS::SAV->m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ) );
+            u16 mx = SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, my = SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY;
+            _slices[ _curX ][ _curY ] = constructSlice( SAVE::SAV->getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE );
+            _slices[ _curX ^ 1 ][ _curY ] = constructSlice( SAVE::SAV->getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE );
+            _slices[ _curX ][ _curY ^ 1 ] = constructSlice( SAVE::SAV->getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE + currentHalf( my ) );
+            _slices[ _curX ^ 1 ][ _curY ^ 1 ] = constructSlice( SAVE::SAV->getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ) );
 
             for( u8 i = 1; i < 4; ++i ) {
                 bgInit( i, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
@@ -151,7 +151,7 @@ namespace MAP {
     }
 
     void mapDrawer::draw( ObjPriority p_playerPrio ) {
-        draw( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY, true ); //Draw the map
+        draw( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY, true ); //Draw the map
 
         IO::initOAMTable( false );
         drawPlayer( p_playerPrio ); //Draw the player
@@ -161,17 +161,17 @@ namespace MAP {
     }
 
     void mapDrawer::drawPlayer( ObjPriority p_playerPrio ) {
-        _sprites[ 0 ] = FS::SAV->m_player.show( 128 - 8, 96 - 24, 0, 0, 0 );
-        _spritePos[ FS::SAV->m_player.m_id ] = 0;
+        _sprites[ 0 ] = SAVE::SAV->getActiveFile( ).m_player.show( 128 - 8, 96 - 24, 0, 0, 0 );
+        _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] = 0;
         _entriesUsed |= ( 1 << 0 );
-        changeMoveMode( FS::SAV->m_player.m_movement );
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( p_playerPrio );
-        if( FS::SAV->m_player.m_movement == SURF ) {
+        changeMoveMode( SAVE::SAV->getActiveFile( ).m_player.m_movement );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setPriority( p_playerPrio );
+        if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF ) {
             surfPlatform.m_id = 1;
             _spritePos[ surfPlatform.m_id ] = 1;
             _sprites[ _spritePos[ surfPlatform.m_id ] ] = surfPlatform.show( 128 - 16, 96 - 20, 1, 1, 192 );
             _entriesUsed |= ( 1 << 1 );
-            _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame( getFrame( FS::SAV->m_player.m_direction ) );
+            _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame( getFrame( SAVE::SAV->getActiveFile( ).m_player.m_direction ) );
         }
     }
 
@@ -188,13 +188,13 @@ namespace MAP {
         cx += dir[ p_direction ][ 0 ];
         cy += dir[ p_direction ][ 1 ];
         //#ifdef DEBUG
-        //        assert( cx != FS::SAV->m_player.m_pos.m_posX || cy != FS::SAV->m_player.m_pos.m_posY );
+        //        assert( cx != SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX || cy != SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
         //#endif
         if( p_updatePlayer ) {
-            FS::SAV->m_player.m_pos.m_posX = cx;
-            FS::SAV->m_player.m_pos.m_posY = cy;
+            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX = cx;
+            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY = cy;
 
-            FS::SAV->stepIncrease( );
+            SAVE::SAV->getActiveFile( ).stepIncrease( );
         }
 
         //Check if a new slice should be loaded
@@ -284,24 +284,24 @@ namespace MAP {
 
     void mapDrawer::loadSlice( direction p_direction ) {
         _slices[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ][ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ]
-            = constructSlice( FS::SAV->m_currentMap, CUR_SLICE->m_x + dir[ p_direction ][ 0 ], CUR_SLICE->m_y + dir[ p_direction ][ 1 ] );
+            = constructSlice( SAVE::SAV->getActiveFile( ).m_currentMap, CUR_SLICE->m_x + dir[ p_direction ][ 0 ], CUR_SLICE->m_y + dir[ p_direction ][ 1 ] );
 
         auto& neigh = _slices[ ( _curX + !dir[ p_direction ][ 0 ] ) & 1 ][ ( _curY + !dir[ p_direction ][ 1 ] ) & 1 ];
         _slices[ _curX ^ 1 ][ _curY ^ 1 ]
-            = constructSlice( FS::SAV->m_currentMap, neigh->m_x + dir[ p_direction ][ 0 ], neigh->m_y + dir[ p_direction ][ 1 ] );
+            = constructSlice( SAVE::SAV->getActiveFile( ).m_currentMap, neigh->m_x + dir[ p_direction ][ 0 ], neigh->m_y + dir[ p_direction ][ 1 ] );
     }
 
     void mapDrawer::disablePkmn( s16 p_steps ) {
-        FS::SAV->m_repelSteps = p_steps;
+        SAVE::SAV->getActiveFile( ).m_repelSteps = p_steps;
     }
     void mapDrawer::enablePkmn( ) {
-        FS::SAV->m_repelSteps = 0;
+        SAVE::SAV->getActiveFile( ).m_repelSteps = 0;
     }
 
     void mapDrawer::handleWarp( warpType p_type ) {
         static warpPos lastWarp = { 0, { 0, 0, 0 } };
 
-        warpPos current = warpPos{ FS::SAV->m_currentMap, FS::SAV->m_player.m_pos };
+        warpPos current = warpPos{ SAVE::SAV->getActiveFile( ).m_currentMap, SAVE::SAV->getActiveFile( ).m_player.m_pos };
         if( !warpList.count( current ) )
             return;
         warpPos target = p_type == LAST_VISITED ? lastWarp : warpList[ current ];
@@ -315,7 +315,7 @@ namespace MAP {
         u8 moveData = atom( p_globX, p_globY ).m_movedata;
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
-        if( FS::SAV->m_repelSteps )
+        if( SAVE::SAV->getActiveFile( ).m_repelSteps )
             return;
         //handle Pkmn stuff
         if( moveData == 0x04 && behave != 0x13 )
@@ -324,12 +324,12 @@ namespace MAP {
             handleWildPkmn( GRASS );
         else if( behave == 0x03 )
             handleWildPkmn( HIGH_GRASS );
-        else if( mapTypes[ FS::SAV->m_currentMap ].first & CAVE )
+        else if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE )
             handleWildPkmn( GRASS );
     }
     bool mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType, bool p_forceEncounter ) {
 
-        u16 rn = rand( ) % 512;
+        u16 rn = rand( ) % ( 512 + SAVE::SAV->getActiveFile( ).m_options.m_encounterRateModifier );
         if( p_type == FISHING_ROD )
             rn /= 8;
         if( p_forceEncounter )
@@ -341,21 +341,21 @@ namespace MAP {
         else if( rn < 14 ) tier = 2;
         else if( rn < 26 ) tier = 1;
         else tier = 0;
-        u8 level = FS::SAV->getEncounterLevel( tier );
+        u8 level = SAVE::SAV->getActiveFile( ).getEncounterLevel( tier );
 
         if( rn > 40 || !level ) {
             if( p_type == FISHING_ROD ) {
-                IO::messageBox m( "Doch nur ein alter Pokéball…" );
+                IO::messageBox m( GET_STRING( 5 ), true );
                 _playerIsFast = false;
                 IO::NAV->draw( true );
             }
             return false;
         }
         if( p_type == FISHING_ROD ) {
-            IO::messageBox m( "Du hast ein Pokémon geangelt!" );
+            IO::messageBox m( GET_STRING( 6 ), true );
             _playerIsFast = false;
             IO::NAV->draw( true );
-        } else if( FS::SAV->m_repelSteps && !p_forceEncounter )
+        } else if( SAVE::SAV->getActiveFile( ).m_repelSteps && !p_forceEncounter )
             return false;
         u8 arridx = u8( p_type ) * 15 + tier * 3;
         if( p_type != FISHING_ROD )
@@ -398,15 +398,16 @@ namespace MAP {
         }
 
         u8 platform = 0, plat2 = 0;
-        u8 battleBack = mapInfo[ FS::SAV->m_currentMap ].second;
+        u8 battleBack = mapInfo[ SAVE::SAV->getActiveFile( ).m_currentMap ].second;
         if( p_type == GRASS || p_type == HIGH_GRASS || p_type == FISHING_ROD ) {
-            if( mapTypes[ FS::SAV->m_currentMap ].first == OUTSIDE && FS::SAV->m_player.m_movement != SURF ) {
+            if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first == OUTSIDE
+                && SAVE::SAV->getActiveFile( ).m_player.m_movement != SURF ) {
                 plat2 = platform = 1;
-            } else if( FS::SAV->m_player.m_movement == SURF ) {
+            } else if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF ) {
                 plat2 = platform = 0;
-            } else if( mapTypes[ FS::SAV->m_currentMap ].first & DARK ) {
+            } else if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & DARK ) {
                 plat2 = platform = 6;
-            } else if( mapTypes[ FS::SAV->m_currentMap ].first & CAVE ) {
+            } else if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE ) {
                 plat2 = platform = 4;
             }
 
@@ -417,19 +418,19 @@ namespace MAP {
         if( !battleBack ) {
             if( p_type == GRASS ) battleBack = 1;
             if( p_type == HIGH_GRASS ) battleBack = 3;
-            if( FS::SAV->m_player.m_movement == SURF )
+            if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF )
                 battleBack = 4;
-            else if( mapTypes[ FS::SAV->m_currentMap ].first & CAVE )
+            else if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE )
                 battleBack = 19;
         }
 
-        auto playerPrio = _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].getPriority( );
+        auto playerPrio = _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].getPriority( );
         ANIMATE_MAP = false;
         swiWaitForVBlank( );
         IO::NAV->togglePower( );
         IO::NAV->draw( );
-        BATTLE::battle( FS::SAV->getBattleTrainer( ), wildPkmn, weat, platform, plat2, battleBack ).start( );
-        FS::SAV->updateTeam( );
+        BATTLE::battle( SAVE::SAV->getActiveFile( ).getBattleTrainer( ), wildPkmn, weat, platform, plat2, battleBack ).start( );
+        SAVE::SAV->getActiveFile( ).updateTeam( );
         FADE_TOP_DARK( );
         draw( playerPrio );
         ANIMATE_MAP = true;
@@ -441,8 +442,10 @@ namespace MAP {
     void mapDrawer::handleTrainer( ) { }
 
     bool mapDrawer::requestWildPkmn( bool p_forceHighGrass ) {
-        u8 moveData = atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata;
-        u8 behave = at( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_bottombehave;
+        u8 moveData = atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata;
+        u8 behave = at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                        SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_bottombehave;
 
         if( moveData == 0x04 && behave != 0x13 )
             return handleWildPkmn( WATER, 0, true );
@@ -450,7 +453,7 @@ namespace MAP {
             return handleWildPkmn( GRASS, 0, true );
         else if( behave == 0x03 || p_forceHighGrass )
             return handleWildPkmn( HIGH_GRASS, 0, true );
-        else if( mapTypes[ FS::SAV->m_currentMap ].first & CAVE )
+        else if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE )
             return handleWildPkmn( GRASS, 0, true );
         return false;
     }
@@ -602,7 +605,7 @@ namespace MAP {
         if( curMoveData % 4 == 1 )
             return false;
         if( lstMoveData == 0x0a ) //Stand up (only possible for the player)
-            return p_direction == FS::SAV->m_player.m_direction;
+            return p_direction == SAVE::SAV->getActiveFile( ).m_player.m_direction;
         if( curMoveData == 0x0a ) //Sit down
             return ( p_moveMode == WALK );
         if( curMoveData == 4 && !( p_moveMode & SURF ) )
@@ -619,15 +622,17 @@ namespace MAP {
 
     }
     void mapDrawer::movePlayer( direction p_direction, bool p_fast ) {
-        u8 newMoveData = atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                               FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata;
-        u8 lstMoveData = atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata;
+        u8 newMoveData = atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                               SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata;
+        u8 lstMoveData = atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                               SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata;
 
-        u8 newBehave = at( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                           FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_bottombehave;
-        u8 lstBehave = at( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_bottombehave;
+        u8 newBehave = at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                           SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_bottombehave;
+        u8 lstBehave = at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                           SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_bottombehave;
 
-        if( FS::SAV->m_player.m_movement != moveMode::WALK )
+        if( SAVE::SAV->getActiveFile( ).m_player.m_movement != moveMode::WALK )
             p_fast = false; //Running is only possible when the player is actually walking
 
         bool reinit = false, moving = true, hadjump = false;
@@ -640,42 +645,47 @@ namespace MAP {
                 swiWaitForVBlank( );
                 swiWaitForVBlank( );
                 stopPlayer( );
-                IO::messageBox m( "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!", "PokéNav" );
+                IO::messageBox m( GET_STRING( 7 ), POKE_NAV );
                 _playerIsFast = false;
                 IO::NAV->draw( true );
                 return;
             }
             //Check for end of surf, stand up and sit down
             if( lstMoveData == 0x0a && newMoveData != 0x0a ) { //Stand up (only possible for the player)
-                if( p_direction != FS::SAV->m_player.m_direction )
+                if( p_direction != SAVE::SAV->getActiveFile( ).m_player.m_direction )
                     return;
 
                 standUpPlayer( p_direction );
-                animateField( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
-                handleWildPkmn( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
+                animateField( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
+                handleWildPkmn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
                 return;
             } else if( lstMoveData == 0x0a ) {
                 fastBike = false;
                 return;
             }
             if( newMoveData == 0x0a ) { //Sit down
-                if( FS::SAV->m_player.m_movement != WALK ) return;
-                FS::SAV->m_player.m_direction = direction( ( u8( p_direction ) + 2 ) % 4 );
-                _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setFrame( getFrame( FS::SAV->m_player.m_direction ) );
-                sitDownPlayer( FS::SAV->m_player.m_direction, SIT );
+                if( SAVE::SAV->getActiveFile( ).m_player.m_movement != WALK ) return;
+                SAVE::SAV->getActiveFile( ).m_player.m_direction = direction( ( u8( p_direction ) + 2 ) % 4 );
+                _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setFrame( getFrame( SAVE::SAV->getActiveFile( ).m_player.m_direction ) );
+                sitDownPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction, SIT );
                 fastBike = false;
                 return;
             }
             if( newMoveData == 0x0c && lstMoveData == 4 ) { //End of surf
                 standUpPlayer( p_direction );
-                animateField( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
-                handleWildPkmn( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
+                animateField( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
+                handleWildPkmn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
                 fastBike = false;
                 return;
             }
 
             //Check for jumps/slides/…
-            if( !canMove( FS::SAV->m_player.m_pos, p_direction, FS::SAV->m_player.m_movement ) ) {
+            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, p_direction,
+                          SAVE::SAV->getActiveFile( ).m_player.m_movement ) ) {
                 stopPlayer( p_direction );
                 fastBike = false;
                 return;
@@ -755,44 +765,44 @@ NO_BREAK:
                             break;
                             //These change the direction of movement
                         case 0x40:
-                            if( !canMove( FS::SAV->m_player.m_pos, RIGHT, FS::SAV->m_player.m_movement ) )
+                            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, RIGHT, SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
                                 goto NEXT_PASS;
                             walkPlayer( RIGHT ); p_direction = RIGHT;
                             break;
                         case 0x41:
-                            if( !canMove( FS::SAV->m_player.m_pos, LEFT, FS::SAV->m_player.m_movement ) )
+                            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, LEFT, SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
                                 goto NEXT_PASS;
                             walkPlayer( LEFT ); p_direction = LEFT;
                             break;
                         case 0x42:
-                            if( !canMove( FS::SAV->m_player.m_pos, UP, FS::SAV->m_player.m_movement ) )
+                            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, UP, SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
                                 goto NEXT_PASS;
                             walkPlayer( UP ); p_direction = UP;
                             break;
                         case 0x60:
                         case 0x43:
-                            if( !canMove( FS::SAV->m_player.m_pos, DOWN, FS::SAV->m_player.m_movement ) )
+                            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, DOWN, SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
                                 goto NEXT_PASS;
                             walkPlayer( DOWN ); p_direction = DOWN;
                             break;
 
                         case 0x44:
-                            if( !canMove( FS::SAV->m_player.m_pos, RIGHT, FS::SAV->m_player.m_movement ) )
+                            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, RIGHT, SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
                                 goto NEXT_PASS;
                             slidePlayer( RIGHT ); p_direction = RIGHT;
                             break;
                         case 0x45:
-                            if( !canMove( FS::SAV->m_player.m_pos, LEFT, FS::SAV->m_player.m_movement ) )
+                            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, LEFT, SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
                                 goto NEXT_PASS;
                             slidePlayer( LEFT ); p_direction = LEFT;
                             break;
                         case 0x46:
-                            if( !canMove( FS::SAV->m_player.m_pos, UP, FS::SAV->m_player.m_movement ) )
+                            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, UP, SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
                                 goto NEXT_PASS;
                             slidePlayer( UP ); p_direction = UP;
                             break;
                         case 0x47:
-                            if( !canMove( FS::SAV->m_player.m_pos, DOWN, FS::SAV->m_player.m_movement ) )
+                            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, DOWN, SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
                                 goto NEXT_PASS;
                             slidePlayer( DOWN ); p_direction = DOWN;
                             break;
@@ -804,22 +814,22 @@ NO_BREAK:
                             break;
 
                         case 0x50:
-                            if( !canMove( FS::SAV->m_player.m_pos, RIGHT, FS::SAV->m_player.m_movement ) )
+                            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, RIGHT, SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
                                 goto NEXT_PASS;
                             walkPlayer( RIGHT, true ); p_direction = RIGHT;
                             break;
                         case 0x51:
-                            if( !canMove( FS::SAV->m_player.m_pos, LEFT, FS::SAV->m_player.m_movement ) )
+                            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, LEFT, SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
                                 goto NEXT_PASS;
                             walkPlayer( LEFT, true ); p_direction = LEFT;
                             break;
                         case 0x52:
-                            if( !canMove( FS::SAV->m_player.m_pos, UP, FS::SAV->m_player.m_movement ) )
+                            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, UP, SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
                                 goto NEXT_PASS;
                             walkPlayer( UP, true ); p_direction = UP;
                             break;
                         case 0x53:
-                            if( !canMove( FS::SAV->m_player.m_pos, DOWN, FS::SAV->m_player.m_movement ) )
+                            if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, DOWN, SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
                                 goto NEXT_PASS;
                             walkPlayer( DOWN, true ); p_direction = DOWN;
                             break;
@@ -854,7 +864,7 @@ NO_BREAK:
 NEXT_PASS:
                         default:
                             if( reinit ) {
-                                _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setFrame( getFrame( p_direction ) );
+                                _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setFrame( getFrame( p_direction ) );
                                 fastBike = false;
                                 return;
                             }
@@ -936,25 +946,29 @@ NEXT_PASS:
 
             }
             reinit = true;
-            newMoveData = atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                                FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata;
-            lstMoveData = atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata;
+            newMoveData = atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata;
+            lstMoveData = atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata;
 
-            newBehave = at( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                            FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_bottombehave;
-            lstBehave = at( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_bottombehave;
+            newBehave = at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_bottombehave;
+            lstBehave = at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_bottombehave;
         }
         walkPlayer( p_direction, p_fast );
-        if( atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata > 4
-            && atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x3c
-            && atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x0a )
-            FS::SAV->m_player.m_pos.m_posZ = atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata / 4;
+        if( atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                  SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata > 4
+            && atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                     SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata != 0x3c
+            && atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                     SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata != 0x0a )
+            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ = atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                                                                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata / 4;
     }
 
     void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
-        bool entryCave = ( !( mapTypes[ FS::SAV->m_currentMap ].first & CAVE )
+        bool entryCave = ( !( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE )
                            && ( mapTypes[ p_target.first ].first & CAVE ) );
-        bool exitCave = ( ( mapTypes[ FS::SAV->m_currentMap ].first & CAVE )
+        bool exitCave = ( ( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE )
                           && !( mapTypes[ p_target.first ].first & CAVE ) );
         switch( p_type ) {
             case DOOR:
@@ -981,19 +995,19 @@ NEXT_PASS:
         swiWaitForVBlank( );
         swiWaitForVBlank( );
 
-        FS::SAV->m_currentMap = p_target.first;
-        FS::SAV->m_player.m_pos = p_target.second;
+        SAVE::SAV->getActiveFile( ).m_currentMap = p_target.first;
+        SAVE::SAV->getActiveFile( ).m_player.m_pos = p_target.second;
         draw( );
-        IO::NAV->showNewMap( FS::SAV->m_currentMap );
+        IO::NAV->showNewMap( SAVE::SAV->getActiveFile( ).m_currentMap );
         if( exitCave )
             movePlayer( DOWN );
     }
 
     void mapDrawer::redirectPlayer( direction p_direction, bool p_fast ) {
         //Check if the player's direction changed
-        if( p_direction != FS::SAV->m_player.m_direction ) {
-            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
-            FS::SAV->m_player.m_direction = p_direction;
+        if( p_direction != SAVE::SAV->getActiveFile( ).m_player.m_direction ) {
+            _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
+            SAVE::SAV->getActiveFile( ).m_player.m_direction = p_direction;
 
             if( _entriesUsed & ( 1 << 1 ) )
                 _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame( getFrame( p_direction ) );
@@ -1002,15 +1016,15 @@ NEXT_PASS:
 
     void mapDrawer::standUpPlayer( direction p_direction ) {
         redirectPlayer( p_direction, false );
-        bool remPlat = FS::SAV->m_player.m_movement == SURF;
+        bool remPlat = SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF;
 
         moveCamera( p_direction, true );
         swiWaitForVBlank( );
         moveCamera( p_direction, true );
         swiWaitForVBlank( );
         moveCamera( p_direction, true );
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].move( DOWN, 1 );
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( getFrame( p_direction ) / 3 + 12 );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].move( DOWN, 1 );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame( getFrame( p_direction ) / 3 + 12 );
         moveCamera( p_direction, true );
         swiWaitForVBlank( );
         if( remPlat ) {
@@ -1018,14 +1032,14 @@ NEXT_PASS:
             _entriesUsed ^= ( 1 << 1 );
         }
         moveCamera( p_direction, true );
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].move( DOWN, 2 );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].move( DOWN, 2 );
         swiWaitForVBlank( );
         moveCamera( p_direction, true );
         swiWaitForVBlank( );
         moveCamera( p_direction, true );
         moveCamera( p_direction, true );
 
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].move( DOWN, 1 );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].move( DOWN, 1 );
         for( u8 i = 0; i < 4; ++i ) {
             moveCamera( p_direction, true );
             swiWaitForVBlank( );
@@ -1052,26 +1066,26 @@ NEXT_PASS:
 
         for( u8 i = 0; i < 7; ++i ) {
             if( i == 3 )
-                _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].move( UP, 2 );
+                _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].move( UP, 2 );
             moveCamera( dir, true );
             swiWaitForVBlank( );
         }
         changeMoveMode( p_newMoveMode );
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( getFrame( p_direction ) / 3 + 12 );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame( getFrame( p_direction ) / 3 + 12 );
 
         for( u8 i = 0; i < 4; ++i ) {
             moveCamera( dir, true );
             if( i % 2 )
                 swiWaitForVBlank( );
         }
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].move( UP, 2 );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].move( UP, 2 );
         swiWaitForVBlank( );
         moveCamera( dir, true );
         swiWaitForVBlank( );
         moveCamera( dir, true );
         moveCamera( dir, true );
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( getFrame( p_direction ) );
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].move( UP, 1 );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame( getFrame( p_direction ) );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].move( UP, 1 );
         swiWaitForVBlank( );
         moveCamera( dir, true );
         swiWaitForVBlank( );
@@ -1080,150 +1094,152 @@ NEXT_PASS:
 
     void mapDrawer::slidePlayer( direction p_direction ) {
         redirectPlayer( p_direction, false );
-        animateField( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                      FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] );
+        animateField( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] );
         if( _playerIsFast ) {
             _playerIsFast = false;
-            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setFrame( getFrame( p_direction ) );
-            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].nextFrame( );
+            _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setFrame( getFrame( p_direction ) );
+            _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].nextFrame( );
         }
         for( u8 i = 0; i < 16; ++i ) {
             moveCamera( p_direction, true );
             if( i == 8 )
-                _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].currentFrame( );
+                _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].currentFrame( );
             swiWaitForVBlank( );
         }
-        handleWildPkmn( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
+        handleWildPkmn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
     }
     void mapDrawer::walkPlayer( direction p_direction, bool p_fast ) {
-        if( FS::SAV->m_player.m_movement != WALK )
+        if( SAVE::SAV->getActiveFile( ).m_player.m_movement != WALK )
             p_fast = false;
         redirectPlayer( p_direction, p_fast );
 
-        if( atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                  FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x3c
-            && FS::SAV->m_player.m_pos.m_posZ > 3
-            && FS::SAV->m_player.m_movement != SURF ) {
-            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( OBJPRIORITY_1 );
+        if( atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                  SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x3c
+            && SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ > 3
+            && SAVE::SAV->getActiveFile( ).m_player.m_movement != SURF ) {
+            _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setPriority( OBJPRIORITY_1 );
         }
 
-        animateField( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                      FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] );
+        animateField( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] );
         if( p_fast != _playerIsFast ) {
             _playerIsFast = p_fast;
-            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
+            _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
         }
         for( u8 i = 0; i < 16; ++i ) {
             moveCamera( p_direction, true );
             if( i == 8 )
-                _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].nextFrame( );
-            if( ( !p_fast || i % 3 ) && FS::SAV->m_player.m_movement != BIKE )
+                _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].nextFrame( );
+            if( ( !p_fast || i % 3 ) && SAVE::SAV->getActiveFile( ).m_player.m_movement != BIKE )
                 swiWaitForVBlank( );
-            if( i % ( fastBike / 3 + 2 ) == 0 && FS::SAV->m_player.m_movement == BIKE )
+            if( i % ( fastBike / 3 + 2 ) == 0 && SAVE::SAV->getActiveFile( ).m_player.m_movement == BIKE )
                 swiWaitForVBlank( );
         }
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
-        if( FS::SAV->m_player.m_movement == BIKE )
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame( ( p_fast * 20 ) + getFrame( p_direction ) );
+        if( SAVE::SAV->getActiveFile( ).m_player.m_movement == BIKE )
             fastBike = std::min( fastBike + 1, 12 );
         else
             fastBike = false;
 
-        if( atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                  FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x3c
-            && ( FS::SAV->m_player.m_pos.m_posZ <= 3 || FS::SAV->m_player.m_movement == SURF ) ) {
-            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( OBJPRIORITY_3 );
-            if( FS::SAV->m_player.m_movement == SURF )
+        if( atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                  SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata == 0x3c
+            && ( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ <= 3 || SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF ) ) {
+            _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setPriority( OBJPRIORITY_3 );
+            if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF )
                 _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_3 );
-        } else if( atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                         FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata != 0x3c
-                   && atom( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY ).m_movedata != 0x3c ) {
-            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setPriority( OBJPRIORITY_2 );
-            if( FS::SAV->m_player.m_movement == SURF )
+        } else if( atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                         SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata != 0x3c
+                   && atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ).m_movedata != 0x3c ) {
+            _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setPriority( OBJPRIORITY_2 );
+            if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF )
                 _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_2 );
         }
-        handleWildPkmn( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
+        handleWildPkmn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
     }
     void mapDrawer::jumpPlayer( direction p_direction ) {
         redirectPlayer( p_direction, false );
         if( _playerIsFast ) {
             _playerIsFast = false;
-            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setFrame( getFrame( p_direction ) );
+            _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setFrame( getFrame( p_direction ) );
         }
         for( u8 i = 0; i < 32; ++i ) {
             moveCamera( p_direction, true );
             if( i < 6 && i % 2 )
-                _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].move( UP, 2 );
+                _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].move( UP, 2 );
             if( i % 8 == 0 )
-                _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].nextFrame( );
+                _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].nextFrame( );
             if( i > 28 && i % 2 )
-                _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].move( DOWN, 3 );
+                _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].move( DOWN, 3 );
             if( i % 4 )
                 swiWaitForVBlank( );
             if( i == 16 ) {
-                animateField( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                              FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] );
+                animateField( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                              SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] );
             }
         }
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( getFrame( p_direction ) );
-        handleWildPkmn( FS::SAV->m_player.m_pos.m_posX, FS::SAV->m_player.m_pos.m_posY );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame( getFrame( p_direction ) );
+        handleWildPkmn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
     }
 
     void mapDrawer::stopPlayer( ) {
         while( fastBike ) {
             fastBike = std::max( 0, (s8) fastBike - 3 );
-            if( canMove( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction, BIKE ) )
-                movePlayer( FS::SAV->m_player.m_direction );
+            if( canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, SAVE::SAV->getActiveFile( ).m_player.m_direction, BIKE ) )
+                movePlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction );
             fastBike = std::max( 0, (s8) fastBike - 1 );
         }
         _playerIsFast = false;
         fastBike = false;
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( getFrame( FS::SAV->m_player.m_direction ) );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame( getFrame( SAVE::SAV->getActiveFile( ).m_player.m_direction ) );
     }
     void mapDrawer::stopPlayer( direction p_direction ) {
-        if( FS::SAV->m_player.m_movement == SIT && ( ( p_direction % 2 == FS::SAV->m_player.m_direction % 2 )
-                                                     || atom( FS::SAV->m_player.m_pos.m_posX + dir[ p_direction ][ 0 ], FS::SAV->m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata
-                                                     != atom( FS::SAV->m_player.m_pos.m_posX + dir[ FS::SAV->m_player.m_direction ][ 0 ], FS::SAV->m_player.m_pos.m_posY + dir[ FS::SAV->m_player.m_direction ][ 1 ] ).m_movedata ) ) {
+        if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SIT && ( ( p_direction % 2 == SAVE::SAV->getActiveFile( ).m_player.m_direction % 2 )
+                                                                        || atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
+                                                                                 SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] ).m_movedata
+                                                                        != atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 0 ],
+                                                                                 SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 1 ] ).m_movedata ) ) {
             return;
         }
         fastBike = false;
         redirectPlayer( p_direction, false );
         _playerIsFast = false;
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].nextFrame( );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].nextFrame( );
     }
 
     void mapDrawer::changeMoveMode( moveMode p_newMode ) {
-        u8 basePic = FS::SAV->m_player.m_picNum / 10 * 10;
+        u8 basePic = SAVE::SAV->getActiveFile( ).m_player.m_picNum / 10 * 10;
         bool newIsBig = false;
         fastBike = false;
         u8 ydif = 0;
-        FS::SAV->m_player.m_movement = p_newMode;
+        SAVE::SAV->getActiveFile( ).m_player.m_movement = p_newMode;
         switch( p_newMode ) {
             case WALK:
-                FS::SAV->m_player.m_picNum = basePic;
+                SAVE::SAV->getActiveFile( ).m_player.m_picNum = basePic;
                 break;
             case SURF:
-                FS::SAV->m_player.m_picNum = basePic + 3;
+                SAVE::SAV->getActiveFile( ).m_player.m_picNum = basePic + 3;
                 newIsBig = basePic == 0 || basePic == 10;
                 ydif = 2;
                 break;
             case BIKE:
-                FS::SAV->m_player.m_picNum = basePic + 1;
+                SAVE::SAV->getActiveFile( ).m_player.m_picNum = basePic + 1;
                 newIsBig = true;
                 break;
             case ACRO_BIKE:
-                FS::SAV->m_player.m_picNum = basePic + 2;
+                SAVE::SAV->getActiveFile( ).m_player.m_picNum = basePic + 2;
                 newIsBig = true;
                 break;
             case SIT:
-                FS::SAV->m_player.m_picNum = basePic + 3;
+                SAVE::SAV->getActiveFile( ).m_player.m_picNum = basePic + 3;
                 newIsBig = basePic == 0 || basePic == 10;
                 ydif = 2;
                 break;
             default:
                 break;
         }
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ] = FS::SAV->m_player.show( 128 - 8 - 8 * newIsBig, 96 - 24 - ydif, 0, 0, 0 );
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].setFrame( getFrame( FS::SAV->m_player.m_direction ) );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ] = SAVE::SAV->getActiveFile( ).m_player.show( 128 - 8 - 8 * newIsBig, 96 - 24 - ydif, 0, 0, 0 );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setFrame( getFrame( SAVE::SAV->getActiveFile( ).m_player.m_direction ) );
     }
 
     bool mapDrawer::canFish( position p_start,
@@ -1235,11 +1251,11 @@ NEXT_PASS:
     void mapDrawer::fishPlayer( direction p_direction, u8 p_rodType ) {
         PLAYER_IS_FISHING = true;
 
-        u8 basePic = FS::SAV->m_player.m_picNum / 10 * 10;
-        FS::SAV->m_player.m_picNum = basePic + 6;
-        bool surfing = ( FS::SAV->m_player.m_movement == SURF );
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ] = FS::SAV->m_player.show( 128 - 16 + 8 * dir[ p_direction ][ 0 ],
-                                                                                   96 - 24 + 8 * ( p_direction == DOWN ), 0, 0, 0 );
+        u8 basePic = SAVE::SAV->getActiveFile( ).m_player.m_picNum / 10 * 10;
+        SAVE::SAV->getActiveFile( ).m_player.m_picNum = basePic + 6;
+        bool surfing = ( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ] = SAVE::SAV->getActiveFile( ).m_player.show( 128 - 16 + 8 * dir[ p_direction ][ 0 ],
+                                                                                                                         96 - 24 + 8 * ( p_direction == DOWN ), 0, 0, 0 );
 
         u8 frame = 0;
         if( p_direction == UP )
@@ -1248,7 +1264,7 @@ NEXT_PASS:
             frame = 8;
 
         for( u8 i = 0; i < 4; ++i ) {
-            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( frame + i, p_direction == RIGHT );
+            _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame( frame + i, p_direction == RIGHT );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
@@ -1273,7 +1289,7 @@ NEXT_PASS:
             }
             FRAME_COUNT = 0;
             fish.carriageReturn( );
-            fish.put( "\nDa ist etwas am Haken!" );
+            fish.put( GET_STRING( 8 ) );
             if( FRAME_COUNT > 60 ) {
                 failed = true;
                 break;
@@ -1283,31 +1299,37 @@ NEXT_PASS:
 OUT:
         fish.clear( );
         if( failed )
-            fish.put( "Es ist entkommen…" );
+            fish.put( GET_STRING( 9 ) );
         IO::NAV->draw( true );
         for( s8 i = 2; i >= 0; --i ) {
-            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( frame + i, p_direction == RIGHT );
+            _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame( frame + i, p_direction == RIGHT );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
         }
         changeMoveMode( surfing ? SURF : WALK );
         if( !failed ) {
+            // Check if the player's leading Pokémon has sucion cups or sticky hold
+            bool forceEncounter = ( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].isEgg( ) &&
+                ( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_ability == A_SUCTION_CUPS ||
+                  SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_ability == A_STICKY ) );
+
             //Start wild PKMN battle here
-            handleWildPkmn( FISHING_ROD, p_rodType );
+            handleWildPkmn( FISHING_ROD, p_rodType, forceEncounter );
         }
 
         PLAYER_IS_FISHING = false;
     }
 
     void mapDrawer::usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny ) {
-        u8 basePic = FS::SAV->m_player.m_picNum / 10 * 10;
-        FS::SAV->m_player.m_picNum = basePic + 5;
-        bool surfing = ( FS::SAV->m_player.m_movement == SURF );
+        u8 basePic = SAVE::SAV->getActiveFile( ).m_player.m_picNum / 10 * 10;
+        SAVE::SAV->getActiveFile( ).m_player.m_picNum = basePic + 5;
+        bool surfing = ( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF );
 
-        _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ] = FS::SAV->m_player.show( 128 - 8 - 8 * ( basePic == 0 || basePic == 10 ), 96 - 24 - 3 * surfing, 0, 0, 0 );
+        _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ] = SAVE::SAV->getActiveFile( ).m_player.show( 128 - 8 - 8 * ( basePic == 0 || basePic == 10 ),
+                                                                                                                         96 - 24 - 3 * surfing, 0, 0, 0 );
         for( u8 i = 0; i < 5; ++i ) {
-            _sprites[ _spritePos[ FS::SAV->m_player.m_id ] ].drawFrame( i, false );
+            _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame( i, false );
             for( u8 j = 0; j < 5; ++j )
                 swiWaitForVBlank( );
         }
@@ -1329,13 +1351,13 @@ OUT:
         changeMoveMode( surfing ? SURF : WALK );
         if( surfing ) {
             _sprites[ _spritePos[ surfPlatform.m_id ] ] = surfPlatform.show( 128 - 16, 96 - 20, 1, 1, 192 );
-            _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame( getFrame( FS::SAV->m_player.m_direction ) );
+            _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame( getFrame( SAVE::SAV->getActiveFile( ).m_player.m_direction ) );
         }
         swiWaitForVBlank( );
     }
 
     u16  mapDrawer::getCurrentLocationId( ) const {
-        u16 res = MAP::mapInfo[ FS::SAV->m_currentMap ].first;
+        u16 res = MAP::mapInfo[ SAVE::SAV->getActiveFile( ).m_currentMap ].first;
         if( res == 2003 ) { //Kanto
 
         } else if( res == 2004 ) { //Johto

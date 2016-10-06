@@ -40,6 +40,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "defines.h"
 #include "saveGame.h"
+#include "fs.h"
 #include "startScreen.h"
 
 #include "hmMoves.h"
@@ -151,15 +152,9 @@ int main( int, char** p_argv ) {
     initTimeAndRnd( );
 
     //Read the savegame
-    if( gMod != EMULATOR ) {
-        FS::SAV = FS::readSave( );
-    } else {
-        FS::SAV->m_savTyp = 0;
-    }
-    startScreen( ).run( );
-
-    FS::SAV->m_hasGDex = true;
-    FS::SAV->m_evolveInBattle = true;
+    if( gMod != EMULATOR && p_argv[ 0 ] )
+        SAVE::SAV = FS::readSave( p_argv[ 0 ] );
+    SAVE::startScreen( ).run( );
 
     irqSet( IRQ_VBLANK, [ ] ( ) {
         scanKeys( );
@@ -233,14 +228,14 @@ int main( int, char** p_argv ) {
             time_t unixTime = time( NULL );
             struct tm* timeStruct = gmtime( (const time_t *) &unixTime );
             std::sprintf( buffer, "Currently at %hu-(%hu,%hu,%hu).\nMap: %hu:%hu, (%02hX,%02hX)\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
-                          FS::SAV->m_currentMap,
-                          FS::SAV->m_player.m_pos.m_posX,
-                          FS::SAV->m_player.m_pos.m_posY,
-                          FS::SAV->m_player.m_pos.m_posZ,
-                          FS::SAV->m_player.m_pos.m_posY / 32,
-                          FS::SAV->m_player.m_pos.m_posX / 32,
-                          FS::SAV->m_player.m_pos.m_posX % 32,
-                          FS::SAV->m_player.m_pos.m_posY % 32,
+                          SAVE::SAV->getActiveFile( ).m_currentMap,
+                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
+                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ,
+                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY / 32,
+                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
+                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX % 32,
+                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32,
                           FRAME_COUNT,
                           achours, acminutes, acseconds, timeStruct->tm_sec );
             IO::messageBox m( buffer );
@@ -250,21 +245,21 @@ int main( int, char** p_argv ) {
 
         if( held & KEY_A ) {
             for( u8 i = 0; i < 6; ++i ) {
-                if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId )
                     break;
-                auto a = FS::SAV->m_pkmnTeam[ i ];
+                auto a = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
                 if( a.m_boxdata.m_individualValues.m_isEgg )
                     continue;
                 for( u8 j = 0; j < 4; ++j ) {
                     if( !AttackList[ a.m_boxdata.m_moves[ j ] ]->m_isFieldAttack
                         || !AttackList[ a.m_boxdata.m_moves[ j ] ]->possible( ) )
                         continue;
-                    sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ j ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                    sprintf( buffer, GET_STRING( 3 ), AttackList[ a.m_boxdata.m_moves[ j ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                     IO::yesNoBox yn;
                     if( yn.getResult( buffer ) ) {
                         IO::NAV->draw( );
                         swiWaitForVBlank( );
-                        sprintf( buffer, "%s setzt %s ein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                        sprintf( buffer, GET_STRING( 10 ), a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                         IO::messageBox( buffer, 0, false );
                         MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
                         IO::NAV->draw( true );
@@ -286,7 +281,7 @@ OUT:
             scanKeys( );
 
             stopped = false;
-            if( MAP::curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) ) {
+            if( MAP::curMap->canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, curDir, SAVE::SAV->getActiveFile( ).m_player.m_movement ) ) {
                 MAP::curMap->movePlayer( curDir, ( held & KEY_B ) );
                 bmp = false;
             } else if( !bmp ) {
@@ -309,7 +304,7 @@ OUT:
             bmp = false;
         }
 
-        IO::NAV->handleInput( touch );
+        IO::NAV->handleInput( touch, p_argv[ 0 ] );
         //End
         scanKeys( );
     }

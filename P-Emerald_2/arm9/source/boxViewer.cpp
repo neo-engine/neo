@@ -63,7 +63,7 @@ namespace BOX {
                 if( !_heldPkmn.m_boxdata.m_speciesId )
                     break;
             } else if( GET_AND_WAIT( KEY_L ) ) {
-                FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                SAVE::SAV->getActiveFile( ).m_curBox = ( SAVE::SAV->getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
                 CLEAN;
                 _ranges = _boxUI.draw( p_allowTakePkmn );
                 select( _selectedIdx );
@@ -75,7 +75,7 @@ namespace BOX {
                     scanKeys( );
                     touchRead( &touch );
                     if( TOUCH_UP ) {
-                        FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                        SAVE::SAV->getActiveFile( ).m_curBox = ( SAVE::SAV->getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
                         CLEAN;
                         _ranges = _boxUI.draw( p_allowTakePkmn );
                         select( _selectedIdx );
@@ -87,7 +87,7 @@ namespace BOX {
                     }
                 }
             } else if( GET_AND_WAIT( KEY_R ) ) {
-                FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
+                SAVE::SAV->getActiveFile( ).m_curBox = ( SAVE::SAV->getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
                 CLEAN;
                 _ranges = _boxUI.draw( p_allowTakePkmn );
                 select( _selectedIdx );
@@ -99,7 +99,7 @@ namespace BOX {
                     scanKeys( );
                     touchRead( &touch );
                     if( TOUCH_UP ) {
-                        FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
+                        SAVE::SAV->getActiveFile( ).m_curBox = ( SAVE::SAV->getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
                         CLEAN;
                         _ranges = _boxUI.draw( p_allowTakePkmn );
                         select( _selectedIdx );
@@ -124,8 +124,8 @@ namespace BOX {
                         IO::printRectangle( 144, 192 - 14, 255, 192, false, false, WHITE_IDX );
 
                         IO::keyboard kb;
-                        sprintf( buffer, "Name für Box „%s“", FS::SAV->getCurrentBox( )->m_name );
-                        strcpy( FS::SAV->getCurrentBox( )->m_name, kb.getText( 14, buffer ).c_str( ) );
+                        sprintf( buffer, GET_STRING( 62 ), SAVE::SAV->getCurrentBox( )->m_name );
+                        strcpy( SAVE::SAV->getCurrentBox( )->m_name, kb.getText( 14, buffer ).c_str( ) );
                         IO::swapScreens( );
                         IO::OamTop->oamBuffer[ 0 ].isHidden = false;
                         IO::updateOAM( false );
@@ -213,12 +213,12 @@ namespace BOX {
         }
         pokemon selection;
         if( p_index < MAX_PKMN_PER_BOX )
-            selection = ( *FS::SAV->getCurrentBox( ) )[ p_index ];
+            selection = ( *SAVE::SAV->getCurrentBox( ) )[ p_index ];
         else if( p_index < MAX_PKMN_PER_BOX + 6 ) {
             if( _showTeam )
-                selection = FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ];
+                selection = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ];
             else
-                selection = FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
+                selection = SAVE::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
         }
         _boxUI.select( p_index );
         if( p_index >= MAX_PKMN_PER_BOX + 6 )
@@ -239,9 +239,9 @@ namespace BOX {
             if( p_index >= MAX_PKMN_PER_BOX + 8 )
                 return;
             if( p_index == MAX_PKMN_PER_BOX + 6 ) // <
-                FS::SAV->m_curBox = ( FS::SAV->m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                SAVE::SAV->getActiveFile( ).m_curBox = ( SAVE::SAV->getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
             else if( p_index == MAX_PKMN_PER_BOX + 7 ) // >
-                FS::SAV->m_curBox = ( FS::SAV->m_curBox + 1 ) % MAX_BOXES;
+                SAVE::SAV->getActiveFile( ).m_curBox = ( SAVE::SAV->getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
 
             CLEAN;
             _ranges = _boxUI.draw( _showTeam );
@@ -251,13 +251,13 @@ namespace BOX {
 
         pokemon::boxPokemon hld = _heldPkmn.m_boxdata;
         if( p_index < MAX_PKMN_PER_BOX )
-            std::swap( hld, FS::SAV->getCurrentBox( )->operator[]( p_index ) );
+            std::swap( hld, SAVE::SAV->getCurrentBox( )->operator[]( p_index ) );
         if( p_index >= MAX_PKMN_PER_BOX && !_showTeam )
-            std::swap( hld, FS::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ] );
+            std::swap( hld, SAVE::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ] );
         if( p_index >= MAX_PKMN_PER_BOX && _showTeam ) {
-            std::swap( _heldPkmn, FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
+            std::swap( _heldPkmn, SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
             if( !updateTeam( ) ) {
-                std::swap( _heldPkmn, FS::SAV->m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
+                std::swap( _heldPkmn, SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
                 return;
             } else
                 _boxUI.updateTeam( );
@@ -270,18 +270,18 @@ namespace BOX {
     bool boxViewer::updateTeam( ) {
         u8 nxt = 1;
         for( u8 i = 0; i < 6; ++i, ++nxt )
-            if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+            if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId )
                 for( ; nxt < 6; ++nxt )
-                    if( FS::SAV->m_pkmnTeam[ nxt ].m_boxdata.m_speciesId ) {
-                        std::swap( FS::SAV->m_pkmnTeam[ i ], FS::SAV->m_pkmnTeam[ nxt ] );
+                    if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ nxt ].m_boxdata.m_speciesId ) {
+                        std::swap( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ], SAVE::SAV->getActiveFile( ).m_pkmnTeam[ nxt ] );
                         break;
                     }
 
         //Check if the party is safe to walk with
         for( u8 i = 0; i < 6; ++i )
-            if( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId
-                && FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP
-                && !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg )
+            if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId
+                && SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP
+                && !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg )
                 return true;
         return false;
     }

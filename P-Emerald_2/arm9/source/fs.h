@@ -73,4 +73,7 @@ namespace FS {
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt, bool p_bottom = false );
 
     const char* getLocation( u16 p_ind );
+
+    SAVE::saveGame* readSave( const char* p_path );
+    bool writeSave( SAVE::saveGame* p_saveGame, const char* p_path );
 }

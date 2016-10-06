@@ -30,12 +30,13 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "item.h"
 #include "script.h"
 #include "pokemon.h"
+#include "saveGame.h"
 
 #include <algorithm>
 #include <nds.h>
 
 namespace BAG {
-    std::string bagnames[ 5 ] = { "Items", "Medizin", "TM/VM", "Beeren", "Basis-Items" };
+    std::string bagnames[ 5 ] = { GET_STRING( 11 ), GET_STRING( 12 ), GET_STRING( 13 ), GET_STRING( 14 ), GET_STRING( 15 ) };
 
     void bag::insert( bagType p_bagType, u16 p_itemId, u16 p_cnt ) {
         for( u16 i = _startIdx[ p_bagType ]; i < _nextFree[ p_bagType ]; ++i )

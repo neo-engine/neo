@@ -49,8 +49,8 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
                                  bool            p_fatefulEncounter ) {
     getAll( p_pkmnId, data );
     m_pid = rand( );
-    m_oTId = FS::SAV->m_id;
-    m_oTSid = FS::SAV->m_sid;
+    m_oTId = SAVE::SAV->getActiveFile( ).m_id;
+    m_oTSid = SAVE::SAV->getActiveFile( ).m_sid;
     if( p_shiny == 2 )
         while( !isShiny( ) || isCloned( ) )
             m_pid = rand( );
@@ -151,11 +151,11 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
         m_individualValues.m_isNicked = false;
     }
     m_hometown = 4;
-    strcpy( m_oT, FS::SAV->m_playername );
+    strcpy( m_oT, SAVE::SAV->getActiveFile( ).m_playername );
     m_pokerus = p_pokerus;
     m_ball = 0;
     m_gotLevel = p_level;
-    m_oTisFemale = !FS::SAV->m_isMale;
+    m_oTisFemale = !SAVE::SAV->getActiveFile( ).m_isMale;
     m_encounter = (encounter) 0;
     m_HGSSBall = 0;
 }
@@ -382,7 +382,7 @@ bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
         if( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember ) {
             bool b = false;
             for( int j = 0; j < 6; ++j )
-                b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId );
+                b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId );
             if( !b )
                 continue;
         }
@@ -439,7 +439,7 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
         if( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember ) {
             bool b = false;
             for( int j = 0; j < 6; ++j )
-                b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId );
+                b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId );
             if( !b )
                 continue;
         }

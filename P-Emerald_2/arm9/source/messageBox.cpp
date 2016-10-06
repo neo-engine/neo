@@ -94,7 +94,7 @@ namespace IO {
         x = 46; y = 24;
         regularFont->printMBStringD( buf, x, y, true );
 
-        FS::SAV->m_bag.insert( BAG::toBagType( p_item->m_itemType ), p_item->getItemId( ), p_count );
+        SAVE::SAV->getActiveFile( ).m_bag.insert( BAG::toBagType( p_item->m_itemType ), p_item->getItemId( ), p_count );
     }
 
     messageBox::messageBox( const char* p_text, bool p_remsprites ) {

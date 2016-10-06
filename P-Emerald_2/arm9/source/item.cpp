@@ -235,41 +235,41 @@ bool item::use( bool p_dryRun ) {
     if( !p_dryRun ) {
         bool ex = false;
         for( u8 i = 0; i < 5; ++i )
-            if( FS::SAV->m_lstUsedItems[ i ] == itm ) {
+            if( SAVE::SAV->getActiveFile( ).m_lstUsedItems[ i ] == itm ) {
                 ex = true;
                 break;
             }
         if( !ex ) {
-            FS::SAV->m_lstUsedItems[ FS::SAV->m_lstUsedItemsIdx ] = itm;
-            FS::SAV->m_lstUsedItemsIdx = ( FS::SAV->m_lstUsedItemsIdx + 1 ) % 5;
+            SAVE::SAV->getActiveFile( ).m_lstUsedItems[ SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx ] = itm;
+            SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx = ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx + 1 ) % 5;
         }
     }
     switch( itm ) {
         case I_REPEL:
             if( !p_dryRun ) {
-                FS::SAV->m_repelSteps = std::max( FS::SAV->m_repelSteps, (s16) 50 );
+                SAVE::SAV->getActiveFile( ).m_repelSteps = std::max( SAVE::SAV->getActiveFile( ).m_repelSteps, (s16) 50 );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                IO::messageBox( "Schutz eingesetzt.", false );
+                IO::messageBox( GET_STRING( 63 ), false );
             }
             return true;
         case I_SUPER_REPEL:
             if( !p_dryRun ) {
-                FS::SAV->m_repelSteps = std::max( FS::SAV->m_repelSteps, (s16) 100 );
+                SAVE::SAV->getActiveFile( ).m_repelSteps = std::max( SAVE::SAV->getActiveFile( ).m_repelSteps, (s16) 100 );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                IO::messageBox( "Superschutz eingesetzt.", false );
+                IO::messageBox( GET_STRING( 64 ), false );
             }
             return true;
         case I_MAX_REPEL:
             if( !p_dryRun ) {
-                FS::SAV->m_repelSteps = std::max( FS::SAV->m_repelSteps, (s16) 250 );
+                SAVE::SAV->getActiveFile( ).m_repelSteps = std::max( SAVE::SAV->getActiveFile( ).m_repelSteps, (s16) 250 );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                IO::messageBox( "Top-Schutz eingesetzt.", false );
+                IO::messageBox( GET_STRING( 65 ), false );
             }
             return true;
         case I_EXP_SHARE:
@@ -277,11 +277,11 @@ bool item::use( bool p_dryRun ) {
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                if( FS::SAV->m_EXPShareEnabled )
-                    IO::messageBox( "EP-Teiler ausgeschaltet.", false );
+                if( SAVE::SAV->getActiveFile( ).m_options.m_EXPShareEnabled )
+                    IO::messageBox( GET_STRING( 66 ), false );
                 else
-                    IO::messageBox( "EP-Teiler eingeschaltet.", false );
-                FS::SAV->m_EXPShareEnabled = !FS::SAV->m_EXPShareEnabled;
+                    IO::messageBox( GET_STRING( 67 ), false );
+                SAVE::SAV->getActiveFile( ).m_options.m_EXPShareEnabled = !SAVE::SAV->getActiveFile( ).m_options.m_EXPShareEnabled;
             }
             return true;
         case I_COIN_CASE:
@@ -289,7 +289,7 @@ bool item::use( bool p_dryRun ) {
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                sprintf( buffer, "Münzen: %lu.", FS::SAV->m_coins );
+                sprintf( buffer, GET_STRING( 68 ), SAVE::SAV->getActiveFile( ).m_coins );
                 IO::messageBox( buffer, false );
             }
             return true;
@@ -298,9 +298,8 @@ bool item::use( bool p_dryRun ) {
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                sprintf( buffer, "Kampfpunkte: %lu.", FS::SAV->m_battlePoints );
+                sprintf( buffer, GET_STRING( 69 ), SAVE::SAV->getActiveFile( ).m_battlePoints );
                 IO::messageBox( buffer, false );
-                FS::SAV->m_EXPShareEnabled = !FS::SAV->m_EXPShareEnabled;
             }
             return true;
         case I_ESCAPE_ROPE:
@@ -315,34 +314,34 @@ bool item::use( bool p_dryRun ) {
         case I_BICYCLE:
         case I_MACH_BIKE:
         case I_ACRO_BIKE:
-            if( FS::SAV->m_player.m_movement == MAP::WALK ) {
+            if( SAVE::SAV->getActiveFile( ).m_player.m_movement == MAP::WALK ) {
                 if( !p_dryRun )
                     MAP::curMap->changeMoveMode( MAP::BIKE );
                 return false;
-            } else if( FS::SAV->m_player.m_movement == MAP::BIKE ) {
+            } else if( SAVE::SAV->getActiveFile( ).m_player.m_movement == MAP::BIKE ) {
                 if( !p_dryRun )
                     MAP::curMap->changeMoveMode( MAP::WALK );
                 return false;
             } else
                 return true;
         case I_OLD_ROD:
-            if( MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
+            if( MAP::curMap->canFish( SAVE::SAV->getActiveFile( ).m_player.m_pos, SAVE::SAV->getActiveFile( ).m_player.m_direction ) ) {
                 if( !p_dryRun )
-                    MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction, 0 );
+                    MAP::curMap->fishPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction, 0 );
                 return false;
             } else
                 return true;
         case I_GOOD_ROD:
-            if( MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
+            if( MAP::curMap->canFish( SAVE::SAV->getActiveFile( ).m_player.m_pos, SAVE::SAV->getActiveFile( ).m_player.m_direction ) ) {
                 if( !p_dryRun )
-                    MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction, 1 );
+                    MAP::curMap->fishPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction, 1 );
                 return false;
             } else
                 return true;
         case I_SUPER_ROD:
-            if( MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction ) ) {
+            if( MAP::curMap->canFish( SAVE::SAV->getActiveFile( ).m_player.m_pos, SAVE::SAV->getActiveFile( ).m_player.m_direction ) ) {
                 if( !p_dryRun )
-                    MAP::curMap->fishPlayer( FS::SAV->m_player.m_direction, 2 );
+                    MAP::curMap->fishPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction, 2 );
                 return false;
             } else
                 return true;
@@ -370,11 +369,11 @@ bool item::useable( ) {
         case I_BICYCLE:
         case I_MACH_BIKE:
         case I_ACRO_BIKE:
-            return FS::SAV->m_player.m_movement == MAP::WALK || FS::SAV->m_player.m_movement == MAP::BIKE;
+            return SAVE::SAV->getActiveFile( ).m_player.m_movement == MAP::WALK || SAVE::SAV->getActiveFile( ).m_player.m_movement == MAP::BIKE;
         case I_OLD_ROD:
         case I_GOOD_ROD:
         case I_SUPER_ROD:
-            return MAP::curMap->canFish( FS::SAV->m_player.m_pos, FS::SAV->m_player.m_direction );
+            return MAP::curMap->canFish( SAVE::SAV->getActiveFile( ).m_player.m_pos, SAVE::SAV->getActiveFile( ).m_player.m_direction );
         default:
             break;
     }

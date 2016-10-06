@@ -47,6 +47,7 @@
     <ClInclude Include="arm9\source\messageBox.h" />
     <ClInclude Include="arm9\source\move.h" />
     <ClInclude Include="arm9\source\nav.h" />
+    <ClInclude Include="arm9\source\saveOptions.h" />
     <ClInclude Include="arm9\source\pokemon.h" />
     <ClInclude Include="arm9\source\ribbon.h" />
     <ClInclude Include="arm9\source\saveGame.h" />
@@ -100,6 +101,7 @@
     <ClCompile Include="arm9\source\startScreen.cpp" />
     <ClCompile Include="arm9\source\statusScreen.cpp" />
     <ClCompile Include="arm9\source\statusScreenUI.cpp" />
+    <ClCompile Include="arm9\source\strings.cpp" />
     <ClCompile Include="arm9\source\type.cpp" />
     <ClCompile Include="arm9\source\uio.cpp" />
     <ClCompile Include="arm9\source\yesNoBox.cpp" />
