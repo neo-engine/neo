@@ -230,6 +230,24 @@ namespace SAVE {
                 drawMainChoice( p_lang, vis, selectedIdx );
             } else if( GET_AND_WAIT( KEY_A ) )
                 return res[ selectedIdx ];
+
+            for( u8 i = 0; i < vis.size(); ++i ) 
+                if( IN_RANGE_R( 4, 4 + 48 * i, 136, 26 + 48 * i ) ) {
+                    selectedIdx = i;
+                    drawMainChoice( p_lang, vis, selectedIdx, i );
+
+                    loop( ) {
+                        swiWaitForVBlank( );
+                        scanKeys( );
+                        touchRead( &touch );
+
+                        if( TOUCH_UP )
+                            return res[ selectedIdx ];
+                        if( !IN_RANGE_R( 4, 4 + 48 * i, 136, 26 + 48 * i ) )
+                            break;
+                    }
+                    drawMainChoice( p_lang, vis, selectedIdx );
+                }
         }
     }
 
@@ -270,6 +288,22 @@ namespace SAVE {
                     continue;
                 return selectedIdx;
             }
+            for( u8 i = 0; i < MAX_SAVE_FILES; ++i )
+                if( IN_RANGE_R( 4, 4 + 64 * i, 86, 26 + 64 * i ) ) {
+                    selectedIdx = i;
+                    drawSlotChoice( selectedIdx, i );
+                    loop( ) {
+                        swiWaitForVBlank( );
+                        scanKeys( );
+                        touchRead( &touch );
+                        if( TOUCH_UP ) {
+                            return selectedIdx;
+                        }
+                        if( !IN_RANGE_R( 4, 4 + 64 * i, 86, 26 + 64 * i ) )
+                            break;
+                    }
+                    drawSlotChoice( selectedIdx );
+                }
         }
     }
 

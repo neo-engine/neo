@@ -149,7 +149,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "You can't choose\nthis item.", "Dieses Item kann nicht\nausgewählt werden." },
     { "Choose %s?", "%s auswählen?" },
-    { "What to do with %s?", "Was tun mit %s?" },
+    { "What do you want to do\nwith %s?", "Was tun mit %s?" },
     { "You can't use\nthat right now.", "Das kann jetzt nicht\neingesetzt werden." },
     { "Pokémon team", "Pokémon-Team" },
 
