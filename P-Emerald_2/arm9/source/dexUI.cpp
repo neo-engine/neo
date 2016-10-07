@@ -34,6 +34,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "saveGame.h"
 #include "pokemon.h"
 #include "defines.h"
+#include "screenFade.h"
 
 #include "Back.h"
 #include "BagSpr.h"
@@ -55,6 +56,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "DexSub.h"
 #include "DexSub2.h"
+
 
 #include <vector>
 #include <algorithm>
@@ -227,6 +229,7 @@ namespace DEX {
     }
 
     void dexUI::drawPage( u16 p_pkmnIdx, u8 p_page, u8 p_forme ) {
+        IO::fadeScreen( IO::CLEAR_WHITE_FAST );
         if( !p_pkmnIdx )
             p_pkmnIdx = _maxPkmn;
 
@@ -256,6 +259,8 @@ namespace DEX {
             BG_PALETTE[ BLACK_IDX ] = BLACK;
             IO::boldFont->printString( NO_DATA, 128, 150, false, IO::font::CENTER );
             IO::updateOAM( true );
+
+            IO::fadeScreen( IO::UNFADE_FAST );
             return;
         }
         for( u8 i = 0; i < 3; ++i )
@@ -484,6 +489,7 @@ namespace DEX {
         }
 
         IO::updateOAM( false );
+        IO::fadeScreen( IO::UNFADE_FAST );
         return;
     }
 

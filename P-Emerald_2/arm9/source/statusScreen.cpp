@@ -36,6 +36,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "ribbon.h"
 #include "bagViewer.h"
 #include "defines.h"
+#include "screenFade.h"
 
 namespace STS {
     statusScreen::statusScreen( u8 p_pkmnIdx ) {
@@ -48,10 +49,12 @@ namespace STS {
     }
 
     move* statusScreen::run( ) {
+        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
         _stsUI->init( _pkmnIdx );
         auto tg = _stsUI->draw( _pkmnIdx, true );
         auto rbs = ribbon::getRibbons( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ] );
         touchPosition touch;
+        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
 
 #define DEFAULT_MODE 0
 #define VIEW_DETAILS 1
@@ -74,18 +77,22 @@ namespace STS {
                     tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
 
                     if( mode != DEFAULT_MODE ) {
+                        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                         mode = VIEW_DETAILS;
                         rbs = ribbon::getRibbons( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ] );
                         _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page, true );
+                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     }
                 } else if( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) {
                     _pkmnIdx = ( _pkmnIdx + SAVE::SAV->getActiveFile( ).getTeamPkmnCount( ) - 1 ) % SAVE::SAV->getActiveFile( ).getTeamPkmnCount( );
                     tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
 
                     if( mode != DEFAULT_MODE ) {
+                        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                         mode = VIEW_DETAILS;
                         rbs = ribbon::getRibbons( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ] );
                         _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page, true );
+                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     }
                 }
             }
@@ -96,9 +103,11 @@ namespace STS {
                     tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
 
                     if( mode != DEFAULT_MODE ) {
+                        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                         mode = VIEW_DETAILS;
                         rbs = ribbon::getRibbons( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ] );
                         _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page, true );
+                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     }
                 }
             for( u8 i = 0; i < 5; ++i ) {
@@ -106,7 +115,9 @@ namespace STS {
                     continue;
                 if( GET_AND_WAIT_C( 62 + 32 * i, 14 - 2 * i, 14 ) ) {
                     _page = i;
+                    IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                     _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page, mode == DEFAULT_MODE );
+                    IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     mode = VIEW_DETAILS;
                 }
             }
@@ -134,6 +145,7 @@ namespace STS {
                         return AttackList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ];
                     } else {
                         IO::messageBox( GET_STRING( 100 ), GET_STRING( 91 ) );
+                        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                         _stsUI->init( _pkmnIdx, false );
                         tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
 
@@ -142,6 +154,7 @@ namespace STS {
                             rbs = ribbon::getRibbons( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ] );
                             _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page, true );
                         }
+                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     }
                     break;
                 }
@@ -174,6 +187,7 @@ namespace STS {
                             SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem = itm;
                         }
                     }
+                    IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                     _stsUI->init( _pkmnIdx );
                     tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
 
@@ -182,10 +196,12 @@ namespace STS {
                         rbs = ribbon::getRibbons( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ] );
                         _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page, true );
                     }
+                    IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                 }
                 if( IN_RANGE_I( touch, tg.back( ) ) && IO::waitForInput( tg.back( ) ) ) {
                     DEX::dex( DEX::dex::SHOW_SINGLE, -1 ).run( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_speciesId );
 
+                    IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                     _stsUI->init( _pkmnIdx );
                     tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
 
@@ -194,6 +210,8 @@ namespace STS {
                         rbs = ribbon::getRibbons( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ] );
                         _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page, true );
                     }
+                    swiWaitForVBlank( );
+                    IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                 }
             }
 
@@ -201,70 +219,117 @@ namespace STS {
                 if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
                     break;
                 } else if( GET_AND_WAIT( KEY_A ) ) {
+                    IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                     _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page, true );
                     mode = VIEW_DETAILS;
+                    swiWaitForVBlank( );
+                    IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                 } else if( GET_AND_WAIT( KEY_SELECT ) ) {
                     if( selectedIdx == 42 ) {
                         selectedIdx = _pkmnIdx;
                         continue;
                     } else if( selectedIdx != _pkmnIdx ) {
+                        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                         std::swap( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ selectedIdx ], SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ] );
                         _stsUI->init( _pkmnIdx );
                         tg = _stsUI->draw( _pkmnIdx, true );
+                        swiWaitForVBlank( );
+                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     }
                     selectedIdx = 42;
                 }
             } else {
                 if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                    IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                     mode = VIEW_DETAILS;
                     _page = ( _page + 1 ) % _stsUI->m_pagemax;
                     _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page, false );
+                    swiWaitForVBlank( );
+                    IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                 } else if( GET_AND_WAIT( KEY_LEFT ) ) {
+                    IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                     mode = VIEW_DETAILS;
                     _page = ( _page + _stsUI->m_pagemax - 1 ) % _stsUI->m_pagemax;
                     _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page, false );
+                    swiWaitForVBlank( );
+                    IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                 }
 
                 if( mode == VIEW_DETAILS ) {
                     if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+                        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                         mode = DEFAULT_MODE;
                         _stsUI->init( _pkmnIdx );
                         tg = _stsUI->draw( _pkmnIdx, true );
+                        swiWaitForVBlank( );
+                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     } else if( _page == 3 && GET_AND_WAIT( KEY_A ) ) {
+                        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                         mode = MOVE_DETAILS;
                         if( !_stsUI->drawMove( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], modeVal ) ) {
                             mode = VIEW_DETAILS;
                             modeVal = 0;
                         }
+                        swiWaitForVBlank( );
+                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     } else if( _page == 4 && !rbs.empty( ) && GET_AND_WAIT( KEY_A ) ) {
+                        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                         mode = RIBBON_DETAILS;
                         modeVal = 0;
                         if( !_stsUI->drawRibbon( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], rbs[ modeVal ] ) ) {
                             mode = VIEW_DETAILS;
                             modeVal = 0;
                         }
+                        swiWaitForVBlank( );
+                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     }
                 } else if( mode == MOVE_DETAILS ) {
                     if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+                        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                         mode = VIEW_DETAILS;
                         _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page, true );
+                        swiWaitForVBlank( );
+                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     } else if( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) {
-                        do modeVal = ( modeVal + 1 ) % 4;
-                        while( !_stsUI->drawMove( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], modeVal ) );
+                        do {
+                            modeVal = ( modeVal + 1 ) % 4;
+                            IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
+                            bool res = _stsUI->drawMove( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], modeVal );
+                            swiWaitForVBlank( );
+                            IO::fadeScreen( IO::fadeType::UNFADE_FAST );
+                            if( res )
+                                break;
+                        } loop( );
                     } else if( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) {
-                        do modeVal = ( modeVal + 3 ) % 4;
-                        while( !_stsUI->drawMove( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], modeVal ) );
+                        do {
+                            modeVal = ( modeVal + 3 ) % 4;
+                            IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
+                            bool res = _stsUI->drawMove( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], modeVal );
+                            swiWaitForVBlank( );
+                            IO::fadeScreen( IO::fadeType::UNFADE_FAST );
+                            if( res )
+                                break;
+                        } loop( );
                     }
                 } else if( mode == RIBBON_DETAILS ) {
                     if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+                        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                         mode = VIEW_DETAILS;
                         _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page, true );
+                        swiWaitForVBlank( );
+                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     } else if( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT_C( 220, 184, 16 ) ) {
+                        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                         modeVal = ( modeVal + 1 ) % rbs.size( );
                         _stsUI->drawRibbon( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], rbs[ modeVal ] );
+                        swiWaitForVBlank( );
+                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     } else if( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT_C( 248, 162, 16 ) ) {
+                        IO::fadeScreen( IO::fadeType::CLEAR_WHITE_FAST );
                         modeVal = ( modeVal + rbs.size( ) - 1 ) % rbs.size( );
                         _stsUI->drawRibbon( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], rbs[ modeVal ] );
+                        swiWaitForVBlank( );
+                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     }
                 }
             }

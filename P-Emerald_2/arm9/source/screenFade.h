@@ -29,9 +29,12 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 namespace IO {
     enum fadeType {
         UNFADE,
+        UNFADE_FAST,
 
         CLEAR_DARK,
+        CLEAR_DARK_FAST,
         CLEAR_WHITE,
+        CLEAR_WHITE_FAST,
         CAVE_ENTRY,
         CAVE_EXIT,
 
