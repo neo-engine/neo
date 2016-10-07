@@ -1358,7 +1358,10 @@ OUT:
     }
 
     u16  mapDrawer::getCurrentLocationId( ) const {
-        u16 res = MAP::mapInfo[ SAVE::SAV->getActiveFile( ).m_currentMap ].first;
+        return getCurrentLocationId( SAVE::SAV->m_activeFile );
+    }
+    u16  mapDrawer::getCurrentLocationId( u8 p_file ) const {
+        u16 res = MAP::mapInfo[ SAVE::SAV->m_saveFile[ p_file ].m_currentMap ].first;
         if( res == 2003 ) { //Kanto
 
         } else if( res == 2004 ) { //Johto

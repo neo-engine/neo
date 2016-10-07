@@ -139,6 +139,13 @@ namespace SAVE {
             m_pkmnTeam[ i ] = tmp[ i ];
     }
 
+    u16         saveGame::getDexCount( ) {
+        u16 cnt = 0;
+        for( u16 i = 0; i < MAX_PKMN; ++i )
+            if( IN_DEX( i ) )
+                cnt++;
+        return cnt;
+    }
     //Return the idx of the resulting Box
     s8          saveGame::storePkmn( const pokemon::boxPokemon& p_pokemon ) {
         s8 idx = m_storedPokemon[ getActiveFile( ).m_curBox ].getFirstFreeSpot( );

@@ -30,7 +30,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 const char* const SAVE::CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ] = {
     { "Prologue", "Prolog" },
-    { "Pokémon", "Pokémon" },
+    { "I Choose You!", "Ich Wähle Dich!" },
     { "Chapter 1", "Kapitel 1" },
     { "(tba)", "(tba)" },
     { "Chapter 2", "Kapitel 2" },
@@ -57,8 +57,17 @@ const char* const SAVE::CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ] = {
     { "Life Goes On", "Das Leben Geht Weiter" },
 };
 
-const char* const SAVE::EPISODE_NAMES[ MAX_CHAPTERS ][ LANGUAGES ] = {
-    { "Dev's Heaven", "Entw.-Himmel" }
+const char* SAVE::EPISODE_NAMES[ LANGUAGES ][ MAX_SPECIAL_EPISODES ] = {
+    { 
+        "Dev's Heaven"
+    }, {
+        "Dev's Heaven"
+    }
+};
+
+const char * LANGUAGE_NAMES[ LANGUAGES ] = {
+    "English",
+    "Deutsch"
 };
 
 const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
@@ -170,7 +179,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Start a new adventure", "Starte ein neues Abenteuer" },
     { "Learn your companion's stories", "Erfahre mehr über deine Begleiter" },
     { "Revive myths of old", "Setze alte Abenteuer fort" },
-    { "There is already a save file here.\nOverride it?", "Es existiert bereits ein Spielstand.\nSoll dieser überschrieben werden?" },
+    { "This slot contains a saved game.\nOverride it?", "Es existiert bereits ein Spielstand.\nSoll dieser überschrieben werden?" },
 
     // 80
 
@@ -200,9 +209,9 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "You may register an\nitem to the button Y.", "Du kannst ein Item\nauf Y registrieren." },
     { "%s used %s!", "%s setzt %s\nein!" },
 
-    
+
     // 100
-    
+
 
     { "You can't use this\nmove right now.","Diese Attacke kann jetzt\nnicht eingesetzt werden." },
     { "Stored %s\nfrom %s.", "%s von %s\nim Beutel verstaut." },
@@ -212,5 +221,14 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "Which move?", "Welche Attacke?" },
     { "%s can't\nforget %s!", "%s kann\n%s nicht vergessen!" },
-    { "%s can't\nlearn %s!", "%s kann\n%s nicht erlernen!" }
+    { "%s can't\nlearn %s!", "%s kann\n%s nicht erlernen!" },
+    { "%hhu badges", "%hhu Orden" },
+    { "Pick a language", "Wähle eine Sprache" },
+
+    // 110
+
+    { "Choose an episode", "Wähle eine Speizalepisode" },
+    { "Welcome to Special Episode 0:\nDeveloper's Heaven.", "Willkommen zur Spezialepisode 0:\nDeveloper's Heaven" },
+    { "In this episode, you will gain\nthe mighty powers of the\ndev himself.", "In dieser Episode erhältst du\ndie Fähigkeiten des Entwicklers." },
+    { "Do whatever you want.", "Mach damit, was immer du möchtest." }
 };

@@ -53,6 +53,7 @@
     <ClInclude Include="arm9\source\saveGame.h" />
     <ClInclude Include="arm9\source\screenFade.h" />
     <ClInclude Include="arm9\source\script.h" />
+    <ClInclude Include="arm9\source\gameStart.h" />
     <ClInclude Include="arm9\source\sprite.h" />
     <ClInclude Include="arm9\source\startScreen.h" />
     <ClInclude Include="arm9\source\statusScreen.h" />
@@ -78,6 +79,7 @@
     <ClCompile Include="arm9\source\font.cpp" />
     <ClCompile Include="arm9\source\fontData.cpp" />
     <ClCompile Include="arm9\source\fs.cpp" />
+    <ClCompile Include="arm9\source\gameStart.cpp" />
     <ClCompile Include="arm9\source\Gen.cpp" />
     <ClCompile Include="arm9\source\item.cpp" />
     <ClCompile Include="arm9\source\keyboard.cpp" />

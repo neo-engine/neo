@@ -100,6 +100,7 @@ namespace IO {
         }
         if( p_both || !p_bottom ) {
             FS::readPictureData( bgGetGfxPtr( bg3 ), "nitro:/PICS/", file );
+            FS::readPictureData( bgGetGfxPtr( bg2 ), "nitro:/PICS/", file );
         }
         regularFont->setColor( RGB( 0, 31, 31 ), 0 );
     }

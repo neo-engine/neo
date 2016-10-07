@@ -240,6 +240,9 @@
     <ClInclude Include="arm9\source\startScreen.h">
       <Filter>Header Files\arm9\saves</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\source\gameStart.h">
+      <Filter>Header Files\arm9\saves</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">
@@ -370,6 +373,9 @@
     </ClCompile>
     <ClCompile Include="arm9\source\startScreen.cpp">
       <Filter>Source Files\arm9\saves</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\gameStart.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

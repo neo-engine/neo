@@ -71,6 +71,7 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define LANGUAGES 2
 #define MAX_STRINGS 150
 
+extern const char * LANGUAGE_NAMES[ LANGUAGES ];
 extern const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
 #define GET_STRING( i ) STRINGS[ i ][ SAVE::SAV->getActiveFile().m_options.m_language ]
 

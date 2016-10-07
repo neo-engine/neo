@@ -108,6 +108,7 @@ namespace MAP {
         bool requestWildPkmn( bool p_forceHighGrass = false );
 
         u16  getCurrentLocationId( ) const;
+        u16  getCurrentLocationId( u8 p_file ) const;
     };
     extern mapDrawer* curMap;
 }

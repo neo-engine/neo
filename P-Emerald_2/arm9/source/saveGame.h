@@ -47,7 +47,7 @@ namespace SAVE {
 #define MAX_CHAPTERS 12
 #define MAX_SPECIAL_EPISODES 1
     extern const char* const CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ];
-    extern const char* const EPISODE_NAMES[ MAX_CHAPTERS ][ LANGUAGES ];
+    extern const char* EPISODE_NAMES[ LANGUAGES ][ MAX_SPECIAL_EPISODES ];
     extern std::vector<pokemon> tmp;
 
     enum gameType {
@@ -55,7 +55,7 @@ namespace SAVE {
         NORMAL = 1,
         TRANSFER = 2,
 
-        SPECIAL = 4
+        SPECIAL = 3
     };
 
     struct saveGame {
@@ -142,6 +142,8 @@ namespace SAVE {
         s8          storePkmn( const pokemon& p_pokemon );
 
         u16         countPkmn( u16 p_pkmnIdx );
+
+        u16         getDexCount( );
 
         BOX::box*   getCurrentBox( );
 
