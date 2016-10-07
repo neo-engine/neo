@@ -348,13 +348,21 @@ namespace IO {
                 ANIMATE_MAP = false;
                 UPDATE_TIME = false;
 
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
+
                 u16 res = bv.run( );
+                
+                FADE_TOP_DARK( );
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
 
                 IO::clearScreenConsole( true, true );
                 _state = HOME;
                 draw( true );
                 UPDATE_TIME = true;
-                FADE_TOP_DARK( );
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
                 updateItems( );
@@ -369,12 +377,22 @@ namespace IO {
                 ANIMATE_MAP = false;
                 _state = HOME;
                 draw( true );
+                videoSetMode( MODE_5_2D );
                 STS::statusScreen sts( 0 );
+
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
+
                 auto res = sts.run( );
+
+                FADE_TOP_DARK( );
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
 
                 IO::clearScreenConsole( true, true );
                 draw( true );
-                FADE_TOP_DARK( );
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
 
@@ -386,11 +404,19 @@ namespace IO {
                 _state = HOME;
                 draw( true );
 
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
+
                 DEX::dex( DEX::dex::SHOW_CAUGHT, MAX_PKMN ).run( SAVE::SAV->getActiveFile( ).m_lstDex );
+
+                FADE_TOP_DARK( );
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
 
                 IO::clearScreenConsole( true, true );
                 draw( true );
-                FADE_TOP_DARK( );
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 8 ],         //StartOptions
