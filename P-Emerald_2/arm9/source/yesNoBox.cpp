@@ -33,11 +33,11 @@ namespace IO {
 
     void yesNoBox::draw( u8 p_pressedIdx ) {
         printChoiceBox( 28, 102, 122, 134, 6, RED_IDX, p_pressedIdx == 0 );
-        regularFont->printString( "Ja", 65 + 2 * ( p_pressedIdx == 0 ),
-                                  110 + ( p_pressedIdx == 0 ), true );
+        regularFont->printString( STRINGS[ 80 ][ _language ], 28 + 47 + 2 * ( p_pressedIdx == 0 ),
+                                  110 + ( p_pressedIdx == 0 ), true, IO::font::CENTER );
         printChoiceBox( 134, 102, 228, 134, 6, BLUE_IDX, p_pressedIdx == 1 );
-        regularFont->printString( "Nein", 165 + 2 * ( p_pressedIdx == 1 ),
-                                  110 + ( p_pressedIdx == 1 ), true );
+        regularFont->printString( STRINGS[ 81 ][ _language ], 134 + 47 + 2 * ( p_pressedIdx == 1 ),
+                                  110 + ( p_pressedIdx == 1 ), true, IO::font::CENTER );
     }
 
     yesNoBox::yesNoBox( bool p_initSprites ) {
@@ -45,6 +45,14 @@ namespace IO {
         if( p_initSprites )
             initOAMTable( true );
         _isNamed = false;
+        _language = SAVE::SAV->getActiveFile( ).m_options.m_language;
+    }
+    yesNoBox::yesNoBox( SAVE::language p_language, bool p_initSprites ) {
+        initTextField( );
+        if( p_initSprites )
+            initOAMTable( true );
+        _isNamed = false;
+        _language = p_language;
     }
     yesNoBox::yesNoBox( const char* p_name, bool p_initSprites ) {
         initTextField( );
@@ -54,12 +62,14 @@ namespace IO {
 
         swiWaitForVBlank( );
         _isNamed = true;
+        _language = SAVE::SAV->getActiveFile( ).m_options.m_language;
     }
     yesNoBox::yesNoBox( messageBox p_box, bool p_initSprites ) {
         initTextField( );
         if( p_initSprites )
             initOAMTable( true );
         _isNamed = p_box.m_isNamed;
+        _language = SAVE::SAV->getActiveFile( ).m_options.m_language;
     }
 
     bool yesNoBox::getResult( const char* p_text = 0 ) {
@@ -79,6 +89,8 @@ namespace IO {
                     draw( 2 );
                     continue;
                 }
+                draw( 2 );
+                swiWaitForVBlank( );
                 result = true;
                 break;
             } else if( t.px >= 134 && t.py >= 102 && t.px <= 228 && t.py <= 134 ) {
@@ -87,6 +99,8 @@ namespace IO {
                     draw( 2 );
                     continue;
                 }
+                draw( 2 );
+                swiWaitForVBlank( );
                 result = false;
                 break;
             }

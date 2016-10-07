@@ -254,7 +254,7 @@ namespace DEX {
 
             BG_PALETTE[ WHITE_IDX ] = WHITE;
             BG_PALETTE[ BLACK_IDX ] = BLACK;
-            IO::boldFont->printString( "Keine Daten.", 128, 150, false, IO::font::CENTER );
+            IO::boldFont->printString( NO_DATA, 128, 150, false, IO::font::CENTER );
             IO::updateOAM( true );
             return;
         }
@@ -506,7 +506,7 @@ namespace DEX {
                         IO::Oam->oamBuffer[ FRAME_START_2 + i ].isHidden = true;
                         IO::Oam->oamBuffer[ PKMN_ICON_START_2 + i ].isHidden = true;
                         if( !i )
-                            IO::boldFont->printString( "Keine Daten.", 128, 89, true, IO::font::CENTER );
+                            IO::boldFont->printString( NO_DATA, 128, 89, true, IO::font::CENTER );
                         continue;
                     }
 

@@ -154,7 +154,11 @@ int main( int, char** p_argv ) {
     //Read the savegame
     if( gMod != EMULATOR && p_argv[ 0 ] )
         SAVE::SAV = FS::readSave( p_argv[ 0 ] );
+    else
+        SAVE::SAV = std::unique_ptr<SAVE::saveGame>( new SAVE::saveGame( ) );
     SAVE::startScreen( ).run( );
+    IO::clearScreenConsole( false, true );
+    IO::clearScreen( false, true );
 
     irqSet( IRQ_VBLANK, [ ] ( ) {
         scanKeys( );
@@ -211,6 +215,8 @@ int main( int, char** p_argv ) {
     FADE_TOP( );
     MAP::curMap = new MAP::mapDrawer( );
     MAP::curMap->draw( );
+
+
     ANIMATE_MAP = true;
 
     touchPosition touch;

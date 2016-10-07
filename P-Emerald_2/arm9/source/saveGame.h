@@ -30,6 +30,7 @@
 #include <nds.h>
 #include <string>
 #include <vector>
+#include <memory>
 #include "bag.h"
 #include "box.h"
 #include "mapObject.h"
@@ -43,21 +44,25 @@ namespace BATTLE {
 
 namespace SAVE {
 #define MAX_SAVE_FILES 3
+#define MAX_CHAPTERS 12
+#define MAX_SPECIAL_EPISODES 1
+    extern const char* const CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ];
+    extern const char* const EPISODE_NAMES[ MAX_CHAPTERS ][ LANGUAGES ];
     extern std::vector<pokemon> tmp;
 
     enum gameType {
-        NORMAL = 0,
-        TRANSFER = 1,
+        UNUSED = 0,
+        NORMAL = 1,
+        TRANSFER = 2,
 
-        SPECIAL = 2
+        SPECIAL = 4
     };
 
     struct saveGame {
         struct playerInfo {
-            u8          m_used : 1;
-
             // general stuff
-            gameType    m_gameType : 6;
+            gameType    m_gameType : 7;
+            u8          m_chapter;
 
             u8          m_isMale : 1;
             char        m_playername[ 12 ];
@@ -131,7 +136,7 @@ namespace SAVE {
         u8          m_seenPkmn[ 1 + MAX_PKMN / 8 ];
 
         u8          m_transfersRemaining; // Times a GBA save file can be copied
-        
+
         // Return the idx of the resulting Box
         s8          storePkmn( const pokemon::boxPokemon& p_pokemon );
         s8          storePkmn( const pokemon& p_pokemon );
@@ -144,6 +149,5 @@ namespace SAVE {
             return m_saveFile[ m_activeFile ];
         }
     };
-
-    extern saveGame* SAV;
+    extern std::unique_ptr<saveGame> SAV;
 }

@@ -34,11 +34,10 @@
 #include "messageBox.h"
 #include "pokemon.h"
 #include "battleTrainer.h"
-    //#include "Gen.h"
 
 namespace SAVE {
     std::vector<pokemon> tmp;
-    saveGame* SAV;
+    std::unique_ptr<saveGame> SAV;
 
 #define PKMN_DATALENGTH 128
 

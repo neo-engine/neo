@@ -285,11 +285,11 @@ namespace IO {
                     ItemList[ SAVE::SAV->getActiveFile( ).m_registeredItem ]->use( );
                     updateItems( );
                 } else {
-                    IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                    IO::messageBox( GET_STRING( 58 ), GET_STRING( 91 ) );
                     IO::NAV->draw( true );
                 }
             } else {
-                IO::messageBox( "Du kannst ein Item\nauf Y registrieren.", "PokéNav" );
+                IO::messageBox( GET_STRING( 98 ), GET_STRING( 91 ) );
                 IO::NAV->draw( true );
             }
             swiWaitForVBlank( );
@@ -308,8 +308,8 @@ namespace IO {
             if( GET_AND_WAIT_C( 96 + 32 * i, 12, 14 ) ) {
                 if( curitm ) {
                     if( u16( -1 ) == SAVE::SAV->getActiveFile( ).m_bag.count( BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm ) ) {
-                        IO::yesNoBox yn( "PokéNav" );
-                        sprintf( buffer, "Kein Exemplar des Items\n%s vorhanden.\nIcon entfernen?", ItemList[ curitm ]->getDisplayName( true ).c_str( ) );
+                        IO::yesNoBox yn( GET_STRING( 91 ) );
+                        sprintf( buffer, GET_STRING( 96 ), ItemList[ curitm ]->getDisplayName( true ).c_str( ) );
                         if( yn.getResult( buffer ) ) {
                             for( u8 j = i; j < 4; ++j ) {
                                 SAVE::SAV->getActiveFile( ).m_lstUsedItems[ ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx + 4 - j ) % 5 ] =
@@ -326,11 +326,11 @@ namespace IO {
                             SAVE::SAV->getActiveFile( ).m_bag.erase( BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm, 1 );
                         IO::NAV->draw( true );
                     } else {
-                        IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                        IO::messageBox( GET_STRING( 58 ), GET_STRING( 91 ) );
                         IO::NAV->draw( true );
                     }
                 } else {
-                    IO::messageBox( "Hier erscheinen zuletzt\neingesetzte Items.", "PokéNav" );
+                    IO::messageBox( GET_STRING( 97 ), GET_STRING( 91 ) );
                     IO::NAV->draw( true );
                 }
                 return;
@@ -403,7 +403,7 @@ namespace IO {
                 _state = HOME;
                 draw( true );
 
-                const char *someText[ 11 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test",
+                const char *someText[ 11 ] = { "PKMN Spawn", "Item Spawn", "1 Item Test",
                                                 "Dbl Battle", "Sgl Battle", "Chg NavScrn",
                                                 "View Boxes A", "View Boxes B", "Hoenn Badges",
                                                 "Kanto Badges", "Keyboard" };
@@ -563,15 +563,15 @@ namespace IO {
                 }
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 10 ],        //Save
                                        POS( _state == HOME || !_power )[ 11 ], 16 ) ) {
-                IO::yesNoBox Save( "PokéNav " );
-                if( Save.getResult( "Möchtest du deinen\nFortschritt sichern?\n" ) ) {
+                IO::yesNoBox Save( GET_STRING( 91 ) );
+                if( Save.getResult( GET_STRING( 92 ) ) ) {
                     draw( );
                     if( !p_path || gMod == EMULATOR )
-                        IO::messageBox Succ( "Speichern?\nIn einem Emulator?!", "PokéNav" );
+                        IO::messageBox Succ( GET_STRING( 93 ), GET_STRING( 91 ) );
                     else if( p_path && FS::writeSave( SAVE::SAV, p_path ) )
-                        IO::messageBox Succ( "Fortschritt\nerfolgreich gesichert!", "PokéNav" );
+                        IO::messageBox Succ( GET_STRING( 94 ), GET_STRING( 91 ) );
                     else
-                        IO::messageBox Succ( "Es trat ein Fehler auf\nSpiel nicht gesichert.", "PokéNav" );
+                        IO::messageBox Succ( GET_STRING( 95 ), GET_STRING( 91 ) );
                 }
                 draw( true );
             } else if( touch.px && touch.py && GET_AND_WAIT_C( 8, 12, 17 ) ) {               //Start Pokénav

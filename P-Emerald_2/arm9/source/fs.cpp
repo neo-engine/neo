@@ -192,7 +192,7 @@ namespace FS {
     }
 
     bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no ) {
-        if( p_no == SAVE::SAV->getActiveFile().m_options.m_bgIdx && IO::NAV_DATA[ 0 ] ) {
+        if( p_no == SAVE::SAV->getActiveFile( ).m_options.m_bgIdx && IO::NAV_DATA[ 0 ] ) {
             dmaCopy( IO::NAV_DATA, p_layer, 256 * 192 );
             dmaCopy( IO::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
             return true;
@@ -412,22 +412,22 @@ namespace FS {
         return buffer;
     }
 
-    SAVE::saveGame* readSave( const char* p_path ) {
+    std::unique_ptr<SAVE::saveGame> readSave( const char* p_path ) {
         FILE* f = FS::open( "", p_path, ".sav" );
         if( !f )
             return 0;
 
-        SAVE::saveGame* result = new SAVE::saveGame( );
-        FS::read( f, result, sizeof( SAVE::saveGame ), 1 );
+        std::unique_ptr<SAVE::saveGame> result = std::unique_ptr<SAVE::saveGame>( new SAVE::saveGame( ) );
+        FS::read( f, result.get( ), sizeof( SAVE::saveGame ), 1 );
         FS::close( f );
         return result;
     }
 
-    bool writeSave( SAVE::saveGame* p_saveGame, const char* p_path ) {
+    bool writeSave( std::unique_ptr<SAVE::saveGame>& p_saveGame, const char* p_path ) {
         FILE* f = FS::open( "", p_path, ".sav", "w" );
         if( !f )
             return 0;
-        FS::write( f, p_saveGame, sizeof( SAVE::saveGame ), 1 );
+        FS::write( f, p_saveGame.get( ), sizeof( SAVE::saveGame ), 1 );
         FS::close( f );
         return true;
     }

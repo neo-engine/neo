@@ -29,11 +29,13 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <nds.h>
 
 #include "messageBox.h"
+#include "saveGame.h"
 
 namespace IO {
     class yesNoBox {
     public:
         yesNoBox( bool p_initSprites = true );
+        yesNoBox( SAVE::language p_language, bool p_initSprites = true );
         yesNoBox( const char* p_name, bool p_initSprites = true );
         yesNoBox( messageBox p_box, bool p_initSprites = true );
 
@@ -43,6 +45,7 @@ namespace IO {
 
     private:
         bool _isNamed;
+        SAVE::language _language;
     };
 
 }

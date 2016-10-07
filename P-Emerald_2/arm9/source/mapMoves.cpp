@@ -119,7 +119,7 @@ void teleport::use( ) { }
 void headbutt::use( ) { }
 void sweetScent::use( ) {
     if( !sweetScent::possible( ) || !MAP::curMap->requestWildPkmn( true ) ) {
-        IO::messageBox( "Der Duft verstrich wirkungslos…" );
+        IO::messageBox( GET_STRING( 90 ), true );
         IO::NAV->draw( );
     }
 }

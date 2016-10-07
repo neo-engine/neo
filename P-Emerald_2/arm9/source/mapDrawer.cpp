@@ -105,7 +105,8 @@ namespace MAP {
             videoSetMode( MODE_0_2D/* | DISPLAY_BG0_ACTIVE*/ | DISPLAY_BG1_ACTIVE |
                           DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D );
             vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
-            //FADE_TOP_DARK( );
+            FADE_TOP_DARK( );
+            bgUpdate( );
 
             u16 mx = SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX, my = SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY;
             _slices[ _curX ][ _curY ] = constructSlice( SAVE::SAV->getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE );

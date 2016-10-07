@@ -74,6 +74,6 @@ namespace FS {
 
     const char* getLocation( u16 p_ind );
 
-    SAVE::saveGame* readSave( const char* p_path );
-    bool writeSave( SAVE::saveGame* p_saveGame, const char* p_path );
+    std::unique_ptr<SAVE::saveGame> readSave( const char* p_path );
+    bool writeSave( std::unique_ptr<SAVE::saveGame>& p_saveGame, const char* p_path );
 }

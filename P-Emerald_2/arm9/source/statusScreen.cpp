@@ -123,7 +123,7 @@ namespace STS {
                     if( AttackList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->possible( ) ) {
 
                         char buffer[ 50 ];
-                        sprintf( buffer, "%s setzt %s\nein!", SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
+                        sprintf( buffer, GET_STRING( 99 ), SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
                                  AttackList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
                         IO::messageBox a( buffer );
                         IO::NAV->draw( );
@@ -133,7 +133,7 @@ namespace STS {
 
                         return AttackList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ];
                     } else {
-                        IO::messageBox( "Diese Attacke kann jetzt\nnicht eingesetzt werden.", "PokéNav" );
+                        IO::messageBox( GET_STRING( 100 ), GET_STRING( 91 ) );
                         _stsUI->init( _pkmnIdx, false );
                         tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
 
@@ -156,7 +156,7 @@ namespace STS {
                         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                         consoleClear( );
 
-                        sprintf( buffer, "%s von %s\nim Beutel verstaut.", acI.getDisplayName( true ).c_str( ), SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
+                        sprintf( buffer, GET_STRING( 101 ), acI.getDisplayName( true ).c_str( ), SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
                         IO::NAV->draw( );
                         IO::messageBox a( buffer );
                         SAVE::SAV->getActiveFile( ).m_bag.insert( BAG::toBagType( acI.m_itemType ), acI.getItemId( ), 1 );

@@ -103,6 +103,7 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
     m_ability = ( p_hiddenAbility && data.m_abilities[ 2 ] ) ? ( ( ( m_pid & 1 ) || !data.m_abilities[ 3 ] ) ? data.m_abilities[ 2 ] : data.m_abilities[ 3 ] ) :
         ( ( ( m_pid & 1 ) || !data.m_abilities[ 1 ] ) ? data.m_abilities[ 0 ] : data.m_abilities[ 1 ] );
     m_markings = 0;
+
     m_origLang = 5;
 
     memset( m_effortValues, 0, sizeof( m_effortValues ) );
@@ -485,7 +486,7 @@ bool pokemon::boxPokemon::learnMove( u16 p_move ) {
         || p_move == m_moves[ 1 ]
         || p_move == m_moves[ 2 ]
         || p_move == m_moves[ 3 ] ) {
-        sprintf( buffer, "%s beherrscht\n%s bereits!", m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
+        sprintf( buffer, GET_STRING( 102 ), m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -498,7 +499,7 @@ bool pokemon::boxPokemon::learnMove( u16 p_move ) {
                 m_moves[ i ] = p_move;
                 m_acPP[ i ] = std::min( m_acPP[ i ], AttackList[ p_move ]->m_movePP );
 
-                sprintf( buffer, "%s erlernt\n%s!", m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
+                sprintf( buffer, GET_STRING( 103 ), m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -509,12 +510,12 @@ bool pokemon::boxPokemon::learnMove( u16 p_move ) {
             }
         if( !freeSpot ) {
             IO::yesNoBox yn( false );
-            sprintf( buffer, "%s beherrscht\nbereits 4 Attacken.\nSoll eine verlernt werden?", m_name );
+            sprintf( buffer, GET_STRING( 104 ), m_name );
             if( yn.getResult( buffer ) ) {
-                u8 res = IO::choiceBox( *this, p_move ).getResult( "Welche Attacke?", false, false );
+                u8 res = IO::choiceBox( *this, p_move ).getResult( GET_STRING( 105 ), false, false );
                 if( res < 4 ) {
                     if( AttackList[ m_moves[ res ] ]->m_isFieldAttack ) {
-                        sprintf( buffer, "%s kann\n%s nicht vergessen!", m_name, AttackList[ m_moves[ res ] ]->m_moveName.c_str( ) );
+                        sprintf( buffer, GET_STRING( 106 ), m_name, AttackList[ m_moves[ res ] ]->m_moveName.c_str( ) );
                         IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                         IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -529,7 +530,7 @@ bool pokemon::boxPokemon::learnMove( u16 p_move ) {
                 return false;
         }
     } else {
-        sprintf( buffer, "%s kann\n%s nicht erlernen!", m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
+        sprintf( buffer, GET_STRING( 107 ), m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
