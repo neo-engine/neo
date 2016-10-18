@@ -235,7 +235,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "Importing a save file will\ncopy all Pokémon and items\nfrom the GBA game.", "Beim Importieren werden alle\nPokémon und Items vom\nGBA-Modul kopiert." },
     { "Further, you will start at\nthe same position as you\nleft off in the GBA game.", "Du wirst das Spiel an der\nselben Stelle wie auf dem\nGBA-Modul fortsetzen." },
-    { "No data will be written to\nthe GBA module.", "Es werden keine Daten auf\ndas GBA-Modul geschrieben." },
+    { "No data will be written to\nthe GBA Game Pak.", "Es werden keine Daten auf\ndas GBA-Modul geschrieben." },
     { "However, proceed at your\nown risk.", "Trotzdem geschieht das\nImportieren auf eigene\nGefahr." },
     { "No compatible cartrige found.\nAborting.", "Kein kompatibles GBA-Modul\ngefunden.\nBreache ab." },
 

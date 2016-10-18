@@ -155,6 +155,8 @@ int main( int, char** p_argv ) {
     if( gMod != EMULATOR && p_argv[ 0 ] )
         SAVE::SAV = FS::readSave( p_argv[ 0 ] );
     else
+        SAVE::SAV = 0;
+    if( !SAVE::SAV )
         SAVE::SAV = std::unique_ptr<SAVE::saveGame>( new SAVE::saveGame( ) );
     SAVE::startScreen( ).run( );
     IO::clearScreenConsole( false, true );
