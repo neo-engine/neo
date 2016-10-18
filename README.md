@@ -31,9 +31,9 @@ _Partially_ implemented features are in _italics_.
     * [ ] Support for .midi as BGM, user customization of BGM via music stored on the micro SD card
     * [x] A real time clock (doesn't work fully on DeSmuME)
       * [ ] Overworld changes based on time
-    * [x] Support for saving the progress to the micro SD (untested, saves may break with a new version)
+    * [x] Support for saving the progress to the micro SD (saves may break with a new version)
     * [ ] Support for communication with “the originals”
-      * [ ] Playing / importing with a save from a GBA version
+      * [ ] Playing with / importing a save from a GBA version
       * [ ] Link trading with Gen IV and Gen V games
     * [x] A clean UI
     * [ ] Dynamic difficulty 
