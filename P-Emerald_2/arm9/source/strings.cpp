@@ -230,5 +230,19 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Choose an episode", "Wähle eine Speizalepisode" },
     { "Welcome to Special Episode 0:\nDeveloper's Heaven.", "Willkommen zur Spezialepisode 0:\nDeveloper's Heaven" },
     { "In this episode, you will gain\nthe mighty powers of the\ndev himself.", "In dieser Episode erhältst du\ndie Fähigkeiten des Entwicklers." },
-    { "Do whatever you want.", "Mach damit, was immer du möchtest." }
+    { "Do whatever you want.", "Mach damit, was immer du möchtest." },
+    { "Do you want to import your\nsave from the GBA game?", "Möchtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?" },
+
+    { "Importing a save file will\ncopy all Pokémon and items\nfrom the GBA game.", "Beim Importieren werden alle\nPokémon und Items vom\nGBA-Modul kopiert." },
+    { "Further, you will start at\nthe same position as you\nleft off in the GBA game.", "Du wirst das Spiel an der\nselben Stelle wie auf dem\nGBA-Modul fortsetzen." },
+    { "No data will be written to\nthe GBA module.", "Es werden keine Daten auf\ndas GBA-Modul geschrieben." },
+    { "However, proceed at your\nown risk.", "Trotzdem geschieht das\nImportieren auf eigene\nGefahr." },
+    { "No compatible cartrige found.\nAborting.", "Kein kompatibles GBA-Modul\ngefunden.\nBreache ab." },
+
+    // 120
+
+    { "Proceed?", "Fortfahren?" },
+    { "Importing data…", "Lade Spielstand…" },
+    { "An error occured.\nAborting.", "Ein Fehler ist aufgetreten.\nKehre zum Hauptmenü zurück." },
+    { "Completed.", "Abgeschlossen." }
 };

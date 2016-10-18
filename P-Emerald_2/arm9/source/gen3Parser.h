@@ -25,14 +25,11 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*
-
 #pragma once
-#include "nds.h"
+#include <nds.h>
 
-
-namespace gen3 //using code from "pokehack" originally by "Grazfather"
-{
+//using code from "pokehack" originally by "Grazfather"
+namespace FS {
     bool isValidItem( int p_gen5Idx );
     int getItemIdx( int p_gen5Idx );
     int getNItemIdx( int p_gen3Idx );
@@ -125,7 +122,7 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
         u8 data[ POKEMON_DATA_LENGTH ];
     } box_pokemon_t;
 
-    class pokemon {
+    class gen3Pokemon {
     public:
         typedef struct {
             u16 species;
@@ -252,87 +249,60 @@ namespace gen3 //using code from "pokehack" originally by "Grazfather"
 
     // Where in data each struct is, based on AEGM order
     static const int DataOrderTable[ 24 ][ 4 ] = {
-    //    A  E  G  M
-         {1, 2, 0, 3},
-         {1, 3, 0, 2},
-         {2, 1, 0, 3},
-         {3, 1, 0, 2},
-         {2, 3, 0, 1},
-         {3, 2, 0, 1},
-         {0, 2, 1, 3},
-         {0, 3, 1, 2},
-         {0, 1, 2, 3},
-         {0, 1, 3, 2},
-         {0, 3, 2, 1},
-         {0, 2, 3, 1},
-         {2, 0, 1, 3},
-         {3, 0, 1, 2},
-         {1, 0, 2, 3},
-         {1, 0, 3, 2},
-         {3, 0, 2, 1},
-         {2, 0, 3, 1},
-         {2, 3, 1, 0},
-         {3, 2, 1, 0},
-         {1, 3, 2, 0},
-         {1, 2, 3, 0},
-         {3, 1, 2, 0},
-         {2, 1, 3, 0} };
+        //    A  E  G  M
+             {1, 2, 0, 3},
+             {1, 3, 0, 2},
+             {2, 1, 0, 3},
+             {3, 1, 0, 2},
+             {2, 3, 0, 1},
+             {3, 2, 0, 1},
+             {0, 2, 1, 3},
+             {0, 3, 1, 2},
+             {0, 1, 2, 3},
+             {0, 1, 3, 2},
+             {0, 3, 2, 1},
+             {0, 2, 3, 1},
+             {2, 0, 1, 3},
+             {3, 0, 1, 2},
+             {1, 0, 2, 3},
+             {1, 0, 3, 2},
+             {3, 0, 2, 1},
+             {2, 0, 3, 1},
+             {2, 3, 1, 0},
+             {3, 2, 1, 0},
+             {1, 3, 2, 0},
+             {1, 2, 3, 0},
+             {3, 1, 2, 0},
+             {2, 1, 3, 0} };
 
     static const int belt_offsets[ ] = { BELT_OFFSET_RSE, BELT_OFFSET_FRLG };
 
-    class SaveParser {
+    class gen3Parser {
     public:
-        static SaveParser* Instance( );
+        static gen3Parser* Instance( );
         int get_newest_save( block *[ NUM_BLOCKS_TOTAL ] );
         char* parse_save( block*[ NUM_BLOCKS_TOTAL ] );
         u16 get_block_checksum( block* b );
         int pack_save( char *, block *[ NUM_BLOCKS_TOTAL ], char[ SAVEFILE_LEN ] );
         char* get_text( u8* p_raw, bool p_isNickname );
-        //void print_pokemon(box_pokemon_t*);
-        int parse_pokemon( char*, int, void**, pokemon::pokemon_moves_t**, pokemon::pokemon_effort_t**, pokemon::pokemon_growth_t**, pokemon::pokemon_misc_t**, int, int );
+        int parse_pokemon( char*, int, void**, gen3Pokemon::pokemon_moves_t**, gen3Pokemon::pokemon_effort_t**, gen3Pokemon::pokemon_growth_t**, gen3Pokemon::pokemon_misc_t**, int, int );
         u16 encrypt( u8*, u32, u32 );
         int load( int );
-        int save( );
         belt_pokemon_t *pokemon[ NUM_BELT_POKEMON ];
-        pokemon::pokemon_moves_t *pokemon_moves[ NUM_BELT_POKEMON ];
-        pokemon::pokemon_effort_t *pokemon_effort[ NUM_BELT_POKEMON ];
-        pokemon::pokemon_growth_t *pokemon_growth[ NUM_BELT_POKEMON ];
-        pokemon::pokemon_misc_t *pokemon_misc[ NUM_BELT_POKEMON ];
+        gen3Pokemon::pokemon_moves_t *pokemon_moves[ NUM_BELT_POKEMON ];
+        gen3Pokemon::pokemon_effort_t *pokemon_effort[ NUM_BELT_POKEMON ];
+        gen3Pokemon::pokemon_growth_t *pokemon_growth[ NUM_BELT_POKEMON ];
+        gen3Pokemon::pokemon_misc_t *pokemon_misc[ NUM_BELT_POKEMON ];
 
         char *unpackeddata;
     private:
-        SaveParser( ) { };	// Private constructor because this is a singleton
+        gen3Parser( ) { };	// Private constructor because this is a singleton
         block *m_blocks[ NUM_BLOCKS_TOTAL ];
-        static SaveParser* spInstance;
+        static gen3Parser* spInstance;
     };
 
     u16 encrypt( u8 *p_data, u32 p_pv, u32 p_otid );
     char* get_text( u8* p_raw, int p_maxLen );
-    int parse_pokemon( char* p_buf, int p_offset, void** p_pokemon, pokemon::pokemon_moves_t** p_pa, pokemon::pokemon_effort_t** p_pe,
-                       pokemon::pokemon_growth_t** p_pg, pokemon::pokemon_misc_t** p_pm, int p_num, int p_size );
-    void print_pokemon( box_pokemon_t* p_pokemon );
-
-    pokemon getGen5Pkmn( const pokemon& p_gen3Pkmn );
-    pokemon getGen3Pkmn( const pokemon &p_gen5Pkmn );
+    int parse_pokemon( char* p_buf, int p_offset, void** p_pokemon, gen3Pokemon::pokemon_moves_t** p_pa, gen3Pokemon::pokemon_effort_t** p_pe,
+                       gen3Pokemon::pokemon_growth_t** p_pg, gen3Pokemon::pokemon_misc_t** p_pm, int p_num, int p_size );
 }
-namespace gen4 {
-    bool isValidItem( int p_gen5Idx );
-    int getItemIdx( int p_gen5Idx );
-    int getItemIdx( int p_gen4Idx );
-
-    class pokemon {
-
-    };
-
-    pokemon getGen5Pkmn( pokemon p_gen4Pkmn );
-    pokemon getGen4Pkmn( pokemon p_gen5Pkmn );
-
-    enum GAME {
-        DIAMANT = 0,
-        PERL = 1,
-        PLATIN = 2,
-        HEARTGOLD = 3,
-        SOULSILVER = 4
-    };
-}
-*/

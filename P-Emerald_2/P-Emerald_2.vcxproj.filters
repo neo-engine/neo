@@ -150,9 +150,6 @@
     <ClInclude Include="arm9\source\fs.h">
       <Filter>Header Files\arm9\fs</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\Gen.h">
-      <Filter>Header Files\arm9\fs</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\source\choiceBox.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
@@ -243,6 +240,9 @@
     <ClInclude Include="arm9\source\gameStart.h">
       <Filter>Header Files\arm9\saves</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\source\gen3Parser.h">
+      <Filter>Header Files\arm9\fs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">
@@ -279,9 +279,6 @@
       <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\fs.cpp">
-      <Filter>Source Files\arm9\fs</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\Gen.cpp">
       <Filter>Source Files\arm9\fs</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\choiceBox.cpp">
@@ -374,8 +371,11 @@
     <ClCompile Include="arm9\source\startScreen.cpp">
       <Filter>Source Files\arm9\saves</Filter>
     </ClCompile>
+    <ClCompile Include="arm9\source\gen3Parser.cpp">
+      <Filter>Source Files\arm9\fs</Filter>
+    </ClCompile>
     <ClCompile Include="arm9\source\gameStart.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\arm9\saves</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

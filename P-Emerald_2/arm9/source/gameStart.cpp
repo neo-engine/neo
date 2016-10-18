@@ -32,6 +32,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "uio.h"
 #include "yesNoBox.h"
 #include "screenFade.h"
+#include "gen3Parser.h"
 
 namespace SAVE {
     const u16 EP_INTRO_TEXT_START[ ] = { 111 };
@@ -82,9 +83,9 @@ namespace SAVE {
         switch( p_episode ) {
             case 0:
                 strcpy( SAV->getActiveFile( ).m_playername, "Test" );
-                SAVE::SAV->getActiveFile( ).m_player = { MAP::mapObject::PLYR,{ 104, 120, 5 }, 0, MAP::moveMode::WALK, 0, 0, MAP::direction::RIGHT };
-                SAVE::SAV->getActiveFile( ).m_isMale = true;
-                SAVE::SAV->getActiveFile( ).m_currentMap = 10;
+                SAV->getActiveFile( ).m_player = { MAP::mapObject::PLYR,{ 104, 120, 5 }, 0, MAP::moveMode::WALK, 0, 0, MAP::direction::RIGHT };
+                SAV->getActiveFile( ).m_isMale = true;
+                SAV->getActiveFile( ).m_currentMap = 10;
                 return true;
             default:
                 SAV->getActiveFile( ).m_gameType = UNUSED;
@@ -93,6 +94,7 @@ namespace SAVE {
     }
 
     bool startScreen::transferGame( u8 p_slot ) {
+        IO::clearScreen( true, false, false );
         char acSlot2Game[ 5 ];
 
         sysSetBusOwners( true, true );
@@ -107,61 +109,74 @@ namespace SAVE {
                 break;
             }
         if( acgame == -1 ) {
+            IO::messageBox( GET_STRING( 119 ), true );
+            IO::clearScreen( true, false, false );
             return false;
         }
 
-        IO::NAV->draw( );
         IO::yesNoBox yn = IO::yesNoBox( );
-        if( yn.getResult( "Möchtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?" ) ) {
-            // TODO: Add some messages here informing the player about what's going on
-            yn = IO::yesNoBox( );
-            if( yn.getResult( "Möchtest du fortfahren?" ) ) {
-                IO::messageBox( "Lade Spielstand…" );
-                //int loadgame = acgame > 2 ? 1 : 0;
+        if( !yn.getResult( GET_STRING( 114 ) ) ) {
+            IO::clearScreen( true, false, false );
+            return false;
+        }
+        IO::messageBox( GET_STRING( 115 ), true );
+        IO::messageBox( GET_STRING( 116 ), true );
+        IO::messageBox( GET_STRING( 117 ), true );
+        IO::messageBox( GET_STRING( 118 ), true );
+        yn = IO::yesNoBox( );
+        if( !yn.getResult( GET_STRING( 120 ) ) ) {
+            IO::clearScreen( true, false, false );
+            return false;
+        }
+        IO::clearScreen( true, false, false );
+        IO::messageBox( GET_STRING( 121 ), true );
+        int loadgame = acgame > 2 ? 1 : 0;
 
-                // gen3::SaveParser* save3 = gen3::SaveParser::Instance( );
+        FS::gen3Parser* save3 = FS::gen3Parser::Instance( );
 
-                //   if( save3->load( loadgame ) == -1 ) {
-                IO::messageBox( "Ein Fehler ist aufgetreten.\nKehre zum Hauptmenü zurück." );
-                return false;
-                //   }
+        if( save3->load( loadgame ) == -1 ) {
+            IO::messageBox( GET_STRING( 122 ), true );
+            IO::clearScreen( true, false, false );
+            return false;
+        }
+        IO::clearScreen( true, false, false );
 
-                SAV->m_activeFile = p_slot;
-                SAV->getActiveFile( ).m_gameType = TRANSFER;
+        SAV->m_activeFile = p_slot;
+        SAV->getActiveFile( ).m_gameType = TRANSFER;
 
-                char savname[ 8 ] = { 0 };
-                // for( int i = 0; i < 7; ++i )
-                //     savname[ i ] = gen3::getNText( save3->unpackeddata[ i ] );
-                strcpy( SAVE::SAV->getActiveFile( ).m_playername, savname );
+        char savname[ 8 ] = { 0 };
+        for( int i = 0; i < 7; ++i )
+            savname[ i ] = FS::getNText( save3->unpackeddata[ i ] );
+        strcpy( SAV->getActiveFile( ).m_playername, savname );
 
-                //  SAVE::SAV->getActiveFile( ).m_isMale = !save3->unpackeddata[ 8 ];
+        SAV->getActiveFile( ).m_isMale = !save3->unpackeddata[ 8 ];
 
-                //SAVE::SAV->getActiveFile( ).m_id = ( save3->unpackeddata[ 11 ] << 8 ) | save3->unpackeddata[ 10 ];
-                //SAVE::SAV->getActiveFile( ).m_sid = ( save3->unpackeddata[ 13 ] << 8 ) | save3->unpackeddata[ 12 ];
+        SAV->getActiveFile( ).m_id = ( save3->unpackeddata[ 11 ] << 8 ) | save3->unpackeddata[ 10 ];
+        SAV->getActiveFile( ).m_sid = ( save3->unpackeddata[ 13 ] << 8 ) | save3->unpackeddata[ 12 ];
 
-                //SAVE::SAV->getActiveFile( ).m_pt.m_hours = ( save3->unpackeddata[ 15 ] << 8 ) | save3->unpackeddata[ 14 ];
-                //SAVE::SAV->getActiveFile( ).m_pt.m_mins = save3->unpackeddata[ 16 ];
-                //SAVE::SAV->getActiveFile( ).m_pt.m_secs = save3->unpackeddata[ 17 ];
+        SAV->getActiveFile( ).m_pt.m_hours = ( save3->unpackeddata[ 15 ] << 8 ) | save3->unpackeddata[ 14 ];
+        SAV->getActiveFile( ).m_pt.m_mins = save3->unpackeddata[ 16 ];
+        SAV->getActiveFile( ).m_pt.m_secs = save3->unpackeddata[ 17 ];
 
-                // SAVE::SAV->getActiveFile( ).m_gba.m_gameid = ( save3->unpackeddata[ 0xaf ] << 24 ) | ( save3->unpackeddata[ 0xae ] << 16 ) | ( save3->unpackeddata[ 0xad ] << 8 ) | save3->unpackeddata[ 0xac ];
+        // SAV->getActiveFile( ).m_gba.m_gameid = ( save3->unpackeddata[ 0xaf ] << 24 ) | ( save3->unpackeddata[ 0xae ] << 16 ) | ( save3->unpackeddata[ 0xad ] << 8 ) | save3->unpackeddata[ 0xac ];
 
-                /*    pokemonData p;
-                for( u8 i = 0; i < 6; ++i ) {
-                if( save3->pokemon[ i ]->personality ) {
+        pokemonData p;
+        for( u8 i = 0; i < 6; ++i ) {
+            if( save3->pokemon[ i ]->personality ) {
 
-                pokemon &acPkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
-                gen3::belt_pokemon_t* &acBeltP = save3->pokemon[ i ];
+                pokemon &acPkmn = SAV->getActiveFile( ).m_pkmnTeam[ i ];
+                FS::belt_pokemon_t* &acBeltP = save3->pokemon[ i ];
 
 
                 acPkmn.m_boxdata.m_pid = acBeltP->personality;
                 acPkmn.m_boxdata.m_oTSid = acBeltP->otid >> 16;
                 acPkmn.m_boxdata.m_oTId = acBeltP->otid % ( 1 << 16 );
                 for( int i = 0; i < 10; ++i )
-                acPkmn.m_boxdata.m_name[ i ] = gen3::getNText( acBeltP->name[ i ] );
+                    acPkmn.m_boxdata.m_name[ i ] = FS::getNText( acBeltP->name[ i ] );
                 acPkmn.m_boxdata.m_name[ 10 ] = 0;
                 acPkmn.m_boxdata.m_hometown = acBeltP->language;
                 for( int i = 0; i < 7; ++i )
-                acPkmn.m_boxdata.m_oT[ i ] = gen3::getNText( acBeltP->otname[ i ] );
+                    acPkmn.m_boxdata.m_oT[ i ] = FS::getNText( acBeltP->otname[ i ] );
                 acPkmn.m_boxdata.m_oT[ 7 ] = 0;
                 acPkmn.m_boxdata.m_markings = acBeltP->markint;
 
@@ -177,62 +192,63 @@ namespace SAVE {
                 acPkmn.m_stats.m_SDef = acBeltP->spdef;
                 acPkmn.m_stats.m_Spd = acBeltP->speed;
 
-                gen3::pokemon::pokemon_growth_t* &acBG = save3->pokemon_growth[ i ];
-                acPkmn.m_boxdata.m_speciesId = gen3::getNPKMNIdx( acBG->species );
-                acPkmn.m_boxdata.m_holdItem = gen3::getNItemIdx( acBG->held );
+                FS::gen3Pokemon::pokemon_growth_t* &acBG = save3->pokemon_growth[ i ];
+                acPkmn.m_boxdata.m_speciesId = FS::getNPKMNIdx( acBG->species );
+                acPkmn.m_boxdata.m_holdItem = FS::getNItemIdx( acBG->held );
                 acPkmn.m_boxdata.m_experienceGained = acBG->xp;
                 acPkmn.m_boxdata.m_steps = acBG->happiness;
                 acPkmn.m_boxdata.m_pPUps = acBG->ppbonuses;
 
-                gen3::pokemon::pokemon_moves_t* &acBA = save3->pokemon_moves[ i ];
+                FS::gen3Pokemon::pokemon_moves_t* &acBA = save3->pokemon_moves[ i ];
                 for( int i = 0; i < 4; ++i ) {
-                acPkmn.m_boxdata.m_moves[ i ] = acBA->atk[ i ];
-                acPkmn.m_boxdata.m_acPP[ i ] = acBA->pp[ i ];
+                    acPkmn.m_boxdata.m_moves[ i ] = acBA->atk[ i ];
+                    acPkmn.m_boxdata.m_acPP[ i ] = acBA->pp[ i ];
                 }
 
-                gen3::pokemon::pokemon_effort_t* &acBE = save3->pokemon_effort[ i ];
+                FS::gen3Pokemon::pokemon_effort_t* &acBE = save3->pokemon_effort[ i ];
                 for( int i = 0; i < 6; ++i ) {
-                acPkmn.m_boxdata.m_effortValues[ i ] = acBE->EV[ i ];
-                acPkmn.m_boxdata.m_contestStats[ i ] = acBE->ConStat[ i ];
+                    acPkmn.m_boxdata.m_effortValues[ i ] = acBE->EV[ i ];
+                    acPkmn.m_boxdata.m_contestStats[ i ] = acBE->ConStat[ i ];
                 }
 
-                gen3::pokemon::pokemon_misc_t* &acBM = save3->pokemon_misc[ i ];
+                FS::gen3Pokemon::pokemon_misc_t* &acBM = save3->pokemon_misc[ i ];
                 acPkmn.m_boxdata.m_iVint = acBM->IVint;
 
                 getAll( acPkmn.m_boxdata.m_speciesId, p );
                 acPkmn.m_boxdata.m_ability = p.m_abilities[ acPkmn.m_boxdata.m_individualValues.m_isEgg ];
                 acPkmn.m_boxdata.m_individualValues.m_isEgg = acPkmn.m_boxdata.m_individualValues.m_isNicked;
-                acPkmn.m_boxdata.m_gotPlace = gen3::getNLocation( acBM->locationcaught );
+                acPkmn.m_boxdata.m_gotPlace = FS::getNLocation( acBM->locationcaught );
 
                 acPkmn.m_boxdata.m_gotLevel = acBM->levelcaught;
 
                 if( acPkmn.m_boxdata.m_individualValues.m_isEgg || acPkmn.m_boxdata.m_gotLevel ) {
-                acPkmn.m_boxdata.m_hatchPlace = 999;
-                acPkmn.m_boxdata.m_gotLevel = 5;
-                acPkmn.m_boxdata.m_hatchDate[ 0 ] =
-                acPkmn.m_boxdata.m_hatchDate[ 1 ] =
-                acPkmn.m_boxdata.m_hatchDate[ 2 ] = 0;
-                acPkmn.m_boxdata.m_gotDate[ 0 ] =
-                acPkmn.m_boxdata.m_gotDate[ 1 ] =
-                acPkmn.m_boxdata.m_gotDate[ 2 ] = 1;
+                    acPkmn.m_boxdata.m_hatchPlace = 999;
+                    acPkmn.m_boxdata.m_gotLevel = 5;
+                    acPkmn.m_boxdata.m_hatchDate[ 0 ] =
+                        acPkmn.m_boxdata.m_hatchDate[ 1 ] =
+                        acPkmn.m_boxdata.m_hatchDate[ 2 ] = 0;
+                    acPkmn.m_boxdata.m_gotDate[ 0 ] =
+                        acPkmn.m_boxdata.m_gotDate[ 1 ] =
+                        acPkmn.m_boxdata.m_gotDate[ 2 ] = 1;
                 }
                 acPkmn.m_boxdata.m_oTisFemale = acBM->tgender;
                 acPkmn.m_boxdata.m_ball = acBM->pokeball;
                 acPkmn.m_boxdata.m_gotDate[ 0 ] =
-                acPkmn.m_boxdata.m_gotDate[ 1 ] =
-                acPkmn.m_boxdata.m_gotDate[ 2 ] = 0;
+                    acPkmn.m_boxdata.m_gotDate[ 1 ] =
+                    acPkmn.m_boxdata.m_gotDate[ 2 ] = 0;
 
-                }
-                }*/
-                //savMod = _GBA;
-
-                //  SAVE::SAV->getActiveFile( ).m_overWorldIdx = 20 * ( ( acgame + 1 ) / 2 ) + ( SAVE::SAV->getActiveFile( ).m_isMale ? 0 : 10 );
-
-                IO::Oam->oamBuffer[ SAVE_ID ].isHidden = false;
-
-                IO::messageBox( "Abgeschlossen." );
             }
         }
+
+        //  SAV->getActiveFile( ).m_overWorldIdx = 20 * ( ( acgame + 1 ) / 2 ) + ( SAV->getActiveFile( ).m_isMale ? 0 : 10 );
+
+        IO::messageBox( GET_STRING( 123 ), true );
+        IO::clearScreen( true, false, false );
+
+        SAV->getActiveFile( ).m_player = { MAP::mapObject::PLYR, { 104, 120, 5 },  SAV->getActiveFile( ).m_isMale ? (u16) 0 : (u16) 10, MAP::moveMode::WALK, 0, 0, MAP::direction::RIGHT };
+        SAV->getActiveFile( ).m_isMale = true;
+        SAV->getActiveFile( ).m_currentMap = 10;
+
         return true;
     }
 }

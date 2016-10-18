@@ -200,7 +200,7 @@ namespace SAVE {
         res.push_back( NEW_GAME );
         vis.push_back( 73 );
         res.push_back( SPECIAL_EPISODE );
-        if( SAV->m_transfersRemaining ) {
+        if( gMod == DEVELOPER || SAV->m_transfersRemaining ) {
             vis.push_back( 74 );
             res.push_back( TRANSFER_GAME );
         }

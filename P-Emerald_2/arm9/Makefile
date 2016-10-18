@@ -64,7 +64,7 @@ CFLAGS	:=	-g -Wall -Wextra -Werror\
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM9 -DNDSFILENAME=\"$(TARGET).nds\"
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++14 -Ofast
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++14 -Ofast -Wno-multichar
 #            -fsanitize=undefined -fsanitize=float-cast-overflow -fsanitize=null\
 #            -fsanitize=return -fsanitize=vptr
 

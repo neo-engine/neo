@@ -25,18 +25,18 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*
-#include "Gen.h"
 
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 
-#include "../ds/pokemon.h"
+#include "gen3Parser.h"
+#include "pokemon.h"
 #include "saveGame.h"
 
-namespace gen3 {
+namespace FS {
 #define MAX_TRAINER_NAME_LEN 7
 #define MAX_NICKNAME_LEN 10
 
@@ -769,7 +769,7 @@ namespace gen3 {
     }
 
 #if (defined __linux__) || (defined __APPLE__)
-    int gbatounicode[240][2]
+    int gbatounicode[ 240 ][ 2 ]
     {
         {0x00,L'\0'},{0x01,L'あ'},{0x02,L'い'},{0x03,L'う'},{0x04,L'え'},{0x05,L'お'},{0x06,L'か'},{0x07,L'き'},{0x08,L'く'},{0x09,L'け'},{0x0A,L'こ'},{0x0B,L'さ'},{0x0C,L'し'},{0x0D,L'す'},{0x0E,L'せ'},{0x0F,L'そ'},
         {0x10,L'た'},{0x11,L'ち'},{0x12,L'つ'},{0x13,L'て'},{0x14,L'と'},{0x15,L'な'},{0x16,L'に'},{0x17,L'ぬ'},{0x18,L'ね'},{0x19,L'の'},{0x1A,L'は'},{0x1B,L'ひ'},{0x1C,L'ふ'},{0x1D,L'へ'},{0x1E,L'ほ'},{0x1F,L'ま'},
@@ -814,337 +814,6 @@ namespace gen3 {
         return '\0';
     }
 
-     void convertgen3pkmtogen5(void * gbapkm, void * pkm)
-     {
-     std::ostringstream o;
-     o
-     << "SELECT abilities.id FROM abilities INNER JOIN ability_names ON abilities.id =  "
-     << "ability_names.ability_id INNER JOIN pokemon_abilities ON abilities.id =  "
-     << "pokemon_abilities.ability_id INNER JOIN pokemon ON pokemon_abilities.pokemon_id "
-     << " = pokemon.id WHERE ( ability_names.local_language_id = 9 ) AND ( pokemon.species_id "
-     << " = " << int(gbapkm->data.species) << " ) AND ( abilities.generation_id = 3 ) AND ( pokemon_abilities.slot "
-     << " = " << int(gbapkm->data.ivs.ability_flag) << " + 1 ) ";
-     int ability = getanint(o);
-     if(ability == 0)
-     {
-     o.clear();
-     o.str("");
-     o
-     << "SELECT abilities.id FROM abilities INNER JOIN ability_names ON abilities.id =  "
-     << "ability_names.ability_id INNER JOIN pokemon_abilities ON abilities.id =  "
-     << "pokemon_abilities.ability_id INNER JOIN pokemon ON pokemon_abilities.pokemon_id "
-     << " = pokemon.id WHERE ( ability_names.local_language_id = 9 ) AND ( pokemon.species_id "
-     << " = " << int(gbapkm->data.species) << " ) AND ( abilities.generation_id = 3 ) AND ( pokemon_abilities.slot "
-     << " = 1) ";
-     ability = getanint(o);
-     }
-     pkm->ability = Abilities::abilities(ability);
-     pkm->contest.beauty = gbapkm->data.contest.beauty;
-     pkm->contest.cool = gbapkm->data.contest.cool;
-     pkm->contest.cute = gbapkm->data.contest.cute;
-     pkm->contest.sheen = gbapkm->data.contest.sheen;
-     pkm->contest.smart = gbapkm->data.contest.smart;
-     pkm->contest.tough = gbapkm->data.contest.tough;
-     switch(gbapkm->lang)
-     {
-     case 0201:
-     pkm->country = Countries::japanese;
-     break;
-     case 0202:
-     pkm->country = Countries::english;
-     break;
-     case 0203:
-     pkm->country = Countries::french;
-     break;
-     case 0204:
-     pkm->country = Countries::italian;
-     break;
-     case 0205:
-     pkm->country = Countries::german;
-     break;
-     case 0206:
-     pkm->country = Countries::southkorean;
-     break;
-     case 0207:
-     pkm->country = Countries::spanish;
-     break;
-     default:
-     pkm->country = Countries::english;
-     }
-     pkm->encounter = Encounters::palpark_egg_hatched_specialevent;
-     pkm->evs.move = gbapkm->data.evs.move;
-     pkm->evs.defense = gbapkm->data.evs.defense;
-     pkm->evs.hp = gbapkm->data.evs.hp;
-     pkm->evs.spatk = gbapkm->data.evs.spatk;
-     pkm->evs.spdef = gbapkm->data.evs.spdef;
-     pkm->evs.speed = gbapkm->data.evs.speed;
-     pkm->exp = gbapkm->data.exp;
-     pkm->ivs.move = gbapkm->data.ivs.move;
-     pkm->ivs.defense = gbapkm->data.ivs.defense;
-     pkm->ivs.hp = gbapkm->data.ivs.hp;
-     pkm->ivs.spatk = gbapkm->data.ivs.spatk;
-     pkm->ivs.spdef = gbapkm->data.ivs.spdef;
-     pkm->ivs.speed = gbapkm->data.ivs.speed;
-     pkm->ivs.isegg = gbapkm->data.ivs.isegg;
-     pkm->met = Locations::poketransfer;
-     pkm->species = Species::species(convertgbaspecies(gbapkm->data.species));
-     pkm->metlevel_otgender.metlevel = getpkmlevel(pkm);
-     pkm->metlevel_otgender.otgender = Genders::genders(int(gbapkm->data.origins.trainergender));
-     pkm->nature = pkmnNatures::natures(gbapkm->pid % 25);
-     pkm->pid = gbapkm->pid;
-     pkm->ppup[0] = gbapkm->data.ppbonuses.move1;
-     pkm->ppup[1] = gbapkm->data.ppbonuses.move2;
-     pkm->ppup[2] = gbapkm->data.ppbonuses.move3;
-     pkm->ppup[3] = gbapkm->data.ppbonuses.move4;
-     pkm->sid = gbapkm->sid;
-     pkm->tameness = gbapkm->data.friendship;
-     pkm->tid = gbapkm->tid;
-     switch(gbapkm->data.ribbons.beauty)
-     {
-     case 4:
-     pkm->hribbon1.beauty_ribbon_master = true;
-     pkm->hribbon1.beauty_ribbon_hyper = true;
-     pkm->hribbon1.beauty_ribbon_super = true;
-     pkm->hribbon1.beauty_ribbon = true;
-     break;
-     case 3:
-     pkm->hribbon1.beauty_ribbon_hyper = true;
-     pkm->hribbon1.beauty_ribbon_super = true;
-     pkm->hribbon1.beauty_ribbon = true;
-     break;
-     case 2:
-     pkm->hribbon1.beauty_ribbon_super = true;
-     pkm->hribbon1.beauty_ribbon = true;
-     break;
-     case 1:
-     pkm->hribbon1.beauty_ribbon = true;
-     break;
-     }
-     switch(gbapkm->data.ribbons.cool)
-     {
-     case 4:
-     pkm->hribbon1.cool_ribbon_master = true;
-     pkm->hribbon1.cool_ribbon_hyper = true;
-     pkm->hribbon1.cool_ribbon_super = true;
-     pkm->hribbon1.cool_ribbon = true;
-     break;
-     case 3:
-     pkm->hribbon1.cool_ribbon_hyper = true;
-     pkm->hribbon1.cool_ribbon_super = true;
-     pkm->hribbon1.cool_ribbon = true;
-     break;
-     case 2:
-     pkm->hribbon1.cool_ribbon_super = true;
-     pkm->hribbon1.cool_ribbon = true;
-     break;
-     case 1:
-     pkm->hribbon1.cool_ribbon = true;
-     break;
-     }
-     switch(gbapkm->data.ribbons.cute)
-     {
-     case 4:
-     pkm->hribbon1.cute_ribbon_master = true;
-     pkm->hribbon1.cute_ribbon_hyper = true;
-     pkm->hribbon1.cute_ribbon_super = true;
-     pkm->hribbon1.cute_ribbon = true;
-     break;
-     case 3:
-     pkm->hribbon1.cute_ribbon_hyper = true;
-     pkm->hribbon1.cute_ribbon_super = true;
-     pkm->hribbon1.cute_ribbon = true;
-     break;
-     case 2:
-     pkm->hribbon1.cute_ribbon_super = true;
-     pkm->hribbon1.cute_ribbon = true;
-     break;
-     case 1:
-     pkm->hribbon1.cute_ribbon = true;
-     break;
-     }
-     switch(gbapkm->data.ribbons.smart)
-     {
-     case 4:
-     pkm->hribbon1.smart_ribbon_master = true;
-     pkm->hribbon1.smart_ribbon_hyper = true;
-     pkm->hribbon1.smart_ribbon_super = true;
-     pkm->hribbon1.smart_ribbon = true;
-     break;
-     case 3:
-     pkm->hribbon1.smart_ribbon_hyper = true;
-     pkm->hribbon1.smart_ribbon_super = true;
-     pkm->hribbon1.smart_ribbon = true;
-     break;
-     case 2:
-     pkm->hribbon1.smart_ribbon_super = true;
-     pkm->hribbon1.smart_ribbon = true;
-     break;
-     case 1:
-     pkm->hribbon1.smart_ribbon = true;
-     break;
-     }
-     switch(gbapkm->data.ribbons.tough)
-     {
-     case 4:
-     pkm->hribbon2.tough_ribbon_master = true;
-     pkm->hribbon2.tough_ribbon_hyper = true;
-     pkm->hribbon2.tough_ribbon_super = true;
-     pkm->hribbon2.tough_ribbon = true;
-     break;
-     case 3:
-     pkm->hribbon2.tough_ribbon_hyper = true;
-     pkm->hribbon2.tough_ribbon_super = true;
-     pkm->hribbon2.tough_ribbon = true;
-     break;
-     case 2:
-     pkm->hribbon2.tough_ribbon_super = true;
-     pkm->hribbon2.tough_ribbon = true;
-     break;
-     case 1:
-     pkm->hribbon2.tough_ribbon = true;
-     break;
-     }
-     pkm->hribbon2.artist_ribbon = bool(gbapkm->data.ribbons.artist);
-     pkm->hribbon2.champion_ribbon = bool(gbapkm->data.ribbons.champion);
-     pkm->hribbon2.effort_ribbon = bool(gbapkm->data.ribbons.effort);
-     pkm->hribbon2.national_ribbon = bool(gbapkm->data.ribbons.national);
-     pkm->forms.fencounter = gbapkm->data.ribbons.fencounter;
-     Genders::genders gender = calcpkmgender(pkm);
-     pkm->forms.female = (gender == Genders::female);
-     pkm->forms.genderless = (gender == Genders::genderless);
-     pkm->markings.circle = bool(gbapkm->mark.circle);
-     pkm->markings.square = bool(gbapkm->mark.square);
-     pkm->markings.heart = bool(gbapkm->mark.heart);
-     pkm->markings.triangle = bool(gbapkm->mark.triangle);
-     for(int i = 0; i < 4; i++)
-     {
-     pkm->pp[i] = gbapkm->data.movepp[i];
-     pkm->moves[i] = Moves::moves(gbapkm->data.moves[i]);
-     }
-     switch(gbapkm->data.origins.game)
-     {
-     case GBAGames::colosseum_bonus_disc:
-     pkm->hometown = Hometowns::colosseum_bonus;
-     break;
-     case GBAGames::colosseum_xd:
-     pkm->hometown = Hometowns::colosseum;
-     break;
-     case GBAGames::emerald:
-     pkm->hometown = Hometowns::emerald;
-     break;
-     case GBAGames::firered:
-     pkm->hometown = Hometowns::firered;
-     break;
-     case GBAGames::leafgreen:
-     pkm->hometown = Hometowns::leafgreen;
-     break;
-     case GBAGames::ruby:
-     pkm->hometown = Hometowns::ruby;
-     break;
-     case GBAGames::sapphire:
-     pkm->hometown = Hometowns::sapphire;
-     break;
-     }
-     switch(gbapkm->data.origins.ball)
-     {
-     case GBABalls::diveball:
-     pkm->ball = Balls::diveball;
-     break;
-     case GBABalls::greatball:
-     pkm->ball = Balls::greatball;
-     break;
-     case GBABalls::luxuryball:
-     pkm->ball = Balls::luxuryball;
-     break;
-     case GBABalls::masterball:
-     pkm->ball = Balls::masterball;
-     break;
-     case GBABalls::nestball:
-     pkm->ball = Balls::nestball;
-     break;
-     case GBABalls::netball:
-     pkm->ball = Balls::netball;
-     break;
-     case GBABalls::pokeball:
-     pkm->ball = Balls::pokeball;
-     break;
-     case GBABalls::premierball:
-     pkm->ball = Balls::premierball;
-     break;
-     case GBABalls::repeatball:
-     pkm->ball = Balls::repeatball;
-     break;
-     case GBABalls::safariball:
-     pkm->ball = Balls::safariball;
-     break;
-     case GBABalls::timerball:
-     pkm->ball = Balls::timerball;
-     break;
-     case GBABalls::ultraball:
-     pkm->ball = Balls::ultraball;
-     break;
-     }
-     time_t t = time(0);
-     struct tm * now = new tm();
-     #if (defined __linux__) || (defined __APPLE__)
-     now = localtime( & t );
-     #else
-     localtime_s(now, &t);
-     #endif
-     pkm->metdate.day = now->tm_mday;
-     pkm->metdate.month = now->tm_mon + 1;
-     pkm->metdate.year = now->tm_year -100;
-     pkm->pkrs.days = gbapkm->data.pkrs.days;
-     pkm->pkrs.strain = gbapkm->data.pkrs.strain;
-     pkm->item = Items::items(convertgbaitems(gbapkm->data.item));
-     std::string nickname = "";
-     std::string otname = "";
-     bool cont = true;
-     for(int i = 0; i < NICKLENGTH; i++)
-     {
-     if(gbapkm->nickname[i] == '\0')
-     {
-     cont = false;
-     }
-     if(cont)
-     {
-     nickname += static_cast<char>(convertgbatext(gbapkm->nickname[i]));
-     }
-     }
-     cont = true;
-     for(int i = 0; i < OTLENGTH; i++)
-     {
-     if(gbapkm->otname[i] == '\0')
-     {
-     cont = false;
-     }
-     if(cont)
-     {
-     otname += static_cast<char>(convertgbatext(gbapkm->otname[i]));
-     }
-     }
-     string speciesname = lookuppkmname(pkm);
-     std::locale loc;
-     for(int i = 0; i < speciesname.length(); i++)
-     {
-     if(nickname[i] != std::toupper(speciesname[i],loc))
-     {
-     pkm->ivs.isnicknamed = true;
-     }
-     }
-     wstring nick = wstring(nickname.begin(),nickname.end());
-     wstring otn = wstring(otname.begin(),otname.end());
-     char * nickw = const_cast<char*>(nick.c_str());
-     char * otw = const_cast<char*>(otn.c_str());
-     setpkmnickname(pkm,"",NICKLENGTH);
-     setpkmotname(pkm,"",OTLENGTH);
-     std::size_t nicklength_ = nickname.find('\0');
-     std::size_t otlength_ = otname.find('\0');
-     setpkmnickname(pkm,nickw,nicklength_);
-     setpkmotname(pkm,otw,otlength_);
-     calcchecksum(pkm);
-     }
-
     int getNLocation( int p_gen3Idx ) {
         if( p_gen3Idx < 88 )
             return p_gen3Idx + 235;
@@ -1163,9 +832,9 @@ namespace gen3 {
         while( p_size-- )
             *p_dest++ = *p_src++;
     }
-    SaveParser* SaveParser::spInstance = NULL;
+    gen3Parser* gen3Parser::spInstance = NULL;
 
-    int SaveParser::get_newest_save( block *p_blocks[ NUM_BLOCKS_TOTAL ] ) {
+    int gen3Parser::get_newest_save( block *p_blocks[ NUM_BLOCKS_TOTAL ] ) {
         int i, newestSave = 0;
 
         for( i = 0; i < NUM_BLOCKS_TOTAL; i++ )
@@ -1174,36 +843,36 @@ namespace gen3 {
         return newestSave;
     }
 
-    u16 SaveParser::get_block_checksum( block* p_b ) {
+    u16 gen3Parser::get_block_checksum( block* p_b ) {
         int checksum = 0;
         int i;
         for( i = 0; i < BLOCK_DATA_LEN; i += 4 )
-            checksum += *( (int*)p_b + i / 4 );
+            checksum += *( (int*) p_b + i / 4 );
         checksum += checksum >> 16;
         checksum &= 0xFFFF;
 
-        return (u16)checksum;
+        return (u16) checksum;
     }
 
-    char* SaveParser::parse_save( block *p_blocks[ NUM_BLOCKS_TOTAL ] ) {
+    char* gen3Parser::parse_save( block *p_blocks[ NUM_BLOCKS_TOTAL ] ) {
         char *data;
         int i, newestSave;
 
         for( i = 0; i < NUM_BLOCKS_TOTAL; i++ ) {
             p_blocks[ i ] = new block( );
-            smemcpy( (u8*)( p_blocks[ i ] ), SRAM + i*( sizeof( block ) ), sizeof( block ) );
+            smemcpy( (u8*) ( p_blocks[ i ] ), SRAM + i*( sizeof( block ) ), sizeof( block ) );
         }
 
         newestSave = get_newest_save( p_blocks );
 
-        data = (char*)malloc( SAVESLOT_LEN );
+        data = (char*) malloc( SAVESLOT_LEN );
         for( i = 0; i < NUM_BLOCKS_TOTAL; i++ )
             if( p_blocks[ i ]->footer.savenumber == newestSave )
                 memcpy( data + BLOCK_DATA_LEN * p_blocks[ i ]->footer.blocknum, p_blocks[ i ]->data, BLOCK_DATA_LEN );
         return data;
     }
 
-    int SaveParser::pack_save( char *p_unpackeddata, block *p_blocks[ NUM_BLOCKS_TOTAL ], char p_savefile[ SAVEFILE_LEN ] ) {
+    int gen3Parser::pack_save( char *p_unpackeddata, block *p_blocks[ NUM_BLOCKS_TOTAL ], char p_savefile[ SAVEFILE_LEN ] ) {
         FILE *f;
         int i, newestSave;
         int tempCount = 0;
@@ -1213,15 +882,15 @@ namespace gen3 {
         // Re-split into blocks and place over buffer
         for( i = 0; i < NUM_BLOCKS_TOTAL; i++ )
             if( p_blocks[ i ]->footer.savenumber == newestSave ) {
-            memcpy( p_blocks[ i ]->data, unpackeddata + BLOCK_DATA_LEN * p_blocks[ i ]->footer.blocknum, BLOCK_DATA_LEN );
-            // Re-calculate and set this block's checksum
-            p_blocks[ i ]->footer.checksum = get_block_checksum( p_blocks[ i ] );
-            tempCount++;
+                memcpy( p_blocks[ i ]->data, p_unpackeddata + BLOCK_DATA_LEN * p_blocks[ i ]->footer.blocknum, BLOCK_DATA_LEN );
+                // Re-calculate and set this block's checksum
+                p_blocks[ i ]->footer.checksum = get_block_checksum( p_blocks[ i ] );
+                tempCount++;
             }
-        free( unpackeddata );
+        free( p_unpackeddata );
 
         // Save back to file
-        if( ( f = fopen( (char*)SRAM, "wb" ) ) == NULL )
+        if( ( f = fopen( (char*) SRAM, "wb" ) ) == NULL )
             return -1;
 
         if( fwrite( p_savefile, SAVEFILE_LEN, 1, f ) != 1 ) {
@@ -1234,7 +903,7 @@ namespace gen3 {
         return 0;
     }
 
-    char* SaveParser::get_text( u8* p_raw, bool p_isNickname ) {
+    char* gen3Parser::get_text( u8* p_raw, bool p_isNickname ) {
         char* actual_text;
         int len;
 
@@ -1253,92 +922,56 @@ namespace gen3 {
 
         return actual_text;
     }
-
-    //void SaveParser::print_pokemon(box_pokemon_t* pokemon)
-    //{
-    //    pokemon::pokemon_moves_t *pa;
-    //    pokemon::pokemon_effort_t *pe;
-    //    pokemon::pokemon_growth_t *pg;
-    //    pokemon::pokemon_misc_t *pm;
-    //    int o, totalIVs, totalEVs;
-    //    char* nickname = get_text(pokemon->name, true);
-    //
-    //    // Figure out the order
-    //    o = pokemon->personality % 24;
-    //    pa = (pokemon::pokemon_moves_t *)(pokemon->data + DataOrderTable[o][0] * sizeof(pokemon::pokemon_moves_t));
-    //    pe = (pokemon::pokemon_effort_t *)(pokemon->data + DataOrderTable[o][1] * sizeof(pokemon::pokemon_effort_t));
-    //    pg = (pokemon::pokemon_growth_t *)(pokemon->data + DataOrderTable[o][2] * sizeof(pokemon::pokemon_growth_t));
-    //    pm = (pokemon::pokemon_misc_t *)(pokemon->data + DataOrderTable[o][3] * sizeof(pokemon::pokemon_misc_t));
-    //
-    //    totalIVs = pm->IVs.hp + pm->IVs.atk + pm->IVs.def + pm->IVs.spatk + pm->IVs.spdef + pm->IVs.spd;
-    //    totalEVs = pe->hp + pe->move + pe->defense + pe->spatk + pe->spdef + pe->speed;
-    //    fprintf(stdout, "Species: %s, Nickname: %s, held: %s, Nature: %s\n", pokemon_species[pg->species], nickname, items[pg->held], natures[pokemon->personality % 25]);
-    //    fprintf(stdout, "Attacks: 1:%s, 2:%s, 3:%s, 4:%s\n", moves[pa->atk1], moves[pa->atk2], moves[pa->atk3], moves[pa->atk4] );
-    //    fprintf(stdout, "IVs:\tHP:%d\tAtk:%d\tDef:%d\tSpA:%d\tSpD:%d\tSpe:%d\tTotal:%d\n", pm->IVs.hp, pm->IVs.atk, pm->IVs.def, pm->IVs.spatk, pm->IVs.spdef, pm->IVs.spd, totalIVs );
-    //    fprintf(stdout, "EVs:\tHP:%d\tAtk:%d\tDef:%d\tSpA:%d\tSpD:%d\tSpe:%d\tTotal:%d\n", pe->hp, pe->move, pe->defense, pe->spatk, pe->spdef, pe->speed, totalEVs );
-    //
-    //    delete[] nickname;
-    //}
-
-    int SaveParser::parse_pokemon( char* p_buf, int p_offset, void** p_pokemon, pokemon::pokemon_moves_t** p_pa, pokemon::pokemon_effort_t** p_pe,
-                                   pokemon::pokemon_growth_t** p_pg, pokemon::pokemon_misc_t** p_pm, int p_num, int p_size ) {
+    
+    int gen3Parser::parse_pokemon( char* p_buf, int p_offset, void** p_pokemon, gen3Pokemon::pokemon_moves_t** p_pa, gen3Pokemon::pokemon_effort_t** p_pe,
+                                   gen3Pokemon::pokemon_growth_t** p_pg, gen3Pokemon::pokemon_misc_t** p_pm, int p_num, int p_size ) {
         int i;
         if( p_size != sizeof( belt_pokemon_t ) && p_size != sizeof( box_pokemon_t ) )
             return -1;
 
-        // Parse pokemon
+        // Parse gen3Pokemon
         for( i = 0; i < p_num; i++ ) {
             int o;
 
-            // Read data on pokemon
+            // Read data on gen3Pokemon
             p_pokemon[ i ] = ( p_buf + p_offset + ( i * p_size ) );
 
-            // Unencrypt pokemon's data
-            // box and belt pokemon have these struct members all at
+            // Unencrypt gen3Pokemon's data
+            // box and belt gen3Pokemon have these struct members all at
             // the same offset so we can cast to either type
-            SaveParser::Instance( )->encrypt( ( (box_pokemon_t*)p_pokemon[ i ] )->data, ( (box_pokemon_t*)p_pokemon[ i ] )->personality, ( (box_pokemon_t*)p_pokemon[ i ] )->otid );
+            gen3Parser::Instance( )->encrypt( ( (box_pokemon_t*) p_pokemon[ i ] )->data, ( (box_pokemon_t*) p_pokemon[ i ] )->personality, ( (box_pokemon_t*) p_pokemon[ i ] )->otid );
 
             // Figure out the order
-            o = ( (box_pokemon_t*)p_pokemon[ i ] )->personality % 24;
-            p_pa[ i ] = ( pokemon::pokemon_moves_t * )( ( (box_pokemon_t*)p_pokemon[ i ] )->data + DataOrderTable[ o ][ 0 ] * sizeof( pokemon::pokemon_moves_t ) );
-            p_pe[ i ] = ( pokemon::pokemon_effort_t * )( ( (box_pokemon_t*)p_pokemon[ i ] )->data + DataOrderTable[ o ][ 1 ] * sizeof( pokemon::pokemon_effort_t ) );
-            p_pg[ i ] = ( pokemon::pokemon_growth_t * )( ( (box_pokemon_t*)p_pokemon[ i ] )->data + DataOrderTable[ o ][ 2 ] * sizeof( pokemon::pokemon_growth_t ) );
-            p_pm[ i ] = ( pokemon::pokemon_misc_t * )( ( (box_pokemon_t*)p_pokemon[ i ] )->data + DataOrderTable[ o ][ 3 ] * sizeof( pokemon::pokemon_misc_t ) );
+            o = ( (box_pokemon_t*) p_pokemon[ i ] )->personality % 24;
+            p_pa[ i ] = ( gen3Pokemon::pokemon_moves_t * )( ( (box_pokemon_t*) p_pokemon[ i ] )->data + DataOrderTable[ o ][ 0 ] * sizeof( gen3Pokemon::pokemon_moves_t ) );
+            p_pe[ i ] = ( gen3Pokemon::pokemon_effort_t * )( ( (box_pokemon_t*) p_pokemon[ i ] )->data + DataOrderTable[ o ][ 1 ] * sizeof( gen3Pokemon::pokemon_effort_t ) );
+            p_pg[ i ] = ( gen3Pokemon::pokemon_growth_t * )( ( (box_pokemon_t*) p_pokemon[ i ] )->data + DataOrderTable[ o ][ 2 ] * sizeof( gen3Pokemon::pokemon_growth_t ) );
+            p_pm[ i ] = ( gen3Pokemon::pokemon_misc_t * )( ( (box_pokemon_t*) p_pokemon[ i ] )->data + DataOrderTable[ o ][ 3 ] * sizeof( gen3Pokemon::pokemon_misc_t ) );
         }
 
         return 0;
     }
 
-    SaveParser* SaveParser::Instance( ) {
+    gen3Parser* gen3Parser::Instance( ) {
         if( !spInstance ) // If an instance hasn't already been created, so do
-            spInstance = new SaveParser( );
+            spInstance = new gen3Parser( );
 
         return spInstance;
     }
 
-    int SaveParser::load( int p_game ) {
+    int gen3Parser::load( int p_game ) {
         // Parse save
         unpackeddata = parse_save( m_blocks );
         if( unpackeddata == NULL )
             return -1;
         // Decode belt part
-        parse_pokemon( unpackeddata, belt_offsets[ p_game ], (void**)pokemon, pokemon_moves,
+        parse_pokemon( unpackeddata, belt_offsets[ p_game ], (void**) pokemon, pokemon_moves,
                        pokemon_effort, pokemon_growth, pokemon_misc, NUM_BELT_POKEMON, sizeof( belt_pokemon_t ) );
 
         return 0;
     }
-
-    int SaveParser::save( ) {
-        // Re encrypt and set checksum
-        for( int i = 0; i < NUM_BELT_POKEMON; i++ )
-            pokemon[ i ]->checksum = encrypt( pokemon[ i ]->data, pokemon[ i ]->personality, pokemon[ i ]->otid );
-
-        if( pack_save( unpackeddata, m_blocks, (char*)SRAM ) )
-            return -1;
-        return 0;
-    }
-
-    u16 SaveParser::encrypt( u8 *p_data, u32 p_pv, u32 p_otid ) {
+    
+    u16 gen3Parser::encrypt( u8 *p_data, u32 p_pv, u32 p_otid ) {
         u32 xorkey = p_pv ^ p_otid;
         u16 checksum = 0;
         u32 i;
@@ -1356,6 +989,4 @@ namespace gen3 {
         return checksum;
 
     }
-
 }
-*/

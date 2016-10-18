@@ -34,7 +34,7 @@
     <ClInclude Include="arm9\source\dexUI.h" />
     <ClInclude Include="arm9\source\font.h" />
     <ClInclude Include="arm9\source\fs.h" />
-    <ClInclude Include="arm9\source\Gen.h" />
+    <ClInclude Include="arm9\source\gen3Parser.h" />
     <ClInclude Include="arm9\source\mapDefines.h" />
     <ClInclude Include="arm9\source\mapObject.h" />
     <ClInclude Include="arm9\source\mapDrawer.h" />
@@ -80,7 +80,7 @@
     <ClCompile Include="arm9\source\fontData.cpp" />
     <ClCompile Include="arm9\source\fs.cpp" />
     <ClCompile Include="arm9\source\gameStart.cpp" />
-    <ClCompile Include="arm9\source\Gen.cpp" />
+    <ClCompile Include="arm9\source\gen3Parser.cpp" />
     <ClCompile Include="arm9\source\item.cpp" />
     <ClCompile Include="arm9\source\keyboard.cpp" />
     <ClCompile Include="arm9\source\main.cpp" />
