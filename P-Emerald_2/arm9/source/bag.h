@@ -34,8 +34,6 @@
 #include "defines.h"
 
 namespace BAG {
-    extern std::string bagnames[ 5 ];
-
     class bag {
     private:
         enum {

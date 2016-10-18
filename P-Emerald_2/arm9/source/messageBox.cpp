@@ -89,7 +89,7 @@ namespace IO {
         s16 x = 32, y = 8;
         regularFont->printMBStringD( buf, x, y, true );
         regularFont->printChar( 489 - 21 + p_item->m_itemType, 32, 24, true );
-        sprintf( buf, GET_STRING( 86 ), BAG::bagnames[ BAG::toBagType( p_item->m_itemType ) ].c_str( ) );
+        sprintf( buf, GET_STRING( 86 ), GET_STRING( 11 + BAG::toBagType( p_item->m_itemType ) ) );
         ASpriteOamIndex = A_ID;
         x = 46; y = 24;
         regularFont->printMBStringD( buf, x, y, true );

@@ -173,7 +173,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Continue", "Weiter" },
     { "New Game", "Neues Spiel" },
     { "Special Episodes", "Spezialepisoden" },
-    { "Import Save", "Spielstand importieren" },
+    { "Import Save", "Spiel-Import" },
 
     { "Continue your adventure", "Setze dein Abenteuer fort" },
     { "Start a new adventure", "Starte ein neues Abenteuer" },

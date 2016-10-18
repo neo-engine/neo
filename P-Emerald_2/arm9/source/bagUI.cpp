@@ -153,7 +153,6 @@ namespace BAG {
     }
 
     void drawItemTop( item* p_item, u16 p_count ) {
-        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         std::string display;
         std::string descr;
         IO::OamTop->oamBuffer[ 0 ].isHidden = true;
@@ -190,7 +189,6 @@ namespace BAG {
                 IO::regularFont->printString( buffer, 140, 145, false );
                 IO::regularFont->setColor( BLACK_IDX, 1 );
 
-                std::string tastes[ 5 ] = { GET_STRING( 24 ), GET_STRING( 25 ), GET_STRING( 26 ), GET_STRING( 27 ), GET_STRING( 28 ) };
                 u8 poses[ 5 ] = { 18, 66, 124, 150, 194 };
                 u8 mx = 0;
                 for( u8 i = 0; i < 5; ++i )
@@ -203,7 +201,7 @@ namespace BAG {
                         IO::regularFont->setColor( GRAY_IDX, 2 );
                         IO::regularFont->setColor( BLACK_IDX, 1 );
                     }
-                    IO::regularFont->printString( tastes[ i ].c_str( ), poses[ i ], 160, false );
+                    IO::regularFont->printString( GET_STRING( 24 + i ), poses[ i ], 160, false );
                 }
                 IO::regularFont->setColor( GRAY_IDX, 2 );
                 IO::regularFont->setColor( BLACK_IDX, 1 );
@@ -360,27 +358,9 @@ namespace BAG {
 
     void drawTop( u8 p_page ) {
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BagUpper" );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         initColors( );
-
-        switch( p_page ) {
-            case 0: case 2:
-            {
-                IO::regularFont->printString( bagnames[ p_page ].c_str( ), 106, 4, false );
-                break;
-            }
-            case 1: case 3:
-            {
-                IO::regularFont->printString( bagnames[ p_page ].c_str( ), 104, 4, false );
-                break;
-            }
-            case 4:
-            {
-                IO::regularFont->printString( bagnames[ p_page ].c_str( ), 90, 4, false );
-                break;
-            }
-            default:
-                break;
-        }
+        IO::regularFont->printString( GET_STRING( 11 + p_page ), 128, 4, false, IO::font::CENTER );
     }
 
     void bagUI::selectItem( u8 p_idx, std::pair<u16, u16> p_item, bool p_pressed ) {
@@ -429,7 +409,7 @@ namespace BAG {
                 drawItemSub( 0, 132, 76 - 18 * i, false, false, true );
                 IO::OamTop->oamBuffer[ i ].isHidden = true;
             }
-            IO::regularFont->printString( GET_STRING( 43 ), 140, 89, true );
+            IO::regularFont->printString( GET_STRING( 43 ), 182, 89, true, IO::font::CENTER );
             IO::updateOAM( false );
         }
         res.insert( res.end( ), pkmnTg.begin( ), pkmnTg.end( ) );

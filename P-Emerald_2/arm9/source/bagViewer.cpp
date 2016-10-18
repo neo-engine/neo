@@ -46,7 +46,7 @@ namespace BAG {
 #define CURRENT_ITEM SAVE::SAV->getActiveFile( ).m_bag( ( bag::bagType )SAVE::SAV->getActiveFile( ).m_lstBag, \
      (SAVE::SAV->getActiveFile( ).m_lstBagItem + _currSelectedIdx) % SAVE::SAV->getActiveFile( ).m_bag.size( ( bag::bagType )SAVE::SAV->getActiveFile( ).m_lstBag ) )
 
-    const char* choices[ 5 ] = { GET_STRING( 44 ), GET_STRING( 45 ), GET_STRING( 46 ), GET_STRING( 47 ), GET_STRING( 48 ) };
+    const char* choices[ 5 ] = { "a", "b", "c", "d", "e" /* GET_STRING( 44 ), GET_STRING( 45 ), GET_STRING( 46 ), GET_STRING( 47 ), GET_STRING( 48 )  */ };
 
     void bagViewer::initUI( ) {
         _bagUI->init( );
