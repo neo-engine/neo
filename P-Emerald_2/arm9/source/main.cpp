@@ -90,6 +90,9 @@ bool ANIMATE_MAP = false;
 u8 FRAME_COUNT = 0;
 bool SCREENS_SWAPPED = false;
 bool PLAYER_IS_FISHING = false;
+bool INIT_NITROFS = false;
+
+char** ARGV;
 
 u8 getCurrentDaytime( ) {
     u8 t = achours, m = acmonth;
@@ -142,10 +145,8 @@ void initTimeAndRnd( ) {
 int main( int, char** p_argv ) {
     //Init
     powerOn( POWER_ALL_2D );
-
-    fatInitDefault( );
     nitroFSInit( p_argv );
-
+    ARGV = p_argv;
 
     irqEnable( IRQ_VBLANK );
     initGraphics( );
@@ -168,6 +169,11 @@ int main( int, char** p_argv ) {
 
         if( ANIMATE_MAP && MAP::curMap )
             MAP::curMap->animateMap( FRAME_COUNT );
+
+        if( INIT_NITROFS ) {
+            nitroFSInit( ARGV );
+            INIT_NITROFS = false;
+        }
 
         if( !UPDATE_TIME )
             return;

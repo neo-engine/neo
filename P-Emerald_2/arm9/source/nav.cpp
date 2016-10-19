@@ -168,7 +168,7 @@ namespace IO {
                                   POS( !p_power || !p_showBack )[ 2 * ( PKMN_ID - 2 ) ] - 16,
                                   POS( !p_power || !p_showBack )[ 2 * ( PKMN_ID - 2 ) + 1 ] - 16,
                                   32, 32, PokemonSpPal, PokemonSpTiles, PokemonSpTilesLen,
-                                  false, false, !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_speciesId, OBJPRIORITY_0, true );
+                                  false, false, !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_pid, OBJPRIORITY_0, true );
         tileCnt = IO::loadSprite( NAV_ID, NAV_ID, tileCnt,
                                   POS( !p_power || !p_showBack )[ 2 * ( NAV_ID - 2 ) ] - 16,
                                   POS( !p_power || !p_showBack )[ 2 * ( NAV_ID - 2 ) + 1 ] - 16,

@@ -51,6 +51,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "buffer.h"
 #include "dex.h"
 
+#include "messageBox.h"
+
 namespace BATTLE {
     std::string trainerClassNames[ 120 ] = { "Pokémon-Trainer", "Altes Paar", "Angler",
         "Aqua-Vorstand", "Aromalady", "Ass-Trainer", "Backpacker", "Camper", "Champ",
@@ -329,6 +331,10 @@ namespace BATTLE {
                 std::string accmd = "";
                 while( p_message[ ++i ] != L']' )
                     accmd += p_message[ i ];
+                if( accmd == "END" ) {
+                    _battleUI->writeLogText( msg );
+                    return;
+                }
                 msg += parseLogCmd( accmd );
                 if( accmd == "CLEAR" ) {
                     _battleUI->writeLogText( msg );
@@ -371,7 +377,7 @@ CHOOSE1:
                     _battleUI->declareBattleMove( 0, false );
                     if( _endBattle ) {
                         endBattle( battleEnd = RUN );
-                        return ( battleEnd );
+                        break;
                     }
                 } else
                     log( "[OWN1] kann nicht angreifen…[A]" );
@@ -400,7 +406,7 @@ CHOOSE1:
             }
             if( _endBattle ) {
                 endBattle( battleEnd = PLAYER_WON );
-                return battleEnd;
+                break;
             }
 
             doWeather( );
@@ -423,6 +429,7 @@ CHOOSE1:
             }
         }
 
+        _battleUI->_battle = 0;
         return battleEnd;
     }
 
@@ -430,12 +437,18 @@ CHOOSE1:
      *  @brief Initialize the battle.
      */
     void battle::initBattle( ) {
-        //Some basic initialization stuff
+        IO::messageBox( "HERE" );
+        // INIT_NITROFS = true;
+        // swiWaitForVBlank( );
+
+         //Some basic initialization stuff
         if( !_battleUI )
             _battleUI = new battleUI( this );
         else
             _battleUI->_battle = this;
         _battleUI->init( );
+
+        log( "CP 2[A]" );
         pokemonData pdata;
         for( u8 i = 0; i < 6; ++i ) {
             if( _player->m_pkmnTeam.size( ) > i ) {
@@ -1666,7 +1679,7 @@ NEXT:
 
                 u8 L = acPkmn.m_level;
 
-                float t = ( acPkmn.m_boxdata.m_oTId == SAVE::SAV->getActiveFile( ).m_id 
+                float t = ( acPkmn.m_boxdata.m_oTId == SAVE::SAV->getActiveFile( ).m_id
                             && acPkmn.m_boxdata.m_oTSid == SAVE::SAV->getActiveFile( ).m_sid ? 1 : 1.5 );
 
                 u32 exp = u32( ( wildModifer * t* b* e* L ) / 7 );

@@ -50,7 +50,7 @@ const char PKMNDATA_PATH[ ] = "nitro:/PKMNDATA/";
 const char ABILITYDATA_PATH[ ] = "nitro:/PKMNDATA/ABILITIES/";
 
 ability::ability( int p_abilityId ) {
-    FILE* f = FS::open( "nitro:/PKMNDATA/ABILITIES/", p_abilityId, ".data" );
+    FILE* f = FS::open( ABILITYDATA_PATH, p_abilityId, ".data" );
 
     if( !f )
         return;
@@ -64,8 +64,7 @@ ability::ability( int p_abilityId ) {
 }
 
 std::string getAbilityName( int p_abilityId ) {
-    sprintf( buffer, "nitro:/LOCATIONS/%i.data", p_abilityId );
-    FILE* f = fopen( buffer, "r" );
+    FILE* f = FS::open( ABILITYDATA_PATH, p_abilityId, ".data" );
 
     if( !f )
         return "---";

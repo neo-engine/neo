@@ -59,6 +59,7 @@ extern bool ANIMATE_MAP;
 extern u8 FRAME_COUNT;
 extern bool SCREENS_SWAPPED;
 extern bool PLAYER_IS_FISHING;
+extern bool INIT_NITROFS;
 
 extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;

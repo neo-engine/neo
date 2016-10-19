@@ -425,6 +425,8 @@ namespace MAP {
                 battleBack = 19;
         }
 
+        IO::fadeScreen( IO::BATTLE );
+
         auto playerPrio = _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].getPriority( );
         ANIMATE_MAP = false;
         swiWaitForVBlank( );

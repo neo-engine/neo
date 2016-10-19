@@ -237,7 +237,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Further, you will start at\nthe same position as you\nleft off in the GBA game.", "Du wirst das Spiel an der\nselben Stelle wie auf dem\nGBA-Modul fortsetzen." },
     { "No data will be written to\nthe GBA Game Pak.", "Es werden keine Daten auf\ndas GBA-Modul geschrieben." },
     { "However, proceed at your\nown risk.", "Trotzdem geschieht das\nImportieren auf eigene\nGefahr." },
-    { "No compatible cartrige found.\nAborting.", "Kein kompatibles GBA-Modul\ngefunden.\nBreache ab." },
+    { "No compatible cartrige found.\nAborting.", "Kein kompatibles GBA-Modul\ngefunden.\nBreche ab." },
 
     // 120
 

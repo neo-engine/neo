@@ -95,10 +95,10 @@ namespace SAVE {
 
     bool startScreen::transferGame( u8 p_slot ) {
         IO::clearScreen( true, false, false );
-        char acSlot2Game[ 5 ];
+        char acSlot2Game[ 5 ] = { 0 };
 
         sysSetBusOwners( true, true );
-        memcpy( acSlot2Game, (char*) 0x080000AC, 4 );
+        memcpy( acSlot2Game, (char*) 0x080000AC, 3 );
 
         char cmpgm[ 5 ][ 4 ] = { "BPE", "AXP", "AXV", "BPR", "BPG" };
         s8 acgame = -1;
@@ -109,7 +109,8 @@ namespace SAVE {
                 break;
             }
         if( acgame == -1 ) {
-            IO::messageBox( GET_STRING( 119 ), true );
+            sprintf( buffer, "%s\n(%s)", GET_STRING( 119 ), acSlot2Game );
+            IO::messageBox( buffer, true );
             IO::clearScreen( true, false, false );
             return false;
         }
@@ -119,6 +120,7 @@ namespace SAVE {
             IO::clearScreen( true, false, false );
             return false;
         }
+        IO::clearScreen( true, false, false );
         IO::messageBox( GET_STRING( 115 ), true );
         IO::messageBox( GET_STRING( 116 ), true );
         IO::messageBox( GET_STRING( 117 ), true );
@@ -239,9 +241,7 @@ namespace SAVE {
 
             }
         }
-
-        //  SAV->getActiveFile( ).m_overWorldIdx = 20 * ( ( acgame + 1 ) / 2 ) + ( SAV->getActiveFile( ).m_isMale ? 0 : 10 );
-
+        
         IO::messageBox( GET_STRING( 123 ), true );
         IO::clearScreen( true, false, false );
 

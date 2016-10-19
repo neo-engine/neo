@@ -589,11 +589,12 @@ namespace BATTLE {
         u16 tilecnt = 0;
         tilecnt = initStsBalls( true, tilecnt );
         initColors( );
+        initLogScreen( );
 
-        sprintf( buffer, "Eine Herausforderung von\n%s %s!",
+        sprintf( buffer, "Eine Herausforderung von\n%s %s![END]",
                  trainerClassNames[ _battle->_opponent->m_trainerClass ].c_str( ),
                  _battle->_opponent->m_battleTrainerName.c_str( ) );
-        IO::regularFont->printString( buffer, 16, 80, true );
+        _battle->log( buffer );
         IO::updateOAM( true );
     }
 

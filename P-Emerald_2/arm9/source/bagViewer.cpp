@@ -45,9 +45,7 @@ namespace BAG {
 
 #define CURRENT_ITEM SAVE::SAV->getActiveFile( ).m_bag( ( bag::bagType )SAVE::SAV->getActiveFile( ).m_lstBag, \
      (SAVE::SAV->getActiveFile( ).m_lstBagItem + _currSelectedIdx) % SAVE::SAV->getActiveFile( ).m_bag.size( ( bag::bagType )SAVE::SAV->getActiveFile( ).m_lstBag ) )
-
-    const char* choices[ 5 ] = { "a", "b", "c", "d", "e" /* GET_STRING( 44 ), GET_STRING( 45 ), GET_STRING( 46 ), GET_STRING( 47 ), GET_STRING( 48 )  */ };
-
+    
     void bagViewer::initUI( ) {
         _bagUI->init( );
         _ranges = _bagUI->drawBagPage( ( bag::bagType )SAVE::SAV->getActiveFile( ).m_lstBag, SAVE::SAV->getActiveFile( ).m_lstBagItem );
@@ -322,6 +320,8 @@ namespace BAG {
         if( itm->m_itemType == item::TM_HM )
             return 0;
 
+        const char* choices[ 5 ] = { GET_STRING( 44 ), GET_STRING( 45 ), GET_STRING( 46 ), GET_STRING( 47 ), GET_STRING( 48 ) };
+
         IO::choiceBox cb( 1 + useable( CURRENT_ITEM.first ), choices + 2
                           + ( itm->m_itemType != item::KEY_ITEM ), 0, true );
         _bagUI->drawPkmnIcons( );
@@ -424,6 +424,7 @@ namespace BAG {
                             useItemOnPkmn( pkm, _ranges[ start ].second.m_item );
                         else if( itm->getEffectType( ) == item::itemEffectType::USE_ON_PKMN
                                  || itm->m_itemType == item::MEDICINE ) {
+                            const char* choices[ 5 ] = { GET_STRING( 44 ), GET_STRING( 45 ), GET_STRING( 46 ), GET_STRING( 47 ), GET_STRING( 48 ) };
                             IO::choiceBox cb( 2, choices, 0, true );
                             sprintf( buffer, GET_STRING( 57 ), itm->getDisplayName( true ).c_str( ) );
                             _bagUI->drawPkmnIcons( );
