@@ -175,19 +175,19 @@ namespace BATTLE {
             cmd( { IS_ALIVE( OWN1 ), NO_WEATHER( OWN2 ), NO_WEATHER( OPPONENT1 ), NO_WEATHER( OPPONENT2 ), //Dry skin
                                     EQ( OWN1, PKMN_ABILITY, A_DRY_SKIN ), NEQ( OWN1, PKMN_HP_PERCENT, 100 ) },
                  cmd::OWN1, cmd::PKMN_HP, cmd::ADD, val( cmd::OWN1, cmd::PKMN_MAX_HP, -1.0f / 8 ),
-                "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]KP von [OWN1]\nregenerieren sich.[A]" ),
+                "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OWN1].[A]" ),
             cmd( { IS_DOUBLE, IS_ALIVE( OWN2 ), NO_WEATHER( OWN1 ), NO_WEATHER( OPPONENT1 ), NO_WEATHER( OPPONENT2 ),
                                     EQ( OWN2, PKMN_ABILITY, A_DRY_SKIN ), NEQ( OWN2, PKMN_HP_PERCENT, 100 ) },
                 cmd::OWN2, cmd::PKMN_HP, cmd::ADD, val( cmd::OWN2, cmd::PKMN_MAX_HP, -1.0f / 8 ),
-                "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]KP von [OWN2]\nregenerieren sich.[A]" ),
+                "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OWN2].[A]" ),
             cmd( { IS_ALIVE( OPPONENT1 ), NO_WEATHER( OWN2 ), NO_WEATHER( OWN1 ), NO_WEATHER( OPPONENT2 ),
                                     EQ( OPPONENT1, PKMN_ABILITY, A_DRY_SKIN ), NEQ( OPPONENT1, PKMN_HP_PERCENT, 100 ) },
                 cmd::OPPONENT1, cmd::PKMN_HP, cmd::ADD, val( cmd::OPPONENT1, cmd::PKMN_MAX_HP, -1.0f / 8 ),
-                "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]KP von [OPP1]\nregenerieren sich.[A]" ),
+                "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OPP1].[A]" ),
             cmd( { IS_DOUBLE, IS_ALIVE( OPPONENT2 ), NO_WEATHER( OWN1 ), NO_WEATHER( OPPONENT1 ), NO_WEATHER( OWN2 ),
                                     EQ( OPPONENT2, PKMN_ABILITY, A_DRY_SKIN ), NEQ( OPPONENT2, PKMN_HP_PERCENT, 100 ) },
                 cmd::OPPONENT2, cmd::PKMN_HP, cmd::ADD, val( cmd::OPPONENT2, cmd::PKMN_MAX_HP, -1.0f / 8 ),
-                "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]KP von [OPP2]\nregenerieren sich.[A]" ),
+                "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OPP2].[A]" ),
 
             cmd( { IS_ALIVE( OWN1 ), NO_WEATHER( OWN2 ), NO_WEATHER( OPPONENT1 ), NO_WEATHER( OPPONENT2 ), //Solar power
                                     EQ( OWN1, PKMN_ABILITY, A_SOLAR_POWER ), NEQ( OWN1, PKMN_HP_PERCENT, 100 ) },

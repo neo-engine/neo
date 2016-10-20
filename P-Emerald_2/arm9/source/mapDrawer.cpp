@@ -37,6 +37,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "saveGame.h"
 #include "battleWeather.h"
 #include "battle.h"
+#include "battleTrainer.h"
 
 #include "BigCirc1.h"
 
@@ -432,8 +433,14 @@ namespace MAP {
         swiWaitForVBlank( );
         IO::NAV->togglePower( );
         IO::NAV->draw( );
-        BATTLE::battle( SAVE::SAV->getActiveFile( ).getBattleTrainer( ), wildPkmn, weat, platform, plat2, battleBack ).start( );
-        SAVE::SAV->getActiveFile( ).updateTeam( );
+        _slices[ 0 ][ 0 ] = 0;
+        _slices[ 0 ][ 1 ] = 0; 
+        _slices[ 1 ][ 0 ] = 0;
+        _slices[ 1 ][ 1 ] = 0;
+        BATTLE::battleTrainer* bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
+        BATTLE::battle( bt, wildPkmn, weat, platform, plat2, battleBack ).start( );
+        SAVE::SAV->getActiveFile( ).updateTeam( bt );
+        delete bt;
         FADE_TOP_DARK( );
         draw( playerPrio );
         ANIMATE_MAP = true;

@@ -152,7 +152,7 @@ struct pokemonData {
     u8              m_stage; //0: Basic, 1: Stage 1, 2: Stage 2, 3 Restored (m_preEvolution: itemIdx)
 };
 
-const char*     getDisplayName( u16 p_pkmnId );
+std::string     getDisplayName( u16 p_pkmnId );
 void            getDisplayName( u16 p_pkmnId, char* p_name );
 bool            getAll( u16 p_pkmnId, pokemonData& out );
 

@@ -192,23 +192,23 @@ namespace DEX {
         if( data.m_formecnt )
             IO::boldFont->printString( p_formeName.c_str( ), 58, 157, false, IO::font::CENTER );
         else if( p_hasGenderDifference && ( p_forme % 2 ) )
-            IO::boldFont->printString( "weiblich", 58, 157, false, IO::font::CENTER );
+            IO::boldFont->printString( GET_STRING( 133 ), 58, 157, false, IO::font::CENTER );
         else if( p_hasGenderDifference )
-            IO::boldFont->printString( "männlich", 58, 157, false, IO::font::CENTER );
+            IO::boldFont->printString( GET_STRING( 134 ), 58, 157, false, IO::font::CENTER );
         else
-            IO::boldFont->printString( getDisplayName( p_pkmnId ), 58, 157, false, IO::font::CENTER );
+            IO::boldFont->printString( getDisplayName( p_pkmnId ).c_str( ), 58, 157, false, IO::font::CENTER );
 
         tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 110, 64,
                                       PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true, p_hasGenderDifference && ( p_forme % 2 ) );
         if( data.m_formecnt )
             IO::boldFont->printString( p_formeName.c_str( ), 158, 150, false, IO::font::CENTER );
         else if( p_hasGenderDifference && ( p_forme % 2 ) )
-            IO::boldFont->printString( "weiblich", 158, 150, false, IO::font::CENTER );
+            IO::boldFont->printString( GET_STRING( 133 ), 158, 150, false, IO::font::CENTER );
         else if( p_hasGenderDifference )
-            IO::boldFont->printString( "männlich", 158, 150, false, IO::font::CENTER );
+            IO::boldFont->printString( GET_STRING( 134 ), 158, 150, false, IO::font::CENTER );
         else
-            IO::boldFont->printString( getDisplayName( p_pkmnId ), 158, 150, false, IO::font::CENTER );
-        IO::boldFont->printString( "(schillernd)", 158, 166, false, IO::font::CENTER );
+            IO::boldFont->printString( getDisplayName( p_pkmnId ).c_str( ), 158, 150, false, IO::font::CENTER );
+        IO::boldFont->printString( GET_STRING( 135 ), 158, 166, false, IO::font::CENTER );
 
         //Load Icons of the other formes ( max 4 )
         if( !data.m_formecnt ) {
@@ -309,7 +309,7 @@ namespace DEX {
                     IO::loadPKMNIcon( data.m_preEvolution, 8, 20, PKMN_SPRITE_START( 2 ), 2,
                                       IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                     consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                    printf( "aus %s", getDisplayName( data.m_preEvolution ) );
+                    printf( GET_STRING( 132 ), getDisplayName( data.m_preEvolution ).c_str( ) );
                     break;
                 case 2:
                     if( p_page == 0 ) {
@@ -322,7 +322,7 @@ namespace DEX {
                     IO::loadPKMNIcon( data.m_preEvolution, 8, 20, PKMN_SPRITE_START( 2 ), 2,
                                       IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                     consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                    printf( "aus %s", getDisplayName( data.m_preEvolution ) );
+                    printf( GET_STRING( 132 ), getDisplayName( data.m_preEvolution ).c_str( ) );
                     break;
                 case 3:
                 default:
@@ -336,7 +336,7 @@ namespace DEX {
                     IO::loadItemIcon( ItemList[ data.m_preEvolution ]->m_itemName, 8, 20, PKMN_SPRITE_START( 2 ), 2,
                                       IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                     consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                    printf( "aus %s", ItemList[ data.m_preEvolution ]->m_itemName.c_str( ) );
+                    printf( GET_STRING( 132 ), ItemList[ data.m_preEvolution ]->m_itemName.c_str( ) );
                     break;
             }
             switch( data.m_types[ 0 ] ) {
@@ -427,17 +427,18 @@ namespace DEX {
 
                     IO::OamTop->oamBuffer[ i + STAR_START ].isHidden = ( bs < 60 + 20 * ( i % 5 ) );
                 }
-                IO::regularFont->printString( "KP", 80, 49, false, IO::font::RIGHT );
-                IO::regularFont->printString( "Angriff", 80, 74, false, IO::font::RIGHT );
-                IO::regularFont->printString( "Sp.-Angr", 80, 99, false, IO::font::RIGHT );
+                IO::regularFont->printString( GET_STRING( 126 ), 80, 49, false, IO::font::RIGHT );
+                IO::regularFont->printString( GET_STRING( 127 ), 80, 74, false, IO::font::RIGHT );
+                IO::regularFont->printString( GET_STRING( 130 ), 80, 99, false, IO::font::RIGHT );
 
-                IO::regularFont->printString( "Initiative", 176, 49, false );
-                IO::regularFont->printString( "Vert", 176, 74, false );
-                IO::regularFont->printString( "Sp.-Vert", 176, 99, false );
+                IO::regularFont->printString( GET_STRING( 129 ), 176, 49, false );
+                IO::regularFont->printString( GET_STRING( 128 ), 176, 74, false );
+                IO::regularFont->printString( GET_STRING( 131 ), 176, 99, false );
 
                 IO::regularFont->setColor( BLACK_IDX, 1 );
                 IO::regularFont->setColor( WHITE_IDX, 2 );
-                IO::regularFont->printString( FS::breakString( data.m_dexEntry, IO::regularFont, 224 ).c_str( ), 16, 134, false, IO::font::LEFT, 12 );
+                IO::regularFont->printString( NO_DATA /* FS::breakString( data.m_dexEntry, IO::regularFont, 224 ).c_str( ) */,
+                                              16, 134, false, IO::font::LEFT, 12 );
 
                 consoleSetWindow( &IO::Top, 3, 22, 32, 23 );
                 if( strlen( data.m_species ) >= 13 )
@@ -504,7 +505,7 @@ namespace DEX {
                 IO::regularFont->setColor( BLACK_IDX, 1 );
                 IO::regularFont->setColor( 0, 2 );
                 setCghtVis( false );
-                IO::regularFont->printString( "Einträge", 2, 0, true );
+                IO::regularFont->printString( GET_STRING( 124 ), 2, 0, true );
                 for( u8 i = 0; i < 5; ++i ) {
                     u16 id = p_pkmnIdcs[ ( p_idxStart + i ) % 5 ] % ( MAX_PKMN + 1 );
 
@@ -520,7 +521,7 @@ namespace DEX {
                     loadPkmnIconToSlot( inDex * id, i, false );
                     sprintf( buffer, "%03d", id );
                     IO::boldFont->printString( buffer, 32, 28 + 32 * i, true );
-                    IO::boldFont->printString( getDisplayName( id ), 100, 28 + 32 * i, true );
+                    IO::boldFont->printString( getDisplayName( id ).c_str( ), 100, 28 + 32 * i, true );
 
                     if( i == p_selectedIdx ) {
                         pokemonData p; getAll( id, p );
@@ -533,7 +534,7 @@ namespace DEX {
             case dex::SHOW_ALL:
                 setAllVis( false );
 
-                IO::regularFont->printString( "Alle", 2, 0, true );
+                IO::regularFont->printString( GET_STRING( 125 ), 2, 0, true );
                 if( p_oldIdx )
                     IO::printRectangle( IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].x + 3,
                                         IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].y + 2,

@@ -106,7 +106,7 @@ namespace BAG {
                     initUI( );
                     swiWaitForVBlank( );
 
-                    sprintf( buffer, GET_STRING( 52 ), getDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
+                    sprintf( buffer, GET_STRING( 52 ), getDisplayName( p_pokemon.m_boxdata.m_speciesId ).c_str( ) );
                     IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -142,7 +142,7 @@ namespace BAG {
                 initUI( );
                 swiWaitForVBlank( );
 
-                sprintf( buffer, GET_STRING( 52 ), getDisplayName( p_pokemon.m_boxdata.m_speciesId ) );
+                sprintf( buffer, GET_STRING( 52 ), getDisplayName( p_pokemon.m_boxdata.m_speciesId ).c_str( ) );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;

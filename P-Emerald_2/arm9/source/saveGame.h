@@ -48,7 +48,6 @@ namespace SAVE {
 #define MAX_SPECIAL_EPISODES 1
     extern const char* const CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ];
     extern const char* EPISODE_NAMES[ LANGUAGES ][ MAX_SPECIAL_EPISODES ];
-    extern std::vector<pokemon> tmp;
 
     enum gameType {
         UNUSED = 0,
@@ -120,7 +119,7 @@ namespace SAVE {
             u8          getTeamPkmnCount( );
 
             BATTLE::battleTrainer* getBattleTrainer( );
-            void        updateTeam( );
+            void        updateTeam( BATTLE::battleTrainer* p_trainer );
         } m_saveFile[ MAX_SAVE_FILES ];
 
         u8          m_activeFile;

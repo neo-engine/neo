@@ -209,13 +209,14 @@ namespace BATTLE {
         }
     }
     void undrawPkmnInfo1( u8 p_hpx, u8 p_hpy ) {
-        IO::printRectangle( p_hpx - 88, p_hpy + 4, p_hpx, p_hpy + 30, false, false, 0 );
+        IO::printRectangle( p_hpx - 88, p_hpy + 4, p_hpx - 2, p_hpy + 30, false, false, 0 );
     }
     void undrawPkmnInfo2( u8 p_hpx, u8 p_hpy ) {
-        IO::printRectangle( p_hpx + 32, p_hpy + 4, p_hpx + 120, p_hpy + 30, false, false, 0 );
+        IO::printRectangle( p_hpx + 32, p_hpy + 4, p_hpx + 118, p_hpy + 30, false, false, 0 );
     }
     void drawPkmnInfo1( u8 p_hpx, u8 p_hpy, pokemon p_pokemon, u8 p_hpCol ) {
         undrawPkmnInfo1( p_hpx, p_hpy );
+        IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_hpx - 12, p_hpy + 2, false, IO::font::RIGHT );
@@ -225,7 +226,7 @@ namespace BATTLE {
         IO::regularFont->setColor( GRAY_IDX, 1 );
         char bf2[ 20 ] = { 0 };
         sprintf( buffer, "Lv%hhu", p_pokemon.m_level );
-        sprintf( bf2, " %huKP", p_pokemon.m_stats.m_acHP );
+        sprintf( bf2, " %hu%s", p_pokemon.m_stats.m_acHP, GET_STRING( 126 ) );
         IO::regularFont->printString( buffer, p_hpx - IO::regularFont->stringWidth( bf2 ) - 2, p_hpy + 15, false, IO::font::RIGHT );
         IO::regularFont->setColor( WHITE_IDX, 1 );
         IO::regularFont->setColor( p_hpCol, 2 );
@@ -235,6 +236,7 @@ namespace BATTLE {
     }
     void drawPkmnInfo2( u8 p_hpx, u8 p_hpy, pokemon p_pokemon, u8 p_hpCol ) {
         undrawPkmnInfo2( p_hpx, p_hpy );
+        IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_hpx + 34, p_hpy + 2, false );
@@ -244,7 +246,7 @@ namespace BATTLE {
         IO::regularFont->setColor( GRAY_IDX, 1 );
         char bf2[ 20 ] = { 0 };
         sprintf( buffer, "Lv%hhu", p_pokemon.m_level );
-        sprintf( bf2, " %huKP", p_pokemon.m_stats.m_acHP );
+        sprintf( bf2, " %hu%s", p_pokemon.m_stats.m_acHP, GET_STRING( 126 ) );
         IO::regularFont->printString( buffer, p_hpx + 34, p_hpy + 15, false );
         IO::regularFont->setColor( WHITE_IDX, 1 );
         IO::regularFont->setColor( p_hpCol, 2 );
@@ -658,6 +660,7 @@ namespace BATTLE {
             IO::displayHP( 100, 100 - acPkmn.m_stats.m_acHP * 100 / acPkmn.m_stats.m_maxHP,
                            hpx, hpy, HP_COL( OPPONENT, 0 ), HP_COL( OPPONENT, 0 ) + 1, false );
 
+            IO::displayEP( 100, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
             IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
                 ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
                            hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
@@ -1077,6 +1080,7 @@ namespace BATTLE {
                            46, 40, 238, 239, false, 59, 62, true );
             IO::boldFont->setColor( GRAY_IDX, 1 );
             IO::boldFont->setColor( BLACK_IDX, 2 );
+            IO::boldFont->setColor( 0, 0 );
 
             consoleSetWindow( &IO::Bottom, 2, 1, 13, 2 );
 
@@ -1097,7 +1101,7 @@ namespace BATTLE {
             IO::boldFont->setColor( BLACK_IDX, 2 );
 
 
-            IO::boldFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
+            IO::boldFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ).c_str( ), 24, 110, true );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::boldFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
@@ -1124,6 +1128,7 @@ namespace BATTLE {
             tilecnt = IO::loadEggSprite( 26, 24, ++oamIndex, ++palIndex, tilecnt, true );
             IO::boldFont->setColor( GRAY_IDX, 1 );
             IO::boldFont->setColor( BLACK_IDX, 2 );
+            IO::boldFont->setColor( 0, 0 );
 
             IO::boldFont->printString( "Ei /", 16, 96, true );
             IO::boldFont->printString( "Ei", 24, 110, true );
@@ -1511,7 +1516,7 @@ NEXT_TRY:
     u16 battleUI::chooseAttack( u8 p_pokemonPos ) {
         u16 result = 0;
 
-        writeLogText( "Welche Attacke?" );
+        writeLogText( GET_STRING( 49 ) );
 
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
 
@@ -1541,9 +1546,10 @@ NEXT_TRY:
                 tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 7, y - 7, ++oamIndex, palIndex++, tilecnt, true );
                 tilecnt = IO::loadDamageCategoryIcon( acMove->m_moveHitType, x + 25, y - 7, ++oamIndex, palIndex++, tilecnt, true );
 
-                sprintf( buffer, "%6hhu/%2hhu AP",
+                sprintf( buffer, "%6hhu/%2hhu %s",
                          acPkmn.m_boxdata.m_acPP[ i ],
-                         s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                         s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ),
+                         GET_STRING( 31 ) );
                 IO::regularFont->setColor( 0, 2 );
                 IO::regularFont->printString( buffer, x + w - 4, y + h - 14, true, IO::font::RIGHT );
                 IO::regularFont->setColor( GRAY_IDX, 2 );
@@ -1575,9 +1581,10 @@ NEXT:
 
                     IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 9, y + 8, true );
 
-                    sprintf( buffer, "%6hhu/%2hhu AP",
+                    sprintf( buffer, "%6hhu/%2hhu %s",
                              acPkmn.m_boxdata.m_acPP[ i ],
-                             s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                             s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ),
+                             GET_STRING( 31 ) );
                     IO::regularFont->setColor( 0, 2 );
                     IO::regularFont->printString( buffer, x + w - 2, y + h - 13, true, IO::font::RIGHT );
                     IO::regularFont->setColor( GRAY_IDX, 2 );
@@ -2208,6 +2215,7 @@ CLEAR:
         IO::displayHP( 100, 100 - acPkmn.m_stats.m_acHP * 100 / acPkmn.m_stats.m_maxHP,
                        hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
 
+        IO::displayEP( 100, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
         IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
             ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
                        hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );

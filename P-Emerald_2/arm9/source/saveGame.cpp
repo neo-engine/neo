@@ -36,7 +36,6 @@
 #include "battleTrainer.h"
 
 namespace SAVE {
-    std::vector<pokemon> tmp;
     std::unique_ptr<saveGame> SAV;
 
 #define PKMN_DATALENGTH 128
@@ -124,19 +123,18 @@ namespace SAVE {
     }
 
     BATTLE::battleTrainer* saveGame::playerInfo::getBattleTrainer( ) {
-        tmp.clear( );
+        std::vector<pokemon> tmp;
         for( u8 i = 0; i < 6; ++i )
             if( m_pkmnTeam[ i ].m_boxdata.m_speciesId )
                 tmp.push_back( m_pkmnTeam[ i ] );
             else
                 break;
 
-        static BATTLE::battleTrainer res( std::string( m_playername ), "", "", "", "", tmp );
-        return &res;
+        return new BATTLE::battleTrainer( std::string( m_playername ), "", "", "", "", tmp );
     }
-    void        saveGame::playerInfo::updateTeam( ) {
-        for( u8 i = 0; i < tmp.size( ); ++i )
-            m_pkmnTeam[ i ] = tmp[ i ];
+    void        saveGame::playerInfo::updateTeam( BATTLE::battleTrainer* p_trainer ) {
+        for( u8 i = 0; i < p_trainer->m_pkmnTeam.size( ); ++i )
+            m_pkmnTeam[ i ] = p_trainer->m_pkmnTeam[ i ];
     }
 
     u16         saveGame::getDexCount( ) {

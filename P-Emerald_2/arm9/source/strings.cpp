@@ -58,7 +58,7 @@ const char* const SAVE::CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ] = {
 };
 
 const char* SAVE::EPISODE_NAMES[ LANGUAGES ][ MAX_SPECIAL_EPISODES ] = {
-    { 
+    {
         "Dev's Heaven"
     }, {
         "Dev's Heaven"
@@ -244,5 +244,25 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Proceed?", "Fortfahren?" },
     { "Importing data…", "Lade Spielstand…" },
     { "An error occured.\nAborting.", "Ein Fehler ist aufgetreten.\nKehre zum Hauptmenü zurück." },
-    { "Completed.", "Abgeschlossen." }
+    { "Completed.", "Abgeschlossen." },
+    { "Entries", "Einträge" },
+
+    { "All", "Alle" },
+    { "HP", "KP" },
+    { "Attack", "Angriff" },
+    { "Defense", "Vert" },
+    { "Speed", "Initiative" },
+
+    // 130
+
+    { "Sp. Atk", "Sp.-Angr" },
+    { "Sp. Def", "Sp.-Vert" },
+    { "f. %s", "aus %s" },
+    { "female", "weiblich" },
+    { "male", "männlich" },
+
+    { "(shining)", "(schillernd)" },
+    { "Fainted", "Besiegt" },
+    { "Statistics", "Statuswerte" },
+    { "Stats at lv.%3i:", "Status auf Lv.%3i:" }
 };

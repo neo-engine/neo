@@ -178,9 +178,11 @@ namespace STS {
 
                 IO::regularFont->setColor( HP_COL + 2 * i, 2 );
                 if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP )
-                    sprintf( buffer, "%hi/%hiKP", SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP, SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP );
+                    sprintf( buffer, "%hi/%hi%s", SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP,
+                             SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP,
+                             GET_STRING( 126 ) );
                 else
-                    sprintf( buffer, "Besiegt" );
+                    sprintf( buffer, GET_STRING( 136 ) );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy, false );
                 IO::regularFont->setColor( GRAY_IDX, 2 );
 
@@ -188,7 +190,7 @@ namespace STS {
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy + 14, false );
 
             } else {
-                sprintf( buffer, "Ei" );
+                sprintf( buffer, GET_STRING( 34 ) );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy - 7, false );
 
                 sprintf( buffer, "%s", ItemList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
@@ -340,14 +342,14 @@ namespace STS {
 
             IO::displayEP( 100, 101, 46, 76, HP_COL + 2, HP_COL + 3, false, 59, 62, p_bottom );
             IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
-                           ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ), 46, 76, HP_COL + 2, HP_COL + 3, false, 59, 62, p_bottom );
+                ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ), 46, 76, HP_COL + 2, HP_COL + 3, false, 59, 62, p_bottom );
 
             IO::regularFont->setColor( 0, 2 );
             IO::regularFont->setColor( HP_COL + 2, 1 );
             sprintf( buffer, "EP %lu%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
-                     ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) );
+                ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) );
             IO::regularFont->printString( buffer, 62, 28, p_bottom, IO::font::CENTER );
-            sprintf( buffer, "KP %i%%", p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
+            sprintf( buffer, "%s %i%%", GET_STRING( 126 ), p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::regularFont->printString( buffer, 62, 38, p_bottom, IO::font::CENTER );
             IO::regularFont->setColor( GRAY_IDX, 2 );
             IO::regularFont->setColor( BLACK_IDX, 1 );
@@ -356,9 +358,9 @@ namespace STS {
             pal[ WHITE_IDX ] = WHITE;
             IO::regularFont->setColor( BLACK_IDX, 1 );
 
-            IO::regularFont->printString( "Ei", 150, 0, p_bottom );
+            IO::regularFont->printString( GET_STRING( 34 ), 150, 0, p_bottom );
             IO::regularFont->printChar( '/', 234, 0, p_bottom );
-            IO::regularFont->printString( "Ei", 160, 13, p_bottom );
+            IO::regularFont->printString( GET_STRING( 34 ), 160, 13, p_bottom );
 
             IO::loadEggSprite( 29, 60, PKMN_SPRITE_START, PKMN_SPRITE_PAL, Oam->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, p_bottom );
             for( u8 i = 1; i < 4; ++i )
@@ -375,7 +377,7 @@ namespace STS {
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
                         0, -5, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
 
-        IO::regularFont->printString( "Statuswerte", 32, 0, p_bottom );
+        IO::regularFont->printString( GET_STRING( 137 ), 32, 0, p_bottom );
         if( !( currPkmn.m_boxdata.m_individualValues.m_isEgg ) ) {
 
             pal[ RED_IDX ] = RED;
@@ -384,7 +386,7 @@ namespace STS {
             pal[ BLUE2_IDX ] = BLUE2;
 
             char buffer[ 50 ];
-            sprintf( buffer, "Status auf Lv.%3i:", currPkmn.m_level );
+            sprintf( buffer, GET_STRING( 138 ), currPkmn.m_level );
             IO::regularFont->printString( buffer, 110, 30, p_bottom );
 
             sprintf( buffer, "KP                     %3i", currPkmn.m_stats.m_maxHP );
@@ -795,7 +797,7 @@ namespace STS {
 
         IO::regularFont->printString( nStr.c_str( ), 226, 39 - 7 * nlCnt, p_bottom, IO::font::RIGHT, 14 );
         IO::regularFont->printString( FS::breakString( ( currRb.m_description == "" ) ?
-                                                       ( currPkmn.m_boxdata.m_fateful ? "Ein Band für Pokémon-Freunde." : "Ein Gedenk-Band. An einem mysteriösen Ort erhalten." )
+            ( currPkmn.m_boxdata.m_fateful ? "Ein Band für Pokémon-Freunde." : "Ein Gedenk-Band. An einem mysteriösen Ort erhalten." )
                                                        : currRb.m_description, IO::regularFont, 120 ).c_str( ),
                                       250, 66, p_bottom, IO::font::RIGHT, 14 );
         IO::updateOAM( p_bottom );

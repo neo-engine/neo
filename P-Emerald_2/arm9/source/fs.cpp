@@ -438,8 +438,8 @@ std::string toString( u16 p_num ) {
     return std::string( buffer );
 }
 
-const char* getDisplayName( u16 p_pkmnId ) {
-    static pokemonData tmp;
+std::string getDisplayName( u16 p_pkmnId ) {
+    pokemonData tmp;
     if( !getAll( p_pkmnId, tmp ) ) {
         return "???";
     }

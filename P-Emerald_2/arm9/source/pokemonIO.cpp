@@ -461,7 +461,7 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
         m_stats.m_maxHP = 1;
 
     if( !m_boxdata.m_individualValues.m_isNicked )
-        strcpy( m_boxdata.m_name, getDisplayName( m_boxdata.m_speciesId ) );
+        strcpy( m_boxdata.m_name, getDisplayName( m_boxdata.m_speciesId ).c_str( ) );
 
     pkmnNatures nature = m_boxdata.getNature( );
     m_stats.m_Atk = ( ( ( m_boxdata.m_individualValues.m_attack + 2 * data.m_bases[ 1 ] + ( m_boxdata.m_effortValues[ 1 ] >> 2 ) )*m_level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];

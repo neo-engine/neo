@@ -98,13 +98,13 @@ namespace SAVE {
         char acSlot2Game[ 5 ] = { 0 };
 
         sysSetBusOwners( true, true );
-        memcpy( acSlot2Game, (char*) 0x080000AC, 3 );
+        memcpy( acSlot2Game, (char*) 0x080000AC, 4 );
 
         char cmpgm[ 5 ][ 4 ] = { "BPE", "AXP", "AXV", "BPR", "BPG" };
         s8 acgame = -1;
 
         for( u8 i = 0; i < 5; ++i )
-            if( !strcmp( cmpgm[ i ], acSlot2Game ) ) {
+            if( !strncmp( cmpgm[ i ], acSlot2Game, 3 ) ) {
                 acgame = i;
                 break;
             }

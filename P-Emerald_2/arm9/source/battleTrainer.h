@@ -45,8 +45,8 @@ namespace BATTLE {
 
         std::string         m_battleTrainerName;
         trainerClass        m_trainerClass;
-        std::vector<pokemon>& m_pkmnTeam;
-        std::pair<u16, u16>*m_items;         //if this is 0 and _itemCount == MAX_ITEMS_IN_BAG, then SAVE::SAV->getActiveFile( ).m_bag is used.
+        std::vector<pokemon> m_pkmnTeam;
+        std::pair<u16, u16>* m_items;         //if this is 0 and _itemCount == MAX_ITEMS_IN_BAG, then SAVE::SAV->getActiveFile( ).m_bag is used.
         u16                 m_itemCount;
     private:
         int                 _moneyEarned;
@@ -61,7 +61,7 @@ namespace BATTLE {
                        std::string p_msg2,
                        std::string p_msg3,
                        std::string p_msg4,
-                       std::vector<pokemon>& p_pkmnTeam,
+                       std::vector<pokemon> p_pkmnTeam,
                        std::pair<u16, u16>* p_items = 0,
                        u16 p_itemCnt = MAX_ITEMS_IN_BAG,
                        trainerClass p_trainerClass = PKMN_TRAINER )

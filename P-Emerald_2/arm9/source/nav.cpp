@@ -510,12 +510,13 @@ namespace IO {
                         }
                         BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm… Du bist gar nicht so schlecht…",
                                                    "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
-
-                        BATTLE::battle test_battle( SAVE::SAV->getActiveFile( ).getBattleTrainer( ), &opp, 100,
+                        auto bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
+                        BATTLE::battle test_battle( bt, &opp, 100,
                                                     BATTLE::weather( rand( ) % 9 ), 10, 0, 5, BATTLE::battle::DOUBLE );
                         ANIMATE_MAP = false;
                         test_battle.start( );
-                        SAVE::SAV->getActiveFile( ).updateTeam( );
+                        SAVE::SAV->getActiveFile( ).updateTeam( bt );
+                        delete bt;
                         break;
                     }
                     case 4:
@@ -531,11 +532,13 @@ namespace IO {
                         BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm… Du bist gar nicht so schlecht…",
                                                    "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
 
-                        BATTLE::battle test_battle( SAVE::SAV->getActiveFile( ).getBattleTrainer( ), &opp, 100,
+                        auto bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
+                        BATTLE::battle test_battle( bt, &opp, 100,
                                                     BATTLE::HAIL/*weather( rand( ) % 9 )*/, 10, 0, 5, BATTLE::battle::SINGLE );
                         ANIMATE_MAP = false;
                         test_battle.start( );
-                        SAVE::SAV->getActiveFile( ).updateTeam( );
+                        SAVE::SAV->getActiveFile( ).updateTeam( bt );
+                        delete bt;
                         break;
                     }
                     case 5:

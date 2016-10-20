@@ -437,7 +437,6 @@ CHOOSE1:
      *  @brief Initialize the battle.
      */
     void battle::initBattle( ) {
-        IO::messageBox( "HERE" );
         // INIT_NITROFS = true;
         // swiWaitForVBlank( );
 
@@ -448,7 +447,6 @@ CHOOSE1:
             _battleUI->_battle = this;
         _battleUI->init( );
 
-        log( "CP 2[A]" );
         pokemonData pdata;
         for( u8 i = 0; i < 6; ++i ) {
             if( _player->m_pkmnTeam.size( ) > i ) {
@@ -1892,7 +1890,7 @@ NEXT:
             acPkmn.evolve( );
             _battleUI->evolvePKMN( p_opponent, p_pokemonPos );
 
-            std::sprintf( buffer, "und wurde zu einem %s![A]", getDisplayName( acPkmn.m_boxdata.m_speciesId ) );
+            std::sprintf( buffer, "und wurde zu einem %s![A]", getDisplayName( acPkmn.m_boxdata.m_speciesId ).c_str( ) );
             log( buffer );
         }
     }
