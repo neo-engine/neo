@@ -368,7 +368,8 @@ namespace MAP {
 
         if( !CUR_SLICE->m_pokemon[ arridx ].first )
             return false;
-
+        
+        IO::fadeScreen( IO::BATTLE );
         pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
         BATTLE::weather weat = BATTLE::weather::NO_WEATHER;
         switch( _weather ) {
@@ -425,8 +426,6 @@ namespace MAP {
             else if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE )
                 battleBack = 19;
         }
-
-        IO::fadeScreen( IO::BATTLE );
 
         auto playerPrio = _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].getPriority( );
         ANIMATE_MAP = false;

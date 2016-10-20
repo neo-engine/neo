@@ -37,6 +37,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "saveGame.h"
 #include "mapSlice.h"
 
+#include "messageBox.h"
+
 namespace FS {
 #define MAXITEMSPERPAGE 12
 
@@ -51,10 +53,17 @@ namespace FS {
     size_t read( FILE* p_stream, void* p_buffer, size_t p_size, size_t p_count );
     size_t write( FILE* p_stream, const void* p_buffer, size_t p_size, size_t p_count );
 
-    // No, I'm absolutely not aware of templates.
-    bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt, unsigned short* p_data );
-    bool readData( const char* p_path, const char* p_name, const unsigned int p_dataCnt1, unsigned int* p_data1, const unsigned short p_dataCnt2, unsigned short* p_data2 );
-    bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt1, unsigned short* p_data1, const unsigned int p_dataCnt2, unsigned int* p_data2 );
+    bool readData( const char* p_path, const char* p_name, unsigned short p_dataCnt, unsigned short* p_data );
+    template<typename T1, typename T2>
+    bool readData( const char* p_path, const char* p_name, T1 p_dataCnt1, T1* p_data1, T2 p_dataCnt2, T2* p_data2 ) {
+        FILE* fd = open( p_path, p_name );
+        if( !fd )
+            return false;
+        read( fd, p_data1, sizeof( T1 ), p_dataCnt1 );
+        read( fd, p_data2, sizeof( T2 ), p_dataCnt2 );
+        close( fd );
+        return true;
+    }
 
     bool readNop( FILE* p_file, u32 p_cnt );
     bool readPal( FILE* p_file, MAP::palette* p_palette );
@@ -72,7 +81,7 @@ namespace FS {
     bool readPictureData( u16* p_layer, const char* p_Path, const char* p_name, u16 p_paletteSize, u16 p_palStart, u32 p_tileCnt, bool p_bottom );
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt, bool p_bottom = false );
 
-    const char* getLocation( u16 p_ind );
+    std::string getLocation( u16 p_ind );
 
     std::unique_ptr<SAVE::saveGame> readSave( const char* p_path );
     bool writeSave( std::unique_ptr<SAVE::saveGame>& p_saveGame, const char* p_path );

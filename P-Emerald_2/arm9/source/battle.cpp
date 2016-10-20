@@ -98,8 +98,6 @@ namespace BATTLE {
         "Ingrain"
     };
 
-    battleUI*    battle::_battleUI;
-
     //////////////////////////////////////////////////////////////////////////
     // BEGIN BATTLE
     //////////////////////////////////////////////////////////////////////////
@@ -297,6 +295,8 @@ namespace BATTLE {
         m_platformId = p_platform;
         m_platform2Id = p_platform2 == u8( -1 ) ? p_platform : p_platform2;
         m_backgroundId = p_background;
+
+        _battleUI = new battleUI( this );
     }
     battle::battle( battleTrainer* p_player, pokemon p_opponent, weather p_weather, u8 p_platform, u8 p_platform2, u8 p_background )
         : _player( p_player ), _opponent( 0 ) {
@@ -317,6 +317,8 @@ namespace BATTLE {
         m_battleMode = SINGLE;
         m_isWildBattle = true;
         m_distributeEXP = true;
+
+        _battleUI = new battleUI( this );
     }
 
 
@@ -430,6 +432,8 @@ CHOOSE1:
         }
 
         _battleUI->_battle = 0;
+        delete _battleUI;
+        _battleUI = 0;
         return battleEnd;
     }
 
@@ -437,14 +441,7 @@ CHOOSE1:
      *  @brief Initialize the battle.
      */
     void battle::initBattle( ) {
-        // INIT_NITROFS = true;
-        // swiWaitForVBlank( );
-
          //Some basic initialization stuff
-        if( !_battleUI )
-            _battleUI = new battleUI( this );
-        else
-            _battleUI->_battle = this;
         _battleUI->init( );
 
         pokemonData pdata;

@@ -86,6 +86,7 @@ namespace SAVE {
             // Map stuff
             MAP::mapObject m_player;
             u8          m_currentMap;
+            u8          m_stepCount;
 
             u8          m_curBox;
 

@@ -313,8 +313,8 @@ namespace IO {
 
         u8 maxSize = std::max( p_width, p_height );
         spriteEntry->size = ( ( maxSize == 64 ) ? OBJSIZE_64 :
-                              ( ( maxSize == 32 ) ? OBJSIZE_32 :
-                                ( ( maxSize == 16 ) ? OBJSIZE_16 : OBJSIZE_8 ) ) );
+            ( ( maxSize == 32 ) ? OBJSIZE_32 :
+                              ( ( maxSize == 16 ) ? OBJSIZE_16 : OBJSIZE_8 ) ) );
 
         copySpriteData( p_spriteData, p_tileIdx, p_spriteDataLen, p_bottom );
         copySpritePal( p_spritePal, p_palIdx, p_bottom );
@@ -354,8 +354,8 @@ namespace IO {
 
         u8 maxSize = std::max( p_width, p_height );
         spriteEntry->size = ( ( maxSize == 64 ) ? OBJSIZE_64 :
-                              ( ( maxSize == 32 ) ? OBJSIZE_32 :
-                                ( ( maxSize == 16 ) ? OBJSIZE_16 : OBJSIZE_8 ) ) );
+            ( ( maxSize == 32 ) ? OBJSIZE_32 :
+                              ( ( maxSize == 16 ) ? OBJSIZE_16 : OBJSIZE_8 ) ) );
 
 
         //Attention! The following code is not meant to be read.
@@ -400,23 +400,25 @@ namespace IO {
 
     u16 loadPKMNSprite( const char* p_path, const u16 p_pkmnId, const s16 p_posX,
                         const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx, bool p_topOnly ) {
-        char buffer[ 100 ];
+        char* buffer = new char[ 100 ];
         if( !p_female )
-            sprintf( buffer, "%d/%d", p_pkmnId, p_pkmnId );
+            snprintf( buffer, 99, "%d/%d", p_pkmnId, p_pkmnId );
         else
-            sprintf( buffer, "%d/%df", p_pkmnId, p_pkmnId );
+            snprintf( buffer, 99, "%d/%df", p_pkmnId, p_pkmnId );
 
         memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
         memset( TEMP, 0, sizeof( TEMP ) );
 
-        if( !FS::readData( p_path, buffer, (unsigned short) ( 16 ), TEMP_PAL, (unsigned int) ( 96 * 96 ), TEMP ) )
+        if( !FS::readData<unsigned short, unsigned int>( p_path, buffer, 16, TEMP_PAL, 96 * 96 / 8, TEMP ) ) {
+            delete[ ] buffer;
             return false;
+        }
 
         if( p_shiny ) {
             if( !p_female )
-                sprintf( buffer, "%d/%ds", p_pkmnId, p_pkmnId );
+                snprintf( buffer, 99, "%d/%ds", p_pkmnId, p_pkmnId );
             else
-                sprintf( buffer, "%d/%dsf", p_pkmnId, p_pkmnId );
+                snprintf( buffer, 99, "%d/%dsf", p_pkmnId, p_pkmnId );
             FS::readData( p_path, buffer, (unsigned short) ( 16 ), TEMP_PAL );
         }
 
@@ -431,6 +433,7 @@ namespace IO {
                         32, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
         }
         updateOAM( p_bottom );
+        delete[ ] buffer;
         return p_tileCnt + 144;
     }
     u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
@@ -440,14 +443,16 @@ namespace IO {
 
     u16 loadTrainerSprite( const char* p_path, const char* p_name, const s16 p_posX,
                            const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_flipx, bool p_topOnly ) {
-        char buffer[ 100 ];
-        sprintf( buffer, "Sprite_%s", p_name );
+        char* buffer = new char[ 100 ];
+        snprintf( buffer, 99, "Sprite_%s", p_name );
 
         memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
         memset( TEMP, 0, sizeof( TEMP ) );
 
-        if( !FS::readData( p_path, buffer, (unsigned short) ( 16 ), TEMP_PAL, (unsigned int) ( 96 * 96 ), TEMP ) )
+        if( !FS::readData<unsigned short, unsigned int>( p_path, buffer, 16, TEMP_PAL, 96 * 96 / 8, TEMP ) ) {
+            delete[ ] buffer;
             return false;
+        }
 
         loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY,
                     64, 64, TEMP_PAL, TEMP, 96 * 96 / 2, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
@@ -460,6 +465,7 @@ namespace IO {
                         32, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
         }
         updateOAM( p_bottom );
+        delete[ ] buffer;
         return p_tileCnt + 144;
     }
 
@@ -516,15 +522,19 @@ namespace IO {
     }
 
     u16 loadPKMNIcon( const u16 p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
-        char buffer[ 100 ];
-        sprintf( buffer, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
-        return loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+        char* buffer = new char[ 100 ];
+        snprintf( buffer, 99, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
+        auto res = loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+        delete[ ] buffer;
+        return res;
     }
 
     u16 loadPKMNIcon( const u16 p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom ) {
-        char buffer[ 100 ];
-        sprintf( buffer, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
-        return loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos, p_tileCnt, p_bottom );
+        char* buffer = new char[ 100 ];
+        snprintf( buffer, 99, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
+        auto res = loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos, p_tileCnt, p_bottom );
+        delete[ ] buffer;
+        return res;
     }
 
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {

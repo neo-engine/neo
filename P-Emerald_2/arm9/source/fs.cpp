@@ -91,10 +91,10 @@ namespace FS {
         return true;
     }
     bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name ) {
-        char buffer[ 100 ];
-        sprintf( buffer, "%s%d/%d%s.raw", p_path, p_pkmnIdx, p_pkmnIdx, p_name );
+        char* buffer = new char[ 100 ];
+        snprintf( buffer, 99, "%s%d/%d%s.raw", p_path, p_pkmnIdx, p_pkmnIdx, p_name );
         FILE* fd = fopen( buffer, "rb" );
-
+        delete[ ] buffer;
         if( fd == 0 ) {
             fclose( fd );
             return false;
@@ -104,14 +104,18 @@ namespace FS {
     }
 
     FILE* open( const char* p_path, const char* p_name, const char* p_ext, const char* p_mode ) {
-        char buffer[ 100 ];
-        sprintf( buffer, "%s%s%s", p_path, p_name, p_ext );
-        return fopen( buffer, p_mode );
+        char* buffer = new char[ 100 ];
+        snprintf( buffer, 99, "%s%s%s", p_path, p_name, p_ext );
+        auto res = fopen( buffer, p_mode );
+        delete[ ] buffer;
+        return res;
     }
     FILE* open( const char* p_path, u16 p_value, const char* p_ext, const char* p_mode ) {
-        char buffer[ 100 ];
-        sprintf( buffer, "%s%d%s", p_path, p_value, p_ext );
-        return fopen( buffer, p_mode );
+        char* buffer = new char[ 100 ];
+        snprintf( buffer, 99, "%s%d%s", p_path, p_value, p_ext );
+        auto res = fopen( buffer, p_mode );
+        delete[ ] buffer;
+        return res;
     }
     void close( FILE* p_file ) {
         fclose( p_file );
@@ -127,7 +131,7 @@ namespace FS {
         return fwrite( p_buffer, p_size, p_count, p_stream );
     }
 
-    bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt, unsigned short* p_data ) {
+    bool readData( const char* p_path, const char* p_name, unsigned short p_dataCnt, unsigned short* p_data ) {
         FILE* fd = open( p_path, p_name );
         if( !fd )
             return false;
@@ -136,29 +140,8 @@ namespace FS {
         return true;
     }
 
-    bool readData( const char* p_path, const char* p_name, const unsigned short p_dataCnt1,
-                   unsigned short* p_data1, unsigned int p_dataCnt2, unsigned int* p_data2 ) {
-        FILE* fd = open( p_path, p_name );
-        if( !fd )
-            return false;
-        read( fd, p_data1, sizeof( unsigned short ), p_dataCnt1 );
-        read( fd, p_data2, sizeof( unsigned int ), p_dataCnt2 );
-        close( fd );
-        return true;
-    }
-    bool readData( const char* p_path, const char* p_name, const unsigned int p_dataCnt1,
-                   unsigned int* p_data1, unsigned short p_dataCnt2, unsigned short* p_data2 ) {
-        FILE* fd = open( p_path, p_name );
-        if( !fd )
-            return false;
-        read( fd, p_data1, sizeof( unsigned int ), p_dataCnt1 );
-        read( fd, p_data2, sizeof( unsigned short ), p_dataCnt2 );
-        close( fd );
-        return true;
-    }
-
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name, const u32 p_tileCnt, const u16 p_palCnt, bool p_bottom ) {
-        if( !readData( p_path, p_name, (unsigned int) p_tileCnt, TEMP, (unsigned short) p_palCnt, TEMP_PAL ) )
+        if( !readData<unsigned int, unsigned short>( p_path, p_name, p_tileCnt, TEMP, p_palCnt, TEMP_PAL ) )
             return false;
 
         IO::copySpriteData( TEMP, p_spriteInfo->m_entry->gfxIndex, 4 * p_tileCnt, p_bottom );
@@ -167,7 +150,7 @@ namespace FS {
     }
 
     bool readPictureData( u16* p_layer, const char* p_path, const char* p_name, u16 p_palSize, u32 p_tileCnt, bool p_bottom ) {
-        if( !readData( p_path, p_name, (unsigned int) ( 12288 ), TEMP, (unsigned short) ( 256 ), TEMP_PAL ) )
+        if( !readData<unsigned int, unsigned short>( p_path, p_name, 12288, TEMP, 256, TEMP_PAL ) )
             return false;
 
         dmaCopy( TEMP, p_layer, p_tileCnt );
@@ -179,7 +162,7 @@ namespace FS {
     }
 
     bool readPictureData( u16* p_layer, const char* p_path, const char* p_name, u16 p_palSize, u16 p_palStart, u32 p_tileCnt, bool p_bottom ) {
-        if( !readData( p_path, p_name, (unsigned int) ( 12288 ), TEMP, (unsigned short) ( 256 ), TEMP_PAL ) )
+        if( !readData<unsigned int, unsigned short>( p_path, p_name, 12288, TEMP, 256, TEMP_PAL ) )
             return false;
 
         dmaCopy( TEMP, p_layer, p_tileCnt );
@@ -197,10 +180,7 @@ namespace FS {
             return true;
         }
 
-        char buffer[ 100 ];
-        sprintf( buffer, "%s", p_name );
-
-        if( !readData( "nitro:/PICS/NAV/", buffer, (unsigned int) 12288, IO::NAV_DATA, (unsigned short) 192, IO::NAV_DATA_PAL ) )
+        if( !readData( "nitro:/PICS/NAV/", p_name, (unsigned int) 12288, IO::NAV_DATA, (unsigned short) 192, IO::NAV_DATA_PAL ) )
             return false;
 
         dmaCopy( IO::NAV_DATA, p_layer, 256 * 192 );
@@ -392,7 +372,7 @@ namespace FS {
         return ret;
     }
 
-    const char* getLocation( u16 p_ind ) {
+    std::string getLocation( u16 p_ind ) {
         if( p_ind > 5000 )
             return FARAWAY_PLACE;
         FILE* f = FS::open( "nitro:/LOCATIONS/", p_ind, ".data" );
@@ -403,12 +383,9 @@ namespace FS {
 
             return FARAWAY_PLACE;
         }
-        static char buffer[ 60 ];
-        memset( buffer, 0, sizeof( buffer ) );
-        FS::read( f, buffer, sizeof( char ), 48 );
-        FS::close( f );
-        buffer[ strlen( buffer ) - 1 ] = 0;
-        return buffer;
+        auto res = readString( f, true );
+        fclose( f );
+        return res;
     }
 
     std::unique_ptr<SAVE::saveGame> readSave( const char* p_path ) {

@@ -41,8 +41,7 @@ namespace SAVE {
 #define PKMN_DATALENGTH 128
 
     void        saveGame::playerInfo::stepIncrease( ) {
-        static u8 stepCnt = 0;
-        stepCnt++;
+        m_stepCount++;
         if( m_repelSteps > 0 ) {
             m_repelSteps--;
             if( !m_repelSteps ) {
@@ -50,7 +49,7 @@ namespace SAVE {
                 IO::NAV->draw( true );
             }
         }
-        if( !stepCnt ) {
+        if( !m_stepCount ) {
             bool hasHatchSpdUp = m_bag.count( BAG::toBagType( item::itemType::KEY_ITEM ), I_OVAL_CHARM );
             for( size_t s = 0; s < 6; ++s ) {
                 pokemon& ac = m_pkmnTeam[ s ];

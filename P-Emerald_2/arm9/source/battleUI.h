@@ -86,9 +86,5 @@ namespace BATTLE {
         battleUI( ) { }
         battleUI( battle* p_battle )
             :_battle( p_battle ) { }
-
-        ~battleUI( ) {
-            _battle = 0;
-        }
     };
 }

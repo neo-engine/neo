@@ -140,7 +140,7 @@ namespace SAVE {
                 BG_PALETTE_SUB[ BLUE_IDX ] = RED2;
 
             IO::regularFont->printString( SAV->m_saveFile[ i ].m_playername, 8, 30 + 64 * i, true );
-            IO::regularFont->printString( FS::getLocation( MAP::curMap->getCurrentLocationId( ) ),
+            IO::regularFont->printString( FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
                                           248, 30 + 64 * i, true, IO::font::RIGHT );
 
 

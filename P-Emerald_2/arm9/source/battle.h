@@ -134,7 +134,7 @@ namespace BATTLE {
         battlePokemon _storedPkmns[ 6 ][ 2 ];
         battlePokemon _wildPokemon;
 
-        static battleUI*    _battleUI;
+        battleUI*    _battleUI;
 
         int         getTargetSpecifierValue( bool p_targetIsOpp, u8 p_targetPosition,
                                              const battleScript::command::targetSpecifier& p_targetSpecifier, u8 p_targetVal = 0 );
