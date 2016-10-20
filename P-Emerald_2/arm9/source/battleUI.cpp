@@ -188,6 +188,20 @@ namespace BATTLE {
 #define SUB_A_OAM 30
 #define SUB_Back_OAM 31
 
+#define OPP_1_HP_X 98
+#define OPP_1_HP_Y 40
+#define OPP_2_HP_X 0
+#define OPP_2_HP_Y 8
+#define OWN_1_HP_X 220
+#define OWN_1_HP_Y 152
+#define OWN_2_HP_X 122
+#define OWN_2_HP_Y 120
+#define WILD_BATTLE_HP_X 98
+#define WILD_BATTLE_HP_Y 40
+#define WILD_BATTLE_SPRITE_X_START 128
+#define WILD_BATTLE_SPRITE_X 144
+#define WILD_BATTLE_SPRITE_Y 19
+
     u16 SUB_TILESTART = 0;
     u8 SUB_PALSTART = 0;
 
@@ -515,22 +529,18 @@ namespace BATTLE {
             dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         } else {
             auto acPkmn = *_battle->_wildPokemon.m_pokemon;
-            u16 x = 128;
-            u8  y = 19;
-
-            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, WILD_BATTLE_SPRITE_X_START, WILD_BATTLE_SPRITE_Y,
                                      PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ),
                                      false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
                 if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
-                                         acPkmn.m_boxdata.m_speciesId, x, y,
+                                         acPkmn.m_boxdata.m_speciesId, WILD_BATTLE_SPRITE_X_START, WILD_BATTLE_SPRITE_Y,
                                          PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
                     _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
                 }
             }
             IO::updateOAM( false );
-            for( u8 i = 0; i < 112 - 96; ++i ) {
-                x++;
+            for( u16 i = WILD_BATTLE_SPRITE_X_START; i < WILD_BATTLE_SPRITE_X; ++i ) {
                 IO::OamTop->oamBuffer[ PKMN_IDX( 0, OPPONENT ) ].x++;
                 IO::OamTop->oamBuffer[ PKMN_IDX( 0, OPPONENT ) + 1 ].x++;
                 IO::OamTop->oamBuffer[ PKMN_IDX( 0, OPPONENT ) + 2 ].x++;
@@ -539,7 +549,7 @@ namespace BATTLE {
                 swiWaitForVBlank( );
             }
             if( acPkmn.m_boxdata.isShiny( ) )
-                animateShiny( x + 16, y + 16, SHINY_ANIM, 15, TILESTART );
+                animateShiny( WILD_BATTLE_SPRITE_X + 16, WILD_BATTLE_SPRITE_X_START + 16, SHINY_ANIM, 15, TILESTART );
         }
     }
 
@@ -564,14 +574,12 @@ namespace BATTLE {
             sendPKMN( i % 2, i / 2, true );
         if( _battle->m_isWildBattle ) {
             auto acPkmn = *_battle->_wildPokemon.m_pokemon;
-            u16 x = 144;
-            u8  y = 19;
 
-            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, WILD_BATTLE_SPRITE_X, WILD_BATTLE_SPRITE_Y,
                                      PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ),
                                      false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
                 if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
-                                         acPkmn.m_boxdata.m_speciesId, x, y,
+                                         acPkmn.m_boxdata.m_speciesId, WILD_BATTLE_SPRITE_X, WILD_BATTLE_SPRITE_Y,
                                          PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
                     _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
@@ -642,7 +650,7 @@ namespace BATTLE {
 
         IO::updateOAM( false );
         if( _battle->m_isWildBattle ) {
-            u8 hpx = 88, hpy = 40;
+            u8 hpx = WILD_BATTLE_HP_X, hpy = WILD_BATTLE_HP_Y;
             auto& acPkmn = *_battle->_wildPokemon.m_pokemon;
             setStsBallPosition( OPPONENT, 0, hpx + 8, hpy + 8, false );
             IO::OamTop->oamBuffer[ HP_IDX( OPPONENT, 0 ) ].isHidden = false;
@@ -1284,10 +1292,10 @@ namespace BATTLE {
 
     void getSpritePos( bool p_opponent, u8 p_pokemonPos, bool p_double, s16& p_x, s16& p_y, u8& p_hpx, u8& p_hpy ) {
         if( p_opponent ) {
-            p_hpx = 88; p_hpy = 40;
+            p_hpx = OPP_1_HP_X; p_hpy = OPP_1_HP_Y;
             p_x = 176; p_y = 20;
             if( p_pokemonPos ) {
-                p_hpx -= 88; p_hpy -= 32;
+                p_hpx = OPP_2_HP_X; p_hpy = OPP_2_HP_Y;
                 p_x = 112; p_y = 14;
             }
             if( !p_double ) {
@@ -1295,10 +1303,10 @@ namespace BATTLE {
                 p_y += 3;
             }
         } else {
-            p_hpx = 220; p_hpy = 152;
+            p_hpx = OWN_1_HP_X; p_hpy = OWN_1_HP_Y;
             p_x = 40; p_y = 100;
             if( !p_pokemonPos ) {
-                p_hpx -= 88; p_hpy -= 32;
+                p_hpx = OWN_2_HP_X; p_hpy = OWN_2_HP_Y;
                 p_x = -40; p_y = 84;
             }
             if( !p_double ) {
