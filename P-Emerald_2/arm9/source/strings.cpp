@@ -264,5 +264,62 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "(shining)", "(schillernd)" },
     { "Fainted", "Besiegt" },
     { "Statistics", "Statuswerte" },
-    { "Stats at lv.%3i:", "Status auf Lv.%3i:" }
+    { "Stats at lv.%3i:", "Status auf Lv.%3i:" },
+    { "[TRAINER] ([TCLASS]) sends\nout %s![A]", "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]" },
+
+    // 140
+
+    { "Go [OWN%d]![A]", "Los [OWN%d]![A]" },
+    { "Do you want to give\na nick name to %s?", "Möchtest du dem %s\neinen Spitznamen geben?" },
+    { "Choose a nick name!", "Wähle einen Spitznamen!" },
+    { "You are challenged by\n%s %s![END]", "Eine Herausforderung von\n%s %s![END]" },
+    { "Frzn", "Eingfr" },
+
+    { "Prlz", "Prlyse" },
+    { "Burn", "Verbrng" },
+    { "Slp",  "Schlaf" },
+    { "Psn", "Gift" },
+    { "Send", "Aussenden" },
+
+    // 150
+
+    { "Already fighting", "Bereits im Kampf" },
+    { "Fainted…", "Schon besiegt…" },
+    { "To be sent", "Schon ausgewählt" },
+    { "An egg can", "Ein Ei kann" },
+    { "not fight!", "nicht kämpfen!" },
+
+    { "Status", "Bericht" },
+    { "Moves", "Attacken" },
+    { "ATK", "ANG" },
+    { "DEF", "VER" },
+    { "SAT", "SAN" },
+
+    // 160
+
+    { "SDF", "SVE" },
+    { "SPD", "INI" },
+    { "What will %s do?", "Was soll %s tun?" },
+    { "You got away safely.[A]", "Du bist entkommen.[A]" },
+    { "You couldn't escape…[A]", "Flucht gescheitert…[A]" },
+
+    { "Choose a target!", "Welches PKMN angreifen?" },
+    { "Choose a PKMN", "Welches PKMN?" },
+    { "%s gained %lu EXP.[A]", "%s gewinnt %lu E.-Punkte.[A]" },
+    { "%s advances\nto level %d.[A]", "%s erreicht Level %d.[A]" },
+    { "The quick claw enables\n%s%s to go first![A]", "%s%s agiert dank\neiner Flinkklaue zuerst![A]" },
+
+    // 170
+
+    { "%s of %s%s applies.[A]", "%s von %s%s wirkt.[A]" },
+    { "[TRAINER] ([TCLASS])\nused %s.[A]", "[TRAINER] ([TCLASS]) setzt\n%s ein.[A]" },
+    { "It got wasted…[A]", "Es hat keine Wirkung…[A]" },
+    { "Used %s.[A]", "%s eingesetzt.[A]" },
+    { "%s's data was\nregistred to the Poké Dex.[A]", "Die Daten von %s\nwurden im PokéDex gespeichert.[A]" },
+
+    { "%s was sent to\nthe Pokémon Storage System.[A]", "%s wurde an das\nPokémon-Lagerungssystem\ngeschickt.[A]" },
+    { "Box “%s” is full.[A]", "Box „%s“ ist voll.[A]" },
+    { "%s was deposited\nto Box “%s”.[A]", "%s wurde in\nBox „%s“ abgelegt.[A]" },
+    { "There is no space left\nfor additional Pokémon.[A]", "Du hast keinen Platz\nfür weitere Pokémon.[A]" },
+    { "%s was released.[A]", "%s wurde wieder\nfreigelassen.[A]" }
 };

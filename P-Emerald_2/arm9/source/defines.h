@@ -61,6 +61,8 @@ extern bool SCREENS_SWAPPED;
 extern bool PLAYER_IS_FISHING;
 extern bool INIT_NITROFS;
 
+extern char** ARGV;
+
 extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;
 
@@ -70,7 +72,7 @@ extern unsigned int TEMP[ 12288 ];
 extern unsigned short TEMP_PAL[ 256 ];
 
 #define LANGUAGES 2
-#define MAX_STRINGS 150
+#define MAX_STRINGS 250
 
 extern const char * LANGUAGE_NAMES[ LANGUAGES ];
 extern const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ];

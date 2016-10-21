@@ -143,14 +143,14 @@ namespace SAVE {
             IO::regularFont->printString( FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
                                           248, 30 + 64 * i, true, IO::font::RIGHT );
 
-
-            sprintf( buffer, "%03d:%02d", SAV->m_saveFile[ i ].m_pt.m_hours, SAV->getActiveFile( ).m_pt.m_mins );
+            char buffer[ 50 ];
+            snprintf( buffer, 49, "%03d:%02d", SAV->m_saveFile[ i ].m_pt.m_hours, SAV->getActiveFile( ).m_pt.m_mins );
             IO::regularFont->printString( buffer, 8, 46 + 64 * i, true );
 
-            sprintf( buffer, STRINGS[ 108 ][ SAV->m_saveFile[ i ].m_options.m_language ], SAV->m_saveFile[ i ].getBadgeCount( ) );
+            snprintf( buffer, 49, STRINGS[ 108 ][ SAV->m_saveFile[ i ].m_options.m_language ], SAV->m_saveFile[ i ].getBadgeCount( ) );
             IO::regularFont->printString( buffer, 110, 46 + 64 * i, true, IO::font::CENTER );
 
-            sprintf( buffer, "PokéDex %03d", SAV->getDexCount( ) );
+            snprintf( buffer, 49, "PokéDex %03d", SAV->getDexCount( ) );
             IO::regularFont->printString( buffer, 248, 46 + 64 * i, true, IO::font::RIGHT );
         }
     }
@@ -231,7 +231,7 @@ namespace SAVE {
             } else if( GET_AND_WAIT( KEY_A ) )
                 return res[ selectedIdx ];
 
-            for( u8 i = 0; i < vis.size(); ++i ) 
+            for( u8 i = 0; i < vis.size( ); ++i )
                 if( IN_RANGE_R( 4, 4 + 48 * i, 136, 26 + 48 * i ) ) {
                     selectedIdx = i;
                     drawMainChoice( p_lang, vis, selectedIdx, i );
@@ -341,7 +341,6 @@ namespace SAVE {
         SAV->getActiveFile( ).m_curBox = 0;
         SAV->getActiveFile( ).m_options.m_language = p_lang;
 
-        SAV->getActiveFile( ).m_activatedPNav = false;
         SAV->getActiveFile( ).m_money = 3000;
         SAV->getActiveFile( ).m_id = rand( ) % 65536;
         SAV->getActiveFile( ).m_sid = rand( ) % 65536;

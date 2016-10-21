@@ -38,6 +38,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "uio.h"
 
 #include <vector>
+#include <cstdio>
 #include <algorithm>
 
 //Sprites
@@ -166,9 +167,10 @@ namespace BAG {
 
             display = p_item->getDisplayName( true );
             descr = p_item->getDescription( );
+            char buffer[ 100 ];
 
             if( p_item->m_itemType != item::itemType::KEY_ITEM ) {
-                std::sprintf( buffer, "x %d", p_count );
+                snprintf( buffer, 99, "x %d", p_count );
                 IO::regularFont->printString( buffer, 144, 53, false );
             }
 
@@ -177,15 +179,15 @@ namespace BAG {
                 curr->load( );
 
                 IO::regularFont->setColor( RED_IDX, 1 );
-                sprintf( buffer, GET_STRING( 16 ), ( curr->m_berryData.m_berryGuete == berry::berryGueteType::HARD ) ? GET_STRING( 17 ) :
+                snprintf( buffer, 99, GET_STRING( 16 ), ( curr->m_berryData.m_berryGuete == berry::berryGueteType::HARD ) ? GET_STRING( 17 ) :
                     ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SOFT ) ? GET_STRING( 18 ) :
-                         ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SUPER_HARD ) ? GET_STRING( 19 ) :
+                          ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SUPER_HARD ) ? GET_STRING( 19 ) :
                       ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SUPER_SOFT ) ? GET_STRING( 20 ) :
-                           ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::VERY_HARD ) ? GET_STRING( 21 ) :
+                            ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::VERY_HARD ) ? GET_STRING( 21 ) :
                         ( GET_STRING( 22 ) ) ) ) ) ) );
                 IO::regularFont->printString( buffer, 24, 145, false );
                 IO::regularFont->setColor( BLUE_IDX, 1 );
-                sprintf( buffer, GET_STRING( 23 ), curr->m_berryData.m_berrySize / 10.0 );
+                snprintf( buffer, 99, GET_STRING( 23 ), curr->m_berryData.m_berrySize / 10.0 );
                 IO::regularFont->printString( buffer, 140, 145, false );
                 IO::regularFont->setColor( BLACK_IDX, 1 );
 
@@ -223,22 +225,23 @@ namespace BAG {
             IO::loadDamageCategoryIcon( AttackList[ mv.m_moveIdx ]->m_moveHitType, 152, 144, 2, 2, tileCnt, false );
 
             IO::regularFont->printString( GET_STRING( 31 ), 190, 145, false );
-            std::sprintf( buffer, "%2d", AttackList[ mv.m_moveIdx ]->m_movePP );
+            char buffer[ 100 ];
+            snprintf( buffer, 99, "%2d", AttackList[ mv.m_moveIdx ]->m_movePP );
             IO::regularFont->printString( buffer, 229, 145, false, IO::font::RIGHT );
 
             IO::regularFont->setColor( RED_IDX, 1 );
             IO::regularFont->printString( GET_STRING( 32 ), 33, 160, false );
             if( AttackList[ mv.m_moveIdx ]->m_moveHitType != move::moveHitTypes::STAT
                 &&  AttackList[ mv.m_moveIdx ]->m_moveBasePower > 1 )
-                std::sprintf( buffer, "%3d", AttackList[ mv.m_moveIdx ]->m_moveBasePower );
+                snprintf( buffer, 99, "%3d", AttackList[ mv.m_moveIdx ]->m_moveBasePower );
             else
-                std::sprintf( buffer, "---" );
+                snprintf( buffer, 99, "---" );
             IO::regularFont->printString( buffer, 108, 160, false, IO::font::RIGHT );
 
             IO::regularFont->setColor( BLUE_IDX, 1 );
             IO::regularFont->printString( GET_STRING( 33 ), 124, 160, false );
             if( AttackList[ mv.m_moveIdx ]->m_moveAccuracy )
-                std::sprintf( buffer, "%3d", AttackList[ mv.m_moveIdx ]->m_moveAccuracy );
+                snprintf( buffer, 99, "%3d", AttackList[ mv.m_moveIdx ]->m_moveAccuracy );
             else
                 std::sprintf( buffer, "---" );
             IO::regularFont->printString( buffer, 229, 160, false, IO::font::RIGHT );
@@ -288,12 +291,13 @@ namespace BAG {
                         IO::regularFont->printString( GET_STRING( 37 ), 40, 33 + 26 * i, true, IO::font::LEFT, 11 );
                     }
                 } else if( p_item &&  p_item->m_itemType == item::itemType::MEDICINE ) {
+                    char buffer[ 100 ];
                     if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP ) {
-                        sprintf( buffer, GET_STRING( 38 ), SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_level,
-                                 SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP,
-                                 SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP );
+                        snprintf( buffer, 99, GET_STRING( 38 ), SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_level,
+                                  SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP,
+                                  SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP );
                     } else {
-                        sprintf( buffer, GET_STRING( 39 ), SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_level );
+                        snprintf( buffer, 99, GET_STRING( 39 ), SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_level );
                     }
                     IO::regularFont->printString( buffer, 40, 33 + 26 * i, true, IO::font::LEFT, 11 );
                 } else {

@@ -275,8 +275,7 @@ namespace DEX {
             p_forme %= data.m_formecnt ? ( ( 2 - isFixed ) * data.m_formecnt ) : ( 2 - isFixed );
 
         u16 currFormeIdx = data.m_formecnt ? data.m_formeIdx[ p_forme / ( 2 - isFixed ) ] : p_pkmnIdx;
-        sprintf( buffer, "%s", data.m_formecnt ? data.m_formeName[ p_forme / ( 2 - isFixed ) ] : data.m_displayName );
-        std::string formeName = std::string( buffer );
+        std::string formeName = std::string( data.m_formecnt ? data.m_formeName[ p_forme / ( 2 - isFixed ) ] : data.m_displayName );
 
         if( currFormeIdx != p_pkmnIdx )
             getAll( currFormeIdx, data );
@@ -519,7 +518,8 @@ namespace DEX {
 
                     bool inDex = IN_DEX( id );
                     loadPkmnIconToSlot( inDex * id, i, false );
-                    sprintf( buffer, "%03d", id );
+                    char buffer[ 10 ];
+                    snprintf( buffer, 9, "%03d", id );
                     IO::boldFont->printString( buffer, 32, 28 + 32 * i, true );
                     IO::boldFont->printString( getDisplayName( id ).c_str( ), 100, 28 + 32 * i, true );
 

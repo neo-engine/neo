@@ -31,6 +31,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "uio.h"
 #include "font.h"
 #include "defines.h"
+#include "saveGame.h"
 
 namespace IO {
     font::font( u8 *p_data, u8 *p_widths, void( *p_shiftchar )( u16& val ) ) {
@@ -53,10 +54,10 @@ namespace IO {
                 if( putX >= 0 && putX < SCREEN_WIDTH && putY >= 0 && putY < SCREEN_HEIGHT ) {
                     if( !p_bottom ) {
                         topScreenPlot( putX, putY, ( (u8) ( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
-                                       (u8) ( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                            (u8) ( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     } else {
                         btmScreenPlot( putX, putY, ( (u8) ( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
-                                       (u8) ( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                            (u8) ( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     }
                 }
             }
@@ -128,7 +129,7 @@ namespace IO {
             _shiftchar( c );
             putX += _widths[ c ];
 
-            for( u8 i = 0; i < 80 / TEXTSPEED; ++i )
+            for( u8 i = 0; i < 80 / ( TEXTSPEED + SAVE::SAV->getActiveFile( ).m_options.m_textSpeedModifier ); ++i )
                 swiWaitForVBlank( );
             current_char++;
         }
@@ -263,7 +264,7 @@ namespace IO {
             _shiftchar( c );
             putX += _widths[ c ];
 
-            for( u8 i = 0; i < 80 / TEXTSPEED; ++i )
+            for( u8 i = 0; i < 80 / ( TEXTSPEED + SAVE::SAV->getActiveFile( ).m_options.m_textSpeedModifier ); ++i )
                 swiWaitForVBlank( );
             current_char++;
         }

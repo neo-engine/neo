@@ -482,11 +482,12 @@ void pokemon::boxPokemon::hatch( ) {
 }
 
 bool pokemon::boxPokemon::learnMove( u16 p_move ) {
+    char buffer[ 50 ];
     if( p_move == m_moves[ 0 ]
         || p_move == m_moves[ 1 ]
         || p_move == m_moves[ 2 ]
         || p_move == m_moves[ 3 ] ) {
-        sprintf( buffer, GET_STRING( 102 ), m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
+        snprintf( buffer, 49, GET_STRING( 102 ), m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -499,7 +500,7 @@ bool pokemon::boxPokemon::learnMove( u16 p_move ) {
                 m_moves[ i ] = p_move;
                 m_acPP[ i ] = std::min( m_acPP[ i ], AttackList[ p_move ]->m_movePP );
 
-                sprintf( buffer, GET_STRING( 103 ), m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
+                snprintf( buffer, 49, GET_STRING( 103 ), m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -510,12 +511,12 @@ bool pokemon::boxPokemon::learnMove( u16 p_move ) {
             }
         if( !freeSpot ) {
             IO::yesNoBox yn( false );
-            sprintf( buffer, GET_STRING( 104 ), m_name );
+            snprintf( buffer, 49, GET_STRING( 104 ), m_name );
             if( yn.getResult( buffer ) ) {
                 u8 res = IO::choiceBox( *this, p_move ).getResult( GET_STRING( 105 ), false, false );
                 if( res < 4 ) {
                     if( AttackList[ m_moves[ res ] ]->m_isFieldAttack ) {
-                        sprintf( buffer, GET_STRING( 106 ), m_name, AttackList[ m_moves[ res ] ]->m_moveName.c_str( ) );
+                        snprintf( buffer, 49, GET_STRING( 106 ), m_name, AttackList[ m_moves[ res ] ]->m_moveName.c_str( ) );
                         IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                         IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -530,7 +531,7 @@ bool pokemon::boxPokemon::learnMove( u16 p_move ) {
                 return false;
         }
     } else {
-        sprintf( buffer, GET_STRING( 107 ), m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
+        snprintf( buffer, 49, GET_STRING( 107 ), m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;

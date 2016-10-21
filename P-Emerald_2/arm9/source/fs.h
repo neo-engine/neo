@@ -37,8 +37,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "saveGame.h"
 #include "mapSlice.h"
 
-#include "messageBox.h"
-
 namespace FS {
 #define MAXITEMSPERPAGE 12
 
@@ -47,8 +45,8 @@ namespace FS {
     bool exists( const char* p_path, const char* p_name );
     bool exists( const char* p_path, u16 p_name, bool p_unused );
     bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name = "" );
-    FILE* open( const char* p_path, const char* p_name, const char* p_ext = ".raw", const char* p_mode = "r" );
-    FILE* open( const char* p_path, u16 p_value, const char* p_ext = ".raw", const char* p_mode = "r" );
+    FILE* open( const char* p_path, const char* p_name, const char* p_ext = ".raw", const char* p_mode = "rb" );
+    FILE* open( const char* p_path, u16 p_value, const char* p_ext = ".raw", const char* p_mode = "rb" );
     void close( FILE* p_file );
     size_t read( FILE* p_stream, void* p_buffer, size_t p_size, size_t p_count );
     size_t write( FILE* p_stream, const void* p_buffer, size_t p_size, size_t p_count );

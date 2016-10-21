@@ -34,7 +34,6 @@ along with Pokémon Emerald 2 Version.  If not, new see <http://www.gnu.org/lice
 #include "pokemon.h"
 #include "script.h"
 
-#include "buffer.h"
 #include "saveGame.h"
 #include "mapDefines.h"
 #include "mapDrawer.h"
@@ -232,6 +231,7 @@ bool item::use( pokemon& p_pokemon ) {
 //Returns false if the original UI has not to be redrawn/will be exited
 bool item::use( bool p_dryRun ) {
     u16 itm = getItemId( );
+    char buffer[ 50 ];
     if( !p_dryRun ) {
         bool ex = false;
         for( u8 i = 0; i < 5; ++i )
@@ -289,7 +289,7 @@ bool item::use( bool p_dryRun ) {
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                sprintf( buffer, GET_STRING( 68 ), SAVE::SAV->getActiveFile( ).m_coins );
+                snprintf( buffer, 50, GET_STRING( 68 ), SAVE::SAV->getActiveFile( ).m_coins );
                 IO::messageBox( buffer, false );
             }
             return true;
@@ -298,7 +298,7 @@ bool item::use( bool p_dryRun ) {
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                sprintf( buffer, GET_STRING( 69 ), SAVE::SAV->getActiveFile( ).m_battlePoints );
+                snprintf( buffer, 50, GET_STRING( 69 ), SAVE::SAV->getActiveFile( ).m_battlePoints );
                 IO::messageBox( buffer, false );
             }
             return true;

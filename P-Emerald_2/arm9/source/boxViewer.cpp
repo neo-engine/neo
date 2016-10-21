@@ -124,7 +124,8 @@ namespace BOX {
                         IO::printRectangle( 144, 192 - 14, 255, 192, false, false, WHITE_IDX );
 
                         IO::keyboard kb;
-                        sprintf( buffer, GET_STRING( 62 ), SAVE::SAV->getCurrentBox( )->m_name );
+                        char buffer[ 50 ];
+                        snprintf( buffer, 49, GET_STRING( 62 ), SAVE::SAV->getCurrentBox( )->m_name );
                         strcpy( SAVE::SAV->getCurrentBox( )->m_name, kb.getText( 14, buffer ).c_str( ) );
                         IO::swapScreens( );
                         IO::OamTop->oamBuffer[ 0 ].isHidden = false;

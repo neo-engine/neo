@@ -41,5 +41,6 @@ namespace SAVE {
         language    m_language;
         s8          m_levelModifier;
         s8          m_encounterRateModifier;
+        s8          m_textSpeedModifier;
     };
 }

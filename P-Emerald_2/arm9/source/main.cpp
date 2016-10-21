@@ -117,8 +117,8 @@ void initGraphics( ) {
     IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
     IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
 
-    IO::consoleFont->gfx = (u16*) consoleFontTiles;
-    IO::consoleFont->pal = (u16*) consoleFontPal;
+    IO::consoleFont->gfx = ( u16* ) const_cast<unsigned int*>( consoleFontTiles );
+    IO::consoleFont->pal = ( u16* ) const_cast<unsigned short*>( consoleFontPal );
     IO::consoleFont->numChars = 218;
     IO::consoleFont->numColors = 16;
     IO::consoleFont->bpp = 8;
@@ -199,6 +199,13 @@ int main( int, char** p_argv ) {
             sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
             IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
 
+            SAVE::SAV->getActiveFile( ).m_pt.m_secs++; // I know, this is rather inaccurate 
+
+            SAVE::SAV->getActiveFile( ).m_pt.m_mins += ( SAVE::SAV->getActiveFile( ).m_pt.m_secs / 60 );
+            SAVE::SAV->getActiveFile( ).m_pt.m_hours += ( SAVE::SAV->getActiveFile( ).m_pt.m_mins / 60 );
+
+            SAVE::SAV->getActiveFile( ).m_pt.m_secs %= 60;
+            SAVE::SAV->getActiveFile( ).m_pt.m_mins %= 60;
 
             achours = timeStruct->tm_hour;
             acminutes = timeStruct->tm_min;
@@ -241,17 +248,18 @@ int main( int, char** p_argv ) {
         if( held & KEY_L && gMod == DEVELOPER ) {
             time_t unixTime = time( NULL );
             struct tm* timeStruct = gmtime( (const time_t *) &unixTime );
-            std::sprintf( buffer, "Currently at %hu-(%hu,%hu,%hu).\nMap: %hu:%hu, (%02hX,%02hX)\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
-                          SAVE::SAV->getActiveFile( ).m_currentMap,
-                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
-                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ,
-                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY / 32,
-                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
-                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX % 32,
-                          SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32,
-                          FRAME_COUNT,
-                          achours, acminutes, acseconds, timeStruct->tm_sec );
+            char buffer[ 100 ];
+            snprintf( buffer, 99, "Currently at %hu-(%hu,%hu,%hu).\nMap: %hu:%hu, (%02hX,%02hX)\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
+                      SAVE::SAV->getActiveFile( ).m_currentMap,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY / 32,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX % 32,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32,
+                      FRAME_COUNT,
+                      achours, acminutes, acseconds, timeStruct->tm_sec );
             IO::messageBox m( buffer );
             IO::NAV->draw( true );
         }
@@ -268,12 +276,13 @@ int main( int, char** p_argv ) {
                     if( !AttackList[ a.m_boxdata.m_moves[ j ] ]->m_isFieldAttack
                         || !AttackList[ a.m_boxdata.m_moves[ j ] ]->possible( ) )
                         continue;
-                    sprintf( buffer, GET_STRING( 3 ), AttackList[ a.m_boxdata.m_moves[ j ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                    char buffer[ 50 ];
+                    snprintf( buffer, 49, GET_STRING( 3 ), AttackList[ a.m_boxdata.m_moves[ j ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                     IO::yesNoBox yn;
                     if( yn.getResult( buffer ) ) {
                         IO::NAV->draw( );
                         swiWaitForVBlank( );
-                        sprintf( buffer, GET_STRING( 10 ), a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                        snprintf( buffer, 49, GET_STRING( 10 ), a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                         IO::messageBox( buffer, 0, false );
                         MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
                         IO::NAV->draw( true );

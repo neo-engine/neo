@@ -109,7 +109,8 @@ namespace SAVE {
                 break;
             }
         if( acgame == -1 ) {
-            sprintf( buffer, "%s\n(%s)", GET_STRING( 119 ), acSlot2Game );
+            char buffer[ 50 ];
+            snprintf( buffer, 49, "%s\n(%s)", GET_STRING( 119 ), acSlot2Game );
             IO::messageBox( buffer, true );
             IO::clearScreen( true, false, false );
             return false;
@@ -173,12 +174,12 @@ namespace SAVE {
                 acPkmn.m_boxdata.m_pid = acBeltP->personality;
                 acPkmn.m_boxdata.m_oTSid = acBeltP->otid >> 16;
                 acPkmn.m_boxdata.m_oTId = acBeltP->otid % ( 1 << 16 );
-                for( int i = 0; i < 10; ++i )
-                    acPkmn.m_boxdata.m_name[ i ] = FS::getNText( acBeltP->name[ i ] );
+                for( u8 j = 0; j < 10; ++j )
+                    acPkmn.m_boxdata.m_name[ j ] = FS::getNText( acBeltP->name[ j ] );
                 acPkmn.m_boxdata.m_name[ 10 ] = 0;
                 acPkmn.m_boxdata.m_hometown = acBeltP->language;
-                for( int i = 0; i < 7; ++i )
-                    acPkmn.m_boxdata.m_oT[ i ] = FS::getNText( acBeltP->otname[ i ] );
+                for( u8 j = 0; j < 7; ++j )
+                    acPkmn.m_boxdata.m_oT[ j ] = FS::getNText( acBeltP->otname[ j ] );
                 acPkmn.m_boxdata.m_oT[ 7 ] = 0;
                 acPkmn.m_boxdata.m_markings = acBeltP->markint;
 
@@ -202,15 +203,15 @@ namespace SAVE {
                 acPkmn.m_boxdata.m_pPUps = acBG->ppbonuses;
 
                 FS::gen3Pokemon::pokemon_moves_t* &acBA = save3->pokemon_moves[ i ];
-                for( int i = 0; i < 4; ++i ) {
-                    acPkmn.m_boxdata.m_moves[ i ] = acBA->atk[ i ];
-                    acPkmn.m_boxdata.m_acPP[ i ] = acBA->pp[ i ];
+                for( u8 j = 0; j < 4; ++j ) {
+                    acPkmn.m_boxdata.m_moves[ j ] = acBA->atk[ j ];
+                    acPkmn.m_boxdata.m_acPP[ j ] = acBA->pp[ j ];
                 }
 
                 FS::gen3Pokemon::pokemon_effort_t* &acBE = save3->pokemon_effort[ i ];
-                for( int i = 0; i < 6; ++i ) {
-                    acPkmn.m_boxdata.m_effortValues[ i ] = acBE->EV[ i ];
-                    acPkmn.m_boxdata.m_contestStats[ i ] = acBE->ConStat[ i ];
+                for( u8 j = 0; j < 6; ++j ) {
+                    acPkmn.m_boxdata.m_effortValues[ j ] = acBE->EV[ j ];
+                    acPkmn.m_boxdata.m_contestStats[ j ] = acBE->ConStat[ j ];
                 }
 
                 FS::gen3Pokemon::pokemon_misc_t* &acBM = save3->pokemon_misc[ i ];
@@ -241,7 +242,7 @@ namespace SAVE {
 
             }
         }
-        
+
         IO::messageBox( GET_STRING( 123 ), true );
         IO::clearScreen( true, false, false );
 

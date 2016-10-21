@@ -301,15 +301,13 @@ namespace MAP {
     }
 
     void mapDrawer::handleWarp( warpType p_type ) {
-        static warpPos lastWarp = { 0, { 0, 0, 0 } };
-
         warpPos current = warpPos{ SAVE::SAV->getActiveFile( ).m_currentMap, SAVE::SAV->getActiveFile( ).m_player.m_pos };
         if( !warpList.count( current ) )
             return;
-        warpPos target = p_type == LAST_VISITED ? lastWarp : warpList[ current ];
+        warpPos target = p_type == LAST_VISITED ? SAVE::SAV->getActiveFile( ).m_lastWarp : warpList[ current ];
         if( target == warpPos{ 0, { 0, 0, 0 } } )
             return;
-        lastWarp = current;
+        SAVE::SAV->getActiveFile( ).m_lastWarp = current;
 
         warpPlayer( p_type, target );
     }
@@ -368,7 +366,7 @@ namespace MAP {
 
         if( !CUR_SLICE->m_pokemon[ arridx ].first )
             return false;
-        
+
         IO::fadeScreen( IO::BATTLE );
         pokemon wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
         BATTLE::weather weat = BATTLE::weather::NO_WEATHER;
@@ -433,7 +431,7 @@ namespace MAP {
         IO::NAV->togglePower( );
         IO::NAV->draw( );
         _slices[ 0 ][ 0 ] = 0;
-        _slices[ 0 ][ 1 ] = 0; 
+        _slices[ 0 ][ 1 ] = 0;
         _slices[ 1 ][ 0 ] = 0;
         _slices[ 1 ][ 1 ] = 0;
         BATTLE::battleTrainer* bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
@@ -1062,7 +1060,7 @@ NEXT_PASS:
         }
     }
     void mapDrawer::sitDownPlayer( direction p_direction, moveMode p_newMoveMode ) {
-        direction dir = ( ( p_newMoveMode == SIT ) ? direction( ( u8( p_direction ) + 2 ) % 4 ) : p_direction );
+        direction di = ( ( p_newMoveMode == SIT ) ? direction( ( u8( p_direction ) + 2 ) % 4 ) : p_direction );
 
         if( p_newMoveMode == SURF ) {
             //Load the Pkmn
@@ -1076,29 +1074,29 @@ NEXT_PASS:
         for( u8 i = 0; i < 7; ++i ) {
             if( i == 3 )
                 _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].move( UP, 2 );
-            moveCamera( dir, true );
+            moveCamera( di, true );
             swiWaitForVBlank( );
         }
         changeMoveMode( p_newMoveMode );
         _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame( getFrame( p_direction ) / 3 + 12 );
 
         for( u8 i = 0; i < 4; ++i ) {
-            moveCamera( dir, true );
+            moveCamera( di, true );
             if( i % 2 )
                 swiWaitForVBlank( );
         }
         _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].move( UP, 2 );
         swiWaitForVBlank( );
-        moveCamera( dir, true );
+        moveCamera( di, true );
         swiWaitForVBlank( );
-        moveCamera( dir, true );
-        moveCamera( dir, true );
+        moveCamera( di, true );
+        moveCamera( di, true );
         _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame( getFrame( p_direction ) );
         _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].move( UP, 1 );
         swiWaitForVBlank( );
-        moveCamera( dir, true );
+        moveCamera( di, true );
         swiWaitForVBlank( );
-        moveCamera( dir, true );
+        moveCamera( di, true );
     }
 
     void mapDrawer::slidePlayer( direction p_direction ) {
@@ -1342,14 +1340,14 @@ OUT:
             for( u8 j = 0; j < 5; ++j )
                 swiWaitForVBlank( );
         }
-        u16 tile = IO::loadSprite( 124, 0, 0, 64, 32, 64, 64, BigCirc1Pal,
-                                   BigCirc1Tiles, BigCirc1TilesLen, false, false, false, OBJPRIORITY_1, false );
+        u16 tl = IO::loadSprite( 124, 0, 0, 64, 32, 64, 64, BigCirc1Pal,
+                                 BigCirc1Tiles, BigCirc1TilesLen, false, false, false, OBJPRIORITY_1, false );
         IO::loadSprite( 125, 0, 0, 128, 32, 64, 64, 0, 0, 0, false, true, false, OBJPRIORITY_1, false );
         IO::loadSprite( 126, 0, 0, 64, 96, 64, 64, 0, 0, 0, true, false, false, OBJPRIORITY_1, false );
         IO::loadSprite( 127, 0, 0, 128, 96, 64, 64, 0, 0, 0, true, true, false, OBJPRIORITY_1, false );
 
-        if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 120, 1, tile, false, p_shiny, p_female ) )
-            IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 120, 1, tile, false, p_shiny, !p_female );
+        if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 120, 1, tl, false, p_shiny, p_female ) )
+            IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 120, 1, tl, false, p_shiny, !p_female );
         IO::updateOAM( false );
         for( u8 i = 0; i < 75; ++i )
             swiWaitForVBlank( );

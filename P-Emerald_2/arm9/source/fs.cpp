@@ -33,7 +33,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <algorithm>
 
 #include "fs.h"
-#include "buffer.h"
 #include "ability.h"
 #include "move.h"
 #include "pokemon.h"
@@ -446,7 +445,7 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
     if( !f )
         return;
 
-    u16 buffer[ 700 ];
+    u16* buffer = new u16[ 700 ];
     FS::read( f, buffer, sizeof( u16 ), 699 );
     FS::close( f );
     u16 ptr = 0;
@@ -476,7 +475,7 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
 N:
             ;
         }
-        FS::close( f );
+        delete[ ] buffer;
         return;
     } else {
         for( u16 i = 0; i <= p_toLevel; ++i ) {
@@ -484,26 +483,28 @@ N:
             for( u16 j = 0; j < z; ++j ) {
                 u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
                 if( i >= p_fromLevel && h == p_mode && g < MAX_ATTACK ) {
-                    for( u16 z = 0; z < rescnt; ++z )
-                        if( g == p_result[ z ] )
+                    for( u16 k = 0; k < rescnt; ++k )
+                        if( g == p_result[ k ] )
                             goto NEXT;
                     p_result[ rescnt ] = g;
-                    if( ++rescnt == p_amount )
+                    if( ++rescnt == p_amount ) {
+                        delete[ ] buffer;
                         return;
+                    }
 NEXT:
                     ;
                 }
             }
         }
     }
-    FS::close( f );
+    delete[ ] buffer;
 }
 bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
     FILE* f = FS::open( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId, ".learnset.data" );
     if( !f )
         return false;
 
-    u16 buffer[ 700 ];
+    u16* buffer = new u16[ 700 ];
     FS::read( f, buffer, sizeof( u16 ), 699 );
     FS::close( f );
     u16 ptr = 0;
@@ -512,10 +513,13 @@ bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
         int z = buffer[ ptr++ ];
         for( int j = 0; j < z; ++j ) {
             u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-            if( g == p_moveId && h == p_mode )
+            if( g == p_moveId && h == p_mode ) {
+                delete[ ] buffer;
                 return true;
+            }
         }
     }
+    delete[ ] buffer;
     return false;
 }
 

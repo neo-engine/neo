@@ -129,7 +129,7 @@ namespace SAVE {
             else
                 break;
 
-        return new BATTLE::battleTrainer( std::string( m_playername ), "", "", "", "", tmp );
+        return new BATTLE::battleTrainer( m_playername, "", "", "", "", tmp );
     }
     void        saveGame::playerInfo::updateTeam( BATTLE::battleTrainer* p_trainer ) {
         for( u8 i = 0; i < p_trainer->m_pkmnTeam.size( ); ++i )

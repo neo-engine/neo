@@ -58,7 +58,9 @@ SOUNDS		:=  sounds
 #---------------------------------------------------------------------------------
 ARCH	:=	-mthumb -mthumb-interwork
 
-CFLAGS	:=	-g -Wall -Wextra -Werror\
+CFLAGS	:=	-g -Wall -Wextra -Warray-bounds=2\
+            -Wtraditional -Wshadow -Wpointer-arith -Wcast-qual -Werror\
+            -Wlogical-op -Wno-error=shadow\
 			-march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 			-ffast-math \
 			$(ARCH)

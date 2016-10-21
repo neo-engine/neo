@@ -102,9 +102,6 @@
     <ClInclude Include="arm9\include\libnds_internal.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\buffer.h">
-      <Filter>Header Files\arm9</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\source\defines.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
@@ -247,9 +244,6 @@
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">
       <Filter>Source Files\arm7</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\buffer.cpp">
-      <Filter>Source Files\arm9</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\bagUI.cpp">
       <Filter>Source Files\arm9\bag</Filter>

@@ -51,7 +51,8 @@ namespace MAP {
                                      ".map" );
         if( !mapF ) {
 #ifdef DEBUG
-            sprintf( buffer, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
+            char buffer[ 50 ];
+            snprintf( buffer, 49, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
             IO::messageBox m( buffer );
             IO::NAV->draw( true );
             swiWaitForVBlank( );
@@ -108,13 +109,13 @@ namespace MAP {
         mapF = FS::open( TILESET_PATH, tsidx1, ".ts" );
         FS::readTiles( mapF, res->m_tileSet.m_tiles );
         FS::close( mapF );
-        
+
         mapF = FS::open( TILESET_PATH, tsidx1, ".bvd" );
         FS::readBlocks( mapF, res->m_blockSet.m_blocks );
         FS::close( mapF );
 
         mapF = FS::open( TILESET_PATH, tsidx1, ".p2l" );
-        FS::readPal( mapF,res->m_pals  );
+        FS::readPal( mapF, res->m_pals );
         FS::close( mapF );
 
         // TODO: FIX THIS!
@@ -133,7 +134,7 @@ namespace MAP {
         FS::close( mapF );
 
         mapF = FS::open( TILESET_PATH, tsidx2, ".p2l" );
-        FS::readPal( mapF,res->m_pals + 6 );
+        FS::readPal( mapF, res->m_pals + 6 );
         FS::close( mapF );
 
         mapF = FS::open( TILESET_PATH, tsidx2, ".anm" );

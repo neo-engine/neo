@@ -212,8 +212,8 @@ namespace IO {
 
     void nav::drawMapMug( ) {
         auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
-
-        sprintf( buffer, "%hu_%hhu", _curMap, getCurrentDaytime( ) % 4 );
+        char buffer[ 100 ];
+        snprintf( buffer, 99, "%hu_%hhu", _curMap, getCurrentDaytime( ) % 4 );
         FS::readPictureData( ptr, "nitro:/PICS/MAP_MUG/", buffer, 512, 49152, !SCREENS_SWAPPED );
         drawBorder( );
 
@@ -309,7 +309,8 @@ namespace IO {
                 if( curitm ) {
                     if( u16( -1 ) == SAVE::SAV->getActiveFile( ).m_bag.count( BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm ) ) {
                         IO::yesNoBox yn( GET_STRING( 91 ) );
-                        sprintf( buffer, GET_STRING( 96 ), ItemList[ curitm ]->getDisplayName( true ).c_str( ) );
+                        char buffer[ 100 ];
+                        snprintf( buffer, 99, GET_STRING( 96 ), ItemList[ curitm ]->getDisplayName( true ).c_str( ) );
                         if( yn.getResult( buffer ) ) {
                             for( u8 j = i; j < 4; ++j ) {
                                 SAVE::SAV->getActiveFile( ).m_lstUsedItems[ ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx + 4 - j ) % 5 ] =
@@ -353,7 +354,7 @@ namespace IO {
                 bgUpdate( );
 
                 u16 res = bv.run( );
-                
+
                 FADE_TOP_DARK( );
                 IO::clearScreen( false );
                 videoSetMode( MODE_5_2D );
@@ -449,10 +450,10 @@ namespace IO {
                             a.m_boxdata.m_experienceGained += 750;
 
                             //Hand out some ribbons
-                            for( u8 i = 0; i < 4; ++i ) {
-                                a.m_boxdata.m_ribbons0[ i ] = rand( ) % 255;
-                                a.m_boxdata.m_ribbons1[ i ] = rand( ) % 255;
-                                a.m_boxdata.m_ribbons2[ i ] = rand( ) % 255;
+                            for( u8 j = 0; j < 4; ++j ) {
+                                a.m_boxdata.m_ribbons0[ j ] = rand( ) % 255;
+                                a.m_boxdata.m_ribbons1[ j ] = rand( ) % 255;
+                                a.m_boxdata.m_ribbons2[ j ] = rand( ) % 255;
                             }
                             a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
                             a.m_boxdata.m_ribbons1[ 3 ] = 0;
@@ -577,9 +578,7 @@ namespace IO {
                     case 10:
                     {
                         IO::keyboard kbd;
-                        auto res = kbd.getText( 10, "Type some text!" );
-                        sprintf( buffer, "Got: “%s”", res.c_str( ) );
-                        IO::messageBox( buffer, true );
+                        IO::messageBox( kbd.getText( 10, "Type some text!" ).c_str( ), true );
                         break;
                     }
                 }

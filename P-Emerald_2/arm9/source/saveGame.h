@@ -87,11 +87,11 @@ namespace SAVE {
             MAP::mapObject m_player;
             u8          m_currentMap;
             u8          m_stepCount;
+            MAP::warpPos m_lastWarp;
 
             u8          m_curBox;
 
             u16         m_lstDex;
-            u8          m_activatedPNav;
 
             u16         m_lstUsedItems[ 5 ];
             u8          m_lstUsedItemsIdx;

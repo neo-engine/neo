@@ -59,7 +59,7 @@ namespace BOX {
 
     constexpr u16 getBoxColor( u8 p_boxIdx ) {
         return RGB15( 4 * ( ( 41 - p_boxIdx ) % 7 + 1 ),
-                      ( p_boxIdx * 30 ) / 42 + 1,
+            ( p_boxIdx * 30 ) / 42 + 1,
                       5 * ( ( 41 - p_boxIdx ) / 7 + 1 ) );
     }
 
@@ -129,6 +129,7 @@ namespace BOX {
 
         auto pal = BG_PAL( !p_bottom );
         pal[ 0 ] = WHITE;
+        char buffer[ 50 ];
 
         IO::initOAMTable( !p_bottom );
         IO::regularFont->printString( GET_STRING( 61 ), 4, 3, !p_bottom );
@@ -148,11 +149,11 @@ namespace BOX {
                     IO::regularFont->setColor( RED_IDX, 1 );
                 else
                     IO::regularFont->setColor( BLACK_IDX, 1 );
-                sprintf( buffer, "%2d", cnt );
+                snprintf( buffer, 49, "%2d", cnt );
                 IO::regularFont->printString( buffer,
                                               x + 7, y + 5, !p_bottom );
             }
-        sprintf( buffer, "%4d Pokémon", pkmncnt );
+        snprintf( buffer, 49, "%4d Pokémon", pkmncnt );
         if( pkmncnt == 756 )
             IO::regularFont->setColor( RED_IDX, 1 );
         else

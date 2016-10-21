@@ -45,7 +45,7 @@ namespace BAG {
 
 #define CURRENT_ITEM SAVE::SAV->getActiveFile( ).m_bag( ( bag::bagType )SAVE::SAV->getActiveFile( ).m_lstBag, \
      (SAVE::SAV->getActiveFile( ).m_lstBagItem + _currSelectedIdx) % SAVE::SAV->getActiveFile( ).m_bag.size( ( bag::bagType )SAVE::SAV->getActiveFile( ).m_lstBag ) )
-    
+
     void bagViewer::initUI( ) {
         _bagUI->init( );
         _ranges = _bagUI->drawBagPage( ( bag::bagType )SAVE::SAV->getActiveFile( ).m_lstBag, SAVE::SAV->getActiveFile( ).m_lstBagItem );
@@ -69,6 +69,7 @@ namespace BAG {
             return false;
         }
 
+        char buffer[ 100 ];
         if( ItemList[ p_item ]->m_itemType == item::itemType::MEDICINE ) {
             for( u8 i = 0; i < 2; ++i )
                 if( ItemList[ p_item ]->needsInformation( i ) ) {
@@ -84,8 +85,8 @@ namespace BAG {
             u8 oldLv = p_pokemon.m_level;
             if( ItemList[ p_item ]->use( p_pokemon ) ) {
 
-                sprintf( buffer, GET_STRING( 50 ), ItemList[ p_item ]->getDisplayName( true ).c_str( ),
-                         p_pokemon.m_boxdata.m_name );
+                snprintf( buffer, 99, GET_STRING( 50 ), ItemList[ p_item ]->getDisplayName( true ).c_str( ),
+                          p_pokemon.m_boxdata.m_name );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -106,7 +107,7 @@ namespace BAG {
                     initUI( );
                     swiWaitForVBlank( );
 
-                    sprintf( buffer, GET_STRING( 52 ), getDisplayName( p_pokemon.m_boxdata.m_speciesId ).c_str( ) );
+                    snprintf( buffer, 99, GET_STRING( 52 ), getDisplayName( p_pokemon.m_boxdata.m_speciesId ).c_str( ) );
                     IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -135,14 +136,14 @@ namespace BAG {
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
-                sprintf( buffer, GET_STRING( 51 ), p_pokemon.m_boxdata.m_name );
+                snprintf( buffer, 99, GET_STRING( 51 ), p_pokemon.m_boxdata.m_name );
                 IO::messageBox( buffer, false );
                 p_pokemon.evolve( p_item, 3 );
 
                 initUI( );
                 swiWaitForVBlank( );
 
-                sprintf( buffer, GET_STRING( 52 ), getDisplayName( p_pokemon.m_boxdata.m_speciesId ).c_str( ) );
+                snprintf( buffer, 99, GET_STRING( 52 ), getDisplayName( p_pokemon.m_boxdata.m_speciesId ).c_str( ) );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -159,8 +160,9 @@ namespace BAG {
     bool bagViewer::giveItemToPkmn( pokemon& p_pokemon, u16 p_item ) {
         if( p_pokemon.getItem( ) ) {
             IO::yesNoBox yn( false );
-            sprintf( buffer, GET_STRING( 54 ),
-                     p_pokemon.m_boxdata.m_name, ItemList[ p_pokemon.getItem( ) ]->getDisplayName( true ).c_str( ) );
+            char buffer[ 100 ];
+            snprintf( buffer, 99, GET_STRING( 54 ),
+                      p_pokemon.m_boxdata.m_name, ItemList[ p_pokemon.getItem( ) ]->getDisplayName( true ).c_str( ) );
             if( !yn.getResult( buffer ) )
                 return false;
 
@@ -208,8 +210,9 @@ namespace BAG {
             return false;
         }
         IO::yesNoBox yn( false );
-        sprintf( buffer, GET_STRING( 56 ),
-                 ItemList[ p_targetItem ]->getDisplayName( true ).c_str( ) );
+        char buffer[ 100 ];
+        snprintf( buffer, 99, GET_STRING( 56 ),
+                  ItemList[ p_targetItem ]->getDisplayName( true ).c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -325,7 +328,8 @@ namespace BAG {
         IO::choiceBox cb( 1 + useable( CURRENT_ITEM.first ), choices + 2
                           + ( itm->m_itemType != item::KEY_ITEM ), 0, true );
         _bagUI->drawPkmnIcons( );
-        sprintf( buffer, GET_STRING( 57 ), itm->getDisplayName( true ).c_str( ) );
+        char buffer[ 100 ];
+        snprintf( buffer, 99, GET_STRING( 57 ), itm->getDisplayName( true ).c_str( ) );
         int res = cb.getResult( buffer, true, false );
         if( res != -1 )
             res += ( itm->m_itemType != item::KEY_ITEM );
@@ -354,8 +358,7 @@ namespace BAG {
                 SAVE::SAV->getActiveFile( ).m_lstUsedItems[ SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx ] = CURRENT_ITEM.first;
                 SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx = ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx + 1 ) % 5;
 
-                bool res = itm->use( true );
-                if( !res )
+                if( !itm->use( true ) )
                     ret = 2 | ( CURRENT_ITEM.first << 2 );
                 else {
                     initUI( );
@@ -426,7 +429,8 @@ namespace BAG {
                                  || itm->m_itemType == item::MEDICINE ) {
                             const char* choices[ 5 ] = { GET_STRING( 44 ), GET_STRING( 45 ), GET_STRING( 46 ), GET_STRING( 47 ), GET_STRING( 48 ) };
                             IO::choiceBox cb( 2, choices, 0, true );
-                            sprintf( buffer, GET_STRING( 57 ), itm->getDisplayName( true ).c_str( ) );
+                            char buffer[ 100 ];
+                            snprintf( buffer, 99, GET_STRING( 57 ), itm->getDisplayName( true ).c_str( ) );
                             _bagUI->drawPkmnIcons( );
                             int res = cb.getResult( buffer, true, false );
                             initUI( );
