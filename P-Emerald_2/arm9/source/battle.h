@@ -134,7 +134,7 @@ namespace BATTLE {
         battlePokemon _storedPkmns[ 6 ][ 2 ];
         battlePokemon _wildPokemon;
 
-        battleUI*    _battleUI;
+        battleUI    _battleUI;
 
         int         getTargetSpecifierValue( bool p_targetIsOpp, u8 p_targetPosition,
                                              const battleScript::command::targetSpecifier& p_targetSpecifier, u8 p_targetVal = 0 );
@@ -199,9 +199,6 @@ namespace BATTLE {
                 u8 p_platform,
                 u8 p_platform2,
                 u8 p_background );
-        ~battle( ) {
-            delete _battleUI;
-        }
 
         void        log( const std::string& p_message );
 
