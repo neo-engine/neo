@@ -435,7 +435,7 @@ namespace MAP {
         _slices[ 1 ][ 0 ] = 0;
         _slices[ 1 ][ 1 ] = 0;
         BATTLE::battleTrainer* bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
-        BATTLE::battle( bt, wildPkmn, weat, platform, plat2, battleBack ).start( );
+        BATTLE::battle( bt, &wildPkmn, weat, platform, plat2, battleBack ).start( );
         SAVE::SAV->getActiveFile( ).updateTeam( bt );
         delete bt;
         FADE_TOP_DARK( );

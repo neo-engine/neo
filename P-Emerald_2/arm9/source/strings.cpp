@@ -207,7 +207,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "No %s available.\nRemove the icon?", "Kein Exemplar des Items\n%s vorhanden.\nIcon entfernen?" },
     { "Recently used items\nwill appear here.", "Hier erscheinen zuletzt\neingesetzte Items." },
     { "You may register an\nitem to the button Y.", "Du kannst ein Item\nauf Y registrieren." },
-    { "%s used %s!", "%s setzt %s\nein!" },
+    { "%s used %s!`", "%s setzt %s\nein!`" },
 
 
     // 100

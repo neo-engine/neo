@@ -46,6 +46,9 @@ namespace SAVE {
 #define MAX_SAVE_FILES 3
 #define MAX_CHAPTERS 12
 #define MAX_SPECIAL_EPISODES 1
+
+#define  getActiveFile( ) m_saveFile[ SAVE::SAV->m_activeFile ]
+
     extern const char* const CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ];
     extern const char* EPISODE_NAMES[ LANGUAGES ][ MAX_SPECIAL_EPISODES ];
 
@@ -60,10 +63,10 @@ namespace SAVE {
     struct saveGame {
         struct playerInfo {
             // general stuff
-            gameType    m_gameType : 7;
+            gameType    m_gameType;
             u8          m_chapter;
 
-            u8          m_isMale : 1;
+            u8          m_isMale;
             char        m_playername[ 12 ];
             u16         m_id;
             u16         m_sid;
@@ -146,10 +149,6 @@ namespace SAVE {
         u16         getDexCount( );
 
         BOX::box*   getCurrentBox( );
-
-        playerInfo&  getActiveFile( ) {
-            return m_saveFile[ m_activeFile ];
-        }
     };
     extern std::unique_ptr<saveGame> SAV;
 }

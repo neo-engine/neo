@@ -194,11 +194,14 @@ namespace BATTLE {
                 battleMode p_battlemode = SINGLE,
                 u8 p_platform2 = -1 );
         battle( battleTrainer* p_player,
-                pokemon p_opponent,
+                pokemon* p_opponent,
                 weather p_weather,
                 u8 p_platform,
                 u8 p_platform2,
                 u8 p_background );
+        ~battle( ) {
+            delete _battleUI;
+        }
 
         void        log( const std::string& p_message );
 

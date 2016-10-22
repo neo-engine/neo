@@ -1278,7 +1278,7 @@ namespace BATTLE {
         IO::updateOAM( true );
         touchPosition touch;
         loop( ) {
-
+            swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
             u32 pressed = keysHeld( );
@@ -1396,7 +1396,7 @@ namespace BATTLE {
         touchPosition touch;
         auto& result = _battle->_battleMoves[ p_pokemonPos ][ PLAYER ];
         loop( ) {
-
+            swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
 
@@ -1570,6 +1570,7 @@ NEXT_TRY:
         touchPosition touch;
         loop( ) {
 NEXT:
+            swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
 
@@ -1753,6 +1754,7 @@ END:
         touchPosition touch;
         loop( ) {
 NEXT:
+            swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
 
@@ -1887,6 +1889,7 @@ START:
         touchPosition touch;
         loop( ) {
 NEXT:
+            swiWaitForVBlank( );
             IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
             IO::updateOAM( true );
 
