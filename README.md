@@ -41,8 +41,8 @@ _Partially_ implemented features are in _italics_.
     * [ ] Dynamic difficulty 
       * [ ] Adjust the encounter rate at will
       * [ ] Adjust opposing Pokémon's level (between battles)
-    * [ ] Support for multiple save files and “New Game+”
-      * [ ] Shared PokéDex and stored Pokémon
+    * [x] Support for multiple save files
+      * [x] Shared PokéDex and stored Pokémon
     * [ ] Support for multiple languages
 * [ ] _Easy-to-understand and ready-to-(re)use code_
     * [x] Strict and intuitive naming conventions
