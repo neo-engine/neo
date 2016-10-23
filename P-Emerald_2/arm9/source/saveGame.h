@@ -30,9 +30,11 @@
 #include <nds.h>
 #include <string>
 #include <vector>
+#include <memory>
 #include "bag.h"
 #include "box.h"
 #include "mapObject.h"
+#include "saveOptions.h"
 
 struct pokemon;
 
@@ -40,92 +42,113 @@ namespace BATTLE {
     class battleTrainer;
 }
 
-namespace FS {
-    enum SavMod {
-        _NDS,
-        _GBA
+namespace SAVE {
+#define MAX_SAVE_FILES 3
+#define MAX_CHAPTERS 12
+#define MAX_SPECIAL_EPISODES 1
+
+#define  getActiveFile( ) m_saveFile[ SAVE::SAV->m_activeFile ]
+
+    extern const char* const CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ];
+    extern const char* EPISODE_NAMES[ LANGUAGES ][ MAX_SPECIAL_EPISODES ];
+
+    enum gameType {
+        UNUSED = 0,
+        NORMAL = 1,
+        TRANSFER = 2,
+
+        SPECIAL = 3
     };
-    extern SavMod savMod;
 
-    extern std::vector<pokemon> tmp;
     struct saveGame {
-        //general stuff
-        char     m_playername[ 12 ];
-        u8          m_isMale : 1;
-        u16         m_id;
-        u16         m_sid;
-        union {
-            u32     m_playtime;
-            struct {
-                u16 m_hours;
-                u8  m_mins;
-                u8  m_secs;
+        struct playerInfo {
+            // general stuff
+            gameType    m_gameType;
+            u8          m_chapter;
 
-            }       m_pt;
-        };
-        u8          m_HOENN_Badges;
-        u8          m_KANTO_Badges;
-        u8          m_JOHTO_Badges;
-        u8          m_savTyp : 3;
-        u8          m_inDex[ 1 + MAX_PKMN / 8 ];
-        u32         m_money;
-        u32         m_coins;
-        u32         m_battlePoints;
+            u8          m_isMale;
+            char        m_playername[ 12 ];
+            u16         m_id;
+            u16         m_sid;
+            union {
+                u32     m_playtime;
+                struct {
+                    u16 m_hours;
+                    u8  m_mins;
+                    u8  m_secs;
 
-        pokemon     m_pkmnTeam[ 6 ];
+                }       m_pt;
+            };
+            u8          m_HOENN_Badges;
+            u8          m_KANTO_Badges;
+            u8          m_JOHTO_Badges;
+            u32         m_money;
+            u32         m_coins;
+            u32         m_battlePoints;
 
-        //Stored Pkmn
+            // Map stuff
+            MAP::mapObject m_player;
+            u8          m_currentMap;
+            u8          m_stepCount;
+            MAP::warpPos m_lastWarp;
+
+            u8          m_curBox;
+
+            u16         m_lstDex;
+
+            u16         m_lstUsedItems[ 5 ];
+            u8          m_lstUsedItemsIdx;
+            u16         m_registeredItem;
+
+            u8          m_lstBag;
+            u16         m_lstBagItem;
+
+            s16         m_repelSteps;
+
+            saveOptions m_options;
+
+            pokemon     m_pkmnTeam[ 6 ];
+
+            u16         m_flags[ 500 ];
+
+            //Bag stuff
+            BAG::bag    m_bag;
+
+            // Methods 'n' stuff
+            bool        checkflag( u8 p_idx );
+            void        setflag( u8 p_idx, bool p_value );
+            void        stepIncrease( );
+            u8          getEncounterLevel( u8 p_tier );
+            u8          getBadgeCount( );
+            u8          getTeamPkmnCount( );
+
+            BATTLE::battleTrainer* getBattleTrainer( );
+            void        updateTeam( BATTLE::battleTrainer* p_trainer );
+        } m_saveFile[ MAX_SAVE_FILES ];
+
+        u8          m_activeFile;
+
+        // Things shared among all save files
+
+        // Stored Pkmn
 #define MAX_BOXES 42
         BOX::box    m_storedPokemon[ MAX_BOXES ];
         pokemon::boxPokemon m_clipboard[ 6 ];
-        u8          m_curBox;
 
-        //Map stuff
-        MAP::mapObject m_player;
-        u8          m_currentMap;
+        u8          m_caughtPkmn[ 1 + MAX_PKMN / 8 ];
+        u8          m_seenPkmn[ 1 + MAX_PKMN / 8 ];
 
-        u8          m_EXPShareEnabled : 1;
-        u8          m_evolveInBattle : 1;
-        u8          m_bgIdx;
+        u8          m_transfersRemaining; // Times a GBA save file can be copied
 
-        u16         m_flags[ 500 ];
-
-        u16         m_lstDex;
-        u8          m_hasGDex : 1;
-        u8          m_activatedPNav;
-
-        //Bag stuff
-        u8          m_lstBag;
-        u16         m_lstBagItem;
-
-        u16         m_lstUsedItems[ 5 ];
-        u8          m_lstUsedItemsIdx;
-        u16         m_registeredItem;
-
-        s16         m_repelSteps;
-        BAG::bag    m_bag;
-
-        bool        checkflag( u8 p_idx );
-        void        setflag( u8 p_idx, bool p_value );
-        void        stepIncrease( );
-        u8          getEncounterLevel( u8 p_tier );
-        u8          getBadgeCount( );
-        u8          getTeamPkmnCount( );
-
-        BATTLE::battleTrainer* getBattleTrainer( );
-        void        updateTeam( );
-
-        //Return the idx of the resulting Box
+        // Return the idx of the resulting Box
         s8          storePkmn( const pokemon::boxPokemon& p_pokemon );
         s8          storePkmn( const pokemon& p_pokemon );
 
         u16         countPkmn( u16 p_pkmnIdx );
 
+        u16         getDexCount( );
+
         BOX::box*   getCurrentBox( );
     };
-
-    saveGame*       readSave( );
-    bool            writeSave( saveGame* p_saveGame );
-
-    extern saveGame* SAV;
+    extern std::unique_ptr<saveGame> SAV;
 }

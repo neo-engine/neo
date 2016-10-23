@@ -63,7 +63,7 @@ namespace IO {
         nav( );
         void draw( bool p_initMainSprites = false, u8 p_newIdx = (u8)255 );
         void showNewMap( u8 p_map );
-        void handleInput( touchPosition p_touch );
+        void handleInput( touchPosition p_touch, const char* p_path );
         void home( ) {
             _state = HOME;
         }

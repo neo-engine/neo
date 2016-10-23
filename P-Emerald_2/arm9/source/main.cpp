@@ -40,6 +40,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "defines.h"
 #include "saveGame.h"
+#include "fs.h"
 #include "startScreen.h"
 
 #include "hmMoves.h"
@@ -89,6 +90,9 @@ bool ANIMATE_MAP = false;
 u8 FRAME_COUNT = 0;
 bool SCREENS_SWAPPED = false;
 bool PLAYER_IS_FISHING = false;
+bool INIT_NITROFS = false;
+
+char** ARGV;
 
 u8 getCurrentDaytime( ) {
     u8 t = achours, m = acmonth;
@@ -113,8 +117,8 @@ void initGraphics( ) {
     IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
     IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
 
-    IO::consoleFont->gfx = (u16*) consoleFontTiles;
-    IO::consoleFont->pal = (u16*) consoleFontPal;
+    IO::consoleFont->gfx = ( u16* ) const_cast<unsigned int*>( consoleFontTiles );
+    IO::consoleFont->pal = ( u16* ) const_cast<unsigned short*>( consoleFontPal );
     IO::consoleFont->numChars = 218;
     IO::consoleFont->numColors = 16;
     IO::consoleFont->bpp = 8;
@@ -141,25 +145,23 @@ void initTimeAndRnd( ) {
 int main( int, char** p_argv ) {
     //Init
     powerOn( POWER_ALL_2D );
-
-    fatInitDefault( );
     nitroFSInit( p_argv );
-
+    ARGV = p_argv;
 
     irqEnable( IRQ_VBLANK );
     initGraphics( );
     initTimeAndRnd( );
 
     //Read the savegame
-    if( gMod != EMULATOR ) {
-        FS::SAV = FS::readSave( );
-    } else {
-        FS::SAV->m_savTyp = 0;
-    }
-    startScreen( ).run( );
-
-    FS::SAV->m_hasGDex = true;
-    FS::SAV->m_evolveInBattle = true;
+    if( gMod != EMULATOR && p_argv[ 0 ] )
+        SAVE::SAV = FS::readSave( p_argv[ 0 ] );
+    else
+        SAVE::SAV = 0;
+    if( !SAVE::SAV )
+        SAVE::SAV = std::unique_ptr<SAVE::saveGame>( new SAVE::saveGame( ) );
+    SAVE::startScreen( ).run( );
+    IO::clearScreenConsole( false, true );
+    IO::clearScreen( false, true );
 
     irqSet( IRQ_VBLANK, [ ] ( ) {
         scanKeys( );
@@ -167,6 +169,11 @@ int main( int, char** p_argv ) {
 
         if( ANIMATE_MAP && MAP::curMap )
             MAP::curMap->animateMap( FRAME_COUNT );
+
+        if( INIT_NITROFS ) {
+            nitroFSInit( ARGV );
+            INIT_NITROFS = false;
+        }
 
         if( !UPDATE_TIME )
             return;
@@ -192,6 +199,13 @@ int main( int, char** p_argv ) {
             sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
             IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
 
+            SAVE::SAV->getActiveFile( ).m_pt.m_secs++; // I know, this is rather inaccurate 
+
+            SAVE::SAV->getActiveFile( ).m_pt.m_mins += ( SAVE::SAV->getActiveFile( ).m_pt.m_secs / 60 );
+            SAVE::SAV->getActiveFile( ).m_pt.m_hours += ( SAVE::SAV->getActiveFile( ).m_pt.m_mins / 60 );
+
+            SAVE::SAV->getActiveFile( ).m_pt.m_secs %= 60;
+            SAVE::SAV->getActiveFile( ).m_pt.m_mins %= 60;
 
             achours = timeStruct->tm_hour;
             acminutes = timeStruct->tm_min;
@@ -216,6 +230,8 @@ int main( int, char** p_argv ) {
     FADE_TOP( );
     MAP::curMap = new MAP::mapDrawer( );
     MAP::curMap->draw( );
+
+
     ANIMATE_MAP = true;
 
     touchPosition touch;
@@ -232,17 +248,18 @@ int main( int, char** p_argv ) {
         if( held & KEY_L && gMod == DEVELOPER ) {
             time_t unixTime = time( NULL );
             struct tm* timeStruct = gmtime( (const time_t *) &unixTime );
-            std::sprintf( buffer, "Currently at %hu-(%hu,%hu,%hu).\nMap: %hu:%hu, (%02hX,%02hX)\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
-                          FS::SAV->m_currentMap,
-                          FS::SAV->m_player.m_pos.m_posX,
-                          FS::SAV->m_player.m_pos.m_posY,
-                          FS::SAV->m_player.m_pos.m_posZ,
-                          FS::SAV->m_player.m_pos.m_posY / 32,
-                          FS::SAV->m_player.m_pos.m_posX / 32,
-                          FS::SAV->m_player.m_pos.m_posX % 32,
-                          FS::SAV->m_player.m_pos.m_posY % 32,
-                          FRAME_COUNT,
-                          achours, acminutes, acseconds, timeStruct->tm_sec );
+            char buffer[ 100 ];
+            snprintf( buffer, 99, "Currently at %hu-(%hu,%hu,%hu).\nMap: %hu:%hu, (%02hX,%02hX)\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
+                      SAVE::SAV->getActiveFile( ).m_currentMap,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY / 32,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX % 32,
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32,
+                      FRAME_COUNT,
+                      achours, acminutes, acseconds, timeStruct->tm_sec );
             IO::messageBox m( buffer );
             IO::NAV->draw( true );
         }
@@ -250,21 +267,22 @@ int main( int, char** p_argv ) {
 
         if( held & KEY_A ) {
             for( u8 i = 0; i < 6; ++i ) {
-                if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId )
                     break;
-                auto a = FS::SAV->m_pkmnTeam[ i ];
+                auto a = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
                 if( a.m_boxdata.m_individualValues.m_isEgg )
                     continue;
                 for( u8 j = 0; j < 4; ++j ) {
                     if( !AttackList[ a.m_boxdata.m_moves[ j ] ]->m_isFieldAttack
                         || !AttackList[ a.m_boxdata.m_moves[ j ] ]->possible( ) )
                         continue;
-                    sprintf( buffer, "%s\nMöchtest du %s nutzen?", AttackList[ a.m_boxdata.m_moves[ j ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                    char buffer[ 50 ];
+                    snprintf( buffer, 49, GET_STRING( 3 ), AttackList[ a.m_boxdata.m_moves[ j ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                     IO::yesNoBox yn;
                     if( yn.getResult( buffer ) ) {
                         IO::NAV->draw( );
                         swiWaitForVBlank( );
-                        sprintf( buffer, "%s setzt %s ein!", a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                        snprintf( buffer, 49, GET_STRING( 10 ), a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                         IO::messageBox( buffer, 0, false );
                         MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
                         IO::NAV->draw( true );
@@ -286,7 +304,7 @@ OUT:
             scanKeys( );
 
             stopped = false;
-            if( MAP::curMap->canMove( FS::SAV->m_player.m_pos, curDir, FS::SAV->m_player.m_movement ) ) {
+            if( MAP::curMap->canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, curDir, SAVE::SAV->getActiveFile( ).m_player.m_movement ) ) {
                 MAP::curMap->movePlayer( curDir, ( held & KEY_B ) );
                 bmp = false;
             } else if( !bmp ) {
@@ -309,7 +327,7 @@ OUT:
             bmp = false;
         }
 
-        IO::NAV->handleInput( touch );
+        IO::NAV->handleInput( touch, p_argv[ 0 ] );
         //End
         scanKeys( );
     }

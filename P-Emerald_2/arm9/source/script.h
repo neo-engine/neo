@@ -32,7 +32,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include <nds/ndstypes.h>
 
-#include "buffer.h"
 #include "type.h"
 
 class pokemon;

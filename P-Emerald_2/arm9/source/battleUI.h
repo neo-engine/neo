@@ -61,7 +61,6 @@ namespace BATTLE {
         u8      chooseAttackTarget( u8 p_pokemonPos, u16 p_moveNo );
         u16     chooseItem( );
         u8      choosePKMN( bool p_firstIsChosen, bool p_back = true, bool p_noRestrict = false );
-        void    useNav( );
 
         void    showAttack( bool p_opponent, u8 p_pokemonPos );
         void    updateHP( bool p_opponent, u8 p_pokemonPos, u16 p_oldHP, u16 p_oldHPmax = -1 );
@@ -86,9 +85,5 @@ namespace BATTLE {
         battleUI( ) { }
         battleUI( battle* p_battle )
             :_battle( p_battle ) { }
-
-        ~battleUI( ) {
-            _battle = 0;
-        }
     };
 }

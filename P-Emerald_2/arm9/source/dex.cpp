@@ -113,7 +113,7 @@ namespace DEX {
             p_idx = ( p_idx + 8 ) % MAX_PKMN_ALL;
         }
         _selectedIdx = p_idx;
-        FS::SAV->m_lstDex = CURR_PKMN;
+        SAVE::SAV->getActiveFile( ).m_lstDex = CURR_PKMN;
 
         DRAW_TOP( );
         _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx, oldIdx );
@@ -146,7 +146,7 @@ namespace DEX {
     }
 
     void dex::run( u16 p_pkmnIdx ) {
-        FS::SAV->m_lstDex = p_pkmnIdx;
+        SAVE::SAV->getActiveFile( ).m_lstDex = p_pkmnIdx;
 
         changeMode( _mode, p_pkmnIdx );
 
@@ -188,7 +188,15 @@ namespace DEX {
                 if( GET_AND_WAIT( KEY_START )
                     || GET_AND_WAIT_R( 1, 1, 30 * ( 1 + ( _mode == SHOW_CAUGHT ) ), 16 ) )
                     changeMode( mode( !_mode ), CURR_PKMN );
-
+            if( _mode != SHOW_ALL ) {
+                if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                    _page = ( _page + 1 ) % MAX_PAGES;
+                    DRAW_TOP( );
+                } else if( GET_AND_WAIT( KEY_LEFT ) ) {
+                    _page = ( _page + MAX_PAGES - 1 ) % MAX_PAGES;
+                    DRAW_TOP( );
+                }
+            }
             if( _mode == SHOW_CAUGHT ) {
                 if( GET_AND_WAIT( KEY_DOWN ) ) {
                     if( nextEntry( CURR_PKMN ) < MAX_PKMN + 1 ) {
@@ -196,7 +204,7 @@ namespace DEX {
                             rotateForward( );
                         else
                             _selectedIdx++;
-                        FS::SAV->m_lstDex = CURR_PKMN;
+                        SAVE::SAV->getActiveFile( ).m_lstDex = CURR_PKMN;
                         DRAW_TOP( );
                         _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
                     }
@@ -206,7 +214,7 @@ namespace DEX {
                             rotateBackward( );
                         else
                             _selectedIdx--;
-                        FS::SAV->m_lstDex = CURR_PKMN;
+                        SAVE::SAV->getActiveFile( ).m_lstDex = CURR_PKMN;
                         DRAW_TOP( );
                         _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
                     }
@@ -216,7 +224,7 @@ namespace DEX {
                         && GET_AND_WAIT_R( IO::Oam->oamBuffer[ i ].x, IO::Oam->oamBuffer[ i ].y,
                                            IO::Oam->oamBuffer[ i ].x + 32, IO::Oam->oamBuffer[ i ].y + 28 ) ) {
                         _selectedIdx = i - FRAME_START_2;
-                        FS::SAV->m_lstDex = CURR_PKMN;
+                        SAVE::SAV->getActiveFile( ).m_lstDex = CURR_PKMN;
                         DRAW_TOP( );
                         _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
                     }

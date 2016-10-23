@@ -49,6 +49,26 @@ namespace IO {
                 swiWaitForVBlank( );
                 break;
             }
+            case IO::UNFADE_FAST:
+            {
+                u16 val = 0x1F;
+                for( s8 i = 3; i >= 0; i -= 2 ) {
+                    swiWaitForVBlank( );
+                    val &= ~( 3 << u8( i ) );
+                    REG_BLDY = val;
+                }
+                swiWaitForVBlank( );
+                break;
+            }
+            case IO::CLEAR_DARK_FAST:
+                REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
+                REG_BLDY = 1;
+                for( u8 i = 1; i < 5; i += 2 ) {
+                    swiWaitForVBlank( );
+                    REG_BLDY |= ( 3 << i );
+                }
+                swiWaitForVBlank( );
+                break;
             case IO::CLEAR_DARK:
             case IO::CAVE_ENTRY:
                 REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
@@ -61,6 +81,16 @@ namespace IO {
                 swiWaitForVBlank( );
                 if( p_type == CLEAR_DARK )
                     break;
+                break;
+            case IO::CLEAR_WHITE_FAST:
+                REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
+                REG_BLDY = 1;
+                for( u8 i = 1; i < 5; i += 2 ) {
+                    for( u8 j = 0; j < 4; ++j )
+                        swiWaitForVBlank( );
+                    REG_BLDY |= ( 3 << i );
+                }
+                swiWaitForVBlank( );
                 break;
             case IO::CLEAR_WHITE:
             case IO::CAVE_EXIT:
@@ -76,16 +106,34 @@ namespace IO {
                     break;
                 break;
             case IO::BATTLE:
+            case IO::BATTLE_STRONG_OPPONENT:
                 REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3;
-                REG_BLDY = 1;
+                for( u8 j = 0; j < p_type - IO::BATTLE + 1; ++j ) {
+                    u16 val = 0x1F;
+                    for( s8 i = 4; i >= 0; --i ) {
+                        for( u8 k = 0; k < 2 + j; ++k )
+                            swiWaitForVBlank( );
+                        val &= ~( 1 << u8( i ) );
+                        REG_BLDY = val;
+                    }
+                    for( u8 i = 1; i < 3; ++i )
+                        swiWaitForVBlank( );
+                    REG_BLDY = 1;
+                    for( u8 i = 1; i < 5; ++i ) {
+                        for( u8 k = 0; k < 2 + j; ++k )
+                            swiWaitForVBlank( );
+                        REG_BLDY |= ( 1 << i );
+                    }
+                    for( u8 i = 1; i < 3; ++i )
+                        swiWaitForVBlank( );
+                }
+                REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
                 for( u8 i = 1; i < 5; ++i ) {
                     for( u8 j = 0; j < 4; ++j )
                         swiWaitForVBlank( );
                     REG_BLDY |= ( 1 << i );
                 }
                 swiWaitForVBlank( );
-                break;
-            case IO::BATTLE_STRONG_OPPONENT:
                 break;
             default:
                 break;
@@ -100,6 +148,7 @@ namespace IO {
         }
         if( p_both || !p_bottom ) {
             FS::readPictureData( bgGetGfxPtr( bg3 ), "nitro:/PICS/", file );
+            FS::readPictureData( bgGetGfxPtr( bg2 ), "nitro:/PICS/", file );
         }
         regularFont->setColor( RGB( 0, 31, 31 ), 0 );
     }

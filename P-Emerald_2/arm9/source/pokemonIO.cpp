@@ -49,8 +49,8 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
                                  bool            p_fatefulEncounter ) {
     getAll( p_pkmnId, data );
     m_pid = rand( );
-    m_oTId = FS::SAV->m_id;
-    m_oTSid = FS::SAV->m_sid;
+    m_oTId = SAVE::SAV->getActiveFile( ).m_id;
+    m_oTSid = SAVE::SAV->getActiveFile( ).m_sid;
     if( p_shiny == 2 )
         while( !isShiny( ) || isCloned( ) )
             m_pid = rand( );
@@ -103,6 +103,7 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
     m_ability = ( p_hiddenAbility && data.m_abilities[ 2 ] ) ? ( ( ( m_pid & 1 ) || !data.m_abilities[ 3 ] ) ? data.m_abilities[ 2 ] : data.m_abilities[ 3 ] ) :
         ( ( ( m_pid & 1 ) || !data.m_abilities[ 1 ] ) ? data.m_abilities[ 0 ] : data.m_abilities[ 1 ] );
     m_markings = 0;
+
     m_origLang = 5;
 
     memset( m_effortValues, 0, sizeof( m_effortValues ) );
@@ -151,11 +152,11 @@ pokemon::boxPokemon::boxPokemon( u16             p_pkmnId,
         m_individualValues.m_isNicked = false;
     }
     m_hometown = 4;
-    strcpy( m_oT, FS::SAV->m_playername );
+    strcpy( m_oT, SAVE::SAV->getActiveFile( ).m_playername );
     m_pokerus = p_pokerus;
     m_ball = 0;
     m_gotLevel = p_level;
-    m_oTisFemale = !FS::SAV->m_isMale;
+    m_oTisFemale = !SAVE::SAV->getActiveFile( ).m_isMale;
     m_encounter = (encounter) 0;
     m_HGSSBall = 0;
 }
@@ -382,7 +383,7 @@ bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
         if( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember ) {
             bool b = false;
             for( int j = 0; j < 6; ++j )
-                b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId );
+                b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId );
             if( !b )
                 continue;
         }
@@ -439,7 +440,7 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
         if( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember ) {
             bool b = false;
             for( int j = 0; j < 6; ++j )
-                b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId );
+                b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId );
             if( !b )
                 continue;
         }
@@ -460,7 +461,7 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
         m_stats.m_maxHP = 1;
 
     if( !m_boxdata.m_individualValues.m_isNicked )
-        strcpy( m_boxdata.m_name, getDisplayName( m_boxdata.m_speciesId ) );
+        strcpy( m_boxdata.m_name, getDisplayName( m_boxdata.m_speciesId ).c_str( ) );
 
     pkmnNatures nature = m_boxdata.getNature( );
     m_stats.m_Atk = ( ( ( m_boxdata.m_individualValues.m_attack + 2 * data.m_bases[ 1 ] + ( m_boxdata.m_effortValues[ 1 ] >> 2 ) )*m_level / 100.0 ) + 5 )*NatMod[ nature ][ 0 ];
@@ -481,11 +482,12 @@ void pokemon::boxPokemon::hatch( ) {
 }
 
 bool pokemon::boxPokemon::learnMove( u16 p_move ) {
+    char buffer[ 50 ];
     if( p_move == m_moves[ 0 ]
         || p_move == m_moves[ 1 ]
         || p_move == m_moves[ 2 ]
         || p_move == m_moves[ 3 ] ) {
-        sprintf( buffer, "%s beherrscht\n%s bereits!", m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
+        snprintf( buffer, 49, GET_STRING( 102 ), m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -498,7 +500,7 @@ bool pokemon::boxPokemon::learnMove( u16 p_move ) {
                 m_moves[ i ] = p_move;
                 m_acPP[ i ] = std::min( m_acPP[ i ], AttackList[ p_move ]->m_movePP );
 
-                sprintf( buffer, "%s erlernt\n%s!", m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
+                snprintf( buffer, 49, GET_STRING( 103 ), m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -509,12 +511,12 @@ bool pokemon::boxPokemon::learnMove( u16 p_move ) {
             }
         if( !freeSpot ) {
             IO::yesNoBox yn( false );
-            sprintf( buffer, "%s beherrscht\nbereits 4 Attacken.\nSoll eine verlernt werden?", m_name );
+            snprintf( buffer, 49, GET_STRING( 104 ), m_name );
             if( yn.getResult( buffer ) ) {
-                u8 res = IO::choiceBox( *this, p_move ).getResult( "Welche Attacke?", false, false );
+                u8 res = IO::choiceBox( *this, p_move ).getResult( GET_STRING( 105 ), false, false );
                 if( res < 4 ) {
                     if( AttackList[ m_moves[ res ] ]->m_isFieldAttack ) {
-                        sprintf( buffer, "%s kann\n%s nicht vergessen!", m_name, AttackList[ m_moves[ res ] ]->m_moveName.c_str( ) );
+                        snprintf( buffer, 49, GET_STRING( 106 ), m_name, AttackList[ m_moves[ res ] ]->m_moveName.c_str( ) );
                         IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
                         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                         IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;
@@ -529,7 +531,7 @@ bool pokemon::boxPokemon::learnMove( u16 p_move ) {
                 return false;
         }
     } else {
-        sprintf( buffer, "%s kann\n%s nicht erlernen!", m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
+        snprintf( buffer, 49, GET_STRING( 107 ), m_name, AttackList[ p_move ]->m_moveName.c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden = true;

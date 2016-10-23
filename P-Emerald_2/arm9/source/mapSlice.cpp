@@ -38,22 +38,21 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #endif
 
 namespace MAP {
-    sliceCache cache;
-
-    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y, bool p_init ) {
+    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y ) {
         FILE* mapF = FS::open( MAP_PATH,
-                               ( toString( p_map )
-                                 + "/" + toString( p_y )
-                                 + "_" + toString( p_x ) ).c_str( ),
+            ( toString( p_map )
+              + "/" + toString( p_y )
+              + "_" + toString( p_x ) ).c_str( ),
                                ".map" );
         if( !mapF ) mapF = FS::open( MAP_PATH,
-                                     ( toString( p_map )
-                                       + "/BORDER/" + toString( p_y )
-                                       + "_" + toString( p_x ) ).c_str( ),
+            ( toString( p_map )
+              + "/BORDER/" + toString( p_y )
+              + "_" + toString( p_x ) ).c_str( ),
                                      ".map" );
         if( !mapF ) {
 #ifdef DEBUG
-            sprintf( buffer, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
+            char buffer[ 50 ];
+            snprintf( buffer, 49, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
             IO::messageBox m( buffer );
             IO::NAV->draw( true );
             swiWaitForVBlank( );
@@ -97,94 +96,50 @@ namespace MAP {
         swiWaitForVBlank( );
 #endif
 
-        //Read the wild Pkoemon data
+        //Read the wild Pokémon data
         mapF = FS::open( MAP_PATH,
-                         ( toString( p_map )
-                           + "/" + toString( p_y )
-                           + "_" + toString( p_x ) ).c_str( ),
+            ( toString( p_map )
+              + "/" + toString( p_y )
+              + "_" + toString( p_x ) ).c_str( ),
                          ".enc" );
         FS::read( mapF, res->m_pokemon, sizeof( std::pair<u16, u16> ), 3 * 5 * 5 );
         FS::close( mapF );
 
         //Read the first tileset
-        s8 ind;
-        if( ( ind = cache.get( tsidx1 ) ) == -1 || p_init ) {
-            ind = cache.set( tsidx1 );
-            if( cache.m_tiles[ ind ] )
-                delete cache.m_tiles[ ind ];
-            mapF = FS::open( TILESET_PATH, tsidx1, ".ts" );
-            cache.m_tiles[ ind ] = new tile[ 512 ];
-            FS::readTiles( mapF, cache.m_tiles[ ind ] );
-            FS::close( mapF );
+        mapF = FS::open( TILESET_PATH, tsidx1, ".ts" );
+        FS::readTiles( mapF, res->m_tileSet.m_tiles );
+        FS::close( mapF );
 
-            if( cache.m_blocks[ ind ] )
-                delete cache.m_blocks[ ind ];
-            mapF = FS::open( TILESET_PATH, tsidx1, ".bvd" );
-            cache.m_blocks[ ind ] = new block[ 512 ];
-            FS::readBlocks( mapF, cache.m_blocks[ ind ] );
-            FS::close( mapF );
+        mapF = FS::open( TILESET_PATH, tsidx1, ".bvd" );
+        FS::readBlocks( mapF, res->m_blockSet.m_blocks );
+        FS::close( mapF );
 
-            if( cache.m_palettes[ ind ] )
-                delete cache.m_palettes[ ind ];
-            mapF = FS::open( TILESET_PATH, tsidx1, ".p2l" );
-            cache.m_palettes[ ind ] = new palette[ 6 ];
-            FS::readPal( mapF, cache.m_palettes[ ind ] );
-            FS::close( mapF );
+        mapF = FS::open( TILESET_PATH, tsidx1, ".p2l" );
+        FS::readPal( mapF, res->m_pals );
+        FS::close( mapF );
 
-            // TODO: FIX THIS!
-            //if( cache.m_animations[ ind ] )
-            //    delete cache.m_animations[ ind ];
-            //mapF = FS::open( TILESET_PATH, tsidx1, ".anm" );
-            //cache.m_animationCounts[ ind ] = FS::readAnimations( mapF, cache.m_animations[ ind ] );
-#ifdef DEBUG
-            //assert( cache.m_animationCounts[ ind ] && cache.m_animations[ ind ] );
-#endif
-        }
-        res->m_tileSet.m_tiles1 = cache.m_tiles[ ind ];
-        res->m_blockSet.m_blocks1 = cache.m_blocks[ ind ];
-        memcpy( res->m_pals, cache.m_palettes[ ind ], sizeof( palette ) * 6 );
+        // TODO: FIX THIS!
+        mapF = FS::open( TILESET_PATH, tsidx1, ".anm" );
+        res->m_tileSet.m_animationCount1 = FS::readAnimations( mapF, res->m_tileSet.m_animations );
+        FS::close( mapF );
 
-        //res->m_tileSet.m_animations1 = cache.m_animations[ ind ];
-        //res->m_tileSet.m_animationCount1 = cache.m_animationCounts[ ind ];
         //Read the second tileset
 
-        if( ( ind = cache.get( tsidx2 ) ) == -1 || p_init ) {
-            ind = cache.set( tsidx2 );
-            if( cache.m_tiles[ ind ] )
-                delete cache.m_tiles[ ind ];
-            mapF = FS::open( TILESET_PATH, tsidx2, ".ts" );
-            cache.m_tiles[ ind ] = new tile[ 512 ];
-            FS::readTiles( mapF, cache.m_tiles[ ind ] );
-            FS::close( mapF );
+        mapF = FS::open( TILESET_PATH, tsidx2, ".ts" );
+        FS::readTiles( mapF, res->m_tileSet.m_tiles, 512 );
+        FS::close( mapF );
 
-            if( cache.m_blocks[ ind ] )
-                delete cache.m_blocks[ ind ];
-            mapF = FS::open( TILESET_PATH, tsidx2, ".bvd" );
-            cache.m_blocks[ ind ] = new block[ 512 ];
-            FS::readBlocks( mapF, cache.m_blocks[ ind ] );
-            FS::close( mapF );
+        mapF = FS::open( TILESET_PATH, tsidx2, ".bvd" );
+        FS::readBlocks( mapF, res->m_blockSet.m_blocks, 512 );
+        FS::close( mapF );
 
-            if( cache.m_palettes[ ind ] )
-                delete cache.m_palettes[ ind ];
-            mapF = FS::open( TILESET_PATH, tsidx2, ".p2l" );
-            cache.m_palettes[ ind ] = new palette[ 6 ];
-            FS::readPal( mapF, cache.m_palettes[ ind ] );
-            FS::close( mapF );
+        mapF = FS::open( TILESET_PATH, tsidx2, ".p2l" );
+        FS::readPal( mapF, res->m_pals + 6 );
+        FS::close( mapF );
 
-          //  if( cache.m_animations[ ind ] )
-          //      delete cache.m_animations[ ind ];
-          //  mapF = FS::open( TILESET_PATH, tsidx2, ".anm" );
-          //  cache.m_animationCounts[ ind ] = FS::readAnimations( mapF, cache.m_animations[ ind ] );
-#ifdef DEBUG
-          //  assert( !cache.m_animationCounts[ ind ] || cache.m_animations[ ind ] );
-#endif
-        }
-        res->m_tileSet.m_tiles2 = cache.m_tiles[ ind ];
-        res->m_blockSet.m_blocks2 = cache.m_blocks[ ind ];
-        memcpy( res->m_pals + 6, cache.m_palettes[ ind ], sizeof( palette ) * 6 );
-
-        //res->m_tileSet.m_animations2 = cache.m_animations[ ind ];
-        //res->m_tileSet.m_animationCount2 = cache.m_animationCounts[ ind ];
+        mapF = FS::open( TILESET_PATH, tsidx2, ".anm" );
+        res->m_tileSet.m_animationCount2 = FS::readAnimations( mapF, res->m_tileSet.m_animations + MAX_ANIM_PER_TILE_SET );
+        FS::close( mapF );
         return res;
     }
 }

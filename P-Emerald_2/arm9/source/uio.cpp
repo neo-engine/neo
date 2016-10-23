@@ -198,7 +198,7 @@ namespace IO {
      * @return     Sine value (Q12)
      */
     s32 isin( s32 p_x ) {
-        static const u16 qN = 13, qA = 12, qP = 15, qR = 2 * qN - qP, qS = qN + qP + 1 - qA;
+        const u16 qN = 13, qA = 12, qP = 15, qR = 2 * qN - qP, qS = qN + qP + 1 - qA;
         p_x <<= ( 30 - qN );                 // shift to full s32 range (Q13->Q30)
         if( ( p_x ^ ( p_x << 1 ) ) < 0 )     // test for quadrant 1 or 2
             p_x = ( 1 << 31 ) - p_x;

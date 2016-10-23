@@ -69,9 +69,9 @@ namespace IO {
         char buf[ 40 ];
         if( BAG::toBagType( p_item->m_itemType ) != BAG::bag::bagType::TM_HM ) {
             if( BAG::toBagType( p_item->m_itemType ) != BAG::bag::bagType::KEY_ITEMS )
-                sprintf( buf, "%3d %s in der", p_count, p_item->getDisplayName( true ).c_str( ) );
+                sprintf( buf, GET_STRING( 89 ), p_count, p_item->getDisplayName( true ).c_str( ) );
             else
-                sprintf( buf, "%s in der", p_item->getDisplayName( true ).c_str( ) );
+                sprintf( buf, GET_STRING( 88 ), p_item->getDisplayName( true ).c_str( ) );
             loadSprite( A_ID, 0, 0,
                         SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
                         ATiles, ATilesLen, false, false, true, OBJPRIORITY_0, true );
@@ -79,7 +79,7 @@ namespace IO {
 
         } else {
             auto mv = *( static_cast<TM*>( p_item ) );
-            sprintf( buf, "%s %s in der", p_item->getDisplayName( true ).c_str( ), AttackList[ mv.m_moveIdx ]->m_moveName.c_str( ) );
+            sprintf( buf, GET_STRING( 87 ), p_item->getDisplayName( true ).c_str( ), AttackList[ mv.m_moveIdx ]->m_moveName.c_str( ) );
             IO::loadTMIcon( AttackList[ mv.m_moveIdx ]->m_moveType, AttackList[ mv.m_moveIdx ]->m_isFieldAttack, 4, 4, 0, 1, 0 );
         }
         loadSprite( A_ID, 2, 64,
@@ -89,12 +89,12 @@ namespace IO {
         s16 x = 32, y = 8;
         regularFont->printMBStringD( buf, x, y, true );
         regularFont->printChar( 489 - 21 + p_item->m_itemType, 32, 24, true );
-        sprintf( buf, "%s-Tasche verstaut.`", BAG::bagnames[ BAG::toBagType( p_item->m_itemType ) ].c_str( ) );
+        sprintf( buf, GET_STRING( 86 ), GET_STRING( 11 + BAG::toBagType( p_item->m_itemType ) ) );
         ASpriteOamIndex = A_ID;
         x = 46; y = 24;
         regularFont->printMBStringD( buf, x, y, true );
 
-        FS::SAV->m_bag.insert( BAG::toBagType( p_item->m_itemType ), p_item->getItemId( ), p_count );
+        SAVE::SAV->getActiveFile( ).m_bag.insert( BAG::toBagType( p_item->m_itemType ), p_item->getItemId( ), p_count );
     }
 
     messageBox::messageBox( const char* p_text, bool p_remsprites ) {

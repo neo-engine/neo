@@ -59,6 +59,9 @@ extern bool ANIMATE_MAP;
 extern u8 FRAME_COUNT;
 extern bool SCREENS_SWAPPED;
 extern bool PLAYER_IS_FISHING;
+extern bool INIT_NITROFS;
+
+extern char** ARGV;
 
 extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;
@@ -68,9 +71,17 @@ extern int pressed, held, last;
 extern unsigned int TEMP[ 12288 ];
 extern unsigned short TEMP_PAL[ 256 ];
 
-#define NO_DATA "Keine Daten."
-#define FARAWAY_PLACE "Entfernter Ort"
-#define UNKNOWN_SPECIES "Unbekannt"
+#define LANGUAGES 2
+#define MAX_STRINGS 250
+
+extern const char * LANGUAGE_NAMES[ LANGUAGES ];
+extern const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
+#define GET_STRING( i ) STRINGS[ i ][ SAVE::SAV->getActiveFile().m_options.m_language ]
+
+#define NO_DATA GET_STRING( 0 )
+#define FARAWAY_PLACE GET_STRING( 1 )
+#define UNKNOWN_SPECIES GET_STRING( 2 ) 
+#define POKE_NAV GET_STRING( 8 )
 
 #define loop() while( 1 )
 
@@ -96,7 +107,7 @@ extern unsigned short TEMP_PAL[ 256 ];
             ( (a) & KEY_RIGHT ) ?   MAP::direction::RIGHT :\
                                     MAP::direction::LEFT ) ) )
 
-#define IN_DEX(pidx) ( FS::SAV->m_inDex[ (pidx) / 8 ] & ( 1 << ( (pidx) % 8 ) ) )
+#define IN_DEX(pidx) ( SAVE::SAV->m_caughtPkmn[ (pidx) / 8 ] & ( 1 << ( (pidx) % 8 ) ) )
 
 #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
 #define COMPL(a) ( RGB( 31 - ( (a) >> 10 ) % 32,31 - ( (a) >> 5 ) % 32,31 - (a) % 32 ) )

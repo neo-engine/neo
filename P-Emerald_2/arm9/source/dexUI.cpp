@@ -34,6 +34,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "saveGame.h"
 #include "pokemon.h"
 #include "defines.h"
+#include "screenFade.h"
 
 #include "Back.h"
 #include "BagSpr.h"
@@ -55,6 +56,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "DexSub.h"
 #include "DexSub2.h"
+
 
 #include <vector>
 #include <algorithm>
@@ -112,13 +114,13 @@ namespace DEX {
         //Initialize the top screen
         IO::initOAMTable( false );
 
-        u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", FS::SAV->m_lstDex, 80, 64, PKMN_SPRITE_START( 0 ), 0, 0, false );
-        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", FS::SAV->m_lstDex, 80, 64, PKMN_SPRITE_START( 1 ), 1, tileCnt, false );
+        u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", SAVE::SAV->getActiveFile( ).m_lstDex, 80, 64, PKMN_SPRITE_START( 0 ), 0, 0, false );
+        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", SAVE::SAV->getActiveFile( ).m_lstDex, 80, 64, PKMN_SPRITE_START( 1 ), 1, tileCnt, false );
 
-        tileCnt = IO::loadPKMNIcon( FS::SAV->m_lstDex, 0, 8, PKMN_SPRITE_START( 2 ), 2, 288, false );
+        tileCnt = IO::loadPKMNIcon( SAVE::SAV->getActiveFile( ).m_lstDex, 0, 8, PKMN_SPRITE_START( 2 ), 2, 288, false );
         tileCnt = IO::loadTypeIcon( type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 1, 3, tileCnt, false );
         tileCnt = IO::loadTypeIcon( type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 2, 4, tileCnt, false );
-        tileCnt = IO::loadPKMNIcon( FS::SAV->m_lstDex, 0, 8, PKMN_SPRITE_START( 3 ), 5, tileCnt, false );
+        tileCnt = IO::loadPKMNIcon( SAVE::SAV->getActiveFile( ).m_lstDex, 0, 8, PKMN_SPRITE_START( 3 ), 5, tileCnt, false );
         for( u8 i = 0; i < 30; ++i ) {
             u8 x = 67 - 13 * ( i % 10 );
             if( i % 10 >= 5 )
@@ -182,51 +184,52 @@ namespace DEX {
         IO::updateOAM( true );
     }
 
-    void dexUI::drawFormes( u16 p_pkmnId, u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName, u8 p_forme ) {
-        pokemonData data; getAll( p_pkmnId, data );
-
-        u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 10, 64,
-                                          PKMN_SPRITE_START( 0 ), 0, 0, false, false, p_hasGenderDifference && ( p_forme % 2 ), true );
-        if( data.m_formecnt )
-            IO::boldFont->printString( p_formeName.c_str( ), 58, 157, false, IO::font::CENTER );
-        else if( p_hasGenderDifference && ( p_forme % 2 ) )
-            IO::boldFont->printString( "weiblich", 58, 157, false, IO::font::CENTER );
-        else if( p_hasGenderDifference )
-            IO::boldFont->printString( "männlich", 58, 157, false, IO::font::CENTER );
+    void dexUI::drawFormes( u16 p_pkmnId, u8 p_forme, u8 p_formeCnt, bool p_isFemale, bool p_isGenderless ) {
+        u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 10, 64,
+                                          PKMN_SPRITE_START( 0 ), 0, 0, false, false,
+                                          p_isFemale && !p_isGenderless, true, false, p_forme );
+        if( p_formeCnt )
+            IO::boldFont->printString( getDisplayName( p_pkmnId, p_forme ).c_str( ), 58, 157, false, IO::font::CENTER );
+        else if( p_isFemale && !p_isGenderless )
+            IO::boldFont->printString( GET_STRING( 133 ), 58, 157, false, IO::font::CENTER );
+        else if( !p_isFemale && !p_isGenderless )
+            IO::boldFont->printString( GET_STRING( 134 ), 58, 157, false, IO::font::CENTER );
         else
-            IO::boldFont->printString( getDisplayName( p_pkmnId ), 58, 157, false, IO::font::CENTER );
+            IO::boldFont->printString( getDisplayName( p_pkmnId ).c_str( ), 58, 157, false, IO::font::CENTER );
 
-        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 110, 64,
-                                      PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true, p_hasGenderDifference && ( p_forme % 2 ) );
-        if( data.m_formecnt )
-            IO::boldFont->printString( p_formeName.c_str( ), 158, 150, false, IO::font::CENTER );
-        else if( p_hasGenderDifference && ( p_forme % 2 ) )
-            IO::boldFont->printString( "weiblich", 158, 150, false, IO::font::CENTER );
-        else if( p_hasGenderDifference )
-            IO::boldFont->printString( "männlich", 158, 150, false, IO::font::CENTER );
+        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 110, 64,
+                                      PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true,
+                                      p_isFemale && !p_isGenderless, false, false, p_forme );
+        if( p_formeCnt )
+            IO::boldFont->printString( getDisplayName( p_pkmnId, p_forme ).c_str( ), 158, 150, false, IO::font::CENTER );
+        else if( p_isFemale && !p_isGenderless )
+            IO::boldFont->printString( GET_STRING( 133 ), 158, 150, false, IO::font::CENTER );
+        else if( !p_isFemale && !p_isGenderless )
+            IO::boldFont->printString( GET_STRING( 134 ), 158, 150, false, IO::font::CENTER );
         else
-            IO::boldFont->printString( getDisplayName( p_pkmnId ), 158, 150, false, IO::font::CENTER );
-        IO::boldFont->printString( "(schillernd)", 158, 166, false, IO::font::CENTER );
+            IO::boldFont->printString( getDisplayName( p_pkmnId ).c_str( ), 158, 150, false, IO::font::CENTER );
+        IO::boldFont->printString( GET_STRING( 135 ), 158, 166, false, IO::font::CENTER );
 
         //Load Icons of the other formes ( max 4 )
-        if( !data.m_formecnt ) {
+        if( !p_formeCnt ) {
             for( u8 i = PKMN_SPRITE_START( 3 ); i <= PKMN_SPRITE_START( 4 ); ++i )
                 IO::OamTop->oamBuffer[ i ].isHidden = true;
             IO::updateOAM( false );
             return;
         }
-        u8 currpos = ( p_forme / ( 1 + p_hasGenderDifference ) ) % data.m_formecnt;
+        u8 currpos = p_forme;
         tileCnt = IO::OamTop->oamBuffer[ STAR_START ].gfxIndex + 64;
-        for( u8 i = 0; i < u16( std::min( 4, data.m_formecnt - 1 ) ); ++i ) {
-            currpos = ( currpos + 1 ) % data.m_formecnt;
-            tileCnt = IO::loadPKMNIcon( data.m_formeIdx[ currpos ], 210, 150 - 35 * i, PKMN_SPRITE_START( 3 ) + i, 6 + i, tileCnt, false );
+        for( u8 i = 0; i < (u8) std::min( 4, p_formeCnt - 1 ); ++i ) {
+            currpos = ( currpos + 1 ) % ( p_formeCnt );
+            tileCnt = IO::loadPKMNIcon( p_pkmnId, 210, 150 - 35 * i, PKMN_SPRITE_START( 3 ) + i, 6 + i, tileCnt, false, currpos );
         }
-        for( u8 i = std::min( u16( 4 ), data.m_formecnt ); i < 4u; ++i )
+        for( u8 i = (u8) std::min( 4, p_formeCnt - 1 ); i < 4u; ++i )
             IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 3 ) + i ].isHidden = true;
         IO::updateOAM( false );
     }
 
     void dexUI::drawPage( u16 p_pkmnIdx, u8 p_page, u8 p_forme ) {
+        IO::fadeScreen( IO::CLEAR_WHITE_FAST );
         if( !p_pkmnIdx )
             p_pkmnIdx = _maxPkmn;
 
@@ -254,8 +257,10 @@ namespace DEX {
 
             BG_PALETTE[ WHITE_IDX ] = WHITE;
             BG_PALETTE[ BLACK_IDX ] = BLACK;
-            IO::boldFont->printString( "Keine Daten.", 128, 150, false, IO::font::CENTER );
+            IO::boldFont->printString( NO_DATA, 128, 150, false, IO::font::CENTER );
             IO::updateOAM( true );
+
+            IO::fadeScreen( IO::UNFADE_FAST );
             return;
         }
         for( u8 i = 0; i < 3; ++i )
@@ -269,12 +274,11 @@ namespace DEX {
         if( p_page <= 1 )
             p_forme %= data.m_formecnt ? ( ( 2 - isFixed ) * data.m_formecnt ) : ( 2 - isFixed );
 
-        u16 currFormeIdx = data.m_formecnt ? data.m_formeIdx[ p_forme / ( 2 - isFixed ) ] : p_pkmnIdx;
-        sprintf( buffer, "%s", data.m_formecnt ? data.m_formeName[ p_forme / ( 2 - isFixed ) ] : data.m_displayName );
-        std::string formeName = std::string( buffer );
+        u8 currFormeIdx = data.m_formecnt ? p_forme / ( 2 - isFixed ) : p_forme;
+        u8 formeCnt = data.m_formecnt;
 
-        if( currFormeIdx != p_pkmnIdx )
-            getAll( currFormeIdx, data );
+        if( currFormeIdx )
+            getAll( p_pkmnIdx, data, currFormeIdx );
 
         for( u8 i = 0; i < PKMN_SPRITE_START( 5 ); ++i )
             IO::OamTop->oamBuffer[ i ].isHidden = true;
@@ -304,7 +308,7 @@ namespace DEX {
                     IO::loadPKMNIcon( data.m_preEvolution, 8, 20, PKMN_SPRITE_START( 2 ), 2,
                                       IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                     consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                    printf( "aus %s", getDisplayName( data.m_preEvolution ) );
+                    printf( GET_STRING( 132 ), getDisplayName( data.m_preEvolution ).c_str( ) );
                     break;
                 case 2:
                     if( p_page == 0 ) {
@@ -317,7 +321,7 @@ namespace DEX {
                     IO::loadPKMNIcon( data.m_preEvolution, 8, 20, PKMN_SPRITE_START( 2 ), 2,
                                       IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                     consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                    printf( "aus %s", getDisplayName( data.m_preEvolution ) );
+                    printf( GET_STRING( 132 ), getDisplayName( data.m_preEvolution ).c_str( ) );
                     break;
                 case 3:
                 default:
@@ -331,7 +335,7 @@ namespace DEX {
                     IO::loadItemIcon( ItemList[ data.m_preEvolution ]->m_itemName, 8, 20, PKMN_SPRITE_START( 2 ), 2,
                                       IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                     consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                    printf( "aus %s", ItemList[ data.m_preEvolution ]->m_itemName.c_str( ) );
+                    printf( GET_STRING( 132 ), ItemList[ data.m_preEvolution ]->m_itemName.c_str( ) );
                     break;
             }
             switch( data.m_types[ 0 ] ) {
@@ -403,13 +407,14 @@ namespace DEX {
             consoleSetWindow( &IO::Top, 28, 1, 32, 2 );
             printf( "%03d", p_pkmnIdx );
             consoleSetWindow( &IO::Top, 28, 2, 32, 3 );
-            printf( "%3d", FS::SAV->countPkmn( p_pkmnIdx ) );
+            printf( "%3d", SAVE::SAV->countPkmn( p_pkmnIdx ) );
         }
 
         switch( p_page ) {
             case 0:
             {
-                IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", currFormeIdx, 80, 35, PKMN_SPRITE_START( 0 ), 0, 0, false );
+                bool isF = currFormeIdx % 2 && !isFixed;
+                IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmnIdx, 80, 35, PKMN_SPRITE_START( 0 ), 0, 0, false, false, isF, false, false, currFormeIdx / ( 2 - isFixed ) );
 
                 for( u8 i = 0; i < 30; ++i ) {
                     u8 bs;
@@ -422,17 +427,18 @@ namespace DEX {
 
                     IO::OamTop->oamBuffer[ i + STAR_START ].isHidden = ( bs < 60 + 20 * ( i % 5 ) );
                 }
-                IO::regularFont->printString( "KP", 80, 49, false, IO::font::RIGHT );
-                IO::regularFont->printString( "Angriff", 80, 74, false, IO::font::RIGHT );
-                IO::regularFont->printString( "Sp.-Angr", 80, 99, false, IO::font::RIGHT );
+                IO::regularFont->printString( GET_STRING( 126 ), 80, 49, false, IO::font::RIGHT );
+                IO::regularFont->printString( GET_STRING( 127 ), 80, 74, false, IO::font::RIGHT );
+                IO::regularFont->printString( GET_STRING( 130 ), 80, 99, false, IO::font::RIGHT );
 
-                IO::regularFont->printString( "Initiative", 176, 49, false );
-                IO::regularFont->printString( "Vert", 176, 74, false );
-                IO::regularFont->printString( "Sp.-Vert", 176, 99, false );
+                IO::regularFont->printString( GET_STRING( 129 ), 176, 49, false );
+                IO::regularFont->printString( GET_STRING( 128 ), 176, 74, false );
+                IO::regularFont->printString( GET_STRING( 131 ), 176, 99, false );
 
                 IO::regularFont->setColor( BLACK_IDX, 1 );
                 IO::regularFont->setColor( WHITE_IDX, 2 );
-                IO::regularFont->printString( FS::breakString( data.m_dexEntry, IO::regularFont, 224 ).c_str( ), 16, 134, false, IO::font::LEFT, 12 );
+                IO::regularFont->printString( NO_DATA /* FS::breakString( data.m_dexEntry, IO::regularFont, 224 ).c_str( ) */,
+                                              16, 134, false, IO::font::LEFT, 12 );
 
                 consoleSetWindow( &IO::Top, 3, 22, 32, 23 );
                 if( strlen( data.m_species ) >= 13 )
@@ -448,8 +454,7 @@ namespace DEX {
                 IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 1 ].isHidden = true;
                 IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 2 ].isHidden = true;
 
-                isFixed = !isFixed;
-                drawFormes( p_pkmnIdx, currFormeIdx, isFixed, formeName, p_forme );
+                drawFormes( p_pkmnIdx, currFormeIdx / ( 2 - isFixed ), formeCnt, currFormeIdx % 2, isFixed );
                 break;
             }
             case 2:
@@ -484,6 +489,7 @@ namespace DEX {
         }
 
         IO::updateOAM( false );
+        IO::fadeScreen( IO::UNFADE_FAST );
         return;
     }
 
@@ -498,7 +504,7 @@ namespace DEX {
                 IO::regularFont->setColor( BLACK_IDX, 1 );
                 IO::regularFont->setColor( 0, 2 );
                 setCghtVis( false );
-                IO::regularFont->printString( "Einträge", 2, 0, true );
+                IO::regularFont->printString( GET_STRING( 124 ), 2, 0, true );
                 for( u8 i = 0; i < 5; ++i ) {
                     u16 id = p_pkmnIdcs[ ( p_idxStart + i ) % 5 ] % ( MAX_PKMN + 1 );
 
@@ -506,15 +512,16 @@ namespace DEX {
                         IO::Oam->oamBuffer[ FRAME_START_2 + i ].isHidden = true;
                         IO::Oam->oamBuffer[ PKMN_ICON_START_2 + i ].isHidden = true;
                         if( !i )
-                            IO::boldFont->printString( "Keine Daten.", 128, 89, true, IO::font::CENTER );
+                            IO::boldFont->printString( NO_DATA, 128, 89, true, IO::font::CENTER );
                         continue;
                     }
 
                     bool inDex = IN_DEX( id );
                     loadPkmnIconToSlot( inDex * id, i, false );
-                    sprintf( buffer, "%03d", id );
+                    char buffer[ 10 ];
+                    snprintf( buffer, 9, "%03d", id );
                     IO::boldFont->printString( buffer, 32, 28 + 32 * i, true );
-                    IO::boldFont->printString( getDisplayName( id ), 100, 28 + 32 * i, true );
+                    IO::boldFont->printString( getDisplayName( id ).c_str( ), 100, 28 + 32 * i, true );
 
                     if( i == p_selectedIdx ) {
                         pokemonData p; getAll( id, p );
@@ -527,7 +534,7 @@ namespace DEX {
             case dex::SHOW_ALL:
                 setAllVis( false );
 
-                IO::regularFont->printString( "Alle", 2, 0, true );
+                IO::regularFont->printString( GET_STRING( 125 ), 2, 0, true );
                 if( p_oldIdx )
                     IO::printRectangle( IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].x + 3,
                                         IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].y + 2,

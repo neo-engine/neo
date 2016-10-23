@@ -105,7 +105,7 @@ namespace IO {
                                   { "Working Klink", NAV_DATA, NAV_DATA_PAL, true, true, mainSpritesPositions }
     };
 
-#define POS( p_isHome ) ( (p_isHome) ? IO::BGs[ FS::SAV->m_bgIdx ].m_mainMenuSpritePoses : mainSpritesPositions2 )
+#define POS( p_isHome ) ( (p_isHome) ? IO::BGs[ SAVE::SAV->getActiveFile( ).m_options.m_bgIdx ].m_mainMenuSpritePoses : mainSpritesPositions2 )
 
     std::map<nav::state, nav::state> backTransition = {
         { nav::MAP_MUG, nav::MAP },
@@ -128,9 +128,9 @@ namespace IO {
     void updateItems( ) {
         bool b = false;
         for( u8 i = 0; i < 3; ++i ) {
-            u16 curitm = FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 4 - i ) % 5 ];
-            if( !b && FS::SAV->m_registeredItem && ( !curitm || i == 2 || curitm == FS::SAV->m_registeredItem ) ) {
-                curitm = FS::SAV->m_registeredItem;
+            u16 curitm = SAVE::SAV->getActiveFile( ).m_lstUsedItems[ ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx + 4 - i ) % 5 ];
+            if( !b && SAVE::SAV->getActiveFile( ).m_registeredItem && ( !curitm || i == 2 || curitm == SAVE::SAV->getActiveFile( ).m_registeredItem ) ) {
+                curitm = SAVE::SAV->getActiveFile( ).m_registeredItem;
                 b = true;
             }
             if( curitm )
@@ -168,7 +168,7 @@ namespace IO {
                                   POS( !p_power || !p_showBack )[ 2 * ( PKMN_ID - 2 ) ] - 16,
                                   POS( !p_power || !p_showBack )[ 2 * ( PKMN_ID - 2 ) + 1 ] - 16,
                                   32, 32, PokemonSpPal, PokemonSpTiles, PokemonSpTilesLen,
-                                  false, false, !FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId, OBJPRIORITY_0, true );
+                                  false, false, !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_pid, OBJPRIORITY_0, true );
         tileCnt = IO::loadSprite( NAV_ID, NAV_ID, tileCnt,
                                   POS( !p_power || !p_showBack )[ 2 * ( NAV_ID - 2 ) ] - 16,
                                   POS( !p_power || !p_showBack )[ 2 * ( NAV_ID - 2 ) + 1 ] - 16,
@@ -212,8 +212,8 @@ namespace IO {
 
     void nav::drawMapMug( ) {
         auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
-
-        sprintf( buffer, "%hu_%hhu", _curMap, getCurrentDaytime( ) % 4 );
+        char buffer[ 100 ];
+        snprintf( buffer, 99, "%hu_%hhu", _curMap, getCurrentDaytime( ) % 4 );
         FS::readPictureData( ptr, "nitro:/PICS/MAP_MUG/", buffer, 512, 49152, !SCREENS_SWAPPED );
         drawBorder( );
 
@@ -223,17 +223,17 @@ namespace IO {
         regularFont->setColor( WHITE_IDX, 1 );
         regularFont->setColor( GRAY_IDX, 2 );
         regularFont->setColor( 0, 0 );
-        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap / 100 * 100 + 10 ].first ), 246, 8, !SCREENS_SWAPPED, IO::font::RIGHT );
-        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap ].first ), 10, 166, !SCREENS_SWAPPED );
+        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap / 100 * 100 + 10 ].first ).c_str( ), 246, 8, !SCREENS_SWAPPED, IO::font::RIGHT );
+        regularFont->printString( FS::getLocation( MAP::mapInfo[ _curMap ].first ).c_str( ), 10, 166, !SCREENS_SWAPPED );
         regularFont->setColor( WHITE_IDX, 2 );
         regularFont->setColor( BLACK_IDX, 1 );
     }
 
     void nav::draw( bool p_initMainSrites, u8 p_newIdx ) {
-        if( FS::SAV->m_bgIdx == p_newIdx )
+        if( SAVE::SAV->getActiveFile( ).m_options.m_bgIdx == p_newIdx )
             return;
         else if( p_newIdx == u8( 255 ) )
-            p_newIdx = FS::SAV->m_bgIdx;
+            p_newIdx = SAVE::SAV->getActiveFile( ).m_options.m_bgIdx;
 
         auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
         auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
@@ -242,13 +242,13 @@ namespace IO {
             if( !BGs[ p_newIdx ].m_loadFromRom ) {
                 dmaCopy( BGs[ p_newIdx ].m_mainMenu, ptr, 256 * 192 );
                 dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, pal, 192 * 2 );
-                FS::SAV->m_bgIdx = p_newIdx;
+                SAVE::SAV->getActiveFile( ).m_options.m_bgIdx = p_newIdx;
             } else if( !FS::readNavScreenData( ptr, BGs[ p_newIdx ].m_name.c_str( ), p_newIdx ) ) {
                 dmaCopy( BGs[ 0 ].m_mainMenu, ptr, 256 * 192 );
                 dmaCopy( BGs[ 0 ].m_mainMenuPal, pal, 192 * 2 );
-                FS::SAV->m_bgIdx = 0;
+                SAVE::SAV->getActiveFile( ).m_options.m_bgIdx = 0;
             } else
-                FS::SAV->m_bgIdx = p_newIdx;
+                SAVE::SAV->getActiveFile( ).m_options.m_bgIdx = p_newIdx;
             drawBorder( );
         } else if( _state == MAP_MUG ) {
             drawBorder( );
@@ -275,21 +275,21 @@ namespace IO {
             }
     }
 
-    void nav::handleInput( touchPosition p_touch ) {
+    void nav::handleInput( touchPosition p_touch, const char* p_path ) {
         touchPosition& touch = p_touch;
 
         if( held & KEY_Y ) {
             IO::waitForKeysUp( KEY_Y );
-            if( FS::SAV->m_registeredItem ) {
-                if( ItemList[ FS::SAV->m_registeredItem ]->useable( ) ) {
-                    ItemList[ FS::SAV->m_registeredItem ]->use( );
+            if( SAVE::SAV->getActiveFile( ).m_registeredItem ) {
+                if( ItemList[ SAVE::SAV->getActiveFile( ).m_registeredItem ]->useable( ) ) {
+                    ItemList[ SAVE::SAV->getActiveFile( ).m_registeredItem ]->use( );
                     updateItems( );
                 } else {
-                    IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                    IO::messageBox( GET_STRING( 58 ), GET_STRING( 91 ) );
                     IO::NAV->draw( true );
                 }
             } else {
-                IO::messageBox( "Du kannst ein Item\nauf Y registrieren.", "PokéNav" );
+                IO::messageBox( GET_STRING( 98 ), GET_STRING( 91 ) );
                 IO::NAV->draw( true );
             }
             swiWaitForVBlank( );
@@ -299,22 +299,24 @@ namespace IO {
 
         bool itmsn = false;
         for( u8 i = 0; i < 3; ++i ) {
-            u16 curitm = FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 4 - i ) % 5 ];
-            if( !itmsn && FS::SAV->m_registeredItem && ( !curitm || i == 2 || curitm == FS::SAV->m_registeredItem ) ) {
-                curitm = FS::SAV->m_registeredItem;
+            u16 curitm = SAVE::SAV->getActiveFile( ).m_lstUsedItems[ ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx + 4 - i ) % 5 ];
+            if( !itmsn && SAVE::SAV->getActiveFile( ).m_registeredItem
+                && ( !curitm || i == 2 || curitm == SAVE::SAV->getActiveFile( ).m_registeredItem ) ) {
+                curitm = SAVE::SAV->getActiveFile( ).m_registeredItem;
                 itmsn = true;
             }
             if( GET_AND_WAIT_C( 96 + 32 * i, 12, 14 ) ) {
                 if( curitm ) {
-                    if( u16( -1 ) == FS::SAV->m_bag.count( BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm ) ) {
-                        IO::yesNoBox yn( "PokéNav" );
-                        sprintf( buffer, "Kein Exemplar des Items\n%s vorhanden.\nIcon entfernen?", ItemList[ curitm ]->getDisplayName( true ).c_str( ) );
+                    if( u16( -1 ) == SAVE::SAV->getActiveFile( ).m_bag.count( BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm ) ) {
+                        IO::yesNoBox yn( GET_STRING( 91 ) );
+                        char buffer[ 100 ];
+                        snprintf( buffer, 99, GET_STRING( 96 ), ItemList[ curitm ]->getDisplayName( true ).c_str( ) );
                         if( yn.getResult( buffer ) ) {
                             for( u8 j = i; j < 4; ++j ) {
-                                FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 4 - j ) % 5 ] =
-                                    FS::SAV->m_lstUsedItems[ ( FS::SAV->m_lstUsedItemsIdx + 3 - j ) % 5 ];
+                                SAVE::SAV->getActiveFile( ).m_lstUsedItems[ ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx + 4 - j ) % 5 ] =
+                                    SAVE::SAV->getActiveFile( ).m_lstUsedItems[ ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx + 3 - j ) % 5 ];
                             }
-                            FS::SAV->m_lstUsedItems[ FS::SAV->m_lstUsedItemsIdx ] = 0;
+                            SAVE::SAV->getActiveFile( ).m_lstUsedItems[ SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx ] = 0;
                         }
                         IO::NAV->draw( true );
                     } else if( ItemList[ curitm ]->useable( ) ) {
@@ -322,14 +324,14 @@ namespace IO {
                             IO::messageBox( "", 0, false );
                         ItemList[ curitm ]->use( );
                         if( ItemList[ curitm ]->m_itemType != item::KEY_ITEM )
-                            FS::SAV->m_bag.erase( BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm, 1 );
+                            SAVE::SAV->getActiveFile( ).m_bag.erase( BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm, 1 );
                         IO::NAV->draw( true );
                     } else {
-                        IO::messageBox( "Das kann jetzt nicht\neingesetzt werden.", "PokéNav" );
+                        IO::messageBox( GET_STRING( 58 ), GET_STRING( 91 ) );
                         IO::NAV->draw( true );
                     }
                 } else {
-                    IO::messageBox( "Hier erscheinen zuletzt\neingesetzte Items.", "PokéNav" );
+                    IO::messageBox( GET_STRING( 97 ), GET_STRING( 91 ) );
                     IO::NAV->draw( true );
                 }
                 return;
@@ -347,13 +349,21 @@ namespace IO {
                 ANIMATE_MAP = false;
                 UPDATE_TIME = false;
 
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
+
                 u16 res = bv.run( );
+
+                FADE_TOP_DARK( );
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
 
                 IO::clearScreenConsole( true, true );
                 _state = HOME;
                 draw( true );
                 UPDATE_TIME = true;
-                FADE_TOP_DARK( );
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
                 updateItems( );
@@ -362,18 +372,28 @@ namespace IO {
                     updateItems( );
                     draw( true );
                 }
-            } else if( FS::SAV->m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
+            } else if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_speciesId     //StartPkmn
                        && ( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 0 ],
                                             POS( _state == HOME || !_power )[ 1 ], 16 ) ) ) {
                 ANIMATE_MAP = false;
                 _state = HOME;
                 draw( true );
+                videoSetMode( MODE_5_2D );
                 STS::statusScreen sts( 0 );
+
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
+
                 auto res = sts.run( );
+
+                FADE_TOP_DARK( );
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
 
                 IO::clearScreenConsole( true, true );
                 draw( true );
-                FADE_TOP_DARK( );
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
 
@@ -385,11 +405,19 @@ namespace IO {
                 _state = HOME;
                 draw( true );
 
-                DEX::dex( DEX::dex::SHOW_CAUGHT, FS::SAV->m_hasGDex ? 649 : 493 ).run( FS::SAV->m_lstDex );
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
+
+                DEX::dex( DEX::dex::SHOW_CAUGHT, MAX_PKMN ).run( SAVE::SAV->getActiveFile( ).m_lstDex );
+
+                FADE_TOP_DARK( );
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
 
                 IO::clearScreenConsole( true, true );
                 draw( true );
-                FADE_TOP_DARK( );
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 8 ],         //StartOptions
@@ -402,7 +430,7 @@ namespace IO {
                 _state = HOME;
                 draw( true );
 
-                const char *someText[ 11 ] = { "PKMN-Spawn", "Item-Spawn", "1-Item-Test",
+                const char *someText[ 11 ] = { "PKMN Spawn", "Item Spawn", "1 Item Test",
                                                 "Dbl Battle", "Sgl Battle", "Chg NavScrn",
                                                 "View Boxes A", "View Boxes B", "Hoenn Badges",
                                                 "Kanto Badges", "Keyboard" };
@@ -412,47 +440,49 @@ namespace IO {
                 switch( res ) {
                     case 0:
                     {
-                        memset( FS::SAV->m_pkmnTeam, 0, sizeof( FS::SAV->m_pkmnTeam ) );
+                        memset( SAVE::SAV->getActiveFile( ).m_pkmnTeam, 0, sizeof( SAVE::SAV->getActiveFile( ).m_pkmnTeam ) );
                         for( int i = 0; i < 5; ++i ) {
-                            pokemon& a = FS::SAV->m_pkmnTeam[ i ];
-                            a = pokemon( 0, rand( ) % MAX_PKMN + 1, 0,
-                                         50, FS::SAV->m_id, FS::SAV->m_sid, FS::SAV->m_playername,
-                                         !FS::SAV->m_isMale, i, false, i % 2, i == 3, i + rand( ) % 500, i, i );
+                            pokemon& a = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
+                            std::vector<u16> tmp = { 29, 493, 646, 201, u16( 1 + rand( ) % MAX_PKMN ) };
+                            a = pokemon( 0, tmp[ i ], 0,
+                                         50, SAVE::SAV->getActiveFile( ).m_id, SAVE::SAV->getActiveFile( ).m_sid, SAVE::SAV->getActiveFile( ).m_playername,
+                                         !SAVE::SAV->getActiveFile( ).m_isMale, i, false, i % 2, i == 3, i + rand( ) % 500, i, i );
                             a.m_stats.m_acHP *= i / 5.0;
                             a.m_boxdata.m_experienceGained += 750;
 
                             //Hand out some ribbons
-                            for( u8 i = 0; i < 4; ++i ) {
-                                a.m_boxdata.m_ribbons0[ i ] = rand( ) % 255;
-                                a.m_boxdata.m_ribbons1[ i ] = rand( ) % 255;
-                                a.m_boxdata.m_ribbons2[ i ] = rand( ) % 255;
+                            for( u8 j = 0; j < 4; ++j ) {
+                                a.m_boxdata.m_ribbons0[ j ] = rand( ) % 255;
+                                a.m_boxdata.m_ribbons1[ j ] = rand( ) % 255;
+                                a.m_boxdata.m_ribbons2[ j ] = rand( ) % 255;
                             }
                             a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
                             a.m_boxdata.m_ribbons1[ 3 ] = 0;
                             a.m_boxdata.m_holdItem = 1 + rand( ) % 400;
 
-                            FS::SAV->m_inDex[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
+                            for( u16 j = 1; j <= MAX_PKMN; ++j )
+                                SAVE::SAV->m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );
                         }
 
                         for( u16 j : { 493, 649, 648, 647, 487, 492, 641, 642, 646, 645, 643, 644 } ) {
                             auto a = pokemon( j, 50, 0, j ).m_boxdata;
                             a.m_gotPlace = j;
-                            FS::SAV->storePkmn( a );
+                            SAVE::SAV->storePkmn( a );
                             /*if( a.isShiny( ) ) {
                               IO::messageBox( "YAAAY" );
-                              s8 idx = FS::SAV->getCurrentBox( )->getFirstFreeSpot( );
-                              if( idx == -1 && !( *FS::SAV->getCurrentBox( ) )[ 17 ].isShiny( ) )
+                              s8 idx = SAVE::SAV->getCurrentBox( )->getFirstFreeSpot( );
+                              if( idx == -1 && !( *SAVE::SAV->getCurrentBox( ) )[ 17 ].isShiny( ) )
                               IO::messageBox( "Lost :(" );
-                              else if( !( *FS::SAV->getCurrentBox( ) )[ idx - 1 ].isShiny( ) )
+                              else if( !( *SAVE::SAV->getCurrentBox( ) )[ idx - 1 ].isShiny( ) )
                               IO::messageBox( "Lost :(" );
                               break;
                               }*/
                         }
 
-                        FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
-                        FS::SAV->m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
-                        FS::SAV->m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
-                        FS::SAV->m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ] = M_SWEET_SCENT;
+                        SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                        SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
+                        SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
+                        SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ] = M_SWEET_SCENT;
 
                         swiWaitForVBlank( );
                         break;
@@ -460,7 +490,7 @@ namespace IO {
                     case 1:
                         for( u16 j = 1; j < 772; ++j ) {
                             if( ItemList[ j ]->m_itemName != "Null" )
-                                FS::SAV->m_bag.insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
+                                SAVE::SAV->getActiveFile( ).m_bag.insert( BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
                         }
                         break;
                     case 2:
@@ -477,18 +507,19 @@ namespace IO {
 
                         for( u8 i = 0; i < 3; ++i ) {
                             pokemon a( 0, i + 456, 0,
-                                       30, FS::SAV->m_id + 1, FS::SAV->m_sid, "Heiko", false );
+                                       30, SAVE::SAV->getActiveFile( ).m_id + 1, SAVE::SAV->getActiveFile( ).m_sid, "Heiko", false );
                             //a.stats.acHP = i*a.stats.maxHP/5;
                             cpy.push_back( a );
                         }
                         BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm… Du bist gar nicht so schlecht…",
                                                    "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
-
-                        BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
+                        auto bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
+                        BATTLE::battle test_battle( bt, &opp, 100,
                                                     BATTLE::weather( rand( ) % 9 ), 10, 0, 5, BATTLE::battle::DOUBLE );
                         ANIMATE_MAP = false;
                         test_battle.start( );
-                        FS::SAV->updateTeam( );
+                        SAVE::SAV->getActiveFile( ).updateTeam( bt );
+                        delete bt;
                         break;
                     }
                     case 4:
@@ -497,18 +528,20 @@ namespace IO {
 
                         for( u8 i = 0; i < 6; ++i ) {
                             pokemon a( 0, 435 + i, 0,
-                                       15, FS::SAV->m_id + 1, FS::SAV->m_sid, "Heiko", false );
+                                       15, SAVE::SAV->getActiveFile( ).m_id + 1, SAVE::SAV->getActiveFile( ).m_sid, "Heiko", false );
                             //a.stats.acHP = i*a.stats.maxHP/5;
                             cpy.push_back( a );
                         }
                         BATTLE::battleTrainer opp( "Heiko", "Auf in den Kampf!", "Hm… Du bist gar nicht so schlecht…",
                                                    "Yay gewonnen!", "Das war wohl eine Niederlage…", cpy, 0, 0 );
 
-                        BATTLE::battle test_battle( FS::SAV->getBattleTrainer( ), &opp, 100,
+                        auto bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
+                        BATTLE::battle test_battle( bt, &opp, 100,
                                                     BATTLE::HAIL/*weather( rand( ) % 9 )*/, 10, 0, 5, BATTLE::battle::SINGLE );
                         ANIMATE_MAP = false;
                         test_battle.start( );
-                        FS::SAV->updateTeam( );
+                        SAVE::SAV->getActiveFile( ).updateTeam( bt );
+                        delete bt;
                         break;
                     }
                     case 5:
@@ -537,23 +570,22 @@ namespace IO {
                         break;
                     }
                     case 8:
-                        FS::SAV->m_HOENN_Badges <<= 1;
-                        FS::SAV->m_HOENN_Badges |= 1;
+                        SAVE::SAV->getActiveFile( ).m_HOENN_Badges <<= 1;
+                        SAVE::SAV->getActiveFile( ).m_HOENN_Badges |= 1;
                         break;
                     case 9:
-                        FS::SAV->m_KANTO_Badges <<= 1;
-                        FS::SAV->m_KANTO_Badges |= 1;
+                        SAVE::SAV->getActiveFile( ).m_KANTO_Badges <<= 1;
+                        SAVE::SAV->getActiveFile( ).m_KANTO_Badges |= 1;
                         break;
                     case 10:
                     {
                         IO::keyboard kbd;
-                        auto res = kbd.getText( 10, "Type some text!" );
-                        sprintf( buffer, "Got: “%s”", res.c_str( ) );
-                        IO::messageBox( buffer, true );
+                        IO::messageBox( kbd.getText( 10, "Type some text!" ).c_str( ) );
                         break;
                     }
                 }
-                draw( true );
+                if( res != 10 )
+                    draw( true );
                 swiWaitForVBlank( );
                 if( res == 3 || res == 4 || res == 6 || res == 7 ) {
                     FADE_TOP_DARK( );
@@ -562,15 +594,15 @@ namespace IO {
                 }
             } else if( GET_AND_WAIT_C( POS( _state == HOME || !_power )[ 10 ],        //Save
                                        POS( _state == HOME || !_power )[ 11 ], 16 ) ) {
-                IO::yesNoBox Save( "PokéNav " );
-                if( Save.getResult( "Möchtest du deinen\nFortschritt sichern?\n" ) ) {
+                IO::yesNoBox Save( GET_STRING( 91 ) );
+                if( Save.getResult( GET_STRING( 92 ) ) ) {
                     draw( );
-                    if( gMod == EMULATOR )
-                        IO::messageBox Succ( "Speichern?\nIn einem Emulator?!", "PokéNav" );
-                    else if( FS::writeSave( FS::SAV ) )
-                        IO::messageBox Succ( "Fortschritt\nerfolgreich gesichert!", "PokéNav" );
+                    if( !p_path || gMod == EMULATOR )
+                        IO::messageBox Succ( GET_STRING( 93 ), GET_STRING( 91 ) );
+                    else if( p_path && FS::writeSave( SAVE::SAV, p_path ) )
+                        IO::messageBox Succ( GET_STRING( 94 ), GET_STRING( 91 ) );
                     else
-                        IO::messageBox Succ( "Es trat ein Fehler auf\nSpiel nicht gesichert.", "PokéNav" );
+                        IO::messageBox Succ( GET_STRING( 95 ), GET_STRING( 91 ) );
                 }
                 draw( true );
             } else if( touch.px && touch.py && GET_AND_WAIT_C( 8, 12, 17 ) ) {               //Start Pokénav

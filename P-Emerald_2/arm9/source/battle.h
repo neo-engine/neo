@@ -134,7 +134,7 @@ namespace BATTLE {
         battlePokemon _storedPkmns[ 6 ][ 2 ];
         battlePokemon _wildPokemon;
 
-        static battleUI*    _battleUI;
+        battleUI    _battleUI;
 
         int         getTargetSpecifierValue( bool p_targetIsOpp, u8 p_targetPosition,
                                              const battleScript::command::targetSpecifier& p_targetSpecifier, u8 p_targetVal = 0 );
@@ -194,7 +194,7 @@ namespace BATTLE {
                 battleMode p_battlemode = SINGLE,
                 u8 p_platform2 = -1 );
         battle( battleTrainer* p_player,
-                pokemon p_opponent,
+                pokemon* p_opponent,
                 weather p_weather,
                 u8 p_platform,
                 u8 p_platform2,

@@ -27,7 +27,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "statusScreenUI.h"
 #include "defines.h"
-#include "buffer.h"
 #include "move.h"
 #include "item.h"
 #include "uio.h"
@@ -121,7 +120,7 @@ namespace STS {
         }
 
         for( u8 i = 0; i < 6; ++i ) {
-            auto pkmn = FS::SAV->m_pkmnTeam[ i ].m_boxdata;
+            auto pkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata;
             if( pkmn.m_individualValues.m_isEgg )
                 nextAvailableTileIdx = IO::loadEggIcon( 4 - 2 * i, 28 + 24 * i,
                                                         SUB_BALL_IDX( i ), SUB_BALL_IDX( i ), nextAvailableTileIdx );
@@ -151,7 +150,7 @@ namespace STS {
         BG_PALETTE[ GRAY_IDX ] = GRAY;
         BG_PALETTE[ BLACK_IDX ] = BLACK;
 
-        for( size_t i = 0; i < FS::SAV->getTeamPkmnCount( ); i++ ) {
+        for( size_t i = 0; i < SAVE::SAV->getActiveFile( ).getTeamPkmnCount( ); i++ ) {
             char buffer[ 100 ];
             u16 sx, sy;
             u16 x = 133;
@@ -165,33 +164,35 @@ namespace STS {
 #define ADJUST_X( i, x, buffer ) ( ( ( i ) % 2 ) ? ( x ) : \
                                    123 - IO::regularFont->stringWidth( buffer ) )
 
-            if( !FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
-                tileCnt = IO::loadPKMNIcon( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_speciesId, sx - 10, sy - 10,
+            if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg ) {
+                tileCnt = IO::loadPKMNIcon( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId, sx - 10, sy - 10,
                                             ICON_IDX( i ), ICON_PAL( i ), tileCnt, false );
                 IO::displayHP( 100, 101, sx - 8, sy - 8, HP_COL + 2 * i, HP_COL + 1 + 2 * i, false, 23, 26 );
-                IO::displayHP( 100, 100 - FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP * 100 / FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP,
+                IO::displayHP( 100, 100 - SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP * 100 / SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP,
                                sx - 8, sy - 8, HP_COL + 2 * i, HP_COL + 1 + 2 * i, false, 23, 26 );
 
 
-                IO::regularFont->printString( FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name,
-                                              ADJUST_X( i, x, FS::SAV->m_pkmnTeam[ i ].m_boxdata.m_name ), sy - 14, false );
+                IO::regularFont->printString( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_name,
+                                              ADJUST_X( i, x, SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_name ), sy - 14, false );
 
                 IO::regularFont->setColor( HP_COL + 2 * i, 2 );
-                if( FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP )
-                    sprintf( buffer, "%hi/%hiKP", FS::SAV->m_pkmnTeam[ i ].m_stats.m_acHP, FS::SAV->m_pkmnTeam[ i ].m_stats.m_maxHP );
+                if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP )
+                    snprintf( buffer, 99, "%hi/%hi%s", SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP,
+                              SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP,
+                              GET_STRING( 126 ) );
                 else
-                    sprintf( buffer, "Besiegt" );
+                    snprintf( buffer, 99, GET_STRING( 136 ) );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy, false );
                 IO::regularFont->setColor( GRAY_IDX, 2 );
 
-                sprintf( buffer, "%s", ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
+                snprintf( buffer, 99, "%s", ItemList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy + 14, false );
 
             } else {
-                sprintf( buffer, "Ei" );
+                snprintf( buffer, 99, GET_STRING( 34 ) );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy - 7, false );
 
-                sprintf( buffer, "%s", ItemList[ FS::SAV->m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
+                snprintf( buffer, 99, "%s", ItemList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ) );
                 IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy + 7, false );
 
                 tileCnt = IO::loadEggIcon( sx - 10, sy - 10, ICON_IDX( i ), ICON_PAL( i ), tileCnt, false );
@@ -199,7 +200,7 @@ namespace STS {
         }
 
         //Preload the page specific sprites
-        auto currPkmn = FS::SAV->m_pkmnTeam[ _current ];
+        auto currPkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _current ];
 
         IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex = tileCnt;
         tileCnt += 144;
@@ -297,8 +298,8 @@ namespace STS {
                 IO::regularFont->setColor( BLACK_IDX, 1 );
                 IO::regularFont->setColor( 0, 2 );
                 char buffer[ 200 ];
-                sprintf( buffer, "%s: %s", ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
-                         ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getShortDescription( ).c_str( ) );
+                snprintf( buffer, 199, "%s: %s", ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
+                          ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getShortDescription( ).c_str( ) );
                 IO::regularFont->printString( buffer, 40, 159, p_bottom );
                 if( p_newpok ) {
                     IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 2, 152,
@@ -340,14 +341,15 @@ namespace STS {
 
             IO::displayEP( 100, 101, 46, 76, HP_COL + 2, HP_COL + 3, false, 59, 62, p_bottom );
             IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
-                           ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ), 46, 76, HP_COL + 2, HP_COL + 3, false, 59, 62, p_bottom );
+                ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ), 46, 76, HP_COL + 2, HP_COL + 3, false, 59, 62, p_bottom );
 
             IO::regularFont->setColor( 0, 2 );
             IO::regularFont->setColor( HP_COL + 2, 1 );
-            sprintf( buffer, "EP %lu%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
-                     ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) );
+            char buffer[ 50 ];
+            snprintf( buffer, 49, "EP %lu%%", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) * 100 /
+                ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) );
             IO::regularFont->printString( buffer, 62, 28, p_bottom, IO::font::CENTER );
-            sprintf( buffer, "KP %i%%", p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
+            snprintf( buffer, 49, "%s %i%%", GET_STRING( 126 ), p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::regularFont->printString( buffer, 62, 38, p_bottom, IO::font::CENTER );
             IO::regularFont->setColor( GRAY_IDX, 2 );
             IO::regularFont->setColor( BLACK_IDX, 1 );
@@ -356,9 +358,9 @@ namespace STS {
             pal[ WHITE_IDX ] = WHITE;
             IO::regularFont->setColor( BLACK_IDX, 1 );
 
-            IO::regularFont->printString( "Ei", 150, 0, p_bottom );
+            IO::regularFont->printString( GET_STRING( 34 ), 150, 0, p_bottom );
             IO::regularFont->printChar( '/', 234, 0, p_bottom );
-            IO::regularFont->printString( "Ei", 160, 13, p_bottom );
+            IO::regularFont->printString( GET_STRING( 34 ), 160, 13, p_bottom );
 
             IO::loadEggSprite( 29, 60, PKMN_SPRITE_START, PKMN_SPRITE_PAL, Oam->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, p_bottom );
             for( u8 i = 1; i < 4; ++i )
@@ -375,7 +377,7 @@ namespace STS {
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex,
                         0, -5, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, p_bottom );
 
-        IO::regularFont->printString( "Statuswerte", 32, 0, p_bottom );
+        IO::regularFont->printString( GET_STRING( 137 ), 32, 0, p_bottom );
         if( !( currPkmn.m_boxdata.m_individualValues.m_isEgg ) ) {
 
             pal[ RED_IDX ] = RED;
@@ -384,10 +386,10 @@ namespace STS {
             pal[ BLUE2_IDX ] = BLUE2;
 
             char buffer[ 50 ];
-            sprintf( buffer, "Status auf Lv.%3i:", currPkmn.m_level );
+            snprintf( buffer, 49, GET_STRING( 138 ), currPkmn.m_level );
             IO::regularFont->printString( buffer, 110, 30, p_bottom );
 
-            sprintf( buffer, "KP                     %3i", currPkmn.m_stats.m_maxHP );
+            snprintf( buffer, 49, "KP                     %3i", currPkmn.m_stats.m_maxHP );
             IO::regularFont->printString( buffer, 130, 46, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 0 ] == 1.1 ) {
@@ -397,7 +399,7 @@ namespace STS {
             } else {
                 IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
             }
-            sprintf( buffer, "ANG                   %3i", currPkmn.m_stats.m_Atk );
+            snprintf( buffer, 49, "ANG                   %3i", currPkmn.m_stats.m_Atk );
             IO::regularFont->printString( buffer, 130, 65, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 1 ] == 1.1 ) {
@@ -407,7 +409,7 @@ namespace STS {
             } else {
                 IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
             }
-            sprintf( buffer, "VER                   %3i", currPkmn.m_stats.m_Def );
+            snprintf( buffer, 49, "VER                   %3i", currPkmn.m_stats.m_Def );
             IO::regularFont->printString( buffer, 130, 82, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 3 ] == 1.1 ) {
@@ -417,7 +419,7 @@ namespace STS {
             } else {
                 IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
             }
-            sprintf( buffer, "SAN                   %3i", currPkmn.m_stats.m_SAtk );
+            snprintf( buffer, 49, "SAN                   %3i", currPkmn.m_stats.m_SAtk );
             IO::regularFont->printString( buffer, 130, 99, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 4 ] == 1.1 ) {
@@ -427,7 +429,7 @@ namespace STS {
             } else {
                 IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
             }
-            sprintf( buffer, "SVE                   %3i", currPkmn.m_stats.m_SDef );
+            snprintf( buffer, 49, "SVE                   %3i", currPkmn.m_stats.m_SDef );
             IO::regularFont->printString( buffer, 130, 116, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 2 ] == 1.1 ) {
@@ -437,7 +439,7 @@ namespace STS {
             } else {
                 IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
             }
-            sprintf( buffer, "INI                   \xC3\xC3""%3i", currPkmn.m_stats.m_Spd );
+            snprintf( buffer, 49, "INI                   \xC3\xC3""%3i", currPkmn.m_stats.m_Spd );
             IO::regularFont->printString( buffer, 130, 133, p_bottom );
 
             IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
@@ -510,8 +512,9 @@ namespace STS {
 
             IO::regularFont->setColor( GRAY_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
-            sprintf( buffer, "AP %2hhu/%2hhu ", currPkmn.m_boxdata.m_acPP[ i ],
-                     s8( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + currPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+            char buffer[ 50 ];
+            snprintf( buffer, 49, "AP %2hhu/%2hhu ", currPkmn.m_boxdata.m_acPP[ i ],
+                      s8( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + currPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
             IO::regularFont->printString( buffer, 135, 45 + 30 * i, p_bottom );
         }
         IO::regularFont->setColor( BLACK_IDX, 1 );
@@ -539,7 +542,8 @@ namespace STS {
         if( rbs.empty( ) ) {
             IO::regularFont->printString( "Keine Bänder", 148, 83, p_bottom );
         } else {
-            sprintf( buffer, "(%u)", rbs.size( ) );
+            char buffer[ 49 ];
+            snprintf( buffer, 49, "(%u)", rbs.size( ) );
             IO::regularFont->printString( buffer, 88, 0, p_bottom );
         }
     }
@@ -574,42 +578,42 @@ namespace STS {
             IO::regularFont->setColor( BLUE2_IDX, 2 );
         }
         char buffer[ 50 ];
-        sprintf( buffer, "%s/%05d", currPkmn.m_boxdata.m_oT, currPkmn.m_boxdata.m_oTId );
+        snprintf( buffer, 49, "%s/%05d", currPkmn.m_boxdata.m_oT, currPkmn.m_boxdata.m_oTId );
         IO::regularFont->printString( buffer, 250, 30, p_bottom, IO::font::RIGHT );
 
         if( !currPkmn.m_boxdata.isShiny( ) )
             IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
-        sprintf( buffer, "%03d", currPkmn.m_boxdata.m_speciesId );
+        snprintf( buffer, 49, "%03d", currPkmn.m_boxdata.m_speciesId );
         IO::regularFont->printString( buffer, 180, 51, p_bottom, IO::font::RIGHT );
         IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::regularFont->printString( "Nr.", 124, 51, p_bottom );
 
-        bool plrOT = currPkmn.m_boxdata.m_oTId == FS::SAV->m_id && currPkmn.m_boxdata.m_oTSid == FS::SAV->m_sid;
+        bool plrOT = currPkmn.m_boxdata.m_oTId == SAVE::SAV->getActiveFile( ).m_id && currPkmn.m_boxdata.m_oTSid == SAVE::SAV->getActiveFile( ).m_sid;
         if( !currPkmn.m_boxdata.m_gotDate[ 0 ] )
-            sprintf( buffer, "%s%d",
-                     plrOT ? "Gef. auf Lv. " : "Off gef auf Lv.",
-                     currPkmn.m_boxdata.m_gotLevel );
+            snprintf( buffer, 49, "%s%d",
+                      plrOT ? "Gef. auf Lv. " : "Off gef auf Lv.",
+                      currPkmn.m_boxdata.m_gotLevel );
         else
-            sprintf( buffer, "%s",
-                     plrOT ? "Ei erhalten" : "Ei offenbar erh." );
+            snprintf( buffer, 49, "%s",
+                      plrOT ? "Ei erhalten" : "Ei offenbar erh." );
         IO::regularFont->printString( buffer, 250, 76, p_bottom, IO::font::RIGHT, 14 );
-        sprintf( buffer, "am %02d.%02d.20%02d,",
-                 currPkmn.m_boxdata.m_gotDate[ 0 ] ? currPkmn.m_boxdata.m_gotDate[ 0 ] : currPkmn.m_boxdata.m_hatchDate[ 0 ],
-                 currPkmn.m_boxdata.m_gotDate[ 1 ] ? currPkmn.m_boxdata.m_gotDate[ 1 ] : currPkmn.m_boxdata.m_hatchDate[ 1 ],
-                 currPkmn.m_boxdata.m_gotDate[ 2 ] ? currPkmn.m_boxdata.m_gotDate[ 2 ] : currPkmn.m_boxdata.m_hatchDate[ 2 ] );
+        snprintf( buffer, 49, "am %02d.%02d.20%02d,",
+                  currPkmn.m_boxdata.m_gotDate[ 0 ] ? currPkmn.m_boxdata.m_gotDate[ 0 ] : currPkmn.m_boxdata.m_hatchDate[ 0 ],
+                  currPkmn.m_boxdata.m_gotDate[ 1 ] ? currPkmn.m_boxdata.m_gotDate[ 1 ] : currPkmn.m_boxdata.m_hatchDate[ 1 ],
+                  currPkmn.m_boxdata.m_gotDate[ 2 ] ? currPkmn.m_boxdata.m_gotDate[ 2 ] : currPkmn.m_boxdata.m_hatchDate[ 2 ] );
         IO::regularFont->printString( buffer, 250, 90, p_bottom, IO::font::RIGHT, 14 );
-        sprintf( buffer, "%s.",
-                 FS::getLocation( currPkmn.m_boxdata.m_gotPlace ) );
+        snprintf( buffer, 49, "%s.",
+                  FS::getLocation( currPkmn.m_boxdata.m_gotPlace ).c_str( ) );
         IO::regularFont->printMaxString( buffer, std::max( (u32) 124, 250 - IO::regularFont->stringWidth( buffer ) ), 104, p_bottom, 254 );
 
         if( currPkmn.m_boxdata.m_gotDate[ 0 ] ) {
-            sprintf( buffer, "Geschl. %02d.%02d.20%02d,",
-                     currPkmn.m_boxdata.m_hatchDate[ 0 ],
-                     currPkmn.m_boxdata.m_hatchDate[ 1 ],
-                     currPkmn.m_boxdata.m_hatchDate[ 2 ] );
+            snprintf( buffer, 49, "Geschl. %02d.%02d.20%02d,",
+                      currPkmn.m_boxdata.m_hatchDate[ 0 ],
+                      currPkmn.m_boxdata.m_hatchDate[ 1 ],
+                      currPkmn.m_boxdata.m_hatchDate[ 2 ] );
             IO::regularFont->printString( buffer, 250, 125, p_bottom, IO::font::RIGHT, 14 );
-            sprintf( buffer, "%s.",
-                     FS::getLocation( currPkmn.m_boxdata.m_hatchPlace ) );
+            snprintf( buffer, 49, "%s.",
+                      FS::getLocation( currPkmn.m_boxdata.m_hatchPlace ).c_str( ) );
             IO::regularFont->printString( buffer, 250, 139, p_bottom, IO::font::RIGHT, 14 );
         } else if( plrOT && currPkmn.m_boxdata.m_fateful )
             IO::regularFont->printString( "Schicksalhafte Begeg.", 102, 139, p_bottom );
@@ -627,11 +631,12 @@ namespace STS {
 
         IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
 
-        sprintf( buffer, "Mag %s""e PokéRg.", TasteList[ currPkmn.m_boxdata.getTasteStr( ) ].c_str( ) );
+        char buffer[ 50 ];
+        snprintf( buffer, 49, "Mag %s""e PokéRg.", TasteList[ currPkmn.m_boxdata.getTasteStr( ) ].c_str( ) );
         IO::regularFont->printString( buffer, 250, 30, p_bottom, IO::font::RIGHT );
 
-        sprintf( buffer, "Sehr %s; %s.", NatureList[ currPkmn.m_boxdata.getNature( ) ].c_str( ),
-                 PersonalityList[ currPkmn.m_boxdata.getPersonality( ) ].c_str( ) );
+        snprintf( buffer, 49, "Sehr %s; %s.", NatureList[ currPkmn.m_boxdata.getNature( ) ].c_str( ),
+                  PersonalityList[ currPkmn.m_boxdata.getPersonality( ) ].c_str( ) );
         auto str = std::string( buffer );
         auto nStr = FS::breakString( str, IO::regularFont, 122 );
         IO::regularFont->printString( nStr.c_str( ), 245, 48, p_bottom, IO::font::RIGHT, 14 );
@@ -715,22 +720,22 @@ namespace STS {
                                     Oam->oamBuffer[ ATK_DMGTYPE_IDX( currMove->m_moveHitType ) ].gfxIndex, p_bottom );
         char buffer[ 20 ];
 
-        sprintf( buffer, "AP %2hhu""/""%2hhu ", currPkmn.m_boxdata.m_acPP[ p_moveIdx ],
-                 currMove->m_movePP * ( ( 5 + ( ( currPkmn.m_boxdata.m_pPUps >> ( 2 * p_moveIdx ) ) % 4 ) ) / 5 ) );
+        snprintf( buffer, 19, "AP %2hhu""/""%2hhu ", currPkmn.m_boxdata.m_acPP[ p_moveIdx ],
+                  currMove->m_movePP * ( ( 5 + ( ( currPkmn.m_boxdata.m_pPUps >> ( 2 * p_moveIdx ) ) % 4 ) ) / 5 ) );
         IO::regularFont->printString( buffer, 128, 47, p_bottom );
 
         IO::regularFont->printString( "Stärke", 128, 60, p_bottom );
         if( currMove->m_moveBasePower )
-            sprintf( buffer, "%3i", currMove->m_moveBasePower );
+            snprintf( buffer, 19, "%3i", currMove->m_moveBasePower );
         else
-            sprintf( buffer, "---" );
+            snprintf( buffer, 19, "---" );
         IO::regularFont->printString( buffer, 226, 60, p_bottom );
 
         IO::regularFont->printString( "Genauigkeit", 128, 72, p_bottom );
         if( currMove->m_moveAccuracy )
-            sprintf( buffer, "%3i", currMove->m_moveAccuracy );
+            snprintf( buffer, 19, "%3i", currMove->m_moveAccuracy );
         else
-            sprintf( buffer, "---" );
+            snprintf( buffer, 19, "---" );
         IO::regularFont->printString( buffer, 226, 72, p_bottom );
 
         IO::regularFont->setColor( BLACK_IDX, 1 );
@@ -795,7 +800,7 @@ namespace STS {
 
         IO::regularFont->printString( nStr.c_str( ), 226, 39 - 7 * nlCnt, p_bottom, IO::font::RIGHT, 14 );
         IO::regularFont->printString( FS::breakString( ( currRb.m_description == "" ) ?
-                                                       ( currPkmn.m_boxdata.m_fateful ? "Ein Band für Pokémon-Freunde." : "Ein Gedenk-Band. An einem mysteriösen Ort erhalten." )
+            ( currPkmn.m_boxdata.m_fateful ? "Ein Band für Pokémon-Freunde." : "Ein Gedenk-Band. An einem mysteriösen Ort erhalten." )
                                                        : currRb.m_description, IO::regularFont, 120 ).c_str( ),
                                       250, 66, p_bottom, IO::font::RIGHT, 14 );
         IO::updateOAM( p_bottom );
@@ -863,7 +868,7 @@ namespace STS {
         std::vector<IO::inputTarget> res;
         std::vector<std::string> names;
 
-        auto pkmn = FS::SAV->m_pkmnTeam[ p_current ];
+        auto pkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_current ];
         IO::NAV->draw( );
         BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
         BG_PALETTE_SUB[ GRAY_IDX ] = GRAY;
@@ -876,15 +881,15 @@ namespace STS {
         }
 
         for( u8 i = 0; i < 6; ++i ) {
-            auto pkmn = FS::SAV->m_pkmnTeam[ i ].m_boxdata;
-            if( pkmn.m_individualValues.m_isEgg )
+            auto p = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata;
+            if( p.m_individualValues.m_isEgg )
                 IO::loadEggIcon( 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ), SUB_BALL_IDX( i ),
                                  IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex );
             else if( i == p_current )
-                IO::loadPKMNIcon( pkmn.m_speciesId, 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ),
+                IO::loadPKMNIcon( p.m_speciesId, 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ),
                                   SUB_BALL_IDX( i ), IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex );
-            else if( i < FS::SAV->getTeamPkmnCount( ) )
-                IO::loadItemIcon( !pkmn.m_ball ? "Pokeball" : ItemList[ pkmn.m_ball ]->m_itemName, 4 - 2 * i,
+            else if( i < SAVE::SAV->getActiveFile( ).getTeamPkmnCount( ) )
+                IO::loadItemIcon( !p.m_ball ? "Pokeball" : ItemList[ p.m_ball ]->m_itemName, 4 - 2 * i,
                                   28 + 24 * i, SUB_BALL_IDX( i ), SUB_BALL_IDX( i ), IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex, true );
             else
                 IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].isHidden = true;

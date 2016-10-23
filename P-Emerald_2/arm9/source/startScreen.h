@@ -26,19 +26,32 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 */
 
 #pragma once
-class startScreen {
-private:
+#include "saveGame.h"
+#include <vector>
 
-    enum ChoiceResult {
-        CONTINUE = 1,
-        NEW_GAME,
-        OPTIONS,
-        GEHEIMGESCHEHEN,
-        TRANSFER_GAME,
-        CANCEL,
-        REDRAW
+namespace SAVE {
+    class startScreen {
+    private:
+        enum choiceType {
+            CONTINUE,
+            NEW_GAME,
+            SPECIAL_EPISODE,
+            TRANSFER_GAME,
+            ABORT
+        };
+
+        void drawMainChoice( language p_lang, std::vector<u8> p_toDraw, s8 p_selected = -1, s8 p_pressed = -1 );
+        void drawSlotChoice( s8 p_selected, s8 p_pressed = -1 );
+
+        choiceType runMainChoice( language p_lang );
+        s8 runSlotChoice( language p_lang, bool p_newGameMode = false );
+        gameType runEpisodeChoice( );
+
+        language runLanguageChoice( language p_current );
+
+        bool initNewGame( u8 p_file, gameType p_type, language p_lang );
+        bool transferGame( u8 p_file );
+    public:
+        void run( );
     };
-    ChoiceResult runChoice( );
-public:
-    void run( );
-};
+}

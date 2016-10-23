@@ -32,6 +32,10 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <cstring>
 
 namespace MAP {
+    const u8 MAX_ANIM_PER_TILE_SET = 32;
+    const u16 MAX_TILES_PER_TILE_SET = 512;
+    const u16 MAX_BLOCKS_PER_TILE_SET = 512;
+
     const char* const MAP_PATH = "nitro:/MAPS/";
     const char* const TILESET_PATH = "nitro:/MAPS/TILESETS/";
     const u16 SIZE = 32;
@@ -69,11 +73,11 @@ namespace MAP {
             tile    m_tiles[ 16 ];
         };
         u8          m_animationCount1, m_animationCount2;
-        animation   *m_animations1, *m_animations2;
-        tile        *m_tiles1, *m_tiles2;
+        animation   m_animations[ 2 * MAX_ANIM_PER_TILE_SET ];
+        tile        m_tiles[ 2 * MAX_TILES_PER_TILE_SET ];
     };
     struct blockSet {
-        block       *m_blocks1, *m_blocks2;
+        block       m_blocks[ 2 * MAX_BLOCKS_PER_TILE_SET ];
     };
 
     struct mapBlockAtom {
@@ -91,49 +95,5 @@ namespace MAP {
 
         std::pair<u16, u16> m_pokemon[ 3 * 5 * 5 ];
     };
-    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y, bool p_init = false );
-
-    struct sliceCache {
-#define MAX_CACHE_SIZE 4
-        s8 m_indices[ MAX_CACHE_SIZE ];
-        tile* m_tiles[ MAX_CACHE_SIZE ];
-        block* m_blocks[ MAX_CACHE_SIZE ];
-        palette* m_palettes[ MAX_CACHE_SIZE ];
-
-        u8 m_animationCounts[ MAX_CACHE_SIZE ];
-        tileSet::animation* m_animations[ MAX_CACHE_SIZE ];
-        u8 m_nextFree;
-
-        sliceCache( ) {
-            m_nextFree = 0;
-            memset( m_indices, -1, sizeof( m_indices ) );
-            memset( m_animationCounts, 0, sizeof( m_animationCounts ) );
-        }
-
-        u8 set( u8 p_index ) { //Gets the next free index
-            u8 res = m_nextFree;
-            m_indices[ m_nextFree ] = p_index;
-            m_nextFree = ( m_nextFree + 1 ) % MAX_CACHE_SIZE;
-            return res;
-        }
-        s8 get( u8 p_index ) { //Return the index or -1 if not found
-            for( u8 i = 0; i < MAX_CACHE_SIZE; ++i )
-                if( m_indices[ i ] == p_index )
-                    return i;
-            return -1;
-        }
-
-        void clear( ) {
-            m_nextFree = 0;
-            memset( m_indices, -1, sizeof( m_indices ) );
-            memset( m_animationCounts, 0, sizeof( m_animationCounts ) );
-            for( u8 i = 0; i < MAX_CACHE_SIZE; ++i ) {
-                delete m_tiles[ i ];
-                delete m_blocks[ i ];
-                delete m_palettes[ i ];
-                delete m_animations[ i ];
-            }
-        }
-    };
-    extern sliceCache cache;
+    std::unique_ptr<mapSlice> constructSlice( u8 p_map, u16 p_x, u16 p_y );
 }

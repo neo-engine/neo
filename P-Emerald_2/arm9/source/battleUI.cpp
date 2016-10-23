@@ -42,7 +42,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "yesNoBox.h"
 #include "choiceBox.h"
 #include "saveGame.h"
-#include "buffer.h"
 #include "fs.h"
 #include "sprite.h"
 #include "uio.h"
@@ -60,7 +59,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "BattleSub3.h"
 #include "BattleSub4.h"
 #include "BattleSub5.h"
-#include "BattleSub6.h"
 
 #include "BattleBall1.h" //Normal
 #include "BattleBall2.h" //Statused
@@ -188,6 +186,24 @@ namespace BATTLE {
 #define SUB_A_OAM 30
 #define SUB_Back_OAM 31
 
+#define OPP_1_HP_X 98
+#define OPP_1_HP_Y 40
+#define OPP_2_HP_X 0
+#define OPP_2_HP_Y 8
+#define OWN_1_HP_X 220
+#define OWN_1_HP_Y 152
+#define OWN_2_HP_X 122
+#define OWN_2_HP_Y 120
+#define WILD_BATTLE_HP_X 98
+#define WILD_BATTLE_HP_Y 40
+#define WILD_BATTLE_SPRITE_X_START 128
+#define WILD_BATTLE_SPRITE_X 144
+#define WILD_BATTLE_SPRITE_Y 19
+
+    const char* PKMN_SPRITE_PATH = "nitro:/PICS/SPRITES/PKMN/";
+    const char* PKMN_SPRITE_BACK_PATH = "nitro:/PICS/SPRITES/PKMNBACK/";
+    const char* SPRITE_FAILED = "Sprite failed!\n(That's a bad thing, btw.)[A]";
+
     u16 SUB_TILESTART = 0;
     u8 SUB_PALSTART = 0;
 
@@ -209,13 +225,14 @@ namespace BATTLE {
         }
     }
     void undrawPkmnInfo1( u8 p_hpx, u8 p_hpy ) {
-        IO::printRectangle( p_hpx - 88, p_hpy + 4, p_hpx, p_hpy + 30, false, false, 0 );
+        IO::printRectangle( p_hpx - 88, p_hpy + 4, p_hpx - 2, p_hpy + 30, false, false, 0 );
     }
     void undrawPkmnInfo2( u8 p_hpx, u8 p_hpy ) {
-        IO::printRectangle( p_hpx + 32, p_hpy + 4, p_hpx + 120, p_hpy + 30, false, false, 0 );
+        IO::printRectangle( p_hpx + 32, p_hpy + 4, p_hpx + 118, p_hpy + 30, false, false, 0 );
     }
     void drawPkmnInfo1( u8 p_hpx, u8 p_hpy, pokemon p_pokemon, u8 p_hpCol ) {
         undrawPkmnInfo1( p_hpx, p_hpy );
+        IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_hpx - 12, p_hpy + 2, false, IO::font::RIGHT );
@@ -223,9 +240,9 @@ namespace BATTLE {
             drawGender( p_hpx - 10, p_hpy + 2, p_pokemon.gender( ) );
         IO::regularFont->setColor( WHITE_IDX, 2 );
         IO::regularFont->setColor( GRAY_IDX, 1 );
-        char bf2[ 20 ] = { 0 };
-        sprintf( buffer, "Lv%hhu", p_pokemon.m_level );
-        sprintf( bf2, " %huKP", p_pokemon.m_stats.m_acHP );
+        char buffer[ 50 ], bf2[ 20 ];
+        snprintf( buffer, 49, "Lv%hhu", p_pokemon.m_level );
+        snprintf( bf2, 19, " %hu%s", p_pokemon.m_stats.m_acHP, GET_STRING( 126 ) );
         IO::regularFont->printString( buffer, p_hpx - IO::regularFont->stringWidth( bf2 ) - 2, p_hpy + 15, false, IO::font::RIGHT );
         IO::regularFont->setColor( WHITE_IDX, 1 );
         IO::regularFont->setColor( p_hpCol, 2 );
@@ -235,6 +252,7 @@ namespace BATTLE {
     }
     void drawPkmnInfo2( u8 p_hpx, u8 p_hpy, pokemon p_pokemon, u8 p_hpCol ) {
         undrawPkmnInfo2( p_hpx, p_hpy );
+        IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_hpx + 34, p_hpy + 2, false );
@@ -242,9 +260,9 @@ namespace BATTLE {
             drawGender( p_hpx + IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) + 34, p_hpy + 2, p_pokemon.gender( ) );
         IO::regularFont->setColor( WHITE_IDX, 2 );
         IO::regularFont->setColor( GRAY_IDX, 1 );
-        char bf2[ 20 ] = { 0 };
-        sprintf( buffer, "Lv%hhu", p_pokemon.m_level );
-        sprintf( bf2, " %huKP", p_pokemon.m_stats.m_acHP );
+        char buffer[ 50 ], bf2[ 20 ];
+        snprintf( buffer, 49, "Lv%hhu", p_pokemon.m_level );
+        snprintf( bf2, 19, " %hu%s", p_pokemon.m_stats.m_acHP, GET_STRING( 126 ) );
         IO::regularFont->printString( buffer, p_hpx + 34, p_hpy + 15, false );
         IO::regularFont->setColor( WHITE_IDX, 1 );
         IO::regularFont->setColor( p_hpCol, 2 );
@@ -488,24 +506,25 @@ namespace BATTLE {
         REG_BLDY = 0x1F;
         bgUpdate( );
 
-        sprintf( buffer, "%d", _battle->m_backgroundId );
+        char buffer[ 100 ];
+        snprintf( buffer, 99, "%d", _battle->m_backgroundId );
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/", buffer, 512, 49152 );
 
-        u16 val = 0x1F;
+        u16 vl = 0x1F;
         for( s8 i = 4; i >= 0; --i ) {
             for( u8 j = 0; j < 5; ++j )
                 swiWaitForVBlank( );
-            val &= ~( 1 << u8( i ) );
-            REG_BLDY = val;
+            vl &= ~( 1 << u8( i ) );
+            REG_BLDY = vl;
         }
         swiWaitForVBlank( );
 
         if( !_battle->m_isWildBattle ) {
-            sprintf( buffer, "%03d_1", _battle->_opponent->m_trainerClass );
+            snprintf( buffer, 99, "%03d_1", _battle->_opponent->m_trainerClass );
             FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 128, 49152 );
             for( u8 i = 0; i < 40; ++i )
                 swiWaitForVBlank( );
-            sprintf( buffer, "%03d_2", _battle->_opponent->m_trainerClass );
+            snprintf( buffer, 99, "%03d_2", _battle->_opponent->m_trainerClass );
             FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 128, 49152 );
             for( u8 i = 0; i < 120; ++i )
                 swiWaitForVBlank( );
@@ -513,22 +532,18 @@ namespace BATTLE {
             dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         } else {
             auto acPkmn = *_battle->_wildPokemon.m_pokemon;
-            u16 x = 128;
-            u8  y = 19;
-
-            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+            if( !IO::loadPKMNSprite( PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, WILD_BATTLE_SPRITE_X_START, WILD_BATTLE_SPRITE_Y,
                                      PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ),
                                      false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
-                                         acPkmn.m_boxdata.m_speciesId, x, y,
+                if( !IO::loadPKMNSprite( PKMN_SPRITE_PATH,
+                                         acPkmn.m_boxdata.m_speciesId, WILD_BATTLE_SPRITE_X_START, WILD_BATTLE_SPRITE_Y,
                                          PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    _battle->log( SPRITE_FAILED );
                 }
             }
             IO::updateOAM( false );
-            for( u8 i = 0; i < 112 - 96; ++i ) {
-                x++;
+            for( u16 i = WILD_BATTLE_SPRITE_X_START; i < WILD_BATTLE_SPRITE_X; ++i ) {
                 IO::OamTop->oamBuffer[ PKMN_IDX( 0, OPPONENT ) ].x++;
                 IO::OamTop->oamBuffer[ PKMN_IDX( 0, OPPONENT ) + 1 ].x++;
                 IO::OamTop->oamBuffer[ PKMN_IDX( 0, OPPONENT ) + 2 ].x++;
@@ -537,7 +552,7 @@ namespace BATTLE {
                 swiWaitForVBlank( );
             }
             if( acPkmn.m_boxdata.isShiny( ) )
-                animateShiny( x + 16, y + 16, SHINY_ANIM, 15, TILESTART );
+                animateShiny( WILD_BATTLE_SPRITE_X + 16, WILD_BATTLE_SPRITE_X_START + 16, SHINY_ANIM, 15, TILESTART );
         }
     }
 
@@ -554,7 +569,8 @@ namespace BATTLE {
         REG_BLDY = 0x1F;
         bgUpdate( );
 
-        sprintf( buffer, "%d", _battle->m_backgroundId );
+        char buffer[ 100 ];
+        snprintf( buffer, 99, "%d", _battle->m_backgroundId );
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/", buffer, 512, 49152 );
 
         loadBattleUITop( );
@@ -562,17 +578,15 @@ namespace BATTLE {
             sendPKMN( i % 2, i / 2, true );
         if( _battle->m_isWildBattle ) {
             auto acPkmn = *_battle->_wildPokemon.m_pokemon;
-            u16 x = 144;
-            u8  y = 19;
 
-            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+            if( !IO::loadPKMNSprite( PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, WILD_BATTLE_SPRITE_X, WILD_BATTLE_SPRITE_Y,
                                      PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ),
                                      false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
-                                         acPkmn.m_boxdata.m_speciesId, x, y,
+                if( !IO::loadPKMNSprite( PKMN_SPRITE_PATH,
+                                         acPkmn.m_boxdata.m_speciesId, WILD_BATTLE_SPRITE_X, WILD_BATTLE_SPRITE_Y,
                                          PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    _battle->log( SPRITE_FAILED );
                 }
             }
             IO::updateOAM( false );
@@ -589,11 +603,13 @@ namespace BATTLE {
         u16 tilecnt = 0;
         tilecnt = initStsBalls( true, tilecnt );
         initColors( );
+        initLogScreen( );
 
-        sprintf( buffer, "Eine Herausforderung von\n%s %s!",
-                 trainerClassNames[ _battle->_opponent->m_trainerClass ].c_str( ),
-                 _battle->_opponent->m_battleTrainerName.c_str( ) );
-        IO::regularFont->printString( buffer, 16, 80, true );
+        char buffer[ 100 ];
+        snprintf( buffer, 99, GET_STRING( 143 ),
+                  trainerClassNames[ _battle->_opponent->m_trainerClass ].c_str( ),
+                  _battle->_opponent->m_battleTrainerName.c_str( ) );
+        _battle->log( buffer );
         IO::updateOAM( true );
     }
 
@@ -639,7 +655,7 @@ namespace BATTLE {
 
         IO::updateOAM( false );
         if( _battle->m_isWildBattle ) {
-            u8 hpx = 88, hpy = 40;
+            u8 hpx = WILD_BATTLE_HP_X, hpy = WILD_BATTLE_HP_Y;
             auto& acPkmn = *_battle->_wildPokemon.m_pokemon;
             setStsBallPosition( OPPONENT, 0, hpx + 8, hpy + 8, false );
             IO::OamTop->oamBuffer[ HP_IDX( OPPONENT, 0 ) ].isHidden = false;
@@ -657,13 +673,14 @@ namespace BATTLE {
             IO::displayHP( 100, 100 - acPkmn.m_stats.m_acHP * 100 / acPkmn.m_stats.m_maxHP,
                            hpx, hpy, HP_COL( OPPONENT, 0 ), HP_COL( OPPONENT, 0 ) + 1, false );
 
+            IO::displayEP( 100, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
             IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
-                           ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
+                ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
                            hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
         }
     }
 
-    void loadBattleUISub( u16 p_pkmnId, bool p_isWildBattle, bool p_showNav ) {
+    void loadBattleUISub( u16 p_pkmnId, bool p_isWildBattle ) {
         u16 tilecnt = 0;
         //Load UI Sprites
         //FIGHT -- 1
@@ -677,14 +694,10 @@ namespace BATTLE {
         tilecnt = IO::loadSprite( SUB_FIGHT_START + 2, 1, tilecnt, 96,
                                   100, 64, 32, BattleSub2Pal, BattleSub2Tiles, BattleSub2TilesLen,
                                   false, false, false, OBJPRIORITY_0, true );
-        //RUN / POKENAV
+        //RUN
         if( p_isWildBattle ) { //Show Run
             tilecnt = IO::loadSprite( SUB_FIGHT_START + 3, 2, tilecnt, 91,
                                       150, 64, 32, BattleSub3Pal, BattleSub3Tiles, BattleSub3TilesLen,
-                                      false, false, false, OBJPRIORITY_3, true );
-        } else if( p_showNav ) { //Show Nav
-            tilecnt = IO::loadSprite( SUB_FIGHT_START + 3, 2, tilecnt, 91,
-                                      150, 64, 32, BattleSub6Pal, BattleSub6Tiles, BattleSub6TilesLen,
                                       false, false, false, OBJPRIORITY_3, true );
         }
         //BAG
@@ -763,24 +776,25 @@ namespace BATTLE {
             IO::regularFont->setColor( WHITE_IDX, 2 );
             IO::regularFont->printString( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
                                           dx + x + 113, dy + y + 15, true, IO::font::RIGHT );
-            sprintf( buffer, "Lv%d", acPkmn.m_level );
+            char buffer[ 20 ];
+            snprintf( buffer, 19, "Lv%d", acPkmn.m_level );
             IO::regularFont->printString( buffer, dx + x + 12, dy + y + 27, true );
             if( acPkmn.m_stats.m_acHP ) {
                 switch( acPkmnStr.m_ailments ) {
                     case FREEZE:
-                        sprintf( buffer, "Eingfr" );
+                        snprintf( buffer, 19, GET_STRING( 144 ) );
                         break;
                     case PARALYSIS:
-                        sprintf( buffer, "Prlyse" );
+                        snprintf( buffer, 19, GET_STRING( 145 ) );
                         break;
                     case BURN:
-                        sprintf( buffer, "Verbrng" );
+                        snprintf( buffer, 19, GET_STRING( 146 ) );
                         break;
                     case SLEEP:
-                        sprintf( buffer, "Schlaf" );
+                        snprintf( buffer, 19, GET_STRING( 147 ) );
                         break;
                     case POISONED:
-                        sprintf( buffer, "Gift" );
+                        snprintf( buffer, 19, GET_STRING( 148 ) );
                     default:
                         if( 5 * acPkmn.m_stats.m_acHP <= acPkmn.m_stats.m_maxHP )
                             IO::regularFont->setColor( RED_IDX, 1 );
@@ -792,14 +806,14 @@ namespace BATTLE {
                 }
             } else {
                 IO::regularFont->setColor( RED_IDX, 1 );
-                sprintf( buffer, "Besiegt" );
+                sprintf( buffer, GET_STRING( 136 ) );
             }
             IO::regularFont->printString( buffer, dx + x + 113, dy + y + 27, true, IO::font::RIGHT );
 
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
         } else
-            IO::regularFont->printString( "Ei", dx + x + 112, dy + y + 2, true, IO::font::RIGHT );
+            IO::regularFont->printString( GET_STRING( 34 ), dx + x + 112, dy + y + 2, true, IO::font::RIGHT );
     }
 
     void battleUI::drawPKMNChoiceScreen( bool p_firstIsChosen ) {
@@ -851,13 +865,13 @@ namespace BATTLE {
 
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
             if( !p_alreadySent && !p_alreadyChosen && !dead )
-                IO::regularFont->printString( "Aussenden", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
-            else if( !p_alreadyChosen  && !dead )
-                IO::regularFont->printString( "Bereits im Kampf", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
+                IO::regularFont->printString( GET_STRING( 149 ), p_x + dx + 64, dy + 52, true, IO::font::CENTER );
+            else if( !p_alreadyChosen && !dead )
+                IO::regularFont->printString( GET_STRING( 150 ), p_x + dx + 64, dy + 52, true, IO::font::CENTER );
             else if( dead )
-                IO::regularFont->printString( "Schon besiegt…", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
+                IO::regularFont->printString( GET_STRING( 151 ), p_x + dx + 64, dy + 52, true, IO::font::CENTER );
             else
-                IO::regularFont->printString( "Schon ausgewählt", p_x + dx + 64, dy + 52, true, IO::font::CENTER );
+                IO::regularFont->printString( GET_STRING( 152 ), p_x + dx + 64, dy + 52, true, IO::font::CENTER );
 
             IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_x + dx + 58, dy + 66, true, IO::font::CENTER );
             drawGender( p_x + dx + 62 + IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2, dy + 66, p_pokemon.gender( ), true );
@@ -868,17 +882,18 @@ namespace BATTLE {
             IO::regularFont->printString( ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
                                           p_x + dx + 64, dy + 80, true, IO::font::CENTER );
 
-            sprintf( buffer, "Lv%d", p_pokemon.m_level );
+            char buffer[ 20 ];
+            snprintf( buffer, 19, "Lv%d", p_pokemon.m_level );
             IO::regularFont->printString( buffer, dx + p_x, dy + 94, true );
-            sprintf( buffer, "%d/%dKP", p_pokemon.m_stats.m_acHP, p_pokemon.m_stats.m_maxHP );
+            snprintf( buffer, 19, "%d/%d%s", p_pokemon.m_stats.m_acHP, p_pokemon.m_stats.m_maxHP, GET_STRING( 126 ) );
             IO::regularFont->printString( buffer, dx + p_x + 128, dy + 94, true, IO::font::RIGHT );
 
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
         } else {
             consoleSetWindow( &IO::Bottom, 8, 11, 16, 10 );
-            IO::regularFont->printString( "Ein Ei kann", p_x + dx + 64, dy + 80, true, IO::font::CENTER );
-            IO::regularFont->printString( "nicht kämpfen!", p_x + dx + 64, dy + 94, true, IO::font::CENTER );
+            IO::regularFont->printString( GET_STRING( 153 ), p_x + dx + 64, dy + 80, true, IO::font::CENTER );
+            IO::regularFont->printString( GET_STRING( 154 ), p_x + dx + 64, dy + 94, true, IO::font::CENTER );
         }
     }
 
@@ -912,22 +927,22 @@ namespace BATTLE {
                                       20, 128, 32, 32, memoPal, memoTiles,
                                       memoTilesLen, false, false, false, OBJPRIORITY_1, true );
             IO::printChoiceBox( 36, 132, 124, 156, 6, GRAY_IDX, false );
-            IO::regularFont->printString( "Bericht", 56, 137, true );
+            IO::regularFont->printString( GET_STRING( 155 ), 56, 137, true );
 
             //Moves
             tilecnt = IO::loadSprite( ++oamIndex, 4, tilecnt,
                                       200, 128, 32, 32, atksPal, atksTiles,
                                       atksTilesLen, false, false, false, OBJPRIORITY_1, true );
             IO::printChoiceBox( 132, 132, 216, 156, 6, GRAY_IDX, false );
-            IO::regularFont->printString( "Attacken", 138, 137, true );
+            IO::regularFont->printString( GET_STRING( 156 ), 138, 137, true );
         } else {
             x = 64;
             y = 64;
         }
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
-            if( !( t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+            if( !( t2 = IO::loadPKMNSprite( PKMN_SPRITE_PATH, p_pokemon.m_boxdata.m_speciesId,
                                             16, 32, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) )
-                t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+                t2 = IO::loadPKMNSprite( PKMN_SPRITE_PATH, p_pokemon.m_boxdata.m_speciesId,
                                          16, 32, oamIndex, palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
             oamIndex += 3;
             tilecnt = t2;
@@ -963,7 +978,7 @@ namespace BATTLE {
                 }
                 if( IN_RANGE_R( 20, 132, 124, 156 ) ) { //Info
                     IO::printChoiceBox( 36, 132, 124, 156, 6, GRAY_IDX, true );
-                    IO::regularFont->printString( "Bericht", 58, 138, true );
+                    IO::regularFont->printString( GET_STRING( 155 ), 58, 138, true );
                     IO::Oam->oamBuffer[ SUB_Back_OAM + 2 ].x += 2;
                     IO::Oam->oamBuffer[ SUB_Back_OAM + 2 ].y += 1;
                     IO::updateOAM( true );
@@ -975,7 +990,7 @@ namespace BATTLE {
                             return 1;
                         if( !IN_RANGE_R( 20, 132, 124, 156 ) ) {
                             IO::printChoiceBox( 36, 132, 124, 156, 6, GRAY_IDX, false );
-                            IO::regularFont->printString( "Bericht", 56, 137, true );
+                            IO::regularFont->printString( GET_STRING( 155 ), 56, 137, true );
                             IO::Oam->oamBuffer[ SUB_Back_OAM + 2 ].x -= 2;
                             IO::Oam->oamBuffer[ SUB_Back_OAM + 2 ].y -= 1;
                             IO::updateOAM( true );
@@ -985,7 +1000,7 @@ namespace BATTLE {
                 }
                 if( IN_RANGE_R( 132, 132, 232, 156 ) ) { //Moves
                     IO::printChoiceBox( 132, 132, 216, 156, 6, GRAY_IDX, true );
-                    IO::regularFont->printString( "Attacken", 140, 138, true );
+                    IO::regularFont->printString( GET_STRING( 156 ), 140, 138, true );
                     IO::Oam->oamBuffer[ SUB_Back_OAM + 3 ].x += 2;
                     IO::Oam->oamBuffer[ SUB_Back_OAM + 3 ].y += 1;
                     IO::updateOAM( true );
@@ -997,7 +1012,7 @@ namespace BATTLE {
                             return 2;
                         if( !IN_RANGE_R( 132, 132, 232, 156 ) ) {
                             IO::printChoiceBox( 132, 132, 216, 156, 6, GRAY_IDX, false );
-                            IO::regularFont->printString( "Attacken", 138, 137, true );
+                            IO::regularFont->printString( GET_STRING( 156 ), 138, 137, true );
                             IO::Oam->oamBuffer[ SUB_Back_OAM + 3 ].x -= 2;
                             IO::Oam->oamBuffer[ SUB_Back_OAM + 3 ].y -= 1;
                             IO::updateOAM( true );
@@ -1054,9 +1069,9 @@ namespace BATTLE {
 
         u16 t2;
         if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
-            if( !( t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+            if( !( t2 = IO::loadPKMNSprite( PKMN_SPRITE_PATH, p_pokemon.m_boxdata.m_speciesId,
                                             16, 8, ++oamIndex, ++palIndex, tilecnt, true, p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale ) ) ) {
-                t2 = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId,
+                t2 = IO::loadPKMNSprite( PKMN_SPRITE_PATH, p_pokemon.m_boxdata.m_speciesId,
                                          16, 8, oamIndex, palIndex, tilecnt,
                                          true, p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale );
             }
@@ -1064,8 +1079,8 @@ namespace BATTLE {
             tilecnt = t2;
 
             consoleSetWindow( &IO::Bottom, 4, 0, 12, 2 );
-            printf( "EP(%3lu%%)\nKP(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] )
-                    * 100 / ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
+            printf( "EP(%3lu%%)\n%s(%3i%%)", ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] )
+                    * 100 / ( EXP[ p_pokemon.m_level ][ exptype ] - EXP[ p_pokemon.m_level - 1 ][ exptype ] ), GET_STRING( 126 ),
                     p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::displayHP( 100, 101, 46, 40, 236, 237, false, 50, 56, true );
             IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP, 46, 40, 236, 237, false, 50, 56, true );
@@ -1076,10 +1091,12 @@ namespace BATTLE {
                            46, 40, 238, 239, false, 59, 62, true );
             IO::boldFont->setColor( GRAY_IDX, 1 );
             IO::boldFont->setColor( BLACK_IDX, 2 );
+            IO::boldFont->setColor( 0, 0 );
 
             consoleSetWindow( &IO::Bottom, 2, 1, 13, 2 );
 
-            std::sprintf( buffer, "%s /", p_pokemon.m_boxdata.m_name );
+            char buffer[ 30 ];
+            snprintf( buffer, 29, "%s /", p_pokemon.m_boxdata.m_name );
             IO::boldFont->printString( buffer, 16, 96, true );
             s8 G = p_pokemon.m_boxdata.gender( );
 
@@ -1096,7 +1113,7 @@ namespace BATTLE {
             IO::boldFont->setColor( BLACK_IDX, 2 );
 
 
-            IO::boldFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ), 24, 110, true );
+            IO::boldFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ).c_str( ), 24, 110, true );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::boldFont->printString( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
@@ -1123,9 +1140,11 @@ namespace BATTLE {
             tilecnt = IO::loadEggSprite( 26, 24, ++oamIndex, ++palIndex, tilecnt, true );
             IO::boldFont->setColor( GRAY_IDX, 1 );
             IO::boldFont->setColor( BLACK_IDX, 2 );
+            IO::boldFont->setColor( 0, 0 );
 
-            IO::boldFont->printString( "Ei /", 16, 96, true );
-            IO::boldFont->printString( "Ei", 24, 110, true );
+            IO::boldFont->printString( GET_STRING( 34 ), 16, 96, true );
+            IO::boldFont->printString( "/", 30, 96, true );
+            IO::boldFont->printString( GET_STRING( 34 ), 24, 110, true );
         }
 
         //Here starts the page specific stuff
@@ -1156,40 +1175,48 @@ namespace BATTLE {
                     tilecnt = IO::loadDamageCategoryIcon( acMove->m_moveHitType, x + 22, y - 7, ++oamIndex, ++palIndex, tilecnt, true );
                     consoleSelect( &IO::Bottom );
                     consoleSetWindow( &IO::Bottom, x / 8, 5 + 5 * i, 20, 2 );
-                    printf( "%6hhu/%2hhu AP", p_pokemon.m_boxdata.m_acPP[ 0 ],
-                            AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_movePP * ( ( 5 + p_pokemon.m_boxdata.m_ppup.m_Up1 ) / 5 ) );
+                    printf( "%6hhu/%2hhu %s", p_pokemon.m_boxdata.m_acPP[ 0 ],
+                            AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_movePP * ( ( 5 + p_pokemon.m_boxdata.m_ppup.m_Up1 ) / 5 ),
+                            GET_STRING( 31 ) );
                 }
             }
         } else { //Status
             if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
                 IO::boldFont->setColor( GRAY_IDX, 1 );
                 IO::boldFont->setColor( BLACK_IDX, 2 );
-                sprintf( buffer, "KP                     %3i", p_pokemon.m_stats.m_maxHP );
-                IO::boldFont->printString( buffer, 130, 16, true );
+                char buffer[ 30 ];
+                snprintf( buffer, 29, "%3hu", p_pokemon.m_stats.m_maxHP );
+                IO::boldFont->printString( GET_STRING( 126 ), 130, 16, true );
+                IO::boldFont->printString( buffer, 158 + 70, 16, true );
 
 #define ADJUST_COLOR( p_val )   if( p_val == 1.1 ) IO::boldFont->setColor( RED_IDX, 2 ); \
                                 else if( p_val == 0.9 ) IO::boldFont->setColor( BLUE_IDX, 2 ); \
                                 else IO::boldFont->setColor( BLACK_IDX, 2 );
 
                 ADJUST_COLOR( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 0 ] );
-                sprintf( buffer, "ANG                   %3i", p_pokemon.m_stats.m_Atk );
-                IO::boldFont->printString( buffer, 126, 41, true );
+                snprintf( buffer, 29, "%3hu", p_pokemon.m_stats.m_Atk );
+                IO::boldFont->printString( GET_STRING( 157 ), 126, 41, true );
+                IO::boldFont->printString( buffer, 154 + 70, 41, true );
 
                 ADJUST_COLOR( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 1 ] );
-                sprintf( buffer, "VER                   %3i", p_pokemon.m_stats.m_Def );
-                IO::boldFont->printString( buffer, 124, 58, true );
+                snprintf( buffer, 29, "%3hu", p_pokemon.m_stats.m_Def );
+                IO::boldFont->printString( GET_STRING( 158 ), 124, 58, true );
+                IO::boldFont->printString( buffer, 152 + 70, 58, true );
 
                 ADJUST_COLOR( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 3 ] );
-                sprintf( buffer, "SAN                   %3i", p_pokemon.m_stats.m_SAtk );
-                IO::boldFont->printString( buffer, 122, 75, true );
+                snprintf( buffer, 29, "%3hu", p_pokemon.m_stats.m_SAtk );
+                IO::boldFont->printString( GET_STRING( 159 ), 122, 75, true );
+                IO::boldFont->printString( buffer, 150 + 70, 75, true );
 
                 ADJUST_COLOR( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 4 ] );
-                sprintf( buffer, "SVE                   %3i", p_pokemon.m_stats.m_SDef );
-                IO::boldFont->printString( buffer, 120, 92, true );
+                snprintf( buffer, 29, "%3hu", p_pokemon.m_stats.m_SDef );
+                IO::boldFont->printString( GET_STRING( 160 ), 120, 92, true );
+                IO::boldFont->printString( buffer, 148 + 70, 92, true );
 
                 ADJUST_COLOR( NatMod[ p_pokemon.m_boxdata.getNature( ) ][ 2 ] );
-                sprintf( buffer, "INI                   \xC3\xC3""%3i", p_pokemon.m_stats.m_Spd );
-                IO::boldFont->printString( buffer, 118, 109, true );
+                snprintf( buffer, 29, "%3hu", p_pokemon.m_stats.m_Spd );
+                IO::boldFont->printString( GET_STRING( 161 ), 118, 109, true );
+                IO::boldFont->printString( buffer, 146 + 70, 109, true );
 
                 IO::printRectangle( (u8) 158, (u8) 18, u8( 158 + 68 ), u8( 18 + 12 ), true, false, WHITE_IDX );
 
@@ -1228,7 +1255,7 @@ namespace BATTLE {
                 IO::boldFont->setColor( WHITE_IDX, 1 );
                 IO::boldFont->setColor( BLACK_IDX, 2 );
                 if( p_pokemon.m_boxdata.m_steps > 10 ) {
-                    IO::boldFont->printString( "Was da wohl", 16 * 8, 50, true );
+                    IO::boldFont->printString( "Was da wohl", 16 * 8, 50, true ); // TODO
                     IO::boldFont->printString( "schlüpfen wird?", 16 * 8, 70, true );
                     IO::boldFont->printString( "Es dauert wohl", 16 * 8, 100, true );
                     IO::boldFont->printString( "noch lange.", 16 * 8, 120, true );
@@ -1251,7 +1278,7 @@ namespace BATTLE {
         IO::updateOAM( true );
         touchPosition touch;
         loop( ) {
-
+            swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
             u32 pressed = keysHeld( );
@@ -1278,10 +1305,10 @@ namespace BATTLE {
 
     void getSpritePos( bool p_opponent, u8 p_pokemonPos, bool p_double, s16& p_x, s16& p_y, u8& p_hpx, u8& p_hpy ) {
         if( p_opponent ) {
-            p_hpx = 88; p_hpy = 40;
+            p_hpx = OPP_1_HP_X; p_hpy = OPP_1_HP_Y;
             p_x = 176; p_y = 20;
             if( p_pokemonPos ) {
-                p_hpx -= 88; p_hpy -= 32;
+                p_hpx = OPP_2_HP_X; p_hpy = OPP_2_HP_Y;
                 p_x = 112; p_y = 14;
             }
             if( !p_double ) {
@@ -1289,10 +1316,10 @@ namespace BATTLE {
                 p_y += 3;
             }
         } else {
-            p_hpx = 220; p_hpy = 152;
+            p_hpx = OWN_1_HP_X; p_hpy = OWN_1_HP_Y;
             p_x = 40; p_y = 100;
             if( !p_pokemonPos ) {
-                p_hpx -= 88; p_hpy -= 32;
+                p_hpx = OWN_2_HP_X; p_hpy = OWN_2_HP_Y;
                 p_x = -40; p_y = 84;
             }
             if( !p_double ) {
@@ -1356,11 +1383,11 @@ namespace BATTLE {
     u8 firstMoveSwitchTarget = 0;
     bool battleUI::declareBattleMove( u8 p_pokemonPos, bool p_showBack ) {
         char buffer[ 100 ];
-        std::sprintf( buffer, "Was soll %s tun?", CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
+        snprintf( buffer, 99, GET_STRING( 162 ), CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
         writeLogText( buffer );
 
         loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                         _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                         _battle->m_isWildBattle );
         if( p_showBack ) {
             IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
             IO::updateOAM( true );
@@ -1369,7 +1396,7 @@ namespace BATTLE {
         touchPosition touch;
         auto& result = _battle->_battleMoves[ p_pokemonPos ][ PLAYER ];
         loop( ) {
-
+            swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
 
@@ -1411,7 +1438,7 @@ SHOW_ATTACK:
                     }
                 }
                 loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                                 _battle->m_isWildBattle );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( buffer );
 
@@ -1423,7 +1450,7 @@ SHOW_ATTACK:
                 result.m_value = chooseItem( );
                 result.m_target = 0;
                 loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                                 _battle->m_isWildBattle );
                 if( result.m_value ) {
                     if( ItemList[ result.m_value ]->m_itemType == item::MEDICINE ) {
                         u8 res = choosePKMN( p_pokemonPos + ( _battle->m_battleMode == battle::DOUBLE ), true, true );
@@ -1433,14 +1460,14 @@ SHOW_ATTACK:
                             for( u8 i = 0; i < 2; ++i )
                                 if( ItemList[ result.m_value ]->needsInformation( i ) ) {
                                     IO::choiceBox cb( CUR_PKMN_2( *_battle, res, PLAYER ), 0 );
-                                    u8 res = 1 + cb.getResult( "Welche Attacke?", false, false );
+                                    u8 rs = 1 + cb.getResult( GET_STRING( 49 ), false, false );
 
                                     result.m_newItemEffect &= ~( 1 << ( 9 + 16 * !i ) );
-                                    result.m_newItemEffect |= ( res << ( 9 + 16 * !i ) );
+                                    result.m_newItemEffect |= ( rs << ( 9 + 16 * !i ) );
                                 }
                         } else {
                             loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                             _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                                             _battle->m_isWildBattle );
                             goto NEXT_TRY;
                         }
                     } else if( ItemList[ result.m_value ]->m_itemType == item::POKE_BALLS )
@@ -1448,7 +1475,7 @@ SHOW_ATTACK:
                     IO::initOAMTable( true );
                     IO::NAV->draw( );
                     loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                     _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                                     _battle->m_isWildBattle );
 
                     setDeclareBattleMoveSpriteVisibility( p_showBack, true );
                     initLogScreen( );
@@ -1457,32 +1484,19 @@ SHOW_ATTACK:
                 }
 NEXT_TRY:
                 initLogScreen( );
-                std::sprintf( buffer, "Was soll %s tun?", CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
+                snprintf( buffer, 99, GET_STRING( 162 ), CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
                 writeLogText( buffer );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
-
-            } else if( !_battle->m_isWildBattle && FS::SAV->m_activatedPNav && GET_AND_WAIT_R( 95, 152, 152, 178 ) ) {
-
-                setDeclareBattleMoveSpriteVisibility( p_showBack );
-                clearLogScreen( );
-                result.m_type = battle::battleMove::USE_NAV;
-                useNav( );
-                if( result.m_value ) {
-                    loadA( );
-                    return true;
-                }
-                setDeclareBattleMoveSpriteVisibility( p_showBack, false );
-                writeLogText( buffer );
 
             } else if( _battle->m_isWildBattle && GET_AND_WAIT_R( 97, 162, 153, 180 ) ) { //Run
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::RUN;
                 if( _battle->run( ) ) {
-                    _battle->log( "Du bist entkommen.[A]" );
+                    _battle->log( GET_STRING( 163 ) );
                     return true;
                 } else
-                    _battle->log( "Flucht gescheitert…[A]" );
+                    _battle->log( GET_STRING( 164 ) );
                 if( result.m_value ) {
                     loadA( );
                     return true;
@@ -1500,7 +1514,7 @@ NEXT_TRY:
                     return true;
                 }
                 loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle, !_battle->m_isWildBattle && FS::SAV->m_activatedPNav );
+                                 _battle->m_isWildBattle );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( buffer );
             }
@@ -1510,7 +1524,7 @@ NEXT_TRY:
     u16 battleUI::chooseAttack( u8 p_pokemonPos ) {
         u16 result = 0;
 
-        writeLogText( "Welche Attacke?" );
+        writeLogText( GET_STRING( 49 ) );
 
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
 
@@ -1540,9 +1554,11 @@ NEXT_TRY:
                 tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 7, y - 7, ++oamIndex, palIndex++, tilecnt, true );
                 tilecnt = IO::loadDamageCategoryIcon( acMove->m_moveHitType, x + 25, y - 7, ++oamIndex, palIndex++, tilecnt, true );
 
-                sprintf( buffer, "%6hhu/%2hhu AP",
-                         acPkmn.m_boxdata.m_acPP[ i ],
-                         s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                char buffer[ 50 ];
+                snprintf( buffer, 49, "%6hhu/%2hhu %s",
+                          acPkmn.m_boxdata.m_acPP[ i ],
+                          s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ),
+                          GET_STRING( 31 ) );
                 IO::regularFont->setColor( 0, 2 );
                 IO::regularFont->printString( buffer, x + w - 4, y + h - 14, true, IO::font::RIGHT );
                 IO::regularFont->setColor( GRAY_IDX, 2 );
@@ -1554,6 +1570,7 @@ NEXT_TRY:
         touchPosition touch;
         loop( ) {
 NEXT:
+            swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
 
@@ -1574,9 +1591,11 @@ NEXT:
 
                     IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 9, y + 8, true );
 
-                    sprintf( buffer, "%6hhu/%2hhu AP",
-                             acPkmn.m_boxdata.m_acPP[ i ],
-                             s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                    char buffer[ 50 ];
+                    snprintf( buffer, 49, "%6hhu/%2hhu %s",
+                              acPkmn.m_boxdata.m_acPP[ i ],
+                              s8( AttackList[ acPkmn.m_boxdata.m_moves[ i ] ]->m_movePP * ( ( 5 + acPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ),
+                              GET_STRING( 31 ) );
                     IO::regularFont->setColor( 0, 2 );
                     IO::regularFont->printString( buffer, x + w - 2, y + h - 13, true, IO::font::RIGHT );
                     IO::regularFont->setColor( GRAY_IDX, 2 );
@@ -1663,7 +1682,7 @@ END:
     u8 battleUI::chooseAttackTarget( u8 p_pokemonPos, u16 p_move ) {
         u8 result = 0;
 
-        writeLogText( "Welches PKMN angreifen?" );
+        writeLogText( GET_STRING( 165 ) );
 
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
 
@@ -1735,6 +1754,7 @@ END:
         touchPosition touch;
         loop( ) {
 NEXT:
+            swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
 
@@ -1863,12 +1883,13 @@ START:
         initColors( );
         IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
 
-        writeLogText( "Welches PKMN?" );
+        writeLogText( GET_STRING( 166 ) );
 
         drawPKMNChoiceScreen( p_firstIsChosen );
         touchPosition touch;
         loop( ) {
 NEXT:
+            swiWaitForVBlank( );
             IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
             IO::updateOAM( true );
 
@@ -1951,10 +1972,6 @@ CLEAR:
         return result;
     }
 
-    void battleUI::useNav( ) {
-        _battle->log( "Use Nav[A]" );
-    }
-
     void battleUI::showAttack( bool p_opponent, u8 p_pokemonPos ) {
         // Attack animation here
 
@@ -2005,9 +2022,10 @@ CLEAR:
         u16 expStart = ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] - p_gainedExp ) * 100 /
             ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] );
         u16 expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
-                                                ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
+            ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
 
-        std::sprintf( buffer, "%s gewinnt %lu E.-Punkte.[A]", acPkmn.m_boxdata.m_name, p_gainedExp );
+        char buffer[ 100 ];
+        snprintf( buffer, 99, GET_STRING( 167 ), acPkmn.m_boxdata.m_name, p_gainedExp );
         _battle->log( buffer );
         IO::displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
 
@@ -2040,7 +2058,7 @@ CLEAR:
 
             acPkmn.m_stats.m_acHP = acPkmn.m_stats.m_maxHP - HPdif;
 
-            std::sprintf( buffer, "%s erreicht Level %d.[A]", acPkmn.m_boxdata.m_name, acPkmn.m_level );
+            snprintf( buffer, 99, GET_STRING( 168 ), acPkmn.m_boxdata.m_name, acPkmn.m_level );
             _battle->log( buffer );
 
             updateHP( p_opponent, p_pokemonPos, oldHP, oldHPmax );
@@ -2056,7 +2074,7 @@ CLEAR:
 
             expStart = 0;
             expEnd = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
-                                                ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
+                ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
 
             IO::displayEP( 101, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
             IO::displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
@@ -2064,8 +2082,6 @@ CLEAR:
     }
 
     void battleUI::updateStats( bool p_opponent, u8 p_pokemonPos, bool p_move ) {
-        //if( _battle->m_battleMode != battle::DOUBLE && p_pokemonPos )
-        //    return;
         if( _battle->m_isWildBattle && p_opponent )
             return;
         setStsBallSts( p_opponent, p_pokemonPos, CUR_PKMN_STS_2( *_battle, p_pokemonPos, p_opponent ), false );
@@ -2080,11 +2096,13 @@ CLEAR:
     }
 
     void battleUI::updateStatus( bool p_opponent, u8 p_pokemonPos ) {
+        // TODO
         (void) p_opponent;
         (void) p_pokemonPos;
     }
 
     void battleUI::showStatus( bool p_opponent, u8 p_pokemonPos ) {
+        // TODO
         (void) p_opponent;
         (void) p_pokemonPos;
     }
@@ -2147,11 +2165,12 @@ CLEAR:
             return;
         //Lets do some animation stuff here
         if( !p_silent ) {
+            char buffer[ 100 ];
             if( p_opponent )
-                std::sprintf( buffer, "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]",
-                              CUR_PKMN_2( *_battle, p_pokemonPos, OPPONENT ).m_boxdata.m_name );
+                snprintf( buffer, 99, GET_STRING( 139 ),
+                          CUR_PKMN_2( *_battle, p_pokemonPos, OPPONENT ).m_boxdata.m_name );
             else
-                std::sprintf( buffer, "Los [OWN%d]![A]", p_pokemonPos + 1 );
+                snprintf( buffer, 99, GET_STRING( 140 ), p_pokemonPos + 1 );
             _battle->log( buffer );
 
             setStsBallVisibility( p_opponent, p_pokemonPos, true, false );
@@ -2161,25 +2180,25 @@ CLEAR:
         }
         //Load the PKMN sprite
         if( p_opponent ) {
-            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+            if( !IO::loadPKMNSprite( PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, x, y,
                                      PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
                                      false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
+                if( !IO::loadPKMNSprite( PKMN_SPRITE_PATH,
                                          acPkmn.m_boxdata.m_speciesId, x, y,
                                          PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    _battle->log( SPRITE_FAILED );
                 }
             }
         } else {
-            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
+            if( !IO::loadPKMNSprite( PKMN_SPRITE_BACK_PATH, acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
                                      PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
                                      false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/",
+                if( !IO::loadPKMNSprite( PKMN_SPRITE_BACK_PATH,
                                          acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
                                          PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    _battle->log( SPRITE_FAILED );
                 }
             }
             adjustSprite( p_opponent, p_pokemonPos );
@@ -2207,8 +2226,9 @@ CLEAR:
         IO::displayHP( 100, 100 - acPkmn.m_stats.m_acHP * 100 / acPkmn.m_stats.m_maxHP,
                        hpx, hpy, HP_COL( p_opponent, p_pokemonPos ), HP_COL( p_opponent, p_pokemonPos ) + 1, false );
 
+        IO::displayEP( 100, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
         IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100 /
-                       ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
+            ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
                        hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
 
     }
@@ -2222,25 +2242,25 @@ CLEAR:
 
         auto acPkmn = CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent );
         if( p_opponent ) {
-            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+            if( !IO::loadPKMNSprite( PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, x, y,
                                      PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
                                      false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
+                if( !IO::loadPKMNSprite( PKMN_SPRITE_PATH,
                                          acPkmn.m_boxdata.m_speciesId, x, y,
                                          PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    _battle->log( SPRITE_FAILED );
                 }
             }
         } else {
-            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/", acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
+            if( !IO::loadPKMNSprite( PKMN_SPRITE_BACK_PATH, acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
                                      PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ),
                                      false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-                if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMNBACK/",
+                if( !IO::loadPKMNSprite( PKMN_SPRITE_BACK_PATH,
                                          acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
                                          PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ), PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                    _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                    _battle->log( SPRITE_FAILED );
                 }
             }
             adjustSprite( p_opponent, p_pokemonPos );
@@ -2261,11 +2281,12 @@ CLEAR:
             if( acPkmn.m_boxdata.m_moves[ i ] == p_move )
                 return;
 
+        char buffer[ 100 ];
         if( acPkmn.m_boxdata.m_moves[ 3 ] ) {
-            std::sprintf( buffer, "%s kann nun\n%s erlernen![A][CLEAR]Aber %s kennt\nbereits 4 Attacken.[A]",
-                          acPkmn.m_boxdata.m_name,
-                          AttackList[ p_move ]->m_moveName.c_str( ),
-                          acPkmn.m_boxdata.m_name );
+            snprintf( buffer, 99, "%s kann nun\n%s erlernen![A][CLEAR]Aber %s kennt\nbereits 4 Attacken.[A]", // TODO
+                      acPkmn.m_boxdata.m_name,
+                      AttackList[ p_move ]->m_moveName.c_str( ),
+                      acPkmn.m_boxdata.m_name );
             _battle->log( buffer );
             IO::yesNoBox yn;
 ST:
@@ -2277,7 +2298,7 @@ ST:
                 IO::updateOAM( true );
 
                 if( !res ) {
-                    std::sprintf( buffer, "Aufgeben %s zu erlernen?", AttackList[ p_move ]->m_moveName.c_str( ) );
+                    snprintf( buffer, 99, "Aufgeben %s zu erlernen?", AttackList[ p_move ]->m_moveName.c_str( ) );
                     if( !yn.getResult( buffer ) ) {
                         for( u8 u = 0; u < 50; ++u )
                             IO::Oam->oamBuffer[ u ].isHidden = true;
@@ -2288,10 +2309,10 @@ ST:
                 } else {
                     initLogScreen( );
                     loadA( );
-                    std::sprintf( buffer, "%s vergisst %s[A]\nund erlernt %s![A]",
-                                  acPkmn.m_boxdata.m_name,
-                                  AttackList[ res ]->m_moveName.c_str( ),
-                                  AttackList[ p_move ]->m_moveName.c_str( ) );
+                    snprintf( buffer, 99, "%s vergisst %s[A]\nund erlernt %s![A]",
+                              acPkmn.m_boxdata.m_name,
+                              AttackList[ res ]->m_moveName.c_str( ),
+                              AttackList[ p_move ]->m_moveName.c_str( ) );
                     _battle->log( buffer );
 
                     for( u8 i = 0; i < 4; ++i )
@@ -2307,7 +2328,7 @@ ST:
                     IO::Oam->oamBuffer[ u ].isHidden = true;
                 IO::updateOAM( true );
 
-                std::sprintf( buffer, "Aufgeben %s zu erlernen?", AttackList[ p_move ]->m_moveName.c_str( ) );
+                snprintf( buffer, 99, "Aufgeben %s zu erlernen?", AttackList[ p_move ]->m_moveName.c_str( ) );
                 if( !yn.getResult( buffer ) ) {
                     initLogScreen( );
                     for( u8 u = 0; u < 50; ++u )
@@ -2321,9 +2342,9 @@ ST:
                 if( !acPkmn.m_boxdata.m_moves[ i ] ) {
                     acPkmn.m_boxdata.m_moves[ i ] = p_move;
                     acPkmn.m_boxdata.m_acPP[ i ] = std::min( acPkmn.m_boxdata.m_acPP[ i ], AttackList[ p_move ]->m_movePP );
-                    std::sprintf( buffer, "%s erlernt %s![A]",
-                                  acPkmn.m_boxdata.m_name,
-                                  AttackList[ p_move ]->m_moveName.c_str( ) );
+                    snprintf( buffer, 99, "%s erlernt %s![A]",
+                              acPkmn.m_boxdata.m_name,
+                              AttackList[ p_move ]->m_moveName.c_str( ) );
                     _battle->log( buffer );
                     break;
                 }
@@ -2341,7 +2362,8 @@ ST:
         consoleSelect( &IO::Top );
         consoleClear( );
 
-        sprintf( buffer, "%03d_1", _battle->_opponent->m_trainerClass );
+        char buffer[ 100 ];
+        snprintf( buffer, 99, "%03d_1", _battle->_opponent->m_trainerClass );
         FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/BATTLE_MUG/", buffer, 128, 49152 );
     }
 
@@ -2390,7 +2412,7 @@ ST:
         if( p_ticks == (u8) -1 ) {
             IO::OamTop->oamBuffer[ PB_ANIM ].isHidden = true;
             IO::updateOAM( false );
-            _battle->log( "Der Ball wurde abgeblockt.\nSei kein Dieb![A]" );
+            _battle->log( "Der Ball wurde abgeblockt.\nSei kein Dieb![A]" ); // TODO
             return;
         }
         for( int i = 0; i < 4; ++i )
@@ -2515,7 +2537,8 @@ ST:
         for( int i = 0; i < 20; ++i )
             swiWaitForVBlank( );
 
-        std::sprintf( buffer, "Toll!\n%s wurde gefangen![A]", _battle->_wildPokemon.m_pokemon->m_boxdata.m_name );
+        char buffer[ 100 ];
+        snprintf( buffer, 99, "Toll!\n%s wurde gefangen![A]", _battle->_wildPokemon.m_pokemon->m_boxdata.m_name );
         _battle->log( buffer );
         return;
 BREAK:
@@ -2549,21 +2572,22 @@ BREAK:
         dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
         bgUpdate( );
 
-        sprintf( buffer, "%d", _battle->m_backgroundId );
+        char buffer[ 20 ];
+        snprintf( buffer, 19, "%d", _battle->m_backgroundId );
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/", buffer, 512, 49152 );
 
         auto& acPkmn = *_battle->_wildPokemon.m_pokemon;
         u16 x = 80;
         u8  y = 48;
 
-        if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", acPkmn.m_boxdata.m_speciesId, x, y,
+        if( !IO::loadPKMNSprite( PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, x, y,
                                  PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ),
                                  false, acPkmn.m_boxdata.isShiny( ), acPkmn.m_boxdata.m_isFemale, false ) ) {
-            if( !IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/",
+            if( !IO::loadPKMNSprite( PKMN_SPRITE_PATH,
                                      acPkmn.m_boxdata.m_speciesId, x, y,
                                      PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
                                      acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
-                _battle->log( "Sprite failed!\n(That's a bad thing, btw.)[A]" );
+                _battle->log( SPRITE_FAILED );
             }
         }
         IO::updateOAM( false );
@@ -2572,10 +2596,10 @@ BREAK:
         initLogScreen( );
 
         IO::yesNoBox yn;
-        sprintf( buffer, "Möchtest du dem %s\neinen Spitznamen geben?", acPkmn.m_boxdata.m_name );
+        sprintf( buffer, GET_STRING( 141 ), acPkmn.m_boxdata.m_name );
         if( yn.getResult( buffer ) ) {
             IO::keyboard kbd;
-            auto nick = kbd.getText( 10, "Wähle einen Spitznamen!" );
+            auto nick = kbd.getText( 10, GET_STRING( 142 ) );
             if( strcmp( nick.c_str( ), acPkmn.m_boxdata.m_name )
                 && strcmp( "", nick.c_str( ) ) ) {
                 strcpy( acPkmn.m_boxdata.m_name, nick.c_str( ) );

@@ -43,10 +43,10 @@ namespace IO {
             sprite_trainer = 2
         };
 
-        messageBox( item* p_item, const u16 p_count );
+        explicit messageBox( item* p_item, const u16 p_count );
 
-        messageBox( const char* p_text, bool p_remsprites = true );
-        messageBox( const char* p_text, const char* p_name, bool p_a = true, bool p_remsprites = true, sprite_type p_sprt = no_sprite, u16 p_sprind = 0 );
+        explicit messageBox( const char* p_text, bool p_remsprites = true );
+        explicit messageBox( const char* p_text, const char* p_name, bool p_a = true, bool p_remsprites = true, sprite_type p_sprt = no_sprite, u16 p_sprind = 0 );
         void put( const char* p_text, bool p_a = true );
         void carriageReturn( );
         void clear( );

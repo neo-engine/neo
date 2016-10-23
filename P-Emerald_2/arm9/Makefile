@@ -58,13 +58,15 @@ SOUNDS		:=  sounds
 #---------------------------------------------------------------------------------
 ARCH	:=	-mthumb -mthumb-interwork
 
-CFLAGS	:=	-g -Wall -Wextra -Werror\
+CFLAGS	:=	-g -Wall -Wextra -Warray-bounds=2\
+            -Wshadow -Wpointer-arith -Wcast-qual -Werror\
+            -Wlogical-op -Wno-error=shadow\
 			-march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 			-ffast-math \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM9 -DNDSFILENAME=\"$(TARGET).nds\"
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++14 -Ofast
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++14 -O2 -Wno-multichar
 #            -fsanitize=undefined -fsanitize=float-cast-overflow -fsanitize=null\
 #            -fsanitize=return -fsanitize=vptr
 
