@@ -188,7 +188,15 @@ namespace DEX {
                 if( GET_AND_WAIT( KEY_START )
                     || GET_AND_WAIT_R( 1, 1, 30 * ( 1 + ( _mode == SHOW_CAUGHT ) ), 16 ) )
                     changeMode( mode( !_mode ), CURR_PKMN );
-
+            if( _mode != SHOW_ALL ) {
+                if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                    _page = ( _page + 1 ) % MAX_PAGES;
+                    DRAW_TOP( );
+                } else if( GET_AND_WAIT( KEY_LEFT ) ) {
+                    _page = ( _page + MAX_PAGES - 1 ) % MAX_PAGES;
+                    DRAW_TOP( );
+                }
+            }
             if( _mode == SHOW_CAUGHT ) {
                 if( GET_AND_WAIT( KEY_DOWN ) ) {
                     if( nextEntry( CURR_PKMN ) < MAX_PKMN + 1 ) {

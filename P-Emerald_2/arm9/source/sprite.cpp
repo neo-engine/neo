@@ -399,12 +399,20 @@ namespace IO {
     }
 
     u16 loadPKMNSprite( const char* p_path, const u16 p_pkmnId, const s16 p_posX,
-                        const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx, bool p_topOnly ) {
+                        const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
+                        bool p_shiny, bool p_female, bool p_flipx, bool p_topOnly, u8 p_forme ) {
         char* buffer = new char[ 100 ];
-        if( !p_female )
-            snprintf( buffer, 99, "%d/%d", p_pkmnId, p_pkmnId );
-        else
-            snprintf( buffer, 99, "%d/%df", p_pkmnId, p_pkmnId );
+        if( !p_forme ) {
+            if( !p_female )
+                snprintf( buffer, 99, "%d/%d", p_pkmnId, p_pkmnId );
+            else
+                snprintf( buffer, 99, "%d/%df", p_pkmnId, p_pkmnId );
+        } else {
+            if( !p_female )
+                snprintf( buffer, 99, "%d/%d-%hhu", p_pkmnId, p_pkmnId, p_forme );
+            else
+                snprintf( buffer, 99, "%d/%d-%hhuf", p_pkmnId, p_pkmnId, p_forme );
+        }
 
         memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
         memset( TEMP, 0, sizeof( TEMP ) );
@@ -415,11 +423,18 @@ namespace IO {
         }
 
         if( p_shiny ) {
-            if( !p_female )
-                snprintf( buffer, 99, "%d/%ds", p_pkmnId, p_pkmnId );
-            else
-                snprintf( buffer, 99, "%d/%dsf", p_pkmnId, p_pkmnId );
-            FS::readData( p_path, buffer, (unsigned short) ( 16 ), TEMP_PAL );
+            if( !p_forme ) {
+                if( !p_female )
+                    snprintf( buffer, 99, "%d/%ds", p_pkmnId, p_pkmnId );
+                else
+                    snprintf( buffer, 99, "%d/%dsf", p_pkmnId, p_pkmnId );
+            } else {
+                if( !p_female )
+                    snprintf( buffer, 99, "%d/%d-%hhus", p_pkmnId, p_pkmnId, p_forme );
+                else
+                    snprintf( buffer, 99, "%d/%d-%hhusf", p_pkmnId, p_pkmnId, p_forme );
+            }
+            FS::readData<unsigned short, unsigned int>( p_path, buffer, 16, TEMP_PAL, 96 * 96 / 8, TEMP );
         }
 
         loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY,
@@ -521,27 +536,33 @@ namespace IO {
         }
     }
 
-    u16 loadPKMNIcon( const u16 p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadPKMNIcon( const u16 p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, u8 p_forme ) {
         char* buffer = new char[ 100 ];
-        snprintf( buffer, 99, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
+        if( !p_forme )
+            snprintf( buffer, 99, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
+        else
+            snprintf( buffer, 99, "%hu/Icon_%hu-%hhu", p_pkmnId, p_pkmnId, p_forme );
         auto res = loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
         delete[ ] buffer;
         return res;
     }
 
-    u16 loadPKMNIcon( const u16 p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadPKMNIcon( const u16 p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom, u8 p_forme ) {
         char* buffer = new char[ 100 ];
-        snprintf( buffer, 99, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
+        if( !p_forme )
+            snprintf( buffer, 99, "%hu/Icon_%hu", p_pkmnId, p_pkmnId );
+        else
+            snprintf( buffer, 99, "%hu/Icon_%hu-%hhu", p_pkmnId, p_pkmnId, p_forme );
         auto res = loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos, p_tileCnt, p_bottom );
         delete[ ] buffer;
         return res;
     }
 
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
-        return loadIcon( "nitro:/PICS/ICONS/", "Icon_egg", p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+        return loadIcon( "nitro:/PICS/SPRITES/PKMN/", "Icon_0-1", p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom ) {
-        return loadIcon( "nitro:/PICS/ICONS/", "Icon_egg", p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos, p_tileCnt, p_bottom );
+        return loadIcon( "nitro:/PICS/SPRITES/PKMN/", "Icon_0-1", p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos, p_tileCnt, p_bottom );
     }
 
     u16 loadItemIcon( const std::string& p_itemName, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {

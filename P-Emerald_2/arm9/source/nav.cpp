@@ -443,7 +443,8 @@ namespace IO {
                         memset( SAVE::SAV->getActiveFile( ).m_pkmnTeam, 0, sizeof( SAVE::SAV->getActiveFile( ).m_pkmnTeam ) );
                         for( int i = 0; i < 5; ++i ) {
                             pokemon& a = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
-                            a = pokemon( 0, rand( ) % MAX_PKMN + 1, 0,
+                            std::vector<u16> tmp = { 29, 493, 646, 201, u16( 1 + rand( ) % MAX_PKMN ) };
+                            a = pokemon( 0, tmp[ i ], 0,
                                          50, SAVE::SAV->getActiveFile( ).m_id, SAVE::SAV->getActiveFile( ).m_sid, SAVE::SAV->getActiveFile( ).m_playername,
                                          !SAVE::SAV->getActiveFile( ).m_isMale, i, false, i % 2, i == 3, i + rand( ) % 500, i, i );
                             a.m_stats.m_acHP *= i / 5.0;
@@ -459,7 +460,8 @@ namespace IO {
                             a.m_boxdata.m_ribbons1[ 3 ] = 0;
                             a.m_boxdata.m_holdItem = 1 + rand( ) % 400;
 
-                            SAVE::SAV->m_caughtPkmn[ ( a.m_boxdata.m_speciesId ) / 8 ] |= ( 1 << ( ( a.m_boxdata.m_speciesId ) % 8 ) );
+                            for( u16 j = 1; j <= MAX_PKMN; ++j )
+                                SAVE::SAV->m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );
                         }
 
                         for( u16 j : { 493, 649, 648, 647, 487, 492, 641, 642, 646, 645, 643, 644 } ) {
@@ -578,11 +580,12 @@ namespace IO {
                     case 10:
                     {
                         IO::keyboard kbd;
-                        IO::messageBox( kbd.getText( 10, "Type some text!" ).c_str( ), true );
+                        IO::messageBox( kbd.getText( 10, "Type some text!" ).c_str( ) );
                         break;
                     }
                 }
-                draw( true );
+                if( res != 10 )
+                    draw( true );
                 swiWaitForVBlank( );
                 if( res == 3 || res == 4 || res == 6 || res == 7 ) {
                     FADE_TOP_DARK( );

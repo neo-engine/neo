@@ -184,46 +184,46 @@ namespace DEX {
         IO::updateOAM( true );
     }
 
-    void dexUI::drawFormes( u16 p_pkmnId, u16 p_formeIdx, bool p_hasGenderDifference, const std::string& p_formeName, u8 p_forme ) {
-        pokemonData data; getAll( p_pkmnId, data );
-
-        u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 10, 64,
-                                          PKMN_SPRITE_START( 0 ), 0, 0, false, false, p_hasGenderDifference && ( p_forme % 2 ), true );
-        if( data.m_formecnt )
-            IO::boldFont->printString( p_formeName.c_str( ), 58, 157, false, IO::font::CENTER );
-        else if( p_hasGenderDifference && ( p_forme % 2 ) )
+    void dexUI::drawFormes( u16 p_pkmnId, u8 p_forme, u8 p_formeCnt, bool p_isFemale, bool p_isGenderless ) {
+        u16 tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 10, 64,
+                                          PKMN_SPRITE_START( 0 ), 0, 0, false, false,
+                                          p_isFemale && !p_isGenderless, true, false, p_forme );
+        if( p_formeCnt )
+            IO::boldFont->printString( getDisplayName( p_pkmnId, p_forme ).c_str( ), 58, 157, false, IO::font::CENTER );
+        else if( p_isFemale && !p_isGenderless )
             IO::boldFont->printString( GET_STRING( 133 ), 58, 157, false, IO::font::CENTER );
-        else if( p_hasGenderDifference )
+        else if( !p_isFemale && !p_isGenderless )
             IO::boldFont->printString( GET_STRING( 134 ), 58, 157, false, IO::font::CENTER );
         else
             IO::boldFont->printString( getDisplayName( p_pkmnId ).c_str( ), 58, 157, false, IO::font::CENTER );
 
-        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_formeIdx, 110, 64,
-                                      PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true, p_hasGenderDifference && ( p_forme % 2 ) );
-        if( data.m_formecnt )
-            IO::boldFont->printString( p_formeName.c_str( ), 158, 150, false, IO::font::CENTER );
-        else if( p_hasGenderDifference && ( p_forme % 2 ) )
+        tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 110, 64,
+                                      PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true,
+                                      p_isFemale && !p_isGenderless, false, false, p_forme );
+        if( p_formeCnt )
+            IO::boldFont->printString( getDisplayName( p_pkmnId, p_forme ).c_str( ), 158, 150, false, IO::font::CENTER );
+        else if( p_isFemale && !p_isGenderless )
             IO::boldFont->printString( GET_STRING( 133 ), 158, 150, false, IO::font::CENTER );
-        else if( p_hasGenderDifference )
+        else if( !p_isFemale && !p_isGenderless )
             IO::boldFont->printString( GET_STRING( 134 ), 158, 150, false, IO::font::CENTER );
         else
             IO::boldFont->printString( getDisplayName( p_pkmnId ).c_str( ), 158, 150, false, IO::font::CENTER );
         IO::boldFont->printString( GET_STRING( 135 ), 158, 166, false, IO::font::CENTER );
 
         //Load Icons of the other formes ( max 4 )
-        if( !data.m_formecnt ) {
+        if( !p_formeCnt ) {
             for( u8 i = PKMN_SPRITE_START( 3 ); i <= PKMN_SPRITE_START( 4 ); ++i )
                 IO::OamTop->oamBuffer[ i ].isHidden = true;
             IO::updateOAM( false );
             return;
         }
-        u8 currpos = ( p_forme / ( 1 + p_hasGenderDifference ) ) % data.m_formecnt;
+        u8 currpos = p_forme;
         tileCnt = IO::OamTop->oamBuffer[ STAR_START ].gfxIndex + 64;
-        for( u8 i = 0; i < u16( std::min( 4, data.m_formecnt - 1 ) ); ++i ) {
-            currpos = ( currpos + 1 ) % data.m_formecnt;
-            tileCnt = IO::loadPKMNIcon( data.m_formeIdx[ currpos ], 210, 150 - 35 * i, PKMN_SPRITE_START( 3 ) + i, 6 + i, tileCnt, false );
+        for( u8 i = 0; i < (u8) std::min( 4, p_formeCnt - 1 ); ++i ) {
+            currpos = ( currpos + 1 ) % ( p_formeCnt );
+            tileCnt = IO::loadPKMNIcon( p_pkmnId, 210, 150 - 35 * i, PKMN_SPRITE_START( 3 ) + i, 6 + i, tileCnt, false, currpos );
         }
-        for( u8 i = std::min( u16( 4 ), data.m_formecnt ); i < 4u; ++i )
+        for( u8 i = (u8) std::min( 4, p_formeCnt - 1 ); i < 4u; ++i )
             IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 3 ) + i ].isHidden = true;
         IO::updateOAM( false );
     }
@@ -274,11 +274,11 @@ namespace DEX {
         if( p_page <= 1 )
             p_forme %= data.m_formecnt ? ( ( 2 - isFixed ) * data.m_formecnt ) : ( 2 - isFixed );
 
-        u16 currFormeIdx = data.m_formecnt ? data.m_formeIdx[ p_forme / ( 2 - isFixed ) ] : p_pkmnIdx;
-        std::string formeName = std::string( data.m_formecnt ? data.m_formeName[ p_forme / ( 2 - isFixed ) ] : data.m_displayName );
+        u8 currFormeIdx = data.m_formecnt ? p_forme / ( 2 - isFixed ) : p_forme;
+        u8 formeCnt = data.m_formecnt;
 
-        if( currFormeIdx != p_pkmnIdx )
-            getAll( currFormeIdx, data );
+        if( currFormeIdx )
+            getAll( p_pkmnIdx, data, currFormeIdx );
 
         for( u8 i = 0; i < PKMN_SPRITE_START( 5 ); ++i )
             IO::OamTop->oamBuffer[ i ].isHidden = true;
@@ -413,7 +413,8 @@ namespace DEX {
         switch( p_page ) {
             case 0:
             {
-                IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", currFormeIdx, 80, 35, PKMN_SPRITE_START( 0 ), 0, 0, false );
+                bool isF = currFormeIdx % 2 && !isFixed;
+                IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmnIdx, 80, 35, PKMN_SPRITE_START( 0 ), 0, 0, false, false, isF, false, false, currFormeIdx / ( 2 - isFixed ) );
 
                 for( u8 i = 0; i < 30; ++i ) {
                     u8 bs;
@@ -453,8 +454,7 @@ namespace DEX {
                 IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 1 ].isHidden = true;
                 IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 2 ].isHidden = true;
 
-                isFixed = !isFixed;
-                drawFormes( p_pkmnIdx, currFormeIdx, isFixed, formeName, p_forme );
+                drawFormes( p_pkmnIdx, currFormeIdx / ( 2 - isFixed ), formeCnt, currFormeIdx % 2, isFixed );
                 break;
             }
             case 2:

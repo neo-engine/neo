@@ -414,25 +414,33 @@ std::string toString( u16 p_num ) {
     return std::string( buffer );
 }
 
-std::string getDisplayName( u16 p_pkmnId ) {
+std::string getDisplayName( u16 p_pkmnId, u8 p_forme ) {
     pokemonData tmp;
-    if( !getAll( p_pkmnId, tmp ) ) {
+    if( !getAll( p_pkmnId, tmp, p_forme ) ) {
         return "???";
     }
     return tmp.m_displayName;
 }
-void getDisplayName( u16 p_pkmnId, char* p_name ) {
+void getDisplayName( u16 p_pkmnId, char* p_name, u8 p_forme ) {
     pokemonData tmp;
-    if( !getAll( p_pkmnId, tmp ) ) {
+    if( !getAll( p_pkmnId, tmp, p_forme ) ) {
         strcpy( p_name, "???" );
         return;
     }
     strcpy( p_name, tmp.m_displayName );
 }
 
-bool getAll( u16 p_pkmnId, pokemonData& p_out ) {
-    FILE* f = FS::open( PKMNDATA_PATH, p_pkmnId, ".data" );
-    if( f == 0 )
+bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
+    FILE* f;
+    if( p_forme ) {
+        char buffer[ 10 ];
+        snprintf( buffer, 9, "%hu-%hhu", p_pkmnId, p_forme );
+        f = FS::open( PKMNDATA_PATH, buffer, ".data" );
+    }
+
+    if( !p_forme || !f )
+        f = FS::open( PKMNDATA_PATH, p_pkmnId, ".data" );
+    if( !f )
         return false;
 
     FS::read( f, &p_out, sizeof( pokemonData ), 1 );

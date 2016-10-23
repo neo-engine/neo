@@ -36,6 +36,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses
 #undef RAND_MAX
 #define RAND_MAX 4294967295
 
+// 721 ... not yet
 #define MAX_PKMN 649
 
 extern std::string NatureList[ 25 ];
@@ -152,9 +153,9 @@ struct pokemonData {
     u8              m_stage; //0: Basic, 1: Stage 1, 2: Stage 2, 3 Restored (m_preEvolution: itemIdx)
 };
 
-std::string     getDisplayName( u16 p_pkmnId );
-void            getDisplayName( u16 p_pkmnId, char* p_name );
-bool            getAll( u16 p_pkmnId, pokemonData& out );
+std::string     getDisplayName( u16 p_pkmnId, u8 p_forme = 0 );
+void            getDisplayName( u16 p_pkmnId, char* p_name, u8 p_forme = 0 );
+bool            getAll( u16 p_pkmnId, pokemonData& out, u8 p_forme = 0 );
 
 void            getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num, u16* p_res );
 bool            canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode );
@@ -229,151 +230,151 @@ public:
         bool                    m_isGenderless : 1;
         u8                      m_altForme : 5;
         bool                    m_cloned : 1;
-u16: 15;
-        u16                     m_hatchPlace : 16; //PT-like
-        u16                     m_gotPlace : 16; //PT-like
-                                                 //}
+        u16 : 15;
+              u16                     m_hatchPlace : 16; //PT-like
+              u16                     m_gotPlace : 16; //PT-like
+                                                       //}
 
-                                                 //BLOCKC{
-        char                    m_name[ PKMN_NAMELENGTH ];
-        u16                     m_hometown : 16;
-        u8                      m_ribbons2[ 4 ];
-u32: 32;
-        //}
+                                                       //BLOCKC{
+              char                    m_name[ PKMN_NAMELENGTH ];
+              u16                     m_hometown : 16;
+              u8                      m_ribbons2[ 4 ];
+              u32 : 32;
+                    //}
 
-        //BLOCKD{
-        char                    m_oT[ OTLENGTH ];
-u32: 32;
-        u8                      m_gotDate[ 3 ];//(EGG)
-        u8                      m_hatchDate[ 3 ]; //gotDate for nonEgg
-        u8                      m_pokerus : 8;//
-        u8                      m_ball : 8;//
-        u16                     m_gotLevel : 7;
-        bool                    m_oTisFemale : 1;
-        enum encounter : char {
-            EGG = 0x0,
-            GRASS = 0x2,
-            DIA_PAL = 0x4,
-            CAVE = 0x5,
-            SURF = 0x7,
-            BUILDING = 0x9,
-            SAFZONE = 0xA,
-            STARTER = 0xC
-        } m_encounter: 8;
-        u8           m_HGSSBall;
-u8: 8;
-        //}
+                    //BLOCKD{
+                    char                    m_oT[ OTLENGTH ];
+                    u32 : 32;
+                          u8                      m_gotDate[ 3 ];//(EGG)
+                          u8                      m_hatchDate[ 3 ]; //gotDate for nonEgg
+                          u8                      m_pokerus : 8;//
+                          u8                      m_ball : 8;//
+                          u16                     m_gotLevel : 7;
+                          bool                    m_oTisFemale : 1;
+                          enum encounter : char {
+                              EGG = 0x0,
+                              GRASS = 0x2,
+                              DIA_PAL = 0x4,
+                              CAVE = 0x5,
+                              SURF = 0x7,
+                              BUILDING = 0x9,
+                              SAFZONE = 0xA,
+                              STARTER = 0xC
+                          } m_encounter : 8;
+                          u8           m_HGSSBall;
+                          u8 : 8;
+                               //}
 
-        pkmnNatures             getNature( ) const {
-            return (pkmnNatures) ( m_pid % 25 );
-        }
-        u16                     getAbility( ) const {
-            return m_ability;
-        }
-        bool                    isShiny( ) const;
-        bool                    isCloned( ) const;
-        s8                      gender( ) const;
+                               pkmnNatures             getNature( ) const {
+                                   return (pkmnNatures) ( m_pid % 25 );
+                               }
+                               u16                     getAbility( ) const {
+                                   return m_ability;
+                               }
+                               bool                    isShiny( ) const;
+                               bool                    isCloned( ) const;
+                               s8                      gender( ) const;
 
-        inline unsigned char    IVget( u8 p_i ) const {
-            switch( p_i ) {
-                case 0: return m_individualValues.m_hp;
-                case 1: return m_individualValues.m_attack;
-                case 2: return m_individualValues.m_defense;
-                case 5: return m_individualValues.m_speed;
-                case 3: return m_individualValues.m_sAttack;
-                case 4: return m_individualValues.m_sDefense;
-                default: return 0;
-            }
-        }
-        u8 inline               PPupget( u8 p_i ) const {
-            switch( p_i ) {
-                case 0: return m_ppup.m_Up1;
-                case 1: return m_ppup.m_Up2;
-                case 2: return m_ppup.m_Up3;
-                case 3: return m_ppup.m_Up4;
-                default: return 0;
-            }
-        }
-        void inline             PPupset( u8 p_i, u8 p_val ) {
-            switch( p_i ) {
-                case 0: m_ppup.m_Up1 = p_val; break;
-                case 1: m_ppup.m_Up2 = p_val; break;
-                case 2: m_ppup.m_Up3 = p_val; break;
-                case 3: m_ppup.m_Up4 = p_val; break;
-                default: return;
-            }
-        }
-        u8                      getPersonality( ) const {
-            u8 counter = 1, i = m_pid % 6;
+                               inline unsigned char    IVget( u8 p_i ) const {
+                                   switch( p_i ) {
+                                       case 0: return m_individualValues.m_hp;
+                                       case 1: return m_individualValues.m_attack;
+                                       case 2: return m_individualValues.m_defense;
+                                       case 5: return m_individualValues.m_speed;
+                                       case 3: return m_individualValues.m_sAttack;
+                                       case 4: return m_individualValues.m_sDefense;
+                                       default: return 0;
+                                   }
+                               }
+                               u8 inline               PPupget( u8 p_i ) const {
+                                   switch( p_i ) {
+                                       case 0: return m_ppup.m_Up1;
+                                       case 1: return m_ppup.m_Up2;
+                                       case 2: return m_ppup.m_Up3;
+                                       case 3: return m_ppup.m_Up4;
+                                       default: return 0;
+                                   }
+                               }
+                               void inline             PPupset( u8 p_i, u8 p_val ) {
+                                   switch( p_i ) {
+                                       case 0: m_ppup.m_Up1 = p_val; break;
+                                       case 1: m_ppup.m_Up2 = p_val; break;
+                                       case 2: m_ppup.m_Up3 = p_val; break;
+                                       case 3: m_ppup.m_Up4 = p_val; break;
+                                       default: return;
+                                   }
+                               }
+                               u8                      getPersonality( ) const {
+                                   u8 counter = 1, i = m_pid % 6;
 
-            u8 max = i, maxval = IVget( i );
-            for( ; counter < 6; ++counter ) {
-                i = ( i + 1 ) % 6;
-                if( IVget( i ) > maxval ) {
-                    maxval = IVget( i );
-                    max = i;
-                }
-            }
+                                   u8 max = i, maxval = IVget( i );
+                                   for( ; counter < 6; ++counter ) {
+                                       i = ( i + 1 ) % 6;
+                                       if( IVget( i ) > maxval ) {
+                                           maxval = IVget( i );
+                                           max = i;
+                                       }
+                                   }
 
-            return ( max * 5 ) + ( maxval % 5 );
-        }
-        int                     getTasteStr( ) const {
-            if( NatMod[ getNature( ) ][ 0 ] == 1.1 )
-                return 0;
-            if( NatMod[ getNature( ) ][ 1 ] == 1.1 )
-                return 1;
-            if( NatMod[ getNature( ) ][ 2 ] == 1.1 )
-                return 2;
-            if( NatMod[ getNature( ) ][ 3 ] == 1.1 )
-                return 3;
-            if( NatMod[ getNature( ) ][ 4 ] == 1.1 )
-                return 4;
-            else
-                return 5;
-        }
-        u16                     getItem( ) const {
-            return m_holdItem;
-        }
-        type                    getHPType( ) const {
-            int a = ( ( IVget( 0 ) & 1 ) + 2 * ( IVget( 1 ) & 1 ) + 4 * ( IVget( 2 ) & 1 ) + 8 * ( IVget( 3 ) & 1 ) + 16 * ( IVget( 4 ) & 1 ) + 32 * ( IVget( 5 ) & 1 ) * 15 ) / 63;
-            return a < 9 ? (type) a : type( a + 1 );
-        }
-        u8                      getHPPower( ) const {
-            return 30 + ( ( ( ( IVget( 0 ) >> 1 ) & 1 ) + 2 * ( ( IVget( 1 ) >> 1 ) & 1 ) + 4 * ( ( IVget( 2 ) >> 1 ) & 1 ) + 8 * ( ( IVget( 3 ) >> 1 ) & 1 ) + 16 * ( ( IVget( 4 ) >> 1 ) & 1 ) + 32 * ( ( IVget( 5 ) >> 1 ) & 1 ) * 40 ) / 63 );
-        }
-        bool                    isEgg( ) const {
-            return m_individualValues.m_isEgg;
-        }
+                                   return ( max * 5 ) + ( maxval % 5 );
+                               }
+                               int                     getTasteStr( ) const {
+                                   if( NatMod[ getNature( ) ][ 0 ] == 1.1 )
+                                       return 0;
+                                   if( NatMod[ getNature( ) ][ 1 ] == 1.1 )
+                                       return 1;
+                                   if( NatMod[ getNature( ) ][ 2 ] == 1.1 )
+                                       return 2;
+                                   if( NatMod[ getNature( ) ][ 3 ] == 1.1 )
+                                       return 3;
+                                   if( NatMod[ getNature( ) ][ 4 ] == 1.1 )
+                                       return 4;
+                                   else
+                                       return 5;
+                               }
+                               u16                     getItem( ) const {
+                                   return m_holdItem;
+                               }
+                               type                    getHPType( ) const {
+                                   int a = ( ( IVget( 0 ) & 1 ) + 2 * ( IVget( 1 ) & 1 ) + 4 * ( IVget( 2 ) & 1 ) + 8 * ( IVget( 3 ) & 1 ) + 16 * ( IVget( 4 ) & 1 ) + 32 * ( IVget( 5 ) & 1 ) * 15 ) / 63;
+                                   return a < 9 ? (type) a : type( a + 1 );
+                               }
+                               u8                      getHPPower( ) const {
+                                   return 30 + ( ( ( ( IVget( 0 ) >> 1 ) & 1 ) + 2 * ( ( IVget( 1 ) >> 1 ) & 1 ) + 4 * ( ( IVget( 2 ) >> 1 ) & 1 ) + 8 * ( ( IVget( 3 ) >> 1 ) & 1 ) + 16 * ( ( IVget( 4 ) >> 1 ) & 1 ) + 32 * ( ( IVget( 5 ) >> 1 ) & 1 ) * 40 ) / 63 );
+                               }
+                               bool                    isEgg( ) const {
+                                   return m_individualValues.m_isEgg;
+                               }
 
-        bool                    learnMove( u16 p_move );
-        void                    hatch( );
+                               bool                    learnMove( u16 p_move );
+                               void                    hatch( );
 
-        bool      operator==( const boxPokemon& p_other ) const;
+                               bool      operator==( const boxPokemon& p_other ) const;
 
-        boxPokemon( ) { }
-        boxPokemon( u16             p_pkmnId,
-                    u16             p_level,
-                    const char*     p_name = 0,
-                    u8              p_shiny = 0,
-                    bool            p_hiddenAbility = false,
-                    bool            p_isEgg = false,
-                    u8              p_pokerus = 0,
-                    bool            p_fatefulEncounter = false );
-        boxPokemon( u16*            p_moves,
-                    u16             p_pkmnId,
-                    const char*     p_name,
-                    u16             p_level,
-                    u16             p_id,
-                    u16             p_sid,
-                    const char*     p_ot,
-                    bool            p_oTFemale,
-                    u8              p_shiny = 0,
-                    bool            p_hiddenAbility = false,
-                    bool            p_fatefulEncounter = false,
-                    bool            p_isEgg = false,
-                    u16             p_gotPlace = 0,
-                    u8              p_ball = 0,
-                    u8              p_pokerus = 0 );
+                               boxPokemon( ) { }
+                               boxPokemon( u16             p_pkmnId,
+                                           u16             p_level,
+                                           const char*     p_name = 0,
+                                           u8              p_shiny = 0,
+                                           bool            p_hiddenAbility = false,
+                                           bool            p_isEgg = false,
+                                           u8              p_pokerus = 0,
+                                           bool            p_fatefulEncounter = false );
+                               boxPokemon( u16*            p_moves,
+                                           u16             p_pkmnId,
+                                           const char*     p_name,
+                                           u16             p_level,
+                                           u16             p_id,
+                                           u16             p_sid,
+                                           const char*     p_ot,
+                                           bool            p_oTFemale,
+                                           u8              p_shiny = 0,
+                                           bool            p_hiddenAbility = false,
+                                           bool            p_fatefulEncounter = false,
+                                           bool            p_isEgg = false,
+                                           u16             p_gotPlace = 0,
+                                           u8              p_ball = 0,
+                                           u8              p_pokerus = 0 );
     } m_boxdata;
 
     union {
@@ -387,102 +388,102 @@ u8: 8;
         } m_status;
         u8                 m_statusint;
     };
-u8: 8;
-u8: 8;
-u8: 8;
-    u8 m_level : 8;
-u8: 8;
-    struct stats {
-        u16 m_acHP : 16;	//current HP
-        u16 m_maxHP : 16;
-        u16 m_Atk : 16;
-        u16 m_Def : 16;
-        u16 m_Spd : 16;
-        u16 m_SAtk : 16;
-        u16 m_SDef : 16;
-    }m_stats;
+    u8 : 8;
+         u8 : 8;
+              u8 : 8;
+                   u8 m_level : 8;
+                   u8 : 8;
+                        struct stats {
+                            u16 m_acHP : 16;	//current HP
+                            u16 m_maxHP : 16;
+                            u16 m_Atk : 16;
+                            u16 m_Def : 16;
+                            u16 m_Spd : 16;
+                            u16 m_SAtk : 16;
+                            u16 m_SDef : 16;
+                        }m_stats;
 
-    pokemon( ) { }
-    pokemon( pokemon::boxPokemon p_boxPokemon );
-    pokemon( u16             p_pkmnId,
-             u16             p_level,
-             const char*    p_name = 0,
-             u8              p_shiny = 0,
-             bool            p_hiddenAbility = false,
-             bool            p_isEgg = false,
-             u8              p_pokerus = 0,
-             bool            p_fatefulEncounter = false );
-    pokemon( u16*           p_moves,
-             u16            p_species,
-             const char*    p_name,
-             u16            p_level,
-             u16            p_id,
-             u16            p_sid,
-             const char*    p_ot,
-             bool           p_oTFemale,
-             u8             p_shiny = 0,
-             bool           p_hiddenAbility = false,
-             bool           p_fatefulEncounter = false,
-             bool           p_isEgg = false,
-             u16            p_gotPlace = 0,
-             u8             p_ball = 0,
-             u8             p_pokerus = 0 );
+                        pokemon( ) { }
+                        pokemon( pokemon::boxPokemon p_boxPokemon );
+                        pokemon( u16             p_pkmnId,
+                                 u16             p_level,
+                                 const char*    p_name = 0,
+                                 u8              p_shiny = 0,
+                                 bool            p_hiddenAbility = false,
+                                 bool            p_isEgg = false,
+                                 u8              p_pokerus = 0,
+                                 bool            p_fatefulEncounter = false );
+                        pokemon( u16*           p_moves,
+                                 u16            p_species,
+                                 const char*    p_name,
+                                 u16            p_level,
+                                 u16            p_id,
+                                 u16            p_sid,
+                                 const char*    p_ot,
+                                 bool           p_oTFemale,
+                                 u8             p_shiny = 0,
+                                 bool           p_hiddenAbility = false,
+                                 bool           p_fatefulEncounter = false,
+                                 bool           p_isEgg = false,
+                                 u16            p_gotPlace = 0,
+                                 u8             p_ball = 0,
+                                 u8             p_pokerus = 0 );
 
 
-    pkmnNatures             getNature( ) const {
-        return m_boxdata.getNature( );
-    }
-    u16                     getAbility( ) const {
-        return m_boxdata.getAbility( );
-    }
-    bool                    isShiny( ) const {
-        return m_boxdata.isShiny( );
-    }
-    bool                    isCloned( ) const {
-        return m_boxdata.isCloned( );
-    }
-    s8                      gender( ) const {
-        return m_boxdata.gender( );
-    }
+                        pkmnNatures             getNature( ) const {
+                            return m_boxdata.getNature( );
+                        }
+                        u16                     getAbility( ) const {
+                            return m_boxdata.getAbility( );
+                        }
+                        bool                    isShiny( ) const {
+                            return m_boxdata.isShiny( );
+                        }
+                        bool                    isCloned( ) const {
+                            return m_boxdata.isCloned( );
+                        }
+                        s8                      gender( ) const {
+                            return m_boxdata.gender( );
+                        }
 
-    inline unsigned char    IVget( u8 p_i ) const {
-        return m_boxdata.IVget( p_i );
-    }
-    inline u8               PPupget( u8 p_i ) const {
-        return PPupget( p_i );
-    }
-    inline void             PPupset( u8 p_i, u8 p_val ) {
-        m_boxdata.PPupset( p_i, p_val );
-    }
-    u8                      getPersonality( ) const {
-        return m_boxdata.getPersonality( );
-    }
-    int                     getTasteStr( ) const {
-        return m_boxdata.getTasteStr( );
-    }
-    u16                     getItem( ) const {
-        return m_boxdata.getItem( );
-    }
-    type                    getHPType( ) const {
-        return m_boxdata.getHPType( );
-    }
-    u8                      getHPPower( ) const {
-        return m_boxdata.getHPPower( );
-    }
-    bool                    isEgg( ) const {
-        return m_boxdata.isEgg( );
-    }
+                        inline unsigned char    IVget( u8 p_i ) const {
+                            return m_boxdata.IVget( p_i );
+                        }
+                        inline u8               PPupget( u8 p_i ) const {
+                            return PPupget( p_i );
+                        }
+                        inline void             PPupset( u8 p_i, u8 p_val ) {
+                            m_boxdata.PPupset( p_i, p_val );
+                        }
+                        u8                      getPersonality( ) const {
+                            return m_boxdata.getPersonality( );
+                        }
+                        int                     getTasteStr( ) const {
+                            return m_boxdata.getTasteStr( );
+                        }
+                        u16                     getItem( ) const {
+                            return m_boxdata.getItem( );
+                        }
+                        type                    getHPType( ) const {
+                            return m_boxdata.getHPType( );
+                        }
+                        u8                      getHPPower( ) const {
+                            return m_boxdata.getHPPower( );
+                        }
+                        bool                    isEgg( ) const {
+                            return m_boxdata.isEgg( );
+                        }
 
-    bool                    learnMove( u16 p_move ) {
-        return m_boxdata.learnMove( p_move );
-    }
-    void                    evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
-    bool                    canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
+                        bool                    learnMove( u16 p_move ) {
+                            return m_boxdata.learnMove( p_move );
+                        }
+                        void                    evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
+                        bool                    canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
 
-    void                    hatch( ) {
-        m_boxdata.hatch( );
-    }
-    bool      operator==( const pokemon& p_other ) const;
+                        void                    hatch( ) {
+                            m_boxdata.hatch( );
+                        }
+                        bool      operator==( const pokemon& p_other ) const;
 };
 
 pokemon::stats  calcStats( const pokemon::boxPokemon& p_boxdata, const pokemonData& p_data );
