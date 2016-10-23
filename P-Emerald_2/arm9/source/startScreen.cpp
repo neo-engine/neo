@@ -54,7 +54,7 @@ namespace SAVE {
     language translate( u8 p_dSRegion ) {
         switch( p_dSRegion ) {
             case 1:
-                return SAVE::EN;
+               // return SAVE::EN;
             case 3:
                 return SAVE::GER;
 
@@ -196,14 +196,14 @@ namespace SAVE {
             vis.push_back( 71 );
             res.push_back( CONTINUE );
         }
-        vis.push_back( 72 );
-        res.push_back( NEW_GAME );
+      //  vis.push_back( 72 );
+      //  res.push_back( NEW_GAME );
         vis.push_back( 73 );
         res.push_back( SPECIAL_EPISODE );
-        if( gMod == DEVELOPER || SAV->m_transfersRemaining ) {
-            vis.push_back( 74 );
-            res.push_back( TRANSFER_GAME );
-        }
+      //  if( gMod == DEVELOPER || SAV->m_transfersRemaining ) {
+      //      vis.push_back( 74 );
+      //      res.push_back( TRANSFER_GAME );
+      //  }
 
         u8 selectedIdx = 0;
         drawMainChoice( p_lang, vis, 0 );
@@ -313,6 +313,8 @@ namespace SAVE {
     }
 
     language startScreen::runLanguageChoice( language p_current ) {
+        return p_current;
+
         IO::clearScreen( true, false, false );
         while( IO::yesNoBox( p_current ).getResult( STRINGS[ 85 ][ p_current ] ) ) {
             IO::clearScreen( true, false, false );
