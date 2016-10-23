@@ -13,6 +13,8 @@ _Partially_ implemented features are in _italics_.
 
 * [ ] A fully working Pokémon engine (at 60fps), including
     * [x] The ability to display a Pokémon's status, including detailed information about the Pokémon's moves and ribbons
+      * [x] Gen 1 - Gen 5 Sprites (Pokémon Black 2 / White 2 Versions)
+      * [ ] Gen 6 Sprites ([Smogon XY Sprite Project](http://www.smogon.com/forums/threads/xy-sprite-project-read-1st-post-release-v1-1-on-post-3240.3486712/))
     * [x] An in-game Pokémon storage system
     * [x] A fully working PokéDex, loading its data from the ROM's filesystem and displaying the various formes of the Pokémon
     * [x] A working battle engine inclunding
