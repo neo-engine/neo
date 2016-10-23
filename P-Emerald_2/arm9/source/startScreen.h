@@ -41,11 +41,11 @@ namespace SAVE {
         };
 
         void drawMainChoice( language p_lang, std::vector<u8> p_toDraw, s8 p_selected = -1, s8 p_pressed = -1 );
-        void drawSlotChoice( s8 p_selected, s8 p_pressed = -1 );
+        void drawSlotChoice( language p_current, s8 p_selected, s8 p_pressed = -1 );
 
         choiceType runMainChoice( language p_lang );
         s8 runSlotChoice( language p_lang, bool p_newGameMode = false );
-        gameType runEpisodeChoice( );
+        gameType runEpisodeChoice( language p_current );
 
         language runLanguageChoice( language p_current );
 

@@ -155,13 +155,13 @@ namespace SAVE {
         }
     }
 
-    void startScreen::drawSlotChoice( s8 p_selected, s8 p_pressed ) {
+    void startScreen::drawSlotChoice( language p_current, s8 p_selected, s8 p_pressed ) {
         initColors( );
         for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) {
             IO::printChoiceBox( 4, 4 + 64 * i, 86, 26 + 64 * i, 6, ( i == p_selected ) ? RED_IDX : COLOR_IDX, i == p_pressed );
             switch( SAV->m_saveFile[ i ].m_gameType ) {
                 case UNUSED:
-                    IO::regularFont->printString( STRINGS[ 82 ][ SAV->m_saveFile[ i ].m_options.m_language ], 45 + 2 * ( i == p_pressed ),
+                    IO::regularFont->printString( STRINGS[ 82 ][ p_current ], 45 + 2 * ( i == p_pressed ),
                                                   8 + 64 * i + ( i == p_pressed ), true, IO::font::CENTER );
                     break;
                 case NORMAL:
@@ -253,7 +253,7 @@ namespace SAVE {
 
     s8 startScreen::runSlotChoice( language p_lang, bool p_newGameMode ) {
         u8 selectedIdx = 0;
-        drawSlotChoice( 0 );
+        drawSlotChoice( p_lang, 0 );
         fillResume( );
 
         touchPosition touch;
@@ -272,16 +272,16 @@ namespace SAVE {
                 return -1;
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
                 selectedIdx = ( selectedIdx + 1 ) % MAX_SAVE_FILES;
-                drawSlotChoice( selectedIdx );
+                drawSlotChoice( p_lang, selectedIdx );
             } else if( GET_AND_WAIT( KEY_UP ) ) {
                 selectedIdx = ( selectedIdx + MAX_SAVE_FILES - 1 ) % MAX_SAVE_FILES;
-                drawSlotChoice( selectedIdx );
+                drawSlotChoice( p_lang, selectedIdx );
             } else if( GET_AND_WAIT( KEY_A ) ) {
                 if( SAV->m_saveFile[ selectedIdx ].m_gameType && p_newGameMode ) {
                     IO::clearScreen( true, false, false );
-                    bool r = !IO::yesNoBox( p_lang ).getResult( GET_STRING( 79 ) );
+                    bool r = !IO::yesNoBox( p_lang ).getResult( STRINGS[ 79 ][ p_lang ] );
                     IO::clearScreen( true, false, false );
-                    drawSlotChoice( selectedIdx );
+                    drawSlotChoice( p_lang, selectedIdx );
                     fillResume( );
                     if( r ) continue;
                 } else if( !SAV->m_saveFile[ selectedIdx ].m_gameType && !p_newGameMode )
@@ -291,7 +291,7 @@ namespace SAVE {
             for( u8 i = 0; i < MAX_SAVE_FILES; ++i )
                 if( IN_RANGE_R( 4, 4 + 64 * i, 86, 26 + 64 * i ) ) {
                     selectedIdx = i;
-                    drawSlotChoice( selectedIdx, i );
+                    drawSlotChoice( p_lang, selectedIdx, i );
                     loop( ) {
                         swiWaitForVBlank( );
                         scanKeys( );
@@ -302,14 +302,14 @@ namespace SAVE {
                         if( !IN_RANGE_R( 4, 4 + 64 * i, 86, 26 + 64 * i ) )
                             break;
                     }
-                    drawSlotChoice( selectedIdx );
+                    drawSlotChoice( p_lang, selectedIdx );
                 }
         }
     }
 
-    gameType startScreen::runEpisodeChoice( ) {
-        IO::choiceBox cb = IO::choiceBox( MAX_SPECIAL_EPISODES, EPISODE_NAMES[ SAV->getActiveFile( ).m_options.m_language ], 0, true );
-        return (gameType) ( SPECIAL + cb.getResult( GET_STRING( 110 ), true, false ) );
+    gameType startScreen::runEpisodeChoice( language p_current ) {
+        IO::choiceBox cb = IO::choiceBox( MAX_SPECIAL_EPISODES, EPISODE_NAMES[ p_current ], 0, true );
+        return (gameType) ( SPECIAL + cb.getResult( STRINGS[ 110 ][ p_current ], true, false ) );
     }
 
     language startScreen::runLanguageChoice( language p_current ) {
@@ -382,7 +382,7 @@ namespace SAVE {
             s8 slot;
 
             if( res == SPECIAL_EPISODE ) {
-                gameType ep = runEpisodeChoice( );
+                gameType ep = runEpisodeChoice( cur );
                 IO::initOAMTable( true );
 
                 if( ep < SPECIAL )
