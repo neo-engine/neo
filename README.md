@@ -96,6 +96,11 @@ Some screens
 
 ##### The PokéDex
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/dx01.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/dx02.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/dx03.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/dx04.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/dx05.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/dx06.png)
 
 ##### The Bag
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg01.png)
@@ -113,6 +118,7 @@ Some screens
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg13.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg14.png)
 ![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg15.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg16.png)
 
 ##### Battles
 ###### Wild Pokémon battles
