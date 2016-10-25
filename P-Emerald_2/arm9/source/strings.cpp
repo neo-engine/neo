@@ -265,7 +265,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Fainted", "Besiegt" },
     { "Statistics", "Statuswerte" },
     { "Stats at lv.%3i:", "Status auf Lv.%3i:" },
-    { "[TRAINER] ([TCLASS]) sends\nout %s![A]", "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]" },
+    { "[TRAINER] ([TCLASS]) sent\nout %s![A]", "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]" },
 
     // 140
 
@@ -306,8 +306,8 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Choose a target!", "Welches PKMN angreifen?" },
     { "Choose a PKMN", "Welches PKMN?" },
     { "%s gained %lu EXP.[A]", "%s gewinnt %lu E.-Punkte.[A]" },
-    { "%s advances\nto level %d.[A]", "%s erreicht Level %d.[A]" },
-    { "The quick claw enables\n%s%s to go first![A]", "%s%s agiert dank\neiner Flinkklaue zuerst![A]" },
+    { "%s advanced\nto level %d.[A]", "%s erreicht Level %d.[A]" },
+    { "The quick claw enabled\n%s%s to go first![A]", "%s%s agiert dank\neiner Flinkklaue zuerst![A]" },
 
     // 170
 

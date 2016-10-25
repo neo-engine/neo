@@ -178,16 +178,19 @@ namespace BATTLE {
                             target.m_pokemon->m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_HP:
+                    {
+                        s16 newVal = target.m_pokemon->m_stats.m_acHP;
                         if( m_action == SET )
-                            target.m_pokemon->m_stats.m_acHP = m_value.get( p_battle, p_self );
+                            newVal = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            target.m_pokemon->m_stats.m_acHP += m_value.get( p_battle, p_self );
+                            newVal = (s16) target.m_pokemon->m_stats.m_acHP + m_value.get( p_battle, p_self );
                         if( m_action == MULTIPLY )
-                            target.m_pokemon->m_stats.m_acHP = int( ( target.m_pokemon->m_stats.m_acHP / 100.f ) *  m_value.get( p_battle, p_self ) );
+                            newVal = int( ( target.m_pokemon->m_stats.m_acHP / 100.f ) *  m_value.get( p_battle, p_self ) );
 
-                        target.m_pokemon->m_stats.m_acHP = std::max( (u16) 0, std::min( target.m_pokemon->m_stats.m_maxHP, target.m_pokemon->m_stats.m_acHP ) );
+                        target.m_pokemon->m_stats.m_acHP = std::max( (s16) 0, std::min( (s16) target.m_pokemon->m_stats.m_maxHP, newVal ) );
 
                         break;
+                    }
                     case BATTLE::battleScript::command::PKMN_ATK:
                         if( m_action == SET )
                             target.m_acStatChanges[ ATK ] = m_value.get( p_battle, p_self );
