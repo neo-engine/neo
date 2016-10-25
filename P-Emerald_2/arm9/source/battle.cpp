@@ -1319,7 +1319,7 @@ NEXT:
         _battleUI.updateStatus( p_opponent, p_pokemonPos );
 
 
-        snprintf( buffer, 99, GET_STRING( 11 ),
+        snprintf( buffer, 99, GET_STRING( 10 ),
             ( acpkmn->m_boxdata.m_name ),
                   ( p_opponent ? " [OPPONENT]" : "" ),
                   acMove->m_moveName.c_str( ) );

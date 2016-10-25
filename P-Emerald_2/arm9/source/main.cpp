@@ -282,7 +282,7 @@ int main( int, char** p_argv ) {
                     if( yn.getResult( buffer ) ) {
                         IO::NAV->draw( );
                         swiWaitForVBlank( );
-                        snprintf( buffer, 49, GET_STRING( 10 ), a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                        snprintf( buffer, 49, GET_STRING( 99 ), a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                         IO::messageBox( buffer, 0, false );
                         MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
                         IO::NAV->draw( true );
