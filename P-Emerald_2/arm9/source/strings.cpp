@@ -85,7 +85,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 10
 
-    { "%s%s used %s![A]", "%s%s setzt %s ein![A]" },
+    { "%s%s used %s![A]", "%s%s setzt\n%s ein![A]" },
     { "Items", "Items" },
     { "Medicine", "Medizin" },
     { "TM/HM", "TM/VM" },

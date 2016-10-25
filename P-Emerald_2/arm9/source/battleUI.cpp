@@ -2572,8 +2572,8 @@ BREAK:
         dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
         bgUpdate( );
 
-        char buffer[ 20 ];
-        snprintf( buffer, 19, "%d", _battle->m_backgroundId );
+        char buffer[ 100 ];
+        snprintf( buffer, 99, "%d", _battle->m_backgroundId );
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/", buffer, 512, 49152 );
 
         auto& acPkmn = *_battle->_wildPokemon.m_pokemon;
@@ -2596,7 +2596,7 @@ BREAK:
         initLogScreen( );
 
         IO::yesNoBox yn;
-        sprintf( buffer, GET_STRING( 141 ), acPkmn.m_boxdata.m_name );
+        snprintf( buffer, 99, GET_STRING( 141 ), acPkmn.m_boxdata.m_name );
         if( yn.getResult( buffer ) ) {
             IO::keyboard kbd;
             auto nick = kbd.getText( 10, GET_STRING( 142 ) );

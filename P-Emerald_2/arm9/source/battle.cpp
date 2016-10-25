@@ -636,8 +636,8 @@ NEXT:
                     if( CUR_PKMN( i, j ).m_boxdata.m_holdItem == I_QUICK_CLAW
                         && ( ( rand( ) % 100 ) < 20 ) ) {
 
-                        char buffer[ 100 ];
-                        snprintf( buffer, 99, GET_STRING( 169 ),
+                        char buffer[ 150 ];
+                        snprintf( buffer, 149, GET_STRING( 169 ),
                             ( CUR_PKMN( i, j ).m_boxdata.m_name ),
                                   ( j ? " [OPPONENT]" : "" ) );
                         log( buffer );
