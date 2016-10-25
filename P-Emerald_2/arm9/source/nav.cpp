@@ -460,7 +460,7 @@ namespace IO {
                             a.m_boxdata.m_ribbons1[ 3 ] = 0;
                             a.m_boxdata.m_holdItem = 1 + rand( ) % 400;
 
-                            for( u16 j = 1; j <= MAX_PKMN; ++j )
+                            for( u16 j = 650; j <= MAX_PKMN; ++j )
                                 SAVE::SAV->m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );
                         }
 

@@ -36,8 +36,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses
 #undef RAND_MAX
 #define RAND_MAX 4294967295
 
-// 721 ... not yet
-#define MAX_PKMN 649
+#define MAX_PKMN 721
 
 extern std::string NatureList[ 25 ];
 extern std::string TypeList[ 19 ];
