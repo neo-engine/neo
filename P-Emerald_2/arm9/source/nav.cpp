@@ -93,18 +93,18 @@ namespace IO {
         250, 128 };
     unsigned int NAV_DATA[ 12288 ] = { 0 };
     unsigned short NAV_DATA_PAL[ 256 ] = { 0 };
-    nav::backgroundSet BGs[ MAXBG ] = { { "Magnetizing Magnemite", bg00Bitmap, bg00Pal, true, true, mainSpritesPositions },
+    nav::backgroundSet BGs[ MAXBG ] = { { "Magnetizing Magnemite", bg00Bitmap, bg00Pal, false, true, mainSpritesPositions },
                                   { "Executing Exeggcute", NAV_DATA, NAV_DATA_PAL, true, true, mainSpritesPositions },
+                                  { "Fighting Torchic", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+                                  { "Reborn Ho-Oh", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Raging Gyarados", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Sleeping Eevee", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Mystic Guardevoir", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
+                                  { "Sleeping Eevee", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Waiting Suicune", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Awakening Xerneas", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Awakening Yveltal", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Fighting Groudon", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Fighting Kyogre", NAV_DATA,NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Fighting Torchic", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
-                                  { "Reborn Ho-Oh", NAV_DATA, NAV_DATA_PAL, true, false, mainSpritesPositions },
                                   { "Working Klink", NAV_DATA, NAV_DATA_PAL, true, true, mainSpritesPositions }
     };
 
