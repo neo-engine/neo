@@ -6,7 +6,7 @@ file        : bagViewer.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2016
+Copyright (C) 2012 - 2017
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.

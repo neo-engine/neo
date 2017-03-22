@@ -6,7 +6,7 @@ file        : statusScreen.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2016
+Copyright (C) 2012 - 2017
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -133,9 +133,9 @@ namespace STS {
                     consoleClear( );
                     if( AttackList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->possible( ) ) {
 
-                        char buffer[ 50 ];
-                        sprintf( buffer, GET_STRING( 99 ), SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
-                                 AttackList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
+                        char buffer[ 50 ] = { 0 };
+                        snprintf( buffer, 49, GET_STRING( 99 ), SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
+                                  AttackList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_moves[ o ] ]->m_moveName.c_str( ) );
                         IO::messageBox a( buffer );
                         IO::NAV->draw( );
 

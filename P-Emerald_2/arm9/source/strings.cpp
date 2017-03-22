@@ -6,7 +6,7 @@ file        : strings.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2016
+Copyright (C) 2012 - 2017
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -85,7 +85,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 10
 
-    { "%s used %s!", "%s setzt %s ein!" },
+    { "%s%s used %s![A]", "%s%s setzt\n%s ein![A]" },
     { "Items", "Items" },
     { "Medicine", "Medizin" },
     { "TM/HM", "TM/VM" },
@@ -207,7 +207,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "No %s available.\nRemove the icon?", "Kein Exemplar des Items\n%s vorhanden.\nIcon entfernen?" },
     { "Recently used items\nwill appear here.", "Hier erscheinen zuletzt\neingesetzte Items." },
     { "You may register an\nitem to the button Y.", "Du kannst ein Item\nauf Y registrieren." },
-    { "%s used %s!`", "%s setzt %s\nein!`" },
+    { "%s used %s!", "%s setzt %s\nein!" },
 
 
     // 100
@@ -265,7 +265,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Fainted", "Besiegt" },
     { "Statistics", "Statuswerte" },
     { "Stats at lv.%3i:", "Status auf Lv.%3i:" },
-    { "[TRAINER] ([TCLASS]) sends\nout %s![A]", "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]" },
+    { "[TRAINER] ([TCLASS]) sent\nout %s![A]", "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]" },
 
     // 140
 
@@ -306,8 +306,8 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Choose a target!", "Welches PKMN angreifen?" },
     { "Choose a PKMN", "Welches PKMN?" },
     { "%s gained %lu EXP.[A]", "%s gewinnt %lu E.-Punkte.[A]" },
-    { "%s advances\nto level %d.[A]", "%s erreicht Level %d.[A]" },
-    { "The quick claw enables\n%s%s to go first![A]", "%s%s agiert dank\neiner Flinkklaue zuerst![A]" },
+    { "%s advanced\nto level %d.[A]", "%s erreicht Level %d.[A]" },
+    { "The quick claw enabled\n%s%s to go first![A]", "%s%s agiert dank\neiner Flinkklaue zuerst![A]" },
 
     // 170
 

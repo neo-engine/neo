@@ -6,7 +6,7 @@ file        : battle.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2016
+Copyright (C) 2012 - 2017
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -636,8 +636,8 @@ NEXT:
                     if( CUR_PKMN( i, j ).m_boxdata.m_holdItem == I_QUICK_CLAW
                         && ( ( rand( ) % 100 ) < 20 ) ) {
 
-                        char buffer[ 100 ];
-                        snprintf( buffer, 99, GET_STRING( 169 ),
+                        char buffer[ 150 ];
+                        snprintf( buffer, 149, GET_STRING( 169 ),
                             ( CUR_PKMN( i, j ).m_boxdata.m_name ),
                                   ( j ? " [OPPONENT]" : "" ) );
                         log( buffer );
@@ -1319,7 +1319,7 @@ NEXT:
         _battleUI.updateStatus( p_opponent, p_pokemonPos );
 
 
-        snprintf( buffer, 99, GET_STRING( 11 ),
+        snprintf( buffer, 99, GET_STRING( 10 ),
             ( acpkmn->m_boxdata.m_name ),
                   ( p_opponent ? " [OPPONENT]" : "" ),
                   acMove->m_moveName.c_str( ) );

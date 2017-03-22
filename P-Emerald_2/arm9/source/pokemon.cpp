@@ -6,7 +6,7 @@ file        : pokemon.cpp
 author      : Philip Wellnitz
 description : The main Pokémon engine
 
-Copyright (C) 2012 - 2016
+Copyright (C) 2012 - 2017
 >>>>>>> up pkmn
 Philip Wellnitz
 
