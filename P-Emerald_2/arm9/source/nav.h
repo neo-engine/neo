@@ -6,7 +6,7 @@ file        : nav.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2016
+Copyright (C) 2012 - 2017
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -31,7 +31,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <string>
 
 namespace IO {
-#define MAXBG 12
+#define MAXBG 13
 #define START_BG 0
     extern unsigned int NAV_DATA[ 12288 ];
     extern unsigned short NAV_DATA_PAL[ 256 ];

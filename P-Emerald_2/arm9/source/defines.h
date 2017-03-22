@@ -6,7 +6,7 @@ file        : defines.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2016
+Copyright (C) 2012 - 2017
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -34,8 +34,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 //#define USE_AS_LIB
 #undef _EMULATOR
-#define VERSION "0.6.1"
-#define VERSION_NAME "Executing Exeggcute"
+#define VERSION "0.7"
+#define VERSION_NAME "Magnetizing Magnemite"
 #define DEBUG
 
 #define MAX_ITEMS_IN_BAG 900
