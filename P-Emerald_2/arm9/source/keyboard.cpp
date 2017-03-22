@@ -176,6 +176,7 @@ namespace IO {
         touchPosition touch;
         int pressed;
         loop( ) {
+            swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
             pressed = keysCurrent( );
