@@ -29,7 +29,6 @@
 #include <map>
 #include <nds.h>
 #include <string>
-#include <map>
 #include "item.h"
 #include "defines.h"
 
