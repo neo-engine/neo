@@ -18,9 +18,7 @@ before_install:
 
 script:
     - cd P-Emerald_2
-    - cp P-Emerald_2.nds repo.nds
     - make
-    - diff P-Emerald_2.nds repo.nds | cat
 
 notifications:
       email: false
