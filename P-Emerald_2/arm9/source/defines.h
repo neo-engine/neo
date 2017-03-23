@@ -128,7 +128,7 @@ extern const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
 #define RED2 RGB(10,0,0)
 #define BLUE RGB(0,10,31)
 #define BLUE2 RGB(0,0,15)
-#define WHITE RGB(30,29,30)
+#define WHITE RGB(30,30,30)
 #define GRAY RGB(15,15,15)
 #define NORMAL_COLOR RGB(27,27,27)
 #define BLACK RGB(0,0,0)
