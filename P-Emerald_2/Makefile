@@ -15,35 +15,31 @@ export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
 export NDSTOOL		:=  $(CURDIR)/tools/ndstool/ndstool
 
-.PHONY: checkarm7 checkarm9
+.PHONY: $(TARGET).arm7 $(TARGET).arm9
+
+ifneq ($(strip $(NITRO_FILES)),)
+_ADDFILES	:=	-d $(NITRO_FILES)
+endif
 
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
-all: checkarm7 checkarm9 $(TARGET).nds
+all: $(TARGET).ds.gba
 
-#---------------------------------------------------------------------------------
-checkarm7:
-	$(MAKE) -C arm7
-	
-#---------------------------------------------------------------------------------
-checkarm9:
-	$(MAKE) -C tools/ndstool
-	$(MAKE) -C arm9
-    
-#---------------------------------------------------------------------------------
-ifneq ($(strip $(NITRO_FILES)),)
-_ADDFILES	:=	-d $(NITRO_FILES)
-endif
+$(TARGET).ds.gba	: $(TARGET).nds
 
 #---------------------------------------------------------------------------------
 $(TARGET).nds	:	$(TARGET).arm7 $(TARGET).arm9
 	$(NDSTOOL) -c $(TARGET).nds -7 $(TARGET).arm7 -9 $(TARGET).arm9 -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES) -g PE2P PW "POKEMON E2"
 
 #---------------------------------------------------------------------------------
+$(TARGET).arm7	: arm7/$(TARGET).elf
+$(TARGET).arm9	: arm9/$(TARGET).elf
+
+#---------------------------------------------------------------------------------
 arm7/$(TARGET).elf:
 	$(MAKE) -C arm7
-	
+
 #---------------------------------------------------------------------------------
 arm9/$(TARGET).elf:
 	$(MAKE) -C tools/ndstool
@@ -54,6 +50,6 @@ clean:
 	$(MAKE) -C arm9 clean
 	$(MAKE) -C arm7 clean
 	$(MAKE) -C tools/ndstool clean
-	rm -f $(TARGET).nds $(TARGET).arm7 $(TARGET).arm9
+	rm -f $(TARGET).ds.gba $(TARGET).nds $(TARGET).arm7 $(TARGET).arm9
 
 rebuild: clean $(BUILD)
