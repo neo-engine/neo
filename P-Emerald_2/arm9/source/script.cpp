@@ -155,7 +155,7 @@ namespace BATTLE {
         if( p_battle.m_battleMode != battle::DOUBLE && p_targetPosition )
             return;
 
-        auto target = CUR_PKMN_STR_2( p_battle, p_targetPosition, p_targetIsOpp );
+        auto tgt = CUR_PKMN_STR_2( p_battle, p_targetPosition, p_targetIsOpp );
         switch( m_action ) {
             case BATTLE::battleScript::command::ADD:
             case BATTLE::battleScript::command::MULTIPLY:
@@ -163,73 +163,73 @@ namespace BATTLE {
                 switch( m_targetSpecifier ) {
                     case BATTLE::battleScript::command::PKMN_SPECIES:
                         if( m_action == SET )
-                            target.m_pokemon->m_boxdata.m_speciesId = m_value.get( p_battle, p_self );
+                            tgt.m_pokemon->m_boxdata.m_speciesId = m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_ITEM:
                         if( m_action == SET )
-                            target.m_pokemon->m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
+                            tgt.m_pokemon->m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_ABILITY:
                         if( m_action == SET )
-                            target.m_pokemon->m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
+                            tgt.m_pokemon->m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_STATUS:
                         if( m_action == SET )
-                            target.m_pokemon->m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
+                            tgt.m_pokemon->m_boxdata.m_holdItem = m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_HP:
                     {
-                        s16 newVal = target.m_pokemon->m_stats.m_acHP;
+                        s16 newVal = tgt.m_pokemon->m_stats.m_acHP;
                         if( m_action == SET )
                             newVal = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            newVal = (s16) target.m_pokemon->m_stats.m_acHP + m_value.get( p_battle, p_self );
+                            newVal = (s16) tgt.m_pokemon->m_stats.m_acHP + m_value.get( p_battle, p_self );
                         if( m_action == MULTIPLY )
-                            newVal = int( ( target.m_pokemon->m_stats.m_acHP / 100.f ) *  m_value.get( p_battle, p_self ) );
+                            newVal = int( ( tgt.m_pokemon->m_stats.m_acHP / 100.f ) *  m_value.get( p_battle, p_self ) );
 
-                        target.m_pokemon->m_stats.m_acHP = std::max( (s16) 0, std::min( (s16) target.m_pokemon->m_stats.m_maxHP, newVal ) );
+                        tgt.m_pokemon->m_stats.m_acHP = std::max( (s16) 0, std::min( (s16) tgt.m_pokemon->m_stats.m_maxHP, newVal ) );
 
                         break;
                     }
                     case BATTLE::battleScript::command::PKMN_ATK:
                         if( m_action == SET )
-                            target.m_acStatChanges[ ATK ] = m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ ATK ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            target.m_acStatChanges[ ATK ] += m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ ATK ] += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_DEF:
                         if( m_action == SET )
-                            target.m_acStatChanges[ DEF ] = m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ DEF ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            target.m_acStatChanges[ DEF ] += m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ DEF ] += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_SPD:
                         if( m_action == SET )
-                            target.m_acStatChanges[ SPD ] = m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ SPD ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            target.m_acStatChanges[ SPD ] += m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ SPD ] += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_SATK:
                         if( m_action == SET )
-                            target.m_acStatChanges[ SATK ] = m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ SATK ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            target.m_acStatChanges[ SATK ] += m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ SATK ] += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_SDEF:
                         if( m_action == SET )
-                            target.m_acStatChanges[ SDEF ] = m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ SDEF ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            target.m_acStatChanges[ SDEF ] += m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ SDEF ] += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_ACCURACY:
                         if( m_action == SET )
-                            target.m_acStatChanges[ ACCURACY ] = m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ ACCURACY ] = m_value.get( p_battle, p_self );
                         if( m_action == ADD )
-                            target.m_acStatChanges[ ACCURACY ] += m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ ACCURACY ] += m_value.get( p_battle, p_self );
                         break;
                     case BATTLE::battleScript::command::PKMN_ATTACK_BLOCKED:
                         if( m_action == SET )
-                            target.m_acStatChanges[ ATTACK_BLOCKED ] = !!m_value.get( p_battle, p_self );
+                            tgt.m_acStatChanges[ ATTACK_BLOCKED ] = !!m_value.get( p_battle, p_self );
                         break;
                     default:
                         break;
@@ -330,16 +330,16 @@ namespace BATTLE {
 
     void battleScript::execute( battle& p_battle, void* p_self ) const {
         bool lastCondition = false;
-        for( auto cmd : _commands ) {
-            for( auto cond : cmd.m_conditions ) {
+        for( auto c : _commands ) {
+            for( auto cond : c.m_conditions ) {
                 if( cond.m_asLastCondition && !lastCondition )
                     goto NEXT;
                 if( !cond.m_asLastCondition && !( lastCondition = cond.check( p_battle, p_self ) ) )
                     goto NEXT;
             }
-            if( cmd.m_log.length( ) )
-                p_battle.log( cmd.m_log );
-            cmd.execute( p_battle, p_self );
+            if( c.m_log.length( ) )
+                p_battle.log( c.m_log );
+            c.execute( p_battle, p_self );
 NEXT:
             continue;
         }

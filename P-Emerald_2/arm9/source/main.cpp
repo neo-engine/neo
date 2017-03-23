@@ -74,6 +74,12 @@ GameMod gMod = GameMod::DEVELOPER;
 GameMod gMod = GameMod::EMULATOR;
 #endif
 
+//extern "C" {
+//    void __sync_synchronize( void ) {
+//        asm( "" : : : "memory" );
+//    }
+//}
+
 u8 DayTimes[ 4 ][ 5 ] = {
     { 7, 10, 15, 17, 23 },
     { 6, 9, 12, 18, 23 },
@@ -163,7 +169,7 @@ int main( int, char** p_argv ) {
     IO::clearScreenConsole( false, true );
     IO::clearScreen( false, true );
 
-    irqSet( IRQ_VBLANK, [ ] ( ) {
+    irqSet( IRQ_VBLANK, []( ) {
         scanKeys( );
         FRAME_COUNT++;
 

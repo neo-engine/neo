@@ -110,7 +110,7 @@ extern const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
 #define IN_DEX(pidx) ( SAVE::SAV->m_caughtPkmn[ (pidx) / 8 ] & ( 1 << ( (pidx) % 8 ) ) )
 
 #define RGB(r, g, b) (RGB15((r), (g), (b)) | BIT(15))
-#define COMPL(a) ( RGB( 31 - ( (a) >> 10 ) % 32,31 - ( (a) >> 5 ) % 32,31 - (a) % 32 ) )
+#define COMPL(a) ( RGB( 31 - ( (a) >> 10 ) % 32, 31 - ( (a) >> 5 ) % 32, 31 - (a) % 32 ) )
 
 #define RED2_IDX (u8(247))
 #define BLUE2_IDX (u8(248))
@@ -128,7 +128,7 @@ extern const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
 #define RED2 RGB(10,0,0)
 #define BLUE RGB(0,10,31)
 #define BLUE2 RGB(0,0,15)
-#define WHITE RGB(28,28,28)
+#define WHITE RGB(30,29,30)
 #define GRAY RGB(15,15,15)
 #define NORMAL_COLOR RGB(27,27,27)
 #define BLACK RGB(0,0,0)

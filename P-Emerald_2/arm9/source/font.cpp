@@ -38,7 +38,7 @@ namespace IO {
         _data = p_data;
         _widths = p_widths;
         _color[ 0 ] = _color[ 1 ] = _color[ 2 ]
-            = _color[ 3 ] = _color[ 4 ] = RGB( 31, 31, 31 );
+            = _color[ 3 ] = _color[ 4 ] = WHITE;
         _shiftchar = p_shiftchar;
     }
 
@@ -141,7 +141,7 @@ namespace IO {
         p_font.printChar( /*'@'*/ u16( 172 ), p_x, p_y, true );
     }
     void hideContinue( u8 p_x, u8 p_y ) {
-        BG_PALETTE_SUB[ 250 ] = RGB15( 31, 31, 31 );
+        BG_PALETTE_SUB[ 250 ] = WHITE;
         printRectangle( p_x, p_y, p_x + 5, p_y + 9, true, false, (u8) 250 );
     }
 

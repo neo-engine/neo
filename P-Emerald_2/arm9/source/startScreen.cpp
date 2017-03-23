@@ -220,7 +220,7 @@ namespace SAVE {
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true );
                 for( u16 i = 1; i < 256; ++i )
-                    BG_PALETTE_SUB[ i ] = RGB15( 31, 31, 31 );
+                    BG_PALETTE_SUB[ i ] = WHITE;
                 return ABORT;
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
                 selectedIdx = ( selectedIdx + 1 ) % vis.size( );
@@ -268,7 +268,7 @@ namespace SAVE {
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true );
                 for( u16 i = 1; i < 256; ++i )
-                    BG_PALETTE_SUB[ i ] = RGB15( 31, 31, 31 );
+                    BG_PALETTE_SUB[ i ] = WHITE;
                 return -1;
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
                 selectedIdx = ( selectedIdx + 1 ) % MAX_SAVE_FILES;
