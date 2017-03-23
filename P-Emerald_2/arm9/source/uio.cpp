@@ -71,6 +71,13 @@ namespace IO {
         bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
         bgSetPriority( bg3, 3 );
         bgSetPriority( bg2, 2 );
+        
+        if( SCREENS_SWAPPED ) {
+            REG_BLDCNT = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
+            REG_BLDALPHA = 0x0671;
+        } else {
+            REG_BLDCNT = BLEND_NONE;
+        }
         bgUpdate( );
     }
     void initVideoSub( ) {
@@ -84,7 +91,13 @@ namespace IO {
                          DISPLAY_BG3_ACTIVE | // Enable BG3 for display
                          DISPLAY_SPR_ACTIVE | // Enable sprites for display
                          DISPLAY_SPR_1D       // Enable 1D tiled sprites
-                         );
+        );
+        if( !SCREENS_SWAPPED ) {
+            REG_BLDCNT_SUB = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
+            REG_BLDALPHA_SUB = 0x0671;
+        } else {
+            REG_BLDCNT_SUB = BLEND_NONE;
+        }
     }
     void vramSetup( ) {
         initVideo( );
@@ -99,6 +112,16 @@ namespace IO {
         else
             lcdMainOnBottom( );
         SCREENS_SWAPPED = !SCREENS_SWAPPED;
+
+        if( !SCREENS_SWAPPED ) {
+            REG_BLDCNT_SUB = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
+            REG_BLDALPHA_SUB = 0x0671;
+            REG_BLDCNT = BLEND_NONE;
+        } else {
+            REG_BLDCNT_SUB = BLEND_NONE;
+            REG_BLDCNT = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
+            REG_BLDALPHA = 0x0671;
+        }
     }
 
     void setDefaultConsoleTextColors( u16* p_palette, u8 p_start ) {

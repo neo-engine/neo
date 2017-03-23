@@ -283,17 +283,16 @@ namespace IO {
                     bool        p_hidden,
                     ObjPriority p_priority,
                     bool        p_bottom ) {
-        IO::SpriteInfo* sInfo = ( p_bottom ? spriteInfo : spriteInfoTop );
+        IO::SpriteInfo* sInfo = ( p_bottom ? spriteInfo : spriteInfoTop ) + p_oamIdx;
         OAMTable* oam = ( p_bottom ? Oam : OamTop );
 
-        SpriteInfo * spriteInfo = &sInfo[ p_oamIdx ];
         SpriteEntry * spriteEntry = &oam->oamBuffer[ p_oamIdx ];
 
-        spriteInfo->m_oamId = p_oamIdx;
-        spriteInfo->m_width = p_width;
-        spriteInfo->m_height = p_height;
-        spriteInfo->m_angle = 0;
-        spriteInfo->m_entry = spriteEntry;
+        sInfo->m_oamId = p_oamIdx;
+        sInfo->m_width = p_width;
+        sInfo->m_height = p_height;
+        sInfo->m_angle = 0;
+        sInfo->m_entry = spriteEntry;
 
         spriteEntry->palette = p_palIdx;
         spriteEntry->gfxIndex = p_tileIdx;
@@ -324,17 +323,16 @@ namespace IO {
     u16 loadSprite( const u8 p_oamIdx, const u8 p_palIdx, const u8 p_palpos, const u16 p_tileIdx, const u16 p_posX, const u16 p_posY, const u8 p_width,
                     const u8 p_height, const unsigned short *p_spritePal, const unsigned int *p_spriteData, const u32 p_spriteDataLen, bool p_flipX, bool p_flipY,
                     bool p_hidden, ObjPriority p_priority, bool p_bottom ) {
-        IO::SpriteInfo* sInfo = ( p_bottom ? spriteInfo : spriteInfoTop );
+        IO::SpriteInfo* sInfo = ( p_bottom ? spriteInfo : spriteInfoTop ) + p_oamIdx;
         OAMTable* oam = ( p_bottom ? Oam : OamTop );
 
-        SpriteInfo * spriteInfo = &sInfo[ p_oamIdx ];
         SpriteEntry * spriteEntry = &oam->oamBuffer[ p_oamIdx ];
 
-        spriteInfo->m_oamId = p_oamIdx;
-        spriteInfo->m_width = p_width;
-        spriteInfo->m_height = p_height;
-        spriteInfo->m_angle = 0;
-        spriteInfo->m_entry = spriteEntry;
+        sInfo->m_oamId = p_oamIdx;
+        sInfo->m_width = p_width;
+        sInfo->m_height = p_height;
+        sInfo->m_angle = 0;
+        sInfo->m_entry = spriteEntry;
 
         spriteEntry->palette = p_palIdx;
         spriteEntry->gfxIndex = p_tileIdx;

@@ -581,8 +581,9 @@ namespace STS {
         snprintf( buffer, 49, "%s/%05d", currPkmn.m_boxdata.m_oT, currPkmn.m_boxdata.m_oTId );
         IO::regularFont->printString( buffer, 250, 30, p_bottom, IO::font::RIGHT );
 
-        if( !currPkmn.m_boxdata.isShiny( ) )
+        if( !currPkmn.m_boxdata.isShiny( ) ) {
             IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );
+        }
         snprintf( buffer, 49, "%03d", currPkmn.m_boxdata.m_speciesId );
         IO::regularFont->printString( buffer, 180, 51, p_bottom, IO::font::RIGHT );
         IO::regularFont->setColor( BLACK_IDX, 1 ); IO::regularFont->setColor( GRAY_IDX, 2 );

@@ -55,11 +55,12 @@ namespace IO {
         u8 endIdx = std::min( _num, u8( ( ( !_big ) * 3 + 3 ) * ( _acPage + 1 ) ) );
 
         BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
+        BG_PALETTE_SUB[ RED_IDX ] = GREEN;
 
         if( _big ) {
             for( u8 i = startIdx; i < endIdx; ++i ) {
                 u8 acPos = i - startIdx;
-                printChoiceBox( 32, 68 + acPos * 35, 192 + 32, 68 + 32 + acPos * 35, 6, COLOR_IDX, acPos == p_pressedIdx );
+                printChoiceBox( 32, 68 + acPos * 35, 192 + 32, 68 + 32 + acPos * 35, 6, ( _selectedIdx == acPos ) ? RED_IDX : COLOR_IDX, acPos == p_pressedIdx );
                 regularFont->printString( _choices[ i ], 32 + 2 * ( p_pressedIdx == acPos ) + 184 / 2,
                                           78 + acPos * 35 + ( p_pressedIdx == acPos ), true, IO::font::CENTER );
                 swiWaitForVBlank( );
@@ -68,7 +69,7 @@ namespace IO {
             for( u8 i = startIdx; i < endIdx; ++i ) {
                 u8 acPos = i - startIdx;
                 printChoiceBox( ( ( acPos % 2 ) ? 129 : 19 ), 68 + ( acPos / 2 ) * 35,
-                                106 + ( ( acPos % 2 ) ? 129 : 19 ), 32 + 68 + ( acPos / 2 ) * 35, 6, COLOR_IDX, acPos == p_pressedIdx );
+                                106 + ( ( acPos % 2 ) ? 129 : 19 ), 32 + 68 + ( acPos / 2 ) * 35, 6, ( _selectedIdx == acPos ) ? RED_IDX : COLOR_IDX, acPos == p_pressedIdx );
                 regularFont->printString( _choices[ i ], ( ( acPos % 2 ) ? 129 : 19 ) + 2 * ( p_pressedIdx == acPos ) + 102 / 2,
                                           78 + ( acPos / 2 ) * 35 + ( p_pressedIdx == acPos ), true, IO::font::CENTER );
                 swiWaitForVBlank( );
@@ -138,9 +139,9 @@ namespace IO {
                 break;
             }
             tileCnt = loadTypeIcon( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveType,
-                                    ( ( i % 2 ) ? 122 : 12 ), 64 + ( i / 2 ) * 35, 3 + 2 * i, 3 + 2 * i, tileCnt, true );
+                ( ( i % 2 ) ? 122 : 12 ), 64 + ( i / 2 ) * 35, 3 + 2 * i, 3 + 2 * i, tileCnt, true );
             tileCnt = loadDamageCategoryIcon( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveHitType,
-                                              ( ( i % 2 ) ? 154 : 44 ), 64 + ( i / 2 ) * 35, 4 + 2 * i, 4 + 2 * i, tileCnt, true );
+                ( ( i % 2 ) ? 154 : 44 ), 64 + ( i / 2 ) * 35, 4 + 2 * i, 4 + 2 * i, tileCnt, true );
         }
         if( p_move ) {
             tileCnt = loadTypeIcon( AttackList[ p_move ]->m_moveType,
@@ -156,28 +157,47 @@ namespace IO {
     int fwdPos[ 2 ][ 2 ] = { { SCREEN_WIDTH - 12, SCREEN_HEIGHT - 12 }, { SCREEN_WIDTH - 11, SCREEN_HEIGHT - 31 } },
         bwdPos[ 2 ][ 2 ] = { { SCREEN_WIDTH - 12, SCREEN_HEIGHT - 12 }, { SCREEN_WIDTH - 31, SCREEN_HEIGHT - 11 } };
 
-    int choiceBox::getResult( const char* p_text, bool p_backButton, bool p_drawSub ) {
-        _drawSub = p_drawSub;
-        _text = p_text;
-        draw( NEW_PAGE );
+    void choiceBox::updateButtons( bool p_backButton ) {
+        u8 pp = ( _num <= 3 || ( _num > 3 && _big ) ) ? 3 : 6;
 
-        int result = -1;
         if( p_backButton ) {
             ( Oam->oamBuffer[ BACK_ID ] ).isHidden = false;
             ( Oam->oamBuffer[ BACK_ID ] ).x = fwdPos[ 0 ][ 0 ] - 16;
             ( Oam->oamBuffer[ BACK_ID ] ).y = fwdPos[ 0 ][ 1 ] - 14;
-            updateOAM( true );
         }
+        if( ( _acPage + 1 ) * pp >= _num ) {
+            ( Oam->oamBuffer[ FWD_ID ] ).isHidden = true;
+            ( Oam->oamBuffer[ BWD_ID ] ).isHidden = !_acPage;
+            ( Oam->oamBuffer[ BWD_ID ] ).x = bwdPos[ p_backButton ][ 0 ] - 16;
+            ( Oam->oamBuffer[ BWD_ID ] ).y = bwdPos[ p_backButton ][ 1 ] - 16;
+        } else if( !_acPage ) {
+            ( Oam->oamBuffer[ BWD_ID ] ).isHidden = true;
+            ( Oam->oamBuffer[ FWD_ID ] ).isHidden = false;
+            ( Oam->oamBuffer[ FWD_ID ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
+            ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
+        } else {
+            ( Oam->oamBuffer[ BWD_ID ] ).isHidden = false;
+            ( Oam->oamBuffer[ FWD_ID ] ).isHidden = false;
+            ( Oam->oamBuffer[ BWD_ID ] ).x = bwdPos[ 1 ][ 0 ] - 16;
+            ( Oam->oamBuffer[ BWD_ID ] ).y = bwdPos[ 1 ][ 1 ] - 16;
+            ( Oam->oamBuffer[ FWD_ID ] ).x = fwdPos[ 1 ][ 0 ] - 16;
+            ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ 1 ][ 1 ] - 16;
+        }
+        updateOAM( true );
+    }
+
+    int choiceBox::getResult( const char* p_text, bool p_backButton, bool p_drawSub, u8 p_initialSelection ) {
+        _drawSub = p_drawSub;
+        _text = p_text;
+        _selectedIdx = p_initialSelection;
+        int result = -1;
+        _acPage = 0;
+        updateButtons( p_backButton );
+        draw( NEW_PAGE );
 
         if( _num < 1 )
             return -1;
         else if( _num <= 3 || ( _num > 3 && _big ) ) {
-            _acPage = 0;
-            if( _num > 3 && _big ) {
-                ( Oam->oamBuffer[ FWD_ID ] ).isHidden = false;
-                ( Oam->oamBuffer[ FWD_ID ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
-                ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
-            }
             loop( ) {
                 swiWaitForVBlank( );
                 updateOAM( true );
@@ -197,66 +217,64 @@ namespace IO {
                         result = i + 3 * _acPage;
                         goto END;
                     }
+                if( GET_AND_WAIT( KEY_DOWN ) ) {
+                    ++_selectedIdx;
+                    if( _selectedIdx + 3 * _acPage >= _num || _selectedIdx == 3 ) {
+                        if( ( _acPage + 1 ) * 3 < _num ) {
+                            ++_acPage;
+                            _selectedIdx = 0;
+                            draw( NEW_PAGE );
+                            updateButtons( p_backButton );
+                        } else
+                            --_selectedIdx;
+                        continue;
+                    }
+                    draw( -1 );
+                }
+                if( GET_AND_WAIT( KEY_UP ) ) {
+                    if( _selectedIdx == (u8) -1 )
+                        _selectedIdx = 0;
+                    else if( !_selectedIdx ) {
+                        if( _acPage ) {
+                            _selectedIdx = 2;
+                            --_acPage;
+                            draw( NEW_PAGE );
+                            updateButtons( p_backButton );
+                        }
+                        continue;
+                    }
+                    --_selectedIdx;
+                    draw( -1 );
+                }
+                if( _selectedIdx != (u8) -1 && GET_AND_WAIT( KEY_A ) ) {
+                    result = _selectedIdx + 3 * _acPage;
+                    goto END;
+                }
                 if( p_backButton && ( GET_AND_WAIT_C( fwdPos[ 0 ][ 0 ], fwdPos[ 0 ][ 1 ] + 2, 16 ) || GET_AND_WAIT( KEY_B ) ) ) { //Back pressed
                     result = -1;
                     goto END;
                 }
-                if( _num > 3 && _big ) {
-                    if( ( !p_backButton && ( ( _num - 1 ) / 3 && _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 ) )
-                        || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
-
-                        waitForTouchUp( );
-                        if( ( ++_acPage ) >= ( ( _num - 1 ) / 3 ) ) {
-                            ( Oam->oamBuffer[ FWD_ID ] ).isHidden = true;
-                            ( Oam->oamBuffer[ BWD_ID ] ).isHidden = !_acPage;
-                            ( Oam->oamBuffer[ BWD_ID ] ).x = bwdPos[ p_backButton ][ 0 ] - 16;
-                            ( Oam->oamBuffer[ BWD_ID ] ).y = bwdPos[ p_backButton ][ 1 ] - 16;
-                            if( _acPage == ( ( _num - 1 ) / 3 ) )
-                                draw( NEW_PAGE );
-                            _acPage = ( ( _num - 1 ) / 3 );
-                        } else {
-                            ( Oam->oamBuffer[ BWD_ID ] ).isHidden = false;
-                            ( Oam->oamBuffer[ FWD_ID ] ).isHidden = false;
-                            ( Oam->oamBuffer[ BWD_ID ] ).x = bwdPos[ 1 ][ 0 ] - 16;
-                            ( Oam->oamBuffer[ BWD_ID ] ).y = bwdPos[ 1 ][ 1 ] - 16;
-                            ( Oam->oamBuffer[ FWD_ID ] ).x = fwdPos[ 1 ][ 0 ] - 16;
-                            ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ 1 ][ 1 ] - 16;
+                if( _num > 3 ) {
+                    if( ( !IO::Oam->oamBuffer[ FWD_ID ].isHidden && GET_AND_WAIT_C( IO::Oam->oamBuffer[ FWD_ID ].x + 16, IO::Oam->oamBuffer[ FWD_ID ].y + 16, 16 ) )
+                        || GET_AND_WAIT( KEY_RIGHT ) ) {
+                        if( ( _acPage + 1 ) * 3 < _num ) {
+                            ++_acPage;
+                            while( _selectedIdx + 3 * _acPage >= _num )
+                                --_selectedIdx;
                             draw( NEW_PAGE );
+                            updateButtons( p_backButton );
                         }
-                        updateOAM( true );
-                    } else if( ( !p_backButton && ( _acPage && _acPage == ( _num - 1 ) / 3 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 ) )
-                               || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
-
-                        waitForTouchUp( );
-                        if( ( --_acPage ) <= 0 ) {
-                            ( Oam->oamBuffer[ 14 ] ).isHidden = true;
-                            ( Oam->oamBuffer[ FWD_ID ] ).isHidden = !( _acPage < ( ( _num - 1 ) / 3 ) );
-                            ( Oam->oamBuffer[ FWD_ID ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
-                            ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
-                            if( _acPage == 0 )
-                                draw( NEW_PAGE );
-                            _acPage = 0;
-                        } else {
-                            ( Oam->oamBuffer[ FWD_ID ] ).isHidden = false;
-                            ( Oam->oamBuffer[ BWD_ID ] ).isHidden = false;
-                            ( Oam->oamBuffer[ BWD_ID ] ).x = bwdPos[ 1 ][ 0 ] - 16;
-                            ( Oam->oamBuffer[ BWD_ID ] ).y = bwdPos[ 1 ][ 1 ] - 16;
-                            ( Oam->oamBuffer[ FWD_ID ] ).x = fwdPos[ 1 ][ 0 ] - 16;
-                            ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ 1 ][ 1 ] - 16;
+                    } else if( ( !IO::Oam->oamBuffer[ BWD_ID ].isHidden && GET_AND_WAIT_C( IO::Oam->oamBuffer[ BWD_ID ].x + 16, IO::Oam->oamBuffer[ BWD_ID ].y + 16, 16 ) )
+                               || GET_AND_WAIT( KEY_LEFT ) ) {
+                        if( _acPage ) {
+                            --_acPage;
                             draw( NEW_PAGE );
+                            updateButtons( p_backButton );
                         }
-                        updateOAM( true );
                     }
                 }
             }
         } else {
-            _acPage = 0;
-            if( _num > 6 ) {
-                ( Oam->oamBuffer[ FWD_ID ] ).isHidden = false;
-                ( Oam->oamBuffer[ FWD_ID ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
-                ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
-            }
-            updateOAM( true );
             loop( ) {
                 swiWaitForVBlank( );
                 updateOAM( true );
@@ -280,50 +298,100 @@ namespace IO {
                         goto END;
                     }
                 }
+                if( _selectedIdx != (u8) -1 && GET_AND_WAIT( KEY_A ) ) {
+                    result = _selectedIdx + 3 * _acPage;
+                    goto END;
+                }
+                if( GET_AND_WAIT( KEY_DOWN ) ) {
+                    if( _selectedIdx == (u8) -1 )
+                        _selectedIdx = 0;
+                    else if( _selectedIdx >= 4 || _selectedIdx + 2 + _acPage * 6 >= _num ) {
+                        if( _selectedIdx % 2 ) {
+                            if( ( _acPage + 1 ) * 6 < _num ) {
+                                ++_acPage;
+                                _selectedIdx = 0;
+                                draw( NEW_PAGE );
+                                updateButtons( p_backButton );
+                            }
+                            continue;
+                        } else
+                            _selectedIdx = 1;
+                    } else
+                        _selectedIdx += 2;
+                    draw( -1 );
+                }
+                if( GET_AND_WAIT( KEY_UP ) ) {
+                    if( _selectedIdx == (u8) -1 )
+                        _selectedIdx = 0;
+                    else if( _selectedIdx < 2 ) {
+                        if( !_selectedIdx ) {
+                            if( _acPage ) {
+                                --_acPage;
+                                _selectedIdx = 5;
+                                draw( NEW_PAGE );
+                                updateButtons( p_backButton );
+                                continue;
+                            }
+                        } else
+                            _selectedIdx = 4;
+                    } else
+                        _selectedIdx -= 2;
+                    draw( -1 );
+                }
+
+                if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                    if( _selectedIdx == (u8) -1 )
+                        _selectedIdx = 0;
+                    else if( _selectedIdx % 2 ) {
+                        if( ( _acPage + 1 ) * 6 < _num ) {
+                            ++_acPage;
+                            _selectedIdx--;
+                            while( _selectedIdx + 6 * _acPage >= _num )
+                                _selectedIdx -= 2;
+                            draw( NEW_PAGE );
+                            updateButtons( p_backButton );
+                        }
+                        continue;
+                    } else {
+                        _selectedIdx++;
+                        if( _selectedIdx + 6 * _acPage >= _num )
+                            _selectedIdx--;
+                    }
+                    draw( -1 );
+                }
+                if( GET_AND_WAIT( KEY_LEFT ) ) {
+                    if( _selectedIdx == (u8) -1 )
+                        _selectedIdx = 0;
+                    else if( _selectedIdx % 2 == 0 ) {
+                        if( _acPage ) {
+                            --_acPage;
+                            _selectedIdx++;
+                            draw( NEW_PAGE );
+                            updateButtons( p_backButton );
+                            continue;
+                        }
+                    } else
+                        _selectedIdx--;
+                    draw( -1 );
+                }
 
                 if( p_backButton && ( GET_AND_WAIT_C( fwdPos[ 0 ][ 0 ], fwdPos[ 0 ][ 1 ] + 2, 16 ) || GET_AND_WAIT( KEY_B ) ) ) { //Back pressed
                     result = -1;
                     goto END;
-                } else if( ( !p_backButton && ( ( _num - 1 ) / 6 && _acPage == 0 && sqrt( sq( t.px - fwdPos[ 0 ][ 0 ] ) + sq( t.py - fwdPos[ 0 ][ 1 ] ) ) < 17 ) )
-                           || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - fwdPos[ 1 ][ 0 ] ) + sq( t.py - fwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
-
-                    waitForTouchUp( );
-                    if( ( ++_acPage ) >= ( ( _num - 1 ) / 6 ) ) {
-                        ( Oam->oamBuffer[ FWD_ID ] ).isHidden = true;
-                        ( Oam->oamBuffer[ BWD_ID ] ).isHidden = !_acPage;
-                        ( Oam->oamBuffer[ BWD_ID ] ).x = bwdPos[ p_backButton ][ 0 ] - 16;
-                        ( Oam->oamBuffer[ BWD_ID ] ).y = bwdPos[ p_backButton ][ 1 ] - 16;
-                        if( _acPage == ( _num / 6 ) )
-                            draw( NEW_PAGE );
-                        _acPage = ( _num / 6 );
-                    } else {
-                        ( Oam->oamBuffer[ BWD_ID ] ).isHidden = false;
-                        ( Oam->oamBuffer[ FWD_ID ] ).isHidden = false;
-                        ( Oam->oamBuffer[ BWD_ID ] ).x = bwdPos[ 1 ][ 0 ] - 16;
-                        ( Oam->oamBuffer[ BWD_ID ] ).y = bwdPos[ 1 ][ 1 ] - 16;
-                        ( Oam->oamBuffer[ FWD_ID ] ).x = fwdPos[ 1 ][ 0 ] - 16;
-                        ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ 1 ][ 1 ] - 16;
+                } else if( !IO::Oam->oamBuffer[ FWD_ID ].isHidden && GET_AND_WAIT_C( IO::Oam->oamBuffer[ FWD_ID ].x + 16, IO::Oam->oamBuffer[ FWD_ID ].y + 16, 16 ) ) {
+                    if( ( _acPage + 1 ) * 6 < _num ) {
+                        ++_acPage;
+                        while( _selectedIdx + 6 * _acPage >= _num )
+                            --_selectedIdx;
                         draw( NEW_PAGE );
+                        updateButtons( p_backButton );
                     }
-                } else if( ( !p_backButton && ( _acPage && _acPage == ( _num - 1 ) / 6 && sqrt( sq( t.px - bwdPos[ 0 ][ 0 ] ) + sq( t.py - bwdPos[ 0 ][ 1 ] ) ) < 17 ) )
-                           || ( ( p_backButton || _acPage ) && sqrt( sq( t.px - bwdPos[ 1 ][ 0 ] ) + sq( t.py - bwdPos[ 1 ][ 1 ] ) ) < 17 ) ) {
+                } else if( !IO::Oam->oamBuffer[ BWD_ID ].isHidden && GET_AND_WAIT_C( IO::Oam->oamBuffer[ BWD_ID ].x + 16, IO::Oam->oamBuffer[ BWD_ID ].y + 16, 16 ) ) {
                     waitForTouchUp( );
-                    if( ( --_acPage ) <= 0 ) {
-                        ( Oam->oamBuffer[ BWD_ID ] ).isHidden = true;
-                        ( Oam->oamBuffer[ FWD_ID ] ).isHidden = !( _acPage < ( ( _num - 1 ) / 6 ) );
-                        ( Oam->oamBuffer[ FWD_ID ] ).x = fwdPos[ p_backButton ][ 0 ] - 16;
-                        ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ p_backButton ][ 1 ] - 16;
-                        if( _acPage == 0 )
-                            draw( NEW_PAGE );
-                        _acPage = 0;
-                    } else {
-                        ( Oam->oamBuffer[ FWD_ID ] ).isHidden = false;
-                        ( Oam->oamBuffer[ BWD_ID ] ).isHidden = false;
-                        ( Oam->oamBuffer[ BWD_ID ] ).x = bwdPos[ 1 ][ 0 ] - 16;
-                        ( Oam->oamBuffer[ BWD_ID ] ).y = bwdPos[ 1 ][ 1 ] - 16;
-                        ( Oam->oamBuffer[ FWD_ID ] ).x = fwdPos[ 1 ][ 0 ] - 16;
-                        ( Oam->oamBuffer[ FWD_ID ] ).y = fwdPos[ 1 ][ 1 ] - 16;
+                    if( _acPage ) {
+                        --_acPage;
                         draw( NEW_PAGE );
+                        updateButtons( p_backButton );
                     }
                 }
             }

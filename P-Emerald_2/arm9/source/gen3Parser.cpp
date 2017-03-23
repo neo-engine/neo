@@ -29,7 +29,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
-#include <iostream>
+//#include <iostream>
 #include <sstream>
 
 #include "gen3Parser.h"
@@ -922,7 +922,7 @@ namespace FS {
 
         return actual_text;
     }
-    
+
     int gen3Parser::parse_pokemon( char* p_buf, int p_offset, void** p_pokemon, gen3Pokemon::pokemon_moves_t** p_pa, gen3Pokemon::pokemon_effort_t** p_pe,
                                    gen3Pokemon::pokemon_growth_t** p_pg, gen3Pokemon::pokemon_misc_t** p_pm, int p_num, int p_size ) {
         int i;
@@ -970,7 +970,7 @@ namespace FS {
 
         return 0;
     }
-    
+
     u16 gen3Parser::encrypt( u8 *p_data, u32 p_pv, u32 p_otid ) {
         u32 xorkey = p_pv ^ p_otid;
         u16 checksum = 0;
