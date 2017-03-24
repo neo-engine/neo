@@ -137,7 +137,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Register", "Registrieren" },
     { "Use", "Einsetzen" },
     { "Trash", "Wegwerfen" },
-    { "Which move?", "Welche Attacke?" },
+    { "Select a move!", "Welche Attacke?" },
 
     // 50
 
@@ -219,7 +219,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s learned\n%s!", "%s erlernt\n%s!" },
     { "%s already\nknows 4 moves.\nForget a move?", "%s beherrscht\nbereits 4 Attacken.\nSoll eine verlernt werden?" },
 
-    { "Which move?", "Welche Attacke?" },
+    { "Select a move!", "Welche Attacke?" },
     { "%s can't\nforget %s!", "%s kann\n%s nicht vergessen!" },
     { "%s can't\nlearn %s!", "%s kann\n%s nicht erlernen!" },
     { "%hhu badges", "%hhu Orden" },
@@ -321,5 +321,12 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Box “%s” is full.[A]", "Box „%s“ ist voll.[A]" },
     { "%s was deposited\nto Box “%s”.[A]", "%s wurde in\nBox „%s“ abgelegt.[A]" },
     { "There is no space left\nfor additional Pokémon.[A]", "Du hast keinen Platz\nfür weitere Pokémon.[A]" },
-    { "%s was released.[A]", "%s wurde wieder\nfreigelassen.[A]" }
+    { "%s was released.[A]", "%s wurde wieder\nfreigelassen.[A]" },
+
+    // 180
+
+    { "FIGHT", "Kampf" },
+    { "BAG", "Beutel" },
+    { "POKÉMON", "Pokémon" },
+    { "RUN", "Flucht" }
 };

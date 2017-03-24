@@ -54,12 +54,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include "Battle1.h"
 
-#include "BattleSub1.h"
-#include "BattleSub2.h"
-#include "BattleSub3.h"
-#include "BattleSub4.h"
-#include "BattleSub5.h"
-
 #include "BattleBall1.h" //Normal
 #include "BattleBall2.h" //Statused
 #include "BattleBall3.h" //Fainted
@@ -111,6 +105,7 @@ namespace BATTLE {
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
         BG_PALETTE_SUB[ RED_IDX ] = RED;
         BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;
+        BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
     }
     void battleUI::initLogScreen( ) {
         initColors( );
@@ -680,39 +675,50 @@ namespace BATTLE {
         }
     }
 
-    void loadBattleUISub( u16 p_pkmnId, bool p_isWildBattle ) {
+#define REDRAW 9
+    void battleUI::loadBattleUISub( u8 p_pressedIdx, u8 p_selectedIdx ) {
+        if( p_pressedIdx == REDRAW ) {
+            IO::NAV->draw( );
+            initColors( );
+            IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
+        }
+
         u16 tilecnt = 0;
         //Load UI Sprites
-        //FIGHT -- 1
-        tilecnt = IO::loadSprite( SUB_FIGHT_START, 0, tilecnt, 64,
-                                  72, 64, 64, BattleSub1Pal, BattleSub1Tiles, BattleSub1TilesLen,
-                                  false, false, false, OBJPRIORITY_2, true );
-        tilecnt = IO::loadSprite( SUB_FIGHT_START + 1, 0, tilecnt, 128,
-                                  72, 64, 64, BattleSub1Pal, BattleSub1Tiles, BattleSub1TilesLen,
-                                  false, true, false, OBJPRIORITY_2, true );
-        //FIGHT-TEXT
-        tilecnt = IO::loadSprite( SUB_FIGHT_START + 2, 1, tilecnt, 96,
-                                  100, 64, 32, BattleSub2Pal, BattleSub2Tiles, BattleSub2TilesLen,
-                                  false, false, false, OBJPRIORITY_0, true );
-        //RUN
-        if( p_isWildBattle ) { //Show Run
-            tilecnt = IO::loadSprite( SUB_FIGHT_START + 3, 2, tilecnt, 91,
-                                      150, 64, 32, BattleSub3Pal, BattleSub3Tiles, BattleSub3TilesLen,
-                                      false, false, false, OBJPRIORITY_3, true );
-        }
-        //BAG
-        tilecnt = IO::loadSprite( SUB_FIGHT_START + 4, 3, tilecnt, 0,
-                                  157, 64, 32, BattleSub4Pal, BattleSub4Tiles, BattleSub4TilesLen,
-                                  false, false, false, OBJPRIORITY_3, true );
-        //POKEMON
-        tilecnt = IO::loadSprite( SUB_FIGHT_START + 5, 4, tilecnt, 185,
-                                  142, 64, 32, BattleSub5Pal, BattleSub5Tiles, BattleSub5TilesLen,
-                                  false, false, false, OBJPRIORITY_3, true );
+        IO::printChoiceBox( 72, 74, 184, 136, 5, ( p_selectedIdx == 0 ) ? COLOR_IDX : GRAY_IDX, p_pressedIdx == 0 );
         //Load an icon of the PKMN, too
-        u8 oamIndex = SUB_FIGHT_START + 6;
-        u8 palIndex = 5;
+        u8 oamIndex = SUB_FIGHT_START + 3;
+        u8 palIndex = 2;
 
-        tilecnt = IO::loadPKMNIcon( p_pkmnId, 112, 68, oamIndex++, palIndex++, tilecnt, true );
+        tilecnt = IO::loadPKMNIcon( CUR_PKMN_2( *_battle, 0, PLAYER ).m_boxdata.m_speciesId,
+                                    78, 102, oamIndex++, palIndex++, tilecnt, true );
+        tilecnt = IO::loadPKMNIcon( CUR_PKMN_2( *_battle, 0, OPPONENT ).m_boxdata.m_speciesId,
+                                    148, 70, oamIndex++, palIndex++, tilecnt, true );
+        if( _battle->m_battleMode == battle::DOUBLE ) {
+            tilecnt = IO::loadPKMNIcon( CUR_PKMN_2( *_battle, 1, PLAYER ).m_boxdata.m_speciesId,
+                                        106, 102, oamIndex++, palIndex++, tilecnt, true );
+            tilecnt = IO::loadPKMNIcon( CUR_PKMN_2( *_battle, 1, OPPONENT ).m_boxdata.m_speciesId,
+                                        122, 70, oamIndex++, palIndex++, tilecnt, true );
+        }
+
+        //FIGHT
+        IO::printChoiceBox( 152, 40, 224, 64, 5, ( p_selectedIdx == 1 ) ? COLOR_IDX : GRAY_IDX, p_pressedIdx == 1 );
+        IO::regularFont->printString( GET_STRING( 180 ), 187, 46, true, IO::font::CENTER );
+
+        //POKEMON
+        IO::printChoiceBox( 152, 144, 224, 168, 5, ( p_selectedIdx == 2 ) ? COLOR_IDX : GRAY_IDX, p_pressedIdx == 2 );
+        IO::regularFont->printString( GET_STRING( 182 ), 187, 150, true, IO::font::CENTER );
+
+        //BAG
+        IO::printChoiceBox( 24, 144, 100, 168, 5, ( p_selectedIdx == 3 ) ? COLOR_IDX : GRAY_IDX, p_pressedIdx == 3 );
+        IO::regularFont->printString( GET_STRING( 181 ), 60, 150, true, IO::font::CENTER );
+
+        //RUN
+        IO::printChoiceBox( 24, 40, 100, 64, 5, ( p_selectedIdx == 4 ) ? COLOR_IDX : GRAY_IDX, p_pressedIdx == 4 );
+        if( _battle->m_isWildBattle )
+            IO::regularFont->printString( GET_STRING( 183 ), 60, 46, true, IO::font::CENTER );
+
+
 
         //PreLoad A and Back buttons
 
@@ -1384,10 +1390,10 @@ namespace BATTLE {
     bool battleUI::declareBattleMove( u8 p_pokemonPos, bool p_showBack ) {
         char buffer[ 100 ];
         snprintf( buffer, 99, GET_STRING( 162 ), CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
-        writeLogText( buffer );
 
-        loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                         _battle->m_isWildBattle );
+        u8 selIdx = 0;
+        loadBattleUISub( REDRAW, selIdx );
+        writeLogText( buffer );
         if( p_showBack ) {
             IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
             IO::updateOAM( true );
@@ -1399,15 +1405,60 @@ namespace BATTLE {
             swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
+            int pressed = keysCurrent( );
 
-            //Accept touches that are almost on the sprite
-            if( p_showBack && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+            if( p_showBack && ( GET_AND_WAIT_R( 224, 164, 300, 300 ) || GET_AND_WAIT( KEY_B ) ) ) {
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
-                clearLogScreen( );
+                IO::NAV->draw( );
+                initColors( );
+                IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
                 return false;
-            } else if( GET_AND_WAIT_R( 74, 81, 181, 127 ) ) { //Attacks
+            } else if( GET_AND_WAIT( KEY_DOWN ) ) {
+                if( selIdx == 4 || selIdx == 1 )
+                    selIdx = 0;
+                else if( selIdx == 0 )
+                    selIdx = 3;
+                else
+                    selIdx = 2;
+                loadBattleUISub( (u8) -1, selIdx );
+            } else if( GET_AND_WAIT( KEY_UP ) ) {
+                if( selIdx == 2 || selIdx == 3 )
+                    selIdx = 0;
+                else
+                    selIdx = 4;
+                loadBattleUISub( (u8) -1, selIdx );
+            } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                if( selIdx == 4 )
+                    selIdx = 1;
+                else if( selIdx == 3 || selIdx == 0 )
+                    selIdx = 2;
+                else continue;
+                loadBattleUISub( (u8) -1, selIdx );
+            } else if( GET_AND_WAIT( KEY_LEFT ) ) {
+                if( selIdx == 1 )
+                    selIdx = 4;
+                else if( selIdx == 2 )
+                    selIdx = 3;
+                else if( selIdx == 0 )
+                    selIdx = 1;
+                else continue;
+                loadBattleUISub( (u8) -1, selIdx );
+            }
+
+            if( GET_AND_WAIT_R( 72, 74, 184, 136 ) || ( selIdx == 0 && GET_AND_WAIT( KEY_A ) ) ) {
+                // 
+                // Battle Status
+                //
+
+                // TODO
+            } else if( GET_AND_WAIT_R( 152, 40, 224, 64 ) || ( selIdx == 1 && GET_AND_WAIT( KEY_A ) ) ) {
+                //
+                // Moves
+                //
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
-                clearLogScreen( );
+                IO::NAV->draw( );
+                initColors( );
+                IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
                 result.m_type = battle::battleMove::ATTACK;
 SHOW_ATTACK:
                 //Check if the PKMN still has AP to use, if not, the move becomes struggle
@@ -1437,20 +1488,19 @@ SHOW_ATTACK:
                         return true;
                     }
                 }
-                loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle );
+                loadBattleUISub( REDRAW, selIdx );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( buffer );
 
-            } else if( GET_AND_WAIT_R( 0, 162, 58, 300 ) ) { //Bag
-
+            } else if( GET_AND_WAIT_R( 24, 144, 100, 168 ) || ( selIdx == 3 && GET_AND_WAIT( KEY_A ) ) ) {
+                //
+                // Bag
+                //
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
-                clearLogScreen( );
                 result.m_type = battle::battleMove::USE_ITEM;
                 result.m_value = chooseItem( );
                 result.m_target = 0;
-                loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle );
+                loadBattleUISub( REDRAW, selIdx );
                 if( result.m_value ) {
                     if( ItemList[ result.m_value ]->m_itemType == item::MEDICINE ) {
                         u8 res = choosePKMN( p_pokemonPos + ( _battle->m_battleMode == battle::DOUBLE ), true, true );
@@ -1466,16 +1516,13 @@ SHOW_ATTACK:
                                     result.m_newItemEffect |= ( rs << ( 9 + 16 * !i ) );
                                 }
                         } else {
-                            loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                             _battle->m_isWildBattle );
+                            loadBattleUISub( REDRAW, selIdx );
                             goto NEXT_TRY;
                         }
                     } else if( ItemList[ result.m_value ]->m_itemType == item::POKE_BALLS )
                         result.m_target |= ( 1 << 2 );
                     IO::initOAMTable( true );
-                    IO::NAV->draw( );
-                    loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                     _battle->m_isWildBattle );
+                    loadBattleUISub( REDRAW, selIdx );
 
                     setDeclareBattleMoveSpriteVisibility( p_showBack, true );
                     initLogScreen( );
@@ -1483,12 +1530,15 @@ SHOW_ATTACK:
                     return true;
                 }
 NEXT_TRY:
-                initLogScreen( );
                 snprintf( buffer, 99, GET_STRING( 162 ), CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_name );
                 writeLogText( buffer );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
 
-            } else if( _battle->m_isWildBattle && GET_AND_WAIT_R( 97, 162, 153, 180 ) ) { //Run
+            } else if( _battle->m_isWildBattle &&
+                ( GET_AND_WAIT_R( 24, 40, 100, 64 ) || ( selIdx == 4 && GET_AND_WAIT( KEY_A ) ) ) ) {
+                //
+                // Run
+                //
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::RUN;
@@ -1497,14 +1547,13 @@ NEXT_TRY:
                     return true;
                 } else
                     _battle->log( GET_STRING( 164 ) );
-                if( result.m_value ) {
-                    loadA( );
-                    return true;
-                }
-                setDeclareBattleMoveSpriteVisibility( p_showBack, false );
-                writeLogText( buffer );
 
-            } else if( GET_AND_WAIT_R( 195, 148, 238, 176 ) ) { // Switch Pkmn
+                loadA( );
+                return true;
+            } else if( GET_AND_WAIT_R( 152, 144, 224, 168 ) || ( selIdx == 2 && GET_AND_WAIT( KEY_A ) ) ) {
+                //
+                // Switch Pkmn
+                //
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 clearLogScreen( );
                 result.m_type = battle::battleMove::SWITCH;
@@ -1513,8 +1562,7 @@ NEXT_TRY:
                     loadA( );
                     return true;
                 }
-                loadBattleUISub( CUR_PKMN_2( *_battle, p_pokemonPos, PLAYER ).m_boxdata.m_speciesId,
-                                 _battle->m_isWildBattle );
+                loadBattleUISub( REDRAW, selIdx );
                 setDeclareBattleMoveSpriteVisibility( p_showBack, false );
                 writeLogText( buffer );
             }
