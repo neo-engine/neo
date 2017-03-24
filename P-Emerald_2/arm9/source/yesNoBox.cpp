@@ -31,11 +31,16 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 namespace IO {
 
-    void yesNoBox::draw( u8 p_pressedIdx ) {
-        printChoiceBox( 28, 102, 122, 134, 6, RED_IDX, p_pressedIdx == 0 );
+    void yesNoBox::draw( u8 p_pressedIdx, u8 p_selectedIdx ) {
+        if( p_selectedIdx == 1 )
+            BG_PALETTE_SUB[ COLOR_IDX ] = BLUE2;
+        else if( p_selectedIdx == 0 )
+            BG_PALETTE_SUB[ COLOR_IDX ] = RED2;
+
+        printChoiceBox( 28, 102, 122, 134, 6, ( p_selectedIdx == 1 ) ? COLOR_IDX : BLUE_IDX, p_pressedIdx == 0 );
         regularFont->printString( STRINGS[ 80 ][ _language ], 28 + 47 + 2 * ( p_pressedIdx == 0 ),
                                   110 + ( p_pressedIdx == 0 ), true, IO::font::CENTER );
-        printChoiceBox( 134, 102, 228, 134, 6, BLUE_IDX, p_pressedIdx == 1 );
+        printChoiceBox( 134, 102, 228, 134, 6, ( p_selectedIdx == 0 ) ? COLOR_IDX : RED_IDX, p_pressedIdx == 1 );
         regularFont->printString( STRINGS[ 81 ][ _language ], 134 + 47 + 2 * ( p_pressedIdx == 1 ),
                                   110 + ( p_pressedIdx == 1 ), true, IO::font::CENTER );
     }
@@ -72,34 +77,52 @@ namespace IO {
         _language = SAVE::SAV->getActiveFile( ).m_options.m_language;
     }
 
-    bool yesNoBox::getResult( const char* p_text = 0 ) {
+    bool yesNoBox::getResult( const char* p_text, bool p_textAtOnce ) {
         s16 x = 8 + 64 * !!_isNamed;
         s16 y = 8;
-        if( p_text )
+        if( p_text && !p_textAtOnce )
             regularFont->printStringD( p_text, x, y, true );
-        draw( 2 );
+        else if( p_text )
+            regularFont->printString( p_text, x, y, true );
+
+        u8 selIdx = (u8) -1;
+        draw( 2, selIdx );
         bool result;
         loop( ) {
             swiWaitForVBlank( );
             touchPosition t;
             touchRead( &t );
+            scanKeys( );
+            int pressed = keysCurrent( );
+
+            if( GET_AND_WAIT( KEY_LEFT ) ) {
+                selIdx = 0;
+                draw( 2, selIdx );
+            } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                selIdx = 1;
+                draw( 2, selIdx );
+            } else if( selIdx != (u8) -1 && GET_AND_WAIT( KEY_A ) ) {
+                result = !selIdx;
+                break;
+            }
+
             if( t.px >= 28 && t.py >= 102 && t.px <= 122 && t.py <= 134 ) {
-                draw( 0 );
+                draw( 0, selIdx );
                 if( !waitForTouchUp( 28, 102, 122, 134 ) ) {
-                    draw( 2 );
+                    draw( 2, selIdx );
                     continue;
                 }
-                draw( 2 );
+                draw( 2, selIdx );
                 swiWaitForVBlank( );
                 result = true;
                 break;
             } else if( t.px >= 134 && t.py >= 102 && t.px <= 228 && t.py <= 134 ) {
-                draw( 1 );
+                draw( 1, selIdx );
                 if( !waitForTouchUp( 134, 102, 228, 134 ) ) {
-                    draw( 2 );
+                    draw( 2, selIdx );
                     continue;
                 }
-                draw( 2 );
+                draw( 2, selIdx );
                 swiWaitForVBlank( );
                 result = false;
                 break;

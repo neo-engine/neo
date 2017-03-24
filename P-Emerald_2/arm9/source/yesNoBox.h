@@ -39,13 +39,11 @@ namespace IO {
         yesNoBox( const char* p_name, bool p_initSprites = true );
         yesNoBox( messageBox p_box, bool p_initSprites = true );
 
-        bool getResult( const char* p_text );
-
-        void draw( u8 p_pressedIdx );
-
+        bool getResult( const char* p_text = 0, bool p_textAtOnce = true );
     private:
         bool _isNamed;
         SAVE::language _language;
+        void draw( u8 p_pressedIdx, u8 p_selectedIdx );
     };
 
 }
