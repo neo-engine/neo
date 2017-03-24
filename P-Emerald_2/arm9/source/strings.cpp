@@ -279,15 +279,15 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Burn", "Verbrng" },
     { "Slp",  "Schlaf" },
     { "Psn", "Gift" },
-    { "Send", "Aussenden" },
+    { "Switch", "Aussenden" },
 
     // 150
 
-    { "Already fighting", "Bereits im Kampf" },
-    { "Fainted…", "Schon besiegt…" },
+    { "In Battle", "Bereits im Kampf" },
+    { "Cannot Battle", "Schon besiegt…" },
     { "To be sent", "Schon ausgewählt" },
-    { "An egg can", "Ein Ei kann" },
-    { "not fight!", "nicht kämpfen!" },
+    { "Eggs can't", "Ein Ei kann" },
+    { "battle!", "nicht kämpfen!" },
 
     { "Status", "Bericht" },
     { "Moves", "Attacken" },
@@ -304,7 +304,7 @@ const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "You couldn't escape…[A]", "Flucht gescheitert…[A]" },
 
     { "Choose a target!", "Welches PKMN angreifen?" },
-    { "Choose a PKMN", "Welches PKMN?" },
+    { "Choose a Pokémon.", "Welches Pokémon?" },
     { "%s gained %lu EXP.[A]", "%s gewinnt %lu E.-Punkte.[A]" },
     { "%s advanced\nto level %d.[A]", "%s erreicht Level %d.[A]" },
     { "The quick claw enabled\n%s%s to go first![A]", "%s%s agiert dank\neiner Flinkklaue zuerst![A]" },

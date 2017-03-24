@@ -105,6 +105,8 @@ namespace BATTLE {
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
         BG_PALETTE_SUB[ RED_IDX ] = RED;
         BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;
+        BG_PALETTE_SUB[ RED2_IDX ] = RED2;
+        BG_PALETTE_SUB[ BLUE2_IDX ] = BLUE2;
         BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
     }
     void battleUI::initLogScreen( ) {
@@ -755,14 +757,14 @@ namespace BATTLE {
         setBattleUISubVisibility( p_isHidden );
     }
 
-    void battleUI::drawPkmnChoicePkmn( u8 p_index, bool p_firstIsChosen, bool p_pressed ) {
+    void battleUI::drawPkmnChoicePkmn( u8 p_index, bool p_firstIsChosen, bool p_pressed, bool p_selected ) {
         u8 x = 8 + ( p_index % 2 ) * 120 - ( p_index / 2 ) * 4,
             y = 32 + ( p_index / 2 ) * 48;
 
         if( !p_index || ( p_firstIsChosen && ( p_index == 1 ) ) || p_index == firstMoveSwitchTarget )
-            IO::printChoiceBox( x + 8, y, x + 120, y + 44, 5, RED_IDX, p_pressed );
+            IO::printChoiceBox( x + 8, y, x + 120, y + 44, 5, p_selected ? RED_IDX : RED2_IDX, p_pressed );
         else
-            IO::printChoiceBox( x + 8, y, x + 120, y + 44, 5, GRAY_IDX, p_pressed );
+            IO::printChoiceBox( x + 8, y, x + 120, y + 44, 5, p_selected ? COLOR_IDX : GRAY_IDX, p_pressed );
 
         if( p_index >= _battle->_player->m_pkmnTeam.size( ) )
             return;
@@ -774,11 +776,13 @@ namespace BATTLE {
         u8 dy = p_pressed;
 
         if( !acPkmn.m_boxdata.m_individualValues.m_isEgg ) {
-            u8 gn = !acPkmn.gender( ) ? 8 : 0;
+            u8 gn = ( !acPkmn.gender( ) || acPkmn.m_boxdata.m_speciesId == 29 || acPkmn.m_boxdata.m_speciesId == 32 ) ? 8 : 0;
+            IO::regularFont->setColor( BLUE2_IDX, 1 );
+            IO::regularFont->setColor( GRAY_IDX, 2 );
             IO::regularFont->printString( acPkmn.m_boxdata.m_name, gn + dx + x + 104, dy + y + 2, true, IO::font::RIGHT );
             if( !gn )
                 drawGender( dx + x + 104, dy + y + 2, acPkmn.gender( ), true );
-            IO::regularFont->setColor( GRAY_IDX, 1 );
+            IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
             IO::regularFont->printString( ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
                                           dx + x + 113, dy + y + 15, true, IO::font::RIGHT );
@@ -815,14 +819,13 @@ namespace BATTLE {
                 sprintf( buffer, GET_STRING( 136 ) );
             }
             IO::regularFont->printString( buffer, dx + x + 113, dy + y + 27, true, IO::font::RIGHT );
-
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
         } else
             IO::regularFont->printString( GET_STRING( 34 ), dx + x + 112, dy + y + 2, true, IO::font::RIGHT );
     }
 
-    void battleUI::drawPKMNChoiceScreen( bool p_firstIsChosen ) {
+    void battleUI::drawPKMNChoiceScreen( bool p_firstIsChosen, u8 p_selectedIdx ) {
         u16 tilecnt = 0;
         u8  palIndex = 3;
         u8 oamIndex = SUB_Back_OAM;
@@ -841,7 +844,7 @@ namespace BATTLE {
             u8 x = 8 + ( i % 2 ) * 120 - ( i / 2 ) * 4,
                 y = 32 + ( i / 2 ) * 48;
 
-            drawPkmnChoicePkmn( i, p_firstIsChosen, false );
+            drawPkmnChoicePkmn( i, p_firstIsChosen, false, i == p_selectedIdx );
 
             if( i >= _battle->_player->m_pkmnTeam.size( ) )
                 continue;
@@ -1933,7 +1936,9 @@ START:
 
         writeLogText( GET_STRING( 166 ) );
 
-        drawPKMNChoiceScreen( p_firstIsChosen );
+        u8 selIdx = 0;
+
+        drawPKMNChoiceScreen( p_firstIsChosen, selIdx );
         touchPosition touch;
         loop( ) {
 NEXT:
@@ -1941,24 +1946,46 @@ NEXT:
             IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = !p_back;
             IO::updateOAM( true );
 
-
             scanKeys( );
             touchRead( &touch );
+            int pressed = keysCurrent( );
 
             //Accept touches that are almost on the sprite
-            if( p_back && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) { //Back
+            if( p_back && ( GET_AND_WAIT_R( 224, 164, 300, 300 ) || GET_AND_WAIT( KEY_B ) ) ) { //Back
                 result = -1;
                 break;
             }
             auto teamSz = _battle->_player->m_pkmnTeam.size( );
+
+            if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                drawPkmnChoicePkmn( selIdx, p_firstIsChosen, false, false );
+                selIdx = ( selIdx + 1 ) % teamSz;
+                drawPkmnChoicePkmn( selIdx, p_firstIsChosen, false, true );
+            } else if( GET_AND_WAIT( KEY_LEFT ) ) {
+                drawPkmnChoicePkmn( selIdx, p_firstIsChosen, false, false );
+                selIdx = ( selIdx + teamSz - 1 ) % teamSz;
+                drawPkmnChoicePkmn( selIdx, p_firstIsChosen, false, true );
+            } else if( GET_AND_WAIT( KEY_UP ) ) {
+                drawPkmnChoicePkmn( selIdx, p_firstIsChosen, false, false );
+                selIdx = ( selIdx + teamSz - 2 ) % teamSz;
+                drawPkmnChoicePkmn( selIdx, p_firstIsChosen, false, true );
+            } else if( GET_AND_WAIT( KEY_DOWN ) ) {
+                drawPkmnChoicePkmn( selIdx, p_firstIsChosen, false, false );
+                selIdx = ( selIdx + 2 ) % teamSz;
+                drawPkmnChoicePkmn( selIdx, p_firstIsChosen, false, true );
+            }
+
             for( u8 i = 0; i < teamSz; ++i ) {
                 if( p_noRestrict && CUR_PKMN_2( *_battle, i, PLAYER ).isEgg( ) )
                     continue;
                 u8 x = 8 + ( i % 2 ) * 120 - ( i / 2 ) * 4,
                     y = 32 + ( i / 2 ) * 48;
 
-                if( touch.px >= x + 8 && touch.py >= y && touch.px <= x + 120 && touch.py <= y + 44 ) {
-                    drawPkmnChoicePkmn( i, p_firstIsChosen, true );
+                if( selIdx == i && GET_AND_WAIT( KEY_A ) )
+                    goto DETAILS;
+
+                if( IN_RANGE_R( x + 8, y, x + 120, y + 44 ) ) {
+                    drawPkmnChoicePkmn( i, p_firstIsChosen, true, selIdx == i );
                     loop( ) {
                         swiWaitForVBlank( );
 
@@ -1966,11 +1993,12 @@ NEXT:
                         touchRead( &touch );
                         if( TOUCH_UP )
                             break;
-                        if( !( touch.px >= x + 8 && touch.py >= y && touch.px <= x + 120 && touch.py <= y + 44 ) ) {
-                            drawPkmnChoicePkmn( i, p_firstIsChosen, false );
+                        if( !IN_RANGE_R( x + 8, y, x + 120, y + 44 ) ) {
+                            drawPkmnChoicePkmn( i, p_firstIsChosen, false, selIdx == i );
                             goto NEXT;
                         }
                     }
+DETAILS:
                     result = i;
                     u8 tmp = 1;
                     if( !p_noRestrict ) {
