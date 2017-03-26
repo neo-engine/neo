@@ -73,7 +73,7 @@ namespace IO {
         bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
         bgSetPriority( bg3, 3 );
         bgSetPriority( bg2, 2 );
-        
+
         if( SCREENS_SWAPPED ) {
             REG_BLDCNT = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
             REG_BLDALPHA = TRANSPARENCY_COEFF;

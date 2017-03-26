@@ -25,18 +25,17 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#include <nds.h>
 #include <fat.h>
 #include <filesystem.h>
+#include <nds.h>
 
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <cmath>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "defines.h"
 #include "saveGame.h"
@@ -48,22 +47,21 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "berry.h"
 #include "pokemon.h"
 
-#include "uio.h"
-#include "messageBox.h"
-#include "yesNoBox.h"
 #include "choiceBox.h"
 #include "keyboard.h"
-#include "sprite.h"
+#include "messageBox.h"
 #include "screenFade.h"
+#include "sprite.h"
+#include "uio.h"
+#include "yesNoBox.h"
 
 #include "mapDrawer.h"
-#include "mapSlice.h"
 #include "mapObject.h"
+#include "mapSlice.h"
 
 #include "battle.h"
 #include "battleTrainer.h"
 #include "nav.h"
-
 
 #include "BigCirc1.h"
 #include "consoleFont.h"
@@ -74,12 +72,6 @@ GameMod gMod = GameMod::DEVELOPER;
 GameMod gMod = GameMod::EMULATOR;
 #endif
 
-//extern "C" {
-//    void __sync_synchronize( void ) {
-//        asm( "" : : : "memory" );
-//    }
-//}
-
 u8 DayTimes[ 4 ][ 5 ] = {
     { 7, 10, 15, 17, 23 },
     { 6, 9, 12, 18, 23 },
@@ -87,16 +79,16 @@ u8 DayTimes[ 4 ][ 5 ] = {
     { 7, 9, 13, 19, 23 }
 };
 
-int hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
-int achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
-int pressed, held, last;
-bool DRAW_TIME = false;
-bool UPDATE_TIME = true;
-bool ANIMATE_MAP = false;
-u8 FRAME_COUNT = 0;
-bool SCREENS_SWAPPED = false;
+int  hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
+int  achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
+int  pressed, held, last;
+bool DRAW_TIME         = false;
+bool UPDATE_TIME       = true;
+bool ANIMATE_MAP       = false;
+u8   FRAME_COUNT       = 0;
+bool SCREENS_SWAPPED   = false;
 bool PLAYER_IS_FISHING = false;
-bool INIT_NITROFS = false;
+bool INIT_NITROFS      = false;
 
 char** ARGV;
 
@@ -181,8 +173,7 @@ int main( int, char** p_argv ) {
             INIT_NITROFS = false;
         }
 
-        if( !UPDATE_TIME )
-            return;
+        if( !UPDATE_TIME ) return;
 
         auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
 
@@ -205,10 +196,12 @@ int main( int, char** p_argv ) {
             sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
             IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
 
-            SAVE::SAV->getActiveFile( ).m_pt.m_secs++; // I know, this is rather inaccurate 
+            SAVE::SAV->getActiveFile( ).m_pt.m_secs++; // I know, this is rather inaccurate
 
-            SAVE::SAV->getActiveFile( ).m_pt.m_mins += ( SAVE::SAV->getActiveFile( ).m_pt.m_secs / 60 );
-            SAVE::SAV->getActiveFile( ).m_pt.m_hours += ( SAVE::SAV->getActiveFile( ).m_pt.m_mins / 60 );
+            SAVE::SAV->getActiveFile( ).m_pt.m_mins
+                += ( SAVE::SAV->getActiveFile( ).m_pt.m_secs / 60 );
+            SAVE::SAV->getActiveFile( ).m_pt.m_hours
+                += ( SAVE::SAV->getActiveFile( ).m_pt.m_mins / 60 );
 
             SAVE::SAV->getActiveFile( ).m_pt.m_secs %= 60;
             SAVE::SAV->getActiveFile( ).m_pt.m_mins %= 60;
@@ -255,7 +248,8 @@ int main( int, char** p_argv ) {
             time_t unixTime = time( NULL );
             struct tm* timeStruct = gmtime( (const time_t *) &unixTime );
             char buffer[ 100 ];
-            snprintf( buffer, 99, "Currently at %hu-(%hu,%hu,%hu).\nMap: %hu:%hu, (%02hX,%02hX)\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
+            snprintf( buffer, 99, "Currently at %hhu-(%hu,%hu,%hhu).\nMap: %i:%i,"
+                                  "(%02X,%02X)\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
                       SAVE::SAV->getActiveFile( ).m_currentMap,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
@@ -263,9 +257,8 @@ int main( int, char** p_argv ) {
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY / 32,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX % 32,
-                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32,
-                      FRAME_COUNT,
-                      achours, acminutes, acseconds, timeStruct->tm_sec );
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32, FRAME_COUNT, achours,
+                      acminutes, acseconds, timeStruct->tm_sec );
             IO::messageBox m( buffer );
             IO::NAV->draw( true );
         }
@@ -283,14 +276,18 @@ int main( int, char** p_argv ) {
                         || !AttackList[ a.m_boxdata.m_moves[ j ] ]->possible( ) )
                         continue;
                     char buffer[ 50 ];
-                    snprintf( buffer, 49, GET_STRING( 3 ), AttackList[ a.m_boxdata.m_moves[ j ] ]->text( ), AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                    snprintf( buffer, 49, GET_STRING( 3 ),
+                              AttackList[ a.m_boxdata.m_moves[ j ] ]->text( ),
+                              AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                     IO::yesNoBox yn;
                     if( yn.getResult( buffer ) ) {
                         IO::NAV->draw( );
                         swiWaitForVBlank( );
-                        snprintf( buffer, 49, GET_STRING( 99 ), a.m_boxdata.m_name, AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                        snprintf( buffer, 49, GET_STRING( 99 ), a.m_boxdata.m_name,
+                                AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                         IO::messageBox( buffer, 0, false );
-                        MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale, a.m_boxdata.isShiny( ) );
+                        MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale,
+                                              a.m_boxdata.isShiny( ) );
                         IO::NAV->draw( true );
                         swiWaitForVBlank( );
 
@@ -304,17 +301,18 @@ OUT:
             scanKeys( );
             continue;
         }
-        //Movement
+        // Movement
         if( held & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
             MAP::direction curDir = GET_DIR( held );
             scanKeys( );
 
             stopped = false;
-            if( MAP::curMap->canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, curDir, SAVE::SAV->getActiveFile( ).m_player.m_movement ) ) {
+            if( MAP::curMap->canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, curDir,
+                        SAVE::SAV->getActiveFile( ).m_player.m_movement ) ) {
                 MAP::curMap->movePlayer( curDir, ( held & KEY_B ) );
                 bmp = false;
             } else if( !bmp ) {
-                //Play "Bump" sound
+                // Play "Bump" sound
                 MAP::curMap->stopPlayer( curDir );
                 swiWaitForVBlank( );
                 bmp = true;
