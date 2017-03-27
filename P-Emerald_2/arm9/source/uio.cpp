@@ -167,26 +167,24 @@ namespace IO {
         return false;
     }
 
-    void waitForKeysUp( KEYPAD_BITS p_keys ) {
+    bool waitForKeysUp( KEYPAD_BITS p_keys ) {
         return waitForKeysUp( inputTarget( p_keys ) );
     }
-    void waitForKeysUp( inputTarget p_inputTarget ) {
+    bool waitForKeysUp( inputTarget p_inputTarget ) {
         if( p_inputTarget.m_inputType == inputTarget::inputType::BUTTON ) {
             loop( ) {
                 scanKeys( );
-                keysCurrent( );
                 swiWaitForVBlank( );
-                if( keysUp( ) & p_inputTarget.m_keys )
-                    return;
+                if( keysUp( ) & p_inputTarget.m_keys ) return true;
+                if( !( keysHeld( ) & p_inputTarget.m_keys ) ) return true;
             }
         }
+        return false;
     }
 
     bool waitForInput( inputTarget p_inputTarget ) {
-        if( p_inputTarget.m_inputType == inputTarget::inputType::BUTTON ) {
-            waitForKeysUp( p_inputTarget );
-            return true;
-        }
+        if( p_inputTarget.m_inputType == inputTarget::inputType::BUTTON )
+            return waitForKeysUp( p_inputTarget );
         return waitForTouchUp( p_inputTarget );
     }
 
@@ -199,10 +197,10 @@ namespace IO {
         boldFont->setColor( WHITE_IDX, 2 );
 
         BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-        BG_PALETTE_SUB[ GRAY_IDX ] = GRAY;
+        BG_PALETTE_SUB[ GRAY_IDX ]  = GRAY;
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
-        BG_PALETTE_SUB[ RED_IDX ] = RED;
-        BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;
+        BG_PALETTE_SUB[ RED_IDX ]   = RED;
+        BG_PALETTE_SUB[ BLUE_IDX ]  = BLUE;
         printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
     }
 

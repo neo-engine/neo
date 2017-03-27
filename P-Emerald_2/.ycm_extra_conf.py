@@ -5,11 +5,12 @@ flags = [
 	'-Wall', '-Wextra', '-Wlogical-op',
 	'-Wshadow', '-Wpointer-arith', '-Wcast-qual',
 	'-std=c++11', '-Wno-multichar',
-	'-x', 'c++',
+	'-x', 'c++', '-DARM9',
 	'-I', 'arm7/include',
 	'-I', 'arm7/source',
 	'-I', 'arm9/include',
 	'-I', 'arm9/source',
+	'-I', 'arm9/build',
 	'-isystem', '/opt/devkitpro/libnds/include/',
 	'-isystem', '/opt/devkitpro/libnds/include/nds/',
 	]

@@ -54,16 +54,15 @@ must not be misrepresented as being the original software.
 distribution.
 
 ---------------------------------------------------------------------------------*/
-#include <nds.h>
 #include <dswifi7.h>
 #include <maxmod7.h>
+#include <nds.h>
 
 //---------------------------------------------------------------------------------
 void VblankHandler( void ) {
     //---------------------------------------------------------------------------------
     Wifi_Update( );
 }
-
 
 //---------------------------------------------------------------------------------
 void VcountHandler( ) {
@@ -83,8 +82,6 @@ void powerButtonCB( ) {
 int main( ) {
     //---------------------------------------------------------------------------------
     readUserSettings( );
-
-    rtcReset( );
 
     irqInit( );
     // Start the RTC tracking IRQ

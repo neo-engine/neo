@@ -38,13 +38,13 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <vector>
 
 #include "defines.h"
-#include "saveGame.h"
 #include "fs.h"
+#include "saveGame.h"
 #include "startScreen.h"
 
+#include "berry.h"
 #include "hmMoves.h"
 #include "item.h"
-#include "berry.h"
 #include "pokemon.h"
 
 #include "choiceBox.h"
@@ -72,12 +72,8 @@ GameMod gMod = GameMod::DEVELOPER;
 GameMod gMod = GameMod::EMULATOR;
 #endif
 
-u8 DayTimes[ 4 ][ 5 ] = {
-    { 7, 10, 15, 17, 23 },
-    { 6, 9, 12, 18, 23 },
-    { 5, 8, 10, 20, 23 },
-    { 7, 9, 13, 19, 23 }
-};
+u8 DayTimes[ 4 ][ 5 ]
+    = {{7, 10, 15, 17, 23}, {6, 9, 12, 18, 23}, {5, 8, 10, 20, 23}, {7, 9, 13, 19, 23}};
 
 int  hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
 int  achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
@@ -96,8 +92,7 @@ u8 getCurrentDaytime( ) {
     u8 t = achours, m = acmonth;
 
     for( u8 i = 0; i < 5; ++i )
-        if( DayTimes[ m / 4 ][ i ] >= t )
-            return i;
+        if( DayTimes[ m / 4 ][ i ] >= t ) return i;
     return 254;
 }
 
@@ -106,42 +101,41 @@ void initGraphics( ) {
 
     IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
     IO::bg2sub = bgInitSub( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
-    for( u8 i = 0; i < 4; ++i )
-        bgSetPriority( i, i );
-    for( u8 i = 0; i < 4; ++i )
-        bgSetPriority( 4 + i, i );
+    for( u8 i = 0; i < 4; ++i ) bgSetPriority( i, i );
+    for( u8 i = 0; i < 4; ++i ) bgSetPriority( 4 + i, i );
     bgUpdate( );
 
     IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
-    IO::Bottom = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
+    IO::Bottom
+        = *consoleInit( &IO::Bottom, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, false, true );
 
-    IO::consoleFont->gfx = ( u16* ) const_cast<unsigned int*>( consoleFontTiles );
-    IO::consoleFont->pal = ( u16* ) const_cast<unsigned short*>( consoleFontPal );
-    IO::consoleFont->numChars = 218;
-    IO::consoleFont->numColors = 16;
-    IO::consoleFont->bpp = 8;
-    IO::consoleFont->asciiOffset = 32;
+    IO::consoleFont->gfx                = (u16*) const_cast<unsigned int*>( consoleFontTiles );
+    IO::consoleFont->pal                = (u16*) const_cast<unsigned short*>( consoleFontPal );
+    IO::consoleFont->numChars           = 218;
+    IO::consoleFont->numColors          = 16;
+    IO::consoleFont->bpp                = 8;
+    IO::consoleFont->asciiOffset        = 32;
     IO::consoleFont->convertSingleColor = false;
 
     consoleSetFont( &IO::Top, IO::consoleFont );
     consoleSetFont( &IO::Bottom, IO::consoleFont );
 }
 void initTimeAndRnd( ) {
-    time_t uTime = time( NULL );
-    tm* tStruct = gmtime( (const time_t *) &uTime );
+    time_t uTime   = time( NULL );
+    tm*    tStruct = gmtime( (const time_t*) &uTime );
 
-    hours = tStruct->tm_hour;
-    month = tStruct->tm_min;
+    hours   = tStruct->tm_hour;
+    month   = tStruct->tm_min;
     seconds = tStruct->tm_sec;
-    day = tStruct->tm_mday;
-    month = tStruct->tm_mon + 1;
-    year = tStruct->tm_year + 1900;
+    day     = tStruct->tm_mday;
+    month   = tStruct->tm_mon + 1;
+    year    = tStruct->tm_year + 1900;
 
     srand( hours ^ ( 100 * minutes ) ^ ( 10000 * seconds ) ^ ( day ^ ( 100 * month ) ^ year ) );
 }
 
 int main( int, char** p_argv ) {
-    //Init
+    // Init
     powerOn( POWER_ALL_2D );
     nitroFSInit( p_argv );
     ARGV = p_argv;
@@ -150,13 +144,12 @@ int main( int, char** p_argv ) {
     initGraphics( );
     initTimeAndRnd( );
 
-    //Read the savegame
+    // Read the savegame
     if( gMod != EMULATOR && p_argv[ 0 ] )
         SAVE::SAV = FS::readSave( p_argv[ 0 ] );
     else
-        SAVE::SAV = 0;
-    if( !SAVE::SAV )
-        SAVE::SAV = std::unique_ptr<SAVE::saveGame>( new SAVE::saveGame( ) );
+        SAVE::SAV              = 0;
+    if( !SAVE::SAV ) SAVE::SAV = std::unique_ptr<SAVE::saveGame>( new SAVE::saveGame( ) );
     SAVE::startScreen( ).run( );
     IO::clearScreenConsole( false, true );
     IO::clearScreen( false, true );
@@ -165,8 +158,7 @@ int main( int, char** p_argv ) {
         scanKeys( );
         FRAME_COUNT++;
 
-        if( ANIMATE_MAP && MAP::curMap )
-            MAP::curMap->animateMap( FRAME_COUNT );
+        if( ANIMATE_MAP && MAP::curMap ) MAP::curMap->animateMap( FRAME_COUNT );
 
         if( INIT_NITROFS ) {
             nitroFSInit( ARGV );
@@ -182,12 +174,12 @@ int main( int, char** p_argv ) {
         u8 oldC2 = IO::boldFont->getColor( 2 );
         IO::boldFont->setColor( 0, 1 );
         IO::boldFont->setColor( BLACK_IDX, 2 );
-        pal[ BLACK_IDX ] = BLACK;
-        time_t unixTime = time( NULL );
-        struct tm* timeStruct = gmtime( (const time_t *) &unixTime );
+        pal[ BLACK_IDX ]      = BLACK;
+        time_t     unixTime   = time( NULL );
+        struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
 
         if( acseconds != timeStruct->tm_sec || DRAW_TIME ) {
-            DRAW_TIME = false;
+            DRAW_TIME        = false;
             pal[ WHITE_IDX ] = WHITE;
             IO::boldFont->setColor( WHITE_IDX, 1 );
             IO::boldFont->setColor( WHITE_IDX, 2 );
@@ -206,7 +198,7 @@ int main( int, char** p_argv ) {
             SAVE::SAV->getActiveFile( ).m_pt.m_secs %= 60;
             SAVE::SAV->getActiveFile( ).m_pt.m_mins %= 60;
 
-            achours = timeStruct->tm_hour;
+            achours   = timeStruct->tm_hour;
             acminutes = timeStruct->tm_min;
             acseconds = timeStruct->tm_sec;
 
@@ -215,11 +207,11 @@ int main( int, char** p_argv ) {
             sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
             IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
         }
-        achours = timeStruct->tm_hour;
+        achours   = timeStruct->tm_hour;
         acminutes = timeStruct->tm_min;
-        acday = timeStruct->tm_mday;
-        acmonth = timeStruct->tm_mon + 1;
-        acyear = timeStruct->tm_year + 1900;
+        acday     = timeStruct->tm_mday;
+        acmonth   = timeStruct->tm_mon + 1;
+        acyear    = timeStruct->tm_year + 1900;
 
         IO::boldFont->setColor( oldC1, 1 );
         IO::boldFont->setColor( oldC2, 2 );
@@ -230,24 +222,23 @@ int main( int, char** p_argv ) {
     MAP::curMap = new MAP::mapDrawer( );
     MAP::curMap->draw( );
 
-
     ANIMATE_MAP = true;
 
     touchPosition touch;
-    bool stopped = true;
-    u8 bmp = false;
+    bool          stopped = true;
+    u8            bmp     = false;
     loop( ) {
         swiWaitForVBlank( );
         touchRead( &touch );
         pressed = keysUp( );
-        last = held;
-        held = keysHeld( );
+        last    = held;
+        held    = keysHeld( );
 
 #ifdef DEBUG
         if( held & KEY_L && gMod == DEVELOPER ) {
-            time_t unixTime = time( NULL );
-            struct tm* timeStruct = gmtime( (const time_t *) &unixTime );
-            char buffer[ 100 ];
+            time_t     unixTime   = time( NULL );
+            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
+            char       buffer[ 100 ];
             snprintf( buffer, 99, "Currently at %hhu-(%hu,%hu,%hhu).\nMap: %i:%i,"
                                   "(%02X,%02X)\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
                       SAVE::SAV->getActiveFile( ).m_currentMap,
@@ -266,11 +257,9 @@ int main( int, char** p_argv ) {
 
         if( held & KEY_A ) {
             for( u8 i = 0; i < 6; ++i ) {
-                if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                    break;
+                if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
                 auto a = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
-                if( a.m_boxdata.m_individualValues.m_isEgg )
-                    continue;
+                if( a.m_boxdata.m_individualValues.m_isEgg ) continue;
                 for( u8 j = 0; j < 4; ++j ) {
                     if( !AttackList[ a.m_boxdata.m_moves[ j ] ]->m_isFieldAttack
                         || !AttackList[ a.m_boxdata.m_moves[ j ] ]->possible( ) )
@@ -284,7 +273,7 @@ int main( int, char** p_argv ) {
                         IO::NAV->draw( );
                         swiWaitForVBlank( );
                         snprintf( buffer, 49, GET_STRING( 99 ), a.m_boxdata.m_name,
-                                AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                                  AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
                         IO::messageBox( buffer, 0, false );
                         MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale,
                                               a.m_boxdata.isShiny( ) );
@@ -297,7 +286,7 @@ int main( int, char** p_argv ) {
                     goto OUT;
                 }
             }
-OUT:
+        OUT:
             scanKeys( );
             continue;
         }
@@ -308,7 +297,7 @@ OUT:
 
             stopped = false;
             if( MAP::curMap->canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, curDir,
-                        SAVE::SAV->getActiveFile( ).m_player.m_movement ) ) {
+                                      SAVE::SAV->getActiveFile( ).m_player.m_movement ) ) {
                 MAP::curMap->movePlayer( curDir, ( held & KEY_B ) );
                 bmp = false;
             } else if( !bmp ) {
@@ -328,11 +317,11 @@ OUT:
         if( !stopped ) {
             MAP::curMap->stopPlayer( );
             stopped = true;
-            bmp = false;
+            bmp     = false;
         }
 
         IO::NAV->handleInput( touch, p_argv[ 0 ] );
-        //End
+        // End
         scanKeys( );
     }
     delete MAP::curMap;
