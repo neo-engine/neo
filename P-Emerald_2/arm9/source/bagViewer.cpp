@@ -48,8 +48,10 @@ namespace BAG {
 
     void bagViewer::initUI( ) {
         _bagUI->init( );
-        _ranges = _bagUI->drawBagPage( ( bag::bagType )SAVE::SAV->getActiveFile( ).m_lstBag, SAVE::SAV->getActiveFile( ).m_lstBagItem );
-        if( SAVE::SAV->getActiveFile( ).m_bag.size( ( bag::bagType )SAVE::SAV->getActiveFile( ).m_lstBag ) )
+        _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
+                                       SAVE::SAV->getActiveFile( ).m_lstBagItem );
+        if( SAVE::SAV->getActiveFile( ).m_bag.size(
+                (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag ) )
             _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM );
     }
 

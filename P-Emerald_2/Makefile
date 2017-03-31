@@ -39,7 +39,6 @@ endif
 #---------------------------------------------------------------------------------
 $(TARGET).nds	:	arm7/$(TARGET).elf arm9/$(TARGET).elf
 	$(NDSTOOL) -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES)
-#- g PE2P PW "POKEMON E2"
 
 #---------------------------------------------------------------------------------
 arm7/$(TARGET).elf:
