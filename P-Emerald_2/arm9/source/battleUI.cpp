@@ -894,8 +894,10 @@ namespace BATTLE {
         IO::updateOAM( true );
     }
 
-    void drawPkmnConfirmation( pokemon p_pokemon, bool p_alreadySent, bool p_alreadyChosen, u8 p_x, u8 p_y, bool p_pressed, bool p_selected ) {
-        IO::printChoiceBox( p_x - 8, p_y, p_x + 136, p_y + 64, 6, p_selected ? COLOR_IDX : GRAY_IDX, p_pressed );
+    void drawPkmnConfirmation( pokemon p_pokemon, bool p_alreadySent, bool p_alreadyChosen, u8 p_x,
+                               u8 p_y, bool p_pressed, bool p_selected ) {
+        IO::printChoiceBox( p_x - 8, p_y, p_x + 136, p_y + 64, 6, p_selected ? COLOR_IDX : GRAY_IDX,
+                            p_pressed );
         bool dead = !p_pokemon.m_stats.m_acHP;
         u8   dx = p_pressed * 2, dy = p_pressed;
 
@@ -912,11 +914,18 @@ namespace BATTLE {
             else
                 IO::regularFont->printString( GET_STRING( 152 ), p_x + dx + 64, dy + 52, true,
                                               IO::font::CENTER );
-            
-            u8 gn = ( !p_pokemon.gender( ) || p_pokemon.m_boxdata.m_speciesId == 29 || p_pokemon.m_boxdata.m_speciesId == 32 ) ? 0 : 4;
-            IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_x + dx + 58 + gn, dy + 66, true, IO::font::CENTER );
+
+            u8 gn = ( !p_pokemon.gender( ) || p_pokemon.m_boxdata.m_speciesId == 29
+                      || p_pokemon.m_boxdata.m_speciesId == 32 )
+                        ? 0
+                        : 4;
+            IO::regularFont->printString( p_pokemon.m_boxdata.m_name, p_x + dx + 58 + gn, dy + 66,
+                                          true, IO::font::CENTER );
             if( gn )
-                drawGender( p_x + dx + 62 + IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2 + gn, dy + 66, p_pokemon.gender( ), true );
+                drawGender( p_x + dx + 62
+                                + IO::regularFont->stringWidth( p_pokemon.m_boxdata.m_name ) / 2
+                                + gn,
+                            dy + 66, p_pokemon.gender( ), true );
 
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
@@ -946,17 +955,18 @@ namespace BATTLE {
     void drawConfirmationChoice( pokemon& p_pokemon, bool p_alreadySent, bool p_alreadyChosen,
                                  u8 p_x, u8 p_y, u8 p_choice, bool p_isSelected ) {
         switch( p_choice ) {
-            case 0:
-                drawPkmnConfirmation( p_pokemon, p_alreadySent, p_alreadyChosen, p_x, p_y, false, p_isSelected );
-                break;
-            case 1:
-                IO::printChoiceBox( 36, 132, 124, 156, 6, p_isSelected ? COLOR_IDX : GRAY_IDX, false );
-                IO::regularFont->printString( GET_STRING( 155 ), 56, 137, true );
-                break;
-            case 2:
-                IO::printChoiceBox( 132, 132, 216, 156, 6, p_isSelected ? COLOR_IDX : GRAY_IDX, false );
-                IO::regularFont->printString( GET_STRING( 156 ), 138, 137, true );
-                break;
+        case 0:
+            drawPkmnConfirmation( p_pokemon, p_alreadySent, p_alreadyChosen, p_x, p_y, false,
+                                  p_isSelected );
+            break;
+        case 1:
+            IO::printChoiceBox( 36, 132, 124, 156, 6, p_isSelected ? COLOR_IDX : GRAY_IDX, false );
+            IO::regularFont->printString( GET_STRING( 155 ), 56, 137, true );
+            break;
+        case 2:
+            IO::printChoiceBox( 132, 132, 216, 156, 6, p_isSelected ? COLOR_IDX : GRAY_IDX, false );
+            IO::regularFont->printString( GET_STRING( 156 ), 138, 137, true );
+            break;
         }
     }
 
@@ -1025,42 +1035,47 @@ namespace BATTLE {
             touchRead( &touch );
             int pressed = keysCurrent( );
 
-            //Accept touches that are almost on the sprite
-            if( GET_AND_WAIT_R( 224, 164, 300, 300 ) || GET_AND_WAIT( KEY_B ) )  //Back
+            // Accept touches that are almost on the sprite
+            if( GET_AND_WAIT_R( 224, 164, 300, 300 ) || GET_AND_WAIT( KEY_B ) ) // Back
                 return 3;
             if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
                 if( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT( KEY_RIGHT ) ) {
-                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, selIdx, false );
+                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, selIdx,
+                                            false );
                     selIdx = ( selIdx + 1 ) % 3;
-                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, selIdx, true );
+                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, selIdx,
+                                            true );
                 } else if( GET_AND_WAIT( KEY_UP ) || GET_AND_WAIT( KEY_LEFT ) ) {
-                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, selIdx, false );
+                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, selIdx,
+                                            false );
                     selIdx = ( selIdx + 2 ) % 3;
-                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, selIdx, true );
+                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, selIdx,
+                                            true );
                 }
 
                 if( !p_alreadySent && !p_alreadyChosen && !dead
-                    && IN_RANGE_R( x, y, x + 128, y + 64 ) ) { //Send
-                    drawPkmnConfirmation( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, true, selIdx == 0 );
+                    && IN_RANGE_R( x, y, x + 128, y + 64 ) ) { // Send
+                    drawPkmnConfirmation( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, true,
+                                          selIdx == 0 );
                     loop( ) {
                         swiWaitForVBlank( );
                         scanKeys( );
                         touchRead( &touch );
-                        if( TOUCH_UP )
-                            return 0;
-                        if( !IN_RANGE_R( x, y, x + 128, y + 64 ) )
-                            break;
+                        if( TOUCH_UP ) return 0;
+                        if( !IN_RANGE_R( x, y, x + 128, y + 64 ) ) break;
                     }
-                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, 0, selIdx == 0 );
+                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, 0,
+                                            selIdx == 0 );
                 }
-                if( !p_alreadySent && !p_alreadyChosen && !dead &&
-                    selIdx == 0 && GET_AND_WAIT( KEY_A ) ) {
+                if( !p_alreadySent && !p_alreadyChosen && !dead && selIdx == 0
+                    && GET_AND_WAIT( KEY_A ) ) {
                     return 0;
                 } else if( GET_AND_WAIT( KEY_A ) )
                     return selIdx;
 
-                if( IN_RANGE_R( 20, 132, 124, 156 ) ) { //Info
-                    IO::printChoiceBox( 36, 132, 124, 156, 6, ( selIdx == 1 ) ? RED_IDX : GRAY_IDX, true );
+                if( IN_RANGE_R( 20, 132, 124, 156 ) ) { // Info
+                    IO::printChoiceBox( 36, 132, 124, 156, 6, ( selIdx == 1 ) ? RED_IDX : GRAY_IDX,
+                                        true );
                     IO::regularFont->printString( GET_STRING( 155 ), 58, 138, true );
                     IO::Oam->oamBuffer[ SUB_Back_OAM + 2 ].x += 2;
                     IO::Oam->oamBuffer[ SUB_Back_OAM + 2 ].y += 1;
@@ -1069,18 +1084,18 @@ namespace BATTLE {
                         swiWaitForVBlank( );
                         scanKeys( );
                         touchRead( &touch );
-                        if( TOUCH_UP )
-                            return 1;
-                        if( !IN_RANGE_R( 20, 132, 124, 156 ) )
-                            break;
+                        if( TOUCH_UP ) return 1;
+                        if( !IN_RANGE_R( 20, 132, 124, 156 ) ) break;
                     }
-                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, 1, selIdx == 1 );
+                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, 1,
+                                            selIdx == 1 );
                     IO::Oam->oamBuffer[ SUB_Back_OAM + 2 ].x -= 2;
                     IO::Oam->oamBuffer[ SUB_Back_OAM + 2 ].y -= 1;
                     IO::updateOAM( true );
                 }
-                if( IN_RANGE_R( 132, 132, 232, 156 ) ) { //Moves
-                    IO::printChoiceBox( 132, 132, 216, 156, 6, ( selIdx == 2 ) ? RED_IDX : GRAY_IDX, true );
+                if( IN_RANGE_R( 132, 132, 232, 156 ) ) { // Moves
+                    IO::printChoiceBox( 132, 132, 216, 156, 6, ( selIdx == 2 ) ? RED_IDX : GRAY_IDX,
+                                        true );
                     IO::regularFont->printString( GET_STRING( 156 ), 140, 138, true );
                     IO::Oam->oamBuffer[ SUB_Back_OAM + 3 ].x += 2;
                     IO::Oam->oamBuffer[ SUB_Back_OAM + 3 ].y += 1;
@@ -1089,12 +1104,11 @@ namespace BATTLE {
                         swiWaitForVBlank( );
                         scanKeys( );
                         touchRead( &touch );
-                        if( TOUCH_UP )
-                            return 2;
-                        if( !IN_RANGE_R( 132, 132, 232, 156 ) )
-                            break;
+                        if( TOUCH_UP ) return 2;
+                        if( !IN_RANGE_R( 132, 132, 232, 156 ) ) break;
                     }
-                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, 2, selIdx == 2 );
+                    drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, 2,
+                                            selIdx == 2 );
                     IO::Oam->oamBuffer[ SUB_Back_OAM + 3 ].x -= 2;
                     IO::Oam->oamBuffer[ SUB_Back_OAM + 3 ].y -= 1;
                     IO::updateOAM( true );
@@ -1322,20 +1336,27 @@ namespace BATTLE {
                 IO::printRectangle( (u8) 158, (u8) 18, u8( 158 + 68 ), u8( 18 + 12 ), true, false,
                                     WHITE_IDX );
 
-                IO::printRectangle( (u8) 158, (u8) 18, u8( 158 + ( 68.0*p_pokemon.m_boxdata.IVget( 0 ) / 31 ) ), u8( 18 + 6 ), true, false, COLOR_IDX );
-                IO::printRectangle( (u8) 158, u8( 18 + 6 ), u8( 158 + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ 0 ] / 252 ) ), u8( 18 + 12 ), true, false, COLOR_IDX );
+                IO::printRectangle( (u8) 158, (u8) 18,
+                                    u8( 158 + ( 68.0 * p_pokemon.m_boxdata.IVget( 0 ) / 31 ) ),
+                                    u8( 18 + 6 ), true, false, COLOR_IDX );
+                IO::printRectangle(
+                    (u8) 158, u8( 18 + 6 ),
+                    u8( 158 + ( 68.0 * p_pokemon.m_boxdata.m_effortValues[ 0 ] / 252 ) ),
+                    u8( 18 + 12 ), true, false, COLOR_IDX );
 
                 for( int i = 1; i < 6; ++i ) {
                     IO::printRectangle( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
-                                        u8( 156 - 2 * i + 68 ), u8( 26 + 12 + ( 17 * i ) ),
-                                        true, false, WHITE_IDX );
-                    IO::printRectangle( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
-                                        u8( 156 - 2 * i + ( 68.0*p_pokemon.m_boxdata.IVget( i ) / 31 ) ),
-                                        u8( 26 + 6 + ( 17 * i ) ),
-                                        true, false, COLOR_IDX );
-                    IO::printRectangle( u8( 156 - 2 * i ), u8( 26 + 6 + ( 17 * i ) ),
-                                        u8( 156 - 2 * i + ( 68.0*p_pokemon.m_boxdata.m_effortValues[ i ] / 252 ) ),
-                                        u8( 26 + 12 + ( 17 * i ) ), true, false, COLOR_IDX );
+                                        u8( 156 - 2 * i + 68 ), u8( 26 + 12 + ( 17 * i ) ), true,
+                                        false, WHITE_IDX );
+                    IO::printRectangle(
+                        u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
+                        u8( 156 - 2 * i + ( 68.0 * p_pokemon.m_boxdata.IVget( i ) / 31 ) ),
+                        u8( 26 + 6 + ( 17 * i ) ), true, false, COLOR_IDX );
+                    IO::printRectangle(
+                        u8( 156 - 2 * i ), u8( 26 + 6 + ( 17 * i ) ),
+                        u8( 156 - 2 * i
+                            + ( 68.0 * p_pokemon.m_boxdata.m_effortValues[ i ] / 252 ) ),
+                        u8( 26 + 12 + ( 17 * i ) ), true, false, COLOR_IDX );
                 }
 
                 // Ability
@@ -1386,8 +1407,8 @@ namespace BATTLE {
             touchRead( &touch );
             u32 pressed = keysHeld( );
 
-            //Accept touches that are almost on the sprite
-            if( GET_AND_WAIT_R( 224, 164, 300, 300 ) || GET_AND_WAIT( KEY_B ) )  //Back
+            // Accept touches that are almost on the sprite
+            if( GET_AND_WAIT_R( 224, 164, 300, 300 ) || GET_AND_WAIT( KEY_B ) ) // Back
                 return 0;
             else if( GET_AND_WAIT( KEY_UP ) )
                 return 2;
