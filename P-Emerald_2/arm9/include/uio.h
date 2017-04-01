@@ -57,7 +57,8 @@ namespace IO {
     extern int bg3;
     extern int bg2sub;
     extern int bg3sub;
-    extern PrintConsole Bottom, Top;
+    extern PrintConsole Bottom;
+    extern PrintConsole Top;
 
     void initVideo( );
     void initVideoSub( );
@@ -92,8 +93,8 @@ namespace IO {
     bool waitForTouchUp( u16 p_targetX1 = 0, u16 p_targetY1 = 0, u16 p_targetX2 = 300, u16 p_targetY2 = 300 );
     bool waitForTouchUp( inputTarget p_inputTarget );
 
-    void waitForKeysUp( KEYPAD_BITS p_keys );
-    void waitForKeysUp( inputTarget p_inputTarget );
+    bool waitForKeysUp( KEYPAD_BITS p_keys );
+    bool waitForKeysUp( inputTarget p_inputTarget );
 
     bool waitForInput( inputTarget p_inputTarget );
 
