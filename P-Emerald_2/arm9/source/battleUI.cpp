@@ -2444,75 +2444,9 @@ namespace BATTLE {
         for( u8 i = 0; i < 4; ++i )
             if( acPkmn.m_boxdata.m_moves[ i ] == p_move ) return;
 
-        char buffer[ 100 ];
-        if( acPkmn.m_boxdata.m_moves[ 3 ] ) {
-            snprintf(
-                buffer, 99,
-                "%s kann nun\n%s erlernen![A][CLEAR]Aber %s kennt\nbereits 4 Attacken.[A]", // TODO
-                acPkmn.m_boxdata.m_name, AttackList[ p_move ]->m_moveName.c_str( ),
-                acPkmn.m_boxdata.m_name );
-            _battle->log( buffer );
-            IO::yesNoBox yn;
-        ST:
-            if( yn.getResult( "Soll eine Attacke\nvergessen werden?" ) ) {
-                initLogScreen( );
-                auto res = chooseAttack( p_pokemonPos );
-                for( u8 u = 0; u < 50; ++u ) IO::Oam->oamBuffer[ u ].isHidden = true;
-                IO::updateOAM( true );
+        acPkmn.learnMove( p_move );
 
-                if( !res ) {
-                    snprintf( buffer, 99, "Aufgeben %s zu erlernen?",
-                              AttackList[ p_move ]->m_moveName.c_str( ) );
-                    if( !yn.getResult( buffer ) ) {
-                        for( u8 u = 0; u < 50; ++u ) IO::Oam->oamBuffer[ u ].isHidden = true;
-                        IO::updateOAM( true );
-                        initLogScreen( );
-                        goto ST;
-                    }
-                } else {
-                    initLogScreen( );
-                    loadA( );
-                    snprintf( buffer, 99, "%s vergisst %s[A]\nund erlernt %s![A]",
-                              acPkmn.m_boxdata.m_name, AttackList[ res ]->m_moveName.c_str( ),
-                              AttackList[ p_move ]->m_moveName.c_str( ) );
-                    _battle->log( buffer );
-
-                    for( u8 i = 0; i < 4; ++i )
-                        if( acPkmn.m_boxdata.m_moves[ i ] == res ) {
-                            acPkmn.m_boxdata.m_moves[ i ] = p_move;
-                            acPkmn.m_boxdata.m_acPP[ i ]  = std::min(
-                                acPkmn.m_boxdata.m_acPP[ i ], AttackList[ p_move ]->m_movePP );
-                        }
-                }
-            } else {
-                initLogScreen( );
-                loadA( );
-                for( u8 u = 0; u < 50; ++u ) IO::Oam->oamBuffer[ u ].isHidden = true;
-                IO::updateOAM( true );
-
-                snprintf( buffer, 99, "Aufgeben %s zu erlernen?",
-                          AttackList[ p_move ]->m_moveName.c_str( ) );
-                if( !yn.getResult( buffer ) ) {
-                    initLogScreen( );
-                    for( u8 u = 0; u < 50; ++u ) IO::Oam->oamBuffer[ u ].isHidden = true;
-                    IO::updateOAM( true );
-                    goto ST;
-                }
-            }
-        } else {
-            for( u8 i = 0; i < 4; ++i ) {
-                if( !acPkmn.m_boxdata.m_moves[ i ] ) {
-                    acPkmn.m_boxdata.m_moves[ i ] = p_move;
-                    acPkmn.m_boxdata.m_acPP[ i ]
-                        = std::min( acPkmn.m_boxdata.m_acPP[ i ], AttackList[ p_move ]->m_movePP );
-                    snprintf( buffer, 99, "%s erlernt %s![A]", acPkmn.m_boxdata.m_name,
-                              AttackList[ p_move ]->m_moveName.c_str( ) );
-                    _battle->log( buffer );
-                    break;
-                }
-            }
-        }
-
+        IO::NAV->draw( false );
         initLogScreen( );
         loadA( );
     }

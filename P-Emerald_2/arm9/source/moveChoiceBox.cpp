@@ -41,7 +41,12 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 namespace IO {
 
     const u8 CHOICE_POS[ 2 ][ 5 ][ 4 ]
-        = {{{24, 40, 124, 96}, {132, 40, 232, 96}, {24, 104, 124, 162}, {132, 104, 232, 162}}};
+        = {{{24, 40, 124, 96}, {132, 40, 232, 96}, {24, 104, 124, 162}, {132, 104, 232, 162}},
+           {{24, 36, 124, 76},
+            {132, 36, 232, 76},
+            {24, 80, 124, 120},
+            {132, 80, 232, 120},
+            {78, 124, 178, 164}}};
 #define NEW_PAGE 9
     void moveChoiceBox::draw( u8 p_pressedIdx ) {
         if( p_pressedIdx == NEW_PAGE ) {
