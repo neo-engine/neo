@@ -168,8 +168,9 @@ namespace IO {
                 }
 
                 loop( ) {
-                    scanKeys( );
                     swiWaitForVBlank( );
+                    scanKeys( );
+                    int pressed = keysDown( );
                     if( ++c == 45 ) {
                         c = 0;
                         if( on )
@@ -178,8 +179,7 @@ namespace IO {
                             drawContinue( *this, 243, 51 );
                         on = !on;
                     }
-                    if( keysUp( ) & KEY_A )
-                        break;
+                    if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_B ) ) break;
                     touchPosition t;
                     touchRead( &t );
                     if( t.px > 224 && t.py > 164
@@ -229,8 +229,9 @@ namespace IO {
                 }
 
                 loop( ) {
-                    scanKeys( );
                     swiWaitForVBlank( );
+                    scanKeys( );
+                    int pressed = keysDown( );
                     if( ++c == 45 ) {
                         c = 0;
                         if( on )
@@ -239,8 +240,7 @@ namespace IO {
                             drawContinue( *this, 243, 51 );
                         on = !on;
                     }
-                    if( keysUp( ) & KEY_A )
-                        break;
+                    if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_B ) ) break;
                     touchPosition t;
                     touchRead( &t );
                     if( t.px > 224 && t.py > 164

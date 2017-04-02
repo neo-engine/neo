@@ -58,6 +58,8 @@ namespace IO {
     int bg3;
     int bg2;
 
+#define TRANSPARENCY_COEFF 0x0671
+
     void initVideo( ) {
 
         vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
@@ -71,10 +73,10 @@ namespace IO {
         bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
         bgSetPriority( bg3, 3 );
         bgSetPriority( bg2, 2 );
-        
+
         if( SCREENS_SWAPPED ) {
             REG_BLDCNT = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
-            REG_BLDALPHA = 0x0671;
+            REG_BLDALPHA = TRANSPARENCY_COEFF;
         } else {
             REG_BLDCNT = BLEND_NONE;
         }
@@ -94,7 +96,7 @@ namespace IO {
         );
         if( !SCREENS_SWAPPED ) {
             REG_BLDCNT_SUB = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
-            REG_BLDALPHA_SUB = 0x0671;
+            REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
         } else {
             REG_BLDCNT_SUB = BLEND_NONE;
         }
@@ -115,12 +117,12 @@ namespace IO {
 
         if( !SCREENS_SWAPPED ) {
             REG_BLDCNT_SUB = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
-            REG_BLDALPHA_SUB = 0x0671;
+            REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
             REG_BLDCNT = BLEND_NONE;
         } else {
             REG_BLDCNT_SUB = BLEND_NONE;
             REG_BLDCNT = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
-            REG_BLDALPHA = 0x0671;
+            REG_BLDALPHA = TRANSPARENCY_COEFF;
         }
     }
 
@@ -165,26 +167,24 @@ namespace IO {
         return false;
     }
 
-    void waitForKeysUp( KEYPAD_BITS p_keys ) {
+    bool waitForKeysUp( KEYPAD_BITS p_keys ) {
         return waitForKeysUp( inputTarget( p_keys ) );
     }
-    void waitForKeysUp( inputTarget p_inputTarget ) {
+    bool waitForKeysUp( inputTarget p_inputTarget ) {
         if( p_inputTarget.m_inputType == inputTarget::inputType::BUTTON ) {
             loop( ) {
                 scanKeys( );
-                keysCurrent( );
                 swiWaitForVBlank( );
-                if( keysUp( ) & p_inputTarget.m_keys )
-                    return;
+                if( keysUp( ) & p_inputTarget.m_keys ) return true;
+                if( !( keysHeld( ) & p_inputTarget.m_keys ) ) return true;
             }
         }
+        return false;
     }
 
     bool waitForInput( inputTarget p_inputTarget ) {
-        if( p_inputTarget.m_inputType == inputTarget::inputType::BUTTON ) {
-            waitForKeysUp( p_inputTarget );
-            return true;
-        }
+        if( p_inputTarget.m_inputType == inputTarget::inputType::BUTTON )
+            return waitForKeysUp( p_inputTarget );
         return waitForTouchUp( p_inputTarget );
     }
 
@@ -197,10 +197,10 @@ namespace IO {
         boldFont->setColor( WHITE_IDX, 2 );
 
         BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-        BG_PALETTE_SUB[ GRAY_IDX ] = GRAY;
+        BG_PALETTE_SUB[ GRAY_IDX ]  = GRAY;
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
-        BG_PALETTE_SUB[ RED_IDX ] = RED;
-        BG_PALETTE_SUB[ BLUE_IDX ] = BLUE;
+        BG_PALETTE_SUB[ RED_IDX ]   = RED;
+        BG_PALETTE_SUB[ BLUE_IDX ]  = BLUE;
         printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
     }
 

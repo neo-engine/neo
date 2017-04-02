@@ -29,297 +29,301 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "saveGame.h"
 
 const char* const SAVE::CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ] = {
-    { "Prologue", "Prolog" },
-    { "I Choose You!", "Ich Wähle Dich!" },
-    { "Chapter 1", "Kapitel 1" },
-    { "(tba)", "(tba)" },
-    { "Chapter 2", "Kapitel 2" },
-    { "(tba)", "(tba)" },
-    { "Chapter 3", "Kapitel 3" },
-    { "(tba)", "(tba)" },
-    { "Chapter 4", "Kapitel 4" },
-    { "(tba)", "(tba)" },
+    {"Prologue", "Prolog"},     {"I Choose You!", "Ich Wähle Dich!"},
+    {"Chapter 1", "Kapitel 1"}, {"(tba)", "(tba)"},
+    {"Chapter 2", "Kapitel 2"}, {"(tba)", "(tba)"},
+    {"Chapter 3", "Kapitel 3"}, {"(tba)", "(tba)"},
+    {"Chapter 4", "Kapitel 4"}, {"(tba)", "(tba)"},
 
-    { "Chapter 5", "Kapitel 5" },
-    { "(tba)", "(tba)" },
-    { "Chapter 6", "Kapitel 6" },
-    { "(tba)", "(tba)" },
-    { "Chapter 7", "Kapitel 7" },
-    { "(tba)", "(tba)" },
-    { "Chapter 8", "Kapitel 8" },
-    { "(tba)", "(tba)" },
-    { "Chapter 9", "Kapitel 9" },
-    { "(tba)", "(tba)" },
+    {"Chapter 5", "Kapitel 5"}, {"(tba)", "(tba)"},
+    {"Chapter 6", "Kapitel 6"}, {"(tba)", "(tba)"},
+    {"Chapter 7", "Kapitel 7"}, {"(tba)", "(tba)"},
+    {"Chapter 8", "Kapitel 8"}, {"(tba)", "(tba)"},
+    {"Chapter 9", "Kapitel 9"}, {"(tba)", "(tba)"},
 
-    { "Final", "Letztes" },
-    { "Pokémon", "Pokémon" },
-    { "Epilogue", "Epilog" },
-    { "Life Goes On", "Das Leben Geht Weiter" },
+    {"Final", "Letztes"},       {"Pokémon", "Pokémon"},
+    {"Epilogue", "Epilog"},     {"Life Goes On", "Das Leben Geht Weiter"},
 };
 
-const char* SAVE::EPISODE_NAMES[ LANGUAGES ][ MAX_SPECIAL_EPISODES ] = {
-    {
-        "Dev's Heaven"
-    }, {
-        "Dev's Heaven"
-    }
-};
+const char* SAVE::EPISODE_NAMES[ LANGUAGES ][ MAX_SPECIAL_EPISODES ]
+    = {{"Dev's Heaven"}, {"Dev's Heaven"}};
 
-const char * LANGUAGE_NAMES[ LANGUAGES ] = {
-    "English",
-    "Deutsch"
-};
+const char* LANGUAGE_NAMES[ LANGUAGES ] = {"English", "Deutsch"};
 
-const char * const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
-    { "No data.", "Keine Daten." },
-    { "Faraway Place", "Entfernter Ort" },
-    { "Unknown", "Unbekannt" },
-    { "%s\nUse %s?", "%s\nMöchtest du %s nutzen?" },
-    { "The repel wore off.","Der Schutz ist aufgebraucht." },
+const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
+    {"No data.", "Keine Daten."},
+    {"Faraway Place", "Entfernter Ort"},
+    {"Unknown", "Unbekannt"},
+    {"%s\nUse %s?", "%s\nMöchtest du %s nutzen?"},
+    {"The repel wore off.", "Der Schutz ist aufgebraucht."},
 
-    { "Just an old Poké Ball…", "Doch nur ein alter Pokéball…" },
-    { "You fished a Pokémon!", "Du hast ein Pokémon geangelt!" },
-    { "Map border.\nReturn, or you\nwill get lost!", "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!" },
-    { "\nSomething's on the hook!", "\nDa ist etwas am Haken!" },
-    { "It disappeared…", "Es ist entkommen…" },
+    {"Just an old Poké Ball…", "Doch nur ein alter Pokéball…"},
+    {"You fished a Pokémon!", "Du hast ein Pokémon geangelt!"},
+    {"Map border.\nReturn, or you\nwill get lost!",
+     "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!"},
+    {"\nSomething's on the hook!", "\nDa ist etwas am Haken!"},
+    {"It disappeared…", "Es ist entkommen…"},
 
     // 10
 
-    { "%s%s used %s![A]", "%s%s setzt\n%s ein![A]" },
-    { "Items", "Items" },
-    { "Medicine", "Medizin" },
-    { "TM/HM", "TM/VM" },
-    { "Berries", "Beeren" },
+    {"%s%s used %s![A]", "%s%s setzt\n%s ein![A]"},
+    {"Items", "Items"},
+    {"Medicine", "Medizin"},
+    {"TM/HM", "TM/VM"},
+    {"Berries", "Beeren"},
 
-    { "Key Items", "Basis-Items" },
-    { "Firmness: %s", "Güte: %s" },
-    { "Hard", "Hart" },
-    { "Soft", "Weich" },
-    { "Super hard", "Steinhart" },
+    {"Key Items", "Basis-Items"},
+    {"Firmness: %s", "Güte: %s"},
+    {"Hard", "Hart"},
+    {"Soft", "Weich"},
+    {"Super hard", "Steinhart"},
 
     // 20
 
-    { "Super soft", "Sehr weich" },
-    { "Very hard", "Sehr hart" },
-    { "Normal", "Normal" },
-    { "Size:%4.1fcm", "Größe:%4.1fcm" },
-    { "Spicy", "Scharf" },
+    {"Super soft", "Sehr weich"},
+    {"Very hard", "Sehr hart"},
+    {"Normal", "Normal"},
+    {"Size:%4.1fcm", "Größe:%4.1fcm"},
+    {"Spicy", "Scharf"},
 
-    { "Dry", "Trocken"},
-    { "Sweet", "Süß" },
-    { "Bitter", "Bitter" },
-    { "Sour", "Sauer" },
-    { "Type", "Typ" },
+    {"Dry", "Trocken"},
+    {"Sweet", "Süß"},
+    {"Bitter", "Bitter"},
+    {"Sour", "Sauer"},
+    {"Type", "Typ"},
 
     // 30
 
-    { "Categ.", "Kateg." },
-    { "PP", "AP" },
-    { "Strength", "Stärke" },
-    { "Accuracy", "Genauigkeit" },
-    { "Egg", "Ei" },
+    {"Categ.", "Kateg."},
+    {"PP", "AP"},
+    {"Strength", "Stärke"},
+    {"Accuracy", "Genauigkeit"},
+    {"Egg", "Ei"},
 
-    { "Already\nlearned", "Bereits\nerlernt" },
-    { "Possible", "Erlernbar" },
-    { "Not\npossible", "Nicht\nerlernbar" },
-    { "Level %3d\n%3d/%3d HP", "Level %3d\n%3d/%3d KP" },
-    { "Level %3d\n Fainted", "Level %3d\n Besiegt" },
+    {"Already\nlearned", "Bereits\nerlernt"},
+    {"Possible", "Erlernbar"},
+    {"Not\npossible", "Nicht\nerlernbar"},
+    {"Level %3d\n%3d/%3d HP", "Level %3d\n%3d/%3d KP"},
+    {"Level %3d\n Fainted", "Level %3d\n Besiegt"},
 
     // 40
 
-    { "Possible", "Möglich" },
-    { "Not\npossible", "Nicht\nmöglich" },
-    { "No item", "Kein Item" },
-    { "No items", "Keine Items" },
-    { "Give", "Geben" },
+    {"Possible", "Möglich"},
+    {"Not\npossible", "Nicht\nmöglich"},
+    {"No item", "Kein Item"},
+    {"No items", "Keine Items"},
+    {"Give", "Geben"},
 
-    { "Apply", "Anwenden" },
-    { "Register", "Registrieren" },
-    { "Use", "Einsetzen" },
-    { "Trash", "Wegwerfen" },
-    { "Which move?", "Welche Attacke?" },
+    {"Apply", "Anwenden"},
+    {"Register", "Registrieren"},
+    {"Use", "Einsetzen"},
+    {"Trash", "Wegwerfen"},
+    {"Select a move!", "Welche Attacke?"},
 
     // 50
 
-    { "Used %s on %s.", "%s auf %s angewendet." },
-    { "%s is evolving…", "%s entwickelt sich…" },
-    { "…and became a(n)\n%s!", "…und wurde zu einem\n%s!" },
-    { "It would be\nwasted…", "Es würde keine\nWirkung haben…" },
-    { "%s holds\n%s already.\nSwap the items?", "%s trägt bereits\ndas Item %s.\nSollen die Items getauscht werden?" }, //TODO
+    {"Used %s on %s.", "%s auf %s angewendet."},
+    {"%s is evolving…", "%s entwickelt sich…"},
+    {"…and became a(n)\n%s!", "…und wurde zu einem\n%s!"},
+    {"It would be\nwasted…", "Es würde keine\nWirkung haben…"},
+    {"%s holds\n%s already.\nSwap the items?",
+     "%s trägt bereits\ndas Item %s.\nSollen die Items getauscht werden?"}, // TODO
 
-    { "You can't choose\nthis item.", "Dieses Item kann nicht\nausgewählt werden." },
-    { "Choose %s?", "%s auswählen?" },
-    { "What do you want to do\nwith %s?", "Was tun mit %s?" },
-    { "You can't use\nthat right now.", "Das kann jetzt nicht\neingesetzt werden." },
-    { "Pokémon team", "Pokémon-Team" },
+    {"You can't choose\nthis item.", "Dieses Item kann nicht\nausgewählt werden."},
+    {"Choose %s?", "%s auswählen?"},
+    {"What do you want to do\nwith %s?", "Was tun mit %s?"},
+    {"You can't use\nthat right now.", "Das kann jetzt nicht\neingesetzt werden."},
+    {"Pokémon team", "Pokémon-Team"},
 
     // 60
 
-    { "Cache", "Zwischenablage" },
-    { "All boxes", "Alle Boxen" },
-    { "New name for box “%s”", "Name für Box „%s“" },
-    { "Repel activated.", "Schutz eingesetzt." },
-    { "Super Repel activated.", "Superschutz eingesetzt." },
+    {"Cache", "Zwischenablage"},
+    {"All boxes", "Alle Boxen"},
+    {"New name for box “%s”", "Name für Box „%s“"},
+    {"Repel activated.", "Schutz eingesetzt."},
+    {"Super Repel activated.", "Superschutz eingesetzt."},
 
-    { "Max Repel activated.", "Top-Schutz eingesetzt." },
-    { "Exp. All deactivated.", "EP-Teiler ausgeschaltet." },
-    { "Exp. All activated.", "EP-Teiler eingeschaltet." },
-    { "Coins: %lu.", "Münzen: %lu." },
-    { "BP: %lu.", "Kampfpunkte: %lu." },
+    {"Max Repel activated.", "Top-Schutz eingesetzt."},
+    {"Exp. All deactivated.", "EP-Teiler ausgeschaltet."},
+    {"Exp. All activated.", "EP-Teiler eingeschaltet."},
+    {"Coins: %lu.", "Münzen: %lu."},
+    {"BP: %lu.", "Kampfpunkte: %lu."},
 
     // 70
 
-    { "         TOUCH TO START", "     BER\x9A""HRE, UM ZU STARTEN" },
-    { "Continue", "Weiter" },
-    { "New Game", "Neues Spiel" },
-    { "Special Episodes", "Spezialepisoden" },
-    { "Import Save", "Spiel-Import" },
+    {"         TOUCH TO START", "     BER\x9A"
+                                "HRE, UM ZU STARTEN"},
+    {"Continue", "Weiter"},
+    {"New Game", "Neues Spiel"},
+    {"Special Episodes", "Spezialepisoden"},
+    {"Import Save", "Spiel-Import"},
 
-    { "Continue your adventure", "Setze dein Abenteuer fort" },
-    { "Start a new adventure", "Starte ein neues Abenteuer" },
-    { "Learn your companion's stories", "Erfahre mehr über deine Begleiter" },
-    { "Revive myths of old", "Setze alte Abenteuer fort" },
-    { "This slot contains a saved game.\nOverride it?", "Es existiert bereits ein Spielstand.\nSoll dieser überschrieben werden?" },
+    {"Continue your adventure", "Setze dein Abenteuer fort"},
+    {"Start a new adventure", "Starte ein neues Abenteuer"},
+    {"Learn your companion's stories", "Erfahre mehr über deine Begleiter"},
+    {"Revive myths of old", "Setze alte Abenteuer fort"},
+    {"This slot contains a saved game.\nOverride it?",
+     "Es existiert bereits ein Spielstand.\nSoll dieser überschrieben werden?"},
 
     // 80
 
-    { "Yes", "Ja" },
-    { "No", "Nein" },
-    { "(empty)", "(leer)" },
-    { "Transfer", "Transfer" },
-    { "Special", "Spezial" },
+    {"Yes", "Ja"},
+    {"No", "Nein"},
+    {"(empty)", "(leer)"},
+    {"Transfer", "Transfer"},
+    {"Special", "Spezial"},
 
-    { "The language is currently\nset to “English”.\nChange the language setting?", "Die eingestellte Sprache\nist „Deutsch“.\nSprache ändern?" },
-    { "into the %s bag.`","%s-Tasche verstaut.`" },
-    { "Stored %s %s",  "%s %s in der" },
-    { "Stored %s", "%s in der" },
-    { "Stored %3d %s", "%3d %s in der" },
+    {"The language is currently\nset to “English”.\nChange the language setting?",
+     "Die eingestellte Sprache\nist „Deutsch“.\nSprache ändern?"},
+    {"into the %s bag.`", "%s-Tasche verstaut.`"},
+    {"Stored %s %s", "%s %s in der"},
+    {"Stored %s", "%s in der"},
+    {"Stored %3d %s", "%3d %s in der"},
 
     // 90
 
-    { "The scent vanished…", "Der Duft verstrich wirkungslos…" },
-    { "PokéNav", "PokéNav" },
-    { " Would you like to\n save your progress?\n", " Möchtest du deinen\n Fortschritt sichern?\n" },
-    { "Save?\nFrom an emulator?!", "Speichern?\nIn einem Emulator?!" },
-    { "Saved successfully!", "Speichern erfolgreich!" },
+    {"The scent vanished…", "Der Duft verstrich wirkungslos…"},
+    {"PokéNav", "PokéNav"},
+    {" Would you like to\n save your progress?\n", " Möchtest du deinen\n Fortschritt sichern?\n"},
+    {"Save?\nFrom an emulator?!", "Speichern?\nIn einem Emulator?!"},
+    {"Saved successfully!", "Speichern erfolgreich!"},
 
-    { "An error occured.\nProgress not saved.", "Es trat ein Fehler auf\nSpiel nicht gesichert." },
-    { "No %s available.\nRemove the icon?", "Kein Exemplar des Items\n%s vorhanden.\nIcon entfernen?" },
-    { "Recently used items\nwill appear here.", "Hier erscheinen zuletzt\neingesetzte Items." },
-    { "You may register an\nitem to the button Y.", "Du kannst ein Item\nauf Y registrieren." },
-    { "%s used %s!", "%s setzt %s\nein!" },
-
+    {"An error occured.\nProgress not saved.", "Es trat ein Fehler auf\nSpiel nicht gesichert."},
+    {"No %s available.\nRemove the icon?",
+     "Kein Exemplar des Items\n%s vorhanden.\nIcon entfernen?"},
+    {"Recently used items\nwill appear here.", "Hier erscheinen zuletzt\neingesetzte Items."},
+    {"You may register an\nitem to the button Y.", "Du kannst ein Item\nauf Y registrieren."},
+    {"%s used %s!", "%s setzt %s\nein!"},
 
     // 100
 
+    {"You can't use this\nmove right now.", "Diese Attacke kann jetzt\nnicht eingesetzt werden."},
+    {"Stored %s\nfrom %s.", "%s von %s\nim Beutel verstaut."},
+    {"%s already\nknows %s!", "%s beherrscht\n%s bereits!"},
+    {"%s learned\n%s!", "%s erlernt\n%s!"},
+    {"%s already\nknows 4 moves.\nForget a move?",
+     "%s beherrscht\nbereits 4 Attacken.\nSoll eine verlernt werden?"},
 
-    { "You can't use this\nmove right now.","Diese Attacke kann jetzt\nnicht eingesetzt werden." },
-    { "Stored %s\nfrom %s.", "%s von %s\nim Beutel verstaut." },
-    { "%s already\nknows %s!", "%s beherrscht\n%s bereits!" },
-    { "%s learned\n%s!", "%s erlernt\n%s!" },
-    { "%s already\nknows 4 moves.\nForget a move?", "%s beherrscht\nbereits 4 Attacken.\nSoll eine verlernt werden?" },
-
-    { "Which move?", "Welche Attacke?" },
-    { "%s can't\nforget %s!", "%s kann\n%s nicht vergessen!" },
-    { "%s can't\nlearn %s!", "%s kann\n%s nicht erlernen!" },
-    { "%hhu badges", "%hhu Orden" },
-    { "Pick a language", "Wähle eine Sprache" },
+    {"Select a move!", "Welche Attacke?"},
+    {"%s can't\nforget %s!", "%s kann\n%s nicht vergessen!"},
+    {"%s can't\nlearn %s!", "%s kann\n%s nicht erlernen!"},
+    {"%hhu badges", "%hhu Orden"},
+    {"Pick a language", "Wähle eine Sprache"},
 
     // 110
 
-    { "Choose an episode", "Wähle eine Speizalepisode" },
-    { "Welcome to Special Episode 0:\nDeveloper's Heaven.", "Willkommen zur Spezialepisode 0:\nDeveloper's Heaven" },
-    { "In this episode, you will gain\nthe mighty powers of the\ndev himself.", "In dieser Episode erhältst du\ndie Fähigkeiten des Entwicklers." },
-    { "Do whatever you want.", "Mach damit, was immer du möchtest." },
-    { "Do you want to import your\nsave from the GBA game?", "Möchtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?" },
+    {"Choose an episode", "Wähle eine Speizalepisode"},
+    {"Welcome to Special Episode 0:\nDeveloper's Heaven.",
+     "Willkommen zur Spezialepisode 0:\nDeveloper's Heaven"},
+    {"In this episode, you will gain\nthe mighty powers of the\ndev himself.",
+     "In dieser Episode erhältst du\ndie Fähigkeiten des Entwicklers."},
+    {"Do whatever you want.", "Mach damit, was immer du möchtest."},
+    {"Do you want to import your\nsave from the GBA game?",
+     "Möchtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?"},
 
-    { "Importing a save file will\ncopy all Pokémon and items\nfrom the GBA game.", "Beim Importieren werden alle\nPokémon und Items vom\nGBA-Modul kopiert." },
-    { "Further, you will start at\nthe same position as you\nleft off in the GBA game.", "Du wirst das Spiel an der\nselben Stelle wie auf dem\nGBA-Modul fortsetzen." },
-    { "No data will be written to\nthe GBA Game Pak.", "Es werden keine Daten auf\ndas GBA-Modul geschrieben." },
-    { "However, proceed at your\nown risk.", "Trotzdem geschieht das\nImportieren auf eigene\nGefahr." },
-    { "No compatible cartrige found.\nAborting.", "Kein kompatibles GBA-Modul\ngefunden.\nBreche ab." },
+    {"Importing a save file will\ncopy all Pokémon and items\nfrom the GBA game.",
+     "Beim Importieren werden alle\nPokémon und Items vom\nGBA-Modul kopiert."},
+    {"Further, you will start at\nthe same position as you\nleft off in the GBA game.",
+     "Du wirst das Spiel an der\nselben Stelle wie auf dem\nGBA-Modul fortsetzen."},
+    {"No data will be written to\nthe GBA Game Pak.",
+     "Es werden keine Daten auf\ndas GBA-Modul geschrieben."},
+    {"However, proceed at your\nown risk.",
+     "Trotzdem geschieht das\nImportieren auf eigene\nGefahr."},
+    {"No compatible cartrige found.\nAborting.",
+     "Kein kompatibles GBA-Modul\ngefunden.\nBreche ab."},
 
     // 120
 
-    { "Proceed?", "Fortfahren?" },
-    { "Importing data…", "Lade Spielstand…" },
-    { "An error occured.\nAborting.", "Ein Fehler ist aufgetreten.\nKehre zum Hauptmenü zurück." },
-    { "Completed.", "Abgeschlossen." },
-    { "Entries", "Einträge" },
+    {"Proceed?", "Fortfahren?"},
+    {"Importing data…", "Lade Spielstand…"},
+    {"An error occured.\nAborting.", "Ein Fehler ist aufgetreten.\nKehre zum Hauptmenü zurück."},
+    {"Completed.", "Abgeschlossen."},
+    {"Entries", "Einträge"},
 
-    { "All", "Alle" },
-    { "HP", "KP" },
-    { "Attack", "Angriff" },
-    { "Defense", "Vert" },
-    { "Speed", "Initiative" },
+    {"All", "Alle"},
+    {"HP", "KP"},
+    {"Attack", "Angriff"},
+    {"Defense", "Vert"},
+    {"Speed", "Initiative"},
 
     // 130
 
-    { "Sp. Atk", "Sp.-Angr" },
-    { "Sp. Def", "Sp.-Vert" },
-    { "f. %s", "aus %s" },
-    { "female", "weiblich" },
-    { "male", "männlich" },
+    {"Sp. Atk", "Sp.-Angr"},
+    {"Sp. Def", "Sp.-Vert"},
+    {"f. %s", "aus %s"},
+    {"female", "weiblich"},
+    {"male", "männlich"},
 
-    { "(shining)", "(schillernd)" },
-    { "Fainted", "Besiegt" },
-    { "Statistics", "Statuswerte" },
-    { "Stats at lv.%3i:", "Status auf Lv.%3i:" },
-    { "[TRAINER] ([TCLASS]) sent\nout %s![A]", "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]" },
+    {"(shining)", "(schillernd)"},
+    {"Fainted", "Besiegt"},
+    {"Statistics", "Statuswerte"},
+    {"Stats at lv.%3i:", "Status auf Lv.%3i:"},
+    {"[TRAINER] ([TCLASS]) sent\nout %s![A]", "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]"},
 
     // 140
 
-    { "Go [OWN%d]![A]", "Los [OWN%d]![A]" },
-    { "Do you want to give\na nick name to %s?", "Möchtest du dem %s\neinen Spitznamen geben?" },
-    { "Choose a nick name!", "Wähle einen Spitznamen!" },
-    { "You are challenged by\n%s %s![END]", "Eine Herausforderung von\n%s %s![END]" },
-    { "Frzn", "Eingfr" },
+    {"Go [OWN%d]![A]", "Los [OWN%d]![A]"},
+    {"Do you want to give\na nick name to %s?", "Möchtest du dem %s\neinen Spitznamen geben?"},
+    {"Choose a nick name!", "Wähle einen Spitznamen!"},
+    {"You are challenged by\n%s %s![END]", "Eine Herausforderung von\n%s %s![END]"},
+    {"Frzn", "Eingfr"},
 
-    { "Prlz", "Prlyse" },
-    { "Burn", "Verbrng" },
-    { "Slp",  "Schlaf" },
-    { "Psn", "Gift" },
-    { "Send", "Aussenden" },
+    {"Prlz", "Prlyse"},
+    {"Burn", "Verbrng"},
+    {"Slp", "Schlaf"},
+    {"Psn", "Gift"},
+    {"Switch", "Aussenden"},
 
     // 150
 
-    { "Already fighting", "Bereits im Kampf" },
-    { "Fainted…", "Schon besiegt…" },
-    { "To be sent", "Schon ausgewählt" },
-    { "An egg can", "Ein Ei kann" },
-    { "not fight!", "nicht kämpfen!" },
+    {"In Battle", "Bereits im Kampf"},
+    {"Cannot Battle", "Schon besiegt…"},
+    {"To be sent", "Schon ausgewählt"},
+    {"Eggs can't", "Ein Ei kann"},
+    {"battle!", "nicht kämpfen!"},
 
-    { "Status", "Bericht" },
-    { "Moves", "Attacken" },
-    { "ATK", "ANG" },
-    { "DEF", "VER" },
-    { "SAT", "SAN" },
+    {"Status", "Bericht"},
+    {"Moves", "Attacken"},
+    {"ATK", "ANG"},
+    {"DEF", "VER"},
+    {"SAT", "SAN"},
 
     // 160
 
-    { "SDF", "SVE" },
-    { "SPD", "INI" },
-    { "What will %s do?", "Was soll %s tun?" },
-    { "You got away safely.[A]", "Du bist entkommen.[A]" },
-    { "You couldn't escape…[A]", "Flucht gescheitert…[A]" },
+    {"SDF", "SVE"},
+    {"SPD", "INI"},
+    {"What will %s do?", "Was soll %s tun?"},
+    {"You got away safely.[A]", "Du bist entkommen.[A]"},
+    {"You couldn't escape…[A]", "Flucht gescheitert…[A]"},
 
-    { "Choose a target!", "Welches PKMN angreifen?" },
-    { "Choose a PKMN", "Welches PKMN?" },
-    { "%s gained %lu EXP.[A]", "%s gewinnt %lu E.-Punkte.[A]" },
-    { "%s advanced\nto level %d.[A]", "%s erreicht Level %d.[A]" },
-    { "The quick claw enabled\n%s%s to go first![A]", "%s%s agiert dank\neiner Flinkklaue zuerst![A]" },
+    {"Choose a target!", "Welches PKMN angreifen?"},
+    {"Choose a Pokémon.", "Welches Pokémon?"},
+    {"%s gained %lu EXP.[A]", "%s gewinnt %lu E.-Punkte.[A]"},
+    {"%s advanced\nto level %d.[A]", "%s erreicht Level %d.[A]"},
+    {"The quick claw enabled\n%s%s to go first![A]",
+     "%s%s agiert dank\neiner Flinkklaue zuerst![A]"},
 
     // 170
 
-    { "%s of %s%s applies.[A]", "%s von %s%s wirkt.[A]" },
-    { "[TRAINER] ([TCLASS])\nused %s.[A]", "[TRAINER] ([TCLASS]) setzt\n%s ein.[A]" },
-    { "It got wasted…[A]", "Es hat keine Wirkung…[A]" },
-    { "Used %s.[A]", "%s eingesetzt.[A]" },
-    { "%s's data was\nregistred to the Poké Dex.[A]", "Die Daten von %s\nwurden im PokéDex gespeichert.[A]" },
+    {"%s of %s%s applies.[A]", "%s von %s%s wirkt.[A]"},
+    {"[TRAINER] ([TCLASS])\nused %s.[A]", "[TRAINER] ([TCLASS]) setzt\n%s ein.[A]"},
+    {"It got wasted…[A]", "Es hat keine Wirkung…[A]"},
+    {"Used %s.[A]", "%s eingesetzt.[A]"},
+    {"%s's data was\nregistred to the Poké Dex.[A]",
+     "Die Daten von %s\nwurden im PokéDex gespeichert.[A]"},
 
-    { "%s was sent to\nthe Pokémon Storage System.[A]", "%s wurde an das\nPokémon-Lagerungssystem\ngeschickt.[A]" },
-    { "Box “%s” is full.[A]", "Box „%s“ ist voll.[A]" },
-    { "%s was deposited\nto Box “%s”.[A]", "%s wurde in\nBox „%s“ abgelegt.[A]" },
-    { "There is no space left\nfor additional Pokémon.[A]", "Du hast keinen Platz\nfür weitere Pokémon.[A]" },
-    { "%s was released.[A]", "%s wurde wieder\nfreigelassen.[A]" }
-};
+    {"%s was sent to\nthe Pokémon Storage System.[A]",
+     "%s wurde an das\nPokémon-Lagerungssystem\ngeschickt.[A]"},
+    {"Box “%s” is full.[A]", "Box „%s“ ist voll.[A]"},
+    {"%s was deposited\nto Box “%s”.[A]", "%s wurde in\nBox „%s“ abgelegt.[A]"},
+    {"There is no space left\nfor additional Pokémon.[A]",
+     "Du hast keinen Platz\nfür weitere Pokémon.[A]"},
+    {"%s was released.[A]", "%s wurde wieder\nfreigelassen.[A]"},
+
+    // 180
+
+    {"FIGHT", "Kampf"},
+    {"BAG", "Beutel"},
+    {"POKÉMON", "Pokémon"},
+    {"RUN", "Flucht"},
+    {"Pwr", "Stk"}};
