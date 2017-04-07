@@ -57,9 +57,8 @@ namespace MAP {
             IO::NAV->draw( true );
             swiWaitForVBlank( );
 #endif
-            // mapF = FS::open( MAP_PATH, "empty", ".map" );
-            // if( !mapF )
-            return;
+            mapF = FS::open( MAP_PATH, "empty", ".map" );
+            if( !mapF ) return;
         }
         p_result = std::unique_ptr<mapSlice>( new mapSlice );
 #ifdef DEBUG
@@ -89,19 +88,19 @@ namespace MAP {
         FS::read( mapF, p_result->m_blocks, sizeof( mapBlockAtom ), SIZE * SIZE );
         FS::close( mapF );
 
-#ifdef DEBUG__
-        sprintf( buffer, "ts1 %d ts2 %d", tsidx1, tsidx2 );
-        IO::messageBox a( buffer );
-        IO::NAV->draw( true );
-        swiWaitForVBlank( );
-#endif
-
         // Read the wild Pokémon data
         mapF = FS::open(
             MAP_PATH,
             ( toString( p_map ) + "/" + toString( p_y ) + "_" + toString( p_x ) ).c_str( ),
             ".enc" );
         FS::read( mapF, p_result->m_pokemon, sizeof( std::pair<u16, u16> ), 3 * 5 * 5 );
+        FS::close( mapF );
+
+        mapF = FS::open(
+            MAP_PATH,
+            ( toString( p_map ) + "/" + toString( p_y ) + "_" + toString( p_x ) ).c_str( ),
+            ".ect" );
+        FS::read( mapF, p_result->m_evtCnt, sizeof( u8 ), 32 * 32 );
         FS::close( mapF );
 
         // Read the first tileset

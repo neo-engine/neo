@@ -67,6 +67,11 @@ namespace MAP {
                            .m_blockidx;
         return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks[ blockidx ];
     }
+    u8 mapDrawer::scriptCount( u16 p_x, u16 p_y ) const {
+        bool x = ( p_x / SIZE != CUR_SLICE->m_x ), y = ( p_y / SIZE != CUR_SLICE->m_y );
+        return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]
+            ->m_evtCnt[ p_y % SIZE ][ p_x % SIZE ];
+    }
 
     u16 lastrow,      // Row to be filled when extending the map to the top
         lastcol;      // Column to be filled when extending the map to the left
@@ -198,8 +203,20 @@ namespace MAP {
     }
 
     void mapDrawer::animateField( u16 p_globX, u16 p_globY ) {
-        (void) p_globX;
-        (void) p_globY;
+        u8 behave = at( p_globX, p_globY ).m_bottombehave;
+
+        switch( behave ) {
+        default:
+            break;
+        }
+
+        // TODO
+    }
+
+    void mapDrawer::stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn ) {
+        animateField( p_globX, p_globY );
+        handleEvents( p_globX, p_globY, p_z );
+        if( p_allowWildPkmn ) handleWildPkmn( p_globX, p_globY );
     }
 
     void mapDrawer::loadNewRow( direction p_direction, bool p_updatePlayer ) {
@@ -327,13 +344,15 @@ namespace MAP {
     void mapDrawer::handleWarp( warpType p_type ) {
         warpPos current = warpPos{SAVE::SAV->getActiveFile( ).m_currentMap,
                                   SAVE::SAV->getActiveFile( ).m_player.m_pos};
-        if( !warpList.count( current ) ) return;
-        warpPos target
-            = p_type == LAST_VISITED ? SAVE::SAV->getActiveFile( ).m_lastWarp : warpList[ current ];
-        if( target == warpPos{0, {0, 0, 0}} ) return;
-        SAVE::SAV->getActiveFile( ).m_lastWarp = current;
+        if( p_type == LAST_VISITED ) {
+            warpPos target = SAVE::SAV->getActiveFile( ).m_lastWarp;
+            if( target == warpPos{0, {0, 0, 0}} ) return;
+            SAVE::SAV->getActiveFile( ).m_lastWarp = current;
 
-        warpPlayer( p_type, target );
+            warpPlayer( p_type, target );
+        } else {
+            handleWarp( p_type, current );
+        }
     }
     void mapDrawer::handleWildPkmn( u16 p_globX, u16 p_globY ) {
         u8 moveData = atom( p_globX, p_globY ).m_movedata;
@@ -675,10 +694,9 @@ namespace MAP {
                 if( p_direction != SAVE::SAV->getActiveFile( ).m_player.m_direction ) return;
 
                 standUpPlayer( p_direction );
-                animateField( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                              SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
-                handleWildPkmn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
+                stepOn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                        SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
+                        SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ );
                 return;
             } else if( lstMoveData == 0x0a ) {
                 fastBike = false;
@@ -696,10 +714,9 @@ namespace MAP {
             }
             if( newMoveData == 0x0c && lstMoveData == 4 ) { // End of surf
                 standUpPlayer( p_direction );
-                animateField( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                              SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
-                handleWildPkmn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
+                stepOn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                        SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
+                        SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ );
                 fastBike = false;
                 return;
             }
@@ -1180,8 +1197,6 @@ namespace MAP {
 
     void mapDrawer::slidePlayer( direction p_direction ) {
         redirectPlayer( p_direction, false );
-        animateField( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] );
         if( _playerIsFast ) {
             _playerIsFast = false;
             _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setFrame(
@@ -1194,8 +1209,9 @@ namespace MAP {
                 _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].currentFrame( );
             swiWaitForVBlank( );
         }
-        handleWildPkmn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                        SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
+        stepOn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
+                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ );
     }
     void mapDrawer::walkPlayer( direction p_direction, bool p_fast ) {
         if( SAVE::SAV->getActiveFile( ).m_player.m_movement != WALK ) p_fast = false;
@@ -1211,8 +1227,6 @@ namespace MAP {
                 OBJPRIORITY_1 );
         }
 
-        animateField( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] );
         if( p_fast != _playerIsFast ) {
             _playerIsFast = p_fast;
             _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setFrame(
@@ -1259,8 +1273,9 @@ namespace MAP {
             if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF )
                 _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_2 );
         }
-        handleWildPkmn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                        SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
+        stepOn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
+                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ );
     }
     void mapDrawer::jumpPlayer( direction p_direction ) {
         redirectPlayer( p_direction, false );
@@ -1278,16 +1293,12 @@ namespace MAP {
             if( i > 28 && i % 2 )
                 _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].move( DOWN, 3 );
             if( i % 4 ) swiWaitForVBlank( );
-            if( i == 16 ) {
-                animateField(
-                    SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                    SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] );
-            }
         }
         _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame(
             getFrame( p_direction ) );
-        handleWildPkmn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                        SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY );
+        stepOn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
+                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ );
     }
 
     void mapDrawer::stopPlayer( ) {

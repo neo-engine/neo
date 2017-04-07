@@ -240,7 +240,7 @@ int main( int, char** p_argv ) {
             struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char       buffer[ 100 ];
             snprintf( buffer, 99, "Currently at %hhu-(%hu,%hu,%hhu).\nMap: %i:%i,"
-                                  "(%02X,%02X)\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
+                                  "(%02u,%02u) %hhu scripts\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
                       SAVE::SAV->getActiveFile( ).m_currentMap,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
@@ -248,8 +248,10 @@ int main( int, char** p_argv ) {
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY / 32,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX % 32,
-                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32, FRAME_COUNT, achours,
-                      acminutes, acseconds, timeStruct->tm_sec );
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32,
+                      MAP::curMap->scriptCount( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ),
+                      FRAME_COUNT, achours, acminutes, acseconds, timeStruct->tm_sec );
             IO::messageBox m( buffer );
             IO::NAV->draw( true );
         }
@@ -286,6 +288,7 @@ int main( int, char** p_argv ) {
                     goto OUT;
                 }
             }
+            MAP::curMap->interact( );
         OUT:
             scanKeys( );
             continue;

@@ -326,4 +326,6 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"BAG", "Beutel"},
     {"POKÉMON", "Pokémon"},
     {"RUN", "Flucht"},
-    {"Pwr", "Stk"}};
+    {"Pwr", "Stk"},
+
+    {"Meteor Falls", "Meteorfälle"}};

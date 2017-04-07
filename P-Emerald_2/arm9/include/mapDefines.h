@@ -26,9 +26,9 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 */
 
 #pragma once
-#include <nds/ndstypes.h>
 #include <map>
 #include <string>
+#include <nds/ndstypes.h>
 
 #define MAP_HOENN 10
 #define MAP_METEOR_FALLS 11
@@ -61,40 +61,34 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #define MAP_ICE_PATH 222
 #define MAP_DRAGONS_DEN 223
 
-
 namespace MAP {
     struct position {
-        u16 m_posX; //Global
-        u16 m_posY; //Global
-        u8 m_posZ;
+        u16 m_posX; // Global
+        u16 m_posY; // Global
+        u8  m_posZ;
     };
-    enum direction : u8 {
-        UP,
-        RIGHT,
-        DOWN,
-        LEFT
-    };
+    enum direction : u8 { UP, RIGHT, DOWN, LEFT };
     enum moveMode {
-        //Player modes
-        WALK = 0,
-        SURF = 1,
-        BIKE = 2,
+        // Player modes
+        WALK      = 0,
+        SURF      = 1,
+        BIKE      = 2,
         ACRO_BIKE = 3,
-        SIT = 4,
-        DIVE = 5,
-        //NPC modes
+        SIT       = 4,
+        DIVE      = 5,
+        // NPC modes
         NO_MOVEMENT = 0,
     };
     enum wildPkmnType {
-        GRASS,      // 5 tiers
-        HIGH_GRASS, // 5 tiers
-        WATER,      // 5 tiers
-        FISHING_ROD,// 5 tiers
-        HEADBUTT,   // 3 tiers
-        ROCK_SMASH  // 2 tiers
+        GRASS,       // 5 tiers
+        HIGH_GRASS,  // 5 tiers
+        WATER,       // 5 tiers
+        FISHING_ROD, // 5 tiers
+        HEADBUTT,    // 3 tiers
+        ROCK_SMASH   // 2 tiers
     };
     enum mapWeather {
-        NOTHING, //Inside
+        NOTHING, // Inside
         SUNNY,
         REGULAR,
         RAINY,
@@ -105,30 +99,19 @@ namespace MAP {
         SANDSTORM,
         FOG,
         DENSE_MIST,
-        CLOUDY, //Dark Forest clouds
+        CLOUDY, // Dark Forest clouds
         HEAVY_SUNLIGHT,
         HEAVY_RAIN,
         UNDERWATER
     };
-    enum mapType {
-        OUTSIDE = 0,
-        CAVE = 1,
-        INSIDE = 2,
-        DARK = 4,
-        FLASHABLE = 8
-    };
-    enum warpType {
-        NO_SPECIAL,
-        CAVE_ENTRY,
-        DOOR,
-        TELEPORT,
-        EMERGE_WATER,
-        LAST_VISITED
-    };
+    enum mapType { OUTSIDE = 0, CAVE = 1, INSIDE = 2, DARK = 4, FLASHABLE = 8 };
+    enum warpType { NO_SPECIAL, CAVE_ENTRY, DOOR, TELEPORT, EMERGE_WATER, LAST_VISITED };
 
+    enum scriptType { WARP_SCRIPT = 0, SCRIPT = 1, TRAINER_SCRIPT = 2 };
+    enum invocationType { STEP_ONTO = 0, INTERACT = 1, WARP_TILE = 2 };
 
     typedef std::pair<u8, position> warpPos;
 
-    extern std::map<u8, std::pair<u16, u16>> mapInfo; //mapId -> (locadionId, battleBG)
+    extern std::map<u8, std::pair<u16, u16>>            mapInfo; // mapId -> (locadionId, battleBG)
     extern std::map<u8, std::pair<mapType, mapWeather>> mapTypes;
 }
