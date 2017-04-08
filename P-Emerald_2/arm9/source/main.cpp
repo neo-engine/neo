@@ -221,6 +221,8 @@ int main( int, char** p_argv ) {
     FADE_TOP( );
     MAP::curMap = new MAP::mapDrawer( );
     MAP::curMap->draw( );
+    MAP::loadNewBank( SAVE::SAV->getActiveFile( ).m_currentMap );
+    IO::NAV->showNewMap( SAVE::SAV->getActiveFile( ).m_currentMap );
 
     ANIMATE_MAP = true;
 
@@ -236,11 +238,11 @@ int main( int, char** p_argv ) {
 
 #ifdef DEBUG
         if( held & KEY_L && gMod == DEVELOPER ) {
-            time_t     unixTime   = time( NULL );
-            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
-            char       buffer[ 100 ];
+            //            time_t     unixTime   = time( NULL );
+            //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
+            char buffer[ 100 ];
             snprintf( buffer, 99, "Currently at %hhu-(%hu,%hu,%hhu).\nMap: %i:%i,"
-                                  "(%02u,%02u) %hhu scripts\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
+                                  "(%02u,%02u) %hhu scripts\n%hhu %s (%hu) %lx",
                       SAVE::SAV->getActiveFile( ).m_currentMap,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
@@ -251,7 +253,10 @@ int main( int, char** p_argv ) {
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32,
                       MAP::curMap->scriptCount( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
                                                 SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ),
-                      FRAME_COUNT, achours, acminutes, acseconds, timeStruct->tm_sec );
+                      MAP::CURRENT_BANK.m_bank,
+                      FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
+                      MAP::curMap->getCurrentLocationId( ),
+                      ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ] );
             IO::messageBox m( buffer );
             IO::NAV->draw( true );
         }

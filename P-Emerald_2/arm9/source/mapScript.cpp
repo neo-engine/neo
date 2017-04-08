@@ -33,7 +33,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses
 #include "defines.h"
 #include "fs.h"
 #include "mapDrawer.h"
-#include "mapWarps.h"
 #include "messageBox.h"
 #include "saveGame.h"
 #include "screenFade.h"
@@ -173,14 +172,14 @@ namespace MAP {
 
             case MSG_I:
                 if( !PARAMB( SCRIPT_INS[ pc ] ) )
-                    IO::messageBox( GET_STRING( PARAMA( SCRIPT_INS[ pc ] ) ), false );
+                    IO::messageBox( GET_STRING( PARAMA( SCRIPT_INS[ pc ] ) ), true );
                 else
                     IO::messageBox( GET_STRING( PARAMA( SCRIPT_INS[ pc ] ) ),
                                     GET_STRING( PARAMB( SCRIPT_INS[ pc ] ) ) );
                 break;
             case MSG:
                 if( !PARAMB( SCRIPT_INS[ pc ] ) )
-                    IO::messageBox( GET_STRING( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ), false );
+                    IO::messageBox( GET_STRING( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ), true );
                 else
                     IO::messageBox( GET_STRING( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ),
                                     GET_STRING( FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) ) );
@@ -279,7 +278,7 @@ namespace MAP {
         warpPos tg = getWarpPos( p_source );
 
         if( tg.first == 0xFF ) tg = SAVE::SAV->getActiveFile( ).m_lastWarp;
-        if( tg == warpPos{0, {0, 0, 0}} ) return;
+        if( !tg.first && !tg.second.m_posY && !tg.second.m_posZ && !tg.second.m_posX ) return;
 
         SAVE::SAV->getActiveFile( ).m_lastWarp = p_source;
         warpPlayer( p_type, tg );

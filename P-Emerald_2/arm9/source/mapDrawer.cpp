@@ -32,7 +32,6 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "battleWeather.h"
 #include "defines.h"
 #include "mapDrawer.h"
-#include "mapWarps.h"
 #include "messageBox.h"
 #include "saveGame.h"
 #include "screenFade.h"
@@ -346,7 +345,9 @@ namespace MAP {
                                   SAVE::SAV->getActiveFile( ).m_player.m_pos};
         if( p_type == LAST_VISITED ) {
             warpPos target = SAVE::SAV->getActiveFile( ).m_lastWarp;
-            if( target == warpPos{0, {0, 0, 0}} ) return;
+            if( !target.first && !target.second.m_posX && !target.second.m_posY
+                && !target.second.m_posZ )
+                return;
             SAVE::SAV->getActiveFile( ).m_lastWarp = current;
 
             warpPlayer( p_type, target );
@@ -366,7 +367,7 @@ namespace MAP {
             handleWildPkmn( GRASS );
         else if( behave == 0x03 )
             handleWildPkmn( HIGH_GRASS );
-        else if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE )
+        else if( ( CURRENT_BANK.m_mapType >> 4 ) & CAVE )
             handleWildPkmn( GRASS );
     }
     pokemon wildPkmn;
@@ -443,16 +444,16 @@ namespace MAP {
         }
 
         u8 platform = 0, plat2 = 0;
-        u8 battleBack = mapInfo[ SAVE::SAV->getActiveFile( ).m_currentMap ].second;
+        u8 battleBack = CURRENT_BANK.m_battleBg;
         if( p_type == GRASS || p_type == HIGH_GRASS || p_type == FISHING_ROD ) {
-            if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first == OUTSIDE
+            if( ( CURRENT_BANK.m_mapType >> 4 ) == OUTSIDE
                 && SAVE::SAV->getActiveFile( ).m_player.m_movement != SURF ) {
                 plat2 = platform = 1;
             } else if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF ) {
                 plat2 = platform = 0;
-            } else if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & DARK ) {
+            } else if( ( CURRENT_BANK.m_mapType >> 4 ) & DARK ) {
                 plat2 = platform = 6;
-            } else if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE ) {
+            } else if( ( CURRENT_BANK.m_mapType >> 4 ) & CAVE ) {
                 plat2 = platform = 4;
             }
 
@@ -464,7 +465,7 @@ namespace MAP {
             if( p_type == HIGH_GRASS ) battleBack = 3;
             if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF )
                 battleBack = 4;
-            else if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE )
+            else if( ( CURRENT_BANK.m_mapType >> 4 ) & CAVE )
                 battleBack = 19;
         }
 
@@ -503,7 +504,7 @@ namespace MAP {
             return handleWildPkmn( GRASS, 0, true );
         else if( behave == 0x03 || p_forceHighGrass )
             return handleWildPkmn( HIGH_GRASS, 0, true );
-        else if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE )
+        else if( ( CURRENT_BANK.m_mapType >> 4 ) & CAVE )
             return handleWildPkmn( GRASS, 0, true );
         return false;
     }
@@ -1063,10 +1064,12 @@ namespace MAP {
     }
 
     void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
-        bool entryCave = ( !( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE )
-                           && ( mapTypes[ p_target.first ].first & CAVE ) );
-        bool exitCave = ( ( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE )
-                          && !( mapTypes[ p_target.first ].first & CAVE ) );
+        u8 oldMapType = CURRENT_BANK.m_mapType >> 4;
+        loadNewBank( p_target.first );
+        u8 newMapType = CURRENT_BANK.m_mapType >> 4;
+
+        bool entryCave = ( !( oldMapType & CAVE ) && ( newMapType & CAVE ) );
+        bool exitCave  = ( ( oldMapType & CAVE ) && !( newMapType & CAVE ) );
         switch( p_type ) {
         case DOOR:
             break;
@@ -1092,10 +1095,13 @@ namespace MAP {
         swiWaitForVBlank( );
         swiWaitForVBlank( );
 
-        SAVE::SAV->getActiveFile( ).m_currentMap   = p_target.first;
         SAVE::SAV->getActiveFile( ).m_player.m_pos = p_target.second;
-        draw( );
-        IO::NAV->showNewMap( SAVE::SAV->getActiveFile( ).m_currentMap );
+        if( SAVE::SAV->getActiveFile( ).m_currentMap != p_target.first ) {
+            SAVE::SAV->getActiveFile( ).m_currentMap = p_target.first;
+            draw( );
+            IO::NAV->showNewMap( SAVE::SAV->getActiveFile( ).m_currentMap );
+        }
+
         if( exitCave ) movePlayer( DOWN );
     }
 
@@ -1501,12 +1507,20 @@ namespace MAP {
         return getCurrentLocationId( SAVE::SAV->m_activeFile );
     }
     u16 mapDrawer::getCurrentLocationId( u8 p_file ) const {
-        u16 res = MAP::mapInfo[ SAVE::SAV->m_saveFile[ p_file ].m_currentMap ].first;
-        if( res == 2003 ) { // Kanto
-
-        } else if( res == 2004 ) { // Johto
-
-        } else if( res == 2005 ) { // Hoenn
+        u8 currentBank = CURRENT_BANK.m_bank;
+        if( currentBank != SAVE::SAV->m_saveFile[ p_file ].m_currentMap )
+            loadNewBank( SAVE::SAV->m_saveFile[ p_file ].m_currentMap );
+        u16 res = CURRENT_BANK.m_locationId;
+        for( u8 i = 0; i < MAX_MAP_LOCATIONS; ++i ) {
+            if( SAVE::SAV->m_saveFile[ p_file ].m_player.m_pos.m_posX
+                    >= CURRENT_BANK.m_data[ i ].m_upperLeftX
+                && SAVE::SAV->m_saveFile[ p_file ].m_player.m_pos.m_posX
+                       <= CURRENT_BANK.m_data[ i ].m_lowerRightX
+                && SAVE::SAV->m_saveFile[ p_file ].m_player.m_pos.m_posY
+                       >= CURRENT_BANK.m_data[ i ].m_upperLeftY
+                && SAVE::SAV->m_saveFile[ p_file ].m_player.m_pos.m_posY
+                       <= CURRENT_BANK.m_data[ i ].m_lowerRightY )
+                return CURRENT_BANK.m_data[ i ].m_locationId;
         }
         return res;
     }

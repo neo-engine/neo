@@ -256,6 +256,23 @@ namespace FS {
         return N;
     }
 
+    bool readBankData( u8 p_bank, MAP::bankInfo& p_result ) {
+        char buffer[ 50 ];
+        snprintf( buffer, 45, "%hhu/%hhu", p_bank, p_bank );
+        FILE* f = open( MAP::MAP_PATH, buffer, ".bnk" );
+        if( !f ) return false;
+        read( f, &p_result.m_locationId, sizeof( u16 ), 1 );
+        read( f, &p_result.m_battleBg, sizeof( u8 ), 1 );
+        read( f, &p_result.m_mapType, sizeof( u8 ), 1 );
+        for( u8 i = 0; i < MAX_MAP_LOCATIONS; ++i ) {
+            read( f, &p_result.m_data[ i ].m_upperLeftX, sizeof( u16 ), 5 );
+            read( f, &p_result.m_data[ i ].m_battleBg, sizeof( u8 ), 1 );
+            read( f, &p_result.m_data[ i ].m_mapType, sizeof( u8 ), 1 );
+        }
+        close( f );
+        return true;
+    }
+
     std::string readString( FILE* p_file, bool p_new ) {
         std::string ret = "";
         int         ac;
