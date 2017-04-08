@@ -230,8 +230,8 @@ namespace MAP {
             FS::read( sc, content, sizeof( u8 ), 6 );
             FS::close( sc );
             return warpPos{content[ 0 ],
-                           {( u16 )( content[ 1 ] * SIZE + content[ 2 ] ),
-                            ( u16 )( content[ 3 ] * SIZE + content[ 4 ] ), content[ 5 ]}};
+                           {( u16 )( content[ 2 ] * SIZE + content[ 3 ] ),
+                            ( u16 )( content[ 1 ] * SIZE + content[ 4 ] ), content[ 5 ]}};
         } else if( header[ 3 ] == 0 ) { // warp specified as global coordinates
             warpPos res;
             FS::read( sc, &res, sizeof( warpPos ), 1 );

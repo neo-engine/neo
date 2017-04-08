@@ -127,7 +127,7 @@ namespace FS {
 
     FILE* openScript( u8 p_bank, u8 p_mapX, u8 p_mapY, u8 p_relX, u8 p_relY, u8 p_id ) {
         char buffer[ 60 ];
-        snprintf( buffer, 50, "%hhu/%hhu_%hhu/%hhu_%hhu_%hhu", p_bank, p_mapX, p_mapY, p_relX,
+        snprintf( buffer, 50, "%hhu/%hhu_%hhu/%hhu_%hhu_%hhu", p_bank, p_mapY, p_mapX, p_relX,
                   p_relY, p_id );
         return open( SCRIPT_PATH, buffer, ".bin", "r" );
     }
@@ -250,7 +250,7 @@ namespace FS {
             fread( &a.m_speed, sizeof( u8 ), 1, p_file );
             fread( &a.m_maxFrame, sizeof( u8 ), 1, p_file );
             a.m_acFrame = 0;
-            fread( a.m_tiles, sizeof( MAP::tile ), a.m_maxFrame, p_file );
+            fread( ( (u8*) a.m_tiles ), sizeof( u8 ), a.m_maxFrame * 32, p_file );
         }
         fclose( p_file );
         return N;

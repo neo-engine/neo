@@ -115,8 +115,9 @@ namespace SAVE {
         return res;
     }
 
+    std::vector<pokemon>   tmp;
     BATTLE::battleTrainer* saveGame::playerInfo::getBattleTrainer( ) {
-        std::vector<pokemon> tmp;
+        tmp.clear( );
         for( u8 i = 0; i < 6; ++i )
             if( m_pkmnTeam[ i ].m_boxdata.m_speciesId )
                 tmp.push_back( m_pkmnTeam[ i ] );

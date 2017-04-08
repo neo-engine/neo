@@ -369,6 +369,7 @@ namespace MAP {
         else if( mapTypes[ SAVE::SAV->getActiveFile( ).m_currentMap ].first & CAVE )
             handleWildPkmn( GRASS );
     }
+    pokemon wildPkmn;
     bool mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType, bool p_forceEncounter ) {
 
         u16 rn = rand( ) % ( 512 + SAVE::SAV->getActiveFile( ).m_options.m_encounterRateModifier );
@@ -411,8 +412,8 @@ namespace MAP {
         if( !CUR_SLICE->m_pokemon[ arridx ].first ) return false;
 
         IO::fadeScreen( IO::BATTLE );
-        pokemon         wildPkmn = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
-        BATTLE::weather weat     = BATTLE::weather::NO_WEATHER;
+        wildPkmn             = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
+        BATTLE::weather weat = BATTLE::weather::NO_WEATHER;
         switch( _weather ) {
         case SUNNY:
             weat = BATTLE::weather::SUN;
@@ -473,10 +474,6 @@ namespace MAP {
         swiWaitForVBlank( );
         IO::NAV->togglePower( );
         IO::NAV->draw( );
-        _slices[ 0 ][ 0 ]         = 0;
-        _slices[ 0 ][ 1 ]         = 0;
-        _slices[ 1 ][ 0 ]         = 0;
-        _slices[ 1 ][ 1 ]         = 0;
         BATTLE::battleTrainer* bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
         BATTLE::battle( bt, &wildPkmn, weat, platform, plat2, battleBack ).start( );
         SAVE::SAV->getActiveFile( ).updateTeam( bt );
@@ -519,7 +516,7 @@ namespace MAP {
             auto& a = CUR_SLICE->m_tileSet.m_animations[ i ];
             if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
                 a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
-                swiCopy( &a.m_tiles[ a.m_acFrame ], tileMemory + a.m_tileIdx * 32, 16 );
+                dmaCopy( a.m_tiles + a.m_acFrame, tileMemory + a.m_tileIdx * 32, sizeof( tile ) );
             }
         }
         if( !CUR_SLICE->m_tileSet.m_animationCount2 ) return;
@@ -527,8 +524,9 @@ namespace MAP {
             auto& a = CUR_SLICE->m_tileSet.m_animations[ i + MAX_ANIM_PER_TILE_SET ];
             if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
                 a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
-                swiCopy( &a.m_tiles[ a.m_acFrame ],
-                         tileMemory + ( a.m_tileIdx + MAX_TILES_PER_TILE_SET ) * 32, 16 );
+                dmaCopy( a.m_tiles + a.m_acFrame,
+                         tileMemory + ( a.m_tileIdx + MAX_TILES_PER_TILE_SET ) * 32,
+                         sizeof( tile ) );
             }
         }
     }
