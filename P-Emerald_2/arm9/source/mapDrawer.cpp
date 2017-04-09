@@ -124,13 +124,14 @@ namespace MAP {
             u16 mx = SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
                 my = SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY;
             constructSlice( SAVE::SAV->getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE,
-                            _slices[ _curX ][ _curY ] );
+                            _slices[ _curX ][ _curY ], _slices );
             constructSlice( SAVE::SAV->getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
-                            my / SIZE, _slices[ _curX ^ 1 ][ _curY ] );
+                            my / SIZE, _slices[ _curX ^ 1 ][ _curY ], _slices );
             constructSlice( SAVE::SAV->getActiveFile( ).m_currentMap, mx / SIZE,
-                            my / SIZE + currentHalf( my ), _slices[ _curX ][ _curY ^ 1 ] );
+                            my / SIZE + currentHalf( my ), _slices[ _curX ][ _curY ^ 1 ], _slices );
             constructSlice( SAVE::SAV->getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
-                            my / SIZE + currentHalf( my ), _slices[ _curX ^ 1 ][ _curY ^ 1 ] );
+                            my / SIZE + currentHalf( my ), _slices[ _curX ^ 1 ][ _curY ^ 1 ],
+                            _slices );
 
             for( u8 i = 1; i < 4; ++i ) {
                 bgInit( i, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
@@ -325,13 +326,13 @@ namespace MAP {
                         CUR_SLICE->m_x + dir[ p_direction ][ 0 ],
                         CUR_SLICE->m_y + dir[ p_direction ][ 1 ],
                         _slices[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
-                               [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ] );
-
+                               [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ],
+                        _slices );
         auto& neigh = _slices[ ( _curX + !dir[ p_direction ][ 0 ] ) & 1 ]
                              [ ( _curY + !dir[ p_direction ][ 1 ] ) & 1 ];
         constructSlice( SAVE::SAV->getActiveFile( ).m_currentMap,
                         neigh->m_x + dir[ p_direction ][ 0 ], neigh->m_y + dir[ p_direction ][ 1 ],
-                        _slices[ _curX ^ 1 ][ _curY ^ 1 ] );
+                        _slices[ _curX ^ 1 ][ _curY ^ 1 ], _slices );
     }
 
     void mapDrawer::disablePkmn( s16 p_steps ) {

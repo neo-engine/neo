@@ -171,8 +171,9 @@ namespace IO {
                                     65, ID_ID, tileCnt );
         tileCnt = IO::loadItemIcon( "Fundsache", POS[ DEX_ID ][ 0 ] - 16, POS[ DEX_ID ][ 1 ] - 16,
                                     66, DEX_ID, tileCnt );
-        tileCnt = IO::loadItemIcon( "----", POS[ OPTS_ID ][ 0 ] - 16, POS[ OPTS_ID ][ 1 ] - 16, 67,
-                                    OPTS_ID, tileCnt );
+        // tileCnt = IO::loadItemIcon( "----", POS[ OPTS_ID ][ 0 ] - 16, POS[ OPTS_ID ][ 1 ] - 16,
+        // 67,
+        //                            OPTS_ID, tileCnt );
 
         IO::loadSprite( PKMN_ID, ITM_BACK, tileCnt, POS[ PKMN_ID ][ 0 ] - 16,
                         POS[ PKMN_ID ][ 1 ] - 16, 32, 32, BagSprPal, BagSprTiles, BagSprTilesLen,
