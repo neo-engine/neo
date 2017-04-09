@@ -85,22 +85,22 @@ namespace MAP {
         CLEAR         = 0xFE, // Call IO::drawNav( true )
         EOP           = 0xFF  // Exit the script
     };
-    void mapDrawer::executeScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_z, u8 p_number,
+    bool mapDrawer::executeScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_z, u8 p_number,
                                    invocationType p_inv ) {
         FILE* sc = FS::openScript( warpPos{p_map, {p_globX, p_globY, p_z}}, p_number );
-        if( !sc ) return;
+        if( !sc ) return false;
 
         u8 header[ 5 ];
         FS::read( sc, header, sizeof( u8 ), 4 );
         // Check if this script is really a script
-        if( header[ 0 ] != scriptType::SCRIPT || header[ 3 ] == 0 ) return;
+        if( header[ 0 ] != scriptType::SCRIPT || header[ 3 ] == 0 ) return true;
         /*
                 snprintf( buffer, 40, "%hhu %hhu %hhu %hhu", header[ 0 ], header[ 1 ], header[ 2 ],
                           header[ 3 ] );
                 IO::messageBox( buffer, true );
                 IO::NAV->draw( );*/
         // Check if it can be executed
-        if( header[ 2 ] != p_inv || ( header[ 1 ] < 0xFF && header[ 1 ] != p_z ) ) return;
+        if( header[ 2 ] != p_inv || ( header[ 1 ] < 0xFF && header[ 1 ] != p_z ) ) return true;
 
         FS::read( sc, SCRIPT_INS, sizeof( u32 ), std::min( (u8) MAX_SCRIPT_SIZE, header[ 3 ] ) );
         FS::close( sc );
@@ -210,6 +210,7 @@ namespace MAP {
             }
             ++pc;
         }
+        return true;
     }
 
     // At most one warp is allowed per block.
@@ -247,31 +248,21 @@ namespace MAP {
         u16  py = SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY;
         u16  pz = SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ;
         auto d  = SAVE::SAV->getActiveFile( ).m_player.m_direction;
-        // char buffer[ 50 ];
-        // snprintf( buffer, 40, "interact called at\n%hu %hu %hu (%i)", px, py, pz, d );
-        // IO::messageBox( buffer, true );
-        // IO::NAV->draw( );
         handleEvents( px, py, pz, d );
     }
 
     void mapDrawer::handleEvents( u16 p_globX, u16 p_globY, u8 p_z ) {
         u8 map = SAVE::SAV->getActiveFile( ).m_currentMap;
-        for( u8 i = 0; i < scriptCount( p_globX, p_globY ); ++i )
-            executeScript( map, p_globX, p_globY, p_z, i, invocationType::STEP_ONTO );
+        u8 i   = 0;
+        while( executeScript( map, p_globX, p_globY, p_z, i, invocationType::STEP_ONTO ) ) ++i;
     }
 
     void mapDrawer::handleEvents( u16 p_globX, u16 p_globY, u8 p_z, direction p_dir ) {
         p_globX += dir[ p_dir ][ 0 ];
         p_globY += dir[ p_dir ][ 1 ];
-        // char buffer[ 50 ];
-        // snprintf( buffer, 45, "handleEvents called at\n%hu %hu %hhu\n%i scripts", p_globX,
-        // p_globY,
-        //          p_z, scriptCount( p_globX, p_globY ) );
-        // IO::messageBox( buffer, true );
-        // IO::NAV->draw( );
         u8 map = SAVE::SAV->getActiveFile( ).m_currentMap;
-        for( u8 i = 0; i < scriptCount( p_globX, p_globY ); ++i )
-            executeScript( map, p_globX, p_globY, p_z, i, invocationType::INTERACT );
+        u8 i   = 0;
+        while( executeScript( map, p_globX, p_globY, p_z, i, invocationType::INTERACT ) ) ++i;
     }
 
     void mapDrawer::handleWarp( warpType p_type, warpPos p_source ) {

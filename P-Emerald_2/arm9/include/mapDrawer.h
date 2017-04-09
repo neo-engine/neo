@@ -62,7 +62,7 @@ namespace MAP {
 
         void animateField( u16 p_globX, u16 p_globY );
 
-        void executeScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_z, u8 p_number,
+        bool executeScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_z, u8 p_number,
                             invocationType p_inv );
 
         void handleEvents( u16 p_globX, u16 p_globY, u8 p_z );
@@ -77,7 +77,6 @@ namespace MAP {
       public:
         block& at( u16 p_x, u16 p_y ) const;
         mapBlockAtom& atom( u16 p_x, u16 p_y ) const;
-        u8 scriptCount( u16 p_x, u16 p_y ) const;
 
         mapDrawer( );
 

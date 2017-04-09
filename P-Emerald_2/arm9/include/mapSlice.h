@@ -86,7 +86,6 @@ namespace MAP {
         tileSet      m_tileSet;
         blockSet     m_blockSet;
         mapBlockAtom m_blocks[ 32 ][ 32 ]; // [ y ][ x ]
-        u8           m_evtCnt[ 32 ][ 32 ]; // [ y ][ x ]
         u8           m_map;
         u16          m_x, m_y;
         u8           m_tIdx1, m_tIdx2;

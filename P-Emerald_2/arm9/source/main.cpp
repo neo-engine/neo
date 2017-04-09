@@ -245,7 +245,7 @@ int main( int, char** p_argv ) {
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char buffer[ 100 ];
             snprintf( buffer, 99, "Currently at %hhu-(%hu,%hu,%hhu).\nMap: %i:%i,"
-                                  "(%02u,%02u) %hhu scripts\n%hhu %s (%hu) %lx",
+                                  "(%02u,%02u)\n%hhu %s (%hu) %lx",
                       SAVE::SAV->getActiveFile( ).m_currentMap,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
@@ -254,8 +254,6 @@ int main( int, char** p_argv ) {
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX % 32,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32,
-                      MAP::curMap->scriptCount( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY ),
                       MAP::CURRENT_BANK.m_bank,
                       FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
                       MAP::curMap->getCurrentLocationId( ),

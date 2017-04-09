@@ -107,17 +107,6 @@ namespace MAP {
             memset( p_result->m_pokemon, 0, sizeof( p_result->m_pokemon ) );
         }
 
-        mapF = FS::open(
-            MAP_PATH,
-            ( toString( p_map ) + "/" + toString( p_y ) + "_" + toString( p_x ) ).c_str( ),
-            ".ect" );
-        if( mapF ) {
-            FS::read( mapF, p_result->m_evtCnt, sizeof( u8 ), 32 * 32 );
-            FS::close( mapF );
-        } else {
-            memset( p_result->m_evtCnt, 0, sizeof( p_result->m_evtCnt ) );
-        }
-
         // Read the first tileset
         if( reloadTs || p_result->m_tIdx1 != tsidx1 ) {
             bool found = false;
@@ -134,7 +123,7 @@ namespace MAP {
                                     MAX_BLOCKS_PER_TILE_SET * sizeof( block ) );
 
                             memcpy( p_result->m_pals, p_cache[ i ][ j ]->m_pals,
-                                    8 * sizeof( palette ) );
+                                    6 * sizeof( palette ) );
                             p_result->m_tileSet.m_animationCount1
                                 = p_cache[ i ][ j ]->m_tileSet.m_animationCount1;
                             memcpy( p_result->m_tileSet.m_animations,
@@ -182,7 +171,7 @@ namespace MAP {
                                         + MAX_BLOCKS_PER_TILE_SET,
                                     MAX_BLOCKS_PER_TILE_SET * sizeof( block ) );
 
-                            memcpy( p_result->m_pals + 8, p_cache[ i ][ j ]->m_pals + 8,
+                            memcpy( p_result->m_pals + 6, p_cache[ i ][ j ]->m_pals + 6,
                                     8 * sizeof( palette ) );
                             p_result->m_tileSet.m_animationCount2
                                 = p_cache[ i ][ j ]->m_tileSet.m_animationCount2;

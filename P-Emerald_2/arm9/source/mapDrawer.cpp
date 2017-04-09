@@ -66,11 +66,6 @@ namespace MAP {
                            .m_blockidx;
         return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks[ blockidx ];
     }
-    u8 mapDrawer::scriptCount( u16 p_x, u16 p_y ) const {
-        bool x = ( p_x / SIZE != CUR_SLICE->m_x ), y = ( p_y / SIZE != CUR_SLICE->m_y );
-        return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]
-            ->m_evtCnt[ p_y % SIZE ][ p_x % SIZE ];
-    }
 
     u16 lastrow,      // Row to be filled when extending the map to the top
         lastcol;      // Column to be filled when extending the map to the left
