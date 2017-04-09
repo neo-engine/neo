@@ -215,6 +215,7 @@ namespace MAP {
     void mapDrawer::stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn ) {
         animateField( p_globX, p_globY );
         handleEvents( p_globX, p_globY, p_z );
+        IO::NAV->updateMap( getCurrentLocationId( ) );
         if( p_allowWildPkmn ) handleWildPkmn( p_globX, p_globY );
     }
 
@@ -473,17 +474,15 @@ namespace MAP {
             = _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].getPriority( );
         ANIMATE_MAP = false;
         swiWaitForVBlank( );
-        IO::NAV->togglePower( );
         IO::NAV->draw( );
         BATTLE::battleTrainer* bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
         BATTLE::battle( bt, &wildPkmn, weat, platform, plat2, battleBack ).start( );
         SAVE::SAV->getActiveFile( ).updateTeam( bt );
         delete bt;
         FADE_TOP_DARK( );
-        draw( playerPrio );
         ANIMATE_MAP = true;
-        IO::NAV->togglePower( );
         IO::NAV->draw( true );
+        draw( playerPrio );
 
         return true;
     }
@@ -1519,9 +1518,13 @@ namespace MAP {
                 && SAVE::SAV->m_saveFile[ p_file ].m_player.m_pos.m_posY
                        >= CURRENT_BANK.m_data[ i ].m_upperLeftY
                 && SAVE::SAV->m_saveFile[ p_file ].m_player.m_pos.m_posY
-                       <= CURRENT_BANK.m_data[ i ].m_lowerRightY )
-                return CURRENT_BANK.m_data[ i ].m_locationId;
+                       <= CURRENT_BANK.m_data[ i ].m_lowerRightY ) {
+                res = CURRENT_BANK.m_data[ i ].m_locationId;
+                break;
+            }
         }
+        if( currentBank != SAVE::SAV->m_saveFile[ p_file ].m_currentMap )
+            loadNewBank( currentBank );
         return res;
     }
 }

@@ -50,7 +50,7 @@ namespace MAP {
                                            .c_str( ),
                              ".map" );
         if( !mapF ) {
-#ifdef DEBUG
+#ifdef DEBUG__
             char buffer[ 50 ];
             snprintf( buffer, 49, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
             IO::messageBox m( buffer );
@@ -100,8 +100,12 @@ namespace MAP {
             MAP_PATH,
             ( toString( p_map ) + "/" + toString( p_y ) + "_" + toString( p_x ) ).c_str( ),
             ".ect" );
-        FS::read( mapF, p_result->m_evtCnt, sizeof( u8 ), 32 * 32 );
-        FS::close( mapF );
+        if( mapF ) {
+            FS::read( mapF, p_result->m_evtCnt, sizeof( u8 ), 32 * 32 );
+            FS::close( mapF );
+        } else {
+            memset( p_result->m_evtCnt, 0, sizeof( p_result->m_evtCnt ) );
+        }
 
         // Read the first tileset
         mapF = FS::open( TILESET_PATH, tsidx1, ".ts" );
