@@ -1091,11 +1091,11 @@ namespace MAP {
         swiWaitForVBlank( );
 
         SAVE::SAV->getActiveFile( ).m_player.m_pos = p_target.second;
-        if( SAVE::SAV->getActiveFile( ).m_currentMap != p_target.first ) {
-            SAVE::SAV->getActiveFile( ).m_currentMap = p_target.first;
-            draw( );
-            IO::NAV->showNewMap( SAVE::SAV->getActiveFile( ).m_currentMap );
-        }
+        //        if( SAVE::SAV->getActiveFile( ).m_currentMap != p_target.first ) {
+        SAVE::SAV->getActiveFile( ).m_currentMap = p_target.first;
+        draw( );
+        IO::NAV->showNewMap( SAVE::SAV->getActiveFile( ).m_currentMap );
+        //        }
 
         if( exitCave ) movePlayer( DOWN );
     }
