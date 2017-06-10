@@ -76,12 +76,17 @@ namespace MAP {
         CLEAR_FLAG_I  = 0x17, // setFlag( [param2], 0 )
         MSG           = 0x90, // Print string $param1. ($param2 is name if nonzero)
         ITEM          = 0x91, // Give player item $param1 $param2 times
-        GIVE_PKMN     = 0x92, // Give player pkmn specified by this and the next ins
+        GIVE_PKMN     = 0x92, // Give player pkmn $paramA at level $paramB
         BATTLE_PKMN   = 0x93, // As GIVE_PKMN, but pkmn battles player
+        MOVE_PLAYER   = 0x94, // Move player in dir $param1 <= $param2 steps at spd $param3
         MSG_I         = 0xA0, // Print string [paramA]. ([paramB] is name if nonzero)
         ITEM_I        = 0xA1, // Give player item [paramA] [paramB] times
-        GIVE_PKMN_I   = 0xA2, // Give player pkmn specified by this and the next ins
+        GIVE_PKMN_I   = 0xA2, // Give player pkmn [paramA] at level [paramB]
         BATTLE_PKMN_I = 0xA3, // As GIVE_PKMN, but pkmn battles player
+        MOVE_PLAYER_I = 0xA4, // Move player in dir [param1] <= [param2] steps at spd [param3]
+        HEAL_TEAM     = 0xE0, // Heal Pkmn team
+        CHOOSE_PKMN   = 0xE1, // Choose Pkmn from team, store result (-1…5) in $param1
+        GET_PKMN_STAT = 0xE2, // Store stats of pkmn $param1 starting at $param2
         CLEAR         = 0xFE, // Call IO::drawNav( true )
         EOP           = 0xFF  // Exit the script
     };
@@ -190,16 +195,49 @@ namespace MAP {
             case ITEM:
                 IO::messageBox( ItemList[ FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ],
                                 FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) );
-            case GIVE_PKMN_I:
+            case GIVE_PKMN_I: {
+                pokemon pk = pokemon( PARAMA( SCRIPT_INS[ pc ] ), PARAMB( SCRIPT_INS[ pc ] ) );
+                SAVE::SAV->getActiveFile( ).givePkmn( pk );
+                break;
+            }
+            case GIVE_PKMN: {
+                pokemon pk = pokemon( FETCH( PARAMA( SCRIPT_INS[ pc ] ) ),
+                                      FETCH( PARAMB( SCRIPT_INS[ pc ] ) ) );
+                SAVE::SAV->getActiveFile( ).givePkmn( pk );
+                break;
+            }
+            case BATTLE_PKMN_I: {
+                pokemon pk = pokemon( PARAMA( SCRIPT_INS[ pc ] ), PARAMB( SCRIPT_INS[ pc ] ) );
                 // TODO
                 break;
-            case GIVE_PKMN:
+            }
+            case BATTLE_PKMN: {
+                pokemon pk = pokemon( FETCH( PARAMA( SCRIPT_INS[ pc ] ) ),
+                                      FETCH( PARAMB( SCRIPT_INS[ pc ] ) ) );
                 // TODO
                 break;
-            case BATTLE_PKMN_I:
+            }
+
+            case MOVE_PLAYER_I:
+                for( u8 i = 0; i < PARAM2( SCRIPT_INS[ pc ] ); ++i )
+                    movePlayer( (MAP::direction) PARAM1( SCRIPT_INS[ pc ] ),
+                                PARAM3( SCRIPT_INS[ pc ] ) );
+                break;
+            case MOVE_PLAYER:
+                for( u8 i = 0; i < FETCH( PARAM2( SCRIPT_INS[ pc ] ) ); ++i )
+                    movePlayer( (MAP::direction) FETCH( PARAM1( SCRIPT_INS[ pc ] ) ),
+                                FETCH( PARAM3( SCRIPT_INS[ pc ] ) ) );
+                break;
+
+            case HEAL_TEAM:
+                for( u8 i = 0; i < 6; ++i )
+                    if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                        SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].heal( );
+                break;
+            case CHOOSE_PKMN:
                 // TODO
                 break;
-            case BATTLE_PKMN:
+            case GET_PKMN_STAT:
                 // TODO
                 break;
             case CLEAR:
