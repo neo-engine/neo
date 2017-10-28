@@ -87,6 +87,7 @@ int main( ) {
     // Start the RTC tracking IRQ
     initClockIRQ( );
     fifoInit( );
+    touchInit( );
 
     mmInstall( FIFO_MAXMOD );
 
