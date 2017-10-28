@@ -102,7 +102,7 @@ pokemon::boxPokemon::boxPokemon( u16 p_pkmnId, u16 p_level, const char* p_name, 
 
     memset( m_effortValues, 0, sizeof( m_effortValues ) );
     memset( m_contestStats, 0, sizeof( m_contestStats ) );
-    memset( m_ribbons1, 0, sizeof( m_ribbons1 ) );
+    memset( m_ribbons0, 0, sizeof( m_ribbons0 ) );
     memset( m_ribbons1, 0, sizeof( m_ribbons1 ) );
     memset( m_ribbons2, 0, sizeof( m_ribbons2 ) );
     getLearnMoves( p_pkmnId, p_level, 0, 1, 4, m_moves );

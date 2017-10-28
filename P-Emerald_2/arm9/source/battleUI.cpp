@@ -410,7 +410,7 @@ namespace BATTLE {
         for( int i = 0; i < 2; ++i ) swiWaitForVBlank( );
         IO::copySpriteData( PokeBall11Tiles, p_tileCnt, PokeBall11TilesLen, false );
         IO::updateOAM( false );
-        for( int i      = 0; i < 3; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 3; ++i ) swiWaitForVBlank( );
         type1->isHidden = true;
 
         type1Info->m_oamId   = p_oamIndex;
@@ -438,7 +438,7 @@ namespace BATTLE {
         IO::copySpritePal( Shiny2Pal, p_palCnt, false );
         IO::copySpriteData( Shiny2Tiles, p_tileCnt, Shiny2TilesLen, false );
         IO::updateOAM( false );
-        for( int i      = 0; i < 2; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 2; ++i ) swiWaitForVBlank( );
         type1->isHidden = true;
         IO::updateOAM( false );
     }
@@ -467,32 +467,32 @@ namespace BATTLE {
         IO::copySpritePal( Shiny1Pal, p_palCnt, false );
         IO::copySpriteData( Shiny1Tiles, p_tileCnt, Shiny1TilesLen, false );
         IO::updateOAM( false );
-        for( int i      = 0; i < 2; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 2; ++i ) swiWaitForVBlank( );
         type1->priority = OBJPRIORITY_1;
         IO::copySpritePal( Shiny2Pal, p_palCnt, false );
         IO::copySpriteData( Shiny2Tiles, p_tileCnt, Shiny2TilesLen, false );
         IO::updateOAM( false );
-        for( int i      = 0; i < 2; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 2; ++i ) swiWaitForVBlank( );
         type1->priority = OBJPRIORITY_0;
         IO::copySpritePal( Shiny1Pal, p_palCnt, false );
         IO::copySpriteData( Shiny1Tiles, p_tileCnt, Shiny1TilesLen, false );
         IO::updateOAM( false );
-        for( int i      = 0; i < 2; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 2; ++i ) swiWaitForVBlank( );
         type1->priority = OBJPRIORITY_1;
         IO::copySpritePal( Shiny2Pal, p_palCnt, false );
         IO::copySpriteData( Shiny2Tiles, p_tileCnt, Shiny2TilesLen, false );
         IO::updateOAM( false );
-        for( int i      = 0; i < 2; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 2; ++i ) swiWaitForVBlank( );
         type1->priority = OBJPRIORITY_0;
         IO::copySpritePal( Shiny1Pal, p_palCnt, false );
         IO::copySpriteData( Shiny1Tiles, p_tileCnt, Shiny1TilesLen, false );
         IO::updateOAM( false );
-        for( int i      = 0; i < 2; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 2; ++i ) swiWaitForVBlank( );
         type1->priority = OBJPRIORITY_1;
         IO::copySpritePal( Shiny2Pal, p_palCnt, false );
         IO::copySpriteData( Shiny2Tiles, p_tileCnt, Shiny2TilesLen, false );
         IO::updateOAM( false );
-        for( int i      = 0; i < 2; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 2; ++i ) swiWaitForVBlank( );
         type1->isHidden = true;
         IO::updateOAM( false );
     }
@@ -687,11 +687,13 @@ namespace BATTLE {
                            hpy, HP_COL( OPPONENT, 0 ), HP_COL( OPPONENT, 0 ) + 1, false );
 
             IO::displayEP( 100, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
-            IO::displayEP( 0, ( acPkmn.m_boxdata.m_experienceGained
-                                - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] )
-                                  * 100 / ( EXP[ acPkmn.m_level ][ p.m_expType ]
-                                            - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
-                           hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
+            IO::displayEP(
+                0,
+                ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] )
+                    * 100
+                    / ( EXP[ acPkmn.m_level ][ p.m_expType ]
+                        - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
+                hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
         }
     }
 
@@ -759,7 +761,7 @@ namespace BATTLE {
     }
 
     void setBattleUISubVisibility( bool p_isHidden = false ) {
-        for( u8 i                            = 0; i <= SUB_FIGHT_START + 6; ++i )
+        for( u8 i = 0; i <= SUB_FIGHT_START + 6; ++i )
             IO::Oam->oamBuffer[ i ].isHidden = p_isHidden;
         IO::updateOAM( true );
     }
@@ -831,6 +833,7 @@ namespace BATTLE {
                     break;
                 case POISONED:
                     snprintf( buffer, 19, GET_STRING( 148 ) );
+                    break;
                 default:
                     if( 5 * acPkmn.m_stats.m_acHP <= acPkmn.m_stats.m_maxHP )
                         IO::regularFont->setColor( RED_IDX, 1 );
@@ -971,9 +974,9 @@ namespace BATTLE {
     }
 
     /**
-    *  @returns 0 if the Pokemon shall be sent, 1 if further information was requested, 2 if the
-    * moves should be displayed, 3 if the previous screen shall be shown
-    */
+     *  @returns 0 if the Pokemon shall be sent, 1 if further information was requested, 2 if the
+     * moves should be displayed, 3 if the previous screen shall be shown
+     */
     u8 showConfirmation( pokemon& p_pokemon, bool p_alreadySent, bool p_alreadyChosen ) {
         IO::NAV->draw( );
         IO::Oam->oamBuffer[ SUB_Back_OAM ].isHidden = false;
@@ -1118,10 +1121,10 @@ namespace BATTLE {
     }
 
     /**
-    *  @param p_page: 1 show moves, 0 show status
-    *  @returns 0: return to prvious screen, 1 view next pokémon, 2 view previous pokémon, 3 switch
-    * screen
-    */
+     *  @param p_page: 1 show moves, 0 show status
+     *  @returns 0: return to prvious screen, 1 view next pokémon, 2 view previous pokémon, 3 switch
+     * screen
+     */
     u8 showDetailedInformation( pokemon& p_pokemon, u8 p_page ) {
         IO::NAV->draw( );
         undrawPKMNChoiceScreen( );
@@ -1179,19 +1182,22 @@ namespace BATTLE {
             printf(
                 "EP(%3lu%%)\n%s(%3i%%)",
                 ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] )
-                    * 100 / ( EXP[ p_pokemon.m_level ][ exptype ]
-                              - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
+                    * 100
+                    / ( EXP[ p_pokemon.m_level ][ exptype ]
+                        - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
                 GET_STRING( 126 ), p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::displayHP( 100, 101, 46, 40, 236, 237, false, 50, 56, true );
             IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP,
                            46, 40, 236, 237, false, 50, 56, true );
 
             IO::displayEP( 100, 101, 46, 40, 238, 239, false, 59, 62, true );
-            IO::displayEP( 0, ( p_pokemon.m_boxdata.m_experienceGained
-                                - EXP[ p_pokemon.m_level - 1 ][ exptype ] )
-                                  * 100 / ( EXP[ p_pokemon.m_level ][ exptype ]
-                                            - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
-                           46, 40, 238, 239, false, 59, 62, true );
+            IO::displayEP(
+                0,
+                ( p_pokemon.m_boxdata.m_experienceGained - EXP[ p_pokemon.m_level - 1 ][ exptype ] )
+                    * 100
+                    / ( EXP[ p_pokemon.m_level ][ exptype ]
+                        - EXP[ p_pokemon.m_level - 1 ][ exptype ] ),
+                46, 40, 238, 239, false, 59, 62, true );
             IO::boldFont->setColor( GRAY_IDX, 1 );
             IO::boldFont->setColor( BLACK_IDX, 2 );
             IO::boldFont->setColor( 0, 0 );
@@ -1477,8 +1483,8 @@ namespace BATTLE {
     }
 
     /**
-    *  @brief Loads all the required graphics and sprites
-    */
+     *  @brief Loads all the required graphics and sprites
+     */
     void battleUI::init( ) {
         // Copy the current PKMNStatus
         for( u8 i = 0; i < 6; ++i )
@@ -1746,7 +1752,7 @@ namespace BATTLE {
         _battle->_battleMoves[ p_pokemonPos ][ PLAYER ].m_target = 1 | 2 | 4 | 8;
 
         for( u8 i = 0; i < 4; ++i ) {
-            u8 aI                  = i % 2;
+            u8 aI = i % 2;
             if( 1 - ( i / 2 ) ) aI = ( 1 - aI );
 
             auto acPkmn = CUR_PKMN_2( *_battle, aI, 1 - ( i / 2 ) );
@@ -1827,7 +1833,7 @@ namespace BATTLE {
 
         drawAttackTargetChoice( selected, neverTarget, p_pokemonPos );
         for( u8 i = 0; i < 4; ++i ) {
-            u8 aI                  = i % 2;
+            u8 aI = i % 2;
             if( 1 - ( i / 2 ) ) aI = ( 1 - aI );
 
             auto acPkmn = CUR_PKMN_2( *_battle, aI, 1 - ( i / 2 ) );
@@ -1856,7 +1862,7 @@ namespace BATTLE {
             }
 
             for( u8 i = 0; i < 4; ++i ) {
-                u8 aI                  = i % 2;
+                u8 aI = i % 2;
                 if( 1 - ( i / 2 ) ) aI = ( 1 - aI );
 
                 auto acPkmn = CUR_PKMN_2( *_battle, aI, 1 - ( i / 2 ) );
@@ -1880,7 +1886,7 @@ namespace BATTLE {
                     for( u8 j = 0; j < 4; ++j ) {
                         if( !selected[ j ] && j != i ) continue;
 
-                        u8 aJ                  = j % 2;
+                        u8 aJ = j % 2;
                         if( 1 - ( j / 2 ) ) aJ = ( 1 - aJ );
 
                         auto acPkmnJ = CUR_PKMN_2( *_battle, aJ, 1 - ( j / 2 ) );
@@ -1926,7 +1932,7 @@ namespace BATTLE {
                         || ( acMove->m_moveAffectsWhom & move::OPPONENTS_FIELD )
                         || ( acMove->m_moveAffectsWhom == move::DEPENDS_ON_ATTACK ) )
                         result = 0;
-                    result     = selected[ 2 ] | ( selected[ 3 ] << 1 ) | ( selected[ 1 ] << 2 )
+                    result = selected[ 2 ] | ( selected[ 3 ] << 1 ) | ( selected[ 1 ] << 2 )
                              | ( selected[ 0 ] << 3 );
                     goto END;
                 }
@@ -2130,15 +2136,17 @@ namespace BATTLE {
 
         getAll( acPkmn.m_boxdata.m_speciesId, p );
 
-        u16 expStart = ( acPkmn.m_boxdata.m_experienceGained
-                         - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] - p_gainedExp )
-                       * 100 / ( EXP[ acPkmn.m_level ][ p.m_expType ]
-                                 - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] );
+        u16 expStart
+            = ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ]
+                - p_gainedExp )
+              * 100
+              / ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] );
         u16 expEnd = std::min(
             u16( 100 ),
             u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] )
-                 * 100 / ( EXP[ acPkmn.m_level ][ p.m_expType ]
-                           - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
+                 * 100
+                 / ( EXP[ acPkmn.m_level ][ p.m_expType ]
+                     - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
 
         char buffer[ 100 ];
         snprintf( buffer, 99, GET_STRING( 167 ), acPkmn.m_boxdata.m_name, p_gainedExp );
@@ -2161,7 +2169,7 @@ namespace BATTLE {
                       + 10;
             else
                 acPkmn.m_stats.m_maxHP = 1;
-            pkmnNatures nature         = acPkmn.m_boxdata.getNature( );
+            pkmnNatures nature = acPkmn.m_boxdata.getNature( );
 
             acPkmn.m_stats.m_Atk
                 = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
@@ -2213,11 +2221,12 @@ namespace BATTLE {
                   && EXP[ acPkmn.m_level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
 
             expStart = 0;
-            expEnd   = std::min( u16( 100 ),
-                               u16( ( acPkmn.m_boxdata.m_experienceGained
-                                      - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] )
-                                    * 100 / ( EXP[ acPkmn.m_level ][ p.m_expType ]
-                                              - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
+            expEnd
+                = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained
+                                               - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] )
+                                             * 100
+                                             / ( EXP[ acPkmn.m_level ][ p.m_expType ]
+                                                 - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
 
             IO::displayEP( 101, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
             IO::displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
@@ -2385,9 +2394,10 @@ namespace BATTLE {
 
         IO::displayEP( 100, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
         IO::displayEP(
-            0, ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] )
-                   * 100 / ( EXP[ acPkmn.m_level ][ p.m_expType ]
-                             - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
+            0,
+            ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100
+                / ( EXP[ acPkmn.m_level ][ p.m_expType ]
+                    - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
             hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
     }
 
@@ -2692,4 +2702,4 @@ namespace BATTLE {
     //////////////////////////////////////////////////////////////////////////
     // END BATTLE_UI
     //////////////////////////////////////////////////////////////////////////
-}
+} // namespace BATTLE

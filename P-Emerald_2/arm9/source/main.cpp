@@ -75,16 +75,17 @@ GameMod gMod = GameMod::EMULATOR;
 u8 DayTimes[ 4 ][ 5 ]
     = {{7, 10, 15, 17, 23}, {6, 9, 12, 18, 23}, {5, 8, 10, 20, 23}, {7, 9, 13, 19, 23}};
 
-int  hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
-int  achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
-int  pressed, held, last;
-bool DRAW_TIME         = false;
-bool UPDATE_TIME       = true;
-bool ANIMATE_MAP       = false;
-u8   FRAME_COUNT       = 0;
-bool SCREENS_SWAPPED   = false;
-bool PLAYER_IS_FISHING = false;
-bool INIT_NITROFS      = false;
+time_t unixTime;
+int    hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
+int    achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
+int    pressed, held, last;
+bool   DRAW_TIME         = false;
+bool   UPDATE_TIME       = true;
+bool   ANIMATE_MAP       = false;
+u8     FRAME_COUNT       = 0;
+bool   SCREENS_SWAPPED   = false;
+bool   PLAYER_IS_FISHING = false;
+bool   INIT_NITROFS      = false;
 
 char** ARGV;
 
@@ -134,6 +135,68 @@ void initTimeAndRnd( ) {
     srand( hours ^ ( 100 * minutes ) ^ ( 10000 * seconds ) ^ ( day ^ ( 100 * month ) ^ year ) );
 }
 
+void vblankIRQ( ) {
+    scanKeys( );
+    FRAME_COUNT++;
+
+    if( ANIMATE_MAP && MAP::curMap ) MAP::curMap->animateMap( FRAME_COUNT );
+
+    if( INIT_NITROFS ) {
+        nitroFSInit( ARGV );
+        INIT_NITROFS = false;
+    }
+
+    if( !UPDATE_TIME ) return;
+
+    auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
+
+    IO::boldFont->setColor( 0, 0 );
+    u8 oldC1 = IO::boldFont->getColor( 1 );
+    u8 oldC2 = IO::boldFont->getColor( 2 );
+    IO::boldFont->setColor( 0, 1 );
+    IO::boldFont->setColor( BLACK_IDX, 2 );
+    pal[ BLACK_IDX ] = BLACK;
+    time( &unixTime );
+    struct tm* timeStruct = gmtime( &unixTime );
+
+    if( acseconds != timeStruct->tm_sec || DRAW_TIME ) {
+        DRAW_TIME        = false;
+        pal[ WHITE_IDX ] = WHITE;
+        IO::boldFont->setColor( WHITE_IDX, 1 );
+        IO::boldFont->setColor( WHITE_IDX, 2 );
+
+        char buffer[ 50 ];
+        sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
+        IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
+
+        SAVE::SAV->getActiveFile( ).m_pt.m_secs++; // I know, this is rather inaccurate
+
+        SAVE::SAV->getActiveFile( ).m_pt.m_mins += ( SAVE::SAV->getActiveFile( ).m_pt.m_secs / 60 );
+        SAVE::SAV->getActiveFile( ).m_pt.m_hours
+            += ( SAVE::SAV->getActiveFile( ).m_pt.m_mins / 60 );
+
+        SAVE::SAV->getActiveFile( ).m_pt.m_secs %= 60;
+        SAVE::SAV->getActiveFile( ).m_pt.m_mins %= 60;
+
+        achours   = timeStruct->tm_hour;
+        acminutes = timeStruct->tm_min;
+        acseconds = timeStruct->tm_sec;
+
+        IO::boldFont->setColor( 0, 1 );
+        IO::boldFont->setColor( BLACK_IDX, 2 );
+        sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
+        IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
+    }
+    achours   = timeStruct->tm_hour;
+    acminutes = timeStruct->tm_min;
+    acday     = timeStruct->tm_mday;
+    acmonth   = timeStruct->tm_mon + 1;
+    acyear    = timeStruct->tm_year + 1900;
+
+    IO::boldFont->setColor( oldC1, 1 );
+    IO::boldFont->setColor( oldC2, 2 );
+}
+
 int main( int, char** p_argv ) {
     // Init
     powerOn( POWER_ALL_2D );
@@ -148,81 +211,23 @@ int main( int, char** p_argv ) {
     if( gMod != EMULATOR && p_argv[ 0 ] )
         SAVE::SAV = FS::readSave( p_argv[ 0 ] );
     else
-        SAVE::SAV              = 0;
+        SAVE::SAV = 0;
     if( !SAVE::SAV ) SAVE::SAV = std::unique_ptr<SAVE::saveGame>( new SAVE::saveGame( ) );
     SAVE::startScreen( ).run( );
     IO::clearScreenConsole( false, true );
     IO::clearScreen( false, true );
 
-    irqSet( IRQ_VBLANK, []( ) {
-        scanKeys( );
-        FRAME_COUNT++;
-
-        if( ANIMATE_MAP && MAP::curMap ) MAP::curMap->animateMap( FRAME_COUNT );
-
-        if( INIT_NITROFS ) {
-            nitroFSInit( ARGV );
-            INIT_NITROFS = false;
-        }
-
-        if( !UPDATE_TIME ) return;
-
-        auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
-
-        IO::boldFont->setColor( 0, 0 );
-        u8 oldC1 = IO::boldFont->getColor( 1 );
-        u8 oldC2 = IO::boldFont->getColor( 2 );
-        IO::boldFont->setColor( 0, 1 );
-        IO::boldFont->setColor( BLACK_IDX, 2 );
-        pal[ BLACK_IDX ]      = BLACK;
-        time_t     unixTime   = time( NULL );
-        struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
-
-        if( acseconds != timeStruct->tm_sec || DRAW_TIME ) {
-            DRAW_TIME        = false;
-            pal[ WHITE_IDX ] = WHITE;
-            IO::boldFont->setColor( WHITE_IDX, 1 );
-            IO::boldFont->setColor( WHITE_IDX, 2 );
-
-            char buffer[ 50 ];
-            sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-            IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
-
-            SAVE::SAV->getActiveFile( ).m_pt.m_secs++; // I know, this is rather inaccurate
-
-            SAVE::SAV->getActiveFile( ).m_pt.m_mins
-                += ( SAVE::SAV->getActiveFile( ).m_pt.m_secs / 60 );
-            SAVE::SAV->getActiveFile( ).m_pt.m_hours
-                += ( SAVE::SAV->getActiveFile( ).m_pt.m_mins / 60 );
-
-            SAVE::SAV->getActiveFile( ).m_pt.m_secs %= 60;
-            SAVE::SAV->getActiveFile( ).m_pt.m_mins %= 60;
-
-            achours   = timeStruct->tm_hour;
-            acminutes = timeStruct->tm_min;
-            acseconds = timeStruct->tm_sec;
-
-            IO::boldFont->setColor( 0, 1 );
-            IO::boldFont->setColor( BLACK_IDX, 2 );
-            sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-            IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
-        }
-        achours   = timeStruct->tm_hour;
-        acminutes = timeStruct->tm_min;
-        acday     = timeStruct->tm_mday;
-        acmonth   = timeStruct->tm_mon + 1;
-        acyear    = timeStruct->tm_year + 1900;
-
-        IO::boldFont->setColor( oldC1, 1 );
-        IO::boldFont->setColor( oldC2, 2 );
-    } );
-    IO::NAV = new IO::nav( );
-
     FADE_TOP( );
     MAP::curMap = new MAP::mapDrawer( );
     MAP::curMap->draw( );
+    MAP::loadNewBank( SAVE::SAV->getActiveFile( ).m_currentMap );
 
     ANIMATE_MAP = true;
+    IO::NAV     = new IO::nav( );
+    irqSet( IRQ_VBLANK, vblankIRQ );
+
+    IO::NAV->showNewMap( SAVE::SAV->getActiveFile( ).m_currentMap );
+    IO::NAV->updateMap( MAP::curMap->getCurrentLocationId( ) );
 
     touchPosition touch;
     bool          stopped = true;
@@ -236,11 +241,12 @@ int main( int, char** p_argv ) {
 
 #ifdef DEBUG
         if( held & KEY_L && gMod == DEVELOPER ) {
-            time_t     unixTime   = time( NULL );
-            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
-            char       buffer[ 100 ];
-            snprintf( buffer, 99, "Currently at %hhu-(%hu,%hu,%hhu).\nMap: %i:%i,"
-                                  "(%02X,%02X)\nFRAME: %hhu; %2d:%2d:%2d (%2d)",
+            //            time_t     unixTime   = time( NULL );
+            //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
+            char buffer[ 100 ];
+            snprintf( buffer, 99,
+                      "Currently at %hhu-(%hu,%hu,%hhu).\nMap: %i:%i,"
+                      "(%02u,%02u)\n%hhu %s (%hu) %lx",
                       SAVE::SAV->getActiveFile( ).m_currentMap,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
@@ -248,8 +254,11 @@ int main( int, char** p_argv ) {
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY / 32,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX % 32,
-                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32, FRAME_COUNT, achours,
-                      acminutes, acseconds, timeStruct->tm_sec );
+                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32,
+                      MAP::CURRENT_BANK.m_bank,
+                      FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
+                      MAP::curMap->getCurrentLocationId( ),
+                      ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ] );
             IO::messageBox m( buffer );
             IO::NAV->draw( true );
         }
@@ -286,6 +295,7 @@ int main( int, char** p_argv ) {
                     goto OUT;
                 }
             }
+            MAP::curMap->interact( );
         OUT:
             scanKeys( );
             continue;
