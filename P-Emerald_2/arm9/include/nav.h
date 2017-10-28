@@ -26,51 +26,46 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 */
 #pragma once
 
+#include <string>
 #include <nds.h>
 #include <nds/ndstypes.h>
-#include <string>
 
 namespace IO {
 #define MAXBG 13
 #define START_BG 0
-    extern unsigned int NAV_DATA[ 12288 ];
+    extern unsigned int   NAV_DATA[ 12288 ];
     extern unsigned short NAV_DATA_PAL[ 256 ];
 
     class nav {
-    public:
+      public:
         struct backgroundSet {
-            std::string             m_name;
-            const unsigned int      *m_mainMenu;
-            const unsigned short    *m_mainMenuPal;
-            bool                    m_loadFromRom;
-            bool                    m_allowsOverlay;
-            u8                      *m_mainMenuSpritePoses;
+            std::string           m_name;
+            const unsigned int *  m_mainMenu;
+            const unsigned short *m_mainMenuPal;
+            bool                  m_loadFromRom;
+            bool                  m_allowsOverlay;
         };
-        enum state {
-            HOME,
-            MAP,
-            MAP_BIG,
-            MAP_MUG
-        };
-    private:
-        bool _power;
+        enum state { HOME, MAP, MAP_BIG, MAP_MUG };
+
+      private:
         state _state;
-        bool _allowInit;
-        u8 _curMap;
+        bool  _allowInit;
+        u8    _curBank;
+        u16   _curMap;
 
         void drawMapMug( );
-    public:
+        void drawBorder( );
+
+      public:
         nav( );
-        void draw( bool p_initMainSprites = false, u8 p_newIdx = (u8)255 );
-        void showNewMap( u8 p_map );
-        void handleInput( touchPosition p_touch, const char* p_path );
+        void draw( bool p_initMainSprites = false, u8 p_newIdx = (u8) 255 );
+        void showNewMap( u8 p_bank );
+        void updateMap( u16 p_map );
+        void handleInput( touchPosition p_touch, const char *p_path );
         void home( ) {
             _state = HOME;
         }
-        void togglePower( ) {
-            _power = !_power;
-        }
     };
     extern nav::backgroundSet BGs[ MAXBG ];
-    extern nav* NAV;
+    extern nav *              NAV;
 }

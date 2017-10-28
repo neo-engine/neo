@@ -13,6 +13,7 @@ nnoremap <F7> :!./.generate_ctags.sh<cr>
 let g:ycm_collect_identifiers_from_tags_files = 1
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_max_diagnostics_to_display = 1000
+let g:ycm_allow_changing_updatetime = 0
 
 autocmd vimenter * NERDTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
