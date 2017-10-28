@@ -155,13 +155,16 @@ namespace MAP {
                 break;
             case SET_FLAG:
                 SAVE::SAV->getActiveFile( ).setFlag( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), 1 );
+                break;
             case SET_FLAG_I:
                 SAVE::SAV->getActiveFile( ).setFlag( ( PARAM1( SCRIPT_INS[ pc ] ) ), 1 );
+                break;
             case CLEAR_FLAG:
                 SAVE::SAV->getActiveFile( ).setFlag( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), 0 );
+                break;
             case CLEAR_FLAG_I:
                 SAVE::SAV->getActiveFile( ).setFlag( ( PARAM1( SCRIPT_INS[ pc ] ) ), 0 );
-
+                break;
             case BRANCH:
                 if( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ) pc = FETCH( PARAM2( SCRIPT_INS[ pc ] ) );
                 break;
@@ -192,28 +195,32 @@ namespace MAP {
             case ITEM_I:
                 IO::messageBox( ItemList[ PARAMA( SCRIPT_INS[ pc ] ) ],
                                 PARAMB( SCRIPT_INS[ pc ] ) );
+                break;
             case ITEM:
                 IO::messageBox( ItemList[ FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ],
                                 FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) );
+                break;
             case GIVE_PKMN_I: {
-                pokemon pk = pokemon( PARAMA( SCRIPT_INS[ pc ] ), PARAMB( SCRIPT_INS[ pc ] ) );
-                SAVE::SAV->getActiveFile( ).givePkmn( pk );
+                // pokemon pk = pokemon( PARAMA( SCRIPT_INS[ pc ] ), PARAMB( SCRIPT_INS[ pc ] ) );
+                // TODO
+                // SAVE::SAV->getActiveFile( ).givePkmn( pk );
                 break;
             }
             case GIVE_PKMN: {
-                pokemon pk = pokemon( FETCH( PARAMA( SCRIPT_INS[ pc ] ) ),
-                                      FETCH( PARAMB( SCRIPT_INS[ pc ] ) ) );
-                SAVE::SAV->getActiveFile( ).givePkmn( pk );
+                // pokemon pk = pokemon( FETCH( PARAMA( SCRIPT_INS[ pc ] ) ),
+                //                       FETCH( PARAMB( SCRIPT_INS[ pc ] ) ) );
+                // TODO
+                // SAVE::SAV->getActiveFile( ).givePkmn( pk );
                 break;
             }
             case BATTLE_PKMN_I: {
-                pokemon pk = pokemon( PARAMA( SCRIPT_INS[ pc ] ), PARAMB( SCRIPT_INS[ pc ] ) );
+                // pokemon pk = pokemon( PARAMA( SCRIPT_INS[ pc ] ), PARAMB( SCRIPT_INS[ pc ] ) );
                 // TODO
                 break;
             }
             case BATTLE_PKMN: {
-                pokemon pk = pokemon( FETCH( PARAMA( SCRIPT_INS[ pc ] ) ),
-                                      FETCH( PARAMB( SCRIPT_INS[ pc ] ) ) );
+                // pokemon pk = pokemon( FETCH( PARAMA( SCRIPT_INS[ pc ] ) ),
+                //                       FETCH( PARAMB( SCRIPT_INS[ pc ] ) ) );
                 // TODO
                 break;
             }

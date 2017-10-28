@@ -368,7 +368,7 @@ namespace MAP {
             handleWildPkmn( GRASS );
     }
     pokemon wildPkmn;
-    bool mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType, bool p_forceEncounter ) {
+    bool    mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType, bool p_forceEncounter ) {
 
         u16 rn = rand( ) % ( 512 + SAVE::SAV->getActiveFile( ).m_options.m_encounterRateModifier );
         if( p_type == FISHING_ROD ) rn /= 8;
@@ -458,7 +458,7 @@ namespace MAP {
         }
 
         if( !battleBack ) {
-            if( p_type == GRASS ) battleBack      = 1;
+            if( p_type == GRASS ) battleBack = 1;
             if( p_type == HIGH_GRASS ) battleBack = 3;
             if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF )
                 battleBack = 4;
@@ -1081,6 +1081,7 @@ namespace MAP {
                 IO::fadeScreen( IO::CAVE_EXIT );
                 break;
             }
+            break;
         case LAST_VISITED:
         case NO_SPECIAL:
         default:
@@ -1391,8 +1392,8 @@ namespace MAP {
                                                          96 - 24 + 8 * ( p_direction == DOWN ), 0,
                                                          0, 0 );
 
-        u8 frame                        = 0;
-        if( p_direction == UP ) frame   = 4;
+        u8 frame = 0;
+        if( p_direction == UP ) frame = 4;
         if( p_direction == DOWN ) frame = 8;
 
         for( u8 i = 0; i < 4; ++i ) {
