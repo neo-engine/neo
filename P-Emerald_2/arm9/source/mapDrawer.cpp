@@ -622,10 +622,27 @@ namespace MAP {
             if( p_direction % 2 == 0 ) return false;
             break;
         case 0x13:
-        case 0xd3:
+            return false;
+        case 0xd3: // Bike stuff
+            if( p_direction % 2 && ( p_moveMode & BIKE ) ) return true;
+            if( p_direction % 2 == 0 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+                return true;
+            return false;
         case 0xd4:
+            if( p_direction % 2 == 0 && ( p_moveMode & BIKE ) ) return true;
+            if( p_direction % 2 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+                return true;
+            return false;
         case 0xd5:
+            if( p_direction % 2 && ( p_moveMode & BIKE ) ) return true;
+            if( p_direction % 2 == 0 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+                return true;
+            return false;
         case 0xd6:
+            if( p_direction % 2 == 0 && ( p_moveMode & BIKE ) ) return true;
+            if( p_direction % 2 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+                return true;
+            return false;
         case 0xd7:
             return false;
         default:
@@ -677,7 +694,7 @@ namespace MAP {
                 swiWaitForVBlank( );
                 swiWaitForVBlank( );
                 stopPlayer( );
-                IO::messageBox m( GET_STRING( 7 ), POKE_NAV );
+                IO::messageBox( GET_STRING( 7 ), POKE_NAV );
                 _playerIsFast = false;
                 IO::NAV->draw( true );
                 return;

@@ -246,7 +246,7 @@ int main( int, char** p_argv ) {
             char buffer[ 100 ];
             snprintf( buffer, 99,
                       "Currently at %hhu-(%hu,%hu,%hhu).\nMap: %i:%i,"
-                      "(%02u,%02u)\n%hhu %s (%hu) %lx",
+                      "(%02u,%02u)\n %hhu %s (%hu) %lx %hx %hx",
                       SAVE::SAV->getActiveFile( ).m_currentMap,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
@@ -258,7 +258,15 @@ int main( int, char** p_argv ) {
                       MAP::CURRENT_BANK.m_bank,
                       FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
                       MAP::curMap->getCurrentLocationId( ),
-                      ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ] );
+                      ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ],
+                      MAP::curMap
+                          ->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
+                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY / 32 )
+                          .m_bottombehave,
+                      MAP::curMap
+                          ->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
+                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY / 32 )
+                          .m_topbehave );
             IO::messageBox m( buffer );
             IO::NAV->draw( true );
         }
