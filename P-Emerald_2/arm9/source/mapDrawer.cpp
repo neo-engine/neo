@@ -622,10 +622,27 @@ namespace MAP {
             if( p_direction % 2 == 0 ) return false;
             break;
         case 0x13:
-        case 0xd3:
+            return false;
+        case 0xd3: // Bike stuff
+            if( p_direction % 2 == 0 && ( p_moveMode & BIKE ) ) return true;
+            if( p_direction % 2 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+                return true;
+            return false;
         case 0xd4:
+            if( p_direction % 2 && ( p_moveMode & BIKE ) ) return true;
+            if( p_direction % 2 == 0 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+                return true;
+            return false;
         case 0xd5:
+            if( p_direction % 2 == 0 && ( p_moveMode & BIKE ) ) return true;
+            if( p_direction % 2 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+                return true;
+            return false;
         case 0xd6:
+            if( p_direction % 2 && ( p_moveMode & BIKE ) ) return true;
+            if( p_direction % 2 == 0 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+                return true;
+            return false;
         case 0xd7:
             return false;
         default:
@@ -677,7 +694,7 @@ namespace MAP {
                 swiWaitForVBlank( );
                 swiWaitForVBlank( );
                 stopPlayer( );
-                IO::messageBox m( GET_STRING( 7 ), POKE_NAV );
+                IO::messageBox( GET_STRING( 7 ), POKE_NAV );
                 _playerIsFast = false;
                 IO::NAV->draw( true );
                 return;
@@ -749,6 +766,22 @@ namespace MAP {
                 jumpPlayer( DOWN );
                 p_direction = DOWN;
                 break;
+
+            case 0xd0:
+                if( p_direction == DOWN ) {
+                    slidePlayer( DOWN );
+                    p_direction = DOWN;
+                    reinit      = true;
+                    break;
+                } else {
+                    if( fastBike > 9 ) goto NEXT_PASS;
+                    walkPlayer( p_direction, p_fast );
+                    slidePlayer( DOWN );
+                    p_direction = DOWN;
+                    reinit      = true;
+                    break;
+                }
+
             // Warpy stuff
             case 0x60:
                 walkPlayer( p_direction, p_fast );
@@ -857,12 +890,6 @@ namespace MAP {
                     p_direction = DOWN;
                     break;
 
-                case 0xd0:
-                    if( fastBike > 9 && p_direction != DOWN ) goto NEXT_PASS;
-                    slidePlayer( DOWN );
-                    p_direction = DOWN;
-                    break;
-
                 case 0x50:
                     if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, RIGHT,
                                   SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
@@ -920,6 +947,13 @@ namespace MAP {
                         break;
                     }
                     goto NEXT_PASS;
+
+                case 0xd0:
+                    if( fastBike > 9 && p_direction != DOWN ) goto NEXT_PASS;
+                    slidePlayer( DOWN );
+                    p_direction = DOWN;
+                    break;
+
                 NEXT_PASS:
                 default:
                     if( reinit ) {
@@ -1102,6 +1136,15 @@ namespace MAP {
     }
 
     void mapDrawer::redirectPlayer( direction p_direction, bool p_fast ) {
+        // Check if redirecting is allowed
+        u8 lstBehave = at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                           SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
+                           .m_bottombehave;
+
+        if( lstBehave >= 0xd3 && lstBehave <= 0xd6
+            && p_direction % 2 != SAVE::SAV->getActiveFile( ).m_player.m_direction % 2 )
+            return;
+
         // Check if the player's direction changed
         if( p_direction != SAVE::SAV->getActiveFile( ).m_player.m_direction ) {
             _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setFrame(

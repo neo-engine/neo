@@ -74,8 +74,9 @@ namespace MAP {
         SURF      = 1,
         BIKE      = 2,
         ACRO_BIKE = 3,
-        SIT       = 4,
-        DIVE      = 5,
+        BIKE_JUMP = 4,
+        SIT       = 5,
+        DIVE      = 6,
         // NPC modes
         NO_MOVEMENT = 0,
     };
@@ -131,5 +132,5 @@ namespace MAP {
     };
 
     extern bankInfo CURRENT_BANK;
-    void loadNewBank( u8 p_bank );
-}
+    void            loadNewBank( u8 p_bank );
+} // namespace MAP
