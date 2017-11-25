@@ -766,6 +766,22 @@ namespace MAP {
                 jumpPlayer( DOWN );
                 p_direction = DOWN;
                 break;
+
+            case 0xd0:
+                if( p_direction == DOWN ) {
+                    slidePlayer( DOWN );
+                    p_direction = DOWN;
+                    reinit      = true;
+                    break;
+                } else {
+                    if( fastBike > 9 ) goto NEXT_PASS;
+                    walkPlayer( p_direction, p_fast );
+                    slidePlayer( DOWN );
+                    p_direction = DOWN;
+                    reinit      = true;
+                    break;
+                }
+
             // Warpy stuff
             case 0x60:
                 walkPlayer( p_direction, p_fast );
@@ -874,12 +890,6 @@ namespace MAP {
                     p_direction = DOWN;
                     break;
 
-                case 0xd0:
-                    if( fastBike > 9 && p_direction != DOWN ) goto NEXT_PASS;
-                    slidePlayer( DOWN );
-                    p_direction = DOWN;
-                    break;
-
                 case 0x50:
                     if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, RIGHT,
                                   SAVE::SAV->getActiveFile( ).m_player.m_movement ) )
@@ -937,6 +947,13 @@ namespace MAP {
                         break;
                     }
                     goto NEXT_PASS;
+
+                case 0xd0:
+                    if( fastBike > 9 && p_direction != DOWN ) goto NEXT_PASS;
+                    slidePlayer( DOWN );
+                    p_direction = DOWN;
+                    break;
+
                 NEXT_PASS:
                 default:
                     if( reinit ) {
