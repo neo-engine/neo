@@ -28,56 +28,61 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include <nds.h>
 #include <nds/ndstypes.h>
 
-#include "uio.h"
-#include "font.h"
 #include "defines.h"
+#include "font.h"
 #include "saveGame.h"
+#include "uio.h"
 
 namespace IO {
-    font::font( u8 *p_data, u8 *p_widths, void( *p_shiftchar )( u16& val ) ) {
-        _data = p_data;
-        _widths = p_widths;
-        _color[ 0 ] = _color[ 1 ] = _color[ 2 ]
-            = _color[ 3 ] = _color[ 4 ] = WHITE;
-        _shiftchar = p_shiftchar;
+    font::font( u8 *p_data, u8 *p_widths, void ( *p_shiftchar )( u16 &val ) ) {
+        _data       = p_data;
+        _widths     = p_widths;
+        _color[ 0 ] = _color[ 1 ] = _color[ 2 ] = _color[ 3 ] = _color[ 4 ] = WHITE;
+        _shiftchar                                                          = p_shiftchar;
     }
 
     void font::printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom ) {
         _shiftchar( p_ch );
 
         s16 putX, putY;
-        u8 getX, getY;
+        u8  getX, getY;
         u32 offset = p_ch * FONT_WIDTH * FONT_HEIGHT;
 
         for( putY = p_y, getY = 0; putY < p_y + FONT_HEIGHT; ++putY, ++getY ) {
             for( putX = p_x, getX = 0; putX < p_x + _widths[ p_ch ]; putX += 2, getX += 2 ) {
                 if( putX >= 0 && putX < SCREEN_WIDTH && putY >= 0 && putY < SCREEN_HEIGHT ) {
                     if( !p_bottom ) {
-                        topScreenPlot( putX, putY, ( (u8) ( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
-                            (u8) ( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                        topScreenPlot(
+                            putX, putY,
+                            ( ( u8 )( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] )
+                              << 8 )
+                                | ( u8 )(
+                                      _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     } else {
-                        btmScreenPlot( putX, putY, ( (u8) ( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] ) << 8 ) |
-                            (u8) ( _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
+                        btmScreenPlot(
+                            putX, putY,
+                            ( ( u8 )( _color[ _data[ 1 + offset + ( getX + getY * FONT_WIDTH ) ] ] )
+                              << 8 )
+                                | ( u8 )(
+                                      _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ] ) );
                     }
                 }
             }
         }
     }
 
-    void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, alignment p_alignment, u8 p_yDistance, s8 p_adjustX ) {
+    void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
+                            alignment p_alignment, u8 p_yDistance, s8 p_adjustX ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
-        if( p_alignment == RIGHT )
-            putX = p_x - stringWidth( p_string );
-        if( p_alignment == CENTER )
-            putX = p_x - stringWidth( p_string ) / 2;
+        if( p_alignment == RIGHT ) putX = p_x - stringWidth( p_string );
+        if( p_alignment == CENTER ) putX = p_x - stringWidth( p_string ) / 2;
 
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
                 putX = ( p_x -= p_adjustX );
-                if( p_alignment == RIGHT )
-                    putX = p_x - stringWidth( p_string + current_char + 1 );
+                if( p_alignment == RIGHT ) putX = p_x - stringWidth( p_string + current_char + 1 );
                 if( p_alignment == CENTER )
                     putX = p_x - stringWidth( p_string + current_char + 1 ) / 2;
 
@@ -94,7 +99,8 @@ namespace IO {
         }
     }
 
-    void font::printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX, u16 p_breakChar ) {
+    void font::printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX,
+                               u16 p_breakChar ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -112,7 +118,7 @@ namespace IO {
         }
     }
 
-    void font::printStringD( const char *p_string, s16& p_x, s16& p_y, bool p_bottom ) {
+    void font::printStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -129,7 +135,9 @@ namespace IO {
             _shiftchar( c );
             putX += _widths[ c ];
 
-            for( u8 i = 0; i < 80 / ( TEXTSPEED + SAVE::SAV->getActiveFile( ).m_options.m_textSpeedModifier ); ++i )
+            for( u8 i = 0;
+                 i < 80 / ( TEXTSPEED + SAVE::SAV->getActiveFile( ).m_options.m_textSpeedModifier );
+                 ++i )
                 swiWaitForVBlank( );
             current_char++;
         }
@@ -157,7 +165,7 @@ namespace IO {
                 continue;
             }
             if( p_string[ current_char ] == '`' ) {
-                u8 c = 0;
+                u8   c  = 0;
                 bool on = false;
                 if( p_bottom ) {
                     Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
@@ -170,7 +178,7 @@ namespace IO {
                 loop( ) {
                     swiWaitForVBlank( );
                     scanKeys( );
-                    int pressed = keysDown( );
+                    int pressed = keysCurrent( );
                     if( ++c == 45 ) {
                         c = 0;
                         if( on )
@@ -182,10 +190,7 @@ namespace IO {
                     if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_B ) ) break;
                     touchPosition t;
                     touchRead( &t );
-                    if( t.px > 224 && t.py > 164
-                        && waitForTouchUp( 224, 164 ) ) {
-                        break;
-                    }
+                    if( t.px > 224 && t.py > 164 && waitForTouchUp( 224, 164 ) ) { break; }
                 }
                 if( p_bottom ) {
                     Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
@@ -206,7 +211,7 @@ namespace IO {
             current_char++;
         }
     }
-    void font::printMBStringD( const char *p_string, s16& p_x, s16& p_y, bool p_bottom ) {
+    void font::printMBStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom ) {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -218,7 +223,7 @@ namespace IO {
                 continue;
             }
             if( p_string[ current_char ] == '`' ) {
-                u8 c = 0;
+                u8   c  = 0;
                 bool on = false;
                 if( p_bottom ) {
                     Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
@@ -231,7 +236,7 @@ namespace IO {
                 loop( ) {
                     swiWaitForVBlank( );
                     scanKeys( );
-                    int pressed = keysDown( );
+                    int pressed = keysCurrent( );
                     if( ++c == 45 ) {
                         c = 0;
                         if( on )
@@ -243,10 +248,7 @@ namespace IO {
                     if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_B ) ) break;
                     touchPosition t;
                     touchRead( &t );
-                    if( t.px > 224 && t.py > 164
-                        && waitForTouchUp( 224, 164 ) ) {
-                        break;
-                    }
+                    if( t.px > 224 && t.py > 164 && waitForTouchUp( 224, 164 ) ) { break; }
                 }
                 if( p_bottom ) {
                     Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
@@ -264,7 +266,9 @@ namespace IO {
             _shiftchar( c );
             putX += _widths[ c ];
 
-            for( u8 i = 0; i < 80 / ( TEXTSPEED + SAVE::SAV->getActiveFile( ).m_options.m_textSpeedModifier ); ++i )
+            for( u8 i = 0;
+                 i < 80 / ( TEXTSPEED + SAVE::SAV->getActiveFile( ).m_options.m_textSpeedModifier );
+                 ++i )
                 swiWaitForVBlank( );
             current_char++;
         }
@@ -274,11 +278,10 @@ namespace IO {
 
     u32 font::stringWidth( const char *p_string ) const {
         u32 current_char = 0;
-        u32 width = 0;
+        u32 width        = 0;
 
         while( p_string[ current_char ] ) {
-            if( p_string[ current_char ] == '\n' )
-                break;
+            if( p_string[ current_char ] == '\n' ) break;
             u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             width += _widths[ c ];
@@ -288,4 +291,4 @@ namespace IO {
 
         return width;
     }
-}
+} // namespace IO
