@@ -624,23 +624,23 @@ namespace MAP {
         case 0x13:
             return false;
         case 0xd3: // Bike stuff
-            if( p_direction % 2 && ( p_moveMode & BIKE ) ) return true;
-            if( p_direction % 2 == 0 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+            if( p_direction % 2 == 0 && ( p_moveMode & BIKE ) ) return true;
+            if( p_direction % 2 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
                 return true;
             return false;
         case 0xd4:
-            if( p_direction % 2 == 0 && ( p_moveMode & BIKE ) ) return true;
-            if( p_direction % 2 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
-                return true;
-            return false;
-        case 0xd5:
             if( p_direction % 2 && ( p_moveMode & BIKE ) ) return true;
             if( p_direction % 2 == 0 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
                 return true;
             return false;
-        case 0xd6:
+        case 0xd5:
             if( p_direction % 2 == 0 && ( p_moveMode & BIKE ) ) return true;
             if( p_direction % 2 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+                return true;
+            return false;
+        case 0xd6:
+            if( p_direction % 2 && ( p_moveMode & BIKE ) ) return true;
+            if( p_direction % 2 == 0 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
                 return true;
             return false;
         case 0xd7:
@@ -1119,6 +1119,15 @@ namespace MAP {
     }
 
     void mapDrawer::redirectPlayer( direction p_direction, bool p_fast ) {
+        // Check if redirecting is allowed
+        u8 lstBehave = at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                           SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
+                           .m_bottombehave;
+
+        if( lstBehave >= 0xd3 && lstBehave <= 0xd6
+            && p_direction % 2 != SAVE::SAV->getActiveFile( ).m_player.m_direction % 2 )
+            return;
+
         // Check if the player's direction changed
         if( p_direction != SAVE::SAV->getActiveFile( ).m_player.m_direction ) {
             _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setFrame(

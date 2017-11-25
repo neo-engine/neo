@@ -260,12 +260,12 @@ int main( int, char** p_argv ) {
                       MAP::curMap->getCurrentLocationId( ),
                       ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ],
                       MAP::curMap
-                          ->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
-                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY / 32 )
+                          ->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
                           .m_bottombehave,
                       MAP::curMap
-                          ->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
-                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY / 32 )
+                          ->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
+                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
                           .m_topbehave );
             IO::messageBox m( buffer );
             IO::NAV->draw( true );
