@@ -6,7 +6,7 @@ file        : mapSprite.cpp
 author      : Philip Wellnitz
 description : Map Sprites.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -26,22 +26,21 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 */
 
 #include "mapSprite.h"
+#include "fs.h"
 #include "sprite.h"
 #include "uio.h"
-#include "fs.h"
 
 #include "messageBox.h"
 
 namespace MAP {
     const char* OW_PATH = "nitro:/PICS/SPRITES/OW/";
 
-    mapSprite::mapSprite( u16 p_currX, u16 p_currY,
-                          u16 p_imageId,
-                          u8 p_startFrame,
-                          u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx )
-        : _oamIndex( p_oamIdx ), _palette( p_palIdx ), _tileIdx( p_tileIdx ),
-        _picNum( p_imageId ), _curFrame( p_startFrame ) {
-        if( !IO::loadOWSprite( OW_PATH, _picNum, p_currX, p_currY, _oamIndex, _palette, _tileIdx ) ) {
+    mapSprite::mapSprite( u16 p_currX, u16 p_currY, u16 p_imageId, u8 p_startFrame, u8 p_oamIdx,
+                          u8 p_palIdx, u16 p_tileIdx )
+        : _oamIndex( p_oamIdx ), _palette( p_palIdx ), _tileIdx( p_tileIdx ), _picNum( p_imageId ),
+          _curFrame( p_startFrame ) {
+        if( !IO::loadOWSprite( OW_PATH, _picNum, p_currX, p_currY, _oamIndex, _palette,
+                               _tileIdx ) ) {
             IO::messageBox m( "Sprite failed" );
             IO::NAV->draw( true );
         }
@@ -80,8 +79,7 @@ namespace MAP {
     }
     void mapSprite::nextFrame( ) {
         _curFrame++;
-        if( ( _curFrame % 20 ) % 3 == 0 )
-            _curFrame -= 2;
+        if( ( _curFrame % 20 ) % 3 == 0 ) _curFrame -= 2;
         drawFrame( _curFrame );
     }
 
@@ -90,4 +88,4 @@ namespace MAP {
         IO::OamTop->oamBuffer[ _oamIndex ].y += p_amount * dir[ p_direction ][ 1 ];
         IO::updateOAM( false );
     }
-}
+} // namespace MAP

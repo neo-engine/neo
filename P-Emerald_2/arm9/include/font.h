@@ -6,7 +6,7 @@ file        : font.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -35,21 +35,21 @@ namespace IO {
 
     namespace REGULAR_FONT {
 #define NUM_CHARS 490
-        void shiftchar( u16& val );
+        void      shiftchar( u16 &val );
         extern u8 fontWidths[ NUM_CHARS ];
         extern u8 fontData[ NUM_CHARS * 256 ];
     }
     namespace BOLD_FONT {
 #define NUM_CHARS 490
-        void shiftchar( u16& val );
+        void      shiftchar( u16 &val );
         extern u8 fontWidths[ NUM_CHARS ];
         extern u8 fontData[ NUM_CHARS * 256 ];
     }
 
     class font {
-    public:
+      public:
         // Constructors
-        font( u8 *p_fontData, u8 *p_characterWidths, void( *p_shiftchar )( u16& val ) );
+        font( u8 *p_fontData, u8 *p_characterWidths, void ( *p_shiftchar )( u16 &val ) );
 
         // Accessors
         void setColor( color p_newColor, int p_num ) {
@@ -59,26 +59,25 @@ namespace IO {
             return _color[ p_num ];
         }
 
-        enum alignment {
-            LEFT,
-            RIGHT,
-            CENTER
-        };
+        enum alignment { LEFT, RIGHT, CENTER };
 
         // Methods
         void printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom );
-        void printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, alignment p_alignment = LEFT, u8 p_yDistance = 16, s8 p_adjustX = 0 );
-        void printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX = 256, u16 p_breakChar = L'.' );
-        void printStringD( const char *p_string, s16& p_x, s16& p_y, bool p_bottom );
+        void printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
+                          alignment p_alignment = LEFT, u8 p_yDistance = 16, s8 p_adjustX = 0 );
+        void printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
+                             s16 p_maxX = 256, u16 p_breakChar = L'.' );
+        void printStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom );
 
         void printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
-        void printMBStringD( const char *p_string, s16& p_x, s16& p_y, bool p_bottom );
+        void printMBStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom );
 
         u32 stringWidth( const char *p_string ) const;
-    private:
+
+      private:
         u8 *_data;
         u8 *_widths;
-        void( *_shiftchar )( u16& val );
+        void ( *_shiftchar )( u16 &val );
         color _color[ 5 ];
     };
 }

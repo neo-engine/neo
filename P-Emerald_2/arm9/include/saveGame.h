@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2017
+    Copyright (C) 2012 - 2018
     Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
@@ -105,12 +105,12 @@ namespace SAVE {
             bool checkFlag( u8 p_idx );
             void setFlag( u8 p_idx, bool p_value );
             void stepIncrease( );
-            u8 getEncounterLevel( u8 p_tier );
-            u8 getBadgeCount( );
-            u8 getTeamPkmnCount( );
+            u8   getEncounterLevel( u8 p_tier );
+            u8   getBadgeCount( );
+            u8   getTeamPkmnCount( );
 
             BATTLE::battleTrainer* getBattleTrainer( );
-            void updateTeam( BATTLE::battleTrainer* p_trainer );
+            void                   updateTeam( BATTLE::battleTrainer* p_trainer );
         } m_saveFile[ MAX_SAVE_FILES ];
 
         u8 m_activeFile;

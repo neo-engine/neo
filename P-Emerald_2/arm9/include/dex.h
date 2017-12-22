@@ -6,7 +6,7 @@ file        : dex.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -35,20 +35,17 @@ namespace DEX {
     u16 previousEntry( u16 p_current );
 
     class dex {
-    public:
-        enum mode {
-            SHOW_CAUGHT = 0,
-            SHOW_ALL = 1,
-            SHOW_SINGLE = 2
-        };
-    private:
-        dexUI* _dexUI;
-        u16 _maxPkmn; //set this to -1 to show only a single dex entry
+      public:
+        enum mode { SHOW_CAUGHT = 0, SHOW_ALL = 1, SHOW_SINGLE = 2 };
 
-        u8 _page;
-        u8 _forme;
+      private:
+        dexUI* _dexUI;
+        u16    _maxPkmn; // set this to -1 to show only a single dex entry
+
+        u8  _page;
+        u8  _forme;
         u16 _curPkmn[ 32 ];
-        u8 _curPkmnStart;
+        u8  _curPkmnStart;
 
         u8 _selectedIdx;
 
@@ -59,8 +56,8 @@ namespace DEX {
 
         void rotateForward( );
         void rotateBackward( );
-    public:
 
+      public:
         dex( mode p_mode, u16 p_maxPkmn );
         ~dex( ) {
             delete _dexUI;
@@ -68,4 +65,4 @@ namespace DEX {
 
         void run( u16 p_pkmnIdx );
     };
-}
+} // namespace DEX

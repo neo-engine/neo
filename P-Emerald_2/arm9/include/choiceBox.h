@@ -6,7 +6,7 @@ file        : choiceBox.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -34,21 +34,23 @@ namespace IO {
 #define MAX_CHOICES_PER_PAGE 3
 #define MAX_CHOICES_PER_SMALL_PAGE 6
     class choiceBox {
-    public:
+      public:
         choiceBox( int p_num, const char** p_choices, const char* p_name, bool p_big );
         choiceBox( pokemon p_pokemon, u16 p_moveToLearn );
 
         void draw( u8 p_pressedIdx );
-        int getResult( const char* p_text = 0, bool p_backButton = false, bool p_drawSub = true, u8 p_initialSelection = 0 );
+        int  getResult( const char* p_text = 0, bool p_backButton = false, bool p_drawSub = true,
+                        u8 p_initialSelection = 0 );
         void kill( );
-    private:
+
+      private:
         const char** _choices;
-        bool _big;
-        u8 _num;
-        const char* _name;
-        const char* _text;
-        u8 _acPage;
-        u8 _selectedIdx;
+        bool         _big;
+        u8           _num;
+        const char*  _name;
+        const char*  _text;
+        u8           _acPage;
+        u8           _selectedIdx;
 
         bool _drawSub;
 

@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2017
+    Copyright (C) 2012 - 2018
     Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
@@ -27,154 +27,124 @@
 
 #pragma once
 
-#include <string>
 #include <map>
+#include <string>
 #include <nds/ndstypes.h>
 
 #include "ability.h"
 #include "script.h"
-extern const char ITEM_PATH[ ];
-
+extern const char ITEM_PATH[];
 
 class item {
-public:
+  public:
     enum itemEffectType {
-        NONE = 0,
-        IN_BATTLE = 1, //Medicine/Berries
-        HOLD = 2, //Has a hold effect only
-        OUT_OF_BATTLE = 4, //Repel, etc
-        USE_ON_PKMN = 8   //Evolutionaries,
+        NONE          = 0,
+        IN_BATTLE     = 1, // Medicine/Berries
+        HOLD          = 2, // Has a hold effect only
+        OUT_OF_BATTLE = 4, // Repel, etc
+        USE_ON_PKMN   = 8  // Evolutionaries,
     };
-    enum itemType {
-        GOODS,
-        KEY_ITEM,
-        TM_HM,
-        MAILS,
-        MEDICINE,
-        BERRIES,
-        POKE_BALLS,
-        BATTLE_ITEM
-    };
+    enum itemType { GOODS, KEY_ITEM, TM_HM, MAILS, MEDICINE, BERRIES, POKE_BALLS, BATTLE_ITEM };
 
     struct itemData {
-        itemEffectType  m_itemEffectType;
-        u32             m_price;
-        u32             m_itemEffect;
+        itemEffectType m_itemEffectType;
+        u32            m_price;
+        u32            m_itemEffect;
 
-        char            m_itemDisplayName[ 15 ];
-        char            m_itemDescription[ 200 ];
-        char            m_itemShortDescr[ 100 ];
+        char m_itemDisplayName[ 15 ];
+        char m_itemDescription[ 200 ];
+        char m_itemShortDescr[ 100 ];
     } m_itemData;
-    bool            m_loaded; //Specifies whether the item data has been loaded
+    bool m_loaded; // Specifies whether the item data has been loaded
 
-    itemType        m_itemType;
+    itemType m_itemType;
 
-    std::string     m_itemName;
+    std::string m_itemName;
 
-    ability::abilityType
-        m_inBattleEffect;
-    BATTLE::battleScript
-        m_inBattleScript;
+    ability::abilityType m_inBattleEffect;
+    BATTLE::battleScript m_inBattleScript;
 
+    // Functions
+    std::string getDisplayName( bool p_new = false );
 
-    //Functions
-    std::string     getDisplayName( bool p_new = false );
+    std::string getDescription( );
 
-    std::string     getDescription( );
+    std::string getShortDescription( );
 
-    std::string     getShortDescription( );
+    u32 getEffect( );
 
-    u32             getEffect( );
+    itemEffectType getEffectType( );
 
+    u32 getPrice( );
 
-    itemEffectType  getEffectType( );
+    u16 getItemId( );
 
-    u32             getPrice( );
+    virtual bool load( );
 
-    u16             getItemId( );
+    bool needsInformation( u8 p_num );
 
-    virtual bool    load( );
+    bool use( pokemon& p_pokemon );
 
-    bool            needsInformation( u8 p_num );
+    bool use( bool p_dryRun = false );
 
-    bool            use( pokemon& p_pokemon );
+    bool useable( );
 
-    bool            use( bool p_dryRun = false );
+    // Constructors
 
-    bool            useable( );
-
-    //Constructors
-
-    item( const std::string& p_itemName )
-        : m_itemName( p_itemName ) {
+    item( const std::string& p_itemName ) : m_itemName( p_itemName ) {
         m_loaded = false;
     }
 
-    item( )
-        : m_itemName( "Null" ) { /*load = false;*/
+    item( ) : m_itemName( "Null" ) { /*load = false;*/
     }
-
 };
 
-class ball
-    : public item {
-public:
-    ball( const std::string& p_name )
-        : item( p_name ) {
+class ball : public item {
+  public:
+    ball( const std::string& p_name ) : item( p_name ) {
         m_itemType = POKE_BALLS;
     }
 };
 
-class medicine
-    : public item {
-public:
-    medicine( const std::string& p_name )
-        : item( p_name ) {
+class medicine : public item {
+  public:
+    medicine( const std::string& p_name ) : item( p_name ) {
         m_itemType = MEDICINE;
     }
 };
 
-class TM
-    : public item {
-public:
+class TM : public item {
+  public:
     u16 m_moveIdx;
-    TM( const std::string& p_name, u16 p_moveIdx )
-        : item( p_name ) {
+    TM( const std::string& p_name, u16 p_moveIdx ) : item( p_name ) {
         m_itemType = TM_HM;
-        m_moveIdx = p_moveIdx;
+        m_moveIdx  = p_moveIdx;
     }
 };
 
-class battleItem
-    : public item {
-public:
-    battleItem( const std::string& p_name )
-        : item( p_name ) {
+class battleItem : public item {
+  public:
+    battleItem( const std::string& p_name ) : item( p_name ) {
         m_itemType = BATTLE_ITEM;
     }
 };
 
-class keyItem
-    : public item {
-public:
-    keyItem( const std::string& p_name )
-        : item( p_name ) {
+class keyItem : public item {
+  public:
+    keyItem( const std::string& p_name ) : item( p_name ) {
         m_itemType = KEY_ITEM;
     }
 };
 
-class mail
-    : public item {
-public:
-    mail( const std::string& p_name )
-        : item( p_name ) {
+class mail : public item {
+  public:
+    mail( const std::string& p_name ) : item( p_name ) {
         m_itemType = MAILS;
     }
 };
 
 #define MAX_ITEMS 772
 extern item* ItemList[ MAX_ITEMS ];
-
 
 #define I_NONE 0
 #define I_MASTER_BALL 1

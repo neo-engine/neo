@@ -2,11 +2,11 @@
 Pokémon Emerald 2 Version
 ------------------------------
 
-file        : Gen.h
+file        : gen3parser.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -28,26 +28,26 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #pragma once
 #include <nds.h>
 
-//using code from "pokehack" originally by "Grazfather"
+// using code from "pokehack" originally by "Grazfather"
 namespace FS {
     bool isValidItem( int p_gen5Idx );
-    int getItemIdx( int p_gen5Idx );
-    int getNItemIdx( int p_gen3Idx );
-    int getPKMNIdx( int p_gen5Idx );
-    int getNPKMNIdx( int p_gen3Idx );
-    int getNLocation( int p_gen3Idx );
-    int getLocation( int p_gen5Idx );
-    int getNText( int p_in );
+    int  getItemIdx( int p_gen5Idx );
+    int  getNItemIdx( int p_gen3Idx );
+    int  getPKMNIdx( int p_gen5Idx );
+    int  getNPKMNIdx( int p_gen3Idx );
+    int  getNLocation( int p_gen3Idx );
+    int  getLocation( int p_gen5Idx );
+    int  getNText( int p_in );
 
-#define SAVEFILE_LEN (1 << 17)
+#define SAVEFILE_LEN ( 1 << 17 )
 #define NUM_BLOCKS_SLOT 14
 #define NUM_BLOCKS_EXTRA 4
 #define NUM_BLOCKS_TOTAL 32
 #define BLOCK_DATA_LEN 3968
 #define BLOCK_PADDING_LEN 116
 #define BLOCK_FOOTER_LEN 12
-#define BLOCK_TOTAL_LEN (BLOCK_DATA_LEN + BLOCK_PADDING_LEN + BLOCK_FOOTER_LEN)
-#define SAVESLOT_LEN (14 * 3968)
+#define BLOCK_TOTAL_LEN ( BLOCK_DATA_LEN + BLOCK_PADDING_LEN + BLOCK_FOOTER_LEN )
+#define SAVESLOT_LEN ( 14 * 3968 )
 #define BELT_OFFSET_RSE 0x11B8
 #define BELT_OFFSET_FRLG 0xFB8
 #define BOX_OFFSET 0x4D84
@@ -55,25 +55,24 @@ namespace FS {
 #define NUM_BELT_POKEMON 6
 #define NUM_BOXES 14
 #define NUM_POKEMON_PER_BOX 30
-#define NUM_BOX_POKEMON (NUM_BOXES * NUM_POKEMON_PER_BOX)
+#define NUM_BOX_POKEMON ( NUM_BOXES * NUM_POKEMON_PER_BOX )
 #define POKEMON_DATA_LENGTH 48
 
 #define NUM_POKEMON_SPECIES 440
 #define NUM_ITEMS 377
 #define NUM_ATTACKS 355
 
-
     typedef struct {
-        u8 blocknum;
-        u8 padding;
+        u8  blocknum;
+        u8  padding;
         u16 checksum;
         u32 validation; // 0x08012025
         int savenumber;
     } block_footer;
 
     typedef struct {
-        u8 data[ BLOCK_DATA_LEN ];
-        u8 padding[ BLOCK_PADDING_LEN ];
+        u8           data[ BLOCK_DATA_LEN ];
+        u8           padding[ BLOCK_PADDING_LEN ];
         block_footer footer;
     } block;
 
@@ -82,9 +81,9 @@ namespace FS {
     typedef struct {
         u32 personality;
         u32 otid;
-        u8 name[ 10 ];
+        u8  name[ 10 ];
         u16 language;
-        u8 otname[ 7 ];
+        u8  otname[ 7 ];
         union {
             struct {
                 u8 circle : 1;
@@ -96,11 +95,11 @@ namespace FS {
             u8 markint;
         };
         u16 checksum;
-        u16 x1;				// unused
-        u8 data[ POKEMON_DATA_LENGTH ];
+        u16 x1; // unused
+        u8  data[ POKEMON_DATA_LENGTH ];
         u32 status;
-        u8 level;
-        u8 pokerus;
+        u8  level;
+        u8  pokerus;
         u16 currentHP;
         u16 maxHP;
         u16 move;
@@ -113,24 +112,24 @@ namespace FS {
     typedef struct {
         u32 personality;
         u32 otid;
-        u8 name[ 10 ];
+        u8  name[ 10 ];
         u16 language;
-        u8 otname[ 7 ];
-        u8 mark;
+        u8  otname[ 7 ];
+        u8  mark;
         u16 checksum;
-        u16 x1;				// unused
-        u8 data[ POKEMON_DATA_LENGTH ];
+        u16 x1; // unused
+        u8  data[ POKEMON_DATA_LENGTH ];
     } box_pokemon_t;
 
     class gen3Pokemon {
-    public:
+      public:
         typedef struct {
             u16 species;
             u16 held;
             u32 xp;
-            u8 ppbonuses;
-            u8 happiness;
-            u8 p_x;				// unused
+            u8  ppbonuses;
+            u8  happiness;
+            u8  p_x; // unused
         } pokemon_growth_t;
 
         typedef struct {
@@ -140,7 +139,7 @@ namespace FS {
                     u16 atk2;
                     u16 atk3;
                     u16 atk4;
-                }_atk;
+                } _atk;
                 u16 atk[ 4 ];
             };
             union {
@@ -149,7 +148,7 @@ namespace FS {
                     u8 pp2;
                     u8 pp3;
                     u8 pp4;
-                }_pp;
+                } _pp;
                 u8 pp[ 4 ];
             };
         } pokemon_moves_t;
@@ -163,7 +162,7 @@ namespace FS {
                     u8 speed;
                     u8 spatk;
                     u8 spdef;
-                }_ev;
+                } _ev;
                 u8 EV[ 6 ];
             };
             union {
@@ -174,7 +173,7 @@ namespace FS {
                     u8 smartness;
                     u8 toughness;
                     u8 feel;
-                }_con;
+                } _con;
                 u8 ConStat[ 6 ];
             };
         } pokemon_effort_t;
@@ -240,69 +239,54 @@ namespace FS {
     };
 
     // Order:
-    //00. GAEM	 06. AGEM	 12. EGAM	 18. MGAE
-    //01. GAME	 07. AGME	 13. EGMA	 19. MGEA
-    //02. GEAM	 08. AEGM	 14. EAGM	 20. MAGE
-    //03. GEMA	 09. AEMG	 15. EAMG	 21. MAEG
-    //04. GMAE	 10. AMGE	 16. EMGA	 22. MEGA
-    //05. GMEA	 11. AMEG	 17. EMAG	 23. MEAG
+    // 00. GAEM	 06. AGEM	 12. EGAM	 18. MGAE
+    // 01. GAME	 07. AGME	 13. EGMA	 19. MGEA
+    // 02. GEAM	 08. AEGM	 14. EAGM	 20. MAGE
+    // 03. GEMA	 09. AEMG	 15. EAMG	 21. MAEG
+    // 04. GMAE	 10. AMGE	 16. EMGA	 22. MEGA
+    // 05. GMEA	 11. AMEG	 17. EMAG	 23. MEAG
 
     // Where in data each struct is, based on AEGM order
     static const int DataOrderTable[ 24 ][ 4 ] = {
         //    A  E  G  M
-             {1, 2, 0, 3},
-             {1, 3, 0, 2},
-             {2, 1, 0, 3},
-             {3, 1, 0, 2},
-             {2, 3, 0, 1},
-             {3, 2, 0, 1},
-             {0, 2, 1, 3},
-             {0, 3, 1, 2},
-             {0, 1, 2, 3},
-             {0, 1, 3, 2},
-             {0, 3, 2, 1},
-             {0, 2, 3, 1},
-             {2, 0, 1, 3},
-             {3, 0, 1, 2},
-             {1, 0, 2, 3},
-             {1, 0, 3, 2},
-             {3, 0, 2, 1},
-             {2, 0, 3, 1},
-             {2, 3, 1, 0},
-             {3, 2, 1, 0},
-             {1, 3, 2, 0},
-             {1, 2, 3, 0},
-             {3, 1, 2, 0},
-             {2, 1, 3, 0} };
+        {1, 2, 0, 3}, {1, 3, 0, 2}, {2, 1, 0, 3}, {3, 1, 0, 2}, {2, 3, 0, 1}, {3, 2, 0, 1},
+        {0, 2, 1, 3}, {0, 3, 1, 2}, {0, 1, 2, 3}, {0, 1, 3, 2}, {0, 3, 2, 1}, {0, 2, 3, 1},
+        {2, 0, 1, 3}, {3, 0, 1, 2}, {1, 0, 2, 3}, {1, 0, 3, 2}, {3, 0, 2, 1}, {2, 0, 3, 1},
+        {2, 3, 1, 0}, {3, 2, 1, 0}, {1, 3, 2, 0}, {1, 2, 3, 0}, {3, 1, 2, 0}, {2, 1, 3, 0}};
 
-    static const int belt_offsets[ ] = { BELT_OFFSET_RSE, BELT_OFFSET_FRLG };
+    static const int belt_offsets[] = {BELT_OFFSET_RSE, BELT_OFFSET_FRLG};
 
     class gen3Parser {
-    public:
+      public:
         static gen3Parser* Instance( );
-        int get_newest_save( block *[ NUM_BLOCKS_TOTAL ] );
-        char* parse_save( block*[ NUM_BLOCKS_TOTAL ] );
-        u16 get_block_checksum( block* b );
-        int pack_save( char *, block *[ NUM_BLOCKS_TOTAL ], char[ SAVEFILE_LEN ] );
-        char* get_text( u8* p_raw, bool p_isNickname );
-        int parse_pokemon( char*, int, void**, gen3Pokemon::pokemon_moves_t**, gen3Pokemon::pokemon_effort_t**, gen3Pokemon::pokemon_growth_t**, gen3Pokemon::pokemon_misc_t**, int, int );
-        u16 encrypt( u8*, u32, u32 );
-        int load( int );
-        belt_pokemon_t *pokemon[ NUM_BELT_POKEMON ];
-        gen3Pokemon::pokemon_moves_t *pokemon_moves[ NUM_BELT_POKEMON ];
-        gen3Pokemon::pokemon_effort_t *pokemon_effort[ NUM_BELT_POKEMON ];
-        gen3Pokemon::pokemon_growth_t *pokemon_growth[ NUM_BELT_POKEMON ];
-        gen3Pokemon::pokemon_misc_t *pokemon_misc[ NUM_BELT_POKEMON ];
+        int                get_newest_save( block * [NUM_BLOCKS_TOTAL] );
+        char*              parse_save( block * [NUM_BLOCKS_TOTAL] );
+        u16                get_block_checksum( block* b );
+        int                pack_save( char*, block * [NUM_BLOCKS_TOTAL], char[ SAVEFILE_LEN ] );
+        char*              get_text( u8* p_raw, bool p_isNickname );
+        int                parse_pokemon( char*, int, void**, gen3Pokemon::pokemon_moves_t**,
+                                          gen3Pokemon::pokemon_effort_t**, gen3Pokemon::pokemon_growth_t**,
+                                          gen3Pokemon::pokemon_misc_t**, int, int );
+        u16                encrypt( u8*, u32, u32 );
+        int                load( int );
+        belt_pokemon_t*    pokemon[ NUM_BELT_POKEMON ];
+        gen3Pokemon::pokemon_moves_t*  pokemon_moves[ NUM_BELT_POKEMON ];
+        gen3Pokemon::pokemon_effort_t* pokemon_effort[ NUM_BELT_POKEMON ];
+        gen3Pokemon::pokemon_growth_t* pokemon_growth[ NUM_BELT_POKEMON ];
+        gen3Pokemon::pokemon_misc_t*   pokemon_misc[ NUM_BELT_POKEMON ];
 
-        char *unpackeddata;
-    private:
-        gen3Parser( ) { };	// Private constructor because this is a singleton
-        block *m_blocks[ NUM_BLOCKS_TOTAL ];
+        char* unpackeddata;
+
+      private:
+        gen3Parser( ){}; // Private constructor because this is a singleton
+        block*             m_blocks[ NUM_BLOCKS_TOTAL ];
         static gen3Parser* spInstance;
     };
 
-    u16 encrypt( u8 *p_data, u32 p_pv, u32 p_otid );
+    u16   encrypt( u8* p_data, u32 p_pv, u32 p_otid );
     char* get_text( u8* p_raw, int p_maxLen );
-    int parse_pokemon( char* p_buf, int p_offset, void** p_pokemon, gen3Pokemon::pokemon_moves_t** p_pa, gen3Pokemon::pokemon_effort_t** p_pe,
-                       gen3Pokemon::pokemon_growth_t** p_pg, gen3Pokemon::pokemon_misc_t** p_pm, int p_num, int p_size );
-}
+    int   parse_pokemon( char* p_buf, int p_offset, void** p_pokemon,
+                         gen3Pokemon::pokemon_moves_t** p_pa, gen3Pokemon::pokemon_effort_t** p_pe,
+                         gen3Pokemon::pokemon_growth_t** p_pg, gen3Pokemon::pokemon_misc_t** p_pm,
+                         int p_num, int p_size );
+} // namespace FS
