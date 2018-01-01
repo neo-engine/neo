@@ -54,11 +54,12 @@ namespace SAVE {
     language translate( u8 p_dSRegion ) {
         switch( p_dSRegion ) {
         case 1:
-            return SAVE::EN;
+            // return SAVE::EN;
         case 3:
-            return SAVE::GER;
         default:
-            return SAVE::EN;
+            return SAVE::GER;
+            // default:
+            // return SAVE::EN;
         }
     }
 
