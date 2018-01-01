@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2017
+    Copyright (C) 2012 - 2018
     Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
@@ -27,36 +27,30 @@
 
 #pragma once
 #include <map>
-#include <nds.h>
 #include <string>
-#include "item.h"
+#include <nds.h>
 #include "defines.h"
+#include "item.h"
 
 namespace BAG {
     class bag {
-    private:
+      private:
         enum {
-            ITEM_START = 0,
-            MEDICINE_START = 550,
-            TM_HM_START = 600,
-            BERRIES_START = 725,
+            ITEM_START      = 0,
+            MEDICINE_START  = 550,
+            TM_HM_START     = 600,
+            BERRIES_START   = 725,
             KEY_ITEMS_START = 825
         };
-        const u16 _startIdx[ 6 ] = { ITEM_START, MEDICINE_START, TM_HM_START,
-            BERRIES_START, KEY_ITEMS_START, MAX_ITEMS_IN_BAG };
+        const u16           _startIdx[ 6 ] = {ITEM_START,    MEDICINE_START,  TM_HM_START,
+                                    BERRIES_START, KEY_ITEMS_START, MAX_ITEMS_IN_BAG};
         std::pair<u16, u16> _items[ MAX_ITEMS_IN_BAG ];
-        u16 _nextFree[ 5 ];
-    public:
-        enum bagType {
-            ITEMS,
-            MEDICINE,
-            TM_HM,
-            BERRIES,
-            KEY_ITEMS
-        };
+        u16                 _nextFree[ 5 ];
+
+      public:
+        enum bagType { ITEMS, MEDICINE, TM_HM, BERRIES, KEY_ITEMS };
         bag( ) {
-            for( u8 i = 0; i < 5; ++i )
-                _nextFree[ i ] = _startIdx[ i ];
+            for( u8 i = 0; i < 5; ++i ) _nextFree[ i ] = _startIdx[ i ];
         }
 
         /*
@@ -81,13 +75,13 @@ namespace BAG {
         bool empty( bagType );
 
         /*
-        * Clears the specified bag.
-        */
+         * Clears the specified bag.
+         */
         void clear( bagType );
 
         /*
-        * Swaps the items at the specified positions.
-        */
+         * Swaps the items at the specified positions.
+         */
         void swap( bagType, u16 p_idx1, u16 p_idx2 );
 
         /*
@@ -96,29 +90,29 @@ namespace BAG {
         std::size_t size( bagType );
 
         /*
-        * Returns the pointer to the first element in the bag.
-        */
+         * Returns the pointer to the first element in the bag.
+         */
         std::pair<u16, u16>* begin( bagType );
 
         /*
-        * Returns the pointer to the first element in the bag.
-        */
+         * Returns the pointer to the first element in the bag.
+         */
         const std::pair<u16, u16>* cbegin( bagType ) const;
 
         /*
-        * Returns the pointer after the last element of the bag.
-        */
+         * Returns the pointer after the last element of the bag.
+         */
         std::pair<u16, u16>* end( bagType );
 
         /*
-        * Returns the pointer after the last element of the bag.
-        */
+         * Returns the pointer after the last element of the bag.
+         */
         const std::pair<u16, u16>* cend( bagType ) const;
 
-        std::pair<u16, u16>& operator()( bagType p_bagType, u16 p_idx ) {
+        std::pair<u16, u16>& operator( )( bagType p_bagType, u16 p_idx ) {
             return begin( p_bagType )[ p_idx ];
         }
-        const std::pair<u16, u16>& operator()( bagType p_bagType, u16 p_idx ) const {
+        const std::pair<u16, u16>& operator( )( bagType p_bagType, u16 p_idx ) const {
             return cbegin( p_bagType )[ p_idx ];
         }
 
@@ -128,4 +122,4 @@ namespace BAG {
     };
 
     bag::bagType toBagType( item::itemType p_itemType );
-}
+} // namespace BAG

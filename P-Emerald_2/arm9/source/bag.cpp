@@ -6,7 +6,7 @@ file        : bag.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -25,12 +25,11 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include "bag.h"
 #include "item.h"
-#include "script.h"
 #include "pokemon.h"
 #include "saveGame.h"
+#include "script.h"
 
 #include <algorithm>
 #include <nds.h>
@@ -43,9 +42,9 @@ namespace BAG {
                 return;
             }
         if( _nextFree[ p_bagType ] >= MAX_ITEMS_IN_BAG
-            || _nextFree[ p_bagType ] == _startIdx[ 1 + p_bagType ] ) //Insert failed.
+            || _nextFree[ p_bagType ] == _startIdx[ 1 + p_bagType ] ) // Insert failed.
             return;
-        _items[ _nextFree[ p_bagType ]++ ] = { p_itemId, p_cnt };
+        _items[ _nextFree[ p_bagType ]++ ] = {p_itemId, p_cnt};
     }
 
     void bag::erase( bagType p_bagType, u16 p_itemId, u16 p_cnt ) {
@@ -56,8 +55,7 @@ namespace BAG {
                 else
                     _items[ i ].second = 0;
                 if( !_items[ i ].second ) {
-                    for( u16 j = i; j < _nextFree[ p_bagType ]; ++j )
-                        _items[ j ] = _items[ j + 1 ];
+                    for( u16 j = i; j < _nextFree[ p_bagType ]; ++j ) _items[ j ] = _items[ j + 1 ];
                     --_nextFree[ p_bagType ];
                 }
                 return;
@@ -66,8 +64,7 @@ namespace BAG {
 
     u16 bag::count( bagType p_bagType, u16 p_itemId ) {
         for( u16 i = _startIdx[ p_bagType ]; i < _nextFree[ p_bagType ]; ++i )
-            if( _items[ i ].first == p_itemId )
-                return _items[ i ].second;
+            if( _items[ i ].first == p_itemId ) return _items[ i ].second;
         return -1;
     }
 
@@ -93,7 +90,8 @@ namespace BAG {
     }
 
     void bag::clear( bagType p_bagType ) {
-        memset( _items + _startIdx[ p_bagType ], 0, _startIdx[ p_bagType + 1 ] - _startIdx[ p_bagType ] + 1 );
+        memset( _items + _startIdx[ p_bagType ], 0,
+                _startIdx[ p_bagType + 1 ] - _startIdx[ p_bagType ] + 1 );
         _nextFree[ p_bagType ] = _startIdx[ p_bagType ];
     }
 
@@ -103,22 +101,22 @@ namespace BAG {
 
     bag::bagType toBagType( item::itemType p_itemType ) {
         switch( p_itemType ) {
-            case item::GOODS:
-            case item::MAILS:
-            case item::POKE_BALLS:
-            case item::BATTLE_ITEM:
-                return bag::bagType::ITEMS;
-            case item::KEY_ITEM:
-                return bag::bagType::KEY_ITEMS;
-            case item::TM_HM:
-                return bag::bagType::TM_HM;
-            case item::MEDICINE:
-                return bag::bagType::MEDICINE;
-            case item::BERRIES:
-                return bag::bagType::BERRIES;
-            default:
-                break;
+        case item::GOODS:
+        case item::MAILS:
+        case item::POKE_BALLS:
+        case item::BATTLE_ITEM:
+            return bag::bagType::ITEMS;
+        case item::KEY_ITEM:
+            return bag::bagType::KEY_ITEMS;
+        case item::TM_HM:
+            return bag::bagType::TM_HM;
+        case item::MEDICINE:
+            return bag::bagType::MEDICINE;
+        case item::BERRIES:
+            return bag::bagType::BERRIES;
+        default:
+            break;
         }
         return bag::bagType::ITEMS;
     }
-}
+} // namespace BAG

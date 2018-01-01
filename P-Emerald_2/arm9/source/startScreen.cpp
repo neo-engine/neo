@@ -6,7 +6,7 @@ file        : startScreen.cpp
 author      : Philip Wellnitz
 description : Header file. See corresponding source file for details.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -27,25 +27,25 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 #include <nds/system.h>
 
-#include "startScreen.h"
+#include "choiceBox.h"
 #include "defines.h"
-#include "uio.h"
+#include "fs.h"
+#include "gameStart.h"
+#include "mapDrawer.h"
+#include "messageBox.h"
 #include "nav.h"
 #include "screenFade.h"
-#include "fs.h"
-#include "mapDrawer.h"
+#include "startScreen.h"
+#include "uio.h"
 #include "yesNoBox.h"
-#include "messageBox.h"
-#include "gameStart.h"
-#include "choiceBox.h"
 
 namespace SAVE {
     void initColors( ) {
         BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
         BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
-        BG_PALETTE_SUB[ GRAY_IDX ] = NORMAL_COLOR;
-        BG_PALETTE_SUB[ RED_IDX ] = GREEN;
+        BG_PALETTE_SUB[ GRAY_IDX ]  = NORMAL_COLOR;
+        BG_PALETTE_SUB[ RED_IDX ]   = GREEN;
         IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::regularFont->setColor( BLACK_IDX, 1 );
@@ -53,13 +53,12 @@ namespace SAVE {
 
     language translate( u8 p_dSRegion ) {
         switch( p_dSRegion ) {
-            case 1:
-               // return SAVE::EN;
-            case 3:
-                return SAVE::GER;
-
-            default:
-                return SAVE::EN;
+        case 1:
+            return SAVE::EN;
+        case 3:
+            return SAVE::GER;
+        default:
+            return SAVE::EN;
         }
     }
 
@@ -72,7 +71,7 @@ namespace SAVE {
 
         BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
 
-        printf( "@ Philip Wellnitz 2012 - 2017\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+        printf( "@ Philip Wellnitz 2012 - 2018\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
 
         if( gMod == DEVELOPER )
             printf( "                   %10sdev\n", VERSION );
@@ -86,7 +85,7 @@ namespace SAVE {
 
         consoleSetWindow( &IO::Top, 0, 23, 32, 1 );
         consoleSelect( &IO::Top );
-        u8 frame = 0;
+        u8            frame = 0;
         touchPosition touch;
         loop( ) {
             scanKeys( );
@@ -94,7 +93,8 @@ namespace SAVE {
             swiWaitForVBlank( );
 
             int pressed = keysCurrent( );
-            if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START ) || GET_AND_WAIT_R( 1, 1, 256, 192 ) )
+            if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
+                || GET_AND_WAIT_R( 1, 1, 256, 192 ) )
                 break;
             ++frame;
             if( !( frame % 120 ) ) {
@@ -108,11 +108,14 @@ namespace SAVE {
         consoleSelect( &IO::Top );
     }
 
-    void startScreen::drawMainChoice( language p_lang, std::vector<u8> p_toDraw, s8 p_selected, s8 p_pressed ) {
+    void startScreen::drawMainChoice( language p_lang, std::vector<u8> p_toDraw, s8 p_selected,
+                                      s8 p_pressed ) {
         initColors( );
         for( u8 i = 0; i < p_toDraw.size( ); ++i ) {
-            IO::printChoiceBox( 4, 4 + 48 * i, 136, 26 + 48 * i, 6, ( i == p_selected ) ? RED_IDX : COLOR_IDX, i == p_pressed );
-            IO::regularFont->printString( STRINGS[ p_toDraw[ i ] ][ p_lang ], 70 + 2 * ( i == p_pressed ),
+            IO::printChoiceBox( 4, 4 + 48 * i, 136, 26 + 48 * i, 6,
+                                ( i == p_selected ) ? RED_IDX : COLOR_IDX, i == p_pressed );
+            IO::regularFont->printString( STRINGS[ p_toDraw[ i ] ][ p_lang ],
+                                          70 + 2 * ( i == p_pressed ),
                                           8 + 48 * i + ( i == p_pressed ), true, IO::font::CENTER );
         }
         swiWaitForVBlank( );
@@ -123,7 +126,8 @@ namespace SAVE {
                 IO::boldFont->setColor( BLACK_IDX, 2 );
             else
                 IO::boldFont->setColor( GRAY_IDX, 2 );
-            IO::boldFont->printString( STRINGS[ p_toDraw[ i ] + 4 ][ p_lang ], 248, 28 + 48 * i, true, IO::font::RIGHT );
+            IO::boldFont->printString( STRINGS[ p_toDraw[ i ] + 4 ][ p_lang ], 248, 28 + 48 * i,
+                                       true, IO::font::RIGHT );
         }
     }
 
@@ -131,8 +135,7 @@ namespace SAVE {
         IO::regularFont->setColor( BLUE_IDX, 1 );
         IO::regularFont->setColor( WHITE_IDX, 2 );
         for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) {
-            if( !SAV->m_saveFile[ i ].m_gameType )
-                continue;
+            if( !SAV->m_saveFile[ i ].m_gameType ) continue;
 
             if( SAV->m_saveFile[ i ].m_isMale )
                 BG_PALETTE_SUB[ BLUE_IDX ] = BLUE2;
@@ -140,14 +143,17 @@ namespace SAVE {
                 BG_PALETTE_SUB[ BLUE_IDX ] = RED2;
 
             IO::regularFont->printString( SAV->m_saveFile[ i ].m_playername, 8, 30 + 64 * i, true );
-            IO::regularFont->printString( FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
-                                          248, 30 + 64 * i, true, IO::font::RIGHT );
+            IO::regularFont->printString(
+                FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ), 248, 30 + 64 * i,
+                true, IO::font::RIGHT );
 
             char buffer[ 50 ];
-            snprintf( buffer, 49, "%03d:%02d", SAV->m_saveFile[ i ].m_pt.m_hours, SAV->getActiveFile( ).m_pt.m_mins );
+            snprintf( buffer, 49, "%03d:%02d", SAV->m_saveFile[ i ].m_pt.m_hours,
+                      SAV->getActiveFile( ).m_pt.m_mins );
             IO::regularFont->printString( buffer, 8, 46 + 64 * i, true );
 
-            snprintf( buffer, 49, STRINGS[ 108 ][ SAV->m_saveFile[ i ].m_options.m_language ], SAV->m_saveFile[ i ].getBadgeCount( ) );
+            snprintf( buffer, 49, STRINGS[ 108 ][ SAV->m_saveFile[ i ].m_options.m_language ],
+                      SAV->m_saveFile[ i ].getBadgeCount( ) );
             IO::regularFont->printString( buffer, 110, 46 + 64 * i, true, IO::font::CENTER );
 
             snprintf( buffer, 49, "PokéDex %03d", SAV->getDexCount( ) );
@@ -158,52 +164,64 @@ namespace SAVE {
     void startScreen::drawSlotChoice( language p_current, s8 p_selected, s8 p_pressed ) {
         initColors( );
         for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) {
-            IO::printChoiceBox( 4, 4 + 64 * i, 86, 26 + 64 * i, 6, ( i == p_selected ) ? RED_IDX : COLOR_IDX, i == p_pressed );
+            IO::printChoiceBox( 4, 4 + 64 * i, 86, 26 + 64 * i, 6,
+                                ( i == p_selected ) ? RED_IDX : COLOR_IDX, i == p_pressed );
             switch( SAV->m_saveFile[ i ].m_gameType ) {
-                case UNUSED:
-                    IO::regularFont->printString( STRINGS[ 82 ][ p_current ], 45 + 2 * ( i == p_pressed ),
-                                                  8 + 64 * i + ( i == p_pressed ), true, IO::font::CENTER );
-                    break;
-                case NORMAL:
-                    IO::regularFont->printString( CHAPTER_NAMES[ 2 * SAV->m_saveFile[ i ].m_chapter ][ SAV->m_saveFile[ i ].m_options.m_language ], 45 + 2 * ( i == p_pressed ),
-                                                  8 + 64 * i + ( i == p_pressed ), true, IO::font::CENTER );
-                    IO::regularFont->printString( CHAPTER_NAMES[ 2 * SAV->m_saveFile[ i ].m_chapter + 1 ][ SAV->m_saveFile[ i ].m_options.m_language ], 248,
-                                                  8 + 64 * i, true, IO::font::RIGHT );
-                    break;
-                case TRANSFER:
-                    IO::regularFont->printString( STRINGS[ 83 ][ SAV->m_saveFile[ i ].m_options.m_language ], 45 + 2 * ( i == p_pressed ),
-                                                  8 + 64 * i + ( i == p_pressed ), true, IO::font::CENTER );
-                    break;
-                default:
-                    IO::regularFont->printString( STRINGS[ 84 ][ SAV->m_saveFile[ i ].m_options.m_language ],
-                                                  45 + 2 * ( i == p_pressed ), 8 + 64 * i + ( i == p_pressed ), true, IO::font::CENTER );
-                    IO::regularFont->printString( EPISODE_NAMES[ SAV->m_saveFile[ i ].m_options.m_language ][ SAV->m_saveFile[ i ].m_gameType - (u8) SPECIAL ],
-                                                  248, 8 + 64 * i, true, IO::font::RIGHT );
+            case UNUSED:
+                IO::regularFont->printString(
+                    STRINGS[ 82 ][ p_current ], 45 + 2 * ( i == p_pressed ),
+                    8 + 64 * i + ( i == p_pressed ), true, IO::font::CENTER );
+                break;
+            case NORMAL:
+                IO::regularFont->printString(
+                    CHAPTER_NAMES[ 2 * SAV->m_saveFile[ i ].m_chapter ]
+                                 [ SAV->m_saveFile[ i ].m_options.m_language ],
+                    45 + 2 * ( i == p_pressed ), 8 + 64 * i + ( i == p_pressed ), true,
+                    IO::font::CENTER );
+                IO::regularFont->printString(
+                    CHAPTER_NAMES[ 2 * SAV->m_saveFile[ i ].m_chapter + 1 ]
+                                 [ SAV->m_saveFile[ i ].m_options.m_language ],
+                    248, 8 + 64 * i, true, IO::font::RIGHT );
+                break;
+            case TRANSFER:
+                IO::regularFont->printString(
+                    STRINGS[ 83 ][ SAV->m_saveFile[ i ].m_options.m_language ],
+                    45 + 2 * ( i == p_pressed ), 8 + 64 * i + ( i == p_pressed ), true,
+                    IO::font::CENTER );
+                break;
+            default:
+                IO::regularFont->printString(
+                    STRINGS[ 84 ][ SAV->m_saveFile[ i ].m_options.m_language ],
+                    45 + 2 * ( i == p_pressed ), 8 + 64 * i + ( i == p_pressed ), true,
+                    IO::font::CENTER );
+                IO::regularFont->printString(
+                    EPISODE_NAMES[ SAV->m_saveFile[ i ].m_options.m_language ]
+                                 [ SAV->m_saveFile[ i ].m_gameType - (u8) SPECIAL ],
+                    248, 8 + 64 * i, true, IO::font::RIGHT );
             }
         }
         swiWaitForVBlank( );
     }
 
     startScreen::choiceType startScreen::runMainChoice( language p_lang ) {
-        std::vector<u8> vis;
+        std::vector<u8>         vis;
         std::vector<choiceType> res;
-        bool hasSave = false;
+        bool                    hasSave = false;
 
-        for( u8 i = 0; i < MAX_SAVE_FILES; ++i )
-            hasSave |= !!( SAV->m_saveFile[ i ].m_gameType );
+        for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) hasSave |= !!( SAV->m_saveFile[ i ].m_gameType );
 
         if( hasSave ) {
             vis.push_back( 71 );
             res.push_back( CONTINUE );
         }
-      //  vis.push_back( 72 );
-      //  res.push_back( NEW_GAME );
+        //  vis.push_back( 72 );
+        //  res.push_back( NEW_GAME );
         vis.push_back( 73 );
         res.push_back( SPECIAL_EPISODE );
-      //  if( gMod == DEVELOPER || SAV->m_transfersRemaining ) {
-      //      vis.push_back( 74 );
-      //      res.push_back( TRANSFER_GAME );
-      //  }
+        //  if( gMod == DEVELOPER || SAV->m_transfersRemaining ) {
+        //      vis.push_back( 74 );
+        //      res.push_back( TRANSFER_GAME );
+        //  }
 
         u8 selectedIdx = 0;
         drawMainChoice( p_lang, vis, 0 );
@@ -219,8 +237,7 @@ namespace SAVE {
             if( GET_AND_WAIT( KEY_B ) ) {
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true );
-                for( u16 i = 1; i < 256; ++i )
-                    BG_PALETTE_SUB[ i ] = WHITE;
+                for( u16 i = 1; i < 256; ++i ) BG_PALETTE_SUB[ i ] = WHITE;
                 return ABORT;
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
                 selectedIdx = ( selectedIdx + 1 ) % vis.size( );
@@ -241,10 +258,8 @@ namespace SAVE {
                         scanKeys( );
                         touchRead( &touch );
 
-                        if( TOUCH_UP )
-                            return res[ selectedIdx ];
-                        if( !IN_RANGE_R( 4, 4 + 48 * i, 136, 26 + 48 * i ) )
-                            break;
+                        if( TOUCH_UP ) return res[ selectedIdx ];
+                        if( !IN_RANGE_R( 4, 4 + 48 * i, 136, 26 + 48 * i ) ) break;
                     }
                     drawMainChoice( p_lang, vis, selectedIdx );
                 }
@@ -267,8 +282,7 @@ namespace SAVE {
             if( GET_AND_WAIT( KEY_B ) ) {
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true );
-                for( u16 i = 1; i < 256; ++i )
-                    BG_PALETTE_SUB[ i ] = WHITE;
+                for( u16 i = 1; i < 256; ++i ) BG_PALETTE_SUB[ i ] = WHITE;
                 return -1;
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
                 selectedIdx = ( selectedIdx + 1 ) % MAX_SAVE_FILES;
@@ -296,11 +310,8 @@ namespace SAVE {
                         swiWaitForVBlank( );
                         scanKeys( );
                         touchRead( &touch );
-                        if( TOUCH_UP ) {
-                            return selectedIdx;
-                        }
-                        if( !IN_RANGE_R( 4, 4 + 64 * i, 86, 26 + 64 * i ) )
-                            break;
+                        if( TOUCH_UP ) { return selectedIdx; }
+                        if( !IN_RANGE_R( 4, 4 + 64 * i, 86, 26 + 64 * i ) ) break;
                     }
                     drawSlotChoice( p_lang, selectedIdx );
                 }
@@ -308,8 +319,9 @@ namespace SAVE {
     }
 
     gameType startScreen::runEpisodeChoice( language p_current ) {
-        IO::choiceBox cb = IO::choiceBox( MAX_SPECIAL_EPISODES, EPISODE_NAMES[ p_current ], 0, true );
-        return (gameType) ( SPECIAL + cb.getResult( STRINGS[ 110 ][ p_current ], true, false ) );
+        IO::choiceBox cb
+            = IO::choiceBox( MAX_SPECIAL_EPISODES, EPISODE_NAMES[ p_current ], 0, true );
+        return ( gameType )( SPECIAL + cb.getResult( STRINGS[ 110 ][ p_current ], true, false ) );
     }
 
     language startScreen::runLanguageChoice( language p_current ) {
@@ -319,7 +331,7 @@ namespace SAVE {
         while( IO::yesNoBox( p_current ).getResult( STRINGS[ 85 ][ p_current ] ) ) {
             IO::clearScreen( true, false, false );
             IO::choiceBox cb = IO::choiceBox( LANGUAGES, LANGUAGE_NAMES, 0, true );
-            p_current = (language) cb.getResult( STRINGS[ 109 ][ p_current ], false, false );
+            p_current        = (language) cb.getResult( STRINGS[ 109 ][ p_current ], false, false );
             IO::clearScreen( true, false, false );
         }
         return p_current;
@@ -329,8 +341,7 @@ namespace SAVE {
         // Check if this is the first save file
         bool hasSave = false;
 
-        for( u8 i = 0; i < MAX_SAVE_FILES; ++i )
-            hasSave |= !!( SAV->m_saveFile[ i ].m_gameType );
+        for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) hasSave |= !!( SAV->m_saveFile[ i ].m_gameType );
 
         if( !hasSave ) {
             memset( SAV->m_storedPokemon, 0, sizeof( SAV->m_storedPokemon ) );
@@ -340,24 +351,25 @@ namespace SAVE {
 
         SAV->m_activeFile = p_file;
 
-        SAV->getActiveFile( ).m_curBox = 0;
+        SAV->getActiveFile( ).m_curBox             = 0;
         SAV->getActiveFile( ).m_options.m_language = p_lang;
 
         SAV->getActiveFile( ).m_money = 3000;
-        SAV->getActiveFile( ).m_id = rand( ) % 65536;
-        SAV->getActiveFile( ).m_sid = rand( ) % 65536;
+        SAV->getActiveFile( ).m_id    = rand( ) % 65536;
+        SAV->getActiveFile( ).m_sid   = rand( ) % 65536;
 
-        SAV->getActiveFile( ).m_gameType = p_type;
+        SAV->getActiveFile( ).m_gameType        = p_type;
         SAV->getActiveFile( ).m_options.m_bgIdx = START_BG;
 
-        SAV->getActiveFile( ).m_playtime = 0;
+        SAV->getActiveFile( ).m_playtime     = 0;
         SAV->getActiveFile( ).m_HOENN_Badges = 0;
         SAV->getActiveFile( ).m_KANTO_Badges = 0;
         SAV->getActiveFile( ).m_JOHTO_Badges = 0;
-        SAV->getActiveFile( ).m_lstBag = 0;
-        SAV->getActiveFile( ).m_lstBagItem = 0;
+        SAV->getActiveFile( ).m_lstBag       = 0;
+        SAV->getActiveFile( ).m_lstBagItem   = 0;
 
-        memset( SAVE::SAV->getActiveFile( ).m_pkmnTeam, 0, sizeof( SAVE::SAV->getActiveFile( ).m_pkmnTeam ) );
+        memset( SAVE::SAV->getActiveFile( ).m_pkmnTeam, 0,
+                sizeof( SAVE::SAV->getActiveFile( ).m_pkmnTeam ) );
 
         return initSpecialEpisode( SAV->getActiveFile( ).m_gameType - (s8) SPECIAL );
     }
@@ -377,8 +389,7 @@ namespace SAVE {
 
             choiceType res = runMainChoice( cur );
 
-            if( res == ABORT )
-                continue;
+            if( res == ABORT ) continue;
 
             IO::clearScreen( true, false, false );
             s8 slot;
@@ -387,40 +398,34 @@ namespace SAVE {
                 gameType ep = runEpisodeChoice( cur );
                 IO::initOAMTable( true );
 
-                if( ep < SPECIAL )
-                    continue;
+                if( ep < SPECIAL ) continue;
                 IO::clearScreen( true, false, false );
                 slot = runSlotChoice( cur, res != CONTINUE );
 
-                if( slot == (s8) -1 )
-                    continue;
+                if( slot == (s8) -1 ) continue;
 
                 IO::clearScreen( true, false, false );
-                if( !initNewGame( slot, ep, runLanguageChoice( cur ) ) )
-                    continue;
+                if( !initNewGame( slot, ep, runLanguageChoice( cur ) ) ) continue;
                 return;
             }
 
             slot = runSlotChoice( cur, res != CONTINUE );
 
-            if( slot == (s8) -1 )
-                continue;
+            if( slot == (s8) -1 ) continue;
 
             switch( res ) {
-                case CONTINUE:
-                    SAV->m_activeFile = slot;
-                    return;
-                case NEW_GAME:
-                    if( !initNewGame( slot, NORMAL, runLanguageChoice( cur ) ) )
-                        continue;
-                    return;
-                case TRANSFER_GAME:
-                    if( !transferGame( slot ) )
-                        continue;
-                    return;
-                default:
-                    continue;
+            case CONTINUE:
+                SAV->m_activeFile = slot;
+                return;
+            case NEW_GAME:
+                if( !initNewGame( slot, NORMAL, runLanguageChoice( cur ) ) ) continue;
+                return;
+            case TRANSFER_GAME:
+                if( !transferGame( slot ) ) continue;
+                return;
+            default:
+                continue;
             }
         }
     }
-}
+} // namespace SAVE

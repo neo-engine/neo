@@ -6,7 +6,7 @@ file        : pokemonIO.cpp
 author      : Philip Wellnitz
 description : Methods for pokémon which require user IO o
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -280,8 +280,8 @@ pokemon::stats calcStats( const pokemon::boxPokemon& p_boxdata, u8 p_level,
                                    + 10;
     else
         res.m_acHP = res.m_maxHP = 1;
-    pkmnNatures nature           = p_boxdata.getNature( );
-    res.m_Atk = ( ( ( p_boxdata.m_individualValues.m_attack + 2 * p_data.m_bases[ 1 ]
+    pkmnNatures nature = p_boxdata.getNature( );
+    res.m_Atk          = ( ( ( p_boxdata.m_individualValues.m_attack + 2 * p_data.m_bases[ 1 ]
                       + ( p_boxdata.m_effortValues[ 1 ] >> 2 ) )
                     * p_level / 100.0 )
                   + 5 )

@@ -6,7 +6,7 @@ file        : moveChoiceBox.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -69,14 +69,15 @@ namespace IO {
 
             if( !acMove ) continue;
 
-            regularFont->printString(
-                acMove->m_moveName.c_str( ), CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ]
-                                                 + ( CHOICE_POS[ !!_moveToLearn ][ i ][ 2 ]
-                                                     - CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ] )
-                                                       / 2
-                                                 + 2 * ( p_pressedIdx == i ),
-                CHOICE_POS[ !!_moveToLearn ][ i ][ 1 ] + 4 + ( p_pressedIdx == i ), true,
-                IO::font::CENTER );
+            regularFont->printString( acMove->m_moveName.c_str( ),
+                                      CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ]
+                                          + ( CHOICE_POS[ !!_moveToLearn ][ i ][ 2 ]
+                                              - CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ] )
+                                                / 2
+                                          + 2 * ( p_pressedIdx == i ),
+                                      CHOICE_POS[ !!_moveToLearn ][ i ][ 1 ] + 4
+                                          + ( p_pressedIdx == i ),
+                                      true, IO::font::CENTER );
             char buffer[ 30 ];
             u8   curPP = ( i < 4 ) ? _pokemon.m_boxdata.m_acPP[ i ] : acMove->m_movePP;
             snprintf( buffer, 20, "%hhu/%hhu%s", curPP, acMove->m_movePP, GET_STRING( 31 ) );
@@ -218,4 +219,4 @@ namespace IO {
         }
         return result;
     }
-}
+} // namespace IO

@@ -6,7 +6,7 @@ file        : messageBox.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -26,9 +26,9 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 */
 #pragma once
 
-#include <nds.h>
-#include <string>
 #include <cstdio>
+#include <string>
+#include <nds.h>
 
 #include "item.h"
 
@@ -36,17 +36,15 @@ namespace IO {
 #define MAXLINES 6
 
     class messageBox {
-    public:
-        enum sprite_type {
-            no_sprite = 0,
-            sprite_pkmn = 1,
-            sprite_trainer = 2
-        };
+      public:
+        enum sprite_type { no_sprite = 0, sprite_pkmn = 1, sprite_trainer = 2 };
 
         explicit messageBox( item* p_item, const u16 p_count );
 
         explicit messageBox( const char* p_text, bool p_remsprites = true );
-        explicit messageBox( const char* p_text, const char* p_name, bool p_a = true, bool p_remsprites = true, sprite_type p_sprt = no_sprite, u16 p_sprind = 0 );
+        explicit messageBox( const char* p_text, const char* p_name, bool p_a = true,
+                             bool p_remsprites = true, sprite_type p_sprt = no_sprite,
+                             u16 p_sprind = 0 );
         void put( const char* p_text, bool p_a = true );
         void carriageReturn( );
         void clear( );

@@ -6,7 +6,7 @@ file        : boxViewer.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -28,23 +28,30 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "boxViewer.h"
 #include "boxUI.h"
 #include "defines.h"
-#include "uio.h"
-#include "messageBox.h"
 #include "keyboard.h"
+#include "messageBox.h"
+#include "uio.h"
 
+#include "saveGame.h"
 #include "statusScreen.h"
 #include "statusScreenUI.h"
-#include "saveGame.h"
 
 namespace BOX {
 #define TRESHOLD 20
 
-#define HAS_SELECTION( no, yes ) do if( _selectedIdx == (u8) -1 ) { no; } else { yes; } while (false)
+#define HAS_SELECTION( no, yes )        \
+    do                                  \
+        if( _selectedIdx == (u8) -1 ) { \
+            no;                         \
+        } else {                        \
+            yes;                        \
+        }                               \
+    while( false )
     void boxViewer::run( bool p_allowTakePkmn ) {
-#define CLEAN ( _topScreenDirty = false  )
+#define CLEAN ( _topScreenDirty = false )
         _ranges = _boxUI.draw( p_allowTakePkmn );
         CLEAN;
-        _curPage = 0;
+        _curPage     = 0;
         _selectedIdx = (u8) -1;
         memset( &_heldPkmn, 0, sizeof( pokemon ) );
 
@@ -57,13 +64,12 @@ namespace BOX {
             touchRead( &touch );
             int pressed = keysCurrent( );
 
-            if( GET_AND_WAIT( KEY_B )
-                || GET_AND_WAIT( KEY_X )
+            if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT( KEY_X )
                 || GET_AND_WAIT_C( SCREEN_WIDTH - 12, SCREEN_HEIGHT - 10, 16 ) ) {
-                if( !_heldPkmn.m_boxdata.m_speciesId )
-                    break;
+                if( !_heldPkmn.m_boxdata.m_speciesId ) break;
             } else if( GET_AND_WAIT( KEY_L ) ) {
-                SAVE::SAV->getActiveFile( ).m_curBox = ( SAVE::SAV->getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                SAVE::SAV->getActiveFile( ).m_curBox
+                    = ( SAVE::SAV->getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
                 CLEAN;
                 _ranges = _boxUI.draw( p_allowTakePkmn );
                 select( _selectedIdx );
@@ -75,7 +81,8 @@ namespace BOX {
                     scanKeys( );
                     touchRead( &touch );
                     if( TOUCH_UP ) {
-                        SAVE::SAV->getActiveFile( ).m_curBox = ( SAVE::SAV->getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                        SAVE::SAV->getActiveFile( ).m_curBox
+                            = ( SAVE::SAV->getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
                         CLEAN;
                         _ranges = _boxUI.draw( p_allowTakePkmn );
                         select( _selectedIdx );
@@ -87,7 +94,8 @@ namespace BOX {
                     }
                 }
             } else if( GET_AND_WAIT( KEY_R ) ) {
-                SAVE::SAV->getActiveFile( ).m_curBox = ( SAVE::SAV->getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
+                SAVE::SAV->getActiveFile( ).m_curBox
+                    = ( SAVE::SAV->getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
                 CLEAN;
                 _ranges = _boxUI.draw( p_allowTakePkmn );
                 select( _selectedIdx );
@@ -99,7 +107,8 @@ namespace BOX {
                     scanKeys( );
                     touchRead( &touch );
                     if( TOUCH_UP ) {
-                        SAVE::SAV->getActiveFile( ).m_curBox = ( SAVE::SAV->getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
+                        SAVE::SAV->getActiveFile( ).m_curBox
+                            = ( SAVE::SAV->getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
                         CLEAN;
                         _ranges = _boxUI.draw( p_allowTakePkmn );
                         select( _selectedIdx );
@@ -124,9 +133,11 @@ namespace BOX {
                         IO::printRectangle( 144, 192 - 14, 255, 192, false, false, WHITE_IDX );
 
                         IO::keyboard kb;
-                        char buffer[ 50 ];
-                        snprintf( buffer, 49, GET_STRING( 62 ), SAVE::SAV->getCurrentBox( )->m_name );
-                        strcpy( SAVE::SAV->getCurrentBox( )->m_name, kb.getText( 14, buffer ).c_str( ) );
+                        char         buffer[ 50 ];
+                        snprintf( buffer, 49, GET_STRING( 62 ),
+                                  SAVE::SAV->getCurrentBox( )->m_name );
+                        strcpy( SAVE::SAV->getCurrentBox( )->m_name,
+                                kb.getText( 14, buffer ).c_str( ) );
                         IO::swapScreens( );
                         IO::OamTop->oamBuffer[ 0 ].isHidden = false;
                         IO::updateOAM( false );
@@ -156,7 +167,8 @@ namespace BOX {
                     _selectedIdx = MAX_PKMN_PER_BOX;
                 else
                     HAS_SELECTION( _selectedIdx = 0,
-                                   _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 2 ) % ( MAX_PKMN_PER_BOX + 8 ) );
+                                   _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 2 )
+                                                  % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
             } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
                 HAS_SELECTION( _selectedIdx = 0,
@@ -164,17 +176,17 @@ namespace BOX {
                 select( _selectedIdx );
             } else if( GET_AND_WAIT( KEY_LEFT ) ) {
                 HAS_SELECTION( _selectedIdx = 0,
-                               _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 7 ) % ( MAX_PKMN_PER_BOX + 8 ) );
+                               _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 7 )
+                                              % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
             } else if( GET_AND_WAIT( KEY_A ) ) {
-                HAS_SELECTION( , takePkmn( _selectedIdx ) );
+                HAS_SELECTION(, takePkmn( _selectedIdx ) );
             } else if( GET_AND_WAIT( KEY_SELECT ) ) {
                 _curPage = ( _curPage + 1 ) % 5;
                 select( _selectedIdx );
             }
             for( u8 i = 0; i < 5; ++i ) {
-                if( IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].isHidden )
-                    continue;
+                if( IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].isHidden ) continue;
                 if( GET_AND_WAIT_C( 62 + 32 * i, 4, 14 ) ) {
                     _curPage = i;
                     select( _selectedIdx );
@@ -200,8 +212,7 @@ namespace BOX {
                             select( _selectedIdx );
                             break;
                         }
-                        if( !IN_RANGE_I( touch, i ) )
-                            break;
+                        if( !IN_RANGE_I( touch, i ) ) break;
                     }
                 }
             }
@@ -222,11 +233,9 @@ namespace BOX {
                 selection = SAVE::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
         }
         _boxUI.select( p_index );
-        if( p_index >= MAX_PKMN_PER_BOX + 6 )
-            return;
+        if( p_index >= MAX_PKMN_PER_BOX + 6 ) return;
         if( selection.m_boxdata.m_speciesId ) {
-            if( !_topScreenDirty )
-                _stsUI->init( );
+            if( !_topScreenDirty ) _stsUI->init( );
             _stsUI->draw( selection, _curPage, true );
             _topScreenDirty = true;
         } else if( _topScreenDirty ) {
@@ -237,12 +246,13 @@ namespace BOX {
 
     void boxViewer::takePkmn( u8 p_index ) {
         if( p_index >= MAX_PKMN_PER_BOX + 6 ) {
-            if( p_index >= MAX_PKMN_PER_BOX + 8 )
-                return;
+            if( p_index >= MAX_PKMN_PER_BOX + 8 ) return;
             if( p_index == MAX_PKMN_PER_BOX + 6 ) // <
-                SAVE::SAV->getActiveFile( ).m_curBox = ( SAVE::SAV->getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                SAVE::SAV->getActiveFile( ).m_curBox
+                    = ( SAVE::SAV->getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
             else if( p_index == MAX_PKMN_PER_BOX + 7 ) // >
-                SAVE::SAV->getActiveFile( ).m_curBox = ( SAVE::SAV->getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
+                SAVE::SAV->getActiveFile( ).m_curBox
+                    = ( SAVE::SAV->getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
 
             CLEAN;
             _ranges = _boxUI.draw( _showTeam );
@@ -256,33 +266,39 @@ namespace BOX {
         if( p_index >= MAX_PKMN_PER_BOX && !_showTeam )
             std::swap( hld, SAVE::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ] );
         if( p_index >= MAX_PKMN_PER_BOX && _showTeam ) {
-            std::swap( _heldPkmn, SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
+            std::swap( _heldPkmn,
+                       SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
             if( !updateTeam( ) ) {
-                std::swap( _heldPkmn, SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
+                std::swap( _heldPkmn,
+                           SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
                 return;
             } else
                 _boxUI.updateTeam( );
         } else
             _heldPkmn = pokemon( hld );
-        _boxUI.takePkmn( p_index, _heldPkmn.m_boxdata.m_speciesId, _heldPkmn.m_boxdata.m_individualValues.m_isEgg );
+        _boxUI.takePkmn( p_index, _heldPkmn.m_boxdata.m_speciesId,
+                         _heldPkmn.m_boxdata.m_individualValues.m_isEgg );
     }
 
-    //Remove gaps in party pkmn
+    // Remove gaps in party pkmn
     bool boxViewer::updateTeam( ) {
         u8 nxt = 1;
         for( u8 i = 0; i < 6; ++i, ++nxt )
             if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId )
                 for( ; nxt < 6; ++nxt )
                     if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ nxt ].m_boxdata.m_speciesId ) {
-                        std::swap( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ], SAVE::SAV->getActiveFile( ).m_pkmnTeam[ nxt ] );
+                        std::swap( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ],
+                                   SAVE::SAV->getActiveFile( ).m_pkmnTeam[ nxt ] );
                         break;
                     }
 
-        //Check if the party is safe to walk with
+        // Check if the party is safe to walk with
         for( u8 i = 0; i < 6; ++i )
             if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId
                 && SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP
-                && !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg )
+                && !SAVE::SAV->getActiveFile( )
+                        .m_pkmnTeam[ i ]
+                        .m_boxdata.m_individualValues.m_isEgg )
                 return true;
         return false;
     }

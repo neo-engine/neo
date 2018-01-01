@@ -6,7 +6,7 @@ file        : battlePokemon.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -33,30 +33,24 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 struct pokemon;
 namespace BATTLE {
 
-    enum acStatus {
-        OK = 0,
-        STS = 1,
-        KO = 2,
-        NA = 3,
-        SELECTED = 4
-    };
+    enum acStatus { OK = 0, STS = 1, KO = 2, NA = 3, SELECTED = 4 };
     enum battleStatus {
         NO_BATTLE_STATUS = 0,
         DIVE,
         FLY,
-        DEFAULTED, //Pokemon used eg Hyperbeam last Turn
+        DEFAULTED, // Pokemon used eg Hyperbeam last Turn
         PROTECTED
-        //Todo ...
+        // Todo ...
     };
 
     struct battlePokemon {
-        pokemon*            m_pokemon;
-        s8                  m_acStatChanges[ 10 ];
-        type                m_types[ 3 ];
-        acStatus            m_acStatus;
-        ailment             m_ailments;
-        u8                  m_ailmentCount;
-        battleStatus        m_battleStatus;
-        u8                  m_toxicCount;
+        pokemon*     m_pokemon;
+        s8           m_acStatChanges[ 10 ];
+        type         m_types[ 3 ];
+        acStatus     m_acStatus;
+        ailment      m_ailments;
+        u8           m_ailmentCount;
+        battleStatus m_battleStatus;
+        u8           m_toxicCount;
     };
-}
+} // namespace BATTLE

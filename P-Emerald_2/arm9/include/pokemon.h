@@ -6,7 +6,7 @@ file        : pokemon.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -169,8 +169,8 @@ struct pokemonData {
 };
 
 std::string getDisplayName( u16 p_pkmnId, u8 p_forme = 0 );
-void getDisplayName( u16 p_pkmnId, char* p_name, u8 p_forme = 0 );
-bool getAll( u16 p_pkmnId, pokemonData& out, u8 p_forme = 0 );
+void        getDisplayName( u16 p_pkmnId, char* p_name, u8 p_forme = 0 );
+bool        getAll( u16 p_pkmnId, pokemonData& out, u8 p_forme = 0 );
 
 void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num,
                     u16* p_res );
@@ -376,11 +376,12 @@ struct pokemon {
             return a < 9 ? (type) a : type( a + 1 );
         }
         u8 getHPPower( ) const {
-            return 30 + ( ( ( ( IVget( 0 ) >> 1 ) & 1 ) + 2 * ( ( IVget( 1 ) >> 1 ) & 1 )
-                            + 4 * ( ( IVget( 2 ) >> 1 ) & 1 ) + 8 * ( ( IVget( 3 ) >> 1 ) & 1 )
-                            + 16 * ( ( IVget( 4 ) >> 1 ) & 1 )
-                            + 32 * ( ( IVget( 5 ) >> 1 ) & 1 ) * 40 )
-                          / 63 );
+            return 30
+                   + ( ( ( ( IVget( 0 ) >> 1 ) & 1 ) + 2 * ( ( IVget( 1 ) >> 1 ) & 1 )
+                         + 4 * ( ( IVget( 2 ) >> 1 ) & 1 ) + 8 * ( ( IVget( 3 ) >> 1 ) & 1 )
+                         + 16 * ( ( IVget( 4 ) >> 1 ) & 1 )
+                         + 32 * ( ( IVget( 5 ) >> 1 ) & 1 ) * 40 )
+                       / 63 );
         }
         bool isEgg( ) const {
             return m_individualValues.m_isEgg;
@@ -499,4 +500,4 @@ struct pokemon {
 pokemon::stats calcStats( const pokemon::boxPokemon& p_boxdata, const pokemonData& p_data );
 pokemon::stats calcStats( const pokemon::boxPokemon& p_boxdata, u8 p_level,
                           const pokemonData& p_data );
-u16 calcLevel( const pokemon::boxPokemon& p_boxdata, const pokemonData& p_data );
+u16            calcLevel( const pokemon::boxPokemon& p_boxdata, const pokemonData& p_data );

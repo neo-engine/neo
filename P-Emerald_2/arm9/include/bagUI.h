@@ -6,7 +6,7 @@ file        : bagUI.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -36,25 +36,26 @@ namespace BAG {
 #define TAKE_ITEM 2
 #define MOVE_ITEM 3
 
-#define MOVE_BAG  4
+#define MOVE_BAG 4
 
 #define BAG_CNT 5
 #define MAX_ITEMS_PER_PAGE 9
     class bagUI {
-    public:
+      public:
         struct targetInfo {
-            u16 m_item;
+            u16  m_item;
             bool m_isHeld;
         };
-    private:
-        std::vector<std::pair<IO::inputTarget, targetInfo>>
-            drawPkmn( item* p_currentSelection );
-    public:
-        u16 drawPkmnIcons( );
+
+      private:
+        std::vector<std::pair<IO::inputTarget, targetInfo>> drawPkmn( item* p_currentSelection );
+
+      public:
+        u16  drawPkmnIcons( );
         void init( );
 
-        std::vector<std::pair<IO::inputTarget, targetInfo>>
-            drawBagPage( bag::bagType, u16 p_firstDisplayedItem );
+        std::vector<std::pair<IO::inputTarget, targetInfo>> drawBagPage( bag::bagType,
+                                                                         u16 p_firstDisplayedItem );
         void selectItem( u8 p_idx, std::pair<u16, u16> p_item, bool p_pressed = false );
         void unselectItem( bag::bagType p_page, u8 p_idx, u16 p_item );
 
