@@ -8,7 +8,7 @@ addons:
 before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -qq gcc-4.9 git curl
-    - curl -L http://sourceforge.net/projects/devkitpro/files/Automated%20Installer/devkitARMupdate.pl/download -o devkitARMupdate.pl
+    - curl -L https://gist.githubusercontent.com/PH111P/959e8ac3aceea74dc2f9f3e2ad3657ab/raw/f9d2ef149cd956c57a0c31f0fcfe4bfd98f9ee3e/devkitARMupdate.pl -o devkitARMupdate.pl
     - chmod +x ./devkitARMupdate.pl
     - sudo ./devkitARMupdate.pl /opt/devkitpro
     - echo "export DEVKITPRO=/opt/devkitpro" >> ~/.bashrc
