@@ -6,7 +6,7 @@ file        : boxUI.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -26,20 +26,16 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 */
 
 #pragma once
+#include <vector>
 #include "box.h"
 #include "uio.h"
-#include <vector>
 
 namespace BOX {
 #define PAGE_ICON_START 5
     class boxUI {
         friend class boxViewer;
 
-        enum button {
-            BUTTON_LEFT,
-            BUTTON_RIGHT,
-            BUTTON_BOX_NAME
-        };
+        enum button { BUTTON_LEFT, BUTTON_RIGHT, BUTTON_BOX_NAME };
 
         void buttonChange( button p_button, bool p_pressed );
 
@@ -53,7 +49,8 @@ namespace BOX {
         void select( u8 p_index );
         void takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg );
         void updateTeam( );
-    private:
+
+      private:
         bool _showTeam;
 
         void drawAllBoxStatus( bool p_bottom = false );

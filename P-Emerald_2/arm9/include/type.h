@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2017
+    Copyright (C) 2012 - 2018
     Philip Wellnitz
 
     This file is part of Pokémon Emerald 2 Version.
@@ -27,31 +27,46 @@
 
 #pragma once
 
-#include "Normal.h"
-#include "Kampf.h"
-#include "Flug.h"
-#include "Gift.h"
 #include "Boden.h"
-#include "Gest.h"
-#include "Kaefer.h"
+#include "Dra.h"
+#include "Eis.h"
+#include "Elek.h"
+#include "Fee.h"
+#include "Feuer.h"
+#include "Flug.h"
 #include "Geist.h"
+#include "Gest.h"
+#include "Gift.h"
+#include "Kaefer.h"
+#include "Kampf.h"
+#include "Normal.h"
+#include "Pfl.h"
+#include "Psycho.h"
 #include "Stahl.h"
 #include "Unbek.h"
-#include "Wasser.h"
-#include "Feuer.h"
-#include "Pfl.h"
-#include "Elek.h"
-#include "Psycho.h"
-#include "Eis.h"
-#include "Dra.h"
 #include "Unl.h"
-#include "Fee.h"
+#include "Wasser.h"
 
 enum type {
-    NORMAL = 0, FIGHTING = 1, FLYING = 2, POISON = 3, GROUND = 4,
-    ROCK = 5, BUG = 6, GHOST = 7, STEEL = 8, UNKNOWN = 9,
-    WATER = 10, FIRE = 11, GRASS = 12, LIGHTNING = 13, PSYCHIC = 14,
-    ICE = 15, DRAGON = 16, DARKNESS = 17, FAIRY = 18
+    NORMAL    = 0,
+    FIGHTING  = 1,
+    FLYING    = 2,
+    POISON    = 3,
+    GROUND    = 4,
+    ROCK      = 5,
+    BUG       = 6,
+    GHOST     = 7,
+    STEEL     = 8,
+    UNKNOWN   = 9,
+    WATER     = 10,
+    FIRE      = 11,
+    GRASS     = 12,
+    LIGHTNING = 13,
+    PSYCHIC   = 14,
+    ICE       = 15,
+    DRAGON    = 16,
+    DARKNESS  = 17,
+    FAIRY     = 18
 };
 
 float getEffectiveness( const type& p_t1, const type& p_t2 );

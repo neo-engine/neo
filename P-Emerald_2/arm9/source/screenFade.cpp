@@ -6,7 +6,7 @@ file        : screenFade.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -25,118 +25,110 @@ You should have received a copy of the GNU General Public License
 along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <nds/bios.h>
-#include <nds/arm9/sprite.h>
 #include <nds/arm9/background.h>
+#include <nds/arm9/sprite.h>
+#include <nds/bios.h>
 
-#include "uio.h"
-#include "screenFade.h"
-#include "fs.h"
 #include "defines.h"
+#include "fs.h"
+#include "screenFade.h"
+#include "uio.h"
 
 namespace IO {
     void fadeScreen( fadeType p_type ) {
         switch( p_type ) {
-            case IO::UNFADE:
-            {
+        case IO::UNFADE: {
+            u16 val = 0x1F;
+            for( s8 i = 4; i >= 0; --i ) {
+                for( u8 j = 0; j < 5; ++j ) swiWaitForVBlank( );
+                val &= ~( 1 << u8( i ) );
+                REG_BLDY = val;
+            }
+            swiWaitForVBlank( );
+            break;
+        }
+        case IO::UNFADE_FAST: {
+            u16 val = 0x1F;
+            for( s8 i = 3; i >= 0; i -= 2 ) {
+                swiWaitForVBlank( );
+                val &= ~( 3 << u8( i ) );
+                REG_BLDY = val;
+            }
+            swiWaitForVBlank( );
+            break;
+        }
+        case IO::CLEAR_DARK_FAST:
+            REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+                         | BLEND_SRC_SPRITE;
+            REG_BLDY = 1;
+            for( u8 i = 1; i < 5; i += 2 ) {
+                swiWaitForVBlank( );
+                REG_BLDY |= ( 3 << i );
+            }
+            swiWaitForVBlank( );
+            break;
+        case IO::CLEAR_DARK:
+        case IO::CAVE_ENTRY:
+            REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+                         | BLEND_SRC_SPRITE;
+            REG_BLDY = 1;
+            for( u8 i = 1; i < 5; ++i ) {
+                for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
+                REG_BLDY |= ( 1 << i );
+            }
+            swiWaitForVBlank( );
+            if( p_type == CLEAR_DARK ) break;
+            break;
+        case IO::CLEAR_WHITE_FAST:
+            REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+                         | BLEND_SRC_SPRITE;
+            REG_BLDY = 1;
+            for( u8 i = 1; i < 5; i += 2 ) {
+                for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
+                REG_BLDY |= ( 3 << i );
+            }
+            swiWaitForVBlank( );
+            break;
+        case IO::CLEAR_WHITE:
+        case IO::CAVE_EXIT:
+            REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+                         | BLEND_SRC_SPRITE;
+            REG_BLDY = 1;
+            for( u8 i = 1; i < 5; ++i ) {
+                for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
+                REG_BLDY |= ( 1 << i );
+            }
+            swiWaitForVBlank( );
+            if( p_type == CLEAR_WHITE ) break;
+            break;
+        case IO::BATTLE:
+        case IO::BATTLE_STRONG_OPPONENT:
+            REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3;
+            for( u8 j = 0; j < p_type - IO::BATTLE + 1; ++j ) {
                 u16 val = 0x1F;
                 for( s8 i = 4; i >= 0; --i ) {
-                    for( u8 j = 0; j < 5; ++j )
-                        swiWaitForVBlank( );
+                    for( u8 k = 0; k < 2 + j; ++k ) swiWaitForVBlank( );
                     val &= ~( 1 << u8( i ) );
                     REG_BLDY = val;
                 }
-                swiWaitForVBlank( );
-                break;
+                for( u8 i = 1; i < 3; ++i ) swiWaitForVBlank( );
+                REG_BLDY = 1;
+                for( u8 i = 1; i < 5; ++i ) {
+                    for( u8 k = 0; k < 2 + j; ++k ) swiWaitForVBlank( );
+                    REG_BLDY |= ( 1 << i );
+                }
+                for( u8 i = 1; i < 3; ++i ) swiWaitForVBlank( );
             }
-            case IO::UNFADE_FAST:
-            {
-                u16 val = 0x1F;
-                for( s8 i = 3; i >= 0; i -= 2 ) {
-                    swiWaitForVBlank( );
-                    val &= ~( 3 << u8( i ) );
-                    REG_BLDY = val;
-                }
-                swiWaitForVBlank( );
-                break;
+            REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+                         | BLEND_SRC_SPRITE;
+            for( u8 i = 1; i < 5; ++i ) {
+                for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
+                REG_BLDY |= ( 1 << i );
             }
-            case IO::CLEAR_DARK_FAST:
-                REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
-                REG_BLDY = 1;
-                for( u8 i = 1; i < 5; i += 2 ) {
-                    swiWaitForVBlank( );
-                    REG_BLDY |= ( 3 << i );
-                }
-                swiWaitForVBlank( );
-                break;
-            case IO::CLEAR_DARK:
-            case IO::CAVE_ENTRY:
-                REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
-                REG_BLDY = 1;
-                for( u8 i = 1; i < 5; ++i ) {
-                    for( u8 j = 0; j < 4; ++j )
-                        swiWaitForVBlank( );
-                    REG_BLDY |= ( 1 << i );
-                }
-                swiWaitForVBlank( );
-                if( p_type == CLEAR_DARK )
-                    break;
-                break;
-            case IO::CLEAR_WHITE_FAST:
-                REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
-                REG_BLDY = 1;
-                for( u8 i = 1; i < 5; i += 2 ) {
-                    for( u8 j = 0; j < 4; ++j )
-                        swiWaitForVBlank( );
-                    REG_BLDY |= ( 3 << i );
-                }
-                swiWaitForVBlank( );
-                break;
-            case IO::CLEAR_WHITE:
-            case IO::CAVE_EXIT:
-                REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
-                REG_BLDY = 1;
-                for( u8 i = 1; i < 5; ++i ) {
-                    for( u8 j = 0; j < 4; ++j )
-                        swiWaitForVBlank( );
-                    REG_BLDY |= ( 1 << i );
-                }
-                swiWaitForVBlank( );
-                if( p_type == CLEAR_WHITE )
-                    break;
-                break;
-            case IO::BATTLE:
-            case IO::BATTLE_STRONG_OPPONENT:
-                REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3;
-                for( u8 j = 0; j < p_type - IO::BATTLE + 1; ++j ) {
-                    u16 val = 0x1F;
-                    for( s8 i = 4; i >= 0; --i ) {
-                        for( u8 k = 0; k < 2 + j; ++k )
-                            swiWaitForVBlank( );
-                        val &= ~( 1 << u8( i ) );
-                        REG_BLDY = val;
-                    }
-                    for( u8 i = 1; i < 3; ++i )
-                        swiWaitForVBlank( );
-                    REG_BLDY = 1;
-                    for( u8 i = 1; i < 5; ++i ) {
-                        for( u8 k = 0; k < 2 + j; ++k )
-                            swiWaitForVBlank( );
-                        REG_BLDY |= ( 1 << i );
-                    }
-                    for( u8 i = 1; i < 3; ++i )
-                        swiWaitForVBlank( );
-                }
-                REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
-                for( u8 i = 1; i < 5; ++i ) {
-                    for( u8 j = 0; j < 4; ++j )
-                        swiWaitForVBlank( );
-                    REG_BLDY |= ( 1 << i );
-                }
-                swiWaitForVBlank( );
-                break;
-            default:
-                break;
+            swiWaitForVBlank( );
+            break;
+        default:
+            break;
         }
     }
 
@@ -164,4 +156,4 @@ namespace IO {
             consoleClear( );
         }
     }
-}
+} // namespace IO

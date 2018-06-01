@@ -6,7 +6,7 @@ file        : script.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -42,7 +42,7 @@ namespace BATTLE {
     struct battlePokemon;
 
     class battleScript {
-    public:
+      public:
         struct command {
             enum target {
                 NO_TARGET,
@@ -51,7 +51,7 @@ namespace BATTLE {
                 OWN1,
                 OWN2,
                 BATTLE_,
-                SELF_PKMN, //move user
+                SELF_PKMN, // move user
                 SELF_BATTLE,
                 MOVE,
 
@@ -80,8 +80,8 @@ namespace BATTLE {
 
                 PKMN_GENDER, //-1: Female, 0: Neutral, 1: Male
 
-                PKMN_AILMENT,   //Burn, ...
-                PKMN_STATUS,    //is Flying, etc
+                PKMN_AILMENT, // Burn, ...
+                PKMN_STATUS,  // is Flying, etc
 
                 PKMN_HP,
                 PKMN_HP_PERCENT,
@@ -93,7 +93,7 @@ namespace BATTLE {
                 PKMN_SDEF,
                 PKMN_ACCURACY,
                 PKMN_ATTACK_BLOCKED,
-                PKMN_KO, //Ko moves
+                PKMN_KO, // Ko moves
 
                 PKMN_LEVEL,
 
@@ -122,37 +122,25 @@ namespace BATTLE {
                 PLAYER_MONEY,
 
                 RAND_MAX_0,
-                RAND_MAX_10 = RAND_MAX_0 + 10,
-                RAND_MAX_50 = RAND_MAX_0 + 50,
+                RAND_MAX_10  = RAND_MAX_0 + 10,
+                RAND_MAX_50  = RAND_MAX_0 + 50,
                 RAND_MAX_100 = RAND_MAX_0 + 100
             };
 
             enum action {
                 SET,
                 ADD,
-                MULTIPLY, //Multiply target by value and divide it by 100
+                MULTIPLY, // Multiply target by value and divide it by 100
                 SWITCH,
                 END,
-                DEFER,    //Don't use a move
+                DEFER, // Don't use a move
             };
-            enum comp {
-                EQUALS,
-                NOT_EQUALS,
-                GREATER,
-                LESS,
-                GEQ,
-                LEQ
-            };
+            enum comp { EQUALS, NOT_EQUALS, GREATER, LESS, GEQ, LEQ };
 
-            enum ctr {
-                IF,
-                IFN,
-                ELSE,
-                WHILE
-            };
+            enum ctr { IF, IFN, ELSE, WHILE };
 
             struct condition {
-            public:
+              public:
                 ctr             m_control;
                 target          m_target;
                 targetSpecifier m_targetSpecifier;
@@ -161,171 +149,125 @@ namespace BATTLE {
                 bool            m_asLastCondition;
 
                 condition( ctr p_control = IF )
-                    : m_control( p_control ),
-                    m_asLastCondition( true ) {
+                    : m_control( p_control ), m_asLastCondition( true ) {
                 }
-                condition( target p_target,
-                           targetSpecifier p_targetSpecifier,
-                           comp p_comp,
+                condition( target p_target, targetSpecifier p_targetSpecifier, comp p_comp,
                            int p_value )
-                    : m_control( IF ),
-                    m_target( p_target ),
-                    m_targetSpecifier( p_targetSpecifier ),
-                    m_comp( p_comp ),
-                    m_value( p_value ),
-                    m_asLastCondition( false ) { }
+                    : m_control( IF ), m_target( p_target ), m_targetSpecifier( p_targetSpecifier ),
+                      m_comp( p_comp ), m_value( p_value ), m_asLastCondition( false ) {
+                }
 
-                bool            check( battle& p_battle, void* p_self ) const;
-                bool            evaluate( int p_other ) const;
+                bool check( battle& p_battle, void* p_self ) const;
+                bool evaluate( int p_other ) const;
             };
 
             struct value {
-            public:
+              public:
                 target          m_target;
                 targetSpecifier m_targetSpecifier;
                 float           m_multiplier;
                 int             m_additiveConstant;
 
                 value( int p_value )
-                    : m_target( NO_TARGET ),
-                    m_targetSpecifier( NONE ),
-                    m_multiplier( 0 ),
-                    m_additiveConstant( p_value ) { }
+                    : m_target( NO_TARGET ), m_targetSpecifier( NONE ), m_multiplier( 0 ),
+                      m_additiveConstant( p_value ) {
+                }
 
-                value( target          p_target,
-                       targetSpecifier p_targetSpecifier,
-                       float           p_multiplier )
-                    : m_target( p_target ),
-                    m_targetSpecifier( p_targetSpecifier ),
-                    m_multiplier( p_multiplier ),
-                    m_additiveConstant( 0 ) { }
+                value( target p_target, targetSpecifier p_targetSpecifier, float p_multiplier )
+                    : m_target( p_target ), m_targetSpecifier( p_targetSpecifier ),
+                      m_multiplier( p_multiplier ), m_additiveConstant( 0 ) {
+                }
 
-                value( target          p_target,
-                       targetSpecifier p_targetSpecifier,
-                       float           p_multiplier,
-                       int             p_additiveConstant )
-                    : m_target( p_target ),
-                    m_targetSpecifier( p_targetSpecifier ),
-                    m_multiplier( p_multiplier ),
-                    m_additiveConstant( p_additiveConstant ) { }
+                value( target p_target, targetSpecifier p_targetSpecifier, float p_multiplier,
+                       int p_additiveConstant )
+                    : m_target( p_target ), m_targetSpecifier( p_targetSpecifier ),
+                      m_multiplier( p_multiplier ), m_additiveConstant( p_additiveConstant ) {
+                }
 
-                int             get( battle& p_battle, void* p_self )const;
-                int             get( battle& p_battle, bool p_targetIsOpp, u8 p_targetPosition )const;
-                int             get( battle& p_target )const;
+                int get( battle& p_battle, void* p_self ) const;
+                int get( battle& p_battle, bool p_targetIsOpp, u8 p_targetPosition ) const;
+                int get( battle& p_target ) const;
             };
 
-            std::vector<condition>  m_conditions;
-            target                  m_target;
-            targetSpecifier         m_targetSpecifier;
-            action                  m_action;
-            value                   m_value;
+            std::vector<condition> m_conditions;
+            target                 m_target;
+            targetSpecifier        m_targetSpecifier;
+            action                 m_action;
+            value                  m_value;
 
-            std::string            m_log;
+            std::string m_log;
 
             command( std::string& p_log )
-                : m_conditions( { } ),
-                m_target( NO_TARGET ),
-                m_targetSpecifier( NONE ),
-                m_action( SET ),
-                m_value( 0 ),
-                m_log( p_log ) { }
+                : m_conditions( {} ), m_target( NO_TARGET ), m_targetSpecifier( NONE ),
+                  m_action( SET ), m_value( 0 ), m_log( p_log ) {
+            }
             command( const char* p_log )
-                : m_conditions( { } ),
-                m_target( NO_TARGET ),
-                m_targetSpecifier( NONE ),
-                m_action( SET ),
-                m_value( 0 ),
-                m_log( p_log ) { }
-
-            command( target                 p_target,
-                     targetSpecifier        p_targetSpecifier,
-                     value                  p_value )
-                : m_target( p_target ),
-                m_targetSpecifier( p_targetSpecifier ),
-                m_action( SET ),
-                m_value( p_value ) {
-            }
-            command( target                 p_target,
-                     targetSpecifier        p_targetSpecifier,
-                     action                 p_action,
-                     value                  p_value )
-                : m_target( p_target ),
-                m_targetSpecifier( p_targetSpecifier ),
-                m_action( p_action ),
-                m_value( p_value ) {
+                : m_conditions( {} ), m_target( NO_TARGET ), m_targetSpecifier( NONE ),
+                  m_action( SET ), m_value( 0 ), m_log( p_log ) {
             }
 
-            command( std::vector<condition>  p_conditions,
-                     target                  p_target,
-                     targetSpecifier         p_targetSpecifier,
-                     action                  p_action,
-                     int                     p_value )
-                : m_conditions( p_conditions ),
-                m_target( p_target ),
-                m_targetSpecifier( p_targetSpecifier ),
-                m_action( p_action ),
-                m_value( p_value ),
-                m_log( "" ) { }
+            command( target p_target, targetSpecifier p_targetSpecifier, value p_value )
+                : m_target( p_target ), m_targetSpecifier( p_targetSpecifier ), m_action( SET ),
+                  m_value( p_value ) {
+            }
+            command( target p_target, targetSpecifier p_targetSpecifier, action p_action,
+                     value p_value )
+                : m_target( p_target ), m_targetSpecifier( p_targetSpecifier ),
+                  m_action( p_action ), m_value( p_value ) {
+            }
 
-            command( std::vector<condition>  p_conditions,
-                     target                  p_target,
-                     targetSpecifier         p_targetSpecifier,
-                     action                  p_action,
-                     int                     p_value,
-                     std::string&            p_log )
-                : m_conditions( p_conditions ),
-                m_target( p_target ),
-                m_targetSpecifier( p_targetSpecifier ),
-                m_action( p_action ),
-                m_value( p_value ),
-                m_log( p_log ) { }
-            command( std::vector<condition>  p_conditions,
-                     target                  p_target,
-                     targetSpecifier         p_targetSpecifier,
-                     action                  p_action,
-                     int                     p_value,
-                     const char*          p_log )
-                : m_conditions( p_conditions ),
-                m_target( p_target ),
-                m_targetSpecifier( p_targetSpecifier ),
-                m_action( p_action ),
-                m_value( p_value ),
-                m_log( p_log ) { }
+            command( std::vector<condition> p_conditions, target p_target,
+                     targetSpecifier p_targetSpecifier, action p_action, int p_value )
+                : m_conditions( p_conditions ), m_target( p_target ),
+                  m_targetSpecifier( p_targetSpecifier ), m_action( p_action ), m_value( p_value ),
+                  m_log( "" ) {
+            }
 
+            command( std::vector<condition> p_conditions, target p_target,
+                     targetSpecifier p_targetSpecifier, action p_action, int p_value,
+                     std::string& p_log )
+                : m_conditions( p_conditions ), m_target( p_target ),
+                  m_targetSpecifier( p_targetSpecifier ), m_action( p_action ), m_value( p_value ),
+                  m_log( p_log ) {
+            }
+            command( std::vector<condition> p_conditions, target p_target,
+                     targetSpecifier p_targetSpecifier, action p_action, int p_value,
+                     const char* p_log )
+                : m_conditions( p_conditions ), m_target( p_target ),
+                  m_targetSpecifier( p_targetSpecifier ), m_action( p_action ), m_value( p_value ),
+                  m_log( p_log ) {
+            }
 
-            command( std::vector<condition>  p_conditions,
-                     target                  p_target,
-                     targetSpecifier         p_targetSpecifier,
-                     action                  p_action,
-                     value                   p_value,
-                     const char*             p_log = "" )
-                : m_conditions( p_conditions ),
-                m_target( p_target ),
-                m_targetSpecifier( p_targetSpecifier ),
-                m_action( p_action ),
-                m_value( p_value ),
-                m_log( p_log ) { }
+            command( std::vector<condition> p_conditions, target p_target,
+                     targetSpecifier p_targetSpecifier, action p_action, value p_value,
+                     const char* p_log = "" )
+                : m_conditions( p_conditions ), m_target( p_target ),
+                  m_targetSpecifier( p_targetSpecifier ), m_action( p_action ), m_value( p_value ),
+                  m_log( p_log ) {
+            }
 
-
-            void                    execute( battle& p_battle, void* p_self )const;
-            void                    evaluateOnTargetVal( battle& p_battle, void* p_self, bool p_targetIsOpp, u8 p_targetPosition )const;
-            void                    evaluateOnTargetVal( battle& p_battle, void* p_self )const;
+            void execute( battle& p_battle, void* p_self ) const;
+            void evaluateOnTargetVal( battle& p_battle, void* p_self, bool p_targetIsOpp,
+                                      u8 p_targetPosition ) const;
+            void evaluateOnTargetVal( battle& p_battle, void* p_self ) const;
         };
 
-        std::vector<command>            _commands;
-    public:
-        battleScript( ) { }
+        std::vector<command> _commands;
 
-        battleScript( std::vector<command> p_commands )
-            : _commands( p_commands ) { }
+      public:
+        battleScript( ) {
+        }
 
-        void                            execute( battle& p_battle, void* p_self ) const;
+        battleScript( std::vector<command> p_commands ) : _commands( p_commands ) {
+        }
+
+        void execute( battle& p_battle, void* p_self ) const;
     };
 
-    extern battleScript weatherEffects[ 9 ];
-    typedef battleScript::command               cmd;
-    typedef battleScript::command::condition    con;
-    typedef battleScript::command::value        val;
+    extern battleScript                      weatherEffects[ 9 ];
+    typedef battleScript::command            cmd;
+    typedef battleScript::command::condition con;
+    typedef battleScript::command::value     val;
 
 #define NEQ( pkmn, var, val ) ( con( cmd::pkmn, cmd::var, cmd::NOT_EQUALS, val ) )
 #define EQ( pkmn, var, val ) ( con( cmd::pkmn, cmd::var, cmd::EQUALS, val ) )
@@ -333,4 +275,4 @@ namespace BATTLE {
 #define LS( pkmn, var, val ) ( con( cmd::pkmn, cmd::var, cmd::LESS, val ) )
 #define GEQ( pkmn, var, val ) ( con( cmd::pkmn, cmd::var, cmd::GEQ, val ) )
 #define LEQ( pkmn, var, val ) ( con( cmd::pkmn, cmd::var, cmd::LEQ, val ) )
-}
+} // namespace BATTLE

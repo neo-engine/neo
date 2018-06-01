@@ -6,7 +6,7 @@ file        : hmMoves.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -29,30 +29,20 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "move.h"
 
 /*
-*  Field moves get a derived class each
-*/
+ *  Field moves get a derived class each
+ */
 
-#define C (char)
-#define A (move::moveAffectsTypes)
-#define F (move::moveFlags)
-#define H (move::moveHitTypes)
+#define C ( char )
+#define A ( move::moveAffectsTypes )
+#define F ( move::moveFlags )
+#define H ( move::moveHitTypes )
 
-//HM01
-class cut
-    : public move {
-public:
+// HM01
+class cut : public move {
+  public:
     cut( )
-        : move( std::string( "Zerschneider" ),
-        { },
-                C 60,
-                NORMAL,
-                C 100,
-                C 15,
-                C 0,
-                SELECTED,
-                C 1,
-                F( MAKES_CONTACT | PROTECT | KINGS_ROCK ),
-                PHYS ) {
+        : move( std::string( "Zerschneider" ), {}, C 60, NORMAL, C 100, C 15, C 0, SELECTED, C 1,
+                F( MAKES_CONTACT | PROTECT | KINGS_ROCK ), PHYS ) {
         this->m_isFieldAttack = true;
     }
 
@@ -67,22 +57,12 @@ public:
     }
 };
 
-//HM02
-class rockSmash
-    : public move {
-public:
+// HM02
+class rockSmash : public move {
+  public:
     rockSmash( )
-        : move( std::string( "Zertrümmerer" ),
-        { },
-                C 60,
-                FIGHTING,
-                C 100,
-                C 15,
-                C 30,
-                SELECTED,
-                C 1,
-                F( MAKES_CONTACT | PROTECT | KINGS_ROCK ),
-                PHYS ) {
+        : move( std::string( "Zertrümmerer" ), {}, C 60, FIGHTING, C 100, C 15, C 30, SELECTED, C 1,
+                F( MAKES_CONTACT | PROTECT | KINGS_ROCK ), PHYS ) {
         this->m_isFieldAttack = true;
     }
 
@@ -97,22 +77,12 @@ public:
     }
 };
 
-//HM03
-class fly
-    : public move {
-public:
+// HM03
+class fly : public move {
+  public:
     fly( )
-        : move( std::string( "Fliegen" ),
-        { },
-                C 90,
-                FLYING,
-                C 100,
-                C 15,
-                C 100,
-                SELECTED,
-                C 1,
-                F( MAKES_CONTACT | PROTECT | KINGS_ROCK ),
-                PHYS ) {
+        : move( std::string( "Fliegen" ), {}, C 90, FLYING, C 100, C 15, C 100, SELECTED, C 1,
+                F( MAKES_CONTACT | PROTECT | KINGS_ROCK ), PHYS ) {
         this->m_isFieldAttack = true;
     }
 
@@ -127,22 +97,12 @@ public:
     }
 };
 
-//HM04
-class flash
-    : public move {
-public:
-    flash( ) :
-        move( std::string( "Blitz" ),
-        { },
-              C 0,
-              LIGHTNING,
-              C 80,
-              C 15,
-              C 100,
-              SELECTED,
-              C 1,
-              F( PROTECT | MAGIC_COAT ),
-              STAT ) {
+// HM04
+class flash : public move {
+  public:
+    flash( )
+        : move( std::string( "Blitz" ), {}, C 0, LIGHTNING, C 80, C 15, C 100, SELECTED, C 1,
+                F( PROTECT | MAGIC_COAT ), STAT ) {
         this->m_isFieldAttack = true;
     }
 
@@ -157,22 +117,12 @@ public:
     }
 };
 
-//HM05
-class whirlpool
-    : public move {
-public:
+// HM05
+class whirlpool : public move {
+  public:
     whirlpool( )
-        : move( std::string( "Whirlpool" ),
-        { },
-                C 35,
-                WATER,
-                C 85,
-                C 15,
-                C 100,
-                SELECTED,
-                C 1,
-                F( PROTECT | KINGS_ROCK ),
-                SPEC ) {
+        : move( std::string( "Whirlpool" ), {}, C 35, WATER, C 85, C 15, C 100, SELECTED, C 1,
+                F( PROTECT | KINGS_ROCK ), SPEC ) {
         this->m_isFieldAttack = true;
     }
 
@@ -187,22 +137,12 @@ public:
     }
 };
 
-//HM06
-class surf
-    : public move {
-public:
+// HM06
+class surf : public move {
+  public:
     surf( )
-        : move( std::string( "Surfer" ),
-        { },
-                C 95,
-                WATER,
-                C 95,
-                C 15,
-                C 100,
-                BOTH_FOES_AND_PARTNER,
-                C 1,
-                F( PROTECT | KINGS_ROCK ),
-                SPEC ) {
+        : move( std::string( "Surfer" ), {}, C 95, WATER, C 95, C 15, C 100, BOTH_FOES_AND_PARTNER,
+                C 1, F( PROTECT | KINGS_ROCK ), SPEC ) {
         this->m_isFieldAttack = true;
     }
 
@@ -217,22 +157,10 @@ public:
     }
 };
 
-//HM07
-class dive
-    : public move {
-public:
-    dive( )
-        : move( "Taucher",
-        { },
-                C 80,
-                WATER,
-                C 100,
-                C 10,
-                C 0,
-                A 0,
-                C 1,
-                F 35,
-                H 0 ) {
+// HM07
+class dive : public move {
+  public:
+    dive( ) : move( "Taucher", {}, C 80, WATER, C 100, C 10, C 0, A 0, C 1, F 35, H 0 ) {
         this->m_isFieldAttack = true;
     }
 
@@ -245,25 +173,12 @@ public:
     const char* description( ) override {
         return "Taucht in Runde 1 ab und greift in Runde 2 aus der Tiefe an. Ermöglicht Tauchgänge zum Meeresgrund.";
     }
-
 };
 
-//HM08
-class defog
-    : public move {
-public:
-    defog( )
-        : move( "Auflockern",
-        { },
-                C 0,
-                FLYING,
-                C 0,
-                C 15,
-                C 0,
-                A 0,
-                C 1,
-                F 6,
-                H 2 ) {
+// HM08
+class defog : public move {
+  public:
+    defog( ) : move( "Auflockern", {}, C 0, FLYING, C 0, C 15, C 0, A 0, C 1, F 6, H 2 ) {
         this->m_isFieldAttack = true;
     }
 
@@ -278,22 +193,10 @@ public:
     }
 };
 
-//HM09
-class strength
-    : public move {
-public:
-    strength( )
-        : move( "Stärke",
-        { },
-                C 80,
-                NORMAL,
-                C 100,
-                C 15,
-                C 0,
-                A 0,
-                C 1,
-                F 35,
-                H 0 ) {
+// HM09
+class strength : public move {
+  public:
+    strength( ) : move( "Stärke", {}, C 80, NORMAL, C 100, C 15, C 0, A 0, C 1, F 35, H 0 ) {
         this->m_isFieldAttack = true;
     }
 
@@ -308,22 +211,10 @@ public:
     }
 };
 
-//HM10
-class rockClimb
-    : public move {
-public:
-    rockClimb( )
-        : move( "Kraxler",
-        { },
-                C 90,
-                NORMAL,
-                C 85,
-                C 20,
-                C 0,
-                A 0,
-                C 1,
-                F 35,
-                H 0 ) {
+// HM10
+class rockClimb : public move {
+  public:
+    rockClimb( ) : move( "Kraxler", {}, C 90, NORMAL, C 85, C 20, C 0, A 0, C 1, F 35, H 0 ) {
         this->m_isFieldAttack = true;
     }
 
@@ -338,22 +229,10 @@ public:
     }
 };
 
-//HM11
-class waterfall
-    : public move {
-public:
-    waterfall( )
-        : move( "Kaskade",
-        { },
-                C 80,
-                WATER,
-                C 100,
-                C 15,
-                C 0,
-                A 0,
-                C 1,
-                F 35,
-                H 0 ) {
+// HM11
+class waterfall : public move {
+  public:
+    waterfall( ) : move( "Kaskade", {}, C 80, WATER, C 100, C 15, C 0, A 0, C 1, F 35, H 0 ) {
         this->m_isFieldAttack = true;
     }
 
@@ -368,21 +247,9 @@ public:
     }
 };
 
-class teleport
-    : public move {
-public:
-    teleport( )
-        : move( "Teleport",
-        { },
-                C 0,
-                PSYCHIC,
-                C 100,
-                C 20,
-                C 0,
-                A 0,
-                C 1,
-                F 0,
-                H 2 ) {
+class teleport : public move {
+  public:
+    teleport( ) : move( "Teleport", {}, C 0, PSYCHIC, C 100, C 20, C 0, A 0, C 1, F 0, H 2 ) {
         this->m_isFieldAttack = true;
     }
 
@@ -397,21 +264,9 @@ public:
     }
 };
 
-class headbutt
-    : public move {
-public:
-    headbutt( ) :
-        move( "Kopfnuss",
-        { },
-              C 70,
-              NORMAL,
-              C 100,
-              C 15,
-              C 0,
-              A 0,
-              C 1,
-              F 3,
-              H 0 ) {
+class headbutt : public move {
+  public:
+    headbutt( ) : move( "Kopfnuss", {}, C 70, NORMAL, C 100, C 15, C 0, A 0, C 1, F 3, H 0 ) {
         this->m_isFieldAttack = true;
     }
 
@@ -426,21 +281,9 @@ public:
     }
 };
 
-class sweetScent
-    : public move {
-public:
-    sweetScent( )
-        : move( "Lockduft",
-        { },
-                C 0,
-                NORMAL,
-                C 100,
-                C 20,
-                C 0,
-                A 0,
-                C 1,
-                F 6,
-                H 2 ) {
+class sweetScent : public move {
+  public:
+    sweetScent( ) : move( "Lockduft", {}, C 0, NORMAL, C 100, C 20, C 0, A 0, C 1, F 6, H 2 ) {
         this->m_isFieldAttack = true;
     }
 
@@ -455,21 +298,9 @@ public:
     }
 };
 
-class dig
-    : public move {
-public:
-    dig( )
-        : move( "Schaufler",
-        { },
-                C 80,
-                GROUND,
-                C 100,
-                C 10,
-                C 0,
-                A 0,
-                C 1,
-                F 35,
-                H 0 ) {
+class dig : public move {
+  public:
+    dig( ) : move( "Schaufler", {}, C 80, GROUND, C 100, C 10, C 0, A 0, C 1, F 35, H 0 ) {
         this->m_isFieldAttack = true;
     }
 

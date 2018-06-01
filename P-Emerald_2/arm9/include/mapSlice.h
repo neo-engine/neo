@@ -6,7 +6,7 @@ file        : mapSlice.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -41,8 +41,12 @@ namespace MAP {
     const u16         SIZE          = 32;
     const s16         dir[ 4 ][ 2 ] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
 
-    typedef struct { u16 m_pal[ 16 ]; } palette;
-    typedef struct { u8 m_tile[ 32 ]; } tile;
+    typedef struct {
+        u16 m_pal[ 16 ];
+    } palette;
+    typedef struct {
+        u8 m_tile[ 32 ];
+    } tile;
     // typedef struct{
     //    u16 tileidx      : 10;
     //    u8 vflip         :  1;
@@ -94,4 +98,4 @@ namespace MAP {
     };
     void constructSlice( u8 p_map, u16 p_x, u16 p_y, std::unique_ptr<mapSlice>& p_result,
                          std::unique_ptr<mapSlice> p_cache[ 2 ][ 2 ] = 0 );
-}
+} // namespace MAP

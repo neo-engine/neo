@@ -6,7 +6,7 @@ file        : mapDefines.h
 author      : Philip Wellnitz
 description : General map stuff.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.

@@ -6,7 +6,7 @@ file        : yesNoBox.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -33,17 +33,18 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 
 namespace IO {
     class yesNoBox {
-    public:
+      public:
         yesNoBox( bool p_initSprites = true );
         yesNoBox( SAVE::language p_language, bool p_initSprites = true );
         yesNoBox( const char* p_name, bool p_initSprites = true );
         yesNoBox( messageBox p_box, bool p_initSprites = true );
 
         bool getResult( const char* p_text = 0, bool p_textAtOnce = true );
-    private:
-        bool _isNamed;
+
+      private:
+        bool           _isNamed;
         SAVE::language _language;
-        void draw( u8 p_pressedIdx, u8 p_selectedIdx );
+        void           draw( u8 p_pressedIdx, u8 p_selectedIdx );
     };
 
-}
+} // namespace IO

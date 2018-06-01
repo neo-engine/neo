@@ -6,7 +6,7 @@ file        : pokemon.cpp
 author      : Philip Wellnitz
 description : The main Pokémon engine
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 >>>>>>> up pkmn
 Philip Wellnitz
 
@@ -63,7 +63,7 @@ std::string PersonalityList[ 30 ] = {"liebt es, zu essen",
                                      "ist ungestüm und einfältig",
                                      "ist fast wie eine Clown",
                                      "flüchtet schnell"};
-std::string TasteList[ 6 ] = {"scharf", "saur", "süß", "trocken", "bitter", "all"};
+std::string TasteList[ 6 ]        = {"scharf", "saur", "süß", "trocken", "bitter", "all"};
 
 std::string Games[ 10 ] = {};
 

@@ -6,7 +6,7 @@ file        : ability.h
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -31,24 +31,25 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "script.h"
 
 class ability {
-public:
+  public:
     enum abilityType {
-        ATTACK = 1,
+        ATTACK        = 1,
         BEFORE_BATTLE = 2,
-        AFTER_BATTLE = 4,
-        GRASS = 8,
+        AFTER_BATTLE  = 4,
+        GRASS         = 8,
         BEFORE_ATTACK = 16,
-        AFTER_ATTACK = 32,
+        AFTER_ATTACK  = 32,
         BETWEEN_TURNS = 64
     };
-    std::string         m_abilityName;
-    std::string         m_flavourText;
-    abilityType         m_type;
+    std::string m_abilityName;
+    std::string m_flavourText;
+    abilityType m_type;
 
     BATTLE::battleScript m_effect;
 
-    ///Constructors
-    ability( ) { }
+    /// Constructors
+    ability( ) {
+    }
 
     ability( int p_abilityId );
 };

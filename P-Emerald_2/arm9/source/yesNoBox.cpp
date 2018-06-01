@@ -6,7 +6,7 @@ file        : yesNoBox.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -26,8 +26,8 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 */
 
 #include "yesNoBox.h"
-#include "uio.h"
 #include "defines.h"
+#include "uio.h"
 
 namespace IO {
 
@@ -37,43 +37,41 @@ namespace IO {
         else if( p_selectedIdx == 0 )
             BG_PALETTE_SUB[ COLOR_IDX ] = RED2;
 
-        printChoiceBox( 28, 102, 122, 134, 6, ( p_selectedIdx == 1 ) ? COLOR_IDX : BLUE_IDX, p_pressedIdx == 0 );
+        printChoiceBox( 28, 102, 122, 134, 6, ( p_selectedIdx == 1 ) ? COLOR_IDX : BLUE_IDX,
+                        p_pressedIdx == 0 );
         regularFont->printString( STRINGS[ 80 ][ _language ], 28 + 47 + 2 * ( p_pressedIdx == 0 ),
                                   110 + ( p_pressedIdx == 0 ), true, IO::font::CENTER );
-        printChoiceBox( 134, 102, 228, 134, 6, ( p_selectedIdx == 0 ) ? COLOR_IDX : RED_IDX, p_pressedIdx == 1 );
+        printChoiceBox( 134, 102, 228, 134, 6, ( p_selectedIdx == 0 ) ? COLOR_IDX : RED_IDX,
+                        p_pressedIdx == 1 );
         regularFont->printString( STRINGS[ 81 ][ _language ], 134 + 47 + 2 * ( p_pressedIdx == 1 ),
                                   110 + ( p_pressedIdx == 1 ), true, IO::font::CENTER );
     }
 
     yesNoBox::yesNoBox( bool p_initSprites ) {
         initTextField( );
-        if( p_initSprites )
-            initOAMTable( true );
-        _isNamed = false;
+        if( p_initSprites ) initOAMTable( true );
+        _isNamed  = false;
         _language = SAVE::SAV->getActiveFile( ).m_options.m_language;
     }
     yesNoBox::yesNoBox( SAVE::language p_language, bool p_initSprites ) {
         initTextField( );
-        if( p_initSprites )
-            initOAMTable( true );
-        _isNamed = false;
+        if( p_initSprites ) initOAMTable( true );
+        _isNamed  = false;
         _language = p_language;
     }
     yesNoBox::yesNoBox( const char* p_name, bool p_initSprites ) {
         initTextField( );
-        if( p_initSprites )
-            initOAMTable( true );
+        if( p_initSprites ) initOAMTable( true );
         regularFont->printString( p_name, 8, 8, true );
 
         swiWaitForVBlank( );
-        _isNamed = true;
+        _isNamed  = true;
         _language = SAVE::SAV->getActiveFile( ).m_options.m_language;
     }
     yesNoBox::yesNoBox( messageBox p_box, bool p_initSprites ) {
         initTextField( );
-        if( p_initSprites )
-            initOAMTable( true );
-        _isNamed = p_box.m_isNamed;
+        if( p_initSprites ) initOAMTable( true );
+        _isNamed  = p_box.m_isNamed;
         _language = SAVE::SAV->getActiveFile( ).m_options.m_language;
     }
 
@@ -130,4 +128,4 @@ namespace IO {
         }
         return result;
     }
-}
+} // namespace IO

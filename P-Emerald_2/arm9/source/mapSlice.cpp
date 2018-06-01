@@ -6,7 +6,7 @@ file        : mapSlice.cpp
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -47,10 +47,11 @@ namespace MAP {
             ( toString( p_map ) + "/" + toString( p_y ) + "_" + toString( p_x ) ).c_str( ),
             ".map" );
         if( !mapF )
-            mapF = FS::open( MAP_PATH, ( toString( p_map ) + "/BORDER/" + toString( p_y ) + "_"
-                                         + toString( p_x ) )
-                                           .c_str( ),
-                             ".map" );
+            mapF = FS::open(
+                MAP_PATH,
+                ( toString( p_map ) + "/BORDER/" + toString( p_y ) + "_" + toString( p_x ) )
+                    .c_str( ),
+                ".map" );
         if( !mapF ) {
 #ifdef DEBUG__
             char buffer[ 50 ];
@@ -205,4 +206,4 @@ namespace MAP {
             p_result->m_tIdx2 = tsidx2;
         }
     }
-}
+} // namespace MAP

@@ -6,7 +6,7 @@ file        : battleUI.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2017
+Copyright (C) 2012 - 2018
 Philip Wellnitz
 
 This file is part of Pokémon Emerald 2 Version.
@@ -39,9 +39,12 @@ namespace BATTLE {
         void    loadBattleUITop( );
         void    loadBattleUISub( u8 p_pressedIdx, u8 p_selectedIdx );
         void    drawPKMNChoiceScreen( bool p_firstIsChosen, u8 p_selectedIdx );
-        void    drawAttackTargetChoice( bool p_selected[ 4 ], bool p_neverTarget[ 4 ], u8 p_pokemonPos );
-        void    drawPkmnChoicePkmn( u8 p_index, bool p_firstIsChosen, bool p_pressed, bool p_selected );
-    public:
+        void    drawAttackTargetChoice( bool p_selected[ 4 ], bool p_neverTarget[ 4 ],
+                                        u8 p_pokemonPos );
+        void    drawPkmnChoicePkmn( u8 p_index, bool p_firstIsChosen, bool p_pressed,
+                                    bool p_selected );
+
+      public:
         friend class battle;
 
         static void initLogScreen( );
@@ -50,41 +53,42 @@ namespace BATTLE {
         static void setLogText2Color( u16 p_color );
         static void writeLogText( const std::string& p_message );
 
-        void    init( );
-        void    trainerIntro( );
-        void    pokemonIntro( );
+        void init( );
+        void trainerIntro( );
+        void pokemonIntro( );
 
-        void    redrawBattle( );
+        void redrawBattle( );
 
-        bool    declareBattleMove( u8 p_pokemonPos, bool p_showBack );
+        bool declareBattleMove( u8 p_pokemonPos, bool p_showBack );
 
-        u16     chooseAttack( u8 p_pokemonPos );
-        u8      chooseAttackTarget( u8 p_pokemonPos, u16 p_moveNo );
-        u16     chooseItem( );
-        u8      choosePKMN( bool p_firstIsChosen, bool p_back = true, bool p_noRestrict = false );
+        u16 chooseAttack( u8 p_pokemonPos );
+        u8  chooseAttackTarget( u8 p_pokemonPos, u16 p_moveNo );
+        u16 chooseItem( );
+        u8  choosePKMN( bool p_firstIsChosen, bool p_back = true, bool p_noRestrict = false );
 
-        void    showAttack( bool p_opponent, u8 p_pokemonPos );
-        void    updateHP( bool p_opponent, u8 p_pokemonPos, u16 p_oldHP, u16 p_oldHPmax = -1 );
-        void    showStatus( bool p_opponent, u8 p_pokemonPos );
-        void    updateStatus( bool p_opponent, u8 p_pokemonPos );
-        void    applyEXPChanges( bool p_opponent, u8 p_pokemonPos, u32 p_gainedExp );
-        void    updateStats( bool p_opponent, u8 p_pokemonPos, bool p_move = true );
+        void showAttack( bool p_opponent, u8 p_pokemonPos );
+        void updateHP( bool p_opponent, u8 p_pokemonPos, u16 p_oldHP, u16 p_oldHPmax = -1 );
+        void showStatus( bool p_opponent, u8 p_pokemonPos );
+        void updateStatus( bool p_opponent, u8 p_pokemonPos );
+        void applyEXPChanges( bool p_opponent, u8 p_pokemonPos, u32 p_gainedExp );
+        void updateStats( bool p_opponent, u8 p_pokemonPos, bool p_move = true );
 
-        void    capture( u16 p_pokeBall, u8 p_ticks );
-        void    handleCapture( );
+        void capture( u16 p_pokeBall, u8 p_ticks );
+        void handleCapture( );
 
-        bool    isVisiblePKMN( bool p_opponent, u8 p_pokemonPos );
+        bool isVisiblePKMN( bool p_opponent, u8 p_pokemonPos );
 
-        void    hidePKMN( bool p_opponent, u8 p_pokemonPos );
-        void    sendPKMN( bool p_opponent, u8 p_pokemonPos, bool p_silent = false );
-        void    evolvePKMN( bool p_opponent, u8 p_pokemonPos );
+        void hidePKMN( bool p_opponent, u8 p_pokemonPos );
+        void sendPKMN( bool p_opponent, u8 p_pokemonPos, bool p_silent = false );
+        void evolvePKMN( bool p_opponent, u8 p_pokemonPos );
 
-        void    learnMove( u8 p_pokemonPos, u16 p_move );
+        void learnMove( u8 p_pokemonPos, u16 p_move );
 
-        void    showEndScreen( );
+        void showEndScreen( );
 
-        battleUI( ) { }
-        battleUI( battle* p_battle )
-            :_battle( p_battle ) { }
+        battleUI( ) {
+        }
+        battleUI( battle* p_battle ) : _battle( p_battle ) {
+        }
     };
-}
+} // namespace BATTLE
