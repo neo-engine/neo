@@ -7,8 +7,9 @@ addons:
         packages: ['libstdc++6']
 before_install:
     - sudo apt-get update -qq
-    - sudo apt-get install -qq gcc-4.9 git curl
-    - curl -L  https://github.com/devkitPro/pacman/releases/download/latest/devkitpro-pacman.deb -o pacman.deb
+    - sudo apt-get install -qq gcc-4.9 git curl wget
+    - curl -s https://api.github.com/repos/devkitPro/pacman/releases/latest | grep "browser_download_url.*deb" | cut -d : -f 2,3 | tr -d \" | wget -i - -O pacman.deb
+
     - sudo dpkg -i pacman.deb
     - sudo dkp-pacman -Syu
     - sudo dkp-pacman -S nds-dev
