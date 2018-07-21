@@ -11,7 +11,7 @@ before_install:
     - curl -L https://github.com/devkitPro/pacman/releases/download/devkitpro-pacman-1.0.1/devkitpro-pacman.deb -o pacman.deb
     - sudo dpkg -i pacman.deb
     - sudo dkp-pacman -Syu
-    - sudo dkp-pacman -S nds-dev
+    - sudo dkp-pacman -S nds-dev --no-confirm
 
 script:
     - cd P-Emerald_2
