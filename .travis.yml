@@ -8,13 +8,10 @@ addons:
 before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -qq gcc-4.9 git curl
-    - curl -L https://gist.githubusercontent.com/PH111P/959e8ac3aceea74dc2f9f3e2ad3657ab/raw/f9d2ef149cd956c57a0c31f0fcfe4bfd98f9ee3e/devkitARMupdate.pl -o devkitARMupdate.pl
-    - chmod +x ./devkitARMupdate.pl
-    - sudo ./devkitARMupdate.pl /opt/devkitpro
-    - echo "export DEVKITPRO=/opt/devkitpro" >> ~/.bashrc
-    - echo "export DEVKITARM=/opt/devkitpro/devkitARM" >> ~/.bashrc
-    - echo "export PATH=$PATH:/opt/devkitpro/devkitARM/bin" >> ~/.bashrc
-    - source ~/.bashrc
+    - curl -L  https://github.com/devkitPro/pacman/releases/download/latest/devkitpro-pacman.deb -o pacman.deb
+    - sudo dpkg -i pacman.deb
+    - sudo dkp-pacman -Syu
+    - sudo dkp-pacman -S nds-dev
 
 script:
     - cd P-Emerald_2
