@@ -102,143 +102,143 @@
     <ClInclude Include="arm9\include\libnds_internal.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\defines.h">
+    <ClInclude Include="arm9\include\battle.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\battlePokemon.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\battleTrainer.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\battleUI.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\battleWeather.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\bag.h">
+      <Filter>Header Files\arm9\bag</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\bagUI.h">
+      <Filter>Header Files\arm9\bag</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\bagViewer.h">
+      <Filter>Header Files\arm9\bag</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\box.h">
+      <Filter>Header Files\arm9\box</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\boxUI.h">
+      <Filter>Header Files\arm9\box</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\boxViewer.h">
+      <Filter>Header Files\arm9\box</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\ability.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\berry.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\defines.h">
       <Filter>Header Files\arm9</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\bag.h">
-      <Filter>Header Files\arm9\bag</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\bagUI.h">
-      <Filter>Header Files\arm9\bag</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\battle.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\battleUI.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\script.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\dexUI.h">
-      <Filter>Header Files\arm9\dex</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\dex.h">
-      <Filter>Header Files\arm9\dex</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\ability.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\berry.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\item.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\move.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\pokemon.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\type.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\fs.h">
-      <Filter>Header Files\arm9\fs</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\choiceBox.h">
+    <ClInclude Include="arm9\include\choiceBox.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\font.h">
+    <ClInclude Include="arm9\include\font.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\keyboard.h">
+    <ClInclude Include="arm9\include\keyboard.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\messageBox.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\sprite.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\uio.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\yesNoBox.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\statusScreen.h">
-      <Filter>Header Files\arm9\sts</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\statusScreenUI.h">
-      <Filter>Header Files\arm9\sts</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\hmMoves.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\ribbon.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\bagViewer.h">
-      <Filter>Header Files\arm9\bag</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\mapSlice.h">
+    <ClInclude Include="arm9\include\mapDefines.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\mapObject.h">
+    <ClInclude Include="arm9\include\mapDrawer.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\mapDrawer.h">
+    <ClInclude Include="arm9\include\mapObject.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\mapSprite.h">
+    <ClInclude Include="arm9\include\mapSlice.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\mapDefines.h">
+    <ClInclude Include="arm9\include\mapSprite.h">
       <Filter>Header Files\arm9\map</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\box.h">
-      <Filter>Header Files\arm9\box</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\boxUI.h">
-      <Filter>Header Files\arm9\box</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\boxViewer.h">
-      <Filter>Header Files\arm9\box</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\mapWarps.h">
-      <Filter>Header Files\arm9\map</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\screenFade.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\battleTrainer.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\battlePokemon.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\battleWeather.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\source\nav.h">
+    <ClInclude Include="arm9\include\nav.h">
       <Filter>Header Files\arm9\nav</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\saveGame.h">
+    <ClInclude Include="arm9\include\gameStart.h">
       <Filter>Header Files\arm9\saves</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\saveOptions.h">
+    <ClInclude Include="arm9\include\saveGame.h">
       <Filter>Header Files\arm9\saves</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\startScreen.h">
+    <ClInclude Include="arm9\include\saveOptions.h">
       <Filter>Header Files\arm9\saves</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\gameStart.h">
+    <ClInclude Include="arm9\include\startScreen.h">
       <Filter>Header Files\arm9\saves</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\source\gen3Parser.h">
+    <ClInclude Include="arm9\include\statusScreen.h">
+      <Filter>Header Files\arm9\sts</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\statusScreenUI.h">
+      <Filter>Header Files\arm9\sts</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\dexUI.h">
+      <Filter>Header Files\arm9\dex</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\dex.h">
+      <Filter>Header Files\arm9\dex</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\fs.h">
       <Filter>Header Files\arm9\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\gen3Parser.h">
+      <Filter>Header Files\arm9\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\messageBox.h">
+      <Filter>Header Files\arm9\io</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\moveChoiceBox.h">
+      <Filter>Header Files\arm9\io</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\screenFade.h">
+      <Filter>Header Files\arm9\io</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\uio.h">
+      <Filter>Header Files\arm9\io</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\yesNoBox.h">
+      <Filter>Header Files\arm9\io</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\sprite.h">
+      <Filter>Header Files\arm9\io</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\script.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\hmMoves.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\item.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\move.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\pokemon.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\ribbon.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\type.h">
+      <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -370,6 +370,9 @@
     </ClCompile>
     <ClCompile Include="arm9\source\gameStart.cpp">
       <Filter>Source Files\arm9\saves</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\moveChoiceBox.cpp">
+      <Filter>Source Files\arm9\io</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

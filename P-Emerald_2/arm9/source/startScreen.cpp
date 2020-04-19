@@ -54,12 +54,11 @@ namespace SAVE {
     language translate( u8 p_dSRegion ) {
         switch( p_dSRegion ) {
         case 1:
-            // return SAVE::EN;
+            return SAVE::EN;
         case 3:
-        default:
             return SAVE::GER;
-            // default:
-            // return SAVE::EN;
+        default:
+            return SAVE::EN;
         }
     }
 
@@ -72,7 +71,7 @@ namespace SAVE {
 
         BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
 
-        printf( "@ Philip Wellnitz 2012 - 2018\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+        printf( "@ Philip Wellnitz 2012 - 2020\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
 
         if( gMod == DEVELOPER )
             printf( "                   %10sdev\n", VERSION );

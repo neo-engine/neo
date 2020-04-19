@@ -28,30 +28,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include "type.h"
 
-std::string TypeList[ 19 ] = {"\xc2\xc3\xc4\xc5",
-                              "\xc6\xc7\xc8\xc9",
-                              "\xca\xcb\xcc\xcd",
-                              "\xce\xcf\xd0\xd1",
-                              "\xd2\xd3\xd4\xd5",
-                              "\xb6\xb7\xb8\xb9",
-                              "\x95\x96\x97\x98",
-                              "\xae\xaf\xb0\xb1",
-                              "\xb2\xb3\xb4\xb5",
-                              "\xa6\xa7\xa8\xa9",
-                              "\x89\x8a\x8b\x8c",
-                              "\x85\x86\x87\x88",
-                              "\xaa\xab\xac\xad",
-                              "\x9e\x9f\xa0\xa1",
-                              "\xba\xbb\xbc\xbd",
-                              "\x8f\x90\x91\x92",
-                              "\xa2\xa3\xa4\xa5",
-                              "\xbe\xbf\xc0\xc1",
-                              "[FEE]"};
-
-std::string toString( type p_type ) {
-    return TypeList[ p_type ];
-}
-
 float TypeEffectiveness[ 19 ][ 19 ] = {
     {1, 1, 1, 1, 1, .5, 1, 0, .5, .75, 1, 1, 1, 1, 1, 1, 1, 1, 1},      // Normal
     {2, 1, .5, .5, 1, 2, .5, 0, 2, .75, 1, 1, 1, 1, .5, 2, 1, 2, .5},   // Fight

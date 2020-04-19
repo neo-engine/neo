@@ -1241,15 +1241,15 @@ namespace BATTLE {
             IO::boldFont->setColor( BLACK_IDX, 2 );
 
             if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
-                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 224, 0, ++oamIndex, ++palIndex,
-                                            tilecnt, true );
+                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 224, 0, ++oamIndex, ++palIndex, tilecnt,
+                                        true, SAVE::SAV->getActiveFile( ).m_options.m_language );
                 oamIndex++;
                 ++palIndex;
             } else {
-                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 192, 0, ++oamIndex, ++palIndex,
-                                            tilecnt, true );
-                tilecnt = IO::loadTypeIcon( data.m_types[ 1 ], 224, 0, ++oamIndex, ++palIndex,
-                                            tilecnt, true );
+                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 192, 0, ++oamIndex, ++palIndex, tilecnt,
+                                        true, SAVE::SAV->getActiveFile( ).m_options.m_language );
+                tilecnt = IO::loadTypeIcon( data.m_types[ 1 ], 224, 0, ++oamIndex, ++palIndex, tilecnt,
+                                        true, SAVE::SAV->getActiveFile( ).m_options.m_language );
             }
 
         } else {
@@ -1286,7 +1286,8 @@ namespace BATTLE {
 
                     IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
                     tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 10, y - 7, ++oamIndex,
-                                                ++palIndex, tilecnt, true );
+                                                ++palIndex, tilecnt, true,
+                                                SAVE::SAV->getActiveFile( ).m_options.m_language );
                     tilecnt = IO::loadDamageCategoryIcon( acMove->m_moveHitType, x + 22, y - 7,
                                                           ++oamIndex, ++palIndex, tilecnt, true );
                     consoleSelect( &IO::Bottom );

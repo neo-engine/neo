@@ -129,8 +129,8 @@ namespace IO {
             if( !p_pokemon.m_boxdata.m_moves[ i ] ) break;
             tileCnt = loadTypeIcon( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveType,
                                     CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ] + 6,
-                                    CHOICE_POS[ !!_moveToLearn ][ i ][ 1 ] + 20, 3 + 2 * i,
-                                    3 + 2 * i, tileCnt, true );
+                                    CHOICE_POS[ !!_moveToLearn ][ i ][ 1 ] + 20, 3 + 2 * i, 3 + 2 * i,
+                                tileCnt, true, SAVE::SAV->getActiveFile( ).m_options.m_language );
             if( !_moveToLearn )
                 tileCnt = loadDamageCategoryIcon(
                     AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveHitType,
@@ -139,8 +139,8 @@ namespace IO {
                     true );
         }
         if( _moveToLearn ) {
-            tileCnt = loadTypeIcon( AttackList[ _moveToLearn ]->m_moveType, 12, 134, 11, 11,
-                                    tileCnt, true );
+            tileCnt = loadTypeIcon( AttackList[ _moveToLearn ]->m_moveType, 12, 134, 11, 11, tileCnt,
+                                true, SAVE::SAV->getActiveFile( ).m_options.m_language );
             tileCnt = loadDamageCategoryIcon( AttackList[ _moveToLearn ]->m_moveHitType, 44, 134,
                                               12, 12, tileCnt, true );
         }

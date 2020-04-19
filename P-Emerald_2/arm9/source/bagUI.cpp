@@ -236,7 +236,7 @@ namespace BAG {
 
             IO::regularFont->printString( GET_STRING( 29 ), 33, 145, false );
             tileCnt = IO::loadTypeIcon( AttackList[ mv.m_moveIdx ]->m_moveType, 62, 144, 1, 1,
-                                        tileCnt, false );
+                                        tileCnt, false, SAVE::SAV->getActiveFile( ).m_options.m_language );
 
             IO::regularFont->printString( GET_STRING( 30 ), 100, 145, false );
             IO::loadDamageCategoryIcon( AttackList[ mv.m_moveIdx ]->m_moveHitType, 152, 144, 2, 2,

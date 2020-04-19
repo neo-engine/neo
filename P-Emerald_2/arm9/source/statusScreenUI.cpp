@@ -231,7 +231,7 @@ namespace STS {
         for( u8 i = 0; i < 4; ++i ) {
             type t  = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
             tileCnt = IO::loadTypeIcon( t, 126, 43 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ), tileCnt,
-                                        false );
+                                        false, SAVE::SAV->getActiveFile( ).m_options.m_language );
         }
         for( u8 i = 0; i < 4; ++i ) {
             tileCnt = IO::loadDamageCategoryIcon( ( move::moveHitTypes )( i % 3 ), 126, 43 + 32 * i,
@@ -554,7 +554,8 @@ namespace STS {
             if( !currPkmn.m_boxdata.m_moves[ i ] ) continue;
             type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
             IO::loadTypeIcon( t, 222, 38 + 30 * i, TYPE_IDX + i, TYPE_PAL( i ),
-                              Oam->oamBuffer[ TYPE_IDX + i ].gfxIndex, p_bottom );
+                              Oam->oamBuffer[ TYPE_IDX + i ].gfxIndex, p_bottom,
+                              SAVE::SAV->getActiveFile( ).m_options.m_language );
 
             pal[ COLOR_IDX ] = GREEN;
             if( t == data.m_types[ 0 ] || t == data.m_types[ 1 ] ) {
@@ -622,13 +623,16 @@ namespace STS {
 
         if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
             IO::loadTypeIcon( data.m_types[ 0 ], 250 - 32, 50, TYPE_IDX, TYPE_PAL( 0 ),
-                              Oam->oamBuffer[ TYPE_IDX ].gfxIndex, p_bottom );
+                              Oam->oamBuffer[ TYPE_IDX ].gfxIndex, p_bottom,
+                              SAVE::SAV->getActiveFile( ).m_options.m_language );
             Oam->oamBuffer[ TYPE_IDX + 1 ].isHidden = true;
         } else {
             IO::loadTypeIcon( data.m_types[ 0 ], 250 - 64, 50, TYPE_IDX, TYPE_PAL( 0 ),
-                              Oam->oamBuffer[ TYPE_IDX ].gfxIndex, p_bottom );
+                              Oam->oamBuffer[ TYPE_IDX ].gfxIndex, p_bottom,
+                              SAVE::SAV->getActiveFile( ).m_options.m_language );
             IO::loadTypeIcon( data.m_types[ 1 ], 250 - 32, 50, TYPE_IDX + 1, TYPE_PAL( 1 ),
-                              Oam->oamBuffer[ TYPE_IDX + 1 ].gfxIndex, p_bottom );
+                              Oam->oamBuffer[ TYPE_IDX + 1 ].gfxIndex, p_bottom,
+                              SAVE::SAV->getActiveFile( ).m_options.m_language );
         }
 
         IO::regularFont->setColor( BLACK_IDX, 1 );
@@ -787,7 +791,7 @@ namespace STS {
 
         IO::loadTypeIcon( currMove->m_moveType, 222, 30, TYPE_IDX + p_moveIdx,
                           TYPE_PAL( p_moveIdx ), Oam->oamBuffer[ TYPE_IDX + p_moveIdx ].gfxIndex,
-                          p_bottom );
+                          p_bottom, SAVE::SAV->getActiveFile( ).m_options.m_language );
         IO::loadDamageCategoryIcon(
             currMove->m_moveHitType, 222, 46, ATK_DMGTYPE_IDX( currMove->m_moveHitType ),
             DMG_TYPE_PAL( currMove->m_moveHitType ),
@@ -1042,7 +1046,7 @@ namespace STS {
         for( u8 i = 0; i < 4; ++i ) {
             type t  = AttackList[ 0 ]->m_moveType;
             tileCnt = IO::loadTypeIcon( t, 126, 43 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ), tileCnt,
-                                        true );
+                                        true, SAVE::SAV->getActiveFile( ).m_options.m_language );
         }
         for( u8 i = 0; i < 4; ++i ) {
             tileCnt = IO::loadDamageCategoryIcon( ( move::moveHitTypes )( i % 3 ), 126, 43 + 32 * i,

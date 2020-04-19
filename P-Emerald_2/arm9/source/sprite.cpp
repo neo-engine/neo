@@ -72,14 +72,44 @@ unsigned int   TEMP[ 12288 ]   = {0};
 unsigned short TEMP_PAL[ 256 ] = {0};
 
 namespace IO {
-    const unsigned int* TypeTiles[ 19 ]
-        = {NormalTiles, KampfTiles, FlugTiles,  GiftTiles,   BodenTiles, GestTiles, KaeferTiles,
-           GeistTiles,  StahlTiles, UnbekTiles, WasserTiles, FeuerTiles, PflTiles,  ElekTiles,
-           PsychoTiles, EisTiles,   DraTiles,   UnlTiles,    FeeTiles};
-    const unsigned short* TypePals[ 19 ]
-        = {NormalPal, KampfPal, FlugPal,  GiftPal,   BodenPal, GestPal, KaeferPal,
-           GeistPal,  StahlPal, UnbekPal, WasserPal, FeuerPal, PflPal,  ElekPal,
-           PsychoPal, EisPal,   DraPal,   UnlPal,    FeePal};
+    const unsigned int* TypeTiles[ 19 ][ LANGUAGES ] = {{type_normal_enTiles, NormalTiles},
+                                                        {type_fight_enTiles, KampfTiles},
+                                                        {type_flying_enTiles, FlugTiles},
+                                                        {type_poison_enTiles, GiftTiles},
+                                                        {type_ground_enTiles, BodenTiles},
+                                                        {type_rock_enTiles, GestTiles},
+                                                        {type_bug_enTiles, KaeferTiles},
+                                                        {type_ghost_enTiles, GeistTiles},
+                                                        {type_steel_enTiles, StahlTiles},
+                                                        {UnbekTiles, UnbekTiles},
+                                                        {type_water_enTiles, WasserTiles},
+                                                        {type_fire_enTiles, FeuerTiles},
+                                                        {type_grass_enTiles, PflTiles},
+                                                        {type_electr_enTiles, ElekTiles},
+                                                        {type_psychic_enTiles, PsychoTiles},
+                                                        {type_ice_enTiles, EisTiles},
+                                                        {type_dragon_enTiles, DraTiles},
+                                                        {type_dark_enTiles, UnlTiles},
+           {type_fairy_enTiles, FeeTiles}};
+    const unsigned short* TypePals[ 19 ][ LANGUAGES ]  = {{type_normal_enPal, NormalPal},
+                                                         {type_fight_enPal, KampfPal},
+                                                         {type_flying_enPal, FlugPal},
+                                                         {type_poison_enPal, GiftPal},
+                                                         {type_ground_enPal, BodenPal},
+                                                         {type_rock_enPal, GestPal},
+                                                         {type_bug_enPal, KaeferPal},
+                                                         {type_ghost_enPal, GeistPal},
+                                                         {type_steel_enPal, StahlPal},
+                                                         {UnbekPal, UnbekPal},
+                                                         {type_water_enPal, WasserPal},
+                                                         {type_fire_enPal, FeuerPal},
+                                                         {type_grass_enPal, PflPal},
+                                                         {type_electr_enPal, ElekPal},
+                                                         {type_psychic_enPal, PsychoPal},
+                                                         {type_ice_enPal, EisPal},
+                                                         {type_dragon_enPal, DraPal},
+                                                         {type_dark_enPal, UnlPal},
+           {type_fairy_enPal, FeePal}};
     const unsigned int* RibbonTiles[ MAX_RIBBONS ]
         = {r0Tiles,  r1Tiles,  r2Tiles,  r3Tiles,  r4Tiles,  r5Tiles,  r6Tiles,  r7Tiles,
            r8Tiles,  r9Tiles,  r10Tiles, r11Tiles, r12Tiles, r13Tiles, r14Tiles, r15Tiles,
@@ -598,10 +628,10 @@ namespace IO {
     }
 
     u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
-                      u16 p_tileCnt, bool p_bottom ) {
+                      u16 p_tileCnt, bool p_bottom, const SAVE::language p_language ) {
         return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16,
-                           TypePals[ p_type ], TypeTiles[ p_type ], 256, false, false, false,
-                           OBJPRIORITY_0, p_bottom );
+                           TypePals[ p_type ][ p_language ], TypeTiles[ p_type ][ p_language ], 256,
+                           false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
     u16 loadRibbonIcon( u8 p_ribbonIdx, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,

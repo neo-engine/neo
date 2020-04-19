@@ -126,10 +126,10 @@ namespace DEX {
 
         tileCnt = IO::loadPKMNIcon( SAVE::SAV->getActiveFile( ).m_lstDex, 0, 8,
                                     PKMN_SPRITE_START( 2 ), 2, 288, false );
-        tileCnt
-            = IO::loadTypeIcon( type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 1, 3, tileCnt, false );
-        tileCnt
-            = IO::loadTypeIcon( type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 2, 4, tileCnt, false );
+        tileCnt = IO::loadTypeIcon( type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 1, 3, tileCnt,
+                                    false, SAVE::SAV->getActiveFile( ).m_options.m_language );
+        tileCnt = IO::loadTypeIcon( type( 0 ), 33, 35, PKMN_SPRITE_START( 2 ) + 2, 4, tileCnt,
+                                    false, SAVE::SAV->getActiveFile( ).m_options.m_language );
         tileCnt = IO::loadPKMNIcon( SAVE::SAV->getActiveFile( ).m_lstDex, 0, 8,
                                     PKMN_SPRITE_START( 3 ), 5, tileCnt, false );
         for( u8 i = 0; i < 30; ++i ) {
@@ -420,14 +420,14 @@ namespace DEX {
             if( data.m_types[ 0 ] != data.m_types[ 1 ] ) {
                 IO::loadTypeIcon( data.m_types[ 0 ], 183, 28, PKMN_SPRITE_START( 2 ) + 1, 3,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 1 ].gfxIndex,
-                                  false );
+                                  false, SAVE::SAV->getActiveFile( ).m_options.m_language );
                 IO::loadTypeIcon( data.m_types[ 1 ], 215, 28, PKMN_SPRITE_START( 2 ) + 2, 4,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 2 ].gfxIndex,
-                                  false );
+                                  false, SAVE::SAV->getActiveFile( ).m_options.m_language );
             } else {
                 IO::loadTypeIcon( data.m_types[ 0 ], 199, 28, PKMN_SPRITE_START( 2 ) + 1, 3,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 1 ].gfxIndex,
-                                  false );
+                                  false, SAVE::SAV->getActiveFile( ).m_options.m_language );
                 IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 2 ].isHidden = true;
             }
 

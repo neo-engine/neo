@@ -31,10 +31,11 @@
 
 #include "move.h"
 #include "type.h"
+#include "saveOptions.h"
 
 namespace IO {
-    extern const unsigned int*   TypeTiles[ 19 ];
-    extern const unsigned short* TypePals[ 19 ];
+    extern const unsigned int*   TypeTiles[ 19 ][ 2 ];
+    extern const unsigned short* TypePals[ 19 ][ 2 ];
     extern const unsigned int*   HitTypeTiles[ 3 ];
     extern const unsigned short* HitTypePals[ 3 ];
 #define MAX_PLATFORMS 12
@@ -143,7 +144,7 @@ namespace IO {
                      u16 p_tileCnt, bool p_bottom = true );
 
     u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
-                      u16 p_tileCnt, bool p_bottom );
+                      u16 p_tileCnt, bool p_bottom, SAVE::language p_language );
 
     u16 loadDamageCategoryIcon( move::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,
                                 u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom );

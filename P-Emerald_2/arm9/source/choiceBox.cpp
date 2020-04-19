@@ -28,6 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "choiceBox.h"
 #include "defines.h"
 #include "uio.h"
+#include "saveGame.h"
 
 #include "Back.h"
 #include "Backward.h"
@@ -146,16 +147,16 @@ namespace IO {
                 break;
             }
             tileCnt = loadTypeIcon( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveType,
-                                    ( ( i % 2 ) ? 122 : 12 ), 64 + ( i / 2 ) * 35, 3 + 2 * i,
-                                    3 + 2 * i, tileCnt, true );
+                                    ( ( i % 2 ) ? 122 : 12 ), 64 + ( i / 2 ) * 35, 3 + 2 * i, 3 + 2 * i,
+                                tileCnt, true, SAVE::SAV->getActiveFile( ).m_options.m_language );
             tileCnt = loadDamageCategoryIcon(
                 AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveHitType,
                 ( ( i % 2 ) ? 154 : 44 ), 64 + ( i / 2 ) * 35, 4 + 2 * i, 4 + 2 * i, tileCnt,
                 true );
         }
         if( p_move ) {
-            tileCnt
-                = loadTypeIcon( AttackList[ p_move ]->m_moveType, 12, 134, 11, 11, tileCnt, true );
+            tileCnt = loadTypeIcon( AttackList[ p_move ]->m_moveType, 12, 134, 11, 11, tileCnt,
+                                    true, SAVE::SAV->getActiveFile( ).m_options.m_language );
             tileCnt = loadDamageCategoryIcon( AttackList[ p_move ]->m_moveHitType, 44, 134, 12, 12,
                                               tileCnt, true );
         }
