@@ -1,10 +1,10 @@
-Pokémon Emerald Version 2
-=========================
+Pokémon _neo_
+===========
 [![Travis](https://travis-ci.org/PH111P/perm2.svg?branch=master)](https://travis-ci.org/PH111P/perm2)
 
-There's still (very) much to do, but when it's complete, it's a recode of Pokémon for Nintendo DS.
+An experimental Pokémon engine for Nintendo DS.
 
-This game is intended to be played on real hardware, but [DeSmuME 0.9.11](http://desmume.org/) seems to be capable of emulating most of real hardware's features, too.
+This engine is intended to be run on real hardware, but [DeSmuME 0.9.11](http://desmume.org/) seems to be capable of emulating most of real hardware's features, too.
 
 Features
 --------
@@ -38,7 +38,7 @@ _Partially_ implemented features are in _italics_.
       * [ ] Playing with / importing a save from a GBA version
       * [ ] Link trading with Gen IV and Gen V games
     * [x] A clean UI
-    * [ ] Dynamic difficulty 
+    * [ ] Dynamic difficulty
       * [ ] Adjust the encounter rate at will
       * [ ] Adjust opposing Pokémon's level (between battles)
     * [x] Support for multiple save files
@@ -61,93 +61,5 @@ Build requirements
 * gcc/g++ ≥ 4.9
 
 * make
-
-Some screens
-------------
-
-##### General gameplay
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/st01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/st02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm03.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm04.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm05.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm06.png)
-
-##### Pokémon status screens
-
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts03.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts04.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts05.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts06.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts07.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts08.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts09.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts10.png)
-
-##### The storage system
-
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bx01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bx02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bx03.png)
-
-##### The PokéDex
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/dx01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/dx02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/dx03.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/dx04.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/dx05.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/dx06.png)
-
-##### The Bag
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg03.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg04.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg05.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg06.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg07.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg08.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg09.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg10.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg11.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg12.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg13.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg14.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg15.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg16.png)
-
-##### Battles
-###### Wild Pokémon battles
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt03.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt04.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt05.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt06.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt07.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt08.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt09.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt10.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt11.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt12.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt13.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt14.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt15.png)
-
-###### Trainer battles
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt16.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt17.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt18.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt19.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt20.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt21.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt22.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt23.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt24.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt25.png)
 
 _More to come_, as this README.md is still under construction!

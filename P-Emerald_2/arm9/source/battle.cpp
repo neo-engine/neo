@@ -1,28 +1,28 @@
 /*
-Pokémon Emerald 2 Version
+PokÃ©mon neo
 ------------------------------
 
 file        : battle.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2018
+Copyright (C) 2012 - 2020
 Philip Wellnitz
 
-This file is part of Pokémon Emerald 2 Version.
+This file is part of PokÃ©mon neo.
 
-Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+PokÃ©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+PokÃ©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+along with PokÃ©mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <algorithm>
@@ -53,7 +53,7 @@ along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/
 #include "messageBox.h"
 
 namespace BATTLE {
-    std::string trainerClassNames[ 120 ] = {"Pokémon-Trainer",
+    std::string trainerClassNames[ 120 ] = {"PokÃ©mon-Trainer",
                                             "Altes Paar",
                                             "Angler",
                                             "Aqua-Vorstand",
@@ -69,32 +69,32 @@ namespace BATTLE {
                                             "Gentleman",
                                             "Geschwister",
                                             "Gitarrist",
-                                            "Göre",
+                                            "GÃ¶re",
                                             "Hexe",
                                             "Hitzkopf",
                                             "Interviewer",
-                                            "Junges Glück",
-                                            "Käfermaniac",
-                                            "Käfersammler",
-                                            "Kämpferin",
-                                            "Künstler",
+                                            "Junges GlÃ¼ck",
+                                            "KÃ¤fermaniac",
+                                            "KÃ¤fersammler",
+                                            "KÃ¤mpferin",
+                                            "KÃ¼nstler",
                                             "Lady",
                                             "Magma-Vorstand",
                                             "Matrose",
                                             "Ninjajunge",
                                             "Picknickerin",
                                             "Planscher",
-                                            "Pokéfan",
-                                            "Pokémaniac",
-                                            "Pokémon Ranger",
-                                            "Pokémon-Sammler",
-                                            "Pokémon-Trainer",
-                                            "Pokémon-Züchter",
+                                            "PokÃ©fan",
+                                            "PokÃ©maniac",
+                                            "PokÃ©mon Ranger",
+                                            "PokÃ©mon-Sammler",
+                                            "PokÃ©mon-Trainer",
+                                            "PokÃ©mon-ZÃ¼chter",
                                             "Psycho",
                                             "Ruinenmaniac",
                                             "Schirmdame",
-                                            "Schnösel",
-                                            "Schönheit",
+                                            "SchnÃ¶sel",
+                                            "SchÃ¶nheit",
                                             "Schulkind",
                                             "Schwarzgurt",
                                             "Schwimmer",
@@ -102,16 +102,16 @@ namespace BATTLE {
                                             "Senior & Junior",
                                             "Serviererin",
                                             "Team Aqua Boss",
-                                            "Team Aqua Rüpel",
+                                            "Team Aqua RÃ¼pel",
                                             "Team Magma Boss",
-                                            "Team Magma Rüpel",
+                                            "Team Magma RÃ¼pel",
                                             "Teenager",
                                             "Top Vier",
                                             "Triathlet",
                                             "Veteran",
-                                            "Vogelfänger",
-                                            "Vorschüler",
-                                            "Vorschülerin",
+                                            "VogelfÃ¤nger",
+                                            "VorschÃ¼ler",
+                                            "VorschÃ¼lerin",
                                             "Wanderer",
                                             "Zwillinge",
                                             "Ass-Duo",
@@ -121,16 +121,16 @@ namespace BATTLE {
                                             "Erbfolgerin",
                                             "Expertin",
                                             "Fahrer",
-                                            "Fräulein Reihumkampf",
+                                            "FrÃ¤ulein Reihumkampf",
                                             "Gastronom",
-                                            "Garçon",
-                                            "Gärtner",
+                                            "GarÃ§on",
+                                            "GÃ¤rtner",
                                             "Geheimbasen-Meister",
                                             "Geheimbasis",
                                             "Graf",
-                                            "Gräfin",
+                                            "GrÃ¤fin",
                                             "Grips & Muckis",
-                                            "Großherzogin",
+                                            "GroÃŸherzogin",
                                             "Halbstarke",
                                             "Herzog",
                                             "Herzogin",
@@ -138,47 +138,47 @@ namespace BATTLE {
                                             "Hochzeitsreisende",
                                             "Illumina-Gangster",
                                             "Inhaber",
-                                            "Kampf-Châtelaine",
-                                            "Kimono-Trägerin",
+                                            "Kampf-ChÃ¢telaine",
+                                            "Kimono-TrÃ¤gerin",
                                             "Koch",
-                                            "Künstlerfamilie",
-                                            "Künstlerin",
+                                            "KÃ¼nstlerfamilie",
+                                            "KÃ¼nstlerin",
                                             "Marquis",
                                             "Marquise",
                                             "Planscherin",
-                                            "Pokéfan-Pärchen",
-                                            "Pokémon-Professor",
-                                            "Pokémon-Züchterin",
+                                            "PokÃ©fan-PÃ¤rchen",
+                                            "PokÃ©mon-Professor",
+                                            "PokÃ©mon-ZÃ¼chterin",
                                             "Punker",
                                             "Punkerin",
-                                            "Punker-Pärchen",
+                                            "Punker-PÃ¤rchen",
                                             "Raubein",
                                             "Rollerskater",
                                             "Rollerskaterin",
-                                            "Schräge Schwestern",
-                                            "Schüler",
-                                            "Schülerin",
+                                            "SchrÃ¤ge Schwestern",
+                                            "SchÃ¼ler",
+                                            "SchÃ¼lerin",
                                             "Taucher",
                                             "Taucherin",
-                                            "Team Flare Rüpel",
+                                            "Team Flare RÃ¼pel",
                                             "Team Flare Vorstand",
                                             "Tourist",
                                             "Touristin",
                                             "Trainerhoffnung",
-                                            "Träumerin",
-                                            "Verdächtige Frau",
-                                            "Verdächtiges Kind",
-                                            "Verdächtiges Mädchen",
+                                            "TrÃ¤umerin",
+                                            "VerdÃ¤chtige Frau",
+                                            "VerdÃ¤chtiges Kind",
+                                            "VerdÃ¤chtiges MÃ¤dchen",
                                             "Vicomte",
                                             "Vicomtesse",
-                                            "Wissenshüterin",
+                                            "WissenshÃ¼terin",
                                             "Xeneraner"};
 
     const char* ailmentnames[] = {"none",
                                   "wurde paralysiert.",
-                                  "schläft ein.",
+                                  "schlÃ¤ft ein.",
                                   "wurde eingefroren.",
-                                  "fängt an zu brennen.",
+                                  "fÃ¤ngt an zu brennen.",
                                   "wurde vergiftet.",
                                   "wurde verwirrt.",
                                   "Infatuation",
@@ -186,12 +186,12 @@ namespace BATTLE {
                                   "wurde in Nachtmahr\ngefangen.",
                                   "wurde Folterknecht\nunterworfen.",
                                   "wurde blockiert.",
-                                  "gähnt.",
+                                  "gÃ¤hnt.",
                                   "kann nicht mehr\ngeheilt werden.",
                                   "No_type_immunity",
                                   "wurde bepflanzt",
-                                  "fällt unter ein\nEmbargo.",
-                                  "hört Abgesang.",
+                                  "fÃ¤llt unter ein\nEmbargo.",
+                                  "hÃ¶rt Abgesang.",
                                   "Ingrain"};
 
     //////////////////////////////////////////////////////////////////////////
@@ -482,7 +482,7 @@ namespace BATTLE {
                         break;
                     }
                 } else
-                    log( "[OWN1] kann nicht angreifen…[A]" );
+                    log( "[OWN1] kann nicht angreifenÂ…[A]" );
             }
             // If 1st action is RUN, the player has no choice for a second move
             if( _battleMoves[ 0 ][ PLAYER ].m_type != battleMove::RUN
@@ -497,7 +497,7 @@ namespace BATTLE {
                         return ( battleEnd );
                     }
                 } else if( m_battleMode == DOUBLE )
-                    log( "[OWN2] kann nicht angreifen…[A]" );
+                    log( "[OWN2] kann nicht angreifenÂ…[A]" );
             } else
                 _battleMoves[ 1 ][ PLAYER ].m_type = battleMove::RUN;
 
@@ -1313,7 +1313,7 @@ namespace BATTLE {
     }
 
     /**
-     * @brief Handles the capture of the wild Pokémon
+     * @brief Handles the capture of the wild PokÃ©mon
      */
     void battle::handleCapture( ) {
         u16  spid = _wildPokemon.m_pokemon->m_boxdata.m_speciesId;
@@ -1495,7 +1495,7 @@ namespace BATTLE {
                 log( buffer );
                 moveHasTarget = true;
             }
-            // If the target is already ko, then it shouldn't be a target at all…
+            // If the target is already ko, then it shouldn't be a target at allÂ…
             else if( !str.m_pokemon->m_stats.m_acHP ) {
                 bm.m_target &= ~( 1 << k );
             }
@@ -1560,7 +1560,7 @@ namespace BATTLE {
                     else if( effectivity < 0.3f )
                         snprintf(
                             buffer, 99,
-                            "[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %s…[A][CLEAR][COLR:00:00:00]",
+                            "[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen %sÂ…[A][CLEAR][COLR:00:00:00]",
                             str.m_pokemon->m_boxdata.m_name );
                     else if( effectivity < 1.0f )
                         snprintf(
@@ -1591,7 +1591,7 @@ namespace BATTLE {
 
             for( u8 j = 0; j < 4; ++j ) handleFaint( j / 2, j % 2 );
         }
-        if( !moveHasTarget ) { log( "Es schlug fehl…[A]" ); }
+        if( !moveHasTarget ) { log( "Es schlug fehlÂ…[A]" ); }
         return;
     }
 
@@ -1862,7 +1862,7 @@ namespace BATTLE {
            }
 
            if( printPkmnMsg )
-               log( "Weitere Pokémon im Team\n erhalten E.-Punkte.[A]" );
+               log( "Weitere PokÃ©mon im Team\n erhalten E.-Punkte.[A]" );
 
            if( SAVE::SAV->getActiveFile( ).m_options.m_EXPShareEnabled && p_opponent ) {
                log( "Der EP-Teiler wirkt![A]" );
@@ -2074,7 +2074,7 @@ namespace BATTLE {
             break;
         case BATTLE::battle::OPPONENT_WON: {
             if( !m_isWildBattle ) {
-                snprintf( buffer, 49, "[TRAINER] [TCLASS] gewinnt…[A]" );
+                snprintf( buffer, 49, "[TRAINER] [TCLASS] gewinntÂ…[A]" );
 
                 _battleUI.showEndScreen( );
 
@@ -2144,7 +2144,7 @@ namespace BATTLE {
     }
 
     /**
-     *  @brief Checks whether the player can run from the wild Pokémon.
+     *  @brief Checks whether the player can run from the wild PokÃ©mon.
      */
     bool battle::run( ) {
         // Check whether run is succesful -- TODO
@@ -2153,7 +2153,7 @@ namespace BATTLE {
     }
 
     /**
-     * @brief Tries to capture with the specified poké ball
+     * @brief Tries to capture with the specified pokÃ© ball
      * @param p_pokeball: item idx of the thrown poke ball
      * @returns true iff the capture was successful
      */

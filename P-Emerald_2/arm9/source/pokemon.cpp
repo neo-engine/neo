@@ -1,69 +1,68 @@
 /*
-PokÈmon Emerald 2 Version
+Pok√©mon neo
 ------------------------------
 
 file        : pokemon.cpp
 author      : Philip Wellnitz
-description : The main PokÈmon engine
+description : The main Pok√©mon engine
 
-Copyright (C) 2012 - 2018
->>>>>>> up pkmn
+Copyright (C) 2012 - 2020
 Philip Wellnitz
 
-This file is part of PokÈmon Emerald 2 Version.
+This file is part of Pok√©mon neo.
 
-PokÈmon Emerald 2 Version is free software: you can redistribute it and/or modify
+Pok√©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-PokÈmon Emerald 2 Version is distributed in the hope that it will be useful,
+Pok√©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with PokÈmon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+along with Pok√©mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "pokemon.h"
 #include "move.h"
 
 std::string NatureList[ 25 ]
-    = {"robust",  "einsam", "mutig",  "hart",  "frech",  "k¸hn",  "sanft", "locker", "pfiffig",
-       "lasch",   "scheu",  "hastig", "ernst", "froh",   "naiv",  "m‰ﬂig", "mild",   "ruhig",
+    = {"robust",  "einsam", "mutig",  "hart",  "frech",  "k√ºhn",  "sanft", "locker", "pfiffig",
+       "lasch",   "scheu",  "hastig", "ernst", "froh",   "naiv",  "m√§√üig", "mild",   "ruhig",
        "zaghaft", "hitzig", "still",  "zart",  "forsch", "sacht", "kauzig"};
 std::string PersonalityList[ 30 ] = {"liebt es, zu essen",
                                      "nickt oft ein",
-                                     "schl‰ft gerne",
+                                     "schl√§ft gerne",
                                      "macht oft Unordnung",
                                      "liebt es, zu entspannen",
-                                     "ist stolz auf seine St‰rke",
-                                     "pr¸gelt sich gerne",
+                                     "ist stolz auf seine St√§rke",
+                                     "pr√ºgelt sich gerne",
                                      "besitzt Temperament",
-                                     "liebt es, zu k‰mpfen",
+                                     "liebt es, zu k√§mpfen",
                                      "ist impulsiv",
-                                     "hat einen robusten Kˆrper",
+                                     "hat einen robusten K√∂rper",
                                      "kann Treffer gut verkraften",
-                                     "ist ‰uﬂerst ausdauernd",
+                                     "ist √§u√üerst ausdauernd",
                                      "hat eine gute Ausdauer",
                                      "ist beharrlich",
                                      "ist sehr neugierig",
-                                     "ist hinterh‰ltig",
-                                     "ist ‰uﬂerst gerissen",
+                                     "ist hinterh√§ltig",
+                                     "ist √§u√üerst gerissen",
                                      "ist oft in Gedanken",
                                      "ist sehr pedantisch",
                                      "besitzt starken Willen",
                                      "ist irgendwie eitel",
-                                     "ist sehr aufs‰ssig",
+                                     "ist sehr aufs√§ssig",
                                      "hasst Niederlagen",
-                                     "ist dickkˆpfig",
+                                     "ist dickk√∂pfig",
                                      "liebt es, zu rennen",
-                                     "achtet auf Ger‰usche",
-                                     "ist ungest¸m und einf‰ltig",
+                                     "achtet auf Ger√§usche",
+                                     "ist ungest√ºm und einf√§ltig",
                                      "ist fast wie eine Clown",
-                                     "fl¸chtet schnell"};
-std::string TasteList[ 6 ]        = {"scharf", "saur", "s¸ﬂ", "trocken", "bitter", "all"};
+                                     "fl√ºchtet schnell"};
+std::string TasteList[ 6 ]        = {"scharf", "saur", "s√º√ü", "trocken", "bitter", "all"};
 
 std::string Games[ 10 ] = {};
 

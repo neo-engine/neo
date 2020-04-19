@@ -1,28 +1,28 @@
 /*
-Pokémon Emerald 2 Version
+PokÃ©mon neo
 ------------------------------
 
 file        : hmMoves.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2018
+Copyright (C) 2012 - 2020
 Philip Wellnitz
 
-This file is part of Pokémon Emerald 2 Version.
+This file is part of PokÃ©mon neo.
 
-Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+PokÃ©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+PokÃ©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+along with PokÃ©mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #pragma once
@@ -53,7 +53,7 @@ class cut : public move {
         return "Ein kleiner Baum.";
     }
     const char* description( ) override {
-        return "Ein Basisangriff mit Schere oder Klaue. Damit können kleine Bäume gefällt werden.";
+        return "Ein Basisangriff mit Schere oder Klaue. Damit kÃ¶nnen kleine BÃ¤ume gefÃ¤llt werden.";
     }
 };
 
@@ -61,7 +61,7 @@ class cut : public move {
 class rockSmash : public move {
   public:
     rockSmash( )
-        : move( std::string( "Zertrümmerer" ), {}, C 60, FIGHTING, C 100, C 15, C 30, SELECTED, C 1,
+        : move( std::string( "ZertrÃ¼mmerer" ), {}, C 60, FIGHTING, C 100, C 15, C 30, SELECTED, C 1,
                 F( MAKES_CONTACT | PROTECT | KINGS_ROCK ), PHYS ) {
         this->m_isFieldAttack = true;
     }
@@ -93,7 +93,7 @@ class fly : public move {
         return "Freier Himmel.";
     }
     const char* description( ) override {
-        return "Steigt in Runde 1 empor und trifft das Ziel in Runde 2. Ermöglicht Flug in jede bekannte Stadt.";
+        return "Steigt in Runde 1 empor und trifft das Ziel in Runde 2. ErmÃ¶glicht Flug in jede bekannte Stadt.";
     }
 };
 
@@ -110,10 +110,10 @@ class flash : public move {
     bool possible( ) override;
 
     const char* text( ) override {
-        return "Eine dunkle Höhle.";
+        return "Eine dunkle HÃ¶hle.";
     }
     const char* description( ) override {
-        return "Erzeugt helles Licht, das die Genauigkeit des Zieles senkt und Höhlen ausleuchten kann.";
+        return "Erzeugt helles Licht, das die Genauigkeit des Zieles senkt und HÃ¶hlen ausleuchten kann.";
     }
 };
 
@@ -133,7 +133,7 @@ class whirlpool : public move {
         return "Ein Strudel.";
     }
     const char* description( ) override {
-        return "Das Ziel wird für 4 bis 5 Runden in einer Wasserhose gefangen. Macht Strudel überwindbar.";
+        return "Das Ziel wird fÃ¼r 4 bis 5 Runden in einer Wasserhose gefangen. Macht Strudel Ã¼berwindbar.";
     }
 };
 
@@ -153,7 +153,7 @@ class surf : public move {
         return "Das Wasser ist tiefblau.";
     }
     const char* description( ) override {
-        return "Eine Welle bricht über alle Pokémon in der Nähe des Anwenders herein. Macht Surfen möglich.";
+        return "Eine Welle bricht Ã¼ber alle PokÃ©mon in der NÃ¤he des Anwenders herein. Macht Surfen mÃ¶glich.";
     }
 };
 
@@ -171,7 +171,7 @@ class dive : public move {
         return "Das Meer scheint hier\nbesonders tief.";
     }
     const char* description( ) override {
-        return "Taucht in Runde 1 ab und greift in Runde 2 aus der Tiefe an. Ermöglicht Tauchgänge zum Meeresgrund.";
+        return "Taucht in Runde 1 ab und greift in Runde 2 aus der Tiefe an. ErmÃ¶glicht TauchgÃ¤nge zum Meeresgrund.";
     }
 };
 
@@ -189,14 +189,14 @@ class defog : public move {
         return "Dichter Nebel.";
     }
     const char* description( ) override {
-        return "Starker Wind hebt Attacken wie Reflektor und Lichtschild des Gegners auf. Senkt außerdem den Fluchtwert.";
+        return "Starker Wind hebt Attacken wie Reflektor und Lichtschild des Gegners auf. Senkt auÃŸerdem den Fluchtwert.";
     }
 };
 
 // HM09
 class strength : public move {
   public:
-    strength( ) : move( "Stärke", {}, C 80, NORMAL, C 100, C 15, C 0, A 0, C 1, F 35, H 0 ) {
+    strength( ) : move( "StÃ¤rke", {}, C 80, NORMAL, C 100, C 15, C 0, A 0, C 1, F 35, H 0 ) {
         this->m_isFieldAttack = true;
     }
 
@@ -204,10 +204,10 @@ class strength : public move {
     bool possible( ) override;
 
     const char* text( ) override {
-        return "Ein großer Felsen.";
+        return "Ein groÃŸer Felsen.";
     }
     const char* description( ) override {
-        return "Das Ziel wird extrem stark getroffen. Macht Verschieben von Felsen möglich.";
+        return "Das Ziel wird extrem stark getroffen. Macht Verschieben von Felsen mÃ¶glich.";
     }
 };
 
@@ -225,7 +225,7 @@ class rockClimb : public move {
         return "Eine steile Felswand.";
     }
     const char* description( ) override {
-        return "Eine stürmische Attacke, die das Ziel eventuell verwirrt.";
+        return "Eine stÃ¼rmische Attacke, die das Ziel eventuell verwirrt.";
     }
 };
 
@@ -243,7 +243,7 @@ class waterfall : public move {
         return "Ein Wasselfall.";
     }
     const char* description( ) override {
-        return "Eine mächtige Attacke, durch die das Ziel evtl. zurückschreckt. Wasserfälle können damit erklommen werden.";
+        return "Eine mÃ¤chtige Attacke, durch die das Ziel evtl. zurÃ¼ckschreckt. WasserfÃ¤lle kÃ¶nnen damit erklommen werden.";
     }
 };
 
@@ -257,10 +257,10 @@ class teleport : public move {
     bool possible( ) override;
 
     const char* text( ) override {
-        return "Zu gefährlich hier?";
+        return "Zu gefÃ¤hrlich hier?";
     }
     const char* description( ) override {
-        return "Fliehe sofort vor wilden Pokémon. Warp zum letzten Pokémon-Center.";
+        return "Fliehe sofort vor wilden PokÃ©mon. Warp zum letzten PokÃ©mon-Center.";
     }
 };
 
@@ -277,7 +277,7 @@ class headbutt : public move {
         return "Da hat sich etwas bewegt!";
     }
     const char* description( ) override {
-        return "Rammt das Ziel mit einer Kopfnuss. Ziel schreckt eventuell zurück.";
+        return "Rammt das Ziel mit einer Kopfnuss. Ziel schreckt eventuell zurÃ¼ck.";
     }
 };
 
@@ -291,10 +291,10 @@ class sweetScent : public move {
     bool possible( ) override;
 
     const char* text( ) override {
-        return "Der Geruch wilder Pokémon\nliegt in der Luft.";
+        return "Der Geruch wilder PokÃ©mon\nliegt in der Luft.";
     }
     const char* description( ) override {
-        return "Lockt Gegner an und senkt deren Fluchtwert. Lockt im Gras auch wilde Pokémon an.";
+        return "Lockt Gegner an und senkt deren Fluchtwert. Lockt im Gras auch wilde PokÃ©mon an.";
     }
 };
 
@@ -311,7 +311,7 @@ class dig : public move {
         return "Zu dunkel hier?";
     }
     const char* description( ) override {
-        return "Gräbt sich ein, um dann aus der Erde anzugreifen. Warp zum Höhleneingang.";
+        return "GrÃ¤bt sich ein, um dann aus der Erde anzugreifen. Warp zum HÃ¶hleneingang.";
     }
 };
 #undef C

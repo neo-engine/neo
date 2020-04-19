@@ -1,28 +1,28 @@
 /*
-PokÈmon Emerald 2 Version
+Pok√©mon neo
 ------------------------------
 
 file        : fontData.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2018
+Copyright (C) 2012 - 2020
 Philip Wellnitz
 
-This file is part of PokÈmon Emerald 2 Version.
+This file is part of Pok√©mon neo.
 
-PokÈmon Emerald 2 Version is free software: you can redistribute it and/or modify
+Pok√©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-PokÈmon Emerald 2 Version is distributed in the hope that it will be useful,
+Pok√©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with PokÈmon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+along with Pok√©mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <nds.h>
@@ -46,204 +46,204 @@ namespace IO {
                 return;
             }
 
-            if( p_val == '¿' ) {
+            if( p_val == '\xc0' ) { // √Ä
                 p_val = 62;
                 return;
             }
-            if( p_val == '¡' ) {
+            if( p_val == '\xc1' ) { // √Å
                 p_val = 63;
                 return;
             }
-            if( p_val == '¬' ) {
+            if( p_val == '\xc5' ) { // √Ç
                 p_val = 64;
                 return;
             }
-            if( p_val == 'ƒ' ) {
+            if( p_val == '\xc4' ) { // √Ñ
                 p_val = 65;
                 return;
             }
-            if( p_val == '«' ) {
+            if( p_val == '\xc7' ) { // √á
                 p_val = 66;
                 return;
             }
-            if( p_val == '»' ) {
+            if( p_val == '\xc8' ) { // √à
                 p_val = 67;
                 return;
             }
-            if( p_val == '…' ) {
+            if( p_val == '\xc9' ) { // √â
                 p_val = 68;
                 return;
             }
-            if( p_val == ' ' ) {
+            if( p_val == '\xca' ) { // √ä
                 p_val = 69;
                 return;
             }
-            if( p_val == 'À' ) {
+            if( p_val == '\xcb' ) { // √ã
                 p_val = 70;
                 return;
             }
-            if( p_val == 'Ã' ) {
+            if( p_val == '\xcc' ) { // √å
                 p_val = 71;
                 return;
             }
-            if( p_val == 'Õ' ) {
+            if( p_val == '\xcd' ) { // √ç
                 p_val = 72;
                 return;
             }
-            if( p_val == 'Œ' ) {
+            if( p_val == '\xce' ) { // √é
                 p_val = 73;
                 return;
             }
-            if( p_val == 'œ' ) {
+            if( p_val == '\xcf' ) { // √è
                 p_val = 74;
                 return;
             }
-            if( p_val == '—' ) {
+            if( p_val == '\xd1' ) { // √ë
                 p_val = 75;
                 return;
             }
-            if( p_val == '“' ) {
+            if( p_val == '\xd2' ) { // √í
                 p_val = 76;
                 return;
             }
-            if( p_val == '”' ) {
+            if( p_val == '\xd3' ) { // √ì
                 p_val = 77;
                 return;
             }
-            if( p_val == '‘' ) {
+            if( p_val == '\xd4' ) { // √î
                 p_val = 78;
                 return;
             }
-            if( p_val == '÷' ) {
+            if( p_val == '\xd6' ) { // √ñ
                 p_val = 79;
                 return;
             }
-            if( p_val == '◊' ) {
+            if( p_val == '\xd7' ) { // √ó
                 p_val = 80;
                 return;
             }
-            if( p_val == 'Ÿ' ) {
+            if( p_val == '\xd9' ) { // √ô
                 p_val = 81;
                 return;
             }
-            if( p_val == '⁄' ) {
+            if( p_val == '\xda' ) { // √ö
                 p_val = 82;
                 return;
             }
-            if( p_val == '€' ) {
+            if( p_val == '\xdb' ) { // √õ
                 p_val = 83;
                 return;
             }
-            if( p_val == '‹' ) {
+            if( p_val == '\xdc' ) { // √ú
                 p_val = 84;
                 return;
             }
 
-            if( p_val == 'ﬂ' ) {
+            if( p_val == '\xdf' ) { // √ü
                 p_val = 85;
                 return;
             }
-            if( p_val == '‡' ) {
+            if( p_val == '\xe0' ) { // √†
                 p_val = 86;
                 return;
             }
-            if( p_val == '·' ) {
+            if( p_val == '\xe1' ) { // √°
                 p_val = 87;
                 return;
             }
-            if( p_val == '‚' ) {
+            if( p_val == '\xe2' ) { // √¢
                 p_val = 88;
                 return;
             }
-            if( p_val == '‰' ) {
+            if( p_val == '\xe4' ) { // √§
                 p_val = 89;
                 return;
             }
-            if( p_val == 'Â' ) {
+            if( p_val == '\xe5' ) { // √•
                 p_val = 90;
                 return;
             }
-            if( p_val == 'Á' ) {
+            if( p_val == '\xe7' ) { // √ß
                 p_val = 91;
                 return;
             }
-            if( p_val == 'Ë' ) {
+            if( p_val == '\xe8' ) { // √®
                 p_val = 92;
                 return;
             }
-            if( p_val == 'È' ) {
+            if( p_val == '\xe9' ) { // √©
                 p_val = 93;
                 return;
             }
-            if( p_val == 'Í' ) {
+            if( p_val == '\xea' ) { // √™
                 p_val = 94;
                 return;
             }
-            if( p_val == 'Î' ) {
+            if( p_val == '\xeb' ) { // √´
                 p_val = 95;
                 return;
             }
-            if( p_val == 'Ï' ) {
+            if( p_val == '\xec' ) { // √¨
                 p_val = 96;
                 return;
             }
-            if( p_val == 'Ì' ) {
+            if( p_val == '\xed' ) { // √≠
                 p_val = 97;
                 return;
             }
-            if( p_val == 'Ó' ) {
+            if( p_val == '\xee' ) { // √Æ
                 p_val = 98;
                 return;
             }
-            if( p_val == 'Ô' ) {
+            if( p_val == '\xef' ) { // √Ø
                 p_val = 99;
                 return;
             }
-            if( p_val == 'Ò' ) {
+            if( p_val == '\xf1' ) { // √±
                 p_val = 100;
                 return;
             }
-            if( p_val == 'Ú' ) {
+            if( p_val == '\xf2' ) { // √≤
                 p_val = 101;
                 return;
             }
-            if( p_val == 'Û' ) {
+            if( p_val == '\xf3' ) { // √≥
                 p_val = 102;
                 return;
             }
-            if( p_val == 'Ù' ) {
+            if( p_val == '\xf4' ) { // √¥
                 p_val = 103;
                 return;
             }
-            if( p_val == 'ˆ' ) {
+            if( p_val == '\xf6' ) { // √∂
                 p_val = 104;
                 return;
             }
-            if( p_val == '˜' ) {
+            if( p_val == '\xf7' ) { // √∑
                 p_val = 105;
                 return;
             }
-            if( p_val == '˘' ) {
+            if( p_val == '\xf9' ) { // √π
                 p_val = 106;
                 return;
             }
-            if( p_val == '˙' ) {
+            if( p_val == '\xfa' ) { // √∫
                 p_val = 107;
                 return;
             }
-            if( p_val == '˚' ) {
+            if( p_val == '\xfb' ) { // √ª
                 p_val = 108;
                 return;
             }
-            if( p_val == '¸' ) {
+            if( p_val == '\xfc' ) { // √º
                 p_val = 109;
                 return;
             }
-            if( p_val == 'å' ) {
+            if( p_val == '¬å' ) {
                 p_val = 110;
                 return;
             }
-            if( p_val == 'ú' ) {
+            if( p_val == '¬ú' ) {
                 p_val = 111;
                 return;
             }
@@ -252,11 +252,11 @@ namespace IO {
                 p_val = 117;
                 return;
             }
-            if( p_val == '°' ) {
+            if( p_val == '¬°' ) {
                 p_val = 118;
                 return;
             }
-            if( p_val == 'ø' ) {
+            if( p_val == '¬ø' ) {
                 p_val = 119;
                 return;
             }
@@ -276,11 +276,11 @@ namespace IO {
                 p_val = 123;
                 return;
             }
-            if( p_val == 'Ö' ) {
+            if( p_val == '¬Ö' ) {
                 p_val = 124;
                 return;
             }
-            if( p_val == '∑' ) {
+            if( p_val == '¬∑' ) {
                 p_val = 124;
                 return;
             }
@@ -288,11 +288,11 @@ namespace IO {
                 p_val = 126;
                 return;
             }
-            if( p_val == 'ë' ) {
+            if( p_val == '¬ë' ) {
                 p_val = 127;
                 return;
             }
-            if( p_val == 'í' ) {
+            if( p_val == '¬í' ) {
                 p_val = 128;
                 return;
             }
@@ -300,11 +300,11 @@ namespace IO {
                 p_val = 128;
                 return;
             }
-            if( p_val == 'ì' ) {
+            if( p_val == '¬ì' ) {
                 p_val = 129;
                 return;
             }
-            if( p_val == 'î' ) {
+            if( p_val == '¬î' ) {
                 p_val = 130;
                 return;
             }
@@ -312,11 +312,11 @@ namespace IO {
                 p_val = 130;
                 return;
             }
-            if( p_val == 'Ñ' ) {
+            if( p_val == '¬Ñ' ) {
                 p_val = 131;
                 return;
             }
-            if( p_val == '´' ) {
+            if( p_val == '¬´' ) {
                 p_val = 132;
                 return;
             }
@@ -324,7 +324,7 @@ namespace IO {
                 p_val = 132;
                 return;
             }
-            if( p_val == 'ª' ) {
+            if( p_val == '¬ª' ) {
                 p_val = 133;
                 return;
             }
@@ -5386,205 +5386,205 @@ namespace IO {
                 return;
             }
 
-            if( p_val == '¿' ) {
+            if( p_val == '\xc0' ) { // √Ä
                 p_val = 62;
                 return;
             }
-            if( p_val == '¡' ) {
+            if( p_val == '\xc1' ) { // √Å
                 p_val = 63;
                 return;
             }
-            if( p_val == '¬' ) {
+            if( p_val == '\xc5' ) { // √Ç
                 p_val = 64;
                 return;
             }
-            if( p_val == 'ƒ' ) {
+            if( p_val == '\xc4' ) { // √Ñ
                 p_val = 65;
                 return;
             }
-            if( p_val == '«' ) {
+            if( p_val == '\xc7' ) { // √á
                 p_val = 66;
                 return;
             }
-            if( p_val == '»' ) {
+            if( p_val == '\xc8' ) { // √à
                 p_val = 67;
                 return;
             }
-            if( p_val == '…' ) {
+            if( p_val == '\xc9' ) { // √â
                 p_val = 68;
                 return;
             }
-            if( p_val == ' ' ) {
+            if( p_val == '\xca' ) { // √ä
                 p_val = 69;
                 return;
             }
-            if( p_val == 'À' ) {
+            if( p_val == '\xcb' ) { // √ã
                 p_val = 70;
                 return;
             }
-            if( p_val == 'Ã' ) {
+            if( p_val == '\xcc' ) { // √å
                 p_val = 71;
                 return;
             }
-            if( p_val == 'Õ' ) {
+            if( p_val == '\xcd' ) { // √ç
                 p_val = 72;
                 return;
             }
-            if( p_val == 'Œ' ) {
+            if( p_val == '\xce' ) { // √é
                 p_val = 73;
                 return;
             }
-            if( p_val == 'œ' ) {
+            if( p_val == '\xcf' ) { // √è
                 p_val = 74;
                 return;
             }
-            if( p_val == '—' ) {
+            if( p_val == '\xd1' ) { // √ë
                 p_val = 75;
                 return;
             }
-            if( p_val == '“' ) {
+            if( p_val == '\xd2' ) { // √í
                 p_val = 76;
                 return;
             }
-            if( p_val == '”' ) {
+            if( p_val == '\xd3' ) { // √ì
                 p_val = 77;
                 return;
             }
-            if( p_val == '‘' ) {
+            if( p_val == '\xd4' ) { // √î
                 p_val = 78;
                 return;
             }
-            if( p_val == '÷' ) {
+            if( p_val == '\xd6' ) { // √ñ
                 p_val = 79;
                 return;
             }
-            if( p_val == '◊' ) {
+            if( p_val == '\xd7' ) { // √ó
                 p_val = 80;
                 return;
             }
-            if( p_val == 'Ÿ' ) {
+            if( p_val == '\xd9' ) { // √ô
                 p_val = 81;
                 return;
             }
-            if( p_val == '⁄' ) {
+            if( p_val == '\xda' ) { // √ö
                 p_val = 82;
                 return;
             }
-            if( p_val == '€' ) {
+            if( p_val == '\xdb' ) { // √õ
                 p_val = 83;
                 return;
             }
-            if( p_val == '‹' ) {
+            if( p_val == '\xdc' ) { // √ú
                 p_val = 84;
                 return;
             }
 
-            if( p_val == 'ﬂ' ) {
+            if( p_val == '\xdf' ) { // √ü
                 p_val = 85;
                 return;
             }
-            if( p_val == '‡' ) {
+            if( p_val == '\xe0' ) { // √†
                 p_val = 86;
                 return;
             }
-            if( p_val == '·' ) {
+            if( p_val == '\xe1' ) { // √°
                 p_val = 87;
                 return;
             }
-            if( p_val == '‚' ) {
+            if( p_val == '\xe2' ) { // √¢
                 p_val = 88;
                 return;
             }
-            //¥¥a
-            if( p_val == '‰' ) {
+            if( p_val == '\xe4' ) { // √§
                 p_val = 90;
                 return;
             }
-            if( p_val == 'Â' ) {
+            if( p_val == '\xe5' ) { // √•
                 p_val = 91;
                 return;
             }
-            if( p_val == 'Á' ) {
+            if( p_val == '\xe7' ) { // √ß
                 p_val = 92;
                 return;
             }
-            if( p_val == 'Ë' ) {
+            if( p_val == '\xe8' ) { // √®
                 p_val = 93;
                 return;
             }
-            if( p_val == 'È' ) {
+            if( p_val == '\xe9' ) { // √©
                 p_val = 94;
                 return;
             }
-            if( p_val == 'Í' ) {
+            if( p_val == '\xea' ) { // √™
                 p_val = 95;
                 return;
             }
-            if( p_val == 'Î' ) {
+            if( p_val == '\xeb' ) { // √´
                 p_val = 96;
                 return;
             }
-            if( p_val == 'Ï' ) {
+            if( p_val == '\xec' ) { // √¨
                 p_val = 97;
                 return;
             }
-            if( p_val == 'Ì' ) {
+            if( p_val == '\xed' ) { // √≠
                 p_val = 98;
                 return;
             }
-            if( p_val == 'Ó' ) {
+            if( p_val == '\xee' ) { // √Æ
                 p_val = 99;
                 return;
             }
-            if( p_val == 'Ô' ) {
+            if( p_val == '\xef' ) { // √Ø
                 p_val = 100;
                 return;
             }
-            if( p_val == 'Ò' ) {
+            if( p_val == '\xf1' ) { // √±
                 p_val = 101;
                 return;
             }
-            if( p_val == 'Ú' ) {
+            if( p_val == '\xf2' ) { // √≤
                 p_val = 102;
                 return;
             }
-            if( p_val == 'Û' ) {
+            if( p_val == '\xf3' ) { // √≥
                 p_val = 103;
                 return;
             }
-            if( p_val == 'Ù' ) {
+            if( p_val == '\xf4' ) { // √¥
                 p_val = 104;
                 return;
             }
-            if( p_val == 'ˆ' ) {
+            if( p_val == '\xf6' ) { // √∂
                 p_val = 105;
                 return;
             }
-            if( p_val == '˜' ) {
+            if( p_val == '\xf7' ) { // √∑
                 p_val = 106;
                 return;
             }
-            if( p_val == '˘' ) {
+            if( p_val == '\xf9' ) { // √π
                 p_val = 107;
                 return;
             }
-            if( p_val == '˙' ) {
+            if( p_val == '\xfa' ) { // √∫
                 p_val = 108;
                 return;
             }
-            if( p_val == '˚' ) {
+            if( p_val == '\xfb' ) { // √ª
                 p_val = 109;
                 return;
             }
-            if( p_val == '¸' ) {
+            if( p_val == '\xfc' ) { // √º
                 p_val = 110;
                 return;
             }
-            if( p_val == 'å' ) {
+
+            if( p_val == '¬å' ) {
                 p_val = 111;
                 return;
             }
-            if( p_val == 'ú' ) {
+            if( p_val == '¬ú' ) {
                 p_val = 112;
                 return;
             }
@@ -5593,11 +5593,11 @@ namespace IO {
                 p_val = 118;
                 return;
             }
-            if( p_val == '°' ) {
+            if( p_val == '¬°' ) {
                 p_val = 119;
                 return;
             }
-            if( p_val == 'ø' ) {
+            if( p_val == '¬ø' ) {
                 p_val = 120;
                 return;
             }
@@ -5617,11 +5617,11 @@ namespace IO {
                 p_val = 124;
                 return;
             }
-            if( p_val == 'Ö' ) {
+            if( p_val == '¬Ö' ) {
                 p_val = 125;
                 return;
             }
-            if( p_val == '∑' ) {
+            if( p_val == '¬∑' ) {
                 p_val = 126;
                 return;
             }
@@ -5629,11 +5629,11 @@ namespace IO {
                 p_val = 127;
                 return;
             }
-            if( p_val == 'ë' ) {
+            if( p_val == '¬ë' ) {
                 p_val = 128;
                 return;
             }
-            if( p_val == 'í' ) {
+            if( p_val == '¬í' ) {
                 p_val = 129;
                 return;
             }
@@ -5641,11 +5641,11 @@ namespace IO {
                 p_val = 129;
                 return;
             }
-            if( p_val == 'ì' ) {
+            if( p_val == '¬ì' ) {
                 p_val = 130;
                 return;
             }
-            if( p_val == 'î' ) {
+            if( p_val == '¬î' ) {
                 p_val = 131;
                 return;
             }
@@ -5653,15 +5653,15 @@ namespace IO {
                 p_val = 131;
                 return;
             }
-            if( p_val == 'Ñ' ) {
+            if( p_val == '¬Ñ' ) {
                 p_val = 132;
                 return;
             }
-            if( p_val == '´' ) {
+            if( p_val == '¬´' ) {
                 p_val = 133;
                 return;
             }
-            if( p_val == 'ª' ) {
+            if( p_val == '¬ª' ) {
                 p_val = 134;
                 return;
             }

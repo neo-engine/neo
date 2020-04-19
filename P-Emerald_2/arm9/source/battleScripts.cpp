@@ -1,28 +1,28 @@
 /*
-Pokémon Emerald 2 Version
+PokÃ©mon neo
 ------------------------------
 
 file        : battleScripts.cpp
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2018
+Copyright (C) 2012 - 2020
 Philip Wellnitz
 
-This file is part of Pokémon Emerald 2 Version.
+This file is part of PokÃ©mon neo.
 
-Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+PokÃ©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+PokÃ©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+along with PokÃ©mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <map>
@@ -292,19 +292,19 @@ namespace BATTLE {
     std::string weatherMessage[ 9 ]    = {"",
                                        "Es regnet.[A]",
                                        "Es hagelt.[A]",
-                                       "Es herrscht dichter Nebel…[A]",
-                                       "Der Sandsturm wütet.[A]",
-                                       "Gleißendes Sonnenlicht.[A]",
+                                       "Es herrscht dichter NebelÂ…[A]",
+                                       "Der Sandsturm wÃ¼tet.[A]",
+                                       "GleiÃŸendes Sonnenlicht.[A]",
                                        "Enormer Regen.[A]",
                                        "Extremes Sonnenlicht.[A]",
                                        "Starke Winde wehen.[A]"};
     std::string weatherEndMessage[ 9 ] = {"",
-                                          "Es hat aufgehört zu regnen.[A]",
-                                          "Es hat aufgehört zu hageln.[A]",
+                                          "Es hat aufgehÃ¶rt zu regnen.[A]",
+                                          "Es hat aufgehÃ¶rt zu hageln.[A]",
                                           "Der Nebel verzog sich.[A]",
                                           "Der Sandsturm legt sich.[A]",
                                           "Das Sonnenlicht wurde wieder normal.[A]",
-                                          "Es hat aufgehört zu regnen.[A]",
+                                          "Es hat aufgehÃ¶rt zu regnen.[A]",
                                           "Das Sonnenlicht wurde wieder normal.[A]",
-                                          "Windstille…[A]"};
+                                          "WindstilleÂ…[A]"};
 }

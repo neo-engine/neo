@@ -1,28 +1,28 @@
 /*
-Pokémon Emerald 2 Version
+PokÃ©mon neo
 ------------------------------
 
 file        : battleUI.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2018
+Copyright (C) 2012 - 2020
 Philip Wellnitz
 
-This file is part of Pokémon Emerald 2 Version.
+This file is part of PokÃ©mon neo.
 
-Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+PokÃ©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+PokÃ©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+along with PokÃ©mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <algorithm>
@@ -1122,7 +1122,7 @@ namespace BATTLE {
 
     /**
      *  @param p_page: 1 show moves, 0 show status
-     *  @returns 0: return to prvious screen, 1 view next pokémon, 2 view previous pokémon, 3 switch
+     *  @returns 0: return to prvious screen, 1 view next pokÃ©mon, 2 view previous pokÃ©mon, 3 switch
      * screen
      */
     u8 showDetailedInformation( pokemon& p_pokemon, u8 p_page ) {
@@ -1386,7 +1386,7 @@ namespace BATTLE {
                 IO::boldFont->setColor( BLACK_IDX, 2 );
                 if( p_pokemon.m_boxdata.m_steps > 10 ) {
                     IO::boldFont->printString( "Was da wohl", 16 * 8, 50, true ); // TODO
-                    IO::boldFont->printString( "schlüpfen wird?", 16 * 8, 70, true );
+                    IO::boldFont->printString( "schlÃ¼pfen wird?", 16 * 8, 70, true );
                     IO::boldFont->printString( "Es dauert wohl", 16 * 8, 100, true );
                     IO::boldFont->printString( "noch lange.", 16 * 8, 120, true );
                 } else if( p_pokemon.m_boxdata.m_steps > 5 ) {
@@ -1396,7 +1396,7 @@ namespace BATTLE {
                     IO::boldFont->printString( "wohl bald was.", 16 * 8, 120, true );
                 } else {
                     IO::boldFont->printString( "Jetzt macht es", 16 * 8, 50, true );
-                    IO::boldFont->printString( "schon Geräusche!", 16 * 8, 70, true );
+                    IO::boldFont->printString( "schon GerÃ¤usche!", 16 * 8, 70, true );
                     IO::boldFont->printString( "Bald ist es", 16 * 8, 100, true );
                     IO::boldFont->printString( "wohl soweit.", 16 * 8, 120, true );
                 }
@@ -2632,13 +2632,13 @@ namespace BATTLE {
         IO::OamTop->oamBuffer[ PB_ANIM ].isHidden = true;
         IO::updateOAM( false );
         if( p_ticks == 0 )
-            _battle->log( "Mist!\nEs hat sich befreit…[A]" );
+            _battle->log( "Mist!\nEs hat sich befreitÂ…[A]" );
         else if( p_ticks == 1 )
-            _battle->log( "Oh.\nFast hätte es geklappt…[A]" );
+            _battle->log( "Oh.\nFast hÃ¤tte es geklapptÂ…[A]" );
         else if( p_ticks == 2 )
-            _battle->log( "Mist!\nDas war knapp…[A]" );
+            _battle->log( "Mist!\nDas war knappÂ…[A]" );
         else if( p_ticks == 3 )
-            _battle->log( "Verflixt!\nEs war doch fast gefangen…[A]" );
+            _battle->log( "Verflixt!\nEs war doch fast gefangenÂ…[A]" );
         return;
     }
 

@@ -1,28 +1,28 @@
 /*
-Pokémon Emerald 2 Version
+PokÃ©mon neo
 ------------------------------
 
 file        : mapDrawer.cpp
 author      : Philip Wellnitz
 description : Map drawing engine
 
-Copyright (C) 2012 - 2018
+Copyright (C) 2012 - 2020
 Philip Wellnitz
 
-This file is part of Pokémon Emerald 2 Version.
+This file is part of PokÃ©mon neo.
 
-Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+PokÃ©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+PokÃ©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+along with PokÃ©mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <algorithm>
@@ -732,7 +732,7 @@ namespace MAP {
                 return;
             }
 
-            // Check for jumps/slides/…
+            // Check for jumps/slides/Â…
             if( !canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, p_direction,
                           SAVE::SAV->getActiveFile( ).m_player.m_movement ) ) {
                 stopPlayer( p_direction );
@@ -1486,7 +1486,7 @@ namespace MAP {
         }
         changeMoveMode( surfing ? SURF : WALK );
         if( !failed ) {
-            // Check if the player's leading Pokémon has sucion cups or sticky hold
+            // Check if the player's leading PokÃ©mon has sucion cups or sticky hold
             bool forceEncounter
                 = ( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].isEgg( )
                     && ( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_ability

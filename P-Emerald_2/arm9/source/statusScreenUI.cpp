@@ -1,28 +1,28 @@
 /*
-Pokémon Emerald 2 Version
+PokÃ©mon neo
 ------------------------------
 
 file        : statusScreenUI.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2018
+Copyright (C) 2012 - 2020
 Philip Wellnitz
 
-This file is part of Pokémon Emerald 2 Version.
+This file is part of PokÃ©mon neo.
 
-Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+PokÃ©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+PokÃ©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+along with PokÃ©mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "statusScreenUI.h"
@@ -523,7 +523,7 @@ namespace STS {
         } else {
             if( currPkmn.m_boxdata.m_steps > 10 ) {
                 IO::regularFont->printString( "Was da wohl", 16 * 8, 46, p_bottom );
-                IO::regularFont->printString( "schlüpfen wird?", 16 * 8, 66, p_bottom );
+                IO::regularFont->printString( "schlÃ¼pfen wird?", 16 * 8, 66, p_bottom );
                 IO::regularFont->printString( "Es dauert wohl", 16 * 8, 96, p_bottom );
                 IO::regularFont->printString( "noch lange.", 16 * 8, 116, p_bottom );
             } else if( currPkmn.m_boxdata.m_steps > 5 ) {
@@ -533,7 +533,7 @@ namespace STS {
                 IO::regularFont->printString( "wohl bald was.", 16 * 8, 116, p_bottom );
             } else {
                 IO::regularFont->printString( "Jetzt macht es", 16 * 8, 46, p_bottom );
-                IO::regularFont->printString( "schon Geräusche!", 16 * 8, 66, p_bottom );
+                IO::regularFont->printString( "schon GerÃ¤usche!", 16 * 8, 66, p_bottom );
                 IO::regularFont->printString( "Bald ist es", 16 * 8, 96, p_bottom );
                 IO::regularFont->printString( "wohl soweit.", 16 * 8, 116, p_bottom );
             }
@@ -588,7 +588,7 @@ namespace STS {
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex, 0,
                         -5, 32, 32, ContestPal, ContestTiles, ContestTilesLen, false, false, false,
                         OBJPRIORITY_0, p_bottom );
-        IO::regularFont->printString( "Bänder", 32, 0, p_bottom );
+        IO::regularFont->printString( "BÃ¤nder", 32, 0, p_bottom );
 
         auto rbs = ribbon::getRibbons( currPkmn );
         // Just draw the first 12 ribbons at max
@@ -603,7 +603,7 @@ namespace STS {
                 tileCnt = tmp;
         }
         if( rbs.empty( ) ) {
-            IO::regularFont->printString( "Keine Bänder", 148, 83, p_bottom );
+            IO::regularFont->printString( "Keine BÃ¤nder", 148, 83, p_bottom );
         } else {
             char buffer[ 49 ];
             snprintf( buffer, 49, "(%u)", rbs.size( ) );
@@ -697,7 +697,7 @@ namespace STS {
         IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX ].gfxIndex, 0,
                         -5, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, false,
                         OBJPRIORITY_0, p_bottom );
-        IO::regularFont->printString( "Pokémon-Info", 32, 0, p_bottom );
+        IO::regularFont->printString( "PokÃ©mon-Info", 32, 0, p_bottom );
 
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
@@ -705,7 +705,7 @@ namespace STS {
         char buffer[ 50 ];
         snprintf( buffer, 49,
                   "Mag %s"
-                  "e PokéRg.",
+                  "e PokÃ©Rg.",
                   TasteList[ currPkmn.m_boxdata.getTasteStr( ) ].c_str( ) );
         IO::regularFont->printString( buffer, 250, 30, p_bottom, IO::font::RIGHT );
 
@@ -719,7 +719,7 @@ namespace STS {
         auto acAbility = ability( currPkmn.m_boxdata.m_ability );
         u8   wd        = IO::regularFont->stringWidth( acAbility.m_abilityName.c_str( ) );
         if( 250 - wd > 140 )
-            IO::regularFont->printString( "Fäh. ", 250 - wd, 94, p_bottom, IO::font::RIGHT );
+            IO::regularFont->printString( "FÃ¤h. ", 250 - wd, 94, p_bottom, IO::font::RIGHT );
         u8 nlCnt = 0;
         nStr     = FS::breakString( acAbility.m_flavourText, IO::regularFont, 130 );
         for( auto c : nStr )
@@ -804,7 +804,7 @@ namespace STS {
                 * ( ( 5 + ( ( currPkmn.m_boxdata.m_pPUps >> ( 2 * p_moveIdx ) ) % 4 ) ) / 5 ) );
         IO::regularFont->printString( buffer, 128, 47, p_bottom );
 
-        IO::regularFont->printString( "Stärke", 128, 60, p_bottom );
+        IO::regularFont->printString( "StÃ¤rke", 128, 60, p_bottom );
         if( currMove->m_moveBasePower )
             snprintf( buffer, 19, "%3i", currMove->m_moveBasePower );
         else
@@ -880,8 +880,8 @@ namespace STS {
         IO::regularFont->printString(
             FS::breakString( ( currRb.m_description == "" )
                                  ? ( currPkmn.m_boxdata.m_fateful
-                                         ? "Ein Band für Pokémon-Freunde."
-                                         : "Ein Gedenk-Band. An einem mysteriösen Ort erhalten." )
+                                         ? "Ein Band fÃ¼r PokÃ©mon-Freunde."
+                                         : "Ein Gedenk-Band. An einem mysteriÃ¶sen Ort erhalten." )
                                  : currRb.m_description,
                              IO::regularFont, 120 )
                 .c_str( ),

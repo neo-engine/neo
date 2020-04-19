@@ -1,28 +1,28 @@
 /*
-Pokémon Emerald 2 Version
+PokÃ©mon neo
 ------------------------------
 
 file        : ribbon.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2018
+Copyright (C) 2012 - 2020
 Philip Wellnitz
 
-This file is part of Pokémon Emerald 2 Version.
+This file is part of PokÃ©mon neo.
 
-Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+PokÃ©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+PokÃ©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+along with PokÃ©mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <initializer_list>
@@ -46,142 +46,142 @@ std::vector<u8> ribbon::getRibbons( const pokemon& p_pokemon ) {
 
 ribbon RibbonList[ MAX_RIBBONS ] = {
     // 0x3c (Contest Ribbons, Hoenn)
-    {"Band der Coolness", "Pokémon- Wettbewerb\n Sieger in der Normal-Klasse!"},
-    {"Band der Coolness Super", "Pokémon- Wettbewerb\n Sieger in der Super-Klasse!"},
-    {"Band der Coolness Hyper", "Pokémon- Wettbewerb\n Sieger in der Hyper-Klasse!"},
-    {"Band der Coolness Master", "Pokémon- Wettbewerb\n Sieger in der Master-Klasse!"},
+    {"Band der Coolness", "PokÃ©mon- Wettbewerb\n Sieger in der Normal-Klasse!"},
+    {"Band der Coolness Super", "PokÃ©mon- Wettbewerb\n Sieger in der Super-Klasse!"},
+    {"Band der Coolness Hyper", "PokÃ©mon- Wettbewerb\n Sieger in der Hyper-Klasse!"},
+    {"Band der Coolness Master", "PokÃ©mon- Wettbewerb\n Sieger in der Master-Klasse!"},
 
-    {"Band der Schönheit", "Pokémon- Wettbewerb\n Sieger in der Normal-Klasse!"},
-    {"Band der Schönheit Super", "Pokémon- Wettbewerb\n Sieger in der Super-Klasse!"},
-    {"Band der Schönheit Hyper", "Pokémon- Wettbewerb\n Sieger in der Hyper-Klasse!"},
-    {"Band d. Schönh. Master", "Pokémon- Wettbewerb\n Sieger in der Master-Klasse!"},
+    {"Band der SchÃ¶nheit", "PokÃ©mon- Wettbewerb\n Sieger in der Normal-Klasse!"},
+    {"Band der SchÃ¶nheit Super", "PokÃ©mon- Wettbewerb\n Sieger in der Super-Klasse!"},
+    {"Band der SchÃ¶nheit Hyper", "PokÃ©mon- Wettbewerb\n Sieger in der Hyper-Klasse!"},
+    {"Band d. SchÃ¶nh. Master", "PokÃ©mon- Wettbewerb\n Sieger in der Master-Klasse!"},
 
     // 0x3d
-    {"Band der Anmut", "Pokémon- Wettbewerb\n Sieger in der Normal-Klasse!"},
-    {"Band der Anmut Super", "Pokémon- Wettbewerb\n Sieger in der Super-Klasse!"},
-    {"Band der Anmut Hyper", "Pokémon- Wettbewerb\n Sieger in der Hyper-Klasse!"},
-    {"Band der Anmut Master", "Pokémon- Wettbewerb\n Sieger in der Master-Klasse!"},
+    {"Band der Anmut", "PokÃ©mon- Wettbewerb\n Sieger in der Normal-Klasse!"},
+    {"Band der Anmut Super", "PokÃ©mon- Wettbewerb\n Sieger in der Super-Klasse!"},
+    {"Band der Anmut Hyper", "PokÃ©mon- Wettbewerb\n Sieger in der Hyper-Klasse!"},
+    {"Band der Anmut Master", "PokÃ©mon- Wettbewerb\n Sieger in der Master-Klasse!"},
 
-    {"Band der Klugheit", "Pokémon- Wettbewerb\n Sieger in der Normal-Klasse!"},
-    {"Band der Klugheit Super", "Pokémon- Wettbewerb\n Sieger in der Super-Klasse!"},
-    {"Band der Klugheit Hyper", "Pokémon- Wettbewerb\n Sieger in der Hyper-Klasse!"},
-    {"Band der Klugh. Master", "Pokémon- Wettbewerb\n Sieger in der Master-Klasse!"},
+    {"Band der Klugheit", "PokÃ©mon- Wettbewerb\n Sieger in der Normal-Klasse!"},
+    {"Band der Klugheit Super", "PokÃ©mon- Wettbewerb\n Sieger in der Super-Klasse!"},
+    {"Band der Klugheit Hyper", "PokÃ©mon- Wettbewerb\n Sieger in der Hyper-Klasse!"},
+    {"Band der Klugh. Master", "PokÃ©mon- Wettbewerb\n Sieger in der Master-Klasse!"},
 
     // 0x3e
-    {"Band der Stärke", "Pokémon- Wettbewerb\n Sieger in der Normal-Klasse!"},
-    {"Band der Stärke Super", "Pokémon- Wettbewerb\n Sieger in der Super-Klasse!"},
-    {"Band der Stärke Hyper", "Pokémon- Wettbewerb\n Sieger in der Hyper-Klasse!"},
-    {"Band der Stärke Master", "Pokémon- Wettbewerb\n Sieger in der Master-Klasse!"},
+    {"Band der StÃ¤rke", "PokÃ©mon- Wettbewerb\n Sieger in der Normal-Klasse!"},
+    {"Band der StÃ¤rke Super", "PokÃ©mon- Wettbewerb\n Sieger in der Super-Klasse!"},
+    {"Band der StÃ¤rke Hyper", "PokÃ©mon- Wettbewerb\n Sieger in der Hyper-Klasse!"},
+    {"Band der StÃ¤rke Master", "PokÃ©mon- Wettbewerb\n Sieger in der Master-Klasse!"},
 
     {"Band des Champs von Hoenn",
-     "Band für das Erreichen des Titels Champ und den Eintritt in die Ruhmeshalle."},
-    {"Band des Gewinners", "Band für Siege in der Lv. 50- Kategorie im Duellturm von Hoenn."},
-    {"Band des Sieges", "Band für Siege in der Lv. 100- Kategorie im Duellturm von Hoenn."},
-    {"Band des Künstlers", "Belohnung für die Wahl zum Super-Model in Hoenn."},
+     "Band fÃ¼r das Erreichen des Titels Champ und den Eintritt in die Ruhmeshalle."},
+    {"Band des Gewinners", "Band fÃ¼r Siege in der Lv. 50- Kategorie im Duellturm von Hoenn."},
+    {"Band des Sieges", "Band fÃ¼r Siege in der Lv. 100- Kategorie im Duellturm von Hoenn."},
+    {"Band des KÃ¼nstlers", "Belohnung fÃ¼r die Wahl zum Super-Model in Hoenn."},
 
     // 0x3f
-    {"Fleiß-Band", "Band für extrem fleißige Arbeiter."},
+    {"FleiÃŸ-Band", "Band fÃ¼r extrem fleiÃŸige Arbeiter."},
     {"Band des Meeres", ""},
     {"Band der Landmassen", ""},
-    {"Band der Lüfte", ""},
+    {"Band der LÃ¼fte", ""},
 
-    {"Band des Landes", "Pokémon Liga\nBand des Champs"},
-    {"Band der Nation", "Band für den erfolgreichen Abschluss aller Schwierigkeits- grade."},
+    {"Band des Landes", "PokÃ©mon Liga\nBand des Champs"},
+    {"Band der Nation", "Band fÃ¼r den erfolgreichen Abschluss aller Schwierigkeits- grade."},
     {"Band der Erde", "100. Sieg in Folge Gedenk-Band"},
-    {"Band der Welt", "Pokémon Liga\nBand des Champs"},
+    {"Band der Welt", "PokÃ©mon Liga\nBand des Champs"},
 
     // 0x24
     {"Band des Champs von Sinnoh",
-     "Band für den Sieg über den Sinnoh Champ und den Eintritt in die Ruhmeshalle."},
-    {"Band der Fähigkeit", "Ein Band, verliehen zum Sieg über den Kampfkoloss des Duellturms."},
-    {"Großes Band der Fähigkeit",
-     "Ein Band, verliehen zum Sieg über den Kampfkoloss des Duellturms."},
-    {"Doppel-Band der Fähigkeit", "Ein Band für die Meisterung des Doppels im Sinnoh Duellturm."},
+     "Band fÃ¼r den Sieg Ã¼ber den Sinnoh Champ und den Eintritt in die Ruhmeshalle."},
+    {"Band der FÃ¤higkeit", "Ein Band, verliehen zum Sieg Ã¼ber den Kampfkoloss des Duellturms."},
+    {"GroÃŸes Band der FÃ¤higkeit",
+     "Ein Band, verliehen zum Sieg Ã¼ber den Kampfkoloss des Duellturms."},
+    {"Doppel-Band der FÃ¤higkeit", "Ein Band fÃ¼r die Meisterung des Doppels im Sinnoh Duellturm."},
 
-    {"Multi-Band der Fähigkeit",
-     "Ein Band für die Meisterung der Multi- Herausforderung im Sinnoh Duellturm."},
-    {"Paar-Band der Fähigkeit",
-     "Ein Band für die Meisterung der Link-Multi- Herausforderung im Sinnoh Duellturm."},
-    {"Welt-Band der Fähigkeit",
-     "Ein Band für die Meisterung der Wi-Fi- Herausforderung im Sinnoh Duellturm."},
+    {"Multi-Band der FÃ¤higkeit",
+     "Ein Band fÃ¼r die Meisterung der Multi- Herausforderung im Sinnoh Duellturm."},
+    {"Paar-Band der FÃ¤higkeit",
+     "Ein Band fÃ¼r die Meisterung der Link-Multi- Herausforderung im Sinnoh Duellturm."},
+    {"Welt-Band der FÃ¤higkeit",
+     "Ein Band fÃ¼r die Meisterung der Wi-Fi- Herausforderung im Sinnoh Duellturm."},
     {"Band der Wachsamkeit",
-     "Ein Band zur Erinnerung an ein stärkendes, Lebensenergie gebendes Erlebnis."},
+     "Ein Band zur Erinnerung an ein stÃ¤rkendes, Lebensenergie gebendes Erlebnis."},
 
     // 0x25
     {"Band des Schocks",
      "Ein Band zur Erinnerung an ein Ereignis, das das Leben aufregender machte."},
     {"Band des Niederschlags",
-     "Ein Band zur Erinnerung an die Traurigkeit, die dem Leben Würze gab."},
+     "Ein Band zur Erinnerung an die Traurigkeit, die dem Leben WÃ¼rze gab."},
     {"Band der Sorglosigkeit",
-     "Ein Band zur Erinnerung an einen Fehler, der zu wichtigen Entscheidungen führte."},
+     "Ein Band zur Erinnerung an einen Fehler, der zu wichtigen Entscheidungen fÃ¼hrte."},
     {"Band der Entspannung",
      "Ein Band zur Erinnerung an ein erfrischendes Ereignis, das dem Leben Glanz gab."},
 
     {"Band des Schlafens",
      "Ein Band zur Erinnerung an einen tiefen Schlaf, der den Fluss des Lebens beruhigte."},
-    {"Band des Lächelns", "Ein Band zur Erinnerung daran, dass ein Lächeln das Leben bereichert."},
-    {"Hinreißendes Band", "Ein außergewönlich schönes und extravagantes Band."},
-    {"Königliches Band",
-     "Ein unglaublich königliches Band, das eine Aura der Erhabenheit ausstrahlt."},
+    {"Band des LÃ¤chelns", "Ein Band zur Erinnerung daran, dass ein LÃ¤cheln das Leben bereichert."},
+    {"HinreiÃŸendes Band", "Ein auÃŸergewÃ¶nlich schÃ¶nes und extravagantes Band."},
+    {"KÃ¶nigliches Band",
+     "Ein unglaublich kÃ¶nigliches Band, das eine Aura der Erhabenheit ausstrahlt."},
 
     // 0x26
-    {"Hinreißendes Königliches Band",
-     "Ein wunderschönes und königliches Band, das einfach sagenhaft ist."},
-    {"Fußabdruck- Band",
-     "Ein Band für ein Pokémon, das einen besonders guten Fußabdruck hinterlässt."},
-    {"Band des Rekords", "Ein Band für das Aufstellen eines unglaublichen Rekords."},
-    {"Band der Geschichte", "Ein Band für das Aufstellen eines historischen Rekords."},
+    {"HinreiÃŸendes KÃ¶nigliches Band",
+     "Ein wunderschÃ¶nes und kÃ¶nigliches Band, das einfach sagenhaft ist."},
+    {"FuÃŸabdruck- Band",
+     "Ein Band fÃ¼r ein PokÃ©mon, das einen besonders guten FuÃŸabdruck hinterlÃ¤sst."},
+    {"Band des Rekords", "Ein Band fÃ¼r das Aufstellen eines unglaublichen Rekords."},
+    {"Band der Geschichte", "Ein Band fÃ¼r das Aufstellen eines historischen Rekords."},
 
-    {"Band der Legende", "Ein Band für das Aufstellen eines legendären Rekords."},
+    {"Band der Legende", "Ein Band fÃ¼r das Aufstellen eines legendÃ¤ren Rekords."},
     {"Rotes Band", ""},  //!
-    {"Grünes Band", ""}, //!
+    {"GrÃ¼nes Band", ""}, //!
     {"Blaues Band", ""}, //!
 
     // 0x27
-    {"Festival-Band", "Pokémon-Festival Teilnehmer-Band"},
+    {"Festival-Band", "PokÃ©mon-Festival Teilnehmer-Band"},
     {"Jahrmarkt-Band", ""},
     {"Klassisches Band", ""},
     {"Premierband", ""},
 
-    {"Sonderband", "Besonderes Band für einen besonderen Tag."},
+    {"Sonderband", "Besonderes Band fÃ¼r einen besonderen Tag."},
     {"Kampfmeister- band", "Band des Siegers eines Kampfturniers."},
     {"Regionalmeister- band", "Band des Siegers eines Kampfturniers."},
     {"Nationalmeister- band", "Band des Siegers eines Kampfturniers."},
 
     // 0x60 (Contest Ribbons, Sinnoh)
-    {"Band der Coolness", "Super-Pokémon- Wettbewerb\n Sieger in der Normal-Klasse in Sinnoh!"},
-    {"Band der Coolness Mega", "Super-Pokémon- Wettbewerb\n Sieger in der Mega-Klasse in Sinnoh!"},
+    {"Band der Coolness", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Normal-Klasse in Sinnoh!"},
+    {"Band der Coolness Mega", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Mega-Klasse in Sinnoh!"},
     {"Band der Coolness Ultra",
-     "Super-Pokémon- Wettbewerb\n Sieger in der Ultra-Klasse in Sinnoh!"},
+     "Super-PokÃ©mon- Wettbewerb\n Sieger in der Ultra-Klasse in Sinnoh!"},
     {"Band der Coolness Master",
-     "Super-Pokémon- Wettbewerb\n Sieger in der Master-Klasse in Sinnoh!"},
+     "Super-PokÃ©mon- Wettbewerb\n Sieger in der Master-Klasse in Sinnoh!"},
 
-    {"Band der Schönheit", "Super-Pokémon- Wettbewerb\n Sieger in der Normal-Klasse in Sinnoh!"},
-    {"Band der Schönheit Mega", "Super-Pokémon- Wettbewerb\n Sieger in der Mega-Klasse in Sinnoh!"},
-    {"Band der Schönheit Ultra",
-     "Super-Pokémon- Wettbewerb\n Sieger in der Ultra-Klasse in Sinnoh!"},
-    {"Band d. Schönh. Master",
-     "Super-Pokémon- Wettbewerb\n Sieger in der Master-Klasse in Sinnoh!"},
+    {"Band der SchÃ¶nheit", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Normal-Klasse in Sinnoh!"},
+    {"Band der SchÃ¶nheit Mega", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Mega-Klasse in Sinnoh!"},
+    {"Band der SchÃ¶nheit Ultra",
+     "Super-PokÃ©mon- Wettbewerb\n Sieger in der Ultra-Klasse in Sinnoh!"},
+    {"Band d. SchÃ¶nh. Master",
+     "Super-PokÃ©mon- Wettbewerb\n Sieger in der Master-Klasse in Sinnoh!"},
 
     // 0x61
-    {"Band der Anmut", "Super-Pokémon- Wettbewerb\n Sieger in der Normal-Klasse in Sinnoh!"},
-    {"Band der Anmut Mega", "Super-Pokémon- Wettbewerb\n Sieger in der Mega-Klasse in Sinnoh!"},
-    {"Band der Anmut Ultra", "Super-Pokémon- Wettbewerb\n Sieger in der Ultra-Klasse in Sinnoh!"},
-    {"Band der Anmut Master", "Super-Pokémon- Wettbewerb\n Sieger in der Master-Klasse in Sinnoh!"},
+    {"Band der Anmut", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Normal-Klasse in Sinnoh!"},
+    {"Band der Anmut Mega", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Mega-Klasse in Sinnoh!"},
+    {"Band der Anmut Ultra", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Ultra-Klasse in Sinnoh!"},
+    {"Band der Anmut Master", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Master-Klasse in Sinnoh!"},
 
-    {"Band der Klugheit", "Super-Pokémon- Wettbewerb\n Sieger in der Normal-Klasse in Sinnoh!"},
-    {"Band der Klugheit Mega", "Super-Pokémon- Wettbewerb\n Sieger in der Mega-Klasse in Sinnoh!"},
+    {"Band der Klugheit", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Normal-Klasse in Sinnoh!"},
+    {"Band der Klugheit Mega", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Mega-Klasse in Sinnoh!"},
     {"Band der Klugheit Ultra",
-     "Super-Pokémon- Wettbewerb\n Sieger in der Ultra-Klasse in Sinnoh!"},
+     "Super-PokÃ©mon- Wettbewerb\n Sieger in der Ultra-Klasse in Sinnoh!"},
     {"Band der Klugh. Master",
-     "Super-Pokémon- Wettbewerb\n Sieger in der Master-Klasse in Sinnoh!"},
+     "Super-PokÃ©mon- Wettbewerb\n Sieger in der Master-Klasse in Sinnoh!"},
 
     // 0x62
-    {"Band der Stärke", "Super-Pokémon- Wettbewerb\n Sieger in der Normal-Klasse in Sinnoh!"},
-    {"Band der Stärke Mega", "Super-Pokémon- Wettbewerb\n Sieger in der Mega-Klasse in Sinnoh!"},
-    {"Band der Stärke Ultra", "Super-Pokémon- Wettbewerb\n Sieger in der Ultra-Klasse in Sinnoh!"},
-    {"Band der Stärke Master",
-     "Super-Pokémon- Wettbewerb\n Sieger in der Master-Klasse in Sinnoh!"},
+    {"Band der StÃ¤rke", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Normal-Klasse in Sinnoh!"},
+    {"Band der StÃ¤rke Mega", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Mega-Klasse in Sinnoh!"},
+    {"Band der StÃ¤rke Ultra", "Super-PokÃ©mon- Wettbewerb\n Sieger in der Ultra-Klasse in Sinnoh!"},
+    {"Band der StÃ¤rke Master",
+     "Super-PokÃ©mon- Wettbewerb\n Sieger in der Master-Klasse in Sinnoh!"},
 
     {"Weltmeister- band", "Band des Siegers eines Kampfturniers."},
     {"Geburtstags- band", "Ein Band um einen Geburtstag zu feiern."},

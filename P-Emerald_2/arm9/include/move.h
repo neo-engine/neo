@@ -1,28 +1,28 @@
 /*
-Pokémon Emerald 2 Version
+PokÃ©mon neo
 ------------------------------
 
 file        : pokemon.h
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2018
+Copyright (C) 2012 - 2020
 Philip Wellnitz
 
-This file is part of Pokémon Emerald 2 Version.
+This file is part of PokÃ©mon neo.
 
-Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+PokÃ©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+PokÃ©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+along with PokÃ©mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #pragma once
@@ -85,7 +85,7 @@ class move {
           type p_moveType, char p_moveAccuracy, char p_movePP, char p_moveEffectAccuracy,
           moveAffectsTypes p_moveAffectsWhom, char p_movePriority, moveFlags p_moveFlags,
           moveHitTypes p_moveHitType,
-          const char*  p_description = "Keine genaueren Informationen verfügbar." )
+          const char*  p_description = "Keine genaueren Informationen verfÃ¼gbar." )
         : m_isFieldAttack( false ), m_moveName( p_moveName ), m_moveEffect( p_moveEffect ),
           m_moveBasePower( p_moveBasePower ), m_moveType( p_moveType ),
           m_moveAccuracy( p_moveAccuracy ), m_movePP( p_movePP ),

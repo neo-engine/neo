@@ -1,35 +1,49 @@
 /*
-Pokémon Emerald 2 Version
+Pok\xe9mon neo
 ------------------------------
 
 file        : strings.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2018
+Copyright (C) 2012 - 2020
 Philip Wellnitz
 
-This file is part of Pokémon Emerald 2 Version.
+This file is part of PokÃ©mon neo.
 
-Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+PokÃ©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+PokÃ©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+along with Pok\xe9mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "defines.h"
 #include "saveGame.h"
 
+// Ã¤ \xe4
+// Ã© \xe9
+// Ã¶ \xf6
+// Ã¼ \xfc
+
+// Ã„ \xc4
+// Ã‰ \xc9
+// Ã– \xd6
+// Ãœ \xdc
+// ÃŸ \xdf
+// { (male)
+// } (female)
+//
+
 const char* const SAVE::CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ] = {
-    {"Prologue", "Prolog"},     {"I Choose You!", "Ich Wähle Dich!"},
+    {"Prologue", "Prolog"},     {"I Choose You!", "Ich W\xe4hle Dich!"},
     {"Chapter 1", "Kapitel 1"}, {"(tba)", "(tba)"},
     {"Chapter 2", "Kapitel 2"}, {"(tba)", "(tba)"},
     {"Chapter 3", "Kapitel 3"}, {"(tba)", "(tba)"},
@@ -41,7 +55,7 @@ const char* const SAVE::CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ] = {
     {"Chapter 8", "Kapitel 8"}, {"(tba)", "(tba)"},
     {"Chapter 9", "Kapitel 9"}, {"(tba)", "(tba)"},
 
-    {"Final", "Letztes"},       {"Pokémon", "Pokémon"},
+    {"Final", "Letztes"},       {"Pok\xe9mon", "Pok\xe9mon"},
     {"Epilogue", "Epilog"},     {"Life Goes On", "Das Leben Geht Weiter"},
 };
 
@@ -54,15 +68,15 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"No data.", "Keine Daten."},
     {"Faraway Place", "Entfernter Ort"},
     {"Unknown", "Unbekannt"},
-    {"%s\nUse %s?", "%s\nMöchtest du %s nutzen?"},
+    {"%s\nUse %s?", "%s\nM\xf6""chtest du %s nutzen?"},
     {"The repel wore off.", "Der Schutz ist aufgebraucht."},
 
-    {"Just an old Poké Ball…", "Doch nur ein alter Pokéball…"},
-    {"You fished a Pokémon!", "Du hast ein Pokémon geangelt!"},
+    {"Just an old Pok\xe9 BallÂ…", "Doch nur ein alter Pok\xe9""ballÂ…"},
+    {"You fished a Pok\xe9mon!", "Du hast ein Pok\xe9mon geangelt!"},
     {"Map border.\nReturn, or you\nwill get lost!",
      "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!"},
     {"\nSomething's on the hook!", "\nDa ist etwas am Haken!"},
-    {"It disappeared…", "Es ist entkommen…"},
+    {"It disappearedÂ…", "Es ist entkommenÂ…"},
 
     // 10
 
@@ -73,7 +87,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Berries", "Beeren"},
 
     {"Key Items", "Basis-Items"},
-    {"Firmness: %s", "Güte: %s"},
+    {"Firmness: %s", "G\xfcte: %s"},
     {"Hard", "Hart"},
     {"Soft", "Weich"},
     {"Super hard", "Steinhart"},
@@ -83,11 +97,11 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Super soft", "Sehr weich"},
     {"Very hard", "Sehr hart"},
     {"Normal", "Normal"},
-    {"Size:%4.1fcm", "Größe:%4.1fcm"},
+    {"Size:%4.1fcm", "Gr\xf6\xdf""e:%4.1fcm"},
     {"Spicy", "Scharf"},
 
     {"Dry", "Trocken"},
-    {"Sweet", "Süß"},
+    {"Sweet", "S\xfc\xdf"},
     {"Bitter", "Bitter"},
     {"Sour", "Sauer"},
     {"Type", "Typ"},
@@ -96,7 +110,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"Categ.", "Kateg."},
     {"PP", "AP"},
-    {"Strength", "Stärke"},
+    {"Strength", "St\xe4rke"},
     {"Accuracy", "Genauigkeit"},
     {"Egg", "Ei"},
 
@@ -108,8 +122,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 40
 
-    {"Possible", "Möglich"},
-    {"Not\npossible", "Nicht\nmöglich"},
+    {"Possible", "M\xf6glich"},
+    {"Not\npossible", "Nicht\nm\xf6glich"},
     {"No item", "Kein Item"},
     {"No items", "Keine Items"},
     {"Give", "Geben"},
@@ -123,30 +137,30 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 50
 
     {"Used %s on %s.", "%s auf %s angewendet."},
-    {"%s is evolving…", "%s entwickelt sich…"},
-    {"…and became a(n)\n%s!", "…und wurde zu einem\n%s!"},
-    {"It would be\nwasted…", "Es würde keine\nWirkung haben…"},
+    {"%s is evolvingÂ…", "%s entwickelt sichÂ…"},
+    {"Â…and became a(n)\n%s!", "Â…und wurde zu einem\n%s!"},
+    {"It would be\nwastedÂ…", "Es w\xfcrde keine\nWirkung habenÂ…"},
     {"%s holds\n%s already.\nSwap the items?",
-     "%s trägt bereits\ndas Item %s.\nSollen die Items getauscht werden?"}, // TODO
+     "%s tr\xe4gt bereits\ndas Item %s.\nSollen die Items getauscht werden?"}, // TODO
 
-    {"You can't choose\nthis item.", "Dieses Item kann nicht\nausgewählt werden."},
-    {"Choose %s?", "%s auswählen?"},
+    {"You can't choose\nthis item.", "Dieses Item kann nicht\nausgew\xe4hlt werden."},
+    {"Choose %s?", "%s ausw\xe4hlen?"},
     {"What do you want to do\nwith %s?", "Was tun mit %s?"},
     {"You can't use\nthat right now.", "Das kann jetzt nicht\neingesetzt werden."},
-    {"Pokémon team", "Pokémon-Team"},
+    {"Pok\xe9mon team", "Pok\xe9mon-Team"},
 
     // 60
 
     {"Cache", "Zwischenablage"},
     {"All boxes", "Alle Boxen"},
-    {"New name for box “%s”", "Name für Box „%s“"},
+    {"New name for box Â“%sÂ”", "Name f\xfcr Box Â„%sÂ“"},
     {"Repel activated.", "Schutz eingesetzt."},
     {"Super Repel activated.", "Superschutz eingesetzt."},
 
     {"Max Repel activated.", "Top-Schutz eingesetzt."},
     {"Exp. All deactivated.", "EP-Teiler ausgeschaltet."},
     {"Exp. All activated.", "EP-Teiler eingeschaltet."},
-    {"Coins: %lu.", "Münzen: %lu."},
+    {"Coins: %lu.", "M\xfcnzen: %lu."},
     {"BP: %lu.", "Kampfpunkte: %lu."},
 
     // 70
@@ -160,10 +174,12 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"Continue your adventure", "Setze dein Abenteuer fort"},
     {"Start a new adventure", "Starte ein neues Abenteuer"},
-    {"Learn your companion's stories", "Erfahre mehr über deine Begleiter"},
+    {"Learn your companion's stories", "Erfahre mehr \xfc"
+        "ber deine Begleiter"},
     {"Revive myths of old", "Setze alte Abenteuer fort"},
     {"This slot contains a saved game.\nOverride it?",
-     "Es existiert bereits ein Spielstand.\nSoll dieser überschrieben werden?"},
+     "Es existiert bereits ein Spielstand.\nSoll dieser \xfc"
+         "berschrieben werden?"},
 
     // 80
 
@@ -173,8 +189,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Transfer", "Transfer"},
     {"Special", "Spezial"},
 
-    {"The language is currently\nset to “English”.\nChange the language setting?",
-     "Die eingestellte Sprache\nist „Deutsch“.\nSprache ändern?"},
+    {"The language is currently\nset to Â“EnglishÂ”.\nChange the language setting?",
+     "Die eingestellte Sprache\nist Â„DeutschÂ“.\nSprache \xe4ndern?"},
     {"into the %s bag.`", "%s-Tasche verstaut.`"},
     {"Stored %s %s", "%s %s in der"},
     {"Stored %s", "%s in der"},
@@ -182,9 +198,9 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 90
 
-    {"The scent vanished…", "Der Duft verstrich wirkungslos…"},
-    {"PokéNav", "PokéNav"},
-    {" Would you like to\n save your progress?\n", " Möchtest du deinen\n Fortschritt sichern?\n"},
+    {"The scent vanishedÂ…", "Der Duft verstrich wirkungslosÂ…"},
+    {"Pok\xe9Nav", "Pok\xe9Nav"},
+    {" Would you like to\n save your progress?\n", " M\xf6""chtest du deinen\n Fortschritt sichern?\n"},
     {"Save?\nFrom an emulator?!", "Speichern?\nIn einem Emulator?!"},
     {"Saved successfully!", "Speichern erfolgreich!"},
 
@@ -208,21 +224,21 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"%s can't\nforget %s!", "%s kann\n%s nicht vergessen!"},
     {"%s can't\nlearn %s!", "%s kann\n%s nicht erlernen!"},
     {"%hhu badges", "%hhu Orden"},
-    {"Pick a language", "Wähle eine Sprache"},
+    {"Pick a language", "W\xe4hle eine Sprache"},
 
     // 110
 
-    {"Choose an episode", "Wähle eine Speizalepisode"},
+    {"Choose an episode", "W\xe4hle eine Speizalepisode"},
     {"Welcome to Special Episode 0:\nDeveloper's Heaven.",
      "Willkommen zur Spezialepisode 0:\nDeveloper's Heaven"},
     {"In this episode, you will gain\nthe mighty powers of the\ndev himself.",
-     "In dieser Episode erhältst du\ndie Fähigkeiten des Entwicklers."},
-    {"Do whatever you want.", "Mach damit, was immer du möchtest."},
+     "In dieser Episode erh\xe4ltst du\ndie F\xe4higkeiten des Entwicklers."},
+    {"Do whatever you want.", "Mach damit, was immer du m\xf6""chtest."},
     {"Do you want to import your\nsave from the GBA game?",
-     "Möchtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?"},
+     "M\xf6""chtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?"},
 
-    {"Importing a save file will\ncopy all Pokémon and items\nfrom the GBA game.",
-     "Beim Importieren werden alle\nPokémon und Items vom\nGBA-Modul kopiert."},
+    {"Importing a save file will\ncopy all Pok\xe9mon and items\nfrom the GBA game.",
+     "Beim Importieren werden alle\nPok\xe9mon und Items vom\nGBA-Modul kopiert."},
     {"Further, you will start at\nthe same position as you\nleft off in the GBA game.",
      "Du wirst das Spiel an der\nselben Stelle wie auf dem\nGBA-Modul fortsetzen."},
     {"No data will be written to\nthe GBA Game Pak.",
@@ -235,10 +251,10 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 120
 
     {"Proceed?", "Fortfahren?"},
-    {"Importing data…", "Lade Spielstand…"},
-    {"An error occured.\nAborting.", "Ein Fehler ist aufgetreten.\nKehre zum Hauptmenü zurück."},
+    {"Importing dataÂ…", "Lade SpielstandÂ…"},
+    {"An error occured.\nAborting.", "Ein Fehler ist aufgetreten.\nKehre zum Hauptmen\xfc zur\xfc""ck."},
     {"Completed.", "Abgeschlossen."},
-    {"Entries", "Einträge"},
+    {"Entries", "Eintr\xe4ge"},
 
     {"All", "Alle"},
     {"HP", "KP"},
@@ -252,7 +268,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Sp. Def", "Sp.-Vert"},
     {"f. %s", "aus %s"},
     {"female", "weiblich"},
-    {"male", "männlich"},
+    {"male", "m\xe4nnlich"},
 
     {"(shining)", "(schillernd)"},
     {"Fainted", "Besiegt"},
@@ -263,8 +279,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 140
 
     {"Go [OWN%d]![A]", "Los [OWN%d]![A]"},
-    {"Do you want to give\na nick name to %s?", "Möchtest du dem %s\neinen Spitznamen geben?"},
-    {"Choose a nick name!", "Wähle einen Spitznamen!"},
+    {"Do you want to give\na nick name to %s?", "M\xf6""chtest du dem %s\neinen Spitznamen geben?"},
+    {"Choose a nick name!", "W\xe4hle einen Spitznamen!"},
     {"You are challenged by\n%s %s![END]", "Eine Herausforderung von\n%s %s![END]"},
     {"Frzn", "Eingfr"},
 
@@ -277,10 +293,10 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 150
 
     {"In Battle", "Bereits im Kampf"},
-    {"Cannot Battle", "Schon besiegt…"},
-    {"To be sent", "Schon ausgewählt"},
+    {"Cannot Battle", "Schon besiegtÂ…"},
+    {"To be sent", "Schon ausgew\xe4hlt"},
     {"Eggs can't", "Ein Ei kann"},
-    {"battle!", "nicht kämpfen!"},
+    {"battle!", "nicht k\xe4mpfen!"},
 
     {"Status", "Bericht"},
     {"Moves", "Attacken"},
@@ -294,10 +310,10 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"SPD", "INI"},
     {"What will %s do?", "Was soll %s tun?"},
     {"You got away safely.[A]", "Du bist entkommen.[A]"},
-    {"You couldn't escape…[A]", "Flucht gescheitert…[A]"},
+    {"You couldn't escapeÂ…[A]", "Flucht gescheitertÂ…[A]"},
 
     {"Choose a target!", "Welches PKMN angreifen?"},
-    {"Choose a Pokémon.", "Welches Pokémon?"},
+    {"Choose a Pok\xe9mon.", "Welches Pok\xe9mon?"},
     {"%s gained %lu EXP.[A]", "%s gewinnt %lu E.-Punkte.[A]"},
     {"%s advanced\nto level %d.[A]", "%s erreicht Level %d.[A]"},
     {"The quick claw enabled\n%s%s to go first![A]",
@@ -307,25 +323,25 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"%s of %s%s applies.[A]", "%s von %s%s wirkt.[A]"},
     {"[TRAINER] ([TCLASS])\nused %s.[A]", "[TRAINER] ([TCLASS]) setzt\n%s ein.[A]"},
-    {"It got wasted…[A]", "Es hat keine Wirkung…[A]"},
+    {"It got wastedÂ…[A]", "Es hat keine WirkungÂ…[A]"},
     {"Used %s.[A]", "%s eingesetzt.[A]"},
-    {"%s's data was\nregistred to the Poké Dex.[A]",
-     "Die Daten von %s\nwurden im PokéDex gespeichert.[A]"},
+    {"%s's data was\nregistred to the Pok\xe9 Dex.[A]",
+     "Die Daten von %s\nwurden im Pok\xe9""Dex gespeichert.[A]"},
 
-    {"%s was sent to\nthe Pokémon Storage System.[A]",
-     "%s wurde an das\nPokémon-Lagerungssystem\ngeschickt.[A]"},
-    {"Box “%s” is full.[A]", "Box „%s“ ist voll.[A]"},
-    {"%s was deposited\nto Box “%s”.[A]", "%s wurde in\nBox „%s“ abgelegt.[A]"},
-    {"There is no space left\nfor additional Pokémon.[A]",
-     "Du hast keinen Platz\nfür weitere Pokémon.[A]"},
+    {"%s was sent to\nthe Pok\xe9mon Storage System.[A]",
+     "%s wurde an das\nPok\xe9mon-Lagerungssystem\ngeschickt.[A]"},
+    {"Box Â“%sÂ” is full.[A]", "Box Â„%sÂ“ ist voll.[A]"},
+    {"%s was deposited\nto Box Â“%sÂ”.[A]", "%s wurde in\nBox Â„%sÂ“ abgelegt.[A]"},
+    {"There is no space left\nfor additional Pok\xe9mon.[A]",
+     "Du hast keinen Platz\nf\xfcr weitere Pok\xe9mon.[A]"},
     {"%s was released.[A]", "%s wurde wieder\nfreigelassen.[A]"},
 
     // 180
 
     {"FIGHT", "Kampf"},
     {"BAG", "Beutel"},
-    {"POKÉMON", "Pokémon"},
+    {"POK\xe9MON", "Pok\xe9mon"},
     {"RUN", "Flucht"},
     {"Pwr", "Stk"},
 
-    {"Meteor Falls", "Meteorfälle"}};
+    {"Meteor Falls", "Meteorf\xe4lle"}};

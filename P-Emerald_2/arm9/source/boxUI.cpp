@@ -1,28 +1,28 @@
 /*
-Pokémon Emerald 2 Version
+PokÃ©mon neo
 ------------------------------
 
 file        : boxUI.cpp
 author      : Philip Wellnitz
 description : Storage sys UI
 
-Copyright (C) 2012 - 2018
+Copyright (C) 2012 - 2020
 Philip Wellnitz
 
-This file is part of Pokémon Emerald 2 Version.
+This file is part of PokÃ©mon neo.
 
-Pokémon Emerald 2 Version is free software: you can redistribute it and/or modify
+PokÃ©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Pokémon Emerald 2 Version is distributed in the hope that it will be useful,
+PokÃ©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Pokémon Emerald 2 Version.  If not, see <http://www.gnu.org/licenses/>.
+along with PokÃ©mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <nds.h>
@@ -152,7 +152,7 @@ namespace BOX {
                 snprintf( buffer, 49, "%2d", cnt );
                 IO::regularFont->printString( buffer, x + 7, y + 5, !p_bottom );
             }
-        snprintf( buffer, 49, "%4d Pokémon", pkmncnt );
+        snprintf( buffer, 49, "%4d PokÃ©mon", pkmncnt );
         if( pkmncnt == 756 )
             IO::regularFont->setColor( RED_IDX, 1 );
         else
