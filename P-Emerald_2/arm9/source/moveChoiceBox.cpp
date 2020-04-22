@@ -51,7 +51,7 @@ namespace IO {
     void moveChoiceBox::draw( u8 p_pressedIdx ) {
         if( p_pressedIdx == NEW_PAGE ) {
             if( _drawSub ) NAV->draw( );
-            IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
+            IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true,  WHITE_IDX );
             regularFont->printString( GET_STRING( 49 ), 8, 8, true );
         }
 

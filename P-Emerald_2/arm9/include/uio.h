@@ -41,6 +41,7 @@ namespace IO {
 
     extern font*        regularFont;
     extern font*        boldFont;
+    extern font*        smallFont;
     extern ConsoleFont* consoleFont;
 
     extern u8 ASpriteOamIndex;
@@ -101,8 +102,11 @@ namespace IO {
 
     void initTextField( );
 
-    void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom = true,
-                         bool p_striped = false, u8 p_color = 42 );
+	
+    void setPixel( u8 p_x, u8 p_y, bool p_bottom, u8 p_color, u8 p_layer = 1 );
+
+    void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom,
+                         u8 p_color, u8 p_layer = 1 );
 
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2,
                     bool p_delay, bool p_big = false ); // HP in %
@@ -115,9 +119,6 @@ namespace IO {
                          bool p_pressed, bool p_bottom = true );
     void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2,
                          u8 p_colorIdx, bool p_pressed, bool p_bottom = true );
-
-    void topScreenPlot( u8 p_x, u8 p_y, color p_color );
-    void btmScreenPlot( u8 p_x, u8 p_y, color p_color );
-
+	
     u16 getColor( type p_type );
 } // namespace IO

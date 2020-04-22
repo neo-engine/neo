@@ -185,6 +185,10 @@ bool pokemon::boxPokemon::isShiny( ) const {
 bool pokemon::boxPokemon::isCloned( ) const {
     return ( ( m_pid >> 16 ) % ( 1 + ( m_pid % ( 1 << 16 ) ) ) ) == ( m_oTSid % ( m_oTId + 1 ) );
 }
+
+/*
+*@ Returns the gender. -1 for female, 0 for genderless, and 1 for male
+*/
 s8 pokemon::boxPokemon::gender( ) const {
     if( m_isGenderless )
         return 0;

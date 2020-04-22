@@ -25,7 +25,9 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "statusScreenUI.h"
+#include <algorithm>
+#include <cstdio>
+
 #include "boxUI.h"
 #include "defines.h"
 #include "fs.h"
@@ -34,10 +36,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "ribbon.h"
 #include "saveGame.h"
 #include "sprite.h"
+#include "statusScreenUI.h"
 #include "uio.h"
-
-#include <algorithm>
-#include <cstdio>
 
 #include "Contest.h"
 #include "PKMN.h"
@@ -55,6 +55,28 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "Forward.h"
 #include "Up.h"
 
+#include "hpbar.h"
+#include "itemicon.h"
+#include "party_blank1.h"
+#include "party_blank2.h"
+#include "party_box1.h"
+#include "party_box2.h"
+#include "party_box_sel1.h"
+#include "party_box_sel2.h"
+#include "party_fnt1.h"
+#include "party_fnt2.h"
+#include "party_fnt_sel1.h"
+#include "party_fnt_sel2.h"
+#include "partybg.h"
+#include "status_brn.h"
+#include "status_fnt.h"
+#include "status_frz.h"
+#include "status_par.h"
+#include "status_psn.h"
+#include "status_shiny.h"
+#include "status_slp.h"
+#include "status_txc.h"
+
 namespace STS {
     u8 borders[ 6 ][ 2 ] = {{4, 2}, {18, 3}, {4, 9}, {18, 10}, {4, 17}, {18, 18}};
 
@@ -62,7 +84,369 @@ namespace STS {
         m_pagemax = p_pageMax;
     }
 
-        // OAMTop indices
+    u16 initPartyTopScreen( bool p_bottom = false ) {
+        if( p_bottom ) {
+            IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_512x512, 5, 0 );
+            bgSetPriority( IO::bg3sub, 3 );
+            dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3sub ), 512 * 512 );
+        } else {
+            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_512x512, 5, 0 );
+            bgSetPriority( IO::bg3, 3 );
+            dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 512 * 512 );
+        }
+        u16* pal = BG_PAL( p_bottom );
+
+        dmaCopy( partybgPal, pal, 3 * 2 );
+        IO::initOAMTable( p_bottom );
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( WHITE_IDX, 1 );
+        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::smallFont->setColor( 0, 0 );
+        IO::smallFont->setColor( WHITE_IDX, 1 );
+        IO::smallFont->setColor( GRAY_IDX, 2 );
+
+        pal[ WHITE_IDX ] = WHITE;
+        pal[ GRAY_IDX ]  = GRAY;
+        pal[ BLACK_IDX ] = BLACK;
+        pal[ BLUE_IDX ]  = RGB( 18, 22, 31 );
+        pal[ RED_IDX ]   = RGB( 31, 18, 18 );
+        pal[ BLUE2_IDX ] = RGB( 0, 0, 25 );
+        pal[ RED2_IDX ]  = RGB( 23, 0, 0 );
+
+        pal[ 240 ] = RGB( 6, 6, 6 );    // hp bar border color
+        pal[ 241 ] = RGB( 12, 30, 12 ); // hp bar green 1
+        pal[ 242 ] = RGB( 3, 23, 4 );   // hp bar green 2
+        pal[ 243 ] = RGB( 30, 30, 12 ); // hp bar yellow 1
+        pal[ 244 ] = RGB( 23, 23, 5 );  // hp bar yellow 2
+        pal[ 245 ] = RGB( 30, 15, 12 ); // hp bar red 1
+        pal[ 246 ] = RGB( 20, 7, 7 );   // hp bar red 2
+
+        u16 tileCnt = 0;
+        // preload sprites to avoid position calculations later
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+
+        // left half
+        for( size_t i = 0; i < 3; i++ ) {
+            u8 pos = 2 * i;
+
+            // background "box"
+            tileCnt
+                = IO::loadSprite( 6 + 2 * pos, 0, tileCnt, 4, 4 + 61 * i, 64, 64, party_blank1Pal,
+                                  party_blank1Tiles, party_blank1TilesLen, false, false, false,
+                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+            tileCnt
+                = IO::loadSprite( 7 + 2 * pos, 0, tileCnt, 68, 4 + 61 * i, 64, 64, party_blank1Pal,
+                                  party_blank2Tiles, party_blank2TilesLen, false, false, false,
+                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+
+            // PKMN icon
+            tileCnt = IO::loadEggIcon( 3, 2 + 61 * i, 30 + pos, 4 + pos, tileCnt, p_bottom );
+            IO::OamTop->oamBuffer[ 30 + pos ].isHidden = true;
+
+            if( i ) {
+                // Item icon
+                IO::loadSprite( 18 + pos, 10, oam[ 18 ].gfxIndex, 3 + 32 - 9, 2 + 32 - 8 + 61 * i,
+                                8, 8, itemiconPal, itemiconTiles, itemiconTilesLen, false, false,
+                                true, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+
+                // HP bar
+                IO::loadSprite( pos, 12, oam[ 0 ].gfxIndex, 120 - 48, 34 + 61 * i, 64, 32, hpbarPal,
+                                hpbarTiles, hpbarTilesLen, false, false, true, OBJPRIORITY_3,
+                                p_bottom, OBJMODE_NORMAL );
+            } else {
+                // Item icon
+                tileCnt = IO::loadSprite( 18 + pos, 10, tileCnt, 3 + 32 - 9, 2 + 32 - 8 + 61 * i, 8,
+                                          8, itemiconPal, itemiconTiles, itemiconTilesLen, false,
+                                          false, true, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+
+                // HP bar
+                tileCnt = IO::loadSprite( pos, 12, tileCnt, 120 - 48, 34 + 61 * i, 64, 32, hpbarPal,
+                                          hpbarTiles, hpbarTilesLen, false, false, true,
+                                          OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
+            }
+
+            // Status icon
+            tileCnt = IO::loadSprite( 24 + pos, 11, tileCnt, 130 - 62 - 22, 33 + 61 * i, 8, 8,
+                                      status_parPal, status_parTiles, status_parTilesLen / 2, false,
+                                      false, true, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+            // Shiny icon
+            tileCnt = IO::loadSprite( 36 + pos, 13, tileCnt, 130 - 62 - 32, 33 + 61 * i, 8, 8,
+                                      status_shinyPal, status_shinyTiles, status_shinyTilesLen,
+                                      false, false, true, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+        }
+
+        // right half
+        for( size_t i = 0; i < 3; i++ ) {
+            u8 pos = 2 * i + 1;
+
+            // background "box"
+            tileCnt
+                = IO::loadSprite( 6 + 2 * pos, 0, tileCnt, 131, 12 + 61 * i, 64, 64,
+                                  party_blank1Pal, party_blank1Tiles, party_blank1TilesLen, false,
+                                  false, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+            tileCnt
+                = IO::loadSprite( 7 + 2 * pos, 0, tileCnt, 195, 12 + 61 * i, 64, 64,
+                                  party_blank1Pal, party_blank2Tiles, party_blank2TilesLen, false,
+                                  false, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+
+            // PKMN icon
+            tileCnt = IO::loadEggIcon( 130, 10 + 61 * i, 30 + pos, 4 + pos, tileCnt, p_bottom );
+            IO::OamTop->oamBuffer[ 30 + pos ].isHidden = true;
+
+            // Item icon
+            IO::loadSprite( 18 + pos, 10, oam[ 18 ].gfxIndex, 130 + 32 - 9, 10 + 32 - 8 + 61 * i, 8,
+                            8, itemiconPal, itemiconTiles, itemiconTilesLen, false, false, true,
+                            OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+
+            // Status icon
+            tileCnt = IO::loadSprite( 24 + pos, 11, tileCnt, 257 - 62 - 22, 41 + 61 * i, 8, 8,
+                                      status_parPal, status_parTiles, status_parTilesLen / 2, false,
+                                      false, true, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+            // Shiny icon
+            tileCnt = IO::loadSprite( 36 + pos, 13, tileCnt, 257 - 62 - 32, 41 + 61 * i, 8, 8,
+                                      status_shinyPal, status_shinyTiles, status_shinyTilesLen,
+                                      false, false, true, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+
+            // HP bar
+            IO::loadSprite( pos, 12, oam[ 0 ].gfxIndex, 247 - 48, 42 + 61 * i, 64, 32, hpbarPal,
+                            hpbarTiles, hpbarTilesLen, false, false, true, OBJPRIORITY_3, p_bottom,
+                            OBJMODE_NORMAL );
+        }
+
+        if( p_bottom ) {
+            REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
+            REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
+        } else {
+            REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
+            REG_BLDALPHA = 0xff | ( 0x06 << 8 );
+        }
+        bgUpdate( );
+        IO::updateOAM( p_bottom );
+        return tileCnt;
+    }
+
+    void drawPartyPkmn( const pokemon* const p_pokemon, u8 p_pos, bool p_selected,
+                        bool p_redraw = true, bool p_bottom = false ) {
+        SpriteEntry* oam      = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        u16          anchor_x = oam[ 6 + 2 * p_pos ].x;
+        u16          anchor_y = oam[ 6 + 2 * p_pos ].y;
+
+        if( p_redraw ) {
+            IO::printRectangle( anchor_x, anchor_y, anchor_x + 124, anchor_y + 61, p_bottom, 0 );
+            oam[ p_pos ].isHidden      = true; // hp bar
+            oam[ 18 + p_pos ].isHidden = true; // item22
+            oam[ 24 + p_pos ].isHidden = true; // status
+            oam[ 30 + p_pos ].isHidden = true; // pkmn
+            oam[ 36 + p_pos ].isHidden = true; // shiny
+        }
+
+        if( p_pokemon == nullptr ) {
+            // No Pkmn -> draw empty box
+            SpriteEntry old = oam[ 6 + 2 * p_pos ];
+            IO::loadSprite( 6 + 2 * p_pos, 0, old.gfxIndex, old.x, old.y, 64, 64, party_blank1Pal,
+                            party_blank1Tiles, party_blank1TilesLen, false, false, false,
+                            OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+            old = oam[ 7 + 2 * p_pos ];
+            IO::loadSprite( 7 + 2 * p_pos, 0, old.gfxIndex, old.x, old.y, 64, 64, party_blank1Pal,
+                            party_blank2Tiles, party_blank2TilesLen, false, false, false,
+                            OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+
+            IO::updateOAM( p_bottom );
+            return;
+        }
+        if( p_pokemon->m_stats.m_acHP ) {
+            // Pkmn is not fainted
+            if( p_selected ) {
+                SpriteEntry old = oam[ 6 + 2 * p_pos ];
+                IO::loadSprite( 6 + 2 * p_pos, 3, old.gfxIndex, old.x, old.y, 64, 64,
+                                party_box_sel1Pal, party_box_sel1Tiles, party_box_sel1TilesLen,
+                                false, false, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+                old = oam[ 7 + 2 * p_pos ];
+                IO::loadSprite( 7 + 2 * p_pos, 3, old.gfxIndex, old.x, old.y, 64, 64,
+                                party_box_sel1Pal, party_box_sel2Tiles, party_box_sel2TilesLen,
+                                false, false, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+            } else {
+                SpriteEntry old = oam[ 6 + 2 * p_pos ];
+                IO::loadSprite( 6 + 2 * p_pos, 1, old.gfxIndex, old.x, old.y, 64, 64, party_box1Pal,
+                                party_box1Tiles, party_box1TilesLen, false, false, false,
+                                OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+                old = oam[ 7 + 2 * p_pos ];
+                IO::loadSprite( 7 + 2 * p_pos, 1, old.gfxIndex, old.x, old.y, 64, 64, party_box1Pal,
+                                party_box2Tiles, party_box2TilesLen, false, false, false,
+                                OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+            }
+        } else {
+            // Pkmn is fainted
+            if( p_selected ) {
+                SpriteEntry old = oam[ 6 + 2 * p_pos ];
+                IO::loadSprite( 6 + 2 * p_pos, 3, old.gfxIndex, old.x, old.y, 64, 64,
+                                party_fnt_sel1Pal, party_fnt_sel1Tiles, party_fnt_sel1TilesLen,
+                                false, false, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+                old = oam[ 7 + 2 * p_pos ];
+                IO::loadSprite( 7 + 2 * p_pos, 3, old.gfxIndex, old.x, old.y, 64, 64,
+                                party_fnt_sel1Pal, party_fnt_sel2Tiles, party_fnt_sel2TilesLen,
+                                false, false, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+            } else {
+                SpriteEntry old = oam[ 6 + 2 * p_pos ];
+                IO::loadSprite( 6 + 2 * p_pos, 2, old.gfxIndex, old.x, old.y, 64, 64, party_fnt1Pal,
+                                party_fnt1Tiles, party_fnt1TilesLen, false, false, false,
+                                OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+                old = oam[ 7 + 2 * p_pos ];
+                IO::loadSprite( 7 + 2 * p_pos, 2, old.gfxIndex, old.x, old.y, 64, 64, party_fnt1Pal,
+                                party_fnt2Tiles, party_fnt2TilesLen, false, false, false,
+                                OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+            }
+        }
+
+        if( p_pokemon->isEgg( ) ) {
+            if( p_redraw ) {
+                // general data
+                IO::regularFont->printString( GET_STRING( 34 ), anchor_x + 30, anchor_y + 12,
+                                              false );
+                IO::loadEggIcon( oam[ 30 + p_pos ].x, oam[ 30 + p_pos ].y, 30 + p_pos, 4 + p_pos,
+                                 oam[ 30 + p_pos ].gfxIndex, p_bottom );
+                bgUpdate( );
+            }
+        } else {
+            if( p_redraw ) {
+                // general data
+                IO::regularFont->printString( p_pokemon->m_boxdata.m_name, anchor_x + 30,
+                                              anchor_y + 12, false );
+
+                if( p_pokemon->m_boxdata.m_isFemale ) {
+                    IO::regularFont->setColor( RED_IDX, 1 );
+                    IO::regularFont->setColor( RED2_IDX, 2 );
+                    IO::regularFont->printString( "}", anchor_x + 109, anchor_y + 12, false );
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( GRAY_IDX, 2 );
+                } else if( !p_pokemon->m_boxdata.m_isGenderless ) {
+                    IO::regularFont->setColor( BLUE_IDX, 1 );
+                    IO::regularFont->setColor( BLUE2_IDX, 2 );
+                    IO::regularFont->printString( "{", anchor_x + 109, anchor_y + 12, false );
+                    IO::regularFont->setColor( WHITE_IDX, 1 );
+                    IO::regularFont->setColor( GRAY_IDX, 2 );
+                }
+
+                // HP
+                u8 barWidth = 45 * p_pokemon->m_stats.m_acHP / p_pokemon->m_stats.m_maxHP;
+                if( p_pokemon->m_stats.m_acHP * 2 >= p_pokemon->m_stats.m_maxHP ) {
+                    IO::smallFont->setColor( 240, 2 );
+                    IO::smallFont->setColor( 241, 1 );
+                    IO::smallFont->setColor( 242, 3 );
+                    IO::printRectangle( anchor_x + 69, anchor_y + 31, anchor_x + 69 + barWidth,
+                                        anchor_y + 32, false, 241 );
+                    IO::printRectangle( anchor_x + 69, anchor_y + 33, anchor_x + 69 + barWidth,
+                                        anchor_y + 33, false, 242 );
+                } else if( p_pokemon->m_stats.m_acHP * 4 >= p_pokemon->m_stats.m_maxHP ) {
+                    IO::smallFont->setColor( 240, 2 );
+                    IO::smallFont->setColor( 243, 1 );
+                    IO::smallFont->setColor( 244, 3 );
+                    IO::printRectangle( anchor_x + 69, anchor_y + 31, anchor_x + 69 + barWidth,
+                                        anchor_y + 32, false, 243 );
+                    IO::printRectangle( anchor_x + 69, anchor_y + 33, anchor_x + 69 + barWidth,
+                                        anchor_y + 33, false, 244 );
+                } else {
+                    IO::smallFont->setColor( 240, 2 );
+                    IO::smallFont->setColor( 245, 1 );
+                    IO::smallFont->setColor( 246, 3 );
+                    if( p_pokemon->m_stats.m_acHP ) {
+                        IO::printRectangle( anchor_x + 69, anchor_y + 31, anchor_x + 69 + barWidth,
+                                            anchor_y + 32, false, 245 );
+                        IO::printRectangle( anchor_x + 69, anchor_y + 33, anchor_x + 69 + barWidth,
+                                            anchor_y + 33, false, 246 );
+                    }
+                }
+
+                IO::smallFont->printString( GET_STRING( 186 ), anchor_x + 116 - 62, anchor_y + 20,
+                                            false ); // HP "icon"
+                IO::smallFont->setColor( WHITE_IDX, 1 );
+                IO::smallFont->setColor( GRAY_IDX, 2 );
+
+                IO::smallFont->printString( "!", anchor_x + 15, anchor_y + 33, false );
+
+                char buffer[ 10 ];
+                snprintf( buffer, 8, "%d", p_pokemon->m_level );
+
+                IO::smallFont->printString( buffer, anchor_x + 24, anchor_y + 32, false );
+
+                snprintf( buffer, 8, "%3d", p_pokemon->m_stats.m_acHP );
+                IO::smallFont->printString( buffer, anchor_x + 116 - 32 - 24, anchor_y + 32,
+                                            false );
+                snprintf( buffer, 8, "/%d", p_pokemon->m_stats.m_maxHP );
+                IO::smallFont->printString( buffer, anchor_x + 116 - 32, anchor_y + 32, false );
+
+                // update sprites
+                oam[ p_pos ].isHidden      = false;
+                oam[ 18 + p_pos ].isHidden = !p_pokemon->m_boxdata.getItem( ); // item
+
+                oam[ 36 + p_pos ].isHidden = !p_pokemon->isShiny( ); // shiny status
+
+                // other status conditions
+                if( !p_pokemon->m_stats.m_acHP ) {
+                    IO::loadSprite( 24 + p_pos, 11, oam[ 24 + p_pos ].gfxIndex, oam[ 24 + p_pos ].x,
+                                    oam[ 24 + p_pos ].y, 8, 8, status_fntPal, status_fntTiles,
+                                    status_fntTilesLen / 2, false, false, false, OBJPRIORITY_0,
+                                    p_bottom, OBJMODE_NORMAL );
+                } else if( p_pokemon->m_status.m_isParalyzed ) {
+                    IO::loadSprite( 24 + p_pos, 11, oam[ 24 + p_pos ].gfxIndex, oam[ 24 + p_pos ].x,
+                                    oam[ 24 + p_pos ].y, 8, 8, status_parPal, status_parTiles,
+                                    status_parTilesLen / 2, false, false, false, OBJPRIORITY_0,
+                                    p_bottom, OBJMODE_NORMAL );
+                } else if( p_pokemon->m_status.m_isAsleep ) {
+                    IO::loadSprite( 24 + p_pos, 11, oam[ 24 + p_pos ].gfxIndex, oam[ 24 + p_pos ].x,
+                                    oam[ 24 + p_pos ].y, 8, 8, status_slpPal, status_slpTiles,
+                                    status_slpTilesLen / 2, false, false, false, OBJPRIORITY_0,
+                                    p_bottom, OBJMODE_NORMAL );
+                } else if( p_pokemon->m_status.m_isBadlyPoisoned ) {
+                    IO::loadSprite( 24 + p_pos, 11, oam[ 24 + p_pos ].gfxIndex, oam[ 24 + p_pos ].x,
+                                    oam[ 24 + p_pos ].y, 8, 8, status_txcPal, status_txcTiles,
+                                    status_txcTilesLen / 2, false, false, false, OBJPRIORITY_0,
+                                    p_bottom, OBJMODE_NORMAL );
+                } else if( p_pokemon->m_status.m_isBurned ) {
+                    IO::loadSprite( 24 + p_pos, 11, oam[ 24 + p_pos ].gfxIndex, oam[ 24 + p_pos ].x,
+                                    oam[ 24 + p_pos ].y, 8, 8, status_brnPal, status_brnTiles,
+                                    status_brnTilesLen / 2, false, false, false, OBJPRIORITY_0,
+                                    p_bottom, OBJMODE_NORMAL );
+                } else if( p_pokemon->m_status.m_isFrozen ) {
+                    IO::loadSprite( 24 + p_pos, 11, oam[ 24 + p_pos ].gfxIndex, oam[ 24 + p_pos ].x,
+                                    oam[ 24 + p_pos ].y, 8, 8, status_frzPal, status_frzTiles,
+                                    status_frzTilesLen / 2, false, false, false, OBJPRIORITY_0,
+                                    p_bottom, OBJMODE_NORMAL );
+                } else if( p_pokemon->m_status.m_isPoisoned ) {
+                    IO::loadSprite( 24 + p_pos, 11, oam[ 24 + p_pos ].gfxIndex, oam[ 24 + p_pos ].x,
+                                    oam[ 24 + p_pos ].y, 8, 8, status_psnPal, status_psnTiles,
+                                    status_psnTilesLen / 2, false, false, false, OBJPRIORITY_0,
+                                    p_bottom, OBJMODE_NORMAL );
+                }
+                IO::updateOAM( p_bottom ); // Shipout fast stuff first
+                bgUpdate( );
+                IO::loadPKMNIcon( p_pokemon->m_boxdata.m_speciesId, oam[ 30 + p_pos ].x,
+                                  oam[ 30 + p_pos ].y, 30 + p_pos, 4 + p_pos,
+                                  oam[ 30 + p_pos ].gfxIndex, p_bottom );
+            }
+        }
+
+        IO::updateOAM( p_bottom );
+    }
+
+    void animatePartyPkmn( u8 p_frame, u8 p_selection, bool p_bottom = false ) {
+        if( ( p_frame & 255 ) == 255 ) {
+            bgScrollf( p_bottom ? IO::bg3sub : IO::bg3, ( -255 ) << 6, ( -255 ) << 6 );
+        }
+        bgScrollf( p_bottom ? IO::bg3sub : IO::bg3, 1 << 6, 1 << 6 );
+
+        if( ( p_frame & 3 ) != 3 ) { return; } // Only do something every fourth frame
+
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        if( ( p_frame & 7 ) != 7 ) {
+            oam[ 30 + p_selection ].y += ( ( p_frame >> 3 ) & 1 ) * 4 - 2;
+        } else {
+            for( u8 i = 0; i < 6; i++ ) { oam[ 30 + i ].y += ( ( p_frame >> 3 ) & 1 ) * 4 - 2; }
+        }
+        IO::updateOAM( p_bottom );
+    }
+
+    // OAMTop indices
 #define ICON_IDX( a ) ( a )
 #define SHINY_IDX 100
 #define PKMN_SPRITE_START 6
@@ -80,12 +464,12 @@ namespace STS {
 #define TYPE_PAL( a ) ( 9 + ( a ) )
 #define DMG_TYPE_PAL( a ) ( 13 + u8( a ) )
 
-        // OamSub indices
-        //#define BACK_ID  0
+    // OamSub indices
+    //#define BACK_ID  0
 #define SUB_PAGE_ICON_IDX( a ) ( 1 + ( a ) )
 #define SUB_BALL_IDX( a ) ( 7 + ( a ) )
-        //#define FWD_ID 13
-        //#define BWD_ID 14
+    //#define FWD_ID 13
+    //#define BWD_ID 14
 
 #define HP_COL 238
     void regStsScreenUI::initSub( ) {
@@ -138,84 +522,17 @@ namespace STS {
     }
 
     void regStsScreenUI::initTop( ) {
-        IO::initOAMTable( false );
-        u16 tileCnt = 0;
-        IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        u16 tileCnt = initPartyTopScreen( false );
 
-        BG_PALETTE[ WHITE_IDX ] = WHITE;
-        BG_PALETTE[ GRAY_IDX ]  = GRAY;
-        BG_PALETTE[ BLACK_IDX ] = BLACK;
-
-        for( size_t i = 0; i < SAVE::SAV->getActiveFile( ).getTeamPkmnCount( ); i++ ) {
-            char buffer[ 100 ];
-            u16  sx, sy;
-            u16  x = 133;
-            if( i % 2 == 0 ) {
-                sx = 20;
-                sy = 24 + 60 * ( i / 2 );
+        for( u8 i = 0; i < 6; i++ ) {
+            if( i < SAVE::SAV->getActiveFile( ).getTeamPkmnCount( ) ) {
+                drawPartyPkmn( &SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ], i, i == _current );
             } else {
-                sx = 220;
-                sy = 36 + 60 * ( i / 2 );
-            }
-#define ADJUST_X( i, x, buffer ) \
-    ( ( ( i ) % 2 ) ? ( x ) : 123 - IO::regularFont->stringWidth( buffer ) )
-
-            if( !SAVE::SAV->getActiveFile( )
-                     .m_pkmnTeam[ i ]
-                     .m_boxdata.m_individualValues.m_isEgg ) {
-                tileCnt = IO::loadPKMNIcon(
-                    SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId, sx - 10,
-                    sy - 10, ICON_IDX( i ), ICON_PAL( i ), tileCnt, false );
-                IO::displayHP( 100, 101, sx - 8, sy - 8, HP_COL + 2 * i, HP_COL + 1 + 2 * i, false,
-                               23, 26 );
-                IO::displayHP(
-                    100,
-                    100
-                        - SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP * 100
-                              / SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP,
-                    sx - 8, sy - 8, HP_COL + 2 * i, HP_COL + 1 + 2 * i, false, 23, 26 );
-
-                IO::regularFont->printString(
-                    SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_name,
-                    ADJUST_X( i, x, SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_name ),
-                    sy - 14, false );
-
-                IO::regularFont->setColor( HP_COL + 2 * i, 2 );
-                if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP )
-                    snprintf( buffer, 99, "%hi/%hi%s",
-                              SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP,
-                              SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP,
-                              GET_STRING( 126 ) );
-                else
-                    snprintf( buffer, 99, GET_STRING( 136 ) );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy, false );
-                IO::regularFont->setColor( GRAY_IDX, 2 );
-
-                snprintf(
-                    buffer, 99, "%s",
-                    ItemList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.getItem( ) ]
-                        ->getDisplayName( true )
-                        .c_str( ) );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy + 14, false );
-
-            } else {
-                snprintf( buffer, 99, GET_STRING( 34 ) );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy - 7, false );
-
-                snprintf(
-                    buffer, 99, "%s",
-                    ItemList[ SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.getItem( ) ]
-                        ->getDisplayName( true )
-                        .c_str( ) );
-                IO::regularFont->printString( buffer, ADJUST_X( i, x, buffer ), sy + 7, false );
-
-                tileCnt = IO::loadEggIcon( sx - 10, sy - 10, ICON_IDX( i ), ICON_PAL( i ), tileCnt,
-                                           false );
+                drawPartyPkmn( nullptr, i, !i );
             }
         }
 
+        /*
         // Preload the page specific sprites
         auto currPkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _current ];
 
@@ -242,22 +559,32 @@ namespace STS {
         for( u8 i = PKMN_SPRITE_START; i < RIBBON_IDX; ++i )
             IO::OamTop->oamBuffer[ i ].isHidden = true;
         IO::updateOAM( false );
+        */
     }
 
     void regStsScreenUI::init( u8 p_current, bool p_initTop ) {
-        _current = p_current;
 
         if( p_initTop ) {
             IO::vramSetup( );
             swiWaitForVBlank( );
+            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
+            bgSetPriority( IO::bg3, 3 );
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNScreen" );
             dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         }
         bgUpdate( );
 
+        _current = p_current;
         IO::NAV->draw( );
         if( p_initTop ) initTop( );
         initSub( );
+    }
+
+    void regStsScreenUI::animate( u8 p_frame, u8 p_page ) {
+		if (p_page == 0) { // party overview
+            animatePartyPkmn( p_frame, this->_current );
+		}
+        bgUpdate( );
     }
 
     void hideSprites( bool p_bottom ) {
@@ -499,26 +826,26 @@ namespace STS {
 
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
-            IO::printRectangle( (u8) 158, (u8) 48, u8( 158 + 68 ), u8( 48 + 12 ), p_bottom, false,
+            IO::printRectangle( (u8) 158, (u8) 48, u8( 158 + 68 ), u8( 48 + 12 ), p_bottom,
                                 (u8) 251 );
 
             IO::printRectangle( (u8) 158, (u8) 48,
                                 u8( 158 + ( 68.0 * currPkmn.m_boxdata.IVget( 0 ) / 31 ) ),
-                                u8( 48 + 6 ), p_bottom, false, 230 );
+                                u8( 48 + 6 ), p_bottom, 230 );
             IO::printRectangle( (u8) 158, u8( 48 + 6 ),
                                 u8( 158 + ( 68.0 * currPkmn.m_boxdata.m_effortValues[ 0 ] / 252 ) ),
-                                u8( 48 + 12 ), p_bottom, false, 230 );
+                                u8( 48 + 12 ), p_bottom, 230 );
 
             for( int i = 1; i < 6; ++i ) {
                 IO::printRectangle( (u8) 158, u8( 50 + ( 17 * i ) ), u8( 158 + 68 ),
-                                    u8( 50 + 12 + ( 17 * i ) ), p_bottom, false, (u8) 251 );
+                                    u8( 50 + 12 + ( 17 * i ) ), p_bottom, (u8) 251 );
                 IO::printRectangle( (u8) 158, u8( 50 + ( 17 * i ) ),
                                     u8( 158 + ( 68.0 * currPkmn.m_boxdata.IVget( i ) / 31 ) ),
-                                    u8( 50 + 6 + ( 17 * i ) ), p_bottom, false, 230 + i );
+                                    u8( 50 + 6 + ( 17 * i ) ), p_bottom, 230 + i );
                 IO::printRectangle(
                     (u8) 158, u8( 50 + 6 + ( 17 * i ) ),
                     u8( 158 + ( 68.0 * currPkmn.m_boxdata.m_effortValues[ i ] / 252 ) ),
-                    u8( 50 + 12 + ( 17 * i ) ), p_bottom, false, 230 + i );
+                    u8( 50 + 12 + ( 17 * i ) ), p_bottom, 230 + i );
             }
         } else {
             if( currPkmn.m_boxdata.m_steps > 10 ) {
@@ -955,11 +1282,15 @@ namespace STS {
     }
 
     std::vector<IO::inputTarget> regStsScreenUI::draw( u8 p_current, bool p_updatePageIcons ) {
-        _current = p_current;
+        drawPartyPkmn( &SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _current ], _current, false,
+                       false );
+        _current  = p_current;
+        auto pkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_current ];
+        drawPartyPkmn( &pkmn, p_current, true, false );
+
         std::vector<IO::inputTarget> res;
         std::vector<std::string>     names;
 
-        auto pkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_current ];
         IO::NAV->draw( );
         BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
         BG_PALETTE_SUB[ GRAY_IDX ]  = GRAY;

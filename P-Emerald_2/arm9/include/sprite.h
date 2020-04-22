@@ -97,12 +97,13 @@ namespace IO {
                     const u16 p_posY, const u8 p_width, const u8 p_height,
                     const unsigned short* p_spritePal, const unsigned int* p_spriteData,
                     const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
-                    ObjPriority p_priority, bool p_bottom );
+                    ObjPriority p_priority, bool p_bottom,
+                    ObjBlendMode p_blendMode = OBJMODE_NORMAL );
     u16 loadSprite( const u8 p_oamIdx, const u8 p_palIdx, const u8 p_palPos, const u16 p_tileIdx,
                     const u16 p_posX, const u16 p_posY, const u8 p_width, const u8 p_height,
                     const unsigned short* p_spritePal, const unsigned int* p_spriteData,
                     const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
-                    ObjPriority p_priority, bool p_bottom );
+                    ObjPriority p_priority, bool p_bottom, ObjBlendMode p_blendMode = OBJMODE_NORMAL );
 
     u16 loadPKMNSprite( const char* p_path, const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
                         u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,

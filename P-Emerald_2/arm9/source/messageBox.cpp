@@ -42,12 +42,12 @@ namespace IO {
     s16 curx = 8, cury = 8;
 
     void messageBox::clear( ) {
-        printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, (u8) 250 );
+        printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true,  (u8) 250 );
         curx = 8;
         cury = 8;
     }
     void messageBox::clearButName( ) {
-        printRectangle( (u8) 72, (u8) 0, (u8) 255, (u8) 63, true, false, (u8) 250 );
+        printRectangle( (u8) 72, (u8) 0, (u8) 255, (u8) 63, true,  (u8) 250 );
         curx = 64 * ( !!m_isNamed ) + 8;
         cury = 8;
     }

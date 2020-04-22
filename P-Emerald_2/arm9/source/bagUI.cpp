@@ -235,8 +235,9 @@ namespace BAG {
                                      196 );
 
             IO::regularFont->printString( GET_STRING( 29 ), 33, 145, false );
-            tileCnt = IO::loadTypeIcon( AttackList[ mv.m_moveIdx ]->m_moveType, 62, 144, 1, 1,
-                                        tileCnt, false, SAVE::SAV->getActiveFile( ).m_options.m_language );
+            tileCnt
+                = IO::loadTypeIcon( AttackList[ mv.m_moveIdx ]->m_moveType, 62, 144, 1, 1, tileCnt,
+                                    false, SAVE::SAV->getActiveFile( ).m_options.m_language );
 
             IO::regularFont->printString( GET_STRING( 30 ), 100, 145, false );
             IO::loadDamageCategoryIcon( AttackList[ mv.m_moveIdx ]->m_moveHitType, 152, 144, 2, 2,
@@ -276,7 +277,7 @@ namespace BAG {
         std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> res;
         for( u8 i = 0; i < 6; ++i ) {
             if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
-            IO::printRectangle( 0, 33 + 26 * i, 128, 33 + 26 * i + 26, true, false, 0 );
+            IO::printRectangle( 0, 33 + 26 * i, 128, 33 + 26 * i + 26, true, 0 );
             IO::regularFont->setColor( WHITE_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
 
@@ -372,7 +373,7 @@ namespace BAG {
 
     void drawItemSub( item* p_item, u16 p_x, u16 p_y, bool p_selected, bool p_pressed,
                       bool p_clearOnly = false ) {
-        IO::printRectangle( p_x, p_y, 255, p_y + 18, true, false, 0 );
+        IO::printRectangle( p_x, p_y, 255, p_y + 18, true, 0 );
         if( p_clearOnly || !p_item ) return;
         if( p_item->m_itemType != item::itemType::GOODS
             && toBagType( p_item->m_itemType ) == bag::bagType::ITEMS ) {

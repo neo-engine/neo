@@ -62,7 +62,10 @@ namespace STS {
         u8 mode        = DEFAULT_MODE;
         u8 modeVal     = 0;
         u8 selectedIdx = 42;
+        u8 frame       = 0;
+
         loop( ) {
+            _stsUI->animate( frame++, mode );
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );

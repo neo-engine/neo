@@ -116,10 +116,10 @@ namespace BATTLE {
         BG_PALETTE[ BLACK_IDX ] = BLACK;
         BG_PALETTE[ RED_IDX ]   = RED;
         BG_PALETTE[ BLUE_IDX ]  = BLUE;
-        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
+        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, WHITE_IDX );
     }
     void battleUI::clearLogScreen( ) {
-        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
+        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, WHITE_IDX );
     }
     void battleUI::setLogTextColor( u16 p_color ) {
         BG_PALETTE_SUB[ COLOR_IDX ] = p_color;
@@ -233,10 +233,10 @@ namespace BATTLE {
         }
     }
     void undrawPkmnInfo1( u8 p_hpx, u8 p_hpy ) {
-        IO::printRectangle( p_hpx - 88, p_hpy + 4, p_hpx - 2, p_hpy + 30, false, false, 0 );
+        IO::printRectangle( p_hpx - 88, p_hpy + 4, p_hpx - 2, p_hpy + 30, false, 0 );
     }
     void undrawPkmnInfo2( u8 p_hpx, u8 p_hpy ) {
-        IO::printRectangle( p_hpx + 32, p_hpy + 4, p_hpx + 118, p_hpy + 30, false, false, 0 );
+        IO::printRectangle( p_hpx + 32, p_hpy + 4, p_hpx + 118, p_hpy + 30, false, 0 );
     }
     void drawPkmnInfo1( u8 p_hpx, u8 p_hpy, pokemon p_pokemon, u8 p_hpCol ) {
         undrawPkmnInfo1( p_hpx, p_hpy );
@@ -702,7 +702,7 @@ namespace BATTLE {
         if( p_pressedIdx == REDRAW ) {
             IO::NAV->draw( );
             initColors( );
-            IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
+            IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, WHITE_IDX );
         }
 
         u16 tilecnt = 0;
@@ -1241,14 +1241,17 @@ namespace BATTLE {
             IO::boldFont->setColor( BLACK_IDX, 2 );
 
             if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
-                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 224, 0, ++oamIndex, ++palIndex, tilecnt,
+                tilecnt
+                    = IO::loadTypeIcon( data.m_types[ 0 ], 224, 0, ++oamIndex, ++palIndex, tilecnt,
                                         true, SAVE::SAV->getActiveFile( ).m_options.m_language );
                 oamIndex++;
                 ++palIndex;
             } else {
-                tilecnt = IO::loadTypeIcon( data.m_types[ 0 ], 192, 0, ++oamIndex, ++palIndex, tilecnt,
+                tilecnt
+                    = IO::loadTypeIcon( data.m_types[ 0 ], 192, 0, ++oamIndex, ++palIndex, tilecnt,
                                         true, SAVE::SAV->getActiveFile( ).m_options.m_language );
-                tilecnt = IO::loadTypeIcon( data.m_types[ 1 ], 224, 0, ++oamIndex, ++palIndex, tilecnt,
+                tilecnt
+                    = IO::loadTypeIcon( data.m_types[ 1 ], 224, 0, ++oamIndex, ++palIndex, tilecnt,
                                         true, SAVE::SAV->getActiveFile( ).m_options.m_language );
             }
 
@@ -1276,13 +1279,10 @@ namespace BATTLE {
                     u8 w = 104, h = 32;
                     u8 x = 144 - 8 * i, y = 18 + ( h + 8 ) * i;
 
-                    IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1, true, false,
-                                        BLACK_IDX );
-                    IO::printRectangle( x, y, x + w, y + h, true, false, 240 + i );
-                    IO::printRectangle( x + 7, y + 5, x + w - 4, y + h - 1, true, false,
-                                        BLACK_IDX );
-                    IO::printRectangle( x + 6, y + 4, x + w - 6, y + h - 2, true, false,
-                                        WHITE_IDX );
+                    IO::printRectangle( x + 1, y + 1, x + w + 2, y + h + 1, true, BLACK_IDX );
+                    IO::printRectangle( x, y, x + w, y + h, true, 240 + i );
+                    IO::printRectangle( x + 7, y + 5, x + w - 4, y + h - 1, true, BLACK_IDX );
+                    IO::printRectangle( x + 6, y + 4, x + w - 6, y + h - 2, true, WHITE_IDX );
 
                     IO::regularFont->printString( acMove->m_moveName.c_str( ), x + 7, y + 7, true );
                     tilecnt = IO::loadTypeIcon( acMove->m_moveType, x - 10, y - 7, ++oamIndex,
@@ -1340,37 +1340,36 @@ namespace BATTLE {
                 IO::boldFont->printString( GET_STRING( 161 ), 118, 109, true );
                 IO::boldFont->printString( buffer, 146 + 70, 109, true );
 
-                IO::printRectangle( (u8) 158, (u8) 18, u8( 158 + 68 ), u8( 18 + 12 ), true, false,
+                IO::printRectangle( (u8) 158, (u8) 18, u8( 158 + 68 ), u8( 18 + 12 ), true,
                                     WHITE_IDX );
 
                 IO::printRectangle( (u8) 158, (u8) 18,
                                     u8( 158 + ( 68.0 * p_pokemon.m_boxdata.IVget( 0 ) / 31 ) ),
-                                    u8( 18 + 6 ), true, false, COLOR_IDX );
+                                    u8( 18 + 6 ), true, COLOR_IDX );
                 IO::printRectangle(
                     (u8) 158, u8( 18 + 6 ),
                     u8( 158 + ( 68.0 * p_pokemon.m_boxdata.m_effortValues[ 0 ] / 252 ) ),
-                    u8( 18 + 12 ), true, false, COLOR_IDX );
+                    u8( 18 + 12 ), true, COLOR_IDX );
 
                 for( int i = 1; i < 6; ++i ) {
                     IO::printRectangle( u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
                                         u8( 156 - 2 * i + 68 ), u8( 26 + 12 + ( 17 * i ) ), true,
-                                        false, WHITE_IDX );
+                                        WHITE_IDX );
                     IO::printRectangle(
                         u8( 156 - 2 * i ), u8( 26 + ( 17 * i ) ),
                         u8( 156 - 2 * i + ( 68.0 * p_pokemon.m_boxdata.IVget( i ) / 31 ) ),
-                        u8( 26 + 6 + ( 17 * i ) ), true, false, COLOR_IDX );
+                        u8( 26 + 6 + ( 17 * i ) ), true, COLOR_IDX );
                     IO::printRectangle(
                         u8( 156 - 2 * i ), u8( 26 + 6 + ( 17 * i ) ),
                         u8( 156 - 2 * i
                             + ( 68.0 * p_pokemon.m_boxdata.m_effortValues[ i ] / 252 ) ),
-                        u8( 26 + 12 + ( 17 * i ) ), true, false, COLOR_IDX );
+                        u8( 26 + 12 + ( 17 * i ) ), true, COLOR_IDX );
                 }
 
                 // Ability
                 auto acAbility = ability( p_pokemon.m_boxdata.m_ability );
 
-                IO::printRectangle( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, false,
-                                    WHITE_IDX );
+                IO::printRectangle( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, WHITE_IDX );
                 IO::regularFont->setColor( WHITE_IDX, 2 );
                 IO::regularFont->setColor( BLACK_IDX, 1 );
                 u8   nlCnt = 0;
@@ -1548,7 +1547,7 @@ namespace BATTLE {
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 IO::NAV->draw( );
                 initColors( );
-                IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
+                IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, WHITE_IDX );
                 return false;
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
                 if( selIdx == 4 || selIdx == 1 )
@@ -1598,7 +1597,7 @@ namespace BATTLE {
                 setDeclareBattleMoveSpriteVisibility( p_showBack );
                 IO::NAV->draw( );
                 initColors( );
-                IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
+                IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, WHITE_IDX );
                 result.m_type = battle::battleMove::ATTACK;
             SHOW_ATTACK:
                 // Check if the PKMN still has AP to use, if not, the move becomes struggle
@@ -1741,14 +1740,14 @@ namespace BATTLE {
     void battleUI::drawAttackTargetChoice( bool p_selected[ 4 ], bool p_neverTarget[ 4 ],
                                            u8 p_pokemonPos ) {
         if( p_selected[ 2 ] && p_selected[ 3 ] )
-            IO::printRectangle( 112 + 1, 130 + 1, 112 + 16 + 2, 146 + 1, true, false, BLACK_IDX );
+            IO::printRectangle( 112 + 1, 130 + 1, 112 + 16 + 2, 146 + 1, true, BLACK_IDX );
         if( p_selected[ 0 ] && p_selected[ 1 ] )
-            IO::printRectangle( 120 + 1, 82 + 1, 120 + 16 + 2, 98 + 1, true, false, BLACK_IDX );
+            IO::printRectangle( 120 + 1, 82 + 1, 120 + 16 + 2, 98 + 1, true, BLACK_IDX );
 
         if( p_selected[ 1 ] && p_selected[ 2 ] )
-            IO::printRectangle( 56 + 1, 106 + 1, 56 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
+            IO::printRectangle( 56 + 1, 106 + 1, 56 + 16 + 2, 122 + 1, true, BLACK_IDX );
         if( p_selected[ 3 ] && p_selected[ 0 ] )
-            IO::printRectangle( 176 + 1, 106 + 1, 176 + 16 + 2, 122 + 1, true, false, BLACK_IDX );
+            IO::printRectangle( 176 + 1, 106 + 1, 176 + 16 + 2, 122 + 1, true, BLACK_IDX );
 
         _battle->_battleMoves[ p_pokemonPos ][ PLAYER ].m_target = 1 | 2 | 4 | 8;
 
@@ -1772,14 +1771,14 @@ namespace BATTLE {
         }
 
         if( p_selected[ 2 ] && p_selected[ 3 ] )
-            IO::printRectangle( 112, 130, 112 + 16, 146, true, false, RED_IDX );
+            IO::printRectangle( 112, 130, 112 + 16, 146, true, RED_IDX );
         if( p_selected[ 0 ] && p_selected[ 1 ] )
-            IO::printRectangle( 120, 82, 120 + 16, 98, true, false, RED_IDX );
+            IO::printRectangle( 120, 82, 120 + 16, 98, true, RED_IDX );
 
         if( p_selected[ 1 ] && p_selected[ 2 ] )
-            IO::printRectangle( 56, 106, 56 + 16, 122, true, false, RED_IDX );
+            IO::printRectangle( 56, 106, 56 + 16, 122, true, RED_IDX );
         if( p_selected[ 3 ] && p_selected[ 0 ] )
-            IO::printRectangle( 176, 106, 176 + 16, 122, true, false, RED_IDX );
+            IO::printRectangle( 176, 106, 176 + 16, 122, true, RED_IDX );
     }
     u8 battleUI::chooseAttackTarget( u8 p_pokemonPos, u16 p_move ) {
         u8 result = 0;
@@ -1875,14 +1874,14 @@ namespace BATTLE {
                 if( touch.px >= x && touch.py >= y && touch.px <= x + w && touch.py <= y + h ) {
 
                     if( selected[ 2 ] && selected[ 3 ] )
-                        IO::printRectangle( 112, 130, 112 + 16, 132, true, false, 0 );
+                        IO::printRectangle( 112, 130, 112 + 16, 132, true, 0 );
                     if( selected[ 0 ] && selected[ 1 ] )
-                        IO::printRectangle( 120, 82, 120 + 16, 84, true, false, 0 );
+                        IO::printRectangle( 120, 82, 120 + 16, 84, true, 0 );
 
                     if( selected[ 1 ] && selected[ 2 ] )
-                        IO::printRectangle( 56, 106, 56 + 2, 122, true, false, 0 );
+                        IO::printRectangle( 56, 106, 56 + 2, 122, true, 0 );
                     if( selected[ 3 ] && selected[ 0 ] )
-                        IO::printRectangle( 176, 106, 176 + 2, 122, true, false, 0 );
+                        IO::printRectangle( 176, 106, 176 + 2, 122, true, 0 );
 
                     for( u8 j = 0; j < 4; ++j ) {
                         if( !selected[ j ] && j != i ) continue;
@@ -1900,17 +1899,15 @@ namespace BATTLE {
                                                       true );
                     }
                     if( selected[ 2 ] && selected[ 3 ] )
-                        IO::printRectangle( 112 + 1, 130 + 1, 112 + 16 + 2, 146 + 1, true, false,
+                        IO::printRectangle( 112 + 1, 130 + 1, 112 + 16 + 2, 146 + 1, true,
                                             RED_IDX );
                     if( selected[ 0 ] && selected[ 1 ] )
-                        IO::printRectangle( 120 + 1, 82 + 1, 120 + 16 + 2, 98 + 1, true, false,
-                                            RED_IDX );
+                        IO::printRectangle( 120 + 1, 82 + 1, 120 + 16 + 2, 98 + 1, true, RED_IDX );
 
                     if( selected[ 1 ] && selected[ 2 ] )
-                        IO::printRectangle( 56 + 2, 106 + 1, 56 + 16 + 2, 122 + 2, true, false,
-                                            RED_IDX );
+                        IO::printRectangle( 56 + 2, 106 + 1, 56 + 16 + 2, 122 + 2, true, RED_IDX );
                     if( selected[ 3 ] && selected[ 0 ] )
-                        IO::printRectangle( 176 + 2, 106 + 1, 176 + 16 + 2, 122 + 2, true, false,
+                        IO::printRectangle( 176 + 2, 106 + 1, 176 + 16 + 2, 122 + 2, true,
                                             RED_IDX );
 
                     loop( ) {
@@ -1979,7 +1976,7 @@ namespace BATTLE {
         IO::updateOAM( true );
         IO::NAV->draw( );
         initColors( );
-        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, false, WHITE_IDX );
+        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 28, true, WHITE_IDX );
 
         writeLogText( GET_STRING( 166 ) );
 

@@ -34,17 +34,23 @@ namespace IO {
     typedef u16 color;
 
     namespace REGULAR_FONT {
-#define NUM_CHARS 490
-        void      shiftchar( u16 &val );
-        extern u8 fontWidths[ NUM_CHARS ];
-        extern u8 fontData[ NUM_CHARS * 256 ];
-    }
+        constexpr auto NUM_CHARS = 490;
+        void           shiftchar( u16 &val );
+        extern u8      fontWidths[ NUM_CHARS ];
+        extern u8      fontData[ NUM_CHARS * 256 ];
+    } // namespace REGULAR_FONT
     namespace BOLD_FONT {
-#define NUM_CHARS 490
-        void      shiftchar( u16 &val );
-        extern u8 fontWidths[ NUM_CHARS ];
-        extern u8 fontData[ NUM_CHARS * 256 ];
-    }
+        constexpr auto NUM_CHARS = 490;
+        void           shiftchar( u16 &val );
+        extern u8      fontWidths[ NUM_CHARS ];
+        extern u8      fontData[ NUM_CHARS * 256 ];
+    } // namespace BOLD_FONT
+    namespace SMALL_FONT {
+        constexpr auto NUM_CHARS = 40;
+        void           shiftchar( u16 &val );
+        extern u8      fontWidths[ NUM_CHARS ];
+        extern u8      fontData[ NUM_CHARS * 256 ];
+    } // namespace SMALL_FONT
 
     class font {
       public:
@@ -62,15 +68,18 @@ namespace IO {
         enum alignment { LEFT, RIGHT, CENTER };
 
         // Methods
-        void printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom );
+        void printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1 );
         void printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                          alignment p_alignment = LEFT, u8 p_yDistance = 16, s8 p_adjustX = 0 );
+                          alignment p_alignment = LEFT, u8 p_yDistance = 16, s8 p_adjustX = 0,
+                          u8 p_layer = 1 );
         void printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                             s16 p_maxX = 256, u16 p_breakChar = L'.' );
-        void printStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom );
+                             s16 p_maxX = 256, u16 p_breakChar = L'.', u8 p_layer = 1 );
+        void printStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom,
+                           u8 p_layer = 1 );
 
-        void printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom );
-        void printMBStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom );
+        void printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1 );
+        void printMBStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom,
+                             u8 p_layer = 1 );
 
         u32 stringWidth( const char *p_string ) const;
 
@@ -80,4 +89,4 @@ namespace IO {
         void ( *_shiftchar )( u16 &val );
         color _color[ 5 ];
     };
-}
+} // namespace IO

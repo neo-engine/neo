@@ -161,7 +161,7 @@ namespace IO {
     void keyboard::clearChar( u8 p_pos ) {
         printRectangle( 8 + p_pos * ( textWidth + margin ), 1 + textHeight + 2 * margin,
                         8 + p_pos * ( textWidth + margin ) + textWidth,
-                        5 + 2 * textHeight + 2 * margin, true, false, GRAY_IDX );
+                        5 + 2 * textHeight + 2 * margin, true,  GRAY_IDX );
         IO::regularFont->printChar( '_', 8 + p_pos * ( textWidth + margin ) + 1,
                                     -9 + 2 * textHeight + 2 * margin, true );
     }

@@ -344,4 +344,6 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"RUN", "Flucht"},
     {"Pwr", "Stk"},
 
-    {"Meteor Falls", "Meteorf\xe4lle"}};
+    {"Meteor Falls", "Meteorf\xe4lle"},
+	{"\xd", "\xe"} // HP icon
+};

@@ -287,7 +287,7 @@ namespace IO {
                     const u16 p_posY, const u8 p_width, const u8 p_height,
                     const unsigned short* p_spritePal, const unsigned int* p_spriteData,
                     const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
-                    ObjPriority p_priority, bool p_bottom ) {
+                    ObjPriority p_priority, bool p_bottom, ObjBlendMode p_blendMode ) {
         IO::SpriteInfo* sInfo = ( p_bottom ? spriteInfo : spriteInfoTop ) + p_oamIdx;
         OAMTable*       oam   = ( p_bottom ? Oam : OamTop );
 
@@ -310,7 +310,7 @@ namespace IO {
 
         spriteEntry->isRotateScale = false;
         spriteEntry->isMosaic      = false;
-        spriteEntry->blendMode     = OBJMODE_NORMAL;
+        spriteEntry->blendMode     = p_blendMode;
         spriteEntry->colorMode     = OBJCOLOR_16;
 
         spriteEntry->shape = ( ( p_width == p_height )
@@ -333,7 +333,7 @@ namespace IO {
                     const u16 p_posX, const u16 p_posY, const u8 p_width, const u8 p_height,
                     const unsigned short* p_spritePal, const unsigned int* p_spriteData,
                     const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
-                    ObjPriority p_priority, bool p_bottom ) {
+                    ObjPriority p_priority, bool p_bottom, ObjBlendMode p_blendMode ) {
         IO::SpriteInfo* sInfo = ( p_bottom ? spriteInfo : spriteInfoTop ) + p_oamIdx;
         OAMTable*       oam   = ( p_bottom ? Oam : OamTop );
 
@@ -356,7 +356,7 @@ namespace IO {
 
         spriteEntry->isRotateScale = false;
         spriteEntry->isMosaic      = false;
-        spriteEntry->blendMode     = OBJMODE_NORMAL;
+        spriteEntry->blendMode     = p_blendMode;
         spriteEntry->colorMode     = OBJCOLOR_256;
 
         spriteEntry->shape = ( ( p_width == p_height )

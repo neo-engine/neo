@@ -40,6 +40,8 @@ namespace IO {
     font *regularFont
         = new font( REGULAR_FONT::fontData, REGULAR_FONT::fontWidths, REGULAR_FONT::shiftchar );
     font *boldFont = new font( BOLD_FONT::fontData, BOLD_FONT::fontWidths, BOLD_FONT::shiftchar );
+    font *smallFont
+        = new font( SMALL_FONT::fontData, SMALL_FONT::fontWidths, SMALL_FONT::shiftchar );
     ConsoleFont *consoleFont = new ConsoleFont( );
 
     u8 ASpriteOamIndex = 0;
@@ -199,22 +201,43 @@ namespace IO {
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
         BG_PALETTE_SUB[ RED_IDX ]   = RED;
         BG_PALETTE_SUB[ BLUE_IDX ]  = BLUE;
-        printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, false, WHITE_IDX );
+        printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, WHITE_IDX );
+    }
+
+    /*
+     * @brief Sets a pixel to the specified color
+     */
+    void setPixel( u8 p_x, u8 p_y, bool p_bottom, u8 p_color, u8 p_layer ) {
+        if( p_bottom ) {
+            color old
+                = ( (color *) BG_BMP_RAM_SUB( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ];
+            u8 bot = old, top = old >> 8;
+            if( p_x & 1 )
+                old = ( ( (u8) p_color ) << 8 ) | bot;
+            else
+                old = ( top << 8 ) | ( (u8) p_color );
+
+            ( (color *) BG_BMP_RAM_SUB( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ] = old;
+        } else {
+            color old
+                = ( (color *) BG_BMP_RAM( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ];
+            u8 bot = old, top = old >> 8;
+            if( p_x & 1 )
+                old = ( ( (u8) p_color ) << 8 ) | bot;
+            else
+                old = ( top << 8 ) | ( (u8) p_color );
+
+            ( (color *) BG_BMP_RAM( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ] = old;
+        }
     }
 
     /*
      * @brief Prints a rectangle to the screen, all coordinates inclusive
      */
-    void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, bool p_striped,
-                         u8 p_color ) {
+    void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, u8 p_color,
+                         u8 p_layer ) {
         for( u16 y = p_y1; y <= p_y2; ++y )
-            for( u16 x = p_x1; x <= p_x2; ++x )
-                if( p_bottom )
-                    ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( x + y * (u16) SCREEN_WIDTH ) / 2 ]
-                        = !p_striped ? ( ( (u8) p_color ) << 8 ) | ( (u8) p_color ) : p_color;
-                else
-                    ( (color *) BG_BMP_RAM( 1 ) )[ ( x + y * (u16) SCREEN_WIDTH ) / 2 ]
-                        = !p_striped ? ( ( (u8) p_color ) << 8 ) | ( (u8) p_color ) : p_color;
+            for( u16 x = p_x1; x <= p_x2; ++x ) { setPixel( x, y, p_bottom, p_color, p_layer ); }
     }
 
     /*
@@ -335,80 +358,46 @@ namespace IO {
     void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2,
                          u8 p_colorIdx, bool p_pressed, bool p_bottom ) {
         if( !p_pressed ) {
-            printRectangle( p_x2 - 2, p_y1 + 1, p_x2, p_y2, p_bottom, false, BLACK_IDX );
-            printRectangle( p_x1 + 1, p_y2 - 1, p_x2, p_y2, p_bottom, false, BLACK_IDX );
+            printRectangle( p_x2 - 2, p_y1 + 1, p_x2, p_y2, p_bottom, BLACK_IDX );
+            printRectangle( p_x1 + 1, p_y2 - 1, p_x2, p_y2, p_bottom, BLACK_IDX );
 
-            printRectangle( p_x1, p_y1, p_x1 + p_borderWidth, p_y2 - 1, p_bottom, false,
+            printRectangle( p_x1, p_y1, p_x1 + p_borderWidth, p_y2 - 1, p_bottom, p_colorIdx );
+            printRectangle( p_x2 - p_borderWidth2 - 2, p_y1, p_x2 - 2, p_y2 - 1, p_bottom,
                             p_colorIdx );
-            printRectangle( p_x2 - p_borderWidth2 - 2, p_y1, p_x2 - 2, p_y2 - 1, p_bottom, false,
-                            p_colorIdx );
-            printRectangle( p_x1, p_y1, p_x2 - 2, p_y1 + p_borderWidth - 2, p_bottom, false,
-                            p_colorIdx );
-            printRectangle( p_x1, p_y2 - p_borderWidth + 3, p_x2 - 2, p_y2 - 1, p_bottom, false,
+            printRectangle( p_x1, p_y1, p_x2 - 2, p_y1 + p_borderWidth - 2, p_bottom, p_colorIdx );
+            printRectangle( p_x1, p_y2 - p_borderWidth + 3, p_x2 - 2, p_y2 - 1, p_bottom,
                             p_colorIdx );
 
             printRectangle( p_x2 - p_borderWidth2 - 1, p_y1 + p_borderWidth - 1,
-                            p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4, p_bottom, false,
-                            BLACK_IDX );
+                            p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4, p_bottom, BLACK_IDX );
             printRectangle( p_x1 + 1 + p_borderWidth, p_y2 - p_borderWidth + 2,
-                            p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4, p_bottom, false,
-                            BLACK_IDX );
+                            p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4, p_bottom, BLACK_IDX );
             printRectangle( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2,
-                            p_x2 - p_borderWidth2 - 2, p_y2 - p_borderWidth + 3, p_bottom, false,
+                            p_x2 - p_borderWidth2 - 2, p_y2 - p_borderWidth + 3, p_bottom,
                             WHITE_IDX );
         } else {
-            printRectangle( p_x1, p_y1, p_x1 + 2, p_y2 - 1, p_bottom, false, 0 );
-            printRectangle( p_x1, p_y1, p_x2 - 1, p_y1 + 1, p_bottom, false, 0 );
+            printRectangle( p_x1, p_y1, p_x1 + 2, p_y2 - 1, p_bottom, 0 );
+            printRectangle( p_x1, p_y1, p_x2 - 1, p_y1 + 1, p_bottom, 0 );
 
-            printRectangle( p_x1 + 2, p_y1 + 1, p_x1 + 2 + p_borderWidth, p_y2, p_bottom, false,
+            printRectangle( p_x1 + 2, p_y1 + 1, p_x1 + 2 + p_borderWidth, p_y2, p_bottom,
                             p_colorIdx );
-            printRectangle( p_x2 - p_borderWidth2, p_y1 + 1, p_x2, p_y2, p_bottom, false,
+            printRectangle( p_x2 - p_borderWidth2, p_y1 + 1, p_x2, p_y2, p_bottom, p_colorIdx );
+            printRectangle( p_x1 + 2, p_y1 + 1, p_x2, p_y1 + p_borderWidth - 1, p_bottom,
                             p_colorIdx );
-            printRectangle( p_x1 + 2, p_y1 + 1, p_x2, p_y1 + p_borderWidth - 1, p_bottom, false,
-                            p_colorIdx );
-            printRectangle( p_x1 + 2, p_y2 - p_borderWidth + 3, p_x2, p_y2, p_bottom, false,
-                            p_colorIdx );
+            printRectangle( p_x1 + 2, p_y2 - p_borderWidth + 3, p_x2, p_y2, p_bottom, p_colorIdx );
 
             printRectangle( p_x2 - p_borderWidth2 + 1, p_y1 + p_borderWidth,
-                            p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4, p_bottom, false,
+                            p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4, p_bottom,
                             BLACK_IDX );
             printRectangle( p_x1 + 3 + p_borderWidth, p_y2 - p_borderWidth + 4,
-                            p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4, p_bottom, false,
+                            p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4, p_bottom,
                             BLACK_IDX );
 
             printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1,
-                            p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 3, p_bottom, false,
-                            WHITE_IDX );
+                            p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 3, p_bottom, WHITE_IDX );
         }
     }
-
-    void topScreenPlot( u8 p_x, u8 p_y, color p_color ) {
-        if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
-            ( (color *) BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
-        else if( ( p_color >> 8 ) != 0 )
-            ( (color *) BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ]
-                = p_color
-                  | ( ( (color *) BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ]
-                      % ( 1 << 8 ) );
-        else if( ( p_color % ( 1 << 8 ) ) != 0 )
-            ( (color *) BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ]
-                = p_color
-                  | ( ( (color *) BG_BMP_RAM( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
-    }
-    void btmScreenPlot( u8 p_x, u8 p_y, color p_color ) {
-        if( ( p_color >> 8 ) != 0 && ( p_color % ( 1 << 8 ) ) != 0 )
-            ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] = p_color;
-        else if( ( p_color >> 8 ) != 0 )
-            ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ]
-                = p_color
-                  | ( ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ]
-                      % ( 1 << 8 ) );
-        else if( ( p_color % ( 1 << 8 ) ) != 0 )
-            ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ]
-                = p_color
-                  | ( ( (color *) BG_BMP_RAM_SUB( 1 ) )[ ( p_x + p_y * SCREEN_WIDTH ) / 2 ] << 8 );
-    }
-
+	
     u16 getColor( type p_type ) {
         switch( p_type ) {
         case NORMAL:

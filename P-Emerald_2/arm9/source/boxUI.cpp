@@ -235,7 +235,7 @@ namespace BOX {
             }
         }
 
-        IO::printRectangle( 0, 140, 255, 192, false, false, WHITE_IDX );
+        IO::printRectangle( 0, 140, 255, 192, false,  WHITE_IDX );
         IO::regularFont->printString( p_showTeam ? GET_STRING( 59 ) : GET_STRING( 60 ), 2, 176,
                                       false );
         for( u8 i = 0; i < 6; ++i ) {

@@ -554,7 +554,7 @@ namespace DEX {
                     getAll( id, p );
                     BG_PALETTE_SUB[ COLOR_IDX ] = IO::getColor( p.m_types[ 0 ] );
                 }
-                IO::printRectangle( 64 + 3, 24 + 32 * i + 2, 64 + 28, 24 + 32 * i + 26, true, false,
+                IO::printRectangle( 64 + 3, 24 + 32 * i + 2, 64 + 28, 24 + 32 * i + 26, true, 
                                     i == p_selectedIdx ? COLOR_IDX : WHITE_IDX );
             }
             break;
@@ -567,7 +567,7 @@ namespace DEX {
                                     IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].y + 2,
                                     IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].x + 29,
                                     IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].y + 25, true,
-                                    false, 0 );
+                                     0 );
 
             if( 12 <= p_selectedIdx && p_selectedIdx < 16 ) {
                 if( IO::Oam->oamBuffer[ BG_SPR_START + 2 * 3 ].x == 88 - 44 ) moveAll( +44 );
@@ -597,7 +597,7 @@ namespace DEX {
                     IO::printRectangle( IO::Oam->oamBuffer[ FRAME_START + i ].x + 3,
                                         IO::Oam->oamBuffer[ FRAME_START + i ].y + 2,
                                         IO::Oam->oamBuffer[ FRAME_START + i ].x + 29,
-                                        IO::Oam->oamBuffer[ FRAME_START + i ].y + 25, true, false,
+                                        IO::Oam->oamBuffer[ FRAME_START + i ].y + 25, true, 
                                         COLOR_IDX );
                 }
             }
