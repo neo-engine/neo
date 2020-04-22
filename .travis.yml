@@ -18,4 +18,12 @@ script:
     - make
 
 notifications:
-      email: false
+    email: false
+
+deploy:
+    provider: releases
+    edge: true
+    file: "P-Emerald_2.nds"
+    draft: true
+    on:
+        tags: true
