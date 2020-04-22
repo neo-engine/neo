@@ -55,4 +55,6 @@ P-Emerald_2/emulator/
 *.evt
 *.opendb
 
+.vs/
+
 tags
