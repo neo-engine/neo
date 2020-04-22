@@ -68,14 +68,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Back.h"
 #include "BagSpr.h"
-#include "Id.h"
-#include "Option.h"
-#include "PokeDex.h"
-#include "PokemonSp.h"
-#include "SPBag.h"
-#include "Save.h"
-#include "poweroff.h"
-#include "poweron.h"
 
 namespace IO {
     nav* NAV = 0;
