@@ -40,6 +40,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "fs.h"
 #include "item.h"
+#include "ailment.h"
 #include "keyboard.h"
 #include "move.h"
 #include "moveChoiceBox.h"

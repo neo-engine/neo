@@ -29,6 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds/ndstypes.h>
 #include "type.h"
+#include "ailment.h"
 
 struct pokemon;
 namespace BATTLE {

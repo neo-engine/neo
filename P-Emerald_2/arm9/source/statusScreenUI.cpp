@@ -431,7 +431,7 @@ namespace STS {
 
     void animatePartyPkmn( u8 p_frame, u8 p_selection, bool p_bottom = false ) {
         if( ( p_frame & 255 ) == 255 ) {
-            bgScrollf( p_bottom ? IO::bg3sub : IO::bg3, ( -255 ) << 6, ( -255 ) << 6 );
+            bgScrollf( p_bottom ? IO::bg3sub : IO::bg3, -( 255 << 6 ), -( 255 << 6 ) );
         }
         bgScrollf( p_bottom ? IO::bg3sub : IO::bg3, 1 << 6, 1 << 6 );
 

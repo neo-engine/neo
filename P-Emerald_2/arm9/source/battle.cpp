@@ -38,6 +38,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battle.h"
 #include "battleTrainer.h"
 
+#include "ailment.h"
 #include "item.h"
 #include "move.h"
 #include "pokemon.h"

@@ -64,8 +64,8 @@ namespace STS {
         void draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) override;
 
         void animate( u8 p_frame, u8 p_page ) override {
-            (void*) p_frame;
-            (void*) p_page;
+            (void) p_frame;
+            (void) p_page;
         }
     };
 

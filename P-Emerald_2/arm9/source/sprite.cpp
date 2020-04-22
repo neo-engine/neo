@@ -34,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "ribbon.h"
 #include "sprite.h"
 #include "uio.h"
+#include "messageBox.h"
 
 #include "Egg.h"
 
@@ -67,49 +68,174 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "plat9a.h"
 #include "plat9b.h"
 
-#include "messageBox.h"
+#include "type_ground_de.h"
+#include "type_ground_en.h"
+#include "type_dragon_de.h"
+#include "type_dragon_en.h"
+#include "type_ice_de.h"
+#include "type_ice_en.h"
+#include "type_electr_de.h"
+#include "type_electr_en.h"
+#include "type_fairy_de.h"
+#include "type_fairy_en.h"
+#include "type_fire_de.h"
+#include "type_fire_en.h"
+#include "type_flying_de.h"
+#include "type_flying_en.h"
+#include "type_ghost_de.h"
+#include "type_ghost_en.h"
+#include "type_rock_de.h"
+#include "type_rock_en.h"
+#include "type_poison_de.h"
+#include "type_poison_en.h"
+#include "type_bug_de.h"
+#include "type_bug_en.h"
+#include "type_fight_de.h"
+#include "type_fight_en.h"
+#include "type_normal_de.h"
+#include "type_normal_en.h"
+#include "type_grass_de.h"
+#include "type_grass_en.h"
+#include "type_psychic_de.h"
+#include "type_psychic_en.h"
+#include "type_steel_de.h"
+#include "type_steel_en.h"
+#include "type_unknown.h"
+#include "type_dark_de.h"
+#include "type_dark_en.h"
+#include "type_water_de.h"
+#include "type_water_en.h"
+
+#include "r0.h"
+#include "r1.h"
+#include "r10.h"
+#include "r11.h"
+#include "r12.h"
+#include "r13.h"
+#include "r14.h"
+#include "r15.h"
+#include "r16.h"
+#include "r17.h"
+#include "r18.h"
+#include "r19.h"
+#include "r2.h"
+#include "r20.h"
+#include "r21.h"
+#include "r22.h"
+#include "r23.h"
+#include "r24.h"
+#include "r25.h"
+#include "r26.h"
+#include "r27.h"
+#include "r28.h"
+#include "r29.h"
+#include "r3.h"
+#include "r30.h"
+#include "r31.h"
+#include "r32.h"
+#include "r33.h"
+#include "r34.h"
+#include "r35.h"
+#include "r36.h"
+#include "r37.h"
+#include "r38.h"
+#include "r39.h"
+#include "r4.h"
+#include "r40.h"
+#include "r41.h"
+#include "r42.h"
+#include "r43.h"
+#include "r44.h"
+#include "r45.h"
+#include "r46.h"
+#include "r47.h"
+#include "r48.h"
+#include "r49.h"
+#include "r5.h"
+#include "r50.h"
+#include "r51.h"
+#include "r52.h"
+#include "r53.h"
+#include "r54.h"
+#include "r55.h"
+#include "r56.h"
+#include "r57.h"
+#include "r58.h"
+#include "r59.h"
+#include "r6.h"
+#include "r60.h"
+#include "r61.h"
+#include "r62.h"
+#include "r63.h"
+#include "r64.h"
+#include "r65.h"
+#include "r66.h"
+#include "r67.h"
+#include "r68.h"
+#include "r69.h"
+#include "r7.h"
+#include "r70.h"
+#include "r71.h"
+#include "r72.h"
+#include "r73.h"
+#include "r74.h"
+#include "r75.h"
+#include "r76.h"
+#include "r77.h"
+#include "r78.h"
+#include "r79.h"
+#include "r8.h"
+#include "r80.h"
+#include "r81.h"
+#include "r82.h"
+#include "r83.h"
+#include "r84.h"
+#include "r85.h"
+#include "r9.h"
+
+
 unsigned int   TEMP[ 12288 ]   = {0};
 unsigned short TEMP_PAL[ 256 ] = {0};
 
 namespace IO {
-    const unsigned int* TypeTiles[ 19 ][ LANGUAGES ] = {{type_normal_enTiles, NormalTiles},
-                                                        {type_fight_enTiles, KampfTiles},
-                                                        {type_flying_enTiles, FlugTiles},
-                                                        {type_poison_enTiles, GiftTiles},
-                                                        {type_ground_enTiles, BodenTiles},
-                                                        {type_rock_enTiles, GestTiles},
-                                                        {type_bug_enTiles, KaeferTiles},
-                                                        {type_ghost_enTiles, GeistTiles},
-                                                        {type_steel_enTiles, StahlTiles},
-                                                        {UnbekTiles, UnbekTiles},
-                                                        {type_water_enTiles, WasserTiles},
-                                                        {type_fire_enTiles, FeuerTiles},
-                                                        {type_grass_enTiles, PflTiles},
-                                                        {type_electr_enTiles, ElekTiles},
-                                                        {type_psychic_enTiles, PsychoTiles},
-                                                        {type_ice_enTiles, EisTiles},
-                                                        {type_dragon_enTiles, DraTiles},
-                                                        {type_dark_enTiles, UnlTiles},
-           {type_fairy_enTiles, FeeTiles}};
-    const unsigned short* TypePals[ 19 ][ LANGUAGES ]  = {{type_normal_enPal, NormalPal},
-                                                         {type_fight_enPal, KampfPal},
-                                                         {type_flying_enPal, FlugPal},
-                                                         {type_poison_enPal, GiftPal},
-                                                         {type_ground_enPal, BodenPal},
-                                                         {type_rock_enPal, GestPal},
-                                                         {type_bug_enPal, KaeferPal},
-                                                         {type_ghost_enPal, GeistPal},
-                                                         {type_steel_enPal, StahlPal},
-                                                         {UnbekPal, UnbekPal},
-                                                         {type_water_enPal, WasserPal},
-                                                         {type_fire_enPal, FeuerPal},
-                                                         {type_grass_enPal, PflPal},
-                                                         {type_electr_enPal, ElekPal},
-                                                         {type_psychic_enPal, PsychoPal},
-                                                         {type_ice_enPal, EisPal},
-                                                         {type_dragon_enPal, DraPal},
-                                                         {type_dark_enPal, UnlPal},
-           {type_fairy_enPal, FeePal}};
+    const unsigned int* TypeTiles[ 19 ][ LANGUAGES ] = {{type_normal_enTiles, type_normal_deTiles},
+                                                        {type_fight_enTiles, type_fight_deTiles},
+                                                        {type_flying_enTiles, type_flying_deTiles},
+                                                        {type_poison_enTiles, type_poison_deTiles},
+                                                        {type_ground_enTiles, type_ground_deTiles},
+                                                        {type_rock_enTiles, type_rock_deTiles},
+                                                        {type_bug_enTiles, type_bug_deTiles},
+                                                        {type_ghost_enTiles, type_ghost_deTiles},
+                                                        {type_steel_enTiles, type_steel_deTiles},
+                                                        {type_unknownTiles, type_unknownTiles},
+                                                        {type_water_enTiles, type_water_deTiles},
+                                                        {type_fire_enTiles, type_fire_deTiles},
+                                                        {type_grass_enTiles, type_grass_deTiles},
+                                                        {type_electr_enTiles, type_electr_deTiles},
+                                                        {type_psychic_enTiles, type_psychic_deTiles},
+                                                        {type_ice_enTiles, type_ice_deTiles},
+                                                        {type_dragon_enTiles, type_dragon_deTiles},
+                                                        {type_dark_enTiles, type_dark_deTiles},
+           {type_fairy_enTiles, type_fairy_deTiles}};
+    const unsigned short* TypePals[ 19 ][ LANGUAGES ]  = {{type_normal_enPal, type_normal_dePal},
+                                                         {type_fight_enPal, type_fight_dePal},
+                                                         {type_flying_enPal, type_flying_dePal},
+                                                         {type_poison_enPal, type_poison_dePal},
+                                                         {type_ground_enPal, type_ground_dePal},
+                                                         {type_rock_enPal, type_rock_dePal},
+                                                         {type_bug_enPal, type_bug_dePal},
+                                                         {type_ghost_enPal, type_ghost_dePal},
+                                                         {type_steel_enPal, type_steel_dePal},
+                                                         {type_unknownPal, type_unknownPal},
+                                                         {type_water_enPal, type_water_dePal},
+                                                         {type_fire_enPal, type_fire_dePal},
+                                                         {type_grass_enPal, type_grass_dePal},
+                                                         {type_electr_enPal, type_electr_dePal},
+                                                         {type_psychic_enPal, type_psychic_dePal},
+                                                         {type_ice_enPal, type_ice_dePal},
+                                                         {type_dragon_enPal, type_dragon_dePal},
+                                                         {type_dark_enPal, type_dark_dePal},
+           {type_fairy_enPal, type_fairy_dePal}};
     const unsigned int* RibbonTiles[ MAX_RIBBONS ]
         = {r0Tiles,  r1Tiles,  r2Tiles,  r3Tiles,  r4Tiles,  r5Tiles,  r6Tiles,  r7Tiles,
            r8Tiles,  r9Tiles,  r10Tiles, r11Tiles, r12Tiles, r13Tiles, r14Tiles, r15Tiles,
