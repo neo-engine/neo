@@ -46,6 +46,8 @@ P-Emerald_2/arm9/build/
 
 P-Emerald_2/emulator/
 
+*.nds
+
 *.FNT
 *.arm7
 *.arm9
