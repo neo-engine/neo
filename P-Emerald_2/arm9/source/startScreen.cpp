@@ -74,13 +74,13 @@ namespace SAVE {
         printf( "@ Philip Wellnitz 2012 - 2020\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
 
         if( gMod == DEVELOPER )
-            printf( "                   %10sdev\n", VERSION );
+            printf( "     %24sdev\n", VERSION );
         else if( gMod == BETA )
-            printf( "                  %10sbeta\n", VERSION );
+            printf( "    %24sbeta\n", VERSION );
         else if( gMod == ALPHA )
-            printf( "                 %10salpha\n", VERSION );
+            printf( "   %24salpha\n", VERSION );
         else if( gMod == EMULATOR )
-            printf( "                   %10semu\n", VERSION );
+            printf( "     %24semu\n", VERSION );
         printf( "%32s", VERSION_NAME );
 
         consoleSetWindow( &IO::Top, 0, 23, 32, 1 );

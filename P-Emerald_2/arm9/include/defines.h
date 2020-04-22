@@ -34,7 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 //#define USE_AS_LIB
 #undef _EMULATOR
-#define VERSION "0.8"
+#define VERSION ("0.8-" __DATE__ " " __TIME__)
 #define VERSION_NAME "Magnetizing Magnemite neo"
 #define DEBUG
 
