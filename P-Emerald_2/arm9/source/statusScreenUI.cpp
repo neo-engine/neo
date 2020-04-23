@@ -84,7 +84,12 @@ namespace STS {
         m_pagemax = p_pageMax;
     }
 
+    constexpr u16 partyTopScreenPkmnIconPosY( u8 p_pos ) {
+        return ( p_pos & 1 ) * 8 + 2 + 61 * ( p_pos >> 1 );
+    }
+
     u16 initPartyTopScreen( bool p_bottom = false ) {
+        IO::vramSetup( );
         if( p_bottom ) {
             IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_512x512, 5, 0 );
             bgSetPriority( IO::bg3sub, 3 );
@@ -429,19 +434,25 @@ namespace STS {
         IO::updateOAM( p_bottom );
     }
 
-    void animatePartyPkmn( u8 p_frame, u8 p_selection, bool p_bottom = false ) {
+    void animateBG( u8 p_frame, bool p_bottom ) {
         if( ( p_frame & 255 ) == 255 ) {
             bgScrollf( p_bottom ? IO::bg3sub : IO::bg3, -( 255 << 6 ), -( 255 << 6 ) );
         }
         bgScrollf( p_bottom ? IO::bg3sub : IO::bg3, 1 << 6, 1 << 6 );
+    }
 
+    void animatePartyPkmn( u8 p_frame, u8 p_selection, bool p_bottom = false ) {
         if( ( p_frame & 3 ) != 3 ) { return; } // Only do something every fourth frame
 
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         if( ( p_frame & 7 ) != 7 ) {
-            oam[ 30 + p_selection ].y += ( ( p_frame >> 3 ) & 1 ) * 4 - 2;
+            oam[ 30 + p_selection ].y =
+                partyTopScreenPkmnIconPosY( p_selection ) + ( ( p_frame >> 3 ) & 1 ) * 4 - 2;
         } else {
-            for( u8 i = 0; i < 6; i++ ) { oam[ 30 + i ].y += ( ( p_frame >> 3 ) & 1 ) * 4 - 2; }
+            for( u8 i = 0; i < 6; i++ ) {
+                oam[ 30 + i ].y =
+                    partyTopScreenPkmnIconPosY( i ) + ( ( p_frame >> 3 ) & 1 ) * 4 - 2;
+            }
         }
         IO::updateOAM( p_bottom );
     }
@@ -506,9 +517,9 @@ namespace STS {
                 nextAvailableTileIdx = IO::loadEggIcon( 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ),
                                                         SUB_BALL_IDX( i ), nextAvailableTileIdx );
             else
-                nextAvailableTileIdx = IO::loadItemIcon(
-                    !pkmn.m_ball ? "Pokeball" : ItemList[ pkmn.m_ball ]->m_itemName, 4 - 2 * i,
-                    28 + 24 * i, SUB_BALL_IDX( i ), SUB_BALL_IDX( i ), nextAvailableTileIdx, true );
+                nextAvailableTileIdx = IO::loadPKMNIcon( 0, 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ),
+                                                        SUB_BALL_IDX( i ), nextAvailableTileIdx );
+            IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].isHidden = true;
         }
 
         nextAvailableTileIdx = IO::loadSprite(
@@ -531,49 +542,9 @@ namespace STS {
                 drawPartyPkmn( nullptr, i, !i );
             }
         }
-
-        /*
-        // Preload the page specific sprites
-        auto currPkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _current ];
-
-        IO::OamTop->oamBuffer[ PKMN_SPRITE_START ].gfxIndex = tileCnt;
-        tileCnt += 144;
-
-        tileCnt
-            = IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, tileCnt, 0, -5, 32, 32, memoPal,
-                              memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, false );
-        tileCnt = IO::loadItemIcon( ItemList[ currPkmn.m_boxdata.getItem( ) ]->m_itemName, 2, 152,
-                                    ITEM_ICON_IDX, ITEM_ICON_PAL, tileCnt, false );
-
-        for( u8 i = 0; i < 4; ++i ) {
-            type t  = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
-            tileCnt = IO::loadTypeIcon( t, 126, 43 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ), tileCnt,
-                                        false, SAVE::SAV->getActiveFile( ).m_options.m_language );
-        }
-        for( u8 i = 0; i < 4; ++i ) {
-            tileCnt = IO::loadDamageCategoryIcon( ( move::moveHitTypes )( i % 3 ), 126, 43 + 32 * i,
-                                                  ATK_DMGTYPE_IDX( i ), DMG_TYPE_PAL( i % 3 ),
-                                                  tileCnt, false );
-        }
-
-        for( u8 i = PKMN_SPRITE_START; i < RIBBON_IDX; ++i )
-            IO::OamTop->oamBuffer[ i ].isHidden = true;
-        IO::updateOAM( false );
-        */
     }
 
     void regStsScreenUI::init( u8 p_current, bool p_initTop ) {
-
-        if( p_initTop ) {
-            IO::vramSetup( );
-            swiWaitForVBlank( );
-            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
-            bgSetPriority( IO::bg3, 3 );
-            FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNScreen" );
-            dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-        }
-        bgUpdate( );
-
         _current = p_current;
         IO::NAV->draw( );
         if( p_initTop ) initTop( );
@@ -581,9 +552,10 @@ namespace STS {
     }
 
     void regStsScreenUI::animate( u8 p_frame, u8 p_page ) {
-		if (p_page == 0) { // party overview
+		if (p_page == 0) {// party overview
             animatePartyPkmn( p_frame, this->_current );
 		}
+        animateBG( p_frame, false );
         bgUpdate( );
     }
 
@@ -1224,7 +1196,7 @@ namespace STS {
         hideSprites( false );
 
         IO::setDefaultConsoleTextColors( BG_PALETTE, 230 );
-        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 420 );
+        // FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PKMNInfoScreen", 420 );
         IO::updateOAM( false );
 
         IO::regularFont->setColor( 0, 0 );
@@ -1308,14 +1280,10 @@ namespace STS {
             if( p.m_individualValues.m_isEgg )
                 IO::loadEggIcon( 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ), SUB_BALL_IDX( i ),
                                  IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex );
-            else if( i == p_current )
+            else if( i < SAVE::SAV->getActiveFile( ).getTeamPkmnCount( ) )
                 IO::loadPKMNIcon( p.m_speciesId, 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ),
                                   SUB_BALL_IDX( i ),
                                   IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex );
-            else if( i < SAVE::SAV->getActiveFile( ).getTeamPkmnCount( ) )
-                IO::loadItemIcon( !p.m_ball ? "Pokeball" : ItemList[ p.m_ball ]->m_itemName,
-                                  4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ), SUB_BALL_IDX( i ),
-                                  IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex, true );
             else
                 IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].isHidden = true;
         }
@@ -1323,6 +1291,7 @@ namespace STS {
         IO::updateOAM( true );
         if( pkmn.m_boxdata.m_individualValues.m_isEgg ) return res;
 
+        /*
         for( u8 i = 0; i < 4; ++i )
             if( pkmn.m_boxdata.m_moves[ i ] < MAX_ATTACK
                 && AttackList[ pkmn.m_boxdata.m_moves[ i ] ]->m_isFieldAttack )
@@ -1344,6 +1313,7 @@ namespace STS {
                                           cur.m_targetY1 + 8, true, IO::font::CENTER );
             res.push_back( cur );
         }
+        */
         return res;
     }
 
