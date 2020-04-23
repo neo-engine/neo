@@ -39,6 +39,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace FS {
 #define MAXITEMSPERPAGE 12
+    const u16 ITEMS_PER_DIR = 30;
 
     std::string readString( FILE*, bool p_new = false );
 
@@ -49,6 +50,8 @@ namespace FS {
                  const char* p_mode = "rb" );
     FILE*  open( const char* p_path, u16 p_value, const char* p_ext = ".raw",
                  const char* p_mode = "rb" );
+    FILE*  openSplit( const char* p_path, u16 p_value, const char* p_ext = ".raw",
+                      u16 p_maxValue = 99 * ITEMS_PER_DIR, const char* p_mode = "rb" );
     void   close( FILE* p_file );
     size_t read( FILE* p_stream, void* p_buffer, size_t p_size, size_t p_count );
     size_t write( FILE* p_stream, const void* p_buffer, size_t p_size, size_t p_count );

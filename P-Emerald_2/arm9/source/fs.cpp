@@ -50,7 +50,7 @@ const char ABILITYDATA_PATH[] = "nitro:/PKMNDATA/ABILITIES/";
 const char SCRIPT_PATH[]      = "nitro:/MAPS/SCRIPTS/";
 
 ability::ability( int p_abilityId ) {
-    FILE* f = FS::open( ABILITYDATA_PATH, p_abilityId, ".data" );
+    FILE* f = FS::openSplit( ABILITYDATA_PATH, p_abilityId, ".data" );
 
     if( !f ) return;
 
@@ -63,7 +63,7 @@ ability::ability( int p_abilityId ) {
 }
 
 std::string getAbilityName( int p_abilityId ) {
-    FILE* f = FS::open( ABILITYDATA_PATH, p_abilityId, ".data" );
+    FILE* f = FS::openSplit( ABILITYDATA_PATH, p_abilityId, ".data" );
 
     if( !f ) return "---";
     auto ret = FS::readString( f, false );
@@ -113,6 +113,25 @@ namespace FS {
         delete[] buffer;
         return res;
     }
+    FILE* openSplit( const char* p_path, u16 p_value, const char* p_ext,
+            u16 p_maxValue, const char* p_mode ) {
+        char* buffer = new char[ 100 ];
+        if( p_maxValue < 10 * ITEMS_PER_DIR ) {
+            snprintf( buffer, 99, "%s%d/%d%s", p_path, p_value / ITEMS_PER_DIR,
+                      p_value, p_ext );
+        } else if( p_maxValue < 100 * ITEMS_PER_DIR ) {
+            snprintf( buffer, 99, "%s%02d/%d%s", p_path, p_value / ITEMS_PER_DIR,
+                      p_value, p_ext );
+        } else {
+            snprintf( buffer, 99, "%s%03d/%d%s", p_path, p_value / ITEMS_PER_DIR,
+                      p_value, p_ext );
+        }
+
+        auto res = fopen( buffer, p_mode );
+        delete[] buffer;
+        return res;
+    }
+
     void close( FILE* p_file ) {
         fclose( p_file );
     }
@@ -401,7 +420,7 @@ namespace FS {
 
     std::string getLocation( u16 p_ind ) {
         if( p_ind > 5000 ) return FARAWAY_PLACE;
-        FILE* f = FS::open( "nitro:/LOCATIONS/", p_ind, ".data" );
+        FILE* f = FS::openSplit( "nitro:/LOCATIONS/", p_ind, ".data", 5000 );
 
         if( !f ) {
             if( p_ind > 322 && p_ind < 1000 ) return getLocation( 3002 );
@@ -456,12 +475,12 @@ void getDisplayName( u16 p_pkmnId, char* p_name, u8 p_forme ) {
 bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
     FILE* f;
     if( p_forme ) {
-        char buffer[ 10 ];
-        snprintf( buffer, 9, "%hu-%hhu", p_pkmnId, p_forme );
+        char buffer[ 15 ];
+        snprintf( buffer, 13, "%02hu/%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId, p_forme );
         f = FS::open( PKMNDATA_PATH, buffer, ".data" );
     }
 
-    if( !p_forme || !f ) f = FS::open( PKMNDATA_PATH, p_pkmnId, ".data" );
+    if( !p_forme || !f ) f = FS::openSplit( PKMNDATA_PATH, p_pkmnId, ".data" );
     if( !f ) return false;
 
     FS::read( f, &p_out, sizeof( pokemonData ), 1 );
@@ -471,7 +490,7 @@ bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
 
 void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount,
                     u16* p_result ) {
-    FILE* f = FS::open( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId,
+    FILE* f = FS::openSplit( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId,
                         ".learnset.data" );
     if( !f ) return;
 
@@ -525,7 +544,7 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
     delete[] buffer;
 }
 bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
-    FILE* f = FS::open( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId,
+    FILE* f = FS::openSplit( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId,
                         ".learnset.data" );
     if( !f ) return false;
 
