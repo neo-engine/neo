@@ -447,7 +447,7 @@ namespace IO {
                             sizeof( SAVE::SAV->getActiveFile( ).m_pkmnTeam ) );
                     for( int i = 0; i < 5; ++i ) {
                         pokemon&         a   = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
-                        std::vector<u16> tmp = {649, 493, 646, 201, u16( 1 + rand( ) % MAX_PKMN )};
+                        std::vector<u16> tmp = { 716, 493, 721, 804, u16( 1 + rand( ) % MAX_PKMN )};
                         a                    = pokemon( tmp[ i ], 50 );
                         a.m_stats.m_acHP *= i / 5.0;
                         a.m_boxdata.m_experienceGained += 750;

@@ -110,6 +110,11 @@ namespace IO {
                         bool p_shiny = false, bool p_female = false, bool p_flipX = false,
                         bool p_topOnly = false, u8 p_forme = 0 );
 
+    u16 loadPKMNSprite( const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
+                        u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
+                        bool p_shiny = false, bool p_female = false, bool p_flipX = false,
+                        bool p_topOnly = false, u8 p_forme = 0 );
+
     u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
                        u16 p_tileCnt, bool p_bottom = false );
 
@@ -117,10 +122,19 @@ namespace IO {
                            const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
                            bool p_bottom, bool p_flipX = false, bool p_topOnly = false );
 
-    u16  loadOWSprite( const char* p_path, const u16 p_picnum, const s16 p_posX, const s16 p_posY,
+    u16 loadTrainerSprite( const char* p_name, const u16 p_posX,
+                           const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
+                           bool p_bottom, bool p_flipX = false, bool p_topOnly = false );
+
+
+    u16 loadAnimatedSprite( FILE* p_file, const s16 p_posX,
+                             const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
+                             ObjPriority p_priority = OBJPRIORITY_2, bool p_bottom = false );
+    u16 loadOWSprite( const u16 p_picnum, const s16 p_posX, const s16 p_posY,
                        u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt );
+
     void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt );
-    void setOWSpriteFrame( u8 p_memPos, bool p_hFlip, u8 p_oamIndex, u16 p_tileCnt );
+    void setAnimatedSpriteFrame( u8 p_frame, bool p_hFlip, u8 p_oamIndex, u16 p_tileCnt );
 
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
                   u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
@@ -134,7 +148,8 @@ namespace IO {
                     u8 p_palCnt, u16 p_tileCnt, bool p_bottom = true );
 
     u16 loadPKMNIcon( const u16 p_pkmnNo, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
-                      u8 p_palcnt, u16 p_tileCnt, bool p_bottom = true, u8 p_forme = 0 );
+                      u8 p_palcnt, u16 p_tileCnt, bool p_bottom = true, u8 p_forme = 0,
+                      bool p_shiny = false, bool p_female = false );
     u16 loadPKMNIcon( const u16 p_pkmnNo, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                       u8 p_palcnt, u8 p_palPos, u16 p_tileCnt, bool p_bottom = true,
                       u8 p_forme = 0 );

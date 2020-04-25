@@ -36,7 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #undef RAND_MAX
 #define RAND_MAX 4294967295
 
-#define MAX_PKMN 721
+#define MAX_PKMN 807
 
 extern std::string NatureList[ 25 ];
 extern std::string TypeList[ 19 ];
