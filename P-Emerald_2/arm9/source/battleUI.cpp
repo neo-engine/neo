@@ -545,12 +545,12 @@ namespace BATTLE {
                     PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, WILD_BATTLE_SPRITE_X_START,
                     WILD_BATTLE_SPRITE_Y, PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ),
                     PKMN_TILE_IDX( 0, OPPONENT ), false, acPkmn.m_boxdata.isShiny( ),
-                    acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    acPkmn.m_boxdata.m_isFemale, false, false, acPkmn.getForme( ) ) ) {
                 if( !IO::loadPKMNSprite(
                         PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, WILD_BATTLE_SPRITE_X_START,
                         WILD_BATTLE_SPRITE_Y, PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ),
                         PKMN_TILE_IDX( 0, OPPONENT ), false, acPkmn.m_boxdata.isShiny( ),
-                        !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                        !acPkmn.m_boxdata.m_isFemale, false, false, acPkmn.getForme( ) ) ) {
                     _battle->log( SPRITE_FAILED );
                 }
             }
@@ -598,12 +598,12 @@ namespace BATTLE {
                     PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, WILD_BATTLE_SPRITE_X,
                     WILD_BATTLE_SPRITE_Y, PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ),
                     PKMN_TILE_IDX( 0, OPPONENT ), false, acPkmn.m_boxdata.isShiny( ),
-                    acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    acPkmn.m_boxdata.m_isFemale, false, false, acPkmn.getForme( ) ) ) {
                 if( !IO::loadPKMNSprite(
                         PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, WILD_BATTLE_SPRITE_X,
                         WILD_BATTLE_SPRITE_Y, PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ),
                         PKMN_TILE_IDX( 0, OPPONENT ), false, acPkmn.m_boxdata.isShiny( ),
-                        !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                        !acPkmn.m_boxdata.m_isFemale, false, false, acPkmn.getForme( ) ) ) {
                     _battle->log( SPRITE_FAILED );
                 }
             }
@@ -679,8 +679,7 @@ namespace BATTLE {
             setStsBallVisibility( OPPONENT, 0, false, false );
             IO::updateOAM( false );
 
-            pokemonData p;
-            getAll( acPkmn.m_boxdata.m_speciesId, p );
+            pkmnData p = getPkmnData( acPkmn.m_boxdata.m_speciesId, acPkmn.getForme( ) );
 
             drawPkmnInfo1( hpx, hpy, acPkmn, HP_COL( OPPONENT, 0 ) );
 
@@ -692,10 +691,10 @@ namespace BATTLE {
             IO::displayEP( 100, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
             IO::displayEP(
                 0,
-                ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] )
+                ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.getExpType( ) ] )
                     * 100
-                    / ( EXP[ acPkmn.m_level ][ p.m_expType ]
-                        - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
+                    / ( EXP[ acPkmn.m_level ][ p.getExpType( ) ]
+                        - EXP[ acPkmn.m_level - 1 ][ p.getExpType( ) ] ),
                 hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
         }
     }
@@ -717,14 +716,18 @@ namespace BATTLE {
         u8 palIndex = 2;
 
         tilecnt = IO::loadPKMNIcon( CUR_PKMN_2( *_battle, 0, PLAYER ).m_boxdata.m_speciesId, 78,
-                                    102, oamIndex++, palIndex++, tilecnt, true );
+                                    102, oamIndex++, palIndex++, tilecnt, true,
+                                    CUR_PKMN_2( *_battle, 0, PLAYER ).getForme( ) );
         tilecnt = IO::loadPKMNIcon( CUR_PKMN_2( *_battle, 0, OPPONENT ).m_boxdata.m_speciesId, 148,
-                                    70, oamIndex++, palIndex++, tilecnt, true );
+                                    70, oamIndex++, palIndex++, tilecnt, true,
+                                    CUR_PKMN_2( *_battle, 0, OPPONENT ).getForme( ) );
         if( _battle->m_battleMode == battle::DOUBLE ) {
             tilecnt = IO::loadPKMNIcon( CUR_PKMN_2( *_battle, 1, PLAYER ).m_boxdata.m_speciesId,
-                                        106, 102, oamIndex++, palIndex++, tilecnt, true );
+                                        106, 102, oamIndex++, palIndex++, tilecnt, true,
+                                        CUR_PKMN_2( *_battle, 1, PLAYER ).getForme( ) );
             tilecnt = IO::loadPKMNIcon( CUR_PKMN_2( *_battle, 1, OPPONENT ).m_boxdata.m_speciesId,
-                                        122, 70, oamIndex++, palIndex++, tilecnt, true );
+                                        122, 70, oamIndex++, palIndex++, tilecnt, true,
+                                        CUR_PKMN_2( *_battle, 1, OPPONENT ).getForme( ) );
         }
 
         // FIGHT
@@ -885,8 +888,9 @@ namespace BATTLE {
             auto& acPkmnStr = CUR_PKMN_STR_2( *_battle, i, PLAYER );
             auto& acPkmn    = *acPkmnStr.m_pokemon;
             if( !acPkmn.isEgg( ) )
-                tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, x - 4, y - 12, ++oamIndex,
-                                            palIndex++, tilecnt, true );
+                tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, x - 4, y - 12,
+                                            ++oamIndex, palIndex++, tilecnt, true,
+                                            acPkmn.getForme( ) );
             else
                 tilecnt = IO::loadEggIcon( x - 4, y - 12, ++oamIndex, palIndex++, tilecnt, true );
         }
@@ -1021,11 +1025,13 @@ namespace BATTLE {
             if( !( t2 = IO::loadPKMNSprite( PKMN_SPRITE_PATH, p_pokemon.m_boxdata.m_speciesId, 16,
                                             32, ++oamIndex, ++palIndex, tilecnt, true,
                                             p_pokemon.m_boxdata.isShiny( ),
-                                            p_pokemon.m_boxdata.m_isFemale ) ) )
+                                            p_pokemon.m_boxdata.m_isFemale, false,
+                                            false, p_pokemon.getForme( ) ) ) )
                 t2 = IO::loadPKMNSprite( PKMN_SPRITE_PATH, p_pokemon.m_boxdata.m_speciesId, 16, 32,
                                          oamIndex, palIndex, tilecnt, true,
                                          p_pokemon.m_boxdata.isShiny( ),
-                                         !p_pokemon.m_boxdata.m_isFemale );
+                                         !p_pokemon.m_boxdata.m_isFemale, false,
+                                         false, p_pokemon.getForme( ) );
             oamIndex += 3;
             tilecnt = t2;
         }
@@ -1160,23 +1166,24 @@ namespace BATTLE {
                                       memoTilesLen, false, false, false, OBJPRIORITY_2, true );
         }
 
-        pokemonData data;
-        getAll( p_pokemon.m_boxdata.m_speciesId, data );
+        pkmnData data = getPkmnData( p_pokemon.m_boxdata.m_speciesId, p_pokemon.getForme( ) );
 
         IO::updateOAM( true );
 
-        u16 exptype = data.m_expType;
+        u16 exptype = data.getExpType( );
 
         u16 t2;
         if( !( p_pokemon.isEgg( ) ) ) {
             if( !( t2 = IO::loadPKMNSprite( PKMN_SPRITE_PATH, p_pokemon.m_boxdata.m_speciesId, 16,
                                             8, ++oamIndex, ++palIndex, tilecnt, true,
                                             p_pokemon.m_boxdata.isShiny( ),
-                                            p_pokemon.m_boxdata.m_isFemale ) ) ) {
+                                            p_pokemon.m_boxdata.m_isFemale, false,
+                                            false, p_pokemon.getForme( ) ) ) ) {
                 t2 = IO::loadPKMNSprite( PKMN_SPRITE_PATH, p_pokemon.m_boxdata.m_speciesId, 16, 8,
                                          oamIndex, palIndex, tilecnt, true,
                                          p_pokemon.m_boxdata.isShiny( ),
-                                         !p_pokemon.m_boxdata.m_isFemale );
+                                         !p_pokemon.m_boxdata.m_isFemale, false, false,
+                                         p_pokemon.getForme( ) );
             }
             oamIndex += 4;
             tilecnt = t2;
@@ -1243,18 +1250,21 @@ namespace BATTLE {
             IO::boldFont->setColor( GRAY_IDX, 1 );
             IO::boldFont->setColor( BLACK_IDX, 2 );
 
-            if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
+            if( data.m_baseForme.m_types[ 0 ] == data.m_baseForme.m_types[ 1 ] ) {
                 tilecnt
-                    = IO::loadTypeIcon( data.m_types[ 0 ], 224, 0, ++oamIndex, ++palIndex, tilecnt,
+                    = IO::loadTypeIcon( data.m_baseForme.m_types[ 0 ], 224, 0, ++oamIndex,
+                                        ++palIndex, tilecnt,
                                         true, SAVE::SAV->getActiveFile( ).m_options.m_language );
                 oamIndex++;
                 ++palIndex;
             } else {
                 tilecnt
-                    = IO::loadTypeIcon( data.m_types[ 0 ], 192, 0, ++oamIndex, ++palIndex, tilecnt,
+                    = IO::loadTypeIcon( data.m_baseForme.m_types[ 0 ], 192, 0, ++oamIndex,
+                                        ++palIndex, tilecnt,
                                         true, SAVE::SAV->getActiveFile( ).m_options.m_language );
                 tilecnt
-                    = IO::loadTypeIcon( data.m_types[ 1 ], 224, 0, ++oamIndex, ++palIndex, tilecnt,
+                    = IO::loadTypeIcon( data.m_baseForme.m_types[ 1 ], 224, 0, ++oamIndex,
+                                        ++palIndex, tilecnt,
                                         true, SAVE::SAV->getActiveFile( ).m_options.m_language );
             }
 
@@ -1847,7 +1857,8 @@ namespace BATTLE {
 
             if( acPkmn.m_stats.m_acHP )
                 tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, x - 10, y - 23,
-                                            ++oamIndex, palIndex++, tilecnt );
+                                            ++oamIndex, palIndex++, tilecnt, true,
+                                            acPkmn.getForme( ) );
         }
         IO::updateOAM( true );
 
@@ -2130,31 +2141,31 @@ namespace BATTLE {
         u8 hpx = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].x,
            hpy = IO::OamTop->oamBuffer[ HP_IDX( p_opponent, p_pokemonPos ) ].y;
 
-        pokemonData p;
         auto&       acPkmn = CUR_PKMN_2( *_battle, p_pokemonPos, p_opponent );
 
         if( !acPkmn.m_stats.m_acHP ) return;
 
-        getAll( acPkmn.m_boxdata.m_speciesId, p );
+        pkmnData p = getPkmnData( acPkmn.m_boxdata.m_speciesId, acPkmn.getForme( ) );
 
         u16 expStart
-            = ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ]
+            = ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.getExpType( ) ]
                 - p_gainedExp )
               * 100
-              / ( EXP[ acPkmn.m_level ][ p.m_expType ] - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] );
+              / ( EXP[ acPkmn.m_level ][ p.getExpType( ) ] - EXP[ acPkmn.m_level - 1 ][ p.getExpType( ) ] );
         u16 expEnd = std::min(
             u16( 100 ),
-            u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] )
+            u16( ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.getExpType( ) ] )
                  * 100
-                 / ( EXP[ acPkmn.m_level ][ p.m_expType ]
-                     - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
+                 / ( EXP[ acPkmn.m_level ][ p.getExpType( ) ]
+                     - EXP[ acPkmn.m_level - 1 ][ p.getExpType( ) ] ) ) );
 
         char buffer[ 100 ];
         snprintf( buffer, 99, GET_STRING( 167 ), acPkmn.m_boxdata.m_name, p_gainedExp );
         _battle->log( buffer );
         IO::displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
 
-        bool newLevel = EXP[ acPkmn.m_level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+        bool newLevel = EXP[ acPkmn.m_level ][ p.getExpType( ) ]
+            <= acPkmn.m_boxdata.m_experienceGained;
         u16  HPdif    = acPkmn.m_stats.m_maxHP - acPkmn.m_stats.m_acHP;
         u16  oldHP    = acPkmn.m_stats.m_acHP;
         u16  oldHPmax = acPkmn.m_stats.m_maxHP;
@@ -2164,7 +2175,7 @@ namespace BATTLE {
 
             if( acPkmn.m_boxdata.m_speciesId != PKMN_SHEDINJA )
                 acPkmn.m_stats.m_maxHP
-                    = ( ( acPkmn.IVget( 0 ) + 2 * p.m_bases[ 0 ]
+                    = ( ( acPkmn.IVget( 0 ) + 2 * p.m_baseForme.m_bases[ 0 ]
                           + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )
                         * acPkmn.m_level / 100 )
                       + 10;
@@ -2173,31 +2184,31 @@ namespace BATTLE {
             pkmnNatures nature = acPkmn.m_boxdata.getNature( );
 
             acPkmn.m_stats.m_Atk
-                = ( ( ( acPkmn.IVget( 1 ) + 2 * p.m_bases[ ATK + 1 ]
+                = ( ( ( acPkmn.IVget( 1 ) + 2 * p.m_baseForme.m_bases[ ATK + 1 ]
                         + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )
                       * acPkmn.m_level / 100.0 )
                     + 5 )
                   * NatMod[ nature ][ ATK ];
             acPkmn.m_stats.m_Def
-                = ( ( ( acPkmn.IVget( 2 ) + 2 * p.m_bases[ DEF + 1 ]
+                = ( ( ( acPkmn.IVget( 2 ) + 2 * p.m_baseForme.m_bases[ DEF + 1 ]
                         + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )
                       * acPkmn.m_level / 100.0 )
                     + 5 )
                   * NatMod[ nature ][ DEF ];
             acPkmn.m_stats.m_Spd
-                = ( ( ( acPkmn.IVget( 5 ) + 2 * p.m_bases[ SPD + 1 ]
+                = ( ( ( acPkmn.IVget( 5 ) + 2 * p.m_baseForme.m_bases[ SPD + 1 ]
                         + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )
                       * acPkmn.m_level / 100.0 )
                     + 5 )
                   * NatMod[ nature ][ SPD ];
             acPkmn.m_stats.m_SAtk
-                = ( ( ( acPkmn.IVget( 3 ) + 2 * p.m_bases[ SATK + 1 ]
+                = ( ( ( acPkmn.IVget( 3 ) + 2 * p.m_baseForme.m_bases[ SATK + 1 ]
                         + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )
                       * acPkmn.m_level / 100.0 )
                     + 5 )
                   * NatMod[ nature ][ SATK ];
             acPkmn.m_stats.m_SDef
-                = ( ( ( acPkmn.IVget( 4 ) + 2 * p.m_bases[ SDEF + 1 ]
+                = ( ( ( acPkmn.IVget( 4 ) + 2 * p.m_baseForme.m_bases[ SDEF + 1 ]
                         + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )
                       * acPkmn.m_level / 100.0 )
                     + 5 )
@@ -2219,15 +2230,16 @@ namespace BATTLE {
                 _battle->checkForAttackLearn( p_pokemonPos );
             newLevel
                 = acPkmn.m_level < 100
-                  && EXP[ acPkmn.m_level ][ p.m_expType ] <= acPkmn.m_boxdata.m_experienceGained;
+                  && EXP[ acPkmn.m_level ][ p.getExpType( ) ]
+                  <= acPkmn.m_boxdata.m_experienceGained;
 
             expStart = 0;
             expEnd
                 = std::min( u16( 100 ), u16( ( acPkmn.m_boxdata.m_experienceGained
-                                               - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] )
+                                               - EXP[ acPkmn.m_level - 1 ][ p.getExpType( ) ] )
                                              * 100
-                                             / ( EXP[ acPkmn.m_level ][ p.m_expType ]
-                                                 - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) ) );
+                                             / ( EXP[ acPkmn.m_level ][ p.getExpType( ) ]
+                                                 - EXP[ acPkmn.m_level - 1 ][ p.getExpType( ) ] ) ) );
 
             IO::displayEP( 101, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
             IO::displayEP( expStart, expEnd, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, true );
@@ -2346,7 +2358,7 @@ namespace BATTLE {
                                          PKMN_PAL_IDX( p_pokemonPos, p_opponent ),
                                          PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale,
-                                         false ) ) {
+                                         false, false, acPkmn.getForme( ) ) ) {
                     _battle->log( SPRITE_FAILED );
                 }
             }
@@ -2355,13 +2367,13 @@ namespace BATTLE {
                     PKMN_SPRITE_BACK_PATH, acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
                     PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ),
                     PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false, acPkmn.m_boxdata.isShiny( ),
-                    acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    acPkmn.m_boxdata.m_isFemale, false, false, acPkmn.getForme( ) ) ) {
                 if( !IO::loadPKMNSprite( PKMN_SPRITE_BACK_PATH, acPkmn.m_boxdata.m_speciesId,
                                          x + 12, y + 12, PKMN_IDX( p_pokemonPos, p_opponent ),
                                          PKMN_PAL_IDX( p_pokemonPos, p_opponent ),
                                          PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale,
-                                         false ) ) {
+                                         false, false, acPkmn.getForme( ) ) ) {
                     _battle->log( SPRITE_FAILED );
                 }
             }
@@ -2378,8 +2390,7 @@ namespace BATTLE {
         setStsBallVisibility( p_opponent, p_pokemonPos, false, false );
         IO::updateOAM( false );
 
-        pokemonData p;
-        getAll( acPkmn.m_boxdata.m_speciesId, p );
+        pkmnData p = getPkmnData( acPkmn.m_boxdata.m_speciesId, acPkmn.getForme( ) );
 
         consoleSelect( &IO::Top );
         if( p_opponent == p_pokemonPos )
@@ -2396,9 +2407,9 @@ namespace BATTLE {
         IO::displayEP( 100, 101, hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
         IO::displayEP(
             0,
-            ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ) * 100
-                / ( EXP[ acPkmn.m_level ][ p.m_expType ]
-                    - EXP[ acPkmn.m_level - 1 ][ p.m_expType ] ),
+            ( acPkmn.m_boxdata.m_experienceGained - EXP[ acPkmn.m_level - 1 ][ p.getExpType( ) ] ) * 100
+                / ( EXP[ acPkmn.m_level ][ p.getExpType( ) ]
+                    - EXP[ acPkmn.m_level - 1 ][ p.getExpType( ) ] ),
             hpx, hpy, OWN1_EP_COL, OWN1_EP_COL + 1, false );
     }
 
@@ -2415,13 +2426,13 @@ namespace BATTLE {
                     PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, x, y,
                     PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ),
                     PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false, acPkmn.m_boxdata.isShiny( ),
-                    acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    acPkmn.m_boxdata.m_isFemale, false, false, acPkmn.getForme( ) ) ) {
                 if( !IO::loadPKMNSprite( PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, x, y,
                                          PKMN_IDX( p_pokemonPos, p_opponent ),
                                          PKMN_PAL_IDX( p_pokemonPos, p_opponent ),
                                          PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale,
-                                         false ) ) {
+                                         false, false, acPkmn.getForme( ) ) ) {
                     _battle->log( SPRITE_FAILED );
                 }
             }
@@ -2430,13 +2441,13 @@ namespace BATTLE {
                     PKMN_SPRITE_BACK_PATH, acPkmn.m_boxdata.m_speciesId, x + 12, y + 12,
                     PKMN_IDX( p_pokemonPos, p_opponent ), PKMN_PAL_IDX( p_pokemonPos, p_opponent ),
                     PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false, acPkmn.m_boxdata.isShiny( ),
-                    acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    acPkmn.m_boxdata.m_isFemale, false, false, acPkmn.getForme( ) ) ) {
                 if( !IO::loadPKMNSprite( PKMN_SPRITE_BACK_PATH, acPkmn.m_boxdata.m_speciesId,
                                          x + 12, y + 12, PKMN_IDX( p_pokemonPos, p_opponent ),
                                          PKMN_PAL_IDX( p_pokemonPos, p_opponent ),
                                          PKMN_TILE_IDX( p_pokemonPos, p_opponent ), false,
                                          acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale,
-                                         false ) ) {
+                                         false, false, acPkmn.getForme( ) ) ) {
                     _battle->log( SPRITE_FAILED );
                 }
             }
@@ -2673,11 +2684,12 @@ namespace BATTLE {
         if( !IO::loadPKMNSprite( PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, x, y,
                                  PKMN_IDX( 0, OPPONENT ), PKMN_PAL_IDX( 0, OPPONENT ),
                                  PKMN_TILE_IDX( 0, OPPONENT ), false, acPkmn.m_boxdata.isShiny( ),
-                                 acPkmn.m_boxdata.m_isFemale, false ) ) {
+                                 acPkmn.m_boxdata.m_isFemale, false, false, acPkmn.getForme( ) ) ) {
             if( !IO::loadPKMNSprite(
                     PKMN_SPRITE_PATH, acPkmn.m_boxdata.m_speciesId, x, y, PKMN_IDX( 0, OPPONENT ),
                     PKMN_PAL_IDX( 0, OPPONENT ), PKMN_TILE_IDX( 0, OPPONENT ), false,
-                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false ) ) {
+                    acPkmn.m_boxdata.isShiny( ), !acPkmn.m_boxdata.m_isFemale, false, false,
+                    acPkmn.getForme( ) ) ) {
                 _battle->log( SPRITE_FAILED );
             }
         }

@@ -168,6 +168,10 @@ struct pkmnData {
     u8              m_eggCycles;
     u8              m_catchrate;
     u8              m_baseFriend;
+
+    u8 getExpType( ) const {
+        return m_expTypeFormeCnt >> 5;
+    }
 };
 
 
