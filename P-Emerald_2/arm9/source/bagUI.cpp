@@ -148,11 +148,12 @@ namespace BAG {
         for( u8 i = 0; i < 6; ++i ) {
             auto acPkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
             if( !acPkmn.m_boxdata.m_speciesId ) break;
-            if( acPkmn.m_boxdata.m_individualValues.m_isEgg )
+            if( acPkmn.isEgg( ) )
                 tileCnt = IO::loadEggIcon( 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
             else
                 tileCnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, 8, 26 + i * 26,
-                                            PKMN_SUB + i, PKMN_SUB + i, tileCnt );
+                                            PKMN_SUB + i, PKMN_SUB + i, tileCnt, true,
+                                            acPkmn.getForme( ) );
             IO::Oam->oamBuffer[ PKMN_SUB + i ].priority = OBJPRIORITY_3;
         }
         return tileCnt;
@@ -288,7 +289,7 @@ namespace BAG {
             } else {
                 res.push_back(
                     {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),
-                     {SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_holdItem, true}} );
+                     {SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].getItem( ), true}} );
                 if( p_item && p_item->m_itemType == item::itemType::TM_HM ) {
                     u16 currMv = static_cast<TM*>( p_item )->m_moveIdx;
                     if( currMv == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 0 ]
@@ -353,10 +354,9 @@ namespace BAG {
                         IO::regularFont->setColor( BLACK_IDX, 2 );
                         IO::regularFont->setColor( GRAY_IDX, 1 );
 
-                        if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_holdItem ) {
+                        if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].getItem( ) ) {
                             IO::regularFont->printString( ItemList[ SAVE::SAV->getActiveFile( )
-                                                                        .m_pkmnTeam[ i ]
-                                                                        .m_boxdata.m_holdItem ]
+                                                                    .m_pkmnTeam[ i ].getItem( ) ]
                                                               ->getDisplayName( true )
                                                               .c_str( ),
                                                           40, 44 + 26 * i, true );
@@ -487,8 +487,7 @@ namespace BAG {
 
         if( p_idx >= MAX_ITEMS_PER_PAGE ) { // It's a PKMN
             if( !SAVE::SAV->getActiveFile( )
-                     .m_pkmnTeam[ p_idx - MAX_ITEMS_PER_PAGE ]
-                     .m_boxdata.m_holdItem ) // Something went wrong
+                     .m_pkmnTeam[ p_idx - MAX_ITEMS_PER_PAGE ].getItem( ) ) // Something went wrong
                 return false;
         }
 

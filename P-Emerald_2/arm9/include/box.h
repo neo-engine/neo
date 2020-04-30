@@ -36,7 +36,7 @@ namespace BOX {
     struct box {
         char m_name[ 15 ];
 #define MAX_PKMN_PER_BOX 18
-        pokemon::boxPokemon m_pokemon[ MAX_PKMN_PER_BOX ];
+        boxPokemon m_pokemon[ MAX_PKMN_PER_BOX ];
         u8                  m_wallpaper;
 
         s8 getFirstFreeSpot( ) const {
@@ -58,12 +58,12 @@ namespace BOX {
             return res;
         }
         void clear( u8 p_pos ) {
-            memset( m_pokemon + p_pos, 0, sizeof( pokemon::boxPokemon ) );
+            memset( m_pokemon + p_pos, 0, sizeof( boxPokemon ) );
         }
-        pokemon::boxPokemon& operator[]( u8 p_pos ) {
+        boxPokemon& operator[]( u8 p_pos ) {
             return m_pokemon[ p_pos ];
         }
-        const pokemon::boxPokemon& operator[]( u8 p_pos ) const {
+        const boxPokemon& operator[]( u8 p_pos ) const {
             return m_pokemon[ p_pos ];
         }
     };

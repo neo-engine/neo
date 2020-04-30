@@ -25,9 +25,9 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "defines.h"
 #include "boxViewer.h"
 #include "boxUI.h"
-#include "defines.h"
 #include "keyboard.h"
 #include "messageBox.h"
 #include "uio.h"
@@ -260,7 +260,7 @@ namespace BOX {
             return;
         }
 
-        pokemon::boxPokemon hld = _heldPkmn.m_boxdata;
+        boxPokemon hld = _heldPkmn.m_boxdata;
         if( p_index < MAX_PKMN_PER_BOX )
             std::swap( hld, SAVE::SAV->getCurrentBox( )->operator[]( p_index ) );
         if( p_index >= MAX_PKMN_PER_BOX && !_showTeam )
@@ -277,7 +277,7 @@ namespace BOX {
         } else
             _heldPkmn = pokemon( hld );
         _boxUI.takePkmn( p_index, _heldPkmn.m_boxdata.m_speciesId,
-                         _heldPkmn.m_boxdata.m_individualValues.m_isEgg );
+                         _heldPkmn.isEgg( ) );
     }
 
     // Remove gaps in party pkmn
@@ -297,8 +297,7 @@ namespace BOX {
             if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId
                 && SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP
                 && !SAVE::SAV->getActiveFile( )
-                        .m_pkmnTeam[ i ]
-                        .m_boxdata.m_individualValues.m_isEgg )
+                        .m_pkmnTeam[ i ].isEgg ( ) )
                 return true;
         return false;
     }

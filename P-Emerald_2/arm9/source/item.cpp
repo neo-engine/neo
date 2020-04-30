@@ -30,7 +30,9 @@ along with Pokémon neo.  If not, new see <http://www.gnu.org/licenses/>.
 
 #include "berry.h"
 #include "item.h"
+#include "itemNames.h"
 #include "move.h"
+#include "moveNames.h"
 #include "pokemon.h"
 #include "script.h"
 
@@ -68,13 +70,12 @@ bool item::needsInformation( u8 p_num ) {
 // Ya'know, this stuff here is serious voodoo,
 // e.g., Zinc's effect encodes to 755051786 = 0b001'01101'0000'0001''001'01010'0000'1010
 bool item::use( pokemon& p_pokemon ) {
-    if( p_pokemon.m_boxdata.m_individualValues.m_isEgg || !p_pokemon.m_boxdata.m_speciesId )
+    if( p_pokemon.isEgg( ) || !p_pokemon.m_boxdata.m_speciesId )
         return false;
     if( !m_loaded && !load( ) ) return false;
 
-    bool        change = false;
-    pokemonData p;
-    getAll( p_pokemon.m_boxdata.m_speciesId, p );
+    bool change = false;
+    pkmnData np = getPkmnData( p_pokemon.m_boxdata.m_speciesId, p_pokemon.getForme( ) );
 
     // Anything that modifies the PKMN's happiness shall be second
     if( ( m_itemData.m_itemEffect >> 24 ) % 32 == 13 )
@@ -175,7 +176,7 @@ bool item::use( pokemon& p_pokemon ) {
             if( tmp != p_pokemon.m_boxdata.m_effortValues[ stat - 6 ] ) {
                 p_pokemon.m_boxdata.m_effortValues[ stat - 6 ] = tmp;
                 change                                         = true;
-                p_pokemon.m_stats = calcStats( p_pokemon.m_boxdata, p );
+                p_pokemon.m_stats = calcStats( p_pokemon.m_boxdata, &np );
             }
             break;
         }
@@ -187,9 +188,9 @@ bool item::use( pokemon& p_pokemon ) {
             if( tmp != p_pokemon.m_level ) {
                 p_pokemon.m_level = tmp;
                 p_pokemon.m_boxdata.m_experienceGained
-                    = EXP[ p_pokemon.m_level - 1 ][ p.m_expType ];
+                    = EXP[ p_pokemon.m_level - 1 ][ np.m_expTypeFormeCnt >> 5 ];
 
-                p_pokemon.m_stats = calcStats( p_pokemon.m_boxdata, p );
+                p_pokemon.m_stats = calcStats( p_pokemon.m_boxdata, &np );
                 change            = true;
             }
             break;
@@ -280,7 +281,7 @@ bool item::use( bool p_dryRun ) {
             IO::messageBox( GET_STRING( 65 ), false );
         }
         return true;
-    case I_EXP_SHARE:
+    case I_EXP__SHARE:
         if( !p_dryRun ) {
             IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
             IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
@@ -318,7 +319,7 @@ bool item::use( bool p_dryRun ) {
         if( !p_dryRun ) AttackList[ M_SWEET_SCENT ]->use( );
         return false;
     case I_BIKE2:
-    case I_BICYCLE:
+    case I_BIKE:
     case I_MACH_BIKE:
     case I_ACRO_BIKE:
         if( SAVE::SAV->getActiveFile( ).m_player.m_movement == MAP::WALK ) {
@@ -365,7 +366,7 @@ bool item::useable( ) {
     case I_REPEL:
     case I_SUPER_REPEL:
     case I_MAX_REPEL:
-    case I_EXP_SHARE:
+    case I_EXP__SHARE:
     case I_COIN_CASE:
     case I_POINT_CARD:
         return true;
@@ -374,7 +375,7 @@ bool item::useable( ) {
     case I_HONEY:
         return AttackList[ M_SWEET_SCENT ]->possible( );
     case I_BIKE2:
-    case I_BICYCLE:
+    case I_BIKE:
     case I_MACH_BIKE:
     case I_ACRO_BIKE:
         return SAVE::SAV->getActiveFile( ).m_player.m_movement == MAP::WALK

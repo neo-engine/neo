@@ -30,6 +30,7 @@
 enum type {
     NORMAL    = 0,
     FIGHTING  = 1,
+    FIGHT     = 1,
     FLYING    = 2,
     POISON    = 3,
     GROUND    = 4,
@@ -42,10 +43,12 @@ enum type {
     FIRE      = 11,
     GRASS     = 12,
     LIGHTNING = 13,
+    ELECTRIC  = 13,
     PSYCHIC   = 14,
     ICE       = 15,
     DRAGON    = 16,
     DARKNESS  = 17,
+    DARK      = 17,
     FAIRY     = 18
 };
 

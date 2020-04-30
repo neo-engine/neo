@@ -39,7 +39,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define DEBUG
 
 #define MAX_ITEMS_IN_BAG 900
-#define MAX_ATTACK 560
+#define MAX_ATTACK 800
+#define MAX_MOVE MAX_ATTACK
+#define MAX_PKMN 890
+#define OTLENGTH 8
+#define PKMN_NAMELENGTH 15
+#define ABILITY_NAMELENGTH 20
+
+#undef RAND_MAX
+#define RAND_MAX 4294967295
 
 enum GameMod : u8 { DEVELOPER, ALPHA, BETA, RELEASE, EMULATOR };
 extern GameMod gMod;
@@ -70,7 +78,8 @@ extern unsigned short TEMP_PAL[ 256 ];
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
-#define GET_STRING( i ) STRINGS[ i ][ SAVE::SAV->getActiveFile( ).m_options.m_language ]
+#define CURRENT_LANGUAGE SAVE::SAV->getActiveFile( ).m_options.m_language
+#define GET_STRING( i ) STRINGS[ i ][ CURRENT_LANGUAGE ]
 
 #define NO_DATA GET_STRING( 0 )
 #define FARAWAY_PLACE GET_STRING( 1 )

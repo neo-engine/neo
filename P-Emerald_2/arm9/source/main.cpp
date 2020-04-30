@@ -276,7 +276,7 @@ int main( int, char** p_argv ) {
             for( u8 i = 0; i < 6; ++i ) {
                 if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
                 auto a = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
-                if( a.m_boxdata.m_individualValues.m_isEgg ) continue;
+                if( a.isEgg( ) ) continue;
                 for( u8 j = 0; j < 4; ++j ) {
                     if( !AttackList[ a.m_boxdata.m_moves[ j ] ]->m_isFieldAttack
                         || !AttackList[ a.m_boxdata.m_moves[ j ] ]->possible( ) )

@@ -40,8 +40,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ailment.h"
 #include "item.h"
+#include "itemNames.h"
 #include "move.h"
+#include "moveNames.h"
 #include "pokemon.h"
+#include "abilityNames.h"
 
 #include "fs.h"
 #include "saveGame.h"
@@ -376,7 +379,8 @@ namespace BATTLE {
 
         if( isPkmn ) {
             auto specifier = p_cmd.substr( 5 );
-            if( specifier == "ABILITY" ) return getAbilityName( target.m_boxdata.m_ability );
+            if( specifier == "ABILITY" ) return getAbilityName( target.m_boxdata.m_ability,
+                    CURRENT_LANGUAGE );
             if( specifier.substr( 0, 4 ) == "MOVE" )
                 return AttackList[ target.m_boxdata.m_moves[ C2I( specifier[ 4 ] ) - 1 ] ]
                     ->m_moveName;
@@ -565,7 +569,7 @@ namespace BATTLE {
             for( u8 o = 0; o < MAX_STATS; ++o )
                 CUR_PKMN_STATCHG( i, PLAYER )[ o ] = CUR_PKMN_STATCHG( i, OPPONENT )[ o ] = 0;
             if( _player->m_pkmnTeam.size( ) > i ) {
-                if( CUR_PKMN( i, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                if( CUR_PKMN( i, PLAYER ).isEgg( ) )
                     CUR_PKMN_STS( i, PLAYER ) = NA;
                 else if( CUR_PKMN( i, PLAYER ).m_stats.m_acHP == 0 )
                     CUR_PKMN_STS( i, PLAYER ) = KO;
@@ -577,7 +581,7 @@ namespace BATTLE {
                 CUR_PKMN_STS( i, PLAYER ) = NA;
             if( !m_isWildBattle ) {
                 if( _opponent->m_pkmnTeam.size( ) > i ) {
-                    if( CUR_PKMN( i, OPPONENT ).m_boxdata.m_individualValues.m_isEgg )
+                    if( CUR_PKMN( i, OPPONENT ).isEgg( ) )
                         CUR_PKMN_STS( i, OPPONENT ) = NA;
                     else if( CUR_PKMN( i, OPPONENT ).m_stats.m_acHP == 0 )
                         CUR_PKMN_STS( i, OPPONENT ) = KO;
@@ -1237,7 +1241,7 @@ namespace BATTLE {
                     || !im->use( CUR_PKMN( p_pokemonPos, p_opponent ) ) )
                     log( GET_STRING( 172 ) );
                 else {
-                    if( CUR_PKMN( p_pokemonPos, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                    if( CUR_PKMN( p_pokemonPos, PLAYER ).isEgg( ) )
                         CUR_PKMN_STS( p_pokemonPos, PLAYER ) = NA;
                     else if( CUR_PKMN( p_pokemonPos, PLAYER ).m_stats.m_acHP == 0 )
                         CUR_PKMN_STS( p_pokemonPos, PLAYER ) = KO;
@@ -1287,7 +1291,7 @@ namespace BATTLE {
                     if( !im->use( CUR_PKMN( pos, p_opponent ) ) )
                         log( GET_STRING( 172 ) );
                     else {
-                        if( CUR_PKMN( pos, PLAYER ).m_boxdata.m_individualValues.m_isEgg )
+                        if( CUR_PKMN( pos, PLAYER ).isEgg( ) )
                             CUR_PKMN_STS( pos, PLAYER ) = NA;
                         else if( CUR_PKMN( pos, PLAYER ).m_stats.m_acHP == 0 )
                             CUR_PKMN_STS( pos, PLAYER ) = KO;
@@ -2005,7 +2009,7 @@ namespace BATTLE {
             _battleUI.evolvePKMN( p_opponent, p_pokemonPos );
 
             snprintf( buffer, 49, GET_STRING( 52 ),
-                      getDisplayName( acPkmn.m_boxdata.m_speciesId ).c_str( ) );
+                      getDisplayName( acPkmn.m_boxdata.m_speciesId, CURRENT_LANGUAGE ).c_str( ) );
             log( buffer );
         }
     }

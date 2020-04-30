@@ -120,7 +120,7 @@ namespace SAVE {
 // Stored Pkmn
 #define MAX_BOXES 42
         BOX::box            m_storedPokemon[ MAX_BOXES ];
-        pokemon::boxPokemon m_clipboard[ 6 ];
+        boxPokemon m_clipboard[ 6 ];
 
         u8 m_caughtPkmn[ 1 + MAX_PKMN / 8 ];
         u8 m_seenPkmn[ 1 + MAX_PKMN / 8 ];
@@ -128,7 +128,7 @@ namespace SAVE {
         u8 m_transfersRemaining; // Times a GBA save file can be copied
 
         // Return the idx of the resulting Box
-        s8 storePkmn( const pokemon::boxPokemon& p_pokemon );
+        s8 storePkmn( const boxPokemon& p_pokemon );
         s8 storePkmn( const pokemon& p_pokemon );
 
         u16 countPkmn( u16 p_pkmnIdx );

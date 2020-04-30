@@ -35,6 +35,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 #include "uio.h"
 #include "messageBox.h"
+#include "pokemonNames.h"
 
 #include "Egg.h"
 
@@ -550,6 +551,29 @@ namespace IO {
     u16 loadPKMNSprite( const char* p_path, const u16 p_pkmnId, const s16 p_posX, const s16 p_posY,
                         u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny,
                         bool p_female, bool p_flipx, bool p_topOnly, u8 p_forme ) {
+        switch( p_pkmnId ) {
+            case PKMN_UNOWN: case PKMN_ABSOL: case PKMN_AMOONGUSS: case PKMN_BARBARACLE:
+            case PKMN_BLACEPHALON: case PKMN_BUDEW: case PKMN_CASTFORM: case PKMN_CLAUNCHER:
+            case PKMN_CLAWITZER: case PKMN_CLEFABLE: case PKMN_CLEFAIRY: case PKMN_CLEFFA:
+            case PKMN_COMFEY: case PKMN_CROCONAW: case PKMN_DARTRIX: case PKMN_DHELMISE:
+            case PKMN_DRILBUR: case PKMN_DUGTRIO: case PKMN_EMBOAR: case PKMN_EXCADRILL:
+            case PKMN_FURFROU: case PKMN_GARBODOR: case PKMN_GOLETT: case PKMN_GOLURK:
+            case PKMN_GRENINJA: case PKMN_IGGLYBUFF: case PKMN_JIGGLYPUFF: case PKMN_KELDEO:
+            case PKMN_KINGLER: case PKMN_KLANG: case PKMN_KLEFKI: case PKMN_KLINK:
+            case PKMN_KLINKLANG: case PKMN_KYUREM: case PKMN_LILLIGANT: case PKMN_LITWICK:
+            case PKMN_MAGMORTAR: case PKMN_MARSHADOW: case PKMN_MELOETTA: case PKMN_MINIOR:
+            case PKMN_MUK: case PKMN_NECROZMA: case PKMN_PANSEAR: case PKMN_POLITOED:
+            case PKMN_POLIWHIRL: case PKMN_POLIWRATH: case PKMN_REGIROCK: case PKMN_ROSELIA:
+            case PKMN_ROSERADE: case PKMN_ROTOM: case PKMN_SAWK: case PKMN_SEVIPER:
+            case PKMN_SHAYMIN: case PKMN_SIMISEAR: case PKMN_SNEASEL: case PKMN_SOLOSIS:
+            case PKMN_STAKATAKA: case PKMN_STEENEE: case PKMN_SYLVEON: case PKMN_TEDDIURSA:
+            case PKMN_TOGEKISS: case PKMN_TORTERRA: case PKMN_TSAREENA: case PKMN_VANILLUXE:
+            case PKMN_WIGGLYTUFF: case PKMN_ZANGOOSE: case PKMN_ZYGARDE:
+                p_flipx = false;
+            default:
+                break;
+        }
+
         char* buffer = new char[ 100 ];
         if( !p_forme ) {
             if( !p_female )
@@ -616,7 +640,6 @@ namespace IO {
     u16 loadPKMNSprite( const u16 p_pkmnId, const s16 p_posX, const s16 p_posY,
                         u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny,
                         bool p_female, bool p_flipx, bool p_topOnly, u8 p_forme ) {
-
         return loadPKMNSprite( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex,
                 p_palCnt, p_tileCnt, p_bottom, p_shiny, p_female, p_flipx,
                 p_topOnly, p_forme );

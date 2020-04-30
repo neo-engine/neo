@@ -31,6 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 //#include <iostream>
 #include <sstream>
 
+#include "defines.h"
 #include "gen3Parser.h"
 #include "pokemon.h"
 #include "saveGame.h"

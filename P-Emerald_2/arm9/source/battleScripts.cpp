@@ -33,11 +33,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 
 #include "ability.h"
+#include "abilityNames.h"
 #include "bag.h"
 #include "battle.h"
 #include "defines.h"
 #include "item.h"
+#include "itemNames.h"
 #include "move.h"
+#include "moveNames.h"
 #include "pokemon.h"
 #include "script.h"
 

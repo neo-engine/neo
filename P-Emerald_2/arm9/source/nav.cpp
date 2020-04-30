@@ -42,6 +42,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "hmMoves.h"
 #include "item.h"
 #include "pokemon.h"
+#include "moveNames.h"
+#include "itemNames.h"
 
 #include "bagUI.h"
 #include "bagViewer.h"
@@ -434,11 +436,11 @@ namespace IO {
 
                 _state = HOME;
 
-                const char* someText[ 11 ]
-                    = {"PKMN Spawn",   "Item Spawn",   "1 Item Test",  "Dbl Battle",
+                const char* someText[ 12 ]
+                    = {"PKMN Spawn",   "Item Spawn", "1 Item Test",  "Dbl Battle",
                        "Sgl Battle",   "Chg NavScrn",  "View Boxes A", "View Boxes B",
-                       "Hoenn Badges", "Kanto Badges", "Keyboard"};
-                IO::choiceBox test( 11, &someText[ 0 ], 0, false );
+                       "Hoenn Badges", "Kanto Badges", "Keyboard", "Plate Spawn" };
+                IO::choiceBox test( 12, &someText[ 0 ], 0, false );
                 int           res = test.getResult( "Tokens of god-being..." );
                 draw( );
                 switch( res ) {
@@ -447,8 +449,10 @@ namespace IO {
                             sizeof( SAVE::SAV->getActiveFile( ).m_pkmnTeam ) );
                     for( int i = 0; i < 5; ++i ) {
                         pokemon&         a   = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
-                        std::vector<u16> tmp = { 716, 493, 721, 804, u16( 1 + rand( ) % MAX_PKMN )};
-                        a                    = pokemon( tmp[ i ], 50 );
+                        std::vector<u16> tmp = { 201, 493, 721, 890, u16( 1 + rand( ) % MAX_PKMN )};
+
+                        a = pokemon( tmp[ i ], 50, !i ? ( rand( ) % 28 ) : 0, 0, i );
+
                         a.m_stats.m_acHP *= i / 5.0;
                         a.m_boxdata.m_experienceGained += 750;
 
@@ -592,6 +596,13 @@ namespace IO {
                     IO::keyboard kbd;
                     IO::messageBox( kbd.getText( 10, "Type some text!" ).c_str( ) );
                     break;
+                }
+                case 11: {
+                    for( u16 j = I_FLAME_PLATE; j <= I_FLAME_PLATE + 17; ++j ) {
+                        if( ItemList[ j ]->m_itemName != "Null" )
+                            SAVE::SAV->getActiveFile( ).m_bag.insert(
+                                BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
+                    }
                 }
                 }
                 if( res != 10 ) draw( true );

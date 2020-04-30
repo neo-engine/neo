@@ -26,175 +26,74 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "pokemon.h"
+#include "itemNames.h"
 #include "move.h"
+#include "saveGame.h"
+#include "mapDrawer.h"
+#include "pokemonNames.h"
 
-std::string NatureList[ 25 ]
-    = {"robust",  "einsam", "mutig",  "hart",  "frech",  "kühn",  "sanft", "locker", "pfiffig",
-       "lasch",   "scheu",  "hastig", "ernst", "froh",   "naiv",  "mäßig", "mild",   "ruhig",
-       "zaghaft", "hitzig", "still",  "zart",  "forsch", "sacht", "kauzig"};
-std::string PersonalityList[ 30 ] = {"liebt es, zu essen",
-                                     "nickt oft ein",
-                                     "schläft gerne",
-                                     "macht oft Unordnung",
-                                     "liebt es, zu entspannen",
-                                     "ist stolz auf seine Stärke",
-                                     "prügelt sich gerne",
-                                     "besitzt Temperament",
-                                     "liebt es, zu kämpfen",
-                                     "ist impulsiv",
-                                     "hat einen robusten Körper",
-                                     "kann Treffer gut verkraften",
-                                     "ist äußerst ausdauernd",
-                                     "hat eine gute Ausdauer",
-                                     "ist beharrlich",
-                                     "ist sehr neugierig",
-                                     "ist hinterhältig",
-                                     "ist äußerst gerissen",
-                                     "ist oft in Gedanken",
-                                     "ist sehr pedantisch",
-                                     "besitzt starken Willen",
-                                     "ist irgendwie eitel",
-                                     "ist sehr aufsässig",
-                                     "hasst Niederlagen",
-                                     "ist dickköpfig",
-                                     "liebt es, zu rennen",
-                                     "achtet auf Geräusche",
-                                     "ist ungestüm und einfältig",
-                                     "ist fast wie eine Clown",
-                                     "flüchtet schnell"};
-std::string TasteList[ 6 ]        = {"scharf", "saur", "süß", "trocken", "bitter", "all"};
-
-std::string Games[ 10 ] = {};
-
-double NatMod[ 25 ][ 5 ]
-    = {{1.0, 1.0, 1.0, 1.0, 1.0}, {1.1, 0.9, 1.0, 1.0, 1.0}, {1.1, 1.0, 0.9, 1.0, 1.0},
-       {1.1, 1.0, 1.0, 0.9, 1.0}, {1.1, 1.0, 1.0, 1.0, 0.9}, {0.9, 1.1, 1.0, 1.0, 1.0},
-       {1.0, 1.0, 1.0, 1.0, 1.0}, {1.0, 1.1, 0.9, 1.0, 1.0}, {1.0, 1.1, 1.0, 0.9, 1.0},
-       {1.0, 1.1, 1.0, 1.0, 0.9}, {0.9, 1.0, 1.1, 1.0, 1.0}, {1.0, 0.9, 1.1, 1.0, 1.0},
-       {1.0, 1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.1, 0.9, 1.0}, {1.0, 1.0, 1.1, 1.0, 0.9},
-       {0.9, 1.0, 1.0, 1.1, 1.0}, {1.0, 0.9, 1.0, 1.1, 1.0}, {1.0, 1.0, 0.9, 1.1, 1.0},
-       {1.0, 1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.1, 0.9}, {0.9, 1.0, 1.0, 1.0, 1.1},
-       {1.0, 0.9, 1.0, 1.0, 1.1}, {1.0, 1.0, 0.9, 1.0, 1.1}, {1.0, 1.0, 1.0, 0.9, 1.1},
-       {1.0, 1.0, 1.0, 1.0, 1.0}};
-
-u32 EXP[ 100 ][ 6 ] = {{0, 0, 0, 0, 0, 0},
-                       {15, 6, 8, 9, 10, 4},
-                       {52, 21, 27, 57, 33, 13},
-                       {122, 51, 64, 96, 80, 32},
-                       {237, 100, 125, 135, 156, 65},
-                       {406, 172, 216, 179, 270, 112},
-                       {637, 274, 343, 236, 428, 178},
-                       {942, 409, 512, 314, 640, 276},
-                       {1326, 583, 729, 419, 911, 393},
-                       {1800, 800, 1000, 560, 1250, 540},
-                       {2369, 1064, 1331, 742, 1663, 745},
-                       {3041, 1382, 1728, 973, 2160, 967},
-                       {3822, 1757, 2197, 1261, 2746, 1230},
-                       {4719, 2195, 2744, 1612, 3430, 1591},
-                       {5737, 2700, 3375, 2035, 4218, 1957},
-                       {6881, 3276, 4096, 2535, 5120, 2457},
-                       {8155, 3930, 4913, 3120, 6141, 3046},
-                       {9564, 4665, 5832, 3798, 7290, 3732},
-                       {11111, 5487, 6859, 4575, 8573, 4526},
-                       {12800, 6400, 8000, 5460, 10000, 5440},
-                       {14632, 7408, 9261, 6458, 11576, 6482},
-                       {16610, 8518, 10648, 7577, 13310, 7666},
-                       {18737, 9733, 12167, 8825, 15208, 9003},
-                       {21012, 11059, 13824, 10208, 17280, 10506},
-                       {23437, 12500, 15625, 11735, 19531, 12187},
-                       {26012, 14060, 17576, 13411, 21970, 14060},
-                       {28737, 15746, 19683, 15244, 24603, 16140},
-                       {31610, 17561, 21952, 17242, 27440, 18439},
-                       {34632, 19511, 24389, 19411, 30486, 20974},
-                       {37800, 21600, 27000, 21760, 33750, 23760},
-                       {41111, 23832, 29791, 24294, 37238, 26811},
-                       {44564, 26214, 32768, 27021, 40960, 30146},
-                       {48155, 28749, 35937, 29949, 44921, 33780},
-                       {51881, 31443, 39304, 33084, 49130, 37731},
-                       {55737, 34300, 42875, 36435, 53593, 42017},
-                       {59719, 37324, 46656, 40007, 58320, 46656},
-                       {63822, 40522, 50653, 43808, 63316, 50653},
-                       {68041, 43897, 54872, 47846, 68590, 55969},
-                       {72369, 47455, 59319, 52127, 74148, 60505},
-                       {76800, 51200, 64000, 56660, 80000, 66560},
-                       {81326, 55136, 68921, 61450, 86151, 71677},
-                       {85942, 59270, 74088, 66505, 92610, 78533},
-                       {90637, 63605, 79507, 71833, 99383, 84277},
-                       {95406, 68147, 85184, 77440, 106480, 91998},
-                       {100237, 72900, 91125, 83335, 113906, 98415},
-                       {105122, 77868, 97336, 89523, 121670, 107069},
-                       {110052, 83058, 103823, 96012, 129778, 114205},
-                       {115015, 88473, 110592, 102810, 138240, 123863},
-                       {120001, 94119, 117649, 109923, 147061, 131766},
-                       {125000, 100000, 125000, 117360, 156250, 142500},
-                       {131324, 106120, 132651, 125126, 165813, 151222},
-                       {137795, 112486, 140608, 133229, 175760, 163105},
-                       {144410, 119101, 148877, 141677, 186096, 172697},
-                       {151165, 125971, 157464, 150476, 196830, 185807},
-                       {158056, 133100, 166375, 159635, 207968, 196322},
-                       {165079, 140492, 175616, 169159, 219520, 210739},
-                       {172229, 148154, 185193, 179056, 231491, 222231},
-                       {179503, 156089, 195112, 189334, 243890, 238036},
-                       {186894, 164303, 205379, 199999, 256723, 250562},
-                       {194400, 172800, 216000, 211060, 270000, 267840},
-                       {202013, 181584, 226981, 222522, 283726, 281456},
-                       {209728, 190662, 238328, 234393, 297910, 300293},
-                       {217540, 200037, 250047, 246681, 312558, 315059},
-                       {225443, 209715, 262144, 259392, 327680, 335544},
-                       {233431, 219700, 274625, 272535, 343281, 351520},
-                       {241496, 229996, 287496, 286115, 359370, 373744},
-                       {249633, 240610, 300763, 300140, 375953, 390991},
-                       {257834, 251545, 314432, 314618, 393040, 415050},
-                       {267406, 262807, 328509, 329555, 410636, 433631},
-                       {276458, 274400, 343000, 344960, 428750, 459620},
-                       {286328, 286328, 357911, 360838, 447388, 479600},
-                       {296358, 298598, 373248, 377197, 466560, 507617},
-                       {305767, 311213, 389017, 394045, 486271, 529063},
-                       {316074, 324179, 405224, 411388, 506530, 559209},
-                       {326531, 337500, 421875, 429235, 527343, 582187},
-                       {336255, 351180, 438976, 447591, 548720, 614566},
-                       {346965, 365226, 456533, 466464, 570666, 639146},
-                       {357812, 379641, 474552, 485862, 593190, 673863},
-                       {367807, 394431, 493039, 505791, 616298, 700115},
-                       {378880, 409600, 512000, 526260, 640000, 737280},
-                       {390077, 425152, 531441, 547274, 664301, 765275},
-                       {400293, 441094, 551368, 568841, 689210, 804997},
-                       {411686, 457429, 571787, 590969, 714733, 834809},
-                       {423190, 474163, 592704, 613664, 740880, 877201},
-                       {433572, 491300, 614125, 636935, 767656, 908905},
-                       {445239, 508844, 636056, 660787, 795070, 954084},
-                       {457001, 526802, 658503, 685228, 823128, 987754},
-                       {467489, 545177, 681472, 710266, 851840, 1035837},
-                       {479378, 563975, 704969, 735907, 881211, 1071552},
-                       {491346, 583200, 729000, 762160, 911250, 1122660},
-                       {501878, 602856, 753571, 789030, 941963, 1160499},
-                       {513934, 622950, 778688, 816525, 973360, 1214753},
-                       {526049, 643485, 804357, 844653, 1005446, 1254796},
-                       {536557, 664467, 830584, 873420, 1038230, 1312322},
-                       {548720, 685900, 857375, 902835, 1071718, 1354652},
-                       {560922, 707788, 884736, 932903, 1105920, 1415577},
-                       {571333, 730138, 912673, 963632, 1140841, 1460276},
-                       {583539, 752953, 941192, 995030, 1176490, 1524731},
-                       {591882, 776239, 970299, 1027103, 1212873, 1571884},
-                       {600000, 800000, 1000000, 1059860, 1250000, 1640000}};
-
-bool pokemon::boxPokemon::isShiny( ) const {
+bool boxPokemon::isShiny( ) const {
     return !( ( ( ( m_oTId ^ m_oTSid ) >> 3 )
                 ^ ( ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) ) ) >> 3 ) );
-}
-bool pokemon::boxPokemon::isCloned( ) const {
-    return ( ( m_pid >> 16 ) % ( 1 + ( m_pid % ( 1 << 16 ) ) ) ) == ( m_oTSid % ( m_oTId + 1 ) );
 }
 
 /*
 *@ Returns the gender. -1 for female, 0 for genderless, and 1 for male
 */
-s8 pokemon::boxPokemon::gender( ) const {
+s8 boxPokemon::gender( ) const {
     if( m_isGenderless )
         return 0;
     else if( m_isFemale )
         return -1;
     return 1;
+}
+
+u8 boxPokemon::getForme( ) {
+    return m_altForme;
+}
+
+void boxPokemon::recalculateForme( ) {
+    switch( m_speciesId ) {
+        case PKMN_GIRATINA: {
+            m_altForme = ( m_holdItem == I_GRISEOUS_ORB );
+            return;
+        }
+        case PKMN_ARCEUS: {
+            if( m_holdItem >= I_FLAME_PLATE && m_holdItem <= I_IRON_PLATE ) {
+                m_altForme = m_holdItem - I_FLAME_PLATE + 1;
+            } else if( m_holdItem == I_PIXIE_PLATE ) {
+                m_altForme = 18;
+            } else if( m_holdItem >= I_FIRIUM_Z && m_holdItem <= I_STEELIUM_Z ) {
+                m_altForme = m_holdItem - I_FIRIUM_Z + 1;
+            } else if( m_holdItem == I_FAIRIUM_Z ) {
+                m_altForme = 18;
+            } else if( m_holdItem >= I_FIRIUM_Z2 && m_holdItem <= I_STEELIUM_Z2 ) {
+                m_altForme = m_holdItem - I_FIRIUM_Z2 + 1;
+            } else if( m_holdItem == I_FAIRIUM_Z2 ) {
+                m_altForme = 18;
+            } else {
+                m_altForme = 0;
+            }
+            return;
+        }
+        case PKMN_GENESECT: {
+            if( m_holdItem >= I_DOUSE_DRIVE && m_holdItem <= I_CHILL_DRIVE ) {
+                m_altForme = m_holdItem - I_DOUSE_DRIVE + 1;
+            } else {
+                m_altForme = 0;
+            }
+            return;
+        }
+        case PKMN_SILVALLY: {
+            if( m_holdItem >= I_FIGHTING_MEMORY && m_holdItem <= I_FAIRY_MEMORY ) {
+                m_altForme = m_holdItem - I_FIGHTING_MEMORY + 1;
+            } else {
+                m_altForme = 0;
+            }
+            return;
+        }
+
+    }
 }
 
 void pokemon::heal( ) {
@@ -210,8 +109,8 @@ void pokemon::heal( ) {
 bool pokemon::operator==( const pokemon& p_other ) const {
     return m_boxdata == p_other.m_boxdata;
 }
-bool pokemon::boxPokemon::operator==( const pokemon::boxPokemon& p_other ) const {
-    if( m_pid != p_other.m_pid || m_b1 != p_other.m_b1 || m_checksum != p_other.m_checksum
+bool boxPokemon::operator==( const boxPokemon& p_other ) const {
+    if( m_pid != p_other.m_pid || m_checksum != p_other.m_checksum
         || m_speciesId != p_other.m_speciesId || m_holdItem != p_other.m_holdItem
         || m_oTId != p_other.m_oTId || m_oTSid != p_other.m_oTSid
         || m_experienceGained != p_other.m_experienceGained || m_steps != p_other.m_steps
@@ -220,3 +119,358 @@ bool pokemon::boxPokemon::operator==( const pokemon::boxPokemon& p_other ) const
         return false;
     return true;
 }
+
+bool pokemon::canBattleTransform( ) const {
+    // TODO: Check whether pkmn can mega evolve etc
+
+    return false;
+}
+
+void pokemon::battleTransform( ) {
+    // TODO: Perform mega evolution etc
+}
+
+void pokemon::revertBattleTransform( ) {
+    m_battleForme = 0;
+}
+
+
+boxPokemon::boxPokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name,
+                                 u8 p_shiny, bool p_hiddenAbility, bool p_isEgg,
+                                 u8 p_ball, u8 p_pokerus, bool p_fatefulEncounter,
+                                 pkmnData* p_data ) :
+    boxPokemon::boxPokemon( nullptr, p_pkmnId, p_name, p_level,
+            SAVE::SAV->getActiveFile( ).m_id, SAVE::SAV->getActiveFile( ).m_sid,
+            SAVE::SAV->getActiveFile( ).m_playername, !SAVE::SAV->getActiveFile( ).m_isMale,
+            p_shiny, p_hiddenAbility, p_fatefulEncounter, p_isEgg,
+            MAP::curMap->getCurrentLocationId( ), p_ball, p_pokerus, p_forme, p_data ) { }
+
+boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name,
+                                 u16 p_level, u16 p_id, u16 p_sid, const char* p_oT,
+                                 bool p_oTFemale, u8 p_shiny, bool p_hiddenAbility,
+                                 bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace,
+                                 u8 p_ball, u8 p_pokerus, u8 p_forme, pkmnData* p_data ) {
+    pkmnData data;
+    if( p_data == nullptr ) {
+        data = getPkmnData( p_pkmnId, p_forme );
+    } else {
+        data = *p_data;
+    }
+
+    m_oTId  = p_id;
+    m_oTSid = p_sid;
+    m_pid   = rand( );
+    if( p_shiny == 2 )
+        while( !isShiny( ) ) m_pid = rand( );
+    else if( p_shiny == 1 )
+        while( isShiny( ) ) m_pid = rand( );
+    else if( p_shiny ) { // Try p_shiny - 2 additional times to generate a shiny PId
+        for( u8 i = 0; i < p_shiny - 2 && !isShiny( ); ++i ) m_pid = rand( );
+    }
+    m_speciesId = p_pkmnId;
+
+    if( data.m_baseForme.m_items[ 3 ] )
+        m_holdItem = data.m_baseForme.m_items[ 3 ];
+    else {
+        u8 m_b1 = rand( ) % 100;
+        if( m_b1 < 5 && data.m_baseForme.m_items[ 0 ] )
+            m_holdItem = data.m_baseForme.m_items[ 0 ];
+        else if( m_b1 < 20 && data.m_baseForme.m_items[ 1 ] )
+            m_holdItem = data.m_baseForme.m_items[ 1 ];
+        else if( m_b1 < 80 && data.m_baseForme.m_items[ 2 ] )
+            m_holdItem = data.m_baseForme.m_items[ 2 ];
+    }
+
+    if( !p_isEgg )
+        m_experienceGained = EXP[ p_level - 1 ][ data.m_expTypeFormeCnt >> 5 ];
+
+    if( p_isEgg ) {
+        m_steps          = data.m_eggCycles;
+        m_gotDate[ 0 ]   = acday;
+        m_gotDate[ 1 ]   = acmonth;
+        m_gotDate[ 2 ]   = acyear % 100;
+        m_gotPlace       = p_gotPlace;
+        m_hatchDate[ 0 ] = m_hatchDate[ 1 ] = m_hatchDate[ 2 ] = m_hatchPlace = 0;
+    } else {
+        m_steps          = data.m_baseFriend;
+        m_hatchDate[ 0 ] = acday;
+        m_hatchDate[ 1 ] = acmonth;
+        m_hatchDate[ 2 ] = acyear % 100;
+        m_gotPlace       = p_gotPlace;
+    }
+
+    m_ability = ( p_hiddenAbility && data.m_baseForme.m_abilities[ 2 ] )
+                    ? ( ( ( m_pid & 1 ) || !data.m_baseForme.m_abilities[ 3 ] )
+                            ? data.m_baseForme.m_abilities[ 2 ]
+                            : data.m_baseForme.m_abilities[ 3 ] )
+                    : ( ( ( m_pid & 1 ) || !data.m_baseForme.m_abilities[ 1 ] )
+                            ? data.m_baseForme.m_abilities[ 0 ]
+                            : data.m_baseForme.m_abilities[ 1 ] );
+    m_origLang = 5;
+
+    if( p_moves )
+        memcpy( m_moves, p_moves, sizeof( m_moves ) );
+    else
+        getLearnMoves( p_pkmnId, p_level, 0, 1, 4, m_moves );
+    for( u8 i = 0; i < 4; ++i ) m_acPP[ i ] = ( u8 )( AttackList[ m_moves[ i ] ]->m_movePP );
+
+    for( u8 i = 0; i < 6; ++i )
+        IVset( i, rand( ) & 31 );
+    setIsNicknamed( !!p_name );
+    setIsEgg( p_isEgg );
+    m_fateful                     = p_fatefulEncounter;
+
+    pkmnGenderType A = data.m_baseForme.m_genderRatio;
+    if( A == MALE )
+        m_isFemale = m_isGenderless = false;
+    else if( A == FEMALE )
+        m_isFemale = true, m_isGenderless = false;
+    else if( A == GENDERLESS )
+        m_isFemale = false, m_isGenderless = true;
+    else if( ( m_pid & 255 ) >= A )
+        m_isFemale = m_isGenderless = false;
+    else
+        m_isFemale = true, m_isGenderless = false;
+
+    m_altForme = p_forme;
+    if( p_name ) {
+        strcpy( m_name, p_name );
+        setIsNicknamed( true );
+    } else {
+        getDisplayName( p_pkmnId, m_name, CURRENT_LANGUAGE );
+        setIsNicknamed( false );
+    }
+    m_hometown = 4;
+    strcpy( m_oT, p_oT );
+    m_pokerus    = p_pokerus;
+    m_ball       = p_ball;
+    m_gotLevel   = p_level;
+    m_oTisFemale = p_oTFemale;
+    recalculateForme( );
+}
+
+pokemon::stats calcStats( const boxPokemon& p_boxdata, u8 p_level,
+                          const pkmnData* p_data ) {
+    pokemon::stats res;
+    u16            pkmnId = p_boxdata.m_speciesId;
+    if( pkmnId != PKMN_SHEDINJA )
+        res.m_acHP = res.m_maxHP = ( ( p_boxdata.IVget( 0 ) + 2 *
+                p_data->m_baseForme.m_bases[ 0 ]
+                                       + ( p_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )
+                                     * p_level / 100 )
+                                   + 10;
+    else
+        res.m_acHP = res.m_maxHP = 1;
+    pkmnNatures nature = p_boxdata.getNature( );
+
+    for( u8 i = 1; i < 6; ++i ) {
+        res.setStat( i, ( ( ( p_boxdata.IVget( i ) + 2
+                    * p_data->m_baseForme.m_bases[ i ]
+                      + ( p_boxdata.m_effortValues[ i ] >> 2 ) )
+                    * p_level / 100.0 )
+                  + 5 ) * NatMod[ nature ][ i - 1 ] );
+    }
+    return res;
+}
+pokemon::stats calcStats( const boxPokemon& p_boxdata, const pkmnData* p_data ) {
+    return calcStats( p_boxdata, calcLevel( p_boxdata, p_data ), p_data );
+}
+u16 calcLevel( const boxPokemon& p_boxdata, const pkmnData* p_data ) {
+    for( u16 i = 2; i < 101; ++i )
+        if( EXP[ i - 1 ][ p_data->m_expTypeFormeCnt >> 5 ] > p_boxdata.m_experienceGained ) return ( i - 1 );
+    return 100;
+}
+
+pokemon::pokemon( boxPokemon& p_boxPokemon ) : m_boxdata( p_boxPokemon ) {
+    pkmnData data       = getPkmnData( p_boxPokemon.m_speciesId, p_boxPokemon.getForme( ) );
+    m_level             = calcLevel( p_boxPokemon, &data );
+    m_stats             = calcStats( m_boxdata, m_level, &data );
+    m_status.m_isAsleep = m_status.m_isBurned = m_status.m_isFrozen = m_status.m_isParalyzed
+        = m_status.m_isPoisoned = m_status.m_isBadlyPoisoned = false;
+}
+pokemon::pokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 p_shiny,
+                  bool p_hiddenAbility, bool p_isEgg, u8 p_ball, u8 p_pokerus,
+                  bool p_fatefulEncounter ) {
+    pkmnData data       = getPkmnData( p_pkmnId, p_forme );
+    m_boxdata           = boxPokemon( p_pkmnId, p_level, p_forme, p_name, p_shiny,
+            p_hiddenAbility, p_isEgg, p_ball, p_pokerus,  p_fatefulEncounter, &data );
+    m_level             = p_level;
+    m_stats             = calcStats( m_boxdata, p_level, &data );
+    m_status.m_isAsleep = m_status.m_isBurned = m_status.m_isFrozen = m_status.m_isParalyzed
+        = m_status.m_isPoisoned = m_status.m_isBadlyPoisoned = false;
+}
+pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id, u16 p_sid,
+                  const char* p_oT, bool p_oTFemale, u8 p_shiny, bool p_hiddenAbility,
+                  bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace, u8 p_ball, u8 p_pokerus,
+                  u8 p_forme ) {
+    pkmnData data       = getPkmnData( p_pkmnId, p_forme );
+    m_boxdata           = boxPokemon( p_moves, p_pkmnId, p_name, p_level, p_id,
+            p_sid, p_oT, p_oTFemale, p_shiny, p_hiddenAbility, p_fatefulEncounter, p_isEgg,
+            p_gotPlace, p_ball, p_pokerus, p_forme, &data );
+    m_level             = p_level;
+    m_stats             = calcStats( m_boxdata, p_level, &data );
+    m_status.m_isAsleep = m_status.m_isBurned = m_status.m_isFrozen = m_status.m_isParalyzed
+        = m_status.m_isPoisoned = m_status.m_isBadlyPoisoned = false;
+}
+
+bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
+    if( isEgg( ) ) return false;
+    if( getItem( ) == I_EVERSTONE ) return false;
+
+    pokemonData data;
+    getAll( m_boxdata.m_speciesId, data, getForme( ) );
+
+    for( int i = 0; i < 7; ++i ) {
+        if( m_level < data.m_evolutions[ i ].m_e.m_evolveLevel ) continue;
+        if( m_boxdata.m_steps < data.m_evolutions[ i ].m_e.m_evolveFriendship ) continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveItem
+            && p_item != data.m_evolutions[ i ].m_e.m_evolveItem )
+            continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveDayTime != -1
+            && getCurrentDaytime( ) != data.m_evolutions[ i ].m_e.m_evolveDayTime )
+            continue;
+        if( data.m_evolutions[ i ].m_e.m_evolvesInto == 0 ) continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveGender
+            && m_boxdata.gender( ) != data.m_evolutions[ i ].m_e.m_evolveGender )
+            continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveLocation
+            && MAP::curMap->getCurrentLocationId( ) != data.m_evolutions[ i ].m_e.m_evolveLocation )
+            continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveHeldItem
+            && m_boxdata.m_holdItem != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
+            continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveKnownMove ) {
+            bool b = false;
+            for( int j = 0; j < 4; ++j )
+                b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMove == m_boxdata.m_moves[ j ] );
+            if( !b ) continue;
+        }
+        if( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType ) {
+            bool b = false;
+            for( int j = 0; j < 4; ++j )
+                b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType
+                       == AttackList[ m_boxdata.m_moves[ j ] ]->m_moveType );
+            if( !b ) continue;
+        }
+        if( data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty
+            && data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty < m_boxdata.m_contestStats[ 1 ] )
+            continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember ) {
+            bool b = false;
+            for( int j = 0; j < 6; ++j )
+                b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember
+                       == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId );
+            if( !b ) continue;
+        }
+        if( p_method != data.m_evolutions[ i ].m_e.m_evolutionTrigger ) continue;
+        return true;
+    }
+    return false;
+}
+
+void pokemon::giveItem( u16 p_newItem ) {
+    m_boxdata.giveItem( p_newItem );
+    pkmnData data = getPkmnData( m_boxdata.m_speciesId, m_boxdata.getForme( ) );
+    auto oldHP    = m_stats.m_maxHP - m_stats.m_acHP;
+    m_stats       = calcStats( m_boxdata, m_level, &data );
+    m_stats.m_acHP  = m_stats.m_maxHP - oldHP;
+}
+u16 pokemon::takeItem( ) {
+    u16 res       = m_boxdata.takeItem( );
+    pkmnData data = getPkmnData( m_boxdata.m_speciesId, m_boxdata.getForme( ) );
+    auto oldHP    = m_stats.m_maxHP - m_stats.m_acHP;
+    m_stats       = calcStats( m_boxdata, m_level, &data );
+    m_stats.m_acHP  = m_stats.m_maxHP - oldHP;
+    return res;
+}
+
+void pokemon::evolve( u16 p_item, u16 p_method ) {
+    if( isEgg( ) ) return;
+    if( getItem( ) == I_EVERSTONE ) return;
+
+    pokemonData data;
+    getAll( m_boxdata.m_speciesId, data );
+
+    int into = 0;
+
+    for( int i = 0; i < 7; ++i ) {
+        if( m_level < data.m_evolutions[ i ].m_e.m_evolveLevel ) continue;
+        if( m_boxdata.m_steps < data.m_evolutions[ i ].m_e.m_evolveFriendship ) continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveItem
+            && p_item != data.m_evolutions[ i ].m_e.m_evolveItem )
+            continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveDayTime != -1
+            && getCurrentDaytime( ) != data.m_evolutions[ i ].m_e.m_evolveDayTime )
+            continue;
+        if( data.m_evolutions[ i ].m_e.m_evolvesInto == 0 ) continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveGender
+            && m_boxdata.gender( ) != data.m_evolutions[ i ].m_e.m_evolveGender )
+            continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveLocation
+            && MAP::curMap->getCurrentLocationId( ) != data.m_evolutions[ i ].m_e.m_evolveLocation )
+            continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveHeldItem
+            && m_boxdata.m_holdItem != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
+            continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveKnownMove ) {
+            bool b = false;
+            for( int j = 0; j < 4; ++j )
+                b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMove == m_boxdata.m_moves[ j ] );
+            if( !b ) continue;
+        }
+        if( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType ) {
+            bool b = false;
+            for( int j = 0; j < 4; ++j )
+                b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType
+                       == AttackList[ m_boxdata.m_moves[ j ] ]->m_moveType );
+            if( !b ) continue;
+        }
+        if( data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty
+            && data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty < m_boxdata.m_contestStats[ 1 ] )
+            continue;
+        if( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember ) {
+            bool b = false;
+            for( int j = 0; j < 6; ++j )
+                b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember
+                       == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId );
+            if( !b ) continue;
+        }
+        if( p_method != data.m_evolutions[ i ].m_e.m_evolutionTrigger ) continue;
+        into = data.m_evolutions[ i ].m_e.m_evolvesInto;
+        break;
+    }
+    if( into == 0 ) return;
+
+    int HPdif             = m_stats.m_maxHP - m_stats.m_acHP;
+    m_boxdata.m_speciesId = into;
+    getAll( m_boxdata.m_speciesId, data );
+    if( m_boxdata.m_speciesId != 292 )
+        m_stats.m_maxHP = ( ( m_boxdata.IVget( 0 ) + 2 * data.m_bases[ 0 ]
+                              + ( m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )
+                            * m_level / 100 )
+                          + 10;
+    else
+        m_stats.m_maxHP = 1;
+
+    if( !m_boxdata.isNicknamed( ) )
+        strcpy( m_boxdata.m_name, getDisplayName( m_boxdata.m_speciesId, CURRENT_LANGUAGE ).c_str( ) );
+
+    pkmnNatures nature = m_boxdata.getNature( );
+    for( u8 i = 1; i < 6; ++i ) {
+        setStat( i, ( ( ( m_boxdata.IVget( i ) + 2
+                    * data.m_bases[ i ]
+                      + ( m_boxdata.m_effortValues[ i ] >> 2 ) )
+                    * m_level / 100.0 )
+                  + 5 ) * NatMod[ nature ][ i - 1 ] );
+    }
+    m_stats.m_acHP = m_stats.m_maxHP - HPdif;
+}
+
+void boxPokemon::hatch( ) {
+    setIsEgg( false );
+    m_hatchPlace               = MAP::curMap->getCurrentLocationId( );
+    m_hatchDate[ 0 ]           = acday;
+    m_hatchDate[ 1 ]           = acmonth + 1;
+    m_hatchDate[ 2 ]           = ( acyear + 1900 ) % 100;
+}
+

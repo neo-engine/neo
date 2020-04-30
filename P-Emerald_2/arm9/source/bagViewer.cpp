@@ -32,6 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 #include "uio.h"
 #include "yesNoBox.h"
+#include "itemNames.h"
 
 #include <nds.h>
 
@@ -114,7 +115,8 @@ namespace BAG {
                     swiWaitForVBlank( );
 
                     snprintf( buffer, 99, GET_STRING( 52 ),
-                              getDisplayName( p_pokemon.m_boxdata.m_speciesId ).c_str( ) );
+                              getDisplayName( p_pokemon.m_boxdata.m_speciesId,
+                                  CURRENT_LANGUAGE ).c_str( ) );
                     IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                     IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
@@ -151,7 +153,8 @@ namespace BAG {
                 swiWaitForVBlank( );
 
                 snprintf( buffer, 99, GET_STRING( 52 ),
-                          getDisplayName( p_pokemon.m_boxdata.m_speciesId ).c_str( ) );
+                          getDisplayName( p_pokemon.m_boxdata.m_speciesId,
+                              CURRENT_LANGUAGE ).c_str( ) );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
@@ -175,15 +178,16 @@ namespace BAG {
 
             takeItemFromPkmn( p_pokemon );
         }
-        p_pokemon.m_boxdata.m_holdItem = p_item;
+        p_pokemon.giveItem( p_item );
+        _bagUI->drawPkmnIcons( );
         return true;
     }
 
     void bagViewer::takeItemFromPkmn( pokemon& p_pokemon ) {
         if( p_pokemon.isEgg( ) || !p_pokemon.getItem( ) ) return;
         auto currBgType = toBagType( ItemList[ p_pokemon.getItem( ) ]->m_itemType );
-        SAVE::SAV->getActiveFile( ).m_bag.insert( currBgType, p_pokemon.getItem( ), 1 );
-        p_pokemon.m_boxdata.m_holdItem = 0;
+        SAVE::SAV->getActiveFile( ).m_bag.insert( currBgType, p_pokemon.takeItem( ), 1 );
+        _bagUI->drawPkmnIcons( );
     }
 
     /*
@@ -327,11 +331,11 @@ namespace BAG {
         return ( p_item == I_REPEL ) || ( p_item == I_SUPER_REPEL ) || ( p_item == I_MAX_REPEL )
                || ( p_item == I_ESCAPE_ROPE ) || ( p_item == I_HONEY )
 
-               || ( p_item == I_EXP_SHARE ) || ( p_item == I_POKE_RADAR )
+               || ( p_item == I_EXP__SHARE ) || ( p_item == I_POKE_RADAR )
                || ( p_item == I_COIN_CASE ) || ( p_item == I_OLD_ROD ) || ( p_item == I_SUPER_ROD )
                || ( p_item == I_GOOD_ROD ) || ( p_item == I_SQUIRT_BOTTLE )
                || ( p_item == I_SPRAYDUCK ) || ( p_item == I_WAILMER_PAIL )
-               || ( p_item == I_BICYCLE ) || ( p_item == I_ACRO_BIKE ) || ( p_item == I_BIKE2 )
+               || ( p_item == I_BIKE ) || ( p_item == I_ACRO_BIKE ) || ( p_item == I_BIKE2 )
                || ( p_item == I_MACH_BIKE );
     }
 
@@ -436,13 +440,14 @@ namespace BAG {
                     if( _ranges[ start ].second.m_isHeld
                         && _ranges[ curr ].second.m_isHeld ) { // Swap held items
                         if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ start - t ].isEgg( )
-                            && !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ curr - t ].isEgg( ) )
-                            std::swap( SAVE::SAV->getActiveFile( )
-                                           .m_pkmnTeam[ start - t ]
-                                           .m_boxdata.m_holdItem,
-                                       SAVE::SAV->getActiveFile( )
-                                           .m_pkmnTeam[ curr - t ]
-                                           .m_boxdata.m_holdItem );
+                            && !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ curr - t ].isEgg( ) ) {
+                            auto oldItem = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ start - t ]
+                                .getItem( );
+                            SAVE::SAV->getActiveFile( ).m_pkmnTeam[ start - t ].giveItem(
+                                    SAVE::SAV->getActiveFile( ).m_pkmnTeam[ curr - t ].getItem( ) );
+                            SAVE::SAV->getActiveFile( ).m_pkmnTeam[ curr - t ].giveItem( oldItem );
+                            _bagUI->drawPkmnIcons( );
+                        }
                     } else if( !_ranges[ start ].second.m_isHeld
                                && !_ranges[ curr ].second.m_isHeld ) { // Swap bag items
                         SAVE::SAV->getActiveFile( ).m_bag.swap(

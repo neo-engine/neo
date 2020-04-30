@@ -43,8 +43,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "ailment.h"
 #include "keyboard.h"
 #include "move.h"
+#include "moveNames.h"
 #include "moveChoiceBox.h"
 #include "pokemon.h"
+#include "pokemonNames.h"
 #include "saveGame.h"
 #include "sprite.h"
 #include "uio.h"
@@ -800,7 +802,7 @@ namespace BATTLE {
         u8 dx = p_pressed * 2;
         u8 dy = p_pressed;
 
-        if( !acPkmn.m_boxdata.m_individualValues.m_isEgg ) {
+        if( !acPkmn.isEgg( ) ) {
             u8 gn = ( !acPkmn.gender( ) || acPkmn.m_boxdata.m_speciesId == 29
                       || acPkmn.m_boxdata.m_speciesId == 32 )
                         ? 8
@@ -882,7 +884,7 @@ namespace BATTLE {
 
             auto& acPkmnStr = CUR_PKMN_STR_2( *_battle, i, PLAYER );
             auto& acPkmn    = *acPkmnStr.m_pokemon;
-            if( !acPkmn.m_boxdata.m_individualValues.m_isEgg )
+            if( !acPkmn.isEgg( ) )
                 tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, x - 4, y - 12, ++oamIndex,
                                             palIndex++, tilecnt, true );
             else
@@ -905,7 +907,7 @@ namespace BATTLE {
         bool dead = !p_pokemon.m_stats.m_acHP;
         u8   dx = p_pressed * 2, dy = p_pressed;
 
-        if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+        if( !( p_pokemon.isEgg( ) ) ) {
             if( !p_alreadySent && !p_alreadyChosen && !dead )
                 IO::regularFont->printString( GET_STRING( 149 ), p_x + dx + 64, dy + 52, true,
                                               IO::font::CENTER );
@@ -999,7 +1001,7 @@ namespace BATTLE {
         // Switch
         BG_PALETTE_SUB[ GRAY_IDX ] = NORMAL_COLOR;
 
-        if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+        if( !( p_pokemon.isEgg( ) ) ) {
             // Status
             tilecnt = IO::loadSprite( ++oamIndex, 3, tilecnt, 20, 128, 32, 32, memoPal, memoTiles,
                                       memoTilesLen, false, false, false, OBJPRIORITY_1, true );
@@ -1015,7 +1017,7 @@ namespace BATTLE {
             x = 64;
             y = 64;
         }
-        if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+        if( !( p_pokemon.isEgg( ) ) ) {
             if( !( t2 = IO::loadPKMNSprite( PKMN_SPRITE_PATH, p_pokemon.m_boxdata.m_speciesId, 16,
                                             32, ++oamIndex, ++palIndex, tilecnt, true,
                                             p_pokemon.m_boxdata.isShiny( ),
@@ -1042,7 +1044,7 @@ namespace BATTLE {
             // Accept touches that are almost on the sprite
             if( GET_AND_WAIT_R( 224, 164, 300, 300 ) || GET_AND_WAIT( KEY_B ) ) // Back
                 return 3;
-            if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+            if( !( p_pokemon.isEgg( ) ) ) {
                 if( GET_AND_WAIT( KEY_DOWN ) || GET_AND_WAIT( KEY_RIGHT ) ) {
                     drawConfirmationChoice( p_pokemon, p_alreadySent, p_alreadyChosen, x, y, selIdx,
                                             false );
@@ -1166,7 +1168,7 @@ namespace BATTLE {
         u16 exptype = data.m_expType;
 
         u16 t2;
-        if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+        if( !( p_pokemon.isEgg( ) ) ) {
             if( !( t2 = IO::loadPKMNSprite( PKMN_SPRITE_PATH, p_pokemon.m_boxdata.m_speciesId, 16,
                                             8, ++oamIndex, ++palIndex, tilecnt, true,
                                             p_pokemon.m_boxdata.isShiny( ),
@@ -1222,8 +1224,8 @@ namespace BATTLE {
             IO::boldFont->setColor( GRAY_IDX, 1 );
             IO::boldFont->setColor( BLACK_IDX, 2 );
 
-            IO::boldFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId ).c_str( ),
-                                       24, 110, true );
+            IO::boldFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId,
+                        CURRENT_LANGUAGE ).c_str( ), 24, 110, true );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::boldFont->printString(
@@ -1268,7 +1270,7 @@ namespace BATTLE {
         }
 
         // Here starts the page specific stuff
-        if( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) p_page = 0;
+        if( p_pokemon.isEgg( ) ) p_page = 0;
 
         if( p_page == 1 ) { // Moves
             for( u8 i = 0; i < 4; ++i ) {
@@ -1293,14 +1295,14 @@ namespace BATTLE {
                                                           ++oamIndex, ++palIndex, tilecnt, true );
                     consoleSelect( &IO::Bottom );
                     consoleSetWindow( &IO::Bottom, x / 8, 5 + 5 * i, 20, 2 );
-                    printf( "%6hhu/%2hhu %s", p_pokemon.m_boxdata.m_acPP[ 0 ],
-                            AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_movePP
-                                * ( ( 5 + p_pokemon.m_boxdata.m_ppup.m_Up1 ) / 5 ),
+                    printf( "%6hhu/%2hhu %s", p_pokemon.m_boxdata.m_acPP[ i ],
+                            AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_movePP
+                                * ( ( 5 + p_pokemon.m_boxdata.PPupget( i ) ) / 5 ),
                             GET_STRING( 31 ) );
                 }
             }
         } else { // Status
-            if( !( p_pokemon.m_boxdata.m_individualValues.m_isEgg ) ) {
+            if( !( p_pokemon.isEgg( ) ) ) {
                 IO::boldFont->setColor( GRAY_IDX, 1 );
                 IO::boldFont->setColor( BLACK_IDX, 2 );
                 char buffer[ 30 ];
@@ -2160,9 +2162,9 @@ namespace BATTLE {
         while( newLevel ) {
             acPkmn.m_level++;
 
-            if( acPkmn.m_boxdata.m_speciesId != 292 ) // Check for Ninjatom
+            if( acPkmn.m_boxdata.m_speciesId != PKMN_SHEDINJA )
                 acPkmn.m_stats.m_maxHP
-                    = ( ( acPkmn.m_boxdata.m_individualValues.m_hp + 2 * p.m_bases[ 0 ]
+                    = ( ( acPkmn.IVget( 0 ) + 2 * p.m_bases[ 0 ]
                           + ( acPkmn.m_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )
                         * acPkmn.m_level / 100 )
                       + 10;
@@ -2171,31 +2173,31 @@ namespace BATTLE {
             pkmnNatures nature = acPkmn.m_boxdata.getNature( );
 
             acPkmn.m_stats.m_Atk
-                = ( ( ( acPkmn.m_boxdata.m_individualValues.m_attack + 2 * p.m_bases[ ATK + 1 ]
+                = ( ( ( acPkmn.IVget( 1 ) + 2 * p.m_bases[ ATK + 1 ]
                         + ( acPkmn.m_boxdata.m_effortValues[ ATK + 1 ] >> 2 ) )
                       * acPkmn.m_level / 100.0 )
                     + 5 )
                   * NatMod[ nature ][ ATK ];
             acPkmn.m_stats.m_Def
-                = ( ( ( acPkmn.m_boxdata.m_individualValues.m_defense + 2 * p.m_bases[ DEF + 1 ]
+                = ( ( ( acPkmn.IVget( 2 ) + 2 * p.m_bases[ DEF + 1 ]
                         + ( acPkmn.m_boxdata.m_effortValues[ DEF + 1 ] >> 2 ) )
                       * acPkmn.m_level / 100.0 )
                     + 5 )
                   * NatMod[ nature ][ DEF ];
             acPkmn.m_stats.m_Spd
-                = ( ( ( acPkmn.m_boxdata.m_individualValues.m_speed + 2 * p.m_bases[ SPD + 1 ]
+                = ( ( ( acPkmn.IVget( 5 ) + 2 * p.m_bases[ SPD + 1 ]
                         + ( acPkmn.m_boxdata.m_effortValues[ SPD + 1 ] >> 2 ) )
                       * acPkmn.m_level / 100.0 )
                     + 5 )
                   * NatMod[ nature ][ SPD ];
             acPkmn.m_stats.m_SAtk
-                = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sAttack + 2 * p.m_bases[ SATK + 1 ]
+                = ( ( ( acPkmn.IVget( 3 ) + 2 * p.m_bases[ SATK + 1 ]
                         + ( acPkmn.m_boxdata.m_effortValues[ SATK + 1 ] >> 2 ) )
                       * acPkmn.m_level / 100.0 )
                     + 5 )
                   * NatMod[ nature ][ SATK ];
             acPkmn.m_stats.m_SDef
-                = ( ( ( acPkmn.m_boxdata.m_individualValues.m_sDefense + 2 * p.m_bases[ SDEF + 1 ]
+                = ( ( ( acPkmn.IVget( 4 ) + 2 * p.m_bases[ SDEF + 1 ]
                         + ( acPkmn.m_boxdata.m_effortValues[ SDEF + 1 ] >> 2 ) )
                       * acPkmn.m_level / 100.0 )
                     + 5 )
@@ -2691,7 +2693,7 @@ namespace BATTLE {
             auto         nick = kbd.getText( 10, GET_STRING( 142 ) );
             if( strcmp( nick.c_str( ), acPkmn.m_boxdata.m_name ) && strcmp( "", nick.c_str( ) ) ) {
                 strcpy( acPkmn.m_boxdata.m_name, nick.c_str( ) );
-                acPkmn.m_boxdata.m_individualValues.m_isNicked = true;
+                acPkmn.m_boxdata.setIsNicknamed( true );
             }
         }
         IO::NAV->draw( );

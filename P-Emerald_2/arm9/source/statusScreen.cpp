@@ -121,8 +121,7 @@ namespace STS {
                 }
             for( u8 i = 0; i < 5; ++i ) {
                 if( SAVE::SAV->getActiveFile( )
-                        .m_pkmnTeam[ _pkmnIdx ]
-                        .m_boxdata.m_individualValues.m_isEgg
+                        .m_pkmnTeam[ _pkmnIdx ].isEgg( )
                     && i != 2 )
                     continue;
                 if( GET_AND_WAIT_C( 62 + 32 * i, 14 - 2 * i, 14 ) ) {
@@ -192,13 +191,11 @@ namespace STS {
                 if( IN_RANGE_I( touch, tg[ tg.size( ) - 2 ] )
                     && IO::waitForInput( tg[ tg.size( ) - 2 ] ) ) {
                     if( SAVE::SAV->getActiveFile( )
-                            .m_pkmnTeam[ _pkmnIdx ]
-                            .m_boxdata.m_holdItem ) { // take item
+                            .m_pkmnTeam[ _pkmnIdx ].getItem( ) ) { // take item
                         char buffer[ 50 ];
                         item acI = *ItemList[ SAVE::SAV->getActiveFile( )
-                                                  .m_pkmnTeam[ _pkmnIdx ]
-                                                  .m_boxdata.m_holdItem ];
-                        SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem = 0;
+                                                  .m_pkmnTeam[ _pkmnIdx ].getItem( ) ];
+                        SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].takeItem( );
                         consoleSelect( &IO::Bottom );
                         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                         consoleClear( );
@@ -224,8 +221,7 @@ namespace STS {
                                 SAVE::SAV->getActiveFile( ).m_bag.insert(
                                     BAG::toBagType( curItm->m_itemType ), curItm->getItemId( ), 1 );
                             }
-                            SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem
-                                = itm;
+                            SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].giveItem( itm );
                         }
                     }
                     IO::fadeScreen( IO::fadeType::CLEAR_DARK_FAST );

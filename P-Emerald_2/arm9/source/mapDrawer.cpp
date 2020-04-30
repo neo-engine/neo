@@ -37,6 +37,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "screenFade.h"
 #include "sprite.h"
 #include "uio.h"
+#include "abilityNames.h"
 
 #include "BigCirc1.h"
 
@@ -1492,7 +1493,7 @@ namespace MAP {
                     && ( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_ability
                              == A_SUCTION_CUPS
                          || SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_ability
-                                == A_STICKY ) );
+                                == A_STICKY_HOLD ) );
 
             // Start wild PKMN battle here
             handleWildPkmn( FISHING_ROD, p_rodType, forceEncounter );

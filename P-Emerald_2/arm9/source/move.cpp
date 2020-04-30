@@ -29,6 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battlePokemon.h"
 #include "hmMoves.h"
 #include "item.h"
+#include "itemNames.h"
 
 #define C ( char )
 #define A ( move::moveAffectsTypes )

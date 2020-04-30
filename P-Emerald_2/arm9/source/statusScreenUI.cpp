@@ -28,8 +28,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <cstdio>
 
-#include "boxUI.h"
 #include "defines.h"
+#include "boxUI.h"
 #include "fs.h"
 #include "item.h"
 #include "move.h"
@@ -230,7 +230,7 @@ namespace STS {
         return tileCnt;
     }
 
-    void drawPartyPkmn( const pokemon* const p_pokemon, u8 p_pos, bool p_selected,
+    void drawPartyPkmn( pokemon* p_pokemon, u8 p_pos, bool p_selected,
                         bool p_redraw = true, bool p_bottom = false ) {
         SpriteEntry* oam      = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         u16          anchor_x = oam[ 6 + 2 * p_pos ].x;
@@ -427,7 +427,7 @@ namespace STS {
                 bgUpdate( );
                 IO::loadPKMNIcon( p_pokemon->m_boxdata.m_speciesId, oam[ 30 + p_pos ].x,
                                   oam[ 30 + p_pos ].y, 30 + p_pos, 4 + p_pos,
-                                  oam[ 30 + p_pos ].gfxIndex, p_bottom );
+                                  oam[ 30 + p_pos ].gfxIndex, p_bottom, p_pokemon->getForme( ) );
             }
         }
 
@@ -483,6 +483,7 @@ namespace STS {
     //#define BWD_ID 14
 
 #define HP_COL 238
+    pkmnData data;
     void regStsScreenUI::initSub( ) {
         IO::initOAMTable( true );
         u16 nextAvailableTileIdx = 0;
@@ -513,7 +514,7 @@ namespace STS {
 
         for( u8 i = 0; i < 6; ++i ) {
             auto pkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata;
-            if( pkmn.m_individualValues.m_isEgg )
+            if( pkmn.isEgg( ) )
                 nextAvailableTileIdx = IO::loadEggIcon( 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ),
                                                         SUB_BALL_IDX( i ), nextAvailableTileIdx );
             else
@@ -567,9 +568,7 @@ namespace STS {
         for( u8 i = 0; i < 12; ++i ) Oam->oamBuffer[ RIBBON_IDX + i ].isHidden = true;
     }
 
-    pokemonData data;
-
-    void drawPkmnInformation( const pokemon& p_pokemon, u8& p_page, bool p_newpok, bool p_bottom ) {
+    void drawPkmnInformation( pokemon& p_pokemon, u8& p_page, bool p_newpok, bool p_bottom ) {
         dmaFillWords( 0, bgGetGfxPtr( p_bottom ? IO::bg2sub : IO::bg2 ), 256 * 192 );
         auto Oam = p_bottom ? IO::Oam : IO::OamTop;
         auto pal = BG_PAL( p_bottom );
@@ -580,7 +579,9 @@ namespace STS {
                               -6, 22, SHINY_IDX, SHINY_PAL, 1000, p_bottom );
         }
 
-        if( !p_pokemon.m_boxdata.m_individualValues.m_isEgg ) {
+        data = getPkmnData( p_pokemon.m_boxdata.m_speciesId, p_pokemon.getForme( ) );
+
+        if( !p_pokemon.isEgg( ) ) {
             pal[ RED_IDX ]   = RED;
             pal[ BLUE_IDX ]  = BLUE;
             pal[ RED2_IDX ]  = RED2;
@@ -606,8 +607,9 @@ namespace STS {
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
 
-            getAll( p_pokemon.m_boxdata.m_speciesId, data );
-            IO::regularFont->printString( data.m_displayName, 160, 13, p_bottom );
+
+            IO::regularFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId,
+                        CURRENT_LANGUAGE ).c_str( ), 160, 13, p_bottom );
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::regularFont->printString( "Item", 2, 176, p_bottom );
@@ -639,26 +641,25 @@ namespace STS {
                 IO::regularFont->setColor( WHITE_IDX, 1 );
                 IO::regularFont->setColor( GRAY_IDX, 2 );
             }
-            if( p_pokemon.m_boxdata.isCloned( ) ) {
-                IO::regularFont->printString( "*", 20, 28, p_bottom );
-            }
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
 
             if( p_newpok )
                 if( !IO::loadPKMNSprite(
-                        "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId, 16, 44,
+                        p_pokemon.m_boxdata.m_speciesId, 16, 44,
                         PKMN_SPRITE_START, PKMN_SPRITE_PAL,
                         Oam->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, p_bottom,
-                        p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale, true ) ) {
+                        p_pokemon.m_boxdata.isShiny( ), p_pokemon.m_boxdata.m_isFemale, true,
+                        false, p_pokemon.getForme( ) ) ) {
                     IO::loadPKMNSprite(
-                        "nitro:/PICS/SPRITES/PKMN/", p_pokemon.m_boxdata.m_speciesId, 16, 44,
+                        p_pokemon.m_boxdata.m_speciesId, 16, 44,
                         PKMN_SPRITE_START, PKMN_SPRITE_PAL,
                         Oam->oamBuffer[ PKMN_SPRITE_START ].gfxIndex, p_bottom,
-                        p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale, true );
+                        p_pokemon.m_boxdata.isShiny( ), !p_pokemon.m_boxdata.m_isFemale, true,
+                        false, p_pokemon.getForme( ) );
                 }
 
-            u16 exptype = data.m_expType;
+            u16 exptype = data.m_expTypeFormeCnt >> 5;
 
             IO::displayHP( 100, 101, 46, 76, HP_COL, HP_COL + 1, false, 50, 56, p_bottom );
             IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP,
@@ -714,7 +715,7 @@ namespace STS {
                         OBJPRIORITY_0, p_bottom );
 
         IO::regularFont->printString( GET_STRING( 137 ), 32, 0, p_bottom );
-        if( !( currPkmn.m_boxdata.m_individualValues.m_isEgg ) ) {
+        if( !( currPkmn.isEgg( ) ) ) {
 
             pal[ RED_IDX ]   = RED;
             pal[ BLUE_IDX ]  = BLUE;
@@ -857,7 +858,7 @@ namespace STS {
                               SAVE::SAV->getActiveFile( ).m_options.m_language );
 
             pal[ COLOR_IDX ] = GREEN;
-            if( t == data.m_types[ 0 ] || t == data.m_types[ 1 ] ) {
+            if( t == data.m_baseForme.m_types[ 0 ] || t == data.m_baseForme.m_types[ 1 ] ) {
                 IO::regularFont->setColor( COLOR_IDX, 1 );
                 IO::regularFont->setColor( WHITE_IDX, 2 );
             } else {
@@ -920,16 +921,16 @@ namespace STS {
                         OBJPRIORITY_0, p_bottom );
         IO::regularFont->printString( "Trainer-Memo", 32, 0, p_bottom );
 
-        if( data.m_types[ 0 ] == data.m_types[ 1 ] ) {
-            IO::loadTypeIcon( data.m_types[ 0 ], 250 - 32, 50, TYPE_IDX, TYPE_PAL( 0 ),
+        if( data.m_baseForme.m_types[ 0 ] == data.m_baseForme.m_types[ 1 ] ) {
+            IO::loadTypeIcon( data.m_baseForme.m_types[ 0 ], 250 - 32, 50, TYPE_IDX, TYPE_PAL( 0 ),
                               Oam->oamBuffer[ TYPE_IDX ].gfxIndex, p_bottom,
                               SAVE::SAV->getActiveFile( ).m_options.m_language );
             Oam->oamBuffer[ TYPE_IDX + 1 ].isHidden = true;
         } else {
-            IO::loadTypeIcon( data.m_types[ 0 ], 250 - 64, 50, TYPE_IDX, TYPE_PAL( 0 ),
+            IO::loadTypeIcon( data.m_baseForme.m_types[ 0 ], 250 - 64, 50, TYPE_IDX, TYPE_PAL( 0 ),
                               Oam->oamBuffer[ TYPE_IDX ].gfxIndex, p_bottom,
                               SAVE::SAV->getActiveFile( ).m_options.m_language );
-            IO::loadTypeIcon( data.m_types[ 1 ], 250 - 32, 50, TYPE_IDX + 1, TYPE_PAL( 1 ),
+            IO::loadTypeIcon( data.m_baseForme.m_types[ 1 ], 250 - 32, 50, TYPE_IDX + 1, TYPE_PAL( 1 ),
                               Oam->oamBuffer[ TYPE_IDX + 1 ].gfxIndex, p_bottom,
                               SAVE::SAV->getActiveFile( ).m_options.m_language );
         }
@@ -1009,12 +1010,12 @@ namespace STS {
         snprintf( buffer, 49,
                   "Mag %s"
                   "e PokéRg.",
-                  TasteList[ currPkmn.m_boxdata.getTasteStr( ) ].c_str( ) );
+                  GET_STRING( 242 + currPkmn.m_boxdata.getTasteStr( ) ) );
         IO::regularFont->printString( buffer, 250, 30, p_bottom, IO::font::RIGHT );
 
         snprintf( buffer, 49, "Sehr %s; %s.",
-                  NatureList[ currPkmn.m_boxdata.getNature( ) ].c_str( ),
-                  PersonalityList[ currPkmn.m_boxdata.getPersonality( ) ].c_str( ) );
+                  GET_STRING( 187 + currPkmn.m_boxdata.getNature( ) ),
+                  GET_STRING( 212 + currPkmn.m_boxdata.getPersonality( ) ) );
         auto str  = std::string( buffer );
         auto nStr = FS::breakString( str, IO::regularFont, 122 );
         IO::regularFont->printString( nStr.c_str( ), 245, 48, p_bottom, IO::font::RIGHT, 14 );
@@ -1049,7 +1050,7 @@ namespace STS {
         auto pal      = BG_PAL( p_bottom );
 
         if( !currPkmn.m_boxdata.m_moves[ p_moveIdx ] ) return false;
-        if( currPkmn.m_boxdata.m_individualValues.m_isEgg ) return false;
+        if( currPkmn.isEgg( ) ) return false;
 
         for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ TYPE_IDX + i ].isHidden = true;
         for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
@@ -1076,8 +1077,8 @@ namespace STS {
         move* currMove = AttackList[ currPkmn.m_boxdata.m_moves[ p_moveIdx ] ];
 
         pal[ COLOR_IDX ] = GREEN;
-        if( currMove->m_moveType == data.m_types[ 0 ]
-            || currMove->m_moveType == data.m_types[ 1 ] ) {
+        if( currMove->m_moveType == data.m_baseForme.m_types[ 0 ]
+            || currMove->m_moveType == data.m_baseForme.m_types[ 1 ] ) {
             IO::regularFont->setColor( COLOR_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
         } else {
@@ -1137,7 +1138,7 @@ namespace STS {
         auto Oam      = p_bottom ? IO::Oam : IO::OamTop;
         auto pal      = BG_PAL( p_bottom );
 
-        if( currPkmn.m_boxdata.m_individualValues.m_isEgg ) return false;
+        if( currPkmn.isEgg( ) ) return false;
 
         for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ TYPE_IDX + i ].isHidden = true;
         for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
@@ -1192,7 +1193,7 @@ namespace STS {
         IO::updateOAM( p_bottom );
         return true;
     }
-    void regStsScreenUI::draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) {
+    void regStsScreenUI::draw( pokemon& p_pokemon, u8 p_page, bool p_newpok ) {
         hideSprites( false );
 
         IO::setDefaultConsoleTextColors( BG_PALETTE, 230 );
@@ -1241,9 +1242,9 @@ namespace STS {
         }
         for( u8 i = 0; i < 5; ++i )
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( i ) ].isHidden
-                = currPkmn.m_boxdata.m_individualValues.m_isEgg;
+                = currPkmn.isEgg( );
         IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( p_page ) ].isHidden
-            = !currPkmn.m_boxdata.m_individualValues.m_isEgg;
+            = !currPkmn.isEgg( );
 
         if( p_newpok ) {
             IO::Oam->oamBuffer[ FWD_ID ].isHidden = false;
@@ -1271,25 +1272,26 @@ namespace STS {
         if( p_updatePageIcons ) {
             for( u8 i = 0; i < 5; ++i )
                 IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( i ) ].isHidden
-                    = pkmn.m_boxdata.m_individualValues.m_isEgg;
+                    = pkmn.isEgg( );
             IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( 2 ) ].isHidden = false;
         }
 
         for( u8 i = 0; i < 6; ++i ) {
             auto p = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata;
-            if( p.m_individualValues.m_isEgg )
+            if( p.isEgg( ) )
                 IO::loadEggIcon( 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ), SUB_BALL_IDX( i ),
                                  IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex );
             else if( i < SAVE::SAV->getActiveFile( ).getTeamPkmnCount( ) )
                 IO::loadPKMNIcon( p.m_speciesId, 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ),
                                   SUB_BALL_IDX( i ),
-                                  IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex );
+                                  IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex, true,
+                                  p.getForme( ) );
             else
                 IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].isHidden = true;
         }
 
         IO::updateOAM( true );
-        if( pkmn.m_boxdata.m_individualValues.m_isEgg ) return res;
+        if( pkmn.isEgg( ) ) return res;
 
         /*
         for( u8 i = 0; i < 4; ++i )
@@ -1362,7 +1364,7 @@ namespace STS {
                              49162, true );
     }
 
-    void boxStsScreenUI::draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) {
+    void boxStsScreenUI::draw( pokemon& p_pokemon, u8 p_page, bool p_newpok ) {
         // Remember: the storage sys swaps the screens.
         // Only draw on the sub screen
         hideSprites( true );
@@ -1391,9 +1393,9 @@ namespace STS {
         }
         for( u8 i = 0; i < 5; ++i )
             IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].isHidden
-                = p_pokemon.m_boxdata.m_individualValues.m_isEgg;
+                = p_pokemon.isEgg( );
         IO::OamTop->oamBuffer[ PAGE_ICON_START + p_page ].isHidden
-            = !p_pokemon.m_boxdata.m_individualValues.m_isEgg;
+            = !p_pokemon.isEgg( );
         IO::updateOAM( false );
         IO::updateOAM( true );
     }

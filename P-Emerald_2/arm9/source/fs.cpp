@@ -26,6 +26,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <algorithm>
+#include <cassert>
 #include <cstdio>
 #include <cstring>
 #include <initializer_list>
@@ -49,27 +50,12 @@ const char PKMNDATA_PATH[]    = "nitro:/PKMNDATA/";
 const char ABILITYDATA_PATH[] = "nitro:/PKMNDATA/ABILITIES/";
 const char SCRIPT_PATH[]      = "nitro:/MAPS/SCRIPTS/";
 
-ability::ability( int p_abilityId ) {
-    FILE* f = FS::openSplit( ABILITYDATA_PATH, p_abilityId, ".data" );
-
-    if( !f ) return;
-
-    m_abilityName = FS::readString( f, true );
-    m_flavourText = FS::readString( f, true );
-    u32 tmp;
-    fscanf( f, "%lu", &tmp );
-    m_type = static_cast<ability::abilityType>( tmp );
-    FS::close( f );
-}
-
-std::string getAbilityName( int p_abilityId ) {
-    FILE* f = FS::openSplit( ABILITYDATA_PATH, p_abilityId, ".data" );
-
-    if( !f ) return "---";
-    auto ret = FS::readString( f, false );
-    FS::close( f );
-    return ret;
-}
+const char ITEM_NAME_PATH[]    = "nitro:/DATA/ITEM_NAME/";
+const char ABILITY_NAME_PATH[] = "nitro:/ABTY/ABTY_NAME/";
+const char MOVE_NAME_PATH[]    = "nitro:/DATA/MOVE_NAME/";
+const char POKEMON_NAME_PATH[] = "nitro:/DATA/PKMN_NAME/";
+const char POKEMON_DATA_PATH[] = "nitro:/DATA/PKMN_DATA/";
+const char PKMN_LEARNSET_PATH[] = "nitro:/DATA/PKMN_LEARN/";
 
 namespace FS {
     bool exists( const char* p_path, const char* p_name ) {
@@ -292,6 +278,7 @@ namespace FS {
         return true;
     }
 
+    [[deprecated]]
     std::string readString( FILE* p_file, bool p_new ) {
         std::string ret = "";
         int         ac;
@@ -385,6 +372,7 @@ namespace FS {
         return result;
     }
 
+    [[deprecated]]
     std::string convertToOld( const std::string& p_string ) {
         std::string ret = "";
         for( auto ac = p_string.begin( ); ac != p_string.end( ); ++ac ) {
@@ -452,25 +440,99 @@ namespace FS {
     }
 } // namespace FS
 
+ability::ability( int p_abilityId ) {
+    FILE* f = FS::openSplit( ABILITYDATA_PATH, p_abilityId, ".data" );
+
+    if( !f ) return;
+
+    m_abilityName = FS::readString( f, true );
+    m_flavourText = FS::readString( f, true );
+    u32 tmp;
+    fscanf( f, "%lu", &tmp );
+    m_type = static_cast<ability::abilityType>( tmp );
+    FS::close( f );
+}
+
+bool getAbilityName( int p_abilityId, int p_language, char* p_out ) {
+    FILE* f = FS::openSplit( ABILITY_NAME_PATH, p_abilityId, ".str" );
+    if( !f ) return false;
+
+    for( int i = 0; i <= p_language; ++i ) {
+        fread( p_out, 1, ABILITY_NAMELENGTH, f );
+    }
+    fclose( f );
+    return true;
+}
+
+std::string getAbilityName( int p_abilityId, int p_language ) {
+    char tmpbuf[ 20 ];
+    if( !getAbilityName( p_abilityId, p_language, tmpbuf ) ) {
+        return "---";
+    }
+    return std::string( tmpbuf );
+}
+
 std::string toString( u16 p_num ) {
     char buffer[ 32 ];
     sprintf( buffer, "%hu", p_num );
     return std::string( buffer );
 }
 
-std::string getDisplayName( u16 p_pkmnId, u8 p_forme ) {
-    pokemonData tmp;
-    if( !getAll( p_pkmnId, tmp, p_forme ) ) { return "???"; }
-    return tmp.m_displayName;
-}
-void getDisplayName( u16 p_pkmnId, char* p_name, u8 p_forme ) {
-    pokemonData tmp;
-    if( !getAll( p_pkmnId, tmp, p_forme ) ) {
-        strcpy( p_name, "???" );
-        return;
+std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
+    char tmpbuf[ 20 ];
+    if( !getDisplayName( p_pkmnId, tmpbuf, p_language, p_forme ) ) {
+        return "???";
     }
-    strcpy( p_name, tmp.m_displayName );
+    return std::string( tmpbuf );
 }
+bool getDisplayName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
+    FILE* f;
+    if( p_forme ) {
+        char tmpbuf[ 40 ];
+        snprintf( tmpbuf, 35, "_%hhu.str", p_forme );
+        f = FS::openSplit( POKEMON_NAME_PATH, p_pkmnId, tmpbuf );
+    }
+    if( !p_forme || !f ) {
+        f = FS::openSplit( POKEMON_NAME_PATH, p_pkmnId, ".str" );
+    }
+    if( !f ) return false;
+
+    for( int i = 0; i <= p_language; ++i ) {
+        assert( PKMN_NAMELENGTH + ( 5 * !!p_forme ) ==
+                fread( p_out, 1, PKMN_NAMELENGTH + ( 5 * !!p_forme ), f ) );
+    }
+    fclose( f );
+    return true;
+}
+
+pkmnData    getPkmnData( const u16 p_pkmnId, const u8 p_forme ) {
+    pkmnData res;
+    if( getPkmnData( p_pkmnId, p_forme, &res ) ) {
+        return res;
+    }
+    getPkmnData( 0, &res );
+    return res;
+}
+bool        getPkmnData( const u16 p_pkmnId, pkmnData* p_out ) {
+    return getPkmnData( p_pkmnId, 0, p_out );
+}
+bool        getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out ) {
+    FILE* f = FS::openSplit( POKEMON_DATA_PATH, p_pkmnId, ".data" );
+    if( !f ) return false;
+    fread( p_out, sizeof( pkmnData ), 1, f );
+    fclose( f );
+
+    if( p_forme ) {
+        char tmpbuf[ 40 ];
+        snprintf( tmpbuf, 35, "_%hhu.data", p_forme );
+        f = FS::openSplit( POKEMON_DATA_PATH, p_pkmnId, tmpbuf );
+        if( !f ) return true;
+        fread( &p_out->m_baseForme, sizeof( pkmnFormeData ), 1, f );
+        fclose( f );
+    }
+    return true;
+}
+
 
 bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
     FILE* f;
@@ -490,9 +552,11 @@ bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
 
 void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount,
                     u16* p_result ) {
-    FILE* f = FS::openSplit( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId,
-                        ".learnset.data" );
-    if( !f ) return;
+    FILE* f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
+    if( !f )
+        f  = FS::openSplit( PKMN_LEARNSET_PATH, 201, ".learnset.data" );
+    if( !f )
+        return;
 
     u16* buffer = new u16[ 700 ];
     FS::read( f, buffer, sizeof( u16 ), 699 );
@@ -544,8 +608,7 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
     delete[] buffer;
 }
 bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
-    FILE* f = FS::openSplit( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId,
-                        ".learnset.data" );
+    FILE* f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
     if( !f ) return false;
 
     u16* buffer = new u16[ 700 ];

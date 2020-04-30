@@ -27,8 +27,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
-#include "boxUI.h"
 #include "defines.h"
+#include "boxUI.h"
 #include "fs.h"
 #include "pokemon.h"
 #include "screenFade.h"
@@ -221,7 +221,7 @@ namespace BOX {
                                             POS_Y( i ) + 31 ) );
             _ranges.push_back( {oam, res.back( )} );
             if( box->m_pokemon[ i ].m_speciesId ) {
-                if( !box->m_pokemon[ i ].m_individualValues.m_isEgg ) {
+                if( !box->m_pokemon[ i ].isEgg( ) ) {
                     tileCnt
                         = IO::loadPKMNIcon( box->m_pokemon[ i ].m_speciesId, POS_X( i ), POS_Y( i ),
                                             oam++, pal / 16, pal % 16, tileCnt, false );
@@ -250,9 +250,8 @@ namespace BOX {
                               ? SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId
                               : SAVE::SAV->m_clipboard[ i ].m_speciesId;
             bool isEgg = p_showTeam ? SAVE::SAV->getActiveFile( )
-                                          .m_pkmnTeam[ i ]
-                                          .m_boxdata.m_individualValues.m_isEgg
-                                    : SAVE::SAV->m_clipboard[ i ].m_individualValues.m_isEgg;
+                                          .m_pkmnTeam[ i ].isEgg( )
+                                    : SAVE::SAV->m_clipboard[ i ].isEgg( );
 
             if( species ) {
                 if( !isEgg )
@@ -313,7 +312,7 @@ namespace BOX {
         if( p_index != (u8) -1 ) {
             box* box = SAVE::SAV->getCurrentBox( );
 
-            pokemon::boxPokemon bpm;
+            boxPokemon bpm;
             if( p_index < MAX_PKMN_PER_BOX )
                 bpm = box->m_pokemon[ p_index ];
             else if( _showTeam )
@@ -325,7 +324,7 @@ namespace BOX {
 
             if( bpm.m_speciesId ) {
                 u8 pal = p_index + PKMN_PALETTE_START;
-                if( !bpm.m_individualValues.m_isEgg ) {
+                if( !bpm.isEgg( ) ) {
                     IO::loadPKMNIcon( bpm.m_speciesId, POS_X( p_index ), POS_Y( p_index ),
                                       PKMN_START + p_index, pal / 16, pal % 16,
                                       PKMN_TILES_START + 32 * p_index, false );
@@ -355,7 +354,7 @@ namespace BOX {
         for( u8 i = 0; i < 6; ++i ) {
             u16  species = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId;
             bool isEgg
-                = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_individualValues.m_isEgg;
+                = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].isEgg( );
             u8 pal = MAX_PKMN_PER_BOX + PKMN_PALETTE_START + i;
 
             if( species ) {

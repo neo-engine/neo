@@ -345,5 +345,90 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Pwr", "Stk"},
 
     {"Meteor Falls", "Meteorf\xe4lle"},
-	{"\xd", "\xe"} // HP icon
+	{"\xd", "\xe"}, // HP icon
+    {"hardy","robust"},
+    {"lonely", "einsam"},
+    {"brave", "mutig"},
+
+    // 190
+
+    {"adamant", "hart"},
+    {"naughy", "frech"},
+    {"bold", "kühn"},
+    {"docile", "sanft"},
+    {"relaxed", "locker"},
+
+    {"impish", "pfiffig"},
+    {"lax", "lasch"},
+    {"timid", "scheu"},
+    {"hasty", "hastig"},
+    {"serious", "ernst"},
+
+    // 200
+
+    {"jolly", "froh"},
+    {"naive", "naiv"},
+    {"modest", "mäßig"},
+    {"mild", "mild"},
+    {"quiet", "ruhig"},
+
+    {"bashful", "zaghaft"},
+    {"rash", "hitzig"},
+    {"calm", "still"},
+    {"gentle", "zart"},
+    {"sassy", "forsch"},
+
+    // 210
+
+    {"careful", "sacht"},
+    {"quirky", "kauzig"},
+    {"Loves to eat", "Liebt es, zu essen"},
+    {"Often dozes off", "Nickt oft ein"},
+    {"Nods off a lot", "Schläft gerne"},
+
+    {"Scatters things often", "Macht oft Unordnung"},
+    {"Likes to relax", "Liebt es zu entspannen"},
+    {"Proud of its power", "Ist stolz auf seine Stärke"},
+    {"Likes to thrash about", "Prügelt sich gerne"},
+    {"A little quick tempered", "Besitzt Temperament"},
+
+    // 220
+
+    {"Likes to fight", "Liebt es zu kämpfen"},
+    {"Quick tempered", "Ist impulsiv"},
+    {"Sturdy body", "Hat einen robusten Körper"},
+    {"Capable of taking hits", "Kann Treffer gut verkraften"},
+    {"Highly persistent", "Ist äußerst ausdauernd"},
+
+    {"Good endurance", "Hat eine gute Ausdauer"},
+    {"Good perseverance", "Ist beharrlich"},
+    {"Highly curious", "Ist sehr neugierig"},
+    {"Mischievous", "Ist hinterhältig"},
+    {"Thoroughly cunning", "Ist äußerst gerissen"},
+
+    // 230
+
+    {"Often lost in thought", "Ist oft in Gedanken"},
+    {"Very finicky", "Ist sehr pedantisch"},
+    {"Strong willed", "Besitzt starken Willen"},
+    {"Somewhat vain", "Ist etwas eitel"},
+    {"Strongly defiant", "Ist sehr aufsässig"},
+
+    {"Hates to lose", "Hasst Niederlagen"},
+    {"Somewhat stubborn", "Ist dickköpfig"},
+    {"Likes to run", "Liebt es, zu rennen"},
+    {"Alert to sounds", "Achtet auf Geräusche"},
+    {"Impetuous and silly", "Ist ungestüm und einfältig"},
+
+    // 240
+
+    {"Somewhat of a clown", "Ist fast wie eine Clown"},
+    {"Quick to flee", "Flüchtet schnell"},
+    {"spicy", "scharf"},
+    {"sour", "saur"},
+    {"sweet", "süß"},
+
+    {"dry", "trocken"},
+    {"bitter", "bitter"},
+    {"all", "all"}
 };

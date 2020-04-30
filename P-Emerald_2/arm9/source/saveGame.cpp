@@ -34,6 +34,8 @@
 #include "pokemon.h"
 #include "saveGame.h"
 #include "uio.h"
+#include "itemNames.h"
+#include "abilityNames.h"
 
 namespace SAVE {
     std::unique_ptr<saveGame> SAV;
@@ -63,7 +65,7 @@ namespace SAVE {
                 pokemon& ac = m_pkmnTeam[ s ];
                 if( !ac.m_boxdata.m_speciesId ) break;
 
-                if( ac.m_boxdata.m_individualValues.m_isEgg ) {
+                if( ac.isEgg( ) ) {
                     if( ac.m_boxdata.m_steps ) ac.m_boxdata.m_steps--;
                     if( hasHatchSpdUp && ac.m_boxdata.m_steps ) ac.m_boxdata.m_steps--;
                     if( !ac.m_boxdata.m_steps ) {
@@ -138,7 +140,7 @@ namespace SAVE {
         return cnt;
     }
     // Return the idx of the resulting Box
-    s8 saveGame::storePkmn( const pokemon::boxPokemon& p_pokemon ) {
+    s8 saveGame::storePkmn( const boxPokemon& p_pokemon ) {
         s8 idx = m_storedPokemon[ getActiveFile( ).m_curBox ].getFirstFreeSpot( );
         u8 i   = 0;
         for( ; idx == -1 && i < MAX_BOXES; )
