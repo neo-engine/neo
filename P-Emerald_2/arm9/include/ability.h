@@ -41,8 +41,6 @@ class ability {
         AFTER_ATTACK  = 32,
         BETWEEN_TURNS = 64
     };
-    std::string m_abilityName;
-    std::string m_flavourText;
     abilityType m_type;
 
     BATTLE::battleScript m_effect;

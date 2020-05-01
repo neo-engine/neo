@@ -811,10 +811,12 @@ namespace BATTLE {
         if( !CUR_PKMN( p_pokemonPos, p_opponent ).m_stats.m_acHP ) return;
 
         auto ab = ability( CUR_PKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability );
+        auto abName = getAbilityName( CUR_PKMN( p_pokemonPos, p_opponent ).m_boxdata.m_ability,
+                CURRENT_LANGUAGE );
 
         if( ab.m_type & p_situation ) {
             char buffer[ 100 ];
-            snprintf( buffer, 99, GET_STRING( 170 ), ab.m_abilityName.c_str( ),
+            snprintf( buffer, 99, GET_STRING( 170 ), abName.c_str( ),
                       ( CUR_PKMN( p_pokemonPos, p_opponent ).m_boxdata.m_name ),
                       ( p_opponent ? "\n[OPPONENT]" : "\n" ) );
 

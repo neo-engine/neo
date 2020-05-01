@@ -447,9 +447,9 @@ namespace IO {
                 case 0: {
                     memset( SAVE::SAV->getActiveFile( ).m_pkmnTeam, 0,
                             sizeof( SAVE::SAV->getActiveFile( ).m_pkmnTeam ) );
-                    for( int i = 0; i < 5; ++i ) {
+                    std::vector<u16> tmp = { 201, 493, 521, 649, u16( 1 + rand( ) % MAX_PKMN )};
+                    for( int i = 0; i < 6; ++i ) {
                         pokemon&         a   = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
-                        std::vector<u16> tmp = { 201, 493, 721, 890, u16( 1 + rand( ) % MAX_PKMN )};
 
                         a = pokemon( tmp[ i ], 50, !i ? ( rand( ) % 28 ) : 0, 0, i );
 
@@ -464,7 +464,15 @@ namespace IO {
                         }
                         a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
                         a.m_boxdata.m_ribbons1[ 3 ] = 0;
-                        a.m_boxdata.m_holdItem      = 1 + rand( ) % 400;
+                        if( a.m_boxdata.m_speciesId == 493 ) {
+                            u8 plate = rand( ) % 17;
+                            if( plate < 16 )
+                                a.giveItem( I_FLAME_PLATE + plate );
+                            else
+                                a.giveItem( I_PIXIE_PLATE );
+                        } else {
+                            a.m_boxdata.m_holdItem      = 1 + rand( ) % 400;
+                        }
 
                         for( u16 j = 1; j <= MAX_PKMN; ++j )
                             SAVE::SAV->m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );

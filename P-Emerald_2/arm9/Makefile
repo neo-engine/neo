@@ -28,7 +28,7 @@ ARCH	:=	-mthumb -mthumb-interwork
 
 CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wpsabi -O3\
             -Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
-			-Wnoclass-memaccess	-march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
+			-Wno-class-memaccess	-march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 			-ffast-math \
 			$(ARCH)
 

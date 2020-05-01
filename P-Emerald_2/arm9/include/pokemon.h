@@ -80,6 +80,9 @@ struct boxPokemon {
         return m_ability;
     }
     bool isShiny( ) const;
+    bool isFemale( ) const {
+        return m_isFemale;
+    }
     s8   gender( ) const;
 
     inline unsigned char IVget( u8 p_i ) const {
@@ -280,6 +283,9 @@ struct pokemon {
     }
     bool isShiny( ) const {
         return m_boxdata.isShiny( );
+    }
+    bool isFemale( ) const {
+        return m_boxdata.isFemale( );
     }
     s8 gender( ) const {
         return m_boxdata.gender( );

@@ -427,7 +427,8 @@ namespace STS {
                 bgUpdate( );
                 IO::loadPKMNIcon( p_pokemon->m_boxdata.m_speciesId, oam[ 30 + p_pos ].x,
                                   oam[ 30 + p_pos ].y, 30 + p_pos, 4 + p_pos,
-                                  oam[ 30 + p_pos ].gfxIndex, p_bottom, p_pokemon->getForme( ) );
+                                  oam[ 30 + p_pos ].gfxIndex, p_bottom, p_pokemon->getForme( ),
+                                  p_pokemon->isShiny( ), p_pokemon->isFemale( ) );
             }
         }
 
@@ -1020,16 +1021,18 @@ namespace STS {
         auto nStr = FS::breakString( str, IO::regularFont, 122 );
         IO::regularFont->printString( nStr.c_str( ), 245, 48, p_bottom, IO::font::RIGHT, 14 );
 
-        auto acAbility = ability( currPkmn.m_boxdata.m_ability );
-        u8   wd        = IO::regularFont->stringWidth( acAbility.m_abilityName.c_str( ) );
+        auto curAbName = getAbilityName( currPkmn.m_boxdata.m_ability, CURRENT_LANGUAGE );
+        u8   wd        = IO::regularFont->stringWidth( curAbName.c_str( ) );
         if( 250 - wd > 140 )
             IO::regularFont->printString( "Fäh. ", 250 - wd, 94, p_bottom, IO::font::RIGHT );
         u8 nlCnt = 0;
+        /*
         nStr     = FS::breakString( acAbility.m_flavourText, IO::regularFont, 130 );
         for( auto c : nStr )
             if( c == '\n' ) nlCnt++;
         IO::regularFont->printString( nStr.c_str( ), 250, 108, p_bottom, IO::font::RIGHT,
                                       u8( 16 - 2 * nlCnt ) );
+        */
 
         if( currPkmn.m_boxdata.m_oTisFemale ) {
             IO::regularFont->setColor( RED_IDX, 1 );
@@ -1038,7 +1041,7 @@ namespace STS {
             IO::regularFont->setColor( BLUE_IDX, 1 );
             IO::regularFont->setColor( BLUE2_IDX, 2 );
         }
-        IO::regularFont->printString( acAbility.m_abilityName.c_str( ), 250 - wd, 94, p_bottom );
+        IO::regularFont->printString( curAbName.c_str( ), 250 - wd, 94, p_bottom );
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
     }
@@ -1285,7 +1288,7 @@ namespace STS {
                 IO::loadPKMNIcon( p.m_speciesId, 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ),
                                   SUB_BALL_IDX( i ),
                                   IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex, true,
-                                  p.getForme( ) );
+                                  p.getForme( ), p.isShiny( ), p.isFemale( ) );
             else
                 IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].isHidden = true;
         }

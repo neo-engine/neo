@@ -153,7 +153,8 @@ namespace BAG {
             else
                 tileCnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, 8, 26 + i * 26,
                                             PKMN_SUB + i, PKMN_SUB + i, tileCnt, true,
-                                            acPkmn.getForme( ) );
+                                            acPkmn.getForme( ), acPkmn.isShiny( ),
+                                            acPkmn.isFemale( ) );
             IO::Oam->oamBuffer[ PKMN_SUB + i ].priority = OBJPRIORITY_3;
         }
         return tileCnt;

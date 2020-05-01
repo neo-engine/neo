@@ -47,11 +47,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 const char ITEM_PATH[]        = "nitro:/ITEMS/";
 const char PKMNDATA_PATH[]    = "nitro:/PKMNDATA/";
-const char ABILITYDATA_PATH[] = "nitro:/PKMNDATA/ABILITIES/";
 const char SCRIPT_PATH[]      = "nitro:/MAPS/SCRIPTS/";
 
 const char ITEM_NAME_PATH[]    = "nitro:/DATA/ITEM_NAME/";
-const char ABILITY_NAME_PATH[] = "nitro:/ABTY/ABTY_NAME/";
+const char ABILITY_NAME_PATH[] = "nitro:/DATA/ABTY_NAME/";
 const char MOVE_NAME_PATH[]    = "nitro:/DATA/MOVE_NAME/";
 const char POKEMON_NAME_PATH[] = "nitro:/DATA/PKMN_NAME/";
 const char POKEMON_DATA_PATH[] = "nitro:/DATA/PKMN_DATA/";
@@ -440,17 +439,9 @@ namespace FS {
     }
 } // namespace FS
 
+[[deprecated]]
 ability::ability( int p_abilityId ) {
-    FILE* f = FS::openSplit( ABILITYDATA_PATH, p_abilityId, ".data" );
-
-    if( !f ) return;
-
-    m_abilityName = FS::readString( f, true );
-    m_flavourText = FS::readString( f, true );
-    u32 tmp;
-    fscanf( f, "%lu", &tmp );
-    m_type = static_cast<ability::abilityType>( tmp );
-    FS::close( f );
+    return;
 }
 
 bool getAbilityName( int p_abilityId, int p_language, char* p_out ) {

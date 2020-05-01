@@ -717,17 +717,25 @@ namespace BATTLE {
 
         tilecnt = IO::loadPKMNIcon( CUR_PKMN_2( *_battle, 0, PLAYER ).m_boxdata.m_speciesId, 78,
                                     102, oamIndex++, palIndex++, tilecnt, true,
-                                    CUR_PKMN_2( *_battle, 0, PLAYER ).getForme( ) );
+                                    CUR_PKMN_2( *_battle, 0, PLAYER ).getForme( ),
+                                    CUR_PKMN_2( *_battle, 0, PLAYER ).isShiny( ),
+                                    CUR_PKMN_2( *_battle, 0, PLAYER ).isFemale( ));
         tilecnt = IO::loadPKMNIcon( CUR_PKMN_2( *_battle, 0, OPPONENT ).m_boxdata.m_speciesId, 148,
                                     70, oamIndex++, palIndex++, tilecnt, true,
-                                    CUR_PKMN_2( *_battle, 0, OPPONENT ).getForme( ) );
+                                    CUR_PKMN_2( *_battle, 0, OPPONENT ).getForme( ),
+                                    CUR_PKMN_2( *_battle, 0, OPPONENT ).isShiny( ),
+                                    CUR_PKMN_2( *_battle, 0, OPPONENT ).isFemale( ) );
         if( _battle->m_battleMode == battle::DOUBLE ) {
             tilecnt = IO::loadPKMNIcon( CUR_PKMN_2( *_battle, 1, PLAYER ).m_boxdata.m_speciesId,
                                         106, 102, oamIndex++, palIndex++, tilecnt, true,
-                                        CUR_PKMN_2( *_battle, 1, PLAYER ).getForme( ) );
+                                        CUR_PKMN_2( *_battle, 1, PLAYER ).getForme( ),
+                                        CUR_PKMN_2( *_battle, 1, PLAYER ).isShiny( ),
+                                        CUR_PKMN_2( *_battle, 1, PLAYER ).isFemale( ) );
             tilecnt = IO::loadPKMNIcon( CUR_PKMN_2( *_battle, 1, OPPONENT ).m_boxdata.m_speciesId,
                                         122, 70, oamIndex++, palIndex++, tilecnt, true,
-                                        CUR_PKMN_2( *_battle, 1, OPPONENT ).getForme( ) );
+                                        CUR_PKMN_2( *_battle, 1, OPPONENT ).getForme( ),
+                                        CUR_PKMN_2( *_battle, 1, OPPONENT ).isShiny( ),
+                                        CUR_PKMN_2( *_battle, 1, OPPONENT ).isFemale( ) );
         }
 
         // FIGHT
@@ -890,7 +898,8 @@ namespace BATTLE {
             if( !acPkmn.isEgg( ) )
                 tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, x - 4, y - 12,
                                             ++oamIndex, palIndex++, tilecnt, true,
-                                            acPkmn.getForme( ) );
+                                            acPkmn.getForme( ), acPkmn.isShiny( ),
+                                            acPkmn.isFemale( ) );
             else
                 tilecnt = IO::loadEggIcon( x - 4, y - 12, ++oamIndex, palIndex++, tilecnt, true );
         }
@@ -1380,18 +1389,21 @@ namespace BATTLE {
                 }
 
                 // Ability
-                auto acAbility = ability( p_pokemon.m_boxdata.m_ability );
+                //auto acAbility = ability( p_pokemon.m_boxdata.m_ability );
+                auto curAbName = getAbilityName( p_pokemon.m_boxdata.m_ability, CURRENT_LANGUAGE );
 
                 IO::printRectangle( u8( 0 ), u8( 138 ), u8( 255 ), u8( 192 ), true, WHITE_IDX );
                 IO::regularFont->setColor( WHITE_IDX, 2 );
                 IO::regularFont->setColor( BLACK_IDX, 1 );
+                /*
                 u8   nlCnt = 0;
                 auto nStr  = FS::breakString( acAbility.m_flavourText, IO::regularFont, 250 );
                 for( auto c : nStr )
                     if( c == '\n' ) nlCnt++;
                 IO::regularFont->printString( nStr.c_str( ), 0, 138, true, IO::font::LEFT,
                                               u8( 16 - 2 * nlCnt ) );
-                IO::regularFont->printString( acAbility.m_abilityName.c_str( ), 5, 176, true );
+                */
+                IO::regularFont->printString( curAbName.c_str( ), 5, 176, true );
                 IO::regularFont->setColor( GRAY_IDX, 1 );
                 IO::regularFont->setColor( BLACK_IDX, 2 );
             } else {
@@ -1858,7 +1870,8 @@ namespace BATTLE {
             if( acPkmn.m_stats.m_acHP )
                 tilecnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, x - 10, y - 23,
                                             ++oamIndex, palIndex++, tilecnt, true,
-                                            acPkmn.getForme( ) );
+                                            acPkmn.getForme( ), acPkmn.isShiny( ),
+                                            acPkmn.isFemale( ) );
         }
         IO::updateOAM( true );
 

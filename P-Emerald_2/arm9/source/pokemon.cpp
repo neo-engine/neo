@@ -61,6 +61,8 @@ void boxPokemon::recalculateForme( ) {
         case PKMN_ARCEUS: {
             if( m_holdItem >= I_FLAME_PLATE && m_holdItem <= I_IRON_PLATE ) {
                 m_altForme = m_holdItem - I_FLAME_PLATE + 1;
+            } else if( m_holdItem == I_NULL_PLATE ) {
+                m_altForme = 17;
             } else if( m_holdItem == I_PIXIE_PLATE ) {
                 m_altForme = 18;
             } else if( m_holdItem >= I_FIRIUM_Z && m_holdItem <= I_STEELIUM_Z ) {
