@@ -28,16 +28,16 @@ along with Pok\xe9mon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "saveGame.h"
 
-// ä \xe4
-// é \xe9
-// ö \xf6
-// ü \xfc
+// ae \xe4
+// e´ \xe9
+// oe \xf6
+// ue \xfc
 
-// Ä \xc4
-// É \xc9
-// Ö \xd6
-// Ü \xdc
-// ß \xdf
+// AE \xc4
+// E´ \xc9
+// OE \xd6
+// UE \xdc
+// ss \xdf
 // { (male)
 // } (female)
 //
@@ -354,7 +354,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"adamant", "hart"},
     {"naughy", "frech"},
-    {"bold", "kühn"},
+    {"bold", "k\xfc""hn"},
     {"docile", "sanft"},
     {"relaxed", "locker"},
 
@@ -368,7 +368,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"jolly", "froh"},
     {"naive", "naiv"},
-    {"modest", "mäßig"},
+    {"modest", "m\xe4""\xdf""ig"},
     {"mild", "mild"},
     {"quiet", "ruhig"},
 
@@ -384,27 +384,27 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"quirky", "kauzig"},
     {"Loves to eat", "Liebt es, zu essen"},
     {"Often dozes off", "Nickt oft ein"},
-    {"Nods off a lot", "Schläft gerne"},
+    {"Nods off a lot", "Schl\xe4""ft gerne"},
 
     {"Scatters things often", "Macht oft Unordnung"},
     {"Likes to relax", "Liebt es zu entspannen"},
-    {"Proud of its power", "Ist stolz auf seine Stärke"},
-    {"Likes to thrash about", "Prügelt sich gerne"},
+    {"Proud of its power", "Ist stolz auf seine St\xe4""rke"},
+    {"Likes to thrash about", "Pr\xfc""gelt sich gerne"},
     {"A little quick tempered", "Besitzt Temperament"},
 
     // 220
 
-    {"Likes to fight", "Liebt es zu kämpfen"},
+    {"Likes to fight", "Liebt es zu k\xe4""mpfen"},
     {"Quick tempered", "Ist impulsiv"},
-    {"Sturdy body", "Hat einen robusten Körper"},
+    {"Sturdy body", "Hat einen robusten K\xf6""rper"},
     {"Capable of taking hits", "Kann Treffer gut verkraften"},
-    {"Highly persistent", "Ist äußerst ausdauernd"},
+    {"Highly persistent", "Ist \xe4""u\xdf""erst ausdauernd"},
 
     {"Good endurance", "Hat eine gute Ausdauer"},
     {"Good perseverance", "Ist beharrlich"},
     {"Highly curious", "Ist sehr neugierig"},
-    {"Mischievous", "Ist hinterhältig"},
-    {"Thoroughly cunning", "Ist äußerst gerissen"},
+    {"Mischievous", "Ist hinterh\xe4""ltig"},
+    {"Thoroughly cunning", "Ist \xe4""u\xdf""erst gerissen"},
 
     // 230
 
@@ -412,21 +412,21 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Very finicky", "Ist sehr pedantisch"},
     {"Strong willed", "Besitzt starken Willen"},
     {"Somewhat vain", "Ist etwas eitel"},
-    {"Strongly defiant", "Ist sehr aufsässig"},
+    {"Strongly defiant", "Ist sehr aufs\xe4""ssig"},
 
     {"Hates to lose", "Hasst Niederlagen"},
-    {"Somewhat stubborn", "Ist dickköpfig"},
+    {"Somewhat stubborn", "Ist dickk\xf6""pfig"},
     {"Likes to run", "Liebt es, zu rennen"},
-    {"Alert to sounds", "Achtet auf Geräusche"},
-    {"Impetuous and silly", "Ist ungestüm und einfältig"},
+    {"Alert to sounds", "Achtet auf Ger\xe4""usche"},
+    {"Impetuous and silly", "Ist ungest\xfc""m und einf\xe4""ltig"},
 
     // 240
 
     {"Somewhat of a clown", "Ist fast wie eine Clown"},
-    {"Quick to flee", "Flüchtet schnell"},
+    {"Quick to flee", "Fl\xfc""chtet schnell"},
     {"spicy", "scharf"},
     {"sour", "saur"},
-    {"sweet", "süß"},
+    {"sweet", "s\xfc\xdf"},
 
     {"dry", "trocken"},
     {"bitter", "bitter"},
