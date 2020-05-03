@@ -345,11 +345,12 @@ namespace DEX {
                     dmaCopy( DexTop32Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
                     dmaCopy( DexTop32Pal + 64, BG_PALETTE + 64, 256 );
                 }
-                IO::loadItemIcon( ItemList[ data.m_preEvolution ]->m_itemName, 8, 20,
+                IO::loadItemIcon( data.m_preEvolution, 8, 20,
                                   PKMN_SPRITE_START( 2 ), 2,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                 consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                printf( GET_STRING( 132 ), ItemList[ data.m_preEvolution ]->m_itemName.c_str( ) );
+                printf( GET_STRING( 132 ), ITEM::getItemName( data.m_preEvolution,
+                            CURRENT_LANGUAGE ).c_str( ) );
                 break;
             }
             switch( data.m_types[ 0 ] ) {
@@ -472,7 +473,7 @@ namespace DEX {
             consoleSetWindow( &IO::Top, 3, 22, 32, 23 );
             if( strlen( data.m_species ) >= 13 ) consoleSetWindow( &IO::Top, 2, 22, 32, 23 );
             if( strlen( data.m_species ) == 8 || strlen( data.m_species ) == 9 ) printf( " " );
-            printf( "%8s %4.1fm %5.1fkg", FS::convertToOld( data.m_species ).c_str( ),
+            printf( "%8s %4.1fm %5.1fkg", data.m_species,
                     data.m_size / 10.0, data.m_weight / 10.0 );
             break;
         }

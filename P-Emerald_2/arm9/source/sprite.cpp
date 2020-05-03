@@ -869,14 +869,16 @@ namespace IO {
                          p_palCnt, p_palpos, p_tileCnt, p_bottom );
     }
 
-    u16 loadItemIcon( const std::string& p_itemName, const u16 p_posX, const u16 p_posY,
+    u16 loadItemIcon( u16 p_itemId, const u16 p_posX, const u16 p_posY,
                       u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
-        return loadIcon( ITEM_PATH, p_itemName.c_str( ), p_posX, p_posY,
+        // TODO
+        return loadIcon( ITEM_PATH, "---", p_posX, p_posY,
                          p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
 
     u16 loadTMIcon( type p_type, bool p_hm, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                     u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+        // TODO
         std::string itemname
             = ( p_hm ? "VM" : "TM" )
               + ( std::vector<std::string>{"Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein",
@@ -884,7 +886,8 @@ namespace IO {
                                            "Feuer", "Pflanze", "Elektro", "Psycho", "Eis", "Drache",
                                            "Unlicht", "Fee"}[ p_type ] );
 
-        return loadItemIcon( itemname, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+        return loadIcon( ITEM_PATH, itemname.c_str( ), p_posX, p_posY,
+                         p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
 
     u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,

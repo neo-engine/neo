@@ -33,11 +33,10 @@
 
 #include <nds.h>
 
-#include "ability.h"
+#include "defines.h"
 #include "battlePokemon.h"
 #include "battleUI.h"
 #include "battleWeather.h"
-#include "defines.h"
 #include "pokemon.h"
 #include "script.h"
 #include "type.h"
@@ -47,11 +46,21 @@ class move;
 namespace BATTLE {
     class battleTrainer;
 
-    extern u8          firstMoveSwitchTarget;
-    extern std::string weatherMessage[ 9 ];
-    extern std::string weatherEndMessage[ 9 ];
+    extern u8  firstMoveSwitchTarget;
+    extern u16 weatherMessage[ 9 ];
+    extern u16 weatherEndMessage[ 9 ];
 
     u16 calcDamage( const move& p_atk, const pokemon& p_atg, const pokemon& p_def, u8 p_rndVal );
+
+    enum situation {
+        ATTACK        = 1,
+        BEFORE_BATTLE = 2,
+        AFTER_BATTLE  = 4,
+        GRASS         = 8,
+        BEFORE_ATTACK = 16,
+        AFTER_ATTACK  = 32,
+        BETWEEN_TURNS = 64
+    };
 
 #define MAX_STATS 8
 #define ATK 0
@@ -214,11 +223,11 @@ namespace BATTLE {
                                                               // stores result in _moveOrder
         void switchPKMN( bool p_opponent, u8 p_toSwitch, u8 p_newPokemonPos );
 
-        void doItems( ability::abilityType p_situation );
-        void doItem( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation );
+        void doItems( situation p_situation );
+        void doItem( bool p_opponent, u8 p_pokemonPos, situation p_situation );
 
-        void doAbilities( ability::abilityType p_situation );
-        void doAbility( bool p_opponent, u8 p_pokemonPos, ability::abilityType p_situation );
+        void doAbilities( situation p_situation );
+        void doAbility( bool p_opponent, u8 p_pokemonPos, situation p_situation );
 
         void getAIMoves( );
         bool canMove( bool p_opponent, u8 p_pokemonPos );

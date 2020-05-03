@@ -113,5 +113,8 @@ class move {
     }
 };
 
+bool getMoveName( int p_moveId, int p_language, char* p_out );
+std::string getMoveName( int p_moveId, int p_language );
+
 extern move* AttackList[ MAX_ATTACK ];
 

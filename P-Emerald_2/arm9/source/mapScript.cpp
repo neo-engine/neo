@@ -192,14 +192,17 @@ namespace MAP {
                     IO::messageBox( GET_STRING( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ),
                                     GET_STRING( FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) ) );
                 break;
-            case ITEM_I:
-                IO::messageBox( ItemList[ PARAMA( SCRIPT_INS[ pc ] ) ],
-                                PARAMB( SCRIPT_INS[ pc ] ) );
+            case ITEM_I: {
+                ITEM::itemData itm = ITEM::getItemData( PARAMA( SCRIPT_INS[ pc ] ) );
+                IO::messageBox( PARAMA( SCRIPT_INS[ pc ] ), itm, PARAMB( SCRIPT_INS[ pc ] ) );
                 break;
-            case ITEM:
-                IO::messageBox( ItemList[ FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ],
+            }
+            case ITEM: {
+                ITEM::itemData itm = ITEM::getItemData( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) );
+                IO::messageBox( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), itm,
                                 FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) );
                 break;
+            }
             case GIVE_PKMN_I: {
                 // pokemon pk = pokemon( PARAMA( SCRIPT_INS[ pc ] ), PARAMB( SCRIPT_INS[ pc ] ) );
                 // TODO

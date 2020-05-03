@@ -430,5 +430,97 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"dry", "trocken"},
     {"bitter", "bitter"},
-    {"all", "all"}
+    {"all", "all"},
+    {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR][OWN1] heilt sich.[A]"},
+    {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR][OWN2] heilt sich.[A]"},
+    {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR][OPP1] heilt sich.[A]"},
+
+    // 250
+
+    {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR][OPP2] heilt sich.[A]"},
+    {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]KP von [OWN1]\nregenerieren sich.[A]"},
+    {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]KP von [OWN2]\nregenerieren sich.[A]"},
+    {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]KP von [OPP1]\nregenerieren sich.[A]"},
+    {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]KP von [OPP2]\nregenerieren sich.[A]"},
+
+    {"", "Der Hagel schadet [OWN1].[A]"},
+    {"", "Der Hagel schadet [OWN2].[A]"},
+    {"", "Der Hagel schadet\n[OPP1].[A]"},
+    {"", "Der Hagel schadet\n[OPP2].[A]"},
+    {"", "Der Sandsturm schadet [OWN1].[A]"},
+
+    // 260
+
+    {"", "Der Sandsturm schadet [OWN2].[A]"},
+    {"", "Der Sandsturm schadet\n[OPP1].[A]"},
+    {"", "Der Sandsturm schadet\n[OPP2].[A]"},
+    {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OWN1].[A]"},
+    {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OWN2].[A]"},
+
+    {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OPP1].[A]"},
+    {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OPP2].[A]"},
+    {"", "Es regnet.[A]"},
+    {"", "Es hagelt.[A]"},
+    {"", "Es herrscht dichter Nebel\x85[A]"},
+
+    // 270
+
+    {"", "Der Sandsturm wütet.[A]"},
+    {"", "Gleißendes Sonnenlicht.[A]"},
+    {"", "Enormer Regen.[A]"},
+    {"", "Extremes Sonnenlicht.[A]"},
+    {"", "Starke Winde wehen.[A]"},
+
+    {"", "Es hat aufgehört zu regnen.[A]"},
+    {"", "Es hat aufgehört zu hageln.[A]"},
+    {"", "Der Nebel verzog sich.[A]"},
+    {"", "Der Sandsturm legt sich.[A]"},
+    {"", "Das Sonnenlicht wurde wieder normal.[A]"},
+
+    // 280
+
+    {"", "Es hat aufgehört zu regnen.[A]"},
+    {"", "Das Sonnenlicht wurde wieder normal.[A]"},
+    {"", "Windstille\x85[A]"},
+    {"", "%s%s ist aufgetaut![A]"},
+    {"", "%s%s ist gefroren.[A]"},
+
+    {"", "%s%s ist paralysiert.[A]"},
+    {"", "%s%s bleibt schlafen.[A]"},
+    {"", "%s%s ist aufgewacht![A]"},
+    {"", "%s%s bleibt unbeeindruckt.[A]"},
+    {"", "%s%s wich aus.[A]"},
+
+    // 290
+
+    {"", "[COLR:15:15:00]Ein Volltreffer![A][CLEAR][COLR:00:00:00]"},
+    {"", "[COLR:00:31:00]Das ist enorm effektiv\ngegen %s![A][CLEAR][COLR:00:00:00]"},
+    {"", "[COLR:00:15:00]Das ist sehr effektiv\ngegen %s![A][CLEAR][COLR:00:00:00]"},
+    {"", "[COLR:31:00:00]Hat die Attacke\n%s getroffen?[A][CLEAR][COLR:00:00:00]"},
+    {"", "[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen%s\x85[A][CLEAR][COLR:00:00:00]"},
+
+    {"", "[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %s.[A][CLEAR][COLR:00:00:00]"},
+    {"", "Es schlug fehl\x85[A]"},
+    {"", "Die Verbrennung schadet\n%s%s.[A]"},
+    {"", "Die Vergiftung schadet\n%s%s.[A]"},
+    {"", "%s%s wurde besiegt.[A]"},
+
+    // 300
+
+    {"", "Das Rundenlimit dieses\nKampfes wurde erreicht.[A]"},
+    {"", "Der Kampf endet in einem\nUnentschieden![A]"},
+    {"", "[TRAINER] [TCLASS] gewinnt<85>[A]"},
+    {"", "Du besiegst [TCLASS] [TRAINER]![A]"},
+    {"", "Du gewinnst %d$.[A]"},
+
+    {"", "Der Kampf endet.[A]"},
+    {"", "[OPP%d] wurde von [TRAINER]\n([TCLASS]) auf die Bank geschickt.[A]"},
+    {"", "Auf die Bank [OWN%d]![A]"},
+    {"", "[OWN1] kann nicht angreifen<85>[A]"},
+    {"", "[OWN2] kann nicht angreifen<85>[A]"},
+
+    // 310
+
+    {"", "(Wild)"},
+    {"", "(Gegner)"},
 };

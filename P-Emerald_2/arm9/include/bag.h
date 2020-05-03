@@ -65,12 +65,12 @@ namespace BAG {
         void erase( bagType, u16 p_itemId, u16 p_cnt = -1 );
 
         /*
-         * Returnes the number of items with no. item_id in the bag.
+         * Returns the number of items with no. item_id in the bag.
          */
         u16 count( bagType, u16 p_itemId );
 
         /*
-         * Returnes true if the specified bag is empty.
+         * Returns true if the specified bag is empty.
          */
         bool empty( bagType );
 
@@ -85,7 +85,7 @@ namespace BAG {
         void swap( bagType, u16 p_idx1, u16 p_idx2 );
 
         /*
-         * Returnes the number of items in the specified bag.
+         * Returns the number of items in the specified bag.
          */
         std::size_t size( bagType );
 
@@ -121,5 +121,5 @@ namespace BAG {
         }
     };
 
-    bag::bagType toBagType( item::itemType p_itemType );
+    bag::bagType toBagType( u8 p_itemType );
 } // namespace BAG

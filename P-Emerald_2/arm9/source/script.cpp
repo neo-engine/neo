@@ -26,6 +26,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "script.h"
+#include "defines.h"
+#include "saveGame.h"
 #include "battle.h"
 
 #include <algorithm>
@@ -71,19 +73,19 @@ namespace BATTLE {
             bool pkmnIsSnd = ( p_battle.m_battleMode == battle::DOUBLE );
             auto acPkmn    = *( (pokemon*) p_self );
 
-            if( acPkmn == CUR_PKMN_2( p_battle, OPPONENT, 0 ) ) {
+            if( !memcmp( &acPkmn, &( CUR_PKMN_2( p_battle, OPPONENT, 0 ) ), sizeof( pokemon ) ) ) {
                 pkmnIsOpp = true;
                 pkmnIsSnd = false;
             }
-            if( acPkmn == CUR_PKMN_2( p_battle, OPPONENT, 1 ) ) {
+            if( !memcmp( &acPkmn, &( CUR_PKMN_2( p_battle, OPPONENT, 1 ) ), sizeof( pokemon ) ) ) {
                 pkmnIsOpp = true;
                 pkmnIsSnd &= true;
             }
-            if( acPkmn == CUR_PKMN_2( p_battle, PLAYER, 0 ) ) {
+            if( !memcmp( &acPkmn, &( CUR_PKMN_2( p_battle, PLAYER, 0 ) ), sizeof( pokemon ) ) ) {
                 pkmnIsOpp = false;
                 pkmnIsSnd = false;
             }
-            if( acPkmn == CUR_PKMN_2( p_battle, PLAYER, 1 ) ) {
+            if( !memcmp( &acPkmn, &( CUR_PKMN_2( p_battle, PLAYER, 1 ) ), sizeof( pokemon ) ) ) {
                 pkmnIsOpp = false;
                 pkmnIsSnd &= true;
             }
@@ -118,19 +120,19 @@ namespace BATTLE {
             bool pkmnIsSnd = ( p_battle.m_battleMode == battle::DOUBLE );
             auto acPkmn    = *( (pokemon*) p_self );
 
-            if( acPkmn == CUR_PKMN_2( p_battle, OPPONENT, 0 ) ) {
+            if( !memcmp( &acPkmn, &( CUR_PKMN_2( p_battle, OPPONENT, 0 ) ), sizeof( pokemon ) ) ) {
                 pkmnIsOpp = true;
                 pkmnIsSnd = false;
             }
-            if( acPkmn == CUR_PKMN_2( p_battle, OPPONENT, 1 ) ) {
+            if( !memcmp( &acPkmn, &( CUR_PKMN_2( p_battle, OPPONENT, 1 ) ), sizeof( pokemon ) ) ) {
                 pkmnIsOpp = true;
                 pkmnIsSnd &= true;
             }
-            if( acPkmn == CUR_PKMN_2( p_battle, PLAYER, 0 ) ) {
+            if( !memcmp( &acPkmn, &( CUR_PKMN_2( p_battle, PLAYER, 0 ) ), sizeof( pokemon ) ) ) {
                 pkmnIsOpp = false;
                 pkmnIsSnd = false;
             }
-            if( acPkmn == CUR_PKMN_2( p_battle, PLAYER, 1 ) ) {
+            if( !memcmp( &acPkmn, &( CUR_PKMN_2( p_battle, PLAYER, 1 ) ), sizeof( pokemon ) ) ) {
                 pkmnIsOpp = false;
                 pkmnIsSnd &= true;
             }
@@ -283,19 +285,19 @@ namespace BATTLE {
             bool pkmnIsSnd = false;
             auto acPkmn    = *( (pokemon*) p_self );
 
-            if( acPkmn == CUR_PKMN_2( p_battle, OPPONENT, 0 ) ) {
+            if( !memcmp( &acPkmn, &( CUR_PKMN_2( p_battle, OPPONENT, 0 ) ), sizeof( pokemon ) ) ) {
                 pkmnIsOpp = true;
                 pkmnIsSnd = false;
             }
-            if( acPkmn == CUR_PKMN_2( p_battle, OPPONENT, 1 ) ) {
+            if( !memcmp( &acPkmn, &( CUR_PKMN_2( p_battle, OPPONENT, 1 ) ), sizeof( pokemon ) ) ) {
                 pkmnIsOpp = true;
                 pkmnIsSnd = true;
             }
-            if( acPkmn == CUR_PKMN_2( p_battle, PLAYER, 0 ) ) {
+            if( !memcmp( &acPkmn, &( CUR_PKMN_2( p_battle, PLAYER, 0 ) ), sizeof( pokemon ) ) ) {
                 pkmnIsOpp = false;
                 pkmnIsSnd = false;
             }
-            if( acPkmn == CUR_PKMN_2( p_battle, PLAYER, 1 ) ) {
+            if( !memcmp( &acPkmn, &( CUR_PKMN_2( p_battle, PLAYER, 1 ) ), sizeof( pokemon ) ) ) {
                 pkmnIsOpp = false;
                 pkmnIsSnd = true;
             }
@@ -335,7 +337,7 @@ namespace BATTLE {
                 if( !cond.m_asLastCondition && !( lastCondition = cond.check( p_battle, p_self ) ) )
                     goto NEXT;
             }
-            if( c.m_log.length( ) ) p_battle.log( c.m_log );
+            if( c.m_log ) p_battle.log( GET_STRING( c.m_log ) );
             c.execute( p_battle, p_self );
         NEXT:
             continue;

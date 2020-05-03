@@ -28,29 +28,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <string>
-#include "script.h"
-
-class ability {
-  public:
-    enum abilityType {
-        ATTACK        = 1,
-        BEFORE_BATTLE = 2,
-        AFTER_BATTLE  = 4,
-        GRASS         = 8,
-        BEFORE_ATTACK = 16,
-        AFTER_ATTACK  = 32,
-        BETWEEN_TURNS = 64
-    };
-    abilityType m_type;
-
-    BATTLE::battleScript m_effect;
-
-    /// Constructors
-    ability( ) {
-    }
-
-    ability( int p_abilityId );
-};
 
 bool        getAbilityName( int p_abilityId, int p_language, char* p_out );
 std::string getAbilityName( int p_abilityId, int p_language );

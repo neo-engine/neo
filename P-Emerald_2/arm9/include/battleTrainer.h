@@ -43,7 +43,7 @@ namespace BATTLE {
 
         };
 
-        std::string          m_battleTrainerName;
+        std::string*         m_battleTrainerName;
         trainerClass         m_trainerClass;
         std::vector<pokemon> m_pkmnTeam;
         std::pair<u16, u16>* m_items; // if this is 0 and _itemCount == MAX_ITEMS_IN_BAG, then
@@ -52,14 +52,16 @@ namespace BATTLE {
 
       private:
         int         _moneyEarned;
-        std::string _msg1;
-        std::string _msg2;
-        std::string _msg3;
-        std::string _msg4;
+        std::string* _msg1;
+        std::string* _msg2;
+        std::string* _msg3;
+        std::string* _msg4;
 
       public:
-        battleTrainer( std::string p_battleTrainerName, std::string p_msg1, std::string p_msg2,
-                       std::string p_msg3, std::string p_msg4, std::vector<pokemon> p_pkmnTeam,
+        battleTrainer( std::string* p_battleTrainerName,
+                       std::string* p_msg1, std::string* p_msg2,
+                       std::string* p_msg3, std::string* p_msg4,
+                       std::vector<pokemon> p_pkmnTeam,
                        std::pair<u16, u16>* p_items = 0, u16 p_itemCnt = MAX_ITEMS_IN_BAG,
                        trainerClass p_trainerClass = PKMN_TRAINER )
             : m_battleTrainerName( p_battleTrainerName ), m_trainerClass( p_trainerClass ),
@@ -67,20 +69,20 @@ namespace BATTLE {
               _msg1( p_msg1 ), _msg2( p_msg2 ), _msg3( p_msg3 ), _msg4( p_msg4 ) {
         }
 
-        const char* getLooseMsg( ) const {
-            return _msg4.c_str( );
+        const char* getLooseMsg( u8 p_language ) const {
+            return _msg4[ p_language ].c_str( );
         }
         int getLooseMoney( ) const {
             return _moneyEarned;
         }
-        const char* getWinMsg( ) const {
-            return _msg3.c_str( );
+        const char* getWinMsg( u8 p_language ) const {
+            return _msg3[ p_language ].c_str( );
         }
-        const char* getCriticalMsg( ) const {
-            return _msg2.c_str( );
+        const char* getCriticalMsg( u8 p_language ) const {
+            return _msg2[ p_language ].c_str( );
         }
-        const char* getInitMsg( ) const {
-            return _msg1.c_str( );
+        const char* getInitMsg( u8 p_language ) const {
+            return _msg1[ p_language ].c_str( );
         }
     };
 } // namespace BATTLE

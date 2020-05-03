@@ -50,37 +50,12 @@ namespace IO {
         SpriteEntry* m_entry;
     };
 
-    /*
-     * updateOAM
-     *
-     * Update the OAM.
-     *
-     */
     void updateOAM( bool p_bottom );
 
-    /*
-     * initOAM
-     *
-     * Initialize the OAM.
-     *
-     */
     void initOAMTable( bool p_bottom );
 
-    /*
-     * rotateSprite
-     *
-     * Rotate a sprite.
-     *
-     */
     void rotateSprite( SpriteRotation* p_spriteRotation, u16 p_angle );
 
-    /*
-     * setSpriteVisibility
-     *
-     * Hide or show a sprite of a certain type: affine double bound, affine
-     * non-double bound, or ordinary.
-     *
-     */
     void setSpriteVisibility( SpriteEntry* p_spriteEntry, bool p_hidden, bool p_affine = false,
                               bool p_doubleBound = false );
 
@@ -141,7 +116,7 @@ namespace IO {
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
                   u8 p_oamIndex, u8 p_palCnt, u8 p_palPos, u16 p_tileCnt, bool p_bottom );
 
-    u16 loadItemIcon( const std::string& p_itemName, const u16 p_posX, const u16 p_posY,
+    u16 loadItemIcon( const u16 p_itemId, const u16 p_posX, const u16 p_posY,
                       u8 p_oamIndex, u8 p_palcnt, u16 p_tileCnt, bool p_bottom = true );
 
     u16 loadTMIcon( type p_type, bool p_hm, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,

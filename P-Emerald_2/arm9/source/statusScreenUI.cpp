@@ -28,6 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <cstdio>
 
+#include "ability.h"
 #include "defines.h"
 #include "boxUI.h"
 #include "fs.h"
@@ -574,9 +575,9 @@ namespace STS {
         auto Oam = p_bottom ? IO::Oam : IO::OamTop;
         auto pal = BG_PAL( p_bottom );
         if( p_newpok ) {
-            IO::loadItemIcon( !p_pokemon.m_boxdata.m_ball
+            IO::loadItemIcon( 0 /* !p_pokemon.m_boxdata.m_ball
                                   ? "Pokeball"
-                                  : ItemList[ p_pokemon.m_boxdata.m_ball ]->m_itemName,
+                                  : ItemList[ p_pokemon.m_boxdata.m_ball ]->m_itemName */,
                               -6, 22, SHINY_IDX, SHINY_PAL, 1000, p_bottom );
         }
 
@@ -618,21 +619,19 @@ namespace STS {
                 IO::regularFont->setColor( 0, 2 );
                 char buffer[ 200 ];
                 snprintf(
-                    buffer, 199, "%s: %s",
-                    ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ),
-                    ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getShortDescription( ).c_str( ) );
+                    buffer, 199, "%s",
+                    ITEM::getItemName( p_pokemon.getItem( ), CURRENT_LANGUAGE ).c_str( ) );
                 IO::regularFont->printString( buffer, 40, 159, p_bottom );
                 if( p_newpok ) {
-                    IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName, 2,
-                                      152, ITEM_ICON_IDX, ITEM_ICON_PAL,
+                    IO::loadItemIcon( p_pokemon.getItem( ), 2, 152, ITEM_ICON_IDX, ITEM_ICON_PAL,
                                       Oam->oamBuffer[ ITEM_ICON_IDX ].gfxIndex, p_bottom );
                 }
             } else {
                 IO::regularFont->setColor( BLACK_IDX, 1 );
                 IO::regularFont->setColor( 0, 2 );
                 IO::regularFont->printString(
-                    ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( ).c_str( ), 56, 168,
-                    p_bottom );
+                    ITEM::getItemName( p_pokemon.m_boxdata.getItem( ), CURRENT_LANGUAGE ).c_str( ),
+                    56, 168, p_bottom );
                 Oam->oamBuffer[ ITEM_ICON_IDX ].isHidden = true;
             }
             if( p_pokemon.m_boxdata.isShiny( ) ) {
@@ -1346,7 +1345,7 @@ namespace STS {
         tileCnt
             = IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, tileCnt, 0, 0, 32, 32, memoPal,
                               memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, true );
-        tileCnt = IO::loadItemIcon( ItemList[ 0 ]->m_itemName, 2, 152, ITEM_ICON_IDX, ITEM_ICON_PAL,
+        tileCnt = IO::loadItemIcon( 0, 2, 152, ITEM_ICON_IDX, ITEM_ICON_PAL,
                                     tileCnt );
 
         for( u8 i = 0; i < 4; ++i ) {

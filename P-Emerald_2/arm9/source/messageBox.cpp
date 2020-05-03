@@ -52,7 +52,7 @@ namespace IO {
         cury = 8;
     }
 
-    messageBox::messageBox( item* p_item, const u16 p_count ) {
+    messageBox::messageBox( u16 p_itemId, ITEM::itemData& p_data, const u16 p_count ) {
         m_isNamed = NULL;
 
         initTextField( );
@@ -66,36 +66,38 @@ namespace IO {
         BG_PALETTE_SUB[ 254 ] = RGB15( 0, 0, 15 );
 
         char buf[ 40 ];
-        if( BAG::toBagType( p_item->m_itemType ) != BAG::bag::bagType::TM_HM ) {
-            if( BAG::toBagType( p_item->m_itemType ) != BAG::bag::bagType::KEY_ITEMS )
-                sprintf( buf, GET_STRING( 89 ), p_count, p_item->getDisplayName( true ).c_str( ) );
+        if( BAG::toBagType( p_data.m_itemType ) != BAG::bag::bagType::TM_HM ) {
+            if( BAG::toBagType( p_data.m_itemType ) != BAG::bag::bagType::KEY_ITEMS )
+                sprintf( buf, GET_STRING( 89 ), p_count, ITEM::getItemName( p_itemId,
+                            CURRENT_LANGUAGE ).c_str( ) );
             else
-                sprintf( buf, GET_STRING( 88 ), p_item->getDisplayName( true ).c_str( ) );
+                sprintf( buf, GET_STRING( 88 ), ITEM::getItemName( p_itemId, CURRENT_LANGUAGE )
+                        .c_str( ) );
             loadSprite( A_ID, 0, 0, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal, ATiles,
                         ATilesLen, false, false, true, OBJPRIORITY_0, true );
-            loadItemIcon( p_item->m_itemName, 4, 4, 0, 1, 0 );
+            loadItemIcon( p_itemId, 4, 4, 0, 1, 0 );
 
         } else {
-            auto mv = *( static_cast<TM*>( p_item ) );
-            sprintf( buf, GET_STRING( 87 ), p_item->getDisplayName( true ).c_str( ),
-                     AttackList[ mv.m_moveIdx ]->m_moveName.c_str( ) );
-            IO::loadTMIcon( AttackList[ mv.m_moveIdx ]->m_moveType,
-                            AttackList[ mv.m_moveIdx ]->m_isFieldAttack, 4, 4, 0, 1, 0 );
+            sprintf( buf, GET_STRING( 87 ),
+                    ITEM::getItemName( p_itemId, CURRENT_LANGUAGE ).c_str( ),
+                    getMoveName( p_data.m_param1, CURRENT_LANGUAGE ).c_str( ) );
+            IO::loadTMIcon( AttackList[ p_data.m_param1 ]->m_moveType,
+                            AttackList[ p_data.m_param1 ]->m_isFieldAttack, 4, 4, 0, 1, 0 );
         }
         loadSprite( A_ID, 2, 64, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal, ATiles,
                     ATilesLen, false, false, true, OBJPRIORITY_0, true );
         updateOAM( true );
         s16 x = 32, y = 8;
         regularFont->printMBStringD( buf, x, y, true );
-        regularFont->printChar( 489 - 21 + p_item->m_itemType, 32, 24, true );
-        sprintf( buf, GET_STRING( 86 ), GET_STRING( 11 + BAG::toBagType( p_item->m_itemType ) ) );
+        regularFont->printChar( ITEM::getItemChar( p_data.m_itemType ), 32, 24, true );
+        sprintf( buf, GET_STRING( 86 ), GET_STRING( 11 + BAG::toBagType( p_data.m_itemType ) ) );
         ASpriteOamIndex = A_ID;
         x               = 46;
         y               = 24;
         regularFont->printMBStringD( buf, x, y, true );
 
-        SAVE::SAV->getActiveFile( ).m_bag.insert( BAG::toBagType( p_item->m_itemType ),
-                                                  p_item->getItemId( ), p_count );
+        SAVE::SAV->getActiveFile( ).m_bag.insert( BAG::toBagType( p_data.m_itemType ),
+                                                  p_itemId, p_count );
     }
 
     messageBox::messageBox( const char* p_text, bool p_remsprites ) {

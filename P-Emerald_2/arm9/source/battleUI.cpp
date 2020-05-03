@@ -32,6 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <initializer_list>
 #include <tuple>
 
+#include "ability.h"
 #include "bagViewer.h"
 #include "battle.h"
 #include "battleTrainer.h"
@@ -626,7 +627,7 @@ namespace BATTLE {
         char buffer[ 100 ];
         snprintf( buffer, 99, GET_STRING( 143 ),
                   trainerClassNames[ _battle->_opponent->m_trainerClass ].c_str( ),
-                  _battle->_opponent->m_battleTrainerName.c_str( ) );
+                  _battle->_opponent->m_battleTrainerName[ CURRENT_LANGUAGE ].c_str( ) );
         _battle->log( buffer );
         IO::updateOAM( true );
     }
@@ -826,7 +827,7 @@ namespace BATTLE {
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
             IO::regularFont->printString(
-                ItemList[ acPkmn.m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
+                ITEM::getItemName( acPkmn.getItem( ), CURRENT_LANGUAGE ).c_str( ),
                 dx + x + 113, dy + y + 15, true, IO::font::RIGHT );
             char buffer[ 20 ];
             snprintf( buffer, 19, "Lv%d", acPkmn.m_level );
@@ -950,7 +951,7 @@ namespace BATTLE {
             IO::regularFont->setColor( WHITE_IDX, 2 );
 
             IO::regularFont->printString(
-                ItemList[ p_pokemon.m_boxdata.m_holdItem ]->getDisplayName( true ).c_str( ),
+                ITEM::getItemName( p_pokemon.getItem( ), CURRENT_LANGUAGE ).c_str( ),
                 p_x + dx + 64, dy + 80, true, IO::font::CENTER );
 
             char buffer[ 20 ];
@@ -1245,15 +1246,15 @@ namespace BATTLE {
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::boldFont->printString(
-                    ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ), 24,
+                    ITEM::getItemName( p_pokemon.getItem( ), CURRENT_LANGUAGE ).c_str( ), 24,
                     122, true );
-                tilecnt = IO::loadItemIcon( ItemList[ p_pokemon.m_boxdata.getItem( ) ]->m_itemName,
+                tilecnt = IO::loadItemIcon( p_pokemon.getItem( ),
                                             0, 116, ++oamIndex, ++palIndex, tilecnt, true );
             } else {
                 ++oamIndex;
                 ++palIndex;
                 IO::regularFont->printString(
-                    ItemList[ p_pokemon.m_boxdata.getItem( ) ]->getDisplayName( true ).c_str( ), 24,
+                    ITEM::getItemName( p_pokemon.getItem( ), CURRENT_LANGUAGE ).c_str( ), 24,
                     122, true );
             }
             IO::boldFont->setColor( GRAY_IDX, 1 );
@@ -1667,12 +1668,15 @@ namespace BATTLE {
                 result.m_target = 0;
                 loadBattleUISub( REDRAW, selIdx );
                 if( result.m_value ) {
-                    if( ItemList[ result.m_value ]->m_itemType == item::MEDICINE ) {
+                    ITEM::itemData iData = ITEM::getItemData( result.m_value );
+
+                    if( iData.m_itemType == ITEM::ITEMTYPE_MEDICINE ) {
                         u8 res = choosePKMN( p_pokemonPos
                                                  + ( _battle->m_battleMode == battle::DOUBLE ),
                                              true, true );
                         if( res != (u8) -1 ) {
                             result.m_target |= ( 1 << res );
+                            /*
                             result.m_newItemEffect
                                 = ItemList[ result.m_value ]->m_itemData.m_itemEffect;
                             for( u8 i = 0; i < 2; ++i )
@@ -1683,11 +1687,12 @@ namespace BATTLE {
                                     result.m_newItemEffect &= ~( 1 << ( 9 + 16 * !i ) );
                                     result.m_newItemEffect |= ( rs << ( 9 + 16 * !i ) );
                                 }
+                            */
                         } else {
                             loadBattleUISub( REDRAW, selIdx );
                             goto NEXT_TRY;
                         }
-                    } else if( ItemList[ result.m_value ]->m_itemType == item::POKE_BALLS )
+                    } else if( iData.m_itemType == ITEM::ITEMTYPE_POKEBALL )
                         result.m_target |= ( 1 << 2 );
                     IO::initOAMTable( true );
                     IO::NAV->draw( );

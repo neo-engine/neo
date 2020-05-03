@@ -53,7 +53,7 @@ namespace SAVE {
         }
         if( !m_stepCount ) {
             bool hasHatchSpdUp
-                = m_bag.count( BAG::toBagType( item::itemType::KEY_ITEM ), I_OVAL_CHARM );
+                = m_bag.count( BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_OVAL_CHARM );
             for( size_t s = 0; s < 6; ++s ) {
                 pokemon& ac = m_pkmnTeam[ s ];
                 if( !ac.m_boxdata.m_speciesId ) break;
@@ -126,7 +126,14 @@ namespace SAVE {
             else
                 break;
 
-        return new BATTLE::battleTrainer( m_playername, "", "", "", "", tmp );
+        std::string tmp2[ LANGUAGES ];
+        std::string pla[ LANGUAGES ];
+        for( u8 i = 0; i < LANGUAGES; ++i ) {
+            tmp2[ i ] = "";
+            pla[ i ] = std::string( m_playername );
+        }
+
+        return new BATTLE::battleTrainer( pla, tmp2, tmp2, tmp2, tmp2, tmp );
     }
     void saveGame::playerInfo::updateTeam( BATTLE::battleTrainer* p_trainer ) {
         for( u8 i = 0; i < p_trainer->m_pkmnTeam.size( ); ++i )

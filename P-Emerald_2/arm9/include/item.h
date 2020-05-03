@@ -26,122 +26,55 @@
     */
 
 #pragma once
-
-#include <map>
 #include <string>
-#include <nds/ndstypes.h>
+#include <functional>
+#include "pokemon.h"
 
-#include "ability.h"
-#include "script.h"
-extern const char ITEM_PATH[];
-
-class item {
-  public:
-    enum itemEffectType {
-        NONE          = 0,
-        IN_BATTLE     = 1, // Medicine/Berries
-        HOLD          = 2, // Has a hold effect only
-        OUT_OF_BATTLE = 4, // Repel, etc
-        USE_ON_PKMN   = 8  // Evolutionaries,
-    };
-    enum itemType { GOODS, KEY_ITEM, TM_HM, MAILS, MEDICINE, BERRIES, POKE_BALLS, BATTLE_ITEM };
+namespace ITEM {
+    const u8 ITEMTYPE_POKEBALL = 1;
+    const u8 ITEMTYPE_MEDICINE = 2;
+    const u8 ITEMTYPE_BATTLEITEM = 3;
+    const u8 ITEMTYPE_COLLECTIBLE = 4;
+    const u8 ITEMTYPE_USABLE = 5;
+    const u8 ITEMTYPE_EVOLUTION = 6;
+    const u8 ITEMTYPE_FORMECHANGE = 8;
+    const u8 ITEMTYPE_KEYITEM = 9;
+    const u8 ITEMTYPE_TM = 12;
+    const u8 ITEMTYPE_APRICORN = 13;
+    const u8 ITEMTYPE_BERRY = 16;
+    const u8 ITEMTYPE_HOLD = 32;
 
     struct itemData {
-        itemEffectType m_itemEffectType;
-        u32            m_price;
-        u32            m_itemEffect;
+        u8   m_itemType;
+        u8   m_effect;   // Effect index
+        u16  m_param1;   // Effect param 1
+        u16  m_param2;   // Effect param 2
+        u16  m_param3;   // Effect param 3
+        u16  m_sellPrice;
+        u16  m_buyPrice;
+    };
 
-        char m_itemDisplayName[ 15 ];
-        char m_itemDescription[ 200 ];
-        char m_itemShortDescr[ 100 ];
-    } m_itemData;
-    bool m_loaded; // Specifies whether the item data has been loaded
+    /*
+     * @brief: Compute itemtype character.
+     */
+    u16 getItemChar( u8 p_itemType );
 
-    itemType m_itemType;
+    bool getItemName( int p_itemId, int p_language, char* p_out );
+    std::string getItemName( int p_itemId, int p_language );
+    itemData getItemData( const u16 p_itemId );
+    bool getItemData( const u16 p_itemId, itemData* p_out );
 
-    std::string m_itemName;
+    bool isUsable( u16 p_itemId );
 
-    ability::abilityType m_inBattleEffect;
-    BATTLE::battleScript m_inBattleScript;
+    /*
+     * @brief: Uses a usable item/ key item.
+     */
+    bool use( u16 p_itemId, bool p_dryRun = false );
 
-    // Functions
-    std::string getDisplayName( bool p_new = false );
-
-    std::string getDescription( );
-
-    std::string getShortDescription( );
-
-    u32 getEffect( );
-
-    itemEffectType getEffectType( );
-
-    u32 getPrice( );
-
-    u16 getItemId( );
-
-    virtual bool load( );
-
-    bool needsInformation( u8 p_num );
-
-    bool use( pokemon& p_pokemon );
-
-    bool use( bool p_dryRun = false );
-
-    bool useable( );
-
-    // Constructors
-
-    item( const std::string& p_itemName ) : m_itemName( p_itemName ) {
-        m_loaded = false;
-    }
-
-    item( ) : m_itemName( "Null" ) { /*load = false;*/
-    }
-};
-
-class ball : public item {
-  public:
-    ball( const std::string& p_name ) : item( p_name ) {
-        m_itemType = POKE_BALLS;
-    }
-};
-
-class medicine : public item {
-  public:
-    medicine( const std::string& p_name ) : item( p_name ) {
-        m_itemType = MEDICINE;
-    }
-};
-
-class TM : public item {
-  public:
-    u16 m_moveIdx;
-    TM( const std::string& p_name, u16 p_moveIdx ) : item( p_name ) {
-        m_itemType = TM_HM;
-        m_moveIdx  = p_moveIdx;
-    }
-};
-
-class battleItem : public item {
-  public:
-    battleItem( const std::string& p_name ) : item( p_name ) {
-        m_itemType = BATTLE_ITEM;
-    }
-};
-
-class keyItem : public item {
-  public:
-    keyItem( const std::string& p_name ) : item( p_name ) {
-        m_itemType = KEY_ITEM;
-    }
-};
-
-class mail : public item {
-  public:
-    mail( const std::string& p_name ) : item( p_name ) {
-        m_itemType = MAILS;
-    }
-};
-
-#define MAX_ITEMS 1280
-extern item* ItemList[ MAX_ITEMS ];
+    /*
+     * @brief: Use specified item on given pokemon. (Item needs to be either medicine,
+     * formeChange).
+     */
+    bool use( u16 p_itemId, itemData& p_data, pokemon& p_pokemon,
+              std::function<u8( u8 )> p_callback, bool p_inbattle = false );
+}

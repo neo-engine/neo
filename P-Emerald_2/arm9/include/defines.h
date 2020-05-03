@@ -42,8 +42,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define MAX_ATTACK 800
 #define MAX_MOVE MAX_ATTACK
 #define MAX_PKMN 890
+#define MAX_ITEMS 1280
 #define OTLENGTH 8
 #define PKMN_NAMELENGTH 15
+#define ITEM_NAMELENGTH 20
+#define MOVE_NAMELENGTH 20
 #define ABILITY_NAMELENGTH 20
 
 #undef RAND_MAX
@@ -74,7 +77,7 @@ extern unsigned int   TEMP[ 12288 ];
 extern unsigned short TEMP_PAL[ 256 ];
 
 #define LANGUAGES 2
-#define MAX_STRINGS 250
+#define MAX_STRINGS 500
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];

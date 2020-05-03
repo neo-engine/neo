@@ -194,14 +194,9 @@ namespace BATTLE {
             targetSpecifier        m_targetSpecifier;
             action                 m_action;
             value                  m_value;
+            u16                    m_log;
 
-            std::string m_log;
-
-            command( std::string& p_log )
-                : m_conditions( {} ), m_target( NO_TARGET ), m_targetSpecifier( NONE ),
-                  m_action( SET ), m_value( 0 ), m_log( p_log ) {
-            }
-            command( const char* p_log )
+            command( u16 p_log )
                 : m_conditions( {} ), m_target( NO_TARGET ), m_targetSpecifier( NONE ),
                   m_action( SET ), m_value( 0 ), m_log( p_log ) {
             }
@@ -220,19 +215,12 @@ namespace BATTLE {
                      targetSpecifier p_targetSpecifier, action p_action, int p_value )
                 : m_conditions( p_conditions ), m_target( p_target ),
                   m_targetSpecifier( p_targetSpecifier ), m_action( p_action ), m_value( p_value ),
-                  m_log( "" ) {
+                  m_log( 0 ) {
             }
 
             command( std::vector<condition> p_conditions, target p_target,
                      targetSpecifier p_targetSpecifier, action p_action, int p_value,
-                     std::string& p_log )
-                : m_conditions( p_conditions ), m_target( p_target ),
-                  m_targetSpecifier( p_targetSpecifier ), m_action( p_action ), m_value( p_value ),
-                  m_log( p_log ) {
-            }
-            command( std::vector<condition> p_conditions, target p_target,
-                     targetSpecifier p_targetSpecifier, action p_action, int p_value,
-                     const char* p_log )
+                     u16 p_log )
                 : m_conditions( p_conditions ), m_target( p_target ),
                   m_targetSpecifier( p_targetSpecifier ), m_action( p_action ), m_value( p_value ),
                   m_log( p_log ) {
@@ -240,7 +228,7 @@ namespace BATTLE {
 
             command( std::vector<condition> p_conditions, target p_target,
                      targetSpecifier p_targetSpecifier, action p_action, value p_value,
-                     const char* p_log = "" )
+                     u16 p_log = 0 )
                 : m_conditions( p_conditions ), m_target( p_target ),
                   m_targetSpecifier( p_targetSpecifier ), m_action( p_action ), m_value( p_value ),
                   m_log( p_log ) {

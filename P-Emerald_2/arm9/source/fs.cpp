@@ -45,11 +45,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "messageBox.h"
 
-const char ITEM_PATH[]        = "nitro:/ITEMS/";
 const char PKMNDATA_PATH[]    = "nitro:/PKMNDATA/";
 const char SCRIPT_PATH[]      = "nitro:/MAPS/SCRIPTS/";
 
 const char ITEM_NAME_PATH[]    = "nitro:/DATA/ITEM_NAME/";
+const char ITEM_DATA_PATH[]    = "nitro:/DATA/ITEM_DATA/";
 const char ABILITY_NAME_PATH[] = "nitro:/DATA/ABTY_NAME/";
 const char MOVE_NAME_PATH[]    = "nitro:/DATA/MOVE_NAME/";
 const char POKEMON_NAME_PATH[] = "nitro:/DATA/PKMN_NAME/";
@@ -279,6 +279,8 @@ namespace FS {
 
     [[deprecated]]
     std::string readString( FILE* p_file, bool p_new ) {
+        (void) p_new;
+
         std::string ret = "";
         int         ac;
 
@@ -298,10 +300,7 @@ namespace FS {
             else
                 ret += ac;
         }
-        if( !p_new )
-            return convertToOld( ret );
-        else
-            return ret;
+        return ret;
     }
 
     std::string breakString( const std::string& p_string, u8 p_lineLength ) {
@@ -371,40 +370,6 @@ namespace FS {
         return result;
     }
 
-    [[deprecated]]
-    std::string convertToOld( const std::string& p_string ) {
-        std::string ret = "";
-        for( auto ac = p_string.begin( ); ac != p_string.end( ); ++ac ) {
-            if( *ac == 'ä' )
-                ret += '\x84';
-            else if( *ac == 'Ä' )
-                ret += '\x8E';
-            else if( *ac == 'ü' )
-                ret += '\x81';
-            else if( *ac == 'Ü' )
-                ret += '\x9A';
-            else if( *ac == 'ö' )
-                ret += '\x94';
-            else if( *ac == 'Ö' )
-                ret += '\x99';
-            else if( *ac == 'ß' )
-                ret += '\x9D';
-            else if( *ac == 'é' )
-                ret += '\x82';
-            else if( *ac == '%' )
-                ret += ' ';
-            else if( *ac == '|' )
-                ret += (char) 136;
-            else if( *ac == '#' )
-                ret += (char) 137;
-            else if( *ac == '\r' )
-                ret += "";
-            else
-                ret += *ac;
-        }
-        return ret;
-    }
-
     std::string getLocation( u16 p_ind ) {
         if( p_ind > 5000 ) return FARAWAY_PLACE;
         FILE* f = FS::openSplit( "nitro:/LOCATIONS/", p_ind, ".data", 5000 );
@@ -439,9 +404,59 @@ namespace FS {
     }
 } // namespace FS
 
-[[deprecated]]
-ability::ability( int p_abilityId ) {
-    return;
+namespace ITEM {
+    bool getItemName( int p_itemId, int p_language, char* p_out ) {
+        FILE* f = FS::openSplit( ITEM_NAME_PATH, p_itemId, ".str" );
+        if( !f ) return false;
+
+        for( int i = 0; i <= p_language; ++i ) {
+            fread( p_out, 1, ITEM_NAMELENGTH, f );
+        }
+        fclose( f );
+        return true;
+    }
+    std::string getItemName( int p_itemId, int p_language ) {
+        char tmpbuf[ ITEM_NAMELENGTH ];
+        if( !getItemName( p_itemId, p_language, tmpbuf ) ) {
+            return "---";
+        }
+        return std::string( tmpbuf );
+    }
+
+    itemData getItemData( const u16 p_itemId ) {
+        itemData res;
+        if( getItemData( p_itemId, &res ) ) {
+            return res;
+        }
+        getItemData( 0, &res );
+        return res;
+    }
+    bool getItemData( const u16 p_itemId, itemData* p_out ) {
+        FILE* f = FS::openSplit( ITEM_DATA_PATH, p_itemId, ".data" );
+        if( !f ) return false;
+        fread( p_out, sizeof( itemData ), 1, f );
+        fclose( f );
+        return true;
+    }
+}
+
+bool getMoveName( int p_moveId, int p_language, char* p_out ) {
+    FILE* f = FS::openSplit( MOVE_NAME_PATH, p_moveId, ".str" );
+    if( !f ) return false;
+
+    for( int i = 0; i <= p_language; ++i ) {
+        fread( p_out, 1, MOVE_NAMELENGTH, f );
+    }
+    fclose( f );
+    return true;
+}
+
+std::string getMoveName( int p_moveId, int p_language ) {
+    char tmpbuf[ MOVE_NAMELENGTH ];
+    if( !getAbilityName( p_moveId, p_language, tmpbuf ) ) {
+        return "---";
+    }
+    return std::string( tmpbuf );
 }
 
 bool getAbilityName( int p_abilityId, int p_language, char* p_out ) {
@@ -456,7 +471,7 @@ bool getAbilityName( int p_abilityId, int p_language, char* p_out ) {
 }
 
 std::string getAbilityName( int p_abilityId, int p_language ) {
-    char tmpbuf[ 20 ];
+    char tmpbuf[ ABILITY_NAMELENGTH ];
     if( !getAbilityName( p_abilityId, p_language, tmpbuf ) ) {
         return "---";
     }
@@ -496,7 +511,7 @@ bool getDisplayName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
     return true;
 }
 
-pkmnData    getPkmnData( const u16 p_pkmnId, const u8 p_forme ) {
+pkmnData getPkmnData( const u16 p_pkmnId, const u8 p_forme ) {
     pkmnData res;
     if( getPkmnData( p_pkmnId, p_forme, &res ) ) {
         return res;
@@ -504,10 +519,10 @@ pkmnData    getPkmnData( const u16 p_pkmnId, const u8 p_forme ) {
     getPkmnData( 0, &res );
     return res;
 }
-bool        getPkmnData( const u16 p_pkmnId, pkmnData* p_out ) {
+bool getPkmnData( const u16 p_pkmnId, pkmnData* p_out ) {
     return getPkmnData( p_pkmnId, 0, p_out );
 }
-bool        getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out ) {
+bool getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out ) {
     FILE* f = FS::openSplit( POKEMON_DATA_PATH, p_pkmnId, ".data" );
     if( !f ) return false;
     fread( p_out, sizeof( pkmnData ), 1, f );
@@ -621,83 +636,3 @@ bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
     return false;
 }
 
-u16 item::getItemId( ) {
-    for( u16 i = 0; i < MAX_ITEMS; ++i )
-        if( ItemList[ i ]->m_itemName == m_itemName ) return i;
-    return 0;
-}
-
-bool item::load( ) {
-    if( m_loaded ) return true;
-    FILE* f = FS::open( ITEM_PATH, m_itemName.c_str( ), ".data" );
-    if( !f ) return false;
-
-    memset( &m_itemData, 0, sizeof( itemData ) );
-    u8 tmp;
-    fscanf( f, "%hhu %lu %lu\n", &tmp, &m_itemData.m_price, &m_itemData.m_itemEffect );
-    m_itemData.m_itemEffectType = static_cast<item::itemEffectType>( tmp );
-    strcpy( m_itemData.m_itemDisplayName, FS::readString( f, true ).c_str( ) );
-    strcpy( m_itemData.m_itemDescription, FS::readString( f, true ).c_str( ) );
-    strcpy( m_itemData.m_itemShortDescr, FS::readString( f, true ).c_str( ) );
-    FS::close( f );
-    return m_loaded = true;
-}
-
-bool berry::load( ) {
-    if( m_loaded ) return true;
-    FILE* f = FS::open( ITEM_PATH, m_itemName.c_str( ), ".data" );
-    if( !f ) return false;
-
-    memset( &m_itemData, 0, sizeof( itemData ) );
-    u8 tmp;
-    fscanf( f, "%hhu %lu %lu\n", &tmp, &m_itemData.m_price, &m_itemData.m_itemEffect );
-    m_itemData.m_itemEffectType = static_cast<item::itemEffectType>( tmp );
-    strcpy( m_itemData.m_itemDisplayName, FS::readString( f, true ).c_str( ) );
-    strcpy( m_itemData.m_itemDescription, FS::readString( f, true ).c_str( ) );
-    strcpy( m_itemData.m_itemShortDescr, FS::readString( f, true ).c_str( ) );
-
-    memset( &m_berryData, 0, sizeof( berryData ) );
-    fscanf( f, "%hu %hhu", &m_berryData.m_berrySize, &tmp );
-    m_berryData.m_berryGuete = static_cast<berry::berryGueteType>( tmp );
-    fscanf( f, "%hhu %hhu", &tmp, &m_berryData.m_naturalGiftStrength );
-    m_berryData.m_naturalGiftType = static_cast<type>( tmp );
-
-    for( u8 i = 0; i < 5; ++i ) fscanf( f, "%hhu", &m_berryData.m_berryTaste[ i ] );
-    fscanf( f, "%hhu %hhu %hhu", &m_berryData.m_hoursPerGrowthStage, &m_berryData.m_minBerries,
-            &m_berryData.m_maxBerries );
-    FS::close( f );
-    return m_loaded = true;
-}
-
-std::string item::getDisplayName( bool p_new ) {
-    if( !m_loaded && !load( ) ) return m_itemName;
-    if( p_new )
-        return std::string( m_itemData.m_itemDisplayName );
-    else
-        return FS::convertToOld( std::string( m_itemData.m_itemDisplayName ) );
-}
-
-std::string item::getDescription( ) {
-    if( !m_loaded && !load( ) ) return NO_DATA;
-    return std::string( m_itemData.m_itemDescription );
-}
-
-std::string item::getShortDescription( ) {
-    if( !m_loaded && !load( ) ) return NO_DATA;
-    return std::string( m_itemData.m_itemShortDescr );
-}
-
-u32 item::getEffect( ) {
-    if( !m_loaded && !load( ) ) return 0;
-    return m_itemData.m_itemEffect;
-}
-
-item::itemEffectType item::getEffectType( ) {
-    if( !m_loaded && !load( ) ) return itemEffectType::NONE;
-    return m_itemData.m_itemEffectType;
-}
-
-u32 item::getPrice( ) {
-    if( !m_loaded && !load( ) ) return 0;
-    return m_itemData.m_price;
-}
