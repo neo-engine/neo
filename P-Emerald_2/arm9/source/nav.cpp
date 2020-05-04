@@ -539,7 +539,7 @@ namespace IO {
                     break;
                 }
                 case 1:
-                    for( u16 j = I_NULL_PLATE; j < MAX_ITEMS; ++j ) {
+                    for( u16 j = 1; j < MAX_ITEMS; ++j ) {
                         auto c = ITEM::getItemData( j );
                         if( c.m_itemType )
                             SAVE::SAV->getActiveFile( ).m_bag.insert(

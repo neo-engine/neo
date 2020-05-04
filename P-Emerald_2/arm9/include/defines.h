@@ -38,11 +38,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define VERSION_NAME "Magnetizing Magnemite neo"
 #define DEBUG
 
-#define MAX_ITEMS_IN_BAG 900
+#define MAX_ITEMS 1280
+#define MAX_ITEMS_IN_BAG MAX_ITEMS
 #define MAX_ATTACK 800
 #define MAX_MOVE MAX_ATTACK
 #define MAX_PKMN 890
-#define MAX_ITEMS 1280
 #define OTLENGTH 8
 #define PKMN_NAMELENGTH 15
 #define ITEM_NAMELENGTH 20

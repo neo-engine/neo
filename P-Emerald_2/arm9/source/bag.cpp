@@ -104,14 +104,16 @@ namespace BAG {
             return bag::bagType::BERRIES;
         }
 
+        if( ( p_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
+            return bag::bagType::MEDICINE;
+        }
+
         switch( p_itemType ) {
         case ITEM::ITEMTYPE_FORMECHANGE:
         case ITEM::ITEMTYPE_KEYITEM:
             return bag::bagType::KEY_ITEMS;
         case ITEM::ITEMTYPE_TM:
             return bag::bagType::TM_HM;
-        case ITEM::ITEMTYPE_MEDICINE:
-            return bag::bagType::MEDICINE;
         default:
             break;
         }

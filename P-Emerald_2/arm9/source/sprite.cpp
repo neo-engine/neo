@@ -200,6 +200,7 @@ unsigned short TEMP_PAL[ 256 ] = {0};
 
 namespace IO {
     const char* OW_PATH = "nitro:/PICS/SPRITES/OW/";
+    const char* TM_PATH = "nitro:/PICS/SPRITES/TM/";
     const char* ITEM_PATH = "nitro:/PICS/SPRITES/ITEMS/";
     const char* PKMN_PATH = "nitro:/PICS/SPRITES/PKMN/";
     const char* PKMN_BACK_PATH = "nitro:/PICS/SPRITES/PKMNBACK/";
@@ -871,14 +872,23 @@ namespace IO {
 
     u16 loadItemIcon( u16 p_itemId, const u16 p_posX, const u16 p_posY,
                       u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
-        // TODO
-        return loadIcon( ITEM_PATH, "---", p_posX, p_posY,
-                         p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+        FILE* f = FS::openSplit( ITEM_PATH, p_itemId, ".raw" );
+        if( !f ) {
+            return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal,
+                               NoItemTiles, NoItemTilesLen, false, false, false,
+                               p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
+        }
+
+        FS::read( f, TEMP, sizeof( unsigned int ), 128 );
+        FS::read( f, TEMP_PAL, sizeof( unsigned short ), 16 );
+
+        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32,
+                           TEMP_PAL, TEMP, 512, false, false, false,
+                           p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
     }
 
     u16 loadTMIcon( type p_type, bool p_hm, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                     u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
-        // TODO
         std::string itemname
             = ( p_hm ? "VM" : "TM" )
               + ( std::vector<std::string>{"Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein",
@@ -886,7 +896,7 @@ namespace IO {
                                            "Feuer", "Pflanze", "Elektro", "Psycho", "Eis", "Drache",
                                            "Unlicht", "Fee"}[ p_type ] );
 
-        return loadIcon( ITEM_PATH, itemname.c_str( ), p_posX, p_posY,
+        return loadIcon( TM_PATH, itemname.c_str( ), p_posX, p_posY,
                          p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
 

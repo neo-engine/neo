@@ -168,7 +168,7 @@ namespace BAG {
         IO::OamTop->oamBuffer[ 2 ].isHidden = true;
 
         if( p_data.m_itemType != ITEM::ITEMTYPE_TM ) {
-            IO::loadItemIcon( p_itemId, 112, 46, 0, 0, 0, false );
+            IO::loadItemIcon( p_itemId, 112, 44, 0, 0, 0, false );
             IO::OamTop->oamBuffer[ 1 ].isHidden = true;
             IO::OamTop->oamBuffer[ 2 ].isHidden = true;
 
@@ -179,7 +179,7 @@ namespace BAG {
             if( p_data.m_itemType != ITEM::ITEMTYPE_KEYITEM
                 && p_data.m_itemType != ITEM::ITEMTYPE_FORMECHANGE ) {
                 snprintf( buffer, 99, "x %d", p_count );
-                IO::regularFont->printString( buffer, 144, 53, false );
+                IO::regularFont->printString( buffer, 146, 52, false );
             }
 
             if( p_data.m_itemType & ITEM::ITEMTYPE_BERRY ) {
@@ -225,43 +225,43 @@ namespace BAG {
                 */
             }
         } else {
-            u16 tileCnt = IO::loadTMIcon( AttackList[ p_data.m_param1 ]->m_moveType,
-                                          AttackList[ p_data.m_param1 ]->m_isFieldAttack, 112, 46, 0,
+            u16 tileCnt = IO::loadTMIcon( AttackList[ p_data.m_param2 ]->m_moveType,
+                                          AttackList[ p_data.m_param2 ]->m_isFieldAttack, 112, 44, 0,
                                           0, 0, false );
 
             display
                 = ITEM::getItemName( p_itemId, CURRENT_LANGUAGE )
-                + ": " + getMoveName( p_data.m_param1, CURRENT_LANGUAGE );
-            descr = FS::breakString( AttackList[ p_data.m_param1 ]->description( ), IO::regularFont,
+                + ": " + getMoveName( p_data.m_param2, CURRENT_LANGUAGE );
+            descr = FS::breakString( AttackList[ p_data.m_param2 ]->description( ), IO::regularFont,
                                      196 );
 
             IO::regularFont->printString( GET_STRING( 29 ), 33, 145, false );
             tileCnt
-                = IO::loadTypeIcon( AttackList[ p_data.m_param1 ]->m_moveType, 62, 144, 1, 1, tileCnt,
+                = IO::loadTypeIcon( AttackList[ p_data.m_param2 ]->m_moveType, 62, 144, 1, 1, tileCnt,
                                     false, CURRENT_LANGUAGE );
 
             IO::regularFont->printString( GET_STRING( 30 ), 100, 145, false );
-            IO::loadDamageCategoryIcon( AttackList[ p_data.m_param1 ]->m_moveHitType, 152, 144, 2, 2,
+            IO::loadDamageCategoryIcon( AttackList[ p_data.m_param2 ]->m_moveHitType, 152, 144, 2, 2,
                                         tileCnt, false );
 
             IO::regularFont->printString( GET_STRING( 31 ), 190, 145, false );
             char buffer[ 100 ];
-            snprintf( buffer, 99, "%2d", AttackList[ p_data.m_param1 ]->m_movePP );
+            snprintf( buffer, 99, "%2d", AttackList[ p_data.m_param2 ]->m_movePP );
             IO::regularFont->printString( buffer, 229, 145, false, IO::font::RIGHT );
 
             IO::regularFont->setColor( RED_IDX, 1 );
             IO::regularFont->printString( GET_STRING( 32 ), 33, 160, false );
-            if( AttackList[ p_data.m_param1 ]->m_moveHitType != move::moveHitTypes::STAT
-                && AttackList[ p_data.m_param1 ]->m_moveBasePower > 1 )
-                snprintf( buffer, 99, "%3d", AttackList[ p_data.m_param1 ]->m_moveBasePower );
+            if( AttackList[ p_data.m_param2 ]->m_moveHitType != move::moveHitTypes::STAT
+                && AttackList[ p_data.m_param2 ]->m_moveBasePower > 1 )
+                snprintf( buffer, 99, "%3d", AttackList[ p_data.m_param2 ]->m_moveBasePower );
             else
                 snprintf( buffer, 99, "---" );
             IO::regularFont->printString( buffer, 108, 160, false, IO::font::RIGHT );
 
             IO::regularFont->setColor( BLUE_IDX, 1 );
             IO::regularFont->printString( GET_STRING( 33 ), 124, 160, false );
-            if( AttackList[ p_data.m_param1 ]->m_moveAccuracy )
-                snprintf( buffer, 99, "%3d", AttackList[ p_data.m_param1 ]->m_moveAccuracy );
+            if( AttackList[ p_data.m_param2 ]->m_moveAccuracy )
+                snprintf( buffer, 99, "%3d", AttackList[ p_data.m_param2 ]->m_moveAccuracy );
             else
                 std::sprintf( buffer, "---" );
             IO::regularFont->printString( buffer, 229, 160, false, IO::font::RIGHT );
@@ -292,7 +292,7 @@ namespace BAG {
                     {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),
                      {SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].getItem( ), true}} );
                 if( p_itemId && p_data.m_itemType == ITEM::ITEMTYPE_TM ) {
-                    u16 currMv = p_data.m_param1;
+                    u16 currMv = p_data.m_param2;
                     if( currMv == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 0 ]
                         || currMv
                                == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 1 ]
@@ -384,7 +384,7 @@ namespace BAG {
                                 p_selected ? RED_IDX : GRAY_IDX, p_pressed );
             IO::boldFont->printChar( 'Y', p_x + 106 + 2 * p_pressed, p_y - 2 + p_pressed, true );
         } else if( p_data.m_itemType == ITEM::ITEMTYPE_TM
-                && AttackList[ p_data.m_param1 ]->m_isFieldAttack ) {
+                && AttackList[ p_data.m_param2 ]->m_isFieldAttack ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
                                 p_selected ? RED_IDX : GRAY_IDX, p_pressed );
             IO::boldFont->setColor( BLUE_IDX, 2 );
@@ -403,7 +403,7 @@ namespace BAG {
             IO::regularFont->printString( ITEM::getItemName( p_itemId, CURRENT_LANGUAGE )
                     .c_str( ), p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
         else
-            IO::regularFont->printString( getMoveName( p_data.m_param1, CURRENT_LANGUAGE ).c_str( ),
+            IO::regularFont->printString( getMoveName( p_data.m_param2, CURRENT_LANGUAGE ).c_str( ),
                 p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
     }
 
@@ -495,8 +495,8 @@ namespace BAG {
                               TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
         } else {
             IO::loadTMIcon(
-                AttackList[ p_data.m_param1 ]->m_moveType,
-                AttackList[ p_data.m_param1 ]->m_isFieldAttack,
+                AttackList[ p_data.m_param2 ]->m_moveType,
+                AttackList[ p_data.m_param2 ]->m_isFieldAttack,
                 0, 0, TRANSFER_SUB, TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
         }
 

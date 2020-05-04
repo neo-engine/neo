@@ -453,7 +453,7 @@ bool getMoveName( int p_moveId, int p_language, char* p_out ) {
 
 std::string getMoveName( int p_moveId, int p_language ) {
     char tmpbuf[ MOVE_NAMELENGTH ];
-    if( !getAbilityName( p_moveId, p_language, tmpbuf ) ) {
+    if( !getMoveName( p_moveId, p_language, tmpbuf ) ) {
         return "---";
     }
     return std::string( tmpbuf );

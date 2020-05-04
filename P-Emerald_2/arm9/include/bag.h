@@ -37,10 +37,10 @@ namespace BAG {
       private:
         enum {
             ITEM_START      = 0,
-            MEDICINE_START  = 550,
-            TM_HM_START     = 600,
-            BERRIES_START   = 725,
-            KEY_ITEMS_START = 825
+            MEDICINE_START  = 500,
+            TM_HM_START     = 625,
+            BERRIES_START   = 850,
+            KEY_ITEMS_START = 950
         };
         const u16           _startIdx[ 6 ] = {ITEM_START,    MEDICINE_START,  TM_HM_START,
                                     BERRIES_START, KEY_ITEMS_START, MAX_ITEMS_IN_BAG};
