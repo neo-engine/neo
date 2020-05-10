@@ -39,7 +39,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "yesNoBox.h"
 
 #include "berry.h"
-#include "hmMoves.h"
 #include "item.h"
 #include "pokemon.h"
 #include "moveNames.h"
@@ -436,7 +435,7 @@ namespace IO {
                 draw( true );
                 MAP::curMap->draw( );
 
-                if( res ) res->use( );
+                if( res ) MOVE::use( res & 32767, res >> 15 );
             } else if( GET_AND_WAIT_C( POS[ DEX_ID ][ 0 ], POS[ DEX_ID ][ 1 ], 16 ) ) {
                 ANIMATE_MAP = false;
                 _state      = HOME;
@@ -474,7 +473,8 @@ namespace IO {
                 case 0: {
                     memset( SAVE::SAV->getActiveFile( ).m_pkmnTeam, 0,
                             sizeof( SAVE::SAV->getActiveFile( ).m_pkmnTeam ) );
-                    std::vector<u16> tmp = { 201, 493, 521, 649, u16( 1 + rand( ) % MAX_PKMN )};
+                    std::vector<u16> tmp = { 201, 493, 521, 649, u16( 1 + rand( ) % MAX_PKMN ),
+                                             MAX_PKMN };
                     for( int i = 0; i < 6; ++i ) {
                         pokemon&         a   = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
 
@@ -498,7 +498,7 @@ namespace IO {
                             else
                                 a.giveItem( I_PIXIE_PLATE );
                         } else {
-                            a.m_boxdata.m_holdItem      = 1 + rand( ) % 400;
+                            a.m_boxdata.m_heldItem      = 1 + rand( ) % 400;
                         }
 
                         for( u16 j = 1; j <= MAX_PKMN; ++j )

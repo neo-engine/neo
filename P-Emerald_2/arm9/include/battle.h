@@ -34,229 +34,403 @@
 #include <nds.h>
 
 #include "defines.h"
-#include "battlePokemon.h"
+#include "battleDefines.h"
+#include "battleTrainer.h"
 #include "battleUI.h"
-#include "battleWeather.h"
 #include "pokemon.h"
-#include "script.h"
 #include "type.h"
 
-class move;
-
 namespace BATTLE {
-    class battleTrainer;
+    typedef std::pair<u8, u8> fieldPosition; // (side, slot)
 
-    extern u8  firstMoveSwitchTarget;
-    extern u16 weatherMessage[ 9 ];
-    extern u16 weatherEndMessage[ 9 ];
-
-    u16 calcDamage( const move& p_atk, const pokemon& p_atg, const pokemon& p_def, u8 p_rndVal );
-
-    enum situation {
-        ATTACK        = 1,
-        BEFORE_BATTLE = 2,
-        AFTER_BATTLE  = 4,
-        GRASS         = 8,
-        BEFORE_ATTACK = 16,
-        AFTER_ATTACK  = 32,
-        BETWEEN_TURNS = 64
+    enum battleMoveType {
+        ATTACK,
+        MEGA_ATTACK, // Mega evolve and attack
+        SWITCH,
+        SWITCH_PURSUIT, // Pursuit used on a switching target
+        USE_ITEM,
+        NO_OP, // No operation (e.g. when trying to run in a double battle)
+        CAPTURE, // (try to) capture pokemon.
+        RUN,
+        CANCEL // Cancel / go back to previous move selection
     };
 
-#define MAX_STATS 8
-#define ATK 0
-#define DEF 1
-#define SPD 2
-#define SATK 3
-#define SDEF 4
-#define ACCURACY 5
-#define EVASION 6
-#define ATTACK_BLOCKED 7
+    struct battleMoveSelection {
+        battleMoveType             m_type;
+        u16                        m_param; // move id for attack/ m attack; target pkmn
+                                            // for swtich; tg item
+        std::vector<fieldPosition> m_target;
+        fieldPosition              m_user;
+    };
+
+    struct battleMove {
+        battleMoveType             m_type;
+        u16                        m_param;
+        std::vector<fieldPosition> m_target;
+        fieldPosition              m_user;
+        s8                         m_priority;
+        s16                        m_userSpeed;
+        u8                         m_pertubation; // random number to break speed ties
+
+        bool operator<( const battleMove& p_other ) {
+            if( this->m_priority < p_other.m_priority ) return true;
+            if( this->m_userSpeed > p_other.m_userSpeed ) return true;
+            if( this->m_pertubation < p_other.m_pertubation ) return true;
+            return false;
+        }
+    };
+
+    /*
+     * @brief: A slot on the field.
+     */
+    class slot {
+        public:
+            enum status {
+                EMPTY = 0,
+                NORMAL,
+                FAINTED,
+                RECALLED, // player/ AI recalled their pokemon
+            };
+        private:
+            status         _status;
+            slotCondition  _slotCondition;
+            pokemon*       _pokemon;
+            u8             _volatileStatusCounter[ MAX_VOLATILE_STATUS ];
+            u8             _volatileStatusAmount[ MAX_VOLATILE_STATUS ]; // Multiple stockpiles
+            boosts         _boosts;
+        public:
+            /*
+             * @brief: Constructs and initializes a new slot, optionally with a default
+             * (wild) pokemon.
+             */
+            slot( pokemon* p_initialPokemon = nullptr );
+
+            /*
+             * Ages the slot by one turn, processes all changes
+             */
+            void age( battleUI p_ui );
+
+            /*
+             * @brief: Recalls a non-FAINTED pokemon.
+             */
+            pokemon* recallPokemon( battleUI p_ui, bool p_keepVolatileStatus = false );
+            /*
+             * @brief: Sends out a new pokemon to an EMPTY slot.
+             */
+            bool sendPokemon( battleUI p_ui, pokemon* p_pokemon );
+
+            bool damagePokemon( battleUI p_ui, u16 p_damage );
+            bool healPokemon( battleUI p_ui, u16 p_heal );
+            /*
+             * @brief: Faints the pokemon. Deals necessary damage first.
+             */
+            bool faintPokemon( battleUI p_ui );
+
+            bool addBoosts( battleUI p_ui, boosts p_boosts );
+            bool resetBoosts( battleUI p_ui );
+            boosts getBoosts( );
+
+            bool addVolatileStatus( battleUI p_ui, volatileStatus p_volatileStatus );
+            volatileStatus getVolatileStatus( );
+
+            bool addSlotCondition( battleUI p_ui, slotCondition p_slotCondition );
+            slotCondition getSlotCondition( );
+
+            /*
+             * @brief: Gets the current value of the specified stat (with all modifiers
+             * applied). (HP: 0, ATK 1, etc)
+             */
+            u16 getStat( u8 p_stat );
+
+            /*
+             * @brief: Checks whether the pokemon can move.
+             */
+            bool canSelectMove( );
+            /*
+             * @brief: Checks whether the pokemon can use its i-th move.
+             */
+            bool canSelectMove( u8 p_moveIdx );
+
+            /*
+             * @brief: pokemon uses move with the given moveid. Returns false if the move
+             * failed (e.g. due to confusion)
+             */
+            bool useMove( battleUI p_ui, u16 p_moveId );
+
+            /*
+             * @brief: pokemon is hit by move with the given id
+             */
+            void hitByMove( battleUI p_ui, u16 p_moveId );
+
+            /*
+             * @brief: Checks whether the pokemon can use an item (from the bag).
+             */
+            bool canUseItem( );
+
+            /*
+             * @brief: Checks whether the pokemon can be switched out.
+             */
+            bool canSwitchOut( );
+
+            /*
+             * @brief: Computes a battle move from the given user's and its targets'
+             * selections.
+             */
+            battleMove computeBattleMove( battleMoveSelection p_usersSelection,
+                                          std::vector<battleMoveSelection>& p_targetsSelecotions );
+
+            /*
+             * @brief: Computes the base damage dealt to each target
+             * @param p_targetsMoves: Moves of the targets of the user's move.
+             * @param p_targetedMoves: Moves that target the user.
+             */
+            std::vector<u16> computeDamageDealt( battleMove p_usersMove,
+                                                 std::vector<battleMove>& p_targetsMoves,
+                                                 std::vector<battleMove>& p_targetedMoves );
+
+            /*
+             * @brief: Computes the actual damage taken by the specified move.
+             */
+            u16 computeDamageTaken( battleMove p_move, u16 p_baseDamage );
+
+            /*
+             * @brief: Computes the recoil the pokemon in the slot would do if hit by the
+             * given amount of damage.
+             */
+            u16 computeRecoil( u16 p_damage );
+
+            /*
+             * @brief: Checks whether the pokemon in this slot absorbs the given move
+             * (e.g. due to rage powder / storm drain / etc.)
+             */
+            bool absorbesMove( battleMove p_move, u16 p_baseDamage );
+    };
+
+    /*
+     * @brief: A side of the field.
+     */
+    class side {
+        private:
+            u8   _sideConditionCounter[ MAX_SIDE_CONDITIONS ]; // Counts turns that side con is active
+            u8   _sideConditionAmount[ MAX_SIDE_CONDITIONS ];
+
+            slot _slots[ 2 ];
+        public:
+            side( ) { }
+
+            /*
+             * Ages the side by one turn, processes all changes
+             */
+            void age( battleUI p_ui );
+
+            /*
+             * @brief: Tries to add the specified side condition(s).
+             * @param p_duration: The duration of the condition in turns. (0 for the
+             * defauls amount)
+             */
+            bool addSideCondition( battleUI p_ui, sideCondition p_sideCondition,
+                                   u8 p_duration = 0 );
+
+            bool removeSideCondition( battleUI p_ui, sideCondition p_sideCondition );
+
+            battleMove computeBattleMove( u8 p_slot, battleMoveSelection& p_usersSelection,
+                                          std::vector<battleMoveSelection>& p_targetsSelecotions );
+
+            /*
+             * @brief: Computes the base damage dealt to each target
+             * @param p_targetsMoves: Moves of the targets of the user's move.
+             * @param p_targetedMoves: Moves that target the user.
+             */
+            std::vector<u16> computeDamageDealt( u8 p_slot, battleMove p_usersMove,
+                                                 std::vector<battleMove>& p_targetsMoves,
+                                                 std::vector<battleMove>& p_targetedMoves );
+
+            /*
+             * @brief: Computes the actual damage taken by the specified move.
+             */
+            u16 computeDamageTaken( u8 p_slot, battleMove p_move, u16 p_baseDamage );
+
+            /*
+             * @brief: Computes the recoil the pokemon in the slot would do if hit by the
+             * given amount of damage.
+             */
+            u16 computeRecoil( u8 p_slot, u16 p_damage );
+
+            /*
+             * @brief: Checks whether the pokemon in this slot absorbs the given move
+             * (e.g. due to rage powder / storm drain / etc.)
+             */
+            bool absorbesMove( u8 p_slot, battleMove p_move, u16 p_baseDamage );
+    };
+
+
+    /*
+     * @brief: The overall field where the battle takes place.
+     */
+    class field {
+        public:
+            static const u8 PLAYER_SIDE = 0;
+            static const u8 OPPONENT_SIDE = 1;
+        private:
+            weather         _weather;
+            u8              _weatherTimer; // Number of turns the weather is still active
+
+            pseudoWeather   _pseudoWeather;
+            u8              _pseudoWeatherTimer;
+
+            terrain         _terrain;
+            u8              _terrainTimer;
+
+            side            _sides[ 2 ];
+        public:
+            field( weather p_initialWeather = NO_WEATHER,
+                   pseudoWeather p_initialPseudoWeather = NO_PSEUDO_WEATHER,
+                   terrain p_initialTerrain = NO_TERRAIN );
+
+            /*
+             * Initializes the field.
+             */
+            void init( battleUI p_ui );
+            /*
+             * Ages the field by one turn, processes all weather changes
+             */
+            void age( battleUI p_ui );
+
+            /*
+             * @brief: Tries to set a new weather; returns false iff that fails.
+             */
+            bool    setWeather( battleUI p_ui, weather p_newWeather );
+            bool    removeWeather( battleUI p_ui );
+            weather getWeather( );
+
+            /*
+             * @brief: Tries to set a new pseudo weather; returns false iff that fails.
+             */
+            bool          setPseudoWeather( battleUI p_ui, pseudoWeather p_newPseudoWeather );
+            bool          removePseudoWeather( battleUI p_ui );
+            pseudoWeather getPseudoWeather( );
+
+            /*
+             * @brief: Tries to set a new terrain; returns false iff that fails.
+             */
+            bool    setTerrain( battleUI p_ui, terrain p_newTerrainr );
+            bool    removeTerrain( battleUI p_ui );
+            terrain getTerrain( );
+
+            bool addSideCondition( battleUI p_ui, u8 p_side, sideCondition p_sideCondition,
+                                   u8 p_duration = 0 );
+            bool removeSideCondition( battleUI p_ui, u8 p_side, sideCondition p_sideCondition );
+
+            std::vector<battleMove>
+            computeSortedBattleMoves( const std::vector<battleMoveSelection>& p_selectedMoves );
+
+            void executeBattleMove( battleUI p_ui, battleMove p_move,
+                                    std::vector<battleMove> p_targetsMoves,
+                                    std::vector<battleMove> p_tergetedMoves );
+    };
+
 
     class battle {
-      private:
-        u16            _round, _maxRounds, _AILevel;
-        battleTrainer *_player, *_opponent;
+        private:
+            u16     _round, _maxRounds, _AILevel;
+            field   _field;
 
-        u8 _acPkmnPosition[ 6 ][ 2 ]; // me; opp; maps the Pkmn's positions in the teams to their
-                                      // real in-battle positions
+            battleUI _battleUI;
 
-        bool _battleSpotOccupied[ 2 ][ 2 ];
+            battleTrainer   _opponent;
+            pokemon         _opponentTeam[ 6 ];
+            u8              _opponentTeamSize;
 
-        enum battleTerrain {
-            NO_BATTLE_TERRAIN = 0,
-            TRICK_ROOM        = 1,
-            // Todo
-        };
-        battleTerrain _battleTerrain;
+            pokemon* _playerTeam;
+            u8       _playerTeamSize;
 
-        struct battleMove {
-            enum type {
-                ATTACK,
-                MEGA_ATTACK, // Mega evolve and attack
-                SWITCH,
-                USE_ITEM,
-                USE_NAV,
-                RUN
+            u8 _curPkmnPosition[ 6 ][ 2 ]; // me; opp; maps the Pkmn's positions in the
+                                          //  teams to their real in-battle positions
+
+            bool     _allowMegaEvolution;
+        public:
+            enum battleMode { SINGLE = 0, DOUBLE = 1 };
+
+            enum battleEndReason {
+                BATTLE_ROUND_LIMIT  = 0,
+                BATTLE_OPPONENT_WON = -1,
+                BATTLE_PLAYER_WON   = 1,
+                BATTLE_NONE         = 2,
+                BATTLE_RUN          = 3,
+                BATTLE_CAPTURE      = 4
             };
-            type m_type;
-            u16  m_value;
-            u8   m_target; // Bitflag: 0 Own1, 1 Own2, 2 Opp1, 3 Opp2, 4 Own Field, 5 OppField,
-                         // m_target == 0 -> default target
 
-            u32 m_newItemEffect;
+            bool m_distributeEXP;
+            bool m_isWildBattle;
 
-            void clear( ) {
-                m_target        = 0;
-                m_type          = (type) 0;
-                m_value         = 0;
-                m_newItemEffect = 0;
-            }
-        };
+            battleMode m_battleMode;
 
-        battleMove _battleMoves[ 2 ][ 2 ];
-        u8         _moveOrder[ 2 ][ 2 ];
-        u16        _lstOwnMove;
-        u16        _lstOppMove;
-        u16        _lstMove;
+            battle( pokemon* p_playerTeam, u16 p_opponentId, u16 p_maxRounds,
+                    weather p_weather, u8 p_platform, u8 p_background, u16 p_AILevel = 5,
+                    battleMode p_battlemode = SINGLE, u8 p_platform2 = -1,
+                    bool p_allowMegaEvolution = true );
+            battle( pokemon* p_playerTeam, pokemon p_opponent,
+                    weather p_weather, u8 p_platform, u8 p_platform2, u8 p_background,
+                    bool p_allowMegaEvolution = true );
 
-        u8 _participatedPKMN[ 6 ][ 2 ];
 
-        // Current turn's current move's "consequences"
-        s16   _acDamage[ 2 ][ 2 ];
-        u8    _critical[ 2 ][ 2 ];
-        u8    _criticalChance[ 2 ][ 2 ];
-        float _effectivity[ 2 ][ 2 ];
-        s8    _acStatChange[ 2 ][ 2 ][ 10 ];
-        bool  _currentMoveIsOpp;
-        bool  _currentMoveIsSnd;
+            s8 start( ); // Runs battle; returns -1 if opponent wins, 0 if tie, 1 otherwise
 
-        bool _restoreItem;
-        bool _allowMegaEvolution;
-        u8   _weatherLength;
+            /*
+             * @brief: Initializes the battle.
+             */
+            void initBattle( );
 
-        bool _endBattle = false;
+            /*
+             * @brief: Makes the player select a move for the pokemon in slot p_slot.
+             * Returns a NO_OP move if the corresponding pokemon cannot move.
+             */
+            battleMoveSelection getMoveSelection( u8 p_slot, bool p_allowMegaEvolution );
 
-        u16           _storedHP[ 2 ][ 2 ];
-        battlePokemon _pkmns[ 6 ][ 2 ];
-        battlePokemon _storedPkmns[ 6 ][ 2 ];
-        battlePokemon _wildPokemon;
+            /*
+             * @brief: Computes an AI move for the opposing pokemon in slot p_slot.
+             */
+            battleMoveSelection getAIMove( u8 p_slot );
 
-        battleUI _battleUI;
+            /*
+             * @brief: Checks whether the battle hit an end
+             */
+            bool endConditionHit( battleEndReason& p_out );
 
-        int
-        getTargetSpecifierValue( bool p_targetIsOpp, u8 p_targetPosition,
-                                 const battleScript::command::targetSpecifier& p_targetSpecifier,
-                                 u8                                            p_targetVal = 0 );
-        int
-                    getTargetSpecifierValue( const battleScript::command::targetSpecifier& p_targetSpecifier );
-        std::string parseLogCmd( const std::string& p_cmd );
+            /*
+             * @brief: Ends the battle due to the given reason.
+             */
+            void endBattle( battleEndReason p_battleEndReason );
 
-      public:
-#define OPPONENT 1
-#define PLAYER 0
+            /*
+             * @brief: Player tries to run.
+             */
+            bool playerRuns( );
 
-#define CUR_POS( p_pokemonPos, p_opponent ) _acPkmnPosition[ p_pokemonPos ][ p_opponent ]
-#define CUR_PKMN_STR( p_pokemonPos, p_opponent ) \
-    ( ( m_isWildBattle && ( p_opponent ) )       \
-          ? _wildPokemon                         \
-          : ( _pkmns[ CUR_POS( ( p_pokemonPos ), ( p_opponent ) ) ][ p_opponent ] ) )
+            /*
+             * @brief: Player tries to capture to wild pokemon with the specified pokemon.
+             */
+            bool playerCaptures( u16 p_pokeball );
 
-#define CUR_PKMN_STS( p_pokemonPos, p_opponent ) CUR_PKMN_STR( p_pokemonPos, p_opponent ).m_acStatus
-#define CUR_PKMN( p_pokemonPos, p_opponent ) \
-    ( *( CUR_PKMN_STR( p_pokemonPos, p_opponent ).m_pokemon ) )
-#define CUR_PKMN_STATCHG( p_pokemonPos, p_opponent ) \
-    CUR_PKMN_STR( p_pokemonPos, p_opponent ).m_acStatChanges
+            /*
+             * @brief: Mega evolves the pokemon at the specified position.
+             */
+            void megaEvolve( fieldPosition p_position );
 
-#define CUR_POS_2( p_battle, p_pokemonPos, p_opponent ) \
-    ( p_battle )._acPkmnPosition[ p_pokemonPos ][ p_opponent ]
-#define CUR_PKMN_STR_2( p_battle, p_pokemonPos, p_opponent ) \
-    ( ( ( p_battle ).m_isWildBattle && ( p_opponent ) )      \
-          ? ( p_battle )._wildPokemon                        \
-          : ( ( p_battle )                                   \
-                  ._pkmns[ CUR_POS_2( p_battle, p_pokemonPos, p_opponent ) ][ p_opponent ] ) )
-#define CUR_PKMN_STS_2( p_battle, p_pokemonPos, p_opponent ) \
-    CUR_PKMN_STR_2( p_battle, p_pokemonPos, p_opponent ).m_acStatus
-#define CUR_PKMN_2( p_battle, p_pokemonPos, p_opponent ) \
-    ( *( CUR_PKMN_STR_2( p_battle, p_pokemonPos, p_opponent ).m_pokemon ) )
-#define CUR_PKMN_STATCHG_2( p_battle, p_pokemonPos, p_opponent ) \
-    CUR_PKMN_STR_2( p_battle, p_pokemonPos, p_opponent ).m_acStatChanges
+            /*
+             * @brief: Checks for slots with the given type and refills them if necessary.
+             */
+            void checkAndRefillBattleSpots( slot::status p_checkType );
 
-        friend class battleScript;
-        friend class battleUI;
+            /*
+             * @brief: Switches the pokemon at the field position with the p_newIndex-th pokemon
+             * of the corresponding trainer.
+             */
+            void switchPokemon( fieldPosition p_toSwitch, u16 p_newIndex );
 
-        enum battleMode { SINGLE = 0, DOUBLE = 1 };
-
-        enum battleEndReason {
-            ROUND_LIMIT  = 0,
-            OPPONENT_WON = -1,
-            PLAYER_WON   = 1,
-            NONE         = 2,
-            RUN          = 3
-        };
-
-        bool m_distributeEXP;
-        bool m_isWildBattle;
-
-        u8 m_platformId;
-        u8 m_platform2Id; // Opponents platform
-        u8 m_backgroundId;
-
-        weather    m_weather;
-        battleMode m_battleMode;
-
-        battle( battleTrainer* p_player, battleTrainer* p_opponent, int p_maxRounds,
-                weather p_weather, u8 p_platform, u8 p_background, int p_AILevel = 5,
-                battleMode p_battlemode = SINGLE, u8 p_platform2 = -1 );
-        battle( battleTrainer* p_player, pokemon* p_opponent, weather p_weather, u8 p_platform,
-                u8 p_platform2, u8 p_background );
-
-        void log( const std::string& p_message );
-
-        s8 start( ); // Runs battle; returns -1 if opponent wins, 0 if tie, 1 otherwise
-
-        void initBattle( );
-
-        void refillBattleSpots( bool p_choice, bool p_send = true );
-        u8   getNextPKMN( bool p_opponent, u8 p_startIdx = 0 );
-        void orderPKMN( bool p_includeMovePriority = false ); // orders PKMN according to their
-                                                              // speed, their move's priority, … and
-                                                              // stores result in _moveOrder
-        void switchPKMN( bool p_opponent, u8 p_toSwitch, u8 p_newPokemonPos );
-
-        void doItems( situation p_situation );
-        void doItem( bool p_opponent, u8 p_pokemonPos, situation p_situation );
-
-        void doAbilities( situation p_situation );
-        void doAbility( bool p_opponent, u8 p_pokemonPos, situation p_situation );
-
-        void getAIMoves( );
-        bool canMove( bool p_opponent, u8 p_pokemonPos );
-        bool run( );
-
-        void registerParticipatedPKMN( );
-        void distributeEXP( bool p_opponent, u8 p_pokemonPos );
-        void evolve( bool p_opponent, u8 p_pokemonPos );
-        void megaEvolve( bool p_opponent, u8 p_pokemonPos );
-        void doMoves( );
-        void doMove( u8 p_moveNo );
-
-        s16  calcDamage( bool p_userIsOpp, u8 p_userPos, bool p_targetIsOpp, u8 p_targetPos );
-        void doAttack( bool p_opponent, u8 p_pokemonPos );
-
-        void storePkmnSts( bool p_opponent, u8 p_pokemonPos );
-        void updatePkmnSts( bool p_opponent, u8 p_pokemonPos );
-
-        void doWeather( );
-        void handleSpecialConditions( bool p_opponent, u8 p_pokemonPos );
-        void handleFaint( bool p_opponent, u8 p_pokemonPos, bool p_show = true );
-
-        bool tryCapture( u16 p_pokeBall );
-        void handleCapture( );
-
-        bool endConditionHit( battleEndReason& p_battleEndReason );
-        void endBattle( battleEndReason p_battleEndReason );
-
-        void checkForAttackLearn( u8 p_pokemonPos );
-        void checkForEvolution( bool p_opponent, u8 p_pokemonPos );
+            /*
+             * @brief: Uses the specified item on the pokemon at the field position.
+             */
+            void useItem( fieldPosition p_target, u16 p_item );
     };
 } // namespace BATTLE

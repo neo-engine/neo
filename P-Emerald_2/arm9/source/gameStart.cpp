@@ -205,7 +205,7 @@ namespace SAVE {
 
                 FS::gen3Pokemon::pokemon_growth_t*& acBG = save3->pokemon_growth[ i ];
                 acPkmn.m_boxdata.m_speciesId             = FS::getNPKMNIdx( acBG->species );
-                acPkmn.m_boxdata.m_holdItem              = FS::getNItemIdx( acBG->held );
+                acPkmn.m_boxdata.m_heldItem              = FS::getNItemIdx( acBG->held );
                 acPkmn.m_boxdata.m_experienceGained      = acBG->xp;
                 acPkmn.m_boxdata.m_steps                 = acBG->happiness;
                 acPkmn.m_boxdata.m_pPUps                 = acBG->ppbonuses;

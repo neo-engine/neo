@@ -34,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "ability.h"
+#include "battleTrainer.h"
 #include "berry.h"
 #include "defines.h"
 #include "fs.h"
@@ -52,9 +53,12 @@ const char ITEM_NAME_PATH[]    = "nitro:/DATA/ITEM_NAME/";
 const char ITEM_DATA_PATH[]    = "nitro:/DATA/ITEM_DATA/";
 const char ABILITY_NAME_PATH[] = "nitro:/DATA/ABTY_NAME/";
 const char MOVE_NAME_PATH[]    = "nitro:/DATA/MOVE_NAME/";
+const char MOVE_DATA_PATH[]    = "nitro:/DATA/MOVE_DATA/";
 const char POKEMON_NAME_PATH[] = "nitro:/DATA/PKMN_NAME/";
 const char POKEMON_DATA_PATH[] = "nitro:/DATA/PKMN_DATA/";
 const char PKMN_LEARNSET_PATH[] = "nitro:/DATA/PKMN_LEARN/";
+
+const char BATTLE_TRAINER_PATH[] = "n/a";
 
 namespace FS {
     bool exists( const char* p_path, const char* p_name ) {
@@ -405,7 +409,7 @@ namespace FS {
 } // namespace FS
 
 namespace ITEM {
-    bool getItemName( int p_itemId, int p_language, char* p_out ) {
+    bool getItemName( const u16 p_itemId, const u8 p_language, char* p_out ) {
         FILE* f = FS::openSplit( ITEM_NAME_PATH, p_itemId, ".str" );
         if( !f ) return false;
 
@@ -415,7 +419,7 @@ namespace ITEM {
         fclose( f );
         return true;
     }
-    std::string getItemName( int p_itemId, int p_language ) {
+    std::string getItemName( const u16 p_itemId, const u8 p_language ) {
         char tmpbuf[ ITEM_NAMELENGTH ];
         if( !getItemName( p_itemId, p_language, tmpbuf ) ) {
             return "---";
@@ -440,23 +444,60 @@ namespace ITEM {
     }
 }
 
-bool getMoveName( int p_moveId, int p_language, char* p_out ) {
-    FILE* f = FS::openSplit( MOVE_NAME_PATH, p_moveId, ".str" );
-    if( !f ) return false;
+namespace MOVE {
+    bool getMoveName( const u16 p_moveId, const u8 p_language, char* p_out ) {
+        FILE* f = FS::openSplit( MOVE_NAME_PATH, p_moveId, ".str" );
+        if( !f ) return false;
 
-    for( int i = 0; i <= p_language; ++i ) {
-        fread( p_out, 1, MOVE_NAMELENGTH, f );
+        for( int i = 0; i <= p_language; ++i ) {
+            fread( p_out, 1, MOVE_NAMELENGTH, f );
+        }
+        fclose( f );
+        return true;
     }
-    fclose( f );
-    return true;
+
+    std::string getMoveName( const u16 p_moveId, const u8 p_language ) {
+        char tmpbuf[ MOVE_NAMELENGTH ];
+        if( !getMoveName( p_moveId, p_language, tmpbuf ) ) {
+            return "---";
+        }
+        return std::string( tmpbuf );
+    }
+
+    moveData getMoveData( const u16 p_moveId ) {
+        moveData res;
+        if( getMoveData( p_moveId, &res ) ) {
+            return res;
+        }
+        getMoveData( 0, &res );
+        return res;
+    }
+    bool getMoveData( const u16 p_moveId, moveData* p_out ) {
+        FILE* f = FS::openSplit( MOVE_DATA_PATH, p_moveId, ".data" );
+        if( !f ) return false;
+        fread( p_out, sizeof( moveData ), 1, f );
+        fclose( f );
+        return true;
+    }
 }
 
-std::string getMoveName( int p_moveId, int p_language ) {
-    char tmpbuf[ MOVE_NAMELENGTH ];
-    if( !getMoveName( p_moveId, p_language, tmpbuf ) ) {
-        return "---";
+namespace BATTLE {
+    battleTrainer getBattleTrainer( u16 p_battleTrainerId, u8 p_language ) {
+        battleTrainer res;
+        if( getBattleTrainer( p_battleTrainerId, p_language, &res ) ) {
+            return res;
+        }
+        getBattleTrainer( 0, p_language, &res );
+        return res;
     }
-    return std::string( tmpbuf );
+    bool getBattleTrainer( u16 p_battleTrainerId, u8 p_language, battleTrainer* p_out ) {
+        FILE* f = FS::openSplit( BATTLE_TRAINER_PATH, p_battleTrainerId,
+                ( "-" + std::to_string( p_language ) + ".data" ).c_str( ) );
+        if( !f ) return false;
+        fread( p_out, sizeof( battleTrainer ), 1, f );
+        fclose( f );
+        return true;
+    }
 }
 
 bool getAbilityName( int p_abilityId, int p_language, char* p_out ) {

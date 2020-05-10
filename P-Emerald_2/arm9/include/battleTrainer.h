@@ -27,62 +27,35 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 #include <string>
-#include <vector>
 #include <nds/ndstypes.h>
 #include "defines.h"
-
-struct pokemon;
+#include "pokemon.h"
 
 namespace BATTLE {
-    extern std::string trainerClassNames[ 120 ];
-
-    class battleTrainer {
-      public:
-        enum trainerClass {
-            PKMN_TRAINER = 0, // Wally
-
-        };
-
-        std::string*         m_battleTrainerName;
-        trainerClass         m_trainerClass;
-        std::vector<pokemon> m_pkmnTeam;
-        std::pair<u16, u16>* m_items; // if this is 0 and _itemCount == MAX_ITEMS_IN_BAG, then
-                                      // SAVE::SAV->getActiveFile( ).m_bag is used.
-        u16 m_itemCount;
-
-      private:
-        int         _moneyEarned;
-        std::string* _msg1;
-        std::string* _msg2;
-        std::string* _msg3;
-        std::string* _msg4;
-
-      public:
-        battleTrainer( std::string* p_battleTrainerName,
-                       std::string* p_msg1, std::string* p_msg2,
-                       std::string* p_msg3, std::string* p_msg4,
-                       std::vector<pokemon> p_pkmnTeam,
-                       std::pair<u16, u16>* p_items = 0, u16 p_itemCnt = MAX_ITEMS_IN_BAG,
-                       trainerClass p_trainerClass = PKMN_TRAINER )
-            : m_battleTrainerName( p_battleTrainerName ), m_trainerClass( p_trainerClass ),
-              m_pkmnTeam( p_pkmnTeam ), m_items( p_items ), m_itemCount( p_itemCnt ),
-              _msg1( p_msg1 ), _msg2( p_msg2 ), _msg3( p_msg3 ), _msg4( p_msg4 ) {
-        }
-
-        const char* getLooseMsg( u8 p_language ) const {
-            return _msg4[ p_language ].c_str( );
-        }
-        int getLooseMoney( ) const {
-            return _moneyEarned;
-        }
-        const char* getWinMsg( u8 p_language ) const {
-            return _msg3[ p_language ].c_str( );
-        }
-        const char* getCriticalMsg( u8 p_language ) const {
-            return _msg2[ p_language ].c_str( );
-        }
-        const char* getInitMsg( u8 p_language ) const {
-            return _msg1[ p_language ].c_str( );
-        }
+    struct trainerStrings {
+        char m_name[ 16 ];
+        char m_message1[ 100 ];
+        char m_message2[ 100 ];
+        char m_message3[ 100 ];
+        char m_message4[ 100 ];
     };
+
+    struct trainerData {
+        u8              m_trainerClass;
+        u8              m_numPokemon;
+        u16             m_items[ 5 ];
+        u32             m_moneyEarned;
+        trainerPokemon  m_pokemon[ 6 ];
+    };
+
+    struct battleTrainer {
+        trainerStrings  m_strings;
+        trainerData     m_data;
+    };
+
+    std::string getTrainerClassName( u8 p_trainerClass, u8 p_language );
+    bool getTrainerClassName( u8 p_trainerClass, u8 p_language, char* p_out );
+
+    battleTrainer getBattleTrainer( u16 p_battleTrainerId, u8 p_language );
+    bool getBattleTrainer( u16 p_battleTrainerId, u8 p_language, battleTrainer* p_out );
 } // namespace BATTLE

@@ -852,7 +852,10 @@ namespace STS {
 
         for( int i = 0; i < 4; i++ ) {
             if( !currPkmn.m_boxdata.m_moves[ i ] ) continue;
-            type t = AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveType;
+
+            auto mdata = MOVE::getMoveData( currPkmn.m_boxdata.m_moves[ i ] );
+
+            type t = mdata.m_type;
             IO::loadTypeIcon( t, 222, 38 + 30 * i, TYPE_IDX + i, TYPE_PAL( i ),
                               Oam->oamBuffer[ TYPE_IDX + i ].gfxIndex, p_bottom,
                               SAVE::SAV->getActiveFile( ).m_options.m_language );
@@ -866,16 +869,14 @@ namespace STS {
                 IO::regularFont->setColor( GRAY_IDX, 2 );
             }
 
-            IO::regularFont->printString(
-                AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_moveName.c_str( ), 128,
-                30 + 30 * i, p_bottom );
+            IO::regularFont->printString( MOVE::getMoveName( currPkmn.m_boxdata.m_moves[ i ],
+                        CURRENT_LANGUAGE ).c_str( ), 128, 30 + 30 * i, p_bottom );
 
             IO::regularFont->setColor( GRAY_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
             char buffer[ 50 ];
             snprintf( buffer, 49, "AP %2hhu/%2hhu ", currPkmn.m_boxdata.m_acPP[ i ],
-                      s8( AttackList[ currPkmn.m_boxdata.m_moves[ i ] ]->m_movePP
-                          * ( ( 5 + currPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                      s8( mdata.m_pp * ( ( 5 + currPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
             IO::regularFont->printString( buffer, 135, 45 + 30 * i, p_bottom );
         }
         IO::regularFont->setColor( BLACK_IDX, 1 );
@@ -1076,28 +1077,29 @@ namespace STS {
                         -5, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false,
                         OBJPRIORITY_0, p_bottom );
 
-        move* currMove = AttackList[ currPkmn.m_boxdata.m_moves[ p_moveIdx ] ];
+        auto mdata = MOVE::getMoveData( currPkmn.m_boxdata.m_moves[ p_moveIdx ] );
 
         pal[ COLOR_IDX ] = GREEN;
-        if( currMove->m_moveType == data.m_baseForme.m_types[ 0 ]
-            || currMove->m_moveType == data.m_baseForme.m_types[ 1 ] ) {
+        if( mdata.m_type == data.m_baseForme.m_types[ 0 ]
+            || mdata.m_type == data.m_baseForme.m_types[ 1 ] ) {
             IO::regularFont->setColor( COLOR_IDX, 1 );
             IO::regularFont->setColor( WHITE_IDX, 2 );
         } else {
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
         }
-        IO::regularFont->printString( currMove->m_moveName.c_str( ), 120, 32, p_bottom );
+        IO::regularFont->printString( MOVE::getMoveName( currPkmn.m_boxdata.m_moves[ p_moveIdx ],
+                    CURRENT_LANGUAGE ).c_str( ), 120, 32, p_bottom );
         IO::regularFont->setColor( GRAY_IDX, 1 );
         IO::regularFont->setColor( WHITE_IDX, 2 );
 
-        IO::loadTypeIcon( currMove->m_moveType, 222, 30, TYPE_IDX + p_moveIdx,
+        IO::loadTypeIcon( mdata.m_type, 222, 30, TYPE_IDX + p_moveIdx,
                           TYPE_PAL( p_moveIdx ), Oam->oamBuffer[ TYPE_IDX + p_moveIdx ].gfxIndex,
                           p_bottom, SAVE::SAV->getActiveFile( ).m_options.m_language );
         IO::loadDamageCategoryIcon(
-            currMove->m_moveHitType, 222, 46, ATK_DMGTYPE_IDX( currMove->m_moveHitType ),
-            DMG_TYPE_PAL( currMove->m_moveHitType ),
-            Oam->oamBuffer[ ATK_DMGTYPE_IDX( currMove->m_moveHitType ) ].gfxIndex, p_bottom );
+            mdata.m_category, 222, 46, ATK_DMGTYPE_IDX( mdata.m_category ),
+            DMG_TYPE_PAL( mdata.m_category ),
+            Oam->oamBuffer[ ATK_DMGTYPE_IDX( mdata.m_category ) ].gfxIndex, p_bottom );
         char buffer[ 20 ];
 
         snprintf(
@@ -1105,30 +1107,29 @@ namespace STS {
             "AP %2hhu"
             "/"
             "%2hhu ",
-            currPkmn.m_boxdata.m_acPP[ p_moveIdx ],
-            currMove->m_movePP
-                * ( ( 5 + ( ( currPkmn.m_boxdata.m_pPUps >> ( 2 * p_moveIdx ) ) % 4 ) ) / 5 ) );
+            currPkmn.m_boxdata.m_acPP[ p_moveIdx ], mdata.m_pp
+            * ( ( 5 + ( ( currPkmn.m_boxdata.m_pPUps >> ( 2 * p_moveIdx ) ) % 4 ) ) / 5 ) );
         IO::regularFont->printString( buffer, 128, 47, p_bottom );
 
         IO::regularFont->printString( "Stärke", 128, 60, p_bottom );
-        if( currMove->m_moveBasePower )
-            snprintf( buffer, 19, "%3i", currMove->m_moveBasePower );
+        if( mdata.m_basePower )
+            snprintf( buffer, 19, "%3i", mdata.m_basePower );
         else
             snprintf( buffer, 19, "---" );
         IO::regularFont->printString( buffer, 226, 60, p_bottom );
 
         IO::regularFont->printString( "Genauigkeit", 128, 72, p_bottom );
-        if( currMove->m_moveAccuracy )
-            snprintf( buffer, 19, "%3i", currMove->m_moveAccuracy );
+        if( mdata.m_accuracy )
+            snprintf( buffer, 19, "%3i", mdata.m_accuracy );
         else
             snprintf( buffer, 19, "---" );
         IO::regularFont->printString( buffer, 226, 72, p_bottom );
 
         IO::regularFont->setColor( BLACK_IDX, 1 );
         IO::regularFont->setColor( GRAY_IDX, 2 );
-        IO::regularFont->printString(
-            FS::breakString( currMove->description( ), IO::regularFont, 120 ).c_str( ), 128, 84,
-            p_bottom, IO::font::LEFT, 11 );
+//        IO::regularFont->printString(
+//            FS::breakString( currMove->description( ), IO::regularFont, 120 ).c_str( ), 128, 84,
+//            p_bottom, IO::font::LEFT, 11 );
 
         IO::updateOAM( p_bottom );
         return true;
@@ -1349,12 +1350,12 @@ namespace STS {
                                     tileCnt );
 
         for( u8 i = 0; i < 4; ++i ) {
-            type t  = AttackList[ 0 ]->m_moveType;
+            type t  = UNKNOWN;
             tileCnt = IO::loadTypeIcon( t, 126, 43 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ), tileCnt,
                                         true, SAVE::SAV->getActiveFile( ).m_options.m_language );
         }
         for( u8 i = 0; i < 4; ++i ) {
-            tileCnt = IO::loadDamageCategoryIcon( ( move::moveHitTypes )( i % 3 ), 126, 43 + 32 * i,
+            tileCnt = IO::loadDamageCategoryIcon( ( MOVE::moveHitTypes )( i % 3 ), 126, 43 + 32 * i,
                                                   ATK_DMGTYPE_IDX( i ), DMG_TYPE_PAL( i % 3 ),
                                                   tileCnt, true );
         }

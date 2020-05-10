@@ -29,7 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "battle.h"
 #include "battleTrainer.h"
-#include "battleWeather.h"
+#include "battleDefines.h"
 #include "defines.h"
 #include "fs.h"
 #include "mapDrawer.h"

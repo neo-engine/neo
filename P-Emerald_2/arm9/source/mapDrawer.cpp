@@ -27,10 +27,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
+#include "defines.h"
 #include "battle.h"
 #include "battleTrainer.h"
-#include "battleWeather.h"
-#include "defines.h"
+#include "battleDefines.h"
 #include "mapDrawer.h"
 #include "messageBox.h"
 #include "saveGame.h"
@@ -472,10 +472,9 @@ namespace MAP {
         ANIMATE_MAP = false;
         swiWaitForVBlank( );
         IO::NAV->draw( );
-        BATTLE::battleTrainer* bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
-        BATTLE::battle( bt, &wildPkmn, weat, platform, plat2, battleBack ).start( );
-        SAVE::SAV->getActiveFile( ).updateTeam( bt );
-        delete bt;
+        BATTLE::battle( SAVE::SAV->getActiveFile( ).m_pkmnTeam,
+                        wildPkmn, weat, platform, plat2, battleBack,
+                        SAVE::SAV->getActiveFile( ).checkFlag( SAVE::F_MEGA_EVOLUTION ) ).start( );
         FADE_TOP_DARK( );
         ANIMATE_MAP = true;
         IO::NAV->draw( true );
@@ -483,6 +482,7 @@ namespace MAP {
 
         return true;
     }
+
     void mapDrawer::handleTrainer( ) {
     }
 

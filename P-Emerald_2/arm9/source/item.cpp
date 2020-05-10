@@ -44,14 +44,14 @@ along with Pokémon neo.  If not, new see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 
 namespace ITEM {
-    u16 getItemChar( u8 p_itemType ) {
+    u16 getItemChar( const u8 p_itemType ) {
         if( p_itemType & ITEMTYPE_BERRY ) {
             return 473;
         }
 
-        p_itemType = ( p_itemType & 15 );
+        auto itemType = ( p_itemType & 15 );
 
-        switch( p_itemType ) {
+        switch( itemType ) {
             case ITEMTYPE_POKEBALL:
                 return 474;
             case ITEMTYPE_BATTLEITEM:
@@ -72,11 +72,11 @@ namespace ITEM {
         }
     }
 
-    bool use( u16 p_itemId, itemData& p_data, pokemon& p_pokemon,
+    bool use( const u16 p_itemId, const itemData& p_data, pokemon& p_pokemon,
               std::function<u8( u8 )> p_callback, bool p_inbattle ) {
         if( p_pokemon.isEgg( ) || !p_pokemon.m_boxdata.m_speciesId ) { return false; }
 
-        itemData& item = p_data;
+        itemData item = p_data;
 
         if( ( item.m_itemType & 15 ) != ITEMTYPE_MEDICINE
                 && item.m_itemType != ITEMTYPE_FORMECHANGE ) {
@@ -224,10 +224,11 @@ namespace ITEM {
                     mv = p_callback( item.m_param3 );
                 }
                 for( u8 i = 0; i < 4; ++i ) {
+                    MOVE::moveData mdata = MOVE::getMoveData( p_pokemon.m_boxdata.m_moves[ i ] );
+
                     if( ( mv & ( 1 << i ) ) && p_pokemon.m_boxdata.m_moves[ i ] ) {
                         u8& tmp = p_pokemon.m_boxdata.m_acPP[ i ];
-                        u8 mx  = s8( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_movePP
-                                * ( 5 + p_pokemon.PPupget( i ) ) / 5 );
+                        u8 mx  = s8( mdata.m_pp * ( 5 + p_pokemon.PPupget( i ) ) / 5 );
                         change |= tmp < mx;
                         tmp = std::min( mx, (u8)( tmp + item.m_param1 + item.m_param2
                                     * mx / 100 ) );
@@ -263,18 +264,18 @@ namespace ITEM {
                 }
                 for( u8 i = 0; i < 4; ++i ) {
                     if( ( mv & ( 1 << i ) ) && p_pokemon.m_boxdata.m_moves[ i ] ) {
+                        MOVE::moveData mdata
+                            = MOVE::getMoveData( p_pokemon.m_boxdata.m_moves[ i ] );
                         u8 ppup = p_pokemon.PPupget( i );
-                        if( ppup >= item.m_param2 ) {
+                        if( ppup >= item.m_param2 || ( mdata.m_flags & MOVE::NOPPBOOST ) ) {
                             continue;
                         }
                         u8& tmp = p_pokemon.m_boxdata.m_acPP[ i ];
-                        u8 oldmx = s8( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_movePP
-                                * ( 5 + p_pokemon.PPupget( i ) ) / 5 );
+                        u8 oldmx = s8( mdata.m_pp * ( 5 + p_pokemon.PPupget( i ) ) / 5 );
 
                         p_pokemon.PPupset( i, std::min( (u8) item.m_param2, (u8)( ppup
                                         + item.m_param1 ) ) );
-                        u8 mx = s8( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_movePP
-                                * ( 5 + p_pokemon.PPupget( i ) ) / 5 );
+                        u8 mx = s8( mdata.m_pp * ( 5 + p_pokemon.PPupget( i ) ) / 5 );
 
                         tmp = std::min( mx, (u8)( mx - oldmx + tmp ) );
                         change = true;
@@ -326,7 +327,7 @@ namespace ITEM {
     }
 
     // Returns false if the original UI has not to be redrawn/will be exited
-    bool use( u16 p_itemId, bool p_dryRun ) {
+    bool use( const u16 p_itemId, bool p_dryRun ) {
         char buffer[ 50 ];
         if( !p_dryRun ) {
             bool ex = false;
@@ -406,10 +407,10 @@ namespace ITEM {
                 }
                 return true;
             case I_ESCAPE_ROPE:
-                if( !p_dryRun ) AttackList[ M_DIG ]->use( );
+                if( !p_dryRun ) MOVE::use( M_DIG, 0 );
                 return false;
             case I_HONEY:
-                if( !p_dryRun ) AttackList[ M_SWEET_SCENT ]->use( );
+                if( !p_dryRun ) MOVE::use( M_SWEET_SCENT, 0 );
                 return false;
             case I_BIKE2:
             case I_BIKE:
@@ -453,7 +454,7 @@ namespace ITEM {
         return false;
     }
 
-    bool isUsable( u16 p_itemId ) {
+    bool isUsable( const u16 p_itemId ) {
         switch( p_itemId ) {
             case I_REPEL:
             case I_SUPER_REPEL:
@@ -463,9 +464,9 @@ namespace ITEM {
             case I_POINT_CARD:
                 return true;
             case I_ESCAPE_ROPE:
-                return AttackList[ M_DIG ]->possible( );
+                return MOVE::possible( M_DIG, 0 );
             case I_HONEY:
-                return AttackList[ M_SWEET_SCENT ]->possible( );
+                return MOVE::possible( M_SWEET_SCENT, 0 );
             case I_BIKE2:
             case I_BIKE:
             case I_MACH_BIKE:

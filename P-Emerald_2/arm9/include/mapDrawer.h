@@ -29,7 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 #include <memory>
 
-#include "hmMoves.h"
+#include "move.h"
 #include "mapDefines.h"
 #include "mapObject.h"
 #include "mapSlice.h"

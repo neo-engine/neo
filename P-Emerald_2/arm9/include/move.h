@@ -31,90 +31,65 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <nds/ndstypes.h>
 #include "defines.h"
-#include "script.h"
+#include "battleDefines.h"
 #include "type.h"
 
-class move {
-  public:
-    enum moveAffectsTypes : u8 {
-        SELECTED              = 0,
-        DEPENDS_ON_ATTACK     = 1,
-        OWN_FIELD             = 2,
-        RANDOM                = 4,
-        BOTH_FOES             = 8,
-        USER                  = 16,
-        BOTH_FOES_AND_PARTNER = 32,
-        OPPONENTS_FIELD       = 64
+namespace MOVE {
+    struct moveData {
+        type        m_type   = UNKNOWN; // ???
+        contestType m_contestType = NO_CONTEST_TYPE; // Clever, Smart, ...
+        u8       m_basePower = 0;
+        u8       m_pp        = 1;
+
+        moveHitTypes        m_category  = (moveHitTypes) 0;
+        moveHitTypes        m_defensiveCategory = (moveHitTypes) 0; // category used for defending pkmn
+        u8       m_accuracy  = 0; // 255: always hit
+        s8       m_priority  = 0;
+
+        BATTLE::sideCondition   m_sideCondition = BATTLE::NO_SIDE_CONDITION; // side introduced by the move (reflect, etc)
+
+        BATTLE::weather         m_weather   = BATTLE::NO_WEATHER; // weather introduced by the move
+        BATTLE::pseudoWeather   m_pseudoWeather = BATTLE::NO_PSEUDO_WEATHER; // pseudo weather introduced by the move
+        BATTLE::terrain         m_terrain   = BATTLE::NO_TERRAIN; // terrain introduced by the move
+        u8                      m_status = 0;
+
+        BATTLE::slotCondition   m_slotCondition = (BATTLE::slotCondition) 0; // stuff introduced on the slot (wish, etc)
+        u8                      m_fixedDamage = 0;
+        target                  m_target    = (target) 0;
+        target                  m_pressureTarget = (target) 0; // restrictions are computed based on different target than resulting effect
+
+        u8       m_heal = 0; // as m_heal / 240
+        u8       m_recoil = 0; // as dealt damage * m_recoil / 240
+        u8       m_drain = 0; // as dealt damage * m_recoil / 240
+        u8       m_multiHit = 0; // as ( min << 8 ) | max
+
+        u8       m_critRatio = 1;
+        u8       m_secondaryChance = 0; // chance that the secondary effect triggers
+        u8       m_secondaryStatus = 0;
+        u8       m_unused = 0;
+
+        BATTLE::volatileStatus m_volatileStatus = (BATTLE::volatileStatus) 0; // confusion, etc
+        BATTLE::volatileStatus m_secondaryVolatileStatus = (BATTLE::volatileStatus) 0; // confusion, etc
+
+        BATTLE::boosts   m_boosts = { 0 }; // Status ``boosts'' for the target
+        BATTLE::boosts   m_selfBoosts = { 0 }; // Status ``boosts'' for the user (if target != user)
+        BATTLE::boosts   m_secondaryBoosts = { 0 }; // Stat ``boosts'' for the target
+        BATTLE::boosts   m_secondarySelfBoosts = { 0 }; // Stat ``boosts'' for the user (if target != user)
+
+        moveFlags m_flags     = (moveFlags) 0;
     };
 
-    enum moveFlags : u8 {
-        MAKES_CONTACT = 1,
-        PROTECT       = 2,
-        MAGIC_COAT    = 4,
-        SNATCH        = 8,
-        MIRROR_MOVE   = 16,
-        KINGS_ROCK    = 32,
-        SOUNDPROOF    = 64,
-        WHILE_ASLEEP  = 128
-    };
+    bool getMoveName( const u16 p_moveId, const u8 p_language, char* p_out );
+    std::string getMoveName( const u16 p_moveId, const u8 p_language );
 
-    enum moveHitTypes : u8 { PHYS = 0, SPEC = 1, STAT = 2 };
+    bool getMoveData( const u16 p_moveId, moveData* p_out );
+    moveData getMoveData( const u16 p_moveId );
 
-    bool m_isFieldAttack;
-
-    std::string          m_moveName;
-    BATTLE::battleScript m_moveEffect;
-    char                 m_moveBasePower;
-    type                 m_moveType;
-    char                 m_moveAccuracy;
-    u8                   m_movePP;
-    char                 m_moveEffectAccuracy;
-    moveAffectsTypes     m_moveAffectsWhom;
-    char                 m_movePriority;
-    moveFlags            m_moveFlags;
-    moveHitTypes         m_moveHitType;
-
-    char m_description[ 300 ] = {0};
-
-    // Constructrs
-
-    move( ) {
-    }
-
-    move( const std::string p_moveName, BATTLE::battleScript p_moveEffect, char p_moveBasePower,
-          type p_moveType, char p_moveAccuracy, char p_movePP, char p_moveEffectAccuracy,
-          moveAffectsTypes p_moveAffectsWhom, char p_movePriority, moveFlags p_moveFlags,
-          moveHitTypes p_moveHitType,
-          const char*  p_description = "Keine genaueren Informationen verfügbar." )
-        : m_isFieldAttack( false ), m_moveName( p_moveName ), m_moveEffect( p_moveEffect ),
-          m_moveBasePower( p_moveBasePower ), m_moveType( p_moveType ),
-          m_moveAccuracy( p_moveAccuracy ), m_movePP( p_movePP ),
-          m_moveEffectAccuracy( p_moveEffectAccuracy ), m_moveAffectsWhom( p_moveAffectsWhom ),
-          m_movePriority( p_movePriority ), m_moveFlags( p_moveFlags ),
-          m_moveHitType( p_moveHitType ) {
-        strcpy( m_description, p_description );
-    }
-
-    ~move( ) {
-    }
-
-    virtual bool possible( ) {
-        return false;
-    }
-
-    virtual void use( ) {
-    }
-
-    virtual const char* text( ) {
-        return "N/A";
-    }
-    virtual const char* description( ) {
-        return m_description;
-    }
-};
-
-bool getMoveName( int p_moveId, int p_language, char* p_out );
-std::string getMoveName( int p_moveId, int p_language );
-
-extern move* AttackList[ MAX_ATTACK ];
-
+    /*
+     * @brief: Returns the text (id) displayed in OW
+     */
+    u16  text( const u16 p_moveId, u8 p_param );
+    bool isFieldMove( const u16 p_moveId );
+    bool possible( const u16 p_moveId, u8 p_param );
+    void use( const u16 p_moveId, u8 p_param );
+}

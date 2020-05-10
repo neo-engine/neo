@@ -57,24 +57,24 @@ namespace ITEM {
     /*
      * @brief: Compute itemtype character.
      */
-    u16 getItemChar( u8 p_itemType );
+    u16 getItemChar( const u8 p_itemType );
 
-    bool getItemName( int p_itemId, int p_language, char* p_out );
-    std::string getItemName( int p_itemId, int p_language );
+    bool getItemName( const u16 p_itemId, const u8 p_language, char* p_out );
+    std::string getItemName( const u16 p_itemId, const u8 p_language );
     itemData getItemData( const u16 p_itemId );
     bool getItemData( const u16 p_itemId, itemData* p_out );
 
-    bool isUsable( u16 p_itemId );
+    bool isUsable( const u16 p_itemId );
 
     /*
      * @brief: Uses a usable item/ key item.
      */
-    bool use( u16 p_itemId, bool p_dryRun = false );
+    bool use( const u16 p_itemId, const bool p_dryRun = false );
 
     /*
      * @brief: Use specified item on given pokemon. (Item needs to be either medicine,
      * formeChange).
      */
-    bool use( u16 p_itemId, itemData& p_data, pokemon& p_pokemon,
+    bool use( const u16 p_itemId, const itemData& p_data, pokemon& p_pokemon,
               std::function<u8( u8 )> p_callback, bool p_inbattle = false );
 }

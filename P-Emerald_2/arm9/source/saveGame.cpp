@@ -75,7 +75,7 @@ namespace SAVE {
                 } else
                     ac.m_boxdata.m_steps
                         = std::min( 255, ac.m_boxdata.m_steps + 1
-                                             + ( ac.m_boxdata.m_holdItem == I_CLEAR_BELL ) );
+                                             + ( ac.m_boxdata.m_heldItem == I_CLEAR_BELL ) );
             }
         }
     }
@@ -115,29 +115,6 @@ namespace SAVE {
         u8 res = 0;
         for( u8 i = 0; i < 6; ++i ) res += !!m_pkmnTeam[ i ].m_boxdata.m_speciesId;
         return res;
-    }
-
-    std::vector<pokemon>   tmp;
-    BATTLE::battleTrainer* saveGame::playerInfo::getBattleTrainer( ) {
-        tmp.clear( );
-        for( u8 i = 0; i < 6; ++i )
-            if( m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                tmp.push_back( m_pkmnTeam[ i ] );
-            else
-                break;
-
-        std::string tmp2[ LANGUAGES ];
-        std::string pla[ LANGUAGES ];
-        for( u8 i = 0; i < LANGUAGES; ++i ) {
-            tmp2[ i ] = "";
-            pla[ i ] = std::string( m_playername );
-        }
-
-        return new BATTLE::battleTrainer( pla, tmp2, tmp2, tmp2, tmp2, tmp );
-    }
-    void saveGame::playerInfo::updateTeam( BATTLE::battleTrainer* p_trainer ) {
-        for( u8 i = 0; i < p_trainer->m_pkmnTeam.size( ); ++i )
-            m_pkmnTeam[ i ] = p_trainer->m_pkmnTeam[ i ];
     }
 
     u16 saveGame::getDexCount( ) {

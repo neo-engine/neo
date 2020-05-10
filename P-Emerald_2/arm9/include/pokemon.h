@@ -30,12 +30,24 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "pokemonData.h"
 
+struct trainerPokemon {
+    u16 m_speciesId;
+    u8  m_forme;
+    u8  m_level;
+    u16 m_ability;
+    u16 m_heldItem;
+    u16 m_moves[ 4 ];
+    u8  m_ev[ 6 ];
+    u8  m_iv[ 6 ];
+    u8  m_shiny;
+};
+
 struct boxPokemon {
     u32 m_pid = 0;
     u16 m_checksum = 0;
 
     u16 m_speciesId = 0;
-    u16 m_holdItem = 0;
+    u16 m_heldItem = 0;
     u16 m_oTId = 0;
     u16 m_oTSid = 0;
     u32 m_experienceGained = 0;
@@ -141,15 +153,15 @@ struct boxPokemon {
             return 5;
     }
     u16 getItem( ) const {
-        return m_holdItem;
+        return m_heldItem;
     }
     void giveItem( u16 p_newItem ) {
-        m_holdItem = p_newItem;
+        m_heldItem = p_newItem;
         recalculateForme( );
     }
     u16 takeItem( ) {
-        u16 res = m_holdItem;
-        m_holdItem = 0;
+        u16 res = m_heldItem;
+        m_heldItem = 0;
         recalculateForme( );
         return res;
     }
@@ -262,6 +274,7 @@ struct pokemon {
 
     pokemon() { }
     pokemon( boxPokemon& p_boxPokemon );
+    pokemon( trainerPokemon& p_trainerPokemon );
     pokemon( u16 p_pkmnId, u16 p_level, u8 p_forme = 0, const char* p_name = 0, u8 p_shiny = 0,
              bool p_hiddenAbility = false, bool p_isEgg = false, u8 p_ball = 0, u8 p_pokerus = 0,
              bool p_fatefulEncounter = false );

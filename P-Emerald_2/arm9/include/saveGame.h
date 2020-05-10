@@ -33,14 +33,9 @@
 #include <nds.h>
 #include "bag.h"
 #include "box.h"
+#include "pokemon.h"
 #include "mapObject.h"
 #include "saveOptions.h"
-
-struct pokemon;
-
-namespace BATTLE {
-    class battleTrainer;
-}
 
 namespace SAVE {
 #define MAX_SAVE_FILES 3
@@ -48,6 +43,8 @@ namespace SAVE {
 #define MAX_SPECIAL_EPISODES 1
 
 #define getActiveFile( ) m_saveFile[ SAVE::SAV->m_activeFile ]
+
+    const u8 F_MEGA_EVOLUTION = 1;
 
     extern const char* const CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ];
     extern const char*       EPISODE_NAMES[ LANGUAGES ][ MAX_SPECIAL_EPISODES ];
@@ -108,9 +105,6 @@ namespace SAVE {
             u8   getEncounterLevel( u8 p_tier );
             u8   getBadgeCount( );
             u8   getTeamPkmnCount( );
-
-            BATTLE::battleTrainer* getBattleTrainer( );
-            void                   updateTeam( BATTLE::battleTrainer* p_trainer );
         } m_saveFile[ MAX_SAVE_FILES ];
 
         u8 m_activeFile;

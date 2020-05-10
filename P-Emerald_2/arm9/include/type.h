@@ -52,5 +52,14 @@ enum type {
     FAIRY     = 18
 };
 
+enum contestType {
+    NO_CONTEST_TYPE = 0,
+    TOUGH = 1,
+    CLEVER = 2,
+    BEAUTIFUL = 3,
+    COOL = 4,
+    CUTE = 5
+};
+
 float getEffectiveness( const type& p_t1, const type& p_t2 );
 

@@ -68,7 +68,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"No data.", "Keine Daten."},
     {"Faraway Place", "Entfernter Ort"},
     {"Unknown", "Unbekannt"},
-    {"%s\nUse %s?", "%s\nM\xf6""chtest du %s nutzen?"},
+    {"%sUse %s?", "%sM\xf6""chtest du %s nutzen?"},
     {"The repel wore off.", "Der Schutz ist aufgebraucht."},
 
     {"Just an old Pok\xe9 Ball", "Doch nur ein alter Pok\xe9""ball"},
@@ -433,94 +433,108 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"all", "all"},
     {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR][OWN1] heilt sich.[A]"},
     {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR][OWN2] heilt sich.[A]"},
-    {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR][OPP1] heilt sich.[A]"},
 
     // 250
 
+    {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR][OPP1] heilt sich.[A]"},
     {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR][OPP2] heilt sich.[A]"},
     {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]KP von [OWN1]\nregenerieren sich.[A]"},
     {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]KP von [OWN2]\nregenerieren sich.[A]"},
     {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]KP von [OPP1]\nregenerieren sich.[A]"},
-    {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]KP von [OPP2]\nregenerieren sich.[A]"},
 
+    {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]KP von [OPP2]\nregenerieren sich.[A]"},
     {"", "Der Hagel schadet [OWN1].[A]"},
     {"", "Der Hagel schadet [OWN2].[A]"},
     {"", "Der Hagel schadet\n[OPP1].[A]"},
     {"", "Der Hagel schadet\n[OPP2].[A]"},
-    {"", "Der Sandsturm schadet [OWN1].[A]"},
 
     // 260
 
+    {"", "Der Sandsturm schadet [OWN1].[A]"},
     {"", "Der Sandsturm schadet [OWN2].[A]"},
     {"", "Der Sandsturm schadet\n[OPP1].[A]"},
     {"", "Der Sandsturm schadet\n[OPP2].[A]"},
     {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OWN1].[A]"},
-    {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OWN2].[A]"},
 
+    {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OWN2].[A]"},
     {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OPP1].[A]"},
     {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OPP2].[A]"},
     {"", "Es regnet.[A]"},
     {"", "Es hagelt.[A]"},
-    {"", "Es herrscht dichter Nebel\x85[A]"},
 
     // 270
 
+    {"", "Es herrscht dichter Nebel\x85[A]"},
     {"", "Der Sandsturm wütet.[A]"},
     {"", "Gleißendes Sonnenlicht.[A]"},
     {"", "Enormer Regen.[A]"},
     {"", "Extremes Sonnenlicht.[A]"},
-    {"", "Starke Winde wehen.[A]"},
 
+    {"", "Starke Winde wehen.[A]"},
     {"", "Es hat aufgehört zu regnen.[A]"},
     {"", "Es hat aufgehört zu hageln.[A]"},
     {"", "Der Nebel verzog sich.[A]"},
     {"", "Der Sandsturm legt sich.[A]"},
-    {"", "Das Sonnenlicht wurde wieder normal.[A]"},
 
     // 280
 
+    {"", "Das Sonnenlicht wurde wieder normal.[A]"},
     {"", "Es hat aufgehört zu regnen.[A]"},
     {"", "Das Sonnenlicht wurde wieder normal.[A]"},
     {"", "Windstille\x85[A]"},
     {"", "%s%s ist aufgetaut![A]"},
-    {"", "%s%s ist gefroren.[A]"},
 
+    {"", "%s%s ist gefroren.[A]"},
     {"", "%s%s ist paralysiert.[A]"},
     {"", "%s%s bleibt schlafen.[A]"},
     {"", "%s%s ist aufgewacht![A]"},
     {"", "%s%s bleibt unbeeindruckt.[A]"},
-    {"", "%s%s wich aus.[A]"},
 
     // 290
 
+    {"", "%s%s wich aus.[A]"},
     {"", "[COLR:15:15:00]Ein Volltreffer![A][CLEAR][COLR:00:00:00]"},
     {"", "[COLR:00:31:00]Das ist enorm effektiv\ngegen %s![A][CLEAR][COLR:00:00:00]"},
     {"", "[COLR:00:15:00]Das ist sehr effektiv\ngegen %s![A][CLEAR][COLR:00:00:00]"},
     {"", "[COLR:31:00:00]Hat die Attacke\n%s getroffen?[A][CLEAR][COLR:00:00:00]"},
-    {"", "[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen%s\x85[A][CLEAR][COLR:00:00:00]"},
 
+    {"", "[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen%s\x85[A][CLEAR][COLR:00:00:00]"},
     {"", "[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %s.[A][CLEAR][COLR:00:00:00]"},
     {"", "Es schlug fehl\x85[A]"},
     {"", "Die Verbrennung schadet\n%s%s.[A]"},
     {"", "Die Vergiftung schadet\n%s%s.[A]"},
-    {"", "%s%s wurde besiegt.[A]"},
 
     // 300
 
+    {"", "%s%s wurde besiegt.[A]"},
     {"", "Das Rundenlimit dieses\nKampfes wurde erreicht.[A]"},
     {"", "Der Kampf endet in einem\nUnentschieden![A]"},
     {"", "[TRAINER] [TCLASS] gewinnt<85>[A]"},
     {"", "Du besiegst [TCLASS] [TRAINER]![A]"},
-    {"", "Du gewinnst %d$.[A]"},
 
+    {"", "Du gewinnst %d$.[A]"},
     {"", "Der Kampf endet.[A]"},
     {"", "[OPP%d] wurde von [TRAINER]\n([TCLASS]) auf die Bank geschickt.[A]"},
     {"", "Auf die Bank [OWN%d]![A]"},
     {"", "[OWN1] kann nicht angreifen<85>[A]"},
-    {"", "[OWN2] kann nicht angreifen<85>[A]"},
 
     // 310
 
+    {"", "[OWN2] kann nicht angreifen<85>[A]"},
     {"", "(Wild)"},
     {"", "(Gegner)"},
+    {"This tree looks like it can be\ncut down. ", "Ein kleiner Baum.\n"},
+    {"This rock appears to be breakable.\n", "Ein kleiner Felsen.\n"},
+
+    {"A huge whirlpool.\n", "Ein riesiger Strudel.\n"},
+    {"The water is a deep blue...\n", "Das Wasser ist tiefblau...\n"},
+    {"The sea is deep here.\n", "Das Wasser ist sehr tief.\n"},
+    {"It's a big boulder.\n", "Ein großer Felsen.\n"},
+    {"The wall is very rocky...\n", "Eine steile Felswand.\n"},
+
+    // 320
+
+    {"It's a large Waterfall.\n", "Ein großer Wasserfall.\n"},
+    {"Something moved!\n", "Da hat sich etwas bewegt!\n"},
+    {"Light is shining from the\nsurface. ", "Licht scheint von der\nOberfläche. "},
 };

@@ -915,11 +915,11 @@ namespace IO {
                            false, OBJPRIORITY_0, p_bottom );
     }
 
-    u16 loadDamageCategoryIcon( move::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,
+    u16 loadDamageCategoryIcon( MOVE::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,
                                 u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16,
-                           HitTypePals[ p_type ], HitTypeTiles[ p_type ], 256, false, false, false,
-                           OBJPRIORITY_0, p_bottom );
+                           HitTypePals[ p_type - 1 ], HitTypeTiles[ p_type - 1 ], 256,
+                           false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
 } // namespace IO

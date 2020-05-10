@@ -39,22 +39,23 @@ bool boxPokemon::learnMove( u16 p_move ) {
     char buffer[ 50 ];
     if( p_move == m_moves[ 0 ] || p_move == m_moves[ 1 ] || p_move == m_moves[ 2 ]
         || p_move == m_moves[ 3 ] ) {
-        snprintf( buffer, 49, GET_STRING( 102 ), m_name,
-                  AttackList[ p_move ]->m_moveName.c_str( ) );
+        snprintf( buffer, 49, GET_STRING( 102 ), m_name, MOVE::getMoveName( p_move,
+                    CURRENT_LANGUAGE ).c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
         IO::messageBox a( buffer, false );
         return false;
     } else if( canLearn( m_speciesId, p_move, 4 ) ) {
+        auto mdata = MOVE::getMoveData( p_move );
         bool freeSpot = false;
         for( u8 i = 0; i < 4; ++i )
             if( !m_moves[ i ] ) {
                 m_moves[ i ] = p_move;
-                m_acPP[ i ]  = std::min( m_acPP[ i ], AttackList[ p_move ]->m_movePP );
+                m_acPP[ i ]  = std::min( m_acPP[ i ], mdata.m_pp );
 
                 snprintf( buffer, 49, GET_STRING( 103 ), m_name,
-                          AttackList[ p_move ]->m_moveName.c_str( ) );
+                          MOVE::getMoveName( p_move, CURRENT_LANGUAGE ).c_str( ) );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
@@ -69,9 +70,9 @@ bool boxPokemon::learnMove( u16 p_move ) {
             if( yn.getResult( buffer ) ) {
                 u8 res = IO::moveChoiceBox( *this, p_move ).getResult( false, false, (u8) -1 );
                 if( res < 4 ) {
-                    if( AttackList[ m_moves[ res ] ]->m_isFieldAttack ) {
+                    if( MOVE::isFieldMove( m_moves[ res ] ) ) {
                         snprintf( buffer, 49, GET_STRING( 106 ), m_name,
-                                  AttackList[ m_moves[ res ] ]->m_moveName.c_str( ) );
+                                  MOVE::getMoveName( m_moves[ res ], CURRENT_LANGUAGE ).c_str( ) );
                         IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
                         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                         IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
@@ -79,7 +80,7 @@ bool boxPokemon::learnMove( u16 p_move ) {
                         return false;
                     } else {
                         m_moves[ res ] = p_move;
-                        m_acPP[ res ]  = std::min( m_acPP[ res ], AttackList[ p_move ]->m_movePP );
+                        m_acPP[ res ]  = std::min( m_acPP[ res ], mdata.m_pp );
                     }
                 }
             } else
@@ -87,7 +88,7 @@ bool boxPokemon::learnMove( u16 p_move ) {
         }
     } else {
         snprintf( buffer, 49, GET_STRING( 107 ), m_name,
-                  AttackList[ p_move ]->m_moveName.c_str( ) );
+                  MOVE::getMoveName( p_move, CURRENT_LANGUAGE ).c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;

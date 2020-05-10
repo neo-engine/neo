@@ -47,7 +47,7 @@ namespace STS {
         delete _stsUI;
     }
 
-    move* statusScreen::run( ) {
+    u8 statusScreen::run( ) {
         IO::fadeScreen( IO::fadeType::CLEAR_DARK_FAST );
         _stsUI->init( _pkmnIdx );
         auto tg  = _stsUI->draw( _pkmnIdx, true );
@@ -137,53 +137,52 @@ namespace STS {
                 if( IN_RANGE_I( touch, tg[ i ] ) && IO::waitForInput( tg[ i ] ) ) {
                     u8 u = 0, o;
                     for( o = 0; o < 4 && u <= i; ++o )
-                        if( AttackList[ SAVE::SAV->getActiveFile( )
+                        if( MOVE::isFieldMove( SAVE::SAV->getActiveFile( )
                                             .m_pkmnTeam[ _pkmnIdx ]
-                                            .m_boxdata.m_moves[ o ] ]
-                                ->m_isFieldAttack )
+                                            .m_boxdata.m_moves[ o ] ) )
                             u++;
                     o--;
                     consoleSelect( &IO::Bottom );
                     consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                     consoleClear( );
-                    if( AttackList[ SAVE::SAV->getActiveFile( )
+                    for( u8 param = 0; param < 2; ++param )
+                        if( MOVE::possible( SAVE::SAV->getActiveFile( )
+                                    .m_pkmnTeam[ _pkmnIdx ]
+                                    .m_boxdata.m_moves[ o ], param ) ) {
+                            char buffer[ 50 ] = {0};
+                            snprintf(
+                                    buffer, 49, GET_STRING( 99 ),
+                                    SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx
+                                    ].m_boxdata.m_name,
+                                    MOVE::getMoveName( SAVE::SAV->getActiveFile( )
                                         .m_pkmnTeam[ _pkmnIdx ]
-                                        .m_boxdata.m_moves[ o ] ]
-                            ->possible( ) ) {
+                                        .m_boxdata.m_moves[ o ],
+                                        CURRENT_LANGUAGE ).c_str( ) );
+                            IO::messageBox a( buffer );
+                            IO::NAV->draw( );
 
-                        char buffer[ 50 ] = {0};
-                        snprintf(
-                            buffer, 49, GET_STRING( 99 ),
-                            SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
-                            AttackList[ SAVE::SAV->getActiveFile( )
-                                            .m_pkmnTeam[ _pkmnIdx ]
-                                            .m_boxdata.m_moves[ o ] ]
-                                ->m_moveName.c_str( ) );
-                        IO::messageBox a( buffer );
-                        IO::NAV->draw( );
+                            // shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
+                            //              (*_pokemon)[_pkmnIdx ].m_boxdata.m_isFemale,
+                            //              (*_pokemon)[_pkmnIdx ].m_boxdata.isShiny( ) );
 
-                        // shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
-                        //              (*_pokemon)[_pkmnIdx ].m_boxdata.m_isFemale,
-                        //              (*_pokemon)[_pkmnIdx ].m_boxdata.isShiny( ) );
-
-                        return AttackList[ SAVE::SAV->getActiveFile( )
-                                               .m_pkmnTeam[ _pkmnIdx ]
-                                               .m_boxdata.m_moves[ o ] ];
-                    } else {
-                        IO::messageBox( GET_STRING( 100 ), GET_STRING( 91 ) );
-                        IO::fadeScreen( IO::fadeType::CLEAR_DARK_FAST );
-                        _stsUI->init( _pkmnIdx, false );
-                        tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
-
-                        if( mode != DEFAULT_MODE ) {
-                            mode = VIEW_DETAILS;
-                            rbs  = ribbon::getRibbons(
-                                SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ] );
-                            _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page,
-                                          true );
+                            return ( param << 15 ) | SAVE::SAV->getActiveFile( )
+                                .m_pkmnTeam[ _pkmnIdx ]
+                                .m_boxdata.m_moves[ o ];
                         }
-                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
+
+                    IO::messageBox( GET_STRING( 100 ), GET_STRING( 91 ) );
+                    IO::fadeScreen( IO::fadeType::CLEAR_DARK_FAST );
+                    _stsUI->init( _pkmnIdx, false );
+                    tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
+
+                    if( mode != DEFAULT_MODE ) {
+                        mode = VIEW_DETAILS;
+                        rbs  = ribbon::getRibbons(
+                                SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ] );
+                        _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page,
+                                true );
                     }
+                    IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     break;
                 }
 

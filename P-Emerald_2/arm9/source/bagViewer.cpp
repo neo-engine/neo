@@ -68,7 +68,7 @@ namespace BAG {
     bool bagViewer::useItemOnPkmn( pokemon& p_pokemon, u16 p_itemId, ITEM::itemData& p_data ) {
         if( !p_pokemon.m_boxdata.m_speciesId || p_pokemon.isEgg( ) ) return false;
         if( p_data.m_itemType == ITEM::ITEMTYPE_TM ) {
-            u16 currMv = p_data.m_param1;
+            u16 currMv = p_data.m_param2;
 
             p_pokemon.learnMove( currMv );
 
