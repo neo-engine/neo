@@ -108,7 +108,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name,
     if( p_moves )
         memcpy( m_moves, p_moves, sizeof( m_moves ) );
     else
-        getLearnMoves( p_pkmnId, p_level, 0, 1, 4, m_moves );
+        getLearnMoves( p_pkmnId, 0, p_level, 4, m_moves );
     for( u8 i = 0; i < 4; ++i ) {
         MOVE::moveData mdata = MOVE::getMoveData( m_moves[ i ] );
         m_acPP[ i ] = mdata.m_pp;

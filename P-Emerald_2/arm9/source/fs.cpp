@@ -35,7 +35,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ability.h"
 #include "battleTrainer.h"
-#include "berry.h"
 #include "defines.h"
 #include "fs.h"
 #include "item.h"
@@ -597,83 +596,61 @@ bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
     return true;
 }
 
-void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount,
-                    u16* p_result ) {
+u16 LEARNSET_BUFFER[ 700 ];
+void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_amount, u16* p_result ) {
     FILE* f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
     if( !f )
         f  = FS::openSplit( PKMN_LEARNSET_PATH, 201, ".learnset.data" );
     if( !f )
         return;
 
-    u16* buffer = new u16[ 700 ];
-    FS::read( f, buffer, sizeof( u16 ), 699 );
+    FS::read( f, LEARNSET_BUFFER, sizeof( u16 ), 680 );
     FS::close( f );
     u16 ptr = 0;
 
-    u16 rescnt = 0;
     for( u8 i = 0; i < p_amount; ++i ) p_result[ i ] = 0;
+    if( p_fromLevel > p_toLevel ) std::swap( p_fromLevel, p_toLevel );
 
-    if( p_fromLevel > p_toLevel ) {
-        std::vector<u16> reses;
-        for( u16 i = 0; i <= p_fromLevel; ++i ) {
-            u16 z = buffer[ ptr++ ];
-            for( int j = 0; j < z; ++j ) {
-                u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-                if( i >= p_toLevel && h == (u16) p_mode && g < MAX_ATTACK ) reses.push_back( g );
+    std::vector<u16> reses;
+    for( u16 i = 0; i <= p_toLevel; ++i ) {
+        while( i == LEARNSET_BUFFER[ ptr ] ) {
+            if( i >= p_fromLevel ) {
+                reses.push_back( LEARNSET_BUFFER[ ++ptr ] );
+            } else {
+                ++ptr;
             }
-        }
-        auto I = reses.rbegin( );
-        for( u16 i = 0; i < p_amount && I != reses.rend( ); ++i, ++I ) {
-            for( u16 z = 0; z < i; ++z )
-                if( *I == p_result[ z ] ) {
-                    --i;
-                    goto N;
-                }
-            p_result[ i ] = *I;
-        N:;
-        }
-        delete[] buffer;
-        return;
-    } else {
-        for( u16 i = 0; i <= p_toLevel; ++i ) {
-            u16 z = buffer[ ptr++ ];
-            for( u16 j = 0; j < z; ++j ) {
-                u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-                if( i >= p_fromLevel && h == p_mode && g < MAX_ATTACK ) {
-                    for( u16 k = 0; k < rescnt; ++k )
-                        if( g == p_result[ k ] ) goto NEXT;
-                    p_result[ rescnt ] = g;
-                    if( ++rescnt == p_amount ) {
-                        delete[] buffer;
-                        return;
-                    }
-                NEXT:;
-                }
-            }
+            ptr++;
         }
     }
-    delete[] buffer;
+    auto I = reses.rbegin( );
+    for( u16 i = 0; i < p_amount && I != reses.rend( ); ++i, ++I ) {
+        for( u16 z = 0; z < i; ++z )
+            if( *I == p_result[ z ] ) {
+                --i;
+                goto N;
+            }
+        p_result[ i ] = *I;
+N:;
+    }
+    return;
 }
-bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
+
+bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_maxLevel ) {
     FILE* f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
     if( !f ) return false;
 
-    u16* buffer = new u16[ 700 ];
-    FS::read( f, buffer, sizeof( u16 ), 699 );
+    FS::read( f, LEARNSET_BUFFER, sizeof( u16 ), 680 );
     FS::close( f );
     u16 ptr = 0;
 
-    for( int i = 0; i <= 100; ++i ) {
-        int z = buffer[ ptr++ ];
-        for( int j = 0; j < z; ++j ) {
-            u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-            if( g == p_moveId && h == p_mode ) {
-                delete[] buffer;
+    for( u16 i = 0; i <= p_maxLevel; ++i ) {
+        while( i == LEARNSET_BUFFER[ ptr ] ) {
+            if( p_moveId == LEARNSET_BUFFER[ ++ptr ] ) {
                 return true;
             }
+            ptr++;
         }
     }
-    delete[] buffer;
     return false;
 }
 
