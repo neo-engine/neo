@@ -59,6 +59,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "itemicon.h"
 #include "party_blank1.h"
 #include "party_blank2.h"
+#include "party_mark1.h"
+#include "party_mark2.h"
 #include "party_box1.h"
 #include "party_box2.h"
 #include "party_box_sel1.h"

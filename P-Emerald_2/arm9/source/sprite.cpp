@@ -30,11 +30,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <initializer_list>
 
 #include "fs.h"
+#include "messageBox.h"
 #include "move.h"
 #include "ribbon.h"
 #include "sprite.h"
 #include "uio.h"
-#include "messageBox.h"
 
 #include "Egg.h"
 
@@ -68,41 +68,41 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "plat9a.h"
 #include "plat9b.h"
 
-#include "type_ground_de.h"
-#include "type_ground_en.h"
+#include "type_bug_de.h"
+#include "type_bug_en.h"
+#include "type_dark_de.h"
+#include "type_dark_en.h"
 #include "type_dragon_de.h"
 #include "type_dragon_en.h"
-#include "type_ice_de.h"
-#include "type_ice_en.h"
 #include "type_electr_de.h"
 #include "type_electr_en.h"
 #include "type_fairy_de.h"
 #include "type_fairy_en.h"
+#include "type_fight_de.h"
+#include "type_fight_en.h"
 #include "type_fire_de.h"
 #include "type_fire_en.h"
 #include "type_flying_de.h"
 #include "type_flying_en.h"
 #include "type_ghost_de.h"
 #include "type_ghost_en.h"
-#include "type_rock_de.h"
-#include "type_rock_en.h"
-#include "type_poison_de.h"
-#include "type_poison_en.h"
-#include "type_bug_de.h"
-#include "type_bug_en.h"
-#include "type_fight_de.h"
-#include "type_fight_en.h"
-#include "type_normal_de.h"
-#include "type_normal_en.h"
 #include "type_grass_de.h"
 #include "type_grass_en.h"
+#include "type_ground_de.h"
+#include "type_ground_en.h"
+#include "type_ice_de.h"
+#include "type_ice_en.h"
+#include "type_normal_de.h"
+#include "type_normal_en.h"
+#include "type_poison_de.h"
+#include "type_poison_en.h"
 #include "type_psychic_de.h"
 #include "type_psychic_en.h"
+#include "type_rock_de.h"
+#include "type_rock_en.h"
 #include "type_steel_de.h"
 #include "type_steel_en.h"
 #include "type_unknown.h"
-#include "type_dark_de.h"
-#include "type_dark_en.h"
 #include "type_water_de.h"
 #include "type_water_en.h"
 
@@ -193,48 +193,31 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "r85.h"
 #include "r9.h"
 
-
 unsigned int   TEMP[ 12288 ]   = {0};
 unsigned short TEMP_PAL[ 256 ] = {0};
 
 namespace IO {
-    const unsigned int* TypeTiles[ 19 ][ LANGUAGES ] = {{type_normal_enTiles, type_normal_deTiles},
-                                                        {type_fight_enTiles, type_fight_deTiles},
-                                                        {type_flying_enTiles, type_flying_deTiles},
-                                                        {type_poison_enTiles, type_poison_deTiles},
-                                                        {type_ground_enTiles, type_ground_deTiles},
-                                                        {type_rock_enTiles, type_rock_deTiles},
-                                                        {type_bug_enTiles, type_bug_deTiles},
-                                                        {type_ghost_enTiles, type_ghost_deTiles},
-                                                        {type_steel_enTiles, type_steel_deTiles},
-                                                        {type_unknownTiles, type_unknownTiles},
-                                                        {type_water_enTiles, type_water_deTiles},
-                                                        {type_fire_enTiles, type_fire_deTiles},
-                                                        {type_grass_enTiles, type_grass_deTiles},
-                                                        {type_electr_enTiles, type_electr_deTiles},
-                                                        {type_psychic_enTiles, type_psychic_deTiles},
-                                                        {type_ice_enTiles, type_ice_deTiles},
-                                                        {type_dragon_enTiles, type_dragon_deTiles},
-                                                        {type_dark_enTiles, type_dark_deTiles},
+    const unsigned int* TypeTiles[ 19 ][ LANGUAGES ]
+        = {{type_normal_enTiles, type_normal_deTiles},   {type_fight_enTiles, type_fight_deTiles},
+           {type_flying_enTiles, type_flying_deTiles},   {type_poison_enTiles, type_poison_deTiles},
+           {type_ground_enTiles, type_ground_deTiles},   {type_rock_enTiles, type_rock_deTiles},
+           {type_bug_enTiles, type_bug_deTiles},         {type_ghost_enTiles, type_ghost_deTiles},
+           {type_steel_enTiles, type_steel_deTiles},     {type_unknownTiles, type_unknownTiles},
+           {type_water_enTiles, type_water_deTiles},     {type_fire_enTiles, type_fire_deTiles},
+           {type_grass_enTiles, type_grass_deTiles},     {type_electr_enTiles, type_electr_deTiles},
+           {type_psychic_enTiles, type_psychic_deTiles}, {type_ice_enTiles, type_ice_deTiles},
+           {type_dragon_enTiles, type_dragon_deTiles},   {type_dark_enTiles, type_dark_deTiles},
            {type_fairy_enTiles, type_fairy_deTiles}};
-    const unsigned short* TypePals[ 19 ][ LANGUAGES ]  = {{type_normal_enPal, type_normal_dePal},
-                                                         {type_fight_enPal, type_fight_dePal},
-                                                         {type_flying_enPal, type_flying_dePal},
-                                                         {type_poison_enPal, type_poison_dePal},
-                                                         {type_ground_enPal, type_ground_dePal},
-                                                         {type_rock_enPal, type_rock_dePal},
-                                                         {type_bug_enPal, type_bug_dePal},
-                                                         {type_ghost_enPal, type_ghost_dePal},
-                                                         {type_steel_enPal, type_steel_dePal},
-                                                         {type_unknownPal, type_unknownPal},
-                                                         {type_water_enPal, type_water_dePal},
-                                                         {type_fire_enPal, type_fire_dePal},
-                                                         {type_grass_enPal, type_grass_dePal},
-                                                         {type_electr_enPal, type_electr_dePal},
-                                                         {type_psychic_enPal, type_psychic_dePal},
-                                                         {type_ice_enPal, type_ice_dePal},
-                                                         {type_dragon_enPal, type_dragon_dePal},
-                                                         {type_dark_enPal, type_dark_dePal},
+    const unsigned short* TypePals[ 19 ][ LANGUAGES ]
+        = {{type_normal_enPal, type_normal_dePal},   {type_fight_enPal, type_fight_dePal},
+           {type_flying_enPal, type_flying_dePal},   {type_poison_enPal, type_poison_dePal},
+           {type_ground_enPal, type_ground_dePal},   {type_rock_enPal, type_rock_dePal},
+           {type_bug_enPal, type_bug_dePal},         {type_ghost_enPal, type_ghost_dePal},
+           {type_steel_enPal, type_steel_dePal},     {type_unknownPal, type_unknownPal},
+           {type_water_enPal, type_water_dePal},     {type_fire_enPal, type_fire_dePal},
+           {type_grass_enPal, type_grass_dePal},     {type_electr_enPal, type_electr_dePal},
+           {type_psychic_enPal, type_psychic_dePal}, {type_ice_enPal, type_ice_dePal},
+           {type_dragon_enPal, type_dragon_dePal},   {type_dark_enPal, type_dark_dePal},
            {type_fairy_enPal, type_fairy_dePal}};
     const unsigned int* RibbonTiles[ MAX_RIBBONS ]
         = {r0Tiles,  r1Tiles,  r2Tiles,  r3Tiles,  r4Tiles,  r5Tiles,  r6Tiles,  r7Tiles,
@@ -546,18 +529,18 @@ namespace IO {
         char* buffer = new char[ 100 ];
         if( !p_forme ) {
             if( !p_female )
-                snprintf( buffer, 99, "%02d/%d/%d", p_pkmnId / FS::ITEMS_PER_DIR,
-                          p_pkmnId, p_pkmnId );
+                snprintf( buffer, 99, "%02d/%d/%d", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                          p_pkmnId );
             else
-                snprintf( buffer, 99, "%02d/%d/%df", p_pkmnId / FS::ITEMS_PER_DIR,
-                          p_pkmnId, p_pkmnId );
+                snprintf( buffer, 99, "%02d/%d/%df", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                          p_pkmnId );
         } else {
             if( !p_female )
-                snprintf( buffer, 99, "%02d/%d/%d-%hhu", p_pkmnId / FS::ITEMS_PER_DIR,
-                          p_pkmnId, p_pkmnId, p_forme );
+                snprintf( buffer, 99, "%02d/%d/%d-%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                          p_pkmnId, p_forme );
             else
-                snprintf( buffer, 99, "%02d/%d/%d-%hhuf", p_pkmnId / FS::ITEMS_PER_DIR,
-                          p_pkmnId, p_pkmnId, p_forme );
+                snprintf( buffer, 99, "%02d/%d/%d-%hhuf", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                          p_pkmnId, p_forme );
         }
 
         memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
@@ -572,11 +555,11 @@ namespace IO {
         if( p_shiny ) {
             if( !p_forme ) {
                 if( !p_female )
-                    snprintf( buffer, 99, "%02d/%d/%ds", p_pkmnId / FS::ITEMS_PER_DIR,
-                              p_pkmnId, p_pkmnId );
+                    snprintf( buffer, 99, "%02d/%d/%ds", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                              p_pkmnId );
                 else
-                    snprintf( buffer, 99, "%02d/%d/%dsf", p_pkmnId / FS::ITEMS_PER_DIR,
-                              p_pkmnId, p_pkmnId );
+                    snprintf( buffer, 99, "%02d/%d/%dsf", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                              p_pkmnId );
             } else {
                 if( !p_female )
                     snprintf( buffer, 99, "%02d/%d/%d-%hhus", p_pkmnId / FS::ITEMS_PER_DIR,
@@ -710,11 +693,11 @@ namespace IO {
                       u8 p_palCnt, u16 p_tileCnt, bool p_bottom, u8 p_forme ) {
         char* buffer = new char[ 100 ];
         if( !p_forme )
-            snprintf( buffer, 99, "%02hu/%hu/Icon_%hu", p_pkmnId / FS::ITEMS_PER_DIR,
-                      p_pkmnId, p_pkmnId );
+            snprintf( buffer, 99, "%02hu/%hu/Icon_%hu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                      p_pkmnId );
         else
-            snprintf( buffer, 99, "%02hu/%hu/Icon_%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR,
-                      p_pkmnId, p_pkmnId, p_forme );
+            snprintf( buffer, 99, "%02hu/%hu/Icon_%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                      p_pkmnId, p_forme );
         auto res = loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex,
                              p_palCnt, p_tileCnt, p_bottom );
         delete[] buffer;
@@ -725,11 +708,11 @@ namespace IO {
                       u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom, u8 p_forme ) {
         char* buffer = new char[ 100 ];
         if( !p_forme )
-            snprintf( buffer, 99, "%02hu/%hu/Icon_%hu", p_pkmnId / FS::ITEMS_PER_DIR,
-                      p_pkmnId, p_pkmnId );
+            snprintf( buffer, 99, "%02hu/%hu/Icon_%hu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                      p_pkmnId );
         else
-            snprintf( buffer, 99, "%02hu/%hu/Icon_%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR,
-                      p_pkmnId, p_pkmnId, p_forme );
+            snprintf( buffer, 99, "%02hu/%hu/Icon_%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                      p_pkmnId, p_forme );
         auto res = loadIcon( "nitro:/PICS/SPRITES/PKMN/", buffer, p_posX, p_posY, p_oamIndex,
                              p_palCnt, p_palpos, p_tileCnt, p_bottom );
         delete[] buffer;
@@ -738,12 +721,12 @@ namespace IO {
 
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
                      bool p_bottom ) {
-        return loadIcon( "nitro:/PICS/SPRITES/PKMN/0/", "Icon_0-1", p_posX, p_posY, p_oamIndex,
+        return loadIcon( "nitro:/PICS/SPRITES/PKMN/00/0/", "Icon_0-1", p_posX, p_posY, p_oamIndex,
                          p_palCnt, p_tileCnt, p_bottom );
     }
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos,
                      u16 p_tileCnt, bool p_bottom ) {
-        return loadIcon( "nitro:/PICS/SPRITES/PKMN/0/", "Icon_0-1", p_posX, p_posY, p_oamIndex,
+        return loadIcon( "nitro:/PICS/SPRITES/PKMN/00/0/", "Icon_0-1", p_posX, p_posY, p_oamIndex,
                          p_palCnt, p_palpos, p_tileCnt, p_bottom );
     }
 

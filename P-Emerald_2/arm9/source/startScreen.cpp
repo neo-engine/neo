@@ -39,6 +39,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 #include "yesNoBox.h"
 
+// BEGIN TEST
+#include "partyScreen.h"
+// END TEST
+
 namespace SAVE {
     void initColors( ) {
         BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
@@ -63,8 +67,22 @@ namespace SAVE {
     }
 
     void drawSplash( language p_lang ) {
-        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "Title" );
-        IO::clearScreen( true, false, false );
+       // FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "Title" );
+       // IO::clearScreen( true, false, false );
+
+        // BEGIN TEST
+
+        pokemon testTeam[ 6 ];
+        for( u8 i = 0; i < 5; i++ ) {
+            testTeam[ i ]
+                = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, i, false, i == 3 );
+            testTeam[ i ].m_stats.m_acHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
+        }
+
+        STS::partyScreen sts = STS::partyScreen( testTeam, 5 );
+        sts.run( );
+
+        // END TEST
 
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleSelect( &IO::Bottom );

@@ -240,6 +240,12 @@
     <ClInclude Include="arm9\include\type.h">
       <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\include\partyScreen.h">
+      <Filter>Header Files\arm9\sts</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\partyScreenUI.h">
+      <Filter>Header Files\arm9\sts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">
@@ -373,6 +379,12 @@
     </ClCompile>
     <ClCompile Include="arm9\source\moveChoiceBox.cpp">
       <Filter>Source Files\arm9\io</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\partyScreen.cpp">
+      <Filter>Source Files\arm9\sts</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\partyScreenUI.cpp">
+      <Filter>Source Files\arm9\sts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

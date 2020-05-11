@@ -66,6 +66,7 @@ namespace IO {
     void vramSetup( );
 
     void swapScreens( );
+    void animateBG( u8 p_frame, int p_bg );
 
     void setDefaultConsoleTextColors( u16* p_palette, u8 p_start = 1 );
 
@@ -102,11 +103,10 @@ namespace IO {
 
     void initTextField( );
 
-	
     void setPixel( u8 p_x, u8 p_y, bool p_bottom, u8 p_color, u8 p_layer = 1 );
 
-    void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom,
-                         u8 p_color, u8 p_layer = 1 );
+    void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, u8 p_color,
+                         u8 p_layer = 1 );
 
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2,
                     bool p_delay, bool p_big = false ); // HP in %
@@ -119,6 +119,6 @@ namespace IO {
                          bool p_pressed, bool p_bottom = true );
     void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2,
                          u8 p_colorIdx, bool p_pressed, bool p_bottom = true );
-	
+
     u16 getColor( type p_type );
 } // namespace IO

@@ -46,6 +46,8 @@
     <ClInclude Include="arm9\include\move.h" />
     <ClInclude Include="arm9\include\moveChoiceBox.h" />
     <ClInclude Include="arm9\include\nav.h" />
+    <ClInclude Include="arm9\include\partyScreen.h" />
+    <ClInclude Include="arm9\include\partyScreenUI.h" />
     <ClInclude Include="arm9\include\pokemon.h" />
     <ClInclude Include="arm9\include\ribbon.h" />
     <ClInclude Include="arm9\include\saveGame.h" />
@@ -92,6 +94,8 @@
     <ClCompile Include="arm9\source\move.cpp" />
     <ClCompile Include="arm9\source\moveChoiceBox.cpp" />
     <ClCompile Include="arm9\source\nav.cpp" />
+    <ClCompile Include="arm9\source\partyScreen.cpp" />
+    <ClCompile Include="arm9\source\partyScreenUI.cpp" />
     <ClCompile Include="arm9\source\pokemon.cpp" />
     <ClCompile Include="arm9\source\pokemonIO.cpp" />
     <ClCompile Include="arm9\source\ribbon.cpp" />

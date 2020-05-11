@@ -34,7 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 //#define USE_AS_LIB
 #undef _EMULATOR
-#define VERSION ("0.8-" __DATE__ " " __TIME__)
+#define VERSION ( "0.8-" __DATE__ " " __TIME__ )
 #define VERSION_NAME "Magnetizing Magnemite neo"
 #define DEBUG
 
@@ -46,6 +46,9 @@ extern GameMod gMod;
 
 std::string toString( u16 p_num ); // I REALLY LIKE WORKAROUNDING g++'S BUGS
 u8          getCurrentDaytime( );
+
+// num frames between button input
+#define COOLDOWN_COUNT 8
 
 extern bool DRAW_TIME;
 extern bool UPDATE_TIME;
@@ -70,7 +73,8 @@ extern unsigned short TEMP_PAL[ 256 ];
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
-#define GET_STRING( i ) STRINGS[ i ][ SAVE::SAV->getActiveFile( ).m_options.m_language ]
+#define GET_STRING( p_stringIdx ) \
+    STRINGS[ p_stringIdx ][ SAVE::SAV->getActiveFile( ).m_options.m_language ]
 
 #define NO_DATA GET_STRING( 0 )
 #define FARAWAY_PLACE GET_STRING( 1 )
@@ -93,7 +97,11 @@ extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
 
 #define TOUCH_UP ( !touch.px && !touch.py )
 
-#define GET_AND_WAIT( key ) ( ( pressed & key ) && IO::waitForInput( IO::inputTarget( key ) ) )
+#define GET_KEY_COOLDOWN( p_key ) \
+    ( pressed & ( p_key ) ) || ( ( held & ( p_key ) ) && !( --cooldown ) )
+
+#define GET_AND_WAIT( p_key ) \
+    ( ( pressed & ( p_key ) ) && IO::waitForInput( IO::inputTarget( p_key ) ) )
 #define GET_AND_WAIT_R( p_x1, p_y1, p_x2, p_y2 )                     \
     ( IN_RANGE_I( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) \
       && IO::waitForInput( IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) )
@@ -101,16 +109,19 @@ extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
     ( IN_RANGE_I_C( touch, IO::inputTarget( p_x, p_y, p_r ) ) \
       && IO::waitForInput( IO::inputTarget( p_x, p_y, p_r ) ) )
 
-#define GET_DIR( a )                                                                       \
-    ( ( (a) &KEY_DOWN ) ? MAP::direction::DOWN                                             \
-                        : ( ( (a) &KEY_UP ) ? MAP::direction::UP                           \
-                                            : ( ( (a) &KEY_RIGHT ) ? MAP::direction::RIGHT \
-                                                                   : MAP::direction::LEFT ) ) )
+#define GET_DIR( p_dir )               \
+    ( ( (p_dir) &KEY_DOWN )            \
+          ? MAP::direction::DOWN       \
+          : ( ( (p_dir) &KEY_UP )      \
+                  ? MAP::direction::UP \
+                  : ( ( (p_dir) &KEY_RIGHT ) ? MAP::direction::RIGHT : MAP::direction::LEFT ) ) )
 
-#define IN_DEX( pidx ) ( SAVE::SAV->m_caughtPkmn[ ( pidx ) / 8 ] & ( 1 << ( ( pidx ) % 8 ) ) )
+#define IN_DEX( p_idx ) ( SAVE::SAV->m_caughtPkmn[ ( p_idx ) / 8 ] & ( 1 << ( ( p_idx ) % 8 ) ) )
 
-#define RGB( r, g, b ) ( RGB15( ( r ), ( g ), ( b ) ) | BIT( 15 ) )
-#define COMPL( a ) ( RGB( 31 - ( ( a ) >> 10 ) % 32, 31 - ( ( a ) >> 5 ) % 32, 31 - ( a ) % 32 ) )
+#define RGB( p_r, p_g, p_b ) ( RGB15( ( p_r ), ( p_g ), ( p_b ) ) | BIT( 15 ) )
+#define COMPL( p_color )                                                    \
+    ( RGB( 31 - ( ( p_color ) >> 10 ) % 32, 31 - ( ( p_color ) >> 5 ) % 32, \
+           31 - ( p_color ) % 32 ) )
 
 #define RED2_IDX ( u8( 247 ) )
 #define BLUE2_IDX ( u8( 248 ) )

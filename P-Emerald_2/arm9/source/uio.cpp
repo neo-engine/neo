@@ -64,7 +64,6 @@ namespace IO {
 #define TRANSPARENCY_COEFF 0x0671
 
     void initVideo( ) {
-
         vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
         vramSetBankB( VRAM_B_MAIN_BG_0x06020000 );
 
@@ -87,7 +86,6 @@ namespace IO {
         bgUpdate( );
     }
     void initVideoSub( ) {
-
         vramSetBankC( VRAM_C_SUB_BG_0x06200000 );
         vramSetBankD( VRAM_D_SUB_SPRITE );
 
@@ -128,6 +126,11 @@ namespace IO {
             REG_BLDCNT     = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
             REG_BLDALPHA   = TRANSPARENCY_COEFF;
         }
+    }
+
+    void animateBG( u8 p_frame, int p_bg ) {
+        if( p_frame == 255 ) { bgScrollf( p_bg, -( 255 << 6 ), -( 255 << 6 ) ); }
+        bgScrollf( p_bg, 1 << 6, 1 << 6 );
     }
 
     void setDefaultConsoleTextColors( u16 *p_palette, u8 p_start ) {
@@ -397,7 +400,7 @@ namespace IO {
                             p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 3, p_bottom, WHITE_IDX );
         }
     }
-	
+
     u16 getColor( type p_type ) {
         switch( p_type ) {
         case NORMAL:
