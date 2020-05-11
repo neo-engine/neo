@@ -37,10 +37,10 @@ namespace BAG {
       private:
         enum {
             ITEM_START      = 0,
-            MEDICINE_START  = 550,
-            TM_HM_START     = 600,
-            BERRIES_START   = 725,
-            KEY_ITEMS_START = 825
+            MEDICINE_START  = 500,
+            TM_HM_START     = 625,
+            BERRIES_START   = 850,
+            KEY_ITEMS_START = 950
         };
         const u16           _startIdx[ 6 ] = {ITEM_START,    MEDICINE_START,  TM_HM_START,
                                     BERRIES_START, KEY_ITEMS_START, MAX_ITEMS_IN_BAG};
@@ -65,12 +65,12 @@ namespace BAG {
         void erase( bagType, u16 p_itemId, u16 p_cnt = -1 );
 
         /*
-         * Returnes the number of items with no. item_id in the bag.
+         * Returns the number of items with no. item_id in the bag.
          */
         u16 count( bagType, u16 p_itemId );
 
         /*
-         * Returnes true if the specified bag is empty.
+         * Returns true if the specified bag is empty.
          */
         bool empty( bagType );
 
@@ -85,7 +85,7 @@ namespace BAG {
         void swap( bagType, u16 p_idx1, u16 p_idx2 );
 
         /*
-         * Returnes the number of items in the specified bag.
+         * Returns the number of items in the specified bag.
          */
         std::size_t size( bagType );
 
@@ -121,5 +121,5 @@ namespace BAG {
         }
     };
 
-    bag::bagType toBagType( item::itemType p_itemType );
+    bag::bagType toBagType( u8 p_itemType );
 } // namespace BAG

@@ -48,7 +48,8 @@ namespace BAG {
         };
 
       private:
-        std::vector<std::pair<IO::inputTarget, targetInfo>> drawPkmn( item* p_currentSelection );
+        std::vector<std::pair<IO::inputTarget, targetInfo>> drawPkmn( u16 p_itemId,
+                ITEM::itemData& p_data );
 
       public:
         u16  drawPkmnIcons( );
@@ -56,11 +57,13 @@ namespace BAG {
 
         std::vector<std::pair<IO::inputTarget, targetInfo>> drawBagPage( bag::bagType,
                                                                          u16 p_firstDisplayedItem );
-        void selectItem( u8 p_idx, std::pair<u16, u16> p_item, bool p_pressed = false );
-        void unselectItem( bag::bagType p_page, u8 p_idx, u16 p_item );
+        void selectItem( u8 p_idx, std::pair<u16, u16> p_item, ITEM::itemData& p_data,
+                         bool p_pressed = false );
+        void unselectItem( bag::bagType p_page, u8 p_idx, u16 p_item, ITEM::itemData& p_data );
 
-        bool getSprite( u8 p_idx, std::pair<u16, u16> p_item );
+        bool getSprite( u8 p_idx, std::pair<u16, u16> p_item, ITEM::itemData& p_data );
         void updateSprite( touchPosition p_touch );
-        void dropSprite( bag::bagType p_page, u8 p_idx, std::pair<u16, u16> p_item );
+        void dropSprite( bag::bagType p_page, u8 p_idx, std::pair<u16, u16> p_item,
+                         ITEM::itemData& p_data );
     };
 }

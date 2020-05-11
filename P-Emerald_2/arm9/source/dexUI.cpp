@@ -201,28 +201,28 @@ namespace DEX {
                                           PKMN_SPRITE_START( 0 ), 0, 0, false, false,
                                           p_isFemale && !p_isGenderless, true, false, p_forme );
         if( p_formeCnt )
-            IO::boldFont->printString( getDisplayName( p_pkmnId, p_forme ).c_str( ), 58, 157, false,
+            IO::boldFont->printString( getDisplayName( p_pkmnId, CURRENT_LANGUAGE, p_forme ).c_str( ), 58, 157, false,
                                        IO::font::CENTER );
         else if( p_isFemale && !p_isGenderless )
             IO::boldFont->printString( GET_STRING( 133 ), 58, 157, false, IO::font::CENTER );
         else if( !p_isFemale && !p_isGenderless )
             IO::boldFont->printString( GET_STRING( 134 ), 58, 157, false, IO::font::CENTER );
         else
-            IO::boldFont->printString( getDisplayName( p_pkmnId ).c_str( ), 58, 157, false,
+            IO::boldFont->printString( getDisplayName( p_pkmnId, CURRENT_LANGUAGE ).c_str( ), 58, 157, false,
                                        IO::font::CENTER );
 
         tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 110, 64,
                                       PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true,
                                       p_isFemale && !p_isGenderless, false, false, p_forme );
         if( p_formeCnt )
-            IO::boldFont->printString( getDisplayName( p_pkmnId, p_forme ).c_str( ), 158, 150,
+            IO::boldFont->printString( getDisplayName( p_pkmnId, CURRENT_LANGUAGE, p_forme ).c_str( ), 158, 150,
                                        false, IO::font::CENTER );
         else if( p_isFemale && !p_isGenderless )
             IO::boldFont->printString( GET_STRING( 133 ), 158, 150, false, IO::font::CENTER );
         else if( !p_isFemale && !p_isGenderless )
             IO::boldFont->printString( GET_STRING( 134 ), 158, 150, false, IO::font::CENTER );
         else
-            IO::boldFont->printString( getDisplayName( p_pkmnId ).c_str( ), 158, 150, false,
+            IO::boldFont->printString( getDisplayName( p_pkmnId, CURRENT_LANGUAGE ).c_str( ), 158, 150, false,
                                        IO::font::CENTER );
         IO::boldFont->printString( GET_STRING( 135 ), 158, 166, false, IO::font::CENTER );
 
@@ -321,7 +321,7 @@ namespace DEX {
                 IO::loadPKMNIcon( data.m_preEvolution, 8, 20, PKMN_SPRITE_START( 2 ), 2,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                 consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                printf( GET_STRING( 132 ), getDisplayName( data.m_preEvolution ).c_str( ) );
+                printf( GET_STRING( 132 ), getDisplayName( data.m_preEvolution, CURRENT_LANGUAGE ).c_str( ) );
                 break;
             case 2:
                 if( p_page == 0 ) {
@@ -334,7 +334,7 @@ namespace DEX {
                 IO::loadPKMNIcon( data.m_preEvolution, 8, 20, PKMN_SPRITE_START( 2 ), 2,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                 consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                printf( GET_STRING( 132 ), getDisplayName( data.m_preEvolution ).c_str( ) );
+                printf( GET_STRING( 132 ), getDisplayName( data.m_preEvolution, CURRENT_LANGUAGE ).c_str( ) );
                 break;
             case 3:
             default:
@@ -345,11 +345,12 @@ namespace DEX {
                     dmaCopy( DexTop32Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
                     dmaCopy( DexTop32Pal + 64, BG_PALETTE + 64, 256 );
                 }
-                IO::loadItemIcon( ItemList[ data.m_preEvolution ]->m_itemName, 8, 20,
+                IO::loadItemIcon( data.m_preEvolution, 8, 20,
                                   PKMN_SPRITE_START( 2 ), 2,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                 consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                printf( GET_STRING( 132 ), ItemList[ data.m_preEvolution ]->m_itemName.c_str( ) );
+                printf( GET_STRING( 132 ), ITEM::getItemName( data.m_preEvolution,
+                            CURRENT_LANGUAGE ).c_str( ) );
                 break;
             }
             switch( data.m_types[ 0 ] ) {
@@ -472,7 +473,7 @@ namespace DEX {
             consoleSetWindow( &IO::Top, 3, 22, 32, 23 );
             if( strlen( data.m_species ) >= 13 ) consoleSetWindow( &IO::Top, 2, 22, 32, 23 );
             if( strlen( data.m_species ) == 8 || strlen( data.m_species ) == 9 ) printf( " " );
-            printf( "%8s %4.1fm %5.1fkg", FS::convertToOld( data.m_species ).c_str( ),
+            printf( "%8s %4.1fm %5.1fkg", data.m_species,
                     data.m_size / 10.0, data.m_weight / 10.0 );
             break;
         }
@@ -547,14 +548,14 @@ namespace DEX {
                 char buffer[ 10 ];
                 snprintf( buffer, 9, "%03d", id );
                 IO::boldFont->printString( buffer, 32, 28 + 32 * i, true );
-                IO::boldFont->printString( getDisplayName( id ).c_str( ), 100, 28 + 32 * i, true );
+                IO::boldFont->printString( getDisplayName( id, CURRENT_LANGUAGE ).c_str( ), 100, 28 + 32 * i, true );
 
                 if( i == p_selectedIdx ) {
                     pokemonData p;
                     getAll( id, p );
                     BG_PALETTE_SUB[ COLOR_IDX ] = IO::getColor( p.m_types[ 0 ] );
                 }
-                IO::printRectangle( 64 + 3, 24 + 32 * i + 2, 64 + 28, 24 + 32 * i + 26, true, 
+                IO::printRectangle( 64 + 3, 24 + 32 * i + 2, 64 + 28, 24 + 32 * i + 26, true,
                                     i == p_selectedIdx ? COLOR_IDX : WHITE_IDX );
             }
             break;
@@ -597,7 +598,7 @@ namespace DEX {
                     IO::printRectangle( IO::Oam->oamBuffer[ FRAME_START + i ].x + 3,
                                         IO::Oam->oamBuffer[ FRAME_START + i ].y + 2,
                                         IO::Oam->oamBuffer[ FRAME_START + i ].x + 29,
-                                        IO::Oam->oamBuffer[ FRAME_START + i ].y + 25, true, 
+                                        IO::Oam->oamBuffer[ FRAME_START + i ].y + 25, true,
                                         COLOR_IDX );
                 }
             }

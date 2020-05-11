@@ -36,7 +36,7 @@ namespace STS {
         u8           m_pagemax;
         virtual bool drawMove( const pokemon& p_pokemon, u8 p_moveIdx, bool p_bottom = false );
         virtual bool drawRibbon( const pokemon& p_pokemon, u8 p_ribbonIdx, bool p_bottom = false );
-        virtual void draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) = 0;
+        virtual void draw( pokemon& p_pokemon, u8 p_page, bool p_newpok ) = 0;
         virtual void animate( u8 p_frame, u8 p_page )                           = 0;
 
         virtual ~statusScreenUI( ) {
@@ -50,7 +50,7 @@ namespace STS {
 
       public:
         void init( u8 p_current, bool p_initTop = true );
-        void draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) override;
+        void draw( pokemon& p_pokemon, u8 p_page, bool p_newpok ) override;
         std::vector<IO::inputTarget> draw( u8 p_current, bool p_updatePageIcons );
 
         void animate( u8 p_frame, u8 p_page ) override;
@@ -61,7 +61,7 @@ namespace STS {
     class boxStsScreenUI : public regStsScreenUI {
       public:
         void init( );
-        void draw( const pokemon& p_pokemon, u8 p_page, bool p_newpok ) override;
+        void draw( pokemon& p_pokemon, u8 p_page, bool p_newpok ) override;
 
         void animate( u8 p_frame, u8 p_page ) override {
             (void) p_frame;

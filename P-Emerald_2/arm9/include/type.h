@@ -30,6 +30,7 @@
 enum type {
     NORMAL    = 0,
     FIGHTING  = 1,
+    FIGHT     = 1,
     FLYING    = 2,
     POISON    = 3,
     GROUND    = 4,
@@ -42,11 +43,22 @@ enum type {
     FIRE      = 11,
     GRASS     = 12,
     LIGHTNING = 13,
+    ELECTRIC  = 13,
     PSYCHIC   = 14,
     ICE       = 15,
     DRAGON    = 16,
     DARKNESS  = 17,
+    DARK      = 17,
     FAIRY     = 18
+};
+
+enum contestType {
+    NO_CONTEST_TYPE = 0,
+    TOUGH = 1,
+    CLEVER = 2,
+    BEAUTIFUL = 3,
+    COOL = 4,
+    CUTE = 5
 };
 
 float getEffectiveness( const type& p_t1, const type& p_t2 );

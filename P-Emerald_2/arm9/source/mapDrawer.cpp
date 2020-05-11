@@ -27,16 +27,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
+#include "defines.h"
 #include "battle.h"
 #include "battleTrainer.h"
-#include "battleWeather.h"
-#include "defines.h"
+#include "battleDefines.h"
 #include "mapDrawer.h"
 #include "messageBox.h"
 #include "saveGame.h"
 #include "screenFade.h"
 #include "sprite.h"
 #include "uio.h"
+#include "abilityNames.h"
 
 #include "BigCirc1.h"
 
@@ -471,10 +472,9 @@ namespace MAP {
         ANIMATE_MAP = false;
         swiWaitForVBlank( );
         IO::NAV->draw( );
-        BATTLE::battleTrainer* bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
-        BATTLE::battle( bt, &wildPkmn, weat, platform, plat2, battleBack ).start( );
-        SAVE::SAV->getActiveFile( ).updateTeam( bt );
-        delete bt;
+        BATTLE::battle( SAVE::SAV->getActiveFile( ).m_pkmnTeam,
+                        wildPkmn, weat, platform, plat2, battleBack,
+                        SAVE::SAV->getActiveFile( ).checkFlag( SAVE::F_MEGA_EVOLUTION ) ).start( );
         FADE_TOP_DARK( );
         ANIMATE_MAP = true;
         IO::NAV->draw( true );
@@ -482,6 +482,7 @@ namespace MAP {
 
         return true;
     }
+
     void mapDrawer::handleTrainer( ) {
     }
 
@@ -1492,7 +1493,7 @@ namespace MAP {
                     && ( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_ability
                              == A_SUCTION_CUPS
                          || SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_ability
-                                == A_STICKY ) );
+                                == A_STICKY_HOLD ) );
 
             // Start wild PKMN battle here
             handleWildPkmn( FISHING_ROD, p_rodType, forceEncounter );

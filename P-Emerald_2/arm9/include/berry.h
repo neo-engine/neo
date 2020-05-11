@@ -27,6 +27,7 @@
 
 #pragma once
 
+/*
 #include <string>
 #include <nds.h>
 #include "item.h"
@@ -62,3 +63,4 @@ class berry : public item {
         this->m_itemType = BERRIES;
     }
 };
+*/

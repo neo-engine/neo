@@ -55,7 +55,7 @@ namespace BAG {
         void initUI( );
 
         bool confirmChoice( context p_context, u16 p_targetItem );
-        bool useItemOnPkmn( pokemon& p_pokemon, u16 p_item );
+        bool useItemOnPkmn( pokemon& p_pokemon, u16 p_item, ITEM::itemData& p_data );
         bool giveItemToPkmn( pokemon& p_pokemon, u16 p_item );
         void takeItemFromPkmn( pokemon& p_pokemon );
 

@@ -39,7 +39,7 @@ namespace IO {
       public:
         enum sprite_type { no_sprite = 0, sprite_pkmn = 1, sprite_trainer = 2 };
 
-        explicit messageBox( item* p_item, const u16 p_count );
+        explicit messageBox( u16 p_itemId, ITEM::itemData& p_data, const u16 p_count );
 
         explicit messageBox( const char* p_text, bool p_remsprites = true );
         explicit messageBox( const char* p_text, const char* p_name, bool p_a = true,

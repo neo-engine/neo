@@ -43,7 +43,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "startScreen.h"
 
 #include "berry.h"
-#include "hmMoves.h"
 #include "item.h"
 #include "pokemon.h"
 
@@ -276,28 +275,30 @@ int main( int, char** p_argv ) {
             for( u8 i = 0; i < 6; ++i ) {
                 if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
                 auto a = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
-                if( a.m_boxdata.m_individualValues.m_isEgg ) continue;
-                for( u8 j = 0; j < 4; ++j ) {
-                    if( !AttackList[ a.m_boxdata.m_moves[ j ] ]->m_isFieldAttack
-                        || !AttackList[ a.m_boxdata.m_moves[ j ] ]->possible( ) )
+                if( a.isEgg( ) ) continue;
+                for( u8 j = 0; j < 4; ++j ) for( u8 param = 0; param < 2; ++param ) {
+                    if( !MOVE::isFieldMove( a.m_boxdata.m_moves[ j ] )
+                        || !MOVE::possible( a.m_boxdata.m_moves[ j ], param )
+                        || !MOVE::text( a.m_boxdata.m_moves[ j ], param ) )
                         continue;
                     char buffer[ 50 ];
+                    auto mname = MOVE::getMoveName( a.m_boxdata.m_moves[ j ], CURRENT_LANGUAGE );
                     snprintf( buffer, 49, GET_STRING( 3 ),
-                              AttackList[ a.m_boxdata.m_moves[ j ] ]->text( ),
-                              AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                              GET_STRING( MOVE::text( a.m_boxdata.m_moves[ j ], param ) ),
+                              mname.c_str( ) );
                     IO::yesNoBox yn;
                     if( yn.getResult( buffer ) ) {
                         IO::NAV->draw( );
                         swiWaitForVBlank( );
                         snprintf( buffer, 49, GET_STRING( 99 ), a.m_boxdata.m_name,
-                                  AttackList[ a.m_boxdata.m_moves[ j ] ]->m_moveName.c_str( ) );
+                                  mname.c_str( ) );
                         IO::messageBox( buffer, 0, false );
                         MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale,
                                               a.m_boxdata.isShiny( ) );
                         IO::NAV->draw( true );
                         swiWaitForVBlank( );
 
-                        AttackList[ a.m_boxdata.m_moves[ j ] ]->use( );
+                        MOVE::use( a.m_boxdata.m_moves[ j ], param );
                     }
                     IO::NAV->draw( true );
                     goto OUT;

@@ -99,21 +99,21 @@ namespace BAG {
         std::swap( begin( p_bagType )[ p_idx1 ], begin( p_bagType )[ p_idx2 ] );
     }
 
-    bag::bagType toBagType( item::itemType p_itemType ) {
-        switch( p_itemType ) {
-        case item::GOODS:
-        case item::MAILS:
-        case item::POKE_BALLS:
-        case item::BATTLE_ITEM:
-            return bag::bagType::ITEMS;
-        case item::KEY_ITEM:
-            return bag::bagType::KEY_ITEMS;
-        case item::TM_HM:
-            return bag::bagType::TM_HM;
-        case item::MEDICINE:
-            return bag::bagType::MEDICINE;
-        case item::BERRIES:
+    bag::bagType toBagType( u8 p_itemType ) {
+        if( p_itemType & ITEM::ITEMTYPE_BERRY ) {
             return bag::bagType::BERRIES;
+        }
+
+        if( ( p_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
+            return bag::bagType::MEDICINE;
+        }
+
+        switch( p_itemType ) {
+        case ITEM::ITEMTYPE_FORMECHANGE:
+        case ITEM::ITEMTYPE_KEYITEM:
+            return bag::bagType::KEY_ITEMS;
+        case ITEM::ITEMTYPE_TM:
+            return bag::bagType::TM_HM;
         default:
             break;
         }

@@ -8,7 +8,7 @@ endif
 include $(DEVKITARM)/ds_rules
 
 GAME_TITLE	    :=	Pok_mon
-GAME_SUBTITLE1	:=  Smaragd Edition 2
+GAME_SUBTITLE1	:=  neo Version
 GAME_ICON       :=  $(CURDIR)/icon.bmp
 
 export TARGET		:=	$(shell basename $(CURDIR))

@@ -34,6 +34,8 @@
 #include "pokemon.h"
 #include "saveGame.h"
 #include "uio.h"
+#include "itemNames.h"
+#include "abilityNames.h"
 
 namespace SAVE {
     std::unique_ptr<saveGame> SAV;
@@ -51,7 +53,7 @@ namespace SAVE {
         }
         if( !m_stepCount ) {
             bool hasHatchSpdUp
-                = m_bag.count( BAG::toBagType( item::itemType::KEY_ITEM ), I_OVAL_CHARM );
+                = m_bag.count( BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_OVAL_CHARM );
             for( size_t s = 0; s < 6; ++s ) {
                 pokemon& ac = m_pkmnTeam[ s ];
                 if( !ac.m_boxdata.m_speciesId ) break;
@@ -63,7 +65,7 @@ namespace SAVE {
                 pokemon& ac = m_pkmnTeam[ s ];
                 if( !ac.m_boxdata.m_speciesId ) break;
 
-                if( ac.m_boxdata.m_individualValues.m_isEgg ) {
+                if( ac.isEgg( ) ) {
                     if( ac.m_boxdata.m_steps ) ac.m_boxdata.m_steps--;
                     if( hasHatchSpdUp && ac.m_boxdata.m_steps ) ac.m_boxdata.m_steps--;
                     if( !ac.m_boxdata.m_steps ) {
@@ -73,7 +75,7 @@ namespace SAVE {
                 } else
                     ac.m_boxdata.m_steps
                         = std::min( 255, ac.m_boxdata.m_steps + 1
-                                             + ( ac.m_boxdata.m_holdItem == I_CLEAR_BELL ) );
+                                             + ( ac.m_boxdata.m_heldItem == I_CLEAR_BELL ) );
             }
         }
     }
@@ -115,22 +117,6 @@ namespace SAVE {
         return res;
     }
 
-    std::vector<pokemon>   tmp;
-    BATTLE::battleTrainer* saveGame::playerInfo::getBattleTrainer( ) {
-        tmp.clear( );
-        for( u8 i = 0; i < 6; ++i )
-            if( m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                tmp.push_back( m_pkmnTeam[ i ] );
-            else
-                break;
-
-        return new BATTLE::battleTrainer( m_playername, "", "", "", "", tmp );
-    }
-    void saveGame::playerInfo::updateTeam( BATTLE::battleTrainer* p_trainer ) {
-        for( u8 i = 0; i < p_trainer->m_pkmnTeam.size( ); ++i )
-            m_pkmnTeam[ i ] = p_trainer->m_pkmnTeam[ i ];
-    }
-
     u16 saveGame::getDexCount( ) {
         u16 cnt = 0;
         for( u16 i = 0; i < MAX_PKMN; ++i )
@@ -138,7 +124,7 @@ namespace SAVE {
         return cnt;
     }
     // Return the idx of the resulting Box
-    s8 saveGame::storePkmn( const pokemon::boxPokemon& p_pokemon ) {
+    s8 saveGame::storePkmn( const boxPokemon& p_pokemon ) {
         s8 idx = m_storedPokemon[ getActiveFile( ).m_curBox ].getFirstFreeSpot( );
         u8 i   = 0;
         for( ; idx == -1 && i < MAX_BOXES; )

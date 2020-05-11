@@ -47,7 +47,7 @@ namespace STS {
         delete _stsUI;
     }
 
-    move* statusScreen::run( ) {
+    u8 statusScreen::run( ) {
         IO::fadeScreen( IO::fadeType::CLEAR_DARK_FAST );
         _stsUI->init( _pkmnIdx );
         auto tg  = _stsUI->draw( _pkmnIdx, true );
@@ -126,8 +126,7 @@ namespace STS {
                 }
             for( u8 i = 0; i < 5; ++i ) {
                 if( SAVE::SAV->getActiveFile( )
-                        .m_pkmnTeam[ _pkmnIdx ]
-                        .m_boxdata.m_individualValues.m_isEgg
+                        .m_pkmnTeam[ _pkmnIdx ].isEgg( )
                     && i != 2 )
                     continue;
                 if( GET_AND_WAIT_C( 62 + 32 * i, 14 - 2 * i, 14 ) ) {
@@ -143,53 +142,52 @@ namespace STS {
                 if( IN_RANGE_I( touch, tg[ i ] ) && IO::waitForInput( tg[ i ] ) ) {
                     u8 u = 0, o;
                     for( o = 0; o < 4 && u <= i; ++o )
-                        if( AttackList[ SAVE::SAV->getActiveFile( )
+                        if( MOVE::isFieldMove( SAVE::SAV->getActiveFile( )
                                             .m_pkmnTeam[ _pkmnIdx ]
-                                            .m_boxdata.m_moves[ o ] ]
-                                ->m_isFieldAttack )
+                                            .m_boxdata.m_moves[ o ] ) )
                             u++;
                     o--;
                     consoleSelect( &IO::Bottom );
                     consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                     consoleClear( );
-                    if( AttackList[ SAVE::SAV->getActiveFile( )
+                    for( u8 param = 0; param < 2; ++param )
+                        if( MOVE::possible( SAVE::SAV->getActiveFile( )
+                                    .m_pkmnTeam[ _pkmnIdx ]
+                                    .m_boxdata.m_moves[ o ], param ) ) {
+                            char buffer[ 50 ] = {0};
+                            snprintf(
+                                    buffer, 49, GET_STRING( 99 ),
+                                    SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx
+                                    ].m_boxdata.m_name,
+                                    MOVE::getMoveName( SAVE::SAV->getActiveFile( )
                                         .m_pkmnTeam[ _pkmnIdx ]
-                                        .m_boxdata.m_moves[ o ] ]
-                            ->possible( ) ) {
+                                        .m_boxdata.m_moves[ o ],
+                                        CURRENT_LANGUAGE ).c_str( ) );
+                            IO::messageBox a( buffer );
+                            IO::NAV->draw( );
 
-                        char buffer[ 50 ] = {0};
-                        snprintf(
-                            buffer, 49, GET_STRING( 99 ),
-                            SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name,
-                            AttackList[ SAVE::SAV->getActiveFile( )
-                                            .m_pkmnTeam[ _pkmnIdx ]
-                                            .m_boxdata.m_moves[ o ] ]
-                                ->m_moveName.c_str( ) );
-                        IO::messageBox a( buffer );
-                        IO::NAV->draw( );
+                            // shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
+                            //              (*_pokemon)[_pkmnIdx ].m_boxdata.m_isFemale,
+                            //              (*_pokemon)[_pkmnIdx ].m_boxdata.isShiny( ) );
 
-                        // shoUseAttack( (*_pokemon)[_pkmnIdx ].m_boxdata.m_speciesId,
-                        //              (*_pokemon)[_pkmnIdx ].m_boxdata.m_isFemale,
-                        //              (*_pokemon)[_pkmnIdx ].m_boxdata.isShiny( ) );
-
-                        return AttackList[ SAVE::SAV->getActiveFile( )
-                                               .m_pkmnTeam[ _pkmnIdx ]
-                                               .m_boxdata.m_moves[ o ] ];
-                    } else {
-                        IO::messageBox( GET_STRING( 100 ), GET_STRING( 91 ) );
-                        IO::fadeScreen( IO::fadeType::CLEAR_DARK_FAST );
-                        _stsUI->init( _pkmnIdx, false );
-                        tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
-
-                        if( mode != DEFAULT_MODE ) {
-                            mode = VIEW_DETAILS;
-                            rbs  = ribbon::getRibbons(
-                                SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ] );
-                            _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page,
-                                          true );
+                            return ( param << 15 ) | SAVE::SAV->getActiveFile( )
+                                .m_pkmnTeam[ _pkmnIdx ]
+                                .m_boxdata.m_moves[ o ];
                         }
-                        IO::fadeScreen( IO::fadeType::UNFADE_FAST );
+
+                    IO::messageBox( GET_STRING( 100 ), GET_STRING( 91 ) );
+                    IO::fadeScreen( IO::fadeType::CLEAR_DARK_FAST );
+                    _stsUI->init( _pkmnIdx, false );
+                    tg = _stsUI->draw( _pkmnIdx, mode == DEFAULT_MODE );
+
+                    if( mode != DEFAULT_MODE ) {
+                        mode = VIEW_DETAILS;
+                        rbs  = ribbon::getRibbons(
+                                SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ] );
+                        _stsUI->draw( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ], _page,
+                                true );
                     }
+                    IO::fadeScreen( IO::fadeType::UNFADE_FAST );
                     break;
                 }
 
@@ -197,24 +195,20 @@ namespace STS {
                 if( IN_RANGE_I( touch, tg[ tg.size( ) - 2 ] )
                     && IO::waitForInput( tg[ tg.size( ) - 2 ] ) ) {
                     if( SAVE::SAV->getActiveFile( )
-                            .m_pkmnTeam[ _pkmnIdx ]
-                            .m_boxdata.m_holdItem ) { // take item
+                            .m_pkmnTeam[ _pkmnIdx ].getItem( ) ) { // take item
                         char buffer[ 50 ];
-                        item acI = *ItemList[ SAVE::SAV->getActiveFile( )
-                                                  .m_pkmnTeam[ _pkmnIdx ]
-                                                  .m_boxdata.m_holdItem ];
-                        SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem = 0;
+                        u16 acI = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].takeItem( );
                         consoleSelect( &IO::Bottom );
                         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
                         consoleClear( );
 
-                        sprintf(
-                            buffer, GET_STRING( 101 ), acI.getDisplayName( true ).c_str( ),
+                        sprintf(buffer, GET_STRING( 101 ),
+                                ITEM::getItemName( acI, CURRENT_LANGUAGE ).c_str( ),
                             SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
                         IO::NAV->draw( );
                         IO::messageBox a( buffer );
-                        SAVE::SAV->getActiveFile( ).m_bag.insert( BAG::toBagType( acI.m_itemType ),
-                                                                  acI.getItemId( ), 1 );
+                        SAVE::SAV->getActiveFile( ).m_bag.insert( BAG::toBagType(
+                                    ITEM::getItemData( acI).m_itemType ), acI, 1 );
                     } else { // give item
                         BAG::bagViewer bv;
                         UPDATE_TIME = false;
@@ -223,14 +217,14 @@ namespace STS {
                         DRAW_TIME   = true;
                         if( itm ) {
                             if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].getItem( ) ) {
-                                auto curItm = ItemList[ SAVE::SAV->getActiveFile( )
+                                auto curItm = SAVE::SAV->getActiveFile( )
                                                             .m_pkmnTeam[ _pkmnIdx ]
-                                                            .getItem( ) ];
+                                                            .getItem( );
                                 SAVE::SAV->getActiveFile( ).m_bag.insert(
-                                    BAG::toBagType( curItm->m_itemType ), curItm->getItemId( ), 1 );
+                                    BAG::toBagType( ITEM::getItemData( curItm ).m_itemType ),
+                                    curItm, 1 );
                             }
-                            SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_holdItem
-                                = itm;
+                            SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].giveItem( itm );
                         }
                     }
                     IO::fadeScreen( IO::fadeType::CLEAR_DARK_FAST );

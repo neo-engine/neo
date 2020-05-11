@@ -25,8 +25,11 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "moveChoiceBox.h"
+#include <algorithm>
+#include <cmath>
+
 #include "defines.h"
+#include "moveChoiceBox.h"
 #include "move.h"
 #include "saveGame.h"
 #include "uio.h"
@@ -34,9 +37,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "Back.h"
 #include "Backward.h"
 #include "Forward.h"
-
-#include <algorithm>
-#include <cmath>
 
 namespace IO {
 
@@ -59,17 +59,17 @@ namespace IO {
 
         for( u8 i = 0; i < 4 + !!_moveToLearn; ++i ) {
             auto moveIdx              = ( i < 4 ) ? _pokemon.m_boxdata.m_moves[ i ] : _moveToLearn;
-            auto acMove               = AttackList[ moveIdx ];
-            BG_PALETTE_SUB[ 240 + i ] = moveIdx ? IO::getColor( acMove->m_moveType ) : GRAY;
+            if( !moveIdx ) continue;
+
+            auto acMove               = MOVE::getMoveData( moveIdx );
+            BG_PALETTE_SUB[ 240 + i ] = moveIdx ? IO::getColor( acMove.m_type ) : GRAY;
 
             printChoiceBox(
                 CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ], CHOICE_POS[ !!_moveToLearn ][ i ][ 1 ],
                 CHOICE_POS[ !!_moveToLearn ][ i ][ 2 ], CHOICE_POS[ !!_moveToLearn ][ i ][ 3 ], 4,
                 ( _selectedIdx == i ) ? RED_IDX : 240 + i, i == p_pressedIdx );
 
-            if( !acMove ) continue;
-
-            regularFont->printString( acMove->m_moveName.c_str( ),
+            regularFont->printString( MOVE::getMoveName( moveIdx, CURRENT_LANGUAGE ).c_str( ),
                                       CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ]
                                           + ( CHOICE_POS[ !!_moveToLearn ][ i ][ 2 ]
                                               - CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ] )
@@ -79,8 +79,8 @@ namespace IO {
                                           + ( p_pressedIdx == i ),
                                       true, IO::font::CENTER );
             char buffer[ 30 ];
-            u8   curPP = ( i < 4 ) ? _pokemon.m_boxdata.m_acPP[ i ] : acMove->m_movePP;
-            snprintf( buffer, 20, "%hhu/%hhu%s", curPP, acMove->m_movePP, GET_STRING( 31 ) );
+            u8   curPP = ( i < 4 ) ? _pokemon.m_boxdata.m_acPP[ i ] : acMove.m_pp;
+            snprintf( buffer, 20, "%hhu/%hhu%s", curPP, acMove.m_pp, GET_STRING( 31 ) );
             regularFont->printString(
                 buffer, CHOICE_POS[ !!_moveToLearn ][ i ][ 2 ] - 5 + 2 * ( p_pressedIdx == i ),
                 CHOICE_POS[ !!_moveToLearn ][ i ][ 1 ] + 20 + ( p_pressedIdx == i ), true,
@@ -92,8 +92,8 @@ namespace IO {
                 = ( p_pressedIdx == i ) + CHOICE_POS[ !!_moveToLearn ][ i ][ 1 ] + 20;
 
             if( !_moveToLearn ) {
-                if( acMove->m_moveBasePower && acMove->m_moveHitType != move::STAT )
-                    snprintf( buffer, 20, "%s %hhu", GET_STRING( 184 ), acMove->m_moveBasePower );
+                if( acMove.m_basePower && acMove.m_category != MOVE::STATUS )
+                    snprintf( buffer, 20, "%s %hhu", GET_STRING( 184 ), acMove.m_basePower );
                 else
                     snprintf( buffer, 20, "%s ---", GET_STRING( 184 ) );
                 regularFont->printString(
@@ -127,22 +127,22 @@ namespace IO {
 
         for( u8 i = 0; i < 4; ++i ) {
             if( !p_pokemon.m_boxdata.m_moves[ i ] ) break;
-            tileCnt = loadTypeIcon( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveType,
+            MOVE::moveData mdata = MOVE::getMoveData( p_pokemon.m_boxdata.m_moves[ i ] );
+            tileCnt = loadTypeIcon( mdata.m_type,
                                     CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ] + 6,
                                     CHOICE_POS[ !!_moveToLearn ][ i ][ 1 ] + 20, 3 + 2 * i, 3 + 2 * i,
                                 tileCnt, true, SAVE::SAV->getActiveFile( ).m_options.m_language );
             if( !_moveToLearn )
-                tileCnt = loadDamageCategoryIcon(
-                    AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveHitType,
+                tileCnt = loadDamageCategoryIcon( mdata.m_category,
                     CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ] + 6,
                     CHOICE_POS[ !!_moveToLearn ][ i ][ 1 ] + 38, 4 + 2 * i, 4 + 2 * i, tileCnt,
                     true );
         }
         if( _moveToLearn ) {
-            tileCnt = loadTypeIcon( AttackList[ _moveToLearn ]->m_moveType, 12, 134, 11, 11, tileCnt,
+            MOVE::moveData mdata = MOVE::getMoveData( _moveToLearn );
+            tileCnt = loadTypeIcon( mdata.m_type, 12, 134, 11, 11, tileCnt,
                                 true, SAVE::SAV->getActiveFile( ).m_options.m_language );
-            tileCnt = loadDamageCategoryIcon( AttackList[ _moveToLearn ]->m_moveHitType, 44, 134,
-                                              12, 12, tileCnt, true );
+            tileCnt = loadDamageCategoryIcon( mdata.m_category, 44, 134, 12, 12, tileCnt, true );
         }
     }
 

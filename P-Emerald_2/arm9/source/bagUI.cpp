@@ -148,41 +148,42 @@ namespace BAG {
         for( u8 i = 0; i < 6; ++i ) {
             auto acPkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
             if( !acPkmn.m_boxdata.m_speciesId ) break;
-            if( acPkmn.m_boxdata.m_individualValues.m_isEgg )
+            if( acPkmn.isEgg( ) )
                 tileCnt = IO::loadEggIcon( 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
             else
                 tileCnt = IO::loadPKMNIcon( acPkmn.m_boxdata.m_speciesId, 8, 26 + i * 26,
-                                            PKMN_SUB + i, PKMN_SUB + i, tileCnt );
+                                            PKMN_SUB + i, PKMN_SUB + i, tileCnt, true,
+                                            acPkmn.getForme( ), acPkmn.isShiny( ),
+                                            acPkmn.isFemale( ) );
             IO::Oam->oamBuffer[ PKMN_SUB + i ].priority = OBJPRIORITY_3;
         }
         return tileCnt;
     }
 
-    void drawItemTop( item* p_item, u16 p_count ) {
+    void drawItemTop( u16 p_itemId, ITEM::itemData& p_data, u16 p_count ) {
         std::string display;
         std::string descr;
         IO::OamTop->oamBuffer[ 0 ].isHidden = true;
         IO::OamTop->oamBuffer[ 1 ].isHidden = true;
         IO::OamTop->oamBuffer[ 2 ].isHidden = true;
 
-        if( p_item->m_itemType != item::itemType::TM_HM ) {
-            IO::loadItemIcon( p_item->m_itemName, 112, 46, 0, 0, 0, false );
+        if( p_data.m_itemType != ITEM::ITEMTYPE_TM ) {
+            IO::loadItemIcon( p_itemId, 112, 44, 0, 0, 0, false );
             IO::OamTop->oamBuffer[ 1 ].isHidden = true;
             IO::OamTop->oamBuffer[ 2 ].isHidden = true;
 
-            display = p_item->getDisplayName( true );
-            descr   = p_item->getDescription( );
+            display = ITEM::getItemName( p_itemId, CURRENT_LANGUAGE );
+            // descr   = ITEM::getDescription( p_itemId, CURRENT_LANGUAGE );
             char buffer[ 100 ];
 
-            if( p_item->m_itemType != item::itemType::KEY_ITEM ) {
+            if( p_data.m_itemType != ITEM::ITEMTYPE_KEYITEM
+                && p_data.m_itemType != ITEM::ITEMTYPE_FORMECHANGE ) {
                 snprintf( buffer, 99, "x %d", p_count );
-                IO::regularFont->printString( buffer, 144, 53, false );
+                IO::regularFont->printString( buffer, 146, 52, false );
             }
 
-            if( p_item->m_itemType == item::itemType::BERRIES ) {
-                berry* curr = static_cast<berry*>( p_item );
-                curr->load( );
-
+            if( p_data.m_itemType & ITEM::ITEMTYPE_BERRY ) {
+                /*
                 IO::regularFont->setColor( RED_IDX, 1 );
                 snprintf( buffer, 99, GET_STRING( 16 ),
                           ( curr->m_berryData.m_berryGuete == berry::berryGueteType::HARD )
@@ -221,46 +222,46 @@ namespace BAG {
                 }
                 IO::regularFont->setColor( GRAY_IDX, 2 );
                 IO::regularFont->setColor( BLACK_IDX, 1 );
+                */
             }
         } else {
-            auto mv = *( static_cast<TM*>( p_item ) );
-
-            u16 tileCnt = IO::loadTMIcon( AttackList[ mv.m_moveIdx ]->m_moveType,
-                                          AttackList[ mv.m_moveIdx ]->m_isFieldAttack, 112, 46, 0,
-                                          0, 0, false );
+            MOVE::moveData move = MOVE::getMoveData( p_data.m_param2 );
+            u16 tileCnt = IO::loadTMIcon( move.m_type, MOVE::isFieldMove( p_data.m_param2 ),
+                                          112, 44, 0, 0, 0, false );
 
             display
-                = p_item->getDisplayName( true ) + ": " + AttackList[ mv.m_moveIdx ]->m_moveName;
-            descr = FS::breakString( AttackList[ mv.m_moveIdx ]->description( ), IO::regularFont,
-                                     196 );
+                = ITEM::getItemName( p_itemId, CURRENT_LANGUAGE )
+                + ": " + MOVE::getMoveName( p_data.m_param2, CURRENT_LANGUAGE );
+
+            // TODO
+            descr = FS::breakString( "", IO::regularFont, 196 );
 
             IO::regularFont->printString( GET_STRING( 29 ), 33, 145, false );
             tileCnt
-                = IO::loadTypeIcon( AttackList[ mv.m_moveIdx ]->m_moveType, 62, 144, 1, 1, tileCnt,
-                                    false, SAVE::SAV->getActiveFile( ).m_options.m_language );
+                = IO::loadTypeIcon( move.m_type, 62, 144, 1, 1, tileCnt,
+                                    false, CURRENT_LANGUAGE );
 
             IO::regularFont->printString( GET_STRING( 30 ), 100, 145, false );
-            IO::loadDamageCategoryIcon( AttackList[ mv.m_moveIdx ]->m_moveHitType, 152, 144, 2, 2,
+            IO::loadDamageCategoryIcon( move.m_category, 152, 144, 2, 2,
                                         tileCnt, false );
 
             IO::regularFont->printString( GET_STRING( 31 ), 190, 145, false );
             char buffer[ 100 ];
-            snprintf( buffer, 99, "%2d", AttackList[ mv.m_moveIdx ]->m_movePP );
+            snprintf( buffer, 99, "%2d", move.m_pp );
             IO::regularFont->printString( buffer, 229, 145, false, IO::font::RIGHT );
 
             IO::regularFont->setColor( RED_IDX, 1 );
             IO::regularFont->printString( GET_STRING( 32 ), 33, 160, false );
-            if( AttackList[ mv.m_moveIdx ]->m_moveHitType != move::moveHitTypes::STAT
-                && AttackList[ mv.m_moveIdx ]->m_moveBasePower > 1 )
-                snprintf( buffer, 99, "%3d", AttackList[ mv.m_moveIdx ]->m_moveBasePower );
+            if( move.m_category != MOVE::STATUS && move.m_basePower > 1 )
+                snprintf( buffer, 99, "%3d", move.m_basePower );
             else
                 snprintf( buffer, 99, "---" );
             IO::regularFont->printString( buffer, 108, 160, false, IO::font::RIGHT );
 
             IO::regularFont->setColor( BLUE_IDX, 1 );
             IO::regularFont->printString( GET_STRING( 33 ), 124, 160, false );
-            if( AttackList[ mv.m_moveIdx ]->m_moveAccuracy )
-                snprintf( buffer, 99, "%3d", AttackList[ mv.m_moveIdx ]->m_moveAccuracy );
+            if( move.m_accuracy )
+                snprintf( buffer, 99, "%3d", move.m_accuracy );
             else
                 std::sprintf( buffer, "---" );
             IO::regularFont->printString( buffer, 229, 160, false, IO::font::RIGHT );
@@ -273,7 +274,8 @@ namespace BAG {
         IO::updateOAM( false );
     }
 
-    std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> bagUI::drawPkmn( item* p_item ) {
+    std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> bagUI::drawPkmn( u16 p_itemId,
+            ITEM::itemData& p_data ) {
         std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> res;
         for( u8 i = 0; i < 6; ++i ) {
             if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
@@ -288,9 +290,9 @@ namespace BAG {
             } else {
                 res.push_back(
                     {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),
-                     {SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_holdItem, true}} );
-                if( p_item && p_item->m_itemType == item::itemType::TM_HM ) {
-                    u16 currMv = static_cast<TM*>( p_item )->m_moveIdx;
+                     {SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].getItem( ), true}} );
+                if( p_itemId && p_data.m_itemType == ITEM::ITEMTYPE_TM ) {
+                    u16 currMv = p_data.m_param2;
                     if( currMv == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 0 ]
                         || currMv
                                == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 1 ]
@@ -318,7 +320,7 @@ namespace BAG {
                         IO::regularFont->printString( GET_STRING( 37 ), 40, 33 + 26 * i, true,
                                                       IO::font::LEFT, 11 );
                     }
-                } else if( p_item && p_item->m_itemType == item::itemType::MEDICINE ) {
+                } else if( p_itemId && ( p_data.m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
                     char buffer[ 100 ];
                     if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP ) {
                         snprintf( buffer, 99, GET_STRING( 38 ),
@@ -332,9 +334,8 @@ namespace BAG {
                     IO::regularFont->printString( buffer, 40, 33 + 26 * i, true, IO::font::LEFT,
                                                   11 );
                 } else {
-                    if( p_item && p_item->getEffectType( ) == item::itemEffectType::USE_ON_PKMN ) {
-                        if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].canEvolve(
-                                p_item->getItemId( ), 3 ) ) {
+                    if( p_itemId && p_data.m_itemType == ITEM::ITEMTYPE_EVOLUTION ) {
+                        if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].canEvolve( p_itemId, 3 ) ) {
                             BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
                             IO::regularFont->setColor( COLOR_IDX, 1 );
                             IO::regularFont->setColor( BLACK_IDX, 2 );
@@ -353,13 +354,10 @@ namespace BAG {
                         IO::regularFont->setColor( BLACK_IDX, 2 );
                         IO::regularFont->setColor( GRAY_IDX, 1 );
 
-                        if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_holdItem ) {
-                            IO::regularFont->printString( ItemList[ SAVE::SAV->getActiveFile( )
-                                                                        .m_pkmnTeam[ i ]
-                                                                        .m_boxdata.m_holdItem ]
-                                                              ->getDisplayName( true )
-                                                              .c_str( ),
-                                                          40, 44 + 26 * i, true );
+                        if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].getItem( ) ) {
+                            IO::regularFont->printString( ITEM::getItemName(
+                                    SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].getItem( ),
+                                    CURRENT_LANGUAGE ).c_str( ), 40, 44 + 26 * i, true );
                         } else
                             IO::regularFont->printString( GET_STRING( 42 ), 40, 44 + 26 * i, true );
                     }
@@ -371,42 +369,41 @@ namespace BAG {
         return res;
     }
 
-    void drawItemSub( item* p_item, u16 p_x, u16 p_y, bool p_selected, bool p_pressed,
-                      bool p_clearOnly = false ) {
+    void drawItemSub( u16 p_itemId, ITEM::itemData& p_data, u16 p_x, u16 p_y, bool p_selected,
+                      bool p_pressed, bool p_clearOnly = false ) {
         IO::printRectangle( p_x, p_y, 255, p_y + 18, true, 0 );
-        if( p_clearOnly || !p_item ) return;
-        if( p_item->m_itemType != item::itemType::GOODS
-            && toBagType( p_item->m_itemType ) == bag::bagType::ITEMS ) {
+        if( p_clearOnly || !p_itemId ) return;
+        /* if( p_item->m_itemType != item::itemType::GOODS
+            && toBagType( p_data.m_itemType ) == bag::bagType::ITEMS ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
                                 p_selected ? RED_IDX : GRAY_IDX, p_pressed );
             IO::boldFont->printChar( 490 - 22 + u16( p_item->m_itemType ),
                                      p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
-        } else if( p_item->getItemId( ) == SAVE::SAV->getActiveFile( ).m_registeredItem ) {
+        } else */ if( p_itemId == SAVE::SAV->getActiveFile( ).m_registeredItem ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
                                 p_selected ? RED_IDX : GRAY_IDX, p_pressed );
             IO::boldFont->printChar( 'Y', p_x + 106 + 2 * p_pressed, p_y - 2 + p_pressed, true );
-        } else if( p_item->m_itemType == item::itemType::TM_HM
-                   && AttackList[ static_cast<TM*>( p_item )->m_moveIdx ]->m_isFieldAttack ) {
+        } else if( p_data.m_itemType == ITEM::ITEMTYPE_TM
+                && MOVE::isFieldMove( p_data.m_param2 ) ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
                                 p_selected ? RED_IDX : GRAY_IDX, p_pressed );
             IO::boldFont->setColor( BLUE_IDX, 2 );
-            IO::boldFont->printChar( 490 - 22 + u16( p_item->m_itemType ),
-                                     p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
+            IO::boldFont->printChar( 468 + 2, p_x + 102 + 2 * p_pressed,
+                                     p_y - 2 + p_pressed, true );
             IO::boldFont->setColor( WHITE_IDX, 2 );
-        } else if( p_item->m_itemType == item::itemType::TM_HM ) {
+        } else if( p_data.m_itemType == ITEM::ITEMTYPE_TM ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
                                 p_selected ? RED_IDX : GRAY_IDX, p_pressed );
-            IO::boldFont->printChar( 490 - 22 + u16( p_item->m_itemType ),
-                                     p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
+            IO::boldFont->printChar( 468 + 2, p_x + 102 + 2 * p_pressed,
+                                     p_y - 2 + p_pressed, true );
         } else
             IO::printChoiceBox( p_x, p_y, p_x + 106, p_y + 16, 3, p_selected ? RED_IDX : GRAY_IDX,
                                 p_pressed );
-        if( p_item->m_itemType != item::itemType::TM_HM )
-            IO::regularFont->printString( p_item->getDisplayName( true ).c_str( ),
-                                          p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
+        if( p_data.m_itemType != ITEM::ITEMTYPE_TM )
+            IO::regularFont->printString( ITEM::getItemName( p_itemId, CURRENT_LANGUAGE )
+                    .c_str( ), p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
         else
-            IO::regularFont->printString(
-                AttackList[ static_cast<TM*>( p_item )->m_moveIdx ]->m_moveName.c_str( ),
+            IO::regularFont->printString( MOVE::getMoveName( p_data.m_param2, CURRENT_LANGUAGE ).c_str( ),
                 p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
     }
 
@@ -417,17 +414,19 @@ namespace BAG {
         IO::regularFont->printString( GET_STRING( 11 + p_page ), 128, 4, false, IO::font::CENTER );
     }
 
-    void bagUI::selectItem( u8 p_idx, std::pair<u16, u16> p_item, bool p_pressed ) {
-        drawPkmn( ItemList[ p_item.first ] );
-        drawItemTop( ItemList[ p_item.first ], p_item.second );
+    void bagUI::selectItem( u8 p_idx, std::pair<u16, u16> p_item, ITEM::itemData& p_data,
+            bool p_pressed ) {
+        drawPkmn( p_item.first, p_data );
+        drawItemTop( p_item.first, p_data, p_item.second );
         if( p_idx < MAX_ITEMS_PER_PAGE )
-            drawItemSub( ItemList[ p_item.first ], 132, 4 + p_idx * 18, true, p_pressed, false );
+            drawItemSub( p_item.first, p_data, 132, 4 + p_idx * 18, true, p_pressed, false );
     }
-    void bagUI::unselectItem( bag::bagType p_page, u8 p_idx, u16 p_item ) {
-        drawPkmn( 0 );
+    void bagUI::unselectItem( bag::bagType p_page, u8 p_idx, u16 p_item,
+            ITEM::itemData& p_data ) {
+        drawPkmn( 0, p_data );
         drawTop( p_page );
         if( p_idx < MAX_ITEMS_PER_PAGE )
-            drawItemSub( ItemList[ p_item ], 132, 4 + p_idx * 18, false, false, false );
+            drawItemSub( p_item, p_data, 132, 4 + p_idx * 18, false, false, false );
     }
 
     std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>>
@@ -446,26 +445,26 @@ namespace BAG {
         drawTop( p_page );
         initColors( );
 
-        auto pkmnTg = drawPkmn( 0 );
+        ITEM::itemData empty = { 0, 0, 0, 0, 0, 0, 0 };
+        auto pkmnTg = drawPkmn( 0, empty );
         if( !SAVE::SAV->getActiveFile( ).m_bag.empty( p_page ) ) {
             u16 sz = SAVE::SAV->getActiveFile( ).m_bag.size( p_page );
             for( u8 i = 0; i < 9; ++i ) {
-                drawItemSub( ItemList[ SAVE::SAV->getActiveFile( )
-                                           .m_bag( p_page, ( p_firstDisplayedItem + i ) % sz )
-                                           .first ],
-                             132, 4 + i * 18, false, false, i >= sz );
+                u16 curitem = SAVE::SAV->getActiveFile( ).m_bag( p_page,
+                        ( p_firstDisplayedItem + i ) % sz ).first;
+                ITEM::itemData data = ITEM::getItemData( curitem );
 
-                if( i < sz )
+                drawItemSub( curitem, data, 132, 4 + i * 18, false, false, i >= sz );
+
+                if( i < sz ) {
                     res.push_back( {IO::inputTarget( 132, 4 + i * 18, 256, 20 + i * 18 ),
-                                    {SAVE::SAV->getActiveFile( )
-                                         .m_bag( p_page, ( p_firstDisplayedItem + i ) % sz )
-                                         .first,
-                                     false}} );
+                                    { curitem, 0 }} );
+                }
             }
         } else {
             for( u8 i = 0; i < 5; ++i ) {
-                drawItemSub( 0, 132, 76 + 18 * i, false, false, true );
-                drawItemSub( 0, 132, 76 - 18 * i, false, false, true );
+                drawItemSub( 0, empty, 132, 76 + 18 * i, false, false, true );
+                drawItemSub( 0, empty, 132, 76 - 18 * i, false, false, true );
                 IO::OamTop->oamBuffer[ i ].isHidden = true;
             }
             IO::regularFont->printString( GET_STRING( 43 ), 182, 89, true, IO::font::CENTER );
@@ -482,36 +481,35 @@ namespace BAG {
         IO::updateOAM( true );
     }
 
-    bool bagUI::getSprite( u8 p_idx, std::pair<u16, u16> p_item ) {
+    bool bagUI::getSprite( u8 p_idx, std::pair<u16, u16> p_item, ITEM::itemData& p_data ) {
         if( !p_item.first ) return false;
 
         if( p_idx >= MAX_ITEMS_PER_PAGE ) { // It's a PKMN
             if( !SAVE::SAV->getActiveFile( )
-                     .m_pkmnTeam[ p_idx - MAX_ITEMS_PER_PAGE ]
-                     .m_boxdata.m_holdItem ) // Something went wrong
+                     .m_pkmnTeam[ p_idx - MAX_ITEMS_PER_PAGE ].getItem( ) ) // Something went wrong
                 return false;
         }
 
-        if( ItemList[ p_item.first ]->m_itemType != item::itemType::TM_HM ) {
-            IO::loadItemIcon( ItemList[ p_item.first ]->m_itemName, 0, 0, TRANSFER_SUB,
+        if( p_data.m_itemType != ITEM::ITEMTYPE_TM ) {
+            IO::loadItemIcon( p_item.first, 0, 0, TRANSFER_SUB,
                               TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
         } else {
-            IO::loadTMIcon(
-                AttackList[ static_cast<TM*>( ItemList[ p_item.first ] )->m_moveIdx ]->m_moveType,
-                AttackList[ static_cast<TM*>( ItemList[ p_item.first ] )->m_moveIdx ]
-                    ->m_isFieldAttack,
-                0, 0, TRANSFER_SUB, TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
+            MOVE::moveData move = MOVE::getMoveData( p_data.m_param2 );
+
+            IO::loadTMIcon( move.m_type, MOVE::isFieldMove( p_data.m_param2 ), 0, 0,
+                    TRANSFER_SUB, TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
         }
 
-        selectItem( p_idx, p_item, true );
+        selectItem( p_idx, p_item, p_data, true );
         return true;
     }
 
-    void bagUI::dropSprite( bag::bagType p_page, u8 p_idx, std::pair<u16, u16> p_item ) {
+    void bagUI::dropSprite( bag::bagType p_page, u8 p_idx, std::pair<u16, u16> p_item,
+            ITEM::itemData& p_data ) {
         IO::Oam->oamBuffer[ TRANSFER_SUB ].isHidden = true;
         IO::updateOAM( true );
 
-        unselectItem( p_page, p_idx, p_item.first );
-        selectItem( p_idx, p_item );
+        unselectItem( p_page, p_idx, p_item.first, p_data );
+        selectItem( p_idx, p_item, p_data );
     }
 } // namespace BAG

@@ -26,6 +26,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <algorithm>
+#include <cassert>
 #include <cstdio>
 #include <cstring>
 #include <initializer_list>
@@ -33,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "ability.h"
+#include "battleTrainer.h"
 #include "berry.h"
 #include "defines.h"
 #include "fs.h"
@@ -44,32 +46,19 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "messageBox.h"
 
-const char ITEM_PATH[]        = "nitro:/ITEMS/";
 const char PKMNDATA_PATH[]    = "nitro:/PKMNDATA/";
-const char ABILITYDATA_PATH[] = "nitro:/PKMNDATA/ABILITIES/";
 const char SCRIPT_PATH[]      = "nitro:/MAPS/SCRIPTS/";
 
-ability::ability( int p_abilityId ) {
-    FILE* f = FS::openSplit( ABILITYDATA_PATH, p_abilityId, ".data" );
+const char ITEM_NAME_PATH[]    = "nitro:/DATA/ITEM_NAME/";
+const char ITEM_DATA_PATH[]    = "nitro:/DATA/ITEM_DATA/";
+const char ABILITY_NAME_PATH[] = "nitro:/DATA/ABTY_NAME/";
+const char MOVE_NAME_PATH[]    = "nitro:/DATA/MOVE_NAME/";
+const char MOVE_DATA_PATH[]    = "nitro:/DATA/MOVE_DATA/";
+const char POKEMON_NAME_PATH[] = "nitro:/DATA/PKMN_NAME/";
+const char POKEMON_DATA_PATH[] = "nitro:/DATA/PKMN_DATA/";
+const char PKMN_LEARNSET_PATH[] = "nitro:/DATA/PKMN_LEARN/";
 
-    if( !f ) return;
-
-    m_abilityName = FS::readString( f, true );
-    m_flavourText = FS::readString( f, true );
-    u32 tmp;
-    fscanf( f, "%lu", &tmp );
-    m_type = static_cast<ability::abilityType>( tmp );
-    FS::close( f );
-}
-
-std::string getAbilityName( int p_abilityId ) {
-    FILE* f = FS::openSplit( ABILITYDATA_PATH, p_abilityId, ".data" );
-
-    if( !f ) return "---";
-    auto ret = FS::readString( f, false );
-    FS::close( f );
-    return ret;
-}
+const char BATTLE_TRAINER_PATH[] = "n/a";
 
 namespace FS {
     bool exists( const char* p_path, const char* p_name ) {
@@ -292,7 +281,10 @@ namespace FS {
         return true;
     }
 
+    [[deprecated]]
     std::string readString( FILE* p_file, bool p_new ) {
+        (void) p_new;
+
         std::string ret = "";
         int         ac;
 
@@ -312,10 +304,7 @@ namespace FS {
             else
                 ret += ac;
         }
-        if( !p_new )
-            return convertToOld( ret );
-        else
-            return ret;
+        return ret;
     }
 
     std::string breakString( const std::string& p_string, u8 p_lineLength ) {
@@ -385,39 +374,6 @@ namespace FS {
         return result;
     }
 
-    std::string convertToOld( const std::string& p_string ) {
-        std::string ret = "";
-        for( auto ac = p_string.begin( ); ac != p_string.end( ); ++ac ) {
-            if( *ac == 'ä' )
-                ret += '\x84';
-            else if( *ac == 'Ä' )
-                ret += '\x8E';
-            else if( *ac == 'ü' )
-                ret += '\x81';
-            else if( *ac == 'Ü' )
-                ret += '\x9A';
-            else if( *ac == 'ö' )
-                ret += '\x94';
-            else if( *ac == 'Ö' )
-                ret += '\x99';
-            else if( *ac == 'ß' )
-                ret += '\x9D';
-            else if( *ac == 'é' )
-                ret += '\x82';
-            else if( *ac == '%' )
-                ret += ' ';
-            else if( *ac == '|' )
-                ret += (char) 136;
-            else if( *ac == '#' )
-                ret += (char) 137;
-            else if( *ac == '\r' )
-                ret += "";
-            else
-                ret += *ac;
-        }
-        return ret;
-    }
-
     std::string getLocation( u16 p_ind ) {
         if( p_ind > 5000 ) return FARAWAY_PLACE;
         FILE* f = FS::openSplit( "nitro:/LOCATIONS/", p_ind, ".data", 5000 );
@@ -452,25 +408,178 @@ namespace FS {
     }
 } // namespace FS
 
+namespace ITEM {
+    bool getItemName( const u16 p_itemId, const u8 p_language, char* p_out ) {
+        FILE* f = FS::openSplit( ITEM_NAME_PATH, p_itemId, ".str" );
+        if( !f ) return false;
+
+        for( int i = 0; i <= p_language; ++i ) {
+            fread( p_out, 1, ITEM_NAMELENGTH, f );
+        }
+        fclose( f );
+        return true;
+    }
+    std::string getItemName( const u16 p_itemId, const u8 p_language ) {
+        char tmpbuf[ ITEM_NAMELENGTH ];
+        if( !getItemName( p_itemId, p_language, tmpbuf ) ) {
+            return "---";
+        }
+        return std::string( tmpbuf );
+    }
+
+    itemData getItemData( const u16 p_itemId ) {
+        itemData res;
+        if( getItemData( p_itemId, &res ) ) {
+            return res;
+        }
+        getItemData( 0, &res );
+        return res;
+    }
+    bool getItemData( const u16 p_itemId, itemData* p_out ) {
+        FILE* f = FS::openSplit( ITEM_DATA_PATH, p_itemId, ".data" );
+        if( !f ) return false;
+        fread( p_out, sizeof( itemData ), 1, f );
+        fclose( f );
+        return true;
+    }
+}
+
+namespace MOVE {
+    bool getMoveName( const u16 p_moveId, const u8 p_language, char* p_out ) {
+        FILE* f = FS::openSplit( MOVE_NAME_PATH, p_moveId, ".str" );
+        if( !f ) return false;
+
+        for( int i = 0; i <= p_language; ++i ) {
+            fread( p_out, 1, MOVE_NAMELENGTH, f );
+        }
+        fclose( f );
+        return true;
+    }
+
+    std::string getMoveName( const u16 p_moveId, const u8 p_language ) {
+        char tmpbuf[ MOVE_NAMELENGTH ];
+        if( !getMoveName( p_moveId, p_language, tmpbuf ) ) {
+            return "---";
+        }
+        return std::string( tmpbuf );
+    }
+
+    moveData getMoveData( const u16 p_moveId ) {
+        moveData res;
+        if( getMoveData( p_moveId, &res ) ) {
+            return res;
+        }
+        getMoveData( 0, &res );
+        return res;
+    }
+    bool getMoveData( const u16 p_moveId, moveData* p_out ) {
+        FILE* f = FS::openSplit( MOVE_DATA_PATH, p_moveId, ".data" );
+        if( !f ) return false;
+        fread( p_out, sizeof( moveData ), 1, f );
+        fclose( f );
+        return true;
+    }
+}
+
+namespace BATTLE {
+    battleTrainer getBattleTrainer( u16 p_battleTrainerId, u8 p_language ) {
+        battleTrainer res;
+        if( getBattleTrainer( p_battleTrainerId, p_language, &res ) ) {
+            return res;
+        }
+        getBattleTrainer( 0, p_language, &res );
+        return res;
+    }
+    bool getBattleTrainer( u16 p_battleTrainerId, u8 p_language, battleTrainer* p_out ) {
+        FILE* f = FS::openSplit( BATTLE_TRAINER_PATH, p_battleTrainerId,
+                ( "-" + std::to_string( p_language ) + ".data" ).c_str( ) );
+        if( !f ) return false;
+        fread( p_out, sizeof( battleTrainer ), 1, f );
+        fclose( f );
+        return true;
+    }
+}
+
+bool getAbilityName( int p_abilityId, int p_language, char* p_out ) {
+    FILE* f = FS::openSplit( ABILITY_NAME_PATH, p_abilityId, ".str" );
+    if( !f ) return false;
+
+    for( int i = 0; i <= p_language; ++i ) {
+        fread( p_out, 1, ABILITY_NAMELENGTH, f );
+    }
+    fclose( f );
+    return true;
+}
+
+std::string getAbilityName( int p_abilityId, int p_language ) {
+    char tmpbuf[ ABILITY_NAMELENGTH ];
+    if( !getAbilityName( p_abilityId, p_language, tmpbuf ) ) {
+        return "---";
+    }
+    return std::string( tmpbuf );
+}
+
 std::string toString( u16 p_num ) {
     char buffer[ 32 ];
     sprintf( buffer, "%hu", p_num );
     return std::string( buffer );
 }
 
-std::string getDisplayName( u16 p_pkmnId, u8 p_forme ) {
-    pokemonData tmp;
-    if( !getAll( p_pkmnId, tmp, p_forme ) ) { return "???"; }
-    return tmp.m_displayName;
-}
-void getDisplayName( u16 p_pkmnId, char* p_name, u8 p_forme ) {
-    pokemonData tmp;
-    if( !getAll( p_pkmnId, tmp, p_forme ) ) {
-        strcpy( p_name, "???" );
-        return;
+std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
+    char tmpbuf[ 20 ];
+    if( !getDisplayName( p_pkmnId, tmpbuf, p_language, p_forme ) ) {
+        return "???";
     }
-    strcpy( p_name, tmp.m_displayName );
+    return std::string( tmpbuf );
 }
+bool getDisplayName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
+    FILE* f;
+    if( p_forme ) {
+        char tmpbuf[ 40 ];
+        snprintf( tmpbuf, 35, "_%hhu.str", p_forme );
+        f = FS::openSplit( POKEMON_NAME_PATH, p_pkmnId, tmpbuf );
+    }
+    if( !p_forme || !f ) {
+        f = FS::openSplit( POKEMON_NAME_PATH, p_pkmnId, ".str" );
+    }
+    if( !f ) return false;
+
+    for( int i = 0; i <= p_language; ++i ) {
+        assert( PKMN_NAMELENGTH + ( 5 * !!p_forme ) ==
+                fread( p_out, 1, PKMN_NAMELENGTH + ( 5 * !!p_forme ), f ) );
+    }
+    fclose( f );
+    return true;
+}
+
+pkmnData getPkmnData( const u16 p_pkmnId, const u8 p_forme ) {
+    pkmnData res;
+    if( getPkmnData( p_pkmnId, p_forme, &res ) ) {
+        return res;
+    }
+    getPkmnData( 0, &res );
+    return res;
+}
+bool getPkmnData( const u16 p_pkmnId, pkmnData* p_out ) {
+    return getPkmnData( p_pkmnId, 0, p_out );
+}
+bool getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out ) {
+    FILE* f = FS::openSplit( POKEMON_DATA_PATH, p_pkmnId, ".data" );
+    if( !f ) return false;
+    fread( p_out, sizeof( pkmnData ), 1, f );
+    fclose( f );
+
+    if( p_forme ) {
+        char tmpbuf[ 40 ];
+        snprintf( tmpbuf, 35, "_%hhu.data", p_forme );
+        f = FS::openSplit( POKEMON_DATA_PATH, p_pkmnId, tmpbuf );
+        if( !f ) return true;
+        fread( &p_out->m_baseForme, sizeof( pkmnFormeData ), 1, f );
+        fclose( f );
+    }
+    return true;
+}
+
 
 bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
     FILE* f;
@@ -490,9 +599,11 @@ bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
 
 void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount,
                     u16* p_result ) {
-    FILE* f = FS::openSplit( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId,
-                        ".learnset.data" );
-    if( !f ) return;
+    FILE* f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
+    if( !f )
+        f  = FS::openSplit( PKMN_LEARNSET_PATH, 201, ".learnset.data" );
+    if( !f )
+        return;
 
     u16* buffer = new u16[ 700 ];
     FS::read( f, buffer, sizeof( u16 ), 699 );
@@ -544,8 +655,7 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u1
     delete[] buffer;
 }
 bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
-    FILE* f = FS::openSplit( ( std::string( PKMNDATA_PATH ) + "/LEARNSETS/" ).c_str( ), p_pkmnId,
-                        ".learnset.data" );
+    FILE* f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
     if( !f ) return false;
 
     u16* buffer = new u16[ 700 ];
@@ -567,83 +677,3 @@ bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
     return false;
 }
 
-u16 item::getItemId( ) {
-    for( u16 i = 0; i < MAX_ITEMS; ++i )
-        if( ItemList[ i ]->m_itemName == m_itemName ) return i;
-    return 0;
-}
-
-bool item::load( ) {
-    if( m_loaded ) return true;
-    FILE* f = FS::open( ITEM_PATH, m_itemName.c_str( ), ".data" );
-    if( !f ) return false;
-
-    memset( &m_itemData, 0, sizeof( itemData ) );
-    u8 tmp;
-    fscanf( f, "%hhu %lu %lu\n", &tmp, &m_itemData.m_price, &m_itemData.m_itemEffect );
-    m_itemData.m_itemEffectType = static_cast<item::itemEffectType>( tmp );
-    strcpy( m_itemData.m_itemDisplayName, FS::readString( f, true ).c_str( ) );
-    strcpy( m_itemData.m_itemDescription, FS::readString( f, true ).c_str( ) );
-    strcpy( m_itemData.m_itemShortDescr, FS::readString( f, true ).c_str( ) );
-    FS::close( f );
-    return m_loaded = true;
-}
-
-bool berry::load( ) {
-    if( m_loaded ) return true;
-    FILE* f = FS::open( ITEM_PATH, m_itemName.c_str( ), ".data" );
-    if( !f ) return false;
-
-    memset( &m_itemData, 0, sizeof( itemData ) );
-    u8 tmp;
-    fscanf( f, "%hhu %lu %lu\n", &tmp, &m_itemData.m_price, &m_itemData.m_itemEffect );
-    m_itemData.m_itemEffectType = static_cast<item::itemEffectType>( tmp );
-    strcpy( m_itemData.m_itemDisplayName, FS::readString( f, true ).c_str( ) );
-    strcpy( m_itemData.m_itemDescription, FS::readString( f, true ).c_str( ) );
-    strcpy( m_itemData.m_itemShortDescr, FS::readString( f, true ).c_str( ) );
-
-    memset( &m_berryData, 0, sizeof( berryData ) );
-    fscanf( f, "%hu %hhu", &m_berryData.m_berrySize, &tmp );
-    m_berryData.m_berryGuete = static_cast<berry::berryGueteType>( tmp );
-    fscanf( f, "%hhu %hhu", &tmp, &m_berryData.m_naturalGiftStrength );
-    m_berryData.m_naturalGiftType = static_cast<type>( tmp );
-
-    for( u8 i = 0; i < 5; ++i ) fscanf( f, "%hhu", &m_berryData.m_berryTaste[ i ] );
-    fscanf( f, "%hhu %hhu %hhu", &m_berryData.m_hoursPerGrowthStage, &m_berryData.m_minBerries,
-            &m_berryData.m_maxBerries );
-    FS::close( f );
-    return m_loaded = true;
-}
-
-std::string item::getDisplayName( bool p_new ) {
-    if( !m_loaded && !load( ) ) return m_itemName;
-    if( p_new )
-        return std::string( m_itemData.m_itemDisplayName );
-    else
-        return FS::convertToOld( std::string( m_itemData.m_itemDisplayName ) );
-}
-
-std::string item::getDescription( ) {
-    if( !m_loaded && !load( ) ) return NO_DATA;
-    return std::string( m_itemData.m_itemDescription );
-}
-
-std::string item::getShortDescription( ) {
-    if( !m_loaded && !load( ) ) return NO_DATA;
-    return std::string( m_itemData.m_itemShortDescr );
-}
-
-u32 item::getEffect( ) {
-    if( !m_loaded && !load( ) ) return 0;
-    return m_itemData.m_itemEffect;
-}
-
-item::itemEffectType item::getEffectType( ) {
-    if( !m_loaded && !load( ) ) return itemEffectType::NONE;
-    return m_itemData.m_itemEffectType;
-}
-
-u32 item::getPrice( ) {
-    if( !m_loaded && !load( ) ) return 0;
-    return m_itemData.m_price;
-}

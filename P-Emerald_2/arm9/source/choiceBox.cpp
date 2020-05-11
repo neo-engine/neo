@@ -25,8 +25,8 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "choiceBox.h"
 #include "defines.h"
+#include "choiceBox.h"
 #include "uio.h"
 #include "saveGame.h"
 
@@ -115,11 +115,11 @@ namespace IO {
     std::vector<const char*> names;
     choiceBox::choiceBox( pokemon p_pokemon, u16 p_move ) {
         _num     = 4 + !!p_move;
-        names    = {AttackList[ p_pokemon.m_boxdata.m_moves[ 0 ] ]->m_moveName.c_str( ),
-                 AttackList[ p_pokemon.m_boxdata.m_moves[ 1 ] ]->m_moveName.c_str( ),
-                 AttackList[ p_pokemon.m_boxdata.m_moves[ 2 ] ]->m_moveName.c_str( ),
-                 AttackList[ p_pokemon.m_boxdata.m_moves[ 3 ] ]->m_moveName.c_str( ),
-                 AttackList[ p_move ]->m_moveName.c_str( )};
+        names    = { MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 0 ], CURRENT_LANGUAGE ).c_str( ),
+            MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 1 ], CURRENT_LANGUAGE ).c_str( ),
+            MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 2 ], CURRENT_LANGUAGE ).c_str( ),
+            MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 3 ], CURRENT_LANGUAGE ).c_str( ),
+            MOVE::getMoveName( p_move, CURRENT_LANGUAGE ).c_str( ) };
         _choices = &names[ 0 ];
         _big     = false;
         _acPage  = 0;
@@ -146,18 +146,20 @@ namespace IO {
                 _num -= 4 - i;
                 break;
             }
-            tileCnt = loadTypeIcon( AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveType,
+            MOVE::moveData mdata = MOVE::getMoveData( p_pokemon.m_boxdata.m_moves[ i ] );
+
+            tileCnt = loadTypeIcon( mdata.m_type,
                                     ( ( i % 2 ) ? 122 : 12 ), 64 + ( i / 2 ) * 35, 3 + 2 * i, 3 + 2 * i,
                                 tileCnt, true, SAVE::SAV->getActiveFile( ).m_options.m_language );
-            tileCnt = loadDamageCategoryIcon(
-                AttackList[ p_pokemon.m_boxdata.m_moves[ i ] ]->m_moveHitType,
+            tileCnt = loadDamageCategoryIcon( mdata.m_category,
                 ( ( i % 2 ) ? 154 : 44 ), 64 + ( i / 2 ) * 35, 4 + 2 * i, 4 + 2 * i, tileCnt,
                 true );
         }
         if( p_move ) {
-            tileCnt = loadTypeIcon( AttackList[ p_move ]->m_moveType, 12, 134, 11, 11, tileCnt,
+            MOVE::moveData mdata = MOVE::getMoveData( p_move );
+            tileCnt = loadTypeIcon( mdata.m_type, 12, 134, 11, 11, tileCnt,
                                     true, SAVE::SAV->getActiveFile( ).m_options.m_language );
-            tileCnt = loadDamageCategoryIcon( AttackList[ p_move ]->m_moveHitType, 44, 134, 12, 12,
+            tileCnt = loadDamageCategoryIcon( mdata.m_category, 44, 134, 12, 12,
                                               tileCnt, true );
         }
 

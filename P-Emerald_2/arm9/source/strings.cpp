@@ -28,16 +28,16 @@ along with Pok\xe9mon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "saveGame.h"
 
-// ä \xe4
-// é \xe9
-// ö \xf6
-// ü \xfc
+// ae \xe4
+// e´ \xe9
+// oe \xf6
+// ue \xfc
 
-// Ä \xc4
-// É \xc9
-// Ö \xd6
-// Ü \xdc
-// ß \xdf
+// AE \xc4
+// E´ \xc9
+// OE \xd6
+// UE \xdc
+// ss \xdf
 // { (male)
 // } (female)
 //
@@ -68,7 +68,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"No data.", "Keine Daten."},
     {"Faraway Place", "Entfernter Ort"},
     {"Unknown", "Unbekannt"},
-    {"%s\nUse %s?", "%s\nM\xf6""chtest du %s nutzen?"},
+    {"%sUse %s?", "%sM\xf6""chtest du %s nutzen?"},
     {"The repel wore off.", "Der Schutz ist aufgebraucht."},
 
     {"Just an old Pok\xe9 Ball", "Doch nur ein alter Pok\xe9""ball"},
@@ -345,5 +345,196 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Pwr", "Stk"},
 
     {"Meteor Falls", "Meteorf\xe4lle"},
-	{"\xd", "\xe"} // HP icon
+	{"\xd", "\xe"}, // HP icon
+    {"hardy","robust"},
+    {"lonely", "einsam"},
+    {"brave", "mutig"},
+
+    // 190
+
+    {"adamant", "hart"},
+    {"naughy", "frech"},
+    {"bold", "k\xfc""hn"},
+    {"docile", "sanft"},
+    {"relaxed", "locker"},
+
+    {"impish", "pfiffig"},
+    {"lax", "lasch"},
+    {"timid", "scheu"},
+    {"hasty", "hastig"},
+    {"serious", "ernst"},
+
+    // 200
+
+    {"jolly", "froh"},
+    {"naive", "naiv"},
+    {"modest", "m\xe4""\xdf""ig"},
+    {"mild", "mild"},
+    {"quiet", "ruhig"},
+
+    {"bashful", "zaghaft"},
+    {"rash", "hitzig"},
+    {"calm", "still"},
+    {"gentle", "zart"},
+    {"sassy", "forsch"},
+
+    // 210
+
+    {"careful", "sacht"},
+    {"quirky", "kauzig"},
+    {"Loves to eat", "Liebt es, zu essen"},
+    {"Often dozes off", "Nickt oft ein"},
+    {"Nods off a lot", "Schl\xe4""ft gerne"},
+
+    {"Scatters things often", "Macht oft Unordnung"},
+    {"Likes to relax", "Liebt es zu entspannen"},
+    {"Proud of its power", "Ist stolz auf seine St\xe4""rke"},
+    {"Likes to thrash about", "Pr\xfc""gelt sich gerne"},
+    {"A little quick tempered", "Besitzt Temperament"},
+
+    // 220
+
+    {"Likes to fight", "Liebt es zu k\xe4""mpfen"},
+    {"Quick tempered", "Ist impulsiv"},
+    {"Sturdy body", "Hat einen robusten K\xf6""rper"},
+    {"Capable of taking hits", "Kann Treffer gut verkraften"},
+    {"Highly persistent", "Ist \xe4""u\xdf""erst ausdauernd"},
+
+    {"Good endurance", "Hat eine gute Ausdauer"},
+    {"Good perseverance", "Ist beharrlich"},
+    {"Highly curious", "Ist sehr neugierig"},
+    {"Mischievous", "Ist hinterh\xe4""ltig"},
+    {"Thoroughly cunning", "Ist \xe4""u\xdf""erst gerissen"},
+
+    // 230
+
+    {"Often lost in thought", "Ist oft in Gedanken"},
+    {"Very finicky", "Ist sehr pedantisch"},
+    {"Strong willed", "Besitzt starken Willen"},
+    {"Somewhat vain", "Ist etwas eitel"},
+    {"Strongly defiant", "Ist sehr aufs\xe4""ssig"},
+
+    {"Hates to lose", "Hasst Niederlagen"},
+    {"Somewhat stubborn", "Ist dickk\xf6""pfig"},
+    {"Likes to run", "Liebt es, zu rennen"},
+    {"Alert to sounds", "Achtet auf Ger\xe4""usche"},
+    {"Impetuous and silly", "Ist ungest\xfc""m und einf\xe4""ltig"},
+
+    // 240
+
+    {"Somewhat of a clown", "Ist fast wie eine Clown"},
+    {"Quick to flee", "Fl\xfc""chtet schnell"},
+    {"spicy", "scharf"},
+    {"sour", "saur"},
+    {"sweet", "s\xfc\xdf"},
+
+    {"dry", "trocken"},
+    {"bitter", "bitter"},
+    {"all", "all"},
+    {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR][OWN1] heilt sich.[A]"},
+    {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR][OWN2] heilt sich.[A]"},
+
+    // 250
+
+    {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR][OPP1] heilt sich.[A]"},
+    {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR][OPP2] heilt sich.[A]"},
+    {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]KP von [OWN1]\nregenerieren sich.[A]"},
+    {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]KP von [OWN2]\nregenerieren sich.[A]"},
+    {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]KP von [OPP1]\nregenerieren sich.[A]"},
+
+    {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]KP von [OPP2]\nregenerieren sich.[A]"},
+    {"", "Der Hagel schadet [OWN1].[A]"},
+    {"", "Der Hagel schadet [OWN2].[A]"},
+    {"", "Der Hagel schadet\n[OPP1].[A]"},
+    {"", "Der Hagel schadet\n[OPP2].[A]"},
+
+    // 260
+
+    {"", "Der Sandsturm schadet [OWN1].[A]"},
+    {"", "Der Sandsturm schadet [OWN2].[A]"},
+    {"", "Der Sandsturm schadet\n[OPP1].[A]"},
+    {"", "Der Sandsturm schadet\n[OPP2].[A]"},
+    {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OWN1].[A]"},
+
+    {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OWN2].[A]"},
+    {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OPP1].[A]"},
+    {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OPP2].[A]"},
+    {"", "Es regnet.[A]"},
+    {"", "Es hagelt.[A]"},
+
+    // 270
+
+    {"", "Es herrscht dichter Nebel\x85[A]"},
+    {"", "Der Sandsturm wütet.[A]"},
+    {"", "Gleißendes Sonnenlicht.[A]"},
+    {"", "Enormer Regen.[A]"},
+    {"", "Extremes Sonnenlicht.[A]"},
+
+    {"", "Starke Winde wehen.[A]"},
+    {"", "Es hat aufgehört zu regnen.[A]"},
+    {"", "Es hat aufgehört zu hageln.[A]"},
+    {"", "Der Nebel verzog sich.[A]"},
+    {"", "Der Sandsturm legt sich.[A]"},
+
+    // 280
+
+    {"", "Das Sonnenlicht wurde wieder normal.[A]"},
+    {"", "Es hat aufgehört zu regnen.[A]"},
+    {"", "Das Sonnenlicht wurde wieder normal.[A]"},
+    {"", "Windstille\x85[A]"},
+    {"", "%s%s ist aufgetaut![A]"},
+
+    {"", "%s%s ist gefroren.[A]"},
+    {"", "%s%s ist paralysiert.[A]"},
+    {"", "%s%s bleibt schlafen.[A]"},
+    {"", "%s%s ist aufgewacht![A]"},
+    {"", "%s%s bleibt unbeeindruckt.[A]"},
+
+    // 290
+
+    {"", "%s%s wich aus.[A]"},
+    {"", "[COLR:15:15:00]Ein Volltreffer![A][CLEAR][COLR:00:00:00]"},
+    {"", "[COLR:00:31:00]Das ist enorm effektiv\ngegen %s![A][CLEAR][COLR:00:00:00]"},
+    {"", "[COLR:00:15:00]Das ist sehr effektiv\ngegen %s![A][CLEAR][COLR:00:00:00]"},
+    {"", "[COLR:31:00:00]Hat die Attacke\n%s getroffen?[A][CLEAR][COLR:00:00:00]"},
+
+    {"", "[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen%s\x85[A][CLEAR][COLR:00:00:00]"},
+    {"", "[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %s.[A][CLEAR][COLR:00:00:00]"},
+    {"", "Es schlug fehl\x85[A]"},
+    {"", "Die Verbrennung schadet\n%s%s.[A]"},
+    {"", "Die Vergiftung schadet\n%s%s.[A]"},
+
+    // 300
+
+    {"", "%s%s wurde besiegt.[A]"},
+    {"", "Das Rundenlimit dieses\nKampfes wurde erreicht.[A]"},
+    {"", "Der Kampf endet in einem\nUnentschieden![A]"},
+    {"", "[TRAINER] [TCLASS] gewinnt<85>[A]"},
+    {"", "Du besiegst [TCLASS] [TRAINER]![A]"},
+
+    {"", "Du gewinnst %d$.[A]"},
+    {"", "Der Kampf endet.[A]"},
+    {"", "[OPP%d] wurde von [TRAINER]\n([TCLASS]) auf die Bank geschickt.[A]"},
+    {"", "Auf die Bank [OWN%d]![A]"},
+    {"", "[OWN1] kann nicht angreifen<85>[A]"},
+
+    // 310
+
+    {"", "[OWN2] kann nicht angreifen<85>[A]"},
+    {"", "(Wild)"},
+    {"", "(Gegner)"},
+    {"This tree looks like it can be\ncut down. ", "Ein kleiner Baum.\n"},
+    {"This rock appears to be breakable.\n", "Ein kleiner Felsen.\n"},
+
+    {"A huge whirlpool.\n", "Ein riesiger Strudel.\n"},
+    {"The water is a deep blue...\n", "Das Wasser ist tiefblau...\n"},
+    {"The sea is deep here.\n", "Das Wasser ist sehr tief.\n"},
+    {"It's a big boulder.\n", "Ein großer Felsen.\n"},
+    {"The wall is very rocky...\n", "Eine steile Felswand.\n"},
+
+    // 320
+
+    {"It's a large Waterfall.\n", "Ein großer Wasserfall.\n"},
+    {"Something moved!\n", "Da hat sich etwas bewegt!\n"},
+    {"Light is shining from the\nsurface. ", "Licht scheint von der\nOberfläche. "},
 };

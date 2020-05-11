@@ -39,9 +39,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "yesNoBox.h"
 
 #include "berry.h"
-#include "hmMoves.h"
 #include "item.h"
 #include "pokemon.h"
+#include "moveNames.h"
+#include "itemNames.h"
 
 #include "bagUI.h"
 #include "bagViewer.h"
@@ -68,6 +69,19 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Back.h"
 #include "BagSpr.h"
+
+#include "icon_bag_1.h"
+#include "icon_bag_2.h"
+#include "icon_dex_1.h"
+#include "icon_dex_2.h"
+#include "icon_id_1.h"
+#include "icon_id_2.h"
+#include "icon_party_1.h"
+#include "icon_party_2.h"
+#include "icon_save_1.h"
+#include "icon_save_2.h"
+#include "icon_settings_1.h"
+#include "icon_settings_2.h"
 
 namespace IO {
     nav* NAV = 0;
@@ -135,7 +149,7 @@ namespace IO {
                 b      = true;
             }
             if( curitm )
-                IO::loadItemIcon( ItemList[ curitm ]->m_itemName, POS[ ITM( i ) ][ 0 ] - 16,
+                IO::loadItemIcon( curitm, POS[ ITM( i ) ][ 0 ] - 16,
                                   POS[ ITM( i ) ][ 1 ] - 16, ITM( i ), ITM( i ),
                                   IO::Oam->oamBuffer[ ITM_BACK + 2 ].gfxIndex + 32 * ( i + 1 ) );
         }
@@ -151,18 +165,30 @@ namespace IO {
                                   !p_showBack, OBJPRIORITY_0, true );
 
         // Main menu sprites
-        tileCnt = IO::loadItemIcon( "Karte", POS[ SAVE_ID ][ 0 ] - 16, POS[ SAVE_ID ][ 1 ] - 16,
-                                    A_ID, A_ID, tileCnt );
-        tileCnt = IO::loadItemIcon( "Beutesack", POS[ BAG_ID ][ 0 ] - 16, POS[ BAG_ID ][ 1 ] - 16,
-                                    FWD_ID, FWD_ID, tileCnt );
-        tileCnt = IO::loadItemIcon( "Pokeball", POS[ PKMN_ID ][ 0 ] - 16, POS[ PKMN_ID ][ 1 ] - 16,
-                                    BWD_ID, PKMN_ID, tileCnt );
-        tileCnt = IO::loadItemIcon( "Tagebuch", POS[ NAV_ID ][ 0 ] - 16, POS[ NAV_ID ][ 1 ] - 16,
-                                    64, NAV_ID, tileCnt );
-        tileCnt = IO::loadItemIcon( "Tueroeffner", POS[ ID_ID ][ 0 ] - 16, POS[ ID_ID ][ 1 ] - 16,
-                                    65, ID_ID, tileCnt );
-        tileCnt = IO::loadItemIcon( "Fundsache", POS[ DEX_ID ][ 0 ] - 16, POS[ DEX_ID ][ 1 ] - 16,
-                                    66, DEX_ID, tileCnt );
+        tileCnt = IO::loadSprite( A_ID, A_ID, tileCnt,
+                                  POS[ SAVE_ID ][ 0 ] - 16, POS[ SAVE_ID ][ 1 ] - 16, 32, 32,
+                                  icon_save_1Pal, icon_save_1Tiles, icon_save_1TilesLen,
+                                  false, false, false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadSprite( FWD_ID, FWD_ID, tileCnt,
+                                  POS[ BAG_ID ][ 0 ] - 16, POS[ BAG_ID ][ 1 ] - 16, 32, 32,
+                                  icon_bag_1Pal, icon_bag_1Tiles, icon_bag_1TilesLen,
+                                  false, false, false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadSprite( BWD_ID, BWD_ID, tileCnt,
+                                  POS[ PKMN_ID ][ 0 ] - 16, POS[ PKMN_ID ][ 1 ] - 16, 32, 32,
+                                  icon_party_1Pal, icon_party_1Tiles, icon_party_1TilesLen,
+                                  false, false, false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadSprite( NAV_ID, NAV_ID, tileCnt,
+                                  POS[ NAV_ID ][ 0 ] - 16, POS[ NAV_ID ][ 1 ] - 16, 32, 32,
+                                  icon_settings_1Pal, icon_settings_1Tiles, icon_settings_1TilesLen,
+                                  false, false, false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadSprite( ID_ID, ID_ID, tileCnt,
+                                  POS[ ID_ID ][ 0 ] - 16, POS[ ID_ID ][ 1 ] - 16, 32, 32,
+                                  icon_id_1Pal, icon_id_1Tiles, icon_id_1TilesLen,
+                                  false, false, false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadSprite( DEX_ID, DEX_ID, tileCnt,
+                                  POS[ DEX_ID ][ 0 ] - 16, POS[ DEX_ID ][ 1 ] - 16, 32, 32,
+                                  icon_dex_1Pal, icon_dex_1Tiles, icon_dex_1TilesLen,
+                                  false, false, false, OBJPRIORITY_0, true );
         // tileCnt = IO::loadItemIcon( "----", POS[ OPTS_ID ][ 0 ] - 16, POS[ OPTS_ID ][ 1 ] - 16,
         // 67,
         //                            OPTS_ID, tileCnt );
@@ -272,8 +298,8 @@ namespace IO {
         if( held & KEY_Y ) {
             IO::waitForKeysUp( KEY_Y );
             if( SAVE::SAV->getActiveFile( ).m_registeredItem ) {
-                if( ItemList[ SAVE::SAV->getActiveFile( ).m_registeredItem ]->useable( ) ) {
-                    ItemList[ SAVE::SAV->getActiveFile( ).m_registeredItem ]->use( );
+                if( ITEM::isUsable( SAVE::SAV->getActiveFile( ).m_registeredItem ) ) {
+                    ITEM::use( SAVE::SAV->getActiveFile( ).m_registeredItem );
                     updateItems( );
                 } else {
                     IO::messageBox( GET_STRING( 58 ), GET_STRING( 91 ) );
@@ -300,6 +326,7 @@ namespace IO {
                 curitm = SAVE::SAV->getActiveFile( ).m_registeredItem;
                 itmsn  = true;
             }
+            /*
             if( GET_AND_WAIT_C( POS[ ITM( i ) ][ 0 ], POS[ ITM( i ) ][ 1 ], 14 ) ) {
                 if( curitm ) {
                     if( u16( -1 )
@@ -342,6 +369,7 @@ namespace IO {
                 }
                 return;
             }
+            */
         }
 
         if( _state != HOME && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
@@ -377,7 +405,7 @@ namespace IO {
                 draw( true );
                 updateItems( );
                 if( res ) {
-                    ItemList[ res ]->use( false );
+                    ITEM::use( res );
                     updateItems( );
                     draw( true );
                 }
@@ -407,7 +435,7 @@ namespace IO {
                 draw( true );
                 MAP::curMap->draw( );
 
-                if( res ) res->use( );
+                if( res ) MOVE::use( res & 32767, res >> 15 );
             } else if( GET_AND_WAIT_C( POS[ DEX_ID ][ 0 ], POS[ DEX_ID ][ 1 ], 16 ) ) {
                 ANIMATE_MAP = false;
                 _state      = HOME;
@@ -434,21 +462,24 @@ namespace IO {
 
                 _state = HOME;
 
-                const char* someText[ 11 ]
-                    = {"PKMN Spawn",   "Item Spawn",   "1 Item Test",  "Dbl Battle",
+                const char* someText[ 12 ]
+                    = {"PKMN Spawn",   "Item Spawn", "1 Item Test",  "Dbl Battle",
                        "Sgl Battle",   "Chg NavScrn",  "View Boxes A", "View Boxes B",
-                       "Hoenn Badges", "Kanto Badges", "Keyboard"};
-                IO::choiceBox test( 11, &someText[ 0 ], 0, false );
+                       "Hoenn Badges", "Kanto Badges", "Keyboard", "Plate Spawn" };
+                IO::choiceBox test( 12, &someText[ 0 ], 0, false );
                 int           res = test.getResult( "Tokens of god-being..." );
                 draw( );
                 switch( res ) {
                 case 0: {
                     memset( SAVE::SAV->getActiveFile( ).m_pkmnTeam, 0,
                             sizeof( SAVE::SAV->getActiveFile( ).m_pkmnTeam ) );
-                    for( int i = 0; i < 5; ++i ) {
+                    std::vector<u16> tmp = { 201, 493, 521, 649, u16( 1 + rand( ) % MAX_PKMN ),
+                                             MAX_PKMN };
+                    for( int i = 0; i < 6; ++i ) {
                         pokemon&         a   = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
-                        std::vector<u16> tmp = {649, 493, 646, 201, u16( 1 + rand( ) % MAX_PKMN )};
-                        a                    = pokemon( tmp[ i ], 50 );
+
+                        a = pokemon( tmp[ i ], 50, !i ? ( rand( ) % 28 ) : 0, 0, i );
+
                         a.m_stats.m_acHP *= i / 5.0;
                         a.m_boxdata.m_experienceGained += 750;
 
@@ -460,7 +491,15 @@ namespace IO {
                         }
                         a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
                         a.m_boxdata.m_ribbons1[ 3 ] = 0;
-                        a.m_boxdata.m_holdItem      = 1 + rand( ) % 400;
+                        if( a.m_boxdata.m_speciesId == 493 ) {
+                            u8 plate = rand( ) % 17;
+                            if( plate < 16 )
+                                a.giveItem( I_FLAME_PLATE + plate );
+                            else
+                                a.giveItem( I_PIXIE_PLATE );
+                        } else {
+                            a.m_boxdata.m_heldItem      = 1 + rand( ) % 400;
+                        }
 
                         for( u16 j = 1; j <= MAX_PKMN; ++j )
                             SAVE::SAV->m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );
@@ -500,19 +539,21 @@ namespace IO {
                     break;
                 }
                 case 1:
-                    for( u16 j = 1; j < 772; ++j ) {
-                        if( ItemList[ j ]->m_itemName != "Null" )
+                    for( u16 j = 1; j < MAX_ITEMS; ++j ) {
+                        auto c = ITEM::getItemData( j );
+                        if( c.m_itemType )
                             SAVE::SAV->getActiveFile( ).m_bag.insert(
-                                BAG::toBagType( ItemList[ j ]->m_itemType ), j, 1 );
+                                BAG::toBagType( c.m_itemType ), j, 1 );
                     }
                     break;
                 case 2: {
-                    item* curr = ItemList[ rand( ) % 638 ];
-                    while( curr->m_itemName == "Null" ) curr = ItemList[ rand( ) % 638 ];
-                    IO::messageBox( curr, 31 );
+                    // item* curr = ItemList[ rand( ) % 638 ];
+                    // while( curr->m_itemName == "Null" ) curr = ItemList[ rand( ) % 638 ];
+                    // IO::messageBox( curr, 31 );
                     break;
                 }
                 case 3: {
+                            /*
                     std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 3; ++i ) {
@@ -522,8 +563,12 @@ namespace IO {
                         cpy.push_back( a );
                     }
                     BATTLE::battleTrainer opp(
-                        "Heiko", "Auf in den Kampf!", "Hm Du bist gar nicht so schlecht",
-                        "Yay gewonnen!", "Das war wohl eine Niederlage", cpy, 0, 0 );
+                            {"Wally", "Heiko"}, {"Let's battle!", "Auf in den Kampf!"},
+                            {"Hmpf\x85 You're not too bad\x85",
+                            "Hm\x85 Du bist gar nicht so schlecht\x85"},
+                            {"Yay, I won!", "Yay gewonnen!"},
+                            {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
+                            cpy, 0, 0 );
                     auto           bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
                     BATTLE::battle test_battle( bt, &opp, 100, BATTLE::weather( rand( ) % 9 ), 10,
                                                 0, 5, BATTLE::battle::DOUBLE );
@@ -531,9 +576,11 @@ namespace IO {
                     test_battle.start( );
                     SAVE::SAV->getActiveFile( ).updateTeam( bt );
                     delete bt;
+                    */
                     break;
                 }
                 case 4: {
+                            /*
                     std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 6; ++i ) {
@@ -543,17 +590,21 @@ namespace IO {
                         cpy.push_back( a );
                     }
                     BATTLE::battleTrainer opp(
-                        "Heiko", "Auf in den Kampf!", "Hm Du bist gar nicht so schlecht",
-                        "Yay gewonnen!", "Das war wohl eine Niederlage", cpy, 0, 0 );
-
+                            {"Wally", "Heiko"}, {"Let's battle!", "Auf in den Kampf!"},
+                            {"Hmpf\x85 You're not too bad\x85",
+                            "Hm\x85 Du bist gar nicht so schlecht\x85"},
+                            {"Yay, I won!", "Yay gewonnen!"},
+                            {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
+                            cpy, 0, 0 );
                     auto           bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
                     BATTLE::battle test_battle( bt, &opp, 100,
-                                                BATTLE::HAIL /*weather( rand( ) % 9 )*/, 10, 0, 5,
+                                                BATTLE::HAIL weather( rand( ) % 9 ), 10, 0, 5,
                                                 BATTLE::battle::SINGLE );
                     ANIMATE_MAP = false;
                     test_battle.start( );
                     SAVE::SAV->getActiveFile( ).updateTeam( bt );
                     delete bt;
+                    */
                     break;
                 }
                 case 5: {
@@ -592,6 +643,12 @@ namespace IO {
                     IO::keyboard kbd;
                     IO::messageBox( kbd.getText( 10, "Type some text!" ).c_str( ) );
                     break;
+                }
+                case 11: {
+                    for( u16 j = I_FLAME_PLATE; j <= I_FLAME_PLATE + 17; ++j ) {
+                        SAVE::SAV->getActiveFile( ).m_bag.insert(
+                            BAG::toBagType( ITEM::ITEMTYPE_COLLECTIBLE ), j, 1 );
+                    }
                 }
                 }
                 if( res != 10 ) draw( true );

@@ -34,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "startScreen.h"
 #include "uio.h"
 #include "yesNoBox.h"
+#include "itemNames.h"
 
 namespace SAVE {
     const u16 EP_INTRO_TEXT_START[] = {111};
@@ -88,9 +89,9 @@ namespace SAVE {
                 = {MAP::mapObject::PLYR, {299, 53, 4}, 0, MAP::moveMode::WALK, 0, 0,
                    MAP::direction::RIGHT};
             SAV->getActiveFile( ).m_isMale = rand( ) % 2;
-            SAV->getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_BICYCLE, 1 );
+            SAV->getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_BIKE, 1 );
             SAV->getActiveFile( ).m_currentMap     = 10;
-            SAV->getActiveFile( ).m_registeredItem = I_BICYCLE;
+            SAV->getActiveFile( ).m_registeredItem = I_BIKE;
             return true;
         default:
             SAV->getActiveFile( ).m_gameType = UNUSED;
@@ -204,7 +205,7 @@ namespace SAVE {
 
                 FS::gen3Pokemon::pokemon_growth_t*& acBG = save3->pokemon_growth[ i ];
                 acPkmn.m_boxdata.m_speciesId             = FS::getNPKMNIdx( acBG->species );
-                acPkmn.m_boxdata.m_holdItem              = FS::getNItemIdx( acBG->held );
+                acPkmn.m_boxdata.m_heldItem              = FS::getNItemIdx( acBG->held );
                 acPkmn.m_boxdata.m_experienceGained      = acBG->xp;
                 acPkmn.m_boxdata.m_steps                 = acBG->happiness;
                 acPkmn.m_boxdata.m_pPUps                 = acBG->ppbonuses;
@@ -226,14 +227,13 @@ namespace SAVE {
 
                 getAll( acPkmn.m_boxdata.m_speciesId, p );
                 acPkmn.m_boxdata.m_ability
-                    = p.m_abilities[ acPkmn.m_boxdata.m_individualValues.m_isEgg ];
-                acPkmn.m_boxdata.m_individualValues.m_isEgg
-                    = acPkmn.m_boxdata.m_individualValues.m_isNicked;
+                    = p.m_abilities[ acPkmn.isEgg( ) ];
+                acPkmn.m_boxdata.setIsEgg( acPkmn.m_boxdata.isNicknamed( ) );
                 acPkmn.m_boxdata.m_gotPlace = FS::getNLocation( acBM->locationcaught );
 
                 acPkmn.m_boxdata.m_gotLevel = acBM->levelcaught;
 
-                if( acPkmn.m_boxdata.m_individualValues.m_isEgg || acPkmn.m_boxdata.m_gotLevel ) {
+                if( acPkmn.isEgg( ) || acPkmn.m_boxdata.m_gotLevel ) {
                     acPkmn.m_boxdata.m_hatchPlace           = 999;
                     acPkmn.m_boxdata.m_gotLevel             = 5;
                     acPkmn.m_boxdata.m_hatchDate[ 0 ]       = acPkmn.m_boxdata.m_hatchDate[ 1 ]
