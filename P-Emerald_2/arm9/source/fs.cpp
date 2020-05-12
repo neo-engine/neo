@@ -210,8 +210,10 @@ namespace FS {
     }
 
     bool readNop( FILE* p_file, u32 p_cnt ) {
-        if( p_file == 0 ) return false;
-        read( p_file, 0, 1, p_cnt );
+        u8 tmp;
+        for( u32 i = 0; i < p_cnt; ++i )
+            if( !read( p_file, &tmp, sizeof( u8 ), 1 ) )
+                return false;
         return true;
     }
 

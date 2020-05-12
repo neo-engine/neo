@@ -19,6 +19,7 @@ SOURCES		:=	source
 INCLUDES	:=	include
 DATA		:=
 GRAPHICS	:=	data
+AUDIO		:=  audio
 
 
 #---------------------------------------------------------------------------------
@@ -42,7 +43,7 @@ LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	-lfilesystem -lfat -lnds9
+LIBS	:=	-lfilesystem -lfat -lmm9 -lnds9
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -67,8 +68,10 @@ export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*))) soundbank.bin
 PNGFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
+
+export AUDIOFILES	:=	$(foreach dir,$(notdir $(wildcard $(AUDIO)/*.*)),$(CURDIR)/$(AUDIO)/$(dir))
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -130,6 +133,14 @@ $(ARM9ELF)	:	$(OFILES)
 %.s %.h	: %.png %.grit
 #---------------------------------------------------------------------------------
 	grit $< -fts -o$*
+
+#---------------------------------------------------------------------------------
+# rule to build soundbank from music files
+#---------------------------------------------------------------------------------
+soundbank.bin soundbank.h : $(AUDIOFILES)
+#---------------------------------------------------------------------------------
+	@mmutil $^ -d -osoundbank.bin -hsoundbank.h
+
 
 -include $(DEPSDIR)/*.d
 
