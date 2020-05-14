@@ -44,12 +44,12 @@ namespace MAP {
                          std::unique_ptr<mapSlice> p_cache[ 2 ][ 2 ] ) {
         FILE* mapF = FS::open(
             MAP_PATH,
-            ( toString( p_map ) + "/" + toString( p_y ) + "_" + toString( p_x ) ).c_str( ),
+            ( std::to_string( p_map ) + "/" + std::to_string( p_y ) + "_" + std::to_string( p_x ) ).c_str( ),
             ".map" );
         if( !mapF )
             mapF = FS::open(
                 MAP_PATH,
-                ( toString( p_map ) + "/BORDER/" + toString( p_y ) + "_" + toString( p_x ) )
+                ( std::to_string( p_map ) + "/BORDER/" + std::to_string( p_y ) + "_" + std::to_string( p_x ) )
                     .c_str( ),
                 ".map" );
         if( !mapF ) {
@@ -57,7 +57,7 @@ namespace MAP {
             char buffer[ 50 ];
             snprintf( buffer, 49, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
             IO::messageBox m( buffer );
-            IO::NAV->draw( true );
+            NAV::draw( true );
             swiWaitForVBlank( );
 #endif
             mapF = FS::open( MAP_PATH, "empty", ".map" );
@@ -72,7 +72,7 @@ namespace MAP {
 #ifdef DEBUG
         if( !p_result ) {
             IO::messageBox( "Not enough memory :(" );
-            IO::NAV->draw( true );
+            NAV::draw( true );
         }
 #endif
 
@@ -99,7 +99,7 @@ namespace MAP {
         // Read the wild Pokémon data
         mapF = FS::open(
             MAP_PATH,
-            ( toString( p_map ) + "/" + toString( p_y ) + "_" + toString( p_x ) ).c_str( ),
+            ( std::to_string( p_map ) + "/" + std::to_string( p_y ) + "_" + std::to_string( p_x ) ).c_str( ),
             ".enc" );
         if( mapF ) {
             FS::read( mapF, p_result->m_pokemon, sizeof( std::pair<u16, u16> ), 3 * 5 * 5 );

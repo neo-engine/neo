@@ -551,7 +551,7 @@ namespace STS {
 
     void regStsScreenUI::init( u8 p_current, bool p_initTop ) {
         _current = p_current;
-        IO::NAV->draw( );
+        NAV::draw( );
         if( p_initTop ) initTop( );
         initSub( );
     }
@@ -979,7 +979,8 @@ namespace STS {
                   currPkmn.m_boxdata.m_gotDate[ 2 ] ? currPkmn.m_boxdata.m_gotDate[ 2 ]
                                                     : currPkmn.m_boxdata.m_hatchDate[ 2 ] );
         IO::regularFont->printString( buffer, 250, 90, p_bottom, IO::font::RIGHT, 14 );
-        snprintf( buffer, 49, "%s.", FS::getLocation( currPkmn.m_boxdata.m_gotPlace ).c_str( ) );
+        snprintf( buffer, 49, "%s.", FS::getLocation( currPkmn.m_boxdata.m_gotPlace,
+                    CURRENT_LANGUAGE ).c_str( ) );
         IO::regularFont->printMaxString(
             buffer, std::max( (u32) 124, 250 - IO::regularFont->stringWidth( buffer ) ), 104,
             p_bottom, 254 );
@@ -989,7 +990,8 @@ namespace STS {
                       currPkmn.m_boxdata.m_hatchDate[ 1 ], currPkmn.m_boxdata.m_hatchDate[ 2 ] );
             IO::regularFont->printString( buffer, 250, 125, p_bottom, IO::font::RIGHT, 14 );
             snprintf( buffer, 49, "%s.",
-                      FS::getLocation( currPkmn.m_boxdata.m_hatchPlace ).c_str( ) );
+                      FS::getLocation( currPkmn.m_boxdata.m_hatchPlace,
+                          CURRENT_LANGUAGE ).c_str( ) );
             IO::regularFont->printString( buffer, 250, 139, p_bottom, IO::font::RIGHT, 14 );
         } else if( plrOT && currPkmn.m_boxdata.m_fateful )
             IO::regularFont->printString( "Schicksalhafte Begeg.", 102, 139, p_bottom );
@@ -1269,7 +1271,7 @@ namespace STS {
         std::vector<IO::inputTarget> res;
         std::vector<std::string>     names;
 
-        IO::NAV->draw( );
+        NAV::draw( );
         BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
         BG_PALETTE_SUB[ GRAY_IDX ]  = GRAY;
         BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;

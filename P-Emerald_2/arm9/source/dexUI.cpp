@@ -144,7 +144,7 @@ namespace DEX {
         IO::updateOAM( false );
 
         // Init sub
-        IO::NAV->draw( );
+        NAV::draw( );
         IO::initOAMTable( true );
 
         tileCnt = 0;
@@ -527,7 +527,7 @@ namespace DEX {
         switch( (dex::mode) p_mode ) {
         case dex::SHOW_SINGLE:
         case dex::SHOW_CAUGHT:
-            IO::NAV->draw( );
+            NAV::draw( );
             IO::regularFont->setColor( 0, 0 );
             IO::regularFont->setColor( BLACK_IDX, 1 );
             IO::regularFont->setColor( 0, 2 );

@@ -42,7 +42,7 @@ LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	-lfilesystem -lfat -lnds9
+LIBS	:=	-lfilesystem -lfat -lmm9 -lnds9
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -62,12 +62,13 @@ export DEPSDIR := $(CURDIR)/$(BUILD)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(DATA),$(CURDIR)/$(dir)) \
-					$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir))
+					$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir)) \
+					$(foreach dir,$(AUDIO),$(CURDIR)/$(dir))
 
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*))) soundbank.bin
 PNGFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
 
 #---------------------------------------------------------------------------------
@@ -94,7 +95,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
-.PHONY: $(BUILD) clean
+.PHONY: $(BUILD)
 
 #---------------------------------------------------------------------------------
 $(BUILD):
@@ -106,7 +107,7 @@ clean:
 	@echo clean ...
 	@rm -fr $(BUILD) *.elf *.nds* *.bin
 
- rebuild: clean $(BUILD)
+rebuild: clean $(BUILD)
 
 #---------------------------------------------------------------------------------
 else
@@ -119,17 +120,15 @@ $(ARM9ELF)	:	$(OFILES)
 	@$(LD)  $(LDFLAGS) $(OFILES) $(LIBPATHS) $(LIBS) -o $@
 
 #---------------------------------------------------------------------------------
-# you need a rule like this for each extension you use as binary data
-#---------------------------------------------------------------------------------
-%.bin.o	:	%.bin
-#---------------------------------------------------------------------------------
-	@echo $(notdir $<)
-	@$(bin2o)
-
-#---------------------------------------------------------------------------------
 %.s %.h	: %.png %.grit
 #---------------------------------------------------------------------------------
 	grit $< -fts -o$*
+
+#---------------------------------------------------------------------------------
+%.bin.o	: %.bin
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
 
 -include $(DEPSDIR)/*.d
 

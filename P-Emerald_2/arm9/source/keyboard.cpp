@@ -129,7 +129,7 @@ namespace IO {
                               32, BackwardPal, BackwardTiles, BackwardTilesLen, false, false, false,
                               OBJPRIORITY_1, true );
         updateOAM( true );
-        NAV->draw( );
+        NAV::draw( );
         initTextField( );
     }
 

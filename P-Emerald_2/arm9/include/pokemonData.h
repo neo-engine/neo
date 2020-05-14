@@ -232,9 +232,12 @@ bool     getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out );
 
 [[deprecated]] bool getAll( u16 p_pkmnId, pokemonData& out, u8 p_forme = 0 );
 
-void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num,
-                    u16* p_res );
-bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode );
+const u16 LEARN_TM = 200;
+const u16 LEARN_TUTOR = 201;
+const u16 LEARN_EGG = 202;
+
+void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_num, u16* p_res );
+bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_maxLevel );
 
 extern double NatMod[ 25 ][ 5 ];
 extern u32    EXP[ 100 ][ 6 ];

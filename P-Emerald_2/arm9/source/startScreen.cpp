@@ -27,6 +27,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds/system.h>
 
+#include "sound.h"
 #include "choiceBox.h"
 #include "defines.h"
 #include "fs.h"
@@ -57,12 +58,23 @@ namespace SAVE {
 
     language translate( u8 p_dSRegion ) {
         switch( p_dSRegion ) {
+        // case 0:
+        //    return SAVE::JPN;
+        default:
         case 1:
             return SAVE::EN;
+        // case 2:
+        //    return SAVE::FRE;
         case 3:
             return SAVE::GER;
-        default:
-            return SAVE::EN;
+        // case 4:
+        //    return SAVE::ITA;
+        // case 5:
+        //    return SAVE::SPA;
+        // case 6:
+        //    return SAVE::CHS;
+        // case 7:
+        //    return SAVE::KOR;
         }
     }
 
@@ -112,8 +124,13 @@ namespace SAVE {
 
             int pressed = keysCurrent( );
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
-                || GET_AND_WAIT_R( 1, 1, 256, 192 ) )
+                || GET_AND_WAIT_R( 1, 1, 256, 192 ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
+                IO::clearScreenConsole( true, true );
+                IO::clearScreen( true, false, false );
+                IO::fadeScreen( IO::CLEAR_WHITE, true, true );
                 break;
+            }
             ++frame;
             if( !( frame % 120 ) ) {
                 printf( STRINGS[ 70 ][ p_lang ] );
@@ -162,7 +179,8 @@ namespace SAVE {
 
             IO::regularFont->printString( SAV->m_saveFile[ i ].m_playername, 8, 30 + 64 * i, true );
             IO::regularFont->printString(
-                FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ), 248, 30 + 64 * i,
+                FS::getLocation( MAP::curMap->getCurrentLocationId( ),
+                    CURRENT_LANGUAGE ).c_str( ), 248, 30 + 64 * i,
                 true, IO::font::RIGHT );
 
             char buffer[ 50 ];
@@ -232,17 +250,19 @@ namespace SAVE {
             vis.push_back( 71 );
             res.push_back( CONTINUE );
         }
-        //  vis.push_back( 72 );
-        //  res.push_back( NEW_GAME );
+        vis.push_back( 72 );
+        res.push_back( NEW_GAME );
         vis.push_back( 73 );
         res.push_back( SPECIAL_EPISODE );
-        //  if( gMod == DEVELOPER || SAV->m_transfersRemaining ) {
-        //      vis.push_back( 74 );
-        //      res.push_back( TRANSFER_GAME );
-        //  }
+        if( gMod == DEVELOPER || SAV->m_transfersRemaining ) {
+            vis.push_back( 74 );
+            res.push_back( TRANSFER_GAME );
+        }
 
         u8 selectedIdx = 0;
         drawMainChoice( p_lang, vis, 0 );
+
+        IO::fadeScreen( IO::UNFADE, true, true );
 
         touchPosition touch;
         consoleSelect( &IO::Bottom );
@@ -253,19 +273,23 @@ namespace SAVE {
             touchRead( &touch );
             u32 pressed = keysCurrent( );
             if( GET_AND_WAIT( KEY_B ) ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true );
                 for( u16 i = 1; i < 256; ++i ) BG_PALETTE_SUB[ i ] = WHITE;
                 return ABORT;
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 selectedIdx = ( selectedIdx + 1 ) % vis.size( );
                 drawMainChoice( p_lang, vis, selectedIdx );
             } else if( GET_AND_WAIT( KEY_UP ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 selectedIdx = ( selectedIdx + vis.size( ) - 1 ) % vis.size( );
                 drawMainChoice( p_lang, vis, selectedIdx );
-            } else if( GET_AND_WAIT( KEY_A ) )
+            } else if( GET_AND_WAIT( KEY_A ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
                 return res[ selectedIdx ];
-
+            }
             for( u8 i = 0; i < vis.size( ); ++i )
                 if( IN_RANGE_R( 4, 4 + 48 * i, 136, 26 + 48 * i ) ) {
                     selectedIdx = i;
@@ -276,7 +300,10 @@ namespace SAVE {
                         scanKeys( );
                         touchRead( &touch );
 
-                        if( TOUCH_UP ) return res[ selectedIdx ];
+                        if( TOUCH_UP ) {
+                            SOUND::playSoundEffect( SFX_CHOOSE );
+                            return res[ selectedIdx ];
+                        }
                         if( !IN_RANGE_R( 4, 4 + 48 * i, 136, 26 + 48 * i ) ) break;
                     }
                     drawMainChoice( p_lang, vis, selectedIdx );
@@ -298,17 +325,21 @@ namespace SAVE {
             touchRead( &touch );
             u32 pressed = keysCurrent( );
             if( GET_AND_WAIT( KEY_B ) ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true );
                 for( u16 i = 1; i < 256; ++i ) BG_PALETTE_SUB[ i ] = WHITE;
                 return -1;
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 selectedIdx = ( selectedIdx + 1 ) % MAX_SAVE_FILES;
                 drawSlotChoice( p_lang, selectedIdx );
             } else if( GET_AND_WAIT( KEY_UP ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 selectedIdx = ( selectedIdx + MAX_SAVE_FILES - 1 ) % MAX_SAVE_FILES;
                 drawSlotChoice( p_lang, selectedIdx );
             } else if( GET_AND_WAIT( KEY_A ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
                 if( SAV->m_saveFile[ selectedIdx ].m_gameType && p_newGameMode ) {
                     IO::clearScreen( true, false, false );
                     bool r = !IO::yesNoBox( p_lang ).getResult( STRINGS[ 79 ][ p_lang ] );
@@ -328,7 +359,10 @@ namespace SAVE {
                         swiWaitForVBlank( );
                         scanKeys( );
                         touchRead( &touch );
-                        if( TOUCH_UP ) { return selectedIdx; }
+                        if( TOUCH_UP ) {
+                            SOUND::playSoundEffect( SFX_CHOOSE );
+                            return selectedIdx;
+                        }
                         if( !IN_RANGE_R( 4, 4 + 64 * i, 86, 26 + 64 * i ) ) break;
                     }
                     drawSlotChoice( p_lang, selectedIdx );
@@ -399,11 +433,10 @@ namespace SAVE {
         if( SAV->getActiveFile( ).m_gameType )
             cur = SAV->getActiveFile( ).m_options.m_language;
         else
-            cur = translate( PersonalData->language );
+            cur = translate( TWL_CONFIG ? *(u8*)0x02000406 : PersonalData->language );
 
         loop( ) {
             drawSplash( cur );
-            // TODO: Add fade
 
             choiceType res = runMainChoice( cur );
 

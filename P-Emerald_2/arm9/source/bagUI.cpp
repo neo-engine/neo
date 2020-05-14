@@ -304,7 +304,7 @@ namespace BAG {
                     } else if( canLearn( SAVE::SAV->getActiveFile( )
                                              .m_pkmnTeam[ i ]
                                              .m_boxdata.m_speciesId,
-                                         currMv, 4 ) ) {
+                                         currMv, LEARN_TM ) ) {
                         BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
                         IO::regularFont->setColor( COLOR_IDX, 1 );
                         IO::regularFont->setColor( BLACK_IDX, 2 );

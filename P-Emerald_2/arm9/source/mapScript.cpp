@@ -103,7 +103,7 @@ namespace MAP {
                 snprintf( buffer, 40, "%hhu %hhu %hhu %hhu", header[ 0 ], header[ 1 ], header[ 2 ],
                           header[ 3 ] );
                 IO::messageBox( buffer, true );
-                IO::NAV->draw( );*/
+                NAV::draw( );*/
         // Check if it can be executed
         if( header[ 2 ] != p_inv || ( header[ 1 ] < 0xFF && header[ 1 ] != p_z ) ) return true;
 
@@ -120,7 +120,7 @@ namespace MAP {
                       PARAM3( SCRIPT_INS[ pc ] ), PARAMA( SCRIPT_INS[ pc ] ),
                       PARAMB( SCRIPT_INS[ pc ] ) );
             IO::messageBox( buffer, true );
-            IO::NAV->draw( );*/
+            NAV::draw( );*/
 
             switch( OPCODE( SCRIPT_INS[ pc ] ) ) {
             case MV:
@@ -251,7 +251,7 @@ namespace MAP {
                 // TODO
                 break;
             case CLEAR:
-                IO::NAV->draw( true );
+                NAV::draw( true );
                 break;
             default:
                 break;

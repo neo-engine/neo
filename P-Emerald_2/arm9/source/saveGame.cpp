@@ -48,7 +48,7 @@ namespace SAVE {
             m_repelSteps--;
             if( !m_repelSteps ) {
                 IO::messageBox( GET_STRING( 4 ), true );
-                IO::NAV->draw( true );
+                NAV::draw( true );
             }
         }
         if( !m_stepCount ) {

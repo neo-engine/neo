@@ -33,9 +33,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <vector>
 
+#include <fat.h>
+#include <sys/stat.h>
+
 #include "ability.h"
 #include "battleTrainer.h"
-#include "berry.h"
 #include "defines.h"
 #include "fs.h"
 #include "item.h"
@@ -49,72 +51,85 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 const char PKMNDATA_PATH[] = "nitro:/PKMNDATA/";
 const char SCRIPT_PATH[]   = "nitro:/MAPS/SCRIPTS/";
 
-const char ITEM_NAME_PATH[]     = "nitro:/DATA/ITEM_NAME/";
-const char ITEM_DATA_PATH[]     = "nitro:/DATA/ITEM_DATA/";
-const char ABILITY_NAME_PATH[]  = "nitro:/DATA/ABTY_NAME/";
-const char MOVE_NAME_PATH[]     = "nitro:/DATA/MOVE_NAME/";
-const char MOVE_DATA_PATH[]     = "nitro:/DATA/MOVE_DATA/";
-const char POKEMON_NAME_PATH[]  = "nitro:/DATA/PKMN_NAME/";
-const char POKEMON_DATA_PATH[]  = "nitro:/DATA/PKMN_DATA/";
+const char LOCATION_NAME_PATH[]    = "nitro:/LOCATIONS/";
+const char ITEM_NAME_PATH[]    = "nitro:/DATA/ITEM_NAME/";
+const char ITEM_DATA_PATH[]    = "nitro:/DATA/ITEM_DATA/";
+const char ABILITY_NAME_PATH[] = "nitro:/DATA/ABTY_NAME/";
+const char MOVE_NAME_PATH[]    = "nitro:/DATA/MOVE_NAME/";
+const char MOVE_DATA_PATH[]    = "nitro:/DATA/MOVE_DATA/";
+const char POKEMON_NAME_PATH[] = "nitro:/DATA/PKMN_NAME/";
+const char POKEMON_DATA_PATH[] = "nitro:/DATA/PKMN_DATA/";
 const char PKMN_LEARNSET_PATH[] = "nitro:/DATA/PKMN_LEARN/";
 
 const char BATTLE_TRAINER_PATH[] = "n/a";
 
 namespace FS {
+    char TMP_BUFFER[ 100 ];
+    char TMP_BUFFER_SHORT[ 50 ];
+
+    bool SD_ACCESSED = false, SD_READ = false;
+    bool SDFound( ) {
+        if( !SD_ACCESSED ) {
+            SD_READ = !access( "sd:/", F_OK );
+            SD_ACCESSED = true;
+        }
+        return SD_READ;
+    }
+
+    bool FC_ACCESSED = false, FC_READ = false;
+    bool FCFound( ) {
+        if( !FC_ACCESSED ) {
+            FC_READ = !access( "fat:/", F_OK );
+            FC_ACCESSED = true;
+        }
+        return FC_READ;
+    }
+
+    bool exists( const char* p_path ) {
+        FILE* fd = fopen( p_path, "r" );
+        bool res = !!fd;
+        fclose( fd );
+        return res;
+    }
     bool exists( const char* p_path, const char* p_name ) {
         FILE* fd = open( p_path, p_name );
-        if( !fd ) return false;
+        bool res = !!fd;
         fclose( fd );
-        return true;
-    }
-    bool exists( const char* p_path, u16 p_name, bool p_unused ) {
-        (void) p_unused;
-
-        FILE* fd = open( p_path, p_name );
-        if( !fd ) return false;
-        fclose( fd );
-        return true;
+        return res;
     }
     bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name ) {
-        char* buffer = new char[ 100 ];
-        snprintf( buffer, 99, "%s%d/%d%s.raw", p_path, p_pkmnIdx, p_pkmnIdx, p_name );
-        FILE* fd = fopen( buffer, "rb" );
-        delete[] buffer;
-        if( fd == 0 ) {
-            fclose( fd );
-            return false;
-        }
+        snprintf( TMP_BUFFER, 99, "%s%d/%d%s.raw", p_path, p_pkmnIdx, p_pkmnIdx, p_name );
+        FILE* fd = fopen( TMP_BUFFER, "rb" );
+        bool res = !!fd;
         fclose( fd );
-        return true;
+        return res;
     }
 
     FILE* open( const char* p_path, const char* p_name, const char* p_ext, const char* p_mode ) {
-        char* buffer = new char[ 100 ];
-        snprintf( buffer, 99, "%s%s%s", p_path, p_name, p_ext );
-        auto res = fopen( buffer, p_mode );
-        delete[] buffer;
+        snprintf( TMP_BUFFER, 99, "%s%s%s", p_path, p_name, p_ext );
+        auto res = fopen( TMP_BUFFER, p_mode );
         return res;
     }
     FILE* open( const char* p_path, u16 p_value, const char* p_ext, const char* p_mode ) {
-        char* buffer = new char[ 100 ];
-        snprintf( buffer, 99, "%s%d%s", p_path, p_value, p_ext );
-        auto res = fopen( buffer, p_mode );
-        delete[] buffer;
+        snprintf( TMP_BUFFER, 99, "%s%d%s", p_path, p_value, p_ext );
+        auto res = fopen( TMP_BUFFER, p_mode );
         return res;
     }
     FILE* openSplit( const char* p_path, u16 p_value, const char* p_ext, u16 p_maxValue,
                      const char* p_mode ) {
         char* buffer = new char[ 100 ];
         if( p_maxValue < 10 * ITEMS_PER_DIR ) {
-            snprintf( buffer, 99, "%s%d/%d%s", p_path, p_value / ITEMS_PER_DIR, p_value, p_ext );
+            snprintf( TMP_BUFFER, 99, "%s%d/%d%s", p_path, p_value / ITEMS_PER_DIR,
+                      p_value, p_ext );
         } else if( p_maxValue < 100 * ITEMS_PER_DIR ) {
-            snprintf( buffer, 99, "%s%02d/%d%s", p_path, p_value / ITEMS_PER_DIR, p_value, p_ext );
+            snprintf( TMP_BUFFER, 99, "%s%02d/%d%s", p_path, p_value / ITEMS_PER_DIR,
+                      p_value, p_ext );
         } else {
-            snprintf( buffer, 99, "%s%03d/%d%s", p_path, p_value / ITEMS_PER_DIR, p_value, p_ext );
+            snprintf( TMP_BUFFER, 99, "%s%03d/%d%s", p_path, p_value / ITEMS_PER_DIR,
+                      p_value, p_ext );
         }
 
-        auto res = fopen( buffer, p_mode );
-        delete[] buffer;
+        auto res = fopen( TMP_BUFFER, p_mode );
         return res;
     }
 
@@ -131,10 +146,9 @@ namespace FS {
     }
 
     FILE* openScript( u8 p_bank, u8 p_mapX, u8 p_mapY, u8 p_relX, u8 p_relY, u8 p_id ) {
-        char buffer[ 60 ];
-        snprintf( buffer, 50, "%hhu/%hhu_%hhu/%hhu_%hhu_%hhu", p_bank, p_mapY, p_mapX, p_relX,
-                  p_relY, p_id );
-        return open( SCRIPT_PATH, buffer, ".bin", "r" );
+        snprintf( TMP_BUFFER_SHORT, 50, "%hhu/%hhu_%hhu/%hhu_%hhu_%hhu", p_bank, p_mapY,
+                  p_mapX, p_relX, p_relY, p_id );
+        return open( SCRIPT_PATH, TMP_BUFFER_SHORT, ".bin", "r" );
     }
     FILE* openScript( MAP::warpPos p_pos, u8 p_id ) {
         return openScript( p_pos.first, p_pos.second.m_posX, p_pos.second.m_posY, p_id );
@@ -191,25 +205,27 @@ namespace FS {
     }
 
     bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no ) {
-        if( p_no == SAVE::SAV->getActiveFile( ).m_options.m_bgIdx && IO::NAV_DATA[ 0 ] ) {
-            dmaCopy( IO::NAV_DATA, p_layer, 256 * 192 );
-            dmaCopy( IO::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
+        if( p_no == SAVE::SAV->getActiveFile( ).m_options.m_bgIdx && NAV::NAV_DATA[ 0 ] ) {
+            dmaCopy( NAV::NAV_DATA, p_layer, 256 * 192 );
+            dmaCopy( NAV::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
             return true;
         }
 
-        if( !readData( "nitro:/PICS/NAV/", p_name, (unsigned int) 12288, IO::NAV_DATA,
-                       (unsigned short) 192, IO::NAV_DATA_PAL ) )
+        if( !readData( "nitro:/PICS/NAV/", p_name, (unsigned int) 12288, NAV::NAV_DATA,
+                       (unsigned short) 192, NAV::NAV_DATA_PAL ) )
             return false;
 
-        dmaCopy( IO::NAV_DATA, p_layer, 256 * 192 );
-        dmaCopy( IO::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
+        dmaCopy( NAV::NAV_DATA, p_layer, 256 * 192 );
+        dmaCopy( NAV::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
 
         return true;
     }
 
     bool readNop( FILE* p_file, u32 p_cnt ) {
-        if( p_file == 0 ) return false;
-        read( p_file, 0, 1, p_cnt );
+        u8 tmp;
+        for( u32 i = 0; i < p_cnt; ++i )
+            if( !read( p_file, &tmp, sizeof( u8 ), 1 ) )
+                return false;
         return true;
     }
 
@@ -262,9 +278,8 @@ namespace FS {
     }
 
     bool readBankData( u8 p_bank, MAP::bankInfo& p_result ) {
-        char buffer[ 50 ];
-        snprintf( buffer, 45, "%hhu/%hhu", p_bank, p_bank );
-        FILE* f = open( MAP::MAP_PATH, buffer, ".bnk" );
+        snprintf( TMP_BUFFER_SHORT, 45, "%hhu/%hhu", p_bank, p_bank );
+        FILE* f = open( MAP::MAP_PATH, TMP_BUFFER_SHORT, ".bnk" );
         if( !f ) return false;
         read( f, &p_result.m_locationId, sizeof( u16 ), 1 );
         read( f, &p_result.m_battleBg, sizeof( u8 ), 1 );
@@ -276,31 +291,6 @@ namespace FS {
         }
         close( f );
         return true;
-    }
-
-    [[deprecated]] std::string readString( FILE* p_file, bool p_new ) {
-        (void) p_new;
-
-        std::string ret = "";
-        int         ac;
-
-        while( ( ac = fgetc( p_file ) ) == '\n' || ac == '\r' )
-            ;
-
-        if( ac == '*' || ac == EOF ) {
-            return ret;
-        } else
-            ret += ac;
-
-        while( ( ac = fgetc( p_file ) ) != '*' && ac != EOF ) {
-            if( ac == '|' )
-                ret += (char) 136;
-            else if( ac == '#' )
-                ret += (char) 137;
-            else
-                ret += ac;
-        }
-        return ret;
     }
 
     std::string breakString( const std::string& p_string, u8 p_lineLength ) {
@@ -370,18 +360,22 @@ namespace FS {
         return result;
     }
 
-    std::string getLocation( u16 p_ind ) {
-        if( p_ind > 5000 ) return FARAWAY_PLACE;
-        FILE* f = FS::openSplit( "nitro:/LOCATIONS/", p_ind, ".data", 5000 );
+    bool getLocation( const u16 p_locationId, const u8 p_language, char* p_out ) {
+        FILE* f = FS::openSplit( LOCATION_NAME_PATH, p_locationId, ".str", 5000 );
+        if( !f ) return false;
 
-        if( !f ) {
-            if( p_ind > 322 && p_ind < 1000 ) return getLocation( 3002 );
-
-            return FARAWAY_PLACE;
+        for( int i = 0; i <= p_language; ++i ) {
+            fread( p_out, 1, LOCATION_NAMELENGTH, f );
         }
-        auto res = readString( f, true );
         fclose( f );
-        return res;
+        return true;
+    }
+    std::string getLocation( const u16 p_itemId, const u8 p_language ) {
+        char tmpbuf[ LOCATION_NAMELENGTH ];
+        if( !getLocation( p_itemId, p_language, tmpbuf ) ) {
+            return "---";
+        }
+        return std::string( tmpbuf );
     }
 
     std::unique_ptr<SAVE::saveGame> readSave( const char* p_path ) {
@@ -497,12 +491,6 @@ std::string getAbilityName( int p_abilityId, int p_language ) {
     return std::string( tmpbuf );
 }
 
-std::string toString( u16 p_num ) {
-    char buffer[ 32 ];
-    sprintf( buffer, "%hu", p_num );
-    return std::string( buffer );
-}
-
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
     char tmpbuf[ 20 ];
     if( !getDisplayName( p_pkmnId, tmpbuf, p_language, p_forme ) ) { return "???"; }
@@ -555,9 +543,9 @@ bool getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out ) {
 bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
     FILE* f;
     if( p_forme ) {
-        char buffer[ 15 ];
-        snprintf( buffer, 13, "%02hu/%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId, p_forme );
-        f = FS::open( PKMNDATA_PATH, buffer, ".data" );
+        snprintf( FS::TMP_BUFFER_SHORT, 13, "%02hu/%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR,
+                  p_pkmnId, p_forme );
+        f = FS::open( PKMNDATA_PATH, FS::TMP_BUFFER_SHORT, ".data" );
     }
 
     if( !p_forme || !f ) f = FS::openSplit( PKMNDATA_PATH, p_pkmnId, ".data" );
@@ -568,80 +556,58 @@ bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
     return true;
 }
 
-void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount,
-                    u16* p_result ) {
+u16 LEARNSET_BUFFER[ 700 ];
+void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_amount, u16* p_result ) {
     FILE* f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
     if( !f ) f = FS::openSplit( PKMN_LEARNSET_PATH, 201, ".learnset.data" );
     if( !f ) return;
 
-    u16* buffer = new u16[ 700 ];
-    FS::read( f, buffer, sizeof( u16 ), 699 );
+    FS::read( f, LEARNSET_BUFFER, sizeof( u16 ), 680 );
     FS::close( f );
     u16 ptr = 0;
 
-    u16 rescnt = 0;
     for( u8 i = 0; i < p_amount; ++i ) p_result[ i ] = 0;
+    if( p_fromLevel > p_toLevel ) std::swap( p_fromLevel, p_toLevel );
 
-    if( p_fromLevel > p_toLevel ) {
-        std::vector<u16> reses;
-        for( u16 i = 0; i <= p_fromLevel; ++i ) {
-            u16 z = buffer[ ptr++ ];
-            for( int j = 0; j < z; ++j ) {
-                u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-                if( i >= p_toLevel && h == (u16) p_mode && g < MAX_ATTACK ) reses.push_back( g );
+    std::vector<u16> reses;
+    for( u16 i = 0; i <= p_toLevel; ++i ) {
+        while( i == LEARNSET_BUFFER[ ptr ] ) {
+            if( i >= p_fromLevel ) {
+                reses.push_back( LEARNSET_BUFFER[ ++ptr ] );
+            } else {
+                ++ptr;
             }
-        }
-        auto I = reses.rbegin( );
-        for( u16 i = 0; i < p_amount && I != reses.rend( ); ++i, ++I ) {
-            for( u16 z = 0; z < i; ++z )
-                if( *I == p_result[ z ] ) {
-                    --i;
-                    goto N;
-                }
-            p_result[ i ] = *I;
-        N:;
-        }
-        delete[] buffer;
-        return;
-    } else {
-        for( u16 i = 0; i <= p_toLevel; ++i ) {
-            u16 z = buffer[ ptr++ ];
-            for( u16 j = 0; j < z; ++j ) {
-                u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-                if( i >= p_fromLevel && h == p_mode && g < MAX_ATTACK ) {
-                    for( u16 k = 0; k < rescnt; ++k )
-                        if( g == p_result[ k ] ) goto NEXT;
-                    p_result[ rescnt ] = g;
-                    if( ++rescnt == p_amount ) {
-                        delete[] buffer;
-                        return;
-                    }
-                NEXT:;
-                }
-            }
+            ptr++;
         }
     }
-    delete[] buffer;
+    auto I = reses.rbegin( );
+    for( u16 i = 0; i < p_amount && I != reses.rend( ); ++i, ++I ) {
+        for( u16 z = 0; z < i; ++z )
+            if( *I == p_result[ z ] ) {
+                --i;
+                goto N;
+            }
+        p_result[ i ] = *I;
+N:;
+    }
+    return;
 }
-bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
+
+bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_maxLevel ) {
     FILE* f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
     if( !f ) return false;
 
-    u16* buffer = new u16[ 700 ];
-    FS::read( f, buffer, sizeof( u16 ), 699 );
+    FS::read( f, LEARNSET_BUFFER, sizeof( u16 ), 680 );
     FS::close( f );
     u16 ptr = 0;
 
-    for( int i = 0; i <= 100; ++i ) {
-        int z = buffer[ ptr++ ];
-        for( int j = 0; j < z; ++j ) {
-            u16 g = buffer[ ptr++ ], h = buffer[ ptr++ ];
-            if( g == p_moveId && h == p_mode ) {
-                delete[] buffer;
+    for( u16 i = 0; i <= p_maxLevel; ++i ) {
+        while( i == LEARNSET_BUFFER[ ptr ] ) {
+            if( p_moveId == LEARNSET_BUFFER[ ++ptr ] ) {
                 return true;
             }
+            ptr++;
         }
     }
-    delete[] buffer;
     return false;
 }
