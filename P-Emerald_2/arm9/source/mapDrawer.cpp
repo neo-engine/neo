@@ -1191,7 +1191,8 @@ namespace MAP {
 
     void mapDrawer::standUpPlayer( direction p_direction ) {
         redirectPlayer( p_direction, false );
-        bool remPlat = SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF;
+        bool remPlat = SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF
+            || SAVE::SAV->getActiveFile( ).m_player.m_movement == ROCK_CLIMB;
 
         moveCamera( p_direction, true );
         swiWaitForVBlank( );
@@ -1232,7 +1233,7 @@ namespace MAP {
         direction di = ( ( p_newMoveMode == SIT ) ? direction( ( u8( p_direction ) + 2 ) % 4 )
                                                   : p_direction );
 
-        if( p_newMoveMode == SURF ) {
+        if( p_newMoveMode == SURF || p_newMoveMode == ROCK_CLIMB ) {
             // Load the Pkmn
             surfPlatform.m_id               = 1;
             _spritePos[ surfPlatform.m_id ] = 1;
@@ -1330,10 +1331,12 @@ namespace MAP {
                     .m_movedata
                 == 0x3c
             && ( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ <= 3
-                 || SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF ) ) {
+                 || SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF
+                 || SAVE::SAV->getActiveFile( ).m_player.m_movement == ROCK_CLIMB ) ) {
             _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setPriority(
                 OBJPRIORITY_3 );
-            if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF )
+            if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF
+                    || SAVE::SAV->getActiveFile( ).m_player.m_movement == ROCK_CLIMB )
                 _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_3 );
         } else if( atom(
                        SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
@@ -1346,7 +1349,8 @@ namespace MAP {
                           != 0x3c ) {
             _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].setPriority(
                 OBJPRIORITY_2 );
-            if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF )
+            if( SAVE::SAV->getActiveFile( ).m_player.m_movement == SURF
+                || SAVE::SAV->getActiveFile( ).m_player.m_movement == ROCK_CLIMB )
                 _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_2 );
         }
         stepOn( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
@@ -1426,6 +1430,7 @@ namespace MAP {
             SAVE::SAV->getActiveFile( ).m_player.m_picNum = basePic;
             break;
         case SURF:
+        case ROCK_CLIMB:
             SAVE::SAV->getActiveFile( ).m_player.m_picNum = basePic + 3;
             newIsBig                                      = basePic == 0 || basePic == 10;
             ydif                                          = 2;

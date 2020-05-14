@@ -77,6 +77,7 @@ namespace MAP {
         BIKE_JUMP = 4,
         SIT       = 5,
         DIVE      = 6,
+        ROCK_CLIMB= 7,
         // NPC modes
         NO_MOVEMENT = 0,
     };

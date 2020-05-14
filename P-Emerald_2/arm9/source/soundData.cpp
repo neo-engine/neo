@@ -64,6 +64,7 @@ namespace SOUND {
             case MAP::BIKE_JUMP:
                 return MOD_CYCLING;
             case MAP::WALK:
+            case MAP::ROCK_CLIMB:
             case MAP::SIT:
             default:
                 return BGMforLocation( currentLocation );
@@ -90,10 +91,8 @@ namespace SOUND {
             case PKMN_RAIKOU:
             case PKMN_SUICUNE:
             case PKMN_ENTEI:
-            case PKMN_ZUBAT:
                 return MOD_BATTLE_RAIKOU_ENTEI_SUICUNE;
             case PKMN_RAYQUAZA:
-            case PKMN_LOTAD:
                 return MOD_BATTLE_RAYQUAZA;
             default:
                 return MOD_BATTLE_WILD;

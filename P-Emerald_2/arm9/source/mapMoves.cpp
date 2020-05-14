@@ -189,7 +189,7 @@ namespace MOVE {
                 return;
             case M_ROCK_CLIMB:
                 MAP::curMap->sitDownPlayer( SAVE::SAV->getActiveFile(
-                            ).m_player.m_direction, MAP::SURF );
+                            ).m_player.m_direction, MAP::ROCK_CLIMB );
                 while( possible( M_ROCK_CLIMB, 0 ) )
                     MAP::curMap->walkPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction );
                 MAP::curMap->standUpPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction );
