@@ -36,6 +36,7 @@ pokemon::pokemon( boxPokemon& p_boxPokemon ) : m_boxdata( p_boxPokemon ) {
     pkmnData data       = getPkmnData( p_boxPokemon.m_speciesId, p_boxPokemon.getForme( ) );
     m_level             = calcLevel( p_boxPokemon, &data );
     m_stats             = calcStats( m_boxdata, m_level, &data );
+    m_battleForme = 0;
     m_statusint = 0;
 }
 pokemon::pokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 p_shiny,
@@ -46,6 +47,7 @@ pokemon::pokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 
             p_hiddenAbility, p_isEgg, p_ball, p_pokerus,  p_fatefulEncounter, &data );
     m_level             = p_level;
     m_stats             = calcStats( m_boxdata, p_level, &data );
+    m_battleForme = 0;
     m_statusint = 0;
 }
 pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id, u16 p_sid,
@@ -58,6 +60,7 @@ pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u
             p_gotPlace, p_ball, p_pokerus, p_forme, &data );
     m_level             = p_level;
     m_stats             = calcStats( m_boxdata, p_level, &data );
+    m_battleForme = 0;
     m_statusint = 0;
 }
 pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
@@ -74,6 +77,7 @@ pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
         m_boxdata.IVset( i, p_trainerPokemon.m_iv[ i ] );
     }
     m_stats             = calcStats( m_boxdata, m_level, &data );
+    m_battleForme = 0;
     m_statusint = 0;
 }
 
