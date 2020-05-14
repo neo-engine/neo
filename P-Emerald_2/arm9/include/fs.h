@@ -41,10 +41,11 @@ namespace FS {
 #define MAXITEMSPERPAGE 12
     const u16 ITEMS_PER_DIR = 30;
 
-    std::string readString( FILE*, bool p_new = false );
+    bool   SDFound( );
+    bool   FCFound( );
 
+    bool   exists( const char* p_path );
     bool   exists( const char* p_path, const char* p_name );
-    bool   exists( const char* p_path, u16 p_name, bool p_unused );
     bool   exists( const char* p_path, u16 p_pkmnIdx, const char* p_name = "" );
     FILE*  open( const char* p_path, const char* p_name, const char* p_ext = ".raw",
                  const char* p_mode = "rb" );
@@ -92,7 +93,8 @@ namespace FS {
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name,
                          const u32 p_tileCnt, const u16 p_palCnt, bool p_bottom = false );
 
-    std::string getLocation( u16 p_ind );
+    std::string getLocation( u16 p_locationId, u8 p_language );
+    bool getLocation( u16 p_locationId, u8 p_language, char* p_out );
 
     std::unique_ptr<SAVE::saveGame> readSave( const char* p_path );
     bool writeSave( std::unique_ptr<SAVE::saveGame>& p_saveGame, const char* p_path );

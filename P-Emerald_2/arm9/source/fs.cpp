@@ -33,6 +33,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <vector>
 
+#include <fat.h>
+#include <sys/stat.h>
+
 #include "ability.h"
 #include "battleTrainer.h"
 #include "defines.h"
@@ -48,6 +51,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 const char PKMNDATA_PATH[]    = "nitro:/PKMNDATA/";
 const char SCRIPT_PATH[]      = "nitro:/MAPS/SCRIPTS/";
 
+const char LOCATION_NAME_PATH[]    = "nitro:/LOCATIONS/";
 const char ITEM_NAME_PATH[]    = "nitro:/DATA/ITEM_NAME/";
 const char ITEM_DATA_PATH[]    = "nitro:/DATA/ITEM_DATA/";
 const char ABILITY_NAME_PATH[] = "nitro:/DATA/ABTY_NAME/";
@@ -60,63 +64,71 @@ const char PKMN_LEARNSET_PATH[] = "nitro:/DATA/PKMN_LEARN/";
 const char BATTLE_TRAINER_PATH[] = "n/a";
 
 namespace FS {
+    char TMP_BUFFER[ 100 ];
+    char TMP_BUFFER_SHORT[ 50 ];
+
+    bool SD_ACCESSED = false, SD_READ = false;
+    bool SDFound( ) {
+        if( !SD_ACCESSED ) {
+            SD_READ = !access( "sd:/", F_OK );
+            SD_ACCESSED = true;
+        }
+        return SD_READ;
+    }
+
+    bool FC_ACCESSED = false, FC_READ = false;
+    bool FCFound( ) {
+        if( !FC_ACCESSED ) {
+            FC_READ = !access( "fat:/", F_OK );
+            FC_ACCESSED = true;
+        }
+        return FC_READ;
+    }
+
+    bool exists( const char* p_path ) {
+        FILE* fd = fopen( p_path, "r" );
+        bool res = !!fd;
+        fclose( fd );
+        return res;
+    }
     bool exists( const char* p_path, const char* p_name ) {
         FILE* fd = open( p_path, p_name );
-        if( !fd ) return false;
+        bool res = !!fd;
         fclose( fd );
-        return true;
-    }
-    bool exists( const char* p_path, u16 p_name, bool p_unused ) {
-        (void) p_unused;
-
-        FILE* fd = open( p_path, p_name );
-        if( !fd ) return false;
-        fclose( fd );
-        return true;
+        return res;
     }
     bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name ) {
-        char* buffer = new char[ 100 ];
-        snprintf( buffer, 99, "%s%d/%d%s.raw", p_path, p_pkmnIdx, p_pkmnIdx, p_name );
-        FILE* fd = fopen( buffer, "rb" );
-        delete[] buffer;
-        if( fd == 0 ) {
-            fclose( fd );
-            return false;
-        }
+        snprintf( TMP_BUFFER, 99, "%s%d/%d%s.raw", p_path, p_pkmnIdx, p_pkmnIdx, p_name );
+        FILE* fd = fopen( TMP_BUFFER, "rb" );
+        bool res = !!fd;
         fclose( fd );
-        return true;
+        return res;
     }
 
     FILE* open( const char* p_path, const char* p_name, const char* p_ext, const char* p_mode ) {
-        char* buffer = new char[ 100 ];
-        snprintf( buffer, 99, "%s%s%s", p_path, p_name, p_ext );
-        auto res = fopen( buffer, p_mode );
-        delete[] buffer;
+        snprintf( TMP_BUFFER, 99, "%s%s%s", p_path, p_name, p_ext );
+        auto res = fopen( TMP_BUFFER, p_mode );
         return res;
     }
     FILE* open( const char* p_path, u16 p_value, const char* p_ext, const char* p_mode ) {
-        char* buffer = new char[ 100 ];
-        snprintf( buffer, 99, "%s%d%s", p_path, p_value, p_ext );
-        auto res = fopen( buffer, p_mode );
-        delete[] buffer;
+        snprintf( TMP_BUFFER, 99, "%s%d%s", p_path, p_value, p_ext );
+        auto res = fopen( TMP_BUFFER, p_mode );
         return res;
     }
     FILE* openSplit( const char* p_path, u16 p_value, const char* p_ext,
             u16 p_maxValue, const char* p_mode ) {
-        char* buffer = new char[ 100 ];
         if( p_maxValue < 10 * ITEMS_PER_DIR ) {
-            snprintf( buffer, 99, "%s%d/%d%s", p_path, p_value / ITEMS_PER_DIR,
+            snprintf( TMP_BUFFER, 99, "%s%d/%d%s", p_path, p_value / ITEMS_PER_DIR,
                       p_value, p_ext );
         } else if( p_maxValue < 100 * ITEMS_PER_DIR ) {
-            snprintf( buffer, 99, "%s%02d/%d%s", p_path, p_value / ITEMS_PER_DIR,
+            snprintf( TMP_BUFFER, 99, "%s%02d/%d%s", p_path, p_value / ITEMS_PER_DIR,
                       p_value, p_ext );
         } else {
-            snprintf( buffer, 99, "%s%03d/%d%s", p_path, p_value / ITEMS_PER_DIR,
+            snprintf( TMP_BUFFER, 99, "%s%03d/%d%s", p_path, p_value / ITEMS_PER_DIR,
                       p_value, p_ext );
         }
 
-        auto res = fopen( buffer, p_mode );
-        delete[] buffer;
+        auto res = fopen( TMP_BUFFER, p_mode );
         return res;
     }
 
@@ -133,10 +145,9 @@ namespace FS {
     }
 
     FILE* openScript( u8 p_bank, u8 p_mapX, u8 p_mapY, u8 p_relX, u8 p_relY, u8 p_id ) {
-        char buffer[ 60 ];
-        snprintf( buffer, 50, "%hhu/%hhu_%hhu/%hhu_%hhu_%hhu", p_bank, p_mapY, p_mapX, p_relX,
-                  p_relY, p_id );
-        return open( SCRIPT_PATH, buffer, ".bin", "r" );
+        snprintf( TMP_BUFFER_SHORT, 50, "%hhu/%hhu_%hhu/%hhu_%hhu_%hhu", p_bank, p_mapY,
+                  p_mapX, p_relX, p_relY, p_id );
+        return open( SCRIPT_PATH, TMP_BUFFER_SHORT, ".bin", "r" );
     }
     FILE* openScript( MAP::warpPos p_pos, u8 p_id ) {
         return openScript( p_pos.first, p_pos.second.m_posX, p_pos.second.m_posY, p_id );
@@ -193,18 +204,18 @@ namespace FS {
     }
 
     bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no ) {
-        if( p_no == SAVE::SAV->getActiveFile( ).m_options.m_bgIdx && IO::NAV_DATA[ 0 ] ) {
-            dmaCopy( IO::NAV_DATA, p_layer, 256 * 192 );
-            dmaCopy( IO::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
+        if( p_no == SAVE::SAV->getActiveFile( ).m_options.m_bgIdx && NAV::NAV_DATA[ 0 ] ) {
+            dmaCopy( NAV::NAV_DATA, p_layer, 256 * 192 );
+            dmaCopy( NAV::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
             return true;
         }
 
-        if( !readData( "nitro:/PICS/NAV/", p_name, (unsigned int) 12288, IO::NAV_DATA,
-                       (unsigned short) 192, IO::NAV_DATA_PAL ) )
+        if( !readData( "nitro:/PICS/NAV/", p_name, (unsigned int) 12288, NAV::NAV_DATA,
+                       (unsigned short) 192, NAV::NAV_DATA_PAL ) )
             return false;
 
-        dmaCopy( IO::NAV_DATA, p_layer, 256 * 192 );
-        dmaCopy( IO::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
+        dmaCopy( NAV::NAV_DATA, p_layer, 256 * 192 );
+        dmaCopy( NAV::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
 
         return true;
     }
@@ -266,9 +277,8 @@ namespace FS {
     }
 
     bool readBankData( u8 p_bank, MAP::bankInfo& p_result ) {
-        char buffer[ 50 ];
-        snprintf( buffer, 45, "%hhu/%hhu", p_bank, p_bank );
-        FILE* f = open( MAP::MAP_PATH, buffer, ".bnk" );
+        snprintf( TMP_BUFFER_SHORT, 45, "%hhu/%hhu", p_bank, p_bank );
+        FILE* f = open( MAP::MAP_PATH, TMP_BUFFER_SHORT, ".bnk" );
         if( !f ) return false;
         read( f, &p_result.m_locationId, sizeof( u16 ), 1 );
         read( f, &p_result.m_battleBg, sizeof( u8 ), 1 );
@@ -280,32 +290,6 @@ namespace FS {
         }
         close( f );
         return true;
-    }
-
-    [[deprecated]]
-    std::string readString( FILE* p_file, bool p_new ) {
-        (void) p_new;
-
-        std::string ret = "";
-        int         ac;
-
-        while( ( ac = fgetc( p_file ) ) == '\n' || ac == '\r' )
-            ;
-
-        if( ac == '*' || ac == EOF ) {
-            return ret;
-        } else
-            ret += ac;
-
-        while( ( ac = fgetc( p_file ) ) != '*' && ac != EOF ) {
-            if( ac == '|' )
-                ret += (char) 136;
-            else if( ac == '#' )
-                ret += (char) 137;
-            else
-                ret += ac;
-        }
-        return ret;
     }
 
     std::string breakString( const std::string& p_string, u8 p_lineLength ) {
@@ -375,18 +359,22 @@ namespace FS {
         return result;
     }
 
-    std::string getLocation( u16 p_ind ) {
-        if( p_ind > 5000 ) return FARAWAY_PLACE;
-        FILE* f = FS::openSplit( "nitro:/LOCATIONS/", p_ind, ".data", 5000 );
+    bool getLocation( const u16 p_locationId, const u8 p_language, char* p_out ) {
+        FILE* f = FS::openSplit( LOCATION_NAME_PATH, p_locationId, ".str", 5000 );
+        if( !f ) return false;
 
-        if( !f ) {
-            if( p_ind > 322 && p_ind < 1000 ) return getLocation( 3002 );
-
-            return FARAWAY_PLACE;
+        for( int i = 0; i <= p_language; ++i ) {
+            fread( p_out, 1, LOCATION_NAMELENGTH, f );
         }
-        auto res = readString( f, true );
         fclose( f );
-        return res;
+        return true;
+    }
+    std::string getLocation( const u16 p_itemId, const u8 p_language ) {
+        char tmpbuf[ LOCATION_NAMELENGTH ];
+        if( !getLocation( p_itemId, p_language, tmpbuf ) ) {
+            return "---";
+        }
+        return std::string( tmpbuf );
     }
 
     std::unique_ptr<SAVE::saveGame> readSave( const char* p_path ) {
@@ -520,12 +508,6 @@ std::string getAbilityName( int p_abilityId, int p_language ) {
     return std::string( tmpbuf );
 }
 
-std::string toString( u16 p_num ) {
-    char buffer[ 32 ];
-    sprintf( buffer, "%hu", p_num );
-    return std::string( buffer );
-}
-
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
     char tmpbuf[ 20 ];
     if( !getDisplayName( p_pkmnId, tmpbuf, p_language, p_forme ) ) {
@@ -585,9 +567,9 @@ bool getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out ) {
 bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
     FILE* f;
     if( p_forme ) {
-        char buffer[ 15 ];
-        snprintf( buffer, 13, "%02hu/%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId, p_forme );
-        f = FS::open( PKMNDATA_PATH, buffer, ".data" );
+        snprintf( FS::TMP_BUFFER_SHORT, 13, "%02hu/%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR,
+                  p_pkmnId, p_forme );
+        f = FS::open( PKMNDATA_PATH, FS::TMP_BUFFER_SHORT, ".data" );
     }
 
     if( !p_forme || !f ) f = FS::openSplit( PKMNDATA_PATH, p_pkmnId, ".data" );

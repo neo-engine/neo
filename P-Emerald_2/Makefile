@@ -29,6 +29,7 @@ checkarm7:
 #---------------------------------------------------------------------------------
 checkarm9:
 	$(MAKE) -C tools/ndstool
+	$(MAKE) -C audio
 	$(MAKE) -C arm9
 
 #---------------------------------------------------------------------------------
@@ -37,7 +38,7 @@ _ADDFILES	:=	-d $(NITRO_FILES)
 endif
 
 #---------------------------------------------------------------------------------
-$(TARGET).nds	:	arm7/$(TARGET).elf arm9/$(TARGET).elf
+$(TARGET).nds	: FORCE	arm7/$(TARGET).elf arm9/$(TARGET).elf
 	$(NDSTOOL) -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1)" $(_ADDFILES)
 
 #---------------------------------------------------------------------------------
@@ -47,6 +48,7 @@ arm7/$(TARGET).elf:
 #---------------------------------------------------------------------------------
 arm9/$(TARGET).elf:
 	$(MAKE) -C tools/ndstool
+	$(MAKE) -C audio
 	$(MAKE) -C arm9
 
 #---------------------------------------------------------------------------------
@@ -54,6 +56,9 @@ clean:
 	$(MAKE) -C arm9 clean
 	$(MAKE) -C arm7 clean
 	$(MAKE) -C tools/ndstool clean
+	$(MAKE) -C audio clean
 	rm -f $(TARGET).nds $(TARGET).arm7 $(TARGET).arm9
 
 rebuild: clean $(BUILD)
+
+FORCE: ;

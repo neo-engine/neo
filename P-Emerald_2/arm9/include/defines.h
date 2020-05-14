@@ -48,6 +48,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define ITEM_NAMELENGTH 20
 #define MOVE_NAMELENGTH 20
 #define ABILITY_NAMELENGTH 20
+#define LOCATION_NAMELENGTH 25
 
 #undef RAND_MAX
 #define RAND_MAX 4294967295
@@ -55,7 +56,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 enum GameMod : u8 { DEVELOPER, ALPHA, BETA, RELEASE, EMULATOR };
 extern GameMod gMod;
 
-std::string toString( u16 p_num ); // I REALLY LIKE WORKAROUNDING g++'S BUGS
 u8          getCurrentDaytime( );
 
 extern bool DRAW_TIME;
@@ -72,6 +72,8 @@ extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;
 
 extern int pressed, held, last;
+
+extern bool TWL_CONFIG;
 
 extern unsigned int   TEMP[ 12288 ];
 extern unsigned short TEMP_PAL[ 256 ];

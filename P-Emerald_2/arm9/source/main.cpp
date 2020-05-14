@@ -41,6 +41,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs.h"
 #include "saveGame.h"
 #include "startScreen.h"
+#include "sound.h"
 
 #include "berry.h"
 #include "item.h"
@@ -85,6 +86,7 @@ u8     FRAME_COUNT       = 0;
 bool   SCREENS_SWAPPED   = false;
 bool   PLAYER_IS_FISHING = false;
 bool   INIT_NITROFS      = false;
+bool   TWL_CONFIG        = false;
 
 char** ARGV;
 
@@ -158,7 +160,7 @@ void vblankIRQ( ) {
     time( &unixTime );
     struct tm* timeStruct = gmtime( &unixTime );
 
-    if( acseconds != timeStruct->tm_sec || DRAW_TIME ) {
+    if( true || acseconds != timeStruct->tm_sec || DRAW_TIME ) {
         DRAW_TIME        = false;
         pal[ WHITE_IDX ] = WHITE;
         IO::boldFont->setColor( WHITE_IDX, 1 );
@@ -197,6 +199,9 @@ void vblankIRQ( ) {
 }
 
 int main( int, char** p_argv ) {
+    TWL_CONFIG = ( isDSiMode( ) && ( *(u8*) 0x02000400 & 0x0F ) && ( *(u8*)0x02000401 == 0 ) &&
+            ( *(u8*)0x02000402 == 0 ) && ( *(u8*)0x02000404 == 0 ) );
+
     // Init
     powerOn( POWER_ALL_2D );
     nitroFSInit( p_argv );
@@ -205,6 +210,9 @@ int main( int, char** p_argv ) {
     irqEnable( IRQ_VBLANK );
     initGraphics( );
     initTimeAndRnd( );
+    initSound( );
+
+    keysSetRepeat(25,5);
 
     // Read the savegame
     if( gMod != EMULATOR && p_argv[ 0 ] )
@@ -217,16 +225,21 @@ int main( int, char** p_argv ) {
     IO::clearScreen( false, true );
 
     FADE_TOP( );
+
     MAP::curMap = new MAP::mapDrawer( );
+    MAP::curMap->registerOnLocationChangedHandler( SOUND::onLocationChange );
+    MAP::curMap->registerOnMoveModeChangedHandler( SOUND::onMovementTypeChange );
+
     MAP::curMap->draw( );
     MAP::loadNewBank( SAVE::SAV->getActiveFile( ).m_currentMap );
 
     ANIMATE_MAP = true;
-    IO::NAV     = new IO::nav( );
-    irqSet( IRQ_VBLANK, vblankIRQ );
+    NAV::draw( true );
+    MAP::curMap->registerOnBankChangedHandler( NAV::showNewMap );
+    MAP::curMap->registerOnLocationChangedHandler( NAV::updateMap );
+    NAV::showNewMap( SAVE::SAV->getActiveFile( ).m_currentMap );
 
-    IO::NAV->showNewMap( SAVE::SAV->getActiveFile( ).m_currentMap );
-    IO::NAV->updateMap( MAP::curMap->getCurrentLocationId( ) );
+    irqSet( IRQ_VBLANK, vblankIRQ );
 
     touchPosition touch;
     bool          stopped = true;
@@ -244,7 +257,7 @@ int main( int, char** p_argv ) {
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char buffer[ 100 ];
             snprintf( buffer, 99,
-                      "Currently at %hhu-(%hu,%hu,%hhu).\nMap: %i:%i,"
+                      "Currently at %hhu-(%hx,%hx,%hhx).\nMap: %i:%i,"
                       "(%02u,%02u)\n %hhu %s (%hu) %lx %hx %hx",
                       SAVE::SAV->getActiveFile( ).m_currentMap,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
@@ -255,7 +268,8 @@ int main( int, char** p_argv ) {
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX % 32,
                       SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32,
                       MAP::CURRENT_BANK.m_bank,
-                      FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
+                      FS::getLocation( MAP::curMap->getCurrentLocationId( ),
+                          CURRENT_LANGUAGE ).c_str( ),
                       MAP::curMap->getCurrentLocationId( ),
                       ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ],
                       MAP::curMap
@@ -267,7 +281,7 @@ int main( int, char** p_argv ) {
                                 SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
                           .m_topbehave );
             IO::messageBox m( buffer );
-            IO::NAV->draw( true );
+            NAV::draw( true );
         }
 #endif
 
@@ -286,21 +300,22 @@ int main( int, char** p_argv ) {
                     snprintf( buffer, 49, GET_STRING( 3 ),
                               GET_STRING( MOVE::text( a.m_boxdata.m_moves[ j ], param ) ),
                               mname.c_str( ) );
+                    SOUND::playSoundEffect( SFX_CHOOSE );
                     IO::yesNoBox yn;
                     if( yn.getResult( buffer ) ) {
-                        IO::NAV->draw( );
+                        NAV::draw( );
                         swiWaitForVBlank( );
                         snprintf( buffer, 49, GET_STRING( 99 ), a.m_boxdata.m_name,
                                   mname.c_str( ) );
                         IO::messageBox( buffer, 0, false );
                         MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale,
                                               a.m_boxdata.isShiny( ) );
-                        IO::NAV->draw( true );
+                        NAV::draw( true );
                         swiWaitForVBlank( );
 
                         MOVE::use( a.m_boxdata.m_moves[ j ], param );
                     }
-                    IO::NAV->draw( true );
+                    NAV::draw( true );
                     goto OUT;
                 }
             }
@@ -322,6 +337,7 @@ int main( int, char** p_argv ) {
             } else if( !bmp ) {
                 // Play "Bump" sound
                 MAP::curMap->stopPlayer( curDir );
+                SOUND::playSoundEffect( SFX_BUMP );
                 swiWaitForVBlank( );
                 bmp = true;
             } else if( bmp < 2 ) {
@@ -339,11 +355,10 @@ int main( int, char** p_argv ) {
             bmp     = false;
         }
 
-        IO::NAV->handleInput( touch, p_argv[ 0 ] );
+        NAV::handleInput( touch, p_argv[ 0 ] );
         // End
         scanKeys( );
     }
     delete MAP::curMap;
-    delete IO::NAV;
     return 0;
 }

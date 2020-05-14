@@ -35,14 +35,20 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 
 namespace IO {
-    void fadeScreen( fadeType p_type ) {
+    void fadeScreen( fadeType p_type, bool p_bottom, bool p_both ) {
+        auto& reg = ( p_bottom ? REG_BLDY_SUB : REG_BLDY );
+        auto& reg2 = ( p_both ? ( !p_bottom ? REG_BLDY_SUB : REG_BLDY ) : reg );
+
+        auto& regcnt = ( p_bottom ? REG_BLDCNT_SUB : REG_BLDCNT );
+        auto& regcnt2 = ( p_both ? ( !p_bottom ? REG_BLDCNT_SUB : REG_BLDCNT ) : regcnt );
+
         switch( p_type ) {
         case IO::UNFADE: {
             u16 val = 0x1F;
             for( s8 i = 4; i >= 0; --i ) {
                 for( u8 j = 0; j < 5; ++j ) swiWaitForVBlank( );
                 val &= ~( 1 << u8( i ) );
-                REG_BLDY = val;
+                reg = reg2 = val;
             }
             swiWaitForVBlank( );
             break;
@@ -52,78 +58,78 @@ namespace IO {
             for( s8 i = 3; i >= 0; i -= 2 ) {
                 swiWaitForVBlank( );
                 val &= ~( 3 << u8( i ) );
-                REG_BLDY = val;
+                reg = reg2 = val;
             }
             swiWaitForVBlank( );
             break;
         }
         case IO::CLEAR_DARK_FAST:
-            REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
                          | BLEND_SRC_SPRITE;
-            REG_BLDY = 1;
+            reg = reg2 = 1;
             for( u8 i = 1; i < 5; i += 2 ) {
                 swiWaitForVBlank( );
-                REG_BLDY |= ( 3 << i );
+                reg = reg2 |= ( 3 << i );
             }
             swiWaitForVBlank( );
             break;
         case IO::CLEAR_DARK:
         case IO::CAVE_ENTRY:
-            REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
                          | BLEND_SRC_SPRITE;
-            REG_BLDY = 1;
+            reg = reg2 = 1;
             for( u8 i = 1; i < 5; ++i ) {
                 for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
-                REG_BLDY |= ( 1 << i );
+                reg = reg2 |= ( 1 << i );
             }
             swiWaitForVBlank( );
             if( p_type == CLEAR_DARK ) break;
             break;
         case IO::CLEAR_WHITE_FAST:
-            REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+            regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
                          | BLEND_SRC_SPRITE;
-            REG_BLDY = 1;
+            reg = reg2 = 1;
             for( u8 i = 1; i < 5; i += 2 ) {
                 for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
-                REG_BLDY |= ( 3 << i );
+                reg = reg2 |= ( 3 << i );
             }
             swiWaitForVBlank( );
             break;
         case IO::CLEAR_WHITE:
         case IO::CAVE_EXIT:
-            REG_BLDCNT = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+            regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
                          | BLEND_SRC_SPRITE;
-            REG_BLDY = 1;
+            reg = reg2 = 1;
             for( u8 i = 1; i < 5; ++i ) {
                 for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
-                REG_BLDY |= ( 1 << i );
+                reg = reg2 |= ( 1 << i );
             }
             swiWaitForVBlank( );
             if( p_type == CLEAR_WHITE ) break;
             break;
         case IO::BATTLE:
         case IO::BATTLE_STRONG_OPPONENT:
-            REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3;
+            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3;
             for( u8 j = 0; j < p_type - IO::BATTLE + 1; ++j ) {
                 u16 val = 0x1F;
                 for( s8 i = 4; i >= 0; --i ) {
                     for( u8 k = 0; k < 2 + j; ++k ) swiWaitForVBlank( );
                     val &= ~( 1 << u8( i ) );
-                    REG_BLDY = val;
+                    reg = reg2 = val;
                 }
                 for( u8 i = 1; i < 3; ++i ) swiWaitForVBlank( );
-                REG_BLDY = 1;
+                reg = reg2 = 1;
                 for( u8 i = 1; i < 5; ++i ) {
                     for( u8 k = 0; k < 2 + j; ++k ) swiWaitForVBlank( );
-                    REG_BLDY |= ( 1 << i );
+                    reg = reg2 |= ( 1 << i );
                 }
                 for( u8 i = 1; i < 3; ++i ) swiWaitForVBlank( );
             }
-            REG_BLDCNT = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
                          | BLEND_SRC_SPRITE;
             for( u8 i = 1; i < 5; ++i ) {
                 for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
-                REG_BLDY |= ( 1 << i );
+                reg = reg2 |= ( 1 << i );
             }
             swiWaitForVBlank( );
             break;

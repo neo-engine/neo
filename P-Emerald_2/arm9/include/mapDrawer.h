@@ -28,6 +28,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 #include <map>
 #include <memory>
+#include <functional>
+#include <vector>
 
 #include "move.h"
 #include "mapDefines.h"
@@ -37,85 +39,97 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace MAP {
     class mapDrawer {
-      private:
-        mapWeather _weather;
+        private:
+            mapWeather _weather;
 
-        std::unique_ptr<mapSlice> _slices[ 2 ][ 2 ] = {{0}}; //[x][y]
-        u8                        _curX, _curY; // Current main slice from the _slices array
-        std::map<std::pair<u16, u16>, std::vector<mapObject>> _mapObjs;
-        bool                                                  _playerIsFast;
+            std::unique_ptr<mapSlice> _slices[ 2 ][ 2 ] = {{0}}; //[x][y]
+            u8                        _curX, _curY; // Current main slice from the _slices array
+            std::map<std::pair<u16, u16>, std::vector<mapObject>> _mapObjs;
 
-        mapSprite         _sprites[ 16 ];
-        u16               _entriesUsed;
-        std::map<u16, u8> _spritePos; // mapObject.id -> index in _sprites
+            bool _playerIsFast;
 
-        void draw( u16 p_globX, u16 p_globY, bool p_init );
-        void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2 );
-        void drawObjects( );
+            mapSprite         _sprites[ 16 ];
+            u16               _entriesUsed;
+            std::map<u16, u8> _spritePos; // mapObject.id -> index in _sprites
 
-        void moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows = true );
+            std::vector<std::function<void( u16 )>>      _newLocationCallbacks
+                = std::vector<std::function<void( u16 )>>( ); // Called whenever player makes a step
+            std::vector<std::function<void( u8 )>>      _newBankCallbacks
+                = std::vector<std::function<void( u8 )>>( ); // Called when a map bank was loaded
+            std::vector<std::function<void( moveMode )>> _newMoveModeCallbacks
+                = std::vector<std::function<void( moveMode )>>( ); // Called when the player's moveMode changed
 
-        void loadNewRow( direction p_direction, bool p_updatePlayer );
-        void loadSlice( direction p_direction ); // dir: dir that needs to be extended
+            void draw( u16 p_globX, u16 p_globY, bool p_init );
+            void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2 );
+            void drawObjects( );
 
-        void stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn = true );
+            void moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows = true );
 
-        void animateField( u16 p_globX, u16 p_globY );
+            void loadNewRow( direction p_direction, bool p_updatePlayer );
+            void loadSlice( direction p_direction ); // dir: dir that needs to be extended
 
-        bool executeScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_z, u8 p_number,
-                            invocationType p_inv );
+            void stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn = true );
 
-        void handleEvents( u16 p_globX, u16 p_globY, u8 p_z );
-        void handleEvents( u16 p_globX, u16 p_globY, u8 p_z, direction p_dir );
-        void handleWarp( warpType p_type, warpPos p_source );
-        void handleWarp( warpType p_type );
+            void animateField( u16 p_globX, u16 p_globY );
 
-        void handleWildPkmn( u16 p_globX, u16 p_globY );
-        bool handleWildPkmn( wildPkmnType p_type, u8 p_rodType = 0, bool p_forceEncounter = false );
-        void handleTrainer( );
+            bool executeScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_z, u8 p_number,
+                    invocationType p_inv );
 
-      public:
-        block&        at( u16 p_x, u16 p_y ) const;
-        mapBlockAtom& atom( u16 p_x, u16 p_y ) const;
+            void handleEvents( u16 p_globX, u16 p_globY, u8 p_z );
+            void handleEvents( u16 p_globX, u16 p_globY, u8 p_z, direction p_dir );
+            void handleWarp( warpType p_type, warpPos p_source );
+            void handleWarp( warpType p_type );
 
-        mapDrawer( );
+            void handleWildPkmn( u16 p_globX, u16 p_globY );
+            bool handleWildPkmn( wildPkmnType p_type, u8 p_rodType = 0, bool p_forceEncounter = false );
+            void handleTrainer( );
 
-        void draw( ObjPriority p_playerPrio = OBJPRIORITY_2 );
+        public:
+            block&        at( u16 p_x, u16 p_y ) const;
+            mapBlockAtom& atom( u16 p_x, u16 p_y ) const;
 
-        void interact( );
+            mapDrawer( );
 
-        void animateMap( u8 p_frame );
+            void registerOnBankChangedHandler( std::function<void( u8 )> p_handler );
+            void registerOnLocationChangedHandler( std::function<void( u16 )> p_handler );
+            void registerOnMoveModeChangedHandler( std::function<void( moveMode )> p_handler );
 
-        bool canMove( position p_start, direction p_direction, moveMode p_moveMode = WALK );
-        void movePlayer( direction p_direction, bool p_fast = false );
+            void draw( ObjPriority p_playerPrio = OBJPRIORITY_2 );
 
-        void jumpPlayer( direction p_direction );
-        void slidePlayer( direction p_direction );
-        void walkPlayer( direction p_direction, bool p_fast = false );
+            void interact( );
 
-        void warpPlayer( warpType p_type, warpPos p_target );
+            void animateMap( u8 p_frame );
 
-        void stopPlayer( );
-        void stopPlayer( direction p_direction );
-        void changeMoveMode( moveMode p_newMode );
+            bool canMove( position p_start, direction p_direction, moveMode p_moveMode = WALK );
+            void movePlayer( direction p_direction, bool p_fast = false );
 
-        void redirectPlayer( direction p_direction, bool p_fast );
+            void jumpPlayer( direction p_direction );
+            void slidePlayer( direction p_direction );
+            void walkPlayer( direction p_direction, bool p_fast = false );
 
-        void standUpPlayer( direction p_direction );
-        void sitDownPlayer( direction p_direction, moveMode p_newMoveMode );
+            void warpPlayer( warpType p_type, warpPos p_target );
 
-        bool canFish( position p_start, direction p_direction );
-        void fishPlayer( direction p_direction, u8 p_rodType = 0 );
+            void stopPlayer( );
+            void stopPlayer( direction p_direction );
+            void changeMoveMode( moveMode p_newMode );
 
-        void usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny );
+            void redirectPlayer( direction p_direction, bool p_fast );
 
-        void disablePkmn( s16 p_steps = -1 );
-        void enablePkmn( );
+            void standUpPlayer( direction p_direction );
+            void sitDownPlayer( direction p_direction, moveMode p_newMoveMode );
 
-        bool requestWildPkmn( bool p_forceHighGrass = false );
+            bool canFish( position p_start, direction p_direction );
+            void fishPlayer( direction p_direction, u8 p_rodType = 0 );
 
-        u16 getCurrentLocationId( ) const;
-        u16 getCurrentLocationId( u8 p_file ) const;
+            void usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny );
+
+            void disablePkmn( s16 p_steps = -1 );
+            void enablePkmn( );
+
+            bool requestWildPkmn( bool p_forceHighGrass = false );
+
+            u16 getCurrentLocationId( ) const;
+            u16 getCurrentLocationId( u8 p_file ) const;
     };
     extern mapDrawer* curMap;
 } // namespace MAP

@@ -37,6 +37,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 #include "uio.h"
 #include "yesNoBox.h"
+#include "sound.h"
 
 #include "berry.h"
 #include "item.h"
@@ -83,14 +84,21 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "icon_settings_1.h"
 #include "icon_settings_2.h"
 
-namespace IO {
-    nav* NAV = 0;
+namespace NAV {
+    state STATE = HOME;
+    bool  ALLOW_INIT = true;
+    u8    CURRENT_BANK = 0;
+    u16   CURRENT_MAP = 0;
+
+    void drawMapMug( );
+    void drawBorder( );
+
     u8   mainSpritePos[ 12 ][ 2 ]
         = {{0, 0},     {12, 42},   {244, 26}, {244, 56}, {244, 86}, {12, 162},
            {244, 116}, {244, 146}, {0, 0},    {12, 72},  {12, 102}, {12, 132}};
     unsigned int       NAV_DATA[ 12288 ]   = {0};
     unsigned short     NAV_DATA_PAL[ 256 ] = {0};
-    nav::backgroundSet BGs[ MAXBG ] = {{"Magnetizing Magnemite", bg00Bitmap, bg00Pal, false, true},
+    backgroundSet BGs[ MAXBG ] = {{"Magnetizing Magnemite", bg00Bitmap, bg00Pal, false, true},
                                        {"Executing Exeggcute", NAV_DATA, NAV_DATA_PAL, true, true},
                                        {"Fighting Torchic", NAV_DATA, NAV_DATA_PAL, true, false},
                                        {"Reborn Ho-Oh", NAV_DATA, NAV_DATA_PAL, true, false},
@@ -106,14 +114,18 @@ namespace IO {
 
 #define POS mainSpritePos
 
-    std::map<nav::state, nav::state> backTransition = {{nav::MAP_MUG, nav::HOME},
-                                                       {nav::MAP_BIG, nav::MAP},
-                                                       {nav::MAP, nav::HOME},
+    std::map<state, state> backTransition = {{MAP_MUG, HOME},
+                                                       {MAP_BIG, MAP},
+                                                       {MAP, HOME},
 
-                                                       {nav::HOME, nav::HOME}};
+                                                       {HOME, HOME}};
 
-    void nav::drawBorder( ) {
-        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg2 ) : bgGetGfxPtr( bg2sub );
+    void home( ) {
+        STATE = HOME;
+    }
+
+    void drawBorder( ) {
+        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( IO::bg2 ) : bgGetGfxPtr( IO::bg2sub );
         auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
 
         dmaCopy( BorderBitmap, ptr, 256 * 192 );
@@ -127,10 +139,10 @@ namespace IO {
               regularFont->setColor( GRAY_IDX, 2 );
               regularFont->setColor( 0, 0 ); */
             IO::boldFont->setColor( 0, 1 );
-            IO::boldFont->setColor( BLACK_IDX, 2 );
+            IO::boldFont->setColor( WHITE_IDX, 2 );
 
-            IO::boldFont->printString( FS::getLocation( _curMap ).c_str( ), 2, -2,
-                                       !SCREENS_SWAPPED );
+            IO::boldFont->printString( (FS::getLocation( CURRENT_MAP, CURRENT_LANGUAGE ) ).c_str( ), 7,
+                    4, !SCREENS_SWAPPED );
         }
 
         DRAW_TIME = true;
@@ -228,30 +240,25 @@ namespace IO {
         IO::updateOAM( true );
     }
 
-    nav::nav( ) {
-        _allowInit = true;
-        _state     = HOME;
-        draw( true );
-    }
-
-    void nav::drawMapMug( ) {
-        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
+    void drawMapMug( ) {
+        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
         char buffer[ 100 ];
-        snprintf( buffer, 99, "%hu_%hhu", _curBank, getCurrentDaytime( ) % 4 );
+        snprintf( buffer, 99, "%03hu/%hu_%hhu", CURRENT_BANK / FS::ITEMS_PER_DIR,
+                CURRENT_BANK, getCurrentDaytime( ) % 4 );
         FS::readPictureData( ptr, "nitro:/PICS/MAP_MUG/", buffer, 512, 49152, !SCREENS_SWAPPED );
         drawBorder( );
     }
 
-    void nav::draw( bool p_initMainSrites, u8 p_newIdx ) {
+    void draw( bool p_initMainSrites, u8 p_newIdx ) {
         if( SAVE::SAV->getActiveFile( ).m_options.m_bgIdx == p_newIdx )
             return;
         else if( p_newIdx == u8( 255 ) )
             p_newIdx = SAVE::SAV->getActiveFile( ).m_options.m_bgIdx;
 
-        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( bg3 ) : bgGetGfxPtr( bg3sub );
+        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
         auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
 
-        if( _state != MAP_MUG ) {
+        if( STATE != MAP_MUG ) {
             if( !BGs[ p_newIdx ].m_loadFromRom ) {
                 dmaCopy( BGs[ p_newIdx ].m_mainMenu, ptr, 256 * 192 );
                 dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, pal, 192 * 2 );
@@ -263,36 +270,38 @@ namespace IO {
             } else
                 SAVE::SAV->getActiveFile( ).m_options.m_bgIdx = p_newIdx;
             drawBorder( );
-        } else if( _state == MAP_MUG ) {
+        } else if( STATE == MAP_MUG ) {
             drawMapMug( );
         }
-        if( p_initMainSrites && _allowInit ) initMainSprites( _state != HOME );
+        if( p_initMainSrites && ALLOW_INIT ) initMainSprites( STATE != HOME );
     }
 
-    void nav::showNewMap( u8 p_newMap ) {
-        if( p_newMap == _curBank ) return;
-        _curBank = p_newMap;
-        _curMap  = MAP::curMap->getCurrentLocationId( );
+    void showNewMap( u8 p_newMap ) {
+        if( p_newMap == CURRENT_BANK ) return;
+        CURRENT_BANK = p_newMap;
+        CURRENT_MAP  = MAP::curMap->getCurrentLocationId( );
         char buffer[ 100 ];
-        snprintf( buffer, 99, "%hu_%hhu", _curBank, getCurrentDaytime( ) % 4 );
+        snprintf( buffer, 99, "%03hhu/%hu_%hhu", CURRENT_BANK / FS::ITEMS_PER_DIR, CURRENT_BANK,
+                getCurrentDaytime( ) % 4 );
         if( FS::exists( "nitro:/PICS/MAP_MUG/", buffer ) )
-            _state = MAP_MUG;
-        else if( _state == MAP_MUG )
-            _state = HOME;
+            STATE = MAP_MUG;
+        else if( STATE == MAP_MUG )
+            STATE = HOME;
 
-        IO::Oam->oamBuffer[ BACK_ID ].isHidden = ( _state == HOME );
+        IO::Oam->oamBuffer[ BACK_ID ].isHidden = ( STATE == HOME );
         IO::updateOAM( true );
+
         draw( false );
     }
 
-    void nav::updateMap( u16 p_newMap ) {
-        if( p_newMap != _curMap ) {
-            _curMap = p_newMap;
+    void updateMap( u16 p_newMap ) {
+        if( p_newMap != CURRENT_MAP ) {
+            CURRENT_MAP = p_newMap;
             draw( false );
         }
     }
 
-    void nav::handleInput( touchPosition p_touch, const char* p_path ) {
+    void handleInput( touchPosition p_touch, const char* p_path ) {
         touchPosition& touch = p_touch;
 
         if( held & KEY_Y ) {
@@ -303,11 +312,11 @@ namespace IO {
                     updateItems( );
                 } else {
                     IO::messageBox( GET_STRING( 58 ), GET_STRING( 91 ) );
-                    IO::NAV->draw( true );
+                    draw( true );
                 }
             } else {
                 IO::messageBox( GET_STRING( 98 ), GET_STRING( 91 ) );
-                IO::NAV->draw( true );
+                draw( true );
             }
             swiWaitForVBlank( );
             scanKeys( );
@@ -351,31 +360,31 @@ namespace IO {
                                 .m_lstUsedItems[ SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx ]
                                 = 0;
                         }
-                        IO::NAV->draw( true );
+                        draw( true );
                     } else if( ItemList[ curitm ]->useable( ) ) {
                         if( ItemList[ curitm ]->use( true ) ) IO::messageBox( "", 0, false );
                         ItemList[ curitm ]->use( );
                         if( ItemList[ curitm ]->m_itemType != item::KEY_ITEM )
                             SAVE::SAV->getActiveFile( ).m_bag.erase(
                                 BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm, 1 );
-                        IO::NAV->draw( true );
+                        draw( true );
                     } else {
                         IO::messageBox( GET_STRING( 58 ), GET_STRING( 91 ) );
-                        IO::NAV->draw( true );
+                        draw( true );
                     }
                 } else {
                     IO::messageBox( GET_STRING( 97 ), GET_STRING( 91 ) );
-                    IO::NAV->draw( true );
+                    draw( true );
                 }
                 return;
             }
             */
         }
 
-        if( _state != HOME && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
-            _state = backTransition[ _state ];
+        if( STATE != HOME && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+            STATE = backTransition[ STATE ];
             draw( false );
-            if( _state == HOME ) {
+            if( STATE == HOME ) {
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::updateOAM( true );
             }
@@ -385,6 +394,7 @@ namespace IO {
                 BAG::bagViewer bv;
                 ANIMATE_MAP = false;
                 UPDATE_TIME = false;
+                SOUND::dimVolume( );
 
                 IO::clearScreen( false );
                 videoSetMode( MODE_5_2D );
@@ -398,10 +408,11 @@ namespace IO {
                 bgUpdate( );
 
                 IO::clearScreenConsole( true, true );
-                _state      = HOME;
+                STATE      = HOME;
                 UPDATE_TIME = true;
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
+                SOUND::restoreVolume( );
                 draw( true );
                 updateItems( );
                 if( res ) {
@@ -414,7 +425,8 @@ namespace IO {
                            .m_boxdata.m_speciesId // StartPkmn
                        && ( GET_AND_WAIT_C( POS[ PKMN_ID ][ 0 ], POS[ PKMN_ID ][ 1 ], 16 ) ) ) {
                 ANIMATE_MAP = false;
-                _state      = HOME;
+                SOUND::dimVolume( );
+                STATE      = HOME;
                 IO::initOAMTable( true );
                 videoSetMode( MODE_5_2D );
                 STS::statusScreen sts( 0 );
@@ -432,13 +444,15 @@ namespace IO {
 
                 IO::clearScreenConsole( true, true );
                 ANIMATE_MAP = true;
+                SOUND::restoreVolume( );
                 draw( true );
                 MAP::curMap->draw( );
 
                 if( res ) MOVE::use( res & 32767, res >> 15 );
             } else if( GET_AND_WAIT_C( POS[ DEX_ID ][ 0 ], POS[ DEX_ID ][ 1 ], 16 ) ) {
                 ANIMATE_MAP = false;
-                _state      = HOME;
+                SOUND::dimVolume( );
+                STATE      = HOME;
 
                 IO::clearScreen( false );
                 videoSetMode( MODE_5_2D );
@@ -454,13 +468,14 @@ namespace IO {
 
                 IO::clearScreenConsole( true, true );
                 ANIMATE_MAP = true;
+                SOUND::restoreVolume( );
                 draw( true );
                 MAP::curMap->draw( );
             } else if( GET_AND_WAIT_C( POS[ OPTS_ID ][ 0 ], POS[ OPTS_ID ][ 1 ], 16 ) ) {
 
             } else if( GET_AND_WAIT_C( POS[ ID_ID ][ 0 ], POS[ ID_ID ][ 1 ], 16 ) ) {
 
-                _state = HOME;
+                STATE = HOME;
 
                 const char* someText[ 12 ]
                     = {"PKMN Spawn",   "Item Spawn", "1 Item Test",  "Dbl Battle",
@@ -609,7 +624,7 @@ namespace IO {
                 }
                 case 5: {
                     const char* bgNames[ MAXBG ];
-                    for( u8 o = 0; o < MAXBG; ++o ) bgNames[ o ] = IO::BGs[ o ].m_name.c_str( );
+                    for( u8 o = 0; o < MAXBG; ++o ) bgNames[ o ] = NAV::BGs[ o ].m_name.c_str( );
 
                     IO::choiceBox scrnChoice( MAXBG, bgNames, 0, true );
                     draw( true,
@@ -673,4 +688,4 @@ namespace IO {
             }
         }
     }
-} // namespace IO
+} // namespace NAV

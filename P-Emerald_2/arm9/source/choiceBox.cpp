@@ -29,6 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "choiceBox.h"
 #include "uio.h"
 #include "saveGame.h"
+#include "sound.h"
 
 #include "Back.h"
 #include "Backward.h"
@@ -41,7 +42,7 @@ namespace IO {
 #define NEW_PAGE 9
     void choiceBox::draw( u8 p_pressedIdx ) {
         if( p_pressedIdx == NEW_PAGE ) {
-            if( _drawSub ) NAV->draw( );
+            if( _drawSub ) NAV::draw( );
             initTextField( );
             if( _text ) {
                 if( _name ) {
@@ -235,6 +236,7 @@ namespace IO {
                         goto END;
                     }
                 if( GET_AND_WAIT( KEY_DOWN ) ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
                     ++_selectedIdx;
                     if( _selectedIdx + 3 * _acPage >= _num || _selectedIdx == 3 ) {
                         if( ( _acPage + 1 ) * 3 < _num ) {
@@ -249,6 +251,7 @@ namespace IO {
                     draw( -1 );
                 }
                 if( GET_AND_WAIT( KEY_UP ) ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
                     if( _selectedIdx == (u8) -1 )
                         _selectedIdx = 0;
                     else if( !_selectedIdx ) {
@@ -327,6 +330,7 @@ namespace IO {
                     goto END;
                 }
                 if( GET_AND_WAIT( KEY_DOWN ) ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
                     if( _selectedIdx == (u8) -1 )
                         _selectedIdx = 0;
                     else if( _selectedIdx >= 4 || _selectedIdx + 2 + _acPage * 6 >= _num ) {
@@ -345,6 +349,7 @@ namespace IO {
                     draw( -1 );
                 }
                 if( GET_AND_WAIT( KEY_UP ) ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
                     if( _selectedIdx == (u8) -1 )
                         _selectedIdx = 0;
                     else if( _selectedIdx < 2 ) {
@@ -364,6 +369,7 @@ namespace IO {
                 }
 
                 if( GET_AND_WAIT( KEY_RIGHT ) ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
                     if( _selectedIdx == (u8) -1 )
                         _selectedIdx = 0;
                     else if( _selectedIdx % 2 ) {
@@ -382,6 +388,7 @@ namespace IO {
                     draw( -1 );
                 }
                 if( GET_AND_WAIT( KEY_LEFT ) ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
                     if( _selectedIdx == (u8) -1 )
                         _selectedIdx = 0;
                     else if( _selectedIdx % 2 == 0 ) {
@@ -424,6 +431,11 @@ namespace IO {
             }
         }
     END:
+        if( result >= 0 ) {
+            SOUND::playSoundEffect( SFX_CHOOSE );
+        } else {
+            SOUND::playSoundEffect( SFX_CANCEL );
+        }
         return result;
     }
 }

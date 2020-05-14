@@ -55,7 +55,7 @@ namespace IO {
         REG_BLDY = 0x1F;                                                                           \
     } while( 0 )
 
-    void fadeScreen( fadeType p_type );
+    void fadeScreen( fadeType p_type, bool p_bottom = false, bool p_both = false );
     void clearScreen( bool p_bottom, bool p_both = false, bool p_dark = true );
     void clearScreenConsole( bool p_bottom, bool p_both = false );
 } // namespace IO

@@ -229,7 +229,7 @@ namespace MOVE {
             case M_SWEET_SCENT:
                 if( !possible( M_SWEET_SCENT, 0 ) || !MAP::curMap->requestWildPkmn( true ) ) {
                     IO::messageBox( GET_STRING( 90 ), true );
-                    IO::NAV->draw( );
+                    NAV::draw( );
                 }
                 return;
             case M_DIG:

@@ -36,6 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 #include "screenFade.h"
 #include "sprite.h"
+#include "sound.h"
 #include "uio.h"
 #include "abilityNames.h"
 
@@ -106,6 +107,15 @@ namespace MAP {
         loadBlock( p_curblock, c );
     }
 
+    void mapDrawer::registerOnBankChangedHandler( std::function<void( u8 )> p_handler ) {
+        _newBankCallbacks.push_back( p_handler );
+    }
+    void mapDrawer::registerOnLocationChangedHandler( std::function<void( u16 )> p_handler ) {
+        _newLocationCallbacks.push_back( p_handler );
+    }
+    void mapDrawer::registerOnMoveModeChangedHandler( std::function<void( moveMode )> p_handler ) {
+         _newMoveModeCallbacks.push_back( p_handler );
+    }
     // Drawing of Maps and stuff
 
     void mapDrawer::draw( u16 p_globX, u16 p_globY, bool p_init ) {
@@ -174,6 +184,12 @@ namespace MAP {
         drawPlayer( p_playerPrio ); // Draw the player
         drawObjects( );             // Draw NPCs / stuff
 
+        for( auto fn : _newBankCallbacks ) {
+            fn( SAVE::SAV->getActiveFile( ).m_currentMap );
+        }
+        auto curLocId = getCurrentLocationId( );
+        for( auto fn : _newLocationCallbacks ) { fn( curLocId ); }
+
         IO::fadeScreen( IO::UNFADE );
     }
 
@@ -212,7 +228,9 @@ namespace MAP {
     void mapDrawer::stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn ) {
         animateField( p_globX, p_globY );
         handleEvents( p_globX, p_globY, p_z );
-        IO::NAV->updateMap( getCurrentLocationId( ) );
+
+        auto curLocId = getCurrentLocationId( );
+        for( auto fn : _newLocationCallbacks ) { fn( curLocId ); }
         if( p_allowWildPkmn ) handleWildPkmn( p_globX, p_globY );
     }
 
@@ -238,7 +256,7 @@ namespace MAP {
             loadSlice( p_direction );
 #ifdef __DEBUG
             IO::messageBox m( "Load Slice" );
-            IO::NAV->draw( );
+            NAV::draw( );
 #endif
         }
         // Check if a new slice got stepped onto
@@ -259,7 +277,7 @@ namespace MAP {
 #ifdef __DEBUG
             sprintf( buffer, "Switch Slice to (%d, %d)", _curX, _curY );
             IO::messageBox m( buffer );
-            IO::NAV->draw( );
+            NAV::draw( );
 #endif
         }
 
@@ -392,14 +410,14 @@ namespace MAP {
             if( p_type == FISHING_ROD ) {
                 IO::messageBox m( GET_STRING( 5 ), true );
                 _playerIsFast = false;
-                IO::NAV->draw( true );
+                NAV::draw( true );
             }
             return false;
         }
         if( p_type == FISHING_ROD ) {
             IO::messageBox m( GET_STRING( 6 ), true );
             _playerIsFast = false;
-            IO::NAV->draw( true );
+            NAV::draw( true );
         } else if( SAVE::SAV->getActiveFile( ).m_repelSteps && !p_forceEncounter )
             return false;
         u8 arridx = u8( p_type ) * 15 + tier * 3;
@@ -411,7 +429,11 @@ namespace MAP {
         if( !CUR_SLICE->m_pokemon[ arridx ].first ) return false;
 
         IO::fadeScreen( IO::BATTLE );
-        wildPkmn             = pokemon( CUR_SLICE->m_pokemon[ arridx ].first, level );
+
+        u16 pkmnId = CUR_SLICE->m_pokemon[ arridx ].first & ( ( 1 << 11 ) - 1 );
+        u8 pkmnForme = CUR_SLICE->m_pokemon[ arridx ].first >> 11;
+
+        wildPkmn             = pokemon( pkmnId, level, pkmnForme );
         BATTLE::weather weat = BATTLE::weather::NO_WEATHER;
         switch( _weather ) {
         case SUNNY:
@@ -470,14 +492,16 @@ namespace MAP {
         auto playerPrio
             = _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].getPriority( );
         ANIMATE_MAP = false;
+        SOUND::playBGM( SOUND::BGMforWildBattle( pkmnId ) );
         swiWaitForVBlank( );
-        IO::NAV->draw( );
+        NAV::draw( );
         BATTLE::battle( SAVE::SAV->getActiveFile( ).m_pkmnTeam,
                         wildPkmn, weat, platform, plat2, battleBack,
                         SAVE::SAV->getActiveFile( ).checkFlag( SAVE::F_MEGA_EVOLUTION ) ).start( );
         FADE_TOP_DARK( );
         ANIMATE_MAP = true;
-        IO::NAV->draw( true );
+        NAV::draw( true );
+        SOUND::restartBGM( );
         draw( playerPrio );
 
         return true;
@@ -697,7 +721,7 @@ namespace MAP {
                 stopPlayer( );
                 IO::messageBox( GET_STRING( 7 ), POKE_NAV );
                 _playerIsFast = false;
-                IO::NAV->draw( true );
+                NAV::draw( true );
                 return;
             }
             // Check for end of surf, stand up and sit down
@@ -1102,12 +1126,15 @@ namespace MAP {
         bool exitCave  = ( ( oldMapType & CAVE ) && !( newMapType & CAVE ) );
         switch( p_type ) {
         case DOOR:
+            SOUND::playSoundEffect( SFX_ENTER_DOOR );
             break;
         case TELEPORT:
+            SOUND::playSoundEffect( SFX_WARP );
             break;
         case EMERGE_WATER:
             break;
         case CAVE_ENTRY:
+            SOUND::playSoundEffect( SFX_CAVE_WARP );
             if( entryCave ) {
                 IO::fadeScreen( IO::CAVE_ENTRY );
                 break;
@@ -1120,6 +1147,7 @@ namespace MAP {
         case LAST_VISITED:
         case NO_SPECIAL:
         default:
+            SOUND::playSoundEffect( SFX_CAVE_WARP );
             IO::fadeScreen( IO::CLEAR_DARK );
             break;
         }
@@ -1130,7 +1158,11 @@ namespace MAP {
         //        if( SAVE::SAV->getActiveFile( ).m_currentMap != p_target.first ) {
         SAVE::SAV->getActiveFile( ).m_currentMap = p_target.first;
         draw( );
-        IO::NAV->showNewMap( SAVE::SAV->getActiveFile( ).m_currentMap );
+        for( auto fn : _newBankCallbacks ) {
+            fn( SAVE::SAV->getActiveFile( ).m_currentMap );
+        }
+        auto curLocId = getCurrentLocationId( );
+        for( auto fn : _newLocationCallbacks ) { fn( curLocId ); }
         //        }
 
         if( exitCave ) movePlayer( DOWN );
@@ -1322,6 +1354,8 @@ namespace MAP {
                 SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ );
     }
     void mapDrawer::jumpPlayer( direction p_direction ) {
+        SOUND::playSoundEffect( SFX_JUMP );
+
         redirectPlayer( p_direction, false );
         if( _playerIsFast ) {
             _playerIsFast = false;
@@ -1386,6 +1420,7 @@ namespace MAP {
         fastBike      = false;
         u8 ydif       = 0;
         SAVE::SAV->getActiveFile( ).m_player.m_movement = p_newMode;
+        for( auto fn : _newMoveModeCallbacks ) { fn( p_newMode ); }
         switch( p_newMode ) {
         case WALK:
             SAVE::SAV->getActiveFile( ).m_player.m_picNum = basePic;
@@ -1477,7 +1512,7 @@ namespace MAP {
     OUT:
         fish.clear( );
         if( failed ) fish.put( GET_STRING( 9 ) );
-        IO::NAV->draw( true );
+        NAV::draw( true );
         for( s8 i = 2; i >= 0; --i ) {
             _sprites[ _spritePos[ SAVE::SAV->getActiveFile( ).m_player.m_id ] ].drawFrame(
                 frame + i, p_direction == RIGHT );

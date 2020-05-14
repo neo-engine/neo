@@ -25,6 +25,7 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "sound.h"
 #include "gameStart.h"
 #include "bag.h"
 #include "defines.h"
@@ -61,8 +62,10 @@ namespace SAVE {
 
             int pressed = keysCurrent( );
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
-                || GET_AND_WAIT_R( 1, 1, 256, 192 ) )
+                || GET_AND_WAIT_R( 1, 1, 256, 192 ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
                 break;
+            }
         }
     }
 
