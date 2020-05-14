@@ -25,28 +25,27 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "pokemon.h"
 #include "itemNames.h"
-#include "move.h"
-#include "saveGame.h"
 #include "mapDrawer.h"
+#include "move.h"
+#include "pokemon.h"
 #include "pokemonNames.h"
+#include "saveGame.h"
 
-boxPokemon::boxPokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name,
-                                 u8 p_shiny, bool p_hiddenAbility, bool p_isEgg,
-                                 u8 p_ball, u8 p_pokerus, bool p_fatefulEncounter,
-                                 pkmnData* p_data ) :
-    boxPokemon::boxPokemon( nullptr, p_pkmnId, p_name, p_level,
-            SAVE::SAV->getActiveFile( ).m_id, SAVE::SAV->getActiveFile( ).m_sid,
-            SAVE::SAV->getActiveFile( ).m_playername, !SAVE::SAV->getActiveFile( ).m_isMale,
-            p_shiny, p_hiddenAbility, p_fatefulEncounter, p_isEgg,
-            MAP::curMap->getCurrentLocationId( ), p_ball, p_pokerus, p_forme, p_data ) { }
+boxPokemon::boxPokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 p_shiny,
+                        bool p_hiddenAbility, bool p_isEgg, u8 p_ball, u8 p_pokerus,
+                        bool p_fatefulEncounter, pkmnData* p_data )
+    : boxPokemon::boxPokemon(
+          nullptr, p_pkmnId, p_name, p_level, SAVE::SAV->getActiveFile( ).m_id,
+          SAVE::SAV->getActiveFile( ).m_sid, SAVE::SAV->getActiveFile( ).m_playername,
+          !SAVE::SAV->getActiveFile( ).m_isMale, p_shiny, p_hiddenAbility, p_fatefulEncounter,
+          p_isEgg, MAP::curMap->getCurrentLocationId( ), p_ball, p_pokerus, p_forme, p_data ) {
+}
 
-boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name,
-                                 u16 p_level, u16 p_id, u16 p_sid, const char* p_oT,
-                                 bool p_oTFemale, u8 p_shiny, bool p_hiddenAbility,
-                                 bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace,
-                                 u8 p_ball, u8 p_pokerus, u8 p_forme, pkmnData* p_data ) {
+boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id,
+                        u16 p_sid, const char* p_oT, bool p_oTFemale, u8 p_shiny,
+                        bool p_hiddenAbility, bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace,
+                        u8 p_ball, u8 p_pokerus, u8 p_forme, pkmnData* p_data ) {
     pkmnData data;
     if( p_data == nullptr ) {
         data = getPkmnData( p_pkmnId, p_forme );
@@ -78,8 +77,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name,
             m_heldItem = data.m_baseForme.m_items[ 2 ];
     }
 
-    if( !p_isEgg )
-        m_experienceGained = EXP[ p_level - 1 ][ data.getExpType( ) ];
+    if( !p_isEgg ) m_experienceGained = EXP[ p_level - 1 ][ data.getExpType( ) ];
 
     if( p_isEgg ) {
         m_steps          = data.m_eggCycles;
@@ -111,14 +109,13 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name,
         getLearnMoves( p_pkmnId, p_level, 0, 1, 4, m_moves );
     for( u8 i = 0; i < 4; ++i ) {
         MOVE::moveData mdata = MOVE::getMoveData( m_moves[ i ] );
-        m_acPP[ i ] = mdata.m_pp;
+        m_acPP[ i ]          = mdata.m_pp;
     }
 
-    for( u8 i = 0; i < 6; ++i )
-        IVset( i, rand( ) & 31 );
+    for( u8 i = 0; i < 6; ++i ) IVset( i, rand( ) & 31 );
     setIsNicknamed( !!p_name );
     setIsEgg( p_isEgg );
-    m_fateful                     = p_fatefulEncounter;
+    m_fateful = p_fatefulEncounter;
 
     pkmnGenderType A = data.m_baseForme.m_genderRatio;
     if( A == MALE )
@@ -171,56 +168,54 @@ u8 boxPokemon::getForme( ) {
 
 void boxPokemon::recalculateForme( ) {
     switch( m_speciesId ) {
-        case PKMN_GIRATINA: {
-            m_altForme = ( m_heldItem == I_GRISEOUS_ORB );
-            return;
+    case PKMN_GIRATINA: {
+        m_altForme = ( m_heldItem == I_GRISEOUS_ORB );
+        return;
+    }
+    case PKMN_ARCEUS: {
+        if( m_heldItem >= I_FLAME_PLATE && m_heldItem <= I_IRON_PLATE ) {
+            m_altForme = m_heldItem - I_FLAME_PLATE + 1;
+        } else if( m_heldItem == I_NULL_PLATE ) {
+            m_altForme = 17;
+        } else if( m_heldItem == I_PIXIE_PLATE ) {
+            m_altForme = 18;
+        } else if( m_heldItem >= I_FIRIUM_Z && m_heldItem <= I_STEELIUM_Z ) {
+            m_altForme = m_heldItem - I_FIRIUM_Z + 1;
+        } else if( m_heldItem == I_FAIRIUM_Z ) {
+            m_altForme = 18;
+        } else if( m_heldItem >= I_FIRIUM_Z2 && m_heldItem <= I_STEELIUM_Z2 ) {
+            m_altForme = m_heldItem - I_FIRIUM_Z2 + 1;
+        } else if( m_heldItem == I_FAIRIUM_Z2 ) {
+            m_altForme = 18;
+        } else {
+            m_altForme = 0;
         }
-        case PKMN_ARCEUS: {
-            if( m_heldItem >= I_FLAME_PLATE && m_heldItem <= I_IRON_PLATE ) {
-                m_altForme = m_heldItem - I_FLAME_PLATE + 1;
-            } else if( m_heldItem == I_NULL_PLATE ) {
-                m_altForme = 17;
-            } else if( m_heldItem == I_PIXIE_PLATE ) {
-                m_altForme = 18;
-            } else if( m_heldItem >= I_FIRIUM_Z && m_heldItem <= I_STEELIUM_Z ) {
-                m_altForme = m_heldItem - I_FIRIUM_Z + 1;
-            } else if( m_heldItem == I_FAIRIUM_Z ) {
-                m_altForme = 18;
-            } else if( m_heldItem >= I_FIRIUM_Z2 && m_heldItem <= I_STEELIUM_Z2 ) {
-                m_altForme = m_heldItem - I_FIRIUM_Z2 + 1;
-            } else if( m_heldItem == I_FAIRIUM_Z2 ) {
-                m_altForme = 18;
-            } else {
-                m_altForme = 0;
-            }
-            return;
+        return;
+    }
+    case PKMN_GENESECT: {
+        if( m_heldItem >= I_DOUSE_DRIVE && m_heldItem <= I_CHILL_DRIVE ) {
+            m_altForme = m_heldItem - I_DOUSE_DRIVE + 1;
+        } else {
+            m_altForme = 0;
         }
-        case PKMN_GENESECT: {
-            if( m_heldItem >= I_DOUSE_DRIVE && m_heldItem <= I_CHILL_DRIVE ) {
-                m_altForme = m_heldItem - I_DOUSE_DRIVE + 1;
-            } else {
-                m_altForme = 0;
-            }
-            return;
+        return;
+    }
+    case PKMN_SILVALLY: {
+        if( m_heldItem >= I_FIGHTING_MEMORY && m_heldItem <= I_FAIRY_MEMORY ) {
+            m_altForme = m_heldItem - I_FIGHTING_MEMORY + 1;
+        } else {
+            m_altForme = 0;
         }
-        case PKMN_SILVALLY: {
-            if( m_heldItem >= I_FIGHTING_MEMORY && m_heldItem <= I_FAIRY_MEMORY ) {
-                m_altForme = m_heldItem - I_FIGHTING_MEMORY + 1;
-            } else {
-                m_altForme = 0;
-            }
-            return;
-        }
-
+        return;
+    }
     }
 }
 
 bool boxPokemon::setNature( pkmnNatures p_newNature ) {
-    if( getNature( ) == p_newNature ) {
-        return false;
-    }
+    if( getNature( ) == p_newNature ) { return false; }
     bool shiny = isShiny( );
-    for( ; getNature( ) != p_newNature || isShiny( ) != shiny; m_pid = rand( ) );
+    for( ; getNature( ) != p_newNature || isShiny( ) != shiny; m_pid = rand( ) )
+        ;
     return true;
 }
 
@@ -256,9 +251,8 @@ bool boxPokemon::swapAbilities( ) {
 
 void boxPokemon::hatch( ) {
     setIsEgg( false );
-    m_hatchPlace               = MAP::curMap->getCurrentLocationId( );
-    m_hatchDate[ 0 ]           = acday;
-    m_hatchDate[ 1 ]           = acmonth + 1;
-    m_hatchDate[ 2 ]           = ( acyear + 1900 ) % 100;
+    m_hatchPlace     = MAP::curMap->getCurrentLocationId( );
+    m_hatchDate[ 0 ] = acday;
+    m_hatchDate[ 1 ] = acmonth + 1;
+    m_hatchDate[ 2 ] = ( acyear + 1900 ) % 100;
 }
-

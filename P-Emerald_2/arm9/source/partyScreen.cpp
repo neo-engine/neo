@@ -96,7 +96,7 @@ namespace STS {
             pressed = keysUp( );
             held    = keysHeld( );
 
-            if( ( held & KEY_X ) || GET_KEY_COOLDOWN( KEY_B ) ) break;
+            if( ( pressed & KEY_X ) || ( pressed & KEY_B ) ) break;
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 select( ( _currentSelection + 1 ) % _teamLength );
                 cooldown = COOLDOWN_COUNT;

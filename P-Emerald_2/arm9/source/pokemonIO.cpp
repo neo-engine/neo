@@ -27,27 +27,27 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
-#include "pokemon.h"
+#include "choiceBox.h"
 #include "defines.h"
+#include "messageBox.h"
+#include "moveChoiceBox.h"
+#include "pokemon.h"
 #include "uio.h"
 #include "yesNoBox.h"
-#include "messageBox.h"
-#include "choiceBox.h"
-#include "moveChoiceBox.h"
 
 bool boxPokemon::learnMove( u16 p_move ) {
     char buffer[ 50 ];
     if( p_move == m_moves[ 0 ] || p_move == m_moves[ 1 ] || p_move == m_moves[ 2 ]
         || p_move == m_moves[ 3 ] ) {
-        snprintf( buffer, 49, GET_STRING( 102 ), m_name, MOVE::getMoveName( p_move,
-                    CURRENT_LANGUAGE ).c_str( ) );
+        snprintf( buffer, 49, GET_STRING( 102 ), m_name,
+                  MOVE::getMoveName( p_move, CURRENT_LANGUAGE ).c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
         IO::messageBox a( buffer, false );
         return false;
     } else if( canLearn( m_speciesId, p_move, 4 ) ) {
-        auto mdata = MOVE::getMoveData( p_move );
+        auto mdata    = MOVE::getMoveData( p_move );
         bool freeSpot = false;
         for( u8 i = 0; i < 4; ++i )
             if( !m_moves[ i ] ) {

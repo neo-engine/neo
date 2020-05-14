@@ -46,16 +46,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "messageBox.h"
 
-const char PKMNDATA_PATH[]    = "nitro:/PKMNDATA/";
-const char SCRIPT_PATH[]      = "nitro:/MAPS/SCRIPTS/";
+const char PKMNDATA_PATH[] = "nitro:/PKMNDATA/";
+const char SCRIPT_PATH[]   = "nitro:/MAPS/SCRIPTS/";
 
-const char ITEM_NAME_PATH[]    = "nitro:/DATA/ITEM_NAME/";
-const char ITEM_DATA_PATH[]    = "nitro:/DATA/ITEM_DATA/";
-const char ABILITY_NAME_PATH[] = "nitro:/DATA/ABTY_NAME/";
-const char MOVE_NAME_PATH[]    = "nitro:/DATA/MOVE_NAME/";
-const char MOVE_DATA_PATH[]    = "nitro:/DATA/MOVE_DATA/";
-const char POKEMON_NAME_PATH[] = "nitro:/DATA/PKMN_NAME/";
-const char POKEMON_DATA_PATH[] = "nitro:/DATA/PKMN_DATA/";
+const char ITEM_NAME_PATH[]     = "nitro:/DATA/ITEM_NAME/";
+const char ITEM_DATA_PATH[]     = "nitro:/DATA/ITEM_DATA/";
+const char ABILITY_NAME_PATH[]  = "nitro:/DATA/ABTY_NAME/";
+const char MOVE_NAME_PATH[]     = "nitro:/DATA/MOVE_NAME/";
+const char MOVE_DATA_PATH[]     = "nitro:/DATA/MOVE_DATA/";
+const char POKEMON_NAME_PATH[]  = "nitro:/DATA/PKMN_NAME/";
+const char POKEMON_DATA_PATH[]  = "nitro:/DATA/PKMN_DATA/";
 const char PKMN_LEARNSET_PATH[] = "nitro:/DATA/PKMN_LEARN/";
 
 const char BATTLE_TRAINER_PATH[] = "n/a";
@@ -102,18 +102,15 @@ namespace FS {
         delete[] buffer;
         return res;
     }
-    FILE* openSplit( const char* p_path, u16 p_value, const char* p_ext,
-            u16 p_maxValue, const char* p_mode ) {
+    FILE* openSplit( const char* p_path, u16 p_value, const char* p_ext, u16 p_maxValue,
+                     const char* p_mode ) {
         char* buffer = new char[ 100 ];
         if( p_maxValue < 10 * ITEMS_PER_DIR ) {
-            snprintf( buffer, 99, "%s%d/%d%s", p_path, p_value / ITEMS_PER_DIR,
-                      p_value, p_ext );
+            snprintf( buffer, 99, "%s%d/%d%s", p_path, p_value / ITEMS_PER_DIR, p_value, p_ext );
         } else if( p_maxValue < 100 * ITEMS_PER_DIR ) {
-            snprintf( buffer, 99, "%s%02d/%d%s", p_path, p_value / ITEMS_PER_DIR,
-                      p_value, p_ext );
+            snprintf( buffer, 99, "%s%02d/%d%s", p_path, p_value / ITEMS_PER_DIR, p_value, p_ext );
         } else {
-            snprintf( buffer, 99, "%s%03d/%d%s", p_path, p_value / ITEMS_PER_DIR,
-                      p_value, p_ext );
+            snprintf( buffer, 99, "%s%03d/%d%s", p_path, p_value / ITEMS_PER_DIR, p_value, p_ext );
         }
 
         auto res = fopen( buffer, p_mode );
@@ -281,8 +278,7 @@ namespace FS {
         return true;
     }
 
-    [[deprecated]]
-    std::string readString( FILE* p_file, bool p_new ) {
+    [[deprecated]] std::string readString( FILE* p_file, bool p_new ) {
         (void) p_new;
 
         std::string ret = "";
@@ -413,25 +409,19 @@ namespace ITEM {
         FILE* f = FS::openSplit( ITEM_NAME_PATH, p_itemId, ".str" );
         if( !f ) return false;
 
-        for( int i = 0; i <= p_language; ++i ) {
-            fread( p_out, 1, ITEM_NAMELENGTH, f );
-        }
+        for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, ITEM_NAMELENGTH, f ); }
         fclose( f );
         return true;
     }
     std::string getItemName( const u16 p_itemId, const u8 p_language ) {
         char tmpbuf[ ITEM_NAMELENGTH ];
-        if( !getItemName( p_itemId, p_language, tmpbuf ) ) {
-            return "---";
-        }
+        if( !getItemName( p_itemId, p_language, tmpbuf ) ) { return "---"; }
         return std::string( tmpbuf );
     }
 
     itemData getItemData( const u16 p_itemId ) {
         itemData res;
-        if( getItemData( p_itemId, &res ) ) {
-            return res;
-        }
+        if( getItemData( p_itemId, &res ) ) { return res; }
         getItemData( 0, &res );
         return res;
     }
@@ -442,33 +432,27 @@ namespace ITEM {
         fclose( f );
         return true;
     }
-}
+} // namespace ITEM
 
 namespace MOVE {
     bool getMoveName( const u16 p_moveId, const u8 p_language, char* p_out ) {
         FILE* f = FS::openSplit( MOVE_NAME_PATH, p_moveId, ".str" );
         if( !f ) return false;
 
-        for( int i = 0; i <= p_language; ++i ) {
-            fread( p_out, 1, MOVE_NAMELENGTH, f );
-        }
+        for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, MOVE_NAMELENGTH, f ); }
         fclose( f );
         return true;
     }
 
     std::string getMoveName( const u16 p_moveId, const u8 p_language ) {
         char tmpbuf[ MOVE_NAMELENGTH ];
-        if( !getMoveName( p_moveId, p_language, tmpbuf ) ) {
-            return "---";
-        }
+        if( !getMoveName( p_moveId, p_language, tmpbuf ) ) { return "---"; }
         return std::string( tmpbuf );
     }
 
     moveData getMoveData( const u16 p_moveId ) {
         moveData res;
-        if( getMoveData( p_moveId, &res ) ) {
-            return res;
-        }
+        if( getMoveData( p_moveId, &res ) ) { return res; }
         getMoveData( 0, &res );
         return res;
     }
@@ -479,43 +463,37 @@ namespace MOVE {
         fclose( f );
         return true;
     }
-}
+} // namespace MOVE
 
 namespace BATTLE {
     battleTrainer getBattleTrainer( u16 p_battleTrainerId, u8 p_language ) {
         battleTrainer res;
-        if( getBattleTrainer( p_battleTrainerId, p_language, &res ) ) {
-            return res;
-        }
+        if( getBattleTrainer( p_battleTrainerId, p_language, &res ) ) { return res; }
         getBattleTrainer( 0, p_language, &res );
         return res;
     }
     bool getBattleTrainer( u16 p_battleTrainerId, u8 p_language, battleTrainer* p_out ) {
         FILE* f = FS::openSplit( BATTLE_TRAINER_PATH, p_battleTrainerId,
-                ( "-" + std::to_string( p_language ) + ".data" ).c_str( ) );
+                                 ( "-" + std::to_string( p_language ) + ".data" ).c_str( ) );
         if( !f ) return false;
         fread( p_out, sizeof( battleTrainer ), 1, f );
         fclose( f );
         return true;
     }
-}
+} // namespace BATTLE
 
 bool getAbilityName( int p_abilityId, int p_language, char* p_out ) {
     FILE* f = FS::openSplit( ABILITY_NAME_PATH, p_abilityId, ".str" );
     if( !f ) return false;
 
-    for( int i = 0; i <= p_language; ++i ) {
-        fread( p_out, 1, ABILITY_NAMELENGTH, f );
-    }
+    for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, ABILITY_NAMELENGTH, f ); }
     fclose( f );
     return true;
 }
 
 std::string getAbilityName( int p_abilityId, int p_language ) {
     char tmpbuf[ ABILITY_NAMELENGTH ];
-    if( !getAbilityName( p_abilityId, p_language, tmpbuf ) ) {
-        return "---";
-    }
+    if( !getAbilityName( p_abilityId, p_language, tmpbuf ) ) { return "---"; }
     return std::string( tmpbuf );
 }
 
@@ -527,9 +505,7 @@ std::string toString( u16 p_num ) {
 
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
     char tmpbuf[ 20 ];
-    if( !getDisplayName( p_pkmnId, tmpbuf, p_language, p_forme ) ) {
-        return "???";
-    }
+    if( !getDisplayName( p_pkmnId, tmpbuf, p_language, p_forme ) ) { return "???"; }
     return std::string( tmpbuf );
 }
 bool getDisplayName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
@@ -539,14 +515,12 @@ bool getDisplayName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
         snprintf( tmpbuf, 35, "_%hhu.str", p_forme );
         f = FS::openSplit( POKEMON_NAME_PATH, p_pkmnId, tmpbuf );
     }
-    if( !p_forme || !f ) {
-        f = FS::openSplit( POKEMON_NAME_PATH, p_pkmnId, ".str" );
-    }
+    if( !p_forme || !f ) { f = FS::openSplit( POKEMON_NAME_PATH, p_pkmnId, ".str" ); }
     if( !f ) return false;
 
     for( int i = 0; i <= p_language; ++i ) {
-        assert( PKMN_NAMELENGTH + ( 5 * !!p_forme ) ==
-                fread( p_out, 1, PKMN_NAMELENGTH + ( 5 * !!p_forme ), f ) );
+        assert( PKMN_NAMELENGTH + ( 5 * !!p_forme )
+                == fread( p_out, 1, PKMN_NAMELENGTH + ( 5 * !!p_forme ), f ) );
     }
     fclose( f );
     return true;
@@ -554,9 +528,7 @@ bool getDisplayName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
 
 pkmnData getPkmnData( const u16 p_pkmnId, const u8 p_forme ) {
     pkmnData res;
-    if( getPkmnData( p_pkmnId, p_forme, &res ) ) {
-        return res;
-    }
+    if( getPkmnData( p_pkmnId, p_forme, &res ) ) { return res; }
     getPkmnData( 0, &res );
     return res;
 }
@@ -580,7 +552,6 @@ bool getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out ) {
     return true;
 }
 
-
 bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
     FILE* f;
     if( p_forme ) {
@@ -600,10 +571,8 @@ bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
 void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_amount,
                     u16* p_result ) {
     FILE* f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
-    if( !f )
-        f  = FS::openSplit( PKMN_LEARNSET_PATH, 201, ".learnset.data" );
-    if( !f )
-        return;
+    if( !f ) f = FS::openSplit( PKMN_LEARNSET_PATH, 201, ".learnset.data" );
+    if( !f ) return;
 
     u16* buffer = new u16[ 700 ];
     FS::read( f, buffer, sizeof( u16 ), 699 );
@@ -676,4 +645,3 @@ bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode ) {
     delete[] buffer;
     return false;
 }
-

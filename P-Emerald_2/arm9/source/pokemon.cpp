@@ -27,58 +27,56 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "pokemon.h"
 #include "itemNames.h"
-#include "move.h"
-#include "saveGame.h"
 #include "mapDrawer.h"
+#include "move.h"
 #include "pokemonNames.h"
+#include "saveGame.h"
 
 pokemon::pokemon( boxPokemon& p_boxPokemon ) : m_boxdata( p_boxPokemon ) {
-    pkmnData data       = getPkmnData( p_boxPokemon.m_speciesId, p_boxPokemon.getForme( ) );
-    m_level             = calcLevel( p_boxPokemon, &data );
-    m_stats             = calcStats( m_boxdata, m_level, &data );
-    m_statusint = 0;
+    pkmnData data = getPkmnData( p_boxPokemon.m_speciesId, p_boxPokemon.getForme( ) );
+    m_level       = calcLevel( p_boxPokemon, &data );
+    m_stats       = calcStats( m_boxdata, m_level, &data );
+    m_statusint   = 0;
 }
 pokemon::pokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 p_shiny,
                   bool p_hiddenAbility, bool p_isEgg, u8 p_ball, u8 p_pokerus,
                   bool p_fatefulEncounter ) {
-    pkmnData data       = getPkmnData( p_pkmnId, p_forme );
-    m_boxdata           = boxPokemon( p_pkmnId, p_level, p_forme, p_name, p_shiny,
-            p_hiddenAbility, p_isEgg, p_ball, p_pokerus,  p_fatefulEncounter, &data );
-    m_level             = p_level;
-    m_stats             = calcStats( m_boxdata, p_level, &data );
+    pkmnData data = getPkmnData( p_pkmnId, p_forme );
+    m_boxdata   = boxPokemon( p_pkmnId, p_level, p_forme, p_name, p_shiny, p_hiddenAbility, p_isEgg,
+                            p_ball, p_pokerus, p_fatefulEncounter, &data );
+    m_level     = p_level;
+    m_stats     = calcStats( m_boxdata, p_level, &data );
     m_statusint = 0;
 }
 pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id, u16 p_sid,
                   const char* p_oT, bool p_oTFemale, u8 p_shiny, bool p_hiddenAbility,
                   bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace, u8 p_ball, u8 p_pokerus,
                   u8 p_forme ) {
-    pkmnData data       = getPkmnData( p_pkmnId, p_forme );
-    m_boxdata           = boxPokemon( p_moves, p_pkmnId, p_name, p_level, p_id,
-            p_sid, p_oT, p_oTFemale, p_shiny, p_hiddenAbility, p_fatefulEncounter, p_isEgg,
-            p_gotPlace, p_ball, p_pokerus, p_forme, &data );
-    m_level             = p_level;
-    m_stats             = calcStats( m_boxdata, p_level, &data );
-    m_statusint = 0;
+    pkmnData data = getPkmnData( p_pkmnId, p_forme );
+    m_boxdata     = boxPokemon( p_moves, p_pkmnId, p_name, p_level, p_id, p_sid, p_oT, p_oTFemale,
+                            p_shiny, p_hiddenAbility, p_fatefulEncounter, p_isEgg, p_gotPlace,
+                            p_ball, p_pokerus, p_forme, &data );
+    m_level       = p_level;
+    m_stats       = calcStats( m_boxdata, p_level, &data );
+    m_statusint   = 0;
 }
 pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
     pkmnData data = getPkmnData( p_trainerPokemon.m_speciesId, p_trainerPokemon.m_forme );
-    m_level = p_trainerPokemon.m_level;
-    m_boxdata = boxPokemon( p_trainerPokemon.m_speciesId, m_level, p_trainerPokemon.m_forme, 0,
+    m_level       = p_trainerPokemon.m_level;
+    m_boxdata     = boxPokemon( p_trainerPokemon.m_speciesId, m_level, p_trainerPokemon.m_forme, 0,
                             p_trainerPokemon.m_shiny, false, false, 0, 0, false, &data );
 
-    m_boxdata.m_ability = p_trainerPokemon.m_ability;
+    m_boxdata.m_ability  = p_trainerPokemon.m_ability;
     m_boxdata.m_heldItem = p_trainerPokemon.m_heldItem;
     memcpy( m_boxdata.m_moves, p_trainerPokemon.m_moves, sizeof( m_boxdata.m_moves ) );
     memcpy( m_boxdata.m_effortValues, p_trainerPokemon.m_ev, sizeof( m_boxdata.m_effortValues ) );
-    for( u8 i = 0; i < 6; ++i ) {
-        m_boxdata.IVset( i, p_trainerPokemon.m_iv[ i ] );
-    }
-    m_stats             = calcStats( m_boxdata, m_level, &data );
+    for( u8 i = 0; i < 6; ++i ) { m_boxdata.IVset( i, p_trainerPokemon.m_iv[ i ] ); }
+    m_stats     = calcStats( m_boxdata, m_level, &data );
     m_statusint = 0;
 }
 
 bool pokemon::heal( ) {
-    bool change = m_stats.m_acHP < m_stats.m_maxHP;
+    bool change    = m_stats.m_acHP < m_stats.m_maxHP;
     m_stats.m_acHP = m_stats.m_maxHP;
 
     change |= !!m_statusint;
@@ -87,7 +85,7 @@ bool pokemon::heal( ) {
     for( u8 i = 0; i < 4; ++i ) {
         if( m_boxdata.m_moves[ i ] ) {
             MOVE::moveData mdata = MOVE::getMoveData( m_boxdata.m_moves[ i ] );
-            auto mx = s8( mdata.m_pp * ( ( 5 + m_boxdata.PPupget( i ) ) / 5.0 ) );
+            auto           mx    = s8( mdata.m_pp * ( ( 5 + m_boxdata.PPupget( i ) ) / 5.0 ) );
             change |= m_boxdata.m_acPP[ i ] < mx;
             m_boxdata.m_acPP[ i ] = mx;
         }
@@ -116,9 +114,9 @@ void pokemon::recalculateStats( ) {
 }
 
 void pokemon::recalculateStats( pkmnData& p_data ) {
-    auto HPdif      = m_stats.m_maxHP - m_stats.m_acHP;
-    m_stats         = calcStats( m_boxdata, m_level, &p_data );
-    m_stats.m_acHP  = m_stats.m_maxHP - HPdif;
+    auto HPdif     = m_stats.m_maxHP - m_stats.m_acHP;
+    m_stats        = calcStats( m_boxdata, m_level, &p_data );
+    m_stats.m_acHP = m_stats.m_maxHP - HPdif;
 }
 
 void pokemon::setForme( u8 p_newForme ) {
@@ -133,35 +131,29 @@ void pokemon::setBattleForme( u8 p_newForme ) {
 }
 
 bool pokemon::setNature( pkmnNatures p_newNature ) {
-    if( !m_boxdata.setNature( p_newNature ) ) {
-        return false;
-    }
+    if( !m_boxdata.setNature( p_newNature ) ) { return false; }
     recalculateStats( );
     return true;
 }
 
 bool pokemon::setLevel( u8 p_newLevel ) {
-    if( p_newLevel > 100 || p_newLevel == m_level ) {
-        return false;
-    }
+    if( p_newLevel > 100 || p_newLevel == m_level ) { return false; }
     pkmnData data = getPkmnData( m_boxdata.m_speciesId, getForme( ) );
 
     m_boxdata.m_experienceGained = EXP[ p_newLevel - 1 ][ data.getExpType( ) ];
-    m_level = calcLevel( m_boxdata, &data );
+    m_level                      = calcLevel( m_boxdata, &data );
     recalculateStats( data );
 
     return true;
 }
 
 bool pokemon::gainExperience( u32 p_amount ) {
-    if( m_level == 100 ) {
-        return false;
-    }
+    if( m_level == 100 ) { return false; }
 
     pkmnData data = getPkmnData( m_boxdata.m_speciesId, getForme( ) );
 
-    m_boxdata.m_experienceGained = std::min( m_boxdata.m_experienceGained + p_amount,
-        EXP[ 99 ][ data.getExpType( ) ] );
+    m_boxdata.m_experienceGained
+        = std::min( m_boxdata.m_experienceGained + p_amount, EXP[ 99 ][ data.getExpType( ) ] );
     m_level = calcLevel( m_boxdata, &data );
     recalculateStats( data );
     return true;
@@ -169,34 +161,37 @@ bool pokemon::gainExperience( u32 p_amount ) {
 
 void pokemon::setStatus( u8 p_status, u8 p_value ) {
     switch( p_status ) {
-        case 0:
-            m_status.m_isAsleep = p_value; break;
-        case 1:
-            m_status.m_isPoisoned = p_value; break;
-        case 2:
-            m_status.m_isBurned = p_value; break;
-        case 3:
-            m_status.m_isFrozen = p_value;
-            if( p_value && m_boxdata.m_speciesId == PKMN_SHAYMIN && getForme( ) == 1 ) {
-                setForme( 0 );
-            }
-            break;
-        case 4:
-            m_status.m_isParalyzed = p_value; break;
-        case 5:
-            m_status.m_isBadlyPoisoned = p_value; break;
-        default:
-            break;
+    case 0:
+        m_status.m_isAsleep = p_value;
+        break;
+    case 1:
+        m_status.m_isPoisoned = p_value;
+        break;
+    case 2:
+        m_status.m_isBurned = p_value;
+        break;
+    case 3:
+        m_status.m_isFrozen = p_value;
+        if( p_value && m_boxdata.m_speciesId == PKMN_SHAYMIN && getForme( ) == 1 ) {
+            setForme( 0 );
+        }
+        break;
+    case 4:
+        m_status.m_isParalyzed = p_value;
+        break;
+    case 5:
+        m_status.m_isBadlyPoisoned = p_value;
+        break;
+    default:
+        break;
     }
 }
 
-pokemon::stats calcStats( const boxPokemon& p_boxdata, u8 p_level,
-                          const pkmnData* p_data ) {
+pokemon::stats calcStats( const boxPokemon& p_boxdata, u8 p_level, const pkmnData* p_data ) {
     pokemon::stats res;
     u16            pkmnId = p_boxdata.m_speciesId;
     if( pkmnId != PKMN_SHEDINJA )
-        res.m_acHP = res.m_maxHP = ( ( p_boxdata.IVget( 0 ) + 2 *
-                p_data->m_baseForme.m_bases[ 0 ]
+        res.m_acHP = res.m_maxHP = ( ( p_boxdata.IVget( 0 ) + 2 * p_data->m_baseForme.m_bases[ 0 ]
                                        + ( p_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )
                                      * p_level / 100 )
                                    + 10;
@@ -205,11 +200,11 @@ pokemon::stats calcStats( const boxPokemon& p_boxdata, u8 p_level,
     pkmnNatures nature = p_boxdata.getNature( );
 
     for( u8 i = 1; i < 6; ++i ) {
-        res.setStat( i, ( ( ( p_boxdata.IVget( i ) + 2
-                    * p_data->m_baseForme.m_bases[ i ]
-                      + ( p_boxdata.m_effortValues[ i ] >> 2 ) )
-                    * p_level / 100.0 )
-                  + 5 ) * NatMod[ nature ][ i - 1 ] );
+        res.setStat( i, ( ( ( p_boxdata.IVget( i ) + 2 * p_data->m_baseForme.m_bases[ i ]
+                              + ( p_boxdata.m_effortValues[ i ] >> 2 ) )
+                            * p_level / 100.0 )
+                          + 5 )
+                            * NatMod[ nature ][ i - 1 ] );
     }
     return res;
 }
@@ -224,17 +219,17 @@ u16 calcLevel( const boxPokemon& p_boxdata, const pkmnData* p_data ) {
 
 void pokemon::giveItem( u16 p_newItem ) {
     m_boxdata.giveItem( p_newItem );
-    pkmnData data = getPkmnData( m_boxdata.m_speciesId, m_boxdata.getForme( ) );
-    auto oldHP    = m_stats.m_maxHP - m_stats.m_acHP;
-    m_stats       = calcStats( m_boxdata, m_level, &data );
-    m_stats.m_acHP  = m_stats.m_maxHP - oldHP;
+    pkmnData data  = getPkmnData( m_boxdata.m_speciesId, m_boxdata.getForme( ) );
+    auto     oldHP = m_stats.m_maxHP - m_stats.m_acHP;
+    m_stats        = calcStats( m_boxdata, m_level, &data );
+    m_stats.m_acHP = m_stats.m_maxHP - oldHP;
 }
 u16 pokemon::takeItem( ) {
-    u16 res       = m_boxdata.takeItem( );
-    pkmnData data = getPkmnData( m_boxdata.m_speciesId, m_boxdata.getForme( ) );
-    auto oldHP    = m_stats.m_maxHP - m_stats.m_acHP;
-    m_stats       = calcStats( m_boxdata, m_level, &data );
-    m_stats.m_acHP  = m_stats.m_maxHP - oldHP;
+    u16      res   = m_boxdata.takeItem( );
+    pkmnData data  = getPkmnData( m_boxdata.m_speciesId, m_boxdata.getForme( ) );
+    auto     oldHP = m_stats.m_maxHP - m_stats.m_acHP;
+    m_stats        = calcStats( m_boxdata, m_level, &data );
+    m_stats.m_acHP = m_stats.m_maxHP - oldHP;
     return res;
 }
 
@@ -355,6 +350,6 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
     recalculateStats( );
 
     if( !m_boxdata.isNicknamed( ) )
-        strcpy( m_boxdata.m_name, getDisplayName( m_boxdata.m_speciesId, CURRENT_LANGUAGE ).c_str( ) );
+        strcpy( m_boxdata.m_name,
+                getDisplayName( m_boxdata.m_speciesId, CURRENT_LANGUAGE ).c_str( ) );
 }
-

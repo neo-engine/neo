@@ -43,8 +43,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "item.h"
 #include "keyboard.h"
 #include "move.h"
-#include "moveNames.h"
 #include "moveChoiceBox.h"
+#include "moveNames.h"
 #include "pokemon.h"
 #include "pokemonNames.h"
 #include "saveGame.h"
@@ -230,4 +230,4 @@ namespace BATTLE {
         IO::regularFont->printMBString( p_message.c_str( ), 8, 8, true );
     }
 
-}
+} // namespace BATTLE

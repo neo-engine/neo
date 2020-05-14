@@ -29,7 +29,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "item.h"
 #include "pokemon.h"
 #include "saveGame.h"
-#include "script.h"
 
 #include <algorithm>
 #include <nds.h>
@@ -100,13 +99,9 @@ namespace BAG {
     }
 
     bag::bagType toBagType( u8 p_itemType ) {
-        if( p_itemType & ITEM::ITEMTYPE_BERRY ) {
-            return bag::bagType::BERRIES;
-        }
+        if( p_itemType & ITEM::ITEMTYPE_BERRY ) { return bag::bagType::BERRIES; }
 
-        if( ( p_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
-            return bag::bagType::MEDICINE;
-        }
+        if( ( p_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) { return bag::bagType::MEDICINE; }
 
         switch( p_itemType ) {
         case ITEM::ITEMTYPE_FORMECHANGE:

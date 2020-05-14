@@ -41,21 +41,21 @@ namespace BATTLE {
     };
 
     struct trainerData {
-        u8              m_trainerClass;
-        u8              m_numPokemon;
-        u16             m_items[ 5 ];
-        u32             m_moneyEarned;
-        trainerPokemon  m_pokemon[ 6 ];
+        u8             m_trainerClass;
+        u8             m_numPokemon;
+        u16            m_items[ 5 ];
+        u32            m_moneyEarned;
+        trainerPokemon m_pokemon[ 6 ];
     };
 
     struct battleTrainer {
-        trainerStrings  m_strings;
-        trainerData     m_data;
+        trainerStrings m_strings;
+        trainerData    m_data;
     };
 
     std::string getTrainerClassName( u8 p_trainerClass, u8 p_language );
-    bool getTrainerClassName( u8 p_trainerClass, u8 p_language, char* p_out );
+    bool        getTrainerClassName( u8 p_trainerClass, u8 p_language, char* p_out );
 
     battleTrainer getBattleTrainer( u16 p_battleTrainerId, u8 p_language );
-    bool getBattleTrainer( u16 p_battleTrainerId, u8 p_language, battleTrainer* p_out );
+    bool          getBattleTrainer( u16 p_battleTrainerId, u8 p_language, battleTrainer* p_out );
 } // namespace BATTLE

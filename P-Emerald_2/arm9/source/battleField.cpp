@@ -25,9 +25,8 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#include "defines.h"
 #include "battle.h"
+#include "defines.h"
 
 namespace BATTLE {
     field::field( weather p_initialWeather, pseudoWeather p_initialPseudoWeather,
@@ -43,12 +42,12 @@ namespace BATTLE {
         // TODO
     }
 
-    bool    field::setWeather( battleUI p_ui, weather p_newWeather ) {
+    bool field::setWeather( battleUI p_ui, weather p_newWeather ) {
         // TODO
         return false;
     }
 
-    bool    field::removeWeather( battleUI p_ui ) {
+    bool field::removeWeather( battleUI p_ui ) {
         // TODO
         return false;
     }
@@ -58,12 +57,12 @@ namespace BATTLE {
         return weather( 0 );
     }
 
-    bool          field::setPseudoWeather( battleUI p_ui, pseudoWeather p_newPseudoWeather ) {
+    bool field::setPseudoWeather( battleUI p_ui, pseudoWeather p_newPseudoWeather ) {
         // TODO
         return false;
     }
 
-    bool          field::removePseudoWeather( battleUI p_ui ) {
+    bool field::removePseudoWeather( battleUI p_ui ) {
         // TODO
         return false;
     }
@@ -73,12 +72,12 @@ namespace BATTLE {
         return pseudoWeather( 0 );
     }
 
-    bool    field::setTerrain( battleUI p_ui, terrain p_newTerrainr ) {
+    bool field::setTerrain( battleUI p_ui, terrain p_newTerrainr ) {
         // TODO
         return false;
     }
 
-    bool    field::removeTerrain( battleUI p_ui ) {
+    bool field::removeTerrain( battleUI p_ui ) {
         // TODO
         return false;
     }
@@ -102,7 +101,7 @@ namespace BATTLE {
     std::vector<battleMove>
     field::computeSortedBattleMoves( const std::vector<battleMoveSelection>& p_selectedMoves ) {
         // TODO
-        return { };
+        return {};
     }
 
     void field::executeBattleMove( battleUI p_ui, battleMove p_move,
@@ -110,4 +109,4 @@ namespace BATTLE {
                                    std::vector<battleMove> p_tergetedMoves ) {
         // TODO
     }
-}
+} // namespace BATTLE

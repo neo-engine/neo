@@ -67,32 +67,32 @@ enum pkmnGenderType {
     MALE       = 0
 };
 enum pkmnEggType {
-    NONE_      = 0,
-    MONSTER_   = 1,
-    WASSER1_   = 2,
-    WATER1_    = 2,
-    KAEFER_    = 4,
-    BUG_       = 4,
-    FLUG_      = 5,
-    FLYING_    = 5,
-    FELD_      = 6,
-    FIELD_     = 6,
-    FEE_       = 7,
-    FAIRY_     = 7,
-    PFLANZE_   = 8,
-    GRASS_     = 8,
-    HUMANOTYP_ = 9,
-    HUMANLIKE_ = 9,
-    WASSER3_   = 10,
-    WATER3_    = 10,
-    MINERAL_   = 11,
-    AMORPH_    = 12,
-    WASSER2_   = 13,
-    WATER2_    = 13,
-    DITTO_     = 14,
-    DRACHE_    = 15,
-    DRAGON_    = 15,
-    UNBEKANNT_ = 16,
+    NONE_         = 0,
+    MONSTER_      = 1,
+    WASSER1_      = 2,
+    WATER1_       = 2,
+    KAEFER_       = 4,
+    BUG_          = 4,
+    FLUG_         = 5,
+    FLYING_       = 5,
+    FELD_         = 6,
+    FIELD_        = 6,
+    FEE_          = 7,
+    FAIRY_        = 7,
+    PFLANZE_      = 8,
+    GRASS_        = 8,
+    HUMANOTYP_    = 9,
+    HUMANLIKE_    = 9,
+    WASSER3_      = 10,
+    WATER3_       = 10,
+    MINERAL_      = 11,
+    AMORPH_       = 12,
+    WASSER2_      = 13,
+    WATER2_       = 13,
+    DITTO_        = 14,
+    DRACHE_       = 15,
+    DRAGON_       = 15,
+    UNBEKANNT_    = 16,
     UNDISCOVERED_ = 16
 };
 
@@ -149,31 +149,30 @@ enum pkmnNatures {
 };
 
 struct pkmnFormeData {
-    type            m_types[ 2 ];
-    u16             m_abilities[ 4 ]; // abilities
-    u8              m_bases[ 6 ]; // base values (hp, atk, def, satk, sdef, spd)
-    u16             m_expYield;
-    pkmnGenderType  m_genderRatio; // from pkmnGenderType
-    u8              m_size; // in dm
-    u16             m_weight; // in 100g
-    u8              m_colorShape; // (color << 4) | shape
-    u8              m_evYield[ 6 ]; // (hp, atk, def, satk, sdef, spd)
-    u16             m_items[ 4 ]; // possible held items: 1%, 5%, 50%, 100%
-    u8              m_eggGroups; // (eg1 << 4) | eg2;
+    type           m_types[ 2 ];
+    u16            m_abilities[ 4 ]; // abilities
+    u8             m_bases[ 6 ];     // base values (hp, atk, def, satk, sdef, spd)
+    u16            m_expYield;
+    pkmnGenderType m_genderRatio;  // from pkmnGenderType
+    u8             m_size;         // in dm
+    u16            m_weight;       // in 100g
+    u8             m_colorShape;   // (color << 4) | shape
+    u8             m_evYield[ 6 ]; // (hp, atk, def, satk, sdef, spd)
+    u16            m_items[ 4 ];   // possible held items: 1%, 5%, 50%, 100%
+    u8             m_eggGroups;    // (eg1 << 4) | eg2;
 };
 
 struct pkmnData {
-    pkmnFormeData   m_baseForme;
-    u8              m_expTypeFormeCnt; // (ExpType << 5) | FormeCnt
-    u8              m_eggCycles;
-    u8              m_catchrate;
-    u8              m_baseFriend;
+    pkmnFormeData m_baseForme;
+    u8            m_expTypeFormeCnt; // (ExpType << 5) | FormeCnt
+    u8            m_eggCycles;
+    u8            m_catchrate;
+    u8            m_baseFriend;
 
     u8 getExpType( ) const {
         return m_expTypeFormeCnt >> 5;
     }
 };
-
 
 // deprecated
 struct pokemonData {
@@ -227,16 +226,15 @@ struct pokemonData {
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme = 0 );
 bool        getDisplayName( u16 p_pkmnId, char* p_name, u8 p_language, u8 p_forme = 0 );
 
-pkmnData    getPkmnData( const u16 p_pkmnId, const u8 p_forme = 0 );
-bool        getPkmnData( const u16 p_pkmnId, pkmnData* p_out );
-bool        getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out );
+pkmnData getPkmnData( const u16 p_pkmnId, const u8 p_forme = 0 );
+bool     getPkmnData( const u16 p_pkmnId, pkmnData* p_out );
+bool     getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out );
 
-[[deprecated]]
-bool        getAll( u16 p_pkmnId, pokemonData& out, u8 p_forme = 0 );
+[[deprecated]] bool getAll( u16 p_pkmnId, pokemonData& out, u8 p_forme = 0 );
 
 void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_mode, u16 p_num,
                     u16* p_res );
 bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_mode );
 
 extern double NatMod[ 25 ][ 5 ];
-extern u32 EXP[ 100 ][ 6 ];
+extern u32    EXP[ 100 ][ 6 ];

@@ -26,32 +26,32 @@
     */
 
 #pragma once
-#include <string>
 #include <functional>
+#include <string>
 #include "pokemon.h"
 
 namespace ITEM {
-    const u8 ITEMTYPE_POKEBALL = 1;
-    const u8 ITEMTYPE_MEDICINE = 2;
-    const u8 ITEMTYPE_BATTLEITEM = 3;
+    const u8 ITEMTYPE_POKEBALL    = 1;
+    const u8 ITEMTYPE_MEDICINE    = 2;
+    const u8 ITEMTYPE_BATTLEITEM  = 3;
     const u8 ITEMTYPE_COLLECTIBLE = 4;
-    const u8 ITEMTYPE_USABLE = 5;
-    const u8 ITEMTYPE_EVOLUTION = 6;
+    const u8 ITEMTYPE_USABLE      = 5;
+    const u8 ITEMTYPE_EVOLUTION   = 6;
     const u8 ITEMTYPE_FORMECHANGE = 8;
-    const u8 ITEMTYPE_KEYITEM = 9;
-    const u8 ITEMTYPE_TM = 12;
-    const u8 ITEMTYPE_APRICORN = 13;
-    const u8 ITEMTYPE_BERRY = 16;
-    const u8 ITEMTYPE_HOLD = 32;
+    const u8 ITEMTYPE_KEYITEM     = 9;
+    const u8 ITEMTYPE_TM          = 12;
+    const u8 ITEMTYPE_APRICORN    = 13;
+    const u8 ITEMTYPE_BERRY       = 16;
+    const u8 ITEMTYPE_HOLD        = 32;
 
     struct itemData {
-        u8   m_itemType;
-        u8   m_effect;   // Effect index
-        u16  m_param1;   // Effect param 1
-        u16  m_param2;   // Effect param 2
-        u16  m_param3;   // Effect param 3
-        u16  m_sellPrice;
-        u16  m_buyPrice;
+        u8  m_itemType;
+        u8  m_effect; // Effect index
+        u16 m_param1; // Effect param 1
+        u16 m_param2; // Effect param 2
+        u16 m_param3; // Effect param 3
+        u16 m_sellPrice;
+        u16 m_buyPrice;
     };
 
     /*
@@ -59,10 +59,10 @@ namespace ITEM {
      */
     u16 getItemChar( const u8 p_itemType );
 
-    bool getItemName( const u16 p_itemId, const u8 p_language, char* p_out );
+    bool        getItemName( const u16 p_itemId, const u8 p_language, char* p_out );
     std::string getItemName( const u16 p_itemId, const u8 p_language );
-    itemData getItemData( const u16 p_itemId );
-    bool getItemData( const u16 p_itemId, itemData* p_out );
+    itemData    getItemData( const u16 p_itemId );
+    bool        getItemData( const u16 p_itemId, itemData* p_out );
 
     bool isUsable( const u16 p_itemId );
 
@@ -77,4 +77,4 @@ namespace ITEM {
      */
     bool use( const u16 p_itemId, const itemData& p_data, pokemon& p_pokemon,
               std::function<u8( u8 )> p_callback, bool p_inbattle = false );
-}
+} // namespace ITEM

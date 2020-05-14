@@ -75,7 +75,7 @@ namespace SAVE {
         pokemon testTeam[ 6 ];
         for( u8 i = 0; i < 5; i++ ) {
             testTeam[ i ]
-                = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, i, false, i == 3 );
+                = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false, i == 3 );
             testTeam[ i ].m_stats.m_acHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
         }
 

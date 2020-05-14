@@ -105,16 +105,10 @@
     <ClInclude Include="arm9\include\battle.h">
       <Filter>Header Files\arm9\battle</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\include\battlePokemon.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\battleTrainer.h">
       <Filter>Header Files\arm9\battle</Filter>
     </ClInclude>
     <ClInclude Include="arm9\include\battleUI.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\battleWeather.h">
       <Filter>Header Files\arm9\battle</Filter>
     </ClInclude>
     <ClInclude Include="arm9\include\bag.h">
@@ -219,12 +213,6 @@
     <ClInclude Include="arm9\include\sprite.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\include\script.h">
-      <Filter>Header Files\arm9\battle</Filter>
-    </ClInclude>
-    <ClInclude Include="arm9\include\hmMoves.h">
-      <Filter>Header Files\arm9\data structures</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\item.h">
       <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
@@ -246,6 +234,24 @@
     <ClInclude Include="arm9\include\partyScreenUI.h">
       <Filter>Header Files\arm9\sts</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\include\battleDefines.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\abilityNames.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\itemNames.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\moveNames.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\pokemonData.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\pokemonNames.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">
@@ -260,17 +266,11 @@
     <ClCompile Include="arm9\source\battleUI.cpp">
       <Filter>Source Files\arm9\battle</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\script.cpp">
-      <Filter>Source Files\arm9\battle</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\dex.cpp">
       <Filter>Source Files\arm9\dex</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\dexUI.cpp">
       <Filter>Source Files\arm9\dex</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\move.cpp">
-      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\pokemon.cpp">
       <Filter>Source Files\arm9\data structures</Filter>
@@ -356,9 +356,6 @@
     <ClCompile Include="arm9\source\pokemonIO.cpp">
       <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\battleScripts.cpp">
-      <Filter>Source Files\arm9\battle</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\nav.cpp">
       <Filter>Source Files\arm9\nav</Filter>
     </ClCompile>
@@ -385,6 +382,21 @@
     </ClCompile>
     <ClCompile Include="arm9\source\partyScreenUI.cpp">
       <Filter>Source Files\arm9\sts</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\battleField.cpp">
+      <Filter>Source Files\arm9\battle</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\battleSide.cpp">
+      <Filter>Source Files\arm9\battle</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\battleSlot.cpp">
+      <Filter>Source Files\arm9\battle</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\boxPokemon.cpp">
+      <Filter>Source Files\arm9\data structures</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\pokemonData.cpp">
+      <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

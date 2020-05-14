@@ -31,10 +31,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace BATTLE {
     class battleUI {
-        u8      _platform;
-        u8      _platform2;
-        u8      _background;
-        bool    _isWildBattle;
+        u8   _platform;
+        u8   _platform2;
+        u8   _background;
+        bool _isWildBattle;
 
       public:
         static void initLogScreen( );

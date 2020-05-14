@@ -25,9 +25,8 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#include "defines.h"
 #include "battle.h"
+#include "defines.h"
 
 namespace BATTLE {
     slot::slot( pokemon* p_initialPokemon ) {
@@ -132,7 +131,7 @@ namespace BATTLE {
         return false;
     }
 
-    battleMove slot::computeBattleMove( battleMoveSelection p_usersSelection,
+    battleMove slot::computeBattleMove( battleMoveSelection               p_usersSelection,
                                         std::vector<battleMoveSelection>& p_targetsSelecotions ) {
         // TODO
         return battleMove( );
@@ -152,4 +151,4 @@ namespace BATTLE {
         // TODO
         return false;
     }
-}
+} // namespace BATTLE

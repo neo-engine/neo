@@ -25,9 +25,8 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#include "defines.h"
 #include "battle.h"
+#include "defines.h"
 
 namespace BATTLE {
     void side::age( battleUI p_ui ) {
@@ -54,7 +53,7 @@ namespace BATTLE {
                                                std::vector<battleMove>& p_targetsMoves,
                                                std::vector<battleMove>& p_targetedMoves ) {
         // TODO
-        return { };
+        return {};
     }
 
     u16 side::computeDamageTaken( u8 p_slot, battleMove p_move, u16 p_baseDamage ) {
@@ -71,4 +70,4 @@ namespace BATTLE {
         // TODO
         return false;
     }
-}
+} // namespace BATTLE

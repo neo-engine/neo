@@ -40,7 +40,8 @@ namespace MOVE {
         CHARGE = ( 1 << 3 ),
         /** Makes contact. */
         CONTACT = ( 1 << 4 ),
-        /** When used by a Pokemon, other Pokemon with the Dancer Ability can attempt to execute the same   move. */
+        /** When used by a Pokemon, other Pokemon with the Dancer Ability can attempt to execute the
+           same   move. */
         DANCE = ( 1 << 5 ),
         /** Thaws the user if executed successfully while the user is frozen. */
         DEFROST = ( 1 << 6 ),
@@ -56,7 +57,8 @@ namespace MOVE {
         MINDBLOWNRECOIL = ( 1 << 11 ),
         /** Prevented from being executed or selected in a Sky Battle. */
         NONSKY = ( 1 << 12 ),
-        /** Has no effect on Grass-type Pokemon, Pokemon with the Overcoat Ability, and Pokemon holding     Safety Goggles. */
+        /** Has no effect on Grass-type Pokemon, Pokemon with the Overcoat Ability, and Pokemon
+           holding     Safety Goggles. */
         POWDER = ( 1 << 13 ),
         /** Blocked by Detect, Protect, Spiky Shield, and if not a Status move, King's Shield. */
         PROTECT = ( 1 << 14 ),
@@ -64,11 +66,13 @@ namespace MOVE {
         PULSE = ( 1 << 15 ),
         /** Power is multiplied by 1.2 when used by a Pokemon with the Iron Fist Ability. */
         PUNCH = ( 1 << 16 ),
-        /** If this move is successful, the user must recharge on the following turn and cannot make a      move. */
+        /** If this move is successful, the user must recharge on the following turn and cannot make
+           a      move. */
         RECHARGE = ( 1 << 17 ),
         /** Bounced back to the original user by Magic Coat or the Magic Bounce Ability. */
         REFLECTABLE = ( 1 << 18 ),
-        /** Can be stolen from the original user and instead used by another Pokemon using Snatch. */
+        /** Can be stolen from the original user and instead used by another Pokemon using Snatch.
+         */
         SNATCH = ( 1 << 19 ),
         /** Has no effect on Pokemon with the Soundproof Ability. */
         SOUND = ( 1 << 20 ),
@@ -131,26 +135,35 @@ namespace MOVE {
     enum moveHitTypes : u8 { NOOP = 0, PHYSICAL = 1, SPECIAL = 2, STATUS = 3 };
 
     enum target : u8 {
-        NORMAL = 0, ADJACENT_ALLY = 2, ADJACENT_FOE = 3, ADJACENT_ALLY_OR_SELF = 4,
-        ANY = 12, // single target
-        SELF = 5, RANDOM = 6, // single-target, automatic
-        ALLIES = 13, ALL_ADJACENT = 7, ALL_ADJACENT_FOES = 8, // spread
-        ALLY_SIDE = 9, FOE_SIDE = 10, ALL = 11, // field
-        SCRIPTED = 14, ALLY_TEAM = 15,
+        NORMAL                = 0,
+        ADJACENT_ALLY         = 2,
+        ADJACENT_FOE          = 3,
+        ADJACENT_ALLY_OR_SELF = 4,
+        ANY                   = 12, // single target
+        SELF                  = 5,
+        RANDOM                = 6, // single-target, automatic
+        ALLIES                = 13,
+        ALL_ADJACENT          = 7,
+        ALL_ADJACENT_FOES     = 8, // spread
+        ALLY_SIDE             = 9,
+        FOE_SIDE              = 10,
+        ALL                   = 11, // field
+        SCRIPTED              = 14,
+        ALLY_TEAM             = 15,
     };
-}
+} // namespace MOVE
 
 namespace BATTLE {
-#define HP         0
-#define ATK        1
-#define DEF        2
-#define SATK       3
-#define SDEF       4
-#define SPEED      5
-#define EVASION    6
-#define ACCURACY   7
+#define HP 0
+#define ATK 1
+#define DEF 2
+#define SATK 3
+#define SDEF 4
+#define SPEED 5
+#define EVASION 6
+#define ACCURACY 7
     struct boosts {
-        u32 m_boosts;
+        u32  m_boosts;
         void setBoost( u8 p_stat, s8 p_val ) {
             if( p_val > 7 || p_val < -7 ) {
                 fprintf( stderr, "Bad boosts value [%hhu] := %hhd\n", p_stat, p_val );
@@ -168,58 +181,58 @@ namespace BATTLE {
 
 #define MAX_VOLATILE_STATUS 51
     enum volatileStatus : u64 {
-        NONE        = 0,
-        CONFUSION   = ( 1 << 0 ),
-        OBSTRUCT    = ( 1 << 1 ),
+        NONE             = 0,
+        CONFUSION        = ( 1 << 0 ),
+        OBSTRUCT         = ( 1 << 1 ),
         PARTIALLYTRAPPED = ( 1 << 2 ),
-        FLINCH      = ( 1 << 3 ),
-        OCTOLOCK    = ( 1 << 4 ),
-        TARSHOT     = ( 1 << 5 ),
-        NORETREAT   = ( 1 << 6 ),
-        LASERFOCUS  = ( 1 << 7 ),
-        SPOTLIGHT   = ( 1 << 8 ),
-        BANEFULBUNKER = ( 1 << 9 ),
-        SMACKDOWN   = ( 1 << 10 ),
-        POWDERED    = ( 1 << 11 ),
-        SPIKYSHIELD = ( 1 << 12 ),
-        KINGSSHIELD = ( 1 << 13 ),
-        ELECTRIFY   = ( 1 << 14 ),
-        RAGEPOWDER  = ( 1 << 15 ),
-        TELEKINESIS = ( 1 << 16 ),
-        MAGNETRISE  = ( 1 << 17 ),
-        AQUARING    = ( 1 << 18 ),
-        GASTROACID  = ( 1 << 19 ),
-        POWERTRICK  = ( 1 << 20 ),
-        HEALBLOCK   = ( 1 << 21 ),
-        EMBARGO     = ( 1 << 22 ),
-        MIRACLEEYE  = ( 1 << 23 ),
-        SUBSTITUTE  = ( 1 << 24 ),
-        BIDE        = ( 1 << 25 ),
-        FOCUSENERGY = ( 1 << 26 ),
-        DEFENSECURL = ( 1 << 27 ),
-        MINIMIZE    = ( 1 << 28 ),
-        LEECHSEED   = ( 1 << 29 ),
-        DISABLE     = ( 1 << 30 ),
-        FORESIGHT   = ( 1LLU << 31 ),
-        SNATCH      = ( 1LLU << 32 ),
-        GRUDGE      = ( 1LLU << 33 ),
-        IMPRISON    = ( 1LLU << 34 ),
-        YAWN        = ( 1LLU << 35 ),
-        MAGICCOAT   = ( 1LLU << 36 ),
-        INGRAIN     = ( 1LLU << 37 ),
-        HELPINGHAND = ( 1LLU << 38 ),
-        TAUNT       = ( 1LLU << 39 ),
-        CHARGE      = ( 1LLU << 40 ),
-        FOLLOWME    = ( 1LLU << 41 ),
-        TORMENT     = ( 1LLU << 42 ),
-        ATTRACT     = ( 1LLU << 43 ),
-        ENDURE      = ( 1LLU << 44 ),
-        PROTECT     = ( 1LLU << 45 ),
-        DESTINYBOND = ( 1LLU << 46 ),
-        CURSE       = ( 1LLU << 47 ),
-        NIGHTMARE   = ( 1LLU << 48 ),
-        STOCKPILE   = ( 1LLU << 49 ),
-        ENCORE      = ( 1LLU << 50 ),
+        FLINCH           = ( 1 << 3 ),
+        OCTOLOCK         = ( 1 << 4 ),
+        TARSHOT          = ( 1 << 5 ),
+        NORETREAT        = ( 1 << 6 ),
+        LASERFOCUS       = ( 1 << 7 ),
+        SPOTLIGHT        = ( 1 << 8 ),
+        BANEFULBUNKER    = ( 1 << 9 ),
+        SMACKDOWN        = ( 1 << 10 ),
+        POWDERED         = ( 1 << 11 ),
+        SPIKYSHIELD      = ( 1 << 12 ),
+        KINGSSHIELD      = ( 1 << 13 ),
+        ELECTRIFY        = ( 1 << 14 ),
+        RAGEPOWDER       = ( 1 << 15 ),
+        TELEKINESIS      = ( 1 << 16 ),
+        MAGNETRISE       = ( 1 << 17 ),
+        AQUARING         = ( 1 << 18 ),
+        GASTROACID       = ( 1 << 19 ),
+        POWERTRICK       = ( 1 << 20 ),
+        HEALBLOCK        = ( 1 << 21 ),
+        EMBARGO          = ( 1 << 22 ),
+        MIRACLEEYE       = ( 1 << 23 ),
+        SUBSTITUTE       = ( 1 << 24 ),
+        BIDE             = ( 1 << 25 ),
+        FOCUSENERGY      = ( 1 << 26 ),
+        DEFENSECURL      = ( 1 << 27 ),
+        MINIMIZE         = ( 1 << 28 ),
+        LEECHSEED        = ( 1 << 29 ),
+        DISABLE          = ( 1 << 30 ),
+        FORESIGHT        = ( 1LLU << 31 ),
+        SNATCH           = ( 1LLU << 32 ),
+        GRUDGE           = ( 1LLU << 33 ),
+        IMPRISON         = ( 1LLU << 34 ),
+        YAWN             = ( 1LLU << 35 ),
+        MAGICCOAT        = ( 1LLU << 36 ),
+        INGRAIN          = ( 1LLU << 37 ),
+        HELPINGHAND      = ( 1LLU << 38 ),
+        TAUNT            = ( 1LLU << 39 ),
+        CHARGE           = ( 1LLU << 40 ),
+        FOLLOWME         = ( 1LLU << 41 ),
+        TORMENT          = ( 1LLU << 42 ),
+        ATTRACT          = ( 1LLU << 43 ),
+        ENDURE           = ( 1LLU << 44 ),
+        PROTECT          = ( 1LLU << 45 ),
+        DESTINYBOND      = ( 1LLU << 46 ),
+        CURSE            = ( 1LLU << 47 ),
+        NIGHTMARE        = ( 1LLU << 48 ),
+        STOCKPILE        = ( 1LLU << 49 ),
+        ENCORE           = ( 1LLU << 50 ),
     };
 
     enum weather : u8 {
@@ -235,61 +248,54 @@ namespace BATTLE {
     };
 
     enum pseudoWeather : u8 {
-        NO_PSEUDO_WEATHER   = 0,
-        IONDELUGE = 1,
-        MAGICROOM = 2,
-        WONDERROOM = 3,
-        TRICKROOM = 4,
-        GRAVITY = 5,
-        WATERSPORT = 6,
-        MUDSPORT = 7,
-        FAIRYLOCK = 8
+        NO_PSEUDO_WEATHER = 0,
+        IONDELUGE         = 1,
+        MAGICROOM         = 2,
+        WONDERROOM        = 3,
+        TRICKROOM         = 4,
+        GRAVITY           = 5,
+        WATERSPORT        = 6,
+        MUDSPORT          = 7,
+        FAIRYLOCK         = 8
     };
 
     enum terrain : u8 {
-        NO_TERRAIN = 0,
-        PSYCHICTERRAIN = 1,
+        NO_TERRAIN      = 0,
+        PSYCHICTERRAIN  = 1,
         ELECTRICTERRAIN = 2,
-        MISTYTERRAIN = 3,
-        GRASSYTERRAIN = 4,
+        MISTYTERRAIN    = 3,
+        GRASSYTERRAIN   = 4,
     };
 
 #define MAX_SIDE_CONDITIONS 15
     enum sideCondition : u16 {
-        NO_SIDE_CONDITION   = 0,
-        CRAFTYSHIELD        = ( 1 << 0 ),
-        STICKYWEB           = ( 1 << 1 ),
-        MATBLOCK            = ( 1 << 2 ),
-        QUICKGUARD          = ( 1 << 3 ),
-        WIDEGUARD           = ( 1 << 4 ),
-        STEALTHROCK         = ( 1 << 5 ),
-        TOXICSPIKES         = ( 1 << 6 ),
-        LUCKYCHANT          = ( 1 << 7 ),
-        TAILWIND            = ( 1 << 8 ),
-        SAFEGUARD           = ( 1 << 9 ),
-        SPIKES              = ( 1 << 10 ),
-        REFLECT             = ( 1 << 11 ),
-        LIGHTSCREEN         = ( 1 << 12 ),
-        MIST                = ( 1 << 13 ),
-        AURORAVEIL          = ( 1 << 14 ),
+        NO_SIDE_CONDITION = 0,
+        CRAFTYSHIELD      = ( 1 << 0 ),
+        STICKYWEB         = ( 1 << 1 ),
+        MATBLOCK          = ( 1 << 2 ),
+        QUICKGUARD        = ( 1 << 3 ),
+        WIDEGUARD         = ( 1 << 4 ),
+        STEALTHROCK       = ( 1 << 5 ),
+        TOXICSPIKES       = ( 1 << 6 ),
+        LUCKYCHANT        = ( 1 << 7 ),
+        TAILWIND          = ( 1 << 8 ),
+        SAFEGUARD         = ( 1 << 9 ),
+        SPIKES            = ( 1 << 10 ),
+        REFLECT           = ( 1 << 11 ),
+        LIGHTSCREEN       = ( 1 << 12 ),
+        MIST              = ( 1 << 13 ),
+        AURORAVEIL        = ( 1 << 14 ),
     };
 
-    const u8 defaultSideConditionDurations[ MAX_SIDE_CONDITIONS ] = {
-        1, 0, 1, 1, 1,
-        0, 0, 5, 5, 5,
-        0, 5, 5, 5, 5
-    };
-    const u8 maxSideConditionAmount[ MAX_SIDE_CONDITIONS ] = {
-        1, 1, 1, 1, 1,
-        1, 2, 1, 1, 1,
-        3, 1, 1, 1, 1
-    };
-
+    const u8 defaultSideConditionDurations[ MAX_SIDE_CONDITIONS ]
+        = {1, 0, 1, 1, 1, 0, 0, 5, 5, 5, 0, 5, 5, 5, 5};
+    const u8 maxSideConditionAmount[ MAX_SIDE_CONDITIONS ]
+        = {1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 3, 1, 1, 1, 1};
 
     enum slotCondition : u8 {
-        NO_SLOT_CONDITION  = 0,
-        WISH = 1,
-        HEALINGWISH = 2,
-        LUNARDANCE = 3,
+        NO_SLOT_CONDITION = 0,
+        WISH              = 1,
+        HEALINGWISH       = 2,
+        LUNARDANCE        = 3,
     };
-}
+} // namespace BATTLE

@@ -35,8 +35,8 @@ namespace STS {
     class partyScreen {
       public:
         union result {
-            u8    m_selectedPkmn;
-            move* m_selectedMove;
+            u8  m_selectedPkmn;
+            u16 m_selectedMove;
         };
 
       private:
