@@ -101,10 +101,12 @@ namespace SOUND {
 
     u16 BGMforLocation( u16 p_locationId ) {
         switch( p_locationId ) {
+            case L_ROUTE_38:
+                return MOD_ROUTE_38;
             case L_ROUTE_101:
             case L_ROUTE_102:
             case L_ROUTE_103:
-                // return MOD_ROUTE_101;
+                return MOD_ROUTE_101;
             case L_ROUTE_104:
             case L_ROUTE_114:
             case L_ROUTE_115:
@@ -128,14 +130,27 @@ namespace SOUND {
                 //            return MOD_ROUTE_120;
             case L_ROUTE_123:
                 return MOD_ROUTE_123;
+            case L_CLIFFELTA_CITY:
+                return MOD_CLIFFELTA_CITY;
             case L_FALLARBOR_TOWN:
                 return MOD_FALLARBOR_TOWN;
             case L_METEOR_FALLS:
                 return MOD_METEOR_FALLS;
             case L_SEALED_CHAMBER:
+            case L_ANCIENT_TOMB:
+            case L_ISLAND_CAVE:
+            case L_DESERT_RUINS:
                 return MOD_SEALED_CHAMBER;
             case L_SHOAL_CAVE:
                 return MOD_SHOAL_CAVE;
+            case L_ROUTE_1112:
+                return MOD_DESERT;
+            case L_LILYCOVE_MUSEUM:
+                return MOD_LILYCOVE_MUSEUM;
+            case L_GRANITE_CAVE:
+            case L_PETALBURG_WOODS:
+            case L_JAGGED_PASS:
+                return MOD_CAVE_FORESTS;
             default:
                 return MOD_ABANDONED_SHIP;
         }

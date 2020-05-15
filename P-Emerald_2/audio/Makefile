@@ -1,5 +1,5 @@
 OUT			:=	../FSROOT/SOUND
-HEADER_OUT	:=	../arm9/build
+HEADER_OUT	:=	../arm9/include
 MUSIC		:=	.
 
 WAVFILES	:=	$(foreach dir,$(notdir $(wildcard $(MUSIC)/*.wav)),$(MUSIC)/$(dir))
@@ -13,17 +13,17 @@ MODFILES	+=	$(foreach dir,$(notdir $(wildcard $(MUSIC)/*.xm)),$(MUSIC)/$(dir))
 #TARGETS		+= $(MODFILES:.it=.msl)
 #TARGETS		+= $(MODFILES:.xm=.msl)
 
-all	:	sound.msl
-	@echo crunching sound
-
 #---------------------------------------------------------------------------------
 # rule to build soundbank from music files
 #---------------------------------------------------------------------------------
-sound.msl	:	$(WAVFILES) $(MODFILES)
+soundbank:	$(WAVFILES) $(MODFILES)
 #---------------------------------------------------------------------------------
 	@mkdir -p $(OUT)/$(@D)
 	@mmutil $^ -d -o$(OUT)/sound.msl -h$(HEADER_OUT)/soundbank.h
+	@touch soundbank
 
 clean	:
 	@echo cleaning sound
+	@rm soundbank
 	@rm -rf $(OUT)/sound.msl
+	@rm -rf $(HEADER_OUT)/soundbank.h
