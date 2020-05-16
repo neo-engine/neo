@@ -51,9 +51,6 @@ LIBS	:=	-lfilesystem -lfat -lmm9 -lnds9
 LIBDIRS	:=	$(LIBNDS)
 
 #---------------------------------------------------------------------------------
-# no real need to edit anything past this point unless you need to add additional
-# rules for different file extensions
-#---------------------------------------------------------------------------------
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
@@ -117,6 +114,8 @@ else
 $(ARM9ELF)	:	$(OFILES)
 	@echo linking $(notdir $@)
 	@$(LD)  $(LDFLAGS) $(OFILES) $(LIBPATHS) $(LIBS) -o $@
+
+.PRECIOUS: %.h %.s
 
 #---------------------------------------------------------------------------------
 %.s %.h	: %.png %.grit
