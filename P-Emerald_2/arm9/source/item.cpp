@@ -375,7 +375,7 @@ namespace ITEM {
                     IO::messageBox( GET_STRING( 65 ), false );
                 }
                 return true;
-            case I_EXP__SHARE:
+            case I_EXP_SHARE:
                 if( !p_dryRun ) {
                     IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
                     IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
@@ -459,7 +459,7 @@ namespace ITEM {
             case I_REPEL:
             case I_SUPER_REPEL:
             case I_MAX_REPEL:
-            case I_EXP__SHARE:
+            case I_EXP_SHARE:
             case I_COIN_CASE:
             case I_POINT_CARD:
                 return true;
@@ -480,9 +480,9 @@ namespace ITEM {
                         SAVE::SAV->getActiveFile( ).m_player.m_direction );
             case I_POKE_RADAR:
                 // TODO
-            case I_VS__SEEKER:
+            case I_VS_SEEKER:
                 // TODO
-            case I_VS__RECORDER:
+            case I_VS_RECORDER:
                 // TODO
             case I_APRICORN_BOX:
                 // TODO

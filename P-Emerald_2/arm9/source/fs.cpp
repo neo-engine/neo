@@ -51,7 +51,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 const char PKMNDATA_PATH[]    = "nitro:/PKMNDATA/";
 const char SCRIPT_PATH[]      = "nitro:/MAPS/SCRIPTS/";
 
-const char LOCATION_NAME_PATH[]    = "nitro:/LOCATIONS/";
+const char LOCATION_NAME_PATH[]    = "nitro:/DATA/LOC_NAME/";
 const char ITEM_NAME_PATH[]    = "nitro:/DATA/ITEM_NAME/";
 const char ITEM_DATA_PATH[]    = "nitro:/DATA/ITEM_DATA/";
 const char ABILITY_NAME_PATH[] = "nitro:/DATA/ABTY_NAME/";
