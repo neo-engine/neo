@@ -68,7 +68,7 @@ arm7/$(TARGET).elf: FORCE
 	$(MAKE) -C arm7
 
 #---------------------------------------------------------------------------------
-arm9/$(TARGET).elf: FORCE fsdata soundbank ndstool
+arm9/$(TARGET).elf: FORCE soundbank ndstool
 	$(MAKE) -C arm9
 
 #---------------------------------------------------------------------------------
@@ -80,15 +80,10 @@ ndstool:
 	$(MAKE) -C tools/ndstool
 
 #---------------------------------------------------------------------------------
-fsdata:
-	$(MAKE) -C tools/fsdata
-
-#---------------------------------------------------------------------------------
 clean:
 	$(MAKE) -C arm9 clean
 	$(MAKE) -C arm7 clean
 	$(MAKE) -C tools/ndstool clean
-	$(MAKE) -C tools/fsdata clean
 	$(MAKE) -C audio clean
 	rm -f $(TARGET).nds $(TARGET).arm7 $(TARGET).arm9
 
