@@ -33,7 +33,7 @@ CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wpsabi -O3\
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM9
-CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -std=c++11 -Wno-multichar
+CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -std=c++17 -Wno-multichar
 
 ASFLAGS	:=	-g $(ARCH) -march=armv5te -mtune=arm946e-s
 
@@ -50,9 +50,6 @@ LIBS	:=	-lfilesystem -lfat -lmm9 -lnds9
 #---------------------------------------------------------------------------------
 LIBDIRS	:=	$(LIBNDS)
 
-#---------------------------------------------------------------------------------
-# no real need to edit anything past this point unless you need to add additional
-# rules for different file extensions
 #---------------------------------------------------------------------------------
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
@@ -117,6 +114,8 @@ else
 $(ARM9ELF)	:	$(OFILES)
 	@echo linking $(notdir $@)
 	@$(LD)  $(LDFLAGS) $(OFILES) $(LIBPATHS) $(LIBS) -o $@
+
+.PRECIOUS: %.h %.s
 
 #---------------------------------------------------------------------------------
 %.s %.h	: %.png %.grit

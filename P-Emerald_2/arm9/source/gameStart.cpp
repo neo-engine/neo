@@ -79,7 +79,7 @@ namespace SAVE {
 
     bool initSpecialEpisode( s8 p_episode ) {
         if( p_episode < 0 ) { // New game
-            SAV->getActiveFile( ).m_gameType = UNUSED;
+            SAV.getActiveFile( ).m_gameType = UNUSED;
             return false;
         }
 
@@ -87,17 +87,17 @@ namespace SAVE {
 
         switch( p_episode ) {
         case 0:
-            strcpy( SAV->getActiveFile( ).m_playername, "Test" );
-            SAV->getActiveFile( ).m_player
+            strcpy( SAV.getActiveFile( ).m_playername, "Test" );
+            SAV.getActiveFile( ).m_player
                 = {MAP::mapObject::PLYR, {299, 53, 4}, 0, MAP::moveMode::WALK, 0, 0,
                    MAP::direction::RIGHT};
-            SAV->getActiveFile( ).m_isMale = rand( ) % 2;
-            SAV->getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_BIKE, 1 );
-            SAV->getActiveFile( ).m_currentMap     = 10;
-            SAV->getActiveFile( ).m_registeredItem = I_BIKE;
+            SAV.getActiveFile( ).m_isMale = rand( ) % 2;
+            SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_BIKE, 1 );
+            SAV.getActiveFile( ).m_currentMap     = 10;
+            SAV.getActiveFile( ).m_registeredItem = I_BIKE;
             return true;
         default:
-            SAV->getActiveFile( ).m_gameType = UNUSED;
+            SAV.getActiveFile( ).m_gameType = UNUSED;
             return false;
         }
     }
@@ -153,25 +153,25 @@ namespace SAVE {
         }
         IO::clearScreen( true, false, false );
 
-        SAV->m_activeFile                = p_slot;
-        SAV->getActiveFile( ).m_gameType = TRANSFER;
+        SAV.m_activeFile                = p_slot;
+        SAV.getActiveFile( ).m_gameType = TRANSFER;
 
         char savname[ 8 ] = {0};
         for( int i = 0; i < 7; ++i ) savname[ i ] = FS::getNText( save3->unpackeddata[ i ] );
-        strcpy( SAV->getActiveFile( ).m_playername, savname );
+        strcpy( SAV.getActiveFile( ).m_playername, savname );
 
-        SAV->getActiveFile( ).m_isMale = !save3->unpackeddata[ 8 ];
+        SAV.getActiveFile( ).m_isMale = !save3->unpackeddata[ 8 ];
 
-        SAV->getActiveFile( ).m_id = ( save3->unpackeddata[ 11 ] << 8 ) | save3->unpackeddata[ 10 ];
-        SAV->getActiveFile( ).m_sid
+        SAV.getActiveFile( ).m_id = ( save3->unpackeddata[ 11 ] << 8 ) | save3->unpackeddata[ 10 ];
+        SAV.getActiveFile( ).m_sid
             = ( save3->unpackeddata[ 13 ] << 8 ) | save3->unpackeddata[ 12 ];
 
-        SAV->getActiveFile( ).m_pt.m_hours
+        SAV.getActiveFile( ).m_pt.m_hours
             = ( save3->unpackeddata[ 15 ] << 8 ) | save3->unpackeddata[ 14 ];
-        SAV->getActiveFile( ).m_pt.m_mins = save3->unpackeddata[ 16 ];
-        SAV->getActiveFile( ).m_pt.m_secs = save3->unpackeddata[ 17 ];
+        SAV.getActiveFile( ).m_pt.m_mins = save3->unpackeddata[ 16 ];
+        SAV.getActiveFile( ).m_pt.m_secs = save3->unpackeddata[ 17 ];
 
-        // SAV->getActiveFile( ).m_gba.m_gameid = ( save3->unpackeddata[ 0xaf ] << 24 ) | (
+        // SAV.getActiveFile( ).m_gba.m_gameid = ( save3->unpackeddata[ 0xaf ] << 24 ) | (
         // save3->unpackeddata[ 0xae ] << 16 ) | ( save3->unpackeddata[ 0xad ] << 8 ) |
         // save3->unpackeddata[ 0xac ];
 
@@ -179,7 +179,7 @@ namespace SAVE {
         for( u8 i = 0; i < 6; ++i ) {
             if( save3->pokemon[ i ]->personality ) {
 
-                pokemon&             acPkmn  = SAV->getActiveFile( ).m_pkmnTeam[ i ];
+                pokemon&             acPkmn  = SAV.getActiveFile( ).m_pkmnTeam[ i ];
                 FS::belt_pokemon_t*& acBeltP = save3->pokemon[ i ];
 
                 acPkmn.m_boxdata.m_pid   = acBeltP->personality;
@@ -254,15 +254,15 @@ namespace SAVE {
         IO::messageBox( GET_STRING( 123 ), true );
         IO::clearScreen( true, false, false );
 
-        SAV->getActiveFile( ).m_player     = {MAP::mapObject::PLYR,
+        SAV.getActiveFile( ).m_player     = {MAP::mapObject::PLYR,
                                           {104, 120, 5},
-                                          SAV->getActiveFile( ).m_isMale ? (u16) 0 : (u16) 10,
+                                          SAV.getActiveFile( ).m_isMale ? (u16) 0 : (u16) 10,
                                           MAP::moveMode::WALK,
                                           0,
                                           0,
                                           MAP::direction::RIGHT};
-        SAV->getActiveFile( ).m_isMale     = true;
-        SAV->getActiveFile( ).m_currentMap = 10;
+        SAV.getActiveFile( ).m_isMale     = true;
+        SAV.getActiveFile( ).m_currentMap = 10;
 
         return true;
     }

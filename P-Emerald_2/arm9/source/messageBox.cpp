@@ -96,7 +96,7 @@ namespace IO {
         y               = 24;
         regularFont->printMBStringD( buf, x, y, true );
 
-        SAVE::SAV->getActiveFile( ).m_bag.insert( BAG::toBagType( p_data.m_itemType ),
+        SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( p_data.m_itemType ),
                                                   p_itemId, p_count );
     }
 

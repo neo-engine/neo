@@ -140,10 +140,10 @@ namespace BOX {
                 pal[ 128 + j * 7 + i ] = getBoxColor( j * 7 + i );
                 u8   x                 = 2 + 36 * i;
                 u8   y                 = 22 + 28 * j;
-                bool prsd              = j * 7 + i == SAVE::SAV->getActiveFile( ).m_curBox;
+                bool prsd              = j * 7 + i == SAVE::SAV.getActiveFile( ).m_curBox;
                 IO::printChoiceBox( x, y, x + w, y + h, 6 - 2 * prsd, 128 + j * 7 + i, false,
                                     !p_bottom );
-                u8 cnt = SAVE::SAV->m_storedPokemon[ j * 7 + i ].count( );
+                u8 cnt = SAVE::SAV.m_storedPokemon[ j * 7 + i ].count( );
                 pkmncnt += cnt;
                 if( cnt == MAX_PKMN_PER_BOX )
                     IO::regularFont->setColor( RED_IDX, 1 );
@@ -183,7 +183,7 @@ namespace BOX {
             IO::regularFont->printString( ">", dx + 216, dy + 28, false );
             break;
         case BOX::boxUI::BUTTON_BOX_NAME: {
-            box* box = SAVE::SAV->getCurrentBox( );
+            box* box = SAVE::SAV.getCurrentBox( );
             IO::printChoiceBox( 50, 23, 206, 48, 6, COLOR_IDX, p_pressed, false ); // Box name
             IO::regularFont->printString( box->m_name, dx + 127, dy + 28, false, IO::font::CENTER );
             break;
@@ -194,12 +194,12 @@ namespace BOX {
     }
 
     std::vector<IO::inputTarget> boxUI::draw( bool p_showTeam ) {
-        BG_PALETTE[ COLOR_IDX ] = getBoxColor( SAVE::SAV->getActiveFile( ).m_curBox );
+        BG_PALETTE[ COLOR_IDX ] = getBoxColor( SAVE::SAV.getActiveFile( ).m_curBox );
 
         std::vector<IO::inputTarget> res;
         _ranges.clear( );
         _showTeam = p_showTeam;
-        box* box  = SAVE::SAV->getCurrentBox( );
+        box* box  = SAVE::SAV.getCurrentBox( );
 
         // SubScreen stuff
         IO::printChoiceBox( 50, 23, 206, 48, 6, COLOR_IDX, false, false ); // Box name
@@ -247,11 +247,11 @@ namespace BOX {
                                 TEAM_POS_Y( i ) + 21, 3, GRAY_IDX, false, false );
 
             u16 species = p_showTeam
-                              ? SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId
-                              : SAVE::SAV->m_clipboard[ i ].m_speciesId;
-            bool isEgg = p_showTeam ? SAVE::SAV->getActiveFile( )
+                              ? SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId
+                              : SAVE::SAV.m_clipboard[ i ].m_speciesId;
+            bool isEgg = p_showTeam ? SAVE::SAV.getActiveFile( )
                                           .m_pkmnTeam[ i ].isEgg( )
-                                    : SAVE::SAV->m_clipboard[ i ].isEgg( );
+                                    : SAVE::SAV.m_clipboard[ i ].isEgg( );
 
             if( species ) {
                 if( !isEgg )
@@ -310,17 +310,17 @@ namespace BOX {
 
     void boxUI::takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg ) {
         if( p_index != (u8) -1 ) {
-            box* box = SAVE::SAV->getCurrentBox( );
+            box* box = SAVE::SAV.getCurrentBox( );
 
             boxPokemon bpm;
             if( p_index < MAX_PKMN_PER_BOX )
                 bpm = box->m_pokemon[ p_index ];
             else if( _showTeam )
-                bpm = SAVE::SAV->getActiveFile( )
+                bpm = SAVE::SAV.getActiveFile( )
                           .m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ]
                           .m_boxdata;
             else
-                bpm = SAVE::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
+                bpm = SAVE::SAV.m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
 
             if( bpm.m_speciesId ) {
                 u8 pal = p_index + PKMN_PALETTE_START;
@@ -352,9 +352,9 @@ namespace BOX {
 
     void boxUI::updateTeam( ) {
         for( u8 i = 0; i < 6; ++i ) {
-            u16  species = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId;
+            u16  species = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId;
             bool isEgg
-                = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].isEgg( );
+                = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].isEgg( );
             u8 pal = MAX_PKMN_PER_BOX + PKMN_PALETTE_START + i;
 
             if( species ) {

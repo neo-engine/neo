@@ -74,7 +74,7 @@ namespace BAG {
     void showActiveBag( u8 p_bagNo, bool p_active = true ) {
         u16 tileIdx = IO::Oam->oamBuffer[ BAG_SUB + p_bagNo ].gfxIndex;
         IO::loadSprite( BAG_SUB + p_bagNo, BAG_SUB + p_bagNo, tileIdx,
-                        26 * p_bagNo /*SAV->getActiveFile( ).m_bagPoses[ p_bagNo ]*/, 3, 32, 32,
+                        26 * p_bagNo /*SAV.getActiveFile( ).m_bagPoses[ p_bagNo ]*/, 3, 32, 32,
                         bagPals[ 2 * p_bagNo + p_active ], bagTiles[ 2 * p_bagNo + p_active ],
                         BackTilesLen, false, false, false, OBJPRIORITY_3, true );
     }
@@ -125,7 +125,7 @@ namespace BAG {
         tileCnt = drawPkmnIcons( );
         for( u8 i = 0; i < 5; ++i ) {
             tileCnt = IO::loadSprite( BAG_SUB + i, BAG_SUB + i, tileCnt,
-                                      26 * i /*SAVE::SAV->getActiveFile( ).m_bagPoses[ i ]*/, 3, 32,
+                                      26 * i /*SAVE::SAV.getActiveFile( ).m_bagPoses[ i ]*/, 3, 32,
                                       32, bagPals[ 2 * i ], bagTiles[ 2 * i ], BackTilesLen, false,
                                       false, false, OBJPRIORITY_3, true );
         }
@@ -146,7 +146,7 @@ namespace BAG {
     u16 bagUI::drawPkmnIcons( ) {
         u16 tileCnt = 32;
         for( u8 i = 0; i < 6; ++i ) {
-            auto acPkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
+            auto acPkmn = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
             if( !acPkmn.m_boxdata.m_speciesId ) break;
             if( acPkmn.isEgg( ) )
                 tileCnt = IO::loadEggIcon( 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
@@ -274,34 +274,35 @@ namespace BAG {
     bagUI::drawPkmn( u16 p_itemId, ITEM::itemData& p_data ) {
         std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> res;
         for( u8 i = 0; i < 6; ++i ) {
-            if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
+            if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
             IO::printRectangle( 0, 33 + 26 * i, 128, 33 + 26 * i + 26, true, 0 );
             IO::regularFont->setColor( WHITE_IDX, 1 );
             IO::regularFont->setColor( GRAY_IDX, 2 );
 
-            if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].isEgg( ) ) {
+            if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].isEgg( ) ) {
                 IO::regularFont->printString( GET_STRING( 34 ), 45, 38 + 26 * i, true );
                 res.push_back(
                     {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ), {0, true}} );
             } else {
-                res.push_back( {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),
-                                {SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].getItem( ), true}} );
+                res.push_back(
+                    {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),
+                     {SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].getItem( ), true}} );
                 if( p_itemId && p_data.m_itemType == ITEM::ITEMTYPE_TM ) {
                     u16 currMv = p_data.m_param2;
-                    if( currMv == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 0 ]
+                    if( currMv == SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 0 ]
                         || currMv
-                               == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 1 ]
+                               == SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 1 ]
                         || currMv
-                               == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 2 ]
+                               == SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 2 ]
                         || currMv
-                               == SAVE::SAV->getActiveFile( )
+                               == SAVE::SAV.getActiveFile( )
                                       .m_pkmnTeam[ i ]
                                       .m_boxdata.m_moves[ 3 ] ) {
                         IO::regularFont->setColor( BLUE_IDX, 1 );
                         IO::regularFont->setColor( BLACK_IDX, 2 );
                         IO::regularFont->printString( GET_STRING( 35 ), 40, 33 + 26 * i, true,
                                                       IO::font::LEFT, 11 );
-                    } else if( canLearn( SAVE::SAV->getActiveFile( )
+                    } else if( canLearn( SAVE::SAV.getActiveFile( )
                                              .m_pkmnTeam[ i ]
                                              .m_boxdata.m_speciesId,
                                          currMv, LEARN_TM ) ) {
@@ -317,20 +318,20 @@ namespace BAG {
                     }
                 } else if( p_itemId && ( p_data.m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
                     char buffer[ 100 ];
-                    if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP ) {
+                    if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP ) {
                         snprintf( buffer, 99, GET_STRING( 38 ),
-                                  SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_level,
-                                  SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP,
-                                  SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP );
+                                  SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_level,
+                                  SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP,
+                                  SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP );
                     } else {
                         snprintf( buffer, 99, GET_STRING( 39 ),
-                                  SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_level );
+                                  SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_level );
                     }
                     IO::regularFont->printString( buffer, 40, 33 + 26 * i, true, IO::font::LEFT,
                                                   11 );
                 } else {
                     if( p_itemId && p_data.m_itemType == ITEM::ITEMTYPE_EVOLUTION ) {
-                        if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].canEvolve( p_itemId, 3 ) ) {
+                        if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].canEvolve( p_itemId, 3 ) ) {
                             BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
                             IO::regularFont->setColor( COLOR_IDX, 1 );
                             IO::regularFont->setColor( BLACK_IDX, 2 );
@@ -343,19 +344,16 @@ namespace BAG {
                         }
                     } else {
                         IO::regularFont->printString(
-                            SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_name, 45,
+                            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_name, 45,
                             33 + 26 * i, true );
 
                         IO::regularFont->setColor( BLACK_IDX, 2 );
                         IO::regularFont->setColor( GRAY_IDX, 1 );
 
-                        if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].getItem( ) ) {
-                            IO::regularFont->printString(
-                                ITEM::getItemName(
-                                    SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].getItem( ),
-                                    CURRENT_LANGUAGE )
-                                    .c_str( ),
-                                40, 44 + 26 * i, true );
+                        if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].getItem( ) ) {
+                            IO::regularFont->printString( ITEM::getItemName(
+                                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].getItem( ),
+                                    CURRENT_LANGUAGE ).c_str( ), 40, 44 + 26 * i, true );
                         } else
                             IO::regularFont->printString( GET_STRING( 42 ), 40, 44 + 26 * i, true );
                     }
@@ -377,8 +375,7 @@ namespace BAG {
                                 p_selected ? RED_IDX : GRAY_IDX, p_pressed );
             IO::boldFont->printChar( 490 - 22 + u16( p_item->m_itemType ),
                                      p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
-        } else */
-        if( p_itemId == SAVE::SAV->getActiveFile( ).m_registeredItem ) {
+        } else */ if( p_itemId == SAVE::SAV.getActiveFile( ).m_registeredItem ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
                                 p_selected ? RED_IDX : GRAY_IDX, p_pressed );
             IO::boldFont->printChar( 'Y', p_x + 106 + 2 * p_pressed, p_y - 2 + p_pressed, true );
@@ -444,14 +441,13 @@ namespace BAG {
         drawTop( p_page );
         initColors( );
 
-        ITEM::itemData empty  = {0, 0, 0, 0, 0, 0, 0};
-        auto           pkmnTg = drawPkmn( 0, empty );
-        if( !SAVE::SAV->getActiveFile( ).m_bag.empty( p_page ) ) {
-            u16 sz = SAVE::SAV->getActiveFile( ).m_bag.size( p_page );
+        ITEM::itemData empty = { 0, 0, 0, 0, 0, 0, 0 };
+        auto pkmnTg = drawPkmn( 0, empty );
+        if( !SAVE::SAV.getActiveFile( ).m_bag.empty( p_page ) ) {
+            u16 sz = SAVE::SAV.getActiveFile( ).m_bag.size( p_page );
             for( u8 i = 0; i < 9; ++i ) {
-                u16 curitem = SAVE::SAV->getActiveFile( )
-                                  .m_bag( p_page, ( p_firstDisplayedItem + i ) % sz )
-                                  .first;
+                u16 curitem = SAVE::SAV.getActiveFile( ).m_bag( p_page,
+                        ( p_firstDisplayedItem + i ) % sz ).first;
                 ITEM::itemData data = ITEM::getItemData( curitem );
 
                 drawItemSub( curitem, data, 132, 4 + i * 18, false, false, i >= sz );
@@ -485,9 +481,8 @@ namespace BAG {
         if( !p_item.first ) return false;
 
         if( p_idx >= MAX_ITEMS_PER_PAGE ) { // It's a PKMN
-            if( !SAVE::SAV->getActiveFile( )
-                     .m_pkmnTeam[ p_idx - MAX_ITEMS_PER_PAGE ]
-                     .getItem( ) ) // Something went wrong
+            if( !SAVE::SAV.getActiveFile( )
+                     .m_pkmnTeam[ p_idx - MAX_ITEMS_PER_PAGE ].getItem( ) ) // Something went wrong
                 return false;
         }
 

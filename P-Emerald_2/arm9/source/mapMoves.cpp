@@ -100,18 +100,18 @@ namespace MOVE {
             case M_WHIRLPOOL:
                 return false;
             case M_SURF:
-                return ( SAVE::SAV->getActiveFile( ).m_player.m_movement != MAP::SURF )
+                return ( SAVE::SAV.getActiveFile( ).m_player.m_movement != MAP::SURF )
                     && MAP::curMap
                     ->atom(
-                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX
-                            + MAP::dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 0 ],
-                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY
-                            + MAP::dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 1 ] )
+                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                            + MAP::dir[ SAVE::SAV.getActiveFile( ).m_player.m_direction ][ 0 ],
+                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
+                            + MAP::dir[ SAVE::SAV.getActiveFile( ).m_player.m_direction ][ 1 ] )
                     .m_movedata
                     == 0x4
                     && MAP::curMap
-                    ->atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
+                    ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                     .m_movedata
                     == 0xc;
             case M_DIVE:
@@ -122,20 +122,20 @@ namespace MOVE {
                 return false;
             case M_ROCK_CLIMB:
                 return MAP::curMap
-                    ->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX
-                            + MAP::dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 0 ],
-                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY
-                            + MAP::dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 1 ] )
+                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                            + MAP::dir[ SAVE::SAV.getActiveFile( ).m_player.m_direction ][ 0 ],
+                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
+                            + MAP::dir[ SAVE::SAV.getActiveFile( ).m_player.m_direction ][ 1 ] )
                     .m_bottombehave
                     == 0x12;
             case M_WATERFALL:
-                return ( SAVE::SAV->getActiveFile( ).m_player.m_movement == MAP::SURF )
+                return ( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::SURF )
                     && MAP::curMap
                     ->at(
-                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX
-                            + MAP::dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 0 ],
-                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY
-                            + MAP::dir[ SAVE::SAV->getActiveFile( ).m_player.m_direction ][ 1 ] )
+                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                            + MAP::dir[ SAVE::SAV.getActiveFile( ).m_player.m_direction ][ 0 ],
+                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
+                            + MAP::dir[ SAVE::SAV.getActiveFile( ).m_player.m_direction ][ 1 ] )
                     .m_bottombehave
                     == 0x13;
             case M_TELEPORT:
@@ -144,8 +144,8 @@ namespace MOVE {
                 return false;
             case M_SWEET_SCENT: {
                 u8 curBehave = MAP::curMap
-                    ->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
+                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                     .m_bottombehave;
                 return curBehave == 0x2 || curBehave == 0x3;
             }
@@ -178,7 +178,7 @@ namespace MOVE {
             case M_WHIRLPOOL:
                 return;
             case M_SURF:
-                MAP::curMap->sitDownPlayer( SAVE::SAV->getActiveFile(
+                MAP::curMap->sitDownPlayer( SAVE::SAV.getActiveFile(
                             ).m_player.m_direction, MAP::SURF );
                 return;
             case M_DIVE:
@@ -188,38 +188,38 @@ namespace MOVE {
             case M_STRENGTH:
                 return;
             case M_ROCK_CLIMB:
-                MAP::curMap->sitDownPlayer( SAVE::SAV->getActiveFile(
+                MAP::curMap->sitDownPlayer( SAVE::SAV.getActiveFile(
                             ).m_player.m_direction, MAP::ROCK_CLIMB );
                 while( possible( M_ROCK_CLIMB, 0 ) )
-                    MAP::curMap->walkPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction );
-                MAP::curMap->standUpPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction );
+                    MAP::curMap->walkPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction );
+                MAP::curMap->standUpPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction );
                 if( MAP::curMap
-                        ->atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
+                        ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                         .m_movedata
                         > 4
                         && MAP::curMap
-                        ->atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
+                        ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                         .m_movedata
                         != 0x3c
                         && MAP::curMap
-                        ->atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                            SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
+                        ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                         .m_movedata
                         != 0x0a )
-                    SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ
+                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ
                         = MAP::curMap
-                        ->atom( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
+                        ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                         .m_movedata
                         / 4;
                 return;
             case M_WATERFALL:
                 MAP::curMap->disablePkmn( );
                 while( possible( M_WATERFALL, 0 ) )
-                    MAP::curMap->walkPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction );
-                MAP::curMap->walkPlayer( SAVE::SAV->getActiveFile( ).m_player.m_direction );
+                    MAP::curMap->walkPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction );
+                MAP::curMap->walkPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction );
                 MAP::curMap->enablePkmn( );
                 return;
             case M_TELEPORT:

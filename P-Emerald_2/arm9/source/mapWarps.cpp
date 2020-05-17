@@ -47,7 +47,7 @@ namespace MAP {
             {MAP_ISLAND_CAVE, {316, 0}},  // Island Caves
             {MAP_ANCIENT_TOMB, {318, 0}}, // Ancient Tomb
 
-         SAVE::SAV->getActiveFile( ).m_currentMap   {MAP_KANTO, {2003, 0}}, // Kanto
+         SAVE::SAV.getActiveFile( ).m_currentMap   {MAP_KANTO, {2003, 0}}, // Kanto
 
             {MAP_TOHJO_FALLS, {223, 0}},        // Tohjo Falls
             {MAP_KANTO_VICTORY_ROAD, {221, 0}}, // Victory Road

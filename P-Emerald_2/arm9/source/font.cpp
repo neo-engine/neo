@@ -123,7 +123,7 @@ namespace IO {
             putX += _widths[ c ];
 
             for( u8 i = 0;
-                 i < 80 / ( TEXTSPEED + SAVE::SAV->getActiveFile( ).m_options.m_textSpeedModifier );
+                 i < 80 / ( TEXTSPEED + SAVE::SAV.getActiveFile( ).m_options.m_textSpeedModifier );
                  ++i )
                 swiWaitForVBlank( );
             current_char++;
@@ -255,7 +255,7 @@ namespace IO {
             putX += _widths[ c ];
 
             for( u8 i = 0;
-                 i < 80 / ( TEXTSPEED + SAVE::SAV->getActiveFile( ).m_options.m_textSpeedModifier );
+                 i < 80 / ( TEXTSPEED + SAVE::SAV.getActiveFile( ).m_options.m_textSpeedModifier );
                  ++i )
                 swiWaitForVBlank( );
             current_char++;
