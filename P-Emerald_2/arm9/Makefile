@@ -29,7 +29,7 @@ ARCH	:=	-mthumb -mthumb-interwork
 CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wpsabi -O3\
             -Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
 			-Wno-class-memaccess	-march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
-			-ffast-math \
+			-ffast-math $(EXTRA_FLAGS) \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM9

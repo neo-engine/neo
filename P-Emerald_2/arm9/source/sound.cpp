@@ -25,8 +25,8 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <maxmod9.h>
 #include <string>
+#include <maxmod9.h>
 
 #include "sound.h"
 
@@ -34,36 +34,40 @@ const char SOUND_PATH[] = "nitro:/SOUND/";
 
 void initSFX( ) {
     // load sound effects
-    for( u16 i = 0; i < NUM_SOUND_EFFECTS; ++i ) {
-        mmLoadEffect( i );
-    }
+    for( u16 i = 0; i < NUM_SOUND_EFFECTS; ++i ) { mmLoadEffect( i ); }
 }
 
 void initSound( ) {
+#ifndef NO_SOUND
     std::string path = ( std::string( SOUND_PATH ) + "sound.msl" );
     mmInitDefault( (char*) path.c_str( ) );
     initSFX( );
+#endif
 }
 
 namespace SOUND {
-    bool BGMLoaded = false;
+    bool BGMLoaded  = false;
     u16  currentBGM = 0;
 
     void setVolume( u16 p_newValue ) {
+#ifndef NO_SOUND
         mmSetModuleVolume( p_newValue );
+#endif
     }
     void dimVolume( ) {
+#ifndef NO_SOUND
         setVolume( 0x50 );
+#endif
     }
     void restoreVolume( ) {
+#ifndef NO_SOUND
         setVolume( 0x100 );
+#endif
     }
 
-
     void playBGM( u16 p_id ) {
-        if( BGMLoaded && p_id == currentBGM ) {
-            return;
-        }
+#ifndef NO_SOUND
+        if( BGMLoaded && p_id == currentBGM ) { return; }
         if( BGMLoaded ) {
             mmStop( );
             mmUnload( currentBGM );
@@ -74,13 +78,16 @@ namespace SOUND {
         restoreVolume( );
         mmLoad( p_id );
         mmStart( p_id, MM_PLAY_LOOP );
-        BGMLoaded = true;
+        BGMLoaded  = true;
         currentBGM = p_id;
+#endif
     }
 
     void playSoundEffect( u16 p_id ) {
+#ifndef NO_SOUND
         auto handle = mmEffect( p_id );
         mmEffectVolume( handle, 0xFF );
         mmEffectRelease( handle );
+#endif
     }
-}
+} // namespace SOUND

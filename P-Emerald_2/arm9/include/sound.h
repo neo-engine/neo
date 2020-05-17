@@ -28,8 +28,8 @@
 #pragma once
 
 #include <nds/ndstypes.h>
-#include "soundbank.h"
 #include "mapDefines.h"
+#include "soundbank.h"
 
 void initSound( );
 
@@ -51,4 +51,4 @@ namespace SOUND {
     void onLocationChange( u16 p_newLocatonId );
     void onMovementTypeChange( MAP::moveMode p_newMoveMode );
     void restartBGM( );
-}
+} // namespace SOUND

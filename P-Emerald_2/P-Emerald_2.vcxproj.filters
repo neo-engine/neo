@@ -91,6 +91,12 @@
     <Filter Include="Source Files\arm9\saves">
       <UniqueIdentifier>{999db076-590a-4ef4-ab89-c1cd94b25e0e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\arm9\sound">
+      <UniqueIdentifier>{3e22aa19-968d-4d21-a2af-a45a3d25c526}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\arm9\sound">
+      <UniqueIdentifier>{eaac7370-2603-40cf-9ee6-321ed0b6addc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arm9\include\unistd.h">
@@ -252,6 +258,15 @@
     <ClInclude Include="arm9\include\pokemonNames.h">
       <Filter>Header Files\arm9\data structures</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\include\sound.h">
+      <Filter>Header Files\arm9\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\locationNames.h">
+      <Filter>Header Files\arm9\data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\soundbank.h">
+      <Filter>Header Files\arm9\sound</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">
@@ -397,6 +412,12 @@
     </ClCompile>
     <ClCompile Include="arm9\source\pokemonData.cpp">
       <Filter>Source Files\arm9\data structures</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\sound.cpp">
+      <Filter>Source Files\arm9\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\soundData.cpp">
+      <Filter>Source Files\arm9\sound</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
