@@ -42,7 +42,10 @@ namespace SAVE {
 #define MAX_CHAPTERS 12
 #define MAX_SPECIAL_EPISODES 1
 
-#define getActiveFile( ) m_saveFile[ SAVE::SAV->m_activeFile ]
+#define getActiveFile( ) m_saveFile[ SAVE::SAV.m_activeFile ]
+
+#define GOOD_MAGIC1 0x01234567
+#define GOOD_MAGIC2 0xFEDCBA98
 
     const u8 F_MEGA_EVOLUTION = 1;
 
@@ -59,6 +62,8 @@ namespace SAVE {
 
     struct saveGame {
         struct playerInfo {
+            u32      m_good1 = 0;
+
             gameType m_gameType;
             u8       m_chapter;
             u8       m_isMale;
@@ -88,6 +93,9 @@ namespace SAVE {
             u16            m_lstDex;
             u16            m_lstUsedItems[ 5 ];
             u8             m_lstUsedItemsIdx;
+
+            u32            m_good2 = 0;
+
             u16            m_registeredItem;
             u8             m_lstBag;
             u16            m_lstBagItem;
@@ -99,12 +107,18 @@ namespace SAVE {
             BAG::bag       m_bag;
 
             // Methods 'n' stuff
+            void clear( );
+            void initialize( );
             bool checkFlag( u8 p_idx );
             void setFlag( u8 p_idx, bool p_value );
             void stepIncrease( );
             u8   getEncounterLevel( u8 p_tier );
             u8   getBadgeCount( );
             u8   getTeamPkmnCount( );
+
+            constexpr bool isGood( ) {
+                return m_good1 == GOOD_MAGIC1 && m_good2 == GOOD_MAGIC2;
+            }
         } m_saveFile[ MAX_SAVE_FILES ];
 
         u8 m_activeFile;
@@ -130,6 +144,10 @@ namespace SAVE {
         u16 getDexCount( );
 
         BOX::box* getCurrentBox( );
+
+        bool isGood( );
+        void clear( );
     };
-    extern std::unique_ptr<saveGame> SAV;
+
+    extern saveGame SAV;
 }

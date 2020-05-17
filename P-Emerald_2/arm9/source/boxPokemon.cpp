@@ -37,8 +37,8 @@ boxPokemon::boxPokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_nam
                                  u8 p_ball, u8 p_pokerus, bool p_fatefulEncounter,
                                  pkmnData* p_data ) :
     boxPokemon::boxPokemon( nullptr, p_pkmnId, p_name, p_level,
-            SAVE::SAV->getActiveFile( ).m_id, SAVE::SAV->getActiveFile( ).m_sid,
-            SAVE::SAV->getActiveFile( ).m_playername, !SAVE::SAV->getActiveFile( ).m_isMale,
+            SAVE::SAV.getActiveFile( ).m_id, SAVE::SAV.getActiveFile( ).m_sid,
+            SAVE::SAV.getActiveFile( ).m_playername, !SAVE::SAV.getActiveFile( ).m_isMale,
             p_shiny, p_hiddenAbility, p_fatefulEncounter, p_isEgg,
             MAP::curMap->getCurrentLocationId( ), p_ball, p_pokerus, p_forme, p_data ) { }
 

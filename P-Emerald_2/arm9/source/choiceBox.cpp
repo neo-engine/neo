@@ -151,7 +151,7 @@ namespace IO {
 
             tileCnt = loadTypeIcon( mdata.m_type,
                                     ( ( i % 2 ) ? 122 : 12 ), 64 + ( i / 2 ) * 35, 3 + 2 * i, 3 + 2 * i,
-                                tileCnt, true, SAVE::SAV->getActiveFile( ).m_options.m_language );
+                                tileCnt, true, SAVE::SAV.getActiveFile( ).m_options.m_language );
             tileCnt = loadDamageCategoryIcon( mdata.m_category,
                 ( ( i % 2 ) ? 154 : 44 ), 64 + ( i / 2 ) * 35, 4 + 2 * i, 4 + 2 * i, tileCnt,
                 true );
@@ -159,7 +159,7 @@ namespace IO {
         if( p_move ) {
             MOVE::moveData mdata = MOVE::getMoveData( p_move );
             tileCnt = loadTypeIcon( mdata.m_type, 12, 134, 11, 11, tileCnt,
-                                    true, SAVE::SAV->getActiveFile( ).m_options.m_language );
+                                    true, SAVE::SAV.getActiveFile( ).m_options.m_language );
             tileCnt = loadDamageCategoryIcon( mdata.m_category, 44, 134, 12, 12,
                                               tileCnt, true );
         }

@@ -45,18 +45,18 @@ namespace BAG {
     }
 
 #define CURRENT_ITEM                                                    \
-    SAVE::SAV->getActiveFile( ).m_bag(                                  \
-        (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,            \
-        ( SAVE::SAV->getActiveFile( ).m_lstBagItem + _currSelectedIdx ) \
-            % SAVE::SAV->getActiveFile( ).m_bag.size(                   \
-                  (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag ) )
+    SAVE::SAV.getActiveFile( ).m_bag(                                  \
+        (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,            \
+        ( SAVE::SAV.getActiveFile( ).m_lstBagItem + _currSelectedIdx ) \
+            % SAVE::SAV.getActiveFile( ).m_bag.size(                   \
+                  (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) )
 
     void bagViewer::initUI( ) {
         _bagUI->init( );
-        _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
-                                       SAVE::SAV->getActiveFile( ).m_lstBagItem );
-        if( SAVE::SAV->getActiveFile( ).m_bag.size(
-                (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag ) ) {
+        _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
+                                       SAVE::SAV.getActiveFile( ).m_lstBagItem );
+        if( SAVE::SAV.getActiveFile( ).m_bag.size(
+                (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) ) {
             auto nw = ITEM::getItemData( CURRENT_ITEM.first );
             _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM, nw );
         }
@@ -94,10 +94,10 @@ namespace BAG {
                     bool change = false;
 
                     for( u8 i = 0; i < 6; ++i ) {
-                        if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) {
+                        if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) {
                             break;
                         }
-                        change |= SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].heal( );
+                        change |= SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].heal( );
                     }
                     return change;
                 }
@@ -111,8 +111,8 @@ namespace BAG {
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
                 IO::messageBox( buffer, false );
 
-                SAVE::SAV->getActiveFile( ).m_bag.erase(
-                    (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag, p_itemId, 1 );
+                SAVE::SAV.getActiveFile( ).m_bag.erase(
+                    (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, p_itemId, 1 );
 
                 // Check for evolution
                 if( p_pokemon.m_level != oldLv && p_pokemon.canEvolve( ) ) {
@@ -197,7 +197,7 @@ namespace BAG {
     void bagViewer::takeItemFromPkmn( pokemon& p_pokemon ) {
         if( p_pokemon.isEgg( ) || !p_pokemon.getItem( ) ) return;
         auto currBgType = toBagType( ITEM::getItemData( p_pokemon.getItem( ) ).m_itemType );
-        SAVE::SAV->getActiveFile( ).m_bag.insert( currBgType, p_pokemon.takeItem( ), 1 );
+        SAVE::SAV.getActiveFile( ).m_bag.insert( currBgType, p_pokemon.takeItem( ), 1 );
         _bagUI->drawPkmnIcons( );
     }
 
@@ -249,102 +249,102 @@ namespace BAG {
         auto& touch   = p_touch;
         auto& pressed = p_pressed;
 
-        auto curBgsz = SAVE::SAV->getActiveFile( ).m_bag.size(
-            (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag );
+        auto curBgsz = SAVE::SAV.getActiveFile( ).m_bag.size(
+            (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag );
 
         if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT( KEY_X )
             || ( !_hasSprite && GET_AND_WAIT_C( SCREEN_WIDTH - 12, SCREEN_HEIGHT - 10, 16 ) ) ) {
             return false;
         } else if( GET_AND_WAIT( KEY_LEFT ) ) {
             _currSelectedIdx = 0;
-            SAVE::SAV->getActiveFile( ).m_lstBag
-                = ( SAVE::SAV->getActiveFile( ).m_lstBag + BAG_CNT - 1 ) % BAG_CNT;
-            if( SAVE::SAV->getActiveFile( ).m_bag.size(
-                    (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag ) )
-                SAVE::SAV->getActiveFile( ).m_lstBagItem %= SAVE::SAV->getActiveFile( ).m_bag.size(
-                    (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag );
+            SAVE::SAV.getActiveFile( ).m_lstBag
+                = ( SAVE::SAV.getActiveFile( ).m_lstBag + BAG_CNT - 1 ) % BAG_CNT;
+            if( SAVE::SAV.getActiveFile( ).m_bag.size(
+                    (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) )
+                SAVE::SAV.getActiveFile( ).m_lstBagItem %= SAVE::SAV.getActiveFile( ).m_bag.size(
+                    (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag );
             else
-                SAVE::SAV->getActiveFile( ).m_lstBagItem = 0;
-            _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
-                                           SAVE::SAV->getActiveFile( ).m_lstBagItem );
-            if( SAVE::SAV->getActiveFile( ).m_bag.size(
-                    (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag ) ) {
+                SAVE::SAV.getActiveFile( ).m_lstBagItem = 0;
+            _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
+                                           SAVE::SAV.getActiveFile( ).m_lstBagItem );
+            if( SAVE::SAV.getActiveFile( ).m_bag.size(
+                    (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) ) {
                 auto nw = ITEM::getItemData( CURRENT_ITEM.first );
                 _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM, nw );
             }
         } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
             _currSelectedIdx = 0;
-            SAVE::SAV->getActiveFile( ).m_lstBag
-                = ( SAVE::SAV->getActiveFile( ).m_lstBag + 1 ) % BAG_CNT;
-            if( SAVE::SAV->getActiveFile( ).m_bag.size(
-                    (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag ) )
-                SAVE::SAV->getActiveFile( ).m_lstBagItem %= SAVE::SAV->getActiveFile( ).m_bag.size(
-                    (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag );
+            SAVE::SAV.getActiveFile( ).m_lstBag
+                = ( SAVE::SAV.getActiveFile( ).m_lstBag + 1 ) % BAG_CNT;
+            if( SAVE::SAV.getActiveFile( ).m_bag.size(
+                    (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) )
+                SAVE::SAV.getActiveFile( ).m_lstBagItem %= SAVE::SAV.getActiveFile( ).m_bag.size(
+                    (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag );
             else
-                SAVE::SAV->getActiveFile( ).m_lstBagItem = 0;
-            _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
-                                           SAVE::SAV->getActiveFile( ).m_lstBagItem );
-            if( SAVE::SAV->getActiveFile( ).m_bag.size(
-                    (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag ) ) {
+                SAVE::SAV.getActiveFile( ).m_lstBagItem = 0;
+            _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
+                                           SAVE::SAV.getActiveFile( ).m_lstBagItem );
+            if( SAVE::SAV.getActiveFile( ).m_bag.size(
+                    (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) ) {
                 auto nw = ITEM::getItemData( CURRENT_ITEM.first );
                 _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM, nw );
             }
         } else if( GET_AND_WAIT( KEY_DOWN ) ) {
             if( !curBgsz ) return true;
             auto nw = ITEM::getItemData( CURRENT_ITEM.first );
-            _bagUI->unselectItem( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
+            _bagUI->unselectItem( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
                                   _currSelectedIdx, CURRENT_ITEM.first, nw );
             u8 mx = std::min( 9u, curBgsz );
             if( ++_currSelectedIdx == mx ) {
                 _currSelectedIdx = 0;
-                SAVE::SAV->getActiveFile( ).m_lstBagItem
-                    = ( SAVE::SAV->getActiveFile( ).m_lstBagItem + mx ) % curBgsz;
-                _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
-                                               SAVE::SAV->getActiveFile( ).m_lstBagItem );
+                SAVE::SAV.getActiveFile( ).m_lstBagItem
+                    = ( SAVE::SAV.getActiveFile( ).m_lstBagItem + mx ) % curBgsz;
+                _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
+                                               SAVE::SAV.getActiveFile( ).m_lstBagItem );
             }
             nw = ITEM::getItemData( CURRENT_ITEM.first );
             _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM, nw );
         } else if( GET_AND_WAIT( KEY_UP ) ) {
             if( !curBgsz ) return true;
             auto nw = ITEM::getItemData( CURRENT_ITEM.first );
-            _bagUI->unselectItem( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
+            _bagUI->unselectItem( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
                                   _currSelectedIdx, CURRENT_ITEM.first, nw );
             u8 mx = std::min( 9u, curBgsz );
             if( _currSelectedIdx-- == 0 ) {
                 _currSelectedIdx = mx - 1;
-                SAVE::SAV->getActiveFile( ).m_lstBagItem
-                    = ( SAVE::SAV->getActiveFile( ).m_lstBagItem + curBgsz - mx ) % curBgsz;
-                _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
-                                               SAVE::SAV->getActiveFile( ).m_lstBagItem );
+                SAVE::SAV.getActiveFile( ).m_lstBagItem
+                    = ( SAVE::SAV.getActiveFile( ).m_lstBagItem + curBgsz - mx ) % curBgsz;
+                _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
+                                               SAVE::SAV.getActiveFile( ).m_lstBagItem );
             }
             nw = ITEM::getItemData( CURRENT_ITEM.first );
             _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM, nw );
         } else if( !_hasSprite && GET_AND_WAIT_C( SCREEN_WIDTH - 44, SCREEN_HEIGHT - 10, 16 ) ) {
             if( !curBgsz ) return true;
-            SAVE::SAV->getActiveFile( ).m_lstBagItem
-                = ( SAVE::SAV->getActiveFile( ).m_lstBagItem + 8 ) % curBgsz;
-            _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
-                                           SAVE::SAV->getActiveFile( ).m_lstBagItem );
+            SAVE::SAV.getActiveFile( ).m_lstBagItem
+                = ( SAVE::SAV.getActiveFile( ).m_lstBagItem + 8 ) % curBgsz;
+            _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
+                                           SAVE::SAV.getActiveFile( ).m_lstBagItem );
             auto nw = ITEM::getItemData( CURRENT_ITEM.first );
             _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM, nw );
         } else if( !_hasSprite && GET_AND_WAIT_C( SCREEN_WIDTH - 76, SCREEN_HEIGHT - 10, 16 ) ) {
             if( !curBgsz ) return true;
-            SAVE::SAV->getActiveFile( ).m_lstBagItem
-                = ( SAVE::SAV->getActiveFile( ).m_lstBagItem + curBgsz - 8 ) % curBgsz;
-            _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
-                                           SAVE::SAV->getActiveFile( ).m_lstBagItem );
+            SAVE::SAV.getActiveFile( ).m_lstBagItem
+                = ( SAVE::SAV.getActiveFile( ).m_lstBagItem + curBgsz - 8 ) % curBgsz;
+            _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
+                                           SAVE::SAV.getActiveFile( ).m_lstBagItem );
             auto nw = ITEM::getItemData( CURRENT_ITEM.first );
             _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM, nw );
         }
 
         for( u8 i = 0; i < 5; ++i )
-            if( i != SAVE::SAV->getActiveFile( ).m_lstBag && !_hasSprite
+            if( i != SAVE::SAV.getActiveFile( ).m_lstBag && !_hasSprite
                 && GET_AND_WAIT_C( 26 * i + 13, 3 + 13, 13 ) ) {
-                SAVE::SAV->getActiveFile( ).m_lstBag = i;
-                _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
-                                               SAVE::SAV->getActiveFile( ).m_lstBagItem );
-                if( SAVE::SAV->getActiveFile( ).m_bag.size(
-                        (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag ) ) {
+                SAVE::SAV.getActiveFile( ).m_lstBag = i;
+                _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
+                                               SAVE::SAV.getActiveFile( ).m_lstBagItem );
+                if( SAVE::SAV.getActiveFile( ).m_bag.size(
+                        (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) ) {
                     auto nw = ITEM::getItemData( CURRENT_ITEM.first );
                     _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM, nw );
                 }
@@ -379,10 +379,10 @@ namespace BAG {
         switch( res ) {
         case 0: // Register
         {
-            if( SAVE::SAV->getActiveFile( ).m_registeredItem != CURRENT_ITEM.first )
-                SAVE::SAV->getActiveFile( ).m_registeredItem = CURRENT_ITEM.first;
+            if( SAVE::SAV.getActiveFile( ).m_registeredItem != CURRENT_ITEM.first )
+                SAVE::SAV.getActiveFile( ).m_registeredItem = CURRENT_ITEM.first;
             else
-                SAVE::SAV->getActiveFile( ).m_registeredItem = 0;
+                SAVE::SAV.getActiveFile( ).m_registeredItem = 0;
             break;
         }
         case 1: // Use
@@ -397,11 +397,11 @@ namespace BAG {
                 break;
             }
 
-            SAVE::SAV->getActiveFile( )
-                .m_lstUsedItems[ SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx ]
+            SAVE::SAV.getActiveFile( )
+                .m_lstUsedItems[ SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx ]
                 = CURRENT_ITEM.first;
-            SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx
-                = ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx + 1 ) % 5;
+            SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx
+                = ( SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx + 1 ) % 5;
 
             if( !ITEM::use( CURRENT_ITEM.first, true ) )
                 ret = 2 | ( CURRENT_ITEM.first << 2 );
@@ -410,14 +410,14 @@ namespace BAG {
                 ITEM::use( CURRENT_ITEM.first );
                 if( data.m_itemType != ITEM::ITEMTYPE_KEYITEM
                         && data.m_itemType != ITEM::ITEMTYPE_FORMECHANGE )
-                    SAVE::SAV->getActiveFile( ).m_bag.erase(
-                        (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag, CURRENT_ITEM.first, 1 );
+                    SAVE::SAV.getActiveFile( ).m_bag.erase(
+                        (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, CURRENT_ITEM.first, 1 );
             }
             break;
         }
         case 2: // Toss everything
-            SAVE::SAV->getActiveFile( ).m_bag.erase(
-                (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag, CURRENT_ITEM.first );
+            SAVE::SAV.getActiveFile( ).m_bag.erase(
+                (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, CURRENT_ITEM.first );
             break;
         default:
             ret = 0;
@@ -446,11 +446,11 @@ namespace BAG {
             if( _hasSprite && !( touch.px | touch.py ) ) { // Player drops the sprite at hand
                 if( !_ranges[ start ].second.m_isHeld ) {
                     auto data = ITEM::getItemData( CURRENT_ITEM.first );
-                    _bagUI->dropSprite( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag, start,
+                    _bagUI->dropSprite( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, start,
                                         CURRENT_ITEM, data );
                 } else {
                     auto data = ITEM::getItemData( _ranges[ start ].second.m_item );
-                    _bagUI->dropSprite( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
+                    _bagUI->dropSprite( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
                                         MAX_ITEMS_PER_PAGE, {_ranges[ start ].second.m_item, 1},
                                         data );
                 }
@@ -463,34 +463,34 @@ namespace BAG {
                 if( curr != (u8) -1 ) {
                     if( _ranges[ start ].second.m_isHeld
                         && _ranges[ curr ].second.m_isHeld ) { // Swap held items
-                        if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ start - t ].isEgg( )
-                            && !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ curr - t ].isEgg( ) ) {
-                            auto oldItem = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ start - t ]
+                        if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ start - t ].isEgg( )
+                            && !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ curr - t ].isEgg( ) ) {
+                            auto oldItem = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ start - t ]
                                 .getItem( );
-                            SAVE::SAV->getActiveFile( ).m_pkmnTeam[ start - t ].giveItem(
-                                    SAVE::SAV->getActiveFile( ).m_pkmnTeam[ curr - t ].getItem( ) );
-                            SAVE::SAV->getActiveFile( ).m_pkmnTeam[ curr - t ].giveItem( oldItem );
+                            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ start - t ].giveItem(
+                                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ curr - t ].getItem( ) );
+                            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ curr - t ].giveItem( oldItem );
                             _bagUI->drawPkmnIcons( );
                         }
                     } else if( !_ranges[ start ].second.m_isHeld
                                && !_ranges[ curr ].second.m_isHeld ) { // Swap bag items
-                        SAVE::SAV->getActiveFile( ).m_bag.swap(
-                            (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
-                            SAVE::SAV->getActiveFile( ).m_lstBagItem + start,
-                            SAVE::SAV->getActiveFile( ).m_lstBagItem + curr );
+                        SAVE::SAV.getActiveFile( ).m_bag.swap(
+                            (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
+                            SAVE::SAV.getActiveFile( ).m_lstBagItem + start,
+                            SAVE::SAV.getActiveFile( ).m_lstBagItem + curr );
                         std::swap( _ranges[ start ].second.m_item, _ranges[ curr ].second.m_item );
                         _currSelectedIdx = curr;
 
                         auto old = ITEM::getItemData( _ranges[ start ].second.m_item );
                         auto nw = ITEM::getItemData( CURRENT_ITEM.first );
 
-                        _bagUI->unselectItem( (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
+                        _bagUI->unselectItem( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
                                               start, _ranges[ start ].second.m_item, old );
                         _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM, nw );
                         continue;
                     } else if( !_ranges[ start ].second.m_isHeld
                                && _ranges[ curr ].second.m_isHeld ) { // Give/use item
-                        pokemon& pkm    = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ curr - t ];
+                        pokemon& pkm    = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ curr - t ];
 
                         auto data = ITEM::getItemData( _ranges[ start ].second.m_item );
                         bool result = false;
@@ -524,14 +524,14 @@ namespace BAG {
                             result = giveItemToPkmn( pkm, _ranges[ start ].second.m_item );
 
                         if( result )
-                            SAVE::SAV->getActiveFile( ).m_bag.erase(
-                                (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
+                            SAVE::SAV.getActiveFile( ).m_bag.erase(
+                                (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
                                 _ranges[ start ].second.m_item, 1 );
                     }
                 } else if( _ranges[ start ].second.m_isHeld
                            && ( curr == (u8) -1
                                 || !_ranges[ curr ].second.m_isHeld ) ) { // Take item
-                    takeItemFromPkmn( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ start - t ] );
+                    takeItemFromPkmn( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ start - t ] );
                 }
                 initUI( );
             } else if( !handleSomeInput( touch, pressed ) )
@@ -558,16 +558,16 @@ namespace BAG {
                                     break;
                                 }
                                 if( !i.second.m_isHeld || i.second.m_item ) {
-                                    if( SAVE::SAV->getActiveFile( ).m_bag.size(
-                                        (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag ) ) {
+                                    if( SAVE::SAV.getActiveFile( ).m_bag.size(
+                                        (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) ) {
                                         auto nw = ITEM::getItemData( CURRENT_ITEM.first );
                                         _bagUI->unselectItem(
-                                            (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
+                                            (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
                                             _currSelectedIdx, CURRENT_ITEM.first, nw );
                                     } else { // the current bag is empty
                                         ITEM::itemData empty = { 0, 0, 0, 0, 0, 0, 0 };
                                         _bagUI->unselectItem(
-                                            (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
+                                            (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
                                             MAX_ITEMS_PER_PAGE, 0, empty );
                                     }
                                 }
@@ -579,8 +579,8 @@ namespace BAG {
                                     u8 vl = j;
                                     if( j < MAX_ITEMS_PER_PAGE )
                                         vl += MAX_ITEMS_PER_PAGE
-                                              - SAVE::SAV->getActiveFile( ).m_bag.size(
-                                                    (bag::bagType) SAVE::SAV->getActiveFile( )
+                                              - SAVE::SAV.getActiveFile( ).m_bag.size(
+                                                    (bag::bagType) SAVE::SAV.getActiveFile( )
                                                         .m_lstBag );
                                     auto nw = ITEM::getItemData( i.second.m_item );
                                     _bagUI->selectItem( vl, {i.second.m_item, 1}, nw );
@@ -593,8 +593,8 @@ namespace BAG {
                                         u8 vl = j;
                                         if( j < MAX_ITEMS_PER_PAGE )
                                             vl += MAX_ITEMS_PER_PAGE
-                                                  - SAVE::SAV->getActiveFile( ).m_bag.size(
-                                                        (bag::bagType) SAVE::SAV->getActiveFile( )
+                                                  - SAVE::SAV.getActiveFile( ).m_bag.size(
+                                                        (bag::bagType) SAVE::SAV.getActiveFile( )
                                                             .m_lstBag );
                                         auto nw = ITEM::getItemData( i.second.m_item );
                                         _hasSprite = _bagUI->getSprite( vl, {i.second.m_item, 1},
@@ -634,14 +634,14 @@ namespace BAG {
             int pressed = keysCurrent( );
             if( !handleSomeInput( touch, pressed ) ) return 0;
             if( GET_AND_WAIT( KEY_A ) ) {
-                if( SAVE::SAV->getActiveFile( ).m_bag.empty(
-                        (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag ) )
+                if( SAVE::SAV.getActiveFile( ).m_bag.empty(
+                        (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) )
                     continue;
                 u16 targetItem = CURRENT_ITEM.first;
                 if( targetItem && confirmChoice( p_context, targetItem ) ) {
                     if( p_context != context::BATTLE )
-                        SAVE::SAV->getActiveFile( ).m_bag.erase(
-                            (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag, CURRENT_ITEM.first,
+                        SAVE::SAV.getActiveFile( ).m_bag.erase(
+                            (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, CURRENT_ITEM.first,
                             1 );
                     return targetItem;
                 }
@@ -666,8 +666,8 @@ namespace BAG {
                             u16 targetItem = i.second.m_item;
                             if( !i.second.m_isHeld && confirmChoice( p_context, targetItem ) ) {
                                 if( p_context != context::BATTLE )
-                                    SAVE::SAV->getActiveFile( ).m_bag.erase(
-                                        (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
+                                    SAVE::SAV.getActiveFile( ).m_bag.erase(
+                                        (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
                                         CURRENT_ITEM.first, 1 );
                                 return targetItem;
                             } else {
@@ -677,16 +677,16 @@ namespace BAG {
                         }
                         if( !touch.px && !touch.py ) {
                             if( !i.second.m_isHeld || i.second.m_item ) {
-                                if( SAVE::SAV->getActiveFile( ).m_bag.size(
-                                    (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag ) ) {
+                                if( SAVE::SAV.getActiveFile( ).m_bag.size(
+                                    (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) ) {
                                     auto nw = ITEM::getItemData( CURRENT_ITEM.first );
                                     _bagUI->unselectItem(
-                                        (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
+                                        (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
                                         _currSelectedIdx, CURRENT_ITEM.first, nw );
                                 } else { // the current bag is empty
                                     ITEM::itemData empty = { 0, 0, 0, 0, 0, 0, 0 };
                                     _bagUI->unselectItem(
-                                        (bag::bagType) SAVE::SAV->getActiveFile( ).m_lstBag,
+                                        (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
                                         MAX_ITEMS_PER_PAGE, 0, empty );
                                 }
                             }
@@ -698,8 +698,8 @@ namespace BAG {
                                 u8 vl = j;
                                 if( j < MAX_ITEMS_PER_PAGE )
                                     vl += MAX_ITEMS_PER_PAGE
-                                          - SAVE::SAV->getActiveFile( ).m_bag.size(
-                                                (bag::bagType) SAVE::SAV->getActiveFile( )
+                                          - SAVE::SAV.getActiveFile( ).m_bag.size(
+                                                (bag::bagType) SAVE::SAV.getActiveFile( )
                                                     .m_lstBag );
                                 auto nw = ITEM::getItemData( i.second.m_item );
                                 _bagUI->selectItem( vl, {i.second.m_item, 1}, nw );

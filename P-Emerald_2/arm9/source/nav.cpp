@@ -151,13 +151,13 @@ namespace NAV {
         bool b = false;
         for( u8 i = 0; i < 3; ++i ) {
             u16 curitm
-                = SAVE::SAV->getActiveFile( )
-                      .m_lstUsedItems[ ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx + 4 - i )
+                = SAVE::SAV.getActiveFile( )
+                      .m_lstUsedItems[ ( SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx + 4 - i )
                                        % 5 ];
-            if( !b && SAVE::SAV->getActiveFile( ).m_registeredItem
+            if( !b && SAVE::SAV.getActiveFile( ).m_registeredItem
                 && ( !curitm || i == 2
-                     || curitm == SAVE::SAV->getActiveFile( ).m_registeredItem ) ) {
-                curitm = SAVE::SAV->getActiveFile( ).m_registeredItem;
+                     || curitm == SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
+                curitm = SAVE::SAV.getActiveFile( ).m_registeredItem;
                 b      = true;
             }
             if( curitm )
@@ -250,10 +250,10 @@ namespace NAV {
     }
 
     void draw( bool p_initMainSrites, u8 p_newIdx ) {
-        if( SAVE::SAV->getActiveFile( ).m_options.m_bgIdx == p_newIdx )
+        if( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx == p_newIdx )
             return;
         else if( p_newIdx == u8( 255 ) )
-            p_newIdx = SAVE::SAV->getActiveFile( ).m_options.m_bgIdx;
+            p_newIdx = SAVE::SAV.getActiveFile( ).m_options.m_bgIdx;
 
         auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
         auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
@@ -262,13 +262,13 @@ namespace NAV {
             if( !BGs[ p_newIdx ].m_loadFromRom ) {
                 dmaCopy( BGs[ p_newIdx ].m_mainMenu, ptr, 256 * 192 );
                 dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, pal, 192 * 2 );
-                SAVE::SAV->getActiveFile( ).m_options.m_bgIdx = p_newIdx;
+                SAVE::SAV.getActiveFile( ).m_options.m_bgIdx = p_newIdx;
             } else if( !FS::readNavScreenData( ptr, BGs[ p_newIdx ].m_name.c_str( ), p_newIdx ) ) {
                 dmaCopy( BGs[ 0 ].m_mainMenu, ptr, 256 * 192 );
                 dmaCopy( BGs[ 0 ].m_mainMenuPal, pal, 192 * 2 );
-                SAVE::SAV->getActiveFile( ).m_options.m_bgIdx = 0;
+                SAVE::SAV.getActiveFile( ).m_options.m_bgIdx = 0;
             } else
-                SAVE::SAV->getActiveFile( ).m_options.m_bgIdx = p_newIdx;
+                SAVE::SAV.getActiveFile( ).m_options.m_bgIdx = p_newIdx;
             drawBorder( );
         } else if( STATE == MAP_MUG ) {
             drawMapMug( );
@@ -306,9 +306,9 @@ namespace NAV {
 
         if( held & KEY_Y ) {
             IO::waitForKeysUp( KEY_Y );
-            if( SAVE::SAV->getActiveFile( ).m_registeredItem ) {
-                if( ITEM::isUsable( SAVE::SAV->getActiveFile( ).m_registeredItem ) ) {
-                    ITEM::use( SAVE::SAV->getActiveFile( ).m_registeredItem );
+            if( SAVE::SAV.getActiveFile( ).m_registeredItem ) {
+                if( ITEM::isUsable( SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
+                    ITEM::use( SAVE::SAV.getActiveFile( ).m_registeredItem );
                     updateItems( );
                 } else {
                     IO::messageBox( GET_STRING( 58 ), GET_STRING( 91 ) );
@@ -326,20 +326,20 @@ namespace NAV {
         bool itmsn = false;
         for( u8 i = 0; i < 3; ++i ) {
             u16 curitm
-                = SAVE::SAV->getActiveFile( )
-                      .m_lstUsedItems[ ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx + 4 - i )
+                = SAVE::SAV.getActiveFile( )
+                      .m_lstUsedItems[ ( SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx + 4 - i )
                                        % 5 ];
-            if( !itmsn && SAVE::SAV->getActiveFile( ).m_registeredItem
+            if( !itmsn && SAVE::SAV.getActiveFile( ).m_registeredItem
                 && ( !curitm || i == 2
-                     || curitm == SAVE::SAV->getActiveFile( ).m_registeredItem ) ) {
-                curitm = SAVE::SAV->getActiveFile( ).m_registeredItem;
+                     || curitm == SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
+                curitm = SAVE::SAV.getActiveFile( ).m_registeredItem;
                 itmsn  = true;
             }
             /*
             if( GET_AND_WAIT_C( POS[ ITM( i ) ][ 0 ], POS[ ITM( i ) ][ 1 ], 14 ) ) {
                 if( curitm ) {
                     if( u16( -1 )
-                        == SAVE::SAV->getActiveFile( ).m_bag.count(
+                        == SAVE::SAV.getActiveFile( ).m_bag.count(
                                BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm ) ) {
                         IO::yesNoBox yn( GET_STRING( 91 ) );
                         char         buffer[ 100 ];
@@ -347,17 +347,17 @@ namespace NAV {
                                   ItemList[ curitm ]->getDisplayName( true ).c_str( ) );
                         if( yn.getResult( buffer ) ) {
                             for( u8 j = i; j < 4; ++j ) {
-                                SAVE::SAV->getActiveFile( )
-                                    .m_lstUsedItems[ ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx
+                                SAVE::SAV.getActiveFile( )
+                                    .m_lstUsedItems[ ( SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx
                                                        + 4 - j )
                                                      % 5 ]
-                                    = SAVE::SAV->getActiveFile( ).m_lstUsedItems
-                                          [ ( SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx + 3
+                                    = SAVE::SAV.getActiveFile( ).m_lstUsedItems
+                                          [ ( SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx + 3
                                               - j )
                                             % 5 ];
                             }
-                            SAVE::SAV->getActiveFile( )
-                                .m_lstUsedItems[ SAVE::SAV->getActiveFile( ).m_lstUsedItemsIdx ]
+                            SAVE::SAV.getActiveFile( )
+                                .m_lstUsedItems[ SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx ]
                                 = 0;
                         }
                         draw( true );
@@ -365,7 +365,7 @@ namespace NAV {
                         if( ItemList[ curitm ]->use( true ) ) IO::messageBox( "", 0, false );
                         ItemList[ curitm ]->use( );
                         if( ItemList[ curitm ]->m_itemType != item::KEY_ITEM )
-                            SAVE::SAV->getActiveFile( ).m_bag.erase(
+                            SAVE::SAV.getActiveFile( ).m_bag.erase(
                                 BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm, 1 );
                         draw( true );
                     } else {
@@ -420,7 +420,7 @@ namespace NAV {
                     updateItems( );
                     draw( true );
                 }
-            } else if( SAVE::SAV->getActiveFile( )
+            } else if( SAVE::SAV.getActiveFile( )
                            .m_pkmnTeam[ 0 ]
                            .m_boxdata.m_speciesId // StartPkmn
                        && ( GET_AND_WAIT_C( POS[ PKMN_ID ][ 0 ], POS[ PKMN_ID ][ 1 ], 16 ) ) ) {
@@ -459,7 +459,7 @@ namespace NAV {
                 bgUpdate( );
 
                 DEX::dex( DEX::dex::SHOW_CAUGHT, MAX_PKMN )
-                    .run( SAVE::SAV->getActiveFile( ).m_lstDex );
+                    .run( SAVE::SAV.getActiveFile( ).m_lstDex );
 
                 FADE_TOP_DARK( );
                 IO::clearScreen( false );
@@ -486,12 +486,12 @@ namespace NAV {
                 draw( );
                 switch( res ) {
                 case 0: {
-                    memset( SAVE::SAV->getActiveFile( ).m_pkmnTeam, 0,
-                            sizeof( SAVE::SAV->getActiveFile( ).m_pkmnTeam ) );
+                    memset( SAVE::SAV.getActiveFile( ).m_pkmnTeam, 0,
+                            sizeof( SAVE::SAV.getActiveFile( ).m_pkmnTeam ) );
                     std::vector<u16> tmp = { 201, 493, 521, 649, u16( 1 + rand( ) % MAX_PKMN ),
                                              MAX_PKMN };
                     for( int i = 0; i < 6; ++i ) {
-                        pokemon&         a   = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
+                        pokemon&         a   = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
 
                         a = pokemon( tmp[ i ], 50, !i ? ( rand( ) % 28 ) : 0, 0, i );
 
@@ -517,7 +517,7 @@ namespace NAV {
                         }
 
                         for( u16 j = 1; j <= MAX_PKMN; ++j )
-                            SAVE::SAV->m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );
+                            SAVE::SAV.m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );
                     }
                     /*
                                         for( u16 j : {493, 649, 648, 647, 487, 492, 641, 642,
@@ -525,16 +525,16 @@ namespace NAV {
                        645, 643, 644} ) {
                                             auto a       = pokemon( j, 50, 0, j ).m_boxdata;
                                             a.m_gotPlace = j;
-                                            SAVE::SAV->storePkmn( a );
+                                            SAVE::SAV.storePkmn( a );
                                             if( a.isShiny( ) ) {
                                               IO::messageBox( "YAAAY" );
-                                              s8 idx = SAVE::SAV->getCurrentBox(
+                                              s8 idx = SAVE::SAV.getCurrentBox(
                        )->getFirstFreeSpot( );
-                                              if( idx == -1 && !( *SAVE::SAV->getCurrentBox( )
+                                              if( idx == -1 && !( *SAVE::SAV.getCurrentBox( )
                        )[ 17
                        ].isShiny( ) )
                                               IO::messageBox( "Lost :(" );
-                                              else if( !( *SAVE::SAV->getCurrentBox( ) )[ idx -
+                                              else if( !( *SAVE::SAV.getCurrentBox( ) )[ idx -
                        1
                        ].isShiny( ) )
                                               IO::messageBox( "Lost :(" );
@@ -542,12 +542,12 @@ namespace NAV {
                                               }
                                         }*/
 
-                    SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
-                    SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ]
+                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ]
                         = M_WATERFALL;
-                    SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ]
+                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ]
                         = M_ROCK_CLIMB;
-                    SAVE::SAV->getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ]
+                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ]
                         = M_SWEET_SCENT;
 
                     swiWaitForVBlank( );
@@ -557,7 +557,7 @@ namespace NAV {
                     for( u16 j = 1; j < MAX_ITEMS; ++j ) {
                         auto c = ITEM::getItemData( j );
                         if( c.m_itemType )
-                            SAVE::SAV->getActiveFile( ).m_bag.insert(
+                            SAVE::SAV.getActiveFile( ).m_bag.insert(
                                 BAG::toBagType( c.m_itemType ), j, 1 );
                     }
                     break;
@@ -572,8 +572,8 @@ namespace NAV {
                     std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 3; ++i ) {
-                        pokemon a( 0, i + 456, 0, 30, SAVE::SAV->getActiveFile( ).m_id + 1,
-                                   SAVE::SAV->getActiveFile( ).m_sid, "Heiko", false );
+                        pokemon a( 0, i + 456, 0, 30, SAVE::SAV.getActiveFile( ).m_id + 1,
+                                   SAVE::SAV.getActiveFile( ).m_sid, "Heiko", false );
                         // a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                     }
@@ -584,12 +584,12 @@ namespace NAV {
                             {"Yay, I won!", "Yay gewonnen!"},
                             {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
                             cpy, 0, 0 );
-                    auto           bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
+                    auto           bt = SAVE::SAV.getActiveFile( ).getBattleTrainer( );
                     BATTLE::battle test_battle( bt, &opp, 100, BATTLE::weather( rand( ) % 9 ), 10,
                                                 0, 5, BATTLE::battle::DOUBLE );
                     ANIMATE_MAP = false;
                     test_battle.start( );
-                    SAVE::SAV->getActiveFile( ).updateTeam( bt );
+                    SAVE::SAV.getActiveFile( ).updateTeam( bt );
                     delete bt;
                     */
                     break;
@@ -599,8 +599,8 @@ namespace NAV {
                     std::vector<pokemon> cpy;
 
                     for( u8 i = 0; i < 6; ++i ) {
-                        pokemon a( 0, 435 + i, 0, 15, SAVE::SAV->getActiveFile( ).m_id + 1,
-                                   SAVE::SAV->getActiveFile( ).m_sid, "Heiko", false );
+                        pokemon a( 0, 435 + i, 0, 15, SAVE::SAV.getActiveFile( ).m_id + 1,
+                                   SAVE::SAV.getActiveFile( ).m_sid, "Heiko", false );
                         // a.stats.acHP = i*a.stats.maxHP/5;
                         cpy.push_back( a );
                     }
@@ -611,13 +611,13 @@ namespace NAV {
                             {"Yay, I won!", "Yay gewonnen!"},
                             {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
                             cpy, 0, 0 );
-                    auto           bt = SAVE::SAV->getActiveFile( ).getBattleTrainer( );
+                    auto           bt = SAVE::SAV.getActiveFile( ).getBattleTrainer( );
                     BATTLE::battle test_battle( bt, &opp, 100,
                                                 BATTLE::HAIL weather( rand( ) % 9 ), 10, 0, 5,
                                                 BATTLE::battle::SINGLE );
                     ANIMATE_MAP = false;
                     test_battle.start( );
-                    SAVE::SAV->getActiveFile( ).updateTeam( bt );
+                    SAVE::SAV.getActiveFile( ).updateTeam( bt );
                     delete bt;
                     */
                     break;
@@ -647,12 +647,12 @@ namespace NAV {
                     break;
                 }
                 case 8:
-                    SAVE::SAV->getActiveFile( ).m_HOENN_Badges <<= 1;
-                    SAVE::SAV->getActiveFile( ).m_HOENN_Badges |= 1;
+                    SAVE::SAV.getActiveFile( ).m_HOENN_Badges <<= 1;
+                    SAVE::SAV.getActiveFile( ).m_HOENN_Badges |= 1;
                     break;
                 case 9:
-                    SAVE::SAV->getActiveFile( ).m_KANTO_Badges <<= 1;
-                    SAVE::SAV->getActiveFile( ).m_KANTO_Badges |= 1;
+                    SAVE::SAV.getActiveFile( ).m_KANTO_Badges <<= 1;
+                    SAVE::SAV.getActiveFile( ).m_KANTO_Badges |= 1;
                     break;
                 case 10: {
                     IO::keyboard kbd;
@@ -661,7 +661,7 @@ namespace NAV {
                 }
                 case 11: {
                     for( u16 j = I_FLAME_PLATE; j <= I_FLAME_PLATE + 17; ++j ) {
-                        SAVE::SAV->getActiveFile( ).m_bag.insert(
+                        SAVE::SAV.getActiveFile( ).m_bag.insert(
                             BAG::toBagType( ITEM::ITEMTYPE_COLLECTIBLE ), j, 1 );
                     }
                 }
@@ -677,9 +677,7 @@ namespace NAV {
                 IO::yesNoBox Save( GET_STRING( 91 ) );
                 if( Save.getResult( GET_STRING( 92 ) ) ) {
                     draw( );
-                    if( !p_path || gMod == EMULATOR )
-                        IO::messageBox Succ( GET_STRING( 93 ), GET_STRING( 91 ) );
-                    else if( p_path && FS::writeSave( SAVE::SAV, p_path ) )
+                    if( FS::writeSave( p_path ) )
                         IO::messageBox Succ( GET_STRING( 94 ), GET_STRING( 91 ) );
                     else
                         IO::messageBox Succ( GET_STRING( 95 ), GET_STRING( 91 ) );

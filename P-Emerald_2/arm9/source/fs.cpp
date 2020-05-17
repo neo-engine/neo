@@ -204,7 +204,7 @@ namespace FS {
     }
 
     bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no ) {
-        if( p_no == SAVE::SAV->getActiveFile( ).m_options.m_bgIdx && NAV::NAV_DATA[ 0 ] ) {
+        if( p_no == SAVE::SAV.getActiveFile( ).m_options.m_bgIdx && NAV::NAV_DATA[ 0 ] ) {
             dmaCopy( NAV::NAV_DATA, p_layer, 256 * 192 );
             dmaCopy( NAV::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
             return true;
@@ -377,21 +377,35 @@ namespace FS {
         return std::string( tmpbuf );
     }
 
-    std::unique_ptr<SAVE::saveGame> readSave( const char* p_path ) {
+    bool readSave( const char* p_path ) {
+        if( CARD::checkCard( ) ) {
+            CARD::readData( 0, reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ) );
+            if( SAVE::SAV.isGood( ) ) { return true; }
+        }
+
         FILE* f = FS::open( "", p_path, ".sav" );
         if( !f ) return 0;
 
-        std::unique_ptr<SAVE::saveGame> result
-            = std::unique_ptr<SAVE::saveGame>( new SAVE::saveGame( ) );
-        FS::read( f, result.get( ), sizeof( SAVE::saveGame ), 1 );
+        FS::read( f, &SAVE::SAV, sizeof( SAVE::saveGame ), 1 );
         FS::close( f );
-        return result;
+        return SAVE::SAV.isGood( );
     }
 
-    bool writeSave( std::unique_ptr<SAVE::saveGame>& p_saveGame, const char* p_path ) {
+    bool writeSave( const char* p_path ) {
+        return writeSave( p_path, []( u16, u16 ) { } );
+    }
+
+    bool writeSave( const char* p_path, std::function<void(u16,u16)> p_progress ) {
+        if( CARD::checkCard( ) ) {
+            if( CARD::writeData( reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ),
+                             p_progress ) ) {
+                return true;
+            }
+        }
+
         FILE* f = FS::open( "", p_path, ".sav", "w" );
-        if( !f ) return 0;
-        FS::write( f, p_saveGame.get( ), sizeof( SAVE::saveGame ), 1 );
+        if( !f ) return false;
+        FS::write( f, &SAVE::SAV, sizeof( SAVE::saveGame ), 1 );
         FS::close( f );
         return true;
     }

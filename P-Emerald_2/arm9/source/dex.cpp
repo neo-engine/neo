@@ -108,7 +108,7 @@ namespace DEX {
             p_idx = ( p_idx + 8 ) % MAX_PKMN_ALL;
         }
         _selectedIdx                         = p_idx;
-        SAVE::SAV->getActiveFile( ).m_lstDex = CURR_PKMN;
+        SAVE::SAV.getActiveFile( ).m_lstDex = CURR_PKMN;
 
         DRAW_TOP( );
         _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx, oldIdx );
@@ -140,7 +140,7 @@ namespace DEX {
     }
 
     void dex::run( u16 p_pkmnIdx ) {
-        SAVE::SAV->getActiveFile( ).m_lstDex = p_pkmnIdx;
+        SAVE::SAV.getActiveFile( ).m_lstDex = p_pkmnIdx;
 
         changeMode( _mode, p_pkmnIdx );
 
@@ -197,7 +197,7 @@ namespace DEX {
                             rotateForward( );
                         else
                             _selectedIdx++;
-                        SAVE::SAV->getActiveFile( ).m_lstDex = CURR_PKMN;
+                        SAVE::SAV.getActiveFile( ).m_lstDex = CURR_PKMN;
                         DRAW_TOP( );
                         _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
                     }
@@ -207,7 +207,7 @@ namespace DEX {
                             rotateBackward( );
                         else
                             _selectedIdx--;
-                        SAVE::SAV->getActiveFile( ).m_lstDex = CURR_PKMN;
+                        SAVE::SAV.getActiveFile( ).m_lstDex = CURR_PKMN;
                         DRAW_TOP( );
                         _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
                     }
@@ -218,7 +218,7 @@ namespace DEX {
                                            IO::Oam->oamBuffer[ i ].x + 32,
                                            IO::Oam->oamBuffer[ i ].y + 28 ) ) {
                         _selectedIdx                         = i - FRAME_START_2;
-                        SAVE::SAV->getActiveFile( ).m_lstDex = CURR_PKMN;
+                        SAVE::SAV.getActiveFile( ).m_lstDex = CURR_PKMN;
                         DRAW_TOP( );
                         _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
                     }

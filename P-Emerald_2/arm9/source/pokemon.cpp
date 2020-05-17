@@ -289,7 +289,7 @@ bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
             bool b = false;
             for( int j = 0; j < 6; ++j )
                 b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember
-                       == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId );
+                       == SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId );
             if( !b ) continue;
         }
         if( p_method != data.m_evolutions[ i ].m_e.m_evolutionTrigger ) continue;
@@ -346,7 +346,7 @@ void pokemon::evolve( u16 p_item, u16 p_method ) {
             bool b = false;
             for( int j = 0; j < 6; ++j )
                 b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember
-                       == SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId );
+                       == SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId );
             if( !b ) continue;
         }
         if( p_method != data.m_evolutions[ i ].m_e.m_evolutionTrigger ) continue;

@@ -51,7 +51,7 @@ namespace IO {
         initTextField( );
         if( p_initSprites ) initOAMTable( true );
         _isNamed  = false;
-        _language = SAVE::SAV->getActiveFile( ).m_options.m_language;
+        _language = SAVE::SAV.getActiveFile( ).m_options.m_language;
     }
     yesNoBox::yesNoBox( SAVE::language p_language, bool p_initSprites ) {
         initTextField( );
@@ -66,13 +66,13 @@ namespace IO {
 
         swiWaitForVBlank( );
         _isNamed  = true;
-        _language = SAVE::SAV->getActiveFile( ).m_options.m_language;
+        _language = SAVE::SAV.getActiveFile( ).m_options.m_language;
     }
     yesNoBox::yesNoBox( messageBox p_box, bool p_initSprites ) {
         initTextField( );
         if( p_initSprites ) initOAMTable( true );
         _isNamed  = p_box.m_isNamed;
-        _language = SAVE::SAV->getActiveFile( ).m_options.m_language;
+        _language = SAVE::SAV.getActiveFile( ).m_options.m_language;
     }
 
     bool yesNoBox::getResult( const char* p_text, bool p_textAtOnce ) {

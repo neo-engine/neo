@@ -170,14 +170,14 @@ void vblankIRQ( ) {
         sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
         IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
 
-        SAVE::SAV->getActiveFile( ).m_pt.m_secs++; // I know, this is rather inaccurate
+        SAVE::SAV.getActiveFile( ).m_pt.m_secs++; // I know, this is rather inaccurate
 
-        SAVE::SAV->getActiveFile( ).m_pt.m_mins += ( SAVE::SAV->getActiveFile( ).m_pt.m_secs / 60 );
-        SAVE::SAV->getActiveFile( ).m_pt.m_hours
-            += ( SAVE::SAV->getActiveFile( ).m_pt.m_mins / 60 );
+        SAVE::SAV.getActiveFile( ).m_pt.m_mins += ( SAVE::SAV.getActiveFile( ).m_pt.m_secs / 60 );
+        SAVE::SAV.getActiveFile( ).m_pt.m_hours
+            += ( SAVE::SAV.getActiveFile( ).m_pt.m_mins / 60 );
 
-        SAVE::SAV->getActiveFile( ).m_pt.m_secs %= 60;
-        SAVE::SAV->getActiveFile( ).m_pt.m_mins %= 60;
+        SAVE::SAV.getActiveFile( ).m_pt.m_secs %= 60;
+        SAVE::SAV.getActiveFile( ).m_pt.m_mins %= 60;
 
         achours   = timeStruct->tm_hour;
         acminutes = timeStruct->tm_min;
@@ -213,13 +213,14 @@ int main( int, char** p_argv ) {
     initSound( );
 
     keysSetRepeat(25,5);
+    sysSetBusOwners( true, true );
 
     // Read the savegame
-    if( gMod != EMULATOR && p_argv[ 0 ] )
-        SAVE::SAV = FS::readSave( p_argv[ 0 ] );
-    else
-        SAVE::SAV = 0;
-    if( !SAVE::SAV ) SAVE::SAV = std::unique_ptr<SAVE::saveGame>( new SAVE::saveGame( ) );
+    if( gMod == EMULATOR || ( !FS::CARD::checkCard( ) && !p_argv[ 0 ] )
+            || !FS::readSave( p_argv[ 0 ] ) ) {
+        SAVE::SAV.clear( );
+    }
+
     SAVE::startScreen( ).run( );
     IO::clearScreenConsole( false, true );
     IO::clearScreen( false, true );
@@ -231,13 +232,13 @@ int main( int, char** p_argv ) {
     MAP::curMap->registerOnMoveModeChangedHandler( SOUND::onMovementTypeChange );
 
     MAP::curMap->draw( );
-    MAP::loadNewBank( SAVE::SAV->getActiveFile( ).m_currentMap );
+    MAP::loadNewBank( SAVE::SAV.getActiveFile( ).m_currentMap );
 
     ANIMATE_MAP = true;
     NAV::draw( true );
     MAP::curMap->registerOnBankChangedHandler( NAV::showNewMap );
     MAP::curMap->registerOnLocationChangedHandler( NAV::updateMap );
-    NAV::showNewMap( SAVE::SAV->getActiveFile( ).m_currentMap );
+    NAV::showNewMap( SAVE::SAV.getActiveFile( ).m_currentMap );
 
     irqSet( IRQ_VBLANK, vblankIRQ );
 
@@ -259,26 +260,26 @@ int main( int, char** p_argv ) {
             snprintf( buffer, 99,
                       "Currently at %hhu-(%hx,%hx,%hhx).\nMap: %i:%i,"
                       "(%02u,%02u)\n %hhu %s (%hu) %lx %hx %hx",
-                      SAVE::SAV->getActiveFile( ).m_currentMap,
-                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY,
-                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ,
-                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY / 32,
-                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX / 32,
-                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX % 32,
-                      SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY % 32,
+                      SAVE::SAV.getActiveFile( ).m_currentMap,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32,
                       MAP::CURRENT_BANK.m_bank,
                       FS::getLocation( MAP::curMap->getCurrentLocationId( ),
                           CURRENT_LANGUAGE ).c_str( ),
                       MAP::curMap->getCurrentLocationId( ),
                       ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ],
                       MAP::curMap
-                          ->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
+                          ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                           .m_bottombehave,
                       MAP::curMap
-                          ->at( SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX,
-                                SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY )
+                          ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                           .m_topbehave );
             IO::messageBox m( buffer );
             NAV::draw( true );
@@ -287,8 +288,8 @@ int main( int, char** p_argv ) {
 
         if( held & KEY_A ) {
             for( u8 i = 0; i < 6; ++i ) {
-                if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
-                auto a = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ];
+                if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
+                auto a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
                 if( a.isEgg( ) ) continue;
                 for( u8 j = 0; j < 4; ++j ) for( u8 param = 0; param < 2; ++param ) {
                     if( !MOVE::isFieldMove( a.m_boxdata.m_moves[ j ] )
@@ -330,8 +331,8 @@ int main( int, char** p_argv ) {
             scanKeys( );
 
             stopped = false;
-            if( MAP::curMap->canMove( SAVE::SAV->getActiveFile( ).m_player.m_pos, curDir,
-                                      SAVE::SAV->getActiveFile( ).m_player.m_movement ) ) {
+            if( MAP::curMap->canMove( SAVE::SAV.getActiveFile( ).m_player.m_pos, curDir,
+                                      SAVE::SAV.getActiveFile( ).m_player.m_movement ) ) {
                 MAP::curMap->movePlayer( curDir, ( held & KEY_B ) );
                 bmp = false;
             } else if( !bmp ) {

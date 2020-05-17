@@ -32,11 +32,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 #include <nds/ndstypes.h>
 
-//#define USE_AS_LIB
-#undef _EMULATOR
 #define VERSION ("0.8-" __DATE__ " " __TIME__)
 #define VERSION_NAME "Magnetizing Magnemite neo"
-#define DEBUG
+#define GAME_TITLE "POKEMON NEO"
+
+// Assumes that the Backup is a 512k flash memory
+#define BACKUP_SIZE ( 512 * 1024 )
 
 #define MAX_ITEMS 1280
 #define MAX_ITEMS_IN_BAG MAX_ITEMS
@@ -83,7 +84,7 @@ extern unsigned short TEMP_PAL[ 256 ];
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
-#define CURRENT_LANGUAGE SAVE::SAV->getActiveFile( ).m_options.m_language
+#define CURRENT_LANGUAGE SAVE::SAV.getActiveFile( ).m_options.m_language
 #define GET_STRING( i ) STRINGS[ i ][ CURRENT_LANGUAGE ]
 
 #define NO_DATA GET_STRING( 0 )
@@ -121,7 +122,7 @@ extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
                                             : ( ( (a) &KEY_RIGHT ) ? MAP::direction::RIGHT \
                                                                    : MAP::direction::LEFT ) ) )
 
-#define IN_DEX( pidx ) ( SAVE::SAV->m_caughtPkmn[ ( pidx ) / 8 ] & ( 1 << ( ( pidx ) % 8 ) ) )
+#define IN_DEX( pidx ) ( SAVE::SAV.m_caughtPkmn[ ( pidx ) / 8 ] & ( 1 << ( ( pidx ) % 8 ) ) )
 
 #define RGB( r, g, b ) ( RGB15( ( r ), ( g ), ( b ) ) | BIT( 15 ) )
 #define COMPL( a ) ( RGB( 31 - ( ( a ) >> 10 ) % 32, 31 - ( ( a ) >> 5 ) % 32, 31 - ( a ) % 32 ) )

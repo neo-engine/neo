@@ -53,8 +53,8 @@ namespace MAP {
 #define FETCH( p_var )   \
     ( ( ( p_var ) == 0 ) \
           ? 0            \
-          : ( ( ( p_var ) == 1 ) ? 1 : SAVE::SAV->getActiveFile( ).m_vars[ p_var ] ) )
-#define FETCH_UNSEC( p_var ) ( SAVE::SAV->getActiveFile( ).m_vars[ p_var ] )
+          : ( ( ( p_var ) == 1 ) ? 1 : SAVE::SAV.getActiveFile( ).m_vars[ p_var ] ) )
+#define FETCH_UNSEC( p_var ) ( SAVE::SAV.getActiveFile( ).m_vars[ p_var ] )
 
     enum opCodes {
         // [param] : immediate
@@ -145,25 +145,25 @@ namespace MAP {
             case CHECK_FLAG:
                 if( PARAM1( SCRIPT_INS[ pc ] ) > 1 )
                     FETCH_UNSEC( PARAM1( SCRIPT_INS[ pc ] ) )
-                        = SAVE::SAV->getActiveFile( ).checkFlag(
+                        = SAVE::SAV.getActiveFile( ).checkFlag(
                             FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) );
                 break;
             case CHECK_FLAG_I:
                 if( PARAM1( SCRIPT_INS[ pc ] ) > 1 )
                     FETCH_UNSEC( PARAM1( SCRIPT_INS[ pc ] ) )
-                        = SAVE::SAV->getActiveFile( ).checkFlag( ( PARAM2( SCRIPT_INS[ pc ] ) ) );
+                        = SAVE::SAV.getActiveFile( ).checkFlag( ( PARAM2( SCRIPT_INS[ pc ] ) ) );
                 break;
             case SET_FLAG:
-                SAVE::SAV->getActiveFile( ).setFlag( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), 1 );
+                SAVE::SAV.getActiveFile( ).setFlag( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), 1 );
                 break;
             case SET_FLAG_I:
-                SAVE::SAV->getActiveFile( ).setFlag( ( PARAM1( SCRIPT_INS[ pc ] ) ), 1 );
+                SAVE::SAV.getActiveFile( ).setFlag( ( PARAM1( SCRIPT_INS[ pc ] ) ), 1 );
                 break;
             case CLEAR_FLAG:
-                SAVE::SAV->getActiveFile( ).setFlag( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), 0 );
+                SAVE::SAV.getActiveFile( ).setFlag( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), 0 );
                 break;
             case CLEAR_FLAG_I:
-                SAVE::SAV->getActiveFile( ).setFlag( ( PARAM1( SCRIPT_INS[ pc ] ) ), 0 );
+                SAVE::SAV.getActiveFile( ).setFlag( ( PARAM1( SCRIPT_INS[ pc ] ) ), 0 );
                 break;
             case BRANCH:
                 if( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ) pc = FETCH( PARAM2( SCRIPT_INS[ pc ] ) );
@@ -206,14 +206,14 @@ namespace MAP {
             case GIVE_PKMN_I: {
                 // pokemon pk = pokemon( PARAMA( SCRIPT_INS[ pc ] ), PARAMB( SCRIPT_INS[ pc ] ) );
                 // TODO
-                // SAVE::SAV->getActiveFile( ).givePkmn( pk );
+                // SAVE::SAV.getActiveFile( ).givePkmn( pk );
                 break;
             }
             case GIVE_PKMN: {
                 // pokemon pk = pokemon( FETCH( PARAMA( SCRIPT_INS[ pc ] ) ),
                 //                       FETCH( PARAMB( SCRIPT_INS[ pc ] ) ) );
                 // TODO
-                // SAVE::SAV->getActiveFile( ).givePkmn( pk );
+                // SAVE::SAV.getActiveFile( ).givePkmn( pk );
                 break;
             }
             case BATTLE_PKMN_I: {
@@ -241,8 +241,8 @@ namespace MAP {
 
             case HEAL_TEAM:
                 for( u8 i = 0; i < 6; ++i )
-                    if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                        SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].heal( );
+                    if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+                        SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].heal( );
                 break;
             case CHOOSE_PKMN:
                 // TODO
@@ -292,15 +292,15 @@ namespace MAP {
     }
 
     void mapDrawer::interact( ) {
-        u16  px = SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posX;
-        u16  py = SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posY;
-        u16  pz = SAVE::SAV->getActiveFile( ).m_player.m_pos.m_posZ;
-        auto d  = SAVE::SAV->getActiveFile( ).m_player.m_direction;
+        u16  px = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16  py = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        u16  pz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+        auto d  = SAVE::SAV.getActiveFile( ).m_player.m_direction;
         handleEvents( px, py, pz, d );
     }
 
     void mapDrawer::handleEvents( u16 p_globX, u16 p_globY, u8 p_z ) {
-        u8 map = SAVE::SAV->getActiveFile( ).m_currentMap;
+        u8 map = SAVE::SAV.getActiveFile( ).m_currentMap;
         u8 i   = 0;
         while( executeScript( map, p_globX, p_globY, p_z, i, invocationType::STEP_ONTO ) ) ++i;
     }
@@ -308,7 +308,7 @@ namespace MAP {
     void mapDrawer::handleEvents( u16 p_globX, u16 p_globY, u8 p_z, direction p_dir ) {
         p_globX += dir[ p_dir ][ 0 ];
         p_globY += dir[ p_dir ][ 1 ];
-        u8 map = SAVE::SAV->getActiveFile( ).m_currentMap;
+        u8 map = SAVE::SAV.getActiveFile( ).m_currentMap;
         u8 i   = 0;
         while( executeScript( map, p_globX, p_globY, p_z, i, invocationType::INTERACT ) ) ++i;
     }
@@ -316,10 +316,10 @@ namespace MAP {
     void mapDrawer::handleWarp( warpType p_type, warpPos p_source ) {
         warpPos tg = getWarpPos( p_source );
 
-        if( tg.first == 0xFF ) tg = SAVE::SAV->getActiveFile( ).m_lastWarp;
+        if( tg.first == 0xFF ) tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
         if( !tg.first && !tg.second.m_posY && !tg.second.m_posZ && !tg.second.m_posX ) return;
 
-        SAVE::SAV->getActiveFile( ).m_lastWarp = p_source;
+        SAVE::SAV.getActiveFile( ).m_lastWarp = p_source;
         warpPlayer( p_type, tg );
     }
 }

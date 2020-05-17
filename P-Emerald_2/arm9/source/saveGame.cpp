@@ -38,9 +38,19 @@
 #include "abilityNames.h"
 
 namespace SAVE {
-    std::unique_ptr<saveGame> SAV;
+    saveGame SAV;
 
 #define PKMN_DATALENGTH 128
+    void saveGame::playerInfo::clear( ) {
+        std::memset( this, 0, sizeof( saveGame::playerInfo ) );
+    }
+    void saveGame::playerInfo::initialize( ) {
+        clear( );
+        m_good1 = GOOD_MAGIC1;
+        m_good2 = GOOD_MAGIC2;
+
+        m_bag = BAG::bag( );
+    }
 
     void saveGame::playerInfo::stepIncrease( ) {
         m_stepCount++;
@@ -153,5 +163,17 @@ namespace SAVE {
             if( !m_clipboard[ i ].isEgg( ) && m_clipboard[ i ].m_speciesId == p_pkmnIdx ) ++res;
         }
         return res;
+    }
+
+    bool saveGame::isGood( ) {
+        for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) {
+            if( SAV.m_saveFile[ i ].isGood( ) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    void saveGame::clear( ) {
+        std::memset( this, 0, sizeof( saveGame ) );
     }
 } // namespace SAVE

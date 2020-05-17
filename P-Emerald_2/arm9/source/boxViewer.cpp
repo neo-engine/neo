@@ -68,8 +68,8 @@ namespace BOX {
                 || GET_AND_WAIT_C( SCREEN_WIDTH - 12, SCREEN_HEIGHT - 10, 16 ) ) {
                 if( !_heldPkmn.m_boxdata.m_speciesId ) break;
             } else if( GET_AND_WAIT( KEY_L ) ) {
-                SAVE::SAV->getActiveFile( ).m_curBox
-                    = ( SAVE::SAV->getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                SAVE::SAV.getActiveFile( ).m_curBox
+                    = ( SAVE::SAV.getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
                 CLEAN;
                 _ranges = _boxUI.draw( p_allowTakePkmn );
                 select( _selectedIdx );
@@ -81,8 +81,8 @@ namespace BOX {
                     scanKeys( );
                     touchRead( &touch );
                     if( TOUCH_UP ) {
-                        SAVE::SAV->getActiveFile( ).m_curBox
-                            = ( SAVE::SAV->getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                        SAVE::SAV.getActiveFile( ).m_curBox
+                            = ( SAVE::SAV.getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
                         CLEAN;
                         _ranges = _boxUI.draw( p_allowTakePkmn );
                         select( _selectedIdx );
@@ -94,8 +94,8 @@ namespace BOX {
                     }
                 }
             } else if( GET_AND_WAIT( KEY_R ) ) {
-                SAVE::SAV->getActiveFile( ).m_curBox
-                    = ( SAVE::SAV->getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
+                SAVE::SAV.getActiveFile( ).m_curBox
+                    = ( SAVE::SAV.getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
                 CLEAN;
                 _ranges = _boxUI.draw( p_allowTakePkmn );
                 select( _selectedIdx );
@@ -107,8 +107,8 @@ namespace BOX {
                     scanKeys( );
                     touchRead( &touch );
                     if( TOUCH_UP ) {
-                        SAVE::SAV->getActiveFile( ).m_curBox
-                            = ( SAVE::SAV->getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
+                        SAVE::SAV.getActiveFile( ).m_curBox
+                            = ( SAVE::SAV.getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
                         CLEAN;
                         _ranges = _boxUI.draw( p_allowTakePkmn );
                         select( _selectedIdx );
@@ -135,8 +135,8 @@ namespace BOX {
                         IO::keyboard kb;
                         char         buffer[ 50 ];
                         snprintf( buffer, 49, GET_STRING( 62 ),
-                                  SAVE::SAV->getCurrentBox( )->m_name );
-                        strcpy( SAVE::SAV->getCurrentBox( )->m_name,
+                                  SAVE::SAV.getCurrentBox( )->m_name );
+                        strcpy( SAVE::SAV.getCurrentBox( )->m_name,
                                 kb.getText( 14, buffer ).c_str( ) );
                         IO::swapScreens( );
                         IO::OamTop->oamBuffer[ 0 ].isHidden = false;
@@ -225,12 +225,12 @@ namespace BOX {
         }
         pokemon selection;
         if( p_index < MAX_PKMN_PER_BOX )
-            selection = ( *SAVE::SAV->getCurrentBox( ) )[ p_index ];
+            selection = ( *SAVE::SAV.getCurrentBox( ) )[ p_index ];
         else if( p_index < MAX_PKMN_PER_BOX + 6 ) {
             if( _showTeam )
-                selection = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ];
+                selection = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ];
             else
-                selection = SAVE::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
+                selection = SAVE::SAV.m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
         }
         _boxUI.select( p_index );
         if( p_index >= MAX_PKMN_PER_BOX + 6 ) return;
@@ -248,11 +248,11 @@ namespace BOX {
         if( p_index >= MAX_PKMN_PER_BOX + 6 ) {
             if( p_index >= MAX_PKMN_PER_BOX + 8 ) return;
             if( p_index == MAX_PKMN_PER_BOX + 6 ) // <
-                SAVE::SAV->getActiveFile( ).m_curBox
-                    = ( SAVE::SAV->getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                SAVE::SAV.getActiveFile( ).m_curBox
+                    = ( SAVE::SAV.getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
             else if( p_index == MAX_PKMN_PER_BOX + 7 ) // >
-                SAVE::SAV->getActiveFile( ).m_curBox
-                    = ( SAVE::SAV->getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
+                SAVE::SAV.getActiveFile( ).m_curBox
+                    = ( SAVE::SAV.getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
 
             CLEAN;
             _ranges = _boxUI.draw( _showTeam );
@@ -262,15 +262,15 @@ namespace BOX {
 
         boxPokemon hld = _heldPkmn.m_boxdata;
         if( p_index < MAX_PKMN_PER_BOX )
-            std::swap( hld, SAVE::SAV->getCurrentBox( )->operator[]( p_index ) );
+            std::swap( hld, SAVE::SAV.getCurrentBox( )->operator[]( p_index ) );
         if( p_index >= MAX_PKMN_PER_BOX && !_showTeam )
-            std::swap( hld, SAVE::SAV->m_clipboard[ p_index - MAX_PKMN_PER_BOX ] );
+            std::swap( hld, SAVE::SAV.m_clipboard[ p_index - MAX_PKMN_PER_BOX ] );
         if( p_index >= MAX_PKMN_PER_BOX && _showTeam ) {
             std::swap( _heldPkmn,
-                       SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
+                       SAVE::SAV.getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
             if( !updateTeam( ) ) {
                 std::swap( _heldPkmn,
-                           SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
+                           SAVE::SAV.getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );
                 return;
             } else
                 _boxUI.updateTeam( );
@@ -284,19 +284,19 @@ namespace BOX {
     bool boxViewer::updateTeam( ) {
         u8 nxt = 1;
         for( u8 i = 0; i < 6; ++i, ++nxt )
-            if( !SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId )
+            if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId )
                 for( ; nxt < 6; ++nxt )
-                    if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ nxt ].m_boxdata.m_speciesId ) {
-                        std::swap( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ],
-                                   SAVE::SAV->getActiveFile( ).m_pkmnTeam[ nxt ] );
+                    if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ nxt ].m_boxdata.m_speciesId ) {
+                        std::swap( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ],
+                                   SAVE::SAV.getActiveFile( ).m_pkmnTeam[ nxt ] );
                         break;
                     }
 
         // Check if the party is safe to walk with
         for( u8 i = 0; i < 6; ++i )
-            if( SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId
-                && SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP
-                && !SAVE::SAV->getActiveFile( )
+            if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId
+                && SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP
+                && !SAVE::SAV.getActiveFile( )
                         .m_pkmnTeam[ i ].isEgg ( ) )
                 return true;
         return false;

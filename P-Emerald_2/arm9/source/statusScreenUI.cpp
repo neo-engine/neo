@@ -515,7 +515,7 @@ namespace STS {
         }
 
         for( u8 i = 0; i < 6; ++i ) {
-            auto pkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata;
+            auto pkmn = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata;
             if( pkmn.isEgg( ) )
                 nextAvailableTileIdx = IO::loadEggIcon( 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ),
                                                         SUB_BALL_IDX( i ), nextAvailableTileIdx );
@@ -539,8 +539,8 @@ namespace STS {
         u16 tileCnt = initPartyTopScreen( false );
 
         for( u8 i = 0; i < 6; i++ ) {
-            if( i < SAVE::SAV->getActiveFile( ).getTeamPkmnCount( ) ) {
-                drawPartyPkmn( &SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ], i, i == _current );
+            if( i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) {
+                drawPartyPkmn( &SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ], i, i == _current );
             } else {
                 drawPartyPkmn( nullptr, i, !i );
             }
@@ -858,7 +858,7 @@ namespace STS {
             type t = mdata.m_type;
             IO::loadTypeIcon( t, 222, 38 + 30 * i, TYPE_IDX + i, TYPE_PAL( i ),
                               Oam->oamBuffer[ TYPE_IDX + i ].gfxIndex, p_bottom,
-                              SAVE::SAV->getActiveFile( ).m_options.m_language );
+                              SAVE::SAV.getActiveFile( ).m_options.m_language );
 
             pal[ COLOR_IDX ] = GREEN;
             if( t == data.m_baseForme.m_types[ 0 ] || t == data.m_baseForme.m_types[ 1 ] ) {
@@ -925,15 +925,15 @@ namespace STS {
         if( data.m_baseForme.m_types[ 0 ] == data.m_baseForme.m_types[ 1 ] ) {
             IO::loadTypeIcon( data.m_baseForme.m_types[ 0 ], 250 - 32, 50, TYPE_IDX, TYPE_PAL( 0 ),
                               Oam->oamBuffer[ TYPE_IDX ].gfxIndex, p_bottom,
-                              SAVE::SAV->getActiveFile( ).m_options.m_language );
+                              SAVE::SAV.getActiveFile( ).m_options.m_language );
             Oam->oamBuffer[ TYPE_IDX + 1 ].isHidden = true;
         } else {
             IO::loadTypeIcon( data.m_baseForme.m_types[ 0 ], 250 - 64, 50, TYPE_IDX, TYPE_PAL( 0 ),
                               Oam->oamBuffer[ TYPE_IDX ].gfxIndex, p_bottom,
-                              SAVE::SAV->getActiveFile( ).m_options.m_language );
+                              SAVE::SAV.getActiveFile( ).m_options.m_language );
             IO::loadTypeIcon( data.m_baseForme.m_types[ 1 ], 250 - 32, 50, TYPE_IDX + 1, TYPE_PAL( 1 ),
                               Oam->oamBuffer[ TYPE_IDX + 1 ].gfxIndex, p_bottom,
-                              SAVE::SAV->getActiveFile( ).m_options.m_language );
+                              SAVE::SAV.getActiveFile( ).m_options.m_language );
         }
 
         IO::regularFont->setColor( BLACK_IDX, 1 );
@@ -961,8 +961,8 @@ namespace STS {
         IO::regularFont->setColor( GRAY_IDX, 2 );
         IO::regularFont->printString( "Nr.", 124, 51, p_bottom );
 
-        bool plrOT = currPkmn.m_boxdata.m_oTId == SAVE::SAV->getActiveFile( ).m_id
-                     && currPkmn.m_boxdata.m_oTSid == SAVE::SAV->getActiveFile( ).m_sid;
+        bool plrOT = currPkmn.m_boxdata.m_oTId == SAVE::SAV.getActiveFile( ).m_id
+                     && currPkmn.m_boxdata.m_oTSid == SAVE::SAV.getActiveFile( ).m_sid;
         if( !currPkmn.m_boxdata.m_gotDate[ 0 ] )
             snprintf( buffer, 49, "%s%d", plrOT ? "Gef. auf Lv. " : "Off gef auf Lv.",
                       currPkmn.m_boxdata.m_gotLevel );
@@ -1097,7 +1097,7 @@ namespace STS {
 
         IO::loadTypeIcon( mdata.m_type, 222, 30, TYPE_IDX + p_moveIdx,
                           TYPE_PAL( p_moveIdx ), Oam->oamBuffer[ TYPE_IDX + p_moveIdx ].gfxIndex,
-                          p_bottom, SAVE::SAV->getActiveFile( ).m_options.m_language );
+                          p_bottom, SAVE::SAV.getActiveFile( ).m_options.m_language );
         IO::loadDamageCategoryIcon(
             mdata.m_category, 222, 46, ATK_DMGTYPE_IDX( mdata.m_category ),
             DMG_TYPE_PAL( mdata.m_category ),
@@ -1260,10 +1260,10 @@ namespace STS {
     }
 
     std::vector<IO::inputTarget> regStsScreenUI::draw( u8 p_current, bool p_updatePageIcons ) {
-        drawPartyPkmn( &SAVE::SAV->getActiveFile( ).m_pkmnTeam[ _current ], _current, false,
+        drawPartyPkmn( &SAVE::SAV.getActiveFile( ).m_pkmnTeam[ _current ], _current, false,
                        false );
         _current  = p_current;
-        auto pkmn = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ p_current ];
+        auto pkmn = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ p_current ];
         drawPartyPkmn( &pkmn, p_current, true, false );
 
         std::vector<IO::inputTarget> res;
@@ -1282,11 +1282,11 @@ namespace STS {
         }
 
         for( u8 i = 0; i < 6; ++i ) {
-            auto p = SAVE::SAV->getActiveFile( ).m_pkmnTeam[ i ].m_boxdata;
+            auto p = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata;
             if( p.isEgg( ) )
                 IO::loadEggIcon( 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ), SUB_BALL_IDX( i ),
                                  IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex );
-            else if( i < SAVE::SAV->getActiveFile( ).getTeamPkmnCount( ) )
+            else if( i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) )
                 IO::loadPKMNIcon( p.m_speciesId, 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX( i ),
                                   SUB_BALL_IDX( i ),
                                   IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].gfxIndex, true,
@@ -1354,7 +1354,7 @@ namespace STS {
         for( u8 i = 0; i < 4; ++i ) {
             type t  = UNKNOWN;
             tileCnt = IO::loadTypeIcon( t, 126, 43 + 32 * i, TYPE_IDX + i, TYPE_PAL( i ), tileCnt,
-                                        true, SAVE::SAV->getActiveFile( ).m_options.m_language );
+                                        true, SAVE::SAV.getActiveFile( ).m_options.m_language );
         }
         for( u8 i = 0; i < 4; ++i ) {
             tileCnt = IO::loadDamageCategoryIcon( ( MOVE::moveHitTypes )( i % 3 ), 126, 43 + 32 * i,
