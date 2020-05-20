@@ -6,3 +6,6 @@
 	path = P-Emerald_2/tools/ndstool
 	url = https://github.com/PH111P/ndstool
     ignore = dirty
+[submodule "P-Emerald_2/tools/fsdata"]
+	path = P-Emerald_2/tools/fsdata
+	url = https://github.com/PH111P/perm2-fsdata
