@@ -68,10 +68,12 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"No data.", "Keine Daten."},
     {"Faraway Place", "Entfernter Ort"},
     {"Unknown", "Unbekannt"},
-    {"%sUse %s?", "%sM\xf6""chtest du %s nutzen?"},
+    {"%sUse %s?", "%sM\xf6"
+                  "chtest du %s nutzen?"},
     {"The repel wore off.", "Der Schutz ist aufgebraucht."},
 
-    {"Just an old Pok\xe9 Ball", "Doch nur ein alter Pok\xe9""ball"},
+    {"Just an old Pok\xe9 Ball", "Doch nur ein alter Pok\xe9"
+                                   "ball"},
     {"You fished a Pok\xe9mon!", "Du hast ein Pok\xe9mon geangelt!"},
     {"Map border.\nReturn, or you\nwill get lost!",
      "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!"},
@@ -97,7 +99,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Super soft", "Sehr weich"},
     {"Very hard", "Sehr hart"},
     {"Normal", "Normal"},
-    {"Size:%4.1fcm", "Gr\xf6\xdf""e:%4.1fcm"},
+    {"Size:%4.1fcm", "Gr\xf6\xdf"
+                     "e:%4.1fcm"},
     {"Spicy", "Scharf"},
 
     {"Dry", "Trocken"},
@@ -145,7 +148,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"You can't choose\nthis item.", "Dieses Item kann nicht\nausgew\xe4hlt werden."},
     {"Choose %s?", "%s ausw\xe4hlen?"},
-    {"What do you want to do\nwith %s?", "Was tun mit %s?"},
+    {"Do what with %s?", "Was tun mit %s?"},
     {"You can't use\nthat right now.", "Das kann jetzt nicht\neingesetzt werden."},
     {"Pok\xe9mon team", "Pok\xe9mon-Team"},
 
@@ -175,11 +178,11 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Continue your adventure", "Setze dein Abenteuer fort"},
     {"Start a new adventure", "Starte ein neues Abenteuer"},
     {"Learn your companion's stories", "Erfahre mehr \xfc"
-        "ber deine Begleiter"},
+                                       "ber deine Begleiter"},
     {"Revive myths of old", "Setze alte Abenteuer fort"},
     {"This slot contains a saved game.\nOverride it?",
      "Es existiert bereits ein Spielstand.\nSoll dieser \xfc"
-         "berschrieben werden?"},
+     "berschrieben werden?"},
 
     // 80
 
@@ -200,7 +203,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"The scent vanished", "Der Duft verstrich wirkungslos"},
     {"Pok\xe9Nav", "Pok\xe9Nav"},
-    {" Would you like to\n save your progress?\n", " M\xf6""chtest du deinen\n Fortschritt sichern?\n"},
+    {" Would you like to\n save your progress?\n", " M\xf6"
+                                                   "chtest du deinen\n Fortschritt sichern?\n"},
     {"Save?\nFrom an emulator?!", "Speichern?\nIn einem Emulator?!"},
     {"Saved successfully!", "Speichern erfolgreich!"},
 
@@ -233,9 +237,11 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
      "Willkommen zur Spezialepisode 0:\nDeveloper's Heaven"},
     {"In this episode, you will gain\nthe mighty powers of the\ndev himself.",
      "In dieser Episode erh\xe4ltst du\ndie F\xe4higkeiten des Entwicklers."},
-    {"Do whatever you want.", "Mach damit, was immer du m\xf6""chtest."},
+    {"Do whatever you want.", "Mach damit, was immer du m\xf6"
+                              "chtest."},
     {"Do you want to import your\nsave from the GBA game?",
-     "M\xf6""chtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?"},
+     "M\xf6"
+     "chtest du deinen Spielstand\nvon dem GBA-Modul auf dem DS\nfortsetzen?"},
 
     {"Importing a save file will\ncopy all Pok\xe9mon and items\nfrom the GBA game.",
      "Beim Importieren werden alle\nPok\xe9mon und Items vom\nGBA-Modul kopiert."},
@@ -252,7 +258,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"Proceed?", "Fortfahren?"},
     {"Importing data", "Lade Spielstand"},
-    {"An error occured.\nAborting.", "Ein Fehler ist aufgetreten.\nKehre zum Hauptmen\xfc zur\xfc""ck."},
+    {"An error occured.\nAborting.", "Ein Fehler ist aufgetreten.\nKehre zum Hauptmen\xfc zur\xfc"
+                                     "ck."},
     {"Completed.", "Abgeschlossen."},
     {"Entries", "Eintr\xe4ge"},
 
@@ -279,7 +286,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 140
 
     {"Go [OWN%d]![A]", "Los [OWN%d]![A]"},
-    {"Do you want to give\na nick name to %s?", "M\xf6""chtest du dem %s\neinen Spitznamen geben?"},
+    {"Do you want to give\na nick name to %s?", "M\xf6"
+                                                "chtest du dem %s\neinen Spitznamen geben?"},
     {"Choose a nick name!", "W\xe4hle einen Spitznamen!"},
     {"You are challenged by\n%s %s![END]", "Eine Herausforderung von\n%s %s![END]"},
     {"Frzn", "Eingfr"},
@@ -325,8 +333,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"[TRAINER] ([TCLASS])\nused %s.[A]", "[TRAINER] ([TCLASS]) setzt\n%s ein.[A]"},
     {"It got wasted[A]", "Es hat keine Wirkung[A]"},
     {"Used %s.[A]", "%s eingesetzt.[A]"},
-    {"%s's data was\nregistred to the Pok\xe9 Dex.[A]",
-     "Die Daten von %s\nwurden im Pok\xe9""Dex gespeichert.[A]"},
+    {"%s's data was\nregistred to the Pok\xe9 Dex.[A]", "Die Daten von %s\nwurden im Pok\xe9"
+                                                        "Dex gespeichert.[A]"},
 
     {"%s was sent to\nthe Pok\xe9mon Storage System.[A]",
      "%s wurde an das\nPok\xe9mon-Lagerungssystem\ngeschickt.[A]"},
@@ -345,8 +353,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Pwr", "Stk"},
 
     {"Meteor Falls", "Meteorf\xe4lle"},
-	{"\xd", "\xe"}, // HP icon
-    {"hardy","robust"},
+    {"\xd", "\xe"}, // HP icon
+    {"hardy", "robust"},
     {"lonely", "einsam"},
     {"brave", "mutig"},
 
@@ -354,7 +362,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"adamant", "hart"},
     {"naughy", "frech"},
-    {"bold", "k\xfc""hn"},
+    {"bold", "k\xfc"
+             "hn"},
     {"docile", "sanft"},
     {"relaxed", "locker"},
 
@@ -368,7 +377,9 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"jolly", "froh"},
     {"naive", "naiv"},
-    {"modest", "m\xe4""\xdf""ig"},
+    {"modest", "m\xe4"
+               "\xdf"
+               "ig"},
     {"mild", "mild"},
     {"quiet", "ruhig"},
 
@@ -384,27 +395,37 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"quirky", "kauzig"},
     {"Loves to eat", "Liebt es, zu essen"},
     {"Often dozes off", "Nickt oft ein"},
-    {"Nods off a lot", "Schl\xe4""ft gerne"},
+    {"Nods off a lot", "Schl\xe4"
+                       "ft gerne"},
 
     {"Scatters things often", "Macht oft Unordnung"},
     {"Likes to relax", "Liebt es zu entspannen"},
-    {"Proud of its power", "Ist stolz auf seine St\xe4""rke"},
-    {"Likes to thrash about", "Pr\xfc""gelt sich gerne"},
+    {"Proud of its power", "Ist stolz auf seine St\xe4"
+                           "rke"},
+    {"Likes to thrash about", "Pr\xfc"
+                              "gelt sich gerne"},
     {"A little quick tempered", "Besitzt Temperament"},
 
     // 220
 
-    {"Likes to fight", "Liebt es zu k\xe4""mpfen"},
+    {"Likes to fight", "Liebt es zu k\xe4"
+                       "mpfen"},
     {"Quick tempered", "Ist impulsiv"},
-    {"Sturdy body", "Hat einen robusten K\xf6""rper"},
+    {"Sturdy body", "Hat einen robusten K\xf6"
+                    "rper"},
     {"Capable of taking hits", "Kann Treffer gut verkraften"},
-    {"Highly persistent", "Ist \xe4""u\xdf""erst ausdauernd"},
+    {"Highly persistent", "Ist \xe4"
+                          "u\xdf"
+                          "erst ausdauernd"},
 
     {"Good endurance", "Hat eine gute Ausdauer"},
     {"Good perseverance", "Ist beharrlich"},
     {"Highly curious", "Ist sehr neugierig"},
-    {"Mischievous", "Ist hinterh\xe4""ltig"},
-    {"Thoroughly cunning", "Ist \xe4""u\xdf""erst gerissen"},
+    {"Mischievous", "Ist hinterh\xe4"
+                    "ltig"},
+    {"Thoroughly cunning", "Ist \xe4"
+                           "u\xdf"
+                           "erst gerissen"},
 
     // 230
 
@@ -412,18 +433,24 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Very finicky", "Ist sehr pedantisch"},
     {"Strong willed", "Besitzt starken Willen"},
     {"Somewhat vain", "Ist etwas eitel"},
-    {"Strongly defiant", "Ist sehr aufs\xe4""ssig"},
+    {"Strongly defiant", "Ist sehr aufs\xe4"
+                         "ssig"},
 
     {"Hates to lose", "Hasst Niederlagen"},
-    {"Somewhat stubborn", "Ist dickk\xf6""pfig"},
+    {"Somewhat stubborn", "Ist dickk\xf6"
+                          "pfig"},
     {"Likes to run", "Liebt es, zu rennen"},
-    {"Alert to sounds", "Achtet auf Ger\xe4""usche"},
-    {"Impetuous and silly", "Ist ungest\xfc""m und einf\xe4""ltig"},
+    {"Alert to sounds", "Achtet auf Ger\xe4"
+                        "usche"},
+    {"Impetuous and silly", "Ist ungest\xfc"
+                            "m und einf\xe4"
+                            "ltig"},
 
     // 240
 
     {"Somewhat of a clown", "Ist fast wie eine Clown"},
-    {"Quick to flee", "Fl\xfc""chtet schnell"},
+    {"Quick to flee", "Fl\xfc"
+                      "chtet schnell"},
     {"spicy", "scharf"},
     {"sour", "saur"},
     {"sweet", "s\xfc\xdf"},
@@ -537,4 +564,21 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"It's a large Waterfall.\n", "Ein großer Wasserfall.\n"},
     {"Something moved!\n", "Da hat sich etwas bewegt!\n"},
     {"Light is shining from the\nsurface. ", "Licht scheint von der\nOberfläche. "},
+    {"Select", "Ausw\xe4hlen"},
+    {"Status", "Status"},
+
+    {"Give Item", "Item geben"},
+    {"Take Item", "Item nehmen"},
+    {"Use Item", "Item nutzen"},
+    {"Swap", "Austauschen"},
+    {"Pok\xe9"
+     "Dex",
+     "Pok\xe9"
+     "Dex"},
+
+    // 330
+
+    {"Cancel", "Zur\xfc"
+               "ck"},
+
 };

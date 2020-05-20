@@ -40,8 +40,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "fs.h"
 #include "saveGame.h"
-#include "startScreen.h"
 #include "sound.h"
+#include "startScreen.h"
 
 #include "berry.h"
 #include "item.h"
@@ -173,8 +173,7 @@ void vblankIRQ( ) {
         SAVE::SAV.getActiveFile( ).m_pt.m_secs++; // I know, this is rather inaccurate
 
         SAVE::SAV.getActiveFile( ).m_pt.m_mins += ( SAVE::SAV.getActiveFile( ).m_pt.m_secs / 60 );
-        SAVE::SAV.getActiveFile( ).m_pt.m_hours
-            += ( SAVE::SAV.getActiveFile( ).m_pt.m_mins / 60 );
+        SAVE::SAV.getActiveFile( ).m_pt.m_hours += ( SAVE::SAV.getActiveFile( ).m_pt.m_mins / 60 );
 
         SAVE::SAV.getActiveFile( ).m_pt.m_secs %= 60;
         SAVE::SAV.getActiveFile( ).m_pt.m_mins %= 60;
@@ -199,8 +198,8 @@ void vblankIRQ( ) {
 }
 
 int main( int, char** p_argv ) {
-    TWL_CONFIG = ( isDSiMode( ) && ( *(u8*) 0x02000400 & 0x0F ) && ( *(u8*)0x02000401 == 0 ) &&
-            ( *(u8*)0x02000402 == 0 ) && ( *(u8*)0x02000404 == 0 ) );
+    TWL_CONFIG = ( isDSiMode( ) && ( *(u8*) 0x02000400 & 0x0F ) && ( *(u8*) 0x02000401 == 0 )
+                   && ( *(u8*) 0x02000402 == 0 ) && ( *(u8*) 0x02000404 == 0 ) );
 
     // Init
     powerOn( POWER_ALL_2D );
@@ -212,12 +211,12 @@ int main( int, char** p_argv ) {
     initTimeAndRnd( );
     initSound( );
 
-    keysSetRepeat(25,5);
+    keysSetRepeat( 25, 5 );
     sysSetBusOwners( true, true );
 
     // Read the savegame
     if( gMod == EMULATOR || ( !FS::CARD::checkCard( ) && !p_argv[ 0 ] )
-            || !FS::readSave( p_argv[ 0 ] ) ) {
+        || !FS::readSave( p_argv[ 0 ] ) ) {
         SAVE::SAV.clear( );
     }
 
@@ -257,30 +256,29 @@ int main( int, char** p_argv ) {
             //            time_t     unixTime   = time( NULL );
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char buffer[ 100 ];
-            snprintf( buffer, 99,
-                      "Currently at %hhu-(%hx,%hx,%hhx).\nMap: %i:%i,"
-                      "(%02u,%02u)\n %hhu %s (%hu) %lx %hx %hx",
-                      SAVE::SAV.getActiveFile( ).m_currentMap,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32,
-                      MAP::CURRENT_BANK.m_bank,
-                      FS::getLocation( MAP::curMap->getCurrentLocationId( ),
-                          CURRENT_LANGUAGE ).c_str( ),
-                      MAP::curMap->getCurrentLocationId( ),
-                      ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ],
-                      MAP::curMap
-                          ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                          .m_bottombehave,
-                      MAP::curMap
-                          ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                          .m_topbehave );
+            snprintf(
+                buffer, 99,
+                "Currently at %hhu-(%hx,%hx,%hhx).\nMap: %i:%i,"
+                "(%02u,%02u)\n %hhu %s (%hu) %lx %hx %hx",
+                SAVE::SAV.getActiveFile( ).m_currentMap,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32, MAP::CURRENT_BANK.m_bank,
+                FS::getLocation( MAP::curMap->getCurrentLocationId( ), CURRENT_LANGUAGE ).c_str( ),
+                MAP::curMap->getCurrentLocationId( ),
+                ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ],
+                MAP::curMap
+                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                    .m_bottombehave,
+                MAP::curMap
+                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                    .m_topbehave );
             IO::messageBox m( buffer );
             NAV::draw( true );
         }
@@ -291,34 +289,36 @@ int main( int, char** p_argv ) {
                 if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
                 auto a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
                 if( a.isEgg( ) ) continue;
-                for( u8 j = 0; j < 4; ++j ) for( u8 param = 0; param < 2; ++param ) {
-                    if( !MOVE::isFieldMove( a.m_boxdata.m_moves[ j ] )
-                        || !MOVE::possible( a.m_boxdata.m_moves[ j ], param )
-                        || !MOVE::text( a.m_boxdata.m_moves[ j ], param ) )
-                        continue;
-                    char buffer[ 50 ];
-                    auto mname = MOVE::getMoveName( a.m_boxdata.m_moves[ j ], CURRENT_LANGUAGE );
-                    snprintf( buffer, 49, GET_STRING( 3 ),
-                              GET_STRING( MOVE::text( a.m_boxdata.m_moves[ j ], param ) ),
-                              mname.c_str( ) );
-                    SOUND::playSoundEffect( SFX_CHOOSE );
-                    IO::yesNoBox yn;
-                    if( yn.getResult( buffer ) ) {
-                        NAV::draw( );
-                        swiWaitForVBlank( );
-                        snprintf( buffer, 49, GET_STRING( 99 ), a.m_boxdata.m_name,
+                for( u8 j = 0; j < 4; ++j )
+                    for( u8 param = 0; param < 2; ++param ) {
+                        if( !MOVE::isFieldMove( a.m_boxdata.m_moves[ j ] )
+                            || !MOVE::possible( a.m_boxdata.m_moves[ j ], param )
+                            || !MOVE::text( a.m_boxdata.m_moves[ j ], param ) )
+                            continue;
+                        char buffer[ 50 ];
+                        auto mname
+                            = MOVE::getMoveName( a.m_boxdata.m_moves[ j ], CURRENT_LANGUAGE );
+                        snprintf( buffer, 49, GET_STRING( 3 ),
+                                  GET_STRING( MOVE::text( a.m_boxdata.m_moves[ j ], param ) ),
                                   mname.c_str( ) );
-                        IO::messageBox( buffer, 0, false );
-                        MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale,
-                                              a.m_boxdata.isShiny( ) );
-                        NAV::draw( true );
-                        swiWaitForVBlank( );
+                        SOUND::playSoundEffect( SFX_CHOOSE );
+                        IO::yesNoBox yn;
+                        if( yn.getResult( buffer ) ) {
+                            NAV::draw( );
+                            swiWaitForVBlank( );
+                            snprintf( buffer, 49, GET_STRING( 99 ), a.m_boxdata.m_name,
+                                      mname.c_str( ) );
+                            IO::messageBox( buffer, 0, false );
+                            MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale,
+                                                  a.m_boxdata.isShiny( ) );
+                            NAV::draw( true );
+                            swiWaitForVBlank( );
 
-                        MOVE::use( a.m_boxdata.m_moves[ j ], param );
+                            MOVE::use( a.m_boxdata.m_moves[ j ], param );
+                        }
+                        NAV::draw( true );
+                        goto OUT;
                     }
-                    NAV::draw( true );
-                    goto OUT;
-                }
             }
             MAP::curMap->interact( );
         OUT:

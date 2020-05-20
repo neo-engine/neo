@@ -27,6 +27,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <vector>
+
 #include "move.h"
 #include "partyScreenUI.h"
 #include "pokemon.h"
@@ -45,6 +47,26 @@ namespace STS {
             SINGLE   // Single Pkmn has focus
         };
 
+        enum choice {
+            SELECT = 0,
+            STATUS,
+            GIVE_ITEM,
+            TAKE_ITEM,
+            USE_ITEM,
+            FIELD_MOVE_1,
+            FIELD_MOVE_2,
+            FIELD_MOVE_3,
+            FIELD_MOVE_4,
+            SWAP,
+            DEX_ENTRY,
+            CANCEL
+        };
+
+        const u16 getTextForChoice( const choice p_choice );
+
+        std::vector<choice> _currentChoices; // Possible choices for the currently selected pkmn
+        u8                  _currentChoiceSelection; // Current choice selected (SINGLE mode)
+
         state    _curState;
         pokemon* _team;               // Pkmn to display
         u8       _teamLength;         // Num Pkmn in team
@@ -52,6 +74,8 @@ namespace STS {
         result   _currentMarksOrMove; // cur marked pkmn / cur selected move
         u8       _toSelect;           // num of pokemon to select
         u8       _allowMoveSelection; // allow player to select field moves of pkmn
+        u8       _allowItems;         // allow player to use items
+        u8       _allowDex;           // allow player to use the pokedex
 
         u8             _frame;
         partyScreenUI* _partyUI;
@@ -67,9 +91,14 @@ namespace STS {
         bool confirmSelection( );
 
         /*
+         * @brief Selects the specified choice window
+         */
+        void selectChoice( u8 p_choice );
+
+        /*
          * @brief Focusses the pkmn at position p_selectedIdx. Returns when pkmn leaves focus.
          */
-        void focus( u8 p_selectedIdx );
+        bool focus( u8 p_selectedIdx );
 
         /*
          * @brief Changes the selection to p_selectedIdx. Unselects old selected idx.
@@ -91,17 +120,24 @@ namespace STS {
          */
         void swap( u8 p_idx1, u8 p_idx2 );
 
+        /*
+         * @brief Computes the possible selections for the currently selected pkmn.
+         */
+        void computeSelectionChoices( );
+
       public:
         /*
          * @brief Creates a new party screen; does nothing else.
          * @param p_team: Pkmn party to display
          * @param p_teamLenth: Num Pkmn in team (max 6)
          * @param p_allowMoves: Allow to select a field move
+         * @param p_allowItems: Allow to interact with items
+         * @param p_allowMoves: Allow to show dex entry
          * @param p_toSelect: Number of Pkmn the player has to select. Any value > 0 makes field
          * moves unselectable
          */
         partyScreen( pokemon p_team[ 6 ], u8 p_teamLength, bool p_allowMoves = true,
-                     u8 p_toSelect = 0 );
+                     bool p_allowItems = true, bool p_allowDex = true, u8 p_toSelect = 0 );
 
         ~partyScreen( );
 

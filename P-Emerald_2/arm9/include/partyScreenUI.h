@@ -30,6 +30,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemon.h"
 
 namespace STS {
+#define CHOICE_FIELD_MOVE 16000
+
     class partyScreenUI {
       private:
         pokemon* _team;
@@ -72,6 +74,23 @@ namespace STS {
          * @brief Changes the selection to p_selectedIdx. Unselects old selected idx.
          */
         void select( u8 p_selectedIdx );
+
+        /*
+         * @brief redraws the sub srceen
+         */
+        void drawPartyPkmnSub( u8 p_pos, bool p_selected, bool p_redraw, bool p_bottom = true );
+        /*
+         * @brief Draws the specified choice box.
+         */
+        void drawPartyPkmnChoice( u8 p_selectedPkmn, const u16 p_choices[], u8 p_choiceCnt,
+                                  bool p_nextButton, bool p_prevButton, u8 p_selectedChoice = 255,
+                                  bool p_bottom = true );
+
+        /*
+         * @brief Returns the upper left corner of the specified choice box. Must be called after
+         * init.
+         */
+        std::pair<u16, u16> getChoiceAnchorPosition( u8 p_choiceIdx, bool p_bottom = true );
 
         /*
          * @brief Adds p_markIdx to the marked indices. Does nothing for already marked indices.

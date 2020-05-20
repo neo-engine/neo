@@ -27,7 +27,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds/system.h>
 
-#include "sound.h"
 #include "choiceBox.h"
 #include "defines.h"
 #include "fs.h"
@@ -36,11 +35,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "messageBox.h"
 #include "nav.h"
 #include "screenFade.h"
+#include "sound.h"
 #include "startScreen.h"
 #include "uio.h"
 #include "yesNoBox.h"
 
 // BEGIN TEST
+#include "moveNames.h"
 #include "partyScreen.h"
 // END TEST
 
@@ -67,31 +68,38 @@ namespace SAVE {
         //    return SAVE::FRE;
         case 3:
             return SAVE::GER;
-        // case 4:
-        //    return SAVE::ITA;
-        // case 5:
-        //    return SAVE::SPA;
-        // case 6:
-        //    return SAVE::CHS;
-        // case 7:
-        //    return SAVE::KOR;
+            // case 4:
+            //    return SAVE::ITA;
+            // case 5:
+            //    return SAVE::SPA;
+            // case 6:
+            //    return SAVE::CHS;
+            // case 7:
+            //    return SAVE::KOR;
         }
     }
 
     void drawSplash( language p_lang ) {
-       // FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "Title" );
-       // IO::clearScreen( true, false, false );
+        // FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "Title" );
+        // IO::clearScreen( true, false, false );
 
         // BEGIN TEST
 
         pokemon testTeam[ 6 ];
-        for( u8 i = 0; i < 5; i++ ) {
+        for( u8 i = 0; i < 6; i++ ) {
             testTeam[ i ]
                 = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false, i == 3 );
             testTeam[ i ].m_stats.m_acHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
         }
+        testTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+        testTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;
+        testTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+        testTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;
+        testTeam[ 1 ].m_boxdata.m_moves[ 2 ] = M_SWEET_SCENT;
+        testTeam[ 1 ].m_boxdata.m_moves[ 3 ] = M_ROCK_SMASH;
+        testTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
 
-        STS::partyScreen sts = STS::partyScreen( testTeam, 5 );
+        STS::partyScreen sts = STS::partyScreen( testTeam, 1 + rand( ) % 6 );
         sts.run( );
 
         // END TEST
@@ -179,9 +187,8 @@ namespace SAVE {
 
             IO::regularFont->printString( SAV.m_saveFile[ i ].m_playername, 8, 30 + 64 * i, true );
             IO::regularFont->printString(
-                FS::getLocation( MAP::curMap->getCurrentLocationId( ),
-                    CURRENT_LANGUAGE ).c_str( ), 248, 30 + 64 * i,
-                true, IO::font::RIGHT );
+                FS::getLocation( MAP::curMap->getCurrentLocationId( ), CURRENT_LANGUAGE ).c_str( ),
+                248, 30 + 64 * i, true, IO::font::RIGHT );
 
             char buffer[ 50 ];
             snprintf( buffer, 49, "%03d:%02d", SAV.m_saveFile[ i ].m_pt.m_hours,
@@ -202,9 +209,7 @@ namespace SAVE {
         for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) {
             IO::printChoiceBox( 4, 4 + 64 * i, 86, 26 + 64 * i, 6,
                                 ( i == p_selected ) ? RED_IDX : COLOR_IDX, i == p_pressed );
-            if( !SAV.m_saveFile[ i ].isGood( ) ) {
-                SAV.m_saveFile[ i ].m_gameType = UNUSED;
-            }
+            if( !SAV.m_saveFile[ i ].isGood( ) ) { SAV.m_saveFile[ i ].m_gameType = UNUSED; }
             switch( SAV.m_saveFile[ i ].m_gameType ) {
             case UNUSED:
                 IO::regularFont->printString(
@@ -434,7 +439,7 @@ namespace SAVE {
         if( SAV.getActiveFile( ).m_gameType )
             cur = SAV.getActiveFile( ).m_options.m_language;
         else
-            cur = translate( TWL_CONFIG ? *(u8*)0x02000406 : PersonalData->language );
+            cur = translate( TWL_CONFIG ? *(u8*) 0x02000406 : PersonalData->language );
 
         loop( ) {
             drawSplash( cur );

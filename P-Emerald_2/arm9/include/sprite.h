@@ -30,8 +30,8 @@
 #include <nds.h>
 
 #include "move.h"
-#include "type.h"
 #include "saveOptions.h"
+#include "type.h"
 
 namespace IO {
     extern const unsigned int*   TypeTiles[ 19 ][ 2 ];
@@ -65,6 +65,8 @@ namespace IO {
     void copySpritePal( const unsigned short* p_spritePal, const u8 p_palIdx, bool p_bottom );
     void copySpritePal( const unsigned short* p_spritePal, const u8 p_palIdx, const u16 p_palLen,
                         bool p_bottom );
+    void copySpritePal( const unsigned short* p_spritePal, const u8 p_palIdx, const u8 p_startIdx,
+                        const u16 p_palLen, bool p_bottom );
     void copySpriteData( const unsigned int* p_spriteData, const u16 p_tileIdx,
                          const u32 p_spriteDataLen, bool p_bottom );
 
@@ -78,17 +80,18 @@ namespace IO {
                     const u16 p_posX, const u16 p_posY, const u8 p_width, const u8 p_height,
                     const unsigned short* p_spritePal, const unsigned int* p_spriteData,
                     const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
-                    ObjPriority p_priority, bool p_bottom, ObjBlendMode p_blendMode = OBJMODE_NORMAL );
+                    ObjPriority p_priority, bool p_bottom,
+                    ObjBlendMode p_blendMode = OBJMODE_NORMAL );
 
     u16 loadPKMNSprite( const char* p_path, const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
                         u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
                         bool p_shiny = false, bool p_female = false, bool p_flipX = false,
                         bool p_topOnly = false, u8 p_forme = 0 );
 
-    u16 loadPKMNSprite( const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
-                        u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
-                        bool p_shiny = false, bool p_female = false, bool p_flipX = false,
-                        bool p_topOnly = false, u8 p_forme = 0 );
+    u16 loadPKMNSprite( const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                        u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny = false,
+                        bool p_female = false, bool p_flipX = false, bool p_topOnly = false,
+                        u8 p_forme = 0 );
 
     u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
                        u16 p_tileCnt, bool p_bottom = false );
@@ -97,16 +100,15 @@ namespace IO {
                            const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
                            bool p_bottom, bool p_flipX = false, bool p_topOnly = false );
 
-    u16 loadTrainerSprite( const char* p_name, const u16 p_posX,
-                           const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
-                           bool p_bottom, bool p_flipX = false, bool p_topOnly = false );
+    u16 loadTrainerSprite( const char* p_name, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
+                           u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_flipX = false,
+                           bool p_topOnly = false );
 
-
-    u16 loadAnimatedSprite( FILE* p_file, const s16 p_posX,
-                             const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
-                             ObjPriority p_priority = OBJPRIORITY_2, bool p_bottom = false );
-    u16 loadOWSprite( const u16 p_picnum, const s16 p_posX, const s16 p_posY,
-                       u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt );
+    u16 loadAnimatedSprite( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                            u8 p_palCnt, u16 p_tileCnt, ObjPriority p_priority = OBJPRIORITY_2,
+                            bool p_bottom = false );
+    u16 loadOWSprite( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                      u8 p_palCnt, u16 p_tileCnt );
 
     void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt );
     void setAnimatedSpriteFrame( u8 p_frame, bool p_hFlip, u8 p_oamIndex, u16 p_tileCnt );
@@ -116,8 +118,8 @@ namespace IO {
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
                   u8 p_oamIndex, u8 p_palCnt, u8 p_palPos, u16 p_tileCnt, bool p_bottom );
 
-    u16 loadItemIcon( const u16 p_itemId, const u16 p_posX, const u16 p_posY,
-                      u8 p_oamIndex, u8 p_palcnt, u16 p_tileCnt, bool p_bottom = true );
+    u16 loadItemIcon( const u16 p_itemId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
+                      u8 p_palcnt, u16 p_tileCnt, bool p_bottom = true );
 
     u16 loadTMIcon( type p_type, bool p_hm, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                     u8 p_palCnt, u16 p_tileCnt, bool p_bottom = true );

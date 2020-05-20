@@ -30,12 +30,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <initializer_list>
 
 #include "fs.h"
+#include "messageBox.h"
 #include "move.h"
+#include "pokemonNames.h"
 #include "ribbon.h"
 #include "sprite.h"
 #include "uio.h"
-#include "messageBox.h"
-#include "pokemonNames.h"
 
 #include "Egg.h"
 
@@ -198,32 +198,23 @@ unsigned int   TEMP[ 12288 ]   = {0};
 unsigned short TEMP_PAL[ 256 ] = {0};
 
 namespace IO {
-    const char* OW_PATH = "nitro:/PICS/SPRITES/OW/";
-    const char* TM_PATH = "nitro:/PICS/SPRITES/TM/";
-    const char* ITEM_PATH = "nitro:/PICS/SPRITES/ITEMS/";
-    const char* PKMN_PATH = "nitro:/PICS/SPRITES/PKMN/";
+    const char* OW_PATH        = "nitro:/PICS/SPRITES/OW/";
+    const char* TM_PATH        = "nitro:/PICS/SPRITES/TM/";
+    const char* ITEM_PATH      = "nitro:/PICS/SPRITES/ITEMS/";
+    const char* PKMN_PATH      = "nitro:/PICS/SPRITES/PKMN/";
     const char* PKMN_BACK_PATH = "nitro:/PICS/SPRITES/PKMNBACK/";
-    const char* TRAINER_PATH = "n/a";
+    const char* TRAINER_PATH   = "n/a";
 
-
-    const unsigned int* TypeTiles[ 19 ][ LANGUAGES ] = {{type_normal_enTiles, type_normal_deTiles},
-                                                        {type_fight_enTiles, type_fight_deTiles},
-                                                        {type_flying_enTiles, type_flying_deTiles},
-                                                        {type_poison_enTiles, type_poison_deTiles},
-                                                        {type_ground_enTiles, type_ground_deTiles},
-                                                        {type_rock_enTiles, type_rock_deTiles},
-                                                        {type_bug_enTiles, type_bug_deTiles},
-                                                        {type_ghost_enTiles, type_ghost_deTiles},
-                                                        {type_steel_enTiles, type_steel_deTiles},
-                                                        {type_unknownTiles, type_unknownTiles},
-                                                        {type_water_enTiles, type_water_deTiles},
-                                                        {type_fire_enTiles, type_fire_deTiles},
-                                                        {type_grass_enTiles, type_grass_deTiles},
-                                                        {type_electr_enTiles, type_electr_deTiles},
-                                                        {type_psychic_enTiles, type_psychic_deTiles},
-                                                        {type_ice_enTiles, type_ice_deTiles},
-                                                        {type_dragon_enTiles, type_dragon_deTiles},
-                                                        {type_dark_enTiles, type_dark_deTiles},
+    const unsigned int* TypeTiles[ 19 ][ LANGUAGES ]
+        = {{type_normal_enTiles, type_normal_deTiles},   {type_fight_enTiles, type_fight_deTiles},
+           {type_flying_enTiles, type_flying_deTiles},   {type_poison_enTiles, type_poison_deTiles},
+           {type_ground_enTiles, type_ground_deTiles},   {type_rock_enTiles, type_rock_deTiles},
+           {type_bug_enTiles, type_bug_deTiles},         {type_ghost_enTiles, type_ghost_deTiles},
+           {type_steel_enTiles, type_steel_deTiles},     {type_unknownTiles, type_unknownTiles},
+           {type_water_enTiles, type_water_deTiles},     {type_fire_enTiles, type_fire_deTiles},
+           {type_grass_enTiles, type_grass_deTiles},     {type_electr_enTiles, type_electr_deTiles},
+           {type_psychic_enTiles, type_psychic_deTiles}, {type_ice_enTiles, type_ice_deTiles},
+           {type_dragon_enTiles, type_dragon_deTiles},   {type_dark_enTiles, type_dark_deTiles},
            {type_fairy_enTiles, type_fairy_deTiles}};
     const unsigned short* TypePals[ 19 ][ LANGUAGES ]
         = {{type_normal_enPal, type_normal_dePal},   {type_fight_enPal, type_fight_dePal},
@@ -391,12 +382,18 @@ namespace IO {
     }
     void copySpritePal( const unsigned short* p_spritePal, const u8 p_palIdx, const u16 p_palLen,
                         bool p_bottom ) {
+        copySpritePal( p_spritePal, p_palIdx, 0, p_palLen, p_bottom );
+    }
+    void copySpritePal( const unsigned short* p_spritePal, const u8 p_palIdx, const u8 p_startIdx,
+                        const u16 p_palLen, bool p_bottom ) {
         if( !p_bottom && p_spritePal )
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal,
-                              &SPRITE_PALETTE[ p_palIdx * COLORS_PER_PALETTE ], p_palLen );
+                              &SPRITE_PALETTE[ p_palIdx * COLORS_PER_PALETTE + p_startIdx ],
+                              p_palLen );
         else if( p_spritePal )
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal,
-                              &SPRITE_PALETTE_SUB[ p_palIdx * COLORS_PER_PALETTE ], p_palLen );
+                              &SPRITE_PALETTE_SUB[ p_palIdx * COLORS_PER_PALETTE + p_startIdx ],
+                              p_palLen );
     }
     void copySpriteData( const unsigned int* p_spriteData, const u16 p_tileIdx,
                          const u32 p_spriteDataLen, bool p_bottom ) {
@@ -540,75 +537,125 @@ namespace IO {
         return p_tileIdx + 2 * ( p_spriteDataLen / BYTES_PER_16_COLOR_TILE );
     }
 
+    char BUFFER[ 100 ];
+
     u16 loadPKMNSprite( const char* p_path, const u16 p_pkmnId, const s16 p_posX, const s16 p_posY,
                         u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny,
                         bool p_female, bool p_flipx, bool p_topOnly, u8 p_forme ) {
         switch( p_pkmnId ) {
-            case PKMN_UNOWN: case PKMN_ABSOL: case PKMN_AMOONGUSS: case PKMN_BARBARACLE:
-            case PKMN_BLACEPHALON: case PKMN_BUDEW: case PKMN_CASTFORM: case PKMN_CLAUNCHER:
-            case PKMN_CLAWITZER: case PKMN_CLEFABLE: case PKMN_CLEFAIRY: case PKMN_CLEFFA:
-            case PKMN_COMFEY: case PKMN_CROCONAW: case PKMN_DARTRIX: case PKMN_DHELMISE:
-            case PKMN_DRILBUR: case PKMN_DUGTRIO: case PKMN_EMBOAR: case PKMN_EXCADRILL:
-            case PKMN_FURFROU: case PKMN_GARBODOR: case PKMN_GOLETT: case PKMN_GOLURK:
-            case PKMN_GRENINJA: case PKMN_IGGLYBUFF: case PKMN_JIGGLYPUFF: case PKMN_KELDEO:
-            case PKMN_KINGLER: case PKMN_KLANG: case PKMN_KLEFKI: case PKMN_KLINK:
-            case PKMN_KLINKLANG: case PKMN_KYUREM: case PKMN_LILLIGANT: case PKMN_LITWICK:
-            case PKMN_MAGMORTAR: case PKMN_MARSHADOW: case PKMN_MELOETTA: case PKMN_MINIOR:
-            case PKMN_MUK: case PKMN_NECROZMA: case PKMN_PANSEAR: case PKMN_POLITOED:
-            case PKMN_POLIWHIRL: case PKMN_POLIWRATH: case PKMN_REGIROCK: case PKMN_ROSELIA:
-            case PKMN_ROSERADE: case PKMN_ROTOM: case PKMN_SAWK: case PKMN_SEVIPER:
-            case PKMN_SHAYMIN: case PKMN_SIMISEAR: case PKMN_SNEASEL: case PKMN_SOLOSIS:
-            case PKMN_STAKATAKA: case PKMN_STEENEE: case PKMN_SYLVEON: case PKMN_TEDDIURSA:
-            case PKMN_TOGEKISS: case PKMN_TORTERRA: case PKMN_TSAREENA: case PKMN_VANILLUXE:
-            case PKMN_WIGGLYTUFF: case PKMN_ZANGOOSE: case PKMN_ZYGARDE:
-                p_flipx = false;
-            default:
-                break;
+        case PKMN_UNOWN:
+        case PKMN_ABSOL:
+        case PKMN_AMOONGUSS:
+        case PKMN_BARBARACLE:
+        case PKMN_BLACEPHALON:
+        case PKMN_BUDEW:
+        case PKMN_CASTFORM:
+        case PKMN_CLAUNCHER:
+        case PKMN_CLAWITZER:
+        case PKMN_CLEFABLE:
+        case PKMN_CLEFAIRY:
+        case PKMN_CLEFFA:
+        case PKMN_COMFEY:
+        case PKMN_CROCONAW:
+        case PKMN_DARTRIX:
+        case PKMN_DHELMISE:
+        case PKMN_DRILBUR:
+        case PKMN_DUGTRIO:
+        case PKMN_EMBOAR:
+        case PKMN_EXCADRILL:
+        case PKMN_FURFROU:
+        case PKMN_GARBODOR:
+        case PKMN_GOLETT:
+        case PKMN_GOLURK:
+        case PKMN_GRENINJA:
+        case PKMN_IGGLYBUFF:
+        case PKMN_JIGGLYPUFF:
+        case PKMN_KELDEO:
+        case PKMN_KINGLER:
+        case PKMN_KLANG:
+        case PKMN_KLEFKI:
+        case PKMN_KLINK:
+        case PKMN_KLINKLANG:
+        case PKMN_KYUREM:
+        case PKMN_LILLIGANT:
+        case PKMN_LITWICK:
+        case PKMN_MAGMORTAR:
+        case PKMN_MARSHADOW:
+        case PKMN_MELOETTA:
+        case PKMN_MINIOR:
+        case PKMN_MUK:
+        case PKMN_NECROZMA:
+        case PKMN_PANSEAR:
+        case PKMN_POLITOED:
+        case PKMN_POLIWHIRL:
+        case PKMN_POLIWRATH:
+        case PKMN_REGIROCK:
+        case PKMN_ROSELIA:
+        case PKMN_ROSERADE:
+        case PKMN_ROTOM:
+        case PKMN_SAWK:
+        case PKMN_SEVIPER:
+        case PKMN_SHAYMIN:
+        case PKMN_SIMISEAR:
+        case PKMN_SNEASEL:
+        case PKMN_SOLOSIS:
+        case PKMN_STAKATAKA:
+        case PKMN_STEENEE:
+        case PKMN_SYLVEON:
+        case PKMN_TEDDIURSA:
+        case PKMN_TOGEKISS:
+        case PKMN_TORTERRA:
+        case PKMN_TSAREENA:
+        case PKMN_VANILLUXE:
+        case PKMN_WIGGLYTUFF:
+        case PKMN_ZANGOOSE:
+        case PKMN_ZYGARDE:
+            p_flipx = false;
+        default:
+            break;
         }
 
-        char* buffer = new char[ 100 ];
         if( !p_forme ) {
             if( !p_female )
-                snprintf( buffer, 99, "%02d/%d/%d", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                snprintf( BUFFER, 99, "%02d/%d/%d", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
                           p_pkmnId );
             else
-                snprintf( buffer, 99, "%02d/%d/%df", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                snprintf( BUFFER, 99, "%02d/%d/%df", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
                           p_pkmnId );
         } else {
             if( !p_female )
-                snprintf( buffer, 99, "%02d/%d/%d-%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                snprintf( BUFFER, 99, "%02d/%d/%d-%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
                           p_pkmnId, p_forme );
             else
-                snprintf( buffer, 99, "%02d/%d/%d-%hhuf", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                snprintf( BUFFER, 99, "%02d/%d/%d-%hhuf", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
                           p_pkmnId, p_forme );
         }
 
         memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
         memset( TEMP, 0, sizeof( TEMP ) );
 
-        if( !FS::readData<unsigned short, unsigned int>( p_path, buffer, 16, TEMP_PAL, 96 * 96 / 8,
+        if( !FS::readData<unsigned short, unsigned int>( p_path, BUFFER, 16, TEMP_PAL, 96 * 96 / 8,
                                                          TEMP ) ) {
-            delete[] buffer;
             return false;
         }
 
         if( p_shiny ) {
             if( !p_forme ) {
                 if( !p_female )
-                    snprintf( buffer, 99, "%02d/%d/%ds", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                    snprintf( BUFFER, 99, "%02d/%d/%ds", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
                               p_pkmnId );
                 else
-                    snprintf( buffer, 99, "%02d/%d/%dsf", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                    snprintf( BUFFER, 99, "%02d/%d/%dsf", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
                               p_pkmnId );
             } else {
                 if( !p_female )
-                    snprintf( buffer, 99, "%02d/%d/%d-%hhus", p_pkmnId / FS::ITEMS_PER_DIR,
+                    snprintf( BUFFER, 99, "%02d/%d/%d-%hhus", p_pkmnId / FS::ITEMS_PER_DIR,
                               p_pkmnId, p_pkmnId, p_forme );
                 else
-                    snprintf( buffer, 99, "%02d/%d/%d-%hhusf", p_pkmnId / FS::ITEMS_PER_DIR,
+                    snprintf( BUFFER, 99, "%02d/%d/%d-%hhusf", p_pkmnId / FS::ITEMS_PER_DIR,
                               p_pkmnId, p_pkmnId, p_forme );
             }
-            FS::readData<unsigned short, unsigned int>( p_path, buffer, 16, TEMP_PAL, 96 * 96 / 8,
+            FS::readData<unsigned short, unsigned int>( p_path, BUFFER, 16, TEMP_PAL, 96 * 96 / 8,
                                                         TEMP );
         }
 
@@ -626,17 +673,14 @@ namespace IO {
                         p_bottom );
         }
         updateOAM( p_bottom );
-        delete[] buffer;
         return p_tileCnt + 144;
     }
-    u16 loadPKMNSprite( const u16 p_pkmnId, const s16 p_posX, const s16 p_posY,
-                        u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny,
-                        bool p_female, bool p_flipx, bool p_topOnly, u8 p_forme ) {
-        return loadPKMNSprite( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex,
-                p_palCnt, p_tileCnt, p_bottom, p_shiny, p_female, p_flipx,
-                p_topOnly, p_forme );
+    u16 loadPKMNSprite( const u16 p_pkmnId, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                        u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female,
+                        bool p_flipx, bool p_topOnly, u8 p_forme ) {
+        return loadPKMNSprite( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
+                               p_bottom, p_shiny, p_female, p_flipx, p_topOnly, p_forme );
     }
-
 
     u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
                        u16 p_tileCnt, bool p_bottom ) {
@@ -647,15 +691,13 @@ namespace IO {
     u16 loadTrainerSprite( const char* p_path, const char* p_name, const s16 p_posX,
                            const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
                            bool p_bottom, bool p_flipx, bool p_topOnly ) {
-        char* buffer = new char[ 100 ];
-        snprintf( buffer, 99, "Sprite_%s", p_name );
+        snprintf( BUFFER, 99, "Sprite_%s", p_name );
 
         memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
         memset( TEMP, 0, sizeof( TEMP ) );
 
-        if( !FS::readData<unsigned short, unsigned int>( p_path, buffer, 16, TEMP_PAL, 96 * 96 / 8,
+        if( !FS::readData<unsigned short, unsigned int>( p_path, BUFFER, 16, TEMP_PAL, 96 * 96 / 8,
                                                          TEMP ) ) {
-            delete[] buffer;
             return false;
         }
 
@@ -673,21 +715,17 @@ namespace IO {
                         p_bottom );
         }
         updateOAM( p_bottom );
-        delete[] buffer;
         return p_tileCnt + 144;
     }
-    u16 loadTrainerSprite( const char* p_name, const s16 p_posX,
-                           const s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
-                           bool p_bottom, bool p_flipx, bool p_topOnly ) {
-        return loadTrainerSprite( TRAINER_PATH, p_name, p_posX,
-                                  p_posY, p_oamIndex, p_palCnt, p_tileCnt,
-                                  p_bottom, p_flipx, p_topOnly );
+    u16 loadTrainerSprite( const char* p_name, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                           u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_flipx,
+                           bool p_topOnly ) {
+        return loadTrainerSprite( TRAINER_PATH, p_name, p_posX, p_posY, p_oamIndex, p_palCnt,
+                                  p_tileCnt, p_bottom, p_flipx, p_topOnly );
     }
 
-
-    u16 loadAnimatedSprite( FILE* p_file, const s16 p_posX, const s16 p_posY,
-                            u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, ObjPriority p_priority,
-                            bool p_bottom ) {
+    u16 loadAnimatedSprite( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                            u8 p_palCnt, u16 p_tileCnt, ObjPriority p_priority, bool p_bottom ) {
         FS::read( p_file, TEMP_PAL, sizeof( unsigned short ), 16 );
         u8 frameCount, width, height;
         FS::read( p_file, &frameCount, sizeof( u8 ), 1 );
@@ -697,14 +735,15 @@ namespace IO {
         FS::close( p_file );
 
         return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, width, height, TEMP_PAL,
-                           TEMP, width * height * frameCount / 2, false, false, false,
-                           p_priority, p_bottom );
+                           TEMP, width * height * frameCount / 2, false, false, false, p_priority,
+                           p_bottom );
     }
 
-    u16 loadOWSprite( const u16 p_picnum, const s16 p_posX, const s16 p_posY,
-                      u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt ) {
+    u16 loadOWSprite( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                      u8 p_palCnt, u16 p_tileCnt ) {
         FILE* f = FS::open( OW_PATH, p_picnum, ".rsd" );
-        return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, OBJPRIORITY_2, false );
+        return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
+                                   OBJPRIORITY_2, false );
     }
 
     void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt ) {
@@ -714,8 +753,8 @@ namespace IO {
         u8 memPos = frame / 20 * 9 + frame % 20;
 
         setAnimatedSpriteFrame( memPos,
-                          ( frame != p_frame ) && ( p_frame % 20 < 12 || p_frame % 20 == 15 ),
-                          p_oamIndex, p_tileCnt );
+                                ( frame != p_frame ) && ( p_frame % 20 < 12 || p_frame % 20 == 15 ),
+                                p_oamIndex, p_tileCnt );
     }
     void setAnimatedSpriteFrame( u8 p_frame, bool p_hFlip, u8 p_oamIndex, u16 p_tileCnt ) {
         u8 width  = spriteInfoTop[ p_oamIndex ].m_width,
@@ -755,81 +794,72 @@ namespace IO {
     u16 loadPKMNIcon( const u16 p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                       u8 p_palCnt, u16 p_tileCnt, bool p_bottom, u8 p_forme, bool p_shiny,
                       bool p_female ) {
-        char* buffer = new char[ 100 ];
         FILE* f;
 
         if( p_forme ) {
-            snprintf( buffer, 99, "/icon%03hu%s%s_%hhu.rsd",
-                    p_pkmnId, p_female ? "f" : "", p_shiny ? "s" : "", p_forme );
+            snprintf( BUFFER, 99, "/icon%03hu%s%s_%hhu.rsd", p_pkmnId, p_female ? "f" : "",
+                      p_shiny ? "s" : "", p_forme );
 
-            f = FS::openSplit( PKMN_PATH, p_pkmnId, buffer );
+            f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
             if( f ) {
-                delete[] buffer;
                 return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
                                            OBJPRIORITY_2, p_bottom );
             }
 
             if( p_shiny ) {
-                snprintf( buffer, 99, "/icon%03hu%ss_%hhu.rsd",
-                        p_pkmnId, p_female ? "f" : "", p_forme );
-                f = FS::openSplit( PKMN_PATH, p_pkmnId, buffer );
+                snprintf( BUFFER, 99, "/icon%03hu%ss_%hhu.rsd", p_pkmnId, p_female ? "f" : "",
+                          p_forme );
+                f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
                 if( f ) {
-                    delete[] buffer;
                     return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
-                            OBJPRIORITY_2, p_bottom );
+                                               OBJPRIORITY_2, p_bottom );
                 }
             }
 
             if( p_female ) {
-                snprintf( buffer, 99, "/icon%03hus_%hhu.rsd", p_pkmnId, p_forme );
-                f = FS::openSplit( PKMN_PATH, p_pkmnId, buffer );
+                snprintf( BUFFER, 99, "/icon%03hus_%hhu.rsd", p_pkmnId, p_forme );
+                f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
                 if( f ) {
-                    delete[] buffer;
                     return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
-                            OBJPRIORITY_2, p_bottom );
+                                               OBJPRIORITY_2, p_bottom );
                 }
             }
         }
 
         if( p_shiny ) {
-            snprintf( buffer, 99, "/icon%03hu%ss.rsd", p_pkmnId, p_female ? "f" : "" );
-            f = FS::openSplit( PKMN_PATH, p_pkmnId, buffer );
+            snprintf( BUFFER, 99, "/icon%03hu%ss.rsd", p_pkmnId, p_female ? "f" : "" );
+            f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
             if( f ) {
-                delete[] buffer;
                 return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
-                        OBJPRIORITY_2, p_bottom );
+                                           OBJPRIORITY_2, p_bottom );
             }
 
             if( p_female ) {
-                snprintf( buffer, 99, "/icon%03hus.rsd", p_pkmnId );
-                f = FS::openSplit( PKMN_PATH, p_pkmnId, buffer );
+                snprintf( BUFFER, 99, "/icon%03hus.rsd", p_pkmnId );
+                f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
                 if( f ) {
-                    delete[] buffer;
                     return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
-                            OBJPRIORITY_2, p_bottom );
+                                               OBJPRIORITY_2, p_bottom );
                 }
             }
         }
 
-        snprintf( buffer, 99, "/icon%03hu%s.rsd", p_pkmnId, p_female ? "f" : "" );
-        f = FS::openSplit( PKMN_PATH, p_pkmnId, buffer );
+        snprintf( BUFFER, 99, "/icon%03hu%s.rsd", p_pkmnId, p_female ? "f" : "" );
+        f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
         if( f ) {
-            delete[] buffer;
             return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
-                    OBJPRIORITY_2, p_bottom );
+                                       OBJPRIORITY_2, p_bottom );
         }
 
         if( p_female ) {
-            snprintf( buffer, 99, "/icon%03hu.rsd", p_pkmnId );
-            f = FS::openSplit( PKMN_PATH, p_pkmnId, buffer );
+            snprintf( BUFFER, 99, "/icon%03hu.rsd", p_pkmnId );
+            f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
             if( f ) {
-                delete[] buffer;
                 return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
-                        OBJPRIORITY_2, p_bottom );
+                                           OBJPRIORITY_2, p_bottom );
             }
         }
 
-        delete[] buffer;
         return loadPKMNIcon( 0, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
 
@@ -837,32 +867,30 @@ namespace IO {
                       u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom, u8 p_forme ) {
         // TODO
 
-        char* buffer = new char[ 100 ];
         if( !p_forme )
-            snprintf( buffer, 99, "%02hu/%hu/Icon_%hu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+            snprintf( BUFFER, 99, "%02hu/%hu/Icon_%hu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
                       p_pkmnId );
         else
-            snprintf( buffer, 99, "%02hu/%hu/Icon_%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR,
-                      p_pkmnId, p_pkmnId, p_forme );
-        auto res = loadIcon( PKMN_PATH, buffer, p_posX, p_posY, p_oamIndex,
-                             p_palCnt, p_palpos, p_tileCnt, p_bottom );
-        delete[] buffer;
+            snprintf( BUFFER, 99, "%02hu/%hu/Icon_%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                      p_pkmnId, p_forme );
+        auto res = loadIcon( PKMN_PATH, BUFFER, p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos,
+                             p_tileCnt, p_bottom );
         return res;
     }
 
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
                      bool p_bottom ) {
-        return loadIcon( PKMN_PATH, "00/0/iconegg", p_posX, p_posY, p_oamIndex,
-                         p_palCnt, p_tileCnt, p_bottom );
+        return loadIcon( PKMN_PATH, "00/0/iconegg", p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
+                         p_bottom );
     }
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos,
                      u16 p_tileCnt, bool p_bottom ) {
-        return loadIcon( PKMN_PATH, "00/0/iconegg", p_posX, p_posY, p_oamIndex,
-                         p_palCnt, p_palpos, p_tileCnt, p_bottom );
+        return loadIcon( PKMN_PATH, "00/0/iconegg", p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos,
+                         p_tileCnt, p_bottom );
     }
 
-    u16 loadItemIcon( u16 p_itemId, const u16 p_posX, const u16 p_posY,
-                      u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadItemIcon( u16 p_itemId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
+                      u16 p_tileCnt, bool p_bottom ) {
         FILE* f = FS::openSplit( ITEM_PATH, p_itemId, ".raw" );
         if( !f ) {
             return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal,
@@ -873,9 +901,9 @@ namespace IO {
         FS::read( f, TEMP, sizeof( unsigned int ), 128 );
         FS::read( f, TEMP_PAL, sizeof( unsigned short ), 16 );
 
-        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32,
-                           TEMP_PAL, TEMP, 512, false, false, false,
-                           p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
+        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP,
+                           512, false, false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0,
+                           p_bottom );
     }
 
     u16 loadTMIcon( type p_type, bool p_hm, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
@@ -887,8 +915,8 @@ namespace IO {
                                            "Feuer", "Pflanze", "Elektro", "Psycho", "Eis", "Drache",
                                            "Unlicht", "Fee"}[ p_type ] );
 
-        return loadIcon( TM_PATH, itemname.c_str( ), p_posX, p_posY,
-                         p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+        return loadIcon( TM_PATH, itemname.c_str( ), p_posX, p_posY, p_oamIndex, p_palCnt,
+                         p_tileCnt, p_bottom );
     }
 
     u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
@@ -909,8 +937,8 @@ namespace IO {
     u16 loadDamageCategoryIcon( MOVE::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,
                                 u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16,
-                           HitTypePals[ p_type - 1 ], HitTypeTiles[ p_type - 1 ], 256,
-                           false, false, false, OBJPRIORITY_0, p_bottom );
+                           HitTypePals[ p_type - 1 ], HitTypeTiles[ p_type - 1 ], 256, false, false,
+                           false, OBJPRIORITY_0, p_bottom );
     }
 
 } // namespace IO

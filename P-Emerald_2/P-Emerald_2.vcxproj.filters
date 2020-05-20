@@ -419,6 +419,9 @@
     <ClCompile Include="arm9\source\soundData.cpp">
       <Filter>Source Files\arm9\sound</Filter>
     </ClCompile>
+    <ClCompile Include="arm9\source\auxspi.cpp">
+      <Filter>Source Files\arm9\fs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile">

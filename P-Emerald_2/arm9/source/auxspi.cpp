@@ -90,7 +90,11 @@ namespace FS::CARD {
         while( p_cnt > 0 ) {
             // Get data
             u8 data = 0;
-            if( p_cnt > 1 ) { data = transfer( 0x00 ); } else { data = write( 0x00, 0x00 ); }
+            if( p_cnt > 1 ) {
+                data = transfer( 0x00 );
+            } else {
+                data = write( 0x00, 0x00 );
+            }
 
             *p_out++ = data;
             p_cnt--;
@@ -105,8 +109,8 @@ namespace FS::CARD {
     }
 
     const u32 BLOCK_LEN = 256;
-    u8 WRITE_BUFFER[ BLOCK_LEN + 4 ];
-    bool writeData( u32 p_address, u8 *p_data, u32 p_cnt ) {
+    u8        WRITE_BUFFER[ BLOCK_LEN + 4 ];
+    bool      writeData( u32 p_address, u8* p_data, u32 p_cnt ) {
         u32 addr_end = p_address + p_cnt;
 
         bool error = false;
@@ -127,14 +131,21 @@ namespace FS::CARD {
             write( p_address & 0xFF );
 
             u32 dtw = 0;
-            for( u32 i = 0; p_address < addr_end && i < BLOCK_LEN;
-                    ++i, ++p_address, ++dtw ) {
+            for( u32 i = 0; p_address < addr_end && i < BLOCK_LEN; ++i, ++p_address, ++dtw ) {
                 if( p_address == addr_end - 1 || i == BLOCK_LEN - 1 ) {
                     // Close before last byte
-                    if( p_data ) { write( 0x00, *p_data++ ); } else { write( 0x00, 0 ); }
+                    if( p_data ) {
+                        write( 0x00, *p_data++ );
+                    } else {
+                        write( 0x00, 0 );
+                    }
                     continue;
                 }
-                if( p_data ) { write( *p_data++ ); } else { write( 0 ); }
+                if( p_data ) {
+                    write( *p_data++ );
+                } else {
+                    write( 0 );
+                }
             }
 
             // Wait for write to finish
@@ -153,7 +164,11 @@ namespace FS::CARD {
             for( u32 i = 0; i < dtw; ++i ) {
                 // Get data
                 u8 data = 0;
-                if( i < dtw - 1 ) { data = transfer( 0x00 ); } else { data = write( 0x00, 0x00 ); }
+                if( i < dtw - 1 ) {
+                    data = transfer( 0x00 );
+                } else {
+                    data = write( 0x00, 0x00 );
+                }
 
                 // Check that it is indeed correct
                 if( !p_data ) {
@@ -173,21 +188,21 @@ namespace FS::CARD {
         return !error;
     }
 
-    bool writeData( u8* p_data, u32 p_cnt, std::function<void(u16,u16)> p_progress ) {
+    bool writeData( u8* p_data, u32 p_cnt, std::function<void( u16, u16 )> p_progress ) {
         u16 numBlocks = BACKUP_SIZE / BLOCK_LEN;
 
         for( u16 b = 0; b < numBlocks; ++b ) {
             std::memset( WRITE_BUFFER, 0xFF, sizeof( WRITE_BUFFER ) );
             if( b * BLOCK_LEN < p_cnt ) {
                 std::memcpy( WRITE_BUFFER, p_data + ( b * BLOCK_LEN ),
-                        std::min( BLOCK_LEN, p_cnt - b * BLOCK_LEN ) );
+                             std::min( BLOCK_LEN, p_cnt - b * BLOCK_LEN ) );
+            } else {
+                break;
             }
-            if( !writeData( b * BLOCK_LEN, WRITE_BUFFER, BLOCK_LEN ) ) {
-                return false;
-            }
+            if( !writeData( b * BLOCK_LEN, WRITE_BUFFER, BLOCK_LEN ) ) { return false; }
             p_progress( b + 1, numBlocks );
         }
 
         return true;
     }
-}
+} // namespace FS::CARD

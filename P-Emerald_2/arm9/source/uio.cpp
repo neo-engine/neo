@@ -129,7 +129,7 @@ namespace IO {
     }
 
     void animateBG( u8 p_frame, int p_bg ) {
-        if( p_frame == 255 ) { bgScrollf( p_bg, -( 255 << 6 ), -( 255 << 6 ) ); }
+        if( p_frame == 255 ) { bgScrollf( p_bg, -( 256 << 6 ), -( 256 << 6 ) ); }
         bgScrollf( p_bg, 1 << 6, 1 << 6 );
     }
 
