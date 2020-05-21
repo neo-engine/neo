@@ -37,18 +37,23 @@ namespace STS {
     class partyScreen {
       public:
         union result {
-            u8  m_selectedPkmn;
+            u32 m_selectedPkmn = 0;
             u16 m_selectedMove;
+
+            constexpr u8 getMark( u8 p_pos ) {
+                return ( m_selectedPkmn >> ( 4 * p_pos ) ) & 0xF;
+            }
+            inline void setMark( u8 p_pos, u8 p_mark ) {
+                p_mark &= 0xf;
+                m_selectedPkmn &= ~( 0xf << ( 4 * p_pos ) );
+                m_selectedPkmn |= ~( p_mark << ( 4 * p_pos ) );
+            }
         };
 
       private:
-        enum state {
-            GENERAL, // no pkmn has focus
-            SINGLE   // Single Pkmn has focus
-        };
-
         enum choice {
             SELECT = 0,
+            UNSELECT,
             STATUS,
             GIVE_ITEM,
             TAKE_ITEM,
@@ -59,23 +64,47 @@ namespace STS {
             FIELD_MOVE_4,
             SWAP,
             DEX_ENTRY,
-            CANCEL
+            CANCEL,
+#ifdef DESQUID
+            _DESQUID,
+#endif
         };
+
+#ifdef DESQUID
+        enum desquidChoice {
+            DESQUID_SPECIES = 50,
+            DESQUID_STATUS,
+            DESQUID_ABILITY,
+            DESQUID_NATURE,
+            DESQUID_ITEM,
+            DESQUID_MOVES,
+            DESQUID_LEVEL,
+            DESQUID_SHINY,
+            DESQUID_DUPLICATE,
+            DESQUID_DELETE,
+            DESQUID_EGG,
+
+            DESQUID_CANCEL,
+        };
+
+        const u16 getTextForDesquidChoice( const desquidChoice p_choice );
+#endif
 
         const u16 getTextForChoice( const choice p_choice );
 
         std::vector<choice> _currentChoices; // Possible choices for the currently selected pkmn
         u8                  _currentChoiceSelection; // Current choice selected (SINGLE mode)
 
-        state    _curState;
-        pokemon* _team;               // Pkmn to display
-        u8       _teamLength;         // Num Pkmn in team
-        u8       _currentSelection;   // cur selected pkmn (always exactly one)
-        result   _currentMarksOrMove; // cur marked pkmn / cur selected move
-        u8       _toSelect;           // num of pokemon to select
-        u8       _allowMoveSelection; // allow player to select field moves of pkmn
-        u8       _allowItems;         // allow player to use items
-        u8       _allowDex;           // allow player to use the pokedex
+        u8       _swapSelection = 255; // Idx of pkmn to be swapped
+        u8       _selectedCnt   = 0;   // Num pkmn currently selected
+        pokemon* _team;                // Pkmn to display
+        u8       _teamLength;          // Num Pkmn in team
+        u8       _currentSelection;    // cur selected pkmn (always exactly one)
+        result   _currentMarksOrMove;  // cur marked pkmn / cur selected move
+        u8       _toSelect;            // num of pokemon to select
+        bool     _allowMoveSelection;  // allow player to select field moves of pkmn
+        bool     _allowItems;          // allow player to use items
+        bool     _allowDex;            // allow player to use the pokedex
 
         u8             _frame;
         partyScreenUI* _partyUI;
@@ -93,12 +122,23 @@ namespace STS {
         /*
          * @brief Selects the specified choice window
          */
-        void selectChoice( u8 p_choice );
+        void selectChoice( u8 p_choice, u8 p_numChoices = 255 );
 
         /*
          * @brief Focusses the pkmn at position p_selectedIdx. Returns when pkmn leaves focus.
          */
         bool focus( u8 p_selectedIdx );
+
+#ifdef DESQUID
+        std::vector<desquidChoice> computeDesquidChoices( );
+
+        bool executeDesquidChoice( desquidChoice p_choice );
+
+        /*
+         * @brief Opens the desquid menu for the speciefied pkmn. Returns when menu is closed.
+         */
+        bool desquid( u8 p_selectedIdx );
+#endif
 
         /*
          * @brief Changes the selection to p_selectedIdx. Unselects old selected idx.
@@ -124,6 +164,16 @@ namespace STS {
          * @brief Computes the possible selections for the currently selected pkmn.
          */
         void computeSelectionChoices( );
+
+        /*
+         * @brief Executes the given choice.
+         */
+        bool executeChoice( choice p_choice );
+
+        /*
+         * @brief Waits till the player touches the touch screen or presses the A or B button.
+         */
+        void waitForInteract( );
 
       public:
         /*

@@ -39,8 +39,9 @@ namespace BAG {
     class bagViewer {
       public:
         enum context {
-            BATTLE,      // Allow only items usable in-battle
-            GIVE_TO_PKMN // Allow only items, medicine and berries
+            BATTLE,       // Allow only items usable in-battle
+            GIVE_TO_PKMN, // Allow only items, medicine and berries
+            // TODO: USE_ON_PKMN,  // Allow only evo items, medicine, berries, and forme change
         };
 
       private:

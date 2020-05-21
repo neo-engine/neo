@@ -64,6 +64,28 @@ const char* SAVE::EPISODE_NAMES[ LANGUAGES ][ MAX_SPECIAL_EPISODES ]
 
 const char* LANGUAGE_NAMES[ LANGUAGES ] = {"English", "Deutsch"};
 
+#ifdef DESQUID
+const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
+    {"Desquid"},
+    {"Set Species"},
+    {"Set Status"},
+    {"Set Ability"},
+    {"Nature/IV/EV"},
+
+    {"Set Item"},
+    {"Set Moves"},
+    {"Set Level"},
+    {"Set Shiny"},
+    {"Duplicate"},
+
+    // 10
+
+    {"Delete"},
+    {"Egg Status"},
+};
+
+#endif
+
 const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"No data.", "Keine Daten."},
     {"Faraway Place", "Entfernter Ort"},
@@ -580,5 +602,6 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"Cancel", "Zur\xfc"
                "ck"},
-
+    {"Deselect", "Abw\xe4hlen"},
+    {"Desquid", "Desquid"},
 };

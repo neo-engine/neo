@@ -195,19 +195,7 @@ namespace STS {
                     && IO::waitForInput( tg[ tg.size( ) - 2 ] ) ) {
                     if( SAVE::SAV.getActiveFile( )
                             .m_pkmnTeam[ _pkmnIdx ].getItem( ) ) { // take item
-                        char buffer[ 50 ];
-                        u16 acI = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].takeItem( );
-                        consoleSelect( &IO::Bottom );
-                        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-                        consoleClear( );
-
-                        sprintf(buffer, GET_STRING( 101 ),
-                                ITEM::getItemName( acI, CURRENT_LANGUAGE ).c_str( ),
-                            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ _pkmnIdx ].m_boxdata.m_name );
-                        NAV::draw( );
-                        IO::messageBox a( buffer );
-                        SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType(
-                                    ITEM::getItemData( acI).m_itemType ), acI, 1 );
+                        
                     } else { // give item
                         BAG::bagViewer bv;
                         UPDATE_TIME = false;

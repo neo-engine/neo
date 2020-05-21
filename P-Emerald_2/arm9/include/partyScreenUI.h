@@ -30,13 +30,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemon.h"
 
 namespace STS {
-#define CHOICE_FIELD_MOVE 16000
+    const u16 CHOICE_FIELD_MOVE = ( 1 << 14 );
+    const u8  SWAP_COLOR        = 255;
+
+    extern char BUFFER[ 50 ];
 
     class partyScreenUI {
       private:
         pokemon* _team;
         u8       _teamLength;
         u8       _selectedIdx;
+        bool     _swapping = false;
 
         constexpr u16 partyTopScreenPkmnIconPosY( u8 p_pos ) {
             return ( p_pos & 1 ) * 8 + 2 + 61 * ( p_pos >> 1 );
@@ -94,18 +98,33 @@ namespace STS {
 
         /*
          * @brief Adds p_markIdx to the marked indices. Does nothing for already marked indices.
-         * @param p_color: color to use for the mark (out of 4)
+         * @param p_color: color to use for the mark ([1, 6] + swap color)
          */
-        void mark( u8 p_markIdx, u8 p_color );
+        void mark( u8 p_markIdx, u8 p_color, bool p_bottom = false );
 
         /*
          * @brief Removes p_markIdx from the marked indices. Does nothing for unmarked indices.
          */
-        void unmark( u8 p_markIdx );
+        void unmark( u8 p_markIdx, bool p_bottom = false );
+
+        /*
+         * @brief Removes a swap mark from p_markIdx. Does nothing for unmarked indices.
+         */
+        void unswap( u8 p_markIdx, bool p_bottom = false );
 
         /*
          * @brief Swaps two Pkmn.
          */
-        void swap( u8 p_idx1, u8 p_idx2 );
+        void swap( u8 p_idx1, u8 p_idx2, bool p_bottom = false );
+
+        /*
+         * @brief Prints the given message
+         */
+        void printMessage( const char* p_message, u16 p_itemIcon = 0 );
+
+        /*
+         * @brief Hides the message box.
+         */
+        void hideMessageBox( );
     };
 } // namespace STS

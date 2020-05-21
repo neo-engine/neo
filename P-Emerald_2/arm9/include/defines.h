@@ -32,9 +32,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 #include <nds/ndstypes.h>
 
-#define VERSION ("0.8-" __DATE__ " " __TIME__)
+#define VERSION ( "0.8-" __DATE__ " " __TIME__ )
 #define VERSION_NAME "Magnetizing Magnemite neo"
 #define GAME_TITLE "POKEMON NEO"
+
+#ifdef DESQUID
+#define DESQUID_STRING ( 1 << 13 )
+#endif
 
 // Assumes that the Backup is a 512k flash memory
 #define BACKUP_SIZE ( 512 * 1024 )
@@ -57,7 +61,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 enum GameMod : u8 { DEVELOPER, ALPHA, BETA, RELEASE, EMULATOR };
 extern GameMod gMod;
 
-u8          getCurrentDaytime( );
+u8 getCurrentDaytime( );
 
 // num frames between button input
 #define COOLDOWN_COUNT 8
@@ -88,7 +92,16 @@ extern unsigned short TEMP_PAL[ 256 ];
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
 #define CURRENT_LANGUAGE SAVE::SAV.getActiveFile( ).m_options.m_language
-#define GET_STRING( i ) STRINGS[ i ][ CURRENT_LANGUAGE ]
+
+#ifdef DESQUID
+#define MAX_DESQUID_STRINGS 50
+extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
+#define GET_STRING( p_stringId )                                                                 \
+    ( ( ( p_stringId ) >= DESQUID_STRING ) ? DESQUID_STRINGS[ p_stringId - DESQUID_STRING ][ 0 ] \
+                                           : STRINGS[ p_stringId ][ CURRENT_LANGUAGE ] )
+#else
+#define GET_STRING( p_stringId ) STRINGS[ p_stringId ][ CURRENT_LANGUAGE ]
+#endif
 
 #define NO_DATA GET_STRING( 0 )
 #define FARAWAY_PLACE GET_STRING( 1 )

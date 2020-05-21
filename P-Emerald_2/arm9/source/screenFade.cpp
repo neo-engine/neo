@@ -36,10 +36,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace IO {
     void fadeScreen( fadeType p_type, bool p_bottom, bool p_both ) {
-        auto& reg = ( p_bottom ? REG_BLDY_SUB : REG_BLDY );
+        auto& reg  = ( p_bottom ? REG_BLDY_SUB : REG_BLDY );
         auto& reg2 = ( p_both ? ( !p_bottom ? REG_BLDY_SUB : REG_BLDY ) : reg );
 
-        auto& regcnt = ( p_bottom ? REG_BLDCNT_SUB : REG_BLDCNT );
+        auto& regcnt  = ( p_bottom ? REG_BLDCNT_SUB : REG_BLDCNT );
         auto& regcnt2 = ( p_both ? ( !p_bottom ? REG_BLDCNT_SUB : REG_BLDCNT ) : regcnt );
 
         switch( p_type ) {
@@ -65,7 +65,7 @@ namespace IO {
         }
         case IO::CLEAR_DARK_FAST:
             regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                         | BLEND_SRC_SPRITE;
+                               | BLEND_SRC_SPRITE;
             reg = reg2 = 1;
             for( u8 i = 1; i < 5; i += 2 ) {
                 swiWaitForVBlank( );
@@ -76,7 +76,7 @@ namespace IO {
         case IO::CLEAR_DARK:
         case IO::CAVE_ENTRY:
             regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                         | BLEND_SRC_SPRITE;
+                               | BLEND_SRC_SPRITE;
             reg = reg2 = 1;
             for( u8 i = 1; i < 5; ++i ) {
                 for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
@@ -87,7 +87,7 @@ namespace IO {
             break;
         case IO::CLEAR_WHITE_FAST:
             regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                         | BLEND_SRC_SPRITE;
+                               | BLEND_SRC_SPRITE;
             reg = reg2 = 1;
             for( u8 i = 1; i < 5; i += 2 ) {
                 for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
@@ -98,7 +98,7 @@ namespace IO {
         case IO::CLEAR_WHITE:
         case IO::CAVE_EXIT:
             regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                         | BLEND_SRC_SPRITE;
+                               | BLEND_SRC_SPRITE;
             reg = reg2 = 1;
             for( u8 i = 1; i < 5; ++i ) {
                 for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
@@ -126,7 +126,7 @@ namespace IO {
                 for( u8 i = 1; i < 3; ++i ) swiWaitForVBlank( );
             }
             regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                         | BLEND_SRC_SPRITE;
+                               | BLEND_SRC_SPRITE;
             for( u8 i = 1; i < 5; ++i ) {
                 for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
                 reg = reg2 |= ( 1 << i );
@@ -138,17 +138,29 @@ namespace IO {
         }
     }
 
-    void clearScreen( bool p_bottom, bool p_both, bool p_dark ) {
-        const char* file = p_dark ? "ClearD" : "Clear";
+    void resetScale( bool p_bottom, bool p_both ) {
+        if( p_both || !p_bottom ) {
+            bgSetScroll( IO::bg3, 0, 0 );
+            bgSetScale( IO::bg3, 1 << 8, 1 << 8 );
+        }
         if( p_both || p_bottom ) {
-            FS::readPictureData( bgGetGfxPtr( bg3sub ), "nitro:/PICS/", file, 512, 49152, true );
-            FS::readPictureData( bgGetGfxPtr( bg2sub ), "nitro:/PICS/", file, 512, 49152, true );
+            bgSetScroll( IO::bg3sub, 0, 0 );
+            bgSetScale( IO::bg3sub, 1 << 8, 1 << 8 );
+        }
+    }
+
+    void clearScreen( bool p_bottom, bool p_both, bool p_dark ) {
+        if( p_both || p_bottom ) {
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
+            dmaFillHalfWords( 0, BG_PALETTE_SUB, 256 );
         }
         if( p_both || !p_bottom ) {
-            FS::readPictureData( bgGetGfxPtr( bg3 ), "nitro:/PICS/", file );
-            FS::readPictureData( bgGetGfxPtr( bg2 ), "nitro:/PICS/", file );
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
+            dmaFillHalfWords( 0, BG_PALETTE, 256 );
         }
-        regularFont->setColor( RGB( 0, 31, 31 ), 0 );
+        regularFont->setColor( 0, 0 );
     }
     void clearScreenConsole( bool p_bottom, bool p_both ) {
         if( p_both || !p_bottom ) {

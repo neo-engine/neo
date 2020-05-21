@@ -66,10 +66,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "BigCirc1.h"
 #include "consoleFont.h"
 
-#ifndef _EMULATOR
+#ifdef DESQUID
 GameMod gMod = GameMod::DEVELOPER;
 #else
-GameMod gMod = GameMod::EMULATOR;
+GameMod gMod = GameMod::ALPHA;
 #endif
 
 u8 DayTimes[ 4 ][ 5 ]
@@ -137,6 +137,7 @@ void initTimeAndRnd( ) {
 }
 
 void vblankIRQ( ) {
+    if( !UPDATE_TIME ) return;
     scanKeys( );
     FRAME_COUNT++;
 
@@ -146,8 +147,6 @@ void vblankIRQ( ) {
         nitroFSInit( ARGV );
         INIT_NITROFS = false;
     }
-
-    if( !UPDATE_TIME ) return;
 
     auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
 
@@ -251,8 +250,8 @@ int main( int, char** p_argv ) {
         last    = held;
         held    = keysHeld( );
 
-#ifdef DEBUG
-        if( held & KEY_L && gMod == DEVELOPER ) {
+#ifdef DESQUID
+        if( held & KEY_L ) {
             //            time_t     unixTime   = time( NULL );
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char buffer[ 100 ];

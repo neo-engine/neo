@@ -32,14 +32,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 
 namespace BAG {
-#define GIVE_ITEM 1
-#define TAKE_ITEM 2
-#define MOVE_ITEM 3
+    const u8 GIVE_ITEM = 1;
+    const u8 TAKE_ITEM = 2;
+    const u8 MOVE_ITEM = 3;
+    const u8 MOVE_BAG  = 4;
 
-#define MOVE_BAG 4
+    const u8 BAG_CNT = 5;
 
-#define BAG_CNT 5
-#define MAX_ITEMS_PER_PAGE 9
+    const u8 MAX_ITEMS_PER_PAGE = 9;
     class bagUI {
       public:
         struct targetInfo {
@@ -48,8 +48,8 @@ namespace BAG {
         };
 
       private:
-        std::vector<std::pair<IO::inputTarget, targetInfo>> drawPkmn( u16 p_itemId,
-                ITEM::itemData& p_data );
+        std::vector<std::pair<IO::inputTarget, targetInfo>> drawPkmn( u16             p_itemId,
+                                                                      ITEM::itemData& p_data );
 
       public:
         u16  drawPkmnIcons( );
@@ -66,4 +66,4 @@ namespace BAG {
         void dropSprite( bag::bagType p_page, u8 p_idx, std::pair<u16, u16> p_item,
                          ITEM::itemData& p_data );
     };
-}
+} // namespace BAG

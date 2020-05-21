@@ -151,11 +151,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeBuildCommandLine>make EXTRA_FLAGS="-DNO_SOUND" 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeBuildCommandLine>
+    <NMakeBuildCommandLine>make EXTRA_FLAGS="-DNO_SOUND -DDESQUID" 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeBuildCommandLine>
     <NMakeOutput>P-Emerald_2.nds</NMakeOutput>
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>make EXTRA_FLAGS="-DNO_SOUND" rebuild 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeReBuildCommandLine>
-    <NMakePreprocessorDefinitions>_EMULATOR;ARM7;ARM9;NO_SOUND;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeReBuildCommandLine>make EXTRA_FLAGS="-DNO_SOUND -DDESQUID" rebuild 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>_EMULATOR;ARM7;ARM9;NO_SOUND;DESQUID;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(ProjectDir)arm9\build;$(ProjectDir)arm7\build;C:\devkitPro\libnds\include\;$(DEVKITPRO)\libnds\include;$(ProjectDir)arm9\include;$(ProjectDir)arm7\include;$(IncludePath);$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <ExecutablePath>$(ProjectDir);$(ExecutablePath)</ExecutablePath>
     <IncludePath>C:\MinGW\lib\gcc\mingw32\4.8.1\include\c++;$(ProjectDir)arm9\build;$(ProjectDir)arm7\build;C:\devkitPro\libnds\include;$(ProjectDir)arm9\include;$(ProjectDir)arm7\include;$(DEVKITARM)\libnds\include;$(IncludePath)</IncludePath>

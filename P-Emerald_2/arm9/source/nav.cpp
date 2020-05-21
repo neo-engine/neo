@@ -34,22 +34,22 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "messageBox.h"
 #include "nav.h"
 #include "screenFade.h"
+#include "sound.h"
 #include "sprite.h"
 #include "uio.h"
 #include "yesNoBox.h"
-#include "sound.h"
 
 #include "berry.h"
 #include "item.h"
-#include "pokemon.h"
-#include "moveNames.h"
 #include "itemNames.h"
+#include "moveNames.h"
+#include "pokemon.h"
 
 #include "bagUI.h"
 #include "bagViewer.h"
 
+#include "partyScreen.h"
 #include "statusScreen.h"
-#include "statusScreenUI.h"
 
 #include "boxUI.h"
 #include "boxViewer.h"
@@ -85,40 +85,40 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "icon_settings_2.h"
 
 namespace NAV {
-    state STATE = HOME;
-    bool  ALLOW_INIT = true;
+    state STATE        = HOME;
+    bool  ALLOW_INIT   = true;
     u8    CURRENT_BANK = 0;
-    u16   CURRENT_MAP = 0;
+    u16   CURRENT_MAP  = 0;
 
     void drawMapMug( );
     void drawBorder( );
 
-    u8   mainSpritePos[ 12 ][ 2 ]
+    u8 mainSpritePos[ 12 ][ 2 ]
         = {{0, 0},     {12, 42},   {244, 26}, {244, 56}, {244, 86}, {12, 162},
            {244, 116}, {244, 146}, {0, 0},    {12, 72},  {12, 102}, {12, 132}};
-    unsigned int       NAV_DATA[ 12288 ]   = {0};
-    unsigned short     NAV_DATA_PAL[ 256 ] = {0};
-    backgroundSet BGs[ MAXBG ] = {{"Magnetizing Magnemite", bg00Bitmap, bg00Pal, false, true},
-                                       {"Executing Exeggcute", NAV_DATA, NAV_DATA_PAL, true, true},
-                                       {"Fighting Torchic", NAV_DATA, NAV_DATA_PAL, true, false},
-                                       {"Reborn Ho-Oh", NAV_DATA, NAV_DATA_PAL, true, false},
-                                       {"Raging Gyarados", NAV_DATA, NAV_DATA_PAL, true, false},
-                                       {"Mystic Guardevoir", NAV_DATA, NAV_DATA_PAL, true, false},
-                                       {"Sleeping Eevee", NAV_DATA, NAV_DATA_PAL, true, false},
-                                       {"Waiting Suicune", NAV_DATA, NAV_DATA_PAL, true, false},
-                                       {"Awakening Xerneas", NAV_DATA, NAV_DATA_PAL, true, false},
-                                       {"Awakening Yveltal", NAV_DATA, NAV_DATA_PAL, true, false},
-                                       {"Fighting Groudon", NAV_DATA, NAV_DATA_PAL, true, false},
-                                       {"Fighting Kyogre", NAV_DATA, NAV_DATA_PAL, true, false},
-                                       {"Working Klink", NAV_DATA, NAV_DATA_PAL, true, true}};
+    unsigned int   NAV_DATA[ 12288 ]   = {0};
+    unsigned short NAV_DATA_PAL[ 256 ] = {0};
+    backgroundSet  BGs[ MAXBG ] = {{"Magnetizing Magnemite", bg00Bitmap, bg00Pal, false, true},
+                                  {"Executing Exeggcute", NAV_DATA, NAV_DATA_PAL, true, true},
+                                  {"Fighting Torchic", NAV_DATA, NAV_DATA_PAL, true, false},
+                                  {"Reborn Ho-Oh", NAV_DATA, NAV_DATA_PAL, true, false},
+                                  {"Raging Gyarados", NAV_DATA, NAV_DATA_PAL, true, false},
+                                  {"Mystic Guardevoir", NAV_DATA, NAV_DATA_PAL, true, false},
+                                  {"Sleeping Eevee", NAV_DATA, NAV_DATA_PAL, true, false},
+                                  {"Waiting Suicune", NAV_DATA, NAV_DATA_PAL, true, false},
+                                  {"Awakening Xerneas", NAV_DATA, NAV_DATA_PAL, true, false},
+                                  {"Awakening Yveltal", NAV_DATA, NAV_DATA_PAL, true, false},
+                                  {"Fighting Groudon", NAV_DATA, NAV_DATA_PAL, true, false},
+                                  {"Fighting Kyogre", NAV_DATA, NAV_DATA_PAL, true, false},
+                                  {"Working Klink", NAV_DATA, NAV_DATA_PAL, true, true}};
 
 #define POS mainSpritePos
 
     std::map<state, state> backTransition = {{MAP_MUG, HOME},
-                                                       {MAP_BIG, MAP},
-                                                       {MAP, HOME},
+                                             {MAP_BIG, MAP},
+                                             {MAP, HOME},
 
-                                                       {HOME, HOME}};
+                                             {HOME, HOME}};
 
     void home( ) {
         STATE = HOME;
@@ -141,8 +141,9 @@ namespace NAV {
             IO::boldFont->setColor( 0, 1 );
             IO::boldFont->setColor( WHITE_IDX, 2 );
 
-            IO::boldFont->printString( (FS::getLocation( CURRENT_MAP, CURRENT_LANGUAGE ) ).c_str( ), 7,
-                    4, !SCREENS_SWAPPED );
+            IO::boldFont->printString(
+                ( FS::getLocation( CURRENT_MAP, CURRENT_LANGUAGE ) ).c_str( ), 7, 4,
+                !SCREENS_SWAPPED );
         }
 
         DRAW_TIME = true;
@@ -161,8 +162,8 @@ namespace NAV {
                 b      = true;
             }
             if( curitm )
-                IO::loadItemIcon( curitm, POS[ ITM( i ) ][ 0 ] - 16,
-                                  POS[ ITM( i ) ][ 1 ] - 16, ITM( i ), ITM( i ),
+                IO::loadItemIcon( curitm, POS[ ITM( i ) ][ 0 ] - 16, POS[ ITM( i ) ][ 1 ] - 16,
+                                  ITM( i ), ITM( i ),
                                   IO::Oam->oamBuffer[ ITM_BACK + 2 ].gfxIndex + 32 * ( i + 1 ) );
         }
         IO::updateOAM( true );
@@ -177,30 +178,27 @@ namespace NAV {
                                   !p_showBack, OBJPRIORITY_0, true );
 
         // Main menu sprites
-        tileCnt = IO::loadSprite( A_ID, A_ID, tileCnt,
-                                  POS[ SAVE_ID ][ 0 ] - 16, POS[ SAVE_ID ][ 1 ] - 16, 32, 32,
-                                  icon_save_1Pal, icon_save_1Tiles, icon_save_1TilesLen,
-                                  false, false, false, OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( FWD_ID, FWD_ID, tileCnt,
-                                  POS[ BAG_ID ][ 0 ] - 16, POS[ BAG_ID ][ 1 ] - 16, 32, 32,
-                                  icon_bag_1Pal, icon_bag_1Tiles, icon_bag_1TilesLen,
-                                  false, false, false, OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( BWD_ID, BWD_ID, tileCnt,
-                                  POS[ PKMN_ID ][ 0 ] - 16, POS[ PKMN_ID ][ 1 ] - 16, 32, 32,
-                                  icon_party_1Pal, icon_party_1Tiles, icon_party_1TilesLen,
-                                  false, false, false, OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( NAV_ID, NAV_ID, tileCnt,
-                                  POS[ NAV_ID ][ 0 ] - 16, POS[ NAV_ID ][ 1 ] - 16, 32, 32,
-                                  icon_settings_1Pal, icon_settings_1Tiles, icon_settings_1TilesLen,
-                                  false, false, false, OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( ID_ID, ID_ID, tileCnt,
-                                  POS[ ID_ID ][ 0 ] - 16, POS[ ID_ID ][ 1 ] - 16, 32, 32,
-                                  icon_id_1Pal, icon_id_1Tiles, icon_id_1TilesLen,
-                                  false, false, false, OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( DEX_ID, DEX_ID, tileCnt,
-                                  POS[ DEX_ID ][ 0 ] - 16, POS[ DEX_ID ][ 1 ] - 16, 32, 32,
-                                  icon_dex_1Pal, icon_dex_1Tiles, icon_dex_1TilesLen,
-                                  false, false, false, OBJPRIORITY_0, true );
+        tileCnt
+            = IO::loadSprite( A_ID, A_ID, tileCnt, POS[ SAVE_ID ][ 0 ] - 16,
+                              POS[ SAVE_ID ][ 1 ] - 16, 32, 32, icon_save_1Pal, icon_save_1Tiles,
+                              icon_save_1TilesLen, false, false, false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadSprite( FWD_ID, FWD_ID, tileCnt, POS[ BAG_ID ][ 0 ] - 16,
+                                  POS[ BAG_ID ][ 1 ] - 16, 32, 32, icon_bag_1Pal, icon_bag_1Tiles,
+                                  icon_bag_1TilesLen, false, false, false, OBJPRIORITY_0, true );
+        tileCnt
+            = IO::loadSprite( BWD_ID, BWD_ID, tileCnt, POS[ PKMN_ID ][ 0 ] - 16,
+                              POS[ PKMN_ID ][ 1 ] - 16, 32, 32, icon_party_1Pal, icon_party_1Tiles,
+                              icon_party_1TilesLen, false, false, false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadSprite( NAV_ID, NAV_ID, tileCnt, POS[ NAV_ID ][ 0 ] - 16,
+                                  POS[ NAV_ID ][ 1 ] - 16, 32, 32, icon_settings_1Pal,
+                                  icon_settings_1Tiles, icon_settings_1TilesLen, false, false,
+                                  false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadSprite( ID_ID, ID_ID, tileCnt, POS[ ID_ID ][ 0 ] - 16,
+                                  POS[ ID_ID ][ 1 ] - 16, 32, 32, icon_id_1Pal, icon_id_1Tiles,
+                                  icon_id_1TilesLen, false, false, false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadSprite( DEX_ID, DEX_ID, tileCnt, POS[ DEX_ID ][ 0 ] - 16,
+                                  POS[ DEX_ID ][ 1 ] - 16, 32, 32, icon_dex_1Pal, icon_dex_1Tiles,
+                                  icon_dex_1TilesLen, false, false, false, OBJPRIORITY_0, true );
         // tileCnt = IO::loadItemIcon( "----", POS[ OPTS_ID ][ 0 ] - 16, POS[ OPTS_ID ][ 1 ] - 16,
         // 67,
         //                            OPTS_ID, tileCnt );
@@ -243,8 +241,8 @@ namespace NAV {
     void drawMapMug( ) {
         auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
         char buffer[ 100 ];
-        snprintf( buffer, 99, "%03hu/%hu_%hhu", CURRENT_BANK / FS::ITEMS_PER_DIR,
-                CURRENT_BANK, getCurrentDaytime( ) % 4 );
+        snprintf( buffer, 99, "%03hu/%hu_%hhu", CURRENT_BANK / FS::ITEMS_PER_DIR, CURRENT_BANK,
+                  getCurrentDaytime( ) % 4 );
         FS::readPictureData( ptr, "nitro:/PICS/MAP_MUG/", buffer, 512, 49152, !SCREENS_SWAPPED );
         drawBorder( );
     }
@@ -282,7 +280,7 @@ namespace NAV {
         CURRENT_MAP  = MAP::curMap->getCurrentLocationId( );
         char buffer[ 100 ];
         snprintf( buffer, 99, "%03hhu/%hu_%hhu", CURRENT_BANK / FS::ITEMS_PER_DIR, CURRENT_BANK,
-                getCurrentDaytime( ) % 4 );
+                  getCurrentDaytime( ) % 4 );
         if( FS::exists( "nitro:/PICS/MAP_MUG/", buffer ) )
             STATE = MAP_MUG;
         else if( STATE == MAP_MUG )
@@ -408,7 +406,7 @@ namespace NAV {
                 bgUpdate( );
 
                 IO::clearScreenConsole( true, true );
-                STATE      = HOME;
+                STATE       = HOME;
                 UPDATE_TIME = true;
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
@@ -420,16 +418,22 @@ namespace NAV {
                     updateItems( );
                     draw( true );
                 }
-            } else if( SAVE::SAV.getActiveFile( )
-                           .m_pkmnTeam[ 0 ]
-                           .m_boxdata.m_speciesId // StartPkmn
+            } else if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_speciesId // StartPkmn
                        && ( GET_AND_WAIT_C( POS[ PKMN_ID ][ 0 ], POS[ PKMN_ID ][ 1 ], 16 ) ) ) {
                 ANIMATE_MAP = false;
+                UPDATE_TIME = false;
                 SOUND::dimVolume( );
-                STATE      = HOME;
+                STATE = HOME;
                 IO::initOAMTable( true );
                 videoSetMode( MODE_5_2D );
-                STS::statusScreen sts( 0 );
+                u8 teamSize = 0;
+                for( ; teamSize < 6; ++teamSize ) {
+                    if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ teamSize ].m_boxdata.m_speciesId ) {
+                        break;
+                    }
+                }
+                STS::partyScreen sts
+                    = STS::partyScreen( SAVE::SAV.getActiveFile( ).m_pkmnTeam, teamSize );
 
                 IO::clearScreen( false );
                 videoSetMode( MODE_5_2D );
@@ -440,19 +444,28 @@ namespace NAV {
                 FADE_TOP_DARK( );
                 IO::clearScreen( false );
                 videoSetMode( MODE_5_2D );
+                IO::resetScale( true, false );
                 bgUpdate( );
 
                 IO::clearScreenConsole( true, true );
                 ANIMATE_MAP = true;
+                UPDATE_TIME = true;
                 SOUND::restoreVolume( );
                 draw( true );
                 MAP::curMap->draw( );
 
-                if( res ) MOVE::use( res & 32767, res >> 15 );
+                if( res.m_selectedMove ) {
+                    for( u8 j = 0; j < 2; ++j ) {
+                        if( MOVE::possible( res.m_selectedMove, j ) ) {
+                            MOVE::use( res.m_selectedMove, j );
+                            break;
+                        }
+                    }
+                }
             } else if( GET_AND_WAIT_C( POS[ DEX_ID ][ 0 ], POS[ DEX_ID ][ 1 ], 16 ) ) {
                 ANIMATE_MAP = false;
                 SOUND::dimVolume( );
-                STATE      = HOME;
+                STATE = HOME;
 
                 IO::clearScreen( false );
                 videoSetMode( MODE_5_2D );
@@ -478,9 +491,9 @@ namespace NAV {
                 STATE = HOME;
 
                 const char* someText[ 12 ]
-                    = {"PKMN Spawn",   "Item Spawn", "1 Item Test",  "Dbl Battle",
+                    = {"PKMN Spawn",   "Item Spawn",   "1 Item Test",  "Dbl Battle",
                        "Sgl Battle",   "Chg NavScrn",  "View Boxes A", "View Boxes B",
-                       "Hoenn Badges", "Kanto Badges", "Keyboard", "Plate Spawn" };
+                       "Hoenn Badges", "Kanto Badges", "Keyboard",     "Plate Spawn"};
                 IO::choiceBox test( 12, &someText[ 0 ], 0, false );
                 int           res = test.getResult( "Tokens of god-being..." );
                 draw( );
@@ -488,10 +501,10 @@ namespace NAV {
                 case 0: {
                     memset( SAVE::SAV.getActiveFile( ).m_pkmnTeam, 0,
                             sizeof( SAVE::SAV.getActiveFile( ).m_pkmnTeam ) );
-                    std::vector<u16> tmp = { 201, 493, 521, 649, u16( 1 + rand( ) % MAX_PKMN ),
-                                             MAX_PKMN };
+                    std::vector<u16> tmp
+                        = {201, 493, 521, 649, u16( 1 + rand( ) % MAX_PKMN ), MAX_PKMN};
                     for( int i = 0; i < 6; ++i ) {
-                        pokemon&         a   = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
+                        pokemon& a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
 
                         a = pokemon( tmp[ i ], 50, !i ? ( rand( ) % 28 ) : 0, 0, i );
 
@@ -513,7 +526,7 @@ namespace NAV {
                             else
                                 a.giveItem( I_PIXIE_PLATE );
                         } else {
-                            a.m_boxdata.m_heldItem      = 1 + rand( ) % 400;
+                            a.m_boxdata.m_heldItem = 1 + rand( ) % 400;
                         }
 
                         for( u16 j = 1; j <= MAX_PKMN; ++j )
@@ -543,8 +556,7 @@ namespace NAV {
                                         }*/
 
                     SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
-                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ]
-                        = M_WATERFALL;
+                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
                     SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ]
                         = M_ROCK_CLIMB;
                     SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ]
@@ -557,8 +569,8 @@ namespace NAV {
                     for( u16 j = 1; j < MAX_ITEMS; ++j ) {
                         auto c = ITEM::getItemData( j );
                         if( c.m_itemType )
-                            SAVE::SAV.getActiveFile( ).m_bag.insert(
-                                BAG::toBagType( c.m_itemType ), j, 1 );
+                            SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( c.m_itemType ),
+                                                                     j, 1 );
                     }
                     break;
                 case 2: {
@@ -568,58 +580,58 @@ namespace NAV {
                     break;
                 }
                 case 3: {
-                            /*
-                    std::vector<pokemon> cpy;
+                    /*
+            std::vector<pokemon> cpy;
 
-                    for( u8 i = 0; i < 3; ++i ) {
-                        pokemon a( 0, i + 456, 0, 30, SAVE::SAV.getActiveFile( ).m_id + 1,
-                                   SAVE::SAV.getActiveFile( ).m_sid, "Heiko", false );
-                        // a.stats.acHP = i*a.stats.maxHP/5;
-                        cpy.push_back( a );
-                    }
-                    BATTLE::battleTrainer opp(
-                            {"Wally", "Heiko"}, {"Let's battle!", "Auf in den Kampf!"},
-                            {"Hmpf\x85 You're not too bad\x85",
-                            "Hm\x85 Du bist gar nicht so schlecht\x85"},
-                            {"Yay, I won!", "Yay gewonnen!"},
-                            {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
-                            cpy, 0, 0 );
-                    auto           bt = SAVE::SAV.getActiveFile( ).getBattleTrainer( );
-                    BATTLE::battle test_battle( bt, &opp, 100, BATTLE::weather( rand( ) % 9 ), 10,
-                                                0, 5, BATTLE::battle::DOUBLE );
-                    ANIMATE_MAP = false;
-                    test_battle.start( );
-                    SAVE::SAV.getActiveFile( ).updateTeam( bt );
-                    delete bt;
-                    */
+            for( u8 i = 0; i < 3; ++i ) {
+                pokemon a( 0, i + 456, 0, 30, SAVE::SAV.getActiveFile( ).m_id + 1,
+                           SAVE::SAV.getActiveFile( ).m_sid, "Heiko", false );
+                // a.stats.acHP = i*a.stats.maxHP/5;
+                cpy.push_back( a );
+            }
+            BATTLE::battleTrainer opp(
+                    {"Wally", "Heiko"}, {"Let's battle!", "Auf in den Kampf!"},
+                    {"Hmpf\x85 You're not too bad\x85",
+                    "Hm\x85 Du bist gar nicht so schlecht\x85"},
+                    {"Yay, I won!", "Yay gewonnen!"},
+                    {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
+                    cpy, 0, 0 );
+            auto           bt = SAVE::SAV.getActiveFile( ).getBattleTrainer( );
+            BATTLE::battle test_battle( bt, &opp, 100, BATTLE::weather( rand( ) % 9 ), 10,
+                                        0, 5, BATTLE::battle::DOUBLE );
+            ANIMATE_MAP = false;
+            test_battle.start( );
+            SAVE::SAV.getActiveFile( ).updateTeam( bt );
+            delete bt;
+            */
                     break;
                 }
                 case 4: {
-                            /*
-                    std::vector<pokemon> cpy;
+                    /*
+            std::vector<pokemon> cpy;
 
-                    for( u8 i = 0; i < 6; ++i ) {
-                        pokemon a( 0, 435 + i, 0, 15, SAVE::SAV.getActiveFile( ).m_id + 1,
-                                   SAVE::SAV.getActiveFile( ).m_sid, "Heiko", false );
-                        // a.stats.acHP = i*a.stats.maxHP/5;
-                        cpy.push_back( a );
-                    }
-                    BATTLE::battleTrainer opp(
-                            {"Wally", "Heiko"}, {"Let's battle!", "Auf in den Kampf!"},
-                            {"Hmpf\x85 You're not too bad\x85",
-                            "Hm\x85 Du bist gar nicht so schlecht\x85"},
-                            {"Yay, I won!", "Yay gewonnen!"},
-                            {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
-                            cpy, 0, 0 );
-                    auto           bt = SAVE::SAV.getActiveFile( ).getBattleTrainer( );
-                    BATTLE::battle test_battle( bt, &opp, 100,
-                                                BATTLE::HAIL weather( rand( ) % 9 ), 10, 0, 5,
-                                                BATTLE::battle::SINGLE );
-                    ANIMATE_MAP = false;
-                    test_battle.start( );
-                    SAVE::SAV.getActiveFile( ).updateTeam( bt );
-                    delete bt;
-                    */
+            for( u8 i = 0; i < 6; ++i ) {
+                pokemon a( 0, 435 + i, 0, 15, SAVE::SAV.getActiveFile( ).m_id + 1,
+                           SAVE::SAV.getActiveFile( ).m_sid, "Heiko", false );
+                // a.stats.acHP = i*a.stats.maxHP/5;
+                cpy.push_back( a );
+            }
+            BATTLE::battleTrainer opp(
+                    {"Wally", "Heiko"}, {"Let's battle!", "Auf in den Kampf!"},
+                    {"Hmpf\x85 You're not too bad\x85",
+                    "Hm\x85 Du bist gar nicht so schlecht\x85"},
+                    {"Yay, I won!", "Yay gewonnen!"},
+                    {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
+                    cpy, 0, 0 );
+            auto           bt = SAVE::SAV.getActiveFile( ).getBattleTrainer( );
+            BATTLE::battle test_battle( bt, &opp, 100,
+                                        BATTLE::HAIL weather( rand( ) % 9 ), 10, 0, 5,
+                                        BATTLE::battle::SINGLE );
+            ANIMATE_MAP = false;
+            test_battle.start( );
+            SAVE::SAV.getActiveFile( ).updateTeam( bt );
+            delete bt;
+            */
                     break;
                 }
                 case 5: {

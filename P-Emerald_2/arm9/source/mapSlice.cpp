@@ -31,7 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "mapSlice.h"
 #include "defines.h"
 #include "fs.h"
-#ifdef DEBUG
+#ifdef DESQUID
 #include "messageBox.h"
 #include "uio.h"
 
@@ -44,16 +44,17 @@ namespace MAP {
                          std::unique_ptr<mapSlice> p_cache[ 2 ][ 2 ] ) {
         FILE* mapF = FS::open(
             MAP_PATH,
-            ( std::to_string( p_map ) + "/" + std::to_string( p_y ) + "_" + std::to_string( p_x ) ).c_str( ),
+            ( std::to_string( p_map ) + "/" + std::to_string( p_y ) + "_" + std::to_string( p_x ) )
+                .c_str( ),
             ".map" );
         if( !mapF )
-            mapF = FS::open(
-                MAP_PATH,
-                ( std::to_string( p_map ) + "/BORDER/" + std::to_string( p_y ) + "_" + std::to_string( p_x ) )
-                    .c_str( ),
-                ".map" );
+            mapF = FS::open( MAP_PATH,
+                             ( std::to_string( p_map ) + "/BORDER/" + std::to_string( p_y ) + "_"
+                               + std::to_string( p_x ) )
+                                 .c_str( ),
+                             ".map" );
         if( !mapF ) {
-#ifdef DEBUG__
+#ifdef DESQUID
             char buffer[ 50 ];
             snprintf( buffer, 49, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
             IO::messageBox m( buffer );
@@ -69,7 +70,7 @@ namespace MAP {
             p_result = std::unique_ptr<mapSlice>( new mapSlice );
             reloadTs = true;
         }
-#ifdef DEBUG
+#ifdef DESQUID
         if( !p_result ) {
             IO::messageBox( "Not enough memory :(" );
             NAV::draw( true );
@@ -99,7 +100,8 @@ namespace MAP {
         // Read the wild Pokémon data
         mapF = FS::open(
             MAP_PATH,
-            ( std::to_string( p_map ) + "/" + std::to_string( p_y ) + "_" + std::to_string( p_x ) ).c_str( ),
+            ( std::to_string( p_map ) + "/" + std::to_string( p_y ) + "_" + std::to_string( p_x ) )
+                .c_str( ),
             ".enc" );
         if( mapF ) {
             FS::read( mapF, p_result->m_pokemon, sizeof( std::pair<u16, u16> ), 3 * 5 * 5 );
