@@ -603,5 +603,5 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Cancel", "Zur\xfc"
                "ck"},
     {"Deselect", "Abw\xe4hlen"},
-    {"Desquid", "Desquid"},
+    {"Select %hhu Pok\xe9mon!", "W\xe4hle %hhu Pok\xe9mon aus!"},
 };

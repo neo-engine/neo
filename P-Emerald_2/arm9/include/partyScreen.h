@@ -46,7 +46,7 @@ namespace STS {
             inline void setMark( u8 p_pos, u8 p_mark ) {
                 p_mark &= 0xf;
                 m_selectedPkmn &= ~( 0xf << ( 4 * p_pos ) );
-                m_selectedPkmn |= ~( p_mark << ( 4 * p_pos ) );
+                m_selectedPkmn |= ( p_mark << ( 4 * p_pos ) );
             }
         };
 
@@ -105,6 +105,9 @@ namespace STS {
         bool     _allowMoveSelection;  // allow player to select field moves of pkmn
         bool     _allowItems;          // allow player to use items
         bool     _allowDex;            // allow player to use the pokedex
+        bool     _eggSelect;           // player has to select eggs
+        bool     _faintSelect;         // allow selection of fainted pkmn
+        bool     _selectConfirm;       // player should confirm selection
 
         u8             _frame;
         partyScreenUI* _partyUI;
@@ -187,7 +190,9 @@ namespace STS {
          * moves unselectable
          */
         partyScreen( pokemon p_team[ 6 ], u8 p_teamLength, bool p_allowMoves = true,
-                     bool p_allowItems = true, bool p_allowDex = true, u8 p_toSelect = 0 );
+                     bool p_allowItems = true, bool p_allowDex = true, u8 p_toSelect = 0,
+                     bool p_confirmSelection = true, bool p_faintSelect = false,
+                     bool p_eggSelect = false );
 
         ~partyScreen( );
 

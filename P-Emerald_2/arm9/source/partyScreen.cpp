@@ -32,15 +32,20 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace STS {
     partyScreen::partyScreen( pokemon p_team[ 6 ], u8 p_teamLength, bool p_allowMoves,
-                              bool p_allowItems, bool p_allowDex, u8 p_toSelect ) {
+                              bool p_allowItems, bool p_allowDex, u8 p_toSelect,
+                              bool p_confirmSelection, bool p_faintSelect, bool p_eggSelect ) {
         _team               = p_team;
         _teamLength         = p_teamLength;
         _allowMoveSelection = p_allowMoves;
         _allowItems         = p_allowItems;
         _allowDex           = p_allowDex;
         _toSelect           = p_toSelect;
+        _selectConfirm      = p_confirmSelection;
+        _faintSelect        = p_faintSelect;
+        _eggSelect          = p_eggSelect;
         _currentSelection   = 0;
-        _partyUI            = new partyScreenUI( p_team, p_teamLength );
+        _selectedCnt        = 0;
+        _partyUI            = new partyScreenUI( p_team, p_teamLength, _toSelect );
     }
 
     partyScreen::~partyScreen( ) {
@@ -404,24 +409,45 @@ namespace STS {
 
     void partyScreen::mark( u8 p_markIdx ) {
         _currentMarksOrMove.setMark( p_markIdx, ++_selectedCnt );
-        _partyUI->mark( p_markIdx, _selectedCnt );
+        if( _selectedCnt < _toSelect || _selectConfirm ) {
+            _partyUI->mark( p_markIdx, _selectedCnt );
+            _partyUI->select( _currentSelection );
+        }
     }
 
     void partyScreen::unmark( u8 p_markIdx ) {
+        u8 oldmark = _currentMarksOrMove.getMark( p_markIdx );
         _currentMarksOrMove.setMark( p_markIdx, 0 );
         _selectedCnt--;
         _partyUI->unmark( p_markIdx );
+
+        // Shift all other marks
+        for( u8 i = 0; i < _teamLength; i++ ) {
+            if( _currentMarksOrMove.getMark( i ) > oldmark ) {
+                _currentMarksOrMove.setMark( i, _currentMarksOrMove.getMark( i ) - 1 );
+                _partyUI->unmark( i );
+                _partyUI->mark( i, _currentMarksOrMove.getMark( i ) );
+            }
+        }
+
+        _partyUI->select( _currentSelection );
     }
 
     void partyScreen::swap( u8 p_idx1, u8 p_idx2 ) {
         std::swap( _team[ p_idx1 ], _team[ p_idx2 ] );
+        u8 marks = _currentMarksOrMove.getMark( p_idx1 );
+        _currentMarksOrMove.setMark( p_idx1, _currentMarksOrMove.getMark( p_idx2 ) );
+        _currentMarksOrMove.setMark( p_idx2, marks );
+
         _partyUI->swap( p_idx1, p_idx2 );
     }
 
     void partyScreen::computeSelectionChoices( ) {
         _currentChoices = std::vector<choice>( );
         if( _swapSelection == 255 ) {
-            if( _toSelect && !_currentMarksOrMove.getMark( _currentSelection ) ) {
+            if( _toSelect && !_currentMarksOrMove.getMark( _currentSelection )
+                && _team[ _currentSelection ].isEgg( ) == _eggSelect
+                && ( _team[ _currentSelection ].m_stats.m_acHP || _faintSelect ) ) {
                 _currentChoices.push_back( SELECT );
             }
             if( _toSelect && _currentMarksOrMove.getMark( _currentSelection ) ) {
@@ -579,7 +605,25 @@ namespace STS {
             pressed = keysUp( );
             held    = keysHeld( );
 
-            if( ( pressed & KEY_X ) || ( pressed & KEY_B ) ) break;
+            if( pressed & KEY_X ) break;
+            if( pressed & KEY_B ) {
+                if( _swapSelection != 255 ) {
+                    _partyUI->unswap( _swapSelection );
+                    _swapSelection = 255;
+                    computeSelectionChoices( );
+                    _partyUI->select( _currentSelection );
+                    u16 c[ 12 ] = {0};
+                    for( u8 i = 0; i < _currentChoices.size( ); i++ ) {
+                        c[ i ] = getTextForChoice( _currentChoices[ i ] );
+                    }
+                    _partyUI->drawPartyPkmnChoice( _currentSelection, c,
+                                                   std::min( size_t( 6 ), _currentChoices.size( ) ),
+                                                   _currentChoices.size( ) > 7, false );
+
+                } else {
+                    break;
+                }
+            }
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 select( ( _currentSelection + 1 ) % _teamLength );
                 cooldown = COOLDOWN_COUNT;
@@ -609,7 +653,7 @@ namespace STS {
                 }
                 if( checkReturnCondition( ) ) {
                     // Make the player confirm the set of selected pkmn, but not the selected move
-                    if( !_toSelect || confirmSelection( ) ) {
+                    if( !_toSelect || !_selectConfirm || confirmSelection( ) ) {
                         break;
                     } else {
                         unmark( _currentSelection );

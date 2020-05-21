@@ -99,7 +99,7 @@ namespace SAVE {
         testTeam[ 1 ].m_boxdata.m_moves[ 3 ] = M_ROCK_SMASH;
         testTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
 
-        STS::partyScreen sts = STS::partyScreen( testTeam, 1 + rand( ) % 6 );
+        STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 1, false );
         sts.run( );
 
         // END TEST

@@ -41,6 +41,7 @@ namespace STS {
         u8       _teamLength;
         u8       _selectedIdx;
         bool     _swapping = false;
+        u8       _toSelect = 0;
 
         constexpr u16 partyTopScreenPkmnIconPosY( u8 p_pos ) {
             return ( p_pos & 1 ) * 8 + 2 + 61 * ( p_pos >> 1 );
@@ -60,7 +61,7 @@ namespace STS {
          * @param p_teamLenth: Num Pkmn in team (max 6)
          * moves unselectable
          */
-        partyScreenUI( pokemon p_team[ 6 ], u8 p_teamLength );
+        partyScreenUI( pokemon p_team[ 6 ], u8 p_teamLength, u8 p_toSelect = 0 );
 
         /*
          * @brief Initializes the party screen UI. Destroys anything that was previously on the
