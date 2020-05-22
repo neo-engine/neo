@@ -188,6 +188,7 @@ namespace STS {
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );
+
             pressed = keysUp( );
             held    = keysHeld( );
 
@@ -255,7 +256,6 @@ namespace STS {
                 ex       = executeChoice( _currentChoices[ _currentChoiceSelection ] );
                 break;
             }
-
             swiWaitForVBlank( );
         }
 
@@ -379,7 +379,6 @@ namespace STS {
                         choices.size( ) > 6, false, _currentChoiceSelection % 6 );
                 }
             }
-
             swiWaitForVBlank( );
         }
         _currentChoiceSelection = 0;
@@ -506,29 +505,38 @@ namespace STS {
         case STS::partyScreen::GIVE_ITEM: {
             BAG::bagViewer bv;
             u16            itm = bv.getItem( BAG::bagViewer::GIVE_TO_PKMN );
+            computeSelectionChoices( );
+            _partyUI->init( _currentSelection );
+            _frame = 0;
             if( itm ) {
                 if( _team[ _currentSelection ].getItem( ) ) {
                     auto curItm = _team[ _currentSelection ].getItem( );
                     SAVE::SAV.getActiveFile( ).m_bag.insert(
                         BAG::toBagType( ITEM::getItemData( curItm ).m_itemType ), curItm, 1 );
-
-                    // TODO print message
-                } else {
-                    // TODO print Message
                 }
+                _partyUI->select( _currentSelection );
+                _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
+
+                sprintf( BUFFER, GET_STRING( 334 ),
+                         ITEM::getItemName( itm, CURRENT_LANGUAGE ).c_str( ),
+                         _team[ _currentSelection ].m_boxdata.m_name );
+                _partyUI->printMessage( BUFFER, itm );
+                waitForInteract( );
+                _partyUI->hideMessageBox( );
                 _team[ _currentSelection ].giveItem( itm );
+                computeSelectionChoices( );
+                _partyUI->select( _currentSelection );
             }
-            computeSelectionChoices( );
-            _partyUI->init( _currentSelection );
-            _frame = 0;
             break;
         }
         case STS::partyScreen::TAKE_ITEM: {
             u16 acI = _team[ _currentSelection ].takeItem( );
+            _partyUI->select( _currentSelection );
+            _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
 
             sprintf( BUFFER, GET_STRING( 101 ), ITEM::getItemName( acI, CURRENT_LANGUAGE ).c_str( ),
                      _team[ _currentSelection ].m_boxdata.m_name );
-            _partyUI->printMessage( BUFFER );
+            _partyUI->printMessage( BUFFER, acI );
             SAVE::SAV.getActiveFile( ).m_bag.insert(
                 BAG::toBagType( ITEM::getItemData( acI ).m_itemType ), acI, 1 );
             waitForInteract( );
@@ -584,6 +592,21 @@ namespace STS {
     }
 
     void STS::partyScreen::waitForInteract( ) {
+        int           pressed, held;
+        touchPosition touch;
+        u8            cooldown = COOLDOWN_COUNT;
+        loop( ) {
+            _partyUI->animate( _frame++ );
+            scanKeys( );
+            touchRead( &touch );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            pressed = keysUp( );
+            held    = keysHeld( );
+
+            if( GET_KEY_COOLDOWN( KEY_A ) ) break;
+            if( GET_KEY_COOLDOWN( KEY_B ) ) break;
+        }
     }
 
     partyScreen::result partyScreen::run( u8 p_initialSelection ) {
@@ -660,7 +683,6 @@ namespace STS {
                     }
                 }
             }
-
             swiWaitForVBlank( );
         }
 

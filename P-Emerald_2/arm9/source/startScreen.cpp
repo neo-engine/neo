@@ -41,6 +41,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "yesNoBox.h"
 
 // BEGIN TEST
+#include "itemNames.h"
 #include "moveNames.h"
 #include "partyScreen.h"
 // END TEST
@@ -98,6 +99,7 @@ namespace SAVE {
         testTeam[ 1 ].m_boxdata.m_moves[ 2 ] = M_SWEET_SCENT;
         testTeam[ 1 ].m_boxdata.m_moves[ 3 ] = M_ROCK_SMASH;
         testTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+        testTeam[ 2 ].m_boxdata.m_heldItem   = I_YAGO_BERRY;
 
         STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 1, false );
         sts.run( );

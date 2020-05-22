@@ -240,7 +240,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 100
 
     {"You can't use this\nmove right now.", "Diese Attacke kann jetzt\nnicht eingesetzt werden."},
-    {"Stored %s\nfrom %s.", "%s von %s\nim Beutel verstaut."},
+    {"Took %s\nfrom %s.", "%s von\n%s genommen."},
     {"%s already\nknows %s!", "%s beherrscht\n%s bereits!"},
     {"%s learned\n%s!", "%s erlernt\n%s!"},
     {"%s already\nknows 4 moves.\nForget a move?",
@@ -603,5 +603,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Cancel", "Zur\xfc"
                "ck"},
     {"Deselect", "Abw\xe4hlen"},
-    {"Select %hhu Pok\xe9mon!", "W\xe4hle %hhu Pok\xe9mon aus!"},
+    {"Select %hhu Pok\xe9mon!", "W\xe4hle %hhu Pok\xe9mon!"},
+    {"Select a Pok\xe9mon!", "W\xe4hle ein Pok\xe9mon!"},
+    {"Gave %s\nto %s.", "%s an\n%s gegeben."}
+
 };

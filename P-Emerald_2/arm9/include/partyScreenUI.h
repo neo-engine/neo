@@ -51,8 +51,9 @@ namespace STS {
         u16 initBottomScreen( bool p_bottom = true );
 
         void drawPartyPkmn( u8 p_pos, bool p_selected, bool p_redraw = true,
-                            bool p_bottom = false );
+                            const char* p_message = 0, bool p_bottom = false );
         void animatePartyPkmn( u8 p_frame, bool p_bottom = false );
+        void animateMessageBox( u8 p_frame, bool p_bottom = false );
 
       public:
         /*
@@ -78,12 +79,13 @@ namespace STS {
         /*
          * @brief Changes the selection to p_selectedIdx. Unselects old selected idx.
          */
-        void select( u8 p_selectedIdx );
+        void select( u8 p_selectedIdx, const char* p_message = 0 );
 
         /*
          * @brief redraws the sub srceen
          */
-        void drawPartyPkmnSub( u8 p_pos, bool p_selected, bool p_redraw, bool p_bottom = true );
+        void drawPartyPkmnSub( u8 p_pos, bool p_selected, bool p_redraw, const char* p_message = 0,
+                               bool p_bottom = true );
         /*
          * @brief Draws the specified choice box.
          */
@@ -121,11 +123,22 @@ namespace STS {
         /*
          * @brief Prints the given message
          */
-        void printMessage( const char* p_message, u16 p_itemIcon = 0 );
+        void printMessage( const char* p_message, u16 p_itemIcon = 0, bool p_bottom = true );
 
         /*
          * @brief Hides the message box.
          */
-        void hideMessageBox( );
+        void hideMessageBox( bool p_bottom = true );
+
+        /*
+         * @brief Prints the given yes no message
+         */
+        void printYNMessage( const char* p_message, u8 p_selection = 255, u16 p_itemIcon = 0,
+                             bool p_bottom = true );
+
+        /*
+         * @brief Hides the yes no message box.
+         */
+        void hideYNMessageBox( bool p_bottom = true );
     };
 } // namespace STS

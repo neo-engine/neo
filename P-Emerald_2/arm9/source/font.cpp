@@ -132,12 +132,11 @@ namespace IO {
         p_y = putY;
     }
 
-    void drawContinue( font p_font, u8 p_x, u8 p_y, u8 p_layer ) {
-        p_font.printChar( /*'@'*/ u16( 172 ), p_x, p_y, true, p_layer );
+    void font::drawContinue( u8 p_x, u8 p_y, bool p_bottom, u8 p_layer ) {
+        printChar( /*'@'*/ u16( 172 ), p_x, p_y, p_bottom, p_layer );
     }
-    void hideContinue( u8 p_x, u8 p_y, u8 p_layer ) {
-        BG_PALETTE_SUB[ 250 ] = WHITE;
-        printRectangle( p_x, p_y, p_x + 5, p_y + 9, true, (u8) 250, p_layer );
+    void font::hideContinue( u8 p_x, u8 p_y, u8 p_color, bool p_bottom, u8 p_layer ) {
+        printRectangle( p_x, p_y, p_x + 5, p_y + 9, p_bottom, p_color, p_layer );
     }
 
     void font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer ) {
@@ -171,7 +170,7 @@ namespace IO {
                         if( on )
                             hideContinue( 243, 51, p_layer );
                         else
-                            drawContinue( *this, 243, 51, p_layer );
+                            drawContinue( 243, 51, p_layer );
                         on = !on;
                     }
                     if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_B ) ) break;
@@ -230,7 +229,7 @@ namespace IO {
                         if( on )
                             hideContinue( 243, 51, p_layer );
                         else
-                            drawContinue( *this, 243, 51, p_layer );
+                            drawContinue( 243, 51, p_layer );
                         on = !on;
                     }
                     if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_B ) ) break;

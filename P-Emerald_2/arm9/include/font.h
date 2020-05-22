@@ -68,6 +68,9 @@ namespace IO {
         enum alignment { LEFT, RIGHT, CENTER };
 
         // Methods
+        void drawContinue( u8 p_x, u8 p_y, bool p_bottom = true, u8 p_layer = 1 );
+        void hideContinue( u8 p_x, u8 p_y, u8 p_color = 250, bool p_bottom = true, u8 p_layer = 1 );
+
         void printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1 );
         void printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                           alignment p_alignment = LEFT, u8 p_yDistance = 16, s8 p_adjustX = 0,

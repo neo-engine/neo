@@ -65,6 +65,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "NoItem.h"
 
+#include "noselection_160_64_1.h"
+#include "noselection_160_64_2.h"
 #include "noselection_32_32.h"
 #include "noselection_32_64.h"
 #include "noselection_96_32_1.h"
@@ -79,7 +81,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 // Top screen defines
 
-// party overview
 #define SPR_HP_BAR_OAM( p_pos ) ( p_pos )
 #define SPR_PKMN_BG_OAM( p_pos ) ( 6 + 2 * ( p_pos ) )
 #define SPR_ITEM_ICON_OAM( p_pos ) ( 18 + ( p_pos ) )
@@ -101,7 +102,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 // Bottom screen defines
 
-// party overview
 #define SPR_PKMN_BG_OAM_SUB( p_pos ) ( ( p_pos ) )
 #define SPR_ITEM_ICON_OAM_SUB( p_pos ) ( 6 + ( p_pos ) )
 #define SPR_PKMN_ICON_OAM_SUB( p_pos ) ( 12 + ( p_pos ) )
@@ -112,13 +112,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_PAGE_RIGHT_OAM_SUB 24
 #define SPR_PAGE_OAM_SUB( p_page ) ( 22 + ( p_page ) )
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 25 + 6 * ( p_pos ) )
+#define SPR_MSG_BOX_OAM_SUB 67
+#define SPR_ITEM_OAM_SUB 74
 #define SPR_WINDOW_PAL_SUB 0
 #define SPR_PKMN_ICON_PAL_SUB( p_pos ) ( 2 + ( p_pos ) )
 #define SPR_ITEM_ICON_PAL_SUB 8
 #define SPR_ARROW_X_PAL_SUB 9
 #define SPR_BOX_PAL_SUB 10
 #define SPR_TYPE_PAL_SUB( p_pos ) ( 11 + ( p_pos ) )
-#define SPR_UNUSED_PAL_SUB 15
+#define SPR_ITEM_PAL_SUB 15
+
+#define SPR_PKMN_BG_GFX_SUB( p_type ) ( 0x40 * 2 * ( p_type ) )
 
 namespace STS {
     char BUFFER[ 50 ];
@@ -450,18 +454,18 @@ namespace STS {
                                 false, false, true, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
             } else {
                 // Item icon
-                tileCnt = IO::loadSprite( SPR_ITEM_ICON_OAM_SUB( i ), SPR_ITEM_ICON_PAL, tileCnt,
-                                          6 - 8 + 36 * i + 32, 154 - 10 + 32, 8, 8, itemiconPal,
-                                          itemiconTiles, itemiconTilesLen, false, false, true,
-                                          OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+                tileCnt = IO::loadSprite( SPR_ITEM_ICON_OAM_SUB( i ), SPR_ITEM_ICON_PAL_SUB,
+                                          tileCnt, 6 - 8 + 36 * i + 32, 154 - 10 + 32, 8, 8,
+                                          itemiconPal, itemiconTiles, itemiconTilesLen, false,
+                                          false, true, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
             }
             // Pkmn BG box
             tileCnt = IO::loadSprite(
                 SPR_PKMN_BG_OAM_SUB( i ), SPR_WINDOW_PAL_SUB, tileCnt, 6 + 36 * i, 154, 32, 32,
                 noselection_32_32Pal, noselection_blank_32_32Tiles, noselection_blank_32_32TilesLen,
                 false, false, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-            // Pkmn icon
 
+            // Pkmn icon
             tileCnt
                 = IO::loadSprite( SPR_PKMN_ICON_OAM_SUB( i ), SPR_PKMN_ICON_PAL_SUB( i ), tileCnt,
                                   6 + 36 * i, 154, 32, 32, NoItemPal, NoItemTiles, NoItemTilesLen,
@@ -556,6 +560,40 @@ namespace STS {
                             OBJMODE_NORMAL );
         }
 
+        // message box
+
+        tileCnt = IO::loadSprite( SPR_MSG_BOX_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt, 28, 52, 32, 64, 0,
+                                  noselection_160_64_1Tiles, noselection_160_64_1TilesLen, false,
+                                  false, true, OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
+        tileCnt
+            = IO::loadSprite( SPR_MSG_BOX_OAM_SUB + 1, SPR_BOX_PAL_SUB, tileCnt, 28 + 32, 52, 32,
+                              64, 0, noselection_160_64_2Tiles, noselection_160_64_2TilesLen, false,
+                              false, true, OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
+        IO::loadSprite( SPR_MSG_BOX_OAM_SUB + 2, SPR_BOX_PAL_SUB,
+                        oam[ SPR_MSG_BOX_OAM_SUB + 1 ].gfxIndex, 68, 52, 32, 64, 0,
+                        noselection_160_64_2Tiles, noselection_160_64_2TilesLen, false, false, true,
+                        OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
+        IO::loadSprite( SPR_MSG_BOX_OAM_SUB + 3, SPR_BOX_PAL_SUB,
+                        oam[ SPR_MSG_BOX_OAM_SUB + 1 ].gfxIndex, 68 + 32, 52, 32, 64, 0,
+                        noselection_160_64_2Tiles, noselection_160_64_2TilesLen, false, false, true,
+                        OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
+        IO::loadSprite( SPR_MSG_BOX_OAM_SUB + 4, SPR_BOX_PAL_SUB,
+                        oam[ SPR_MSG_BOX_OAM_SUB + 1 ].gfxIndex, 68 + 64, 52, 32, 64, 0,
+                        noselection_160_64_2Tiles, noselection_160_64_2TilesLen, false, false, true,
+                        OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
+        IO::loadSprite( SPR_MSG_BOX_OAM_SUB + 5, SPR_BOX_PAL_SUB,
+                        oam[ SPR_MSG_BOX_OAM_SUB + 1 ].gfxIndex, 68 + 96, 52, 32, 64, 0,
+                        noselection_160_64_2Tiles, noselection_160_64_2TilesLen, false, false, true,
+                        OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
+        IO::loadSprite( SPR_MSG_BOX_OAM_SUB + 6, SPR_BOX_PAL_SUB,
+                        oam[ SPR_MSG_BOX_OAM_SUB ].gfxIndex, 68 + 128, 52, 32, 64, 0,
+                        noselection_160_64_1Tiles, noselection_160_64_1TilesLen, true, true, true,
+                        OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
+
+        tileCnt = IO::loadSprite( SPR_ITEM_OAM_SUB, SPR_ITEM_PAL_SUB, tileCnt, 32, 68, 32, 32,
+                                  NoItemPal, NoItemTiles, NoItemTilesLen, false, false, true,
+                                  OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+
         // build the shared pals
         IO::copySpritePal( noselection_32_32Pal, SPR_WINDOW_PAL_SUB, 0, 2 * 4, p_bottom );
         IO::copySpritePal( noselection_faint_32_32Pal + 4, SPR_WINDOW_PAL_SUB, 4, 2 * 3, p_bottom );
@@ -571,8 +609,9 @@ namespace STS {
         return tileCnt;
     }
 
-    void partyScreenUI::drawPartyPkmn( u8 p_pos, bool p_selected, bool p_redraw, bool p_bottom ) {
-        drawPartyPkmnSub( p_pos, p_selected, p_redraw, !p_bottom );
+    void partyScreenUI::drawPartyPkmn( u8 p_pos, bool p_selected, bool p_redraw,
+                                       const char* p_message, bool p_bottom ) {
+        drawPartyPkmnSub( p_pos, p_selected, p_redraw, p_message, !p_bottom );
 
         SpriteEntry* oam      = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         u16          anchor_x = oam[ SPR_PKMN_BG_OAM( p_pos ) ].x;
@@ -806,7 +845,7 @@ namespace STS {
     }
 
     void partyScreenUI::drawPartyPkmnSub( u8 p_pos, bool p_selected, bool p_redraw,
-                                          bool p_bottom ) {
+                                          const char* p_message, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
 
         if( p_redraw ) {
@@ -890,18 +929,26 @@ namespace STS {
                 dmaCopy( partysubBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 256 );
             }
 
-            if( !_swapping ) {
-                if( !_toSelect ) {
-                    snprintf( BUFFER, 49, GET_STRING( 57 ),
-                              _team[ p_pos ].isEgg( ) ? GET_STRING( 34 )
-                                                      : _team[ p_pos ].m_boxdata.m_name );
-                } else {
-                    snprintf( BUFFER, 49, GET_STRING( 332 ), _toSelect );
-                }
+            if( p_message ) {
+                IO::regularFont->printString( p_message, 32, 2, p_bottom );
             } else {
-                snprintf( BUFFER, 49, GET_STRING( 166 ) );
+                if( !_swapping ) {
+                    if( !_toSelect ) {
+                        snprintf( BUFFER, 49, GET_STRING( 57 ),
+                                  _team[ p_pos ].isEgg( ) ? GET_STRING( 34 )
+                                                          : _team[ p_pos ].m_boxdata.m_name );
+                    } else {
+                        if( _toSelect > 1 ) {
+                            snprintf( BUFFER, 49, GET_STRING( 332 ), _toSelect );
+                        } else {
+                            snprintf( BUFFER, 49, GET_STRING( 333 ) );
+                        }
+                    }
+                } else {
+                    snprintf( BUFFER, 49, GET_STRING( 166 ) );
+                }
+                IO::regularFont->printString( BUFFER, 32, 2, p_bottom );
             }
-            IO::regularFont->printString( BUFFER, 32, 2, p_bottom );
         }
 
         IO::updateOAM( p_bottom );
@@ -974,6 +1021,11 @@ namespace STS {
         IO::updateOAM( false );
     }
 
+    void partyScreenUI::animateMessageBox( u8 p_frame, bool p_bottom ) {
+        if( ( p_frame & 31 ) == 15 ) { IO::regularFont->drawContinue( 216, 104, p_bottom ); }
+        if( ( p_frame & 31 ) == 31 ) { IO::regularFont->hideContinue( 216, 104, 0, p_bottom ); }
+    }
+
     void partyScreenUI::init( u8 p_initialSelection ) {
         _selectedIdx = p_initialSelection;
         IO::vramSetup( );
@@ -988,16 +1040,19 @@ namespace STS {
         animatePartyPkmn( p_frame );
         IO::animateBG( p_frame, IO::bg3 );
         IO::animateBG( p_frame, IO::bg3sub );
+
+        if( !IO::Oam->oamBuffer[ SPR_MSG_BOX_OAM_SUB ].isHidden ) { animateMessageBox( p_frame ); }
+
         bgUpdate( );
     }
 
-    void partyScreenUI::select( u8 p_selectedIdx ) {
+    void partyScreenUI::select( u8 p_selectedIdx, const char* p_message ) {
         if( _selectedIdx != p_selectedIdx ) {
-            drawPartyPkmn( _selectedIdx, false, false );
+            drawPartyPkmn( _selectedIdx, false, false, p_message );
             _selectedIdx = p_selectedIdx;
-            drawPartyPkmn( _selectedIdx, true, false );
+            drawPartyPkmn( _selectedIdx, true, false, p_message );
         } else {
-            drawPartyPkmn( _selectedIdx, true, true );
+            drawPartyPkmn( _selectedIdx, true, true, p_message );
         }
     }
 
@@ -1049,20 +1104,91 @@ namespace STS {
             oam[ SPR_MARK_OAM( p_idx1, i ) ].isHidden = oam[ SPR_MARK_OAM( p_idx2, i ) ].isHidden;
             oam[ SPR_MARK_OAM( p_idx2, i ) ].isHidden = tmp;
         }
-        drawPartyPkmn( p_idx1, p_idx1 == _selectedIdx, true, p_bottom );
-        drawPartyPkmn( p_idx2, p_idx2 == _selectedIdx, true, p_bottom );
+        drawPartyPkmn( p_idx1, p_idx1 == _selectedIdx, true, 0, p_bottom );
+        drawPartyPkmn( p_idx2, p_idx2 == _selectedIdx, true, 0, p_bottom );
         unswap( p_idx1, p_bottom );
         unswap( p_idx2, p_bottom );
         IO::fadeScreen( IO::UNFADE_FAST );
     }
-    void partyScreenUI::printMessage( const char* p_message, u16 p_itemIcon ) {
 
-        // TODO
+    void partyScreenUI::printMessage( const char* p_message, u16 p_itemIcon, bool p_bottom ) {
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        for( u8 i = 0; i < 7; i++ ) { oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = false; }
+        if( p_itemIcon ) {
+            oam[ SPR_ITEM_OAM_SUB ].isHidden = false;
+            IO::loadItemIcon( p_itemIcon, oam[ SPR_ITEM_OAM_SUB ].x, oam[ SPR_ITEM_OAM_SUB ].y,
+                              SPR_ITEM_OAM_SUB, SPR_ITEM_PAL_SUB, oam[ SPR_ITEM_OAM_SUB ].gfxIndex,
+                              p_bottom );
+            if( p_message ) {
+                IO::regularFont->printString( p_message, oam[ SPR_ITEM_OAM_SUB ].x + 36,
+                                              oam[ SPR_ITEM_OAM_SUB ].y, p_bottom, IO::font::LEFT );
+            }
+        } else if( p_message ) {
+            IO::regularFont->printString( p_message, 128, oam[ SPR_ITEM_OAM_SUB ].y, p_bottom,
+                                          IO::font::CENTER );
+        }
+
+        IO::updateOAM( p_bottom );
     }
 
-    void partyScreenUI::hideMessageBox( ) {
+    void partyScreenUI::hideMessageBox( bool p_bottom ) {
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        for( u8 i = 0; i < 7; i++ ) { oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = true; }
+        oam[ SPR_ITEM_OAM_SUB ].isHidden = true;
+        IO::updateOAM( p_bottom );
+    }
 
-        // TODO
+    void partyScreenUI::printYNMessage( const char* p_message, u8 p_selection, u16 p_itemIcon,
+                                        bool p_bottom ) {
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        for( u8 i = 0; i < 7; i++ ) {
+            oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = false;
+            oam[ SPR_MSG_BOX_OAM_SUB + i ].y -= 36;
+        }
+        if( p_itemIcon ) {
+            oam[ SPR_ITEM_OAM_SUB ].isHidden = false;
+            IO::loadItemIcon( p_itemIcon, oam[ SPR_ITEM_OAM_SUB ].x, oam[ SPR_ITEM_OAM_SUB ].y,
+                              SPR_ITEM_OAM_SUB, SPR_ITEM_PAL_SUB, oam[ SPR_ITEM_OAM_SUB ].gfxIndex,
+                              p_bottom );
+            if( p_message ) {
+                IO::regularFont->printString( p_message, oam[ SPR_ITEM_OAM_SUB ].x + 36,
+                                              oam[ SPR_ITEM_OAM_SUB ].y, p_bottom, IO::font::LEFT );
+            }
+        } else if( p_message ) {
+            IO::regularFont->printString( p_message, 128, oam[ SPR_ITEM_OAM_SUB ].y, p_bottom,
+                                          IO::font::CENTER );
+        }
+        for( u8 i = 4; i < 6; i++ ) {
+            for( u8 j = 0; j < 6; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
+                    = ( i - 4 == p_selection ? SPR_WINDOW_PAL_SUB : SPR_BOX_PAL_SUB );
+            }
+        }
+        if( p_message ) {
+            IO::regularFont->printString(
+                GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 48,
+                oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].y + 8, p_bottom, IO::font::CENTER );
+            IO::regularFont->printString(
+                GET_STRING( 81 ), oam[ SPR_CHOICE_START_OAM_SUB( 5 ) ].x + 48,
+                oam[ SPR_CHOICE_START_OAM_SUB( 5 ) ].y + 8, p_bottom, IO::font::CENTER );
+        }
+        IO::updateOAM( p_bottom );
+    }
+
+    void partyScreenUI::hideYNMessageBox( bool p_bottom ) {
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        for( u8 i = 0; i < 7; i++ ) {
+            oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = true;
+            oam[ SPR_MSG_BOX_OAM_SUB + i ].y += 36;
+        }
+        oam[ SPR_ITEM_OAM_SUB ].isHidden = true;
+        for( u8 i = 4; i < 6; i++ ) {
+            for( u8 j = 0; j < 6; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
+            }
+        }
+        IO::updateOAM( p_bottom );
     }
 
 } // namespace STS
