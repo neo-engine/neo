@@ -29,6 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "bagViewer.h"
 #include "item.h"
 #include "saveGame.h"
+#include "sound.h"
 
 namespace STS {
     partyScreen::partyScreen( pokemon p_team[ 6 ], u8 p_teamLength, bool p_allowMoves,
@@ -196,8 +197,11 @@ namespace STS {
                 ex = true;
                 break;
             }
-            if( pressed & KEY_B ) { break; }
+            if( pressed & KEY_B ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                break; }
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( ( _currentChoiceSelection & 1 ) && _currentChoiceSelection < 6
                     && _currentChoices.size( ) > 6 ) {
                     // Switch to second page
@@ -214,6 +218,7 @@ namespace STS {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( !( _currentChoiceSelection & 1 ) && _currentChoiceSelection >= 6 ) {
                     // Switch to first page
                     _currentChoiceSelection -= 5;
@@ -225,6 +230,7 @@ namespace STS {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _currentChoiceSelection >= 6
                     && size_t( _currentChoiceSelection + 2 ) >= _currentChoices.size( ) ) {
                     selectChoice( ( _currentChoiceSelection & 1 ) + 6 );
@@ -237,6 +243,7 @@ namespace STS {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _currentChoiceSelection >= 6 && _currentChoiceSelection < 8 ) {
                     selectChoice(
                         6
@@ -252,6 +259,7 @@ namespace STS {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_A ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
                 cooldown = COOLDOWN_COUNT;
                 ex       = executeChoice( _currentChoices[ _currentChoiceSelection ] );
                 break;
@@ -308,8 +316,12 @@ namespace STS {
                 ex = true;
                 break;
             }
-            if( pressed & KEY_B ) { break; }
+            if( pressed & KEY_B ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                break;
+            }
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( ( _currentChoiceSelection & 1 ) && _currentChoiceSelection < 6
                     && choices.size( ) > 6 ) {
                     // Switch to second page
@@ -326,6 +338,7 @@ namespace STS {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( !( _currentChoiceSelection & 1 ) && _currentChoiceSelection >= 6 ) {
                     // Switch to first page
                     _currentChoiceSelection -= 5;
@@ -337,6 +350,7 @@ namespace STS {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _currentChoiceSelection >= 6
                     && size_t( _currentChoiceSelection + 2 ) >= choices.size( ) ) {
                     selectChoice( ( _currentChoiceSelection & 1 ) + 6, choices.size( ) );
@@ -349,6 +363,7 @@ namespace STS {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _currentChoiceSelection >= 6 && _currentChoiceSelection < 8 ) {
                     selectChoice(
                         6 + ( choices.size( ) - 7 - ( _currentChoiceSelection & 1 ) ) / 2 * 2
@@ -365,6 +380,7 @@ namespace STS {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_A ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
                 cooldown = COOLDOWN_COUNT;
                 if( executeDesquidChoice( choices[ _currentChoiceSelection ] ) ) { break; }
                 _partyUI->select( _currentSelection );
@@ -604,8 +620,14 @@ namespace STS {
             pressed = keysUp( );
             held    = keysHeld( );
 
-            if( GET_KEY_COOLDOWN( KEY_A ) ) break;
-            if( GET_KEY_COOLDOWN( KEY_B ) ) break;
+            if( GET_KEY_COOLDOWN( KEY_A ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
+                break;
+            }
+            if( GET_KEY_COOLDOWN( KEY_B ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
+                break;
+            }
         }
     }
 
@@ -628,8 +650,12 @@ namespace STS {
             pressed = keysUp( );
             held    = keysHeld( );
 
-            if( pressed & KEY_X ) break;
+            if( pressed & KEY_X ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                break;
+            }
             if( pressed & KEY_B ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
                 if( _swapSelection != 255 ) {
                     _partyUI->unswap( _swapSelection );
                     _swapSelection = 255;
@@ -648,12 +674,15 @@ namespace STS {
                 }
             }
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 select( ( _currentSelection + 1 ) % _teamLength );
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 select( ( _currentSelection + _teamLength - 1 ) % _teamLength );
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _currentSelection + 2 >= _teamLength ) {
                     select( _currentSelection & 1 );
                 } else {
@@ -661,6 +690,7 @@ namespace STS {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _currentSelection < 2 ) {
                     select( ( _teamLength - 1 - ( _currentSelection & 1 ) ) / 2 * 2
                             + ( _currentSelection & 1 ) );
@@ -669,6 +699,7 @@ namespace STS {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_A ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
                 cooldown = COOLDOWN_COUNT;
                 if( focus( _currentSelection ) ) { // User pressed X
                     _currentMarksOrMove.m_selectedMove = 0;
