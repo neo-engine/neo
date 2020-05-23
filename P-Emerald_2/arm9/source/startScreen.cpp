@@ -48,14 +48,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace SAVE {
     void initColors( ) {
-        BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
-        BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
-        BG_PALETTE_SUB[ GRAY_IDX ]  = NORMAL_COLOR;
-        BG_PALETTE_SUB[ RED_IDX ]   = GREEN;
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
+        BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::CHOICE_COLOR;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::NORMAL_COLOR;
+        BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::GREEN;
         IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
-        IO::regularFont->setColor( BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
     }
 
     language translate( u8 p_dSRegion ) {
@@ -158,38 +158,38 @@ namespace SAVE {
         initColors( );
         for( u8 i = 0; i < p_toDraw.size( ); ++i ) {
             IO::printChoiceBox( 4, 4 + 48 * i, 136, 26 + 48 * i, 6,
-                                ( i == p_selected ) ? RED_IDX : COLOR_IDX, i == p_pressed );
+                                ( i == p_selected ) ? IO::RED_IDX : IO::COLOR_IDX, i == p_pressed );
             IO::regularFont->printString( STRINGS[ p_toDraw[ i ] ][ p_lang ],
                                           70 + 2 * ( i == p_pressed ),
                                           8 + 48 * i + ( i == p_pressed ), true, IO::font::CENTER );
         }
         swiWaitForVBlank( );
         IO::boldFont->setColor( 0, 0 );
-        IO::boldFont->setColor( WHITE_IDX, 1 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 1 );
         for( u8 i = 0; i < p_toDraw.size( ); ++i ) {
             if( i == p_selected || i == p_pressed )
-                IO::boldFont->setColor( BLACK_IDX, 2 );
+                IO::boldFont->setColor( IO::BLACK_IDX, 2 );
             else
-                IO::boldFont->setColor( GRAY_IDX, 2 );
+                IO::boldFont->setColor( IO::GRAY_IDX, 2 );
             IO::boldFont->printString( STRINGS[ p_toDraw[ i ] + 4 ][ p_lang ], 248, 28 + 48 * i,
                                        true, IO::font::RIGHT );
         }
     }
 
     void fillResume( ) {
-        IO::regularFont->setColor( BLUE_IDX, 1 );
-        IO::regularFont->setColor( WHITE_IDX, 2 );
+        IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 2 );
         for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) {
             if( !SAV.m_saveFile[ i ].m_gameType ) continue;
 
             if( SAV.m_saveFile[ i ].m_isMale )
-                BG_PALETTE_SUB[ BLUE_IDX ] = BLUE2;
+                BG_PALETTE_SUB[ IO::BLUE_IDX ] = IO::BLUE2;
             else
-                BG_PALETTE_SUB[ BLUE_IDX ] = RED2;
+                BG_PALETTE_SUB[ IO::BLUE_IDX ] = IO::RED2;
 
             IO::regularFont->printString( SAV.m_saveFile[ i ].m_playername, 8, 30 + 64 * i, true );
             IO::regularFont->printString(
-                FS::getLocation( MAP::curMap->getCurrentLocationId( ), CURRENT_LANGUAGE ).c_str( ),
+                FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
                 248, 30 + 64 * i, true, IO::font::RIGHT );
 
             char buffer[ 50 ];
@@ -210,7 +210,7 @@ namespace SAVE {
         initColors( );
         for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) {
             IO::printChoiceBox( 4, 4 + 64 * i, 86, 26 + 64 * i, 6,
-                                ( i == p_selected ) ? RED_IDX : COLOR_IDX, i == p_pressed );
+                                ( i == p_selected ) ? IO::RED_IDX : IO::COLOR_IDX, i == p_pressed );
             if( !SAV.m_saveFile[ i ].isGood( ) ) { SAV.m_saveFile[ i ].m_gameType = UNUSED; }
             switch( SAV.m_saveFile[ i ].m_gameType ) {
             case UNUSED:
@@ -286,7 +286,7 @@ namespace SAVE {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true );
-                for( u16 i = 1; i < 256; ++i ) BG_PALETTE_SUB[ i ] = WHITE;
+                for( u16 i = 1; i < 256; ++i ) BG_PALETTE_SUB[ i ] = IO::WHITE;
                 return ABORT;
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
@@ -338,7 +338,7 @@ namespace SAVE {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true );
-                for( u16 i = 1; i < 256; ++i ) BG_PALETTE_SUB[ i ] = WHITE;
+                for( u16 i = 1; i < 256; ++i ) BG_PALETTE_SUB[ i ] = IO::WHITE;
                 return -1;
             } else if( GET_AND_WAIT( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );

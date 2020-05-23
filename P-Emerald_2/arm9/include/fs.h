@@ -94,6 +94,7 @@ namespace FS {
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name,
                          const u32 p_tileCnt, const u16 p_palCnt, bool p_bottom = false );
 
+    std::string getLocation( u16 p_locationId );
     std::string getLocation( u16 p_locationId, u8 p_language );
     bool getLocation( u16 p_locationId, u8 p_language, char* p_out );
 

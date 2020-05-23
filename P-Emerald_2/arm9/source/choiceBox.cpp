@@ -116,11 +116,11 @@ namespace IO {
     std::vector<const char*> names;
     choiceBox::choiceBox( pokemon p_pokemon, u16 p_move ) {
         _num     = 4 + !!p_move;
-        names    = { MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 0 ], CURRENT_LANGUAGE ).c_str( ),
-            MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 1 ], CURRENT_LANGUAGE ).c_str( ),
-            MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 2 ], CURRENT_LANGUAGE ).c_str( ),
-            MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 3 ], CURRENT_LANGUAGE ).c_str( ),
-            MOVE::getMoveName( p_move, CURRENT_LANGUAGE ).c_str( ) };
+        names    = { MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 0 ] ).c_str( ),
+            MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 1 ] ).c_str( ),
+            MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 2 ] ).c_str( ),
+            MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 3 ] ).c_str( ),
+            MOVE::getMoveName( p_move ).c_str( ) };
         _choices = &names[ 0 ];
         _big     = false;
         _acPage  = 0;

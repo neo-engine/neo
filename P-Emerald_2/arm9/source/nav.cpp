@@ -132,17 +132,17 @@ namespace NAV {
         dmaCopy( BorderPal + 192, pal + 192, 64 );
 
         if( ANIMATE_MAP ) {
-            /*  pal[ WHITE_IDX ] = WHITE;
-              pal[ GRAY_IDX ]  = GRAY;
-              pal[ BLACK_IDX ] = BLACK;
-              regularFont->setColor( WHITE_IDX, 1 );
-              regularFont->setColor( GRAY_IDX, 2 );
+            /*  pal[ IO::WHITE_IDX ] = IO::WHITE;
+              pal[ IO::GRAY_IDX ]  = IO::GRAY;
+              pal[ IO::BLACK_IDX ] = IO::BLACK;
+              regularFont->setColor( IO::WHITE_IDX, 1 );
+              regularFont->setColor( IO::GRAY_IDX, 2 );
               regularFont->setColor( 0, 0 ); */
             IO::boldFont->setColor( 0, 1 );
-            IO::boldFont->setColor( WHITE_IDX, 2 );
+            IO::boldFont->setColor( IO::WHITE_IDX, 2 );
 
             IO::boldFont->printString(
-                ( FS::getLocation( CURRENT_MAP, CURRENT_LANGUAGE ) ).c_str( ), 7, 4,
+                ( FS::getLocation( CURRENT_MAP ) ).c_str( ), 7, 4,
                 !SCREENS_SWAPPED );
         }
 

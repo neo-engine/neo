@@ -46,7 +46,7 @@ namespace IO {
         extern u8      fontData[ NUM_CHARS * 256 ];
     } // namespace BOLD_FONT
     namespace SMALL_FONT {
-        constexpr auto NUM_CHARS = 40;
+        constexpr auto NUM_CHARS = 150;
         void           shiftchar( u16 &val );
         extern u8      fontWidths[ NUM_CHARS ];
         extern u8      fontData[ NUM_CHARS * 256 ];
@@ -68,24 +68,27 @@ namespace IO {
         enum alignment { LEFT, RIGHT, CENTER };
 
         // Methods
-        void drawContinue( u8 p_x, u8 p_y, bool p_bottom = true, u8 p_layer = 1 );
-        void hideContinue( u8 p_x, u8 p_y, u8 p_color = 250, bool p_bottom = true, u8 p_layer = 1 );
+        void drawContinue( u8 p_x, u8 p_y, bool p_bottom = true, u8 p_layer = 1 ) const;
+        void hideContinue( u8 p_x, u8 p_y, u8 p_color = 250, bool p_bottom = true, u8 p_layer = 1 ) const;
 
-        void printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1 );
+        void printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1 ) const;
         void printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                           alignment p_alignment = LEFT, u8 p_yDistance = 16, s8 p_adjustX = 0,
-                          u8 p_layer = 1 );
+                          u8 p_layer = 1 ) const;
         void printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                             s16 p_maxX = 256, u16 p_breakChar = L'.', u8 p_layer = 1 );
+                             s16 p_maxX = 256, u16 p_breakChar = L'.', u8 p_layer = 1 ) const;
         void printStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom,
-                           u8 p_layer = 1 );
+                           u8 p_layer = 1 ) const;
 
-        void printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1 );
+        void printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1 )
+            const;
         void printMBStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom,
-                             u8 p_layer = 1 );
+                             u8 p_layer = 1 ) const;
 
         u32 stringWidth( const char *p_string ) const;
 
+        void printCounter( u32 p_value, u8 p_digits, u16 p_x, u16 p_y, u8 p_highlightDigit,
+                           u8 p_highlightBG, u8 p_highlightFG, bool p_bottom, u8 p_layer = 1 );
       private:
         u8 *_data;
         u8 *_widths;

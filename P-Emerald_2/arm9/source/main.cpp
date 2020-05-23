@@ -154,16 +154,16 @@ void vblankIRQ( ) {
     u8 oldC1 = IO::boldFont->getColor( 1 );
     u8 oldC2 = IO::boldFont->getColor( 2 );
     IO::boldFont->setColor( 0, 1 );
-    IO::boldFont->setColor( BLACK_IDX, 2 );
-    pal[ BLACK_IDX ] = BLACK;
+    IO::boldFont->setColor( IO::BLACK_IDX, 2 );
+    pal[ IO::BLACK_IDX ] = IO::BLACK;
     time( &unixTime );
     struct tm* timeStruct = gmtime( &unixTime );
 
     if( true || acseconds != timeStruct->tm_sec || DRAW_TIME ) {
         DRAW_TIME        = false;
-        pal[ WHITE_IDX ] = WHITE;
-        IO::boldFont->setColor( WHITE_IDX, 1 );
-        IO::boldFont->setColor( WHITE_IDX, 2 );
+        pal[ IO::WHITE_IDX ] = IO::WHITE;
+        IO::boldFont->setColor( IO::WHITE_IDX, 1 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
 
         char buffer[ 50 ];
         sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
@@ -182,7 +182,7 @@ void vblankIRQ( ) {
         acseconds = timeStruct->tm_sec;
 
         IO::boldFont->setColor( 0, 1 );
-        IO::boldFont->setColor( BLACK_IDX, 2 );
+        IO::boldFont->setColor( IO::BLACK_IDX, 2 );
         sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
         IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
     }
@@ -267,7 +267,7 @@ int main( int, char** p_argv ) {
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32, MAP::CURRENT_BANK.m_bank,
-                FS::getLocation( MAP::curMap->getCurrentLocationId( ), CURRENT_LANGUAGE ).c_str( ),
+                FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
                 MAP::curMap->getCurrentLocationId( ),
                 ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ],
                 MAP::curMap
@@ -296,7 +296,7 @@ int main( int, char** p_argv ) {
                             continue;
                         char buffer[ 50 ];
                         auto mname
-                            = MOVE::getMoveName( a.m_boxdata.m_moves[ j ], CURRENT_LANGUAGE );
+                            = MOVE::getMoveName( a.m_boxdata.m_moves[ j ] );
                         snprintf( buffer, 49, GET_STRING( 3 ),
                                   GET_STRING( MOVE::text( a.m_boxdata.m_moves[ j ], param ) ),
                                   mname.c_str( ) );

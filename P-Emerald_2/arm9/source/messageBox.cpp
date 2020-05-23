@@ -71,7 +71,7 @@ namespace IO {
                 sprintf( buf, GET_STRING( 89 ), p_count, ITEM::getItemName( p_itemId,
                             CURRENT_LANGUAGE ).c_str( ) );
             else
-                sprintf( buf, GET_STRING( 88 ), ITEM::getItemName( p_itemId, CURRENT_LANGUAGE )
+                sprintf( buf, GET_STRING( 88 ), ITEM::getItemName( p_itemId )
                         .c_str( ) );
             loadSprite( A_ID, 0, 0, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal, ATiles,
                         ATilesLen, false, false, true, OBJPRIORITY_0, true );
@@ -79,8 +79,8 @@ namespace IO {
 
         } else {
             sprintf( buf, GET_STRING( 87 ),
-                    ITEM::getItemName( p_itemId, CURRENT_LANGUAGE ).c_str( ),
-                    MOVE::getMoveName( p_data.m_param1, CURRENT_LANGUAGE ).c_str( ) );
+                    ITEM::getItemName( p_itemId ).c_str( ),
+                    MOVE::getMoveName( p_data.m_param1 ).c_str( ) );
             MOVE::moveData mdata = MOVE::getMoveData( p_data.m_param1 );
             IO::loadTMIcon( mdata.m_type, MOVE::isFieldMove( p_data.m_param1 ), 4, 4, 0, 1, 0 );
         }

@@ -150,6 +150,8 @@ namespace IO {
     }
 
     void clearScreen( bool p_bottom, bool p_both, bool p_dark ) {
+        (void) p_dark;
+
         if( p_both || p_bottom ) {
             dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
             dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );

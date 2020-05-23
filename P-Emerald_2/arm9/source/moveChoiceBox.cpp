@@ -69,7 +69,7 @@ namespace IO {
                 CHOICE_POS[ !!_moveToLearn ][ i ][ 2 ], CHOICE_POS[ !!_moveToLearn ][ i ][ 3 ], 4,
                 ( _selectedIdx == i ) ? RED_IDX : 240 + i, i == p_pressedIdx );
 
-            regularFont->printString( MOVE::getMoveName( moveIdx, CURRENT_LANGUAGE ).c_str( ),
+            regularFont->printString( MOVE::getMoveName( moveIdx ).c_str( ),
                                       CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ]
                                           + ( CHOICE_POS[ !!_moveToLearn ][ i ][ 2 ]
                                               - CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ] )

@@ -169,8 +169,11 @@ struct pkmnData {
     u8            m_catchrate;
     u8            m_baseFriend;
 
-    u8 getExpType( ) const {
+    inline u8 getExpType( ) const {
         return m_expTypeFormeCnt >> 5;
+    }
+    inline u8 getFormeCnt( ) const {
+        return m_expTypeFormeCnt & 0xF;
     }
 };
 
@@ -223,7 +226,8 @@ struct pokemonData {
     u8  m_stage; // 0: Basic, 1: Stage 1, 2: Stage 2, 3 Restored (m_preEvolution: itemIdx)
 };
 
-std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme = 0 );
+std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme );
+std::string getDisplayName( u16 p_pkmnId, u8 p_forme = 0 );
 bool        getDisplayName( u16 p_pkmnId, char* p_name, u8 p_language, u8 p_forme = 0 );
 
 pkmnData getPkmnData( const u16 p_pkmnId, const u8 p_forme = 0 );

@@ -87,6 +87,7 @@ namespace MOVE {
 
     bool        getMoveName( const u16 p_moveId, const u8 p_language, char* p_out );
     std::string getMoveName( const u16 p_moveId, const u8 p_language );
+    std::string getMoveName( const u16 p_moveId );
 
     bool     getMoveData( const u16 p_moveId, moveData* p_out );
     moveData getMoveData( const u16 p_moveId );

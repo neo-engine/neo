@@ -109,87 +109,10 @@ extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
 #define POKE_NAV GET_STRING( 8 )
 
 #define loop( ) while( 1 )
-
-#define IN_RANGE_I( p_touch, p_input )                                                     \
-    ( ( p_touch ).px >= ( p_input ).m_targetX1 && ( p_touch ).py >= ( p_input ).m_targetY1 \
-      && ( p_touch ).px <= ( p_input ).m_targetX2 && ( p_touch ).py <= ( p_input ).m_targetY2 )
-#define IN_RANGE_I_C( p_touch, p_input )                      \
-    ( sqrt( sq( ( p_touch ).px - ( p_input ).m_targetX1 )     \
-            + sq( ( p_touch ).py - ( p_input ).m_targetY1 ) ) \
-      <= ( p_input ).m_targetR )
-
-#define IN_RANGE_R( p_x1, p_y1, p_x2, p_y2 ) \
-    IN_RANGE_I( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) )
-#define IN_RANGE_C( p_x, p_y, p_r ) IN_RANGE_I_C( touch, IO::inputTarget( p_x, p_y, p_r ) )
-
-#define TOUCH_UP ( !touch.px && !touch.py )
-
-#define GET_KEY_COOLDOWN( p_key ) \
-    ( pressed & ( p_key ) ) || ( ( held & ( p_key ) ) && !( --cooldown ) )
-
-#define GET_AND_WAIT( p_key ) \
-    ( ( pressed & ( p_key ) ) && IO::waitForInput( IO::inputTarget( p_key ) ) )
-#define GET_AND_WAIT_R( p_x1, p_y1, p_x2, p_y2 )                     \
-    ( IN_RANGE_I( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) \
-      && IO::waitForInput( IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) )
-#define GET_AND_WAIT_C( p_x, p_y, p_r )                       \
-    ( IN_RANGE_I_C( touch, IO::inputTarget( p_x, p_y, p_r ) ) \
-      && IO::waitForInput( IO::inputTarget( p_x, p_y, p_r ) ) )
-
-#define GET_DIR( p_dir )               \
-    ( ( (p_dir) &KEY_DOWN )            \
-          ? MAP::direction::DOWN       \
-          : ( ( (p_dir) &KEY_UP )      \
-                  ? MAP::direction::UP \
-                  : ( ( (p_dir) &KEY_RIGHT ) ? MAP::direction::RIGHT : MAP::direction::LEFT ) ) )
-
-#define IN_DEX( pidx ) ( SAVE::SAV.m_caughtPkmn[ ( pidx ) / 8 ] & ( 1 << ( ( pidx ) % 8 ) ) )
-
-#define RGB( p_r, p_g, p_b ) ( RGB15( ( p_r ), ( p_g ), ( p_b ) ) | BIT( 15 ) )
-#define COMPL( p_color )                                                    \
-    ( RGB( 31 - ( ( p_color ) >> 10 ) % 32, 31 - ( ( p_color ) >> 5 ) % 32, \
-           31 - ( p_color ) % 32 ) )
-
-#define RED2_IDX ( u8( 247 ) )
-#define BLUE2_IDX ( u8( 248 ) )
-#define COLOR_IDX ( u8( 249 ) )
-#define WHITE_IDX ( u8( 250 ) )
-#define GRAY_IDX ( u8( 251 ) )
-#define BLACK_IDX ( u8( 252 ) )
-#define RED_IDX ( u8( 253 ) )
-#define BLUE_IDX ( u8( 254 ) )
-
-#define CHOICE_COLOR RGB( 16, 25, 19 )
-
-#define GREEN RGB( 0, 20, 0 )
-#define RED RGB( 28, 0, 0 )
-#define RED2 RGB( 10, 0, 0 )
-#define BLUE RGB( 0, 10, 31 )
-#define BLUE2 RGB( 0, 0, 15 )
-#define WHITE RGB( 30, 30, 30 )
-#define GRAY RGB( 15, 15, 15 )
-#define NORMAL_COLOR RGB( 27, 27, 27 )
-#define BLACK RGB( 0, 0, 0 )
-#define YELLOW RGB( 24, 24, 0 )
-#define PURPLE RGB( 24, 0, 24 )
-#define TURQOISE RGB( 0, 24, 24 )
-#define ICE_COLOR RGB( 15, 31, 31 )
-#define FAIRY_COLOR RGB( 31, 15, 31 )
-#define GROUND_COLOR RGB( 31, 31, 15 )
-#define POISON_COLOR RGB( 31, 0, 15 )
-#define ORANGE RGB( 31, 15, 0 )
-#define GHOST_COLOR RGB( 15, 0, 31 )
-#define ROCK_COLOR RGB( 28, 23, 7 )
-#define BUG_COLOR RGB( 15, 28, 7 )
-#define STEEL_COLOR RGB( 24, 24, 24 )
-#define DRAGON_COLOR RGB( 7, 7, 24 )
-#define UNKNOWN_COLOR RGB( 0, 42, 42 )
-
-#define BG_PAL( p_sub ) ( ( p_sub ) ? BG_PALETTE_SUB : BG_PALETTE )
-#define BG_BMP( p_sub ) ( ( p_sub ) ? BG_BMP_RAM_SUB( 1 ) : BG_BMP_RAM( 1 ) )
-
 #define TIMER_SPEED ( BUS_CLOCK / 1024 )
 #define sq( a ) ( ( a ) * ( a ) )
+
+#define IN_DEX( pidx ) ( SAVE::SAV.m_caughtPkmn[ ( pidx ) / 8 ] & ( 1 << ( ( pidx ) % 8 ) ) )
 
 // Main sprite's OAM indices
 #define BACK_ID 0

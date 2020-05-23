@@ -44,9 +44,9 @@ namespace SAVE {
     void printTextAndWait( const char* p_text ) {
         IO::fadeScreen( IO::fadeType::CLEAR_DARK );
         IO::clearScreen( true, true, true );
-        BG_PALETTE[ BLACK_IDX ] = BLACK;
-        BG_PALETTE[ WHITE_IDX ] = WHITE;
-        BG_PALETTE[ COLOR_IDX ] = GRAY;
+        BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
+        BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE[ IO::COLOR_IDX ] = IO::GRAY;
         u8 nw                   = 0;
         for( u8 i = 0; i < strlen( p_text ); ++i )
             if( p_text[ i ] == '\n' ) ++nw;
@@ -70,8 +70,8 @@ namespace SAVE {
     }
 
     void printEpisodeInfo( s8 p_episode ) {
-        IO::regularFont->setColor( COLOR_IDX, 2 );
-        IO::regularFont->setColor( WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::COLOR_IDX, 2 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
 
         for( u8 i = 0; i < EP_INTRO_TEXT_LEN[ p_episode ]; ++i )
             printTextAndWait( GET_STRING( EP_INTRO_TEXT_START[ p_episode ] + i ) );

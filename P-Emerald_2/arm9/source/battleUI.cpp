@@ -116,9 +116,9 @@ namespace BATTLE {
 
             _battleUI.setLogTextColor( RGB15( r, g, b ) );
             if( r != 15 || g != 15 || b != 15 )
-                IO::regularFont->setColor( COLOR_IDX, 1 );
+                IO::regularFont->setColor( IO::COLOR_IDX, 1 );
             else
-                IO::regularFont->setColor( GRAY_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 1 );
             return "";
         }
 
@@ -196,35 +196,35 @@ namespace BATTLE {
     void initColors( ) {
 
         IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::boldFont->setColor( 0, 0 );
-        IO::boldFont->setColor( GRAY_IDX, 1 );
-        IO::boldFont->setColor( WHITE_IDX, 2 );
+        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
 
-        BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-        BG_PALETTE_SUB[ GRAY_IDX ]  = STEEL_COLOR;
-        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
-        BG_PALETTE_SUB[ RED_IDX ]   = RED;
-        BG_PALETTE_SUB[ BLUE_IDX ]  = BLUE;
-        BG_PALETTE_SUB[ RED2_IDX ]  = RED2;
-        BG_PALETTE_SUB[ BLUE2_IDX ] = BLUE2;
-        BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::STEEL_COLOR;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
+        BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::RED;
+        BG_PALETTE_SUB[ IO::BLUE_IDX ]  = IO::BLUE;
+        BG_PALETTE_SUB[ IO::RED2_IDX ]  = IO::RED2;
+        BG_PALETTE_SUB[ IO::BLUE2_IDX ] = IO::BLUE2;
+        BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::CHOICE_COLOR;
     }
     void battleUI::initLogScreen( ) {
         initColors( );
-        BG_PALETTE[ WHITE_IDX ] = WHITE;
-        BG_PALETTE[ GRAY_IDX ]  = STEEL_COLOR;
-        BG_PALETTE[ BLACK_IDX ] = BLACK;
-        BG_PALETTE[ RED_IDX ]   = RED;
-        BG_PALETTE[ BLUE_IDX ]  = BLUE;
-        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, WHITE_IDX );
+        BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE[ IO::GRAY_IDX ]  = IO::STEEL_COLOR;
+        BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
+        BG_PALETTE[ IO::RED_IDX ]   = IO::RED;
+        BG_PALETTE[ IO::BLUE_IDX ]  = IO::BLUE;
+        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, IO::WHITE_IDX );
     }
     void battleUI::clearLogScreen( ) {
-        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, WHITE_IDX );
+        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, IO::WHITE_IDX );
     }
     void battleUI::setLogTextColor( u16 p_color ) {
-        BG_PALETTE_SUB[ COLOR_IDX ] = p_color;
+        BG_PALETTE_SUB[ IO::COLOR_IDX ] = p_color;
     }
     void battleUI::writeLogText( const std::string& p_message ) {
         IO::regularFont->printMBString( p_message.c_str( ), 8, 8, true );

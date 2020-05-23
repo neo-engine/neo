@@ -366,10 +366,13 @@ namespace FS {
         fclose( f );
         return true;
     }
-    std::string getLocation( const u16 p_itemId, const u8 p_language ) {
+    std::string getLocation( const u16 p_locationId, const u8 p_language ) {
         char tmpbuf[ LOCATION_NAMELENGTH ];
-        if( !getLocation( p_itemId, p_language, tmpbuf ) ) { return "---"; }
+        if( !getLocation( p_locationId, p_language, tmpbuf ) ) { return "---"; }
         return std::string( tmpbuf );
+    }
+    std::string getLocation( const u16 p_locationId ) {
+        return getLocation( p_locationId, CURRENT_LANGUAGE );
     }
 
     bool readSave( const char* p_path ) {
@@ -420,6 +423,9 @@ namespace ITEM {
         if( !getItemName( p_itemId, p_language, tmpbuf ) ) { return "---"; }
         return std::string( tmpbuf );
     }
+    std::string getItemName( const u16 p_itemId ) {
+        return getItemName( p_itemId, CURRENT_LANGUAGE );
+    }
 
     itemData getItemData( const u16 p_itemId ) {
         itemData res;
@@ -450,6 +456,10 @@ namespace MOVE {
         char tmpbuf[ MOVE_NAMELENGTH ];
         if( !getMoveName( p_moveId, p_language, tmpbuf ) ) { return "---"; }
         return std::string( tmpbuf );
+    }
+
+    std::string getMoveName( const u16 p_moveId ) {
+        return getMoveName( p_moveId, CURRENT_LANGUAGE );
     }
 
     moveData getMoveData( const u16 p_moveId ) {
@@ -499,11 +509,20 @@ std::string getAbilityName( int p_abilityId, int p_language ) {
     return std::string( tmpbuf );
 }
 
+std::string getAbilityName( int p_abilityId ) {
+    return getAbilityName( p_abilityId, CURRENT_LANGUAGE );
+}
+
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
     char tmpbuf[ 20 ];
     if( !getDisplayName( p_pkmnId, tmpbuf, p_language, p_forme ) ) { return "???"; }
     return std::string( tmpbuf );
 }
+
+std::string getDisplayName( u16 p_pkmnId, u8 p_forme ) {
+    return getDisplayName( p_pkmnId, CURRENT_LANGUAGE, p_forme );
+}
+
 bool getDisplayName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
     FILE* f;
     if( p_forme ) {

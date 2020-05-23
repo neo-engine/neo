@@ -82,6 +82,8 @@ const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
 
     {"Delete"},
     {"Egg Status"},
+    {"Species: %15s"},
+    {"Forme: %15s"},
 };
 
 #endif

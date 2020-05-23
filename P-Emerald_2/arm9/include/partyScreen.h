@@ -28,6 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <vector>
+#include <functional>
 
 #include "move.h"
 #include "partyScreenUI.h"
@@ -87,7 +88,20 @@ namespace STS {
             DESQUID_CANCEL,
         };
 
+        struct desquidItem {
+            u16 m_string;           // Desquid string id
+            bool m_hasCounterName;  // Counter values have names
+            u16 m_maxValue;         // Max value for the counter
+            u16 m_minValue;         // Min value for the counter
+            std::function<u16()> m_currentValue; // Callback for current value
+            std::function<void(u16)> m_counterUpdate; // Callback when counter value changed
+            std::function<std::string(u16)> m_nameForValue; // Used to obtain name for value (0 for n/a)
+            std::string getString( );
+        };
+
         const u16 getTextForDesquidChoice( const desquidChoice p_choice );
+
+        std::vector<desquidItem> getDesquidItemsForChoice( const desquidChoice p_choice );
 #endif
 
         const u16 getTextForChoice( const choice p_choice );
@@ -134,6 +148,8 @@ namespace STS {
 
 #ifdef DESQUID
         std::vector<desquidChoice> computeDesquidChoices( );
+
+        bool desquidWindow( desquidChoice p_choice );
 
         bool executeDesquidChoice( desquidChoice p_choice );
 

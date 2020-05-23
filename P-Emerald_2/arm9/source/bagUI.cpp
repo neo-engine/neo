@@ -82,22 +82,22 @@ namespace BAG {
 
     void initColors( ) {
         IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::boldFont->setColor( 0, 0 );
-        IO::boldFont->setColor( GRAY_IDX, 1 );
-        IO::boldFont->setColor( WHITE_IDX, 2 );
+        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
 
-        BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-        BG_PALETTE_SUB[ GRAY_IDX ]  = GRAY;
-        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
-        BG_PALETTE_SUB[ RED_IDX ]   = RED;
-        BG_PALETTE_SUB[ BLUE_IDX ]  = BLUE;
-        BG_PALETTE[ WHITE_IDX ]     = WHITE;
-        BG_PALETTE[ GRAY_IDX ]      = GRAY;
-        BG_PALETTE[ BLACK_IDX ]     = BLACK;
-        BG_PALETTE[ RED_IDX ]       = RED;
-        BG_PALETTE[ BLUE_IDX ]      = BLUE;
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
+        BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::RED;
+        BG_PALETTE_SUB[ IO::BLUE_IDX ]  = IO::BLUE;
+        BG_PALETTE[ IO::WHITE_IDX ]     = IO::WHITE;
+        BG_PALETTE[ IO::GRAY_IDX ]      = IO::GRAY;
+        BG_PALETTE[ IO::BLACK_IDX ]     = IO::BLACK;
+        BG_PALETTE[ IO::RED_IDX ]       = IO::RED;
+        BG_PALETTE[ IO::BLUE_IDX ]      = IO::BLUE;
     }
 
     void bagUI::init( ) {
@@ -170,8 +170,8 @@ namespace BAG {
             IO::OamTop->oamBuffer[ 1 ].isHidden = true;
             IO::OamTop->oamBuffer[ 2 ].isHidden = true;
 
-            display = ITEM::getItemName( p_itemId, CURRENT_LANGUAGE );
-            // descr   = ITEM::getDescription( p_itemId, CURRENT_LANGUAGE );
+            display = ITEM::getItemName( p_itemId );
+            // descr   = ITEM::getDescription( p_itemId );
             char buffer[ 100 ];
 
             if( p_data.m_itemType != ITEM::ITEMTYPE_KEYITEM
@@ -182,7 +182,7 @@ namespace BAG {
 
             if( p_data.m_itemType & ITEM::ITEMTYPE_BERRY ) {
                 /*
-                IO::regularFont->setColor( RED_IDX, 1 );
+                IO::regularFont->setColor( IO::RED_IDX, 1 );
                 snprintf( buffer, 99, GET_STRING( 16 ),
                           ( curr->m_berryData.m_berryGuete == berry::berryGueteType::HARD )
                               ? GET_STRING( 17 )
@@ -199,10 +199,10 @@ namespace BAG {
                                                               ? GET_STRING( 21 )
                                                               : ( GET_STRING( 22 ) ) ) ) ) ) );
                 IO::regularFont->printString( buffer, 24, 145, false );
-                IO::regularFont->setColor( BLUE_IDX, 1 );
+                IO::regularFont->setColor( IO::BLUE_IDX, 1 );
                 snprintf( buffer, 99, GET_STRING( 23 ), curr->m_berryData.m_berrySize / 10.0 );
                 IO::regularFont->printString( buffer, 140, 145, false );
-                IO::regularFont->setColor( BLACK_IDX, 1 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 
                 u8 poses[ 5 ] = {18, 66, 124, 150, 194};
                 u8 mx         = 0;
@@ -210,16 +210,16 @@ namespace BAG {
                     mx = std::max( mx, curr->m_berryData.m_berryTaste[ i ] );
                 for( u8 i = 0; i < 5; ++i ) {
                     if( curr->m_berryData.m_berryTaste[ i ] != mx ) {
-                        IO::regularFont->setColor( GRAY_IDX, 1 );
-                        IO::regularFont->setColor( WHITE_IDX, 2 );
+                        IO::regularFont->setColor( IO::GRAY_IDX, 1 );
+                        IO::regularFont->setColor( IO::WHITE_IDX, 2 );
                     } else {
-                        IO::regularFont->setColor( GRAY_IDX, 2 );
-                        IO::regularFont->setColor( BLACK_IDX, 1 );
+                        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                     }
                     IO::regularFont->printString( GET_STRING( 24 + i ), poses[ i ], 160, false );
                 }
-                IO::regularFont->setColor( GRAY_IDX, 2 );
-                IO::regularFont->setColor( BLACK_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                 */
             }
         } else {
@@ -227,8 +227,8 @@ namespace BAG {
             u16 tileCnt = IO::loadTMIcon( move.m_type, MOVE::isFieldMove( p_data.m_param2 ), 112,
                                           44, 0, 0, 0, false );
 
-            display = ITEM::getItemName( p_itemId, CURRENT_LANGUAGE ) + ": "
-                      + MOVE::getMoveName( p_data.m_param2, CURRENT_LANGUAGE );
+            display = ITEM::getItemName( p_itemId ) + ": "
+                      + MOVE::getMoveName( p_data.m_param2 );
 
             // TODO
             descr = FS::breakString( "", IO::regularFont, 196 );
@@ -245,7 +245,7 @@ namespace BAG {
             snprintf( buffer, 99, "%2d", move.m_pp );
             IO::regularFont->printString( buffer, 229, 145, false, IO::font::RIGHT );
 
-            IO::regularFont->setColor( RED_IDX, 1 );
+            IO::regularFont->setColor( IO::RED_IDX, 1 );
             IO::regularFont->printString( GET_STRING( 32 ), 33, 160, false );
             if( move.m_category != MOVE::STATUS && move.m_basePower > 1 )
                 snprintf( buffer, 99, "%3d", move.m_basePower );
@@ -253,14 +253,14 @@ namespace BAG {
                 snprintf( buffer, 99, "---" );
             IO::regularFont->printString( buffer, 108, 160, false, IO::font::RIGHT );
 
-            IO::regularFont->setColor( BLUE_IDX, 1 );
+            IO::regularFont->setColor( IO::BLUE_IDX, 1 );
             IO::regularFont->printString( GET_STRING( 33 ), 124, 160, false );
             if( move.m_accuracy )
                 snprintf( buffer, 99, "%3d", move.m_accuracy );
             else
                 std::sprintf( buffer, "---" );
             IO::regularFont->printString( buffer, 229, 160, false, IO::font::RIGHT );
-            IO::regularFont->setColor( BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
         }
 
         IO::regularFont->printString( display.c_str( ), 128, 26, false, IO::font::CENTER );
@@ -275,8 +275,8 @@ namespace BAG {
         for( u8 i = 0; i < 6; ++i ) {
             if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
             IO::printRectangle( 0, 33 + 26 * i, 128, 33 + 26 * i + 26, true, 0 );
-            IO::regularFont->setColor( WHITE_IDX, 1 );
-            IO::regularFont->setColor( GRAY_IDX, 2 );
+            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
             if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].isEgg( ) ) {
                 IO::regularFont->printString( GET_STRING( 34 ), 45, 38 + 26 * i, true );
@@ -296,20 +296,20 @@ namespace BAG {
                                == SAVE::SAV.getActiveFile( )
                                       .m_pkmnTeam[ i ]
                                       .m_boxdata.m_moves[ 3 ] ) {
-                        IO::regularFont->setColor( BLUE_IDX, 1 );
-                        IO::regularFont->setColor( BLACK_IDX, 2 );
+                        IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                        IO::regularFont->setColor( IO::BLACK_IDX, 2 );
                         IO::regularFont->printString( GET_STRING( 35 ), 40, 33 + 26 * i, true,
                                                       IO::font::LEFT, 11 );
                     } else if( canLearn(
                                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId,
                                    currMv, LEARN_TM ) ) {
-                        BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
-                        IO::regularFont->setColor( COLOR_IDX, 1 );
-                        IO::regularFont->setColor( BLACK_IDX, 2 );
+                        BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
+                        IO::regularFont->setColor( IO::COLOR_IDX, 1 );
+                        IO::regularFont->setColor( IO::BLACK_IDX, 2 );
                         IO::regularFont->printString( GET_STRING( 36 ), 40, 38 + 26 * i, true );
                     } else {
-                        IO::regularFont->setColor( RED_IDX, 1 );
-                        IO::regularFont->setColor( BLACK_IDX, 2 );
+                        IO::regularFont->setColor( IO::RED_IDX, 1 );
+                        IO::regularFont->setColor( IO::BLACK_IDX, 2 );
                         IO::regularFont->printString( GET_STRING( 37 ), 40, 33 + 26 * i, true,
                                                       IO::font::LEFT, 11 );
                     }
@@ -329,13 +329,13 @@ namespace BAG {
                 } else {
                     if( p_itemId && p_data.m_itemType == ITEM::ITEMTYPE_EVOLUTION ) {
                         if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].canEvolve( p_itemId, 3 ) ) {
-                            BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
-                            IO::regularFont->setColor( COLOR_IDX, 1 );
-                            IO::regularFont->setColor( BLACK_IDX, 2 );
+                            BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
+                            IO::regularFont->setColor( IO::COLOR_IDX, 1 );
+                            IO::regularFont->setColor( IO::BLACK_IDX, 2 );
                             IO::regularFont->printString( GET_STRING( 40 ), 40, 38 + 26 * i, true );
                         } else {
-                            IO::regularFont->setColor( RED_IDX, 1 );
-                            IO::regularFont->setColor( BLACK_IDX, 2 );
+                            IO::regularFont->setColor( IO::RED_IDX, 1 );
+                            IO::regularFont->setColor( IO::BLACK_IDX, 2 );
                             IO::regularFont->printString( GET_STRING( 41 ), 40, 33 + 26 * i, true,
                                                           IO::font::LEFT, 11 );
                         }
@@ -344,8 +344,8 @@ namespace BAG {
                             SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_name, 45,
                             33 + 26 * i, true );
 
-                        IO::regularFont->setColor( BLACK_IDX, 2 );
-                        IO::regularFont->setColor( GRAY_IDX, 1 );
+                        IO::regularFont->setColor( IO::BLACK_IDX, 2 );
+                        IO::regularFont->setColor( IO::GRAY_IDX, 1 );
 
                         if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].getItem( ) ) {
                             IO::regularFont->printString(
@@ -360,8 +360,8 @@ namespace BAG {
                 }
             }
         }
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         return res;
     }
 
@@ -372,36 +372,36 @@ namespace BAG {
         /* if( p_item->m_itemType != item::itemType::GOODS
             && toBagType( p_data.m_itemType ) == bag::bagType::ITEMS ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
-                                p_selected ? RED_IDX : GRAY_IDX, p_pressed );
+                                p_selected ? IO::RED_IDX : IO::GRAY_IDX, p_pressed );
             IO::boldFont->printChar( 490 - 22 + u16( p_item->m_itemType ),
                                      p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
         } else */
         if( p_itemId == SAVE::SAV.getActiveFile( ).m_registeredItem ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
-                                p_selected ? RED_IDX : GRAY_IDX, p_pressed );
+                                p_selected ? IO::RED_IDX : IO::GRAY_IDX, p_pressed );
             IO::boldFont->printChar( 'Y', p_x + 106 + 2 * p_pressed, p_y - 2 + p_pressed, true );
         } else if( p_data.m_itemType == ITEM::ITEMTYPE_TM
                    && MOVE::isFieldMove( p_data.m_param2 ) ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
-                                p_selected ? RED_IDX : GRAY_IDX, p_pressed );
-            IO::boldFont->setColor( BLUE_IDX, 2 );
+                                p_selected ? IO::RED_IDX : IO::GRAY_IDX, p_pressed );
+            IO::boldFont->setColor( IO::BLUE_IDX, 2 );
             IO::boldFont->printChar( 468 + 2, p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed,
                                      true );
-            IO::boldFont->setColor( WHITE_IDX, 2 );
+            IO::boldFont->setColor( IO::WHITE_IDX, 2 );
         } else if( p_data.m_itemType == ITEM::ITEMTYPE_TM ) {
             IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
-                                p_selected ? RED_IDX : GRAY_IDX, p_pressed );
+                                p_selected ? IO::RED_IDX : IO::GRAY_IDX, p_pressed );
             IO::boldFont->printChar( 468 + 2, p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed,
                                      true );
         } else
-            IO::printChoiceBox( p_x, p_y, p_x + 106, p_y + 16, 3, p_selected ? RED_IDX : GRAY_IDX,
+            IO::printChoiceBox( p_x, p_y, p_x + 106, p_y + 16, 3, p_selected ? IO::RED_IDX : IO::GRAY_IDX,
                                 p_pressed );
         if( p_data.m_itemType != ITEM::ITEMTYPE_TM )
-            IO::regularFont->printString( ITEM::getItemName( p_itemId, CURRENT_LANGUAGE ).c_str( ),
+            IO::regularFont->printString( ITEM::getItemName( p_itemId ).c_str( ),
                                           p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
         else
             IO::regularFont->printString(
-                MOVE::getMoveName( p_data.m_param2, CURRENT_LANGUAGE ).c_str( ),
+                MOVE::getMoveName( p_data.m_param2 ).c_str( ),
                 p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
     }
 

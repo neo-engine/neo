@@ -42,6 +42,7 @@ namespace STS {
         u8       _selectedIdx;
         bool     _swapping = false;
         u8       _toSelect = 0;
+        bool     _animateMsg = false;
 
         constexpr u16 partyTopScreenPkmnIconPosY( u8 p_pos ) {
             return ( p_pos & 1 ) * 8 + 2 + 61 * ( p_pos >> 1 );
@@ -53,8 +54,7 @@ namespace STS {
         void drawPartyPkmn( u8 p_pos, bool p_selected, bool p_redraw = true,
                             const char* p_message = 0, bool p_bottom = false );
         void animatePartyPkmn( u8 p_frame, bool p_bottom = false );
-        void animateMessageBox( u8 p_frame, bool p_bottom = false );
-
+        void animateMessageBox( u8 p_frame, bool p_bottom = true );
       public:
         /*
          * @brief Creates a new party screen UI; does nothing else.
@@ -63,6 +63,18 @@ namespace STS {
          * moves unselectable
          */
         partyScreenUI( pokemon p_team[ 6 ], u8 p_teamLength, u8 p_toSelect = 0 );
+
+#ifdef DESQUID
+        void updateTeamLength( u8 p_newLength );
+
+        void showDesquidWindow( bool p_bottom = true );
+
+        void hideDesquidWindow( bool p_bottom = true );
+
+        void drawDesquidItem( u8 p_idx, const char* p_string, u32 p_value, u32 p_maxValue,
+                              bool p_highlight = false, u8 p_highlightDigit = 255,
+                              bool p_bottom = true );
+#endif
 
         /*
          * @brief Initializes the party screen UI. Destroys anything that was previously on the

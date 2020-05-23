@@ -201,28 +201,28 @@ namespace DEX {
                                           PKMN_SPRITE_START( 0 ), 0, 0, false, false,
                                           p_isFemale && !p_isGenderless, true, false, p_forme );
         if( p_formeCnt )
-            IO::boldFont->printString( getDisplayName( p_pkmnId, CURRENT_LANGUAGE, p_forme ).c_str( ), 58, 157, false,
+            IO::boldFont->printString( getDisplayName( p_pkmnId, p_forme ).c_str( ), 58, 157, false,
                                        IO::font::CENTER );
         else if( p_isFemale && !p_isGenderless )
             IO::boldFont->printString( GET_STRING( 133 ), 58, 157, false, IO::font::CENTER );
         else if( !p_isFemale && !p_isGenderless )
             IO::boldFont->printString( GET_STRING( 134 ), 58, 157, false, IO::font::CENTER );
         else
-            IO::boldFont->printString( getDisplayName( p_pkmnId, CURRENT_LANGUAGE ).c_str( ), 58, 157, false,
+            IO::boldFont->printString( getDisplayName( p_pkmnId ).c_str( ), 58, 157, false,
                                        IO::font::CENTER );
 
         tileCnt = IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", p_pkmnId, 110, 64,
                                       PKMN_SPRITE_START( 1 ), 1, tileCnt, false, true,
                                       p_isFemale && !p_isGenderless, false, false, p_forme );
         if( p_formeCnt )
-            IO::boldFont->printString( getDisplayName( p_pkmnId, CURRENT_LANGUAGE, p_forme ).c_str( ), 158, 150,
+            IO::boldFont->printString( getDisplayName( p_pkmnId, p_forme ).c_str( ), 158, 150,
                                        false, IO::font::CENTER );
         else if( p_isFemale && !p_isGenderless )
             IO::boldFont->printString( GET_STRING( 133 ), 158, 150, false, IO::font::CENTER );
         else if( !p_isFemale && !p_isGenderless )
             IO::boldFont->printString( GET_STRING( 134 ), 158, 150, false, IO::font::CENTER );
         else
-            IO::boldFont->printString( getDisplayName( p_pkmnId, CURRENT_LANGUAGE ).c_str( ), 158, 150, false,
+            IO::boldFont->printString( getDisplayName( p_pkmnId ).c_str( ), 158, 150, false,
                                        IO::font::CENTER );
         IO::boldFont->printString( GET_STRING( 135 ), 158, 166, false, IO::font::CENTER );
 
@@ -258,10 +258,10 @@ namespace DEX {
 
         // Init some colors
         IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( WHITE_IDX, 2 );
-        IO::boldFont->setColor( BLACK_IDX, 2 );
-        IO::boldFont->setColor( WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 2 );
+        IO::boldFont->setColor( IO::BLACK_IDX, 2 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 1 );
 
         if( _useInDex && !IN_DEX( p_pkmnIdx ) ) {
             for( u8 i = 0; i < 128; ++i ) IO::OamTop->oamBuffer[ i ].isHidden = true;
@@ -270,8 +270,8 @@ namespace DEX {
             IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", 0, 80, 35, PKMN_SPRITE_START( 0 ), 0,
                                 0, false );
 
-            BG_PALETTE[ WHITE_IDX ] = WHITE;
-            BG_PALETTE[ BLACK_IDX ] = BLACK;
+            BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
+            BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
             IO::boldFont->printString( NO_DATA, 128, 150, false, IO::font::CENTER );
             IO::updateOAM( true );
 
@@ -321,7 +321,7 @@ namespace DEX {
                 IO::loadPKMNIcon( data.m_preEvolution, 8, 20, PKMN_SPRITE_START( 2 ), 2,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                 consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                printf( GET_STRING( 132 ), getDisplayName( data.m_preEvolution, CURRENT_LANGUAGE ).c_str( ) );
+                printf( GET_STRING( 132 ), getDisplayName( data.m_preEvolution ).c_str( ) );
                 break;
             case 2:
                 if( p_page == 0 ) {
@@ -334,7 +334,7 @@ namespace DEX {
                 IO::loadPKMNIcon( data.m_preEvolution, 8, 20, PKMN_SPRITE_START( 2 ), 2,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                 consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                printf( GET_STRING( 132 ), getDisplayName( data.m_preEvolution, CURRENT_LANGUAGE ).c_str( ) );
+                printf( GET_STRING( 132 ), getDisplayName( data.m_preEvolution ).c_str( ) );
                 break;
             case 3:
             default:
@@ -401,11 +401,11 @@ namespace DEX {
             case DARKNESS:
                 FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/TYPE_BACK/", "Dark",
                                      128 );
-                IO::regularFont->setColor( BLACK_IDX, 2 );
-                IO::regularFont->setColor( WHITE_IDX, 1 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 2 );
+                IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 if( data.m_stage == 0 || data.m_stage == 3 ) {
-                    IO::boldFont->setColor( BLACK_IDX, 1 );
-                    IO::boldFont->setColor( WHITE_IDX, 2 );
+                    IO::boldFont->setColor( IO::BLACK_IDX, 1 );
+                    IO::boldFont->setColor( IO::WHITE_IDX, 2 );
                 }
                 break;
             default:
@@ -413,8 +413,8 @@ namespace DEX {
             }
 
             BG_PALETTE[ 251 ]       = RGB15( 3, 3, 3 );
-            BG_PALETTE[ WHITE_IDX ] = WHITE;
-            BG_PALETTE[ BLACK_IDX ] = BLACK;
+            BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
+            BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
 
             IO::boldFont->printString( data.m_displayName, 58, 11, false );
 
@@ -464,8 +464,8 @@ namespace DEX {
             IO::regularFont->printString( GET_STRING( 128 ), 176, 74, false );
             IO::regularFont->printString( GET_STRING( 131 ), 176, 99, false );
 
-            IO::regularFont->setColor( BLACK_IDX, 1 );
-            IO::regularFont->setColor( WHITE_IDX, 2 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::WHITE_IDX, 2 );
             IO::regularFont->printString(
                 NO_DATA /* FS::breakString( data.m_dexEntry, IO::regularFont, 224 ).c_str( ) */, 16,
                 134, false, IO::font::LEFT, 12 );
@@ -495,8 +495,8 @@ namespace DEX {
                 FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/", "JohtoMap" );
 
             BG_PALETTE[ 251 ]       = RGB15( 3, 3, 3 );
-            BG_PALETTE[ WHITE_IDX ] = WHITE;
-            BG_PALETTE[ BLACK_IDX ] = BLACK;
+            BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
+            BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
 
             IO::boldFont->printString( data.m_displayName, 32, 4, false );
             IO::loadPKMNIcon( p_pkmnIdx, 0, -4, PKMN_SPRITE_START( 2 ), 2,
@@ -529,7 +529,7 @@ namespace DEX {
         case dex::SHOW_CAUGHT:
             NAV::draw( );
             IO::regularFont->setColor( 0, 0 );
-            IO::regularFont->setColor( BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->setColor( 0, 2 );
             setCghtVis( false );
             IO::regularFont->printString( GET_STRING( 124 ), 2, 0, true );
@@ -548,15 +548,15 @@ namespace DEX {
                 char buffer[ 10 ];
                 snprintf( buffer, 9, "%03d", id );
                 IO::boldFont->printString( buffer, 32, 28 + 32 * i, true );
-                IO::boldFont->printString( getDisplayName( id, CURRENT_LANGUAGE ).c_str( ), 100, 28 + 32 * i, true );
+                IO::boldFont->printString( getDisplayName( id ).c_str( ), 100, 28 + 32 * i, true );
 
                 if( i == p_selectedIdx ) {
                     pokemonData p;
                     getAll( id, p );
-                    BG_PALETTE_SUB[ COLOR_IDX ] = IO::getColor( p.m_types[ 0 ] );
+                    BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::getColor( p.m_types[ 0 ] );
                 }
                 IO::printRectangle( 64 + 3, 24 + 32 * i + 2, 64 + 28, 24 + 32 * i + 26, true,
-                                    i == p_selectedIdx ? COLOR_IDX : WHITE_IDX );
+                                    i == p_selectedIdx ? IO::COLOR_IDX : IO::WHITE_IDX );
             }
             break;
         case dex::SHOW_ALL:
@@ -594,12 +594,12 @@ namespace DEX {
                     pokemonData p;
                     getAll( id * inDex, p );
                     IO::Oam->oamBuffer[ PKMN_ICON_START + i ].priority = OBJPRIORITY_1;
-                    BG_PALETTE_SUB[ COLOR_IDX ] = IO::getColor( p.m_types[ 0 ] );
+                    BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::getColor( p.m_types[ 0 ] );
                     IO::printRectangle( IO::Oam->oamBuffer[ FRAME_START + i ].x + 3,
                                         IO::Oam->oamBuffer[ FRAME_START + i ].y + 2,
                                         IO::Oam->oamBuffer[ FRAME_START + i ].x + 29,
                                         IO::Oam->oamBuffer[ FRAME_START + i ].y + 25, true,
-                                        COLOR_IDX );
+                                        IO::COLOR_IDX );
                 }
             }
             break;

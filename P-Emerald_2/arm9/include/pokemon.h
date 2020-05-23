@@ -202,8 +202,6 @@ struct boxPokemon {
     bool learnMove( u16 p_move );
     void hatch( );
 
-    //  bool operator==( const boxPokemon& p_other ) const;
-
     // Recalculates form based on held item
     void recalculateForme( );
 };
@@ -383,7 +381,6 @@ struct pokemon {
     void hatch( ) {
         m_boxdata.hatch( );
     }
-    //    bool operator==( const pokemon& p_other ) const;
 };
 
 static_assert( std::is_trivially_copyable<pokemon>::value, "" );

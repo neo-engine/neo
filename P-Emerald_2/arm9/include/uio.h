@@ -33,6 +33,81 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 
 namespace IO {
+#define IN_RANGE_I( p_touch, p_input )                                                     \
+    ( ( p_touch ).px >= ( p_input ).m_targetX1 && ( p_touch ).py >= ( p_input ).m_targetY1 \
+      && ( p_touch ).px <= ( p_input ).m_targetX2 && ( p_touch ).py <= ( p_input ).m_targetY2 )
+#define IN_RANGE_I_C( p_touch, p_input )                      \
+    ( sqrt( sq( ( p_touch ).px - ( p_input ).m_targetX1 )     \
+            + sq( ( p_touch ).py - ( p_input ).m_targetY1 ) ) \
+      <= ( p_input ).m_targetR )
+
+#define IN_RANGE_R( p_x1, p_y1, p_x2, p_y2 ) \
+    IN_RANGE_I( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) )
+#define IN_RANGE_C( p_x, p_y, p_r ) IN_RANGE_I_C( touch, IO::inputTarget( p_x, p_y, p_r ) )
+
+#define TOUCH_UP ( !touch.px && !touch.py )
+
+#define GET_KEY_COOLDOWN( p_key ) \
+    ( ( pressed & ( p_key ) ) || ( ( held & ( p_key ) ) && !( --cooldown ) ) )
+
+#define GET_AND_WAIT( p_key ) \
+    ( ( pressed & ( p_key ) ) && IO::waitForInput( IO::inputTarget( p_key ) ) )
+#define GET_AND_WAIT_R( p_x1, p_y1, p_x2, p_y2 )                     \
+    ( IN_RANGE_I( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) \
+      && IO::waitForInput( IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) )
+#define GET_AND_WAIT_C( p_x, p_y, p_r )                       \
+    ( IN_RANGE_I_C( touch, IO::inputTarget( p_x, p_y, p_r ) ) \
+      && IO::waitForInput( IO::inputTarget( p_x, p_y, p_r ) ) )
+
+#define GET_DIR( p_dir )               \
+    ( ( (p_dir) &KEY_DOWN )            \
+          ? MAP::direction::DOWN       \
+          : ( ( (p_dir) &KEY_UP )      \
+                  ? MAP::direction::UP \
+                  : ( ( (p_dir) &KEY_RIGHT ) ? MAP::direction::RIGHT : MAP::direction::LEFT ) ) )
+
+#define RGB( p_r, p_g, p_b ) ( RGB15( ( p_r ), ( p_g ), ( p_b ) ) | BIT( 15 ) )
+#define COMPL( p_color )                                                    \
+    ( RGB( 31 - ( ( p_color ) >> 10 ) % 32, 31 - ( ( p_color ) >> 5 ) % 32, \
+           31 - ( p_color ) % 32 ) )
+
+    const u8 RED2_IDX  = 247;
+    const u8 BLUE2_IDX = 248;
+    const u8 COLOR_IDX = 249;
+    const u8 WHITE_IDX = 250;
+    const u8 GRAY_IDX  = 251;
+    const u8 BLACK_IDX = 252;
+    const u8 RED_IDX   = 253;
+    const u8 BLUE_IDX  = 254;
+
+    const u16 CHOICE_COLOR = RGB( 16, 25, 19 );
+
+    const u16 GREEN = RGB( 0, 20, 0 );
+    const u16 RED = RGB( 28, 0, 0 );
+    const u16 RED2 = RGB( 10, 0, 0 );
+    const u16 BLUE = RGB( 0, 10, 31 );
+    const u16 BLUE2 = RGB( 0, 0, 15 );
+    const u16 WHITE = RGB( 30, 30, 30 );
+    const u16 GRAY = RGB( 15, 15, 15 );
+    const u16 NORMAL_COLOR = RGB( 27, 27, 27 );
+    const u16 BLACK = RGB( 0, 0, 0 );
+    const u16 YELLOW = RGB( 24, 24, 0 );
+    const u16 PURPLE = RGB( 24, 0, 24 );
+    const u16 TURQOISE = RGB( 0, 24, 24 );
+    const u16 ICE_COLOR = RGB( 15, 31, 31 );
+    const u16 FAIRY_COLOR = RGB( 31, 15, 31 );
+    const u16 GROUND_COLOR = RGB( 31, 31, 15 );
+    const u16 POISON_COLOR = RGB( 31, 0, 15 );
+    const u16 ORANGE = RGB( 31, 15, 0 );
+    const u16 GHOST_COLOR = RGB( 15, 0, 31 );
+    const u16 ROCK_COLOR = RGB( 28, 23, 7 );
+    const u16 BUG_COLOR = RGB( 15, 28, 7 );
+    const u16 STEEL_COLOR = RGB( 24, 24, 24 );
+    const u16 DRAGON_COLOR = RGB( 7, 7, 24 );
+    const u16 UNKNOWN_COLOR = RGB( 0, 42, 42 );
+
+#define BG_PAL( p_sub ) ( ( p_sub ) ? BG_PALETTE_SUB : BG_PALETTE )
+#define BG_BMP( p_sub ) ( ( p_sub ) ? BG_BMP_RAM_SUB( 1 ) : BG_BMP_RAM( 1 ) )
 
     const u8 SCREEN_TOP    = 1;
     const u8 SCREEN_BOTTOM = 0;

@@ -133,6 +133,12 @@ namespace STS {
         _toSelect   = p_toSelect;
     }
 
+#ifdef DESQUID
+    void partyScreenUI::updateTeamLength( u8 p_newLength ) {
+        _teamLength = p_newLength;
+    }
+#endif
+
     u16 partyScreenUI::initTopScreen( bool p_bottom ) {
         IO::clearScreen( p_bottom, false, true );
         if( p_bottom ) {
@@ -157,19 +163,19 @@ namespace STS {
         dmaCopy( partybgPal, pal, 3 * 2 );
         IO::initOAMTable( p_bottom );
         IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( WHITE_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::smallFont->setColor( 0, 0 );
-        IO::smallFont->setColor( WHITE_IDX, 1 );
-        IO::smallFont->setColor( GRAY_IDX, 2 );
+        IO::smallFont->setColor( IO::WHITE_IDX, 1 );
+        IO::smallFont->setColor( IO::GRAY_IDX, 2 );
 
-        pal[ WHITE_IDX ] = WHITE;
-        pal[ GRAY_IDX ]  = GRAY;
-        pal[ BLACK_IDX ] = BLACK;
-        pal[ BLUE_IDX ]  = RGB( 18, 22, 31 );
-        pal[ RED_IDX ]   = RGB( 31, 18, 18 );
-        pal[ BLUE2_IDX ] = RGB( 0, 0, 25 );
-        pal[ RED2_IDX ]  = RGB( 23, 0, 0 );
+        pal[ IO::WHITE_IDX ] = IO::WHITE;
+        pal[ IO::GRAY_IDX ]  = IO::GRAY;
+        pal[ IO::BLACK_IDX ] = IO::BLACK;
+        pal[ IO::BLUE_IDX ]  = RGB( 18, 22, 31 );
+        pal[ IO::RED_IDX ]   = RGB( 31, 18, 18 );
+        pal[ IO::BLUE2_IDX ] = RGB( 0, 0, 25 );
+        pal[ IO::RED2_IDX ]  = RGB( 23, 0, 0 );
 
         pal[ 240 ] = RGB( 6, 6, 6 );    // hp bar border color
         pal[ 241 ] = RGB( 12, 30, 12 ); // hp bar green 1
@@ -421,13 +427,13 @@ namespace STS {
         }
         u16* pal = BG_PAL( p_bottom );
 
-        pal[ WHITE_IDX ] = WHITE;
-        pal[ GRAY_IDX ]  = GRAY;
-        pal[ BLACK_IDX ] = BLACK;
-        pal[ BLUE_IDX ]  = RGB( 18, 22, 31 );
-        pal[ RED_IDX ]   = RGB( 31, 18, 18 );
-        pal[ BLUE2_IDX ] = RGB( 0, 0, 25 );
-        pal[ RED2_IDX ]  = RGB( 23, 0, 0 );
+        pal[ IO::WHITE_IDX ] = IO::WHITE;
+        pal[ IO::GRAY_IDX ]  = IO::GRAY;
+        pal[ IO::BLACK_IDX ] = IO::BLACK;
+        pal[ IO::BLUE_IDX ]  = RGB( 18, 22, 31 );
+        pal[ IO::RED_IDX ]   = RGB( 31, 18, 18 );
+        pal[ IO::BLUE2_IDX ] = RGB( 0, 0, 25 );
+        pal[ IO::RED2_IDX ]  = RGB( 23, 0, 0 );
 
         dmaCopy( partybgPal, pal, 3 * 2 );
         dmaCopy( partysubPal + 3, pal + 3, 8 * 2 );
@@ -711,17 +717,17 @@ namespace STS {
                                               anchor_y + 12, false );
 
                 if( _team[ p_pos ].m_boxdata.m_isFemale ) {
-                    IO::regularFont->setColor( RED_IDX, 1 );
-                    IO::regularFont->setColor( RED2_IDX, 2 );
+                    IO::regularFont->setColor( IO::RED_IDX, 1 );
+                    IO::regularFont->setColor( IO::RED2_IDX, 2 );
                     IO::regularFont->printString( "}", anchor_x + 109, anchor_y + 12, false );
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( GRAY_IDX, 2 );
+                    IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                    IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                 } else if( !_team[ p_pos ].m_boxdata.m_isGenderless ) {
-                    IO::regularFont->setColor( BLUE_IDX, 1 );
-                    IO::regularFont->setColor( BLUE2_IDX, 2 );
+                    IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                    IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
                     IO::regularFont->printString( "{", anchor_x + 109, anchor_y + 12, false );
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( GRAY_IDX, 2 );
+                    IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                    IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                 }
 
                 // HP
@@ -756,8 +762,8 @@ namespace STS {
 
                 IO::smallFont->printString( GET_STRING( 186 ), anchor_x + 116 - 62, anchor_y + 20,
                                             false ); // HP "icon"
-                IO::smallFont->setColor( WHITE_IDX, 1 );
-                IO::smallFont->setColor( GRAY_IDX, 2 );
+                IO::smallFont->setColor( IO::WHITE_IDX, 1 );
+                IO::smallFont->setColor( IO::GRAY_IDX, 2 );
 
                 IO::smallFont->printString( "!", anchor_x + 15, anchor_y + 33, false );
 
@@ -970,16 +976,16 @@ namespace STS {
             if( p_choices[ i ] & CHOICE_FIELD_MOVE ) {
                 u16 move = _team[ p_selectedPkmn ].m_boxdata.m_moves[ p_choices[ i ] & 3 ];
 
-                IO::regularFont->setColor( BLUE_IDX, 1 );
-                IO::regularFont->setColor( BLUE2_IDX, 2 );
+                IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
 
-                IO::regularFont->printString( MOVE::getMoveName( move, CURRENT_LANGUAGE ).c_str( ),
+                IO::regularFont->printString( MOVE::getMoveName( move ).c_str( ),
                                               oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
                                               oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, p_bottom,
                                               IO::font::CENTER );
 
-                IO::regularFont->setColor( WHITE_IDX, 1 );
-                IO::regularFont->setColor( GRAY_IDX, 2 );
+                IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             } else {
                 IO::regularFont->printString(
                     GET_STRING( p_choices[ i ] ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
@@ -1026,6 +1032,55 @@ namespace STS {
         if( ( p_frame & 31 ) == 31 ) { IO::regularFont->hideContinue( 216, 104, 0, p_bottom ); }
     }
 
+#ifdef DESQUID
+    void partyScreenUI::showDesquidWindow( bool p_bottom ) {
+        (void) p_bottom;
+        // SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        // for( u8 i = 0; i < 7; i++ ) { oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = false; }
+        // IO::updateOAM( p_bottom );
+    }
+
+    void partyScreenUI::hideDesquidWindow( bool p_bottom ) {
+        (void) p_bottom;
+        // SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        // for( u8 i = 0; i < 7; i++ ) { oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = true; }
+        // IO::updateOAM( p_bottom );
+    }
+
+    void partyScreenUI::drawDesquidItem( u8 p_idx, const char* p_string, u32 p_value,
+                                         u32 p_maxValue, bool p_highlight, u8 p_highlightDigit,
+                                         bool p_bottom ) {
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+
+        IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 32 + p_idx * 20,
+                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * 20, p_bottom, 0 );
+        if( p_highlight ) {
+            IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 32 + p_idx * 20,
+                oam[ SPR_MSG_BOX_OAM_SUB ].x, 31 + ( p_idx + 1 ) * 20, p_bottom,
+                IO::RED_IDX );
+            IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 32 + p_idx * 20,
+                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 32 + p_idx * 20, p_bottom,
+                IO::RED_IDX );
+            IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 31 + ( p_idx + 1 ) * 20,
+                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * 20, p_bottom,
+                IO::RED_IDX );
+            IO::printRectangle( 256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 32 + p_idx * 20,
+                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * 20, p_bottom,
+                IO::RED_IDX );
+        }
+
+        IO::regularFont->printString( p_string, oam[ SPR_MSG_BOX_OAM_SUB ].x + 8, 34 + p_idx * 20, p_bottom );
+
+        u8 dg = 0;
+        for( u32 tmp = p_maxValue; tmp > 0; ++dg, tmp /= 10 );
+
+        IO::regularFont->printCounter( p_value, dg, 256 - oam[ SPR_MSG_BOX_OAM_SUB ].x -
+                ( dg + 1 ) * 8, 34 + p_idx * 20, p_highlightDigit,
+                IO::WHITE_IDX, IO::BLACK_IDX, p_bottom );
+
+    }
+#endif
+
     void partyScreenUI::init( u8 p_initialSelection ) {
         _selectedIdx = p_initialSelection;
         IO::vramSetup( );
@@ -1041,7 +1096,7 @@ namespace STS {
         IO::animateBG( p_frame, IO::bg3 );
         IO::animateBG( p_frame, IO::bg3sub );
 
-        if( !IO::Oam->oamBuffer[ SPR_MSG_BOX_OAM_SUB ].isHidden ) { animateMessageBox( p_frame ); }
+        if( _animateMsg ) { animateMessageBox( p_frame ); }
 
         bgUpdate( );
     }
@@ -1098,6 +1153,8 @@ namespace STS {
 
     void partyScreenUI::swap( u8 p_idx1, u8 p_idx2, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        REG_BLDCNT     = BLEND_ALPHA;
+        REG_BLDCNT_SUB = BLEND_ALPHA;
         IO::fadeScreen( IO::CLEAR_DARK_FAST );
         for( u8 i = 0; i < 6; ++i ) {
             bool tmp                                  = oam[ SPR_MARK_OAM( p_idx1, i ) ].isHidden;
@@ -1109,9 +1166,15 @@ namespace STS {
         unswap( p_idx1, p_bottom );
         unswap( p_idx2, p_bottom );
         IO::fadeScreen( IO::UNFADE_FAST );
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
+        REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA = 0xff | ( 0x06 << 8 );
+        bgUpdate( );
     }
 
     void partyScreenUI::printMessage( const char* p_message, u16 p_itemIcon, bool p_bottom ) {
+        _animateMsg = true;
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         for( u8 i = 0; i < 7; i++ ) { oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = false; }
         if( p_itemIcon ) {
@@ -1132,6 +1195,7 @@ namespace STS {
     }
 
     void partyScreenUI::hideMessageBox( bool p_bottom ) {
+        _animateMsg = false;
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         for( u8 i = 0; i < 7; i++ ) { oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = true; }
         oam[ SPR_ITEM_OAM_SUB ].isHidden = true;

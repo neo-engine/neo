@@ -122,7 +122,11 @@ void pokemon::recalculateStats( ) {
 void pokemon::recalculateStats( pkmnData& p_data ) {
     auto HPdif     = m_stats.m_maxHP - m_stats.m_acHP;
     m_stats        = calcStats( m_boxdata, m_level, &p_data );
-    m_stats.m_acHP = m_stats.m_maxHP - HPdif;
+    if( m_stats.m_maxHP < HPdif ) {
+        m_stats.m_acHP = 0;
+    } else {
+        m_stats.m_acHP = m_stats.m_maxHP - HPdif;
+    }
 }
 
 void pokemon::setForme( u8 p_newForme ) {

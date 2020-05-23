@@ -130,7 +130,7 @@ namespace BOX {
                         IO::swapScreens( );
                         IO::OamTop->oamBuffer[ 0 ].isHidden = true;
                         IO::updateOAM( false );
-                        IO::printRectangle( 144, 192 - 14, 255, 192, false,  WHITE_IDX );
+                        IO::printRectangle( 144, 192 - 14, 255, 192, false,  IO::WHITE_IDX );
 
                         IO::keyboard kb;
                         char         buffer[ 50 ];

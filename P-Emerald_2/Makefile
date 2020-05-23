@@ -39,8 +39,6 @@ export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
 export NDSTOOL		:=  $(CURDIR)/tools/ndstool/ndstool
 
-export EXTRA_VARIABLES :=
-
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------

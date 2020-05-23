@@ -107,19 +107,19 @@ namespace STS {
         dmaCopy( partybgPal, pal, 3 * 2 );
         IO::initOAMTable( p_bottom );
         IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( WHITE_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::smallFont->setColor( 0, 0 );
-        IO::smallFont->setColor( WHITE_IDX, 1 );
-        IO::smallFont->setColor( GRAY_IDX, 2 );
+        IO::smallFont->setColor( IO::WHITE_IDX, 1 );
+        IO::smallFont->setColor( IO::GRAY_IDX, 2 );
 
-        pal[ WHITE_IDX ] = WHITE;
-        pal[ GRAY_IDX ]  = GRAY;
-        pal[ BLACK_IDX ] = BLACK;
-        pal[ BLUE_IDX ]  = RGB( 18, 22, 31 );
-        pal[ RED_IDX ]   = RGB( 31, 18, 18 );
-        pal[ BLUE2_IDX ] = RGB( 0, 0, 25 );
-        pal[ RED2_IDX ]  = RGB( 23, 0, 0 );
+        pal[ IO::WHITE_IDX ] = IO::WHITE;
+        pal[ IO::GRAY_IDX ]  = IO::GRAY;
+        pal[ IO::BLACK_IDX ] = IO::BLACK;
+        pal[ IO::BLUE_IDX ]  = RGB( 18, 22, 31 );
+        pal[ IO::RED_IDX ]   = RGB( 31, 18, 18 );
+        pal[ IO::BLUE2_IDX ] = RGB( 0, 0, 25 );
+        pal[ IO::RED2_IDX ]  = RGB( 23, 0, 0 );
 
         pal[ 240 ] = RGB( 6, 6, 6 );    // hp bar border color
         pal[ 241 ] = RGB( 12, 30, 12 ); // hp bar green 1
@@ -322,17 +322,17 @@ namespace STS {
                                               anchor_y + 12, false );
 
                 if( p_pokemon->m_boxdata.m_isFemale ) {
-                    IO::regularFont->setColor( RED_IDX, 1 );
-                    IO::regularFont->setColor( RED2_IDX, 2 );
+                    IO::regularFont->setColor( IO::RED_IDX, 1 );
+                    IO::regularFont->setColor( IO::RED2_IDX, 2 );
                     IO::regularFont->printString( "}", anchor_x + 109, anchor_y + 12, false );
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( GRAY_IDX, 2 );
+                    IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                    IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                 } else if( !p_pokemon->m_boxdata.m_isGenderless ) {
-                    IO::regularFont->setColor( BLUE_IDX, 1 );
-                    IO::regularFont->setColor( BLUE2_IDX, 2 );
+                    IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                    IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
                     IO::regularFont->printString( "{", anchor_x + 109, anchor_y + 12, false );
-                    IO::regularFont->setColor( WHITE_IDX, 1 );
-                    IO::regularFont->setColor( GRAY_IDX, 2 );
+                    IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                    IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                 }
 
                 // HP
@@ -367,8 +367,8 @@ namespace STS {
 
                 IO::smallFont->printString( GET_STRING( 186 ), anchor_x + 116 - 62, anchor_y + 20,
                                             false ); // HP "icon"
-                IO::smallFont->setColor( WHITE_IDX, 1 );
-                IO::smallFont->setColor( GRAY_IDX, 2 );
+                IO::smallFont->setColor( IO::WHITE_IDX, 1 );
+                IO::smallFont->setColor( IO::GRAY_IDX, 2 );
 
                 IO::smallFont->printString( "!", anchor_x + 15, anchor_y + 33, false );
 
@@ -533,7 +533,7 @@ namespace STS {
         nextAvailableTileIdx = IO::loadSprite(
             BWD_ID, BWD_ID, nextAvailableTileIdx, SCREEN_WIDTH - 25, SCREEN_HEIGHT - 28 - 25, 32,
             32, UpPal, UpTiles, UpTilesLen, false, false, false, OBJPRIORITY_1, true );
-        BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
+        BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::CHOICE_COLOR;
         IO::updateOAM( true );
     }
 
@@ -586,12 +586,12 @@ namespace STS {
         data = getPkmnData( p_pokemon.m_boxdata.m_speciesId, p_pokemon.getForme( ) );
 
         if( !p_pokemon.isEgg( ) ) {
-            pal[ RED_IDX ]   = RED;
-            pal[ BLUE_IDX ]  = BLUE;
-            pal[ RED2_IDX ]  = RED2;
-            pal[ BLUE2_IDX ] = BLUE2;
-            pal[ WHITE_IDX ] = WHITE;
-            IO::regularFont->setColor( BLACK_IDX, 1 );
+            pal[ IO::RED_IDX ]   = IO::RED;
+            pal[ IO::BLUE_IDX ]  = IO::BLUE;
+            pal[ IO::RED2_IDX ]  = IO::RED2;
+            pal[ IO::BLUE2_IDX ] = IO::BLUE2;
+            pal[ IO::WHITE_IDX ] = IO::WHITE;
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 
             IO::regularFont->printString( p_pokemon.m_boxdata.m_name, 150, 0, p_bottom );
             s8 G = p_pokemon.m_boxdata.gender( );
@@ -599,17 +599,17 @@ namespace STS {
             IO::regularFont->printChar( '/', 234, 0, p_bottom );
             if( p_pokemon.m_boxdata.m_speciesId != 29 && p_pokemon.m_boxdata.m_speciesId != 32 ) {
                 if( G == 1 ) {
-                    IO::regularFont->setColor( BLUE_IDX, 1 );
-                    IO::regularFont->setColor( BLUE2_IDX, 2 );
+                    IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                    IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
                     IO::regularFont->printChar( 136, 246, 7, p_bottom );
                 } else if( G == -1 ) {
-                    IO::regularFont->setColor( RED_IDX, 1 );
-                    IO::regularFont->setColor( RED2_IDX, 2 );
+                    IO::regularFont->setColor( IO::RED_IDX, 1 );
+                    IO::regularFont->setColor( IO::RED2_IDX, 2 );
                     IO::regularFont->printChar( 137, 246, 7, p_bottom );
                 }
             }
-            IO::regularFont->setColor( BLACK_IDX, 1 );
-            IO::regularFont->setColor( GRAY_IDX, 2 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
 
             IO::regularFont->printString( getDisplayName( p_pokemon.m_boxdata.m_speciesId,
@@ -617,34 +617,34 @@ namespace STS {
 
             if( p_pokemon.m_boxdata.getItem( ) ) {
                 IO::regularFont->printString( "Item", 2, 176, p_bottom );
-                IO::regularFont->setColor( BLACK_IDX, 1 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                 IO::regularFont->setColor( 0, 2 );
                 char buffer[ 200 ];
                 snprintf(
                     buffer, 199, "%s",
-                    ITEM::getItemName( p_pokemon.getItem( ), CURRENT_LANGUAGE ).c_str( ) );
+                    ITEM::getItemName( p_pokemon.getItem( ) ).c_str( ) );
                 IO::regularFont->printString( buffer, 40, 159, p_bottom );
                 if( p_newpok ) {
                     IO::loadItemIcon( p_pokemon.getItem( ), 2, 152, ITEM_ICON_IDX, ITEM_ICON_PAL,
                                       Oam->oamBuffer[ ITEM_ICON_IDX ].gfxIndex, p_bottom );
                 }
             } else {
-                IO::regularFont->setColor( BLACK_IDX, 1 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                 IO::regularFont->setColor( 0, 2 );
                 IO::regularFont->printString(
-                    ITEM::getItemName( p_pokemon.m_boxdata.getItem( ), CURRENT_LANGUAGE ).c_str( ),
+                    ITEM::getItemName( p_pokemon.m_boxdata.getItem( ) ).c_str( ),
                     56, 168, p_bottom );
                 Oam->oamBuffer[ ITEM_ICON_IDX ].isHidden = true;
             }
             if( p_pokemon.m_boxdata.isShiny( ) ) {
-                IO::regularFont->setColor( RED_IDX, 1 );
-                IO::regularFont->setColor( WHITE_IDX, 2 );
+                IO::regularFont->setColor( IO::RED_IDX, 1 );
+                IO::regularFont->setColor( IO::WHITE_IDX, 2 );
                 IO::regularFont->printString( "*", 1, 47, p_bottom );
-                IO::regularFont->setColor( WHITE_IDX, 1 );
-                IO::regularFont->setColor( GRAY_IDX, 2 );
+                IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             }
-            IO::regularFont->setColor( BLACK_IDX, 1 );
-            IO::regularFont->setColor( GRAY_IDX, 2 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
             if( p_newpok )
                 if( !IO::loadPKMNSprite(
@@ -689,12 +689,12 @@ namespace STS {
             snprintf( buffer, 49, "%s %i%%", GET_STRING( 126 ),
                       p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::regularFont->printString( buffer, 62, 38, p_bottom, IO::font::CENTER );
-            IO::regularFont->setColor( GRAY_IDX, 2 );
-            IO::regularFont->setColor( BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
         } else {
             p_page           = -1;
-            pal[ WHITE_IDX ] = WHITE;
-            IO::regularFont->setColor( BLACK_IDX, 1 );
+            pal[ IO::WHITE_IDX ] = IO::WHITE;
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 
             IO::regularFont->printString( GET_STRING( 34 ), 150, 0, p_bottom );
             IO::regularFont->printChar( '/', 234, 0, p_bottom );
@@ -719,10 +719,10 @@ namespace STS {
         IO::regularFont->printString( GET_STRING( 137 ), 32, 0, p_bottom );
         if( !( currPkmn.isEgg( ) ) ) {
 
-            pal[ RED_IDX ]   = RED;
-            pal[ BLUE_IDX ]  = BLUE;
-            pal[ RED2_IDX ]  = RED2;
-            pal[ BLUE2_IDX ] = BLUE2;
+            pal[ IO::RED_IDX ]   = IO::RED;
+            pal[ IO::BLUE_IDX ]  = IO::BLUE;
+            pal[ IO::RED2_IDX ]  = IO::RED2;
+            pal[ IO::BLUE2_IDX ] = IO::BLUE2;
 
             char buffer[ 50 ];
             snprintf( buffer, 49, GET_STRING( 138 ), currPkmn.m_level );
@@ -732,66 +732,66 @@ namespace STS {
             IO::regularFont->printString( buffer, 130, 46, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 0 ] == 1.1 ) {
-                IO::regularFont->setColor( RED_IDX, 1 );
-                IO::regularFont->setColor( RED2_IDX, 2 );
+                IO::regularFont->setColor( IO::RED_IDX, 1 );
+                IO::regularFont->setColor( IO::RED2_IDX, 2 );
             } else if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 0 ] == 0.9 ) {
-                IO::regularFont->setColor( BLUE_IDX, 1 );
-                IO::regularFont->setColor( BLUE2_IDX, 2 );
+                IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
             } else {
-                IO::regularFont->setColor( BLACK_IDX, 1 );
-                IO::regularFont->setColor( GRAY_IDX, 2 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             }
             snprintf( buffer, 49, "ANG                   %3i", currPkmn.m_stats.m_Atk );
             IO::regularFont->printString( buffer, 130, 65, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 1 ] == 1.1 ) {
-                IO::regularFont->setColor( RED_IDX, 1 );
-                IO::regularFont->setColor( RED2_IDX, 2 );
+                IO::regularFont->setColor( IO::RED_IDX, 1 );
+                IO::regularFont->setColor( IO::RED2_IDX, 2 );
             } else if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 1 ] == 0.9 ) {
-                IO::regularFont->setColor( BLUE_IDX, 1 );
-                IO::regularFont->setColor( BLUE2_IDX, 2 );
+                IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
             } else {
-                IO::regularFont->setColor( BLACK_IDX, 1 );
-                IO::regularFont->setColor( GRAY_IDX, 2 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             }
             snprintf( buffer, 49, "VER                   %3i", currPkmn.m_stats.m_Def );
             IO::regularFont->printString( buffer, 130, 82, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 3 ] == 1.1 ) {
-                IO::regularFont->setColor( RED_IDX, 1 );
-                IO::regularFont->setColor( RED2_IDX, 2 );
+                IO::regularFont->setColor( IO::RED_IDX, 1 );
+                IO::regularFont->setColor( IO::RED2_IDX, 2 );
             } else if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 3 ] == 0.9 ) {
-                IO::regularFont->setColor( BLUE_IDX, 1 );
-                IO::regularFont->setColor( BLUE2_IDX, 2 );
+                IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
             } else {
-                IO::regularFont->setColor( BLACK_IDX, 1 );
-                IO::regularFont->setColor( GRAY_IDX, 2 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             }
             snprintf( buffer, 49, "SAN                   %3i", currPkmn.m_stats.m_SAtk );
             IO::regularFont->printString( buffer, 130, 99, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 4 ] == 1.1 ) {
-                IO::regularFont->setColor( RED_IDX, 1 );
-                IO::regularFont->setColor( RED2_IDX, 2 );
+                IO::regularFont->setColor( IO::RED_IDX, 1 );
+                IO::regularFont->setColor( IO::RED2_IDX, 2 );
             } else if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 4 ] == 0.9 ) {
-                IO::regularFont->setColor( BLUE_IDX, 1 );
-                IO::regularFont->setColor( BLUE2_IDX, 2 );
+                IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
             } else {
-                IO::regularFont->setColor( BLACK_IDX, 1 );
-                IO::regularFont->setColor( GRAY_IDX, 2 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             }
             snprintf( buffer, 49, "SVE                   %3i", currPkmn.m_stats.m_SDef );
             IO::regularFont->printString( buffer, 130, 116, p_bottom );
 
             if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 2 ] == 1.1 ) {
-                IO::regularFont->setColor( RED_IDX, 1 );
-                IO::regularFont->setColor( RED2_IDX, 2 );
+                IO::regularFont->setColor( IO::RED_IDX, 1 );
+                IO::regularFont->setColor( IO::RED2_IDX, 2 );
             } else if( NatMod[ currPkmn.m_boxdata.getNature( ) ][ 2 ] == 0.9 ) {
-                IO::regularFont->setColor( BLUE_IDX, 1 );
-                IO::regularFont->setColor( BLUE2_IDX, 2 );
+                IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
             } else {
-                IO::regularFont->setColor( BLACK_IDX, 1 );
-                IO::regularFont->setColor( GRAY_IDX, 2 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             }
             snprintf( buffer, 49,
                       "INI                   \xC3\xC3"
@@ -799,8 +799,8 @@ namespace STS {
                       currPkmn.m_stats.m_Spd );
             IO::regularFont->printString( buffer, 130, 133, p_bottom );
 
-            IO::regularFont->setColor( BLACK_IDX, 1 );
-            IO::regularFont->setColor( GRAY_IDX, 2 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             IO::printRectangle( (u8) 158, (u8) 48, u8( 158 + 68 ), u8( 48 + 12 ), p_bottom,
                                 (u8) 251 );
 
@@ -862,27 +862,27 @@ namespace STS {
                               Oam->oamBuffer[ TYPE_IDX + i ].gfxIndex, p_bottom,
                               SAVE::SAV.getActiveFile( ).m_options.m_language );
 
-            pal[ COLOR_IDX ] = GREEN;
+            pal[ IO::COLOR_IDX ] = IO::GREEN;
             if( t == data.m_baseForme.m_types[ 0 ] || t == data.m_baseForme.m_types[ 1 ] ) {
-                IO::regularFont->setColor( COLOR_IDX, 1 );
-                IO::regularFont->setColor( WHITE_IDX, 2 );
+                IO::regularFont->setColor( IO::COLOR_IDX, 1 );
+                IO::regularFont->setColor( IO::WHITE_IDX, 2 );
             } else {
-                IO::regularFont->setColor( BLACK_IDX, 1 );
-                IO::regularFont->setColor( GRAY_IDX, 2 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             }
 
             IO::regularFont->printString( MOVE::getMoveName( currPkmn.m_boxdata.m_moves[ i ],
                         CURRENT_LANGUAGE ).c_str( ), 128, 30 + 30 * i, p_bottom );
 
-            IO::regularFont->setColor( GRAY_IDX, 1 );
-            IO::regularFont->setColor( WHITE_IDX, 2 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 1 );
+            IO::regularFont->setColor( IO::WHITE_IDX, 2 );
             char buffer[ 50 ];
             snprintf( buffer, 49, "AP %2hhu/%2hhu ", currPkmn.m_boxdata.m_acPP[ i ],
                       s8( mdata.m_pp * ( ( 5 + currPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
             IO::regularFont->printString( buffer, 135, 45 + 30 * i, p_bottom );
         }
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
     }
 
     void drawPkmnRibbons( const pokemon& p_pokemon, bool p_bottom ) {
@@ -938,29 +938,29 @@ namespace STS {
                               SAVE::SAV.getActiveFile( ).m_options.m_language );
         }
 
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
         IO::regularFont->printString( "OT", 110, 30, p_bottom );
         if( currPkmn.m_boxdata.m_oTisFemale ) {
-            IO::regularFont->setColor( RED_IDX, 1 );
-            IO::regularFont->setColor( RED2_IDX, 2 );
+            IO::regularFont->setColor( IO::RED_IDX, 1 );
+            IO::regularFont->setColor( IO::RED2_IDX, 2 );
         } else {
-            IO::regularFont->setColor( BLUE_IDX, 1 );
-            IO::regularFont->setColor( BLUE2_IDX, 2 );
+            IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+            IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
         }
         char buffer[ 50 ];
         snprintf( buffer, 49, "%s/%05d", currPkmn.m_boxdata.m_oT, currPkmn.m_boxdata.m_oTId );
         IO::regularFont->printString( buffer, 250, 30, p_bottom, IO::font::RIGHT );
 
         if( !currPkmn.m_boxdata.isShiny( ) ) {
-            IO::regularFont->setColor( BLACK_IDX, 1 );
-            IO::regularFont->setColor( GRAY_IDX, 2 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         }
         snprintf( buffer, 49, "%03d", currPkmn.m_boxdata.m_speciesId );
         IO::regularFont->printString( buffer, 180, 51, p_bottom, IO::font::RIGHT );
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::regularFont->printString( "Nr.", 124, 51, p_bottom );
 
         bool plrOT = currPkmn.m_boxdata.m_oTId == SAVE::SAV.getActiveFile( ).m_id
@@ -1008,8 +1008,8 @@ namespace STS {
                         OBJPRIORITY_0, p_bottom );
         IO::regularFont->printString( "Pokémon-Info", 32, 0, p_bottom );
 
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
         char buffer[ 50 ];
         snprintf( buffer, 49,
@@ -1025,7 +1025,7 @@ namespace STS {
         auto nStr = FS::breakString( str, IO::regularFont, 122 );
         IO::regularFont->printString( nStr.c_str( ), 245, 48, p_bottom, IO::font::RIGHT, 14 );
 
-        auto curAbName = getAbilityName( currPkmn.m_boxdata.m_ability, CURRENT_LANGUAGE );
+        auto curAbName = getAbilityName( currPkmn.m_boxdata.m_ability );
         u8   wd        = IO::regularFont->stringWidth( curAbName.c_str( ) );
         if( 250 - wd > 140 )
             IO::regularFont->printString( "Fäh. ", 250 - wd, 94, p_bottom, IO::font::RIGHT );
@@ -1039,15 +1039,15 @@ namespace STS {
         */
 
         if( currPkmn.m_boxdata.m_oTisFemale ) {
-            IO::regularFont->setColor( RED_IDX, 1 );
-            IO::regularFont->setColor( RED2_IDX, 2 );
+            IO::regularFont->setColor( IO::RED_IDX, 1 );
+            IO::regularFont->setColor( IO::RED2_IDX, 2 );
         } else {
-            IO::regularFont->setColor( BLUE_IDX, 1 );
-            IO::regularFont->setColor( BLUE2_IDX, 2 );
+            IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+            IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
         }
         IO::regularFont->printString( curAbName.c_str( ), 250 - wd, 94, p_bottom );
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
     }
 
     // Draw extra information about the specified move
@@ -1062,15 +1062,15 @@ namespace STS {
         for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ TYPE_IDX + i ].isHidden = true;
         for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
 
-        pal[ WHITE_IDX ] = WHITE;
-        pal[ GRAY_IDX ]  = RGB( 20, 20, 20 );
-        pal[ BLACK_IDX ] = BLACK;
+        pal[ IO::WHITE_IDX ] = IO::WHITE;
+        pal[ IO::GRAY_IDX ]  = RGB( 20, 20, 20 );
+        pal[ IO::BLACK_IDX ] = IO::BLACK;
         IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::boldFont->setColor( 0, 0 );
-        IO::boldFont->setColor( GRAY_IDX, 1 );
-        IO::boldFont->setColor( WHITE_IDX, 2 );
+        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
 
         u8 isNotEgg = 1;
         drawPkmnInformation( currPkmn, isNotEgg, false, p_bottom );
@@ -1083,19 +1083,19 @@ namespace STS {
 
         auto mdata = MOVE::getMoveData( currPkmn.m_boxdata.m_moves[ p_moveIdx ] );
 
-        pal[ COLOR_IDX ] = GREEN;
+        pal[ IO::COLOR_IDX ] = IO::GREEN;
         if( mdata.m_type == data.m_baseForme.m_types[ 0 ]
             || mdata.m_type == data.m_baseForme.m_types[ 1 ] ) {
-            IO::regularFont->setColor( COLOR_IDX, 1 );
-            IO::regularFont->setColor( WHITE_IDX, 2 );
+            IO::regularFont->setColor( IO::COLOR_IDX, 1 );
+            IO::regularFont->setColor( IO::WHITE_IDX, 2 );
         } else {
-            IO::regularFont->setColor( BLACK_IDX, 1 );
-            IO::regularFont->setColor( GRAY_IDX, 2 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         }
         IO::regularFont->printString( MOVE::getMoveName( currPkmn.m_boxdata.m_moves[ p_moveIdx ],
                     CURRENT_LANGUAGE ).c_str( ), 120, 32, p_bottom );
-        IO::regularFont->setColor( GRAY_IDX, 1 );
-        IO::regularFont->setColor( WHITE_IDX, 2 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 1 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 2 );
 
         IO::loadTypeIcon( mdata.m_type, 222, 30, TYPE_IDX + p_moveIdx,
                           TYPE_PAL( p_moveIdx ), Oam->oamBuffer[ TYPE_IDX + p_moveIdx ].gfxIndex,
@@ -1129,8 +1129,8 @@ namespace STS {
             snprintf( buffer, 19, "---" );
         IO::regularFont->printString( buffer, 226, 72, p_bottom );
 
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 //        IO::regularFont->printString(
 //            FS::breakString( currMove->description( ), IO::regularFont, 120 ).c_str( ), 128, 84,
 //            p_bottom, IO::font::LEFT, 11 );
@@ -1151,15 +1151,15 @@ namespace STS {
         for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
         for( u8 i = 0; i < 12; ++i ) Oam->oamBuffer[ RIBBON_IDX + i ].isHidden = true;
 
-        pal[ WHITE_IDX ] = WHITE;
-        pal[ GRAY_IDX ]  = RGB( 20, 20, 20 );
-        pal[ BLACK_IDX ] = BLACK;
+        pal[ IO::WHITE_IDX ] = IO::WHITE;
+        pal[ IO::GRAY_IDX ]  = RGB( 20, 20, 20 );
+        pal[ IO::BLACK_IDX ] = IO::BLACK;
         IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( BLACK_IDX, 1 );
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::boldFont->setColor( 0, 0 );
-        IO::boldFont->setColor( GRAY_IDX, 1 );
-        IO::boldFont->setColor( WHITE_IDX, 2 );
+        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
 
         u8 isNotEgg = 1;
         drawPkmnInformation( currPkmn, isNotEgg, false, p_bottom );
@@ -1209,20 +1209,20 @@ namespace STS {
 
         IO::regularFont->setColor( 0, 0 );
         {
-            IO::regularFont->setColor( BLACK_IDX, 1 );
-            IO::regularFont->setColor( GRAY_IDX, 2 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         }
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::boldFont->setColor( 0, 0 );
-        IO::boldFont->setColor( GRAY_IDX, 1 );
-        IO::boldFont->setColor( WHITE_IDX, 2 );
+        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
 
-        BG_PALETTE[ WHITE_IDX ] = WHITE;
-        BG_PALETTE[ GRAY_IDX ]  = RGB( 20, 20, 20 );
-        BG_PALETTE[ BLACK_IDX ] = BLACK;
+        BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE[ IO::GRAY_IDX ]  = RGB( 20, 20, 20 );
+        BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
         if( p_newpok ) {
-            BG_PALETTE_SUB[ GRAY_IDX ]  = RGB( 10, 10, 10 );
-            BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
+            BG_PALETTE_SUB[ IO::GRAY_IDX ]  = RGB( 10, 10, 10 );
+            BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
         }
         auto currPkmn = p_pokemon;
 
@@ -1272,9 +1272,9 @@ namespace STS {
         std::vector<std::string>     names;
 
         NAV::draw( );
-        BG_PALETTE_SUB[ COLOR_IDX ] = CHOICE_COLOR;
-        BG_PALETTE_SUB[ GRAY_IDX ]  = GRAY;
-        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
+        BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::CHOICE_COLOR;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
 
         if( p_updatePageIcons ) {
             for( u8 i = 0; i < 5; ++i )
@@ -1331,17 +1331,17 @@ namespace STS {
 
         IO::regularFont->setColor( 0, 0 );
         {
-            IO::regularFont->setColor( BLACK_IDX, 1 );
-            IO::regularFont->setColor( GRAY_IDX, 2 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         }
-        IO::regularFont->setColor( GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::boldFont->setColor( 0, 0 );
-        IO::boldFont->setColor( GRAY_IDX, 1 );
-        IO::boldFont->setColor( WHITE_IDX, 2 );
+        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
 
-        BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-        BG_PALETTE_SUB[ GRAY_IDX ]  = RGB( 20, 20, 20 );
-        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = RGB( 20, 20, 20 );
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
 
         u16 tileCnt                                      = 0;
         IO::Oam->oamBuffer[ PKMN_SPRITE_START ].gfxIndex = tileCnt;

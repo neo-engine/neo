@@ -107,17 +107,17 @@ namespace BOX {
         IO::updateOAM( false );
         IO::initOAMTable( true );
 
-        BG_PALETTE[ COLOR_IDX ] = GREEN;
-        BG_PALETTE[ WHITE_IDX ] = WHITE;
-        BG_PALETTE[ GRAY_IDX ]  = GRAY;
-        BG_PALETTE[ BLACK_IDX ] = BLACK;
-        BG_PALETTE[ RED_IDX ]   = RED;
+        BG_PALETTE[ IO::COLOR_IDX ] = IO::GREEN;
+        BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
+        BG_PALETTE[ IO::RED_IDX ]   = IO::RED;
 
-        BG_PALETTE_SUB[ COLOR_IDX ] = GREEN;
-        BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-        BG_PALETTE_SUB[ GRAY_IDX ]  = GRAY;
-        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
-        BG_PALETTE_SUB[ RED_IDX ]   = RED;
+        BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
+        BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::RED;
     }
     boxUI::~boxUI( ) {
         IO::swapScreens( );
@@ -128,7 +128,7 @@ namespace BOX {
         dmaFillWords( 0, bgGetGfxPtr( !p_bottom ? IO::bg3sub : IO::bg3 ), 256 * 192 );
 
         auto pal = BG_PAL( !p_bottom );
-        pal[ 0 ] = WHITE;
+        pal[ 0 ] = IO::WHITE;
         char buffer[ 50 ];
 
         IO::initOAMTable( !p_bottom );
@@ -146,17 +146,17 @@ namespace BOX {
                 u8 cnt = SAVE::SAV.m_storedPokemon[ j * 7 + i ].count( );
                 pkmncnt += cnt;
                 if( cnt == MAX_PKMN_PER_BOX )
-                    IO::regularFont->setColor( RED_IDX, 1 );
+                    IO::regularFont->setColor( IO::RED_IDX, 1 );
                 else
-                    IO::regularFont->setColor( BLACK_IDX, 1 );
+                    IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                 snprintf( buffer, 49, "%2d", cnt );
                 IO::regularFont->printString( buffer, x + 7, y + 5, !p_bottom );
             }
         snprintf( buffer, 49, "%4d Pokémon", pkmncnt );
         if( pkmncnt == 756 )
-            IO::regularFont->setColor( RED_IDX, 1 );
+            IO::regularFont->setColor( IO::RED_IDX, 1 );
         else
-            IO::regularFont->setColor( BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
         IO::regularFont->printString( buffer, 252, 3, !p_bottom, IO::font::RIGHT );
 
         for( u8 i = 0; i < 5; ++i ) {
@@ -175,16 +175,16 @@ namespace BOX {
         u8 dy = p_pressed;
         switch( p_button ) {
         case BOX::boxUI::BUTTON_LEFT:
-            IO::printChoiceBox( 24, 23, 48, 48, 6, GRAY_IDX, p_pressed, false ); // <
+            IO::printChoiceBox( 24, 23, 48, 48, 6, IO::GRAY_IDX, p_pressed, false ); // <
             IO::regularFont->printString( "<", dx + 31, dy + 28, false );
             break;
         case BOX::boxUI::BUTTON_RIGHT:
-            IO::printChoiceBox( 208, 23, 232, 48, 6, GRAY_IDX, p_pressed, false ); // >
+            IO::printChoiceBox( 208, 23, 232, 48, 6, IO::GRAY_IDX, p_pressed, false ); // >
             IO::regularFont->printString( ">", dx + 216, dy + 28, false );
             break;
         case BOX::boxUI::BUTTON_BOX_NAME: {
             box* box = SAVE::SAV.getCurrentBox( );
-            IO::printChoiceBox( 50, 23, 206, 48, 6, COLOR_IDX, p_pressed, false ); // Box name
+            IO::printChoiceBox( 50, 23, 206, 48, 6, IO::COLOR_IDX, p_pressed, false ); // Box name
             IO::regularFont->printString( box->m_name, dx + 127, dy + 28, false, IO::font::CENTER );
             break;
         }
@@ -194,7 +194,7 @@ namespace BOX {
     }
 
     std::vector<IO::inputTarget> boxUI::draw( bool p_showTeam ) {
-        BG_PALETTE[ COLOR_IDX ] = getBoxColor( SAVE::SAV.getActiveFile( ).m_curBox );
+        BG_PALETTE[ IO::COLOR_IDX ] = getBoxColor( SAVE::SAV.getActiveFile( ).m_curBox );
 
         std::vector<IO::inputTarget> res;
         _ranges.clear( );
@@ -202,9 +202,9 @@ namespace BOX {
         box* box  = SAVE::SAV.getCurrentBox( );
 
         // SubScreen stuff
-        IO::printChoiceBox( 50, 23, 206, 48, 6, COLOR_IDX, false, false ); // Box name
-        IO::printChoiceBox( 24, 23, 48, 48, 6, GRAY_IDX, false, false );   // <
-        IO::printChoiceBox( 208, 23, 232, 48, 6, GRAY_IDX, false, false ); // >
+        IO::printChoiceBox( 50, 23, 206, 48, 6, IO::COLOR_IDX, false, false ); // Box name
+        IO::printChoiceBox( 24, 23, 48, 48, 6, IO::GRAY_IDX, false, false );   // <
+        IO::printChoiceBox( 208, 23, 232, 48, 6, IO::GRAY_IDX, false, false ); // >
 
         IO::regularFont->printString( box->m_name, 127, 28, false, IO::font::CENTER );
         IO::regularFont->printString( "<", 31, 28, false );
@@ -214,7 +214,7 @@ namespace BOX {
         u8  pal     = PKMN_PALETTE_START;
         u16 tileCnt = PKMN_TILES_START;
 
-        IO::printChoiceBox( 24, 51, 232, 136, 6, COLOR_IDX, false, false );
+        IO::printChoiceBox( 24, 51, 232, 136, 6, IO::COLOR_IDX, false, false );
 
         for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
             res.push_back( IO::inputTarget( POS_X( i ) + 5, POS_Y( i ) + 10, POS_X( i ) + 33,
@@ -235,7 +235,7 @@ namespace BOX {
             }
         }
 
-        IO::printRectangle( 0, 140, 255, 192, false,  WHITE_IDX );
+        IO::printRectangle( 0, 140, 255, 192, false,  IO::WHITE_IDX );
         IO::regularFont->printString( p_showTeam ? GET_STRING( 59 ) : GET_STRING( 60 ), 2, 176,
                                       false );
         for( u8 i = 0; i < 6; ++i ) {
@@ -244,7 +244,7 @@ namespace BOX {
             _ranges.push_back( {oam, res.back( )} );
 
             IO::printChoiceBox( TEAM_POS_X( i ), TEAM_POS_Y( i ), TEAM_POS_X( i ) + 28,
-                                TEAM_POS_Y( i ) + 21, 3, GRAY_IDX, false, false );
+                                TEAM_POS_Y( i ) + 21, 3, IO::GRAY_IDX, false, false );
 
             u16 species = p_showTeam
                               ? SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId

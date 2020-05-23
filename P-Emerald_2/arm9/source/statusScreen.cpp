@@ -160,8 +160,7 @@ namespace STS {
                                     ].m_boxdata.m_name,
                                     MOVE::getMoveName( SAVE::SAV.getActiveFile( )
                                         .m_pkmnTeam[ _pkmnIdx ]
-                                        .m_boxdata.m_moves[ o ],
-                                        CURRENT_LANGUAGE ).c_str( ) );
+                                        .m_boxdata.m_moves[ o ] ).c_str( ) );
                             IO::messageBox a( buffer );
                             NAV::draw( );
 
@@ -195,7 +194,7 @@ namespace STS {
                     && IO::waitForInput( tg[ tg.size( ) - 2 ] ) ) {
                     if( SAVE::SAV.getActiveFile( )
                             .m_pkmnTeam[ _pkmnIdx ].getItem( ) ) { // take item
-                        
+
                     } else { // give item
                         BAG::bagViewer bv;
                         UPDATE_TIME = false;

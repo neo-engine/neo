@@ -161,8 +161,254 @@ namespace STS {
         return res;
     }
 
+    std::string partyScreen::desquidItem::getString( ) {
+        if( m_hasCounterName ) {
+            snprintf( BUFFER, 49, GET_STRING( m_string ),
+                    m_nameForValue( m_currentValue( ) ).c_str( ) );
+        } else {
+            snprintf( BUFFER, 49, GET_STRING( m_string ) );
+        }
+        return std::string( BUFFER );
+    }
+
+    std::vector<partyScreen::desquidItem> partyScreen::getDesquidItemsForChoice(
+            const partyScreen::desquidChoice p_choice ) {
+        auto res = std::vector<partyScreen::desquidItem>( );
+        switch( p_choice ) {
+            case DESQUID_SPECIES: {
+                // Species
+                res.push_back(partyScreen::desquidItem({
+                            DESQUID_STRING + 12, true, MAX_PKMN, 1,
+                            [&]() {
+                                return _team[ _currentSelection ].m_boxdata.m_speciesId;
+                            },
+                            [&]( u16 p_newValue ) {
+                                _team[ _currentSelection ].m_boxdata.m_speciesId = p_newValue;
+                                _team[ _currentSelection ].setForme( 0 );
+                                 if( !_team[ _currentSelection ].m_boxdata.isNicknamed( ) ) {
+                                     getDisplayName( p_newValue,
+                                             _team[ _currentSelection ].m_boxdata.m_name,
+                                             CURRENT_LANGUAGE );
+                                 }
+                            },
+                            []( u16 p_value ) {
+                                return getDisplayName( p_value );
+                            }
+                        }));
+                // Forme
+                res.push_back(partyScreen::desquidItem({
+                            DESQUID_STRING + 13, true, 31, 0,
+                            [&]() {
+                                return _team[ _currentSelection ].getForme( );
+                            },
+                            [&]( u16 p_newValue ) {
+                                _team[ _currentSelection ].setForme( p_newValue );
+                            },
+                            [&]( u16 p_value ) {
+                                return getDisplayName(
+                                        _team[ _currentSelection ].m_boxdata.m_speciesId, p_value );
+                            }
+                        }));
+
+                break;
+            }
+
+            default: break;
+        }
+
+        return res;
+    }
+
+#define UPDATE_VALUE( p_newValue ) do {\
+    choices[ selectedLine ].m_counterUpdate( p_newValue ); \
+    data = getPkmnData( p_newValue ); \
+} while( false );
+
+    bool partyScreen::desquidWindow( desquidChoice p_choice ) {
+        pkmnData data = getPkmnData( _team[ _currentSelection ].m_boxdata.m_speciesId );
+        snprintf( BUFFER, 49, "%s: %s", GET_STRING( DESQUID_STRING ),
+                GET_STRING( getTextForDesquidChoice( p_choice ) ) );
+        _partyUI->select( _currentSelection, BUFFER );
+        _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
+        swiWaitForVBlank( );
+        //_partyUI->drawPartyPkmnSub( _currentSelection, true, false, GET_STRING( DESQUID_STRING ) );
+        _partyUI->showDesquidWindow( );
+
+        int           pressed, held;
+        touchPosition touch;
+        u8            cooldown = COOLDOWN_COUNT;
+        bool          redraw   = false;
+
+        auto choices       = getDesquidItemsForChoice( p_choice );
+        u8   selectedLine  = 0;
+        u8   selectedDigit = 0;
+        bool editing       = false;
+        u32  oldval        = 0;
+
+        for( u8 i = 0; i < choices.size( ); ++i ) {
+            _partyUI->drawDesquidItem( i, choices[ i ].getString( ).c_str( ),
+                                       choices[ i ].m_currentValue( ), choices[ i ].m_maxValue );
+        }
+        loop( ) {
+            _partyUI->animate( _frame++ );
+            scanKeys( );
+            touchRead( &touch );
+            swiWaitForVBlank( );
+
+            pressed = keysUp( );
+            held    = keysHeld( );
+
+            if( GET_KEY_COOLDOWN( KEY_B ) ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                if( editing ) {
+                    redraw = false;;
+                    editing = false;
+                    UPDATE_VALUE( oldval );
+                    _partyUI->drawDesquidItem( selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                                               choices[ selectedLine ].m_currentValue( ),
+                                               choices[ selectedLine ].m_maxValue, true );
+                    cooldown = COOLDOWN_COUNT;
+                } else {
+                    break;
+                }
+            } else if( GET_KEY_COOLDOWN( KEY_A ) ) {
+                if( !editing ) {
+                    SOUND::playSoundEffect( SFX_CHOOSE );
+                    oldval = choices[ selectedLine ].m_currentValue( );
+                    editing       = true;
+                    selectedDigit = 0;
+                    _partyUI->drawDesquidItem( selectedLine,
+                            choices[ selectedLine ].getString( ).c_str( ),
+                            choices[ selectedLine ].m_currentValue( ),
+                            choices[ selectedLine ].m_maxValue, true, selectedDigit );
+                } else {
+                    redraw = oldval != choices[ selectedLine ].m_currentValue( );;
+                    SOUND::playSoundEffect( SFX_SAVE );
+                    _team[ _currentSelection ].recalculateStats( );
+                    editing = false;
+                    snprintf( BUFFER, 49, "%s: %s", GET_STRING( DESQUID_STRING ),
+                            GET_STRING( getTextForDesquidChoice( p_choice ) ) );
+                    _partyUI->select( _currentSelection, BUFFER );
+
+                    for( u8 i = 0; i < choices.size( ); ++i ) {
+                        _partyUI->drawDesquidItem( i, choices[ i ].getString( ).c_str( ),
+                                choices[ i ].m_currentValue( ), choices[ i ].m_maxValue,
+                                i == selectedLine );
+                    }
+                }
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+                if( editing ) {
+                    u32 change = 1;
+                    for( u8 i = 0; i < selectedDigit; ++i, change *= 10 );
+                    if( choices[ selectedLine ].m_currentValue( ) == choices[ selectedLine ].m_minValue ) {
+                        UPDATE_VALUE( choices[ selectedLine ].m_maxValue );
+                    } else if( choices[ selectedLine ].m_currentValue( ) <
+                            change + choices[ selectedLine ].m_minValue ) {
+                        UPDATE_VALUE( choices[ selectedLine ].m_minValue );
+                    } else {
+                        UPDATE_VALUE( choices[ selectedLine ].m_currentValue( ) - change );
+                    }
+                    _partyUI->drawDesquidItem( selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                            choices[ selectedLine ].m_currentValue( ),
+                            choices[ selectedLine ].m_maxValue, true,
+                            selectedDigit );
+                } else {
+                    _partyUI->drawDesquidItem( selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                            choices[ selectedLine ].m_currentValue( ),
+                            choices[ selectedLine ].m_maxValue );
+                    selectedLine = ( selectedLine + 1 ) % choices.size( );
+                    _partyUI->drawDesquidItem( selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                            choices[ selectedLine ].m_currentValue( ),
+                            choices[ selectedLine ].m_maxValue, true );
+                }
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+                if( editing ) {
+                    u32 change = 1;
+                    for( u8 i = 0; i < selectedDigit; ++i, change *= 10 );
+                    if( choices[ selectedLine ].m_currentValue( ) == choices[ selectedLine ].m_maxValue ) {
+                        UPDATE_VALUE( choices[ selectedLine ].m_minValue );
+                    } else if( choices[ selectedLine ].m_currentValue( ) >
+                            choices[ selectedLine ].m_maxValue - change ) {
+                        UPDATE_VALUE( choices[ selectedLine ].m_maxValue );
+                    } else {
+                        UPDATE_VALUE( choices[ selectedLine ].m_currentValue( ) + change );
+                    }
+                    _partyUI->drawDesquidItem( selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                            choices[ selectedLine ].m_currentValue( ),
+                            choices[ selectedLine ].m_maxValue, true,
+                            selectedDigit );
+                } else {
+                    _partyUI->drawDesquidItem( selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                            choices[ selectedLine ].m_currentValue( ),
+                            choices[ selectedLine ].m_maxValue );
+                    selectedLine = ( selectedLine + choices.size( ) - 1 ) % choices.size( );
+                    _partyUI->drawDesquidItem( selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                            choices[ selectedLine ].m_currentValue( ),
+                            choices[ selectedLine ].m_maxValue, true );
+                }
+                cooldown = COOLDOWN_COUNT;
+            } else if( editing && GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+
+                u8 numDig = 0;
+                for( u32 cur = choices[ selectedLine ].m_maxValue; cur > 0; ++numDig, cur /= 10 );
+                selectedDigit = ( selectedDigit + 1 ) % numDig;
+                _partyUI->drawDesquidItem( selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                                           choices[ selectedLine ].m_currentValue( ),
+                                           choices[ selectedLine ].m_maxValue, true, selectedDigit );
+
+                cooldown = COOLDOWN_COUNT;
+            } else if( editing && GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+
+                u8 numDig = 0;
+                for( u32 cur = choices[ selectedLine ].m_maxValue; cur > 0; ++numDig, cur /= 10 );
+                selectedDigit = ( selectedDigit + numDig - 1 ) % numDig;
+                _partyUI->drawDesquidItem( selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                                           choices[ selectedLine ].m_currentValue( ),
+                                           choices[ selectedLine ].m_maxValue, true, selectedDigit );
+
+                cooldown = COOLDOWN_COUNT;
+            }
+            swiWaitForVBlank( );
+        }
+
+
+        _partyUI->hideDesquidWindow( );
+        return redraw;
+    }
+
+#undef UPDATE_VALUE
+
     bool partyScreen::executeDesquidChoice( desquidChoice p_choice ) {
-        return false;
+        switch( p_choice ) {
+            case DESQUID_DUPLICATE:
+                if( _teamLength < 6 ) {
+                    std::memcpy( &_team[ _teamLength++ ], &_team[ _currentSelection ],
+                                 sizeof( pokemon ) );
+                    _partyUI->updateTeamLength( _teamLength );
+                    return true;
+                } else {
+                    return false;
+                }
+            case DESQUID_DELETE:
+                if( _teamLength <= 1 ) { return false; }
+                if( _currentSelection + 1 < _teamLength ) {
+                    std::memmove( &_team[ _currentSelection ],
+                                  &_team[ _currentSelection + 1 ],
+                                  ( _teamLength - _currentSelection - 1 ) * sizeof( pokemon ) );
+                }
+                std::memset( &_team[ --_teamLength ], 0, sizeof( pokemon ) );
+                _partyUI->updateTeamLength( _teamLength );
+                return true;
+            default:
+                break;
+        }
+        return desquidWindow( p_choice );
     }
 #endif
 
@@ -197,7 +443,7 @@ namespace STS {
                 ex = true;
                 break;
             }
-            if( pressed & KEY_B ) {
+            if( GET_KEY_COOLDOWN( KEY_B ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 break; }
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
@@ -316,7 +562,7 @@ namespace STS {
                 ex = true;
                 break;
             }
-            if( pressed & KEY_B ) {
+            if( GET_KEY_COOLDOWN( KEY_B ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 break;
             }
@@ -534,7 +780,7 @@ namespace STS {
                 _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
 
                 sprintf( BUFFER, GET_STRING( 334 ),
-                         ITEM::getItemName( itm, CURRENT_LANGUAGE ).c_str( ),
+                         ITEM::getItemName( itm ).c_str( ),
                          _team[ _currentSelection ].m_boxdata.m_name );
                 _partyUI->printMessage( BUFFER, itm );
                 waitForInteract( );
@@ -550,7 +796,7 @@ namespace STS {
             _partyUI->select( _currentSelection );
             _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
 
-            sprintf( BUFFER, GET_STRING( 101 ), ITEM::getItemName( acI, CURRENT_LANGUAGE ).c_str( ),
+            sprintf( BUFFER, GET_STRING( 101 ), ITEM::getItemName( acI ).c_str( ),
                      _team[ _currentSelection ].m_boxdata.m_name );
             _partyUI->printMessage( BUFFER, acI );
             SAVE::SAV.getActiveFile( ).m_bag.insert(
@@ -654,7 +900,7 @@ namespace STS {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 break;
             }
-            if( pressed & KEY_B ) {
+            if( GET_KEY_COOLDOWN( KEY_B ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 if( _swapSelection != 255 ) {
                     _partyUI->unswap( _swapSelection );

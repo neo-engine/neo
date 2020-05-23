@@ -40,7 +40,7 @@ bool boxPokemon::learnMove( u16 p_move ) {
     if( p_move == m_moves[ 0 ] || p_move == m_moves[ 1 ] || p_move == m_moves[ 2 ]
         || p_move == m_moves[ 3 ] ) {
         snprintf( buffer, 49, GET_STRING( 102 ), m_name,
-                  MOVE::getMoveName( p_move, CURRENT_LANGUAGE ).c_str( ) );
+                  MOVE::getMoveName( p_move ).c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
@@ -55,7 +55,7 @@ bool boxPokemon::learnMove( u16 p_move ) {
                 m_acPP[ i ]  = std::min( m_acPP[ i ], mdata.m_pp );
 
                 snprintf( buffer, 49, GET_STRING( 103 ), m_name,
-                          MOVE::getMoveName( p_move, CURRENT_LANGUAGE ).c_str( ) );
+                          MOVE::getMoveName( p_move ).c_str( ) );
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
@@ -72,7 +72,7 @@ bool boxPokemon::learnMove( u16 p_move ) {
                 if( res < 4 ) {
                     if( MOVE::isFieldMove( m_moves[ res ] ) ) {
                         snprintf( buffer, 49, GET_STRING( 106 ), m_name,
-                                  MOVE::getMoveName( m_moves[ res ], CURRENT_LANGUAGE ).c_str( ) );
+                                  MOVE::getMoveName( m_moves[ res ] ).c_str( ) );
                         IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
                         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                         IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
@@ -88,7 +88,7 @@ bool boxPokemon::learnMove( u16 p_move ) {
         }
     } else {
         snprintf( buffer, 49, GET_STRING( 107 ), m_name,
-                  MOVE::getMoveName( p_move, CURRENT_LANGUAGE ).c_str( ) );
+                  MOVE::getMoveName( p_move ).c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
