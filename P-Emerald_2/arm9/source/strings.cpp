@@ -69,7 +69,7 @@ const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
     {"Desquid"},
     {"Set Species"},
     {"Set Status"},
-    {"Set Ability"},
+    {"Egg Status"},
     {"Nature/IV/EV"},
 
     {"Set Item"},
@@ -81,9 +81,10 @@ const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
     // 10
 
     {"Delete"},
-    {"Egg Status"},
+    {"Heal"},
     {"Species: %15s"},
     {"Forme: %15s"},
+    {"Ability: %15s"},
 };
 
 #endif

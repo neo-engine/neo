@@ -31,6 +31,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 #include "sound.h"
 
+#ifdef DESQUID
+#include "ability.h"
+#endif
+
 namespace STS {
     partyScreen::partyScreen( pokemon p_team[ 6 ], u8 p_teamLength, bool p_allowMoves,
                               bool p_allowItems, bool p_allowDex, u8 p_toSelect,
@@ -60,7 +64,7 @@ namespace STS {
             return DESQUID_STRING + 1;
         case DESQUID_STATUS:
             return DESQUID_STRING + 2;
-        case DESQUID_ABILITY:
+        case DESQUID_EGG:
             return DESQUID_STRING + 3;
         case DESQUID_NATURE:
             return DESQUID_STRING + 4;
@@ -76,7 +80,7 @@ namespace STS {
             return DESQUID_STRING + 9;
         case DESQUID_DELETE:
             return DESQUID_STRING + 10;
-        case DESQUID_EGG:
+        case DESQUID_HEAL:
             return DESQUID_STRING + 11;
 
         case DESQUID_CANCEL:
@@ -209,9 +213,79 @@ namespace STS {
                                         _team[ _currentSelection ].m_boxdata.m_speciesId, p_value );
                             }
                         }));
+                // Ability
+                res.push_back(partyScreen::desquidItem({
+                            DESQUID_STRING + 14, true, 3, 0,
+                            [&]() {
+                                pkmnData data = getPkmnData(
+                                        _team[ _currentSelection ].m_boxdata.m_speciesId,
+                                        _team[ _currentSelection ].getForme( ) );
+                                for( u8 i = 0; i < 4; ++i ) {
+                                    if( data.m_baseForme.m_abilities[ i ] ==
+                                            _team[ _currentSelection ].getAbility( ) ) {
+                                        return i;
+                                    }
+                                }
+                                return u8( 0 );
+                            },
+                            [&]( u16 p_newValue ) {
+                                pkmnData data = getPkmnData(
+                                        _team[ _currentSelection ].m_boxdata.m_speciesId,
+                                        _team[ _currentSelection ].getForme( ) );
+                                if( data.m_baseForme.m_abilities[ p_newValue ] ) {
+                                    _team[ _currentSelection ].m_boxdata.m_ability =
+                                    data.m_baseForme.m_abilities[ p_newValue ];
+                                } else {
+                                    _team[ _currentSelection ].m_boxdata.m_ability =
+                                    data.m_baseForme.m_abilities[ p_newValue ^ 1 ];
+                                }
+                            },
+                            [&]( u16 ) {
+                                return getAbilityName(
+                                        _team[ _currentSelection ].m_boxdata.m_ability );
+                            }
+                        }));
 
                 break;
             }
+            case DESQUID_STATUS: {
+                // Species
+                res.push_back(partyScreen::desquidItem({
+                            DESQUID_STRING + 12, true, MAX_PKMN, 1,
+                            [&]() {
+                                return _team[ _currentSelection ].m_boxdata.m_speciesId;
+                            },
+                            [&]( u16 p_newValue ) {
+                                _team[ _currentSelection ].m_boxdata.m_speciesId = p_newValue;
+                                _team[ _currentSelection ].setForme( 0 );
+                                 if( !_team[ _currentSelection ].m_boxdata.isNicknamed( ) ) {
+                                     getDisplayName( p_newValue,
+                                             _team[ _currentSelection ].m_boxdata.m_name,
+                                             CURRENT_LANGUAGE );
+                                 }
+                            },
+                            []( u16 p_value ) {
+                                return getDisplayName( p_value );
+                            }
+                        }));
+                // Forme
+                res.push_back(partyScreen::desquidItem({
+                            DESQUID_STRING + 13, true, 31, 0,
+                            [&]() {
+                                return _team[ _currentSelection ].getForme( );
+                            },
+                            [&]( u16 p_newValue ) {
+                                _team[ _currentSelection ].setForme( p_newValue );
+                            },
+                            [&]( u16 p_value ) {
+                                return getDisplayName(
+                                        _team[ _currentSelection ].m_boxdata.m_speciesId, p_value );
+                            }
+                        }));
+
+                break;
+            }
+
 
             default: break;
         }
@@ -221,11 +295,9 @@ namespace STS {
 
 #define UPDATE_VALUE( p_newValue ) do {\
     choices[ selectedLine ].m_counterUpdate( p_newValue ); \
-    data = getPkmnData( p_newValue ); \
 } while( false );
 
     bool partyScreen::desquidWindow( desquidChoice p_choice ) {
-        pkmnData data = getPkmnData( _team[ _currentSelection ].m_boxdata.m_speciesId );
         snprintf( BUFFER, 49, "%s: %s", GET_STRING( DESQUID_STRING ),
                 GET_STRING( getTextForDesquidChoice( p_choice ) ) );
         _partyUI->select( _currentSelection, BUFFER );
@@ -258,10 +330,15 @@ namespace STS {
             pressed = keysUp( );
             held    = keysHeld( );
 
-            if( GET_KEY_COOLDOWN( KEY_B ) ) {
+            if( pressed & KEY_X ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                UPDATE_VALUE( oldval );
+                redraw = true;
+                break;
+            } else if( GET_KEY_COOLDOWN( KEY_B ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 if( editing ) {
-                    redraw = false;;
+                    redraw = false;
                     editing = false;
                     UPDATE_VALUE( oldval );
                     _partyUI->drawDesquidItem( selectedLine, choices[ selectedLine ].getString( ).c_str( ),
@@ -405,6 +482,9 @@ namespace STS {
                 std::memset( &_team[ --_teamLength ], 0, sizeof( pokemon ) );
                 _partyUI->updateTeamLength( _teamLength );
                 return true;
+            case DESQUID_HEAL:
+                _team[ _currentSelection ].heal( );
+                return false;
             default:
                 break;
         }

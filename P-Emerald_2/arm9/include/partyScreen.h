@@ -75,7 +75,7 @@ namespace STS {
         enum desquidChoice {
             DESQUID_SPECIES = 50,
             DESQUID_STATUS,
-            DESQUID_ABILITY,
+            DESQUID_EGG,
             DESQUID_NATURE,
             DESQUID_ITEM,
             DESQUID_MOVES,
@@ -83,7 +83,7 @@ namespace STS {
             DESQUID_SHINY,
             DESQUID_DUPLICATE,
             DESQUID_DELETE,
-            DESQUID_EGG,
+            DESQUID_HEAL,
 
             DESQUID_CANCEL,
         };
