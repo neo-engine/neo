@@ -169,6 +169,17 @@ bool pokemon::gainExperience( u32 p_amount ) {
     return true;
 }
 
+bool pokemon::setExperience( u32 p_amount ) {
+    if( m_level == 100 ) { return false; }
+
+    pkmnData data = getPkmnData( m_boxdata.m_speciesId, getForme( ) );
+
+    m_boxdata.m_experienceGained = std::min( p_amount, EXP[ 99 ][ data.getExpType( ) ] );
+    m_level = calcLevel( m_boxdata, &data );
+    recalculateStats( data );
+    return true;
+}
+
 void pokemon::setStatus( u8 p_status, u8 p_value ) {
     switch( p_status ) {
     case 0:
@@ -197,7 +208,7 @@ void pokemon::setStatus( u8 p_status, u8 p_value ) {
     }
 }
 
-pokemon::stats calcStats( const boxPokemon& p_boxdata, u8 p_level, const pkmnData* p_data ) {
+pokemon::stats calcStats( boxPokemon& p_boxdata, u8 p_level, const pkmnData* p_data ) {
     pokemon::stats res;
     u16            pkmnId = p_boxdata.m_speciesId;
     if( pkmnId != PKMN_SHEDINJA )
@@ -218,10 +229,10 @@ pokemon::stats calcStats( const boxPokemon& p_boxdata, u8 p_level, const pkmnDat
     }
     return res;
 }
-pokemon::stats calcStats( const boxPokemon& p_boxdata, const pkmnData* p_data ) {
+pokemon::stats calcStats( boxPokemon& p_boxdata, const pkmnData* p_data ) {
     return calcStats( p_boxdata, calcLevel( p_boxdata, p_data ), p_data );
 }
-u16 calcLevel( const boxPokemon& p_boxdata, const pkmnData* p_data ) {
+u16 calcLevel( boxPokemon& p_boxdata, const pkmnData* p_data ) {
     for( u16 i = 2; i < 101; ++i )
         if( EXP[ i - 1 ][ p_data->getExpType( ) ] > p_boxdata.m_experienceGained ) return ( i - 1 );
     return 100;

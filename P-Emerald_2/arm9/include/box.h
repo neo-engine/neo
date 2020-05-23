@@ -39,18 +39,18 @@ namespace BOX {
         boxPokemon m_pokemon[ MAX_PKMN_PER_BOX ];
         u8                  m_wallpaper;
 
-        s8 getFirstFreeSpot( ) const {
+        constexpr s8 getFirstFreeSpot( )  {
             for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i )
                 if( !( m_pokemon + i )->m_speciesId ) return i;
             return -1;
         }
-        u8 count( ) const {
+        constexpr u8 count( ) {
             u8 res = 0;
             for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i )
                 if( ( m_pokemon + i )->m_speciesId ) res++;
             return res;
         }
-        u8 count( u16 p_pkmnIdx ) const {
+        constexpr u8 count( u16 p_pkmnIdx ) {
             u8 res = 0;
             for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i )
                 if( !( m_pokemon + i )->isEgg( ) && ( m_pokemon + i )->m_speciesId == p_pkmnIdx )

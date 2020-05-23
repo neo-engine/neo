@@ -63,7 +63,8 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     else if( p_shiny ) { // Try p_shiny - 2 additional times to generate a shiny PId
         for( u8 i = 0; i < p_shiny - 2 && !isShiny( ); ++i ) m_pid = rand( );
     }
-    m_speciesId = p_pkmnId;
+
+    m_experienceGained = EXP[ p_level - 1 ][ data.getExpType( ) ];
 
     if( data.m_baseForme.m_items[ 3 ] )
         m_heldItem = data.m_baseForme.m_items[ 3 ];
@@ -76,8 +77,6 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
         else if( m_b1 < 80 && data.m_baseForme.m_items[ 2 ] )
             m_heldItem = data.m_baseForme.m_items[ 2 ];
     }
-
-    if( !p_isEgg ) m_experienceGained = EXP[ p_level - 1 ][ data.getExpType( ) ];
 
     if( p_isEgg ) {
         m_steps          = data.m_eggCycles;
@@ -93,14 +92,6 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
         m_hatchDate[ 2 ] = acyear % 100;
         m_gotPlace       = p_gotPlace;
     }
-
-    m_ability = ( p_hiddenAbility && data.m_baseForme.m_abilities[ 2 ] )
-                    ? ( ( ( m_pid & 1 ) || !data.m_baseForme.m_abilities[ 3 ] )
-                            ? data.m_baseForme.m_abilities[ 2 ]
-                            : data.m_baseForme.m_abilities[ 3 ] )
-                    : ( ( ( m_pid & 1 ) || !data.m_baseForme.m_abilities[ 1 ] )
-                            ? data.m_baseForme.m_abilities[ 0 ]
-                            : data.m_baseForme.m_abilities[ 1 ] );
     m_origLang = 5;
 
     if( p_moves )
@@ -117,19 +108,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     setIsEgg( p_isEgg );
     m_fateful = p_fatefulEncounter;
 
-    pkmnGenderType A = data.m_baseForme.m_genderRatio;
-    if( A == MALE )
-        m_isFemale = m_isGenderless = false;
-    else if( A == FEMALE )
-        m_isFemale = true, m_isGenderless = false;
-    else if( A == GENDERLESS )
-        m_isFemale = false, m_isGenderless = true;
-    else if( ( m_pid & 255 ) >= A )
-        m_isFemale = m_isGenderless = false;
-    else
-        m_isFemale = true, m_isGenderless = false;
-
-    m_altForme = p_forme;
+    setForme( p_forme );
     if( p_name ) {
         strcpy( m_name, p_name );
         setIsNicknamed( true );
@@ -143,68 +122,95 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     m_ball       = p_ball;
     m_gotLevel   = p_level;
     m_oTisFemale = p_oTFemale;
+
+    m_abilitySlot = 2 * p_hiddenAbility + ( m_pid & 1 );
+    setSpecies( p_pkmnId, &data );
+}
+
+void boxPokemon::setSpecies( u16 p_newSpecies, pkmnData* p_data ) {
+    m_speciesId = p_newSpecies;
+    setForme( 0 );
+    pkmnData data;
+    if( p_data == nullptr ) {
+        data = getPkmnData( getSpecies( ), getForme( ) );
+    } else {
+        data = *p_data;
+    }
+
+    pkmnGenderType A = data.m_baseForme.m_genderRatio;
+    if( A == MALE )
+        m_isFemale = m_isGenderless = false;
+    else if( A == FEMALE )
+        m_isFemale = true, m_isGenderless = false;
+    else if( A == GENDERLESS )
+        m_isFemale = false, m_isGenderless = true;
+    else if( ( m_pid & 255 ) >= A )
+        m_isFemale = m_isGenderless = false;
+    else
+        m_isFemale = true, m_isGenderless = false;
+
+    setAbility( getAbilitySlot( ), &data );
     recalculateForme( );
 }
 
-bool boxPokemon::isShiny( ) const {
-    return !( ( ( ( m_oTId ^ m_oTSid ) >> 3 )
-                ^ ( ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) ) ) >> 3 ) );
-}
+void boxPokemon::setAbility( u8 p_newAbilitySlot, pkmnData* p_data  ) {
+    pkmnData data;
+    if( p_data == nullptr ) {
+        data = getPkmnData( getSpecies( ), getForme( ) );
+    } else {
+        data = *p_data;
+    }
 
-/*
- * @brief: Returns the gender. -1 for female, 0 for genderless, and 1 for male
- */
-s8 boxPokemon::gender( ) const {
-    if( m_isGenderless )
-        return 0;
-    else if( m_isFemale )
-        return -1;
-    return 1;
-}
+    m_abilitySlot = p_newAbilitySlot;
 
-u8 boxPokemon::getForme( ) {
-    return m_altForme;
+    m_ability = ( p_newAbilitySlot >= 2 && data.m_baseForme.m_abilities[ 2 ] )
+                    ? ( ( ( p_newAbilitySlot & 1 ) || !data.m_baseForme.m_abilities[ 3 ] )
+                            ? data.m_baseForme.m_abilities[ 2 ]
+                            : data.m_baseForme.m_abilities[ 3 ] )
+                    : ( ( ( p_newAbilitySlot & 1 ) || !data.m_baseForme.m_abilities[ 1 ] )
+                            ? data.m_baseForme.m_abilities[ 0 ]
+                            : data.m_baseForme.m_abilities[ 1 ] );
 }
 
 void boxPokemon::recalculateForme( ) {
     switch( m_speciesId ) {
     case PKMN_GIRATINA: {
-        m_altForme = ( m_heldItem == I_GRISEOUS_ORB );
+        setForme( ( m_heldItem == I_GRISEOUS_ORB ) );
         return;
     }
     case PKMN_ARCEUS: {
         if( m_heldItem >= I_FLAME_PLATE && m_heldItem <= I_IRON_PLATE ) {
-            m_altForme = m_heldItem - I_FLAME_PLATE + 1;
+            setForme( m_heldItem - I_FLAME_PLATE + 1 );
         } else if( m_heldItem == I_NULL_PLATE ) {
-            m_altForme = 17;
+            setForme( 17 );
         } else if( m_heldItem == I_PIXIE_PLATE ) {
-            m_altForme = 18;
+            setForme( 18 );
         } else if( m_heldItem >= I_FIRIUM_Z && m_heldItem <= I_STEELIUM_Z ) {
-            m_altForme = m_heldItem - I_FIRIUM_Z + 1;
+            setForme( m_heldItem - I_FIRIUM_Z + 1 );
         } else if( m_heldItem == I_FAIRIUM_Z ) {
-            m_altForme = 18;
+            setForme( 18 );
         } else if( m_heldItem >= I_FIRIUM_Z2 && m_heldItem <= I_STEELIUM_Z2 ) {
-            m_altForme = m_heldItem - I_FIRIUM_Z2 + 1;
+            setForme( m_heldItem - I_FIRIUM_Z2 + 1 );
         } else if( m_heldItem == I_FAIRIUM_Z2 ) {
-            m_altForme = 18;
+            setForme( 18 );
         } else {
-            m_altForme = 0;
+            setForme( 0 );
         }
         return;
     }
     case PKMN_GENESECT: {
         if( m_heldItem >= I_DOUSE_DRIVE && m_heldItem <= I_CHILL_DRIVE ) {
-            m_altForme = m_heldItem - I_DOUSE_DRIVE + 1;
+            setForme( m_heldItem - I_DOUSE_DRIVE + 1 );
         } else {
-            m_altForme = 0;
+            setForme( 0 );
         }
         return;
     }
     case PKMN_SILVALLY: {
         if( m_heldItem >= I_FIGHTING_MEMORY && m_heldItem <= I_FAIRY_MEMORY ) {
-            m_altForme = m_heldItem - I_FIGHTING_MEMORY + 1;
+            setForme( m_heldItem - I_FIGHTING_MEMORY + 1 );
         } else {
-            m_altForme = 0;
+            setForme( 0 );
         }
         return;
     }

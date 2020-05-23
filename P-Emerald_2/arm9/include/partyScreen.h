@@ -75,15 +75,15 @@ namespace STS {
         enum desquidChoice {
             DESQUID_SPECIES = 50,
             DESQUID_STATUS,
+            DESQUID_HEAL,
             DESQUID_EGG,
             DESQUID_NATURE,
+            DESQUID_IV,
+            DESQUID_EV,
             DESQUID_ITEM,
             DESQUID_MOVES,
-            DESQUID_LEVEL,
-            DESQUID_SHINY,
             DESQUID_DUPLICATE,
             DESQUID_DELETE,
-            DESQUID_HEAL,
 
             DESQUID_CANCEL,
         };
@@ -91,11 +91,11 @@ namespace STS {
         struct desquidItem {
             u16 m_string;           // Desquid string id
             bool m_hasCounterName;  // Counter values have names
-            u16 m_maxValue;         // Max value for the counter
-            u16 m_minValue;         // Min value for the counter
-            std::function<u16()> m_currentValue; // Callback for current value
-            std::function<void(u16)> m_counterUpdate; // Callback when counter value changed
-            std::function<std::string(u16)> m_nameForValue; // Used to obtain name for value (0 for n/a)
+            u32 m_maxValue;         // Max value for the counter
+            u32 m_minValue;         // Min value for the counter
+            std::function<u32()> m_currentValue; // Callback for current value
+            std::function<void(u32)> m_counterUpdate; // Callback when counter value changed
+            std::function<std::string(u32)> m_nameForValue; // Used to obtain name for value (0 for n/a)
             std::string getString( );
         };
 

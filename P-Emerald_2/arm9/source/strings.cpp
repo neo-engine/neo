@@ -67,24 +67,54 @@ const char* LANGUAGE_NAMES[ LANGUAGES ] = {"English", "Deutsch"};
 #ifdef DESQUID
 const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
     {"Desquid"},
-    {"Set Species"},
-    {"Set Status"},
+    {"Basic Data"},
+    {"Status"},
     {"Egg Status"},
-    {"Nature/IV/EV"},
+    {"Nature"},
 
-    {"Set Item"},
-    {"Set Moves"},
-    {"Set Level"},
-    {"Set Shiny"},
+    {"Held Item"},
+    {"Moves"},
+    {"IV"},
+    {"EV"},
     {"Duplicate"},
 
     // 10
 
     {"Delete"},
     {"Heal"},
-    {"Species: %15s"},
-    {"Forme: %15s"},
-    {"Ability: %15s"},
+    {"Species: %s"},
+    {"Forme: %s"},
+    {"Ability: %s"},
+
+    {"Sleep"},
+    {"Poison"},
+    {"Burn"},
+    {"Freeze"},
+    {"Paralyzed"},
+
+    // 20
+
+    {"Toxic"},
+    {"Level"},
+    {"EXP"},
+    {"Shininess"},
+    {"Is Egg?"},
+
+    {"Steps/Happiness"},
+    {"Obt. at %s"},
+    {"Hatd at %s"},
+    {"OT Id"},
+    {"OT SId"},
+
+    // 30
+
+    {"Nature: %s"},
+    {"%2s Attack"},
+    {"%2s Defense"},
+    {"%2s Speed"},
+    {"%2s Special Atk"},
+
+    {"%2s Special Def"},
 };
 
 #endif

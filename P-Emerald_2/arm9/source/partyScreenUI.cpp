@@ -843,7 +843,8 @@ namespace STS {
                     _team[ p_pos ].m_boxdata.m_speciesId, oam[ SPR_PKMN_ICON_OAM( p_pos ) ].x,
                     oam[ SPR_PKMN_ICON_OAM( p_pos ) ].y, SPR_PKMN_ICON_OAM( p_pos ),
                     SPR_PKMN_ICON_PAL( p_pos ), oam[ SPR_PKMN_ICON_OAM( p_pos ) ].gfxIndex,
-                    p_bottom, _team[ p_pos ].getForme( ) );
+                    p_bottom, _team[ p_pos ].getForme( ), _team[ p_pos ].isShiny( ),
+                    _team[ p_pos ].isFemale( ) );
             }
         }
 
@@ -924,7 +925,8 @@ namespace STS {
                     _team[ p_pos ].m_boxdata.m_speciesId, oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].x,
                     oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].y, SPR_PKMN_ICON_OAM_SUB( p_pos ),
                     SPR_PKMN_ICON_PAL_SUB( p_pos ), oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].gfxIndex,
-                    p_bottom, _team[ p_pos ].getForme( ) );
+                    p_bottom, _team[ p_pos ].getForme( ), _team[ p_pos ].isShiny( ),
+                    _team[ p_pos ].isFemale( ) );
             }
         }
 
@@ -1051,31 +1053,33 @@ namespace STS {
                                          u32 p_maxValue, bool p_highlight, u8 p_highlightDigit,
                                          bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        const u8 height = 18;
 
-        IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 32 + p_idx * 20,
-                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * 20, p_bottom, 0 );
+        IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 32 + p_idx * height,
+                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * height, p_bottom, 0 );
         if( p_highlight ) {
-            IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 32 + p_idx * 20,
-                oam[ SPR_MSG_BOX_OAM_SUB ].x, 31 + ( p_idx + 1 ) * 20, p_bottom,
+            IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 32 + p_idx * height,
+                oam[ SPR_MSG_BOX_OAM_SUB ].x, 31 + ( p_idx + 1 ) * height, p_bottom,
                 IO::RED_IDX );
-            IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 32 + p_idx * 20,
-                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 32 + p_idx * 20, p_bottom,
+            IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 32 + p_idx * height,
+                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 32 + p_idx * height, p_bottom,
                 IO::RED_IDX );
-            IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 31 + ( p_idx + 1 ) * 20,
-                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * 20, p_bottom,
+            IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 31 + ( p_idx + 1 ) * height,
+                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * height, p_bottom,
                 IO::RED_IDX );
-            IO::printRectangle( 256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 32 + p_idx * 20,
-                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * 20, p_bottom,
+            IO::printRectangle( 256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 32 + p_idx * height,
+                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * height, p_bottom,
                 IO::RED_IDX );
         }
 
-        IO::regularFont->printString( p_string, oam[ SPR_MSG_BOX_OAM_SUB ].x + 8, 34 + p_idx * 20, p_bottom );
+        IO::regularFont->printString( p_string, oam[ SPR_MSG_BOX_OAM_SUB ].x + 8,
+                33 + p_idx * height, p_bottom );
 
         u8 dg = 0;
         for( u32 tmp = p_maxValue; tmp > 0; ++dg, tmp /= 10 );
 
         IO::regularFont->printCounter( p_value, dg, 256 - oam[ SPR_MSG_BOX_OAM_SUB ].x -
-                ( dg + 1 ) * 8, 34 + p_idx * 20, p_highlightDigit,
+                ( dg + 1 ) * 8, 33 + p_idx * height, p_highlightDigit,
                 IO::WHITE_IDX, IO::BLACK_IDX, p_bottom );
 
     }
