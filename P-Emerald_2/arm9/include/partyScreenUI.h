@@ -40,12 +40,12 @@ namespace STS {
         pokemon* _team;
         u8       _teamLength;
         u8       _selectedIdx;
-        bool     _swapping = false;
-        u8       _toSelect = 0;
+        bool     _swapping   = false;
+        u8       _toSelect   = 0;
         bool     _animateMsg = false;
 
         constexpr u16 partyTopScreenPkmnIconPosY( u8 p_pos ) {
-            return ( p_pos & 1 ) * 8 + 2 + 61 * ( p_pos >> 1 );
+            return ( p_pos & 1 ) * 8 + 8 + 61 * ( p_pos >> 1 );
         }
 
         u16 initTopScreen( bool p_bottom = false );
@@ -55,6 +55,7 @@ namespace STS {
                             const char* p_message = 0, bool p_bottom = false );
         void animatePartyPkmn( u8 p_frame, bool p_bottom = false );
         void animateMessageBox( u8 p_frame, bool p_bottom = true );
+
       public:
         /*
          * @brief Creates a new party screen UI; does nothing else.

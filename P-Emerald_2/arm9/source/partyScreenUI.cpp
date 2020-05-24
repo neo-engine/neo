@@ -87,8 +87,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_STATUS_ICON_OAM( p_pos ) ( 24 + ( p_pos ) )
 #define SPR_PKMN_ICON_OAM( p_pos ) ( 30 + ( p_pos ) )
 #define SPR_SHINY_ICON_OAM( p_pos ) ( 36 + ( p_pos ) )
-#define SPR_SWAP_OAM( p_pos ) ( 42 + 2 * ( p_pos ) )
-#define SPR_MARK_OAM( p_pos, p_color ) ( 54 + 6 * ( p_pos ) + ( p_color ) )
+#define SPR_SWAP_OAM( p_pos ) ( 42 + 3 * ( p_pos ) )
+#define SPR_MARK_OAM( p_pos, p_color ) ( 60 + 6 * ( p_pos ) + ( p_color ) )
 #define SPR_PKMN_BG_PAL 0
 #define SPR_PKMN_ICON_PAL( p_pos ) ( 4 + ( p_pos ) )
 #define SPR_ITEM_ICON_PAL 10
@@ -204,16 +204,17 @@ namespace STS {
 
             // PKMN icon
             tileCnt = IO::loadSprite( SPR_PKMN_ICON_OAM( pos ), SPR_PKMN_ICON_PAL( pos ), tileCnt,
-                                      3, 2 + 61 * i, 32, 32, NoItemPal, NoItemTiles, NoItemTilesLen,
-                                      false, false, true, OBJPRIORITY_2, p_bottom, OBJMODE_NORMAL );
+                                      4, partyTopScreenPkmnIconPosY( pos ), 32, 32, NoItemPal,
+                                      NoItemTiles, NoItemTilesLen, false, false, true,
+                                      OBJPRIORITY_2, p_bottom, OBJMODE_NORMAL );
 
             if( i ) {
                 // Item icon
                 IO::loadSprite( SPR_ITEM_ICON_OAM( pos ), SPR_ITEM_ICON_PAL,
                                 oam[ SPR_ITEM_ICON_OAM( 0 ) ].gfxIndex, 3 + 32 - 9,
-                                2 + 32 - 8 + 61 * i, 8, 8, itemiconPal, itemiconTiles,
-                                itemiconTilesLen, false, false, true, OBJPRIORITY_0, p_bottom,
-                                OBJMODE_NORMAL );
+                                partyTopScreenPkmnIconPosY( pos ) + 32 - 8, 8, 8, itemiconPal,
+                                itemiconTiles, itemiconTilesLen, false, false, true, OBJPRIORITY_0,
+                                p_bottom, OBJMODE_NORMAL );
 
                 // HP bar
                 IO::loadSprite( SPR_HP_BAR_OAM( pos ), SPR_HP_BAR_PAL,
@@ -223,43 +224,47 @@ namespace STS {
 
                 // mark
                 IO::loadSprite( SPR_SWAP_OAM( pos ), SPR_SWAP_PAL,
-                                oam[ SPR_SWAP_OAM( 0 ) ].gfxIndex, 5, 3 + 61 * i, 64, 64,
-                                party_mark1Pal, party_mark1Tiles, party_mark1TilesLen, false, false,
+                                oam[ SPR_SWAP_OAM( 0 ) ].gfxIndex, 0, 2 + 61 * i, 64, 64,
+                                party_mark2Pal, party_mark2Tiles, party_mark2TilesLen, true, true,
                                 true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
                 IO::loadSprite( SPR_SWAP_OAM( pos ) + 1, SPR_SWAP_PAL,
-                                oam[ SPR_SWAP_OAM( 0 ) + 1 ].gfxIndex, 69, 3 + 61 * i, 64, 64,
+                                oam[ SPR_SWAP_OAM( 0 ) + 1 ].gfxIndex, 37, 3 + 61 * i, 32, 64,
+                                party_mark1Pal, party_mark1Tiles, party_mark1TilesLen, false, false,
+                                true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+                IO::loadSprite( SPR_SWAP_OAM( pos ) + 2, SPR_SWAP_PAL,
+                                oam[ SPR_SWAP_OAM( 0 ) ].gfxIndex, 65, 3 + 61 * i, 64, 64,
                                 party_mark2Pal, party_mark2Tiles, party_mark2TilesLen, false, false,
                                 true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
                 IO::loadSprite( SPR_MARK_OAM( pos, 0 ), SPR_MARK_PAL,
-                                oam[ SPR_MARK_OAM( 0, 0 ) ].gfxIndex, 29, 4 + 61 * i, 32, 16,
+                                oam[ SPR_MARK_OAM( 0, 0 ) ].gfxIndex, 24, 4 + 61 * i, 32, 16,
                                 party_1Pal, party_1Tiles, party_1TilesLen, false, false, true,
                                 OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
                 IO::loadSprite( SPR_MARK_OAM( pos, 1 ), SPR_MARK_PAL,
-                                oam[ SPR_MARK_OAM( 0, 1 ) ].gfxIndex, 29, 4 + 61 * i, 32, 16,
+                                oam[ SPR_MARK_OAM( 0, 1 ) ].gfxIndex, 24, 4 + 61 * i, 32, 16,
                                 party_1Pal, party_2Tiles, party_1TilesLen, false, false, true,
                                 OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
                 IO::loadSprite( SPR_MARK_OAM( pos, 2 ), SPR_MARK_PAL,
-                                oam[ SPR_MARK_OAM( 0, 2 ) ].gfxIndex, 29, 4 + 61 * i, 32, 16,
+                                oam[ SPR_MARK_OAM( 0, 2 ) ].gfxIndex, 24, 4 + 61 * i, 32, 16,
                                 party_1Pal, party_3Tiles, party_1TilesLen, false, false, true,
                                 OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
                 IO::loadSprite( SPR_MARK_OAM( pos, 3 ), SPR_MARK_PAL,
-                                oam[ SPR_MARK_OAM( 0, 3 ) ].gfxIndex, 29, 4 + 61 * i, 32, 16,
+                                oam[ SPR_MARK_OAM( 0, 3 ) ].gfxIndex, 24, 4 + 61 * i, 32, 16,
                                 party_1Pal, party_4Tiles, party_1TilesLen, false, false, true,
                                 OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
                 IO::loadSprite( SPR_MARK_OAM( pos, 4 ), SPR_MARK_PAL,
-                                oam[ SPR_MARK_OAM( 0, 4 ) ].gfxIndex, 29, 4 + 61 * i, 32, 16,
+                                oam[ SPR_MARK_OAM( 0, 4 ) ].gfxIndex, 24, 4 + 61 * i, 32, 16,
                                 party_1Pal, party_5Tiles, party_1TilesLen, false, false, true,
                                 OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
                 IO::loadSprite( SPR_MARK_OAM( pos, 5 ), SPR_MARK_PAL,
-                                oam[ SPR_MARK_OAM( 0, 5 ) ].gfxIndex, 29, 4 + 61 * i, 32, 16,
+                                oam[ SPR_MARK_OAM( 0, 5 ) ].gfxIndex, 24, 4 + 61 * i, 32, 16,
                                 party_1Pal, party_6Tiles, party_1TilesLen, false, false, true,
                                 OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
             } else {
                 // Item icon
                 tileCnt = IO::loadSprite( SPR_ITEM_ICON_OAM( pos ), SPR_ITEM_ICON_PAL, tileCnt,
-                                          3 + 32 - 9, 2 + 32 - 8 + 61 * i, 8, 8, itemiconPal,
-                                          itemiconTiles, itemiconTilesLen, false, false, true,
-                                          OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+                                          3 + 32 - 9, partyTopScreenPkmnIconPosY( pos ) + 32 - 8, 8,
+                                          8, itemiconPal, itemiconTiles, itemiconTilesLen, false,
+                                          false, true, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
 
                 // HP bar
                 tileCnt
@@ -268,36 +273,40 @@ namespace STS {
                                       false, false, true, OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
 
                 // mark
-                tileCnt = IO::loadSprite( SPR_SWAP_OAM( pos ), SPR_SWAP_PAL, tileCnt, 5, 3 + 61 * i,
-                                          64, 64, party_mark1Pal, party_mark1Tiles,
+                tileCnt
+                    = IO::loadSprite( SPR_SWAP_OAM( pos ), SPR_SWAP_PAL, tileCnt, 0, 2 + 61 * i, 64,
+                                      64, party_mark2Pal, party_mark2Tiles, party_mark2TilesLen,
+                                      true, true, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+                tileCnt = IO::loadSprite( SPR_SWAP_OAM( pos ) + 1, SPR_SWAP_PAL, tileCnt, 37,
+                                          3 + 61 * i, 32, 64, party_mark1Pal, party_mark1Tiles,
                                           party_mark1TilesLen, false, false, true, OBJPRIORITY_3,
                                           p_bottom, OBJMODE_BLENDED );
-                tileCnt = IO::loadSprite( SPR_SWAP_OAM( pos ) + 1, SPR_SWAP_PAL, tileCnt, 69,
-                                          3 + 61 * i, 64, 64, party_mark2Pal, party_mark2Tiles,
-                                          party_mark2TilesLen, false, false, true, OBJPRIORITY_3,
-                                          p_bottom, OBJMODE_BLENDED );
+                IO::loadSprite( SPR_SWAP_OAM( pos ) + 2, SPR_SWAP_PAL,
+                                oam[ SPR_SWAP_OAM( pos ) ].gfxIndex, 65, 3 + 61 * i, 64, 64,
+                                party_mark2Pal, party_mark2Tiles, party_mark2TilesLen, false, false,
+                                true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
                 tileCnt
-                    = IO::loadSprite( SPR_MARK_OAM( pos, 0 ), SPR_MARK_PAL, tileCnt, 29, 4 + 61 * i,
+                    = IO::loadSprite( SPR_MARK_OAM( pos, 0 ), SPR_MARK_PAL, tileCnt, 24, 4 + 61 * i,
                                       32, 16, party_1Pal, party_1Tiles, party_1TilesLen, false,
                                       false, true, OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
                 tileCnt
-                    = IO::loadSprite( SPR_MARK_OAM( pos, 1 ), SPR_MARK_PAL, tileCnt, 29, 4 + 61 * i,
+                    = IO::loadSprite( SPR_MARK_OAM( pos, 1 ), SPR_MARK_PAL, tileCnt, 24, 4 + 61 * i,
                                       32, 16, party_1Pal, party_2Tiles, party_1TilesLen, false,
                                       false, true, OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
                 tileCnt
-                    = IO::loadSprite( SPR_MARK_OAM( pos, 2 ), SPR_MARK_PAL, tileCnt, 29, 4 + 61 * i,
+                    = IO::loadSprite( SPR_MARK_OAM( pos, 2 ), SPR_MARK_PAL, tileCnt, 24, 4 + 61 * i,
                                       32, 16, party_1Pal, party_3Tiles, party_1TilesLen, false,
                                       false, true, OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
                 tileCnt
-                    = IO::loadSprite( SPR_MARK_OAM( pos, 3 ), SPR_MARK_PAL, tileCnt, 29, 4 + 61 * i,
+                    = IO::loadSprite( SPR_MARK_OAM( pos, 3 ), SPR_MARK_PAL, tileCnt, 24, 4 + 61 * i,
                                       32, 16, party_1Pal, party_4Tiles, party_1TilesLen, false,
                                       false, true, OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
                 tileCnt
-                    = IO::loadSprite( SPR_MARK_OAM( pos, 4 ), SPR_MARK_PAL, tileCnt, 29, 4 + 61 * i,
+                    = IO::loadSprite( SPR_MARK_OAM( pos, 4 ), SPR_MARK_PAL, tileCnt, 24, 4 + 61 * i,
                                       32, 16, party_1Pal, party_5Tiles, party_1TilesLen, false,
                                       false, true, OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
                 tileCnt
-                    = IO::loadSprite( SPR_MARK_OAM( pos, 5 ), SPR_MARK_PAL, tileCnt, 29, 4 + 61 * i,
+                    = IO::loadSprite( SPR_MARK_OAM( pos, 5 ), SPR_MARK_PAL, tileCnt, 24, 4 + 61 * i,
                                       32, 16, party_1Pal, party_6Tiles, party_1TilesLen, false,
                                       false, true, OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
             }
@@ -329,16 +338,17 @@ namespace STS {
                             OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
 
             // PKMN icon
-            tileCnt
-                = IO::loadSprite( SPR_PKMN_ICON_OAM( pos ), SPR_PKMN_ICON_PAL( pos ), tileCnt, 130,
-                                  10 + 61 * i, 32, 32, NoItemPal, NoItemTiles, NoItemTilesLen,
-                                  false, false, true, OBJPRIORITY_2, p_bottom, OBJMODE_NORMAL );
+            tileCnt = IO::loadSprite( SPR_PKMN_ICON_OAM( pos ), SPR_PKMN_ICON_PAL( pos ), tileCnt,
+                                      131, partyTopScreenPkmnIconPosY( pos ), 32, 32, NoItemPal,
+                                      NoItemTiles, NoItemTilesLen, false, false, true,
+                                      OBJPRIORITY_2, p_bottom, OBJMODE_NORMAL );
 
             // Item icon
-            IO::loadSprite(
-                SPR_ITEM_ICON_OAM( pos ), SPR_ITEM_ICON_PAL, oam[ SPR_ITEM_ICON_OAM( 0 ) ].gfxIndex,
-                130 + 32 - 9, 10 + 32 - 8 + 61 * i, 8, 8, itemiconPal, itemiconTiles,
-                itemiconTilesLen, false, false, true, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+            IO::loadSprite( SPR_ITEM_ICON_OAM( pos ), SPR_ITEM_ICON_PAL,
+                            oam[ SPR_ITEM_ICON_OAM( 0 ) ].gfxIndex, 130 + 32 - 9,
+                            partyTopScreenPkmnIconPosY( pos ) + 32 - 8, 8, 8, itemiconPal,
+                            itemiconTiles, itemiconTilesLen, false, false, true, OBJPRIORITY_0,
+                            p_bottom, OBJMODE_NORMAL );
 
             // Status icon
             tileCnt = IO::loadSprite( SPR_STATUS_ICON_OAM( pos ), SPR_STATUS_ICON_PAL, tileCnt,
@@ -359,35 +369,39 @@ namespace STS {
 
             // mark
             IO::loadSprite( SPR_SWAP_OAM( pos ), SPR_SWAP_PAL, oam[ SPR_SWAP_OAM( 0 ) ].gfxIndex,
-                            132, 11 + 61 * i, 64, 64, party_mark1Pal, party_mark1Tiles,
-                            party_mark1TilesLen, false, false, true, OBJPRIORITY_3, p_bottom,
+                            127, 10 + 61 * i, 64, 64, party_mark2Pal, party_mark2Tiles,
+                            party_mark2TilesLen, true, true, true, OBJPRIORITY_3, p_bottom,
                             OBJMODE_BLENDED );
             IO::loadSprite( SPR_SWAP_OAM( pos ) + 1, SPR_SWAP_PAL,
-                            oam[ SPR_SWAP_OAM( 0 ) + 1 ].gfxIndex, 132 + 64, 11 + 61 * i, 64, 64,
+                            oam[ SPR_SWAP_OAM( 0 ) + 1 ].gfxIndex, 164, 11 + 61 * i, 32, 64,
+                            party_mark1Pal, party_mark1Tiles, party_mark1TilesLen, false, false,
+                            true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+            IO::loadSprite( SPR_SWAP_OAM( pos ) + 2, SPR_SWAP_PAL,
+                            oam[ SPR_SWAP_OAM( 0 ) ].gfxIndex, 132 + 60, 11 + 61 * i, 64, 64,
                             party_mark2Pal, party_mark2Tiles, party_mark2TilesLen, false, false,
                             true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
             IO::loadSprite( SPR_MARK_OAM( pos, 0 ), SPR_MARK_PAL,
-                            oam[ SPR_MARK_OAM( 0, 0 ) ].gfxIndex, 156, 12 + 61 * i, 32, 16,
+                            oam[ SPR_MARK_OAM( 0, 0 ) ].gfxIndex, 151, 12 + 61 * i, 32, 16,
                             party_1Pal, party_1Tiles, party_1TilesLen, false, false, true,
                             OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
             IO::loadSprite( SPR_MARK_OAM( pos, 1 ), SPR_MARK_PAL,
-                            oam[ SPR_MARK_OAM( 0, 1 ) ].gfxIndex, 156, 12 + 61 * i, 32, 16,
+                            oam[ SPR_MARK_OAM( 0, 1 ) ].gfxIndex, 151, 12 + 61 * i, 32, 16,
                             party_1Pal, party_2Tiles, party_1TilesLen, false, false, true,
                             OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
             IO::loadSprite( SPR_MARK_OAM( pos, 2 ), SPR_MARK_PAL,
-                            oam[ SPR_MARK_OAM( 0, 2 ) ].gfxIndex, 156, 12 + 61 * i, 32, 16,
+                            oam[ SPR_MARK_OAM( 0, 2 ) ].gfxIndex, 151, 12 + 61 * i, 32, 16,
                             party_1Pal, party_3Tiles, party_1TilesLen, false, false, true,
                             OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
             IO::loadSprite( SPR_MARK_OAM( pos, 3 ), SPR_MARK_PAL,
-                            oam[ SPR_MARK_OAM( 0, 3 ) ].gfxIndex, 156, 12 + 61 * i, 32, 16,
+                            oam[ SPR_MARK_OAM( 0, 3 ) ].gfxIndex, 151, 12 + 61 * i, 32, 16,
                             party_1Pal, party_4Tiles, party_1TilesLen, false, false, true,
                             OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
             IO::loadSprite( SPR_MARK_OAM( pos, 4 ), SPR_MARK_PAL,
-                            oam[ SPR_MARK_OAM( 0, 4 ) ].gfxIndex, 156, 12 + 61 * i, 32, 16,
+                            oam[ SPR_MARK_OAM( 0, 4 ) ].gfxIndex, 151, 12 + 61 * i, 32, 16,
                             party_1Pal, party_5Tiles, party_1TilesLen, false, false, true,
                             OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
             IO::loadSprite( SPR_MARK_OAM( pos, 5 ), SPR_MARK_PAL,
-                            oam[ SPR_MARK_OAM( 0, 5 ) ].gfxIndex, 156, 12 + 61 * i, 32, 16,
+                            oam[ SPR_MARK_OAM( 0, 5 ) ].gfxIndex, 151, 12 + 61 * i, 32, 16,
                             party_1Pal, party_6Tiles, party_1TilesLen, false, false, true,
                             OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
         }
@@ -702,7 +716,7 @@ namespace STS {
         if( _team[ p_pos ].isEgg( ) ) {
             if( p_redraw ) {
                 // general data
-                IO::regularFont->printString( GET_STRING( 34 ), anchor_x + 30, anchor_y + 12,
+                IO::regularFont->printString( GET_STRING( 34 ), anchor_x + 32, anchor_y + 12,
                                               false );
                 IO::loadEggIcon( oam[ SPR_PKMN_ICON_OAM( p_pos ) ].x,
                                  oam[ SPR_PKMN_ICON_OAM( p_pos ) ].y, SPR_PKMN_ICON_OAM( p_pos ),
@@ -713,7 +727,7 @@ namespace STS {
         } else {
             if( p_redraw ) {
                 // general data
-                IO::regularFont->printString( _team[ p_pos ].m_boxdata.m_name, anchor_x + 30,
+                IO::regularFont->printString( _team[ p_pos ].m_boxdata.m_name, anchor_x + 32,
                                               anchor_y + 12, false );
 
                 if( _team[ p_pos ].m_boxdata.m_isFemale ) {
@@ -765,12 +779,12 @@ namespace STS {
                 IO::smallFont->setColor( IO::WHITE_IDX, 1 );
                 IO::smallFont->setColor( IO::GRAY_IDX, 2 );
 
-                IO::smallFont->printString( "!", anchor_x + 15, anchor_y + 33, false );
+                IO::smallFont->printString( "!", anchor_x + 5, anchor_y + 33, false );
 
                 char buffer[ 10 ];
                 snprintf( buffer, 8, "%d", _team[ p_pos ].m_level );
 
-                IO::smallFont->printString( buffer, anchor_x + 24, anchor_y + 32, false );
+                IO::smallFont->printString( buffer, anchor_x + 14, anchor_y + 32, false );
 
                 snprintf( buffer, 8, "%3d", _team[ p_pos ].m_stats.m_curHP );
                 IO::smallFont->printString( buffer, anchor_x + 116 - 32 - 24, anchor_y + 32,
@@ -981,10 +995,9 @@ namespace STS {
                 IO::regularFont->setColor( IO::BLUE_IDX, 1 );
                 IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
 
-                IO::regularFont->printString( MOVE::getMoveName( move ).c_str( ),
-                                              oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
-                                              oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, p_bottom,
-                                              IO::font::CENTER );
+                IO::regularFont->printString(
+                    MOVE::getMoveName( move ).c_str( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, p_bottom, IO::font::CENTER );
 
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -1052,36 +1065,37 @@ namespace STS {
     void partyScreenUI::drawDesquidItem( u8 p_idx, const char* p_string, u32 p_value,
                                          u32 p_maxValue, bool p_highlight, u8 p_highlightDigit,
                                          bool p_bottom ) {
-        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
-        const u8 height = 18;
+        SpriteEntry* oam    = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        const u8     height = 18;
 
         IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 32 + p_idx * height,
-                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * height, p_bottom, 0 );
+                            256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * height,
+                            p_bottom, 0 );
         if( p_highlight ) {
             IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 32 + p_idx * height,
-                oam[ SPR_MSG_BOX_OAM_SUB ].x, 31 + ( p_idx + 1 ) * height, p_bottom,
-                IO::RED_IDX );
+                                oam[ SPR_MSG_BOX_OAM_SUB ].x, 31 + ( p_idx + 1 ) * height, p_bottom,
+                                IO::RED_IDX );
             IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 32 + p_idx * height,
-                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 32 + p_idx * height, p_bottom,
-                IO::RED_IDX );
+                                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 32 + p_idx * height,
+                                p_bottom, IO::RED_IDX );
             IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, 31 + ( p_idx + 1 ) * height,
-                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * height, p_bottom,
-                IO::RED_IDX );
+                                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * height,
+                                p_bottom, IO::RED_IDX );
             IO::printRectangle( 256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 32 + p_idx * height,
-                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * height, p_bottom,
-                IO::RED_IDX );
+                                256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - 1, 31 + ( p_idx + 1 ) * height,
+                                p_bottom, IO::RED_IDX );
         }
 
         IO::regularFont->printString( p_string, oam[ SPR_MSG_BOX_OAM_SUB ].x + 8,
-                33 + p_idx * height, p_bottom );
+                                      33 + p_idx * height, p_bottom );
 
         u8 dg = 0;
-        for( u32 tmp = p_maxValue; tmp > 0; ++dg, tmp /= 10 );
+        for( u32 tmp = p_maxValue; tmp > 0; ++dg, tmp /= 10 )
+            ;
 
-        IO::regularFont->printCounter( p_value, dg, 256 - oam[ SPR_MSG_BOX_OAM_SUB ].x -
-                ( dg + 1 ) * 8, 33 + p_idx * height, p_highlightDigit,
-                IO::WHITE_IDX, IO::BLACK_IDX, p_bottom );
-
+        IO::regularFont->printCounter(
+            p_value, dg, 256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - ( dg + 1 ) * 8, 33 + p_idx * height,
+            p_highlightDigit, IO::WHITE_IDX, IO::BLACK_IDX, p_bottom );
     }
 #endif
 
@@ -1124,6 +1138,7 @@ namespace STS {
 
             oam[ SPR_SWAP_OAM( p_markIdx ) ].isHidden     = false;
             oam[ SPR_SWAP_OAM( p_markIdx ) + 1 ].isHidden = false;
+            oam[ SPR_SWAP_OAM( p_markIdx ) + 2 ].isHidden = false;
         } else {
             if( oam[ SPR_MARK_OAM( p_markIdx, p_color - 1 ) ].isHidden ) {
                 --_toSelect;
@@ -1151,14 +1166,15 @@ namespace STS {
         if( !oam[ SPR_SWAP_OAM( p_markIdx ) ].isHidden ) { _swapping = false; }
         oam[ SPR_SWAP_OAM( p_markIdx ) ].isHidden     = true;
         oam[ SPR_SWAP_OAM( p_markIdx ) + 1 ].isHidden = true;
+        oam[ SPR_SWAP_OAM( p_markIdx ) + 2 ].isHidden = true;
 
         IO::updateOAM( p_bottom );
     }
 
     void partyScreenUI::swap( u8 p_idx1, u8 p_idx2, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
-        REG_BLDCNT     = BLEND_ALPHA;
-        REG_BLDCNT_SUB = BLEND_ALPHA;
+        REG_BLDCNT       = BLEND_ALPHA;
+        REG_BLDCNT_SUB   = BLEND_ALPHA;
         IO::fadeScreen( IO::CLEAR_DARK_FAST );
         for( u8 i = 0; i < 6; ++i ) {
             bool tmp                                  = oam[ SPR_MARK_OAM( p_idx1, i ) ].isHidden;
@@ -1172,13 +1188,13 @@ namespace STS {
         IO::fadeScreen( IO::UNFADE_FAST );
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
         REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
-        REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
-        REG_BLDALPHA = 0xff | ( 0x06 << 8 );
+        REG_BLDCNT       = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA     = 0xff | ( 0x06 << 8 );
         bgUpdate( );
     }
 
     void partyScreenUI::printMessage( const char* p_message, u16 p_itemIcon, bool p_bottom ) {
-        _animateMsg = true;
+        _animateMsg      = true;
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         for( u8 i = 0; i < 7; i++ ) { oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = false; }
         if( p_itemIcon ) {
@@ -1199,7 +1215,7 @@ namespace STS {
     }
 
     void partyScreenUI::hideMessageBox( bool p_bottom ) {
-        _animateMsg = false;
+        _animateMsg      = false;
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         for( u8 i = 0; i < 7; i++ ) { oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = true; }
         oam[ SPR_ITEM_OAM_SUB ].isHidden = true;
@@ -1222,7 +1238,8 @@ namespace STS {
                               p_bottom );
             if( p_message ) {
                 IO::regularFont->printString( p_message, oam[ SPR_ITEM_OAM_SUB ].x + 36,
-                                              oam[ SPR_ITEM_OAM_SUB ].y - 18, p_bottom, IO::font::LEFT );
+                                              oam[ SPR_ITEM_OAM_SUB ].y - 18, p_bottom,
+                                              IO::font::LEFT );
             }
         } else if( p_message ) {
             IO::regularFont->printString( p_message, 128, oam[ SPR_ITEM_OAM_SUB ].y - 18, p_bottom,

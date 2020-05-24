@@ -85,7 +85,7 @@ namespace SAVE {
         IO::clearScreen( true, false, false );
 
         // BEGIN TEST
-        /*
+        
         pokemon testTeam[ 6 ];
         for( u8 i = 0; i < 6; i++ ) {
             testTeam[ i ]
@@ -104,7 +104,7 @@ namespace SAVE {
         STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
         sts.run( );
 
-        */
+        
         // END TEST
 
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );

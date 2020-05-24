@@ -52,6 +52,8 @@ namespace SOUND {
     void setVolume( u16 p_newValue ) {
 #ifndef NO_SOUND
         mmSetModuleVolume( p_newValue );
+#else
+        (void) p_newValue;
 #endif
     }
     void dimVolume( ) {
@@ -80,6 +82,8 @@ namespace SOUND {
         mmStart( p_id, MM_PLAY_LOOP );
         BGMLoaded  = true;
         currentBGM = p_id;
+#else
+        (void) p_id;
 #endif
     }
 
@@ -88,6 +92,8 @@ namespace SOUND {
         auto handle = mmEffect( p_id );
         mmEffectVolume( handle, 0xFF );
         mmEffectRelease( handle );
+#else
+        (void) p_id;
 #endif
     }
 } // namespace SOUND
