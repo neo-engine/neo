@@ -143,28 +143,28 @@ namespace ITEM {
 
         switch( item.m_effect ) {
         case 1: { // heal hp
-            if( ( !p_pokemon.m_stats.m_acHP ) == item.m_param3
-                && p_pokemon.m_stats.m_acHP < p_pokemon.m_stats.m_maxHP ) {
-                p_pokemon.m_stats.m_acHP
+            if( ( !p_pokemon.m_stats.m_curHP ) == item.m_param3
+                && p_pokemon.m_stats.m_curHP < p_pokemon.m_stats.m_maxHP ) {
+                p_pokemon.m_stats.m_curHP
                     = std::min( p_pokemon.m_stats.m_maxHP,
-                                ( u16 )( p_pokemon.m_stats.m_acHP + item.m_param1 ) );
-                p_pokemon.m_stats.m_acHP = (u16) std::min(
+                                ( u16 )( p_pokemon.m_stats.m_curHP + item.m_param1 ) );
+                p_pokemon.m_stats.m_curHP = (u16) std::min(
                     (u32) p_pokemon.m_stats.m_maxHP,
-                    p_pokemon.m_stats.m_acHP
+                    p_pokemon.m_stats.m_curHP
                         + ( item.m_param2 * (u32) p_pokemon.m_stats.m_maxHP / 100 ) );
                 change = true;
             }
             return change;
         }
         case 2: { // heal hp + status
-            if( ( !p_pokemon.m_stats.m_acHP ) == item.m_param3
-                && p_pokemon.m_stats.m_acHP < p_pokemon.m_stats.m_maxHP ) {
-                p_pokemon.m_stats.m_acHP
+            if( ( !p_pokemon.m_stats.m_curHP ) == item.m_param3
+                && p_pokemon.m_stats.m_curHP < p_pokemon.m_stats.m_maxHP ) {
+                p_pokemon.m_stats.m_curHP
                     = std::min( p_pokemon.m_stats.m_maxHP,
-                                ( u16 )( p_pokemon.m_stats.m_acHP + item.m_param1 ) );
-                p_pokemon.m_stats.m_acHP
+                                ( u16 )( p_pokemon.m_stats.m_curHP + item.m_param1 ) );
+                p_pokemon.m_stats.m_curHP
                     = std::min( p_pokemon.m_stats.m_maxHP,
-                                ( u16 )( p_pokemon.m_stats.m_acHP
+                                ( u16 )( p_pokemon.m_stats.m_curHP
                                          + ( item.m_param2 * p_pokemon.m_stats.m_maxHP / 100 ) ) );
                 change = true;
             }
@@ -221,7 +221,7 @@ namespace ITEM {
                 MOVE::moveData mdata = MOVE::getMoveData( p_pokemon.m_boxdata.m_moves[ i ] );
 
                 if( ( mv & ( 1 << i ) ) && p_pokemon.m_boxdata.m_moves[ i ] ) {
-                    u8& tmp = p_pokemon.m_boxdata.m_acPP[ i ];
+                    u8& tmp = p_pokemon.m_boxdata.m_curPP[ i ];
                     u8  mx  = s8( mdata.m_pp * ( 5 + p_pokemon.PPupget( i ) ) / 5 );
                     change |= tmp < mx;
                     tmp = std::min( mx, ( u8 )( tmp + item.m_param1 + item.m_param2 * mx / 100 ) );
@@ -258,7 +258,7 @@ namespace ITEM {
                     MOVE::moveData mdata = MOVE::getMoveData( p_pokemon.m_boxdata.m_moves[ i ] );
                     u8             ppup  = p_pokemon.PPupget( i );
                     if( ppup >= item.m_param2 || ( mdata.m_flags & MOVE::NOPPBOOST ) ) { continue; }
-                    u8& tmp   = p_pokemon.m_boxdata.m_acPP[ i ];
+                    u8& tmp   = p_pokemon.m_boxdata.m_curPP[ i ];
                     u8  oldmx = s8( mdata.m_pp * ( 5 + p_pokemon.PPupget( i ) ) / 5 );
 
                     p_pokemon.PPupset(

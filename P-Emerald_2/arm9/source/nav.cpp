@@ -508,7 +508,7 @@ namespace NAV {
 
                         a = pokemon( tmp[ i ], 50, !i ? ( rand( ) % 28 ) : 0, 0, i );
 
-                        a.m_stats.m_acHP *= i / 5.0;
+                        a.m_stats.m_curHP *= i / 5.0;
                         a.m_boxdata.m_experienceGained += 750;
 
                         // Hand out some ribbons

@@ -34,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef DESQUID
 #include "ability.h"
 #include "fs.h"
+#include "move.h"
 #endif
 
 namespace STS {
@@ -404,7 +405,6 @@ namespace STS {
                                 return std::string( GET_STRING( 187 + p_value ) );
                             }
                         }));
-#define NAT_MOD( p_val ) ( ( p_val ) == 0 ? 0.9 : ( ( p_val == 1 ) ? 1.0 : 1.1 ) )
                 for( u8 i = 0; i < 5; ++i ) {
                 res.push_back(partyScreen::desquidItem({
                             u16( DESQUID_STRING + 31 + i ), true, 2, 0,
@@ -422,9 +422,113 @@ namespace STS {
                             }
                         }));
                 }
+                break;
+            }
+            case DESQUID_IV: {
+                // IV
+                for( u8 i = 0; i < 6; ++i ) {
+                    res.push_back(partyScreen::desquidItem({
+                            u16( DESQUID_STRING + 36 + i ), true, 31, 0,
+                            [&, i]() { return _team[ _currentSelection ].IVget( i ); },
+                            [&, i]( u32 p_newValue ) {
+                                _team[ _currentSelection ].IVset( i, p_newValue & 31 );
+                            },
+                            []( u32 ) { return ""; }
+                        }));
+                }
+                break;
+            }
+            case DESQUID_EV: {
+                // IV
+                for( u8 i = 0; i < 6; ++i ) {
+                    res.push_back(partyScreen::desquidItem({
+                            u16( DESQUID_STRING + 36 + i ), true, 252, 0,
+                            [&, i]() { return _team[ _currentSelection ].EVget( i ); },
+                            [&, i]( u32 p_newValue ) {
+                                _team[ _currentSelection ].EVset( i, p_newValue );
+                            },
+                            []( u32 ) { return ""; }
+                        }));
+                }
+                break;
+            }
+            case DESQUID_MOVES: {
+                // Moves
+                for( u8 i = 0; i < 4; ++i ) {
+                    res.push_back(partyScreen::desquidItem({
+                            u16( DESQUID_STRING + 42 ), true, 796, 1,
+                            [&, i]() {
+                                return _team[ _currentSelection ].m_boxdata.m_moves[ i ];
+                            },
+                            [&, i]( u32 p_newValue ) {
+                                _team[ _currentSelection ].m_boxdata.m_moves[ i ] = p_newValue;
+                                _team[ _currentSelection ].PPupset( i, 0 );
+                            },
+                            []( u32 p_value ) { return MOVE::getMoveName( p_value ); }
+                        }));
+                }
+                // Held Item
+                res.push_back(partyScreen::desquidItem({
+                            DESQUID_STRING + 43, true, 1278, 1,
+                            [&]() {
+                                return _team[ _currentSelection ].getItem( );
+                            },
+                            [&]( u32 p_newValue ) {
+                                _team[ _currentSelection ].giveItem( p_newValue );
+                            },
+                            []( u32 p_value ) {
+                                return ITEM::getItemName( p_value );
+                            }
+                        }));
 
                 break;
             }
+            case DESQUID_ITEM: {
+                // Current HP
+                res.push_back(partyScreen::desquidItem({
+                            DESQUID_STRING + 36, false, 999, 0,
+                            [&]() {
+                                return _team[ _currentSelection ].m_stats.m_curHP;
+                            },
+                            [&]( u32 p_newValue ) {
+                                _team[ _currentSelection ].m_stats.m_curHP
+                                    = std::min( u16( p_newValue ),
+                                            _team[ _currentSelection ].m_stats.m_maxHP );
+                            },
+                            []( u32 ) { return ""; }
+                        }));
+                // Moves
+                for( u8 i = 0; i < 4; ++i ) {
+                    res.push_back(partyScreen::desquidItem({
+                            u16( DESQUID_STRING + 44 ), true, 99, 0,
+                            [&, i]() {
+                                return _team[ _currentSelection ].m_boxdata.m_curPP[ i ];
+                            },
+                            [&, i]( u32 p_newValue ) {
+                                MOVE::moveData mdata = MOVE::getMoveData(
+                                        _team[ _currentSelection ].m_boxdata.m_moves[ i ] );
+                                u8 dmx =
+                                    u8( mdata.m_pp * ( 5 + _team[ _currentSelection ].PPupget( i ) ) / 5 );
+                                bool boost = !( mdata.m_flags & MOVE::NOPPBOOST );
+                                u8 gmx =
+                                    s8( mdata.m_pp * ( 5 + ( boost ? 3 : 0 ) ) / 5 );
+                                p_newValue = std::min( u8( p_newValue ), gmx );
+                                if( p_newValue > dmx ) {
+                                    _team[ _currentSelection ].PPupset( i, 3 );
+                                }
+                                _team[ _currentSelection ].m_boxdata.m_curPP[ i ] = p_newValue;
+                            },
+                            [&, i]( u32 ) {
+                                return MOVE::getMoveName(
+                                        _team[ _currentSelection ].m_boxdata.m_moves[ i ] );
+                            }
+                        }));
+                }
+
+                break;
+            }
+
+
             default: break;
         }
         return res;
@@ -585,7 +689,6 @@ namespace STS {
             }
             swiWaitForVBlank( );
         }
-
 
         _partyUI->hideDesquidWindow( );
         return false;
@@ -774,6 +877,7 @@ namespace STS {
             }
             if( pressed & KEY_B ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
+                _partyUI->select( _currentSelection );
                 cooldown = COOLDOWN_COUNT;
                 break;
             }
@@ -839,7 +943,9 @@ namespace STS {
             } else if( pressed & KEY_A ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 cooldown = COOLDOWN_COUNT;
-                if( ( ex = executeDesquidChoice( choices[ _currentChoiceSelection ] ) ) ) { break; }
+                if( ( ex = executeDesquidChoice( choices[ _currentChoiceSelection ] ) ) ) {
+                    break;
+                }
                 _partyUI->select( _currentSelection );
 
                 if( _currentChoiceSelection >= 6 ) {
@@ -920,7 +1026,7 @@ namespace STS {
         if( _swapSelection == 255 ) {
             if( _toSelect && !_currentMarksOrMove.getMark( _currentSelection )
                 && _team[ _currentSelection ].isEgg( ) == _eggSelect
-                && ( _team[ _currentSelection ].m_stats.m_acHP || _faintSelect ) ) {
+                && ( _team[ _currentSelection ].m_stats.m_curHP || _faintSelect ) ) {
                 _currentChoices.push_back( SELECT );
             }
             if( _toSelect && _currentMarksOrMove.getMark( _currentSelection ) ) {

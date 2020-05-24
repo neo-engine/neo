@@ -90,7 +90,7 @@ namespace SAVE {
         for( u8 i = 0; i < 6; i++ ) {
             testTeam[ i ]
                 = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false, i == 3 );
-            testTeam[ i ].m_stats.m_acHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
+            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
         }
         testTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_SURF;
         testTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;

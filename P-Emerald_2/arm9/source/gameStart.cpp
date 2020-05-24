@@ -198,7 +198,7 @@ namespace SAVE {
                 acPkmn.m_level             = acBeltP->level;
                 acPkmn.m_boxdata.m_pokerus = acBeltP->pokerus;
 
-                acPkmn.m_stats.m_acHP  = acBeltP->currentHP;
+                acPkmn.m_stats.m_curHP  = acBeltP->currentHP;
                 acPkmn.m_stats.m_maxHP = acBeltP->maxHP;
                 acPkmn.m_stats.m_Atk   = acBeltP->move;
                 acPkmn.m_stats.m_Def   = acBeltP->defense;
@@ -216,7 +216,7 @@ namespace SAVE {
                 FS::gen3Pokemon::pokemon_moves_t*& acBA = save3->pokemon_moves[ i ];
                 for( u8 j = 0; j < 4; ++j ) {
                     acPkmn.m_boxdata.m_moves[ j ] = acBA->atk[ j ];
-                    acPkmn.m_boxdata.m_acPP[ j ]  = acBA->pp[ j ];
+                    acPkmn.m_boxdata.m_curPP[ j ] = acBA->pp[ j ];
                 }
 
                 FS::gen3Pokemon::pokemon_effort_t*& acBE = save3->pokemon_effort[ i ];

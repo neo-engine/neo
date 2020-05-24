@@ -315,10 +315,10 @@ namespace BAG {
                     }
                 } else if( p_itemId && ( p_data.m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
                     char buffer[ 100 ];
-                    if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP ) {
+                    if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_curHP ) {
                         snprintf( buffer, 99, GET_STRING( 38 ),
                                   SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_level,
-                                  SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP,
+                                  SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_curHP,
                                   SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP );
                     } else {
                         snprintf( buffer, 99, GET_STRING( 39 ),

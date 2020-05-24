@@ -61,7 +61,7 @@ struct boxPokemon {
     u8  m_ribbons1[ 4 ]     = {0};
 
     u16  m_moves[ 4 ]    = {0};
-    u8   m_acPP[ 4 ]     = {0}; //
+    u8   m_curPP[ 4 ]    = {0}; //
     u8   m_pPUps         = 0;
     u32  m_iVint         = 0; // hp/5, atk/5, def/5, satk/5, sdef/5, spd/5, nicked/1, isEgg/1
     u8   m_ribbons0[ 4 ] = {0};
@@ -127,6 +127,18 @@ struct boxPokemon {
         else if( m_isFemale )
             return -1;
         return 1;
+    }
+
+    constexpr u8 EVget( u8 p_i ) {
+        return m_effortValues[ p_i ];
+    }
+    inline void EVset( u8 p_i, u8 p_val ) {
+        u16 maxev = 510, curev = 0;
+        for( u8 i = 0; i < 6; ++i ) { curev += m_effortValues[ i ]; };
+        if( s16( p_val ) - m_effortValues[ p_i ] + curev > maxev ) {
+            p_val =  maxev - curev + m_effortValues[ p_i ];
+        }
+        m_effortValues[ p_i ] = p_val;
     }
 
     constexpr u8 IVget( u8 p_i ) {
@@ -254,7 +266,7 @@ struct pokemon {
     u8 m_level : 8;
     u8 m_battleForme : 8;
     struct stats {
-        u16 m_acHP : 16; // current HP
+        u16 m_curHP : 16; // current HP
         u16 m_maxHP : 16;
         u16 m_Atk : 16;
         u16 m_Def : 16;
@@ -354,6 +366,13 @@ struct pokemon {
     }
     constexpr s8 gender( ) {
         return m_boxdata.gender( );
+    }
+    constexpr unsigned char EVget( u8 p_i ) {
+        return m_boxdata.EVget( p_i );
+    }
+    void inline EVset( u8 p_i, u8 p_val ) {
+        m_boxdata.EVset( p_i, p_val );
+        recalculateStats( );
     }
 
     constexpr unsigned char IVget( u8 p_i ) {

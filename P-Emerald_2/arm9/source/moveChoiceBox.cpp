@@ -79,7 +79,7 @@ namespace IO {
                                           + ( p_pressedIdx == i ),
                                       true, IO::font::CENTER );
             char buffer[ 30 ];
-            u8   curPP = ( i < 4 ) ? _pokemon.m_boxdata.m_acPP[ i ] : acMove.m_pp;
+            u8   curPP = ( i < 4 ) ? _pokemon.m_boxdata.m_curPP[ i ] : acMove.m_pp;
             snprintf( buffer, 20, "%hhu/%hhu%s", curPP, acMove.m_pp, GET_STRING( 31 ) );
             regularFont->printString(
                 buffer, CHOICE_POS[ !!_moveToLearn ][ i ][ 2 ] - 5 + 2 * ( p_pressedIdx == i ),

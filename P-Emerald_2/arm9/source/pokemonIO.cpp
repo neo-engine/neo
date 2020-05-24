@@ -52,7 +52,7 @@ bool boxPokemon::learnMove( u16 p_move ) {
         for( u8 i = 0; i < 4; ++i )
             if( !m_moves[ i ] ) {
                 m_moves[ i ] = p_move;
-                m_acPP[ i ]  = std::min( m_acPP[ i ], mdata.m_pp );
+                m_curPP[ i ]  = std::min( m_curPP[ i ], mdata.m_pp );
 
                 snprintf( buffer, 49, GET_STRING( 103 ), m_name,
                           MOVE::getMoveName( p_move ).c_str( ) );
@@ -80,7 +80,7 @@ bool boxPokemon::learnMove( u16 p_move ) {
                         return false;
                     } else {
                         m_moves[ res ] = p_move;
-                        m_acPP[ res ]  = std::min( m_acPP[ res ], mdata.m_pp );
+                        m_curPP[ res ] = std::min( m_curPP[ res ], mdata.m_pp );
                     }
                 }
             } else

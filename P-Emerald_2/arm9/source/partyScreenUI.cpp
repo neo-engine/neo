@@ -647,7 +647,7 @@ namespace STS {
             IO::updateOAM( p_bottom );
             return;
         }
-        if( _team[ p_pos ].m_stats.m_acHP ) {
+        if( _team[ p_pos ].m_stats.m_curHP ) {
             // Pkmn is not fainted
             if( p_selected ) {
                 SpriteEntry old = oam[ SPR_PKMN_BG_OAM( p_pos ) ];
@@ -731,8 +731,8 @@ namespace STS {
                 }
 
                 // HP
-                u8 barWidth = 45 * _team[ p_pos ].m_stats.m_acHP / _team[ p_pos ].m_stats.m_maxHP;
-                if( _team[ p_pos ].m_stats.m_acHP * 2 >= _team[ p_pos ].m_stats.m_maxHP ) {
+                u8 barWidth = 45 * _team[ p_pos ].m_stats.m_curHP / _team[ p_pos ].m_stats.m_maxHP;
+                if( _team[ p_pos ].m_stats.m_curHP * 2 >= _team[ p_pos ].m_stats.m_maxHP ) {
                     IO::smallFont->setColor( 240, 2 );
                     IO::smallFont->setColor( 241, 1 );
                     IO::smallFont->setColor( 242, 3 );
@@ -740,7 +740,7 @@ namespace STS {
                                         anchor_y + 32, false, 241 );
                     IO::printRectangle( anchor_x + 69, anchor_y + 33, anchor_x + 69 + barWidth,
                                         anchor_y + 33, false, 242 );
-                } else if( _team[ p_pos ].m_stats.m_acHP * 4 >= _team[ p_pos ].m_stats.m_maxHP ) {
+                } else if( _team[ p_pos ].m_stats.m_curHP * 4 >= _team[ p_pos ].m_stats.m_maxHP ) {
                     IO::smallFont->setColor( 240, 2 );
                     IO::smallFont->setColor( 243, 1 );
                     IO::smallFont->setColor( 244, 3 );
@@ -752,7 +752,7 @@ namespace STS {
                     IO::smallFont->setColor( 240, 2 );
                     IO::smallFont->setColor( 245, 1 );
                     IO::smallFont->setColor( 246, 3 );
-                    if( _team[ p_pos ].m_stats.m_acHP ) {
+                    if( _team[ p_pos ].m_stats.m_curHP ) {
                         IO::printRectangle( anchor_x + 69, anchor_y + 31, anchor_x + 69 + barWidth,
                                             anchor_y + 32, false, 245 );
                         IO::printRectangle( anchor_x + 69, anchor_y + 33, anchor_x + 69 + barWidth,
@@ -772,7 +772,7 @@ namespace STS {
 
                 IO::smallFont->printString( buffer, anchor_x + 24, anchor_y + 32, false );
 
-                snprintf( buffer, 8, "%3d", _team[ p_pos ].m_stats.m_acHP );
+                snprintf( buffer, 8, "%3d", _team[ p_pos ].m_stats.m_curHP );
                 IO::smallFont->printString( buffer, anchor_x + 116 - 32 - 24, anchor_y + 32,
                                             false );
                 snprintf( buffer, 8, "/%d", _team[ p_pos ].m_stats.m_maxHP );
@@ -787,7 +787,7 @@ namespace STS {
                     = !_team[ p_pos ].isShiny( ); // shiny status
 
                 // other status conditions
-                if( !_team[ p_pos ].m_stats.m_acHP ) {
+                if( !_team[ p_pos ].m_stats.m_curHP ) {
                     IO::loadSprite( SPR_STATUS_ICON_OAM( p_pos ), SPR_STATUS_ICON_PAL,
                                     oam[ SPR_STATUS_ICON_OAM( p_pos ) ].gfxIndex,
                                     oam[ SPR_STATUS_ICON_OAM( p_pos ) ].x,
@@ -870,7 +870,7 @@ namespace STS {
             IO::updateOAM( p_bottom );
             return;
         }
-        if( _team[ p_pos ].m_stats.m_acHP ) {
+        if( _team[ p_pos ].m_stats.m_curHP ) {
             // Pkmn is not fainted
             if( p_selected ) {
                 SpriteEntry old = oam[ SPR_PKMN_BG_OAM_SUB( p_pos ) ];

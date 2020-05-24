@@ -100,7 +100,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
         getLearnMoves( p_pkmnId, 0, p_level, 4, m_moves );
     for( u8 i = 0; i < 4; ++i ) {
         MOVE::moveData mdata = MOVE::getMoveData( m_moves[ i ] );
-        m_acPP[ i ]          = mdata.m_pp;
+        m_curPP[ i ]          = mdata.m_pp;
     }
 
     for( u8 i = 0; i < 6; ++i ) IVset( i, rand( ) & 31 );
@@ -226,33 +226,13 @@ bool boxPokemon::setNature( pkmnNatures p_newNature ) {
 }
 
 bool boxPokemon::swapAbilities( ) {
-    pkmnData data = getPkmnData( m_speciesId, getForme( ) );
-
-    if( m_ability == data.m_baseForme.m_abilities[ 2 ] ) {
-        if( !data.m_baseForme.m_abilities[ 3 ] ) {
-            return false;
-        } else {
-            m_ability = data.m_baseForme.m_abilities[ 3 ];
-            return true;
-        }
+    auto old = m_ability;
+    setAbility( m_abilitySlot ^ 1 );
+    if( old == m_ability ) {
+        m_abilitySlot ^= 1;
+        return false;
     }
-    if( m_ability == data.m_baseForme.m_abilities[ 3 ] ) {
-        m_ability = data.m_baseForme.m_abilities[ 2 ];
-        return true;
-    }
-    if( m_ability == data.m_baseForme.m_abilities[ 0 ] ) {
-        if( !data.m_baseForme.m_abilities[ 1 ] ) {
-            return false;
-        } else {
-            m_ability = data.m_baseForme.m_abilities[ 1 ];
-            return true;
-        }
-    }
-    if( m_ability == data.m_baseForme.m_abilities[ 1 ] ) {
-        m_ability = data.m_baseForme.m_abilities[ 0 ];
-        return true;
-    }
-    return false;
+    return true;
 }
 
 void boxPokemon::hatch( ) {

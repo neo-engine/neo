@@ -72,8 +72,8 @@ const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
     {"Egg Status"},
     {"Nature"},
 
-    {"Held Item"},
-    {"Moves"},
+    {"HP/PP"},
+    {"Moves/Item"},
     {"IV"},
     {"EV"},
     {"Duplicate"},
@@ -115,6 +115,18 @@ const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
     {"%2s Special Atk"},
 
     {"%2s Special Def"},
+    {"HP"},
+    {"Attack"},
+    {"Defense"},
+    {"Special Attack"},
+
+    // 40
+
+    {"Special Defense"},
+    {"Speed"},
+    {"%s"},
+    {"Held: %s"},
+    {"PP(%s)"},
 };
 
 #endif

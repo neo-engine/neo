@@ -295,7 +295,7 @@ namespace BOX {
         // Check if the party is safe to walk with
         for( u8 i = 0; i < 6; ++i )
             if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId
-                && SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_acHP
+                && SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_curHP
                 && !SAVE::SAV.getActiveFile( )
                         .m_pkmnTeam[ i ].isEgg ( ) )
                 return true;

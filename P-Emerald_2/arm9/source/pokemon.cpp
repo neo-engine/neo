@@ -82,8 +82,8 @@ pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
 }
 
 bool pokemon::heal( ) {
-    bool change    = m_stats.m_acHP < m_stats.m_maxHP;
-    m_stats.m_acHP = m_stats.m_maxHP;
+    bool change    = m_stats.m_curHP < m_stats.m_maxHP;
+    m_stats.m_curHP = m_stats.m_maxHP;
 
     change |= !!m_statusint;
     m_statusint = 0;
@@ -92,8 +92,8 @@ bool pokemon::heal( ) {
         if( m_boxdata.m_moves[ i ] ) {
             MOVE::moveData mdata = MOVE::getMoveData( m_boxdata.m_moves[ i ] );
             auto           mx    = s8( mdata.m_pp * ( ( 5 + m_boxdata.PPupget( i ) ) / 5.0 ) );
-            change |= m_boxdata.m_acPP[ i ] < mx;
-            m_boxdata.m_acPP[ i ] = mx;
+            change |= m_boxdata.m_curPP[ i ] < mx;
+            m_boxdata.m_curPP[ i ] = mx;
         }
     }
 
@@ -120,12 +120,12 @@ void pokemon::recalculateStats( ) {
 }
 
 void pokemon::recalculateStats( pkmnData& p_data ) {
-    auto HPdif     = m_stats.m_maxHP - m_stats.m_acHP;
+    auto HPdif     = m_stats.m_maxHP - m_stats.m_curHP;
     m_stats        = calcStats( m_boxdata, m_level, &p_data );
     if( m_stats.m_maxHP < HPdif ) {
-        m_stats.m_acHP = 0;
+        m_stats.m_curHP = 0;
     } else {
-        m_stats.m_acHP = m_stats.m_maxHP - HPdif;
+        m_stats.m_curHP = m_stats.m_maxHP - HPdif;
     }
 }
 
@@ -212,12 +212,12 @@ pokemon::stats calcStats( boxPokemon& p_boxdata, u8 p_level, const pkmnData* p_d
     pokemon::stats res;
     u16            pkmnId = p_boxdata.m_speciesId;
     if( pkmnId != PKMN_SHEDINJA )
-        res.m_acHP = res.m_maxHP = ( ( p_boxdata.IVget( 0 ) + 2 * p_data->m_baseForme.m_bases[ 0 ]
+        res.m_curHP = res.m_maxHP = ( ( p_boxdata.IVget( 0 ) + 2 * p_data->m_baseForme.m_bases[ 0 ]
                                        + ( p_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )
                                      * p_level / 100 )
                                    + 10;
     else
-        res.m_acHP = res.m_maxHP = 1;
+        res.m_curHP = res.m_maxHP = 1;
     pkmnNatures nature = p_boxdata.getNature( );
 
     for( u8 i = 1; i < 6; ++i ) {
@@ -241,16 +241,16 @@ u16 calcLevel( boxPokemon& p_boxdata, const pkmnData* p_data ) {
 void pokemon::giveItem( u16 p_newItem ) {
     m_boxdata.giveItem( p_newItem );
     pkmnData data  = getPkmnData( m_boxdata.m_speciesId, m_boxdata.getForme( ) );
-    auto     oldHP = m_stats.m_maxHP - m_stats.m_acHP;
+    auto     oldHP = m_stats.m_maxHP - m_stats.m_curHP;
     m_stats        = calcStats( m_boxdata, m_level, &data );
-    m_stats.m_acHP = m_stats.m_maxHP - oldHP;
+    m_stats.m_curHP = m_stats.m_maxHP - oldHP;
 }
 u16 pokemon::takeItem( ) {
     u16      res   = m_boxdata.takeItem( );
     pkmnData data  = getPkmnData( m_boxdata.m_speciesId, m_boxdata.getForme( ) );
-    auto     oldHP = m_stats.m_maxHP - m_stats.m_acHP;
+    auto     oldHP = m_stats.m_maxHP - m_stats.m_curHP;
     m_stats        = calcStats( m_boxdata, m_level, &data );
-    m_stats.m_acHP = m_stats.m_maxHP - oldHP;
+    m_stats.m_curHP = m_stats.m_maxHP - oldHP;
     return res;
 }
 

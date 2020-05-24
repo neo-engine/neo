@@ -262,7 +262,7 @@ namespace STS {
             IO::updateOAM( p_bottom );
             return;
         }
-        if( p_pokemon->m_stats.m_acHP ) {
+        if( p_pokemon->m_stats.m_curHP ) {
             // Pkmn is not fainted
             if( p_selected ) {
                 SpriteEntry old = oam[ 6 + 2 * p_pos ];
@@ -336,8 +336,8 @@ namespace STS {
                 }
 
                 // HP
-                u8 barWidth = 45 * p_pokemon->m_stats.m_acHP / p_pokemon->m_stats.m_maxHP;
-                if( p_pokemon->m_stats.m_acHP * 2 >= p_pokemon->m_stats.m_maxHP ) {
+                u8 barWidth = 45 * p_pokemon->m_stats.m_curHP / p_pokemon->m_stats.m_maxHP;
+                if( p_pokemon->m_stats.m_curHP * 2 >= p_pokemon->m_stats.m_maxHP ) {
                     IO::smallFont->setColor( 240, 2 );
                     IO::smallFont->setColor( 241, 1 );
                     IO::smallFont->setColor( 242, 3 );
@@ -345,7 +345,7 @@ namespace STS {
                                         anchor_y + 32, false, 241 );
                     IO::printRectangle( anchor_x + 69, anchor_y + 33, anchor_x + 69 + barWidth,
                                         anchor_y + 33, false, 242 );
-                } else if( p_pokemon->m_stats.m_acHP * 4 >= p_pokemon->m_stats.m_maxHP ) {
+                } else if( p_pokemon->m_stats.m_curHP * 4 >= p_pokemon->m_stats.m_maxHP ) {
                     IO::smallFont->setColor( 240, 2 );
                     IO::smallFont->setColor( 243, 1 );
                     IO::smallFont->setColor( 244, 3 );
@@ -357,7 +357,7 @@ namespace STS {
                     IO::smallFont->setColor( 240, 2 );
                     IO::smallFont->setColor( 245, 1 );
                     IO::smallFont->setColor( 246, 3 );
-                    if( p_pokemon->m_stats.m_acHP ) {
+                    if( p_pokemon->m_stats.m_curHP ) {
                         IO::printRectangle( anchor_x + 69, anchor_y + 31, anchor_x + 69 + barWidth,
                                             anchor_y + 32, false, 245 );
                         IO::printRectangle( anchor_x + 69, anchor_y + 33, anchor_x + 69 + barWidth,
@@ -377,7 +377,7 @@ namespace STS {
 
                 IO::smallFont->printString( buffer, anchor_x + 24, anchor_y + 32, false );
 
-                snprintf( buffer, 8, "%3d", p_pokemon->m_stats.m_acHP );
+                snprintf( buffer, 8, "%3d", p_pokemon->m_stats.m_curHP );
                 IO::smallFont->printString( buffer, anchor_x + 116 - 32 - 24, anchor_y + 32,
                                             false );
                 snprintf( buffer, 8, "/%d", p_pokemon->m_stats.m_maxHP );
@@ -390,7 +390,7 @@ namespace STS {
                 oam[ 36 + p_pos ].isHidden = !p_pokemon->isShiny( ); // shiny status
 
                 // other status conditions
-                if( !p_pokemon->m_stats.m_acHP ) {
+                if( !p_pokemon->m_stats.m_curHP ) {
                     IO::loadSprite( 24 + p_pos, 11, oam[ 24 + p_pos ].gfxIndex, oam[ 24 + p_pos ].x,
                                     oam[ 24 + p_pos ].y, 8, 8, status_fntPal, status_fntTiles,
                                     status_fntTilesLen / 2, false, false, false, OBJPRIORITY_0,
@@ -664,7 +664,7 @@ namespace STS {
             u16 exptype = data.m_expTypeFormeCnt >> 5;
 
             IO::displayHP( 100, 101, 46, 76, HP_COL, HP_COL + 1, false, 50, 56, p_bottom );
-            IO::displayHP( 100, 100 - p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP,
+            IO::displayHP( 100, 100 - p_pokemon.m_stats.m_curHP * 100 / p_pokemon.m_stats.m_maxHP,
                            46, 76, HP_COL, HP_COL + 1, false, 50, 56, p_bottom );
 
             IO::displayEP( 100, 101, 46, 76, HP_COL + 2, HP_COL + 3, false, 59, 62, p_bottom );
@@ -687,7 +687,7 @@ namespace STS {
                         - EXP[ p_pokemon.m_level - 1 ][ exptype ] ) );
             IO::regularFont->printString( buffer, 62, 28, p_bottom, IO::font::CENTER );
             snprintf( buffer, 49, "%s %i%%", GET_STRING( 126 ),
-                      p_pokemon.m_stats.m_acHP * 100 / p_pokemon.m_stats.m_maxHP );
+                      p_pokemon.m_stats.m_curHP * 100 / p_pokemon.m_stats.m_maxHP );
             IO::regularFont->printString( buffer, 62, 38, p_bottom, IO::font::CENTER );
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
@@ -877,7 +877,7 @@ namespace STS {
             IO::regularFont->setColor( IO::GRAY_IDX, 1 );
             IO::regularFont->setColor( IO::WHITE_IDX, 2 );
             char buffer[ 50 ];
-            snprintf( buffer, 49, "AP %2hhu/%2hhu ", currPkmn.m_boxdata.m_acPP[ i ],
+            snprintf( buffer, 49, "AP %2hhu/%2hhu ", currPkmn.m_boxdata.m_curPP[ i ],
                       s8( mdata.m_pp * ( ( 5 + currPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
             IO::regularFont->printString( buffer, 135, 45 + 30 * i, p_bottom );
         }
@@ -1111,7 +1111,7 @@ namespace STS {
             "AP %2hhu"
             "/"
             "%2hhu ",
-            currPkmn.m_boxdata.m_acPP[ p_moveIdx ], mdata.m_pp
+            currPkmn.m_boxdata.m_curPP[ p_moveIdx ], mdata.m_pp
             * ( ( 5 + ( ( currPkmn.m_boxdata.m_pPUps >> ( 2 * p_moveIdx ) ) % 4 ) ) / 5 ) );
         IO::regularFont->printString( buffer, 128, 47, p_bottom );
 
