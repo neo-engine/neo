@@ -630,7 +630,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"It's a large Waterfall.\n", "Ein großer Wasserfall.\n"},
     {"Something moved!\n", "Da hat sich etwas bewegt!\n"},
-    {"Light is shining from the\nsurface. ", "Licht scheint von der\nOberfläche. "},
+    {"Light is shining from the\nsurface. ", "Licht scheint von der\nOberfl\xe4""che. "},
     {"Select", "Ausw\xe4hlen"},
     {"Status", "Status"},
 
@@ -650,6 +650,9 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Deselect", "Abw\xe4hlen"},
     {"Select %hhu Pok\xe9mon!", "W\xe4hle %hhu Pok\xe9mon!"},
     {"Select a Pok\xe9mon!", "W\xe4hle ein Pok\xe9mon!"},
-    {"Gave %s\nto %s.", "%s an\n%s gegeben."}
+    {"Gave %s\nto %s.", "%s an\n%s gegeben."},
+
+    {"Choose these Pok\xe9mon?", "Diese Pok\xe9mon w\xe4hlen?"},
+    {"Choose this Pok\xe9mon?", "Dieses Pok\xe9mon w\xe4hlen?"},
 
 };

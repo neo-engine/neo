@@ -1210,8 +1210,10 @@ namespace STS {
                                         bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         for( u8 i = 0; i < 7; i++ ) {
-            oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = false;
-            oam[ SPR_MSG_BOX_OAM_SUB + i ].y -= 36;
+            if( p_message ) {
+                oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = false;
+                oam[ SPR_MSG_BOX_OAM_SUB + i ].y -= 18;
+            }
         }
         if( p_itemIcon ) {
             oam[ SPR_ITEM_OAM_SUB ].isHidden = false;
@@ -1220,26 +1222,38 @@ namespace STS {
                               p_bottom );
             if( p_message ) {
                 IO::regularFont->printString( p_message, oam[ SPR_ITEM_OAM_SUB ].x + 36,
-                                              oam[ SPR_ITEM_OAM_SUB ].y, p_bottom, IO::font::LEFT );
+                                              oam[ SPR_ITEM_OAM_SUB ].y - 18, p_bottom, IO::font::LEFT );
             }
         } else if( p_message ) {
-            IO::regularFont->printString( p_message, 128, oam[ SPR_ITEM_OAM_SUB ].y, p_bottom,
+            IO::regularFont->printString( p_message, 128, oam[ SPR_ITEM_OAM_SUB ].y - 18, p_bottom,
                                           IO::font::CENTER );
         }
-        for( u8 i = 4; i < 6; i++ ) {
+
+        for( u8 i = 0; i < 6; i++ ) {
             for( u8 j = 0; j < 6; j++ ) {
-                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
-                    = ( i - 4 == p_selection ? SPR_WINDOW_PAL_SUB : SPR_BOX_PAL_SUB );
+                    = ( ( i & 1 ) == ( p_selection & 1 ) ) ? SPR_WINDOW_PAL_SUB : SPR_BOX_PAL_SUB;
             }
         }
-        if( p_message ) {
+        if( p_message || p_selection >= 254 ) {
+            u8 shift = 0;
+            if( !p_message && p_selection == 254 ) {
+                // Use the middle choice boxes
+                shift = 2;
+            }
+
+            for( u8 i = 4 - shift; i < 6 - shift; i++ ) {
+                for( u8 j = 0; j < 6; j++ ) {
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
+                }
+            }
+
             IO::regularFont->printString(
                 GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 48,
-                oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].y + 8, p_bottom, IO::font::CENTER );
+                oam[ SPR_CHOICE_START_OAM_SUB( 4 - shift ) ].y + 8, p_bottom, IO::font::CENTER );
             IO::regularFont->printString(
                 GET_STRING( 81 ), oam[ SPR_CHOICE_START_OAM_SUB( 5 ) ].x + 48,
-                oam[ SPR_CHOICE_START_OAM_SUB( 5 ) ].y + 8, p_bottom, IO::font::CENTER );
+                oam[ SPR_CHOICE_START_OAM_SUB( 5 - shift ) ].y + 8, p_bottom, IO::font::CENTER );
         }
         IO::updateOAM( p_bottom );
     }
@@ -1248,7 +1262,7 @@ namespace STS {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         for( u8 i = 0; i < 7; i++ ) {
             oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = true;
-            oam[ SPR_MSG_BOX_OAM_SUB + i ].y += 36;
+            oam[ SPR_MSG_BOX_OAM_SUB + i ].y += 18;
         }
         oam[ SPR_ITEM_OAM_SUB ].isHidden = true;
         for( u8 i = 4; i < 6; i++ ) {

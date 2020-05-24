@@ -139,8 +139,20 @@ namespace STS {
     }
 
     bool partyScreen::confirmSelection( ) {
-        // TODO
-        return true;
+        if( _toSelect > 1 ) {
+            _partyUI->select( _currentSelection, GET_STRING( 335 ) );
+        } else {
+            _partyUI->select( _currentSelection, GET_STRING( 336 ) );
+        }
+        _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
+
+        _partyUI->printYNMessage( 0, 254 );
+
+        bool res = runYNChoice( );
+
+        _partyUI->hideYNMessageBox( );
+        _currentChoiceSelection = 0;
+        return res;
     }
 
     void partyScreen::selectChoice( u8 p_choice, u8 p_numChoices ) {
@@ -1183,17 +1195,50 @@ namespace STS {
             pressed = keysUp( );
             held    = keysHeld( );
 
-            if( GET_KEY_COOLDOWN( KEY_A ) ) {
+            if( pressed & KEY_A ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 cooldown = COOLDOWN_COUNT;
                 break;
             }
-            if( GET_KEY_COOLDOWN( KEY_B ) ) {
+            if( pressed & KEY_B ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 cooldown = COOLDOWN_COUNT;
                 break;
             }
         }
+    }
+
+    bool STS::partyScreen::runYNChoice( ) {
+        cooldown = COOLDOWN_COUNT;
+        u8 selection = 0;
+        loop( ) {
+            _partyUI->animate( _frame++ );
+            scanKeys( );
+            touchRead( &touch );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            pressed = keysUp( );
+            held    = keysHeld( );
+
+            if( pressed & KEY_A ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
+                cooldown = COOLDOWN_COUNT;
+                break;
+            }
+            if( pressed & KEY_B ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                cooldown = COOLDOWN_COUNT;
+                selection = 1;
+                break;
+            }
+            if( GET_KEY_COOLDOWN( KEY_RIGHT ) || GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+                selection ^= 1;
+                _partyUI->printYNMessage( 0, selection );
+                cooldown = COOLDOWN_COUNT;
+            }
+        }
+        return !selection;
     }
 
     partyScreen::result partyScreen::run( u8 p_initialSelection ) {
@@ -1273,6 +1318,9 @@ namespace STS {
                         break;
                     } else {
                         unmark( _currentSelection );
+                        u8 tmp = _currentSelection;
+                        _currentSelection = 255;
+                        select( tmp );
                     }
                 }
                 cooldown = COOLDOWN_COUNT;

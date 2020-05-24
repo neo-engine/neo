@@ -75,12 +75,12 @@ namespace STS {
         enum desquidChoice {
             DESQUID_SPECIES = 50,
             DESQUID_STATUS,
+            DESQUID_ITEM,
             DESQUID_HEAL,
             DESQUID_EGG,
             DESQUID_NATURE,
             DESQUID_IV,
             DESQUID_EV,
-            DESQUID_ITEM,
             DESQUID_MOVES,
             DESQUID_DUPLICATE,
             DESQUID_DELETE,
@@ -193,6 +193,11 @@ namespace STS {
          * @brief Waits till the player touches the touch screen or presses the A or B button.
          */
         void waitForInteract( );
+
+        /*
+         * @brief Runs a YN message box
+         */
+        bool runYNChoice( );
 
       public:
         /*
