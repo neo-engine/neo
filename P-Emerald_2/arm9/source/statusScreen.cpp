@@ -51,7 +51,7 @@ namespace STS {
     }
 
     statusScreen::result statusScreen::run( u8 p_initialPage ) {
-        _ui->init( p_initialPage );
+        _ui->init( _pokemon, p_initialPage, _allowKeyUp, _allowKeyDown );
         _frame   = 0;
         cooldown = COOLDOWN_COUNT;
 

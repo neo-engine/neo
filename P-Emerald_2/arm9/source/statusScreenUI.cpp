@@ -29,6 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "ability.h"
 #include "boxUI.h"
 #include "defines.h"
+#include "font.h"
 #include "fs.h"
 #include "item.h"
 #include "move.h"
@@ -50,6 +51,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "status_shiny.h"
 #include "status_slp.h"
 #include "status_txc.h"
+
+#include "NoItem.h"
 
 #include "partybg.h"
 #include "partybg2.h"
@@ -126,7 +129,7 @@ namespace STS {
 
         // Info BG
 #define INFO_X 104
-#define INFO_Y 28
+#define INFO_Y 36
 
         IO::loadSprite( SPR_INOFPAGE_START_OAM, SPR_INOFPAGE_PAL, tileCnt, INFO_X, INFO_Y, 64, 64,
                         0, 0, infopage1TilesLen, false, false, false, OBJPRIORITY_3, p_bottom,
@@ -156,6 +159,16 @@ namespace STS {
             = IO::loadSprite( SPR_INOFPAGE_START_OAM + 4, SPR_INOFPAGE_PAL, tileCnt, INFO_X + 64,
                               INFO_Y + 63, 32, 16, infopage4Pal, infopage4Tiles, infopage4TilesLen,
                               true, true, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+
+        // Pkmn Sprite
+        tileCnt = IO::loadSprite( SPR_PKMN_START_OAM, SPR_PKMN_PAL, tileCnt, 8, 54, 64, 64, 0, 0,
+                                  96 * 96 / 2, false, false, false, OBJPRIORITY_2, p_bottom,
+                                  OBJMODE_NORMAL );
+
+        // Item icon
+        tileCnt = IO::loadSprite( SPR_ITEM_OAM, SPR_ITEM_PAL, tileCnt, 72, 140, 32, 32, NoItemPal,
+                                  NoItemTiles, NoItemTilesLen, false, false, true, OBJPRIORITY_1,
+                                  p_bottom, OBJMODE_NORMAL );
 
         if( p_bottom ) {
             REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
@@ -218,26 +231,60 @@ namespace STS {
         return tileCnt;
     }
 
+    void statusScreenUI::drawBasicInfoTop( pokemon* p_pokemon, bool p_bottom ) {
+        if( p_bottom ) {
+            dmaCopy( partybg2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
+        } else {
+            dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+        }
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+
+        // Load correct sprite
+        IO::loadPKMNSprite( p_pokemon->getSpecies( ), oam[ SPR_PKMN_START_OAM ].x,
+                            oam[ SPR_PKMN_START_OAM ].y, SPR_PKMN_START_OAM, SPR_PKMN_PAL,
+                            oam[ SPR_PKMN_START_OAM ].gfxIndex, p_bottom, p_pokemon->isShiny( ),
+                            p_pokemon->isFemale( ), true, false, p_pokemon->getForme( ) );
+
+        // Print Basic Pkmn info
+        if( !p_pokemon->isEgg( ) ) {
+            IO::regularFont->printString( p_pokemon->m_boxdata.m_name, 12, 34, p_bottom );
+        } else {
+            IO::regularFont->printString( GET_STRING( 34 ), 12, 34, p_bottom );
+        }
+        IO::updateOAM( p_bottom );
+    }
+
     void statusScreenUI::writeLineTop( const char* p_string, u8 p_line, u8 p_color,
                                        bool p_bottom ) {
         IO::regularFont->setColor( p_color, 1 );
         IO::regularFont->printString( p_string, INFO_X + 12, INFO_Y + 11 + 15 * p_line, p_bottom );
     }
 
-    void statusScreenUI::init( u8 p_initialPage, bool p_allowKeyUp, bool p_allowKeyDown ) {
-        _currentPage  = p_initialPage;
+    void statusScreenUI::init( pokemon* p_pokemon, u8 p_initialPage, bool p_allowKeyUp,
+                               bool p_allowKeyDown ) {
         _allowKeyUp   = p_allowKeyUp;
         _allowKeyDown = p_allowKeyDown;
         IO::vramSetup( );
         initTopScreen( );
         initBottomScreen( );
 
-        for( u8 i = 0; i < 8; i++ ) { writeLineTop( "TEST Test gg", i ); }
+        _data = getPkmnData( p_pokemon->getSpecies( ), p_pokemon->getForme( ) );
 
+        draw( p_pokemon, p_initialPage );
         bgUpdate( );
     }
 
     void statusScreenUI::draw( pokemon* p_pokemon, u8 p_page ) {
+        if( _currentPage == p_page || !p_pokemon ) { return; }
+        _currentPage = p_pokemon->isEgg( ) ? 0 : p_page;
+        drawBasicInfoTop( p_pokemon, false );
+
+        switch( _currentPage ) {
+        case 0:
+            break;
+        default:
+            break;
+        }
     }
 
     void STS::statusScreenUI::animate( u8 p_frame ) {
@@ -247,284 +294,6 @@ namespace STS {
     }
 } // namespace STS
 
-// u16 initPartyTopScreen( bool p_bottom = false ) {
-//    IO::vramSetup( );
-//    if( p_bottom ) {
-//        IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_512x512, 5, 0 );
-//        bgSetPriority( IO::bg3sub, 3 );
-//        dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3sub ), 512 * 512 );
-//    } else {
-//        IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_512x512, 5, 0 );
-//            bgSetPriority( IO::bg3, 3 );
-//            dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 512 * 512 );
-//        }
-//        u16* pal = BG_PAL( p_bottom );
-//
-//        dmaCopy( partybgPal, pal, 3 * 2 );
-//        IO::initOAMTable( p_bottom );
-//        IO::regularFont->setColor( 0, 0 );
-//        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
-//        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-//        IO::smallFont->setColor( 0, 0 );
-//        IO::smallFont->setColor( IO::WHITE_IDX, 1 );
-//        IO::smallFont->setColor( IO::GRAY_IDX, 2 );
-//
-//        pal[ IO::WHITE_IDX ] = IO::WHITE;
-//        pal[ IO::GRAY_IDX ]  = IO::GRAY;
-//        pal[ IO::BLACK_IDX ] = IO::BLACK;
-//        pal[ IO::BLUE_IDX ]  = RGB( 18, 22, 31 );
-//        pal[ IO::RED_IDX ]   = RGB( 31, 18, 18 );
-//        pal[ IO::BLUE2_IDX ] = RGB( 0, 0, 25 );
-//        pal[ IO::RED2_IDX ]  = RGB( 23, 0, 0 );
-//
-//        pal[ 240 ] = RGB( 6, 6, 6 );    // hp bar border color
-//        pal[ 241 ] = RGB( 12, 30, 12 ); // hp bar green 1
-//        pal[ 242 ] = RGB( 3, 23, 4 );   // hp bar green 2
-//        pal[ 243 ] = RGB( 30, 30, 12 ); // hp bar yellow 1
-//        pal[ 244 ] = RGB( 23, 23, 5 );  // hp bar yellow 2
-//        pal[ 245 ] = RGB( 30, 15, 12 ); // hp bar red 1
-//        pal[ 246 ] = RGB( 20, 7, 7 );   // hp bar red 2
-//
-//        u16 tileCnt = 0;
-//        // preload sprites to avoid position calculations later
-//        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
-//
-//        // left half
-//        for( size_t i = 0; i < 3; i++ ) {
-//            u8 pos = 2 * i;
-//
-//            // background "box"
-//            tileCnt
-//                = IO::loadSprite( 6 + 2 * pos, 0, tileCnt, 4, 4 + 61 * i, 64, 64,
-//                party_blank1Pal,
-//                                  party_blank1Tiles, party_blank1TilesLen, false, false,
-//                                  false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-//            tileCnt
-//                = IO::loadSprite( 7 + 2 * pos, 0, tileCnt, 68, 4 + 61 * i, 64, 64,
-//                party_blank1Pal,
-//                                  party_blank2Tiles, party_blank2TilesLen, false, false,
-//                                  false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-//
-//            // PKMN icon
-//            tileCnt = IO::loadEggIcon( 3, 2 + 61 * i, 30 + pos, 4 + pos, tileCnt, p_bottom );
-//            IO::OamTop->oamBuffer[ 30 + pos ].isHidden = true;
-//
-//            if( i ) {
-//                // Item icon
-//                IO::loadSprite( 18 + pos, 10, oam[ 18 ].gfxIndex, 3 + 32 - 9, 2 + 32 - 8 + 61
-//                * i,
-//                                8, 8, itemiconPal, itemiconTiles, itemiconTilesLen, false,
-//                                false, true, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
-//
-//                // HP bar
-//                IO::loadSprite( pos, 12, oam[ 0 ].gfxIndex, 120 - 48, 34 + 61 * i, 64, 32,
-//                hpbarPal,
-//                                hpbarTiles, hpbarTilesLen, false, false, true, OBJPRIORITY_3,
-//                                p_bottom, OBJMODE_NORMAL );
-//            } else {
-//                // Item icon
-//                tileCnt = IO::loadSprite( 18 + pos, 10, tileCnt, 3 + 32 - 9, 2 + 32 - 8 + 61 *
-//                i, 8,
-//                                          8, itemiconPal, itemiconTiles, itemiconTilesLen,
-//                                          false, false, true, OBJPRIORITY_0, p_bottom,
-//                                          OBJMODE_NORMAL );
-//
-//                // HP bar
-//                tileCnt = IO::loadSprite( pos, 12, tileCnt, 120 - 48, 34 + 61 * i, 64, 32,
-//                hpbarPal,
-//                                          hpbarTiles, hpbarTilesLen, false, false, true,
-//                                          OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
-//            }
-//
-//            // Status icon
-//            tileCnt = IO::loadSprite( 24 + pos, 11, tileCnt, 130 - 62 - 22, 33 + 61 * i, 8, 8,
-//                                      status_parPal, status_parTiles, status_parTilesLen / 2,
-//                                      false, false, true, OBJPRIORITY_0, p_bottom,
-//                                      OBJMODE_NORMAL );
-//            // Shiny icon
-//            tileCnt = IO::loadSprite( 36 + pos, 13, tileCnt, 130 - 62 - 32, 33 + 61 * i, 8, 8,
-//                                      status_shinyPal, status_shinyTiles,
-//                                      status_shinyTilesLen, false, false, true, OBJPRIORITY_0,
-//                                      p_bottom, OBJMODE_NORMAL );
-//        }
-//
-//        // right half
-//        for( size_t i = 0; i < 3; i++ ) {
-//            u8 pos = 2 * i + 1;
-//
-//            // background "box"
-//            tileCnt
-//                = IO::loadSprite( 6 + 2 * pos, 0, tileCnt, 131, 12 + 61 * i, 64, 64,
-//                                  party_blank1Pal, party_blank1Tiles, party_blank1TilesLen,
-//                                  false, false, false, OBJPRIORITY_3, p_bottom,
-//                                  OBJMODE_BLENDED );
-//            tileCnt
-//                = IO::loadSprite( 7 + 2 * pos, 0, tileCnt, 195, 12 + 61 * i, 64, 64,
-//                                  party_blank1Pal, party_blank2Tiles, party_blank2TilesLen,
-//                                  false, false, false, OBJPRIORITY_3, p_bottom,
-//                                  OBJMODE_BLENDED );
-//
-//            // PKMN icon
-//            tileCnt = IO::loadEggIcon( 130, 10 + 61 * i, 30 + pos, 4 + pos, tileCnt, p_bottom
-//            ); IO::OamTop->oamBuffer[ 30 + pos ].isHidden = true;
-//
-//            // Item icon
-//            IO::loadSprite( 18 + pos, 10, oam[ 18 ].gfxIndex, 130 + 32 - 9, 10 + 32 - 8 + 61 *
-//            i, 8,
-//                            8, itemiconPal, itemiconTiles, itemiconTilesLen, false, false,
-//                            true, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
-//
-//            // Status icon
-//            tileCnt = IO::loadSprite( 24 + pos, 11, tileCnt, 257 - 62 - 22, 41 + 61 * i, 8, 8,
-//                                      status_parPal, status_parTiles, status_parTilesLen / 2,
-//                                      false, false, true, OBJPRIORITY_0, p_bottom,
-//                                      OBJMODE_NORMAL );
-//            // Shiny icon
-//            tileCnt = IO::loadSprite( 36 + pos, 13, tileCnt, 257 - 62 - 32, 41 + 61 * i, 8, 8,
-//                                      status_shinyPal, status_shinyTiles,
-//                                      status_shinyTilesLen, false, false, true, OBJPRIORITY_0,
-//                                      p_bottom, OBJMODE_NORMAL );
-//
-//            // HP bar
-//            IO::loadSprite( pos, 12, oam[ 0 ].gfxIndex, 247 - 48, 42 + 61 * i, 64, 32,
-//            hpbarPal,
-//                            hpbarTiles, hpbarTilesLen, false, false, true, OBJPRIORITY_3,
-//                            p_bottom, OBJMODE_NORMAL );
-//        }
-//
-//        if( p_bottom ) {
-//            REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
-//            REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
-//        } else {
-//            REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
-//            REG_BLDALPHA = 0xff | ( 0x06 << 8 );
-//        }
-//        bgUpdate( );
-//        IO::updateOAM( p_bottom );
-//        return tileCnt;
-//    }
-//
-//
-//
-//    // OAMTop indices
-//#define ICON_IDX( a ) ( a )
-//#define SHINY_IDX 100
-//#define PKMN_SPRITE_START 6
-//#define PAGE_ICON_IDX 10
-//#define ITEM_ICON_IDX 11
-//#define TYPE_IDX 12
-//#define ATK_DMGTYPE_IDX( a ) ( 16 + u8( a ) )
-//#define RIBBON_IDX 20
-//
-//#define ICON_PAL( a ) ( a )
-//#define SHINY_PAL 5
-//#define PKMN_SPRITE_PAL 6
-//#define PAGE_ICON_PAL 7
-//#define ITEM_ICON_PAL 8
-//#define TYPE_PAL( a ) ( 9 + ( a ) )
-//#define DMG_TYPE_PAL( a ) ( 13 + u8( a ) )
-//
-//    // OamSub indices
-//    //#define BACK_ID  0
-//#define SUB_PAGE_ICON_IDX( a ) ( 1 + ( a ) )
-//#define SUB_BALL_IDX( a ) ( 7 + ( a ) )
-//    //#define FWD_ID 13
-//    //#define BWD_ID 14
-//
-//#define HP_COL 238
-//    pkmnData data;
-//    void regStsScreenUI::initSub( ) {
-//        IO::initOAMTable( true );
-//        u16 nextAvailableTileIdx = 0;
-//
-//        nextAvailableTileIdx = IO::loadSprite(
-//            BACK_ID, BACK_ID, nextAvailableTileIdx, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32,
-//            32, BackPal, BackTiles, BackTilesLen, false, false, false, OBJPRIORITY_0, true );
-//        nextAvailableTileIdx
-//            = IO::loadSprite( SUB_PAGE_ICON_IDX( 0 ), SUB_PAGE_ICON_IDX( 0 ),
-//            nextAvailableTileIdx,
-//                              0, 0, 32, 32, time_iconPal, time_iconTiles, time_iconTilesLen,
-//                              false, false, false, OBJPRIORITY_0, true );
-//        nextAvailableTileIdx = IO::loadSprite(
-//            SUB_PAGE_ICON_IDX( 1 ), SUB_PAGE_ICON_IDX( 1 ), nextAvailableTileIdx, 0, 0, 32,
-//            32, PKMNPal, PKMNTiles, PKMNTilesLen, false, false, false, OBJPRIORITY_0, true );
-//        nextAvailableTileIdx = IO::loadSprite(
-//            SUB_PAGE_ICON_IDX( 2 ), SUB_PAGE_ICON_IDX( 2 ), nextAvailableTileIdx, 0, 0, 32,
-//            32, memoPal, memoTiles, memoTilesLen, false, false, false, OBJPRIORITY_0, true );
-//        nextAvailableTileIdx = IO::loadSprite(
-//            SUB_PAGE_ICON_IDX( 3 ), SUB_PAGE_ICON_IDX( 3 ), nextAvailableTileIdx, 0, 0, 32,
-//            32, atksPal, atksTiles, atksTilesLen, false, false, false, OBJPRIORITY_0, true );
-//        nextAvailableTileIdx = IO::loadSprite(
-//            SUB_PAGE_ICON_IDX( 4 ), SUB_PAGE_ICON_IDX( 4 ), nextAvailableTileIdx, 0, 0, 32,
-//            32, ContestPal, ContestTiles, ContestTilesLen, false, false, false, OBJPRIORITY_0,
-//            true );
-//        for( u8 i = 0; i < 5; ++i ) {
-//            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( i ) ].x = 48 + 32 * i;
-//            IO::Oam->oamBuffer[ SUB_PAGE_ICON_IDX( i ) ].y = -2 * i;
-//        }
-//
-//        for( u8 i = 0; i < 6; ++i ) {
-//            auto pkmn = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata;
-//            if( pkmn.isEgg( ) )
-//                nextAvailableTileIdx = IO::loadEggIcon( 4 - 2 * i, 28 + 24 * i, SUB_BALL_IDX(
-//                i ),
-//                                                        SUB_BALL_IDX( i ),
-//                                                        nextAvailableTileIdx );
-//            else
-//                nextAvailableTileIdx = IO::loadPKMNIcon( 0, 4 - 2 * i, 28 + 24 * i,
-//                SUB_BALL_IDX( i ),
-//                                                        SUB_BALL_IDX( i ),
-//                                                        nextAvailableTileIdx );
-//            IO::Oam->oamBuffer[ SUB_BALL_IDX( i ) ].isHidden = true;
-//        }
-//
-//        nextAvailableTileIdx = IO::loadSprite(
-//            FWD_ID, FWD_ID, nextAvailableTileIdx, SCREEN_WIDTH - 28 - 25, SCREEN_HEIGHT - 25,
-//            32, 32, DownPal, DownTiles, DownTilesLen, false, false, false, OBJPRIORITY_1, true
-//            );
-//        nextAvailableTileIdx = IO::loadSprite(
-//            BWD_ID, BWD_ID, nextAvailableTileIdx, SCREEN_WIDTH - 25, SCREEN_HEIGHT - 28 - 25,
-//            32, 32, UpPal, UpTiles, UpTilesLen, false, false, false, OBJPRIORITY_1, true );
-//        BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::CHOICE_COLOR;
-//        IO::updateOAM( true );
-//    }
-//
-//    void regStsScreenUI::initTop( ) {
-//        u16 tileCnt = initPartyTopScreen( false );
-//
-//        for( u8 i = 0; i < 6; i++ ) {
-//            if( i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) {
-//                drawPartyPkmn( &SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ], i, i == _current
-//                );
-//            } else {
-//                drawPartyPkmn( nullptr, i, !i );
-//            }
-//        }
-//    }
-//
-//    void regStsScreenUI::init( u8 p_current, bool p_initTop ) {
-//        _current = p_current;
-//        NAV::draw( );
-//        if( p_initTop ) initTop( );
-//        initSub( );
-//    }
-//
-//    void regStsScreenUI::animate( u8 p_frame, u8 p_page ) {
-//		if (p_page == 0) {// party overview
-//            animatePartyPkmn( p_frame, this->_current );
-//		}
-//        animateBG( p_frame, false );
-//        bgUpdate( );
-//    }
-//
-//    void hideSprites( bool p_bottom ) {
-//        auto Oam = p_bottom ? IO::Oam : IO::OamTop;
-//        for( u8 i = 0; i < 6; ++i ) Oam->oamBuffer[ ICON_IDX( i ) ].isHidden = true;
-//        for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ TYPE_IDX + i ].isHidden = true;
-//        for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
-//        for( u8 i = 0; i < 12; ++i ) Oam->oamBuffer[ RIBBON_IDX + i ].isHidden = true;
-//    }
-//
 //    void drawPkmnInformation( pokemon& p_pokemon, u8& p_page, bool p_newpok, bool p_bottom ) {
 //        dmaFillWords( 0, bgGetGfxPtr( p_bottom ? IO::bg2sub : IO::bg2 ), 256 * 192 );
 //        auto Oam = p_bottom ? IO::Oam : IO::OamTop;
@@ -535,8 +304,6 @@ namespace STS {
 //                                  : ItemList[ p_pokemon.m_boxdata.m_ball ]->m_itemName */,
 //                              -6, 22, SHINY_IDX, SHINY_PAL, 1000, p_bottom );
 //        }
-//
-//        data = getPkmnData( p_pokemon.m_boxdata.m_speciesId, p_pokemon.getForme( ) );
 //
 //        if( !p_pokemon.isEgg( ) ) {
 //            pal[ IO::RED_IDX ]   = IO::RED;

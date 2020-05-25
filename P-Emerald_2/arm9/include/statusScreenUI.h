@@ -27,16 +27,23 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include "pokemon.h"
+#include "pokemonData.h"
 
 namespace STS {
     class statusScreenUI {
       private:
-        u8   _currentPage;
-        bool _allowKeyUp;
-        bool _allowKeyDown;
+        u8       _currentPage = 255;
+        bool     _allowKeyUp;
+        bool     _allowKeyDown;
+        pkmnData _data;
 
         u16 initTopScreen( bool p_bottom = false );
         u16 initBottomScreen( bool p_bottom = true );
+
+        /*
+         * @brief Draws basic information about the pkmn (name, etc)
+         */
+        void drawBasicInfoTop( pokemon* p_pokemon, bool p_bottom = false );
 
         /*
          * @brief Writes the given string to the specified line to the text field.
@@ -50,7 +57,8 @@ namespace STS {
          * screen.
          * @param p_initialPage: initially selected page
          */
-        void init( u8 p_initialPage, bool p_allowKeyUp = true, bool p_allowKeyDown = true );
+        void init( pokemon* p_pokemon, u8 p_initialPage, bool p_allowKeyUp = true,
+                   bool p_allowKeyDown = true );
 
         /*
          * @brief Returns the number of different pages.
