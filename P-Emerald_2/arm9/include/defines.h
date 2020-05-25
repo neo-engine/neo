@@ -79,7 +79,9 @@ extern char** ARGV;
 extern int achours, acseconds, acminutes, acday, acmonth, acyear;
 extern int hours, seconds, minutes, day, month, year;
 
-extern int pressed, held, last;
+extern int           pressed, held, last;
+extern touchPosition touch;
+extern u8            cooldown;
 
 extern bool TWL_CONFIG;
 

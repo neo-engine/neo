@@ -35,16 +35,37 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace STS {
     class statusScreen {
       private:
-        // Displays player's Pkmn team
-        u8              _page;
-        u8              _pkmnIdx;
-        regStsScreenUI* _stsUI;
+        pokemon*        _pokemon;
+        statusScreenUI* _ui;
+
+        u8 _currentPage;
+        u8 _frame;
+
+        bool _allowKeyUp;
+        bool _allowKeyDown;
+
+        void select( u8 p_newPage );
 
       public:
-        statusScreen( u8 p_pkmnIdx );
-        ~statusScreen( );
+        enum result { BACK, NEXT_PKMN, PREV_PKMN, EXIT };
 
-        // Returns 0 or a move id
-        u8 run( );
+        /*
+         * @brief Creates a new status screen. Does nothing else
+         * @param p_allowKeyUp: Handle KEY_UP
+         * @param p_allowKeyDown: Handle KEY_DOWN
+         */
+        statusScreen( pokemon* p_pokemon, bool p_allowKeyUp = true, bool p_allowKeyDown = true,
+                      statusScreenUI* p_ui = nullptr );
+
+        ~statusScreen( ) {
+            if( _ui ) { delete _ui; }
+        }
+
+        /*
+         * @brief Runs the status screen. Destroys anything that was previously on the screen.
+         * @param p_initialPage: initially selected page
+         * @returns an action the player wishes to do
+         */
+        result run( u8 p_initialPage = 0 );
     };
 } // namespace STS

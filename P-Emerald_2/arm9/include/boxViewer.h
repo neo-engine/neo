@@ -44,7 +44,6 @@ namespace BOX {
         bool                         _topScreenDirty;
         u8                           _curPage;
         boxUI                        _boxUI;
-        STS::boxStsScreenUI*         _stsUI;
 
         void select( u8 p_index );
         void takePkmn( u8 p_index );
@@ -53,10 +52,8 @@ namespace BOX {
 
       public:
         boxViewer( ) {
-            _stsUI = new STS::boxStsScreenUI;
         }
         ~boxViewer( ) {
-            delete _stsUI;
         }
         void run( bool p_allowTakePkmn = false );
     };

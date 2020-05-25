@@ -75,18 +75,20 @@ GameMod gMod = GameMod::ALPHA;
 u8 DayTimes[ 4 ][ 5 ]
     = {{7, 10, 15, 17, 23}, {6, 9, 12, 18, 23}, {5, 8, 10, 20, 23}, {7, 9, 13, 19, 23}};
 
-time_t unixTime;
-int    hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
-int    achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
-int    pressed, held, last;
-bool   DRAW_TIME         = false;
-bool   UPDATE_TIME       = true;
-bool   ANIMATE_MAP       = false;
-u8     FRAME_COUNT       = 0;
-bool   SCREENS_SWAPPED   = false;
-bool   PLAYER_IS_FISHING = false;
-bool   INIT_NITROFS      = false;
-bool   TWL_CONFIG        = false;
+time_t        unixTime;
+int           hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
+int           achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
+int           pressed, held, last;
+touchPosition touch;
+u8            cooldown          = COOLDOWN_COUNT;
+bool          DRAW_TIME         = false;
+bool          UPDATE_TIME       = true;
+bool          ANIMATE_MAP       = false;
+u8            FRAME_COUNT       = 0;
+bool          SCREENS_SWAPPED   = false;
+bool          PLAYER_IS_FISHING = false;
+bool          INIT_NITROFS      = false;
+bool          TWL_CONFIG        = false;
 
 char** ARGV;
 
@@ -160,7 +162,7 @@ void vblankIRQ( ) {
     struct tm* timeStruct = gmtime( &unixTime );
 
     if( true || acseconds != timeStruct->tm_sec || DRAW_TIME ) {
-        DRAW_TIME        = false;
+        DRAW_TIME            = false;
         pal[ IO::WHITE_IDX ] = IO::WHITE;
         IO::boldFont->setColor( IO::WHITE_IDX, 1 );
         IO::boldFont->setColor( IO::WHITE_IDX, 2 );
@@ -255,29 +257,29 @@ int main( int, char** p_argv ) {
             //            time_t     unixTime   = time( NULL );
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char buffer[ 100 ];
-            snprintf(
-                buffer, 99,
-                "Currently at %hhu-(%hx,%hx,%hhx).\nMap: %i:%i,"
-                "(%02u,%02u)\n %hhu %s (%hu) %lx %hx %hx",
-                SAVE::SAV.getActiveFile( ).m_currentMap,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32, MAP::CURRENT_BANK.m_bank,
-                FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
-                MAP::curMap->getCurrentLocationId( ),
-                ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ],
-                MAP::curMap
-                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                    .m_bottombehave,
-                MAP::curMap
-                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                    .m_topbehave );
+            snprintf( buffer, 99,
+                      "Currently at %hhu-(%hx,%hx,%hhx).\nMap: %i:%i,"
+                      "(%02u,%02u)\n %hhu %s (%hu) %lx %hx %hx",
+                      SAVE::SAV.getActiveFile( ).m_currentMap,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32,
+                      MAP::CURRENT_BANK.m_bank,
+                      FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
+                      MAP::curMap->getCurrentLocationId( ),
+                      ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ],
+                      MAP::curMap
+                          ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                          .m_bottombehave,
+                      MAP::curMap
+                          ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                          .m_topbehave );
             IO::messageBox m( buffer );
             NAV::draw( true );
         }
@@ -295,8 +297,7 @@ int main( int, char** p_argv ) {
                             || !MOVE::text( a.m_boxdata.m_moves[ j ], param ) )
                             continue;
                         char buffer[ 50 ];
-                        auto mname
-                            = MOVE::getMoveName( a.m_boxdata.m_moves[ j ] );
+                        auto mname = MOVE::getMoveName( a.m_boxdata.m_moves[ j ] );
                         snprintf( buffer, 49, GET_STRING( 3 ),
                                   GET_STRING( MOVE::text( a.m_boxdata.m_moves[ j ], param ) ),
                                   mname.c_str( ) );

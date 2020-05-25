@@ -26,53 +26,47 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 
-#include <vector>
 #include "pokemon.h"
-#include "uio.h"
 
 namespace STS {
     class statusScreenUI {
-      public:
-        u8           m_pagemax;
-        virtual bool drawMove( const pokemon& p_pokemon, u8 p_moveIdx, bool p_bottom = false );
-        virtual bool drawRibbon( const pokemon& p_pokemon, u8 p_ribbonIdx, bool p_bottom = false );
-        virtual void draw( pokemon& p_pokemon, u8 p_page, bool p_newpok ) = 0;
-        virtual void animate( u8 p_frame, u8 p_page )                           = 0;
+      private:
+        u8   _currentPage;
+        bool _allowKeyUp;
+        bool _allowKeyDown;
 
-        virtual ~statusScreenUI( ) {
+        u16 initTopScreen( bool p_bottom = false );
+        u16 initBottomScreen( bool p_bottom = true );
+
+        /*
+         * @brief Writes the given string to the specified line to the text field.
+         */
+        void writeLineTop( const char* p_string, u8 p_line, u8 p_color = 252,
+                           bool p_bottom = false );
+
+      public:
+        /*
+         * @brief Initializes the status screen UI. Destroys anything that was previously on the
+         * screen.
+         * @param p_initialPage: initially selected page
+         */
+        void init( u8 p_initialPage, bool p_allowKeyUp = true, bool p_allowKeyDown = true );
+
+        /*
+         * @brief Returns the number of different pages.
+         */
+        constexpr u8 getPageCount( ) {
+            return 3;
         }
+
+        /*
+         * @brief Draws the specified info page for the given pokemon.
+         */
+        void draw( pokemon* p_pokemon, u8 p_page );
+
+        /*
+         * @brief Draws the p_frame-th frame. Needs to be called every frame.
+         */
+        void animate( u8 p_frame );
     };
-
-    class regStsScreenUI : public statusScreenUI {
-        u8   _current;
-        void initTop( );
-        void initSub( );
-
-      public:
-        void init( u8 p_current, bool p_initTop = true );
-        void draw( pokemon& p_pokemon, u8 p_page, bool p_newpok ) override;
-        std::vector<IO::inputTarget> draw( u8 p_current, bool p_updatePageIcons );
-
-        void animate( u8 p_frame, u8 p_page ) override;
-
-        regStsScreenUI( u8 p_pageMax = 5 );
-    };
-
-    class boxStsScreenUI : public regStsScreenUI {
-      public:
-        void init( );
-        void draw( pokemon& p_pokemon, u8 p_page, bool p_newpok ) override;
-
-        void animate( u8 p_frame, u8 p_page ) override {
-            (void) p_frame;
-            (void) p_page;
-        }
-    };
-
-    // class battleStsScreenUI : public statusScreenUI {
-    // public:
-    //    void init( u8 p_current ) override;
-    //    void draw( u8 p_current, u8 p_page, bool p_newpok ) override;
-    //    void draw( u8 p_current ) override;
-    //};
 } // namespace STS

@@ -44,6 +44,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "itemNames.h"
 #include "moveNames.h"
 #include "partyScreen.h"
+#include "statusScreen.h"
 // END TEST
 
 namespace SAVE {
@@ -85,7 +86,7 @@ namespace SAVE {
         IO::clearScreen( true, false, false );
 
         // BEGIN TEST
-        
+
         pokemon testTeam[ 6 ];
         for( u8 i = 0; i < 6; i++ ) {
             testTeam[ i ]
@@ -100,11 +101,13 @@ namespace SAVE {
         testTeam[ 1 ].m_boxdata.m_moves[ 3 ] = M_ROCK_SMASH;
         testTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
         testTeam[ 2 ].m_boxdata.m_heldItem   = I_YAGO_BERRY;
+        /*
+                STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
+                sts.run( );
+        */
+        STS::statusScreen psts = STS::statusScreen( testTeam );
+        psts.run( );
 
-        STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
-        sts.run( );
-
-        
         // END TEST
 
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
@@ -190,8 +193,8 @@ namespace SAVE {
 
             IO::regularFont->printString( SAV.m_saveFile[ i ].m_playername, 8, 30 + 64 * i, true );
             IO::regularFont->printString(
-                FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
-                248, 30 + 64 * i, true, IO::font::RIGHT );
+                FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ), 248, 30 + 64 * i,
+                true, IO::font::RIGHT );
 
             char buffer[ 50 ];
             snprintf( buffer, 49, "%03d:%02d", SAV.m_saveFile[ i ].m_pt.m_hours,

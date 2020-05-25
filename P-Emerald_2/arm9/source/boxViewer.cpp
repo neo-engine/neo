@@ -25,9 +25,9 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "defines.h"
 #include "boxViewer.h"
 #include "boxUI.h"
+#include "defines.h"
 #include "keyboard.h"
 #include "messageBox.h"
 #include "uio.h"
@@ -130,7 +130,7 @@ namespace BOX {
                         IO::swapScreens( );
                         IO::OamTop->oamBuffer[ 0 ].isHidden = true;
                         IO::updateOAM( false );
-                        IO::printRectangle( 144, 192 - 14, 255, 192, false,  IO::WHITE_IDX );
+                        IO::printRectangle( 144, 192 - 14, 255, 192, false, IO::WHITE_IDX );
 
                         IO::keyboard kb;
                         char         buffer[ 50 ];
@@ -235,9 +235,9 @@ namespace BOX {
         _boxUI.select( p_index );
         if( p_index >= MAX_PKMN_PER_BOX + 6 ) return;
         if( selection.m_boxdata.m_speciesId ) {
-            if( !_topScreenDirty ) _stsUI->init( );
-            _stsUI->draw( selection, _curPage, true );
-            _topScreenDirty = true;
+            /*           if( !_topScreenDirty ) _stsUI->init( );
+                       _stsUI->draw( selection, _curPage, true );
+                       _topScreenDirty = true;*/
         } else if( _topScreenDirty ) {
             _boxUI.drawAllBoxStatus( );
             _topScreenDirty = false;
@@ -276,8 +276,7 @@ namespace BOX {
                 _boxUI.updateTeam( );
         } else
             _heldPkmn = pokemon( hld );
-        _boxUI.takePkmn( p_index, _heldPkmn.m_boxdata.m_speciesId,
-                         _heldPkmn.isEgg( ) );
+        _boxUI.takePkmn( p_index, _heldPkmn.m_boxdata.m_speciesId, _heldPkmn.isEgg( ) );
     }
 
     // Remove gaps in party pkmn
@@ -296,9 +295,8 @@ namespace BOX {
         for( u8 i = 0; i < 6; ++i )
             if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId
                 && SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_curHP
-                && !SAVE::SAV.getActiveFile( )
-                        .m_pkmnTeam[ i ].isEgg ( ) )
+                && !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].isEgg( ) )
                 return true;
         return false;
     }
-}
+} // namespace BOX
