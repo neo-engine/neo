@@ -807,7 +807,7 @@ namespace IO {
             }
 
             if( p_shiny ) {
-                snprintf( BUFFER, 99, "/icon%03hu%ss_%hhu.rsd", p_pkmnId, p_female ? "f" : "",
+                snprintf( BUFFER, 99, "/icon%03hu%s_%hhu.rsd", p_pkmnId, p_female ? "f" : "",
                           p_forme );
                 f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
                 if( f ) {
@@ -817,7 +817,8 @@ namespace IO {
             }
 
             if( p_female ) {
-                snprintf( BUFFER, 99, "/icon%03hus_%hhu.rsd", p_pkmnId, p_forme );
+                snprintf( BUFFER, 99, "/icon%03hu%s_%hhu.rsd", p_pkmnId, p_shiny ? "s" : "",
+                          p_forme );
                 f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
                 if( f ) {
                     return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
@@ -826,33 +827,24 @@ namespace IO {
             }
         }
 
-        if( p_shiny ) {
-            snprintf( BUFFER, 99, "/icon%03hu%ss.rsd", p_pkmnId, p_female ? "f" : "" );
-            f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
-            if( f ) {
-                return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
-                                           OBJPRIORITY_2, p_bottom );
-            }
-
-            if( p_female ) {
-                snprintf( BUFFER, 99, "/icon%03hus.rsd", p_pkmnId );
-                f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
-                if( f ) {
-                    return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
-                                               OBJPRIORITY_2, p_bottom );
-                }
-            }
-        }
-
-        snprintf( BUFFER, 99, "/icon%03hu%s.rsd", p_pkmnId, p_female ? "f" : "" );
+        snprintf( BUFFER, 99, "/icon%03hu%s%s.rsd", p_pkmnId, p_female ? "f" : "",
+                  p_shiny ? "s" : "" );
         f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
         if( f ) {
             return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
                                        OBJPRIORITY_2, p_bottom );
         }
+        if( p_shiny ) {
+            snprintf( BUFFER, 99, "/icon%03hu%s.rsd", p_pkmnId, p_female ? "f" : "" );
+            f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
+            if( f ) {
+                return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
+                                           OBJPRIORITY_2, p_bottom );
+            }
+        }
 
         if( p_female ) {
-            snprintf( BUFFER, 99, "/icon%03hu.rsd", p_pkmnId );
+            snprintf( BUFFER, 99, "/icon%03hu%s.rsd", p_pkmnId, p_shiny ? "s" : "" );
             f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
             if( f ) {
                 return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
