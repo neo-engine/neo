@@ -539,96 +539,201 @@ namespace IO {
 
     char BUFFER[ 100 ];
 
+    bool existsPKMNSprite( const u16 p_pkmnId, bool p_flipx, bool p_female ) {
+        if( p_flipx ) {
+            switch( p_pkmnId ) {
+                case PKMN_UNOWN:
+                case PKMN_ABSOL:
+                case PKMN_AMOONGUSS:
+                case PKMN_BARBARACLE:
+                case PKMN_BLACEPHALON:
+                case PKMN_BUDEW:
+                case PKMN_CASTFORM:
+                case PKMN_CLAUNCHER:
+                case PKMN_CLAWITZER:
+                case PKMN_CLEFABLE:
+                case PKMN_CLEFAIRY:
+                case PKMN_CLEFFA:
+                case PKMN_COMFEY:
+                case PKMN_CROCONAW:
+                case PKMN_DARTRIX:
+                case PKMN_DHELMISE:
+                case PKMN_DRILBUR:
+                case PKMN_DUGTRIO:
+                case PKMN_EMBOAR:
+                case PKMN_EXCADRILL:
+                case PKMN_FURFROU:
+                case PKMN_GARBODOR:
+                case PKMN_GOLETT:
+                case PKMN_GOLURK:
+                case PKMN_GRENINJA:
+                case PKMN_IGGLYBUFF:
+                case PKMN_JIGGLYPUFF:
+                case PKMN_KELDEO:
+                case PKMN_KINGLER:
+                case PKMN_KLANG:
+                case PKMN_KLEFKI:
+                case PKMN_KLINK:
+                case PKMN_KLINKLANG:
+                case PKMN_KYUREM:
+                case PKMN_LILLIGANT:
+                case PKMN_LITWICK:
+                case PKMN_MAGMORTAR:
+                case PKMN_MARSHADOW:
+                case PKMN_MELOETTA:
+                case PKMN_MINIOR:
+                case PKMN_MUK:
+                case PKMN_NECROZMA:
+                case PKMN_PANSEAR:
+                case PKMN_POLITOED:
+                case PKMN_POLIWHIRL:
+                case PKMN_POLIWRATH:
+                case PKMN_REGIROCK:
+                case PKMN_ROSELIA:
+                case PKMN_ROSERADE:
+                case PKMN_ROTOM:
+                case PKMN_SAWK:
+                case PKMN_SEVIPER:
+                case PKMN_SHAYMIN:
+                case PKMN_SIMISEAR:
+                case PKMN_SNEASEL:
+                case PKMN_SOLOSIS:
+                case PKMN_STAKATAKA:
+                case PKMN_STEENEE:
+                case PKMN_SYLVEON:
+                case PKMN_TEDDIURSA:
+                case PKMN_TOGEKISS:
+                case PKMN_TORTERRA:
+                case PKMN_TSAREENA:
+                case PKMN_VANILLUXE:
+                case PKMN_WIGGLYTUFF:
+                case PKMN_ZANGOOSE:
+                case PKMN_ZYGARDE:
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
+        if( p_female ) {
+            switch( p_pkmnId ) {
+                case PKMN_VENUSAUR:
+                case PKMN_BUTTERFREE:
+                case PKMN_RATTATA:
+                case PKMN_RATICATE:
+                case PKMN_PIKACHU:
+                case PKMN_RAICHU:
+                case PKMN_ZUBAT:
+                case PKMN_GOLBAT:
+                case PKMN_GLOOM:
+                case PKMN_VILEPLUME:
+                case PKMN_KADABRA:
+                case PKMN_ALAKAZAM:
+                case PKMN_DODUO:
+                case PKMN_DODRIO:
+                case PKMN_HYPNO:
+                case PKMN_RHYHORN:
+                case PKMN_RHYDON:
+                case PKMN_GOLDEEN:
+                case PKMN_SEAKING:
+                case PKMN_SCYTHER:
+                case PKMN_MAGIKARP:
+                case PKMN_GYARADOS:
+                case PKMN_MEGANIUM:
+                case PKMN_LEDYBA:
+                case PKMN_LEDIAN:
+                case PKMN_XATU:
+                case PKMN_SUDOWOODO:
+                case PKMN_POLITOED:
+                case PKMN_AIPOM:
+                case PKMN_WOOPER:
+                case PKMN_QUAGSIRE:
+                case PKMN_MURKROW:
+                case PKMN_WOBBUFFET:
+                case PKMN_GIRAFARIG:
+                case PKMN_GLIGAR:
+                case PKMN_STEELIX:
+                case PKMN_SCIZOR:
+                case PKMN_HERACROSS:
+                case PKMN_SNEASEL:
+                case PKMN_URSARING:
+                case PKMN_PILOSWINE:
+                case PKMN_OCTILLERY:
+                case PKMN_HOUNDOOM:
+                case PKMN_DONPHAN:
+                case PKMN_TORCHIC:
+                case PKMN_COMBUSKEN:
+                case PKMN_BLAZIKEN:
+                case PKMN_BEAUTIFLY:
+                case PKMN_DUSTOX:
+                case PKMN_LUDICOLO:
+                case PKMN_NUZLEAF:
+                case PKMN_SHIFTRY:
+                case PKMN_MEDITITE:
+                case PKMN_MEDICHAM:
+                case PKMN_ROSELIA:
+                case PKMN_GULPIN:
+                case PKMN_SWALOT:
+                case PKMN_NUMEL:
+                case PKMN_CAMERUPT:
+                case PKMN_CACTURNE:
+                case PKMN_MILOTIC:
+                case PKMN_RELICANTH:
+                case PKMN_STARLY:
+                case PKMN_STARAVIA:
+                case PKMN_STARAPTOR:
+                case PKMN_BIDOOF:
+                case PKMN_BIBAREL:
+                case PKMN_KRICKETOT:
+                case PKMN_KRICKETUNE:
+                case PKMN_SHINX:
+                case PKMN_LUXIO:
+                case PKMN_LUXRAY:
+                case PKMN_ROSERADE:
+                case PKMN_COMBEE:
+                case PKMN_PACHIRISU:
+                case PKMN_BUIZEL:
+                case PKMN_FLOATZEL:
+                case PKMN_AMBIPOM:
+                case PKMN_GIBLE:
+                case PKMN_GABITE:
+                case PKMN_GARCHOMP:
+                case PKMN_HIPPOPOTAS:
+                case PKMN_HIPPOWDON:
+                case PKMN_CROAGUNK:
+                case PKMN_TOXICROAK:
+                case PKMN_FINNEON:
+                case PKMN_LUMINEON:
+                case PKMN_SNOVER:
+                case PKMN_ABOMASNOW:
+                case PKMN_WEAVILE:
+                case PKMN_RHYPERIOR:
+                case PKMN_TANGROWTH:
+                case PKMN_MAMOSWINE:
+                case PKMN_UNFEZANT:
+                case PKMN_FRILLISH:
+                case PKMN_JELLICENT:
+                case PKMN_PYROAR:
+                case PKMN_MEOWSTIC:
+                case PKMN_INDEEDEE:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        return true;
+    }
+
     u16 loadPKMNSprite( const char* p_path, const u16 p_pkmnId, const s16 p_posX, const s16 p_posY,
                         u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny,
                         bool p_female, bool p_flipx, bool p_topOnly, u8 p_forme ) {
-        switch( p_pkmnId ) {
-        case PKMN_UNOWN:
-        case PKMN_ABSOL:
-        case PKMN_AMOONGUSS:
-        case PKMN_BARBARACLE:
-        case PKMN_BLACEPHALON:
-        case PKMN_BUDEW:
-        case PKMN_CASTFORM:
-        case PKMN_CLAUNCHER:
-        case PKMN_CLAWITZER:
-        case PKMN_CLEFABLE:
-        case PKMN_CLEFAIRY:
-        case PKMN_CLEFFA:
-        case PKMN_COMFEY:
-        case PKMN_CROCONAW:
-        case PKMN_DARTRIX:
-        case PKMN_DHELMISE:
-        case PKMN_DRILBUR:
-        case PKMN_DUGTRIO:
-        case PKMN_EMBOAR:
-        case PKMN_EXCADRILL:
-        case PKMN_FURFROU:
-        case PKMN_GARBODOR:
-        case PKMN_GOLETT:
-        case PKMN_GOLURK:
-        case PKMN_GRENINJA:
-        case PKMN_IGGLYBUFF:
-        case PKMN_JIGGLYPUFF:
-        case PKMN_KELDEO:
-        case PKMN_KINGLER:
-        case PKMN_KLANG:
-        case PKMN_KLEFKI:
-        case PKMN_KLINK:
-        case PKMN_KLINKLANG:
-        case PKMN_KYUREM:
-        case PKMN_LILLIGANT:
-        case PKMN_LITWICK:
-        case PKMN_MAGMORTAR:
-        case PKMN_MARSHADOW:
-        case PKMN_MELOETTA:
-        case PKMN_MINIOR:
-        case PKMN_MUK:
-        case PKMN_NECROZMA:
-        case PKMN_PANSEAR:
-        case PKMN_POLITOED:
-        case PKMN_POLIWHIRL:
-        case PKMN_POLIWRATH:
-        case PKMN_REGIROCK:
-        case PKMN_ROSELIA:
-        case PKMN_ROSERADE:
-        case PKMN_ROTOM:
-        case PKMN_SAWK:
-        case PKMN_SEVIPER:
-        case PKMN_SHAYMIN:
-        case PKMN_SIMISEAR:
-        case PKMN_SNEASEL:
-        case PKMN_SOLOSIS:
-        case PKMN_STAKATAKA:
-        case PKMN_STEENEE:
-        case PKMN_SYLVEON:
-        case PKMN_TEDDIURSA:
-        case PKMN_TOGEKISS:
-        case PKMN_TORTERRA:
-        case PKMN_TSAREENA:
-        case PKMN_VANILLUXE:
-        case PKMN_WIGGLYTUFF:
-        case PKMN_ZANGOOSE:
-        case PKMN_ZYGARDE:
-            p_flipx = false;
-        default:
-            break;
-        }
 
-        if( !p_forme ) {
-            if( !p_female )
-                snprintf( BUFFER, 99, "%02d/%d/%d", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
-                          p_pkmnId );
-            else
-                snprintf( BUFFER, 99, "%02d/%d/%df", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
-                          p_pkmnId );
+       if( !p_forme ) {
+            snprintf( BUFFER, 99, "%02d/%d/%d%s%s", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                      p_pkmnId, p_shiny ? "s": "", p_female ? "f" : "" );
         } else {
-            if( !p_female )
-                snprintf( BUFFER, 99, "%02d/%d/%d-%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
-                          p_pkmnId, p_forme );
-            else
-                snprintf( BUFFER, 99, "%02d/%d/%d-%hhuf", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
-                          p_pkmnId, p_forme );
+            snprintf( BUFFER, 99, "%02d/%d/%d-%hhu%s%s", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                      p_pkmnId, p_forme, p_shiny ? "s": "", p_female ? "f" : "" );
         }
 
         memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
@@ -637,26 +742,6 @@ namespace IO {
         if( !FS::readData<unsigned short, unsigned int>( p_path, BUFFER, 16, TEMP_PAL, 96 * 96 / 8,
                                                          TEMP ) ) {
             return false;
-        }
-
-        if( p_shiny ) {
-            if( !p_forme ) {
-                if( !p_female )
-                    snprintf( BUFFER, 99, "%02d/%d/%ds", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
-                              p_pkmnId );
-                else
-                    snprintf( BUFFER, 99, "%02d/%d/%dsf", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
-                              p_pkmnId );
-            } else {
-                if( !p_female )
-                    snprintf( BUFFER, 99, "%02d/%d/%d-%hhus", p_pkmnId / FS::ITEMS_PER_DIR,
-                              p_pkmnId, p_pkmnId, p_forme );
-                else
-                    snprintf( BUFFER, 99, "%02d/%d/%d-%hhusf", p_pkmnId / FS::ITEMS_PER_DIR,
-                              p_pkmnId, p_pkmnId, p_forme );
-            }
-            FS::readData<unsigned short, unsigned int>( p_path, BUFFER, 16, TEMP_PAL, 96 * 96 / 8,
-                                                        TEMP );
         }
 
         loadSprite( p_oamIndex++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY, 64,
@@ -679,6 +764,12 @@ namespace IO {
                         u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female,
                         bool p_flipx, bool p_topOnly, u8 p_forme ) {
         u16 res = 0;
+        if( !existsPKMNSprite( p_pkmnId, p_flipx, p_female ) ) {
+            p_flipx = false;
+        }
+        if( !existsPKMNSprite( p_pkmnId, p_flipx, p_female ) ) {
+            p_female = false;
+        }
 
         if( ( res = loadPKMNSprite( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_palCnt,
                                     p_tileCnt, p_bottom, p_shiny, p_female, p_flipx, p_topOnly,
@@ -723,8 +814,15 @@ namespace IO {
             return res;
         }
 
-        return loadPKMNSprite( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
-                               p_bottom, false, false, p_flipx, p_topOnly );
+        if( ( res = loadPKMNSprite( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex,
+                                    p_palCnt, p_tileCnt, p_bottom, false, false, p_flipx,
+                                    p_topOnly ) ) ) {
+            return res;
+        }
+
+        return  loadPKMNSprite( PKMN_PATH, 0, p_posX, p_posY, p_oamIndex,
+                                p_palCnt, p_tileCnt, p_bottom, false, false, p_flipx,
+                                p_topOnly );
     }
 
     u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
@@ -841,6 +939,16 @@ namespace IO {
                       bool p_female ) {
         FILE* f;
 
+        /*
+        if( !existsPKMNSprite( p_pkmnId, true, p_female ) ) {
+            // TODO: Handle existing flipx sprites
+            p_flipx = false;
+        }
+        */
+        if( !existsPKMNSprite( p_pkmnId, false, p_female ) ) {
+            p_female = false;
+        }
+
         if( p_forme ) {
             snprintf( BUFFER, 99, "/icon%03hu%s%s_%hhu.rsd", p_pkmnId, p_female ? "f" : "",
                       p_shiny ? "s" : "", p_forme );
@@ -897,6 +1005,12 @@ namespace IO {
             }
         }
 
+        snprintf( BUFFER, 99, "/icon%03hu.rsd", p_pkmnId );
+        f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
+        if( f ) {
+            return loadAnimatedSprite( f, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
+                    OBJPRIORITY_2, p_bottom );
+        }
         return loadPKMNIcon( 0, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
 

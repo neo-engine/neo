@@ -30,11 +30,14 @@ namespace IO {
     enum fadeType {
         UNFADE,
         UNFADE_FAST,
+        UNFADE_IMMEDIATE,
 
         CLEAR_DARK,
         CLEAR_DARK_FAST,
+        CLEAR_DARK_IMMEDIATE,
         CLEAR_WHITE,
         CLEAR_WHITE_FAST,
+        CLEAR_WHITE_IMMEDIATE,
         CAVE_ENTRY,
         CAVE_EXIT,
 

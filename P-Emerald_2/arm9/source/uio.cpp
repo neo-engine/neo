@@ -63,7 +63,7 @@ namespace IO {
 
 #define TRANSPARENCY_COEFF 0x0671
 
-    void initVideo( ) {
+    void initVideo( bool p_noFade ) {
         vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
         vramSetBankB( VRAM_B_MAIN_BG_0x06020000 );
 
@@ -77,15 +77,17 @@ namespace IO {
         bgSetPriority( bg3, 3 );
         bgSetPriority( bg2, 2 );
 
-        if( SCREENS_SWAPPED ) {
-            REG_BLDCNT   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
-            REG_BLDALPHA = TRANSPARENCY_COEFF;
-        } else {
-            REG_BLDCNT = BLEND_NONE;
+        if( !p_noFade ) {
+            if( SCREENS_SWAPPED ) {
+                REG_BLDCNT   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
+                REG_BLDALPHA = TRANSPARENCY_COEFF;
+            } else {
+                REG_BLDCNT = BLEND_NONE;
+            }
         }
         bgUpdate( );
     }
-    void initVideoSub( ) {
+    void initVideoSub( bool p_noFade ) {
         vramSetBankC( VRAM_C_SUB_BG_0x06200000 );
         vramSetBankD( VRAM_D_SUB_SPRITE );
 
@@ -96,16 +98,18 @@ namespace IO {
                          DISPLAY_SPR_ACTIVE | // Enable sprites for display
                          DISPLAY_SPR_1D       // Enable 1D tiled sprites
         );
-        if( !SCREENS_SWAPPED ) {
-            REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
-            REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
-        } else {
-            REG_BLDCNT_SUB = BLEND_NONE;
+        if( !p_noFade ) {
+            if( !SCREENS_SWAPPED ) {
+                REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
+                REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
+            } else {
+                REG_BLDCNT_SUB = BLEND_NONE;
+            }
         }
     }
-    void vramSetup( ) {
-        initVideo( );
-        initVideoSub( );
+    void vramSetup( bool p_noFade ) {
+        initVideo( p_noFade );
+        initVideoSub( p_noFade );
         vramSetBankG( VRAM_G_LCD );
         vramSetBankH( VRAM_H_LCD );
     }

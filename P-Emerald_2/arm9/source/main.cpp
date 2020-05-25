@@ -242,7 +242,6 @@ int main( int, char** p_argv ) {
 
     irqSet( IRQ_VBLANK, vblankIRQ );
 
-    touchPosition touch;
     bool          stopped = true;
     u8            bmp     = false;
     loop( ) {

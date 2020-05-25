@@ -140,27 +140,7 @@ namespace STS {
 #endif
 
     u16 partyScreenUI::initTopScreen( bool p_bottom ) {
-        IO::clearScreen( p_bottom, false, true );
-        if( p_bottom ) {
-            IO::bg2sub = bgInitSub( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
-            bgSetPriority( IO::bg2sub, 2 );
-            IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
-            bgSetPriority( IO::bg3sub, 3 );
-            bgSetScale( IO::bg3sub, 1 << 7, 1 << 7 );
-            dmaCopy( partybg2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
-            bgSetScroll( IO::bg3sub, 0, 0 );
-        } else {
-            IO::bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
-            bgSetPriority( IO::bg2, 2 );
-            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
-            bgSetPriority( IO::bg3, 3 );
-            bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
-            dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
-            bgSetScroll( IO::bg3, 0, 0 );
-        }
-        u16* pal = BG_PAL( p_bottom );
-
-        dmaCopy( partybgPal, pal, 3 * 2 );
+        IO::clearScreen( p_bottom );
         IO::initOAMTable( p_bottom );
         IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
@@ -169,21 +149,6 @@ namespace STS {
         IO::smallFont->setColor( IO::WHITE_IDX, 1 );
         IO::smallFont->setColor( IO::GRAY_IDX, 2 );
 
-        pal[ IO::WHITE_IDX ] = IO::WHITE;
-        pal[ IO::GRAY_IDX ]  = IO::GRAY;
-        pal[ IO::BLACK_IDX ] = IO::BLACK;
-        pal[ IO::BLUE_IDX ]  = RGB( 18, 22, 31 );
-        pal[ IO::RED_IDX ]   = RGB( 31, 18, 18 );
-        pal[ IO::BLUE2_IDX ] = RGB( 0, 0, 25 );
-        pal[ IO::RED2_IDX ]  = RGB( 23, 0, 0 );
-
-        pal[ 240 ] = RGB( 6, 6, 6 );    // hp bar border color
-        pal[ 241 ] = RGB( 12, 30, 12 ); // hp bar green 1
-        pal[ 242 ] = RGB( 3, 23, 4 );   // hp bar green 2
-        pal[ 243 ] = RGB( 30, 30, 12 ); // hp bar yellow 1
-        pal[ 244 ] = RGB( 23, 23, 5 );  // hp bar yellow 2
-        pal[ 245 ] = RGB( 30, 15, 12 ); // hp bar red 1
-        pal[ 246 ] = RGB( 20, 7, 7 );   // hp bar red 2
 
         u16 tileCnt = SPR_PKMN_BG_GFX( 3 );
         // preload sprites to avoid position calculations later
@@ -405,61 +370,18 @@ namespace STS {
                             party_1Pal, party_6Tiles, party_1TilesLen, false, false, true,
                             OBJPRIORITY_0, p_bottom, OBJMODE_BLENDED );
         }
-
-        if( p_bottom ) {
-            REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
-            REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
-        } else {
-            REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
-            REG_BLDALPHA = 0xff | ( 0x06 << 8 );
-        }
-        bgUpdate( );
-        IO::updateOAM( p_bottom );
         return tileCnt;
     }
 
     u16 partyScreenUI::initBottomScreen( bool p_bottom ) {
-        IO::clearScreen( p_bottom, false, true );
+        IO::clearScreen( p_bottom );
         if( p_bottom ) {
-            IO::bg2sub = bgInitSub( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
-            bgSetPriority( IO::bg2sub, 2 );
             dmaCopy( partysubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
-            IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
-            bgSetPriority( IO::bg3sub, 3 );
-            bgSetScale( IO::bg3sub, 1 << 7, 1 << 7 );
-            bgSetScroll( IO::bg3sub, 0, 0 );
-            dmaCopy( partybg2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
         } else {
-            IO::bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
-            bgSetPriority( IO::bg2, 2 );
             dmaCopy( partysubBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 256 );
-            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
-            bgSetPriority( IO::bg3, 3 );
-            bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
-            bgSetScroll( IO::bg3, 0, 0 );
-            dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
         }
-        u16* pal = BG_PAL( p_bottom );
 
-        pal[ IO::WHITE_IDX ] = IO::WHITE;
-        pal[ IO::GRAY_IDX ]  = IO::GRAY;
-        pal[ IO::BLACK_IDX ] = IO::BLACK;
-        pal[ IO::BLUE_IDX ]  = RGB( 18, 22, 31 );
-        pal[ IO::RED_IDX ]   = RGB( 31, 18, 18 );
-        pal[ IO::BLUE2_IDX ] = RGB( 0, 0, 25 );
-        pal[ IO::RED2_IDX ]  = RGB( 23, 0, 0 );
-
-        dmaCopy( partybgPal, pal, 3 * 2 );
-        dmaCopy( partysubPal + 3, pal + 3, 8 * 2 );
         IO::initOAMTable( p_bottom );
-        if( p_bottom ) {
-            REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3; //| BLEND_SRC_BG2;
-            REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
-        } else {
-            REG_BLDCNT = BLEND_ALPHA | BLEND_DST_BG3;
-            // | BLEND_SRC_BG2;
-            REG_BLDALPHA = 0xff | ( 0x06 << 8 );
-        }
 
         SpriteEntry* oam     = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         u16          tileCnt = 0;
@@ -624,7 +546,6 @@ namespace STS {
         IO::copySpritePal( arrowPal, SPR_ARROW_X_PAL_SUB, 0, 2 * 4, p_bottom );
         IO::copySpritePal( x_16_16Pal + 4, SPR_ARROW_X_PAL_SUB, 4, 2 * 3, p_bottom );
 
-        bgUpdate( );
         IO::updateOAM( p_bottom );
         return tileCnt;
     }
@@ -722,7 +643,6 @@ namespace STS {
                                  oam[ SPR_PKMN_ICON_OAM( p_pos ) ].y, SPR_PKMN_ICON_OAM( p_pos ),
                                  SPR_PKMN_ICON_PAL( p_pos ),
                                  oam[ SPR_PKMN_ICON_OAM( p_pos ) ].gfxIndex, p_bottom );
-                bgUpdate( );
             }
         } else {
             if( p_redraw ) {
@@ -852,7 +772,6 @@ namespace STS {
                                     OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
                 }
                 IO::updateOAM( p_bottom ); // Shipout fast stuff first
-                bgUpdate( );
                 IO::loadPKMNIcon(
                     _team[ p_pos ].m_boxdata.m_speciesId, oam[ SPR_PKMN_ICON_OAM( p_pos ) ].x,
                     oam[ SPR_PKMN_ICON_OAM( p_pos ) ].y, SPR_PKMN_ICON_OAM( p_pos ),
@@ -923,7 +842,6 @@ namespace STS {
                                  oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].y,
                                  SPR_PKMN_ICON_OAM_SUB( p_pos ), SPR_PKMN_ICON_PAL_SUB( p_pos ),
                                  oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].gfxIndex, p_bottom );
-                bgUpdate( );
             }
         } else {
             if( p_redraw ) {
@@ -934,7 +852,6 @@ namespace STS {
                     = !_team[ p_pos ].m_boxdata.getItem( ); // item
 
                 IO::updateOAM( p_bottom ); // Shipout fast stuff first
-                bgUpdate( );
                 IO::loadPKMNIcon(
                     _team[ p_pos ].m_boxdata.m_speciesId, oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].x,
                     oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].y, SPR_PKMN_ICON_OAM_SUB( p_pos ),
@@ -1101,11 +1018,54 @@ namespace STS {
 
     void partyScreenUI::init( u8 p_initialSelection ) {
         _selectedIdx = p_initialSelection;
-        IO::vramSetup( );
+
+        IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
+        IO::vramSetup( true );
+        IO::bg2sub = bgInitSub( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
+        bgSetPriority( IO::bg2sub, 2 );
+        IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
+        bgSetPriority( IO::bg3sub, 3 );
+
         initTopScreen( );
         initBottomScreen( );
 
         for( u8 i = 0; i < 6; i++ ) { drawPartyPkmn( i, i == _selectedIdx ); }
+
+        IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
+
+        dmaCopy( partybgPal, BG_PALETTE, 3 * 2 );
+        dmaCopy( partybgPal, BG_PALETTE_SUB, 3 * 2 );
+        dmaCopy( partysubPal + 3, BG_PALETTE_SUB + 3, 8 * 2 );
+
+        for( u8 i = 0; i < 2; ++i ) {
+            u16* pal = BG_PAL( i );
+            pal[ IO::WHITE_IDX ] = IO::WHITE;
+            pal[ IO::GRAY_IDX ]  = IO::GRAY;
+            pal[ IO::BLACK_IDX ] = IO::BLACK;
+            pal[ IO::BLUE_IDX ]  = RGB( 18, 22, 31 );
+            pal[ IO::RED_IDX ]   = RGB( 31, 18, 18 );
+            pal[ IO::BLUE2_IDX ] = RGB( 0, 0, 25 );
+            pal[ IO::RED2_IDX ]  = RGB( 23, 0, 0 );
+
+            pal[ 240 ] = RGB( 6, 6, 6 );    // hp bar border color
+            pal[ 241 ] = RGB( 12, 30, 12 ); // hp bar green 1
+            pal[ 242 ] = RGB( 3, 23, 4 );   // hp bar green 2
+            pal[ 243 ] = RGB( 30, 30, 12 ); // hp bar yellow 1
+            pal[ 244 ] = RGB( 23, 23, 5 );  // hp bar yellow 2
+            pal[ 245 ] = RGB( 30, 15, 12 ); // hp bar red 1
+            pal[ 246 ] = RGB( 20, 7, 7 );   // hp bar red 2
+        }
+
+        bgSetScale( IO::bg3sub, 1 << 7, 1 << 7 );
+        bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
+        bgSetScroll( IO::bg3sub, 0, 0 );
+        bgSetScroll( IO::bg3, 0, 0 );
+        dmaCopy( partybg2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
+        dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
+        REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA = 0xff | ( 0x06 << 8 );
         bgUpdate( );
     }
 
@@ -1175,7 +1135,7 @@ namespace STS {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         REG_BLDCNT       = BLEND_ALPHA;
         REG_BLDCNT_SUB   = BLEND_ALPHA;
-        IO::fadeScreen( IO::CLEAR_DARK_FAST );
+        IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE );
         for( u8 i = 0; i < 6; ++i ) {
             bool tmp                                  = oam[ SPR_MARK_OAM( p_idx1, i ) ].isHidden;
             oam[ SPR_MARK_OAM( p_idx1, i ) ].isHidden = oam[ SPR_MARK_OAM( p_idx2, i ) ].isHidden;
@@ -1185,7 +1145,7 @@ namespace STS {
         drawPartyPkmn( p_idx2, p_idx2 == _selectedIdx, true, 0, p_bottom );
         unswap( p_idx1, p_bottom );
         unswap( p_idx2, p_bottom );
-        IO::fadeScreen( IO::UNFADE_FAST );
+        IO::fadeScreen( IO::UNFADE_IMMEDIATE );
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
         REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
         REG_BLDCNT       = BLEND_ALPHA | BLEND_DST_BG3;

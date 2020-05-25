@@ -30,6 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "item.h"
 #include "saveGame.h"
 #include "sound.h"
+#include "statusScreen.h"
 
 #ifdef DESQUID
 #include "ability.h"
@@ -1024,10 +1025,29 @@ namespace STS {
             unmark( _currentSelection );
             computeSelectionChoices( );
             break;
-        case STS::partyScreen::STATUS:
-            // TODO
+        case STS::partyScreen::STATUS: {
+            statusScreen::result stsres;
+            u8 curStsPage = 0;
+            do {
+                statusScreen sts = statusScreen( _team + _currentSelection,
+                        _teamLength > 1, _teamLength > 1 );
+                stsres = sts.run( curStsPage );
+                curStsPage = sts.currentPage( );
+                if( stsres == statusScreen::NEXT_PKMN ) {
+                    _currentSelection = ( _currentSelection + 1 ) % _teamLength;
+                } else if( stsres == statusScreen::PREV_PKMN ) {
+                    _currentSelection = ( _currentSelection + _teamLength - 1 ) % _teamLength;
+                }
+            } while( stsres != statusScreen::BACK && stsres != statusScreen::EXIT );
 
+            if( stsres == statusScreen::EXIT ) {
+                return true;
+            }
+            computeSelectionChoices( );
+            _partyUI->init( _currentSelection );
+            _frame = 0;
             break;
+        }
         case STS::partyScreen::GIVE_ITEM: {
             BAG::bagViewer bv;
             u16            itm = bv.getItem( BAG::bagViewer::GIVE_TO_PKMN );

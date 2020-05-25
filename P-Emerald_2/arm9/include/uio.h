@@ -136,9 +136,9 @@ namespace IO {
     extern PrintConsole Bottom;
     extern PrintConsole Top;
 
-    void initVideo( );
-    void initVideoSub( );
-    void vramSetup( );
+    void initVideo( bool p_noFade = false );
+    void initVideoSub( bool p_noFade = false );
+    void vramSetup( bool p_noFade = false );
 
     void swapScreens( );
     void animateBG( u8 p_frame, int p_bg );

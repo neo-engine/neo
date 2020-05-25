@@ -40,7 +40,7 @@ void initSFX( ) {
 void initSound( ) {
 #ifndef NO_SOUND
     std::string path = ( std::string( SOUND_PATH ) + "sound.msl" );
-    mmInitDefault( (char*) path.c_str( ) );
+    mmInitDefault( const_cast<char*>( path.c_str( ) ) );
     initSFX( );
 #endif
 }

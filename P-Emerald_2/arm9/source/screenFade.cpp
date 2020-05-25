@@ -63,6 +63,11 @@ namespace IO {
             swiWaitForVBlank( );
             break;
         }
+        case IO::UNFADE_IMMEDIATE: {
+            reg = reg2 = 0;
+            swiWaitForVBlank( );
+            break;
+        }
         case IO::CLEAR_DARK_FAST:
             regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
                                | BLEND_SRC_SPRITE;
@@ -73,6 +78,13 @@ namespace IO {
             }
             swiWaitForVBlank( );
             break;
+        case IO::CLEAR_DARK_IMMEDIATE:
+            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+                               | BLEND_SRC_SPRITE;
+            reg = reg2 = 0x1F;
+            swiWaitForVBlank( );
+            break;
+
         case IO::CLEAR_DARK:
         case IO::CAVE_ENTRY:
             regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
@@ -95,6 +107,13 @@ namespace IO {
             }
             swiWaitForVBlank( );
             break;
+        case IO::CLEAR_WHITE_IMMEDIATE:
+            regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+                               | BLEND_SRC_SPRITE;
+            reg = reg2 = 0x1F;
+            swiWaitForVBlank( );
+            break;
+
         case IO::CLEAR_WHITE:
         case IO::CAVE_EXIT:
             regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3

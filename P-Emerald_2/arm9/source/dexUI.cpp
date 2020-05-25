@@ -173,8 +173,7 @@ namespace DEX {
                             DexSub2Pal, DexSub2Tiles, DexSub2TilesLen, false, true, true,
                             OBJPRIORITY_3, true );
             u8   l  = 0;
-            auto jj = {2, 0, 1, 3};
-            if( i > 3 ) jj = {0, 2, 3, 1};
+            auto jj = ( i > 3 ) ? std::vector<u8>({0, 2, 3, 1}) : std::vector<u8>({2, 0, 1, 3});
             for( u8 j : jj ) {
                 tc3 = IO::loadSprite( FRAME_START + 4 * k + l, 0, PAGE_START + 4, tc2,
                                       x + 6 + 40 * ( j % 2 ), y + 2 + 32 * ( j / 2 ), 32, 32,

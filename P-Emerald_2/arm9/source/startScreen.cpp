@@ -101,12 +101,12 @@ namespace SAVE {
         testTeam[ 1 ].m_boxdata.m_moves[ 3 ] = M_ROCK_SMASH;
         testTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
         testTeam[ 2 ].m_boxdata.m_heldItem   = I_YAGO_BERRY;
-        /*
-                STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
-                sts.run( );
-        */
-        STS::statusScreen psts = STS::statusScreen( testTeam );
-        psts.run( );
+
+        STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
+        sts.run( );
+
+        // STS::statusScreen psts = STS::statusScreen( testTeam );
+        // psts.run( );
 
         // END TEST
 

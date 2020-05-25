@@ -67,5 +67,12 @@ namespace STS {
          * @returns an action the player wishes to do
          */
         result run( u8 p_initialPage = 0 );
+
+        /*
+         * @brief Returns the current page.
+         */
+        constexpr u8 currentPage( ) {
+            return _currentPage;
+        }
     };
 } // namespace STS
