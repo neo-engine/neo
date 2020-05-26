@@ -32,15 +32,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemonNames.h"
 #include "saveGame.h"
 
-boxPokemon::boxPokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name,
-                                 u8 p_shiny, bool p_hiddenAbility, bool p_isEgg,
-                                 u8 p_ball, u8 p_pokerus, bool p_fatefulEncounter,
-                                 pkmnData* p_data ) :
-    boxPokemon::boxPokemon( nullptr, p_pkmnId, p_name, p_level,
-            SAVE::SAV.getActiveFile( ).m_id, SAVE::SAV.getActiveFile( ).m_sid,
-            SAVE::SAV.getActiveFile( ).m_playername, !SAVE::SAV.getActiveFile( ).m_isMale,
-            p_shiny, p_hiddenAbility, p_fatefulEncounter, p_isEgg,
-            MAP::curMap->getCurrentLocationId( ), p_ball, p_pokerus, p_forme, p_data ) { }
+boxPokemon::boxPokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 p_shiny,
+                        bool p_hiddenAbility, bool p_isEgg, u8 p_ball, u8 p_pokerus,
+                        bool p_fatefulEncounter, pkmnData* p_data )
+    : boxPokemon::boxPokemon(
+          nullptr, p_pkmnId, p_name, p_level, SAVE::SAV.getActiveFile( ).m_id,
+          SAVE::SAV.getActiveFile( ).m_sid, SAVE::SAV.getActiveFile( ).m_playername,
+          !SAVE::SAV.getActiveFile( ).m_isMale, p_shiny, p_hiddenAbility, p_fatefulEncounter,
+          p_isEgg, MAP::curMap->getCurrentLocationId( ), p_ball, p_pokerus, p_forme, p_data ) {
+}
 
 boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id,
                         u16 p_sid, const char* p_oT, bool p_oTFemale, u8 p_shiny,
@@ -100,7 +100,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
         getLearnMoves( p_pkmnId, 0, p_level, 4, m_moves );
     for( u8 i = 0; i < 4; ++i ) {
         MOVE::moveData mdata = MOVE::getMoveData( m_moves[ i ] );
-        m_curPP[ i ]          = mdata.m_pp;
+        m_curPP[ i ]         = mdata.m_pp;
     }
 
     for( u8 i = 0; i < 6; ++i ) IVset( i, rand( ) & 31 );
@@ -153,7 +153,7 @@ void boxPokemon::setSpecies( u16 p_newSpecies, pkmnData* p_data ) {
     recalculateForme( );
 }
 
-void boxPokemon::setAbility( u8 p_newAbilitySlot, pkmnData* p_data  ) {
+void boxPokemon::setAbility( u8 p_newAbilitySlot, pkmnData* p_data ) {
     pkmnData data;
     if( p_data == nullptr ) {
         data = getPkmnData( getSpecies( ), getForme( ) );

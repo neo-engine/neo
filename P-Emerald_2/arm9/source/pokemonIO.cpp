@@ -39,8 +39,7 @@ bool boxPokemon::learnMove( u16 p_move ) {
     char buffer[ 50 ];
     if( p_move == m_moves[ 0 ] || p_move == m_moves[ 1 ] || p_move == m_moves[ 2 ]
         || p_move == m_moves[ 3 ] ) {
-        snprintf( buffer, 49, GET_STRING( 102 ), m_name,
-                  MOVE::getMoveName( p_move ).c_str( ) );
+        snprintf( buffer, 49, GET_STRING( 102 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
@@ -52,7 +51,7 @@ bool boxPokemon::learnMove( u16 p_move ) {
         for( u8 i = 0; i < 4; ++i )
             if( !m_moves[ i ] ) {
                 m_moves[ i ] = p_move;
-                m_curPP[ i ]  = std::min( m_curPP[ i ], mdata.m_pp );
+                m_curPP[ i ] = std::min( m_curPP[ i ], mdata.m_pp );
 
                 snprintf( buffer, 49, GET_STRING( 103 ), m_name,
                           MOVE::getMoveName( p_move ).c_str( ) );
@@ -87,8 +86,7 @@ bool boxPokemon::learnMove( u16 p_move ) {
                 return false;
         }
     } else {
-        snprintf( buffer, 49, GET_STRING( 107 ), m_name,
-                  MOVE::getMoveName( p_move ).c_str( ) );
+        snprintf( buffer, 49, GET_STRING( 107 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
         IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
         IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
         IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;

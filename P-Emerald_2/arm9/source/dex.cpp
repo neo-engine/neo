@@ -107,7 +107,7 @@ namespace DEX {
             rotateBackward( );
             p_idx = ( p_idx + 8 ) % MAX_PKMN_ALL;
         }
-        _selectedIdx                         = p_idx;
+        _selectedIdx                        = p_idx;
         SAVE::SAV.getActiveFile( ).m_lstDex = CURR_PKMN;
 
         DRAW_TOP( );
@@ -217,7 +217,7 @@ namespace DEX {
                         && GET_AND_WAIT_R( IO::Oam->oamBuffer[ i ].x, IO::Oam->oamBuffer[ i ].y,
                                            IO::Oam->oamBuffer[ i ].x + 32,
                                            IO::Oam->oamBuffer[ i ].y + 28 ) ) {
-                        _selectedIdx                         = i - FRAME_START_2;
+                        _selectedIdx                        = i - FRAME_START_2;
                         SAVE::SAV.getActiveFile( ).m_lstDex = CURR_PKMN;
                         DRAW_TOP( );
                         _dexUI->drawSub( _mode, _curPkmn, _curPkmnStart, _selectedIdx );
@@ -243,4 +243,4 @@ namespace DEX {
             }
         }
     }
-}
+} // namespace DEX

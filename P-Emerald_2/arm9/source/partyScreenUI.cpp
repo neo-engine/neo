@@ -146,7 +146,6 @@ namespace STS {
         IO::smallFont->setColor( IO::WHITE_IDX, 1 );
         IO::smallFont->setColor( IO::GRAY_IDX, 2 );
 
-
         u16 tileCnt = SPR_PKMN_BG_GFX( 3 );
         // preload sprites to avoid position calculations later
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
@@ -940,7 +939,7 @@ namespace STS {
             dmaCopy( partysubPal + 3, BG_PALETTE_SUB + 3, 8 * 2 );
 
             for( u8 i = 0; i < 2; ++i ) {
-                u16* pal = BG_PAL( i );
+                u16* pal             = BG_PAL( i );
                 pal[ IO::WHITE_IDX ] = IO::WHITE;
                 pal[ IO::GRAY_IDX ]  = IO::GRAY;
                 pal[ IO::BLACK_IDX ] = IO::BLACK;
@@ -966,8 +965,8 @@ namespace STS {
             dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
             REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
             REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
-            REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
-            REG_BLDALPHA = 0xff | ( 0x06 << 8 );
+            REG_BLDCNT       = BLEND_ALPHA | BLEND_DST_BG3;
+            REG_BLDALPHA     = 0xff | ( 0x06 << 8 );
             bgUpdate( );
         }
     }

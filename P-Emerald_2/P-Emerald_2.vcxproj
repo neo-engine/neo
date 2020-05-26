@@ -105,7 +105,6 @@
     <ClCompile Include="arm9\source\partyScreen.cpp" />
     <ClCompile Include="arm9\source\partyScreenUI.cpp" />
     <ClCompile Include="arm9\source\pokemon.cpp" />
-    <ClCompile Include="arm9\source\pokemonData.cpp" />
     <ClCompile Include="arm9\source\pokemonIO.cpp" />
     <ClCompile Include="arm9\source\ribbon.cpp" />
     <ClCompile Include="arm9\source\saveGame.cpp" />
@@ -117,7 +116,6 @@
     <ClCompile Include="arm9\source\statusScreen.cpp" />
     <ClCompile Include="arm9\source\statusScreenUI.cpp" />
     <ClCompile Include="arm9\source\strings.cpp" />
-    <ClCompile Include="arm9\source\type.cpp" />
     <ClCompile Include="arm9\source\uio.cpp" />
     <ClCompile Include="arm9\source\yesNoBox.cpp" />
   </ItemGroup>

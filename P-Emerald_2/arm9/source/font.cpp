@@ -59,7 +59,8 @@ namespace IO {
     }
 
     void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                            alignment p_alignment, u8 p_yDistance, s8 p_adjustX, u8 p_layer ) const {
+                            alignment p_alignment, u8 p_yDistance, s8 p_adjustX,
+                            u8 p_layer ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
         if( p_alignment == RIGHT ) putX = p_x - stringWidth( p_string );
@@ -105,7 +106,8 @@ namespace IO {
         }
     }
 
-    void font::printStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom, u8 p_layer ) const {
+    void font::printStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom,
+                             u8 p_layer ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -139,7 +141,8 @@ namespace IO {
         printRectangle( p_x, p_y, p_x + 5, p_y + 9, p_bottom, p_color, p_layer );
     }
 
-    void font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer ) const {
+    void font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
+                              u8 p_layer ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -280,23 +283,25 @@ namespace IO {
     }
 
     void font::printCounter( u32 p_value, u8 p_digits, u16 p_x, u16 p_y, u8 p_highlightDigit,
-            u8 p_highlightBG, u8 p_highlightFG, bool p_bottom, u8 p_layer ) {
+                             u8 p_highlightBG, u8 p_highlightFG, bool p_bottom, u8 p_layer ) {
         for( u8 i = 0; i < p_digits; ++i, p_value /= 10 ) {
             auto old = getColor( 1 );
             if( i == p_highlightDigit ) {
                 IO::printRectangle( p_x + ( p_digits - i - 1 ) * 8, p_y + 2,
-                        p_x + ( p_digits - i ) * 8 - 1, p_y + 14, p_bottom, p_highlightBG, p_layer );
+                                    p_x + ( p_digits - i ) * 8 - 1, p_y + 14, p_bottom,
+                                    p_highlightBG, p_layer );
                 setColor( p_highlightFG, 1 );
             } else {
                 IO::printRectangle( p_x + ( p_digits - i - 1 ) * 8, p_y + 2,
-                        p_x + ( p_digits - i ) * 8 - 1, p_y + 14, p_bottom, 0, p_layer );
+                                    p_x + ( p_digits - i ) * 8 - 1, p_y + 14, p_bottom, 0,
+                                    p_layer );
             }
-            printChar( '0' + ( p_value % 10 ), p_x + ( p_digits - i - 1 ) * 8, p_y, p_bottom, p_layer );
-            if( i == p_highlightDigit ) {
-                setColor( old, 1 );
-            }
-//            printChar( 173, p_x + ( p_digits - i - 1 ) * 8, p_y + 15, p_bottom, p_layer );
-//            printChar( 175, p_x + ( p_digits - i - 1 ) * 8, p_y, p_bottom, p_layer );
+            printChar( '0' + ( p_value % 10 ), p_x + ( p_digits - i - 1 ) * 8, p_y, p_bottom,
+                       p_layer );
+            if( i == p_highlightDigit ) { setColor( old, 1 ); }
+            //            printChar( 173, p_x + ( p_digits - i - 1 ) * 8, p_y + 15, p_bottom,
+            //            p_layer ); printChar( 175, p_x + ( p_digits - i - 1 ) * 8, p_y, p_bottom,
+            //            p_layer );
         }
     }
 } // namespace IO

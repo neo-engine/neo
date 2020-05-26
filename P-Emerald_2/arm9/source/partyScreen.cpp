@@ -951,11 +951,11 @@ namespace STS {
             break;
         case STS::partyScreen::STATUS: {
             statusScreen::result stsres;
-            u8 curStsPage = 0;
+            u8                   curStsPage = 0;
             do {
-                statusScreen sts = statusScreen( _team + _currentSelection,
-                        _teamLength > 1, _teamLength > 1 );
-                stsres = sts.run( curStsPage );
+                statusScreen sts
+                    = statusScreen( _team + _currentSelection, _teamLength > 1, _teamLength > 1 );
+                stsres     = sts.run( curStsPage );
                 curStsPage = sts.currentPage( );
                 if( stsres == statusScreen::NEXT_PKMN ) {
                     _currentSelection = ( _currentSelection + 1 ) % _teamLength;
@@ -964,9 +964,7 @@ namespace STS {
                 }
             } while( stsres != statusScreen::BACK && stsres != statusScreen::EXIT );
 
-            if( stsres == statusScreen::EXIT ) {
-                return true;
-            }
+            if( stsres == statusScreen::EXIT ) { return true; }
             computeSelectionChoices( );
             _partyUI->init( _currentSelection );
             _frame = 0;

@@ -173,7 +173,7 @@ namespace DEX {
                             DexSub2Pal, DexSub2Tiles, DexSub2TilesLen, false, true, true,
                             OBJPRIORITY_3, true );
             u8   l  = 0;
-            auto jj = ( i > 3 ) ? std::vector<u8>({0, 2, 3, 1}) : std::vector<u8>({2, 0, 1, 3});
+            auto jj = ( i > 3 ) ? std::vector<u8>( {0, 2, 3, 1} ) : std::vector<u8>( {2, 0, 1, 3} );
             for( u8 j : jj ) {
                 tc3 = IO::loadSprite( FRAME_START + 4 * k + l, 0, PAGE_START + 4, tc2,
                                       x + 6 + 40 * ( j % 2 ), y + 2 + 32 * ( j / 2 ), 32, 32,
@@ -344,12 +344,11 @@ namespace DEX {
                     dmaCopy( DexTop32Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
                     dmaCopy( DexTop32Pal + 64, BG_PALETTE + 64, 256 );
                 }
-                IO::loadItemIcon( data.m_preEvolution, 8, 20,
-                                  PKMN_SPRITE_START( 2 ), 2,
+                IO::loadItemIcon( data.m_preEvolution, 8, 20, PKMN_SPRITE_START( 2 ), 2,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
                 consoleSetWindow( &IO::Top, 6, 4, 15, 1 );
-                printf( GET_STRING( 132 ), ITEM::getItemName( data.m_preEvolution,
-                            CURRENT_LANGUAGE ).c_str( ) );
+                printf( GET_STRING( 132 ),
+                        ITEM::getItemName( data.m_preEvolution, CURRENT_LANGUAGE ).c_str( ) );
                 break;
             }
             switch( data.m_types[ 0 ] ) {
@@ -411,7 +410,7 @@ namespace DEX {
                 break;
             }
 
-            BG_PALETTE[ 251 ]       = RGB15( 3, 3, 3 );
+            BG_PALETTE[ 251 ]           = RGB15( 3, 3, 3 );
             BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
             BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
 
@@ -472,8 +471,8 @@ namespace DEX {
             consoleSetWindow( &IO::Top, 3, 22, 32, 23 );
             if( strlen( data.m_species ) >= 13 ) consoleSetWindow( &IO::Top, 2, 22, 32, 23 );
             if( strlen( data.m_species ) == 8 || strlen( data.m_species ) == 9 ) printf( " " );
-            printf( "%8s %4.1fm %5.1fkg", data.m_species,
-                    data.m_size / 10.0, data.m_weight / 10.0 );
+            printf( "%8s %4.1fm %5.1fkg", data.m_species, data.m_size / 10.0,
+                    data.m_weight / 10.0 );
             break;
         }
         case 1: {
@@ -493,7 +492,7 @@ namespace DEX {
             else
                 FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/", "JohtoMap" );
 
-            BG_PALETTE[ 251 ]       = RGB15( 3, 3, 3 );
+            BG_PALETTE[ 251 ]           = RGB15( 3, 3, 3 );
             BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
             BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
 
@@ -566,8 +565,7 @@ namespace DEX {
                 IO::printRectangle( IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].x + 3,
                                     IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].y + 2,
                                     IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].x + 29,
-                                    IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].y + 25, true,
-                                     0 );
+                                    IO::Oam->oamBuffer[ FRAME_START + p_oldIdx ].y + 25, true, 0 );
 
             if( 12 <= p_selectedIdx && p_selectedIdx < 16 ) {
                 if( IO::Oam->oamBuffer[ BG_SPR_START + 2 * 3 ].x == 88 - 44 ) moveAll( +44 );
@@ -605,4 +603,4 @@ namespace DEX {
         }
         IO::updateOAM( true );
     }
-}
+} // namespace DEX

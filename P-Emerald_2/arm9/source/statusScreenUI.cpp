@@ -63,16 +63,21 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "infopage2.h"
 #include "infopage3.h"
 #include "infopage4.h"
+#include "window1.h"
+#include "window2.h"
+#include "window3.h"
 
 namespace STS {
     // top screen sprites
-#define SPR_INOFPAGE_START_OAM 0
-#define SPR_PKMN_START_OAM 8
-#define SPR_ITEM_OAM 12
+#define SPR_WINDOW_START_OAM 0
+#define SPR_INFOPAGE_START_OAM 5
+#define SPR_PKMN_START_OAM 13
+#define SPR_ITEM_OAM 14
 
 #define SPR_INOFPAGE_PAL 0
 #define SPR_PKMN_PAL 1
 #define SPR_ITEM_PAL 2
+#define SPR_WINDOW_PAL 3
 
     u16 statusScreenUI::initTopScreen( bool p_bottom ) {
         IO::clearScreen( p_bottom, false, true );
@@ -97,34 +102,53 @@ namespace STS {
 #define INFO_X 104
 #define INFO_Y 36
 
-        IO::loadSprite( SPR_INOFPAGE_START_OAM, SPR_INOFPAGE_PAL, tileCnt, INFO_X, INFO_Y, 64, 64,
+        IO::loadSprite( SPR_INFOPAGE_START_OAM, SPR_INOFPAGE_PAL, tileCnt, INFO_X, INFO_Y, 64, 64,
                         0, 0, infopage1TilesLen, false, false, false, OBJPRIORITY_3, p_bottom,
                         OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( SPR_INOFPAGE_START_OAM + 7, SPR_INOFPAGE_PAL, tileCnt,
+        tileCnt = IO::loadSprite( SPR_INFOPAGE_START_OAM + 7, SPR_INOFPAGE_PAL, tileCnt,
                                   INFO_X + 64, INFO_Y + 64 + 15, 64, 64, infopage1Pal,
                                   infopage1Tiles, infopage1TilesLen, true, true, false,
                                   OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-        IO::loadSprite( SPR_INOFPAGE_START_OAM + 1, SPR_INOFPAGE_PAL, tileCnt, INFO_X + 64, INFO_Y,
+        IO::loadSprite( SPR_INFOPAGE_START_OAM + 1, SPR_INOFPAGE_PAL, tileCnt, INFO_X + 64, INFO_Y,
                         64, 64, 0, 0, infopage2TilesLen, false, false, false, OBJPRIORITY_3,
                         p_bottom, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( SPR_INOFPAGE_START_OAM + 6, SPR_INOFPAGE_PAL, tileCnt, INFO_X,
+        tileCnt = IO::loadSprite( SPR_INFOPAGE_START_OAM + 6, SPR_INOFPAGE_PAL, tileCnt, INFO_X,
                                   INFO_Y + 64 + 15, 64, 64, infopage2Pal, infopage2Tiles,
                                   infopage2TilesLen, true, true, false, OBJPRIORITY_3, p_bottom,
                                   OBJMODE_BLENDED );
-        IO::loadSprite( SPR_INOFPAGE_START_OAM + 2, SPR_INOFPAGE_PAL, tileCnt, INFO_X, INFO_Y + 64,
+        IO::loadSprite( SPR_INFOPAGE_START_OAM + 2, SPR_INOFPAGE_PAL, tileCnt, INFO_X, INFO_Y + 64,
                         32, 16, 0, 0, infopage3TilesLen, false, false, false, OBJPRIORITY_3,
                         p_bottom, OBJMODE_BLENDED );
         tileCnt
-            = IO::loadSprite( SPR_INOFPAGE_START_OAM + 5, SPR_INOFPAGE_PAL, tileCnt, INFO_X + 96,
+            = IO::loadSprite( SPR_INFOPAGE_START_OAM + 5, SPR_INOFPAGE_PAL, tileCnt, INFO_X + 96,
                               INFO_Y + 63, 32, 16, infopage3Pal, infopage3Tiles, infopage3TilesLen,
                               true, true, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-        IO::loadSprite( SPR_INOFPAGE_START_OAM + 3, SPR_INOFPAGE_PAL, tileCnt, INFO_X + 32,
+        IO::loadSprite( SPR_INFOPAGE_START_OAM + 3, SPR_INOFPAGE_PAL, tileCnt, INFO_X + 32,
                         INFO_Y + 64, 32, 16, 0, 0, infopage4TilesLen, false, false, false,
                         OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
         tileCnt
-            = IO::loadSprite( SPR_INOFPAGE_START_OAM + 4, SPR_INOFPAGE_PAL, tileCnt, INFO_X + 64,
+            = IO::loadSprite( SPR_INFOPAGE_START_OAM + 4, SPR_INOFPAGE_PAL, tileCnt, INFO_X + 64,
                               INFO_Y + 63, 32, 16, infopage4Pal, infopage4Tiles, infopage4TilesLen,
                               true, true, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+
+        // Window
+
+        tileCnt = IO::loadSprite( SPR_WINDOW_START_OAM, SPR_WINDOW_PAL, tileCnt, INFO_X, INFO_Y, 64,
+                                  32, window1Pal, window1Tiles, window1TilesLen, false, false,
+                                  false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        IO::loadSprite( SPR_WINDOW_START_OAM + 1, SPR_WINDOW_PAL, tileCnt, INFO_X, INFO_Y + 32, 64,
+                        32, 0, 0, window2TilesLen, false, false, false, OBJPRIORITY_3, p_bottom,
+                        OBJMODE_BLENDED );
+        IO::loadSprite( SPR_WINDOW_START_OAM + 2, SPR_WINDOW_PAL, tileCnt, INFO_X, INFO_Y + 32 + 30,
+                        64, 32, 0, 0, window2TilesLen, false, false, false, OBJPRIORITY_3, p_bottom,
+                        OBJMODE_BLENDED );
+        tileCnt
+            = IO::loadSprite( SPR_WINDOW_START_OAM + 3, SPR_WINDOW_PAL, tileCnt, INFO_X,
+                              INFO_Y + 64 + 28, 64, 32, window1Pal, window2Tiles, window2TilesLen,
+                              false, false, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( SPR_WINDOW_START_OAM + 4, SPR_WINDOW_PAL, tileCnt, INFO_X,
+                                  INFO_Y + 111, 64, 32, window3Pal, window3Tiles, window3TilesLen,
+                                  false, false, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
 
         // Pkmn Sprite
         tileCnt = IO::loadSprite( SPR_PKMN_START_OAM, SPR_PKMN_PAL, tileCnt, 8, 54, 64, 64, 0, 0,
@@ -168,15 +192,15 @@ namespace STS {
         if( !p_pokemon->isEgg( ) ) {
             // Load correct sprite
             IO::loadPKMNSprite( p_pokemon->getSpecies( ), oam[ SPR_PKMN_START_OAM ].x,
-                    oam[ SPR_PKMN_START_OAM ].y, SPR_PKMN_START_OAM, SPR_PKMN_PAL,
-                    oam[ SPR_PKMN_START_OAM ].gfxIndex, p_bottom, p_pokemon->isShiny( ),
-                    p_pokemon->isFemale( ), true, false, p_pokemon->getForme( ) );
+                                oam[ SPR_PKMN_START_OAM ].y, SPR_PKMN_START_OAM, SPR_PKMN_PAL,
+                                oam[ SPR_PKMN_START_OAM ].gfxIndex, p_bottom, p_pokemon->isShiny( ),
+                                p_pokemon->isFemale( ), true, false, p_pokemon->getForme( ) );
 
             IO::regularFont->printString( p_pokemon->m_boxdata.m_name, 12, 34, p_bottom );
         } else {
-            IO::loadEggSprite( oam[ SPR_PKMN_START_OAM ].x,
-                    oam[ SPR_PKMN_START_OAM ].y, SPR_PKMN_START_OAM, SPR_PKMN_PAL,
-                    oam[ SPR_PKMN_START_OAM ].gfxIndex, p_bottom );
+            IO::loadEggSprite( oam[ SPR_PKMN_START_OAM ].x, oam[ SPR_PKMN_START_OAM ].y,
+                               SPR_PKMN_START_OAM, SPR_PKMN_PAL, oam[ SPR_PKMN_START_OAM ].gfxIndex,
+                               p_bottom );
 
             IO::regularFont->printString( GET_STRING( 34 ), 12, 34, p_bottom );
         }
@@ -216,7 +240,7 @@ namespace STS {
         dmaCopy( statussubPal + 3, BG_PALETTE_SUB + 3, 8 * 2 );
 
         for( u8 i = 0; i < 2; ++i ) {
-            u16* pal = BG_PAL( i );
+            u16* pal             = BG_PAL( i );
             pal[ IO::WHITE_IDX ] = IO::WHITE;
             pal[ IO::GRAY_IDX ]  = IO::GRAY;
             pal[ IO::BLACK_IDX ] = IO::BLACK;
@@ -242,8 +266,8 @@ namespace STS {
         dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
         REG_BLDALPHA_SUB = 0xff | ( 0x05 << 8 );
-        REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
-        REG_BLDALPHA = 0xff | ( 0x05 << 8 );
+        REG_BLDCNT       = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA     = 0xff | ( 0x05 << 8 );
         bgUpdate( );
     }
 

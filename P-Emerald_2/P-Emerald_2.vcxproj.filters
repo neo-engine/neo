@@ -290,9 +290,6 @@
     <ClCompile Include="arm9\source\pokemon.cpp">
       <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\type.cpp">
-      <Filter>Source Files\arm9\data structures</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\fs.cpp">
       <Filter>Source Files\arm9\fs</Filter>
     </ClCompile>
@@ -408,9 +405,6 @@
       <Filter>Source Files\arm9\battle</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\boxPokemon.cpp">
-      <Filter>Source Files\arm9\data structures</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\pokemonData.cpp">
       <Filter>Source Files\arm9\data structures</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\sound.cpp">

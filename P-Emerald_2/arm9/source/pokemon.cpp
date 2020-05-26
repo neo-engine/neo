@@ -33,35 +33,35 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 
 pokemon::pokemon( boxPokemon& p_boxPokemon ) : m_boxdata( p_boxPokemon ) {
-    pkmnData data       = getPkmnData( p_boxPokemon.m_speciesId, p_boxPokemon.getForme( ) );
-    m_level             = calcLevel( p_boxPokemon, &data );
-    m_stats             = calcStats( m_boxdata, m_level, &data );
+    pkmnData data = getPkmnData( p_boxPokemon.m_speciesId, p_boxPokemon.getForme( ) );
+    m_level       = calcLevel( p_boxPokemon, &data );
+    m_stats       = calcStats( m_boxdata, m_level, &data );
     m_battleForme = 0;
-    m_statusint = 0;
+    m_statusint   = 0;
 }
 pokemon::pokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 p_shiny,
                   bool p_hiddenAbility, bool p_isEgg, u8 p_ball, u8 p_pokerus,
                   bool p_fatefulEncounter ) {
-    pkmnData data       = getPkmnData( p_pkmnId, p_forme );
-    m_boxdata           = boxPokemon( p_pkmnId, p_level, p_forme, p_name, p_shiny,
-            p_hiddenAbility, p_isEgg, p_ball, p_pokerus,  p_fatefulEncounter, &data );
-    m_level             = p_level;
-    m_stats             = calcStats( m_boxdata, p_level, &data );
+    pkmnData data = getPkmnData( p_pkmnId, p_forme );
+    m_boxdata = boxPokemon( p_pkmnId, p_level, p_forme, p_name, p_shiny, p_hiddenAbility, p_isEgg,
+                            p_ball, p_pokerus, p_fatefulEncounter, &data );
+    m_level   = p_level;
+    m_stats   = calcStats( m_boxdata, p_level, &data );
     m_battleForme = 0;
-    m_statusint = 0;
+    m_statusint   = 0;
 }
 pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id, u16 p_sid,
                   const char* p_oT, bool p_oTFemale, u8 p_shiny, bool p_hiddenAbility,
                   bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace, u8 p_ball, u8 p_pokerus,
                   u8 p_forme ) {
-    pkmnData data       = getPkmnData( p_pkmnId, p_forme );
-    m_boxdata           = boxPokemon( p_moves, p_pkmnId, p_name, p_level, p_id,
-            p_sid, p_oT, p_oTFemale, p_shiny, p_hiddenAbility, p_fatefulEncounter, p_isEgg,
-            p_gotPlace, p_ball, p_pokerus, p_forme, &data );
-    m_level             = p_level;
-    m_stats             = calcStats( m_boxdata, p_level, &data );
+    pkmnData data = getPkmnData( p_pkmnId, p_forme );
+    m_boxdata     = boxPokemon( p_moves, p_pkmnId, p_name, p_level, p_id, p_sid, p_oT, p_oTFemale,
+                            p_shiny, p_hiddenAbility, p_fatefulEncounter, p_isEgg, p_gotPlace,
+                            p_ball, p_pokerus, p_forme, &data );
+    m_level       = p_level;
+    m_stats       = calcStats( m_boxdata, p_level, &data );
     m_battleForme = 0;
-    m_statusint = 0;
+    m_statusint   = 0;
 }
 pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
     pkmnData data = getPkmnData( p_trainerPokemon.m_speciesId, p_trainerPokemon.m_forme );
@@ -73,16 +73,14 @@ pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
     m_boxdata.m_heldItem = p_trainerPokemon.m_heldItem;
     memcpy( m_boxdata.m_moves, p_trainerPokemon.m_moves, sizeof( m_boxdata.m_moves ) );
     memcpy( m_boxdata.m_effortValues, p_trainerPokemon.m_ev, sizeof( m_boxdata.m_effortValues ) );
-    for( u8 i = 0; i < 6; ++i ) {
-        m_boxdata.IVset( i, p_trainerPokemon.m_iv[ i ] );
-    }
-    m_stats             = calcStats( m_boxdata, m_level, &data );
+    for( u8 i = 0; i < 6; ++i ) { m_boxdata.IVset( i, p_trainerPokemon.m_iv[ i ] ); }
+    m_stats       = calcStats( m_boxdata, m_level, &data );
     m_battleForme = 0;
-    m_statusint = 0;
+    m_statusint   = 0;
 }
 
 bool pokemon::heal( ) {
-    bool change    = m_stats.m_curHP < m_stats.m_maxHP;
+    bool change     = m_stats.m_curHP < m_stats.m_maxHP;
     m_stats.m_curHP = m_stats.m_maxHP;
 
     change |= !!m_statusint;
@@ -120,8 +118,8 @@ void pokemon::recalculateStats( ) {
 }
 
 void pokemon::recalculateStats( pkmnData& p_data ) {
-    auto HPdif     = m_stats.m_maxHP - m_stats.m_curHP;
-    m_stats        = calcStats( m_boxdata, m_level, &p_data );
+    auto HPdif = m_stats.m_maxHP - m_stats.m_curHP;
+    m_stats    = calcStats( m_boxdata, m_level, &p_data );
     if( m_stats.m_maxHP < HPdif ) {
         m_stats.m_curHP = 0;
     } else {
@@ -175,7 +173,7 @@ bool pokemon::setExperience( u32 p_amount ) {
     pkmnData data = getPkmnData( m_boxdata.m_speciesId, getForme( ) );
 
     m_boxdata.m_experienceGained = std::min( p_amount, EXP[ 99 ][ data.getExpType( ) ] );
-    m_level = calcLevel( m_boxdata, &data );
+    m_level                      = calcLevel( m_boxdata, &data );
     recalculateStats( data );
     return true;
 }
@@ -213,9 +211,9 @@ pokemon::stats calcStats( boxPokemon& p_boxdata, u8 p_level, const pkmnData* p_d
     u16            pkmnId = p_boxdata.m_speciesId;
     if( pkmnId != PKMN_SHEDINJA )
         res.m_curHP = res.m_maxHP = ( ( p_boxdata.IVget( 0 ) + 2 * p_data->m_baseForme.m_bases[ 0 ]
-                                       + ( p_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )
-                                     * p_level / 100 )
-                                   + 10;
+                                        + ( p_boxdata.m_effortValues[ 0 ] / 4 ) + 100 )
+                                      * p_level / 100 )
+                                    + 10;
     else
         res.m_curHP = res.m_maxHP = 1;
     pkmnNatures nature = p_boxdata.getNature( );
@@ -240,16 +238,16 @@ u16 calcLevel( boxPokemon& p_boxdata, const pkmnData* p_data ) {
 
 void pokemon::giveItem( u16 p_newItem ) {
     m_boxdata.giveItem( p_newItem );
-    pkmnData data  = getPkmnData( m_boxdata.m_speciesId, m_boxdata.getForme( ) );
-    auto     oldHP = m_stats.m_maxHP - m_stats.m_curHP;
-    m_stats        = calcStats( m_boxdata, m_level, &data );
+    pkmnData data   = getPkmnData( m_boxdata.m_speciesId, m_boxdata.getForme( ) );
+    auto     oldHP  = m_stats.m_maxHP - m_stats.m_curHP;
+    m_stats         = calcStats( m_boxdata, m_level, &data );
     m_stats.m_curHP = m_stats.m_maxHP - oldHP;
 }
 u16 pokemon::takeItem( ) {
-    u16      res   = m_boxdata.takeItem( );
-    pkmnData data  = getPkmnData( m_boxdata.m_speciesId, m_boxdata.getForme( ) );
-    auto     oldHP = m_stats.m_maxHP - m_stats.m_curHP;
-    m_stats        = calcStats( m_boxdata, m_level, &data );
+    u16      res    = m_boxdata.takeItem( );
+    pkmnData data   = getPkmnData( m_boxdata.m_speciesId, m_boxdata.getForme( ) );
+    auto     oldHP  = m_stats.m_maxHP - m_stats.m_curHP;
+    m_stats         = calcStats( m_boxdata, m_level, &data );
     m_stats.m_curHP = m_stats.m_maxHP - oldHP;
     return res;
 }
