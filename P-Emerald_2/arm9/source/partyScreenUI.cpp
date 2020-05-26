@@ -119,10 +119,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_ITEM_ICON_PAL_SUB 8
 #define SPR_ARROW_X_PAL_SUB 9
 #define SPR_BOX_PAL_SUB 10
-#define SPR_TYPE_PAL_SUB( p_pos ) ( 11 + ( p_pos ) )
-#define SPR_ITEM_PAL_SUB 15
-
-#define SPR_PKMN_BG_GFX_SUB( p_type ) ( 0x40 * 2 * ( p_type ) )
+#define SPR_ITEM_PAL_SUB 11
 
 namespace STS {
     char BUFFER[ 50 ];
@@ -929,6 +926,50 @@ namespace STS {
         oam[ SPR_PAGE_RIGHT_OAM_SUB ].isHidden  = !p_nextButton;
         oam[ SPR_ARROW_RIGHT_OAM_SUB ].isHidden = !p_nextButton;
         IO::updateOAM( p_bottom );
+
+        if( _needsInit ) {
+            _needsInit = false;
+            dmaCopy( partybgPal, BG_PALETTE, 3 * 2 );
+            dmaCopy( partybgPal, BG_PALETTE_SUB, 3 * 2 );
+            dmaCopy( partysubPal + 3, BG_PALETTE_SUB + 3, 8 * 2 );
+
+            IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
+
+            dmaCopy( partybgPal, BG_PALETTE, 3 * 2 );
+            dmaCopy( partybgPal, BG_PALETTE_SUB, 3 * 2 );
+            dmaCopy( partysubPal + 3, BG_PALETTE_SUB + 3, 8 * 2 );
+
+            for( u8 i = 0; i < 2; ++i ) {
+                u16* pal = BG_PAL( i );
+                pal[ IO::WHITE_IDX ] = IO::WHITE;
+                pal[ IO::GRAY_IDX ]  = IO::GRAY;
+                pal[ IO::BLACK_IDX ] = IO::BLACK;
+                pal[ IO::BLUE_IDX ]  = RGB( 18, 22, 31 );
+                pal[ IO::RED_IDX ]   = RGB( 31, 18, 18 );
+                pal[ IO::BLUE2_IDX ] = RGB( 0, 0, 25 );
+                pal[ IO::RED2_IDX ]  = RGB( 23, 0, 0 );
+
+                pal[ 240 ] = RGB( 6, 6, 6 );    // hp bar border color
+                pal[ 241 ] = RGB( 12, 30, 12 ); // hp bar green 1
+                pal[ 242 ] = RGB( 3, 23, 4 );   // hp bar green 2
+                pal[ 243 ] = RGB( 30, 30, 12 ); // hp bar yellow 1
+                pal[ 244 ] = RGB( 23, 23, 5 );  // hp bar yellow 2
+                pal[ 245 ] = RGB( 30, 15, 12 ); // hp bar red 1
+                pal[ 246 ] = RGB( 20, 7, 7 );   // hp bar red 2
+            }
+
+            bgSetScale( IO::bg3sub, 1 << 7, 1 << 7 );
+            bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
+            bgSetScroll( IO::bg3sub, 0, 0 );
+            bgSetScroll( IO::bg3, 0, 0 );
+            dmaCopy( partybg2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
+            dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+            REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
+            REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
+            REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
+            REG_BLDALPHA = 0xff | ( 0x06 << 8 );
+            bgUpdate( );
+        }
     }
 
     std::pair<u16, u16> partyScreenUI::getChoiceAnchorPosition( u8 p_choiceIdx, bool p_bottom ) {
@@ -1030,43 +1071,7 @@ namespace STS {
         initBottomScreen( );
 
         for( u8 i = 0; i < 6; i++ ) { drawPartyPkmn( i, i == _selectedIdx ); }
-
-        IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
-
-        dmaCopy( partybgPal, BG_PALETTE, 3 * 2 );
-        dmaCopy( partybgPal, BG_PALETTE_SUB, 3 * 2 );
-        dmaCopy( partysubPal + 3, BG_PALETTE_SUB + 3, 8 * 2 );
-
-        for( u8 i = 0; i < 2; ++i ) {
-            u16* pal = BG_PAL( i );
-            pal[ IO::WHITE_IDX ] = IO::WHITE;
-            pal[ IO::GRAY_IDX ]  = IO::GRAY;
-            pal[ IO::BLACK_IDX ] = IO::BLACK;
-            pal[ IO::BLUE_IDX ]  = RGB( 18, 22, 31 );
-            pal[ IO::RED_IDX ]   = RGB( 31, 18, 18 );
-            pal[ IO::BLUE2_IDX ] = RGB( 0, 0, 25 );
-            pal[ IO::RED2_IDX ]  = RGB( 23, 0, 0 );
-
-            pal[ 240 ] = RGB( 6, 6, 6 );    // hp bar border color
-            pal[ 241 ] = RGB( 12, 30, 12 ); // hp bar green 1
-            pal[ 242 ] = RGB( 3, 23, 4 );   // hp bar green 2
-            pal[ 243 ] = RGB( 30, 30, 12 ); // hp bar yellow 1
-            pal[ 244 ] = RGB( 23, 23, 5 );  // hp bar yellow 2
-            pal[ 245 ] = RGB( 30, 15, 12 ); // hp bar red 1
-            pal[ 246 ] = RGB( 20, 7, 7 );   // hp bar red 2
-        }
-
-        bgSetScale( IO::bg3sub, 1 << 7, 1 << 7 );
-        bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
-        bgSetScroll( IO::bg3sub, 0, 0 );
-        bgSetScroll( IO::bg3, 0, 0 );
-        dmaCopy( partybg2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
-        dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
-        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
-        REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
-        REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
-        REG_BLDALPHA = 0xff | ( 0x06 << 8 );
-        bgUpdate( );
+        _needsInit = true;
     }
 
     void partyScreenUI::animate( u8 p_frame ) {

@@ -57,7 +57,31 @@ namespace ITEM {
     /*
      * @brief: Compute itemtype character.
      */
-    u16 getItemChar( const u8 p_itemType );
+    constexpr u16 getItemChar( const u8 p_itemType ) {
+        if( p_itemType & ITEMTYPE_BERRY ) { return 473; }
+
+        auto itemType = ( p_itemType & 15 );
+
+        switch( itemType ) {
+        case ITEMTYPE_POKEBALL:
+            return 474;
+        case ITEMTYPE_BATTLEITEM:
+            return 475;
+        case ITEMTYPE_COLLECTIBLE:
+        case ITEMTYPE_USABLE:
+        case ITEMTYPE_EVOLUTION:
+            return 468;
+        case ITEMTYPE_MEDICINE:
+            return 472;
+        case ITEMTYPE_FORMECHANGE:
+        case ITEMTYPE_KEYITEM:
+            return 469;
+        case ITEMTYPE_TM:
+            return 470;
+        default:
+            return ' ';
+        }
+    }
 
     bool        getItemName( const u16 p_itemId, const u8 p_language, char* p_out );
     std::string getItemName( const u16 p_itemId, const u8 p_language );

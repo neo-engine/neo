@@ -93,8 +93,8 @@ namespace BATTLE {
     //////////////////////////////////////////////////////////////////////////
     // BEGIN BATTLE_UI
     //////////////////////////////////////////////////////////////////////////
-#define C2I( a ) ( ( a ) - '0' )
 #if false
+#define C2I( a ) ( ( a ) - '0' )
     std::string battleUI::parseLogCmd( const std::string& p_cmd ) {
         if( p_cmd == "A" ) return "`";
         if( p_cmd == "CLEAR" ) return "";

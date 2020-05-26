@@ -40,7 +40,6 @@
 namespace SAVE {
     saveGame SAV;
 
-#define PKMN_DATALENGTH 128
     void saveGame::playerInfo::clear( ) {
         std::memset( this, 0, sizeof( saveGame::playerInfo ) );
     }

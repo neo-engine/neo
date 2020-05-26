@@ -539,7 +539,7 @@ namespace IO {
 
     char BUFFER[ 100 ];
 
-    bool existsPKMNSprite( const u16 p_pkmnId, bool p_flipx, bool p_female ) {
+    constexpr bool existsPKMNSprite( const u16 p_pkmnId, bool p_flipx, bool p_female ) {
         if( p_flipx ) {
             switch( p_pkmnId ) {
                 case PKMN_UNOWN:

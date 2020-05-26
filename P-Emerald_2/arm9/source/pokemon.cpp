@@ -225,7 +225,7 @@ pokemon::stats calcStats( boxPokemon& p_boxdata, u8 p_level, const pkmnData* p_d
                               + ( p_boxdata.m_effortValues[ i ] >> 2 ) )
                             * p_level / 100.0 )
                           + 5 )
-                            * NatMod[ nature ][ i - 1 ] );
+                            * NatMod[ nature ][ i - 1 ] / 10 );
     }
     return res;
 }

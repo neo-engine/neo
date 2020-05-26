@@ -51,8 +51,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace BOX {
 #define ARROW_ID 1
 #define HELD_PKMN 2
-#define FWD_ICON 3
-#define BWD_ICON 4
+// #define FWD_ICON 3
+// #define BWD_ICON 4
 #define PKMN_START 10
 #define PKMN_PALETTE_START 15
 #define PKMN_TILES_START 96 + 182

@@ -29,20 +29,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "mapSprite.h"
 
 namespace MAP {
-    u8 getFrame( direction p_direction ) {
-        switch( p_direction ) {
-        case MAP::UP:
-            return 3;
-        case MAP::RIGHT:
-            return 9;
-        case MAP::DOWN:
-            return 0;
-        case MAP::LEFT:
-            return 6;
-        }
-        return 0;
-    }
-
     void mapObject::interact( ) {
     }
 

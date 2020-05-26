@@ -172,11 +172,11 @@ struct boxPokemon {
         return ( max * 5 ) + ( maxval % 5 );
     }
     constexpr int getTasteStr( ) {
-        if( NatMod[ getNature( ) ][ 0 ] == 1.1 ) return 0;
-        if( NatMod[ getNature( ) ][ 1 ] == 1.1 ) return 1;
-        if( NatMod[ getNature( ) ][ 2 ] == 1.1 ) return 2;
-        if( NatMod[ getNature( ) ][ 3 ] == 1.1 ) return 3;
-        if( NatMod[ getNature( ) ][ 4 ] == 1.1 )
+        if( NatMod[ getNature( ) ][ 0 ] == 11 ) return 0;
+        if( NatMod[ getNature( ) ][ 1 ] == 11 ) return 1;
+        if( NatMod[ getNature( ) ][ 2 ] == 11 ) return 2;
+        if( NatMod[ getNature( ) ][ 3 ] == 11 ) return 3;
+        if( NatMod[ getNature( ) ][ 4 ] == 11 )
             return 4;
         else
             return 5;

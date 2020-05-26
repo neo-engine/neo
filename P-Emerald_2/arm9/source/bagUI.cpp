@@ -67,7 +67,7 @@ namespace BAG {
     //#define BACK_ID 0
 #define PKMN_SUB 1
 #define BAG_SUB 7
-#define SORT_SUB 12
+    //#define SORT_SUB 12
     //#define UP_SUB 13
     //#define DOWN_SUB 14
 #define TRANSFER_SUB 15

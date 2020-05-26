@@ -100,12 +100,73 @@ namespace STS {
             std::string getString( );
         };
 
-        const u16 getTextForDesquidChoice( const desquidChoice p_choice );
+        constexpr u16 getTextForDesquidChoice( const desquidChoice p_choice ) {
+            switch( p_choice ) {
+                case DESQUID_SPECIES:
+                    return DESQUID_STRING + 1;
+                case DESQUID_STATUS:
+                    return DESQUID_STRING + 2;
+                case DESQUID_EGG:
+                    return DESQUID_STRING + 3;
+                case DESQUID_NATURE:
+                    return DESQUID_STRING + 4;
+                case DESQUID_ITEM:
+                    return DESQUID_STRING + 5;
+                case DESQUID_MOVES:
+                    return DESQUID_STRING + 6;
+                case DESQUID_IV:
+                    return DESQUID_STRING + 7;
+                case DESQUID_EV:
+                    return DESQUID_STRING + 8;
+                case DESQUID_DUPLICATE:
+                    return DESQUID_STRING + 9;
+                case DESQUID_DELETE:
+                    return DESQUID_STRING + 10;
+                case DESQUID_HEAL:
+                    return DESQUID_STRING + 11;
+                case DESQUID_CANCEL:
+                    return 330;
+            }
+            return 0;
+        }
 
         std::vector<desquidItem> getDesquidItemsForChoice( const desquidChoice p_choice );
 #endif
-
-        const u16 getTextForChoice( const choice p_choice );
+        constexpr u16 getTextForChoice( const choice p_choice ) {
+            switch( p_choice ) {
+                case SELECT:
+                    return 323;
+                case UNSELECT:
+                    return 331;
+                case STATUS:
+                    return 324;
+                case GIVE_ITEM:
+                    return 325;
+                case TAKE_ITEM:
+                    return 326;
+                case USE_ITEM:
+                    return 327;
+                case FIELD_MOVE_1:
+                    return CHOICE_FIELD_MOVE | 0;
+                case FIELD_MOVE_2:
+                    return CHOICE_FIELD_MOVE | 1;
+                case FIELD_MOVE_3:
+                    return CHOICE_FIELD_MOVE | 2;
+                case FIELD_MOVE_4:
+                    return CHOICE_FIELD_MOVE | 3;
+                case SWAP:
+                    return 328;
+                case DEX_ENTRY:
+                    return 329;
+                case CANCEL:
+                    return 330;
+#ifdef DESQUID
+                case _DESQUID:
+                    return DESQUID_STRING + 0;
+#endif
+            }
+            return 0;
+        }
 
         std::vector<choice> _currentChoices; // Possible choices for the currently selected pkmn
         u8                  _currentChoiceSelection; // Current choice selected (SINGLE mode)

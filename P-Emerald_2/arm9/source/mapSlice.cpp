@@ -34,9 +34,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef DESQUID
 #include "messageBox.h"
 #include "uio.h"
-
-#define assert( a ) \
-    if( !( a ) ) IO::messageBox( "assert failed o.O" )
 #endif
 
 namespace MAP {

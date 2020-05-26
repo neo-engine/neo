@@ -252,7 +252,7 @@ namespace IO {
      * @param p_x   angle (with 2^15 units/circle)
      * @return     Sine value (Q12)
      */
-    s32 isin( s32 p_x ) {
+    constexpr s32 isin( s32 p_x ) {
         const u16 qN = 13, qA = 12, qP = 15, qR = 2 * qN - qP, qS = qN + qP + 1 - qA;
         p_x <<= ( 30 - qN );             // shift to full s32 range (Q13->Q30)
         if( ( p_x ^ ( p_x << 1 ) ) < 0 ) // test for quadrant 1 or 2
@@ -403,71 +403,5 @@ namespace IO {
             printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1,
                             p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 3, p_bottom, WHITE_IDX );
         }
-    }
-
-    u16 getColor( type p_type ) {
-        switch( p_type ) {
-        case NORMAL:
-            return NORMAL_COLOR;
-            break;
-        case FIGHTING:
-            return RED;
-            break;
-        case FLYING:
-            return TURQOISE;
-            break;
-        case POISON:
-            return POISON_COLOR;
-            break;
-        case GROUND:
-            return GROUND_COLOR;
-            break;
-        case ROCK:
-            return ROCK_COLOR;
-            break;
-        case BUG:
-            return BUG_COLOR;
-            break;
-        case GHOST:
-            return GHOST_COLOR;
-            break;
-        case STEEL:
-            return STEEL_COLOR;
-            break;
-        case UNKNOWN:
-            return UNKNOWN_COLOR;
-            break;
-        case WATER:
-            return BLUE;
-            break;
-        case FIRE:
-            return ORANGE;
-            break;
-        case GRASS:
-            return GREEN;
-            break;
-        case LIGHTNING:
-            return YELLOW;
-            break;
-        case PSYCHIC:
-            return PURPLE;
-            break;
-        case ICE:
-            return ICE_COLOR;
-            break;
-        case DRAGON:
-            return DRAGON_COLOR;
-            break;
-        case DARKNESS:
-            return BLACK;
-            break;
-        case FAIRY:
-            return FAIRY_COLOR;
-            break;
-        default:
-            return DRAGON_COLOR;
-            break;
-        }
-        return WHITE;
     }
 } // namespace IO

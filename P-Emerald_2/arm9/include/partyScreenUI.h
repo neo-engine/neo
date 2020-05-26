@@ -43,6 +43,7 @@ namespace STS {
         bool     _swapping   = false;
         u8       _toSelect   = 0;
         bool     _animateMsg = false;
+        bool     _needsInit = false;
 
         constexpr u16 partyTopScreenPkmnIconPosY( u8 p_pos ) {
             return ( p_pos & 1 ) * 8 + 8 + 61 * ( p_pos >> 1 );

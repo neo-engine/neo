@@ -59,7 +59,7 @@ namespace SAVE {
         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
     }
 
-    language translate( u8 p_dSRegion ) {
+    constexpr language translate( u8 p_dSRegion ) {
         switch( p_dSRegion ) {
         // case 0:
         //    return SAVE::JPN;
@@ -391,8 +391,6 @@ namespace SAVE {
     }
 
     language startScreen::runLanguageChoice( language p_current ) {
-        return p_current;
-
         IO::clearScreen( true, false, false );
         while( IO::yesNoBox( p_current ).getResult( STRINGS[ 85 ][ p_current ] ) ) {
             IO::clearScreen( true, false, false );

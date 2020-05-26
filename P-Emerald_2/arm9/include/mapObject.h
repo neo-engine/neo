@@ -30,7 +30,19 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
     class mapSprite;
 
-    u8 getFrame( direction p_direction );
+    constexpr u8 getFrame( direction p_direction ) {
+        switch( p_direction ) {
+        case MAP::UP:
+            return 3;
+        case MAP::RIGHT:
+            return 9;
+        case MAP::DOWN:
+            return 0;
+        case MAP::LEFT:
+            return 6;
+        }
+        return 0;
+    }
 
     struct mapObject {
         enum type { PLYR, SURF_PLATFORM, SIGN, NPC } m_type;

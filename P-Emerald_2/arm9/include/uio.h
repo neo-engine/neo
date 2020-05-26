@@ -195,5 +195,69 @@ namespace IO {
     void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2,
                          u8 p_colorIdx, bool p_pressed, bool p_bottom = true );
 
-    u16 getColor( type p_type );
+    constexpr u16 getColor( type p_type ) {
+        switch( p_type ) {
+        case NORMAL:
+            return NORMAL_COLOR;
+            break;
+        case FIGHTING:
+            return RED;
+            break;
+        case FLYING:
+            return TURQOISE;
+            break;
+        case POISON:
+            return POISON_COLOR;
+            break;
+        case GROUND:
+            return GROUND_COLOR;
+            break;
+        case ROCK:
+            return ROCK_COLOR;
+            break;
+        case BUG:
+            return BUG_COLOR;
+            break;
+        case GHOST:
+            return GHOST_COLOR;
+            break;
+        case STEEL:
+            return STEEL_COLOR;
+            break;
+        case UNKNOWN:
+            return UNKNOWN_COLOR;
+            break;
+        case WATER:
+            return BLUE;
+            break;
+        case FIRE:
+            return ORANGE;
+            break;
+        case GRASS:
+            return GREEN;
+            break;
+        case LIGHTNING:
+            return YELLOW;
+            break;
+        case PSYCHIC:
+            return PURPLE;
+            break;
+        case ICE:
+            return ICE_COLOR;
+            break;
+        case DRAGON:
+            return DRAGON_COLOR;
+            break;
+        case DARKNESS:
+            return BLACK;
+            break;
+        case FAIRY:
+            return FAIRY_COLOR;
+            break;
+        default:
+            return DRAGON_COLOR;
+            break;
+        }
+        return WHITE;
+    }
 } // namespace IO

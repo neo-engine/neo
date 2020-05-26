@@ -43,32 +43,6 @@ along with Pokémon neo.  If not, new see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 
 namespace ITEM {
-    u16 getItemChar( const u8 p_itemType ) {
-        if( p_itemType & ITEMTYPE_BERRY ) { return 473; }
-
-        auto itemType = ( p_itemType & 15 );
-
-        switch( itemType ) {
-        case ITEMTYPE_POKEBALL:
-            return 474;
-        case ITEMTYPE_BATTLEITEM:
-            return 475;
-        case ITEMTYPE_COLLECTIBLE:
-        case ITEMTYPE_USABLE:
-        case ITEMTYPE_EVOLUTION:
-            return 468;
-        case ITEMTYPE_MEDICINE:
-            return 472;
-        case ITEMTYPE_FORMECHANGE:
-        case ITEMTYPE_KEYITEM:
-            return 469;
-        case ITEMTYPE_TM:
-            return 470;
-        default:
-            return ' ';
-        }
-    }
-
     bool use( const u16 p_itemId, const itemData& p_data, pokemon& p_pokemon,
               std::function<u8( u8 )> p_callback, bool p_inbattle ) {
         if( p_pokemon.isEgg( ) || !p_pokemon.m_boxdata.m_speciesId ) { return false; }

@@ -26,11 +26,14 @@ GRAPHICS	:=	data
 #---------------------------------------------------------------------------------
 ARCH	:=	-mthumb -mthumb-interwork
 
-CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wpsabi -O3\
-            -Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
-			-Wno-class-memaccess	-march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
-			-ffast-math $(EXTRA_FLAGS) \
-			$(ARCH)
+CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wpsabi -O3 -D_FORTIFY_SOURCE=1\
+			-Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
+			-Wduplicated-branches -Wduplicated-cond\
+			-Wfloat-equal -Wformat=1 -Wlogical-op -Wnull-dereference\
+			-Wmissing-noreturn -Wsuggest-attribute=malloc -Wunused-macros\
+			-Wno-class-memaccess -march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
+			-ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funsafe-loop-optimizations\
+			$(EXTRA_FLAGS) $(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM9
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -std=c++17 -Wno-multichar
