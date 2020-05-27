@@ -131,7 +131,7 @@ namespace STS {
         case DESQUID_SPECIES: {
             // Species
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 12, true, MAX_PKMN, 1,
+                {DESQUID_STRING + 12, true, MAX_PKMN, 0,
                  [&]( ) { return _team[ _currentSelection ].getSpecies( ); },
                  [&]( u32 p_newValue ) {
                      _team[ _currentSelection ].setSpecies( p_newValue );

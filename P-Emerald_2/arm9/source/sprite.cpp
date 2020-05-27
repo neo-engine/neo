@@ -37,8 +37,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 #include "uio.h"
 
-#include "Egg.h"
-
 #include "NoItem.h"
 #include "damage_0.h"
 #include "damage_1.h"
@@ -728,6 +726,8 @@ namespace IO {
                         u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny,
                         bool p_female, bool p_flipx, bool p_topOnly, u8 p_forme ) {
 
+        memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
+        memset( TEMP, 0, sizeof( TEMP ) );
         if( !p_forme ) {
             snprintf( BUFFER, 99, "%02d/%d/%d%s%s", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
                       p_pkmnId, p_shiny ? "s" : "", p_female ? "f" : "" );
@@ -735,10 +735,6 @@ namespace IO {
             snprintf( BUFFER, 99, "%02d/%d/%d-%hhu%s%s", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
                       p_pkmnId, p_forme, p_shiny ? "s" : "", p_female ? "f" : "" );
         }
-
-        memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
-        memset( TEMP, 0, sizeof( TEMP ) );
-
         if( !FS::readData<unsigned short, unsigned int>( p_path, BUFFER, 16, TEMP_PAL, 96 * 96 / 8,
                                                          TEMP ) ) {
             return false;
@@ -820,9 +816,9 @@ namespace IO {
     }
 
     u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
-                       u16 p_tileCnt, bool p_bottom ) {
-        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 64, 64, EggPal,
-                           EggTiles, EggTilesLen, false, false, false, OBJPRIORITY_1, p_bottom );
+                       u16 p_tileCnt, bool p_bottom, bool p_manaphy ) {
+        return loadPKMNSprite( 1 - 1, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
+                p_bottom, false, false, false, false, 1 + p_manaphy );
     }
 
     u16 loadTrainerSprite( const char* p_path, const char* p_name, const s16 p_posX,
@@ -1006,30 +1002,10 @@ namespace IO {
         return loadPKMNIcon( 0, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
     }
 
-    u16 loadPKMNIcon( const u16 p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
-                      u8 p_palCnt, u8 p_palpos, u16 p_tileCnt, bool p_bottom, u8 p_forme ) {
-        // TODO
-
-        if( !p_forme )
-            snprintf( BUFFER, 99, "%02hu/%hu/Icon_%hu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
-                      p_pkmnId );
-        else
-            snprintf( BUFFER, 99, "%02hu/%hu/Icon_%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
-                      p_pkmnId, p_forme );
-        auto res = loadIcon( PKMN_PATH, BUFFER, p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos,
-                             p_tileCnt, p_bottom );
-        return res;
-    }
-
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
-                     bool p_bottom ) {
-        return loadIcon( PKMN_PATH, "00/0/iconegg", p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
-                         p_bottom );
-    }
-    u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u8 p_palpos,
-                     u16 p_tileCnt, bool p_bottom ) {
-        return loadIcon( PKMN_PATH, "00/0/iconegg", p_posX, p_posY, p_oamIndex, p_palCnt, p_palpos,
-                         p_tileCnt, p_bottom );
+                     bool p_bottom, bool p_manaphy ) {
+        return  loadPKMNIcon( 1 - 1, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
+                p_bottom, 1 + p_manaphy, false, false );
     }
 
     u16 loadItemIcon( u16 p_itemId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,

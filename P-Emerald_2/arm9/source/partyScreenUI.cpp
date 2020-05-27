@@ -30,6 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 #include "screenFade.h"
 #include "uio.h"
+#include "pokemonNames.h"
 
 #include "hpbar.h"
 #include "itemicon.h"
@@ -638,7 +639,8 @@ namespace STS {
                 IO::loadEggIcon( oam[ SPR_PKMN_ICON_OAM( p_pos ) ].x,
                                  oam[ SPR_PKMN_ICON_OAM( p_pos ) ].y, SPR_PKMN_ICON_OAM( p_pos ),
                                  SPR_PKMN_ICON_PAL( p_pos ),
-                                 oam[ SPR_PKMN_ICON_OAM( p_pos ) ].gfxIndex, p_bottom );
+                                 oam[ SPR_PKMN_ICON_OAM( p_pos ) ].gfxIndex, p_bottom,
+                                 _team[ p_pos ].getSpecies( ) == PKMN_MANAPHY );
             }
         } else {
             if( p_redraw ) {
@@ -837,7 +839,8 @@ namespace STS {
                 IO::loadEggIcon( oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].x,
                                  oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].y,
                                  SPR_PKMN_ICON_OAM_SUB( p_pos ), SPR_PKMN_ICON_PAL_SUB( p_pos ),
-                                 oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].gfxIndex, p_bottom );
+                                 oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].gfxIndex, p_bottom,
+                                 _team[ p_pos ].getSpecies( ) == PKMN_MANAPHY );
             }
         } else {
             if( p_redraw ) {

@@ -67,6 +67,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "window2.h"
 #include "window3.h"
 
+#include "pokemonNames.h"
+
 namespace STS {
     // top screen sprites
 #define SPR_WINDOW_START_OAM 0
@@ -187,9 +189,11 @@ namespace STS {
             dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
         }
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        for( u8 i = 0; i < 5; ++i ) { oam[ SPR_WINDOW_START_OAM + i ].isHidden = true; }
 
         // Print Basic Pkmn info
         if( !p_pokemon->isEgg( ) ) {
+            for( u8 i = 0; i < 5; ++i ) { oam[ SPR_WINDOW_START_OAM + i ].isHidden = false; }
             // Load correct sprite
             IO::loadPKMNSprite( p_pokemon->getSpecies( ), oam[ SPR_PKMN_START_OAM ].x,
                                 oam[ SPR_PKMN_START_OAM ].y, SPR_PKMN_START_OAM, SPR_PKMN_PAL,
@@ -199,12 +203,23 @@ namespace STS {
             IO::regularFont->printString( p_pokemon->m_boxdata.m_name, 12, 34, p_bottom );
         } else {
             IO::loadEggSprite( oam[ SPR_PKMN_START_OAM ].x, oam[ SPR_PKMN_START_OAM ].y,
-                               SPR_PKMN_START_OAM, SPR_PKMN_PAL, oam[ SPR_PKMN_START_OAM ].gfxIndex,
-                               p_bottom );
+                    SPR_PKMN_START_OAM, SPR_PKMN_PAL, oam[ SPR_PKMN_START_OAM ].gfxIndex,
+                    p_bottom, p_pokemon->getSpecies( ) == PKMN_MANAPHY );
 
             IO::regularFont->printString( GET_STRING( 34 ), 12, 34, p_bottom );
         }
         IO::updateOAM( p_bottom );
+    }
+
+    void statusScreenUI::writeLineTop( const char* p_stringLeft, const char* p_stringRight,
+                                       u8 p_line, u8 p_colorLeft, u8 p_colorRight,
+                                       bool p_bottom ) {
+        IO::regularFont->setColor( p_colorLeft, 1 );
+        IO::regularFont->printString( p_stringLeft, INFO_X + 12, INFO_Y + 11 + 15 * p_line,
+                                      p_bottom );
+        IO::regularFont->setColor( p_colorRight, 1 );
+        IO::regularFont->printString( p_stringRight, INFO_X - 12 + 128, INFO_Y + 11 + 15 * p_line,
+                                      p_bottom, IO::font::RIGHT );
     }
 
     void statusScreenUI::writeLineTop( const char* p_string, u8 p_line, u8 p_color,

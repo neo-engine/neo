@@ -50,6 +50,13 @@ namespace STS {
          */
         void writeLineTop( const char* p_string, u8 p_line, u8 p_color = 252,
                            bool p_bottom = false );
+        /*
+         * @brief Writes the given string to the specified line to the text field.
+         */
+        void writeLineTop( const char* p_stringLeft,  const char* p_stringRight,
+                           u8 p_line, u8 p_colorLeft = 250, u8 p_colorRight = 252,
+                           bool p_bottom = false );
+
 
       public:
         /*
