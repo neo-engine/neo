@@ -678,7 +678,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 340
 
     {"ID No.", "Id Nr."},
-    {"Exp.", "Erf."},
+    {"Exp.", "E.-Pkt."},
     {"Next", "N\xe4""chst."},
     {"Level", "Level"},
     {"Pok\xe9mon Info", "Pok\xe9mon-Info"},

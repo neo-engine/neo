@@ -38,7 +38,7 @@ namespace STS {
         pkmnData _data;
 
         u16 initTopScreen( pokemon* p_pokemon, bool p_bottom = false );
-        u16 initBottomScreen( bool p_bottom = true );
+        u16 initBottomScreen( pokemon* p_pokemon, bool p_bottom = true );
 
         /*
          * @brief Draws basic information about the pkmn (name, etc)

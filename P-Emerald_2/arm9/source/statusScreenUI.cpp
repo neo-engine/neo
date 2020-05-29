@@ -104,10 +104,12 @@ namespace STS {
 #define SPR_PAGE_LEFT_OAM_SUB 21
 #define SPR_PAGE_OAM_SUB( p_page ) ( 22 + ( p_page ) )
 #define SPR_NAVIGATION_OAM_SUB( p_page ) ( 25 + ( p_page ) )
+#define SPR_TYPE_OAM_SUB( p_idx ) ( 30 + ( p_idx ) )
 
 #define SPR_INFOPAGE_PAL_SUB 0
 #define SPR_ARROW_X_PAL_SUB 1
 #define SPR_BOX_PAL_SUB 2
+#define SPR_TYPE_PAL_SUB( p_idx ) ( 3 + ( p_idx ) )
 
     u16 statusScreenUI::initTopScreen( pokemon* p_pokemon, bool p_bottom ) {
         IO::clearScreen( p_bottom, false, true );
@@ -347,7 +349,7 @@ namespace STS {
         return tileCnt;
     }
 
-    u16 statusScreenUI::initBottomScreen( bool p_bottom ) {
+    u16 statusScreenUI::initBottomScreen( pokemon* p_pokemon, bool p_bottom ) {
         IO::clearScreen( p_bottom, false, true );
         if( p_bottom ) {
             dmaCopy( statussubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
@@ -462,7 +464,13 @@ namespace STS {
                                   infopage2TilesLen, true, true, false, OBJPRIORITY_3, p_bottom,
                                   OBJMODE_BLENDED );
 
-
+        // Moves
+        for( u8 i = 0; i < 4; ++i ) {
+            auto mdata = MOVE::getMoveData( p_pokemon->m_boxdata.m_moves[ i ] );
+            type t = mdata.m_type;
+            tileCnt = IO::loadTypeIcon( t, 222, 38 + 30 * i, SPR_TYPE_OAM_SUB( i ),
+                    SPR_TYPE_PAL_SUB( i ), tileCnt, true, CURRENT_LANGUAGE );
+        }
 
         // Build the shared pals
         IO::copySpritePal( arrow_upPal, SPR_ARROW_X_PAL_SUB, 0, 2 * 4, p_bottom );
@@ -640,7 +648,7 @@ namespace STS {
         _data = getPkmnData( p_pokemon->getSpecies( ), p_pokemon->getForme( ) );
 
         initTopScreen( p_pokemon );
-        initBottomScreen( );
+        initBottomScreen( p_pokemon );
 
         draw( p_pokemon, p_initialPage );
 
@@ -994,9 +1002,38 @@ namespace STS {
 
             // BOTTOM
 
+            // Moves
+            for( int i = 0; i < 4; i++ ) {
+                if( !p_pokemon->m_boxdata.m_moves[ i ] ) continue;
+
+                auto mdata = MOVE::getMoveData( p_pokemon->m_boxdata.m_moves[ i ] );
+
+                type t = mdata.m_type;
+                oamSub[ SPR_TYPE_OAM_SUB( i ) ].isHidden = false;
+
+                if( t == _data.m_baseForme.m_types[ 0 ] || t == _data.m_baseForme.m_types[ 1 ] ) {
+                    IO::regularFont->setColor( IO::COLOR_IDX, 1 );
+                    IO::regularFont->setColor( IO::WHITE_IDX, 2 );
+                } else {
+                    IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                    IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                }
+
+                IO::regularFont->printString( MOVE::getMoveName( p_pokemon->m_boxdata.m_moves[ i ],
+                            CURRENT_LANGUAGE ).c_str( ), 128, 30 + 30 * i, true );
+
+                IO::regularFont->setColor( IO::GRAY_IDX, 1 );
+                IO::regularFont->setColor( IO::WHITE_IDX, 2 );
+                snprintf( buffer, 49, "AP %2hhu/%2hhu ", p_pokemon->m_boxdata.m_curPP[ i ],
+                        s8( mdata.m_pp * ( ( 5 + p_pokemon->m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                IO::regularFont->printString( buffer, 135, 45 + 30 * i, true );
+            }
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
         }
         default:
-                break;
+            break;
         }
         IO::updateOAM( true );
         IO::updateOAM( false );
@@ -1021,9 +1058,9 @@ namespace STS {
 //                        OBJPRIORITY_0, p_bottom );
 //
 //        for( int i = 0; i < 4; i++ ) {
-//            if( !currPkmn.m_boxdata.m_moves[ i ] ) continue;
+//            if( !p_pokemon->m_boxdata.m_moves[ i ] ) continue;
 //
-//            auto mdata = MOVE::getMoveData( currPkmn.m_boxdata.m_moves[ i ] );
+//            auto mdata = MOVE::getMoveData( p_pokemon->m_boxdata.m_moves[ i ] );
 //
 //            type t = mdata.m_type;
 //            IO::loadTypeIcon( t, 222, 38 + 30 * i, TYPE_IDX + i, TYPE_PAL( i ),
@@ -1031,7 +1068,7 @@ namespace STS {
 //                              SAVE::SAV.getActiveFile( ).m_options.m_language );
 //
 //            pal[ IO::COLOR_IDX ] = IO::GREEN;
-//            if( t == data.m_baseForme.m_types[ 0 ] || t == data.m_baseForme.m_types[ 1 ] ) {
+//            if( t == _data.m_baseForme.m_types[ 0 ] || t == _data.m_baseForme.m_types[ 1 ] ) {
 //                IO::regularFont->setColor( IO::COLOR_IDX, 1 );
 //                IO::regularFont->setColor( IO::WHITE_IDX, 2 );
 //            } else {
@@ -1039,14 +1076,14 @@ namespace STS {
 //                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 //            }
 //
-//            IO::regularFont->printString( MOVE::getMoveName( currPkmn.m_boxdata.m_moves[ i ],
+//            IO::regularFont->printString( MOVE::getMoveName( p_pokemon->m_boxdata.m_moves[ i ],
 //                        CURRENT_LANGUAGE ).c_str( ), 128, 30 + 30 * i, p_bottom );
 //
 //            IO::regularFont->setColor( IO::GRAY_IDX, 1 );
 //            IO::regularFont->setColor( IO::WHITE_IDX, 2 );
 //            char buffer[ 50 ];
-//            snprintf( buffer, 49, "AP %2hhu/%2hhu ", currPkmn.m_boxdata.m_curPP[ i ],
-//                      s8( mdata.m_pp * ( ( 5 + currPkmn.m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+//            snprintf( buffer, 49, "AP %2hhu/%2hhu ", p_pokemon->m_boxdata.m_curPP[ i ],
+//                      s8( mdata.m_pp * ( ( 5 + p_pokemon->m_boxdata.PPupget( i ) ) / 5.0 ) ) );
 //            IO::regularFont->printString( buffer, 135, 45 + 30 * i, p_bottom );
 //        }
 //        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
@@ -1092,8 +1129,8 @@ namespace STS {
 //        auto Oam      = p_bottom ? IO::Oam : IO::OamTop;
 //        auto pal      = BG_PAL( p_bottom );
 //
-//        if( !currPkmn.m_boxdata.m_moves[ p_moveIdx ] ) return false;
-//        if( currPkmn.isEgg( ) ) return false;
+//        if( !p_pokemon->m_boxdata.m_moves[ p_moveIdx ] ) return false;
+//        if( p_pokemon->isEgg( ) ) return false;
 //
 //        for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ TYPE_IDX + i ].isHidden = true;
 //        for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
@@ -1118,18 +1155,18 @@ namespace STS {
 //                        -5, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false,
 //                        OBJPRIORITY_0, p_bottom );
 //
-//        auto mdata = MOVE::getMoveData( currPkmn.m_boxdata.m_moves[ p_moveIdx ] );
+//        auto mdata = MOVE::getMoveData( p_pokemon->m_boxdata.m_moves[ p_moveIdx ] );
 //
 //        pal[ IO::COLOR_IDX ] = IO::GREEN;
-//        if( mdata.m_type == data.m_baseForme.m_types[ 0 ]
-//            || mdata.m_type == data.m_baseForme.m_types[ 1 ] ) {
+//        if( mdata.m_type == _data.m_baseForme.m_types[ 0 ]
+//            || mdata.m_type == _data.m_baseForme.m_types[ 1 ] ) {
 //            IO::regularFont->setColor( IO::COLOR_IDX, 1 );
 //            IO::regularFont->setColor( IO::WHITE_IDX, 2 );
 //        } else {
 //            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 //            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 //        }
-//        IO::regularFont->printString( MOVE::getMoveName( currPkmn.m_boxdata.m_moves[ p_moveIdx
+//        IO::regularFont->printString( MOVE::getMoveName( p_pokemon->m_boxdata.m_moves[ p_moveIdx
 //        ],
 //                    CURRENT_LANGUAGE ).c_str( ), 120, 32, p_bottom );
 //        IO::regularFont->setColor( IO::GRAY_IDX, 1 );
@@ -1150,8 +1187,8 @@ namespace STS {
 //            "AP %2hhu"
 //            "/"
 //            "%2hhu ",
-//            currPkmn.m_boxdata.m_curPP[ p_moveIdx ], mdata.m_pp
-//            * ( ( 5 + ( ( currPkmn.m_boxdata.m_pPUps >> ( 2 * p_moveIdx ) ) % 4 ) ) / 5 ) );
+//            p_pokemon->m_boxdata.m_curPP[ p_moveIdx ], mdata.m_pp
+//            * ( ( 5 + ( ( p_pokemon->m_boxdata.m_pPUps >> ( 2 * p_moveIdx ) ) % 4 ) ) / 5 ) );
 //        IO::regularFont->printString( buffer, 128, 47, p_bottom );
 //
 //        IO::regularFont->printString( "Stärke", 128, 60, p_bottom );
@@ -1185,7 +1222,7 @@ namespace STS {
 //        auto Oam      = p_bottom ? IO::Oam : IO::OamTop;
 //        auto pal      = BG_PAL( p_bottom );
 //
-//        if( currPkmn.isEgg( ) ) return false;
+//        if( p_pokemon->isEgg( ) ) return false;
 //
 //        for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ TYPE_IDX + i ].isHidden = true;
 //        for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
@@ -1233,7 +1270,7 @@ namespace STS {
 //                                      14 );
 //        IO::regularFont->printString(
 //            FS::breakString( ( currRb.m_description == "" )
-//                                 ? ( currPkmn.m_boxdata.m_fateful
+//                                 ? ( p_pokemon->m_boxdata.m_fateful
 //                                         ? "Ein Band für Pokémon-Freunde."
 //                                         : "Ein Gedenk-Band. An einem mysteriösen Ort
 //                                         erhalten." )
