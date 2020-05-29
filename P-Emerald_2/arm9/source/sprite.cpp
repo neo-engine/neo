@@ -607,6 +607,7 @@ namespace IO {
             case PKMN_WIGGLYTUFF:
             case PKMN_ZANGOOSE:
             case PKMN_ZYGARDE:
+            case PKMN_VIVILLON:
                 return false;
             default:
                 return true;

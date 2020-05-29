@@ -386,6 +386,14 @@ namespace STS {
                              _team[ _currentSelection ].m_boxdata.m_moves[ i ] );
                      }} ) );
             }
+            // Fateful encounter
+            res.push_back( partyScreen::desquidItem(
+                {DESQUID_STRING + 45, false, 1, 0,
+                 [&]( ) { return _team[ _currentSelection ].m_boxdata.m_fateful; },
+                 [&]( u32 p_newValue ) {
+                     _team[ _currentSelection ].m_boxdata.m_fateful = p_newValue;
+                 },
+                 []( u32 ) { return ""; }} ) );
 
             break;
         }

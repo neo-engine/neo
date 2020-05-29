@@ -93,6 +93,7 @@ extern unsigned short TEMP_PAL[ 256 ];
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
+extern const char* const MONTHS[ 12 ][ LANGUAGES ];
 #define CURRENT_LANGUAGE SAVE::SAV.getActiveFile( ).m_options.m_language
 
 #ifdef DESQUID

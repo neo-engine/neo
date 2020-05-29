@@ -37,7 +37,7 @@ namespace STS {
         bool     _allowKeyDown;
         pkmnData _data;
 
-        u16 initTopScreen( bool p_bottom = false );
+        u16 initTopScreen( pokemon* p_pokemon, bool p_bottom = false );
         u16 initBottomScreen( bool p_bottom = true );
 
         /*

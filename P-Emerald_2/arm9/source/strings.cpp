@@ -127,9 +127,26 @@ const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
     {"%s"},
     {"Held: %s"},
     {"PP(%s)"},
+
+    {"Fateful Enc."},
 };
 
 #endif
+
+const char* const MONTHS[ 12 ][ LANGUAGES ] = {
+    {"Jan.", "Jan."},
+    {"Feb.", "Feb."},
+    {"Mar.", "M\xe4r."},
+    {"Apr.", "Apr."},
+    {"May", "Mai"},
+    {"June", "Juni"},
+    {"July", "Juli"},
+    {"Aug.", "Aug."},
+    {"Sep.", "Sep."},
+    {"Oct.", "Okt."},
+    {"Nov.", "Nov."},
+    {"Dec.", "Dez."}
+};
 
 const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"No data.", "Keine Daten."},
@@ -285,7 +302,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 100
 
     {"You can't use this\nmove right now.", "Diese Attacke kann jetzt\nnicht eingesetzt werden."},
-    {"Took %s\nfrom %s.", "%s von\n%s genommen."},
+    {"Took %s\nfrom %s.", "%s von\n%s verstaut."},
     {"%s already\nknows %s!", "%s beherrscht\n%s bereits!"},
     {"%s learned\n%s!", "%s erlernt\n%s!"},
     {"%s already\nknows 4 moves.\nForget a move?",
@@ -333,13 +350,13 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"All", "Alle"},
     {"HP", "KP"},
     {"Attack", "Angriff"},
-    {"Defense", "Vert"},
-    {"Speed", "Initiative"},
+    {"Defense", "Vert."},
+    {"Sp. Atk", "Sp. Ang."},
 
     // 130
 
-    {"Sp. Atk", "Sp.-Angr"},
-    {"Sp. Def", "Sp.-Vert"},
+    {"Sp. Def", "Sp. Ver."},
+    {"Speed", "Init."},
     {"f. %s", "aus %s"},
     {"female", "weiblich"},
     {"male", "m\xe4nnlich"},
@@ -347,7 +364,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"(shining)", "(schillernd)"},
     {"Fainted", "Besiegt"},
     {"Statistics", "Statuswerte"},
-    {"Stats at lv.%3i:", "Status auf Lv.%3i:"},
+    {"Lv.%3i", "Lv.%3i"},
     {"[TRAINER] ([TCLASS]) sent\nout %s![A]", "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]"},
 
     // 140
@@ -421,103 +438,103 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"Meteor Falls", "Meteorf\xe4lle"},
     {"\xd", "\xe"}, // HP icon
-    {"hardy", "robust"},
-    {"lonely", "einsam"},
-    {"brave", "mutig"},
+    {"Hardy", "Robust"},
+    {"Lonely", "Einsam"},
+    {"Brave", "Mutig"},
 
     // 190
 
-    {"adamant", "hart"},
-    {"naughy", "frech"},
-    {"bold", "k\xfc"
+    {"Adamant", "Hart"},
+    {"Naughy", "Frech"},
+    {"Bold", "K\xfc"
              "hn"},
-    {"docile", "sanft"},
-    {"relaxed", "locker"},
+    {"Docile", "Sanft"},
+    {"Relaxed", "Locker"},
 
-    {"impish", "pfiffig"},
-    {"lax", "lasch"},
-    {"timid", "scheu"},
-    {"hasty", "hastig"},
-    {"serious", "ernst"},
+    {"Impish", "Pfiffig"},
+    {"Lax", "Lasch"},
+    {"Timid", "Scheu"},
+    {"Hasty", "Hastig"},
+    {"Serious", "Ernst"},
 
     // 200
 
-    {"jolly", "froh"},
-    {"naive", "naiv"},
-    {"modest", "m\xe4"
+    {"Jolly", "Froh"},
+    {"Naive", "Naiv"},
+    {"Modest", "M\xe4"
                "\xdf"
                "ig"},
-    {"mild", "mild"},
-    {"quiet", "ruhig"},
+    {"Mild", "Mild"},
+    {"Quiet", "Ruhig"},
 
-    {"bashful", "zaghaft"},
-    {"rash", "hitzig"},
-    {"calm", "still"},
-    {"gentle", "zart"},
-    {"sassy", "forsch"},
+    {"Bashful", "Zaghaft"},
+    {"rash", "Hitzig"},
+    {"Calm", "Still"},
+    {"Gentle", "Zart"},
+    {"Sassy", "Forsch"},
 
     // 210
 
-    {"careful", "sacht"},
-    {"quirky", "kauzig"},
-    {"Loves to eat", "Liebt es, zu essen"},
-    {"Often dozes off", "Nickt oft ein"},
-    {"Nods off a lot", "Schl\xe4"
-                       "ft gerne"},
+    {"Careful", "Sacht"},
+    {"Quirky", "Kauzig"},
+    {"Loves to eat.", "Liebt es, zu essen."},
+    {"Often dozes off.", "Nickt oft ein."},
+    {"Nods off a lot.", "Schl\xe4"
+                       "ft gerne."},
 
-    {"Scatters things often", "Macht oft Unordnung"},
-    {"Likes to relax", "Liebt es zu entspannen"},
-    {"Proud of its power", "Ist stolz auf seine St\xe4"
-                           "rke"},
-    {"Likes to thrash about", "Pr\xfc"
-                              "gelt sich gerne"},
-    {"A little quick tempered", "Besitzt Temperament"},
+    {"Scatters things often.", "Macht oft Unordnung."},
+    {"Likes to relax.", "Liebt es zu entspannen."},
+    {"Proud of its power.", "Ist stolz auf seine St\xe4"
+                           "rke."},
+    {"Likes to thrash about.", "Pr\xfc"
+                              "gelt sich gerne."},
+    {"A little quick tempered.", "Besitzt Temperament."},
 
     // 220
 
-    {"Likes to fight", "Liebt es zu k\xe4"
-                       "mpfen"},
-    {"Quick tempered", "Ist impulsiv"},
-    {"Sturdy body", "Hat einen robusten K\xf6"
-                    "rper"},
-    {"Capable of taking hits", "Kann Treffer gut verkraften"},
-    {"Highly persistent", "Ist \xe4"
+    {"Likes to fight.", "Liebt es zu k\xe4"
+                       "mpfen."},
+    {"Quick tempered.", "Ist impulsiv."},
+    {"Sturdy body.", "Hat einen robusten K\xf6"
+                    "rper."},
+    {"Capable of taking hits.", "Kann Treffer gut verkraften."},
+    {"Highly persistent.", "Ist \xe4"
                           "u\xdf"
-                          "erst ausdauernd"},
+                          "erst ausdauernd."},
 
-    {"Good endurance", "Hat eine gute Ausdauer"},
-    {"Good perseverance", "Ist beharrlich"},
-    {"Highly curious", "Ist sehr neugierig"},
-    {"Mischievous", "Ist hinterh\xe4"
-                    "ltig"},
-    {"Thoroughly cunning", "Ist \xe4"
+    {"Good endurance.", "Hat eine gute Ausdauer."},
+    {"Good perseverance.", "Ist beharrlich."},
+    {"Highly curious.", "Ist sehr neugierig."},
+    {"Mischievous.", "Ist hinterh\xe4"
+                    "ltig."},
+    {"Thoroughly cunning.", "Ist \xe4"
                            "u\xdf"
-                           "erst gerissen"},
+                           "erst gerissen."},
 
     // 230
 
-    {"Often lost in thought", "Ist oft in Gedanken"},
-    {"Very finicky", "Ist sehr pedantisch"},
-    {"Strong willed", "Besitzt starken Willen"},
-    {"Somewhat vain", "Ist etwas eitel"},
-    {"Strongly defiant", "Ist sehr aufs\xe4"
-                         "ssig"},
+    {"Often lost in thought.", "Ist oft in Gedanken."},
+    {"Very finicky.", "Ist sehr pedantisch."},
+    {"Strong willed.", "Besitzt starken Willen."},
+    {"Somewhat vain.", "Ist etwas eitel."},
+    {"Strongly defiant.", "Ist sehr aufs\xe4"
+                         "ssig."},
 
-    {"Hates to lose", "Hasst Niederlagen"},
-    {"Somewhat stubborn", "Ist dickk\xf6"
-                          "pfig"},
-    {"Likes to run", "Liebt es, zu rennen"},
-    {"Alert to sounds", "Achtet auf Ger\xe4"
-                        "usche"},
-    {"Impetuous and silly", "Ist ungest\xfc"
+    {"Hates to lose.", "Hasst Niederlagen."},
+    {"Somewhat stubborn.", "Ist dickk\xf6"
+                          "pfig."},
+    {"Likes to run.", "Liebt es, zu rennen."},
+    {"Alert to sounds.", "Achtet auf Ger\xe4"
+                        "usche."},
+    {"Impetuous and silly.", "Ist ungest\xfc"
                             "m und einf\xe4"
-                            "ltig"},
+                            "ltig."},
 
     // 240
 
-    {"Somewhat of a clown", "Ist fast wie eine Clown"},
-    {"Quick to flee", "Fl\xfc"
-                      "chtet schnell"},
+    {"Somewhat of a clown.", "Ist fast wie eine Clown."},
+    {"Quick to flee.", "Fl\xfc"
+                      "chtet schnell."},
     {"spicy", "scharf"},
     {"sour", "saur"},
     {"sweet", "s\xfc\xdf"},
@@ -654,5 +671,60 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"Choose these Pok\xe9mon?", "Diese Pok\xe9mon w\xe4hlen?"},
     {"Choose this Pok\xe9mon?", "Dieses Pok\xe9mon w\xe4hlen?"},
+    {"Dex No.", "Dex Nr."},
+    {"Name", "Name"},
+    {"OT", "OT"},
 
+    // 340
+
+    {"ID No.", "Id Nr."},
+    {"Exp.", "Erf."},
+    {"Next", "N\xe4""chst."},
+    {"Level", "Level"},
+    {"Pok\xe9mon Info", "Pok\xe9mon-Info"},
+
+    {"It looks like this Egg", "Was da wohl schl\xfcpfen"},
+    {"will take a long time", "wird? Es dauert wohl"},
+    {"to hatch.", "noch lange."},
+    {"It appears to move", "Hat es sich gerade"},
+    {"occasionally. It may", "bewegt? Da tut sich"},
+
+    // 350
+
+    {"be close to hatching.", "wohl bald was."},
+    {"Sounds can be heard", "Jetzt macht es schon"},
+    {"coming from inside!", "Ger\xe4usche! Bald ist"},
+    {"It will hatch soon!", "es wohl soweit!"},
+    {"A mysterious Pok\xe9mon", "Ein r\xe4tselhaftes"},
+
+    {"Egg received", "Pok\xe9mon-Ei erhalten"},
+    {"from", "vom"},
+    {"at", "in/bei"},
+    {"from", "von"},
+    {"A highly mysterious", "Ein \xe4u\xdf""erst seltsames"},
+
+    // 360
+
+    {"Pok\xe9mon Egg that", "Pok\xe9mon-Ei, das"},
+    {"somehow reached you", "irgendwie zu dir fand"},
+    {"Item", "Item"},
+    {"Ability", "F\xe4hig."},
+    {"", "Wesen: "},
+
+    {"nature.", ""},
+    {"Egg received.", "Ei erhalten."},
+    {"Had a fateful encunter.", "Schicksalhafte Begegnung."},
+    {"Egg hatched.", "Ei geschl\xfcpft."},
+    {"Egg apparently hatched.", "Ei offenbar geschl\xfcpft."},
+
+    // 370
+
+    {"Met at Lv. %hu.", "Erhalten mit Lv. %hu."},
+    {"Apparently met at Lv. %hu.", "Offenbar erhalten mit Lv. %hu."},
+    {"Had a fateful enc. at Lv. %hu.", "Schicksalhafte Begeg. mit Lv. %hu."},
+    {"App. had a fatef. enc. at Lv. %hu.", "Off. schicks. Begeg. mit Lv. %hu."},
+    {"Likes ", "Mag "},
+
+    {"%s ", "%se "},
+    {"Pok\xe9""blocks.", "Pok\xe9riegel."},
 };

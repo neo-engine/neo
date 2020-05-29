@@ -28,7 +28,7 @@ ARCH	:=	-mthumb -mthumb-interwork
 
 CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wpsabi -O3 -D_FORTIFY_SOURCE=1\
 			-Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
-			-Wduplicated-branches -Wduplicated-cond\
+			-Wduplicated-branches -Wduplicated-cond -Wno-volatile\
 			-Wfloat-equal -Wformat=1 -Wlogical-op -Wnull-dereference\
 			-Wmissing-noreturn -Wsuggest-attribute=malloc -Wunused-macros\
 			-Wno-class-memaccess -march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
@@ -36,7 +36,7 @@ CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wpsabi -O3 -D_FORTIFY_SOURCE=1\
 			$(EXTRA_FLAGS) $(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM9
-CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -std=c++17 -Wno-multichar
+CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -std=c++2a -Wno-multichar
 
 ASFLAGS	:=	-g $(ARCH) -march=armv5te -mtune=arm946e-s
 

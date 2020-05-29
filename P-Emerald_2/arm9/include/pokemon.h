@@ -65,10 +65,10 @@ struct boxPokemon {
     u8   m_pPUps         = 0;
     u32  m_iVint         = 0; // hp/5, atk/5, def/5, satk/5, sdef/5, spd/5, nicked/1, isEgg/1
     u8   m_ribbons0[ 4 ] = {0};
-    bool m_fateful       = 0; // 1
-    bool m_isFemale      = 0; // 1
-    bool m_isGenderless  = 0; // 1
-    u8   m_altForme      = 0; // 5
+    bool m_fateful : 1   = 0;
+    bool m_isFemale : 1  = 0;
+    bool m_isGenderless : 1 = 0;
+    u8   m_altForme : 5  = 0;
     u16  m_hatchPlace    = 0; // PT-like
     u16  m_gotPlace      = 0; // PT-like
 
@@ -81,8 +81,8 @@ struct boxPokemon {
     u8   m_hatchDate[ 3 ] = {0}; // gotDate for nonEgg
     u8   m_pokerus        = 0;   //
     u8   m_ball           = 0;   //
-    u8   m_gotLevel       = 0;   // 7
-    bool m_oTisFemale     = 0;   // 1
+    u8   m_gotLevel : 7   = 0;   //
+    u8   m_oTisFemale : 1 = 0;   // unused
     u8   m_encounter      = 0;
     u8   m_abilitySlot    = 0;
 
@@ -95,6 +95,11 @@ struct boxPokemon {
                 const char* p_ot, bool p_oTFemale, u8 p_shiny = 0, bool p_hiddenAbility = false,
                 bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
                 u8 p_ball = 0, u8 p_pokerus = 0, u8 p_forme = 0, pkmnData* p_data = nullptr );
+
+    constexpr bool wasEgg( ) {
+        return !!m_gotPlace;
+    }
+    bool isForeign( ) const;
 
     constexpr u16 getSpecies( ) {
         return m_speciesId;
@@ -346,6 +351,13 @@ struct pokemon {
         return m_boxdata.getNature( );
     }
     bool setNature( pkmnNatures p_newNature );
+
+    constexpr bool wasEgg( ) {
+        return m_boxdata.wasEgg( );
+    }
+    bool isForeign( ) const {
+        return m_boxdata.isForeign( );
+    }
 
     constexpr u16 getSpecies( ) {
         return m_boxdata.getSpecies( );

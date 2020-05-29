@@ -648,18 +648,21 @@ namespace STS {
                 IO::regularFont->printString( _team[ p_pos ].m_boxdata.m_name, anchor_x + 32,
                                               anchor_y + 12, false );
 
-                if( _team[ p_pos ].m_boxdata.m_isFemale ) {
-                    IO::regularFont->setColor( IO::RED_IDX, 1 );
-                    IO::regularFont->setColor( IO::RED2_IDX, 2 );
-                    IO::regularFont->printString( "}", anchor_x + 109, anchor_y + 12, false );
-                    IO::regularFont->setColor( IO::WHITE_IDX, 1 );
-                    IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-                } else if( !_team[ p_pos ].m_boxdata.m_isGenderless ) {
-                    IO::regularFont->setColor( IO::BLUE_IDX, 1 );
-                    IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
-                    IO::regularFont->printString( "{", anchor_x + 109, anchor_y + 12, false );
-                    IO::regularFont->setColor( IO::WHITE_IDX, 1 );
-                    IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                if( _team[ p_pos ].getSpecies( ) != PKMN_NIDORAN_F &&
+                        _team[ p_pos ].getSpecies( ) != PKMN_NIDORAN_M ) {
+                    if( _team[ p_pos ].m_boxdata.m_isFemale ) {
+                        IO::regularFont->setColor( IO::RED_IDX, 1 );
+                        IO::regularFont->setColor( IO::RED2_IDX, 2 );
+                        IO::regularFont->printString( "}", anchor_x + 109, anchor_y + 12, false );
+                        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                    } else if( !_team[ p_pos ].m_boxdata.m_isGenderless ) {
+                        IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                        IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
+                        IO::regularFont->printString( "{", anchor_x + 109, anchor_y + 12, false );
+                        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                    }
                 }
 
                 // HP
@@ -1142,7 +1145,7 @@ namespace STS {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         REG_BLDCNT       = BLEND_ALPHA;
         REG_BLDCNT_SUB   = BLEND_ALPHA;
-        IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE );
+//        IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
         for( u8 i = 0; i < 6; ++i ) {
             bool tmp                                  = oam[ SPR_MARK_OAM( p_idx1, i ) ].isHidden;
             oam[ SPR_MARK_OAM( p_idx1, i ) ].isHidden = oam[ SPR_MARK_OAM( p_idx2, i ) ].isHidden;
@@ -1152,7 +1155,7 @@ namespace STS {
         drawPartyPkmn( p_idx2, p_idx2 == _selectedIdx, true, 0, p_bottom );
         unswap( p_idx1, p_bottom );
         unswap( p_idx2, p_bottom );
-        IO::fadeScreen( IO::UNFADE_IMMEDIATE );
+//        IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
         REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
         REG_BLDCNT       = BLEND_ALPHA | BLEND_DST_BG3;

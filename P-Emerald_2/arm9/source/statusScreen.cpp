@@ -54,6 +54,7 @@ namespace STS {
         _ui->init( _pokemon, p_initialPage, _allowKeyUp, _allowKeyDown );
         _frame   = 0;
         cooldown = COOLDOWN_COUNT;
+        _currentPage = p_initialPage;
 
         loop( ) {
             _ui->animate( _frame++ );

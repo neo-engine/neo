@@ -90,7 +90,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
         m_hatchDate[ 0 ] = acday;
         m_hatchDate[ 1 ] = acmonth;
         m_hatchDate[ 2 ] = acyear % 100;
-        m_gotPlace       = p_gotPlace;
+        m_hatchPlace     = p_gotPlace;
     }
     m_origLang = 5;
 
@@ -125,6 +125,13 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
 
     m_abilitySlot = 2 * p_hiddenAbility + ( m_pid & 1 );
     setSpecies( p_pkmnId, &data );
+}
+
+bool boxPokemon::isForeign( ) const {
+    if( std::strcmp( m_oT, SAVE::SAV.getActiveFile( ).m_playername ) ) { return true; }
+    if( m_oTId != SAVE::SAV.getActiveFile( ).m_id ) { return true; }
+    if( m_oTSid != SAVE::SAV.getActiveFile( ).m_sid ) { return true; }
+    return false;
 }
 
 void boxPokemon::setSpecies( u16 p_newSpecies, pkmnData* p_data ) {

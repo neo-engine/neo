@@ -404,4 +404,27 @@ namespace IO {
                             p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 3, p_bottom, WHITE_IDX );
         }
     }
+
+
+
+    std::string formatDate( u8 p_date[ 3 ], u8 p_language ) {
+        char buffer[ 20 ];
+        switch( p_language ) {
+            default:
+            case 0: // EN
+                // I know that this will "break" in 2100.
+                snprintf( buffer, 19, "%s %hhu, 20%02hhu", MONTHS[ p_date[ 1 ] ][ p_language ],
+                          p_date[ 0 ] + 1, p_date[ 2 ] );
+                break;
+            case 1: // DE
+                snprintf( buffer, 19, "%hhu. %s 20%02hhu", p_date[ 0 ] + 1,
+                          MONTHS[ p_date[ 1 ] ][ p_language ], p_date[ 2 ] );
+                break;
+        }
+        return std::string( buffer );
+    }
+
+    std::string formatDate( u8 p_date[ 3 ] ) {
+        return formatDate( p_date, CURRENT_LANGUAGE );
+    }
 } // namespace IO

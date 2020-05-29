@@ -58,6 +58,36 @@ namespace IO {
         }
     }
 
+    void font::printStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
+                             alignment p_alignment, u8 p_yDistance, s8 p_adjustX,
+                             u8 p_layer ) const {
+        u32 current_char = 0;
+        s16 putX = p_x, putY = p_y;
+        if( p_alignment == RIGHT ) putX = p_x - stringWidth( p_string );
+        if( p_alignment == CENTER ) putX = p_x - stringWidth( p_string ) / 2;
+
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' ) {
+                putY += p_yDistance;
+                putX = ( p_x -= p_adjustX );
+                if( p_alignment == RIGHT ) putX = p_x - stringWidth( p_string + current_char + 1 );
+                if( p_alignment == CENTER )
+                    putX = p_x - stringWidth( p_string + current_char + 1 ) / 2;
+
+                current_char++;
+                continue;
+            }
+            printChar( p_string[ current_char ], putX, putY, p_bottom, p_layer );
+
+            u16 c = (u16) p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ] - 1;
+
+            current_char++;
+        }
+    }
+
+
     void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                             alignment p_alignment, u8 p_yDistance, s8 p_adjustX,
                             u8 p_layer ) const {

@@ -195,6 +195,9 @@ namespace IO {
     void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2,
                          u8 p_colorIdx, bool p_pressed, bool p_bottom = true );
 
+    std::string formatDate( u8 p_date[ 3 ] );
+    std::string formatDate( u8 p_date[ 3 ], u8 p_language );
+
     constexpr u16 getColor( type p_type ) {
         switch( p_type ) {
         case NORMAL:
