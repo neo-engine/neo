@@ -31,7 +31,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "fs.h"
 #include "messageBox.h"
-#include "move.h"
 #include "pokemonNames.h"
 #include "ribbon.h"
 #include "sprite.h"

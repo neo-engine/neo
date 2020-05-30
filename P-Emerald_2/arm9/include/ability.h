@@ -32,3 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 bool        getAbilityName( int p_abilityId, int p_language, char* p_out );
 std::string getAbilityName( int p_abilityId, int p_language );
 std::string getAbilityName( int p_abilityId );
+
+bool        getAbilityDescr( int p_abilityId, int p_language, char* p_out );
+std::string getAbilityDescr( int p_abilityId, int p_language );
+std::string getAbilityDescr( int p_abilityId );

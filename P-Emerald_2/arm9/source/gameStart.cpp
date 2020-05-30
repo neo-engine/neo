@@ -192,7 +192,6 @@ namespace SAVE {
                 for( u8 j = 0; j < 7; ++j )
                     acPkmn.m_boxdata.m_oT[ j ] = FS::getNText( acBeltP->otname[ j ] );
                 acPkmn.m_boxdata.m_oT[ 7 ]  = 0;
-                acPkmn.m_boxdata.m_markings = acBeltP->markint;
 
                 acPkmn.m_statusint         = acBeltP->status;
                 acPkmn.m_level             = acBeltP->level;

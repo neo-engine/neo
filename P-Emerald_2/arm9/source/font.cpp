@@ -135,6 +135,25 @@ namespace IO {
         }
     }
 
+    void font::printMaxStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX,
+                               u16 p_breakChar, u8 p_layer ) const {
+        u32 current_char = 0;
+        s16 putX = p_x, putY = p_y;
+
+        while( p_string[ current_char ] ) {
+            u16 c = (u16) p_string[ current_char ];
+            _shiftchar( c );
+            if( putX + _widths[ c ] > p_maxX ) {
+                printChar( p_breakChar, putX, putY, p_bottom, p_layer );
+                break;
+            } else
+                printChar( p_string[ current_char ], putX, putY, p_bottom, p_layer );
+
+            putX += _widths[ c ] - 1;
+            current_char++;
+        }
+    }
+
     void font::printStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom,
                              u8 p_layer ) const {
         u32 current_char = 0;
@@ -168,6 +187,68 @@ namespace IO {
     }
     void font::hideContinue( u8 p_x, u8 p_y, u8 p_color, bool p_bottom, u8 p_layer ) const {
         printRectangle( p_x, p_y, p_x + 5, p_y + 9, p_bottom, p_color, p_layer );
+    }
+
+    void font::printBreakingString( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
+            bool p_bottom, alignment p_alignment, u8 p_yDistance, char p_breakChar,
+            s8 p_adjustX, u8 p_layer ) const {
+        u32 current_char = 0;
+        s16 putX = p_x, putY = p_y;
+
+        s16 lineWd = stringMaxWidth( p_string, p_maxWidth, p_breakChar );
+        if( p_alignment == RIGHT ) putX = p_x - lineWd;
+        if( p_alignment == CENTER ) putX = p_x - lineWd / 2;
+
+        while( p_string[ current_char ] ) {
+            if( lineWd <= 0 || p_string[ current_char ] == '\n' ) {
+                putY += p_yDistance;
+                putX = ( p_x -= p_adjustX );
+                lineWd = stringMaxWidth( p_string + current_char + 1, p_maxWidth, p_breakChar );
+                if( p_alignment == RIGHT ) putX = p_x - lineWd;
+                if( p_alignment == CENTER ) putX = p_x - lineWd / 2;
+
+                current_char++;
+                continue;
+            }
+            printChar( p_string[ current_char ], putX, putY, p_bottom, p_layer );
+
+            u16 c = (u16) p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ];
+            lineWd -= _widths[ c ];
+            current_char++;
+        }
+    }
+
+    void font::printBreakingStringC( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
+            bool p_bottom, alignment p_alignment, u8 p_yDistance, char p_breakChar,
+            s8 p_adjustX, u8 p_layer ) const {
+        u32 current_char = 0;
+        s16 putX = p_x, putY = p_y;
+
+        s16 lineWd = stringMaxWidthC( p_string, p_maxWidth, p_breakChar );
+        if( p_alignment == RIGHT ) putX = p_x - lineWd;
+        if( p_alignment == CENTER ) putX = p_x - lineWd / 2;
+
+        while( p_string[ current_char ] ) {
+            if( lineWd <= 0 || p_string[ current_char ] == '\n' ) {
+                putY += p_yDistance;
+                putX = ( p_x -= p_adjustX );
+                lineWd = stringMaxWidthC( p_string + current_char + 1, p_maxWidth, p_breakChar );
+                if( p_alignment == RIGHT ) putX = p_x - lineWd;
+                if( p_alignment == CENTER ) putX = p_x - lineWd / 2;
+
+                current_char++;
+                continue;
+            }
+            printChar( p_string[ current_char ], putX, putY, p_bottom, p_layer );
+
+            u16 c = (u16) p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ] - 1;
+            lineWd -= _widths[ c ] - 1;
+            current_char++;
+        }
     }
 
     void font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
@@ -326,6 +407,43 @@ namespace IO {
 
         return width;
     }
+
+    u32 font::stringMaxWidth( const char *p_string, u16 p_maxWidth, char p_breakChar ) const {
+        u32 current_char = 0;
+        u32 width        = 0;
+        u32 lasttmpwidth = 0;
+
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' ) { return width; }
+            if( p_string[ current_char ] == p_breakChar ) { lasttmpwidth = width; }
+            u16 c = (u16) p_string[ current_char ];
+            _shiftchar( c );
+            width += _widths[ c ];
+            if( width > p_maxWidth ) { return lasttmpwidth; }
+            current_char++;
+        }
+
+        return width;
+    }
+
+    u32 font::stringMaxWidthC( const char *p_string, u16 p_maxWidth, char p_breakChar ) const {
+        u32 current_char = 0;
+        u32 width        = 0;
+        u32 lasttmpwidth = 0;
+
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' ) { return width; }
+            if( p_string[ current_char ] == p_breakChar ) { lasttmpwidth = width; }
+            u16 c = (u16) p_string[ current_char ];
+            _shiftchar( c );
+            width += _widths[ c ] - 1;
+            if( width > p_maxWidth ) { return lasttmpwidth; }
+            current_char++;
+        }
+
+        return width;
+    }
+
     void font::printCounter( u32 p_value, u8 p_digits, u16 p_x, u16 p_y, u8 p_highlightDigit,
                              u8 p_highlightBG, u8 p_highlightFG, bool p_bottom, u8 p_layer ) {
         for( u8 i = 0; i < p_digits; ++i, p_value /= 10 ) {

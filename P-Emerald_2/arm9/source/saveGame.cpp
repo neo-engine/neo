@@ -31,7 +31,6 @@
 #include "battleTrainer.h"
 #include "fs.h"
 #include "messageBox.h"
-#include "pokemon.h"
 #include "saveGame.h"
 #include "uio.h"
 #include "itemNames.h"

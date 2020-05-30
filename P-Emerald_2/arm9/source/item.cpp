@@ -30,10 +30,8 @@ along with Pokémon neo.  If not, new see <http://www.gnu.org/licenses/>.
 
 #include "berry.h"
 #include "item.h"
-#include "itemNames.h"
 #include "move.h"
 #include "moveNames.h"
-#include "pokemon.h"
 #include "pokemonNames.h"
 
 #include "mapDefines.h"

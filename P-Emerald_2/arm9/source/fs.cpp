@@ -41,7 +41,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "fs.h"
 #include "item.h"
-#include "mapSlice.h"
 #include "move.h"
 #include "pokemon.h"
 #include "uio.h"
@@ -55,6 +54,7 @@ const char LOCATION_NAME_PATH[] = "nitro:/DATA/LOC_NAME/";
 const char ITEM_NAME_PATH[]     = "nitro:/DATA/ITEM_NAME/";
 const char ITEM_DATA_PATH[]     = "nitro:/DATA/ITEM_DATA/";
 const char ABILITY_NAME_PATH[]  = "nitro:/DATA/ABTY_NAME/";
+const char ABILITY_DSCR_PATH[]  = "nitro:/DATA/ABTY_DSCR/";
 const char MOVE_NAME_PATH[]     = "nitro:/DATA/MOVE_NAME/";
 const char MOVE_DATA_PATH[]     = "nitro:/DATA/MOVE_DATA/";
 const char POKEMON_NAME_PATH[]  = "nitro:/DATA/PKMN_NAME/";
@@ -291,73 +291,6 @@ namespace FS {
         return true;
     }
 
-    std::string breakString( const std::string& p_string, u8 p_lineLength ) {
-        std::string result = "";
-
-        u8          acLineLength = 0;
-        std::string tmp          = "";
-        for( auto c : p_string ) {
-            if( c == ' ' ) {
-                if( acLineLength + tmp.length( ) > p_lineLength ) {
-                    if( acLineLength ) {
-                        result += "\n" + tmp + " ";
-                        acLineLength = tmp.length( );
-                        tmp          = "";
-                    } else {
-                        result += tmp + "\n";
-                        acLineLength = 0;
-                        tmp          = "";
-                    }
-                } else {
-                    result += tmp + ' ';
-                    tmp = "";
-                    acLineLength += tmp.length( ) + 1;
-                }
-            } else
-                tmp += c;
-        }
-
-        if( acLineLength + tmp.length( ) > p_lineLength && acLineLength )
-            result += "\n" + tmp + " ";
-        else
-            result += tmp;
-        return result;
-    }
-
-    std::string breakString( const std::string& p_string, IO::font* p_font, u8 p_lineLength ) {
-        std::string result = "";
-
-        u8          acLineLength = 0;
-        std::string tmp          = "";
-        for( auto c : p_string ) {
-            if( c == ' ' ) {
-                u8 tmpLen = p_font->stringWidth( tmp.c_str( ) );
-                if( acLineLength + tmpLen > p_lineLength ) {
-                    if( acLineLength ) {
-                        result += "\n" + tmp + " ";
-                        acLineLength = tmpLen;
-                        tmp          = "";
-                    } else {
-                        result += tmp + "\n";
-                        acLineLength = 0;
-                        tmp          = "";
-                    }
-                } else {
-                    result += tmp + ' ';
-                    tmp = "";
-                    acLineLength += tmpLen;
-                }
-            } else
-                tmp += c;
-        }
-
-        if( acLineLength + p_font->stringWidth( tmp.c_str( ) ) > p_lineLength && acLineLength )
-            result += "\n" + tmp + " ";
-        else
-            result += tmp;
-        return result;
-    }
-
     bool getLocation( const u16 p_locationId, const u8 p_language, char* p_out ) {
         FILE* f = FS::openSplit( LOCATION_NAME_PATH, p_locationId, ".str", 5000 );
         if( !f ) return false;
@@ -512,6 +445,27 @@ std::string getAbilityName( int p_abilityId, int p_language ) {
 std::string getAbilityName( int p_abilityId ) {
     return getAbilityName( p_abilityId, CURRENT_LANGUAGE );
 }
+
+bool getAbilityDescr( int p_abilityId, int p_language, char* p_out ) {
+    FILE* f = FS::openSplit( ABILITY_DSCR_PATH, p_abilityId, ".str" );
+    if( !f ) return false;
+
+    for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, ABILITY_DSCRLENGTH, f ); }
+    fclose( f );
+    return true;
+}
+
+std::string getAbilityDescr( int p_abilityId, int p_language ) {
+    char tmpbuf[ ABILITY_DSCRLENGTH ];
+    if( !getAbilityDescr( p_abilityId, p_language, tmpbuf ) ) { return "---"; }
+    return std::string( tmpbuf );
+}
+
+std::string getAbilityDescr( int p_abilityId ) {
+    return getAbilityDescr( p_abilityId, CURRENT_LANGUAGE );
+}
+
+
 
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
     char tmpbuf[ 20 ];

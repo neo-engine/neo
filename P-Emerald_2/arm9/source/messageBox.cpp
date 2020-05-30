@@ -29,7 +29,6 @@
 #include <vector>
 #include "messageBox.h"
 #include "fs.h"
-#include "item.h"
 #include "saveGame.h"
 #include "sprite.h"
 

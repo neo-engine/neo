@@ -26,7 +26,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "bagUI.h"
-#include "bag.h"
 #include "bagViewer.h"
 #include "berry.h"
 #include "defines.h"
@@ -35,7 +34,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "messageBox.h"
 #include "saveGame.h"
 #include "screenFade.h"
-#include "uio.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -230,9 +228,6 @@ namespace BAG {
             display = ITEM::getItemName( p_itemId ) + ": "
                       + MOVE::getMoveName( p_data.m_param2 );
 
-            // TODO
-            descr = FS::breakString( "", IO::regularFont, 196 );
-
             IO::regularFont->printString( GET_STRING( 29 ), 33, 145, false );
             tileCnt
                 = IO::loadTypeIcon( move.m_type, 62, 144, 1, 1, tileCnt, false, CURRENT_LANGUAGE );
@@ -265,7 +260,8 @@ namespace BAG {
 
         IO::regularFont->printString( display.c_str( ), 128, 26, false, IO::font::CENTER );
 
-        IO::regularFont->printString( descr.c_str( ), 33, 83, false, IO::font::LEFT, 11 );
+        IO::regularFont->printBreakingString( descr.c_str( ), 33, 83, 196, false,
+                IO::font::LEFT, 11 );
         IO::updateOAM( false );
     }
 

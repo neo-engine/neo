@@ -701,7 +701,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Pok\xe9mon Egg that", "Pok\xe9mon-Ei, das"},
     {"somehow reached you", "irgendwie zu dir fand"},
     {"Item", "Item"},
-    {"Ability", "F\xe4hig."},
+    {"Ability", "F\xe4higkeit"},
     {"", "Wesen: "},
 
     {" nature.", ""},
@@ -722,5 +722,5 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Pok\xe9"
      "blocks.",
      "Pok\xe9riegel."},
-    {"%2hhu/%2hhu", "%2hhu/%2hhu"},
+    {"%2hhu/%2hhu", "%2hhu/%2hhu"}, // PP
 };

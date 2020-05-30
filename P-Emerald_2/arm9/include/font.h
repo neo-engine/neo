@@ -29,8 +29,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 
 namespace IO {
-#define NUMFONTS 2
-
     typedef u16 color;
 
     namespace REGULAR_FONT {
@@ -57,10 +55,16 @@ namespace IO {
         // Constructors
         font( u8 *p_fontData, u8 *p_characterWidths, void ( *p_shiftchar )( u16 &val ) );
 
-        // Accessors
+        /*
+         * @brief: Sets the p_num-th color.
+         */
         void setColor( color p_newColor, int p_num ) {
             _color[ p_num ] = p_newColor;
         }
+
+        /*
+         * @brief: Returns the p_num-th color
+         */
         color getColor( int p_num ) const {
             return _color[ p_num ];
         }
@@ -68,33 +72,109 @@ namespace IO {
         enum alignment { LEFT, RIGHT, CENTER };
 
         // Methods
+
+        /*
+         * @brief: Draws the continue triangle for message boxes.
+         */
         void drawContinue( u8 p_x, u8 p_y, bool p_bottom = true, u8 p_layer = 1 ) const;
+
+        /*
+         * @brief: Un-draws the continue triangle.
+         */
         void hideContinue( u8 p_x, u8 p_y, u8 p_color = 250, bool p_bottom = true,
                            u8 p_layer = 1 ) const;
-
+        /*
+         * @brief: Prints the given character at the given position.
+         */
         void printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1 ) const;
+
+        /*
+         * @brief: Prints the given string, where newlines are inserted whenever the
+         * current line exceeds the given p_maxWidth.
+         */
+        void printBreakingString( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
+                                  bool p_bottom, alignment p_alignment = LEFT, u8 p_yDistance = 16,
+                                  char p_breakChar = ' ', s8 p_adjustX = 0, u8 p_layer = 1 ) const;
+        /*
+         * @brief: Prints the given string, where newlines are inserted whenever the
+         * current line exceeds the given p_maxWidth. Uses less horizontal space for each
+         * character.
+         */
+        void printBreakingStringC( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
+                                   bool p_bottom, alignment p_alignment = LEFT, u8 p_yDistance = 16,
+                                   char p_breakChar = ' ', s8 p_adjustX = 0, u8 p_layer = 1 ) const;
+
         /*
          * @brief: Prints a string with less horizontal space between characters
          */
         void printStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                            alignment p_alignment = LEFT, u8 p_yDistance = 16, s8 p_adjustX = 0,
                            u8 p_layer = 1 ) const;
+        /*
+         * @brief: Prints the given string at the given position to the screen.
+         */
         void printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                           alignment p_alignment = LEFT, u8 p_yDistance = 16, s8 p_adjustX = 0,
                           u8 p_layer = 1 ) const;
+        /*
+         * @brief: Prints a string until p_maxX is reached, writes p_breakChar if the
+         * limit is hit
+         */
         void printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                              s16 p_maxX = 256, u16 p_breakChar = L'.', u8 p_layer = 1 ) const;
+        /*
+         * @brief: Prints a string with less horizontal space between characters;
+         * prints p_breakChar once p_maxX is reached.
+         */
+        void printMaxStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
+                             s16 p_maxX = 256, u16 p_breakChar = L'.', u8 p_layer = 1 ) const;
+        /*
+         * @brief: Prints the given string with some delay after every character.
+         */
         void printStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom,
                            u8 p_layer = 1 ) const;
 
+        /*
+         * @brief: Prints the given string; pauses and waits for KEY_A or KEY_B when a "`" is
+         * encountered in the given string.
+         */
         void printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                             u8 p_layer = 1 ) const;
+        /*
+         * @brief: Prints the given string; pauses and waits for KEY_A or KEY_B when a "`" is
+         * encountered in the given string. Has additional delay after every character.
+         */
         void printMBStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom,
                              u8 p_layer = 1 ) const;
 
+        /*
+         * @brief: Returns the width in px that the given string has when using the font
+         */
         u32 stringWidth( const char *p_string ) const;
+        /*
+         * @brief: Returns the width in px that the given string has when using the
+         * (compressed) font of the printStringC variants
+         */
         u32 stringWidthC( const char *p_string ) const;
+        /*
+         * @brief: Returns the width in px that the given string has when using the font
+         * or the length of the longest prefix ending before a p_breakChar that is shorter
+         * than p_maxwidth
+         */
+        u32 stringMaxWidth( const char *p_string, u16 p_maxWidth, char p_breakChar ) const;
+        /*
+         * @brief: Returns the width in px that the given string has when using the
+         * (compressed) font of the printStringC variants
+         * or the length of the longest prefix ending before a p_breakChar that is shorter
+         * than p_maxwidth
+         */
+        u32 stringMaxWidthC( const char *p_string, u16 p_maxWidth, char p_breakChar ) const;
 
+
+
+        /*
+         * @brief: Prints a counter with the specified value.
+         */
         void printCounter( u32 p_value, u8 p_digits, u16 p_x, u16 p_y, u8 p_highlightDigit,
                            u8 p_highlightBG, u8 p_highlightFG, bool p_bottom, u8 p_layer = 1 );
 

@@ -53,8 +53,7 @@ struct boxPokemon {
     u16 m_oTSid             = 0;
     u32 m_experienceGained  = 0;
     u8  m_steps             = 0; // StepstoHatch/256 // Happiness
-    u8  m_ability           = 0;
-    u8  m_markings          = 0;
+    u16 m_ability           = 0;
     u8  m_origLang          = 0;
     u8  m_effortValues[ 6 ] = {0}; // HP,Attack,Defense,SAttack,SDefense,Speed
     u8  m_contestStats[ 6 ] = {0}; // Cool, Beauty, Cute, Smart, Tough, Sheen

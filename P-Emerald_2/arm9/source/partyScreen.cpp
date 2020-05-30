@@ -35,7 +35,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef DESQUID
 #include "ability.h"
 #include "fs.h"
-#include "move.h"
 #endif
 
 namespace STS {

@@ -34,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "screenFade.h"
 #include "sprite.h"
 #include "uio.h"
+#include "pokemonNames.h"
 
 #include "hpbar.h"
 #include "status_brn.h"
@@ -44,17 +45,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "status_shiny.h"
 #include "status_slp.h"
 #include "status_txc.h"
-
 #include "NoItem.h"
-
-#include "partybg.h"
-#include "partybg2.h"
-#include "statussub.h"
-#include "statustop.h"
-
 #include "arrow_up.h"
 #include "infopage1.h"
 #include "infopage2.h"
+#include "infopage3.h"
+#include "infopage4.h"
 #include "movebox1.h"
 #include "movebox2.h"
 #include "noselection_32_64.h"
@@ -65,8 +61,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "window2.h"
 #include "window3.h"
 #include "x_16_16.h"
+#include "ability1.h"
+#include "ability2.h"
+#include "ability3.h"
 
-#include "pokemonNames.h"
+#include "partybg.h"
+#include "partybg2.h"
+#include "statussub.h"
+#include "statustop.h"
+
 
 namespace STS {
     // top screen sprites
@@ -107,11 +110,13 @@ namespace STS {
 #define SPR_NAVIGATION_OAM_SUB( p_page ) ( 25 + ( p_page ) )
 #define SPR_TYPE_OAM_SUB( p_idx ) ( 30 + ( p_idx ) )
 #define SPR_MOVE_OAM_SUB( p_move ) ( 34 + 6 * ( p_move ) )
+#define SPR_ABILITY_OAM_SUB 60
 
 #define SPR_INFOPAGE_PAL_SUB 0
 #define SPR_ARROW_X_PAL_SUB 1
 #define SPR_BOX_PAL_SUB 2
 #define SPR_TYPE_PAL_SUB( p_idx ) ( 3 + ( p_idx ) )
+#define SPR_ABILITY_PAL_SUB 8
 
     u16 statusScreenUI::initTopScreen( pokemon* p_pokemon, bool p_bottom ) {
         IO::clearScreen( p_bottom, false, true );
@@ -509,6 +514,28 @@ namespace STS {
             IO::copySpritePal( movebox1Pal + 4, SPR_TYPE_PAL_SUB( i ), 4, 2 * 4, p_bottom );
         }
 
+        // ability window
+
+        tileCnt = IO::loadSprite( SPR_ABILITY_OAM_SUB, SPR_ABILITY_PAL_SUB, tileCnt,
+                                  INFO_X_SUB + 88, INFO_Y_SUB, 32, 64, 0,
+                                  ability3Tiles, ability3TilesLen, false, false, false,
+                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        IO::loadSprite( SPR_ABILITY_OAM_SUB + 1, SPR_ABILITY_PAL_SUB, tileCnt,
+                        INFO_X_SUB - 12, INFO_Y_SUB, 64, 64, 0, 0, 0, false, false, false,
+                        OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( SPR_ABILITY_OAM_SUB + 2, SPR_ABILITY_PAL_SUB, tileCnt,
+                                  INFO_X_SUB + 36, INFO_Y_SUB, 64, 64, ability1Pal,
+                                  ability1Tiles, ability1TilesLen, false, false, false,
+                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        IO::loadSprite( SPR_ABILITY_OAM_SUB + 4, SPR_ABILITY_PAL_SUB, tileCnt,
+                                  INFO_X_SUB + 64 + 36, INFO_Y_SUB, 64, 64, 0, 0, 0,
+                                  false, false, false,
+                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( SPR_ABILITY_OAM_SUB + 3, SPR_ABILITY_PAL_SUB, tileCnt,
+                                  INFO_X_SUB + 64 + 68, INFO_Y_SUB, 64, 64, 0,
+                                  ability2Tiles, ability2TilesLen, false, false, false,
+                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+
         // Build the shared pals
         IO::copySpritePal( arrow_upPal, SPR_ARROW_X_PAL_SUB, 0, 2 * 4, p_bottom );
         IO::copySpritePal( x_16_16Pal + 4, SPR_ARROW_X_PAL_SUB, 4, 2 * 3, p_bottom );
@@ -823,9 +850,8 @@ namespace STS {
             }
 
             // BOTTOM
-            for( u8 i = 0; i < 12; ++i ) {
-                oamSub[ SPR_INFOPAGE_START_OAM_SUB + i ].isHidden = false;
-            }
+            for( u8 i = 0; i < 5; ++i ) { oamSub[ SPR_ABILITY_OAM_SUB + i ].isHidden = true; }
+            for( u8 i = 0; i < 12; ++i ) { oamSub[ SPR_INFOPAGE_START_OAM_SUB + i ].isHidden = false; }
 
             // Nature
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
@@ -947,13 +973,10 @@ namespace STS {
             // TOP
 
             // Draw Pokemon stats
-            for( u8 i = 0; i < 6; ++i ) { oam[ SPR_WINDOW_START_OAM + i ].isHidden = false; }
-            oam[ SPR_WINDOW_START_OAM + 3 ].isHidden   = true;
-            oam[ SPR_WINDOW_START_OAM + 4 ].isHidden   = true;
+            for( u8 i = 0; i < 5; ++i ) { oam[ SPR_WINDOW_START_OAM + i ].isHidden = false; }
+            oam[ SPR_WINDOW_START_OAM + 5 ].isHidden   = true;
             oam[ SPR_HP_BAR_OAM ].isHidden             = false;
             oam[ SPR_HP_BAR_OAM + 1 ].isHidden         = false;
-            oam[ SPR_INFOPAGE_START_OAM + 6 ].isHidden = true;
-            oam[ SPR_INFOPAGE_START_OAM + 7 ].isHidden = true;
 
             // HP
             u8 barWidth = ( 45 + 14 ) * p_pokemon->m_stats.m_curHP / p_pokemon->m_stats.m_maxHP;
@@ -1001,7 +1024,7 @@ namespace STS {
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             IO::regularFont->printString( GET_STRING( 126 ), INFO_X - 7, INFO_Y + 3, false );
 
-            snprintf( buffer, 49, "%hu/%hu", p_pokemon->EVget( 0 ), p_pokemon->IVget( 0 ) );
+            snprintf( buffer, 49, "%hu/%hu", p_pokemon->IVget( 0 ), p_pokemon->EVget( 0 ) );
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->setColor( 0, 2 );
             IO::regularFont->printStringC( buffer, INFO_X - 8 + 128, INFO_Y + 4, false,
@@ -1013,9 +1036,11 @@ namespace STS {
             IO::regularFont->printStringC( buffer, INFO_X - 7 + 72, INFO_Y + 3, false,
                                            IO::font::CENTER );
 
+            u16 evtotal = p_pokemon->EVget( 0 );
             for( u8 i = 0; i < 5; ++i ) {
-                snprintf( buffer, 49, "%hu/%hu", p_pokemon->EVget( i + 1 ),
-                          p_pokemon->IVget( i + 1 ) );
+                snprintf( buffer, 49, "%hu/%hu", p_pokemon->IVget( i + 1 ),
+                          p_pokemon->EVget( i + 1 ) );
+                evtotal += p_pokemon->EVget( i + 1 );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                 IO::regularFont->setColor( 0, 2 );
                 IO::regularFont->printStringC( buffer, INFO_X - 7 + 128,
@@ -1037,15 +1062,40 @@ namespace STS {
                                               false, IO::font::CENTER );
             }
 
-            // Ability
-            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
-            IO::regularFont->printStringC( GET_STRING( 363 ), INFO_X, 150, false );
+            // EV total / Happiness
+            IO::regularFont->setColor( IO::COLOR_IDX, 2 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 4 );
+            IO::regularFont->setColor( IO::COLOR_IDX, 3 );
 
-            auto aname = getAbilityName( p_pokemon->getAbility( ) );
-            IO::regularFont->printStringC( aname.c_str( ), INFO_X - 8 + 128 + aname.length( ), 150,
-                                           false, IO::font::RIGHT );
+            snprintf( buffer, 49, "\x01 %hu \x02 %hu", p_pokemon->m_boxdata.m_steps,
+                    evtotal );
+
+            IO::regularFont->printStringC( buffer, INFO_X - 7 + 128,
+                    INFO_Y + 12 + 15 * 7, false,
+                    IO::font::RIGHT );
+
 
             // BOTTOM
+
+            for( u8 i = 0; i < 5; ++i ) { oamSub[ SPR_ABILITY_OAM_SUB + i ].isHidden = false; }
+            for( u8 i = 0; i < 12; ++i ) { oamSub[ SPR_INFOPAGE_START_OAM_SUB + i ].isHidden = true; }
+
+            // Ability
+            IO::regularFont->setColor( IO::COLOR_IDX, 1 );
+            IO::regularFont->setColor( 0, 2 );
+            IO::regularFont->printStringC( GET_STRING( 363 ), INFO_X_SUB + 190 - 8,
+                    INFO_Y_SUB, true, IO::font::RIGHT );
+
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            auto aname = getAbilityName( p_pokemon->getAbility( ) );
+            IO::regularFont->printStringC( aname.c_str( ), INFO_X_SUB - 5, INFO_Y_SUB + 3, true );
+
+            // Ability description
+
+            IO::regularFont->printBreakingStringC(
+                    getAbilityDescr( p_pokemon->getAbility( ) ).c_str( ),
+                    INFO_X_SUB, INFO_Y_SUB + 18, 188, true, IO::font::LEFT, 13 );
+
 
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             IO::regularFont->setColor( 0, 2 );
@@ -1080,6 +1130,16 @@ namespace STS {
             }
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
+            break;
+        }
+        case 2: {
+
+
+            // BOTTOM
+
+            for( u8 i = 0; i < 5; ++i ) { oamSub[ SPR_ABILITY_OAM_SUB + i ].isHidden = true; }
+            for( u8 i = 0; i < 12; ++i ) { oamSub[ SPR_INFOPAGE_START_OAM_SUB + i ].isHidden = true; }
         }
         default:
             break;

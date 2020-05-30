@@ -27,7 +27,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "mapSprite.h"
 #include "fs.h"
-#include "sprite.h"
 #include "uio.h"
 
 #include "messageBox.h"

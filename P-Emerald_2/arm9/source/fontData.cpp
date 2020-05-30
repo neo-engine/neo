@@ -56,13 +56,13 @@ namespace IO {
 
         u8 fontWidths[ NUM_CHARS ] = {8, 8, 8, 8, 8,
 			8, 8, 8, 8, 8,
-			9, 8, 8, 13, 13, 
+			9, 8, 8, 13, 13,
 			0, 0, 0, 0, 3,
 			3, 3, 2,
 
 			// A-Z start
 			4, 4, 4, 4, 3, 3, 4, 4,
-			2, 3, 4, 4, 4, 5, 4, 4,			
+			2, 3, 4, 4, 4, 5, 4, 4,
 		};
 
         u8 fontData[ NUM_CHARS * 256 ] = {
@@ -2452,6 +2452,14 @@ namespace IO {
             }
             if( p_val == '' ) {
                 p_val = 111;
+                return;
+            }
+            if( p_val == '\x01' ) { // Heart
+                p_val = 445;
+                return;
+            }
+            if( p_val == '\x02' ) { // Battle
+                p_val = 475;
                 return;
             }
 

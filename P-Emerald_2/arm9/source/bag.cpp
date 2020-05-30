@@ -26,7 +26,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "bag.h"
-#include "item.h"
 #include "pokemon.h"
 #include "saveGame.h"
 

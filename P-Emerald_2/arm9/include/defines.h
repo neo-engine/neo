@@ -53,6 +53,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define ITEM_NAMELENGTH 20
 #define MOVE_NAMELENGTH 20
 #define ABILITY_NAMELENGTH 20
+#define ABILITY_DSCRLENGTH 200
 #define LOCATION_NAMELENGTH 25
 
 #undef RAND_MAX
