@@ -133,20 +133,10 @@ const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
 
 #endif
 
-const char* const MONTHS[ 12 ][ LANGUAGES ] = {
-    {"Jan.", "Jan."},
-    {"Feb.", "Feb."},
-    {"Mar.", "M\xe4r."},
-    {"Apr.", "Apr."},
-    {"May", "Mai"},
-    {"June", "Juni"},
-    {"July", "Juli"},
-    {"Aug.", "Aug."},
-    {"Sep.", "Sep."},
-    {"Oct.", "Okt."},
-    {"Nov.", "Nov."},
-    {"Dec.", "Dez."}
-};
+const char* const MONTHS[ 12 ][ LANGUAGES ]
+    = {{"Jan.", "Jan."}, {"Feb.", "Feb."}, {"Mar.", "M\xe4r."}, {"Apr.", "Apr."},
+       {"May", "Mai"},   {"June", "Juni"}, {"July", "Juli"},    {"Aug.", "Aug."},
+       {"Sep.", "Sep."}, {"Oct.", "Okt."}, {"Nov.", "Nov."},    {"Dec.", "Dez."}};
 
 const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"No data.", "Keine Daten."},
@@ -480,36 +470,36 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Loves to eat.", "Liebt es, zu essen."},
     {"Often dozes off.", "Nickt oft ein."},
     {"Nods off a lot.", "Schl\xe4"
-                       "ft gerne."},
+                        "ft gerne."},
 
     {"Scatters things often.", "Macht oft Unordnung."},
     {"Likes to relax.", "Liebt es zu entspannen."},
     {"Proud of its power.", "Ist stolz auf seine St\xe4"
-                           "rke."},
+                            "rke."},
     {"Likes to thrash about.", "Pr\xfc"
-                              "gelt sich gerne."},
+                               "gelt sich gerne."},
     {"A little quick tempered.", "Besitzt Temperament."},
 
     // 220
 
     {"Likes to fight.", "Liebt es zu k\xe4"
-                       "mpfen."},
+                        "mpfen."},
     {"Quick tempered.", "Ist impulsiv."},
     {"Sturdy body.", "Hat einen robusten K\xf6"
-                    "rper."},
+                     "rper."},
     {"Capable of taking hits.", "Kann Treffer gut verkraften."},
     {"Highly persistent.", "Ist \xe4"
-                          "u\xdf"
-                          "erst ausdauernd."},
+                           "u\xdf"
+                           "erst ausdauernd."},
 
     {"Good endurance.", "Hat eine gute Ausdauer."},
     {"Good perseverance.", "Ist beharrlich."},
     {"Highly curious.", "Ist sehr neugierig."},
     {"Mischievous.", "Ist hinterh\xe4"
-                    "ltig."},
+                     "ltig."},
     {"Thoroughly cunning.", "Ist \xe4"
-                           "u\xdf"
-                           "erst gerissen."},
+                            "u\xdf"
+                            "erst gerissen."},
 
     // 230
 
@@ -518,23 +508,23 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Strong willed.", "Besitzt starken Willen."},
     {"Somewhat vain.", "Ist etwas eitel."},
     {"Strongly defiant.", "Ist sehr aufs\xe4"
-                         "ssig."},
+                          "ssig."},
 
     {"Hates to lose.", "Hasst Niederlagen."},
     {"Somewhat stubborn.", "Ist dickk\xf6"
-                          "pfig."},
+                           "pfig."},
     {"Likes to run.", "Liebt es, zu rennen."},
     {"Alert to sounds.", "Achtet auf Ger\xe4"
-                        "usche."},
+                         "usche."},
     {"Impetuous and silly.", "Ist ungest\xfc"
-                            "m und einf\xe4"
-                            "ltig."},
+                             "m und einf\xe4"
+                             "ltig."},
 
     // 240
 
     {"Somewhat of a clown.", "Ist fast wie eine Clown."},
     {"Quick to flee.", "Fl\xfc"
-                      "chtet schnell."},
+                       "chtet schnell."},
     {"spicy", "scharf"},
     {"sour", "saur"},
     {"sweet", "s\xfc\xdf"},
@@ -647,7 +637,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"It's a large Waterfall.\n", "Ein großer Wasserfall.\n"},
     {"Something moved!\n", "Da hat sich etwas bewegt!\n"},
-    {"Light is shining from the\nsurface. ", "Licht scheint von der\nOberfl\xe4""che. "},
+    {"Light is shining from the\nsurface. ", "Licht scheint von der\nOberfl\xe4"
+                                             "che. "},
     {"Select", "Ausw\xe4hlen"},
     {"Status", "Status"},
 
@@ -679,7 +670,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"ID No.", "Id Nr."},
     {"Exp.", "E.-Pkt."},
-    {"Next", "N\xe4""chst."},
+    {"Next", "N\xe4"
+             "chst."},
     {"Level", "Level"},
     {"Pok\xe9mon Info", "Pok\xe9mon-Info"},
 
@@ -699,9 +691,10 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"Egg received", "Pok\xe9mon-Ei erhalten"},
     {"from", "vom"},
-    {"at", "in/bei"},
+    {"in/at", "in/bei"},
     {"from", "von"},
-    {"A highly mysterious", "Ein \xe4u\xdf""erst seltsames"},
+    {"A highly mysterious", "Ein \xe4u\xdf"
+                            "erst seltsames"},
 
     // 360
 
@@ -711,7 +704,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Ability", "F\xe4hig."},
     {"", "Wesen: "},
 
-    {"nature.", ""},
+    {" nature.", ""},
     {"Egg received.", "Ei erhalten."},
     {"Had a fateful encunter.", "Schicksalhafte Begegnung."},
     {"Egg hatched.", "Ei geschl\xfcpft."},
@@ -726,5 +719,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Likes ", "Mag "},
 
     {"%s ", "%se "},
-    {"Pok\xe9""blocks.", "Pok\xe9riegel."},
+    {"Pok\xe9"
+     "blocks.",
+     "Pok\xe9riegel."},
+    {"%2hhu/%2hhu", "%2hhu/%2hhu"},
 };

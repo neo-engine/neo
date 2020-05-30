@@ -69,7 +69,8 @@ namespace IO {
 
         // Methods
         void drawContinue( u8 p_x, u8 p_y, bool p_bottom = true, u8 p_layer = 1 ) const;
-        void hideContinue( u8 p_x, u8 p_y, u8 p_color = 250, bool p_bottom = true, u8 p_layer = 1 ) const;
+        void hideContinue( u8 p_x, u8 p_y, u8 p_color = 250, bool p_bottom = true,
+                           u8 p_layer = 1 ) const;
 
         void printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1 ) const;
         /*
@@ -86,15 +87,17 @@ namespace IO {
         void printStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom,
                            u8 p_layer = 1 ) const;
 
-        void printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1 )
-            const;
+        void printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
+                            u8 p_layer = 1 ) const;
         void printMBStringD( const char *p_string, s16 &p_x, s16 &p_y, bool p_bottom,
                              u8 p_layer = 1 ) const;
 
         u32 stringWidth( const char *p_string ) const;
+        u32 stringWidthC( const char *p_string ) const;
 
         void printCounter( u32 p_value, u8 p_digits, u16 p_x, u16 p_y, u8 p_highlightDigit,
                            u8 p_highlightBG, u8 p_highlightFG, bool p_bottom, u8 p_layer = 1 );
+
       private:
         u8 *_data;
         u8 *_widths;

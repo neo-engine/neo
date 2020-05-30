@@ -63,16 +63,16 @@ namespace IO {
                              u8 p_layer ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
-        if( p_alignment == RIGHT ) putX = p_x - stringWidth( p_string );
-        if( p_alignment == CENTER ) putX = p_x - stringWidth( p_string ) / 2;
+        if( p_alignment == RIGHT ) putX = p_x - stringWidthC( p_string );
+        if( p_alignment == CENTER ) putX = p_x - stringWidthC( p_string ) / 2;
 
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
                 putX = ( p_x -= p_adjustX );
-                if( p_alignment == RIGHT ) putX = p_x - stringWidth( p_string + current_char + 1 );
+                if( p_alignment == RIGHT ) putX = p_x - stringWidthC( p_string + current_char + 1 );
                 if( p_alignment == CENTER )
-                    putX = p_x - stringWidth( p_string + current_char + 1 ) / 2;
+                    putX = p_x - stringWidthC( p_string + current_char + 1 ) / 2;
 
                 current_char++;
                 continue;
@@ -86,7 +86,6 @@ namespace IO {
             current_char++;
         }
     }
-
 
     void font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                             alignment p_alignment, u8 p_yDistance, s8 p_adjustX,
@@ -312,6 +311,21 @@ namespace IO {
         return width;
     }
 
+    u32 font::stringWidthC( const char *p_string ) const {
+        u32 current_char = 0;
+        u32 width        = 0;
+
+        while( p_string[ current_char ] ) {
+            if( p_string[ current_char ] == '\n' ) break;
+            u16 c = (u16) p_string[ current_char ];
+            _shiftchar( c );
+            width += _widths[ c ] - 1;
+
+            current_char++;
+        }
+
+        return width;
+    }
     void font::printCounter( u32 p_value, u8 p_digits, u16 p_x, u16 p_y, u8 p_highlightDigit,
                              u8 p_highlightBG, u8 p_highlightFG, bool p_bottom, u8 p_layer ) {
         for( u8 i = 0; i < p_digits; ++i, p_value /= 10 ) {

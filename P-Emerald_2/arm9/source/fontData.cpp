@@ -48,9 +48,22 @@ namespace IO {
                 p_val = 12;
                 return;
             }
+			if( 'A' <= p_val && p_val <= 'Z' ) {
+				 p_val = p_val - 'A' + 23;
+				return;
+			}
         }
 
-        u8 fontWidths[ NUM_CHARS ] = {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 8, 8, 13, 13};
+        u8 fontWidths[ NUM_CHARS ] = {8, 8, 8, 8, 8,
+			8, 8, 8, 8, 8,
+			9, 8, 8, 13, 13, 
+			0, 0, 0, 0, 3,
+			3, 3, 2,
+
+			// A-Z start
+			4, 4, 4, 4, 3, 3, 4, 4,
+			2, 3, 4, 4, 4, 5, 4, 4,			
+		};
 
         u8 fontData[ NUM_CHARS * 256 ] = {
  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

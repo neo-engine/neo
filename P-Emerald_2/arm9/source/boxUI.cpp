@@ -42,12 +42,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "Up.h"
 #include "box_arrow.h"
 
-#include "Contest.h"
-#include "PKMN.h"
-#include "atks.h"
-#include "memo.h"
-#include "time_icon.h"
-
 namespace BOX {
 #define ARROW_ID 1
 #define HELD_PKMN 2
@@ -84,7 +78,7 @@ namespace BOX {
         tileCnt
             = IO::loadSprite( ARROW_ID, 0, 1, tileCnt, 0, 0, 16, 16, box_arrowPal, box_arrowTiles,
                               box_arrowTilesLen, false, false, true, OBJPRIORITY_0, false );
-        tileCnt += 64;
+        tileCnt += 64;/*
         tileCnt = IO::loadSprite( PAGE_ICON_START + ( 0 ), 0, PAGE_ICON_START + ( 0 ), tileCnt, 20,
                                   0, 32, 32, time_iconPal, time_iconTiles, time_iconTilesLen, false,
                                   false, true, OBJPRIORITY_0, false );
@@ -99,7 +93,7 @@ namespace BOX {
                                   OBJPRIORITY_0, false );
         tileCnt = IO::loadSprite( PAGE_ICON_START + ( 4 ), 0, PAGE_ICON_START + ( 4 ), tileCnt, 60,
                                   0, 32, 32, ContestPal, ContestTiles, ContestTilesLen, false,
-                                  false, true, OBJPRIORITY_0, false );
+                                  false, true, OBJPRIORITY_0, false );*/
         for( u8 i = 0; i < 5; ++i ) {
             IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].x = 48 + 32 * i;
             IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].y = 256 - 10;
