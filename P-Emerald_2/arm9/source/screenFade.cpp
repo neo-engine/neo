@@ -63,6 +63,17 @@ namespace IO {
             swiWaitForVBlank( );
             break;
         }
+        case IO::UNFADE_IMMEDIATE_HALF: {
+            u16 val = 0x1F;
+            for( s8 i = 3; i >= 0; i -= 2 ) {
+                val &= ~( 3 << u8( i ) );
+                reg = reg2 = val;
+                if( i == 3 ) {
+                    swiWaitForVBlank( );
+                }
+            }
+            break;
+        }
         case IO::UNFADE_IMMEDIATE: {
             reg = reg2 = 0;
             swiWaitForVBlank( );
@@ -78,6 +89,18 @@ namespace IO {
             }
             swiWaitForVBlank( );
             break;
+        case IO::CLEAR_DARK_IMMEDIATE_HALF:
+            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+                               | BLEND_SRC_SPRITE;
+            reg = reg2 = 1;
+            for( u8 i = 1; i < 5; i += 2 ) {
+                reg = reg2 |= ( 3 << i );
+                if( i == 1 ) {
+                    swiWaitForVBlank( );
+                }
+            }
+            break;
+
         case IO::CLEAR_DARK_IMMEDIATE:
             regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
                                | BLEND_SRC_SPRITE;
@@ -106,6 +129,17 @@ namespace IO {
                 reg = reg2 |= ( 3 << i );
             }
             swiWaitForVBlank( );
+            break;
+        case IO::CLEAR_WHITE_IMMEDIATE_HALF:
+            regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
+                               | BLEND_SRC_SPRITE;
+            reg = reg2 = 1;
+            for( u8 i = 1; i < 5; i += 2 ) {
+                reg = reg2 |= ( 3 << i );
+                if( i == 1 ) {
+                    swiWaitForVBlank( );
+                }
+            }
             break;
         case IO::CLEAR_WHITE_IMMEDIATE:
             regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3

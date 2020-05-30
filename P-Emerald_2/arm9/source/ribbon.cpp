@@ -25,6 +25,7 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
 #include <initializer_list>
 #include "ribbon.h"
 
@@ -199,3 +200,5 @@ ribbon RibbonList[ MAX_RIBBONS ] = {
     {"", ""},
     {"", ""},
 };
+
+*/

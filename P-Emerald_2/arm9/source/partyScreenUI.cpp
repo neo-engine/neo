@@ -645,8 +645,13 @@ namespace STS {
         } else {
             if( p_redraw ) {
                 // general data
-                IO::regularFont->printString( _team[ p_pos ].m_boxdata.m_name, anchor_x + 32,
+                if( IO::regularFont->stringWidth( _team[ p_pos ].m_boxdata.m_name ) > 80 ) {
+                    IO::regularFont->printStringC( _team[ p_pos ].m_boxdata.m_name, anchor_x + 32,
                                               anchor_y + 12, false );
+                } else {
+                    IO::regularFont->printString( _team[ p_pos ].m_boxdata.m_name, anchor_x + 32,
+                                              anchor_y + 12, false );
+                }
 
                 if( _team[ p_pos ].getSpecies( ) != PKMN_NIDORAN_F &&
                         _team[ p_pos ].getSpecies( ) != PKMN_NIDORAN_M ) {

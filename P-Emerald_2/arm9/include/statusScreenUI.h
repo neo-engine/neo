@@ -35,6 +35,7 @@ namespace STS {
         u8       _currentPage = 255;
         bool     _allowKeyUp;
         bool     _allowKeyDown;
+        bool     _needsInit;
         pkmnData _data;
 
         u16 initTopScreen( pokemon* p_pokemon, bool p_bottom = false );
@@ -71,7 +72,8 @@ namespace STS {
          * @brief Returns the number of different pages.
          */
         constexpr u8 getPageCount( ) {
-            return 3;
+            // TODO: Add Contest Screen
+            return 2;
         }
 
         /*

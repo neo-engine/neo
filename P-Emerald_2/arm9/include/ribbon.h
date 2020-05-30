@@ -25,6 +25,7 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
 #pragma once
 
 #include <string>
@@ -42,3 +43,4 @@ struct ribbon {
 
 #define MAX_RIBBONS ( 12 * 8 )
 extern ribbon RibbonList[ MAX_RIBBONS ];
+*/

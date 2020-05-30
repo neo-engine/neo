@@ -337,7 +337,7 @@ namespace STS {
             // Moves
             for( u8 i = 0; i < 4; ++i ) {
                 res.push_back( partyScreen::desquidItem(
-                    {u16( DESQUID_STRING + 42 ), true, 796, 1,
+                    {u16( DESQUID_STRING + 42 ), true, 796, 0,
                      [&, i]( ) { return _team[ _currentSelection ].m_boxdata.m_moves[ i ]; },
                      [&, i]( u32 p_newValue ) {
                          _team[ _currentSelection ].m_boxdata.m_moves[ i ] = p_newValue;
