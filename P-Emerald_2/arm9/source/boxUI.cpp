@@ -27,8 +27,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
-#include "defines.h"
 #include "boxUI.h"
+#include "defines.h"
 #include "fs.h"
 #include "pokemon.h"
 #include "screenFade.h"
@@ -51,25 +51,26 @@ namespace BOX {
 #define PKMN_PALETTE_START 15
 #define PKMN_TILES_START 96 + 182
 
-
     void boxUI::init( ) {
         IO::clearScreen( true, false, false );
         IO::initOAMTable( true );
-        oamInit( &oamSub, SpriteMapping_Bmp_1D_128, false);
-        vramSetBankD(VRAM_D_SUB_SPRITE);
+        // oamInit( &oamSub, SpriteMapping_Bmp_1D_128, false);
+        vramSetBankD( VRAM_D_SUB_SPRITE );
+        videoSetModeSub( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
+                         | ( ( DISPLAY_SPR_1D | DISPLAY_SPR_1D_SIZE_128 | DISPLAY_SPR_1D_BMP
+                               | DISPLAY_SPR_1D_BMP_SIZE_128 | ( 5 << 28 ) | 2 )
+                             & 0xffffff0 ) );
 
         u16 tileCnt = 0;
         for( u8 i = 0; i < 5; ++i ) {
             for( u8 j = 0; j < 6; ++j ) {
-                tileCnt = IO::loadPKMNIconB( rand( ) % MAX_PKMN, 32 * j, 32 * i, 6 * i + j, tileCnt,
-                        true );
+                tileCnt = IO::loadPKMNIconB( rand( ) % MAX_PKMN, 26 * j, 26 * i, 6 * i + j, tileCnt,
+                                             true );
             }
         }
-        tileCnt = IO::loadPKMNIcon( rand( ) % MAX_PKMN, 200, 32, 90, 0, tileCnt, true );
 
         IO::updateOAM( true );
     }
-
 
     constexpr u16 getBoxColor( u8 p_boxIdx ) {
         return RGB15( 4 * ( ( 41 - p_boxIdx ) % 7 + 1 ), ( p_boxIdx * 30 ) / 42 + 1,
@@ -379,4 +380,4 @@ namespace BOX {
         IO::updateOAM( false );
         */
     }
-}
+} // namespace BOX
