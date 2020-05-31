@@ -45,6 +45,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "moveNames.h"
 #include "partyScreen.h"
 #include "statusScreen.h"
+#include "boxViewer.h"
 // END TEST
 
 namespace SAVE {
@@ -92,6 +93,7 @@ namespace SAVE {
             testTeam[ i ]
                 = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false, i == 3 );
             testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
+//            SAVE::SAV.getActiveFile( ).storePkmn( testTeam[ i ] );
         }
         testTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_SURF;
         testTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;
@@ -102,9 +104,14 @@ namespace SAVE {
         testTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
         testTeam[ 2 ].m_boxdata.m_heldItem   = I_YAGO_BERRY;
 
+        BOX::boxViewer bxv;
+        bxv.run( 0 );
+
+        /*
         STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
         sts.run( );
 
+        */
         // STS::statusScreen psts = STS::statusScreen( testTeam );
         // psts.run( );
 

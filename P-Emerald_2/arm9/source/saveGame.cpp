@@ -158,7 +158,6 @@ namespace SAVE {
             if( !getActiveFile( ).m_pkmnTeam[ i ].isEgg( )
                 && getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId == p_pkmnIdx )
                 ++res;
-            if( !m_clipboard[ i ].isEgg( ) && m_clipboard[ i ].m_speciesId == p_pkmnIdx ) ++res;
         }
         return res;
     }

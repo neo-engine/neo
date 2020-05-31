@@ -126,9 +126,8 @@ namespace SAVE {
 // Things shared among all save files
 
 // Stored Pkmn
-#define MAX_BOXES 42
+#define MAX_BOXES 40
         BOX::box            m_storedPokemon[ MAX_BOXES ];
-        boxPokemon m_clipboard[ 6 ];
 
         u8 m_caughtPkmn[ 1 + MAX_PKMN / 8 ];
         u8 m_seenPkmn[ 1 + MAX_PKMN / 8 ];

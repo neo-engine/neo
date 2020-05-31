@@ -51,12 +51,33 @@ namespace BOX {
 #define PKMN_PALETTE_START 15
 #define PKMN_TILES_START 96 + 182
 
+
+    void boxUI::init( ) {
+        IO::clearScreen( true, false, false );
+        IO::initOAMTable( true );
+        oamInit( &oamSub, SpriteMapping_Bmp_1D_128, false);
+        vramSetBankD(VRAM_D_SUB_SPRITE);
+
+        u16 tileCnt = 0;
+        for( u8 i = 0; i < 5; ++i ) {
+            for( u8 j = 0; j < 6; ++j ) {
+                tileCnt = IO::loadPKMNIconB( rand( ) % MAX_PKMN, 32 * j, 32 * i, 6 * i + j, tileCnt,
+                        true );
+            }
+        }
+        tileCnt = IO::loadPKMNIcon( rand( ) % MAX_PKMN, 200, 32, 90, 0, tileCnt, true );
+
+        IO::updateOAM( true );
+    }
+
+
     constexpr u16 getBoxColor( u8 p_boxIdx ) {
         return RGB15( 4 * ( ( 41 - p_boxIdx ) % 7 + 1 ), ( p_boxIdx * 30 ) / 42 + 1,
                       5 * ( ( 41 - p_boxIdx ) / 7 + 1 ) );
     }
 
     boxUI::boxUI( ) {
+        /*
         IO::swapScreens( );
         IO::vramSetup( );
         videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
@@ -78,7 +99,7 @@ namespace BOX {
         tileCnt
             = IO::loadSprite( ARROW_ID, 0, 1, tileCnt, 0, 0, 16, 16, box_arrowPal, box_arrowTiles,
                               box_arrowTilesLen, false, false, true, OBJPRIORITY_0, false );
-        tileCnt += 64;/*
+        tileCnt += 64;
         tileCnt = IO::loadSprite( PAGE_ICON_START + ( 0 ), 0, PAGE_ICON_START + ( 0 ), tileCnt, 20,
                                   0, 32, 32, time_iconPal, time_iconTiles, time_iconTilesLen, false,
                                   false, true, OBJPRIORITY_0, false );
@@ -93,7 +114,7 @@ namespace BOX {
                                   OBJPRIORITY_0, false );
         tileCnt = IO::loadSprite( PAGE_ICON_START + ( 4 ), 0, PAGE_ICON_START + ( 4 ), tileCnt, 60,
                                   0, 32, 32, ContestPal, ContestTiles, ContestTilesLen, false,
-                                  false, true, OBJPRIORITY_0, false );*/
+                                  false, true, OBJPRIORITY_0, false );
         for( u8 i = 0; i < 5; ++i ) {
             IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].x = 48 + 32 * i;
             IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].y = 256 - 10;
@@ -112,12 +133,14 @@ namespace BOX {
         BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
         BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
         BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::RED;
+        */
     }
     boxUI::~boxUI( ) {
-        IO::swapScreens( );
+        // IO::swapScreens( );
     }
 
     void boxUI::drawAllBoxStatus( bool p_bottom ) {
+        /*
         dmaFillWords( 0, bgGetGfxPtr( !p_bottom ? IO::bg2sub : IO::bg2 ), 256 * 192 );
         dmaFillWords( 0, bgGetGfxPtr( !p_bottom ? IO::bg3sub : IO::bg3 ), 256 * 192 );
 
@@ -157,6 +180,7 @@ namespace BOX {
             IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].isHidden = true;
         }
         IO::updateOAM( false );
+        */
     }
 
 #define POS_X( i ) ( 30 + 33 * ( ( i ) % 6 ) )
@@ -165,6 +189,8 @@ namespace BOX {
 #define TEAM_POS_Y( i ) ( 8 + 57 + 28 * 3 )
 
     void BOX::boxUI::buttonChange( button p_button, bool p_pressed ) {
+
+        /*
         u8 dx = p_pressed * 2;
         u8 dy = p_pressed;
         switch( p_button ) {
@@ -185,9 +211,11 @@ namespace BOX {
         default:
             break;
         }
+        */
     }
 
     std::vector<IO::inputTarget> boxUI::draw( bool p_showTeam ) {
+        /*
         BG_PALETTE[ IO::COLOR_IDX ] = getBoxColor( SAVE::SAV.getActiveFile( ).m_curBox );
 
         std::vector<IO::inputTarget> res;
@@ -240,33 +268,16 @@ namespace BOX {
             IO::printChoiceBox( TEAM_POS_X( i ), TEAM_POS_Y( i ), TEAM_POS_X( i ) + 28,
                                 TEAM_POS_Y( i ) + 21, 3, IO::GRAY_IDX, false, false );
 
-            u16 species = p_showTeam
-                              ? SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId
-                              : SAVE::SAV.m_clipboard[ i ].m_speciesId;
-            bool isEgg = p_showTeam ? SAVE::SAV.getActiveFile( )
-                                          .m_pkmnTeam[ i ].isEgg( )
-                                    : SAVE::SAV.m_clipboard[ i ].isEgg( );
-
-            if( species ) {
-                if( !isEgg )
-                    tileCnt = IO::loadPKMNIcon( species, TEAM_POS_X( i ) - 3, TEAM_POS_Y( i ) - 10,
-                                                oam++, pal / 16, pal % 16, tileCnt, false );
-                else
-                    tileCnt = IO::loadEggIcon( TEAM_POS_X( i ) - 3, TEAM_POS_Y( i ) - 10, oam++,
-                                               pal / 16, pal % 16, tileCnt, false );
-                ++pal;
-            } else {
-                IO::OamTop->oamBuffer[ oam++ ].isHidden = true;
-                tileCnt += 32;
-            }
         }
 
         drawAllBoxStatus( );
         IO::updateOAM( false );
         return res;
+        */
     }
 
     void boxUI::select( u8 p_index ) {
+        /*
         if( p_index == (u8) -1 ) {
             IO::OamTop->oamBuffer[ ARROW_ID ].isHidden = true;
             IO::updateOAM( false );
@@ -300,9 +311,11 @@ namespace BOX {
         IO::OamTop->oamBuffer[ HELD_PKMN ].x = x - 5;
         IO::OamTop->oamBuffer[ HELD_PKMN ].y = y - 5;
         IO::updateOAM( false );
+        */
     }
 
     void boxUI::takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg ) {
+        /*
         if( p_index != (u8) -1 ) {
             box* box = SAVE::SAV.getCurrentBox( );
 
@@ -313,8 +326,6 @@ namespace BOX {
                 bpm = SAVE::SAV.getActiveFile( )
                           .m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ]
                           .m_boxdata;
-            else
-                bpm = SAVE::SAV.m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
 
             if( bpm.m_speciesId ) {
                 u8 pal = p_index + PKMN_PALETTE_START;
@@ -342,9 +353,11 @@ namespace BOX {
             IO::OamTop->oamBuffer[ HELD_PKMN ].isHidden = true;
         }
         select( p_index );
+        */
     }
 
     void boxUI::updateTeam( ) {
+        /*
         for( u8 i = 0; i < 6; ++i ) {
             u16  species = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId;
             bool isEgg
@@ -364,5 +377,6 @@ namespace BOX {
                 IO::OamTop->oamBuffer[ PKMN_START + 18 + i ].isHidden = true;
         }
         IO::updateOAM( false );
+        */
     }
 }

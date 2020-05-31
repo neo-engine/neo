@@ -33,10 +33,20 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace BOX {
 #define PAGE_ICON_START 5
     class boxUI {
-        friend class boxViewer;
+        public:
+            /*
+             * @brief: Initializes the box UI.
+             */
+            void init( );
+
+
+
+
+
+
+
 
         enum button { BUTTON_LEFT, BUTTON_RIGHT, BUTTON_BOX_NAME };
-
         void buttonChange( button p_button, bool p_pressed );
 
         std::vector<std::pair<u8, IO::inputTarget>> _ranges;
@@ -50,7 +60,6 @@ namespace BOX {
         void takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg );
         void updateTeam( );
 
-      private:
         bool _showTeam;
 
         void drawAllBoxStatus( bool p_bottom = false );

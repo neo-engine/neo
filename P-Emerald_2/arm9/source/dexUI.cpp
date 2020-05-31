@@ -100,6 +100,7 @@ namespace DEX {
     dexUI::dexUI( bool p_useInDex, u16 p_maxPkmn )
         : _useInDex( p_useInDex ), _maxPkmn( p_maxPkmn ) {
         IO::vramSetup( );
+        /*
         videoSetModeSub( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
                          | DISPLAY_SPR_1D | DISPLAY_SPR_EXT_PALETTE );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
@@ -191,7 +192,7 @@ namespace DEX {
                                   DexSubPal, DexSubTiles, DexSubTilesLen, false, false, true,
                                   OBJPRIORITY_1, true );
         }
-        IO::updateOAM( true );
+        IO::updateOAM( true );*/
     }
 
     void dexUI::drawFormes( u16 p_pkmnId, u8 p_forme, u8 p_formeCnt, bool p_isFemale,

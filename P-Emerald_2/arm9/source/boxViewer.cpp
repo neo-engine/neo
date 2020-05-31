@@ -48,7 +48,13 @@ namespace BOX {
         }                               \
     while( false )
     void boxViewer::run( bool p_allowTakePkmn ) {
+        _boxUI.init( );
+        loop( );
+
+
+
 #define CLEAN ( _topScreenDirty = false )
+
         _ranges = _boxUI.draw( p_allowTakePkmn );
         CLEAN;
         _curPage     = 0;
@@ -229,8 +235,6 @@ namespace BOX {
         else if( p_index < MAX_PKMN_PER_BOX + 6 ) {
             if( _showTeam )
                 selection = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ];
-            else
-                selection = SAVE::SAV.m_clipboard[ p_index - MAX_PKMN_PER_BOX ];
         }
         _boxUI.select( p_index );
         if( p_index >= MAX_PKMN_PER_BOX + 6 ) return;
@@ -263,8 +267,6 @@ namespace BOX {
         boxPokemon hld = _heldPkmn.m_boxdata;
         if( p_index < MAX_PKMN_PER_BOX )
             std::swap( hld, SAVE::SAV.getCurrentBox( )->operator[]( p_index ) );
-        if( p_index >= MAX_PKMN_PER_BOX && !_showTeam )
-            std::swap( hld, SAVE::SAV.m_clipboard[ p_index - MAX_PKMN_PER_BOX ] );
         if( p_index >= MAX_PKMN_PER_BOX && _showTeam ) {
             std::swap( _heldPkmn,
                        SAVE::SAV.getActiveFile( ).m_pkmnTeam[ p_index - MAX_PKMN_PER_BOX ] );

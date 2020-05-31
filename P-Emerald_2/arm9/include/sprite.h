@@ -70,18 +70,25 @@ namespace IO {
     void copySpriteData( const unsigned int* p_spriteData, const u16 p_tileIdx,
                          const u32 p_spriteDataLen, bool p_bottom );
 
+    /*
+     * @brief: Loads the given tiles and pal to the specified position in the OAM(Sub)
+     * (Assumes 1D tiled sprites w/ 16 colors per palette)
+     */
     u16 loadSprite( const u8 p_oamIdx, const u8 p_palIdx, const u16 p_tileIdx, const u16 p_posX,
                     const u16 p_posY, const u8 p_width, const u8 p_height,
                     const unsigned short* p_spritePal, const unsigned int* p_spriteData,
                     const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
                     ObjPriority p_priority, bool p_bottom,
                     ObjBlendMode p_blendMode = OBJMODE_NORMAL );
-    u16 loadSprite( const u8 p_oamIdx, const u8 p_palIdx, const u8 p_palPos, const u16 p_tileIdx,
-                    const u16 p_posX, const u16 p_posY, const u8 p_width, const u8 p_height,
-                    const unsigned short* p_spritePal, const unsigned int* p_spriteData,
-                    const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
-                    ObjPriority p_priority, bool p_bottom,
-                    ObjBlendMode p_blendMode = OBJMODE_NORMAL );
+
+    /*
+     * @brief: Loads the given tiles and pals to the OAM(Sub); assumes bitmap mode.
+     */
+    u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileIdx, const u16 p_posX,
+                     const u16 p_posY, const u8 p_width, const u8 p_height,
+                     const unsigned short* p_spritePal, const unsigned int* p_spriteData,
+                     const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
+                     ObjPriority p_priority, bool p_bottom );
 
     u16 loadPKMNSprite( const char* p_path, const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
                         u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
@@ -107,35 +114,72 @@ namespace IO {
     u16 loadAnimatedSprite( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                             u8 p_palCnt, u16 p_tileCnt, ObjPriority p_priority = OBJPRIORITY_2,
                             bool p_bottom = false );
+    u16 loadAnimatedSpriteB( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                             u16 p_tileCnt, ObjPriority p_priority = OBJPRIORITY_2,
+                             bool p_bottom = false );
+
     u16 loadOWSprite( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                       u8 p_palCnt, u16 p_tileCnt );
+    u16 loadOWSpriteB( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                       u16 p_tileCnt );
 
     void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt );
     void setAnimatedSpriteFrame( u8 p_frame, bool p_hFlip, u8 p_oamIndex, u16 p_tileCnt );
 
+    /*
+     * @brief: Loads the specified icon from the nitro FAT. (1D tiled)
+     */
     u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
                   u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
-    u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
-                  u8 p_oamIndex, u8 p_palCnt, u8 p_palPos, u16 p_tileCnt, bool p_bottom );
+    /*
+     * @brief: Loads the specified icon from the nitro FAT. (1D bitmap)
+     */
+    u16 loadIconB( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
+                   u8 p_oamIndex, u16 p_tileCnt, bool p_bottom );
 
     u16 loadItemIcon( const u16 p_itemId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                       u8 p_palcnt, u16 p_tileCnt, bool p_bottom = true );
+    u16 loadItemIconB( const u16 p_itemId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
+                       u16 p_tileCnt, bool p_bottom = true );
 
     u16 loadTMIcon( type p_type, bool p_hm, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                     u8 p_palCnt, u16 p_tileCnt, bool p_bottom = true );
+    u16 loadTMIconB( type p_type, bool p_hm, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
+                     u16 p_tileCnt, bool p_bottom = true );
 
+    /*
+     * @brief: Loads the specified pokemon icon from the nitro FAT. (1D tiled)
+     */
     u16 loadPKMNIcon( const u16 p_pkmnNo, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                       u8 p_palcnt, u16 p_tileCnt, bool p_bottom = true, u8 p_forme = 0,
                       bool p_shiny = false, bool p_female = false );
+    /*
+     * @brief: Loads the specified pokemon icon from the nitro FAT. (1D bitmap)
+     */
+    u16 loadPKMNIconB( const u16 p_pkmnNo, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
+                       u16 p_tileCnt, bool p_bottom = true, u8 p_forme = 0,
+                       bool p_shiny = false, bool p_female = false );
 
+    /*
+     * @brief: Loads an egg icon from the nitro FAT. (1D tiled)
+     */
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palcnt, u16 p_tileCnt,
+                     bool p_bottom = true, bool p_manaphy = false );
+    /*
+     * @brief: Loads an egg icon from the nitro FAT. (1D bitmap)
+     */
+    u16 loadEggIconB( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u16 p_tileCnt,
                      bool p_bottom = true, bool p_manaphy = false );
 
     u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
                       u16 p_tileCnt, bool p_bottom, SAVE::language p_language );
+    u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
+                      u16 p_tileCnt, bool p_bottom, SAVE::language p_language );
 
     u16 loadDamageCategoryIcon( MOVE::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,
                                 u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
+    u16 loadDamageCategoryIcon( MOVE::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,
+                                u8 p_oamIndex, u16 p_tileCnt, bool p_bottom );
 
     u16 loadRibbonIcon( u8 p_ribbonIdx, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                         u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
