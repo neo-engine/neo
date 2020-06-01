@@ -33,10 +33,26 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace BOX {
 #define PAGE_ICON_START 5
     class boxUI {
-        bool _showTeam;
+        private:
+            bool _showTeam;
+            u8   _currentSelectedPkmn;
 
-
+            void initTop( );
+            void initSub( );
         public:
+            enum button {
+                BUTTON_LEFT,
+                BUTTON_RIGHT,
+                BUTTON_BOX_NAME,
+                BUTTON_BACK,
+                BUTTON_PARTY,
+                BUTTON_MODE_MOVE,
+                BUTTON_MODE_SELECT,
+                BUTTON_PKMN_STATUS,
+                BUTTON_PKMN_MOVE,
+                BUTTON_PKMN_RELEASE
+            };
+
             /*
              * @brief: Initializes the box UI.
              */
@@ -47,13 +63,43 @@ namespace BOX {
              */
             std::vector<IO::inputTarget> draw( box* p_box, bool p_showTeam = false );
 
+            /*
+             * @brief: Selects the given button.
+             */
+            void selectButton( button p_selectedButton, bool p_touched = false );
+
+            /*
+             * @brief: Unselects the given button.
+             */
+            void unselectButton( button p_selectedButton, bool p_touched = false );
+
+            /*
+             * @brief: Selects the given pkmn; shows the corresponding buttons
+             */
+            void selectPkmn( u8 p_index, bool p_touched = false );
+
+            /*
+             * @brief: Hovers over a pkmn.
+             */
+            void hoverPkmn( u8 p_index );
+
+            /*
+             * @brief: Draws some basic info of the pkmn to the top screen
+             */
+            void drawPkmnInfoTop( boxPokemon* p_pokemon );
+
+            /*
+             * @brief: Shows the pkmn party window
+             */
+            std::vector<IO::inputTarget> showParty( pokemon* p_party, u8 p_partyLen );
+
+            /*
+             * @brief: Hides the party window
+             */
+            void hideParty( );
 
 
 
-
-
-
-            enum button { BUTTON_LEFT, BUTTON_RIGHT, BUTTON_BOX_NAME };
             void buttonChange( button p_button, bool p_pressed );
 
             std::vector<std::pair<u8, IO::inputTarget>> _ranges;

@@ -61,7 +61,7 @@ namespace BOX {
     const unsigned short* wallpaperPals[ MAX_WALLPAPERS ] = { boxwp1Pal, boxwp2Pal };
 
 
-    void boxUI::init( ) {
+    void boxUI::initSub( ) {
         REG_BLDCNT_SUB = BLEND_NONE;
         IO::clearScreen( true, false, false );
         IO::initOAMTable( true );
@@ -89,12 +89,15 @@ namespace BOX {
         for( u8 i = 0; i < 5; ++i ) {
             for( u8 j = 0; j < 6; ++j ) {
                 tileCnt = IO::loadSpriteB( SPR_PKMN_START_OAM_SUB + 6 * i + j,
-                        tileCnt, 29 + 26 * j, 32 + 26 * i,
+                        tileCnt, 26 + 26 * j, 32 + 26 * i,
                         32, 32, NoItemPal, NoItemTiles, NoItemTilesLen,
                         false, false, false, OBJPRIORITY_3, true );
             }
         }
+    }
 
+    void boxUI::init( ) {
+        initSub( );
         bgUpdate( );
         IO::updateOAM( true );
     }
@@ -108,6 +111,19 @@ namespace BOX {
         dmaCopy( wallpaperPals[ p_box->m_wallpaper % MAX_WALLPAPERS ], BG_PALETTE_SUB, 64 * 2 );
         dmaCopy( boxsubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
         dmaCopy( boxsubPal, BG_PALETTE_SUB, 6 * 2 );
+
+        // Load some placeholder
+        for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
+            if( p_box->m_pokemon[ i ].getSpecies( ) ) {
+                IO::loadSpriteB( SPR_PKMN_START_OAM_SUB + i,
+                        oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex,
+                        oam[ SPR_PKMN_START_OAM_SUB + i ].x,
+                        oam[ SPR_PKMN_START_OAM_SUB + i ].y,
+                        32, 32, NoItemPal, NoItemTiles, NoItemTilesLen,
+                        false, false, false, OBJPRIORITY_3, true );
+            }
+        }
+        IO::updateOAM( true );
 
         for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
             u8 x = i % 6, y = i / 6;

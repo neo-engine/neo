@@ -458,7 +458,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Quiet", "Ruhig"},
 
     {"Bashful", "Zaghaft"},
-    {"rash", "Hitzig"},
+    {"Rash", "Hitzig"},
     {"Calm", "Still"},
     {"Gentle", "Zart"},
     {"Sassy", "Forsch"},

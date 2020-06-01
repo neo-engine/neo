@@ -89,12 +89,12 @@ namespace SAVE {
         // BEGIN TEST
 
 //        pokemon testTeam[ 6 ];
-        for( u8 i = 0; i < 30; i++ ) {
+       // for( u8 i = 0; i < 30; i++ ) {
 //            testTeam[ i ]
 //                = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false, i == 3 );
 //            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
-            SAVE::SAV.getActiveFile( ).storePkmn( pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false, i == 3 ) );
-        }
+        //    SAVE::SAV.getActiveFile( ).storePkmn( pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false, i == 3 ) );
+      //  }
 /*        testTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_SURF;
         testTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;
         testTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
@@ -112,8 +112,8 @@ namespace SAVE {
         sts.run( );
 
         */
-        // STS::statusScreen psts = STS::statusScreen( testTeam );
-        // psts.run( );
+       // STS::statusScreen psts = STS::statusScreen( testTeam );
+       // psts.run( );
 
         // END TEST
 
@@ -122,7 +122,9 @@ namespace SAVE {
 
         BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
 
-        printf( "@ Philip Wellnitz 2012 - 2020\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+        printf( "Free Software, PW 2012 - 2020\n"
+                "                             \n"
+                "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
 
         if( gMod == DEVELOPER )
             printf( "     %24sdev\n", VERSION );

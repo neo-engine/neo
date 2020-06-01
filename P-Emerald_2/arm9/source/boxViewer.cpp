@@ -32,6 +32,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "messageBox.h"
 #include "uio.h"
 
+#include "sound.h"
+
 #include "saveGame.h"
 #include "statusScreen.h"
 #include "statusScreenUI.h"
@@ -52,34 +54,45 @@ namespace BOX {
 
         _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ), p_allowTakePkmn );
 
-        loop( );
-
-#define CLEAN ( _topScreenDirty = false )
-
-        CLEAN;
         _curPage     = 0;
         _selectedIdx = (u8) -1;
         memset( &_heldPkmn, 0, sizeof( pokemon ) );
 
-        _showTeam = p_allowTakePkmn;
+        _showTeam = false;
 
-        touchPosition touch;
+        cooldown = COOLDOWN_COUNT;
         loop( ) {
-            swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
-            int pressed = keysCurrent( );
+            swiWaitForVBlank( );
+            pressed = keysUp( );
+            held    = keysHeld( );
 
-            if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT( KEY_X )
-                || GET_AND_WAIT_C( SCREEN_WIDTH - 12, SCREEN_HEIGHT - 10, 16 ) ) {
-                if( !_heldPkmn.m_boxdata.m_speciesId ) break;
-            } else if( GET_AND_WAIT( KEY_L ) ) {
+            if( ( pressed & KEY_X ) ) {
+                if( !_heldPkmn.getSpecies( ) ) {
+                    SOUND::playSoundEffect( SFX_CANCEL );
+                    return;
+                }
+            }
+            if( pressed & KEY_B ) {
+                if( _showTeam ) {
+                    SOUND::playSoundEffect( SFX_CANCEL );
+                   //  _boxUI.hidePkmnTeam( );
+                } else {
+                    if( !_heldPkmn.getSpecies( ) ) {
+                        SOUND::playSoundEffect( SFX_CANCEL );
+                        return;
+                    }
+                }
+            }
+
+            if( GET_KEY_COOLDOWN( KEY_L ) ) {
                 SAVE::SAV.getActiveFile( ).m_curBox
                     = ( SAVE::SAV.getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
-                CLEAN;
-                _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ), p_allowTakePkmn );
+                _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ),
+                        p_allowTakePkmn );
                 select( _selectedIdx );
-            } else if( IN_RANGE_R( 24, 23, 48, 48 ) ) {
+            } /* else if( IN_RANGE_R( 24, 23, 48, 48 ) ) {
                 _boxUI.buttonChange( boxUI::BUTTON_LEFT, true );
                 loop( ) {
                     swiWaitForVBlank( );
@@ -89,7 +102,6 @@ namespace BOX {
                     if( TOUCH_UP ) {
                         SAVE::SAV.getActiveFile( ).m_curBox
                             = ( SAVE::SAV.getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
-                        CLEAN;
                         _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ), p_allowTakePkmn );
                         select( _selectedIdx );
                         break;
@@ -99,13 +111,12 @@ namespace BOX {
                         break;
                     }
                 }
-            } else if( GET_AND_WAIT( KEY_R ) ) {
+            } */  else if( GET_KEY_COOLDOWN( KEY_R ) ) {
                 SAVE::SAV.getActiveFile( ).m_curBox
                     = ( SAVE::SAV.getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
-                CLEAN;
                 _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ), p_allowTakePkmn );
                 select( _selectedIdx );
-            } else if( IN_RANGE_R( 208, 23, 232, 48 ) ) {
+            } /* else if( IN_RANGE_R( 208, 23, 232, 48 ) ) {
                 _boxUI.buttonChange( boxUI::BUTTON_RIGHT, true );
                 loop( ) {
                     swiWaitForVBlank( );
@@ -115,7 +126,6 @@ namespace BOX {
                     if( TOUCH_UP ) {
                         SAVE::SAV.getActiveFile( ).m_curBox
                             = ( SAVE::SAV.getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
-                        CLEAN;
                         _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ), p_allowTakePkmn );
                         select( _selectedIdx );
                         break;
@@ -157,37 +167,37 @@ namespace BOX {
                         break;
                     }
                 }
-            } else if( GET_AND_WAIT( KEY_DOWN ) ) {
-                if( _selectedIdx >= MAX_PKMN_PER_BOX && _selectedIdx < MAX_PKMN_PER_BOX + 6 )
-                    _selectedIdx = MAX_PKMN_PER_BOX + 6;
-                else if( _selectedIdx >= MAX_PKMN_PER_BOX + 6 )
+            } */ else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                if( _selectedIdx >= MAX_PKMN_PER_BOX && _selectedIdx < MAX_PKMN_PER_BOX )
+                    _selectedIdx = MAX_PKMN_PER_BOX;
+                else if( _selectedIdx >= MAX_PKMN_PER_BOX )
                     _selectedIdx = 0;
                 else
                     HAS_SELECTION( _selectedIdx = 0,
                                    _selectedIdx = ( _selectedIdx + 6 ) % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
-            } else if( GET_AND_WAIT( KEY_UP ) ) {
+            } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 if( _selectedIdx < 6 )
-                    _selectedIdx = MAX_PKMN_PER_BOX + 6;
-                else if( _selectedIdx >= MAX_PKMN_PER_BOX + 6 )
+                    _selectedIdx = MAX_PKMN_PER_BOX;
+                else if( _selectedIdx >= MAX_PKMN_PER_BOX )
                     _selectedIdx = MAX_PKMN_PER_BOX;
                 else
                     HAS_SELECTION( _selectedIdx = 0,
                                    _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 2 )
                                                   % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
-            } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
+            } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 HAS_SELECTION( _selectedIdx = 0,
                                _selectedIdx = ( _selectedIdx + 1 ) % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
-            } else if( GET_AND_WAIT( KEY_LEFT ) ) {
+            } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 HAS_SELECTION( _selectedIdx = 0,
                                _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 7 )
                                               % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
-            } else if( GET_AND_WAIT( KEY_A ) ) {
+            } else if( GET_KEY_COOLDOWN( KEY_A ) ) {
                 HAS_SELECTION(, takePkmn( _selectedIdx ) );
-            } else if( GET_AND_WAIT( KEY_SELECT ) ) {
+            } else if( GET_KEY_COOLDOWN( KEY_SELECT ) ) {
                 _curPage = ( _curPage + 1 ) % 5;
                 select( _selectedIdx );
             }
@@ -222,6 +232,7 @@ namespace BOX {
                     }
                 }
             }
+            swiWaitForVBlank( );
         }
     }
     void boxViewer::select( u8 p_index ) {
@@ -258,7 +269,6 @@ namespace BOX {
                 SAVE::SAV.getActiveFile( ).m_curBox
                     = ( SAVE::SAV.getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
 
-            CLEAN;
             _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ), _showTeam );
             select( _selectedIdx );
             return;
