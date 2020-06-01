@@ -434,7 +434,7 @@ namespace DEX {
             consoleSetWindow( &IO::Top, 28, 1, 32, 2 );
             printf( "%03d", p_pkmnIdx );
             consoleSetWindow( &IO::Top, 28, 2, 32, 3 );
-            printf( "%3d", SAVE::SAV.countPkmn( p_pkmnIdx ) );
+            printf( "%3d", SAVE::SAV.getActiveFile( ).countPkmn( p_pkmnIdx ) );
         }
 
         switch( p_page ) {

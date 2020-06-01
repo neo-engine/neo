@@ -116,7 +116,7 @@ extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
 #define TIMER_SPEED ( BUS_CLOCK / 1024 )
 #define sq( a ) ( ( a ) * ( a ) )
 
-#define IN_DEX( pidx ) ( SAVE::SAV.m_caughtPkmn[ ( pidx ) / 8 ] & ( 1 << ( ( pidx ) % 8 ) ) )
+#define IN_DEX( pidx ) ( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ ( pidx ) / 8 ] & ( 1 << ( ( pidx ) % 8 ) ) )
 
 // Main sprite's OAM indices
 #define BACK_ID 0

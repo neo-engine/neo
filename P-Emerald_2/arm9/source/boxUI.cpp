@@ -42,42 +42,110 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "Up.h"
 #include "box_arrow.h"
 
+#include "NoItem.h"
+#include "boxsub.h"
+#include "boxwp1.h"
+#include "boxwp2.h"
+
+#include "backarrow.h"
+#include "x_16_16.h"
+
 namespace BOX {
-#define ARROW_ID 1
-#define HELD_PKMN 2
-// #define FWD_ICON 3
-// #define BWD_ICON 4
-#define PKMN_START 10
-#define PKMN_PALETTE_START 15
-#define PKMN_TILES_START 96 + 182
+
+#define SPR_PKMN_START_OAM_SUB 0
+#define SPR_X_OAM_SUB 40
+#define SPR_ARROW_BACK_OAM_SUB 41
+
+#define MAX_WALLPAPERS 2
+    const unsigned int* wallpaperTiles[ MAX_WALLPAPERS ] = { boxwp1Bitmap, boxwp2Bitmap };
+    const unsigned short* wallpaperPals[ MAX_WALLPAPERS ] = { boxwp1Pal, boxwp2Pal };
+
 
     void boxUI::init( ) {
+        REG_BLDCNT_SUB = BLEND_NONE;
         IO::clearScreen( true, false, false );
         IO::initOAMTable( true );
-        // oamInit( &oamSub, SpriteMapping_Bmp_1D_128, false);
         vramSetBankD( VRAM_D_SUB_SPRITE );
-        videoSetModeSub( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
+        videoSetModeSub( MODE_5_2D | // DISPLAY_BG1_ACTIVE |
+                         DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
                          | ( ( DISPLAY_SPR_1D | DISPLAY_SPR_1D_SIZE_128 | DISPLAY_SPR_1D_BMP
-                               | DISPLAY_SPR_1D_BMP_SIZE_128 | ( 5 << 28 ) | 2 )
-                             & 0xffffff0 ) );
+                         | DISPLAY_SPR_1D_BMP_SIZE_128 | ( 5 << 28 ) | 2 ) & 0xffffff0 ) );
 
         u16 tileCnt = 0;
+
+        // back arrow
+        tileCnt
+            = IO::loadSpriteB( SPR_ARROW_BACK_OAM_SUB, tileCnt, 102 + 56 + 32,
+                               192 - 19, 16, 16, backarrowPal, backarrowTiles,
+                               backarrowTilesLen, false,
+                               false, false, OBJPRIORITY_0, true );
+        // x
+        tileCnt = IO::loadSpriteB( SPR_X_OAM_SUB, tileCnt, 236, 172, 16, 16,
+                                   x_16_16Pal, x_16_16Tiles, x_16_16TilesLen, false, false, false,
+                                   OBJPRIORITY_2, true );
+
+
+        // pkmn
         for( u8 i = 0; i < 5; ++i ) {
             for( u8 j = 0; j < 6; ++j ) {
-                tileCnt = IO::loadPKMNIconB( rand( ) % MAX_PKMN, 26 * j, 26 * i, 6 * i + j, tileCnt,
-                                             true );
+                tileCnt = IO::loadSpriteB( SPR_PKMN_START_OAM_SUB + 6 * i + j,
+                        tileCnt, 29 + 26 * j, 32 + 26 * i,
+                        32, 32, 0, 0, NoItemTilesLen, false, false, false, OBJPRIORITY_3, true );
+            }
+        }
+
+        bgUpdate( );
+        IO::updateOAM( true );
+    }
+
+    std::vector<IO::inputTarget> boxUI::draw( box* p_box, bool p_showTeam ) {
+        std::vector<IO::inputTarget> res;
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        dmaCopy( wallpaperTiles[ p_box->m_wallpaper % MAX_WALLPAPERS ],
+                 bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
+        dmaCopy( wallpaperPals[ p_box->m_wallpaper % MAX_WALLPAPERS ], BG_PALETTE_SUB, 64 * 2 );
+        dmaCopy( boxsubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
+        dmaCopy( boxsubPal, BG_PALETTE_SUB, 6 * 2 );
+
+        for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
+            u8 x = i % 6, y = i / 6;
+
+            res.push_back( IO::inputTarget( oam[ SPR_PKMN_START_OAM_SUB + i ].x,
+                                            oam[ SPR_PKMN_START_OAM_SUB + i ].y,
+                                            oam[ SPR_PKMN_START_OAM_SUB + i ].x + 26,
+                                            oam[ SPR_PKMN_START_OAM_SUB + i ].y + 26 ) );
+            // _ranges.push_back( {oam, res.back( )} );
+            if( p_box->m_pokemon[ i ].getSpecies( ) ) {
+                if( !p_box->m_pokemon[ i ].isEgg( ) ) {
+                    IO::loadPKMNIconB( ( *p_box )[ i ].getSpecies( ),
+                            oam[ SPR_PKMN_START_OAM_SUB + i ].x,
+                            oam[ SPR_PKMN_START_OAM_SUB + i ].y,
+                            SPR_PKMN_START_OAM_SUB + i,  oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex,
+                            true );
+                } else {
+                    IO::loadEggIconB(
+                            oam[ SPR_PKMN_START_OAM_SUB + i ].x,
+                            oam[ SPR_PKMN_START_OAM_SUB + i ].y,
+                            SPR_PKMN_START_OAM_SUB + i,  oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex,
+                            true );
+                }
+            } else {
+                oam[ SPR_PKMN_START_OAM_SUB + i ].isHidden = true;
             }
         }
 
         IO::updateOAM( true );
+        return res;
     }
+
 
     constexpr u16 getBoxColor( u8 p_boxIdx ) {
         return RGB15( 4 * ( ( 41 - p_boxIdx ) % 7 + 1 ), ( p_boxIdx * 30 ) / 42 + 1,
                       5 * ( ( 41 - p_boxIdx ) / 7 + 1 ) );
     }
 
-    boxUI::boxUI( ) {
+//    boxUI::boxUI( ) {
         /*
         IO::swapScreens( );
         IO::vramSetup( );
@@ -135,10 +203,10 @@ namespace BOX {
         BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
         BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::RED;
         */
-    }
-    boxUI::~boxUI( ) {
+//    }
+//    boxUI::~boxUI( ) {
         // IO::swapScreens( );
-    }
+//    }
 
     void boxUI::drawAllBoxStatus( bool p_bottom ) {
         /*
@@ -161,7 +229,7 @@ namespace BOX {
                 bool prsd              = j * 7 + i == SAVE::SAV.getActiveFile( ).m_curBox;
                 IO::printChoiceBox( x, y, x + w, y + h, 6 - 2 * prsd, 128 + j * 7 + i, false,
                                     !p_bottom );
-                u8 cnt = SAVE::SAV.m_storedPokemon[ j * 7 + i ].count( );
+                u8 cnt = SAVE::SAV.getActiveFile( )m_storedPokemon[ j * 7 + i ].count( );
                 pkmncnt += cnt;
                 if( cnt == MAX_PKMN_PER_BOX )
                     IO::regularFont->setColor( IO::RED_IDX, 1 );
@@ -204,7 +272,7 @@ namespace BOX {
             IO::regularFont->printString( ">", dx + 216, dy + 28, false );
             break;
         case BOX::boxUI::BUTTON_BOX_NAME: {
-            box* box = SAVE::SAV.getCurrentBox( );
+            box* box = SAVE::SAV.getActiveFile( )getCurrentBox( );
             IO::printChoiceBox( 50, 23, 206, 48, 6, IO::COLOR_IDX, p_pressed, false ); // Box name
             IO::regularFont->printString( box->m_name, dx + 127, dy + 28, false, IO::font::CENTER );
             break;
@@ -215,14 +283,14 @@ namespace BOX {
         */
     }
 
-    std::vector<IO::inputTarget> boxUI::draw( bool p_showTeam ) {
+    //std::vector<IO::inputTarget> boxUI::draw( bool p_showTeam ) {
         /*
         BG_PALETTE[ IO::COLOR_IDX ] = getBoxColor( SAVE::SAV.getActiveFile( ).m_curBox );
 
         std::vector<IO::inputTarget> res;
         _ranges.clear( );
         _showTeam = p_showTeam;
-        box* box  = SAVE::SAV.getCurrentBox( );
+        box* box  = SAVE::SAV.getActiveFile( )getCurrentBox( );
 
         // SubScreen stuff
         IO::printChoiceBox( 50, 23, 206, 48, 6, IO::COLOR_IDX, false, false ); // Box name
@@ -238,25 +306,6 @@ namespace BOX {
         u16 tileCnt = PKMN_TILES_START;
 
         IO::printChoiceBox( 24, 51, 232, 136, 6, IO::COLOR_IDX, false, false );
-
-        for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
-            res.push_back( IO::inputTarget( POS_X( i ) + 5, POS_Y( i ) + 10, POS_X( i ) + 33,
-                                            POS_Y( i ) + 31 ) );
-            _ranges.push_back( {oam, res.back( )} );
-            if( box->m_pokemon[ i ].m_speciesId ) {
-                if( !box->m_pokemon[ i ].isEgg( ) ) {
-                    tileCnt
-                        = IO::loadPKMNIcon( box->m_pokemon[ i ].m_speciesId, POS_X( i ), POS_Y( i ),
-                                            oam++, pal / 16, pal % 16, tileCnt, false );
-                } else
-                    tileCnt = IO::loadEggIcon( POS_X( i ), POS_Y( i ), oam++, pal / 16, pal % 16,
-                                               tileCnt, false );
-                ++pal;
-            } else {
-                IO::OamTop->oamBuffer[ oam++ ].isHidden = true;
-                tileCnt += 32;
-            }
-        }
 
         IO::printRectangle( 0, 140, 255, 192, false,  IO::WHITE_IDX );
         IO::regularFont->printString( p_showTeam ? GET_STRING( 59 ) : GET_STRING( 60 ), 2, 176,
@@ -275,7 +324,7 @@ namespace BOX {
         IO::updateOAM( false );
         return res;
         */
-    }
+  //  }
 
     void boxUI::select( u8 p_index ) {
         /*
@@ -318,7 +367,7 @@ namespace BOX {
     void boxUI::takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg ) {
         /*
         if( p_index != (u8) -1 ) {
-            box* box = SAVE::SAV.getCurrentBox( );
+            box* box = SAVE::SAV.getActiveFile( )getCurrentBox( );
 
             boxPokemon bpm;
             if( p_index < MAX_PKMN_PER_BOX )

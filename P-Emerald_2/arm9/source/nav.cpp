@@ -530,7 +530,7 @@ namespace NAV {
                         }
 
                         for( u16 j = 1; j <= MAX_PKMN; ++j )
-                            SAVE::SAV.m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );
+                            SAVE::SAV.getActiveFile( ).m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );
                     }
                     /*
                                         for( u16 j : {493, 649, 648, 647, 487, 492, 641, 642,

@@ -33,12 +33,19 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace BOX {
 #define PAGE_ICON_START 5
     class boxUI {
+        bool _showTeam;
+
+
         public:
             /*
              * @brief: Initializes the box UI.
              */
             void init( );
 
+            /*
+             * @brief: Draw the specified box.
+             */
+            std::vector<IO::inputTarget> draw( box* p_box, bool p_showTeam = false );
 
 
 
@@ -46,22 +53,15 @@ namespace BOX {
 
 
 
-        enum button { BUTTON_LEFT, BUTTON_RIGHT, BUTTON_BOX_NAME };
-        void buttonChange( button p_button, bool p_pressed );
+            enum button { BUTTON_LEFT, BUTTON_RIGHT, BUTTON_BOX_NAME };
+            void buttonChange( button p_button, bool p_pressed );
 
-        std::vector<std::pair<u8, IO::inputTarget>> _ranges;
+            std::vector<std::pair<u8, IO::inputTarget>> _ranges;
 
-        boxUI( );
-        ~boxUI( );
+            void select( u8 p_index );
+            void takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg );
+            void updateTeam( );
 
-        std::vector<IO::inputTarget> draw( bool p_showTeam = false );
-
-        void select( u8 p_index );
-        void takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg );
-        void updateTeam( );
-
-        bool _showTeam;
-
-        void drawAllBoxStatus( bool p_bottom = false );
+            void drawAllBoxStatus( bool p_bottom = false );
     };
 }

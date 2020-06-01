@@ -458,19 +458,21 @@ namespace IO {
 
         auto gfx = p_bottom ? &SPRITE_GFX_SUB[ (u32) p_tileIdx * 64 ]
                             : &SPRITE_GFX[ (u32) p_tileIdx * 64 ];
-        u32 i = 0;
-        for( u8 tiley = 0; tiley < p_height / 8; ++tiley ) {
-            for( u8 tilex = 0; tilex < p_width / 8; ++tilex ) {
-                int shift = tilex * ( -28 ); // size per tile
-                for( u8 y = 0; y < 8; ++y ) {
-                    for( u8 x = 0; x < 8; x += 2, ++i ) {
-                        u8 cur = reinterpret_cast<u8*>(
-                            const_cast<unsigned int*>( p_spriteData ) )[ i ];
-                        u8 up = cur >> 4, down = cur & 0xf;
-                        if( up ) { gfx[ 2 * ( i + shift ) + 1 ] = p_spritePal[ up ]; }
-                        if( down ) { gfx[ 2 * ( i + shift ) ] = p_spritePal[ down ]; }
+        if( p_spritePal && p_spriteData ) {
+            u32 i = 0;
+            for( u8 tiley = 0; tiley < p_height / 8; ++tiley ) {
+                for( u8 tilex = 0; tilex < p_width / 8; ++tilex ) {
+                    int shift = tilex * ( -28 ); // size per tile
+                    for( u8 y = 0; y < 8; ++y ) {
+                        for( u8 x = 0; x < 8; x += 2, ++i ) {
+                            u8 cur = reinterpret_cast<u8*>(
+                                    const_cast<unsigned int*>( p_spriteData ) )[ i ];
+                            u8 up = cur >> 4, down = cur & 0xf;
+                            if( up ) { gfx[ 2 * ( i + shift ) + 1 ] = p_spritePal[ up ]; }
+                            if( down ) { gfx[ 2 * ( i + shift ) ] = p_spritePal[ down ]; }
+                        }
+                        shift += 4 * ( p_width / 8 - 1 );
                     }
-                    shift += 4 * ( p_width / 8 - 1 );
                 }
             }
         }

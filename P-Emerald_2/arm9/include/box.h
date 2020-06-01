@@ -34,7 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace BOX {
     struct box {
-        char m_name[ 15 ];
+        char m_name[ 12 ];
 #define MAX_PKMN_PER_BOX 30
         boxPokemon m_pokemon[ MAX_PKMN_PER_BOX ];
         u8                  m_wallpaper;

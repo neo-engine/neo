@@ -46,6 +46,7 @@ namespace SAVE {
 
 #define GOOD_MAGIC1 0x01234567
 #define GOOD_MAGIC2 0xFEDCBA98
+#define MAX_BOXES 40
 
     const u8 F_MEGA_EVOLUTION = 1;
 
@@ -106,7 +107,22 @@ namespace SAVE {
             u16            m_flags[ 244 ];
             BAG::bag       m_bag;
 
+            BOX::box       m_storedPokemon[ MAX_BOXES ];
+
+            u8 m_caughtPkmn[ 1 + MAX_PKMN / 8 ];
+            u8 m_seenPkmn[ 1 + MAX_PKMN / 8 ];
+
             // Methods 'n' stuff
+            // Return the idx of the resulting Box
+            s8 storePkmn( const boxPokemon& p_pokemon );
+            s8 storePkmn( const pokemon& p_pokemon );
+
+            u16 countPkmn( u16 p_pkmnIdx );
+
+            u16 getDexCount( );
+
+            BOX::box* getCurrentBox( );
+
             void clear( );
             void initialize( );
             bool checkFlag( u8 p_idx );
@@ -123,27 +139,7 @@ namespace SAVE {
 
         u8 m_activeFile;
 
-// Things shared among all save files
-
-// Stored Pkmn
-#define MAX_BOXES 40
-        BOX::box            m_storedPokemon[ MAX_BOXES ];
-
-        u8 m_caughtPkmn[ 1 + MAX_PKMN / 8 ];
-        u8 m_seenPkmn[ 1 + MAX_PKMN / 8 ];
-
-        u8 m_transfersRemaining; // Times a GBA save file can be copied
-
-        // Return the idx of the resulting Box
-        s8 storePkmn( const boxPokemon& p_pokemon );
-        s8 storePkmn( const pokemon& p_pokemon );
-
-        u16 countPkmn( u16 p_pkmnIdx );
-
-        u16 getDexCount( );
-
-        BOX::box* getCurrentBox( );
-
+        // Things shared among all save files
         bool isGood( );
         void clear( );
     };

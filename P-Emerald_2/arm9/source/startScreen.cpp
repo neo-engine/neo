@@ -88,14 +88,14 @@ namespace SAVE {
 
         // BEGIN TEST
 
-        pokemon testTeam[ 6 ];
-        for( u8 i = 0; i < 6; i++ ) {
-            testTeam[ i ]
-                = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false, i == 3 );
-            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
-//            SAVE::SAV.getActiveFile( ).storePkmn( testTeam[ i ] );
+//        pokemon testTeam[ 6 ];
+        for( u8 i = 0; i < 30; i++ ) {
+//            testTeam[ i ]
+//                = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false, i == 3 );
+//            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
+            SAVE::SAV.getActiveFile( ).storePkmn( pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false, i == 3 ) );
         }
-        testTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+/*        testTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_SURF;
         testTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;
         testTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
         testTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;
@@ -103,7 +103,7 @@ namespace SAVE {
         testTeam[ 1 ].m_boxdata.m_moves[ 3 ] = M_ROCK_SMASH;
         testTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
         testTeam[ 2 ].m_boxdata.m_heldItem   = I_YAGO_BERRY;
-
+*/
         BOX::boxViewer bxv;
         bxv.run( 0 );
 
@@ -205,14 +205,14 @@ namespace SAVE {
 
             char buffer[ 50 ];
             snprintf( buffer, 49, "%03d:%02d", SAV.m_saveFile[ i ].m_pt.m_hours,
-                      SAV.getActiveFile( ).m_pt.m_mins );
+                      SAV.m_saveFile[ i ].m_pt.m_mins );
             IO::regularFont->printString( buffer, 8, 46 + 64 * i, true );
 
             snprintf( buffer, 49, STRINGS[ 108 ][ SAV.m_saveFile[ i ].m_options.m_language ],
                       SAV.m_saveFile[ i ].getBadgeCount( ) );
             IO::regularFont->printString( buffer, 110, 46 + 64 * i, true, IO::font::CENTER );
 
-            snprintf( buffer, 49, "PokéDex %03d", SAV.getDexCount( ) );
+            snprintf( buffer, 49, "PokéDex %03d", SAV.m_saveFile[ i ].getDexCount( ) );
             IO::regularFont->printString( buffer, 248, 46 + 64 * i, true, IO::font::RIGHT );
         }
     }
@@ -275,7 +275,7 @@ namespace SAVE {
         res.push_back( NEW_GAME );
         vis.push_back( 73 );
         res.push_back( SPECIAL_EPISODE );
-        if( gMod == DEVELOPER || SAV.m_transfersRemaining ) {
+        if( gMod == DEVELOPER ) {
             vis.push_back( 74 );
             res.push_back( TRANSFER_GAME );
         }
@@ -416,8 +416,6 @@ namespace SAVE {
 
         if( !hasSave ) {
             SAV.clear( );
-            for( u8 i = 0; i < MAX_BOXES; ++i )
-                sprintf( ( SAV.m_storedPokemon + i )->m_name, "Box %d", i + 1 );
         }
 
         SAV.m_activeFile = p_file;

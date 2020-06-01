@@ -48,6 +48,10 @@ namespace SAVE {
         m_good2 = GOOD_MAGIC2;
 
         m_bag = BAG::bag( );
+        for( u8 i = 0; i < MAX_BOXES; ++i ) {
+            sprintf( ( m_storedPokemon + i )->m_name, "Box %d", i + 1 );
+            ( m_storedPokemon + i )->m_wallpaper = i;
+        }
     }
 
     void saveGame::playerInfo::stepIncrease( ) {
@@ -125,38 +129,38 @@ namespace SAVE {
         return res;
     }
 
-    u16 saveGame::getDexCount( ) {
+    u16 saveGame::playerInfo::getDexCount( ) {
         u16 cnt = 0;
         for( u16 i = 0; i < MAX_PKMN; ++i )
             if( IN_DEX( i ) ) cnt++;
         return cnt;
     }
     // Return the idx of the resulting Box
-    s8 saveGame::storePkmn( const boxPokemon& p_pokemon ) {
-        s8 idx = m_storedPokemon[ getActiveFile( ).m_curBox ].getFirstFreeSpot( );
+    s8 saveGame::playerInfo::storePkmn( const boxPokemon& p_pokemon ) {
+        s8 idx = m_storedPokemon[ m_curBox ].getFirstFreeSpot( );
         u8 i   = 0;
         for( ; idx == -1 && i < MAX_BOXES; )
-            idx = m_storedPokemon[ ( ( ++i ) + getActiveFile( ).m_curBox ) % MAX_BOXES ]
+            idx = m_storedPokemon[ ( ( ++i ) + m_curBox ) % MAX_BOXES ]
                       .getFirstFreeSpot( );
         if( idx == -1 ) // Everything's full :/
             return -1;
-        getActiveFile( ).m_curBox = ( getActiveFile( ).m_curBox + i ) % MAX_BOXES;
-        m_storedPokemon[ getActiveFile( ).m_curBox ][ idx ] = p_pokemon;
-        return getActiveFile( ).m_curBox;
+        m_curBox = ( m_curBox + i ) % MAX_BOXES;
+        m_storedPokemon[ m_curBox ][ idx ] = p_pokemon;
+        return m_curBox;
     }
-    s8 saveGame::storePkmn( const pokemon& p_pokemon ) {
+    s8 saveGame::playerInfo::storePkmn( const pokemon& p_pokemon ) {
         return storePkmn( p_pokemon.m_boxdata );
     }
-    BOX::box* saveGame::getCurrentBox( ) {
-        return m_storedPokemon + getActiveFile( ).m_curBox;
+    BOX::box* saveGame::playerInfo::getCurrentBox( ) {
+        return m_storedPokemon + m_curBox;
     }
 
-    u16 saveGame::countPkmn( u16 p_pkmnIdx ) {
+    u16 saveGame::playerInfo::countPkmn( u16 p_pkmnIdx ) {
         u16 res = 0;
         for( u8 i = 0; i < MAX_BOXES; i++ ) res += m_storedPokemon[ i ].count( p_pkmnIdx );
         for( u8 i = 0; i < 6; ++i ) {
-            if( !getActiveFile( ).m_pkmnTeam[ i ].isEgg( )
-                && getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId == p_pkmnIdx )
+            if( !m_pkmnTeam[ i ].isEgg( )
+                && m_pkmnTeam[ i ].m_boxdata.m_speciesId == p_pkmnIdx )
                 ++res;
         }
         return res;
