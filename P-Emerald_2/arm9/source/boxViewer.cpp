@@ -77,7 +77,7 @@ namespace BOX {
             if( pressed & KEY_B ) {
                 if( _showTeam ) {
                     SOUND::playSoundEffect( SFX_CANCEL );
-                   //  _boxUI.hidePkmnTeam( );
+                    //  _boxUI.hidePkmnTeam( );
                 } else {
                     if( !_heldPkmn.getSpecies( ) ) {
                         SOUND::playSoundEffect( SFX_CANCEL );
@@ -89,9 +89,10 @@ namespace BOX {
             if( GET_KEY_COOLDOWN( KEY_L ) ) {
                 SAVE::SAV.getActiveFile( ).m_curBox
                     = ( SAVE::SAV.getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
-                _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ),
-                        p_allowTakePkmn );
+                _ranges
+                    = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ), p_allowTakePkmn );
                 select( _selectedIdx );
+                cooldown = COOLDOWN_COUNT;
             } /* else if( IN_RANGE_R( 24, 23, 48, 48 ) ) {
                 _boxUI.buttonChange( boxUI::BUTTON_LEFT, true );
                 loop( ) {
@@ -102,20 +103,22 @@ namespace BOX {
                     if( TOUCH_UP ) {
                         SAVE::SAV.getActiveFile( ).m_curBox
                             = ( SAVE::SAV.getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
-                        _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ), p_allowTakePkmn );
-                        select( _selectedIdx );
-                        break;
+                        _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ),
+            p_allowTakePkmn ); select( _selectedIdx ); break;
                     }
                     if( !IN_RANGE_R( 24, 23, 48, 48 ) ) {
                         _boxUI.buttonChange( boxUI::BUTTON_LEFT, false );
                         break;
                     }
                 }
-            } */  else if( GET_KEY_COOLDOWN( KEY_R ) ) {
+            } */
+            else if( GET_KEY_COOLDOWN( KEY_R ) ) {
                 SAVE::SAV.getActiveFile( ).m_curBox
                     = ( SAVE::SAV.getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
-                _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ), p_allowTakePkmn );
+                _ranges
+                    = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ), p_allowTakePkmn );
                 select( _selectedIdx );
+                cooldown = COOLDOWN_COUNT;
             } /* else if( IN_RANGE_R( 208, 23, 232, 48 ) ) {
                 _boxUI.buttonChange( boxUI::BUTTON_RIGHT, true );
                 loop( ) {
@@ -126,9 +129,8 @@ namespace BOX {
                     if( TOUCH_UP ) {
                         SAVE::SAV.getActiveFile( ).m_curBox
                             = ( SAVE::SAV.getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
-                        _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ), p_allowTakePkmn );
-                        select( _selectedIdx );
-                        break;
+                        _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ),
+            p_allowTakePkmn ); select( _selectedIdx ); break;
                     }
                     if( !IN_RANGE_R( 208, 23, 232, 48 ) ) {
                         _boxUI.buttonChange( boxUI::BUTTON_RIGHT, false );
@@ -158,16 +160,16 @@ namespace BOX {
                         IO::OamTop->oamBuffer[ 0 ].isHidden = false;
                         IO::updateOAM( false );
 
-                        _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ), p_allowTakePkmn );
-                        select( _selectedIdx );
-                        break;
+                        _ranges = _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ),
+            p_allowTakePkmn ); select( _selectedIdx ); break;
                     }
                     if( !IN_RANGE_R( 49, 23, 207, 48 ) ) {
                         _boxUI.buttonChange( boxUI::BUTTON_BOX_NAME, false );
                         break;
                     }
                 }
-            } */ else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+            } */
+            else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 if( _selectedIdx >= MAX_PKMN_PER_BOX && _selectedIdx < MAX_PKMN_PER_BOX )
                     _selectedIdx = MAX_PKMN_PER_BOX;
                 else if( _selectedIdx >= MAX_PKMN_PER_BOX )
@@ -176,6 +178,7 @@ namespace BOX {
                     HAS_SELECTION( _selectedIdx = 0,
                                    _selectedIdx = ( _selectedIdx + 6 ) % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
+                cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 if( _selectedIdx < 6 )
                     _selectedIdx = MAX_PKMN_PER_BOX;
@@ -186,20 +189,25 @@ namespace BOX {
                                    _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 2 )
                                                   % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
+                cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 HAS_SELECTION( _selectedIdx = 0,
                                _selectedIdx = ( _selectedIdx + 1 ) % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
+                cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 HAS_SELECTION( _selectedIdx = 0,
                                _selectedIdx = ( _selectedIdx + MAX_PKMN_PER_BOX + 7 )
                                               % ( MAX_PKMN_PER_BOX + 8 ) );
                 select( _selectedIdx );
+                cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_A ) ) {
                 HAS_SELECTION(, takePkmn( _selectedIdx ) );
+                cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_SELECT ) ) {
                 _curPage = ( _curPage + 1 ) % 5;
                 select( _selectedIdx );
+                cooldown = COOLDOWN_COUNT;
             }
             for( u8 i = 0; i < 5; ++i ) {
                 if( IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].isHidden ) continue;

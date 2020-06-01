@@ -42,24 +42,35 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "Up.h"
 #include "box_arrow.h"
 
-#include "NoItem.h"
+#include "NoPkmn.h"
 #include "boxsub.h"
 #include "boxwp1.h"
 #include "boxwp2.h"
+#include "boxwp3.h"
 
+#include "arrow.h"
 #include "backarrow.h"
+#include "noselection_128_32_1.h"
+#include "noselection_128_32_2.h"
+#include "noselection_64_32.h"
 #include "x_16_16.h"
 
 namespace BOX {
 
 #define SPR_PKMN_START_OAM_SUB 0
-#define SPR_X_OAM_SUB 40
-#define SPR_ARROW_BACK_OAM_SUB 41
+#define SPR_X_OAM_SUB 39
+#define SPR_ARROW_BACK_OAM_SUB 40
+#define SPR_ARROW_BACK_BG_OAM_SUB 41
+#define SPR_NEXT_BG_OAM_SUB 42
+#define SPR_NEXT_ARR_OAM_SUB 43
+#define SPR_NAME_BG_OAM_SUB 44
+#define SPR_PREV_BG_OAM_SUB 46
+#define SPR_PREV_ARR_OAM_SUB 47
 
-#define MAX_WALLPAPERS 2
-    const unsigned int* wallpaperTiles[ MAX_WALLPAPERS ] = { boxwp1Bitmap, boxwp2Bitmap };
-    const unsigned short* wallpaperPals[ MAX_WALLPAPERS ] = { boxwp1Pal, boxwp2Pal };
-
+#define MAX_WALLPAPERS 3
+    const unsigned int* wallpaperTiles[ MAX_WALLPAPERS ]
+        = {boxwp1Bitmap, boxwp2Bitmap, boxwp3Bitmap};
+    const unsigned short* wallpaperPals[ MAX_WALLPAPERS ] = {boxwp1Pal, boxwp2Pal, boxwp3Pal};
 
     void boxUI::initSub( ) {
         REG_BLDCNT_SUB = BLEND_NONE;
@@ -69,29 +80,53 @@ namespace BOX {
         videoSetModeSub( MODE_5_2D | // DISPLAY_BG1_ACTIVE |
                          DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
                          | ( ( DISPLAY_SPR_1D | DISPLAY_SPR_1D_SIZE_128 | DISPLAY_SPR_1D_BMP
-                         | DISPLAY_SPR_1D_BMP_SIZE_128 | ( 5 << 28 ) | 2 ) & 0xffffff0 ) );
+                               | DISPLAY_SPR_1D_BMP_SIZE_128 | ( 5 << 28 ) | 2 )
+                             & 0xffffff0 ) );
 
-        u16 tileCnt = 0;
+        SpriteEntry* oam     = IO::Oam->oamBuffer;
+        u16          tileCnt = 0;
+
+        // x
+        tileCnt
+            = IO::loadSpriteB( SPR_X_OAM_SUB, tileCnt, 236, 172, 16, 16, x_16_16Pal, x_16_16Tiles,
+                               x_16_16TilesLen, false, false, false, OBJPRIORITY_2, true );
+
+        // prev / box name / next
+        tileCnt
+            = IO::loadSpriteB( SPR_PREV_BG_OAM_SUB, tileCnt, 2, -4, 64, 32, noselection_64_32Pal,
+                               noselection_64_32Tiles, noselection_64_32TilesLen, true, true, false,
+                               OBJPRIORITY_3, true );
+        IO::loadSpriteB( SPR_NEXT_BG_OAM_SUB, oam[ SPR_PREV_BG_OAM_SUB ].gfxIndex, 120, -4, 64, 32,
+                         0, 0, 0, true, true, false, OBJPRIORITY_3, true );
+        tileCnt
+            = IO::loadSpriteB( SPR_NAME_BG_OAM_SUB, tileCnt, 36, 0, 64, 32, noselection_128_32_1Pal,
+                               noselection_128_32_1Tiles, noselection_128_32_1TilesLen, false,
+                               false, false, OBJPRIORITY_3, true );
+        tileCnt = IO::loadSpriteB( SPR_NAME_BG_OAM_SUB + 1, tileCnt, 100, 0, 64, 32,
+                                   noselection_128_32_2Pal, noselection_128_32_2Tiles,
+                                   noselection_128_32_2TilesLen, false, false, false, OBJPRIORITY_3,
+                                   true );
+
+        tileCnt
+            = IO::loadSpriteB( SPR_PREV_ARR_OAM_SUB, tileCnt, 26, 6, 16, 16, arrowPal, arrowTiles,
+                               arrowTilesLen, false, false, false, OBJPRIORITY_1, true );
+        IO::loadSpriteB( SPR_NEXT_ARR_OAM_SUB, oam[ SPR_PREV_ARR_OAM_SUB ].gfxIndex, 146, 6, 16, 16,
+                         0, 0, arrowTilesLen, false, true, false, OBJPRIORITY_1, true );
 
         // back arrow
-        tileCnt
-            = IO::loadSpriteB( SPR_ARROW_BACK_OAM_SUB, tileCnt, 102 + 56 + 32,
-                               192 - 19, 16, 16, backarrowPal, backarrowTiles,
-                               backarrowTilesLen, false,
-                               false, false, OBJPRIORITY_0, true );
-        // x
-        tileCnt = IO::loadSpriteB( SPR_X_OAM_SUB, tileCnt, 236, 172, 16, 16,
-                                   x_16_16Pal, x_16_16Tiles, x_16_16TilesLen, false, false, false,
-                                   OBJPRIORITY_2, true );
-
+        tileCnt = IO::loadSpriteB( SPR_ARROW_BACK_OAM_SUB, tileCnt, 102 + 56 + 16, 192 - 19, 16, 16,
+                                   backarrowPal, backarrowTiles, backarrowTilesLen, false, false,
+                                   false, OBJPRIORITY_0, true );
+        IO::loadSpriteB( SPR_ARROW_BACK_BG_OAM_SUB, oam[ SPR_PREV_BG_OAM_SUB ].gfxIndex, 102 + 48,
+                         192 - 24, 64, 32, 0, 0, 0, false, false, false, OBJPRIORITY_2, true );
 
         // pkmn
         for( u8 i = 0; i < 5; ++i ) {
             for( u8 j = 0; j < 6; ++j ) {
-                tileCnt = IO::loadSpriteB( SPR_PKMN_START_OAM_SUB + 6 * i + j,
-                        tileCnt, 26 + 26 * j, 32 + 26 * i,
-                        32, 32, NoItemPal, NoItemTiles, NoItemTilesLen,
-                        false, false, false, OBJPRIORITY_3, true );
+                tileCnt
+                    = IO::loadSpriteB( SPR_PKMN_START_OAM_SUB + 6 * i + j, tileCnt, 26 + 26 * j,
+                                       32 + 26 * i, 32, 32, NoPkmnPal, NoPkmnTiles, NoPkmnTilesLen,
+                                       false, false, false, OBJPRIORITY_3, true );
             }
         }
     }
@@ -104,26 +139,54 @@ namespace BOX {
 
     std::vector<IO::inputTarget> boxUI::draw( box* p_box, bool p_showTeam ) {
         std::vector<IO::inputTarget> res;
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        SpriteEntry*                 oam = IO::Oam->oamBuffer;
 
-        dmaCopy( wallpaperTiles[ p_box->m_wallpaper % MAX_WALLPAPERS ],
-                 bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
+        dmaCopy( wallpaperTiles[ p_box->m_wallpaper % MAX_WALLPAPERS ], bgGetGfxPtr( IO::bg3sub ),
+                 256 * 256 );
         dmaCopy( wallpaperPals[ p_box->m_wallpaper % MAX_WALLPAPERS ], BG_PALETTE_SUB, 64 * 2 );
         dmaCopy( boxsubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
         dmaCopy( boxsubPal, BG_PALETTE_SUB, 6 * 2 );
 
+        for( u8 i = 0; i < 2; ++i ) {
+            u16* pal             = BG_PAL( i );
+            pal[ IO::WHITE_IDX ] = IO::WHITE;
+            pal[ IO::GRAY_IDX ]  = IO::GRAY;
+            pal[ IO::BLACK_IDX ] = IO::BLACK;
+            pal[ IO::BLUE_IDX ]  = RGB( 18, 22, 31 );
+            pal[ IO::RED_IDX ]   = RGB( 31, 18, 18 );
+            pal[ IO::BLUE2_IDX ] = RGB( 0, 0, 25 );
+            pal[ IO::RED2_IDX ]  = RGB( 23, 0, 0 );
+
+            pal[ 240 ] = RGB( 6, 6, 6 );    // hp bar border color
+            pal[ 241 ] = RGB( 12, 30, 12 ); // hp bar green 1
+            pal[ 242 ] = RGB( 3, 23, 4 );   // hp bar green 2
+            pal[ 243 ] = RGB( 30, 30, 12 ); // hp bar yellow 1
+            pal[ 244 ] = RGB( 23, 23, 5 );  // hp bar yellow 2
+            pal[ 245 ] = RGB( 30, 15, 12 ); // hp bar red 1
+            pal[ 246 ] = RGB( 20, 7, 7 );   // hp bar red 2
+        }
+
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::smallFont->setColor( 0, 0 );
+        IO::smallFont->setColor( IO::WHITE_IDX, 1 );
+        IO::smallFont->setColor( IO::GRAY_IDX, 2 );
+
         // Load some placeholder
         for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
             if( p_box->m_pokemon[ i ].getSpecies( ) ) {
-                IO::loadSpriteB( SPR_PKMN_START_OAM_SUB + i,
-                        oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex,
-                        oam[ SPR_PKMN_START_OAM_SUB + i ].x,
-                        oam[ SPR_PKMN_START_OAM_SUB + i ].y,
-                        32, 32, NoItemPal, NoItemTiles, NoItemTilesLen,
-                        false, false, false, OBJPRIORITY_3, true );
+                IO::loadSpriteB(
+                    SPR_PKMN_START_OAM_SUB + i, oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex,
+                    oam[ SPR_PKMN_START_OAM_SUB + i ].x, oam[ SPR_PKMN_START_OAM_SUB + i ].y, 32,
+                    32, NoPkmnPal, NoPkmnTiles, NoPkmnTilesLen, false, false, false, OBJPRIORITY_3,
+                    true );
+            } else {
+                oam[ SPR_PKMN_START_OAM_SUB + i ].isHidden = true;
             }
         }
         IO::updateOAM( true );
+        IO::regularFont->printStringC( p_box->m_name, 94, 6, true, IO::font::CENTER );
 
         for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
             u8 x = i % 6, y = i / 6;
@@ -135,17 +198,17 @@ namespace BOX {
             // _ranges.push_back( {oam, res.back( )} );
             if( p_box->m_pokemon[ i ].getSpecies( ) ) {
                 if( !p_box->m_pokemon[ i ].isEgg( ) ) {
-                    IO::loadPKMNIconB( ( *p_box )[ i ].getSpecies( ),
-                            oam[ SPR_PKMN_START_OAM_SUB + i ].x,
-                            oam[ SPR_PKMN_START_OAM_SUB + i ].y,
-                            SPR_PKMN_START_OAM_SUB + i,  oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex,
-                            true );
+                    IO::loadPKMNIconB(
+                        ( *p_box )[ i ].getSpecies( ), oam[ SPR_PKMN_START_OAM_SUB + i ].x,
+                        oam[ SPR_PKMN_START_OAM_SUB + i ].y, SPR_PKMN_START_OAM_SUB + i,
+                        oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex, true,
+                        ( *p_box )[ i ].getForme( ), ( *p_box )[ i ].isShiny( ),
+                        ( *p_box )[ i ].isFemale( ) );
                 } else {
-                    IO::loadEggIconB(
-                            oam[ SPR_PKMN_START_OAM_SUB + i ].x,
-                            oam[ SPR_PKMN_START_OAM_SUB + i ].y,
-                            SPR_PKMN_START_OAM_SUB + i,  oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex,
-                            true );
+                    IO::loadEggIconB( oam[ SPR_PKMN_START_OAM_SUB + i ].x,
+                                      oam[ SPR_PKMN_START_OAM_SUB + i ].y,
+                                      SPR_PKMN_START_OAM_SUB + i,
+                                      oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex, true );
                 }
             } else {
                 oam[ SPR_PKMN_START_OAM_SUB + i ].isHidden = true;
@@ -156,74 +219,73 @@ namespace BOX {
         return res;
     }
 
-
     constexpr u16 getBoxColor( u8 p_boxIdx ) {
         return RGB15( 4 * ( ( 41 - p_boxIdx ) % 7 + 1 ), ( p_boxIdx * 30 ) / 42 + 1,
                       5 * ( ( 41 - p_boxIdx ) / 7 + 1 ) );
     }
 
-//    boxUI::boxUI( ) {
-        /*
-        IO::swapScreens( );
-        IO::vramSetup( );
-        videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
-                      | DISPLAY_SPR_1D | DISPLAY_SPR_EXT_PALETTE );
-        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+    //    boxUI::boxUI( ) {
+    /*
+    IO::swapScreens( );
+    IO::vramSetup( );
+    videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
+                  | DISPLAY_SPR_1D | DISPLAY_SPR_EXT_PALETTE );
+    dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
+    dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
 
-        bgUpdate( );
-        swiWaitForVBlank( );
-        NAV::draw( );
-        drawAllBoxStatus( );
+    bgUpdate( );
+    swiWaitForVBlank( );
+    NAV::draw( );
+    drawAllBoxStatus( );
 
-        IO::initOAMTable( false );
-        u16 tileCnt = 0;
+    IO::initOAMTable( false );
+    u16 tileCnt = 0;
 
-        tileCnt = IO::loadSprite( BACK_ID, BACK_ID, 0, tileCnt, SCREEN_WIDTH - 28,
-                                  SCREEN_HEIGHT - 28, 32, 32, BackPal, BackTiles, BackTilesLen,
-                                  false, false, false, OBJPRIORITY_1, false );
-        tileCnt
-            = IO::loadSprite( ARROW_ID, 0, 1, tileCnt, 0, 0, 16, 16, box_arrowPal, box_arrowTiles,
-                              box_arrowTilesLen, false, false, true, OBJPRIORITY_0, false );
-        tileCnt += 64;
-        tileCnt = IO::loadSprite( PAGE_ICON_START + ( 0 ), 0, PAGE_ICON_START + ( 0 ), tileCnt, 20,
-                                  0, 32, 32, time_iconPal, time_iconTiles, time_iconTilesLen, false,
-                                  false, true, OBJPRIORITY_0, false );
-        tileCnt = IO::loadSprite( PAGE_ICON_START + ( 1 ), 0, PAGE_ICON_START + ( 1 ), tileCnt, 40,
-                                  0, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, true,
-                                  OBJPRIORITY_0, false );
-        tileCnt = IO::loadSprite( PAGE_ICON_START + ( 2 ), 0, PAGE_ICON_START + ( 2 ), tileCnt, 0,
-                                  0, 32, 32, PKMNPal, PKMNTiles, PKMNTilesLen, false, false, true,
-                                  OBJPRIORITY_0, false );
-        tileCnt = IO::loadSprite( PAGE_ICON_START + ( 3 ), 0, PAGE_ICON_START + ( 3 ), tileCnt, 50,
-                                  0, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, true,
-                                  OBJPRIORITY_0, false );
-        tileCnt = IO::loadSprite( PAGE_ICON_START + ( 4 ), 0, PAGE_ICON_START + ( 4 ), tileCnt, 60,
-                                  0, 32, 32, ContestPal, ContestTiles, ContestTilesLen, false,
-                                  false, true, OBJPRIORITY_0, false );
-        for( u8 i = 0; i < 5; ++i ) {
-            IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].x = 48 + 32 * i;
-            IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].y = 256 - 10;
-        }
-        IO::updateOAM( false );
-        IO::initOAMTable( true );
+    tileCnt = IO::loadSprite( BACK_ID, BACK_ID, 0, tileCnt, SCREEN_WIDTH - 28,
+                              SCREEN_HEIGHT - 28, 32, 32, BackPal, BackTiles, BackTilesLen,
+                              false, false, false, OBJPRIORITY_1, false );
+    tileCnt
+        = IO::loadSprite( ARROW_ID, 0, 1, tileCnt, 0, 0, 16, 16, box_arrowPal, box_arrowTiles,
+                          box_arrowTilesLen, false, false, true, OBJPRIORITY_0, false );
+    tileCnt += 64;
+    tileCnt = IO::loadSprite( PAGE_ICON_START + ( 0 ), 0, PAGE_ICON_START + ( 0 ), tileCnt, 20,
+                              0, 32, 32, time_iconPal, time_iconTiles, time_iconTilesLen, false,
+                              false, true, OBJPRIORITY_0, false );
+    tileCnt = IO::loadSprite( PAGE_ICON_START + ( 1 ), 0, PAGE_ICON_START + ( 1 ), tileCnt, 40,
+                              0, 32, 32, memoPal, memoTiles, memoTilesLen, false, false, true,
+                              OBJPRIORITY_0, false );
+    tileCnt = IO::loadSprite( PAGE_ICON_START + ( 2 ), 0, PAGE_ICON_START + ( 2 ), tileCnt, 0,
+                              0, 32, 32, PKMNPal, PKMNTiles, PKMNTilesLen, false, false, true,
+                              OBJPRIORITY_0, false );
+    tileCnt = IO::loadSprite( PAGE_ICON_START + ( 3 ), 0, PAGE_ICON_START + ( 3 ), tileCnt, 50,
+                              0, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, true,
+                              OBJPRIORITY_0, false );
+    tileCnt = IO::loadSprite( PAGE_ICON_START + ( 4 ), 0, PAGE_ICON_START + ( 4 ), tileCnt, 60,
+                              0, 32, 32, ContestPal, ContestTiles, ContestTilesLen, false,
+                              false, true, OBJPRIORITY_0, false );
+    for( u8 i = 0; i < 5; ++i ) {
+        IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].x = 48 + 32 * i;
+        IO::OamTop->oamBuffer[ PAGE_ICON_START + i ].y = 256 - 10;
+    }
+    IO::updateOAM( false );
+    IO::initOAMTable( true );
 
-        BG_PALETTE[ IO::COLOR_IDX ] = IO::GREEN;
-        BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
-        BG_PALETTE[ IO::GRAY_IDX ]  = IO::GRAY;
-        BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
-        BG_PALETTE[ IO::RED_IDX ]   = IO::RED;
+    BG_PALETTE[ IO::COLOR_IDX ] = IO::GREEN;
+    BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
+    BG_PALETTE[ IO::GRAY_IDX ]  = IO::GRAY;
+    BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
+    BG_PALETTE[ IO::RED_IDX ]   = IO::RED;
 
-        BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
-        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
-        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
-        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
-        BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::RED;
-        */
-//    }
-//    boxUI::~boxUI( ) {
-        // IO::swapScreens( );
-//    }
+    BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
+    BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+    BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+    BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
+    BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::RED;
+    */
+    //    }
+    //    boxUI::~boxUI( ) {
+    // IO::swapScreens( );
+    //    }
 
     void boxUI::drawAllBoxStatus( bool p_bottom ) {
         /*
@@ -300,48 +362,48 @@ namespace BOX {
         */
     }
 
-    //std::vector<IO::inputTarget> boxUI::draw( bool p_showTeam ) {
-        /*
-        BG_PALETTE[ IO::COLOR_IDX ] = getBoxColor( SAVE::SAV.getActiveFile( ).m_curBox );
+    // std::vector<IO::inputTarget> boxUI::draw( bool p_showTeam ) {
+    /*
+    BG_PALETTE[ IO::COLOR_IDX ] = getBoxColor( SAVE::SAV.getActiveFile( ).m_curBox );
 
-        std::vector<IO::inputTarget> res;
-        _ranges.clear( );
-        _showTeam = p_showTeam;
-        box* box  = SAVE::SAV.getActiveFile( )getCurrentBox( );
+    std::vector<IO::inputTarget> res;
+    _ranges.clear( );
+    _showTeam = p_showTeam;
+    box* box  = SAVE::SAV.getActiveFile( )getCurrentBox( );
 
-        // SubScreen stuff
-        IO::printChoiceBox( 50, 23, 206, 48, 6, IO::COLOR_IDX, false, false ); // Box name
-        IO::printChoiceBox( 24, 23, 48, 48, 6, IO::GRAY_IDX, false, false );   // <
-        IO::printChoiceBox( 208, 23, 232, 48, 6, IO::GRAY_IDX, false, false ); // >
+    // SubScreen stuff
+    IO::printChoiceBox( 50, 23, 206, 48, 6, IO::COLOR_IDX, false, false ); // Box name
+    IO::printChoiceBox( 24, 23, 48, 48, 6, IO::GRAY_IDX, false, false );   // <
+    IO::printChoiceBox( 208, 23, 232, 48, 6, IO::GRAY_IDX, false, false ); // >
 
-        IO::regularFont->printString( box->m_name, 127, 28, false, IO::font::CENTER );
-        IO::regularFont->printString( "<", 31, 28, false );
-        IO::regularFont->printString( ">", 216, 28, false );
+    IO::regularFont->printString( box->m_name, 127, 28, false, IO::font::CENTER );
+    IO::regularFont->printString( "<", 31, 28, false );
+    IO::regularFont->printString( ">", 216, 28, false );
 
-        u8  oam     = PKMN_START;
-        u8  pal     = PKMN_PALETTE_START;
-        u16 tileCnt = PKMN_TILES_START;
+    u8  oam     = PKMN_START;
+    u8  pal     = PKMN_PALETTE_START;
+    u16 tileCnt = PKMN_TILES_START;
 
-        IO::printChoiceBox( 24, 51, 232, 136, 6, IO::COLOR_IDX, false, false );
+    IO::printChoiceBox( 24, 51, 232, 136, 6, IO::COLOR_IDX, false, false );
 
-        IO::printRectangle( 0, 140, 255, 192, false,  IO::WHITE_IDX );
-        IO::regularFont->printString( p_showTeam ? GET_STRING( 59 ) : GET_STRING( 60 ), 2, 176,
-                                      false );
-        for( u8 i = 0; i < 6; ++i ) {
-            res.push_back( IO::inputTarget( TEAM_POS_X( i ), TEAM_POS_Y( i ), TEAM_POS_X( i ) + 28,
-                                            TEAM_POS_Y( i ) + 21 ) );
-            _ranges.push_back( {oam, res.back( )} );
+    IO::printRectangle( 0, 140, 255, 192, false,  IO::WHITE_IDX );
+    IO::regularFont->printString( p_showTeam ? GET_STRING( 59 ) : GET_STRING( 60 ), 2, 176,
+                                  false );
+    for( u8 i = 0; i < 6; ++i ) {
+        res.push_back( IO::inputTarget( TEAM_POS_X( i ), TEAM_POS_Y( i ), TEAM_POS_X( i ) + 28,
+                                        TEAM_POS_Y( i ) + 21 ) );
+        _ranges.push_back( {oam, res.back( )} );
 
-            IO::printChoiceBox( TEAM_POS_X( i ), TEAM_POS_Y( i ), TEAM_POS_X( i ) + 28,
-                                TEAM_POS_Y( i ) + 21, 3, IO::GRAY_IDX, false, false );
+        IO::printChoiceBox( TEAM_POS_X( i ), TEAM_POS_Y( i ), TEAM_POS_X( i ) + 28,
+                            TEAM_POS_Y( i ) + 21, 3, IO::GRAY_IDX, false, false );
 
-        }
+    }
 
-        drawAllBoxStatus( );
-        IO::updateOAM( false );
-        return res;
-        */
-  //  }
+    drawAllBoxStatus( );
+    IO::updateOAM( false );
+    return res;
+    */
+    //  }
 
     void boxUI::select( u8 p_index ) {
         /*
