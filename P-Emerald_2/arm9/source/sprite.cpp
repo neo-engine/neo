@@ -465,8 +465,7 @@ namespace IO {
                     int shift = tilex * ( -28 ); // size per tile
                     for( u8 y = 0; y < 8; ++y ) {
                         for( u8 x = 0; x < 8; x += 2, ++i ) {
-                            u8 cur = reinterpret_cast<u8*>(
-                                    const_cast<unsigned int*>( p_spriteData ) )[ i ];
+                            u8 cur = reinterpret_cast<const u8*>( p_spriteData )[ i ];
                             u8 up = cur >> 4, down = cur & 0xf;
                             if( up ) { gfx[ 2 * ( i + shift ) + 1 ] = p_spritePal[ up ]; }
                             if( down ) { gfx[ 2 * ( i + shift ) ] = p_spritePal[ down ]; }
