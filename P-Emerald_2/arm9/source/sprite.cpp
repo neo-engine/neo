@@ -416,6 +416,7 @@ namespace IO {
         return p_tileIdx + ( p_spriteDataLen / BYTES_PER_16_COLOR_TILE );
     }
 
+    u16 BITMAP_SPRITE[ 64 * 64 * 2 ];
     u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileIdx, const u16 p_posX, const u16 p_posY,
                      const u8 p_width, const u8 p_height, const unsigned short* p_spritePal,
                      const unsigned int* p_spriteData, const u32 p_spriteDataLen, bool p_flipX,
@@ -467,15 +468,18 @@ namespace IO {
                         for( u8 x = 0; x < 8; x += 2, ++i ) {
                             u8 cur = reinterpret_cast<const u8*>( p_spriteData )[ i ];
                             u8 up = cur >> 4, down = cur & 0xf;
-                            if( up ) { gfx[ 2 * ( i + shift ) + 1 ] = p_spritePal[ up ]; }
-                            if( down ) { gfx[ 2 * ( i + shift ) ] = p_spritePal[ down ]; }
+                            BITMAP_SPRITE[ 2 * ( i + shift ) + 1 ] = ( !!up ) *
+                                ( ( 1 << 15 ) | p_spritePal[ up ] );
+                            BITMAP_SPRITE[ 2 * ( i + shift ) ] = ( !!down ) * ( ( 1 << 15 ) |
+                                    p_spritePal[ down ] );
                         }
                         shift += 4 * ( p_width / 8 - 1 );
                     }
                 }
             }
+            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BITMAP_SPRITE,
+                              gfx, p_width * p_height * 2 );
         }
-
         return p_tileIdx + ( p_spriteDataLen / BYTES_PER_16_COLOR_TILE );
     }
 

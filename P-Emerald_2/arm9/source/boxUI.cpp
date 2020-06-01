@@ -90,7 +90,8 @@ namespace BOX {
             for( u8 j = 0; j < 6; ++j ) {
                 tileCnt = IO::loadSpriteB( SPR_PKMN_START_OAM_SUB + 6 * i + j,
                         tileCnt, 29 + 26 * j, 32 + 26 * i,
-                        32, 32, 0, 0, NoItemTilesLen, false, false, false, OBJPRIORITY_3, true );
+                        32, 32, NoItemPal, NoItemTiles, NoItemTilesLen,
+                        false, false, false, OBJPRIORITY_3, true );
             }
         }
 
