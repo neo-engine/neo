@@ -36,25 +36,58 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace BOX {
     class boxViewer {
       private:
+        enum mode {
+            STATUS, // pressing A on a pkmn shows menu
+            MOVE,   // pressing A on a pkmn picks it up
+        };
+
+        mode                         _mode;
+
         std::vector<IO::inputTarget> _ranges;
         u8                           _selectedIdx;
-        std::pair<u8, u8>            _heldPokmPos; //(box, pos in box); (_, 19..24) for team pkmn
+        std::pair<u8, u8>            _heldPokmPos; //(box, pos in box); (_, 40..45) for team pkmn
         pokemon                      _heldPkmn;
-        bool                         _showTeam;
-        bool                         _topScreenDirty;
-        u8                           _curPage;
+        bool                         _showParty;
         boxUI                        _boxUI;
 
+        /*
+         * @brief: Selects the pkmn/button at p_index.
+         */
         void select( u8 p_index );
+
+        /*
+         * @brief: Takes and holds the pkmn at p_index.
+         */
         void takePkmn( u8 p_index );
 
-        bool updateTeam( );
+        /*
+         * @brief: Returns the currently held pkmn where it came from.
+         */
+        void returnPkmn( );
 
+        /*
+         * @brief: Shows the party and runs everything related.
+         */
+        void runParty( );
+
+        /*
+         * @brief: Runs the status choice for a pkmn (show status, move, release, ...)
+         * Returns 1 if the pkmn has to be picked up, 0 otherwise.
+         * (Picking up the pkmn may require placing the currently held pkmn.)
+         */
+        u8 runStatusChoice( );
+
+        /*
+         * @brief: Runs the choice screen for the various box settings. (rename,
+         * wallpaper, sort)
+         */
+        void runBoxSettings( );
       public:
-        boxViewer( ) {
-        }
-        ~boxViewer( ) {
-        }
-        void run( bool p_allowTakePkmn = false );
+
+        /*
+         * @brief: Runs the box interface. Bottom screen requires complete re-init
+         * afterwards (including setMode)
+         */
+        void run( );
     };
 } // namespace BOX

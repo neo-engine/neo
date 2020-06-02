@@ -107,7 +107,7 @@ namespace SAVE {
                 testTeam[ 2 ].m_boxdata.m_heldItem   = I_YAGO_BERRY;
         */
         BOX::boxViewer bxv;
-        bxv.run( 0 );
+        bxv.run( );
 
         /*
         STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );

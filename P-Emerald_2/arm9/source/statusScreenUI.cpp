@@ -240,7 +240,7 @@ namespace STS {
         for( u8 i = 0; i < 2; ++i ) {
             tileCnt
                 = IO::loadTypeIcon( _data.m_baseForme.m_types[ i ], INFO_X - 7 + 128 - 66 + 34 * i,
-                                    INFO_Y + +11 + 15 * 2, SPR_TYPE_OAM( i ), SPR_TYPE_PAL( i ),
+                                    INFO_Y + 11 + 15 * 2, SPR_TYPE_OAM( i ), SPR_TYPE_PAL( i ),
                                     tileCnt, p_bottom, CURRENT_LANGUAGE );
             oam[ SPR_TYPE_OAM( i ) ].isHidden = true;
         }

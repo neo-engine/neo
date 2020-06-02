@@ -492,7 +492,7 @@ namespace NAV {
 
                 const char* someText[ 12 ]
                     = {"PKMN Spawn",   "Item Spawn",   "1 Item Test",  "Dbl Battle",
-                       "Sgl Battle",   "Chg NavScrn",  "View Boxes A", "View Boxes B",
+                       "Sgl Battle",   "Chg NavScrn",  "---", "View Boxes",
                        "Hoenn Badges", "Kanto Badges", "Keyboard",     "Plate Spawn"};
                 IO::choiceBox test( 12, &someText[ 0 ], 0, false );
                 int           res = test.getResult( "Tokens of god-being..." );
@@ -643,12 +643,20 @@ namespace NAV {
                           scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
                     break;
                 }
-                case 6:
                 case 7: {
                     BOX::boxViewer bxv;
                     ANIMATE_MAP = false;
+                    UPDATE_TIME = true;
+                    SOUND::dimVolume( );
 
-                    bxv.run( res % 2 );
+                    bxv.run( );
+
+                    IO::initVideoSub( );
+                    ANIMATE_MAP = true;
+                    UPDATE_TIME = true;
+                    SOUND::restoreVolume( );
+                    draw( true );
+                    MAP::curMap->draw( );
 
                     consoleSelect( &IO::Top );
                     consoleSetWindow( &IO::Top, 0, 0, 32, 24 );

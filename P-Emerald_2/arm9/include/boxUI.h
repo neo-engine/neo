@@ -39,12 +39,16 @@ namespace BOX {
 
             void initTop( );
             void initSub( );
+
+            void writeLineTop( const char* p_string, u8 p_line, u8 p_color = 252,
+                               bool p_bottom = false );
         public:
             enum button {
                 BUTTON_LEFT,
                 BUTTON_RIGHT,
                 BUTTON_BOX_NAME,
                 BUTTON_BACK,
+                BUTTON_PKMN,
                 BUTTON_PARTY,
                 BUTTON_MODE_MOVE,
                 BUTTON_MODE_SELECT,
@@ -54,6 +58,20 @@ namespace BOX {
             };
 
             /*
+             * @brief: Describes buttons in the UI.
+             */
+            struct interact {
+                IO::inputTarget m_touch;
+                button m_buttonType;
+                u8 m_param; // pkmn id
+            };
+
+            /*
+             * @brief: returns the current buttons.
+             */
+            std::vector<interact> getInteractions( );
+
+            /*
              * @brief: Initializes the box UI.
              */
             void init( );
@@ -61,7 +79,7 @@ namespace BOX {
             /*
              * @brief: Draw the specified box.
              */
-            std::vector<IO::inputTarget> draw( box* p_box, bool p_showTeam = false );
+            void draw( box* p_box );
 
             /*
              * @brief: Selects the given button.
@@ -69,29 +87,24 @@ namespace BOX {
             void selectButton( button p_selectedButton, bool p_touched = false );
 
             /*
-             * @brief: Unselects the given button.
-             */
-            void unselectButton( button p_selectedButton, bool p_touched = false );
-
-            /*
              * @brief: Selects the given pkmn; shows the corresponding buttons
              */
-            void selectPkmn( u8 p_index, bool p_touched = false );
+            void selectPkmn( pokemon* p_pokemon, u8 p_index, bool p_touched = false );
 
             /*
              * @brief: Hovers over a pkmn.
              */
-            void hoverPkmn( u8 p_index );
+            void hoverPkmn( boxPokemon* p_pokemon, u8 p_index );
 
             /*
              * @brief: Draws some basic info of the pkmn to the top screen
              */
-            void drawPkmnInfoTop( boxPokemon* p_pokemon );
+            void drawPkmnInfoTop( pokemon* p_pokemon );
 
             /*
              * @brief: Shows the pkmn party window
              */
-            std::vector<IO::inputTarget> showParty( pokemon* p_party, u8 p_partyLen );
+            void showParty( pokemon* p_party, u8 p_partyLen );
 
             /*
              * @brief: Hides the party window
@@ -99,15 +112,8 @@ namespace BOX {
             void hideParty( );
 
 
-
-            void buttonChange( button p_button, bool p_pressed );
-
-            std::vector<std::pair<u8, IO::inputTarget>> _ranges;
-
-            void select( u8 p_index );
-            void takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg );
-            void updateTeam( );
-
-            void drawAllBoxStatus( bool p_bottom = false );
+    //        void select( u8 p_index );
+    //        void takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg );
+    //        void updateTeam( );
     };
 }

@@ -723,4 +723,5 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
      "blocks.",
      "Pok\xe9riegel."},
     {"%2hhu/%2hhu", "%2hhu/%2hhu"}, // PP
+    {"Nature", "Wesen"},
 };
