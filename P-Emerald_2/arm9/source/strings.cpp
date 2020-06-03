@@ -724,4 +724,16 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
      "Pok\xe9riegel."},
     {"%2hhu/%2hhu", "%2hhu/%2hhu"}, // PP
     {"Nature", "Wesen"},
+    {"Move Pok\xe9mon", "Pok\xe9mon bewegen"},
+
+    // 380
+
+    {"Show Party", "Team-PKMN"},
+    {"Hide Party", "Team-PKMN"},
+    {"Move", "Bewegen"},
+    {"Summary", "Details"},
+    {"Release", "Freilassen"},
+
+    {"Give Item", "Item geben"},
+    {"Take Item", "Item nehmen"},
 };

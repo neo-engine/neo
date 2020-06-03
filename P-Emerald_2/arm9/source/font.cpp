@@ -58,6 +58,85 @@ namespace IO {
         }
     }
 
+    void font::printCharB( u16 p_ch, u16* p_palette, u16* p_buffer, u16 p_bufferWidth, s16 p_x, s16 p_y ) const {
+        _shiftchar( p_ch );
+
+        s16 putX, putY;
+        u8  getX, getY;
+        u32 offset = p_ch * FONT_WIDTH * FONT_HEIGHT;
+
+        for( putY = p_y, getY = 0; putY < p_y + FONT_HEIGHT; ++putY, ++getY ) {
+            for( putX = p_x, getX = 0; putX < p_x + _widths[ p_ch ]; putX++, getX++ ) {
+                if( putX >= 0 && putX < p_bufferWidth ) {
+                    u8 clr = _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ];
+                    if( clr ) {
+                        p_buffer[ p_bufferWidth * putY + putX ] = ( 1 << 15 ) | p_palette[ clr ];
+                    }
+                }
+            }
+        }
+    }
+
+    void font::printStringBC( const char *p_string, u16* p_palette, u16* p_buffer,
+                              u16 p_bufferWidth, alignment p_alignment, u8 p_yDistance ) const {
+        u32 current_char = 0;
+        s16 putX = 0, putY = 0;
+        if( p_alignment == RIGHT ) putX = p_bufferWidth - stringWidthC( p_string );
+        if( p_alignment == CENTER ) putX = ( p_bufferWidth - stringWidthC( p_string ) ) / 2;
+
+        while( p_string[ current_char ] && putX < p_bufferWidth ) {
+            if( p_string[ current_char ] == '\n' ) {
+                putY += p_yDistance;
+                if( p_alignment == RIGHT ) {
+                    putX = p_bufferWidth - stringWidthC( p_string + current_char + 1 );
+                }
+                if( p_alignment == CENTER ) {
+                    putX = ( p_bufferWidth - stringWidthC( p_string + current_char + 1 ) ) / 2;
+                }
+
+                current_char++;
+                continue;
+            }
+            printCharB( p_string[ current_char ], p_palette, p_buffer, p_bufferWidth, putX, putY );
+
+            u16 c = (u16) p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ] - 1;
+
+            current_char++;
+        }
+    }
+
+    void font::printStringB( const char *p_string, u16* p_palette, u16* p_buffer,
+                             u16 p_bufferWidth, alignment p_alignment, u8 p_yDistance ) const {
+        u32 current_char = 0;
+        s16 putX = 0, putY = 0;
+        if( p_alignment == RIGHT ) putX = p_bufferWidth - stringWidth( p_string );
+        if( p_alignment == CENTER ) putX = ( p_bufferWidth - stringWidth( p_string ) ) / 2;
+
+        while( p_string[ current_char ] && putX < p_bufferWidth ) {
+            if( p_string[ current_char ] == '\n' ) {
+                putY += p_yDistance;
+                if( p_alignment == RIGHT ) {
+                    putX = p_bufferWidth - stringWidth( p_string + current_char + 1 );
+                }
+                if( p_alignment == CENTER ) {
+                    putX = ( p_bufferWidth - stringWidth( p_string + current_char + 1 ) ) / 2;
+                }
+
+                current_char++;
+                continue;
+            }
+            printCharB( p_string[ current_char ], p_palette, p_buffer, p_bufferWidth, putX, putY );
+
+            u16 c = (u16) p_string[ current_char ];
+            _shiftchar( c );
+            putX += _widths[ c ];
+
+            current_char++;
+        }
+    }
+
     void font::printStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                              alignment p_alignment, u8 p_yDistance, s8 p_adjustX,
                              u8 p_layer ) const {

@@ -420,6 +420,74 @@ namespace IO {
     u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileIdx, const u16 p_posX, const u16 p_posY,
                      const u8 p_width, const u8 p_height, const unsigned short* p_spritePal,
                      const unsigned int* p_spriteData, const u32 p_spriteDataLen, bool p_flipX,
+                     bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom,
+                     bool p_outline, bool p_tiled ) {
+        if( p_spritePal && p_spriteData && p_tiled ) {
+            u32 i = 0;
+            for( u8 tiley = 0; tiley < p_height / 8; ++tiley ) {
+                for( u8 tilex = 0; tilex < p_width / 8; ++tilex ) {
+                    int shift = tilex * ( -28 ); // size per tile
+                    for( u8 y = 0; y < 8; ++y ) {
+                        for( u8 x = 0; x < 8; x += 2, ++i ) {
+                            u8 cur = reinterpret_cast<const u8*>( p_spriteData )[ i ];
+                            u8 up = cur >> 4, down = cur & 0xf;
+                            BITMAP_SPRITE[ 2 * ( i + shift ) + 1 ] = ( !!up ) *
+                                ( ( 1 << 15 ) | p_spritePal[ up ] );
+                            BITMAP_SPRITE[ 2 * ( i + shift ) ] = ( !!down ) * ( ( 1 << 15 ) |
+                                    p_spritePal[ down ] );
+                        }
+                        shift += 4 * ( p_width / 8 - 1 );
+                    }
+                }
+            }
+        } else if( p_spritePal && p_spriteData ) {
+            u32 i = 0;
+            for( u8 y = 0; y < p_height; ++y ) {
+                for( u8 x = 0; x < p_width; x += 2, ++i ) {
+                    u8 cur = reinterpret_cast<const u8*>( p_spriteData )[ i ];
+                    u8 up = cur >> 4, down = cur & 0xf;
+                    BITMAP_SPRITE[ 2 * ( i ) + 1 ] = ( !!up ) *
+                        ( ( 1 << 15 ) | p_spritePal[ up ] );
+                    BITMAP_SPRITE[ 2 * ( i ) ] = ( !!down ) * ( ( 1 << 15 ) |
+                            p_spritePal[ down ] );
+                }
+            }
+        }
+
+#define OUTLINE_COLOR 0xF4A0
+        if( p_outline ) {
+            for( u8 y = 0; y < p_height; ++y ) {
+                for( u8 x = 0; x < p_width; ++x ) {
+                    if( !( BITMAP_SPRITE[ p_width * y + x ] & ( 1 << 15 ) ) ) {
+                        bool isOutline = false;
+                        for( s8 dx = -1; dx < 2; ++dx ) {
+                            for( s8 dy = -1; dy < 2; ++dy ) {
+                                if( x + dx >= 0 && x + dx < p_width
+                                        && y + dy >= 0 && y + dy < p_height ) {
+                                    auto cur = BITMAP_SPRITE[ p_width * ( y + dy ) + x + dx ];
+                                    if( ( cur & ( 1 << 15 ) ) && cur != OUTLINE_COLOR ) {
+                                        isOutline = true;
+                                    }
+                                }
+                            }
+                        }
+                        if( isOutline ) {
+                            BITMAP_SPRITE[ p_width * y + x ] = OUTLINE_COLOR;
+                        }
+                    }
+                }
+            }
+        }
+
+        return loadSpriteB( p_oamIdx, p_tileIdx, p_posX, p_posY, p_width, p_height,
+                            ( p_spritePal && p_spriteData ) ? BITMAP_SPRITE : 0,
+                            p_spriteDataLen, p_flipX, p_flipY, p_hidden, p_priority, p_bottom );
+    }
+
+
+    u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileIdx, const u16 p_posX, const u16 p_posY,
+                     const u8 p_width, const u8 p_height, const unsigned short* p_spriteData,
+                     const u32 p_spriteDataLen, bool p_flipX,
                      bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom ) {
         IO::SpriteInfo* sInfo = ( p_bottom ? spriteInfo : spriteInfoTop ) + p_oamIdx;
         OAMTable*       oam   = ( p_bottom ? Oam : OamTop );
@@ -459,26 +527,8 @@ namespace IO {
 
         auto gfx = p_bottom ? &SPRITE_GFX_SUB[ (u32) p_tileIdx * 64 ]
                             : &SPRITE_GFX[ (u32) p_tileIdx * 64 ];
-        if( p_spritePal && p_spriteData ) {
-            u32 i = 0;
-            for( u8 tiley = 0; tiley < p_height / 8; ++tiley ) {
-                for( u8 tilex = 0; tilex < p_width / 8; ++tilex ) {
-                    int shift = tilex * ( -28 ); // size per tile
-                    for( u8 y = 0; y < 8; ++y ) {
-                        for( u8 x = 0; x < 8; x += 2, ++i ) {
-                            u8 cur = reinterpret_cast<const u8*>( p_spriteData )[ i ];
-                            u8 up = cur >> 4, down = cur & 0xf;
-                            BITMAP_SPRITE[ 2 * ( i + shift ) + 1 ] = ( !!up ) *
-                                ( ( 1 << 15 ) | p_spritePal[ up ] );
-                            BITMAP_SPRITE[ 2 * ( i + shift ) ] = ( !!down ) * ( ( 1 << 15 ) |
-                                    p_spritePal[ down ] );
-                        }
-                        shift += 4 * ( p_width / 8 - 1 );
-                    }
-                }
-            }
-            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, BITMAP_SPRITE,
-                              gfx, p_width * p_height * 2 );
+        if( p_spriteData ) {
+            dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, gfx, p_width * p_height * 2 );
         }
         return p_tileIdx + ( p_spriteDataLen / BYTES_PER_16_COLOR_TILE );
     }
@@ -808,12 +858,12 @@ namespace IO {
 
     u16 loadAnimatedSprite( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                             u8 p_palCnt, u16 p_tileCnt, ObjPriority p_priority, bool p_bottom ) {
-        FS::read( p_file, TEMP_PAL, sizeof( unsigned short ), 16 );
+        FS::read( p_file, TEMP_PAL, sizeof( u16 ), 16 );
         u8 frameCount, width, height;
         FS::read( p_file, &frameCount, sizeof( u8 ), 1 );
         FS::read( p_file, &width, sizeof( u8 ), 1 );
         FS::read( p_file, &height, sizeof( u8 ), 1 );
-        FS::read( p_file, TEMP, sizeof( unsigned int ), width * height * frameCount / 8 );
+        FS::read( p_file, TEMP, sizeof( u32 ), width * height * frameCount / 8 );
         FS::close( p_file );
 
         return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, width, height, TEMP_PAL,
@@ -821,18 +871,19 @@ namespace IO {
                            p_bottom );
     }
     u16 loadAnimatedSpriteB( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
-                             u16 p_tileCnt, ObjPriority p_priority, bool p_bottom ) {
-        FS::read( p_file, TEMP_PAL, sizeof( unsigned short ), 16 );
+                             u16 p_tileCnt, ObjPriority p_priority, bool p_bottom,
+                             bool p_outline ) {
+        FS::read( p_file, TEMP_PAL, sizeof( u16 ), 16 );
         u8 frameCount, width, height;
         FS::read( p_file, &frameCount, sizeof( u8 ), 1 );
         FS::read( p_file, &width, sizeof( u8 ), 1 );
         FS::read( p_file, &height, sizeof( u8 ), 1 );
-        FS::read( p_file, TEMP, sizeof( unsigned int ), width * height * frameCount / 8 );
+        FS::read( p_file, TEMP, sizeof( u32 ), width * height * frameCount / 8 );
         FS::close( p_file );
 
         return loadSpriteB( p_oamIndex, p_tileCnt, p_posX, p_posY, width, height, TEMP_PAL, TEMP,
                             width * height * frameCount / 2, false, false, false, p_priority,
-                            p_bottom );
+                            p_bottom, p_outline );
     }
 
     u16 loadOWSprite( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
@@ -972,7 +1023,8 @@ namespace IO {
     }
 
     u16 loadPKMNIconB( const u16 p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
-                       u16 p_tileCnt, bool p_bottom, u8 p_forme, bool p_shiny, bool p_female ) {
+                       u16 p_tileCnt, bool p_bottom, u8 p_forme, bool p_shiny, bool p_female,
+                       bool p_outline ) {
         FILE* f;
         /*
         if( !existsPKMNSprite( p_pkmnId, true, p_female ) ) {
@@ -989,7 +1041,7 @@ namespace IO {
             f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
             if( f ) {
                 return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt, OBJPRIORITY_2,
-                                            p_bottom );
+                                            p_bottom, p_outline );
             }
 
             if( p_shiny ) {
@@ -998,7 +1050,7 @@ namespace IO {
                 f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
                 if( f ) {
                     return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt,
-                                                OBJPRIORITY_2, p_bottom );
+                                                OBJPRIORITY_2, p_bottom, p_outline );
                 }
             }
 
@@ -1008,7 +1060,7 @@ namespace IO {
                 f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
                 if( f ) {
                     return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt,
-                                                OBJPRIORITY_2, p_bottom );
+                                                OBJPRIORITY_2, p_bottom, p_outline );
                 }
             }
         }
@@ -1018,14 +1070,14 @@ namespace IO {
         f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
         if( f ) {
             return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt, OBJPRIORITY_2,
-                                        p_bottom );
+                                        p_bottom, p_outline );
         }
         if( p_shiny ) {
             snprintf( BUFFER, 99, "/icon%03hu%s.rsd", p_pkmnId, p_female ? "f" : "" );
             f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
             if( f ) {
                 return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt, OBJPRIORITY_2,
-                                            p_bottom );
+                                            p_bottom, p_outline );
             }
         }
 
@@ -1034,7 +1086,7 @@ namespace IO {
             f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
             if( f ) {
                 return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt, OBJPRIORITY_2,
-                                            p_bottom );
+                                            p_bottom, p_outline );
             }
         }
 
@@ -1042,9 +1094,9 @@ namespace IO {
         f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
         if( f ) {
             return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt, OBJPRIORITY_2,
-                                        p_bottom );
+                                        p_bottom, p_outline );
         }
-        return loadPKMNIconB( 0, p_posX, p_posY, p_oamIndex, p_tileCnt, p_bottom );
+        return loadPKMNIconB( 0, p_posX, p_posY, p_oamIndex, p_tileCnt, p_bottom, p_outline );
     }
 
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
@@ -1054,9 +1106,9 @@ namespace IO {
     }
 
     u16 loadEggIconB( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u16 p_tileCnt,
-                      bool p_bottom, bool p_manaphy ) {
+                      bool p_bottom, bool p_manaphy, bool p_outline ) {
         return loadPKMNIconB( 1 - 1, p_posX, p_posY, p_oamIndex, p_tileCnt, p_bottom, 1 + p_manaphy,
-                              false, false );
+                              false, false, p_outline );
     }
 
     u16 loadItemIcon( u16 p_itemId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
@@ -1068,8 +1120,8 @@ namespace IO {
                                p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
         }
 
-        FS::read( f, TEMP, sizeof( unsigned int ), 128 );
-        FS::read( f, TEMP_PAL, sizeof( unsigned short ), 16 );
+        FS::read( f, TEMP, sizeof( u32 ), 128 );
+        FS::read( f, TEMP_PAL, sizeof( u16 ), 16 );
 
         return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP,
                            512, false, false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0,
@@ -1085,8 +1137,8 @@ namespace IO {
                                 p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
         }
 
-        FS::read( f, TEMP, sizeof( unsigned int ), 128 );
-        FS::read( f, TEMP_PAL, sizeof( unsigned short ), 16 );
+        FS::read( f, TEMP, sizeof( u32 ), 128 );
+        FS::read( f, TEMP_PAL, sizeof( u16 ), 16 );
 
         return loadSpriteB( p_oamIndex, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP, 512,
                             false, false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0,

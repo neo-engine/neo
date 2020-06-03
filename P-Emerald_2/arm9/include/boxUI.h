@@ -40,6 +40,17 @@ namespace BOX {
             void initTop( );
             void initSub( );
 
+            /*
+             * @brief: Draws some basic info of the pkmn to the top screen (clears screen
+             * if p_pokemon is nullptr)
+             */
+            void drawPkmnInfoTop( pokemon* p_pokemon );
+
+            /*
+             * @brief: Updates the buttons for the given pkmn. (Hides all buttons if
+             * p_pokemon is nullptr)
+             */
+            void drawPkmnInfoSub( boxPokemon* p_pokemon );
             void writeLineTop( const char* p_string, u8 p_line, u8 p_color = 252,
                                bool p_bottom = false );
         public:
@@ -52,9 +63,11 @@ namespace BOX {
                 BUTTON_PARTY,
                 BUTTON_MODE_MOVE,
                 BUTTON_MODE_SELECT,
-                BUTTON_PKMN_STATUS,
                 BUTTON_PKMN_MOVE,
-                BUTTON_PKMN_RELEASE
+                BUTTON_PKMN_STATUS,
+                BUTTON_PKMN_RELEASE,
+                BUTTON_PKMN_GIVE_ITEM,
+                BUTTON_PKMN_TAKE_ITEM
             };
 
             /*
@@ -89,17 +102,12 @@ namespace BOX {
             /*
              * @brief: Selects the given pkmn; shows the corresponding buttons
              */
-            void selectPkmn( pokemon* p_pokemon, u8 p_index, bool p_touched = false );
+            void selectPkmn( boxPokemon* p_pokemon, u8 p_index, bool p_touched = false );
 
             /*
              * @brief: Hovers over a pkmn.
              */
-            void hoverPkmn( boxPokemon* p_pokemon, u8 p_index );
-
-            /*
-             * @brief: Draws some basic info of the pkmn to the top screen
-             */
-            void drawPkmnInfoTop( pokemon* p_pokemon );
+            void hoverPkmn( boxPokemon* p_pokemon, u8 p_index, bool p_redraw = true );
 
             /*
              * @brief: Shows the pkmn party window
@@ -111,9 +119,9 @@ namespace BOX {
              */
             void hideParty( );
 
-
-    //        void select( u8 p_index );
-    //        void takePkmn( u8 p_index, u16 p_heldPkmnIdx, bool p_isEgg );
-    //        void updateTeam( );
+            /*
+             * @brief: Replaces the pkmn at position p_index with the given pkmn.
+             */
+            void updatePkmn( boxPokemon* p_newPkmn, u8 p_index );
     };
 }

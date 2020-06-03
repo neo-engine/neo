@@ -84,6 +84,12 @@ namespace IO {
         void hideContinue( u8 p_x, u8 p_y, u8 p_color = 250, bool p_bottom = true,
                            u8 p_layer = 1 ) const;
         /*
+         * @brief: Prints the given character (as bitmap) in the given buffer.
+         */
+        void printCharB( u16 p_ch, u16* p_palette, u16* p_buffer, u16 p_bufferWidth, s16 p_x = 0,
+                         s16 p_y = 0 ) const;
+
+        /*
          * @brief: Prints the given character at the given position.
          */
         void printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1 ) const;
@@ -105,16 +111,27 @@ namespace IO {
                                    char p_breakChar = ' ', s8 p_adjustX = 0, u8 p_layer = 1 ) const;
 
         /*
+         * @brief: Prints a string in the given buffer with less horizontal space between characters
+         */
+        void printStringBC( const char *p_string, u16* p_palette, u16* p_buffer, u16 p_bufferWidth,
+                            alignment p_alignment = LEFT, u8 p_yDistance = 15 ) const;
+        /*
+         * @brief: Prints the given string to the given buffer.
+         */
+        void printStringB( const char *p_string, u16* p_palette, u16* p_buffer, u16 p_bufferWidth,
+                           alignment p_alignment = LEFT, u8 p_yDistance = 15 ) const;
+
+        /*
          * @brief: Prints a string with less horizontal space between characters
          */
         void printStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                           alignment p_alignment = LEFT, u8 p_yDistance = 16, s8 p_adjustX = 0,
+                           alignment p_alignment = LEFT, u8 p_yDistance = 15, s8 p_adjustX = 0,
                            u8 p_layer = 1 ) const;
         /*
          * @brief: Prints the given string at the given position to the screen.
          */
         void printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                          alignment p_alignment = LEFT, u8 p_yDistance = 16, s8 p_adjustX = 0,
+                          alignment p_alignment = LEFT, u8 p_yDistance = 15, s8 p_adjustX = 0,
                           u8 p_layer = 1 ) const;
         /*
          * @brief: Prints a string until p_maxX is reached, writes p_breakChar if the
@@ -169,8 +186,6 @@ namespace IO {
          * than p_maxwidth
          */
         u32 stringMaxWidthC( const char *p_string, u16 p_maxWidth, char p_breakChar ) const;
-
-
 
         /*
          * @brief: Prints a counter with the specified value.

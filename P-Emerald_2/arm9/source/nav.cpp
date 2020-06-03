@@ -646,7 +646,9 @@ namespace NAV {
                 case 7: {
                     BOX::boxViewer bxv;
                     ANIMATE_MAP = false;
-                    UPDATE_TIME = true;
+                    UPDATE_TIME = false;
+                    videoSetMode( MODE_5_2D );
+                    bgUpdate( );
                     SOUND::dimVolume( );
 
                     bxv.run( );
@@ -658,6 +660,8 @@ namespace NAV {
                     draw( true );
                     MAP::curMap->draw( );
 
+                    videoSetMode( MODE_5_2D );
+                    IO::resetScale( true, false );
                     consoleSelect( &IO::Top );
                     consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
                     consoleClear( );

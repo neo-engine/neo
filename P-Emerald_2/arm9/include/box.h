@@ -39,17 +39,63 @@ namespace BOX {
         boxPokemon m_pokemon[ MAX_PKMN_PER_BOX ];
         u8                  m_wallpaper;
 
+        /*
+         * @brief: Returns the first non-occupied spot in the box or -1 if the box is
+         * full.
+         */
         constexpr s8 getFirstFreeSpot( )  {
             for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i )
                 if( !( m_pokemon + i )->m_speciesId ) return i;
             return -1;
         }
+
+        /*
+         * @brief: Searches for the next filled spot after the given position.
+         */
+        constexpr u8 getNextFilledSpot( u8 p_position ) {
+            for( u8 i = p_position + 1; i < MAX_PKMN_PER_BOX; ++i ) {
+                if( m_pokemon[ i ].getSpecies( ) ) {
+                    return i;
+                }
+            }
+            for( u8 i = 0; i < p_position; ++i ) {
+                if( m_pokemon[ i ].getSpecies( ) ) {
+                    return i;
+                }
+            }
+            return p_position;
+        }
+
+        /*
+         * @brief: Searches for the last filled spot before the given position.
+         */
+        constexpr u8 getPrevFilledSpot( u8 p_position ) {
+            for( s8 i = p_position - 1; i > 0; --i ) {
+                if( m_pokemon[ i ].getSpecies( ) ) {
+                    return i;
+                }
+            }
+            for( u8 i = MAX_PKMN_PER_BOX - 1; i > p_position; --i ) {
+                if( m_pokemon[ i ].getSpecies( ) ) {
+                    return i;
+                }
+            }
+            return p_position;
+        }
+
+        /*
+         * @brief: Returns the number of pokemon in the box.
+         */
         constexpr u8 count( ) {
             u8 res = 0;
             for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i )
                 if( ( m_pokemon + i )->m_speciesId ) res++;
             return res;
         }
+
+        /*
+         * @brief: Returns how often the given pokemon appears in the box.
+         */
         constexpr u8 count( u16 p_pkmnIdx ) {
             u8 res = 0;
             for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i )
@@ -57,9 +103,14 @@ namespace BOX {
                     res++;
             return res;
         }
+
+        /*
+         * @brief: Clears the given position of the box.
+         */
         void clear( u8 p_pos ) {
             memset( m_pokemon + p_pos, 0, sizeof( boxPokemon ) );
         }
+
         boxPokemon& operator[]( u8 p_pos ) {
             return m_pokemon[ p_pos ];
         }

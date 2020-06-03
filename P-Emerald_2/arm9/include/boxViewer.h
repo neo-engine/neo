@@ -82,6 +82,12 @@ namespace BOX {
          * wallpaper, sort)
          */
         void runBoxSettings( );
+
+        /*
+         * @brief: Shows the current pkmn's status.
+         * @returns: 255 if the user pressed x; 0 otherwise
+         */
+        u8 showPkmnStatus( );
       public:
 
         /*
