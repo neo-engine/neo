@@ -89,14 +89,15 @@ namespace SAVE {
         // BEGIN TEST
 
         //        pokemon testTeam[ 6 ];
-        //for( u8 i = 0; i < 200; i++ ) {
+//        for( u16 i = 0; i < 600; i++ ) {
         //    //            testTeam[ i ]
         //    //                = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false,
         //    //                i == 3 );
         //    //            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
-        //    SAVE::SAV.getActiveFile( ).storePkmn(
-        //        pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false, i == 3 ) );
-        //}
+//            SAVE::SAV.getActiveFile( ).storePkmn(
+//                pokemon( 1 + ( 3 * i ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, rand( ) % 2, 3 * i ==
+//                    490, rand( ) % 20 ) );
+//        }
         /*        testTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_SURF;
                 testTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;
                 testTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;

@@ -90,7 +90,7 @@ namespace IO {
                      const unsigned short* p_spritePal, const unsigned int* p_spriteData,
                      const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
                      ObjPriority p_priority, bool p_bottom, bool p_outline = false,
-                     bool p_tiled = true );
+                     u16 p_outlineColor = 0xFFFF, bool p_tiled = true );
     /*
      * @brief: Loads the sprite data to the OAM(Sub); assumes bitmap mode.
      */
@@ -126,7 +126,8 @@ namespace IO {
                             bool p_bottom = false );
     u16 loadAnimatedSpriteB( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                              u16 p_tileCnt, ObjPriority p_priority = OBJPRIORITY_2,
-                             bool p_bottom = false, bool p_outline = false );
+                             bool p_bottom = false, bool p_outline = false,
+                             u16 p_outlineColor = 0xFFFF );
 
     u16 loadOWSprite( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                       u8 p_palCnt, u16 p_tileCnt );
@@ -168,7 +169,8 @@ namespace IO {
      */
     u16 loadPKMNIconB( const u16 p_pkmnNo, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                        u16 p_tileCnt, bool p_bottom = true, u8 p_forme = 0,
-                       bool p_shiny = false, bool p_female = false, bool p_outline = false );
+                       bool p_shiny = false, bool p_female = false, bool p_outline = false,
+                       u16 p_outlineColor = 0xFFFF );
 
     /*
      * @brief: Loads an egg icon from the nitro FAT. (1D tiled)
@@ -179,7 +181,8 @@ namespace IO {
      * @brief: Loads an egg icon from the nitro FAT. (1D bitmap)
      */
     u16 loadEggIconB( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u16 p_tileCnt,
-                     bool p_bottom = true, bool p_manaphy = false, bool p_outline = false );
+                     bool p_bottom = true, bool p_manaphy = false, bool p_outline = false,
+                     u16 p_outlineColor = 0xFFFF );
 
     u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
                       u16 p_tileCnt, bool p_bottom, SAVE::language p_language );

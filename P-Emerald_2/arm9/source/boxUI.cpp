@@ -85,8 +85,8 @@ namespace BOX {
 #define SPR_PKMN_SHADOW_PAL 7
 
     // bottom screen
-#define SPR_PKMN_START_OAM_SUB 0
-#define SPR_PKMN_SEL_OAM_SUB 38
+#define SPR_PKMN_SEL_OAM_SUB 0
+#define SPR_PKMN_START_OAM_SUB 1
 #define SPR_X_OAM_SUB 39
 // #define SPR_ARROW_BACK_OAM_SUB 40
 // #define SPR_ARROW_BACK_BG_OAM_SUB 41
@@ -201,24 +201,24 @@ namespace BOX {
                                    TEXT_BUF, 64 * 32 / 2, false, false, true, OBJPRIORITY_1, true );
 
         // pkmn options
-        for( u8 i = 0; i < 5; ++i ) {
+        for( u8 i = 0; i < 6; ++i ) {
             IO::loadSpriteB( SPR_PKMN_OPTS_OAM_SUB( i ) + 1, oam[ SPR_PARTY_BG_OAM_SUB ].gfxIndex,
-                    256 - 64, 45 + 21 * i, 32, 32, 0, 0, 0, false, false, true,
+                    256 - 64, 36 + 21 * i, 32, 32, 0, 0, 0, false, false, true,
                     OBJPRIORITY_2, true );
             IO::loadSpriteB( SPR_PKMN_OPTS_OAM_SUB( i ), oam[ SPR_PARTY_BG_OAM_SUB ].gfxIndex,
-                    256 - 32, 33 + 21 * i, 32, 32, 0, 0, 0, true, true, true,
+                    256 - 32, 24 + 21 * i, 32, 32, 0, 0, 0, true, true, true,
                     OBJPRIORITY_2, true );
             std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
             IO::regularFont->printStringBC( GET_STRING( 382 + i ),
                     BG_PAL( true ), TEXT_BUF, 64, IO::font::CENTER );
             tileCnt = IO::loadSpriteB( SPR_PKMN_OPTS_OAM_SUB( i ) + 2, tileCnt, 256 - 64,
-                    47 + 21 * i, 64, 32,
+                    38 + 21 * i, 64, 32,
                     TEXT_BUF, 64 * 32 / 2, false, false, true, OBJPRIORITY_1, true );
         }
 
         tileCnt = IO::loadSpriteB( SPR_PKMN_SEL_OAM_SUB, tileCnt, 0,
                     0, 32, 32, NoPkmnPal, NoPkmnTiles, NoPkmnTilesLen,
-                    false, false, true, OBJPRIORITY_3, true );
+                    false, false, true, OBJPRIORITY_1, true );
         // pkmn
         for( u8 i = 0; i < 5; ++i ) {
             for( u8 j = 0; j < 6; ++j ) {
@@ -268,6 +268,33 @@ namespace BOX {
         bgUpdate( );
         IO::updateOAM( true );
         IO::updateOAM( false );
+    }
+
+    void boxUI::setMode( u8 p_newMode ) {
+        switch( p_newMode ) {
+            default:
+            case 0: // Blue arrow for status
+                _outlineColor = 0xF4A0;
+                IO::loadSpriteB( SPR_SEL_ARROW_OAM_SUB,
+                        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].gfxIndex,
+                        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x,
+                        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].y,
+                        16, 16, box_arrowPal, box_arrowTiles,
+                        box_arrowTilesLen, false, false,
+                        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].isHidden, OBJPRIORITY_0, true );
+                break;
+            case 1:  // Redish arrow for move
+                _outlineColor = 0x4A04;
+                IO::loadSpriteB( SPR_SEL_ARROW_OAM_SUB,
+                        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].gfxIndex,
+                        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x,
+                        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].y,
+                        16, 16, box_arrowPal, box_arrowTiles,
+                        box_arrowTilesLen, false, false,
+                        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].isHidden, OBJPRIORITY_0, true );
+                break;
+        }
+        IO::updateOAM( true );
     }
 
     void boxUI::draw( box* p_box ) {
@@ -327,30 +354,33 @@ namespace BOX {
     void boxUI::selectButton( button p_selectedButton, bool p_touched ) {
         switch( p_selectedButton ) {
             case BUTTON_BOX_NAME:
-                drawPkmnInfoTop( 0 );
-                drawPkmnInfoSub( 0 );
+                if( !_heldPkmn.getSpecies( ) ) {
+                    drawPkmnInfoTop( 0 );
+                    drawPkmnInfoSub( 0 );
+                }
                 IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].isHidden = false;
                 IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x =
                     IO::Oam->oamBuffer[ SPR_NAME_BG_OAM_SUB + 1 ].x;
                 IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].y =
                     IO::Oam->oamBuffer[ SPR_NAME_BG_OAM_SUB ].y - 2;
-                IO::updateOAM( true );
                 break;
             case BUTTON_PARTY:
-                drawPkmnInfoTop( 0 );
-                drawPkmnInfoSub( 0 );
+                if( !_heldPkmn.getSpecies( ) ) {
+                    drawPkmnInfoTop( 0 );
+                    drawPkmnInfoSub( 0 );
+                }
                 IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].isHidden = false;
                 IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x =
                     IO::Oam->oamBuffer[ SPR_PARTY_BG_OAM_SUB + 2 ].x + 8;
                 IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].y =
                     IO::Oam->oamBuffer[ SPR_PARTY_BG_OAM_SUB ].y - 4;
-                IO::updateOAM( true );
                 break;
             case BUTTON_PKMN_MOVE:
             case BUTTON_PKMN_STATUS:
             case BUTTON_PKMN_RELEASE:
             case BUTTON_PKMN_GIVE_ITEM:
             case BUTTON_PKMN_TAKE_ITEM:
+            case BUTTON_PKMN_CANCEL:
                 IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].isHidden = false;
                 IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x =
                     IO::Oam->oamBuffer[ SPR_PKMN_OPTS_OAM_SUB(
@@ -358,11 +388,19 @@ namespace BOX {
                 IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].y =
                     IO::Oam->oamBuffer[ SPR_PKMN_OPTS_OAM_SUB(
                             p_selectedButton - BUTTON_PKMN_MOVE ) + 1 ].y - 8;
-                IO::updateOAM( true );
                 break;
             default:
                 break;
         }
+        if( _heldPkmn.getSpecies( ) ) {
+            IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].isHidden = false;
+            IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].x =
+                IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x - 20;
+            IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].y =
+                IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].y - 4;
+
+        }
+        IO::updateOAM( true );
     }
 
     void boxUI::selectPkmn( boxPokemon* p_pokemon, u8 p_index, bool p_touched ) {
@@ -374,29 +412,40 @@ namespace BOX {
                         oam[ SPR_PKMN_START_OAM_SUB + p_index ].y, SPR_PKMN_SEL_OAM_SUB,
                         oam[ SPR_PKMN_SEL_OAM_SUB ].gfxIndex, true,
                         p_pokemon->getForme( ), p_pokemon->isShiny( ), p_pokemon->isFemale( ),
-                        true );
+                        true, _outlineColor );
+                oam[ SPR_PKMN_SEL_OAM_SUB ].priority = OBJPRIORITY_1;
             } else {
                 IO::loadEggIconB( oam[ SPR_PKMN_START_OAM_SUB + p_index ].x,
                         oam[ SPR_PKMN_START_OAM_SUB + p_index ].y,
                         SPR_PKMN_SEL_OAM_SUB,
                         oam[ SPR_PKMN_SEL_OAM_SUB ].gfxIndex, true,
-                        p_pokemon->getSpecies( ) == PKMN_MANAPHY, true );
+                        p_pokemon->getSpecies( ) == PKMN_MANAPHY, true, _outlineColor );
+                oam[ SPR_PKMN_SEL_OAM_SUB ].priority = OBJPRIORITY_1;
             }
+            _currentSelection = p_index;
         } else {
             oam[ SPR_PKMN_SEL_OAM_SUB ].isHidden = true;
+            _currentSelection = -1;
         }
         IO::updateOAM( true );
         drawPkmnInfoSub( p_pokemon );
     }
 
     void boxUI::hoverPkmn( boxPokemon* p_pokemon, u8 p_index, bool p_redraw ) {
+        if( _heldPkmn.getSpecies( ) ) {
+            updateHeldPkmn( p_index );
+            return;
+        }
+
         if( p_index != u8( -1 ) ) {
             IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].isHidden = false;
             IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x =
                 IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].x + 20;
             IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].y =
                 IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].y + 4;
-            auto tmp = pokemon( *p_pokemon );
+            auto tmp = ( _heldPkmn.getSpecies( ) || p_pokemon == nullptr )
+                ? pokemon( _heldPkmn ) : pokemon( *p_pokemon );
+
             if( p_redraw ) {
                 drawPkmnInfoTop( &tmp );
                 drawPkmnInfoSub( 0 );
@@ -434,8 +483,11 @@ namespace BOX {
                 oam[ SPR_PKMN_OPTS_OAM_SUB( 4 ) + 1 ].isHidden = true;
                 oam[ SPR_PKMN_OPTS_OAM_SUB( 4 ) + 2 ].isHidden = true;
             }
+            oam[ SPR_PKMN_OPTS_OAM_SUB( 5 ) ].isHidden = false;
+            oam[ SPR_PKMN_OPTS_OAM_SUB( 5 ) + 1 ].isHidden = false;
+            oam[ SPR_PKMN_OPTS_OAM_SUB( 5 ) + 2 ].isHidden = false;
         } else {
-            for( u8 i = 0; i < 5; ++i ) {
+            for( u8 i = 0; i < 6; ++i ) {
                 oam[ SPR_PKMN_OPTS_OAM_SUB( i ) ].isHidden = true;
                 oam[ SPR_PKMN_OPTS_OAM_SUB( i ) + 1 ].isHidden = true;
                 oam[ SPR_PKMN_OPTS_OAM_SUB( i ) + 2 ].isHidden = true;
@@ -816,7 +868,36 @@ namespace BOX {
         } else {
             oam[ SPR_PKMN_START_OAM_SUB + p_index ].isHidden = true;
         }
+        if( p_index == _currentSelection ) {
+            selectPkmn( p_pokemon, p_index );
+        }
         IO::updateOAM( true );
+    }
+
+    void boxUI::updateHeldPkmn( u8 p_index ) {
+        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].isHidden = false;
+        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x =
+            IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].x + 25;
+        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].y =
+            IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].y - 1;
+
+        IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].isHidden = false;
+        IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].x =
+            IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].x + 5;
+        IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].y =
+            IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].y - 5;
+
+        IO::updateOAM( true );
+    }
+
+    void boxUI::setNewHeldPkmn( boxPokemon* p_pokemon, u8 p_index ) {
+        if( p_pokemon != nullptr ) {
+            _heldPkmn = *p_pokemon;
+        } else {
+            std::memset( &_heldPkmn, 0, sizeof( boxPokemon ) );
+        }
+
+        updateHeldPkmn( p_index );
     }
 
     void boxUI::showParty( pokemon* p_party, u8 p_partyLen ) {

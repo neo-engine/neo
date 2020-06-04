@@ -736,4 +736,5 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"Give Item", "Item geben"},
     {"Take Item", "Item nehmen"},
+    {"Cancel", "Abbrechen"},
 };

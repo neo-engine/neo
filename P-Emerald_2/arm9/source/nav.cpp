@@ -653,21 +653,18 @@ namespace NAV {
 
                     bxv.run( );
 
+                    FADE_TOP_DARK( );
+                    IO::clearScreen( false );
+                    videoSetMode( MODE_5_2D );
+                    bgUpdate( );
+
                     IO::initVideoSub( );
+                    IO::resetScale( true, false );
                     ANIMATE_MAP = true;
                     UPDATE_TIME = true;
                     SOUND::restoreVolume( );
                     draw( true );
                     MAP::curMap->draw( );
-
-                    videoSetMode( MODE_5_2D );
-                    IO::resetScale( true, false );
-                    consoleSelect( &IO::Top );
-                    consoleSetWindow( &IO::Top, 0, 0, 32, 24 );
-                    consoleClear( );
-                    consoleSelect( &IO::Bottom );
-                    consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-                    consoleClear( );
                     break;
                 }
                 case 8:
@@ -692,7 +689,7 @@ namespace NAV {
                 }
                 if( res != 10 ) draw( true );
                 swiWaitForVBlank( );
-                if( res == 3 || res == 4 || res == 6 || res == 7 ) {
+                if( res == 3 || res == 4 ) {
                     FADE_TOP_DARK( );
                     ANIMATE_MAP = true;
                     MAP::curMap->draw( );

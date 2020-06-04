@@ -34,8 +34,10 @@ namespace BOX {
 #define PAGE_ICON_START 5
     class boxUI {
         private:
-            bool _showTeam;
-            u8   _currentSelectedPkmn;
+            bool       _showTeam;
+            u8         _currentSelection;
+            boxPokemon _heldPkmn;
+            u16        _outlineColor = 0xF4A0;
 
             void initTop( );
             void initSub( );
@@ -67,8 +69,14 @@ namespace BOX {
                 BUTTON_PKMN_STATUS,
                 BUTTON_PKMN_RELEASE,
                 BUTTON_PKMN_GIVE_ITEM,
-                BUTTON_PKMN_TAKE_ITEM
+                BUTTON_PKMN_TAKE_ITEM,
+                BUTTON_PKMN_CANCEL
             };
+
+            /*
+             * @brief: Sets the current movement mode (changes arrow and outline colors)
+             */
+            void setMode( u8 p_newMode );
 
             /*
              * @brief: Describes buttons in the UI.
@@ -103,6 +111,17 @@ namespace BOX {
              * @brief: Selects the given pkmn; shows the corresponding buttons
              */
             void selectPkmn( boxPokemon* p_pokemon, u8 p_index, bool p_touched = false );
+
+            /*
+             * @brief: Shows the currently held pkmn at the specified index.
+             */
+            void updateHeldPkmn( u8 p_index );
+
+            /*
+             * @brief: Sets the given pkmn as the currently held pkmn.
+             * (if p_pokemon is nullptr, the held pkmn is hidden)
+             */
+            void setNewHeldPkmn( boxPokemon* p_pokemon, u8 p_index );
 
             /*
              * @brief: Hovers over a pkmn.

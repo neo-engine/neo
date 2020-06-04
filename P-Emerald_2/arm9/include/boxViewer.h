@@ -37,15 +37,15 @@ namespace BOX {
     class boxViewer {
       private:
         enum mode {
-            STATUS, // pressing A on a pkmn shows menu
-            MOVE,   // pressing A on a pkmn picks it up
+            STATUS = 0, // pressing A on a pkmn shows menu
+            MOVE = 1,   // pressing A on a pkmn picks it up
         };
 
         mode                         _mode;
 
         std::vector<IO::inputTarget> _ranges;
         u8                           _selectedIdx;
-        std::pair<u8, u8>            _heldPokmPos; //(box, pos in box); (_, 40..45) for team pkmn
+        std::pair<u8, u8>            _heldPkmnPos; //(box, pos in box); (_, 31..36) for team pkmn
         pokemon                      _heldPkmn;
         bool                         _showParty;
         boxUI                        _boxUI;
@@ -57,8 +57,10 @@ namespace BOX {
 
         /*
          * @brief: Takes and holds the pkmn at p_index.
+         * @param p_continuousSwap: When "taking" a pkmn while already holding a pkmn, allow
+         * to swap these pkmn and to directly "take" the new pkmn.
          */
-        void takePkmn( u8 p_index );
+        void takePkmn( u8 p_index, bool p_continuousSwap );
 
         /*
          * @brief: Returns the currently held pkmn where it came from.
@@ -88,6 +90,21 @@ namespace BOX {
          * @returns: 255 if the user pressed x; 0 otherwise
          */
         u8 showPkmnStatus( );
+
+        /*
+         * @brief: Returns the pokemon at the given position.
+         * if p_position is larger than MEX_PKMN_PER_BOX, a party pkmn is returned.
+         */
+        boxPokemon* getPkmn( u8 p_position );
+        boxPokemon* getPkmn( std::pair<u8, u8> p_position );
+
+        /*
+         * @brief: Overrides the pokemon at the given position with the given pokemon.
+         */
+        void setPkmn( u8 p_position, boxPokemon* p_pokemon );
+        void setPkmn( u8 p_position, pokemon* p_pokemon );
+        void setPkmn( std::pair<u8, u8> p_position, boxPokemon* p_pokemon );
+        void setPkmn( std::pair<u8, u8> p_position, pokemon* p_pokemon );
       public:
 
         /*

@@ -421,7 +421,8 @@ namespace IO {
                      const u8 p_width, const u8 p_height, const unsigned short* p_spritePal,
                      const unsigned int* p_spriteData, const u32 p_spriteDataLen, bool p_flipX,
                      bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom,
-                     bool p_outline, bool p_tiled ) {
+                     bool p_outline, u16 p_outlineColor, bool p_tiled ) {
+        memset( BITMAP_SPRITE, 0, sizeof( BITMAP_SPRITE ) );
         if( p_spritePal && p_spriteData && p_tiled ) {
             u32 i = 0;
             for( u8 tiley = 0; tiley < p_height / 8; ++tiley ) {
@@ -454,7 +455,6 @@ namespace IO {
             }
         }
 
-#define OUTLINE_COLOR 0xF4A0
         if( p_outline ) {
             for( u8 y = 0; y < p_height; ++y ) {
                 for( u8 x = 0; x < p_width; ++x ) {
@@ -465,14 +465,14 @@ namespace IO {
                                 if( x + dx >= 0 && x + dx < p_width
                                         && y + dy >= 0 && y + dy < p_height ) {
                                     auto cur = BITMAP_SPRITE[ p_width * ( y + dy ) + x + dx ];
-                                    if( ( cur & ( 1 << 15 ) ) && cur != OUTLINE_COLOR ) {
+                                    if( ( cur & ( 1 << 15 ) ) && cur != p_outlineColor ) {
                                         isOutline = true;
                                     }
                                 }
                             }
                         }
                         if( isOutline ) {
-                            BITMAP_SPRITE[ p_width * y + x ] = OUTLINE_COLOR;
+                            BITMAP_SPRITE[ p_width * y + x ] = p_outlineColor;
                         }
                     }
                 }
@@ -872,7 +872,7 @@ namespace IO {
     }
     u16 loadAnimatedSpriteB( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                              u16 p_tileCnt, ObjPriority p_priority, bool p_bottom,
-                             bool p_outline ) {
+                             bool p_outline, u16 p_outlineColor ) {
         FS::read( p_file, TEMP_PAL, sizeof( u16 ), 16 );
         u8 frameCount, width, height;
         FS::read( p_file, &frameCount, sizeof( u8 ), 1 );
@@ -883,7 +883,7 @@ namespace IO {
 
         return loadSpriteB( p_oamIndex, p_tileCnt, p_posX, p_posY, width, height, TEMP_PAL, TEMP,
                             width * height * frameCount / 2, false, false, false, p_priority,
-                            p_bottom, p_outline );
+                            p_bottom, p_outline, p_outlineColor );
     }
 
     u16 loadOWSprite( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
@@ -1024,7 +1024,7 @@ namespace IO {
 
     u16 loadPKMNIconB( const u16 p_pkmnId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                        u16 p_tileCnt, bool p_bottom, u8 p_forme, bool p_shiny, bool p_female,
-                       bool p_outline ) {
+                       bool p_outline, u16 p_outlineColor ) {
         FILE* f;
         /*
         if( !existsPKMNSprite( p_pkmnId, true, p_female ) ) {
@@ -1041,7 +1041,7 @@ namespace IO {
             f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
             if( f ) {
                 return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt, OBJPRIORITY_2,
-                                            p_bottom, p_outline );
+                                            p_bottom, p_outline, p_outlineColor );
             }
 
             if( p_shiny ) {
@@ -1050,7 +1050,8 @@ namespace IO {
                 f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
                 if( f ) {
                     return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt,
-                                                OBJPRIORITY_2, p_bottom, p_outline );
+                                                OBJPRIORITY_2, p_bottom, p_outline,
+                                                p_outlineColor );
                 }
             }
 
@@ -1060,7 +1061,8 @@ namespace IO {
                 f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
                 if( f ) {
                     return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt,
-                                                OBJPRIORITY_2, p_bottom, p_outline );
+                                                OBJPRIORITY_2, p_bottom, p_outline,
+                                                p_outlineColor );
                 }
             }
         }
@@ -1070,14 +1072,14 @@ namespace IO {
         f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
         if( f ) {
             return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt, OBJPRIORITY_2,
-                                        p_bottom, p_outline );
+                                        p_bottom, p_outline, p_outlineColor );
         }
         if( p_shiny ) {
             snprintf( BUFFER, 99, "/icon%03hu%s.rsd", p_pkmnId, p_female ? "f" : "" );
             f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
             if( f ) {
                 return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt, OBJPRIORITY_2,
-                                            p_bottom, p_outline );
+                                            p_bottom, p_outline, p_outlineColor );
             }
         }
 
@@ -1086,7 +1088,7 @@ namespace IO {
             f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
             if( f ) {
                 return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt, OBJPRIORITY_2,
-                                            p_bottom, p_outline );
+                                            p_bottom, p_outline, p_outlineColor );
             }
         }
 
@@ -1094,9 +1096,10 @@ namespace IO {
         f = FS::openSplit( PKMN_PATH, p_pkmnId, BUFFER );
         if( f ) {
             return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt, OBJPRIORITY_2,
-                                        p_bottom, p_outline );
+                                        p_bottom, p_outline, p_outlineColor );
         }
-        return loadPKMNIconB( 0, p_posX, p_posY, p_oamIndex, p_tileCnt, p_bottom, p_outline );
+        return loadPKMNIconB( 0, p_posX, p_posY, p_oamIndex, p_tileCnt, p_bottom, p_outline,
+                              p_outlineColor );
     }
 
     u16 loadEggIcon( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
@@ -1106,9 +1109,9 @@ namespace IO {
     }
 
     u16 loadEggIconB( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u16 p_tileCnt,
-                      bool p_bottom, bool p_manaphy, bool p_outline ) {
+                      bool p_bottom, bool p_manaphy, bool p_outline, u16 p_outlineColor ) {
         return loadPKMNIconB( 1 - 1, p_posX, p_posY, p_oamIndex, p_tileCnt, p_bottom, 1 + p_manaphy,
-                              false, false, p_outline );
+                              false, false, p_outline, p_outlineColor );
     }
 
     u16 loadItemIcon( u16 p_itemId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
