@@ -76,6 +76,7 @@ namespace BOX {
                     return;
                 } else {
                     returnPkmn( );
+                    _boxUI.hoverPkmn( getPkmn( _selectedIdx ), _selectedIdx );
                 }
             }
             if( pressed & KEY_SELECT ) {
@@ -248,7 +249,7 @@ namespace BOX {
                 _heldPkmnPos = std::pair<u8, u8>( SAVE::SAV.getActiveFile( ).m_curBox, p_index );
                 _boxUI.setNewHeldPkmn( &_heldPkmn.m_boxdata, p_index );
             }
-            _boxUI.hoverPkmn( getPkmn( p_index ), p_index );
+            _boxUI.hoverPkmn( getPkmn( p_index ), p_index, false );
         } else {
             // put down pkmn
             setPkmn( p_index, &_heldPkmn );
@@ -258,7 +259,6 @@ namespace BOX {
             _boxUI.hoverPkmn( getPkmn( p_index ), p_index );
             _boxUI.setNewHeldPkmn( nullptr, p_index );
         }
-        _boxUI.selectPkmn( nullptr, 0 );
     }
 
     boxPokemon* boxViewer::getPkmn( u8 p_position ) {
@@ -333,10 +333,13 @@ namespace BOX {
         setPkmn( _heldPkmnPos, &_heldPkmn );
         std::memset( &_heldPkmn, 0, sizeof( pokemon ) );
 
+
         if( _heldPkmnPos.first == SAVE::SAV.getActiveFile( ).m_curBox ) {
-            _boxUI.updatePkmn( getPkmn( _heldPkmnPos.second ), _heldPkmnPos.second );
-        }
-        _boxUI.setNewHeldPkmn( nullptr, _heldPkmnPos.second );
+             _boxUI.setNewHeldPkmn( nullptr, _heldPkmnPos.second );
+             _boxUI.updatePkmn( getPkmn( _heldPkmnPos.second ), _heldPkmnPos.second );
+        } else {
+             _boxUI.setNewHeldPkmn( nullptr, _selectedIdx );
+         }
 
         _heldPkmnPos = { 0, 0 };
     }

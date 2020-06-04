@@ -285,7 +285,7 @@ namespace BOX {
                 IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].isHidden, OBJPRIORITY_0, true );
             break;
         case 1: // Redish arrow for move
-            _outlineColor = 0x4A04;
+            _outlineColor = 0b1001'0100'0001'1101;
             IO::loadSpriteB(
                 SPR_SEL_ARROW_OAM_SUB, IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].gfxIndex,
                 IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x,
@@ -294,11 +294,35 @@ namespace BOX {
                 IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].isHidden, OBJPRIORITY_0, true );
             break;
         }
+        if( _heldPkmn.getSpecies( ) ) {
+            if( !_heldPkmn.isEgg( ) ) {
+                IO::loadPKMNIconB(
+                        _heldPkmn.getSpecies( ),
+                        IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].x,
+                        IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].y,
+                        SPR_PKMN_SEL_OAM_SUB,
+                        IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].gfxIndex, true,
+                        _heldPkmn.getForme( ),
+                        _heldPkmn.isShiny( ), _heldPkmn.isFemale( ), true, _outlineColor );
+                IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].priority = OBJPRIORITY_1;
+            } else {
+                IO::loadEggIconB( IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].x,
+                        IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].y,
+                        SPR_PKMN_SEL_OAM_SUB,
+                        IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].gfxIndex, true,
+                        _heldPkmn.getSpecies( ) == PKMN_MANAPHY, true, _outlineColor );
+                IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].priority = OBJPRIORITY_1;
+            }
+        }
         IO::updateOAM( true );
     }
 
     void boxUI::draw( box* p_box ) {
-        drawPkmnInfoTop( 0 );
+        if( !_heldPkmn.getSpecies( ) ) {
+            drawPkmnInfoTop( 0 );
+        }
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
         dmaCopy( wallpaperTiles[ p_box->m_wallpaper % MAX_WALLPAPERS ], bgGetGfxPtr( IO::bg3sub ),
@@ -848,28 +872,60 @@ namespace BOX {
     }
 
     void boxUI::updateHeldPkmn( u8 p_index ) {
-        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].isHidden = false;
-        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x
-            = IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].x + 25;
-        IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].y
-            = IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].y - 1;
+        if( _heldPkmn.getSpecies( ) ) {
+            IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].isHidden = false;
+            IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x
+                = IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].x + 25;
+            IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].y
+                = IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].y - 1;
 
-        IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].isHidden = false;
-        IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].x
-            = IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].x + 5;
-        IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].y
-            = IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].y - 5;
+            IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].isHidden = false;
+            IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].x
+                = IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].x + 5;
+            IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].y
+                = IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + p_index ].y - 5;
+        } else {
+            IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].isHidden = true;
+            hoverPkmn( nullptr, p_index, false );
+        }
 
         IO::updateOAM( true );
     }
 
     void boxUI::setNewHeldPkmn( boxPokemon* p_pokemon, u8 p_index ) {
+        SpriteEntry* oam = IO::Oam->oamBuffer;
         if( p_pokemon != nullptr ) {
+            bool redraw = false;
+            if( _heldPkmn.getSpecies( ) ) {
+                redraw = true;
+            }
             _heldPkmn = *p_pokemon;
+            if( !_heldPkmn.isEgg( ) ) {
+                IO::loadPKMNIconB(
+                        _heldPkmn.getSpecies( ), oam[ SPR_PKMN_START_OAM_SUB + p_index ].x,
+                        oam[ SPR_PKMN_START_OAM_SUB + p_index ].y, SPR_PKMN_SEL_OAM_SUB,
+                        oam[ SPR_PKMN_SEL_OAM_SUB ].gfxIndex, true, _heldPkmn.getForme( ),
+                        _heldPkmn.isShiny( ), _heldPkmn.isFemale( ), true, _outlineColor );
+                oam[ SPR_PKMN_SEL_OAM_SUB ].priority = OBJPRIORITY_1;
+            } else {
+                IO::loadEggIconB( oam[ SPR_PKMN_START_OAM_SUB + p_index ].x,
+                        oam[ SPR_PKMN_START_OAM_SUB + p_index ].y, SPR_PKMN_SEL_OAM_SUB,
+                        oam[ SPR_PKMN_SEL_OAM_SUB ].gfxIndex, true,
+                        _heldPkmn.getSpecies( ) == PKMN_MANAPHY, true, _outlineColor );
+                oam[ SPR_PKMN_SEL_OAM_SUB ].priority = OBJPRIORITY_1;
+            }
+            oam[ SPR_PKMN_SEL_OAM_SUB ].isHidden = false;
+
+            if( redraw ) {
+                auto tmp = pokemon( _heldPkmn );
+                drawPkmnInfoTop( &tmp );
+            }
+            drawPkmnInfoSub( 0 );
         } else {
             std::memset( &_heldPkmn, 0, sizeof( boxPokemon ) );
+            oam[ SPR_PKMN_SEL_OAM_SUB ].isHidden = true;
         }
-
+        _currentSelection = -1;
         updateHeldPkmn( p_index );
     }
 
