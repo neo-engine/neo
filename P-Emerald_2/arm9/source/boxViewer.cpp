@@ -269,8 +269,13 @@ namespace BOX {
                 _boxUI.updatePkmn( getPkmn( p_index ), p_index );
             } else {
                 u8 st = SAVE::SAV.getActiveFile( ).consolidatePkmn( );
-                for( ; st < 6; ++st ) {
-                    _boxUI.updatePkmn( getPkmn( MAX_PKMN_PER_BOX + st ), MAX_PKMN_PER_BOX + st );
+                if( st == u8( -1 ) ) {
+                    _boxUI.updatePkmn( getPkmn( p_index ), p_index );
+                } else {
+                    for( ; st < 6; ++st ) {
+                        _boxUI.updatePkmn( getPkmn( MAX_PKMN_PER_BOX + st ),
+                                MAX_PKMN_PER_BOX + st );
+                    }
                 }
             }
             memset( &_heldPkmn, 0, sizeof( pokemon ) );
