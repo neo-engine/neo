@@ -70,7 +70,6 @@ namespace BOX {
 #define SPR_MOVEWINDOW_START_OAM 5
 #define SPR_TYPE_OAM( p_type ) ( 10 + ( p_type ) )
 #define SPR_BALL_ICON_OAM 12
-#define SPR_EXP_BAR_OAM 13
 #define SPR_CHOICE_START_OAM 14
 #define SPR_SHINY_ICON_OAM 23
 #define SPR_INFOPAGE_START_OAM 24
@@ -192,12 +191,12 @@ namespace BOX {
                                    true );
 
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-        IO::regularFont->printStringBC( GET_STRING( 380 ), BG_PAL( true ), TEXT_BUF, 64,
+        IO::regularFont->printStringBC( GET_STRING( 380 ), IO::BG_PAL( true ), TEXT_BUF, 64,
                                         IO::font::CENTER );
         tileCnt = IO::loadSpriteB( SPR_PARTY_TEXT_OAM_SUB, tileCnt, 40, 192 - 18, 64, 32, TEXT_BUF,
                                    64 * 32 / 2, false, false, false, OBJPRIORITY_1, true );
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-        IO::regularFont->printStringBC( GET_STRING( 381 ), BG_PAL( true ), TEXT_BUF, 64,
+        IO::regularFont->printStringBC( GET_STRING( 381 ), IO::BG_PAL( true ), TEXT_BUF, 64,
                                         IO::font::CENTER );
         tileCnt = IO::loadSpriteB( SPR_PARTY_TEXT_OAM_SUB + 1, tileCnt, 40, 192 - 18, 64, 32,
                                    TEXT_BUF, 64 * 32 / 2, false, false, true, OBJPRIORITY_1, true );
@@ -211,7 +210,7 @@ namespace BOX {
                              256 - 32, 24 + 21 * i, 32, 32, 0, 0, 0, true, true, true,
                              OBJPRIORITY_2, true );
             std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-            IO::regularFont->printStringBC( GET_STRING( 382 + i ), BG_PAL( true ), TEXT_BUF, 64,
+            IO::regularFont->printStringBC( GET_STRING( 382 + i ), IO::BG_PAL( true ), TEXT_BUF, 64,
                                             IO::font::CENTER );
             tileCnt = IO::loadSpriteB( SPR_PKMN_OPTS_OAM_SUB( i ) + 2, tileCnt, 256 - 64,
                                        38 + 21 * i, 64, 32, TEXT_BUF, 64 * 32 / 2, false, false,
@@ -255,23 +254,23 @@ namespace BOX {
 
     void boxUI::init( ) {
         for( u8 i = 0; i < 2; ++i ) {
-            u16* pal             = BG_PAL( i );
+            u16* pal             = IO::BG_PAL( i );
             pal[ IO::WHITE_IDX ] = IO::WHITE;
             pal[ IO::GRAY_IDX ]  = IO::GRAY;
-            pal[ IO::COLOR_IDX ] = RGB( 22, 22, 22 );
+            pal[ IO::COLOR_IDX ] = IO::RGB( 22, 22, 22 );
             pal[ IO::BLACK_IDX ] = IO::BLACK;
-            pal[ IO::BLUE_IDX ]  = RGB( 18, 22, 31 );
-            pal[ IO::RED_IDX ]   = RGB( 31, 18, 18 );
-            pal[ IO::BLUE2_IDX ] = RGB( 0, 0, 25 );
-            pal[ IO::RED2_IDX ]  = RGB( 23, 0, 0 );
+            pal[ IO::BLUE_IDX ]  = IO::RGB( 18, 22, 31 );
+            pal[ IO::RED_IDX ]   = IO::RGB( 31, 18, 18 );
+            pal[ IO::BLUE2_IDX ] = IO::RGB( 0, 0, 25 );
+            pal[ IO::RED2_IDX ]  = IO::RGB( 23, 0, 0 );
 
-            pal[ 240 ] = RGB( 6, 6, 6 );    // hp bar border color
-            pal[ 241 ] = RGB( 12, 30, 12 ); // hp bar green 1
-            pal[ 242 ] = RGB( 3, 23, 4 );   // hp bar green 2
-            pal[ 243 ] = RGB( 30, 30, 12 ); // hp bar yellow 1
-            pal[ 244 ] = RGB( 23, 23, 5 );  // hp bar yellow 2
-            pal[ 245 ] = RGB( 30, 15, 12 ); // hp bar red 1
-            pal[ 246 ] = RGB( 20, 7, 7 );   // hp bar red 2
+            pal[ 240 ] = IO::RGB( 6, 6, 6 );    // hp bar border color
+            pal[ 241 ] = IO::RGB( 12, 30, 12 ); // hp bar green 1
+            pal[ 242 ] = IO::RGB( 3, 23, 4 );   // hp bar green 2
+            pal[ 243 ] = IO::RGB( 30, 30, 12 ); // hp bar yellow 1
+            pal[ 244 ] = IO::RGB( 23, 23, 5 );  // hp bar yellow 2
+            pal[ 245 ] = IO::RGB( 30, 15, 12 ); // hp bar red 1
+            pal[ 246 ] = IO::RGB( 20, 7, 7 );   // hp bar red 2
         }
 
         IO::regularFont->setColor( 0, 0 );
@@ -363,11 +362,6 @@ namespace BOX {
         IO::regularFont->printStringC( p_box->m_name, 94, 6, true, IO::font::CENTER );
 
         for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
-            //    res.push_back( IO::inputTarget( oam[ SPR_PKMN_START_OAM_SUB + i ].x,
-            //                                    oam[ SPR_PKMN_START_OAM_SUB + i ].y,
-            //                                    oam[ SPR_PKMN_START_OAM_SUB + i ].x + 26,
-            ///                                   oam[ SPR_PKMN_START_OAM_SUB + i ].y + 26 ) );
-            // _ranges.push_back( {oam, res.back( )} );
             if( p_box->m_pokemon[ i ].getSpecies( ) ) {
                 if( !p_box->m_pokemon[ i ].isEgg( ) ) {
                     IO::loadPKMNIconB(
@@ -883,6 +877,9 @@ namespace BOX {
         } else {
             oam[ SPR_PKMN_START_OAM_SUB + p_index ].isHidden = true;
         }
+        if( p_index >= MAX_PKMN_PER_BOX ) {
+            oam[ SPR_PKMN_START_OAM_SUB + p_index ].priority = OBJPRIORITY_1;
+        }
         if( p_index == _currentSelection ) { selectPkmn( p_pokemon, p_index ); }
         IO::updateOAM( true );
     }
@@ -949,7 +946,7 @@ namespace BOX {
         SpriteEntry* oam = IO::Oam->oamBuffer;
         // Load some placeholder
         for( u8 i = MAX_PKMN_PER_BOX; i < MAX_PKMN_PER_BOX + p_partyLen; ++i ) {
-            if( p_party[ i ].getSpecies( ) ) {
+            if( p_party[ i - MAX_PKMN_PER_BOX ].getSpecies( ) ) {
                 IO::loadSpriteB(
                     SPR_PKMN_START_OAM_SUB + i, oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex,
                     oam[ SPR_PKMN_START_OAM_SUB + i ].x, oam[ SPR_PKMN_START_OAM_SUB + i ].y, 32,
@@ -960,11 +957,34 @@ namespace BOX {
             }
         }
         IO::updateOAM( true );
+
+        for( u8 i = MAX_PKMN_PER_BOX; i < MAX_PKMN_PER_BOX + p_partyLen; ++i ) {
+            if( p_party[ i - MAX_PKMN_PER_BOX ].getSpecies( ) ) {
+                if( !p_party[ i - MAX_PKMN_PER_BOX ].isEgg( ) ) {
+                    IO::loadPKMNIconB(
+                        p_party[ i - MAX_PKMN_PER_BOX ].getSpecies( ),
+                        oam[ SPR_PKMN_START_OAM_SUB + i ].x,
+                        oam[ SPR_PKMN_START_OAM_SUB + i ].y, SPR_PKMN_START_OAM_SUB + i,
+                        oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex, true,
+                        p_party[ i - MAX_PKMN_PER_BOX ].getForme( ),
+                        p_party[ i - MAX_PKMN_PER_BOX ].isShiny( ),
+                        p_party[ i - MAX_PKMN_PER_BOX ].isFemale( ) );
+                } else {
+                    IO::loadEggIconB(
+                        oam[ SPR_PKMN_START_OAM_SUB + i ].x, oam[ SPR_PKMN_START_OAM_SUB + i ].y,
+                        SPR_PKMN_START_OAM_SUB + i, oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex,
+                        true, p_party[ i - MAX_PKMN_PER_BOX ].getSpecies( ) == PKMN_MANAPHY );
+                }
+            } else {
+                oam[ SPR_PKMN_START_OAM_SUB + i ].isHidden = true;
+            }
+            oam[ SPR_PKMN_START_OAM_SUB + i ].priority = OBJPRIORITY_1;
+        }
+        IO::updateOAM( true );
     }
 
     void boxUI::hideParty( ) {
         SpriteEntry* oam = IO::Oam->oamBuffer;
-        // Load some placeholder
         for( u8 i = MAX_PKMN_PER_BOX; i < MAX_PKMN_PER_BOX + 6; ++i ) {
             oam[ SPR_PKMN_START_OAM_SUB + i ].isHidden = true;
         }

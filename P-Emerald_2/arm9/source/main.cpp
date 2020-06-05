@@ -326,7 +326,7 @@ int main( int, char** p_argv ) {
         }
         // Movement
         if( held & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
-            MAP::direction curDir = GET_DIR( held );
+            MAP::direction curDir = MAP::getDir( held );
             scanKeys( );
 
             stopped = false;

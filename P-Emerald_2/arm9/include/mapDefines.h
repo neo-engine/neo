@@ -28,7 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 #include <map>
 #include <string>
-#include <nds/ndstypes.h>
+#include <nds.h>
 
 #define MAP_HOENN 10
 #define MAP_METEOR_FALLS 11
@@ -134,4 +134,14 @@ namespace MAP {
 
     extern bankInfo CURRENT_BANK;
     void            loadNewBank( u8 p_bank );
+
+    constexpr direction getDir( int p_dir ) {
+        if( p_dir & KEY_DOWN ) { return MAP::direction::DOWN; }
+        if( p_dir & KEY_UP ) { return MAP::direction::UP; }
+        if( p_dir & KEY_LEFT ) { return MAP::direction::LEFT; }
+        if( p_dir & KEY_RIGHT ) { return MAP::direction::RIGHT; }
+        return MAP::direction::RIGHT;
+    }
+
+
 } // namespace MAP

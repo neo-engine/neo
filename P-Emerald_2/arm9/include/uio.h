@@ -59,60 +59,61 @@ namespace IO {
     ( IN_RANGE_I_C( touch, IO::inputTarget( p_x, p_y, p_r ) ) \
       && IO::waitForInput( IO::inputTarget( p_x, p_y, p_r ) ) )
 
-#define GET_DIR( p_dir )               \
-    ( ( (p_dir) &KEY_DOWN )            \
-          ? MAP::direction::DOWN       \
-          : ( ( (p_dir) &KEY_UP )      \
-                  ? MAP::direction::UP \
-                  : ( ( (p_dir) &KEY_RIGHT ) ? MAP::direction::RIGHT : MAP::direction::LEFT ) ) )
+    consteval u16 RGB( u8 p_r, u8 p_g, u8 p_b ) {
+        return RGB15( p_r, p_g, p_b ) | BIT( 15 );
+    }
 
-#define RGB( p_r, p_g, p_b ) ( RGB15( ( p_r ), ( p_g ), ( p_b ) ) | BIT( 15 ) )
-#define COMPL( p_color )                                                    \
-    ( RGB( 31 - ( ( p_color ) >> 10 ) % 32, 31 - ( ( p_color ) >> 5 ) % 32, \
-           31 - ( p_color ) % 32 ) )
+    consteval u16 COMPL( u16 p_color ) {
+        return  RGB( 31 - ( p_color >> 10 ) % 32, 31 - ( p_color >> 5 ) % 32,
+                31 - p_color % 32 );
+    }
 
-    const u8 RED2_IDX  = 247;
-    const u8 BLUE2_IDX = 248;
-    const u8 COLOR_IDX = 249;
-    const u8 WHITE_IDX = 250;
-    const u8 GRAY_IDX  = 251;
-    const u8 BLACK_IDX = 252;
-    const u8 RED_IDX   = 253;
-    const u8 BLUE_IDX  = 254;
+    constexpr u8 RED2_IDX  = 247;
+    constexpr u8 BLUE2_IDX = 248;
+    constexpr u8 COLOR_IDX = 249;
+    constexpr u8 WHITE_IDX = 250;
+    constexpr u8 GRAY_IDX  = 251;
+    constexpr u8 BLACK_IDX = 252;
+    constexpr u8 RED_IDX   = 253;
+    constexpr u8 BLUE_IDX  = 254;
 
-    const u16 CHOICE_COLOR = RGB( 16, 25, 19 );
+    constexpr u16 CHOICE_COLOR = RGB( 16, 25, 19 );
 
-    const u16 GREEN = RGB( 0, 20, 0 );
-    const u16 RED = RGB( 28, 0, 0 );
-    const u16 RED2 = RGB( 10, 0, 0 );
-    const u16 BLUE = RGB( 0, 10, 31 );
-    const u16 BLUE2 = RGB( 0, 0, 15 );
-    const u16 WHITE = RGB( 30, 30, 30 );
-    const u16 GRAY = RGB( 15, 15, 15 );
-    const u16 NORMAL_COLOR = RGB( 27, 27, 27 );
-    const u16 BLACK = RGB( 0, 0, 0 );
-    const u16 YELLOW = RGB( 24, 24, 0 );
-    const u16 PURPLE = RGB( 24, 0, 24 );
-    const u16 TURQOISE = RGB( 0, 24, 24 );
-    const u16 ICE_COLOR = RGB( 15, 31, 31 );
-    const u16 FAIRY_COLOR = RGB( 31, 15, 31 );
-    const u16 GROUND_COLOR = RGB( 31, 31, 15 );
-    const u16 POISON_COLOR = RGB( 31, 0, 15 );
-    const u16 ORANGE = RGB( 31, 15, 0 );
-    const u16 GHOST_COLOR = RGB( 15, 0, 31 );
-    const u16 ROCK_COLOR = RGB( 28, 23, 7 );
-    const u16 BUG_COLOR = RGB( 15, 28, 7 );
-    const u16 STEEL_COLOR = RGB( 24, 24, 24 );
-    const u16 DRAGON_COLOR = RGB( 7, 7, 24 );
-    const u16 UNKNOWN_COLOR = RGB( 0, 42, 42 );
+    constexpr u16 GREEN = RGB( 0, 20, 0 );
+    constexpr u16 RED = RGB( 28, 0, 0 );
+    constexpr u16 RED2 = RGB( 10, 0, 0 );
+    constexpr u16 BLUE = RGB( 0, 10, 31 );
+    constexpr u16 BLUE2 = RGB( 0, 0, 15 );
+    constexpr u16 WHITE = RGB( 30, 30, 30 );
+    constexpr u16 GRAY = RGB( 15, 15, 15 );
+    constexpr u16 NORMAL_COLOR = RGB( 27, 27, 27 );
+    constexpr u16 BLACK = RGB( 0, 0, 0 );
+    constexpr u16 YELLOW = RGB( 24, 24, 0 );
+    constexpr u16 PURPLE = RGB( 24, 0, 24 );
+    constexpr u16 TURQOISE = RGB( 0, 24, 24 );
+    constexpr u16 ICE_COLOR = RGB( 15, 31, 31 );
+    constexpr u16 FAIRY_COLOR = RGB( 31, 15, 31 );
+    constexpr u16 GROUND_COLOR = RGB( 31, 31, 15 );
+    constexpr u16 POISON_COLOR = RGB( 31, 0, 15 );
+    constexpr u16 ORANGE = RGB( 31, 15, 0 );
+    constexpr u16 GHOST_COLOR = RGB( 15, 0, 31 );
+    constexpr u16 ROCK_COLOR = RGB( 28, 23, 7 );
+    constexpr u16 BUG_COLOR = RGB( 15, 28, 7 );
+    constexpr u16 STEEL_COLOR = RGB( 24, 24, 24 );
+    constexpr u16 DRAGON_COLOR = RGB( 7, 7, 24 );
+    constexpr u16 UNKNOWN_COLOR = RGB( 0, 42, 42 );
 
-#define BG_PAL( p_sub ) ( ( p_sub ) ? BG_PALETTE_SUB : BG_PALETTE )
-#define BG_BMP( p_sub ) ( ( p_sub ) ? BG_BMP_RAM_SUB( 1 ) : BG_BMP_RAM( 1 ) )
+    inline u16* BG_PAL( bool p_bottom ) {
+        return p_bottom ? BG_PALETTE_SUB : BG_PALETTE;
+    }
+    inline u16* BG_BMP( bool p_bottom ) {
+        return p_bottom ? BG_BMP_RAM_SUB( 1 ) : BG_BMP_RAM( 1 );
+    }
 
-    const u8 SCREEN_TOP    = 1;
-    const u8 SCREEN_BOTTOM = 0;
-    const u8 FONT_WIDTH    = 16;
-    const u8 FONT_HEIGHT   = 16;
+    constexpr u8 SCREEN_TOP    = 1;
+    constexpr u8 SCREEN_BOTTOM = 0;
+    constexpr u8 FONT_WIDTH    = 16;
+    constexpr u8 FONT_HEIGHT   = 16;
 
     extern font*        regularFont;
     extern font*        boldFont;

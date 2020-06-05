@@ -95,37 +95,37 @@ struct boxPokemon {
                 bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
                 u8 p_ball = 0, u8 p_pokerus = 0, u8 p_forme = 0, pkmnData* p_data = nullptr );
 
-    constexpr bool wasEgg( ) {
+    constexpr bool wasEgg( ) const {
         return !!m_gotPlace;
     }
     bool isForeign( ) const;
 
-    constexpr u16 getSpecies( ) {
+    constexpr u16 getSpecies( ) const {
         return m_speciesId;
     }
     void setSpecies( u16 p_newSpecies, pkmnData* p_data = 0 );
 
-    constexpr pkmnNatures getNature( )  {
+    constexpr pkmnNatures getNature( ) const {
         return ( pkmnNatures )( m_pid % 25 );
     }
     bool setNature( pkmnNatures p_newNature );
 
-    constexpr u16 getAbility( )  {
+    constexpr u16 getAbility( ) const {
         return m_ability;
     }
     bool swapAbilities( );
-    constexpr bool isShiny( ) {
+    constexpr bool isShiny( ) const {
         return !( ( ( ( m_oTId ^ m_oTSid ) >> 3 )
                     ^ ( ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) ) ) >> 3 ) );
     }
-    constexpr bool isFemale( )  {
+    constexpr bool isFemale( ) const {
         return m_isFemale;
     }
 
     /*
      * @brief: Returns the gender. -1 for female, 0 for genderless, and 1 for male
      */
-    constexpr s8 gender( ) {
+    constexpr s8 gender( ) const {
         if( m_isGenderless )
             return 0;
         else if( m_isFemale )
@@ -133,7 +133,7 @@ struct boxPokemon {
         return 1;
     }
 
-    constexpr u8 EVget( u8 p_i ) {
+    constexpr u8 EVget( u8 p_i ) const {
         return m_effortValues[ p_i ];
     }
     inline void EVset( u8 p_i, u8 p_val ) {
@@ -145,7 +145,7 @@ struct boxPokemon {
         m_effortValues[ p_i ] = p_val;
     }
 
-    constexpr u8 IVget( u8 p_i ) {
+    constexpr u8 IVget( u8 p_i ) const {
         p_i = 5 - p_i;
         return ( m_iVint >> ( 2 + 5 * p_i ) ) & 31;
     }
@@ -154,14 +154,14 @@ struct boxPokemon {
         m_iVint &= 0xFFFFFFFF - ( 31 << ( 2 + 5 * p_i ) );
         m_iVint |= ( p_val << ( 2 + 5 * p_i ) );
     }
-    constexpr u8 inline PPupget( u8 p_i )  {
+    constexpr u8 inline PPupget( u8 p_i ) const {
         return ( m_pPUps >> ( 2 * p_i ) ) & 3;
     }
     inline void PPupset( u8 p_i, u8 p_val ) {
         m_pPUps &= 0xFF - ( 3 << ( 2 * p_i ) );
         m_pPUps |= ( p_val << ( 2 * p_i ) );
     }
-    constexpr u8 getPersonality( ) {
+    constexpr u8 getPersonality( ) const {
         u8 counter = 1, i = m_pid % 6;
 
         u8 max = i, maxval = IVget( i );
@@ -175,7 +175,7 @@ struct boxPokemon {
 
         return ( max * 5 ) + ( maxval % 5 );
     }
-    constexpr int getTasteStr( ) {
+    constexpr int getTasteStr( ) const {
         if( NatMod[ getNature( ) ][ 0 ] == 11 ) return 0;
         if( NatMod[ getNature( ) ][ 1 ] == 11 ) return 1;
         if( NatMod[ getNature( ) ][ 2 ] == 11 ) return 2;
@@ -185,7 +185,7 @@ struct boxPokemon {
         else
             return 5;
     }
-    constexpr u16 getItem( )  {
+    constexpr u16 getItem( ) const {
         return m_heldItem;
     }
     inline void giveItem( u16 p_newItem ) {
@@ -199,28 +199,28 @@ struct boxPokemon {
         return res;
     }
 
-    constexpr type getHPType( ) {
+    constexpr type getHPType( ) const {
         int a
             = ( ( IVget( 0 ) & 1 ) + 2 * ( IVget( 1 ) & 1 ) + 4 * ( IVget( 2 ) & 1 )
                 + 8 * ( IVget( 3 ) & 1 ) + 16 * ( IVget( 4 ) & 1 ) + 32 * ( IVget( 5 ) & 1 ) * 15 )
               / 63;
         return a < 9 ? (type) a : type( a + 1 );
     }
-    constexpr u8 getHPPower( )  {
+    constexpr u8 getHPPower( ) const {
         return 30
                + ( ( ( ( IVget( 0 ) >> 1 ) & 1 ) + 2 * ( ( IVget( 1 ) >> 1 ) & 1 )
                      + 4 * ( ( IVget( 2 ) >> 1 ) & 1 ) + 8 * ( ( IVget( 3 ) >> 1 ) & 1 )
                      + 16 * ( ( IVget( 4 ) >> 1 ) & 1 ) + 32 * ( ( IVget( 5 ) >> 1 ) & 1 ) * 40 )
                    / 63 );
     }
-    constexpr bool isEgg( )  {
+    constexpr bool isEgg( ) const {
         return m_iVint & 1;
     }
     void setIsEgg( bool p_val ) {
         if( isEgg( ) == p_val ) return;
         m_iVint ^= 1;
     }
-    constexpr bool isNicknamed( )  {
+    constexpr bool isNicknamed( ) const {
         return m_iVint & 1;
     }
     void setIsNicknamed( bool p_val ) {
@@ -230,11 +230,11 @@ struct boxPokemon {
 
     // Recalculates ability
     void setAbility( u8 p_abilityIdx, pkmnData* p_data = nullptr );
-    constexpr u8 getAbilitySlot( ) {
+    constexpr u8 getAbilitySlot( ) const {
         return m_abilitySlot;
     }
 
-    constexpr u8 getForme( ) {
+    constexpr u8 getForme( ) const {
         return m_altForme;
     }
     inline void setForme( u8 p_newForme ) {
@@ -278,7 +278,7 @@ struct pokemon {
         u16 m_SDef : 16;
         u16 m_Spd : 16;
 
-        u16 getStat( u8 p_i ) const {
+        constexpr u16 getStat( u8 p_i ) const {
             switch( p_i ) {
             case 0:
                 return m_maxHP;
@@ -295,7 +295,7 @@ struct pokemon {
             }
             return 0;
         }
-        void setStat( u8 p_i, u16 p_val ) {
+        inline void setStat( u8 p_i, u16 p_val ) {
             switch( p_i ) {
             case 0:
                 m_maxHP = p_val;
@@ -335,14 +335,14 @@ struct pokemon {
      * @brief: Returns whether the pkmn can participate in a battle i.e. is not an egg and
      * is not fainted.
      */
-    constexpr bool canBattle( ) {
-        return !isEgg( ) && !m_stats.m_curHP;
+    constexpr bool canBattle( ) const {
+        return !isEgg( ) && m_stats.m_curHP;
     }
 
-    u16 getStat( u8 p_i ) const {
+    constexpr u16 getStat( u8 p_i ) const {
         return m_stats.getStat( p_i );
     }
-    void setStat( u8 p_i, u16 p_val ) {
+    inline void setStat( u8 p_i, u16 p_val ) {
         m_stats.setStat( p_i, p_val );
     }
 
@@ -354,19 +354,19 @@ struct pokemon {
     void setStatus( u8 p_status, u8 p_value = 1 );
 
     bool        heal( );
-    constexpr pkmnNatures getNature( ) {
+    constexpr pkmnNatures getNature( ) const {
         return m_boxdata.getNature( );
     }
     bool setNature( pkmnNatures p_newNature );
 
-    constexpr bool wasEgg( ) {
+    constexpr bool wasEgg( ) const {
         return m_boxdata.wasEgg( );
     }
-    bool isForeign( ) const {
+    inline bool isForeign( ) const {
         return m_boxdata.isForeign( );
     }
 
-    constexpr u16 getSpecies( ) {
+    constexpr u16 getSpecies( ) const {
         return m_boxdata.getSpecies( );
     }
     inline void setSpecies( u16 p_newSpecies ) {
@@ -374,19 +374,19 @@ struct pokemon {
         recalculateStats( );
     }
 
-    constexpr u16 getAbility( ) {
+    constexpr u16 getAbility( ) const {
         return m_boxdata.getAbility( );
     }
-    constexpr bool isShiny( ) {
+    constexpr bool isShiny( ) const {
         return m_boxdata.isShiny( );
     }
-    constexpr bool isFemale( ) {
+    constexpr bool isFemale( ) const {
         return m_boxdata.isFemale( );
     }
-    constexpr s8 gender( ) {
+    constexpr s8 gender( ) const {
         return m_boxdata.gender( );
     }
-    constexpr unsigned char EVget( u8 p_i ) {
+    constexpr unsigned char EVget( u8 p_i ) const {
         return m_boxdata.EVget( p_i );
     }
     void inline EVset( u8 p_i, u8 p_val ) {
@@ -394,35 +394,35 @@ struct pokemon {
         recalculateStats( );
     }
 
-    constexpr unsigned char IVget( u8 p_i ) {
+    constexpr unsigned char IVget( u8 p_i ) const {
         return m_boxdata.IVget( p_i );
     }
     void inline IVset( u8 p_i, u8 p_val ) {
         m_boxdata.IVset( p_i, p_val );
         recalculateStats( );
     }
-    constexpr u8 PPupget( u8 p_i ) {
+    constexpr u8 PPupget( u8 p_i ) const {
         return m_boxdata.PPupget( p_i );
     }
     inline void PPupset( u8 p_i, u8 p_val ) {
         m_boxdata.PPupset( p_i, p_val );
     }
-    constexpr u8 getPersonality( ) {
+    constexpr u8 getPersonality( ) const {
         return m_boxdata.getPersonality( );
     }
-    constexpr int getTasteStr( ) {
+    constexpr int getTasteStr( ) const {
         return m_boxdata.getTasteStr( );
     }
-    constexpr u16 getItem( ) {
+    constexpr u16 getItem( ) const {
         return m_boxdata.getItem( );
     }
-    constexpr type getHPType( )  {
+    constexpr type getHPType( ) const {
         return m_boxdata.getHPType( );
     }
-    constexpr u8 getHPPower( )  {
+    constexpr u8 getHPPower( ) const {
         return m_boxdata.getHPPower( );
     }
-    constexpr u8 getForme( ) {
+    constexpr u8 getForme( ) const {
         return std::max( m_battleForme, m_boxdata.getForme( ) );
     }
     void setForme( u8 p_newForme );
@@ -437,24 +437,24 @@ struct pokemon {
     bool setLevel( u8 p_newLevel );
     bool setExperience( u32 p_amount );
     bool gainExperience( u32 p_amount );
-    bool swapAbilities( ) {
+    inline bool swapAbilities( ) {
         return m_boxdata.swapAbilities( );
     }
 
     void recalculateStats( );
     void recalculateStats( pkmnData& p_data );
 
-    constexpr bool isEgg( )  {
+    constexpr bool isEgg( ) const {
         return m_boxdata.isEgg( );
     }
 
-    bool learnMove( u16 p_move ) {
+    inline bool learnMove( u16 p_move ) {
         return m_boxdata.learnMove( p_move );
     }
     void evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
     bool canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
 
-    void hatch( ) {
+    inline void hatch( ) {
         m_boxdata.hatch( );
     }
 };

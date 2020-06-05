@@ -57,7 +57,7 @@ namespace STS {
         statusScreen( pokemon* p_pokemon, bool p_allowKeyUp = true, bool p_allowKeyDown = true,
                       statusScreenUI* p_ui = nullptr );
 
-        ~statusScreen( ) {
+        inline ~statusScreen( ) {
             if( _ui ) { delete _ui; }
         }
 
@@ -71,7 +71,7 @@ namespace STS {
         /*
          * @brief Returns the current page.
          */
-        constexpr u8 currentPage( ) {
+        inline u8 currentPage( ) const {
             return _currentPage;
         }
     };

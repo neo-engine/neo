@@ -779,25 +779,25 @@ namespace STS {
         dmaCopy( statussubPal + 3, BG_PALETTE_SUB + 3, 8 * 2 );
 
         for( u8 i = 0; i < 2; ++i ) {
-            u16* pal             = BG_PAL( i );
-            pal[ IO::COLOR_IDX ] = RGB( 22, 22, 22 );
+            u16* pal             = IO::BG_PAL( i );
+            pal[ IO::COLOR_IDX ] = IO::RGB( 22, 22, 22 );
             pal[ IO::WHITE_IDX ] = IO::WHITE;
-            pal[ IO::GRAY_IDX ]  = RGB( 16, 16, 16 );
-            pal[ IO::BLACK_IDX ] = RGB( 8, 8, 8 );
-            pal[ IO::BLUE_IDX ]  = RGB( 18, 22, 31 );
-            pal[ IO::RED_IDX ]   = RGB( 31, 18, 18 );
-            pal[ IO::BLUE2_IDX ] = RGB( 0, 0, 25 );
-            pal[ IO::RED2_IDX ]  = RGB( 23, 0, 0 );
+            pal[ IO::GRAY_IDX ]  = IO::RGB( 16, 16, 16 );
+            pal[ IO::BLACK_IDX ] = IO::RGB( 8, 8, 8 );
+            pal[ IO::BLUE_IDX ]  = IO::RGB( 18, 22, 31 );
+            pal[ IO::RED_IDX ]   = IO::RGB( 31, 18, 18 );
+            pal[ IO::BLUE2_IDX ] = IO::RGB( 0, 0, 25 );
+            pal[ IO::RED2_IDX ]  = IO::RGB( 23, 0, 0 );
 
-            pal[ 238 ] = RGB( 13, 25, 25 ); // exp bar blue 1
-            pal[ 239 ] = RGB( 6, 18, 18 );  // exp bar blue 2
-            pal[ 240 ] = RGB( 6, 6, 6 );    // hp bar border color
-            pal[ 241 ] = RGB( 12, 30, 12 ); // hp bar green 1
-            pal[ 242 ] = RGB( 3, 23, 4 );   // hp bar green 2
-            pal[ 243 ] = RGB( 30, 30, 12 ); // hp bar yellow 1
-            pal[ 244 ] = RGB( 23, 23, 5 );  // hp bar yellow 2
-            pal[ 245 ] = RGB( 30, 15, 12 ); // hp bar red 1
-            pal[ 246 ] = RGB( 20, 7, 7 );   // hp bar red 2
+            pal[ 238 ] = IO::RGB( 13, 25, 25 ); // exp bar blue 1
+            pal[ 239 ] = IO::RGB( 6, 18, 18 );  // exp bar blue 2
+            pal[ 240 ] = IO::RGB( 6, 6, 6 );    // hp bar border color
+            pal[ 241 ] = IO::RGB( 12, 30, 12 ); // hp bar green 1
+            pal[ 242 ] = IO::RGB( 3, 23, 4 );   // hp bar green 2
+            pal[ 243 ] = IO::RGB( 30, 30, 12 ); // hp bar yellow 1
+            pal[ 244 ] = IO::RGB( 23, 23, 5 );  // hp bar yellow 2
+            pal[ 245 ] = IO::RGB( 30, 15, 12 ); // hp bar red 1
+            pal[ 246 ] = IO::RGB( 20, 7, 7 );   // hp bar red 2
         }
         bgSetScale( IO::bg3sub, 1 << 7, 1 << 7 );
         bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
@@ -1317,7 +1317,7 @@ namespace STS {
 //    bool statusScreenUI::drawMove( const pokemon& p_pokemon, u8 p_moveIdx, bool p_bottom ) {
 //        auto currPkmn = p_pokemon;
 //        auto Oam      = p_bottom ? IO::Oam : IO::OamTop;
-//        auto pal      = BG_PAL( p_bottom );
+//        auto pal      = IO::BG_PAL( p_bottom );
 //
 //        if( !p_pokemon->m_boxdata.m_moves[ p_moveIdx ] ) return false;
 //        if( p_pokemon->isEgg( ) ) return false;
@@ -1326,7 +1326,7 @@ namespace STS {
 //        for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
 //
 //        pal[ IO::WHITE_IDX ] = IO::WHITE;
-//        pal[ IO::GRAY_IDX ]  = RGB( 20, 20, 20 );
+//        pal[ IO::GRAY_IDX ]  = IO::RGB( 20, 20, 20 );
 //        pal[ IO::BLACK_IDX ] = IO::BLACK;
 //        IO::regularFont->setColor( 0, 0 );
 //        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
@@ -1410,7 +1410,7 @@ namespace STS {
 //    {
 //        auto currPkmn = p_pokemon;
 //        auto Oam      = p_bottom ? IO::Oam : IO::OamTop;
-//        auto pal      = BG_PAL( p_bottom );
+//        auto pal      = IO::BG_PAL( p_bottom );
 //
 //        if( p_pokemon->isEgg( ) ) return false;
 //
@@ -1419,7 +1419,7 @@ namespace STS {
 //        for( u8 i = 0; i < 12; ++i ) Oam->oamBuffer[ RIBBON_IDX + i ].isHidden = true;
 //
 //        pal[ IO::WHITE_IDX ] = IO::WHITE;
-//        pal[ IO::GRAY_IDX ]  = RGB( 20, 20, 20 );
+//        pal[ IO::GRAY_IDX ]  = IO::RGB( 20, 20, 20 );
 //        pal[ IO::BLACK_IDX ] = IO::BLACK;
 //        IO::regularFont->setColor( 0, 0 );
 //        IO::regularFont->setColor( IO::BLACK_IDX, 1 );

@@ -203,7 +203,7 @@ namespace FS {
     bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no ) {
         if( p_no == SAVE::SAV.getActiveFile( ).m_options.m_bgIdx && NAV::NAV_DATA[ 0 ] ) {
             dmaCopy( NAV::NAV_DATA, p_layer, 256 * 192 );
-            dmaCopy( NAV::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
+            dmaCopy( NAV::NAV_DATA_PAL, IO::BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
             return true;
         }
 
@@ -212,7 +212,7 @@ namespace FS {
             return false;
 
         dmaCopy( NAV::NAV_DATA, p_layer, 256 * 192 );
-        dmaCopy( NAV::NAV_DATA_PAL, BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
+        dmaCopy( NAV::NAV_DATA_PAL, IO::BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
 
         return true;
     }

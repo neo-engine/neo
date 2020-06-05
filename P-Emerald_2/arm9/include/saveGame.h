@@ -179,7 +179,7 @@ namespace SAVE {
              * @brief: Returns the team pkmn at the specified position or nullptr if there
              * is no pkmn at that position.
              */
-            constexpr pokemon* getTeamPkmn( u8 p_position ) {
+            inline pokemon* getTeamPkmn( u8 p_position ) {
                 if( m_pkmnTeam[ p_position ].getSpecies( ) )
                     return &m_pkmnTeam[ p_position ];
                 else
@@ -201,12 +201,9 @@ namespace SAVE {
             /*
              * @brief: Returns the number of party pkmn that can participate in a battle.
              */
-            constexpr u8 countAlivePkmn( ) {
+            constexpr u8 countAlivePkmn( ) const {
                 u8 res = 0;
                 for( u8 i = 0; i < 6; ++i ) {
-                    if( !m_pkmnTeam[ i ].getSpecies( ) ) {
-                        return res;
-                    }
                     res += m_pkmnTeam[ i ].canBattle( );
                 }
                 return res;
@@ -221,7 +218,7 @@ namespace SAVE {
             /*
              * @brief: Returns whether the save is valid.
              */
-            constexpr bool isGood( ) {
+            inline bool isGood( ) const {
                 return m_good1 == GOOD_MAGIC1 && m_good2 == GOOD_MAGIC2;
             }
         } m_saveFile[ MAX_SAVE_FILES ];
