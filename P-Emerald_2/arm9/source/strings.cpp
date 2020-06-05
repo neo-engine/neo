@@ -214,8 +214,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 50
 
     {"Used %s on %s.", "%s auf %s angewendet."},
-    {"%s is evolving", "%s entwickelt sich"},
-    {"and became a(n)\n%s!", "und wurde zu einem\n%s!"},
+    {"What?\n%s is evolving!", "Nanu?\n%s entwickelt sich!"},
+    {"Congratulations! Your %s\nevolved into %s!", "Gl\xfc""ckwunsch! Dein %s\nwurde zu einem %s!"},
     {"It would be\nwasted", "Es w\xfcrde keine\nWirkung haben"},
     {"%s holds\n%s already.\nSwap the items?",
      "%s tr\xe4gt bereits\ndas Item %s.\nSollen die Items getauscht werden?"}, // TODO
@@ -737,4 +737,9 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Give Item", "Item geben"},
     {"Take Item", "Item nehm."},
     {"Cancel", "Abbrechen"},
+    {"Huh? The evolution\nwas interrupted|", "Huh? Die Entwicklung\nwurde abgebrochen|"},
+    {"%s hatched from the Egg!", "%s schl\xfcpfte aus dem Ei!"},
+
+    // 390
+
 };

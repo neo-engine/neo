@@ -46,6 +46,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "moveNames.h"
 #include "partyScreen.h"
 #include "statusScreen.h"
+#include "animations.h"
 // END TEST
 
 namespace SAVE {
@@ -107,6 +108,10 @@ namespace SAVE {
                 testTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
                 testTeam[ 2 ].m_boxdata.m_heldItem   = I_YAGO_BERRY;
         */
+
+        IO::ANIM::evolvePkmn( 665, 0, 666, rand( ) % 22, rand( ) % 2, true, true );
+        IO::ANIM::evolvePkmn( 665, 0, 666, rand( ) % 22, rand( ) % 2, true, false );
+
         BOX::boxViewer bxv;
         bxv.run( );
 
