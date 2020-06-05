@@ -89,39 +89,39 @@ namespace SAVE {
 
         // BEGIN TEST
 
-        //        pokemon testTeam[ 6 ];
-//        for( u16 i = 0; i < 600; i++ ) {
-        //    //            testTeam[ i ]
-        //    //                = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false,
-        //    //                i == 3 );
-        //    //            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
-//            SAVE::SAV.getActiveFile( ).storePkmn(
-//                pokemon( 1 + ( 3 * i ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, rand( ) % 2, 3 * i ==
-//                    490, rand( ) % 20 ) );
-//        }
+//        pokemon testTeam[ 6 ];
+//        for( u16 i = 0; i < 6; i++ ) {
+//            testTeam[ i ]
+//                = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false,
+//                        i == 3 );
+//            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
+            //            SAVE::SAV.getActiveFile( ).storePkmn(
+            //                pokemon( 1 + ( 3 * i ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, rand( ) % 2, 3 * i ==
+            //                    490, rand( ) % 20 ) );
+ //       }
         /*        testTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_SURF;
-                testTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;
-                testTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
-                testTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;
-                testTeam[ 1 ].m_boxdata.m_moves[ 2 ] = M_SWEET_SCENT;
-                testTeam[ 1 ].m_boxdata.m_moves[ 3 ] = M_ROCK_SMASH;
-                testTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
-                testTeam[ 2 ].m_boxdata.m_heldItem   = I_YAGO_BERRY;
-        */
+                  testTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;
+                  testTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                  testTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;
+                  testTeam[ 1 ].m_boxdata.m_moves[ 2 ] = M_SWEET_SCENT;
+                  testTeam[ 1 ].m_boxdata.m_moves[ 3 ] = M_ROCK_SMASH;
+                  testTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                  testTeam[ 2 ].m_boxdata.m_heldItem   = I_YAGO_BERRY;
+                  */
 
-        IO::ANIM::evolvePkmn( 665, 0, 666, rand( ) % 22, rand( ) % 2, true, true );
-        IO::ANIM::evolvePkmn( 665, 0, 666, rand( ) % 22, rand( ) % 2, true, false );
+        // IO::ANIM::evolvePkmn( 665, 0, 666, rand( ) % 22, rand( ) % 2, true, true );
+        // IO::ANIM::evolvePkmn( 665, 0, 666, rand( ) % 22, rand( ) % 2, true, false );
 
-        BOX::boxViewer bxv;
-        bxv.run( );
+        // BOX::boxViewer bxv;
+        // bxv.run( );
 
         /*
         STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
         sts.run( );
 
         */
-        // STS::statusScreen psts = STS::statusScreen( testTeam );
-        // psts.run( );
+//        STS::statusScreen psts = STS::statusScreen( testTeam );
+//        psts.run( );
 
         // END TEST
 

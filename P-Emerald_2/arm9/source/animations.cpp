@@ -102,6 +102,7 @@ namespace IO::ANIM {
         regularFont->printStringC( buffer, 127, 136, false, font::CENTER );
 
         initOAMTable( false );
+        initOAMTable( true );
 
         // Load both sprites
 
@@ -164,6 +165,7 @@ namespace IO::ANIM {
         BG_PALETTE[ BLACK_IDX ] = BLACK;
 
         initOAMTable( false );
+        initOAMTable( true );
         // Load both sprites
 
         u16 tileCnt = 0;

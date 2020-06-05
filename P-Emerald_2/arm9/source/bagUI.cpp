@@ -175,7 +175,7 @@ namespace BAG {
             if( p_data.m_itemType != ITEM::ITEMTYPE_KEYITEM
                 && p_data.m_itemType != ITEM::ITEMTYPE_FORMECHANGE ) {
                 snprintf( buffer, 99, "x %d", p_count );
-                IO::regularFont->printString( buffer, 146, 52, false );
+                IO::regularFont->printStringC( buffer, 146, 52, false );
             }
 
             if( p_data.m_itemType & ITEM::ITEMTYPE_BERRY ) {
@@ -196,10 +196,10 @@ namespace BAG {
                                                             == berry::berryGueteType::VERY_HARD )
                                                               ? GET_STRING( 21 )
                                                               : ( GET_STRING( 22 ) ) ) ) ) ) );
-                IO::regularFont->printString( buffer, 24, 145, false );
+                IO::regularFont->printStringC( buffer, 24, 145, false );
                 IO::regularFont->setColor( IO::BLUE_IDX, 1 );
                 snprintf( buffer, 99, GET_STRING( 23 ), curr->m_berryData.m_berrySize / 10.0 );
-                IO::regularFont->printString( buffer, 140, 145, false );
+                IO::regularFont->printStringC( buffer, 140, 145, false );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 
                 u8 poses[ 5 ] = {18, 66, 124, 150, 194};
@@ -214,7 +214,7 @@ namespace BAG {
                         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                     }
-                    IO::regularFont->printString( GET_STRING( 24 + i ), poses[ i ], 160, false );
+                    IO::regularFont->printStringC( GET_STRING( 24 + i ), poses[ i ], 160, false );
                 }
                 IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
@@ -228,37 +228,37 @@ namespace BAG {
             display = ITEM::getItemName( p_itemId ) + ": "
                       + MOVE::getMoveName( p_data.m_param2 );
 
-            IO::regularFont->printString( GET_STRING( 29 ), 33, 145, false );
+            IO::regularFont->printStringC( GET_STRING( 29 ), 33, 145, false );
             tileCnt
                 = IO::loadTypeIcon( move.m_type, 62, 144, 1, 1, tileCnt, false, CURRENT_LANGUAGE );
 
-            IO::regularFont->printString( GET_STRING( 30 ), 100, 145, false );
+            IO::regularFont->printStringC( GET_STRING( 30 ), 100, 145, false );
             IO::loadDamageCategoryIcon( move.m_category, 152, 144, 2, 2, tileCnt, false );
 
-            IO::regularFont->printString( GET_STRING( 31 ), 190, 145, false );
+            IO::regularFont->printStringC( GET_STRING( 31 ), 190, 145, false );
             char buffer[ 100 ];
             snprintf( buffer, 99, "%2d", move.m_pp );
-            IO::regularFont->printString( buffer, 229, 145, false, IO::font::RIGHT );
+            IO::regularFont->printStringC( buffer, 229, 145, false, IO::font::RIGHT );
 
             IO::regularFont->setColor( IO::RED_IDX, 1 );
-            IO::regularFont->printString( GET_STRING( 32 ), 33, 160, false );
+            IO::regularFont->printStringC( GET_STRING( 32 ), 33, 160, false );
             if( move.m_category != MOVE::STATUS && move.m_basePower > 1 )
                 snprintf( buffer, 99, "%3d", move.m_basePower );
             else
                 snprintf( buffer, 99, "---" );
-            IO::regularFont->printString( buffer, 108, 160, false, IO::font::RIGHT );
+            IO::regularFont->printStringC( buffer, 108, 160, false, IO::font::RIGHT );
 
             IO::regularFont->setColor( IO::BLUE_IDX, 1 );
-            IO::regularFont->printString( GET_STRING( 33 ), 124, 160, false );
+            IO::regularFont->printStringC( GET_STRING( 33 ), 124, 160, false );
             if( move.m_accuracy )
                 snprintf( buffer, 99, "%3d", move.m_accuracy );
             else
                 std::sprintf( buffer, "---" );
-            IO::regularFont->printString( buffer, 229, 160, false, IO::font::RIGHT );
+            IO::regularFont->printStringC( buffer, 229, 160, false, IO::font::RIGHT );
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
         }
 
-        IO::regularFont->printString( display.c_str( ), 128, 26, false, IO::font::CENTER );
+        IO::regularFont->printStringC( display.c_str( ), 128, 26, false, IO::font::CENTER );
 
         IO::regularFont->printBreakingString( descr.c_str( ), 33, 83, 196, false,
                 IO::font::LEFT, 11 );
@@ -275,7 +275,7 @@ namespace BAG {
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
             if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].isEgg( ) ) {
-                IO::regularFont->printString( GET_STRING( 34 ), 45, 38 + 26 * i, true );
+                IO::regularFont->printStringC( GET_STRING( 34 ), 45, 38 + 26 * i, true );
                 res.push_back(
                     {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ), {0, true}} );
             } else {
@@ -294,7 +294,7 @@ namespace BAG {
                                       .m_boxdata.m_moves[ 3 ] ) {
                         IO::regularFont->setColor( IO::BLUE_IDX, 1 );
                         IO::regularFont->setColor( IO::BLACK_IDX, 2 );
-                        IO::regularFont->printString( GET_STRING( 35 ), 40, 33 + 26 * i, true,
+                        IO::regularFont->printStringC( GET_STRING( 35 ), 40, 33 + 26 * i, true,
                                                       IO::font::LEFT, 11 );
                     } else if( canLearn(
                                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId,
@@ -302,11 +302,11 @@ namespace BAG {
                         BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
                         IO::regularFont->setColor( IO::COLOR_IDX, 1 );
                         IO::regularFont->setColor( IO::BLACK_IDX, 2 );
-                        IO::regularFont->printString( GET_STRING( 36 ), 40, 38 + 26 * i, true );
+                        IO::regularFont->printStringC( GET_STRING( 36 ), 40, 38 + 26 * i, true );
                     } else {
                         IO::regularFont->setColor( IO::RED_IDX, 1 );
                         IO::regularFont->setColor( IO::BLACK_IDX, 2 );
-                        IO::regularFont->printString( GET_STRING( 37 ), 40, 33 + 26 * i, true,
+                        IO::regularFont->printStringC( GET_STRING( 37 ), 40, 33 + 26 * i, true,
                                                       IO::font::LEFT, 11 );
                     }
                 } else if( p_itemId && ( p_data.m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
@@ -320,7 +320,7 @@ namespace BAG {
                         snprintf( buffer, 99, GET_STRING( 39 ),
                                   SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_level );
                     }
-                    IO::regularFont->printString( buffer, 40, 33 + 26 * i, true, IO::font::LEFT,
+                    IO::regularFont->printStringC( buffer, 40, 33 + 26 * i, true, IO::font::LEFT,
                                                   11 );
                 } else {
                     if( p_itemId && p_data.m_itemType == ITEM::ITEMTYPE_EVOLUTION ) {
@@ -328,15 +328,15 @@ namespace BAG {
                             BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
                             IO::regularFont->setColor( IO::COLOR_IDX, 1 );
                             IO::regularFont->setColor( IO::BLACK_IDX, 2 );
-                            IO::regularFont->printString( GET_STRING( 40 ), 40, 38 + 26 * i, true );
+                            IO::regularFont->printStringC( GET_STRING( 40 ), 40, 38 + 26 * i, true );
                         } else {
                             IO::regularFont->setColor( IO::RED_IDX, 1 );
                             IO::regularFont->setColor( IO::BLACK_IDX, 2 );
-                            IO::regularFont->printString( GET_STRING( 41 ), 40, 33 + 26 * i, true,
+                            IO::regularFont->printStringC( GET_STRING( 41 ), 40, 33 + 26 * i, true,
                                                           IO::font::LEFT, 11 );
                         }
                     } else {
-                        IO::regularFont->printString(
+                        IO::regularFont->printStringC(
                             SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_name, 45,
                             33 + 26 * i, true );
 
@@ -344,14 +344,14 @@ namespace BAG {
                         IO::regularFont->setColor( IO::GRAY_IDX, 1 );
 
                         if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].getItem( ) ) {
-                            IO::regularFont->printString(
+                            IO::regularFont->printStringC(
                                 ITEM::getItemName(
                                     SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].getItem( ),
                                     CURRENT_LANGUAGE )
                                     .c_str( ),
                                 40, 44 + 26 * i, true );
                         } else
-                            IO::regularFont->printString( GET_STRING( 42 ), 40, 44 + 26 * i, true );
+                            IO::regularFont->printStringC( GET_STRING( 42 ), 40, 44 + 26 * i, true );
                     }
                 }
             }
@@ -393,10 +393,10 @@ namespace BAG {
             IO::printChoiceBox( p_x, p_y, p_x + 106, p_y + 16, 3, p_selected ? IO::RED_IDX : IO::GRAY_IDX,
                                 p_pressed );
         if( p_data.m_itemType != ITEM::ITEMTYPE_TM )
-            IO::regularFont->printString( ITEM::getItemName( p_itemId ).c_str( ),
+            IO::regularFont->printStringC( ITEM::getItemName( p_itemId ).c_str( ),
                                           p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
         else
-            IO::regularFont->printString(
+            IO::regularFont->printStringC(
                 MOVE::getMoveName( p_data.m_param2 ).c_str( ),
                 p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
     }
@@ -405,7 +405,7 @@ namespace BAG {
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BagUpper" );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         initColors( );
-        IO::regularFont->printString( GET_STRING( 11 + p_page ), 128, 4, false, IO::font::CENTER );
+        IO::regularFont->printStringC( GET_STRING( 11 + p_page ), 128, 4, false, IO::font::CENTER );
     }
 
     void bagUI::selectItem( u8 p_idx, std::pair<u16, u16> p_item, ITEM::itemData& p_data,
@@ -461,7 +461,7 @@ namespace BAG {
                 drawItemSub( 0, empty, 132, 76 - 18 * i, false, false, true );
                 IO::OamTop->oamBuffer[ i ].isHidden = true;
             }
-            IO::regularFont->printString( GET_STRING( 43 ), 182, 89, true, IO::font::CENTER );
+            IO::regularFont->printStringC( GET_STRING( 43 ), 182, 89, true, IO::font::CENTER );
             IO::updateOAM( false );
         }
         res.insert( res.end( ), pkmnTg.begin( ), pkmnTg.end( ) );

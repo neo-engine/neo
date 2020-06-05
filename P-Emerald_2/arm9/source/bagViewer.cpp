@@ -25,6 +25,7 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "animations.h"
 #include "bagViewer.h"
 #include "choiceBox.h"
 #include "defines.h"
@@ -116,24 +117,14 @@ namespace BAG {
 
                 // Check for evolution
                 if( p_pokemon.m_level != oldLv && p_pokemon.canEvolve( ) ) {
-                    initUI( );
-                    IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
-                    IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
-                    IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
-                    sprintf( buffer, GET_STRING( 51 ), p_pokemon.m_boxdata.m_name );
-                    IO::messageBox( buffer, false );
+                    u16 oldsp = p_pokemon.getSpecies( );
+                    u8 oldfm = p_pokemon.getForme( );
                     p_pokemon.evolve( );
+                    u16 newsp = p_pokemon.getSpecies( );
+                    u8 newfm = p_pokemon.getForme( );
 
-                    initUI( );
-                    swiWaitForVBlank( );
-
-                    snprintf( buffer, 99, GET_STRING( 52 ),
-                              getDisplayName( p_pokemon.m_boxdata.m_speciesId, CURRENT_LANGUAGE )
-                                  .c_str( ) );
-                    IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
-                    IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
-                    IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
-                    IO::messageBox( buffer, false );
+                    IO::ANIM::evolvePkmn( oldsp, oldfm, newsp, newfm, p_pokemon.isShiny( ),
+                            p_pokemon.isFemale( ), false );
                 }
                 return false;
             }
@@ -153,23 +144,14 @@ namespace BAG {
                 IO::messageBox( GET_STRING( 53 ), false );
                 return false;
             } else {
-                IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
-                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
-                IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
-                snprintf( buffer, 99, GET_STRING( 51 ), p_pokemon.m_boxdata.m_name );
-                IO::messageBox( buffer, false );
-                p_pokemon.evolve( p_itemId, 3 );
+                    u16 oldsp = p_pokemon.getSpecies( );
+                    u8 oldfm = p_pokemon.getForme( );
+                    p_pokemon.evolve( p_itemId, 3 );
+                    u16 newsp = p_pokemon.getSpecies( );
+                    u8 newfm = p_pokemon.getForme( );
 
-                initUI( );
-                swiWaitForVBlank( );
-
-                snprintf(
-                    buffer, 99, GET_STRING( 52 ),
-                    getDisplayName( p_pokemon.m_boxdata.m_speciesId, CURRENT_LANGUAGE ).c_str( ) );
-                IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
-                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
-                IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
-                IO::messageBox( buffer, false );
+                    IO::ANIM::evolvePkmn( oldsp, oldfm, newsp, newfm, p_pokemon.isShiny( ),
+                            p_pokemon.isFemale( ), false );
             }
             return false;
         }
