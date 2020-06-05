@@ -130,8 +130,7 @@ namespace BOX {
         IO::resetScale( true, false );
         IO::initOAMTable( true );
         vramSetBankD( VRAM_D_SUB_SPRITE );
-        videoSetModeSub( MODE_5_2D | // DISPLAY_BG1_ACTIVE |
-                         DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
+        videoSetModeSub( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
                          | ( ( DISPLAY_SPR_1D | DISPLAY_SPR_1D_SIZE_128 | DISPLAY_SPR_1D_BMP
                                | DISPLAY_SPR_1D_BMP_SIZE_128 | ( 5 << 28 ) | 2 )
                              & 0xffffff0 ) );
@@ -956,6 +955,8 @@ namespace BOX {
                 oam[ SPR_PKMN_START_OAM_SUB + i ].isHidden = true;
             }
         }
+        oam[ SPR_PARTY_TEXT_OAM_SUB ].isHidden = true;
+        oam[ SPR_PARTY_TEXT_OAM_SUB + 1 ].isHidden = false;
         IO::updateOAM( true );
 
         for( u8 i = MAX_PKMN_PER_BOX; i < MAX_PKMN_PER_BOX + p_partyLen; ++i ) {
@@ -988,6 +989,8 @@ namespace BOX {
         for( u8 i = MAX_PKMN_PER_BOX; i < MAX_PKMN_PER_BOX + 6; ++i ) {
             oam[ SPR_PKMN_START_OAM_SUB + i ].isHidden = true;
         }
+        oam[ SPR_PARTY_TEXT_OAM_SUB ].isHidden = false;
+        oam[ SPR_PARTY_TEXT_OAM_SUB + 1 ].isHidden = true;
         IO::updateOAM( true );
     }
 

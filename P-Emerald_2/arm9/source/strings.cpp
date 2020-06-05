@@ -729,12 +729,12 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 380
 
     {"Show Party", "Team-PKMN"},
-    {"Hide Party", "Team-PKMN"},
+    {"Hide Party", "Box-PKMN"},
     {"Move", "Bewegen"},
     {"Summary", "Details"},
     {"Release", "Freilassen"},
 
     {"Give Item", "Item geben"},
-    {"Take Item", "Item nehmen"},
+    {"Take Item", "Item nehm."},
     {"Cancel", "Abbrechen"},
 };

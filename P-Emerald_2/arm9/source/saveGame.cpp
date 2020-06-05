@@ -193,11 +193,11 @@ namespace SAVE {
     u8 saveGame::playerInfo::consolidatePkmn( ) {
         u8 currentGap = 0;
         u8 res = u8( -1 );
-        for( u8 i = 1; i < 6; ++i ) {
+        for( u8 i = 0; i < 6; ++i ) {
             if( !m_pkmnTeam[ i ].getSpecies( ) ) {
                 currentGap++;
             } else if( currentGap ) {
-                if( res == u8( -1 ) ) { res = i; }
+                if( res == u8( -1 ) ) { res = i - currentGap; }
                 m_pkmnTeam[ i - currentGap ] = m_pkmnTeam[ i ];
                 memset( &m_pkmnTeam[ i ], 0, sizeof( pokemon ) );
             }

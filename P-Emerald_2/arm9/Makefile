@@ -30,7 +30,7 @@ ARCH	:=	-mthumb -mthumb-interwork
 CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wpsabi -O3 -D_FORTIFY_SOURCE=1\
 			-Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
 			-Wduplicated-branches -Wduplicated-cond -Wno-volatile\
-			-Wfloat-equal -Wformat=1 -Wlogical-op -Wnull-dereference\
+			-Wfloat-equal -Wformat=1 -Wlogical-op\
 			-Wmissing-noreturn -Wsuggest-attribute=malloc -Wunused-macros\
 			-Wno-class-memaccess -march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 			-ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funsafe-loop-optimizations\

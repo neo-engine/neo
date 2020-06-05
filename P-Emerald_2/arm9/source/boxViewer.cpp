@@ -242,26 +242,43 @@ namespace BOX {
         }
 
         if( tmp.getSpecies( ) ) {
-            if( _heldPkmn.getSpecies( ) ) {
-                // Swap pkmn
-                std::swap( tmp, _heldPkmn );
-                setPkmn( p_index, &tmp );
-                _boxUI.updatePkmn( getPkmn( p_index ), p_index );
-                if( !p_continuousSwap ) {
-                    // Return new pkmn
-                    returnPkmn( );
+                if( _heldPkmn.getSpecies( ) ) {
+                    // Make sure that we disallow picking up the players last pkmn
+                    if( p_index < MAX_PKMN_PER_BOX
+                            || ( p_index < MAX_PKMN_PER_BOX + 6 &&
+                                ( SAVE::SAV.getActiveFile( ).countAlivePkmn( ) > 1
+                                  || !tmp.canBattle( ) ) ) ) {
+                        // Swap pkmn
+                        std::swap( tmp, _heldPkmn );
+                        setPkmn( p_index, &tmp );
+                        _boxUI.updatePkmn( getPkmn( p_index ), p_index );
+                        if( !p_continuousSwap ) {
+                            // Return new pkmn
+                            returnPkmn( );
+                        } else {
+                            _boxUI.setNewHeldPkmn( &_heldPkmn.m_boxdata, p_index );
+                        }
+                    }
                 } else {
-                    _boxUI.setNewHeldPkmn( &_heldPkmn.m_boxdata, p_index );
+                    // Make sure that we disallow picking up the players last pkmn
+                    if( p_index < MAX_PKMN_PER_BOX
+                            || ( p_index < MAX_PKMN_PER_BOX + 6 &&
+                                ( SAVE::SAV.getActiveFile( ).countAlivePkmn( ) > 1
+                                  || !tmp.canBattle( ) ) ) ) {
+                        // Pick up pkmn
+                        _heldPkmn = tmp;
+                        setPkmn( p_index, (pokemon*) nullptr );
+                        _boxUI.updatePkmn( getPkmn( p_index ), p_index );
+                        _heldPkmnPos = std::pair<u8, u8>( SAVE::SAV.getActiveFile( ).m_curBox, p_index );
+                        _boxUI.setNewHeldPkmn( &_heldPkmn.m_boxdata, p_index );
+                    } else {
+                        memset( &_heldPkmn, 0, sizeof( pokemon ) );
+                        _heldPkmnPos = std::pair<u8, u8>( -1, -1 );
+                        _boxUI.setNewHeldPkmn( nullptr, p_index );
+                        _boxUI.selectPkmn( nullptr, p_index );
+                    }
                 }
-            } else {
-                // Pick up pkmn
-                _heldPkmn = tmp;
-                setPkmn( p_index, (pokemon*) nullptr );
-                _boxUI.updatePkmn( getPkmn( p_index ), p_index );
-                _heldPkmnPos = std::pair<u8, u8>( SAVE::SAV.getActiveFile( ).m_curBox, p_index );
-                _boxUI.setNewHeldPkmn( &_heldPkmn.m_boxdata, p_index );
-            }
-            _boxUI.hoverPkmn( getPkmn( p_index ), p_index, false );
+                _boxUI.hoverPkmn( getPkmn( p_index ), p_index, false );
         } else {
             // put down pkmn
             setPkmn( p_index, &_heldPkmn );
@@ -272,6 +289,7 @@ namespace BOX {
                 if( st == u8( -1 ) ) {
                     _boxUI.updatePkmn( getPkmn( p_index ), p_index );
                 } else {
+                    _selectedIdx = p_index = MAX_PKMN_PER_BOX + st;
                     for( ; st < 6; ++st ) {
                         _boxUI.updatePkmn( getPkmn( MAX_PKMN_PER_BOX + st ),
                                 MAX_PKMN_PER_BOX + st );
@@ -280,8 +298,8 @@ namespace BOX {
             }
             memset( &_heldPkmn, 0, sizeof( pokemon ) );
             _heldPkmnPos = std::pair<u8, u8>( -1, -1 );
-            _boxUI.hoverPkmn( getPkmn( p_index ), p_index );
             _boxUI.setNewHeldPkmn( nullptr, p_index );
+            _boxUI.hoverPkmn( getPkmn( p_index ), p_index );
         }
     }
 
@@ -486,6 +504,7 @@ namespace BOX {
             swiWaitForVBlank( );
         }
         _boxUI.hideParty( );
+        select( 0 );
         return false;
     }
 
@@ -610,10 +629,29 @@ namespace BOX {
                     }
                     case boxUI::BUTTON_PKMN_RELEASE: {
                         // TODO: Add confirmation
-                        SAVE::SAV.getActiveFile( ).getCurrentBox( )->clear( _selectedIdx );
-                        _boxUI.updatePkmn( nullptr, _selectedIdx );
-                        _boxUI.selectPkmn( nullptr, 0 );
-                        _boxUI.hoverPkmn( nullptr, _selectedIdx );
+                        if( _selectedIdx < MAX_PKMN_PER_BOX ) {
+                            setPkmn( _selectedIdx, (pokemon*) nullptr );
+                            _boxUI.updatePkmn( nullptr, _selectedIdx );
+                            _boxUI.selectPkmn( nullptr, 0 );
+                            _boxUI.hoverPkmn( nullptr, _selectedIdx );
+                        } else if( _selectedIdx < MAX_PKMN_PER_BOX + 6 ) {
+                            if( SAVE::SAV.getActiveFile( ).countAlivePkmn( ) > 1
+                                    || !SAVE::SAV.getActiveFile( ).getTeamPkmn(
+                                        _selectedIdx - MAX_PKMN_PER_BOX )->canBattle( ) ) {
+                                setPkmn( _selectedIdx, (pokemon*) nullptr );
+                                u8 st = SAVE::SAV.getActiveFile( ).consolidatePkmn( );
+                                if( st == u8( -1 ) ) {
+                                    _boxUI.updatePkmn( getPkmn( _selectedIdx ), _selectedIdx );
+                                } else {
+                                    for( ; st < 6; ++st ) {
+                                        _boxUI.updatePkmn( getPkmn( MAX_PKMN_PER_BOX + st ),
+                                            MAX_PKMN_PER_BOX + st );
+                                    }
+                                }
+                            }
+                            _boxUI.selectPkmn( nullptr, 0 );
+                            _boxUI.hoverPkmn( getPkmn( _selectedIdx ), _selectedIdx );
+                        }
                         return 0;
                     }
                     case boxUI::BUTTON_PKMN_GIVE_ITEM: {

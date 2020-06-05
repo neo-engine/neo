@@ -221,7 +221,7 @@ struct boxPokemon {
         m_iVint ^= 1;
     }
     constexpr bool isNicknamed( ) const {
-        return m_iVint & 1;
+        return ( m_iVint >> 1 ) & 1;
     }
     void setIsNicknamed( bool p_val ) {
         if( isNicknamed( ) == p_val ) return;
