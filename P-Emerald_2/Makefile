@@ -33,7 +33,11 @@ GAME_SUBTITLE2_ES	:=  Homebrew
 
 GAME_ICON       :=  $(CURDIR)/icon.bmp
 
-VERSION			:=	8
+export DEV_CODE			:=	01
+export GAME_CODE		:=	ADAJ
+export GAME_TITLE		:=	POKEMON NEO
+export VERSION			:=	8
+export VERSION_NAME		:=	Magnetizing Magnemite neo
 
 export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
@@ -59,7 +63,7 @@ $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 		"$(GAME_TITLE_DE);$(GAME_SUBTITLE1_DE);$(GAME_SUBTITLE2_DE)" $(_ADDFILES) \
 		"$(GAME_TITLE_IT);$(GAME_SUBTITLE1_IT);$(GAME_SUBTITLE2_IT)" $(_ADDFILES) \
 		"$(GAME_TITLE_ES);$(GAME_SUBTITLE1_ES);$(GAME_SUBTITLE2_ES)" $(_ADDFILES) \
-		-g ADAE 01 "POKEMON NEO" $(VERSION)
+		-g $(GAME_CODE) $(DEV_CODE) "$(GAME_TITLE)" $(VERSION)
 
 #---------------------------------------------------------------------------------
 arm7/$(TARGET).elf: FORCE

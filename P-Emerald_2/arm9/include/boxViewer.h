@@ -69,8 +69,9 @@ namespace BOX {
 
         /*
          * @brief: Shows the party and runs everything related.
+         * @returns: True if the player pressed X
          */
-        void runParty( );
+        bool runParty( );
 
         /*
          * @brief: Runs the status choice for a pkmn (show status, move, release, ...)

@@ -111,10 +111,10 @@ const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
     {"Nature: %s"},
     {"%2s Attack"},
     {"%2s Defense"},
-    {"%2s Speed"},
     {"%2s Special Atk"},
-
     {"%2s Special Def"},
+
+    {"%2s Speed"},
     {"HP"},
     {"Attack"},
     {"Defense"},

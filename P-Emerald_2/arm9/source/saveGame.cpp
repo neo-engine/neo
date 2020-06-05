@@ -166,15 +166,56 @@ namespace SAVE {
         return res;
     }
 
+    bool saveGame::playerInfo::setTeamPkmn( u8 p_position, pokemon* p_pokemon ) {
+        if( p_pokemon != nullptr ) {
+            m_pkmnTeam[ p_position ] = *p_pokemon;
+        } else {
+            if( countAlivePkmn( ) - m_pkmnTeam[ p_position ].canBattle( ) == 0 ) {
+                return false;
+            }
+            memset( &m_pkmnTeam[ p_position ], 0, sizeof( pokemon ) );
+        }
+        return true;
+    }
+
+    bool saveGame::playerInfo::setTeamPkmn( u8 p_position, boxPokemon* p_pokemon ) {
+        if( p_pokemon != nullptr ) {
+            m_pkmnTeam[ p_position ] = pokemon( *p_pokemon );
+        } else {
+            if( countAlivePkmn( ) - m_pkmnTeam[ p_position ].canBattle( ) == 0 ) {
+                return false;
+            }
+            memset( &m_pkmnTeam[ p_position ], 0, sizeof( pokemon ) );
+        }
+        return true;
+    }
+
+    u8 saveGame::playerInfo::consolidatePkmn( ) {
+        u8 currentGap = 0;
+        u8 res = u8( -1 );
+        for( u8 i = 1; i < 6; ++i ) {
+            if( !m_pkmnTeam[ i ].getSpecies( ) ) {
+                currentGap++;
+            } else if( currentGap ) {
+                if( res == u8( -1 ) ) { res = i; }
+                m_pkmnTeam[ i - currentGap ] = m_pkmnTeam[ i ];
+                memset( &m_pkmnTeam[ i ], 0, sizeof( pokemon ) );
+            }
+        }
+        return res;
+    }
+
     bool saveGame::isGood( ) {
         for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) {
             if( SAV.m_saveFile[ i ].isGood( ) ) {
                 return true;
             }
         }
+        // return VERSION == m_version;
         return false;
     }
     void saveGame::clear( ) {
         std::memset( this, 0, sizeof( saveGame ) );
+        m_version = VERSION;
     }
 } // namespace SAVE

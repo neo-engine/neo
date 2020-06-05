@@ -32,10 +32,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 #include <nds/ndstypes.h>
 
-#define VERSION ( "0.8-" __DATE__ " " __TIME__ )
-#define VERSION_NAME "Magnetizing Magnemite neo"
-#define GAME_TITLE "POKEMON NEO"
-
 #ifdef DESQUID
 #define DESQUID_STRING ( 1 << 13 )
 #endif

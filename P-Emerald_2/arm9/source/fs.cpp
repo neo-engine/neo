@@ -107,13 +107,11 @@ namespace FS {
 
     FILE* open( const char* p_path, const char* p_name, const char* p_ext, const char* p_mode ) {
         snprintf( TMP_BUFFER, 99, "%s%s%s", p_path, p_name, p_ext );
-        auto res = fopen( TMP_BUFFER, p_mode );
-        return res;
+        return fopen( TMP_BUFFER, p_mode );
     }
     FILE* open( const char* p_path, u16 p_value, const char* p_ext, const char* p_mode ) {
         snprintf( TMP_BUFFER, 99, "%s%d%s", p_path, p_value, p_ext );
-        auto res = fopen( TMP_BUFFER, p_mode );
-        return res;
+        return fopen( TMP_BUFFER, p_mode );
     }
     FILE* openSplit( const char* p_path, u16 p_value, const char* p_ext, u16 p_maxValue,
                      const char* p_mode ) {
@@ -128,8 +126,7 @@ namespace FS {
                       p_ext );
         }
 
-        auto res = fopen( TMP_BUFFER, p_mode );
-        return res;
+        return fopen( TMP_BUFFER, p_mode );
     }
 
     void close( FILE* p_file ) {

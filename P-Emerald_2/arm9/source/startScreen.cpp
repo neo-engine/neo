@@ -130,13 +130,13 @@ namespace SAVE {
                 "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
 
         if( gMod == DEVELOPER )
-            printf( "     %24sdev\n", VERSION );
+            printf( "    " __DATE__ " " __TIME__ " v%02hhu-dev\n", VERSION );
         else if( gMod == BETA )
-            printf( "    %24sbeta\n", VERSION );
+            printf( "   " __DATE__ " " __TIME__ " v%02hhu-beta\n", VERSION );
         else if( gMod == ALPHA )
-            printf( "   %24salpha\n", VERSION );
+            printf( "  " __DATE__ " " __TIME__ " v%02hhu-alpha\n", VERSION );
         else if( gMod == EMULATOR )
-            printf( "     %24semu\n", VERSION );
+            printf( "    " __DATE__ " " __TIME__ " v%02hhu-emu\n", VERSION );
         printf( "%32s", VERSION_NAME );
 
         consoleSetWindow( &IO::Top, 0, 23, 32, 1 );

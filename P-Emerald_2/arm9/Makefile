@@ -26,6 +26,7 @@ GRAPHICS	:=	data
 #---------------------------------------------------------------------------------
 ARCH	:=	-mthumb -mthumb-interwork
 
+
 CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wpsabi -O3 -D_FORTIFY_SOURCE=1\
 			-Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
 			-Wduplicated-branches -Wduplicated-cond -Wno-volatile\
@@ -33,7 +34,13 @@ CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wpsabi -O3 -D_FORTIFY_SOURCE=1\
 			-Wmissing-noreturn -Wsuggest-attribute=malloc -Wunused-macros\
 			-Wno-class-memaccess -march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 			-ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funsafe-loop-optimizations\
-			$(EXTRA_FLAGS) $(ARCH)
+			$(EXTRA_FLAGS) -DGAME_CODE="\"$(GAME_CODE)\"" -DVERSION=$(VERSION) \
+			-DGAME_TITLE="\"$(GAME_TITLE)\"" -DVERSION_NAME="\"$(VERSION_NAME)\"" $(ARCH)
+
+ifdef DESQUID
+CFLAGS	+=	-DDESQUID -fanalyzer -Wno-analyzer-null-dereference
+endif
+
 
 CFLAGS	+=	$(INCLUDE) -DARM9
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -std=c++2a -Wno-multichar

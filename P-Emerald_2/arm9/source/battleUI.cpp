@@ -56,7 +56,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "A.h"
 #include "Back.h"
 
-#include "Battle1.h"
+// #include "Battle1.h"
 
 #include "BattleBall1.h" //Normal
 #include "BattleBall2.h" //Statused

@@ -64,9 +64,9 @@ struct boxPokemon {
     u8   m_pPUps         = 0;
     u32  m_iVint         = 0; // hp/5, atk/5, def/5, satk/5, sdef/5, spd/5, nicked/1, isEgg/1
     u8   m_ribbons0[ 4 ] = {0};
-    bool m_fateful : 1   = 0;
-    bool m_isFemale : 1  = 0;
-    bool m_isGenderless : 1 = 0;
+    u8   m_fateful : 1   = 0;
+    u8   m_isFemale : 1  = 0;
+    u8   m_isGenderless : 1 = 0;
     u8   m_altForme : 5  = 0;
     u16  m_hatchPlace    = 0; // PT-like
     u16  m_gotPlace      = 0; // PT-like
@@ -330,6 +330,14 @@ struct pokemon {
              const char* p_ot, bool p_oTFemale, u8 p_shiny = 0, bool p_hiddenAbility = false,
              bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
              u8 p_ball = 0, u8 p_pokerus = 0, u8 p_forme = 0 );
+
+    /*
+     * @brief: Returns whether the pkmn can participate in a battle i.e. is not an egg and
+     * is not fainted.
+     */
+    constexpr bool canBattle( ) {
+        return !isEgg( ) && !m_stats.m_curHP;
+    }
 
     u16 getStat( u8 p_i ) const {
         return m_stats.getStat( p_i );

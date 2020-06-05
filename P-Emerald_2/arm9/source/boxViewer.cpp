@@ -265,7 +265,8 @@ namespace BOX {
         if( p_position < MAX_PKMN_PER_BOX ) {
             return &( *SAVE::SAV.getActiveFile( ).getCurrentBox( ) )[ p_position ];
         } else if( p_position < MAX_PKMN_PER_BOX + 6 ) {
-//            return SAVE::SAV.getActiveFile( )
+            return &SAVE::SAV.getActiveFile( ).getTeamPkmn( p_position - MAX_PKMN_PER_BOX )
+                ->m_boxdata;
         }
         return nullptr;
     }
@@ -275,7 +276,8 @@ namespace BOX {
             return &SAVE::SAV.getActiveFile( ).
                 m_storedPokemon[ p_position.first ][ p_position.second ];
         } else if( p_position.second < MAX_PKMN_PER_BOX + 6 ) {
-//            return SAVE::SAV.getActiveFile( )
+            return &SAVE::SAV.getActiveFile( ).getTeamPkmn( p_position.second - MAX_PKMN_PER_BOX )
+                ->m_boxdata;
         }
         return nullptr;
     }
@@ -288,7 +290,8 @@ namespace BOX {
                 std::memset( getPkmn( p_position ), 0, sizeof( boxPokemon ) );
             }
         } else if( p_position < MAX_PKMN_PER_BOX + 6 ) {
-//            return SAVE::SAV.getActiveFile( )
+            SAVE::SAV.getActiveFile( ).setTeamPkmn( p_position - MAX_PKMN_PER_BOX,
+                    p_pokemon );
         }
     }
 
@@ -300,7 +303,8 @@ namespace BOX {
                 std::memset( getPkmn( p_position ), 0, sizeof( boxPokemon ) );
             }
         } else if( p_position < MAX_PKMN_PER_BOX + 6 ) {
-//            return SAVE::SAV.getActiveFile( )
+            SAVE::SAV.getActiveFile( ).setTeamPkmn( p_position - MAX_PKMN_PER_BOX,
+                    p_pokemon );
         }
     }
 
@@ -312,7 +316,8 @@ namespace BOX {
                 std::memset( getPkmn( p_position ), 0, sizeof( boxPokemon ) );
             }
         } else if( p_position.second < MAX_PKMN_PER_BOX + 6 ) {
-//            return SAVE::SAV.getActiveFile( )
+            SAVE::SAV.getActiveFile( ).setTeamPkmn( p_position.second - MAX_PKMN_PER_BOX,
+                    p_pokemon );
         }
     }
 
@@ -324,7 +329,8 @@ namespace BOX {
                 std::memset( getPkmn( p_position ), 0, sizeof( boxPokemon ) );
             }
         } else if( p_position.second < MAX_PKMN_PER_BOX + 6 ) {
-//            return SAVE::SAV.getActiveFile( )
+            SAVE::SAV.getActiveFile( ).setTeamPkmn( p_position.second - MAX_PKMN_PER_BOX,
+                    p_pokemon );
         }
     }
 
@@ -344,25 +350,123 @@ namespace BOX {
         _heldPkmnPos = { 0, 0 };
     }
 
-    void boxViewer::runParty( ) {
-        // TODO
+    bool boxViewer::runParty( ) {
+        _boxUI.showParty( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) );
+        _selectedIdx = MAX_PKMN_PER_BOX;
+
+        cooldown = COOLDOWN_COUNT;
+        loop( ) {
+            scanKeys( );
+            touchRead( &touch );
+            swiWaitForVBlank( );
+            pressed = keysUp( );
+            held    = keysHeld( );
+
+            if( ( pressed & KEY_X ) ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                if( _heldPkmn.getSpecies( ) ) { returnPkmn( ); }
+                return true;
+            }
+            if( pressed & KEY_B ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                if( !_heldPkmn.getSpecies( ) ) {
+                    return false;
+                } else {
+                    returnPkmn( );
+                    _boxUI.hoverPkmn( getPkmn( _selectedIdx ), _selectedIdx );
+                }
+            }
+            if( pressed & KEY_SELECT ) {
+                _mode = mode( u8( _mode ) ^ 1 );
+                _boxUI.setMode( u8( _mode ) );
+            }
+
+            if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                if( _selectedIdx == u8( -1 ) ) {
+                    select( 0 );
+                } else if( _selectedIdx + 2
+                        >= MAX_PKMN_PER_BOX + SAVE::SAV.getActiveFile( ).getTeamPkmnCount( )
+                        && _selectedIdx
+                        < MAX_PKMN_PER_BOX + SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) {
+                    select( PARTY_BUTTON );
+                } else if( _selectedIdx == PARTY_BUTTON ) {
+                    select( MAX_PKMN_PER_BOX );
+                } else {
+                    select( 2 + _selectedIdx );
+                }
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
+                if( _selectedIdx == u8( -1 ) ) {
+                    select( 0 );
+                } else if( _selectedIdx < MAX_PKMN_PER_BOX + 2 ) {
+                    select( PARTY_BUTTON );
+                } else if( _selectedIdx == PARTY_BUTTON ) {
+                    select( MAX_PKMN_PER_BOX + SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) - 1 );
+                } else {
+                    select( _selectedIdx - 2 );
+                }
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+                if( _selectedIdx == u8( -1 ) ) {
+                    select( 0 );
+                } else if( _selectedIdx < MAX_PKMN_PER_BOX + 6 ) {
+                    select( MAX_PKMN_PER_BOX +
+                            ( _selectedIdx - MAX_PKMN_PER_BOX + 1 )
+                            % SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) );
+                }
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+                if( _selectedIdx == u8( -1 ) ) {
+                    select( 0 );
+                } else if( _selectedIdx < MAX_PKMN_PER_BOX + 6 ) {
+                    select( MAX_PKMN_PER_BOX + ( _selectedIdx - MAX_PKMN_PER_BOX +
+                                SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) - 1 )
+                            % SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) );
+                }
+                cooldown = COOLDOWN_COUNT;
+            } else if( pressed & KEY_A ) {
+                if( _selectedIdx == u8( -1 ) ) {
+                    select( 0 );
+                } else if( _selectedIdx < MAX_PKMN_PER_BOX + 6 ) { // player selects a pkmn
+                    auto tmp = getPkmn( _selectedIdx );
+                    if( tmp != nullptr && tmp->getSpecies( ) ) {
+                        if( _mode != MOVE && !_heldPkmn.getSpecies( ) ) {
+                            u8 res = runStatusChoice( );
+                            if( !res ) {
+                                cooldown = COOLDOWN_COUNT;
+                                continue;
+                            }
+                            if( res == 255 ) { // player pressed X
+                                return true;
+                            }
+                        }
+                    }
+                    takePkmn( _selectedIdx, _mode == MOVE );
+                } else if( _selectedIdx == PARTY_BUTTON ) {
+                    return false;
+                }
+                cooldown = COOLDOWN_COUNT;
+            }
+            swiWaitForVBlank( );
+        }
+        _boxUI.hideParty( );
     }
 
     u8 boxViewer::runStatusChoice( ) {
         pokemon curSel;
-        if( _selectedIdx < MAX_PKMN_PER_BOX + 6 && getPkmn( _selectedIdx ) != nullptr ) {
-            curSel = pokemon( *getPkmn( _selectedIdx ) );
-            _boxUI.selectPkmn( getPkmn( _selectedIdx ), _selectedIdx );
+        auto tmp = getPkmn( _selectedIdx );
+        if( _selectedIdx < MAX_PKMN_PER_BOX + 6 && tmp != nullptr ) {
+            curSel = pokemon( *tmp );
+            _boxUI.selectPkmn( tmp, _selectedIdx );
         } else {
             _boxUI.selectPkmn( nullptr, 0 );
             return 0;
         }
 
         u8 selectedBtn = 0;
-        std::vector<boxUI::button> btns = std::vector<boxUI::button>( );
+        std::vector<boxUI::button> btns = { boxUI::BUTTON_PKMN_MOVE, boxUI::BUTTON_PKMN_STATUS };
 
-        btns.push_back( boxUI::BUTTON_PKMN_MOVE );
-        btns.push_back( boxUI::BUTTON_PKMN_STATUS );
         if( !curSel.isEgg( ) ) {
             btns.push_back( boxUI::BUTTON_PKMN_RELEASE );
             btns.push_back( boxUI::BUTTON_PKMN_GIVE_ITEM );
@@ -371,7 +475,9 @@ namespace BOX {
             }
         }
         btns.push_back( boxUI::BUTTON_PKMN_CANCEL );
-        _boxUI.selectButton( btns[ selectedBtn ] );
+
+        // Using "at" here to tame -fanalyze
+        _boxUI.selectButton( btns.at( selectedBtn ) );
 
         cooldown = COOLDOWN_COUNT;
         loop( ) {
@@ -457,7 +563,7 @@ namespace BOX {
                                 SAVE::SAV.getActiveFile( ).m_bag.insert(
                                         BAG::toBagType( ITEM::getItemData( curItm ).m_itemType ), curItm, 1 );
                             }
-                            auto tmp = getPkmn( _selectedIdx );
+                            tmp = getPkmn( _selectedIdx );
                             if( tmp != nullptr ) { tmp->giveItem( itm ); }
                         }
                         _boxUI.init( );
@@ -466,7 +572,7 @@ namespace BOX {
                         break;
                     }
                     case boxUI::BUTTON_PKMN_TAKE_ITEM: {
-                        auto tmp = getPkmn( _selectedIdx );
+                        tmp = getPkmn( _selectedIdx );
                         if( tmp != nullptr ) {
                             u16 acI = tmp->takeItem( );
                             SAVE::SAV.getActiveFile( ).m_bag.insert(

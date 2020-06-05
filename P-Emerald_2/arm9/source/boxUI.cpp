@@ -230,6 +230,22 @@ namespace BOX {
                                        false, false, false, OBJPRIORITY_3, true );
             }
         }
+        // team pkmn
+        for( u8 i = 0; i < 3; ++i ) {
+            u8 pos = 2 * i;
+            tileCnt
+                = IO::loadSpriteB( SPR_PKMN_START_OAM_SUB + 30 + pos, tileCnt, 32,
+                        32 + 26 * i, 32, 32, NoPkmnPal, NoPkmnTiles, NoPkmnTilesLen,
+                        false, false, true, OBJPRIORITY_1, true );
+        }
+        for( u8 i = 0; i < 3; ++i ) {
+            u8 pos = 2 * i + 1;
+            tileCnt
+                = IO::loadSpriteB( SPR_PKMN_START_OAM_SUB + 30 + pos, tileCnt, 72,
+                        32 + 26 * i, 32, 32, NoPkmnPal, NoPkmnTiles, NoPkmnTilesLen,
+                        false, false, true, OBJPRIORITY_1, true );
+        }
+
     }
 
     std::vector<boxUI::interact> boxUI::getInteractions( ) {
@@ -930,11 +946,29 @@ namespace BOX {
     }
 
     void boxUI::showParty( pokemon* p_party, u8 p_partyLen ) {
-        // TODO
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+        // Load some placeholder
+        for( u8 i = MAX_PKMN_PER_BOX; i < MAX_PKMN_PER_BOX + p_partyLen; ++i ) {
+            if( p_party[ i ].getSpecies( ) ) {
+                IO::loadSpriteB(
+                    SPR_PKMN_START_OAM_SUB + i, oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex,
+                    oam[ SPR_PKMN_START_OAM_SUB + i ].x, oam[ SPR_PKMN_START_OAM_SUB + i ].y, 32,
+                    32, NoPkmnPal, NoPkmnTiles, NoPkmnTilesLen, false, false, false, OBJPRIORITY_1,
+                    true );
+            } else {
+                oam[ SPR_PKMN_START_OAM_SUB + i ].isHidden = true;
+            }
+        }
+        IO::updateOAM( true );
     }
 
     void boxUI::hideParty( ) {
-        // TODO
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+        // Load some placeholder
+        for( u8 i = MAX_PKMN_PER_BOX; i < MAX_PKMN_PER_BOX + 6; ++i ) {
+            oam[ SPR_PKMN_START_OAM_SUB + i ].isHidden = true;
+        }
+        IO::updateOAM( true );
     }
 
 } // namespace BOX
