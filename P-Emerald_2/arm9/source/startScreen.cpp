@@ -94,11 +94,12 @@ namespace SAVE {
 //            testTeam[ i ]
 //                = pokemon( 1 + rand( ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, false,
 //                        i == 3 );
-//            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
+            //            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
             //            SAVE::SAV.getActiveFile( ).storePkmn(
             //                pokemon( 1 + ( 3 * i ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, rand( ) % 2, 3 * i ==
             //                    490, rand( ) % 20 ) );
  //       }
+ //
         /*        testTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_SURF;
                   testTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_WHIRLPOOL;
                   testTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
@@ -115,12 +116,12 @@ namespace SAVE {
         // BOX::boxViewer bxv;
         // bxv.run( );
 
-        /*
-        STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
-        sts.run( );
 
-        */
-//        STS::statusScreen psts = STS::statusScreen( testTeam );
+//        STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
+//        sts.run( );
+
+
+//        STS::statusScreen psts = STS::statusScreen( SAVE::SAV.getActiveFile( ).getTeamPkmn( 1 ) );
 //        psts.run( );
 
         // END TEST

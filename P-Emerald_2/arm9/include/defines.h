@@ -48,6 +48,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define PKMN_NAMELENGTH 15
 #define ITEM_NAMELENGTH 20
 #define MOVE_NAMELENGTH 20
+#define MOVE_DSCRLENGTH 200
 #define ABILITY_NAMELENGTH 20
 #define ABILITY_DSCRLENGTH 200
 #define LOCATION_NAMELENGTH 25

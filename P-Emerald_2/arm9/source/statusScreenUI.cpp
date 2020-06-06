@@ -53,7 +53,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "infopage4.h"
 #include "movebox1.h"
 #include "movebox2.h"
+#include "movebox3.h"
+#include "noselection_160_64_1.h"
+#include "noselection_160_64_2.h"
 #include "noselection_32_64.h"
+#include "noselection_64_20.h"
 #include "noselection_64_32.h"
 #include "noselection_96_32_1.h"
 #include "noselection_96_32_2.h"
@@ -118,9 +122,11 @@ namespace STS {
 #define SPR_MOVE_OAM_SUB( p_move ) ( 34 + 6 * ( p_move ) )
 #define SPR_ABILITY_OAM_SUB 60
 #define SPR_ARROW_BACK_OAM_SUB 70
+#define SPR_WINDOW_ICON_OAM_SUB( p_page ) ( 71 + ( p_page ) )
 #define SPR_WINDOW_PKMN_OAM_SUB 71
 #define SPR_WINDOW_MOVE_OAM_SUB 72
 // #define SPR_WINDOW_CONTEST_OAM_SUB 73
+#define SPR_MOVE_DETAILS_OAM_SUB 75
 
 #define SPR_INFOPAGE_PAL_SUB 0
 #define SPR_ARROW_X_PAL_SUB 1
@@ -491,56 +497,56 @@ namespace STS {
                 tileCnt = IO::loadSprite(
                     SPR_MOVE_OAM_SUB( pos ), SPR_TYPE_PAL_SUB( pos ), tileCnt, 29, 44 + i * 44, 16,
                     32, 0, movebox1Tiles, movebox1TilesLen, false, false,
-                    !p_pokemon->m_boxdata.m_moves[ pos ], OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
+                    !p_pokemon->getMove( pos ), OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
                 tileCnt = IO::loadSprite(
                     SPR_MOVE_OAM_SUB( pos ) + 1, SPR_TYPE_PAL_SUB( pos ), tileCnt, 29 + 16,
                     44 + i * 44, 16, 32, 0, movebox2Tiles, movebox2TilesLen, false, false,
-                    !p_pokemon->m_boxdata.m_moves[ pos ], OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
+                    !p_pokemon->getMove( pos ), OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
             } else {
                 IO::loadSprite( SPR_MOVE_OAM_SUB( pos ), SPR_TYPE_PAL_SUB( pos ),
                                 oam[ SPR_MOVE_OAM_SUB( 0 ) ].gfxIndex, 29, 44 + i * 44, 16, 32, 0,
-                                0, 0, false, false, !p_pokemon->m_boxdata.m_moves[ pos ],
+                                0, 0, false, false, !p_pokemon->getMove( pos ),
                                 OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
                 IO::loadSprite( SPR_MOVE_OAM_SUB( pos ) + 1, SPR_TYPE_PAL_SUB( pos ),
                                 oam[ SPR_MOVE_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + 16, 44 + i * 44, 16,
-                                32, 0, 0, 0, false, false, !p_pokemon->m_boxdata.m_moves[ pos ],
+                                32, 0, 0, 0, false, false, !p_pokemon->getMove( pos ),
                                 OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
             }
             for( u8 j = 2; j < 5; j++ ) {
                 IO::loadSprite( SPR_MOVE_OAM_SUB( pos ) + j, SPR_TYPE_PAL_SUB( pos ),
                                 oam[ SPR_MOVE_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + j * 16, 44 + i * 44,
-                                16, 32, 0, 0, 0, false, false, !p_pokemon->m_boxdata.m_moves[ pos ],
+                                16, 32, 0, 0, 0, false, false, !p_pokemon->getMove( pos ),
                                 OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
             }
             IO::loadSprite( SPR_MOVE_OAM_SUB( pos ) + 5, SPR_TYPE_PAL_SUB( pos ),
                             oam[ SPR_MOVE_OAM_SUB( 0 ) ].gfxIndex, 29 + 5 * 16, 44 + i * 44, 16, 32,
-                            0, 0, 0, true, true, !p_pokemon->m_boxdata.m_moves[ pos ],
+                            0, 0, 0, true, true, !p_pokemon->getMove( pos ),
                             OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
         }
         for( u8 i = 1; i < 3; i++ ) {
             u8 pos = 2 * i - 1;
             IO::loadSprite( SPR_MOVE_OAM_SUB( pos ), SPR_TYPE_PAL_SUB( pos ),
                             oam[ SPR_MOVE_OAM_SUB( 0 ) ].gfxIndex, 131, 44 + i * 44, 16, 32, 0, 0,
-                            0, false, false, !p_pokemon->m_boxdata.m_moves[ pos ], OBJPRIORITY_3,
+                            0, false, false, !p_pokemon->getMove( pos ), OBJPRIORITY_3,
                             p_bottom, OBJMODE_NORMAL );
             for( u8 j = 1; j < 5; j++ ) {
                 IO::loadSprite( SPR_MOVE_OAM_SUB( pos ) + j, SPR_TYPE_PAL_SUB( pos ),
                                 oam[ SPR_MOVE_OAM_SUB( 0 ) + 1 ].gfxIndex, 131 + j * 16,
                                 44 + i * 44, 16, 32, 0, 0, 0, false, false,
-                                !p_pokemon->m_boxdata.m_moves[ pos ], OBJPRIORITY_3, p_bottom,
+                                !p_pokemon->getMove( pos ), OBJPRIORITY_3, p_bottom,
                                 OBJMODE_NORMAL );
             }
             IO::loadSprite( SPR_MOVE_OAM_SUB( pos ) + 5, SPR_TYPE_PAL_SUB( pos ),
                             oam[ SPR_MOVE_OAM_SUB( 0 ) ].gfxIndex, 131 + 5 * 16, 44 + i * 44, 16,
-                            32, 0, 0, 0, true, true, !p_pokemon->m_boxdata.m_moves[ pos ],
+                            32, 0, 0, 0, true, true, !p_pokemon->getMove( pos ),
                             OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
         }
 
         // type icons
         for( u8 i = 0; i < 4; ++i ) {
             type t;
-            if( p_pokemon->m_boxdata.m_moves[ i ] != M_HIDDEN_POWER ) {
-                auto mdata = MOVE::getMoveData( p_pokemon->m_boxdata.m_moves[ i ] );
+            if( p_pokemon->getMove( i ) != M_HIDDEN_POWER ) {
+                auto mdata = MOVE::getMoveData( p_pokemon->getMove( i ) );
                 t          = mdata.m_type;
             } else {
                 t = p_pokemon->getHPType( );
@@ -573,6 +579,41 @@ namespace STS {
                                   INFO_X_SUB + 64 + 68, INFO_Y_SUB, 64, 64, 0,
                                   ability2Tiles, ability2TilesLen, false, false, false,
                                   OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+
+        // move details
+        IO::loadSprite( SPR_MOVE_DETAILS_OAM_SUB + 7, SPR_BOX_PAL_SUB, tileCnt,
+                        INFO_X_SUB - 12, INFO_Y_SUB - 2, 32, 64, 0, 0, 0, false, false, true,
+                        OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( SPR_MOVE_DETAILS_OAM_SUB + 13, SPR_BOX_PAL_SUB, tileCnt,
+                                  INFO_X_SUB + 64 + 68 + 32, INFO_Y_SUB - 2, 32, 64,
+                                  0, noselection_160_64_1Tiles, noselection_160_64_1TilesLen,
+                                  true, true, true,
+                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        for( u8 i = 1; i < 5; ++i ) {
+            IO::loadSprite( SPR_MOVE_DETAILS_OAM_SUB + i + 7, SPR_BOX_PAL_SUB, tileCnt,
+                        INFO_X_SUB - 12 + 32 * i, INFO_Y_SUB - 2,
+                        32, 64, 0, 0, 0, false, false, true,
+                        OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        }
+        tileCnt = IO::loadSprite( SPR_MOVE_DETAILS_OAM_SUB + 12, SPR_BOX_PAL_SUB, tileCnt,
+                                  INFO_X_SUB + 64 + 68, INFO_Y_SUB - 2, 32, 64,
+                                  0, noselection_160_64_2Tiles, noselection_160_64_2TilesLen,
+                                  false, false, true,
+                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+
+        IO::loadSprite( SPR_MOVE_DETAILS_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt,
+                        INFO_X_SUB + 28, INFO_Y_SUB + 56 - 2, 32, 32, 0, 0, 0, false, false, true,
+                        OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        for( u8 i = 0; i < 5; ++i ) {
+            IO::loadSprite( SPR_MOVE_DETAILS_OAM_SUB + 6 - i, SPR_BOX_PAL_SUB, tileCnt,
+                        INFO_X_SUB + 60 + 24 * i,
+                        INFO_Y_SUB + 44 - 2, 32, 32, 0, 0, 0, true, true, true,
+                        OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        }
+        IO::loadSprite( SPR_MOVE_DETAILS_OAM_SUB + 1, SPR_BOX_PAL_SUB, tileCnt,
+                        INFO_X_SUB + 132 + 24, INFO_Y_SUB + 44 - 2, 32, 32, 0,
+                        noselection_64_20Tiles, noselection_64_20TilesLen, true, true, true,
+                        OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
 
         // Build the shared pals
         IO::copySpritePal( arrow_upPal, SPR_ARROW_X_PAL_SUB, 0, 2 * 4, p_bottom );
@@ -766,12 +807,24 @@ namespace STS {
         IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
         bgSetPriority( IO::bg3sub, 3 );
         _data = getPkmnData( p_pokemon->getSpecies( ), p_pokemon->getForme( ) );
+        for( u8 i = 0; i < 4; ++i ) {
+            if( p_pokemon->getMove( i ) ) {
+                _moves[ i ] = MOVE::getMoveData( p_pokemon->getMove( i ) );
+            }
+        }
 
         initTopScreen( p_pokemon );
         initBottomScreen( p_pokemon );
 
         _needsInit = true;
         draw( p_pokemon, p_initialPage );
+
+        bgSetScale( IO::bg3sub, 1 << 7, 1 << 7 );
+        bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
+        bgSetScroll( IO::bg3sub, 0, 0 );
+        bgSetScroll( IO::bg3, 0, 0 );
+
+        IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
 
         dmaCopy( partybgPal, BG_PALETTE, 3 * 2 );
         dmaCopy( statustopPal + 3, BG_PALETTE + 3, 8 * 2 );
@@ -799,14 +852,9 @@ namespace STS {
             pal[ 245 ] = IO::RGB( 30, 15, 12 ); // hp bar red 1
             pal[ 246 ] = IO::RGB( 20, 7, 7 );   // hp bar red 2
         }
-        bgSetScale( IO::bg3sub, 1 << 7, 1 << 7 );
-        bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
-        bgSetScroll( IO::bg3sub, 0, 0 );
-        bgSetScroll( IO::bg3, 0, 0 );
         dmaCopy( partybg2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
         dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
 
-        IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
         _needsInit = false;
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
         REG_BLDCNT       = BLEND_ALPHA | BLEND_DST_BG3;
@@ -864,6 +912,8 @@ namespace STS {
             IO::updateOAM( true );
             IO::updateOAM( false );
 
+            dmaCopy( partybg2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
+            dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
             if( !_needsInit ) {
                 IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
                 REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
@@ -871,8 +921,6 @@ namespace STS {
                 REG_BLDCNT       = BLEND_ALPHA | BLEND_DST_BG3;
                 REG_BLDALPHA     = 0xff | ( 0x05 << 8 );
             }
-            dmaCopy( partybg2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
-            dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
             bgUpdate( );
             return;
         }
@@ -1184,6 +1232,9 @@ namespace STS {
 
             for( u8 i = 0; i < 5; ++i ) { oamSub[ SPR_ABILITY_OAM_SUB + i ].isHidden = false; }
             for( u8 i = 0; i < 12; ++i ) { oamSub[ SPR_INFOPAGE_START_OAM_SUB + i ].isHidden = true; }
+            for( u8 i = 0; i < 4; ++i ) {
+                IO::copySpritePal( movebox1Pal + 4, SPR_TYPE_PAL_SUB( i ), 4, 2 * 4, true );
+            }
 
             // Ability
             IO::regularFont->setColor( IO::COLOR_IDX, 1 );
@@ -1208,15 +1259,14 @@ namespace STS {
             IO::smallFont->setColor( 0, 2 );
             // Moves
             for( int i = 0; i < 4; i++ ) {
-                if( !p_pokemon->m_boxdata.m_moves[ i ] ) continue;
+                if( !p_pokemon->getMove( i ) ) continue;
 
-                auto mdata = MOVE::getMoveData( p_pokemon->m_boxdata.m_moves[ i ] );
                 oamSub[ SPR_TYPE_OAM_SUB( i ) ].isHidden = false;
                 for( u8 j = 0; j < 6; j++ ) {
                     oamSub[ SPR_MOVE_OAM_SUB( i ) + j ].isHidden = false;
                 }
 
-                auto mname = MOVE::getMoveName( p_pokemon->m_boxdata.m_moves[ i ] );
+                auto mname = MOVE::getMoveName( p_pokemon->getMove( i ) );
                 if( mname.length( ) > 18 ) {
                     snprintf( buffer, 20, "%s.", mname.c_str( ) );
                 } else {
@@ -1228,7 +1278,8 @@ namespace STS {
                                                IO::font::CENTER );
 
                 snprintf( buffer, 49, GET_STRING( 377 ), p_pokemon->m_boxdata.m_curPP[ i ],
-                          s8( mdata.m_pp * ( ( 5 + p_pokemon->m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                          s8( _moves[ i ].m_pp *
+                              ( ( 5 + p_pokemon->m_boxdata.PPupget( i ) ) / 5.0 ) ) );
                 IO::smallFont->printStringC( buffer, oamSub[ SPR_MOVE_OAM_SUB( i ) ].x + 91,
                                              oamSub[ SPR_MOVE_OAM_SUB( i ) ].y + 13, true,
                                              IO::font::RIGHT );
@@ -1277,6 +1328,111 @@ namespace STS {
         IO::animateBG( p_frame, IO::bg3sub );
         bgUpdate( );
     }
+
+    void statusScreenUI::showDetails( pokemon* p_pokemon, u8 p_page, u8 p_detailsPage ) {
+        _currentPage = -1;
+        char buffer[ 50 ];
+        switch( p_page ) {
+            case 1: {
+                // highlight move
+                for( u8 i = 0; i < 4; ++i ) {
+                    if( i == p_detailsPage ) {
+                        IO::copySpritePal( movebox3Pal + 4, SPR_TYPE_PAL_SUB( i ),
+                                4, 2 * 4, true );
+                    } else {
+                        IO::copySpritePal( movebox1Pal + 4, SPR_TYPE_PAL_SUB( i ),
+                                4, 2 * 4, true );
+                    }
+                }
+                // hide ability window
+                for( u8 i = 0; i < 5; ++i ) {
+                    IO::Oam->oamBuffer[ SPR_ABILITY_OAM_SUB + i ].isHidden =
+                        p_detailsPage < 4;
+                }
+                // show move details window
+                for( u8 i = 0; i < 14; ++i ) {
+                    IO::Oam->oamBuffer[ SPR_MOVE_DETAILS_OAM_SUB + i ].isHidden =
+                        p_detailsPage >= 4;
+                }
+
+                // hide prev/next pkmn icons
+                IO::Oam->oamBuffer[ SPR_ARROW_UP_OAM_SUB ].isHidden = !_allowKeyUp
+                    || p_detailsPage < 4;
+                IO::Oam->oamBuffer[ SPR_ARROW_DOWN_OAM_SUB ].isHidden = !_allowKeyDown
+                    || p_detailsPage < 4;
+                IO::Oam->oamBuffer[ SPR_NAVIGATION_OAM_SUB( 2 ) ].isHidden = !_allowKeyUp
+                    || p_detailsPage < 4;
+                IO::Oam->oamBuffer[ SPR_NAVIGATION_OAM_SUB( 1 ) ].isHidden = !_allowKeyDown
+                    || p_detailsPage < 4;
+
+                // hide page icons
+                for( u8 i = 0; i < getPageCount( ); ++i ) {
+                    IO::Oam->oamBuffer[ SPR_PAGE_OAM_SUB( i ) ].isHidden = ( i == p_page )
+                        || p_pokemon->isEgg( ) || p_detailsPage < 4;
+                    IO::Oam->oamBuffer[ SPR_WINDOW_ICON_OAM_SUB( i ) ].isHidden =
+                        ( i == p_page ) || p_pokemon->isEgg( ) || p_detailsPage < 4;
+                }
+
+
+                // Clear text window
+                dmaCopy( statussubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 78 );
+
+                // Write move details
+                if( p_detailsPage < 4 ) {
+                    IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                    IO::regularFont->setColor( 0, 2 );
+
+                    // Move descr
+                    IO::regularFont->printBreakingStringC(
+                            MOVE::getMoveDescr( p_pokemon->getMove( p_detailsPage ) ).c_str( ),
+                            INFO_X_SUB - 8, INFO_Y_SUB + 3 - 2, 200, true, IO::font::LEFT, 13 );
+
+                    // power / acc
+                    char buffer2[ 25 ] = { 0 }, buffer3[ 25 ] = { 0 };
+
+                    if( _moves[ p_detailsPage ].m_basePower ) {
+                        snprintf( buffer2, 24, GET_STRING( 390 ),
+                                _moves[ p_detailsPage ].m_basePower );
+                    }
+                    if( _moves[ p_detailsPage ].m_accuracy > 0 &&
+                            _moves[ p_detailsPage ].m_accuracy <= 100 ) {
+                        snprintf( buffer3, 24, GET_STRING( 391 ),
+                                _moves[ p_detailsPage ].m_accuracy );
+                    } else {
+                        snprintf( buffer3, 24, GET_STRING( 392 ) );
+                    }
+
+                    snprintf( buffer, 49, "%s %s", buffer2, buffer3 );
+                    IO::regularFont->printStringC( buffer, INFO_X_SUB + 190 - 16,
+                            INFO_Y_SUB + 58 - 2, true, IO::font::RIGHT );
+                } else {
+                    // restore ability
+                    IO::regularFont->setColor( IO::COLOR_IDX, 1 );
+                    IO::regularFont->setColor( 0, 2 );
+                    IO::regularFont->printStringC( GET_STRING( 363 ), INFO_X_SUB + 190 - 8,
+                            INFO_Y_SUB, true, IO::font::RIGHT );
+
+                    IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                    auto aname = getAbilityName( p_pokemon->getAbility( ) );
+                    IO::regularFont->printStringC( aname.c_str( ), INFO_X_SUB - 5,
+                            INFO_Y_SUB + 3, true );
+
+                    // Ability description
+                    IO::regularFont->printBreakingStringC(
+                            getAbilityDescr( p_pokemon->getAbility( ) ).c_str( ),
+                            INFO_X_SUB, INFO_Y_SUB + 18, 188, true, IO::font::LEFT, 13 );
+                    IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                    IO::regularFont->setColor( 0, 2 );
+                }
+
+
+                IO::updateOAM( true );
+                break;
+            }
+            default:
+                break;
+        }
+    }
 } // namespace STS
 
 //
@@ -1312,99 +1468,6 @@ namespace STS {
 //            IO::regularFont->printString( buffer, 88, 0, p_bottom );
 //        }
 //    }
-//
-//    // Draw extra information about the specified move
-//    bool statusScreenUI::drawMove( const pokemon& p_pokemon, u8 p_moveIdx, bool p_bottom ) {
-//        auto currPkmn = p_pokemon;
-//        auto Oam      = p_bottom ? IO::Oam : IO::OamTop;
-//        auto pal      = IO::BG_PAL( p_bottom );
-//
-//        if( !p_pokemon->m_boxdata.m_moves[ p_moveIdx ] ) return false;
-//        if( p_pokemon->isEgg( ) ) return false;
-//
-//        for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ TYPE_IDX + i ].isHidden = true;
-//        for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
-//
-//        pal[ IO::WHITE_IDX ] = IO::WHITE;
-//        pal[ IO::GRAY_IDX ]  = IO::RGB( 20, 20, 20 );
-//        pal[ IO::BLACK_IDX ] = IO::BLACK;
-//        IO::regularFont->setColor( 0, 0 );
-//        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-//        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-//        IO::boldFont->setColor( 0, 0 );
-//        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
-//        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
-//
-//        u8 isNotEgg = 1;
-//        drawPkmnInformation( currPkmn, isNotEgg, false, p_bottom );
-//        if( !isNotEgg ) return false; // This should never occur
-//
-//        IO::regularFont->printString( "Attackeninfos", 32, 0, p_bottom );
-//        IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX
-//        ].gfxIndex, 0,
-//                        -5, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false,
-//                        OBJPRIORITY_0, p_bottom );
-//
-//        auto mdata = MOVE::getMoveData( p_pokemon->m_boxdata.m_moves[ p_moveIdx ] );
-//
-//        pal[ IO::COLOR_IDX ] = IO::GREEN;
-//        if( mdata.m_type == _data.m_baseForme.m_types[ 0 ]
-//            || mdata.m_type == _data.m_baseForme.m_types[ 1 ] ) {
-//            IO::regularFont->setColor( IO::COLOR_IDX, 1 );
-//            IO::regularFont->setColor( IO::WHITE_IDX, 2 );
-//        } else {
-//            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-//            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-//        }
-//        IO::regularFont->printString( MOVE::getMoveName( p_pokemon->m_boxdata.m_moves[ p_moveIdx
-//        ],
-//                    CURRENT_LANGUAGE ).c_str( ), 120, 32, p_bottom );
-//        IO::regularFont->setColor( IO::GRAY_IDX, 1 );
-//        IO::regularFont->setColor( IO::WHITE_IDX, 2 );
-//
-//        IO::loadTypeIcon( mdata.m_type, 222, 30, TYPE_IDX + p_moveIdx,
-//                          TYPE_PAL( p_moveIdx ), Oam->oamBuffer[ TYPE_IDX + p_moveIdx
-//                          ].gfxIndex, p_bottom, SAVE::SAV.getActiveFile(
-//                          ).m_options.m_language );
-//        IO::loadDamageCategoryIcon(
-//            mdata.m_category, 222, 46, ATK_DMGTYPE_IDX( mdata.m_category ),
-//            DMG_TYPE_PAL( mdata.m_category ),
-//            Oam->oamBuffer[ ATK_DMGTYPE_IDX( mdata.m_category ) ].gfxIndex, p_bottom );
-//        char buffer[ 20 ];
-//
-//        snprintf(
-//            buffer, 19,
-//            "AP %2hhu"
-//            "/"
-//            "%2hhu ",
-//            p_pokemon->m_boxdata.m_curPP[ p_moveIdx ], mdata.m_pp
-//            * ( ( 5 + ( ( p_pokemon->m_boxdata.m_pPUps >> ( 2 * p_moveIdx ) ) % 4 ) ) / 5 ) );
-//        IO::regularFont->printString( buffer, 128, 47, p_bottom );
-//
-//        IO::regularFont->printString( "Stärke", 128, 60, p_bottom );
-//        if( mdata.m_basePower )
-//            snprintf( buffer, 19, "%3i", mdata.m_basePower );
-//        else
-//            snprintf( buffer, 19, "---" );
-//        IO::regularFont->printString( buffer, 226, 60, p_bottom );
-//
-//        IO::regularFont->printString( "Genauigkeit", 128, 72, p_bottom );
-//        if( mdata.m_accuracy )
-//            snprintf( buffer, 19, "%3i", mdata.m_accuracy );
-//        else
-//            snprintf( buffer, 19, "---" );
-//        IO::regularFont->printString( buffer, 226, 72, p_bottom );
-//
-//        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-//        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-////        IO::regularFont->printString(
-////            FS::breakString( currMove->description( ), IO::regularFont, 120 ).c_str( ), 128,
-/// 84, /            p_bottom, IO::font::LEFT, 11 );
-//
-//        IO::updateOAM( p_bottom );
-//        return true;
-//    }
-//
 //    // Draw extra information about the specified ribbon
 //    bool statusScreenUI::drawRibbon( const pokemon& p_pokemon, u8 p_ribbonIdx, bool p_bottom )
 //    {

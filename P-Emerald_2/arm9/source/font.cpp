@@ -306,6 +306,7 @@ namespace IO {
         s16 putX = p_x, putY = p_y;
 
         s16 lineWd = stringMaxWidthC( p_string, p_maxWidth, p_breakChar );
+
         if( p_alignment == RIGHT ) putX = p_x - lineWd;
         if( p_alignment == CENTER ) putX = p_x - lineWd / 2;
 
@@ -314,6 +315,7 @@ namespace IO {
                 putY += p_yDistance;
                 putX = ( p_x -= p_adjustX );
                 lineWd = stringMaxWidthC( p_string + current_char + 1, p_maxWidth, p_breakChar );
+
                 if( p_alignment == RIGHT ) putX = p_x - lineWd;
                 if( p_alignment == CENTER ) putX = p_x - lineWd / 2;
 
@@ -498,7 +500,7 @@ namespace IO {
             u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             width += _widths[ c ];
-            if( width > p_maxWidth ) { return lasttmpwidth; }
+            if( width >= p_maxWidth ) { return lasttmpwidth; }
             current_char++;
         }
 
@@ -516,7 +518,7 @@ namespace IO {
             u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             width += _widths[ c ] - 1;
-            if( width > p_maxWidth ) { return lasttmpwidth; }
+            if( width >= p_maxWidth ) { return lasttmpwidth; }
             current_char++;
         }
 

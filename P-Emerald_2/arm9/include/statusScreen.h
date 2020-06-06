@@ -44,6 +44,7 @@ namespace STS {
         bool _allowKeyUp;
         bool _allowKeyDown;
 
+        bool runDetails( );
         void select( u8 p_newPage );
 
       public:

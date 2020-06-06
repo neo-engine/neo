@@ -56,6 +56,7 @@ const char ITEM_DATA_PATH[]     = "nitro:/DATA/ITEM_DATA/";
 const char ABILITY_NAME_PATH[]  = "nitro:/DATA/ABTY_NAME/";
 const char ABILITY_DSCR_PATH[]  = "nitro:/DATA/ABTY_DSCR/";
 const char MOVE_NAME_PATH[]     = "nitro:/DATA/MOVE_NAME/";
+const char MOVE_DSCR_PATH[]     = "nitro:/DATA/MOVE_DSCR/";
 const char MOVE_DATA_PATH[]     = "nitro:/DATA/MOVE_DATA/";
 const char POKEMON_NAME_PATH[]  = "nitro:/DATA/PKMN_NAME/";
 const char POKEMON_DATA_PATH[]  = "nitro:/DATA/PKMN_DATA/";
@@ -390,6 +391,25 @@ namespace MOVE {
 
     std::string getMoveName( const u16 p_moveId ) {
         return getMoveName( p_moveId, CURRENT_LANGUAGE );
+    }
+
+    bool getMoveDescr( const u16 p_moveId, const u8 p_language, char* p_out ) {
+        FILE* f = FS::openSplit( MOVE_DSCR_PATH, p_moveId, ".str" );
+        if( !f ) return false;
+
+        for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, MOVE_DSCRLENGTH, f ); }
+        fclose( f );
+        return true;
+    }
+
+    std::string getMoveDescr( const u16 p_moveId, const u8 p_language ) {
+        char tmpbuf[ MOVE_DSCRLENGTH ];
+        if( !getMoveDescr( p_moveId, p_language, tmpbuf ) ) { return "---"; }
+        return std::string( tmpbuf );
+    }
+
+    std::string getMoveDescr( const u16 p_moveId ) {
+        return getMoveDescr( p_moveId, CURRENT_LANGUAGE );
     }
 
     moveData getMoveData( const u16 p_moveId ) {

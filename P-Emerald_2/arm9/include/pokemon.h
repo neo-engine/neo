@@ -95,6 +95,10 @@ struct boxPokemon {
                 bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
                 u8 p_ball = 0, u8 p_pokerus = 0, u8 p_forme = 0, pkmnData* p_data = nullptr );
 
+    constexpr u16 getMove( u8 p_idx ) const {
+        return m_moves[ p_idx ];
+    }
+
     constexpr bool wasEgg( ) const {
         return !!m_gotPlace;
     }
@@ -344,6 +348,10 @@ struct pokemon {
     }
     inline void setStat( u8 p_i, u16 p_val ) {
         m_stats.setStat( p_i, p_val );
+    }
+
+    constexpr u16 getMove( u8 p_idx ) const {
+        return m_boxdata.getMove( p_idx );
     }
 
     /*

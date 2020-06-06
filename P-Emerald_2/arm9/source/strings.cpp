@@ -741,5 +741,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"%s hatched from the Egg!", "%s schl\xfcpfte aus dem Ei!"},
 
     // 390
+    {"Power: %hhu", "St\xe4rke: %hhu"},
+    {"Accuracy: %hhu", "Genauigkeit: %hhu"},
+    {"(never misses)", "(trifft immer)"},
 
 };

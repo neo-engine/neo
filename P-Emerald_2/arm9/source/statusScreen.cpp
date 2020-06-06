@@ -50,6 +50,58 @@ namespace STS {
         }
     }
 
+    bool statusScreen::runDetails( ) {
+        u8 currentDetailChoice = 0;
+        _ui->showDetails( _pokemon, _currentPage, currentDetailChoice );
+        loop( ) {
+            _ui->animate( _frame++ );
+            scanKeys( );
+            touchRead( &touch );
+            swiWaitForVBlank( );
+            pressed = keysUp( );
+            held    = keysHeld( );
+
+            if( pressed & KEY_X ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                return true;
+            }
+            if( pressed & KEY_B ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                break;
+            } else if( _allowKeyDown && GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+                currentDetailChoice = ( currentDetailChoice + 2 )
+                    % _ui->getDetailsPageCount( _pokemon, _currentPage );
+                _ui->showDetails( _pokemon, _currentPage, currentDetailChoice );
+                cooldown = COOLDOWN_COUNT;
+            } else if( _allowKeyUp && GET_KEY_COOLDOWN( KEY_UP ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+                currentDetailChoice = ( currentDetailChoice +
+                        _ui->getDetailsPageCount( _pokemon, _currentPage ) - 2 )
+                    % _ui->getDetailsPageCount( _pokemon, _currentPage );
+                _ui->showDetails( _pokemon, _currentPage, currentDetailChoice );
+                cooldown = COOLDOWN_COUNT;
+            } else if( _allowKeyDown && GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+                currentDetailChoice = ( currentDetailChoice + 1 )
+                    % _ui->getDetailsPageCount( _pokemon, _currentPage );
+                _ui->showDetails( _pokemon, _currentPage, currentDetailChoice );
+                cooldown = COOLDOWN_COUNT;
+            } else if( _allowKeyUp && GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+                currentDetailChoice = ( currentDetailChoice +
+                        _ui->getDetailsPageCount( _pokemon, _currentPage ) - 1 )
+                    % _ui->getDetailsPageCount( _pokemon, _currentPage );
+                _ui->showDetails( _pokemon, _currentPage, currentDetailChoice );
+                cooldown = COOLDOWN_COUNT;
+            }
+            swiWaitForVBlank( );
+        }
+
+        _ui->showDetails( _pokemon, _currentPage, -1 );
+        return false;
+    }
+
     statusScreen::result statusScreen::run( u8 p_initialPage ) {
         _ui->init( _pokemon, p_initialPage, _allowKeyUp, _allowKeyDown );
         _frame   = 0;
@@ -72,7 +124,15 @@ namespace STS {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 return result::BACK;
             }
-            if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+            if( pressed & KEY_A ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+                if( _ui->getDetailsPageCount( _pokemon, _currentPage ) ) {
+                    if( runDetails( ) ) {
+                        return result::EXIT;
+                    }
+                }
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 select( ( _currentPage + 1 ) % _ui->getPageCount( ) );
                 cooldown = COOLDOWN_COUNT;

@@ -28,6 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "pokemon.h"
 #include "pokemonData.h"
+#include "move.h"
 
 namespace STS {
     class statusScreenUI {
@@ -37,22 +38,23 @@ namespace STS {
         bool     _allowKeyDown;
         bool     _needsInit;
         pkmnData _data;
+        MOVE::moveData _moves[ 4 ];
 
         u16 initTopScreen( pokemon* p_pokemon, bool p_bottom = false );
         u16 initBottomScreen( pokemon* p_pokemon, bool p_bottom = true );
 
         /*
-         * @brief Draws basic information about the pkmn (name, etc)
+         * @brief: Draws basic information about the pkmn (name, etc)
          */
         void drawBasicInfoTop( pokemon* p_pokemon, bool p_bottom = false );
 
         /*
-         * @brief Writes the given string to the specified line to the text field.
+         * @brief: Writes the given string to the specified line to the text field.
          */
         void writeLineTop( const char* p_string, u8 p_line, u8 p_color = 252,
                            bool p_bottom = false );
         /*
-         * @brief Writes the given string to the specified line to the text field.
+         * @brief: Writes the given string to the specified line to the text field.
          */
         void writeLineTop( const char* p_stringLeft,  const char* p_stringRight,
                            u8 p_line, u8 p_colorLeft = 250, u8 p_colorRight = 252,
@@ -61,7 +63,7 @@ namespace STS {
 
       public:
         /*
-         * @brief Initializes the status screen UI. Destroys anything that was previously on the
+         * @brief: Initializes the status screen UI. Destroys anything that was previously on the
          * screen.
          * @param p_initialPage: initially selected page
          */
@@ -69,7 +71,7 @@ namespace STS {
                    bool p_allowKeyDown = true );
 
         /*
-         * @brief Returns the number of different pages.
+         * @brief: Returns the number of different pages.
          */
         constexpr u8 getPageCount( ) {
             // TODO: Add Contest Screen
@@ -77,12 +79,32 @@ namespace STS {
         }
 
         /*
-         * @brief Draws the specified info page for the given pokemon.
+         * @brief: Returns the different choices for the given page.
+         */
+        constexpr u8 getDetailsPageCount( pokemon* p_pokemon, u8 p_page ) {
+            if( p_pokemon->isEgg( ) ) { return 0; }
+            if( p_page == 1 ) {
+                u8 numMoves = 0;
+                for( ; numMoves < 4; ++numMoves ) {
+                    if( !p_pokemon->getMove( numMoves ) ) { break; }
+                }
+                return numMoves;
+            }
+            return 0;
+        }
+
+        /*
+         * @brief: Draws the specified info page for the given pokemon.
          */
         void draw( pokemon* p_pokemon, u8 p_page );
 
         /*
-         * @brief Draws the p_frame-th frame. Needs to be called every frame.
+         * @brief: Draws the specified details (i.e. move details, etc) for the given page.
+         */
+        void showDetails( pokemon* p_pokemon, u8 p_page, u8 p_detailsPage );
+
+        /*
+         * @brief: Draws the p_frame-th frame. Needs to be called every frame.
          */
         void animate( u8 p_frame );
     };
