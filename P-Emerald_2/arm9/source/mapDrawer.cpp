@@ -427,34 +427,6 @@ namespace MAP {
         u8  pkmnForme = CUR_SLICE->m_pokemon[ arridx ].first >> 11;
 
         wildPkmn             = pokemon( pkmnId, level, pkmnForme );
-        BATTLE::weather weat = BATTLE::weather::NO_WEATHER;
-        switch( _weather ) {
-        case SUNNY:
-            weat = BATTLE::weather::SUN;
-            break;
-        case RAINY:
-        case THUNDERSTORM:
-            weat = BATTLE::weather::RAIN;
-            break;
-        case SNOW:
-        case BLIZZARD:
-            weat = BATTLE::weather::HAIL;
-            break;
-        case SANDSTORM:
-            weat = BATTLE::weather::SANDSTORM;
-            break;
-        case FOG:
-            weat = BATTLE::weather::FOG;
-            break;
-        case HEAVY_SUNLIGHT:
-            weat = BATTLE::weather::HEAVY_SUNSHINE;
-            break;
-        case HEAVY_RAIN:
-            weat = BATTLE::weather::HEAVY_RAIN;
-            break;
-        default:
-            break;
-        }
 
         u8 platform = 0, plat2 = 0;
         u8 battleBack = CURRENT_BANK.m_battleBg;
@@ -485,12 +457,15 @@ namespace MAP {
         auto playerPrio
             = _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].getPriority( );
         ANIMATE_MAP = false;
-        SOUND::playBGM( SOUND::BGMforWildBattle( pkmnId ) );
         swiWaitForVBlank( );
         NAV::draw( );
-        BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam, wildPkmn, weat, platform, plat2,
-                        battleBack, SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_MEGA_EVOLUTION ) )
-            .start( );
+        if( BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                        SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ),
+                        wildPkmn, platform, plat2, battleBack,
+                        getBattlePolicy( true ) ).start( )
+                == BATTLE::battle::BATTLE_OPPONENT_WON ) {
+            // TODO: faint player
+        }
         FADE_TOP_DARK( );
         ANIMATE_MAP = true;
         NAV::draw( true );
@@ -498,6 +473,49 @@ namespace MAP {
         draw( playerPrio );
 
         return true;
+    }
+
+    BATTLE::battlePolicy mapDrawer::getBattlePolicy( bool p_isWildBattle,
+            BATTLE::battlePolicy::battleMode p_mode, bool p_distributeEXP ) {
+        BATTLE::battlePolicy res = p_isWildBattle ?
+            BATTLE::battlePolicy( BATTLE::DEFAULT_WILD_POLICY ) :
+            BATTLE::battlePolicy( BATTLE::DEFAULT_TRAINER_POLICY );
+
+        res.m_mode = p_mode;
+        res.m_distributeEXP = p_distributeEXP;
+        res.m_allowMegaEvolution
+            = SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_MEGA_EVOLUTION );
+
+        res.m_weather = BATTLE::weather::NO_WEATHER;
+        switch( _weather ) {
+        case SUNNY:
+            res.m_weather = BATTLE::weather::SUN;
+            break;
+        case RAINY:
+        case THUNDERSTORM:
+            res.m_weather = BATTLE::weather::RAIN;
+            break;
+        case SNOW:
+        case BLIZZARD:
+            res.m_weather = BATTLE::weather::HAIL;
+            break;
+        case SANDSTORM:
+            res.m_weather = BATTLE::weather::SANDSTORM;
+            break;
+        case FOG:
+            res.m_weather = BATTLE::weather::FOG;
+            break;
+        case HEAVY_SUNLIGHT:
+            res.m_weather = BATTLE::weather::HEAVY_SUNSHINE;
+            break;
+        case HEAVY_RAIN:
+            res.m_weather = BATTLE::weather::HEAVY_RAIN;
+            break;
+        default:
+            break;
+        }
+
+        return res;
     }
 
     void mapDrawer::handleTrainer( ) {
@@ -1412,7 +1430,6 @@ namespace MAP {
         fastBike      = false;
         u8 ydif       = 0;
         SAVE::SAV.getActiveFile( ).m_player.m_movement = p_newMode;
-        for( auto fn : _newMoveModeCallbacks ) { fn( p_newMode ); }
         switch( p_newMode ) {
         case WALK:
             SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic;
@@ -1444,6 +1461,7 @@ namespace MAP {
                                                         0, 0 );
         _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
             getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
+         for( auto fn : _newMoveModeCallbacks ) { fn( p_newMode ); }
     }
 
     bool mapDrawer::canFish( position p_start, direction p_direction ) {

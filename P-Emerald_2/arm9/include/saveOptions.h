@@ -32,7 +32,8 @@ namespace SAVE {
 
     struct saveOptions {
         u8 m_EXPShareEnabled;
-        u8 m_evolveInBattle;
+        u8 m_enableBGM : 1 = true;
+        u8 m_enableSFX : 7 = true;
         u8 m_bgIdx;
 
         language m_language;

@@ -333,7 +333,37 @@ namespace BATTLE {
                                 std::vector<battleMove> p_tergetedMoves );
     };
 
+    struct battlePolicy {
+        enum battleMode { SINGLE = 0, DOUBLE = 1 };
+
+        battleMode  m_mode;
+        bool        m_allowMegaEvolution;
+        bool        m_distributeEXP;
+        bool        m_allowNextPkmnPreview; // Preview of next opp. pkmn
+        bool        m_allowCapture;
+        weather     m_weather;
+        u16         m_aiLevel;
+        u16         m_roundLimit;
+    };
+
+    constexpr battlePolicy DEFAULT_TRAINER_POLICY = {
+        battlePolicy::SINGLE, true, true, true, false, NO_WEATHER, 5, 0
+    };
+    constexpr battlePolicy DEFAULT_WILD_POLICY = {
+        battlePolicy::SINGLE, true, true, true, true, NO_WEATHER, 0, 0
+    };
+
     class battle {
+        public:
+        enum battleEndReason {
+            BATTLE_ROUND_LIMIT  = 0,
+            BATTLE_OPPONENT_WON = -1,
+            BATTLE_PLAYER_WON   = 1,
+            BATTLE_NONE         = 2,
+            BATTLE_RUN          = 3,
+            BATTLE_CAPTURE      = 4
+        };
+
       private:
         u16   _round, _maxRounds, _AILevel;
         field _field;
@@ -350,32 +380,8 @@ namespace BATTLE {
         u8 _curPkmnPosition[ 6 ][ 2 ]; // me; opp; maps the Pkmn's positions in the
                                        //  teams to their real in-battle positions
 
-        bool _allowMegaEvolution;
-
-      public:
-        enum battleMode { SINGLE = 0, DOUBLE = 1 };
-
-        enum battleEndReason {
-            BATTLE_ROUND_LIMIT  = 0,
-            BATTLE_OPPONENT_WON = -1,
-            BATTLE_PLAYER_WON   = 1,
-            BATTLE_NONE         = 2,
-            BATTLE_RUN          = 3,
-            BATTLE_CAPTURE      = 4
-        };
-
-        bool m_distributeEXP;
-        bool m_isWildBattle;
-
-        battleMode m_battleMode;
-
-        battle( pokemon* p_playerTeam, u16 p_opponentId, u16 p_maxRounds, weather p_weather,
-                u8 p_platform, u8 p_background, u16 p_AILevel = 5, battleMode p_battlemode = SINGLE,
-                u8 p_platform2 = -1, bool p_allowMegaEvolution = true );
-        battle( pokemon* p_playerTeam, pokemon p_opponent, weather p_weather, u8 p_platform,
-                u8 p_platform2, u8 p_background, bool p_allowMegaEvolution = true );
-
-        s8 start( ); // Runs battle; returns -1 if opponent wins, 0 if tie, 1 otherwise
+        battlePolicy _policy;
+        bool        _isWildBattle;
 
         /*
          * @brief: Initializes the battle.
@@ -433,5 +439,28 @@ namespace BATTLE {
          * @brief: Uses the specified item on the pokemon at the field position.
          */
         void useItem( fieldPosition p_target, u16 p_item );
+
+      public:
+        /*
+         * @brief: Creates a new trainer battle.
+         */
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize,
+                u16 p_opponentId, u8 p_platform = 0, u8 p_platform2 = 0, u8 p_background = 0,
+                battlePolicy = DEFAULT_TRAINER_POLICY );
+
+        /*
+         * @brief: Creates a new wild pkmn battle.
+         */
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent,
+                u8 p_platform = 0, u8 p_platform2 = 0, u8 p_background = 0,
+                battlePolicy = DEFAULT_WILD_POLICY );
+
+        /*
+         * @brief: Starts the battle.
+         * @returns: positive values if the player won the battle; negative value if the
+         * player lost.
+         */
+        battleEndReason start( );
+
     };
 } // namespace BATTLE

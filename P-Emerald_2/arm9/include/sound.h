@@ -129,4 +129,5 @@ namespace SOUND {
     void onLocationChange( u16 p_newLocatonId );
     void onMovementTypeChange( MAP::moveMode p_newMoveMode );
     void restartBGM( );
+    void stopBGM( );
 } // namespace SOUND

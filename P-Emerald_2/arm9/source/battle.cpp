@@ -25,93 +25,57 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
-#include <cstdio>
-#include <cstring>
-#include <cwchar>
-#include <functional>
-#include <initializer_list>
-#include <tuple>
+#include <string>
 
 #include "defines.h"
 
+#include "saveGame.h"
 #include "battle.h"
 #include "battleTrainer.h"
 
-#include "ability.h"
-#include "abilityNames.h"
-#include "item.h"
-#include "itemNames.h"
-#include "move.h"
-#include "moveNames.h"
 #include "pokemon.h"
-#include "pokemonData.h"
+#include "sound.h"
 
-#include "fs.h"
-#include "saveGame.h"
-
-#include "bag.h"
-#include "dex.h"
 
 namespace BATTLE {
     std::string trainerClassNames[ 120 ] = {"Pokémon-Trainer"};
 
-    battle::battle( pokemon* p_playerTeam, u16 p_opponentId, u16 p_maxRounds, weather p_weather,
-                    u8 p_platform, u8 p_background, u16 p_AILevel, battleMode p_battleMode,
-                    u8 p_platform2, bool p_allowMegaEvolution ) {
+    battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId,
+                    u8 p_platform, u8 p_platform2, u8 p_background, battlePolicy p_policy ) {
         _playerTeam         = p_playerTeam;
-        _allowMegaEvolution = p_allowMegaEvolution;
-        for( _playerTeamSize = 0; _playerTeamSize < 6; ++_playerTeamSize ) {
-            if( !p_playerTeam[ _playerTeamSize ].m_boxdata.m_speciesId ) { break; }
-        }
+        _playerTeamSize     = p_playerTeamSize;
 
         _opponent = getBattleTrainer( p_opponentId, CURRENT_LANGUAGE );
         for( u8 i = 0; i < _opponent.m_data.m_numPokemon; ++i ) {
             _opponentTeam[ i ] = pokemon( _opponent.m_data.m_pokemon[ i ] );
         }
 
-        _maxRounds      = p_maxRounds;
-        _AILevel        = p_AILevel;
-        m_battleMode    = p_battleMode;
-        m_isWildBattle  = false;
-        m_distributeEXP = true;
+        _policy = p_policy;
+        _isWildBattle = false;
 
-        _field    = field( p_weather );
+        _field    = field( p_policy.m_weather );
         _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
-                              p_background, m_isWildBattle );
+                              p_background, _isWildBattle );
     }
-    battle::battle( pokemon* p_playerTeam, pokemon p_opponent, weather p_weather, u8 p_platform,
-                    u8 p_platform2, u8 p_background, bool p_allowMegaEvolution ) {
-        _maxRounds          = 0;
-        _AILevel            = 0;
+    battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent,
+                    u8 p_platform, u8 p_platform2, u8 p_background, battlePolicy p_policy ) {
         _playerTeam         = p_playerTeam;
-        _allowMegaEvolution = p_allowMegaEvolution;
-
-        for( _playerTeamSize = 0; _playerTeamSize < 6; ++_playerTeamSize ) {
-            if( !p_playerTeam[ _playerTeamSize ].m_boxdata.m_speciesId ) { break; }
-        }
+        _playerTeamSize     = p_playerTeamSize;
 
         _opponent          = battleTrainer( );
         _opponentTeam[ 0 ] = p_opponent;
         _opponentTeamSize  = 1;
 
-        m_battleMode = SINGLE;
+        _isWildBattle = true;
 
-        _field    = field( p_weather );
+        _field    = field( p_policy.m_weather );
         _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
-                              p_background, m_isWildBattle );
+                              p_background, _isWildBattle );
 
-        m_isWildBattle  = true;
-        m_distributeEXP = true;
     }
 
-    /**
-     *  @brief:     Runs the battle.
-     *  @returns:   -1 if opponent won, 0 if the battle resulted in a tie, 1 if player
-     *  won; 2 on error.
-     */
-    s8 battle::start( ) {
-        if( !_opponentTeamSize || !_playerTeamSize ) { return 2; }
+    battle::battleEndReason battle::start( ) {
+        if( !_opponentTeamSize || !_playerTeamSize ) { return battle::BATTLE_NONE; }
 
         battleEndReason battleEnd = BATTLE_NONE;
         initBattle( );
@@ -126,9 +90,10 @@ namespace BATTLE {
             u16  playerWillCatch = 0;
             loop( ) {
                 // Compute player's first pokemon's move
-                moves[ field::PLAYER_SIDE ][ 0 ] = getMoveSelection( 0, _allowMegaEvolution );
+                moves[ field::PLAYER_SIDE ][ 0 ] = getMoveSelection( 0,
+                        _policy.m_allowMegaEvolution );
 
-                if( m_battleMode == DOUBLE ) {
+                if( _policy.m_mode == battlePolicy::DOUBLE ) {
                     // Compute player's first pokemon's move
                     if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == RUN ) {
                         moves[ field::PLAYER_SIDE ][ 0 ] = {NO_OP, 0, {}, {field::PLAYER_SIDE, 0}};
@@ -144,7 +109,7 @@ namespace BATTLE {
                     }
 
                     moves[ field::PLAYER_SIDE ][ 1 ] = getMoveSelection(
-                        1, _allowMegaEvolution
+                        1, _policy.m_allowMegaEvolution
                                && moves[ field::PLAYER_SIDE ][ 0 ].m_type != MEGA_ATTACK );
 
                     // Player wishes to start over
@@ -165,7 +130,7 @@ namespace BATTLE {
             }
 
             // Compute AI's moves
-            for( u8 i = 0; i < u8( m_battleMode ); ++i ) {
+            for( u8 i = 0; i < u8( _policy.m_mode ); ++i ) {
                 moves[ field::OPPONENT_SIDE ][ i ] = getAIMove( i );
             }
 
@@ -181,7 +146,7 @@ namespace BATTLE {
             // Sort moves
             std::vector<battleMoveSelection> selection = std::vector<battleMoveSelection>( );
             for( u8 i = 0; i < 2; ++i )
-                for( u8 j = 0; j < u8( m_battleMode ); ++j ) {
+                for( u8 j = 0; j < u8( _policy.m_mode ); ++j ) {
                     selection.push_back( moves[ i ][ j ] );
                 }
 
@@ -231,6 +196,11 @@ namespace BATTLE {
     }
 
     void battle::initBattle( ) {
+        if( _isWildBattle ) {
+            SOUND::playBGM( SOUND::BGMforWildBattle( _opponentTeam[ 0 ].getSpecies( ) ) );
+        } else {
+            SOUND::playBGM( SOUND::BGMforWildBattle( _opponent.getClass( ) ) );
+        }
         // TODO
     }
 
@@ -258,6 +228,7 @@ namespace BATTLE {
 
     void battle::endBattle( battle::battleEndReason p_battleEndReason ) {
         // TODO
+        (void) p_battleEndReason;
     }
 
     bool battle::playerRuns( ) {

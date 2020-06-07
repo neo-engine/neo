@@ -139,12 +139,12 @@ void initTimeAndRnd( ) {
 }
 
 void vblankIRQ( ) {
-    if( !UPDATE_TIME ) return;
+    if( !ANIMATE_MAP ) return;
     scanKeys( );
     FRAME_COUNT++;
-
     if( ANIMATE_MAP && MAP::curMap ) MAP::curMap->animateMap( FRAME_COUNT );
 
+    /*
     if( INIT_NITROFS ) {
         nitroFSInit( ARGV );
         INIT_NITROFS = false;
@@ -196,6 +196,7 @@ void vblankIRQ( ) {
 
     IO::boldFont->setColor( oldC1, 1 );
     IO::boldFont->setColor( oldC2, 2 );
+    */
 }
 
 int main( int, char** p_argv ) {
@@ -241,6 +242,11 @@ int main( int, char** p_argv ) {
     NAV::showNewMap( SAVE::SAV.getActiveFile( ).m_currentMap );
 
     irqSet( IRQ_VBLANK, vblankIRQ );
+
+    // TODO remove
+    SAVE::SAV.getActiveFile( ).m_options.m_enableBGM = false;
+    SAVE::SAV.getActiveFile( ).m_options.m_enableSFX = true;
+    SAVE::SAV.m_version = VERSION;
 
     bool          stopped = true;
     u8            bmp     = false;

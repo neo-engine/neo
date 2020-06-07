@@ -36,6 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "mapObject.h"
 #include "mapSlice.h"
 #include "mapSprite.h"
+#include "battle.h"
 
 namespace MAP {
     class mapDrawer {
@@ -84,6 +85,9 @@ namespace MAP {
             bool handleWildPkmn( wildPkmnType p_type, u8 p_rodType = 0, bool p_forceEncounter = false );
             void handleTrainer( );
 
+            BATTLE::battlePolicy getBattlePolicy( bool p_isWildBattle,
+                    BATTLE::battlePolicy::battleMode p_mode = BATTLE::battlePolicy::SINGLE,
+                    bool p_distributeEXP = true );
         public:
             block&        at( u16 p_x, u16 p_y ) const;
             mapBlockAtom& atom( u16 p_x, u16 p_y ) const;

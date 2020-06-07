@@ -51,6 +51,10 @@ namespace BATTLE {
     struct battleTrainer {
         trainerStrings m_strings;
         trainerData    m_data;
+
+        constexpr u8 getClass( ) const {
+            return m_data.m_trainerClass;
+        }
     };
 
     std::string getTrainerClassName( u8 p_trainerClass, u8 p_language );

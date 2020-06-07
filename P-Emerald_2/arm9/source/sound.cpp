@@ -29,6 +29,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <maxmod9.h>
 
 #include "sound.h"
+#include "defines.h"
+#include "saveGame.h"
 
 const char SOUND_PATH[] = "nitro:/SOUND/";
 
@@ -69,29 +71,43 @@ namespace SOUND {
 
     void playBGM( u16 p_id ) {
 #ifndef NO_SOUND
-        if( BGMLoaded && p_id == currentBGM ) { return; }
-        if( BGMLoaded ) {
-            mmStop( );
-            mmUnload( currentBGM );
+        if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
+            if( BGMLoaded && p_id == currentBGM ) { return; }
+            if( BGMLoaded ) {
+                mmStop( );
+                mmUnload( currentBGM );
+            }
+            // std::string path = ( std::string( SOUND_PATH ) + std::to_string( p_id ) + ".msl" );
+            // mmInitDefault( (char*) path.c_str( ) );
+            // initSFX( );
+            restoreVolume( );
+            mmLoad( p_id );
+            mmStart( p_id, MM_PLAY_LOOP );
+            BGMLoaded  = true;
+            currentBGM = p_id;
         }
-        // std::string path = ( std::string( SOUND_PATH ) + std::to_string( p_id ) + ".msl" );
-        // mmInitDefault( (char*) path.c_str( ) );
-        // initSFX( );
-        restoreVolume( );
-        mmLoad( p_id );
-        mmStart( p_id, MM_PLAY_LOOP );
-        BGMLoaded  = true;
-        currentBGM = p_id;
 #else
         (void) p_id;
 #endif
     }
 
+    void stopBGM( ) {
+#ifndef NO_SOUND
+        if( BGMLoaded ) {
+            mmStop( );
+            mmUnload( currentBGM );
+            BGMLoaded = false;
+        }
+#endif
+    }
+
     void playSoundEffect( u16 p_id ) {
 #ifndef NO_SOUND
-        auto handle = mmEffect( p_id );
-        mmEffectVolume( handle, 0xFF );
-        mmEffectRelease( handle );
+        if( SAVE::SAV.getActiveFile( ).m_options.m_enableSFX ) {
+            auto handle = mmEffect( p_id );
+            mmEffectVolume( handle, 0xFF );
+            mmEffectRelease( handle );
+        }
 #else
         (void) p_id;
 #endif
