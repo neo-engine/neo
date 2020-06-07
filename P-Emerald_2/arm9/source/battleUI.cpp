@@ -52,11 +52,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 #include "yesNoBox.h"
 
+#include "screenFade.h"
+
 // Sprites
 #include "A.h"
 #include "Back.h"
-
-// #include "Battle1.h"
 
 #include "BattleBall1.h" //Normal
 #include "BattleBall2.h" //Statused
@@ -90,144 +90,107 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "Shiny2.h"
 
 namespace BATTLE {
-    //////////////////////////////////////////////////////////////////////////
-    // BEGIN BATTLE_UI
-    //////////////////////////////////////////////////////////////////////////
-#if false
-#define C2I( a ) ( ( a ) - '0' )
-    std::string battleUI::parseLogCmd( const std::string& p_cmd ) {
-        if( p_cmd == "A" ) return "`";
-        if( p_cmd == "CLEAR" ) return "";
 
-        if( p_cmd == "TRAINER" ) { return _opponent->m_battleTrainerName[ CURRENT_LANGUAGE ]; }
-        if( p_cmd == "TCLASS" ) { return trainerClassNames[ _opponent->m_trainerClass ]; }
-        if( p_cmd == "OPPONENT" ) {
-            if( m_isWildBattle )
-                return GET_STRING( 310 );
-            else
-                return GET_STRING( 311 );
-        }
-        if( p_cmd.substr( 0, 4 ) == "COLR" ) {
-            u8 r, g, b;
+// Top screen
+#define SPR_PKMN_START_OAM( p_idx ) ( 4 * ( p_idx ) )
+#define SPR_PLATFORM_OAM 16
 
-            r = 10 * C2I( p_cmd[ 5 ] ) + C2I( p_cmd[ 6 ] );
-            g = 10 * C2I( p_cmd[ 8 ] ) + C2I( p_cmd[ 9 ] );
-            b = 10 * C2I( p_cmd[ 11 ] ) + C2I( p_cmd[ 12 ] );
+#define SPR_PKMN_PAL( p_idx ) ( ( p_idx ) )
+#define SPR_PLATFORM_PAL 4
 
-            _battleUI.setLogTextColor( RGB15( r, g, b ) );
-            if( r != 15 || g != 15 || b != 15 )
-                IO::regularFont->setColor( IO::COLOR_IDX, 1 );
-            else
-                IO::regularFont->setColor( IO::GRAY_IDX, 1 );
-            return "";
-        }
+#define SPR_PKMN_GFX( p_idx ) ( 144 * ( p_idx ) )
 
-        pokemon target = CUR_PKMN( 0, PLAYER );
-        bool    isPkmn = false;
-        bool    isOpp  = false;
+#define WILD_BATTLE_HP_X 98
+#define WILD_BATTLE_HP_Y 40
+#define WILD_BATTLE_SPRITE_X_START 128
+#define WILD_BATTLE_SPRITE_X 144
 
-        if( p_cmd.substr( 0, 4 ) == "OWN1" ) {
-            target = CUR_PKMN( 0, PLAYER );
-            isPkmn = true;
-        }
-        if( p_cmd.substr( 0, 4 ) == "OWN2" ) {
-            target = CUR_PKMN( 1, PLAYER );
-            isPkmn = true;
-        }
-        if( p_cmd.substr( 0, 4 ) == "OPP1" ) {
-            target = CUR_PKMN( 0, OPPONENT );
-            isOpp  = true;
-            isPkmn = true;
-        }
-        if( p_cmd.substr( 0, 4 ) == "OPP2" ) {
-            target = CUR_PKMN( 1, OPPONENT );
-            isOpp  = true;
-            isPkmn = true;
-        }
+#define OPP_PLAT_Y 56
+#define PLY_PLAT_Y 120
 
-        if( isPkmn && p_cmd.length( ) == 4 )
-            return target.m_boxdata.m_name
-                   + std::string( isOpp ? " " + parseLogCmd( "OPPONENT" ) : "" );
+    void battleUI::initTop( ) {
+        videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
+                      | DISPLAY_SPR_1D );
+        IO::bg2 = bgInit( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
+        IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
+        bgSetPriority( IO::bg3, 3 );
+        bgSetPriority( IO::bg2, 2 );
+        IO::initOAMTable( IO::OamTop );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
 
-        if( isPkmn ) {
-            auto specifier = p_cmd.substr( 5 );
-            if( specifier == "ABILITY" ) return getAbilityName( target.m_boxdata.m_ability,
-                    CURRENT_LANGUAGE );
-            if( specifier.substr( 0, 4 ) == "MOVE" )
-                return getMoveName( target.m_boxdata.m_moves[ C2I( specifier[ 4 ] ) - 1 ],
-                    CURRENT_LANGUAGE );
-            if( specifier == "ITEM" ) return ITEM::getItemName( target.m_boxdata.m_holdItem,
-                    CURRENT_LANGUAGE );
-            if( specifier == "LEVEL" ) return ( "" + target.m_level );
-        }
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/",
+                std::to_string( _background ).c_str( ), 512,
+                             49152 );
 
-        return "";
+        u16 tileCnt = SPR_PKMN_GFX( 4 );
+
+        // platforms
+        tileCnt = IO::loadSprite( SPR_PLATFORM_OAM, SPR_PLATFORM_PAL, tileCnt, 128, OPP_PLAT_Y, 64, 64,
+                IO::PlatformPals[ _platform2 ], IO::PlatformTiles[ 2 * _platform2 ], 2048, false,
+                false, false, OBJPRIORITY_3, false );
+        tileCnt = IO::loadSprite( SPR_PLATFORM_OAM + 1, SPR_PLATFORM_PAL, tileCnt, 192, OPP_PLAT_Y, 64, 64,
+                IO::PlatformPals[ _platform2 ], IO::PlatformTiles[ 2 * _platform2 + 1 ], 2048,
+                false, false, false, OBJPRIORITY_3, false );
+        tileCnt = IO::loadSprite( SPR_PLATFORM_OAM + 2, SPR_PLATFORM_PAL + 1, tileCnt,
+                -52, PLY_PLAT_Y, 64, 64, IO::PlatformPals[ _platform ],
+                IO::PlatformTiles[ 2 * _platform ], 2048, false,
+                false, false, OBJPRIORITY_3, false );
+        tileCnt = IO::loadSprite( SPR_PLATFORM_OAM + 3, SPR_PLATFORM_PAL + 1, tileCnt, 80
+                - 16, PLY_PLAT_Y, 64, 64, IO::PlatformPals[ _platform ],
+                IO::PlatformTiles[ 2 * _platform + 1 ], 2048, false,
+                false, false, OBJPRIORITY_3, false );
+        IO::OamTop->oamBuffer[ SPR_PLATFORM_OAM + 2 ].isRotateScale = true;
+        IO::OamTop->oamBuffer[ SPR_PLATFORM_OAM + 2 ].isSizeDouble  = true;
+        IO::OamTop->oamBuffer[ SPR_PLATFORM_OAM + 2 ].rotationIndex = 0;
+        IO::OamTop->oamBuffer[ SPR_PLATFORM_OAM + 3 ].isRotateScale = true;
+        IO::OamTop->oamBuffer[ SPR_PLATFORM_OAM + 3 ].isSizeDouble  = true;
+        IO::OamTop->oamBuffer[ SPR_PLATFORM_OAM + 3 ].rotationIndex = 0;
+        IO::OamTop->matrixBuffer[ 0 ].hdx                         = 140;
+        IO::OamTop->matrixBuffer[ 0 ].vdy                         = 130;
+        IO::OamTop->matrixBuffer[ 1 ].hdx                         = 154;
+        IO::OamTop->matrixBuffer[ 1 ].vdy                         = 154;
+
+
+        IO::updateOAM( false );
     }
 
-    /**
-     *  @brief Write the message p_message to the battle log
-     *  @param p_message: The message to be written
-     */
-    void battle::log( const std::string& p_message ) {
-        std::string msg = "";
-        for( size_t i = 0; i < p_message.length( ); i++ ) {
-            if( p_message[ i ] == L'[' ) {
-                std::string accmd = "";
-                while( p_message[ ++i ] != L']' ) accmd += p_message[ i ];
-                if( accmd == "END" ) {
-                    _battleUI.writeLogText( msg );
-                    return;
-                }
-                msg += parseLogCmd( accmd );
-                if( accmd == "CLEAR" ) {
-                    _battleUI.writeLogText( msg );
-                    _battleUI.clearLogScreen( );
-                    msg = "";
-                }
-            } else
-                msg += p_message[ i ];
+    void battleUI::initSub( ) {
+        IO::bg2sub = bgInitSub( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
+        bgSetPriority( IO::bg2sub, 2 );
+        IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
+        bgSetPriority( IO::bg3sub, 3 );
+
+    }
+
+    void battleUI::init( ) {
+        IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
+        IO::vramSetup( true );
+        initTop( );
+        initSub( );
+    }
+
+    void battleUI::startWildBattle( pokemon* p_pokemon ) {
+        // Load pkmn sprite
+        IO::loadPKMNSprite( p_pokemon->getSpecies( ), WILD_BATTLE_SPRITE_X_START,
+                    OPP_PLAT_Y + 35 - 96 + IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ),
+                    SPR_PKMN_START_OAM( 0 ), SPR_PKMN_PAL( 0 ),
+                    SPR_PKMN_GFX( 0 ), false, p_pokemon->isShiny( ),
+                    p_pokemon->isFemale( ), false, false, p_pokemon->getForme( ) );
+        IO::fadeScreen( IO::UNFADE, true, true );
+
+        for( u16 i = WILD_BATTLE_SPRITE_X_START; i < WILD_BATTLE_SPRITE_X; ++i ) {
+            IO::OamTop->oamBuffer[ SPR_PKMN_START_OAM( 0 ) ].x++;
+            IO::OamTop->oamBuffer[ SPR_PKMN_START_OAM( 0 ) + 1 ].x++;
+            IO::OamTop->oamBuffer[ SPR_PKMN_START_OAM( 0 ) + 2 ].x++;
+            IO::OamTop->oamBuffer[ SPR_PKMN_START_OAM( 0 ) + 3 ].x++;
+            IO::updateOAM( false );
+            swiWaitForVBlank( );
+        }
+        if( p_pokemon->isShiny( ) ) {
+           // TODO
+           // animateShiny( WILD_BATTLE_SPRITE_X + 16, WILD_BATTLE_SPRITE_X_START + 16,
+           //         SHINY_ANIM, 15, tileCnt );
         }
 
-        if( msg != "" ) _battleUI.writeLogText( msg );
-        _battleUI.clearLogScreen( );
     }
-#endif
-
-    void initColors( ) {
-
-        IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-        IO::boldFont->setColor( 0, 0 );
-        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
-        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
-
-        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
-        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::STEEL_COLOR;
-        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
-        BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::RED;
-        BG_PALETTE_SUB[ IO::BLUE_IDX ]  = IO::BLUE;
-        BG_PALETTE_SUB[ IO::RED2_IDX ]  = IO::RED2;
-        BG_PALETTE_SUB[ IO::BLUE2_IDX ] = IO::BLUE2;
-        BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::CHOICE_COLOR;
-    }
-    void battleUI::initLogScreen( ) {
-        initColors( );
-        BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
-        BG_PALETTE[ IO::GRAY_IDX ]  = IO::STEEL_COLOR;
-        BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
-        BG_PALETTE[ IO::RED_IDX ]   = IO::RED;
-        BG_PALETTE[ IO::BLUE_IDX ]  = IO::BLUE;
-        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, IO::WHITE_IDX );
-    }
-    void battleUI::clearLogScreen( ) {
-        IO::printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, IO::WHITE_IDX );
-    }
-    void battleUI::setLogTextColor( u16 p_color ) {
-        BG_PALETTE_SUB[ IO::COLOR_IDX ] = p_color;
-    }
-    void battleUI::writeLogText( const std::string& p_message ) {
-        IO::regularFont->printMBString( p_message.c_str( ), 8, 8, true );
-    }
-
 } // namespace BATTLE

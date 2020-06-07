@@ -201,7 +201,14 @@ namespace BATTLE {
         } else {
             SOUND::playBGM( SOUND::BGMforWildBattle( _opponent.getClass( ) ) );
         }
-        // TODO
+
+        _battleUI.init( );
+
+        if( _isWildBattle ) {
+            _battleUI.startWildBattle( &_opponentTeam[ 0 ] );
+        } else {
+            // TODO
+        }
     }
 
     battleMoveSelection battle::getMoveSelection( u8 p_slot, bool p_allowMegaEvolution ) {

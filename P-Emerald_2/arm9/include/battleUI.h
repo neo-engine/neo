@@ -36,18 +36,26 @@ namespace BATTLE {
         u8   _background;
         bool _isWildBattle;
 
-      public:
-        static void initLogScreen( );
-        static void clearLogScreen( );
-        static void setLogTextColor( u16 p_color );
-        static void setLogText2Color( u16 p_color );
-        static void writeLogText( const std::string& p_message );
+        void initTop( );
+        void initSub( );
 
-        battleUI( ) {
-        }
+      public:
+        battleUI() {}
+
         battleUI( u8 p_platform, u8 p_platform2, u8 p_background, bool p_isWildBattle )
             : _platform( p_platform ), _platform2( p_platform2 ), _background( p_background ),
               _isWildBattle( p_isWildBattle ) {
         }
+
+        /*
+         * @brief: Initializes the battleUI. Destroys anything that was previously on the
+         * screen.
+         */
+        void init( );
+
+        /*
+         * @brief: shows the wild pkmn appear
+         */
+        void startWildBattle( pokemon* p_pokemon );
     };
 } // namespace BATTLE

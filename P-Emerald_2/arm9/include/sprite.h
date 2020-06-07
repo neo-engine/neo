@@ -100,6 +100,11 @@ namespace IO {
                      bool p_flipX, bool p_flipY, bool p_hidden,
                      ObjPriority p_priority, bool p_bottom );
 
+    /*
+     * @brief: Returns the number of empty pixels below the pkmn in its sprite.
+     */
+    u16 pkmnSpriteHeight( u16 p_speciesId );
+
     u16 loadPKMNSprite( const char* p_path, const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
                         u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
                         bool p_shiny = false, bool p_female = false, bool p_flipX = false,
