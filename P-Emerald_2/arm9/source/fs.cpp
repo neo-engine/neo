@@ -404,7 +404,14 @@ namespace MOVE {
 
     std::string getMoveDescr( const u16 p_moveId, const u8 p_language ) {
         char tmpbuf[ MOVE_DSCRLENGTH ];
-        if( !getMoveDescr( p_moveId, p_language, tmpbuf ) ) { return "---"; }
+        if( !getMoveDescr( p_moveId, p_language, tmpbuf ) ) {
+            return "---"
+#ifdef DESQUID
+                   + std::string( " moveid " ) + std::to_string( p_moveId ) + " lang "
+                   + std::to_string( p_language )
+#endif
+                ;
+        }
         return std::string( tmpbuf );
     }
 
@@ -481,8 +488,6 @@ std::string getAbilityDescr( int p_abilityId, int p_language ) {
 std::string getAbilityDescr( int p_abilityId ) {
     return getAbilityDescr( p_abilityId, CURRENT_LANGUAGE );
 }
-
-
 
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
     char tmpbuf[ 20 ];

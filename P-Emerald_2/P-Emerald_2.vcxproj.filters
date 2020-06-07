@@ -267,6 +267,9 @@
     <ClInclude Include="arm9\include\soundbank.h">
       <Filter>Header Files\arm9\sound</Filter>
     </ClInclude>
+    <ClInclude Include="arm9\include\animations.h">
+      <Filter>Header Files\arm9\io</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c">
@@ -415,6 +418,9 @@
     </ClCompile>
     <ClCompile Include="arm9\source\auxspi.cpp">
       <Filter>Source Files\arm9\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="arm9\source\animations.cpp">
+      <Filter>Source Files\arm9\io</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

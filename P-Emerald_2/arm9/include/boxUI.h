@@ -33,114 +33,115 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace BOX {
 #define PAGE_ICON_START 5
     class boxUI {
-        private:
-            bool       _showTeam;
-            u8         _currentSelection;
-            boxPokemon _heldPkmn;
-            u16        _outlineColor = 0xF4A0;
+      private:
+        bool       _showTeam;
+        u8         _currentSelection;
+        boxPokemon _heldPkmn;
+        u16        _outlineColor = 0xF4A0;
 
-            void initTop( );
-            void initSub( );
+        void initTop( );
+        void initSub( );
 
-            /*
-             * @brief: Draws some basic info of the pkmn to the top screen (clears screen
-             * if p_pokemon is nullptr)
-             */
-            void drawPkmnInfoTop( pokemon* p_pokemon );
+        /*
+         * @brief: Draws some basic info of the pkmn to the top screen (clears screen
+         * if p_pokemon is nullptr)
+         */
+        void drawPkmnInfoTop( pokemon* p_pokemon );
 
-            /*
-             * @brief: Updates the buttons for the given pkmn. (Hides all buttons if
-             * p_pokemon is nullptr)
-             */
-            void drawPkmnInfoSub( boxPokemon* p_pokemon );
-            void writeLineTop( const char* p_string, u8 p_line, u8 p_color = 252,
-                               bool p_bottom = false );
-        public:
-            enum button {
-                BUTTON_LEFT,
-                BUTTON_RIGHT,
-                BUTTON_BOX_NAME,
-                BUTTON_BACK,
-                BUTTON_PKMN,
-                BUTTON_PARTY,
-                BUTTON_MODE_MOVE,
-                BUTTON_MODE_SELECT,
-                BUTTON_PKMN_MOVE,
-                BUTTON_PKMN_STATUS,
-                BUTTON_PKMN_RELEASE,
-                BUTTON_PKMN_GIVE_ITEM,
-                BUTTON_PKMN_TAKE_ITEM,
-                BUTTON_PKMN_CANCEL
-            };
+        /*
+         * @brief: Updates the buttons for the given pkmn. (Hides all buttons if
+         * p_pokemon is nullptr)
+         */
+        void drawPkmnInfoSub( boxPokemon* p_pokemon );
+        void writeLineTop( const char* p_string, u8 p_line, u8 p_color = 252,
+                           bool p_bottom = false );
 
-            /*
-             * @brief: Sets the current movement mode (changes arrow and outline colors)
-             */
-            void setMode( u8 p_newMode );
+      public:
+        enum button {
+            BUTTON_LEFT,
+            BUTTON_RIGHT,
+            BUTTON_BOX_NAME,
+            BUTTON_BACK,
+            BUTTON_PKMN,
+            BUTTON_PARTY,
+            BUTTON_MODE_MOVE,
+            BUTTON_MODE_SELECT,
+            BUTTON_PKMN_MOVE,
+            BUTTON_PKMN_STATUS,
+            BUTTON_PKMN_RELEASE,
+            BUTTON_PKMN_GIVE_ITEM,
+            BUTTON_PKMN_TAKE_ITEM,
+            BUTTON_PKMN_CANCEL
+        };
 
-            /*
-             * @brief: Describes buttons in the UI.
-             */
-            struct interact {
-                IO::inputTarget m_touch;
-                button m_buttonType;
-                u8 m_param; // pkmn id
-            };
+        /*
+         * @brief: Sets the current movement mode (changes arrow and outline colors)
+         */
+        void setMode( u8 p_newMode );
 
-            /*
-             * @brief: returns the current buttons.
-             */
-            std::vector<interact> getInteractions( );
+        /*
+         * @brief: Describes buttons in the UI.
+         */
+        struct interact {
+            IO::inputTarget m_touch;
+            button          m_buttonType;
+            u8              m_param; // pkmn id
+        };
 
-            /*
-             * @brief: Initializes the box UI.
-             */
-            void init( );
+        /*
+         * @brief: returns the current buttons.
+         */
+        std::vector<interact> getInteractions( );
 
-            /*
-             * @brief: Draw the specified box.
-             */
-            void draw( box* p_box );
+        /*
+         * @brief: Initializes the box UI.
+         */
+        void init( );
 
-            /*
-             * @brief: Selects the given button.
-             */
-            void selectButton( button p_selectedButton, bool p_touched = false );
+        /*
+         * @brief: Draw the specified box.
+         */
+        void draw( box* p_box );
 
-            /*
-             * @brief: Selects the given pkmn; shows the corresponding buttons
-             */
-            void selectPkmn( boxPokemon* p_pokemon, u8 p_index, bool p_touched = false );
+        /*
+         * @brief: Selects the given button.
+         */
+        void selectButton( button p_selectedButton, bool p_touched = false );
 
-            /*
-             * @brief: Shows the currently held pkmn at the specified index.
-             */
-            void updateHeldPkmn( u8 p_index );
+        /*
+         * @brief: Selects the given pkmn; shows the corresponding buttons
+         */
+        void selectPkmn( boxPokemon* p_pokemon, u8 p_index, bool p_touched = false );
 
-            /*
-             * @brief: Sets the given pkmn as the currently held pkmn.
-             * (if p_pokemon is nullptr, the held pkmn is hidden)
-             */
-            void setNewHeldPkmn( boxPokemon* p_pokemon, u8 p_index );
+        /*
+         * @brief: Shows the currently held pkmn at the specified index.
+         */
+        void updateHeldPkmn( u8 p_index );
 
-            /*
-             * @brief: Hovers over a pkmn.
-             */
-            void hoverPkmn( boxPokemon* p_pokemon, u8 p_index, bool p_redraw = true );
+        /*
+         * @brief: Sets the given pkmn as the currently held pkmn.
+         * (if p_pokemon is nullptr, the held pkmn is hidden)
+         */
+        void setNewHeldPkmn( boxPokemon* p_pokemon, u8 p_index );
 
-            /*
-             * @brief: Shows the pkmn party window
-             */
-            void showParty( pokemon* p_party, u8 p_partyLen );
+        /*
+         * @brief: Hovers over a pkmn.
+         */
+        void hoverPkmn( boxPokemon* p_pokemon, u8 p_index, bool p_redraw = true );
 
-            /*
-             * @brief: Hides the party window
-             */
-            void hideParty( );
+        /*
+         * @brief: Shows the pkmn party window
+         */
+        void showParty( box* p_box, pokemon* p_party, u8 p_partyLen );
 
-            /*
-             * @brief: Replaces the pkmn at position p_index with the given pkmn.
-             */
-            void updatePkmn( boxPokemon* p_newPkmn, u8 p_index );
+        /*
+         * @brief: Hides the party window
+         */
+        void hideParty( box* p_box );
+
+        /*
+         * @brief: Replaces the pkmn at position p_index with the given pkmn.
+         */
+        void updatePkmn( boxPokemon* p_newPkmn, u8 p_index );
     };
-}
+} // namespace BOX

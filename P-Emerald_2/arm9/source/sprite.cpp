@@ -345,10 +345,10 @@ namespace IO {
                         for( u8 x = 0; x < 8; x += 2, ++i ) {
                             u8 cur = reinterpret_cast<const u8*>( p_spriteData )[ i ];
                             u8 up = cur >> 4, down = cur & 0xf;
-                            BITMAP_SPRITE[ 2 * ( i + shift ) + 1 ] = ( !!up ) *
-                                ( ( 1 << 15 ) | p_spritePal[ up ] );
-                            BITMAP_SPRITE[ 2 * ( i + shift ) ] = ( !!down ) * ( ( 1 << 15 ) |
-                                    p_spritePal[ down ] );
+                            BITMAP_SPRITE[ 2 * ( i + shift ) + 1 ]
+                                = ( !!up ) * ( ( 1 << 15 ) | p_spritePal[ up ] );
+                            BITMAP_SPRITE[ 2 * ( i + shift ) ]
+                                = ( !!down ) * ( ( 1 << 15 ) | p_spritePal[ down ] );
                         }
                         shift += 4 * ( p_width / 8 - 1 );
                     }
@@ -360,10 +360,8 @@ namespace IO {
                 for( u8 x = 0; x < p_width; x += 2, ++i ) {
                     u8 cur = reinterpret_cast<const u8*>( p_spriteData )[ i ];
                     u8 up = cur >> 4, down = cur & 0xf;
-                    BITMAP_SPRITE[ 2 * ( i ) + 1 ] = ( !!up ) *
-                        ( ( 1 << 15 ) | p_spritePal[ up ] );
-                    BITMAP_SPRITE[ 2 * ( i ) ] = ( !!down ) * ( ( 1 << 15 ) |
-                            p_spritePal[ down ] );
+                    BITMAP_SPRITE[ 2 * ( i ) + 1 ] = ( !!up ) * ( ( 1 << 15 ) | p_spritePal[ up ] );
+                    BITMAP_SPRITE[ 2 * ( i ) ] = ( !!down ) * ( ( 1 << 15 ) | p_spritePal[ down ] );
                 }
             }
         }
@@ -375,8 +373,8 @@ namespace IO {
                         bool isOutline = false;
                         for( s8 dx = -1; dx < 2; ++dx ) {
                             for( s8 dy = -1; dy < 2; ++dy ) {
-                                if( x + dx >= 0 && x + dx < p_width
-                                        && y + dy >= 0 && y + dy < p_height ) {
+                                if( x + dx >= 0 && x + dx < p_width && y + dy >= 0
+                                    && y + dy < p_height ) {
                                     auto cur = BITMAP_SPRITE[ p_width * ( y + dy ) + x + dx ];
                                     if( ( cur & ( 1 << 15 ) ) && cur != p_outlineColor ) {
                                         isOutline = true;
@@ -384,24 +382,21 @@ namespace IO {
                                 }
                             }
                         }
-                        if( isOutline ) {
-                            BITMAP_SPRITE[ p_width * y + x ] = p_outlineColor;
-                        }
+                        if( isOutline ) { BITMAP_SPRITE[ p_width * y + x ] = p_outlineColor; }
                     }
                 }
             }
         }
 
         return loadSpriteB( p_oamIdx, p_tileIdx, p_posX, p_posY, p_width, p_height,
-                            ( p_spritePal && p_spriteData ) ? BITMAP_SPRITE : 0,
-                            p_spriteDataLen, p_flipX, p_flipY, p_hidden, p_priority, p_bottom );
+                            ( p_spritePal && p_spriteData ) ? BITMAP_SPRITE : 0, p_spriteDataLen,
+                            p_flipX, p_flipY, p_hidden, p_priority, p_bottom );
     }
-
 
     u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileIdx, const u16 p_posX, const u16 p_posY,
                      const u8 p_width, const u8 p_height, const unsigned short* p_spriteData,
-                     const u32 p_spriteDataLen, bool p_flipX,
-                     bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom ) {
+                     const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
+                     ObjPriority p_priority, bool p_bottom ) {
         IO::SpriteInfo* sInfo = ( p_bottom ? spriteInfo : spriteInfoTop ) + p_oamIdx;
         OAMTable*       oam   = ( p_bottom ? Oam : OamTop );
 
@@ -784,8 +779,8 @@ namespace IO {
                            p_bottom );
     }
     u16 loadAnimatedSpriteB( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
-                             u16 p_tileCnt, ObjPriority p_priority, bool p_bottom,
-                             bool p_outline, u16 p_outlineColor ) {
+                             u16 p_tileCnt, ObjPriority p_priority, bool p_bottom, bool p_outline,
+                             u16 p_outlineColor ) {
         FS::read( p_file, TEMP_PAL, sizeof( u16 ), 16 );
         u8 frameCount, width, height;
         FS::read( p_file, &frameCount, sizeof( u8 ), 1 );

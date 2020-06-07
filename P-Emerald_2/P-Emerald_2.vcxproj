@@ -14,6 +14,7 @@
     <ClInclude Include="arm7\include\ipc.h" />
     <ClInclude Include="arm9\include\ability.h" />
     <ClInclude Include="arm9\include\abilityNames.h" />
+    <ClInclude Include="arm9\include\animations.h" />
     <ClInclude Include="arm9\include\bag.h" />
     <ClInclude Include="arm9\include\bagUI.h" />
     <ClInclude Include="arm9\include\bagViewer.h" />
@@ -70,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arm7\source\main.c" />
+    <ClCompile Include="arm9\source\animations.cpp" />
     <ClCompile Include="arm9\source\auxspi.cpp" />
     <ClCompile Include="arm9\source\bag.cpp" />
     <ClCompile Include="arm9\source\bagUI.cpp" />

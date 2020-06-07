@@ -58,7 +58,8 @@ namespace IO {
         }
     }
 
-    void font::printCharB( u16 p_ch, u16* p_palette, u16* p_buffer, u16 p_bufferWidth, s16 p_x, s16 p_y ) const {
+    void font::printCharB( u16 p_ch, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth, s16 p_x,
+                           s16 p_y ) const {
         _shiftchar( p_ch );
 
         s16 putX, putY;
@@ -77,7 +78,7 @@ namespace IO {
         }
     }
 
-    void font::printStringBC( const char *p_string, u16* p_palette, u16* p_buffer,
+    void font::printStringBC( const char *p_string, u16 *p_palette, u16 *p_buffer,
                               u16 p_bufferWidth, alignment p_alignment, u8 p_yDistance ) const {
         u32 current_char = 0;
         s16 putX = 0, putY = 0;
@@ -107,8 +108,8 @@ namespace IO {
         }
     }
 
-    void font::printStringB( const char *p_string, u16* p_palette, u16* p_buffer,
-                             u16 p_bufferWidth, alignment p_alignment, u8 p_yDistance ) const {
+    void font::printStringB( const char *p_string, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth,
+                             alignment p_alignment, u8 p_yDistance ) const {
         u32 current_char = 0;
         s16 putX = 0, putY = 0;
         if( p_alignment == RIGHT ) putX = p_bufferWidth - stringWidth( p_string );
@@ -215,7 +216,7 @@ namespace IO {
     }
 
     void font::printMaxStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX,
-                               u16 p_breakChar, u8 p_layer ) const {
+                                u16 p_breakChar, u8 p_layer ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -269,8 +270,8 @@ namespace IO {
     }
 
     void font::printBreakingString( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
-            bool p_bottom, alignment p_alignment, u8 p_yDistance, char p_breakChar,
-            s8 p_adjustX, u8 p_layer ) const {
+                                    bool p_bottom, alignment p_alignment, u8 p_yDistance,
+                                    char p_breakChar, s8 p_adjustX, u8 p_layer ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -281,7 +282,7 @@ namespace IO {
         while( p_string[ current_char ] ) {
             if( lineWd <= 0 || p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
-                putX = ( p_x -= p_adjustX );
+                putX   = ( p_x -= p_adjustX );
                 lineWd = stringMaxWidth( p_string + current_char + 1, p_maxWidth, p_breakChar );
                 if( p_alignment == RIGHT ) putX = p_x - lineWd;
                 if( p_alignment == CENTER ) putX = p_x - lineWd / 2;
@@ -300,8 +301,8 @@ namespace IO {
     }
 
     void font::printBreakingStringC( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
-            bool p_bottom, alignment p_alignment, u8 p_yDistance, char p_breakChar,
-            s8 p_adjustX, u8 p_layer ) const {
+                                     bool p_bottom, alignment p_alignment, u8 p_yDistance,
+                                     char p_breakChar, s8 p_adjustX, u8 p_layer ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -313,7 +314,7 @@ namespace IO {
         while( p_string[ current_char ] ) {
             if( lineWd <= 0 || p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
-                putX = ( p_x -= p_adjustX );
+                putX   = ( p_x -= p_adjustX );
                 lineWd = stringMaxWidthC( p_string + current_char + 1, p_maxWidth, p_breakChar );
 
                 if( p_alignment == RIGHT ) putX = p_x - lineWd;

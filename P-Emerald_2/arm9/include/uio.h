@@ -59,13 +59,12 @@ namespace IO {
     ( IN_RANGE_I_C( touch, IO::inputTarget( p_x, p_y, p_r ) ) \
       && IO::waitForInput( IO::inputTarget( p_x, p_y, p_r ) ) )
 
-    consteval u16 RGB( u8 p_r, u8 p_g, u8 p_b ) {
+    constexpr u16 RGB( u8 p_r, u8 p_g, u8 p_b ) {
         return RGB15( p_r, p_g, p_b ) | BIT( 15 );
     }
 
-    consteval u16 COMPL( u16 p_color ) {
-        return  RGB( 31 - ( p_color >> 10 ) % 32, 31 - ( p_color >> 5 ) % 32,
-                31 - p_color % 32 );
+    constexpr u16 COMPL( u16 p_color ) {
+        return RGB( 31 - ( p_color >> 10 ) % 32, 31 - ( p_color >> 5 ) % 32, 31 - p_color % 32 );
     }
 
     constexpr u8 RED2_IDX  = 247;
@@ -79,28 +78,28 @@ namespace IO {
 
     constexpr u16 CHOICE_COLOR = RGB( 16, 25, 19 );
 
-    constexpr u16 GREEN = RGB( 0, 20, 0 );
-    constexpr u16 RED = RGB( 28, 0, 0 );
-    constexpr u16 RED2 = RGB( 10, 0, 0 );
-    constexpr u16 BLUE = RGB( 0, 10, 31 );
-    constexpr u16 BLUE2 = RGB( 0, 0, 15 );
-    constexpr u16 WHITE = RGB( 30, 30, 30 );
-    constexpr u16 GRAY = RGB( 15, 15, 15 );
-    constexpr u16 NORMAL_COLOR = RGB( 27, 27, 27 );
-    constexpr u16 BLACK = RGB( 0, 0, 0 );
-    constexpr u16 YELLOW = RGB( 24, 24, 0 );
-    constexpr u16 PURPLE = RGB( 24, 0, 24 );
-    constexpr u16 TURQOISE = RGB( 0, 24, 24 );
-    constexpr u16 ICE_COLOR = RGB( 15, 31, 31 );
-    constexpr u16 FAIRY_COLOR = RGB( 31, 15, 31 );
-    constexpr u16 GROUND_COLOR = RGB( 31, 31, 15 );
-    constexpr u16 POISON_COLOR = RGB( 31, 0, 15 );
-    constexpr u16 ORANGE = RGB( 31, 15, 0 );
-    constexpr u16 GHOST_COLOR = RGB( 15, 0, 31 );
-    constexpr u16 ROCK_COLOR = RGB( 28, 23, 7 );
-    constexpr u16 BUG_COLOR = RGB( 15, 28, 7 );
-    constexpr u16 STEEL_COLOR = RGB( 24, 24, 24 );
-    constexpr u16 DRAGON_COLOR = RGB( 7, 7, 24 );
+    constexpr u16 GREEN         = RGB( 0, 20, 0 );
+    constexpr u16 RED           = RGB( 28, 0, 0 );
+    constexpr u16 RED2          = RGB( 10, 0, 0 );
+    constexpr u16 BLUE          = RGB( 0, 10, 31 );
+    constexpr u16 BLUE2         = RGB( 0, 0, 15 );
+    constexpr u16 WHITE         = RGB( 30, 30, 30 );
+    constexpr u16 GRAY          = RGB( 15, 15, 15 );
+    constexpr u16 NORMAL_COLOR  = RGB( 27, 27, 27 );
+    constexpr u16 BLACK         = RGB( 0, 0, 0 );
+    constexpr u16 YELLOW        = RGB( 24, 24, 0 );
+    constexpr u16 PURPLE        = RGB( 24, 0, 24 );
+    constexpr u16 TURQOISE      = RGB( 0, 24, 24 );
+    constexpr u16 ICE_COLOR     = RGB( 15, 31, 31 );
+    constexpr u16 FAIRY_COLOR   = RGB( 31, 15, 31 );
+    constexpr u16 GROUND_COLOR  = RGB( 31, 31, 15 );
+    constexpr u16 POISON_COLOR  = RGB( 31, 0, 15 );
+    constexpr u16 ORANGE        = RGB( 31, 15, 0 );
+    constexpr u16 GHOST_COLOR   = RGB( 15, 0, 31 );
+    constexpr u16 ROCK_COLOR    = RGB( 28, 23, 7 );
+    constexpr u16 BUG_COLOR     = RGB( 15, 28, 7 );
+    constexpr u16 STEEL_COLOR   = RGB( 24, 24, 24 );
+    constexpr u16 DRAGON_COLOR  = RGB( 7, 7, 24 );
     constexpr u16 UNKNOWN_COLOR = RGB( 0, 42, 42 );
 
     inline u16* BG_PAL( bool p_bottom ) {
