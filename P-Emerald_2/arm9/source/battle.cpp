@@ -66,11 +66,12 @@ namespace BATTLE {
         _opponentTeam[ 0 ] = p_opponent;
         _opponentTeamSize  = 1;
 
+        _policy = p_policy;
         _isWildBattle = true;
 
         _field    = field( p_policy.m_weather );
         _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
-                              p_background, _policy.m_mode );
+                              p_background, DOUBLE /*_policy.m_mode*/ );
 
     }
 
@@ -130,7 +131,8 @@ namespace BATTLE {
             }
 
             // Compute AI's moves
-            for( u8 i = 0; i < u8( _policy.m_mode ); ++i ) {
+
+            for( u8 i = 0; i < ( _policy.m_mode == SINGLE ? 1 : 0 ); ++i ) {
                 moves[ field::OPPONENT_SIDE ][ i ] = getAIMove( i );
             }
 

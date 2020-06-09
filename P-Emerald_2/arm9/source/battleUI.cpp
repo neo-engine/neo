@@ -73,20 +73,20 @@ namespace BATTLE {
 // Top screen
 // (opp 1, opp 2, own 1, own 2)
 #define SPR_HPBAR_OAM 0
-#define SPR_PKMN_START_OAM( p_idx ) ( 4 + 4 * ( p_idx ) )
-#define SPR_PKMN_SHADOW_START_OAM( p_idx ) ( 20 + 4 * ( p_idx ) )
-#define SPR_PLATFORM_OAM 36
-#define SPR_STATUS_ICON_OAM( p_idx ) ( 40 + ( p_idx ) )
-#define SPR_SHINY_ICON_OAM( p_idx ) ( 44 + ( p_idx ) )
-#define SPR_STATUSBG_OAM( p_idx ) ( 48 + 2 * ( p_idx ) )
+#define SPR_STATUSBG_OAM( p_idx ) ( 4 + 3 * ( p_idx ) )
+#define SPR_PKMN_START_OAM( p_idx ) ( 16 + 4 * ( p_idx ) )
+#define SPR_PKMN_SHADOW_START_OAM( p_idx ) ( 32 + 4 * ( p_idx ) )
+#define SPR_PLATFORM_OAM 48
+#define SPR_STATUS_ICON_OAM( p_idx ) ( 52 + ( p_idx ) )
+#define SPR_SHINY_ICON_OAM( p_idx ) ( 56 + ( p_idx ) )
 
 #define SPR_PKMN_PAL( p_idx ) ( ( p_idx ) )
 #define SPR_PKMN_SHADOW_PAL 4
 #define SPR_PLATFORM_PAL 5
 #define SPR_HPBAR_PAL 7
-#define SPR_STATUS_ICON_PAL 8
-#define SPR_SHINY_ICON_PAL 9
-#define SPR_STATUSBG_PAL 10
+#define SPR_STATUS_ICON_PAL 9
+#define SPR_SHINY_ICON_PAL 10
+#define SPR_STATUSBG_PAL 11
 
 #define SPR_PKMN_GFX( p_idx ) ( 144 * ( p_idx ) )
 
@@ -95,13 +95,13 @@ namespace BATTLE {
 
 #define OPP_PLAT_Y 56
 #define PLY_PLAT_Y 120
-#define OPP_2_HP_X 102
-#define OPP_2_HP_Y 40
-#define OPP_1_HP_X 114
-#define OPP_1_HP_Y 8
-#define OWN_2_HP_X 122
+#define OPP_2_HP_X 94
+#define OPP_2_HP_Y 44
+#define OPP_1_HP_X 100
+#define OPP_1_HP_Y 12
+#define OWN_2_HP_X 130
 #define OWN_2_HP_Y 152
-#define OWN_1_HP_X 110
+#define OWN_1_HP_X 124
 #define OWN_1_HP_Y 120
 
 #define OWN_HP_COL 210
@@ -162,6 +162,14 @@ namespace BATTLE {
                         IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OPP_1_HP_X - 32,
                         OPP_1_HP_Y, 64, 32, 0, 0, 0, false, true, false, OBJPRIORITY_3, false,
                         OBJMODE_BLENDED );
+        IO::loadSprite( SPR_STATUSBG_OAM( 1 ), SPR_STATUSBG_PAL,
+                        IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OPP_2_HP_X - 96,
+                        OPP_2_HP_Y, 64, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false,
+                        OBJMODE_BLENDED );
+        IO::loadSprite( SPR_STATUSBG_OAM( 1 ) + 1, SPR_STATUSBG_PAL,
+                        IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OPP_2_HP_X - 32,
+                        OPP_2_HP_Y, 64, 32, 0, 0, 0, false, true, false, OBJPRIORITY_3, false,
+                        OBJMODE_BLENDED );
 
         IO::loadSprite( SPR_HPBAR_OAM, SPR_HPBAR_PAL, tileCnt, OPP_1_HP_X, OPP_1_HP_Y, 32, 32, 0, 0,
                         0, false, false, true, OBJPRIORITY_3, false, OBJMODE_BLENDED );
@@ -179,6 +187,33 @@ namespace BATTLE {
                                       OWN_2_HP_Y, 32, 32, hpbar_battlePal, hpbar_battleTiles,
                                       hpbar_battleTilesLen, false, false, true, OBJPRIORITY_3,
                                       false, OBJMODE_BLENDED );
+
+            IO::loadSprite( SPR_STATUSBG_OAM( 2 ), SPR_STATUSBG_PAL,
+                    IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_1_HP_X,
+                    OWN_1_HP_Y, 64, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false,
+                    OBJMODE_BLENDED );
+            IO::loadSprite( SPR_STATUSBG_OAM( 2 ) + 2, SPR_STATUSBG_PAL,
+                    IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_1_HP_X + 64,
+                    OWN_1_HP_Y, 64, 32, 0, 0, 0, false, true, false, OBJPRIORITY_3, false,
+                    OBJMODE_BLENDED );
+            IO::loadSprite( SPR_STATUSBG_OAM( 2 ) + 1, SPR_STATUSBG_PAL,
+                    IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_1_HP_X + 76,
+                    OWN_1_HP_Y, 64, 32, 0, 0, 0, false, true, false, OBJPRIORITY_3, false,
+                    OBJMODE_BLENDED );
+
+            IO::loadSprite( SPR_STATUSBG_OAM( 3 ), SPR_STATUSBG_PAL,
+                    IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_2_HP_X,
+                    OWN_2_HP_Y, 64, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false,
+                    OBJMODE_BLENDED );
+            IO::loadSprite( SPR_STATUSBG_OAM( 3 ) + 2, SPR_STATUSBG_PAL,
+                    IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_2_HP_X + 64,
+                    OWN_2_HP_Y, 64, 32, 0, 0, 0, false, true, false, OBJPRIORITY_3, false,
+                    OBJMODE_BLENDED );
+            IO::loadSprite( SPR_STATUSBG_OAM( 3 ) + 1, SPR_STATUSBG_PAL,
+                    IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_2_HP_X + 76,
+                    OWN_2_HP_Y, 64, 32, 0, 0, 0, false, true, false, OBJPRIORITY_3, false,
+                    OBJMODE_BLENDED );
+
         } else {
             IO::loadSprite( SPR_HPBAR_OAM + 3, SPR_HPBAR_PAL + 1, tileCnt, OWN_1_HP_X, OWN_1_HP_Y,
                             32, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3, false,
@@ -187,6 +222,32 @@ namespace BATTLE {
                                       OWN_2_HP_Y, 32, 32, hpbar_battlePal, hpbar_battleTiles,
                                       hpbar_battleTilesLen, false, false, true, OBJPRIORITY_3,
                                       false, OBJMODE_BLENDED );
+
+            IO::loadSprite( SPR_STATUSBG_OAM( 2 ), SPR_STATUSBG_PAL,
+                    IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_2_HP_X,
+                    OWN_2_HP_Y, 64, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false,
+                    OBJMODE_BLENDED );
+            IO::loadSprite( SPR_STATUSBG_OAM( 2 ) + 2, SPR_STATUSBG_PAL,
+                    IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_2_HP_X + 64,
+                    OWN_2_HP_Y, 64, 32, 0, 0, 0, false, true, false, OBJPRIORITY_3, false,
+                    OBJMODE_BLENDED );
+            IO::loadSprite( SPR_STATUSBG_OAM( 2 ) + 1, SPR_STATUSBG_PAL,
+                    IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_2_HP_X + 96,
+                    OWN_2_HP_Y, 64, 32, 0, 0, 0, false, true, false, OBJPRIORITY_3, false,
+                    OBJMODE_BLENDED );
+
+            IO::loadSprite( SPR_STATUSBG_OAM( 3 ), SPR_STATUSBG_PAL,
+                    IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_1_HP_X,
+                    OWN_1_HP_Y, 64, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false,
+                    OBJMODE_BLENDED );
+            IO::loadSprite( SPR_STATUSBG_OAM( 3 ) + 1, SPR_STATUSBG_PAL,
+                    IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_1_HP_X + 96,
+                    OWN_1_HP_Y, 64, 32, 0, 0, 0, false, true, false, OBJPRIORITY_3, false,
+                    OBJMODE_BLENDED );
+            IO::loadSprite( SPR_STATUSBG_OAM( 3 ) + 2, SPR_STATUSBG_PAL,
+                    IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_1_HP_X + 64,
+                    OWN_1_HP_Y, 64, 32, 0, 0, 0, false, true, false, OBJPRIORITY_3, false,
+                    OBJMODE_BLENDED );
         }
 
         // Shiny / Status icon
@@ -204,12 +265,12 @@ namespace BATTLE {
             u16 anchory = IO::OamTop->oamBuffer[ SPR_HPBAR_OAM + i ].y + 4;
             IO::loadSprite( SPR_STATUS_ICON_OAM( i ), SPR_STATUS_ICON_PAL,
                             IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 0 ) ].gfxIndex,
-                            anchorx + 90, anchory + 4, 8, 8, status_parPal, status_parTiles,
+                            anchorx + 90, anchory, 8, 8, status_parPal, status_parTiles,
                             status_parTilesLen / 2, false, false, true, OBJPRIORITY_0, false,
                             OBJMODE_NORMAL );
             IO::loadSprite( SPR_SHINY_ICON_OAM( i ), SPR_SHINY_ICON_PAL,
-                            IO::OamTop->oamBuffer[ SPR_SHINY_ICON_OAM( 0 ) ].gfxIndex, anchorx + 82,
-                            anchory + 4, 8, 8, status_shinyPal, status_shinyTiles,
+                            IO::OamTop->oamBuffer[ SPR_SHINY_ICON_OAM( 0 ) ].gfxIndex, anchorx + 90,
+                            anchory + 8, 8, 8, status_shinyPal, status_shinyTiles,
                             status_shinyTilesLen, false, false, true, OBJPRIORITY_0, false,
                             OBJMODE_NORMAL );
         }
@@ -261,7 +322,7 @@ namespace BATTLE {
         u16 hpy     = oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].y;
 
         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 2 );
         IO::smallFont->setColor( IO::WHITE_IDX, 1 );
         IO::smallFont->setColor( IO::GRAY_IDX, 2 );
         // show/hide hp bar
@@ -411,7 +472,7 @@ namespace BATTLE {
 
         IO::fadeScreen( IO::UNFADE, true, true );
         REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
-        REG_BLDALPHA = 0x0f | ( 0x0A << 8 );
+        REG_BLDALPHA = 0xff | ( 0x06 << 8 );
         bgUpdate( );
         // Load pkmn sprite
         IO::loadPKMNSprite( p_pokemon->getSpecies( ), WILD_BATTLE_SPRITE_X_START,
@@ -421,50 +482,40 @@ namespace BATTLE {
                             p_pokemon->getForme( ) );
 
         u16 emptyPal[ 32 ]                = {0xffff, 0xffff, 0};
-        IO::OamTop->matrixBuffer[ 1 ].hdx = ( 1 << 8 );
-        IO::OamTop->matrixBuffer[ 1 ].hdy = ( 0 << 8 );
-        IO::OamTop->matrixBuffer[ 1 ].vdx = ( 1 << 9 );
-        IO::OamTop->matrixBuffer[ 1 ].vdy = ( 1 << 10 );
+        IO::OamTop->matrixBuffer[ 2 ].hdx = ( 1 << 8 );
+        IO::OamTop->matrixBuffer[ 2 ].hdy = ( 0 << 8 );
+        IO::OamTop->matrixBuffer[ 2 ].vdx = ( 1 << 9 );
+        IO::OamTop->matrixBuffer[ 2 ].vdy = ( 1 << 10 );
 
-        s8 sy = 4, sx = -3;
+        u16 sy = oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].y + 8
+                - ( IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / 2 ),
+            sx = oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].x + 2 -
+                3 * IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / 4;
         s8 diffx = 80, diffy = 44;
         IO::loadSprite( SPR_PKMN_SHADOW_START_OAM( 0 ) + 0, SPR_PKMN_SHADOW_PAL,
-                        oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].gfxIndex,
-                        oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].x
-                            + IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / sx,
-                        oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].y
-                            - IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / sy,
+                        oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].gfxIndex, sx, sy,
                         64, 64, emptyPal, 0, 0, false, false, false, OBJPRIORITY_3, false,
                         OBJMODE_BLENDED );
         IO::loadSprite( SPR_PKMN_SHADOW_START_OAM( 0 ) + 1, SPR_PKMN_SHADOW_PAL,
                         oam[ SPR_PKMN_START_OAM( 0 ) + 1 ].gfxIndex,
-                        diffx + oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].x
-                            + IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / sx,
-                        oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].y
-                            - IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / sy,
+                        diffx + sx, sy,
                         32, 64, 0, 0, 0, false, false, false, OBJPRIORITY_3, false,
                         OBJMODE_BLENDED );
         IO::loadSprite( SPR_PKMN_SHADOW_START_OAM( 0 ) + 2, SPR_PKMN_SHADOW_PAL,
                         oam[ SPR_PKMN_START_OAM( 0 ) + 2 ].gfxIndex,
-                        -23 + oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].x
-                            + IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / sx,
-                        diffy + oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].y
-                            - IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / sy,
+                        -23 + sx, diffy + sy,
                         64, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false,
                         OBJMODE_BLENDED );
         IO::loadSprite( SPR_PKMN_SHADOW_START_OAM( 0 ) + 3, SPR_PKMN_SHADOW_PAL,
                         oam[ SPR_PKMN_START_OAM( 0 ) + 3 ].gfxIndex,
-                        -23 + diffx + oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].x
-                            + IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / sx,
-                        diffy + oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].y
-                            - IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / sy,
+                        -23 + diffx + sx, diffy + sy,
                         32, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false,
                         OBJMODE_BLENDED );
 
         for( u8 i = 0; i < 4; ++i ) {
             oam[ SPR_PKMN_SHADOW_START_OAM( 0 ) + i ].isRotateScale = true;
             oam[ SPR_PKMN_SHADOW_START_OAM( 0 ) + i ].isSizeDouble  = true;
-            oam[ SPR_PKMN_SHADOW_START_OAM( 0 ) + i ].rotationIndex = 1;
+            oam[ SPR_PKMN_SHADOW_START_OAM( 0 ) + i ].rotationIndex = 2;
         }
 
         IO::updateOAM( false );
@@ -483,6 +534,12 @@ namespace BATTLE {
             //         SHINY_ANIM, 15, tileCnt );
         }
         _curHP[ 0 ][ 0 ] = 101;
+        _curHP[ 0 ][ 1 ] = 101;
+        _curHP[ 1 ][ 0 ] = 101;
+        _curHP[ 1 ][ 1 ] = 101;
         updatePkmnStats( true, 0, p_pokemon );
+        updatePkmnStats( true, 1, p_pokemon );
+        updatePkmnStats( false, 0, p_pokemon );
+        updatePkmnStats( false, 1, p_pokemon );
     }
 } // namespace BATTLE
