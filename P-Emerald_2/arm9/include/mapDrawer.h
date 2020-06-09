@@ -86,7 +86,7 @@ namespace MAP {
             void handleTrainer( );
 
             BATTLE::battlePolicy getBattlePolicy( bool p_isWildBattle,
-                    BATTLE::battlePolicy::battleMode p_mode = BATTLE::battlePolicy::SINGLE,
+                    BATTLE::battleMode p_mode = BATTLE::SINGLE,
                     bool p_distributeEXP = true );
         public:
             block&        at( u16 p_x, u16 p_y ) const;

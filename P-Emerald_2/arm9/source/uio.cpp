@@ -266,7 +266,7 @@ namespace IO {
         if( p_big )
             displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 20, 24 );
         else
-            displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 8, 12 );
+            displayHP( p_HPstart, p_HP, p_x, p_y, p_freecolor1, p_freecolor2, p_delay, 9, 12 );
     }
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2,
                     bool p_delay, u8 p_innerR, u8 p_outerR, bool p_sub ) {
@@ -274,6 +274,7 @@ namespace IO {
 
         if( p_HP > 100 ) {
             BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
+            BG_PAL( p_sub )[ p_freecolor2 ] = GREEN2;
             for( u16 phi = 0; phi < 300; phi++ ) {
                 s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
                 s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
@@ -281,13 +282,14 @@ namespace IO {
                     u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
                     u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
                     if( nx == p_x + 16 + j ) --nx;
-                    ( (color *) ( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ]
-                        = ( ( (u8) p_freecolor1 ) << 8 ) | (u8) p_freecolor1;
-                    // printf( "%i %i; ", nx, ny );
+                    if( j == p_outerR || j == p_innerR ) {
+                        setPixel( nx, ny, p_sub, p_freecolor2 );
+                    } else {
+                        setPixel( nx, ny, p_sub, p_freecolor1 );
+                    }
                 }
             }
         } else {
-            BG_PAL( p_sub )[ p_freecolor2 ] = NORMAL_COLOR;
             if( 100 - p_HPstart <= p_HP ) {
                 for( u16 phi = 3 * ( 100 - p_HPstart ); phi < 3 * p_HP; phi++ ) {
                     s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
@@ -297,10 +299,15 @@ namespace IO {
                         u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
                         if( nx == p_x + 16 + j ) --nx;
 
-                        ( (color *) ( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ]
-                            = ( ( (u8) p_freecolor2 ) << 8 ) | (u8) p_freecolor2;
-                        if( phi >= 150 ) BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
-                        if( phi >= 225 ) BG_PAL( p_sub )[ p_freecolor1 ] = RED;
+                        setPixel( nx, ny, p_sub, 0 );
+                        if( phi >= 150 ) {
+                            BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
+                            BG_PAL( p_sub )[ p_freecolor2 ] = YELLOW2;
+                        }
+                        if( phi >= 225 ) {
+                            BG_PAL( p_sub )[ p_freecolor1 ] = RED;
+                            BG_PAL( p_sub )[ p_freecolor2 ] = RED2;
+                        }
                     }
                     if( p_delay ) swiWaitForVBlank( );
                 }
@@ -313,10 +320,15 @@ namespace IO {
                         u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
                         if( nx == p_x + 16 + j ) --nx;
 
-                        ( (color *) ( BG_BMP( p_sub ) ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ]
-                            = ( ( (u8) p_freecolor1 ) << 8 ) | (u8) p_freecolor1;
-                        if( phi < 225 ) BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
-                        if( phi < 150 ) BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
+                        setPixel( nx, ny, p_sub, 0 );
+                        if( phi < 225 ) {
+                            BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
+                            BG_PAL( p_sub )[ p_freecolor2 ] = YELLOW2;
+                        }
+                        if( phi < 150 ) {
+                            BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
+                            BG_PAL( p_sub )[ p_freecolor2 ] = GREEN2;
+                        }
                     }
                     if( p_delay ) swiWaitForVBlank( );
                 }

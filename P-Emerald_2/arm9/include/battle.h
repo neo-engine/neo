@@ -333,26 +333,6 @@ namespace BATTLE {
                                 std::vector<battleMove> p_tergetedMoves );
     };
 
-    struct battlePolicy {
-        enum battleMode { SINGLE = 0, DOUBLE = 1 };
-
-        battleMode  m_mode;
-        bool        m_allowMegaEvolution;
-        bool        m_distributeEXP;
-        bool        m_allowNextPkmnPreview; // Preview of next opp. pkmn
-        bool        m_allowCapture;
-        weather     m_weather;
-        u16         m_aiLevel;
-        u16         m_roundLimit;
-    };
-
-    constexpr battlePolicy DEFAULT_TRAINER_POLICY = {
-        battlePolicy::SINGLE, true, true, true, false, NO_WEATHER, 5, 0
-    };
-    constexpr battlePolicy DEFAULT_WILD_POLICY = {
-        battlePolicy::SINGLE, true, true, true, true, NO_WEATHER, 0, 0
-    };
-
     class battle {
         public:
         enum battleEndReason {
@@ -445,14 +425,14 @@ namespace BATTLE {
          * @brief: Creates a new trainer battle.
          */
         battle( pokemon* p_playerTeam, u8 p_playerTeamSize,
-                u16 p_opponentId, u8 p_platform = 0, u8 p_platform2 = 0, u8 p_background = 0,
+                u16 p_opponentId, u8 p_platform = 10, u8 p_platform2 = 10, u8 p_background = 0,
                 battlePolicy = DEFAULT_TRAINER_POLICY );
 
         /*
          * @brief: Creates a new wild pkmn battle.
          */
         battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent,
-                u8 p_platform = 0, u8 p_platform2 = 0, u8 p_background = 0,
+                u8 p_platform = 10, u8 p_platform2 = 10, u8 p_background = 0,
                 battlePolicy = DEFAULT_WILD_POLICY );
 
         /*

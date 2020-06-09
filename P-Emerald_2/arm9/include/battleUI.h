@@ -27,24 +27,32 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "battle.h"
+#include "battleDefines.h"
 
 namespace BATTLE {
     class battleUI {
         u8   _platform;
         u8   _platform2;
         u8   _background;
-        bool _isWildBattle;
+        battleMode _mode;
+
+        u8   _curHP[ 2 ][ 2 ] = { { 0 } };
 
         void initTop( );
         void initSub( );
 
+        /*
+         * @brief: Updates the HP bar for the given pkmn to the specified value.
+         * @param p_init: Initialize the hp bar first.
+         */
+        void updateHPbar( bool p_opponent, u8 p_pos, u8 p_newValue, bool p_init = false );
+
       public:
         battleUI() {}
 
-        battleUI( u8 p_platform, u8 p_platform2, u8 p_background, bool p_isWildBattle )
+        battleUI( u8 p_platform, u8 p_platform2, u8 p_background, battleMode p_mode )
             : _platform( p_platform ), _platform2( p_platform2 ), _background( p_background ),
-              _isWildBattle( p_isWildBattle ) {
+              _mode( p_mode ) {
         }
 
         /*
@@ -52,6 +60,21 @@ namespace BATTLE {
          * screen.
          */
         void init( );
+
+        /*
+         * @brief: Update the stats of the pkmn at the given position.
+         */
+        void updatePkmnStats( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
+
+        /*
+         * @brief: Recalls the given pkmn.
+         */
+        void recallPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
+
+        /*
+         * @brief: Sends out the given pkmn at the specified position.
+         */
+        void sendOutPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
 
         /*
          * @brief: shows the wild pkmn appear

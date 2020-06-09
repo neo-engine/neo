@@ -55,7 +55,7 @@ namespace BATTLE {
 
         _field    = field( p_policy.m_weather );
         _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
-                              p_background, _isWildBattle );
+                              p_background, _policy.m_mode );
     }
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent,
                     u8 p_platform, u8 p_platform2, u8 p_background, battlePolicy p_policy ) {
@@ -70,7 +70,7 @@ namespace BATTLE {
 
         _field    = field( p_policy.m_weather );
         _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
-                              p_background, _isWildBattle );
+                              p_background, _policy.m_mode );
 
     }
 
@@ -93,7 +93,7 @@ namespace BATTLE {
                 moves[ field::PLAYER_SIDE ][ 0 ] = getMoveSelection( 0,
                         _policy.m_allowMegaEvolution );
 
-                if( _policy.m_mode == battlePolicy::DOUBLE ) {
+                if( _policy.m_mode == DOUBLE ) {
                     // Compute player's first pokemon's move
                     if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == RUN ) {
                         moves[ field::PLAYER_SIDE ][ 0 ] = {NO_OP, 0, {}, {field::PLAYER_SIDE, 0}};

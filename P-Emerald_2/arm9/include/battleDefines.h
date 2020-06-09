@@ -298,4 +298,26 @@ namespace BATTLE {
         HEALINGWISH       = 2,
         LUNARDANCE        = 3,
     };
+
+    enum battleMode { SINGLE = 0, DOUBLE = 1 };
+
+    struct battlePolicy {
+        battleMode  m_mode;
+        bool        m_allowMegaEvolution;
+        bool        m_distributeEXP;
+        bool        m_allowNextPkmnPreview; // Preview of next opp. pkmn
+        bool        m_allowCapture;
+        weather     m_weather;
+        u16         m_aiLevel;
+        u16         m_roundLimit;
+    };
+
+    constexpr battlePolicy DEFAULT_TRAINER_POLICY = {
+        SINGLE, true, true, true, false, NO_WEATHER, 5, 0
+    };
+    constexpr battlePolicy DEFAULT_WILD_POLICY = {
+        SINGLE, true, true, true, true, NO_WEATHER, 0, 0
+    };
+
+
 } // namespace BATTLE

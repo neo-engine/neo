@@ -476,7 +476,7 @@ namespace MAP {
     }
 
     BATTLE::battlePolicy mapDrawer::getBattlePolicy( bool p_isWildBattle,
-            BATTLE::battlePolicy::battleMode p_mode, bool p_distributeEXP ) {
+            BATTLE::battleMode p_mode, bool p_distributeEXP ) {
         BATTLE::battlePolicy res = p_isWildBattle ?
             BATTLE::battlePolicy( BATTLE::DEFAULT_WILD_POLICY ) :
             BATTLE::battlePolicy( BATTLE::DEFAULT_TRAINER_POLICY );
