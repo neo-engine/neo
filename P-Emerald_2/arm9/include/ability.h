@@ -28,11 +28,62 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <string>
+#include <nds.h>
 
-bool        getAbilityName( int p_abilityId, int p_language, char* p_out );
-std::string getAbilityName( int p_abilityId, int p_language );
-std::string getAbilityName( int p_abilityId );
+#include "abilityNames.h"
 
-bool        getAbilityDescr( int p_abilityId, int p_language, char* p_out );
-std::string getAbilityDescr( int p_abilityId, int p_language );
-std::string getAbilityDescr( int p_abilityId );
+bool        getAbilityName( u16 p_abilityId, u8 p_language, char* p_out );
+std::string getAbilityName( u16 p_abilityId, u8 p_language );
+std::string getAbilityName( u16 p_abilityId );
+
+bool        getAbilityDescr( u16 p_abilityId, u8 p_language, char* p_out );
+std::string getAbilityDescr( u16 p_abilityId, u8 p_language );
+std::string getAbilityDescr( u16 p_abilityId );
+
+constexpr bool allowsReplace( u16 p_ability ) {
+    switch( p_ability ) {
+        case A_COMATOSE:
+        case A_MULTITYPE:
+        case A_DISGUISE:
+        case A_GULP_MISSILE:
+        case A_ICE_FACE:
+        case A_ILLUSION:
+        case A_POWER_CONSTRUCT:
+        case A_RKS_SYSTEM:
+        case A_SCHOOLING:
+        case A_SHIELDS_DOWN:
+        case A_STANCE_CHANGE:
+        case A_WONDER_GUARD:
+        case A_ZEN_MODE:
+            return false;
+        default:
+            return true;
+    }
+}
+
+constexpr bool allowsCopy( u16 p_ability ) {
+    switch( p_ability ) {
+        case A_COMATOSE:
+        case A_MULTITYPE:
+        case A_DISGUISE:
+        case A_FLOWER_GIFT:
+        case A_FORECAST:
+        case A_GULP_MISSILE:
+        case A_ICE_FACE:
+        case A_IMPOSTER:
+        case A_ILLUSION:
+        case A_POWER_CONSTRUCT:
+        case A_POWER_OF_ALCHEMY:
+        case A_RECEIVER:
+        case A_RKS_SYSTEM:
+        case A_SCHOOLING:
+        case A_SHIELDS_DOWN:
+        case A_STANCE_CHANGE:
+        case A_TRACE:
+        case A_WONDER_GUARD:
+        case A_ZEN_MODE:
+            return false;
+        default:
+            return true;
+    }
+}

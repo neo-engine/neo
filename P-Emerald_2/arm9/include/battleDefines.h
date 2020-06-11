@@ -249,14 +249,14 @@ namespace BATTLE {
 
     enum pseudoWeather : u8 {
         NO_PSEUDO_WEATHER = 0,
-        IONDELUGE         = 1,
-        MAGICROOM         = 2,
-        WONDERROOM        = 3,
-        TRICKROOM         = 4,
-        GRAVITY           = 5,
-        WATERSPORT        = 6,
-        MUDSPORT          = 7,
-        FAIRYLOCK         = 8
+        IONDELUGE         = 1 << 0,
+        MAGICROOM         = 1 << 1,
+        WONDERROOM        = 1 << 2,
+        TRICKROOM         = 1 << 3,
+        GRAVITY           = 1 << 4,
+        WATERSPORT        = 1 << 5,
+        MUDSPORT          = 1 << 6,
+        FAIRYLOCK         = 1 << 7
     };
 
     enum terrain : u8 {

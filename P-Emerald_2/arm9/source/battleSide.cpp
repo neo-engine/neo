@@ -29,16 +29,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 
 namespace BATTLE {
-    void side::age( battleUI p_ui ) {
+    void side::age( battleUI* p_ui ) {
         // TODO
     }
 
-    bool side::addSideCondition( battleUI p_ui, sideCondition p_sideCondition, u8 p_duration ) {
+    bool side::addSideCondition( battleUI* p_ui, sideCondition p_sideCondition, u8 p_duration ) {
         // TODO
         return false;
     }
 
-    bool side::removeSideCondition( battleUI p_ui, sideCondition p_sideCondition ) {
+    bool side::removeSideCondition( battleUI* p_ui, sideCondition p_sideCondition ) {
         // TODO
         return false;
     }

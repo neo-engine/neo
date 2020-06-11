@@ -115,6 +115,15 @@ namespace IO {
                         bool p_female = false, bool p_flipX = false, bool p_topOnly = false,
                         u8 p_forme = 0 );
 
+    /*
+     * @brief: Loads the back sprite for the given pkmn.
+     */
+    u16 loadPKMNSpriteBack( const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                        u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny = false,
+                        bool p_female = false, bool p_flipX = false, bool p_topOnly = false,
+                        u8 p_forme = 0 );
+
+
     u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
                        u16 p_tileCnt, bool p_bottom = false, bool p_manaphy = false );
 

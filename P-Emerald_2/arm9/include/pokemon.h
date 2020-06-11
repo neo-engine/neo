@@ -30,6 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <type_traits>
 #include "defines.h"
 #include "pokemonData.h"
+#include "ability.h"
 
 struct trainerPokemon {
     u16 m_speciesId;
@@ -271,8 +272,9 @@ struct pokemon {
         } m_status;
         u8 m_statusint;
     };
-    u8 m_level : 8;
-    u8 m_battleForme : 8;
+    u8  m_level : 8;
+    u8  m_battleForme : 8;
+    u16 m_battleTimeAbility : 16;
     struct stats {
         u16 m_curHP : 16; // current HP
         u16 m_maxHP : 16;
@@ -383,7 +385,16 @@ struct pokemon {
     }
 
     constexpr u16 getAbility( ) const {
-        return m_boxdata.getAbility( );
+        if( m_battleTimeAbility ) {
+            return m_battleTimeAbility;
+        } else {
+            return m_boxdata.getAbility( );
+        }
+    }
+    inline bool setBattleTimeAbility( u16 p_ability ) {
+        if( !allowsReplace( getAbility( ) ) ) { return false; }
+        m_battleTimeAbility = p_ability;
+        return true;
     }
     constexpr bool isShiny( ) const {
         return m_boxdata.isShiny( );

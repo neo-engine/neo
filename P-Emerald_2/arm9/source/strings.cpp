@@ -744,5 +744,5 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Power: %hhu", "St\xe4rke: %hhu"},
     {"Accuracy: %hhu", "Genauigkeit: %hhu"},
     {"(never misses)", "(trifft immer)"},
-
+    {"%s's\n%s%.0s", "%.0s%s\nvon %s"},
 };

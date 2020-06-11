@@ -26,6 +26,7 @@
     */
 
 #pragma once
+#include <cstring>
 #include <map>
 #include <set>
 #include <string>
@@ -96,46 +97,57 @@ namespace BATTLE {
         status        _status;
         slotCondition _slotCondition;
         pokemon*      _pokemon;
+        pokemon       _transformedPkmn; // pkmn the pkmn is transformed into
+        bool          _isTransformed;
         u8            _volatileStatusCounter[ MAX_VOLATILE_STATUS ];
         u8            _volatileStatusAmount[ MAX_VOLATILE_STATUS ]; // Multiple stockpiles
         boosts        _boosts;
 
       public:
         /*
-         * @brief: Constructs and initializes a new slot, optionally with a default
-         * (wild) pokemon.
-         */
-        slot( pokemon* p_initialPokemon = nullptr );
-
-        /*
          * Ages the slot by one turn, processes all changes
          */
-        void age( battleUI p_ui );
+        void age( battleUI* p_ui );
+
+        /*
+         * @brief: Resets the slot
+         */
+        inline void reset( ) {
+            _status = status( 0 );
+            _slotCondition = slotCondition( 0 );
+            _isTransformed = false;
+            _boosts = boosts( 0 );
+            std::memset( &_transformedPkmn, 0, sizeof( pokemon ) );
+            std::memset( _volatileStatusCounter, 0, sizeof( _volatileStatusCounter ) );
+            std::memset( _volatileStatusAmount, 0, sizeof( _volatileStatusAmount ) );
+        }
 
         /*
          * @brief: Recalls a non-FAINTED pokemon.
          */
-        pokemon* recallPokemon( battleUI p_ui, bool p_keepVolatileStatus = false );
+        pokemon* recallPokemon( battleUI* p_ui, bool p_keepVolatileStatus = false );
         /*
          * @brief: Sends out a new pokemon to an EMPTY slot.
          */
-        bool sendPokemon( battleUI p_ui, pokemon* p_pokemon );
+        bool sendPokemon( battleUI* p_ui, pokemon* p_pokemon );
 
-        bool damagePokemon( battleUI p_ui, u16 p_damage );
-        bool healPokemon( battleUI p_ui, u16 p_heal );
+        bool damagePokemon( battleUI* p_ui, u16 p_damage );
+        bool healPokemon( battleUI* p_ui, u16 p_heal );
         /*
          * @brief: Faints the pokemon. Deals necessary damage first.
          */
-        bool faintPokemon( battleUI p_ui );
+        bool faintPokemon( battleUI* p_ui );
 
-        bool   addBoosts( battleUI p_ui, boosts p_boosts );
-        bool   resetBoosts( battleUI p_ui );
-        boosts getBoosts( );
+        bool   addBoosts( battleUI* p_ui, boosts p_boosts );
+        bool   resetBoosts( battleUI* p_ui );
+        constexpr boosts getBoosts( ) const {
+            return _boosts;
+        }
 
-        bool           addVolatileStatus( battleUI p_ui, volatileStatus p_volatileStatus );
+        bool           addVolatileStatus( battleUI* p_ui, volatileStatus p_volatileStatus );
         volatileStatus getVolatileStatus( );
 
-        bool          addSlotCondition( battleUI p_ui, slotCondition p_slotCondition );
+        bool          addSlotCondition( battleUI* p_ui, slotCondition p_slotCondition );
         slotCondition getSlotCondition( );
 
         /*
@@ -157,12 +169,12 @@ namespace BATTLE {
          * @brief: pokemon uses move with the given moveid. Returns false if the move
          * failed (e.g. due to confusion)
          */
-        bool useMove( battleUI p_ui, u16 p_moveId );
+        bool useMove( battleUI* p_ui, u16 p_moveId );
 
         /*
          * @brief: pokemon is hit by move with the given id
          */
-        void hitByMove( battleUI p_ui, u16 p_moveId );
+        void hitByMove( battleUI* p_ui, u16 p_moveId );
 
         /*
          * @brief: Checks whether the pokemon can use an item (from the bag).
@@ -206,6 +218,60 @@ namespace BATTLE {
          * (e.g. due to rage powder / storm drain / etc.)
          */
         bool absorbesMove( battleMove p_move, u16 p_baseDamage );
+
+        /*
+         * @brief: Sets the pkmn to the specified value.
+         */
+        inline void setPkmn( pokemon* p_pokemon ) {
+            _pokemon = p_pokemon;
+            reset( );
+        }
+
+        /*
+         * @brief: Returns the pkmn currently in the slot (or nullptr if the slot is
+         * empty)
+         */
+        constexpr pokemon* getPkmn( ) {
+            if( !_isTransformed ) {
+                return _pokemon;
+            } else {
+                return &_transformedPkmn;
+            }
+        }
+
+        /*
+         * @brief: Transforms the pkmn at the specified position to the specified pkmn.
+         * @returns: true iff the transformation succeeded.
+         */
+        inline bool transformPkmn( pokemon* p_target ) {
+            if( _pokemon == nullptr ) {
+                return false;
+            }
+            if( p_target != nullptr ) {
+                _isTransformed = true;
+                _transformedPkmn = *p_target;
+
+                _transformedPkmn.m_stats.m_curHP = _pokemon->m_stats.m_curHP;
+                _transformedPkmn.m_stats.m_maxHP = _pokemon->m_stats.m_maxHP;
+                for( u8 i = 0; i < 4; ++i ) {
+                    _transformedPkmn.m_boxdata.m_curPP[ i ] = 5;
+                }
+
+            } else {
+                _isTransformed = false;
+                std::memset( &_transformedPkmn, 0, sizeof( pokemon ) );
+            }
+            return true;
+        }
+
+        /*
+         * @brief: Changes the ability of the specified pkmn to p_newAbility.
+         * Does nothing and returns false if p_newAbility is 0.
+         */
+        inline bool changeAbility( u16 p_newAbility ) {
+            if( !_pokemon ) { return false; }
+            return _pokemon->setBattleTimeAbility( p_newAbility );
+        }
     };
 
     /*
@@ -219,22 +285,19 @@ namespace BATTLE {
         slot _slots[ 2 ];
 
       public:
-        side( ) {
-        }
-
         /*
          * Ages the side by one turn, processes all changes
          */
-        void age( battleUI p_ui );
+        void age( battleUI* p_ui );
 
         /*
          * @brief: Tries to add the specified side condition(s).
          * @param p_duration: The duration of the condition in turns. (0 for the
          * defauls amount)
          */
-        bool addSideCondition( battleUI p_ui, sideCondition p_sideCondition, u8 p_duration = 0 );
+        bool addSideCondition( battleUI* p_ui, sideCondition p_sideCondition, u8 p_duration = 0 );
 
-        bool removeSideCondition( battleUI p_ui, sideCondition p_sideCondition );
+        bool removeSideCondition( battleUI* p_ui, sideCondition p_sideCondition );
 
         battleMove computeBattleMove( u8 p_slot, battleMoveSelection& p_usersSelection,
                                       std::vector<battleMoveSelection>& p_targetsSelecotions );
@@ -264,6 +327,53 @@ namespace BATTLE {
          * (e.g. due to rage powder / storm drain / etc.)
          */
         bool absorbesMove( u8 p_slot, battleMove p_move, u16 p_baseDamage );
+
+        /*
+         * @brief: Sends out a new pokemon to an EMPTY slot.
+         */
+        bool sendPokemon( battleUI* p_ui, u8 p_slot, pokemon* p_pokemon );
+
+        /*
+         * @brief: Sets the pokemon of the specified slot. Only used at battle start
+         */
+        inline void setSlot( u8 p_slot, pokemon* p_pokemon ) {
+            _slots[ p_slot ].setPkmn( p_pokemon );
+        }
+
+        /*
+         * @brief: Returns the pkmn in the specified slot or nullptr if the slot is empty.
+         */
+        constexpr pokemon* getPkmn( u8 p_slot ) {
+            return _slots[ p_slot ].getPkmn( );
+        }
+
+        /*
+         * @brief: Adds the specified boost to the specified pkmn, returns true iff
+         * successful
+         */
+        bool   addBoosts( battleUI* p_ui, u8 p_slot, boosts p_boosts ) {
+            return _slots[ p_slot ].addBoosts( p_ui, p_boosts );
+        }
+        bool   resetBoosts( battleUI* p_ui, u8 p_slot ) {
+            return _slots[ p_slot ].resetBoosts( p_ui );
+        }
+        constexpr boosts getBoosts( u8 p_slot ) const { return _slots[ p_slot ].getBoosts( ); }
+
+        /*
+         * @brief: Transforms the pkmn at the specified position to the specified pkmn.
+         * @returns: true iff the transformation succeeded.
+         */
+        inline bool transformPkmn( u8 p_slot, pokemon* p_target ) {
+            return _slots[ p_slot ].transformPkmn( p_target );
+        }
+
+        /*
+         * @brief: Changes the ability of the specified pkmn to p_newAbility.
+         * Does nothing and returns false if p_newAbility is 0.
+         */
+        inline bool changeAbility( u8 p_slot, u16 p_newAbility ) {
+            return _slots[ p_slot ].changeAbility( p_newAbility );
+        }
     };
 
     /*
@@ -271,8 +381,8 @@ namespace BATTLE {
      */
     class field {
       public:
-        static const u8 PLAYER_SIDE   = 0;
-        static const u8 OPPONENT_SIDE = 1;
+        static constexpr u8 PLAYER_SIDE   = 0;
+        static constexpr u8 OPPONENT_SIDE = 1;
 
       private:
         weather _weather;
@@ -294,43 +404,108 @@ namespace BATTLE {
         /*
          * Initializes the field.
          */
-        void init( battleUI p_ui );
+        void init( battleUI* p_ui );
         /*
          * Ages the field by one turn, processes all weather changes
          */
-        void age( battleUI p_ui );
+        void age( battleUI* p_ui );
 
         /*
          * @brief: Tries to set a new weather; returns false iff that fails.
+         * @param p_extended: If true, the duration is extended to 8 turns instead of the
+         * usual 5.
          */
-        bool    setWeather( battleUI p_ui, weather p_newWeather );
-        bool    removeWeather( battleUI p_ui );
+        bool    setWeather( battleUI* p_ui, weather p_newWeather, bool p_extended = false );
+        bool    removeWeather( battleUI* p_ui );
         weather getWeather( );
 
         /*
          * @brief: Tries to set a new pseudo weather; returns false iff that fails.
+         * @param p_extended: If true, the duration is extended to 8 turns instead of the
+         * usual 5.
          */
-        bool          setPseudoWeather( battleUI p_ui, pseudoWeather p_newPseudoWeather );
-        bool          removePseudoWeather( battleUI p_ui );
+        bool          setPseudoWeather( battleUI* p_ui, pseudoWeather p_newPseudoWeather,
+                                        bool p_extended = false );
+        bool          removePseudoWeather( battleUI* p_ui );
         pseudoWeather getPseudoWeather( );
 
         /*
          * @brief: Tries to set a new terrain; returns false iff that fails.
+         * @param p_extended: If true, the duration is extended to 8 turns instead of the
+         * usual 5.
          */
-        bool    setTerrain( battleUI p_ui, terrain p_newTerrainr );
-        bool    removeTerrain( battleUI p_ui );
+        bool    setTerrain( battleUI* p_ui, terrain p_newTerrain, bool p_extended = false );
+        bool    removeTerrain( battleUI* p_ui );
         terrain getTerrain( );
 
-        bool addSideCondition( battleUI p_ui, u8 p_side, sideCondition p_sideCondition,
+        bool addSideCondition( battleUI* p_ui, u8 p_side, sideCondition p_sideCondition,
                                u8 p_duration = 0 );
-        bool removeSideCondition( battleUI p_ui, u8 p_side, sideCondition p_sideCondition );
+        bool removeSideCondition( battleUI* p_ui, u8 p_side, sideCondition p_sideCondition );
 
         std::vector<battleMove>
         computeSortedBattleMoves( const std::vector<battleMoveSelection>& p_selectedMoves );
 
-        void executeBattleMove( battleUI p_ui, battleMove p_move,
+        void executeBattleMove( battleUI* p_ui, battleMove p_move,
                                 std::vector<battleMove> p_targetsMoves,
                                 std::vector<battleMove> p_tergetedMoves );
+
+        /*
+         * @brief: Sets the pokemon of the specified slot. Only used at battle start
+         */
+        inline void setSlot( bool p_opponent, u8 p_slot, pokemon* p_pokemon ) {
+            _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setSlot( p_slot, p_pokemon );
+        }
+
+        /*
+         * @brief: Sends out a new pokemon to an EMPTY slot.
+         */
+        bool sendPokemon( battleUI* p_ui, bool p_opponent, u8 p_slot, pokemon* p_pokemon );
+
+        /*
+         * @brief: Handles anything a pkmn may do when sent out.
+         */
+        void checkOnSendOut( battleUI* p_ui, bool p_opponent, u8 p_slot );
+
+        /*
+         * @brief: Adds the specified boost to the specified pkmn, returns true iff
+         * successful
+         */
+        bool   addBoosts( battleUI* p_ui, bool p_opponent, u8 p_slot, boosts p_boosts ) {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].addBoosts( p_ui,
+                    p_slot, p_boosts );
+        }
+        bool   resetBoosts( battleUI* p_ui, bool p_opponent, u8 p_slot ) {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].resetBoosts( p_ui, p_slot );
+        }
+        constexpr boosts getBoosts( bool p_opponent, u8 p_slot ) const {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getBoosts( p_slot );
+        }
+
+        /*
+         * @brief: Transforms the pkmn at the specified position to the specified pkmn.
+         * @returns: true iff the transformation succeeded.
+         */
+        inline bool transformPkmn( bool p_opponent, u8 p_slot, pokemon* p_target ) {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].transformPkmn( p_slot,
+                    p_target );
+        }
+
+        /*
+         * @brief: Changes the ability of the specified pkmn to p_newAbility.
+         * Does nothing and returns false if p_newAbility is 0.
+         */
+        inline bool changeAbility( bool p_opponent, u8 p_slot, u16 p_newAbility ) {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].changeAbility( p_slot,
+                    p_newAbility );
+        }
+
+        /*
+         * @brief: Returns the pkmn in the specified slot or nullptr if the slot is empty.
+         */
+        constexpr pokemon* getPkmn( bool p_opponent, u8 p_slot ) {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getPkmn( p_slot );
+        }
+
     };
 
     class battle {
@@ -353,9 +528,11 @@ namespace BATTLE {
         battleTrainer _opponent;
         pokemon       _opponentTeam[ 6 ];
         u8            _opponentTeamSize;
+        u8            _opponentPkmnPerm[ 6 ];
 
         pokemon* _playerTeam;
         u8       _playerTeamSize;
+        u8       _playerPkmnPerm[ 6 ];
 
         u8 _curPkmnPosition[ 6 ][ 2 ]; // me; opp; maps the Pkmn's positions in the
                                        //  teams to their real in-battle positions
@@ -396,6 +573,7 @@ namespace BATTLE {
 
         /*
          * @brief: Player tries to capture to wild pokemon with the specified pokemon.
+         * @param p_pokeball: Item id of the pokeball used.
          */
         bool playerCaptures( u16 p_pokeball );
 
@@ -420,6 +598,21 @@ namespace BATTLE {
          */
         void useItem( fieldPosition p_target, u16 p_item );
 
+
+        /*
+         * @brief: Moves pkmn that cannot battle to the end of the list.
+         */
+        void sortPkmn( bool p_opponent );
+
+        /*
+         * @brief: Restores the order the pkmn were at the start of the battle
+         */
+        void restoreInitialOrder( bool p_opponent );
+
+        /*
+         * @brief: Resets any battle-time only transformations of pkmn.
+         */
+        void resetBattleTransformations( bool p_opponent );
       public:
         /*
          * @brief: Creates a new trainer battle.

@@ -31,12 +31,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "move.h"
 #include "pokemonNames.h"
 #include "saveGame.h"
+#include "abilityNames.h"
 
 pokemon::pokemon( boxPokemon& p_boxPokemon ) : m_boxdata( p_boxPokemon ) {
     pkmnData data = getPkmnData( p_boxPokemon.m_speciesId, p_boxPokemon.getForme( ) );
     m_level       = calcLevel( p_boxPokemon, &data );
     m_stats       = calcStats( m_boxdata, m_level, &data );
     m_battleForme = 0;
+    m_battleTimeAbility = 0;
     m_statusint   = 0;
 }
 pokemon::pokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 p_shiny,
@@ -48,6 +50,7 @@ pokemon::pokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 
     m_level   = p_level;
     m_stats   = calcStats( m_boxdata, p_level, &data );
     m_battleForme = 0;
+    m_battleTimeAbility = 0;
     m_statusint   = 0;
 }
 pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id, u16 p_sid,
@@ -61,6 +64,7 @@ pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u
     m_level       = p_level;
     m_stats       = calcStats( m_boxdata, p_level, &data );
     m_battleForme = 0;
+    m_battleTimeAbility = 0;
     m_statusint   = 0;
 }
 pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
@@ -76,6 +80,7 @@ pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
     for( u8 i = 0; i < 6; ++i ) { m_boxdata.IVset( i, p_trainerPokemon.m_iv[ i ] ); }
     m_stats       = calcStats( m_boxdata, m_level, &data );
     m_battleForme = 0;
+    m_battleTimeAbility = 0;
     m_statusint   = 0;
 }
 
@@ -106,10 +111,16 @@ bool pokemon::canBattleTransform( ) const {
 
 void pokemon::battleTransform( ) {
     // TODO: Perform mega evolution etc
+
+    if( getSpecies( ) == PKMN_DARMANITAN
+            && getAbility( ) == A_ZEN_MODE ) {
+        setBattleForme( 2 * ( getForme( ) / 2 ) + 1 );
+        return;
+    }
 }
 
 void pokemon::revertBattleTransform( ) {
-    m_battleForme = 0;
+    setBattleForme( 0 );
 }
 
 void pokemon::recalculateStats( ) {
@@ -133,7 +144,6 @@ void pokemon::setForme( u8 p_newForme ) {
 }
 
 void pokemon::setBattleForme( u8 p_newForme ) {
-    m_boxdata.setForme( 0 );
     m_battleForme = p_newForme;
     recalculateStats( );
 }

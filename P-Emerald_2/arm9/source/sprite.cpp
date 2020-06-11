@@ -772,6 +772,67 @@ namespace IO {
                                p_bottom, false, false, p_flipx, p_topOnly );
     }
 
+    u16 loadPKMNSpriteBack( const u16 p_pkmnId, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                            u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female,
+                            bool p_flipx, bool p_topOnly, u8 p_forme ) {
+        u16 res = 0;
+        if( !existsPKMNSprite( p_pkmnId, true, false ) ) { p_flipx = false; }
+        if( !existsPKMNSprite( p_pkmnId, false, true ) ) { p_female = false; }
+
+        if( ( res = loadPKMNSprite( PKMN_BACK_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_palCnt,
+                                    p_tileCnt, p_bottom, p_shiny, p_female, p_flipx, p_topOnly,
+                                    p_forme ) ) ) {
+            return res;
+        }
+        if( p_female
+            && ( res = loadPKMNSprite( PKMN_BACK_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_palCnt,
+                                       p_tileCnt, p_bottom, p_shiny, false, p_flipx, p_topOnly,
+                                       p_forme ) ) ) {
+            return res;
+        }
+        if( p_forme
+            && ( res = loadPKMNSprite( PKMN_BACK_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_palCnt,
+                                       p_tileCnt, p_bottom, p_shiny, p_female, p_flipx,
+                                       p_topOnly ) ) ) {
+            return res;
+        }
+        if( p_shiny
+            && ( res = loadPKMNSprite( PKMN_BACK_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_palCnt,
+                                       p_tileCnt, p_bottom, false, p_female, p_flipx, p_topOnly,
+                                       p_forme ) ) ) {
+            return res;
+        }
+
+        if( p_female && p_forme
+            && ( res
+                 = loadPKMNSprite( PKMN_BACK_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_palCnt,
+                                   p_tileCnt, p_bottom, p_shiny, false, p_flipx, p_topOnly ) ) ) {
+            return res;
+        }
+        if( p_female && p_shiny
+            && ( res = loadPKMNSprite( PKMN_BACK_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_palCnt,
+                                       p_tileCnt, p_bottom, false, false, p_flipx, p_topOnly,
+                                       p_forme ) ) ) {
+            return res;
+        }
+        if( p_shiny && p_forme
+            && ( res
+                 = loadPKMNSprite( PKMN_BACK_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_palCnt,
+                                   p_tileCnt, p_bottom, false, p_female, p_flipx, p_topOnly ) ) ) {
+            return res;
+        }
+
+        if( ( res = loadPKMNSprite( PKMN_BACK_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_palCnt,
+                                    p_tileCnt, p_bottom, false, false, p_flipx, p_topOnly ) ) ) {
+            return res;
+        }
+
+        return loadPKMNSprite( PKMN_BACK_PATH, 0, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt,
+                               p_bottom, false, false, p_flipx, p_topOnly );
+    }
+
+
+
     u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
                        u16 p_tileCnt, bool p_bottom, bool p_manaphy ) {
         return loadPKMNSprite( 1 - 1, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom,

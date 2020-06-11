@@ -50,7 +50,7 @@ namespace IO {
 
         for( putY = p_y, getY = 0; putY < p_y + FONT_HEIGHT; ++putY, ++getY ) {
             for( putX = p_x, getX = 0; putX < p_x + _widths[ p_ch ]; putX++, getX++ ) {
-                if( putX >= 0 && putX < SCREEN_WIDTH && putY >= 0 && putY < SCREEN_HEIGHT ) {
+                if( putX >= 0 && putX < SCREEN_WIDTH && putY >= 0 && putY < 256 ) {
                     u8 clr = _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ];
                     if( clr ) setPixel( putX, putY, p_bottom, clr, p_layer );
                 }

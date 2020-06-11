@@ -29,55 +29,46 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 
 namespace BATTLE {
-    slot::slot( pokemon* p_initialPokemon ) {
+    void slot::age( battleUI* p_ui ) {
         // TODO
     }
 
-    void slot::age( battleUI p_ui ) {
-        // TODO
-    }
-
-    pokemon* slot::recallPokemon( battleUI p_ui, bool p_keepVolatileStatus ) {
+    pokemon* slot::recallPokemon( battleUI* p_ui, bool p_keepVolatileStatus ) {
         // TODO
         return nullptr;
     }
 
-    bool slot::sendPokemon( battleUI p_ui, pokemon* p_pokemon ) {
+    bool slot::sendPokemon( battleUI* p_ui, pokemon* p_pokemon ) {
         // TODO
         return false;
     }
 
-    bool slot::damagePokemon( battleUI p_ui, u16 p_damage ) {
+    bool slot::damagePokemon( battleUI* p_ui, u16 p_damage ) {
         // TODO
         return false;
     }
 
-    bool slot::healPokemon( battleUI p_ui, u16 p_heal ) {
+    bool slot::healPokemon( battleUI* p_ui, u16 p_heal ) {
         // TODO
         return false;
     }
 
-    bool slot::faintPokemon( battleUI p_ui ) {
+    bool slot::faintPokemon( battleUI* p_ui ) {
         // TODO
         return false;
     }
 
-    bool slot::addBoosts( battleUI p_ui, boosts p_boosts ) {
+    bool slot::addBoosts( battleUI* p_ui, boosts p_boosts ) {
         // TODO
         return false;
     }
 
-    bool slot::resetBoosts( battleUI p_ui ) {
+    bool slot::resetBoosts( battleUI* p_ui ) {
         // TODO
         return false;
     }
 
-    boosts slot::getBoosts( ) {
-        // TODO
-        return boosts( );
-    }
-
-    bool slot::addVolatileStatus( battleUI p_ui, volatileStatus p_volatileStatus ) {
+    bool slot::addVolatileStatus( battleUI* p_ui, volatileStatus p_volatileStatus ) {
         // TODO
         return false;
     }
@@ -87,7 +78,7 @@ namespace BATTLE {
         return volatileStatus( );
     }
 
-    bool slot::addSlotCondition( battleUI p_ui, slotCondition p_slotCondition ) {
+    bool slot::addSlotCondition( battleUI* p_ui, slotCondition p_slotCondition ) {
         // TODO
         return false;
     }
@@ -112,12 +103,12 @@ namespace BATTLE {
         return false;
     }
 
-    bool slot::useMove( battleUI p_ui, u16 p_moveId ) {
+    bool slot::useMove( battleUI* p_ui, u16 p_moveId ) {
         // TODO
         return false;
     }
 
-    void slot::hitByMove( battleUI p_ui, u16 p_moveId ) {
+    void slot::hitByMove( battleUI* p_ui, u16 p_moveId ) {
         // TODO
     }
 

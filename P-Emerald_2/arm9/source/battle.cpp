@@ -55,7 +55,7 @@ namespace BATTLE {
 
         _field    = field( p_policy.m_weather );
         _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
-                              p_background, _policy.m_mode );
+                              p_background, _policy.m_mode, false );
     }
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent,
                     u8 p_platform, u8 p_platform2, u8 p_background, battlePolicy p_policy ) {
@@ -69,9 +69,10 @@ namespace BATTLE {
         _policy = p_policy;
         _isWildBattle = true;
 
-        _field    = field( p_policy.m_weather );
+        // Initialize the field with the wild pkmn
+        _field    = field( p_policy.m_weather, NO_PSEUDO_WEATHER, NO_TERRAIN );
         _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
-                              p_background, DOUBLE /*_policy.m_mode*/ );
+                              p_background, _policy.m_mode, true );
 
     }
 
@@ -148,7 +149,7 @@ namespace BATTLE {
             // Sort moves
             std::vector<battleMoveSelection> selection = std::vector<battleMoveSelection>( );
             for( u8 i = 0; i < 2; ++i )
-                for( u8 j = 0; j < u8( _policy.m_mode ); ++j ) {
+                for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
                     selection.push_back( moves[ i ][ j ] );
                 }
 
@@ -172,7 +173,7 @@ namespace BATTLE {
                             if( t == sortedMoves[ i ].m_user ) { targetedBy.push_back( m ); }
                     }
 
-                    _field.executeBattleMove( _battleUI, sortedMoves[ i ], targets, targetedBy );
+                    _field.executeBattleMove( &_battleUI, sortedMoves[ i ], targets, targetedBy );
 
                     checkAndRefillBattleSpots( slot::status::RECALLED );
                 }
@@ -185,7 +186,7 @@ namespace BATTLE {
                     useItem( sortedMoves[ i ].m_user, sortedMoves[ i ].m_param );
                 }
             }
-            _field.age( _battleUI );
+            _field.age( &_battleUI );
 
             if( endConditionHit( battleEnd ) ) {
                 endBattle( battleEnd );
@@ -194,6 +195,7 @@ namespace BATTLE {
 
             checkAndRefillBattleSpots( slot::status::FAINTED );
         }
+        endBattle( battleEnd );
         return battleEnd;
     }
 
@@ -206,11 +208,36 @@ namespace BATTLE {
 
         _battleUI.init( );
 
+        for( u8 i = 0; i < 6; ++i ) {
+            _opponentPkmnPerm[ i ] = i;
+            _playerPkmnPerm[ i ] = i;
+        }
+
+        sortPkmn( true );
+        sortPkmn( false );
+
         if( _isWildBattle ) {
             _battleUI.startWildBattle( &_opponentTeam[ 0 ] );
+            _field.setSlot( true, 0, &_opponentTeam[ 0 ] );
         } else {
-            // TODO
+            _battleUI.startTrainerBattle( &_opponent );
         }
+
+        for( u8 i = u8( _isWildBattle ); i < 2; ++i )
+            for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
+                _battleUI.sendOutPkmn( !i, j, ( i ? &_playerTeam[ j ] : &_opponentTeam[ j ] ) );
+                _field.setSlot( !i, j, ( i ? &_playerTeam[ j ] : &_opponentTeam[ j ] ) );
+            }
+        _field.init( &_battleUI );
+
+        for( u8 i = 0; i < 2; ++i )
+            for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
+#ifdef DESQUID
+                _battleUI.log( std::string( "_field.checkOnSendOut(" )
+                        + std::to_string( !i ) + ", " + std::to_string( j ) + ")" );
+#endif
+                _field.checkOnSendOut( &_battleUI, !i, j );
+            }
     }
 
     battleMoveSelection battle::getMoveSelection( u8 p_slot, bool p_allowMegaEvolution ) {
@@ -238,6 +265,9 @@ namespace BATTLE {
     void battle::endBattle( battle::battleEndReason p_battleEndReason ) {
         // TODO
         (void) p_battleEndReason;
+
+        restoreInitialOrder( false );
+        resetBattleTransformations( false );
     }
 
     bool battle::playerRuns( ) {
@@ -273,5 +303,44 @@ namespace BATTLE {
         // TODO
         (void) p_target;
         (void) p_item;
+    }
+
+    void battle::sortPkmn( bool p_opponent ) {
+        pokemon* pkmn = p_opponent ? _opponentTeam : _playerTeam;
+        u8* perm = p_opponent ? _opponentPkmnPerm : _playerPkmnPerm;
+        u8 len = p_opponent ? _opponentTeamSize : _playerTeamSize;
+
+        for( u8 i = 0; i < len - 1; ++i ) {
+            if( !pkmn[ i ].canBattle( ) ) {
+                // pkmn cannot battle, move it to the end of the list.
+                for( u8 j = i + 1; j < len; ++j ) {
+                    std::swap( pkmn[ j - 1 ], pkmn[ j ] );
+                    std::swap( perm[ j - 1 ], perm[ j ] );
+                }
+            }
+        }
+    }
+
+    void battle::restoreInitialOrder( bool p_opponent ) {
+        pokemon* pkmn = p_opponent ? _opponentTeam : _playerTeam;
+        u8* perm = p_opponent ? _opponentPkmnPerm : _playerPkmnPerm;
+        u8 len = p_opponent ? _opponentTeamSize : _playerTeamSize;
+
+        for( u8 i = 0; i < len - 1; ++i ) {
+            // In each step, move the i-th pkmn to the correct place.
+            while( perm[ i ] != i ) {
+                std::swap( pkmn[ i ], pkmn[ perm[ i ] ] );
+                std::swap( perm[ i ], perm[ perm[ i ] ] );
+            }
+        }
+    }
+
+    void battle::resetBattleTransformations( bool p_opponent ) {
+        pokemon* pkmn = p_opponent ? _opponentTeam : _playerTeam;
+        u8 len = p_opponent ? _opponentTeamSize : _playerTeamSize;
+        for( u8 i = 0; i < len; ++i ) {
+            pkmn[ i ].revertBattleTransform( );
+            pkmn[ i ].setBattleTimeAbility( 0 );
+        }
     }
 } // namespace BATTLE

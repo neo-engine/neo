@@ -451,41 +451,41 @@ namespace BATTLE {
     }
 } // namespace BATTLE
 
-bool getAbilityName( int p_abilityId, int p_language, char* p_out ) {
+bool getAbilityName( u16 p_abilityId, u8 p_language, char* p_out ) {
     FILE* f = FS::openSplit( ABILITY_NAME_PATH, p_abilityId, ".str" );
     if( !f ) return false;
 
-    for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, ABILITY_NAMELENGTH, f ); }
+    for( u8 i = 0; i <= p_language; ++i ) { fread( p_out, 1, ABILITY_NAMELENGTH, f ); }
     fclose( f );
     return true;
 }
 
-std::string getAbilityName( int p_abilityId, int p_language ) {
+std::string getAbilityName( u16 p_abilityId, u8 p_language ) {
     char tmpbuf[ ABILITY_NAMELENGTH ];
     if( !getAbilityName( p_abilityId, p_language, tmpbuf ) ) { return "---"; }
     return std::string( tmpbuf );
 }
 
-std::string getAbilityName( int p_abilityId ) {
+std::string getAbilityName( u16 p_abilityId ) {
     return getAbilityName( p_abilityId, CURRENT_LANGUAGE );
 }
 
-bool getAbilityDescr( int p_abilityId, int p_language, char* p_out ) {
+bool getAbilityDescr( u16 p_abilityId, u8 p_language, char* p_out ) {
     FILE* f = FS::openSplit( ABILITY_DSCR_PATH, p_abilityId, ".str" );
     if( !f ) return false;
 
-    for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, ABILITY_DSCRLENGTH, f ); }
+    for( u8 i = 0; i <= p_language; ++i ) { fread( p_out, 1, ABILITY_DSCRLENGTH, f ); }
     fclose( f );
     return true;
 }
 
-std::string getAbilityDescr( int p_abilityId, int p_language ) {
+std::string getAbilityDescr( u16 p_abilityId, u8 p_language ) {
     char tmpbuf[ ABILITY_DSCRLENGTH ];
     if( !getAbilityDescr( p_abilityId, p_language, tmpbuf ) ) { return "---"; }
     return std::string( tmpbuf );
 }
 
-std::string getAbilityDescr( int p_abilityId ) {
+std::string getAbilityDescr( u16 p_abilityId ) {
     return getAbilityDescr( p_abilityId, CURRENT_LANGUAGE );
 }
 

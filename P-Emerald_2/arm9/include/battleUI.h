@@ -27,6 +27,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include "battleDefines.h"
 
 namespace BATTLE {
@@ -35,6 +38,9 @@ namespace BATTLE {
         u8   _platform2;
         u8   _background;
         battleMode _mode;
+        bool _isWildBattle;
+
+        u8   _currentLogLine = 0;
 
         u8   _curHP[ 2 ][ 2 ] = { { 0 } };
 
@@ -47,12 +53,17 @@ namespace BATTLE {
          */
         void updateHPbar( bool p_opponent, u8 p_pos, u8 p_newValue, bool p_init = false );
 
-      public:
-        battleUI() {}
+        /*
+         * @brief: Loads a pkmn sprite for the given pkmn at the specified position.
+         */
+        void loadPkmnSprite( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
+     public:
+        battleUI( ) { }
 
-        battleUI( u8 p_platform, u8 p_platform2, u8 p_background, battleMode p_mode )
+        battleUI( u8 p_platform, u8 p_platform2, u8 p_background, battleMode p_mode,
+                  bool p_isWildBattle )
             : _platform( p_platform ), _platform2( p_platform2 ), _background( p_background ),
-              _mode( p_mode ) {
+              _mode( p_mode ), _isWildBattle( p_isWildBattle ) {
         }
 
         /*
@@ -62,9 +73,36 @@ namespace BATTLE {
         void init( );
 
         /*
+         * @brief: prints the given message to the battle log.
+         */
+        void log( std::string p_message );
+
+        /*
+         * @brief: Logs that the given pkmn's ability is effective.
+         */
+        void logAbility( pokemon* p_pokemon, bool p_opponent );
+
+        /*
+         * @brief: Prints that the given pkmn's forewarn ability has identified the
+         * specified move.
+         */
+        void logForewarn( pokemon* p_pokemon, bool p_opponent, u16 p_move );
+
+        /*
+         * @brief: Prints that the given pkmn's frisk ability has identified the
+         * specified items.
+         */
+        void logFrisk( pokemon* p_pokemon, bool p_opponent, std::vector<u16> p_itms );
+
+        /*
          * @brief: Update the stats of the pkmn at the given position.
          */
         void updatePkmnStats( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
+
+        /*
+         * @brief: Updates the pkmn at the specified position (e.g. after a form change)
+         */
+        void updatePkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
 
         /*
          * @brief: Recalls the given pkmn.
@@ -80,5 +118,10 @@ namespace BATTLE {
          * @brief: shows the wild pkmn appear
          */
         void startWildBattle( pokemon* p_pokemon );
+
+        /*
+         * @brief: plays the intro for the given trainer
+         */
+        void startTrainerBattle( battleTrainer* p_trainer );
     };
 } // namespace BATTLE
