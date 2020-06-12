@@ -378,6 +378,8 @@ namespace BOX {
     }
 
     void boxUI::selectButton( button p_selectedButton, bool p_touched ) {
+        (void) p_touched;
+
         switch( p_selectedButton ) {
         case BUTTON_BOX_NAME:
             if( !_heldPkmn.getSpecies( ) ) {
@@ -432,6 +434,8 @@ namespace BOX {
     }
 
     void boxUI::selectPkmn( boxPokemon* p_pokemon, u8 p_index, bool p_touched ) {
+        (void) p_touched;
+
         SpriteEntry* oam = IO::Oam->oamBuffer;
         if( p_pokemon != nullptr && p_pokemon->getSpecies( ) ) {
             if( !p_pokemon->isEgg( ) ) {

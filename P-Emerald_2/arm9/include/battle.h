@@ -40,6 +40,7 @@
 #include "defines.h"
 #include "pokemon.h"
 #include "type.h"
+#include "abilityNames.h"
 
 namespace BATTLE {
     typedef std::pair<u8, u8> fieldPosition; // (side, slot)
@@ -253,6 +254,8 @@ namespace BATTLE {
 
                 _transformedPkmn.m_stats.m_curHP = _pokemon->m_stats.m_curHP;
                 _transformedPkmn.m_stats.m_maxHP = _pokemon->m_stats.m_maxHP;
+                std::strncpy( _transformedPkmn.m_boxdata.m_name,
+                        _pokemon->m_boxdata.m_name, PKMN_NAMELENGTH );
                 for( u8 i = 0; i < 4; ++i ) {
                     _transformedPkmn.m_boxdata.m_curPP[ i ] = 5;
                 }
@@ -271,6 +274,15 @@ namespace BATTLE {
         inline bool changeAbility( u16 p_newAbility ) {
             if( !_pokemon ) { return false; }
             return _pokemon->setBattleTimeAbility( p_newAbility );
+        }
+
+        /*
+         * @brief: Checks whether abilities are currently suppressed by something on the
+         * field. (Some abilities cannot be suppressed).
+         */
+        constexpr bool suppressesAbilities( ) {
+            if( _pokemon == nullptr ) { return false; }
+            return getPkmn( )->getAbility( ) == A_NEUTRALIZING_GAS;
         }
     };
 
@@ -373,6 +385,14 @@ namespace BATTLE {
          */
         inline bool changeAbility( u8 p_slot, u16 p_newAbility ) {
             return _slots[ p_slot ].changeAbility( p_newAbility );
+        }
+
+        /*
+         * @brief: Checks whether abilities are currently suppressed by something on the
+         * field. (Some abilities cannot be suppressed).
+         */
+        constexpr bool suppressesAbilities( ) {
+            return _slots[ 0 ].suppressesAbilities( ) || _slots[ 1 ].suppressesAbilities( );
         }
     };
 
@@ -506,6 +526,13 @@ namespace BATTLE {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getPkmn( p_slot );
         }
 
+        /*
+         * @brief: Checks whether abilities are currently suppressed by something on the
+         * field. (Some abilities cannot be suppressed).
+         */
+        constexpr bool suppressesAbilities( ) {
+            return _sides[ true ].suppressesAbilities( ) || _sides[ false ].suppressesAbilities( );
+        }
     };
 
     class battle {

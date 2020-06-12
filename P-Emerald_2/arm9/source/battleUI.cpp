@@ -73,6 +73,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "status_txc.h"
 
 #include "battle_ability.h"
+#include "battle_fite.h"
+#include "battle_pkmn.h"
+#include "battle_bag.h"
+#include "battle_run.h"
+
+#include "message_24.h"
+#include "message_large.h"
 
 namespace BATTLE {
 
@@ -98,6 +105,23 @@ namespace BATTLE {
 
 #define SPR_PKMN_GFX( p_idx ) ( 144 * ( p_idx ) )
 
+// Sub screen
+#define SPR_BATTLE_FITE_OAM_SUB 0
+#define SPR_BATTLE_BAG_OAM_SUB 2
+#define SPR_BATTLE_PKMN_OAM_SUB 4
+#define SPR_BATTLE_RUN_OAM_SUB 6
+#define SPR_BATTLE_ICON_OAM_SUB 8
+#define SPR_SMALL_MESSAGE_OAM_SUB 9
+#define SPR_LARGE_MESSAGE_OAM_SUB 20
+
+#define SPR_BATTLE_FITE_PAL_SUB 0
+#define SPR_BATTLE_BAG_PAL_SUB 1
+#define SPR_BATTLE_PKMN_PAL_SUB 2
+#define SPR_BATTLE_RUN_PAL_SUB 3
+#define SPR_BATTLE_ICON_PAL_SUB 4
+#define SPR_BOX_PAL_SUB 0
+
+// other macros
 #define WILD_BATTLE_SPRITE_X_START 144
 #define WILD_BATTLE_SPRITE_X 160
 
@@ -319,6 +343,10 @@ namespace BATTLE {
     }
 
     void battleUI::initSub( ) {
+        IO::initOAMTable( true );
+
+        u16          tileCnt = 0;
+
         bgSetScroll( IO::bg2sub, 0, 0 );
         bgUpdate( );
 
@@ -328,12 +356,79 @@ namespace BATTLE {
         bgSetPriority( IO::bg3sub, 3 );
 
         dmaCopy( battlesub2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
-        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
         dmaCopy( battlesubPal, BG_PALETTE_SUB, 60 * 2 );
 
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
         bgSetScroll( IO::bg2sub, 0, 192 );
         bgUpdate( );
+
+        // Load sprites
+        // log bg
         // TODO
+
+
+        // move selection
+
+        IO::loadSprite( SPR_BATTLE_FITE_OAM_SUB, SPR_BATTLE_FITE_PAL_SUB, tileCnt, 128 - 64, 68, 64,
+                        64, 0, 0, 0, false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( SPR_BATTLE_FITE_OAM_SUB + 1, SPR_BATTLE_FITE_PAL_SUB, tileCnt,
+                        128, 64, 64, 64, battle_fitePal, battle_fiteTiles, battle_fiteTilesLen,
+                        true, true, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+        IO::loadSprite( SPR_BATTLE_PKMN_OAM_SUB, SPR_BATTLE_PKMN_PAL_SUB, tileCnt,
+                        128 - 32 - 16 - 64 - 6, 68 + 64 + 18, 32,
+                        32, 0, 0, 0, false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( SPR_BATTLE_PKMN_OAM_SUB + 1, SPR_BATTLE_PKMN_PAL_SUB, tileCnt,
+                        128 - 32 - 16 - 32 - 6, 68 + 64 + 18, 32, 32, battle_pkmnPal, battle_pkmnTiles,
+                        battle_pkmnTilesLen, true, true, true,
+                        OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+        IO::loadSprite( SPR_BATTLE_RUN_OAM_SUB, SPR_BATTLE_RUN_PAL_SUB, tileCnt,
+                        128 - 32, 68 + 64 + 18, 32,
+                        32, 0, 0, 0, false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB, tileCnt,
+                        128, 68 + 64 + 18, 32, 32, battle_runPal, battle_runTiles,
+                        battle_runTilesLen, true, true, true,
+                        OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+        IO::loadSprite( SPR_BATTLE_BAG_OAM_SUB, SPR_BATTLE_BAG_PAL_SUB, tileCnt,
+                        128 + 32 + 16 + 6, 68 + 64 + 18, 32,
+                        32, 0, 0, 0, false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB, tileCnt,
+                        128 + 32 + 16 + 32 + 6, 68 + 64 + 18, 32, 32, battle_bagPal,
+                        battle_bagTiles, battle_bagTilesLen, true, true, true,
+                        OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+
+        // message boxes
+
+        // small (move / attack selection)
+        for( u8 i = 0; i < 7; ++i ) {
+            IO::loadSprite( SPR_SMALL_MESSAGE_OAM_SUB + 7 - i, SPR_BOX_PAL_SUB, tileCnt,
+                        128 - 32 - 64 + 28 * i, 68 - 18 - 26, 32, 32, 0, 0, 0,
+                        false, true, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        }
+        tileCnt = IO::loadSprite( SPR_SMALL_MESSAGE_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt,
+                        128 - 24 - 16 - 64, 68 - 18 - 26, 32,
+                        32, message_24Pal, message_24Tiles, message_24TilesLen,
+                        false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+        // large (battle log)
+
+
+        for( u8 i = 0; i < 4; ++i ) {
+            for( u8 j = 0; j < 3; ++j ) {
+                IO::loadSprite( SPR_LARGE_MESSAGE_OAM_SUB + 3 + 4 * j - i,
+                        SPR_BOX_PAL_SUB, tileCnt,
+                        8 + 58 * i, 20 + 49 * j, 64, 64, 0, 0, 0,
+                        j == 2, i, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            }
+        }
+        tileCnt = IO::loadSprite( SPR_LARGE_MESSAGE_OAM_SUB + 3, SPR_BOX_PAL_SUB, tileCnt,
+                        8, 20, 64, 64, message_largePal, message_largeTiles, message_largeTilesLen,
+                        false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+        IO::updateOAM( true );
     }
 
     void battleUI::init( ) {
@@ -363,15 +458,33 @@ namespace BATTLE {
     }
 
     void battleUI::log( std::string p_message ) {
-        // TODO
+        SpriteEntry* oam     = IO::Oam->oamBuffer;
 
-        bgScroll( IO::bg2sub, 0, -14 );
+        if( oam[ SPR_LARGE_MESSAGE_OAM_SUB ].isHidden ) {
+            for( u8 i = 0; i < 12; ++i ) {
+                oam[ SPR_LARGE_MESSAGE_OAM_SUB + i ].isHidden = false;
+            }
+
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
+            bgSetScroll( IO::bg2sub, 0, 192 );
+            bgUpdate( );
+            IO::updateOAM( true );
+        }
+
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
+        u8 height = IO::regularFont->printBreakingStringC( p_message.c_str( ), 16,
+                192 + 10 + -14 * _currentLogLine, 256 - 32, true, IO::font::LEFT, 14,
+                ' ', 0, false, false, -1 );
+        _currentLogLine += height - 1;
+        bgScroll( IO::bg2sub, 0, -14 * height );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ) +
                  ( ( 192 + 10 + -14 * ( 12 + _currentLogLine ) ) % 256 ) * 128, 14 * 256 );
         bgUpdate( );
-        IO::regularFont->printStringC( p_message.c_str( ), 24,
-                192 + 10 + -14 * _currentLogLine, true );
-        ++_currentLogLine;
+        IO::regularFont->printBreakingStringC( p_message.c_str( ), 16,
+                192 + 10 + -14 * _currentLogLine, 256 - 32, true, IO::font::LEFT, 14 );
+        _currentLogLine++;
     }
 
     void battleUI::logAbility( pokemon* p_pokemon, bool p_opponent ) {
@@ -408,11 +521,33 @@ namespace BATTLE {
     }
 
     void battleUI::logForewarn( pokemon* p_pokemon, bool p_opponent, u16 p_move ) {
+        char buffer[ 50 ];
+        snprintf( buffer, 49, GET_STRING( 396 ), p_pokemon->m_boxdata.m_name,
+                getOpponentString( p_opponent ),
+                MOVE::getMoveName( p_move ).c_str( ) );
+        log( std::string( buffer ) );
+    }
 
+    void battleUI::logAnticipation( pokemon* p_pokemon, bool p_opponent ) {
+        char buffer[ 50 ];
+        snprintf( buffer, 49, GET_STRING( 397 ), p_pokemon->m_boxdata.m_name,
+                getOpponentString( p_opponent ) );
+        log( std::string( buffer ) );
     }
 
     void battleUI::logFrisk( pokemon* p_pokemon, bool p_opponent, std::vector<u16> p_itms ) {
-
+        char buffer[ 100 ];
+        if( p_itms.size( ) == 1 ) {
+            snprintf( buffer, 99, GET_STRING( 398 ), p_pokemon->m_boxdata.m_name,
+                    getOpponentString( p_opponent ),
+                    ITEM::getItemName( p_itms[ 0 ] ) );
+        } else if( p_itms.size( ) == 2 ) {
+            snprintf( buffer, 99, GET_STRING( 399 ), p_pokemon->m_boxdata.m_name,
+                    getOpponentString( p_opponent ),
+                    ITEM::getItemName( p_itms[ 0 ] ),
+                    ITEM::getItemName( p_itms[ 1 ] ) );
+        } else { return; }
+        log( std::string( buffer ) );
     }
 
     void battleUI::updatePkmnStats( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {
@@ -688,6 +823,8 @@ namespace BATTLE {
         IO::fadeScreen( IO::UNFADE, true, true );
         REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
         REG_BLDALPHA = 0xff | ( 0x06 << 8 );
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = 0xff | ( 0x02 << 8 );
         bgUpdate( );
         // Load pkmn sprite
         IO::loadPKMNSprite( p_pokemon->getSpecies( ), WILD_BATTLE_SPRITE_X_START,
@@ -732,6 +869,10 @@ namespace BATTLE {
 
         IO::updateOAM( false );
 
+        char buffer[ 50 ];
+        snprintf( buffer, 49, GET_STRING( 394 ), p_pokemon->m_boxdata.m_name );
+        log( std::string( buffer ) );
+
         for( u16 i = WILD_BATTLE_SPRITE_X_START; i < WILD_BATTLE_SPRITE_X; ++i ) {
             for( u8 j = 0; j < 4; ++j ) {
                 oam[ SPR_PKMN_START_OAM( 0 ) + j ].x++;
@@ -740,6 +881,12 @@ namespace BATTLE {
             IO::updateOAM( false );
             swiWaitForVBlank( );
         }
+
+        // pokemon cry
+        for( u8 i = 0; i < 30; ++i ) {
+            swiWaitForVBlank( );
+        }
+
         if( p_pokemon->isShiny( ) ) {
             // TODO
             // animateShiny( WILD_BATTLE_SPRITE_X + 16, WILD_BATTLE_SPRITE_X_START + 16,
@@ -756,8 +903,15 @@ namespace BATTLE {
     }
 
     void battleUI::sendOutPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {
-        // play pokeball animation
+        char buffer[ 50 ];
+        if( p_opponent ) {
+            // (TODO)
+        } else {
+            snprintf( buffer, 49, GET_STRING( 395 ), p_pokemon->m_boxdata.m_name );
+            log( std::string( buffer ) );
+        }
 
+        // play pokeball animation
         // (TODO)
 
         loadPkmnSprite( p_opponent, p_pos, p_pokemon );
@@ -768,5 +922,12 @@ namespace BATTLE {
 
         _curHP[ !p_opponent ][ p_pos ] = 101;
         updatePkmnStats( p_opponent, p_pos, p_pokemon );
+    }
+
+    void battleUI::showMoveSelection( pokemon* p_pokemon, u8 p_highlightedButton ) {
+        if( p_highlightedButton == u8( -1 ) ) {
+            // initialize stuff
+            dmaCopy( battlesubBitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
+        }
     }
 } // namespace BATTLE

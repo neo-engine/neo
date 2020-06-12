@@ -32,6 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 #include "battle.h"
 #include "battleTrainer.h"
+#include "uio.h"
 
 #include "pokemon.h"
 #include "sound.h"
@@ -241,11 +242,66 @@ namespace BATTLE {
     }
 
     battleMoveSelection battle::getMoveSelection( u8 p_slot, bool p_allowMegaEvolution ) {
-        // TODO
-        (void) p_slot;
-        (void) p_allowMegaEvolution;
+        battleMoveSelection res = {NO_OP, 0, {}, {field::PLAYER_SIDE, p_slot}};
 
-        return {NO_OP, 0, {}, {field::PLAYER_SIDE, 0}};
+        _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ) );
+        u8 curSel = 0;
+        cooldown     = COOLDOWN_COUNT;
+
+        loop( ) {
+            scanKeys( );
+            touchRead( &touch );
+            swiWaitForVBlank( );
+            pressed = keysUp( );
+            held    = keysHeld( );
+
+            if( p_slot && ( pressed & KEY_B ) ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+
+                res.m_type = CANCEL;
+                break;
+            }
+            if( pressed & KEY_A ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+
+                switch( curSel ) {
+                    case 0: // Choose attack
+                        break;
+                    case 1: // Choose pkmn
+                        break;
+                    case 2: // Run / Cancel
+                        break;
+                    case 3: // Choose attack
+                        break;
+                    default:
+                        break;
+                }
+
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+
+
+
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+
+
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+
+                cooldown = COOLDOWN_COUNT;
+            }
+            swiWaitForVBlank( );
+        }
+
+        return res;
     }
 
     battleMoveSelection battle::getAIMove( u8 p_slot ) {

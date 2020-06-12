@@ -622,8 +622,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 310
 
     {"", "[OWN2] kann nicht angreifen<85>[A]"},
-    {"", "(Wild)"},
-    {"", "(Gegner)"},
+    {"(wild)", "(Wild)"},
+    {"(opponent)", "(Gegner)"},
     {"This tree looks like it can be\ncut down. ", "Ein kleiner Baum.\n"},
     {"This rock appears to be breakable.\n", "Ein kleiner Felsen.\n"},
 
@@ -745,4 +745,11 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Accuracy: %hhu", "Genauigkeit: %hhu"},
     {"(never misses)", "(trifft immer)"},
     {"%s's\n%s%.0s", "%.0s%s\nvon %s"},
+    {"A wild %s appears!", "Ein wildes %s erscheint!"},
+
+    {"Go %s!", "Los %s!"},
+    {"%s%s detects %s.", "%s%s erkennt %s."}, // Forewarn
+    {"%s%s shudders.", "%s%s erschaudert."}, // Anticipation
+    {"%s%s identifies %s.", "%s%s erkennt %s."}, // Frisk
+    {"%s%s identifies %s and %s.", "%s%s erkennt %s und%s."}, // Frisk
 };

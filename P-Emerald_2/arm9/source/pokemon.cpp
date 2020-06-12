@@ -117,6 +117,11 @@ void pokemon::battleTransform( ) {
         setBattleForme( 2 * ( getForme( ) / 2 ) + 1 );
         return;
     }
+    if( getSpecies( ) == PKMN_WISHIWASHI
+            && getAbility( ) == A_SCHOOLING ) {
+        setBattleForme( 1 );
+        return;
+    }
 }
 
 void pokemon::revertBattleTransform( ) {

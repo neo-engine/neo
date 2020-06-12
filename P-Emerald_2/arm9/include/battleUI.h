@@ -31,6 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "battleDefines.h"
+#include "saveGame.h"
 
 namespace BATTLE {
     class battleUI {
@@ -57,6 +58,15 @@ namespace BATTLE {
          * @brief: Loads a pkmn sprite for the given pkmn at the specified position.
          */
         void loadPkmnSprite( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
+
+        /*
+         * @brief: Returns
+         */
+        inline std::string getOpponentString( bool p_opponent ) const {
+            if( !p_opponent ) { return ""; }
+            else if( _isWildBattle ) { return std::string( GET_STRING( 311 ) ); }
+            else { return std::string( GET_STRING( 312 ) ); }
+        }
      public:
         battleUI( ) { }
 
@@ -87,6 +97,12 @@ namespace BATTLE {
          * specified move.
          */
         void logForewarn( pokemon* p_pokemon, bool p_opponent, u16 p_move );
+
+        /*
+         * @brief: Prints that the given pkmn's anticipation ability has identified
+         * something.
+         */
+        void logAnticipation( pokemon* p_pokemon, bool p_opponent );
 
         /*
          * @brief: Prints that the given pkmn's frisk ability has identified the
@@ -123,5 +139,11 @@ namespace BATTLE {
          * @brief: plays the intro for the given trainer
          */
         void startTrainerBattle( battleTrainer* p_trainer );
+
+        /*
+         * @brief: Shows the move selection for the given pkmn ("attack", "item", "pkmn",
+         * "run", etc)
+         */
+        void showMoveSelection( pokemon* p_pokemon, u8 p_highlightedButton = -1 );
     };
 } // namespace BATTLE

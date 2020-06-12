@@ -92,8 +92,6 @@ namespace MOVE {
         CRASHDAMAGE = ( 1 << 27 ),
         /** OHKO move */
         OHKO = ( 1 << 28 ),
-        /** OHKO move (useless on ice-type pkmn) */
-        OHKOICE = ( 1 << 28 ),
         /** PKMN self-destructs */
         SELFDESTRUCT = ( 1 << 29 ),
         /** PKMN self-destructs */
@@ -130,6 +128,8 @@ namespace MOVE {
         FUTUREMOVE = ( 1LLU << 45 ),
         /** Beton pass */
         BATONPASS = ( 1LLU << 46 ),
+        /** OHKO move (useless on ice-type pkmn) */
+        OHKOICE = ( 1LLU << 47 ),
     };
 
     enum moveHitTypes : u8 { NOOP = 0, PHYSICAL = 1, SPECIAL = 2, STATUS = 3 };

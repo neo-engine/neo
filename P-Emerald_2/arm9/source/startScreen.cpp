@@ -47,6 +47,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "moveNames.h"
 #include "partyScreen.h"
 #include "statusScreen.h"
+#include "pokemonNames.h"
 
 #include "battle.h"
 // END TEST
@@ -93,7 +94,7 @@ namespace SAVE {
 
         pokemon testTeam[ 6 ];
         for( u16 i = 0; i < 6; i++ ) {
-            testTeam[ i ] = pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 3, false, i == 3 );
+            testTeam[ i ] = pokemon( PKMN_WEEZING, 100, 0, 0, 3, false, i == 3 );
             testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
             //            SAVE::SAV.getActiveFile( ).storePkmn(
             //                pokemon( 1 + ( 3 * i ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, rand( )
@@ -113,7 +114,7 @@ namespace SAVE {
         //       SOUND::playBGM( MOD_SURFING );
 
         BATTLE::battle bt
-            = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 2 ),
+            = BATTLE::battle( testTeam, 6, pokemon( PKMN_LUGIA, 100, 0, 0, 2 ),
                     rand( ) % 9, rand( ) % 9, rand( ) % 33 );
 
         bt.start( );
