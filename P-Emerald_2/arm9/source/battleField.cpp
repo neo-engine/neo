@@ -54,14 +54,6 @@ namespace BATTLE {
         auto pkmn = getPkmn( p_opponent, p_slot );
         if( pkmn == nullptr ) { return; }
 
-#ifdef DESQUID
-        p_ui->log( std::string( pkmn->m_boxdata.m_name ) + " (" +
-                std::to_string( pkmn->getSpecies( ) ) + ") has ability: "
-                + getAbilityName( pkmn->getAbility( ) ) + " ("
-                + std::to_string( pkmn->getAbility( ) ) + ")" );
-#endif
-
-
         switch( pkmn->getAbility( ) ) {
             // abilities that cannot be suppressed
             case A_COMATOSE:
@@ -101,22 +93,40 @@ namespace BATTLE {
                     // Stat changing abilities
                     case A_DAUNTLESS_SHIELD: {
                         p_ui->logAbility( pkmn, p_opponent );
-                        boosts bt = boosts( 0 ); bt.setBoost( DEF, 1 );
-                        addBoosts( p_ui, p_opponent, p_slot, bt );
+                        boosts bt = boosts( ); bt.setBoost( DEF, 1 );
+                        auto res = addBoosts( p_opponent, p_slot, bt );
+                        p_ui->logBoosts( pkmn, p_opponent, bt, res );
                         break;
                     }
                     case A_INTREPID_SWORD: {
                         p_ui->logAbility( pkmn, p_opponent );
-                        boosts bt = boosts( 0 ); bt.setBoost( ATK, 1 );
-                        addBoosts( p_ui, p_opponent, p_slot, bt );
+                        boosts bt = boosts( ); bt.setBoost( ATK, 1 );
+                        auto res = addBoosts( p_opponent, p_slot, bt );
+                        p_ui->logBoosts( pkmn, p_opponent, bt, res );
                         break;
                     }
                     case A_INTIMIDATE: {
                         p_ui->logAbility( pkmn, p_opponent );
-                        boosts bt = boosts( 0 ); bt.setBoost( ATK, -1 );
+                        boosts bt = boosts( ); bt.setBoost( ATK, -1 );
                         for( u8 i = 0; i < 2; ++i ) {
-                            addBoosts( p_ui, !p_opponent, i, bt );
+                            if( getPkmn( !p_opponent, i ) == nullptr ) { continue; }
+                            auto res = addBoosts( !p_opponent, i, bt );
+                            p_ui->logBoosts( getPkmn( !p_opponent, i ), !p_opponent, bt, res );
                         }
+                        break;
+                    }
+                    case A_DOWNLOAD: {
+                        p_ui->logAbility( pkmn, p_opponent );
+                        boosts bt = boosts( );
+
+                        u16 def = 0, sdef = 0;
+                        for( u8 i = 0; i < 2; ++i ) {
+                            def += getStat( !p_opponent, i, DEF );
+                            sdef += getStat( !p_opponent, i, SDEF );
+                        }
+                        bt.setBoost( def < sdef ? ATK : SATK, 1 );
+                        auto res = addBoosts( p_opponent, p_slot, bt );
+                        p_ui->logBoosts( pkmn, p_opponent, bt, res );
                         break;
                     }
 

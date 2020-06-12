@@ -164,6 +164,12 @@ namespace BATTLE {
 #define ACCURACY 7
     struct boosts {
         u32  m_boosts;
+
+        boosts( ) {
+            m_boosts = 0;
+            for( u8 i = 0; i < 8; ++i ) { setBoost( i, 0 ); }
+        }
+
         void setBoost( u8 p_stat, s8 p_val ) {
             if( p_val > 7 || p_val < -7 ) {
                 fprintf( stderr, "Bad boosts value [%hhu] := %hhd\n", p_stat, p_val );
@@ -171,11 +177,43 @@ namespace BATTLE {
             }
             p_val += 7;
 
-            m_boosts &= ( 0xFFFFFFFF - ( 0xF << p_stat ) );
-            m_boosts |= ( p_val << p_stat );
+            m_boosts &= ( 0xFFFFFFFF - ( 0xF << ( 4 * p_stat ) ) );
+            m_boosts |= ( p_val << ( 4 * p_stat ) );
         }
-        constexpr s8 getBoost( u8 p_stat ) {
-            return ( ( m_boosts >> p_stat ) & 0xF ) - 7;
+        constexpr s8 getBoost( u8 p_stat ) const {
+            return ( ( m_boosts >> ( 4 * p_stat ) ) & 0xF ) - 7;
+        }
+
+        /*
+         * @returns the boost for the specified stat in the range [ 0, 15 ]; 7 being no
+         * boost.
+         */
+        constexpr u8 getShiftedBoost( u8 p_stat ) const {
+            return ( ( m_boosts >> ( 4 * p_stat ) ) & 0xF );
+        }
+
+        /*
+         * @brief: Adds the given boosts to the boosts.
+         * @returns: the change in boosts.
+         */
+        inline boosts addBoosts( boosts p_other ) {
+            boosts res = boosts( );
+            for( u8 i = 0; i < 8; ++i ) {
+                s8 old = getBoost( i );
+                setBoost( i, std::min( s8( 6 ), std::max( s8( -6 ),
+                                s8( old + p_other.getBoost( i ) ) ) ) );
+                res.setBoost( i, getBoost( i ) - old );
+            }
+            return res;
+        }
+
+        /*
+         * @brief: Inverts all boosts.
+         */
+        inline void invert( ) {
+            for( u8 i = 0; i < 8; ++i ) {
+                setBoost( i, -getBoost( i ) );
+            }
         }
     };
 

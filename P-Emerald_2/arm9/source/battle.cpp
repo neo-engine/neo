@@ -233,16 +233,18 @@ namespace BATTLE {
 
         for( u8 i = 0; i < 2; ++i )
             for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
-#ifdef DESQUID
-                _battleUI.log( std::string( "_field.checkOnSendOut(" )
-                        + std::to_string( !i ) + ", " + std::to_string( j ) + ")" );
-#endif
                 _field.checkOnSendOut( &_battleUI, !i, j );
             }
     }
 
     battleMoveSelection battle::getMoveSelection( u8 p_slot, bool p_allowMegaEvolution ) {
-        battleMoveSelection res = {NO_OP, 0, {}, {field::PLAYER_SIDE, p_slot}};
+        battleMoveSelection res = NO_OP_SELECTION;
+        res.m_user = {field::PLAYER_SIDE, p_slot};
+
+        if( !_field.canSelectMove( false, p_slot ) ) {
+            // pkmn is hibernating / charging
+            return _field.getStoredMove( false, p_slot );
+        }
 
         _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ) );
         u8 curSel = 0;

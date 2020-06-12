@@ -77,11 +77,11 @@ namespace MOVE {
         BATTLE::volatileStatus m_secondaryVolatileStatus
             = (BATTLE::volatileStatus) 0; // confusion, etc
 
-        BATTLE::boosts m_boosts     = {0}; // Status ``boosts'' for the target
-        BATTLE::boosts m_selfBoosts = {0}; // Status ``boosts'' for the user (if target != user)
-        BATTLE::boosts m_secondaryBoosts = {0}; // Stat ``boosts'' for the target
+        BATTLE::boosts m_boosts     = BATTLE::boosts( ); // Status ``boosts'' for the target
+        BATTLE::boosts m_selfBoosts = BATTLE::boosts( ); // Status ``boosts'' for the user (if target != user)
+        BATTLE::boosts m_secondaryBoosts = BATTLE::boosts( ); // Stat ``boosts'' for the target
         BATTLE::boosts m_secondarySelfBoosts
-            = {0}; // Stat ``boosts'' for the user (if target != user)
+            = BATTLE::boosts( ); // Stat ``boosts'' for the user (if target != user)
 
         moveFlags m_flags = (moveFlags) 0;
     };

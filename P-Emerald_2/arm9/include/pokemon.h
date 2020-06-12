@@ -95,6 +95,13 @@ struct boxPokemon {
                 const char* p_ot, bool p_oTFemale, u8 p_shiny = 0, bool p_hiddenAbility = false,
                 bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
                 u8 p_ball = 0, u8 p_pokerus = 0, u8 p_forme = 0, pkmnData* p_data = nullptr );
+    /*
+     * @brief: Returns whether the given pkmn can still evolve.
+     */
+    constexpr bool isFullyEvolved( ) const {
+        // TODO
+        return true;
+    }
 
     constexpr u16 getMove( u8 p_idx ) const {
         return m_moves[ p_idx ];
@@ -209,7 +216,7 @@ struct boxPokemon {
             = ( ( IVget( 0 ) & 1 ) + 2 * ( IVget( 1 ) & 1 ) + 4 * ( IVget( 2 ) & 1 )
                 + 8 * ( IVget( 3 ) & 1 ) + 16 * ( IVget( 4 ) & 1 ) + 32 * ( IVget( 5 ) & 1 ) * 15 )
               / 63;
-        return a < 9 ? (type) a : type( a + 1 );
+        return a < 8 ? (type) ( a + 1 ) : type( a + 2 );
     }
     constexpr u8 getHPPower( ) const {
         return 30
@@ -336,6 +343,13 @@ struct pokemon {
              const char* p_ot, bool p_oTFemale, u8 p_shiny = 0, bool p_hiddenAbility = false,
              bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
              u8 p_ball = 0, u8 p_pokerus = 0, u8 p_forme = 0 );
+
+    /*
+     * @brief: Returns whether the given pkmn can still evolve.
+     */
+    constexpr bool isFullyEvolved( ) const {
+        return m_boxdata.isFullyEvolved( );
+    }
 
     /*
      * @brief: Returns whether the pkmn can participate in a battle i.e. is not an egg and

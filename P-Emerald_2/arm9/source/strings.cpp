@@ -532,28 +532,28 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"dry", "trocken"},
     {"bitter", "bitter"},
     {"all", "all"},
-    {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR][OWN1] heilt sich.[A]"},
-    {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR][OWN2] heilt sich.[A]"},
+    {"HP", "HP"},
+    {"Attack", "Angriff"},
 
     // 250
 
-    {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR][OPP1] heilt sich.[A]"},
-    {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR][OPP2] heilt sich.[A]"},
-    {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]KP von [OWN1]\nregenerieren sich.[A]"},
-    {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]KP von [OWN2]\nregenerieren sich.[A]"},
-    {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]KP von [OPP1]\nregenerieren sich.[A]"},
+    {"Defense", "Verteidigung"},
+    {"Sp. Attack", "Spez Angr."},
+    {"Sp. Def.", "Sepz. Vert."},
+    {"Speed", "Initiative"},
+    {"Evasion", "Fluchtwert"},
 
-    {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]KP von [OPP2]\nregenerieren sich.[A]"},
-    {"", "Der Hagel schadet [OWN1].[A]"},
-    {"", "Der Hagel schadet [OWN2].[A]"},
-    {"", "Der Hagel schadet\n[OPP1].[A]"},
-    {"", "Der Hagel schadet\n[OPP2].[A]"},
+    {"Accuracy", "Genauigkeit"},
+    {"%s's %s did not change.", "%.0s%s von %s blieb unver\xe4ndert."},
+    {"%s's %s rose.", "%.0s%s von %s stieg."},
+    {"%s's %s rose sharply.", "%.0s%s von %s stieg stark."},
+    {"%s's %s rose drastically.", "%.0s%s von %s stieg drastisch."},
 
     // 260
 
-    {"", "Der Sandsturm schadet [OWN1].[A]"},
-    {"", "Der Sandsturm schadet [OWN2].[A]"},
-    {"", "Der Sandsturm schadet\n[OPP1].[A]"},
+    {"%s's %s fell.", "%.0s%s von %s sank."},
+    {"%s's %s harshly fell.", "%.0s%s von %s sank stark."},
+    {"%s's %s severely fell.", "%.0s%s von %s sank drastisch."},
     {"", "Der Sandsturm schadet\n[OPP2].[A]"},
     {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OWN1].[A]"},
 
@@ -622,8 +622,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 310
 
     {"", "[OWN2] kann nicht angreifen<85>[A]"},
-    {"(wild)", "(Wild)"},
-    {"(opponent)", "(Gegner)"},
+    {"The wild %s", "%s (Wild)"},
+    {"The foe's %s", "%s (Gegner)"},
     {"This tree looks like it can be\ncut down. ", "Ein kleiner Baum.\n"},
     {"This rock appears to be breakable.\n", "Ein kleiner Felsen.\n"},
 
@@ -745,11 +745,11 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Accuracy: %hhu", "Genauigkeit: %hhu"},
     {"(never misses)", "(trifft immer)"},
     {"%s's\n%s%.0s", "%.0s%s\nvon %s"},
-    {"A wild %s appears!", "Ein wildes %s erscheint!"},
+    {"A wild %s appeared!", "Ein wildes %s erscheint!"},
 
     {"Go %s!", "Los %s!"},
-    {"%s%s detects %s.", "%s%s erkennt %s."}, // Forewarn
-    {"%s%s shudders.", "%s%s erschaudert."}, // Anticipation
-    {"%s%s identifies %s.", "%s%s erkennt %s."}, // Frisk
-    {"%s%s identifies %s and %s.", "%s%s erkennt %s und%s."}, // Frisk
+    {"%s detects %s.", "%s erkennt %s."}, // Forewarn
+    {"%s shudders.", "%s erschaudert."}, // Anticipation
+    {"%s identifies %s.", "%s erkennt %s."}, // Frisk
+    {"%s identifies %s and %s.", "%s erkennt %s und%s."}, // Frisk
 };

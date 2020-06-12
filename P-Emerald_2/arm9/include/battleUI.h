@@ -60,13 +60,9 @@ namespace BATTLE {
         void loadPkmnSprite( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
 
         /*
-         * @brief: Returns
+         * @brief: Returns a string correctly describing the given pkmn.
          */
-        inline std::string getOpponentString( bool p_opponent ) const {
-            if( !p_opponent ) { return ""; }
-            else if( _isWildBattle ) { return std::string( GET_STRING( 311 ) ); }
-            else { return std::string( GET_STRING( 312 ) ); }
-        }
+        std::string getPkmnName( pokemon* p_pokemon, bool p_opponent ) const;
      public:
         battleUI( ) { }
 
@@ -86,6 +82,12 @@ namespace BATTLE {
          * @brief: prints the given message to the battle log.
          */
         void log( std::string p_message );
+
+        /*
+         * @brief: Logs the boosts the given pkmn obtains.
+         */
+        void logBoosts( pokemon* p_pokemon, bool p_opponent, boosts p_intended,
+                        boosts p_actual );
 
         /*
          * @brief: Logs that the given pkmn's ability is effective.

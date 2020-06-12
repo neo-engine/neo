@@ -58,9 +58,14 @@ namespace BATTLE {
         return false;
     }
 
-    bool slot::addBoosts( battleUI* p_ui, boosts p_boosts ) {
-        // TODO
-        return false;
+    boosts slot::addBoosts( boosts p_boosts, bool p_allowAbilities ) {
+        if( getPkmn( ) == nullptr ) { return boosts( ); }
+
+        if( p_allowAbilities && getPkmn( )->getAbility( ) == A_CONTRARY ) {
+            p_boosts.invert( );
+        }
+
+        return _boosts.addBoosts( p_boosts );
     }
 
     bool slot::resetBoosts( battleUI* p_ui ) {
@@ -73,32 +78,7 @@ namespace BATTLE {
         return false;
     }
 
-    volatileStatus slot::getVolatileStatus( ) {
-        // TODO
-        return volatileStatus( );
-    }
-
     bool slot::addSlotCondition( battleUI* p_ui, slotCondition p_slotCondition ) {
-        // TODO
-        return false;
-    }
-
-    slotCondition slot::getSlotCondition( ) {
-        // TODO
-        return slotCondition( );
-    }
-
-    u16 slot::getStat( u8 p_stat ) {
-        // TODO
-        return 0;
-    }
-
-    bool slot::canSelectMove( ) {
-        // TODO
-        return false;
-    }
-
-    bool slot::canSelectMove( u8 p_moveIdx ) {
         // TODO
         return false;
     }
@@ -110,16 +90,6 @@ namespace BATTLE {
 
     void slot::hitByMove( battleUI* p_ui, u16 p_moveId ) {
         // TODO
-    }
-
-    bool slot::canUseItem( ) {
-        // TODO
-        return false;
-    }
-
-    bool slot::canSwitchOut( ) {
-        // TODO
-        return false;
     }
 
     battleMove slot::computeBattleMove( battleMoveSelection               p_usersSelection,
