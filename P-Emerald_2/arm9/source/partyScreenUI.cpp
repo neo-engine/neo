@@ -64,7 +64,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "status_slp.h"
 #include "status_txc.h"
 
-#include "NoItem.h"
+#include "NoPkmn.h"
 
 #include "noselection_160_64_1.h"
 #include "noselection_160_64_2.h"
@@ -166,8 +166,8 @@ namespace STS {
 
             // PKMN icon
             tileCnt = IO::loadSprite( SPR_PKMN_ICON_OAM( pos ), SPR_PKMN_ICON_PAL( pos ), tileCnt,
-                                      4, partyTopScreenPkmnIconPosY( pos ), 32, 32, NoItemPal,
-                                      NoItemTiles, NoItemTilesLen, false, false, true,
+                                      4, partyTopScreenPkmnIconPosY( pos ), 32, 32, NoPkmnPal,
+                                      NoPkmnTiles, NoPkmnTilesLen, false, false, true,
                                       OBJPRIORITY_2, p_bottom, OBJMODE_NORMAL );
 
             if( i ) {
@@ -301,8 +301,8 @@ namespace STS {
 
             // PKMN icon
             tileCnt = IO::loadSprite( SPR_PKMN_ICON_OAM( pos ), SPR_PKMN_ICON_PAL( pos ), tileCnt,
-                                      131, partyTopScreenPkmnIconPosY( pos ), 32, 32, NoItemPal,
-                                      NoItemTiles, NoItemTilesLen, false, false, true,
+                                      131, partyTopScreenPkmnIconPosY( pos ), 32, 32, NoPkmnPal,
+                                      NoPkmnTiles, NoPkmnTilesLen, false, false, true,
                                       OBJPRIORITY_2, p_bottom, OBJMODE_NORMAL );
 
             // Item icon
@@ -407,7 +407,7 @@ namespace STS {
             // Pkmn icon
             tileCnt
                 = IO::loadSprite( SPR_PKMN_ICON_OAM_SUB( i ), SPR_PKMN_ICON_PAL_SUB( i ), tileCnt,
-                                  6 + 36 * i, 154, 32, 32, NoItemPal, NoItemTiles, NoItemTilesLen,
+                                  6 + 36 * i, 154, 32, 32, NoPkmnPal, NoPkmnTiles, NoPkmnTilesLen,
                                   false, false, true, OBJPRIORITY_2, p_bottom, OBJMODE_NORMAL );
         }
 
@@ -530,7 +530,7 @@ namespace STS {
                         OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
 
         tileCnt = IO::loadSprite( SPR_ITEM_OAM_SUB, SPR_ITEM_PAL_SUB, tileCnt, 32, 68, 32, 32,
-                                  NoItemPal, NoItemTiles, NoItemTilesLen, false, false, true,
+                                  NoPkmnPal, NoPkmnTiles, NoPkmnTilesLen, false, false, true,
                                   OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
 
         // build the shared pals

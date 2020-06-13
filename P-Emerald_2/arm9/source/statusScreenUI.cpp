@@ -34,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemonNames.h"
 #include "screenFade.h"
 #include "sprite.h"
+#include "sound.h"
 #include "uio.h"
 
 #include "NoItem.h"
@@ -848,6 +849,11 @@ namespace STS {
         REG_BLDALPHA_SUB = 0xff | ( 0x05 << 8 );
         REG_BLDALPHA     = 0xff | ( 0x05 << 8 );
         bgUpdate( );
+
+        if( !p_pokemon->isEgg( ) ) {
+            SOUND::playCry( p_pokemon->getSpecies( ), p_pokemon->getForme( ),
+                            p_pokemon->isFemale( ) );
+        }
     }
 
     void statusScreenUI::draw( pokemon* p_pokemon, u8 p_page ) {

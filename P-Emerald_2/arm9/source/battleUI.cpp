@@ -46,6 +46,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 #include "uio.h"
 #include "yesNoBox.h"
+#include "sound.h"
 
 #include "screenFade.h"
 
@@ -75,11 +76,18 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battle_ability.h"
 #include "battle_fite.h"
 #include "battle_pkmn.h"
+#include "battle_inactive.h"
 #include "battle_bag.h"
 #include "battle_run.h"
 
+#include "shiny_big.h"
+#include "shiny_big_alt.h"
+#include "shiny_big_alt2.h"
+
 #include "message_24.h"
 #include "message_large.h"
+
+#include "NoPkmn.h"
 
 namespace BATTLE {
 
@@ -93,6 +101,10 @@ namespace BATTLE {
 #define SPR_PLATFORM_OAM 54
 #define SPR_STATUS_ICON_OAM( p_idx ) ( 58 + ( p_idx ) )
 #define SPR_SHINY_ICON_OAM( p_idx ) ( 62 + ( p_idx ) )
+#define SPR_SHINY_PARTICLE_START_OAM 70
+#define SPR_STAT_CHANGE_PARTICLE_START_OAM 86
+#define SPR_BALL_START_OAM 100
+#define SPR_STATUS_BALL_OAM( p_idx ) ( 105 + ( p_idx ) )
 
 #define SPR_PKMN_PAL( p_idx ) ( p_idx )
 #define SPR_PKMN_SHADOW_PAL 4
@@ -102,6 +114,9 @@ namespace BATTLE {
 #define SPR_SHINY_ICON_PAL 10
 #define SPR_STATUSBG_PAL 11
 #define SPR_BOX_PAL 12
+#define SPR_STAT_CHANGE_PAL 13
+#define SPR_BALL_PAL 14
+#define SPR_STATUS_BALL_PAL 15
 
 #define SPR_PKMN_GFX( p_idx ) ( 144 * ( p_idx ) )
 
@@ -119,7 +134,7 @@ namespace BATTLE {
 #define SPR_BATTLE_PKMN_PAL_SUB 2
 #define SPR_BATTLE_RUN_PAL_SUB 3
 #define SPR_BATTLE_ICON_PAL_SUB 4
-#define SPR_BOX_PAL_SUB 0
+#define SPR_BOX_PAL_SUB 5
 
 // other macros
 #define WILD_BATTLE_SPRITE_X_START 144
@@ -339,6 +354,24 @@ namespace BATTLE {
                                   battle_abilityTilesLen, true,
                                   true, true, OBJPRIORITY_3, false, OBJMODE_NORMAL );
 
+        // Shiny animation
+        for( u8 i = 0; i < 8; ++i ) {
+            IO::loadSprite( SPR_SHINY_PARTICLE_START_OAM + i, SPR_SHINY_ICON_PAL,
+                    IO::OamTop->oamBuffer[ SPR_SHINY_ICON_OAM( 0 ) ].gfxIndex, 0, 0, 8, 8, 0, 0, 0,
+                    false, false, true, OBJPRIORITY_0, false, OBJMODE_BLENDED );
+        }
+        for( u8 i = 8; i < 15; ++i ) {
+            IO::loadSprite( SPR_SHINY_PARTICLE_START_OAM + i, SPR_SHINY_ICON_PAL,
+                    tileCnt, 0, 0, 16, 16, 0, 0, 0,
+                    false, false, true, OBJPRIORITY_0, false, OBJMODE_BLENDED );
+        }
+        tileCnt =
+            IO::loadSprite( SPR_SHINY_PARTICLE_START_OAM + 15, SPR_SHINY_ICON_PAL,
+                    tileCnt, 0, 0, 16, 16, 0, shiny_bigTiles, shiny_bigTilesLen,
+                    false, false, true, OBJPRIORITY_0, false, OBJMODE_BLENDED );
+
+        // stat increase / decrease
+
         IO::updateOAM( false );
     }
 
@@ -420,8 +453,154 @@ namespace BATTLE {
                         8, 20, 64, 64, message_largePal, message_largeTiles, message_largeTilesLen,
                         false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
+
+        // Pkmn Icon
+        tileCnt = IO::loadSprite( SPR_BATTLE_ICON_OAM_SUB, SPR_BATTLE_ICON_PAL_SUB, tileCnt,
+                                  112, 68 + 4, 32, 32, NoPkmnPal, NoPkmnTiles, NoPkmnTilesLen,
+                                  false, false, true, OBJPRIORITY_0, true );
+
         IO::updateOAM( true );
     }
+
+    void battleUI::animateBallRelease( bool p_opponent, u8 p_slot, u8 p_ballId ) const {
+        SOUND::playSoundEffect( SFX_BATTLE_RECALL );
+        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+
+        // TODO
+    }
+
+    void battleUI::animateBallThrow( u8 p_slot, u8 p_ballId ) const {
+        SOUND::playSoundEffect( SFX_BATTLE_THROW );
+        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+
+        // TODO
+    }
+
+    void battleUI::animateShiny( bool p_opponent, u8 p_slot, u8 p_shinyType ) const {
+        SOUND::playSoundEffect( SFX_SHINY );
+        SpriteEntry* oam     = IO::OamTop->oamBuffer;
+
+        if( p_shinyType == 2 ) { // Forced shinies
+            IO::loadSprite( SPR_SHINY_PARTICLE_START_OAM + 15, SPR_SHINY_ICON_PAL,
+                    oam[ SPR_SHINY_PARTICLE_START_OAM + 15 ].gfxIndex,
+                    0, 0, 16, 16, 0, shiny_big_alt2Tiles, shiny_big_alt2TilesLen,
+                    false, false, true, OBJPRIORITY_0, false, OBJMODE_BLENDED );
+        } else if( p_shinyType == 1 ) { // Circle for shinies due to extra rolls
+            IO::loadSprite( SPR_SHINY_PARTICLE_START_OAM + 15, SPR_SHINY_ICON_PAL,
+                    oam[ SPR_SHINY_PARTICLE_START_OAM + 15 ].gfxIndex,
+                    0, 0, 16, 16, 0, shiny_big_altTiles, shiny_big_altTilesLen,
+                    false, false, true, OBJPRIORITY_0, false, OBJMODE_BLENDED );
+        } else { // normal star
+            IO::loadSprite( SPR_SHINY_PARTICLE_START_OAM + 15, SPR_SHINY_ICON_PAL,
+                    oam[ SPR_SHINY_PARTICLE_START_OAM + 15 ].gfxIndex,
+                    0, 0, 16, 16, 0, shiny_bigTiles, shiny_bigTilesLen,
+                    false, false, true, OBJPRIORITY_0, false, OBJMODE_BLENDED );
+        }
+
+
+        u16 centerx = oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_slot ) ].x + 48;
+        u16 centery = oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_slot ) ].y + 48;
+
+        u16 radius = 25;
+        u16 sm_sh = 4, bg_sh = 8;
+
+        if( !p_opponent ) {
+            sm_sh = 8, bg_sh = 16;
+            radius *= 2;
+            centerx += 48;
+            centery += 48;
+        }
+
+        constexpr s8 dirs[ 32 ][ 2 ] = {
+            { 10, 0 }, { 10, 2 }, { 9, 4 }, { 8, 6 },
+            { 7, 7 },  { 6, 8 },  { 4, 9 }, { 2, 10 },
+
+            { 0, 10 }, { -2, 10 }, { -4, 9 }, { -6, 8 },
+            { -7, 7 }, { -8, 6 },  { -9, 4 }, { -10, 2 },
+
+            { -10, 0 }, { -10, -2 }, { -9, -4 }, { -8, -6 },
+            { -7, -7 }, { -6, -8 },  { -4, -9 }, { -2, -10 },
+
+            { 0, -10 }, { 2, -10 }, { 4, -9 }, { 6, -8 },
+            { 7, -7 },  { 8, -6 },  { 9, -4 }, { 10, -2 },
+        };
+
+        // init frame
+        for( u8 i = 0; i < 8; ++i ) {
+            oam[ SPR_SHINY_PARTICLE_START_OAM + i ].isHidden = false;
+            oam[ SPR_SHINY_PARTICLE_START_OAM + 8 + i ].isHidden = false;
+
+            oam[ SPR_SHINY_PARTICLE_START_OAM + i ].x = centerx + dirs[ 4 * i ][ 0 ] - sm_sh;
+            oam[ SPR_SHINY_PARTICLE_START_OAM + i ].y = centery + dirs[ 4 * i ][ 1 ] - sm_sh;
+            oam[ SPR_SHINY_PARTICLE_START_OAM + 8 + i ].x = centerx + dirs[ 4 * i + 2 ][ 0 ]
+                - bg_sh;
+            oam[ SPR_SHINY_PARTICLE_START_OAM + 8 + i ].y = centery + dirs[ 4 * i + 2 ][ 1 ]
+                - bg_sh;
+        }
+        IO::updateOAM( false );
+        swiWaitForVBlank( );
+
+
+        for( u8 f = 0; f < 14; ++f ) {
+            for( u8 i = 0; i < 8; ++i ) {
+                u8 pos = ( 4 * i + ( f & 3 ) ) & 31;
+
+                oam[ SPR_SHINY_PARTICLE_START_OAM + i ].x = centerx +
+                    ( dirs[ pos ][ 0 ] * ( radius + 5 * f / 4 ) / 10 ) - sm_sh;
+                oam[ SPR_SHINY_PARTICLE_START_OAM + i ].y = centery +
+                    ( dirs[ pos ][ 1 ] * ( radius + 5 * f / 4 ) / 10 ) - sm_sh;
+                oam[ SPR_SHINY_PARTICLE_START_OAM + 8 + i ].x = centerx +
+                    ( dirs[ ( pos + 2 ) & 31 ][ 0 ] * ( radius + 5 * f / 4 ) / 10 ) - bg_sh;
+                oam[ SPR_SHINY_PARTICLE_START_OAM + 8 + i ].y = centery +
+                    ( dirs[ ( pos + 2 ) & 31 ][ 1 ] * ( radius + 5 * f / 4 ) / 10 ) - bg_sh;
+            }
+            IO::updateOAM( false );
+            swiWaitForVBlank( );
+            if( f & 1 ) {
+                swiWaitForVBlank( );
+            }
+        }
+
+        // hide everything
+        for( u8 i = 0; i < 8; ++i ) {
+            oam[ SPR_SHINY_PARTICLE_START_OAM + i ].isHidden = true;
+            oam[ SPR_SHINY_PARTICLE_START_OAM + 8 + i ].isHidden = true;
+        }
+
+        // some random extra noise
+        for( u8 f = 0; f < 8; ++f ) {
+            for( u8 i = 0; i < 8; ++i ) {
+                oam[ SPR_SHINY_PARTICLE_START_OAM + i ].isHidden = rand( ) & 2;
+                oam[ SPR_SHINY_PARTICLE_START_OAM + 8 + i ].isHidden = rand( ) & 2;
+
+                oam[ SPR_SHINY_PARTICLE_START_OAM + i ].x = centerx - 32 - sm_sh
+                    + ( rand( ) & 63 );
+                oam[ SPR_SHINY_PARTICLE_START_OAM + i ].y = centery - 32 - sm_sh
+                    + ( rand( ) & 63 );
+                oam[ SPR_SHINY_PARTICLE_START_OAM + 8 + i ].x = centerx - 32 - bg_sh
+                    + ( rand( ) & 63 );
+                oam[ SPR_SHINY_PARTICLE_START_OAM + 8 + i ].y = centery - 32 - bg_sh
+                    + ( rand( ) & 63 );
+            }
+            IO::updateOAM( false );
+            swiWaitForVBlank( );
+        }
+
+        // hide everything
+        for( u8 i = 0; i < 8; ++i ) {
+            oam[ SPR_SHINY_PARTICLE_START_OAM + i ].isHidden = true;
+            oam[ SPR_SHINY_PARTICLE_START_OAM + 8 + i ].isHidden = true;
+        }
+        IO::updateOAM( false );
+
+
+        swiWaitForVBlank( );
+    }
+
+    void battleUI::animateStatChange( bool p_opponent, u8 p_slot, boosts p_poosts ) const {
+        // TODO
+    }
+
 
     void battleUI::init( ) {
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
@@ -449,17 +628,24 @@ namespace BATTLE {
         }
     }
 
+    void battleUI::resetLog( ) {
+        SpriteEntry* oam     = IO::Oam->oamBuffer;
+        for( u8 i = 0; i < 128; ++i ) {
+            oam[ i ].isHidden = true;
+        }
+        for( u8 i = 0; i < 12; ++i ) {
+            oam[ SPR_LARGE_MESSAGE_OAM_SUB + i ].isHidden = false;
+        }
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
+        IO::updateOAM( true );
+        _currentLogLine = 1;
+    }
 
     void battleUI::log( std::string p_message ) {
         SpriteEntry* oam     = IO::Oam->oamBuffer;
 
         if( oam[ SPR_LARGE_MESSAGE_OAM_SUB ].isHidden ) {
-            for( u8 i = 0; i < 12; ++i ) {
-                oam[ SPR_LARGE_MESSAGE_OAM_SUB + i ].isHidden = false;
-            }
-            dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
-            IO::updateOAM( true );
-            _currentLogLine = 1;
+            resetLog( );
         }
 
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
@@ -493,8 +679,8 @@ namespace BATTLE {
         return std::string( buffer );
     }
 
-    void battleUI::logBoosts( pokemon* p_pokemon, bool p_opponent, boosts p_intended,
-                              boosts p_actual ) {
+    void battleUI::logBoosts( pokemon* p_pokemon, bool p_opponent, u8 p_slot,
+                              boosts p_intended, boosts p_actual ) {
         char buffer[ 100 ];
         auto pkmnstr = getPkmnName( p_pokemon, p_opponent );
         for( u8 i = 0; i < 8; ++i ) {
@@ -526,6 +712,7 @@ namespace BATTLE {
                 log( std::string( buffer ) );
             }
         }
+        animateStatChange( p_opponent, p_slot, p_actual );
     }
 
     void battleUI::logAbility( pokemon* p_pokemon, bool p_opponent ) {
@@ -547,7 +734,7 @@ namespace BATTLE {
                 oam[ SPR_ABILITY_OAM( !p_opponent ) ].y + 1, false,
                 p_opponent ? IO::font::LEFT : IO::font::RIGHT, 14, -14 );
 
-        for( u8 i = 0; i < 60; ++i ) {
+        for( u8 i = 0; i < 75; ++i ) {
             swiWaitForVBlank( );
         }
 
@@ -919,15 +1106,13 @@ namespace BATTLE {
             swiWaitForVBlank( );
         }
 
-        // pokemon cry
-        for( u8 i = 0; i < 30; ++i ) {
-            swiWaitForVBlank( );
-        }
+        SOUND::playCry( p_pokemon->getSpecies( ), p_pokemon->getForme( ),
+                        p_pokemon->isFemale( ) );
+
+        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
 
         if( p_pokemon->isShiny( ) ) {
-            // TODO
-            // animateShiny( WILD_BATTLE_SPRITE_X + 16, WILD_BATTLE_SPRITE_X_START + 16,
-            //         SHINY_ANIM, 15, tileCnt );
+            animateShiny( true, 0, p_pokemon->m_boxdata.m_shinyType );
         }
         _curHP[ 0 ][ 0 ] = 101;
         updatePkmnStats( true, 0, p_pokemon );
@@ -939,32 +1124,166 @@ namespace BATTLE {
         // TODO
     }
 
-    void battleUI::sendOutPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {
-        char buffer[ 50 ];
+    void battleUI::sendOutPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon,
+                                battleTrainer* p_trainer ) {
+        char buffer[ 100 ];
         if( p_opponent ) {
-            // (TODO)
+            (void) p_trainer;
+//            snprintf( buffer, 99, GET_STRING( 264 ),
+//                    getTrainerClassName( p_trainer->getClass( ) ).c_str( ),
+//                    p_trainer->m_strings.m_name, p_pokemon->m_boxdata.m_name );
+//            log( std::string( buffer ) );
         } else {
-            snprintf( buffer, 49, GET_STRING( 395 ), p_pokemon->m_boxdata.m_name );
+            snprintf( buffer, 99, GET_STRING( 395 ), p_pokemon->m_boxdata.m_name );
             log( std::string( buffer ) );
         }
 
         // play pokeball animation
-        // (TODO)
+        animateBallRelease( p_opponent, p_pos, p_pokemon->getBall( ) );
+        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
 
         loadPkmnSprite( p_opponent, p_pos, p_pokemon );
+        SOUND::playCry( p_pokemon->getSpecies( ), p_pokemon->getForme( ),
+                        p_pokemon->isFemale( ) );
+
+        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
 
         if( p_pokemon->isShiny( ) ) {
-            // TODO shiny animation
+            animateShiny( p_opponent, p_pos, p_pokemon->m_boxdata.m_shinyType );
         }
 
         _curHP[ !p_opponent ][ p_pos ] = 101;
         updatePkmnStats( p_opponent, p_pos, p_pokemon );
     }
 
-    void battleUI::showMoveSelection( pokemon* p_pokemon, u8 p_highlightedButton ) {
+    void battleUI::showMoveSelection( pokemon* p_pokemon, u8 p_slot, u8 p_highlightedButton ) {
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+        char buffer[ 100 ];
+
         if( p_highlightedButton == u8( -1 ) ) {
             // initialize stuff
             dmaCopy( battlesubBitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
+            // Clear log window
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+            for( u8 i = 0; i < 12; ++i ) {
+                oam[ SPR_LARGE_MESSAGE_OAM_SUB + i ].isHidden = true;
+            }
+
+
+            for( u8 i = 0; i < 8; ++i ) {
+                oam[ SPR_SMALL_MESSAGE_OAM_SUB + i ].isHidden = false;
+            }
+
+            for( u8 i = 0; i < 2; ++i ) {
+                oam[ SPR_BATTLE_FITE_OAM_SUB + i].isHidden = false;
+                oam[ SPR_BATTLE_PKMN_OAM_SUB + i].isHidden = false;
+                oam[ SPR_BATTLE_RUN_OAM_SUB + i].isHidden = false;
+                oam[ SPR_BATTLE_BAG_OAM_SUB + i].isHidden = false;
+            }
+
+            if( !_isWildBattle && !p_slot ) {
+                IO::loadSprite( SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
+                        oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                        128, 68 + 64 + 18, 32, 32, battle_inactivePal, 0, 0, true, true, false,
+                        OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            } else {
+                IO::loadSprite( SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
+                        oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                        128, 68 + 64 + 18, 32, 32, battle_runPal, 0, 0, true, true, false,
+                        OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+            }
+
+            IO::loadPKMNIcon(
+                    p_pokemon->getSpecies( ), oam[ SPR_BATTLE_ICON_OAM_SUB ].x,
+                    oam[ SPR_BATTLE_ICON_OAM_SUB ].y, SPR_BATTLE_ICON_OAM_SUB,
+                    SPR_BATTLE_ICON_PAL_SUB, oam[ SPR_BATTLE_ICON_OAM_SUB ].gfxIndex,
+                    true, p_pokemon->getForme( ), p_pokemon->isShiny( ),
+                    p_pokemon->isFemale( ) );
+
+            IO::updateOAM( true );
+
+            IO::regularFont->printString( GET_STRING( 264 ), 128,
+                    oam[ SPR_BATTLE_FITE_OAM_SUB].y + 34, true, IO::font::CENTER );
+            IO::regularFont->printStringC( GET_STRING( 265 ),
+                    oam[ SPR_BATTLE_PKMN_OAM_SUB ].x + 32,
+                    oam[ SPR_BATTLE_PKMN_OAM_SUB].y + 9, true, IO::font::CENTER );
+            if( _isWildBattle || !p_slot ) {
+                IO::regularFont->printStringC( GET_STRING( 266 ),
+                        oam[ SPR_BATTLE_RUN_OAM_SUB ].x + 32,
+                        oam[ SPR_BATTLE_RUN_OAM_SUB].y + 9, true, IO::font::CENTER );
+            } else {
+                IO::regularFont->printStringC( GET_STRING( 268 ),
+                        oam[ SPR_BATTLE_RUN_OAM_SUB ].x + 32,
+                        oam[ SPR_BATTLE_RUN_OAM_SUB].y + 9, true, IO::font::CENTER );
+            }
+            IO::regularFont->printStringC( GET_STRING( 267 ),
+                    oam[ SPR_BATTLE_BAG_OAM_SUB ].x + 32,
+                    oam[ SPR_BATTLE_BAG_OAM_SUB].y + 9, true, IO::font::CENTER );
+
+            snprintf( buffer, 99, GET_STRING( 162 ), p_pokemon->m_boxdata.m_name );
+            IO::regularFont->printStringC( buffer,
+                    128, oam[ SPR_SMALL_MESSAGE_OAM_SUB ].y + 4, true, IO::font::CENTER );
+        }
+        if( p_highlightedButton == 0 ) {
+            IO::loadSprite( SPR_BATTLE_FITE_OAM_SUB + 1, SPR_BATTLE_FITE_PAL_SUB,
+                    oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].gfxIndex,
+                    oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].x,
+                    oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].y,
+                    64, 64, battle_inactivePal, 0, 0, true, true, false,
+                    OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        } else {
+            IO::loadSprite( SPR_BATTLE_FITE_OAM_SUB + 1, SPR_BATTLE_FITE_PAL_SUB,
+                    oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].gfxIndex,
+                    oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].x,
+                    oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].y,
+                    64, 64, battle_fitePal, 0, 0, true, true, false,
+                    OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        }
+        if( p_highlightedButton == 1 ) {
+            IO::loadSprite( SPR_BATTLE_PKMN_OAM_SUB + 1, SPR_BATTLE_PKMN_PAL_SUB,
+                    oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].gfxIndex,
+                    oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].x,
+                    oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].y,
+                    32, 32, battle_inactivePal, 0, 0, true, true, false,
+                    OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        } else {
+            IO::loadSprite( SPR_BATTLE_PKMN_OAM_SUB + 1, SPR_BATTLE_PKMN_PAL_SUB,
+                    oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].gfxIndex,
+                    oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].x,
+                    oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].y,
+                    32, 32, battle_pkmnPal, 0, 0, true, true, false,
+                    OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        }
+        if( p_highlightedButton == 2 || ( !p_slot && !_isWildBattle ) ) {
+            IO::loadSprite( SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
+                    oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                    oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
+                    oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y,
+                    32, 32, battle_inactivePal, 0, 0, true, true, false,
+                    OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        } else {
+            IO::loadSprite( SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
+                    oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                    oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
+                    oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y,
+                    32, 32, battle_runPal, 0, 0, true, true, false,
+                    OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        }
+        if( p_highlightedButton == 3 ) {
+            IO::loadSprite( SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
+                    oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
+                    oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
+                    oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y,
+                    32, 32, battle_inactivePal, 0, 0, true, true, false,
+                    OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        } else {
+            IO::loadSprite( SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
+                    oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
+                    oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
+                    oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y,
+                    32, 32, battle_bagPal, 0, 0, true, true, false,
+                    OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
     }
 } // namespace BATTLE

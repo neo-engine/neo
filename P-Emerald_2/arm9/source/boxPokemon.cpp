@@ -53,15 +53,21 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
         data = *p_data;
     }
 
+    m_rand = rand( ) & 0xF;
+
     m_oTId  = p_id;
     m_oTSid = p_sid;
     m_pid   = rand( );
-    if( p_shiny == 2 )
-        while( !isShiny( ) ) m_pid = rand( );
-    else if( p_shiny == 1 )
+    if( p_shiny == 2 ) {
+        while( !isShiny( ) ) { m_pid = rand( ); }
+        m_shinyType = 2;
+    } else if( p_shiny == 1 ) {
         while( isShiny( ) ) m_pid = rand( );
-    else if( p_shiny ) { // Try p_shiny - 2 additional times to generate a shiny PId
-        for( u8 i = 0; i < p_shiny - 2 && !isShiny( ); ++i ) m_pid = rand( );
+    } else if( p_shiny ) { // Try p_shiny - 2 additional times to generate a shiny PId
+        for( u8 i = 0; i < p_shiny - 2 && !isShiny( ); ++i ) {
+            m_pid = rand( );
+            m_shinyType = 1;
+        }
     }
 
     m_experienceGained = EXP[ p_level - 1 ][ data.getExpType( ) ];

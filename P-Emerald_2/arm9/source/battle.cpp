@@ -96,21 +96,20 @@ namespace BATTLE {
                 moves[ field::PLAYER_SIDE ][ 0 ] = getMoveSelection( 0,
                         _policy.m_allowMegaEvolution );
 
-                if( _policy.m_mode == DOUBLE ) {
-                    // Compute player's first pokemon's move
-                    if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == RUN ) {
-                        moves[ field::PLAYER_SIDE ][ 0 ] = {NO_OP, 0, {}, {field::PLAYER_SIDE, 0}};
-                        moves[ field::PLAYER_SIDE ][ 1 ] = {NO_OP, 0, {}, {field::PLAYER_SIDE, 1}};
-                        playerWillRun                    = true;
-                        break;
-                    }
-                    if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == CAPTURE ) {
-                        playerWillCatch                  = moves[ field::PLAYER_SIDE ][ 0 ].m_param;
-                        moves[ field::PLAYER_SIDE ][ 0 ] = {NO_OP, 0, {}, {field::PLAYER_SIDE, 0}};
-                        moves[ field::PLAYER_SIDE ][ 1 ] = {NO_OP, 0, {}, {field::PLAYER_SIDE, 1}};
-                        break;
-                    }
+                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == RUN ) {
+                    moves[ field::PLAYER_SIDE ][ 0 ] = {NO_OP, 0, {}, {field::PLAYER_SIDE, 0}};
+                    moves[ field::PLAYER_SIDE ][ 1 ] = {NO_OP, 0, {}, {field::PLAYER_SIDE, 1}};
+                    playerWillRun                    = true;
+                    break;
+                }
+                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == CAPTURE ) {
+                    playerWillCatch                  = moves[ field::PLAYER_SIDE ][ 0 ].m_param;
+                    moves[ field::PLAYER_SIDE ][ 0 ] = {NO_OP, 0, {}, {field::PLAYER_SIDE, 0}};
+                    moves[ field::PLAYER_SIDE ][ 1 ] = {NO_OP, 0, {}, {field::PLAYER_SIDE, 1}};
+                    break;
+                }
 
+                if( _policy.m_mode == DOUBLE ) {
                     moves[ field::PLAYER_SIDE ][ 1 ] = getMoveSelection(
                         1, _policy.m_allowMegaEvolution
                                && moves[ field::PLAYER_SIDE ][ 0 ].m_type != MEGA_ATTACK );
@@ -138,10 +137,19 @@ namespace BATTLE {
                 moves[ field::OPPONENT_SIDE ][ i ] = getAIMove( i );
             }
 
+            _battleUI.resetLog( );
+
             if( playerWillRun && playerRuns( ) ) {
+                SOUND::playSoundEffect( SFX_BATTLE_ESCAPE );
+                _battleUI.log( std::string( GET_STRING( 163 ) ) );
+                for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
                 endBattle( battleEnd = BATTLE_RUN );
                 return battleEnd;
+            } else {
+                _battleUI.log( std::string( GET_STRING( 164 ) ) );
+                for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
             }
+
             if( playerWillCatch && playerCaptures( playerWillCatch ) ) {
                 endBattle( battleEnd = BATTLE_CAPTURE );
                 return battleEnd;
@@ -237,6 +245,15 @@ namespace BATTLE {
             }
     }
 
+    battleMoveSelection battle::chooseAttack( u8 p_slot, bool p_allowMegaEvolution ) {
+        battleMoveSelection res = NO_OP_SELECTION;
+        res.m_user = {field::PLAYER_SIDE, p_slot};
+
+        // TODO
+
+        return res;
+    }
+
     battleMoveSelection battle::getMoveSelection( u8 p_slot, bool p_allowMegaEvolution ) {
         battleMoveSelection res = NO_OP_SELECTION;
         res.m_user = {field::PLAYER_SIDE, p_slot};
@@ -246,10 +263,11 @@ namespace BATTLE {
             return _field.getStoredMove( false, p_slot );
         }
 
-        _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ) );
+        _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
         u8 curSel = 0;
-        cooldown     = COOLDOWN_COUNT;
+        _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot, curSel );
 
+        cooldown     = COOLDOWN_COUNT;
         loop( ) {
             scanKeys( );
             touchRead( &touch );
@@ -259,21 +277,31 @@ namespace BATTLE {
 
             if( p_slot && ( pressed & KEY_B ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
-
                 res.m_type = CANCEL;
-                break;
+                return res;
             }
             if( pressed & KEY_A ) {
-                SOUND::playSoundEffect( SFX_SELECT );
-
                 switch( curSel ) {
                     case 0: // Choose attack
+                        res = chooseAttack( p_slot, p_allowMegaEvolution );
+                        if( res.m_type != CANCEL ) {
+                            return res;
+                        }
                         break;
                     case 1: // Choose pkmn
+                        // TODO
                         break;
                     case 2: // Run / Cancel
-                        break;
-                    case 3: // Choose attack
+                        if( _isWildBattle ) {
+                            SOUND::playSoundEffect( SFX_SELECT );
+                            res.m_type = RUN;
+                        } else if( p_slot ) {
+                            SOUND::playSoundEffect( SFX_CANCEL );
+                            res.m_type = CANCEL;
+                        }
+                        return res;
+                    case 3: // Choose item
+                        // TODO
                         break;
                     default:
                         break;
@@ -283,20 +311,29 @@ namespace BATTLE {
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
+                if( curSel == 0 ) { curSel = 3; }
+                else if( curSel < 3 ) { curSel++; }
+                else { curSel = 0; }
 
+                _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot, curSel );
 
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
+                if( curSel == 0 ) { curSel = 1; }
+                else { curSel--; }
+
+                _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot, curSel );
 
                 cooldown = COOLDOWN_COUNT;
-            } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+            } else if( GET_KEY_COOLDOWN( KEY_DOWN ) || GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
-                cooldown = COOLDOWN_COUNT;
-            } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
+                if( curSel == 0 && ( p_slot || _isWildBattle ) ) { curSel = 2; }
+                else { curSel = 0; }
+
+                _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot, curSel );
 
                 cooldown = COOLDOWN_COUNT;
             }
@@ -329,9 +366,25 @@ namespace BATTLE {
     }
 
     bool battle::playerRuns( ) {
-        // TODO
+        auto p1 = _field.getPkmn( false, 0 );
+        if( p1 == nullptr ) { return true; }
 
-        return true;
+        if( p1->getItem( ) == I_SMOKE_BALL ) {
+            return true;
+        }
+
+        if( !_field.suppressesAbilities( ) ) {
+            if( p1->getAbility( ) == A_RUN_AWAY ) {
+                return true;
+            }
+        }
+
+        u16 ownSpeed = _field.getStat( false, 0, SPEED );
+        u16 oppSpeed = _field.getStat( true, 0, SPEED );
+
+        if( ownSpeed > oppSpeed || oppSpeed == 0 ) { return true; }
+
+        return ( ownSpeed + ( rand( ) % oppSpeed ) >= oppSpeed );
     }
 
     bool battle::playerCaptures( u16 p_pokeball ) {

@@ -33,6 +33,10 @@ namespace SOUND {
     u16 currentLocation = 0;
     MAP::moveMode currentMoveMode = MAP::WALK;
 
+    void playCry( u16 p_pokemonId, u8 p_formeId, bool p_female ) {
+//        playSoundEffect( SFX_132CRY );
+    }
+
     void onLocationChange( u16 p_newLocation ) {
         if( currentLocation == p_newLocation ) { return; }
 

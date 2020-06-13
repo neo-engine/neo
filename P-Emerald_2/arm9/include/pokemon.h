@@ -84,7 +84,9 @@ struct boxPokemon {
     u8   m_gotLevel : 7   = 0;   //
     u8   m_oTisFemale : 1 = 0;   // unused
     u8   m_encounter      = 0;
-    u8   m_abilitySlot    = 0;
+    u8   m_abilitySlot : 2 = 0;
+    u8   m_shinyType : 2  = 0;
+    u8   m_rand : 4       = 0;
 
     boxPokemon( ) {
     }
@@ -101,6 +103,13 @@ struct boxPokemon {
     constexpr bool isFullyEvolved( ) const {
         // TODO
         return true;
+    }
+
+    /*
+     * @brief: Returns the poke ball the pkmn was caught in.
+     */
+    constexpr u8 getBall( ) const {
+        return m_ball;
     }
 
     constexpr u16 getMove( u8 p_idx ) const {
@@ -349,6 +358,13 @@ struct pokemon {
      */
     constexpr bool isFullyEvolved( ) const {
         return m_boxdata.isFullyEvolved( );
+    }
+
+    /*
+     * @brief: Returns the poke ball the pkmn was caught in.
+     */
+    constexpr u8 getBall( ) const {
+        return m_boxdata.getBall( );
     }
 
     /*

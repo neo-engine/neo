@@ -94,7 +94,7 @@ namespace SAVE {
 
         pokemon testTeam[ 6 ];
         for( u16 i = 0; i < 6; i++ ) {
-            testTeam[ i ] = pokemon( PKMN_GYARADOS, 100, 0, 0, 3, false, i == 3 );
+            testTeam[ i ] = pokemon( PKMN_GYARADOS, 100, 0, 0, 255, false, i == 3 );
             testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
             //            SAVE::SAV.getActiveFile( ).storePkmn(
             //                pokemon( 1 + ( 3 * i ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, rand( )

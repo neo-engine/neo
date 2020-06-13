@@ -391,8 +391,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"SDF", "SVE"},
     {"SPD", "INI"},
     {"What will %s do?", "Was soll %s tun?"},
-    {"You got away safely.[A]", "Du bist entkommen.[A]"},
-    {"You couldn't escape[A]", "Flucht gescheitert[A]"},
+    {"You got away safely.", "Du bist entkommen."},
+    {"You couldn't escape|", "Flucht gescheitert|"},
 
     {"Choose a target!", "Welches PKMN angreifen?"},
     {"Choose a Pok\xe9mon.", "Welches Pok\xe9mon?"},
@@ -554,13 +554,13 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"%s's %s fell.", "%.0s%s von %s sank."},
     {"%s's %s harshly fell.", "%.0s%s von %s sank stark."},
     {"%s's %s severely fell.", "%.0s%s von %s sank drastisch."},
-    {"", "Der Sandsturm schadet\n[OPP2].[A]"},
-    {"", "[OWN1:ABILITY] von\n[OWN1] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OWN1].[A]"},
+    {"%s %s sends out %s.", "%s %s schickt %s in den Kampf."},
+    {"F I G H T", "K A M P F"},
 
-    {"", "[OWN2:ABILITY] von\n[OWN2] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OWN2].[A]"},
-    {"", "[OPP1:ABILITY] von\n[OPP1] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OPP1].[A]"},
-    {"", "[OPP2:ABILITY] von\n[OPP2] wirkt![A][CLEAR]Das Sonnenlicht\nschadet [OPP2].[A]"},
-    {"", "Es regnet.[A]"},
+    {"POK\xc9MON", "POK\xc9MON"},
+    {"RUN", "FLUCHT"},
+    {"BAG", "BEUTEL"},
+    {"BACK", "ZUR\xdc""CK"},
     {"", "Es hagelt.[A]"},
 
     // 270

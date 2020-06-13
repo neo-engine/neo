@@ -63,6 +63,27 @@ namespace BATTLE {
          * @brief: Returns a string correctly describing the given pkmn.
          */
         std::string getPkmnName( pokemon* p_pokemon, bool p_opponent ) const;
+
+        /*
+         * @brief: Animates the given ball type opening
+         */
+        void animateBallRelease( bool p_opponent, u8 p_slot, u8 p_ballId ) const;
+
+        /*
+         * @brief: Animates the given ball being thrown at the opponents pkmn in the given
+         * slot.
+         */
+        void animateBallThrow( u8 p_slot, u8 p_ballId ) const;
+
+        /*
+         * @brief: Plays the shiny animation for the given pkmn.
+         */
+        void animateShiny( bool p_opponent, u8 p_slot, u8 p_shinyType = 0 ) const;
+
+        /*
+         * @brief: Plays the boosts animation tor the given boosts and specified pkmn.
+         */
+        void animateStatChange( bool p_opponent, u8 p_slot, boosts p_poosts ) const;
      public:
         battleUI( ) { }
 
@@ -79,6 +100,11 @@ namespace BATTLE {
         void init( );
 
         /*
+         * @brief: Initializes and shows the log screen.
+         */
+        void resetLog( );
+
+        /*
          * @brief: prints the given message to the battle log.
          */
         void log( std::string p_message );
@@ -86,7 +112,7 @@ namespace BATTLE {
         /*
          * @brief: Logs the boosts the given pkmn obtains.
          */
-        void logBoosts( pokemon* p_pokemon, bool p_opponent, boosts p_intended,
+        void logBoosts( pokemon* p_pokemon, bool p_opponent, u8 p_slot, boosts p_intended,
                         boosts p_actual );
 
         /*
@@ -130,7 +156,8 @@ namespace BATTLE {
         /*
          * @brief: Sends out the given pkmn at the specified position.
          */
-        void sendOutPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
+        void sendOutPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon,
+                          battleTrainer* p_trainer = 0 );
 
         /*
          * @brief: shows the wild pkmn appear
@@ -146,6 +173,6 @@ namespace BATTLE {
          * @brief: Shows the move selection for the given pkmn ("attack", "item", "pkmn",
          * "run", etc)
          */
-        void showMoveSelection( pokemon* p_pokemon, u8 p_highlightedButton = -1 );
+        void showMoveSelection( pokemon* p_pokemon, u8 p_slot, u8 p_highlightedButton = -1 );
     };
 } // namespace BATTLE

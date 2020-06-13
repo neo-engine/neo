@@ -36,9 +36,11 @@
 void initSound( );
 
 namespace SOUND {
-#define NUM_SOUND_EFFECTS 16
+#define NUM_SOUND_EFFECTS 27
     void playBGM( u16 p_id );
     void playSoundEffect( u16 p_id );
+
+    void playCry( u16 p_pokemonId, u8 p_formeId = 0, bool p_female = false );
 
     void setVolume( u16 p_newValue );
     void dimVolume( );

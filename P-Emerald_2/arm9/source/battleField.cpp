@@ -95,14 +95,14 @@ namespace BATTLE {
                         p_ui->logAbility( pkmn, p_opponent );
                         boosts bt = boosts( ); bt.setBoost( DEF, 1 );
                         auto res = addBoosts( p_opponent, p_slot, bt );
-                        p_ui->logBoosts( pkmn, p_opponent, bt, res );
+                        p_ui->logBoosts( pkmn, p_opponent, p_slot, bt, res );
                         break;
                     }
                     case A_INTREPID_SWORD: {
                         p_ui->logAbility( pkmn, p_opponent );
                         boosts bt = boosts( ); bt.setBoost( ATK, 1 );
                         auto res = addBoosts( p_opponent, p_slot, bt );
-                        p_ui->logBoosts( pkmn, p_opponent, bt, res );
+                        p_ui->logBoosts( pkmn, p_opponent, p_slot, bt, res );
                         break;
                     }
                     case A_INTIMIDATE: {
@@ -111,7 +111,7 @@ namespace BATTLE {
                         for( u8 i = 0; i < 2; ++i ) {
                             if( getPkmn( !p_opponent, i ) == nullptr ) { continue; }
                             auto res = addBoosts( !p_opponent, i, bt );
-                            p_ui->logBoosts( getPkmn( !p_opponent, i ), !p_opponent, bt, res );
+                            p_ui->logBoosts( getPkmn( !p_opponent, i ), !p_opponent, i, bt, res );
                         }
                         break;
                     }
@@ -126,7 +126,7 @@ namespace BATTLE {
                         }
                         bt.setBoost( def < sdef ? ATK : SATK, 1 );
                         auto res = addBoosts( p_opponent, p_slot, bt );
-                        p_ui->logBoosts( pkmn, p_opponent, bt, res );
+                        p_ui->logBoosts( pkmn, p_opponent, p_slot, bt, res );
                         break;
                     }
 

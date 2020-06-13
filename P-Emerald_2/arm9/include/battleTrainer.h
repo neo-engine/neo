@@ -57,9 +57,11 @@ namespace BATTLE {
         }
     };
 
+    std::string getTrainerClassName( u8 p_trainerClass );
     std::string getTrainerClassName( u8 p_trainerClass, u8 p_language );
     bool        getTrainerClassName( u8 p_trainerClass, u8 p_language, char* p_out );
 
+    battleTrainer getBattleTrainer( u16 p_battleTrainerId );
     battleTrainer getBattleTrainer( u16 p_battleTrainerId, u8 p_language );
     bool          getBattleTrainer( u16 p_battleTrainerId, u8 p_language, battleTrainer* p_out );
 } // namespace BATTLE

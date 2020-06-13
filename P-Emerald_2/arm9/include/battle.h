@@ -998,9 +998,18 @@ namespace BATTLE {
 
         /*
          * @brief: Makes the player select a move for the pokemon in slot p_slot.
-         * Returns a NO_OP move if the corresponding pokemon cannot move.
+         * @returns: a NO_OP move if the corresponding pokemon cannot move.
          */
         battleMoveSelection getMoveSelection( u8 p_slot, bool p_allowMegaEvolution );
+
+        /*
+         * @brief: Makes the player select an attack for the pokemon in slot p_slot.
+         * A player may not be presented with a choice if the pkmn is forced to use an
+         * attack or has no PP left.
+         * @returns: A valid battleMoveSelection. May be of type CANCEL if the player
+         * didn't choose a move.
+         */
+        battleMoveSelection chooseAttack( u8 p_slot, bool p_allowMegaEvolution );
 
         /*
          * @brief: Computes an AI move for the opposing pokemon in slot p_slot.
