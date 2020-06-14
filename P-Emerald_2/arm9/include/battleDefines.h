@@ -135,46 +135,43 @@ namespace MOVE {
     enum moveHitTypes : u8 { NOOP = 0, PHYSICAL = 1, SPECIAL = 2, STATUS = 3 };
 
     enum target : u8 {
-        NORMAL                = 0,
-        ADJACENT_ALLY         = 2,
-        ADJACENT_FOE          = 3,
-        ADJACENT_ALLY_OR_SELF = 4,
-        ANY                   = 12, // single target
+        NO_TARGET             = 0,
+        ANY                   = 1,
+        ANY_FOE               = 3,
+        ALLY                  = 2,
         SELF                  = 5,
+        ALLY_OR_SELF          = 4,
         RANDOM                = 6, // single-target, automatic
-        ALLIES                = 13,
-        ALL_ADJACENT          = 7,
-        ALL_ADJACENT_FOES     = 8, // spread
+        ALL_ALLIES            = 13,
+        ALL_FOES              = 8, // spread
+        ALL_FOES_AND_ALLY     = 7,
         ALLY_SIDE             = 9,
         FOE_SIDE              = 10,
-        ALL                   = 11, // field
+        FIELD                 = 11, // field
         SCRIPTED              = 14,
         ALLY_TEAM             = 15,
     };
 } // namespace MOVE
 
 namespace BATTLE {
-#define HP 0
-#define ATK 1
-#define DEF 2
-#define SATK 3
-#define SDEF 4
-#define SPEED 5
-#define EVASION 6
-#define ACCURACY 7
+    constexpr u8 HP = 0;
+    constexpr u8 ATK = 1;
+    constexpr u8 DEF = 2;
+    constexpr u8 SATK = 3;
+    constexpr u8 SDEF = 4;
+    constexpr u8 SPEED = 5;
+    constexpr u8 EVASION = 6;
+    constexpr u8 ACCURACY = 7;
+
     struct boosts {
         u32  m_boosts;
 
-        boosts( ) {
+        constexpr boosts( ) {
             m_boosts = 0;
             for( u8 i = 0; i < 8; ++i ) { setBoost( i, 0 ); }
         }
 
-        void setBoost( u8 p_stat, s8 p_val ) {
-            if( p_val > 7 || p_val < -7 ) {
-                fprintf( stderr, "Bad boosts value [%hhu] := %hhd\n", p_stat, p_val );
-                return;
-            }
+        constexpr void setBoost( u8 p_stat, s8 p_val ) {
             p_val += 7;
 
             m_boosts &= ( 0xFFFFFFFF - ( 0xF << ( 4 * p_stat ) ) );
@@ -217,7 +214,7 @@ namespace BATTLE {
         }
     };
 
-#define MAX_VOLATILE_STATUS 51
+    constexpr u8 MAX_VOLATILE_STATUS = 52;
     enum volatileStatus : u64 {
         NONE             = 0,
         CONFUSION        = ( 1 << 0 ),
@@ -271,6 +268,7 @@ namespace BATTLE {
         NIGHTMARE        = ( 1LLU << 48 ),
         STOCKPILE        = ( 1LLU << 49 ),
         ENCORE           = ( 1LLU << 50 ),
+        TYPECHANGE       = ( 1LLU << 51 ),
     };
 
     enum weather : u8 {
@@ -285,6 +283,7 @@ namespace BATTLE {
         HEAVY_WINDS    = 8
     };
 
+    constexpr u8 MAX_PSEUDO_WEATHER = 8;
     enum pseudoWeather : u8 {
         NO_PSEUDO_WEATHER = 0,
         IONDELUGE         = 1 << 0,
@@ -305,7 +304,7 @@ namespace BATTLE {
         GRASSYTERRAIN   = 4,
     };
 
-#define MAX_SIDE_CONDITIONS 15
+    constexpr u8 MAX_SIDE_CONDITIONS = 15;
     enum sideCondition : u16 {
         NO_SIDE_CONDITION = 0,
         CRAFTYSHIELD      = ( 1 << 0 ),

@@ -52,7 +52,7 @@ namespace MOVE {
 
         BATTLE::weather       m_weather = BATTLE::NO_WEATHER; // weather introduced by the move
         BATTLE::pseudoWeather m_pseudoWeather
-            = BATTLE::NO_PSEUDO_WEATHER;                // (logarithm of the) pseudo weather introduced by the move
+            = BATTLE::NO_PSEUDO_WEATHER;                // pseudo weather introduced by the move
         BATTLE::terrain m_terrain = BATTLE::NO_TERRAIN; // terrain introduced by the move
         u8              m_status  = 0;
 

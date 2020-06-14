@@ -34,6 +34,7 @@
 
 #include <nds.h>
 
+#include "move.h"
 #include "battleDefines.h"
 #include "battleTrainer.h"
 #include "battleUI.h"
@@ -48,7 +49,6 @@ namespace BATTLE {
 
     enum battleMoveType {
         ATTACK,
-        MEGA_ATTACK, // Mega evolve and attack
         SWITCH,
         SWITCH_PURSUIT, // Pursuit used on a switching target
         USE_ITEM,
@@ -62,27 +62,30 @@ namespace BATTLE {
         battleMoveType m_type;
         u16            m_param; // move id for attack/ m attack; target pkmn
                                 // for swtich; tg item
-        std::vector<fieldPosition> m_target;
-        fieldPosition              m_user;
+        fieldPosition  m_target; // If the move has a selectable, single target, it is stored here
+        fieldPosition  m_user;
+        bool           m_megaEvolve;
+        MOVE::moveData m_moveData;
     };
 
-    const inline battleMoveSelection NO_OP_SELECTION = {NO_OP, 0, {}, {255, 255}};
-
+    constexpr battleMoveSelection NO_OP_SELECTION = {
+        NO_OP, 0, {255, 255}, {255, 255}, false, MOVE::moveData( ) };
 
     struct battleMove {
         battleMoveType             m_type;
         u16                        m_param;
-        std::vector<fieldPosition> m_target;
+        std::vector<fieldPosition> m_target; // List of all pkmn targeted (empty if field or side)
         fieldPosition              m_user;
         s8                         m_priority;
         s16                        m_userSpeed;
         u8                         m_pertubation; // random number to break speed ties
+        MOVE::moveData             m_moveData;
+        bool                       m_megaEvolve;
 
-        bool operator<( const battleMove& p_other ) {
-            if( this->m_priority < p_other.m_priority ) return true;
-            if( this->m_userSpeed > p_other.m_userSpeed ) return true;
-            if( this->m_pertubation < p_other.m_pertubation ) return true;
-            return false;
+        std::strong_ordering operator<=>( const battleMove& p_other ) {
+            if( auto cmp = p_other.m_priority <=> this->m_priority; cmp != 0 ) return cmp;
+            if( auto cmp = this->m_userSpeed <=> p_other.m_userSpeed; cmp != 0 ) return cmp;
+            return this->m_pertubation <=> p_other.m_pertubation;
         }
     };
 
@@ -113,6 +116,10 @@ namespace BATTLE {
         bool          _charging; // pkmn is preparing _lockedMove
         battleMoveSelection _lockedMove; // move that a pkmn is forced to execute (no op if hib)
         u8            _lockedMoveTurns; // remaining turns the pkmn is locked into _lockedMove
+        u16           _lastMove; // Last used moves
+        u16           _disabledMove; // move that was disabled
+        pkmnData      _pkmnData;
+        std::vector<type> _altTypes; // Type(s) the pkmn changed into
 
       public:
         slot( ) {
@@ -138,9 +145,49 @@ namespace BATTLE {
             _slotCondition = slotCondition( 0 );
             _isTransformed = false;
             _boosts = boosts( );
+            _lastMove = 0;
+            _disabledMove = 0;
+            _altTypes.clear( );
             std::memset( &_transformedPkmn, 0, sizeof( pokemon ) );
             std::memset( _volatileStatusCounter, 0, sizeof( _volatileStatusCounter ) );
             std::memset( _volatileStatusAmount, 0, sizeof( _volatileStatusAmount ) );
+        }
+
+        /*
+         * @brief: Returns a list of all types the pkmn currently has. May be empty
+         */
+        inline std::vector<type> getTypes( ) const {
+            std::vector<type> res = std::vector<type>( );
+
+            for( u8 i = 0; i < 18; ++i ) {
+                if( hasType( type( i ) ) ) {
+                    res.push_back( type( i ) );
+                }
+            }
+
+            return res;
+        }
+
+        /*
+         * @brief: Checks whether the pkmn currently has the specified type.
+         */
+        constexpr bool hasType( type p_type ) const {
+            if( _pokemon == nullptr ) [[unlikely]] { return false; }
+
+            if( _volatileStatusCounter[ 51 ] ) [[unlikely]] { // Type change
+                for( auto t : _altTypes ) {
+                    if( p_type == t ) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            if( _pkmnData.m_baseForme.m_types[ 0 ] == p_type
+                    || _pkmnData.m_baseForme.m_types[ 1 ] == p_type ) {
+                return true;
+            }
+            return false;
         }
 
         /*
@@ -182,13 +229,32 @@ namespace BATTLE {
         }
 
         /*
+         * @brief: returns whether the specified pkmn currently touches the ground.
+         */
+        inline bool isGrounded( bool p_allowAbilities = true ) {
+            if( _pokemon == nullptr ) [[unlikely]] { return false; }
+
+            bool grn = hasType( FLYING ) ||
+                ( p_allowAbilities && getPkmn( )->getAbility( ) == A_LEVITATE )
+                || getPkmn( )->getItem( ) == I_AIR_BALLOON
+                || _volatileStatusCounter[ 16 ] /* telekinesis */
+                || _volatileStatusCounter[ 17 ] /* magnet rise */;
+
+            grn = grn && !( getPkmn( )->getItem( ) == I_IRON_BALL )
+                && !_volatileStatusCounter[ 37 ] /* ingrain */
+                && !_volatileStatusCounter[ 10 ] /* smack down / Thousand arrows */;
+
+            return grn;
+        }
+
+        /*
          * @brief: Gets the current value of the specified stat (with all modifiers
          * applied). (current HP: 0, ATK 1, etc)
          * @returns: The numerical value of the stat or a value in [0, 15] for ACCURACY
          * and EVASION, where 7 represents no change.
          */
-        constexpr u16 getStat( u8 p_stat, bool p_allowAbilities = true  ) {
-            if( _pokemon == nullptr ) { return 0; }
+        constexpr u16 getStat( u8 p_stat, bool p_allowAbilities = true ) {
+            if( _pokemon == nullptr ) [[unlikely]] { return 0; }
 
             if( p_stat == EVASION || p_stat == ACCURACY ) {
                 return _boosts.getShiftedBoost( p_stat );
@@ -216,9 +282,9 @@ namespace BATTLE {
             }
 
             // Abilities
-            if( p_allowAbilities ) {
+            if( p_allowAbilities ) [[likely]] {
                 switch( getPkmn( )->getAbility( ) ) {
-                    case A_SLOW_START: {
+                    case A_SLOW_START: [[unlikely]] {
                         if( ( p_stat == ATK || p_stat == SPEED )
                                 && _turnsInPlay < 5 ) {
                             base >>= 1;
@@ -262,7 +328,7 @@ namespace BATTLE {
                         break;
                     }
 
-                    default:
+                    [[likely]] default:
                         break;
                 }
             }
@@ -299,12 +365,12 @@ namespace BATTLE {
                     if( getPkmn( )->getSpecies( ) == PKMN_DITTO && !_isTransformed
                             && p_stat == DEF ) { base <<= 1; }
                     break;
-                case I_EVIOLITE:
+                [[unlikely]] case I_EVIOLITE:
                     if( ( p_stat == SDEF || p_stat == DEF )
                             && !_pokemon->isFullyEvolved( ) ) { base = 3 * base / 2; }
                     break;
 
-                default:
+                [[likely]] default:
                     break;
             }
 
@@ -315,15 +381,41 @@ namespace BATTLE {
          * @brief: Checks whether the pokemon can move.
          */
         constexpr bool canSelectMove( ) const {
-            if( _pokemon == nullptr ) { return false; }
+            if( _pokemon == nullptr ) [[unlikely]] { return false; }
             return !_hibernating && !_charging;
         }
 
         /*
          * @brief: Checks whether the pokemon can use its i-th move.
          */
-        constexpr bool canSelectMove( u8 p_moveIdx ) const {
-            // TODO
+        constexpr bool canSelectMove( u8 p_moveIdx ) {
+            if( _pokemon == nullptr ) [[unlikely]] { return false; }
+
+            auto mv = getPkmn( )->getMove( p_moveIdx );
+            if( !mv ) { return false; }
+
+
+            // pkmn may only use the move it is locked into
+            if( _lockedMove.m_type == ATTACK && _lockedMove.m_param != mv ) { return false; }
+
+            if( !getPkmn( )->m_boxdata.m_curPP[ p_moveIdx ] ) {
+                return false;
+            }
+
+            if( _volatileStatusCounter[ 39 ] ) [[unlikely]] { // Taunt
+                if( MOVE::getMoveData( mv ).m_category == MOVE::STATUS ) {
+                    return false;
+                }
+            }
+
+            if( _volatileStatusCounter[ 30 ] ) [[unlikely]] { // Disable
+                if( _disabledMove == mv ) { return false; }
+            }
+
+            if( _volatileStatusCounter[ 42 ] ) [[unlikely]] { // Torment
+                if( _lastMove == mv ) { return false; }
+            }
+
             return true;
         }
 
@@ -331,7 +423,7 @@ namespace BATTLE {
          * @brief: Returns the move the pkmn in this slot is forced/preparing to use.
          */
         inline battleMoveSelection getStoredMove( ) const {
-            if( _pokemon == nullptr ) { return NO_OP_SELECTION; }
+            if( _pokemon == nullptr ) [[unlikely]] { return NO_OP_SELECTION; }
             return _lockedMove;
         }
 
@@ -357,8 +449,21 @@ namespace BATTLE {
         /*
          * @brief: Checks whether the pokemon can be switched out.
          */
-        constexpr bool canSwitchOut( ) const {
-            // TODO
+        inline bool canSwitchOut( ) {
+            if( _pokemon == nullptr ) [[unlikely]] { return false; }
+
+            if( getPkmn( )->getItem( ) == I_SHED_SHELL ) { return true; }
+
+            if( _volatileStatusCounter[ 6 ] ) [[unlikely]] { // no retreat
+                return false;
+            }
+            if( _volatileStatusCounter[ 37 ] ) [[unlikely]] { // ingrain
+                return false;
+            }
+            if( _volatileStatusCounter[ 4 ] ) [[unlikely]] { // octo lock
+                return false;
+            }
+
             return true;
         }
 
@@ -400,6 +505,7 @@ namespace BATTLE {
          */
         inline void setPkmn( pokemon* p_pokemon ) {
             _pokemon = p_pokemon;
+            _pkmnData = getPkmnData( p_pokemon->getSpecies( ), p_pokemon->getForme( ) );
             reset( );
         }
 
@@ -420,12 +526,14 @@ namespace BATTLE {
          * @returns: true iff the transformation succeeded.
          */
         inline bool transformPkmn( pokemon* p_target ) {
-            if( _pokemon == nullptr ) {
+            if( _pokemon == nullptr ) [[unlikely]] {
                 return false;
             }
             if( p_target != nullptr ) {
                 _isTransformed = true;
                 _transformedPkmn = *p_target;
+                _pkmnData = getPkmnData( _transformedPkmn.getSpecies( ),
+                        _transformedPkmn.getForme( ) );
 
                 _pokemon->setBattleTimeAbility( 0 );
                 _transformedPkmn.m_stats.m_curHP = _pokemon->m_stats.m_curHP;
@@ -450,7 +558,7 @@ namespace BATTLE {
          * Does nothing and returns false if p_newAbility is 0.
          */
         inline bool changeAbility( u16 p_newAbility ) {
-            if( !_pokemon ) { return false; }
+            if( !_pokemon ) [[unlikely]] { return false; }
             return _pokemon->setBattleTimeAbility( p_newAbility );
         }
 
@@ -459,7 +567,7 @@ namespace BATTLE {
          * field. (Some abilities cannot be suppressed).
          */
         constexpr bool suppressesAbilities( ) {
-            if( _pokemon == nullptr ) { return false; }
+            if( _pokemon == nullptr ) [[unlikely]] { return false; }
             return getPkmn( )->getAbility( ) == A_NEUTRALIZING_GAS;
         }
 
@@ -468,12 +576,12 @@ namespace BATTLE {
          * field
          */
         constexpr bool suppressesWeather( ) {
-            if( _pokemon == nullptr ) { return false; }
+            if( _pokemon == nullptr ) [[unlikely]] { return false; }
             switch( getPkmn( )->getAbility( ) ) {
                 case A_AIR_LOCK:
                 case A_CLOUD_NINE:
                     return true;
-                default:
+                [[likely]] default:
                     return false;
             }
         }
@@ -495,6 +603,21 @@ namespace BATTLE {
          * Ages the side by one turn, processes all changes
          */
         void age( battleUI* p_ui );
+
+        /*
+         * @brief: Returns a list of all types the pkmn currently has. May be empty
+         */
+        inline std::vector<type> getTypes( u8 p_slot ) const {
+            return _slots[ p_slot ].getTypes( );
+        }
+
+        /*
+         * @brief: Checks whether the pkmn currently has the specified type.
+         */
+        constexpr bool hasType( u8 p_slot, type p_type ) const {
+            return _slots[ p_slot ].hasType( p_type );
+        }
+
 
         /*
          * @brief: Tries to add the specified side condition(s).
@@ -563,7 +686,9 @@ namespace BATTLE {
         bool   resetBoosts( battleUI* p_ui, u8 p_slot ) {
             return _slots[ p_slot ].resetBoosts( p_ui );
         }
-        inline boosts getBoosts( u8 p_slot ) const { return _slots[ p_slot ].getBoosts( ); }
+        inline boosts getBoosts( u8 p_slot ) const {
+            return _slots[ p_slot ].getBoosts( );
+        }
 
         /*
          * @brief: Transforms the pkmn at the specified position to the specified pkmn.
@@ -601,18 +726,19 @@ namespace BATTLE {
          * @brief: Gets the current value of the specified stat (with all modifiers
          * applied). (HP: 0, ATK 1, etc)
          */
-        constexpr u16 getStat( u8 p_slot, u8 p_stat, bool p_allowAbilities = true ) {
-            if( getPkmn( p_slot ) == nullptr ) { return 0; }
+        constexpr u16 getStat( u8 p_slot, u8 p_stat,
+                               bool p_allowAbilities = true ) {
+            if( getPkmn( p_slot ) == nullptr ) [[unlikely]] { return 0; }
             u16 base = _slots[ p_slot ].getStat( p_stat, p_allowAbilities );
 
-            if( p_stat == SPEED && _sideConditionAmount[ 8 ] ) { // Tailwind
+            if( p_stat == SPEED && _sideConditionAmount[ 8 ] ) [[unlikely]] { // Tailwind
                 base *= 2;
             }
 
             // plus / minus
-            if( p_allowAbilities ) {
+            if( p_allowAbilities ) [[likely]] {
                 if( p_stat == SATK && ( getPkmn( p_slot )->getAbility( ) == A_PLUS
-                        || getPkmn( p_slot )->getAbility( ) == A_MINUS ) ) {
+                        || getPkmn( p_slot )->getAbility( ) == A_MINUS ) ) [[unlikely]] {
                     auto ot = getPkmn( !p_slot );
                     if( ot != nullptr &&
                             ( ot->getAbility( ) == A_MINUS || ot->getAbility( ) == A_PLUS ) ) {
@@ -633,14 +759,21 @@ namespace BATTLE {
         /*
          * @brief: Checks whether the pokemon can use its i-th move.
          */
-        constexpr bool canSelectMove( u8 p_slot, u8 p_moveIdx ) const {
+        constexpr bool canSelectMove( u8 p_slot, u8 p_moveIdx ) {
+
+            if( getPkmn( !p_slot ) == nullptr
+                    && MOVE::getMoveData( getPkmn( p_slot )->getMove( p_moveIdx ) ).m_target
+                    == MOVE::ALLY ) [[unlikely]] {
+                return false;
+            }
+
             return _slots[ p_slot ].canSelectMove( p_moveIdx );
         }
 
         /*
          * @brief: Returns the move the pkmn in this slot is forced/preparing to use.
          */
-        inline battleMoveSelection getStoredMove( u8 p_slot ) const {
+        inline battleMoveSelection getStoredMove( u8 p_slot ) {
             auto tmp = _slots[ p_slot ].getStoredMove( );
             tmp.m_user.second = p_slot;
             return tmp;
@@ -669,9 +802,16 @@ namespace BATTLE {
         }
 
         /*
+         * @brief: returns whether the specified pkmn currently touches the ground.
+         */
+        inline bool isGrounded( u8 p_slot, bool p_allowAbilities = true ) {
+            return _slots[ p_slot ].isGrounded( p_allowAbilities );
+        }
+
+        /*
          * @brief: Checks whether the pokemon can be switched out.
          */
-        constexpr bool canSwitchOut( u8 p_slot ) const {
+        inline bool canSwitchOut( u8 p_slot ) {
             return _slots[ p_slot ].canSwitchOut( );
         }
     };
@@ -689,7 +829,7 @@ namespace BATTLE {
         u8      _weatherTimer; // Number of turns the weather is still active
 
         pseudoWeather _pseudoWeather;
-        u8            _pseudoWeatherTimer;
+        u8            _pseudoWeatherTimer[ MAX_PSEUDO_WEATHER ];
 
         terrain _terrain;
         u8      _terrainTimer;
@@ -752,7 +892,8 @@ namespace BATTLE {
         /*
          * @brief: Sets the pokemon of the specified slot. Only used at battle start
          */
-        inline void setSlot( bool p_opponent, u8 p_slot, pokemon* p_pokemon ) {
+        inline void setSlot( bool p_opponent, u8 p_slot,
+                             pokemon* p_pokemon ) {
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setSlot( p_slot, p_pokemon );
         }
 
@@ -765,6 +906,22 @@ namespace BATTLE {
          * @brief: Handles anything a pkmn may do when sent out.
          */
         void checkOnSendOut( battleUI* p_ui, bool p_opponent, u8 p_slot );
+
+        /*
+         * @brief: Returns a list of all types the pkmn currently has. May be empty
+         */
+        inline std::vector<type> getTypes( bool p_opponent,
+                                           u8 p_slot ) const {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getTypes( p_slot );
+        }
+
+        /*
+         * @brief: Checks whether the pkmn currently has the specified type.
+         */
+        constexpr bool hasType( bool p_opponent, u8 p_slot,
+                                type p_type ) const {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].hasType( p_slot, p_type );
+        }
 
         /*
          * @brief: Adds the specified boost to the specified pkmn, returns true iff
@@ -786,7 +943,8 @@ namespace BATTLE {
          * @brief: Transforms the pkmn at the specified position to the specified pkmn.
          * @returns: true iff the transformation succeeded.
          */
-        inline bool transformPkmn( bool p_opponent, u8 p_slot, pokemon* p_target ) {
+        inline bool transformPkmn( bool p_opponent, u8 p_slot,
+                                   pokemon* p_target ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].transformPkmn( p_slot,
                     p_target );
         }
@@ -795,7 +953,8 @@ namespace BATTLE {
          * @brief: Changes the ability of the specified pkmn to p_newAbility.
          * Does nothing and returns false if p_newAbility is 0.
          */
-        inline bool changeAbility( bool p_opponent, u8 p_slot, u16 p_newAbility ) {
+        inline bool changeAbility( bool p_opponent, u8 p_slot,
+                                   u16 p_newAbility ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].changeAbility( p_slot,
                     p_newAbility );
         }
@@ -829,7 +988,7 @@ namespace BATTLE {
          */
         constexpr u16 getStat( bool p_opponent, u8 p_slot, u8 p_stat,
                                bool p_allowAbilities = true ) {
-            if( getPkmn( p_opponent, p_slot ) == nullptr ) { return 0; }
+            if( getPkmn( p_opponent, p_slot ) == nullptr ) [[unlikely]] { return 0; }
 
             bool allowAbilities = p_allowAbilities && !suppressesAbilities( );
             bool allowWeather = suppressesWeather( );
@@ -914,7 +1073,7 @@ namespace BATTLE {
         /*
          * @brief: Checks whether the pokemon can use its i-th move.
          */
-        constexpr bool canSelectMove( bool p_opponent, u8 p_slot, u8 p_moveIdx ) const {
+        constexpr bool canSelectMove( bool p_opponent, u8 p_slot, u8 p_moveIdx ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].
                 canSelectMove( p_slot, p_moveIdx );
         }
@@ -922,7 +1081,7 @@ namespace BATTLE {
         /*
          * @brief: Returns the move the pkmn in this slot is forced/preparing to use.
          */
-        inline battleMoveSelection getStoredMove( bool p_opponent, u8 p_slot ) const {
+        inline battleMoveSelection getStoredMove( bool p_opponent, u8 p_slot ) {
             auto tmp = _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getStoredMove( p_slot );
             tmp.m_user.first = p_opponent ? OPPONENT_SIDE : PLAYER_SIDE;
             return tmp;
@@ -932,7 +1091,8 @@ namespace BATTLE {
          * @brief: pokemon uses move with the given moveid. Returns false if the move
          * failed (e.g. due to confusion)
          */
-        inline bool useMove( battleUI* p_ui, bool p_opponent, u8 p_slot, u16 p_moveId ) {
+        inline bool useMove( battleUI* p_ui, bool p_opponent, u8 p_slot,
+                             u16 p_moveId ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].
                 useMove( p_ui, p_slot, p_moveId );
         }
@@ -940,7 +1100,8 @@ namespace BATTLE {
         /*
          * @brief: pokemon is hit by move with the given id
          */
-        void hitByMove( battleUI* p_ui, bool p_opponent, u8 p_slot, u16 p_moveId ) {
+        void hitByMove( battleUI* p_ui, bool p_opponent, u8 p_slot,
+                        u16 p_moveId ) {
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].hitByMove( p_ui, p_slot, p_moveId );
         }
 
@@ -954,8 +1115,56 @@ namespace BATTLE {
         /*
          * @brief: Checks whether the pokemon can be switched out.
          */
-        constexpr bool canSwitchOut( bool p_opponent, u8 p_slot ) const {
-            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].canSwitchOut( p_slot );
+        inline bool canSwitchOut( bool p_opponent, u8 p_slot ) {
+            if( !_sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].canSwitchOut( p_slot ) )
+            [[unlikely]] {
+                return false;
+            }
+
+            if( !suppressesAbilities( ) ) [[likely]] {
+                auto p1 = getPkmn( !p_opponent, 0 );
+                auto p2 = getPkmn( !p_opponent, 1 );
+                // Shadow tag
+                if( getPkmn( p_opponent, p_slot )->getAbility( ) != A_SHADOW_TAG ) [[likely]] {
+                    if( ( p1 != nullptr && p1->getAbility( ) == A_SHADOW_TAG )
+                            || ( p2 != nullptr && p2->getAbility( ) == A_SHADOW_TAG ) ) [[unlikely]] {
+                        return false;
+                    }
+                }
+
+                // Arena trap
+                if( ( p1 != nullptr && p1->getAbility( ) == A_ARENA_TRAP )
+                        || ( p2 != nullptr && p2->getAbility( ) == A_ARENA_TRAP ) ) [[unlikely]] {
+                    if( isGrounded( p_opponent, p_slot ) ) [[likely]] {
+                        return false;
+                    }
+                }
+
+                // Magnet pull
+                if( ( p1 != nullptr && p1->getAbility( ) == A_MAGNET_PULL )
+                        || ( p2 != nullptr && p2->getAbility( ) == A_MAGNET_PULL ) ) [[unlikely]] {
+                    if( hasType( p_opponent, p_slot, STEEL ) ) [[unlikely]] {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /*
+         * @brief: returns whether the specified pkmn currently touches the ground.
+         */
+        inline bool isGrounded( bool p_opponent, u8 p_slot,
+                                bool p_allowAbilities = true ) {
+            bool ab = p_allowAbilities && suppressesAbilities( );
+            bool grn = _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].isGrounded( p_slot, ab );
+
+            if( _pseudoWeather & GRAVITY ) [[unlikely]] { // gravity
+                grn = false;
+            }
+
+            return grn;
         }
     };
 
@@ -990,6 +1199,7 @@ namespace BATTLE {
 
         battlePolicy _policy;
         bool        _isWildBattle;
+        bool        _opponentRuns; // wild pkmn tries to run whenever possible
 
         /*
          * @brief: Initializes the battle.
@@ -1086,7 +1296,7 @@ namespace BATTLE {
          */
         battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent,
                 u8 p_platform = 10, u8 p_platform2 = 10, u8 p_background = 0,
-                battlePolicy = DEFAULT_WILD_POLICY );
+                battlePolicy = DEFAULT_WILD_POLICY, bool p_wildPkmnRuns = false );
 
         /*
          * @brief: Starts the battle.

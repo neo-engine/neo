@@ -35,8 +35,93 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 const char SOUND_PATH[] = "nitro:/SOUND/";
 
 void initSFX( ) {
-    // load sound effects
-    for( u16 i = 0; i < NUM_SOUND_EFFECTS; ++i ) { mmLoadEffect( i ); }
+    mmLoadEffect( SFX_CANCEL );
+    mmLoadEffect( SFX_CHOOSE );
+    mmLoadEffect( SFX_SELECT );
+    mmLoadEffect( SFX_USE_ITEM );
+
+    mmLoadEffect( SFX_BATTLE_BALLDROP );
+    mmLoadEffect( SFX_BATTLE_BALLSHAKE );
+    mmLoadEffect( SFX_BATTLE_DAMAGE_NORMAL );
+    mmLoadEffect( SFX_BATTLE_DECREASE );
+    mmLoadEffect( SFX_BATTLE_ESCAPE );
+    mmLoadEffect( SFX_BATTLE_EXPFULL );
+    mmLoadEffect( SFX_BATTLE_FAINT );
+    mmLoadEffect( SFX_BATTLE_INCREASE );
+    mmLoadEffect( SFX_BATTLE_JUMPTOBALL );
+    mmLoadEffect( SFX_BATTLE_RECALL );
+    mmLoadEffect( SFX_BATTLE_THROW );
+    mmLoadEffect( SFX_SHINY );
+
+    mmLoadEffect( SFX_BUMP );
+    mmLoadEffect( SFX_CAVE_WARP );
+    mmLoadEffect( SFX_ENTER_DOOR );
+    mmLoadEffect( SFX_EXMARK );
+    mmLoadEffect( SFX_JUMP );
+    mmLoadEffect( SFX_MENU );
+    mmLoadEffect( SFX_OBTAIN_EGG );
+    mmLoadEffect( SFX_OBTAIN_ITEM );
+    mmLoadEffect( SFX_OBTAIN_KEY_ITEM );
+    mmLoadEffect( SFX_SAVE );
+    mmLoadEffect( SFX_WARP );
+}
+
+void initBattleSFX( ) {
+    /*
+    mmLoadEffect( SFX_BATTLE_BALLDROP );
+    mmLoadEffect( SFX_BATTLE_BALLSHAKE );
+    mmLoadEffect( SFX_BATTLE_DAMAGE_NORMAL );
+    mmLoadEffect( SFX_BATTLE_DECREASE );
+    mmLoadEffect( SFX_BATTLE_ESCAPE );
+    mmLoadEffect( SFX_BATTLE_EXPFULL );
+    mmLoadEffect( SFX_BATTLE_FAINT );
+    mmLoadEffect( SFX_BATTLE_INCREASE );
+    mmLoadEffect( SFX_BATTLE_JUMPTOBALL );
+    mmLoadEffect( SFX_BATTLE_RECALL );
+    mmLoadEffect( SFX_BATTLE_THROW );
+    mmLoadEffect( SFX_SHINY );
+
+    mmUnloadEffect( SFX_BUMP );
+    mmUnloadEffect( SFX_CAVE_WARP );
+    mmUnloadEffect( SFX_ENTER_DOOR );
+    mmUnloadEffect( SFX_EXMARK );
+    mmUnloadEffect( SFX_JUMP );
+    mmUnloadEffect( SFX_MENU );
+    mmUnloadEffect( SFX_OBTAIN_EGG );
+    mmUnloadEffect( SFX_OBTAIN_ITEM );
+    mmUnloadEffect( SFX_OBTAIN_KEY_ITEM );
+    mmUnloadEffect( SFX_SAVE );
+    mmUnloadEffect( SFX_WARP );
+    */
+}
+
+void deinitBattleSFX( ) {
+    /*
+    mmUnloadEffect( SFX_BATTLE_BALLDROP );
+    mmUnloadEffect( SFX_BATTLE_BALLSHAKE );
+    mmUnloadEffect( SFX_BATTLE_DAMAGE_NORMAL );
+    mmUnloadEffect( SFX_BATTLE_DECREASE );
+    mmUnloadEffect( SFX_BATTLE_ESCAPE );
+    mmUnloadEffect( SFX_BATTLE_EXPFULL );
+    mmUnloadEffect( SFX_BATTLE_FAINT );
+    mmUnloadEffect( SFX_BATTLE_INCREASE );
+    mmUnloadEffect( SFX_BATTLE_JUMPTOBALL );
+    mmUnloadEffect( SFX_BATTLE_RECALL );
+    mmUnloadEffect( SFX_BATTLE_THROW );
+    mmUnloadEffect( SFX_SHINY );
+
+    mmLoadEffect( SFX_BUMP );
+    mmLoadEffect( SFX_CAVE_WARP );
+    mmLoadEffect( SFX_ENTER_DOOR );
+    mmLoadEffect( SFX_EXMARK );
+    mmLoadEffect( SFX_JUMP );
+    mmLoadEffect( SFX_MENU );
+    mmLoadEffect( SFX_OBTAIN_EGG );
+    mmLoadEffect( SFX_OBTAIN_ITEM );
+    mmLoadEffect( SFX_OBTAIN_KEY_ITEM );
+    mmLoadEffect( SFX_SAVE );
+    mmLoadEffect( SFX_WARP );
+    */
 }
 
 void initSound( ) {
@@ -50,6 +135,18 @@ void initSound( ) {
 namespace SOUND {
     bool BGMLoaded  = false;
     u16  currentBGM = 0;
+
+    void initBattleSound( ) {
+#ifndef NO_SOUND
+        initBattleSFX( );
+#endif
+    }
+
+    void deinitBattleSound( ) {
+#ifndef NO_SOUND
+        deinitBattleSFX( );
+#endif
+    }
 
     void setVolume( u16 p_newValue ) {
 #ifndef NO_SOUND
@@ -77,9 +174,6 @@ namespace SOUND {
                 mmStop( );
                 mmUnload( currentBGM );
             }
-            // std::string path = ( std::string( SOUND_PATH ) + std::to_string( p_id ) + ".msl" );
-            // mmInitDefault( (char*) path.c_str( ) );
-            // initSFX( );
             restoreVolume( );
             mmLoad( p_id );
             mmStart( p_id, MM_PLAY_LOOP );

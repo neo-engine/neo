@@ -44,7 +44,12 @@ namespace BATTLE {
         _weatherTimer = u8( -1 ); // Initial weather stays forever
 
         _pseudoWeather = p_initialPseudoWeather;
-        _pseudoWeatherTimer = u8( -1 ); // Initial pseudo weather stays forever
+        std::memset( _pseudoWeatherTimer, 0, sizeof( _pseudoWeatherTimer ) );
+        for( u8 i = 0; i < MAX_PSEUDO_WEATHER; ++i ) {
+            if( p_initialPseudoWeather & ( 1 << i ) ) [[unlikely]] {
+                _pseudoWeatherTimer[ i ] = u8( -1 ); // Initial pseudo weather stays forever
+            }
+        }
 
         _terrain = p_initialTerrain;
         _terrainTimer = u8( -1 ); // Initial terrain stays forever
@@ -81,6 +86,9 @@ namespace BATTLE {
             default:
             if( !suppressesAbilities( ) ) {
                 switch( pkmn->getAbility( ) ) {
+                    case A_ARENA_TRAP:
+                    case A_SHADOW_TAG:
+                    case A_MAGNET_PULL:
                     case A_CLOUD_NINE:
                     case A_AIR_LOCK:
                     case A_MOLD_BREAKER:
@@ -206,14 +214,21 @@ namespace BATTLE {
                     case A_ANTICIPATION: {
                         p_ui->logAbility( pkmn, p_opponent );
                         bool warn = false;
-                        pkmnData own = getPkmnData( pkmn->getSpecies( ), pkmn->getForme( ) );
                         for( u8 i = 0; !warn && i < 2; ++i ) {
                             auto tmp = getPkmn( !p_opponent, i );
                             if( tmp == nullptr ) { continue; }
                             for( u8 j = 0; j < 4; ++j ) {
-                                if( tmp->getMove( j ) ) {
+                                if( tmp->getMove( j ) ) [[likely]] {
                                     auto mdata = MOVE::getMoveData( tmp->getMove( j ) );
-                                    if( ( mdata.m_flags & MOVE::OHKO ) ) {
+                                    if( ( mdata.m_flags & MOVE::OHKO ) ) [[unlikely]] {
+                                        warn = true;
+                                        break;
+                                    }
+                                    u16 eff = 1;
+                                    for( auto tp : getTypes( p_opponent, p_slot ) ) {
+                                        eff *= getEffectiveness( mdata.m_type, tp );
+                                    }
+                                    if( eff > 1 ) {
                                         warn = true;
                                         break;
                                     }
@@ -348,13 +363,121 @@ namespace BATTLE {
 
     std::vector<battleMove>
     field::computeSortedBattleMoves( const std::vector<battleMoveSelection>& p_selectedMoves ) {
-        // TODO
-        return {};
+        std::vector<battleMove> res = std::vector<battleMove>( );
+
+        u8 pertub[ 4 ] = { 0, 1, 2, 3 };
+        for( u8 i = 0; i < 4; ++i ) {
+            std::swap( pertub[ i ], pertub[ rand( ) % 4 ] );
+        }
+
+        for( u8 j = 0; j < p_selectedMoves.size( ); ++j ) {
+            battleMove bm;
+            auto m = p_selectedMoves[ j ];
+
+            bm.m_param = m.m_param;
+            bm.m_user = m.m_user;
+            bm.m_target = std::vector<fieldPosition>( );
+            bm.m_pertubation = pertub[ j ];
+            bm.m_moveData = m.m_moveData;
+            bm.m_megaEvolve = m.m_megaEvolve;
+
+            // compute targets, priority
+            switch( m.m_type ) {
+                case ATTACK:
+                case SWITCH_PURSUIT: {
+                    if( m.m_type == battleMoveType::SWITCH_PURSUIT ) {
+                        // Double the power of pursuit
+                        bm.m_priority = 123;
+                        bm.m_moveData.m_basePower *= 2;
+                    } else {
+                        bm.m_priority = m.m_moveData.m_priority;
+                    }
+                    bm.m_type = ATTACK;
+
+                    auto tg = ( m.m_moveData.m_pressureTarget != MOVE::NO_TARGET )
+                        ? m.m_moveData.m_pressureTarget : m.m_moveData.m_target;
+                    switch( tg ) {
+                        case MOVE::ANY:
+                        case MOVE::RANDOM:
+                        case MOVE::ALLY_OR_SELF:
+                        case MOVE::ANY_FOE:
+                            // target is already computed
+                            bm.m_target.push_back( m.m_target );
+                            break;
+                        case MOVE::ALL_FOES_AND_ALLY:
+                            if( getPkmn( m.m_user.first, !m.m_user.second ) ) {
+                                bm.m_target.push_back( fieldPosition( m.m_user.first,
+                                            !m.m_user.second ) );
+                            }
+                            [[fallthrough]];
+                        case MOVE::ALL_FOES:
+                            for( u8 i = 0; i < 2; ++i ) {
+                                if( getPkmn( !m.m_user.first, i ) != nullptr ) {
+                                    bm.m_target.push_back( fieldPosition( !m.m_user.first, i ) );
+                                }
+                            }
+                            break;
+                        case MOVE::ALL_ALLIES:
+                            for( u8 i = 0; i < 2; ++i ) {
+                                if( getPkmn( m.m_user.first, i ) != nullptr ) {
+                                    bm.m_target.push_back( fieldPosition( m.m_user.first, i ) );
+                                }
+                            }
+                            break;
+                        case MOVE::SELF:
+                            bm.m_target.push_back( fieldPosition( m.m_user.first,
+                                                   m.m_user.second ) );
+                            break;
+                        case MOVE::ALLY:
+                            bm.m_target.push_back( fieldPosition( m.m_user.first,
+                                                   !m.m_user.second ) );
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                }
+                case SWITCH:
+                case USE_ITEM:
+                    bm.m_type = m.m_type;
+                    bm.m_target.push_back( m.m_user );
+                    bm.m_priority = 120;
+                    break;
+                default:
+                    bm.m_type = NO_OP;
+                    bm.m_target.push_back( m.m_user );
+                    bm.m_priority = -120;
+                    break;
+            }
+
+            if( bm.m_priority > -100 ) [[likely]] {
+                if( _pseudoWeather & TRICKROOM ) {
+                    bm.m_userSpeed = -getStat( m.m_user.first, m.m_user.second, SPEED );
+                } else {
+                    bm.m_userSpeed = getStat( m.m_user.first, m.m_user.second, SPEED );
+                }
+            } else {
+                bm.m_userSpeed = 0;
+            }
+            res.push_back( bm );
+        }
+
+        std::sort( res.begin( ), res.end( ) );
+
+        return res;
     }
 
     void field::executeBattleMove( battleUI* p_ui, battleMove p_move,
                                    std::vector<battleMove> p_targetsMoves,
                                    std::vector<battleMove> p_tergetedMoves ) {
+        p_ui->log(
+                std::string( getPkmn( p_move.m_user.first, p_move.m_user.second )->m_boxdata.m_name ) + " used " +
+                MOVE::getMoveName( p_move.m_param ) );
+
+        for( u8 i = 0; i < 60; ++i ) {
+            swiWaitForVBlank( );
+        }
+
         // TODO
     }
 

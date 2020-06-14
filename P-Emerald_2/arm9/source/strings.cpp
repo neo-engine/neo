@@ -403,7 +403,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 170
 
-    {"%s of %s%s applies.[A]", "%s von %s%s wirkt.[A]"},
+    {"The wild %s fled!", "%s (wild) floh."},
     {"[TRAINER] ([TCLASS])\nused %s.[A]", "[TRAINER] ([TCLASS]) setzt\n%s ein.[A]"},
     {"It got wasted[A]", "Es hat keine Wirkung[A]"},
     {"Used %s.[A]", "%s eingesetzt.[A]"},

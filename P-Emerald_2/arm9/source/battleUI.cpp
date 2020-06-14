@@ -463,8 +463,8 @@ namespace BATTLE {
     }
 
     void battleUI::animateBallRelease( bool p_opponent, u8 p_slot, u8 p_ballId ) const {
-        SOUND::playSoundEffect( SFX_BATTLE_RECALL );
         for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+        SOUND::playSoundEffect( SFX_BATTLE_RECALL );
 
         // TODO
     }
@@ -683,6 +683,7 @@ namespace BATTLE {
                               boosts p_intended, boosts p_actual ) {
         char buffer[ 100 ];
         auto pkmnstr = getPkmnName( p_pokemon, p_opponent );
+        animateStatChange( p_opponent, p_slot, p_actual );
         for( u8 i = 0; i < 8; ++i ) {
             if( p_intended.getBoost( i ) != 0 ) {
                 auto bt = p_actual.getBoost( i );
@@ -712,7 +713,7 @@ namespace BATTLE {
                 log( std::string( buffer ) );
             }
         }
-        animateStatChange( p_opponent, p_slot, p_actual );
+        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
     }
 
     void battleUI::logAbility( pokemon* p_pokemon, bool p_opponent ) {
@@ -1140,9 +1141,9 @@ namespace BATTLE {
 
         // play pokeball animation
         animateBallRelease( p_opponent, p_pos, p_pokemon->getBall( ) );
+        loadPkmnSprite( p_opponent, p_pos, p_pokemon );
         for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
 
-        loadPkmnSprite( p_opponent, p_pos, p_pokemon );
         SOUND::playCry( p_pokemon->getSpecies( ), p_pokemon->getForme( ),
                         p_pokemon->isFemale( ) );
 

@@ -36,7 +36,16 @@
 void initSound( );
 
 namespace SOUND {
-#define NUM_SOUND_EFFECTS 27
+    /*
+     * @brief: Initializes sound effects for battles.
+     */
+    void initBattleSound( );
+
+    /*
+     * @brief: Unloads battle SFX and loads general sfx.
+     */
+    void deinitBattleSound( );
+
     void playBGM( u16 p_id );
     void playSoundEffect( u16 p_id );
 

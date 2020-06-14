@@ -27,7 +27,7 @@ GRAPHICS	:=	data
 ARCH	:=	-mthumb -mthumb-interwork
 
 
-CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wpsabi -O3 -D_FORTIFY_SOURCE=1\
+CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
 			-Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
 			-Wduplicated-branches -Wduplicated-cond -Wno-volatile\
 			-Wfloat-equal -Wformat=1 -Wlogical-op\
