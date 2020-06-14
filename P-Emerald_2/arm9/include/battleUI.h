@@ -60,11 +60,6 @@ namespace BATTLE {
         void loadPkmnSprite( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
 
         /*
-         * @brief: Returns a string correctly describing the given pkmn.
-         */
-        std::string getPkmnName( pokemon* p_pokemon, bool p_opponent ) const;
-
-        /*
          * @brief: Animates the given ball type opening
          */
         void animateBallRelease( bool p_opponent, u8 p_slot, u8 p_ballId ) const;
@@ -98,6 +93,12 @@ namespace BATTLE {
          * screen.
          */
         void init( );
+
+        /*
+         * @brief: Returns a string correctly describing the given pkmn.
+         */
+        std::string getPkmnName( pokemon* p_pokemon, bool p_opponent,
+                                 bool p_sentenceStart = true ) const;
 
         /*
          * @brief: Initializes and shows the log screen.
@@ -174,5 +175,12 @@ namespace BATTLE {
          * "run", etc)
          */
         void showMoveSelection( pokemon* p_pokemon, u8 p_slot, u8 p_highlightedButton = -1 );
+
+        /*
+         * @brief: Shows the attack selection for the given pkmn.
+         */
+        void showAttackSelection( pokemon* p_pokemon, u8 p_slot, bool p_canUseMove[ 4 ],
+                                  bool p_showMegaEvolution, u8 p_highlightedButton = -1,
+                                  bool p_megaButtonActive = false );
     };
 } // namespace BATTLE

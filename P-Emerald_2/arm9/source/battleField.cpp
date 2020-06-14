@@ -361,6 +361,29 @@ namespace BATTLE {
         return false;
     }
 
+    void field::megaEvolve( battleUI* p_ui, bool p_opponent, u8 p_slot ) {
+        char buffer[ 100 ];
+
+        snprintf( buffer, 99, GET_STRING( 307 ), p_ui->getPkmnName(
+                    getPkmn( p_opponent, p_slot ), p_opponent ).c_str( ),
+                    getPkmn( p_opponent, p_slot )->getItem( ) );
+        p_ui->log( std::string( buffer ) );
+
+        for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+
+        getPkmn( p_opponent, p_slot )->battleTransform( );
+        p_ui->updatePkmn( p_opponent, p_slot, getPkmn( p_opponent, p_slot ) );
+
+        snprintf( buffer, 99, GET_STRING( 308 ), p_ui->getPkmnName(
+                    getPkmn( p_opponent, p_slot ), p_opponent ).c_str( ),
+                    getPkmn( p_opponent, p_slot )->getItem( ) );
+        p_ui->log( std::string( buffer ) );
+
+        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+
+        checkOnSendOut( p_ui, p_opponent, p_slot );
+    }
+
     std::vector<battleMove>
     field::computeSortedBattleMoves( const std::vector<battleMoveSelection>& p_selectedMoves ) {
         std::vector<battleMove> res = std::vector<battleMove>( );
@@ -390,7 +413,82 @@ namespace BATTLE {
                         bm.m_priority = 123;
                         bm.m_moveData.m_basePower *= 2;
                     } else {
-                        bm.m_priority = m.m_moveData.m_priority;
+                        bm.m_priority = 3 * m.m_moveData.m_priority;
+                        bool haspd = false;
+
+                        // Check for priority changing abilities
+                        if( !suppressesAbilities( ) ) [[likely]] {
+                            // Gale wings
+                            if( m.m_moveData.m_type == FLYING &&
+                                    getPkmn( m.m_user.first, m.m_user.second )->getStat( HP )
+                                        == getPkmn( m.m_user.first, m.m_user.second )->
+                                        m_stats.m_maxHP &&
+                                    getPkmn( m.m_user.first, m.m_user.second )->getAbility( )
+                                    == A_GALE_WINGS ) [[unlikely]] {
+                                bm.m_priority += 3;
+                            }
+
+                            // Prankster
+                            if( m.m_moveData.m_category == MOVE::STATUS
+                                    && getPkmn( m.m_user.first, m.m_user.second )->getAbility( )
+                                    == A_PRANKSTER ) [[unlikely]] {
+                                bm.m_priority += 3;
+                            }
+
+                            // Triage
+                            if( m.m_moveData.m_heal
+                                    && getPkmn( m.m_user.first, m.m_user.second )->getAbility( )
+                                    == A_TRIAGE ) [[unlikely]] {
+                                bm.m_priority += 9;
+                            }
+
+                            // Stall
+                            if( getPkmn( m.m_user.first, m.m_user.second )->getAbility( )
+                                    == A_STALL ) {
+                                bm.m_priority--;
+                                haspd = true;
+                            }
+                        }
+
+                        // Items
+
+                        if( !haspd && getPkmn( m.m_user.first, m.m_user.second )->getItem( )
+                                == I_LAGGING_TAIL ) [[unlikely]] {
+                            bm.m_priority--;
+                        }
+
+                        if( !haspd && getPkmn( m.m_user.first, m.m_user.second )->getItem( )
+                                == I_FULL_INCENSE ) [[unlikely]] {
+                            bm.m_priority--;
+                        }
+
+                        if( getPkmn( m.m_user.first, m.m_user.second )->getItem( )
+                                == I_QUICK_CLAW ) [[unlikely]] {
+                            if( rand( ) % 100 < 20 ) {
+                                bm.m_priority++;
+                                res.push_back( { MESSAGE_ITEM, I_QUICK_CLAW, { },
+                                    { 255, 255 }, 127, 0, u8( 5 + j ), MOVE::moveData( ), false } );
+                            }
+                        }
+                        if( getPkmn( m.m_user.first, m.m_user.second )->getItem( )
+                                == I_CUSTAP_BERRY &&
+                                getPkmn( m.m_user.first, m.m_user.second )->getStat( HP )
+                                    * 4 < getPkmn( m.m_user.first, m.m_user.second )->
+                                        m_stats.m_maxHP ) [[unlikely]] {
+                            bm.m_priority++;
+                            res.push_back( { MESSAGE_ITEM, I_CUSTAP_BERRY, { },
+                                    { 255, 255 }, 127, 0, u8( 5 + j ), MOVE::moveData( ), false } );
+                            removeItem( m.m_user.first, m.m_user.second );
+                        }
+
+                        // moves w/ changing message
+
+                        if( bm.m_param == M_FOCUS_PUNCH
+                                || bm.m_param == M_BEAK_BLAST
+                                || bm.m_param == M_SHELL_TRAP ) {
+                            res.push_back( { MESSAGE_MOVE, bm.m_param, { },
+                                    { 255, 255 }, 125, 0, u8( 5 + j ), MOVE::moveData( ), false } );
+                        }
                     }
                     bm.m_type = ATTACK;
 

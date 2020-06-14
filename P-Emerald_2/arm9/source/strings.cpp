@@ -394,12 +394,12 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"You got away safely.", "Du bist entkommen."},
     {"You couldn't escape|", "Flucht gescheitert|"},
 
-    {"Choose a target!", "Welches PKMN angreifen?"},
+    {"Choose a target!", "Welches Pok\xe9mon angreifen?"},
     {"Choose a Pok\xe9mon.", "Welches Pok\xe9mon?"},
     {"%s gained %lu EXP.[A]", "%s gewinnt %lu E.-Punkte.[A]"},
     {"%s advanced\nto level %d.[A]", "%s erreicht Level %d.[A]"},
-    {"The quick claw enabled\n%s%s to go first![A]",
-     "%s%s agiert dank\neiner Flinkklaue zuerst![A]"},
+    {"The %s enabled\n%s to go first!",
+     "%.0s%s agiert dank\neiner %s zuerst!"},
 
     // 170
 
@@ -561,12 +561,12 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"RUN", "FLUCHT"},
     {"BAG", "BEUTEL"},
     {"BACK", "ZUR\xdc""CK"},
-    {"", "Es hagelt.[A]"},
+    {"%s sets up a trap.", "%s legt eine Falle."},
 
     // 270
 
-    {"", "Es herrscht dichter Nebel\x85[A]"},
-    {"", "Der Sandsturm wütet.[A]"},
+    {"%s is tightening its focus.", "%s versch\xe4rft seinen Fokus."},
+    {"%s's beak glows.", "Der Schnabel von %s gl\xfcht."},
     {"", "Gleißendes Sonnenlicht.[A]"},
     {"", "Enormer Regen.[A]"},
     {"", "Extremes Sonnenlicht.[A]"},
@@ -615,14 +615,14 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"", "Du gewinnst %d$.[A]"},
     {"", "Der Kampf endet.[A]"},
-    {"", "[OPP%d] wurde von [TRAINER]\n([TCLASS]) auf die Bank geschickt.[A]"},
-    {"", "Auf die Bank [OWN%d]![A]"},
-    {"", "[OWN1] kann nicht angreifen<85>[A]"},
+    {"%s makes a wish upon its %s.", "%s w\xfcnscht sich St\xe4rke vom %s."},
+    {"%s's wish for power was granted!", "Der Wunsch von %s wurde erh\xf6hrt!"},
+    {"the wild %s", "%s (wild)"},
 
     // 310
 
-    {"", "[OWN2] kann nicht angreifen<85>[A]"},
-    {"The wild %s", "%s (Wild)"},
+    {"the foe's %s", "%s (Gegner)"},
+    {"The wild %s", "%s (wild)"},
     {"The foe's %s", "%s (Gegner)"},
     {"This tree looks like it can be\ncut down. ", "Ein kleiner Baum.\n"},
     {"This rock appears to be breakable.\n", "Ein kleiner Felsen.\n"},

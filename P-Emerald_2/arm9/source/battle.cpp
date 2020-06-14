@@ -232,6 +232,49 @@ namespace BATTLE {
             }
 
             for( size_t i = 0; i < sortedMoves.size( ); ++i ) {
+                for( u8 j = 0; j < 30; ++j ) { swiWaitForVBlank( ); }
+                if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_ITEM ) [[unlikely]] {
+                    auto itmnm = ITEM::getItemName( sortedMoves[ i ].m_param );
+                    snprintf( buffer, 99, GET_STRING( 169 ), itmnm.c_str( ),
+                              _battleUI.getPkmnName(
+                                  _field.getPkmn( sortedMoves[ i ].m_user.first,
+                                  sortedMoves[ i ].m_user.second ),
+                                  sortedMoves[ i ].m_user.first, false ).c_str( ),
+                              itmnm.c_str( ) );
+                    _battleUI.log( std::string( buffer ) );
+                }
+
+                if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_MOVE ) [[unlikely]] {
+                    switch( sortedMoves[ i ].m_param ) {
+                        case M_SHELL_TRAP:
+                            snprintf( buffer, 99, GET_STRING( 269 ),
+                              _battleUI.getPkmnName(
+                                  _field.getPkmn( sortedMoves[ i ].m_user.first,
+                                  sortedMoves[ i ].m_user.second ),
+                                  sortedMoves[ i ].m_user.first, false ).c_str( ) );
+                            _battleUI.log( buffer );
+                            break;
+                        case M_FOCUS_PUNCH:
+                            snprintf( buffer, 99, GET_STRING( 270 ),
+                              _battleUI.getPkmnName(
+                                  _field.getPkmn( sortedMoves[ i ].m_user.first,
+                                  sortedMoves[ i ].m_user.second ),
+                                  sortedMoves[ i ].m_user.first, false ).c_str( ) );
+                            _battleUI.log( buffer );
+                            break;
+                        case M_BEAK_BLAST:
+                            snprintf( buffer, 99, GET_STRING( 271 ),
+                              _battleUI.getPkmnName(
+                                  _field.getPkmn( sortedMoves[ i ].m_user.first,
+                                  sortedMoves[ i ].m_user.second ),
+                                  sortedMoves[ i ].m_user.first, false ).c_str( ) );
+                            _battleUI.log( buffer );
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
                 if( sortedMoves[ i ].m_type == battleMoveType::ATTACK ) [[likely]] {
                     std::vector<battleMove> targets    = std::vector<battleMove>( );
                     std::vector<battleMove> targetedBy = std::vector<battleMove>( );
@@ -307,13 +350,147 @@ namespace BATTLE {
             }
     }
 
+    battleMoveSelection battle::chooseTarget( const battleMoveSelection& p_move ) {
+        auto res = p_move;
+        res.m_moveData = MOVE::getMoveData( res.m_param );
+
+        if( _policy.m_mode == SINGLE ) {
+            switch( res.m_moveData.m_type ) {
+                case MOVE::ANY:
+                case MOVE::ANY_FOE:
+                case MOVE::ALL_FOES_AND_ALLY:
+                case MOVE::ALL_FOES:
+                case MOVE::RANDOM:
+                    res.m_target = { true, 0 };
+                    return res;
+                case MOVE::SELF:
+                case MOVE::ALLY_OR_SELF:
+                case MOVE::ALL_ALLIES:
+                    res.m_target = { false, 0 };
+                    return res;
+                default:
+                    res.m_target = { 255, 255 };
+                    return res;
+            }
+        }
+
+        // User needs to choose / confirm target (TODO)
+
+        res.m_type = CANCEL;
+        return res;
+    }
+
     battleMoveSelection battle::chooseAttack( u8 p_slot, bool p_allowMegaEvolution ) {
         battleMoveSelection res = NO_OP_SELECTION;
         res.m_user = {field::PLAYER_SIDE, p_slot};
+        res.m_type = ATTACK;
 
-        (void) p_allowMegaEvolution;
+        bool mega = _field.canMegaEvolve( false, p_slot ) && p_allowMegaEvolution;
 
-        // TODO
+        bool canUse[ 4 ], strgl = false;
+        for( u8 i = 0; i < 4; ++i ) {
+            canUse[ i ] = _field.canSelectMove( false, p_slot, i );
+            strgl = strgl || canUse[ i ];
+        }
+
+        if( strgl ) {
+            // pkmn will struggle
+            res.m_param = M_STRUGGLE;
+            return chooseTarget( res );
+        }
+
+        _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), p_slot, canUse, mega );
+        u8 curSel = 0;
+        _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), p_slot, canUse, mega,
+                                       curSel, res.m_megaEvolve );
+
+        cooldown     = COOLDOWN_COUNT;
+        loop( ) {
+            scanKeys( );
+            touchRead( &touch );
+            swiWaitForVBlank( );
+            pressed = keysUp( );
+            held    = keysHeld( );
+
+            if( p_slot && ( pressed & KEY_B ) ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                res.m_type = CANCEL;
+                return res;
+            }
+            if( pressed & KEY_A ) {
+                if( curSel < 4 ) { // Choos attack curSel
+                    if( canUse[ curSel ] ) {
+                        SOUND::playSoundEffect( SFX_CHOOSE );
+                        res.m_param = _field.getPkmn( false, p_slot )->getMove( curSel );
+                        auto tmp = chooseTarget( res );
+
+                        if( tmp.m_type != CANCEL ) { return tmp; }
+                        else {
+                            res.m_param = 0;
+                        }
+                    }
+                } else if( curSel == 4 ) { // Cancel
+                    SOUND::playSoundEffect( SFX_CANCEL );
+                    res.m_type = CANCEL;
+                    return res;
+                } else if ( mega && curSel == 5 ) { // Toggle Mega Evolution
+                    res.m_megaEvolve = !res.m_megaEvolve;
+                    _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), p_slot, canUse,
+                                                   mega, curSel, res.m_megaEvolve );
+                }
+
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) || GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+
+                if( curSel < 4 ) { curSel ^= 1; }
+                else if( curSel == 5 ) { curSel = 4; }
+                else {
+                    if( mega ) {
+                        curSel = 5;
+                    } else {
+                        cooldown = COOLDOWN_COUNT;
+                        continue;
+                    }
+                }
+
+                _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), p_slot, canUse,
+                                               mega, curSel, res.m_megaEvolve );
+
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+
+                if( curSel + 2 < 4 ) { curSel += 2; }
+                else if( curSel < 4 ) { curSel = 4; }
+                else if( curSel == 4 ) { curSel = 0; }
+                else {
+                    cooldown = COOLDOWN_COUNT;
+                    continue;
+                }
+
+                _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), p_slot, canUse,
+                                               mega, curSel, res.m_megaEvolve );
+
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+
+                if( curSel >= 2 && curSel <= 4 ) { curSel -= 2; }
+                else if( curSel < 2 ) { curSel = 4; }
+                else {
+                    cooldown = COOLDOWN_COUNT;
+                    continue;
+                }
+
+                _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), p_slot, canUse,
+                                               mega, curSel, res.m_megaEvolve );
+
+                cooldown = COOLDOWN_COUNT;
+
+            }
+            swiWaitForVBlank( );
+        }
 
         return res;
     }
@@ -347,17 +524,19 @@ namespace BATTLE {
             if( pressed & KEY_A ) {
                 switch( curSel ) {
                     case 0: // Choose attack
+                        SOUND::playSoundEffect( SFX_CHOOSE );
                         res = chooseAttack( p_slot, p_allowMegaEvolution );
                         if( res.m_type != CANCEL ) {
                             return res;
                         }
                         break;
                     case 1: // Choose pkmn
+                        SOUND::playSoundEffect( SFX_CHOOSE );
                         // TODO
                         break;
                     case 2: // Run / Cancel
                         if( _isWildBattle ) {
-                            SOUND::playSoundEffect( SFX_SELECT );
+                            SOUND::playSoundEffect( SFX_CHOOSE );
                             res.m_type = RUN;
                         } else if( p_slot ) {
                             SOUND::playSoundEffect( SFX_CANCEL );
@@ -365,6 +544,7 @@ namespace BATTLE {
                         }
                         return res;
                     case 3: // Choose item
+                        SOUND::playSoundEffect( SFX_CHOOSE );
                         // TODO
                         break;
                     default:
@@ -514,8 +694,8 @@ namespace BATTLE {
     }
 
     void battle::megaEvolve( fieldPosition p_position ) {
-        // TODO
-        (void) p_position;
+        _field.megaEvolve( &_battleUI, p_position.first, p_position.second );
+        _policy.m_allowMegaEvolution = false;
     }
 
     void battle::checkAndRefillBattleSpots( slot::status p_checkType ) {

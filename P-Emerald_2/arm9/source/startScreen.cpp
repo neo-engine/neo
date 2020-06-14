@@ -102,6 +102,9 @@ namespace SAVE {
             //                    490, rand( ) % 20 ) );
         }
 
+        testTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_FOCUS_BLAST;
+        testTeam[ 0 ].m_boxdata.m_heldItem = I_GYARADOSITE;
+
         // BOX::boxViewer bxv;
         // bxv.run( );
 
@@ -113,11 +116,13 @@ namespace SAVE {
 
         //       SOUND::playBGM( MOD_SURFING );
 
-        BATTLE::battle bt
-            = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 2 ),
-                    rand( ) % 9, rand( ) % 9, rand( ) % 33 );
+//        BATTLE::battle bt
+//            = BATTLE::battle( testTeam, 6, testTeam[ 0 ],
+//                    rand( ) % 9, rand( ) % 9, rand( ) % 33 );
+//            = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 2 ),
+//                    rand( ) % 9, rand( ) % 9, rand( ) % 33 );
 
-        bt.start( );
+//        bt.start( );
 
         // END TEST
 

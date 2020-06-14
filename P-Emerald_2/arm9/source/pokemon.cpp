@@ -103,12 +103,6 @@ bool pokemon::heal( ) {
     return change;
 }
 
-bool pokemon::canBattleTransform( ) const {
-    // TODO: Check whether pkmn can mega evolve etc
-
-    return false;
-}
-
 void pokemon::battleTransform( ) {
     // TODO: Perform mega evolution etc
 
@@ -121,6 +115,26 @@ void pokemon::battleTransform( ) {
             && getAbility( ) == A_SCHOOLING ) {
         setBattleForme( 1 );
         return;
+    }
+
+    if( canBattleTransform( ) ) {
+        if ( getSpecies( ) == PKMN_CHARIZARD ) {
+            if( getItem( ) == I_CHARIZARDITE_X ) {
+                setBattleForme( 1 );
+            } else {
+                setBattleForme( 2 );
+            }
+            return;
+        }
+        if ( getSpecies( ) == PKMN_MEWTWO ) {
+            if( getItem( ) == I_MEWTWONITE_X ) {
+                setBattleForme( 1 );
+            } else {
+                setBattleForme( 2 );
+            }
+            return;
+        }
+        setBattleForme( 1 );
     }
 }
 

@@ -15,6 +15,12 @@ before_install:
 
 script:
     - cd P-Emerald_2
+    - make NOSOUND=1
+    - mv P-Emerald_2.nds P-Emerald_2_NOSOUND.nds
+    - make DESQUID=1 NOSOUND=1
+    - mv P-Emerald_2.nds P-Emerald_2_NOSOUND_DESQUID.nds
+    - make DESQUID=1
+    - mv P-Emerald_2.nds P-Emerald_2_DESQUID.nds
     - make
 
 notifications:
@@ -23,7 +29,11 @@ notifications:
 deploy:
     provider: releases
     edge: true
-    file: "P-Emerald_2.nds"
+    file:
+    - "P-Emerald_2.nds"
+    - "P-Emerald_2_NOSOUND.nds"
+    - "P-Emerald_2_NOSOUND_DESQUID.nds"
+    - "P-Emerald_2_DESQUID.nds"
     draft: true
     on:
         tags: true

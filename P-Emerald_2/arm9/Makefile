@@ -40,6 +40,9 @@ CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
 ifdef DESQUID
 CFLAGS	+=	-DDESQUID -fanalyzer -Wno-analyzer-null-dereference
 endif
+ifdef NOSOUND
+CFLAGS	+=	-DNO_SOUND
+endif
 
 
 CFLAGS	+=	$(INCLUDE) -DARM9

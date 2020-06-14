@@ -667,12 +667,21 @@ namespace BATTLE {
                                                      256 - 32, true, IO::font::LEFT, 14 );
     }
 
-    std::string battleUI::getPkmnName( pokemon* p_pokemon, bool p_opponent ) const {
+    std::string battleUI::getPkmnName( pokemon* p_pokemon, bool p_opponent,
+                                       bool p_sentenceStart ) const {
         char buffer[ 50 ];
         if( p_opponent && _isWildBattle ) {
-            snprintf( buffer, 49, GET_STRING( 311 ), p_pokemon->m_boxdata.m_name );
+            if( p_sentenceStart ) {
+                snprintf( buffer, 49, GET_STRING( 311 ), p_pokemon->m_boxdata.m_name );
+            } else {
+                snprintf( buffer, 49, GET_STRING( 309 ), p_pokemon->m_boxdata.m_name );
+            }
         } else if( p_opponent ) {
-            snprintf( buffer, 49, GET_STRING( 312 ), p_pokemon->m_boxdata.m_name );
+            if( p_sentenceStart ) {
+                snprintf( buffer, 49, GET_STRING( 312 ), p_pokemon->m_boxdata.m_name );
+            } else {
+                snprintf( buffer, 49, GET_STRING( 310 ), p_pokemon->m_boxdata.m_name );
+            }
         } else {
             snprintf( buffer, 49, p_pokemon->m_boxdata.m_name );
         }
@@ -1287,4 +1296,50 @@ namespace BATTLE {
                     OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
     }
+
+    void battleUI::showAttackSelection( pokemon* p_pokemon, u8 p_slot, bool p_canUseMove[ 4 ],
+            bool p_showMegaEvolution, u8 p_highlightedButton,
+            bool p_megaButtonActive ) {
+
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+        char buffer[ 100 ];
+
+        if( p_highlightedButton == u8( -1 ) ) {
+            // initialize stuff
+            dmaCopy( battlesub3Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
+            // Clear log window
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+            for( u8 i = 0; i < 12; ++i ) {
+                oam[ SPR_LARGE_MESSAGE_OAM_SUB + i ].isHidden = true;
+            }
+
+
+            for( u8 i = 0; i < 8; ++i ) {
+                oam[ SPR_SMALL_MESSAGE_OAM_SUB + i ].isHidden = false;
+            }
+
+            for( u8 i = 0; i < 2; ++i ) {
+                oam[ SPR_BATTLE_FITE_OAM_SUB + i].isHidden = true;
+                oam[ SPR_BATTLE_PKMN_OAM_SUB + i].isHidden = true;
+                oam[ SPR_BATTLE_RUN_OAM_SUB + i].isHidden = false;
+                oam[ SPR_BATTLE_BAG_OAM_SUB + i].isHidden = true;
+            }
+
+            IO::loadSprite( SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
+                    oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                    128, 68 + 64 + 18, 32, 32, battle_runPal, 0, 0, true, true, false,
+                    OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+
+            IO::updateOAM( true );
+
+            IO::regularFont->printStringC( GET_STRING( 268 ),
+                    oam[ SPR_BATTLE_RUN_OAM_SUB ].x + 32,
+                    oam[ SPR_BATTLE_RUN_OAM_SUB].y + 9, true, IO::font::CENTER );
+        }
+
+
+        // TODO
+    }
+
 } // namespace BATTLE

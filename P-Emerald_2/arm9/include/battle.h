@@ -55,7 +55,9 @@ namespace BATTLE {
         NO_OP,   // No operation (e.g. when trying to run in a double battle)
         CAPTURE, // (try to) capture pokemon.
         RUN,
-        CANCEL // Cancel / go back to previous move selection
+        CANCEL, // Cancel / go back to previous move selection
+        MESSAGE_ITEM, // Extra message for certain items
+        MESSAGE_MOVE, // Extra message for certain moves
     };
 
     struct battleMoveSelection {
@@ -226,6 +228,16 @@ namespace BATTLE {
         bool          addSlotCondition( battleUI* p_ui, slotCondition p_slotCondition );
         constexpr slotCondition getSlotCondition( ) const {
             return _slotCondition;
+        }
+
+        /*
+         * @brief: Removes any held item.
+         */
+        constexpr void removeItem( ) {
+            if( _pokemon == nullptr ) [[unlikely]] { return; }
+
+            _pokemon->takeItem( );
+            if( _isTransformed ) { _transformedPkmn.takeItem( ); }
         }
 
         /*
@@ -554,6 +566,14 @@ namespace BATTLE {
         }
 
         /*
+         * @brief: Returns true iff the specified pokemon fulfills all reqs to mega
+         * evolve.
+         */
+        constexpr bool canMegaEvolve( ) {
+            return getPkmn( )->canBattleTransform( );
+        }
+
+        /*
          * @brief: Changes the ability of the specified pkmn to p_newAbility.
          * Does nothing and returns false if p_newAbility is 0.
          */
@@ -799,6 +819,21 @@ namespace BATTLE {
          */
         constexpr bool canUseItem( u8 p_slot ) const {
             return _slots[ p_slot ].canUseItem( );
+        }
+
+        /*
+         * @brief: Removes any held item.
+         */
+        constexpr void removeItem( u8 p_slot ) {
+            _slots[ p_slot ].removeItem( );
+        }
+
+        /*
+         * @brief: Returns true iff the specified pokemon fulfills all reqs to mega
+         * evolve.
+         */
+        constexpr bool canMegaEvolve( u8 p_slot ) {
+            return _slots[ p_slot ].canMegaEvolve( );
         }
 
         /*
@@ -1153,6 +1188,26 @@ namespace BATTLE {
         }
 
         /*
+         * @brief: Removes any held item.
+         */
+        constexpr void removeItem( bool p_opponent, u8 p_slot ) {
+            _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].removeItem( p_slot );
+        }
+
+        /*
+         * @brief: Returns true iff the specified pokemon fulfills all reqs to mega
+         * evolve.
+         */
+        constexpr bool canMegaEvolve( bool p_opponent, u8 p_slot ) {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].canMegaEvolve( p_slot );
+        }
+
+        /*
+         * @brief: Mega evolve the specified pkmn.
+         */
+        void megaEvolve( battleUI* p_ui, bool p_opponent, u8 p_slot );
+
+        /*
          * @brief: returns whether the specified pkmn currently touches the ground.
          */
         inline bool isGrounded( bool p_opponent, u8 p_slot,
@@ -1205,6 +1260,12 @@ namespace BATTLE {
          * @brief: Initializes the battle.
          */
         void initBattle( );
+
+        /*
+         * @brief: Computes the move target for single battles or lets the player choose a
+         * target for double battles.
+         */
+        battleMoveSelection chooseTarget( const battleMoveSelection& p_move );
 
         /*
          * @brief: Makes the player select a move for the pokemon in slot p_slot.
