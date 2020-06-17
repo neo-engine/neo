@@ -86,7 +86,7 @@ namespace BATTLE {
 
         std::strong_ordering operator<=>( const battleMove& p_other ) {
             if( auto cmp = p_other.m_priority <=> this->m_priority; cmp != 0 ) return cmp;
-            if( auto cmp = this->m_userSpeed <=> p_other.m_userSpeed; cmp != 0 ) return cmp;
+            if( auto cmp = p_other.m_userSpeed <=> this->m_userSpeed; cmp != 0 ) return cmp;
             return this->m_pertubation <=> p_other.m_pertubation;
         }
     };
@@ -557,6 +557,7 @@ namespace BATTLE {
                 for( u8 i = 0; i < 4; ++i ) {
                     _transformedPkmn.m_boxdata.m_curPP[ i ] = 5;
                 }
+                _transformedPkmn.m_level = _pokemon->m_level;
 
             } else {
                 _isTransformed = false;
@@ -619,6 +620,11 @@ namespace BATTLE {
         slot _slots[ 2 ];
 
       public:
+        side( ) {
+            std::memset( _sideConditionAmount, 0, sizeof( _sideConditionAmount ) );
+            std::memset( _sideConditionCounter, 0, sizeof( _sideConditionCounter ) );
+        }
+
         /*
          * Ages the side by one turn, processes all changes
          */

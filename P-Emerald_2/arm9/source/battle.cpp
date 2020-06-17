@@ -313,11 +313,13 @@ namespace BATTLE {
     }
 
     void battle::initBattle( ) {
+        /*
         if( _isWildBattle ) {
             SOUND::playBGM( SOUND::BGMforWildBattle( _opponentTeam[ 0 ].getSpecies( ) ) );
         } else {
             SOUND::playBGM( SOUND::BGMforWildBattle( _opponent.getClass( ) ) );
         }
+        */
         SOUND::initBattleSound( );
 
         _battleUI.init( );
@@ -393,15 +395,15 @@ namespace BATTLE {
             strgl = strgl || canUse[ i ];
         }
 
-        if( strgl ) {
+        if( !strgl ) {
             // pkmn will struggle
             res.m_param = M_STRUGGLE;
             return chooseTarget( res );
         }
 
-        _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), p_slot, canUse, mega );
+        _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse, mega );
         u8 curSel = 0;
-        _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), p_slot, canUse, mega,
+        _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse, mega,
                                        curSel, res.m_megaEvolve );
 
         cooldown     = COOLDOWN_COUNT;
@@ -412,7 +414,7 @@ namespace BATTLE {
             pressed = keysUp( );
             held    = keysHeld( );
 
-            if( p_slot && ( pressed & KEY_B ) ) {
+            if( pressed & KEY_B ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 res.m_type = CANCEL;
                 return res;
@@ -435,7 +437,7 @@ namespace BATTLE {
                     return res;
                 } else if ( mega && curSel == 5 ) { // Toggle Mega Evolution
                     res.m_megaEvolve = !res.m_megaEvolve;
-                    _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), p_slot, canUse,
+                    _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse,
                                                    mega, curSel, res.m_megaEvolve );
                 }
 
@@ -443,47 +445,53 @@ namespace BATTLE {
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) || GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
-                if( curSel < 4 ) { curSel ^= 1; }
-                else if( curSel == 5 ) { curSel = 4; }
-                else {
-                    if( mega ) {
-                        curSel = 5;
-                    } else {
-                        cooldown = COOLDOWN_COUNT;
-                        continue;
-                    }
+                if( curSel < 4 && _field.getPkmn( false, p_slot )->getMove( curSel ^ 1 ) ) {
+                    curSel ^= 1;
+                } else if( curSel == 5 ) { curSel = 4; }
+                else if( curSel == 4 && mega) {
+                    curSel = 5;
+                } else {
+                    cooldown = COOLDOWN_COUNT;
+                    continue;
                 }
 
-                _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), p_slot, canUse,
+                _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse,
                                                mega, curSel, res.m_megaEvolve );
 
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
-                if( curSel + 2 < 4 ) { curSel += 2; }
-                else if( curSel < 4 ) { curSel = 4; }
+                if( curSel + 2 < 4 && _field.getPkmn( false, p_slot )->getMove( curSel + 2 ) ) {
+                    curSel += 2;
+                } else if( curSel < 4 ) { curSel = 4; }
                 else if( curSel == 4 ) { curSel = 0; }
                 else {
                     cooldown = COOLDOWN_COUNT;
                     continue;
                 }
 
-                _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), p_slot, canUse,
+                _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse,
                                                mega, curSel, res.m_megaEvolve );
 
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
-                if( curSel >= 2 && curSel <= 4 ) { curSel -= 2; }
-                else if( curSel < 2 ) { curSel = 4; }
+                if( curSel >= 2 && curSel < 4 ) { curSel -= 2; }
+                else if( curSel == 4 ) {
+                    if( _field.getPkmn( false, p_slot )->getMove( 2 ) ) {
+                        curSel = 2;
+                    } else {
+                        curSel = 0;
+                    }
+                } else if( curSel < 2 ) { curSel = 4; }
                 else {
                     cooldown = COOLDOWN_COUNT;
                     continue;
                 }
 
-                _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), p_slot, canUse,
+                _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse,
                                                mega, curSel, res.m_megaEvolve );
 
                 cooldown = COOLDOWN_COUNT;
@@ -550,6 +558,10 @@ namespace BATTLE {
                     default:
                         break;
                 }
+                _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
+                curSel = 0;
+                _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ),
+                        p_slot, curSel );
 
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
@@ -660,6 +672,7 @@ namespace BATTLE {
         restoreInitialOrder( false );
         resetBattleTransformations( false );
 
+        _battleUI.deinit( );
         SOUND::deinitBattleSound( );
     }
 

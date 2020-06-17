@@ -191,7 +191,7 @@ namespace BATTLE {
                         if( transformPkmn( p_opponent, p_slot, getPkmn( !p_opponent, p_slot ) ) ) {
                             p_ui->logAbility( pkmn, p_opponent );
                             p_ui->updatePkmn( p_opponent, p_slot, getPkmn( p_opponent, p_slot ) );
-                            if( pkmn->getAbility ( ) != A_IMPOSTER ) {
+                            if( getPkmn( p_opponent, p_slot )->getAbility ( ) != A_IMPOSTER ) {
                                 checkOnSendOut( p_ui, p_opponent, p_slot );
                             }
                         }
@@ -204,7 +204,7 @@ namespace BATTLE {
                                 changeAbility( p_opponent, p_slot, tmp->getAbility( ) ) ) {
                             p_ui->logAbility( pkmn, p_opponent );
 
-                            if( pkmn->getAbility ( ) != A_TRACE ) {
+                            if( getPkmn( p_opponent, p_slot )->getAbility ( ) != A_TRACE ) {
                                 checkOnSendOut( p_ui, p_opponent, p_slot );
                             }
                         }

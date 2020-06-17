@@ -76,9 +76,9 @@ namespace BATTLE {
         void animateShiny( bool p_opponent, u8 p_slot, u8 p_shinyType = 0 ) const;
 
         /*
-         * @brief: Plays the boosts animation tor the given boosts and specified pkmn.
+         * @brief: Plays the boosts animation for the given stat change.
          */
-        void animateStatChange( bool p_opponent, u8 p_slot, boosts p_poosts ) const;
+        void animateStatChange( bool p_opponent, u8 p_slot, bool p_down ) const;
      public:
         battleUI( ) { }
 
@@ -93,6 +93,8 @@ namespace BATTLE {
          * screen.
          */
         void init( );
+
+        void deinit( );
 
         /*
          * @brief: Returns a string correctly describing the given pkmn.
@@ -179,7 +181,7 @@ namespace BATTLE {
         /*
          * @brief: Shows the attack selection for the given pkmn.
          */
-        void showAttackSelection( pokemon* p_pokemon, u8 p_slot, bool p_canUseMove[ 4 ],
+        void showAttackSelection( pokemon* p_pokemon, bool p_canUseMove[ 4 ],
                                   bool p_showMegaEvolution, u8 p_highlightedButton = -1,
                                   bool p_megaButtonActive = false );
     };

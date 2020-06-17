@@ -116,13 +116,11 @@ namespace SAVE {
 
         //       SOUND::playBGM( MOD_SURFING );
 
-//        BATTLE::battle bt
-//            = BATTLE::battle( testTeam, 6, testTeam[ 0 ],
-//                    rand( ) % 9, rand( ) % 9, rand( ) % 33 );
-//            = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 2 ),
-//                    rand( ) % 9, rand( ) % 9, rand( ) % 33 );
+        BATTLE::battle bt
+            = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 2 ),
+                    rand( ) % 46, rand( ) % 46, rand( ) % 58 );
 
-//        bt.start( );
+        bt.start( );
 
         // END TEST
 

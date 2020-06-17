@@ -30,10 +30,10 @@ deploy:
     provider: releases
     edge: true
     file:
-    - "P-Emerald_2.nds"
     - "P-Emerald_2_NOSOUND.nds"
     - "P-Emerald_2_NOSOUND_DESQUID.nds"
-    - "P-Emerald_2_DESQUID.nds"
+      #    - "P-Emerald_2.nds"
+      #    - "P-Emerald_2_DESQUID.nds"
     draft: true
     on:
         tags: true

@@ -538,8 +538,7 @@ namespace STS {
         for( u8 i = 0; i < 4; ++i ) {
             type t;
             if( p_pokemon->getMove( i ) != M_HIDDEN_POWER ) {
-                auto mdata = MOVE::getMoveData( p_pokemon->getMove( i ) );
-                t          = mdata.m_type;
+                t = _moves[ i ].m_type;
             } else {
                 t = p_pokemon->getHPType( );
             }

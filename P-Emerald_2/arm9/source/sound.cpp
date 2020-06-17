@@ -171,6 +171,14 @@ namespace SOUND {
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
             if( BGMLoaded && p_id == currentBGM ) { return; }
             if( BGMLoaded ) {
+                setVolume( 0x50 );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+                setVolume( 0x25 );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
                 mmStop( );
                 mmUnload( currentBGM );
             }

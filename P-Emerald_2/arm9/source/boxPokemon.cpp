@@ -68,6 +68,13 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
             m_pid = rand( );
             m_shinyType = 1;
         }
+        if( SAVE::SAV.getActiveFile( ).m_bag.count(
+                BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SHINY_CHARM ) ) {
+            for( u8 i = 0; i < p_shiny - 2 && !isShiny( ); ++i ) {
+                m_pid = rand( );
+                m_shinyType = 1;
+            }
+        }
     }
 
     m_experienceGained = EXP[ p_level - 1 ][ data.getExpType( ) ];

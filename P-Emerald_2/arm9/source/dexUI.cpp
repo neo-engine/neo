@@ -45,14 +45,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "time_icon.h"
 
 #include "DexTop.h"
-#include "DexTop0.h"
-#include "DexTop02.h"
-#include "DexTop1.h"
-#include "DexTop12.h"
-#include "DexTop2.h"
-#include "DexTop22.h"
-#include "DexTop3.h"
-#include "DexTop32.h"
 
 #include "DexSub.h"
 #include "DexSub2.h"
@@ -299,6 +291,7 @@ namespace DEX {
         // Draw top screen's background
 
         if( p_page <= 1 ) {
+            /*
             switch( data.m_stage ) {
             case 0:
                 if( p_page == 0 ) {
@@ -352,6 +345,7 @@ namespace DEX {
                         ITEM::getItemName( data.m_preEvolution, CURRENT_LANGUAGE ).c_str( ) );
                 break;
             }
+            */
             switch( data.m_types[ 0 ] ) {
             case NORMAL:
             case FLYING:

@@ -32,7 +32,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs.h"
 #include "messageBox.h"
 #include "pokemonNames.h"
-// #include "ribbon.h"
 #include "sprite.h"
 #include "uio.h"
 
@@ -40,31 +39,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "damage_0.h"
 #include "damage_1.h"
 #include "damage_2.h"
-
-#include "plat0a.h"
-#include "plat0b.h"
-#include "plat10a.h"
-#include "plat10b.h"
-#include "plat11a.h"
-#include "plat11b.h"
-#include "plat1a.h"
-#include "plat1b.h"
-#include "plat2a.h"
-#include "plat2b.h"
-#include "plat3a.h"
-#include "plat3b.h"
-#include "plat4a.h"
-#include "plat4b.h"
-#include "plat5a.h"
-#include "plat5b.h"
-#include "plat6a.h"
-#include "plat6b.h"
-#include "plat7a.h"
-#include "plat7b.h"
-#include "plat8a.h"
-#include "plat8b.h"
-#include "plat9a.h"
-#include "plat9b.h"
 
 #include "type_bug_de.h"
 #include "type_bug_en.h"
@@ -137,15 +111,6 @@ namespace IO {
            {type_psychic_enPal, type_psychic_dePal}, {type_ice_enPal, type_ice_dePal},
            {type_dragon_enPal, type_dragon_dePal},   {type_dark_enPal, type_dark_dePal},
            {type_fairy_enPal, type_fairy_dePal}};
-
-    const unsigned int* PlatformTiles[ 2 * MAX_PLATFORMS ]
-        = {plat0aTiles, plat0bTiles, plat1aTiles,  plat1bTiles,  plat2aTiles,  plat2bTiles,
-           plat3aTiles, plat3bTiles, plat4aTiles,  plat4bTiles,  plat5aTiles,  plat5bTiles,
-           plat6aTiles, plat6bTiles, plat7aTiles,  plat7bTiles,  plat8aTiles,  plat8bTiles,
-           plat9aTiles, plat9bTiles, plat10aTiles, plat10bTiles, plat11aTiles, plat11bTiles};
-    const unsigned short* PlatformPals[ MAX_PLATFORMS ]
-        = {plat0aPal, plat1aPal, plat2aPal, plat3aPal, plat4aPal,  plat5aPal,
-           plat6aPal, plat7aPal, plat8aPal, plat9aPal, plat10aPal, plat11aPal};
 
     const unsigned int*   HitTypeTiles[ 3 ] = {damage_0Tiles, damage_1Tiles, damage_2Tiles};
     const unsigned short* HitTypePals[ 3 ]  = {damage_0Pal, damage_1Pal, damage_2Pal};
@@ -1207,25 +1172,49 @@ namespace IO {
                             256, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
+    u16 loadPlatform( u8 p_platform, const u16 p_posX, const u16 p_posY,
+                      u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+
+        if( FS::readData<unsigned short, unsigned int>( "nitro:/PICS/SPRITES/PLAT/",
+                    ( "plat" + std::to_string( p_platform ) ).c_str( ), 16, TEMP_PAL,
+                     128 * 64 / 8, TEMP ) ) {
+                loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 64, 64, TEMP_PAL,
+                               TEMP, 128 * 64 / 2, false, false, false,
+                               OBJPRIORITY_3, p_bottom, p_platform > 40 ? OBJMODE_BLENDED :
+                               OBJMODE_NORMAL );
+            return loadSprite( ++p_oamIndex, p_palCnt, p_tileCnt + 64,
+                               p_posX + 64, p_posY, 64, 64, 0,
+                               0, 64 * 64 / 2, false, false, false,
+                               OBJPRIORITY_3, p_bottom, p_platform > 40 ? OBJMODE_BLENDED :
+                               OBJMODE_NORMAL );
+        } else {
+            return loadPlatform( 10, p_posX, p_posY, p_oamIndex, p_palCnt, p_tileCnt, p_bottom );
+        }
+    }
+
     u16 loadRibbonIcon( u8 p_ribbonIdx, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                         u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
 
-        // TODO
-        (void) p_ribbonIdx;
-        (void) p_posX;
-        (void) p_posY;
-        (void) p_oamIndex;
-        (void) p_palCnt;
-        (void) p_tileCnt;
-        (void) p_bottom;
+        if( FS::readData( "nitro:/PICS/SPRITES/RIBBON/", ( "r" +  std::to_string( p_ribbonIdx )
+                          ).c_str( ), (unsigned int) 32 * 32 / 8, TEMP,
+                        (unsigned short) 16, TEMP_PAL ) ) {
+            return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL,
+                               TEMP, 32 * 32 / 2, false, false, false,
+                               OBJPRIORITY_0, p_bottom );
+        }
+        return p_tileCnt + ( 32 * 16 ) / BYTES_PER_16_COLOR_TILE;
+    }
 
-        return 0;
-        /*
-        if( !RibbonPals[ p_ribbonIdx ] || !RibbonTiles[ p_ribbonIdx ] ) return 0;
-        return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32,
-                           RibbonPals[ p_ribbonIdx ], RibbonTiles[ p_ribbonIdx ], 512, false, false,
-                           false, OBJPRIORITY_0, p_bottom );
-                           */
+    u16 loadShapeIcon( u8 p_shapeIdx, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
+                       u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+
+        if( FS::readData( "nitro:/PICS/SPRITES/SHAPES/", std::to_string( p_shapeIdx ).c_str( ),
+                          (unsigned int) 32 * 32 / 8, TEMP, (unsigned short) 16, TEMP_PAL ) ) {
+            return loadSprite( p_oamIndex, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL,
+                               TEMP, 32 * 32 / 2, false, false, false,
+                               OBJPRIORITY_0, p_bottom );
+        }
+        return p_tileCnt + ( 32 * 16 ) / BYTES_PER_16_COLOR_TILE;
     }
 
     u16 loadDamageCategoryIcon( MOVE::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,

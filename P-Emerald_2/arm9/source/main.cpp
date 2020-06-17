@@ -228,6 +228,12 @@ int main( int, char** p_argv ) {
 
     FADE_TOP( );
 
+    // TODO remove
+    SAVE::SAV.getActiveFile( ).m_options.m_enableBGM = true;
+    SAVE::SAV.getActiveFile( ).m_options.m_enableSFX = true;
+    SAVE::SAV.m_version = VERSION;
+
+
     MAP::curMap = new MAP::mapDrawer( );
     MAP::curMap->registerOnLocationChangedHandler( SOUND::onLocationChange );
     MAP::curMap->registerOnMoveModeChangedHandler( SOUND::onMovementTypeChange );
@@ -243,10 +249,6 @@ int main( int, char** p_argv ) {
 
     irqSet( IRQ_VBLANK, vblankIRQ );
 
-    // TODO remove
-    SAVE::SAV.getActiveFile( ).m_options.m_enableBGM = false;
-    SAVE::SAV.getActiveFile( ).m_options.m_enableSFX = true;
-    SAVE::SAV.m_version = VERSION;
 
     bool          stopped = true;
     u8            bmp     = false;

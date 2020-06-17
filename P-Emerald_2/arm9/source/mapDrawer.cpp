@@ -421,12 +421,30 @@ namespace MAP {
 
         if( !CUR_SLICE->m_pokemon[ arridx ].first ) return false;
 
-        IO::fadeScreen( IO::BATTLE );
-
         u16 pkmnId    = CUR_SLICE->m_pokemon[ arridx ].first & ( ( 1 << 11 ) - 1 );
         u8  pkmnForme = CUR_SLICE->m_pokemon[ arridx ].first >> 11;
 
-        wildPkmn             = pokemon( pkmnId, level, pkmnForme );
+        bool luckyenc =
+            SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ),
+                    I_WISHING_CHARM ) ? !( rand( ) & 127 ) : !( rand( ) & 2047 );
+        bool charm =
+            SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ),
+                    I_SHINY_CHARM );
+
+        if( luckyenc ) {
+            SOUND::playBGM( MOD_BATTLE_WILD_ALT );
+        } else {
+            SOUND::playBGM( SOUND::BGMforWildBattle( pkmnId ) );
+        }
+
+        IO::fadeScreen( IO::BATTLE );
+        IO::BG_PAL( true )[ 0 ] = 0;
+        IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
+
+        wildPkmn = pokemon( pkmnId, level, pkmnForme, 0,
+                luckyenc ? 255 : ( charm ? 3 : 0 ), luckyenc, false, 0, 0, luckyenc );
 
         u8 platform = 0, plat2 = 0;
         u8 battleBack = CURRENT_BANK.m_battleBg;
@@ -457,8 +475,8 @@ namespace MAP {
         auto playerPrio
             = _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].getPriority( );
         ANIMATE_MAP = false;
+        DRAW_TIME = false;
         swiWaitForVBlank( );
-        NAV::draw( );
         if( BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
                         SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ),
                         wildPkmn, platform, plat2, battleBack,
@@ -468,6 +486,7 @@ namespace MAP {
         }
         FADE_TOP_DARK( );
         ANIMATE_MAP = true;
+        DRAW_TIME = true;
         NAV::draw( true );
         SOUND::restartBGM( );
         draw( playerPrio );
