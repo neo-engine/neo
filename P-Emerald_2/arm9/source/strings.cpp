@@ -156,7 +156,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 10
 
-    {"%s%s used %s![A]", "%s%s setzt\n%s ein![A]"},
+    {"%s used %s!", "%s setzt %s ein!"},
     {"Items", "Items"},
     {"Medicine", "Medizin"},
     {"TM/HM", "TM/VM"},
@@ -567,14 +567,14 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"%s is tightening its focus.", "%s versch\xe4rft seinen Fokus."},
     {"%s's beak glows.", "Der Schnabel von %s gl\xfcht."},
-    {"", "Gleißendes Sonnenlicht.[A]"},
-    {"", "Enormer Regen.[A]"},
-    {"", "Extremes Sonnenlicht.[A]"},
+    {"%s returned to you.", "%s kam zu dir zur\xfc""ck"},
+    {"That is enough %s.", "Das reicht, %s."},
+    {"%s returned to %s.", "%s kam zu %s zur\xfc""ck."},
 
-    {"", "Starke Winde wehen.[A]"},
-    {"", "Es hat aufgehört zu regnen.[A]"},
-    {"", "Es hat aufgehört zu hageln.[A]"},
-    {"", "Der Nebel verzog sich.[A]"},
+    {"%s withdrew %s.", "%s rief %s zur\xfc""ck."},
+    {"%s recharges.", "%s l\xe4""dt sich wieder auf."},
+    {"%s became confused.", "%s ist vor Ersch\xf6pfung verwirrt."},
+    {"%s ate its %s. Its confusion vanished.", "%s a\df die %s. Es ist nicht mehr verwirrt."},
     {"", "Der Sandsturm legt sich.[A]"},
 
     // 280
@@ -593,27 +593,27 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 290
 
-    {"", "%s%s wich aus.[A]"},
-    {"", "[COLR:15:15:00]Ein Volltreffer![A][CLEAR][COLR:00:00:00]"},
-    {"", "[COLR:00:31:00]Das ist enorm effektiv\ngegen %s![A][CLEAR][COLR:00:00:00]"},
-    {"", "[COLR:00:15:00]Das ist sehr effektiv\ngegen %s![A][CLEAR][COLR:00:00:00]"},
-    {"", "[COLR:31:00:00]Hat die Attacke\n%s getroffen?[A][CLEAR][COLR:00:00:00]"},
+    {"It missed %s.", "%s wich aus."},
+    {"A critical hit!", "Ein Volltreffer!"},
+    {"%s prepares a move.", "%s bereitet einen Angriff vor."},
+    {"%s is confused.", "%s ist verwirrst."},
+    {"%s snapped out of its confusion.", "%s ist nicht mehr verwirrt."},
 
-    {"", "[COLR:31:00:00]Das ist nur enorm wenig\neffektiv gegen%s\x85[A][CLEAR][COLR:00:00:00]"},
-    {"", "[COLR:15:00:00]Das ist nicht sehr effektiv\ngegen %s.[A][CLEAR][COLR:00:00:00]"},
-    {"", "Es schlug fehl\x85[A]"},
-    {"", "Die Verbrennung schadet\n%s%s.[A]"},
-    {"", "Die Vergiftung schadet\n%s%s.[A]"},
+    {"It hurt itself in its confusion.", "Es hat sich in seiner Verwirrung selbst verletzt."},
+    {"%s flinches.", "%s schreckt zur\xfc""ck."},
+    {"%s is frozen solid.", "%s ist gefroren."},
+    {"%s was thawed.", "%s ist aufgetaut."},
+    {"%s is asleep.", "%s schl\xe4""ft."},
 
     // 300
 
-    {"", "%s%s wurde besiegt.[A]"},
-    {"", "Das Rundenlimit dieses\nKampfes wurde erreicht.[A]"},
-    {"", "Der Kampf endet in einem\nUnentschieden![A]"},
-    {"", "[TRAINER] [TCLASS] gewinnt<85>[A]"},
-    {"", "Du besiegst [TCLASS] [TRAINER]![A]"},
+    {"%s woke up.", "%s ist aufgewacht."},
+    {"%s is paralyzed. It can't move.", "%s ist paralysiert. Es kann nicht angreifen."},
+    {"%s is immobilized by its love.", "%s ist starr vor Liebe."},
+    {"The weather didn't change.", "Das Wetter bleibt unver\xe4ndert."},
+    {"It failed.", "Es schlug fehl."},
 
-    {"", "Du gewinnst %d$.[A]"},
+    {"%s became fully charged due to its Power Herb!", "Dank Energiekraut ist %s sofort bereit!"},
     {"", "Der Kampf endet.[A]"},
     {"%s makes a wish upon its %s.", "%s w\xfcnscht sich St\xe4rke vom %s."},
     {"%s's wish for power was granted!", "Der Wunsch von %s wurde erh\xf6hrt!"},

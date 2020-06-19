@@ -97,7 +97,6 @@ namespace BOX {
 #define SPR_PARTY_BG_OAM_SUB 49
 #define SPR_PARTY_TEXT_OAM_SUB 52
 #define SPR_PKMN_OPTS_OAM_SUB( p_opt ) ( 54 + 3 * ( p_opt ) )
-#define SPR_PARTY_PKMN_BG_OAM_SUB 80
 
 #define MAX_WALLPAPERS 3
 #define INFO_X 8

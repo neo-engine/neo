@@ -31,6 +31,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "saveGame.h"
 #include "battle.h"
+#include "battleUI.h"
+#include "battleSlot.h"
+#include "battleSide.h"
+#include "battleField.h"
 #include "battleTrainer.h"
 #include "uio.h"
 
@@ -313,13 +317,6 @@ namespace BATTLE {
     }
 
     void battle::initBattle( ) {
-        /*
-        if( _isWildBattle ) {
-            SOUND::playBGM( SOUND::BGMforWildBattle( _opponentTeam[ 0 ].getSpecies( ) ) );
-        } else {
-            SOUND::playBGM( SOUND::BGMforWildBattle( _opponent.getClass( ) ) );
-        }
-        */
         SOUND::initBattleSound( );
 
         _battleUI.init( );

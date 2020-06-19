@@ -26,36 +26,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "battle.h"
+#include "battleUI.h"
+#include "battleSlot.h"
+#include "battleSide.h"
+#include "battleField.h"
 #include "defines.h"
 
 namespace BATTLE {
     void slot::age( battleUI* p_ui ) {
         // TODO
-    }
-
-    pokemon* slot::recallPokemon( battleUI* p_ui, bool p_keepVolatileStatus ) {
-        // TODO
-        return nullptr;
-    }
-
-    bool slot::sendPokemon( battleUI* p_ui, pokemon* p_pokemon ) {
-        // TODO
-        return false;
-    }
-
-    bool slot::damagePokemon( battleUI* p_ui, u16 p_damage ) {
-        // TODO
-        return false;
-    }
-
-    bool slot::healPokemon( battleUI* p_ui, u16 p_heal ) {
-        // TODO
-        return false;
-    }
-
-    bool slot::faintPokemon( battleUI* p_ui ) {
-        // TODO
-        return false;
     }
 
     boosts slot::addBoosts( boosts p_boosts, bool p_allowAbilities ) {
@@ -71,36 +50,6 @@ namespace BATTLE {
     bool slot::resetBoosts( battleUI* p_ui ) {
         // TODO
         return false;
-    }
-
-    bool slot::addVolatileStatus( battleUI* p_ui, volatileStatus p_volatileStatus ) {
-        // TODO
-        return false;
-    }
-
-    bool slot::addSlotCondition( battleUI* p_ui, slotCondition p_slotCondition ) {
-        // TODO
-        return false;
-    }
-
-    bool slot::useMove( battleUI* p_ui, u16 p_moveId ) {
-        // TODO
-        return false;
-    }
-
-    void slot::hitByMove( battleUI* p_ui, u16 p_moveId ) {
-        // TODO
-    }
-
-    battleMove slot::computeBattleMove( battleMoveSelection               p_usersSelection,
-                                        std::vector<battleMoveSelection>& p_targetsSelecotions ) {
-        // TODO
-        return battleMove( );
-    }
-
-    u16 slot::computeDamageTaken( battleMove p_move, u16 p_baseDamage ) {
-        // TODO
-        return 0;
     }
 
     u16 slot::computeRecoil( u16 p_damage ) {

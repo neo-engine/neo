@@ -26,6 +26,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "battle.h"
+#include "battleUI.h"
+#include "battleSlot.h"
+#include "battleSide.h"
+#include "battleField.h"
 #include "defines.h"
 
 namespace BATTLE {
@@ -41,24 +45,6 @@ namespace BATTLE {
     bool side::removeSideCondition( battleUI* p_ui, sideCondition p_sideCondition ) {
         // TODO
         return false;
-    }
-
-    battleMove side::computeBattleMove( u8 p_slot, battleMoveSelection& p_usersSelection,
-                                        std::vector<battleMoveSelection>& p_targetsSelecotions ) {
-        // TODO
-        return battleMove( );
-    }
-
-    std::vector<u16> side::computeDamageDealt( u8 p_slot, battleMove p_usersMove,
-                                               std::vector<battleMove>& p_targetsMoves,
-                                               std::vector<battleMove>& p_targetedMoves ) {
-        // TODO
-        return {};
-    }
-
-    u16 side::computeDamageTaken( u8 p_slot, battleMove p_move, u16 p_baseDamage ) {
-        // TODO
-        return 0;
     }
 
     u16 side::computeRecoil( u8 p_slot, u16 p_damage ) {

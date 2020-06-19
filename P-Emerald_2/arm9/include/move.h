@@ -36,56 +36,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "moveNames.h"
 
 namespace MOVE {
-    struct moveData {
-        type        m_type        = UNKNOWN;         // ???
-        contestType m_contestType = NO_CONTEST_TYPE; // Clever, Smart, ...
-        u8          m_basePower   = 0;
-        u8          m_pp          = 1;
-
-        moveHitTypes m_category          = (moveHitTypes) 0;
-        moveHitTypes m_defensiveCategory = (moveHitTypes) 0; // category used for defending pkmn
-        u8           m_accuracy          = 0;                // 255: always hit
-        s8           m_priority          = 0;
-
-        BATTLE::sideCondition m_sideCondition
-            = BATTLE::NO_SIDE_CONDITION; // side introduced by the move (reflect, etc)
-
-        BATTLE::weather       m_weather = BATTLE::NO_WEATHER; // weather introduced by the move
-        BATTLE::pseudoWeather m_pseudoWeather
-            = BATTLE::NO_PSEUDO_WEATHER;                // pseudo weather introduced by the move
-        BATTLE::terrain m_terrain = BATTLE::NO_TERRAIN; // terrain introduced by the move
-        u8              m_status  = 0;
-
-        BATTLE::slotCondition m_slotCondition
-            = (BATTLE::slotCondition) 0; // stuff introduced on the slot (wish, etc)
-        u8     m_fixedDamage    = 0;
-        target m_target         = (target) 0;
-        target m_pressureTarget = (target) 0; // restrictions are computed based on different target
-                                              // than resulting effect
-
-        u8 m_heal     = 0; // as m_heal / 240
-        u8 m_recoil   = 0; // as dealt damage * m_recoil / 240
-        u8 m_drain    = 0; // as dealt damage * m_recoil / 240
-        u8 m_multiHit = 0; // as ( min << 8 ) | max
-
-        u8 m_critRatio       = 1;
-        u8 m_secondaryChance = 0; // chance that the secondary effect triggers
-        u8 m_secondaryStatus = 0;
-        u8 m_unused          = 0;
-
-        BATTLE::volatileStatus m_volatileStatus = (BATTLE::volatileStatus) 0; // confusion, etc
-        BATTLE::volatileStatus m_secondaryVolatileStatus
-            = (BATTLE::volatileStatus) 0; // confusion, etc
-
-        BATTLE::boosts m_boosts     = BATTLE::boosts( ); // Status ``boosts'' for the target
-        BATTLE::boosts m_selfBoosts = BATTLE::boosts( ); // Status ``boosts'' for the user (if target != user)
-        BATTLE::boosts m_secondaryBoosts = BATTLE::boosts( ); // Stat ``boosts'' for the target
-        BATTLE::boosts m_secondarySelfBoosts
-            = BATTLE::boosts( ); // Stat ``boosts'' for the user (if target != user)
-
-        moveFlags m_flags = (moveFlags) 0;
-    };
-
     bool        getMoveName( const u16 p_moveId, const u8 p_language, char* p_out );
     std::string getMoveName( const u16 p_moveId, const u8 p_language );
     std::string getMoveName( const u16 p_moveId );

@@ -40,6 +40,7 @@ namespace BATTLE {
         u8   _background;
         battleMode _mode;
         bool _isWildBattle;
+        battleTrainer* _battleTrainer = nullptr;
 
         u8   _currentLogLine = 0;
 
@@ -103,6 +104,24 @@ namespace BATTLE {
                                  bool p_sentenceStart = true ) const;
 
         /*
+         * @brief: Plays an animation that the pkmn at the specified slot currently has
+         * the specified status condition.
+         */
+        void animateVolatileStatusCondition( bool p_opponent, u8 p_slot, volatileStatus p_status );
+
+        /*
+         * @brief: Plays an animation that the pkmn at the specified slot currently has
+         * the specified status condition.
+         */
+        void animateStatusCondition( bool p_opponent, u8 p_slot, u8 p_status );
+
+        /*
+         * @brief: Runs the animation when the given move is prepared and prints
+         * corresponding log commands.
+         */
+        void prepareMove( bool p_opponent, u8 p_slot, battleMove p_move );
+
+        /*
          * @brief: Initializes and shows the log screen.
          */
         void resetLog( );
@@ -147,20 +166,30 @@ namespace BATTLE {
         void updatePkmnStats( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
 
         /*
+         * @brief: Hides the specified pokemon's stats.
+         */
+        void hidePkmnStats( bool p_opponent, u8 p_pos );
+
+        /*
+         * @brief: Hides the specified pokemon.
+         */
+        void hidePkmn( bool p_opponent, u8 p_pos );
+
+        /*
          * @brief: Updates the pkmn at the specified position (e.g. after a form change)
          */
         void updatePkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
 
         /*
          * @brief: Recalls the given pkmn.
+         * @param p_forced: True if the recall was forced by the trainer
          */
-        void recallPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
+        void recallPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon, bool p_forced = false );
 
         /*
          * @brief: Sends out the given pkmn at the specified position.
          */
-        void sendOutPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon,
-                          battleTrainer* p_trainer = 0 );
+        void sendOutPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
 
         /*
          * @brief: shows the wild pkmn appear
