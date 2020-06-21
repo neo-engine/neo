@@ -139,7 +139,9 @@ void pokemon::battleTransform( ) {
 }
 
 void pokemon::revertBattleTransform( ) {
-    setBattleForme( 0 );
+    if( m_battleForme ) {
+        setBattleForme( 0 );
+    }
 }
 
 void pokemon::recalculateStats( ) {

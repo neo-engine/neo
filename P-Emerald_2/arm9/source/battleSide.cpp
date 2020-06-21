@@ -36,24 +36,4 @@ namespace BATTLE {
     void side::age( battleUI* p_ui ) {
         // TODO
     }
-
-    bool side::addSideCondition( battleUI* p_ui, sideCondition p_sideCondition, u8 p_duration ) {
-        // TODO
-        return false;
-    }
-
-    bool side::removeSideCondition( battleUI* p_ui, sideCondition p_sideCondition ) {
-        // TODO
-        return false;
-    }
-
-    u16 side::computeRecoil( u8 p_slot, u16 p_damage ) {
-        // TODO
-        return 0;
-    }
-
-    bool side::absorbesMove( u8 p_slot, battleMove p_move, u16 p_baseDamage ) {
-        // TODO
-        return false;
-    }
 } // namespace BATTLE

@@ -54,7 +54,8 @@ namespace BATTLE {
             BATTLE_PLAYER_WON   = 1,
             BATTLE_NONE         = 2,
             BATTLE_RUN          = 3,
-            BATTLE_CAPTURE      = 4
+            BATTLE_CAPTURE      = 4,
+            BATTLE_OPPONENT_RAN = 5,
         };
 
       private:

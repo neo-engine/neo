@@ -574,22 +574,23 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"%s withdrew %s.", "%s rief %s zur\xfc""ck."},
     {"%s recharges.", "%s l\xe4""dt sich wieder auf."},
     {"%s became confused.", "%s ist vor Ersch\xf6pfung verwirrt."},
-    {"%s ate its %s. Its confusion vanished.", "%s a\df die %s. Es ist nicht mehr verwirrt."},
-    {"", "Der Sandsturm legt sich.[A]"},
+    {"%s ate its %s. Its confusion vanished.", "%s a\xdf die %s. Es ist nicht mehr verwirrt."},
+    {"%s ate its %s.", "%s a\xdf die %s."},
 
     // 280
 
-    {"", "Das Sonnenlicht wurde wieder normal.[A]"},
-    {"", "Es hat aufgehört zu regnen.[A]"},
-    {"", "Das Sonnenlicht wurde wieder normal.[A]"},
-    {"", "Windstille\x85[A]"},
-    {"", "%s%s ist aufgetaut![A]"},
+    {"%s remains unaffected.", "%s blieb unber\xfchrt."},
+    {"%s passes its %s. The %s found its purpose.",
+        "%s gibt seine %s weiter. Die %s fand ihre Bestimmung."},
+    {"The %s protects %s.", "Die %s sch\xfctzt %s."},
+    {"%s obtained the %s.", "%s erhielt das Item %s."},
+    {"It has no effect on %s|", "Es hat keine Wirkung auf %s|"},
 
-    {"", "%s%s ist gefroren.[A]"},
-    {"", "%s%s ist paralysiert.[A]"},
-    {"", "%s%s bleibt schlafen.[A]"},
-    {"", "%s%s ist aufgewacht![A]"},
-    {"", "%s%s bleibt unbeeindruckt.[A]"},
+    {"It is super effective on %s.", "Es ist sehr effektiv gegen %s."},
+    {"It is not very effective on %s.", "Es ist nicht sehr effektiv gegen %s."},
+    {"%s is hit by the recoil.", "Der R\xfc""cksto\xdf schadet %s."},
+    {"%s restores some HP.", "%s heilt ein paar KP."},
+    {"%s fainted.", "%s wurde besiegt."},
 
     // 290
 
@@ -614,7 +615,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"It failed.", "Es schlug fehl."},
 
     {"%s became fully charged due to its Power Herb!", "Dank Energiekraut ist %s sofort bereit!"},
-    {"", "Der Kampf endet.[A]"},
+    {"%s looses some HP.", "%s verliert ein paar KP."},
     {"%s makes a wish upon its %s.", "%s w\xfcnscht sich St\xe4rke vom %s."},
     {"%s's wish for power was granted!", "Der Wunsch von %s wurde erh\xf6hrt!"},
     {"the wild %s", "%s (wild)"},

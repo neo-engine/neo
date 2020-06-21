@@ -687,6 +687,9 @@ namespace BATTLE {
         u16 centerx = oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_slot ) ].x + 48;
         u16 centery = oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_slot ) ].y + 48;
 
+        u16 scale = 1;
+
+
         if( p_down ) {
             SOUND::playSoundEffect( SFX_BATTLE_DECREASE );
             IO::loadSprite( SPR_STAT_CHANGE_PARTICLE_START_OAM, SPR_STAT_CHANGE_PAL,
@@ -703,6 +706,13 @@ namespace BATTLE {
                                   false, true, OBJPRIORITY_0, false, OBJMODE_BLENDED );
             diff = -1;
             shift = 20;
+        }
+
+        if( !p_opponent ) {
+            centerx += 48;
+            centery += 48;
+            scale = 2;
+            shift *= scale;
         }
 
         constexpr s8 pos[ 15 ][ 2 ] = {
@@ -722,28 +732,48 @@ namespace BATTLE {
             { 19, 5 },
         };
 
-        for( u8 i = 0; i < 15; ++i ) {
+        for( u8 i = 0; i < 14; ++i ) {
             oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM + i ].isHidden = false;
+            if( !p_opponent ) {
+                oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM + i ].isSizeDouble = true;
+                oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM + i ].isRotateScale = true;
+            }
 
             oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM + i ].x = centerx + 3 * pos[ i ][ 0 ] / 2;
             oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM + i ].y
-                = centery + shift + 3 * pos[ i ][ 1 ] / 2;
+                = centery + shift + 3 * scale * pos[ i ][ 1 ] / 2;
         }
         IO::updateOAM( false );
 
         for( u8 j = 0; j < 10; ++j ) {
-            for( u8 i = 0; i < 15; ++i ) {
-                oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM + i ].y += 2 * diff;
+            for( u8 i = 0; i < 14; ++i ) {
+                oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM + i ].y += 2 * diff * scale;
             }
             swiWaitForVBlank( );
             IO::updateOAM( false );
         }
-        for( u8 i = 0; i < 15; ++i ) {
+        for( u8 i = 0; i < 14; ++i ) {
             oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM + i ].isHidden = true;
+            if( !p_opponent ) {
+                oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM + i ].isRotateScale = false;
+            }
         }
         IO::updateOAM( false );
     }
 
+    void battleUI::animateHitPkmn( bool p_opponent, u8 p_pos, u8 p_effectiveness ) {
+        // FIXME: proper sfx
+        if( p_effectiveness > 100 ) { SOUND::playSoundEffect( SFX_BATTLE_DAMAGE_NORMAL ); }
+        else if( p_effectiveness < 100 ) { SOUND::playSoundEffect( SFX_BATTLE_DAMAGE_NORMAL ); }
+        else { SOUND::playSoundEffect( SFX_BATTLE_DAMAGE_NORMAL ); }
+
+        for( u8 f = 0; f < 4; ++f ) {
+            hidePkmn( p_opponent, p_pos );
+            for( u8 i = 0; i < 5; ++i ) { swiWaitForVBlank( ); }
+            showPkmn( p_opponent, p_pos );
+            for( u8 i = 0; i < 5; ++i ) { swiWaitForVBlank( ); }
+        }
+    }
 
     void battleUI::init( ) {
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
@@ -960,7 +990,8 @@ namespace BATTLE {
         log( std::string( buffer ) );
     }
 
-    void battleUI::updatePkmnStats( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {
+    void battleUI::updatePkmnStats( bool p_opponent, u8 p_pos, pokemon* p_pokemon,
+                                    bool p_redraw ) {
         SpriteEntry* oam = IO::OamTop->oamBuffer;
         u16          anchorx
             = oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].x + ( p_opponent ? -88 : 34 );
@@ -974,15 +1005,16 @@ namespace BATTLE {
         IO::smallFont->setColor( 251, 2 );
         // show/hide hp bar
         oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].isHidden
-            = p_pokemon == nullptr || ( p_pos && _mode != DOUBLE ) || !p_pokemon->canBattle( );
-        // clear relevant part of the screen
-        dmaFillWords( 0,
-                      bgGetGfxPtr( IO::bg2 )
-                          + ( oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].y ) * 128,
-                      32 * 256 );
+            = p_pokemon == nullptr || ( p_pos && _mode != DOUBLE );
+        if( p_redraw ) {
+            // clear relevant part of the screen
+            dmaFillWords( 0,
+                          bgGetGfxPtr( IO::bg2 )
+                              + ( oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].y ) * 128,
+                          32 * 256 );
+        }
 
-        if( p_pokemon != nullptr && ( !p_pos || _mode == DOUBLE ) && p_pokemon->canBattle( ) ) {
-
+        if( p_pokemon != nullptr && ( !p_pos || _mode == DOUBLE ) ) {
             // pkmn name
             u16 namewd = IO::regularFont->stringWidth( p_pokemon->m_boxdata.m_name );
             if( namewd > 60 ) {
@@ -1019,26 +1051,12 @@ namespace BATTLE {
                 }
             }
 
-            // hp
-            char buffer[ 10 ];
-            snprintf( buffer, 8, "%3d", p_pokemon->m_stats.m_curHP );
-            IO::smallFont->printString( buffer, anchorx + 96 - 32 - 28, anchory + 9, false );
-            snprintf( buffer, 8, "/%d", p_pokemon->m_stats.m_maxHP );
-            IO::smallFont->printString( buffer, anchorx + 96 - 32 - 4, anchory + 9, false );
-
             // Hp bars
-
-            if( _curHP[ !p_opponent ][ p_pos ] == 101 ) {
-                IO::displayHP( 100, 101, hpx, hpy, HP_COL( p_opponent, p_pos ),
-                               HP_COL( p_opponent, p_pos ) + 1, false );
-                _curHP[ !p_opponent ][ p_pos ] = 100;
+            if( p_redraw ) {
+                IO::displayHP( 0, _curHP[ !p_opponent ][ p_pos ],
+                        hpx, hpy,
+                        HP_COL( p_opponent, p_pos ), HP_COL( p_opponent, p_pos ) + 1, false );
             }
-            IO::displayHP( _curHP[ !p_opponent ][ p_pos ],
-                           100 - p_pokemon->m_stats.m_curHP * 100 / p_pokemon->m_stats.m_maxHP, hpx,
-                           hpy, HP_COL( p_opponent, p_pos ), HP_COL( p_opponent, p_pos ) + 1,
-                           false );
-            _curHP[ !p_opponent ][ p_pos ]
-                = 100 - p_pokemon->m_stats.m_curHP * 100 / p_pokemon->m_stats.m_maxHP;
 
             IO::smallFont->setColor( HP_COL( p_opponent, p_pos ), 1 );
             IO::smallFont->setColor( HP_OUTLINE_COL, 2 );
@@ -1046,6 +1064,31 @@ namespace BATTLE {
             IO::smallFont->printString(
                 GET_STRING( 186 ), oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].x + 10,
                 oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].y - 6, false ); // HP "icon"
+
+            IO::displayHP( _curHP[ !p_opponent ][ p_pos ],
+                    p_pokemon->m_stats.m_curHP * 100 / p_pokemon->m_stats.m_maxHP, hpx,
+                    hpy, HP_COL( p_opponent, p_pos ), HP_COL( p_opponent, p_pos ) + 1,
+                    !p_redraw && _curHP[ !p_opponent ][ p_pos ] );
+            _curHP[ !p_opponent ][ p_pos ] = p_pokemon->m_stats.m_curHP
+                * 100 / p_pokemon->m_stats.m_maxHP;
+
+            IO::smallFont->printString(
+                GET_STRING( 186 ), oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].x + 10,
+                oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].y - 6, false ); // HP "icon"
+
+            // hp
+
+            if( !p_redraw ) {
+                IO::printRectangle( anchorx + 96 - 32 - 28, anchory + 16,
+                                    anchorx + 96 - 6, anchory + 9 + 15, false, 0 );
+            }
+            IO::smallFont->setColor( 250, 1 );
+            IO::smallFont->setColor( 251, 2 );
+            char buffer[ 10 ];
+            snprintf( buffer, 8, "%3d", p_pokemon->m_stats.m_curHP );
+            IO::smallFont->printString( buffer, anchorx + 96 - 32 - 28, anchory + 9, false );
+            snprintf( buffer, 8, "/%d", p_pokemon->m_stats.m_maxHP );
+            IO::smallFont->printString( buffer, anchorx + 96 - 32 - 4, anchory + 9, false );
         }
 
         // Status / shiny
@@ -1139,26 +1182,78 @@ namespace BATTLE {
 
     void battleUI::updatePkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {
         loadPkmnSprite( p_opponent, p_pos, p_pokemon );
-        _curHP[ !p_opponent ][ p_pos ] = 101;
+        _curHP[ !p_opponent ][ p_pos ] = 0;
         updatePkmnStats( p_opponent, p_pos, p_pokemon );
+    }
+
+    void battleUI::showPkmn( bool p_opponent, u8 p_pos ) {
+        SpriteEntry* oam = IO::OamTop->oamBuffer;
+        for( u8 i = 0; i < 4; ++i ) {
+            if( !p_opponent ) {
+                oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isRotateScale = true;
+                oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isSizeDouble = true;
+                oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].rotationIndex = 1;
+            } else {
+                oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isHidden = false;
+            }
+        }
+        for( u8 i = 0; i < 4; ++i ) {
+            oam[ SPR_PKMN_SHADOW_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isRotateScale
+                = true;
+            oam[ SPR_PKMN_SHADOW_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isSizeDouble
+                = true;
+        }
+
+        IO::updateOAM( false );
     }
 
     void battleUI::hidePkmn( bool p_opponent, u8 p_pos ) {
         SpriteEntry* oam = IO::OamTop->oamBuffer;
         for( u8 i = 0; i < 4; ++i ) {
-            oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isHidden = true;
             oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isRotateScale = false;
-            oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isSizeDouble = false;
+            oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isHidden = true;
         }
         for( u8 i = 0; i < 4; ++i ) {
             oam[ SPR_PKMN_SHADOW_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isRotateScale
-                = false;
-            oam[ SPR_PKMN_SHADOW_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isSizeDouble
                 = false;
             oam[ SPR_PKMN_SHADOW_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isHidden = true;
         }
 
         IO::updateOAM( false );
+    }
+
+    void battleUI::faintPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {
+        SpriteEntry* oam = IO::OamTop->oamBuffer;
+        char buffer[ 100 ];
+        SOUND::playSoundEffect( SFX_BATTLE_FAINT );
+
+        for( u8 i = 0; i < 4; ++i ) {
+            oam[ SPR_PKMN_SHADOW_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isRotateScale
+                = false;
+            oam[ SPR_PKMN_SHADOW_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isHidden = true;
+        }
+
+        for( u8 f = 0; f < 24 * ( 1 + !p_opponent ); ++f ) {
+            for( u8 i = 0; i < 4; ++i ) {
+                oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].y += 1;
+            }
+            IO::updateOAM( false );
+            swiWaitForVBlank( );
+        }
+
+        hidePkmn( p_opponent, p_pos );
+        hidePkmnStats( p_opponent, p_pos );
+
+        if( p_pokemon != nullptr ) [[likely]] {
+            snprintf( buffer, 99, GET_STRING( 289 ),
+                    getPkmnName( p_pokemon, p_opponent ).c_str( ) );
+        } else {
+#ifdef DESQUID
+            snprintf( buffer, 99, GET_STRING( 289 ), "[it's a nullptr]" );
+#endif
+        }
+        log( std::string( buffer ) );
+        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
     }
 
     void battleUI::loadPkmnSprite( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {
@@ -1338,7 +1433,7 @@ namespace BATTLE {
         if( p_pokemon->isShiny( ) ) {
             animateShiny( true, 0, p_pokemon->m_boxdata.m_shinyType );
         }
-        _curHP[ 0 ][ 0 ] = 101;
+        _curHP[ 0 ][ 0 ] = 0;
         updatePkmnStats( true, 0, p_pokemon );
     }
 
@@ -1375,7 +1470,7 @@ namespace BATTLE {
             animateShiny( p_opponent, p_pos, p_pokemon->m_boxdata.m_shinyType );
         }
 
-        _curHP[ !p_opponent ][ p_pos ] = 101;
+        _curHP[ !p_opponent ][ p_pos ] = 0;
         updatePkmnStats( p_opponent, p_pos, p_pokemon );
     }
 

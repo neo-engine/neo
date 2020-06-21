@@ -161,9 +161,15 @@ namespace BATTLE {
         void logFrisk( pokemon* p_pokemon, bool p_opponent, std::vector<u16> p_itms );
 
         /*
+         * @brief: Animates that the specified pkmn was hit by an attack with the
+         * specified effectiveness.
+         */
+        void animateHitPkmn( bool p_opponent, u8 p_pos, u8 p_effectiveness );
+
+        /*
          * @brief: Update the stats of the pkmn at the given position.
          */
-        void updatePkmnStats( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
+        void updatePkmnStats( bool p_opponent, u8 p_pos, pokemon* p_pokemon, bool p_redraw = true );
 
         /*
          * @brief: Hides the specified pokemon's stats.
@@ -176,9 +182,19 @@ namespace BATTLE {
         void hidePkmn( bool p_opponent, u8 p_pos );
 
         /*
+         * @brief: Shows the specified pokemon.
+         */
+        void showPkmn( bool p_opponent, u8 p_pos );
+
+        /*
          * @brief: Updates the pkmn at the specified position (e.g. after a form change)
          */
         void updatePkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
+
+        /*
+         * @brief: faints the specified pokemon.
+         */
+        void faintPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
 
         /*
          * @brief: Recalls the given pkmn.

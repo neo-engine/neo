@@ -272,69 +272,71 @@ namespace IO {
                     bool p_delay, u8 p_innerR, u8 p_outerR, bool p_sub ) {
         p_HP = std::max( std::min( (u16) 101, p_HP ), u16( 0 ) );
 
-        if( p_HP > 100 ) {
+        if( 3 * ( p_HPstart ) < 75 ) {
+            BG_PAL( p_sub )[ p_freecolor1 ] = RED;
+            BG_PAL( p_sub )[ p_freecolor2 ] = RED2;
+        } else if( 3 * p_HPstart < 150 ) {
+            BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
+            BG_PAL( p_sub )[ p_freecolor2 ] = YELLOW2;
+        } else {
             BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
             BG_PAL( p_sub )[ p_freecolor2 ] = GREEN2;
-            for( u16 phi = 0; phi < 300; phi++ ) {
+        }
+
+        if( p_HPstart < p_HP ) {
+            // heal
+            for( u16 phi = 3 * p_HPstart; phi <= 3 * p_HP; phi++ ) {
+                if( phi > 294 || phi < 6 ) { continue; }
                 s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
                 s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
                 for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                    u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
+                    u16 nx = p_x + 16 + j * ( x / ( 1.0 * ( 1 << 12 ) ) );
                     u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
-                    if( nx == p_x + 16 + j ) --nx;
+                    // if( nx == p_x + 16 + j ) --nx;
+
                     if( j == p_outerR || j == p_innerR ) {
                         setPixel( nx, ny, p_sub, p_freecolor2 );
                     } else {
                         setPixel( nx, ny, p_sub, p_freecolor1 );
                     }
+
+                    if( phi >= 75 ) {
+                        BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
+                        BG_PAL( p_sub )[ p_freecolor2 ] = YELLOW2;
+                    }
+                    if( phi >= 150 ) {
+                        BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
+                        BG_PAL( p_sub )[ p_freecolor2 ] = GREEN2;
+                    }
                 }
+                if( p_delay && ( phi & 1 ) ) swiWaitForVBlank( );
             }
-        } else {
-            if( 100 - p_HPstart <= p_HP ) {
-                for( u16 phi = 3 * ( 100 - p_HPstart ); phi < 3 * p_HP; phi++ ) {
-                    s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
-                    s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
-                    for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                        u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
-                        u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
-                        if( nx == p_x + 16 + j ) --nx;
+        } else if( p_HPstart > p_HP ) {
+            // damage
+            for( u16 phi = 3 * p_HPstart; phi > 3 * p_HP; phi-- ) {
+                if( phi > 294 || phi < 6 ) { continue; }
+                s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
+                s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
+                for( u16 j = p_innerR; j <= p_outerR; ++j ) {
+                    u16 nx = p_x + 16 + j * ( x / ( 1.0 * ( 1 << 12 ) ) );
+                    u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
+                    // if( nx == p_x + 16 + j ) --nx;
 
-                        setPixel( nx, ny, p_sub, 0 );
-                        if( phi >= 150 ) {
-                            BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
-                            BG_PAL( p_sub )[ p_freecolor2 ] = YELLOW2;
-                        }
-                        if( phi >= 225 ) {
-                            BG_PAL( p_sub )[ p_freecolor1 ] = RED;
-                            BG_PAL( p_sub )[ p_freecolor2 ] = RED2;
-                        }
+                    setPixel( nx, ny, p_sub, 0 );
+                    if( phi < 150 ) {
+                        BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
+                        BG_PAL( p_sub )[ p_freecolor2 ] = YELLOW2;
                     }
-                    if( p_delay ) swiWaitForVBlank( );
-                }
-            } else {
-                for( u16 phi = 3 * ( 100 - p_HPstart ); phi > 3 * p_HP; phi-- ) {
-                    s16 x = isin( degreesToAngle( ( 210 + phi ) % 360 ) );
-                    s16 y = isin( degreesToAngle( ( 120 + phi ) % 360 ) );
-                    for( u16 j = p_innerR; j <= p_outerR; ++j ) {
-                        u16 nx = p_x + 16 - j * ( x / ( 1.0 * ( 1 << 12 ) ) );
-                        u16 ny = p_y + 16 - j * ( y / ( 1.0 * ( 1 << 12 ) ) );
-                        if( nx == p_x + 16 + j ) --nx;
-
-                        setPixel( nx, ny, p_sub, 0 );
-                        if( phi < 225 ) {
-                            BG_PAL( p_sub )[ p_freecolor1 ] = YELLOW;
-                            BG_PAL( p_sub )[ p_freecolor2 ] = YELLOW2;
-                        }
-                        if( phi < 150 ) {
-                            BG_PAL( p_sub )[ p_freecolor1 ] = GREEN;
-                            BG_PAL( p_sub )[ p_freecolor2 ] = GREEN2;
-                        }
+                    if( phi < 75 ) {
+                        BG_PAL( p_sub )[ p_freecolor1 ] = RED;
+                        BG_PAL( p_sub )[ p_freecolor2 ] = RED2;
                     }
-                    if( p_delay ) swiWaitForVBlank( );
                 }
+                if( p_delay && ( phi & 1 ) ) swiWaitForVBlank( );
             }
         }
     }
+
     void displayEP( u16 p_EPstart, u16 p_EP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2,
                     bool p_delay, u8 p_innerR, u8 p_outerR, bool p_sub ) {
         if( p_EPstart >= 100 || p_EP > 100 ) {

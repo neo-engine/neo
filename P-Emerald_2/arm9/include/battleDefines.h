@@ -102,7 +102,7 @@ namespace BATTLE {
 
     typedef std::pair<u8, u8> fieldPosition; // (side, slot)
 
-    constexpr u8 MAX_VOLATILE_STATUS = 57;
+    constexpr u8 MAX_VOLATILE_STATUS = 64;
     enum volatileStatus : u64 {
         NONE             = 0,
         CONFUSION        = ( 1 << 0 ),
@@ -112,14 +112,14 @@ namespace BATTLE {
         OCTOLOCK         = ( 1 << 4 ),  // TODO
         TARSHOT          = ( 1 << 5 ),  // TODO
         NORETREAT        = ( 1 << 6 ),
-        LASERFOCUS       = ( 1 << 7 ),  // TODO
+        LASERFOCUS       = ( 1 << 7 ),
         SPOTLIGHT        = ( 1 << 8 ),  // TODO
         BANEFULBUNKER    = ( 1 << 9 ),  // TODO
         SMACKDOWN        = ( 1 << 10 ), // TODO
         POWDERED         = ( 1 << 11 ), // TODO
         SPIKYSHIELD      = ( 1 << 12 ), // TODO
         KINGSSHIELD      = ( 1 << 13 ), // TODO
-        ELECTRIFY        = ( 1 << 14 ), // TODO
+        ELECTRIFY        = ( 1 << 14 ),
         RAGEPOWDER       = ( 1 << 15 ), // TODO
         TELEKINESIS      = ( 1 << 16 ),
         MAGNETRISE       = ( 1 << 17 ),
@@ -127,11 +127,11 @@ namespace BATTLE {
         GASTROACID       = ( 1 << 19 ), // TODO
         POWERTRICK       = ( 1 << 20 ), // TODO
         HEALBLOCK        = ( 1 << 21 ),
-        EMBARGO          = ( 1 << 22 ), // TODO
+        EMBARGO          = ( 1 << 22 ),
         MIRACLEEYE       = ( 1 << 23 ), // TODO
         SUBSTITUTE       = ( 1 << 24 ), // TODO
         BIDE             = ( 1 << 25 ), // TODO
-        FOCUSENERGY      = ( 1 << 26 ), // TODO
+        FOCUSENERGY      = ( 1 << 26 ),
         DEFENSECURL      = ( 1 << 27 ), // TODO
         MINIMIZE         = ( 1 << 28 ), // TODO
         LEECHSEED        = ( 1 << 29 ), // TODO
@@ -162,6 +162,10 @@ namespace BATTLE {
         ROOST            = ( 1LLU << 54 ),
         BURNUP           = ( 1LLU << 55 ),
         REPLACETYPE      = ( 1LLU << 56 ),
+        DIVING           = ( 1LLU << 57 ),
+        INAIR            = ( 1LLU << 58 ),
+        DIGGING          = ( 1LLU << 59 ),
+        INVISIBLE        = ( 1LLU << 60 ),
     };
 
     enum weather : u8 {
@@ -198,7 +202,7 @@ namespace BATTLE {
     };
 
     constexpr u8 MAX_SIDE_CONDITIONS = 15;
-    enum sideCondition : u16 {
+    enum sideCondition : u32 {
         NO_SIDE_CONDITION = 0,
         CRAFTYSHIELD      = ( 1 << 0 ),
         STICKYWEB         = ( 1 << 1 ),
@@ -310,7 +314,7 @@ namespace MOVE {
         /** Self-Switch: User switches after successful use */
         SELFSWITCH = ( 1 << 25 ),
         /** Use source defensive stats as offensive stats */
-        DEFASOFF = ( 1 << 26 ), // TODO
+        DEFASOFF = ( 1 << 26 ),
         /** User is damaged if the attack misses */
         CRASHDAMAGE = ( 1 << 27 ), // TODO
         /** OHKO move */
@@ -376,36 +380,36 @@ namespace MOVE {
     };
 
     struct moveData {
-        type        m_type        = UNKNOWN;         // ???
-        contestType m_contestType = NO_CONTEST_TYPE; // Clever, Smart, ...
+        type        m_type    : 8     = UNKNOWN;         // ???
+        contestType m_contestType : 8 = NO_CONTEST_TYPE; // Clever, Smart, ...
         u8          m_basePower   = 0;
         u8          m_pp          = 1;
 
-        moveHitTypes m_category          = (moveHitTypes) 0;
-        moveHitTypes m_defensiveCategory = (moveHitTypes) 0; // category used for defending pkmn
+        moveHitTypes m_category  : 8        = (moveHitTypes) 0;
+        moveHitTypes m_defensiveCategory : 8 = (moveHitTypes) 0; // category used for defending pkmn
         u8           m_accuracy          = 0;                // 255: always hit
         s8           m_priority          = 0;
 
-        BATTLE::sideCondition m_sideCondition
+        BATTLE::sideCondition m_sideCondition : 32
             = BATTLE::NO_SIDE_CONDITION; // side introduced by the move (reflect, etc)
 
-        BATTLE::weather       m_weather = BATTLE::NO_WEATHER; // weather introduced by the move
-        BATTLE::pseudoWeather m_pseudoWeather
+        BATTLE::weather       m_weather : 8 = BATTLE::NO_WEATHER; // weather introduced by the move
+        BATTLE::pseudoWeather m_pseudoWeather : 8
             = BATTLE::NO_PSEUDO_WEATHER;                // pseudo weather introduced by the move
-        BATTLE::terrain m_terrain = BATTLE::NO_TERRAIN; // terrain introduced by the move
+        BATTLE::terrain m_terrain : 8 = BATTLE::NO_TERRAIN; // terrain introduced by the move
         u8              m_status  = 0;
 
-        BATTLE::slotCondition m_slotCondition
+        BATTLE::slotCondition m_slotCondition : 8
             = (BATTLE::slotCondition) 0; // stuff introduced on the slot (wish, etc)
         u8     m_fixedDamage    = 0;
-        target m_target         = (target) 0;
-        target m_pressureTarget = (target) 0; // restrictions are computed based on different target
+        target m_target     : 8    = (target) 0;
+        target m_pressureTarget : 8 = (target) 0; // restrictions are computed based on different target
                                               // than resulting effect
 
         u8 m_heal     = 0; // as m_heal / 240
         u8 m_recoil   = 0; // as dealt damage * m_recoil / 240
         u8 m_drain    = 0; // as dealt damage * m_recoil / 240
-        u8 m_multiHit = 0; // as ( min << 8 ) | max
+        u8 m_multiHit = 0; // as ( min << 4 ) | max
 
         u8 m_critRatio       = 1;
         u8 m_secondaryChance = 0; // chance that the secondary effect triggers
@@ -423,6 +427,14 @@ namespace MOVE {
             = BATTLE::boosts( ); // Stat ``boosts'' for the user (if target != user)
 
         moveFlags m_flags = (moveFlags) 0;
+
+        constexpr u8 getMultiHitMin( ) const {
+            return m_multiHit >> 4;
+        }
+
+        constexpr u8 getMultiHitMax( ) const {
+            return m_multiHit & ( ( 1 << 4 ) - 1 );
+        }
     };
 } // namespace MOVE
 

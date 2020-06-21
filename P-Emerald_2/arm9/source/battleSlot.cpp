@@ -36,29 +36,4 @@ namespace BATTLE {
     void slot::age( battleUI* p_ui ) {
         // TODO
     }
-
-    boosts slot::addBoosts( boosts p_boosts, bool p_allowAbilities ) {
-        if( getPkmn( ) == nullptr ) { return boosts( ); }
-
-        if( p_allowAbilities && getPkmn( )->getAbility( ) == A_CONTRARY ) {
-            p_boosts.invert( );
-        }
-
-        return _boosts.addBoosts( p_boosts );
-    }
-
-    bool slot::resetBoosts( battleUI* p_ui ) {
-        // TODO
-        return false;
-    }
-
-    u16 slot::computeRecoil( u16 p_damage ) {
-        // TODO
-        return 0;
-    }
-
-    bool slot::absorbesMove( battleMove p_move, u16 p_baseDamage ) {
-        // TODO
-        return false;
-    }
 } // namespace BATTLE

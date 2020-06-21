@@ -60,10 +60,32 @@ namespace BATTLE {
             std::memset( _sideConditionCounter, 0, sizeof( _sideConditionCounter ) );
         }
 
+        inline slot* getSlot( u8 p_slot ) {
+            return &_slots[ p_slot ];
+        }
+
+        constexpr slot::status getSlotStatus( u8 p_slot ) const {
+            return _slots[ p_slot ].getSlotStatus( );
+        }
+
         /*
          * Ages the side by one turn, processes all changes
          */
         void age( battleUI* p_ui );
+
+        /*
+         * @brief: Sets the type of the specified pkmn.
+         */
+        inline void setType( u8 p_slot, type p_type ) {
+            return _slots[ p_slot ].setType( p_type );
+        }
+
+        /*
+         * @brief: Sets the extra type of the specified pkmn.
+         */
+        inline void setExtraType( u8 p_slot, type p_type ) {
+            return _slots[ p_slot ].setExtraType( p_type );
+        }
 
         /*
          * @brief: Returns a list of all types the pkmn currently has. May be empty
@@ -85,9 +107,36 @@ namespace BATTLE {
          * @param p_duration: The duration of the condition in turns. (0 for the
          * defauls amount)
          */
-        bool addSideCondition( battleUI* p_ui, sideCondition p_sideCondition, u8 p_duration = 0 );
+        constexpr bool addSideCondition( sideCondition p_sideCondition, u8 p_duration = 0 ) {
+            for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
+                if( p_sideCondition & ( 1 << i ) ) {
+                    _sideConditionAmount[ i ]++;
+                    _sideConditionCounter[ i ] = p_duration;
+                }
+            }
+            return true;
+        }
 
-        bool removeSideCondition( battleUI* p_ui, sideCondition p_sideCondition );
+        constexpr bool removeSideCondition( sideCondition p_sideCondition ) {
+            for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
+                if( p_sideCondition & ( 1 << i ) ) {
+                    _sideConditionAmount[ i ] = 0;
+                    _sideConditionCounter[ i ] = 0;
+                }
+            }
+            return true;
+        }
+
+
+        constexpr sideCondition getSideCondition( ) const {
+            sideCondition res = sideCondition( 0 );
+            for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
+                if( _sideConditionAmount[ i ] ) {
+                    res = sideCondition( res | ( 1 << i ) );
+                }
+            }
+            return res;
+        }
 
         /*
          * @brief: returns the volatile statuses of the pkmn in the given slot.
@@ -135,37 +184,6 @@ namespace BATTLE {
             return _slots[ p_slot ].hasStatusCondition( p_status );
         }
 
-
-        battleMove computeBattleMove( u8 p_slot, battleMoveSelection& p_usersSelection,
-                                      const std::vector<battleMoveSelection>&
-                                      p_targetsSelecotions );
-
-        /*
-         * @brief: Computes the base damage dealt to each target
-         * @param p_targetsMoves: Moves of the targets of the user's move.
-         * @param p_targetedMoves: Moves that target the user.
-         */
-        std::vector<s16> computeDamageDealt( u8 p_slot, battleMove p_usersMove,
-                                             const std::vector<battleMove>& p_targetsMoves,
-                                             const std::vector<battleMove>& p_targetedMoves );
-
-        /*
-         * @brief: Computes the actual damage taken by the specified move.
-         */
-        s16 computeDamageTaken( u8 p_slot, battleMove p_move, u16 p_baseDamage );
-
-        /*
-         * @brief: Computes the recoil the pokemon in the slot would do if hit by the
-         * given amount of damage.
-         */
-        u16 computeRecoil( u8 p_slot, u16 p_damage );
-
-        /*
-         * @brief: Checks whether the pokemon in this slot absorbs the given move
-         * (e.g. due to rage powder / storm drain / etc.)
-         */
-        bool absorbesMove( u8 p_slot, battleMove p_move, u16 p_baseDamage );
-
         /*
          * @brief: Sends out a new pokemon to an EMPTY slot.
          */
@@ -185,6 +203,10 @@ namespace BATTLE {
             return _slots[ p_slot ].getPkmn( );
         }
 
+        constexpr u8 getConsecutiveMoveCount( u8 p_slot ) const {
+            return _slots[ p_slot ].getConsecutiveMoveCount( );
+        }
+
         /*
          * @brief: Adds the specified boost to the specified pkmn, returns true iff
          * successful
@@ -192,8 +214,8 @@ namespace BATTLE {
         boosts addBoosts( u8 p_slot, boosts p_boosts, bool p_allowAbilities = true ) {
             return _slots[ p_slot ].addBoosts( p_boosts, p_allowAbilities );
         }
-        bool   resetBoosts( battleUI* p_ui, u8 p_slot ) {
-            return _slots[ p_slot ].resetBoosts( p_ui );
+        bool   resetBoosts( u8 p_slot ) {
+            return _slots[ p_slot ].resetBoosts( );
         }
         inline boosts getBoosts( u8 p_slot ) const {
             return _slots[ p_slot ].getBoosts( );
@@ -203,7 +225,7 @@ namespace BATTLE {
          * @brief: Transforms the pkmn at the specified position to the specified pkmn.
          * @returns: true iff the transformation succeeded.
          */
-        inline bool transformPkmn( u8 p_slot, pokemon* p_target ) {
+        inline bool transformPkmn( u8 p_slot, slot* p_target ) {
             return _slots[ p_slot ].transformPkmn( p_target );
         }
 
@@ -261,6 +283,10 @@ namespace BATTLE {
             _slots[ p_slot ].setLastUsedMove( p_move );
         }
 
+        inline battleMove getLastUsedMove( u8 p_slot ) const {
+            return _slots[ p_slot ].getLastUsedMove( );
+        }
+
         /*
          * @brief: Faints the specified pokemon. Also deals the necessary damage.
          */
@@ -295,16 +321,19 @@ namespace BATTLE {
          * applied). (HP: 0, ATK 1, etc)
          */
         constexpr u16 getStat( u8 p_slot, u8 p_stat,
-                               bool p_allowAbilities = true ) {
+                               bool p_allowAbilities = true,
+                               bool p_ignoreNegative = false, bool p_ignorePositive = false ) {
             if( getPkmn( p_slot ) == nullptr ) [[unlikely]] { return 0; }
-            u16 base = _slots[ p_slot ].getStat( p_stat, p_allowAbilities );
+            u16 base = _slots[ p_slot ].getStat( p_stat, p_allowAbilities,
+                                                 p_ignoreNegative, p_ignorePositive );
 
-            if( p_stat == SPEED && _sideConditionAmount[ 8 ] ) [[unlikely]] { // Tailwind
+            if( !p_ignorePositive && p_stat == SPEED
+                    && _sideConditionAmount[ 8 ] ) [[unlikely]] { // Tailwind
                 base *= 2;
             }
 
             // plus / minus
-            if( p_allowAbilities ) [[likely]] {
+            if( p_allowAbilities && !p_ignorePositive ) [[likely]] {
                 if( p_stat == SATK && ( getPkmn( p_slot )->getAbility( ) == A_PLUS
                         || getPkmn( p_slot )->getAbility( ) == A_MINUS ) ) [[unlikely]] {
                     auto ot = getPkmn( !p_slot );
@@ -358,15 +387,22 @@ namespace BATTLE {
         /*
          * @brief: Checks whether the pokemon can use an item (from the bag).
          */
-        constexpr bool canUseItem( u8 p_slot ) const {
-            return _slots[ p_slot ].canUseItem( );
+        constexpr bool canUseItem( u8 p_slot, bool p_allowAbilities = true ) {
+            return _slots[ p_slot ].canUseItem( p_allowAbilities );
+        }
+
+        /*
+         * @brief: Gives the specified item to the specified pkmn.
+         */
+        inline void giveItem( u8 p_slot, u16 p_item ) {
+            _slots[ p_slot ].giveItem( p_item );
         }
 
         /*
          * @brief: Removes any held item.
          */
-        constexpr void removeItem( u8 p_slot ) {
-            _slots[ p_slot ].removeItem( );
+        inline void removeItem( u8 p_slot, bool p_used = true ) {
+            _slots[ p_slot ].removeItem( p_used );
         }
 
         /*

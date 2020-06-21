@@ -77,6 +77,9 @@ constexpr u8 TypeEffectiveness[ 19 ][ 19 ] = {
     {100, 200, 100, 50, 100, 100, 100, 100, 50, 75, 100, 50, 100, 100, 100, 100, 200, 200, 100}      // Fairy
 };
 
-constexpr u8 getEffectiveness( const type& p_t1, const type& p_t2 ) { // t1 is moving
+/*
+ * @brief: Computes how effective a move of type p_t1 is on a pkmn of type p_t2
+ */
+constexpr u8 getTypeEffectiveness( type p_t1, type p_t2 ) { // t1 is moving
     return TypeEffectiveness[ (int) p_t1 ][ (int) p_t2 ];
 }

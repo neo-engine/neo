@@ -198,6 +198,7 @@ namespace BATTLE {
                     selection.push_back( moves[ i ][ j ] );
                 }
 #ifdef DESQUID
+/*
             for( u8 i = 0; i < selection.size( ); ++i ) {
                 _battleUI.log( "Move sel " + std::to_string( i )
                         + " tp: " + std::to_string( u16( selection[ i ].m_type ) )
@@ -208,11 +209,13 @@ namespace BATTLE {
 //                        + " tg: " + std::to_string( selection[ i ].m_target.first )
 //                        + ", " + std::to_string( selection[ i ].m_target.second ) );
             }
+            */
 #endif
 
-            auto sortedMoves = _field.computeSortedBattleMoves( selection );
+            auto sortedMoves = _field.computeSortedBattleMoves( &_battleUI, selection );
 
 #ifdef DESQUID
+            /*
             _battleUI.log( "Sorting done" );
             for( u8 i = 0; i < sortedMoves.size( ); ++i ) {
                 _battleUI.log( "Move sel " + std::to_string( i )
@@ -227,6 +230,7 @@ namespace BATTLE {
                         );
             }
             for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+            */
 #endif
 
             for( size_t i = 0; i < sortedMoves.size( ); ++i ) {
@@ -302,6 +306,11 @@ namespace BATTLE {
                 if( sortedMoves[ i ].m_type == battleMoveType::USE_ITEM ) {
                     useItem( sortedMoves[ i ].m_user, sortedMoves[ i ].m_param );
                 }
+
+                if( endConditionHit( battleEnd ) ) {
+                    endBattle( battleEnd );
+                    return battleEnd;
+                }
             }
             _field.age( &_battleUI );
 
@@ -341,6 +350,7 @@ namespace BATTLE {
                 _battleUI.sendOutPkmn( !i, j, ( i ? &_playerTeam[ j ] : &_opponentTeam[ j ] ) );
                 _field.setSlot( !i, j, ( i ? &_playerTeam[ j ] : &_opponentTeam[ j ] ) );
             }
+
         _field.init( &_battleUI );
 
         for( u8 i = 0; i < 2; ++i )
@@ -354,7 +364,7 @@ namespace BATTLE {
         res.m_moveData = MOVE::getMoveData( res.m_param );
 
         if( _policy.m_mode == SINGLE ) {
-            switch( res.m_moveData.m_type ) {
+            switch( res.m_moveData.m_target ) {
                 case MOVE::ANY:
                 case MOVE::ANY_FOE:
                 case MOVE::ALL_FOES_AND_ALLY:
@@ -608,12 +618,6 @@ namespace BATTLE {
                 for( u8 i = 0; i < 4; ++i ) {
                     canUse[ i ] = _field.canSelectMove( true, p_slot, i );
                     str = str || canUse[ i ];
-#ifdef DESQUID
-                    if( !canUse[ i ] ) {
-                        _battleUI.log( " Can't select " + MOVE::getMoveName(
-                                    _field.getPkmn( true, p_slot )->getMove( i ) ) );
-                    }
-#endif
                 }
 
                 if( !str ) { // pkmn struggles
@@ -626,6 +630,7 @@ namespace BATTLE {
 
                 // Pick a random target
                 auto mdata = MOVE::getMoveData( res.m_param );
+                res.m_moveData = mdata;
                 auto tg = mdata.m_pressureTarget != MOVE::NO_TARGET
                     ? mdata.m_pressureTarget : mdata.m_target;
 
@@ -656,8 +661,47 @@ namespace BATTLE {
     }
 
     bool battle::endConditionHit( battle::battleEndReason& p_out ) {
-        // TODO
-        (void) p_out;
+        if( _isWildBattle && _field.getSlotStatus( true, 0 ) == slot::FAINTED ) {
+            // distribute exp
+            // TODO
+            p_out = battleEndReason::BATTLE_PLAYER_WON;
+            return true;
+        }
+        if( _isWildBattle && _field.getSlotStatus( true, 0 ) == slot::RECALLED ) {
+            // wild pkmn fled
+            p_out = battleEndReason::BATTLE_OPPONENT_RAN;
+            return true;
+        }
+
+        if( _round >= _maxRounds && _maxRounds ) {
+            p_out = battleEndReason::BATTLE_ROUND_LIMIT;
+            return true;
+        }
+
+        // Check amount of non-koed PKMN
+        // PLAYER
+        u8 pkmnCnt = 0;
+        for( u8 i = 0; i < _playerTeamSize; ++i ) {
+            if( _playerTeam[ _playerPkmnPerm[ i ] ].canBattle( ) ) {
+                pkmnCnt++;
+            }
+        }
+        if( !pkmnCnt ) {
+            p_out = battleEndReason::BATTLE_OPPONENT_WON;
+            return true;
+        }
+
+        // OPPONENT
+        pkmnCnt = 0;
+        for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+            if( _opponentTeam[ _opponentPkmnPerm[ i ] ].canBattle( ) ) {
+                pkmnCnt++;
+            }
+        }
+        if( !pkmnCnt ) {
+            p_out = battleEndReason::BATTLE_PLAYER_WON;
+            return true;
+        }
 
         return false;
     }
